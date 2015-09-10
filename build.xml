@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." name="PAWS Base run build jar" default="build_jar">
+
+<!--	comment out to make false
+	<property name="include_svn_info" value="true"/>
+-->		
+		
+	<property name="java_target" value="1.7"/>
+	<property name="java_source" value="1.7"/>
+		
+	<property name="java.source.character.set" value="iso-8859-1"/>
+	
+
+		
+	<property name="output_jar" value="proxl_base.jar"/>
+	
+    <property name="deploy" value="deploy" />
+    <property name="config" value="resources" />
+
+	<property name="src" value="src" />
+	<property name="classes" value="classes" />	
+
+	
+	
+			
+			
+	
+	<!-- ================================================================================== -->
+	<!-- user defined values can be defined in build.properties -->
+	<!-- ================================================================================== -->
+	<property file="${basedir}${file.separator}build.properties" />
+	
+	<!-- ================================================================================== -->
+  	<!-- PRINT HELP -->
+	<!-- ================================================================================== -->
+	<target name="help"   description="print this help">
+		<exec executable="ant">
+	   		<arg value="-p"/>
+	  	</exec>
+	</target>
+
+	
+	<!-- ================================================================================== -->
+	<!-- Create a Manifest.MF file with the SVN info -->
+	<!-- ================================================================================== -->
+	<target name="manifest" depends="prepare">
+		<manifest file="${basedir}/MANIFEST.MF">
+			<attribute name="Date" value="${build-info.current-date}" />
+			<attribute name="Time" value="${build-info.current-time}" />
+		</manifest>
+	</target>
+	
+	<!-- Check timestamp on files -->
+    <target name="prepare">
+    	<tstamp prefix="build-info">
+			<format property="current-date" pattern="d-MMMM-yyyy" locale="en" />
+			<format property="current-time" pattern="hh:mm:ss a z" locale="en" />
+			<format property="year-month-day" pattern="yyyy-MM-dd" locale="en" />
+		</tstamp>
+
+    </target>
+	
+	<!-- ================================================================================== -->
+	<!-- Build the jar -->
+	<!-- ================================================================================== -->
+	<target name="build_jar" depends="compile,manifest"
+			description="Packages the project as a jar file">
+		
+		
+		<!-- exclude everything in the default package-->
+		<jar destfile="${basedir}${file.separator}${deploy}${file.separator}${output_jar}" 
+			basedir="${basedir}${file.separator}${classes}"
+			manifest="${basedir}/MANIFEST.MF">
+
+			<!--  			excludes="*.*"  --> 
+			
+		</jar>
+		
+
+	  	<copy file="${deploy}/${output_jar}" todir="../generated_jars" />
+
+		
+	</target>
+	
+	<!-- ================================================================================== -->
+	<!-- Clean the build directory -->
+	<!-- ================================================================================== -->
+    <target name="clean" description="Prepare for clean build">
+      <delete dir="${classes}"/>
+      <mkdir  dir="${classes}"/>
+      <delete dir="${deploy}" />
+      <mkdir  dir="${deploy}"/>
+    </target>
+	
+	<!-- ================================================================================== -->
+	<!-- Normal build of application -->
+	<!-- ================================================================================== -->
+    <target name="compile" depends="clean">
+    	<!-- <echo message="${toString:compile.classpath}"/> -->
+        <javac debug="on" srcdir="src" destdir="${classes}" source="${java_source}" target="${java_target}"  encoding="${java.source.character.set}" >
+            <classpath refid="compile.classpath"/>
+        </javac>
+
+	<!--
+  	<copy  todir="${classes}">
+
+	</copy>
+  	-->
+
+  	  	<copy  todir="${classes}">
+  	  		
+  		    <fileset dir="${src}">
+  				<exclude name="**/*.java" />
+  		    </fileset>
+  		</copy>
+  		
+    </target>
+	
+	<!-- classpath  -->
+    <path id="compile.classpath">
+    	<fileset dir="lib">
+        	<include name="**/*.jar"/>
+      	</fileset>
+    </path>
+		
+
+</project>
