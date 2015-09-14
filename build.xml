@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." name="PAWS Base run build jar" default="build_jar">
+<project basedir="." name="Proxl Base run build jar" default="build_jar">
 
 <!--	comment out to make false
 	<property name="include_svn_info" value="true"/>

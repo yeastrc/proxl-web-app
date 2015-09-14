@@ -127,7 +127,7 @@ public class DBConnectionFactory  {
 				conn = ds.getConnection();
 				if (conn != null) {
 					
-					boolean connectionAutoCommit = conn.getAutoCommit();
+//					boolean connectionAutoCommit = conn.getAutoCommit();
 
 					return conn;
 				} else {

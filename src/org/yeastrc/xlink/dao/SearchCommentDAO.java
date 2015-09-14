@@ -219,7 +219,8 @@ public class SearchCommentDAO {
 			pstmt.setInt( 2, item.getAuthUserId() );
 			pstmt.setInt( 3, item.getId() );
 			
-			int updatedRowCount = pstmt.executeUpdate();
+//			int updatedRowCount = 
+			pstmt.executeUpdate();
 			
 			
 			

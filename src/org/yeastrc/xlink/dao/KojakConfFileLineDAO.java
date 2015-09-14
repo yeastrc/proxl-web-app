@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
  * Table kojak_conf_file

@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.NRProteinDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 
 public class XLinkUtils {
 	
-	private static final Logger log = Logger.getLogger(XLinkUtils.class);
+//	private static final Logger log = Logger.getLogger(XLinkUtils.class);
 
 	public static final int TYPE_UNLINKED  = 0;
 	public static final int TYPE_MONOLINK  = 1;
