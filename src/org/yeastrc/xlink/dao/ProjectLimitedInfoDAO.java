@@ -46,7 +46,7 @@ public class ProjectLimitedInfoDAO {
 			
 			if ( rs.next() ) {
 				
-				isProjectEnabled = rs.getBoolean( "project_locked" );
+				isProjectEnabled = rs.getBoolean( "enabled" );
 			}
 			
 
@@ -106,7 +106,7 @@ public class ProjectLimitedInfoDAO {
 			
 			if ( rs.next() ) {
 				
-				isProjectMarkedForDeletion = rs.getBoolean( "project_locked" );
+				isProjectMarkedForDeletion = rs.getBoolean( "marked_for_deletion" );
 			}
 			
 
