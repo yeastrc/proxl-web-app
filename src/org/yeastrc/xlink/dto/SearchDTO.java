@@ -1,6 +1,11 @@
 package org.yeastrc.xlink.dto;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+
+
 
 
 
@@ -11,6 +16,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.yeastrc.xlink.dao.SearchFileDAO;
 import org.yeastrc.xlink.searchers.SearchCommentSearcher;
+import org.yeastrc.xlink.searchers.SearchLinkerSearcher;
 import org.yeastrc.xlink.searchers.SearchWebLinksSearcher;
 
 
@@ -70,20 +76,7 @@ public class SearchDTO implements Comparable<SearchDTO> {
 		}
 	}
 	
-	
-// DJJ added --> @XmlTransient
 	public List<SearchCommentDTO> getComments() throws Exception {
-		
-		//  FAKE for exception handling testing
-//		if ( true ) {
-//			
-//			String msg = "getComments() is called:  id: " + id;
-//			
-//			log.error( msg );
-//			
-//			throw new Exception( msg );
-//			
-//		}
 		
 		try {
 			return SearchCommentSearcher.getInstance().getCommentsForSearch( this );
@@ -99,32 +92,55 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	}
 
 	
-	// DJJ added --> @XmlTransient
-		public List<SearchWebLinksDTO> getWebLinks() throws Exception {
-			
-			//  FAKE for exception handling testing
-//			if ( true ) {
-//				
-//				String msg = "getWebLinks() is called:  id: " + id;
-//				
-//				log.error( msg );
-//				
-//				throw new Exception( msg );
-//				
-//			}
-			
-			try {
-				return SearchWebLinksSearcher.getInstance().getWebLinksForSearch(this);
-				
-			} catch ( Exception e ) {
-				
-				String msg = "Exception caught in getWebLinks(): " + e.toString();
-				
-				log.error( msg, e );
-				
-				throw e;
-			}
+	public List<SearchWebLinksDTO> getWebLinks() throws Exception {
+
+		try {
+			return SearchWebLinksSearcher.getInstance().getWebLinksForSearch(this);
+
+		} catch ( Exception e ) {
+
+			String msg = "Exception caught in getWebLinks(): " + e.toString();
+
+			log.error( msg, e );
+
+			throw e;
 		}
+	}
+	
+	
+	public List<LinkerDTO> getLinkersSorted() throws Exception {
+
+		List<LinkerDTO> linkers = getLinkers();
+		
+		//  sort on the names
+		
+		Collections.sort( linkers, new Comparator<LinkerDTO>() { 
+
+			@Override
+			public int compare(LinkerDTO o1, LinkerDTO o2) {
+
+				return o1.getName().compareTo( o2.getName() );
+		
+			}
+		} );
+		
+		return linkers;
+	}
+	
+	public List<LinkerDTO> getLinkers() throws Exception {
+
+		try {
+			return SearchLinkerSearcher.getInstance().getLinkersForSearch(this);
+
+		} catch ( Exception e ) {
+
+			String msg = "Exception caught in getLinkers(): " + e.toString();
+
+			log.error( msg, e );
+
+			throw e;
+		}
+	}	
 
 	
 //	public String getName() {
