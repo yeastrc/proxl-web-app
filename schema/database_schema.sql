@@ -1600,6 +1600,114 @@ CREATE INDEX `default_page_view_search_id_fk_idx` ON `default_page_view` (`searc
 CREATE INDEX `default_page_view_auth_user_id_fk_idx` ON `default_page_view` (`auth_user_id` ASC);
 
 
+-- -----------------------------------------------------
+-- Table `search_for_xlinks_file`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `search_for_xlinks_file` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_id` INT UNSIGNED NOT NULL,
+  `filename` VARCHAR(255) NOT NULL,
+  `path` VARCHAR(2000) NOT NULL,
+  `sha1sum` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `search_for_xlinks_file_search_id`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `filename` ON `search_for_xlinks_file` (`filename` ASC);
+
+CREATE INDEX `search_for_xlinks_file_search_id_idx` ON `search_for_xlinks_file` (`search_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `search_for_xlinks_psm`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `search_for_xlinks_psm` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `file_id` INT UNSIGNED NOT NULL,
+  `psm_id` INT UNSIGNED NOT NULL,
+  `data_key` VARCHAR(255) NOT NULL,
+  `value` VARCHAR(4000) NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `search_for_xlinks_psm_psm_id_fk`
+    FOREIGN KEY (`psm_id`)
+    REFERENCES `psm` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `search_for_xlinks_psm_file_id`
+    FOREIGN KEY (`file_id`)
+    REFERENCES `search_for_xlinks_file` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `search_for_xlinks_psm_psm_id_fk_idx` ON `search_for_xlinks_psm` (`psm_id` ASC);
+
+CREATE INDEX `search_for_xlinks_psm_file_id_idx` ON `search_for_xlinks_psm` (`file_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `search_for_xlinks_params_file`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `search_for_xlinks_params_file` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_for_xlinks_file_id` INT UNSIGNED NOT NULL,
+  `filename` VARCHAR(255) NOT NULL,
+  `path` VARCHAR(2000) NOT NULL,
+  `sha1sum` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `search_for_xlinks_file_search_for_xlinks_file_id`
+    FOREIGN KEY (`search_for_xlinks_file_id`)
+    REFERENCES `search_for_xlinks_file` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `filename` ON `search_for_xlinks_params_file` (`filename` ASC);
+
+CREATE INDEX `search_for_xlinks_file_search_for_xlinks_file_id_idx` ON `search_for_xlinks_params_file` (`search_for_xlinks_file_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `search_for_xlinks_params_key_value`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `search_for_xlinks_params_key_value` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `file_id` INT UNSIGNED NOT NULL,
+  `data_key` VARCHAR(255) NOT NULL,
+  `value` VARCHAR(4000) NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `search_for_xlinks_params_key_value_file_id`
+    FOREIGN KEY (`file_id`)
+    REFERENCES `search_for_xlinks_params_file` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `search_for_xlinks_params_key_value_file_id_idx` ON `search_for_xlinks_params_key_value` (`file_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `search_for_xlinks_params_line`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `search_for_xlinks_params_line` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `file_id` INT UNSIGNED NOT NULL,
+  `line` VARCHAR(4000) NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `search_for_xlinks_params_line_file_id`
+    FOREIGN KEY (`file_id`)
+    REFERENCES `search_for_xlinks_params_file` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `search_for_xlinks_params_key_value_file_id_idx` ON `search_for_xlinks_params_line` (`file_id` ASC);
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
