@@ -6,8 +6,9 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+
+import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
@@ -17,7 +18,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class ScanIdFromScanFileIdScanNumberSearcher {
 
-	private static final Log log = LogFactory.getLog(ScanIdFromScanFileIdScanNumberSearcher.class);
+	private static final Logger log = Logger.getLogger(ScanIdFromScanFileIdScanNumberSearcher.class);
 	
 	private ScanIdFromScanFileIdScanNumberSearcher() { }
 	private static final ScanIdFromScanFileIdScanNumberSearcher _INSTANCE = new ScanIdFromScanFileIdScanNumberSearcher();
