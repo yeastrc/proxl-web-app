@@ -305,7 +305,7 @@ public class PsmDAO {
 			if ( psm.isChargeSet() ) {
 				pstmt.setInt( counter, psm.getCharge() );
 			} else {
-				pstmt.setInt( counter, java.sql.Types.INTEGER );
+				pstmt.setNull( counter, java.sql.Types.INTEGER );
 			}
 			
 			pstmt.executeUpdate();

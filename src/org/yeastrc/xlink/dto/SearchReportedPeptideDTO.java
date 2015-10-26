@@ -4,7 +4,7 @@ package org.yeastrc.xlink.dto;
 	CREATE TABLE search_reported_peptide (
 		search_id INT UNSIGNED NOT NULL,
 		reported_peptide_id INT UNSIGNED NOT NULL,
-		q_value DOUBLE NOT NULL,
+		q_value DOUBLE NULL DEFAULT NULL,
 	);
  */
 public class SearchReportedPeptideDTO {
@@ -12,18 +12,15 @@ public class SearchReportedPeptideDTO {
 	
 	private int searchId;
 	private int reportedPeptideId;
-	private double qValue;
-	
-	
+	private Double qValue;
 
 	
 	@Override
 	public String toString() {
 		return "SearchReportedPeptideDTO [searchId=" + searchId
-				+ ", reportedPeptideId=" + reportedPeptideId + ", qValue="
-				+ qValue + "]";
+				+ ", reportedPeptideId=" + reportedPeptideId
+				+ ", qValue=" + qValue + "]";
 	}
-	
 	
 	
 	public int getSearchId() {
@@ -38,10 +35,11 @@ public class SearchReportedPeptideDTO {
 	public void setReportedPeptideId(int reportedPeptideId) {
 		this.reportedPeptideId = reportedPeptideId;
 	}
-	public double getqValue() {
+
+	public Double getqValue() {
 		return qValue;
 	}
-	public void setqValue(double qValue) {
+	public void setqValue(Double qValue) {
 		this.qValue = qValue;
 	}
 	

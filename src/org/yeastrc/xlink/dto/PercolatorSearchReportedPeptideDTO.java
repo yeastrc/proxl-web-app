@@ -4,11 +4,11 @@ package org.yeastrc.xlink.dto;
 	CREATE TABLE percolator_search_reported_peptide (
 		search_id INT UNSIGNED NOT NULL,
 		reported_peptide_id INT UNSIGNED NOT NULL,
-		svm_score DOUBLE NOT NULL,
-		q_value DOUBLE NOT NULL,
-		pep DOUBLE NOT NULL,
-		calc_mass DOUBLE NOT NULL,
-		p_value DOUBLE NOT NULL
+		svm_score DOUBLE  NULL,
+		q_value DOUBLE  NULL,
+		pep DOUBLE  NULL,
+		calc_mass DOUBLE  NULL,
+		p_value DOUBLE  NULL
 	);
  */
 public class PercolatorSearchReportedPeptideDTO {
@@ -34,43 +34,43 @@ public class PercolatorSearchReportedPeptideDTO {
 	public void setReportedPeptideId(int reportedPeptideId) {
 		this.reportedPeptideId = reportedPeptideId;
 	}
-	public double getSvmScore() {
+	public Double getSvmScore() {
 		return svmScore;
 	}
-	public void setSvmScore(double svmScore) {
+	public void setSvmScore(Double svmScore) {
 		this.svmScore = svmScore;
 	}
-	public double getqValue() {
+	public Double getqValue() {
 		return qValue;
 	}
-	public void setqValue(double qValue) {
+	public void setqValue(Double qValue) {
 		this.qValue = qValue;
 	}
-	public double getPep() {
+	public Double getPep() {
 		return pep;
 	}
-	public void setPep(double pep) {
+	public void setPep(Double pep) {
 		this.pep = pep;
 	}
-	public double getCalcMass() {
+	public Double getCalcMass() {
 		return calcMass;
 	}
-	public void setCalcMass(double calcMass) {
+	public void setCalcMass(Double calcMass) {
 		this.calcMass = calcMass;
 	}
-	public double getpValue() {
+	public Double getpValue() {
 		return pValue;
 	}
-	public void setpValue(double pValue) {
+	public void setpValue(Double pValue) {
 		this.pValue = pValue;
 	}
 	
 	private int searchId;
 	private int reportedPeptideId;
-	private double svmScore;
-	private double qValue;
-	private double pep;
-	private double calcMass;
-	private double pValue;
+	private Double svmScore;
+	private Double qValue;
+	private Double pep;
+	private Double calcMass;
+	private Double pValue;
 	
 }

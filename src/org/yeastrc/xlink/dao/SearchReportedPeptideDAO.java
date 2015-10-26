@@ -19,8 +19,10 @@ public class SearchReportedPeptideDAO {
 	CREATE TABLE search_reported_peptide (
 		search_id INT UNSIGNED NOT NULL,
 		reported_peptide_id INT UNSIGNED NOT NULL,
-		q_value DOUBLE NOT NULL
+		unified_reported_peptide_id  INT UNSIGNED NOT NULL,
+		q_value DOUBLE NULL DEFAULT NULL
 	);
+
 
 	 * @param psm
 	 * @throws Exception
@@ -32,6 +34,7 @@ public class SearchReportedPeptideDAO {
 		
 		String sql = "INSERT INTO search_reported_peptide ( search_id, reported_peptide_id, q_value ) VALUES (?, ?, ?)";
 
+		
 		try {
 			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
@@ -39,7 +42,13 @@ public class SearchReportedPeptideDAO {
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, prp.getSearchId() );
 			pstmt.setInt( 2, prp.getReportedPeptideId() );
-			pstmt.setDouble( 3, prp.getqValue() );
+			
+			if ( prp.getqValue() != null ) {
+				pstmt.setDouble( 3, prp.getqValue() );
+			} else {
+				
+				pstmt.setNull( 3, java.sql.Types.DOUBLE );
+			}
 			
 			pstmt.executeUpdate();
 			
@@ -88,7 +97,13 @@ public class SearchReportedPeptideDAO {
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, prp.getSearchId() );
 			pstmt.setInt( 2, prp.getReportedPeptideId() );
-			pstmt.setDouble( 3, prp.getqValue() );
+
+			if ( prp.getqValue() != null ) {
+				pstmt.setDouble( 3, prp.getqValue() );
+			} else {
+				
+				pstmt.setNull( 3, java.sql.Types.DOUBLE );
+			}
 			
 			pstmt.executeUpdate();
 			

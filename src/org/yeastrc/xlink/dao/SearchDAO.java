@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.SearchDTO;
 
@@ -95,7 +96,16 @@ public class SearchDAO {
 				search.setLoad_time( new DateTime( rs.getTimestamp( "load_time" ) ) );
 				search.setName( rs.getString( "name" ) );
 				search.setProjectId( rs.getInt( "project_id" ) );
-				search.setInsertComplete( rs.getBoolean( "insert_complete" ) );
+				
+				int insertCompleteInt = rs.getInt( "insert_complete" );
+				
+				if ( Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE == insertCompleteInt ) {
+					search.setInsertComplete( false );
+				} else {
+					search.setInsertComplete( true );
+				}
+				
+				
 				search.setSearchProgram( rs.getString( "search_program" ) );
 				search.setDisplayOrder( rs.getInt( "display_order" ) );
 
@@ -264,9 +274,9 @@ public class SearchDAO {
 			
 			counter++;
 			if ( pr.isInsertComplete() ) {
-				pstmt.setInt( counter, SearchDTO.PERC_SEARCH_INSERT_COMPLETE_TRUE );
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
 			} else {
-				pstmt.setInt( counter, SearchDTO.PERC_SEARCH_INSERT_COMPLETE_FALSE );
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
 			}
 			
 			counter++;
@@ -487,9 +497,9 @@ public class SearchDAO {
 			
 
 			if ( insertComplete ) {
-				pstmt.setInt( 1, SearchDTO.PERC_SEARCH_INSERT_COMPLETE_TRUE );
+				pstmt.setInt( 1, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
 			} else {
-				pstmt.setInt( 1, SearchDTO.PERC_SEARCH_INSERT_COMPLETE_FALSE );
+				pstmt.setInt( 1, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
 			}
 			
 			pstmt.setInt( 2, searchId );

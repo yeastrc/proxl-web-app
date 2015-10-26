@@ -29,8 +29,6 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	private static final Logger log = Logger.getLogger(SearchDTO.class);
 
 	
-	public static final int PERC_SEARCH_INSERT_COMPLETE_TRUE = 1;
-	public static final int PERC_SEARCH_INSERT_COMPLETE_FALSE = 0;
 
 
 

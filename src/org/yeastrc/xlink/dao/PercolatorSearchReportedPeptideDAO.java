@@ -112,6 +112,9 @@ public class PercolatorSearchReportedPeptideDAO {
 		result.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
 		result.setSvmScore( rs.getDouble( "svm_score" ) );
 		result.setqValue( rs.getDouble( "q_value" ) );
+		if ( rs.wasNull() ) {
+			result.setqValue( null );
+		}
 		result.setPep( rs.getDouble( "pep" ) );
 		result.setCalcMass( rs.getDouble( "calc_mass" ) );
 		result.setpValue( rs.getDouble( "p_value" ) );
@@ -152,7 +155,14 @@ public class PercolatorSearchReportedPeptideDAO {
 			pstmt.setInt( 1, item.getSearchId() );
 			pstmt.setInt( 2, item.getReportedPeptideId() );
 			pstmt.setDouble( 3, item.getSvmScore() );
-			pstmt.setDouble( 4, item.getqValue() );
+			
+			if ( item.getqValue() != null ) {
+				pstmt.setDouble( 4, item.getqValue() );
+			} else {
+				
+				pstmt.setNull( 4, java.sql.Types.DOUBLE );
+			}
+			
 			pstmt.setDouble( 5, item.getPep() );
 			pstmt.setDouble( 6, item.getCalcMass() );
 			pstmt.setDouble( 7, item.getpValue() );
