@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+  <data-sources />
+
+  <form-beans>
+  		<form-bean name="searchViewCrosslinkProteinForm" type="org.yeastrc.xlink.www.forms.SearchViewProteinsForm" />
+  		<form-bean name="searchViewCrosslinkPeptideForm" type="org.yeastrc.xlink.www.forms.SearchViewPeptidesForm" />
+  		<form-bean name="mergedSearchViewCrosslinkPeptideForm" type="org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm" />
+  		<form-bean name="mergedSearchViewCrosslinkProteinForm" type="org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm" />
+  		
+  		<form-bean name="QCPlotRetentionTimeForm" type="org.yeastrc.xlink.www.forms.QCPlotRetentionTimeForm" />
+  		<form-bean name="uploadPDBFileForm" type="org.yeastrc.xlink.www.forms.UploadPDBFileForm" />
+  		<form-bean name="downloadStringAsFileForm" type="org.yeastrc.xlink.www.forms.DownloadStringAsFileForm" />
+
+   </form-beans>
+  
+  <global-exceptions />
+  
+
+  <global-forwards>
+
+  		<forward name="welcome" path="/home.do" redirect="false" />
+  		<forward name="home" path="/home.do" redirect="false" />
+  		
+  		<forward name="generalError" path="/WEB-INF/jsp-pages/generalError.jsp" />
+  		
+  		<forward name="login" path="/user_loginPage.do" redirect="false" />
+  		
+  		<forward name="no_user_session" path="/user_loginPage.do" redirect="false" />
+<!--  
+  		<forward name="no_user_session" path="/user_noSession.do" redirect="false" />
+-->  		
+ 		<forward name="insufficient_access_privilege" path="/user_insufficient_access_privilege.do" redirect="false" />
+ 		
+ 		<forward name="account_disabled" path="/account_disabled.do" redirect="true" />
+ 		
+ 		<forward name="invalidRequestSearchesAcrossProjects" path="/invalidRequestSearchesAcrossProjects.do" redirect="false" />
+ 		
+ 		<forward name="invalidRequestData" path="/invalidRequestData.do" redirect="false" />
+
+		<forward name="No_project_id_query_string" path="/WEB-INF/jsp-pages/special_redirect_pages/redirect_project_id_FromPageToQueryString.jsp" redirect="false" />
+ 		
+   		<forward name="ProjectNotFound" path="/WEB-INF/jsp-pages/projectNotFound.jsp" redirect="false" />
+   
+  </global-forwards>
+  
+    <action-mappings>
+		
+		<action path="/home"
+				type="org.yeastrc.xlink.www.actions.HomeAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/listProjects.do" redirect="true"/>
+		</action>			
+		
+<!--  		
+		<action path="/home"
+				type="org.yeastrc.xlink.www.actions.HomeAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/home.jsp" redirect="false"/>
+		</action>	
+-->		
+		
+		<action
+		   path="/user_noSession"
+		   forward="/WEB-INF/jsp-pages/user_account/no_user_session.jsp">
+		</action>
+		
+		<action path="/user_insufficient_access_privilege"
+				type="org.yeastrc.xlink.www.user_account.UserInsufficientAccessPrivilegePageInitAction"
+				scope="request"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/user_account/insufficient_access_privilege.jsp" redirect="false" />
+			<forward name="UserDisabled" path="/account_disabled.do" redirect="true" />
+		</action>			
+		
+		
+		<action path="/account_disabled"
+				type="org.yeastrc.xlink.www.user_account.UserDisabledPageInitAction"
+				scope="request"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/user_account/account_disabled.jsp" redirect="false" />
+		</action>	
+	
+				
+		<action
+		   path="/invalidRequestSearchesAcrossProjects"
+		   forward="/WEB-INF/jsp-pages/invalidRequestSearchesAcrossProjects.jsp">
+		</action>		
+
+		<action
+		   path="/invalidRequestData"
+		   forward="/WEB-INF/jsp-pages/invalidRequestData.jsp">
+		</action>				
+			
+  				
+		<action path="/projectReadProcessCode"
+				type="org.yeastrc.xlink.www.actions.ProjectReadProcessCodeAction"
+				scope="request"
+				validate="false">
+			<forward name="Success" path="/viewProject.do" redirect="false" /><!-- same path used with redirect and project_id -->
+			<forward name="Failure" path="/WEB-INF/jsp-pages/projectReadProcessCodeFailure.jsp" redirect="false" />
+		</action>			
+
+		<action path="/listProjects"
+				type="org.yeastrc.xlink.www.actions.ListProjectsAction"
+				scope="request"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/listProjects.jsp" redirect="false" />
+			<forward name="Failure" path="/WEB-INF/jsp-pages/listProjects.jsp" redirect="false" />
+		</action>		
+	    
+  		<action path="/deleteSearch"
+				type="org.yeastrc.xlink.www.actions.DeletePercolatorSearchAction"
+				scope="request"
+				validate="false">
+			<!-- This forward is used as a template, the project id will be appended to it  -->
+			<forward name="Success" path="/viewProject.do" redirect="true" />
+		</action>
+		
+  
+		<action path="/viewProject"
+				type="org.yeastrc.xlink.www.actions.ViewProjectAction"
+				scope="request"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewProject.jsp" redirect="false" />
+			<forward name="Failure" path="/WEB-INF/jsp-pages/viewProject.jsp" redirect="false" />
+		</action>
+		
+
+  		<action path="/downloadSearchFile"
+				type="org.yeastrc.xlink.www.actions.DownloadSearchFileAction"
+				scope="request"
+				validate="false">
+		</action>
+		
+	 	<action path="/downloadPDBFile"
+				type="org.yeastrc.xlink.www.actions.DownloadPDBFileAction"
+				scope="request"
+				validate="false">
+		</action>
+
+  		<action path="/downloadStringAsFile"
+				type="org.yeastrc.xlink.www.actions.DownloadStringAsFileAction"
+				scope="request"
+				name="downloadStringAsFileForm"
+				validate="false">
+		</action>
+		
+  		<action path="/viewSearchCrosslinkProtein"
+				type="org.yeastrc.xlink.www.actions.ViewSearchCrosslinkProteinsAction"
+				scope="request"
+				name="searchViewCrosslinkProteinForm"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewSearchCrosslinkProtein.jsp" redirect="false" />
+		</action>
+
+  		<action path="/viewSearchLooplinkProtein"
+				type="org.yeastrc.xlink.www.actions.ViewSearchLooplinkProteinsAction"
+				scope="request"
+				name="searchViewCrosslinkProteinForm"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewSearchLooplinkProtein.jsp" redirect="false" />
+		</action>
+
+
+  		<action path="/viewSearchPeptide"
+				type="org.yeastrc.xlink.www.actions.ViewSearchPeptidesAction"
+				scope="request"
+				name="searchViewCrosslinkPeptideForm"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewSearchPeptide.jsp" redirect="false" />
+		</action>
+
+
+  		<action path="/viewMergedPeptide"
+				type="org.yeastrc.xlink.www.actions.ViewMergedSearchPeptidesAction"
+				scope="request"
+				name="mergedSearchViewCrosslinkPeptideForm"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewMergedPeptide.jsp" redirect="false" />
+		</action>
+
+
+  		<action path="/viewMergedCrosslinkProtein"
+				type="org.yeastrc.xlink.www.actions.ViewMergedSearchCrosslinkProteinsAction"
+				scope="request"
+				name="mergedSearchViewCrosslinkProteinForm"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewMergedCrosslinkProtein.jsp" redirect="false" />
+		</action>
+
+  		<action path="/viewMergedLooplinkProtein"
+				type="org.yeastrc.xlink.www.actions.ViewMergedSearchLooplinkProteinsAction"
+				scope="request"
+				name="mergedSearchViewCrosslinkProteinForm"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewMergedLooplinkProtein.jsp" redirect="false" />
+		</action>
+  
+    	<action path="/viewMergedImage"
+				type="org.yeastrc.xlink.www.actions.ViewMergedSearchImageAction"
+				name="mergedSearchViewCrosslinkProteinForm"
+				scope="request"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewMergedImage.jsp" redirect="false" />
+			<forward name="NoSearchIds" path="/WEB-INF/jsp-pages/special_redirect_pages/redirect_searchIdsFromHashToQueryString.jsp" redirect="false" />
+		</action>
+
+    	<action path="/viewMergedStructure"
+				type="org.yeastrc.xlink.www.actions.ViewMergedStructureAction"
+				name="mergedSearchViewCrosslinkProteinForm"
+				scope="request"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewMergedStructure.jsp" redirect="false" />
+			<forward name="NoSearchIds" path="/WEB-INF/jsp-pages/special_redirect_pages/redirect_searchIdsFromHashToQueryString.jsp" redirect="false" />
+		</action>
+  
+    	<action path="/downloadMergedPeptides"
+				type="org.yeastrc.xlink.www.actions.DownloadMergedSearchPeptidesAction"
+				scope="request"
+				name="mergedSearchViewCrosslinkPeptideForm"
+				validate="false">
+		</action>
+  
+  		<action path="/downloadMergedProteins"
+				type="org.yeastrc.xlink.www.actions.DownloadMergedSearchProteinsAction"
+				scope="request"
+				name="mergedSearchViewCrosslinkProteinForm"
+				validate="false">
+		</action>
+		
+		<action path="/modifiedLysineReport"
+				type="org.yeastrc.xlink.www.actions.ModifiedLysineReportAction"
+				scope="request"
+				validate="false">
+		</action>
+
+  		<action path="/downloadMergedProteinUDRs"
+				type="org.yeastrc.xlink.www.actions.DownloadMergedSearchUDRsAction"
+				scope="request"
+				name="mergedSearchViewCrosslinkProteinForm"
+				validate="false">
+		</action>
+  
+    	<action path="/downloadProteinCoverageReport"
+				type="org.yeastrc.xlink.www.actions.DownloadProteinReportAction"
+				scope="request"
+				name="mergedSearchViewCrosslinkProteinForm"
+				validate="false">
+		</action>
+  
+  
+    	<action path="/viewMergedProteinCoverageReport"
+				type="org.yeastrc.xlink.www.actions.ViewMergedSearchCoverageReportAction"
+				scope="request"
+				name="mergedSearchViewCrosslinkProteinForm"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewMergedProteinCoverageReport.jsp" redirect="false" />
+		</action>
+		
+		<action path="/viewProteinCoverageReport"
+				type="org.yeastrc.xlink.www.actions.ViewSearchCoverageReportAction"
+				scope="request"
+				name="searchViewCrosslinkProteinForm"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewProteinCoverageReport.jsp" redirect="false" />
+		</action>
+  
+  
+  
+  		<action path="/QCPlotRetentionTime"
+				type="org.yeastrc.xlink.www.actions.QCPlotRetentionTimeAction"
+				scope="request"
+				name="QCPlotRetentionTimeForm"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/QCPlotRetentionTime.jsp" redirect="false" />
+		</action>
+  
+  
+  
+		
+		<!-- User Account Actions -->
+		
+		<!--   The plan was for the filter to use "user_" as a prefix that doesn't require a user to be logged in.
+				This filter is currently not being used.
+		 -->
+		
+				
+    	<action path="/user_loginPage"
+				type="org.yeastrc.xlink.www.user_account.UserLoginPageInitAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/user_account/login.jsp" redirect="false"/>
+		</action>	
+		
+		<action path="/user_logout"
+				type="org.yeastrc.xlink.www.user_account.UserLogoutAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/listProjects.do" redirect="true"/>
+		</action>		
+		
+		
+		<action path="/user_resetPasswordProcessCode"
+				type="org.yeastrc.xlink.www.user_account.UserResetPasswordProcessCodeAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/user_account/resetPasswordChangePassword.jsp" redirect="false"/>
+		    <forward name="Failure" path="/WEB-INF/jsp-pages/user_account/resetPasswordChangePasswordProcessCodeFail.jsp" redirect="false"/>
+		</action>	
+		
+		
+		
+		<action
+		   path="/user_resetPasswordPage"
+		   forward="/WEB-INF/jsp-pages/user_account/resetPassword.jsp">
+		</action>		
+		
+		
+		
+		<!--   User Invite processing  -->
+
+		  		
+		<action path="/user_inviteProcessCode"
+				type="org.yeastrc.xlink.www.user_account.UserInviteProcessCodeAction"
+				scope="request"
+				validate="false">
+		    <forward name="ProjectInviteLandingPage" path="/user_inviteLandingPage.do" redirect="false"/>
+		    <forward name="AddNewUser" path="/user_inviteCreateNewUserPage.do" redirect="false"/>
+		    <forward name="GoToProjectList" path="/listProjects.do" redirect="false"/>
+		    <forward name="Failure" path="/WEB-INF/jsp-pages/user_account/inviteUserProcessCodeFail.jsp" redirect="false"/>
+		</action>	
+		  		
+		<action path="/user_inviteLandingPage"
+				type="org.yeastrc.xlink.www.user_account.UserInviteLandingPageInitAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/user_account/inviteLandingPage.jsp" redirect="false"/>
+		    <forward name="Failure" path="/WEB-INF/jsp-pages/user_account/inviteUserProcessCodeFail.jsp" redirect="false"/>
+		</action>	
+		
+		<action path="/user_inviteCreateNewUserPage"
+				type="org.yeastrc.xlink.www.user_account.UserInviteCreateNewUserInitPageAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/user_account/inviteUserGetNewUserInfo.jsp" redirect="false"/>
+		    <forward name="Failure" path="/user_inviteProcessCode.do" redirect="false"/>
+		</action>			
+		
+		<!--   Account Maint area -->
+		
+		<action path="/accountPage"
+				type="org.yeastrc.xlink.www.user_account.AccountPageInitAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/user_account/account.jsp" redirect="false"/>
+		</action>	
+		
+		<!--  Manage Users  -->
+		
+		<action path="/manageUsersPage"
+				type="org.yeastrc.xlink.www.user_account.ManageUsersPageInitAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/user_account/manageUsersPage.jsp" redirect="false"/>
+		</action>			
+		
+		<action path="/uploadPDBFileService"
+				type="org.yeastrc.xlink.www.struts_services.UploadPDBFileActionService"
+				scope="request"
+				name="uploadPDBFileForm"
+				validate="false">
+		</action>
+
+		<action
+                  path="/proxlExternalViewer"
+                  forward="/WEB-INF/jsp-pages/proxl-external-viewer.jsp">
+        </action>
+		
+  </action-mappings>
+  
+  <!-- properties file for Struts messages -->
+  <message-resources parameter="web_app_application_properties" />
+  
+</struts-config>

@@ -1,0 +1,43 @@
+	
+//  Generic tool tip
+
+	$(document).ready(function() {
+		
+		addToolTips();
+
+	});
+	
+	var addToolTips = function ( $element ) {
+
+		var $elements;
+		
+		if( $element != undefined ) {
+			$elements = $element.find( ".tool_tip_attached_jq" );
+			//console.log($element);
+			//console.log($elements);
+		} else {
+			$elements = $(".tool_tip_attached_jq" );
+		}
+		
+		$elements.each( function(  ) {
+			
+			var $this = $( this );
+	
+			//console.log( "Adding handler to:" );
+			//console.log( $this );
+			
+			var tooltipText = $this.attr("data-tooltip");			
+			
+			$this.qtip( {
+		        content: {
+		            text: tooltipText
+		        },
+				position: {
+					target: 'mouse',
+					adjust: { x: 5, y: 5 }, // Offset it slightly from under the mouse
+		            viewport: $(window)
+		         }
+		    });				
+
+		});
+	};

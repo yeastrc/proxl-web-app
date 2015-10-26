@@ -1,0 +1,1450 @@
+
+/*
+
+Google Chrome default values for the body tag as retrieved from Developer tools 
+
+body {display: block;margin: 8px;}
+
+
+Body settings for fixing footer at bottom of page
+body {
+	margin:0;
+	padding:0;
+	height:100%;
+}
+
+*/
+
+html, body {
+	margin:0;
+	padding:0;
+	height:100%;
+}
+
+
+BODY { color: #545454; background-color: #FFFFFF; font-size:14px; font-family: arial, sans-serif; font-style:normal; font-weight:500; }
+
+
+/*  TABLE SORTER CSS Override  */
+
+	/* Add padding-right so the header text stays to the left of the icons TableSorter adds  */
+table.tablesorter thead tr th, table.tablesorter tfoot tr th  {	padding-right: 15px; background-color: #FFF0F0; }
+
+table.tablesorter tbody td {	padding-right: 15px; }
+
+	
+
+
+/*  END  TABLE SORTER CSS Override  */
+
+
+A.overide-text-color-to-base-color:link, A.overide-text-color-to-base-color:visited , A.overide-text-color-to-base-color:active , A.overide-text-color-to-base-color:hover 
+{ color: #545454 }
+
+
+input { font-size:14px;  }
+select { font-size:14px;  }
+
+input[type="radio"], input[type="checkbox"] {vertical-align: middle; margin-top: 0px; margin-bottom: 0px; }
+
+/*        
+input { font-size:20px;  }
+*/        
+        
+BODY.inset-page, BODY.login-page, BODY.reset-password-page, BODY.reset-password-code-fail-page  { background-color: #FFF8F8 }        
+        
+
+        
+
+/* */
+A:link  { color: #A55353; text-decoration: none; }
+A:visited  { color: #A55353; }
+A:hover  { color: green; text-decoration: none; }
+A:active  { color: green; }
+
+
+
+/* Links used for Javascript to show the child data for the given row */
+/*
+A.show-child-data-link  { color: black; text-decoration: none; }
+A.show-child-data-link:link  { color: blue; text-decoration: none; }
+A:show-child-data-link:visited  { color: black; }
+A:show-child-data-link:hover  { color: green  !important; text-decoration: underline  !important;  }
+A:show-child-data-link:active  { text-decoration: underline; }
+*/
+
+/* Links used for Javascript to show the search details data  */
+A.show-search-details-data-link:link  {  }
+A:show-search-details-data-link:hover  {  }
+
+
+label { padding-right: 2px; }
+label:hover { background-color: #ECECEC  /* pink background used elsewhere #FFF0F0 */; }
+
+input[type="button"], input[type="submit"] {  font-size:14px; color: #FFFFFF; background-color: #A55353;  }
+input[type="button"]:disabled, input[type="submit"]:disabled, .disabled-checkbox { opacity:0.6;filter:alpha(opacity=60); }
+/* .disabled-checkbox  is put on the span surrounding the checkbox to also impact the label */
+
+.submit-button {  font-size:14px; color: #FFFFFF; background-color: #A55353;  }
+
+/* input[type="button"] */
+.submit-button:disabled { opacity:0.6;filter:alpha(opacity=60); }
+
+.structure-link-non-link  { opacity:0.6;filter:alpha(opacity=60); }
+
+
+/*  Class for all objects that are clickable.  Changes mouse pointer to same as when hover on a link */
+.clickable { cursor: pointer;   }
+
+/*  CSS styling for qtip2 tool tips  */
+
+/*  Values in the qtip2 css file:
+.qtip-default{border-width:1px;border-style:solid;border-color:#F1D031;background-color:#FFFFA3;color:#555}
+*/
+
+.qtip-default{border-width:1px;border-style:solid;border-color:#AAAAAA;background-color:#FFF0F0;color:#000000;font-size:10pt;}
+
+
+/* css for styling the autocomplete */
+
+.autocomplete { background-color: #E8EAFF; border-color:#000000; border-width:1; border-style:solid; padding:10px; overflow-y: scroll; overflow-x: hidden; }
+
+.autocomplete .selected { 	color: white;	background-color:#000000; }
+
+.autocomplete div { padding:2px 5px; white-space:nowrap; overflow:hidden; }
+	
+
+.ProXL-DB-text { color: #A55353; font-weight: bold }
+
+/* styling of text in tooltip svg on merged image page.  "fill" sets the text color on <text> element */
+.proxl-primary-color-bold-svg-text { fill: #A55353; font-weight: bold; }
+
+
+.hidden { display:none; }
+.isTooltip { font-size:11px;font-family:sans-serif; }
+
+img.edit-icon { max-width:12px;margin-left:2px;margin-right:5px;opacity:0.8;filter:alpha(opacity=80);border-width:0px; }
+
+span.search-name-display { font-weight:bold; }
+
+
+/* 'body.inset-page'  is for pages with an 'inset' look, login.jsp, forgotPassword.jsp, ... */
+
+body.inset-page {  }
+
+body.inset-page div.page-content-outer-container { width: 100%; text-align: center;  }
+
+body.inset-page div.page-content-container { width: 466px; margin-top: 140px; display: inline-block;  }
+
+body.inset-page div.page-content { text-align: center; /*  width: 100%;   */ border-width: 2px; border-color: #D3D3D3; border-style: solid; background-color: #FFFFFF; }
+
+body.inset-page div.logo-large-container { margin-top: 20px; }
+
+body.inset-page .page-label { font-size:20px; margin-top: 20px; margin-bottom: 10px; }
+
+body.inset-page .page-text { font-size: 14px; text-align: left; }
+
+
+body.inset-page .input-field,body.inset-page div.page-text, body.inset-page .submit-button { display: inline-block; width: 275px; margin-bottom: 4px; }
+
+body.inset-page .input-field {  font-size:21px; color: #000000; opacity:0.8;filter:alpha(opacity=80); }
+
+body.inset-page input { font-size:21px;  }
+body.inset-page select { font-size:21px;  }
+body.inset-page input[type="button"], body.inset-page input[type="submit"] {  font-size:21px; }
+
+
+
+body.inset-page .bottom-tab { float: right; padding: 8px; border-width: 2px; border-top-width: 0px; border-color: #D3D3D3; border-style: solid; background-color: #FFFFFF;  }
+body.inset-page .bottom-tab a { color:#000000; background-color: #FFF8F8; opacity:0.5;filter:alpha(opacity=50); text-decoration: none; }
+
+
+
+body.inset-page div.error-message-container, body.inset-page div.success-message-container { display: none; width: 100%; text-align: center; position: absolute; z-index: 1; }
+
+body.inset-page .error-message-inner-container, body.inset-page .success-message-inner-container { display: inline-block; width: 90%; font-size: 18px; padding: 10px; border-width: 2px; border-color: #D3D3D3; border-style: solid; color: white;  }
+
+body.inset-page .error-message-inner-container { background-color: red; }
+
+body.inset-page .success-message-inner-container { background-color: green; }
+
+body.inset-page span.error-message-text, body.inset-page span.success-message-text {  }
+	
+body.inset-page .error-message-close-x, body.inset-page .success-message-close-x { cursor: pointer; float: right; margin-left: 10px; }
+
+
+
+/* Invite Landing Page  */
+
+
+body.user-invite-landing-page .sign-in-above-text { margin-top: 10px; }
+
+
+
+
+
+
+
+
+
+/*  Main pages (non-inset pages)  */
+
+/*
+		These pages have special settings on the *-outer-container to lock the footer to the bottom of the page
+*/
+
+	/*  Whole Page level  */
+
+body.crosslinks-page-main .crosslinks-page-main-outermost-div { /*  lock the footer to the bottom of the page */	min-height:100%; position:relative; }
+
+body.crosslinks-page-main .project-text-link { font-size: 12px; text-decoration: none; color: black; font-weight: bold; opacity:0.7;filter:alpha(opacity=70);  }
+
+
+body.crosslinks-page-main div.error-message-container, body.crosslinks-page-main div.success-message-container { display: none; width: 100%; text-align: center; position: absolute; z-index: 1; }
+
+body.crosslinks-page-main .error-message-inner-container, body.crosslinks-page-main .success-message-inner-container { display: inline-block; width: 90%; font-size: 18px; padding: 10px; border-width: 2px; border-color: #D3D3D3; border-style: solid; color: white;  }
+
+body.crosslinks-page-main .error-message-inner-container { background-color: red; }
+
+body.crosslinks-page-main .success-message-inner-container { background-color: green; }
+
+body.crosslinks-page-main span.error-message-text, body.crosslinks-page-main span.success-message-text {  }
+	
+body.crosslinks-page-main .error-message-close-x, body.crosslinks-page-main .success-message-close-x { cursor: pointer; float: right; margin-left: 10px; }
+
+
+
+	/* Main Pages, integer number columns in tables, usually columns sorted by tablesorter jQuery plugin  */
+	
+body.crosslinks-page-main .integer-number-column-header, 
+body.crosslinks-page-main .integer-number-column { text-align: right; padding-right: 15px;}
+		/* For Rightmost column if no table sorter */
+body.crosslinks-page-main .integer-number-column-right-most-column-no-ts-header, 
+body.crosslinks-page-main .integer-number-column-right-most-column-no-ts { text-align: right; }
+
+		/*  Shrink the expand and contract images to fit the 8pt text in the data tables */
+body.crosslinks-page-main .icon-expand-contract-in-data-table { max-width: 10px; margin-left: 3px; }
+
+/*  from g2p
+overlay-background {
+
+cursor: pointer;
+
+background: #666 url(/g2p/css/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
+opacity: .50;
+filter: Alpha(Opacity=50);
+
+
+*/
+
+
+	/* modal dialog background */
+body.crosslinks-page-main .modal-dialog-overlay-background { display: none; position: fixed; cursor: pointer;top: 0;left: 0;height: 100%;width: 100%;background-color: #000 /* #A55353 */;opacity: 0.8;filter:alpha(opacity=80);z-index: 99998;}
+
+	/* modal dialog overlay container */
+body.crosslinks-page-main .modal-dialog-overlay-container { display: none; text-align: left; position: absolute; z-index: 999999; background-color: white; padding: 20px; border-color: #A0A0A0; border-width: 2px; border-style: solid;   }
+
+
+	/*  Header and Footer  */
+	
+
+body.crosslinks-page-main .header-outer-container, .footer-outer-container { min-width: 1000px; }
+	
+
+
+	/*  Header  */
+
+/* min-width set for this class above so that it is the same for the header and footer  */
+body.crosslinks-page-main .header-outer-container { height: 22px; padding: 4px; background-color: #FFF0F0; border-bottom-style: solid; border-bottom-color:  #D3D3D3; border-bottom-width: 1px; }
+
+	/* Right side items  */ 
+ 
+body.crosslinks-page-main .header-outer-container .header-right-edge-container { float: right; }
+
+body.crosslinks-page-main .header-outer-container .header-right-icons { float: right; }
+
+body.crosslinks-page-main .header-outer-container .header-logout-image { position:relative; top:2px; }
+
+body.crosslinks-page-main .header-outer-container .header-user-name-container { float: right; padding-right: 7px; padding-top: 3px; }
+
+body.crosslinks-page-main .header-outer-container .header-user-name { font-size: 12px; opacity:0.9;filter:alpha(opacity=90); }
+
+	/* Left side items  */
+
+body.crosslinks-page-main .header-outer-container .header-logo { float: left; }
+
+	/* 'header-left-main-container' excludes the Logo in the top left corner */
+body.crosslinks-page-main .header-outer-container .header-left-main-container { padding-top: 2px; }
+
+body.crosslinks-page-main .header-outer-container .header-pointer-right { float: left; padding-left: 5px; padding-right: 5px; }	
+
+body.crosslinks-page-main .header-outer-container .header-projects-label-div { float: left; padding-left: 5px; padding-right: 5px; }	
+
+body.crosslinks-page-main .header-outer-container .header-projects-pointer-right--right-of-projects { float: left; padding-left: 10px; padding-right: 10px; }
+
+body.crosslinks-page-main .header-outer-container .header-current-project-label-div { float: left; padding-top: 3px; }	
+
+
+/*  opacity 0.9 per different request  */
+body.crosslinks-page-main .header-outer-container .header-projects-label { color: #000000; font-size: 18px; font-weight: bold; opacity:0.9;filter:alpha(opacity=90); text-decoration: none; }
+
+body.crosslinks-page-main .header-outer-container .header-project-title { color: #000000; font-size: 14px; font-weight: bold; opacity:0.9;filter:alpha(opacity=90); text-decoration: none; }
+
+	/* drop down project list */
+body.crosslinks-page-main .header-outer-container .header-projects-list { 
+	display: none; position: absolute; background-color: white; top: 24px; width: 330px; padding: 15px; border-style: solid; border-width: 1px; border-color: #D3D3D3; z-index: 1; 
+}
+
+
+body.crosslinks-page-main .header-outer-container .header-icon-tool-tips { 
+	display: none; position: absolute; background-color: #FFF0F0; top: 24px; right: 0px; padding: 3px; white-space:nowrap; border-style: solid; border-width: 1px; border-color: #D3D3D3; z-index: 1; 
+} /*  display: none;  */
+
+
+	/*  End Header  */
+	
+
+	/*  Footer  */
+	
+	
+/* min-width set for this class above so that it is the same for the header and footer  */
+.footer-outer-container { margin-top: 15px; background-color: #FFF0F0; font-size: 12px; color: black; opacity:0.9;filter:alpha(opacity=90); 
+							border-top-style: solid; border-top-color:  #D3D3D3; border-top-width: 1px;
+							 
+   /*  lock the footer to the bottom of the page: */  
+   	width:100%;
+	height:30px;
+	position:absolute;
+	bottom:0;
+	left:0;
+	
+	/* Update .overall-enclosing-block when changing the height of this  */
+}
+
+.footer-left-container { float:left; padding-left: 7px; margin-top: 8px;  }
+	
+.footer-right-container { float: right; padding-right: 7px;margin-top: 8px;  }
+	
+.footer-center-outer-container { text-align: center; margin-top: 8px;  }	
+.footer-center-container {  }
+
+
+/*  Overall Main page  class "crosslinks-page-main" is added in header_main.jsp  */
+
+body.crosslinks-page-main .overall-enclosing-block { padding-left: 40px; padding-right: 40px;
+
+	/*  lock the footer to the bottom of the page: */  
+	padding-bottom:40px;   /* Height of the footer element */
+}
+
+
+body.crosslinks-page-main .top-level-label { font-weight: bold; font-size: 24px; }
+
+
+body.crosslinks-page-main .top-level-label-bottom-border {
+	clear: left;
+	margin-top: 10px; margin-bottom: 10px;
+	width: 100%; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: #A55353; opacity:0.6;filter:alpha(opacity=60);
+}
+
+
+
+/*  Projects List Page  */
+
+
+body.projects-list-page .your-projects-title { margin-top: 20px; margin-bottom: 10px; font-weight: bold; }
+
+
+body.projects-list-page .new-project-container {  }
+body.projects-list-page .new-project-icon-container { float: left; padding-right: 10px;  padding-top: 0px; }
+body.projects-list-page .new-project-text-link { font-size: 14px; text-decoration: none; color: black; font-weight: bold; opacity:0.6;filter:alpha(opacity=60);  }
+
+
+
+
+body.projects-list-page .project-container { clear: both; }
+body.projects-list-page .project-icon-container { float: left; padding-right: 10px; padding-top: 0px; }
+body.projects-list-page .project-icon-container-hidden { visibility: hidden; }
+body.projects-list-page .project-text-link { font-size: 12px; text-decoration: none; color: black; font-weight: bold; opacity:0.7;filter:alpha(opacity=70);  }
+body.projects-list-page .project-text-link-hidden { visibility: hidden; }
+
+body.projects-list-page .new-project-container-top-border {
+	margin-bottom: 10px;
+	width: 100%; border-top-style: solid; border-top-width: 1px; border-top-color: #A55353; opacity:0.6;filter:alpha(opacity=60);
+}
+
+body.projects-list-page .new-project-container-bottom-border, body.projects-list-page .project-container-bottom-border {
+	margin-top: 10px; margin-bottom: 10px;
+	width: 100%; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: #A55353; opacity:0.6;filter:alpha(opacity=60);
+}
+
+
+
+	/* mark project for deletion modal dialog */
+
+body.projects-list-page .mark-project-for-deletion-overlay-containing-outermost-div { position: relative; width: 100%; height: 0px;  text-align: left;  }
+
+/* For some reason "display: inline-block;" on the next class positions it over the delete icon for the first entry in the list.
+		It is not needed since not horizontally centering this overlay  */
+body.projects-list-page .mark-project-for-deletion-overlay-containing-outer-div { position: relative; height: 0px;  text-align: left; }/* display: inline-block; */ 
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.projects-list-page .mark-project-for-deletion-overlay-containing-outer-div, body.projects-list-page .mark-project-for-deletion-overlay-container { width: 600px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.projects-list-page .mark-project-for-deletion-overlay-container {   }
+
+
+
+
+/*  View Project Page  */
+
+body.project-page .collapsable-link-container { float:left; }
+
+body.project-page .top-level-container { margin-top: 20px; clear: left; } 
+
+body.project-page .top-level-collapsable-link-container { padding-top: 5px; }
+
+body.project-page .top-level-collapsable-link {  }
+
+body.project-page .top-level-label { margin-left: 30px; }
+
+
+body.project-page .second-level-label { font-weight: bold; }
+
+
+body.project-page .project-info-block { margin-left: 40px; }
+
+body.project-page .project-info-single-block { margin-bottom: 10px; clear: both; }
+
+body.project-page .project-info-label { float: left;  }
+
+body.project-page .project-info-text { margin-left: 120px; }
+
+body.project-page .project-info-end-block-clear-float { clear: both;  }
+
+
+body.project-page .note-display-div { margin-bottom: 10px; }
+
+
+
+	/* delete note modal dialog */
+
+body.project-page .delete-note-overlay-containing-outermost-div { width: 100%; height: 0px;   }
+body.project-page .delete-note-overlay-containing-outer-div { position: relative; display: inline-block; }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .delete-note-overlay-containing-outer-div, body.project-page .delete-note-overlay-container { width: 600px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .delete-note-overlay-container {   }
+
+
+
+body.project-page .researchers-block { margin-left: 30px; }
+
+body.project-page .researchers-icon { float: left;  }
+
+body.project-page .invite-user-block { margin-left: 20px; }
+
+body.project-page .invite-user-expand-icon-container { float: left; padding-right: 8px; }
+
+body.project-page .invite-user-expand-link { text-decoration: none; }
+
+
+	/* user list, invited and current */
+	
+body.project-page .invited-person-invite-date-block { padding-left: 20px; }	
+
+
+body.project-page .searches-block { margin-left: 10px; }
+
+body.project-page .search-entry-bottom-border {
+	clear: left;
+	margin-top: 5px; margin-bottom: 5px;
+	width: 100%; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: #A55353; opacity:0.6;filter:alpha(opacity=60);
+}
+
+
+
+
+
+/* -----------------------------  */
+
+/*  Modal Dialogs  */
+
+	/* revoke invite to project modal dialog */
+
+body.project-page .revoke-invite-to-project-overlay-containing-outermost-div {  }
+body.project-page .revoke-invite-to-project-overlay-containing-outer-div { }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .revoke-invite-to-project-overlay-containing-outer-div, body.project-page .revoke-invite-to-project-overlay-container { width: 600px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .revoke-invite-to-project-overlay-container {   }
+
+	/* remove user from project modal dialog */
+
+body.project-page .remove-user-from-project-overlay-containing-outermost-div {  }
+body.project-page .remove-user-from-project-overlay-containing-outer-div { }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .remove-user-from-project-overlay-containing-outer-div, body.project-page .remove-user-from-project-overlay-container { width: 600px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .remove-user-from-project-overlay-container {   }
+
+
+
+
+body.project-page .public-access-block { margin-left: 30px; }
+
+body.project-page .public-access-block .public-access-url {  }
+
+
+
+	/* Modal dialog for confirming Generating new public access code */
+
+body.project-page .generate-new-pub-access-code-overlay-containing-outermost-div { width: 100%; height: 0px;   }
+body.project-page .generate-new-pub-access-code-overlay-containing-outer-div { position: relative; display: inline-block; }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .generate-new-pub-access-code-overlay-containing-outer-div, body.project-page .generate-new-pub-access-code-overlay-container { width: 600px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .generate-new-pub-access-code-overlay-container { top: -50px;  }
+
+
+
+
+
+body.project-page .no-searches-in-project-text { margin-left: 20px; }
+
+
+	/* move searches modal dialog */
+
+body.project-page .move-searches-overlay-containing-full-width-div { width: 100%; height: 0px; text-align: center; }
+body.project-page .move-searches-overlay-containing-relative-div { position: relative; display: inline-block; }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .move-searches-overlay-containing-relative-div, body.project-page .move-searches-overlay-container { width: 600px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .move-searches-overlay-container {   }
+
+body.project-page .move-searches-overlay-project-list-block { margin-left: 20px;  }
+
+
+
+	/* delete search modal dialog */
+
+body.project-page .delete-search-overlay-containing-outermost-div { width: 100%; height: 0px;  text-align: right;  }
+body.project-page .delete-search-overlay-containing-outer-div { position: relative; display: inline-block; padding-right: 50px; }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .delete-search-overlay-containing-outer-div, body.project-page .delete-search-overlay-container { width: 600px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .delete-search-overlay-container {   }
+
+
+
+	/* delete search comment modal dialog */
+
+body.project-page .delete-search-comment-overlay-containing-outermost-div { width: 100%; height: 0px;  text-align: left;  }
+body.project-page .delete-search-comment-overlay-containing-outer-div { position: relative; display: inline-block; padding-left: 150px; }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .delete-search-comment-overlay-containing-outer-div, body.project-page .delete-search-comment-overlay-container { width: 400px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .delete-search-comment-overlay-container {   }
+
+
+
+	/* delete search web link modal dialog */
+
+body.project-page .delete-search-web-link-overlay-containing-outermost-div { width: 100%; height: 0px;  text-align: left;  }
+body.project-page .delete-search-web-link-overlay-containing-outer-div { position: relative; display: inline-block; padding-left: 150px; }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .delete-search-web-link-overlay-containing-outer-div, body.project-page .delete-search-web-link-overlay-container { width: 400px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .delete-search-web-link-overlay-container {   }
+
+
+
+
+
+/* -----------------------------  */
+
+/*   Modal Dialogs with Title Bar and "X" for close at top right
+
+
+	/* QC Plots modal dialog */
+/*
+body.project-page .qc-plot-overlay-containing-outermost-div {  }
+body.project-page .qc-plot-overlay-containing-outer-div { }
+*/
+/* These 2 divs MUST have the same width so set width for both together */
+/*
+body.project-page .qc-plot-overlay-containing-outer-div, body.project-page .qc-plot-overlay-container { width: 900px;  }
+*/
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+/*
+body.project-page .qc-plot-overlay-container {   }
+*/
+
+
+
+
+
+	/* QC Plots modal dialog background */
+body.project-page .qc-plot-overlay-background {
+	
+
+	cursor: pointer; /* set mouse to pointer */
+
+	  z-index: 1001;
+	  
+	  background-color: black;
+	opacity: .80;
+	filter: Alpha(Opacity=80);
+
+	  /*  Moved to inline style in header so context is not hard coded
+	background: #666 url(/???context???/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
+	*/
+	/*  
+	opacity: .50;
+	filter: Alpha(Opacity=50);
+	*/
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+
+/*  QC Plots Overlay   */
+
+
+body.project-page div.qc-plot-overlay-div {
+
+	opacity: 1;
+	filter: Alpha(Opacity=100);
+
+	background-color:white;
+	outline: 0px;
+
+	position: absolute;
+	top: 50px;
+	left: 50px;
+
+	/*
+	height: 400px;
+	*/
+
+	border: 1px;
+	border-style: solid;
+	border-color: #D3D3D3 ;
+
+
+	display: block;
+	z-index: 1002;
+
+	width: 1000px;
+
+
+}
+
+body.project-page .qc-plot-overlay-header { 
+	
+	height: 35px;
+	background-color: #FFF0F0; padding-bottom: 5px;
+
+	border-width: 0px;
+	border-bottom-width: 1px;
+	border-style: solid;
+	border-color: #D3D3D3 ;
+ }
+
+body.project-page .qc-plot-overlay-X-for-exit-overlay { float: right; border-color: #000000; height:33px; background-color: #A55353; color: white; padding: 3px; margin: 0px;  cursor: pointer;  }
+
+body.project-page .qc-plot-overlay-header-text { color: black; padding: 3px; margin: 0px; text-align: center;  }
+
+body.project-page .qc-plot-overlay-body {  padding: 20px; }
+
+body.project-page .qc-plot-overlay-link { margin-right: 20px;  }
+
+
+
+
+
+	/* ----------------------  */
+	
+	/*  All View Data pages */
+	
+
+	/* General View Data pages */
+
+body.crosslinks-page-main .psm-open-spectrum-link-clicked { color: #FF0000; }
+
+
+	/*  Merged Search Data Pages  */
+	
+	
+	/* background colors for the searches.  
+	
+	This number of colors must match the calculation in /WebRoot/WEB-INF/jsp-includes/mergedSearch_SearchIndexToSearchColorCSSClassName.jsp
+	
+	There is a copy of these colors altered to compensate for fill-opacity: 0.3 in the venn diagram in js/mergedSearchesVennDiagramCreator.js
+	
+	*/
+body.crosslinks-page-main .merged-search-search-background-color-1 { background-color: #FFDFDF }
+body.crosslinks-page-main .merged-search-search-background-color-2 { background-color: #DFFFDF }
+body.crosslinks-page-main .merged-search-search-background-color-3 { background-color: #DFDFFF }
+body.crosslinks-page-main .merged-search-search-background-color-4 { background-color: #FFDFFF }
+body.crosslinks-page-main .merged-search-search-background-color-5 { background-color: #FFEBC1 }
+body.crosslinks-page-main .merged-search-search-background-color-6 { background-color: #DFFFFF }
+body.crosslinks-page-main .merged-search-search-background-color-7 { background-color: #FFFDC1 }
+body.crosslinks-page-main .merged-search-search-background-color-8 { background-color: #EBF2FF }
+body.crosslinks-page-main .merged-search-search-background-color-9 { background-color: #F5FFDE }
+
+
+
+
+/*  User Account Management Pages */
+
+/*  User Account Page  */
+
+body.manage-account-page {  }
+
+body.manage-account-page  .top-level-label { margin-top: 20px; }
+
+body.manage-account-page .account-info-block { margin-left: 40px; }
+
+body.manage-account-page .value-container { clear: both; margin-bottom: 20px; }
+body.manage-account-page .value-container-keep-with-next { clear: both; margin-bottom: 5px; }
+
+body.manage-account-page .value-label {  float: left; font-weight: bold; }
+
+body.manage-account-page .current-value-container, body.manage-account-page .edit-value-container {  margin-left: 120px; }
+
+body.manage-account-page .edit-value-container { display: none; }
+
+body.manage-account-page  .edit-value-input-field { width: 275px;  }
+
+
+
+body.manage-account-page div.error-message-container { display: none; width: 100%; text-align: center; position: absolute; z-index: 1; }
+
+body.manage-account-page .error-message-inner-container { font-size: 18px; padding: 10px; color: white; background-color: red; }
+
+body.manage-account-page span.error-message-text {  }
+	
+body.manage-account-page .error-message-close-x { cursor: pointer; float: right; margin-left: 10px; }
+
+
+/* Manage Users Page  */
+
+
+body.manage-users-page {  }
+
+body.manage-users-page  .top-level-label { margin-top: 20px; }
+
+
+	/* user list, invited and current */
+	
+body.manage-users-page .invited-person-invite-date-block { padding-left: 20px; }	
+
+body.manage-users-page .invite-user-text-link { font-size: 14px; text-decoration: none; color: black; font-weight: bold; opacity:0.6;filter:alpha(opacity=60);  }
+
+body.manage-users-page .account-info-block { margin-left: 40px; }
+
+
+body.manage-users-page .name-of-user, body.manage-users-page .role-of-user  {  }
+
+body.manage-users-page .name-of-user-disabled-user { font-style: italic; opacity:0.4;filter:alpha(opacity=40);  }
+
+/*
+body.manage-users-page .name-of-user, body.manage-users-page .role-of-user  { font-size: 12px;color: black; opacity:0.7;filter:alpha(opacity=70);  }
+
+body.manage-users-page .name-of-user-disabled-user { font-size: 12px; font-style: italic; color: black; opacity:0.4;filter:alpha(opacity=40);  }
+*/
+
+/*
+manage users:
+	"Manage Users" text: black, 60% opacity, bold, 24px
+	"Invite User" text: black, 60% opacity, bold, 14px
+	Names and roles text: black, 70%, 12px
+	Disabled user name text: black, 40%, italic, 12px
+	red horizontal rules: width 1px, color: #A55353, 60% opacity, width: 80-90ish %
+
+*/	
+
+
+
+
+/* ----------------------  OVERLAYS  ----------------------  */
+
+
+
+/* -----   Running Program to Create Annotation Data  Overlay Div on View Image Page  modal dialog background ----- */
+
+.run-pgm-annotation-data-modal-dialog-overlay-background {
+	
+
+	cursor: pointer; /* set mouse to pointer */
+
+	  z-index: 18;
+	  
+	  background-color: black;
+	opacity: .80;
+	filter: Alpha(Opacity=80);
+
+	  /*  Moved to inline style in header so context is not hard coded
+	background: #666 url(/???context???/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
+	*/
+	/*  
+	opacity: .50;
+	filter: Alpha(Opacity=50);
+	*/
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+
+/*  Running Program to Create Annotation Data  Overlay     */
+
+
+.view-merged-image-page  div.run-pgm-annotation-data-overlay-div {
+
+	opacity: 1;
+	filter: Alpha(Opacity=100);
+
+	background-color:white;
+	outline: 0px;
+
+	position: absolute;
+	top: 20px;
+	left: 20px;
+
+	/*
+	height: 400px;
+	*/
+	border: 1px;
+	border-style: solid;
+	border-color: #D3D3D3 ;
+
+	display: block;
+	z-index: 20;
+
+	width: 600px;
+
+
+}
+
+
+
+.run-pgm-annotation-data-overlay-header  { 
+	
+	height: 35px;
+	background-color: #FFF0F0; padding-bottom: 5px;
+
+	border-width: 0px;
+	border-bottom-width: 1px;
+	border-style: solid;
+	border-color: #D3D3D3 ;
+ }
+
+.run-pgm-annotation-data-overlay-X-for-exit-overlay { float: right; border-color: #000000; height:33px; background-color: #A55353; color: white;  padding: 3px; margin: 0px;  cursor: pointer;  }
+
+.run-pgm-annotation-data-overlay-header-text { color: black; padding: 3px; margin: 0px; text-align: center;  }
+
+.run-pgm-annotation-data-overlay-body {  padding: 20px; }
+
+.run-pgm-annotation-data-overlay-link { margin-right: 20px;  }
+
+
+
+
+
+/* -----   Program to Create Annotation Data FAILED  Overlay Div on View Image Page  modal dialog background ----- */
+
+.pgm-failed-annotation-data-modal-dialog-overlay-background {
+	
+
+	/*  cursor: pointer; */ /* set mouse to pointer */
+
+	  z-index: 18;
+	  
+	  background-color: black;
+	opacity: .80;
+	filter: Alpha(Opacity=80);
+
+	  /*  Moved to inline style in header so context is not hard coded
+	background: #666 url(/???context???/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
+	*/
+	/*  
+	opacity: .50;
+	filter: Alpha(Opacity=50);
+	*/
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+
+/*  Running Program to Create Annotation Data  Overlay     */
+
+
+.view-merged-image-page  div.pgm-failed-annotation-data-overlay-div {
+
+	opacity: 1;
+	filter: Alpha(Opacity=100);
+
+	background-color:white;
+	outline: 0px;
+
+	position: absolute;
+	top: 20px;
+	left: 20px;
+
+	/*
+	height: 400px;
+	*/
+	border: 1px;
+	border-style: solid;
+	border-color: #D3D3D3 ;
+
+	display: block;
+	z-index: 20;
+
+	width: 600px;
+
+	/* Special for ERROR overlay div */
+	border: 3px;
+	border-style: solid;
+	border-color: red ;
+}
+
+
+
+.pgm-failed-annotation-data-overlay-header  { 
+	
+/*	height: 35px; */
+
+	background-color: #FFF0F0; padding-bottom: 5px;
+
+	border-width: 0px;
+	border-bottom-width: 1px;
+	border-style: solid;
+	border-color: #D3D3D3 ;
+ }
+
+.pgm-failed-annotation-data-overlay-X-for-exit-overlay { float: right; border-color: #000000; height:33px; background-color: #A55353; color: white;  padding: 3px; margin: 0px;  cursor: pointer;  }
+
+.pgm-failed-annotation-data-overlay-header-text { color: black; padding: 3px; margin: 0px; text-align: center;  }
+
+.pgm-failed-annotation-data-overlay-body {  padding: 20px; }
+
+.pgm-failed-annotation-data-overlay-link { margin-right: 20px;  }
+
+
+
+/* -----   View Line Information on View Image Page  modal dialog background ----- */
+
+.view-link-info-modal-dialog-overlay-background {
+	
+
+	cursor: pointer; /* set mouse to pointer */
+
+	  z-index: 18;
+	  
+	  background-color: black;
+	opacity: .80;
+	filter: Alpha(Opacity=80);
+
+	  /*  Moved to inline style in header so context is not hard coded
+	background: #666 url(/???context???/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
+	*/
+	/*  
+	opacity: .50;
+	filter: Alpha(Opacity=50);
+	*/
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+
+/*  View Line Info Overlay    */
+
+
+.view-merged-image-page  div.view-link-info-overlay-div, .view-merged-structure-page  div.view-link-info-overlay-div {
+
+	opacity: 1;
+	filter: Alpha(Opacity=100);
+
+	background-color:white;
+	outline: 0px;
+
+	position: absolute;
+	top: 50px;
+	left: 50px;
+
+	/*
+	height: 400px;
+	*/
+	border: 1px;
+	border-style: solid;
+	border-color: #D3D3D3 ;
+
+	display: block;
+	z-index: 20;
+
+	width: 1000px;
+
+
+}
+
+.link-info-table thead th, .link-info-table tbody td { padding: 4px; }
+
+
+
+/*
+.view-link-info-overlay-header { background-color: black; padding-bottom: 5px; }
+*/
+.view-link-info-overlay-header  { 
+	
+	height: 35px;
+	background-color: #FFF0F0; padding-bottom: 5px;
+
+	border-width: 0px;
+	border-bottom-width: 1px;
+	border-style: solid;
+	border-color: #D3D3D3 ;
+ }
+
+.view-link-info-overlay-X-for-exit-overlay { float: right; border-color: #000000; height:33px; background-color: #A55353; color: white;  padding: 3px; margin: 0px;  cursor: pointer;  }
+
+.view-link-info-overlay-header-text { color: black; padding: 3px; margin: 0px; text-align: center;  }
+
+.view-link-info-overlay-body {  padding: 20px; }
+
+.view-link-info-overlay-link { margin-right: 20px;  }
+
+
+.view-link-info-overlay-body table.link-info-table,
+.view-link-info-overlay-body table.link-info-table table { background-color: #CDCDCD; }
+
+.view-link-info-overlay-body table.link-info-table tbody td,
+.view-link-info-overlay-body table.link-info-table table tbody td { background-color: #FFFFFF; }
+
+
+
+
+/* -----   Lorikeet  modal dialog background ----- */
+
+
+	/* Lorikeet modal dialog background */
+.lorikeet-modal-dialog-overlay-background {
+	
+
+	cursor: pointer; /* set mouse to pointer */
+
+	  z-index: 1001;
+	  
+	  background-color: black;
+	opacity: .80;
+	filter: Alpha(Opacity=80);
+
+	  /*  Moved to inline style in header so context is not hard coded
+	background: #666 url(/???context???/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
+	*/
+	/*  
+	opacity: .50;
+	filter: Alpha(Opacity=50);
+	*/
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+
+/*  View Spectra Overlay for View Spectra Div   */
+
+
+div.view-spectra-overlay-div {
+
+	opacity: 1;
+	filter: Alpha(Opacity=100);
+
+	background-color:white;
+	outline: 0px;
+
+	position: absolute;
+	top: 50px;
+	left: 50px;
+
+	/*
+	height: 400px;
+	*/
+
+	border: 1px;
+	border-style: solid;
+	border-color: #D3D3D3 ;
+
+
+	display: block;
+	z-index: 1002;
+
+	width: 1000px;
+
+
+}
+
+.view-spectra-overlay-header { 
+	
+	height: 35px;
+	background-color: #FFF0F0; padding-bottom: 5px;
+
+	border-width: 0px;
+	border-bottom-width: 1px;
+	border-style: solid;
+	border-color: #D3D3D3 ;
+ }
+
+.view-spectra-overlay-X-for-exit-overlay { float: right; border-color: #000000; height:33px; background-color: #A55353; color: white; padding: 3px; margin: 0px;  cursor: pointer;  }
+
+.view-spectra-overlay-header-text { color: black; padding: 3px; margin: 0px; text-align: center;  }
+
+.view-spectra-overlay-body {  padding: 20px; }
+
+.view-spectra-overlay-link { margin-right: 20px;  }
+
+
+
+
+
+/* -----   Nag User  modal dialog background ----- */
+
+
+	/* Nag User modal dialog background */
+.nag-user-modal-dialog-overlay-background {
+	
+
+	cursor: pointer; /* set mouse to pointer */
+
+	  z-index: 1001;
+	  
+	  background-color: black;
+	opacity: .80;
+	filter: Alpha(Opacity=80);
+
+	  /*  Moved to inline style in header so context is not hard coded
+	background: #666 url(/???context???/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
+	*/
+	/*  
+	opacity: .50;
+	filter: Alpha(Opacity=50);
+	*/
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+
+/*  Nag User Overlay    */
+
+
+div.nag-user-overlay-div {
+
+	opacity: 1;
+	filter: Alpha(Opacity=100);
+
+	background-color:white;
+	outline: 0px;
+
+	position: absolute;
+	top: 50px;
+	left: 50px;
+
+	/*
+	height: 400px;
+
+	border: 3px;
+	border-style: solid;
+	*/
+
+
+	display: block;
+	z-index: 1002;
+
+	width: 1000px;
+
+
+}
+
+.nag-user-overlay-header { background-color: black; padding-bottom: 5px; }
+
+.nag-user-overlay-X-for-exit-overlay { float: right; border-color: #000000; background-color: white; color: #A55353; padding: 3px; margin: 0px;  cursor: pointer;  }
+
+.nag-user-overlay-header-text { color: white; padding: 3px; margin: 0px; text-align: center;  }
+
+.nag-user-overlay-body {  padding: 20px; }
+
+.nag-user-overlay-link { margin-right: 20px;  }
+
+
+
+/* -----   upload pdb modal dialog background ----- */
+
+
+	/* upload pdb modal dialog background */
+.pdb-upload-modal-dialog-overlay-background {
+	
+
+	cursor: pointer; /* set mouse to pointer */
+
+	  z-index: 1001;
+	  
+	  background-color: black;
+	opacity: .80;
+	filter: Alpha(Opacity=80);
+
+	  /*  Moved to inline style in header so context is not hard coded
+	background: #666 url(/???context???/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
+	*/
+	/*  
+	opacity: .50;
+	filter: Alpha(Opacity=50);
+	*/
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+
+/*  pdb upload Overlay    */
+
+
+div.pdb-upload-overlay-div {
+
+	opacity: 1;
+	filter: Alpha(Opacity=100);
+
+	background-color:white;
+	outline: 0px;
+
+	position: absolute;
+	top: 50px;
+	left: 50px;
+
+	/*
+	height: 400px;
+
+	border: 3px;
+	border-style: solid;
+	*/
+
+
+	display: block;
+	z-index: 1002;
+
+	width: 500px;
+
+
+}
+
+.pdb-upload-overlay-header { background-color: #A55353; padding-bottom: 5px; }
+
+.pdb-upload-overlay-X-for-exit-overlay { float: right; border-color: #000000; background-color: white; color: #A55353; padding: 3px; margin: 0px;  cursor: pointer;  }
+
+.pdb-upload-overlay-header-text { color: white; padding: 3px; margin: 0px; text-align: center;  }
+
+.pdb-upload-overlay-body {  padding: 20px; }
+
+.pdb-upload-overlay-link { margin-right: 20px;  }
+
+
+
+
+
+
+
+.pdb-map-protein-modal-dialog-overlay-background {
+	
+
+	cursor: pointer; /* set mouse to pointer */
+
+	  z-index: 1001;
+	  
+	  background-color: black;
+	opacity: .80;
+	filter: Alpha(Opacity=80);
+
+	  /*  Moved to inline style in header so context is not hard coded
+	background: #666 url(/???context???/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
+	*/
+	/*  
+	opacity: .50;
+	filter: Alpha(Opacity=50);
+	*/
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+div.pdb-map-protein-overlay-div {
+
+	opacity: 1;
+	filter: Alpha(Opacity=100);
+
+	background-color:white;
+	outline: 0px;
+
+	position: absolute;
+	top: 50px;
+	left: 50px;
+
+	/*
+	height: 400px;
+
+	border: 3px;
+	border-style: solid;
+	*/
+
+
+	display: block;
+	z-index: 1002;
+
+	width: 1000px;
+
+
+}
+
+.pdb-map-protein-overlay-header { background-color: #A55353; padding-bottom: 5px; }
+
+.pdb-map-protein-overlay-X-for-exit-overlay { float: right; border-color: #000000; background-color: white; color: #A55353; padding: 3px; margin: 0px;  cursor: pointer;  }
+
+.pdb-map-protein-overlay-header-text { color: white; padding: 3px; margin: 0px; text-align: center;  }
+
+.pdb-map-protein-overlay-body {  padding: 20px; }
+
+.pdb-map-protein-overlay-link { margin-right: 20px;  }
+
+
+
+
+
+
+.pdb-show-alignment-modal-dialog-overlay-background {
+	
+
+	cursor: pointer; /* set mouse to pointer */
+
+	  z-index: 1001;
+	  
+	  background-color: black;
+	opacity: .80;
+	filter: Alpha(Opacity=80);
+
+	  /*  Moved to inline style in header so context is not hard coded
+	background: #666 url(/???context???/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
+	*/
+	/*  
+	opacity: .50;
+	filter: Alpha(Opacity=50);
+	*/
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+div.pdb-show-alignment-overlay-div {
+
+	opacity: 1;
+	filter: Alpha(Opacity=100);
+
+	background-color:white;
+	outline: 0px;
+
+	position: absolute;
+	top: 50px;
+	left: 50px;
+
+	/*
+	height: 400px;
+
+	border: 3px;
+	border-style: solid;
+	*/
+
+
+	display: block;
+	z-index: 1002;
+
+	width: 1000px;
+
+
+}
+
+.pdb-show-alignment-overlay-header { background-color: #A55353; padding-bottom: 5px; }
+
+.pdb-show-alignment-overlay-X-for-exit-overlay { float: right; border-color: #000000; background-color: white; color: #A55353; padding: 3px; margin: 0px;  cursor: pointer;  }
+
+.pdb-show-alignment-overlay-header-text { color: white; padding: 3px; margin: 0px; text-align: center;  }
+
+.pdb-show-alignment-overlay-body {  padding: 20px; }
+
+.pdb-show-alignment-overlay-link { margin-right: 20px;  }
+
+
+
+
+	/* delete pdb-file modal dialog */
+
+body.project-page .delete-pdb-file-overlay-containing-outermost-div { width: 100%; height: 0px;   }
+body.project-page .delete-pdb-file-overlay-containing-outer-div { position: relative; display: inline-block; }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .delete-pdb-file-overlay-containing-outer-div, body.project-page .delete-pdb-file-overlay-container { width: 500px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .delete-pdb-file-overlay-container { left: -200px;  }
+
+
+	/* delete alignment modal dialog */
+
+body.project-page .delete-alignment-overlay-containing-outermost-div { width: 100%; height: 0px;   }
+body.project-page .delete-alignment-overlay-containing-outer-div { position: relative; display: inline-block; }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .delete-alignment-overlay-containing-outer-div, body.project-page .delete-alignment-overlay-container { width: 500px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .delete-alignment-overlay-container { left: -200px;  }
+
+
+

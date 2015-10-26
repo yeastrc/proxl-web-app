@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+
+<taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd"> 
+
+   
+
+<tlib-version>1.0</tlib-version> 
+
+  <short-name>Proxl-Default-page</short-name> 
+
+  <uri>http://org.yeastrc.proxl</uri> 
+
+ 
+
+  <tag> 
+
+    <name>defaultPageUrl</name> 
+
+    <tag-class>org.yeastrc.xlink.www.taglib.GetDefaultPageURLTaglib</tag-class> 
+
+	<bodycontent>JSP</bodycontent>
+
+<!--  
+    <body-content>scriptless</body-content> 
+    <body-content>empty</body-content> 
+-->
+	<attribute>
+	<name>pageName</name>
+	<required>true</required>
+	<rtexprvalue>true</rtexprvalue>
+	</attribute>
+	
+	<attribute>
+	<name>searchId</name>
+	<required>true</required>
+	<rtexprvalue>true</rtexprvalue>
+	</attribute>
+  </tag> 
+
+ 
+
+</taglib>

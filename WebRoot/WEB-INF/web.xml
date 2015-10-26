@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	version="2.5"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee   http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+	<display-name />
+	<servlet>
+		<servlet-name>action</servlet-name>
+		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+		<init-param>
+			<param-name>config</param-name>
+			<param-value>/WEB-INF/struts-config.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>3</param-value>
+		</init-param>
+		<init-param>
+			<param-name>detail</param-name>
+			<param-value>3</param-value>
+		</init-param>
+		<load-on-startup>0</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+  <!-- REST Webservices by JAX-RS Jersey Servlet -->
+    <servlet>
+        <servlet-name>JAX-RS REST Jersey Servlet</servlet-name>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            
+            <!-- specifies the packages to scan for Classes that have Jersey annotations for webservices -->
+            <!-- Adding "jackson.jaxrs" changes the JSON and JAXB XML provider to Jackson -->
+            <param-value>com.fasterxml.jackson.jaxrs;org.yeastrc.xlink.www.webservices;org.yeastrc.xlink.www.user_account_webservices</param-value>
+        </init-param>  
+        
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>JAX-RS REST Jersey Servlet</servlet-name>
+  	<url-pattern>/services/*</url-pattern>
+  </servlet-mapping>
+
+
+  <!-- Filters - run on each request -->
+   
+
+    <!-- filter to set character encoding on each request -->
+    
+    <filter>
+        <filter-name>Set Character Encoding</filter-name>
+        <filter-class>org.apache.filters.SetCharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ignore</param-name>
+            <param-value>false</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>Set Character Encoding</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+	<!-- This filter will be the Second called for a request and does initial setup -->
+    <filter>
+	  <filter-name>InitialServletFilter</filter-name>
+	  <filter-class>org.yeastrc.xlink.www.servlet_filter.InitialServletFilter</filter-class>
+    </filter>
+
+	<filter-mapping>
+	  <filter-name>InitialServletFilter</filter-name>
+	  <url-pattern>/*</url-pattern> 
+	</filter-mapping>	
+
+ 
+
+
+
+	<!-- Servlet Context Listeners.  Called on Web app startup and shutdown -->
+	<listener>
+		<listener-class>
+		org.yeastrc.xlink.www.servlet_context.ServletContextAppListener
+		</listener-class>
+	</listener>
+  
+
+</web-app>
+
