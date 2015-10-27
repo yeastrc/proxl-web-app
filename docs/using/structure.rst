@@ -88,13 +88,30 @@ Viewer Interaction
 
 .. _structure-upload-pdb-label:
 
-Upload PDB
+Upload PDB File
 --------------------------------------
+A PDB file in ProXL is any file adhering to the `PDB file format <http://www.wwpdb.org/documentation/file-format>`_. These
+include public PDB files downloaded from the PDB database, or structures you have generated yourself using any number of programs--
+as long as they adhere to the PDB file format. The PDB file may contain structures for multiple proteins (such as for a protein complex).
+PDB files you upload to ProXL are only visible to members of the project which
+which the data are associated. (If you enable public access on the project, the PDB file will be visible to public access users as well.)
+
+To upload a PDB file, click the "+Upload PDB File" link next to the PDB file pull-down menu above the viewer:
+
+.. image:: /images/structure-upload-pdb1.png
+
+This will open a dialog for uploading a PDB file. Click the button next to "Select PDB File" to select a PDB file on your computer:
+
+.. image:: /images/structure-upload-pdb2.png
+
+Enter a brief description for your PDB file and click "Upload PDB File." The PDB file will then be visible in the PDB File pull-down menu.
 
 .. _structure-map-pdb-to-proteins-label:
 
 Map PDB Chains to Proteins
 ----------------------------------------
+After PDB file has been uploaded, it is possible to map proteins from the experiment to sequences present for chains in the PDB file.
+
 
 .. _structure-interactive-structure-panel-label:
 
