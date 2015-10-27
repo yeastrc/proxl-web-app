@@ -28,7 +28,7 @@ public class SearchUtils {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		String sql = "SELECT accessionString FROM tblProteinDatabase WHERE proteinID = ? AND databaseID = ?";
+		String sql = "SELECT GROUP_CONCAT(accessionString) FROM tblProteinDatabase WHERE proteinID = ? AND databaseID = ? GROUP BY proteinID";
 		
 		try {
 			
