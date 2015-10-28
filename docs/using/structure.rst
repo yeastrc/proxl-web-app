@@ -250,17 +250,77 @@ Popin Viewer
 To pop the structure viewer back into the original panel, simply close the new window or click the "[Popin Viewer]" link where the "[Popout Viewer]" link
 was originally.
 
+Delete PDB File
+-------------------------------------------------
+.. image:: /images/structure-delete-pdb.png
+
+Project owners may delete a PDB file from by clicking the red (X) icon above the structure view panel. This will remove the PDB file from this project
+and make it unavailable to users of the project. Note, if the same PDB file has been uploaded to other projects, those will be unaffected.
+
+Download PDB File
+-------------------------------------------------
+.. image:: /images/structure-download-pdb.png
+
+Project members (or public access users, if enabled) may download the PDB file by clicking the download icon above the structure view panel. This file is suitable
+for viewing in structure viewing software such as Chimera or Pymol.
+
+Download Chimera Script
+-------------------------------------------------
+.. image:: /images/structure-download-chimera-script.png
+
+Project members (or public access users, if enabled) may download a Chimera script that will draw the currently-visible links onto the current PDB
+file by clicking the Chimera icon above the stucture view panel. This script may be run in Chimera after loading the PDB file, by choosing "File->Open",
+choosing the script that was downloaded, and choosing "Chimera Commands" as the file type.
+
+.. image:: /images/structure-chimera-example.png
+
+
+Download Pymol Script
+-------------------------------------------------
+.. image:: /images/structure-download-pymol-script.png
+
+Project members (or public access users, if enabled) may download a Pymol script that will draw the currently-visible links onto the current PDB
+file by clicking the Pymol icon above the stucture view panel. This script may be run in Pymol after loading the PDB file by typing "@C:\location\to\script.txt"
+in the Pymol command line (where C:\location\to\script.txt is the actual location of the downloaded file).
+
+.. image:: /images/structure-pymol-example.png
+
 
 .. _structure-pdb-chain-to-protein-map-label:
 
 PDB Chain to Protein Map
 ======================================
+This section describes the functionality and features of the default right panel, where the proteins from the experiment that
+have been aligned to chains in the PDB file are displayed:
 
+.. image:: /images/structure-pdb-chain-to-protein-map.png
+
+
+
+
+View Alignment
+-------------------------------------------------
+As shown below, project owners and non-owners have a different set of options associated with protein/PDB alignments:
+
+.. image:: /images/structure-view-alignment1.png
+
+Owners may click on the edit icon (pencil icon) to either view or manually edit the alignment. Non owners may click
+on the examine icon (magnifying glass icon) to view the alignment.
+
+Edit Alignment
+-------------------------------------------------
+Project owners may click on the edit icon (pencil icon) next to the protein/PDB alignment they wish to view or edit.
+
+Delete Alignment
+-------------------------------------------------
+Project owners may click the delete icon ((X) icon) next to the protein/PDB alignment they wish to delete. Deleting
+the alignment removes it from the database and makes it unavailable for all users.
 
 .. _structure-distance-report-label:
 
 Distance Report
 ==========================================
+
 
 
 
