@@ -163,66 +163,79 @@ public class MergedSearchCrosslinkPeptideSearcher {
 	 */
 	public int getNumUniqueLinkedPeptides( MergedSearchProteinCrosslink crosslink ) throws Exception {
 		
-		int count = 0;
-		
+		try {
 
-		Collection<SearchDTO> searches = crosslink.getSearchProteinCrosslinks().keySet();
-		
-		// iterate over each peptide, see which are unique in the contest of the FASTAs represented by
-		// this merged search set
-		for( ReportedPeptideDTO reportedPeptide : getLinkedPeptides( crosslink ) ) {
-			
-			PsmDTO psm = null;
-			
-			for ( SearchDTO search : searches ) {
+			int count = 0;
 
-				psm = PsmDAO.getInstance().getOnePsmDTOForSearchIdAndReportedPeptideId( reportedPeptide.getId(), search.getId() );
-				
-				if ( psm != null ) {
-					
-					break;
+
+			Collection<SearchDTO> searches = crosslink.getSearchProteinCrosslinks().keySet();
+
+			// iterate over each peptide, see which are unique in the contest of the FASTAs represented by
+			// this merged search set
+			for( ReportedPeptideDTO reportedPeptide : getLinkedPeptides( crosslink ) ) {
+
+				PsmDTO psm = null;
+
+				for ( SearchDTO search : searches ) {
+
+					psm = PsmDAO.getInstance().getOnePsmDTOForSearchIdAndReportedPeptideId( reportedPeptide.getId(), search.getId() );
+
+					if ( psm != null ) {
+
+						break;
+					}
 				}
-			}
-			
-			if ( psm == null ) {
-				
 
-				String msg = "Skipping Reported Peptide:  No PSMs found for reportedPeptide.getId(): " + reportedPeptide.getId();
-				
-				log.warn( msg );
-				
-				continue;
-			}
-			
+				if ( psm == null ) {
 
-			CrosslinkDTO crosslinkDTO = CrosslinkDAO.getInstance().getCrosslinkDTOByPsmId( psm.getId() );
+
+					String msg = "Skipping Reported Peptide:  No PSMs found for reportedPeptide.getId(): " + reportedPeptide.getId();
+
+					log.warn( msg );
+
+					continue;
+				}
+
+
+				CrosslinkDTO crosslinkDTO = CrosslinkDAO.getInstance().getCrosslinkDTOByPsmId( psm.getId() );
+
+				if ( crosslinkDTO == null ) {
+
+					String msg = "No Crosslink found for psm.getId(): " + psm.getId();
+
+					log.error( msg );
+
+					throw new Exception( msg );
+				}
+
+				Collection<Integer> peptideIds = new ArrayList<>();
+
+				peptideIds.add( crosslinkDTO.getPeptide1Id() );
+
+				if ( crosslinkDTO.getPeptide1Id() != crosslinkDTO.getPeptide2Id() ) {
+
+					peptideIds.add( crosslinkDTO.getPeptide2Id() );
+				}
+
+
+				if( ReportedPeptideSearcher.getInstance().isUnique( reportedPeptide, peptideIds, crosslink.getSearchProteinCrosslinks().keySet() ) ) {
+
+					count++;
+				}
+			}		
+
+			return count;
+
+		} catch ( Exception e ) {
 			
-			if ( crosslinkDTO == null ) {
-				
-				String msg = "No Crosslink found for psm.getId(): " + psm.getId();
-				
-				log.error( msg );
-				
-				throw new Exception( msg );
-			}
+			String msg = "Exception in getNumUniqueLinkedPeptides( MergedSearchProteinCrosslink crosslink ): " 
+					+ " crosslink.getProtein1().getNrProtein().getNrseqId(): " + crosslink.getProtein1().getNrProtein().getNrseqId()
+					+ " crosslink.getProtein2().getNrProtein().getNrseqId(): " + crosslink.getProtein2().getNrProtein().getNrseqId();
 			
-			Collection<Integer> peptideIds = new ArrayList<>();
+			log.error( msg, e );
 			
-			peptideIds.add( crosslinkDTO.getPeptide1Id() );
-			
-			if ( crosslinkDTO.getPeptide1Id() != crosslinkDTO.getPeptide2Id() ) {
-				
-				peptideIds.add( crosslinkDTO.getPeptide2Id() );
-			}
-			
-			
-			if( ReportedPeptideSearcher.getInstance().isUnique( reportedPeptide, peptideIds, crosslink.getSearchProteinCrosslinks().keySet() ) ) {
-			
-				count++;
-			}
-		}		
-		
-		return count;
+			throw e;
+		}
 	}
 	
 	

@@ -63,8 +63,12 @@ public class ReportedPeptideSearcher {
 				rs.next();
 				
 				int count = rs.getInt( 1 );
-				if( count == 0 )
-					throw new Exception( "Got 0 proteins for peptide?" );
+				if( count == 0 ) {
+				
+					String msg = "Got zero proteins for peptide: " + peptideId;
+					log.error( msg );
+					throw new Exception( msg );
+				}
 				
 				if( count > 1 ) {
 					isUniqueRetBool = false;

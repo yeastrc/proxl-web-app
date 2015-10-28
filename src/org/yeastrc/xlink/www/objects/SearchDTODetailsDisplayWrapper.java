@@ -6,16 +6,22 @@ import java.util.List;
 
 import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.searcher.SearchProgramDisplaySearcher;
 
 /**
- * Used for the searchDetailsBlock.jsp
+ * Used for the searchDetailsBlock.jsp and viewProject.jsp
  *
  */
 public class SearchDTODetailsDisplayWrapper {
 
 	private SearchDTO searchDTO;
 
+	private List<SearchProgramDisplay> searchProgramDisplayList; 
 	
+	/**
+	 * @return
+	 * @throws Exception
+	 */
 	public String getLinkersDisplayString() throws Exception {
 		
 		if ( searchDTO == null ) {
@@ -53,6 +59,27 @@ public class SearchDTODetailsDisplayWrapper {
 		
 		return linkersString;
 	}
+	
+
+	
+	/**
+	 * @return
+	 * @throws Exception
+	 */
+	public List<SearchProgramDisplay> getSearchPrograms() throws Exception {
+		
+		if ( searchProgramDisplayList != null ) {
+			
+			return searchProgramDisplayList;
+		}
+		
+		int searchId = getSearchDTO().getId();
+		
+		searchProgramDisplayList = SearchProgramDisplaySearcher.getInstance().getSearchProgramDisplay( searchId );
+		
+		return searchProgramDisplayList;
+	}
+	
 	
 	
 	//  Getters & Setters
