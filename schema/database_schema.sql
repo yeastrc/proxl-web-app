@@ -2029,6 +2029,50 @@ CREATE INDEX `search__rep_pep__dyn_mods_search_id_lnk_tp_bpqv_idx` ON `search__r
 CREATE INDEX `search__rep_pep__dyn_mods_search_id_bpqv_idx` ON `search__reported_peptide__dynamic_mod_lookup` (`search_id` ASC, `best_psm_q_value` ASC);
 
 
+-- -----------------------------------------------------
+-- Table `search_program`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `search_program` ;
+
+CREATE TABLE IF NOT EXISTS `search_program` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(200) NOT NULL,
+  `short_name` VARCHAR(100) NOT NULL,
+  `display_name` VARCHAR(255) NOT NULL,
+  `description` VARCHAR(255) NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+CREATE UNIQUE INDEX `search_program__name_unique_idx` ON `search_program` (`name` ASC);
+
+CREATE UNIQUE INDEX `search_program__short_name_unique_idx` ON `search_program` (`short_name` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `search__search_program`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `search__search_program` ;
+
+CREATE TABLE IF NOT EXISTS `search__search_program` (
+  `search_id` INT UNSIGNED NOT NULL,
+  `search_program_id` INT UNSIGNED NOT NULL,
+  `version` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`search_id`, `search_program_id`),
+  CONSTRAINT `search_program_version_search_program_id_fk`
+    FOREIGN KEY (`search_program_id`)
+    REFERENCES `search_program` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT `search_program_version__search_id_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `search_program_version_search_program_id_fk_idx` ON `search__search_program` (`search_program_id` ASC);
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
