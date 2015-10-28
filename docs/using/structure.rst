@@ -86,7 +86,7 @@ more information.
 
 
 Uploading PDB Files and Mapping Proteins
-====================================
+=========================================
 
 .. _structure-upload-pdb-label:
 
@@ -150,13 +150,13 @@ This process can be repeated for as many other chains as desired. Additionally, 
 in the case that homologs or proteoforms are present in the search results. However, only up to one protein listed under a given chain may be checked at any given time.
 
 Then, to view the crosslinking results on the structure, check the desired protein chain alignments (check box next to a given protein listed under a given chain). To learn
-more about the effects and implications of checking the alignments, see :ref:`structure-checking-and-unchecking-proteins-label`.
+more about the effects and implications of checking the alignments, see :ref:`structure-pdb-chain-to-protein-map-label`.
 
 .. image:: /images/structure-map-proteins-to-chains6.png
 
 Edit PDB Chain to Protein Mapping
 ------------------------------------------
-Although not generally advised, there are two methods for editing the alignment between an experimental protein and a PDB chain. First, during the initial mapping process described above, instead
+Although not generally advised, there are two methods for manually editing the alignment between an experimental protein and a PDB chain. First, during the initial mapping process described above, instead
 of clicking "Save" or "Cancel" on the final step, click "Edit." Or, after the mapping is complete, click the pencil icon next to the protein name associated with
 a chain in the PDB and click "Edit" in the resulting window. Both methods will open the alignment edit window:
 
@@ -167,32 +167,102 @@ This alignment may be manually edited, either in this window or in an external t
 the dashes (-) must be identical, and the sequences present for the experimental protein and PDB chain (without the dashes) must match the sequences on record. To cancel the process,
 click "Cancel". To save the manual alignment, click "Save."
 
-Viewer Interaction
-============================
-
-.. _structure-checking-and-unchecking-proteins-label:
-
-PDB Chain to Protein Map
---------------------------------
-
-.. _structure-distance-report-label:
+Delete PDB Chain to Protein Mapping
+------------------------------------------
+Click the red circle (X) icon next to the protein listed for a chain in the PDB on the "PDB Chain to Protein Map" panel to remove that alignment from the database.
 
 
 .. _structure-interactive-structure-panel-label:
 
 Interactive Structure Panel
---------------------------------
+================================================
+This section describes the functionality and features of the left panel, where the 3D protein structures are presented:
 
-.. _structure-pdb-chain-to-protein-map-label:
-
-
-Distance Report
---------------------------------
+.. image:: /images/structure-interaction1.png
 
 .. _structure-manipulation-label:
 
 Structure Manipulation
---------------------------------
+-------------------------------------------------
+
+Rotation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Using a mouse, the structure may be rotated on a central axis by clicking and dragging in the panel--that is, click, hold down mouse button, and move the mouse cursor in the desired
+direction of rotation. On touch devices, simply tap, hold, and slide finger in desired direction of rotation.
+
+Zooming
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To zoom in or out using a mouse, use the scroll wheel--slide the scroll wheel towards you to zoom in and away from you to zoom out. On touch devices, pinch and zoom with two
+fingers to zoom in or to zoom out.
+
+Re-centering
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Double clicking on the structure will move the center of rotation to that point and re-center the view of the structure to that point.
+
+Click on Links
+-------------------------------------------------
+Any link (crosslink, looplinks or monolink) may be clicked on to view underlying link information (such as which positions in
+which proteins are connected), a peptide list for peptides found to support those links, a list of corresponding PSMs, and view
+associated spectra.
+
+Clicking a link will open a window that lists the link information and underlying peptide list:
+
+.. image:: /images/structure-data-for-link1.png
+
+At the top are the linked proteins, their respective positions, and the distance of that link. A list of peptides is then presented
+for each search (if viewing data from multiple searches, each search is listed) that support this link.  Any of the rows listing
+peptides may be clicked and expanded to view the underlying PSMs:
+
+.. image:: /images/structure-data-for-link2.png
+
+The "View Spectrum" link for each PSM will show the respective spectrum using the built-in spectrum viewer. See :doc:`/using/spectrum-viewer` for more information.
+
+Save Image of Structure
+-------------------------------------------------
+Right-click the structure to save the current view as an image. This image has the same dimensions as the view window. To capture a high resolution
+image of the structure, use the :ref:`structure-popout-viewer-label` function to view the structure in a separate window, make that window as large
+as possible and then save the view as an image.
+
+.. image:: /images/structure-save-image.png
+
+
+.. _structure-popout-viewer-label:
+
+Popout Viewer
+-------------------------------------------------
+The structure viewer may be "popped out" into a separate window by clicking the "[Popout Viewer]" link next to the viewer options:
+
+.. image:: /images/structure-popout-viewer1.png
+
+Clicking this link creates a new browser window with a structure viewer that fills that window:
+
+.. image:: /images/structure-popout-viewer2.png
+
+Resizing the new window dynamically changes the size of the structure viewer so that it always fills the window. The separate window allows for enhanced exploration
+of the structure. Not only is the structure larger and easier to see, but clicking on links in the viewer will open windows for those links in the
+original window without obscuring the structure. This is further enhanced in a multi-monitor environment, where it is possible to run the structure viewer full-screen on its own monitor.
+
+The separate window also allows for the download of much higher resolution images of the structure, since the downloaded image has the same resolution as the 3D
+rendering of the structure. To download the image, right-click on the structure in the new window and choose to save the image to your computer or device.
+
+Popin Viewer
+-------------------------------------------------
+To pop the structure viewer back into the original panel, simply close the new window or click the "[Popin Viewer]" link where the "[Popout Viewer]" link
+was originally.
+
+
+.. _structure-pdb-chain-to-protein-map-label:
+
+PDB Chain to Protein Map
+======================================
+
+
+.. _structure-distance-report-label:
+
+Distance Report
+==========================================
+
+
 
 
 
