@@ -3,12 +3,16 @@ package org.yeastrc.xlink.www.objects;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.www.searcher.MergedSearchCrosslinkPeptideSearcher;
 import org.yeastrc.xlink.www.searcher.MergedSearchPsmSearcher;
 
 public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedSearchLink {
 
+	private static final Logger log = Logger.getLogger(MergedSearchProteinCrosslink.class);
+	
+			
 	@Override
 	public Collection<SearchDTO> getSearches() {
 
@@ -100,10 +104,24 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 		return this.numLinkedPeptides;
 	}
 	public int getNumUniqueLinkedPeptides() throws Exception {
-		if( this.numUniqueLinkedPeptides == -1 )
-			this.numUniqueLinkedPeptides = MergedSearchCrosslinkPeptideSearcher.getInstance().getNumUniqueLinkedPeptides( this );
+		
+		try {
+			if( this.numUniqueLinkedPeptides == -1 )
+				this.numUniqueLinkedPeptides = MergedSearchCrosslinkPeptideSearcher.getInstance().getNumUniqueLinkedPeptides( this );
+
+			return this.numUniqueLinkedPeptides;
 			
-		return this.numUniqueLinkedPeptides;
+		} catch ( Exception e ) {
+			
+			String msg = "Exception in getNumUniqueLinkedPeptides( MergedSearchProteinCrosslink crosslink ): " 
+					+ " this.getProtein1().getNrProtein().getNrseqId(): " + this.getProtein1().getNrProtein().getNrseqId()
+					+ " this.getProtein2().getNrProtein().getNrseqId(): " + this.getProtein2().getNrProtein().getNrseqId();
+			
+			log.error( msg, e );
+			
+			throw e;
+		}
+
 	}
 	
 

@@ -1538,6 +1538,41 @@
 												<td>Linker:</td>
 												<td><c:out value="${ search_wrapper.linkersDisplayString }"></c:out></td>
 											</tr>								  
+
+											<tr>
+												<td valign="top"  >
+													Search 
+													Program<c:if test="${ fn:length( search_wrapper.searchPrograms ) > 1 }" >s</c:if>:
+												</td>
+												
+												 <c:choose>
+												  <c:when test="${ empty search_wrapper.searchPrograms }">
+													<td  style="padding-top: 2px;">
+													  	Not Found
+													</td>
+												  </c:when>
+												  <c:otherwise>
+												    <td style="border-width:0px; padding: 0px;">
+
+													<table  style="border-width:0px; border-spacing: 0px; ">
+
+												   <c:forEach var="searchProgram" items="${ search_wrapper.searchPrograms }">
+												     <tr>
+												      <td style="padding-right: 5px;">
+												     	<c:out value="${ searchProgram.displayName }"></c:out>
+												      </td>
+												      <td >
+												     	<c:out value="${ searchProgram.version }"></c:out>
+												      </td>
+												     </tr>
+												   </c:forEach>
+
+												    </table>
+												  
+													</td>
+												  </c:otherwise> 
+												 </c:choose>
+											</tr>								  
 											
 											<tr>
 												<td>Upload:</td>

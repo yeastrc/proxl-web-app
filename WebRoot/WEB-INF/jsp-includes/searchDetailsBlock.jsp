@@ -50,7 +50,45 @@
 			<tr>
 				<td>Linker:</td>
 				<td><c:out value="${ search_details.linkersDisplayString }"></c:out></td>
+			</tr>							
+
+
+			<tr>
+				<td valign="top"  >
+					Search 
+					Program<c:if test="${ fn:length( search_details.searchPrograms ) > 1 }" >s</c:if>:
+				</td>
+				
+				 <c:choose>
+				  <c:when test="${ empty search_details.searchPrograms }">
+					<td  style="padding-top: 2px;">
+					  	Not Found
+					</td>
+				  </c:when>
+				  <c:otherwise>
+				    <td style="border-width:0px; padding: 0px;">
+
+					<table  style="border-width:0px; border-spacing: 0px; ">
+
+				   <c:forEach var="searchProgram" items="${ search_details.searchPrograms }">
+				     <tr>
+				      <td style="padding-right: 5px;">
+				     	<c:out value="${ searchProgram.displayName }"></c:out>
+				      </td>
+				      <td >
+				     	<c:out value="${ searchProgram.version }"></c:out>
+				      </td>
+				     </tr>
+				   </c:forEach>
+
+				    </table>
+				  
+					</td>
+				  </c:otherwise> 
+				 </c:choose>
 			</tr>								  
+										  
+
 			<tr>
 				<td>Upload&nbsp;date:</td>
 				<td><bean:write name="search" property="formattedLoadTime" /></td>
