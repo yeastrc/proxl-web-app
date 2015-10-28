@@ -199,6 +199,8 @@ Re-centering
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Double clicking on the structure will move the center of rotation to that point and re-center the view of the structure to that point.
 
+.. _structure-click-on-links-label:
+
 Click on Links
 -------------------------------------------------
 Any link (crosslink, looplinks or monolink) may be clicked on to view underlying link information (such as which positions in
@@ -291,12 +293,53 @@ in the Pymol command line (where C:\location\to\script.txt is the actual locatio
 PDB Chain to Protein Map
 ======================================
 This section describes the functionality and features of the default right panel, where the proteins from the experiment that
-have been aligned to chains in the PDB file are displayed:
+have been aligned to chains in the PDB file are displayed. (If the Distance Report is currently visible in place of this panel, click the
+"[Show PDB Chain to Protein Map]" link above the report.)
 
 .. image:: /images/structure-pdb-chain-to-protein-map.png
 
+The PDB Chain to Protein Map shows which proteins from the experiment have been mapped to which chains present in
+the currently-selected PDB file.  The check box next to each protein indicates if that specific alignment is currently
+being considered when drawing links on the structure or generating the distance report. Alignments (that is a specific
+protein mapped to a PDB chain) that are not checked are not being considered. For example, in the figure below, only
+"mCRY2-1-544-mouse" is selected in Chain A. The only links drawn on the structure will only involve that protein
+and will only be drawn on Chain A. (If that protein were to other chains, and they were not checked, only chain A
+would be considered for drawing links or reporting distances.)
+
+.. image:: /images/structure-check-boxes1.png
+
+Then, in the example below, "Skp1dd-human" on chain C is also checked. Now this protein aligned to this chain
+will also be considered for drawing links and reporting distances:
+
+.. image:: /images/structure-check-boxes2.png
+
+Finally, in the example below, "Fbxl3-human" on chain B is also selected. Now this alignment will also be considered:
+
+.. image:: /images/structure-check-boxes3.png
+
+Note that it is possible for a given chain in a PDB to be aligned to multiple proteins in the experiment, such as when
+homologs or proteoforms were present in the proteomics search database. In this case, only one alignment for a given
+chain may be checked at a time.
+
+Further note that it is also possible for the same protein to be mapped to multiple chains in the PDB, such
+as if the PDB depicts an oligomer. In this case, it is certainly possible to check that same protein multiple times
+for the different chains; however, this creates multiple possibilities for where links may be drawn on the PDB. As
+an example, the figure below depicts a cartoon of the same protein mapped two chains, A and B. A crosslink between
+positions 56 and 102 was observed. If the alignment for Protein A is checked for both chains A and B, there are
+four possibilities for where to draw the crosslink (each corresponding to a different distance):
+
+.. image:: /images/structure-oligomer-example1.png
+
+By default, ProXL will pick the shortest possibility and only draw that one:
+
+.. image:: /images/structure-oligomer-example2.png
+
+This behavior may be changed, see :ref:`structure-show-UDRs-once-label` for more information.
 
 
+Add New Alignment
+-------------------------------------------------
+For a description of how to map proteins to chains in the PDB file, see :ref:`structure-map-pdb-to-proteins-label`.
 
 View Alignment
 -------------------------------------------------
@@ -320,11 +363,40 @@ the alignment removes it from the database and makes it unavailable for all user
 
 Distance Report
 ==========================================
+This section describes the functionality and features of the right panel when the distance report is being displayed.
+To display the distance report, click the "[Show Distance Report]" link above the PDB Chain to Protein Map.
 
+.. image:: /images/structure-distance-report-overview.png
 
+The distance report shows three primary types of data: 1) Total UDRs, or the number of observed links of each
+type that were mappable to the structure, 2) Shown Links, or the number and proportion of the currently-visible
+links that have distances less than or equal to a user-supplied distance cutoff, and 3) Shown Crosslinks/Shown Looplinks, which is
+a table of shown links and their distances
 
+Total UDRs
+-------------------------
+UDR stands for "unique distance restraint." In ProXL, this is the name for a distinct position in a
+protein linked to a distinct position in the same or another protein. This section of the distance
+report reports the total number of such UDRs present in the data, and how many of those are mappable
+to the structure. To learn more about what "mappable" means or about how ProXL maps protein
+positions to PDB structure, see :ref:`structure-mapping-residue-position-to-3D-label`.
 
+Shown links
+-------------------------
+This section shows the number of UDRs (that were mappable to the structure) have distances less than
+or equal to the supplied distance cutoff. (This defaults to 35 Angstroms.) This cutoff may be changed
+simply by changing its value in the text field--the report will dynamic update as the value is changed.
 
+Shown Crosslinks / Shown Looplinks
+-----------------------------------
+These tables list the crosslinks and/or looplinks currently being shown on the structure. The coloring of
+the rows matches the coloring of those links on the structure--even if an alternate coloring scheme is
+chosen (see :ref:`structure-color-option-label`). Each of the rows shows the positions in respective
+proteins that are linked, as well as the distance of that link in Angstroms. All of the currently
+drawn crosslinks and/or looplinks will be listed in the table.
+
+Each row may be clicked on (or tapped on touch devices) to view the underlying peptides, PSMs, and
+spectra. See :ref:`structure-click-on-links-label` for more information.
 
 Viewer Options
 ============================
@@ -332,6 +404,11 @@ Viewer Options
 .. _structure-color-option-label:
 
 Color links by
+-------------------------
+
+.. _structure-show-UDRs-once-label:
+
+Show UDRs once
 -------------------------
 
 
