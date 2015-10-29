@@ -467,6 +467,60 @@ comparison of results between searches.
 
 Render mode
 -------------------------
+Provides access to different rendering modes for the structure, itself. The options are:
+
+Cartoon (default)
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Provides a helix, strand coil cartoon view of the structure.
+
+Smooth Line
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Draws the structure as a smoothed line tracing consecutive alpha carbons..
+
+Trace
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Draws the structure as straight lines connecting consecutive alpha carbons.
+
+Lines
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Draws the struture at atomic resolution using lines for bonds.
+
+Points
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Draws the structure as point cloud of all atoms.
+
 
 Filter Data
 ============================
+The data presented in the viewer may be filtered using the form at the top of the page and clicking "Update From Database". The
+filtering options are:
+
+PSM Q-value cutoff
+--------------------
+Only links with at least one peptide that have at least one peptide spectrum match (PSM) with a q-value <= to this cutoff will be shown.
+Additionally, when viewing PSMs for peptides, only PSMs with with a q-value <= to this cutoff will be shown.
+
+Peptide Q-value cutoff
+-----------------------
+Only links with at least one peptide with a peptide-level q-value <= to this cutoff will be shown. If the pipeline used to
+generate the search results does not generate peptide-level q-values, this field has no effect.
+
+Exclude xlinks with
+--------------------
+Links that exclusively have peptides with any of the checked attributes will not be shown. The attributes are:
+
+	* no unique peptides - If the link (crosslink, looplink, or monolink) was exclusively identified by peptides that also map to othe proteins
+	* only one PSM - If a given link was identified by a single PSM
+	* only one peptide - If a given link was identifed by a single peptide, where a peptide is the combination of sequence, linked positions, and modifications
+
+Exclude proteins with
+----------------------
+This option limits which proteins will appear in the pull-down menu for mapping proteins to PDB chains.
+Proteins that contain any of the checked options will not appear. For example, checking 'No links' prevents
+proteins that do not contain crosslinks, looplinks, or monolinks from appearing. This will also prevent any
+links involving excluded proteins from being drawn on the structure.
+
+Exclude organisms
+--------------------
+This options limits which proteins will appear in the pull-down menu for mapping proteins to PDB chains. No proteins from any of the checked organisms will appear.
+This will also prevent any links involving excluded proteins from being drawn on the structure.

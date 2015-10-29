@@ -15,8 +15,8 @@ help on all of the sections.
 
 Project Information
 =========================
-Project owners may edit the title or abstract by clicking the pencil icon next to the
-respective item. Logged-in users may add notes to the project by clicking "[+Note]".
+Project members may edit the title or abstract by clicking the pencil icon next to the
+respective item. Project members may add notes to the project by clicking "[+Note]".
 Notes may be edited or deleted by clicking on the associated pencil or delete (X) icons.
 The title, abstract, and notes are visible to public users (if public access is enabled,
 see below).
