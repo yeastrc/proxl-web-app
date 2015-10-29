@@ -373,6 +373,9 @@ type that were mappable to the structure, 2) Shown Links, or the number and prop
 links that have distances less than or equal to a user-supplied distance cutoff, and 3) Shown Crosslinks/Shown Looplinks, which is
 a table of shown links and their distances
 
+Links are drawn (and distances measured) between alpha carbons from PDB residues mapped to the respective residues from the
+experimental protein. To learn more about this mapping, see :ref:`structure-mapping-residue-position-to-3D-label`.
+
 Total UDRs
 -------------------------
 UDR stands for "unique distance restraint." In ProXL, this is the name for a distinct position in a
@@ -401,16 +404,69 @@ spectra. See :ref:`structure-click-on-links-label` for more information.
 Viewer Options
 ============================
 
-.. _structure-color-option-label:
-
-Color links by
+Show crosslinks
 -------------------------
+Toggle the showing of crosslinks on and off.
+
+Show looplinks
+-------------------------
+Toggle the showing of looplinks on and off.
+
+Show monolinks
+-------------------------
+Toggle the showing of monolinks on and off.
+
+Show linkable positions
+-------------------------
+Toggle the showing of linkable positions. Linkable positions appear as black spheres on the alpha carbons
+of residues in the PDB that mapped to linkable positions in the experimental protein. A linkable position
+is a residue expected to be theoretically linkable by the crosslinker used in the experiment.
 
 .. _structure-show-UDRs-once-label:
 
 Show UDRs once
 -------------------------
+Maybe I should delete this feature.
 
+Shade by counts
+-------------------------
+If enabled, the opacity (transparency) of links reflects the number of PSMs found (or spectrum count) for the shown link. The shading scales from
+1 PSM (minimum opacity, most transparent) to 10 PSMs (maximum opacity). Any link having 10 or more PSMs will have the
+maximum opacity.
+
+Show sequence coverage
+-------------------------
+If enabled, the color of the structure, itself, will reflect the sequence coverage for the protein mapped to the respective chain. Segments of the structure
+will be shaded green where those residues map to experimental protein residues that were contained in any observed peptide (at the given cutoffs).
+Segments will be shaded red where no peptides were observed that contained those residues. Areas of the structure not being considered (either residues that do not
+map to experimental protein residues orno protein/PDB aligments are enabled for that chain) will appear as white.
+
+.. image:: /images/structure-sequence-coverage.png
+
+.. _structure-color-option-label:
+
+Color links by
+-------------------------
+This pull-down menu alters the coloring applied to the links. The three options are 1) Length (default), 2) Type, and 3) Search.
+
+Length (default)
+^^^^^^^^^^^^^^^^
+This option colors links based on their length. 
+
+Type
+^^^^^^^^^^^^^^^^
+This option colors links based on their type--crosslink, looplink, or monolink. 
+
+Search
+^^^^^^^^^^^^^^^^
+When merging multiple searches (maximum of 3), this option colors links based on which search(es) they were found in. This allows for a quick, structure-based
+comparison of results between searches.
+
+.. image:: /images/structure-color-by.png
+
+
+Render mode
+-------------------------
 
 Filter Data
 ============================
