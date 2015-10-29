@@ -214,11 +214,12 @@ public class XquestFileDAO {
 		}
 	}
 	
-	private static String insertSQL = "INSERT INTO xquest_file ( filename, path, sha1sum )"
-		+ " VALUES ( ?, ?, ? )";
+	private static String insertSQL = "INSERT INTO xquest_file ( search_id, filename, path, sha1sum )"
+		+ " VALUES ( ?, ?, ?, ? )";
 
 //	CREATE TABLE xquest_file (
 //	  id int(10) unsigned NOT NULL AUTO_INCREMENT,
+//	  search_id INT UNSIGNED NOT NULL,
 //	  filename varchar(255) NOT NULL,
 //	  path varchar(2000) DEFAULT NULL,
 //	  sha1sum varchar(255) DEFAULT NULL,
@@ -246,6 +247,8 @@ public class XquestFileDAO {
 
 			int counter = 0;
 
+			counter++;
+			pstmt.setInt( counter, item.getSearchId() );
 			counter++;
 			pstmt.setString( counter, item.getFilename() );
 			counter++;

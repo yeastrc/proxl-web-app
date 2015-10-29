@@ -1304,13 +1304,21 @@ DROP TABLE IF EXISTS `xquest_file` ;
 
 CREATE TABLE IF NOT EXISTS `xquest_file` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_id` INT UNSIGNED NOT NULL,
   `filename` VARCHAR(255) NOT NULL,
   `path` VARCHAR(2000) NOT NULL,
   `sha1sum` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  CONSTRAINT `xquest_file__search_id_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
 ENGINE = InnoDB;
 
 CREATE INDEX `filename` ON `xquest_file` (`filename` ASC);
+
+CREATE INDEX `xquest_file__search_id_fk_idx` ON `xquest_file` (`search_id` ASC);
 
 
 -- -----------------------------------------------------
@@ -2040,6 +2048,7 @@ CREATE TABLE IF NOT EXISTS `search_program` (
   `short_name` VARCHAR(100) NOT NULL,
   `display_name` VARCHAR(255) NOT NULL,
   `description` VARCHAR(255) NULL,
+  `display_order` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 

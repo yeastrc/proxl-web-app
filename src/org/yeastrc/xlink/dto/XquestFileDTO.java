@@ -7,12 +7,19 @@ package org.yeastrc.xlink.dto;
 public class XquestFileDTO {
 
 	private int id;
-
+	private int searchId;
 	private String filename;
 	private String path;
 	private String sha1sum;
 
 
+
+	public int getSearchId() {
+		return searchId;
+	}
+	public void setSearchId(int searchId) {
+		this.searchId = searchId;
+	}
 	public String getSha1sum() {
 		return sha1sum;
 	}
