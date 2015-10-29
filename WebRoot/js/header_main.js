@@ -113,6 +113,16 @@ var initHeaderMain = function() {
 	} );
 	
 
+	$("#help_header_link").mouseenter( function( eventObject  ) {
+		
+		$("#help_header_tooltip").show();
+		
+	} ).mouseleave( function( eventObject  ) {
+		
+		$("#help_header_tooltip").hide();
+		
+	} );
+	
 };
 
 
