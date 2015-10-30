@@ -10,7 +10,7 @@ the data from multiple searches and presents the results as an interactive table
 The searches do not need to be from the same software pipeline. For example,
 different versions of the same program may be compared, or the results from
 entirely different programs (e.g., Kojak and XQuest) may be compared. Currently,
-the total number of merged runs must be 2 or 3 and must be from the same
+the total number of merged searches must be 2 or 3 and must be from the same
 project. Note, for the peptide view page seen when viewing a single search,
 see :doc:`/using/peptide`.
 
@@ -75,7 +75,8 @@ Euler diagram
 ======================================
 .. image:: /images/merged-peptide-euler-diagram.png
 
-The Euler diagram (similar to a Venn diagram) provides a graphical depiction of the overlap
+The Euler diagram (similar to a Venn diagram) provides a graphical depiction of the
+relative sizes and overlap
 between the peptides found in the merged searches. The colors in the diagram match
 the colors used for the search list above. The search list is provided  to the
 left of the diagram with their associated colors as a legend. The labels for each

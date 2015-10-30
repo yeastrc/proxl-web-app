@@ -25,6 +25,7 @@ Here you will find documentation for both using and installing ProXL.
    using/peptide
    using/merged-peptide
    using/protein
+   using/merged-protein
    using/spectrum-viewer
 
 

@@ -8,7 +8,7 @@ The protein view page provides a table view of crosslinks or looplinks at the pr
 Each row in the table corresponds to a unique crosslink ( specific position in protein A linked
 to a specific position in protein B) or a unique looplink (specific  pair of positions
 in a protein). The data may be filtered according to confidence, taxonomy, or individually
-by protein.
+by protein. For the view page seen when merging multiple searches, see :doc:`/using/merged-protein`.
 
 **Note**: If any identified peptides map to multiple proteins, those proteins are listed here
 as separate rows. For example if peptide 1 is linked to peptide 2, and peptide 1 maps to
