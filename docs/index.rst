@@ -20,10 +20,11 @@ Here you will find documentation for both using and installing ProXL.
    
    using/intro
    using/project
-   using/peptide
-   using/protein
    using/image
    using/structure
+   using/peptide
+   using/merged-peptide
+   using/protein
    using/spectrum-viewer
 
 

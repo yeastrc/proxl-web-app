@@ -87,6 +87,12 @@ Click the red (X) icon to the left of the project title on the project list to d
 that project. Only project owners may delete projects. Once a project is deleted,
 the project and all associated data will be removed.
 
+Get Help
+---------------------------------
+To view documentation for ProXL, click the (?) icon on the top-right nagivation
+bar present on all pages.
+
+.. image:: /images/get-help.png
 
 Manage Account
 ---------------------------------

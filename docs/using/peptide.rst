@@ -8,14 +8,23 @@ The peptide view page provides a table view of the data at the peptide level.
 That is, all peptides (and crosslinked peptide pairs) identified by the search
 software may be viewed on this page--along with accompanying peptide spectrum
 matches (PSMs) and tandem mass spectra. The data presented may be filtered according
-to confidence, type of peptide, and which modifications are present on the peptide.
+to confidence, type of peptide, and which modifications are present on the peptide. Note,
+this document covers the peptide view page for a single search. For the view page seen
+when merging multiple searches, see :doc:`/using/merged-peptide`.
 
 Search Information
 =========================
 The name of the search (and internal search ID reference number) from which these
-data were obtained is shown first. The red [+] icon may be clicked to reveal more
-information about the search, including the path the data were imported from,
-the linker that was used, the upload date, and the FASTA file that was searched.
+data were obtained is shown first. The red [+] icon may be clicked to reveal details
+about the search.
+
+Search Details
+---------------------------
+The "Path" is the location on disk from which the data were imported. The "Linker" is the
+name of the crossinker used in the experiment. "Search Program(s)" is the name and
+version number of the PSM search software used. "Upload date" is the date the data were
+uploaded into ProXL. "FASTA file" is the name of the FASTA file used to perform the
+PSM search.
 
 Filter Data
 =========================
