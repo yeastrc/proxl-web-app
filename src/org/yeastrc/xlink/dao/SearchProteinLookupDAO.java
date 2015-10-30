@@ -65,6 +65,9 @@ public class SearchProteinLookupDAO {
 					prpl.setSearchId( searchId );
 					prpl.setBestCrosslinkPSMQValue( rs.getDouble( 2 ) );
 					prpl.setBestCrosslinkPeptideQValue( rs.getDouble( 3 ) );
+					if ( rs.wasNull() ) {
+						prpl.setBestCrosslinkPeptideQValue( null );
+					}
 					
 					prplMap.put( prpl.getNrseqId(), prpl );
 				}
@@ -85,25 +88,46 @@ public class SearchProteinLookupDAO {
 				
 				while( rs.next() ) {
 					
-					int pid = rs.getInt( 1 );
-					if( prplMap.containsKey( pid ) ) {
+					int proteinNrseqId = rs.getInt( 1 );
+					
+					if( prplMap.containsKey( proteinNrseqId ) ) {
 						
 						double psmq = rs.getDouble( 2 );
-						double pepq = rs.getDouble( 3 );
 						
-						if( prplMap.get( pid ).getBestCrosslinkPSMQValue() == null || prplMap.get( pid ).getBestCrosslinkPSMQValue() > psmq )
-							prplMap.get( pid ).setBestCrosslinkPSMQValue( psmq );
+						Double pepq = rs.getDouble( 3 );
+						if ( rs.wasNull() ) {
+							pepq = null;
+						}
 						
-						if( prplMap.get( pid ).getBestCrosslinkPeptideQValue() == null || prplMap.get( pid ).getBestCrosslinkPeptideQValue() > pepq )
-							prplMap.get( pid ).setBestCrosslinkPeptideQValue( pepq );
+						SearchProteinLookupDTO searchProteinLookupDTOForProteinNrseqId 
+							= prplMap.get( proteinNrseqId );
+						
+						if( searchProteinLookupDTOForProteinNrseqId.getBestCrosslinkPSMQValue() == null || searchProteinLookupDTOForProteinNrseqId.getBestCrosslinkPSMQValue() > psmq ) {
+							searchProteinLookupDTOForProteinNrseqId.setBestCrosslinkPSMQValue( psmq );
+						}
+						
+						if( pepq == null ) {
+						
+							//  Peptide level q value of null is the "lowest" possible value
+							
+							searchProteinLookupDTOForProteinNrseqId.setBestCrosslinkPeptideQValue( pepq );
+							
+						} else if( searchProteinLookupDTOForProteinNrseqId.getBestCrosslinkPeptideQValue() != null && searchProteinLookupDTOForProteinNrseqId.getBestCrosslinkPeptideQValue() > pepq ) {
+							
+							searchProteinLookupDTOForProteinNrseqId.setBestCrosslinkPeptideQValue( pepq );
+						}
 						
 					} else {
 					
 						SearchProteinLookupDTO prpl = new SearchProteinLookupDTO();
+						
 						prpl.setNrseqId( rs.getInt( 1 ) );
 						prpl.setSearchId( searchId );
 						prpl.setBestCrosslinkPSMQValue( rs.getDouble( 2 ) );
 						prpl.setBestCrosslinkPeptideQValue( rs.getDouble( 3 ) );
+						if ( rs.wasNull() ) {
+							prpl.setBestCrosslinkPeptideQValue( null );
+						}
 						
 						prplMap.put( prpl.getNrseqId(), prpl );
 					}
@@ -153,20 +177,33 @@ public class SearchProteinLookupDAO {
 				
 				while( rs.next() ) {
 					
-					int pid = rs.getInt( 1 );
-					if( prplMap.containsKey( pid ) ) {
+					int proteinNrseqId = rs.getInt( 1 );
+					
+					if( prplMap.containsKey( proteinNrseqId ) ) {
 						
-						prplMap.get( pid ).setBestLooplinkPSMQValue( rs.getDouble( 2 ) );
-						prplMap.get( pid ).setBestLooplinkPeptideQValue( rs.getDouble( 3 ) );
-						
+						SearchProteinLookupDTO searchProteinLookupDTOForProteinNrseqId = 
+								prplMap.get( proteinNrseqId );
+
+						searchProteinLookupDTOForProteinNrseqId.setBestLooplinkPSMQValue( rs.getDouble( 2 ) );
+						searchProteinLookupDTOForProteinNrseqId.setBestLooplinkPeptideQValue( rs.getDouble( 3 ) );
+						if ( rs.wasNull() ) {
+							searchProteinLookupDTOForProteinNrseqId.setBestLooplinkPeptideQValue( null );
+						}
+
+
 					} else {
 					
 						SearchProteinLookupDTO prpl = new SearchProteinLookupDTO();
+
 						prpl.setNrseqId( rs.getInt( 1 ) );
 						prpl.setSearchId( searchId );
 						prpl.setBestLooplinkPSMQValue( rs.getDouble( 2 ) );
-						prpl.setBestLooplinkPeptideQValue( rs.getDouble( 3 ) );
 						
+						prpl.setBestLooplinkPeptideQValue( rs.getDouble( 3 ) );
+						if ( rs.wasNull() ) {
+							prpl.setBestLooplinkPeptideQValue( null );
+						}
+
 						prplMap.put( prpl.getNrseqId(), prpl );
 					}
 				}
@@ -214,12 +251,20 @@ public class SearchProteinLookupDAO {
 				
 				while( rs.next() ) {
 					
-					int pid = rs.getInt( 1 );
-					if( prplMap.containsKey( pid ) ) {
+					int proteinNrseqId = rs.getInt( 1 );
+					
+					if( prplMap.containsKey( proteinNrseqId ) ) {
 						
-						prplMap.get( pid ).setBestMonolinkPSMQValue( rs.getDouble( 2 ) );
-						prplMap.get( pid ).setBestMonolinkPeptideQValue( rs.getDouble( 3 ) );
-						
+						SearchProteinLookupDTO searchProteinLookupDTOForProteinNrseqId = 
+								prplMap.get( proteinNrseqId );
+
+						searchProteinLookupDTOForProteinNrseqId.setBestMonolinkPSMQValue( rs.getDouble( 2 ) );
+						searchProteinLookupDTOForProteinNrseqId.setBestMonolinkPeptideQValue( rs.getDouble( 3 ) );
+						if ( rs.wasNull() ) {
+							searchProteinLookupDTOForProteinNrseqId.setBestMonolinkPeptideQValue( null );
+						}
+
+
 					} else {
 					
 						SearchProteinLookupDTO prpl = new SearchProteinLookupDTO();
@@ -227,6 +272,9 @@ public class SearchProteinLookupDAO {
 						prpl.setSearchId( searchId );
 						prpl.setBestMonolinkPSMQValue( rs.getDouble( 2 ) );
 						prpl.setBestMonolinkPeptideQValue( rs.getDouble( 3 ) );
+						if ( rs.wasNull() ) {
+							prpl.setBestMonolinkPeptideQValue( null );
+						}
 						
 						prplMap.put( prpl.getNrseqId(), prpl );
 					}
@@ -274,14 +322,21 @@ public class SearchProteinLookupDAO {
 				
 				while( rs.next() ) {
 
-					int pid = rs.getInt( 1 );
-					if( prplMap.containsKey( pid ) ) {
+					int proteinNrseqId = rs.getInt( 1 );
+					
+					if( prplMap.containsKey( proteinNrseqId ) ) {
 						
+						SearchProteinLookupDTO searchProteinLookupDTOForProteinNrseqId = 
+								prplMap.get( proteinNrseqId );
+
 						double psmq = rs.getDouble( 2 );
-						double pepq = rs.getDouble( 3 );
-						
-						prplMap.get( pid ).setBestDimerPSMQValue( psmq );
-						prplMap.get( pid ).setBestDimerPeptideQValue( pepq );
+						Double pepq = rs.getDouble( 3 );
+						if ( rs.wasNull() ) {
+							pepq = null;
+						}
+
+						searchProteinLookupDTOForProteinNrseqId.setBestDimerPSMQValue( psmq );
+						searchProteinLookupDTOForProteinNrseqId.setBestDimerPeptideQValue( pepq );
 						
 					} else {
 					
@@ -290,7 +345,10 @@ public class SearchProteinLookupDAO {
 						prpl.setSearchId( searchId );
 						prpl.setBestDimerPSMQValue( rs.getDouble( 2 ) );
 						prpl.setBestDimerPeptideQValue( rs.getDouble( 3 ) );
-						
+						if ( rs.wasNull() ) {
+							prpl.setBestDimerPeptideQValue( null ); 
+						}
+								
 						prplMap.put( prpl.getNrseqId(), prpl );
 					}
 				}
@@ -311,17 +369,34 @@ public class SearchProteinLookupDAO {
 				
 				while( rs.next() ) {
 					
-					int pid = rs.getInt( 1 );
-					if( prplMap.containsKey( pid ) ) {
+					int proteinNrseqId = rs.getInt( 1 );
+					
+					if( prplMap.containsKey( proteinNrseqId ) ) {
 						
+						SearchProteinLookupDTO searchProteinLookupDTOForProteinNrseqId = 
+								prplMap.get( proteinNrseqId );
+
 						double psmq = rs.getDouble( 2 );
-						double pepq = rs.getDouble( 3 );
+						Double pepq = rs.getDouble( 3 );
+						if ( rs.wasNull() ) {
+							pepq = null;
+						}
+
+						if( searchProteinLookupDTOForProteinNrseqId.getBestDimerPSMQValue() == null || searchProteinLookupDTOForProteinNrseqId.getBestDimerPSMQValue() > psmq ) {
+							searchProteinLookupDTOForProteinNrseqId.setBestDimerPSMQValue( psmq );
+						}
 						
-						if( prplMap.get( pid ).getBestDimerPSMQValue() == null || prplMap.get( pid ).getBestDimerPSMQValue() > psmq )
-							prplMap.get( pid ).setBestDimerPSMQValue( psmq );
+
+						if( pepq == null ) {
 						
-						if( prplMap.get( pid ).getBestDimerPeptideQValue() == null || prplMap.get( pid ).getBestDimerPeptideQValue() > pepq )
-							prplMap.get( pid ).setBestDimerPeptideQValue( pepq );
+							//  Peptide level q value of null is the "lowest" possible value
+							
+							searchProteinLookupDTOForProteinNrseqId.setBestDimerPeptideQValue( pepq );
+							
+						} else if( searchProteinLookupDTOForProteinNrseqId.getBestDimerPeptideQValue() != null && searchProteinLookupDTOForProteinNrseqId.getBestDimerPeptideQValue() > pepq ) {
+							
+							searchProteinLookupDTOForProteinNrseqId.setBestDimerPeptideQValue( pepq );
+						}
 						
 					} else {
 					
@@ -330,6 +405,10 @@ public class SearchProteinLookupDAO {
 						prpl.setSearchId( searchId );
 						prpl.setBestDimerPSMQValue( rs.getDouble( 2 ) );
 						prpl.setBestDimerPeptideQValue( rs.getDouble( 3 ) );
+						if ( rs.wasNull() ) {
+							prpl.setBestDimerPeptideQValue( null );
+						}
+
 						
 						prplMap.put( prpl.getNrseqId(), prpl );
 					}
@@ -384,14 +463,21 @@ public class SearchProteinLookupDAO {
 				
 				while( rs.next() ) {
 
-					int pid = rs.getInt( 1 );
-					if( prplMap.containsKey( pid ) ) {
-						
+					int proteinNrseqId = rs.getInt( 1 );
+					
+					if( prplMap.containsKey( proteinNrseqId ) ) {
+
+						SearchProteinLookupDTO searchProteinLookupDTOForProteinNrseqId = 
+								prplMap.get( proteinNrseqId );
+
 						double psmq = rs.getDouble( 2 );
-						double pepq = rs.getDouble( 3 );
-						
-						prplMap.get( pid ).setBestUnlinkedPSMQValue( psmq );
-						prplMap.get( pid ).setBestUnlinkedPeptideQValue( pepq );
+						Double pepq = rs.getDouble( 3 );
+						if ( rs.wasNull() ) {
+							pepq = null;
+						}
+
+						searchProteinLookupDTOForProteinNrseqId.setBestUnlinkedPSMQValue( psmq );
+						searchProteinLookupDTOForProteinNrseqId.setBestUnlinkedPeptideQValue( pepq );
 						
 					} else {
 					
@@ -400,6 +486,9 @@ public class SearchProteinLookupDAO {
 						prpl.setSearchId( searchId );
 						prpl.setBestUnlinkedPSMQValue( rs.getDouble( 2 ) );
 						prpl.setBestUnlinkedPeptideQValue( rs.getDouble( 3 ) );
+						if ( rs.wasNull() ) {
+							prpl.setBestUnlinkedPeptideQValue( null );
+						}
 						
 						prplMap.put( prpl.getNrseqId(), prpl );
 					}

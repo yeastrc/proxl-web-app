@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.dto;
 
+
 public class SearchCrosslinkLookupDTO {	
 	
 	public int getNrseqId1() {
@@ -38,19 +39,45 @@ public class SearchCrosslinkLookupDTO {
 	public void setBestPSMQValue(double bestPSMQValue) {
 		this.bestPSMQValue = bestPSMQValue;
 	}
-	public double getBestPeptideQValue() {
+	public Double getBestPeptideQValue() {
 		return bestPeptideQValue;
 	}
-	public void setBestPeptideQValue(double bestPeptideQValue) {
+	public void setBestPeptideQValue(Double bestPeptideQValue) {
 		this.bestPeptideQValue = bestPeptideQValue;
 	}
+	public int getNumPsmAtPt01QCutoff() {
+		return numPsmAtPt01QCutoff;
+	}
+	public void setNumPsmAtPt01QCutoff(int numPsmAtPt01QCutoff) {
+		this.numPsmAtPt01QCutoff = numPsmAtPt01QCutoff;
+	}
+	public int getNumLinkedPeptidesAtPt01QCutoff() {
+		return numLinkedPeptidesAtPt01QCutoff;
+	}
+	public void setNumLinkedPeptidesAtPt01QCutoff(int numLinkedPeptidesAtPt01QCutoff) {
+		this.numLinkedPeptidesAtPt01QCutoff = numLinkedPeptidesAtPt01QCutoff;
+	}
+	public int getNumUniqueLinkedPeptidesAtPt01QCutoff() {
+		return numUniqueLinkedPeptidesAtPt01QCutoff;
+	}
+	public void setNumUniqueLinkedPeptidesAtPt01QCutoff(
+			int numUniqueLinkedPeptidesAtPt01QCutoff) {
+		this.numUniqueLinkedPeptidesAtPt01QCutoff = numUniqueLinkedPeptidesAtPt01QCutoff;
+	}
+
+
 	
 	private int nrseqId1;
 	private int nrseqId2;
 	private int searchId;
 	private int protein1Position;
 	private int protein2Position;
+	
 	private double bestPSMQValue;
-	private double bestPeptideQValue;
+	private Double bestPeptideQValue;
+	
+	private int numPsmAtPt01QCutoff;
+	private int numLinkedPeptidesAtPt01QCutoff;
+	private int numUniqueLinkedPeptidesAtPt01QCutoff;
 	
 }

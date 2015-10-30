@@ -26,10 +26,10 @@ public class SearchMonolinkLookupDTO {
 	public void setBestPSMQValue(double bestPSMQValue) {
 		this.bestPSMQValue = bestPSMQValue;
 	}
-	public double getBestPeptideQValue() {
+	public Double getBestPeptideQValue() {
 		return bestPeptideQValue;
 	}
-	public void setBestPeptideQValue(double bestPeptideQValue) {
+	public void setBestPeptideQValue(Double bestPeptideQValue) {
 		this.bestPeptideQValue = bestPeptideQValue;
 	}
 	
@@ -37,6 +37,6 @@ public class SearchMonolinkLookupDTO {
 	private int searchId;
 	private int proteinPosition;
 	private double bestPSMQValue;
-	private double bestPeptideQValue;
+	private Double bestPeptideQValue;
 	
 }

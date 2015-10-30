@@ -32,18 +32,41 @@ public class SearchLooplinkLookupDTO {
 	public void setBestPSMQValue(double bestPSMQValue) {
 		this.bestPSMQValue = bestPSMQValue;
 	}
-	public double getBestPeptideQValue() {
+	public Double getBestPeptideQValue() {
 		return bestPeptideQValue;
 	}
-	public void setBestPeptideQValue(double bestPeptideQValue) {
+	public void setBestPeptideQValue(Double bestPeptideQValue) {
 		this.bestPeptideQValue = bestPeptideQValue;
+	}
+	public int getNumPsmAtPt01QCutoff() {
+		return numPsmAtPt01QCutoff;
+	}
+	public void setNumPsmAtPt01QCutoff(int numPsmAtPt01QCutoff) {
+		this.numPsmAtPt01QCutoff = numPsmAtPt01QCutoff;
+	}
+	public int getNumPeptidesAtPt01QCutoff() {
+		return numPeptidesAtPt01QCutoff;
+	}
+	public void setNumPeptidesAtPt01QCutoff(int numPeptidesAtPt01QCutoff) {
+		this.numPeptidesAtPt01QCutoff = numPeptidesAtPt01QCutoff;
+	}
+	public int getNumUniquePeptidesAtPt01QCutoff() {
+		return numUniquePeptidesAtPt01QCutoff;
+	}
+	public void setNumUniquePeptidesAtPt01QCutoff(int numUniquePeptidesAtPt01QCutoff) {
+		this.numUniquePeptidesAtPt01QCutoff = numUniquePeptidesAtPt01QCutoff;
 	}
 	
 	private int nrseqId;
 	private int searchId;
 	private int proteinPosition1;
 	private int proteinPosition2;
+
 	private double bestPSMQValue;
-	private double bestPeptideQValue;
+	private Double bestPeptideQValue;
+	
+	private int numPsmAtPt01QCutoff;
+	private int numPeptidesAtPt01QCutoff;
+	private int numUniquePeptidesAtPt01QCutoff;
 	
 }

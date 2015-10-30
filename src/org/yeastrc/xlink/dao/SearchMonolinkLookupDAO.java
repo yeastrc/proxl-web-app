@@ -51,6 +51,9 @@ public class SearchMonolinkLookupDAO {
 				prml.setProteinPosition( rs.getInt( 2 ) );
 				prml.setBestPSMQValue( rs.getDouble( 3 ) );
 				prml.setBestPeptideQValue( rs.getDouble( 4 ) );
+				if ( rs.wasNull() ) {
+					prml.setBestPeptideQValue( null );
+				}
 				
 				save( prml );
 				
@@ -111,8 +114,13 @@ public class SearchMonolinkLookupDAO {
 			pstmt.setInt( 2,  prml.getNrseqId() );
 			pstmt.setInt( 3,  prml.getProteinPosition() );
 			pstmt.setDouble( 4, prml.getBestPSMQValue() );
-			pstmt.setDouble( 5, prml.getBestPeptideQValue() );
-			
+			if ( prml.getBestPeptideQValue() != null ) {
+				pstmt.setDouble( 5, prml.getBestPeptideQValue() );
+			} else {
+				pstmt.setNull( 5, java.sql.Types.DOUBLE );
+			}
+
+
 			pstmt.executeUpdate();
 			
 		} catch ( Exception e ) {
