@@ -11,7 +11,6 @@ import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.SearchDTO;
-import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.objects.SearchPeptideCrosslink;
 
@@ -23,31 +22,6 @@ public class SearchPeptideCrosslinkSearcher {
 	private static final SearchPeptideCrosslinkSearcher _INSTANCE = new SearchPeptideCrosslinkSearcher();
 	public static SearchPeptideCrosslinkSearcher getInstance() { return _INSTANCE; }
 	
-	
-	/**
-	 * Get all crosslink peptides corresponding to the given crosslink protein
-	 * @param proteinLink
-	 * @return
-	 * @throws Exception
-	 */
-	public List<SearchPeptideCrosslink> searchOnSearchProteinCrosslink( SearchProteinCrosslink proteinLink ) throws Exception {
-		
-
-		
-		return searchOnSearchProteinCrosslinkInternal(
-				proteinLink.getSearch().getId(),
-				proteinLink.getPeptideCutoff(),
-				proteinLink.getPsmCutoff(),
-				proteinLink.getProtein1().getNrProtein().getNrseqId(),
-				proteinLink.getProtein2().getNrProtein().getNrseqId(),
-				proteinLink.getProtein1Position(),
-				proteinLink.getProtein2Position()
-				, proteinLink);
-	}
-	
-
-	
-
 	/**
 	 * Get all crosslink peptides corresponding to the given Criteria
 	 * @param searchId
@@ -71,7 +45,7 @@ public class SearchPeptideCrosslinkSearcher {
 			
 			) throws Exception {
 		
-		return searchOnSearchProteinCrosslinkInternal( searchId, peptideQValueCutoff, psmQValueCutoff, protein1Id, protein2Id, protein1Position, protein2Position, null /* proteinLink */ );
+		return searchOnSearchProteinCrosslinkInternal( searchId, peptideQValueCutoff, psmQValueCutoff, protein1Id, protein2Id, protein1Position, protein2Position );
 	}
 	
 	
@@ -97,9 +71,7 @@ public class SearchPeptideCrosslinkSearcher {
 			int protein1Id,
 			int protein2Id,
 			int protein1Position,
-			int protein2Position,
-			
-			SearchProteinCrosslink proteinLink
+			int protein2Position
 			
 			) throws Exception {
 		
@@ -149,12 +121,7 @@ public class SearchPeptideCrosslinkSearcher {
 			
 			SearchDTO searchDTO = null;
 			
-			if ( proteinLink != null ) {
-				searchDTO = proteinLink.getSearch();
-			} else {
-				
-				searchDTO = SearchDAO.getInstance().getSearch( searchId );
-			}
+			searchDTO = SearchDAO.getInstance().getSearch( searchId );
 			
 
 			while( rs.next() ) {

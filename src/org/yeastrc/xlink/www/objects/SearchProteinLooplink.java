@@ -1,13 +1,15 @@
 package org.yeastrc.xlink.www.objects;
 
 
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
-import org.yeastrc.xlink.www.searcher.SearchLooplinkPeptideSearcher;
-import org.yeastrc.xlink.www.searcher.SearchPeptideLooplinkSearcher;
-import org.yeastrc.xlink.www.searcher.SearchPsmSearcher;
+import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
+import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
+import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
+
+
+
 
 public class SearchProteinLooplink implements IProteinLooplink {
 
@@ -41,15 +43,27 @@ public class SearchProteinLooplink implements IProteinLooplink {
 	}
 
 	/**
-	 * Returns the number of PSMs found for this crosslink, given its cutoffs
+	 * Returns the number of PSMs found for this looplink, given its cutoffs
 	 * @return
 	 * @throws Exception
 	 */
 	public int getNumPsms() throws Exception {
 		
 		try {
-			if( this.numPsms == null )
-				this.numPsms = SearchPsmSearcher.getInstance().getNumPsms( this );
+			if( this.numPsms == null ) {
+
+				this.numPsms = 
+						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForLooplink(
+								this.getSearch().getId(),
+								this.getPsmCutoff(),
+								this.getPeptideCutoff(),
+								this.getProtein().getNrProtein().getNrseqId(),
+								this.getProteinPosition1(),
+								this.getProteinPosition2() );
+				
+				// WAS 
+				//  this.numPsms = SearchPsmSearcher.getInstance().getNumPsms( this );
+			}
 
 			return this.numPsms;
 			
@@ -62,6 +76,105 @@ public class SearchProteinLooplink implements IProteinLooplink {
 			throw e;
 		}
 	}
+	
+
+	
+	public int getNumPeptides() throws Exception {
+		
+		try {
+			if( this.numPeptides == -1 ) {
+
+				this.numPeptides = 
+						NumPeptidesForProteinCriteriaSearcher.getInstance()
+						.getNumPeptidesForLooplink(
+								this.getSearch().getId(),
+								this.getPsmCutoff(),
+								this.getPeptideCutoff(),
+								this.getProtein().getNrProtein().getNrseqId(),
+								this.getProteinPosition1(),
+								this.getProteinPosition2() );
+								
+//								searchId, psmCutoff, peptideCutoff, nrseqId_protein, protein_position_1, protein_position_2)
+				
+				//  WAS
+				
+				// this.numPeptides = SearchLooplinkPeptideSearcher.getInstance().getNumPeptides( this );
+			}
+
+			return this.numPeptides;
+			
+		} catch ( Exception e ) {
+			
+			String msg = "Exception in getNumPeptides()";
+			
+			log.error( msg, e );
+			
+			throw e;
+		}
+	}
+	
+	
+	public int getNumUniquePeptides() throws Exception {
+		
+		try {
+			if( this.numUniquePeptides == -1 ) {
+				
+
+				this.numUniquePeptides = 
+						NumPeptidesForProteinCriteriaSearcher.getInstance()
+						.getNumUniquePeptidesForLooplink(
+								this.getSearch().getId(),
+								this.getPsmCutoff(),
+								this.getPeptideCutoff(),
+								this.getProtein().getNrProtein().getNrseqId(),
+								this.getProteinPosition1(),
+								this.getProteinPosition2(),
+								YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
+								
+//								searchId, psmCutoff, peptideCutoff, nrseqId_protein, protein_position_1, protein_position_2)
+				
+				//  WAS
+				
+				// this.numUniquePeptides = SearchLooplinkPeptideSearcher.getInstance().getNumUniquePeptides( this );
+			}
+
+			return this.numUniquePeptides;
+			
+		} catch ( Exception e ) {
+			
+			String msg = "Exception in getNumUniquePeptides()";
+			
+			log.error( msg, e );
+			
+			throw e;
+		}
+	}
+	
+
+	/**
+	 * Only set if the PSM and Peptide Cutoffs match the cutoffs for the source field
+	 * @param numPsms
+	 */
+	public void setNumPsms(Integer numPsms) {
+		this.numPsms = numPsms;
+	}
+	
+	/**
+	 * Only set if the PSM and Peptide Cutoffs match the cutoffs for the source field
+	 * @param numPeptides
+	 */
+	public void setNumPeptides(int numPeptides) {
+		this.numPeptides = numPeptides;
+	}
+	
+	/**
+	 * Only set if the PSM and Peptide Cutoffs match the cutoffs for the source field
+	 * @param numUniquePeptides
+	 */
+	public void setNumUniquePeptides(int numUniquePeptides) {
+		this.numUniquePeptides = numUniquePeptides;
+	}
+
 	
 	public int getNumUniquePsms() {
 		return numUniquePsms;
@@ -81,61 +194,6 @@ public class SearchProteinLooplink implements IProteinLooplink {
 	public void setPeptideCutoff(double peptideCutoff) {
 		this.peptideCutoff = peptideCutoff;
 	}
-	
-	
-	public int getNumPeptides() throws Exception {
-		
-		try {
-			if( this.numPeptides == -1 )
-				this.numPeptides = SearchLooplinkPeptideSearcher.getInstance().getNumPeptides( this );
-
-			return this.numPeptides;
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Exception in getNumPeptides()";
-			
-			log.error( msg, e );
-			
-			throw e;
-		}
-	}
-	public int getNumUniquePeptides() throws Exception {
-		
-		try {
-			if( this.numUniquePeptides == -1 )
-				this.numUniquePeptides = SearchLooplinkPeptideSearcher.getInstance().getNumUniquePeptides( this );
-
-			return this.numUniquePeptides;
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Exception in getNumUniquePeptides()";
-			
-			log.error( msg, e );
-			
-			throw e;
-		}
-	}
-	
-	public List<SearchPeptideLooplink> getPeptides() throws Exception {
-		
-		try {
-			if( this.peptides == null )
-				this.peptides = SearchPeptideLooplinkSearcher.getInstance().searchOnSearchProteinLooplink( this );
-
-			return this.peptides;
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Exception in getPeptides()";
-			
-			log.error( msg, e );
-			
-			throw e;
-		}
-	}
-	
 	
 	
 	public double getBestPSMQValue() {
@@ -161,8 +219,9 @@ public class SearchProteinLooplink implements IProteinLooplink {
 	private Integer numPsms;
 	private int numUniquePsms;
 
+
+
 	private int numPeptides = -1;
-	List<SearchPeptideLooplink> peptides;
 	
 	private int numUniquePeptides = -1;
 	private double psmCutoff;

@@ -10,36 +10,16 @@ import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.SearchDTO;
-import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.objects.SearchPeptideLooplink;
+
+
 
 public class SearchPeptideLooplinkSearcher {
 
 	private SearchPeptideLooplinkSearcher() { }
 	private static final SearchPeptideLooplinkSearcher _INSTANCE = new SearchPeptideLooplinkSearcher();
 	public static SearchPeptideLooplinkSearcher getInstance() { return _INSTANCE; }
-	
-	/**
-	 * Get all looplink peptides corresponding to the given looplink protein
-	 * @param proteinLink
-	 * @return
-	 * @throws Exception
-	 */
-	public List<SearchPeptideLooplink> searchOnSearchProteinLooplink( SearchProteinLooplink proteinLink ) throws Exception {
-		
-
-		
-		return searchOnSearchProteinLooplinkInternal(
-				proteinLink.getSearch().getId(),
-				proteinLink.getPeptideCutoff(),
-				proteinLink.getPsmCutoff(),
-				proteinLink.getProtein().getNrProtein().getNrseqId(),
-				proteinLink.getProteinPosition1(),
-				proteinLink.getProteinPosition2(),
-				proteinLink);
-	}
-
 	
 
 	/**
@@ -63,7 +43,7 @@ public class SearchPeptideLooplinkSearcher {
 			
 			) throws Exception {
 		
-		return searchOnSearchProteinLooplinkInternal( searchId, peptideQValueCutoff, psmQValueCutoff, proteinId, proteinPosition1, proteinPosition2, null /* proteinLink */ );
+		return searchOnSearchProteinLooplinkInternal( searchId, peptideQValueCutoff, psmQValueCutoff, proteinId, proteinPosition1, proteinPosition2 );
 	}
 	
 	
@@ -79,7 +59,6 @@ public class SearchPeptideLooplinkSearcher {
 	 * @param proteinId
 	 * @param proteinPosition1
 	 * @param proteinPosition2
-	 * @param proteinLink
 	 * @return
 	 * @throws Exception
 	 */
@@ -89,9 +68,7 @@ public class SearchPeptideLooplinkSearcher {
 			double psmQValueCutoff,
 			int proteinId,
 			int proteinPosition1,
-			int proteinPosition2,
-			
-			SearchProteinLooplink proteinLink
+			int proteinPosition2
 			
 			) throws Exception {
 
@@ -128,12 +105,7 @@ public class SearchPeptideLooplinkSearcher {
 			
 			SearchDTO searchDTO = null;
 			
-			if ( proteinLink != null ) {
-				searchDTO = proteinLink.getSearch();
-			} else {
-				
-				searchDTO = SearchDAO.getInstance().getSearch( searchId );
-			}
+			searchDTO = SearchDAO.getInstance().getSearch( searchId );
 			
 
 			while( rs.next() ) {

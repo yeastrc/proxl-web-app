@@ -10,6 +10,7 @@ import org.yeastrc.xlink.dao.NRProteinDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.NRProteinDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.constants.DefaultQValueCutoffConstants;
 import org.yeastrc.xlink.www.objects.SearchProtein;
 import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
 
@@ -20,6 +21,7 @@ public class SearchProteinLooplinkSearcher {
 	public static SearchProteinLooplinkSearcher getInstance() { return _INSTANCE; }
 	
 	public List<SearchProteinLooplink> search( SearchDTO search, double psmCutoff, double peptideCutoff ) throws Exception {
+		
 		List<SearchProteinLooplink> links = new ArrayList<SearchProteinLooplink>();
 				
 		Connection conn = null;
@@ -28,8 +30,10 @@ public class SearchProteinLooplinkSearcher {
 		try {
 			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
-			String sql = "SELECT nrseq_id, protein_position_1, protein_position_2, bestPSMQValue, bestPeptideQValue " +
-					"FROM search_looplink_lookup WHERE search_id = ? AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  "
+			String sql = "SELECT nrseq_id, protein_position_1, protein_position_2, bestPSMQValue, bestPeptideQValue, " 
+					+ "num_psm_at_pt_01_q_cutoff, num_peptides_at_pt_01_q_cutoff, num_unique_peptides_at_pt_01_q_cutoff "
+
+					+ "FROM search_looplink_lookup WHERE search_id = ? AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  "
 					+ "ORDER BY nrseq_id, protein_position_1, protein_position_2";			
 			
 			pstmt = conn.prepareStatement( sql );
@@ -54,6 +58,18 @@ public class SearchProteinLooplinkSearcher {
 				if ( rs.wasNull() ) {
 					link.setBestPeptideQValue( null );
 				}
+				
+
+				//  These counts are only valid for PSM and Peptide Q value cutoff of default 0.01
+				
+				if ( DefaultQValueCutoffConstants.PSM_Q_VALUE_CUTOFF_DEFAULT == psmCutoff 
+						&& DefaultQValueCutoffConstants.PEPTIDE_Q_VALUE_CUTOFF_DEFAULT == peptideCutoff ) {
+
+					link.setNumPsms( rs.getInt( "num_psm_at_pt_01_q_cutoff" ) );
+					link.setNumPeptides( rs.getInt( "num_peptides_at_pt_01_q_cutoff" ) );
+					link.setNumUniquePeptides( rs.getInt( "num_unique_peptides_at_pt_01_q_cutoff" ) );
+				}
+				
 				
 				link.setSearch( search );
 				
@@ -92,8 +108,10 @@ public class SearchProteinLooplinkSearcher {
 		try {
 			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
-			String sql = "SELECT bestPSMQValue, bestPeptideQValue " +
-					"FROM search_looplink_lookup WHERE search_id = ? AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  AND "
+			String sql = "SELECT bestPSMQValue, bestPeptideQValue " 
+					+ "num_psm_at_pt_01_q_cutoff, num_peptides_at_pt_01_q_cutoff, num_unique_peptides_at_pt_01_q_cutoff, "
+
+					+ "FROM search_looplink_lookup WHERE search_id = ? AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  AND "
 					+ "nrseq_id = ? AND protein_position_1 = ? AND protein_position_2 = ?";	
 			
 			pstmt = conn.prepareStatement( sql );
@@ -122,6 +140,20 @@ public class SearchProteinLooplinkSearcher {
 				if ( rs.wasNull() ) {
 					link.setBestPeptideQValue( null );
 				}
+				
+
+				
+				//  These counts are only valid for PSM and Peptide Q value cutoff of default 0.01
+				
+				if ( DefaultQValueCutoffConstants.PSM_Q_VALUE_CUTOFF_DEFAULT == psmCutoff 
+						&& DefaultQValueCutoffConstants.PEPTIDE_Q_VALUE_CUTOFF_DEFAULT == peptideCutoff ) {
+
+					link.setNumPsms( rs.getInt( "num_psm_at_pt_01_q_cutoff" ) );
+					link.setNumPeptides( rs.getInt( "num_peptides_at_pt_01_q_cutoff" ) );
+					link.setNumUniquePeptides( rs.getInt( "num_unique_peptides_at_pt_01_q_cutoff" ) );
+				}
+				
+				
 				
 				link.setSearch( search );
 				

@@ -18,8 +18,6 @@ import org.yeastrc.xlink.www.objects.SearchPeptideDimer;
 import org.yeastrc.xlink.www.objects.SearchPeptideLooplink;
 import org.yeastrc.xlink.www.objects.SearchPeptideMonolink;
 import org.yeastrc.xlink.www.objects.SearchPeptideUnlink;
-import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
-import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
 import org.yeastrc.xlink.www.objects.SearchProteinMonolink;
 import org.yeastrc.xlink.www.web_utils.RetentionTimeScalingAndRounding;
 
@@ -31,144 +29,150 @@ public class SearchPsmSearcher {
 	private static final SearchPsmSearcher _INSTANCE = new SearchPsmSearcher();
 	public static SearchPsmSearcher getInstance() { return _INSTANCE; }
 	
-	/**
-	 * Get the number of PSMs in the database corresponding to the given crosslink with its given cutoffs
-	 * @param crosslink
-	 * @return
-	 * @throws Exception
-	 */
-	public int getNumPsms( SearchProteinCrosslink crosslink ) throws Exception {
-		
-		int count = 0;
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		final String sql = 
-				"SELECT COUNT(*) FROM psm AS a INNER JOIN search_reported_peptide AS b ON ( a.search_id = b.search_id AND a.reported_peptide_id = b.reported_peptide_id ) "
-				+ "INNER JOIN crosslink AS c ON a.id = c.psm_id WHERE a.search_id = ? AND a.q_value <= ? AND ( b.q_value <= ? OR b.q_value IS NULL )   AND "
-				+ "c.nrseq_id_1 = ? AND c.nrseq_id_2 = ? AND c.protein_1_position = ? AND c.protein_2_position = ? ";
-
-		try {
-			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
 	
-			pstmt = conn.prepareStatement( sql );
-
-			pstmt.setInt( 1,  crosslink.getSearch().getId() );
-			pstmt.setDouble( 2,  crosslink.getPsmCutoff() );
-			pstmt.setDouble( 3,  crosslink.getPeptideCutoff() );
-			pstmt.setInt( 4,  crosslink.getProtein1().getNrProtein().getNrseqId() );
-			pstmt.setInt( 5,  crosslink.getProtein2().getNrProtein().getNrseqId() );
-			pstmt.setInt( 6,  crosslink.getProtein1Position() );
-			pstmt.setInt( 7,  crosslink.getProtein2Position() );
-
-			rs = pstmt.executeQuery();
-			
-			rs.next();
-			count = rs.getInt( 1 );
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Exception in getNumPsms( SearchProteinCrosslink crosslink ): sql: " + sql;
-			
-			log.error( msg );
-			
-			throw e;
-			
-		} finally {
-			
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-			
-		}
-		
-		
-		return count;
-	}
+	//  method moved to NumPsmsForProteinCriteriaSearcher.getNumPsmsForCrosslink(...) in proxl base
 	
-	/**
-	 * Get the number of PSMs in the database corresponding to the given looplink with its given cutoffs
-	 * @param crosslink
-	 * @return
-	 * @throws Exception
-	 */
-	public int getNumPsms( SearchProteinLooplink looplink ) throws Exception {
-		
-		int count = 0;
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		final String sql = 
-				"SELECT COUNT(*) FROM psm AS a INNER JOIN search_reported_peptide AS b ON ( a.search_id = b.search_id AND a.reported_peptide_id = b.reported_peptide_id ) "
-				+ "INNER JOIN looplink AS c ON a.id = c.psm_id WHERE a.search_id = ? AND a.q_value <= ? AND ( b.q_value <= ? OR b.q_value IS NULL )   AND "
-				+ "c.nrseq_id = ? AND c.protein_position_1 = ? AND c.protein_position_2 = ? ";
+//	/**
+//	 * Get the number of PSMs in the database corresponding to the given crosslink with its given cutoffs
+//	 * @param crosslink
+//	 * @return
+//	 * @throws Exception
+//	 */
+//	public int getNumPsms( SearchProteinCrosslink crosslink ) throws Exception {
+//		
+//		int count = 0;
+//		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		ResultSet rs = null;
+//		
+//		final String sql = 
+//				"SELECT COUNT(*) FROM psm AS a INNER JOIN search_reported_peptide AS b ON ( a.search_id = b.search_id AND a.reported_peptide_id = b.reported_peptide_id ) "
+//				+ "INNER JOIN crosslink AS c ON a.id = c.psm_id WHERE a.search_id = ? AND a.q_value <= ? AND ( b.q_value <= ? OR b.q_value IS NULL )   AND "
+//				+ "c.nrseq_id_1 = ? AND c.nrseq_id_2 = ? AND c.protein_1_position = ? AND c.protein_2_position = ? ";
+//
+//		try {
+//			
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//	
+//			pstmt = conn.prepareStatement( sql );
+//
+//			pstmt.setInt( 1,  crosslink.getSearch().getId() );
+//			pstmt.setDouble( 2,  crosslink.getPsmCutoff() );
+//			pstmt.setDouble( 3,  crosslink.getPeptideCutoff() );
+//			pstmt.setInt( 4,  crosslink.getProtein1().getNrProtein().getNrseqId() );
+//			pstmt.setInt( 5,  crosslink.getProtein2().getNrProtein().getNrseqId() );
+//			pstmt.setInt( 6,  crosslink.getProtein1Position() );
+//			pstmt.setInt( 7,  crosslink.getProtein2Position() );
+//
+//			rs = pstmt.executeQuery();
+//			
+//			rs.next();
+//			count = rs.getInt( 1 );
+//			
+//		} catch ( Exception e ) {
+//			
+//			String msg = "Exception in getNumPsms( SearchProteinCrosslink crosslink ): sql: " + sql;
+//			
+//			log.error( msg );
+//			
+//			throw e;
+//			
+//		} finally {
+//			
+//			// be sure database handles are closed
+//			if( rs != null ) {
+//				try { rs.close(); } catch( Throwable t ) { ; }
+//				rs = null;
+//			}
+//			
+//			if( pstmt != null ) {
+//				try { pstmt.close(); } catch( Throwable t ) { ; }
+//				pstmt = null;
+//			}
+//			
+//			if( conn != null ) {
+//				try { conn.close(); } catch( Throwable t ) { ; }
+//				conn = null;
+//			}
+//			
+//		}
+//		
+//		
+//		return count;
+//	}
 	
-		try {
-			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+	
+	//  method moved to NumPsmsForProteinCriteriaSearcher.getNumPsmsForLooplink(...) in proxl base
 
-			pstmt = conn.prepareStatement( sql );
-
-			pstmt.setInt( 1,  looplink.getSearch().getId() );
-			pstmt.setDouble( 2,  looplink.getPsmCutoff() );
-			pstmt.setDouble( 3,  looplink.getPeptideCutoff() );
-			pstmt.setInt( 4,  looplink.getProtein().getNrProtein().getNrseqId() );
-			pstmt.setInt( 5,  looplink.getProteinPosition1() );
-			pstmt.setInt( 6,  looplink.getProteinPosition2() );
-
-			rs = pstmt.executeQuery();
-			
-			rs.next();
-			count = rs.getInt( 1 );
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Exception in getNumPsms( SearchProteinLooplink looplink ): sql: " + sql;
-			
-			log.error( msg );
-			
-			throw e;
-			
-		} finally {
-			
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-			
-		}
-		
-		
-		return count;
-	}
+//	/**
+//	 * Get the number of PSMs in the database corresponding to the given looplink with its given cutoffs
+//	 * @param crosslink
+//	 * @return
+//	 * @throws Exception
+//	 */
+//	public int getNumPsms( SearchProteinLooplink looplink ) throws Exception {
+//		
+//		int count = 0;
+//		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		ResultSet rs = null;
+//		
+//		final String sql = 
+//				"SELECT COUNT(*) FROM psm AS a INNER JOIN search_reported_peptide AS b ON ( a.search_id = b.search_id AND a.reported_peptide_id = b.reported_peptide_id ) "
+//				+ "INNER JOIN looplink AS c ON a.id = c.psm_id WHERE a.search_id = ? AND a.q_value <= ? AND ( b.q_value <= ? OR b.q_value IS NULL )   AND "
+//				+ "c.nrseq_id = ? AND c.protein_position_1 = ? AND c.protein_position_2 = ? ";
+//	
+//		try {
+//			
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//
+//			pstmt = conn.prepareStatement( sql );
+//
+//			pstmt.setInt( 1,  looplink.getSearch().getId() );
+//			pstmt.setDouble( 2,  looplink.getPsmCutoff() );
+//			pstmt.setDouble( 3,  looplink.getPeptideCutoff() );
+//			pstmt.setInt( 4,  looplink.getProtein().getNrProtein().getNrseqId() );
+//			pstmt.setInt( 5,  looplink.getProteinPosition1() );
+//			pstmt.setInt( 6,  looplink.getProteinPosition2() );
+//
+//			rs = pstmt.executeQuery();
+//			
+//			rs.next();
+//			count = rs.getInt( 1 );
+//			
+//		} catch ( Exception e ) {
+//			
+//			String msg = "Exception in getNumPsms( SearchProteinLooplink looplink ): sql: " + sql;
+//			
+//			log.error( msg );
+//			
+//			throw e;
+//			
+//		} finally {
+//			
+//			// be sure database handles are closed
+//			if( rs != null ) {
+//				try { rs.close(); } catch( Throwable t ) { ; }
+//				rs = null;
+//			}
+//			
+//			if( pstmt != null ) {
+//				try { pstmt.close(); } catch( Throwable t ) { ; }
+//				pstmt = null;
+//			}
+//			
+//			if( conn != null ) {
+//				try { conn.close(); } catch( Throwable t ) { ; }
+//				conn = null;
+//			}
+//			
+//		}
+//		
+//		
+//		return count;
+//	}
 	
 	
 	private static final String GET_NUM_PSMS_FOR_MONOLINK_SQL =
