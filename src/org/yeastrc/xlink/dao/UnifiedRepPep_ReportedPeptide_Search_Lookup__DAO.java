@@ -30,6 +30,7 @@ public class UnifiedRepPep_ReportedPeptide_Search_Lookup__DAO {
 //			  peptide_q_value_for_search DOUBLE NULL,
 //			  best_psm_q_value DOUBLE NULL,
 //	  		  psm_num_at_pt_01_q_cutoff INT NOT NULL,
+//			  sample_psm_id INT(10) UNSIGNED NULL DEFAULT NULL
 //			  PRIMARY KEY (unified_reported_peptide_id, reported_peptide_id, search_id),
 			  
 	
@@ -77,6 +78,7 @@ public class UnifiedRepPep_ReportedPeptide_Search_Lookup__DAO {
 //	  		  has_dynamic_modifictions TINYINT UNSIGNED NOT NULL,
 //	  		  has_monolinks TINYINT UNSIGNED NOT NULL,
 //	  		  psm_num_at_pt_01_q_cutoff INT NOT NULL,
+//	  		  sample_psm_id INT(10) UNSIGNED NULL DEFAULT NULL
 //			  PRIMARY KEY (unified_reported_peptide_id, reported_peptide_id, search_id),
 
 	
@@ -88,8 +90,8 @@ public class UnifiedRepPep_ReportedPeptide_Search_Lookup__DAO {
 			"INSERT INTO unified_rep_pep__reported_peptide__search_lookup "
 			+ 	"( unified_reported_peptide_id, reported_peptide_id, search_id, link_type, "
 			+        " peptide_q_value_for_search, best_psm_q_value, "
-			+  		 " has_dynamic_modifictions, has_monolinks, psm_num_at_pt_01_q_cutoff ) "
-			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )";
+			+  		 " has_dynamic_modifictions, has_monolinks, psm_num_at_pt_01_q_cutoff, sample_psm_id ) "
+			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
 	
 	/**
@@ -183,6 +185,9 @@ public class UnifiedRepPep_ReportedPeptide_Search_Lookup__DAO {
 			
 			counter++;
 			pstmt.setInt( counter, item.getPsmNumAtPt01QvalueCutoff() );
+			
+			counter++;
+			pstmt.setInt( counter, item.getSamplePsmId() );
 			
 			
 			pstmt.executeUpdate();

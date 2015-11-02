@@ -95,7 +95,7 @@
 	<!-- ================================================================================== -->
     <target name="compile" depends="clean">
     	<!-- <echo message="${toString:compile.classpath}"/> -->
-        <javac debug="on" srcdir="src" destdir="${classes}" source="${java_source}" target="${java_target}"  encoding="${java.source.character.set}" >
+        <javac includeantruntime="false"  debug="on" srcdir="src" destdir="${classes}" source="${java_source}" target="${java_target}"  encoding="${java.source.character.set}" >
             <classpath refid="compile.classpath"/>
         </javac>
 

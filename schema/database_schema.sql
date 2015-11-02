@@ -228,9 +228,9 @@ CREATE INDEX `type` ON `psm` (`type` ASC);
 
 CREATE INDEX `psm_scan_id_fk_idx` ON `psm` (`scan_id` ASC);
 
-CREATE INDEX `psm__search_id_type_q_value_idx` ON `psm` (`search_id` ASC, `type` ASC, `q_value` ASC);
-
 CREATE INDEX `psm__search_id_rep_pep_id_q_value_idx` ON `psm` (`search_id` ASC, `reported_peptide_id` ASC, `q_value` ASC);
+
+CREATE INDEX `psm__search_id_type_q_value_idx` ON `psm` (`search_id` ASC, `type` ASC, `q_value` ASC);
 
 
 -- -----------------------------------------------------
@@ -362,6 +362,8 @@ CREATE INDEX `crosslink_ibfk_4_idx` ON `crosslink` (`peptide_1_matched_peptide_i
 CREATE INDEX `crosslink_ibfk_5_idx` ON `crosslink` (`peptide_2_matched_peptide_id` ASC);
 
 CREATE INDEX `crosslink_linker_id_fj_idx` ON `crosslink` (`linker_id` ASC);
+
+CREATE INDEX `crosslink_pr1prp1pr2prp2` ON `crosslink` (`nrseq_id_1` ASC, `protein_1_position` ASC, `nrseq_id_2` ASC, `protein_2_position` ASC);
 
 
 -- -----------------------------------------------------
@@ -633,13 +635,13 @@ CREATE TABLE IF NOT EXISTS `search_comment` (
   `commentCreatedTimestamp` TIMESTAMP NULL,
   `created_auth_user_id` INT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `search_comment_user_fk`
-    FOREIGN KEY (`auth_user_id`)
-    REFERENCES `auth_user` (`id`),
   CONSTRAINT `perc_run_comment_ibfk_1`
     FOREIGN KEY (`search_id`)
     REFERENCES `search` (`id`)
-    ON DELETE CASCADE)
+    ON DELETE CASCADE,
+  CONSTRAINT `search_comment_user_fk`
+    FOREIGN KEY (`auth_user_id`)
+    REFERENCES `auth_user` (`id`))
 ENGINE = InnoDB;
 
 CREATE INDEX `search_id` ON `search_comment` (`search_id` ASC, `commentTimestamp` ASC);
@@ -660,6 +662,9 @@ CREATE TABLE IF NOT EXISTS `search_crosslink_lookup` (
   `protein_2_position` INT(10) UNSIGNED NOT NULL,
   `bestPSMQValue` DOUBLE NOT NULL,
   `bestPeptideQValue` DOUBLE NULL,
+  `num_psm_at_pt_01_q_cutoff` INT UNSIGNED NOT NULL,
+  `num_linked_peptides_at_pt_01_q_cutoff` INT UNSIGNED NOT NULL,
+  `num_unique_peptides_linked_at_pt_01_q_cutoff` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`search_id`, `nrseq_id_1`, `nrseq_id_2`, `protein_1_position`, `protein_2_position`),
   CONSTRAINT `search_crosslink_lookup_ibfk_1`
     FOREIGN KEY (`search_id`)
@@ -686,6 +691,9 @@ CREATE TABLE IF NOT EXISTS `search_looplink_lookup` (
   `protein_position_2` INT(10) UNSIGNED NOT NULL,
   `bestPSMQValue` DOUBLE NOT NULL,
   `bestPeptideQValue` DOUBLE NULL,
+  `num_psm_at_pt_01_q_cutoff` INT(10) UNSIGNED NOT NULL,
+  `num_peptides_at_pt_01_q_cutoff` INT(10) UNSIGNED NOT NULL,
+  `num_unique_peptides_at_pt_01_q_cutoff` INT(10) UNSIGNED NOT NULL,
   PRIMARY KEY (`search_id`, `nrseq_id`, `protein_position_1`, `protein_position_2`),
   CONSTRAINT `search_looplink_lookup_ibfk_1`
     FOREIGN KEY (`search_id`)
@@ -738,8 +746,7 @@ CREATE TABLE IF NOT EXISTS `search_reported_peptide` (
   CONSTRAINT `search_reported_peptide_ibfk_1`
     FOREIGN KEY (`search_id`)
     REFERENCES `search` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT,
+    ON DELETE CASCADE,
   CONSTRAINT `search_reported_peptide_ibfk_2`
     FOREIGN KEY (`reported_peptide_id`)
     REFERENCES `reported_peptide` (`id`)
@@ -1282,16 +1289,15 @@ CREATE TABLE IF NOT EXISTS `search_linker` (
   `search_id` INT UNSIGNED NOT NULL,
   `linker_id` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`search_id`, `linker_id`),
-  CONSTRAINT `search_linker_search_id_fk`
-    FOREIGN KEY (`search_id`)
-    REFERENCES `search` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT,
   CONSTRAINT `search_linker_linker_id_fk`
     FOREIGN KEY (`linker_id`)
     REFERENCES `linker` (`id`)
     ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
+    ON UPDATE RESTRICT,
+  CONSTRAINT `search_linker_search_id_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE)
 ENGINE = InnoDB;
 
 CREATE INDEX `search_linker_linker_id_fk_idx` ON `search_linker` (`linker_id` ASC);
@@ -1313,7 +1319,7 @@ CREATE TABLE IF NOT EXISTS `xquest_file` (
     FOREIGN KEY (`search_id`)
     REFERENCES `search` (`id`)
     ON DELETE CASCADE
-    ON UPDATE RESTRICT)
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 CREATE INDEX `filename` ON `xquest_file` (`filename` ASC);
@@ -1584,8 +1590,7 @@ CREATE TABLE IF NOT EXISTS `search_file` (
   CONSTRAINT `search_file_search_id_fk`
     FOREIGN KEY (`search_id`)
     REFERENCES `search` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
+    ON DELETE CASCADE)
 ENGINE = InnoDB;
 
 CREATE INDEX `search_file_search_id_fk_idx` ON `search_file` (`search_id` ASC);
@@ -1628,8 +1633,7 @@ CREATE TABLE IF NOT EXISTS `static_mod` (
   CONSTRAINT `static_mod_search_id_fk`
     FOREIGN KEY (`search_id`)
     REFERENCES `search` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
+    ON DELETE CASCADE)
 ENGINE = InnoDB;
 
 CREATE INDEX `static_mod_search_id_fk_idx` ON `static_mod` (`search_id` ASC);
@@ -1693,16 +1697,15 @@ CREATE TABLE IF NOT EXISTS `search_web_links` (
   `link_label` VARCHAR(400) NOT NULL,
   `link_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  CONSTRAINT `search_links_search_id_fk`
-    FOREIGN KEY (`search_id`)
-    REFERENCES `search` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT,
   CONSTRAINT `search_links_auth_user_id_fk`
     FOREIGN KEY (`auth_user_id`)
     REFERENCES `auth_user` (`id`)
     ON DELETE SET NULL
-    ON UPDATE RESTRICT)
+    ON UPDATE RESTRICT,
+  CONSTRAINT `search_links_search_id_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE)
 ENGINE = InnoDB;
 
 CREATE INDEX `search_links_search_id_fk_idx` ON `search_web_links` (`search_id` ASC);
@@ -1721,16 +1724,15 @@ CREATE TABLE IF NOT EXISTS `default_page_view` (
   `auth_user_id` INT UNSIGNED NOT NULL,
   `url` VARCHAR(6000) NOT NULL,
   PRIMARY KEY (`search_id`, `page_name`),
-  CONSTRAINT `default_page_view_search_id_fk`
-    FOREIGN KEY (`search_id`)
-    REFERENCES `search` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT,
   CONSTRAINT `default_page_view_auth_user_id_fk`
     FOREIGN KEY (`auth_user_id`)
     REFERENCES `auth_user` (`id`)
     ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
+    ON UPDATE RESTRICT,
+  CONSTRAINT `default_page_view_search_id_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE)
 ENGINE = InnoDB;
 
 CREATE INDEX `default_page_view_search_id_fk_idx` ON `default_page_view` (`search_id` ASC);
@@ -1753,8 +1755,7 @@ CREATE TABLE IF NOT EXISTS `search_for_xlinks_file` (
   CONSTRAINT `search_for_xlinks_file_search_id`
     FOREIGN KEY (`search_id`)
     REFERENCES `search` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
+    ON DELETE CASCADE)
 ENGINE = InnoDB;
 
 CREATE INDEX `filename` ON `search_for_xlinks_file` (`filename` ASC);
@@ -1938,14 +1939,13 @@ DROP TABLE IF EXISTS `search__dynamic_mod_mass_lookup` ;
 
 CREATE TABLE IF NOT EXISTS `search__dynamic_mod_mass_lookup` (
   `search_id` INT UNSIGNED NOT NULL,
-  `dynamic_mod_mass` DOUBLE UNSIGNED NOT NULL,
-  `search_id_dynamic_mod_mass_count` INT UNSIGNED NOT NULL,
+  `dynamic_mod_mass` DOUBLE NOT NULL,
+  `search_id_dynamic_mod_mass_count` INT NOT NULL,
   PRIMARY KEY (`search_id`, `dynamic_mod_mass`),
   CONSTRAINT `search__dynamic_mod_mass__search_id_fk`
     FOREIGN KEY (`search_id`)
     REFERENCES `search` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
+    ON DELETE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -1981,20 +1981,25 @@ CREATE TABLE IF NOT EXISTS `unified_rep_pep__reported_peptide__search_lookup` (
   `has_dynamic_modifictions` TINYINT UNSIGNED NOT NULL,
   `has_monolinks` TINYINT UNSIGNED NOT NULL,
   `psm_num_at_pt_01_q_cutoff` INT NOT NULL,
+  `sample_psm_id` INT UNSIGNED NULL,
   PRIMARY KEY (`unified_reported_peptide_id`, `reported_peptide_id`, `search_id`),
-  CONSTRAINT `unified_rp__reported_peptide__search__unified_rp_id_fk`
-    FOREIGN KEY (`unified_reported_peptide_id`)
-    REFERENCES `unified_reported_peptide_lookup` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT,
   CONSTRAINT `unified_rp__reported_peptide__search__reported_peptide_id_fk`
     FOREIGN KEY (`reported_peptide_id`)
     REFERENCES `reported_peptide` (`id`)
     ON DELETE CASCADE
     ON UPDATE RESTRICT,
+  CONSTRAINT `unified_rp__reported_peptide__search___sample_psm_id_fk`
+    FOREIGN KEY (`sample_psm_id`)
+    REFERENCES `psm` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
   CONSTRAINT `unified_rp__reported_peptide__search__search_id_fk`
     FOREIGN KEY (`search_id`)
     REFERENCES `search` (`id`)
+    ON DELETE CASCADE,
+  CONSTRAINT `unified_rp__reported_peptide__search__unified_rp_id_fk`
+    FOREIGN KEY (`unified_reported_peptide_id`)
+    REFERENCES `unified_reported_peptide_lookup` (`id`)
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB;
@@ -2004,6 +2009,8 @@ CREATE INDEX `unified_rp__reported_peptide__search__reported_peptide_id_f_idx` O
 CREATE INDEX `unified_rp__reported_peptide__search__search_id_fk_idx` ON `unified_rep_pep__reported_peptide__search_lookup` (`search_id` ASC);
 
 CREATE INDEX `unified_rp__rp__search__srch_type_bpsmqval_idx` ON `unified_rep_pep__reported_peptide__search_lookup` (`search_id` ASC, `link_type` ASC, `best_psm_q_value` ASC);
+
+CREATE INDEX `unified_rep_pep__reported_peptide__search_lookup__sample_ps_idx` ON `unified_rep_pep__reported_peptide__search_lookup` (`sample_psm_id` ASC);
 
 
 -- -----------------------------------------------------
@@ -2018,16 +2025,15 @@ CREATE TABLE IF NOT EXISTS `search__reported_peptide__dynamic_mod_lookup` (
   `link_type` ENUM('looplink','crosslink','unlinked','dimer') NOT NULL,
   `best_psm_q_value` DOUBLE NOT NULL,
   PRIMARY KEY (`search_id`, `reported_peptide_id`, `dynamic_mod_mass`),
-  CONSTRAINT `search__rep_pep__dyn_mods_search_id_fk`
-    FOREIGN KEY (`search_id`)
-    REFERENCES `search` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT,
   CONSTRAINT `search__rep_pep__dyn_mods_rep_pep_id_fk`
     FOREIGN KEY (`reported_peptide_id`)
     REFERENCES `reported_peptide` (`id`)
     ON DELETE CASCADE
-    ON UPDATE RESTRICT)
+    ON UPDATE RESTRICT,
+  CONSTRAINT `search__rep_pep__dyn_mods_search_id_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE)
 ENGINE = InnoDB;
 
 CREATE INDEX `search__rep_pep__dyn_mods_rep_pep_id_fk_idx` ON `search__reported_peptide__dynamic_mod_lookup` (`reported_peptide_id` ASC);
@@ -2075,8 +2081,7 @@ CREATE TABLE IF NOT EXISTS `search__search_program` (
   CONSTRAINT `search_program_version__search_id_fk`
     FOREIGN KEY (`search_id`)
     REFERENCES `search` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
+    ON DELETE CASCADE)
 ENGINE = InnoDB;
 
 CREATE INDEX `search_program_version_search_program_id_fk_idx` ON `search__search_program` (`search_program_id` ASC);

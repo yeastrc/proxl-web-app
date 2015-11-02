@@ -19,7 +19,15 @@ public class UnifiedRepPep_ReportedPeptide_Search_Lookup__DTO {
 	
 	private int psmNumAtPt01QvalueCutoff;
 	
+	private int samplePsmId;
 	
+	
+	public int getSamplePsmId() {
+		return samplePsmId;
+	}
+	public void setSamplePsmId(int samplePsmId) {
+		this.samplePsmId = samplePsmId;
+	}
 	public boolean isHasMonolinks() {
 		return hasMonolinks;
 	}
