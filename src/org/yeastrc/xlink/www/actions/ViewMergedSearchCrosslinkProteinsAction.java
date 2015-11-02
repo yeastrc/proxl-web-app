@@ -548,7 +548,7 @@ public class ViewMergedSearchCrosslinkProteinsAction extends Action {
 				
 				for( SearchDTO search : searches ) {
 				
-					if( link.getSearchProteinCrosslinks().keySet().contains( search ) ) {
+					if( link.getSearches().contains( search ) ) {
 				
 						booleanWrapper.add( new SearchBooleanWrapper( search, true ) );
 						

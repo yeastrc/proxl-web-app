@@ -13,7 +13,7 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+//import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.commons.lang3.StringUtils;
@@ -85,7 +85,7 @@ public class ViewMergedSearchLooplinkProteinsAction extends Action {
 
 
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 
 			
 
@@ -537,7 +537,7 @@ public class ViewMergedSearchLooplinkProteinsAction extends Action {
 
 				List<SearchBooleanWrapper> booleanWrapper = new ArrayList<SearchBooleanWrapper>( searches.size() );
 				for( SearchDTO search : searches ) {
-					if( link.getSearchProteinLooplinks().keySet().contains( search ) ) {
+					if( link.getSearches().contains( search ) ) {
 						booleanWrapper.add( new SearchBooleanWrapper( search, true ) );
 					} else {
 						booleanWrapper.add( new SearchBooleanWrapper( search, false ) );

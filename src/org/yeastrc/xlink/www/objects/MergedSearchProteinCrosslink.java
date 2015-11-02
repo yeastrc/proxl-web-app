@@ -1,33 +1,69 @@
 package org.yeastrc.xlink.www.objects;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.www.searcher.MergedSearchCrosslinkPeptideSearcher;
 import org.yeastrc.xlink.www.searcher.MergedSearchPsmSearcher;
+import org.yeastrc.xlink.www.searcher.SearchProteinCrosslinkSearcher;
 
 public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedSearchLink {
 
 	private static final Logger log = Logger.getLogger(MergedSearchProteinCrosslink.class);
 	
 			
+	/* 
+	 * The searches for the records that were found for this specific set of query keys
+	 */
 	@Override
 	public Collection<SearchDTO> getSearches() {
-
-		if ( searchProteinCrosslinks == null ) {
-			
-			return null;
-		}
-		return searchProteinCrosslinks.keySet();
+		
+		return searches;
 	}
 	
+
+	public void setSearches(List<SearchDTO> searches) {
+		this.searches = searches;
+	}
+
+	
+
+	public Map<SearchDTO, SearchProteinCrosslink> getSearchProteinCrosslinks() throws Exception {
+		
+		if ( searchProteinCrosslinks == null ) {
+			
+			searchProteinCrosslinks = new TreeMap<SearchDTO, SearchProteinCrosslink>();
+			for( SearchDTO search : searches ) {
+				SearchProteinCrosslink tlink = SearchProteinCrosslinkSearcher.getInstance().search(search, 
+																									 psmCutoff, 
+																									 peptideCutoff, 
+																									 this.getProtein1().getNrProtein(),
+																									 this.getProtein2().getNrProtein(),
+																									 this.getProtein1Position(),
+																									 this.getProtein2Position()
+																									);
+
+				if( tlink != null )
+					searchProteinCrosslinks.put( search, tlink );
+			}
+			
+		}
+		
+		return searchProteinCrosslinks;
+	}
+
+	
+
 	
 	/**
 	 * @return true if any child level link "Best Peptide Q-Value" is not null
+	 * @throws Exception 
 	 */
-	public boolean isAnyLinksHaveBestPeptideQValue() {
+	public boolean isAnyLinksHaveBestPeptideQValue() throws Exception {
 
 		if ( anyLinksHaveBestPeptideQValueSet ) {
 			
@@ -36,7 +72,7 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 	
 		/// Check if any child level link "Best Peptide Q-Value" is not null
 
-		for ( Map.Entry<SearchDTO, SearchProteinCrosslink> searchProteinCrosslinksEntry : searchProteinCrosslinks.entrySet() ) {
+		for ( Map.Entry<SearchDTO, SearchProteinCrosslink> searchProteinCrosslinksEntry : getSearchProteinCrosslinks().entrySet() ) {
 
 			SearchProteinCrosslink searchProteinCrosslinkEntry = searchProteinCrosslinksEntry.getValue();
 
@@ -52,6 +88,7 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 		return anyLinksHaveBestPeptideQValue;
 	}
 
+	
 	
 	
 	public MergedSearchProtein getProtein1() {
@@ -78,12 +115,21 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 	public void setProtein2Position(int protein2Position) {
 		this.protein2Position = protein2Position;
 	}
+	
 	public int getNumPsms() throws Exception {
-		if( this.numPsms == null )
+		
+		if( this.numPsms == null ) {
+		
 			this.numPsms = MergedSearchPsmSearcher.getInstance().getNumPsms( this );
+		}
 		
 		return this.numPsms;
 	}
+
+	public void setNumPsms(Integer numPsms) {
+		this.numPsms = numPsms;
+	}
+
 
 	public int getNumUniquePsms() {
 		return numUniquePsms;
@@ -125,14 +171,6 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 	}
 	
 
-	
-	public Map<SearchDTO, SearchProteinCrosslink> getSearchProteinCrosslinks() {
-		return searchProteinCrosslinks;
-	}
-	public void setSearchProteinCrosslinks(
-			Map<SearchDTO, SearchProteinCrosslink> searchProteinCrosslinks) {
-		this.searchProteinCrosslinks = searchProteinCrosslinks;
-	}
 	public double getPeptideCutoff() {
 		return peptideCutoff;
 	}
@@ -142,8 +180,8 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 
 	
 	public int getNumSearches() {
-		if( this.searchProteinCrosslinks == null ) return 0;
-		return this.searchProteinCrosslinks.keySet().size();
+		if( this.searches == null ) return 0;
+		return this.searches.size();
 	}
 
 	
@@ -172,15 +210,22 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 	private int numUniquePsms;
 
 	private int numLinkedPeptides = -1;
+	
+	private List<SearchDTO> searches;
+	
 	private Map<SearchDTO, SearchProteinCrosslink> searchProteinCrosslinks;
 	
+
+
+
+
 	private int numUniqueLinkedPeptides = -1;
 	private double psmCutoff;
 	private double peptideCutoff;
 	private double bestPSMQValue;
 	private Double bestPeptideQValue;
 	
+
 	private boolean anyLinksHaveBestPeptideQValue;
-	private boolean anyLinksHaveBestPeptideQValueSet;
-	
+	private boolean anyLinksHaveBestPeptideQValueSet;	
 }

@@ -3,26 +3,34 @@ package org.yeastrc.xlink.www.searcher;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.NRProteinDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.constants.DefaultQValueCutoffConstants;
 import org.yeastrc.xlink.www.objects.MergedSearchProtein;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinLooplink;
-import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
+
+
 
 public class MergedSearchProteinLooplinkSearcher {
+	
+	private static final Logger log = Logger.getLogger(MergedSearchProteinLooplinkSearcher.class);
 
 	private MergedSearchProteinLooplinkSearcher() { }
 	private static final MergedSearchProteinLooplinkSearcher _INSTANCE = new MergedSearchProteinLooplinkSearcher();
 	public static MergedSearchProteinLooplinkSearcher getInstance() { return _INSTANCE; }
+	
+	
+	private final String SEARCH_ID_GROUP_SEPARATOR = ","; //  separator as search ids are combined by the group by
+
 	
 	public List<MergedSearchProteinLooplink> search( Collection<SearchDTO> searches, double psmCutoff, double peptideCutoff ) throws Exception {
 		List<MergedSearchProteinLooplink> links = new ArrayList<MergedSearchProteinLooplink>();
@@ -33,7 +41,11 @@ public class MergedSearchProteinLooplinkSearcher {
 		try {
 			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
-			String sql = "SELECT nrseq_id, protein_position_1, protein_position_2, min(bestPSMQValue), min(bestPeptideQValue) "
+
+			String sql = "SELECT nrseq_id, protein_position_1, protein_position_2, min(bestPSMQValue), min(bestPeptideQValue), "
+					+ " SUM( num_psm_at_pt_01_q_cutoff ) AS num_psm_at_pt_01_q_cutoff, "
+					+ " GROUP_CONCAT( DISTINCT search_id SEPARATOR '" + SEARCH_ID_GROUP_SEPARATOR + "' ) AS search_ids "
+					
 					+ "FROM search_looplink_lookup WHERE search_id IN (#SEARCHES#) AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  "
 					+ "GROUP BY nrseq_id, protein_position_1, protein_position_2 "
 					+ "ORDER BY nrseq_id, protein_position_1, protein_position_2";
@@ -66,22 +78,30 @@ public class MergedSearchProteinLooplinkSearcher {
 					link.setBestPeptideQValue( null );
 				}
 				
-				// add search-level info for the protein looplinks:
-				Map<SearchDTO, SearchProteinLooplink> searchLooplinks = new TreeMap<SearchDTO, SearchProteinLooplink>();
-				for( SearchDTO search : searches ) {
-					SearchProteinLooplink tlink = SearchProteinLooplinkSearcher.getInstance().search(search, 
-																										 psmCutoff, 
-																										 peptideCutoff, 
-																										 link.getProtein().getNrProtein(),
-																										 link.getProteinPosition1(),
-																										 link.getProteinPosition2()
-																										);
 
-					if( tlink != null )
-						searchLooplinks.put( search, tlink );
+
+				int numPsmsForpt01Cutoff = rs.getInt( "num_psm_at_pt_01_q_cutoff" );
+				
+				if ( DefaultQValueCutoffConstants.PSM_Q_VALUE_CUTOFF_DEFAULT == psmCutoff ) {
+					
+					link.setNumPsms( numPsmsForpt01Cutoff ); // code is needed in WebMergedReportedPeptide for when psmCutoff is not default
 				}
 				
-				link.setSearchProteinLooplinks( searchLooplinks );
+				
+
+				//  Build collection of SearchDTO objects for the search ids found for this unified_reported_peptide_id
+				
+				String searchIdsCommaDelimString = rs.getString( "search_ids" );
+				List<SearchDTO> searchesFoundInCurrentRecord = getSearchDTOsForCurrentResultRecord( searches, searchIdsCommaDelimString );
+				
+				List<Integer> searchIdsFoundInCurrentRecord = new ArrayList<>( searchesFoundInCurrentRecord.size() );
+				
+				for ( SearchDTO searchDTO : searchesFoundInCurrentRecord ) {
+					
+					searchIdsFoundInCurrentRecord.add( searchDTO.getId() );
+				}
+				
+				link.setSearches( searchesFoundInCurrentRecord );
 				
 				
 				links.add( link );
@@ -110,4 +130,66 @@ public class MergedSearchProteinLooplinkSearcher {
 		return links;
 	}
 	
+
+
+	//////////////////////////////////////////////////////////////////////////////
+
+	//  Build collection of SearchDTO objects for the search ids found for this unified_reported_peptide_id
+	
+	private List<SearchDTO> getSearchDTOsForCurrentResultRecord( Collection<SearchDTO> searches, String searchIdsCommaDelimString ) throws SQLException, Exception {
+		
+		
+		List<SearchDTO> searchesFoundInCurrentRecord = new ArrayList<>( searches.size() );
+		
+		
+		if ( searchIdsCommaDelimString != null  ) {
+		
+			String[] searchIdsCommaDelimStringSplit = searchIdsCommaDelimString.split( SEARCH_ID_GROUP_SEPARATOR );
+			
+			for ( String searchIdString : searchIdsCommaDelimStringSplit ) {
+				
+				int searchIdFoundInCurrentRecord = 0;
+				
+				try {
+					
+					searchIdFoundInCurrentRecord = Integer.parseInt( searchIdString );
+				} catch ( Exception e ) {
+					
+					String msg = "Failed to parse search id from comma delim query result.  searchIdString: |"
+							+ searchIdString + "|, searchIdsCommaDelimString from DB: |" + searchIdsCommaDelimString + "|.";
+					
+					log.error( msg, e );
+					
+					throw new Exception(msg);
+				}
+				
+				// get SearchDTO from passed in collection.
+				
+				SearchDTO searchesItemForSearchIdFoundInCurrentRecord = null;
+				
+				for ( SearchDTO searchesItem : searches ) {
+					
+					if ( searchesItem.getId() == searchIdFoundInCurrentRecord ) {
+						
+						searchesItemForSearchIdFoundInCurrentRecord = searchesItem;
+						break;
+					}
+				}
+				
+				if ( searchesItemForSearchIdFoundInCurrentRecord == null ) {
+					
+					String msg = "Failed to search id from comma delim query result in list of passed in SearchDTOs."
+							+ "  searchId from comma delim query result: " + searchIdFoundInCurrentRecord;
+					
+					log.error( msg );
+					
+					throw new Exception(msg);
+				}
+				
+				searchesFoundInCurrentRecord.add( searchesItemForSearchIdFoundInCurrentRecord );
+			}
+		}
+		return searchesFoundInCurrentRecord;
+	}
+
 }

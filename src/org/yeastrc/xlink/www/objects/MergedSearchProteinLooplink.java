@@ -1,30 +1,65 @@
 package org.yeastrc.xlink.www.objects;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.www.searcher.MergedSearchLooplinkPeptideSearcher;
 import org.yeastrc.xlink.www.searcher.MergedSearchPsmSearcher;
+import org.yeastrc.xlink.www.searcher.SearchProteinLooplinkSearcher;
 
 public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSearchLink {
 	
+	
 
+	/* 
+	 * The searches for the records that were found for this specific set of query keys
+	 */
 	@Override
 	public Collection<SearchDTO> getSearches() {
 		
-		if ( searchProteinLooplinks == null ) {
-			
-			return null;
-		}
-		return searchProteinLooplinks.keySet();
+		return searches;
 	}
 	
+	public void setSearches(List<SearchDTO> searches) {
+		this.searches = searches;
+	}
+
+	
+
+
+	public Map<SearchDTO, SearchProteinLooplink> getSearchProteinLooplinks() throws Exception {
+		
+		if ( searchProteinLooplinks == null ) {
+
+			// add search-level info for the protein looplinks:
+			searchProteinLooplinks = new TreeMap<SearchDTO, SearchProteinLooplink>();
+			for( SearchDTO search : searches ) {
+				SearchProteinLooplink tlink = SearchProteinLooplinkSearcher.getInstance().search(search, 
+						psmCutoff, 
+						peptideCutoff, 
+						this.getProtein().getNrProtein(),
+						this.getProteinPosition1(),
+						this.getProteinPosition2()
+						);
+
+				if( tlink != null ) {
+					searchProteinLooplinks.put( search, tlink );
+				}
+			}
+		}
+		
+		return searchProteinLooplinks;
+	}
+
 
 	/**
 	 * @return true if any child level link "Best Peptide Q-Value" is not null
+	 * @throws Exception 
 	 */
-	public boolean isAnyLinksHaveBestPeptideQValue() {
+	public boolean isAnyLinksHaveBestPeptideQValue() throws Exception {
 
 		if ( anyLinksHaveBestPeptideQValueSet ) {
 			
@@ -33,7 +68,7 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 	
 		/// Check if any child level link "Best Peptide Q-Value" is not null
 
-		for ( Map.Entry<SearchDTO, SearchProteinLooplink> searchProteinLooplinksEntry : searchProteinLooplinks.entrySet() ) {
+		for ( Map.Entry<SearchDTO, SearchProteinLooplink> searchProteinLooplinksEntry : this.getSearchProteinLooplinks().entrySet() ) { 
 
 			SearchProteinLooplink searchProteinLooplinkEntry = searchProteinLooplinksEntry.getValue();
 
@@ -71,11 +106,19 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 	}
 
 	public int getNumPsms() throws Exception {
-		if( this.numPsms == null )
+		
+		if( this.numPsms == null ) {
+		
 			this.numPsms = MergedSearchPsmSearcher.getInstance().getNumPsms( this );
+		}
 		
 		return this.numPsms;
 	}
+	
+	public void setNumPsms(Integer numPsms) {
+		this.numPsms = numPsms;
+	}
+
 	
 	public int getNumUniquePsms() {
 		return numUniquePsms;
@@ -113,17 +156,10 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 	
 	
 	
-	public Map<SearchDTO, SearchProteinLooplink> getSearchProteinLooplinks() {
-		return searchProteinLooplinks;
-	}
-	public void setSearchProteinLooplinks(
-			Map<SearchDTO, SearchProteinLooplink> searchProteinLooplinks) {
-		this.searchProteinLooplinks = searchProteinLooplinks;
-	}
 
 	public int getNumSearches() {
-		if( this.searchProteinLooplinks == null ) return 0;
-		return this.searchProteinLooplinks.keySet().size();
+		if( this.searches == null ) return 0;
+		return this.searches.size();
 	}
 
 
@@ -142,6 +178,11 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 	}
 
 
+	private List<SearchDTO> searches;
+	
+
+	private Map<SearchDTO, SearchProteinLooplink> searchProteinLooplinks;
+
 
 	private MergedSearchProtein protein;
 	private int proteinPosition1;
@@ -151,9 +192,9 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 	private int numUniquePsms;
 
 	private int numPeptides = -1;
-	private Map<SearchDTO, SearchProteinLooplink> searchProteinLooplinks;
 	
-	private int numUniquePeptides = -1;
+
+		private int numUniquePeptides = -1;
 	private double psmCutoff;
 	private double peptideCutoff;
 	private double bestPSMQValue;

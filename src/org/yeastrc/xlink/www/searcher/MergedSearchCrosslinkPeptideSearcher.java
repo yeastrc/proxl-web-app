@@ -48,7 +48,7 @@ public class MergedSearchCrosslinkPeptideSearcher {
 					"   AND b.nrseq_id_1 = ? AND b.nrseq_id_2 = ? AND b.protein_1_position = ? AND b.protein_2_position = ?";
 			
 			Collection<Integer> searchIds = new HashSet<Integer>();
-			for( SearchDTO search : crosslink.getSearchProteinCrosslinks().keySet() )
+			for( SearchDTO search : crosslink.getSearches() )
 				searchIds.add( search.getId() );
 			
 			sql = sql.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
@@ -104,6 +104,7 @@ public class MergedSearchCrosslinkPeptideSearcher {
 		try {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			
 			String sql = "SELECT COUNT(distinct a.reported_peptide_id) " +
 					"FROM psm AS a INNER JOIN crosslink AS b ON a.id = b.psm_id " +
 					"INNER JOIN search_reported_peptide AS c ON a.reported_peptide_id = c.reported_peptide_id " +
@@ -111,8 +112,34 @@ public class MergedSearchCrosslinkPeptideSearcher {
 					"   AND c.search_id IN (#SEARCHES#) " +
 					"   AND b.nrseq_id_1 = ? AND b.nrseq_id_2 = ? AND b.protein_1_position = ? AND b.protein_2_position = ?";
 			
+			
+//			String sql = "SELECT COUNT(distinct un_rrrp_s_l.reported_peptide_id) " 
+//					
+//					+ "FROM unified_rep_pep__reported_peptide__search_lookup AS un_rrrp_s_l"
+//					+ " INNER JOIN crosslink  ON un_rrrp_s_l.sample_psm_id = crosslink.psm_id " 
+//					
+//					+ "WHERE "
+//					+ " un_rrrp_s_l.search_id IN (#SEARCHES#) "
+//					+ " AND un_rrrp_s_l.best_psm_q_value <= ? "
+//					+ " AND  ( un_rrrp_s_l.peptide_q_value_for_search <= ? OR un_rrrp_s_l.peptide_q_value_for_search IS NULL ) " 
+//					+ " AND crosslink.nrseq_id_1 = ? AND crosslink.nrseq_id_2 = ? AND crosslink.protein_1_position = ? AND crosslink.protein_2_position = ?";
+			
+
+//CREATE TABLE IF NOT EXISTS `proxl`.`unified_rep_pep__reported_peptide__search_lookup` (
+//  `unified_reported_peptide_id` INT UNSIGNED NOT NULL,
+//  `reported_peptide_id` INT UNSIGNED NOT NULL,
+//  `search_id` INT UNSIGNED NOT NULL,
+//  `link_type` ENUM('looplink','crosslink','unlinked','dimer') NOT NULL,
+//  `peptide_q_value_for_search` DOUBLE NULL,
+//  `best_psm_q_value` DOUBLE NULL,
+//  `has_dynamic_modifictions` TINYINT UNSIGNED NOT NULL,
+//  `has_monolinks` TINYINT UNSIGNED NOT NULL,
+//  `psm_num_at_pt_01_q_cutoff` INT NOT NULL,
+//  `sample_psm_id` INT UNSIGNED NULL,
+//			
+			
 			Collection<Integer> searchIds = new HashSet<Integer>();
-			for( SearchDTO search : crosslink.getSearchProteinCrosslinks().keySet() )
+			for( SearchDTO search : crosslink.getSearches() )
 				searchIds.add( search.getId() );
 			
 			sql = sql.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
@@ -168,7 +195,7 @@ public class MergedSearchCrosslinkPeptideSearcher {
 			int count = 0;
 
 
-			Collection<SearchDTO> searches = crosslink.getSearchProteinCrosslinks().keySet();
+			Collection<SearchDTO> searches = crosslink.getSearches();
 
 			// iterate over each peptide, see which are unique in the contest of the FASTAs represented by
 			// this merged search set
@@ -218,7 +245,7 @@ public class MergedSearchCrosslinkPeptideSearcher {
 				}
 
 
-				if( ReportedPeptideSearcher.getInstance().isUnique( reportedPeptide, peptideIds, crosslink.getSearchProteinCrosslinks().keySet() ) ) {
+				if( ReportedPeptideSearcher.getInstance().isUnique( reportedPeptide, peptideIds, crosslink.getSearches() ) ) {
 
 					count++;
 				}

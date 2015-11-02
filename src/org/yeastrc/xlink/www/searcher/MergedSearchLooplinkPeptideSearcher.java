@@ -44,7 +44,7 @@ public class MergedSearchLooplinkPeptideSearcher {
 			
 			
 			Collection<Integer> searchIds = new HashSet<Integer>();
-			for( SearchDTO search : looplink.getSearchProteinLooplinks().keySet() )
+			for( SearchDTO search : looplink.getSearches() )
 				searchIds.add( search.getId() );
 			
 			sql = sql.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
@@ -107,7 +107,7 @@ public class MergedSearchLooplinkPeptideSearcher {
 			
 			
 			Collection<Integer> searchIds = new HashSet<Integer>();
-			for( SearchDTO search : looplink.getSearchProteinLooplinks().keySet() )
+			for( SearchDTO search : looplink.getSearches() )
 				searchIds.add( search.getId() );
 			
 			sql = sql.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
@@ -156,7 +156,7 @@ public class MergedSearchLooplinkPeptideSearcher {
 	public int getNumUniquePeptides( MergedSearchProteinLooplink looplink ) throws Exception {
 		
 
-		Collection<SearchDTO> searches = looplink.getSearchProteinLooplinks().keySet();
+		Collection<SearchDTO> searches = looplink.getSearches();
 		
 		
 		int count = 0;
@@ -205,7 +205,7 @@ public class MergedSearchLooplinkPeptideSearcher {
 			peptideIds.add( looplinkDTO.getPeptideId() );
 			
 			
-			if( ReportedPeptideSearcher.getInstance().isUnique( reportedPeptide, peptideIds, looplink.getSearchProteinLooplinks().keySet() ) ) {
+			if( ReportedPeptideSearcher.getInstance().isUnique( reportedPeptide, peptideIds, looplink.getSearches() ) ) {
 				count++;			
 			}
 		}		

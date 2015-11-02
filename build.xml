@@ -102,7 +102,7 @@
 	<!--  Build the Java code   -->
 
   	
-  	<javac srcdir="${src}" destdir="${classesweb}" debug="true"  
+  	<javac includeantruntime="false"  srcdir="${src}" destdir="${classesweb}" debug="true"  
   		 source="${java_source}" target="${java_target}"  encoding="${java.source.character.set}" >
 		<classpath refid="classpath"/>
 	</javac>

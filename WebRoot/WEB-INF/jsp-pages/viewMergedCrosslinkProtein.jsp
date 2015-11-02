@@ -58,6 +58,9 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js"></script>
 					
+					
+		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkProteinsLoadedFromWebServiceTemplate.js"></script>
+					
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js"></script>
 		
@@ -225,6 +228,48 @@
 		<%@ include file="/WEB-INF/jsp-includes/viewPsmsLoadedFromWebServiceTemplateFragment.jsp" %>
 		<%@ include file="/WEB-INF/jsp-includes/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
 		
+		
+	
+	<%--  Crosslink Protein Template --%>
+
+
+		
+		<script id="crosslink_protein_block_template"  type="text/x-handlebars-template">
+
+			<%--  include the template text  --%>
+			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedCrosslinkProtein.jsp_templates/crosslink_protein_block_template.jsp" %>
+
+		</script>
+	
+
+	<%--  Crosslink Protein Entry Template --%>
+
+
+
+		<%-- !!!   Handlebars template:  Crosslink Protein Entry Template  !!!!!!!!!   --%>
+		
+		
+		<script id="crosslink_protein_data_row_entry_template"  type="text/x-handlebars-template">
+
+			<%--  include the template text  --%>
+			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedCrosslinkProtein.jsp_templates/crosslink_protein_data_row_entry_template.jsp" %>
+
+		</script>
+
+
+
+	<%--  Crosslink Protein Child row Entry Template --%>
+
+		
+		<script id="crosslink_protein_child_row_entry_template"  type="text/x-handlebars-template">
+
+			<%--  include the template text  --%>
+			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedCrosslinkProtein.jsp_templates/crosslink_protein_child_row_entry_template.jsp" %>
+
+		</script>
+
+	
+		
 		<div class="overall-enclosing-block">
 	
 			<h2 style="margin-bottom:5px;">List merged search proteins:</h2>
@@ -304,15 +349,6 @@
 					</td>
 				</tr>
 								
-<%-- 						 
-				<tr>
-					<td>Filter out xlinks with no unique peptides:</td>
-					<td>
-						<html:checkbox property="filterNonUniquePeptides" styleId="filterNonUniquePeptides" onchange="searchFormChanged()" ></html:checkbox>					
-					</td>
-				</tr>
---%>						 
-
 				<tr>
 					<td>Exclude organisms:</td>
 					<td>
@@ -468,12 +504,30 @@
 						
 					<logic:iterate id="crosslink" name="crosslinks">
 
+<%-- 
 							<tr id="<bean:write name="crosslink" property="mergedSearchProteinCrosslink.protein1.nrProtein.nrseqId" />-<bean:write name="crosslink" property="mergedSearchProteinCrosslink.protein1Position" />-<bean:write name="crosslink" property="mergedSearchProteinCrosslink.protein2.nrProtein.nrseqId" />-<bean:write name="crosslink" property="mergedSearchProteinCrosslink.protein2Position" />"
 								style="cursor: pointer; "
 								onclick="toggleVisibility(this)"
 								toggle_visibility_associated_element_id="<bean:write name="crosslink" property="mergedSearchProteinCrosslink.protein1.nrProtein.nrseqId" />-<bean:write name="crosslink" property="mergedSearchProteinCrosslink.protein1Position" />-<bean:write name="crosslink" property="mergedSearchProteinCrosslink.protein2.nrProtein.nrseqId" />-<bean:write name="crosslink" property="mergedSearchProteinCrosslink.protein2Position" />"
 							>
-						
+--%>						
+
+
+
+							<tr 
+								style="cursor: pointer; "
+								
+								onclick="viewCrosslinkProteinsLoadedFromWebServiceTemplate.showHideCrosslinkProteins( { clickedElement : this })"
+								project_id="${ projectId }"
+								search_ids="<c:forEach var="searchEntryForThisRow" items="${ crosslink.mergedSearchProteinCrosslink.searches }">,${ searchEntryForThisRow.id }</c:forEach>"
+								peptide_q_value_cutoff="${ peptideQValueCutoff }"
+								psm_q_value_cutoff="${ psmQValueCutoff }"
+								protein_1_id="<bean:write name="crosslink" property="mergedSearchProteinCrosslink.protein1.nrProtein.nrseqId" />"
+								protein_2_id="<bean:write name="crosslink" property="mergedSearchProteinCrosslink.protein2.nrProtein.nrseqId" />"
+								protein_1_position="<bean:write name="crosslink" property="mergedSearchProteinCrosslink.protein1Position" />"
+								protein_2_position="<bean:write name="crosslink" property="mergedSearchProteinCrosslink.protein2Position" />"
+							>
+										
 
 								<c:forEach items="${ crosslink.searchContainsCrosslink }" var="isMarked"  varStatus="searchVarStatus">
 								
@@ -536,7 +590,14 @@
 								
 							
 								<%--  colspan set to the number of searches plus the number of other columns --%>
-								<td colspan="<c:out value="${ fn:length( searches ) + 9 + colspanPeptidesAdded }"></c:out>" align="center">
+								<td colspan="<c:out value="${ fn:length( searches ) + 9 + colspanPeptidesAdded }"></c:out>" align="center"  class=" child_data_container_jq ">
+								
+								
+									<div style="color: green; font-size: 16px; padding-top: 10px; padding-bottom: 10px;" >
+										Loading...
+									</div>
+
+<%-- 								
 								
 									<table class="tablesorter" style="width:80%">
 									
@@ -597,13 +658,15 @@
 							
 											<tr class="expand-child" style="display:none;">
 											
-
+--%>
 												<%--  Adjust colspan for number of columns in current table --%>
 								
 												<%--  Init to zero --%>
+<%--												
 												<c:set var="colspanPSMsAdded" value="${ 0 }" />
-												
+--%>												
 												<%--   Now add 1 for each column being displayed --%>
+<%--												
 												<c:if test="${ crosslink.mergedSearchProteinCrosslink.anyLinksHaveBestPeptideQValue }">
 													<c:set var="colspanPSMsAdded" value="${ colspanPSMsAdded + 1 }" />
 												</c:if>
@@ -619,6 +682,7 @@
 										</logic:iterate>
 										
 									</table>
+--%>									
 								</td>
 							</tr>
 

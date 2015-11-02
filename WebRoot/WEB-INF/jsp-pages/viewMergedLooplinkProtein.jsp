@@ -61,6 +61,7 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js"></script>
 			
+		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkProteinsLoadedFromWebServiceTemplate.js"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js"></script>
 	
@@ -231,6 +232,49 @@
 		<%@ include file="/WEB-INF/jsp-includes/viewPsmsLoadedFromWebServiceTemplateFragment.jsp" %>
 	
 		<%@ include file="/WEB-INF/jsp-includes/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
+	
+
+		
+	
+	<%--  Looplink Protein Template --%>
+
+
+		
+		<script id="looplink_protein_block_template"  type="text/x-handlebars-template">
+
+			<%--  include the template text  --%>
+			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedLooplinkProtein.jsp_templates/looplink_protein_block_template.jsp" %>
+
+		</script>
+	
+
+	<%--  Looplink Protein Entry Template --%>
+
+
+
+		<%-- !!!   Handlebars template:  Looplink Protein Entry Template  !!!!!!!!!   --%>
+		
+		
+		<script id="looplink_protein_data_row_entry_template"  type="text/x-handlebars-template">
+
+			<%--  include the template text  --%>
+			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedLooplinkProtein.jsp_templates/looplink_protein_data_row_entry_template.jsp" %>
+
+		</script>
+
+
+
+	<%--  Looplink Protein Child row Entry Template --%>
+
+		
+		<script id="looplink_protein_child_row_entry_template"  type="text/x-handlebars-template">
+
+			<%--  include the template text  --%>
+			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedLooplinkProtein.jsp_templates/looplink_protein_child_row_entry_template.jsp" %>
+
+		</script>
+
+		
 		
 		<div class="overall-enclosing-block">
 			
@@ -483,12 +527,29 @@
 						
 					<logic:iterate id="looplink" name="looplinks">
 
+<%-- 
 							<tr id="<bean:write name="looplink" property="mergedSearchProteinLooplink.protein.nrProtein.nrseqId" />-<bean:write name="looplink" property="mergedSearchProteinLooplink.proteinPosition1" />-<bean:write name="looplink" property="mergedSearchProteinLooplink.protein.nrProtein.nrseqId" />-<bean:write name="looplink" property="mergedSearchProteinLooplink.proteinPosition2" />"
 								style="cursor: pointer; "
 								onclick="toggleVisibility(this)"
 								toggle_visibility_associated_element_id="<bean:write name="looplink" property="mergedSearchProteinLooplink.protein.nrProtein.nrseqId" />-<bean:write name="looplink" property="mergedSearchProteinLooplink.proteinPosition1" />-<bean:write name="looplink" property="mergedSearchProteinLooplink.protein.nrProtein.nrseqId" />-<bean:write name="looplink" property="mergedSearchProteinLooplink.proteinPosition2" />"
 							>
+--%>
 
+
+
+							<tr 
+								style="cursor: pointer; "
+								
+								onclick="viewLooplinkProteinsLoadedFromWebServiceTemplate.showHideLooplinkProteins( { clickedElement : this })"
+								project_id="${ projectId }"
+								search_ids="<c:forEach var="searchEntryForThisRow" items="${ looplink.mergedSearchProteinLooplink.searches }">,${ searchEntryForThisRow.id }</c:forEach>"
+								peptide_q_value_cutoff="${ peptideQValueCutoff }"
+								psm_q_value_cutoff="${ psmQValueCutoff }"
+								protein_id="<bean:write name="looplink" property="mergedSearchProteinLooplink.protein.nrProtein.nrseqId" />"
+								protein_position_1="<bean:write name="looplink" property="mergedSearchProteinLooplink.proteinPosition1" />"
+								protein_position_2="<bean:write name="looplink" property="mergedSearchProteinLooplink.proteinPosition2" />"
+							>
+									
 								<c:forEach items="${ looplink.searchContainsLooplink }" var="isMarked"  varStatus="searchVarStatus">
 								
 									<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
@@ -547,8 +608,9 @@
 								</c:if>
 							
 								<%--  colspan set to the number of searches plus the number of other columns --%>
-								<td colspan="<c:out value="${ fn:length( searches ) + 8 + colspanPeptidesAdded }"></c:out>" align="center">
+								<td colspan="<c:out value="${ fn:length( searches ) + 8 + colspanPeptidesAdded }"></c:out>" align="center" class=" child_data_container_jq ">
 								
+<%-- 								
 									<table class="tablesorter" style="width:80%">
 
 									  <thead>
@@ -606,13 +668,15 @@
 											</tr>
 							
 											<tr class="expand-child" style="display:none;">
-											
+--%>											
 												<%--  Adjust colspan for number of columns in current table --%>
 								
 												<%--  Init to zero --%>
+<%--												
 												<c:set var="colspanPSMsAdded" value="${ 0 }" />
-												
+--%>												
 												<%--   Now add 1 for each column being displayed --%>
+<%--												
 												<c:if test="${ crosslink.mergedSearchProteinCrosslink.anyLinksHaveBestPeptideQValue }">
 													<c:set var="colspanPSMsAdded" value="${ colspanPSMsAdded + 1 }" />
 												</c:if>
@@ -628,6 +692,7 @@
 										</logic:iterate>
 										
 									</table>
+--%>									
 								</td>
 							</tr>
 
