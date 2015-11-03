@@ -154,6 +154,8 @@ var _project_id = null;
 	 			
 	 			initQCPlotsClickHandlers();
 	 			
+	 			initQCPlotQValueCountClickHandlers();
+	 			
 	 			
 	 			
 	 			//  Initialize the buttons from the current values of the check boxes.

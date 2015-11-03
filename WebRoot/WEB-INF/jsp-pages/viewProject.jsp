@@ -1581,7 +1581,11 @@
 											
 											<tr>
 												<td>QC Plots:</td>
-												<td><a href="javascript:" data-tooltip="View scan counts as function of retention time" class="tool_tip_attached_jq qc_plot_scan_retention_time_link_jq" >Retention Time</a></td>
+												<td>
+													[<a href="javascript:" data-tooltip="View scan counts as function of retention time" class="tool_tip_attached_jq qc_plot_scan_retention_time_link_jq" >Retention Time</a>]
+												
+													[<a href="javascript:" data-tooltip="View PSM counts as function of Q value" class="tool_tip_attached_jq qc_plot_psm_q_value_count_link_jq" >PSM Q Values</a>]
+												</td>
 											</tr>
 											
 
@@ -2118,6 +2122,136 @@
 		<!-- END:   Modal dialog for displaying the Retention Time QC plot -->
 								
 	
+	
+
+		
+		<!--  Modal dialog for displaying the PSM Q Value Counts QC plot -->
+
+
+			<%--   Overlay Background --%>
+			
+		<div id="psm_q_value_count_qc_plot_overlay_background" 
+			class=" qc-plot-overlay-background   psm_q_value_count_qc_plot_overlay_show_hide_parts_jq psm_q_value_count_qc_plot_overlay_close_parts_jq  overlay_show_hide_parts_jq"  
+			style="display: none;"  >
+		
+		</div>
+			
+			<%--  PSM Q Value Counts QC plot Overlay Div --%>
+			
+				<!--  Inline div for positioning modal dialog on page -->
+		<div class="qc-plot-overlay-containing-outermost-div " id="psm_q_value_count_qc_plot_overlay_containing_outermost_div_inline_div" >
+
+		  <div class="qc-plot-overlay-containing-outer-div " style="position: relative;" >
+			
+			
+			
+			<div id="psm_q_value_count_qc_plot_overlay_container" 
+				class=" qc-plot-overlay-div overlay-outer-div   psm_q_value_count_qc_plot_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
+				style="display: none; "  >
+			
+				<div id="psm_q_value_count_qc_plot_overlay_header" class="qc-plot-overlay-header" style="width:100%; " >
+				
+					<h1 id="psm_q_value_count_qc_plot_overlay_X_for_exit_overlay" 
+						class="qc-plot-overlay-X-for-exit-overlay  psm_q_value_count_qc_plot_overlay_close_parts_jq" 
+						>X</h1>
+						
+					<h1 id="psm_q_value_count_qc_plot_overlay_header_text" class="qc-plot-overlay-header-text" >QC Plot: PSM Q Value Counts</h1>
+				</div>
+				<div id="psm_q_value_count_qc_plot_overlay_body" class="qc-plot-overlay-body" >
+			
+			
+				<div >
+				
+					<input type="hidden" id="psm_q_value_count_qc_plot_current_search_id" >
+		
+					
+					<table style="border-width:0px;">
+						
+						<tr>
+							<td>PSMs with:</td>
+							<td>
+							  <label >
+								<input type="checkbox" class="psm_q_value_count_qc_plot_link_type_include_jq psm_q_value_count_qc_plot_on_change_jq"
+									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__CROSSLINK_PSM%>" >
+								crosslinks
+							  </label>
+							  <label >
+								<input type="checkbox" class="psm_q_value_count_qc_plot_link_type_include_jq psm_q_value_count_qc_plot_on_change_jq"
+									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__LOOPLINK_PSM%>" >
+								looplinks
+							  </label> 
+							  <label >
+								<input type="checkbox" class="psm_q_value_count_qc_plot_link_type_include_jq psm_q_value_count_qc_plot_on_change_jq"
+									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__MONOLINK_PSM%>" >
+								monolinks
+							  </label>
+							  <label >
+								<input type="checkbox" class="psm_q_value_count_qc_plot_link_type_include_jq psm_q_value_count_qc_plot_on_change_jq"
+									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__NO_LINK_PSM%>" >
+								no&nbsp;links
+							  </label>
+
+							</td>
+						</tr>
+								
+					</table>
+
+					
+					
+					<a style="font-size:10pt;white-space:nowrap;" href="javascript:" id="psm_q_value_count_qc_plot_download_svg"
+							title="Download a SVG file of the image">[Download SVG]</a>
+					
+					
+					<div style="clear: both; " >
+					
+					
+					
+					</div>
+					
+					
+					<h1 class="psm_q_value_count_qc_plot_no_data_jq" 
+						style="display: none;  ">
+					
+						No Data
+					</h1>
+					
+					
+					<%-- overflow: hidden; and left: -50px; to clip off padding from left side of chart --%>
+					
+<%-- 				commented out since on redraw shifts further left and hides vertical axis label
+ 	
+					<div style="position: relative; width: 920px; height: 650px; overflow: hidden;" >
+						<div style="position: absolute; top: 0px; left: -50px;">
+--%>						
+					<div class=" psm_q_value_count_qc_plot_have_data_jq ">
+					
+							<div id="psm_q_value_count_qc_plot_chartDiv"
+								style="width: 920px; height: 650px;"  
+									<%-- style="width: 1050px; height: 800px;"   
+										Keep this width and height in sync with the chart create config in the 
+													JS as RETENTION_TIME_COUNT_CHART_WIDTH and RETENTION_TIME_COUNT_CHART_HEIGHT  --%>
+								></div>
+												
+					</div>
+<%-- 					
+						</div>
+					</div>
+--%>
+					
+									
+				</div>
+				
+			</div>
+		   
+		   </div>
+	
+		  </div>
+		</div>
+		
+		
+		<!-- END:   Modal dialog for displaying the PSM Q Value Counts QC plot -->
+								
+		
 		
 		<!--  END:    Overlays for displaying QC Quality Control Plots/Charts   -->
 	
@@ -2173,6 +2307,8 @@
   var googleOnLoadCallbackFunction = function() {
 	  
 	  initQCCharts();
+	  
+	  initQCChartQValueCount();
   };
   
   //  Do NOT call a method on an object here.  The "this" gets set to the window.
@@ -2181,7 +2317,7 @@
 
 	
 			<script type="text/javascript" src="${ contextPath }/js/qcChartsViewProjectPage.js"></script>
-
+			<script type="text/javascript" src="${ contextPath }/js/qcChartQValueCounts.js"></script>
 	
 
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>
