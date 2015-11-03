@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -226,7 +227,7 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 
 
 
-				writer.write( "TYPE\tPEPTIDE 1\tPOSITION\tMODS\tPEPTIDE 2\tPOSITION\tMODS\tPROTEIN 1\tPROTEIN 2\tBEST PSM Q-VALUE\tNUM PSMS\n" );
+				writer.write( "SEARCH ID(S)\tTYPE\tPEPTIDE 1\tPOSITION\tMODS\tPEPTIDE 2\tPOSITION\tMODS\tPROTEIN 1\tPROTEIN 2\tBEST PSM Q-VALUE\tNUM PSMS\n" );
 
 
 				List<String> linkTypes = new ArrayList<>();
@@ -341,13 +342,27 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 						PeptideMergedWebPageSearcher.getInstance().search( searches, psmQValueCutoff, peptideQValueCutoff, linkTypes, modMassSelections );
 
 				for( WebMergedReportedPeptide link : links ) {
+
 					
+
 					List<WebMergedProteinPosition> peptide1ProteinPositions = link.getPeptide1ProteinPositions();
 					List<WebMergedProteinPosition> peptide2ProteinPositions = link.getPeptide2ProteinPositions();
 					
 					String peptide1ProteinPositionsString = XLinkWebAppUtils.getPeptideProteinPositionsString( peptide1ProteinPositions );
 					String peptide2ProteinPositionsString = XLinkWebAppUtils.getPeptideProteinPositionsString( peptide2ProteinPositions );
 
+
+					
+					List<Integer> searchIdsForLink = new ArrayList<Integer>( link.getSearches().size() );
+					for( SearchDTO r : link.getSearches() ) { 
+						searchIdsForLink.add( r.getId() ); 
+					}
+					Collections.sort( searchIdsForLink );
+
+					writer.write( StringUtils.join( searchIdsForLink, "," ) );
+					writer.write( "\t" );
+					
+					
 					writer.write( link.getLinkType() );
 					writer.write( "\t" );
 					writer.write( link.getPeptide1().getSequence() );
