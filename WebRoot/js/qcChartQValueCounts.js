@@ -673,21 +673,15 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 	
 	var lineColors = [];
 	
-	var maxPSMCount = 0;
-	
-	var updateMaxPSMCountForType = function( chartDataForType ) {
-		
-		var bucketsFor_chartDataForType = chartDataForType.chartBuckets;
-		
-		var lastBucket = bucketsFor_chartDataForType[ dataArraySize - 1 ];
-		
-		var lastBucket_totalCount = lastBucket.totalCount;
-		
-		if ( maxPSMCount < lastBucket_totalCount ) {
-			
-			maxPSMCount = lastBucket_totalCount;
-		}
-	};
+//	var maxPSMCount = 0;
+//	
+//	var updateMaxPSMCountForType = function( chartDataForType ) {
+//		
+//		if ( maxPSMCount < chartDataForType.totalCountForType ) {
+//			
+//			maxPSMCount = chartDataForType.totalCountForType;
+//		}
+//	};
 	
 	
 //	red: #A55353
@@ -705,7 +699,7 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 		
 		lineColors.push( '#a5a5a5' );	//	combined: #a5a5a5 (gray)
 		
-		updateMaxPSMCountForType( alllinkChartData );
+//		updateMaxPSMCountForType( alllinkChartData );
 	}
 	
 	if ( crosslinkChartData ) {
@@ -715,7 +709,7 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 
 		lineColors.push( '#A55353' );	//	red: #A55353
 		
-		updateMaxPSMCountForType( crosslinkChartData );
+//		updateMaxPSMCountForType( crosslinkChartData );
 	}
 	
 	if ( looplinkChartData ) {
@@ -725,7 +719,7 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 
 		lineColors.push( '#53a553' );	//	green: #53a553
 		
-		updateMaxPSMCountForType( looplinkChartData );
+//		updateMaxPSMCountForType( looplinkChartData );
 	}
 	
 	if ( unlinkedChartData ) {
@@ -735,7 +729,7 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 
 		lineColors.push( '#5353a5' );	//	blue: #5353a5
 		
-		updateMaxPSMCountForType( unlinkedChartData );
+//		updateMaxPSMCountForType( unlinkedChartData );
 	}
 	
 	
@@ -754,14 +748,12 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 		var linkTypeLabel = params.linkTypeLabel;
 
 		if ( dataForType ) {
-
-			var lastBucket = dataForType.chartBuckets[ dataArraySize - 1 ];
-			
-			var lastBucket_totalCount = lastBucket.totalCount;
 			
 			var bucket = dataForType.chartBuckets[ index ];
 			
 			if ( chartDataEntry.length === 0 ) {
+				
+				// Add position to chartDataEntry array if chartDataEntry is empty
 				
 				chartDataEntry.push( bucket.binEnd );
 			}
@@ -770,7 +762,7 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 			
 			if ( displayAsPercentage ) {
 				
-				chartDataValue = chartDataValue / lastBucket_totalCount * 100;
+				chartDataValue = chartDataValue / dataForType.totalCountForType * 100;
 			}
 
 			chartDataEntry.push( chartDataValue );

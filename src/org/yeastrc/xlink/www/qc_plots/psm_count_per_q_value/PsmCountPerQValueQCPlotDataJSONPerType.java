@@ -5,8 +5,15 @@ import java.util.List;
 public class PsmCountPerQValueQCPlotDataJSONPerType {
 
 	private List<PsmCountPerQValueQCPlotDataJSONChartBucket> chartBuckets;
-//	private int zeroQvalueCount = 0;
 	
+	private int totalCountForType;
+	
+	public int getTotalCountForType() {
+		return totalCountForType;
+	}
+	public void setTotalCountForType(int totalCountForType) {
+		this.totalCountForType = totalCountForType;
+	}
 	public List<PsmCountPerQValueQCPlotDataJSONChartBucket> getChartBuckets() {
 		return chartBuckets;
 	}

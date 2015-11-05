@@ -110,6 +110,13 @@ public class CreatePsmCountPerQValueQCPlotData {
 		
 			List<Double> qValuesForPSMsthatMeetCriteriaList = 
 				QValuesFromPsmTblSearcher.getInstance().getQValues( selectedDBLinkTypes, searchId, psmQValueCutoff );
+			
+			int totalCountForType = qValuesForPSMsthatMeetCriteriaList.size();
+			
+			if ( psmQValueCutoff != null ) {
+				
+				totalCountForType = QValuesFromPsmTblSearcher.getInstance().getQValuesCount( selectedDBLinkTypes, searchId );
+			}
 
 			PsmCountPerQValueQCPlotDataJSONPerType linkData = null;
 
@@ -132,10 +139,9 @@ public class CreatePsmCountPerQValueQCPlotData {
 
 				unlinkedData = new PsmCountPerQValueQCPlotDataJSONPerType();
 				linkData = unlinkedData;
-
 			}
-
-
+			
+			
 			int qvalueZeroCount = 0;
 
 			int[] qvalueCounts = new int[ BIN_COUNT ];
@@ -215,6 +221,10 @@ public class CreatePsmCountPerQValueQCPlotData {
 			linkData.setChartBuckets( chartBuckets );
 			
 			dataArraySize = chartBuckets.size();
+			
+
+			linkData.setTotalCountForType( totalCountForType );
+			
 		}
 		
 		
