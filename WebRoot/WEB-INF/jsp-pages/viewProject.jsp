@@ -2181,7 +2181,6 @@
 									id="psm_q_value_count_qc_plot_y_axis_as_percentage"
 									name="psm_q_value_count_qc_plot_y_axis_choice"
 									class=" psm_q_value_count_qc_plot_on_change_jq"
-									checked="checked"
 									value="" >
 									percentage
 							  </label>
@@ -2191,6 +2190,7 @@
 									id="psm_q_value_count_qc_plot_y_axis_as_raw_counts"
 									name="psm_q_value_count_qc_plot_y_axis_choice"
 									class=" psm_q_value_count_qc_plot_on_change_jq"
+									checked="checked"
 									value="" >
 									raw counts
 							  </label>
