@@ -217,17 +217,20 @@ QCChartQValueCounts.prototype.openQvalueCountQCPlotOverlay = function(clickThis,
 
 	// copy the search name to the overlay
 
-//	var $search_name_display_jq = $search_root_jq.find(".search_name_display_jq");
+	var $search_name_display_jq = $search_root_jq.find(".search_name_display_jq");
 
-//	var search_name_display_jq = $search_name_display_jq.text();
+	var search_name_display_jq = $search_name_display_jq.text();
 
-//	var $delete_search_overlay_search_name = $("#delete_search_overlay_search_name");
-//	$delete_search_overlay_search_name.text( search_name_display_jq );
-
-
-
-//	var $delete_search_confirm_button = $("#delete_search_confirm_button");
-//	$delete_search_confirm_button.data("searchId", searchId);
+	var $search_number_in_parens_display_jq = $search_root_jq.find(".search_number_in_parens_display_jq");
+	
+	var search_number_in_parens_display_jq = $search_number_in_parens_display_jq.text();
+	
+	var searchNameAndNumberInParens = search_name_display_jq + " " + search_number_in_parens_display_jq;
+	
+	var $psm_q_value_count_qc_plot_current_search_name_and_id = $("#psm_q_value_count_qc_plot_current_search_name_and_id");
+	
+	$psm_q_value_count_qc_plot_current_search_name_and_id.val( searchNameAndNumberInParens );
+	
 	
 	// Position dialog over clicked link
 	
@@ -760,8 +763,14 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 		
 	}
 
+	var $psm_q_value_count_qc_plot_current_search_name_and_id = $("#psm_q_value_count_qc_plot_current_search_name_and_id");
 	
-	var chartTitle = 'PSM Count vs Q-value';
+	var searchNameAndNumberInParens = 
+		$psm_q_value_count_qc_plot_current_search_name_and_id.val( );
+	
+
+	
+	var chartTitle = 'PSM Count vs Q-value\n' + searchNameAndNumberInParens;
 	
 	var yAxisLabel = "Count";
 	

@@ -1458,7 +1458,7 @@
 
 							<table style="padding:0px;margin-top:0px;margin-bottom:0px;width:100%;">
 							
-								<tr style="" searchId="<bean:write name="search" property="id" />" class="search_root_jq">
+								<tr searchId="<bean:write name="search" property="id" />" class=" search_root_jq ">
 		
 									<td style="width:10px;" valign="top">
 										<input id="search-checkbox-<bean:write name="search" property="id" />" onChange="javascript:checkSearchCheckboxes(<bean:write name="search" property="id" />)" class="search-checkbox" type="checkbox" name="searchIds" value="<bean:write name="search" property="id" />"/>
@@ -1514,7 +1514,7 @@
 											><span class="search-name-display  search_name_display_jq" id="search-name-display-<bean:write name="search" property="id" />"
 												><bean:write name="search" property="name" /></span
 											 ><c:if test="${authAccessLevel.writeAllowed}" 
-											 		> <span class="search-name-display ">(<bean:write name="search" property="id" />)</span></c:if><c:if test="${authAccessLevel.writeAllowed}" 
+											 		> <span class="search-name-display search_number_in_parens_display_jq ">(<bean:write name="search" property="id" />)</span></c:if><c:if test="${authAccessLevel.writeAllowed}" 
 											 		><a class="tool_tip_attached_jq" data-tooltip="Edit name of search" href="javascript:showSearchNameForm(<bean:write name="search" property="id" />)"
 												><img class="edit-icon" src="${ contextPath }/images/icon-edit-small.png" 
 													></a></c:if></span>
@@ -2165,6 +2165,8 @@
 				<div >
 				
 					<input type="hidden" id="psm_q_value_count_qc_plot_current_search_id" >
+					
+					<input type="hidden" id="psm_q_value_count_qc_plot_current_search_name_and_id" >
 		
 					
 					<table style="border-width:0px;">
