@@ -75,7 +75,8 @@ public class SearchDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		String sql = "SELECT path, directory_name, load_time, fasta_filename, name, project_id, insert_complete, search_program, display_order FROM search WHERE id = ?";
+		String sql = "SELECT path, directory_name, load_time, fasta_filename, name, project_id, insert_complete, search_program, display_order, no_scan_data FROM search WHERE id = ?";
+
 
 		try {
 			
@@ -103,6 +104,15 @@ public class SearchDAO {
 					search.setInsertComplete( false );
 				} else {
 					search.setInsertComplete( true );
+				}
+				
+
+				int noScanDataInt = rs.getInt( "no_scan_data" );
+				
+				if ( Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE == noScanDataInt ) {
+					search.setNoScanData( false );
+				} else {
+					search.setNoScanData( true );
 				}
 				
 				
@@ -249,8 +259,9 @@ public class SearchDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		String sql = "INSERT INTO search (path, directory_name, fasta_filename, name, project_id, insert_complete, search_program) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO search (path, directory_name, fasta_filename, name, project_id, insert_complete, search_program, no_scan_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 		
+
 		try {
 			
 //			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
@@ -281,6 +292,14 @@ public class SearchDAO {
 			
 			counter++;
 			pstmt.setString( counter, pr.getSearchProgram() );
+			
+
+			counter++;
+			if ( pr.isNoScanData() ) {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+			} else {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+			}
 			
 			pstmt.executeUpdate();
 			

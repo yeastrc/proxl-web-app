@@ -57,10 +57,10 @@ public class PsmDTO {
 	public void setReportedPeptideId(int peptideId) {
 		this.reportedPeptideId = peptideId;
 	}
-	public int getScanId() {
+	public Integer getScanId() {
 		return scanId;
 	}
-	public void setScanId(int scanId) {
+	public void setScanId(Integer scanId) {
 		this.scanId = scanId;
 	}
 	public int getCharge() {
@@ -89,7 +89,7 @@ public class PsmDTO {
 	
 	private int id;
 	private int searchId;
-	private int scanId;
+	private Integer scanId;
 	private double qValue;
 	private int type;
 	private int reportedPeptideId;

@@ -42,7 +42,12 @@ public class PsmDAO {
 				
 				psm.setId( id );
 				psm.setSearchId( rs.getInt( "search_id" ) );
-				psm.setScanId( rs.getInt( "scan_id" ) );
+				
+				int scanId = rs.getInt( "scan_id" );
+				if ( ! rs.wasNull() ) {
+					
+					psm.setScanId( scanId );
+				}
 				
 				psm.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
 				psm.setqValue( rs.getDouble( "q_value" ) );
@@ -131,7 +136,12 @@ public class PsmDAO {
 				
 				psm.setId( rs.getInt( "id" ) );
 				psm.setSearchId( rs.getInt( "search_id" ) );
-				psm.setScanId( rs.getInt( "scan_id" ) );
+				
+				int scanId = rs.getInt( "scan_id" );
+				if ( ! rs.wasNull() ) {
+					
+					psm.setScanId( scanId );
+				}
 				
 				psm.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
 				psm.setqValue( rs.getDouble( "q_value" ) );
@@ -189,7 +199,7 @@ public class PsmDAO {
 //	CREATE TABLE psm (
 //			  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 //			  search_id INT(10) UNSIGNED NOT NULL,
-//			  scan_id INT UNSIGNED NOT NULL,
+//			  scan_id INT UNSIGNED NULL,
 //			  q_value DOUBLE NULL DEFAULT NULL,
 //			  type ENUM('looplink','crosslink','unlinked','monolink','dimer') NOT NULL,
 //			  reported_peptide_id INT(10) UNSIGNED NOT NULL,
@@ -201,7 +211,7 @@ public class PsmDAO {
 	CREATE TABLE psm (
 	    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	    search_id INT UNSIGNED NOT NULL,
-	    scan_id INT UNSIGNED UNSIGNED NOT NULL,
+	    scan_id INT UNSIGNED NULL,
 	    q_value DOUBLE,
 	    type ENUM('looplink','crosslink', 'unlinked', 'monolink', 'dimer' ) NOT NULL,
 	    reported_peptide_id INT UNSIGNED NOT NULL,
@@ -290,8 +300,14 @@ public class PsmDAO {
 			
 			counter++;
 			pstmt.setInt( counter, psm.getSearchId() );
+
 			counter++;
-			pstmt.setInt( counter, psm.getScanId() );
+			
+			if ( psm.getScanId() != null ) {
+				pstmt.setInt( counter, psm.getScanId() );
+			} else {
+				pstmt.setNull( counter, java.sql.Types.INTEGER );
+			}
 
 			counter++;
 			pstmt.setDouble( counter, psm.getqValue() );

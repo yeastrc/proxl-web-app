@@ -107,6 +107,7 @@ CREATE TABLE IF NOT EXISTS `search` (
   `directory_name` VARCHAR(255) NOT NULL,
   `search_program` VARCHAR(200) NULL,
   `display_order` INT NOT NULL DEFAULT 0,
+  `no_scan_data` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_project_id`
     FOREIGN KEY (`project_id`)
@@ -195,7 +196,7 @@ DROP TABLE IF EXISTS `psm` ;
 CREATE TABLE IF NOT EXISTS `psm` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `search_id` INT(10) UNSIGNED NOT NULL,
-  `scan_id` INT UNSIGNED NOT NULL,
+  `scan_id` INT UNSIGNED NULL,
   `q_value` DOUBLE NULL,
   `type` ENUM('looplink','crosslink','unlinked','dimer') CHARACTER SET 'latin1' NOT NULL,
   `reported_peptide_id` INT(10) UNSIGNED NOT NULL,
