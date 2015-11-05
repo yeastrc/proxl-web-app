@@ -7,13 +7,13 @@ import org.yeastrc.xlink.dto.PsmDTO;
 public class PsmWebDisplay {
 
 	private PsmDTO psmDTO;
-	private int scanNumber;
+	private Integer scanNumber;
 	private String scanFilename;
 	private BigDecimal retentionTime;
 	private BigDecimal retentionTimeMinutesRounded;
 	private String retentionTimeMinutesRoundedString;
 	
-	private int charge;
+	private Integer charge;
 	private BigDecimal preMZ;
 	private String preMZRounded; 
 
@@ -52,10 +52,10 @@ public class PsmWebDisplay {
 	public void setPreMZ(BigDecimal preMZ) {
 		this.preMZ = preMZ;
 	}
-	public int getCharge() {
+	public Integer getCharge() {
 		return charge;
 	}
-	public void setCharge(int charge) {
+	public void setCharge(Integer charge) {
 		this.charge = charge;
 	}
 	public BigDecimal getRetentionTime() {
@@ -70,10 +70,10 @@ public class PsmWebDisplay {
 	public void setPsmDTO(PsmDTO psmDTO) {
 		this.psmDTO = psmDTO;
 	}
-	public int getScanNumber() {
+	public Integer getScanNumber() {
 		return scanNumber;
 	}
-	public void setScanNumber(int scanNumber) {
+	public void setScanNumber(Integer scanNumber) {
 		this.scanNumber = scanNumber;
 	}
 	public String getScanFilename() {

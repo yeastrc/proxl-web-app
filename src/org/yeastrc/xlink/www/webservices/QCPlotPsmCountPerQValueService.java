@@ -8,6 +8,7 @@ package org.yeastrc.xlink.www.webservices;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -40,8 +41,9 @@ public class QCPlotPsmCountPerQValueService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getPsmCountPerQValue") 
 	public PsmCountPerQValueQCPlotDataJSONRoot getViewerData( 
-			@QueryParam( "selectedLinkTypes" ) List<String> selectedLinkTypes,			
+			@QueryParam( "selectedLinkTypes" ) Set<String> selectedLinkTypes,			
 			@QueryParam( "searchId" ) int searchId,
+			@QueryParam( "psmQValueCutoff" ) Double psmQValueCutoff,
 			@Context HttpServletRequest request )
 	throws Exception {
 		
@@ -155,7 +157,7 @@ public class QCPlotPsmCountPerQValueService {
 			
 			PsmCountPerQValueQCPlotDataJSONRoot psmCountPerQValueQCPlotDataJSONRoot = 
 					CreatePsmCountPerQValueQCPlotData.getInstance()
-					.create( selectedLinkTypes, searchId );
+					.create( selectedLinkTypes, searchId, psmQValueCutoff );
 			
 			return psmCountPerQValueQCPlotDataJSONRoot;
 			

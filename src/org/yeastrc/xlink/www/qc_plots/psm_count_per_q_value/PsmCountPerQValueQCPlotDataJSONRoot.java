@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.qc_plots.psm_count_per_q_value;
 
-import java.util.List;
 
 
 /**
@@ -9,37 +8,55 @@ import java.util.List;
  */
 public class PsmCountPerQValueQCPlotDataJSONRoot {
 
-	private List<PsmCountPerQValueQCPlotDataJSONChartBucket> chartBuckets;
-	private int totalQValueCount;
+	private PsmCountPerQValueQCPlotDataJSONPerType crosslinkData;
+	private PsmCountPerQValueQCPlotDataJSONPerType looplinkData;
+	private PsmCountPerQValueQCPlotDataJSONPerType unlinkedData;
 	
-	private int qvalueZeroCount;
-	private int qvalueOneCount;
+	private PsmCountPerQValueQCPlotDataJSONPerType alllinkData;
+	
+	private int dataArraySize;
+	
+	
 
-	public int getQvalueZeroCount() {
-		return qvalueZeroCount;
-	}
-	public void setQvalueZeroCount(int qvalueZeroCount) {
-		this.qvalueZeroCount = qvalueZeroCount;
-	}
-	public int getQvalueOneCount() {
-		return qvalueOneCount;
-	}
-	public void setQvalueOneCount(int qvalueOneCount) {
-		this.qvalueOneCount = qvalueOneCount;
-	}
-	public int getTotalQValueCount() {
-		return totalQValueCount;
-	}
-	public void setTotalQValueCount(int totalQValueCount) {
-		this.totalQValueCount = totalQValueCount;
-	}
-	public List<PsmCountPerQValueQCPlotDataJSONChartBucket> getChartBuckets() {
-		return chartBuckets;
-	}
-	public void setChartBuckets(
-			List<PsmCountPerQValueQCPlotDataJSONChartBucket> chartBuckets) {
-		this.chartBuckets = chartBuckets;
+	public int getDataArraySize() {
+		return dataArraySize;
 	}
 
+	public void setDataArraySize(int dataArraySize) {
+		this.dataArraySize = dataArraySize;
+	}
+
+	public PsmCountPerQValueQCPlotDataJSONPerType getCrosslinkData() {
+		return crosslinkData;
+	}
+
+	public void setCrosslinkData(
+			PsmCountPerQValueQCPlotDataJSONPerType crosslinkData) {
+		this.crosslinkData = crosslinkData;
+	}
+
+	public PsmCountPerQValueQCPlotDataJSONPerType getLooplinkData() {
+		return looplinkData;
+	}
+
+	public void setLooplinkData(PsmCountPerQValueQCPlotDataJSONPerType looplinkData) {
+		this.looplinkData = looplinkData;
+	}
+
+	public PsmCountPerQValueQCPlotDataJSONPerType getUnlinkedData() {
+		return unlinkedData;
+	}
+
+	public void setUnlinkedData(PsmCountPerQValueQCPlotDataJSONPerType unlinkedData) {
+		this.unlinkedData = unlinkedData;
+	}
+
+	public PsmCountPerQValueQCPlotDataJSONPerType getAlllinkData() {
+		return alllinkData;
+	}
+
+	public void setAlllinkData(PsmCountPerQValueQCPlotDataJSONPerType alllinkData) {
+		this.alllinkData = alllinkData;
+	}
 	
 }

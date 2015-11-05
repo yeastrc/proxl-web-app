@@ -1582,7 +1582,9 @@
 											<tr>
 												<td>QC Plots:</td>
 												<td>
-													[<a href="javascript:" data-tooltip="View scan counts as function of retention time" class="tool_tip_attached_jq qc_plot_scan_retention_time_link_jq" >Retention Time</a>]
+													<c:if test="${ not search.noScanData }" >
+														[<a href="javascript:" data-tooltip="View scan counts as function of retention time" class="tool_tip_attached_jq qc_plot_scan_retention_time_link_jq" >Retention Time</a>]
+													</c:if>
 												
 													[<a href="javascript:" data-tooltip="View PSM counts as function of Q value" class="tool_tip_attached_jq qc_plot_psm_q_value_count_link_jq" >PSM Q Values</a>]
 												</td>
@@ -2168,18 +2170,60 @@
 					<table style="border-width:0px;">
 						
 						<tr>
+
+							<td>View as:</td>
+							<td>
+							 
+							  <label >
+								<input type="radio"
+									id="psm_q_value_count_qc_plot_y_axis_as_percentage"
+									name="psm_q_value_count_qc_plot_y_axis_choice"
+									class=" psm_q_value_count_qc_plot_on_change_jq"
+									checked="checked"
+									value="" >
+									percentage
+							  </label>
+							  
+							  <label >
+								<input type="radio"
+									id="psm_q_value_count_qc_plot_y_axis_as_raw_counts"
+									name="psm_q_value_count_qc_plot_y_axis_choice"
+									class=" psm_q_value_count_qc_plot_on_change_jq"
+									value="" >
+									raw counts
+							  </label>
+							 
+							<td>
+						</tr>
+						
+						<tr>
 							<td>PSMs with:</td>
 							<td>
 							  <label >
 								<input type="checkbox" class="psm_q_value_count_qc_plot_link_type_include_jq psm_q_value_count_qc_plot_on_change_jq"
+									checked="checked"
 									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__CROSSLINK_PSM%>" >
 								crosslinks
 							  </label>
 							  <label >
 								<input type="checkbox" class="psm_q_value_count_qc_plot_link_type_include_jq psm_q_value_count_qc_plot_on_change_jq"
+									checked="checked"
 									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__LOOPLINK_PSM%>" >
 								looplinks
 							  </label> 
+							  
+							  <label >
+								<input type="checkbox" class="psm_q_value_count_qc_plot_link_type_include_jq psm_q_value_count_qc_plot_on_change_jq"
+									checked="checked"
+									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__UNLINKED_PSM%>" >
+								unlinked
+							  </label>
+							  <label >
+								<input type="checkbox" class="psm_q_value_count_qc_plot_link_type_include_jq psm_q_value_count_qc_plot_on_change_jq"
+									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__ALL_PSM%>" >
+								all
+							  </label> 							  
+<%-- 							  
 							  <label >
 								<input type="checkbox" class="psm_q_value_count_qc_plot_link_type_include_jq psm_q_value_count_qc_plot_on_change_jq"
 									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__MONOLINK_PSM%>" >
@@ -2190,10 +2234,27 @@
 									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__NO_LINK_PSM%>" >
 								no&nbsp;links
 							  </label>
-
+--%>
 							</td>
 						</tr>
-								
+			
+												
+						<tr>
+							<td>Max: </td>
+							<td>
+								X:
+								<input type="text" id="psm_q_value_count_qc_plot_max_x" 
+									class="psm_q_value_count_qc_plot_on_change_jq" 
+									size="8"> 
+								Y:
+								<input type="text" id="psm_q_value_count_qc_plot_max_y" 
+									class="psm_q_value_count_qc_plot_on_change_jq"
+									size="8">
+				
+								<input type="button" id="psm_q_value_count_qc_plot_max_reset_button" value="Reset">
+							</td>
+						</tr>	
+														
 					</table>
 
 					
@@ -2213,6 +2274,13 @@
 						style="display: none;  ">
 					
 						No Data
+					</h1>
+					
+					
+					<h1 class="psm_q_value_count_qc_plot_param_not_a_number_jq" 
+						style="display: none;  ">
+					
+						Max X or Max Y is not empty and is not a number
 					</h1>
 					
 					

@@ -68,8 +68,6 @@ var QCChartQValueCounts = function(  ) {
 			currentSearchData : 
 				{ 
 				
-				prevScanFileId : undefined
-				,
 				maxValuesInDB : {
 					
 					maxX : undefined,
@@ -157,6 +155,17 @@ QCChartQValueCounts.prototype.init = function() {
 			objectThis.createChartFromPageParams( );
 				
 		}, objectThis.RELOAD_Q_VALUE_COUNT_CHART_TIMER_DELAY );
+		
+		return false;
+	});
+	
+
+	$("#psm_q_value_count_qc_plot_max_reset_button").click(function(eventObject) {
+
+		
+		objectThis.resetMaxXMaxY();
+
+		objectThis.createChartFromPageParams( );
 		
 		return false;
 	});
@@ -264,17 +273,6 @@ QCChartQValueCounts.prototype.openQvalueCountQCPlotOverlay = function(clickThis,
 	
 	$psm_q_value_count_qc_plot_current_search_id.val( searchId );
 	
-	//  initialize all "Scans for" checkboxes to checked
-
-	var $psm_q_value_count_qc_plot_link_type_include_jq = $(".psm_q_value_count_qc_plot_link_type_include_jq");
-
-	$psm_q_value_count_qc_plot_link_type_include_jq.each( function(   ) {
-
-		$( this ).prop('checked',true);
-
-	} );
-
-		
 	
 	objectThis.createChartFromPageParams( { 
 		searchId: searchId
@@ -318,6 +316,64 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 		this.globals.currentSearchData = {};
 	}
 	
+	
+
+	
+	var $psm_q_value_count_qc_plot_max_x = $("#psm_q_value_count_qc_plot_max_x");
+	
+	var $psm_q_value_count_qc_plot_max_y = $("#psm_q_value_count_qc_plot_max_y");
+	
+	
+	if ( ! this.globals.currentSearchData ) {
+		
+		this.globals.currentSearchData = {};
+	}
+	
+
+	var userInputMaxX = $psm_q_value_count_qc_plot_max_x.val();
+	var userInputMaxY = $psm_q_value_count_qc_plot_max_y.val();
+
+
+	if ( userInputMaxX !== "" ) {
+
+		if ( isNaN( parseFloat( userInputMaxX ) ) ) {
+
+			$(".psm_q_value_count_qc_plot_param_not_a_number_jq").show();
+
+			$(".psm_q_value_count_qc_plot_no_data_jq").hide();
+			$(".psm_q_value_count_qc_plot_have_data_jq").hide();
+			
+			return;  //  EARLY EXIT
+		}
+	}	
+
+	if ( userInputMaxY !== "" ) {
+
+		var userInputMaxYNum = parseFloat( userInputMaxY ); 
+		
+		if ( isNaN( userInputMaxYNum ) ) {
+
+			$(".psm_q_value_count_qc_plot_param_not_a_number_jq").show();
+
+			$(".psm_q_value_count_qc_plot_no_data_jq").hide();
+			$(".psm_q_value_count_qc_plot_have_data_jq").hide();
+			
+			return;  //  EARLY EXIT
+		}
+		
+		if ( $("#psm_q_value_count_qc_plot_y_axis_as_percentage").prop("checked") ) {
+			
+			if ( userInputMaxYNum > 100 ) {
+				
+				$psm_q_value_count_qc_plot_max_y.val( "100" );
+			}
+		}
+	}	
+
+	
+	
+
+
 
 
 	var $psm_q_value_count_qc_plot_current_search_id = $("#psm_q_value_count_qc_plot_current_search_id");
@@ -331,6 +387,8 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 		
 
 		$(".psm_q_value_count_qc_plot_no_data_jq").show();
+		
+		$(".psm_q_value_count_qc_plot_param_not_a_number_jq").hide();
 		
 		$(".psm_q_value_count_qc_plot_have_data_jq").hide();
 		
@@ -347,7 +405,9 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 	
 	objectThis.createChart( {  
 		searchId : searchId,
-		selectedLinkTypes : selectedLinkTypes } );
+		selectedLinkTypes : selectedLinkTypes,
+		userInputMaxX : userInputMaxX,
+		userInputMaxY : userInputMaxY } );
 };
 
 
@@ -387,7 +447,9 @@ QCChartQValueCounts.prototype.createChart = function( params ) {
 	
 	var searchId = params.searchId;
 	var selectedLinkTypes = params.selectedLinkTypes;
-	
+
+	var userInputMaxXString = params.userInputMaxX;
+
 	if ( ! qcChartQValueCountInitialized ) {
 		
 		throw "qcChartQValueCountInitialized is false"; 
@@ -407,6 +469,13 @@ QCChartQValueCounts.prototype.createChart = function( params ) {
 			searchId : searchId
 	};
 	
+
+	if ( userInputMaxXString !== "" ) {
+		
+		var psmQValueCutoff = userInputMaxXString;
+	
+		requestData.psmQValueCutoff = psmQValueCutoff;
+	}
 	
 
 	// var request =
@@ -449,27 +518,80 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 	
 	var $psm_q_value_count_qc_plot_chartDiv = $("#psm_q_value_count_qc_plot_chartDiv");
 	
-	var chartBuckets = responseData.chartBuckets;
+
+	var userInputMaxXString = originalParams.userInputMaxX;
+	var userInputMaxYString = originalParams.userInputMaxY;
 	
 
+	var userInputMaxX = undefined;
 	
-	if ( chartBuckets.length === 0
-			|| ( chartBuckets[ 0 ].binCenter === 0 ) ) {
+	if ( userInputMaxXString !== "" ) {
+		
+		userInputMaxX = parseFloat( userInputMaxXString );
+		
+		if ( isNaN( userInputMaxX ) ) {
+			
+			userInputMaxX = undefined;
+		}
+	}
+	
+	var userInputMaxY = undefined;
+	
+	if ( userInputMaxYString !== "" ) {
+		
+		userInputMaxY = parseFloat( userInputMaxYString );
+		
+		if ( isNaN( userInputMaxY ) ) {
+			
+			userInputMaxY = undefined;
+		}
+	}
+
+	
+	
+	
+	var chartDataParam = responseData;
+	
+	
+	var dataArraySize = chartDataParam.dataArraySize;
+	
+	var crosslinkChartData = chartDataParam.crosslinkData;
+	var looplinkChartData = chartDataParam.looplinkData;
+	var unlinkedChartData = chartDataParam.unlinkedData;
+	var alllinkChartData = chartDataParam.alllinkData;
+	
+	
+	
+	if ( ( crosslinkChartData && crosslinkChartData.chartBuckets.length > 0 )
+			|| ( looplinkChartData && looplinkChartData.chartBuckets.length > 0 )
+			|| ( unlinkedChartData && unlinkedChartData.chartBuckets.length > 0 )
+			|| ( alllinkChartData && alllinkChartData.chartBuckets.length > 0 ) ) {
+
+		$(".psm_q_value_count_qc_plot_no_data_jq").hide();
+		
+		$(".psm_q_value_count_qc_plot_param_not_a_number_jq").hide();
+		
+		$(".psm_q_value_count_qc_plot_have_data_jq").show();
+
+	} else {
 		
 		$(".psm_q_value_count_qc_plot_no_data_jq").show();
 		
 		$(".psm_q_value_count_qc_plot_have_data_jq").hide();
 		
+		$(".psm_q_value_count_qc_plot_param_not_a_number_jq").hide();
+		
 		return;  //  EARLY EXIT
 		
-	} else {
-		
-		$(".psm_q_value_count_qc_plot_no_data_jq").hide();
-
-		$(".psm_q_value_count_qc_plot_have_data_jq").show();
 	}
 	
 	
+	var displayAsPercentage = false;
+	
+	if ( $("#psm_q_value_count_qc_plot_y_axis_as_percentage").prop("checked") ) {
+		
+		displayAsPercentage = true;
+	}
 	
 
 	//  chart data for Google charts
@@ -477,68 +599,177 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 
 	//  output columns specification
 //	chartData.push( ["preMZ","count"] );
-
-	//  With Tooltip
-	chartData.push( ["q_value",
-	                 "total_count",{role: "tooltip",  'p': {'html': true} }
-//	                 , { role: 'style' } 
-	                 ] );
 	
-	
-	var tooltipZero = "<div style='margin: 10px;'>Total PSMs: " + responseData.qvalueZeroCount + 
-	"<br>Q-value <= 0</div>";
-
-
-	var qvalueZeroXPosition = 0;
-	
-	chartData.push( [qvalueZeroXPosition, 
-	                 responseData.qvalueZeroCount, tooltipZero 
-//	                 ,  'stroke-width: 2;stroke-color: blue; '
-	                 ] );	
+//	//  With Tooltip
+//	chartData.push( ["q_value",
+//	                 "total_count",{role: "tooltip",  'p': {'html': true} }
+////	                 , { role: 'style' } 
+//	                 ] );
 	
 
-	var bucketTotalCount = 0;
 	
-//	private int qvalueZeroCount;
-//	private int qvalueOneCount;
+	var lineColors = [];
 	
-	for ( var index = 0; index < chartBuckets.length; index++ ) {
-
-		var bucket = chartBuckets[ index ];
+	var maxPSMCount = 0;
+	
+	var updateMaxPSMCountForType = function( chartDataForType ) {
 		
+		var bucketsFor_chartDataForType = chartDataForType.chartBuckets;
+		
+		var lastBucket = bucketsFor_chartDataForType[ dataArraySize - 1 ];
+		
+		var lastBucket_totalCount = lastBucket.totalCount;
+		
+		if ( maxPSMCount < lastBucket_totalCount ) {
+			
+			maxPSMCount = lastBucket_totalCount;
+		}
+	};
+	
+	
+//	red: #A55353
+//	green: #53a553
+//	blue: #5353a5
+//	combined: #a5a5a5 (gray)
+	
+	
+	var chartDataHeaderEntry = [ "q_value" ];
+	
+	if ( alllinkChartData ) {
 
-//		chartData.push( [bucket.binMiddle, bucket.totalCount  ] );
+		chartDataHeaderEntry.push( "all" );
+		chartDataHeaderEntry.push( {role: "tooltip", 'p': {'html': true} }  ); 
+		
+		lineColors.push( '#a5a5a5' );	//	combined: #a5a5a5 (gray)
+		
+		updateMaxPSMCountForType( alllinkChartData );
+	}
+	
+	if ( crosslinkChartData ) {
+
+		chartDataHeaderEntry.push( "crosslink" );
+		chartDataHeaderEntry.push( {role: "tooltip", 'p': {'html': true} }  ); 
+
+		lineColors.push( '#A55353' );	//	red: #A55353
+		
+		updateMaxPSMCountForType( crosslinkChartData );
+	}
+	
+	if ( looplinkChartData ) {
+
+		chartDataHeaderEntry.push( "looplink" );
+		chartDataHeaderEntry.push( {role: "tooltip", 'p': {'html': true} }  ); 
+
+		lineColors.push( '#53a553' );	//	green: #53a553
+		
+		updateMaxPSMCountForType( looplinkChartData );
+	}
+	
+	if ( unlinkedChartData ) {
+
+		chartDataHeaderEntry.push( "unlinked" );
+		chartDataHeaderEntry.push( {role: "tooltip", 'p': {'html': true} }  ); 
+
+		lineColors.push( '#5353a5' );	//	blue: #5353a5
+		
+		updateMaxPSMCountForType( unlinkedChartData );
+	}
+	
+	
+	
+	
+	chartData.push( chartDataHeaderEntry );
+
+
+	var _BIN_END_TO_FIXED_VALUE = 2;
+	
+	var _PERCENTAGE_OF_MAX_TO_FIXED_VALUE = 1;
+	
+	var processBucketForType = function( params ) {
+
+		var dataForType = params.dataForType;
+		var linkTypeLabel = params.linkTypeLabel;
+
+		if ( dataForType ) {
+
+			var lastBucket = dataForType.chartBuckets[ dataArraySize - 1 ];
+			
+			var lastBucket_totalCount = lastBucket.totalCount;
+			
+			var bucket = dataForType.chartBuckets[ index ];
+			
+			if ( chartDataEntry.length === 0 ) {
+				
+				chartDataEntry.push( bucket.binEnd );
+			}
+			
+			var chartDataValue = bucket.totalCount;
+			
+			if ( displayAsPercentage ) {
+				
+				chartDataValue = chartDataValue / lastBucket_totalCount * 100;
+			}
+
+			chartDataEntry.push( chartDataValue );
+			
+			var binEndRounded = bucket.binEnd.toFixed( _BIN_END_TO_FIXED_VALUE );
+
+			var rawCount = bucket.totalCount;
+			
+			try {
+				
+				rawCount = rawCount.toLocaleString();
+			} catch (e) {
+
+			}
+
+
+			var tooltip = "<div style='margin: 10px;'>Type: " + linkTypeLabel +
+							"<br>Raw count: " + rawCount;
+			
+			if ( displayAsPercentage ) {
+				
+				var chartDataValueRounded = chartDataValue.toFixed( _PERCENTAGE_OF_MAX_TO_FIXED_VALUE );
+			
+				tooltip += "<br>Percent of Max: " + chartDataValueRounded; 
+			}
+			
+			tooltip += "<br>Q-value <= " + binEndRounded + "</div>";
+			
+			chartDataEntry.push( tooltip );
+		}
+	};
+
+	
+	for ( var index = 0; index < dataArraySize; index++ ) {
+		
+		var chartDataEntry = [];
+
+		
+		processBucketForType( { dataForType: alllinkChartData, linkTypeLabel: "all" } );
+		
+		processBucketForType( { dataForType: crosslinkChartData, linkTypeLabel: "crosslink" }  );
+		processBucketForType( { dataForType: looplinkChartData, linkTypeLabel: "loooplink" }  );
+		processBucketForType( { dataForType: unlinkedChartData, linkTypeLabel: "unlinked" }  );
 		
 		
-		bucketTotalCount = bucket.totalCount; 
-
-
-		//  With Tooltip
+		if ( chartDataEntry && chartDataEntry.length > 0 ) {
+			
+			chartData.push( chartDataEntry );
+		}
 		
-		var binEndRounded = bucket.binEnd.toFixed( 2 );
-		
-		var tooltip = "<div style='margin: 10px;'>Total PSMs: " + bucketTotalCount + 
-		"<br>Q-value <= " + binEndRounded + "</div>";
-
-		chartData.push( [bucket.binCenter, 
-		                 bucketTotalCount, tooltip 
-//		                 ,  'stroke-width: 2;stroke-color: blue; '
-		                 ] );
 	}
 
-	var tooltipOne = "<div style='margin: 10px;'>Total PSMs: " + bucketTotalCount + 
-	"<br>Q-value <= 1</div>";
-
-	var qvalueOneXPosition = 1;
-	
-	chartData.push( [qvalueOneXPosition, 
-	                 bucketTotalCount, tooltipOne 
-//	                 ,  'stroke-width: 2;stroke-color: blue; '
-	                 ] );	
-	
 	
 	var chartTitle = 'PSM Count vs Q-value';
 	
+	var yAxisLabel = "Count";
+	
+
+	if ( displayAsPercentage ) {
+		
+		yAxisLabel = "Percent of Max";
+	}
 	
 	var optionsFullsize = {
 
@@ -546,18 +777,58 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 
 			//  X axis label below chart
 			hAxis: { title: 'Q-value', titleTextStyle: {color: 'black'}
-						,ticks: [ 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 ], format:'#.##'
+//						,ticks: [ 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 ], format:'#.##'
 //							,minValue: -.05
 //						,maxValue : maxDataX
 			},  
 			//  Y axis label left of chart
-			vAxis: { title: 'Count', titleTextStyle: {color: 'black'}
+			vAxis: { title: yAxisLabel, titleTextStyle: {color: 'black'}
 						,baseline: 0                    // always start at zero
 //						,ticks: vAxisTicks, format:'#,###'
-//						,maxValue : maxDataY
+//						,maxValue : 10
 
 			},
-			legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
+//			legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
+			
+			legend: { position: 'top', alignment: 'end', textStyle: { fontSize : 14 } },
+			
+//			legend.alignment	
+//				Alignment of the legend. Can be one of the following:
+//	
+//				'start' - Aligned to the start of the area allocated for the legend.
+//				'center' - Centered in the area allocated for the legend.
+//				'end' - Aligned to the end of the area allocated for the legend.
+//				Start, center, and end are relative to the style -- vertical or horizontal -- of the legend. 
+//				For example, in a 'right' legend, 'start' and 'end' are at the top and bottom, respectively; 
+//					for a 'top' legend, 'start' and 'end' would be at the left and right of the area, 
+//					respectively.
+//	
+//				The default value depends on the legend's position. For 'bottom' legends, the default is 'center'; other legends default to 'start'.
+//	
+//				Type: string
+//				Default: automatic
+			
+//			legend.position	
+//				Position of the legend. Can be one of the following:
+//	
+//				'bottom' - Below the chart.
+//				'left' - To the left of the chart, provided the left axis has no series associated with it. 
+//							So if you want the legend on the left, use the option targetAxisIndex: 1.
+//				'in' - Inside the chart, by the top left corner.
+//				'none' - No legend is displayed.
+//				'right' - To the right of the chart. Incompatible with the vAxes option.
+//				'top' - Above the chart.
+//				Type: string
+//				Default: 'right'
+			
+//			legend.textStyle	
+//			An object that specifies the legend text style. The object has this format:
+//
+//			{ color: <string>,
+//			  fontName: <string>,
+//			  fontSize: <number>,
+//			  bold: <boolean>,
+//			  italic: <boolean> }
 			
 			width : objectThis.Q_VALUE__COUNT_CHART_WIDTH, 
 			height : objectThis.Q_VALUE__COUNT_CHART_HEIGHT,   // width and height of chart, otherwise controlled by enclosing div
@@ -567,8 +838,12 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 
 //			colors: ['red','blue'],  //  Color of bars
 			
-			colors: ['#A55353','#FFF0F0'],  //  Color of bars, Proxl shades of red, total counts is second
+			colors: lineColors,  //  Color of lines
 			
+//			red: #A55353
+//			green: #53a553
+//			blue: #5353a5
+//			combined: #a5a5a5 (gray)
 			
 			tooltip: {isHtml: true},
 //			isStacked: true
@@ -579,15 +854,28 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 			
 	};        
 	
+	if ( userInputMaxY ) {
+		
+		//  Data points with Y axis > userInputMaxY will not be shown
+		optionsFullsize.vAxis.viewWindow = { max : userInputMaxY };
+	}
+	
+	var $psm_q_value_count_qc_plot_overlay_container = $("#psm_q_value_count_qc_plot_overlay_container");
+
+	var $psm_q_value_count_qc_plot_overlay_background = $("#psm_q_value_count_qc_plot_overlay_background"); 
+	$psm_q_value_count_qc_plot_overlay_background.show();
+	$psm_q_value_count_qc_plot_overlay_container.show();
+
 	
 	// create the chart
 
 	var data = google.visualization.arrayToDataTable( chartData );
 	
 	var chartFullsize = new google.visualization.LineChart( $psm_q_value_count_qc_plot_chartDiv[0] );
-	chartFullsize.draw(data, optionsFullsize);
 	
-	google.visualization.events.addListener(chartFullsize, 'select', function() {
+	chartFullsize.draw( data, optionsFullsize );
+	
+	google.visualization.events.addListener( chartFullsize, 'select', function() {
 		  
 //		var tableSelection = chartFullsize.getSelection();
 //		
@@ -601,12 +889,27 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 //		  var z = 0;
 	});
 	
-	var $psm_q_value_count_qc_plot_overlay_container = $("#psm_q_value_count_qc_plot_overlay_container");
-
-	var $psm_q_value_count_qc_plot_overlay_background = $("#psm_q_value_count_qc_plot_overlay_background"); 
-	$psm_q_value_count_qc_plot_overlay_background.show();
-	$psm_q_value_count_qc_plot_overlay_container.show();
 
 };
 
 
+
+
+
+
+///////////
+
+QCChartQValueCounts.prototype.resetMaxXMaxY = function() {
+
+//	var objectThis = this;
+
+
+
+	var $psm_q_value_count_qc_plot_max_x = $("#psm_q_value_count_qc_plot_max_x");
+
+	var $psm_q_value_count_qc_plot_max_y = $("#psm_q_value_count_qc_plot_max_y");
+
+	$psm_q_value_count_qc_plot_max_x.val( "" );
+	$psm_q_value_count_qc_plot_max_y.val( "" );
+
+};

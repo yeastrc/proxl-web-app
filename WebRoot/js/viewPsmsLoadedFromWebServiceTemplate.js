@@ -20,8 +20,8 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 
 	var _DATA_LOADED_DATA_KEY = "dataLoaded";
 	
-	var _psm_block_template = null;
-	var _handlebarsTemplate_psm_entry_template = null;
+	var _handlebarsTemplate_psm_block_template = null;
+	var _handlebarsTemplate_psm_data_row_entry_template = null;
 	
 	
 	this.showHidePsms = function( params ) {
@@ -141,6 +141,10 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		
 		var ajaxResponseData = params.ajaxResponseData;
 		
+
+		var psms = ajaxResponseData;
+		
+		
 	//	var ajaxRequestData = params.ajaxRequestData;
 
 		var $topTRelement = params.$topTRelement;
@@ -154,30 +158,73 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 
 		$psm_data_container.empty();
 		
-		if ( _psm_block_template === null ) {
+		if ( _handlebarsTemplate_psm_block_template === null ) {
 			
-			//  Not a handlebars template so just use the html
-			_psm_block_template = $( "#psm_block_template" ).html();
-		}
-	
-		if ( _handlebarsTemplate_psm_entry_template === null ) {
+			var handlebarsSource_psm_block_template = $( "#psm_block_template" ).html();
 
-			var handlebarsSource_psm_entry_template = $( "#psm_entry_template tbody" ).html(); //  " tbody" since it is a table
-
-			if ( handlebarsSource_psm_entry_template === undefined ) {
-				throw "handlebarsSource_psm_entry_template === undefined";
+			if ( handlebarsSource_psm_block_template === undefined ) {
+				throw "handlebarsSource_psm_block_template === undefined";
 			}
-			if ( handlebarsSource_psm_entry_template === null ) {
-				throw "handlebarsSource_psm_entry_template === null";
+			if ( handlebarsSource_psm_block_template === null ) {
+				throw "handlebarsSource_psm_block_template === null";
 			}
 			
-			_handlebarsTemplate_psm_entry_template = Handlebars.compile( handlebarsSource_psm_entry_template );
+			_handlebarsTemplate_psm_block_template = Handlebars.compile( handlebarsSource_psm_block_template );
+		}
+	
+		if ( _handlebarsTemplate_psm_data_row_entry_template === null ) {
+
+			var handlebarsSource_psm_data_row_entry_template = $( "#psm_data_row_entry_template" ).html();
+
+			if ( handlebarsSource_psm_data_row_entry_template === undefined ) {
+				throw "handlebarsSource_psm_data_row_entry_template === undefined";
+			}
+			if ( handlebarsSource_psm_data_row_entry_template === null ) {
+				throw "handlebarsSource_psm_data_row_entry_template === null";
+			}
+			
+			_handlebarsTemplate_psm_data_row_entry_template = Handlebars.compile( handlebarsSource_psm_data_row_entry_template );
 		}
 		
+
+		var scanDataAnyRows = false;
+		var chargeDataAnyRows = false;
+		var percolatorDataAnyRows = false;
 		
-		
+
+		for ( var psmIndex = 0; psmIndex < psms.length ; psmIndex++ ) {
 	
-		var $psm_block_template = $(_psm_block_template).appendTo( $psm_data_container );  ///////////////////////////
+			var psm = psms[ psmIndex ];
+	
+			if (  psm.psmDTO.scanId ) {
+				
+				scanDataAnyRows = true;
+			}
+
+			if (  psm.chargeSet ) {
+				
+				chargeDataAnyRows = true;
+			}
+			
+			if ( psm.psmDTO.percolatorPsm ) {
+				
+				percolatorDataAnyRows = true;
+			}
+			
+			
+		}
+
+		var context = {};
+		
+		context.scanDataAnyRows = scanDataAnyRows;
+		context.chargeDataAnyRows = chargeDataAnyRows;
+		context.percolatorDataAnyRows = percolatorDataAnyRows;
+		
+
+		var html = _handlebarsTemplate_psm_block_template(context);
+
+	
+		var $psm_block_template = $( html ).appendTo( $psm_data_container ); 
 		
 		var $psm_table_jq = $psm_block_template.find(".psm_table_jq");
 	
@@ -188,10 +235,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			throw "unable to find HTML element with class 'psm_table_jq'";
 		}
 		
-		var psms = ajaxResponseData;
 	
-		var percolatorPsmFound = false;
-		
 		//  Add psm data to the page
 	
 		for ( var psmIndex = 0; psmIndex < psms.length ; psmIndex++ ) {
@@ -202,25 +246,18 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 				
 				psm.chargeDisplay = psm.charge;
 			}
-			
-			if ( psm.psmDTO.percolatorPsm ) {
-				
-				percolatorPsmFound = true;
-			}
-			
+						
 			var context = psm;
+			
+			context.scanDataAnyRows = scanDataAnyRows;
+			context.chargeDataAnyRows = chargeDataAnyRows;
+			context.percolatorDataAnyRows = percolatorDataAnyRows;
+			
 	
-			var html = _handlebarsTemplate_psm_entry_template(context);
+			var html = _handlebarsTemplate_psm_data_row_entry_template(context);
 	
 	//		var $psm_entry = 
 			$(html).appendTo($psm_table_jq);
-		}
-		
-		if ( ! percolatorPsmFound ) {
-			
-			//  Remove percolatorPsm columns across the table since no data found
-			var $percolatorPsm_columns_jq = $psm_table_jq.find(".percolatorPsm_columns_jq");
-			$percolatorPsm_columns_jq.remove();
 		}
 		
 		var $openLorkeetLinks = $(".view_spectrum_open_spectrum_link_jq");

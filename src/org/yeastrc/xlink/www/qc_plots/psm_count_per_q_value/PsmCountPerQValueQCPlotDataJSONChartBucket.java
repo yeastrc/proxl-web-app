@@ -4,7 +4,6 @@ public class PsmCountPerQValueQCPlotDataJSONChartBucket {
 
 	private double binStart;
 	private double binEnd;
-	private double binCenter;
 	private int totalCount;
 	
 	
@@ -19,12 +18,6 @@ public class PsmCountPerQValueQCPlotDataJSONChartBucket {
 	}
 	public void setBinEnd(double binEnd) {
 		this.binEnd = binEnd;
-	}
-	public double getBinCenter() {
-		return binCenter;
-	}
-	public void setBinCenter(double binCenter) {
-		this.binCenter = binCenter;
 	}
 	public int getTotalCount() {
 		return totalCount;
