@@ -73,7 +73,9 @@ var QCChartQValueCounts = function(  ) {
 					maxX : undefined,
 					maxY : undefined
 				}
-			}
+			},
+			
+			prevYAxisChoice : undefined
 			
 	};
 	
@@ -96,6 +98,13 @@ QCChartQValueCounts.prototype.Q_VALUE__COUNT_CHART_WIDTH = Q_VALUE__COUNT_CHART_
 QCChartQValueCounts.prototype.Q_VALUE__COUNT_CHART_HEIGHT = Q_VALUE__COUNT_CHART_HEIGHT;
 
 QCChartQValueCounts.prototype.RELOAD_Q_VALUE_COUNT_CHART_TIMER_DELAY = RELOAD_Q_VALUE_COUNT_CHART_TIMER_DELAY;  // in Milliseconds
+
+
+QCChartQValueCounts.prototype.Y_AXIS_CHOICE_PERCENTAGE = "PERCENTAGE";
+
+QCChartQValueCounts.prototype.Y_AXIS_CHOICE_RAW_COUNTS = "RAW_COUNTS";
+
+
 
 
 //////////
@@ -320,6 +329,8 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 	}
 	
 	
+	
+	
 
 	
 	var $psm_q_value_count_qc_plot_max_x = $("#psm_q_value_count_qc_plot_max_x");
@@ -332,6 +343,33 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 		this.globals.currentSearchData = {};
 	}
 	
+	/////////////
+	
+	//  if Y Axis choice has changed, clear Y Axis Max input field
+	
+	if ( ( $("#psm_q_value_count_qc_plot_y_axis_as_percentage").prop("checked")
+			&& this.globals.prevYAxisChoice !== this.Y_AXIS_CHOICE_PERCENTAGE )
+			|| ( $("#psm_q_value_count_qc_plot_y_axis_as_raw_counts").prop("checked")
+					&& this.globals.prevYAxisChoice !== this.Y_AXIS_CHOICE_RAW_COUNTS ) ) {
+			
+			$psm_q_value_count_qc_plot_max_y.val( "" );
+	}
+	
+	
+	//  Set this.globals.prevYAxisChoice per current selected Y Axis choice
+
+	if ( $("#psm_q_value_count_qc_plot_y_axis_as_percentage").prop("checked") ) {
+		
+		this.globals.prevYAxisChoice = this.Y_AXIS_CHOICE_PERCENTAGE;
+	}
+
+	if ( $("#psm_q_value_count_qc_plot_y_axis_as_raw_counts").prop("checked") ) {
+		
+		this.globals.prevYAxisChoice = this.Y_AXIS_CHOICE_RAW_COUNTS;
+	}
+	
+	
+	/////////////
 
 	var userInputMaxX = $psm_q_value_count_qc_plot_max_x.val();
 	var userInputMaxY = $psm_q_value_count_qc_plot_max_y.val();
@@ -339,7 +377,9 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 
 	if ( userInputMaxX !== "" ) {
 
-		if ( isNaN( parseFloat( userInputMaxX ) ) ) {
+		var userInputMaxXNum = parseFloat( userInputMaxX ); 
+
+		if ( isNaN( userInputMaxXNum ) ) {
 
 			$(".psm_q_value_count_qc_plot_param_not_a_number_jq").show();
 
@@ -348,6 +388,14 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 			
 			return;  //  EARLY EXIT
 		}
+		
+		if ( userInputMaxXNum < 0 ) {
+			
+			$psm_q_value_count_qc_plot_max_x.val( "0" );
+			
+			userInputMaxX = "0";
+		}
+
 	}	
 
 	if ( userInputMaxY !== "" ) {
@@ -364,15 +412,27 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 			return;  //  EARLY EXIT
 		}
 		
+		if ( userInputMaxYNum < 0 ) {
+			
+			$psm_q_value_count_qc_plot_max_y.val( "0" );
+			
+			userInputMaxY = "0";
+		}
+
+		
 		if ( $("#psm_q_value_count_qc_plot_y_axis_as_percentage").prop("checked") ) {
 			
 			if ( userInputMaxYNum > 100 ) {
 				
 				$psm_q_value_count_qc_plot_max_y.val( "100" );
+				
+				userInputMaxY = "100";
 			}
 		}
 	}	
 
+	
+	
 	
 	
 
@@ -770,14 +830,15 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 	
 
 	
-	var chartTitle = 'PSM Count vs Q-value\n' + searchNameAndNumberInParens;
+	var chartTitle = 'Cumulative PSM Count vs Q-value\n' + searchNameAndNumberInParens;
 	
-	var yAxisLabel = "Count";
+	
+	var yAxisLabel = "Cumulative PSM Count";
 	
 
 	if ( displayAsPercentage ) {
 		
-		yAxisLabel = "Percent of Max";
+		yAxisLabel = "Cumulative PSM Count (% of max)";
 	}
 	
 	var optionsFullsize = {
