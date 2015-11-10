@@ -38,7 +38,9 @@
 			{{#if percolatorDataAnyRows}} <%-- Only show percolator data columns if any percolator data value are not null --%>
 				<th style="text-align:left;font-weight:bold;" >PEP</th>
 				<th style="text-align:left;font-weight:bold;" >SVM Score</th>
+<%-- 				
 				<th style="text-align:left;font-weight:bold;" >Calc. Mass</th>
+--%>				
 			{{/if}}
 		</tr>
 		</thead>

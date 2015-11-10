@@ -37,7 +37,9 @@
 	{{#if percolatorDataAnyRows}} <%-- Only show percolator data columns if any percolator data value are not null --%>
 		<td style="text-align: left; white-space: nowrap; " >{{psmDTO.percolatorPsm.pep}}</td>
 		<td style="text-align: left; white-space: nowrap; " >{{psmDTO.percolatorPsm.svmScore}}</td>
+<%-- 		
 		<td style="text-align: left; white-space: nowrap; " >{{psmDTO.percolatorPsm.calcMass}}</td>
+--%>		
 	{{/if}}
 </tr>
 
