@@ -350,7 +350,10 @@ public class ViewSearchPeptidesAction extends Action {
 			}
 
 			
-
+			if ( ! search.isNoScanData() ) {
+			
+				request.setAttribute( "showNumberUniquePSMs", true );
+			}
 
 			request.setAttribute( "showTopLevelPeptideQValue", showTopLevelPeptideQValue );
 

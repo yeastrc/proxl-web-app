@@ -252,8 +252,25 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		}
 		
 
+		//  Search for NumberUniquePSMs being set in any row
+
+		var showNumberUniquePSMs = false;
+		
+		for ( var looplink_peptideIndex = 0; looplink_peptideIndex < looplink_peptides.length ; looplink_peptideIndex++ ) {
+			
+			var looplink_peptide = looplink_peptides[ looplink_peptideIndex ];
+			
+			if ( looplink_peptide.numUniquePsms !== undefined && looplink_peptide.numUniquePsms !== null ) {
+				
+				showNumberUniquePSMs = true;
+				break;
+			}
+		}
+		
+		
+
 		//  create context for header row
-		var context = { qvalueSetAnyRows : qvalueSetAnyRows };
+		var context = { qvalueSetAnyRows : qvalueSetAnyRows, showNumberUniquePSMs : showNumberUniquePSMs };
 
 		var html = _handlebarsTemplate_looplink_peptide_block_template(context);
 
@@ -278,7 +295,10 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			var looplink_peptide = looplink_peptides[ looplink_peptideIndex ];
 			
 			//  wrap data in an object to allow adding more fields
-			var context = { data : looplink_peptide, searchId : ajaxRequestData.search_id, qvalueSetAnyRows : qvalueSetAnyRows };
+			var context = { data : looplink_peptide, 
+					searchId : ajaxRequestData.search_id, 
+					qvalueSetAnyRows : qvalueSetAnyRows,
+					showNumberUniquePSMs : showNumberUniquePSMs };
 	
 			var html = _handlebarsTemplate_looplink_peptide_data_row_entry_template(context);
 	

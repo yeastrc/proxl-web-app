@@ -44,3 +44,7 @@
 	</script>
 	
 	
+	<%-- include the overlay for when click on the "N" for is PSM Unique --%>
+	
+	<%@ include file="/WEB-INF/jsp-includes/viewPeptidesRelatedToPSMsByScanId.jsp" %>
+	

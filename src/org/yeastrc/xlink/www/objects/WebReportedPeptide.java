@@ -7,17 +7,19 @@ import java.util.List;
 
 
 
-//import org.apache.log4j.Logger;
+
+import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.www.searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
+import org.yeastrc.xlink.www.searcher.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
 
 
 
 public class WebReportedPeptide {
 	
-//	private static final Logger log = Logger.getLogger(WebReportedPeptide.class);
+	private static final Logger log = Logger.getLogger(WebReportedPeptide.class);
 
 	
 
@@ -35,7 +37,7 @@ public class WebReportedPeptide {
 			return numPsms;
 		}
 
-//		num psms is always based on searching psm table for: search id, reported peptide id, and q value.
+		//		num psms is always based on searching psm table for: search id, reported peptide id, and q value.
 
 		numPsms = 
 				PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
@@ -45,6 +47,42 @@ public class WebReportedPeptide {
 		
 		return numPsms;
 	}
+	
+
+	
+	public void setNumUniquePsms(int numUniquePsms) {
+		this.numUniquePsms = numUniquePsms;
+		numUniquePsmsSet = true;
+	}
+
+	public int getNumUniquePsms() throws Exception {
+		
+		try {
+
+			if ( numUniquePsmsSet ) {
+
+				return numUniquePsms;
+			}
+
+
+			numUniquePsms = 
+					PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher.getInstance()
+					.getPsmCountForUniquePSM_SearchIdReportedPeptideId( reportedPeptideId, searchId, peptideQValueCutoff, psmQValueCutoff );
+
+			numUniquePsmsSet = true;
+
+			return numUniquePsms;
+			
+		} catch ( Exception e ) {
+			
+			log.error( "getNumUniquePsms() Exception: " + e.toString(), e );
+			
+			throw e;
+		}
+	}
+	
+	
+	
 		
 
 	
@@ -410,6 +448,12 @@ public class WebReportedPeptide {
 	}
 
 
+	public double getPeptideQValueCutoff() {
+		return peptideQValueCutoff;
+	}
+	public void setPeptideQValueCutoff(double peptideQValueCutoff) {
+		this.peptideQValueCutoff = peptideQValueCutoff;
+	}
 
 	
 	
@@ -431,8 +475,6 @@ public class WebReportedPeptide {
 
 	//  Percolator only
 
-
-
 	private boolean pValuePopulated = false;
 	private boolean svmScorePopulated = false;
 	private boolean pepPopulated = false;
@@ -449,10 +491,27 @@ public class WebReportedPeptide {
 	 */
 	private boolean numPsmsSet;
 
+	
+
+
+	private int numUniquePsms;
+	/**
+	 * true when SetNumUniquePsms has been called
+	 */
+	private boolean numUniquePsmsSet;
+
+	
 	/**
 	 * Used to get numPsms when they are not already set
 	 */
 	private double psmQValueCutoff;
+
+	
+	/**
+	 * 
+	 */
+	private double peptideQValueCutoff;
+
 
 
 }

@@ -249,8 +249,25 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		}
 		
 
+		//  Search for NumberUniquePSMs being set in any row
+
+		var showNumberUniquePSMs = false;
+		
+		for ( var crosslink_peptideIndex = 0; crosslink_peptideIndex < crosslink_peptides.length ; crosslink_peptideIndex++ ) {
+			
+			var crosslink_peptide = crosslink_peptides[ crosslink_peptideIndex ];
+			
+			if ( crosslink_peptide.numUniquePsms !== undefined && crosslink_peptide.numUniquePsms !== null ) {
+				
+				showNumberUniquePSMs = true;
+				break;
+			}
+		}
+		
+		
+
 		//  create context for header row
-		var context = { qvalueSetAnyRows : qvalueSetAnyRows };
+		var context = { qvalueSetAnyRows : qvalueSetAnyRows, showNumberUniquePSMs : showNumberUniquePSMs };
 
 		var html = _handlebarsTemplate_crosslink_peptide_block_template(context);
 
@@ -280,7 +297,10 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			var crosslink_peptide = crosslink_peptides[ crosslink_peptideIndex ];
 			
 			//  wrap data in an object to allow adding more fields
-			var context = { data : crosslink_peptide, searchId : ajaxRequestData.search_id, qvalueSetAnyRows : qvalueSetAnyRows };
+			var context = { data : crosslink_peptide, 
+					searchId : ajaxRequestData.search_id, 
+					qvalueSetAnyRows : qvalueSetAnyRows,
+					showNumberUniquePSMs : showNumberUniquePSMs };
 	
 			var html = _handlebarsTemplate_crosslink_peptide_data_row_entry_template(context);
 	
@@ -303,29 +323,6 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			//  Add next row for child data
 			$( childRowHTML ).appendTo($crosslink_peptide_table_jq);
 		}
-		
-		if ( ! percolatorPsmFound ) {
-			
-			//  Remove percolatorPsm columns across the table since no data found
-			var $percolatorPsm_columns_jq = $crosslink_peptide_table_jq.find(".percolatorPsm_columns_jq");
-			$percolatorPsm_columns_jq.remove();
-		}
-		
-		var $openLorkeetLinks = $(".view_spectrum_open_spectrum_link_jq");
-		
-		addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
-	
-		//  Does not seem to work so not run it
-//		if ( crosslink_peptides.length > 0 ) {
-//			
-//			try {
-//				$crosslink_peptide_block_template.tablesorter(); // gets exception if there are no data rows
-//			} catch (e) {
-//				
-//				var z = 0;
-//			}
-//		}
-
 		
 	};
 	

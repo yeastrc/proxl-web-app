@@ -378,7 +378,7 @@
 			
   
 			  
-				<table style="" id="crosslink-table" class="tablesorter">
+				<table style="" id="crosslink-table" class="tablesorter  top_data_table_jq ">
 				
 					<thead>
 					<tr>
@@ -399,7 +399,12 @@
 							</th>
 						</c:if>
 						
-						<th data-tooltip="Number of PSMs matched to this peptide (or linked pair)" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;PSMs</th>
+						<th data-tooltip="Number of PSMs matched to this peptide (or linked pair)" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># PSMs</th>
+						
+						<c:if test="${ showNumberUniquePSMs }">
+							<th data-tooltip="Number of scans that uniquely matched to this reported peptide" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># Unique</th>
+						</c:if>
+						
 						<th data-tooltip="Best q-value among PSMs that matched this peptide (or linked pair)" class="tool_tip_attached_jq" style="width:10%;font-weight:bold;">Best&nbsp;PSM <span style="white-space: nowrap">Q-value</span></th>
 					</tr>
 					</thead>
@@ -412,6 +417,7 @@
 								reported_peptide_id="${ peptideEntry.reportedPeptide.id }"
 								search_id="${ search.id }"
 								project_id="${ projectId }"
+								peptide_q_value_cutoff="${ peptideQValueCutoff }"  <%-- JSP EL value --%>
 								psm_q_value_cutoff="${ psmQValueCutoff }"
 								>
 								
@@ -485,12 +491,34 @@
 															></span>
 									</a>
 								</td>
+
+								<c:if test="${ showNumberUniquePSMs }">
+								
+									<td class="integer-number-column" 
+										><bean:write name="peptideEntry" property="numUniquePsms" />
+									</td>
+								</c:if>					
+								
+								
 								<td><c:out  value="${ peptideEntry.bestPsmQValue }" /></td>
 							</tr>
 
 							<tr class="expand-child" style="display:none;">
 							 
-							 <td colspan="11" align="center" class=" child_data_container_jq ">
+								<%--  Adjust colspan for number of columns in current table --%>
+								
+								
+								<%--  Init to zero --%>
+								<c:set var="colspanPeptidesAdded" value="${ 0 }" />
+								
+								<%--   Now add 1 for each column being displayed --%>
+								<c:if test="${ showTopLevelPeptideQValue }">
+									<c:set var="colspanPeptidesAdded" value="${ colspanPeptidesAdded + 1 }" />
+								</c:if>
+																		
+								
+															 
+							 <td colspan="<c:out value="${ 11 + colspanPeptidesAdded }"></c:out>" align="center" class=" child_data_container_jq ">
 									
 									<div style="color: green; font-size: 16px; padding-top: 10px; padding-bottom: 10px;" >
 										Loading...

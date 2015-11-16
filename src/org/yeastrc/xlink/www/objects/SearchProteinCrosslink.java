@@ -2,11 +2,14 @@ package org.yeastrc.xlink.www.objects;
 
 
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
 import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
 import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
+import org.yeastrc.xlink.www.searcher.SearchPeptideCrosslinkSearcher;
 
 
 
@@ -199,6 +202,37 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 		this.search = search;
 	}
 
+	public List<SearchPeptideCrosslink> getPeptides() throws Exception {
+
+		try {
+			if( this.peptides == null ) {
+				
+				this.peptides = 
+					SearchPeptideCrosslinkSearcher.getInstance()
+					.searchOnSearchProteinCrosslink( 
+							this.getSearch().getId(),
+							this.getPeptideCutoff(),
+							this.getPsmCutoff(),
+							this.getProtein1().getNrProtein().getNrseqId(),
+							this.getProtein2().getNrProtein().getNrseqId(),
+							this.getProtein1Position(),
+							this.getProtein2Position() );
+			}
+			
+
+
+			return this.peptides;
+
+		} catch ( Exception e ) {
+
+			String msg = "Exception in getPeptides()";
+
+			log.error( msg, e );
+
+			throw e;
+		}
+	}
+
 	
 
 	public double getBestPSMQValue() {
@@ -221,6 +255,9 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 	private SearchDTO search;
 	private int protein1Position;
 	private int protein2Position;
+	
+
+	private List<SearchPeptideCrosslink> peptides;
 	
 	private Integer numPsms;
 	private int numUniquePsms;

@@ -10,6 +10,7 @@ import org.yeastrc.xlink.dto.LooplinkDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.searcher.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
 import org.yeastrc.xlink.www.searcher.SearchProteinSearcher;
 import org.yeastrc.xlink.www.searcher.SearchPsmSearcher;
 
@@ -228,7 +229,48 @@ public class SearchPeptideLooplink {
 	}
 
 
-	
+
+	/**
+	 * @return null when no scan data for search
+	 * @throws Exception
+	 */
+	public Integer getNumUniquePsms() throws Exception {
+		
+		try {
+
+			if ( numUniquePsmsSet ) {
+
+				return numUniquePsms;
+			}
+			
+			
+			if ( this.getSearch().isNoScanData() ) {
+				
+				numUniquePsms = null;
+				
+				numUniquePsmsSet = true;
+				
+				return numUniquePsms;
+			}
+
+
+
+
+			numUniquePsms = 
+					PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher.getInstance()
+					.getPsmCountForUniquePSM_SearchIdReportedPeptideId( this.getReportedPeptide().getId(), this.getSearch().getId(), peptideQValueCutoff, psmQValueCutoff );
+
+			numUniquePsmsSet = true;
+
+			return numUniquePsms;
+			
+		} catch ( Exception e ) {
+			
+			log.error( "getNumUniquePsms() Exception: " + e.toString(), e );
+			
+			throw e;
+		}
+	}
 	
 	public int getNumPsms() {
 		return numPsms;
@@ -262,7 +304,7 @@ public class SearchPeptideLooplink {
 		try {
 
 			if( this.peptideProteinPositions == null )
-				this.peptideProteinPositions = SearchProteinSearcher.getInstance().getProteinDoublePositions( this.search, this.peptide, this.peptidePosition1, this.peptidePosition2);
+				this.peptideProteinPositions = SearchProteinSearcher.getInstance().getProteinDoublePositions( this.getSearch(), this.getPeptide(), this.getPeptidePosition1(), this.getPeptidePosition2() );
 
 			return peptideProteinPositions;
 
@@ -322,5 +364,8 @@ public class SearchPeptideLooplink {
 	
 	private int numPsms;
 	private double bestPsmQValue;
+	
+	private Integer numUniquePsms;
+	private boolean numUniquePsmsSet;
 	
 }

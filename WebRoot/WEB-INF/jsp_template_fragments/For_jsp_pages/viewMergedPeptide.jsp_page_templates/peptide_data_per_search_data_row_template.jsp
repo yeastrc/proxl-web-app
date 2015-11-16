@@ -19,6 +19,7 @@
 	reported_peptide_id="{{ data.reportedPeptide.id }}"
 	search_id="{{  data.searchId }}"
 	project_id="{{  project_id }}"
+	peptide_q_value_cutoff="${ peptideQValueCutoff }" <%-- JSP EL value  --%>
 	psm_q_value_cutoff="{{  psm_q_value_cutoff }}"
 >
 	<td>{{ data.searchName }}</td>

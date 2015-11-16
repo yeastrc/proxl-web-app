@@ -2,11 +2,14 @@ package org.yeastrc.xlink.www.objects;
 
 
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
 import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
 import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
+import org.yeastrc.xlink.www.searcher.SearchPeptideLooplinkSearcher;
 
 
 
@@ -149,6 +152,37 @@ public class SearchProteinLooplink implements IProteinLooplink {
 			throw e;
 		}
 	}
+
+
+	public List<SearchPeptideLooplink> getPeptides() throws Exception {
+		
+		try {
+			if( this.peptides == null ) {
+
+				this.peptides = 
+				SearchPeptideLooplinkSearcher.getInstance()
+				.searchOnSearchProteinLooplink(
+						this.getSearch().getId(),
+						this.getPeptideCutoff(),
+						this.getPsmCutoff(),
+						this.getProtein().getNrProtein().getNrseqId(),
+						this.getProteinPosition1(),
+						this.getProteinPosition2() );
+
+			}
+
+			return this.peptides;
+			
+		} catch ( Exception e ) {
+			
+			String msg = "Exception in getPeptides()";
+			
+			log.error( msg, e );
+			
+			throw e;
+		}
+	}
+	
 	
 
 	/**
@@ -215,6 +249,10 @@ public class SearchProteinLooplink implements IProteinLooplink {
 	private SearchDTO search;
 	private int proteinPosition1;
 	private int proteinPosition2;
+	
+
+	private List<SearchPeptideLooplink> peptides;
+	
 	
 	private Integer numPsms;
 	private int numUniquePsms;

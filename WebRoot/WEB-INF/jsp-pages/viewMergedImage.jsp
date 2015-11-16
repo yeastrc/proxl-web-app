@@ -606,7 +606,7 @@
 				  </div>			
 
 		
-				<table id="link_info_table" class="link-info-table  " >
+				<table id="link_info_table" class="link-info-table  top_data_table_jq " >
 					<thead>
 					<tr>
 						<th style="text-align:left;width:60%;font-weight:bold;">Name</th>
@@ -731,6 +731,7 @@
 			reported_peptide_id="{{ reportedPeptide.id }}"
 			search_id="{{ searchId }}"
 			project_id="${ project_id }"
+			peptide_q_value_cutoff="{{ peptideQValueCutoff }}"			
 			psm_q_value_cutoff="{{ psmQValueCutoff }}"
 		>
 				
@@ -823,6 +824,7 @@
 			reported_peptide_id="{{ reportedPeptide.id }}"
 			search_id="{{ searchId }}"
 			project_id="${ project_id }"
+			peptide_q_value_cutoff="{{ peptideQValueCutoff }}"			
 			psm_q_value_cutoff="{{ psmQValueCutoff }}"			
 		>
 			<td>{{reportedPeptide.sequence}}</td>
@@ -914,6 +916,7 @@
 			reported_peptide_id="{{ reportedPeptide.id }}"
 			search_id="{{ searchId }}"
 			project_id="${ project_id }"
+			peptide_q_value_cutoff="{{ peptideQValueCutoff }}"			
 			psm_q_value_cutoff="{{ psmQValueCutoff }}"
 		>
 			<td>{{reportedPeptide.sequence}}</td>

@@ -16,47 +16,37 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.PsmWebDisplay;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
+import org.yeastrc.xlink.www.objects.WebReportedPeptideWebserviceWrapper;
 import org.yeastrc.xlink.www.constants.QueryCriteriaValueCountsFieldValuesConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.QueryCriteriaValueCountsDAO;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
-@Path("/data")
-public class PsmsService {
+@Path("/reportedPeptidesRelatedToPSMService")
+public class ReportedPeptidesRelatedToPSMService {
 
-	private static final Logger log = Logger.getLogger(PsmsService.class);
+	private static final Logger log = Logger.getLogger(ReportedPeptidesRelatedToPSMService.class);
 	
+	
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/getPsms") 
-	public List<PsmWebDisplay> getViewerData( @QueryParam( "search_id" ) Integer searchId,
+	@Path("/get") 
+	public List<WebReportedPeptideWebserviceWrapper> get( @QueryParam( "search_id" ) Integer searchId,
 										  @QueryParam( "project_id" ) Integer projectIdParam,
-										  @QueryParam( "reported_peptide_id" ) Integer reportedPeptideId,
 										  @QueryParam( "peptide_q_value_cutoff" ) Double peptideQValueCutoff,
 										  @QueryParam( "psm_q_value_cutoff" ) Double psmQValueCutoff,
+										  @QueryParam( "psm_id" ) Integer psmId,
+										  @QueryParam( "scan_id" ) Integer scanId,
 										  @Context HttpServletRequest request )
 	throws Exception {
 		
 		if ( searchId == null ) {
 
 			String msg = "Provided search_id is null or search_id is missing";
-
-			log.error( msg );
-
-		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-		    	        .entity( msg )
-		    	        .build()
-		    	        );
-		}
-		
-		if ( reportedPeptideId == null ) {
-
-			String msg = "Provided reported_peptide_id is null or reported_peptide_id is missing";
 
 			log.error( msg );
 
@@ -79,7 +69,7 @@ public class PsmsService {
 					.build()
 					);
 		}
-
+		
 		if ( psmQValueCutoff == null ) {
 
 			String msg = "Provided psm_q_value_cutoff is null or psm_q_value_cutoff is missing";
@@ -93,15 +83,46 @@ public class PsmsService {
 		    	        );
 		}
 		
+		///////////////////////
+		
+		
+		if ( psmId == null ) {
+
+			String msg = "Provided psm_id is null or psm_id is missing";
+
+			log.error( msg );
+
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	        .entity( msg )
+		    	        .build()
+		    	        );
+		}		
+		if ( scanId == null ) {
+
+			String msg = "Provided scan_id is null or scan_id is missing";
+
+			log.error( msg );
+
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	        .entity( msg )
+		    	        .build()
+		    	        );
+		}		
+		
+		  
 
 		try {
-			
+
 
 			
 			QueryCriteriaValueCountsDAO.getInstance().saveOrIncrement( 
 					QueryCriteriaValueCountsFieldValuesConstants.PSM_Q_VALUE_FIELD_VALUE, Double.toString( psmQValueCutoff ) );
+			QueryCriteriaValueCountsDAO.getInstance().saveOrIncrement( 
+					QueryCriteriaValueCountsFieldValuesConstants.PEPTIDE_Q_VALUE_FIELD_VALUE, Double.toString( peptideQValueCutoff ) );
 
-
+			
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 
@@ -185,12 +206,17 @@ public class PsmsService {
 						);
 
 			}
+			
+			
+			
+			
 
-			List<PsmWebDisplay> psms = 
-					PsmWebDisplaySearcher.getInstance().getPsmsWebDisplay( searchId, reportedPeptideId, peptideQValueCutoff, psmQValueCutoff );
+			List<WebReportedPeptideWebserviceWrapper> linkPeptides = 
+					ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher.getInstance()
+					.reportedPeptideRecordsForAssociatedScanId( psmId, searchId, peptideQValueCutoff, psmQValueCutoff ); 
 					
 
-			return psms;
+			return linkPeptides;
 
 			
 		} catch ( WebApplicationException e ) {
@@ -214,4 +240,5 @@ public class PsmsService {
 
 	}
 	
+		
 }

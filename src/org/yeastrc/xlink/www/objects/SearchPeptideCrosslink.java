@@ -10,6 +10,7 @@ import org.yeastrc.xlink.dto.CrosslinkDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.searcher.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
 import org.yeastrc.xlink.www.searcher.SearchProteinSearcher;
 import org.yeastrc.xlink.www.searcher.SearchPsmSearcher;
 
@@ -26,7 +27,7 @@ public class SearchPeptideCrosslink {
 		
 		if ( psmId == null ) {
 			
-			log.warn( "No PSMs for search.id : " + search.getId() 
+			log.warn( "No PSMs for search.id : " + this.getSearch().getId() 
 					+ ", this.getReportedPeptide().getId(): " + this.getReportedPeptide().getId() 
 					+ ", this.getReportedPeptide().getSequence(): " + this.getReportedPeptide().getSequence() );
 			
@@ -237,7 +238,7 @@ public class SearchPeptideCrosslink {
 		try {
 
 			if( this.peptide1ProteinPositions == null )
-				this.peptide1ProteinPositions = SearchProteinSearcher.getInstance().getProteinPositions( this.search, this.peptide1, this.peptide1Position);
+				this.peptide1ProteinPositions = SearchProteinSearcher.getInstance().getProteinPositions( this.getSearch(), this.getPeptide1(), this.getPeptide1Position() );
 
 			return peptide1ProteinPositions;
 
@@ -275,7 +276,7 @@ public class SearchPeptideCrosslink {
 		try {
 
 			if( this.peptide2ProteinPositions == null )
-				this.peptide2ProteinPositions = SearchProteinSearcher.getInstance().getProteinPositions( this.search, this.peptide2, this.peptide2Position);
+				this.peptide2ProteinPositions = SearchProteinSearcher.getInstance().getProteinPositions( this.getSearch(), this.getPeptide2(), this.getPeptide2Position() );
 
 			return peptide2ProteinPositions;
 
@@ -292,12 +293,63 @@ public class SearchPeptideCrosslink {
 			List<SearchProteinPosition> peptide2ProteinPositions) {
 		this.peptide2ProteinPositions = peptide2ProteinPositions;
 	}
+	
+
+	
+	public void setNumUniquePsms(int numUniquePsms) {
+		this.numUniquePsms = numUniquePsms;
+		numUniquePsmsSet = true;
+	}
+
+	/**
+	 * @return null when no scan data for search
+	 * @throws Exception
+	 */
+	public Integer getNumUniquePsms() throws Exception {
+		
+		try {
+
+			if ( numUniquePsmsSet ) {
+
+				return numUniquePsms;
+			}
+			
+			if ( this.getSearch().isNoScanData() ) {
+				
+				numUniquePsms = null;
+				
+				numUniquePsmsSet = true;
+				
+				return numUniquePsms;
+			}
+
+
+			numUniquePsms = 
+					PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher.getInstance()
+					.getPsmCountForUniquePSM_SearchIdReportedPeptideId( this.getReportedPeptide().getId(), this.getSearch().getId(), peptideQValueCutoff, psmQValueCutoff );
+
+			numUniquePsmsSet = true;
+
+			return numUniquePsms;
+			
+		} catch ( Exception e ) {
+			
+			log.error( "getNumUniquePsms() Exception: " + e.toString(), e );
+			
+			throw e;
+		}
+	}
+	
 	public int getNumPsms() {
 		return numPsms;
 	}
 	public void setNumPsms(int numPsms) {
 		this.numPsms = numPsms;
 	}
+	
+	
+	
+	
 	public double getBestPsmQValue() {
 		return bestPsmQValue;
 	}
@@ -400,5 +452,8 @@ public class SearchPeptideCrosslink {
 	
 	private int numPsms;
 	private double bestPsmQValue;
+	
+	private Integer numUniquePsms;
+	private boolean numUniquePsmsSet;
 	
 }

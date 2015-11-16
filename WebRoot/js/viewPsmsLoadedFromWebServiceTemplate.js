@@ -72,12 +72,21 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		}
 		
 
-		
+		var initial_scan_id = $clickedElement.attr( "initial_scan_id" );
 		var reported_peptide_id = $clickedElement.attr( "reported_peptide_id" );
 		var search_id = $clickedElement.attr( "search_id" );
 		var project_id = $clickedElement.attr( "project_id" );
+		var peptide_q_value_cutoff = $clickedElement.attr( "peptide_q_value_cutoff" );
 		var psm_q_value_cutoff = $clickedElement.attr( "psm_q_value_cutoff" );
 
+		var skip_associated_peptides_link = $clickedElement.attr( "skip_associated_peptides_link" );
+		
+		var show_associated_peptides_link_true = true; // default to true
+		
+		if ( skip_associated_peptides_link === "true" ) {
+			
+			show_associated_peptides_link_true = false;
+		}
 		
 		//  Convert all attributes to empty string if null or undefined
 		if ( ! reported_peptide_id ) {
@@ -89,6 +98,9 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		if ( ! project_id ) {
 			project_id = "";
 		}
+		if ( ! peptide_q_value_cutoff ) {
+			peptide_q_value_cutoff = "";
+		}
 		if ( ! psm_q_value_cutoff ) {
 			psm_q_value_cutoff = "";
 		}
@@ -99,6 +111,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 				reported_peptide_id : reported_peptide_id,
 				search_id : search_id,
 				project_id : project_id,
+				peptide_q_value_cutoff : peptide_q_value_cutoff,
 				psm_q_value_cutoff : psm_q_value_cutoff
 		};
 		
@@ -115,7 +128,14 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 
 			success : function( ajaxResponseData ) {
 
-				objectThis.loadAndInsertPsmsResponse( { ajaxResponseData : ajaxResponseData, $topTRelement : $topTRelement } );
+				objectThis.loadAndInsertPsmsResponse( 
+						{ ajaxResponseData : ajaxResponseData, 
+							$topTRelement : $topTRelement, 
+							ajaxRequestData : ajaxRequestData,
+							otherData : 
+								{ show_associated_peptides_link_true : show_associated_peptides_link_true,
+									initial_scan_id : initial_scan_id }
+						} );
 				
 
 				$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
@@ -136,13 +156,26 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		
 	};
 	
+	////////////
 	
 	this.loadAndInsertPsmsResponse = function( params ) {
+
+		var ajaxRequestData = params.ajaxRequestData;
 		
 		var ajaxResponseData = params.ajaxResponseData;
 		
+		var show_associated_peptides_link_true = params.otherData.show_associated_peptides_link_true;
+		
+		var initial_scan_id = params.otherData.initial_scan_id;
 
 		var psms = ajaxResponseData;
+		
+		initial_scan_id = parseInt( initial_scan_id, 10 );
+		
+		if ( isNaN( initial_scan_id ) ) {
+			
+			initial_scan_id = null;
+		}
 		
 		
 	//	var ajaxRequestData = params.ajaxRequestData;
@@ -220,7 +253,6 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		context.chargeDataAnyRows = chargeDataAnyRows;
 		context.percolatorDataAnyRows = percolatorDataAnyRows;
 		
-
 		var html = _handlebarsTemplate_psm_block_template(context);
 
 	
@@ -253,7 +285,31 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			context.chargeDataAnyRows = chargeDataAnyRows;
 			context.percolatorDataAnyRows = percolatorDataAnyRows;
 			
-	
+			
+			if ( psm.psmCountForAssocScanId < 2 ) {
+				
+				context.uniquePSM = true;
+			}
+			
+
+			if ( psm.psmDTO.scanId !== undefined
+					&& psm.psmDTO.scanId !== null
+					&& initial_scan_id !== null 
+					&& psm.psmDTO.scanId === initial_scan_id ) {
+				
+				context.scanIdMatchesInitialScanId = true;
+			}
+
+			context.project_id = ajaxRequestData.project_id;
+			context.search_id = ajaxRequestData.search_id;
+
+			context.peptide_q_value_cutoff = ajaxRequestData.peptide_q_value_cutoff;
+			context.psm_q_value_cutoff = ajaxRequestData.psm_q_value_cutoff;
+			
+			context.show_associated_peptides_link_true = show_associated_peptides_link_true;
+
+
+			
 			var html = _handlebarsTemplate_psm_data_row_entry_template(context);
 	
 	//		var $psm_entry = 

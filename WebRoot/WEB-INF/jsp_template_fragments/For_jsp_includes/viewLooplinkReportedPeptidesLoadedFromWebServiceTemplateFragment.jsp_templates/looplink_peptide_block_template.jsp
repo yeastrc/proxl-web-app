@@ -21,6 +21,10 @@
 						{{/if}}
 
 						<th class="integer-number-column-right-most-column-no-ts-header" style="font-weight:bold;">#&nbsp;PSMs</th>
+						
+						{{#if showNumberUniquePSMs}} <%-- Only show column if any values are not null --%>
+							<th class=" integer-number-column-right-most-column-no-ts-header " style="font-weight:bold; white-space: nowrap;"># Unique</th>
+						{{/if}}	
 				</tr>
 				</thead>
 				<tbody></tbody>

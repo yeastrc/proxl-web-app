@@ -20,6 +20,10 @@
 			{{#if scanDataAnyRows}}
 				<th style="text-align:right;font-weight:bold;" class="integer-number-column"><span style="white-space: nowrap">Scan Num.</span></th>
 			{{/if}}
+			
+			{{#if scanDataAnyRows}}
+				<th style="text-align:right;font-weight:bold;" class=""><span style="white-space: nowrap">U</span></th>
+			{{/if}}
 
 
 			{{#if chargeDataAnyRows}}

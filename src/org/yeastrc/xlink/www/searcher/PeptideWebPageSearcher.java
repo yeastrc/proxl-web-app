@@ -455,6 +455,7 @@ public class PeptideWebPageSearcher {
 				
 				WebReportedPeptide item = new WebReportedPeptide();
 				
+				item.setPeptideQValueCutoff( peptideQValueCutoff );
 				item.setPsmQValueCutoff( psmQValueCutoff );
 				
 

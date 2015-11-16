@@ -11,6 +11,7 @@
 			reported_peptide_id="{{ data.reportedPeptide.id }}"
 			search_id="{{ searchId }}"
 			project_id="${ projectId }"  <%-- JSP EL value --%>
+			peptide_q_value_cutoff="${ peptideQValueCutoff }"  <%-- JSP EL value --%>
 			psm_q_value_cutoff="${ psmQValueCutoff }"  <%-- JSP EL value --%>
 		>
 			 
@@ -37,8 +38,11 @@
 										></span>
 				</a>
 			</td>												
-			
-			<%-- 
-			<td class="integer-number-column-right-most-column-no-ts" style="" >{{ data.numPsms }}</td>
-			--%>
+
+
+			{{#if showNumberUniquePSMs}} <%-- Only show column if any values are not null --%>
+				<td class="integer-number-column" 
+					>{{ data.numUniquePsms }}
+				</td>
+			{{/if}}	
 		</tr>

@@ -479,7 +479,7 @@
 			</script>
 			
 			
-				<table style="" id="crosslink-table" class="tablesorter">
+				<table style="" id="crosslink-table" class="tablesorter top_data_table_jq ">
 				
 				  <thead>
 					<tr>

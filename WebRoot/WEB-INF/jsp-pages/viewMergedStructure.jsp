@@ -77,6 +77,8 @@
 		
 		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
 		
+		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
+		
 
 		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/lorikeet.css">
 		
@@ -507,7 +509,7 @@
 				  </div>			
 
 		
-				<table id="link_info_table" class="link-info-table tablesorter " >
+				<table id="link_info_table" class="link-info-table tablesorter top_data_table_jq " >
 					<thead>
 					<tr>
 						<th style="text-align:left;width:60%;font-weight:bold;">Search Name</th>
@@ -631,6 +633,7 @@
 			reported_peptide_id="{{ reportedPeptide.id }}"
 			search_id="{{ searchId }}"
 			project_id="${ project_id }"
+			peptide_q_value_cutoff="{{ peptideQValueCutoff }}"			
 			psm_q_value_cutoff="{{ psmQValueCutoff }}"
 		>
 			<td>{{reportedPeptide.sequence}}</td>
@@ -724,6 +727,7 @@
 			reported_peptide_id="{{ reportedPeptide.id }}"
 			search_id="{{ searchId }}"
 			project_id="${ project_id }"
+			peptide_q_value_cutoff="{{ peptideQValueCutoff }}"			
 			psm_q_value_cutoff="{{ psmQValueCutoff }}"		
 		>
 			<td>{{reportedPeptide.sequence}}</td>
@@ -815,6 +819,7 @@
 			reported_peptide_id="{{ reportedPeptide.id }}"
 			search_id="{{ searchId }}"
 			project_id="${ project_id }"
+			peptide_q_value_cutoff="{{ peptideQValueCutoff }}"			
 			psm_q_value_cutoff="{{ psmQValueCutoff }}"
 		>
 			<td>{{reportedPeptide.sequence}}</td>
