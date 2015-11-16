@@ -30,6 +30,7 @@
 			{{#if uniquePSM}}
 			
 			<%--  TEMP --%>
+			<%-- 
 				{{#if show_associated_peptides_link_true }}
 				 {{#if psmDTO.scanId }}
 				  <a href="javascript:" psm_id="{{ psmDTO.id }}" scan_id="{{ psmDTO.scanId }}" 
@@ -37,7 +38,7 @@
 					project_id="{{ project_id }}" search_id="{{ search_id }}"
 				 	onclick="viewPeptidesRelatedToPSMsByScanId.openOverlayForPeptidesRelatedToPSMsByScanId( { clickedElement : this } )"
 				 	>{{/if}}{{/if}}TEMP_N{{#if show_associated_peptides_link_true }}{{#if psmDTO.scanId }}</a>{{/if}}{{/if}}
-	
+			--%>
 				Y
 			{{else}}
 				{{#if show_associated_peptides_link_true }}
