@@ -13,7 +13,7 @@
 	<tr 
 		style="cursor: pointer; "
 		onclick="viewPsmsLoadedFromWebServiceTemplate.showHidePsms( { clickedElement : this } )"
-		initial_scan_id="{{ initial_scan_id }}"
+		initial_scan_id="{{ initial_scan_id }}"  <%-- For the Related Peptides Overlay, this is the initial scan id clicked on  --%>
 		reported_peptide_id="{{ data.reportedPeptide_Id }}"
 		search_id="{{ searchId }}"
 		project_id="{{ projectId }}"
@@ -22,7 +22,7 @@
 		skip_associated_peptides_link="true"
 		>
 		
-		<td>
+		<td class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " >
 			{{ data.linkType }}
 <%-- 										
 			<c:choose>
@@ -38,19 +38,19 @@
 		
 		</td>
 		
-		<td>{{ data.reportedPeptide_Sequence }}</td>
-		<td>{{ data.peptide_1_Sequence }}</td>
-		<td class="integer-number-column" >{{ data.peptide_1_Position }}</td>
-		<td>{{ data.peptide_2_Sequence }}</td>
-		<td class="integer-number-column" >{{ data.peptide_2_Position }}</td>
-		<td>
+		<td class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " >{{ data.reportedPeptide_Sequence }}</td>
+		<td class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " >{{ data.peptide_1_Sequence }}</td>
+		<td class="integer-number-column {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >{{ data.peptide_1_Position }}</td>
+		<td class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " >{{ data.peptide_2_Sequence }}</td>
+		<td class="integer-number-column {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >{{ data.peptide_2_Position }}</td>
+		<td class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " >
 		   {{#each data.peptide_1_ProteinPositions}}
 				<span class=" protein_name_jq " data-protein-id="{{ this.proteinId }}">
 					{{ this.name }}{{#if this.position_1 }}({{ this.position_1 }}{{#if this.position_2 }}, {{ this.position_2 }}{{/if}}){{/if}}
 				</span>
 		   {{/each}}
 		</td>
-		<td>
+		<td class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " >
 		   {{#each data.peptide_2_ProteinPositions}}
 				<span class=" protein_name_jq " data-protein-id="{{ this.proteinId }}">
 					{{ this.name }}{{#if this.position_1 }}({{ this.position_1 }}{{#if this.position_2 }}, {{ this.position_2 }}{{/if}}){{/if}}
@@ -58,10 +58,11 @@
 		   {{/each}}
 		</td>
 		{{#if showPeptideQValue}}
-			<td style="white-space: nowrap">{{ data.qValue }}</td>
+			<td style="white-space: nowrap" class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " >{{ data.qValue }}</td>
 		{{/if}}
 
-		<td class="integer-number-column" ><a class="show-child-data-link  " 
+		<td class="integer-number-column {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
+			<a class="show-child-data-link  " 
 				href="javascript:"
 				>{{ data.numPsms }}<span class="toggle_visibility_expansion_span_jq" 
 						><img src="${contextPath }/images/icon-expand-small.png" 
@@ -74,12 +75,12 @@
 			</a>
 		</td>
 		
-		<td class="integer-number-column" 
+		<td class="integer-number-column {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" 
 			>{{ data.numUniquePsms }} 
 		</td>
 			
 		
 		
-		<td>{{ data.bestPsmQValue }}</td>
+		<td class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " >{{ data.bestPsmQValue }}</td>
 	</tr>
 

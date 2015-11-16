@@ -306,6 +306,8 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			context.peptide_q_value_cutoff = ajaxRequestData.peptide_q_value_cutoff;
 			context.psm_q_value_cutoff = ajaxRequestData.psm_q_value_cutoff;
 			
+			context.reported_peptide_id = ajaxRequestData.reported_peptide_id;
+			
 			context.show_associated_peptides_link_true = show_associated_peptides_link_true;
 
 
@@ -316,7 +318,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			$(html).appendTo($psm_table_jq);
 		}
 		
-		var $openLorkeetLinks = $(".view_spectrum_open_spectrum_link_jq");
+		var $openLorkeetLinks = $psm_table_jq.find(".view_spectrum_open_spectrum_link_jq");
 		
 		addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
 	

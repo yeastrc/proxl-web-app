@@ -34,15 +34,19 @@
 				{{#if show_associated_peptides_link_true }}
 				 {{#if psmDTO.scanId }}
 				  <a href="javascript:" psm_id="{{ psmDTO.id }}" scan_id="{{ psmDTO.scanId }}" 
+				  	initial_reported_peptide_id="{{ reported_peptide_id }}"
 					peptide_q_value_cutoff="{{ peptide_q_value_cutoff }}" psm_q_value_cutoff="{{ psm_q_value_cutoff }}"
 					project_id="{{ project_id }}" search_id="{{ search_id }}"
 				 	onclick="viewPeptidesRelatedToPSMsByScanId.openOverlayForPeptidesRelatedToPSMsByScanId( { clickedElement : this } )"
 				 	>{{/if}}{{/if}}TEMP_N{{#if show_associated_peptides_link_true }}{{#if psmDTO.scanId }}</a>{{/if}}{{/if}}
 			--%>
+			<%-- 
+			--%>
 				Y
 			{{else}}
 				{{#if show_associated_peptides_link_true }}
 				  <a href="javascript:" psm_id="{{ psmDTO.id }}" scan_id="{{ psmDTO.scanId }}" 
+				  	initial_reported_peptide_id="{{ reported_peptide_id }}"
 					peptide_q_value_cutoff="{{ peptide_q_value_cutoff }}" psm_q_value_cutoff="{{ psm_q_value_cutoff }}"
 					project_id="{{ project_id }}" search_id="{{ search_id }}"
 				 	onclick="viewPeptidesRelatedToPSMsByScanId.openOverlayForPeptidesRelatedToPSMsByScanId( { clickedElement : this } )"

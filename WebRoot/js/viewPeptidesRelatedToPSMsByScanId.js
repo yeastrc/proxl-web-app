@@ -14,7 +14,7 @@
 "use strict";
 
 
-//Class contructor
+// Class contructor
 
 var ViewPeptidesRelatedToPSMsByScanId = function() {
 
@@ -23,15 +23,15 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 	var _handlebarsTemplate_peptides_related_to_psm_child_row_template = null;
 	
 	
-	//////////////
+	// ////////////
 	
 	this.init = function( ) {
 
 		var objectThis = this;
 		
-		///////////////////////////////////////////////////////////////////////////
+		// /////////////////////////////////////////////////////////////////////////
 
-		///  Attach Overlay Click handlers
+		// / Attach Overlay Click handlers
 
 
 		var $view_data_related_to_psm_data_overlay_X_for_exit_overlay = $(".view-data-related-to-psm-data-overlay-X-for-exit-overlay");
@@ -52,7 +52,7 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 	};
 	
 
-	///////////
+	// /////////
 	
 	this.closeOverlay = function(  ) {
 		
@@ -65,7 +65,7 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 		$view_data_related_to_psm_data_overlay_div.hide();
 	};
 
-	///////////
+	// /////////
 	
 	this.openOverlayForPeptidesRelatedToPSMsByScanId = function( params ) {
 
@@ -82,17 +82,17 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 		$view_data_related_to_psm_data_overlay_div.show();
 		
 
-		//  Close any open Lorikeet Overlay
+		// Close any open Lorikeet Overlay
 		closeLorikeetOverlay();
 
 
-		//  Adjust the overlay positon to be within the viewport
+		// Adjust the overlay positon to be within the viewport
 
 		var scrollTopWindow = $(window).scrollTop();
 
 		if ( scrollTopWindow > 0 ) {
 
-			//  User has scrolled down
+			// User has scrolled down
 
 			var overlayTop = scrollTopWindow + 10;
 
@@ -117,7 +117,7 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 
 
 
-	///////////
+	// /////////
 
 	this.loadAndInsertPeptides = function( params ) {
 
@@ -133,7 +133,7 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 		var peptide_q_value_cutoff = $clickedElement.attr( "peptide_q_value_cutoff" );
 		var psm_q_value_cutoff = $clickedElement.attr( "psm_q_value_cutoff" );
 		
-		//  Convert all attributes to empty string if null or undefined
+		// Convert all attributes to empty string if null or undefined
 		if ( ! search_id ) {
 			search_id = "";
 		}
@@ -169,9 +169,11 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 		$.ajax({
 			url : contextPathJSVar + "/services/reportedPeptidesRelatedToPSMService/get",
 
-//			traditional: true,  //  Force traditional serialization of the data sent
-//			//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-//			//   So searchIds array is passed as "searchIds=<value>" which is what Jersey expects
+// traditional: true, // Force traditional serialization of the data sent
+// // One thing this means is that arrays are sent as the object property
+// instead of object property followed by "[]".
+// // So searchIds array is passed as "searchIds=<value>" which is what Jersey
+// expects
 
 			data : ajaxRequestData,  // The data sent as params on the URL
 			dataType : "json",
@@ -202,7 +204,7 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 	};
 
 
-	///////////
+	// /////////
 
 	this.loadAndInsertPeptidesResponse = function( params ) {
 
@@ -215,6 +217,14 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 
 		var reportedPeptides = ajaxResponseData;
 
+		var initial_reported_peptide_id = $clickedElement.attr( "initial_reported_peptide_id" );
+
+		initial_reported_peptide_id = parseInt( initial_reported_peptide_id, 10 );
+		
+		if ( isNaN( initial_reported_peptide_id ) ) {
+			
+			initial_reported_peptide_id = null;
+		}
 
 		var $reported_peptide_data_container = $("#view_data_related_to_psm_data_overlay_data_container");
 
@@ -270,7 +280,7 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 
 
 
-		//  Search for qvalue being set in any row
+		// Search for qvalue being set in any row
 
 		var qvalueSetAnyRows = false;
 
@@ -286,7 +296,7 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 		}
 
 
-		//  create context for header row
+		// create context for header row
 		var context = { qvalueSetAnyRows : qvalueSetAnyRows };
 
 		var html = _handlebarsTemplate_peptides_related_to_psm_block_template(context);
@@ -298,20 +308,21 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 
 		var $peptides_related_to_psm_table_jq = $peptides_related_to_psm_block_template.find("." + peptides_related_to_psm_table_jq_ClassName );
 
-//		var $peptides_related_to_psm_table_jq = $reported_peptide_data_container.find(".peptides_related_to_psm_table_jq");
+// var $peptides_related_to_psm_table_jq =
+// $reported_peptide_data_container.find(".peptides_related_to_psm_table_jq");
 
 		if ( $peptides_related_to_psm_table_jq.length === 0 ) {
 
 			throw "unable to find HTML element with class '" + peptides_related_to_psm_table_jq_ClassName + "'";
 		}
 
-		//  Add reported_peptide data to the page
+		// Add reported_peptide data to the page
 
 		for ( var reportedPeptideIndex = 0; reportedPeptideIndex < reportedPeptides.length ; reportedPeptideIndex++ ) {
 
 			var reportedPeptide = reportedPeptides[ reportedPeptideIndex ];
 
-			//  wrap data in an object to allow adding more fields
+			// wrap data in an object to allow adding more fields
 			var context = { 
 					data : reportedPeptide, 
 					initial_scan_id : ajaxRequestData.scan_id,
@@ -320,6 +331,15 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 					psm_q_value_cutoff : ajaxRequestData.psm_q_value_cutoff, 
 					qvalueSetAnyRows : qvalueSetAnyRows 
 			};
+			
+
+			if ( initial_reported_peptide_id !== undefined
+					&& initial_reported_peptide_id !== null 
+					&& reportedPeptide.reportedPeptide_Id === initial_reported_peptide_id ) {
+				
+				context.scanIdMatchesInitialScanId = true;
+			}
+			
 
 			var html = _handlebarsTemplate_peptides_related_to_psm_row_entry_template(context);
 
@@ -327,19 +347,20 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 				$(html).appendTo($peptides_related_to_psm_table_jq);
 
 
-			//  Get the number of columns of the inserted row so can set the "colspan=" in the next row
-			//       that holds the child data
+			// Get the number of columns of the inserted row so can set the
+			// "colspan=" in the next row
+			// that holds the child data
 
 			var $reported_peptide_entry__columns = $reported_peptide_entry.find("td");
 
 			var reported_peptide_entry__numColumns = $reported_peptide_entry__columns.length;
 
-			//  colSpan is used as the value for "colspan=" in the <td>
+			// colSpan is used as the value for "colspan=" in the <td>
 			var childRowHTML_Context = { colSpan : reported_peptide_entry__numColumns };
 
 			var childRowHTML = _handlebarsTemplate_peptides_related_to_psm_child_row_template( childRowHTML_Context );
 
-			//  Add next row for child data
+			// Add next row for child data
 			$( childRowHTML ).appendTo($peptides_related_to_psm_table_jq);
 		}
 		
@@ -348,23 +369,24 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 	};
 	
 
-	//////////////////////
+	// ////////////////////
 
 	this.overlayWidthResizer = function( params ) {
 		
-		var $clickedElement = params.$clickedElement;
+// var $clickedElement = params.$clickedElement;
 
 		var view_data_related_to_psm_data_overlay_div__Width = 0;
 
-//		var $top_data_table_jq = $clickedElement.closest(".top_data_table_jq");
+// var $top_data_table_jq = $clickedElement.closest(".top_data_table_jq");
 //		
-//		if ( $top_data_table_jq.length > 0 ) {
+// if ( $top_data_table_jq.length > 0 ) {
 //		
-//			var top_data_table__Width = $top_data_table_jq.outerWidth( true /* [ includeMargin ] */ );
+// var top_data_table__Width = $top_data_table_jq.outerWidth( true /* [
+// includeMargin ] */ );
 //
-//			view_data_related_to_psm_data_overlay_div__Width = top_data_table__Width;
+// view_data_related_to_psm_data_overlay_div__Width = top_data_table__Width;
 //
-//		} 
+// }
 
 		var $peptides_related_to_psm_table = $("#peptides_related_to_psm_table");
 
@@ -376,7 +398,8 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 		}
 		
 		
-//		Adjust width of link info overlay to be 40 pixels wider than the link info table
+// Adjust width of link info overlay to be 40 pixels wider than the link info
+// table
 
 		var view_data_related_to_psm_data_overlay_div__Width = view_data_related_to_psm_data_overlay_div__Width + 40;
 
@@ -388,12 +411,12 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 
 
 
-//Static Singleton Instance of Class
+// Static Singleton Instance of Class
 
 var viewPeptidesRelatedToPSMsByScanId = new ViewPeptidesRelatedToPSMsByScanId();
 
 
-///////////////////////////////////////////////
+// /////////////////////////////////////////////
 
 $(document).ready(function()  { 
 
