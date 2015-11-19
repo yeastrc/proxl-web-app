@@ -1460,7 +1460,7 @@
 							
 								<tr searchId="<bean:write name="search" property="id" />" class=" search_root_jq ">
 		
-									<td style="width:10px;" valign="top">
+									<td style="width:10px;" valign="top" class="search-checkbox-cell">
 										<input id="search-checkbox-<bean:write name="search" property="id" />" onChange="javascript:checkSearchCheckboxes(<bean:write name="search" property="id" />)" class="search-checkbox" type="checkbox" name="searchIds" value="<bean:write name="search" property="id" />"/>
 									</td>
 									<td>
@@ -1504,7 +1504,7 @@
 										
 									  </div>
 		
-									  <div  >
+									  <div>
 		
 										<a class="tool_tip_attached_jq expand-link" data-tooltip="Show or hide more details" id="search-details-link-<bean:write name="search" property="id" />" style="font-size:80%;color:#4900d4;text-decoration:none;" href="javascript:showSearchDetails(<bean:write name="search" property="id" />)"
 											><img src="${ contextPath }/images/icon-expand-small.png" <%-- This image src is changed in the Javascript --%>
@@ -1522,7 +1522,7 @@
 										<span style="display:none;" id="search-name-edit-<bean:write name="search" property="id" />"><input id="search-name-value-<bean:write name="search" property="id" />" type="text" style="width:200px;" value="<bean:write name="search" property="name" />"><input class="submit-button" type="button" value="Save" onClick="saveName(<bean:write name="search" property="id" />)"><input class="submit-button" type="button" value="Cancel" onClick="cancelNameEdit(<bean:write name="search" property="id" />)"></span>
 										
 									  </div>
-									  <div style="clear: right;" >
+									  <div style="clear: right;"  class="search-details-container-div">
 																	
 										<table class="search-details" id="search-details-<bean:write name="search" property="id" />" style="display:none;margin-left:15px;">
 

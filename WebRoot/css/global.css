@@ -684,8 +684,9 @@ body.project-page .qc-plot-overlay-body {  padding: 20px; }
 
 body.project-page .qc-plot-overlay-link { margin-right: 20px;  }
 
-
-
+body.project-page tr.search_root_jq:hover { background-color:#fff0f0; }
+body.project-page td.search-checkbox-cell { background-color:#ffffff; }
+body.project-page div.search-details-container-div { background-color:#ffffff; }
 
 
 	/* ----------------------  */
