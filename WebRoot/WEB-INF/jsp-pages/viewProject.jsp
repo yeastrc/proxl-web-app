@@ -2018,13 +2018,8 @@
 							  </label> 
 							  <label >
 								<input type="checkbox" class="scan_retention_time_qc_plot_scans_include_jq scan_retention_time_qc_plot_on_change_jq"
-									value="<%=QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_MONOLINK_PSM%>" >
-								monolinks
-							  </label>
-							  <label >
-								<input type="checkbox" class="scan_retention_time_qc_plot_scans_include_jq scan_retention_time_qc_plot_on_change_jq"
-									value="<%=QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_NO_LINK_PSM%>" >
-								no&nbsp;links
+									value="<%=QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_UNLINKED_PSM%>" >
+								unlinked
 							  </label>
 
 							</td>

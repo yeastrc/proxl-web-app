@@ -26,35 +26,17 @@ public class RetentionTimesFromScanTblSearcher {
 	public static RetentionTimesFromScanTblSearcher getInstance() { return _INSTANCE; }
 	
 	
-	
+	private static final String SQL_SELECT__MAIN =
+			"SELECT retention_time FROM scan INNER JOIN ( ";
 
 	
-	private static final String SQL_SCAN_IDS_FOR_ALL_WEB_LINK_TYPES =
+	private static final String SQL_SUB_SELECT__SCAN_IDS_MAIN =
 			" SELECT psm.scan_id FROM psm  " 
 					+ " WHERE psm.search_id = ? AND psm.q_value <= ? ";
 
+	private static final String SQL_SUB_SELECT__SCAN_IDS__START_WHERE_PSM_TYPE_IN = " AND psm.type IN ( "; 
 
-	//  The UNION DISTINCT removes duplicate scan_id values so the sub queries don't have to
-
-	
-	private static final String SQL_CROSSLINK_PART =
-			" SELECT psm.scan_id FROM psm  " 
-					+ " WHERE psm.search_id = ? AND psm.q_value <= ? AND psm.type = '" + XLinkUtils.CROSS_TYPE_STRING + "' ";
-
-	
-	private static final String SQL_LOOPLINK_PART =
-			" SELECT psm.scan_id FROM psm  " 
-					+ " WHERE psm.search_id = ? AND psm.q_value <= ? AND psm.type = '" + XLinkUtils.LOOP_TYPE_STRING + "' ";
-	
-	private static final String SQL_MONOLINK_PART =
-			" SELECT psm.scan_id FROM psm INNER JOIN monolink ON psm.id = monolink.psm_id " 
-					+ " WHERE psm.search_id = ? AND psm.q_value <= ? ";
-	
-	private static final String SQL_NO_LINK_PART =
-			" SELECT psm.scan_id FROM psm LEFT OUTER JOIN monolink ON psm.id = monolink.psm_id " 
-					+ " WHERE psm.search_id = ? AND psm.q_value <= ? "
-					+ " AND ( psm.type = '" + XLinkUtils.UNLINKED_TYPE_STRING + "' OR  psm.type = '" + XLinkUtils.DIMER_TYPE_STRING + "' ) "
-					+ "   AND  monolink.psm_id IS NULL";
+	private static final String SQL_SUB_SELECT__SCAN_IDS__END_WHERE_PSM_TYPE_IN = " ) "; 
 	
 
 
@@ -77,8 +59,7 @@ public class RetentionTimesFromScanTblSearcher {
 		
 		boolean webLinkTypeCrosslink = false;
 		boolean webLinkTypeLooplink = false;
-		boolean webLinkTypeMonolink = false;
-		boolean webLinkTypeNolink = false;
+		boolean webLinkTypeUnlinked = false;
 		
 
 		for ( String selectedLinkType : scansForSelectedLinkTypes ) {
@@ -91,13 +72,9 @@ public class RetentionTimesFromScanTblSearcher {
 
 				webLinkTypeLooplink = true;
 				
-			} else if ( QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_MONOLINK_PSM.equals( selectedLinkType ) ) {
+			} else if ( QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_UNLINKED_PSM.equals( selectedLinkType ) ) {
 				
-				webLinkTypeMonolink = true;
-				
-			} else if ( QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_NO_LINK_PSM.equals( selectedLinkType ) ) {
-
-				webLinkTypeNolink = true;
+				webLinkTypeUnlinked = true;
 				
 			} else {
 				
@@ -112,18 +89,19 @@ public class RetentionTimesFromScanTblSearcher {
 
 		StringBuilder sqlSB = new StringBuilder( 10000 );
 
-		sqlSB.append( "SELECT retention_time FROM scan INNER JOIN ( " );
+		sqlSB.append( SQL_SELECT__MAIN );
 
+		sqlSB.append( SQL_SUB_SELECT__SCAN_IDS_MAIN );
 
 		if ( webLinkTypeCrosslink
 				&& webLinkTypeLooplink
-				&& webLinkTypeMonolink 
-				&& webLinkTypeNolink ) {
+				&& webLinkTypeUnlinked ) {
 
-			sqlSB.append( SQL_SCAN_IDS_FOR_ALL_WEB_LINK_TYPES );
 
 		} else {
 
+			sqlSB.append( SQL_SUB_SELECT__SCAN_IDS__START_WHERE_PSM_TYPE_IN );   //   ...  IN (
+			
 
 			boolean firstScanForType = true;
 
@@ -135,30 +113,33 @@ public class RetentionTimesFromScanTblSearcher {
 
 				} else {
 
-					//  "UNION DISTINCT" is a union that removes duplicate rows where all the fields are evaluated as part of the duplicate match
-
-					//   This "DISTINCT" will also remove duplicates from within the query result being UNION together
-
-					sqlSB.append( " UNION DISTINCT " );  // DISTINCT is the default for UNION in MySQL.  
+					sqlSB.append( " , " );    
 				}
 
 				if ( QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_CROSSLINK_PSM.equals( scansForSelectedLinkType ) ) {
 
-					sqlSB.append( SQL_CROSSLINK_PART );
+					sqlSB.append(  "'" ); 
+					sqlSB.append( XLinkUtils.CROSS_TYPE_STRING );
+					sqlSB.append ( "'" );
 
 				} else if ( QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_LOOPLINK_PSM.equals( scansForSelectedLinkType ) ) {
 
-					sqlSB.append( SQL_LOOPLINK_PART );
-
-				} else if ( QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_MONOLINK_PSM.equals( scansForSelectedLinkType ) ) {
-
-
-					sqlSB.append( SQL_MONOLINK_PART );
-
-				} else if ( QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_NO_LINK_PSM.equals( scansForSelectedLinkType ) ) {
+					sqlSB.append(  "'" ); 
+					sqlSB.append( XLinkUtils.LOOP_TYPE_STRING );
+					sqlSB.append ( "'" );
 
 
-					sqlSB.append( SQL_NO_LINK_PART );
+				} else if ( QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_UNLINKED_PSM.equals( scansForSelectedLinkType ) ) {
+
+					sqlSB.append(  "'" ); 
+					sqlSB.append( XLinkUtils.UNLINKED_TYPE_STRING );
+					sqlSB.append ( "'" );
+
+					sqlSB.append ( ", " );
+					
+					sqlSB.append(  "'" ); 
+					sqlSB.append( XLinkUtils.DIMER_TYPE_STRING );
+					sqlSB.append ( "'" );
 
 				} else {
 
@@ -170,6 +151,10 @@ public class RetentionTimesFromScanTblSearcher {
 				}
 
 			}
+			
+			
+			sqlSB.append( SQL_SUB_SELECT__SCAN_IDS__END_WHERE_PSM_TYPE_IN );   //  )
+
 		}
 
 		sqlSB.append( " ) AS scan_ids ON scan_ids.scan_id = scan.id   " );
@@ -202,53 +187,11 @@ public class RetentionTimesFromScanTblSearcher {
 			
 			int paramCounter = 0;
 			
+			paramCounter++;
+			pstmt.setInt( paramCounter, searchId );
+			paramCounter++;
+			pstmt.setDouble( paramCounter, psmQValueCutoff );
 
-			if ( webLinkTypeCrosslink
-					&& webLinkTypeLooplink
-					&& webLinkTypeMonolink 
-					&& webLinkTypeNolink ) {
-
-				paramCounter++;
-				pstmt.setInt( paramCounter, searchId );
-				paramCounter++;
-				pstmt.setDouble( paramCounter, psmQValueCutoff );
-				
-			} else {
-
-				for ( String scansForSelectedLinkType : scansForSelectedLinkTypes ) {
-
-					if ( QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_CROSSLINK_PSM.equals( scansForSelectedLinkType ) ) {
-
-						paramCounter++;
-						pstmt.setInt( paramCounter, searchId );
-						paramCounter++;
-						pstmt.setDouble( paramCounter, psmQValueCutoff );
-
-					} else if ( QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_LOOPLINK_PSM.equals( scansForSelectedLinkType ) ) {
-
-						paramCounter++;
-						pstmt.setInt( paramCounter, searchId );
-						paramCounter++;
-						pstmt.setDouble( paramCounter, psmQValueCutoff );
-
-					} else if ( QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_MONOLINK_PSM.equals( scansForSelectedLinkType ) ) {
-
-
-						paramCounter++;
-						pstmt.setInt( paramCounter, searchId );
-						paramCounter++;
-						pstmt.setDouble( paramCounter, psmQValueCutoff );
-
-					} else if ( QCPlotConstants.RETENTION_TIME_PLOT_TYPE_SCANS_CONFIDENT_NO_LINK_PSM.equals( scansForSelectedLinkType ) ) {
-
-
-						paramCounter++;
-						pstmt.setInt( paramCounter, searchId );
-						paramCounter++;
-						pstmt.setDouble( paramCounter, psmQValueCutoff );
-					}
-				}
-			}
 			
 			paramCounter++;
 			pstmt.setInt( paramCounter, scanFileId );

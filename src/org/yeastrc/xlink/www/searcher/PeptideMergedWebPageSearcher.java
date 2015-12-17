@@ -116,18 +116,10 @@ public class PeptideMergedWebPageSearcher {
 	
 	
 
-	private static final String SQL_LINK_TYPE_START = "  unified_rep_pep__reported_peptide__search_lookup.link_type = '";
-	private static final String SQL_LINK_TYPE_END = "' ";
+	private static final String SQL_LINK_TYPE_START = "  unified_rep_pep__reported_peptide__search_lookup.link_type IN ( ";
+	private static final String SQL_LINK_TYPE_END = " ) ";
 
 
-	private static final String SQL_MONOLINK_INCLUDE = "  unified_rep_pep__reported_peptide__search_lookup.has_monolinks = " + Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE;
-
-	private static final String SQL_NO_LINKS_INCLUDE = 
-			" ( unified_rep_pep__reported_peptide__search_lookup.has_monolinks = " + Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE
-			+ " AND ( unified_rep_pep__reported_peptide__search_lookup.link_type = '" + XLinkUtils.UNLINKED_TYPE_STRING + "' " 
-			+             " OR  unified_rep_pep__reported_peptide__search_lookup.link_type = '" + XLinkUtils.DIMER_TYPE_STRING + "' "
-			+     " ) "
-			+ " ) ";
 
 	
 	
@@ -151,8 +143,8 @@ public class PeptideMergedWebPageSearcher {
 	private static final String SQL_DYNAMIC_MOD_JOIN_START_LINK_TYPES = // After Dynamic Mod Masses 
 						" AND  ( ";
 	
-	private static final String SQL_DYNAMIC_MOD_LINK_TYPE_START = "  search__reported_peptide__dynamic_mod_lookup.link_type = '";
-	private static final String SQL_DYNAMIC_MOD_LINK_TYPE_END = "' ";
+	private static final String SQL_DYNAMIC_MOD_LINK_TYPE_START = "  search__reported_peptide__dynamic_mod_lookup.link_type IN ( ";
+	private static final String SQL_DYNAMIC_MOD_LINK_TYPE_END = " ) ";
 
 
 	private static final String SQL_DYNAMIC_MOD_JOIN_AFTER_LINK_TYPES = // After Link Types
@@ -229,8 +221,7 @@ public class PeptideMergedWebPageSearcher {
 		
 		boolean crosslinkTypeRequested = false;
 		boolean looplinkTypeRequested = false;
-		boolean monolinkTypeRequested = false;
-		boolean nolinksRequested = false;
+		boolean unlinkedTypeRequested = false;
 		
 		
 		if ( linkTypes != null && ( ! linkTypes.isEmpty() ) ) {
@@ -245,13 +236,9 @@ public class PeptideMergedWebPageSearcher {
 
 					looplinkTypeRequested = true;
 
-				} else if ( PeptideViewLinkTypesConstants.MONOLINK_PSM.equals( linkType ) ) {
+				} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkType ) ) {
 
-					monolinkTypeRequested = true;
-
-				} else if ( PeptideViewLinkTypesConstants.NO_LINK_PSM.equals( linkType ) ) {
-
-					nolinksRequested = true;
+					unlinkedTypeRequested = true;
 
 				} else {
 
@@ -266,17 +253,15 @@ public class PeptideMergedWebPageSearcher {
 		
 		
 		
-		
-		
-		
 		//////////////////////
 		
 		/////   Start building the SQL
 		
 		
+		
+
 		sqlSB.append( SQL_FIRST_PART );
-		
-		
+
 		//  If Yes modifications, join to get records for those modifications
 		
 		if ( modMassSelectionsIncludesYesModifications && modMassSelectionsWithoutNoMods != null ) {
@@ -310,41 +295,69 @@ public class PeptideMergedWebPageSearcher {
 
 			//  Process link types for Dynamic Mod subselect
 
-			if ( ! monolinkTypeRequested && ! nolinksRequested ) {
-			
-				//  Only can use this performance improvement approach 
-				//  if ! monolinkTypeRequested  and ! nolinksRequested 
+			if ( linkTypes != null && ( ! linkTypes.isEmpty() ) ) {
 
-				if ( crosslinkTypeRequested || looplinkTypeRequested ) {
+				sqlSB.append( SQL_DYNAMIC_MOD_JOIN_START_LINK_TYPES );
+				
+				sqlSB.append( SQL_DYNAMIC_MOD_LINK_TYPE_START );   //   ...  IN  (
+				
 
-					sqlSB.append( SQL_DYNAMIC_MOD_JOIN_START_LINK_TYPES );
 
-					if ( crosslinkTypeRequested ) {
+				boolean firstLinkType = true;
+				
+				for ( String linkType : linkTypes ) {
+					
+					if ( firstLinkType ) {
+						
+						firstLinkType = false;
+					} else {
+						
+						sqlSB.append( ", " );
+					}
 
-						sqlSB.append( SQL_DYNAMIC_MOD_LINK_TYPE_START );
+					if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkType ) ) {
+						
+						sqlSB.append( "'" );
 						sqlSB.append( XLinkUtils.CROSS_TYPE_STRING );
-						sqlSB.append( SQL_DYNAMIC_MOD_LINK_TYPE_END );
-					}
+						sqlSB.append( "'" );
 
-					if ( looplinkTypeRequested ) {
+					} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkType ) ) {
 
-						if ( crosslinkTypeRequested ) {
-
-							sqlSB.append( " OR " );
-						}
-
-						sqlSB.append( SQL_DYNAMIC_MOD_LINK_TYPE_START );
+						sqlSB.append( "'" );
 						sqlSB.append( XLinkUtils.LOOP_TYPE_STRING );
-						sqlSB.append( SQL_DYNAMIC_MOD_LINK_TYPE_END );
+						sqlSB.append( "'" );
+
+					} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkType ) ) {
+
+						sqlSB.append( "'" );
+						sqlSB.append( XLinkUtils.UNLINKED_TYPE_STRING );
+						sqlSB.append( "'" );
+
+						sqlSB.append( ", " );
+
+						sqlSB.append( "'" );
+						sqlSB.append( XLinkUtils.DIMER_TYPE_STRING );
+						sqlSB.append( "'" );
+
+					} else {
+
+						String msg = "linkType is invalid, linkType: " + linkType;
+
+						log.error( linkType );
+
+						throw new Exception( msg );
 					}
+				}
 
-					sqlSB.append( SQL_DYNAMIC_MOD_JOIN_AFTER_LINK_TYPES );
-				}		
+				sqlSB.append( SQL_DYNAMIC_MOD_LINK_TYPE_END );
+			
+				sqlSB.append( SQL_DYNAMIC_MOD_JOIN_AFTER_LINK_TYPES );
+						
 			}
-
+			
 			sqlSB.append( SQL_DYNAMIC_MOD_JOIN_END );
 		}
-
+		
 		
 		sqlSB.append( SQL_MAIN_WHERE_START );
 
@@ -353,6 +366,9 @@ public class PeptideMergedWebPageSearcher {
 		if ( linkTypes != null && ( ! linkTypes.isEmpty() ) ) {
 
 			sqlSB.append( " AND ( " );
+			
+			sqlSB.append( SQL_LINK_TYPE_START );  //  ...  IN (
+			
 
 			boolean firstLinkType = true;
 			
@@ -363,28 +379,32 @@ public class PeptideMergedWebPageSearcher {
 					firstLinkType = false;
 				} else {
 					
-					sqlSB.append( " OR " );
+					sqlSB.append( ", " );
 				}
 
 				if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkType ) ) {
 					
-					sqlSB.append( SQL_LINK_TYPE_START );
+					sqlSB.append( "'" );
 					sqlSB.append( XLinkUtils.CROSS_TYPE_STRING );
-					sqlSB.append( SQL_LINK_TYPE_END );
+					sqlSB.append( "'" );
 
 				} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkType ) ) {
 
-					sqlSB.append( SQL_LINK_TYPE_START );
+					sqlSB.append( "'" );
 					sqlSB.append( XLinkUtils.LOOP_TYPE_STRING );
-					sqlSB.append( SQL_LINK_TYPE_END );
+					sqlSB.append( "'" );
 
-				} else if ( PeptideViewLinkTypesConstants.MONOLINK_PSM.equals( linkType ) ) {
+				} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkType ) ) {
 
-					sqlSB.append( SQL_MONOLINK_INCLUDE );
+					sqlSB.append( "'" );
+					sqlSB.append( XLinkUtils.UNLINKED_TYPE_STRING );
+					sqlSB.append( "'" );
 
-				} else if ( PeptideViewLinkTypesConstants.NO_LINK_PSM.equals( linkType ) ) {
+					sqlSB.append( ", " );
 
-					sqlSB.append( SQL_NO_LINKS_INCLUDE );
+					sqlSB.append( "'" );
+					sqlSB.append( XLinkUtils.DIMER_TYPE_STRING );
+					sqlSB.append( "'" );
 
 				} else {
 
@@ -395,6 +415,8 @@ public class PeptideMergedWebPageSearcher {
 					throw new Exception( msg );
 				}
 			}
+			
+			sqlSB.append( SQL_LINK_TYPE_END );  //   )
 
 			sqlSB.append( " ) " );
 		}		

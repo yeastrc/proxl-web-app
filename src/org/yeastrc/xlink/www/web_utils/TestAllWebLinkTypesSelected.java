@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.web_utils;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -28,10 +29,17 @@ public class TestAllWebLinkTypesSelected {
 		
 		boolean webLinkTypeSelected_CROSSLINK = false;
 		boolean webLinkTypeSelected_LOOPLINK = false;
-		boolean webLinkTypeSelected_MONOLINK = false;
-		boolean webLinkTypeSelected_NO_LINK = false;
+		boolean webLinkTypeSelected_UNLINKED = false;
+		
+//		boolean webLinkTypeSelected_PREVIOUS_VALUE_MONOLINK_PSM = false;
+//		boolean webLinkTypeSelected_PREVIOUS_VALUE_NO_LINK_PSM = false;
 
-		for ( String linkType : linkTypes ) {
+		
+		Iterator<String> linkTypeIter = linkTypes.iterator();
+		
+		while ( linkTypeIter.hasNext() ) {
+
+			String linkType = linkTypeIter.next();
 			
 
 			if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkType ) ) {
@@ -40,16 +48,29 @@ public class TestAllWebLinkTypesSelected {
 
 			} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkType ) ) {
 
-				webLinkTypeSelected_CROSSLINK = true;
+				webLinkTypeSelected_LOOPLINK = true;
 
-			} else if ( PeptideViewLinkTypesConstants.MONOLINK_PSM.equals( linkType ) ) {
+			} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkType ) ) {
 
-				webLinkTypeSelected_CROSSLINK = true;
+				webLinkTypeSelected_UNLINKED = true;
 
-			} else if ( PeptideViewLinkTypesConstants.NO_LINK_PSM.equals( linkType ) ) {
 
-				webLinkTypeSelected_CROSSLINK = true;
+			//  Process OLD values:
 
+			} else if ( PeptideViewLinkTypesConstants.PREVIOUS_VALUE_MONOLINK_PSM.equals( linkType ) ) {
+
+//				webLinkTypeSelected_PREVIOUS_VALUE_MONOLINK_PSM = true;
+				
+				linkTypeIter.remove();  //  Remove since value is no longer valid
+
+			} else if ( PeptideViewLinkTypesConstants.PREVIOUS_VALUE_NO_LINK_PSM.equals( linkType ) ) {
+
+//				webLinkTypeSelected_PREVIOUS_VALUE_NO_LINK_PSM = true;
+
+				linkTypeIter.remove();  //  Remove since value is no longer valid
+				
+				
+				
 			} else {
 
 				String msg = "linkType is invalid, linkType: " + linkType;
@@ -59,12 +80,29 @@ public class TestAllWebLinkTypesSelected {
 				throw new Exception( msg );
 			}
 		}
+		
+		//  Removed this since would have to get these values back into the form object so that the 
+		//   web page would properly reflect the values processed.
+		
+//		if ( webLinkTypeSelected_CROSSLINK 
+//				&& webLinkTypeSelected_LOOPLINK
+//				&& webLinkTypeSelected_PREVIOUS_VALUE_MONOLINK_PSM 
+//				&& webLinkTypeSelected_PREVIOUS_VALUE_NO_LINK_PSM ) {
+//			
+//			//  Previously selected all values, so set equivalent current selections
+//			
+//			webLinkTypeSelected_UNLINKED = true;
+//			
+//			linkTypes.add( PeptideViewLinkTypesConstants.UNLINKED_PSM );
+//		}
+		
+		
+		
 
 		
 		if ( webLinkTypeSelected_CROSSLINK 
 				&& webLinkTypeSelected_LOOPLINK 
-				&& webLinkTypeSelected_MONOLINK 
-				&& webLinkTypeSelected_NO_LINK ) {
+				&& webLinkTypeSelected_UNLINKED ) {
 			
 			allWebLinkTypesSelected = true;
 		}

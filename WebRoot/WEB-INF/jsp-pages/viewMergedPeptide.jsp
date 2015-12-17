@@ -292,12 +292,8 @@
 						looplinks
 					  </label> 
 					  <label >
-						<html:multibox property="linkType" value="<%= PeptideViewLinkTypesConstants.MONOLINK_PSM %>" ></html:multibox>
-						monolinks
-					  </label>
-					  <label >
-						<html:multibox property="linkType" value="<%= PeptideViewLinkTypesConstants.NO_LINK_PSM %>" ></html:multibox>
-						no&nbsp;links
+						<html:multibox property="linkType" value="<%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>" ></html:multibox>
+						 unlinked
 					  </label>
 		
 

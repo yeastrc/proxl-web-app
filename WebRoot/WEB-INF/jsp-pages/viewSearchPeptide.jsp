@@ -184,8 +184,7 @@
 			
 			var crosslinksTypeFilter = $("#crosslinksTypeFilter").is( ':checked' );
 			var looplinksTypeFilter = $("#looplinksTypeFilter").is( ':checked' );
-			var monolinksTypeFilter = $("#monolinksTypeFilter").is( ':checked' );
-			var noLinksTypeFilter = $("#noLinksTypeFilter").is( ':checked' );
+			var unlinkedTypeFilter = $("#unlinkedTypeFilter").is( ':checked' );
 			
 
 			var modMassFilter = [];
@@ -212,8 +211,7 @@
 					
 					crosslinksTypeFilter : crosslinksTypeFilter,
 					looplinksTypeFilter : looplinksTypeFilter,
-					monolinksTypeFilter : monolinksTypeFilter,
-					noLinksTypeFilter : noLinksTypeFilter,
+					unlinkedTypeFilter : unlinkedTypeFilter,
 					modMassFilter: modMassFilter
 			};
 			return formValues;
@@ -317,14 +315,9 @@
 						looplinks
 					  </label> 
 					  <label >
-						<html:multibox property="linkType" value="<%= PeptideViewLinkTypesConstants.MONOLINK_PSM %>"  styleId="monolinksTypeFilter" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" ></html:multibox>
-						monolinks
+						<html:multibox property="linkType" value="<%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>"  styleId="unlinkedTypeFilter" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" ></html:multibox>
+						 unlinked
 					  </label>
-					  <label >
-						<html:multibox property="linkType" value="<%= PeptideViewLinkTypesConstants.NO_LINK_PSM %>"  styleId="noLinksTypeFilter" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" ></html:multibox>
-						no&nbsp;links
-					  </label>
-		
 
 					</td>
 				</tr>
