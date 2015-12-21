@@ -24,7 +24,7 @@ public class SearchPeptideMonolinkSearcher {
 	
 	
 
-//	CREATE TABLE IF NOT EXISTS proxl.monolink (
+//	CREATE TABLE monolink (
 //			  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 //			  psm_id INT(10) UNSIGNED NOT NULL,
 //			  nrseq_id INT(10) UNSIGNED NOT NULL,

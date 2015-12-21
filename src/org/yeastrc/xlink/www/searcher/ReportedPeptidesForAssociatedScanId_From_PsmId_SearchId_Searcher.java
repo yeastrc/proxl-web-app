@@ -49,7 +49,7 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 			+ " FROM "
 			
 	
-			+ 	"proxl.psm  "
+			+ 	"psm  "
 			+ 	"INNER JOIN psm AS psm_other ON psm.scan_id = psm_other.scan_id "
 			+ 	"INNER JOIN unified_rep_pep__reported_peptide__search_lookup  "
 			+ 		"ON psm_other.search_id = unified_rep_pep__reported_peptide__search_lookup.search_id " 

@@ -26,7 +26,7 @@ public class PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher {
 		
 			+ 	"SELECT psm.scan_id " 
 			
-			+ 	"FROM proxl.psm  "
+			+ 	"FROM psm  "
 			+ 	"INNER JOIN psm AS psm_other ON psm.scan_id = psm_other.scan_id "
 			+ 	"INNER JOIN search_reported_peptide  "
 			+ 		"ON psm_other.search_id = search_reported_peptide.search_id " 
