@@ -1795,18 +1795,15 @@ var getLinkerStringsAsArray = function() {
 /**
  * Sends the request out for a lookup
  */
-var queueLinkablePositionsLookup = function( chain1, protein1, chain2, protein2 ) {
-	
-	console.log( "Looking up linkable positions between " + protein1 + " and " + protein2 + "." );
-	
+var doLinkablePositionsLookup = function( proteins ) {
+		
 	incrementSpinner();				// create spinner
 	
 	var url = contextPathJSVar + "/services/linkablePositions/getLinkablePositionsBetweenProteins";
 	
 	var requestData = {
-		protein1 : protein1,
-		protein2 : protein2,
-		linkers : getLinkerStringsAsArray()
+		linkers : getLinkerStringsAsArray(),
+		proteins : proteins
 	};
 	
 	 $.ajax({
@@ -1819,7 +1816,7 @@ var queueLinkablePositionsLookup = function( chain1, protein1, chain2, protein2 
 	        dataType: "json",
 	        success: function(data)	{
 	        	decrementSpinner();
-	        	answerLinkablePositionsLookup( chain1, protein1, chain2, protein2, data );
+	        	answerLinkablePositionsLookup( data );
 	        },
 	        failure: function(errMsg) {
 				decrementSpinner();
@@ -1835,83 +1832,69 @@ var queueLinkablePositionsLookup = function( chain1, protein1, chain2, protein2 
 /**
  * Answers the request for the lookup
  */
-var answerLinkablePositionsLookup = function( chain1, protein1, chain2, protein2, data ) {
+var answerLinkablePositionsLookup = function( data ) {
 	
 	var response = "";
+	var visibleProteinsMap = getVisibleProteins();
 	
-	if( parseInt(protein2) < parseInt(protein1) ) {
-		var tmp = chain1;
-		chain1 = chain2;
-		chain2 = tmp;
-		
-		tmp = protein1;
-		protein1 = protein2;
-		protein2 = tmp;
-	}
-
 	for( var i = 0; i < data.length; i++ ) {
 		
-		var position1 = data[ i ][ 'position1' ];
-		var position2 = data[ i ][ 'position2' ];
+		var protein1 =  parseInt(data[ i ][ 'protein1' ]);
+		var protein2 =  parseInt(data[ i ][ 'protein2' ]);
 		
-		if( data[ i ][ 'protein1' ] != protein1 ) {
-			console.log( "ERROR, protein1s do not match: [" + protein1 + "][" + data[ i ][ 'protein1' ] + "]" );
-		}
-		if( data[ i ][ 'protein2' ] != protein2 ) {
-			console.log( "ERROR, protein2s do not match: [" + protein2 + "][" + data[ i ][ 'protein2' ] + "]" );
-		}
-		
-		if( chain1 == chain2 && protein1 == protein2 && position1 == position2 ) { continue; }
+		var position1 = parseInt(data[ i ][ 'position1' ]);
+		var position2 = parseInt(data[ i ][ 'position2' ]);
 		
 
-		var coordsArray1 = findCACoords( protein1, position1, chain1 );
-		var coordsArray2 = findCACoords( protein2, position2, chain2 );
+		var chains1 = visibleProteinsMap[ protein1 ];
+		var chains2 = visibleProteinsMap[ protein2 ];
 		
-		if( coordsArray1 == undefined || coordsArray1.length < 1 ) { continue; }
-		if( coordsArray2 == undefined || coordsArray2.length < 1 ) { continue; }
 
-		var distance = calculateDistance( coordsArray1[ 0 ], coordsArray2[ 0 ] );
+		if( !chains1 || chains1 == undefined || chains1.length < 1 ) {
+			console.log( "ERROR: Got no chains for protein: " + protein1 );
+			return;
+		}
 		
-		response += chain1 + "\t" + _proteinNames[ data[ i ][ 'protein1' ] ] + "\t" + position1 + "\t";
-		response += chain2 + "\t" + _proteinNames[ data[ i ][ 'protein2' ] ] + "\t" + position2 + "\t";		
-		response += distance + "\n";
+		if( !chains2 || chains2 == undefined || chains2.length < 1 ) {
+			console.log( "ERROR: Got no chains for protein: " + protein2 );
+			return;
+		}
+		
+
+		for( var j = 0; j < chains1.length; j++ ) {
+			var chain1 = chains1[ j ];
+
+			var coordsArray1 = findCACoords( protein1, position1, [ chain1 ] );			
+			if( coordsArray1 == undefined || coordsArray1.length < 1 ) { continue; }
+			
+			for( var k = 0; k < chains2.length; k++ ) {
+				var chain2 = chains2[ k ];
+				
+				if( chain1 == chain2 && protein1 == protein2 && position1 == position2 ) { continue; }
+				
+				var coordsArray2 = findCACoords( protein2, position2, [ chain2 ] );			
+				if( coordsArray1 == undefined || coordsArray2.length < 1 ) { continue; }
+				
+				var distance = calculateDistance( coordsArray1[ 0 ], coordsArray2[ 0 ] );
+				
+				response += chain1 + "\t" + _proteinNames[ protein1 ] + "\t" + position1 + "\t";
+				response += chain2 + "\t" + _proteinNames[ protein2 ] + "\t" + position2 + "\t";		
+				response += distance + "\n";	
+				
+			}
+		}
 	}
-	
+		
 	console.log( response );
 };
 
-var downloadAllLinkablePositions = function() {
-	var downloadText = "";
+var downloadAllLinkablePositions = function() {	
+	var visibleProteinsMap = getVisibleProteins();
 	
-	var visibleChainMap = getVisibleChains();
-	if( !visibleChainMap ) { return; }
+	if( !visibleProteinsMap || visibleProteinsMap == undefined || visibleProteinsMap.length < 1 ) { return; }
 	
-	var visibleChains = Object.keys( visibleChainMap );
-	
-	for( var i = 0; i < visibleChains.length; i++ ) {
-		
-		var visibleProteinsForChain = visibleChainMap[ visibleChains[ i ] ];
-		if( !visibleProteinsForChain || visibleProteinsForChain.length < 1 ) { continue; }
-		var protein1 = visibleProteinsForChain[ 0 ];
-		
-		// queue up this ajax call in the call handler
-		queueLinkablePositionsLookup( visibleChains[i], protein1, visibleChains[i], protein1 );
-		
-		for( var j = 0; j < visibleChains.length; j++ ) {
-
-			if( j <= i ) { continue; }
-			
-			var visibleProteinsForChain2 = visibleChainMap[ visibleChains[ j ] ];
-			if( !visibleProteinsForChain2 || visibleProteinsForChain2.length < 1 ) { continue; }
-			var protein2 = visibleProteinsForChain2[ 0 ];
-			
-			// queue up this ajax call in the call handler
-			queueLinkablePositionsLookup( visibleChains[i], protein1, visibleChains[j], protein2 );
-			
-		}
-		
-	}
-
+	var visibleProteins = Object.keys( visibleProteinsMap );
+	doLinkablePositionsLookup( visibleProteins );
 };
 
 /**
