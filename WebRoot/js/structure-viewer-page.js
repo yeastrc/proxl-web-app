@@ -1795,7 +1795,7 @@ var getLinkerStringsAsArray = function() {
 /**
  * Sends the request out for a lookup
  */
-var doLinkablePositionsLookup = function( proteins ) {
+var doLinkablePositionsLookup = function( proteins, onlyShortest ) {
 		
 	incrementSpinner();				// create spinner
 	
@@ -1816,7 +1816,7 @@ var doLinkablePositionsLookup = function( proteins ) {
 	        dataType: "json",
 	        success: function(data)	{
 	        	decrementSpinner();
-	        	answerLinkablePositionsLookup( data );
+	        	answerLinkablePositionsLookup( data, onlyShortest );
 	        },
 	        failure: function(errMsg) {
 				decrementSpinner();
@@ -1832,7 +1832,7 @@ var doLinkablePositionsLookup = function( proteins ) {
 /**
  * Answers the request for the lookup
  */
-var answerLinkablePositionsLookup = function( data ) {
+var answerLinkablePositionsLookup = function( data, onlyShortest ) {
 	
 	var response = "";
 	var visibleProteinsMap = getVisibleProteins();
@@ -1885,16 +1885,34 @@ var answerLinkablePositionsLookup = function( data ) {
 		}
 	}
 		
-	console.log( response );
+	downloadStringAsFile( "all-by-all-linkable-positions.txt", "text/plain", response );
 };
 
-var downloadAllLinkablePositions = function() {	
+/**
+ * Given the protein/position pair, find and return the shortest pair of coordinates
+ * (based on calculated distance between the pair) on the currently-visible chain/protein
+ * alignments. Will not return a zero-distance pair for the same position in the same
+ * protein in the same chain.
+ * 
+ * Returns data structure:
+ * 			{ 
+ * 			  chain name : coordinates,
+ * 			  chain name : coordinates
+ * 			}
+ * 
+ */
+var findShortestLinkOnStructure = function( protein1, position1, protein2, position2 ) {
+	
+}
+
+
+var downloadAllLinkablePositions = function( onlyShortest) {	
 	var visibleProteinsMap = getVisibleProteins();
 	
 	if( !visibleProteinsMap || visibleProteinsMap == undefined || visibleProteinsMap.length < 1 ) { return; }
 	
 	var visibleProteins = Object.keys( visibleProteinsMap );
-	doLinkablePositionsLookup( visibleProteins );
+	doLinkablePositionsLookup( visibleProteins, onlyShortest );
 };
 
 /**
@@ -1995,7 +2013,7 @@ var redrawDistanceReport = function( ) {
 	
 	
 	var html = "<div style=\"margin-top:10px;\">";
-	
+		
 	html += "<div style=\"font-size:14pt;\">Total UDRs: " + UDRDataObject.totalUnique + " (" + UDRDataObject.totalUniqueMappable + " mappable)</div>";
 	html += "<div style=\"font-size:12pt;margin-left:20px;\">Crosslink UDRs: " + UDRDataObject.crosslinkTotal + " (" + UDRDataObject.crosslinkTotalMappable + " mappable)</div>";
 	html += "<div style=\"font-size:12pt;margin-left:20px;\">Looplink UDRs: " + UDRDataObject.looplinkTotal + " (" + UDRDataObject.looplinkTotalMappable + " mappable)</div>";
@@ -2018,6 +2036,9 @@ var redrawDistanceReport = function( ) {
 	html += "<div id=\"shown-looplinks-text\"></div>\n";
 	html += "</div>";
 	
+	html += "<div style=\"font-size:14pt;margin-top:15px;\">Download reports:</div>";
+	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadAllLinkablePositions(0)\">All possible UDRs (all possible points on structure)</a></div>";
+	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadAllLinkablePositions(1)\">All possible UDRs (shortest-only)</a></div>";
 	
 	$distanceReportDiv.html( html );
 	
