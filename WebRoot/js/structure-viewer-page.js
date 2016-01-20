@@ -1848,7 +1848,7 @@ var answerLinkablePositionsLookup = function( data, onlyShortest ) {
 
 		var chains1 = visibleProteinsMap[ protein1 ];
 		var chains2 = visibleProteinsMap[ protein2 ];
-		
+		 
 
 		if( !chains1 || chains1 == undefined || chains1.length < 1 ) {
 			console.log( "ERROR: Got no chains for protein: " + protein1 );
