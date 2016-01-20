@@ -219,6 +219,13 @@
 			<forward name="NoSearchIds" path="/WEB-INF/jsp-pages/special_redirect_pages/redirect_searchIdsFromHashToQueryString.jsp" redirect="false" />
 		</action>
   
+    	<action path="/downloadMergedPSMsForPeptides"
+				type="org.yeastrc.xlink.www.actions.DownloadPSMsForMergedPeptidesAction"
+				scope="request"
+				name="mergedSearchViewCrosslinkPeptideForm"
+				validate="false">
+		</action>
+  
     	<action path="/downloadMergedPeptides"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedSearchPeptidesAction"
 				scope="request"
