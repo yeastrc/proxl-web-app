@@ -1848,7 +1848,8 @@ var answerLinkablePositionsLookup = function( data, onlyShortest ) {
 
 		var chains1 = visibleProteinsMap[ protein1 ];
 		var chains2 = visibleProteinsMap[ protein2 ];
-		 
+		
+		var shortestLink = 0;
 
 		if( !chains1 || chains1 == undefined || chains1.length < 1 ) {
 			console.log( "ERROR: Got no chains for protein: " + protein1 );
@@ -1876,34 +1877,42 @@ var answerLinkablePositionsLookup = function( data, onlyShortest ) {
 				if( coordsArray1 == undefined || coordsArray2.length < 1 ) { continue; }
 				
 				var distance = calculateDistance( coordsArray1[ 0 ], coordsArray2[ 0 ] );
+
+				if( !onlyShortest ) {
 				
-				response += chain1 + "\t" + _proteinNames[ protein1 ] + "\t" + position1 + "\t";
-				response += chain2 + "\t" + _proteinNames[ protein2 ] + "\t" + position2 + "\t";		
-				response += distance + "\n";	
-				
+					response += chain1 + "\t" + _proteinNames[ protein1 ] + "\t" + position1 + "\t";
+					response += chain2 + "\t" + _proteinNames[ protein2 ] + "\t" + position2 + "\t";		
+					response += distance + "\n";	
+
+				} else {
+					
+					if( !shortestLink || shortestLink[ 'distance' ] > distance ) {
+
+						shortestLink = {
+											'chain1' : chain1,
+											'chain2' : chain2,
+											'protein1' : protein1,
+											'protein2' : protein2,
+											'position1' : position1,
+											'position2' : position2,
+											'distance' : distance
+									   };
+					}
+					
+				}
 			}
+		}
+		
+		if( onlyShortest && shortestLink ) {
+			
+			response += shortestLink.chain1 + "\t" + _proteinNames[ shortestLink.protein1 ] + "\t" + shortestLink.position1 + "\t";
+			response += shortestLink.chain2 + "\t" + _proteinNames[ shortestLink.protein2 ] + "\t" + shortestLink.position2 + "\t";		
+			response += shortestLink.distance + "\n";
 		}
 	}
 		
 	downloadStringAsFile( "all-by-all-linkable-positions.txt", "text/plain", response );
 };
-
-/**
- * Given the protein/position pair, find and return the shortest pair of coordinates
- * (based on calculated distance between the pair) on the currently-visible chain/protein
- * alignments. Will not return a zero-distance pair for the same position in the same
- * protein in the same chain.
- * 
- * Returns data structure:
- * 			{ 
- * 			  chain name : coordinates,
- * 			  chain name : coordinates
- * 			}
- * 
- */
-var findShortestLinkOnStructure = function( protein1, position1, protein2, position2 ) {
-	
-}
 
 
 var downloadAllLinkablePositions = function( onlyShortest) {	
