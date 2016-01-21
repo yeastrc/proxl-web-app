@@ -1915,6 +1915,57 @@ var downloadAllLinkablePositions = function( onlyShortest) {
 	doLinkablePositionsLookup( visibleProteins, onlyShortest );
 };
 
+
+var downloadShownUDRLinks = function() {
+	var response = "";
+	
+	if( _renderedLinks[ 'crosslinks' ] && _renderedLinks[ 'crosslinks' ].length > 0 ) {
+		
+		for( var i = 0; i < _renderedLinks[ 'crosslinks' ].length; i++ ) {
+			var link = _renderedLinks[ 'crosslinks' ][ i ][ 'link' ];
+
+			var chain1 = _renderedLinks[ 'crosslinks' ][ i ][ 'atom1' ].residue().chain().name();
+			var chain2 = _renderedLinks[ 'crosslinks' ][ i ][ 'atom2' ].residue().chain().name();
+
+			var protein1 = _proteinNames[ link[ 'protein1' ] ];
+			var protein2 = _proteinNames[ link[ 'protein2' ] ];
+			
+			var position1 = link[ 'position1' ];
+			var position2 = link[ 'position2' ];
+			
+			var distance = link[ 'length' ];
+			
+			response += "crosslink\t" + chain1 + "\t" + protein1 + "\t" + position1 + "\t";
+			response += chain2 + "\t" + protein2 + "\t" + position2 + "\t" + distance + "\n";
+		}
+	}
+	
+	if( _renderedLinks[ 'looplinks' ] && _renderedLinks[ 'looplinks' ].length > 0 ) {
+				
+		for( var i = 0; i < _renderedLinks[ 'looplinks' ].length; i++ ) {
+			var link = _renderedLinks[ 'looplinks' ][ i ][ 'link' ];
+
+			var chain1 = _renderedLinks[ 'looplinks' ][ i ][ 'atom1' ].residue().chain().name();
+			var chain2 = _renderedLinks[ 'looplinks' ][ i ][ 'atom2' ].residue().chain().name();
+
+			var protein1 = _proteinNames[ link[ 'protein1' ] ];
+			
+			var position1 = link[ 'position1' ];
+			var position2 = link[ 'position2' ];
+			
+			var distance = link[ 'length' ];
+			
+			response += "looplink\t" + chain1 + "\t" + protein1 + "\t" + position1 + "\t";
+			response += chain2 + "\t" + protein1 + "\t" + position2 + "\t" + distance + "\n";
+		}
+		
+	}
+	
+	if( response == "" ) { return; }
+	
+	downloadStringAsFile( "all-shown-udrs.txt", "text/plain", response );
+};
+
 /**
  * Get an array of currently-visible protein IDs
  */
@@ -2037,6 +2088,7 @@ var redrawDistanceReport = function( ) {
 	html += "</div>";
 	
 	html += "<div style=\"font-size:14pt;margin-top:15px;\">Download reports:</div>";
+	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadShownUDRLinks()\">All shown UDRs</a></div>";
 	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadAllLinkablePositions(0)\">All possible UDRs (all possible points on structure)</a></div>";
 	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadAllLinkablePositions(1)\">All possible UDRs (shortest-only)</a></div>";
 	
