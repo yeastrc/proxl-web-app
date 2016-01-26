@@ -76,7 +76,7 @@ LinkColorHandler.prototype._CONSTANTS = {
  */
 LinkColorHandler.prototype.getLinkColor = function( link, colorFormat ) {
 	if( !link ) {
-		console.log( "ERROR, got not link in getLinkColor" );
+		console.log( "ERROR, got no linker in getLinkColor" );
 		return;
 	}
 	
