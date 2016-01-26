@@ -38,7 +38,6 @@ LinkColorHandler.prototype._CONSTANTS = {
 
 		},
 		
-		
 		searchColors_3searches : {
 			1:		"#FF0000",			// red, for items belonging only to first search
 			2:		"#0000FF",			// blue, for items belonging only to second search
@@ -63,6 +62,12 @@ LinkColorHandler.prototype._CONSTANTS = {
 			unknown   : "#000000",
 		},
 		
+		lengthColors : {
+			short : "#00B428",			// greenish
+			medium : "#E3E602",			// yellowish
+			long : "#D33333"			// reddish
+		},
+		
 		defaultOpacity : 0.9,			// default opacity to use for links		
 };
 
@@ -85,10 +90,134 @@ LinkColorHandler.prototype.getLinkColor = function( link, colorFormat ) {
 		return;
 	}
 	
+	var mode = getLinkColorMode();
+	var color = '';
 	
+	if( mode === 'length' ) {
+		color =  this.getLinkColorByLength( link );
+	}
 	
+	if( mode === 'type' ) {
+		color =  this.getLinkColorByType( link );
+	}
 	
+	if( mode === 'search' ) {
+		color =  this.getLinkColorBySearches( link );
+	}
+
+	if( !color || color === '' ) {
+		console.log( 'ERROR, COULD NOT GET COLOR FOR LINK:' );
+		console.log( link );
+		console.log( colorFormat );
+	}
+	
+	if( colorFormat === 'hex' ) {
+		return color;
+	}
+	
+	if( colorFormat === 'rgb' ) {
+		return this.hexToRgb( color );
+	}
+	
+	if( colorFormat === 'pvrgba' ) {
+		return this.hexToRgbaDecimalArray( color, this.getOpacity( link ) );
+	}
+	
+	console.log( "ERROR, GOT INVALID COLOR FORMAT:" );
+	console.log( colorFormat );
+	
+	return;
 };
+
+/**
+ * Get the color to use for the given link, based on length
+ * @param link
+ */
+LinkColorHandler.prototype.getLinkColorByLength = function( link ) {
+
+	var length = parseInt( link.length );
+	
+	var constraints = this.getDistanceConstraints();
+	if( !constraints ) {
+		console.log("ERROR, GOT NOT CONSTRAINTS IN getLinkColorByLength" );
+		console.log( link );
+		console.log( colorFormat );
+	}
+	
+	if( length <= constraints.shortDistance ) {
+		return this._CONSTANTS.lengthColors.short;
+	}
+	
+	if( length <= constraints.longDistance ) {
+		return this._CONSTANTS.lengthColors.medium;
+	}
+	
+	return this._CONSTANTS.lengthColors.long;
+}
+
+/**
+ * Get the color to use for the given link, based on link type
+ * @param link
+ */
+LinkColorHandler.prototype.getLinkColorByType = function( link ) {
+	
+	// color by the type (e.g. cross-link, loop-link, and mono-link)
+	if( link.type === 'crosslink' ) { return this._CONSTANTS.typeColors.crosslink; }
+	if( link.type === 'looplink' ) { return this._CONSTANTS.typeColors.looplink; }
+	if( link.type === 'monolink' ) { return this._CONSTANTS.typeColors.monolink; }		
+	
+	console.log( "ERROR: link.type is not recognized." );
+	return this._CONSTANTS.typeColors.unknown;
+}
+
+
+/**
+ * Get the color to use for the given link, based on which search(es) the link is in
+ * @param link
+ */
+LinkColorHandler.prototype.getLinkColorBySearches = function( link ) {
+
+	var searches;		// searches in which this link is found
+	
+	if( link.type === 'crosslink' ) { searches = findSearchesForCrosslink( link.protein1, link.protein2, link.position1, link.position2 ); }
+	else if( link.type === 'looplink' ) { searches = findSearchesForLooplink( link.protein1, link.position1, link.position2 ); }
+	else if( link.type === 'monolink' ) { searches = findSearchesForMonolink( link.protein1, link.position1 ); }	
+	else {
+		console.log( "ERROR: link.type is not recognized." );
+		return;
+	}
+	
+	if( !searches || searches.length < 1 ) {
+		console.log( "ERROR: got no searches for link:" );
+		console.log (link );
+		return;
+	}
+	
+	return this.getColorForSearches( searches );
+}
+
+/**
+ * Get the color to use for the list of searches passed in
+ * @param searches
+ */
+LinkColorHandler.prototype.getColorForSearches = function( searches ) {
+	var colorIndex = "";
+	
+	for ( var i = 0; i < _searches.length; i++ ) {
+		for ( var k = 0; k < searches.length; k++ ) {
+			if ( _searches[i]['id'] === searches[ k ] ) {
+				colorIndex += ( i + 1 );
+				break;
+			}
+		}
+	}
+	
+	if( _searches.length === 2 ) {
+		return this._CONSTANTS.searchColors_2searches[ colorIndex ];
+	}
+	
+	return this._CONSTANTS.searchColors_3searches[ colorIndex ];
+}
 
 
 /**

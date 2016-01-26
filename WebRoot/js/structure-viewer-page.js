@@ -8,6 +8,8 @@
 
 var _searchIds = {};
 
+// object to handle all link color determination duties
+var _linkColorHandler = new LinkColorHandler();
 
 //Loaded data:
 
@@ -46,25 +48,6 @@ var _filterOnlyOnePSM;
 var _filterOnlyOnePeptide;
 
 var _distanceReportData = { };
-
-//colors to use for search-based coloring, based on 
-//RYB subractive color model
-
-var _SEARCH_COLORS = {
-					1:		"#FF0000",			// red, for items belonging only to first search
-					2:		"#0000FF",			// blue, for items belonging only to second search
-					3:		"#dcd900",			// mustard yellow, for items belonging only to third search
-					12:		"#8a51ff",			// purple, for items belonging to first and second search
-					13:		"#FF6600",			// orange, for items belonging to first and third search
-					23:		"#006600",			// green, for items belonging to second and third search
-					123:	"#000000",			// black, for items belonging to all three searches
-};
-
-var _SEARCH_COLORS_TWO_SEARCHES = {
-					1:		"#FF0000",
-					2:		"#0000FF",
-					12:		"#00FF00",
-};
 
 
 //get values for variables from the hash part of the URL as JSON
@@ -821,65 +804,6 @@ function findSearchesForLooplink( protein, position1, position2 ) {
 function findSearchesForCrosslink( protein1, protein2, position1, position2 ) {	
 	
 	return _proteinLinkPositions[ protein1 ][ protein2 ][ position1 ][ position2 ];
-}
-
-/**
- * Return the color to use based on the searches a link is in
- * @param searchList
- * @returns
- */
-function getColorForSearches( searchList, opacity, forLegend ) {
-	
-	if( !opacity ) { opacity = 0.9; }
-	
-	var colorIndex = "";
-	
-	for ( var i = 0; i < _searches.length; i++ ) {
-		for ( var k = 0; k < searchList.length; k++ ) {
-			if ( _searches[i]['id'] === searchList[ k ] ) {
-				colorIndex += ( i + 1 );
-				break;
-			}
-		}
-	}
-
-	
-	if ( _searches.length === 2 ) {
-		
-		if( !forLegend ) {
-			var rgb = hexToRgb( _SEARCH_COLORS_TWO_SEARCHES[ colorIndex ] );
-			
-			if( !rgb ) { console.log( "Got no rgb!" ); }
-			return [ rgb.r / 255, rgb.g / 255, rgb.b / 255, opacity ];
-		}
-		
-		return _SEARCH_COLORS_TWO_SEARCHES[ colorIndex ];
-	}
-
-	if( !forLegend ) {
-		var rgb = hexToRgb( _SEARCH_COLORS[ colorIndex ] );
-		
-		if( !rgb ) { console.log( "Got no rgb!" ); }
-		return [ rgb.r / 255, rgb.g / 255, rgb.b / 255, opacity ];
-	}
-	
-	return _SEARCH_COLORS[ colorIndex ];
-}
-
-
-function hexToRgb(hex) {
-    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-        return r + r + g + g + b + b;
-    });
-
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
 }
 
 function populateNavigation() {
@@ -2127,8 +2051,8 @@ var updateShownLinks = function () {
 		for( var i = 0; i < _renderedLinks[ 'crosslinks' ].length; i++ ) {
 			var link = _renderedLinks[ 'crosslinks' ][ i ][ 'link' ];
 			
-			var color = getLinkColor( link, true );
-			var rgbaString = "rgba(" + (color[ 0 ] * 255) + "," + (color[ 1 ] * 255) + "," + (color[ 2 ] * 255) + ",0.15)";			
+			var color = _linkColorHandler.getLinkColor( link, 'rgb' );
+			var rgbaString = "rgba(" + color.r + "," + color.g + "," + color.b + ",0.15)";			
 			
 			html += "<tr class=\"reported-crosslink\" data-crosslink-index=\"" + i + "\" style=\"background-color:" + rgbaString + "\">\n";		
 			html += "<td style=\"width:180px;\">" + _proteinNames[ link.protein1 ] + " (" + link.position1 + ")</td>";
@@ -2177,8 +2101,8 @@ var updateShownLinks = function () {
 		for( var i = 0; i < _renderedLinks[ 'looplinks' ].length; i++ ) {
 			var link = _renderedLinks[ 'looplinks' ][ i ][ 'link' ];
 			
-			var color = getLinkColor( link, true );
-			var rgbaString = "rgba(" + (color[ 0 ] * 255) + "," + (color[ 1 ] * 255) + "," + (color[ 2 ] * 255) + ",0.15)";			
+			var color = _linkColorHandler.getLinkColor( link, 'rgb' );
+			var rgbaString = "rgba(" + color.r + "," + color.g + "," + color.b + ",0.15)";			
 			
 			html += "<tr class=\"reported-looplink\" data-looplink-index=\"" + i + "\" style=\"background-color:" + rgbaString + "\">\n";			
 			html += "<td style=\"width:180px;\">" + _proteinNames[ link.protein1 ] + " (" + link.position1 + ", " + link.position2 + ")</td>";
@@ -2974,7 +2898,7 @@ var drawCrosslinks = function( proteins ) {
 									}
 								}
 								
-								_CROSSLINKS_MESH.addTube( shortestPair[ 0 ].pos(), shortestPair[ 1 ].pos(), 0.6, { cap: true, color : getLinkColor( link ), userData: link });
+								_CROSSLINKS_MESH.addTube( shortestPair[ 0 ].pos(), shortestPair[ 1 ].pos(), 0.6, { cap: true, color : _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link });
 								
 								renderedLink.link = link;
 								
@@ -3056,7 +2980,7 @@ var drawCrosslinks = function( proteins ) {
 							}
 						}
 						
-						_CROSSLINKS_MESH.addTube( UDR[ 'shortestPair' ][ 0 ].pos(), UDR[ 'shortestPair' ][ 1 ].pos(), 0.6, { cap: true, color : getLinkColor( link ), userData: link });
+						_CROSSLINKS_MESH.addTube( UDR[ 'shortestPair' ][ 0 ].pos(), UDR[ 'shortestPair' ][ 1 ].pos(), 0.6, { cap: true, color : _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link });
 						
 						UDR[ 'renderedLink' ].link = link;
 						
@@ -3130,7 +3054,7 @@ var drawMonolinks = function( proteins ) {
 				}
 				
 				var coord = atoms[ k ].pos();
-				_MONOLINKS_MESH.addTube( coord, [ coord[ 0 ] + 3, coord[ 1 ] + 3, coord[ 2 ] + 3 ], 0.6, { color: getLinkColor( link ), userData: link });
+				_MONOLINKS_MESH.addTube( coord, [ coord[ 0 ] + 3, coord[ 1 ] + 3, coord[ 2 ] + 3 ], 0.6, { color: _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link });
 
 				var renderedLink = { };
 				renderedLink.atom1 = atoms[ k ];
@@ -3281,7 +3205,7 @@ var drawLooplinks = function( proteins ) {
 							}
 						}
 						
-						_LOOPLINKS_MESH.addTube( fromCoords, toCoords, 0.6, { color: getLinkColor( link ), userData: link } );
+						_LOOPLINKS_MESH.addTube( fromCoords, toCoords, 0.6, { color: _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link } );
 						
 						renderedLink.link = link;
 						
@@ -3352,7 +3276,7 @@ var drawLooplinks = function( proteins ) {
 						}
 					}
 					
-					_LOOPLINKS_MESH.addTube( UDR[ 'shortestPair' ][ 0 ], UDR[ 'shortestPair' ][ 1 ], 0.6, { cap: true, color : getLinkColor( link ), userData: link });
+					_LOOPLINKS_MESH.addTube( UDR[ 'shortestPair' ][ 0 ], UDR[ 'shortestPair' ][ 1 ], 0.6, { cap: true, color : _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link });
 					
 					UDR[ 'renderedLink' ].link = link;
 					
@@ -3444,99 +3368,6 @@ var getShowUniqueUDRs = function() {
 	return $( "#show-unique-udrs" ).is( ':checked' );
 };
 
-/**
- * Get the color to use for a link, depending on the link color mode
- * @param link An object with properties 'type', 'length', 'protein1, 'protein2', 'position1', and 'position2' (protein2 and position2 optional)
- * @param forReport If true, it is assumed this is for the report and shadeByCount will not be used
- * @returns An array 
- */
-var getLinkColor = function( link, forReport ) {
-	
-	var mode = getLinkColorMode();
-	
-	var shadeByCounts = false;
-	if ( !forReport && $( "input#shade-by-counts" ).is( ':checked' ) ) { shadeByCounts = true; }
-	
-	if( shadeByCounts && !('psmCount' in link)) {
-		console.log( "ERROR: Was told to shade by counts, but link has no PSM count Using default opacity. Link:" );
-		console.log( link );
-	}
-	
-	var opacity = 0.9;
-	if( shadeByCounts && 'psmCount' in link ) {
-		var psmCount = link[ 'psmCount' ];
-		var min = 0.5;
-		var max = opacity;
-		var countForMaxOpacity = 10;
-		
-		if( psmCount > countForMaxOpacity ) { psmCount = countForMaxOpacity; }
-		
-		opacity = max - ( ( max - min ) * ( ( countForMaxOpacity - psmCount ) / countForMaxOpacity ) );
-		if( opacity < min || opacity > max ) {
-			console.log( "WARNING: Invalid opacity: " + opacity  + " (psmCount: " + psmCount + ")" );
-		}
-		
-	}
-	
-	if( mode === 'type' ) {
-		
-		// color by the type (e.g. crosslink, looplink, and monolink)
-		if( link.type === 'crosslink' ) { return [ 1, 0, 0, opacity ]; }
-		if( link.type === 'looplink' ) { return [ 0, 0, 1, opacity ]; }
-		if( link.type === 'monolink' ) { return [ 162/255, 67/255, 228/255, opacity ]; }		
-		
-		console.log( "ERROR: link.type is not recognized." );
-		return;
-	}
-	
-	if( mode === 'search' ) {
-		
-		var searches;
-		
-		if( link.type === 'crosslink' ) { searches = findSearchesForCrosslink( link.protein1, link.protein2, link.position1, link.position2 ); }
-		else if( link.type === 'looplink' ) { searches = findSearchesForLooplink( link.protein1, link.position1, link.position2 ); }
-		else if( link.type === 'monolink' ) { searches = findSearchesForMonolink( link.protein1, link.position1 ); }	
-		else {
-			console.log( "ERROR: link.type is not recognized." );
-			return;
-		}
-
-		return getColorForSearches( searches, opacity );		
-	}
-	
-	if( mode !== 'length' ) {
-		alert( "Unknown link color mode, using length." );
-	}
-	
-	// color by length
-	if( !( 'length' in link || link.length == undefined || link.length == null ) ) {
-		alert( "Error, could not read length of link." );
-		return;
-	}
-	
-	var color = getColorForDistance( link.length, opacity );
-	return color;
-	
-	
-};
-
-
-/**
- * Get the color for the distance. Scales from green to red, where
- * green is shorter (<= 12 all green) and red is longer (>=35 all red)
- * @param distance Distance in angstroms
- * @returns
- */
-function getColorForDistance( distance, opacity ) {
-
-	if( !opacity ) { opacity = 0.9; }
-	
-	if( distance <= 25 ) { return [ 0, 180/255, 40/255, opacity ]; }
-	if( distance <= 35 ) { return [ 227/255, 230/255, 2/255, opacity ]; }
-	return [ 211/255, 51/255, 51/255, opacity ];
-	
-}
-
 
 var _RESIDUE_COLOR_LIGHT = [ 220/255, 220/255, 220/255, 0.75 ];
 var _RESIDUE_COLOR_DARK = [ 120/255, 120/255, 120/255, 0.75 ];
@@ -3598,15 +3429,15 @@ var drawLegend = function() {
 	if( mode === 'type' ) {
 		
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:rgb(255, 0, 0);\"></span> Crosslinks";
+		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.typeColors.crosslink + "\"></span> Crosslinks";
 		html += "</span>\n";
 		
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:rgb(0, 0, 255);\"></span> Looplinks";
+		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.typeColors.looplink + "\"></span> Looplinks";
 		html += "</span>\n";
 		
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:rgb(162, 67, 228);\"></span> Monolinks";
+		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.typeColors.monolink + "\"></span> Monolinks";
 		html += "</span>\n";
 		
 	}
@@ -3615,16 +3446,16 @@ var drawLegend = function() {
 		
 		for ( var i = 0; i < _searches.length; i++ ) {
 			html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-			html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + getColorForSearches( [ _searches[ i ].id ], undefined, true ) + "\"></span> Search: " + _searches[ i ].id;
+			html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler.getColorForSearches( [ _searches[ i ].id ] ) + "\"></span> Search: " + _searches[ i ].id;
 			html += "</span>\n";
 		}
 		
 		for( var i = 0; i < _searches.length; i++ ) {
 			for( var k = 0; k < _searches.length; k++ ) {
 				if( _searches[ i ].id >= _searches[ k ].id ) { continue; }
-				
+								
 				html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-				html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + getColorForSearches( [ _searches[ i ].id, _searches[ k ].id ], undefined, true) + "\"></span> Search: " + _searches[ i ].id + ", " + _searches[ k ].id;
+				html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler.getColorForSearches( [ _searches[ i ].id, _searches[ k ].id ] ) + "\"></span> Search: " + _searches[ i ].id + ", " + _searches[ k ].id;
 				html += "</span>\n";
 				
 			}
@@ -3633,7 +3464,7 @@ var drawLegend = function() {
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
 		
 		if( _searches.length === 3 ) {
-			html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + getColorForSearches( [ _searches[ 0 ].id, _searches[ 1 ].id, _searches[ 2 ].id ], undefined, true) + "\"></span> Search: " + _searches[ 0 ].id + ", " + _searches[ 1 ].id + ", " + _searches[ 2 ].id + "</span>\n";
+			html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler.getColorForSearches( [ _searches[ 0 ].id, _searches[ 1 ].id, _searches[ 2 ].id ] ) + "\"></span> Search: " + _searches[ 0 ].id + ", " + _searches[ 1 ].id + ", " + _searches[ 2 ].id + "</span>\n";
 		}
 
 	}
@@ -3642,15 +3473,15 @@ var drawLegend = function() {
 	
 		// color by length
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:rgb(0, 180, 40);\"></span> <= 25 &Aring; ";
+		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.short + "\"></span> <= " + _linkColorHandler.getDistanceConstraints().shortDistance + " &Aring; ";
 		html += "</span>\n";
 		
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:rgb(227, 230, 2);\"></span> <= 35 &Aring; ";
+		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.medium + "\"></span> <= " + _linkColorHandler.getDistanceConstraints().longDistance + " &Aring; ";
 		html += "</span>\n";
 	
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:rgb(221, 51, 51);\"></span> >35 &Aring; ";
+		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.long + "\"></span> > " + _linkColorHandler.getDistanceConstraints().longDistance + " &Aring; ";
 		html += "</span>\n";
 	}
 	

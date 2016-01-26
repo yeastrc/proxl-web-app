@@ -59,6 +59,7 @@
 		 
 		<script type="text/javascript" src="${ contextPath }/js/spinner.js"></script> 
 		 
+		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-color-handler.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-page.js"></script> 
 		
 		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js"></script>
