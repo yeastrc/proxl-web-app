@@ -135,7 +135,7 @@ LinkColorHandler.prototype.getLinkColor = function( link, colorFormat ) {
  */
 LinkColorHandler.prototype.getLinkColorByLength = function( link ) {
 
-	var length = parseInt( link.length );
+	var length = link.length;
 	
 	var constraints = this.getDistanceConstraints();
 	if( !constraints ) {
