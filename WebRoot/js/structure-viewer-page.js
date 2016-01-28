@@ -306,6 +306,14 @@ function updateURLHash( useSearchForm) {
 		items[ 'distance-report-visible' ] = true;
 	}
 	
+	// include user-defined distance constraints for coloring
+	var userDistanceConstraints = _linkColorHandler.getUserDistanceConstraints();
+	if( userDistanceConstraints ) {
+		items[ 'udcs' ] = userDistanceConstraints.shortDistance;
+		items[ 'udcl' ] = userDistanceConstraints.longDistance;
+	}
+	
+	
 	window.location.hash = encodeURI( JSON.stringify( items ) );
 }
 
@@ -1097,6 +1105,10 @@ var populatePDBFormArea = function() {
 	
 	if( 'link-color-mode' in json ) {
 		$( "#select-link-color-mode" ).val( json[ 'link-color-mode' ] );
+	}
+		
+	if( 'udcs' in json && 'udcl' in json ) {		
+		_linkColorHandler.setUserDistanceConstraints(parseInt( json.udcs), parseInt( json.udcl ) );		
 	}
 	
 	drawLegend();
@@ -3485,6 +3497,11 @@ var drawLegend = function() {
 		html += "</span>\n";
 		
 		html += "<span style=\"margin-left:15px\">[<a href=\"javascript:userChangeDistanceConstraintsInterface()\">Customize</a>]</span>";
+		
+		if( _linkColorHandler.getUserDistanceConstraints() ) {
+			html += "<span style=\"margin-left:2px\">[<a href=\"javascript:removeUserDistanceConstraints()\">Reset</a>]</span>";
+		}
+		
 	}
 	
 	html += "</div>\n";
@@ -3523,10 +3540,22 @@ var updateUserDistanceConstraints = function() {
 	
 	_linkColorHandler.setUserDistanceConstraints( shortDistance, longDistance );
 	
+	updateURLHash( false /* useSearchForm */ );
+	
 	drawStructure();
 	redrawDistanceReport();
 	drawLegend();
 	
+};
+
+var removeUserDistanceConstraints = function() {
+	_linkColorHandler.removeUserDistanceConstraints();
+	
+	updateURLHash( false /* useSearchForm */ );
+	
+	drawStructure();
+	redrawDistanceReport();
+	drawLegend();
 };
 
 var userChangeDistanceConstraintsInterface = function() {

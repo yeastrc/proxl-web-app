@@ -286,6 +286,10 @@ LinkColorHandler.prototype.getOpacity = function( link ) {
 	return opacity;
 }
 
+LinkColorHandler.prototype.removeUserDistanceConstraints = function() {
+	this.userDistanceConstraint = undefined;
+}
+
 LinkColorHandler.prototype.setUserDistanceConstraints = function(short, long) {
 	this.userDistanceConstraint = {
 		shortDistance : short,
