@@ -15,7 +15,7 @@
 			<span class="ProXL-DB-text" >ProXL DB</span> - Protein Crosslinking Database
 		</div>
 		<div class="footer-right-container">
-			© 2015 University of Washington
+			© 2016 University of Washington
 		</div>
 		<div class="footer-center-outer-container">
 			<div class="footer-center-container">
