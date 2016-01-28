@@ -3424,7 +3424,7 @@ var drawLegend = function() {
 	
 	var html = "<h2 style=\"display:inline;font-size:12pt;margin-top:5px;\">Legend:</h2>";
 	
-	html += "<div style=\"font-size:10pt;margin-left:20px;\">\n";
+	html += "<div id=\"legend-label\" style=\"font-size:10pt;margin-left:20px;\">\n";
 	
 	if( mode === 'type' ) {
 		
@@ -3483,10 +3483,74 @@ var drawLegend = function() {
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
 		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.long + "\"></span> > " + _linkColorHandler.getDistanceConstraints().longDistance + " &Aring; ";
 		html += "</span>\n";
+		
+		html += "<span style=\"margin-left:15px\">[<a href=\"javascript:userChangeDistanceConstraintsInterface()\">Customize</a>]</span>";
 	}
 	
 	html += "</div>\n";
 	$legendDiv.html( html );
+};
+
+
+var updateUserDistanceConstraints = function() {
+	
+	var shortDistance = parseInt( $( '#userConstraintFormShortDistance' ).val() );
+	var longDistance = parseInt( $( '#userConstraintFormLongDistance' ).val() );
+	
+	var $errorSpan = $( '#userConstraintsErrorSpan' );
+	
+	if( shortDistance != $( '#userConstraintFormShortDistance' ).val() ) {
+		$errorSpan.html( "Non integer entered for short distance." );
+		return;
+	}
+	
+	if( longDistance != $( '#userConstraintFormLongDistance' ).val() ) {
+		$errorSpan.html( "Non integer entered for long distance." );
+		return;
+	}
+	
+	if( longDistance <= shortDistance ) {
+		$errorSpan.html( "Long distance must be greater than short distance." );
+		return;
+	}
+	
+	if( shortDistance <= 0 ) {
+		$errorSpan.html( "Short distance must be 1 or more." );
+		return;
+	}
+	
+	$errorSpan.empty();
+	
+	_linkColorHandler.setUserDistanceConstraints( shortDistance, longDistance );
+	
+	drawStructure();
+	redrawDistanceReport();
+	drawLegend();
+	
+};
+
+var userChangeDistanceConstraintsInterface = function() {
+	
+	var html = "<span>Fill in new distance cutoffs for color coding:</span><form id=\"userDistanceConstraintsForm\">";
+	
+	html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
+	html += "<span style=\"display:inline-block;width:22px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.short + "\"></span> ";
+	html += "<input id=\"userConstraintFormShortDistance\" type=\"text\" style=\"width:30px;\" value=\"" + _linkColorHandler.getDistanceConstraints().shortDistance + "\">&Aring; ";
+	html += "<span style=\"display:inline-block;width:22px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.medium + "\"></span> ";
+	html += "<input id=\"userConstraintFormLongDistance\" type=\"text\" style=\"width:30px;\" value=\"" + _linkColorHandler.getDistanceConstraints().longDistance + "\">&Aring; ";
+	html += "<span style=\"display:inline-block;width:22px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.long + "\"></span>";
+	
+	html += "<span style=\"margin-left:15px\">[<a href=\"javascript:updateUserDistanceConstraints()\">Update</a>]</span>";
+	html += "<span style=\"margin-left:5px\">[<a href=\"javascript:drawLegend()\">Cancel</a>]</span>";
+	
+	html += "</span>\n";
+	html += "</form>";	
+	html += "<span style=\"margin-left:15px;\" id=\"userConstraintsErrorSpan\"></span>\n";
+	
+	var $legendLabelDiv = $( '#legend-label' );
+	$legendLabelDiv.empty();	
+	$legendLabelDiv.html( html );
+	
 };
 
 var _currentLoadRequest;
