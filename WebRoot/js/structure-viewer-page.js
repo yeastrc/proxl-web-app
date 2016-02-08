@@ -1483,6 +1483,8 @@ var getAlignmentByChainAndProtein = function ( chainId, proteinId ) {
  */
 var downloadChimeraScript = function() {
 	
+	console.log( "downloadChimeraScript called." );
+	
 	var scriptText = "";
 		
 	// do monolinks
@@ -2531,8 +2533,8 @@ var listChains = function( doDraw ) {
 	}
 	
 	html += " <span style=\"font-size:10pt;\"><a href=\"" +  contextPathJSVar + "/downloadPDBFile.do?id=" + pdbFile.id + "\" target=\"download_pdb_file\"><img id=\"download-pdb-icon\" style=\"border-width:0px;margin-left:2px;max-width:15px;\" src=\"" + contextPathJSVar + "/images/icon-download-small.png\" /></a>\n";
-	html += " <span style=\"font-size:10pt;\"><a href=\"javascript:downloadChimeraScript()\" target=\"download_pdb_file\"><img id=\"chimera-icon\" style=\"border-width:0px;margin-left:2px;max-width:12px;\" src=\"" + contextPathJSVar + "/images/chimera-logo.png\" /></a>\n";
-	html += " <span style=\"font-size:10pt;\"><a href=\"javascript:downloadPymolScript()\" target=\"download_pdb_file\"><img id=\"pymol-icon\" style=\"border-width:0px;margin-left:2px;max-width:12px;\" src=\"" + contextPathJSVar + "/images/pymol-logo.png\" /></a>\n";
+	html += " <span style=\"font-size:10pt;\"><a href=\"javascript:\" onClick=\"downloadChimeraScript()\" target=\"download_pdb_file\"><img id=\"chimera-icon\" style=\"border-width:0px;margin-left:2px;max-width:12px;\" src=\"" + contextPathJSVar + "/images/chimera-logo.png\" /></a>\n";
+	html += " <span style=\"font-size:10pt;\"><a href=\"javascript:\" onClick=\"downloadPymolScript()\" target=\"download_pdb_file\"><img id=\"pymol-icon\" style=\"border-width:0px;margin-left:2px;max-width:12px;\" src=\"" + contextPathJSVar + "/images/pymol-logo.png\" /></a>\n";
 
 	html += "<script type=\"text/javascript\">\
 				$(\"#chimera-icon\").qtip({ \
