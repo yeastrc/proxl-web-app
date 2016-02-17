@@ -48,7 +48,7 @@ public class EDC implements ILinker {
 		}
 		*/
 		
-		String subjectResidue = querySequence.substring( subjectPosition - 1, subjectPosition );
+		String subjectResidue = subjectSequence.substring( subjectPosition - 1, subjectPosition );
 		Collection<Integer> linkablePositions = new HashSet<Integer>();
 		
 		if( subjectResidue.equals( "K" ) ) {
