@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 
 public class ImageViewerData {
 
@@ -74,23 +75,6 @@ public class ImageViewerData {
 		this.taxonomies = taxonomies;
 	}
 
-
-
-	public double getPsmQValueCutoff() {
-		return psmQValueCutoff;
-	}
-
-	public void setPsmQValueCutoff(double psmQValueCutoff) {
-		this.psmQValueCutoff = psmQValueCutoff;
-	}
-
-	public double getPeptideQValueCutoff() {
-		return peptideQValueCutoff;
-	}
-
-	public void setPeptideQValueCutoff(double peptideQValueCutoff) {
-		this.peptideQValueCutoff = peptideQValueCutoff;
-	}
 
 	public Collection<Integer> getExcludeTaxonomy() {
 		return excludeTaxonomy;
@@ -184,12 +168,21 @@ public class ImageViewerData {
 			Map<Integer, Map<Integer, Integer>> monolinkPSMCounts) {
 		this.monolinkPSMCounts = monolinkPSMCounts;
 	}
+	
+	public CutoffValuesRootLevel getCutoffs() {
+		return cutoffs;
+	}
+
+	public void setCutoffs(CutoffValuesRootLevel cutoffs) {
+		this.cutoffs = cutoffs;
+	}
 
 
 
 
-	private double psmQValueCutoff;
-	private double peptideQValueCutoff;
+	private CutoffValuesRootLevel cutoffs;
+
+
 	private Collection<Integer> excludeTaxonomy;
 	private Collection<Integer> excludeType;
 	private Set<Integer> proteins;

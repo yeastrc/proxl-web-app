@@ -21,6 +21,37 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 	var _handlebarsTemplate_peptides_related_to_psm_block_template = null;
 	var _handlebarsTemplate_peptides_related_to_psm_row_entry_template = null;
 	var _handlebarsTemplate_peptides_related_to_psm_child_row_template = null;
+
+	
+	var _psmPeptideCutoffsRootObject = null;
+
+	//   Currently expect _psmPeptideCriteria = 
+//					searches: Object
+//						128: Object			
+//							peptideCutoffValues: Object
+//								238: Object
+//									id: 238
+//									value: "0.01"
+//							psmCutoffValues: Object
+//								384: Object
+//									id: 384
+//									value: "0.01"
+//							searchId: 128
+	
+//           The key to:
+//				searches - searchId
+//				peptideCutoffValues and psmCutoffValues - annotation type id
+	
+//			peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+	
+	
+	//////////////
+	
+	this.setPsmPeptideCriteria = function( psmPeptideCutoffsRootObject ) {
+		
+		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
+	};
+	
 	
 	
 	// ////////////
@@ -130,8 +161,6 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 		var search_id = $clickedElement.attr( "search_id" );
 		var psm_id = $clickedElement.attr( "psm_id" );
 		var scan_id = $clickedElement.attr( "scan_id" );
-		var peptide_q_value_cutoff = $clickedElement.attr( "peptide_q_value_cutoff" );
-		var psm_q_value_cutoff = $clickedElement.attr( "psm_q_value_cutoff" );
 		
 		// Convert all attributes to empty string if null or undefined
 		if ( ! search_id ) {
@@ -146,13 +175,41 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 		if ( ! scan_id ) {
 			scan_id = "";
 		}
-		if ( ! peptide_q_value_cutoff ) {
-			peptide_q_value_cutoff = "";
-		}
-		if ( ! psm_q_value_cutoff ) {
-			psm_q_value_cutoff = "";
+
+		
+
+
+		//   Currently expect _psmPeptideCriteria = 
+//						searches: Object
+//							128: Object			
+//								peptideCutoffValues: Object
+//									238: Object
+//										id: 238
+//										value: "0.01"
+//								psmCutoffValues: Object
+//									384: Object
+//										id: 384
+//										value: "0.01"
+//								searchId: 128
+		
+//	           The key to:
+//					searches - searchId
+//					peptideCutoffValues and psmCutoffValues - annotation type id
+		
+//				peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+		
+		var psmPeptideCutoffsForSearchId = _psmPeptideCutoffsRootObject.searches[ search_id ];
+
+		if ( psmPeptideCutoffsForSearchId === undefined || psmPeptideCutoffsForSearchId === null ) {
+			
+			psmPeptideCutoffsForSearchId = {};
+			
+//			throw "Getting data.  Unable to get cutoff data for search id: " + search_id;
 		}
 
+		var psmPeptideCutoffsForSearchId_JSONString = JSON.stringify( psmPeptideCutoffsForSearchId );
+
+				
 
 
 		var ajaxRequestData = {
@@ -161,8 +218,7 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 				project_id : project_id,
 				psm_id : psm_id,
 				scan_id : scan_id,
-				peptide_q_value_cutoff : peptide_q_value_cutoff,
-				psm_q_value_cutoff : psm_q_value_cutoff
+				psmPeptideCutoffsForSearchId : psmPeptideCutoffsForSearchId_JSONString
 		};
 
 
@@ -214,8 +270,8 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 		
 		var $clickedElement = params.$clickedElement;
 
-
-		var reportedPeptides = ajaxResponseData;
+		var annotationDisplayNameDescriptionList = ajaxResponseData.annotationDisplayNameDescriptionList;
+		var reportedPeptides = ajaxResponseData.webReportedPeptideWebserviceWrapperList;
 
 		var initial_reported_peptide_id = $clickedElement.attr( "initial_reported_peptide_id" );
 

@@ -6,13 +6,18 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
 import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
 import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
-import org.yeastrc.xlink.www.searcher.SearchPeptideCrosslinkSearcher;
 
 
 
+
+/**
+ * 
+ *
+ */
 public class SearchProteinCrosslink implements IProteinCrosslink {	
 	
 	private static final Logger log = Logger.getLogger(SearchProteinCrosslink.class);
@@ -51,20 +56,15 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 
 		try {
 			if( this.numPsms == null ) {
-				
+								
 				this.numPsms =
 						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForCrosslink(
 								this.getSearch().getId(),
-								this.getPsmCutoff(),
-								this.getPeptideCutoff(),
+								this.getSearcherCutoffValuesSearchLevel(),
 								this.getProtein1().getNrProtein().getNrseqId(),
 								this.getProtein2().getNrProtein().getNrseqId(),
 								this.getProtein1Position(),
 								this.getProtein2Position() );
-
-				//  WAS
-				
-				//  this.numPsms = SearchPsmSearcher.getInstance().getNumPsms( this );
 
 			}
 
@@ -89,15 +89,11 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 						NumPeptidesForProteinCriteriaSearcher.getInstance()
 						.getNumLinkedPeptidesForCrosslink( 
 								this.getSearch().getId(),
-								this.getPsmCutoff(),
-								this.getPeptideCutoff(),
+								this.getSearcherCutoffValuesSearchLevel(),
 								this.getProtein1().getNrProtein().getNrseqId(),
 								this.getProtein2().getNrProtein().getNrseqId(),
 								this.getProtein1Position(),
 								this.getProtein2Position() );
-							
-				// WAS
-				// this.numLinkedPeptides = SearchCrosslinkPeptideSearcher.getInstance().getNumLinkedPeptides( this );
 			}
 
 			return this.numLinkedPeptides;
@@ -122,15 +118,12 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 						NumPeptidesForProteinCriteriaSearcher.getInstance()
 						.getNumUniqueLinkedPeptidesForCrosslink(
 								this.getSearch().getId(),
-								this.getPsmCutoff(),
-								this.getPeptideCutoff(),
+								this.getSearcherCutoffValuesSearchLevel(),
 								this.getProtein1().getNrProtein().getNrseqId(),
 								this.getProtein2().getNrProtein().getNrseqId(),
 								this.getProtein1Position(),
 								this.getProtein2Position(),
 								YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
-				//  WAS
-				// this.numUniqueLinkedPeptides = SearchCrosslinkPeptideSearcher.getInstance().getNumUniqueLinkedPeptides( this );
 			}
 
 			return this.numUniqueLinkedPeptides;
@@ -172,81 +165,95 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 	}
 
 
-	
-
-	public int getNumUniquePsms() {
-		return numUniquePsms;
-	}
-	public void setNumUniquePsms(int numUniquePsms) {
-		this.numUniquePsms = numUniquePsms;
-	}
-	public double getPsmCutoff() {
-		return psmCutoff;
-	}
-	public void setPsmCutoff(double cutoff) {
-		this.psmCutoff = cutoff;
-	}
-
-
-
-	public double getPeptideCutoff() {
-		return peptideCutoff;
-	}
-	public void setPeptideCutoff(double peptideCutoff) {
-		this.peptideCutoff = peptideCutoff;
-	}
 	public SearchDTO getSearch() {
 		return search;
 	}
 	public void setSearch(SearchDTO search) {
 		this.search = search;
 	}
-
-	public List<SearchPeptideCrosslink> getPeptides() throws Exception {
-
-		try {
-			if( this.peptides == null ) {
-				
-				this.peptides = 
-					SearchPeptideCrosslinkSearcher.getInstance()
-					.searchOnSearchProteinCrosslink( 
-							this.getSearch().getId(),
-							this.getPeptideCutoff(),
-							this.getPsmCutoff(),
-							this.getProtein1().getNrProtein().getNrseqId(),
-							this.getProtein2().getNrProtein().getNrseqId(),
-							this.getProtein1Position(),
-							this.getProtein2Position() );
-			}
+	
+	public String getSearchName() {
+		if ( search == null ) {
 			
-
-
-			return this.peptides;
-
-		} catch ( Exception e ) {
-
-			String msg = "Exception in getPeptides()";
-
-			log.error( msg, e );
-
-			throw e;
+			return "";
 		}
+		return search.getName();
 	}
 
+	public int getSearchId() {
+		if ( search == null ) {
+			
+			return -1;
+		}
+		return search.getId();
+	}
 	
 
-	public double getBestPSMQValue() {
-		return bestPSMQValue;
+	public List<String> getPsmAnnotationValueList() {
+		return psmAnnotationValueList;
 	}
-	public void setBestPSMQValue(double bestPSMQValue) {
-		this.bestPSMQValue = bestPSMQValue;
+	public void setPsmAnnotationValueList(List<String> psmAnnotationValueList) {
+		this.psmAnnotationValueList = psmAnnotationValueList;
 	}
-	public Double getBestPeptideQValue() {
-		return bestPeptideQValue;
+	public List<String> getPeptideAnnotationValueList() {
+		return peptideAnnotationValueList;
 	}
-	public void setBestPeptideQValue(Double bestPeptideQValue) {
-		this.bestPeptideQValue = bestPeptideQValue;
+	public void setPeptideAnnotationValueList(
+			List<String> peptideAnnotationValueList) {
+		this.peptideAnnotationValueList = peptideAnnotationValueList;
 	}
+
+
+
+	public SearcherCutoffValuesSearchLevel getSearcherCutoffValuesSearchLevel() {
+		return searcherCutoffValuesSearchLevel;
+	}
+	public void setSearcherCutoffValuesSearchLevel(
+			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel) {
+		this.searcherCutoffValuesSearchLevel = searcherCutoffValuesSearchLevel;
+	}
+
+
+	////////////////////////////////////////////////
+	
+	////   WAS
+	
+	
+	/**
+	 * Used by Javascript in Merged Image and Merged Structure pages
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+//	public List<SearchPeptideCrosslink> getPeptides() throws Exception {
+//
+//		try {
+//			if( this.peptides == null ) {
+//
+//				this.peptides = 
+//					SearchPeptideCrosslinkSearcher.getInstance()
+//					.searchOnSearchProteinCrosslink( 
+//							this.getSearch().getId(),
+//							this.searcherCutoffValuesSearchLevel,
+//							this.getProtein1().getNrProtein().getNrseqId(),
+//							this.getProtein2().getNrProtein().getNrseqId(),
+//							this.getProtein1Position(),
+//							this.getProtein2Position() );
+//			}
+//
+//
+//			return this.peptides;
+//
+//		} catch ( Exception e ) {
+//
+//			String msg = "Exception in getPeptides()";
+//
+//			log.error( msg, e );
+//
+//			throw e;
+//		}
+//	}
+
 
 
 
@@ -257,18 +264,29 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 	private int protein2Position;
 	
 
-	private List<SearchPeptideCrosslink> peptides;
+//	private List<SearchPeptideCrosslink> peptides;
 	
 	private Integer numPsms;
-	private int numUniquePsms;
 
 	private int numLinkedPeptides = -1;
 	
 	private int numUniqueLinkedPeptides = -1;
 
-	private double psmCutoff;
-	private double peptideCutoff;
-	private double bestPSMQValue;
-	private Double bestPeptideQValue;
 	
+	private SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel;
+	
+
+
+	/**
+	 * Used for display on web page
+	 */
+	private List<String> psmAnnotationValueList;
+	
+
+	/**
+	 * Used for display on web page
+	 */
+	private List<String> peptideAnnotationValueList;
+
+
 }

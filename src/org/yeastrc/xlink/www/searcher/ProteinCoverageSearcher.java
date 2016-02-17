@@ -11,10 +11,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.dao.NRProteinDAO;
 import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.linkable_positions.GetLinkablePositionsForLinkers;
-import org.yeastrc.xlink.utils.XLinkUtils;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.www.objects.MergedSearchProtein;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinLooplink;
@@ -22,8 +23,12 @@ import org.yeastrc.xlink.www.objects.MergedSearchProteinMonolink;
 import org.yeastrc.xlink.www.objects.ProteinCoverageData;
 import org.yeastrc.xlink.www.objects.ProteinSequenceCoverage;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
+import org.yeastrc.xlink.www.objects.SearchProteinDimer;
+import org.yeastrc.xlink.www.objects.SearchProteinDimerWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
 import org.yeastrc.xlink.www.objects.SearchProteinMonolink;
+import org.yeastrc.xlink.www.objects.SearchProteinUnlinked;
+import org.yeastrc.xlink.www.objects.SearchProteinUnlinkedWrapper;
 
 import com.google.common.collect.Range;
 
@@ -31,9 +36,10 @@ public class ProteinCoverageSearcher {
 	
 	private static final Logger log = Logger.getLogger(ProteinCoverageSearcher.class);
 
-	private double psmQValueCutoff;
-	private double peptideQValueCutoff;
 	private Collection<SearchDTO> searches;
+	
+	private SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel;
+	
 	private boolean filterNonUniquePeptides = false;
 	private boolean filterOnlyOnePSM = false;
 	private boolean filterOnlyOnePeptide = false;
@@ -61,23 +67,17 @@ public class ProteinCoverageSearcher {
 	public void setFilterOnlyOnePeptide(boolean filterOnlyOnePeptide) {
 		this.filterOnlyOnePeptide = filterOnlyOnePeptide;
 	}
-
-
-	public double getPsmQValueCutoff() {
-		return psmQValueCutoff;
+	
+	public SearcherCutoffValuesRootLevel getSearcherCutoffValuesRootLevel() {
+		return searcherCutoffValuesRootLevel;
 	}
 
-	public void setPsmQValueCutoff(double psmQValueCutoff) {
-		this.psmQValueCutoff = psmQValueCutoff;
+	public void setSearcherCutoffValuesRootLevel(
+			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel) {
+		this.searcherCutoffValuesRootLevel = searcherCutoffValuesRootLevel;
 	}
 
-	public double getPeptideQValueCutoff() {
-		return peptideQValueCutoff;
-	}
 
-	public void setPeptideQValueCutoff(double peptideQValueCutoff) {
-		this.peptideQValueCutoff = peptideQValueCutoff;
-	}
 
 	public Collection<SearchDTO> getSearches() {
 		return searches;
@@ -123,21 +123,81 @@ public class ProteinCoverageSearcher {
 		
 		List<ProteinCoverageData> proteinCoverageDataList = new ArrayList<ProteinCoverageData>();
 		
-		// get unique collection of all proteins
-		MergedSearchProteinSearcher mrps = MergedSearchProteinSearcher.getInstance();
 		
-		// pass in all possible types to the searcher
-		Collection<Integer> types = new HashSet<Integer>();
-		types.add( XLinkUtils.TYPE_CROSSLINK );
-		types.add( XLinkUtils.TYPE_DIMER );
-		types.add( XLinkUtils.TYPE_LOOPLINK );
-		types.add( XLinkUtils.TYPE_MONOLINK );
-		types.add( XLinkUtils.TYPE_UNLINKED );
 		
-		Collection<MergedSearchProtein> proteins = mrps.getProteinsWithLinkType( searches, types, psmQValueCutoff, peptideQValueCutoff);
-		List<MergedSearchProteinMonolink> monolinks = MergedSearchProteinMonolinkSearcher.getInstance().search( searches, psmQValueCutoff, peptideQValueCutoff);
-		List<MergedSearchProteinLooplink> looplinks = MergedSearchProteinLooplinkSearcher.getInstance().search( searches, psmQValueCutoff, peptideQValueCutoff);
-		List<MergedSearchProteinCrosslink> crosslinks = MergedSearchProteinCrosslinkSearcher.getInstance().search( searches, psmQValueCutoff, peptideQValueCutoff);
+		Collection<MergedSearchProtein> proteins = new ArrayList<>();
+		
+		
+
+		Set<Integer> proteinIds = new HashSet<>();
+		
+		{
+
+			List<MergedSearchProteinCrosslink> crosslinksProteins = MergedSearchProteinCrosslinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
+
+			List<MergedSearchProteinLooplink> looplinksProteins = MergedSearchProteinLooplinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
+
+			for( MergedSearchProteinCrosslink item : crosslinksProteins ) {
+
+				proteinIds.add( item.getProtein1().getNrProtein().getNrseqId() );
+
+				proteinIds.add( item.getProtein2().getNrProtein().getNrseqId() );
+			}
+
+			for( MergedSearchProteinLooplink item : looplinksProteins ) {
+
+				proteinIds.add( item.getProtein().getNrProtein().getNrseqId() );
+			}
+
+			for ( SearchDTO search : searches ) {
+
+				{
+					List<SearchProteinDimerWrapper> wrappedDimerLinks = 
+							SearchProteinDimerSearcher.getInstance()
+							.searchOnSearchIdandCutoffs( search, searcherCutoffValuesRootLevel.getPerSearchCutoffs( search.getId() ) );
+
+					for ( SearchProteinDimerWrapper wrappedDimer : wrappedDimerLinks ) {
+
+						SearchProteinDimer dimer = wrappedDimer.getSearchProteinDimer();
+
+						proteinIds.add( dimer.getProtein1().getNrProtein().getNrseqId() );
+
+						proteinIds.add( dimer.getProtein2().getNrProtein().getNrseqId() );
+					}
+				}
+
+				{
+					List<SearchProteinUnlinkedWrapper> wrappedUnlinkedLinks = 
+							SearchProteinUnlinkedSearcher.getInstance()
+							.searchOnSearchIdandCutoffs( search, searcherCutoffValuesRootLevel.getPerSearchCutoffs( search.getId() ) );
+
+					for ( SearchProteinUnlinkedWrapper wrappedUnlinked : wrappedUnlinkedLinks ) {
+
+						SearchProteinUnlinked unlinked = wrappedUnlinked.getSearchProteinUnlinked();
+
+						proteinIds.add( unlinked.getProtein().getNrProtein().getNrseqId() );
+					}
+				}
+				
+			}
+
+			for ( int proteinId : proteinIds ) {
+
+				proteins.add( new MergedSearchProtein( searches, NRProteinDAO.getInstance().getNrProtein( proteinId ) ) );
+			}
+		}
+		
+		////////////////////////////////////////////////////////////////////////
+		
+		
+		List<MergedSearchProteinMonolink> monolinks = 
+				MergedSearchProteinMonolinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
+		
+		List<MergedSearchProteinLooplink> looplinks = 
+				MergedSearchProteinLooplinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
+		
+		List<MergedSearchProteinCrosslink> crosslinks = 
+				MergedSearchProteinCrosslinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
 		
 		int totalLinkableResidues = 0;
 		int totalLinkableResiduesCovered = 0;
@@ -461,7 +521,7 @@ public class ProteinCoverageSearcher {
 			totalResidues += pcd.getNumResidues();
 			
 			// calculate and report sequence coverage
-			ProteinSequenceCoverage psc = MergedSearchProteinSequenceCoverageSearcher.getInstance().getProteinSequenceCoverage(protein, psmQValueCutoff, peptideQValueCutoff);
+			ProteinSequenceCoverage psc = MergedSearchProteinSequenceCoverageSearcher.getInstance().getProteinSequenceCoverage(protein, searcherCutoffValuesRootLevel);
 			pcd.setSequenceCoverage( psc.getSequenceCoverage() );
 
 			totalCoveredResidues += (int)Math.round( pcd.getNumResidues() * psc.getSequenceCoverage() );
@@ -515,16 +575,32 @@ public class ProteinCoverageSearcher {
 			Set<Integer> lcResidues = new HashSet<Integer>();
 			
 			Set<Integer> monolinkedResidues = new HashSet<Integer>();
+			
 			for( MergedSearchProteinMonolink monolink : monolinks ) {
-				if( monolink.getProtein().getNrProtein().getNrseqId() != protein.getNrProtein().getNrseqId() ) { continue; }
+				
+				
+				if( monolink.getProtein().getNrProtein().getNrseqId() != protein.getNrProtein().getNrseqId() ) { 
+				
+					//  Protein id for this link is not the protein id being processed in this iteration through the proteins
+					//     so skip to next link
+					continue; 
+				}
 				
 				monolinkedResidues.add( monolink.getProteinPosition() );
 				mlcResidues.add( monolink.getProteinPosition() );
 			}
 			
 			Set<Integer> looplinkedResidues = new HashSet<Integer>();
+			
 			for( MergedSearchProteinLooplink looplink : looplinks ) {
-				if( looplink.getProtein().getNrProtein().getNrseqId() != protein.getNrProtein().getNrseqId() ) { continue; }
+
+				
+				if( looplink.getProtein().getNrProtein().getNrseqId() != protein.getNrProtein().getNrseqId() ) { 
+					
+					//  Protein id for this link is not the protein id being processed in this iteration through the proteins
+					//     so skip to next link
+					continue;
+				}
 				
 				looplinkedResidues.add( looplink.getProteinPosition1() );
 				looplinkedResidues.add( looplink.getProteinPosition2() );
@@ -538,14 +614,24 @@ public class ProteinCoverageSearcher {
 			
 			
 			Set<Integer> crosslinkedResidues = new HashSet<Integer>();
+			
 			for( MergedSearchProteinCrosslink crosslink : crosslinks ) {
+				
 				if( crosslink.getProtein1().getNrProtein().getNrseqId() == protein.getNrProtein().getNrseqId() ) {
+					
+					//  Protein id 1 for this link is the protein id being processed in this iteration through the proteins
+					//     so process this link
+
 					crosslinkedResidues.add( crosslink.getProtein1Position() );					
 					mlcResidues.add( crosslink.getProtein1Position() );
 					lcResidues.add( crosslink.getProtein1Position() );
 				}
 				
 				if( crosslink.getProtein2().getNrProtein().getNrseqId() == protein.getNrProtein().getNrseqId() ) {
+
+					//  Protein id 2 for this link is the protein id being processed in this iteration through the proteins
+					//     so process this link
+
 					crosslinkedResidues.add( crosslink.getProtein2Position() );					
 					mlcResidues.add( crosslink.getProtein2Position() );
 					lcResidues.add( crosslink.getProtein2Position() );

@@ -18,17 +18,22 @@
 					style="text-align:left;width:{{ pageFormatting.reportedPeptideWidthPercent }}%;font-weight:bold;">
 				Reported peptide
 			</th>
-			{{#if anyLinksHavePeptideQValue }}
-				<th style="text-align:left;width:7%;font-weight:bold;"><span style="white-space: nowrap">Q-value</span></th>
-			{{/if}}
-			{{#if anyLinksHavePeptidePEPValue }}
-				<th style="text-align:left;width:7%;font-weight:bold;">PEP</th>
-			{{/if}}
-			{{#if anyLinksHavePeptideSVMValue }}
-				<th style="text-align:left;width:7%;font-weight:bold;">SVM Score</th>
-			{{/if}}
+
+			{{#each peptideAnnotationDisplayNameDescriptionList}}
+			 	<th style="text-align:left;font-weight:bold;"
+			 		><span style="white-space: nowrap" <%-- TODO Add Description as tool tip, {{this.description}} --%>
+			 			>{{this.displayName}}</span></th>
+			{{/each}}
+			
 				
 			<th style="text-align:right;width:7%;font-weight:bold;">Psms</th>
+
+			{{#each psmAnnotationDisplayNameDescriptionList}}
+			 	<th style="text-align:left;font-weight:bold;"
+			 		><span style="white-space: nowrap" >Best PSM</span> <span style="white-space: nowrap" <%-- TODO Add Description as tool tip, {{this.description}} --%>
+			 			>{{this.displayName}}</span></th>
+			{{/each}}
+						
 		</tr>
 	  </thead>
 	  

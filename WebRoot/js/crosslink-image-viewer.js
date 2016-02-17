@@ -36,6 +36,12 @@
 ///////////////   CONSTANTS  ////////////////////////
 
 
+//  Default exclude link type "No Links"
+
+var EXCLUDE_LINK_TYPE_DEFAULT = [ 0 ];
+
+
+
 //////  Code flow constants
 
 //   These turn on and off certain features under consideration
@@ -229,8 +235,32 @@ var _ranges;
 
 //  From JSON (probably round trips from the input fields to the JSON in the Hash in the URL to these variables)
 
-var _psmQValueCutoff;
-var _peptideQValueCutoff;
+var _psmPeptideCutoffsRootObjectStorage = {
+		
+		_psmPeptideCutoffsRootObject : null,
+		
+		setPsmPeptideCutoffsRootObject : function( psmPeptideCutoffsRootObject ) {
+			
+			this._psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
+			
+			viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+			viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+			viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+			
+			viewPsmsLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+		},
+
+		getPsmPeptideCutoffsRootObject : function( ) {
+
+			return this._psmPeptideCutoffsRootObject;
+		}
+};
+
+//	var _psmQValueCutoff;
+//	var _peptideQValueCutoff;
+
+
+
 var _excludeTaxonomy;
 var _excludeType;
 var _filterNonUniquePeptides;
@@ -369,17 +399,49 @@ function getJsonFromHash() {
 	
 	if ( windowHash === "" || windowHash === "#" ) {
 		
-		return null;
+		//  Set cutoff defaults if not in JSON
+			
+		json = { 
+				cutoffs : getCutoffDefaultsFromPage(),
+				
+				'excludeType' : EXCLUDE_LINK_TYPE_DEFAULT
+		};
+		
+		return json;
+		
+//		return null;
 	}
+	
+	var windowHashContentsMinusHashChar = windowHash.slice( 1 );
 	
 	try {
 		
 		// if this works, the hash contains native (non encoded) JSON
-		json = JSON.parse( window.location.hash.slice( 1 ) );
+		json = JSON.parse( windowHashContentsMinusHashChar );
 	} catch( e ) {
 		
-		// if we got here, the hash contained URI-encoded JSON
-		json = JSON.parse( decodeURI( window.location.hash.slice( 1 ) ) );
+		// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURI( windowHashContentsMinusHashChar )
+		
+		var windowHashContentsMinusHashCharDecodeURI = decodeURI( windowHashContentsMinusHashChar );
+		
+		try {
+			json = JSON.parse( windowHashContentsMinusHashCharDecodeURI );
+		} catch( e2 ) {
+			
+
+			// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURIComponent( windowHashContentsMinusHashChar )
+			
+			var windowHashContentsMinusHashCharDecodeURIComponent = decodeURIComponent( windowHashContentsMinusHashChar );
+
+			try {
+				json = JSON.parse( windowHashContentsMinusHashCharDecodeURIComponent );
+			} catch( e3 ) {
+				
+
+				throw "Failed to parse window hash string as JSON and decodeURI and then parse as JSON.  windowHashContentsMinusHashChar: " 
+				+ windowHashContentsMinusHashChar;
+			}
+		}
 	}
 	
 	//  Since show-lysines was renamed to show-linkable-positions
@@ -389,11 +451,45 @@ function getJsonFromHash() {
 		json[ 'show-linkable-positions' ] = true;
 	}
 	
+	if ( json.cutoffs === undefined || json.cutoffs === null ) {
+
+		//  Set cutoff defaults if not in JSON
+		
+		json.cutoffs = getCutoffDefaultsFromPage();
+	}
+	
+	//  Set default for exclude link type
+	
+	if ( json[ 'excludeType' ] === undefined ) {
+		
+		json[ 'excludeType' ] = EXCLUDE_LINK_TYPE_DEFAULT;
+	}
+
 	
 	return json;
 }
 
+function getCutoffDefaultsFromPage() {
+	
 
+	
+	var $cutoffValuesRootLevelCutoffDefaults = $("#cutoffValuesRootLevelCutoffDefaults");
+	
+	var cutoffValuesRootLevelCutoffDefaultsString = $cutoffValuesRootLevelCutoffDefaults.val();
+	
+	try {
+		var cutoffValuesRootLevelCutoffDefaults = JSON.parse( cutoffValuesRootLevelCutoffDefaultsString );
+	} catch( e2 ) {
+		
+		throw "Failed to parse cutoffValuesRootLevelCutoffDefaults string as JSON.  " +
+				"Error Message: " + e2.message +
+				".  cutoffValuesRootLevelCutoffDefaultsString: |" +
+				cutoffValuesRootLevelCutoffDefaultsString +
+				"|";
+	}
+
+	return cutoffValuesRootLevelCutoffDefaults;
+}
 
 
 
@@ -402,36 +498,63 @@ function getValuesFromForm() {
 
 	var items = { };
 
-	var psmCutoff = parseFloat( $( "input#psmQValueCutoff" ).val() );
-
-	if ( isNaN( psmCutoff ) ) {
+//	var psmCutoff = parseFloat( $( "input#psmQValueCutoff" ).val() );
+//
+//	if ( isNaN( psmCutoff ) ) {
+//		
+//		destroySpinner();
+//		
+//		var $element = $("#error_message_invalid_psm_q_value_cutoff");
+//		
+//		showErrorMsg( $element );
+//
+////		alert( "Invalid value for PSM q-value cutoff." );
+//
+//		return null; //  EARLY EXIT  return null
+//	}
+//	items[ 'psmQValueCutoff' ] = psmCutoff;
+//
+//	var peptideCutoff = parseFloat( $( "input#peptideQValueCutoff" ).val() );
+//	if ( isNaN( peptideCutoff ) ) {
+//		
+//		destroySpinner();
+//		
+//		var $element = $("#error_message_invalid_peptide_q_value_cutoff");
+//		
+//		showErrorMsg( $element );
+//		
+////		alert( "Invalid value for Peptide q-value cutoff." );
+//
+//		return null; //  EARLY EXIT  return null;
+//	}
+//	
+//	items[ 'peptideQValueCutoff' ] = peptideCutoff;
+	
+//	var inputCutoffs = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
+	
+	var getCutoffsFromThePageResult = cutoffProcessingCommonCode.getCutoffsFromThePage(  {  } );
+	
+	var getCutoffsFromThePageResult_FieldDataFailedValidation = getCutoffsFromThePageResult.getCutoffsFromThePageResult_FieldDataFailedValidation;
+	
+	if ( getCutoffsFromThePageResult_FieldDataFailedValidation ) {
 		
-		destroySpinner();
+		//  Cutoffs failed validation and error message was displayed
 		
-		var $element = $("#error_message_invalid_psm_q_value_cutoff");
+		//  EARLY EXIT from function
 		
-		showErrorMsg( $element );
-
-//		alert( "Invalid value for PSM q-value cutoff." );
-
-		return null; //  EARLY EXIT  return null
+//		return { output_FieldDataFailedValidation : getCutoffsFromThePageResult_FieldDataFailedValidation };
+		
+		throw "Cutoffs are invalid so stop processing";
 	}
-	items[ 'psmQValueCutoff' ] = psmCutoff;
+	
+	var outputCutoffs = getCutoffsFromThePageResult.cutoffsBySearchId;
+	
 
-	var peptideCutoff = parseFloat( $( "input#peptideQValueCutoff" ).val() );
-	if ( isNaN( peptideCutoff ) ) {
-		
-		destroySpinner();
-		
-		var $element = $("#error_message_invalid_peptide_q_value_cutoff");
-		
-		showErrorMsg( $element );
-		
-//		alert( "Invalid value for Peptide q-value cutoff." );
-
-		return null; //  EARLY EXIT  return null;
-	}
-	items[ 'peptideQValueCutoff' ] = peptideCutoff;
+	
+	
+	items[ 'cutoffs' ] = outputCutoffs;
+	
+	
 
 	if ( $( "input#filterNonUniquePeptides" ).is( ':checked' ) )
 		items[ 'filterNonUniquePeptides' ] = true;
@@ -501,10 +624,13 @@ function updateURLHash( useSearchForm) {
 		items[ 'excludeType' ] = _excludeType;
 
 //		add psm cutoff
-		items[ 'psmQValueCutoff' ] = _psmQValueCutoff;
+//		items[ 'psmQValueCutoff' ] = _psmQValueCutoff;
 
 //		add peptide cutoff 
-		items[ 'peptideQValueCutoff' ] = _peptideQValueCutoff;
+//		items[ 'peptideQValueCutoff' ] = _peptideQValueCutoff;
+		
+//		add psm/peptide cutoffs
+		items[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
 
 //		add filter out non unique peptides
 		items[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
@@ -531,8 +657,6 @@ function updateURLHash( useSearchForm) {
 		items = formValues;
 
 	}
-
-
 
 
 //	load in settings from viewer section
@@ -697,8 +821,20 @@ function buildQueryStringFromHash() {
 		}
 	}
 	
-	items.push( "psmQValueCutoff=" + json.psmQValueCutoff );
-	items.push( "peptideQValueCutoff=" + json.peptideQValueCutoff );
+//	items.push( "psmQValueCutoff=" + json.psmQValueCutoff );
+//	items.push( "peptideQValueCutoff=" + json.peptideQValueCutoff );
+	
+	
+	
+	
+	///   Serialize cutoffs to JSON
+	
+	var cutoffs = json.cutoffs;
+	
+	var psmPeptideCutoffsForSearchIds_JSONString = JSON.stringify( cutoffs );
+
+	items.push( "psmPeptideCutoffsForSearchIds=" + psmPeptideCutoffsForSearchIds_JSONString );
+
 	
 	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
 		items.push( "filterNonUniquePeptides=on" );
@@ -860,7 +996,8 @@ function loadProteinSequenceDataForProtein( proteinIdsToGetSequence, doDraw ) {
 
 
 
-//Load protein taxonomy id data for a list of proteins
+//  Load mapping of protein id to  taxonomy id data for a list of proteins
+
 function loadProteinTaxonomyIdDataForProtein( proteinIds, doDraw ) {
 
 	console.log( "Loading protein taxonomy id data for proteins: " + proteinIds );
@@ -975,6 +1112,8 @@ function loadMonolinkData( doDraw ) {
 		reportLinkDataLoadComplete( 'monolinks', doDraw );
 	}
 }
+
+
 function loadMonolinkPSMCounts( doDraw ) {
 	
 	console.log( "Loading monolink PSM counts." );
@@ -1205,7 +1344,9 @@ function loadCrosslinkPSMCounts( doDraw ) {
 
 
 var _dataLoadManager = { };
+
 var loadRequiredLinkData = function( doDraw ) {
+	
 	if( !( 'currentLoad' in _dataLoadManager ) ) { _dataLoadManager.currentLoad = { }; }
 	if( !( 'currentLoadCount' in _dataLoadManager ) ) { _dataLoadManager.currentLoadCount = 0; }
 	
@@ -1655,8 +1796,12 @@ function loadDataFromService() {
 	        	_linkablePositions = data.linkablePositions;
 	        	
 	        	// handle other search parameters
-	        	_psmQValueCutoff = data.psmQValueCutoff;
-	        	_peptideQValueCutoff = data.peptideQValueCutoff;
+	        	
+//	        	_psmQValueCutoff = data.psmQValueCutoff;
+//	        	_peptideQValueCutoff = data.peptideQValueCutoff;
+	        	
+	        	_psmPeptideCutoffsRootObjectStorage.setPsmPeptideCutoffsRootObject( data.cutoffs );
+	        	
 	        	_excludeTaxonomy = data.excludeTaxonomy;
 	        	_excludeType = data.excludeType;
 	        	_filterNonUniquePeptides = data.filterNonUniquePeptides;
@@ -1758,8 +1903,12 @@ function populateHighlightedProtein() {
 
 function populateSearchForm() {
 	
-	$( "input#psmQValueCutoff" ).val( _psmQValueCutoff );
-	$( "input#peptideQValueCutoff" ).val( _peptideQValueCutoff );
+//	$( "input#psmQValueCutoff" ).val( _psmQValueCutoff );
+//	$( "input#peptideQValueCutoff" ).val( _peptideQValueCutoff );
+
+	cutoffProcessingCommonCode.putCutoffsOnThePage(  { cutoffs : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject() } );
+
+	
 	$( "input#filterNonUniquePeptides" ).prop('checked', _filterNonUniquePeptides);
 	$( "input#filterOnlyOnePSM" ).prop('checked', _filterOnlyOnePSM);
 	$( "input#filterOnlyOnePeptide" ).prop('checked', _filterOnlyOnePeptide);
@@ -1896,16 +2045,19 @@ function populateNavigation() {
 	
 	
 	var json = getJsonFromHash();
+	
+	
+	
 
-	var project_id = $("#project_id").val();
-	
-	if ( project_id === undefined || project_id === null 
-			|| project_id === "" ) {
-		
-		throw '$("#project_id").val() returned no value';
-	}
-	
-	items.push( "project_id=" + project_id );
+//	var project_id = $("#project_id").val();
+//	
+//	if ( project_id === undefined || project_id === null 
+//			|| project_id === "" ) {
+//		
+//		throw '$("#project_id").val() returned no value';
+//	}
+//	
+//	items.push( "project_id=" + project_id );
 	
 	
 	if ( _searches.length > 1 ) {
@@ -1916,33 +2068,80 @@ function populateNavigation() {
 		items.push( "searchId=" + _searchIds[ 0 ] );		
 	}
 
-	if ( json.excludeTaxonomy != undefined && json.excludeTaxonomy.length > 0 ) {
-		for ( var i = 0; i < json.excludeTaxonomy.length; i++ ) {
-			items.push( "excludeTaxonomy=" + json.excludeTaxonomy[ i ] );
-		}
+
+	//   Moved to inserto into JSON
+	
+//	if ( json.excludeTaxonomy != undefined && json.excludeTaxonomy.length > 0 ) {
+//		for ( var i = 0; i < json.excludeTaxonomy.length; i++ ) {
+//			items.push( "excludeTaxonomy=" + json.excludeTaxonomy[ i ] );
+//		}
+//	}
+	
+//	items.push( "psmQValueCutoff=" + json.psmQValueCutoff );
+//	items.push( "peptideQValueCutoff=" + json.peptideQValueCutoff );
+	
+
+	//   Moved to inserto into JSON
+	
+//	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
+//		items.push( "filterNonUniquePeptides=on" );
+//	}
+//	if ( json.filterOnlyOnePSM != undefined && json.filterOnlyOnePSM ) {
+//		items.push( "filterOnlyOnePSM=on" );
+//	}
+//	if ( json.filterOnlyOnePeptide != undefined && json.filterOnlyOnePeptide ) {
+//		items.push( "filterOnlyOnePeptide=on" );
+//	}
+	
+	
+	
+	///   Serialize cutoffs to JSON
+	
+	var cutoffs = json.cutoffs;
+	
+	//  Layout of baseJSONObject  matches Java class A_QueryBase_JSONRoot
+	
+	var baseJSONObject = { cutoffs : cutoffs };
+	
+	
+	//  Add to baseJSONObject
+	
+	if ( json.filterNonUniquePeptides !== undefined ) {
+		baseJSONObject.filterNonUniquePeptides = json.filterNonUniquePeptides;
+	}
+	if ( json.filterOnlyOnePSM !== undefined ) {
+		baseJSONObject.filterOnlyOnePSM = json.filterOnlyOnePSM;
+	}
+	if ( json.filterOnlyOnePeptide !== undefined ) {
+		baseJSONObject.filterOnlyOnePeptide = json.filterOnlyOnePeptide;
 	}
 	
-	items.push( "psmQValueCutoff=" + json.psmQValueCutoff );
-	items.push( "peptideQValueCutoff=" + json.peptideQValueCutoff );
 	
-	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
-		items.push( "filterNonUniquePeptides=on" );
+	if ( json.excludeTaxonomy !== undefined ) {
+		baseJSONObject.excludeTaxonomy = json.excludeTaxonomy;
 	}
-	if ( json.filterOnlyOnePSM != undefined && json.filterOnlyOnePSM ) {
-		items.push( "filterOnlyOnePSM=on" );
-	}
-	if ( json.filterOnlyOnePeptide != undefined && json.filterOnlyOnePeptide ) {
-		items.push( "filterOnlyOnePeptide=on" );
-	}
+
+	
+	var psmPeptideCutoffsForSearchIds_JSONString = JSON.stringify( baseJSONObject );
+	
+	var psmPeptideCutoffsForSearchIds_JSONStringEncodedURIComponent = encodeURIComponent( psmPeptideCutoffsForSearchIds_JSONString ); 
+
+	//  Parameter name matches standard form parameter name for JSON
+	
+	items.push( "queryJSON=" + psmPeptideCutoffsForSearchIds_JSONStringEncodedURIComponent );
+
 	
 	queryString += items.join( "&" );
 
 	var html = "";
 
 	if ( _searches.length > 1 ) {
-		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/viewMergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
-		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/viewMergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
-		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/viewMergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
+		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
+		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
+		
+		html += ' <span style="color:red; font-size: 24px;">Merged Coverage Report under construction </span> ';
+		
+//		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
 	} else {
 		
 
@@ -1954,7 +2153,7 @@ function populateNavigation() {
 		
 		if ( viewSearchPeptideDefaultPageUrl === undefined || viewSearchPeptideDefaultPageUrl === "" ) {
 			      
-			html += "viewSearchPeptide.do" + queryString;
+			html += "peptide.do" + queryString;
 
 		} else {
 			
@@ -1972,7 +2171,7 @@ function populateNavigation() {
 		
 		if ( viewSearchCrosslinkProteinDefaultPageUrl === undefined || viewSearchCrosslinkProteinDefaultPageUrl === "" ) {
 			      
-			html += "viewSearchCrosslinkProtein.do" + queryString;
+			html += "crosslinkProtein.do" + queryString;
 
 		} else {
 			
@@ -1990,7 +2189,7 @@ function populateNavigation() {
 		
 		if ( viewProteinCoverageReportDefaultPageUrl === undefined || viewProteinCoverageReportDefaultPageUrl === "" ) {
 			      
-			html += "viewProteinCoverageReport.do" + queryString;
+			html += "proteinCoverageReport.do" + queryString;
 
 		} else {
 			
@@ -2013,10 +2212,16 @@ function populateNavigation() {
 	
 	if ( $structure_viewer_link_span.length > 0 ) {
 
-		var structureQueryString = "?project_id=" + project_id;
+		var structureQueryString = "?";
 
 		for ( var i = 0; i < _searchIds.length; i++ ) {
-			structureQueryString += "&searchIds=" + _searchIds[ i ];
+			
+			if ( i > 0 ) {
+				
+				structureQueryString += "&";
+			}
+			
+			structureQueryString += "searchIds=" + _searchIds[ i ];
 		}
 
 		var structureJSON = { };
@@ -2028,10 +2233,13 @@ function populateNavigation() {
 		structureJSON[ 'excludeType' ] = _excludeType;
 
 //		add psm cutoff
-		structureJSON[ 'psmQValueCutoff' ] = _psmQValueCutoff;
+//		structureJSON[ 'psmQValueCutoff' ] = _psmQValueCutoff;
 
 //		add peptide cutoff 
-		structureJSON[ 'peptideQValueCutoff' ] = _peptideQValueCutoff;
+//		structureJSON[ 'peptideQValueCutoff' ] = _peptideQValueCutoff;
+		
+		structureJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
+		
 
 //		add filter out non unique peptides
 		structureJSON[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
@@ -2041,8 +2249,10 @@ function populateNavigation() {
 
 		var structureJSONString = encodeURI( JSON.stringify( structureJSON ) );
 
-		var structureNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View data on 3D structures\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/viewMergedStructure.do" 
-				+ structureQueryString + "#" + structureJSONString + "\">Structure View</a>]</span>";
+		var structureNavHTML = ' <span style="color:red; font-size: 24px;">[Merged Structure under construction]</span> ';
+		
+//		var structureNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View data on 3D structures\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/structure.do" 
+//				+ structureQueryString + "#" + structureJSONString + "\">Structure View</a>]</span>";
 
 		$structure_viewer_link_span.empty();
 		$structure_viewer_link_span.html( structureNavHTML );
@@ -5742,8 +5952,9 @@ function processClickOnLoopLink( clickThis  ) {
 
 	var params = {
 			clickThis : clickThis,
-			psmQValueCutoff : _psmQValueCutoff,
-			peptideQValueCutoff : _peptideQValueCutoff
+//			psmQValueCutoff : _psmQValueCutoff,
+//			peptideQValueCutoff : _peptideQValueCutoff
+			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
 	};
 
 	getLooplinkDataForSpecificLinkInGraph( params );
@@ -5760,8 +5971,9 @@ function processClickOnCrossLink( clickThis  ) {
 
 	var params = {
 			clickThis : clickThis,
-			psmQValueCutoff : _psmQValueCutoff,
-			peptideQValueCutoff : _peptideQValueCutoff
+//			psmQValueCutoff : _psmQValueCutoff,
+//			peptideQValueCutoff : _peptideQValueCutoff
+			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
 	};
 
 	getCrosslinkDataForSpecificLinkInGraph( params );
@@ -5778,8 +5990,9 @@ function processClickOnMonoLink( clickThis  ) {
 
 	var params = {
 			clickThis : clickThis,
-			psmQValueCutoff : _psmQValueCutoff,
-			peptideQValueCutoff : _peptideQValueCutoff
+//			psmQValueCutoff : _psmQValueCutoff,
+//			peptideQValueCutoff : _peptideQValueCutoff
+			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
 	};
 
 	getMonolinkDataForSpecificLinkInGraph( params );
@@ -5907,14 +6120,16 @@ function initPage() {
 	_proteinBarToolTip_template_HandlebarsTemplate = Handlebars.compile( proteinBarToolTip_template_handlebarsSource );
 
 	
-	$( "input#psmQValueCutoff" ).change(function() {
-		
-		searchFormChanged_ForNag();	searchFormChanged_ForDefaultPageView();
-	});
-	$( "input#peptideQValueCutoff" ).change(function() {
-		
-		searchFormChanged_ForNag();	searchFormChanged_ForDefaultPageView();
-	});
+//	$( "input#psmQValueCutoff" ).change(function() {
+//		
+//		searchFormChanged_ForNag();	searchFormChanged_ForDefaultPageView();
+//	});
+//	$( "input#peptideQValueCutoff" ).change(function() {
+//		
+//		searchFormChanged_ForNag();	searchFormChanged_ForDefaultPageView();
+//	});
+	
+	
 	$( "input#filterNonUniquePeptides" ).change(function() {
 		
 		searchFormChanged_ForNag();	searchFormChanged_ForDefaultPageView();

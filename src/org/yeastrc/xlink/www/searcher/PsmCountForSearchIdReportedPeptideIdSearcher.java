@@ -3,9 +3,14 @@ package org.yeastrc.xlink.www.searcher;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
+import org.yeastrc.xlink.enum_classes.FilterDirectionType;
+import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 
 /**
  * 
@@ -20,23 +25,17 @@ public class PsmCountForSearchIdReportedPeptideIdSearcher {
 	
 
 	
-	private static final String SQL = 
-			"SELECT COUNT(ID) AS count FROM psm WHERE search_id = ? "
-					+ "  AND reported_peptide_id = ? "
-					+ "  AND q_value <= ? "
-					;
-
-			
 			
 	
 	/**
 	 * @param reportedPeptideId
 	 * @param searchId
-	 * @param psmQValueCutoff
+	 * @param searcherCutoffValuesSearchLevel
 	 * @return
 	 * @throws Exception
 	 */
-	public int getPsmCountForSearchIdReportedPeptideId( int reportedPeptideId, int searchId, double psmQValueCutoff ) throws Exception {
+	public int getPsmCountForSearchIdReportedPeptideId( int reportedPeptideId, int searchId, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
+		
 		
 		int numPsms = 0;
 		
@@ -44,8 +43,119 @@ public class PsmCountForSearchIdReportedPeptideIdSearcher {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		String sql = SQL;
+
 		
+		List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesList = 
+				searcherCutoffValuesSearchLevel.getPsmPerAnnotationCutoffsList();
+
+		
+		
+		StringBuilder sqlSB = new StringBuilder( 10000 );
+		
+		sqlSB.append( "SELECT COUNT(*) AS count FROM  " ); 
+
+
+		if ( psmCutoffValuesList.isEmpty() ) {
+			
+
+			sqlSB.append( " psm WHERE search_id = ? AND reported_peptide_id = ? " );
+
+
+			
+		} else {
+			
+			{
+
+				for ( int counter = 1; counter <= psmCutoffValuesList.size(); counter++ ) {
+
+					if ( counter > 1 ) {
+
+						sqlSB.append( " INNER JOIN " );
+					}
+
+					sqlSB.append( " psm_filterable_annotation__generic_lookup AS tbl_" );
+					sqlSB.append( Integer.toString( counter ) );
+
+
+					if ( counter > 1 ) {
+
+						sqlSB.append( " ON "  );
+
+						sqlSB.append( "tbl_" );
+						sqlSB.append( Integer.toString( counter - 1 ) );
+						sqlSB.append( ".psm_id " );
+
+						sqlSB.append( " = " );
+
+						sqlSB.append( "tbl_" );
+						sqlSB.append( Integer.toString( counter ) );
+						sqlSB.append( ".psm_id" );
+					}
+
+				}
+
+
+				sqlSB.append( " WHERE ( " );
+
+				{
+
+					int counter = 0; 
+
+					for ( SearcherCutoffValuesAnnotationLevel entry : psmCutoffValuesList ) {
+
+						counter++;
+
+						if ( counter > 1 ) {
+
+							sqlSB.append( " ) AND ( " );
+						}
+
+
+						sqlSB.append( "tbl_" );
+						sqlSB.append( Integer.toString( counter ) );
+						sqlSB.append( ".search_id = ? AND " );
+
+						sqlSB.append( "tbl_" );
+						sqlSB.append( Integer.toString( counter ) );
+						sqlSB.append( ".reported_peptide_id = ? AND " );
+
+
+						sqlSB.append( "tbl_" );
+						sqlSB.append( Integer.toString( counter ) );
+						sqlSB.append( ".annotation_type_id = ? AND " );
+
+						sqlSB.append( "tbl_" );
+						sqlSB.append( Integer.toString( counter ) );
+						sqlSB.append( ".value_double " );
+
+						if ( entry.getAnnotationTypeDTO().getAnnotationTypeFilterableDTO() == null ) {
+
+							String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + entry.getAnnotationTypeDTO().getId();
+							log.error( msg );
+							throw new Exception(msg);
+						}
+
+						if ( entry.getAnnotationTypeDTO().getAnnotationTypeFilterableDTO().getFilterDirectionType() == FilterDirectionType.ABOVE ) {
+
+							sqlSB.append( SearcherGeneralConstants.SQL_END_BIGGER_VALUE_BETTER );
+
+						} else {
+
+							sqlSB.append( SearcherGeneralConstants.SQL_END_SMALLER_VALUE_BETTER );
+
+						}
+
+						sqlSB.append( "? " );
+					}
+				}
+			}
+
+			sqlSB.append( " ) " );
+		}
+
+		
+		
+		String sql = sqlSB.toString();
 		
 		try {
 			
@@ -53,18 +163,33 @@ public class PsmCountForSearchIdReportedPeptideIdSearcher {
 
 			pstmt = conn.prepareStatement( sql );
 			
-			int counter = 0;
-			
-			
-			counter++;
-			pstmt.setInt( counter, searchId );
-		
-			counter++;
-			pstmt.setInt( counter, reportedPeptideId );
-			
-			counter++;
-			pstmt.setDouble( counter, psmQValueCutoff );
-			
+			int pstmtCounter = 0;
+
+
+			if ( psmCutoffValuesList.isEmpty() ) {
+
+				pstmtCounter++;
+				pstmt.setInt( pstmtCounter, searchId );
+				pstmtCounter++;
+				pstmt.setInt( pstmtCounter, reportedPeptideId );
+
+				
+			} else {
+
+				for ( SearcherCutoffValuesAnnotationLevel entry : psmCutoffValuesList ) {
+
+					pstmtCounter++;
+					pstmt.setInt( pstmtCounter, searchId );
+					pstmtCounter++;
+					pstmt.setInt( pstmtCounter, reportedPeptideId );
+
+					pstmtCounter++;
+					pstmt.setInt( pstmtCounter, entry.getAnnotationTypeDTO().getId() );
+
+					pstmtCounter++;
+					pstmt.setDouble( pstmtCounter, entry.getAnnotationCutoffValue() );
+				}
+			}
 			
 			
 			rs = pstmt.executeQuery();
@@ -77,7 +202,7 @@ public class PsmCountForSearchIdReportedPeptideIdSearcher {
 
 		} catch ( Exception e ) {
 
-			log.error( "ERROR:  SQL: " + sql, e );
+			log.error( "ERROR getting psm count:  SQL: " + sql, e );
 
 			throw e;
 			

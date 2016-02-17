@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.objects.SearchDTODetailsDisplayWrapper;
 
 /**
@@ -16,8 +17,6 @@ public class GetSearchDetailsData {
 
 	private static final GetSearchDetailsData instance = new GetSearchDetailsData();
 	
-	private static final String SEARCHES_DETAILS_LIST_REQUEST_KEY = "searches_details_list";
-
 	private GetSearchDetailsData() { }
 	public static GetSearchDetailsData getInstance() { return instance; }
 
@@ -55,7 +54,7 @@ public class GetSearchDetailsData {
 		}
 
 		
-		request.setAttribute( SEARCHES_DETAILS_LIST_REQUEST_KEY, searchDTODetailsList );
+		request.setAttribute( WebConstants.PARAMETER_SEARCHES_DETAILS_LIST_REQUEST_KEY, searchDTODetailsList );
 
 	}
 }

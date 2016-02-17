@@ -53,7 +53,7 @@ var _project_id = null;
 	 			
 	 			
 	 			
-	 			//   Delete Search click handlers
+	 			//   Attach Delete Search click handlers
 	 			
 
 	 			$(".delete_search_link_jq").click(function(eventObject) {
@@ -87,7 +87,7 @@ var _project_id = null;
 	 			
 
 	 			
-	 			///////  Delete Search Weblink Click handlers
+	 			///////  Attach Delete Search Weblink Click handlers
 	 			
 	 			
 
@@ -123,7 +123,7 @@ var _project_id = null;
 	 			
 	 			
 	 			
-	 			///////  Delete Search Comment Click handlers
+	 			///////  Attach Delete Search Comment Click handlers
 	 			
 	 			
 	 			
@@ -1013,12 +1013,22 @@ var _project_id = null;
 			}
 			
 			function viewMergedPeptides() {
-				$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/viewMergedPeptide.do");
+				$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/mergedPeptide.do");
 				$( "form#viewMergedDataForm" ).submit();
 			}
 			
 			function viewMergedProteins() {
-				$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/viewMergedCrosslinkProtein.do");
+				$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/mergedCrosslinkProtein.do");
+				$( "form#viewMergedDataForm" ).submit();
+			}
+			
+			function viewMergedImage() {
+				$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/image.do");
+				$( "form#viewMergedDataForm" ).submit();
+			}
+
+			function viewMergedStructure() {
+				$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/structure.do");
 				$( "form#viewMergedDataForm" ).submit();
 			}
 
@@ -1097,126 +1107,4 @@ var _project_id = null;
 			}
 			
 			
-			
-			//////////
-			
-			function viewImage( id ) {
-				var items = { };
-
-				items.psmQValueCutoff = 0.01;
-				items.peptideQValueCutoff = 0.01;
-				
-
-				
-				var excludeType = new Array();
-				excludeType.push(0);
-				items.excludeType = excludeType;
-				
-				var pageURL = contextPathJSVar + "/";
-				
-				
-
-				var defaultURL = $( "#viewMergedImageDefaultPageUrl_" + id ).val();
-				
-				if ( defaultURL === "" ) {
-				          
-					pageURL += "viewMergedImage.do?project_id=" + _project_id + "&searchIds=" + id + "#" + encodeURI( JSON.stringify( items ) );
-					
-				} else {
-					
-					pageURL += defaultURL;
-					
-				}
-				
-				document.location.href = pageURL;
-			}
-			
-			
-			function viewStructure( id ) {
-				var items = { };
-
-				items.psmQValueCutoff = 0.01;
-				items.peptideQValueCutoff = 0.01;
-				
-				var excludeType = new Array();
-				excludeType.push(0);
-				items.excludeType = excludeType;
-				
-				
-				var pageURL = contextPathJSVar + "/";
-				
-				
-
-				var defaultURL = $( "#viewMergedStructureDefaultPageUrl_" + id ).val();
-				
-				if ( defaultURL === "" ) {
-				          
-					pageURL += "viewMergedStructure.do?project_id=" + _project_id + "&searchIds=" + id + "#" + encodeURI( JSON.stringify( items ) );
-					
-				} else {
-					
-					pageURL += defaultURL;
-					
-				}
-				
-				document.location.href = pageURL;				
-			}
-			
-			//////////
-			
-			function viewMergedImage() {
-				var items = { };
-
-				items.searches = searchesToMerge;
-				items.psmQValueCutoff = 0.01;
-				items.peptideQValueCutoff = 0.01;
-
-
-				var excludeType = new Array();
-				excludeType.push(0);
-				items.excludeType = excludeType;
-				
-
-
-				var searchIds = "";
-				for ( var searchesToMergeIndex = 0; searchesToMergeIndex < searchesToMerge.length; searchesToMergeIndex++ ) {
-					
-					if ( searchesToMergeIndex > 0 ) {
-						searchIds += "&";
-					}
-					searchIds += "searchIds=" + searchesToMerge[ searchesToMergeIndex ];
-				}
-				
-				var url = contextPathJSVar + "/viewMergedImage.do?project_id=" + _project_id + "&" 
-						+ searchIds + "#" + encodeURI( JSON.stringify( items ) );
-				
-				document.location.href = url;
-			}
-			
-			
-			function viewMergedStructure() {
-				var items = { };
-
-				items.psmQValueCutoff = 0.01;
-				items.peptideQValueCutoff = 0.01;
-
-
-				var searchIds = "";
-				for ( var searchesToMergeIndex = 0; searchesToMergeIndex < searchesToMerge.length; searchesToMergeIndex++ ) {
-					
-					if ( searchesToMergeIndex > 0 ) {
-						searchIds += "&";
-					}
-					searchIds += "searchIds=" + searchesToMerge[ searchesToMergeIndex ];
-				}
-				
-				var excludeType = new Array();
-				excludeType.push(0);
-				items.excludeType = excludeType;
-				
-				var url = contextPathJSVar + "/viewMergedStructure.do?project_id=" + _project_id + "&" 
-						+ searchIds + "#" + encodeURI( JSON.stringify( items ) );
-				
-				document.location.href = url;
-			}
 			

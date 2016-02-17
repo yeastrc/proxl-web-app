@@ -24,6 +24,38 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 	var _handlebarsTemplate_psm_data_row_entry_template = null;
 	
 	
+	var _psmPeptideCutoffsRootObject = null;
+	
+	//   Currently expect _psmPeptideCriteria = 
+//					searches: Object
+//						128: Object			
+//							peptideCutoffValues: Object
+//								238: Object
+//									id: 238
+//									value: "0.01"
+//							psmCutoffValues: Object
+//								384: Object
+//									id: 384
+//									value: "0.01"
+//							searchId: 128
+	
+//           The key to:
+//				searches - searchId
+//				peptideCutoffValues and psmCutoffValues - annotation type id
+	
+//			peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+	
+	
+	//////////////
+	
+	this.setPsmPeptideCriteria = function( psmPeptideCutoffsRootObject ) {
+		
+		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
+	};
+	
+	
+	//////////
+	
 	this.showHidePsms = function( params ) {
 		
 		var clickedElement = params.clickedElement;
@@ -70,14 +102,13 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			
 			return;  //  EARLY EXIT  since data already loaded. 
 		}
-		
+
 
 		var initial_scan_id = $clickedElement.attr( "initial_scan_id" );
 		var reported_peptide_id = $clickedElement.attr( "reported_peptide_id" );
 		var search_id = $clickedElement.attr( "search_id" );
 		var project_id = $clickedElement.attr( "project_id" );
-		var peptide_q_value_cutoff = $clickedElement.attr( "peptide_q_value_cutoff" );
-		var psm_q_value_cutoff = $clickedElement.attr( "psm_q_value_cutoff" );
+		
 
 		var skip_associated_peptides_link = $clickedElement.attr( "skip_associated_peptides_link" );
 		
@@ -98,12 +129,39 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		if ( ! project_id ) {
 			project_id = "";
 		}
-		if ( ! peptide_q_value_cutoff ) {
-			peptide_q_value_cutoff = "";
+		
+		
+
+		//   Currently expect _psmPeptideCriteria = 
+//						searches: Object
+//							128: Object			
+//								peptideCutoffValues: Object
+//									238: Object
+//										id: 238
+//										value: "0.01"
+//								psmCutoffValues: Object
+//									384: Object
+//										id: 384
+//										value: "0.01"
+//								searchId: 128
+		
+//	           The key to:
+//					searches - searchId
+//					peptideCutoffValues and psmCutoffValues - annotation type id
+		
+//				peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+		
+		var psmPeptideCutoffsForSearchId = _psmPeptideCutoffsRootObject.searches[ search_id ];
+
+		if ( psmPeptideCutoffsForSearchId === undefined || psmPeptideCutoffsForSearchId === null ) {
+			
+			psmPeptideCutoffsForSearchId = {};
+			
+//			throw "Getting data.  Unable to get cutoff data for search id: " + search_id;
 		}
-		if ( ! psm_q_value_cutoff ) {
-			psm_q_value_cutoff = "";
-		}
+
+		var psmPeptideCutoffsForSearchId_JSONString = JSON.stringify( psmPeptideCutoffsForSearchId );
+
 				
 		
 		var ajaxRequestData = {
@@ -111,8 +169,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 				reported_peptide_id : reported_peptide_id,
 				search_id : search_id,
 				project_id : project_id,
-				peptide_q_value_cutoff : peptide_q_value_cutoff,
-				psm_q_value_cutoff : psm_q_value_cutoff
+				psmPeptideCutoffsForSearchId : psmPeptideCutoffsForSearchId_JSONString
 		};
 		
 		
@@ -168,7 +225,10 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		
 		var initial_scan_id = params.otherData.initial_scan_id;
 
-		var psms = ajaxResponseData;
+
+		var annotationDisplayNameDescriptionList = ajaxResponseData.annotationDisplayNameDescriptionList;
+		
+		var psms = ajaxResponseData.psmWebDisplayList;
 		
 		initial_scan_id = parseInt( initial_scan_id, 10 );
 		
@@ -222,7 +282,6 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 
 		var scanDataAnyRows = false;
 		var chargeDataAnyRows = false;
-		var percolatorDataAnyRows = false;
 		
 
 		for ( var psmIndex = 0; psmIndex < psms.length ; psmIndex++ ) {
@@ -239,19 +298,16 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 				chargeDataAnyRows = true;
 			}
 			
-			if ( psm.psmDTO.percolatorPsm ) {
-				
-				percolatorDataAnyRows = true;
-			}
-			
-			
 		}
 
-		var context = {};
+		var context = {
+				
+				annotationDisplayNameDescriptionList : annotationDisplayNameDescriptionList
+				
+		};
 		
 		context.scanDataAnyRows = scanDataAnyRows;
 		context.chargeDataAnyRows = chargeDataAnyRows;
-		context.percolatorDataAnyRows = percolatorDataAnyRows;
 		
 		var html = _handlebarsTemplate_psm_block_template(context);
 
@@ -283,10 +339,10 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			
 			context.scanDataAnyRows = scanDataAnyRows;
 			context.chargeDataAnyRows = chargeDataAnyRows;
-			context.percolatorDataAnyRows = percolatorDataAnyRows;
 			
+			//  psm.psmCountForOtherAssocScanId is count of psms with same scan id, excluding current psm
 			
-			if ( psm.psmCountForAssocScanId < 2 ) {
+			if ( psm.psmCountForOtherAssocScanId < 1 ) {
 				
 				context.uniquePSM = true;
 			}

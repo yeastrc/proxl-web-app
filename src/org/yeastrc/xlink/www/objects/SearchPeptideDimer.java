@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.MatchedPeptideDAO;
 import org.yeastrc.xlink.dao.PeptideDAO;
+import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dto.MatchedPeptideDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
@@ -25,8 +26,7 @@ public class SearchPeptideDimer {
 		if ( psmId == null ) {
 			
 			log.warn( "No PSMs for search.id : " + search.getId() 
-					+ ", this.getReportedPeptide().getId(): " + this.getReportedPeptide().getId() 
-					+ ", this.getReportedPeptide().getSequence(): " + this.getReportedPeptide().getSequence() );
+					+ ", this.getReportedPeptideId(): " + this.getReportedPeptideId() );
 			
 			return;
 		}
@@ -78,13 +78,46 @@ public class SearchPeptideDimer {
 	}
 	
 
-	
-	public ReportedPeptideDTO getReportedPeptide() {
-		return reportedPeptide;
+	public int getReportedPeptideId() {
+		return reportedPeptideId;
 	}
+
+	public void setReportedPeptideId(int reportedPeptideId) {
+		this.reportedPeptideId = reportedPeptideId;
+	}
+
+
+	public ReportedPeptideDTO getReportedPeptide() throws Exception {
+		
+		try {
+			if ( reportedPeptide == null ) {
+
+				reportedPeptide = 
+						ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( reportedPeptideId );
+			}
+
+			return reportedPeptide;
+
+		} catch ( Exception e ) {
+
+			log.error( "getReportedPeptide() Exception: " + e.toString(), e );
+
+			throw e;
+		}
+			
+	}
+
+
 	public void setReportedPeptide(ReportedPeptideDTO reportedPeptide) {
 		this.reportedPeptide = reportedPeptide;
+
+		if ( reportedPeptide != null ) {
+			this.reportedPeptideId = reportedPeptide.getId();
+		}
+
 	}
+
+
 	public PeptideDTO getPeptide1() throws Exception {
 		
 		try {
@@ -130,87 +163,19 @@ public class SearchPeptideDimer {
 	}
 
 
-	public Double getQValue() {
-		return qValue;
-	}
-	public void setQValue(Double qValue) {
-		this.qValue = qValue;
-	}
-	public double getPsmQValueCutoff() {
-		return psmQValueCutoff;
-	}
-	public void setPsmQValueCutoff(double psmQValueCutoff) {
-		this.psmQValueCutoff = psmQValueCutoff;
-	}
-	public double getPeptideQValueCutoff() {
-		return peptideQValueCutoff;
-	}
-	public void setPeptideQValueCutoff(double peptideQValueCutoff) {
-		this.peptideQValueCutoff = peptideQValueCutoff;
-	}
-	
-
-
-	//  Percolator only
-
-
-	public boolean ispValuePopulated() {
-		return pValuePopulated;
-	}
-
-	public void setpValuePopulated(boolean pValuePopulated) {
-		this.pValuePopulated = pValuePopulated;
-	}
-
-	public boolean isSvmScorePopulated() {
-		return svmScorePopulated;
-	}
-
-	public void setSvmScorePopulated(boolean svmScorePopulated) {
-		this.svmScorePopulated = svmScorePopulated;
-	}
-
-	public boolean isPepPopulated() {
-		return pepPopulated;
-	}
-
-	public void setPepPopulated(boolean pepPopulated) {
-		this.pepPopulated = pepPopulated;
-	}
-	
-	
-	public double getpValue() {
-		return pValue;
-	}
-
-	public void setpValue(double pValue) {
-		this.pValue = pValue;
-	}
-
-	public double getSvmScore() {
-		return svmScore;
-	}
-
-	public void setSvmScore(double svmScore) {
-		this.svmScore = svmScore;
-	}
-
-	public double getPep() {
-		return pep;
-	}
-
-	public void setPep(double pep) {
-		this.pep = pep;
-	}
-
-
 	
 	
 	public int getNumPsms() {
-		return numPsms;
+		
+		throw new RuntimeException( "Unsuppported, No Logic to retrieve value");
+//		return numPsms;
 	}
 	public void setNumPsms(int numPsms) {
-		this.numPsms = numPsms;
+
+		throw new RuntimeException( "Unsuppported, No Logic to retrieve value");
+//		return numPsms;
+
+//		this.numPsms = numPsms;
 	}
 	
 	
@@ -220,18 +185,11 @@ public class SearchPeptideDimer {
 	 */
 	public Integer getSinglePsmId() throws Exception {
 
-		Integer psmId = SearchPsmSearcher.getInstance().getSinglePsmId( this );
+		Integer psmId = SearchPsmSearcher.getInstance().getSinglePsmId( this.getSearch().getId(), this.getReportedPeptide().getId() );
 		
 		return psmId;
 	}
 	
-	
-	public double getBestPsmQValue() {
-		return bestPsmQValue;
-	}
-	public void setBestPsmQValue(double bestPsmQValue) {
-		this.bestPsmQValue = bestPsmQValue;
-	}
 	
 	
 	
@@ -277,34 +235,21 @@ public class SearchPeptideDimer {
 	private List<SearchProteinPosition> peptide1ProteinPositions;
 	private List<SearchProteinPosition> peptide2ProteinPositions;
 	
+
+	private int reportedPeptideId = -999;
+
+
 	private ReportedPeptideDTO reportedPeptide;
+	
+	
 	private PeptideDTO peptide1;
 	private PeptideDTO peptide2;
 
-
-	private Double qValue;
 	
-
-
-	//  Percolator only
-
-	private boolean pValuePopulated = false;
-	private boolean svmScorePopulated = false;
-	private boolean pepPopulated = false;
-	
-	private double pValue;
-	private double svmScore;
-	private double pep;
-	
-	
-	
-	private double psmQValueCutoff;
-	private double peptideQValueCutoff;
 	
 	private SearchDTO search;
 //	private List<SearchProteinDoublePosition> peptideProteinPositions;
 	
-	private int numPsms;
-	private double bestPsmQValue;
+//	private int numPsms = -999;
 	
 }

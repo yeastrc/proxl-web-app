@@ -12,8 +12,16 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.PsmDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.PsmDTO;
-import org.yeastrc.xlink.www.objects.PsmWebDisplay;
+import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.enum_classes.FilterDirectionType;
+import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.web_utils.RetentionTimeScalingAndRounding;
+
+
+
 
 public class PsmWebDisplaySearcher {
 
@@ -23,34 +31,208 @@ public class PsmWebDisplaySearcher {
 	private static final PsmWebDisplaySearcher _INSTANCE = new PsmWebDisplaySearcher();
 	public static PsmWebDisplaySearcher getInstance() { return _INSTANCE; }
 	
+	
+	
+
+	private static final String SQL_MAIN = 
+			"SELECT psm.id AS psm_id, psm.charge, scan.start_scan_number AS scan_number, scan.retention_time, "
+			+        "  scan.preMZ, scan_file.filename AS scan_filename "
+					
+			+ " FROM psm  "
+			+ " LEFT OUTER JOIN scan ON psm.scan_id = scan.id "
+			+ " LEFT OUTER JOIN scan_file ON scan.scan_file_id = scan_file.id ";
+
+	private static final String SQL_WHERE_START =  " WHERE psm.search_id = ? AND psm.reported_peptide_id = ?  ";
+			
+	private static final String SQL_ORDER_BY =   " ORDER BY psm.id ";
+
+	
+	
 	/**
 	 * @param searchId
 	 * @param reportedPeptideId
-	 * @param peptideQValueCutoff
-	 * @param psmQValueCutoff
+	 * @param searcherCutoffValuesSearchLevel - PSM and Peptide cutoffs for a search id
 	 * @return
 	 * @throws Exception
 	 */
-	public List<PsmWebDisplay> getPsmsWebDisplay( int searchId, int reportedPeptideId, double peptideQValueCutoff, double psmQValueCutoff  ) throws Exception {
+	public List<PsmWebDisplayWebServiceResult> getPsmsWebDisplay( int searchId, int reportedPeptideId, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel  ) throws Exception {
 		
-		List<PsmWebDisplay> psms = new ArrayList<PsmWebDisplay>();
+		List<PsmWebDisplayWebServiceResult> psms = new ArrayList<PsmWebDisplayWebServiceResult>();
+		
+
+		List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesList = 
+				searcherCutoffValuesSearchLevel.getPsmPerAnnotationCutoffsList();
+
+
+
+		////////////
+		
+		//  All cutoffs are default?
+		
+//		boolean onlyDefaultPeptideCutoffs = true;
+		
+//		boolean onlyDefaultPsmCutoffs = true;
+		
+		
+		
+		//   Check if all Peptide Cutoffs are default values
+		
+//		for ( SearcherCutoffValuesAnnotationLevel item : peptideCutoffValuesList ) {
+//			
+//			if ( ! item.annotationValueMatchesDefault() ) {
+//				
+//				onlyDefaultPeptideCutoffs = false;
+//				break;
+//			}
+//		}
+
+		//   Check if all Psm Cutoffs are default values
+		
+//		for ( SearcherCutoffValuesAnnotationLevel item : psmCutoffValuesList ) {
+//			
+//			if ( ! item.annotationValueMatchesDefault() ) {
+//				
+//				onlyDefaultPsmCutoffs = false;
+//				break;
+//			}
+//		}
+		
+		
+		
+
+		StringBuilder sqlSB = new StringBuilder( 1000 );
+		
+
+		//////////////////////
+		
+		/////   Start building the SQL
+		
+		
+		
+
+		sqlSB.append( SQL_MAIN );
+		
+
+		{
+			
+//			if ( ! onlyDefaultPsmCutoffs ) { //  Can only use this if psm table or a lookup has a flag for "met default cutoffs"
+				
+				
+				// NOT CURRENTLY APPLY SINCE "if" just above commented out:     Non-Default PSM cutoffs so have to query on the cutoffs
+
+
+				//  Add inner join for each PSM cutoff
+
+				for ( int counter = 1; counter <= psmCutoffValuesList.size(); counter++ ) {
+
+					sqlSB.append( " INNER JOIN " );
+					
+					
+					//  If slow, use psm_filterable_annotation__generic_lookup and put more limits in query on search, reported peptide, and maybe link type
+
+					sqlSB.append( " psm_annotation AS psm_fltrbl_tbl_" );
+					sqlSB.append( Integer.toString( counter ) );
+
+					sqlSB.append( " ON "  );
+
+					sqlSB.append( " psm.id = "  );
+
+					sqlSB.append( "psm_fltrbl_tbl_" );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( ".psm_id" );
+
+				}
+
+//			}
+		
+		}
+		
+		///////////
+		
+		sqlSB.append( SQL_WHERE_START );
+		
+		//////////
+		
+
+		// Process PSM Cutoffs for WHERE
+
+		{
+
+			
+//			if ( onlyDefaultPsmCutoffs ) {
+//				
+//				//   Only Default PSM Cutoffs chosen so criteria simply the Peptides where the PSM count for the default cutoffs is > zero
+//				
+//
+//				sqlSB.append( " AND " );
+//
+//
+//				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff > 0 " );
+//
+//				
+//			} else {
+
+				
+				//  Non-Default PSM cutoffs so have to query on the cutoffs
+
+				int counter = 0; 
+
+				for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesPsmAnnotationLevel : psmCutoffValuesList ) {
+
+
+					AnnotationTypeDTO srchPgmFilterablePsmAnnotationTypeDTO = searcherCutoffValuesPsmAnnotationLevel.getAnnotationTypeDTO();
+
+					counter++;
+
+					sqlSB.append( " AND " );
+
+					sqlSB.append( " ( " );
+
+					sqlSB.append( "psm_fltrbl_tbl_" );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( ".annotation_type_id = ? AND " );
+
+					sqlSB.append( "psm_fltrbl_tbl_" );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( ".value_double " );
+
+					if ( srchPgmFilterablePsmAnnotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
+						
+						String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + srchPgmFilterablePsmAnnotationTypeDTO.getId();
+						log.error( msg );
+						throw new Exception(msg);
+					}
+					
+					if ( srchPgmFilterablePsmAnnotationTypeDTO.getAnnotationTypeFilterableDTO().getFilterDirectionType() == FilterDirectionType.ABOVE ) {
+
+						sqlSB.append( SearcherGeneralConstants.SQL_END_BIGGER_VALUE_BETTER );
+
+					} else {
+
+						sqlSB.append( SearcherGeneralConstants.SQL_END_SMALLER_VALUE_BETTER );
+
+					}
+
+					sqlSB.append( " ? " );
+
+					sqlSB.append( " ) " );
+				}
+//			}
+		}
+		
+
+		sqlSB.append( SQL_ORDER_BY );
+
+		
+
+		String sql = sqlSB.toString();
+		
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-
-		final String sql = 
-				"SELECT psm.id AS psm_id, psm.charge, scan.start_scan_number AS scan_number, scan.retention_time, "
-				+        "  scan.preMZ, scan_file.filename AS scan_filename "
-						
-				+ " FROM psm  "
-				+ " LEFT OUTER JOIN percolator_psm ON psm.id = percolator_psm.psm_id"
-				+ " LEFT OUTER JOIN scan ON psm.scan_id = scan.id "
-				+ " LEFT OUTER JOIN scan_file ON scan.scan_file_id = scan_file.id "
-				
-				+ " WHERE search_id = ? AND reported_peptide_id = ? AND psm.q_value <= ? "
-				
-				+ " ORDER BY psm.q_value , percolator_psm.pep, percolator_psm.svm_score DESC, psm.id ";
+		
+		
 
 		
 		
@@ -59,19 +241,48 @@ public class PsmWebDisplaySearcher {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
 			
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, searchId );
-			pstmt.setInt( 2, reportedPeptideId );
-			pstmt.setDouble( 3, psmQValueCutoff );
+			
+			int paramCounter = 0;
+			
+			paramCounter++;
+			pstmt.setInt( paramCounter, searchId );
+			
+			paramCounter++;
+			pstmt.setInt( paramCounter, reportedPeptideId );
 
+
+			// Process PSM Cutoffs for WHERE
+
+
+			{
+				
+//				if ( ! onlyDefaultPsmCutoffs ) {
+					
+					//  PSM Cutoffs are not the default 
+					
+
+					for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesPsmAnnotationLevel : psmCutoffValuesList ) {
+
+						AnnotationTypeDTO srchPgmFilterablePsmAnnotationTypeDTO = searcherCutoffValuesPsmAnnotationLevel.getAnnotationTypeDTO();
+
+						paramCounter++;
+						pstmt.setInt( paramCounter, srchPgmFilterablePsmAnnotationTypeDTO.getId() );
+
+						paramCounter++;
+						pstmt.setDouble( paramCounter, searcherCutoffValuesPsmAnnotationLevel.getAnnotationCutoffValue() );
+					}
+//				}
+			}
+			
 			rs = pstmt.executeQuery();
 			
 			while( rs.next() ) {
 				
-				PsmWebDisplay psmWebDisplay = new PsmWebDisplay();
+				PsmWebDisplayWebServiceResult psmWebDisplay = new PsmWebDisplayWebServiceResult();
 				
 				psmWebDisplay.setSearchId( searchId );
-				psmWebDisplay.setPeptideQValueCutoff( peptideQValueCutoff );
-				psmWebDisplay.setPsmQValueCutoff( psmQValueCutoff );
+				
+				psmWebDisplay.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 				
 				
 				PsmDTO psmDTO = PsmDAO.getInstance().getPsmDTO( rs.getInt( "psm_id" ) );

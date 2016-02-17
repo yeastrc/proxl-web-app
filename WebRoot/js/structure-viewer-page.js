@@ -934,9 +934,13 @@ function populateNavigation() {
 	var html = "";
 
 	if ( _searches.length > 1 ) {
-		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/viewMergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
-		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/viewMergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
-		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/viewMergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
+		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
+		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
+		
+		html += ' <span style="color:red; font-size: 24px;">Merged Coverage Report under construction </span> ';
+		
+//		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
+		
 	} else {
 		
 
@@ -949,7 +953,7 @@ function populateNavigation() {
 		
 		if ( viewSearchPeptideDefaultPageUrl === undefined || viewSearchPeptideDefaultPageUrl === "" ) {
 			      
-			html += "viewSearchPeptide.do" + queryString;
+			html += "peptide.do" + queryString;
 
 		} else {
 			
@@ -967,7 +971,7 @@ function populateNavigation() {
 		
 		if ( viewSearchCrosslinkProteinDefaultPageUrl === undefined || viewSearchCrosslinkProteinDefaultPageUrl === "" ) {
 			      
-			html += "viewSearchCrosslinkProtein.do" + queryString;
+			html += "crosslinkProtein.do" + queryString;
 
 		} else {
 			
@@ -985,7 +989,7 @@ function populateNavigation() {
 		
 		if ( viewProteinCoverageReportDefaultPageUrl === undefined || viewProteinCoverageReportDefaultPageUrl === "" ) {
 			      
-			html += "viewProteinCoverageReport.do" + queryString;
+			html += "proteinCoverageReport.do" + queryString;
 
 		} else {
 			
@@ -1042,7 +1046,7 @@ function populateNavigation() {
 		
 
 		
-		html += "viewMergedImage.do" + imageQueryString + "#" + imageJSONString ;
+		html += "image.do" + imageQueryString + "#" + imageJSONString ;
 
 	} else {
 		

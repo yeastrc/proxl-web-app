@@ -22,6 +22,10 @@ public class ProteinSequenceCoverage {
 	private void calculateSequenceCoverage() throws Exception {
 		int totalResidues = 0;
 		
+		if( this.ranges == null )
+			this.ranges = TreeRangeSet.create();
+
+		
 		for( Range<Integer> r : this.ranges.asRanges() ) {
 			totalResidues += r.upperEndpoint() - r.lowerEndpoint() + 1;
 		}
@@ -57,6 +61,10 @@ public class ProteinSequenceCoverage {
 	 * @return
 	 */
 	public Set<Range<Integer>> getRanges() {
+		
+		if( this.ranges == null )
+			this.ranges = TreeRangeSet.create();
+		
 		return ranges.asRanges();
 	}
 	

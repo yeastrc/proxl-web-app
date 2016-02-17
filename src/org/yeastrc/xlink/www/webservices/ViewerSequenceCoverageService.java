@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+//import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -21,25 +22,31 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.NRProteinDAO;
 import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.ProteinSequenceCoverage;
 import org.yeastrc.xlink.www.searcher.MergedSearchPeptideSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.constants.QueryCriteriaValueCountsFieldValuesConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.dao.QueryCriteriaValueCountsDAO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
+import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
+import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.objects.SequenceCoverageData;
 import org.yeastrc.xlink.www.objects.SequenceCoverageRange;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Range;
 
 @Path("/sequenceCoverage")
@@ -50,13 +57,15 @@ public class ViewerSequenceCoverageService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getDataForProtein") 
-	public SequenceCoverageData getSequenceCoverageDataForProtein( @QueryParam( "searchIds" ) List<Integer> searchIds,
-										  @QueryParam( "psmQValueCutoff" ) Double psmQValueCutoff,
-										  @QueryParam( "peptideQValueCutoff" ) Double peptideQValueCutoff,
-										  @QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
-										  @QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
-										  @QueryParam( "proteinId" ) int proteinId,
-										  @Context HttpServletRequest request )
+	public SequenceCoverageData getSequenceCoverageDataForProtein( 
+			@QueryParam( "searchIds" ) List<Integer> searchIds,
+
+			@QueryParam( "psmPeptideCutoffsForSearchIds" ) String psmPeptideCutoffsForSearchIds_JSONString,
+
+			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
+			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
+			@QueryParam( "proteinId" ) int proteinId,
+			@Context HttpServletRequest request )
 	throws Exception {
 
 		if ( searchIds == null || searchIds.isEmpty() ) {
@@ -71,13 +80,25 @@ public class ViewerSequenceCoverageService {
 		    	        .build()
 		    	        );
 		}
-		
+
+		if ( StringUtils.isEmpty( psmPeptideCutoffsForSearchIds_JSONString ) ) {
+
+			String msg = "Provided psmPeptideCutoffsForSearchIds is null or psmPeptideCutoffsForSearchIds is missing";
+
+			log.error( msg );
+
+			throw new WebApplicationException(
+					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					.entity( msg )
+					.build()
+					);
+		}
 		
 		try {
 			
 
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 
 
 			if ( searchIds.isEmpty() ) {
@@ -92,15 +113,15 @@ public class ViewerSequenceCoverageService {
 			
 			//   Get the project id for this search
 			
-			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
+			Set<Integer> searchIdsSet = new HashSet<Integer>( );
 			
 			for ( int searchId : searchIds ) {
 
-				searchIdsCollection.add( searchId );
+				searchIdsSet.add( searchId );
 			}
 			
 			
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsSet );
 			
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				
@@ -136,7 +157,7 @@ public class ViewerSequenceCoverageService {
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 			
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
 
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 
@@ -168,18 +189,59 @@ public class ViewerSequenceCoverageService {
 			}
 
 
+			////////   Auth complete
+
+			//////////////////////////////////////////
+			
+			
+
+			//   Get PSM and Peptide Cutoff data from JSON
+
+
+			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON Mapper object for JSON deserialization
+
+
+			CutoffValuesRootLevel cutoffValuesRootLevel = null;
+
+			try {
+				cutoffValuesRootLevel = jacksonJSON_Mapper.readValue( psmPeptideCutoffsForSearchIds_JSONString, CutoffValuesRootLevel.class );
+
+			} catch ( JsonParseException e ) {
+
+				String msg = "Failed to parse 'psmPeptideCutoffsForSearchIds_JSONString', JsonParseException.  psmPeptideCutoffsForSearchIds_JSONString: " + psmPeptideCutoffsForSearchIds_JSONString;
+				log.error( msg, e );
+				throw e;
+
+			} catch ( JsonMappingException e ) {
+
+				String msg = "Failed to parse 'psmPeptideCutoffsForSearchIds_JSONString', JsonMappingException.  psmPeptideCutoffsForSearchIds_JSONString: " + psmPeptideCutoffsForSearchIds_JSONString;
+				log.error( msg, e );
+				throw e;
+
+			} catch ( IOException e ) {
+
+				String msg = "Failed to parse 'psmPeptideCutoffsForSearchIds_JSONString', IOException.  psmPeptideCutoffsForSearchIds_JSONString: " + psmPeptideCutoffsForSearchIds_JSONString;
+				log.error( msg, e );
+				throw e;
+			}
+			
+
+			
+			Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
+					Z_CutoffValuesObjectsToOtherObjectsFactory.createSearcherCutoffValuesRootLevel( 
+							searchIdsSet, cutoffValuesRootLevel ); 
+			
+			
+			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
+			
+			
+
 
 			Map<Integer, Double> coverages = new HashMap<Integer, Double>();
 			Map<Integer, List<SequenceCoverageRange>> ranges = new HashMap<Integer, List<SequenceCoverageRange>>();
 
 			SequenceCoverageData scd = new SequenceCoverageData();
 
-			// ensure our cutoffs have some default values
-			if( psmQValueCutoff == null )
-				psmQValueCutoff = 0.01;
-			
-			if( peptideQValueCutoff == null )
-				peptideQValueCutoff = 0.01;
 
 			if( excludeTaxonomy == null ) 
 				excludeTaxonomy = new ArrayList<Integer>();
@@ -212,29 +274,19 @@ public class ViewerSequenceCoverageService {
 			}
 
 			
-
-			
-			QueryCriteriaValueCountsDAO.getInstance().saveOrIncrement( 
-					QueryCriteriaValueCountsFieldValuesConstants.PSM_Q_VALUE_FIELD_VALUE, Double.toString( psmQValueCutoff ) );
-			QueryCriteriaValueCountsDAO.getInstance().saveOrIncrement( 
-					QueryCriteriaValueCountsFieldValuesConstants.PEPTIDE_Q_VALUE_FIELD_VALUE, Double.toString( peptideQValueCutoff ) );
-
-			
 			
 
 			// add these to the SCD so that we have context for the results
 			scd.setExcludeTaxonomy( excludeTaxonomy );
 			scd.setFilterNonUniquePeptides( filterNonUniquePeptides );
-			scd.setPeptideQValueCutoff( peptideQValueCutoff );
-			scd.setPsmQValueCutoff( psmQValueCutoff );
-			scd.setSearches( searches );
+//			scd.setSearches( searches );
 
 			// first get all distinct proteins that have at least one linked peptide, given the search parameters
 			NRProteinDTO protein = NRProteinDAO.getInstance().getNrProtein( proteinId );
 
 			ProteinSequenceCoverage cov = new ProteinSequenceCoverage( protein );
 
-			Collection<PeptideDTO> peptides = MergedSearchPeptideSearcher.getInstance().getPeptides( protein, searches, psmQValueCutoff, peptideQValueCutoff);
+			Collection<PeptideDTO> peptides = MergedSearchPeptideSearcher.getInstance().getPeptides( protein, searches, searcherCutoffValuesRootLevel);
 			for( PeptideDTO peptide : peptides ) {
 				cov.addPeptide( peptide.getSequence() );
 			}
@@ -307,6 +359,18 @@ public class ViewerSequenceCoverageService {
 		} catch ( WebApplicationException e ) {
 
 			throw e;
+
+		} catch ( ProxlWebappDataException e ) {
+
+			String msg = "Exception processing request data, msg: " + e.toString();
+			
+			log.error( msg, e );
+
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	        .entity( msg )
+		    	        .build()
+		    	        );			
 			
 		} catch ( Exception e ) {
 			
@@ -314,8 +378,14 @@ public class ViewerSequenceCoverageService {
 			
 			log.error( msg, e );
 			
-			throw e;
-		}	
+
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
+					.build()
+					);
+		}
+
 	}
 	
 	

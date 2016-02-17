@@ -9,8 +9,11 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.XLinkUtils;
-import org.yeastrc.xlink.www.searcher.PsmCountForSearchIdsUnifiedReportedPeptideIdSearcher;
+import org.yeastrc.xlink.www.searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
+import org.yeastrc.xlink.www.searcher.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher;
 
 
 
@@ -62,17 +65,57 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 			
 			return numPsms;
 		}
+		
 
-//		num psms is always based on searching psm table for: search id, reported peptide id, and q value.
+//		num psms is always based on searching psm table for: search id, reported peptide id, and peptide and psm cutoffs.
 //		reported peptide id can be gotten from unified reported peptide id and search id
 
-		numPsms = 
-				PsmCountForSearchIdsUnifiedReportedPeptideIdSearcher.getInstance()
-				.getPsmCountForSearchIdsUnifiedReportedPeptideId( unifiedReportedPeptideId, searchIds, psmQValueCutoff, peptideQValueCutoff );
-
-		numPsmsSet = true;
 		
-		return numPsms;
+		//   Use WebReportedPeptide.getNumPsms() code for each search id / reported peptide id
+		
+		try {
+
+			int totalNumPsms = 0;
+
+			List<ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult>  reppeptideIdSearchIdList = 
+					ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher.getInstance()
+					.getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( searchIds, unifiedReportedPeptideId );
+			
+			for ( ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult item : reppeptideIdSearchIdList ) {
+				
+				int searchId = item.getSearchId();
+
+				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = 
+						searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
+				
+				if ( searcherCutoffValuesSearchLevel == null ) {
+					
+					searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
+					
+//					String msg = "Unable to get cutoffs for search id: " + searchId;
+//					log.error( msg );
+//					throw new Exception(msg);
+				}
+
+				int numPsms = PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
+						.getPsmCountForSearchIdReportedPeptideId( item.getReportedPeptideId(), item.getSearchId(), searcherCutoffValuesSearchLevel );
+
+				totalNumPsms += numPsms;
+			}
+
+
+			numPsms = totalNumPsms;
+
+			numPsmsSet = true;
+
+			return numPsms;
+			
+		} catch ( Exception e ) {
+			
+			String msg = "Error getting num psms";
+			log.error( msg, e );
+			throw e;
+		}
 	}
 		
 
@@ -364,19 +407,6 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 	
 	
 	
-	
-	
-	public void setBestPeptideQValue(Double bestPeptideQValue) {
-		this.bestPeptideQValue = bestPeptideQValue;
-	}
-
-
-	public Double getBestPeptideQValue() {
-		
-		return bestPeptideQValue;
-	}
-	
-
 
 	public List<SearchBooleanWrapper> getSearchContainsPeptide() {
 		return searchContainsPeptide;
@@ -452,19 +482,6 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 	}
 
 
-	public double getPsmQValueCutoff() {
-		return psmQValueCutoff;
-	}
-	public void setPsmQValueCutoff(double psmQValueCutoff) {
-		this.psmQValueCutoff = psmQValueCutoff;
-	}
-	
-	public double getPeptideQValueCutoff() {
-		return peptideQValueCutoff;
-	}
-	public void setPeptideQValueCutoff(double peptideQValueCutoff) {
-		this.peptideQValueCutoff = peptideQValueCutoff;
-	}
 
 	public Collection<Integer> getSearchIds() {
 		return searchIds;
@@ -472,6 +489,27 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 	public void setSearchIds(Collection<Integer> searchIds) {
 		this.searchIds = searchIds;
 	}
+	
+	public SearcherCutoffValuesRootLevel getSearcherCutoffValuesRootLevel() {
+		return searcherCutoffValuesRootLevel;
+	}
+	public void setSearcherCutoffValuesRootLevel(
+			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel) {
+		this.searcherCutoffValuesRootLevel = searcherCutoffValuesRootLevel;
+	}
+
+
+	public List<AnnValuePeptPsmListsPair> getPeptidePsmAnnotationValueListsForEachSearch() {
+		return peptidePsmAnnotationValueListsForEachSearch;
+	}
+
+
+
+	public void setPeptidePsmAnnotationValueListsForEachSearch(
+			List<AnnValuePeptPsmListsPair> peptidePsmAnnotationValueListsForEachSearch) {
+		this.peptidePsmAnnotationValueListsForEachSearch = peptidePsmAnnotationValueListsForEachSearch;
+	}
+
 
 
 
@@ -493,23 +531,33 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 
 	private int numSearches;
 
-	private Double bestPeptideQValue = null;
-
 	private int numPsms;
 	/**
 	 * true when SetNumPsms has been called
 	 */
 	private boolean numPsmsSet;
 
+
+	
 	/**
-	 * Used to get numPsms when they are not already set
+	 *  Used to get numPsms when they are not already set
 	 */
-	private double psmQValueCutoff;
+	private SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel;
+
+
+
+
+
 
 	/**
-	 * Used to get numPsms when they are not already set
+	 * Used for display on web page
 	 */
-	private double peptideQValueCutoff;
+	private List<AnnValuePeptPsmListsPair> peptidePsmAnnotationValueListsForEachSearch;
+
+
+
+
+
 
 
 

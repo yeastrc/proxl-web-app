@@ -1,7 +1,9 @@
 package org.yeastrc.xlink.www.webservices;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+//import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -20,26 +22,45 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.dao.NRProteinDAO;
 import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.linkable_positions.GetLinkablePositionsForLinkers;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.MergedSearchProtein;
+import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
+import org.yeastrc.xlink.www.objects.SearchProteinDimer;
+import org.yeastrc.xlink.www.objects.SearchProteinDimerWrapper;
+import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
+import org.yeastrc.xlink.www.objects.SearchProteinLooplinkWrapper;
+import org.yeastrc.xlink.www.objects.SearchProteinCrosslinkWrapper;
+import org.yeastrc.xlink.www.objects.SearchProteinUnlinked;
+import org.yeastrc.xlink.www.objects.SearchProteinUnlinkedWrapper;
 import org.yeastrc.xlink.www.searcher.LinkersForSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.MergedSearchProteinSearcher;
+import org.yeastrc.xlink.www.searcher.SearchProteinCrosslinkSearcher;
+import org.yeastrc.xlink.www.searcher.SearchProteinDimerSearcher;
+import org.yeastrc.xlink.www.searcher.SearchProteinLooplinkSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.SearchProteinUnlinkedSearcher;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.TaxonomyUtils;
 import org.yeastrc.xlink.utils.XLinkUtils;
-import org.yeastrc.xlink.www.constants.QueryCriteriaValueCountsFieldValuesConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.dao.QueryCriteriaValueCountsDAO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
+import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
+import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.objects.ImageViewerData;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Ordering;
@@ -54,23 +75,25 @@ public class ViewerProteinDataService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getProteinData") 
-	public ImageViewerData getViewerData( @QueryParam( "searchIds" ) List<Integer> searchIds,
-										  @QueryParam( "psmQValueCutoff" ) Double psmQValueCutoff,
-										  @QueryParam( "peptideQValueCutoff" ) Double peptideQValueCutoff,
-										  @QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
-										  @QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
-										  @QueryParam( "filterOnlyOnePeptide" ) String filterOnlyOnePeptideString,
-										  @QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
-										  @QueryParam( "excludeType" ) List<Integer> excludeType,
-										  @Context HttpServletRequest request )
+	public ImageViewerData getViewerData( 
+			@QueryParam( "searchIds" ) List<Integer> searchIdsParam,
+
+			@QueryParam( "psmPeptideCutoffsForSearchIds" ) String psmPeptideCutoffsForSearchIds_JSONString,
+
+			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
+			@QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
+			@QueryParam( "filterOnlyOnePeptide" ) String filterOnlyOnePeptideString,
+			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
+			@QueryParam( "excludeType" ) List<Integer> excludeType,
+			@Context HttpServletRequest request )
 	throws Exception {
 
 //		if (true)
 //		throw new Exception("Forced Error");
 		
-		if ( searchIds == null || searchIds.isEmpty() ) {
+		if ( searchIdsParam == null || searchIdsParam.isEmpty() ) {
 
-			String msg = "Provided searchIds is null or empty, searchIds = " + searchIds;
+			String msg = "Provided searchIds is null or empty, searchIds = " + searchIdsParam;
 
 			log.error( msg );
 
@@ -81,21 +104,42 @@ public class ViewerProteinDataService {
 		    	        );
 		}
 		
+		if ( StringUtils.isEmpty( psmPeptideCutoffsForSearchIds_JSONString ) ) {
+
+			String msg = "Provided psmPeptideCutoffsForSearchIds is null or psmPeptideCutoffsForSearchIds is missing";
+
+			log.error( msg );
+
+			throw new WebApplicationException(
+					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					.entity( msg )
+					.build()
+					);
+		}
+
+
+		
 		try {
 
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 
 
 
 			ImageViewerData ivd = new ImageViewerData();
-
-			if( psmQValueCutoff == null )
-				psmQValueCutoff = 0.01;
 			
-			if( peptideQValueCutoff == null )
-				peptideQValueCutoff = 0.01;
+			//  Dedup SearchIds
 
+			Set<Integer> searchIdsSet = new HashSet<Integer>( );
+			
+			for ( int searchId : searchIdsParam ) {
+
+				searchIdsSet.add( searchId );
+			}
+			
+
+			
+			
 			if( excludeTaxonomy == null ) 
 				excludeTaxonomy = new ArrayList<Integer>();
 
@@ -113,7 +157,7 @@ public class ViewerProteinDataService {
 
 			
 
-			if ( searchIds.isEmpty() ) {
+			if ( searchIdsParam.isEmpty() ) {
 				
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
@@ -124,22 +168,14 @@ public class ViewerProteinDataService {
 
 			
 			//   Get the project id for this search
-			
-			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
-			
-			for ( int searchId : searchIds ) {
-
-				searchIdsCollection.add( searchId );
-			}
-			
-			
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+						
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsSet );
 			
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				
 				// should never happen
 				String msg = "No project ids for search ids: ";
-				for ( int searchId : searchIds ) {
+				for ( int searchId : searchIdsSet ) {
 
 					msg += searchId + ", ";
 				}				
@@ -169,7 +205,7 @@ public class ViewerProteinDataService {
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 			
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
 
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 
@@ -201,16 +237,75 @@ public class ViewerProteinDataService {
 			}
 
 
-			
-			QueryCriteriaValueCountsDAO.getInstance().saveOrIncrement( 
-					QueryCriteriaValueCountsFieldValuesConstants.PSM_Q_VALUE_FIELD_VALUE, Double.toString( psmQValueCutoff ) );
-			QueryCriteriaValueCountsDAO.getInstance().saveOrIncrement( 
-					QueryCriteriaValueCountsFieldValuesConstants.PEPTIDE_Q_VALUE_FIELD_VALUE, Double.toString( peptideQValueCutoff ) );
 
+
+			////////   Auth complete
+
+			//////////////////////////////////////////
+			
+			
+			List<Integer> searchIdsListDedupedSorted = new ArrayList<>( searchIdsSet );
+
+			
+			Collections.sort( searchIdsListDedupedSorted );
+			
+			
+
+			//   Get PSM and Peptide Cutoff data from JSON
+
+
+			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON Mapper object for JSON deserialization
+
+
+			CutoffValuesRootLevel cutoffValuesRootLevel = null;
+
+			try {
+				cutoffValuesRootLevel = jacksonJSON_Mapper.readValue( psmPeptideCutoffsForSearchIds_JSONString, CutoffValuesRootLevel.class );
+
+			} catch ( JsonParseException e ) {
+
+				String msg = "Failed to parse 'psmPeptideCutoffsForSearchIds_JSONString', JsonParseException.  psmPeptideCutoffsForSearchIds_JSONString: " + psmPeptideCutoffsForSearchIds_JSONString;
+				log.error( msg, e );
+				throw e;
+
+			} catch ( JsonMappingException e ) {
+
+				String msg = "Failed to parse 'psmPeptideCutoffsForSearchIds_JSONString', JsonMappingException.  psmPeptideCutoffsForSearchIds_JSONString: " + psmPeptideCutoffsForSearchIds_JSONString;
+				log.error( msg, e );
+				throw e;
+
+			} catch ( IOException e ) {
+
+				String msg = "Failed to parse 'psmPeptideCutoffsForSearchIds_JSONString', IOException.  psmPeptideCutoffsForSearchIds_JSONString: " + psmPeptideCutoffsForSearchIds_JSONString;
+				log.error( msg, e );
+				throw e;
+			}
+			
+
+			/////////////
+
+
+			Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
+					Z_CutoffValuesObjectsToOtherObjectsFactory.createSearcherCutoffValuesRootLevel( 
+							searchIdsSet, cutoffValuesRootLevel ); 
+			
+			
+			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
+			
+			
+			
+			
+			
+
+			// Create collection with all possible proteins included in this set of  searches for this type
+
+			//  Keyed on proteinNRSEQ_Id
+			Map<Integer, List<SearchDTO>> searchDTOsKeyedOnProteinNRSEQ_IdsMap = new HashMap<>();
 			
 			
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
-			for( int searchId : searchIds ) {
+			
+			for( int searchId : searchIdsListDedupedSorted ) {
 				
 				SearchDTO search = SearchDAO.getInstance().getSearch( searchId );
 				
@@ -228,136 +323,338 @@ public class ViewerProteinDataService {
 				}
 				
 				searches.add( search );
-			}
+
+				
+				SearchDTO searchDTO = SearchDAO.getInstance().getSearch( searchId );
+
+				SearcherCutoffValuesSearchLevel	searcherCutoffValuesSearchLevel =
+						searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
+
+				//////////////////////////
+
+				///   Get Crosslink Proteins from DB
 
 
+				List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
+						SearchProteinCrosslinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
 
-			// first build a collection of types to include
-			Collection<Integer> includedTypes = new HashSet<Integer>();
-			includedTypes.add( XLinkUtils.TYPE_CROSSLINK );
-			includedTypes.add( XLinkUtils.TYPE_DIMER );
-			includedTypes.add( XLinkUtils.TYPE_LOOPLINK );
-			includedTypes.add( XLinkUtils.TYPE_MONOLINK );
-			includedTypes.add( XLinkUtils.TYPE_UNLINKED );
+				for ( SearchProteinCrosslinkWrapper wrappedItem : wrappedCrosslinks ) {
 
-			if( excludeType == null )
-				excludeType = new ArrayList<Integer>(0);
+					SearchProteinCrosslink item = wrappedItem.getSearchProteinCrosslink();
+					
+					Integer proteinId_1 = item.getProtein1().getNrProtein().getNrseqId();
+					Integer proteinId_2 = item.getProtein2().getNrProtein().getNrseqId();
 
-			for( int type : excludeType ) {
-				if( type != XLinkUtils.TYPE_UNLINKED )
-					includedTypes.remove( type );
-			}
+					{
+						List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinNRSEQ_IdsMap.get( proteinId_1 );
 
+						if ( searchDTOListForProteinId == null ) {
 
-			// build a collection of the potentially included proteins
-			Map<Integer, MergedSearchProtein> includedProteins = new HashMap<Integer, MergedSearchProtein>();
+							searchDTOListForProteinId = new ArrayList<>();
+							searchDTOsKeyedOnProteinNRSEQ_IdsMap.put( proteinId_1, searchDTOListForProteinId );
+						}
 
-			for( int type : includedTypes ) {
-				Collection<MergedSearchProtein> mp = MergedSearchProteinSearcher.getInstance().getProteinsWithLinkType( searches, type, psmQValueCutoff, peptideQValueCutoff);
-				for( MergedSearchProtein mrp : mp ) {
-					includedProteins.put( mrp.getNrProtein().getNrseqId(), mrp );
+						searchDTOListForProteinId.add(searchDTO);
+					}
+					{
+						List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinNRSEQ_IdsMap.get( proteinId_2 );
+
+						if ( searchDTOListForProteinId == null ) {
+
+							searchDTOListForProteinId = new ArrayList<>();
+							searchDTOsKeyedOnProteinNRSEQ_IdsMap.put( proteinId_2, searchDTOListForProteinId );
+						}
+
+						searchDTOListForProteinId.add(searchDTO);
+					}
 				}
-			}
 
-			if ( log.isDebugEnabled() ) {
+				//////////////////////////
 
-				log.debug( "Number of initially-included proteins: " + includedProteins.keySet().size() );
-			}
+				///   Get Looplink Proteins from DB
 
-			// remove all proteins that have a peptide of at least one of the included excluded types
-			for( int type: excludeType ) {
-				if( type != XLinkUtils.TYPE_UNLINKED ) {
-					Collection<MergedSearchProtein> mp = MergedSearchProteinSearcher.getInstance().getProteinsWithLinkType( searches, type, psmQValueCutoff, peptideQValueCutoff);
+				List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
+						SearchProteinLooplinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
 
-					if ( log.isDebugEnabled() ) {
+				for ( SearchProteinLooplinkWrapper wrappedItem : wrappedLooplinks ) {
 
-						log.debug( "Removing proteins of type: " + type );
+					SearchProteinLooplink item = wrappedItem.getSearchProteinLooplink();
+					
+					Integer proteinId = item.getProtein().getNrProtein().getNrseqId();
+
+					List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinNRSEQ_IdsMap.get( proteinId );
+
+					if ( searchDTOListForProteinId == null ) {
+
+						searchDTOListForProteinId = new ArrayList<>();
+						searchDTOsKeyedOnProteinNRSEQ_IdsMap.put( proteinId, searchDTOListForProteinId );
 					}
 
-					for( MergedSearchProtein mrp : mp ) {
-						includedProteins.remove( mrp.getNrProtein().getNrseqId() );
-					}
-				} else {
+					searchDTOListForProteinId.add(searchDTO);
+				}
 
-					// if one of the excluded types is "no links", then remove all proteins that _only_ have unlinked and/or dimer peptides
+				boolean includeUnlinkedAndDimer = true;
 
-					// create collection of proteins with unlinked or dimer peptides
-					Collection<MergedSearchProtein> mp = MergedSearchProteinSearcher.getInstance().getProteinsWithLinkType( searches, XLinkUtils.TYPE_UNLINKED, psmQValueCutoff, peptideQValueCutoff);
-					Collection<Integer> onlyUnlinkedProteins = new HashSet<Integer>();
-					for( MergedSearchProtein mrp : mp ) {
-						onlyUnlinkedProteins.add( mrp.getNrProtein().getNrseqId() );
-					}
-
-					mp = MergedSearchProteinSearcher.getInstance().getProteinsWithLinkType( searches, XLinkUtils.TYPE_DIMER, psmQValueCutoff, peptideQValueCutoff);
-					for( MergedSearchProtein mrp : mp ) {
-						onlyUnlinkedProteins.add( mrp.getNrProtein().getNrseqId() );
-					}
-
-					// remove from this set any proteins that have peptides of any type other than unlinked or dimer
-					// since I've already removed proteins with the excludedTypes, I only need to remove proteins with peptides
-					// belonging to any of the included types (except unlinked)
-					for( int type2 : includedTypes ) {
-						if( type2 == XLinkUtils.TYPE_UNLINKED ) continue;
-						if( type2 == XLinkUtils.TYPE_DIMER ) continue;
-
-						Collection<MergedSearchProtein> mp2 = MergedSearchProteinSearcher.getInstance().getProteinsWithLinkType( searches, type2, psmQValueCutoff, peptideQValueCutoff);
-						for( MergedSearchProtein mrp : mp2 ) {
-							onlyUnlinkedProteins.remove( mrp.getNrProtein().getNrseqId() );
+				if ( excludeType != null ) {
+					for( int type : excludeType ) {
+						if( type == XLinkUtils.TYPE_UNLINKED ) {
+							includeUnlinkedAndDimer = false;
+							break;
 						}
 					}
-
-					// onlyUnlinkedProteins should now contain only proteins that only have unlinked peptides
-					// remove these from the included proteins
-					for( int unlinkedProtein : onlyUnlinkedProteins ) {
-						includedProteins.remove( unlinkedProtein );
-					}				
 				}
+
+
+				if ( includeUnlinkedAndDimer ) {
+
+					//////////////////////////
+
+					///   Get Dimer Proteins from DB
+
+
+					List<SearchProteinDimerWrapper> wrappedDimers = 
+							SearchProteinDimerSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
+
+					for ( SearchProteinDimerWrapper wrappedItem : wrappedDimers ) {
+
+						SearchProteinDimer item = wrappedItem.getSearchProteinDimer();
+						
+						Integer proteinId_1 = item.getProtein1().getNrProtein().getNrseqId();
+						Integer proteinId_2 = item.getProtein2().getNrProtein().getNrseqId();
+
+						{
+							List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinNRSEQ_IdsMap.get( proteinId_1 );
+
+							if ( searchDTOListForProteinId == null ) {
+
+								searchDTOListForProteinId = new ArrayList<>();
+								searchDTOsKeyedOnProteinNRSEQ_IdsMap.put( proteinId_1, searchDTOListForProteinId );
+							}
+
+							searchDTOListForProteinId.add(searchDTO);
+						}
+						{
+							List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinNRSEQ_IdsMap.get( proteinId_2 );
+
+							if ( searchDTOListForProteinId == null ) {
+
+								searchDTOListForProteinId = new ArrayList<>();
+								searchDTOsKeyedOnProteinNRSEQ_IdsMap.put( proteinId_2, searchDTOListForProteinId );
+							}
+
+							searchDTOListForProteinId.add(searchDTO);
+						}
+						
+						
+					}
+					
+
+					//////////////////////////
+
+					///   Get Unlinked Proteins from DB
+
+
+					List<SearchProteinUnlinkedWrapper> wrappedUnlinkeds = 
+							SearchProteinUnlinkedSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
+
+					for ( SearchProteinUnlinkedWrapper wrappedItem : wrappedUnlinkeds ) {
+
+						SearchProteinUnlinked item = wrappedItem.getSearchProteinUnlinked();
+						
+						Integer proteinId = item.getProtein().getNrProtein().getNrseqId();
+
+						List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinNRSEQ_IdsMap.get( proteinId );
+
+						if ( searchDTOListForProteinId == null ) {
+
+							searchDTOListForProteinId = new ArrayList<>();
+							searchDTOsKeyedOnProteinNRSEQ_IdsMap.put( proteinId, searchDTOListForProteinId );
+						}
+
+						searchDTOListForProteinId.add(searchDTO);
+						
+						
+					}
+				}
+
 			}
 
-			if ( log.isDebugEnabled() ) {
+			
+			
+			
+			
+			
+			
 
-				log.debug( "Number of finally-included proteins: " + includedProteins.keySet().size() );
-			}
+//			// build a collection of the potentially included proteins
+//			Map<Integer, SearchProtein> includedProteins = new HashMap<Integer, SearchProtein>();
+//
+//
+//			// build a collection of protein IDs to include
+//			for( SearchProtein mrp : prProteinsHashSet ) {
+//				
+//				includedProteins.put( mrp.getNrProtein().getNrseqId(), mrp );
+//			}
+
+			
+			/////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////
+			
+			///    WAS This Before
+			
+//
+//			// first build a collection of types to include
+//			Collection<Integer> includedTypes = new HashSet<Integer>();
+//			includedTypes.add( XLinkUtils.TYPE_CROSSLINK );
+//			includedTypes.add( XLinkUtils.TYPE_DIMER );
+//			includedTypes.add( XLinkUtils.TYPE_LOOPLINK );
+//			includedTypes.add( XLinkUtils.TYPE_MONOLINK );
+//			includedTypes.add( XLinkUtils.TYPE_UNLINKED );
+//
+//			if( excludeType == null )
+//				excludeType = new ArrayList<Integer>(0);
+//
+//			for( int type : excludeType ) {
+//				if( type != XLinkUtils.TYPE_UNLINKED )
+//					includedTypes.remove( type );
+//			}
+//
+//
+//			// build a collection of the potentially included proteins
+//			Map<Integer, SearchProtein> includedProteins = new HashMap<Integer, SearchProtein>();
+//
+//			for( int type : includedTypes ) {
+//				Collection<SearchProtein> mp = SearchProteinSearcher.getInstance().getProteinsWithLinkType( searches, type, psmQValueCutoff, peptideQValueCutoff);
+//				for( SearchProtein mrp : mp ) {
+//					includedProteins.put( mrp.getNrProtein().getNrseqId(), mrp );
+//				}
+//			}
+//
+//			if ( log.isDebugEnabled() ) {
+//
+//				log.debug( "Number of initially-included proteins: " + includedProteins.keySet().size() );
+//			}
+//
+//			// remove all proteins that have a peptide of at least one of the included excluded types
+//			for( int type: excludeType ) {
+//				if( type != XLinkUtils.TYPE_UNLINKED ) {
+//					Collection<SearchProtein> mp = SearchProteinSearcher.getInstance().getProteinsWithLinkType( searches, type, psmQValueCutoff, peptideQValueCutoff);
+//
+//					if ( log.isDebugEnabled() ) {
+//
+//						log.debug( "Removing proteins of type: " + type );
+//					}
+//
+//					for( SearchProtein mrp : mp ) {
+//						includedProteins.remove( mrp.getNrProtein().getNrseqId() );
+//					}
+//				} else {
+//
+//					// if one of the excluded types is "no links", then remove all proteins that _only_ have unlinked and/or dimer peptides
+//
+//					// create collection of proteins with unlinked or dimer peptides
+//					Collection<SearchProtein> mp = SearchProteinSearcher.getInstance().getProteinsWithLinkType( searches, XLinkUtils.TYPE_UNLINKED, psmQValueCutoff, peptideQValueCutoff);
+//					Collection<Integer> onlyUnlinkedProteins = new HashSet<Integer>();
+//					for( SearchProtein mrp : mp ) {
+//						onlyUnlinkedProteins.add( mrp.getNrProtein().getNrseqId() );
+//					}
+//
+//					mp = SearchProteinSearcher.getInstance().getProteinsWithLinkType( searches, XLinkUtils.TYPE_DIMER, psmQValueCutoff, peptideQValueCutoff);
+//					for( SearchProtein mrp : mp ) {
+//						onlyUnlinkedProteins.add( mrp.getNrProtein().getNrseqId() );
+//					}
+//
+//					// remove from this set any proteins that have peptides of any type other than unlinked or dimer
+//					// since I've already removed proteins with the excludedTypes, I only need to remove proteins with peptides
+//					// belonging to any of the included types (except unlinked)
+//					for( int type2 : includedTypes ) {
+//						if( type2 == XLinkUtils.TYPE_UNLINKED ) continue;
+//						if( type2 == XLinkUtils.TYPE_DIMER ) continue;
+//
+//						Collection<SearchProtein> mp2 = SearchProteinSearcher.getInstance().getProteinsWithLinkType( searches, type2, psmQValueCutoff, peptideQValueCutoff);
+//						for( SearchProtein mrp : mp2 ) {
+//							onlyUnlinkedProteins.remove( mrp.getNrProtein().getNrseqId() );
+//						}
+//					}
+//
+//					// onlyUnlinkedProteins should now contain only proteins that only have unlinked peptides
+//					// remove these from the included proteins
+//					for( int unlinkedProtein : onlyUnlinkedProteins ) {
+//						includedProteins.remove( unlinkedProtein );
+//					}				
+//				}
+//			}
+			
+			//////////////////////////////////////////////////////
+
+//			if ( log.isDebugEnabled() ) {
+//
+//				log.debug( "Number of finally-included proteins: " + includedProteins.keySet().size() );
+//			}
+
 
 			// create the collection of proteins we're going to include
-			Collection<MergedSearchProtein> proteins = new ArrayList<MergedSearchProtein>();
-			for( int pid : includedProteins.keySet() )
-				proteins.add( includedProteins.get( pid ) );
 
+			Collection<MergedSearchProtein> proteins = new ArrayList<MergedSearchProtein>();
+			
+			for ( Map.Entry<Integer, List<SearchDTO>> item : searchDTOsKeyedOnProteinNRSEQ_IdsMap.entrySet() ) {
+
+				MergedSearchProtein mergedSearchProtein =
+						new MergedSearchProtein( item.getValue(), NRProteinDAO.getInstance().getNrProtein( item.getKey() ) );
+
+				proteins.add( mergedSearchProtein );
+			}
 
 			// build list of taxonomies to show in exclusion list
 			Map<Integer, String> taxonomies = new HashMap<Integer,String>();
 			for( MergedSearchProtein mp : proteins ) {
-				if( taxonomies.containsKey( mp.getNrProtein().getTaxonomyId() ) ) continue;
+				if( taxonomies.containsKey( mp.getNrProtein().getTaxonomyId() ) ) { 
+					continue;
+				}
 				taxonomies.put( mp.getNrProtein().getTaxonomyId(), TaxonomyUtils.getTaxonomyName( mp.getNrProtein().getTaxonomyId() ) );
 			}
 			ivd.setTaxonomies( taxonomies );
 
 
+			//   Protein pages are using SearchTaxonomySearcher.getInstance().getTaxonomies( search );
+			//   	which is per search
+				
+			
 			// remove all proteins that are in the excluded taxonomy
-			Collection<MergedSearchProtein> proteins2 = new HashSet<MergedSearchProtein>();
-			proteins2.addAll( proteins );
 
-			for( int taxy : excludeTaxonomy ) {
-				for( MergedSearchProtein mp : proteins2 ) {
-					if( mp.getNrProtein().getTaxonomyId() == taxy )
-						proteins.remove( mp );
+			if ( ! excludeTaxonomy.isEmpty() ) {
+
+				Collection<MergedSearchProtein> proteinsWithTaxonomyRemoved = new ArrayList<>( proteins.size() );
+
+				for ( MergedSearchProtein item : proteins ) {
+
+					for( int taxy : excludeTaxonomy ) {
+
+						if( item.getNrProtein().getTaxonomyId() == taxy ) {
+
+							continue; //  EARLY CONTINUE - Drop "item" from output list
+						}
+					}
+
+					proteinsWithTaxonomyRemoved.add(item);  //  Not excluded so add to this list
 				}
-			}
 
+				proteins = proteinsWithTaxonomyRemoved;  // Copy to original list for further processing
+			}
 
 			//  Map of linkablePositions where the key is the protein id and the value is the collection of linkable positions
 			Map<Integer, Collection<Integer>> proteinIdslinkablePositionsMap = new HashMap<Integer, Collection<Integer>>();
 			
 
-			List<LinkerDTO>  linkerList = LinkersForSearchIdsSearcher.getInstance().getLinkersForSearchIds( searchIds );
+			List<LinkerDTO>  linkerList = LinkersForSearchIdsSearcher.getInstance().getLinkersForSearchIds( searchIdsListDedupedSorted );
 			
 			
 			if ( linkerList == null || linkerList.isEmpty() ) {
 				
 				String errorMsgSearchIdList = null;
 				
-				for ( Integer searchId : searchIds ) {
+				for ( Integer searchId : searchIdsListDedupedSorted ) {
 					
 					if ( errorMsgSearchIdList == null ) {
 						
@@ -413,8 +710,8 @@ public class ViewerProteinDataService {
 			ivd.setProteinNames( proteinNames );
 			ivd.setProteins( sortedProteinNames.keySet() );
 
-			ivd.setPsmQValueCutoff( psmQValueCutoff );
-			ivd.setPeptideQValueCutoff( peptideQValueCutoff );
+			ivd.setCutoffs( cutoffValuesRootLevel );
+
 			ivd.setExcludeTaxonomy( excludeTaxonomy );
 			ivd.setExcludeType( excludeType );
 			ivd.setSearches( searches );
@@ -431,14 +728,33 @@ public class ViewerProteinDataService {
 
 			throw e;
 			
+
+		} catch ( ProxlWebappDataException e ) {
+
+			String msg = "Exception processing request data, msg: " + e.toString();
+			
+			log.error( msg, e );
+
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	        .entity( msg )
+		    	        .build()
+		    	        );			
+			
 		} catch ( Exception e ) {
 			
 			String msg = "Exception caught: " + e.toString();
 			
 			log.error( msg, e );
 			
-			throw e;
+
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
+					.build()
+					);
 		}
+
 	}
 	
     public class SortIgnoreCase implements Comparator<Object> {

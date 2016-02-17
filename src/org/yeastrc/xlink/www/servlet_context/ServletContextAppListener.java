@@ -8,6 +8,7 @@ import org.yeastrc.auth.db.AuthLibraryDBConnectionFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.auth_db.AuthLibraryDBConnectionFactoryForWeb;
 import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.db_web.DBConnectionFactoryWeb;
 import org.yeastrc.xlink.www.send_email.GetEmailConfig;
 
 
@@ -30,7 +31,17 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 
 		///  Uncomment this for using the other database for old Crosslinks Runs
 		
-//		DBConnectionFactory.setProxlJNDINameTo_proxl_old_crosslinks_runs();;
+		DBConnectionFactoryWeb.setProxlJNDINameTo_proxl_generic_fields();
+		
+//		DBConnectionFactoryWeb.setProxlJNDINameTo_proxl_generic_fields_demo_feb_2016();
+		
+		
+		
+		//   Set   to use DBConnectionFactoryWeb;
+		
+		DBConnectionFactoryWeb dbConnectionFactoryWeb = new DBConnectionFactoryWeb();
+		
+		DBConnectionFactory.setDbConnectionFactoryImpl( dbConnectionFactoryWeb );
 		
 		
 		

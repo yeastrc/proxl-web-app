@@ -62,8 +62,12 @@
 		<script type="text/javascript" src="${ contextPath }/js/trypsinCutPointsForSequence.js"></script>
 		 
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-protein-annotation.js"></script>
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer.js"></script> 
+
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js"></script>
+
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-click-element-handlers.js"></script>
+
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer.js"></script> 
 		
 		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js"></script>
 		
@@ -73,6 +77,9 @@
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js"></script>
 		
 		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
@@ -95,9 +102,14 @@
 	
 		<%@ include file="/WEB-INF/jsp-includes/defaultPageViewFragment.jsp" %>
 		
+		<%@ include file="/WEB-INF/jsp-includes/specificProteinDataPerSearchProtIdsPositionsFragment.jsp" %>
+		
 		<%@ include file="/WEB-INF/jsp-includes/viewPsmsLoadedFromWebServiceTemplateFragment.jsp" %>
 		
-		
+			
+		<%@ include file="/WEB-INF/jsp-includes/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
+		<%@ include file="/WEB-INF/jsp-includes/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
+		<%@ include file="/WEB-INF/jsp-includes/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
 		
 	<div class="overall-enclosing-block">
 	
@@ -114,13 +126,13 @@
 	<c:if test="${ not empty onlySingleSearchId }">
 	
 		<input class="tool_tip_attached_jq" data-tooltip="View peptides" type="hidden" id="viewSearchPeptideDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="viewSearchPeptide.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="peptide.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 		<input class="tool_tip_attached_jq" data-tooltip="View proteins" type="hidden" id="viewSearchCrosslinkProteinDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="viewSearchCrosslinkProtein.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="crosslinkProtein.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 		<input class="tool_tip_attached_jq" data-tooltip="View protein coverage report" type="hidden" id="viewProteinCoverageReportDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="viewProteinCoverageReport.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="proteinCoverageReport.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 		<input class="tool_tip_attached_jq" data-tooltip="View data on 3D structures" type="hidden" id="viewMergedStructureDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="viewMergedStructure.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="structure.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 	</c:if>
 					
 	
@@ -148,6 +160,18 @@
 				</c:choose>
 								
 			</div>
+			
+			<%--  Hidden fields to pass data to JS --%>
+			
+			<input type="hidden" id="cutoffValuesRootLevelCutoffDefaults" value="<c:out value="${ cutoffValuesRootLevelCutoffDefaults }"></c:out>"> 
+			
+				<%--  A block outside any form for PSM Peptide cutoff JS code --%>
+				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_outsideAnyForm.jsp" %>
+			
+				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
+				<%--   In the Merged Image and Merged Structure Pages, this will not be in any form  --%>
+				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
+
 	
 			<form action="#">
 	
@@ -164,6 +188,16 @@
 				</tr>
 
 
+				<%-- Spacer --%>  
+				<tr>
+					<td style="height: 6px;"></td>
+				</tr>
+				
+				<%--  The section at the top of the page with the cutoffs, in the user input section --%>
+				
+				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inDataEntryForm.jsp" %>
+				
+<%-- 				
 				<tr>
 					<td style="white-space: nowrap">PSM Q-value cutoff:</td>
 					<td>
@@ -196,9 +230,9 @@
 						<input type="text" style="width:40px;" id="peptideQValueCutoff">
 					</td>
 				</tr>
-				
+--%>				
 				<tr>
-					<td>Exclude xlinks with:</td>
+					<td>Exclude links with:</td>
 					<td>
 						 <label><span style="white-space:nowrap;" >
 						 	<input type="checkbox" id="filterNonUniquePeptides">
@@ -218,17 +252,22 @@
 				<tr>
 					<td>Exclude proteins with:</td>
 					<td id="exclude_protein_types_block">
+
+						<%--
 						<label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-4">Crosslinks</span></label>
 						<label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-2">Looplinks</span></label>
 						<label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-1">Monolinks</span></label>
+						-%>
 						<%-- <label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-3">Dimers</span></label> --%>
-						<label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-0">No links</span></label>		
+						<label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-0">No links</span></label>
 					</td>
 				</tr>
 
 				<tr>
 					<td>Exclude organisms:</td>
-					<td><div id="taxonomy-checkboxes"></div></td>
+					<td><div id="taxonomy-checkboxes"></div>
+					</td>
+					
 				</tr>
 				
 				
@@ -249,7 +288,6 @@
 			
 		</div>
 	
-			
 		<hr>
 
 		<div>
@@ -604,22 +642,11 @@
 					</div>		
 					
 				  </div>			
-
-		
-				<table id="link_info_table" class="link-info-table  top_data_table_jq " >
-					<thead>
-					<tr>
-						<th style="text-align:left;width:60%;font-weight:bold;">Name</th>
-						<th class="integer-number-column-header" style="width:10%;font-weight:bold;">Peptides</th>
-						<th class="integer-number-column-header" style="width:10%;font-weight:bold;">Unique peptides</th>
-						<th class="integer-number-column-header" style="width:10%;font-weight:bold;">Psms</th>
-						<th style="text-align:left;width:10%;font-weight:bold; padding-left: 5px;">Best&nbsp;Peptide <span style="white-space: nowrap">Q-value</span></th>
-						<th style="text-align:left;width:10%;font-weight:bold; padding-left: 5px;">Best&nbsp;PSM <span style="white-space: nowrap">Q-value</span></th>
-					</tr>
-					</thead>
-					<tbody id="link_info_table__tbody"></tbody>
-				</table>
-
+				  
+				  <div id="link_data_table_place_holder">
+				  
+				  
+				  </div>
 
 
 			<%-- !!!!  Handlebars templates   !!!! --%>
@@ -632,58 +659,6 @@
 
 
 
-	<%--  Search Template - row to hold data --%>
-
-	<%-- This table is just a container and will not be placed into the final output --%>
-	<table id="search_entry_data_row_template" style="display: none;" >
-
-		<tr id="perc_{{search.id}}" 
-			style="cursor: pointer; "
-			onclick="toggleVisibility(this)"
-			toggle_visibility_associated_element_id="perc_{{search.id}}"
-		>
-			<td>{{search.name}}</td>
-			
-			<td class="integer-number-column" style="" >
-				<a class="show-child-data-link   "
-					href="javascript:"
-					>{{numPeptides}}<%-- << actual data in the cell --%><span class=" toggle_visibility_expansion_span_jq" 
-								style="" 
-							><img src="${contextPath}/images/icon-expand-small.png" 
-								class=" icon-expand-contract-in-data-table "
-								></span><span class="toggle_visibility_contraction_span_jq" 
-									style=" display: none;" 
-									><img src="${contextPath}/images/icon-collapse-small.png"
-										class=" icon-expand-contract-in-data-table "
-										></span>
-				</a>
-			</td>												
-			
-			<td class="integer-number-column" style="" >{{numUniquePeptides}}</td>
-			
-			<td class="integer-number-column" style="" >{{numPsms}}</td>
-			<td style="text-align: left; padding-left: 5px; white-space: nowrap" >{{bestPeptideQValue}}</td>
-			<td style="text-align: left; padding-left: 5px; white-space: nowrap" >{{bestPSMQValue}}</td>
-		</tr>
-	</table>	
-		
-		
-
-	<%--  Search Template - row to hold children --%>
-
-	<%-- This table is just a container and will not be placed into the final output --%>
-	<table id="search_entry_child_row_template" style="display: none;" >
-		
-		<tr  class="expand-child  expand_child_jq " style=" display:none; " > 
-		
-			<td class="peptide_data_container" colspan="6"  style="text-align: center;" >
-				
-
-			</td>
-		</tr>
-	</table>	
-
-				
 
 	<%--  Looplink Peptide Template --%>
 
@@ -731,10 +706,8 @@
 			reported_peptide_id="{{ reportedPeptide.id }}"
 			search_id="{{ searchId }}"
 			project_id="${ project_id }"
-			peptide_q_value_cutoff="{{ peptideQValueCutoff }}"			
-			psm_q_value_cutoff="{{ psmQValueCutoff }}"
 		>
-				
+		
 			<td>{{reportedPeptide.sequence}}</td>
 			<td>{{peptide.sequence}}</td>
 			<td class="integer-number-column" style="" >{{peptidePosition1}}</td>
@@ -824,8 +797,6 @@
 			reported_peptide_id="{{ reportedPeptide.id }}"
 			search_id="{{ searchId }}"
 			project_id="${ project_id }"
-			peptide_q_value_cutoff="{{ peptideQValueCutoff }}"			
-			psm_q_value_cutoff="{{ psmQValueCutoff }}"			
 		>
 			<td>{{reportedPeptide.sequence}}</td>
 			<td style="text-align:left;" >{{peptide1.sequence}}</td>
@@ -916,8 +887,6 @@
 			reported_peptide_id="{{ reportedPeptide.id }}"
 			search_id="{{ searchId }}"
 			project_id="${ project_id }"
-			peptide_q_value_cutoff="{{ peptideQValueCutoff }}"			
-			psm_q_value_cutoff="{{ psmQValueCutoff }}"
 		>
 			<td>{{reportedPeptide.sequence}}</td>
 			<td>{{peptide.sequence}}</td>

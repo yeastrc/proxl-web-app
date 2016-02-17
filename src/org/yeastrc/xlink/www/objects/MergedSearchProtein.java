@@ -23,22 +23,41 @@ public class MergedSearchProtein implements IProtein {
 		this.searchs = searches;
 		this.nrProtein = protein;
 	}
-	
+
+	// Get the name(s) for this protein from the searches
+	public String getNameLowerCase() throws Exception {
+		
+		if ( ! nameLowercaseSet ) {
+			
+			nameLowercase = getName().toLowerCase();
+		}
+
+		return nameLowercase;
+	}
+		
+		
 	// Get the name(s) for this protein from the searches
 	public String getName() throws Exception {
-		Set<String> names = new HashSet<String>();
 		
-		for( SearchDTO search : searchs ) {
-			String name = SearchUtils.getProteinNameForSearch( new SearchProtein( search, nrProtein ) );
-			if( name != null )
-				names.add( name );
+		if ( ! nameSet ) {
+
+			Set<String> names = new HashSet<String>();
+
+			for( SearchDTO search : searchs ) {
+				String name = SearchUtils.getProteinNameForSearch( new SearchProtein( search, nrProtein ) );
+				if( name != null )
+					names.add( name );
+			}
+
+			List<String> nameList = new ArrayList<String>();
+			nameList.addAll( names );		
+			Collections.sort( nameList );
+
+			name = StringUtils.join( names, ", " );
 		}
 		
-		List<String> nameList = new ArrayList<String>();
-		nameList.addAll( names );		
-		Collections.sort( nameList );
-		
-		return StringUtils.join( names, ", " );
+		return name;
+			
 	}
 	
 	// Get the description(s) for this protein from the searches
@@ -64,6 +83,14 @@ public class MergedSearchProtein implements IProtein {
 	}
 
 
+	private String name;
+	private boolean nameSet;
+	
+	private String nameLowercase;
+	private boolean nameLowercaseSet;
+	
+
+	
 	private final NRProteinDTO nrProtein;
 	private final Collection<SearchDTO> searchs;
 	

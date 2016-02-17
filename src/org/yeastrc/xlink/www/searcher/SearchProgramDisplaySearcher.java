@@ -29,15 +29,13 @@ public class SearchProgramDisplaySearcher {
 	
 	
 
-	private final String SQL = "SELECT search_program.display_name , search__search_program.version "
+	private final String SQL = "SELECT display_name , version "
 			
-			+ "FROM search_program "
-			+ ""
-			+ "INNER JOIN search__search_program ON search_program.id = search__search_program.search_program_id"
+			+ "FROM search_programs_per_search "
 
-		+ " WHERE search__search_program.search_id = ? "
+		+ " WHERE search_id = ? "
 
-		+ " ORDER BY  search_program.display_order, search_program.display_name, search__search_program.version ";
+		+ " ORDER BY  display_name, version ";
 
 	/**
 	 * @param searchId

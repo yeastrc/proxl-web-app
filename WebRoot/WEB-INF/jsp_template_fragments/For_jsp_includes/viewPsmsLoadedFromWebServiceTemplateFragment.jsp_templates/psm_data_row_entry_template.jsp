@@ -72,22 +72,13 @@
 			{{scanFilename}}
 		</td>
 	{{/if}}
-		
-	<td style="text-align: left; white-space: nowrap; "  class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} "  >
-		{{psmDTO.qValue}}
-	</td>
-	
-	{{#if percolatorDataAnyRows}} <%-- Only show percolator data columns if any percolator data value are not null --%>
-		<td style="text-align: left; white-space: nowrap; "  class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} "  >
-			{{psmDTO.percolatorPsm.pep}}
-		</td>
-		<td style="text-align: left; white-space: nowrap; "  class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} "  >
-			{{psmDTO.percolatorPsm.svmScore}}
-		</td>
-<%-- 		
-		<td style="text-align: left; white-space: nowrap; "  class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} "  >{{psmDTO.percolatorPsm.calcMass}}</td>
---%>		
-	{{/if}}
+
+	{{#each psmAnnotationValueList}}
+		<td style="text-align: left; white-space: nowrap; "  class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} "  
+	 			>{{this}}</td>
+	{{/each}}
+			
+
 </tr>
 
 	  

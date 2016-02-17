@@ -24,6 +24,40 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 	var _handlebarsTemplate_looplink_peptide_data_row_entry_template = null;
 	var _handlebarsTemplate_looplink_peptide_child_row_entry_template = null;
 	
+
+	var _psmPeptideCutoffsRootObject = null;
+
+	//   Currently expect _psmPeptideCriteria = 
+//					searches: Object
+//						128: Object			
+//							peptideCutoffValues: Object
+//								238: Object
+//									id: 238
+//									value: "0.01"
+//							psmCutoffValues: Object
+//								384: Object
+//									id: 384
+//									value: "0.01"
+//							searchId: 128
+	
+//           The key to:
+//				searches - searchId
+//				peptideCutoffValues and psmCutoffValues - annotation type id
+	
+//			peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+	
+	
+	//////////////
+	
+	this.setPsmPeptideCriteria = function( psmPeptideCutoffsRootObject ) {
+		
+		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
+	};
+	
+	
+	
+	// ////////////
+	
 	
 	this.showHideLooplinkReportedPeptides = function( params ) {
 		
@@ -74,34 +108,17 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		
 
 		
-		var reported_peptide_id = $clickedElement.attr( "reported_peptide_id" );
 		var search_id = $clickedElement.attr( "search_id" );
-		var project_id = $clickedElement.attr( "project_id" );
-		var peptide_q_value_cutoff = $clickedElement.attr( "peptide_q_value_cutoff" );
-		var psm_q_value_cutoff = $clickedElement.attr( "psm_q_value_cutoff" );
 		var protein_id = $clickedElement.attr( "protein_id" );
 		var protein_position_1 = $clickedElement.attr( "protein_position_1" );
 		var protein_position_2 = $clickedElement.attr( "protein_position_2" );
 
 		
 		//  Convert all attributes to empty string if null or undefined
-		if ( ! reported_peptide_id ) {
-			reported_peptide_id = "";
-		}
 		if ( ! search_id ) {
 			search_id = "";
 		}
-		if ( ! project_id ) {
-			project_id = "";
-		}
-		if ( ! peptide_q_value_cutoff ) {
-			peptide_q_value_cutoff = "";
-		}
 
-		//
-		if ( ! psm_q_value_cutoff ) {
-			psm_q_value_cutoff = "";
-		}
 		if ( ! protein_id ) {
 			protein_id = "";
 		}
@@ -111,18 +128,54 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		if ( ! protein_position_2 ) {
 			protein_position_2 = "";
 		}
+
 		
+
+
+		//   Currently expect _psmPeptideCriteria = 
+//						searches: Object
+//							128: Object			
+//								peptideCutoffValues: Object
+//									238: Object
+//										id: 238
+//										value: "0.01"
+//								psmCutoffValues: Object
+//									384: Object
+//										id: 384
+//										value: "0.01"
+//								searchId: 128
+		
+//	           The key to:
+//					searches - searchId
+//					peptideCutoffValues and psmCutoffValues - annotation type id
+		
+//				peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+		
+		if ( _psmPeptideCutoffsRootObject === null || _psmPeptideCutoffsRootObject === undefined ) {
+			
+			throw "_psmPeptideCutoffsRootObject not initialized";
+		} 
+		
+		var psmPeptideCutoffsForSearchId = _psmPeptideCutoffsRootObject.searches[ search_id ];
+
+		if ( psmPeptideCutoffsForSearchId === undefined || psmPeptideCutoffsForSearchId === null ) {
+			
+			psmPeptideCutoffsForSearchId = {};
+			
+//			throw "Getting data.  Unable to get cutoff data for search id: " + search_id;
+		}
+		
+		var psmPeptideCutoffsForSearchId_JSONString = JSON.stringify( psmPeptideCutoffsForSearchId );
+
+				
 		
 		var ajaxRequestData = {
 
-				reported_peptide_id : reported_peptide_id,
 				search_id : search_id,
-				project_id : project_id,
-				peptide_q_value_cutoff : peptide_q_value_cutoff,
-				psm_q_value_cutoff : psm_q_value_cutoff,
 				protein_id : protein_id,
 				protein_position_1 : protein_position_1,
 				protein_position_2 : protein_position_2,
+				psmPeptideCutoffsForSearchId : psmPeptideCutoffsForSearchId_JSONString
 		};
 		
 		
@@ -141,7 +194,8 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 				var responseParams = {
 						ajaxResponseData : ajaxResponseData, 
 						ajaxRequestData : ajaxRequestData,
-						$topTRelement : $topTRelement
+						$topTRelement : $topTRelement,
+						$clickedElement : $clickedElement
 				};
 
 				objectThis.loadAndInsertLooplinkReportedPeptidesResponse( responseParams );
@@ -173,10 +227,19 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		var ajaxRequestData = params.ajaxRequestData;
 
 		var $topTRelement = params.$topTRelement;
+
+		var $clickedElement = params.$clickedElement;
 		
 
-		var looplink_peptides = ajaxResponseData;
+		var show_children_if_one_row = $clickedElement.attr( "show_children_if_one_row" );
 		
+		
+		
+		var peptideAnnotationDisplayNameDescriptionList = ajaxResponseData.peptideAnnotationDisplayNameDescriptionList;
+		var psmAnnotationDisplayNameDescriptionList = ajaxResponseData.psmAnnotationDisplayNameDescriptionList;
+		
+		var looplink_peptides = ajaxResponseData.searchPeptideLooplinkList;
+
 		
 		var $looplink_peptide_data_container = $topTRelement.find(".child_data_container_jq");
 		
@@ -233,25 +296,6 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			}
 		}
 
-		
-
-
-		//  Search for qvalue being set in any row
-
-		var qvalueSetAnyRows = false;
-
-		for ( var looplink_peptideIndex = 0; looplink_peptideIndex < looplink_peptides.length ; looplink_peptideIndex++ ) {
-	
-			var looplink_peptide = looplink_peptides[ looplink_peptideIndex ];
-			
-			if ( looplink_peptide.qvalue !== undefined && looplink_peptide.qvalue !== null ) {
-				
-				qvalueSetAnyRows = true;
-				break;
-			}
-		}
-		
-
 		//  Search for NumberUniquePSMs being set in any row
 
 		var showNumberUniquePSMs = false;
@@ -259,7 +303,7 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		for ( var looplink_peptideIndex = 0; looplink_peptideIndex < looplink_peptides.length ; looplink_peptideIndex++ ) {
 			
 			var looplink_peptide = looplink_peptides[ looplink_peptideIndex ];
-			
+		
 			if ( looplink_peptide.numUniquePsms !== undefined && looplink_peptide.numUniquePsms !== null ) {
 				
 				showNumberUniquePSMs = true;
@@ -267,10 +311,15 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			}
 		}
 		
-		
 
 		//  create context for header row
-		var context = { qvalueSetAnyRows : qvalueSetAnyRows, showNumberUniquePSMs : showNumberUniquePSMs };
+		var context = { 
+				showNumberUniquePSMs : showNumberUniquePSMs,
+				peptideAnnotationDisplayNameDescriptionList : peptideAnnotationDisplayNameDescriptionList,
+				psmAnnotationDisplayNameDescriptionList : psmAnnotationDisplayNameDescriptionList
+				
+		};
+
 
 		var html = _handlebarsTemplate_looplink_peptide_block_template(context);
 
@@ -285,8 +334,6 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			throw "unable to find HTML element with class '" + looplink_peptide_table_jq_ClassName + "'";
 		}
 		
-	
-		var percolatorPsmFound = false;
 		
 		//  Add looplink_peptide data to the page
 	
@@ -295,10 +342,11 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			var looplink_peptide = looplink_peptides[ looplink_peptideIndex ];
 			
 			//  wrap data in an object to allow adding more fields
-			var context = { data : looplink_peptide, 
-					searchId : ajaxRequestData.search_id, 
-					qvalueSetAnyRows : qvalueSetAnyRows,
-					showNumberUniquePSMs : showNumberUniquePSMs };
+			var context = { 
+					showNumberUniquePSMs : showNumberUniquePSMs,
+					data : looplink_peptide, 
+					searchId : ajaxRequestData.search_id
+					};
 	
 			var html = _handlebarsTemplate_looplink_peptide_data_row_entry_template(context);
 	
@@ -319,20 +367,20 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			var childRowHTML = _handlebarsTemplate_looplink_peptide_child_row_entry_template( childRowHTML_Context );
 			
 			//  Add next row for child data
-			$( childRowHTML ).appendTo($looplink_peptide_table_jq);			
-		}
-		
-		if ( ! percolatorPsmFound ) {
+			$( childRowHTML ).appendTo($looplink_peptide_table_jq);	
 			
-			//  Remove percolatorPsm columns aloop the table since no data found
-			var $percolatorPsm_columns_jq = $looplink_peptide_table_jq.find(".percolatorPsm_columns_jq");
-			$percolatorPsm_columns_jq.remove();
+
+			
+			
+			
+			//  If only one record, click on it to show it's children
+			
+			if ( show_children_if_one_row === "true" && looplink_peptides.length === 1 ) {
+				
+				$looplink_peptide_entry.click();
+			}
 		}
 		
-		var $openLorkeetLinks = $(".view_spectrum_open_spectrum_link_jq");
-		
-		addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
-	
 		//  Does not seem to work so not run it
 //		if ( looplink_peptides.length > 0 ) {
 //			

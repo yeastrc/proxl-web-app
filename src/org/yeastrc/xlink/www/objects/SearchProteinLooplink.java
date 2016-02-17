@@ -2,14 +2,16 @@ package org.yeastrc.xlink.www.objects;
 
 
 
+
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
 import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
 import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
-import org.yeastrc.xlink.www.searcher.SearchPeptideLooplinkSearcher;
 
 
 
@@ -18,7 +20,6 @@ public class SearchProteinLooplink implements IProteinLooplink {
 
 	
 	private static final Logger log = Logger.getLogger(SearchProteinLooplink.class);
-	
 	
 	public SearchProtein getProtein() {
 		return protein;
@@ -32,6 +33,25 @@ public class SearchProteinLooplink implements IProteinLooplink {
 	public void setSearch(SearchDTO search) {
 		this.search = search;
 	}
+	
+	public String getSearchName() {
+		if ( search == null ) {
+			
+			return "";
+		}
+		return search.getName();
+	}
+	
+
+	public int getSearchId() {
+		if ( search == null ) {
+			
+			return -1;
+		}
+		return search.getId();
+	}
+	
+	
 	public int getProteinPosition1() {
 		return proteinPosition1;
 	}
@@ -44,6 +64,18 @@ public class SearchProteinLooplink implements IProteinLooplink {
 	public void setProteinPosition2(int proteinPosition2) {
 		this.proteinPosition2 = proteinPosition2;
 	}
+	
+	
+
+	/**
+	 * Only set if the PSM and Peptide Cutoffs match the cutoffs for the source field
+	 * @param numPsms
+	 */
+	public void setNumPsms(Integer numPsms) {
+		this.numPsms = numPsms;
+	}
+	
+	
 
 	/**
 	 * Returns the number of PSMs found for this looplink, given its cutoffs
@@ -58,8 +90,7 @@ public class SearchProteinLooplink implements IProteinLooplink {
 				this.numPsms = 
 						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForLooplink(
 								this.getSearch().getId(),
-								this.getPsmCutoff(),
-								this.getPeptideCutoff(),
+								this.getSearcherCutoffValuesSearchLevel(),
 								this.getProtein().getNrProtein().getNrseqId(),
 								this.getProteinPosition1(),
 								this.getProteinPosition2() );
@@ -80,6 +111,13 @@ public class SearchProteinLooplink implements IProteinLooplink {
 		}
 	}
 	
+	/**
+	 * Only set if the PSM and Peptide Cutoffs match the cutoffs for the source field
+	 * @param numPeptides
+	 */
+	public void setNumPeptides(int numPeptides) {
+		this.numPeptides = numPeptides;
+	}
 
 	
 	public int getNumPeptides() throws Exception {
@@ -91,8 +129,7 @@ public class SearchProteinLooplink implements IProteinLooplink {
 						NumPeptidesForProteinCriteriaSearcher.getInstance()
 						.getNumPeptidesForLooplink(
 								this.getSearch().getId(),
-								this.getPsmCutoff(),
-								this.getPeptideCutoff(),
+								this.getSearcherCutoffValuesSearchLevel(),
 								this.getProtein().getNrProtein().getNrseqId(),
 								this.getProteinPosition1(),
 								this.getProteinPosition2() );
@@ -116,6 +153,15 @@ public class SearchProteinLooplink implements IProteinLooplink {
 		}
 	}
 	
+
+	/**
+	 * Only set if the PSM and Peptide Cutoffs match the cutoffs for the source field
+	 * @param numUniquePeptides
+	 */
+	public void setNumUniquePeptides(int numUniquePeptides) {
+		this.numUniquePeptides = numUniquePeptides;
+	}
+	
 	
 	public int getNumUniquePeptides() throws Exception {
 		
@@ -127,8 +173,7 @@ public class SearchProteinLooplink implements IProteinLooplink {
 						NumPeptidesForProteinCriteriaSearcher.getInstance()
 						.getNumUniquePeptidesForLooplink(
 								this.getSearch().getId(),
-								this.getPsmCutoff(),
-								this.getPeptideCutoff(),
+								this.getSearcherCutoffValuesSearchLevel(),
 								this.getProtein().getNrProtein().getNrseqId(),
 								this.getProteinPosition1(),
 								this.getProteinPosition2(),
@@ -154,93 +199,68 @@ public class SearchProteinLooplink implements IProteinLooplink {
 	}
 
 
-	public List<SearchPeptideLooplink> getPeptides() throws Exception {
-		
-		try {
-			if( this.peptides == null ) {
-
-				this.peptides = 
-				SearchPeptideLooplinkSearcher.getInstance()
-				.searchOnSearchProteinLooplink(
-						this.getSearch().getId(),
-						this.getPeptideCutoff(),
-						this.getPsmCutoff(),
-						this.getProtein().getNrProtein().getNrseqId(),
-						this.getProteinPosition1(),
-						this.getProteinPosition2() );
-
-			}
-
-			return this.peptides;
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Exception in getPeptides()";
-			
-			log.error( msg, e );
-			
-			throw e;
-		}
-	}
 	
-	
-
-	/**
-	 * Only set if the PSM and Peptide Cutoffs match the cutoffs for the source field
-	 * @param numPsms
-	 */
-	public void setNumPsms(Integer numPsms) {
-		this.numPsms = numPsms;
-	}
+	//  WAS
 	
 	/**
-	 * Only set if the PSM and Peptide Cutoffs match the cutoffs for the source field
-	 * @param numPeptides
+	 * WAS
+	 * Used by Javascript in Merged Image and Merged Structure pages
+	 * 
+	 * @return
+	 * @throws Exception
 	 */
-	public void setNumPeptides(int numPeptides) {
-		this.numPeptides = numPeptides;
-	}
+//	public List<SearchPeptideLooplink> getPeptides() throws Exception {
+//		
+//		try {
+//			if( this.peptides == null ) {
+//
+//				this.peptides = 
+//				SearchPeptideLooplinkSearcher.getInstance()
+//				.searchOnSearchProteinLooplink(
+//						this.getSearch().getId(),
+//						searcherCutoffValuesSearchLevel,
+//						this.getProtein().getNrProtein().getNrseqId(),
+//						this.getProteinPosition1(),
+//						this.getProteinPosition2() );
+//
+//			}
+//
+//			return this.peptides;
+//			
+//		} catch ( Exception e ) {
+//			
+//			String msg = "Exception in getPeptides()";
+//			
+//			log.error( msg, e );
+//			
+//			throw e;
+//		}
+//	}
 	
-	/**
-	 * Only set if the PSM and Peptide Cutoffs match the cutoffs for the source field
-	 * @param numUniquePeptides
-	 */
-	public void setNumUniquePeptides(int numUniquePeptides) {
-		this.numUniquePeptides = numUniquePeptides;
+	
+
+
+	public List<String> getPsmAnnotationValueList() {
+		return psmAnnotationValueList;
+	}
+	public void setPsmAnnotationValueList(List<String> psmAnnotationValueList) {
+		this.psmAnnotationValueList = psmAnnotationValueList;
+	}
+	public List<String> getPeptideAnnotationValueList() {
+		return peptideAnnotationValueList;
+	}
+	public void setPeptideAnnotationValueList(
+			List<String> peptideAnnotationValueList) {
+		this.peptideAnnotationValueList = peptideAnnotationValueList;
 	}
 
-	
-	public int getNumUniquePsms() {
-		return numUniquePsms;
+
+	public SearcherCutoffValuesSearchLevel getSearcherCutoffValuesSearchLevel() {
+		return searcherCutoffValuesSearchLevel;
 	}
-	public void setNumUniquePsms(int numUniquePsms) {
-		this.numUniquePsms = numUniquePsms;
-	}
-	public double getPsmCutoff() {
-		return psmCutoff;
-	}
-	public void setPsmCutoff(double psmCutoff) {
-		this.psmCutoff = psmCutoff;
-	}
-	public double getPeptideCutoff() {
-		return peptideCutoff;
-	}
-	public void setPeptideCutoff(double peptideCutoff) {
-		this.peptideCutoff = peptideCutoff;
-	}
-	
-	
-	public double getBestPSMQValue() {
-		return bestPSMQValue;
-	}
-	public void setBestPSMQValue(double bestPSMQValue) {
-		this.bestPSMQValue = bestPSMQValue;
-	}
-	public Double getBestPeptideQValue() {
-		return bestPeptideQValue;
-	}
-	public void setBestPeptideQValue(Double bestPeptideQValue) {
-		this.bestPeptideQValue = bestPeptideQValue;
+	public void setSearcherCutoffValuesSearchLevel(
+			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel) {
+		this.searcherCutoffValuesSearchLevel = searcherCutoffValuesSearchLevel;
 	}
 
 
@@ -251,19 +271,31 @@ public class SearchProteinLooplink implements IProteinLooplink {
 	private int proteinPosition2;
 	
 
-	private List<SearchPeptideLooplink> peptides;
+//	private List<SearchPeptideLooplink> peptides;
 	
 	
 	private Integer numPsms;
-	private int numUniquePsms;
+//	private int numUniquePsms = -999;
 
 
 
 	private int numPeptides = -1;
 	
 	private int numUniquePeptides = -1;
-	private double psmCutoff;
-	private double peptideCutoff;
-	private double bestPSMQValue;
-	private Double bestPeptideQValue;
+	
+	private SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel;
+
+
+
+	/**
+	 * Used for display on web page
+	 */
+	private List<String> psmAnnotationValueList;
+	
+
+	/**
+	 * Used for display on web page
+	 */
+	private List<String> peptideAnnotationValueList;
+
 }

@@ -23,7 +23,40 @@ var ViewLooplinkProteinsLoadedFromWebServiceTemplate = function() {
 	var _handlebarsTemplate_looplink_protein_block_template = null;
 	var _handlebarsTemplate_looplink_protein_data_row_entry_template = null;
 	var _handlebarsTemplate_looplink_protein_child_row_entry_template = null;
+
+	var _data_per_search_between_searches_html = null;
+
+	var _psmPeptideCutoffsRootObject = null;
 	
+	//   Currently expect _psmPeptideCriteria = 
+//					searches: Object
+//						128: Object			
+//							peptideCutoffValues: Object
+//								238: Object
+//									id: 238
+//									value: "0.01"
+//							psmCutoffValues: Object
+//								384: Object
+//									id: 384
+//									value: "0.01"
+//							searchId: 128
+	
+//           The key to:
+//				searches - searchId
+//				peptideCutoffValues and psmCutoffValues - annotation type id
+	
+//			peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+	
+
+	//////////////
+
+	this.setPsmPeptideCriteria = function( psmPeptideCutoffsRootObject ) {
+		
+		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
+	};
+	
+	
+	//////////////
 	
 	this.showHideLooplinkProteins = function( params ) {
 		
@@ -75,9 +108,6 @@ var ViewLooplinkProteinsLoadedFromWebServiceTemplate = function() {
 
 		
 		var search_idsCommaDelim = $clickedElement.attr( "search_ids" );
-		var project_id = $clickedElement.attr( "project_id" );
-		var peptide_q_value_cutoff = $clickedElement.attr( "peptide_q_value_cutoff" );
-		var psm_q_value_cutoff = $clickedElement.attr( "psm_q_value_cutoff" );
 		var protein_id = $clickedElement.attr( "protein_id" );
 		var protein_position_1 = $clickedElement.attr( "protein_position_1" );
 		var protein_position_2 = $clickedElement.attr( "protein_position_2" );
@@ -85,17 +115,6 @@ var ViewLooplinkProteinsLoadedFromWebServiceTemplate = function() {
 		
 		//  Convert all attributes to empty string if null or undefined
 
-		if ( ! project_id ) {
-			project_id = "";
-		}
-		if ( ! peptide_q_value_cutoff ) {
-			peptide_q_value_cutoff = "";
-		}
-
-		//
-		if ( ! psm_q_value_cutoff ) {
-			psm_q_value_cutoff = "";
-		}
 		if ( ! protein_id ) {
 			protein_id = "";
 		}
@@ -135,22 +154,68 @@ var ViewLooplinkProteinsLoadedFromWebServiceTemplate = function() {
 		}
 		
 		
+
+		//   Currently expect _psmPeptideCutoffsRootObject = 
+//						searches: Object
+//							128: Object			
+//								peptideCutoffValues: Object
+//									238: Object
+//										id: 238
+//										value: "0.01"
+//								psmCutoffValues: Object
+//									384: Object
+//										id: 384
+//										value: "0.01"
+//								searchId: 128
+		
+//	           The key to:
+//					searches - searchId
+//					peptideCutoffValues and psmCutoffValues - annotation type id
+		
+//				peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+
+		
+		
+		//   Copy the cutoffs for the search ids found on the element
+		
+		var psmPeptideCriteriaSearches = _psmPeptideCutoffsRootObject.searches;
+		
+		var cutoffsPerSearchIds = {};
+		
+		for ( var searchIdIndex = 0; searchIdIndex < search_ids.length; searchIdIndex++ ) {
+			
+			var searchIdForLookup = search_ids[ searchIdIndex ];
+			
+			var cutoffForSearchId = psmPeptideCriteriaSearches[ searchIdForLookup ];
+			
+			if ( cutoffForSearchId === undefined || cutoffForSearchId === null ) {
+				
+				throw "No Cutoff data found for search id: " + searchIdForLookup;
+			}
+			
+			cutoffsPerSearchIds[ searchIdForLookup ] = cutoffForSearchId;
+		}
+		
+		var cutoffsForWebservice = { searches: cutoffsPerSearchIds };
+		
+
+		var psmPeptideCutoffsForSearchIds_JSONString = JSON.stringify( cutoffsForWebservice );
+
+				
 		
 		
 		var ajaxRequestData = {
 
 				search_ids : search_ids,
-				project_id : project_id,
-				peptide_q_value_cutoff : peptide_q_value_cutoff,
-				psm_q_value_cutoff : psm_q_value_cutoff,
+				psmPeptideCutoffsForSearchIds : psmPeptideCutoffsForSearchIds_JSONString,
 				protein_id : protein_id,
 				protein_position_1 : protein_position_1,
 				protein_position_2 : protein_position_2,
 		};
 		
-		
+
 		$.ajax({
-			url : contextPathJSVar + "/services/data/getLooplinkProteins",
+			url : contextPathJSVar + "/services/data/getLooplinkProteinsPerSearchIdsProteinIdsPositions",
 
 			traditional: true,  //  Force traditional serialization of the data sent
 								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
@@ -195,21 +260,21 @@ var ViewLooplinkProteinsLoadedFromWebServiceTemplate = function() {
 		
 		var ajaxRequestData = params.ajaxRequestData;
 		
-
-		var looplink_proteins = ajaxResponseData;
+		var proteinsPerSearchIdMap = ajaxResponseData.proteinsPerSearchIdMap;
+		
 		
 		
 		
 		var $topTRelement = params.$topTRelement;
 		
-		var $looplink_protein_data_container = $topTRelement.find(".child_data_container_jq");
+		var $data_container = $topTRelement.find(".child_data_container_jq");
 		
-		if ( $looplink_protein_data_container.length === 0 ) {
+		if ( $data_container.length === 0 ) {
 			
 			throw "unable to find HTML element with class 'child_data_container_jq'";
 		}
 
-		$looplink_protein_data_container.empty();
+		$data_container.empty();
 		
 		if ( _handlebarsTemplate_looplink_protein_block_template === null ) {
 			
@@ -254,90 +319,128 @@ var ViewLooplinkProteinsLoadedFromWebServiceTemplate = function() {
 			_handlebarsTemplate_looplink_protein_child_row_entry_template = Handlebars.compile( handlebarsSource_looplink_protein_child_row_entry_template );
 		}
 
-		
 
-		//  Search for bestPeptideQValue being set in any row
-
-		var bestPeptideQValueSetAnyRows = false;
+		////////////////////////////
 		
-		for ( var looplink_proteinIndex = 0; looplink_proteinIndex < looplink_proteins.length ; looplink_proteinIndex++ ) {
+		
+		///////   Process Per Search Id:
+		
+		var searchIdArray = Object.keys( proteinsPerSearchIdMap );
+		
+		//  Sort the search ids in ascending order
+		searchIdArray.sort(function compareNumbers(a, b) {
+			  return a - b;
+		});
+
+		for ( var searchIdIndex = 0; searchIdIndex < searchIdArray.length; searchIdIndex++ ) {
 			
-			var looplink_protein = looplink_proteins[ looplink_proteinIndex ];
 			
-			if ( looplink_protein.searchProteinLooplink.bestPeptideQValue !== undefined && looplink_protein.searchProteinLooplink.bestPeptideQValue !== null ) {
+			//  If after the first search, insert the separator
+			
+			if ( searchIdIndex > 0 ) {
 				
-				bestPeptideQValueSetAnyRows = true;
-				break;
+				var $data_per_search_between_searches_htmlEntry =
+					$( _data_per_search_between_searches_html ).appendTo( $data_container) ;
+				
+				$data_per_search_between_searches_htmlEntry.show();
 			}
-		}
+			
+
+			var searchId = searchIdArray[ searchIdIndex ];
+			
+			var proteinsForSearchWithAnnotationNameDescList = proteinsPerSearchIdMap[ searchId ];
+
+			
+			var peptideAnnotationDisplayNameDescriptionList =  proteinsForSearchWithAnnotationNameDescList.peptideAnnotationDisplayNameDescriptionList;
+			var psmAnnotationDisplayNameDescriptionList =  proteinsForSearchWithAnnotationNameDescList.psmAnnotationDisplayNameDescriptionList;
+			
+
+			var proteinsForSearch =  proteinsForSearchWithAnnotationNameDescList.proteins;
+		
 		
 
-		//  create context for header row
-		var context = { bestPeptideQValueSetAnyRows : bestPeptideQValueSetAnyRows };
+			
+			//  create context for header row
+			var context = { 
+					
+					peptideAnnotationDisplayNameDescriptionList : peptideAnnotationDisplayNameDescriptionList,
+					psmAnnotationDisplayNameDescriptionList : psmAnnotationDisplayNameDescriptionList
+			};
+			
 
-		var html = _handlebarsTemplate_looplink_protein_block_template(context);
+			var html = _handlebarsTemplate_looplink_protein_block_template(context);
 
-		var $looplink_protein_block_template = $(html).appendTo($looplink_protein_data_container);
-		
+			var $looplink_protein_block_template = $(html).appendTo( $data_container );
 
-		var looplink_protein_table_jq_ClassName = "looplink_protein_table_jq";
-		
-		var $looplink_protein_table_jq = $looplink_protein_block_template.find("." + looplink_protein_table_jq_ClassName );
-	
-	//			var $looplink_protein_table_jq = $looplink_protein_data_container.find(".looplink_protein_table_jq");
-		
-		if ( $looplink_protein_table_jq.length === 0 ) {
-			
-			throw "unable to find HTML element with class '" + looplink_protein_table_jq_ClassName + "'";
-		}
-		
-		
-		//  Add looplink_protein data to the page
-	
-		for ( var looplink_proteinIndex = 0; looplink_proteinIndex < looplink_proteins.length ; looplink_proteinIndex++ ) {
-	
-			var looplink_protein = looplink_proteins[ looplink_proteinIndex ];
-			
-			//  wrap data in an object to allow adding more fields
-			var context = { data : looplink_protein, bestPeptideQValueSetAnyRows : bestPeptideQValueSetAnyRows };
-	
-			var html = _handlebarsTemplate_looplink_protein_data_row_entry_template(context);
-	
-			var $looplink_protein_entry = 
-				$(html).appendTo($looplink_protein_table_jq);
-			
-			
-			//  Get the number of columns of the inserted row so can set the "colspan=" in the next row
-			//       that holds the child data
-			
-			var $looplink_protein_entry__columns = $looplink_protein_entry.find("td");
-			
-			var looplink_protein_entry__numColumns = $looplink_protein_entry__columns.length;
-			
-			//  colSpan is used as the value for "colspan=" in the <td>
-			var childRowHTML_Context = { colSpan : looplink_protein_entry__numColumns };
-			
-			var childRowHTML = _handlebarsTemplate_looplink_protein_child_row_entry_template( childRowHTML_Context );
-			
-			//  Add next row for child data
-			$( childRowHTML ).appendTo($looplink_protein_table_jq);
-		}
-		
-		var $openLorkeetLinks = $(".view_spectrum_open_spectrum_link_jq");
-		
-		addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
-	
-		//  Does not seem to work so not run it
-//		if ( looplink_proteins.length > 0 ) {
-//			
-//			try {
-//				$looplink_protein_block_template.tablesorter(); // gets exception if there are no data rows
-//			} catch (e) {
-//				
-//				var z = 0;
-//			}
-//		}
 
+			if ( _data_per_search_between_searches_html === null ) {
+				
+				_data_per_search_between_searches_html = $looplink_protein_block_template.find( ".data_per_search_between_searches_html_jq" ).html();
+				
+				if ( _data_per_search_between_searches_html === undefined ) {
+					throw "data_per_search_between_searches_html_jq === undefined";
+				}
+				if ( _data_per_search_between_searches_html === null ) {
+					throw "data_per_search_between_searches_html_jq === null";
+				}
+
+			}
+
+
+			var looplink_protein_table_jq_ClassName = "looplink_protein_table_jq";
+
+			var $looplink_protein_table_jq = $looplink_protein_block_template.find("." + looplink_protein_table_jq_ClassName );
+
+			//			var $looplink_protein_table_jq = $data_container.find(".looplink_protein_table_jq");
+
+			if ( $looplink_protein_table_jq.length === 0 ) {
+
+				throw "unable to find HTML element with class '" + looplink_protein_table_jq_ClassName + "'";
+			}
+
+
+			//  Add protein data to the page
+
+			for ( var proteinIndex = 0; proteinIndex < proteinsForSearch.length ; proteinIndex++ ) {
+
+			
+				var proteinData = proteinsForSearch[ proteinIndex ];
+
+				var context = { 
+						
+						data : proteinData,
+
+						protein_id : ajaxRequestData.protein_id,
+						protein_position_1 : ajaxRequestData.protein_position_1,
+						protein_position_2 : ajaxRequestData.protein_position_2
+				};
+
+
+				var html = _handlebarsTemplate_looplink_protein_data_row_entry_template(context);
+
+				var $looplink_protein_entry = 
+					$(html).appendTo($looplink_protein_table_jq);
+
+
+				//  Get the number of columns of the inserted row so can set the "colspan=" in the next row
+				//       that holds the child data
+
+				var $looplink_protein_entry__columns = $looplink_protein_entry.find("td");
+
+				var looplink_protein_entry__numColumns = $looplink_protein_entry__columns.length;
+
+				//  colSpan is used as the value for "colspan=" in the <td>
+				var childRowHTML_Context = { colSpan : looplink_protein_entry__numColumns };
+
+				var childRowHTML = _handlebarsTemplate_looplink_protein_child_row_entry_template( childRowHTML_Context );
+
+				//  Add next row for child data
+				$( childRowHTML ).appendTo($looplink_protein_table_jq);
+			}
+
+
+		}  // END:  For Each Search Id
+				
 		
 	};
 	

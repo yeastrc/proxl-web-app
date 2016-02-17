@@ -1142,14 +1142,16 @@
 				
 			</c:if>	  <%-- END  <c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" >  --%>
 
+
+		<%-- Place outside of submitted form --%>
+		<input type="hidden" id="project_id" value="<c:out value="${project_id}" />" />
+
 			
 				
 			<!--  Search Data -->
 
 			<form action="" method="get" id="viewMergedDataForm">
 
-
-			<input type="hidden" name="project_id" id="project_id" value="<c:out value="${project_id}" />" />
 
 			
 			<div class="top-level-container collapsable_container_jq" >
@@ -1468,20 +1470,29 @@
 		
 									  <div style="float: right;" >
 										
-										[<a data-tooltip="View peptides found in search" class="tool_tip_attached_jq" href="${ contextPath }/<proxl:defaultPageUrl pageName="viewSearchPeptide.do" searchId="${ search.id }">viewSearchPeptide.do?project_id=<c:out value="${project_id}" />&searchId=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
+										[<a data-tooltip="View peptides found in search" class="tool_tip_attached_jq" 
+											href="${ contextPath }/<proxl:defaultPageUrl pageName="peptide.do" searchId="${ search.id }">peptide.do?searchId=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
 												>Peptides</a>]
 										
-										[<a data-tooltip="View proteins found in search" class="tool_tip_attached_jq" href="${ contextPath }/<proxl:defaultPageUrl pageName="viewSearchCrosslinkProtein.do" searchId="${ search.id }">viewSearchCrosslinkProtein.do?project_id=<c:out value="${project_id}" />&searchId=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
+										[<a data-tooltip="View proteins found in search" class="tool_tip_attached_jq" 
+											href="${ contextPath }/<proxl:defaultPageUrl pageName="crosslinkProtein.do" searchId="${ search.id }">crosslinkProtein.do?searchId=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
 												>Proteins</a>]
-												
-										[<a data-tooltip="Graphical view of links between proteins" class="tool_tip_attached_jq" href="javascript:viewImage(<bean:write name="search" property="id" />)">Image</a>]
-										
-										
+
+										[<a data-tooltip="Graphical view of links between proteins" class="tool_tip_attached_jq" 
+											href="${ contextPath }/<proxl:defaultPageUrl pageName="image.do" searchId="${ search.id }">image.do?searchIds=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
+												>Image</a>]
+
+				<span style="color:red; font-size: 14px;">[Merged Structure under construction]</span> 
+
+<%-- 										
 										<c:choose>
 										 <c:when test="${ showStructureLink }">
 										
-											[<a data-tooltip="View data on 3D structures" class="tool_tip_attached_jq" href="javascript:viewStructure(<bean:write name="search" property="id" />)">Structure</a>]
-										
+
+											[<a data-tooltip="View data on 3D structures" class="tool_tip_attached_jq" 
+												href="${ contextPath }/<proxl:defaultPageUrl pageName="structure.do" searchId="${ search.id }">structure.do?searchIds=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
+													>Structure</a>]
+																							
 										 </c:when>
 										 <c:otherwise>
 										 	
@@ -1490,11 +1501,8 @@
 										 </c:otherwise>
 										</c:choose>
 		
-										<input type="hidden" id="viewMergedImageDefaultPageUrl_${ search.id }" 
-											value="<proxl:defaultPageUrl pageName="viewMergedImage.do" searchId="${ search.id }"></proxl:defaultPageUrl>">
-		
-										<input type="hidden" id="viewMergedStructureDefaultPageUrl_${ search.id }" 
-											value="<proxl:defaultPageUrl pageName="viewMergedStructure.do" searchId="${ search.id }"></proxl:defaultPageUrl>">
+--%>
+			
 			
 										<c:if test="${authAccessLevel.searchDeleteAllowed}" >
 											<a href="javascript:" data-tooltip="Delete search" class="tool_tip_attached_jq delete_search_link_jq"

@@ -7,10 +7,16 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
+import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
 import org.yeastrc.xlink.www.searcher.MergedSearchCrosslinkPeptideSearcher;
-import org.yeastrc.xlink.www.searcher.MergedSearchPsmSearcher;
 import org.yeastrc.xlink.www.searcher.SearchProteinCrosslinkSearcher;
 
+/**
+ * 
+ *
+ */
 public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedSearchLink {
 
 	private static final Logger log = Logger.getLogger(MergedSearchProteinCrosslink.class);
@@ -34,59 +40,63 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 
 	public Map<SearchDTO, SearchProteinCrosslink> getSearchProteinCrosslinks() throws Exception {
 		
-		if ( searchProteinCrosslinks == null ) {
-			
-			searchProteinCrosslinks = new TreeMap<SearchDTO, SearchProteinCrosslink>();
-			for( SearchDTO search : searches ) {
-				SearchProteinCrosslink tlink = SearchProteinCrosslinkSearcher.getInstance().search(search, 
-																									 psmCutoff, 
-																									 peptideCutoff, 
-																									 this.getProtein1().getNrProtein(),
-																									 this.getProtein2().getNrProtein(),
-																									 this.getProtein1Position(),
-																									 this.getProtein2Position()
-																									);
+		try {
 
-				if( tlink != null )
-					searchProteinCrosslinks.put( search, tlink );
+			//  Used in Action for isFilterOnlyOnePSM and isFilterOnlyOnePeptide
+
+
+			if ( searchProteinCrosslinks == null ) {
+
+				searchProteinCrosslinks = new TreeMap<SearchDTO, SearchProteinCrosslink>();
+
+
+				for ( SearchDTO search : searches ) {
+					
+					int searchId = search.getId();
+					
+					SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
+
+					if ( searcherCutoffValuesSearchLevel == null ) {
+
+						String msg = "No searcherCutoffValuesSearchLevel found in searcherCutoffValuesRootLevel for search id: " + searchId;
+						log.error( msg );
+						throw new Exception(msg);
+					}
+
+					SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper =
+							SearchProteinCrosslinkSearcher.getInstance().search(
+									search, 
+									searcherCutoffValuesSearchLevel, 
+									this.getProtein1().getNrProtein(),
+									this.getProtein2().getNrProtein(),
+									this.getProtein1Position(),
+									this.getProtein2Position()
+									);
+
+					if( searchProteinCrosslinkWrapper != null ) {
+
+						SearchProteinCrosslink tlink = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
+
+						if( tlink != null ) {
+							searchProteinCrosslinks.put( search, tlink );
+						}
+					}
+				}
 			}
-			
+
+			return searchProteinCrosslinks;
+
+		} catch (Exception e ) {
+
+			String msg = "Error in getSearchProteinCrosslinks(): " + e.toString();
+
+			log.error( msg, e );
+
+			throw e;
 		}
-		
-		return searchProteinCrosslinks;
 	}
 
 	
-
-	
-	/**
-	 * @return true if any child level link "Best Peptide Q-Value" is not null
-	 * @throws Exception 
-	 */
-	public boolean isAnyLinksHaveBestPeptideQValue() throws Exception {
-
-		if ( anyLinksHaveBestPeptideQValueSet ) {
-			
-			return anyLinksHaveBestPeptideQValue;
-		}
-	
-		/// Check if any child level link "Best Peptide Q-Value" is not null
-
-		for ( Map.Entry<SearchDTO, SearchProteinCrosslink> searchProteinCrosslinksEntry : getSearchProteinCrosslinks().entrySet() ) {
-
-			SearchProteinCrosslink searchProteinCrosslinkEntry = searchProteinCrosslinksEntry.getValue();
-
-			if ( searchProteinCrosslinkEntry.getBestPeptideQValue() != null ) {
-
-				anyLinksHaveBestPeptideQValue = true;
-				break;
-			}
-		}
-		
-		anyLinksHaveBestPeptideQValueSet = true;
-		
-		return anyLinksHaveBestPeptideQValue;
-	}
 
 	
 	
@@ -120,7 +130,45 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 		
 		if( this.numPsms == null ) {
 		
-			this.numPsms = MergedSearchPsmSearcher.getInstance().getNumPsms( this );
+			
+			//  Use code in  SearchProteinCrosslink.getNumPsms() for each search
+//			
+//			NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForCrosslink(
+//					this.getSearch().getId(),
+//					this.getSearcherCutoffValuesSearchLevel(),
+//					this.getProtein1().getNrProtein().getNrseqId(),
+//					this.getProtein2().getNrProtein().getNrseqId(),
+//					this.getProtein1Position(),
+//					this.getProtein2Position() );
+
+			int totalNumPsms = 0;
+			
+			for ( SearchDTO search : searches ) {
+								
+				int searchId = search.getId();
+				
+				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
+				
+				if ( searcherCutoffValuesSearchLevel == null ) {
+					
+					String msg = "No searcherCutoffValuesSearchLevel found in searcherCutoffValuesRootLevel for search id: " + searchId;
+					log.error( msg );
+					throw new Exception(msg);
+				}
+				
+				
+				int numPsmsForSearch = NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForCrosslink(
+						searchId,
+						searcherCutoffValuesSearchLevel,
+						this.getProtein1().getNrProtein().getNrseqId(),
+						this.getProtein2().getNrProtein().getNrseqId(),
+						this.getProtein1Position(),
+						this.getProtein2Position() );
+				
+				totalNumPsms += numPsmsForSearch;
+			}
+			
+			this.numPsms = totalNumPsms;
 		}
 		
 		return this.numPsms;
@@ -137,21 +185,33 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 	public void setNumUniquePsms(int numUniquePsms) {
 		this.numUniquePsms = numUniquePsms;
 	}
-	public double getPsmCutoff() {
-		return psmCutoff;
-	}
-	public void setPsmCutoff(double cutoff) {
-		this.psmCutoff = cutoff;
-	}
+
+	
 	public int getNumLinkedPeptides() throws Exception {
-		if( this.numLinkedPeptides == -1 )
-			this.numLinkedPeptides = MergedSearchCrosslinkPeptideSearcher.getInstance().getNumLinkedPeptides( this );
-			
-		return this.numLinkedPeptides;
+
+		try {
+
+
+			if( this.numLinkedPeptides == -1 )
+				this.numLinkedPeptides = MergedSearchCrosslinkPeptideSearcher.getInstance().getNumLinkedPeptides( this );
+
+			return this.numLinkedPeptides;
+
+		} catch ( Exception e ) {
+
+			String msg = "Exception in getNumLinkedPeptides( MergedSearchProteinCrosslink crosslink ): " 
+					+ " this.getProtein1().getNrProtein().getNrseqId(): " + this.getProtein1().getNrProtein().getNrseqId()
+					+ " this.getProtein2().getNrProtein().getNrseqId(): " + this.getProtein2().getNrProtein().getNrseqId();
+
+			log.error( msg, e );
+
+			throw e;
+		}
 	}
 	public int getNumUniqueLinkedPeptides() throws Exception {
 		
 		try {
+			
 			if( this.numUniqueLinkedPeptides == -1 )
 				this.numUniqueLinkedPeptides = MergedSearchCrosslinkPeptideSearcher.getInstance().getNumUniqueLinkedPeptides( this );
 
@@ -170,36 +230,33 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 
 	}
 	
-
-	public double getPeptideCutoff() {
-		return peptideCutoff;
-	}
-	public void setPeptideCutoff(double peptideCutoff) {
-		this.peptideCutoff = peptideCutoff;
-	}
-
 	
 	public int getNumSearches() {
 		if( this.searches == null ) return 0;
 		return this.searches.size();
 	}
 
-	
-	
-	public double getBestPSMQValue() {
-		return bestPSMQValue;
+	public SearcherCutoffValuesRootLevel getSearcherCutoffValuesRootLevel() {
+		return searcherCutoffValuesRootLevel;
 	}
-	public void setBestPSMQValue(double bestPSMQValue) {
-		this.bestPSMQValue = bestPSMQValue;
+	public void setSearcherCutoffValuesRootLevel(
+			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel) {
+		this.searcherCutoffValuesRootLevel = searcherCutoffValuesRootLevel;
 	}
-	public Double getBestPeptideQValue() {
-		return bestPeptideQValue;
-	}
-	public void setBestPeptideQValue(Double bestPeptideQValue) {
-		this.bestPeptideQValue = bestPeptideQValue;
+
+	public List<AnnValuePeptPsmListsPair> getPeptidePsmAnnotationValueListsForEachSearch() {
+		return peptidePsmAnnotationValueListsForEachSearch;
 	}
 
 
+	public void setPeptidePsmAnnotationValueListsForEachSearch(
+			List<AnnValuePeptPsmListsPair> peptidePsmAnnotationValueListsForEachSearch) {
+		this.peptidePsmAnnotationValueListsForEachSearch = peptidePsmAnnotationValueListsForEachSearch;
+	}
+
+
+
+	
 
 	private MergedSearchProtein protein1;
 	private MergedSearchProtein protein2;
@@ -210,22 +267,22 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 	private int numUniquePsms;
 
 	private int numLinkedPeptides = -1;
+
+	private int numUniqueLinkedPeptides = -1;
+
 	
 	private List<SearchDTO> searches;
 	
 	private Map<SearchDTO, SearchProteinCrosslink> searchProteinCrosslinks;
 	
 
-
-
-
-	private int numUniqueLinkedPeptides = -1;
-	private double psmCutoff;
-	private double peptideCutoff;
-	private double bestPSMQValue;
-	private Double bestPeptideQValue;
 	
+	private SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel;
 
-	private boolean anyLinksHaveBestPeptideQValue;
-	private boolean anyLinksHaveBestPeptideQValueSet;	
+	/**
+	 * Used for display on web page
+	 */
+	private List<AnnValuePeptPsmListsPair> peptidePsmAnnotationValueListsForEachSearch;
+
+
 }

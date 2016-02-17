@@ -81,7 +81,21 @@ public class ViewProjectAction extends Action {
 				}
 			
 			}
+
+			//  Confirm projectId is in database
 			
+			Integer authShareableObjectId =	ProjectDAO.getInstance().getAuthShareableObjectIdForProjectId( projectId );
+			
+			if ( authShareableObjectId == null ) {
+				
+				// should never happen
+				
+				String msg = "Project id is not in database: " + projectId;
+				
+				log.error( msg );
+
+				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
+			}
 
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );

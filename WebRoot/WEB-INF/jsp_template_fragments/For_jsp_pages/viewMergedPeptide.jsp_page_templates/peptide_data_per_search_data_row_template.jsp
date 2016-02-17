@@ -19,8 +19,6 @@
 	reported_peptide_id="{{ data.reportedPeptide.id }}"
 	search_id="{{  data.searchId }}"
 	project_id="{{  project_id }}"
-	peptide_q_value_cutoff="${ peptideQValueCutoff }" <%-- JSP EL value  --%>
-	psm_q_value_cutoff="{{  psm_q_value_cutoff }}"
 >
 	<td>{{ data.searchName }}</td>
 
@@ -28,27 +26,11 @@
 		{{ data.reportedPeptide.sequence }}
 	</td>
 	
-	{{#if anyLinksHavePeptideQValue }}
-		<td style="white-space: nowrap">{{ data.peptideQValue }}</td>
-	{{/if}}
-	
-	{{#if anyLinksHavePeptidePEPValue }}
-		<td style="white-space: nowrap">
-			{{#if data.pepPopulated }}
-			{{/if}}
-				{{ data.peptidePEP }}
-		</td>
-	{{/if}}
-	
-
-	{{#if anyLinksHavePeptideSVMValue }}
-		<td style="white-space: nowrap">
-			{{#if data.svmScorePopulated }}
-			{{/if}}
-				{{ data.peptideSVMScore }}
-		</td>
-	{{/if}}
-
+	{{#each data.peptideAnnotationValues}}
+		<td style="text-align: left; white-space: nowrap; "  class="  "  
+	 			>{{this}}</td>
+	{{/each}}
+			
 	<td style="text-align: right;" ><a class="show-child-data-link   " 
 			href="javascript:"
 			>{{ data.numPSMs }}<span class="toggle_visibility_expansion_span_jq" 
@@ -61,6 +43,12 @@
 								></span>
 		</a>
 	</td>
+	
+
+	{{#each data.psmAnnotationValues}}
+		<td style="text-align: left; white-space: nowrap; "  class="  "  
+	 			>{{this}}</td>
+	{{/each}}	
 </tr>
 
 													

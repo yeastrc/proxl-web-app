@@ -301,9 +301,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	</div>
 
   </div>
-	
-		<input type="hidden" id="project_id_from_query_string" value="<c:out value="${ project_id }"></c:out>"> 
-	
+
 	
 
 		

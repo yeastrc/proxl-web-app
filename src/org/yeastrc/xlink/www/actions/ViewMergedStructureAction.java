@@ -113,24 +113,6 @@ public class ViewMergedStructureAction extends Action {
 			request.setAttribute( "projectId", projectId ); 
 			
 			request.setAttribute( "project_id", projectId );
-
-			
-			String project_id_from_query_string = request.getParameter( WebConstants.PARAMETER_PROJECT_ID );
-			
-			if ( StringUtils.isEmpty( project_id_from_query_string ) ) {
-
-				//  Forward to special Javascript to copy the project from the searches to the URL and redirect to that new URL.
-				
-				if ( log.isInfoEnabled() ) {
-					
-					log.info( "Redirecting to special Javascript page to add '" + WebConstants.PARAMETER_PROJECT_ID + "=" + projectId + "' to query string." );
-				}
-				
-				return mapping.findForward( StrutsGlobalForwardNames.NO_PROJECT_ID_IN_QUERY_STRING );
-			}
-			
-			
-			
 			
 
 			///////////////////////

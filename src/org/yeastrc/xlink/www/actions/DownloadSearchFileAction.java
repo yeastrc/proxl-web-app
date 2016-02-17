@@ -115,29 +115,6 @@ public class DownloadSearchFileAction extends Action {
 			request.setAttribute( "projectId", projectId ); 
 
 
-
-			String project_id_from_query_string = request.getParameter( WebConstants.PARAMETER_PROJECT_ID );
-
-			if ( StringUtils.isEmpty( project_id_from_query_string ) ) {
-
-				//  copy the project from the searches to the URL and redirect to that new URL.
-				
-				String getRequestURI = request.getRequestURI();
-				
-				String getQueryString = request.getQueryString();
-				
-				String newURL = getRequestURI + "?" + WebConstants.PARAMETER_PROJECT_ID + "=" + projectId + "&" + getQueryString;
-				
-				if ( log.isInfoEnabled() ) {
-					
-					log.info( "Redirecting to new URL to add '" + WebConstants.PARAMETER_PROJECT_ID + "=" + projectId + "' to query string.  new URL: " + newURL );
-				}
-				
-				response.sendRedirect( newURL );
-				
-				return null;
-			}
-			
 			///////////////////////
 			
 			

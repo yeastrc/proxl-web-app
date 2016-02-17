@@ -57,9 +57,12 @@
 				</span>
 		   {{/each}}
 		</td>
+		
+		<%-- showPeptideQValue removed from JS code
 		{{#if showPeptideQValue}}
 			<td style="white-space: nowrap" class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " >{{ data.qValue }}</td>
 		{{/if}}
+		--%>
 
 		<td class="integer-number-column {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
 			<a class="show-child-data-link  " 
@@ -79,8 +82,10 @@
 			>{{ data.numUniquePsms }} 
 		</td>
 			
-		
+		<%-- 
 		
 		<td class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " >{{ data.bestPsmQValue }}</td>
+		
+		--%>
 	</tr>
 

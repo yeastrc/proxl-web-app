@@ -6,27 +6,40 @@
 	
 	<%--  Looplink Peptide Template --%>
 
-		<div > 
+<div > 
 
-			<table  class=" tablesorter looplink_peptide_table_jq " style="width:60%"  >
-				<thead>
-				<tr>
-						<th style="text-align:left; font-weight:bold;">Reported peptide</th>
-						<th style="text-align:left; font-weight:bold;">Peptide</th>
-						<th class="integer-number-column-header" style="font-weight:bold;">Pos&nbsp;1</th>
-						<th class="integer-number-column-header" style="font-weight:bold;">Pos&nbsp;2</th>
+	<table  class=" tablesorter looplink_peptide_table_jq " style="width:60%"  >
+		<thead>
+		<tr>
+				<th style="text-align:left; font-weight:bold;">Reported peptide</th>
+				<th style="text-align:left; font-weight:bold;">Peptide</th>
+				<th class="integer-number-column-header" style="font-weight:bold; white-space: nowrap;">Pos 1</th>
+				<th class="integer-number-column-header" style="font-weight:bold; white-space: nowrap;">Pos 2</th>
 
-						{{#if qvalueSetAnyRows}} <%-- Only show peptide q value column if any peptide q value are not null --%>
-							<th style="text-align:left; font-weight:bold;"><span style="white-space: nowrap">Q-value</span></th>
-						{{/if}}
 
-						<th class="integer-number-column-right-most-column-no-ts-header" style="font-weight:bold;">#&nbsp;PSMs</th>
-						
-						{{#if showNumberUniquePSMs}} <%-- Only show column if any values are not null --%>
-							<th class=" integer-number-column-right-most-column-no-ts-header " style="font-weight:bold; white-space: nowrap;"># Unique</th>
-						{{/if}}	
-				</tr>
-				</thead>
-				<tbody></tbody>
-			</table>
-		</div>
+				{{#each peptideAnnotationDisplayNameDescriptionList}}
+				 	<th style="text-align:left;font-weight:bold;"
+				 		><span style="white-space: nowrap" <%-- TODO Add Description as tool tip, {{this.description}} --%>
+				 			>{{this.displayName}}</span></th>
+				{{/each}}
+				
+				
+				<th class="integer-number-column-right-most-column-no-ts-header" style="font-weight:bold; white-space: nowrap;"># PSMs</th>
+				
+
+					<%-- Only show column if any values are not null --%>
+				{{#if showNumberUniquePSMs}} 
+					<th class=" integer-number-column-right-most-column-no-ts-header " style="font-weight:bold; white-space: nowrap;"># Unique</th>
+				{{/if}}	
+
+				{{#each psmAnnotationDisplayNameDescriptionList}}
+				 	<th style="text-align:left;font-weight:bold;"
+				 		><span style="white-space: nowrap">Best PSM</span>
+				 		<span style="white-space: nowrap" <%-- TODO Add Description as tool tip, {{this.description}} --%>
+				 			>{{this.displayName}}</span></th>
+				{{/each}}					
+		</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</div>

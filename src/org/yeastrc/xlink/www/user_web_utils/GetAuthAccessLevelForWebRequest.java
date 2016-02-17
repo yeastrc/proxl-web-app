@@ -55,7 +55,14 @@ public class GetAuthAccessLevelForWebRequest {
 		
 		ProjectDTO projectOnlyProjectLockedPublicAccessLevel = ProjectDAO.getInstance().getProjectLockedPublicAccessLevelPublicAccessLockedForProjectId( projectId );
 		
-		
+		if ( projectOnlyProjectLockedPublicAccessLevel == null ) {
+			
+			String msg = "Failed to get project for project id: " + projectId;
+				
+			log.error( msg );
+
+			throw new Exception( msg );
+		}
 		
 
 		UserSessionObject userSessionObject 
@@ -336,6 +343,17 @@ public class GetAuthAccessLevelForWebRequest {
 		
 		
 		ProjectDTO projectOnlyProjectLockedPublicAccessLevel = ProjectDAO.getInstance().getProjectLockedPublicAccessLevelPublicAccessLockedForProjectId( projectId );
+		
+
+		if ( projectOnlyProjectLockedPublicAccessLevel == null ) {
+			
+			String msg = "Failed to get project for project id: " + projectId;
+			
+			log.error( msg );
+
+			throw new Exception( msg );
+		}
+		
 		
 		
 		XLinkUserDTO xLinkUserDBObject = userSessionObject.getUserDBObject();

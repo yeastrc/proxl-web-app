@@ -74,6 +74,12 @@ function uploadPDBFile() {
 	var desc = $("#pdb-file-description").val();
 //	var visibility = $("#pdb-file-visibility").val();
 	
+	var projectId = $("#project_id" ).val();
+	
+	if ( projectId === undefined || projectId === null || projectId === "" ) {
+		
+		throw "Input field with id 'project_id' not found";
+	}
 	
 	
 
@@ -89,7 +95,7 @@ function uploadPDBFile() {
 	var formData = new FormData();
 	formData.append( 'file', file, file.name );
 	formData.append( 'description', desc );
-	formData.append( 'projectId', $("#project_id_from_query_string" ).val() );
+	formData.append( 'projectId', projectId );
 //	formData.append( 'visibility', visibility );
 	
 	var xhr = new XMLHttpRequest();

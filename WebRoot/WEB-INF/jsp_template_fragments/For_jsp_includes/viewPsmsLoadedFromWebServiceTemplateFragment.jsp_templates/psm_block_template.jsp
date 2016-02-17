@@ -37,15 +37,15 @@
 				<th style="text-align:left;font-weight:bold;"><span style="white-space: nowrap">Scan Filename</span></th>
 			{{/if}}
 
-			<th style="text-align:left;font-weight:bold;"><span style="white-space: nowrap">Q-value</span></th>
 			
-			{{#if percolatorDataAnyRows}} <%-- Only show percolator data columns if any percolator data value are not null --%>
-				<th style="text-align:left;font-weight:bold;" >PEP</th>
-				<th style="text-align:left;font-weight:bold;" >SVM Score</th>
-<%-- 				
-				<th style="text-align:left;font-weight:bold;" >Calc. Mass</th>
---%>				
-			{{/if}}
+			
+			{{#each annotationDisplayNameDescriptionList}}
+			 	<th style="text-align:left;font-weight:bold;"
+			 		><span style="white-space: nowrap" <%-- TODO Add Description as tool tip, {{this.description}} --%>
+			 			>{{this.displayName}}</span></th>
+			{{/each}}
+			
+			
 		</tr>
 		</thead>
 		<tbody></tbody>

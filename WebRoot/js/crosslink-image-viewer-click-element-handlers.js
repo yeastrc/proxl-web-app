@@ -3,6 +3,8 @@
 
 
 
+var _data_per_search_between_searches_html = null;
+
 ///////////////////////////////////////////////////////////////////////////
 
 ////////////    Click handlers for the links ( Lines that show the links )
@@ -31,44 +33,49 @@ var linkInfoOverlayWidthResizer = function() {
 function getLooplinkDataForSpecificLinkInGraph( params ) {
 
 	var clickThis = params.clickThis;
-	var psmQValueCutoff = params.psmQValueCutoff;
-	var peptideQValueCutoff = params.peptideQValueCutoff;
 
+	var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
 
 	var $clickThis = $(clickThis);
-	
-//	var $link_info_table = $("#link_info_table__tbody");
-//	
-//	$link_info_table.empty();
 	
 	
 	createSpinner();				// create spinner
 
-//	var fromP = $clickThis.attr( "fromp" );
+	var fromP = $clickThis.attr( "fromp" );
 	var fromPp = $clickThis.attr( "frompp" );
 	var toPp = $clickThis.attr( "topp" );
 	var lsearches = $clickThis.attr( "searches" );
 
 	var from_protein_id = $clickThis.attr( "from_protein_id" );
-//	var to_protein_id = $clickThis.attr( "to_protein_id" );
 
 	var searchesArray = lsearches.split(",");
 
-	var _URL = contextPathJSVar + "/services/imageViewer/getLooplinkDataForSpecificLinkInGraph";
 
-//	_URL += buildQueryStringFromHash();
+	///   Serialize cutoffs to JSON
+	
+	var psmPeptideCutoffsRootObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObject );
 
-	var ajaxRequestData = {
-
-			psmQValueCutoff : psmQValueCutoff,
-			peptideQValueCutoff : peptideQValueCutoff,
+	var requestContext = {
 			
-			searchIds: searchesArray,
-			proteinId: from_protein_id,
-			proteinLinkPosition1: fromPp,
-			proteinLinkPosition2: toPp
+			from_protein_id : from_protein_id,
+
+			fromP : fromP,
+			fromPp : fromPp,
+			toPp : toPp,
+			lsearches : lsearches
 	};
 	
+	var ajaxRequestData = {
+
+			search_ids : searchesArray,
+			psmPeptideCutoffsForSearchIds : psmPeptideCutoffsRootObject_JSONString,
+			protein_id : from_protein_id,
+			protein_position_1 : fromPp,
+			protein_position_2 : toPp,
+	};
+	
+
+	var _URL = contextPathJSVar + "/services/data/getLooplinkProteinsPerSearchIdsProteinIdsPositions";
 
 	$.ajax({
 		type: "GET",
@@ -85,7 +92,7 @@ function getLooplinkDataForSpecificLinkInGraph( params ) {
 
 			destroySpinner();
 
-			getLooplinkDataForSpecificLinkInGraphProcessResponse( { ajaxResponseData: data, ajaxRequestData: ajaxRequestData, clickThis: clickThis });
+			getLooplinkDataForSpecificLinkInGraphProcessResponse( { ajaxResponseData: data, ajaxRequestData: ajaxRequestData, requestContext : requestContext });
 
 		},
         failure: function(errMsg) {
@@ -106,256 +113,230 @@ function getLooplinkDataForSpecificLinkInGraphProcessResponse( params ) {
 	
 	var ajaxResponseData = params.ajaxResponseData;
 	
-//	var ajaxRequestData = params.ajaxRequestData;
+	var requestContext = params.requestContext;
+	
+	
 
-	var clickThis = params.clickThis;
-
-	var $clickThis = $(clickThis);
+	var proteinsPerSearchIdMap = ajaxResponseData.proteinsPerSearchIdMap;
+	
 	
 	
 	openLinkInfoOverlayBackground();
 	
-	var fromP = $clickThis.attr( "fromp" );
-	var fromPp = $clickThis.attr( "frompp" );
-	var toPp = $clickThis.attr( "topp" );
-	var lsearches = $clickThis.attr( "searches" );
 
 	
 	$("#loop_link_general_data").show();
 	$("#cross_link_general_data").hide();
 	$("#mono_link_general_data").hide();
 
-	var from_protein_id = $clickThis.attr( "from_protein_id" );
-
 	$from_protein_id = $("#loop_link_from_protein_id");
 
-	$from_protein_id.text( from_protein_id );
+	$from_protein_id.text( requestContext.from_protein_id );
 
 	var $from_protein_name = $("#loop_link_from_protein_name");
 
-	$from_protein_name.text( fromP );
+	$from_protein_name.text( requestContext.fromP );
 
 	$from_protein_position = $("#loop_link_from_protein_position");
 	$to_protein_position = $("#loop_link_to_protein_position");
 
-	$from_protein_position.text( fromPp );
-	$to_protein_position.text( toPp );
+	$from_protein_position.text( requestContext.fromPp );
+	$to_protein_position.text( requestContext.toPp );
 
 	$searches = $("#searches");
 
-	$searches.text( lsearches );
-	
-	var $link_info_table = $("#link_info_table__tbody");
-	
-	$link_info_table.empty();
-	
-	var $loop_link_protein_info = $("#loop_link_protein_info");
-	
-	var loop_link_protein_info = $loop_link_protein_info.text();
+	$searches.text( requestContext.lsearches );
 	
 	
-	var handlebarsSource_search_entry_data_row_template = $( "#search_entry_data_row_template tbody" ).html(); //  " tbody" since it is a table
+//	var $loop_link_protein_info = $("#loop_link_protein_info");
+	
+//	var loop_link_protein_info = $loop_link_protein_info.text();
+	
+	
 
-	if ( handlebarsSource_search_entry_data_row_template === undefined ) {
-		throw "handlebarsSource_search_entry_data_row_template === undefined";
+	var handlebarsSource_protein_data_per_search_block_template = $( "#protein_data_per_search_block_template" ).html(); 
+
+	if ( handlebarsSource_protein_data_per_search_block_template === undefined ) {
+		throw "handlebarsSource_protein_data_per_search_block_template === undefined";
 	}
-	if ( handlebarsSource_search_entry_data_row_template === null ) {
-		throw "handlebarsSource_search_entry_data_row_template === null";
+	if ( handlebarsSource_protein_data_per_search_block_template === null ) {
+		throw "handlebarsSource_protein_data_per_search_block_template === null";
 	}
 	
-	var handlebarsTemplate_search_entry_data_row_template = Handlebars.compile( handlebarsSource_search_entry_data_row_template );
-	
-	
-	var handlebarsSource_search_entry_child_row_template = $( "#search_entry_child_row_template tbody" ).html(); //  " tbody" since it is a table
+	var handlebarsTemplate_protein_data_per_search_block_template = Handlebars.compile( handlebarsSource_protein_data_per_search_block_template );
 
-	var handlebarsSource_looplink_peptide_block_template = $( "#looplink_peptide_block_template" ).html(); 
 	
-	
-	var handlebarsSource_looplink_peptide_data_row_entry_template = $( "#looplink_peptide_data_row_entry_template tbody" ).html(); //  " tbody" since it is a table
+	var handlebarsSource_protein_data_per_search_data_row_entry_template = $( "#protein_data_per_search_data_row_entry_template" ).html(); 
 
-	if ( handlebarsSource_looplink_peptide_data_row_entry_template === undefined ) {
-		throw "handlebarsSource_looplink_peptide_data_row_entry_template === undefined";
+	if ( handlebarsSource_protein_data_per_search_data_row_entry_template === undefined ) {
+		throw "handlebarsSource_protein_data_per_search_data_row_entry_template === undefined";
 	}
-	if ( handlebarsSource_looplink_peptide_data_row_entry_template === null ) {
-		throw "handlebarsSource_looplink_peptide_data_row_entry_template === null";
+	if ( handlebarsSource_protein_data_per_search_data_row_entry_template === null ) {
+		throw "handlebarsSource_protein_data_per_search_data_row_entry_template === null";
 	}
 	
-	var handlebarsTemplate_looplink_peptide_data_row_entry_template = Handlebars.compile( handlebarsSource_looplink_peptide_data_row_entry_template );
-
+	var handlebarsTemplate_protein_data_per_search_data_row_entry_template = Handlebars.compile( handlebarsSource_protein_data_per_search_data_row_entry_template );
 	
 	
-	var handlebarsSource_looplink_peptide_child_row_entry_template = $( "#looplink_peptide_child_row_entry_template tbody" ).html(); //  " tbody" since it is a table
+	var handlebarsSource_protein_data_per_search_child_row_entry_template = $( "#protein_data_per_search_child_row_entry_template" ).html(); 
 
-	var searchIdArray = Object.keys( ajaxResponseData );
+	if ( handlebarsSource_protein_data_per_search_child_row_entry_template === undefined ) {
+		throw "handlebarsSource_protein_data_per_search_child_row_entry_template === undefined";
+	}
+	if ( handlebarsSource_protein_data_per_search_child_row_entry_template === null ) {
+		throw "handlebarsSource_protein_data_per_search_child_row_entry_template === null";
+	}
+	
+	var handlebarsTemplate_protein_data_per_search_child_row_entry_template = Handlebars.compile( handlebarsSource_protein_data_per_search_child_row_entry_template );
+
+
+	////////////////////////////
+	
+
+	var $link_data_table_place_holder = $("#link_data_table_place_holder");
+
+	$link_data_table_place_holder.empty();
+
+	////////////////////////////
+	
+	
+	///////   Process Per Search Id:
+	
+	var searchIdArray = Object.keys( proteinsPerSearchIdMap );
 	
 	//  Sort the search ids in ascending order
 	searchIdArray.sort(function compareNumbers(a, b) {
 		  return a - b;
 	});
-	
+
 	for ( var searchIdIndex = 0; searchIdIndex < searchIdArray.length; searchIdIndex++ ) {
+		
+		
+		//  If after the first search, insert the separator
+		
+		if ( searchIdIndex > 0 ) {
+			
+			var $data_per_search_between_searches_htmlEntry =
+				$( _data_per_search_between_searches_html ).appendTo( $link_data_table_place_holder );
+			
+			$data_per_search_between_searches_htmlEntry.show();
+		}
+		
+		
 		
 		var searchId = searchIdArray[ searchIdIndex ];
 		
-		var searchProteinLooplink = ajaxResponseData[ searchId ];
+		var proteinsForSearchWithAnnotationNameDescList = proteinsPerSearchIdMap[ searchId ];
 
-		var context = searchProteinLooplink;
+		
+		var peptideAnnotationDisplayNameDescriptionList =  proteinsForSearchWithAnnotationNameDescList.peptideAnnotationDisplayNameDescriptionList;
+		var psmAnnotationDisplayNameDescriptionList =  proteinsForSearchWithAnnotationNameDescList.psmAnnotationDisplayNameDescriptionList;
 		
 
-		var html = handlebarsTemplate_search_entry_data_row_template(context);
+		var proteinsForSearch =  proteinsForSearchWithAnnotationNameDescList.proteins;
+	
+	
 
-		var $search_entry_data_row = $(html).appendTo($link_info_table);
 		
-		var $search_entry_child_row = $( handlebarsSource_search_entry_child_row_template ).appendTo($link_info_table);
-		
-		if ( searchIdArray.length === 1 ) {
-			
-			var $toggle_visibility_expansion_span_jq = $search_entry_data_row.find(".toggle_visibility_expansion_span_jq");
-			var $toggle_visibility_contraction_span_jq = $search_entry_data_row.find(".toggle_visibility_contraction_span_jq");
-
-			$toggle_visibility_expansion_span_jq.hide();
-			$toggle_visibility_contraction_span_jq.show();
-			$search_entry_child_row.show();
-		}
-		
-		var $peptide_data_container = $search_entry_child_row.find(".peptide_data_container");
-		
-		var $looplink_peptide_block_template = $(handlebarsSource_looplink_peptide_block_template).appendTo($peptide_data_container);
-
-		//  This only works if $looplink_peptide_block_template has a single top level node in it
-		var $peptide_table_jq =  $looplink_peptide_block_template.find(".peptide_table_jq");
-
-		//  This accomplishes the same thing as the previous statement using a higher node in the HTML
-//		var $peptide_table_jq =  $peptide_data_container.find(".peptide_table_jq");
-
-
-
-
-		var peptides = searchProteinLooplink.peptides;
-
-		for ( var peptideIndex = 0; peptideIndex < peptides.length ; peptideIndex++ ) {
-
-			var peptide = peptides[ peptideIndex ];
-
-			peptide.loop_link_protein_info = loop_link_protein_info;
-			
-			peptide.searchId = searchId;
-			
-//			var 
-			context = peptide;
-		
-//			var    
-			html = handlebarsTemplate_looplink_peptide_data_row_entry_template(context);
-
-			var $peptide_entry_data_row = $( html ).appendTo($peptide_table_jq);
-			
-//			var $peptide_entry_child_row = 
-			$( handlebarsSource_looplink_peptide_child_row_entry_template ).appendTo($peptide_table_jq);
-
-			if ( peptides.length === 1 ) {
+		//  create context for header row
+		var dataBlockContext = { 
 				
-				//  There is only one peptide so show the PSMs for it.
-				
-				$peptide_entry_data_row.click();
+				peptideAnnotationDisplayNameDescriptionList : peptideAnnotationDisplayNameDescriptionList,
+				psmAnnotationDisplayNameDescriptionList : psmAnnotationDisplayNameDescriptionList
+		};
+
+
+		var protein_data_per_search_block = handlebarsTemplate_protein_data_per_search_block_template( dataBlockContext );
+
+
+		var $protein_data_per_search_block = $( protein_data_per_search_block ).appendTo( $link_data_table_place_holder );
+
+
+		if ( _data_per_search_between_searches_html === null ) {
+			
+			_data_per_search_between_searches_html = $protein_data_per_search_block.find( ".data_per_search_between_searches_html_jq" ).html();
+			
+			if ( _data_per_search_between_searches_html === undefined ) {
+				throw "data_per_search_between_searches_html_jq === undefined";
 			}
-			
+			if ( _data_per_search_between_searches_html === null ) {
+				throw "data_per_search_between_searches_html_jq === null";
+			}
+
 		}
+		
+		
+		////////////////////////////
+		
+		
+		var link_info_table_jq_ClassName = "link_info_table_jq";
+
+		var $link_info_table_jq = $protein_data_per_search_block.find("." + link_info_table_jq_ClassName );
+
+		//			var $link_info_table_jq = $crosslink_protein_data_container.find(".link_info_table_jq");
+
+		if ( $link_info_table_jq.length === 0 ) {
+
+			throw "unable to find HTML element with class '" + link_info_table_jq_ClassName + "'";
+		}
+
+
+
+		//  Add protein data to the page
+
+		for ( var proteinIndex = 0; proteinIndex < proteinsForSearch.length ; proteinIndex++ ) {
+
+		
+			var proteinData = proteinsForSearch[ proteinIndex ];
+
+			var dataRowContext = { 
+					data : proteinData, 
+					searchId : searchId,
+					from_protein_id : requestContext.from_protein_id,
+					from_protein_position : requestContext.fromPp,
+					to_protein_position : requestContext.toPp,
+
+					isLooplink : true 
+			};
+
+
+			var html = handlebarsTemplate_protein_data_per_search_data_row_entry_template( dataRowContext );
+
+			var $search_entry_data_row = $( html ).appendTo( $link_info_table_jq );
+
+
+			var $search_entry_data_row__columns = $search_entry_data_row.find("td");
+
+			var search_entry_data_row__columns = $search_entry_data_row__columns.length;
+
+
+
+			var contextChildRow = { 
+					colSpan : search_entry_data_row__columns
+			};
+
+
+			var htmlChildRow = handlebarsTemplate_protein_data_per_search_child_row_entry_template( contextChildRow );
+
+//			var $search_entry_child_row = 
+			$( htmlChildRow ).appendTo( $link_info_table_jq );
+
+
+			//  If only one record, click on it to show it's children
+
+			if ( searchIdArray.length === 1 ) {
+
+				$search_entry_data_row.click();
+			}
+
+		}  // END:  For Each Search Id
+		
 	}
 	
-	var $openLorkeetLinks = $(".view_spectrum_open_spectrum_link_jq");
-	
-	addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
-
 
 	linkInfoOverlayWidthResizer();
 	
 }
-
-
-//searchProteinLooplink: Object
-//	bestPSMQValue: 0.001051
-//	bestPeptideQValue: 0.004214
-//	numPeptides: 3
-//	numPsms: 8
-//	numUniquePeptides: 3
-//	numUniquePsms: 0
-//	peptideCutoff: 0.01
-//	peptides: Array[3]
-//		0: Object
-//		bestPsmQValue: 0.001051
-//		numPsms: 4
-//		pValue: 0
-//		pep: 0.009062
-//		reportedPeptide: Object
-//			c: "-"
-//				id: 1012223
-//				n: "-"
-//				sequence: "NSSEEGTAEK[155.09]SKKLR(12,13)-LOOP"
-//		peptide: Object
-//			id: 228484
-//			sequence: "NSSEEGTAEKSKKLR"
-//		peptidePosition1: 12
-//		peptidePosition2: 13
-//		
-//		peptideProteinPositions: Array[1]
-//			0: Object
-//			position1: 24
-//			position2: 25
-//			protein: Object - Same or similar to "protein: Object" below
-//				description: "No description in FASTA."
-//					name: "Fbxl3-human"
-//					nrProtein: Object
-//					search: Object
-//			
-//		peptideQValueCutoff: 0.01
-//		proteinPositionsString: "Fbxl3-human(24,25)"
-//		psmQValueCutoff: 0.01
-//
-//		psms: Array[4]
-//			0: Object
-//			calcMass: 0
-//			charge: 2
-//			chargeSet: true
-//			id: 382114
-//			pep: 0.0009191
-//			reportedPeptideId: 1012223
-//			searchId: 308
-//			psmId: "T-28418.pf.2015-01-08-Q_2013_1016_RJ_08-relD500odb-percolatorIn.txt"
-//			qValue: 0.001051
-//			scanId: 635969
-//			svmScore: 0.733
-//			type: 2
-//
-//		qvalue: 0.004214
-//		search: Object
-//		svmScore: 0.733
-//
-//	search: Object
-//		comments: Array[0]
-//		fastaFilename: "RJAZ10-comet-plus.fasta"
-//		filename: "/data/search_space/CrossLinks/Crosslinks_Importer/ImportPercolatorKojakAndMzMLFiles_Searchespace/../Sample_FIles_Mike_Example_Dir__Modified_to_point_to_local_copy_of_files__2015_01_22/percout.xml"
-//		formattedLoadTime: "2015-02-06 16:27:35"
-//		id: 308
-//		load_time: Object
-//		name: "Search: 308"
-//		projectId: 1
-//		sha1sum: "586f185fc905d6d34f928292f8d221d95a415126"
-//	
-//	protein: Object
-//		description: "No description in FASTA."
-//		name: "Fbxl3-human"
-//		nrProtein: Object
-//			nrseqId: 23980491
-//			sequence: "GSMKRGGRDSDRNSSEEGTAEKSKKLRTTNEHSQTCDWGNLLQDIILQVFKYLPLLDRAHASQVCRNWNQVFHMPDLWRCFEFELNQPATSYLKATHPELIKQIIKRHSNHLQYVSFKVDSSKESAEAACDILSQLVNCSLKTLGLISTARPSFMDLPKSHFISALTVVFVNSKSLSSLKIDDTPVDDPSLKVLVANNSDTLKLLKMSSCPHVSPAGILCVADQCHGLRELALNYHLLSDELLLALSSEKHVRLEHLRIDVVSENPGQTHFHTIQKSSWDAFIRHSPKVNLVMYFFLYEEEFDPFFRYEIPATHLYFGRSVSKDVLGRVGMTCPRLVELVVCANGLRPLDEELIRIAERCKNLSAIGLGECEVSCSAFVEFVKMCGGRLSQLSIMEEVLIPDQKYSLEQIHWEVSKHLGRVWFPDMMPTW"
-//			taxonomyId: 9606
-//	
-//	proteinPosition1: 24
-//	proteinPosition2: 25
-//	psmCutoff: 0.01
-
-
-
-
 
 
 
@@ -371,9 +352,9 @@ function getLooplinkDataForSpecificLinkInGraphProcessResponse( params ) {
 function getCrosslinkDataForSpecificLinkInGraph( params ) {
 
 	var clickThis = params.clickThis;
-	var psmQValueCutoff = params.psmQValueCutoff;
-	var peptideQValueCutoff = params.peptideQValueCutoff;
 
+	var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
+	
 	var $clickThis = $(clickThis);
 
 
@@ -452,21 +433,26 @@ function getCrosslinkDataForSpecificLinkInGraph( params ) {
 		context.protein1 = context.protein2;
 		context.protein2 = tempprotein;
 	}
-	
 
-	var _URL = contextPathJSVar + "/services/imageViewer/getCrosslinkDataForSpecificLinkInGraph";
+	///   Serialize cutoffs to JSON
+	
+	var psmPeptideCutoffsRootObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObject );
+
+
+	var _URL = contextPathJSVar + "/services/data/getCrosslinkProteinsPerSearchIdsProteinIdsPositions";
 
 	var ajaxRequestData = {
 
-			psmQValueCutoff : psmQValueCutoff,
-			peptideQValueCutoff : peptideQValueCutoff,
+			psmPeptideCutoffsForSearchIds : psmPeptideCutoffsRootObject_JSONString,
 			
-			searchIds: context.searchesArray,
-			proteinId1: context.protein1.protein_id_int,
-			proteinId2: context.protein2.protein_id_int,
-			proteinLinkPosition1: context.protein1.protein_position,
-			proteinLinkPosition2: context.protein2.protein_position
+			search_ids: context.searchesArray,
+			protein_1_id: context.protein1.protein_id_int,
+			protein_2_id: context.protein2.protein_id_int,
+			protein_1_position: context.protein1.protein_position,
+			protein_2_position: context.protein2.protein_position
 	};
+	
+
 
 	$.ajax({
 		type: "GET",
@@ -521,6 +507,10 @@ function getCrosslinkDataForSpecificLinkInGraphProcessResponse( params ) {
 //	var $clickThis = $(clickThis);
 
 
+	var proteinsPerSearchIdMap = ajaxResponseData.proteinsPerSearchIdMap;
+	
+	
+
 	openLinkInfoOverlayBackground();
 
 
@@ -554,139 +544,203 @@ function getCrosslinkDataForSpecificLinkInGraphProcessResponse( params ) {
 
 	$searches.text( responseContext.searchesCommaDelim );
 
-	var $link_info_table = $("#link_info_table__tbody");
-
-	$link_info_table.empty();
 
 
-	var handlebarsSource_search_entry_data_row_template = $( "#search_entry_data_row_template tbody" ).html(); //  " tbody" since it is a table
+	var handlebarsSource_protein_data_per_search_block_template = $( "#protein_data_per_search_block_template" ).html(); 
 
-	if ( handlebarsSource_search_entry_data_row_template === undefined ) {
-		throw "handlebarsSource_search_entry_data_row_template === undefined";
+	if ( handlebarsSource_protein_data_per_search_block_template === undefined ) {
+		throw "handlebarsSource_protein_data_per_search_block_template === undefined";
 	}
-	if ( handlebarsSource_search_entry_data_row_template === null ) {
-		throw "handlebarsSource_search_entry_data_row_template === null";
+	if ( handlebarsSource_protein_data_per_search_block_template === null ) {
+		throw "handlebarsSource_protein_data_per_search_block_template === null";
 	}
 	
-	var handlebarsTemplate_search_entry_data_row_template = Handlebars.compile( handlebarsSource_search_entry_data_row_template );
-	
-	
-	var handlebarsSource_search_entry_child_row_template = $( "#search_entry_child_row_template tbody" ).html(); //  " tbody" since it is a table
-
-	var handlebarsSource_crosslink_peptide_block_template = $( "#crosslink_peptide_block_template" ).html(); 
+	var handlebarsTemplate_protein_data_per_search_block_template = Handlebars.compile( handlebarsSource_protein_data_per_search_block_template );
 
 	
-	var handlebarsSource_crosslink_peptide_data_row_entry_template = $( "#crosslink_peptide_data_row_entry_template tbody" ).html(); //  " tbody" since it is a table
+	var handlebarsSource_protein_data_per_search_data_row_entry_template = $( "#protein_data_per_search_data_row_entry_template" ).html(); 
 
-	if ( handlebarsSource_crosslink_peptide_data_row_entry_template === undefined ) {
-		throw "handlebarsSource_crosslink_peptide_data_row_entry_template === undefined";
+	if ( handlebarsSource_protein_data_per_search_data_row_entry_template === undefined ) {
+		throw "handlebarsSource_protein_data_per_search_data_row_entry_template === undefined";
 	}
-	if ( handlebarsSource_crosslink_peptide_data_row_entry_template === null ) {
-		throw "handlebarsSource_crosslink_peptide_data_row_entry_template === null";
+	if ( handlebarsSource_protein_data_per_search_data_row_entry_template === null ) {
+		throw "handlebarsSource_protein_data_per_search_data_row_entry_template === null";
 	}
 	
-	var handlebarsTemplate_crosslink_peptide_data_row_entry_template = Handlebars.compile( handlebarsSource_crosslink_peptide_data_row_entry_template );
+	var handlebarsTemplate_protein_data_per_search_data_row_entry_template = Handlebars.compile( handlebarsSource_protein_data_per_search_data_row_entry_template );
+	
+	
+	var handlebarsSource_protein_data_per_search_child_row_entry_template = $( "#protein_data_per_search_child_row_entry_template" ).html(); 
+
+	if ( handlebarsSource_protein_data_per_search_child_row_entry_template === undefined ) {
+		throw "handlebarsSource_protein_data_per_search_child_row_entry_template === undefined";
+	}
+	if ( handlebarsSource_protein_data_per_search_child_row_entry_template === null ) {
+		throw "handlebarsSource_protein_data_per_search_child_row_entry_template === null";
+	}
+	
+	var handlebarsTemplate_protein_data_per_search_child_row_entry_template = Handlebars.compile( handlebarsSource_protein_data_per_search_child_row_entry_template );
 
 	
-	var handlebarsSource_crosslink_peptide_child_row_entry_template = $( "#crosslink_peptide_child_row_entry_template tbody" ).html(); //  " tbody" since it is a table
 
-	var searchIdArray = Object.keys( ajaxResponseData );
+	////////////////////////////
+	
+
+	var $link_data_table_place_holder = $("#link_data_table_place_holder");
+
+	$link_data_table_place_holder.empty();
+
+	////////////////////////////
+	
+	
+	///////   Process Per Search Id:
+	
+	var searchIdArray = Object.keys( proteinsPerSearchIdMap );
 	
 	//  Sort the search ids in ascending order
 	searchIdArray.sort(function compareNumbers(a, b) {
 		  return a - b;
 	});
-	
+
 	for ( var searchIdIndex = 0; searchIdIndex < searchIdArray.length; searchIdIndex++ ) {
-
+		
+		
+		//  If after the first search, insert the separator
+		
+		if ( searchIdIndex > 0 ) {
+			
+			var $data_per_search_between_searches_htmlEntry =
+				$( _data_per_search_between_searches_html ).appendTo( $link_data_table_place_holder );
+			
+			$data_per_search_between_searches_htmlEntry.show();
+		}
+		
+		
+		
 		var searchId = searchIdArray[ searchIdIndex ];
-
-		var searchProteinCrosslink = ajaxResponseData[ searchId ];
-
-		searchProteinCrosslink.numPeptides = searchProteinCrosslink.numLinkedPeptides;
-		searchProteinCrosslink.numUniquePeptides  = searchProteinCrosslink.numUniqueLinkedPeptides;
 		
-		var context = searchProteinCrosslink;
+		var proteinsForSearchWithAnnotationNameDescList = proteinsPerSearchIdMap[ searchId ];
 
 		
-		var html = handlebarsTemplate_search_entry_data_row_template(context);
-
-
-
-		var $search_entry_data_row = $(html).appendTo($link_info_table);
+		var peptideAnnotationDisplayNameDescriptionList =  proteinsForSearchWithAnnotationNameDescList.peptideAnnotationDisplayNameDescriptionList;
+		var psmAnnotationDisplayNameDescriptionList =  proteinsForSearchWithAnnotationNameDescList.psmAnnotationDisplayNameDescriptionList;
 		
-		var $search_entry_child_row = $( handlebarsSource_search_entry_child_row_template ).appendTo($link_info_table);
+
+		var proteinsForSearch =  proteinsForSearchWithAnnotationNameDescList.proteins;
+	
+	
+
 		
-		if ( searchIdArray.length === 1 ) {
+		//  create context for header row
+		var dataBlockContext = { 
+				
+				peptideAnnotationDisplayNameDescriptionList : peptideAnnotationDisplayNameDescriptionList,
+				psmAnnotationDisplayNameDescriptionList : psmAnnotationDisplayNameDescriptionList
+		};
+
+
+		var protein_data_per_search_block = handlebarsTemplate_protein_data_per_search_block_template( dataBlockContext );
+
+
+		var $protein_data_per_search_block = $( protein_data_per_search_block ).appendTo( $link_data_table_place_holder );
+
+
+		if ( _data_per_search_between_searches_html === null ) {
 			
-			var $toggle_visibility_expansion_span_jq = $search_entry_data_row.find(".toggle_visibility_expansion_span_jq");
-			var $toggle_visibility_contraction_span_jq = $search_entry_data_row.find(".toggle_visibility_contraction_span_jq");
+			_data_per_search_between_searches_html = $protein_data_per_search_block.find( ".data_per_search_between_searches_html_jq" ).html();
+			
+			if ( _data_per_search_between_searches_html === undefined ) {
+				throw "data_per_search_between_searches_html_jq === undefined";
+			}
+			if ( _data_per_search_between_searches_html === null ) {
+				throw "data_per_search_between_searches_html_jq === null";
+			}
 
-			$toggle_visibility_expansion_span_jq.hide();
-			$toggle_visibility_contraction_span_jq.show();
-			$search_entry_child_row.show();
 		}
 		
-		var $peptide_data_container = $search_entry_child_row.find(".peptide_data_container");
 		
-		var $crosslink_peptide_block_template = $(handlebarsSource_crosslink_peptide_block_template).appendTo($peptide_data_container);
-
+		////////////////////////////
 		
-		var $peptide_table_jq =  $crosslink_peptide_block_template.find(".peptide_table_jq");
+		
+		var link_info_table_jq_ClassName = "link_info_table_jq";
 
-//		var $peptide_table_jq =  $peptide_data_container.find(".peptide_table_jq");
+		var $link_info_table_jq = $protein_data_per_search_block.find("." + link_info_table_jq_ClassName );
 
+		//			var $link_info_table_jq = $crosslink_protein_data_container.find(".link_info_table_jq");
 
+		if ( $link_info_table_jq.length === 0 ) {
 
-		var peptides = searchProteinCrosslink.peptides;
-
-		for ( var peptideIndex = 0; peptideIndex < peptides.length ; peptideIndex++ ) {
-
-			var peptide = peptides[ peptideIndex ];
-
-			peptide.searchId = searchId;
-			
-//			var 
-			context = peptide;
-			
-			if ( peptides.length === 1 ) {
-				context.onlyOneEntry = true;
-			}
-			
-			
-
-//			var    
-			html = handlebarsTemplate_crosslink_peptide_data_row_entry_template(context);
-
-			var $peptide_entry_data_row = $( html ).appendTo($peptide_table_jq);
-			
-//			var $peptide_entry_child_row = 
-			$( handlebarsSource_crosslink_peptide_child_row_entry_template ).appendTo($peptide_table_jq);
-
-
-			if ( peptides.length === 1 ) {
-				
-				//  There is only one peptide so show the PSMs for it.
-				
-				$peptide_entry_data_row.click();
-			}
-			
+			throw "unable to find HTML element with class '" + link_info_table_jq_ClassName + "'";
 		}
 
+
+
+		//  Add protein data to the page
+
+		for ( var proteinIndex = 0; proteinIndex < proteinsForSearch.length ; proteinIndex++ ) {
+
+		
+			var proteinData = proteinsForSearch[ proteinIndex ];
+
+			var dataRowContext = { 
+					data : proteinData, 
+					searchId : searchId,
+					from_protein_id : responseContext.protein1.protein_id_int,
+					to_protein_id : responseContext.protein2.protein_id_int,
+					from_protein_position : responseContext.protein1.protein_position,
+					to_protein_position : responseContext.protein2.protein_position,
+					isCrosslink : true 
+			};
+
+
+			var html = handlebarsTemplate_protein_data_per_search_data_row_entry_template( dataRowContext );
+
+			var $search_entry_data_row = $(html).appendTo( $link_info_table_jq );
+
+
+			var $search_entry_data_row__columns = $search_entry_data_row.find("td");
+
+			var search_entry_data_row__columns = $search_entry_data_row__columns.length;
+
+
+
+			var contextChildRow = { 
+					colSpan : search_entry_data_row__columns
+			};
+
+
+			var htmlChildRow = handlebarsTemplate_protein_data_per_search_child_row_entry_template( contextChildRow );
+
+//			var $search_entry_child_row = 
+			$( htmlChildRow ).appendTo( $link_info_table_jq );
+
+
+			//  If only one record, click on it to show it's children
+
+			if ( searchIdArray.length === 1 ) {
+
+				$search_entry_data_row.click();
+			}
+
+
+		}  // END:  For Each Search Id
+				
 	}
 
 
-	var $openLorkeetLinks = $(".view_spectrum_open_spectrum_link_jq");
-
-	addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
+//	var $openLorkeetLinks = $(".view_spectrum_open_spectrum_link_jq");
+//
+//	addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
 
 
 	linkInfoOverlayWidthResizer();
 
 }
 
+////////////////////////////////////////////
 
-//////////////Process MONO link
+
+//////////////  Process MONO link
 
 
 /////////////////////
@@ -694,40 +748,49 @@ function getCrosslinkDataForSpecificLinkInGraphProcessResponse( params ) {
 function getMonolinkDataForSpecificLinkInGraph( params ) {
 
 	var clickThis = params.clickThis;
-	var psmQValueCutoff = params.psmQValueCutoff;
-	var peptideQValueCutoff = params.peptideQValueCutoff;
 
+	var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
+	
 	var $clickThis = $(clickThis);
-
-//	var $link_info_table = $("#link_info_table__tbody");
-
-//	$link_info_table.empty();
 
 
 	createSpinner();				// create spinner
 
-//	var fromP = $clickThis.attr( "fromp" );
+	var fromP = $clickThis.attr( "fromp" );
 	var fromPp = $clickThis.attr( "frompp" );
-//	var toPp = $clickThis.attr( "topp" );
+	var toPp = $clickThis.attr( "topp" );
 	var lsearches = $clickThis.attr( "searches" );
 
 	var from_protein_id = $clickThis.attr( "from_protein_id" );
-//	var to_protein_id = $clickThis.attr( "to_protein_id" );
 
 	var searchesArray = lsearches.split(",");
 
-	var _URL = contextPathJSVar + "/services/imageViewer/getMonolinkDataForSpecificLinkInGraph";
+	
+	///   Serialize cutoffs to JSON
+	
+	var psmPeptideCutoffsRootObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObject );
 
-//	_URL += buildQueryStringFromHash();
+	var requestContext = {
+			
+			from_protein_id : from_protein_id,
+
+			fromP : fromP,
+			fromPp : fromPp,
+			toPp : toPp,
+			lsearches : lsearches
+	};
+
 
 	var ajaxRequestData = {
 
-			psmQValueCutoff : psmQValueCutoff,
-			peptideQValueCutoff : peptideQValueCutoff,
-			searchIds: searchesArray,
-			proteinId: from_protein_id,
-			proteinLinkPosition: fromPp
+			psmPeptideCutoffsForSearchIds : psmPeptideCutoffsRootObject_JSONString,
+
+			search_ids: searchesArray,
+			protein_id: from_protein_id,
+			protein_position: fromPp
 	};
+
+	var _URL = contextPathJSVar + "/services/data/getMonolinkProteinsPerSearchIdsProteinIdsPositions";
 
 	$.ajax({
 		type: "GET",
@@ -744,7 +807,7 @@ function getMonolinkDataForSpecificLinkInGraph( params ) {
 
 			destroySpinner();
 
-			getMonolinkDataForSpecificLinkInGraphProcessResponse( { ajaxResponseData: data, ajaxRequestData: ajaxRequestData, clickThis: clickThis });
+			getMonolinkDataForSpecificLinkInGraphProcessResponse( { ajaxResponseData: data, ajaxRequestData: ajaxRequestData, requestContext : requestContext });
 
 		},
         failure: function(errMsg) {
@@ -765,19 +828,14 @@ function getMonolinkDataForSpecificLinkInGraphProcessResponse( params ) {
 
 	var ajaxResponseData = params.ajaxResponseData;
 
-//	var ajaxRequestData = params.ajaxRequestData;
+	var requestContext = params.requestContext;
+	
 
-	var clickThis = params.clickThis;
 
-	var $clickThis = $(clickThis);
+	var proteinsPerSearchIdMap = ajaxResponseData.proteinsPerSearchIdMap;
 
 
 	openLinkInfoOverlayBackground();
-
-	var fromP = $clickThis.attr( "fromp" );
-	var fromPp = $clickThis.attr( "frompp" );
-//	var toPp = $clickThis.attr( "topp" );
-	var lsearches = $clickThis.attr( "searches" );
 
 
 	$("#mono_link_general_data").show();
@@ -785,145 +843,205 @@ function getMonolinkDataForSpecificLinkInGraphProcessResponse( params ) {
 	$("#cross_link_general_data").hide();
 
 
-	var from_protein_id = $clickThis.attr( "from_protein_id" );
-
 	$from_protein_id = $("#mono_link_from_protein_id");
 
-	$from_protein_id.text( from_protein_id );
+	$from_protein_id.text( requestContext.from_protein_id );
 
 	var $from_protein_name = $("#mono_link_from_protein_name");
 
-	$from_protein_name.text( fromP );
+	$from_protein_name.text( requestContext.fromP );
 
 	$protein_position = $("#mono_link_protein_position");
 
-	$protein_position.text( fromPp );
+	$protein_position.text( requestContext.fromPp );
 
 	$searches = $("#searches");
 
-	$searches.text( lsearches );
+	$searches.text( requestContext.lsearches );
 
-	var $link_info_table = $("#link_info_table__tbody");
 
-	$link_info_table.empty();
+//	var $mono_link_protein_info = $("#mono_link_protein_info");
+//
+//	var mono_link_protein_info = $mono_link_protein_info.text();
 
-	var $mono_link_protein_info = $("#mono_link_protein_info");
 
-	var mono_link_protein_info = $mono_link_protein_info.text();
 
-	
+	var handlebarsSource_protein_data_per_search_block_template = $( "#protein_data_per_search_block_template" ).html(); 
 
-	var handlebarsSource_search_entry_data_row_template = $( "#search_entry_data_row_template tbody" ).html(); //  " tbody" since it is a table
-
-	if ( handlebarsSource_search_entry_data_row_template === undefined ) {
-		throw "handlebarsSource_search_entry_data_row_template === undefined";
+	if ( handlebarsSource_protein_data_per_search_block_template === undefined ) {
+		throw "handlebarsSource_protein_data_per_search_block_template === undefined";
 	}
-	if ( handlebarsSource_search_entry_data_row_template === null ) {
-		throw "handlebarsSource_search_entry_data_row_template === null";
+	if ( handlebarsSource_protein_data_per_search_block_template === null ) {
+		throw "handlebarsSource_protein_data_per_search_block_template === null";
 	}
 	
-	var handlebarsTemplate_search_entry_data_row_template = Handlebars.compile( handlebarsSource_search_entry_data_row_template );
-	
-	
-	var handlebarsSource_search_entry_child_row_template = $( "#search_entry_child_row_template tbody" ).html(); //  " tbody" since it is a table
-
-	var handlebarsSource_monolink_peptide_block_template = $( "#monolink_peptide_block_template" ).html(); 
+	var handlebarsTemplate_protein_data_per_search_block_template = Handlebars.compile( handlebarsSource_protein_data_per_search_block_template );
 
 	
-	var handlebarsSource_monolink_peptide_data_row_entry_template = $( "#monolink_peptide_data_row_entry_template tbody" ).html(); //  " tbody" since it is a table
+	var handlebarsSource_protein_data_per_search_data_row_entry_template = $( "#protein_data_per_search_data_row_entry_template" ).html(); 
 
-	if ( handlebarsSource_monolink_peptide_data_row_entry_template === undefined ) {
-		throw "handlebarsSource_monolink_peptide_data_row_entry_template === undefined";
+	if ( handlebarsSource_protein_data_per_search_data_row_entry_template === undefined ) {
+		throw "handlebarsSource_protein_data_per_search_data_row_entry_template === undefined";
 	}
-	if ( handlebarsSource_monolink_peptide_data_row_entry_template === null ) {
-		throw "handlebarsSource_monolink_peptide_data_row_entry_template === null";
+	if ( handlebarsSource_protein_data_per_search_data_row_entry_template === null ) {
+		throw "handlebarsSource_protein_data_per_search_data_row_entry_template === null";
 	}
 	
-	var handlebarsTemplate_monolink_peptide_data_row_entry_template = Handlebars.compile( handlebarsSource_monolink_peptide_data_row_entry_template );
-
+	var handlebarsTemplate_protein_data_per_search_data_row_entry_template = Handlebars.compile( handlebarsSource_protein_data_per_search_data_row_entry_template );
 	
-	var handlebarsSource_monolink_peptide_child_row_entry_template = $( "#monolink_peptide_child_row_entry_template tbody" ).html(); //  " tbody" since it is a table
+	
+	var handlebarsSource_protein_data_per_search_child_row_entry_template = $( "#protein_data_per_search_child_row_entry_template" ).html(); 
 
-	var searchIdArray = Object.keys( ajaxResponseData );
+	if ( handlebarsSource_protein_data_per_search_child_row_entry_template === undefined ) {
+		throw "handlebarsSource_protein_data_per_search_child_row_entry_template === undefined";
+	}
+	if ( handlebarsSource_protein_data_per_search_child_row_entry_template === null ) {
+		throw "handlebarsSource_protein_data_per_search_child_row_entry_template === null";
+	}
+	
+	var handlebarsTemplate_protein_data_per_search_child_row_entry_template = Handlebars.compile( handlebarsSource_protein_data_per_search_child_row_entry_template );
+
+
+	////////////////////////////
+	
+
+	var $link_data_table_place_holder = $("#link_data_table_place_holder");
+
+	$link_data_table_place_holder.empty();
+
+	////////////////////////////
+	
+	
+	///////   Process Per Search Id:
+	
+	var searchIdArray = Object.keys( proteinsPerSearchIdMap );
 	
 	//  Sort the search ids in ascending order
 	searchIdArray.sort(function compareNumbers(a, b) {
 		  return a - b;
 	});
-	
+
 	for ( var searchIdIndex = 0; searchIdIndex < searchIdArray.length; searchIdIndex++ ) {
-
+		
+		
+		//  If after the first search, insert the separator
+		
+		if ( searchIdIndex > 0 ) {
+			
+			var $data_per_search_between_searches_htmlEntry =
+				$( _data_per_search_between_searches_html ).appendTo( $link_data_table_place_holder );
+			
+			$data_per_search_between_searches_htmlEntry.show();
+		}
+		
+		
+		
 		var searchId = searchIdArray[ searchIdIndex ];
-
-		var searchProteinMonolink = ajaxResponseData[ searchId ];
-
-		var context = searchProteinMonolink;
+		
+		var proteinsForSearchWithAnnotationNameDescList = proteinsPerSearchIdMap[ searchId ];
 
 		
-		var html = handlebarsTemplate_search_entry_data_row_template(context);
-
-		var $search_entry_data_row = $(html).appendTo($link_info_table);
+		var peptideAnnotationDisplayNameDescriptionList =  proteinsForSearchWithAnnotationNameDescList.peptideAnnotationDisplayNameDescriptionList;
+		var psmAnnotationDisplayNameDescriptionList =  proteinsForSearchWithAnnotationNameDescList.psmAnnotationDisplayNameDescriptionList;
 		
-		var $search_entry_child_row = $( handlebarsSource_search_entry_child_row_template ).appendTo($link_info_table);
+
+		var proteinsForSearch =  proteinsForSearchWithAnnotationNameDescList.proteins;
+	
+	
+
 		
-		if ( searchIdArray.length === 1 ) {
-			
-			var $toggle_visibility_expansion_span_jq = $search_entry_data_row.find(".toggle_visibility_expansion_span_jq");
-			var $toggle_visibility_contraction_span_jq = $search_entry_data_row.find(".toggle_visibility_contraction_span_jq");
-
-			$toggle_visibility_expansion_span_jq.hide();
-			$toggle_visibility_contraction_span_jq.show();
-			$search_entry_child_row.show();
-		}
-		
-		var $peptide_data_container = $search_entry_child_row.find(".peptide_data_container");
-		
-		var $monolink_peptide_block_template = 
-			$(handlebarsSource_monolink_peptide_block_template).appendTo($peptide_data_container);
-
-
-		var $peptide_table_jq =  $monolink_peptide_block_template.find(".peptide_table_jq");
-
-//		var $peptide_table_jq =  $peptide_data_container.find(".peptide_table_jq");
-
-
-
-
-		var peptides = searchProteinMonolink.peptides;
-
-		for ( var peptideIndex = 0; peptideIndex < peptides.length ; peptideIndex++ ) {
-
-			var peptide = peptides[ peptideIndex ];
-
-			peptide.mono_link_protein_info = mono_link_protein_info;
-
-			peptide.searchId = searchId;
-
-//			var 
-			context = peptide;
-
-
-//			var    
-			html = handlebarsTemplate_monolink_peptide_data_row_entry_template(context);
-
-			var $peptide_entry_data_row = $( html ).appendTo($peptide_table_jq);
-			
-//			var $peptide_entry_child_row = 
-			$( handlebarsSource_monolink_peptide_child_row_entry_template ).appendTo($peptide_table_jq);
-
-
-			if ( peptides.length === 1 ) {
+		//  create context for header row
+		var dataBlockContext = { 
 				
-				//  There is only one peptide so show the PSMs for it.
-				$peptide_entry_data_row.click();
-			}
+				peptideAnnotationDisplayNameDescriptionList : peptideAnnotationDisplayNameDescriptionList,
+				psmAnnotationDisplayNameDescriptionList : psmAnnotationDisplayNameDescriptionList
+		};
+
+
+		var protein_data_per_search_block = handlebarsTemplate_protein_data_per_search_block_template( dataBlockContext );
+
+
+		var $protein_data_per_search_block = $( protein_data_per_search_block ).appendTo( $link_data_table_place_holder );
+
+
+		if ( _data_per_search_between_searches_html === null ) {
 			
+			_data_per_search_between_searches_html = $protein_data_per_search_block.find( ".data_per_search_between_searches_html_jq" ).html();
+			
+			if ( _data_per_search_between_searches_html === undefined ) {
+				throw "data_per_search_between_searches_html_jq === undefined";
+			}
+			if ( _data_per_search_between_searches_html === null ) {
+				throw "data_per_search_between_searches_html_jq === null";
+			}
+
 		}
+		
+		
+		////////////////////////////
+		
+		
+		var link_info_table_jq_ClassName = "link_info_table_jq";
+
+		var $link_info_table_jq = $protein_data_per_search_block.find("." + link_info_table_jq_ClassName );
+
+		//			var $link_info_table_jq = $crosslink_protein_data_container.find(".link_info_table_jq");
+
+		if ( $link_info_table_jq.length === 0 ) {
+
+			throw "unable to find HTML element with class '" + link_info_table_jq_ClassName + "'";
+		}
+
+
+
+		//  Add protein data to the page
+
+		for ( var proteinIndex = 0; proteinIndex < proteinsForSearch.length ; proteinIndex++ ) {
+
+		
+			var proteinData = proteinsForSearch[ proteinIndex ];
+
+			var dataRowContext = { 
+					data : proteinData, 
+					searchId : searchId,
+					from_protein_id : requestContext.from_protein_id,
+					from_protein_position : requestContext.fromPp,
+
+					isMonolink : true 
+			};
+
+
+			var html = handlebarsTemplate_protein_data_per_search_data_row_entry_template( dataRowContext );
+
+			var $search_entry_data_row = $( html ).appendTo( $link_info_table_jq );
+
+			var $search_entry_data_row__columns = $search_entry_data_row.find("td");
+
+			var search_entry_data_row__columns = $search_entry_data_row__columns.length;
+
+
+
+			var contextChildRow = { 
+					colSpan : search_entry_data_row__columns
+			};
+
+
+			var htmlChildRow = handlebarsTemplate_protein_data_per_search_child_row_entry_template( contextChildRow );
+
+//			var $search_entry_child_row = 
+			$( htmlChildRow ).appendTo( $link_info_table_jq );
+
+
+			//  If only one record, click on it to show it's children
+
+			if ( searchIdArray.length === 1 ) {
+
+				$search_entry_data_row.click();
+			}
+
+		}  // END:  For Each Search Id
+		
 	}
-
-	var $openLorkeetLinks = $(".view_spectrum_open_spectrum_link_jq");
-
-	addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
 
 
 	linkInfoOverlayWidthResizer();

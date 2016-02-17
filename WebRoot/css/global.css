@@ -194,6 +194,13 @@ body.user-invite-landing-page .sign-in-above-text { margin-top: 10px; }
 
 /*  Main pages (non-inset pages)  */
 
+
+/* In Showing Protein and Peptide data per search, this specifies the vertical space between the tables for each search */
+
+.data-per-search-between-searches{ height: 1px; }
+
+
+
 /*
 		These pages have special settings on the *-outer-container to lock the footer to the bottom of the page
 */

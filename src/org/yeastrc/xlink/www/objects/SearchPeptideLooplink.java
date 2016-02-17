@@ -6,15 +6,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.LooplinkDAO;
 import org.yeastrc.xlink.dao.PeptideDAO;
+import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dto.LooplinkDTO;
-import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
+import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
 import org.yeastrc.xlink.www.searcher.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
 import org.yeastrc.xlink.www.searcher.SearchProteinSearcher;
 import org.yeastrc.xlink.www.searcher.SearchPsmSearcher;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+
+
 
 public class SearchPeptideLooplink {
 	
@@ -28,8 +34,7 @@ public class SearchPeptideLooplink {
 		if ( psmId == null ) {
 			
 			log.warn( "No PSMs for search.id : " + search.getId() 
-					+ ", this.getReportedPeptide().getId(): " + this.getReportedPeptide().getId() 
-					+ ", this.getReportedPeptide().getSequence(): " + this.getReportedPeptide().getSequence() );
+					+ ", this.getReportedPeptideId(): " + this.getReportedPeptideId() );
 			
 			return;
 		}
@@ -84,13 +89,50 @@ public class SearchPeptideLooplink {
 		this.search = search;
 	}
 	
-	
-	public ReportedPeptideDTO getReportedPeptide() {
-		return reportedPeptide;
+
+	public int getReportedPeptideId() {
+		return reportedPeptideId;
 	}
+
+	public void setReportedPeptideId(int reportedPeptideId) {
+		this.reportedPeptideId = reportedPeptideId;
+	}
+
+	
+
+
+	public ReportedPeptideDTO getReportedPeptide() throws Exception {
+		
+		try {
+			if ( reportedPeptide == null ) {
+
+				reportedPeptide = 
+						ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( reportedPeptideId );
+			}
+
+			return reportedPeptide;
+
+		} catch ( Exception e ) {
+
+			log.error( "getReportedPeptide() Exception: " + e.toString(), e );
+
+			throw e;
+		}
+			
+	}
+
+
 	public void setReportedPeptide(ReportedPeptideDTO reportedPeptide) {
 		this.reportedPeptide = reportedPeptide;
+
+		if ( reportedPeptide != null ) {
+			this.reportedPeptideId = reportedPeptide.getId();
+		}
 	}
+
+
+	
+
 	public PeptideDTO getPeptide() throws Exception {
 		
 		try {
@@ -154,79 +196,17 @@ public class SearchPeptideLooplink {
 	public void setPeptidePosition2(int peptidePosition2) {
 		this.peptidePosition2 = peptidePosition2;
 	}
-	public Double getQValue() {
-		return qValue;
-	}
-	public void setQValue(Double qValue) {
-		this.qValue = qValue;
-	}
-	public double getPsmQValueCutoff() {
-		return psmQValueCutoff;
-	}
-	public void setPsmQValueCutoff(double psmQValueCutoff) {
-		this.psmQValueCutoff = psmQValueCutoff;
-	}
-	public double getPeptideQValueCutoff() {
-		return peptideQValueCutoff;
-	}
-	public void setPeptideQValueCutoff(double peptideQValueCutoff) {
-		this.peptideQValueCutoff = peptideQValueCutoff;
-	}
 
 
-
-
-	//  Percolator only
-
-
-	public boolean ispValuePopulated() {
-		return pValuePopulated;
+	public SearcherCutoffValuesSearchLevel getSearcherCutoffValuesSearchLevel() {
+		return searcherCutoffValuesSearchLevel;
 	}
 
-	public void setpValuePopulated(boolean pValuePopulated) {
-		this.pValuePopulated = pValuePopulated;
+	public void setSearcherCutoffValuesSearchLevel(
+			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel) {
+		this.searcherCutoffValuesSearchLevel = searcherCutoffValuesSearchLevel;
 	}
 
-	public boolean isSvmScorePopulated() {
-		return svmScorePopulated;
-	}
-
-	public void setSvmScorePopulated(boolean svmScorePopulated) {
-		this.svmScorePopulated = svmScorePopulated;
-	}
-
-	public boolean isPepPopulated() {
-		return pepPopulated;
-	}
-
-	public void setPepPopulated(boolean pepPopulated) {
-		this.pepPopulated = pepPopulated;
-	}
-	
-	
-	public double getpValue() {
-		return pValue;
-	}
-
-	public void setpValue(double pValue) {
-		this.pValue = pValue;
-	}
-
-	public double getSvmScore() {
-		return svmScore;
-	}
-
-	public void setSvmScore(double svmScore) {
-		this.svmScore = svmScore;
-	}
-
-	public double getPep() {
-		return pep;
-	}
-
-	public void setPep(double pep) {
-		this.pep = pep;
-	}
 
 
 
@@ -244,7 +224,7 @@ public class SearchPeptideLooplink {
 			}
 			
 			
-			if ( this.getSearch().isNoScanData() ) {
+			if ( this.search.isNoScanData() ) {
 				
 				numUniquePsms = null;
 				
@@ -258,7 +238,7 @@ public class SearchPeptideLooplink {
 
 			numUniquePsms = 
 					PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher.getInstance()
-					.getPsmCountForUniquePSM_SearchIdReportedPeptideId( this.getReportedPeptide().getId(), this.getSearch().getId(), peptideQValueCutoff, psmQValueCutoff );
+					.getPsmCountForUniquePSM_SearchIdReportedPeptideId( this.getReportedPeptideId(), this.search.getId(), searcherCutoffValuesSearchLevel );
 
 			numUniquePsmsSet = true;
 
@@ -272,14 +252,32 @@ public class SearchPeptideLooplink {
 		}
 	}
 	
-	public int getNumPsms() {
+
+	public int getNumPsms() throws Exception {
+
+		if ( numPsmsSet ) {
+
+			return numPsms;
+		}
+
+		//		num psms is always based on searching psm table for: search id, reported peptide id, and psm cutoff values.
+
+		numPsms = 
+				PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
+				.getPsmCountForSearchIdReportedPeptideId( reportedPeptideId, search.getId(), searcherCutoffValuesSearchLevel );
+
+		numPsmsSet = true;
+
 		return numPsms;
 	}
+
 	public void setNumPsms(int numPsms) {
 		this.numPsms = numPsms;
+		numPsmsSet = true;
 	}
 	
-	
+
+
 	
 	/**
 	 * @return the psmId for a random psm record associated with this Peptide, null if none found
@@ -287,24 +285,29 @@ public class SearchPeptideLooplink {
 	 */
 	public Integer getSinglePsmId() throws Exception {
 
-		Integer psmId = SearchPsmSearcher.getInstance().getSinglePsmId( this );
-		
-		return psmId;
+		try {
+			
+			Integer psmId = SearchPsmSearcher.getInstance().getSinglePsmId( this.getSearch().getId(), this.getReportedPeptideId() );
+
+			return psmId;
+
+		} catch ( Exception e ) {
+
+			String msg = "Exception in getSinglePsmId()";
+
+			log.error( msg, e );
+
+			throw e;
+		}
 	}
 	
-	public double getBestPsmQValue() {
-		return bestPsmQValue;
-	}
-	public void setBestPsmQValue(double bestPsmQValue) {
-		this.bestPsmQValue = bestPsmQValue;
-	}
 	
 	public List<SearchProteinDoublePosition> getPeptideProteinPositions() throws Exception {
 		
 		try {
 
 			if( this.peptideProteinPositions == null )
-				this.peptideProteinPositions = SearchProteinSearcher.getInstance().getProteinDoublePositions( this.getSearch(), this.getPeptide(), this.getPeptidePosition1(), this.getPeptidePosition2() );
+				this.peptideProteinPositions = SearchProteinSearcher.getInstance().getProteinDoublePositions( this.search, this.getPeptide(), this.getPeptidePosition1(), this.getPeptidePosition2() );
 
 			return peptideProteinPositions;
 
@@ -333,39 +336,66 @@ public class SearchPeptideLooplink {
 			throw e;
 		}
 	}
-
 	
+
+	public List<String> getPsmAnnotationValueList() {
+		return psmAnnotationValueList;
+	}
+
+	public void setPsmAnnotationValueList(List<String> psmAnnotationValueList) {
+		this.psmAnnotationValueList = psmAnnotationValueList;
+	}
+
+	public List<String> getPeptideAnnotationValueList() {
+		return peptideAnnotationValueList;
+	}
+
+	public void setPeptideAnnotationValueList(
+			List<String> peptideAnnotationValueList) {
+		this.peptideAnnotationValueList = peptideAnnotationValueList;
+	}
+
+
+	private int reportedPeptideId = -999;
+
 	private ReportedPeptideDTO reportedPeptide;
+	
+	
 	private PeptideDTO peptide;
 	private int peptidePosition1 = -1;
 	private int peptidePosition2 = -1;
 
-	private Double qValue;
+	
 	
 
+	private SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel;
 
-	//  Percolator only
 
-	private boolean pValuePopulated = false;
-	private boolean svmScorePopulated = false;
-	private boolean pepPopulated = false;
-	
-	private double pValue;
-	private double svmScore;
-	private double pep;
-	
-	
-	
-	private double psmQValueCutoff;
-	private double peptideQValueCutoff;
-	
 	private SearchDTO search;
 	private List<SearchProteinDoublePosition> peptideProteinPositions;
 	
 	private int numPsms;
-	private double bestPsmQValue;
+	/**
+	 * true when SetNumPsms has been called
+	 */
+	private boolean numPsmsSet;
 	
+
 	private Integer numUniquePsms;
 	private boolean numUniquePsmsSet;
 	
+
+
+	/**
+	 * Used for display on web page
+	 */
+	private List<String> psmAnnotationValueList;
+	
+
+	/**
+	 * Used for display on web page
+	 */
+	private List<String> peptideAnnotationValueList;
+
+
 }

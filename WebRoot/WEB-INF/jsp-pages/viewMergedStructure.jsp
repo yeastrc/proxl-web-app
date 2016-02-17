@@ -132,13 +132,13 @@
 	<c:if test="${ not empty onlySingleSearchId }">
 	
 		<input class="tool_tip_attached_jq" data-tooltip="View peptides" type="hidden" id="viewSearchPeptideDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="viewSearchPeptide.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="peptide.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 		<input class="tool_tip_attached_jq" data-tooltip="View proteins" type="hidden" id="viewSearchCrosslinkProteinDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="viewSearchCrosslinkProtein.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="crosslinkProtein.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 		<input class="tool_tip_attached_jq" data-tooltip="View protein coverage report" type="hidden" id="viewProteinCoverageReportDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="viewProteinCoverageReport.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="proteinCoverageReport.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 		<input class="tool_tip_attached_jq" data-tooltip="Graphical view of links between proteins" type="hidden" id="viewviewMergedImageDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="viewMergedImage.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="image.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 	</c:if>
 					
 		

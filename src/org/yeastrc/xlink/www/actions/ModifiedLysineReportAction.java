@@ -11,9 +11,7 @@ import java.util.Map;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -59,7 +57,7 @@ public class ModifiedLysineReportAction extends Action {
 
 
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 
 			
 			//   Get the project id for this search
@@ -94,30 +92,6 @@ public class ModifiedLysineReportAction extends Action {
 			request.setAttribute( "projectId", projectId ); 
 
 
-			
-			String project_id_from_query_string = request.getParameter( WebConstants.PARAMETER_PROJECT_ID );
-			
-
-			if ( StringUtils.isEmpty( project_id_from_query_string ) ) {
-
-				//  copy the project from the searches to the URL and redirect to that new URL.
-				
-				String getRequestURI = request.getRequestURI();
-				
-				String getQueryString = request.getQueryString();
-				
-				String newURL = getRequestURI + "?" + WebConstants.PARAMETER_PROJECT_ID + "=" + projectId + "&" + getQueryString;
-
-				if ( log.isInfoEnabled() ) {
-					
-					log.info( "Redirecting to new URL to add '" + WebConstants.PARAMETER_PROJECT_ID + "=" + projectId + "' to query string.  new URL: " + newURL );
-				}
-				
-				response.sendRedirect( newURL );
-				
-				return null;
-			}
-			
 			
 			
 			///////////////////////

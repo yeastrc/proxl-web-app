@@ -39,9 +39,9 @@ public class SearchTaxonomySearcher {
 		try {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
-			String sql = "SELECT DISTINCT a.speciesID FROM YRC_NRSEQ.tblProtein AS a INNER JOIN crosslink AS b ON a.id = b.nrseq_id_1 INNER JOIN psm AS c ON b.psm_id = c.id WHERE c.search_id = ? " +
-						 "UNION " +
-						 "SELECT DISTINCT a.speciesID FROM YRC_NRSEQ.tblProtein AS a INNER JOIN crosslink AS b ON a.id = b.nrseq_id_1 INNER JOIN psm AS c ON b.psm_id = c.id WHERE c.search_id = ?";
+			String sql = "SELECT  a.speciesID FROM YRC_NRSEQ.tblProtein AS a INNER JOIN crosslink AS b ON a.id = b.nrseq_id_1 INNER JOIN psm AS c ON b.psm_id = c.id WHERE c.search_id = ? " +
+						 "UNION DISTINCT " +
+						 "SELECT  a.speciesID FROM YRC_NRSEQ.tblProtein AS a INNER JOIN crosslink AS b ON a.id = b.nrseq_id_1 INNER JOIN psm AS c ON b.psm_id = c.id WHERE c.search_id = ?";
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, search.getId() );

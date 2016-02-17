@@ -27,10 +27,5 @@ public class StrutsGlobalForwardNames {
 	
 	
 	
-	public final static String NO_PROJECT_ID_IN_QUERY_STRING = "No_project_id_query_string";
-	
-	
-	
-	
 
 }

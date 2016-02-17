@@ -26,17 +26,23 @@
 			<th data-tooltip="Proteins (and positions) matched by first peptide and position" class=" <%-- tool_tip_attached_jq --%> " style="text-align:left;width:5%;font-weight:bold;">Protein 1</th>
 			<th data-tooltip="Proteins (and positions) matched by second peptide and position" class=" <%-- tool_tip_attached_jq --%> " style="text-align:left;width:5%;font-weight:bold;">Protein 2</th>
 			
+			<%-- showPeptideQValue removed from JS code
+			
 			{{#if showPeptideQValue}}
 				<th data-tooltip="Peptide-level q-value for this peptide (or linked pair)" 
-						class=" <%-- tool_tip_attached_jq --%> " 
+						class=" " 
 						style="width:10%;font-weight:bold;">
 					<span style="white-space: nowrap">Q-value</span>
 				</th>
 			{{/if}}
+			--%> <%-- tool_tip_attached_jq --%>
 			
 			<th data-tooltip="Number of PSMs matched to this peptide (or linked pair)" class=" <%-- tool_tip_attached_jq --%>  integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># PSMs</th>
 			<th data-tooltip="Number of scans that uniquely matched to this reported peptide" class=" <%-- tool_tip_attached_jq --%>  integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># Unique</th>
-			<th data-tooltip="Best q-value among PSMs that matched this peptide (or linked pair)" class=" <%-- tool_tip_attached_jq --%> " style="width:10%;font-weight:bold;">Best&nbsp;PSM <span style="white-space: nowrap">Q-value</span></th>
+			
+			<%-- 
+			<th data-tooltip="Best q-value among PSMs that matched this peptide (or linked pair)" class=" tool_tip_attached_jq  " style="width:10%;font-weight:bold;">Best&nbsp;PSM <span style="white-space: nowrap">Q-value</span></th>
+			--%>
 		</tr>
 		</thead>
 	</table>

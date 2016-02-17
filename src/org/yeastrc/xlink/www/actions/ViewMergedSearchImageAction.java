@@ -22,17 +22,23 @@ import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
+import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplayRoot;
+import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.cutoff_processing_web.GetCutoffPageDisplayRoot;
+import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class ViewMergedSearchImageAction extends Action {
@@ -102,23 +108,7 @@ public class ViewMergedSearchImageAction extends Action {
 			
 			request.setAttribute( "project_id", projectId );
 
-			
-			String project_id_from_query_string = request.getParameter( WebConstants.PARAMETER_PROJECT_ID );
-			
-			if ( StringUtils.isEmpty( project_id_from_query_string ) ) {
-
-				//  Forward to special Javascript to copy the project from the searches to the URL and redirect to that new URL.
-				
-				if ( log.isInfoEnabled() ) {
 					
-					log.info( "Redirecting to special Javascript page to add '" + WebConstants.PARAMETER_PROJECT_ID + "=" + projectId + "' to query string." );
-				}
-				
-				return mapping.findForward( StrutsGlobalForwardNames.NO_PROJECT_ID_IN_QUERY_STRING );
-			}
-			
-			
-			
 			
 
 			///////////////////////
@@ -206,6 +196,20 @@ public class ViewMergedSearchImageAction extends Action {
 				return mapping.findForward( StrutsGlobalForwardNames.PROJECT_NOT_FOUND );
 			}
 
+			
+			///    Done Processing Auth Check and Auth Level
+
+			
+			//////////////////////////////
+
+
+			//  Jackson JSON Mapper object for JSON deserialization and serialization
+			
+			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
+
+
+			
+			
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 
 			
@@ -247,8 +251,38 @@ public class ViewMergedSearchImageAction extends Action {
 			request.setAttribute( "annotation_data_webservice_base_url", annotation_data_webservice_base_url );
 			
 			
+
+			/////////////////////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////////////////////
+			
+			////////   Generic Param processing
+			
+			
+
+			
+			
+			
+			CutoffValuesRootLevel cutoffValuesRootLevelCutoffDefaults = 
+					GetDefaultPsmPeptideCutoffs.getInstance()
+					.getDefaultPsmPeptideCutoffs( searchIdsCollection );
+
+
+			String cutoffValuesRootLevelCutoffDefaultsJSONString = jacksonJSON_Mapper.writeValueAsString( cutoffValuesRootLevelCutoffDefaults );
+
+			request.setAttribute( "cutoffValuesRootLevelCutoffDefaults", cutoffValuesRootLevelCutoffDefaultsJSONString );
+
+			
+			//  This builds an object for the cutoff selection block on the page
+			
+
+
+//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
+			
+			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsCollection, request );
+	
+			
 		
-		return mapping.findForward( "Success" );
+			return mapping.findForward( "Success" );
 		
 
 

@@ -19,8 +19,18 @@ public class WebReportedPeptideWebserviceWrapper {
 
 	private WebReportedPeptide webReportedPeptide;
 	
+	private List<String> annotationValues;
 	
 	
+	
+
+	public List<String> getAnnotationValues() {
+		return annotationValues;
+	}
+
+	public void setAnnotationValues(List<String> annotationValues) {
+		this.annotationValues = annotationValues;
+	}
 
 	public void setWebReportedPeptide(WebReportedPeptide webReportedPeptide) {
 		this.webReportedPeptide = webReportedPeptide;
@@ -146,10 +156,6 @@ public class WebReportedPeptideWebserviceWrapper {
 		return webReportedPeptide.getNumUniquePsms();
 	}
 	
-	public double getBestPsmQValue() throws Exception {
-		
-		return webReportedPeptide.getBestPsmQValue();
-	}
 
 
 	/**

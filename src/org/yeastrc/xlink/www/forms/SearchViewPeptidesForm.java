@@ -1,64 +1,43 @@
 package org.yeastrc.xlink.www.forms;
 
-import org.apache.struts.action.ActionForm;
-import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 
-public class SearchViewPeptidesForm extends ActionForm {
+
+
+public class SearchViewPeptidesForm extends PeptideProteinCommonForm {
 	
-	/**
-	 * 
-	 */
+	
+	//  First attempt at Generic Cutoffs, NOT used
+	
+//	//  Cutoffs for PSM and Peptide for Generic
+//	
+//	private Map<String, String> psmCutoffs = new HashMap<String, String>();
+//	
+//
+//	//  Specifically formatted to support Struts 1 Mapped form fields
+//	public String getPsmCutoffsMapped(String name) { 
+//		return psmCutoffs.get(name); 
+//	}
+//	public void setPsmCutoffsMapped(String name, String value) { 
+//		psmCutoffs.put(name, value); 
+//	}
+//	
+//	public Map<String, String> getPsmCutoffs() {
+//		return psmCutoffs;
+//	}
+//	public void setPsmCutoffs(Map<String, String> psmCutoffs) {
+//		this.psmCutoffs = psmCutoffs;
+//	}
+//	
+//	
+//
+//	<tr>
+//		<td><span style="white-space: nowrap"><c:out value="${ psmCutoffPSMEntry.name }"></c:out> cutoff:</span></td>
+//		<td>
+//			<input type="text" name="PsmCutoffsMapped(${psmCutoffPSMEntry })" value="<c:out value="${ psmCutoffPSMEntry.value }"></c:out>" />
+//	</tr>
+
+	
+	
 	private static final long serialVersionUID = 1L;
-
-	public double getPsmQValueCutoff() {
-		return psmQValueCutoff;
-	}
-	public void setPsmQValueCutoff(double psmQValueCutoff) {
-		this.psmQValueCutoff = psmQValueCutoff;
-	}
-	public double getPeptideQValueCutoff() {
-		return peptideQValueCutoff;
-	}
-	public void setPeptideQValueCutoff(double peptideQValueCutoff) {
-		this.peptideQValueCutoff = peptideQValueCutoff;
-	}
-	public int getSearchId() {
-		return searchId;
-	}
-	public void setSearchId(int searchId) {
-		this.searchId = searchId;
-	}
-	public String[] getLinkType() {
-		return linkType;
-	}
-	public void setLinkType(String[] linkType) {
-		this.linkType = linkType;
-	}
-	public String getProject_id() {
-		return project_id;
-	}
-	public void setProject_id(String project_id) {
-		this.project_id = project_id;
-	}
-	public String[] getModMassFilter() {
-		return modMassFilter;
-	}
-	public void setModMassFilter(String[] modMassFilter) {
-		this.modMassFilter = modMassFilter;
-	}
-
 	
-
-
-	private double psmQValueCutoff = 0.01;
-	private double peptideQValueCutoff = 0.01;
-	private int searchId;
-	private String project_id;	
-
-
-	private String[] modMassFilter = null;
-
-
-	private String[] linkType = { PeptideViewLinkTypesConstants.CROSSLINK_PSM };
-
 }

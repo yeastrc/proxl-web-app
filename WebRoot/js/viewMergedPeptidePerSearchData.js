@@ -18,13 +18,47 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 
 
 	var _DATA_LOADED_DATA_KEY = "dataLoaded";
-	
+
+	var _data_per_search_between_searches_html = null;
+
 	var _handlebarsTemplate_peptide_data_per_search_block_template = null;
 	var _handlebarsTemplate_peptide_data_per_search_data_row_template = null;
 	var _handlebarsTemplate_peptide_data_per_search_child_row_template = null;
 	
+
+	var _psmPeptideCutoffsRootObject = null;
 	
-	this.showHideCrosslinkReportedPeptides = function( params ) {
+	//   Currently expect _psmPeptideCriteria = 
+//					searches: Object
+//						128: Object			
+//							peptideCutoffValues: Object
+//								238: Object
+//									id: 238
+//									value: "0.01"
+//							psmCutoffValues: Object
+//								384: Object
+//									id: 384
+//									value: "0.01"
+//							searchId: 128
+	
+//           The key to:
+//				searches - searchId
+//				peptideCutoffValues and psmCutoffValues - annotation type id
+	
+//			peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+	
+
+	//////////////
+	
+	this.setPsmPeptideCriteria = function( psmPeptideCutoffsRootObject ) {
+		
+		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
+	};
+	
+	
+	//////////////
+	
+	this.showHideReportedPeptidesPerSearch = function( params ) {
 		
 		var clickedElement = params.clickedElement;
 		
@@ -46,7 +80,7 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 			$clickedElement.find(".toggle_visibility_expansion_span_jq").hide();
 			$clickedElement.find(".toggle_visibility_contraction_span_jq").show();
 
-			this.loadAndInsertCrosslinkReportedPeptidesIfNeeded( { $topTRelement : $itemToToggle, $clickedElement : $clickedElement } );
+			this.loadAndInsertReportedPeptidesPerSearchIfNeeded( { $topTRelement : $itemToToggle, $clickedElement : $clickedElement } );
 		}
 
 		return false;  // does not stop bubbling of click event
@@ -56,7 +90,7 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 	
 	////////////////////////
 	
-	this.loadAndInsertCrosslinkReportedPeptidesIfNeeded = function( params ) {
+	this.loadAndInsertReportedPeptidesPerSearchIfNeeded = function( params ) {
 
 		var objectThis = this;
 		
@@ -73,9 +107,7 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 		
 
 		
-		var project_id = $( "#project_id_for_js" ).val();
-		var peptide_q_value_cutoff = $( "#peptide_q_value_cutoff_for_js" ).val();
-		var psm_q_value_cutoff = $( "#psm_q_value_cutoff_for_js" ).val();
+//		var project_id = $( "#project_id_for_js" ).val();
 
 		var unified_reported_peptide_id = $clickedElement.attr( "data-unified_reported_peptide_id" );
 
@@ -107,31 +139,43 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 		
 		
 		//  Convert all attributes to empty string if null or undefined
-		if ( ! project_id ) {
-			project_id = "";
-		}
-		if ( ! peptide_q_value_cutoff ) {
-			peptide_q_value_cutoff = "";
-		}
 
-		//
-		if ( ! psm_q_value_cutoff ) {
-			psm_q_value_cutoff = "";
-		}
 		if ( ! unified_reported_peptide_id ) {
 			unified_reported_peptide_id = "";
 		}
 		
+
+
+		//   Currently expect _psmPeptideCriteria = 
+//						searches: Object
+//							128: Object			
+//								peptideCutoffValues: Object
+//									238: Object
+//										id: 238
+//										value: "0.01"
+//								psmCutoffValues: Object
+//									384: Object
+//										id: 384
+//										value: "0.01"
+//								searchId: 128
 		
+//	           The key to:
+//					searches - searchId
+//					peptideCutoffValues and psmCutoffValues - annotation type id
+		
+//				peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+		
+
+		var psmPeptideCutoffsForSearchIds_JSONString = JSON.stringify( _psmPeptideCutoffsRootObject );
+
+				
 		
 		
 		var ajaxRequestData = {
 
 				search_ids : search_ids,
-				project_id : project_id,
-				peptide_q_value_cutoff : peptide_q_value_cutoff,
-				psm_q_value_cutoff : psm_q_value_cutoff,
 				unified_reported_peptide_id : unified_reported_peptide_id,
+				psmPeptideCutoffsForSearchIds : psmPeptideCutoffsForSearchIds_JSONString
 		};
 		
 		
@@ -153,7 +197,7 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 						$topTRelement : $topTRelement
 				};
 
-				objectThis.loadAndInsertCrosslinkReportedPeptidesResponse( responseParams );
+				objectThis.loadAndInsertReportedPeptidesPerSearchResponse( responseParams );
 				
 
 				$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
@@ -175,28 +219,20 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 	};
 	
 	
-	this.loadAndInsertCrosslinkReportedPeptidesResponse = function( params ) {
+	this.loadAndInsertReportedPeptidesPerSearchResponse = function( params ) {
 		
 		var ajaxResponseData = params.ajaxResponseData;
 		
-		var ajaxRequestData = params.ajaxRequestData;
+//		var ajaxRequestData = params.ajaxRequestData;
 		
 
-		var reported_peptides = ajaxResponseData;
+		var reportedPeptidesPerSearchResponse = ajaxResponseData;
 		
-		var project_id = $( "#project_id_for_js" ).val();
+		
+		
+//		var project_id = $( "#project_id_for_js" ).val();
 
 		//  Convert all attributes to empty string if null or undefined
-		if ( ! project_id ) {
-			project_id = "";
-		}
-
-		var psm_q_value_cutoff = $( "#psm_q_value_cutoff_for_js" ).val();
-
-		//
-		if ( ! psm_q_value_cutoff ) {
-			psm_q_value_cutoff = "";
-		}
 
 		
 		
@@ -210,6 +246,23 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 		}
 
 		$data_container.empty();
+		
+		
+		
+		if ( _data_per_search_between_searches_html === null ) {
+			
+			_data_per_search_between_searches_html = $( "#data_per_search_between_searches_html" ).html();
+			
+			if ( _data_per_search_between_searches_html === undefined ) {
+				throw "_data_per_search_between_searches_html === undefined";
+			}
+			if ( _data_per_search_between_searches_html === null ) {
+				throw "_data_per_search_between_searches_html === null";
+			}
+
+		}
+		
+		
 		
 		if ( _handlebarsTemplate_peptide_data_per_search_block_template === null ) {
 			
@@ -256,138 +309,135 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 
 		
 
-		//  Search for qvalue being set in any row
+		
+//		var nameWidthPercent = 40;  // percentage width of table for Search Name
+//		var reportedPeptideWidthPercent = 50;  // percentage width of table for Reported Peptide Sequence String
+//			
+//		//  Reduce name and rep peptide width for q value, pep and svm if they are displayed.
+//		//     those fields are hard coded at 10% table width
+//		
+//		if ( anyLinksHavePeptideQValue ) {
+//			
+//			nameWidthPercent -= 4;
+//			reportedPeptideWidthPercent -= 3;
+//		}
+//
+//		if ( anyLinksHavePeptidePEPValue ) {
+//			
+//			nameWidthPercent -= 4;
+//			reportedPeptideWidthPercent -= 3;
+//		}
+//
+//		if ( anyLinksHavePeptideSVMValue ) {
+//			
+//			nameWidthPercent -= 4;
+//			reportedPeptideWidthPercent -= 3;
+//		}
 
-		var anyLinksHavePeptideQValue = false;
-		var anyLinksHavePeptidePEPValue = false;
-		var anyLinksHavePeptideSVMValue = false;
 		
 		
-		for ( var peptideIndex = 0; peptideIndex < reported_peptides.length ; peptideIndex++ ) {
+		////////////////////////////
+		
+		
+		///////   Process Per Search Id:
+		
+		
+
+		var reportedPeptidesPerSearch =  reportedPeptidesPerSearchResponse.reportedPeptidesPerSearchIdMap;
+
+		var searchIdArray = Object.keys( reportedPeptidesPerSearch );
+		
+		//  Sort the search ids in ascending order
+		searchIdArray.sort(function compareNumbers(a, b) {
+			  return a - b;
+		});
+		
+		
+		
+		for ( var searchIdIndex = 0; searchIdIndex < searchIdArray.length; searchIdIndex++ ) {
 			
-			var peptide = reported_peptides[ peptideIndex ];
 			
-			if ( peptide.peptideQValue !== undefined && peptide.peptideQValue !== null ) {
+			//  If after the first search, insert the separator
+			
+			if ( searchIdIndex > 0 ) {
 				
-				anyLinksHavePeptideQValue = true;
-				break;
+//				var $peptide_data_per_search_between_searches_html = 
+				$( _data_per_search_between_searches_html ).appendTo($data_container);
 			}
-		}
+			
+			
+			
+			var searchId = searchIdArray[ searchIdIndex ];
+			
+			var reportedPeptidesPerSearchEntry = reportedPeptidesPerSearch[ searchId ];
 
-		for ( var peptideIndex = 0; peptideIndex < reported_peptides.length ; peptideIndex++ ) {
-			
-			var peptide = reported_peptides[ peptideIndex ];
+			var reportedPeptidesForSearch =  reportedPeptidesPerSearchEntry.reportedPepides;
 		
-			if ( peptide.peptidePEP !== undefined && peptide.peptidePEP !== null ) {
-				
-				anyLinksHavePeptidePEPValue = true;
-				break;
-			}
-		}
 		
-		for ( var peptideIndex = 0; peptideIndex < reported_peptides.length ; peptideIndex++ ) {
 			
-			var peptide = reported_peptides[ peptideIndex ];
-			
-			if ( peptide.peptideSVMScore !== undefined && peptide.peptideSVMScore !== null ) {
-				
-				anyLinksHavePeptideSVMValue = true;
-				break;
-			}
-		}
-		
-		var nameWidthPercent = 40;  // percentage width of table for Search Name
-		var reportedPeptideWidthPercent = 50;  // percentage width of table for Reported Peptide Sequence String
-			
-		//  Reduce name and rep peptide width for q value, pep and svm if they are displayed.
-		//     those fields are hard coded at 10% table width
-		
-		if ( anyLinksHavePeptideQValue ) {
-			
-			nameWidthPercent -= 4;
-			reportedPeptideWidthPercent -= 3;
-		}
-
-		if ( anyLinksHavePeptidePEPValue ) {
-			
-			nameWidthPercent -= 4;
-			reportedPeptideWidthPercent -= 3;
-		}
-
-		if ( anyLinksHavePeptideSVMValue ) {
-			
-			nameWidthPercent -= 4;
-			reportedPeptideWidthPercent -= 3;
-		}
-
-		//  create context for header row
-		var context = { 
-				pageFormatting : {
-					nameWidthPercent : nameWidthPercent,
-					reportedPeptideWidthPercent : reportedPeptideWidthPercent
-				},
-				anyLinksHavePeptideQValue : anyLinksHavePeptideQValue, 
-				anyLinksHavePeptidePEPValue : anyLinksHavePeptidePEPValue,
-				anyLinksHavePeptideSVMValue : anyLinksHavePeptideSVMValue
-		};
-		
-
-		var html = _handlebarsTemplate_peptide_data_per_search_block_template(context);
-
-		var $peptide_data_per_search_block_template = $(html).appendTo($data_container);
-		
-
-		var peptide_table_jq_ClassName = "peptide_table_jq";
-		
-		var $peptide_table_jq = $peptide_data_per_search_block_template.find("." + peptide_table_jq_ClassName );
-	
-		if ( $peptide_table_jq.length === 0 ) {
-			
-			throw "unable to find HTML element with class '" + peptide_table_jq_ClassName + "'";
-		}
-		
-
-		
-		//  Add peptide data to the page
-	
-		for ( var peptideIndex = 0; peptideIndex < reported_peptides.length ; peptideIndex++ ) {
-	
-			var peptide = reported_peptides[ peptideIndex ];
-			
-			//  wrap data in an object to allow adding more fields
-			var context = { data : peptide, 
-					anyLinksHavePeptideQValue : anyLinksHavePeptideQValue, 
-					anyLinksHavePeptidePEPValue : anyLinksHavePeptidePEPValue,
-					anyLinksHavePeptideSVMValue : anyLinksHavePeptideSVMValue,
-					psm_q_value_cutoff : psm_q_value_cutoff, project_id : project_id 
+			//  create context for header row
+			var context = { 
+					
+					peptideAnnotationDisplayNameDescriptionList : reportedPeptidesPerSearchEntry.peptideAnnotationDisplayNameDescriptionList,
+					psmAnnotationDisplayNameDescriptionList : reportedPeptidesPerSearchEntry.psmAnnotationDisplayNameDescriptionList
 			};
-	
-			var html = _handlebarsTemplate_peptide_data_per_search_data_row_template(context);
-	
-			var $peptide_entry = 
-				$(html).appendTo($peptide_table_jq);
-			
-			
-			//  Get the number of columns of the inserted row so can set the "colspan=" in the next row
-			//       that holds the child data
-			
-			var $peptide_entry__columns = $peptide_entry.find("td");
-			
-			var peptide_entry__numColumns = $peptide_entry__columns.length;
-			
-			//  colSpan is used as the value for "colspan=" in the <td>
-			var childRowHTML_Context = { colSpan : peptide_entry__numColumns };
-			
-			var childRowHTML = _handlebarsTemplate_peptide_data_per_search_child_row_template( childRowHTML_Context );
-			
-			//  Add next row for child data
-			$( childRowHTML ).appendTo($peptide_table_jq);
-		}
-		
 
 		
+
+			var html = _handlebarsTemplate_peptide_data_per_search_block_template(context);
+
+			var $peptide_data_per_search_block_template = $(html).appendTo($data_container);
+
+
+			var peptide_table_jq_ClassName = "peptide_table_jq";
+
+			var $peptide_table_jq = $peptide_data_per_search_block_template.find("." + peptide_table_jq_ClassName );
+
+			if ( $peptide_table_jq.length === 0 ) {
+
+				throw "unable to find HTML element with class '" + peptide_table_jq_ClassName + "'";
+			}
+
+
+			
+			
+
+			//  Add peptide data to the page
+
+			for ( var peptideIndex = 0; peptideIndex < reportedPeptidesForSearch.length ; peptideIndex++ ) {
+
+				var peptide = reportedPeptidesForSearch[ peptideIndex ];
+
+				//  wrap data in an object to allow adding more fields
+				var context = { data : peptide
+				};
+
+				var html = _handlebarsTemplate_peptide_data_per_search_data_row_template(context);
+
+				var $peptide_entry = 
+					$(html).appendTo($peptide_table_jq);
+
+
+				//  Get the number of columns of the inserted row so can set the "colspan=" in the next row
+				//       that holds the child data
+
+				var $peptide_entry__columns = $peptide_entry.find("td");
+
+				var peptide_entry__numColumns = $peptide_entry__columns.length;
+
+				//  colSpan is used as the value for "colspan=" in the <td>
+				var childRowHTML_Context = { colSpan : peptide_entry__numColumns };
+
+				var childRowHTML = _handlebarsTemplate_peptide_data_per_search_child_row_template( childRowHTML_Context );
+
+				//  Add next row for child data
+				$( childRowHTML ).appendTo($peptide_table_jq);
+			}
+
+
+		}  // END:  For Each Search Id
 	};
-	
+
 
 };
 

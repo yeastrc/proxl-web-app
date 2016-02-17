@@ -52,10 +52,10 @@
     <br><br>
   
 	  <c:choose>
-	   <c:when test="${ not empty param.project_id }">
+	   <c:when test="${ not empty project_id }">
 	   	
 	   
-	   		 <a href="viewProject.do?project_id=<c:out value="${ param.project_id }"></c:out>" >home</a>
+	   		 <a href="viewProject.do?project_id=<c:out value="${ project_id }"></c:out>" >home</a>
 	   </c:when>
 	   <c:otherwise>
 	   

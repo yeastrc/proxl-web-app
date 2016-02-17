@@ -1,14 +1,20 @@
 package org.yeastrc.xlink.www.objects;
 
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
-import org.yeastrc.xlink.www.searcher.SearchMonolinkPeptideSearcher;
-import org.yeastrc.xlink.www.searcher.SearchPeptideMonolinkSearcher;
-import org.yeastrc.xlink.www.searcher.SearchPsmSearcher;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
+import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
+import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
+import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 
+/**
+ * 
+ *
+ */
 public class SearchProteinMonolink {
 
 	private static final Logger log = Logger.getLogger(SearchProteinMonolink.class);
@@ -25,6 +31,24 @@ public class SearchProteinMonolink {
 	public void setSearch(SearchDTO search) {
 		this.search = search;
 	}
+
+	public String getSearchName() {
+		if ( search == null ) {
+			
+			return "";
+		}
+		return search.getName();
+	}
+
+	public SearcherCutoffValuesSearchLevel getSearcherCutoffValuesSearchLevel() {
+		return searcherCutoffValuesSearchLevel;
+	}
+	public void setSearcherCutoffValuesSearchLevel(
+			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel) {
+		this.searcherCutoffValuesSearchLevel = searcherCutoffValuesSearchLevel;
+	}
+	
+	
 	public int getProteinPosition() {
 		return proteinPosition;
 	}
@@ -32,10 +56,6 @@ public class SearchProteinMonolink {
 		this.proteinPosition = proteinPosition;
 	}
 
-//	public int getNumPsms() {
-//		return numPsms;
-//	}
-	
 
 	/**
 	 * Returns the number of PSMs found for this crosslink, given its cutoffs
@@ -45,8 +65,16 @@ public class SearchProteinMonolink {
 	public int getNumPsms() throws Exception {
 		
 		try {
-			if( this.numPsms == null )
-				this.numPsms = SearchPsmSearcher.getInstance().getNumPsms( this );
+			if( this.numPsms == null ) {
+				
+				this.numPsms =
+						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForMonolink(
+								this.getSearch().getId(),
+								this.getSearcherCutoffValuesSearchLevel(),
+								this.getProtein().getNrProtein().getNrseqId(),
+								this.getProteinPosition() );
+
+			}
 
 			return this.numPsms;
 			
@@ -59,35 +87,81 @@ public class SearchProteinMonolink {
 			throw e;
 		}
 	}
-	
+
 	
 	public void setNumPsms(int numPsms) {
+		
+//		if ( true ) {
+//			
+//			throw new RuntimeException( "TEMP not supported" );
+//		}
+//		
+//
+//		//  TODO TEMP COMMENT OUT
+		
 		this.numPsms = numPsms;
 	}
-	public int getNumUniquePsms() {
-		return numUniquePsms;
+	
+	
+	
+//	public int getNumUniquePsms() {
+//
+//		if ( true ) {
+//			
+//			throw new RuntimeException( "TEMP not supported" );
+//		}
+//
+//
+//		//  TODO TEMP COMMENT OUT
+//		
+//		return numUniquePsms;
+//	}
+//	
+//	
+//	
+//	public void setNumUniquePsms(int numUniquePsms) {
+//		
+//		if ( true ) {
+//			
+//			throw new RuntimeException( "TEMP not supported" );
+//		}
+//		
+//		
+//		//  TODO TEMP COMMENT OUT
+//		
+////		this.numUniquePsms = numUniquePsms;
+//	}
+	
+	
+	
+
+	public void setNumPeptides(int numPeptides) {
+		
+//		if ( true ) {
+//			
+//			throw new RuntimeException( "TEMP not supported" );
+//		}
+//		
+
+		//  TODO TEMP COMMENT OUT
+		
+		this.numPeptides = numPeptides;
 	}
-	public void setNumUniquePsms(int numUniquePsms) {
-		this.numUniquePsms = numUniquePsms;
-	}
-	public double getPsmCutoff() {
-		return psmCutoff;
-	}
-	public void setPsmCutoff(double psmCutoff) {
-		this.psmCutoff = psmCutoff;
-	}
-	public double getPeptideCutoff() {
-		return peptideCutoff;
-	}
-	public void setPeptideCutoff(double peptideCutoff) {
-		this.peptideCutoff = peptideCutoff;
-	}	
+	
 	
 	public int getNumPeptides() throws Exception {
 		
 		try {
-			if( this.numPeptides == -1 )
-				this.numPeptides = SearchMonolinkPeptideSearcher.getInstance().getNumPeptides( this );
+			if( this.numPeptides == -1 ) {
+				
+				this.numPeptides = 
+						NumPeptidesForProteinCriteriaSearcher.getInstance()
+						.getNumPeptidesForMonolink(
+								this.getSearch().getId(),
+								this.getSearcherCutoffValuesSearchLevel(),
+								this.getProtein().getNrProtein().getNrseqId(),
+								this.getProteinPosition() );
+			}
 
 			return this.numPeptides;
 			
@@ -100,11 +174,37 @@ public class SearchProteinMonolink {
 			throw e;
 		}
 	}
+
+	public void setNumUniquePeptides(int numUniquePeptides) {
+		
+		
+//		if ( true ) {
+//			
+//			throw new RuntimeException( "TEMP not supported" );
+//		}
+		
+
+		//  TODO TEMP COMMENT OUT
+		
+		this.numUniquePeptides = numUniquePeptides;
+	}
+	
 	public int getNumUniquePeptides() throws Exception {
 		
 		try {
-			if( this.numUniquePeptides == -1 )
-				this.numUniquePeptides = SearchMonolinkPeptideSearcher.getInstance().getNumUniquePeptides( this );
+			if( this.numUniquePeptides == -1 ) {
+				
+				
+
+				this.numUniquePeptides = 
+						NumPeptidesForProteinCriteriaSearcher.getInstance()
+						.getNumUniquePeptidesForMonolink(
+								this.getSearch().getId(),
+								this.getSearcherCutoffValuesSearchLevel(),
+								this.getProtein().getNrProtein().getNrseqId(),
+								this.getProteinPosition(),
+								YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
+			}
 
 			return this.numUniquePeptides;
 
@@ -118,39 +218,51 @@ public class SearchProteinMonolink {
 		}
 	}
 
-	public List<SearchPeptideMonolink> getPeptides() throws Exception {
-
-		try {
-			if( this.peptides == null )
-				this.peptides = SearchPeptideMonolinkSearcher.getInstance().search( this );
-
-			return this.peptides;
-
-		} catch ( Exception e ) {
-
-			String msg = "Exception in getPeptides()";
-
-			log.error( msg, e );
-
-			throw e;
-		}
+	public List<String> getPsmAnnotationValueList() {
+		return psmAnnotationValueList;
 	}
+	public void setPsmAnnotationValueList(List<String> psmAnnotationValueList) {
+		this.psmAnnotationValueList = psmAnnotationValueList;
+	}
+	public List<String> getPeptideAnnotationValueList() {
+		return peptideAnnotationValueList;
+	}
+	public void setPeptideAnnotationValueList(
+			List<String> peptideAnnotationValueList) {
+		this.peptideAnnotationValueList = peptideAnnotationValueList;
+	}
+
+	////////////////////////////////////////////////
+	
+	////   WAS
+	
+	
+//	/**
+//	 * Used by Javascript in Merged Image and Merged Structure pages
+//	 * 
+//	 * @return
+//	 * @throws Exception
+//	 */
+//	public List<SearchPeptideMonolink> getPeptides() throws Exception {
+//
+//		try {
+//			if( this.peptides == null )
+//				this.peptides = SearchPeptideMonolinkSearcher.getInstance().search( this );
+//
+//			return this.peptides;
+//
+//		} catch ( Exception e ) {
+//
+//			String msg = "Exception in getPeptides()";
+//
+//			log.error( msg, e );
+//
+//			throw e;
+//		}
+//	}
 
 
 	
-	
-	public double getBestPSMQValue() {
-		return bestPSMQValue;
-	}
-	public void setBestPSMQValue(double bestPSMQValue) {
-		this.bestPSMQValue = bestPSMQValue;
-	}
-	public Double getBestPeptideQValue() {
-		return bestPeptideQValue;
-	}
-	public void setBestPeptideQValue(Double bestPeptideQValue) {
-		this.bestPeptideQValue = bestPeptideQValue;
-	}
 
 
 
@@ -160,14 +272,28 @@ public class SearchProteinMonolink {
 	private int proteinPosition;
 	
 	private Integer numPsms;
-	private int numUniquePsms;
+//	private int numUniquePsms;
 
 	private int numPeptides = -1;
-	List<SearchPeptideMonolink> peptides;
-	
 	private int numUniquePeptides = -1;
-	private double psmCutoff;
-	private double peptideCutoff;
-	private double bestPSMQValue;
-	private Double bestPeptideQValue;
+
+	
+//	List<SearchPeptideMonolink> peptides;
+	
+
+	private SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel;
+
+
+
+	/**
+	 * Used for display on web page
+	 */
+	private List<String> psmAnnotationValueList;
+	
+
+	/**
+	 * Used for display on web page
+	 */
+	private List<String> peptideAnnotationValueList;
+
 }

@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,6 @@ import java.util.Map;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -25,23 +25,26 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.objects.AnnDisplayNameDescPeptPsmListsPair;
+import org.yeastrc.xlink.www.objects.AnnValuePeptPsmListsPair;
+import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinLooplink;
-import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
-import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
-import org.yeastrc.xlink.www.searcher.MergedSearchProteinCrosslinkSearcher;
-import org.yeastrc.xlink.www.searcher.MergedSearchProteinLooplinkSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.actions.ProteinsMergedCommonPageDownload.ProteinsMergedCommonPageDownloadResult;
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 
 
+/**
+ * 
+ *
+ */
 public class DownloadMergedSearchProteinsAction extends Action {
 	
 	private static final Logger log = Logger.getLogger(DownloadMergedSearchProteinsAction.class);
@@ -59,7 +62,7 @@ public class DownloadMergedSearchProteinsAction extends Action {
 
 
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 
 
 			
@@ -77,14 +80,20 @@ public class DownloadMergedSearchProteinsAction extends Action {
 			
 			//   Get the project id for this search
 			
-			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
+			Collection<Integer> searchIdsSet = new HashSet<Integer>( );
 			
 			for ( int searchId : searchIdsFromForm ) {
 
-				searchIdsCollection.add( searchId );
+				searchIdsSet.add( searchId );
 			}
+
+			List<Integer> searchIdsListDeduppedSorted = new ArrayList<>( searchIdsSet );
+
+			Collections.sort( searchIdsListDeduppedSorted );
+
 			
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsSet );
 			
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				
@@ -112,33 +121,6 @@ public class DownloadMergedSearchProteinsAction extends Action {
 			int projectId = projectIdsFromSearchIds.get( 0 );
 			
 			request.setAttribute( "projectId", projectId ); 
-			
-
-			
-			String project_id_from_query_string = request.getParameter( WebConstants.PARAMETER_PROJECT_ID );
-			
-
-			if ( StringUtils.isEmpty( project_id_from_query_string ) ) {
-
-				//  copy the project from the searches to the URL and redirect to that new URL.
-				
-				String getRequestURI = request.getRequestURI();
-				
-				String getQueryString = request.getQueryString();
-				
-				String newURL = getRequestURI + "?" + WebConstants.PARAMETER_PROJECT_ID + "=" + projectId + "&" + getQueryString;
-
-				if ( log.isInfoEnabled() ) {
-					
-					log.info( "Redirecting to new URL to add '" + WebConstants.PARAMETER_PROJECT_ID + "=" + projectId + "' to query string.  new URL: " + newURL );
-				}
-				
-				response.sendRedirect( newURL );
-				
-				return null;
-			}
-			
-			
 			
 
 			///////////////////////
@@ -172,11 +154,19 @@ public class DownloadMergedSearchProteinsAction extends Action {
 			request.setAttribute( WebConstants.REQUEST_AUTH_ACCESS_LEVEL, authAccessLevel );
 
 
+			///    Done Processing Auth Check and Auth Level
+
+
+			//////////////////////////////
+
 
 			
 
 
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
+			
+			Map<Integer, SearchDTO> searchesMapOnId = new HashMap<>();
+
 			
 			for( int searchId : searchIdsFromForm ) {
 				
@@ -196,38 +186,48 @@ public class DownloadMergedSearchProteinsAction extends Action {
 				}
 				
 				searches.add( search );
+
+				searchesMapOnId.put( searchId, search );
 			}
 
 			
-			
-			
-			
-			
-
-			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
-
-
-
-
-			// generate file name
-			String filename = "xlinks-proteins-search-";
-			filename += StringUtils.join( form.getSearchIds(), '-' );
-
-			DateTime dt = new DateTime();
-			DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
-			filename += "-" + fmt.print( dt );
-
-			filename += ".txt";
-
-			response.setContentType("application/x-download");
-			response.setHeader("Content-Disposition", "attachment; filename=" + filename);
-
 
 			OutputStreamWriter writer = null;
 			
 			try {
 
 
+				
+				ProteinsMergedCommonPageDownloadResult proteinsMergedCommonPageDownloadResult =
+						ProteinsMergedCommonPageDownload.getInstance()
+						.getCrosslinksAndLooplinkWrapped(
+								form,
+								ProteinsMergedCommonPageDownload.ForCrosslinksOrLooplinkOrBoth.BOTH_CROSSLINKS_AND_LOOPLINKS,
+								searchIdsListDeduppedSorted,
+								searches,
+								searchesMapOnId );
+
+
+				List<MergedSearchProteinCrosslink> crosslinks = proteinsMergedCommonPageDownloadResult.getCrosslinks();
+				List<MergedSearchProteinLooplink> looplinks = proteinsMergedCommonPageDownloadResult.getLooplinks();
+
+
+				// generate file name
+				String filename = "xlinks-proteins-search-";
+				filename += StringUtils.join( form.getSearchIds(), '-' );
+
+				DateTime dt = new DateTime();
+				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
+				filename += "-" + fmt.print( dt );
+
+				filename += ".txt";
+
+				response.setContentType("application/x-download");
+				response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+
+				
+				
+				
 				ServletOutputStream out = response.getOutputStream();
 
 				BufferedOutputStream bos = new BufferedOutputStream(out);
@@ -235,301 +235,125 @@ public class DownloadMergedSearchProteinsAction extends Action {
 				writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
 
 
-				double psmQValueCutoff = form.getPsmQValueCutoff();		
-				double peptideQValueCutoff = form.getPeptideQValueCutoff();
-				boolean filterNonUniquePeptides = form.isFilterNonUniquePeptides();	
-				boolean filterOnlyOnePSM = form.isFilterOnlyOnePSM();
-				boolean filterOnlyOnePeptide = form.isFilterOnlyOnePeptide();
 
-				List<MergedSearchProteinCrosslink> links = MergedSearchProteinCrosslinkSearcher.getInstance().search( searches, psmQValueCutoff, peptideQValueCutoff );
+				writer.write( "SEARCH ID(S)\tTYPE\tPROTEIN 1\tPOSITION\tPROTEIN 2\tPOSITION\tNUM PSMS\tNUM PEPTIDES\tNUM UNIQUE PEPTIDES" );
 
-				// Filter out links if requested
-				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide
-						|| ( form.getExcludeTaxonomy() != null && form.getExcludeTaxonomy().length > 0 )  
-						|| ( form.getExcludeProtein() != null && form.getExcludeProtein().length > 0 ) ) {
+
+				for ( AnnDisplayNameDescPeptPsmListsPair annDisplayNameDescPeptPsmListsPair : proteinsMergedCommonPageDownloadResult.getPeptidePsmAnnotationNameDescListsForEachSearch() ) {
+				
+					for ( AnnotationDisplayNameDescription peptideAnnotationDisplayNameDescription : annDisplayNameDescPeptPsmListsPair.getPeptideAnnotationNameDescriptionList() ) {
 					
+						writer.write( "\tPeptide Value:" );
+						writer.write( peptideAnnotationDisplayNameDescription.getDisplayName() );
+						writer.write( "(SEARCH ID: " );
+						writer.write( Integer.toString( annDisplayNameDescPeptPsmListsPair.getSearchId() ) );
+						writer.write( ")" );
+					}
+				
+					for ( AnnotationDisplayNameDescription psmAnnotationDisplayNameDescription : annDisplayNameDescPeptPsmListsPair.getPeptideAnnotationNameDescriptionList() ) {
 					
-					List<MergedSearchProteinCrosslink> linksCopy = new ArrayList<MergedSearchProteinCrosslink>();
-					linksCopy.addAll( links );
-
-					for( MergedSearchProteinCrosslink link : linksCopy ) {
-
-						// did they request to removal of non unique peptides?
-						if( filterNonUniquePeptides ) {
-							if( link.getNumUniqueLinkedPeptides() < 1 ) {
-								links.remove( link );
-								continue;
-							}
-						}
-
-//
-//					
-//						link.getNumPsms() <= 1 WILL NOT WORK if more than one search since it is across all searches
-//					
-//					// did they request to removal of links with only one PSM?
-						if( filterOnlyOnePSM ) {
-
-							boolean foundSearchWithMoreThanOnePSM = false;
-
-							Map<SearchDTO, SearchProteinCrosslink> searchCrosslinks = link.getSearchProteinCrosslinks();
-
-							for ( Map.Entry<SearchDTO, SearchProteinCrosslink> searchEntry : searchCrosslinks.entrySet() ) {
-
-								SearchProteinCrosslink searchProteinCrosslink = searchEntry.getValue();
-
-								int psmCountForSearchId = searchProteinCrosslink.getNumPsms();
-
-								if ( psmCountForSearchId > 1 ) {
-
-									foundSearchWithMoreThanOnePSM = true;
-									break;
-								}
-							}
-
-							if (  ! foundSearchWithMoreThanOnePSM ) {
-								links.remove( link );
-								continue;
-							}
-
-						}
-
-						// did they request to removal of links with only one Reported Peptide?
-						if( filterOnlyOnePeptide ) {
-
-							boolean foundSearchWithMoreThanOneReportedPeptide = false;
-
-							Map<SearchDTO, SearchProteinCrosslink> searchCrosslinks = link.getSearchProteinCrosslinks();
-
-							for ( Map.Entry<SearchDTO, SearchProteinCrosslink> searchEntry : searchCrosslinks.entrySet() ) {
-
-								SearchProteinCrosslink searchProteinCrosslink = searchEntry.getValue();
-
-								int peptideCountForSearchId = searchProteinCrosslink.getNumLinkedPeptides();
-
-								if ( peptideCountForSearchId > 1 ) {
-
-									foundSearchWithMoreThanOneReportedPeptide = true;
-									break;
-								}
-							}
-
-							if (  ! foundSearchWithMoreThanOneReportedPeptide ) {
-								links.remove( link );
-								continue;
-							}
-						}
-						
-						
-						// did they request removal of certain taxonomy IDs?
-						if( form.getExcludeTaxonomy() != null && form.getExcludeTaxonomy().length > 0 ) {
-							for( int tid : form.getExcludeTaxonomy() ) {
-								if( link.getProtein1().getNrProtein().getTaxonomyId() == tid ||
-										link.getProtein2().getNrProtein().getTaxonomyId() == tid ) {
-									links.remove( link );
-									continue;
-								}
-							}
-						}
-
-						// did they request removal of certain protein IDs?
-						if( form.getExcludeProtein() != null && form.getExcludeProtein().length > 0 ) {
-							for( int pid : form.getExcludeProtein() ) {
-								if( link.getProtein1().getNrProtein().getNrseqId() == pid ||
-										link.getProtein2().getNrProtein().getNrseqId() == pid ) {
-									links.remove( link );
-									continue;
-								}
-							}
-						}
+						writer.write( "\tBest PSM Value:" );
+						writer.write( psmAnnotationDisplayNameDescription.getDisplayName() );
+						writer.write( "(SEARCH ID: " );
+						writer.write( Integer.toString( annDisplayNameDescPeptPsmListsPair.getSearchId() ) );
+						writer.write( ")" );
 					}
 				}
 				
-				
+				writer.write( "\n" );
 
 
-
-
-				List<MergedSearchProteinLooplink> llinks = MergedSearchProteinLooplinkSearcher.getInstance().search( searches, psmQValueCutoff, peptideQValueCutoff );
-
-				// Filter out links if requested
-				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide
-						|| ( form.getExcludeTaxonomy() != null && form.getExcludeTaxonomy().length > 0 ) 
-						|| ( form.getExcludeProtein() != null && form.getExcludeProtein().length > 0 ) ) {
-					
-					
-					List<MergedSearchProteinLooplink> linksCopy = new ArrayList<MergedSearchProteinLooplink>();
-					linksCopy.addAll( llinks );
-
-					for( MergedSearchProteinLooplink link : linksCopy ) {
-
-						// did they request to removal of non unique peptides?
-						if( filterNonUniquePeptides ) {
-							if( link.getNumUniquePeptides() < 1 ) {
-								llinks.remove( link );
-								continue;
-							}
-						}
-
-
-						
-//							link.getNumPsms() <= 1 WILL NOT WORK if more than one search since it is across all searches
-//						
-//						// did they request to removal of links with only one PSM?
-						if( filterOnlyOnePSM ) {
-							
-							boolean foundSearchWithMoreThanOnePSM = false;
-							
-
-							Map<SearchDTO, SearchProteinLooplink> searchLooplinks = link.getSearchProteinLooplinks();
-
-							for ( Map.Entry<SearchDTO, SearchProteinLooplink> searchEntry : searchLooplinks.entrySet() ) {
-
-								SearchProteinLooplink searchProteinLooplink = searchEntry.getValue();
-
-								int psmCountForSearchId = searchProteinLooplink.getNumPsms();
-
-								if ( psmCountForSearchId > 1 ) {
-
-									foundSearchWithMoreThanOnePSM = true;
-									break;
-								}
-							}
-							
-							if (  ! foundSearchWithMoreThanOnePSM ) {
-								llinks.remove( link );
-								continue;
-							}
-
-						}
-						
-						
-						// did they request to removal of links with only one Reported Peptide?
-						if( filterOnlyOnePeptide ) {
-							
-							boolean foundSearchWithMoreThanOneReportedPeptide = false;
-
-							Map<SearchDTO, SearchProteinLooplink> searchLooplinks = link.getSearchProteinLooplinks();
-
-							for ( Map.Entry<SearchDTO, SearchProteinLooplink> searchEntry : searchLooplinks.entrySet() ) {
-
-								SearchProteinLooplink searchProteinLooplink = searchEntry.getValue();
-
-								int peptideCountForSearchId = searchProteinLooplink.getNumPeptides();
-
-								if ( peptideCountForSearchId > 1 ) {
-
-									foundSearchWithMoreThanOneReportedPeptide = true;
-									break;
-								}
-							}
-							
-							if (  ! foundSearchWithMoreThanOneReportedPeptide ) {
-								llinks.remove( link );
-								continue;
-							}
-						}
-						
-						
-						// did they request removal of certain taxonomy IDs?
-						if( form.getExcludeTaxonomy() != null && form.getExcludeTaxonomy().length > 0 ) {
-							for( int tid : form.getExcludeTaxonomy() ) {
-								if( link.getProtein().getNrProtein().getTaxonomyId() == tid ) {
-									llinks.remove( link );
-									continue;
-								}
-							}
-						}
-
-						// did they request removal of certain protein IDs?
-						if( form.getExcludeProtein() != null && form.getExcludeProtein().length > 0 ) {
-							for( int pid : form.getExcludeProtein() ) {
-								if( link.getProtein().getNrProtein().getNrseqId() == pid ) {
-									llinks.remove( link );
-									continue;
-								}
-							}
-						}
-					}
-				}
-				
-				
-
-				writer.write( "SEARCH ID(S)\tTYPE\tPROTEIN 1\tPOSITION\tPROTEIN 2\tPOSITION\tNUM PSMS\tNUM PEPTIDES\tNUM UNIQUE PEPTIDES\tBEST PEPTIDE Q-VALUE\tBEST PSM Q-VALUE\n" );
-
-
-				for( MergedSearchProteinCrosslink link : links ) {
-					
-					StringBuilder line = new StringBuilder();
+				for( MergedSearchProteinCrosslink link : crosslinks ) {
 
 					List<Integer> searchIds = new ArrayList<Integer>( link.getSearches().size() );
 					for( SearchDTO r : link.getSearches() ) { searchIds.add( r.getId() ); }
 					Collections.sort( searchIds );
 
-					line.append( StringUtils.join( searchIds, "," ) );
-					line.append( "\t" );
-					line.append( "CROSSLINK\t" );
-					line.append( link.getProtein1().getName() );
-					line.append( "\t" );
-					line.append( link.getProtein1Position() );
-					line.append( "\t" );
-					line.append( link.getProtein2().getName() );
-					line.append( "\t" );
-					line.append( link.getProtein2Position() );
-					line.append( "\t" );
-					line.append( link.getNumPsms() );
-					line.append( "\t" );
-					line.append( link.getNumLinkedPeptides() );
-					line.append( "\t" );
-					line.append( link.getNumUniqueLinkedPeptides() );
-					line.append( "\t" );
-					if ( link.getBestPeptideQValue() != null ) {
-						line.append( link.getBestPeptideQValue() );
-					}
-					line.append( "\t" );
-					line.append( link.getBestPSMQValue() );
-					line.append( "\n" );
+					writer.write( StringUtils.join( searchIds, "," ) );
+					writer.write( "\t" );
+					writer.write( "CROSSLINK\t" );
+					writer.write( link.getProtein1().getName() );
+					writer.write( "\t" );
+					writer.write( Integer.toString( link.getProtein1Position() ) );
+					writer.write( "\t" );
+					writer.write( link.getProtein2().getName() );
+					writer.write( "\t" );
+					writer.write( Integer.toString( link.getProtein2Position() ) );
+					writer.write( "\t" );
+					writer.write( Integer.toString( link.getNumPsms() ) );
+					writer.write( "\t" );
+					writer.write( Integer.toString( link.getNumLinkedPeptides() ) );
+					writer.write( "\t" );
+					writer.write( Integer.toString( link.getNumUniqueLinkedPeptides() ) );
 
-					writer.write( line.toString() );
+
+					for ( AnnValuePeptPsmListsPair annValuePeptPsmListsPair : link.getPeptidePsmAnnotationValueListsForEachSearch() ) {
+					
+						for ( String peptideAnnotationValue : annValuePeptPsmListsPair.getPeptideAnnotationValueList() ) {
+						
+							writer.write( "\t" );
+							writer.write( peptideAnnotationValue );
+						}
+
+						for ( String psmAnnotationValue : annValuePeptPsmListsPair.getPsmAnnotationValueList() ) {
+						
+							writer.write( "\t" );
+							writer.write( psmAnnotationValue );
+						}
+					
+					}
+
+					writer.write( "\n" );
+
 				}
 
 
 
 
 
-				for( MergedSearchProteinLooplink link : llinks ) {
+				for( MergedSearchProteinLooplink link : looplinks ) {
 					
-					StringBuffer line = new StringBuffer();
-
 					List<Integer> searchIds = new ArrayList<Integer>( link.getSearches().size() );
 					for( SearchDTO r : link.getSearches() ) { searchIds.add( r.getId() ); }
 					Collections.sort( searchIds );
 
-					line.append( StringUtils.join( searchIds, "," ) );
-					line.append( "\t" );
-					line.append( "LOOPLINK" );
-					line.append( "\t" );
-					line.append( link.getProtein().getName() );
-					line.append( "\t" );
-					line.append( link.getProteinPosition1() );
-					line.append( "\t" );
-					line.append( link.getProtein().getName() );
-					line.append( "\t" );
-					line.append( link.getProteinPosition2() );
-					line.append( "\t" );
-					line.append( link.getNumPsms() );
-					line.append( "\t" );
-					line.append( link.getNumPeptides() );
-					line.append( "\t" );
-					line.append( link.getNumUniquePeptides() );
-					line.append( "\t" );
-					if ( link.getBestPeptideQValue() != null ) {
-						line.append( link.getBestPeptideQValue() );
-					}
-					line.append( "\t" );
-					line.append( link.getBestPSMQValue() );
-					line.append( "\n" );
+					writer.write( StringUtils.join( searchIds, "," ) );
+					writer.write( "\t" );
+					writer.write( "LOOPLINK" );
+					writer.write( "\t" );
+					writer.write( link.getProtein().getName() );
+					writer.write( "\t" );
+					writer.write( Integer.toString( link.getProteinPosition1() ) );
+					writer.write( "\t" );
+					writer.write( link.getProtein().getName() );
+					writer.write( "\t" );
+					writer.write( Integer.toString( link.getProteinPosition2() ) );
+					writer.write( "\t" );
+					writer.write( Integer.toString( link.getNumPsms() ) );
+					writer.write( "\t" );
+					writer.write( Integer.toString( link.getNumPeptides() ) );
+					writer.write( "\t" );
+					writer.write( Integer.toString( link.getNumUniquePeptides() ) );
+					writer.write( "\t" );
 
-					writer.write( line.toString() );
+					for ( AnnValuePeptPsmListsPair annValuePeptPsmListsPair : link.getPeptidePsmAnnotationValueListsForEachSearch() ) {
+					
+						for ( String peptideAnnotationValue : annValuePeptPsmListsPair.getPeptideAnnotationValueList() ) {
+						
+							writer.write( "\t" );
+							writer.write( peptideAnnotationValue );
+						}
+
+						for ( String psmAnnotationValue : annValuePeptPsmListsPair.getPsmAnnotationValueList() ) {
+						
+							writer.write( "\t" );
+							writer.write( psmAnnotationValue );
+						}
+					
+					}
+
+					writer.write( "\n" );
+
 				}
 
 			} finally {

@@ -24,6 +24,39 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 	var _handlebarsTemplate_crosslink_peptide_data_row_entry_template = null;
 	var _handlebarsTemplate_crosslink_peptide_child_row_entry_template = null;
 	
+
+	var _psmPeptideCutoffsRootObject = null;
+
+	//   Currently expect _psmPeptideCriteria = 
+//					searches: Object
+//						128: Object			
+//							peptideCutoffValues: Object
+//								238: Object
+//									id: 238
+//									value: "0.01"
+//							psmCutoffValues: Object
+//								384: Object
+//									id: 384
+//									value: "0.01"
+//							searchId: 128
+	
+//           The key to:
+//				searches - searchId
+//				peptideCutoffValues and psmCutoffValues - annotation type id
+	
+//			peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+	
+	
+	//////////////
+	
+	this.setPsmPeptideCriteria = function( psmPeptideCutoffsRootObject ) {
+		
+		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
+	};
+	
+	
+	
+	// ////////////
 	
 	this.showHideCrosslinkReportedPeptides = function( params ) {
 		
@@ -75,9 +108,6 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 
 		
 		var search_id = $clickedElement.attr( "search_id" );
-		var project_id = $clickedElement.attr( "project_id" );
-		var peptide_q_value_cutoff = $clickedElement.attr( "peptide_q_value_cutoff" );
-		var psm_q_value_cutoff = $clickedElement.attr( "psm_q_value_cutoff" );
 		var protein_1_id = $clickedElement.attr( "protein_1_id" );
 		var protein_2_id = $clickedElement.attr( "protein_2_id" );
 		var protein_1_position = $clickedElement.attr( "protein_1_position" );
@@ -88,17 +118,7 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		if ( ! search_id ) {
 			search_id = "";
 		}
-		if ( ! project_id ) {
-			project_id = "";
-		}
-		if ( ! peptide_q_value_cutoff ) {
-			peptide_q_value_cutoff = "";
-		}
 
-		//
-		if ( ! psm_q_value_cutoff ) {
-			psm_q_value_cutoff = "";
-		}
 		if ( ! protein_1_id ) {
 			protein_1_id = "";
 		}
@@ -112,19 +132,55 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			protein_2_position = "";
 		}
 		
+
 		
+
+
+		//   Currently expect _psmPeptideCriteria = 
+//						searches: Object
+//							128: Object			
+//								peptideCutoffValues: Object
+//									238: Object
+//										id: 238
+//										value: "0.01"
+//								psmCutoffValues: Object
+//									384: Object
+//										id: 384
+//										value: "0.01"
+//								searchId: 128
+		
+//	           The key to:
+//					searches - searchId
+//					peptideCutoffValues and psmCutoffValues - annotation type id
+		
+//				peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+		
+		if ( _psmPeptideCutoffsRootObject === null || _psmPeptideCutoffsRootObject === undefined ) {
+			
+			throw "_psmPeptideCutoffsRootObject not initialized";
+		} 
+		
+		var psmPeptideCutoffsForSearchId = _psmPeptideCutoffsRootObject.searches[ search_id ];
+		
+		if ( psmPeptideCutoffsForSearchId === undefined || psmPeptideCutoffsForSearchId === null ) {
+			
+			psmPeptideCutoffsForSearchId = {};
+			
+//			throw "Getting data.  Unable to get cutoff data for search id: " + search_id;
+		}
+
+		var psmPeptideCutoffsForSearchId_JSONString = JSON.stringify( psmPeptideCutoffsForSearchId );
+
+				
 		var ajaxRequestData = {
 
 				search_id : search_id,
-				project_id : project_id,
-				peptide_q_value_cutoff : peptide_q_value_cutoff,
-				psm_q_value_cutoff : psm_q_value_cutoff,
 				protein_1_id : protein_1_id,
 				protein_2_id : protein_2_id,
 				protein_1_position : protein_1_position,
 				protein_2_position : protein_2_position,
+				psmPeptideCutoffsForSearchId : psmPeptideCutoffsForSearchId_JSONString
 		};
-		
 		
 		$.ajax({
 			url : contextPathJSVar + "/services/data/getCrosslinkReportedPeptides",
@@ -141,7 +197,8 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 				var responseParams = {
 						ajaxResponseData : ajaxResponseData, 
 						ajaxRequestData : ajaxRequestData,
-						$topTRelement : $topTRelement
+						$topTRelement : $topTRelement,
+						$clickedElement : $clickedElement
 				};
 
 				objectThis.loadAndInsertCrosslinkReportedPeptidesResponse( responseParams );
@@ -165,6 +222,7 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		
 	};
 	
+	///////////////////
 	
 	this.loadAndInsertCrosslinkReportedPeptidesResponse = function( params ) {
 		
@@ -172,9 +230,17 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		
 		var ajaxRequestData = params.ajaxRequestData;
 		
-
-		var crosslink_peptides = ajaxResponseData;
+		var $clickedElement = params.$clickedElement;
 		
+		var show_children_if_one_row = $clickedElement.attr( "show_children_if_one_row" );
+		
+
+		
+		var peptideAnnotationDisplayNameDescriptionList = ajaxResponseData.peptideAnnotationDisplayNameDescriptionList;
+		var psmAnnotationDisplayNameDescriptionList = ajaxResponseData.psmAnnotationDisplayNameDescriptionList;
+		
+		var crosslink_peptides = ajaxResponseData.searchPeptideCrosslinkList;
+
 		
 		
 		var $topTRelement = params.$topTRelement;
@@ -231,23 +297,6 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			_handlebarsTemplate_crosslink_peptide_child_row_entry_template = Handlebars.compile( handlebarsSource_crosslink_peptide_child_row_entry_template );
 		}
 
-		
-
-		//  Search for qvalue being set in any row
-
-		var qvalueSetAnyRows = false;
-		
-		for ( var crosslink_peptideIndex = 0; crosslink_peptideIndex < crosslink_peptides.length ; crosslink_peptideIndex++ ) {
-			
-			var crosslink_peptide = crosslink_peptides[ crosslink_peptideIndex ];
-			
-			if ( crosslink_peptide.qvalue !== undefined && crosslink_peptide.qvalue !== null ) {
-				
-				qvalueSetAnyRows = true;
-				break;
-			}
-		}
-		
 
 		//  Search for NumberUniquePSMs being set in any row
 
@@ -265,9 +314,13 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		}
 		
 		
-
+		
 		//  create context for header row
-		var context = { qvalueSetAnyRows : qvalueSetAnyRows, showNumberUniquePSMs : showNumberUniquePSMs };
+		var context = { 
+				showNumberUniquePSMs : showNumberUniquePSMs,
+				peptideAnnotationDisplayNameDescriptionList : peptideAnnotationDisplayNameDescriptionList,
+				psmAnnotationDisplayNameDescriptionList : psmAnnotationDisplayNameDescriptionList
+		};
 
 		var html = _handlebarsTemplate_crosslink_peptide_block_template(context);
 
@@ -278,16 +331,12 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		
 		var $crosslink_peptide_table_jq = $crosslink_peptide_block_template.find("." + crosslink_peptide_table_jq_ClassName );
 	
-	//			var $crosslink_peptide_table_jq = $crosslink_peptide_data_container.find(".crosslink_peptide_table_jq");
-		
 		if ( $crosslink_peptide_table_jq.length === 0 ) {
 			
 			throw "unable to find HTML element with class '" + crosslink_peptide_table_jq_ClassName + "'";
 		}
 		
 	
-		var percolatorPsmFound = false;
-		
 		
 		
 		//  Add crosslink_peptide data to the page
@@ -297,10 +346,11 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			var crosslink_peptide = crosslink_peptides[ crosslink_peptideIndex ];
 			
 			//  wrap data in an object to allow adding more fields
-			var context = { data : crosslink_peptide, 
-					searchId : ajaxRequestData.search_id, 
-					qvalueSetAnyRows : qvalueSetAnyRows,
-					showNumberUniquePSMs : showNumberUniquePSMs };
+			var context = { 
+					showNumberUniquePSMs : showNumberUniquePSMs,
+					data : crosslink_peptide, 
+					searchId : ajaxRequestData.search_id
+					};
 	
 			var html = _handlebarsTemplate_crosslink_peptide_data_row_entry_template(context);
 	
@@ -322,6 +372,15 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			
 			//  Add next row for child data
 			$( childRowHTML ).appendTo($crosslink_peptide_table_jq);
+			
+			
+			//  If only one record, click on it to show it's children
+			
+			if ( show_children_if_one_row === "true" && crosslink_peptides.length === 1 ) {
+				
+				$crosslink_peptide_entry.click();
+			}
+
 		}
 		
 	};

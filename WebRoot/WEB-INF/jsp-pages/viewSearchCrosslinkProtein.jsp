@@ -59,9 +59,17 @@
 		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js"></script>
 				
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js"></script>
-			
+		
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js"></script>
+
+			
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/viewSearchCrosslinkProteinPage.js"></script>
+
 	
 		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
@@ -71,148 +79,6 @@
 		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/jquery-ui-1.10.2-Themes/ui-lightness/jquery-ui.min.css">
 		--%>
 		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/lorikeet.css">
-
-	<script>
-		$(document).ready(function() 
-		    { 
-
-			
-				   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-					  
-			       	$("#crosslink-table").tablesorter(); // gets exception if there are no data rows
-				   },10);
-		    } 
-		); 
-
-		
-		//  function called after all HTML above main table is generated
-		
-		function createPartsAboveMainTable() {
-
-	 		createImageViewerLink();
-	 		
-	 		createStructureViewerLink();
-	 		
-			
-			   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-					  
-					initNagUser();
-			   },10);
-			   
-			   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-					
-					initDefaultPageView() ;
-			   },10);
-		}	 		
-
-		
-		function imageViewerJSON() {
-			var json = { };
-			
-			json.psmQValueCutoff = <bean:write name="psmQValueCutoff" />;
-			json.peptideQValueCutoff = <bean:write name="peptideQValueCutoff" />;
-			
-			return "#" + encodeURI( JSON.stringify( json ) );
-		}
-		
-		function createImageViewerLink() {
-			var html = "";
-			
-			html += "[<a href='${ contextPath }/";
-			          
-			var defaultURL = $("#viewMergedImageDefaultPageUrl").val();
-			
-			if ( defaultURL === "" ) {
-			          
-				html += "viewMergedImage.do?project_id=<c:out value="${ projectId }"></c:out>" 
-				+ "&searchIds=<bean:write name="search" property="id" />"
-				+ imageViewerJSON() ;
-				
-			} else {
-				
-				html += defaultURL;
-				
-			}
-			html += "'>Image View</a>]";
-			
-			$( "span#image-viewer-link-span" ).empty();
-			$( "span#image-viewer-link-span" ).html (html );
-		}
-
-		function createStructureViewerLink() {
-			
-			var $structure_viewer_link_span = $("#structure-viewer-link-span");
-			
-			if ( $structure_viewer_link_span.length > 0 ) {
-				
-				var html = "";
-				
-				html += "[<a href='${ contextPath }/";
-				  
-				var defaultURL = $("#viewMergedStructureDefaultPageUrl").val();
-				
-				if ( defaultURL === "" ) {
-				
-					html += "viewMergedStructure.do?project_id=<c:out value="${ projectId }"></c:out>" 
-								+ "&searchIds=<bean:write name="search" property="id" />"
-								+ imageViewerJSON() ;
-								
-				} else {
-					
-					html += defaultURL;
-				}
-					
-				html += "'>Structure View</a>]";						
-							
-				$structure_viewer_link_span.empty();
-				$structure_viewer_link_span.html( html );
-			}
-		}
-		
-		function getValuesFromForm() {
-			
-			var psmQValueCutoff = $("#psmQValueCutoff").val();
-			var peptideQValueCutoff = $("#peptideQValueCutoff").val();
-			
-			var filterNonUniquePeptides = $("#filterNonUniquePeptides").is( ':checked' );
-			
-			var filterOnlyOnePSM = $("#filterOnlyOnePSM").is( ':checked' );
-			var filterOnlyOnePeptide = $("#filterOnlyOnePeptide").is( ':checked' );
-
-			
-			var excludeTaxonomy = [];
-
-			var $excludeTaxonomy_jq = $(".excludeTaxonomy_jq");
-			
-			$excludeTaxonomy_jq.each(function () {
-				
-				var $this = $(this);
-				
-			    if ( $this.is( ':checked' ) ) {
-			    	
-			    	var value = $this.val();
-			    	
-			    	excludeTaxonomy.push( value );
-			    }
-			    
-			});
-			
-			
-			var excludeProtein = $("#excludeProtein").val();
-
-			var formValues = {
-					psmQValueCutoff : psmQValueCutoff,
-					peptideQValueCutoff : peptideQValueCutoff,
-					filterNonUniquePeptides : filterNonUniquePeptides,
-					filterOnlyOnePSM : filterOnlyOnePSM,
-					filterOnlyOnePeptide : filterOnlyOnePeptide,
-					excludeTaxonomy : excludeTaxonomy,
-					excludeProtein : excludeProtein
-			};
-			return formValues;
-		}		
-		
-	</script>
 
 
 
@@ -234,41 +100,69 @@
 	
 			<h2 style="margin-bottom:5px;">List search proteins:</h2>
 	
-			<div style="margin-bottom:20px;">
+			<div style="margin-bottom:20px;"> 
 				
-				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" href="${ contextPath }/<proxl:defaultPageUrl pageName="viewSearchPeptide.do" searchId="${ search.id }">viewSearchPeptide.do?project_id=<c:out value="${projectId}" />&searchId=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
+				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" 
+					href="${ contextPath }/<proxl:defaultPageUrl pageName="peptide.do" searchId="${ search.id }"
+						>peptide.do?searchId=<bean:write name="search" property="id" 
+						/>&queryJSON=<c:out value="${ peptidePageQueryJSON }" escapeXml="false" 
+						></c:out></proxl:defaultPageUrl>"
 						>Peptide View</a>]
-				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" href="${ contextPath }/<proxl:defaultPageUrl pageName="viewProteinCoverageReport.do" searchId="${ search.id }">viewProteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+						 
+				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
+					href="${ contextPath }/<proxl:defaultPageUrl pageName="proteinCoverageReport.do" searchId="${ search.id }">proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 						>Coverage Report</a>]
-				<span class="tool_tip_attached_jq" data-tooltip="Graphical view of links between proteins" id="image-viewer-link-span"></span>
+						
+						
+				<%-- Navigation links to Merged Image and Merged Structure --%>
 				
-				<input type="hidden" id="viewMergedImageDefaultPageUrl" 
-					value="<proxl:defaultPageUrl pageName="viewMergedImage.do" searchId="${ search.id }"></proxl:defaultPageUrl>">
-	
+				<%@ include file="/WEB-INF/jsp-includes/imageAndStructureNavLinks.jsp" %>
 
-				<c:choose>
-				 <c:when test="${ showStructureLink }">
-					
-					<span class="tool_tip_attached_jq" data-tooltip="View data on 3D structures" id="structure-viewer-link-span"></span>
-									
-					<input type="hidden" id="viewMergedStructureDefaultPageUrl" 
-						value="<proxl:defaultPageUrl pageName="viewMergedStructure.do" searchId="${ search.id }"></proxl:defaultPageUrl>">
-	
-				 </c:when>
-				 <c:otherwise>
-				 	
-					<%@ include file="/WEB-INF/jsp-includes/structure_link_non_link.jsp" %>
-				 </c:otherwise>
-				</c:choose>
 						
 		
 			</div>
+			
+			<%-- query JSON in field outside of form for input to Javascript --%>
+				
+			<input type="hidden" id="query_json_field_outside_form" value="<c:out value="${ queryJSONToForm }" ></c:out>" > 
 	
+			<%--  A block outside any form for PSM Peptide cutoff JS code --%>
+			<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_outsideAnyForm.jsp" %>
+
+	
+			<html:form action="crosslinkProtein" method="get" styleId="form_get_for_updated_parameters">
+				
+				<html:hidden property="searchId"/>
+				
+				<html:hidden property="queryJSON" styleId="query_json_field" />
+
+				<%--  A block in the submitted form for Protein Common JS code --%>
+				<%@ include file="/WEB-INF/jsp-includes/proteinPageCommonSubmittedForm.jsp" %>
+			
+				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
+				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
+
+
+
+			</html:form>
+			
+						
+			<%-- WAS		
+			
+			
 			<html:form action="viewSearchCrosslinkProtein" method="get" styleId="form_get_for_updated_parameters">
 			
 				<html:hidden property="project_id"/>
 				
 				<html:hidden property="searchId"/>
+			
+			
+			--%>
+			
+			
+			<form action="javascript:viewSearchCrosslinkProteinPageCode.updatePageForFormParams()" method="get" > <%-- id="form_get_for_updated_parameters" --%>
+			
+			
 			
 			<table style="border-width:0px;">
 				<tr>
@@ -283,7 +177,17 @@
 
 					</td>
 				</tr>
-
+				
+				<%-- Spacer --%>  
+				<tr>
+					<td style="height: 6px;"></td>
+				</tr>
+				
+				<%--  The section at the top of the page with the cutoffs, in the user input section --%>
+				
+				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inDataEntryForm.jsp" %>
+				
+<%--				
 				<tr>
 					<td>PSM <span style="white-space: nowrap">Q-value</span> cutoff:</td>
 					<td><html:text property="psmQValueCutoff" styleId="psmQValueCutoff" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" ></html:text></td>
@@ -293,44 +197,45 @@
 					<td>Peptide <span style="white-space: nowrap">Q-value</span> cutoff:</td>
 					<td><html:text property="peptideQValueCutoff" styleId="peptideQValueCutoff" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" ></html:text></td>
 				</tr>
+--%>  
+
 
 				<tr>
 					<td>Exclude xlinks with:</td>
 					<td>
 						 <label><span style="white-space:nowrap;" >
-							<html:checkbox property="filterNonUniquePeptides" styleId="filterNonUniquePeptides" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" ></html:checkbox>					
+							<input type="checkbox" id="filterNonUniquePeptides" > <%-- onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" --%> 					
 						 	 no unique peptides
 						 </span></label>
 						 <label><span style="white-space:nowrap;" >
-							<html:checkbox property="filterOnlyOnePSM" styleId="filterOnlyOnePSM" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" ></html:checkbox>					
+							<input type="checkbox" id="filterOnlyOnePSM" > <%--  onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" --%> 					
 						 	 only one PSM
 						 </span></label>
 						 <label><span style="white-space:nowrap;" >
-							<html:checkbox property="filterOnlyOnePeptide" styleId="filterOnlyOnePeptide" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" ></html:checkbox>					
+							<input type="checkbox" id="filterOnlyOnePeptide" > <%--  onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" --%> 					
 						 	 only one peptide
 						 </span></label>
 					</td>
 				</tr>
-								
-<%-- 						 
-				<tr>
-					<td>Filter out xlinks with no unique peptides:</td>
-					<td>
-						<html:checkbox property="filterNonUniquePeptides" styleId="filterNonUniquePeptides" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" ></html:checkbox>					
-					</td>
-				</tr>
---%>					
 
 				<tr>
 					<td>Exclude organisms:</td>
 					<td>
 						<logic:iterate id="taxonomy" name="taxonomies">
+						
+<%-- 						
 						 <label style="white-space: nowrap" >
 						  <html:multibox property="excludeTaxonomy" styleClass="excludeTaxonomy_jq" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" >
 						   <bean:write name="taxonomy" property="key"/> 
 						  </html:multibox> 
 						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
 						 </label> 
+--%>						 
+						 <label style="white-space: nowrap" >
+						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq "> <%-- onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" --%>  
+						  
+						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
+						 </label> 						 
 						</logic:iterate>				
 					</td>
 				</tr>
@@ -339,9 +244,23 @@
 					<td>Exclude protein(s):</td>
 					<td>
 						<%--  shortened property from "excludeProtein" to "excP" to shorten the URL  --%>
+						<%-- TODO   TEMP
 						<html:select property="excP" multiple="true" styleId="excludeProtein" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" >
 							<html:options collection="proteins" property="nrProtein.nrseqId" labelProperty="name" />
-						</html:select>			
+						</html:select>
+						--%>
+						
+						
+						<%--  New version: 
+						
+						All <option> values must be parsable as integers:
+						--%>
+						<select name="excludedProteins" multiple="multiple" id="excludeProtein"> <!-- onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" -->  
+						  
+	  						<logic:iterate id="protein" name="proteins">
+	  						  <option value="<c:out value="${ protein.nrProtein.nrseqId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
+	  						</logic:iterate>
+	  					</select>
 					</td>
 				</tr>
 				
@@ -358,13 +277,18 @@
 				</tr>
 			
 			</table>
-			</html:form>
+			
+			
+			</form>
+
 	
 			<h3 style="display:inline;">Crosslinks (<bean:write name="numCrosslinks" />):</h3>
 			<div style="display:inline;">
-
-				[<a class="tool_tip_attached_jq" data-tooltip="View looplinks (instead of crosslinks)" href="${ contextPath }/<proxl:defaultPageUrl pageName="viewSearchLooplinkProtein.do" searchId="${ search.id }">viewSearchLooplinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+				[<a class="tool_tip_attached_jq" data-tooltip="View looplinks (instead of crosslinks)" href="${ contextPath }/<proxl:defaultPageUrl pageName="looplinkProtein.do" searchId="${ search.id }">looplinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 						>View Looplinks (<bean:write name="numLooplinks" />)</a>]
+
+				<span style="color: red;font-size: 18pt;">Links to Downloads Under Construction and will not work</span>
+
 				[<a class="tool_tip_attached_jq" data-tooltip="Download all crosslinks as tab-delimited text" href="${ contextPath }/downloadMergedProteins.do?<bean:write name="mergedQueryString" />">Download Data (<bean:write name="numLinks" />)</a>]
 				[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="mergedQueryString" />">Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
 			</div>
@@ -373,13 +297,13 @@
 			<%--  Create via javascript the parts that will be above the main table --%>
 			<script type="text/javascript">
 			
-				createPartsAboveMainTable();
+				viewSearchCrosslinkProteinPageCode.createPartsAboveMainTable();
 				
 			</script>
 			
 
 			
-				<table style="" id="crosslink-table" class="tablesorter top_data_table_jq ">
+				<table style="" id="main_page_data_table" class="tablesorter top_data_table_jq ">
 				
 					<thead>
 					<tr>
@@ -391,11 +315,29 @@
 						<th data-tooltip="Number of distinct pairs of peptides showing link" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Peptides</th>
 						<th data-tooltip="Number of found peptide pairs that uniquely map to these two proteins from the FASTA file" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Unique Peptides</th>
 						
-						<c:if test="${ showTopLevelBestPeptideQValue }">
-							<th data-tooltip="Best peptide-level q-value for peptides found showing this link" class="tool_tip_attached_jq" style="width:10%;font-weight:bold;">Best&nbsp;Peptide <span style="white-space: nowrap">Q-value</span></th>
-						</c:if>
-						
-						<th data-tooltip="Best PSM-level q-value for PSMs matched to peptides that show this link" class="tool_tip_attached_jq" style="width:10%;font-weight:bold;">Best&nbsp;PSM <span style="white-space: nowrap">Q-value</span></th>
+
+						<c:forEach var="peptideAnnotationDisplayNameDescription" items="${ peptideAnnotationDisplayNameDescriptionList }">
+
+								<%--  Consider displaying the description somewhere   peptideAnnotationDisplayNameDescription.description --%>
+							<th data-tooltip="Best Peptide-level <c:out value="${ peptideAnnotationDisplayNameDescription.displayName }"></c:out> for this peptide (or linked pair)" 
+									class="tool_tip_attached_jq" 
+									style="width:10%;font-weight:bold;">
+								<span style="white-space: nowrap">Best Peptide</span>
+								<span style="white-space: nowrap"><c:out value="${ peptideAnnotationDisplayNameDescription.displayName }"></c:out></span>
+							</th>
+							
+						</c:forEach>
+										
+
+						<c:forEach var="psmAnnotationDisplayNameDescription" items="${ psmAnnotationDisplayNameDescriptionList }">
+
+								<%--  Consider displaying the description somewhere   psmAnnotationDisplayNameDescription.description --%>
+						  <th data-tooltip="Best PSM-level <c:out value="${ psmAnnotationDisplayNameDescription.displayName }"></c:out> for PSMs matched to peptides that show this link" class="tool_tip_attached_jq" style="width:10%;font-weight:bold;"
+							><span style="white-space: nowrap">Best PSM</span> 
+								<span style="white-space: nowrap"><c:out value="${ psmAnnotationDisplayNameDescription.displayName }"></c:out></span></th>
+
+						</c:forEach>
+							
 					</tr>
 					</thead>
 						
@@ -406,8 +348,6 @@
 								onclick="viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.showHideCrosslinkReportedPeptides( { clickedElement : this })"
 								search_id="${ search.id }"
 								project_id="${ projectId }"
-								peptide_q_value_cutoff="${ peptideQValueCutoff }"
-								psm_q_value_cutoff="${ psmQValueCutoff }"
 								protein_1_id="<bean:write name="crosslink" property="protein1.nrProtein.nrseqId" />"
 								protein_2_id="<bean:write name="crosslink" property="protein2.nrProtein.nrseqId" />"
 								protein_1_position="<bean:write name="crosslink" property="protein1Position" />"
@@ -437,28 +377,31 @@
 								
 								<td class="integer-number-column"><bean:write name="crosslink" property="numUniqueLinkedPeptides" /></td>
 								
-								<c:if test="${ showTopLevelBestPeptideQValue }">
-									<td style="white-space: nowrap"><bean:write name="crosslink" property="bestPeptideQValue" /></td>
-								</c:if>
+						
+
+								<c:forEach var="annotationValue" items="${ crosslink.peptideAnnotationValueList }">
+			
+									<td style="white-space: nowrap"><c:out  value="${ annotationValue }" /></td>
+								</c:forEach>	
+
+								<c:forEach var="annotationValue" items="${ crosslink.psmAnnotationValueList }">
+			
+									<td><c:out  value="${ annotationValue }" /></td>
+								</c:forEach>															
 								
-								<td style="white-space: nowrap"><bean:write name="crosslink" property="bestPSMQValue" /></td>
 							</tr>
 							
 							<tr class="expand-child" style="display:none;">
 							
-
-								<%--  Adjust colspan for number of columns in current table --%>
-								
-								
-								<%--  Init to zero --%>
-								<c:set var="colspanPeptidesAdded" value="${ 0 }" />
-								
-								<%--   Now add 1 for each column being displayed --%>
-								<c:if test="${ showTopLevelBestPeptideQValue }">
-									<c:set var="colspanPeptidesAdded" value="${ colspanPeptidesAdded + 1 }" />
-								</c:if>
-												
-								<td colspan="${ 8 + colspanPeptidesAdded }" align="center" class=" child_data_container_jq ">
+	
+									<%--  Adjust colspan for number of columns in current table --%>
+									
+								<%--  Add to value for length of Peptide and PSM value lists --%>
+								<c:set var="columnsAddedForAnnotationData" 
+									value="${ fn:length( crosslink.peptideAnnotationValueList ) + fn:length( crosslink.psmAnnotationValueList ) }" />
+																								
+															
+								<td colspan="${ 8 + columnsAddedForAnnotationData }" align="center" class=" child_data_container_jq ">
 								
 									<div style="color: green; font-size: 16px; padding-top: 10px; padding-bottom: 10px;" >
 										Loading...

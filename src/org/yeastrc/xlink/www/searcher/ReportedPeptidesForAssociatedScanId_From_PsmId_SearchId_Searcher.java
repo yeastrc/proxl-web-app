@@ -12,8 +12,12 @@ import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.enum_classes.FilterDirectionType;
+import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.XLinkUtils;
-import org.yeastrc.xlink.www.constants.DefaultQValueCutoffConstants;
 import org.yeastrc.xlink.www.objects.SearchPeptideCrosslink;
 import org.yeastrc.xlink.www.objects.SearchPeptideDimer;
 import org.yeastrc.xlink.www.objects.SearchPeptideLooplink;
@@ -35,43 +39,49 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 	
 
 	
-	private static final String SQL = 
+	private static final String SQL_FIRST_PART = 
 		
 
-			"SELECT unified_rep_pep__reported_peptide__search_lookup.reported_peptide_id, "
+//			"SELECT unified_rep_pep__reported_peptide__search_lookup.reported_peptide_id, "
+//			
+//			+ " unified_rep_pep__reported_peptide__search_lookup.peptide_q_value_for_search, "
+//			
+//			+ " unified_rep_pep__reported_peptide__search_lookup.best_psm_q_value,"
+//			+ " unified_rep_pep__reported_peptide__search_lookup.link_type, "
+//			+ " unified_rep_pep__reported_peptide__search_lookup.psm_num_at_pt_01_q_cutoff "
 			
-			+ " unified_rep_pep__reported_peptide__search_lookup.peptide_q_value_for_search, "
+
+
+			"SELECT unified_rp__rep_pept__search__generic_lookup.reported_peptide_id, "
 			
-			+ " unified_rep_pep__reported_peptide__search_lookup.best_psm_q_value,"
-			+ " unified_rep_pep__reported_peptide__search_lookup.link_type, "
-			+ " unified_rep_pep__reported_peptide__search_lookup.psm_num_at_pt_01_q_cutoff "
+			+ " unified_rp__rep_pept__search__generic_lookup.link_type, "
+			+ " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff "
 			
 			+ " FROM "
 			
-	
-			+ 	"proxl.psm  "
-			+ 	"INNER JOIN psm AS psm_other ON psm.scan_id = psm_other.scan_id "
-			+ 	"INNER JOIN unified_rep_pep__reported_peptide__search_lookup  "
-			+ 		"ON psm_other.search_id = unified_rep_pep__reported_peptide__search_lookup.search_id " 
-			+ 			"AND psm_other.reported_peptide_id = unified_rep_pep__reported_peptide__search_lookup.reported_peptide_id "
+			+ 	"psm  "
+			+ 	"INNER JOIN unified_rp__rep_pept__search__generic_lookup  "
+			+ 		"ON psm.search_id = unified_rp__rep_pept__search__generic_lookup.search_id " 
+			+ 			"AND psm.reported_peptide_id = unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
 		
-			+ 	"WHERE psm.id = ? AND psm.search_id = ? AND psm.q_value <= ? "
-			+ 	"AND psm_other.search_id = ? AND psm_other.q_value <= ? "
-			+ 	"AND unified_rep_pep__reported_peptide__search_lookup.peptide_q_value_for_search <= ? ";
+	private static final String SQL_MAIN_WHERE_START =
+	
+			" WHERE psm.scan_id = ? AND psm.search_id = ? ";
 		
 
+	private static final String SQL_LAST_PART = " ORDER BY psm.id";
 			
 			
 	
 	/**
 	 * @param psmId
+	 * @param scanId
 	 * @param searchId
-	 * @param peptideQValueCutoff
-	 * @param psmQValueCutoff
+	 * @param searcherCutoffValuesSearchLevel
 	 * @return
 	 * @throws Exception
 	 */
-	public List<WebReportedPeptideWebserviceWrapper> reportedPeptideRecordsForAssociatedScanId( int psmId, int searchId, double peptideQValueCutoff, double psmQValueCutoff ) throws Exception {
+	public List<WebReportedPeptideWebserviceWrapper> reportedPeptideRecordsForAssociatedScanId( int psmId, int scanId, int searchId, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
 		
 		
 		List<WebReportedPeptideWebserviceWrapper> results = new ArrayList<>();
@@ -92,11 +102,298 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 			
 		}
 		
+		
+
+		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
+				searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
+		
+		List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesList = 
+				searcherCutoffValuesSearchLevel.getPsmPerAnnotationCutoffsList();
+
+
+		////////////
+		
+		//  All cutoffs are default?
+		
+//		boolean onlyDefaultPeptideCutoffs = true;
+		
+		boolean onlyDefaultPsmCutoffs = true;
+		
+		
+		
+		//   Check if all Peptide Cutoffs are default values
+		
+//		for ( SearcherCutoffValuesAnnotationLevel item : peptideCutoffValuesList ) {
+//			
+//			if ( ! item.annotationValueMatchesDefault() ) {
+//				
+//				onlyDefaultPeptideCutoffs = false;
+//				break;
+//			}
+//		}
+
+		//   Check if all Psm Cutoffs are default values
+		
+		for ( SearcherCutoffValuesAnnotationLevel item : psmCutoffValuesList ) {
+			
+			if ( ! item.annotationValueMatchesDefault() ) {
+				
+				onlyDefaultPsmCutoffs = false;
+				break;
+			}
+		}
+		
+		
+		//////////////////////////////////
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		String sql = SQL;
+		
+		
+
+		//////////////////////
+		
+		/////   Start building the SQL
+		
+		
+
+		
+		StringBuilder sqlSB = new StringBuilder( 1000 );
+		
+		
+		
+		
+
+		sqlSB.append( SQL_FIRST_PART );
+		
+
+		{
+			
+			if ( ! onlyDefaultPsmCutoffs ) {
+				
+				
+				//  Non-Default PSM cutoffs so have to query on the cutoffs
+
+
+				//  Add inner join for each PSM cutoff
+
+				for ( int counter = 1; counter <= psmCutoffValuesList.size(); counter++ ) {
+
+					sqlSB.append( " INNER JOIN " );
+
+					sqlSB.append( " unified_rp__rep_pept__search__best_psm_value_generic_lookup AS psm_fltrbl_tbl_" );
+					sqlSB.append( Integer.toString( counter ) );
+
+					sqlSB.append( " ON "  );
+
+					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.search_id = "  );
+
+					sqlSB.append( "psm_fltrbl_tbl_" );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( ".search_id" );
+
+					sqlSB.append( " AND " );
+
+
+					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.reported_peptide_id = "  );
+
+					sqlSB.append( "psm_fltrbl_tbl_" );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( ".reported_peptide_id" );
+				}
+			}
+		}
+		
+		
+		
+
+		{
+			
+			//  Add inner join for each Peptide cutoff
+			
+			for ( int counter = 1; counter <= peptideCutoffValuesList.size(); counter++ ) {
+				
+				sqlSB.append( " INNER JOIN " );
+				
+				sqlSB.append( " srch__rep_pept__annotation AS srch__rep_pept_fltrbl_tbl_" );
+				sqlSB.append( Integer.toString( counter ) );
+
+				sqlSB.append( " ON "  );
+
+				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.search_id = "  );
+
+				sqlSB.append( "srch__rep_pept_fltrbl_tbl_" );
+				sqlSB.append( Integer.toString( counter ) );
+				sqlSB.append( ".search_id" );
+
+				sqlSB.append( " AND " );
+
+
+				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.reported_peptide_id = "  );
+
+				sqlSB.append( "srch__rep_pept_fltrbl_tbl_" );
+				sqlSB.append( Integer.toString( counter ) );
+				sqlSB.append( ".reported_peptide_id" );
+
+			}
+		}
+
+		
+
+		
+		//////////
+		
+		sqlSB.append( SQL_MAIN_WHERE_START );
+		
+		//////////
+		
+		
+
+		// Process PSM Cutoffs for WHERE
+
+		{
+
+			
+			if ( onlyDefaultPsmCutoffs ) {
+				
+				//   Only Default PSM Cutoffs chosen so criteria simply the Peptides where the PSM count for the default cutoffs is > zero
+				
+
+				sqlSB.append( " AND " );
+
+
+				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff > 0 " );
+
+				
+			} else {
+
+				
+				//  Non-Default PSM cutoffs so have to query on the cutoffs
+
+				int counter = 0; 
+
+				for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesPsmAnnotationLevel : psmCutoffValuesList ) {
+
+
+					AnnotationTypeDTO srchPgmFilterablePsmAnnotationTypeDTO = searcherCutoffValuesPsmAnnotationLevel.getAnnotationTypeDTO();
+
+					counter++;
+
+					sqlSB.append( " AND " );
+
+					sqlSB.append( " ( " );
+
+
+					sqlSB.append( "psm_fltrbl_tbl_" );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( ".search_id = ? AND " );
+
+					sqlSB.append( "psm_fltrbl_tbl_" );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( ".annotation_type_id = ? AND " );
+
+					sqlSB.append( "psm_fltrbl_tbl_" );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( ".best_psm_value_for_ann_type_id " );
+
+					if ( srchPgmFilterablePsmAnnotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
+						
+						String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + srchPgmFilterablePsmAnnotationTypeDTO.getId();
+						log.error( msg );
+						throw new Exception(msg);
+					}
+						
+					if ( srchPgmFilterablePsmAnnotationTypeDTO.getAnnotationTypeFilterableDTO().getFilterDirectionType() == FilterDirectionType.ABOVE ) {
+
+						sqlSB.append( SearcherGeneralConstants.SQL_END_BIGGER_VALUE_BETTER );
+
+					} else {
+
+						sqlSB.append( SearcherGeneralConstants.SQL_END_SMALLER_VALUE_BETTER );
+
+					}
+
+					sqlSB.append( " ? " );
+
+					sqlSB.append( " ) " );
+				}
+			}
+		}
+		
+		//  Process Peptide Cutoffs for WHERE
+
+		{
+			int counter = 0; 
+			
+			for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesReportedPeptideAnnotationLevel : peptideCutoffValuesList ) {
+
+				AnnotationTypeDTO srchPgmFilterableReportedPeptideAnnotationTypeDTO = searcherCutoffValuesReportedPeptideAnnotationLevel.getAnnotationTypeDTO();
+				
+				counter++;
+
+				sqlSB.append( " AND " );
+				
+				sqlSB.append( " ( " );
+
+
+				sqlSB.append( "srch__rep_pept_fltrbl_tbl_" );
+				sqlSB.append( Integer.toString( counter ) );
+				sqlSB.append( ".search_id = ? AND " );
+
+				sqlSB.append( "srch__rep_pept_fltrbl_tbl_" );
+				sqlSB.append( Integer.toString( counter ) );
+				sqlSB.append( ".annotation_type_id = ? AND " );
+
+				sqlSB.append( "srch__rep_pept_fltrbl_tbl_" );
+				sqlSB.append( Integer.toString( counter ) );
+				sqlSB.append( ".value_double " );
+
+				if ( srchPgmFilterableReportedPeptideAnnotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
+					
+					String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + srchPgmFilterableReportedPeptideAnnotationTypeDTO.getId();
+					log.error( msg );
+					throw new Exception(msg);
+				}
+					
+				if ( srchPgmFilterableReportedPeptideAnnotationTypeDTO.getAnnotationTypeFilterableDTO().getFilterDirectionType() == FilterDirectionType.ABOVE ) {
+
+					sqlSB.append( SearcherGeneralConstants.SQL_END_BIGGER_VALUE_BETTER );
+
+				} else {
+
+					sqlSB.append( SearcherGeneralConstants.SQL_END_SMALLER_VALUE_BETTER );
+
+				}
+
+				sqlSB.append( "? " );
+
+				sqlSB.append( " ) " );
+			}
+		}
+		
+		
+		
+		sqlSB.append( SQL_LAST_PART );
+		
+		
+		
+
+		
+		String sql = sqlSB.toString();
+		
 		
 		
 		
@@ -106,28 +403,67 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 
 			pstmt = conn.prepareStatement( sql );
 			
-			int counter = 0;
+			int paramCounter = 0;
 			
-			counter++;
-			pstmt.setInt( counter, psmId );
-
-			counter++;
-			pstmt.setInt( counter, searchId );
-
-			counter++;
-			pstmt.setDouble( counter, psmQValueCutoff );
+			paramCounter++;
+			pstmt.setInt( paramCounter, scanId );
 			
-			counter++;
-			pstmt.setInt( counter, searchId );
-			
-			counter++;
-			pstmt.setDouble( counter, psmQValueCutoff );
+			paramCounter++;
+			pstmt.setInt( paramCounter, searchId );
 			
 
-			counter++;
-			pstmt.setDouble( counter, peptideQValueCutoff );
+
+
+			// Process PSM Cutoffs for WHERE
+
+
+			{
+				
+				if ( ! onlyDefaultPsmCutoffs ) {
+					
+					//  PSM Cutoffs are not the default 
+					
+
+					for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesPsmAnnotationLevel : psmCutoffValuesList ) {
+
+						AnnotationTypeDTO srchPgmFilterablePsmAnnotationTypeDTO = searcherCutoffValuesPsmAnnotationLevel.getAnnotationTypeDTO();
+
+						paramCounter++;
+						pstmt.setInt( paramCounter, searchId );
+
+						paramCounter++;
+						pstmt.setInt( paramCounter, srchPgmFilterablePsmAnnotationTypeDTO.getId() );
+
+						paramCounter++;
+						pstmt.setDouble( paramCounter, searcherCutoffValuesPsmAnnotationLevel.getAnnotationCutoffValue() );
+					}
+				}
+			}
 			
+
+
+
+			// Process Peptide Cutoffs for WHERE
+
+
+			{
+
+				for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesReportedPeptideAnnotationLevel : peptideCutoffValuesList ) {
+
+					AnnotationTypeDTO srchPgmFilterableReportedPeptideAnnotationTypeDTO = searcherCutoffValuesReportedPeptideAnnotationLevel.getAnnotationTypeDTO();
+					
+					paramCounter++;
+					pstmt.setInt( paramCounter, searchId );
+
+					paramCounter++;
+					pstmt.setInt( paramCounter, srchPgmFilterableReportedPeptideAnnotationTypeDTO.getId() );
+
+					paramCounter++;
+					pstmt.setDouble( paramCounter, searcherCutoffValuesReportedPeptideAnnotationLevel.getAnnotationCutoffValue() );
+				}
+			}
 			
+		
 			rs = pstmt.executeQuery();
 			
 			while( rs.next() ) {
@@ -135,8 +471,7 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 
 				WebReportedPeptide item = new WebReportedPeptide();
 				
-				item.setPeptideQValueCutoff( peptideQValueCutoff );
-				item.setPsmQValueCutoff( psmQValueCutoff );
+				item.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 				
 
 				String linkType = rs.getString( "link_type" );
@@ -147,23 +482,31 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 				item.setSearchId( searchId );
 				item.setReportedPeptideId( reportedPeptideId );
 				
+				item.setSearch( search );
+
+				
 				ReportedPeptideDTO reportedPeptideDTO = 
 						ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( reportedPeptideId );
 
 				
-				item.setqValue( rs.getDouble( "peptide_q_value_for_search" ) );
-				if ( rs.wasNull() ) {
-					item.setqValue( null );
-				}
-
-				item.setBestPsmQValue( rs.getDouble( "best_psm_q_value" ) );
-
-				int numPsmsForpt01Cutoff = rs.getInt( "psm_num_at_pt_01_q_cutoff" );
+//				item.setqValue( rs.getDouble( "peptide_q_value_for_search" ) );
+//				if ( rs.wasNull() ) {
+//					item.setqValue( null );
+//				}
+//
+//				item.setBestPsmQValue( rs.getDouble( "best_psm_q_value" ) );
 				
-				if ( DefaultQValueCutoffConstants.PSM_Q_VALUE_CUTOFF_DEFAULT == psmQValueCutoff ) {
+				
+
+				if ( onlyDefaultPsmCutoffs ) {
 					
-					item.setNumPsms( numPsmsForpt01Cutoff ); // code is needed in WebMergedReportedPeptide for when psmCutoff is not default
+					int numPsmsForDefaultCutoffs = rs.getInt( "psm_num_at_default_cutoff" );
+					if ( ! rs.wasNull() ) {
+					
+						item.setNumPsms( numPsmsForDefaultCutoffs );
+					}
 				}
+				
 				
 
 				if ( XLinkUtils.CROSS_TYPE_STRING.equals(linkType) ) {

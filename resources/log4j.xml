@@ -167,17 +167,12 @@
                 <appender-ref ref="ROLL_ERROR" />
         </logger>
 
-        <logger name="org.yeastrc.xlink.www.actions.ViewSearchCrosslinkProteinsAction" additivity="false">
+        <logger name="org.yeastrc.xlink.www.actions.ViewSearchProteinsAction" additivity="false">
                 <level value="debug"/>
                 <appender-ref ref="ROLL" />
                 <appender-ref ref="ROLL_ERROR" />
         </logger>
 
-        <logger name="org.yeastrc.xlink.www.actions.ViewSearchLooplinkProteinsAction" additivity="false">
-                <level value="debug"/>
-                <appender-ref ref="ROLL" />
-                <appender-ref ref="ROLL_ERROR" />
-        </logger>
 
         <logger name="org.yeastrc.xlink.www.actions.ViewMergedSearchPeptidesAction" additivity="false">
                 <level value="debug"/>
@@ -185,7 +180,7 @@
                 <appender-ref ref="ROLL_ERROR" />
         </logger>
 
-        <logger name="org.yeastrc.xlink.www.actions.ViewMergedSearchCrosslinkProteinsAction" additivity="false">
+        <logger name="org.yeastrc.xlink.www.actions.ViewMergedSearchProteinsAction" additivity="false">
                 <level value="debug"/>
                 <appender-ref ref="ROLL" />
                 <appender-ref ref="ROLL_ERROR" />
