@@ -8,6 +8,8 @@
 
 var _searchIds = {};
 
+// object to handle all link color determination duties
+var _linkColorHandler = new LinkColorHandler();
 
 //Loaded data:
 
@@ -46,25 +48,6 @@ var _filterOnlyOnePSM;
 var _filterOnlyOnePeptide;
 
 var _distanceReportData = { };
-
-//colors to use for search-based coloring, based on 
-//RYB subractive color model
-
-var _SEARCH_COLORS = {
-					1:		"#FF0000",			// red, for items belonging only to first search
-					2:		"#0000FF",			// blue, for items belonging only to second search
-					3:		"#dcd900",			// mustard yellow, for items belonging only to third search
-					12:		"#8a51ff",			// purple, for items belonging to first and second search
-					13:		"#FF6600",			// orange, for items belonging to first and third search
-					23:		"#006600",			// green, for items belonging to second and third search
-					123:	"#000000",			// black, for items belonging to all three searches
-};
-
-var _SEARCH_COLORS_TWO_SEARCHES = {
-					1:		"#FF0000",
-					2:		"#0000FF",
-					12:		"#00FF00",
-};
 
 
 //get values for variables from the hash part of the URL as JSON
@@ -322,6 +305,14 @@ function updateURLHash( useSearchForm) {
 	if( isDistanceReportVisible() ) {
 		items[ 'distance-report-visible' ] = true;
 	}
+	
+	// include user-defined distance constraints for coloring
+	var userDistanceConstraints = _linkColorHandler.getUserDistanceConstraints();
+	if( userDistanceConstraints ) {
+		items[ 'udcs' ] = userDistanceConstraints.shortDistance;
+		items[ 'udcl' ] = userDistanceConstraints.longDistance;
+	}
+	
 	
 	window.location.hash = encodeURI( JSON.stringify( items ) );
 }
@@ -823,65 +814,6 @@ function findSearchesForCrosslink( protein1, protein2, position1, position2 ) {
 	return _proteinLinkPositions[ protein1 ][ protein2 ][ position1 ][ position2 ];
 }
 
-/**
- * Return the color to use based on the searches a link is in
- * @param searchList
- * @returns
- */
-function getColorForSearches( searchList, opacity, forLegend ) {
-	
-	if( !opacity ) { opacity = 0.9; }
-	
-	var colorIndex = "";
-	
-	for ( var i = 0; i < _searches.length; i++ ) {
-		for ( var k = 0; k < searchList.length; k++ ) {
-			if ( _searches[i]['id'] === searchList[ k ] ) {
-				colorIndex += ( i + 1 );
-				break;
-			}
-		}
-	}
-
-	
-	if ( _searches.length === 2 ) {
-		
-		if( !forLegend ) {
-			var rgb = hexToRgb( _SEARCH_COLORS_TWO_SEARCHES[ colorIndex ] );
-			
-			if( !rgb ) { console.log( "Got no rgb!" ); }
-			return [ rgb.r / 255, rgb.g / 255, rgb.b / 255, opacity ];
-		}
-		
-		return _SEARCH_COLORS_TWO_SEARCHES[ colorIndex ];
-	}
-
-	if( !forLegend ) {
-		var rgb = hexToRgb( _SEARCH_COLORS[ colorIndex ] );
-		
-		if( !rgb ) { console.log( "Got no rgb!" ); }
-		return [ rgb.r / 255, rgb.g / 255, rgb.b / 255, opacity ];
-	}
-	
-	return _SEARCH_COLORS[ colorIndex ];
-}
-
-
-function hexToRgb(hex) {
-    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-        return r + r + g + g + b + b;
-    });
-
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
-
 function populateNavigation() {
 	
 	var queryString = "?";
@@ -934,13 +866,9 @@ function populateNavigation() {
 	var html = "";
 
 	if ( _searches.length > 1 ) {
-		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
-		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
-		
-		html += ' <span style="color:red; font-size: 24px;">Merged Coverage Report under construction </span> ';
-		
-//		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
-		
+		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/viewMergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
+		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/viewMergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
+		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/viewMergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
 	} else {
 		
 
@@ -953,7 +881,7 @@ function populateNavigation() {
 		
 		if ( viewSearchPeptideDefaultPageUrl === undefined || viewSearchPeptideDefaultPageUrl === "" ) {
 			      
-			html += "peptide.do" + queryString;
+			html += "viewSearchPeptide.do" + queryString;
 
 		} else {
 			
@@ -971,7 +899,7 @@ function populateNavigation() {
 		
 		if ( viewSearchCrosslinkProteinDefaultPageUrl === undefined || viewSearchCrosslinkProteinDefaultPageUrl === "" ) {
 			      
-			html += "crosslinkProtein.do" + queryString;
+			html += "viewSearchCrosslinkProtein.do" + queryString;
 
 		} else {
 			
@@ -989,7 +917,7 @@ function populateNavigation() {
 		
 		if ( viewProteinCoverageReportDefaultPageUrl === undefined || viewProteinCoverageReportDefaultPageUrl === "" ) {
 			      
-			html += "proteinCoverageReport.do" + queryString;
+			html += "viewProteinCoverageReport.do" + queryString;
 
 		} else {
 			
@@ -1046,7 +974,7 @@ function populateNavigation() {
 		
 
 		
-		html += "image.do" + imageQueryString + "#" + imageJSONString ;
+		html += "viewMergedImage.do" + imageQueryString + "#" + imageJSONString ;
 
 	} else {
 		
@@ -1177,6 +1105,10 @@ var populatePDBFormArea = function() {
 	
 	if( 'link-color-mode' in json ) {
 		$( "#select-link-color-mode" ).val( json[ 'link-color-mode' ] );
+	}
+		
+	if( 'udcs' in json && 'udcl' in json ) {		
+		_linkColorHandler.setUserDistanceConstraints(parseInt( json.udcs), parseInt( json.udcl ) );		
 	}
 	
 	drawLegend();
@@ -1551,6 +1483,8 @@ var getAlignmentByChainAndProtein = function ( chainId, proteinId ) {
  */
 var downloadChimeraScript = function() {
 	
+	console.log( "downloadChimeraScript called." );
+	
 	var scriptText = "";
 		
 	// do monolinks
@@ -1784,6 +1718,201 @@ var downloadPymolScript = function() {
 	downloadStringAsFile( "pymol-script-" + getSelectedPDBFile().filename + ".txt", "text/plain", scriptText );
 };
 
+var getLinkerStringsAsArray = function() {
+	var linkers = [ ];
+	
+	for( var i = 0; i < _searches.length; i++ ) {
+		for( var j = 0; j < _searches[ i ][ 'linkers' ].length; j++ ) {			
+			linkers.push( _searches[ i ][ 'linkers' ][ j ][ 'abbr' ] );
+		}
+	}
+	
+	return linkers
+};
+
+/**
+ * Sends the request out for a lookup
+ */
+var doLinkablePositionsLookup = function( proteins, onlyShortest ) {
+		
+	incrementSpinner();				// create spinner
+	
+	var url = contextPathJSVar + "/services/linkablePositions/getLinkablePositionsBetweenProteins";
+	
+	var requestData = {
+		linkers : getLinkerStringsAsArray(),
+		proteins : proteins
+	};
+	
+	 $.ajax({
+	        type: "GET",
+	        url: url,
+			traditional: true,  //  Force traditional serialization of the data sent
+			//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+			//   So proteinIdsToGetSequence array is passed as "proteinIdsToGetSequence=<value>" which is what Jersey expects
+	        data : requestData,
+	        dataType: "json",
+	        success: function(data)	{
+	        	decrementSpinner();
+	        	answerLinkablePositionsLookup( data, onlyShortest );
+	        },
+	        failure: function(errMsg) {
+				decrementSpinner();
+	        	handleAJAXFailure( errMsg );
+	        },
+			error: function(jqXHR, textStatus, errorThrown) {	
+					decrementSpinner();
+					handleAJAXError( jqXHR, textStatus, errorThrown );
+			}
+	  });
+};
+
+/**
+ * Answers the request for the lookup
+ */
+var answerLinkablePositionsLookup = function( data, onlyShortest ) {
+	
+	var response = "";
+	var visibleProteinsMap = getVisibleProteins();
+	
+	for( var i = 0; i < data.length; i++ ) {
+		
+		var protein1 =  parseInt(data[ i ][ 'protein1' ]);
+		var protein2 =  parseInt(data[ i ][ 'protein2' ]);
+		
+		var position1 = parseInt(data[ i ][ 'position1' ]);
+		var position2 = parseInt(data[ i ][ 'position2' ]);
+		
+
+		var chains1 = visibleProteinsMap[ protein1 ];
+		var chains2 = visibleProteinsMap[ protein2 ];
+		
+		var shortestLink = 0;
+
+		if( !chains1 || chains1 == undefined || chains1.length < 1 ) {
+			console.log( "ERROR: Got no chains for protein: " + protein1 );
+			return;
+		}
+		
+		if( !chains2 || chains2 == undefined || chains2.length < 1 ) {
+			console.log( "ERROR: Got no chains for protein: " + protein2 );
+			return;
+		}
+		
+
+		for( var j = 0; j < chains1.length; j++ ) {
+			var chain1 = chains1[ j ];
+
+			var coordsArray1 = findCACoords( protein1, position1, [ chain1 ] );			
+			if( coordsArray1 == undefined || coordsArray1.length < 1 ) { continue; }
+			
+			for( var k = 0; k < chains2.length; k++ ) {
+				var chain2 = chains2[ k ];
+				
+				if( chain1 == chain2 && protein1 == protein2 && position1 == position2 ) { continue; }
+				
+				var coordsArray2 = findCACoords( protein2, position2, [ chain2 ] );			
+				if( coordsArray1 == undefined || coordsArray2.length < 1 ) { continue; }
+				
+				var distance = calculateDistance( coordsArray1[ 0 ], coordsArray2[ 0 ] );
+
+				if( !onlyShortest ) {
+				
+					response += chain1 + "\t" + _proteinNames[ protein1 ] + "\t" + position1 + "\t";
+					response += chain2 + "\t" + _proteinNames[ protein2 ] + "\t" + position2 + "\t";		
+					response += distance + "\n";	
+
+				} else {
+					
+					if( !shortestLink || shortestLink[ 'distance' ] > distance ) {
+
+						shortestLink = {
+											'chain1' : chain1,
+											'chain2' : chain2,
+											'protein1' : protein1,
+											'protein2' : protein2,
+											'position1' : position1,
+											'position2' : position2,
+											'distance' : distance
+									   };
+					}
+					
+				}
+			}
+		}
+		
+		if( onlyShortest && shortestLink ) {
+			
+			response += shortestLink.chain1 + "\t" + _proteinNames[ shortestLink.protein1 ] + "\t" + shortestLink.position1 + "\t";
+			response += shortestLink.chain2 + "\t" + _proteinNames[ shortestLink.protein2 ] + "\t" + shortestLink.position2 + "\t";		
+			response += shortestLink.distance + "\n";
+		}
+	}
+		
+	downloadStringAsFile( "all-by-all-linkable-positions.txt", "text/plain", response );
+};
+
+
+var downloadAllLinkablePositions = function( onlyShortest) {	
+	var visibleProteinsMap = getVisibleProteins();
+	
+	if( !visibleProteinsMap || visibleProteinsMap == undefined || visibleProteinsMap.length < 1 ) { return; }
+	
+	var visibleProteins = Object.keys( visibleProteinsMap );
+	doLinkablePositionsLookup( visibleProteins, onlyShortest );
+};
+
+
+var downloadShownUDRLinks = function() {
+	var response = "";
+	
+	if( _renderedLinks[ 'crosslinks' ] && _renderedLinks[ 'crosslinks' ].length > 0 ) {
+		
+		for( var i = 0; i < _renderedLinks[ 'crosslinks' ].length; i++ ) {
+			var link = _renderedLinks[ 'crosslinks' ][ i ][ 'link' ];
+
+			var chain1 = _renderedLinks[ 'crosslinks' ][ i ][ 'atom1' ].residue().chain().name();
+			var chain2 = _renderedLinks[ 'crosslinks' ][ i ][ 'atom2' ].residue().chain().name();
+
+			var protein1 = _proteinNames[ link[ 'protein1' ] ];
+			var protein2 = _proteinNames[ link[ 'protein2' ] ];
+			
+			var position1 = link[ 'position1' ];
+			var position2 = link[ 'position2' ];
+			
+			var distance = link[ 'length' ];
+			
+			response += "crosslink\t" + chain1 + "\t" + protein1 + "\t" + position1 + "\t";
+			response += chain2 + "\t" + protein2 + "\t" + position2 + "\t" + distance + "\n";
+		}
+	}
+	
+	if( _renderedLinks[ 'looplinks' ] && _renderedLinks[ 'looplinks' ].length > 0 ) {
+				
+		for( var i = 0; i < _renderedLinks[ 'looplinks' ].length; i++ ) {
+			var link = _renderedLinks[ 'looplinks' ][ i ][ 'link' ];
+
+			var chain1 = _renderedLinks[ 'looplinks' ][ i ][ 'atom1' ].residue().chain().name();
+			var chain2 = _renderedLinks[ 'looplinks' ][ i ][ 'atom2' ].residue().chain().name();
+
+			var protein1 = _proteinNames[ link[ 'protein1' ] ];
+			
+			var position1 = link[ 'position1' ];
+			var position2 = link[ 'position2' ];
+			
+			var distance = link[ 'length' ];
+			
+			response += "looplink\t" + chain1 + "\t" + protein1 + "\t" + position1 + "\t";
+			response += chain2 + "\t" + protein1 + "\t" + position2 + "\t" + distance + "\n";
+		}
+		
+	}
+	
+	if( response == "" ) { return; }
+	
+	downloadStringAsFile( "all-shown-udrs.txt", "text/plain", response );
+};
+
 /**
  * Get an array of currently-visible protein IDs
  */
@@ -1882,7 +2011,7 @@ var redrawDistanceReport = function( ) {
 	
 	
 	var html = "<div style=\"margin-top:10px;\">";
-	
+		
 	html += "<div style=\"font-size:14pt;\">Total UDRs: " + UDRDataObject.totalUnique + " (" + UDRDataObject.totalUniqueMappable + " mappable)</div>";
 	html += "<div style=\"font-size:12pt;margin-left:20px;\">Crosslink UDRs: " + UDRDataObject.crosslinkTotal + " (" + UDRDataObject.crosslinkTotalMappable + " mappable)</div>";
 	html += "<div style=\"font-size:12pt;margin-left:20px;\">Looplink UDRs: " + UDRDataObject.looplinkTotal + " (" + UDRDataObject.looplinkTotalMappable + " mappable)</div>";
@@ -1905,6 +2034,10 @@ var redrawDistanceReport = function( ) {
 	html += "<div id=\"shown-looplinks-text\"></div>\n";
 	html += "</div>";
 	
+	html += "<div style=\"font-size:14pt;margin-top:15px;\">Download reports:</div>";
+	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadShownUDRLinks()\">All shown UDRs</a></div>";
+	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadAllLinkablePositions(0)\">All possible UDRs (all possible points on structure)</a></div>";
+	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadAllLinkablePositions(1)\">All possible UDRs (shortest-only)</a></div>";
 	
 	$distanceReportDiv.html( html );
 	
@@ -1932,8 +2065,8 @@ var updateShownLinks = function () {
 		for( var i = 0; i < _renderedLinks[ 'crosslinks' ].length; i++ ) {
 			var link = _renderedLinks[ 'crosslinks' ][ i ][ 'link' ];
 			
-			var color = getLinkColor( link, true );
-			var rgbaString = "rgba(" + (color[ 0 ] * 255) + "," + (color[ 1 ] * 255) + "," + (color[ 2 ] * 255) + ",0.15)";			
+			var color = _linkColorHandler.getLinkColor( link, 'rgb' );
+			var rgbaString = "rgba(" + color.r + "," + color.g + "," + color.b + ",0.15)";			
 			
 			html += "<tr class=\"reported-crosslink\" data-crosslink-index=\"" + i + "\" style=\"background-color:" + rgbaString + "\">\n";		
 			html += "<td style=\"width:180px;\">" + _proteinNames[ link.protein1 ] + " (" + link.position1 + ")</td>";
@@ -1982,8 +2115,8 @@ var updateShownLinks = function () {
 		for( var i = 0; i < _renderedLinks[ 'looplinks' ].length; i++ ) {
 			var link = _renderedLinks[ 'looplinks' ][ i ][ 'link' ];
 			
-			var color = getLinkColor( link, true );
-			var rgbaString = "rgba(" + (color[ 0 ] * 255) + "," + (color[ 1 ] * 255) + "," + (color[ 2 ] * 255) + ",0.15)";			
+			var color = _linkColorHandler.getLinkColor( link, 'rgb' );
+			var rgbaString = "rgba(" + color.r + "," + color.g + "," + color.b + ",0.15)";			
 			
 			html += "<tr class=\"reported-looplink\" data-looplink-index=\"" + i + "\" style=\"background-color:" + rgbaString + "\">\n";			
 			html += "<td style=\"width:180px;\">" + _proteinNames[ link.protein1 ] + " (" + link.position1 + ", " + link.position2 + ")</td>";
@@ -2400,8 +2533,8 @@ var listChains = function( doDraw ) {
 	}
 	
 	html += " <span style=\"font-size:10pt;\"><a href=\"" +  contextPathJSVar + "/downloadPDBFile.do?id=" + pdbFile.id + "\" target=\"download_pdb_file\"><img id=\"download-pdb-icon\" style=\"border-width:0px;margin-left:2px;max-width:15px;\" src=\"" + contextPathJSVar + "/images/icon-download-small.png\" /></a>\n";
-	html += " <span style=\"font-size:10pt;\"><a href=\"javascript:downloadChimeraScript()\" target=\"download_pdb_file\"><img id=\"chimera-icon\" style=\"border-width:0px;margin-left:2px;max-width:12px;\" src=\"" + contextPathJSVar + "/images/chimera-logo.png\" /></a>\n";
-	html += " <span style=\"font-size:10pt;\"><a href=\"javascript:downloadPymolScript()\" target=\"download_pdb_file\"><img id=\"pymol-icon\" style=\"border-width:0px;margin-left:2px;max-width:12px;\" src=\"" + contextPathJSVar + "/images/pymol-logo.png\" /></a>\n";
+	html += " <span style=\"font-size:10pt;\"><a href=\"javascript:\" onClick=\"downloadChimeraScript()\" target=\"download_pdb_file\"><img id=\"chimera-icon\" style=\"border-width:0px;margin-left:2px;max-width:12px;\" src=\"" + contextPathJSVar + "/images/chimera-logo.png\" /></a>\n";
+	html += " <span style=\"font-size:10pt;\"><a href=\"javascript:\" onClick=\"downloadPymolScript()\" target=\"download_pdb_file\"><img id=\"pymol-icon\" style=\"border-width:0px;margin-left:2px;max-width:12px;\" src=\"" + contextPathJSVar + "/images/pymol-logo.png\" /></a>\n";
 
 	html += "<script type=\"text/javascript\">\
 				$(\"#chimera-icon\").qtip({ \
@@ -2779,7 +2912,7 @@ var drawCrosslinks = function( proteins ) {
 									}
 								}
 								
-								_CROSSLINKS_MESH.addTube( shortestPair[ 0 ].pos(), shortestPair[ 1 ].pos(), 0.6, { cap: true, color : getLinkColor( link ), userData: link });
+								_CROSSLINKS_MESH.addTube( shortestPair[ 0 ].pos(), shortestPair[ 1 ].pos(), 0.6, { cap: true, color : _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link });
 								
 								renderedLink.link = link;
 								
@@ -2861,7 +2994,7 @@ var drawCrosslinks = function( proteins ) {
 							}
 						}
 						
-						_CROSSLINKS_MESH.addTube( UDR[ 'shortestPair' ][ 0 ].pos(), UDR[ 'shortestPair' ][ 1 ].pos(), 0.6, { cap: true, color : getLinkColor( link ), userData: link });
+						_CROSSLINKS_MESH.addTube( UDR[ 'shortestPair' ][ 0 ].pos(), UDR[ 'shortestPair' ][ 1 ].pos(), 0.6, { cap: true, color : _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link });
 						
 						UDR[ 'renderedLink' ].link = link;
 						
@@ -2935,7 +3068,7 @@ var drawMonolinks = function( proteins ) {
 				}
 				
 				var coord = atoms[ k ].pos();
-				_MONOLINKS_MESH.addTube( coord, [ coord[ 0 ] + 3, coord[ 1 ] + 3, coord[ 2 ] + 3 ], 0.6, { color: getLinkColor( link ), userData: link });
+				_MONOLINKS_MESH.addTube( coord, [ coord[ 0 ] + 3, coord[ 1 ] + 3, coord[ 2 ] + 3 ], 0.6, { color: _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link });
 
 				var renderedLink = { };
 				renderedLink.atom1 = atoms[ k ];
@@ -3086,7 +3219,7 @@ var drawLooplinks = function( proteins ) {
 							}
 						}
 						
-						_LOOPLINKS_MESH.addTube( fromCoords, toCoords, 0.6, { color: getLinkColor( link ), userData: link } );
+						_LOOPLINKS_MESH.addTube( fromCoords, toCoords, 0.6, { color: _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link } );
 						
 						renderedLink.link = link;
 						
@@ -3157,7 +3290,7 @@ var drawLooplinks = function( proteins ) {
 						}
 					}
 					
-					_LOOPLINKS_MESH.addTube( UDR[ 'shortestPair' ][ 0 ], UDR[ 'shortestPair' ][ 1 ], 0.6, { cap: true, color : getLinkColor( link ), userData: link });
+					_LOOPLINKS_MESH.addTube( UDR[ 'shortestPair' ][ 0 ], UDR[ 'shortestPair' ][ 1 ], 0.6, { cap: true, color : _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link });
 					
 					UDR[ 'renderedLink' ].link = link;
 					
@@ -3249,99 +3382,6 @@ var getShowUniqueUDRs = function() {
 	return $( "#show-unique-udrs" ).is( ':checked' );
 };
 
-/**
- * Get the color to use for a link, depending on the link color mode
- * @param link An object with properties 'type', 'length', 'protein1, 'protein2', 'position1', and 'position2' (protein2 and position2 optional)
- * @param forReport If true, it is assumed this is for the report and shadeByCount will not be used
- * @returns An array 
- */
-var getLinkColor = function( link, forReport ) {
-	
-	var mode = getLinkColorMode();
-	
-	var shadeByCounts = false;
-	if ( !forReport && $( "input#shade-by-counts" ).is( ':checked' ) ) { shadeByCounts = true; }
-	
-	if( shadeByCounts && !('psmCount' in link)) {
-		console.log( "ERROR: Was told to shade by counts, but link has no PSM count Using default opacity. Link:" );
-		console.log( link );
-	}
-	
-	var opacity = 0.9;
-	if( shadeByCounts && 'psmCount' in link ) {
-		var psmCount = link[ 'psmCount' ];
-		var min = 0.5;
-		var max = opacity;
-		var countForMaxOpacity = 10;
-		
-		if( psmCount > countForMaxOpacity ) { psmCount = countForMaxOpacity; }
-		
-		opacity = max - ( ( max - min ) * ( ( countForMaxOpacity - psmCount ) / countForMaxOpacity ) );
-		if( opacity < min || opacity > max ) {
-			console.log( "WARNING: Invalid opacity: " + opacity  + " (psmCount: " + psmCount + ")" );
-		}
-		
-	}
-	
-	if( mode === 'type' ) {
-		
-		// color by the type (e.g. crosslink, looplink, and monolink)
-		if( link.type === 'crosslink' ) { return [ 1, 0, 0, opacity ]; }
-		if( link.type === 'looplink' ) { return [ 0, 0, 1, opacity ]; }
-		if( link.type === 'monolink' ) { return [ 162/255, 67/255, 228/255, opacity ]; }		
-		
-		console.log( "ERROR: link.type is not recognized." );
-		return;
-	}
-	
-	if( mode === 'search' ) {
-		
-		var searches;
-		
-		if( link.type === 'crosslink' ) { searches = findSearchesForCrosslink( link.protein1, link.protein2, link.position1, link.position2 ); }
-		else if( link.type === 'looplink' ) { searches = findSearchesForLooplink( link.protein1, link.position1, link.position2 ); }
-		else if( link.type === 'monolink' ) { searches = findSearchesForMonolink( link.protein1, link.position1 ); }	
-		else {
-			console.log( "ERROR: link.type is not recognized." );
-			return;
-		}
-
-		return getColorForSearches( searches, opacity );		
-	}
-	
-	if( mode !== 'length' ) {
-		alert( "Unknown link color mode, using length." );
-	}
-	
-	// color by length
-	if( !( 'length' in link || link.length == undefined || link.length == null ) ) {
-		alert( "Error, could not read length of link." );
-		return;
-	}
-	
-	var color = getColorForDistance( link.length, opacity );
-	return color;
-	
-	
-};
-
-
-/**
- * Get the color for the distance. Scales from green to red, where
- * green is shorter (<= 12 all green) and red is longer (>=35 all red)
- * @param distance Distance in angstroms
- * @returns
- */
-function getColorForDistance( distance, opacity ) {
-
-	if( !opacity ) { opacity = 0.9; }
-	
-	if( distance <= 25 ) { return [ 0, 180/255, 40/255, opacity ]; }
-	if( distance <= 35 ) { return [ 227/255, 230/255, 2/255, opacity ]; }
-	return [ 211/255, 51/255, 51/255, opacity ];
-	
-}
-
 
 var _RESIDUE_COLOR_LIGHT = [ 220/255, 220/255, 220/255, 0.75 ];
 var _RESIDUE_COLOR_DARK = [ 120/255, 120/255, 120/255, 0.75 ];
@@ -3398,20 +3438,20 @@ var drawLegend = function() {
 	
 	var html = "<h2 style=\"display:inline;font-size:12pt;margin-top:5px;\">Legend:</h2>";
 	
-	html += "<div style=\"font-size:10pt;margin-left:20px;\">\n";
+	html += "<div id=\"legend-label\" style=\"font-size:10pt;margin-left:20px;\">\n";
 	
 	if( mode === 'type' ) {
 		
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:rgb(255, 0, 0);\"></span> Crosslinks";
+		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.typeColors.crosslink + "\"></span> Crosslinks";
 		html += "</span>\n";
 		
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:rgb(0, 0, 255);\"></span> Looplinks";
+		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.typeColors.looplink + "\"></span> Looplinks";
 		html += "</span>\n";
 		
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:rgb(162, 67, 228);\"></span> Monolinks";
+		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.typeColors.monolink + "\"></span> Monolinks";
 		html += "</span>\n";
 		
 	}
@@ -3420,16 +3460,16 @@ var drawLegend = function() {
 		
 		for ( var i = 0; i < _searches.length; i++ ) {
 			html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-			html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + getColorForSearches( [ _searches[ i ].id ], undefined, true ) + "\"></span> Search: " + _searches[ i ].id;
+			html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler.getColorForSearches( [ _searches[ i ].id ] ) + "\"></span> Search: " + _searches[ i ].id;
 			html += "</span>\n";
 		}
 		
 		for( var i = 0; i < _searches.length; i++ ) {
 			for( var k = 0; k < _searches.length; k++ ) {
 				if( _searches[ i ].id >= _searches[ k ].id ) { continue; }
-				
+								
 				html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-				html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + getColorForSearches( [ _searches[ i ].id, _searches[ k ].id ], undefined, true) + "\"></span> Search: " + _searches[ i ].id + ", " + _searches[ k ].id;
+				html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler.getColorForSearches( [ _searches[ i ].id, _searches[ k ].id ] ) + "\"></span> Search: " + _searches[ i ].id + ", " + _searches[ k ].id;
 				html += "</span>\n";
 				
 			}
@@ -3438,7 +3478,7 @@ var drawLegend = function() {
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
 		
 		if( _searches.length === 3 ) {
-			html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + getColorForSearches( [ _searches[ 0 ].id, _searches[ 1 ].id, _searches[ 2 ].id ], undefined, true) + "\"></span> Search: " + _searches[ 0 ].id + ", " + _searches[ 1 ].id + ", " + _searches[ 2 ].id + "</span>\n";
+			html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler.getColorForSearches( [ _searches[ 0 ].id, _searches[ 1 ].id, _searches[ 2 ].id ] ) + "\"></span> Search: " + _searches[ 0 ].id + ", " + _searches[ 1 ].id + ", " + _searches[ 2 ].id + "</span>\n";
 		}
 
 	}
@@ -3447,20 +3487,101 @@ var drawLegend = function() {
 	
 		// color by length
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:rgb(0, 180, 40);\"></span> <= 25 &Aring; ";
+		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.short + "\"></span> <= " + _linkColorHandler.getDistanceConstraints().shortDistance + " &Aring; ";
 		html += "</span>\n";
 		
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:rgb(227, 230, 2);\"></span> <= 35 &Aring; ";
+		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.medium + "\"></span> <= " + _linkColorHandler.getDistanceConstraints().longDistance + " &Aring; ";
 		html += "</span>\n";
 	
 		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:rgb(221, 51, 51);\"></span> >35 &Aring; ";
+		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.long + "\"></span> > " + _linkColorHandler.getDistanceConstraints().longDistance + " &Aring; ";
 		html += "</span>\n";
+		
+		html += "<span style=\"margin-left:15px\">[<a href=\"javascript:userChangeDistanceConstraintsInterface()\">Customize</a>]</span>";
+		
+		if( _linkColorHandler.getUserDistanceConstraints() ) {
+			html += "<span style=\"margin-left:2px\">[<a href=\"javascript:removeUserDistanceConstraints()\">Reset</a>]</span>";
+		}
+		
 	}
 	
 	html += "</div>\n";
 	$legendDiv.html( html );
+};
+
+
+var updateUserDistanceConstraints = function() {
+	
+	var shortDistance = parseInt( $( '#userConstraintFormShortDistance' ).val() );
+	var longDistance = parseInt( $( '#userConstraintFormLongDistance' ).val() );
+	
+	var $errorSpan = $( '#userConstraintsErrorSpan' );
+	
+	if( shortDistance != $( '#userConstraintFormShortDistance' ).val() ) {
+		$errorSpan.html( "Non integer entered for short distance." );
+		return;
+	}
+	
+	if( longDistance != $( '#userConstraintFormLongDistance' ).val() ) {
+		$errorSpan.html( "Non integer entered for long distance." );
+		return;
+	}
+	
+	if( longDistance <= shortDistance ) {
+		$errorSpan.html( "Long distance must be greater than short distance." );
+		return;
+	}
+	
+	if( shortDistance <= 0 ) {
+		$errorSpan.html( "Short distance must be 1 or more." );
+		return;
+	}
+	
+	$errorSpan.empty();
+	
+	_linkColorHandler.setUserDistanceConstraints( shortDistance, longDistance );
+	
+	updateURLHash( false /* useSearchForm */ );
+	
+	drawStructure();
+	redrawDistanceReport();
+	drawLegend();
+	
+};
+
+var removeUserDistanceConstraints = function() {
+	_linkColorHandler.removeUserDistanceConstraints();
+	
+	updateURLHash( false /* useSearchForm */ );
+	
+	drawStructure();
+	redrawDistanceReport();
+	drawLegend();
+};
+
+var userChangeDistanceConstraintsInterface = function() {
+	
+	var html = "<span>Fill in new distance cutoffs for color coding:</span><form id=\"userDistanceConstraintsForm\">";
+	
+	html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
+	html += "<span style=\"display:inline-block;width:22px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.short + "\"></span> ";
+	html += "<input id=\"userConstraintFormShortDistance\" type=\"text\" style=\"width:30px;\" value=\"" + _linkColorHandler.getDistanceConstraints().shortDistance + "\">&Aring; ";
+	html += "<span style=\"display:inline-block;width:22px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.medium + "\"></span> ";
+	html += "<input id=\"userConstraintFormLongDistance\" type=\"text\" style=\"width:30px;\" value=\"" + _linkColorHandler.getDistanceConstraints().longDistance + "\">&Aring; ";
+	html += "<span style=\"display:inline-block;width:22px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.long + "\"></span>";
+	
+	html += "<span style=\"margin-left:15px\">[<a href=\"javascript:updateUserDistanceConstraints()\">Update</a>]</span>";
+	html += "<span style=\"margin-left:5px\">[<a href=\"javascript:drawLegend()\">Cancel</a>]</span>";
+	
+	html += "</span>\n";
+	html += "</form>";	
+	html += "<span style=\"margin-left:15px;\" id=\"userConstraintsErrorSpan\"></span>\n";
+	
+	var $legendLabelDiv = $( '#legend-label' );
+	$legendLabelDiv.empty();	
+	$legendLabelDiv.html( html );
+	
 };
 
 var _currentLoadRequest;
@@ -3850,7 +3971,7 @@ var findPDBResidueFromAlignment = function(proteinId, position, chain) {
 		}
 	}
 	
-	console( "MAJOR WARNING: DID NOT FIND POSITION " + position + " FOR PROTEIN " + proteinId + " IN CHAIN " + chain );
+	console.log( "MAJOR WARNING: DID NOT FIND POSITION " + position + " FOR PROTEIN " + proteinId + " IN CHAIN " + chain );
 	return undefined;
 };
 

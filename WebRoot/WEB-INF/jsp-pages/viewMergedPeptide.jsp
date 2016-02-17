@@ -253,7 +253,14 @@
 				<h3 style="display:inline;">Peptides (<bean:write name="peptideListSize" />):</h3>
 				
 				<div style="display:inline;">
-					[<a  class="tool_tip_attached_jq" data-tooltip="Download as tab-delimited text" href="${ contextPath }/downloadMergedPeptides.do?<bean:write name="queryString" />">Download Data</a>]
+					[<a  class="tool_tip_attached_jq" data-tooltip="Download as tab-delimited text" 
+							href="${ contextPath }/downloadMergedPeptides.do?<bean:write name="queryString" />"
+						>Download Data</a>]
+					
+					[<a class="tool_tip_attached_jq" data-tooltip="Download PSM data as tab-delimited text" 
+							href="${ contextPath }/downloadMergedPSMsForPeptides.do?<bean:write name="queryString" />"
+						>Download PSM Data</a>]
+						
 				</div>
 			</div>
 			

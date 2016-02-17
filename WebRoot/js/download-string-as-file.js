@@ -8,6 +8,10 @@
  */
 var downloadStringAsFile = function( filename, mimetype, content ) {
 	
+	
+	
+	console.log( "downloadStringAsFile called." );
+	
 	var form = document.createElement( "form" );
 	
 	$( form ).hide();
@@ -38,4 +42,7 @@ var downloadStringAsFile = function( filename, mimetype, content ) {
     form.submit();
 	
     document.body.removeChild( form );
+
+	
+	//window.open("data:" + mimetype + ";charset=utf-8," + encodeURIComponent(content));
 };

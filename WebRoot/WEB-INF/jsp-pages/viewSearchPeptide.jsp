@@ -244,7 +244,13 @@
 			<h3 style="display:inline;">Peptides (<c:out value="${ viewSearchPeptidesPageDataRoot.peptideListSize }"></c:out>):</h3>
 			
 			<div style="display:inline;">
-				[<a class="tool_tip_attached_jq" data-tooltip="Download data as tab-delimited text" href="${ contextPath }/downloadMergedPeptides.do?<bean:write name="mergedQueryString" />">Download Data</a>]
+				[<a class="tool_tip_attached_jq" data-tooltip="Download data as tab-delimited text" 
+						href="${ contextPath }/downloadMergedPeptides.do?<bean:write name="mergedQueryString" />"
+					>Download Data</a>]
+					
+				[<a class="tool_tip_attached_jq" data-tooltip="Download PSM data as tab-delimited text" 
+						href="${ contextPath }/downloadMergedPSMsForPeptides.do?<bean:write name="mergedQueryString" />"
+					>Download PSM Data</a>]
 			</div>
 
 			<%--  Create via javascript the parts that will be above the main table --%>
