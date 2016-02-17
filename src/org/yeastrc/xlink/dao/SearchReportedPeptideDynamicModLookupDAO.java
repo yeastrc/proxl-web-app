@@ -22,9 +22,8 @@ public class SearchReportedPeptideDynamicModLookupDAO {
 //	CREATE TABLE search__reported_peptide__dynamic_mod_lookup (
 //			  search_id INT UNSIGNED NOT NULL,
 //			  reported_peptide_id INT UNSIGNED NOT NULL,
-//			  dynamic_mod_mass DOUBLE UNSIGNED NOT NULL,
-//			  link_type ENUM('looplink','crosslink','unlinked','monolink','dimer') NOT NULL,
-//	  		  best_psm_q_value DOUBLE NOT NULL,
+//			  dynamic_mod_mass DOUBLE NOT NULL,
+//			  link_type ENUM('looplink','crosslink','unlinked','dimer') NOT NULL,
 	
 	/**
 	 *	insert duplicates are ignored
@@ -37,7 +36,7 @@ public class SearchReportedPeptideDynamicModLookupDAO {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		
-		String sql = "INSERT IGNORE INTO search__reported_peptide__dynamic_mod_lookup ( search_id, reported_peptide_id, dynamic_mod_mass, link_type, best_psm_q_value ) VALUES (?, ?, ?, ?, ?)";
+		String sql = "INSERT IGNORE INTO search__reported_peptide__dynamic_mod_lookup ( search_id, reported_peptide_id, dynamic_mod_mass, link_type ) VALUES (?, ?, ?, ?)";
 
 		try {
 			
@@ -51,7 +50,6 @@ public class SearchReportedPeptideDynamicModLookupDAO {
 			pstmt.setInt( 2, item.getReportedPeptideId() );
 			pstmt.setDouble( 3, item.getDynamicModMass() );
 			pstmt.setString( 4, linkTypeString );
-			pstmt.setDouble( 5, item.getBestPsmQValue() );
 
 			pstmt.executeUpdate();
 			

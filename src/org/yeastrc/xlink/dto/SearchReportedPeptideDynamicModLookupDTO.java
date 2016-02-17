@@ -11,15 +11,9 @@ public class SearchReportedPeptideDynamicModLookupDTO {
 	private int reportedPeptideId;
 	private double dynamicModMass;
 	private int linkType;
-	private double bestPsmQValue;
+
 
 	
-	public double getBestPsmQValue() {
-		return bestPsmQValue;
-	}
-	public void setBestPsmQValue(double bestPsmQValue) {
-		this.bestPsmQValue = bestPsmQValue;
-	}
 	public double getDynamicModMass() {
 		return dynamicModMass;
 	}

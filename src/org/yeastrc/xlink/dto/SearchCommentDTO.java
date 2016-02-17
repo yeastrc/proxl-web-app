@@ -48,12 +48,12 @@ public class SearchCommentDTO {
 	}
 
 	@XmlTransient //  Does not stop JACKSON from serializing to JSON
-	public int getAuthUserId() {
+	public Integer getAuthUserId() {
 		return authUserId;
 	}
 
 
-	public void setAuthUserId(int authUserId) {
+	public void setAuthUserId(Integer authUserId) {
 		this.authUserId = authUserId;
 	}
 
@@ -71,7 +71,7 @@ public class SearchCommentDTO {
 	private String comment;
 	private DateTime dateTime;	
 	private int searchid;
-	private int authUserId;
+	private Integer authUserId;
 
 	private int id;
 	

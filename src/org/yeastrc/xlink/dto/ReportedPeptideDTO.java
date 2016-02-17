@@ -14,23 +14,9 @@ public class ReportedPeptideDTO {
 	public void setSequence(String sequence) {
 		this.sequence = sequence;
 	}
-	public String getN() {
-		return N;
-	}
-	public void setN(String n) {
-		N = n;
-	}
-	public String getC() {
-		return C;
-	}
-	public void setC(String c) {
-		C = c;
-	}
-
 
 	private int id;
 	private String sequence;
-	private String N;
-	private String C;
+
 	
 }

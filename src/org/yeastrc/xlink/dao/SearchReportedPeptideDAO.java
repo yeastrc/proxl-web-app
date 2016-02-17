@@ -19,8 +19,6 @@ public class SearchReportedPeptideDAO {
 	CREATE TABLE search_reported_peptide (
 		search_id INT UNSIGNED NOT NULL,
 		reported_peptide_id INT UNSIGNED NOT NULL,
-		unified_reported_peptide_id  INT UNSIGNED NOT NULL,
-		q_value DOUBLE NULL DEFAULT NULL
 	);
 
 
@@ -32,7 +30,7 @@ public class SearchReportedPeptideDAO {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		
-		String sql = "INSERT INTO search_reported_peptide ( search_id, reported_peptide_id, q_value ) VALUES (?, ?, ?)";
+		String sql = "INSERT INTO search_reported_peptide ( search_id, reported_peptide_id ) VALUES (?, ?)";
 
 		
 		try {
@@ -42,13 +40,6 @@ public class SearchReportedPeptideDAO {
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, prp.getSearchId() );
 			pstmt.setInt( 2, prp.getReportedPeptideId() );
-			
-			if ( prp.getqValue() != null ) {
-				pstmt.setDouble( 3, prp.getqValue() );
-			} else {
-				
-				pstmt.setNull( 3, java.sql.Types.DOUBLE );
-			}
 			
 			pstmt.executeUpdate();
 			
@@ -88,7 +79,7 @@ public class SearchReportedPeptideDAO {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		
-		String sql = "INSERT IGNORE INTO search_reported_peptide ( search_id, reported_peptide_id, q_value ) VALUES (?, ?, ?)";
+		String sql = "INSERT IGNORE INTO search_reported_peptide ( search_id, reported_peptide_id ) VALUES (?, ?)";
 
 		try {
 			
@@ -97,13 +88,6 @@ public class SearchReportedPeptideDAO {
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, prp.getSearchId() );
 			pstmt.setInt( 2, prp.getReportedPeptideId() );
-
-			if ( prp.getqValue() != null ) {
-				pstmt.setDouble( 3, prp.getqValue() );
-			} else {
-				
-				pstmt.setNull( 3, java.sql.Types.DOUBLE );
-			}
 			
 			pstmt.executeUpdate();
 			

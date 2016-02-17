@@ -35,10 +35,20 @@ public class SearchCommentDAO {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
 			
 			pstmt = conn.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );
+			
 			pstmt.setInt( 1, comment.getSearchid() );
 			pstmt.setString( 2, comment.getComment() );
-			pstmt.setInt( 3, comment.getAuthUserId() );
-			pstmt.setInt( 4, comment.getAuthUserId() );
+			
+			if ( comment.getAuthUserId() != null ) {
+			
+				pstmt.setInt( 3, comment.getAuthUserId() );
+				pstmt.setInt( 4, comment.getAuthUserId() );
+			
+			} else {
+				
+				pstmt.setNull( 3, java.sql.Types.INTEGER );
+				pstmt.setNull( 4, java.sql.Types.INTEGER );
+			}
 			
 			pstmt.executeUpdate();
 			

@@ -23,7 +23,7 @@ public class ReportedPeptideDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		String sql = "SELECT sequence, N, C FROM reported_peptide WHERE id = ?";
+		String sql = "SELECT sequence FROM reported_peptide WHERE id = ?";
 
 		try {
 			
@@ -39,8 +39,6 @@ public class ReportedPeptideDAO {
 			
 			peptide = new ReportedPeptideDTO();
 			peptide.setSequence( rs.getString( 1 ) );
-			peptide.setN( rs.getString( 2 ) );
-			peptide.setC( rs.getString( 3 ) );
 			peptide.setId( id );
 			
 			
@@ -84,14 +82,12 @@ public class ReportedPeptideDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public ReportedPeptideDTO getReportedPeptideDTO( String sequence, String N, String C ) throws Exception {
+	public ReportedPeptideDTO getReportedPeptideDTO( String sequence ) throws Exception {
 		
 		ReportedPeptideDTO plpeptide = new ReportedPeptideDTO();
 		plpeptide.setSequence( sequence );
-		plpeptide.setN( N );
-		plpeptide.setC( C );
 		
-		plpeptide.setId( getReportedPeptideIdForSequence( sequence, N, C ) );
+		plpeptide.setId( getReportedPeptideIdForSequence( sequence ) );
 		
 		if( plpeptide.getId() == 0 )
 			saveToDatabase( plpeptide );
@@ -106,14 +102,14 @@ public class ReportedPeptideDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public int getReportedPeptideIdForSequence( String sequence, String N, String C ) throws Exception {
+	public int getReportedPeptideIdForSequence( String sequence ) throws Exception {
 		int id = 0;
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		String sql = "SELECT id FROM reported_peptide WHERE sequence = ? AND N = ? AND C = ?";
+		String sql = "SELECT id FROM reported_peptide WHERE sequence = ?";
 
 		try {
 			
@@ -121,8 +117,6 @@ public class ReportedPeptideDAO {
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setString( 1, sequence );
-			pstmt.setString( 2, N );
-			pstmt.setString( 3, C );
 			
 			rs = pstmt.executeQuery();
 
@@ -172,7 +166,7 @@ public class ReportedPeptideDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		String sql = "INSERT INTO reported_peptide (sequence, N, C ) VALUES (?, ?, ?)";
+		String sql = "INSERT INTO reported_peptide (sequence ) VALUES (?)";
 
 		try {
 			
@@ -180,8 +174,6 @@ public class ReportedPeptideDAO {
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setString( 1, peptide.getSequence() );
-			pstmt.setString( 2, peptide.getN() );
-			pstmt.setString( 3, peptide.getC() );
 			
 			pstmt.executeUpdate();
 			

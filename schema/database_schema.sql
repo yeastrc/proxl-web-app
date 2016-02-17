@@ -2,9 +2,9 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
-DROP SCHEMA IF EXISTS `proxl` ;
-CREATE SCHEMA IF NOT EXISTS `proxl` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
-USE `proxl` ;
+DROP SCHEMA IF EXISTS `proxl_generic_fields` ;
+CREATE SCHEMA IF NOT EXISTS `proxl_generic_fields` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+USE `proxl_generic_fields` ;
 
 -- -----------------------------------------------------
 -- Table `auth_user`
@@ -197,10 +197,8 @@ CREATE TABLE IF NOT EXISTS `psm` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `search_id` INT(10) UNSIGNED NOT NULL,
   `scan_id` INT UNSIGNED NULL,
-  `q_value` DOUBLE NULL,
   `type` ENUM('looplink','crosslink','unlinked','dimer') CHARACTER SET 'latin1' NOT NULL,
   `reported_peptide_id` INT(10) UNSIGNED NOT NULL,
-  `charge` SMALLINT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `psm_ibfk_1`
     FOREIGN KEY (`search_id`)
@@ -219,8 +217,6 @@ CREATE TABLE IF NOT EXISTS `psm` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1;
 
-CREATE INDEX `q_value` ON `psm` (`q_value` ASC);
-
 CREATE INDEX `perc_run_id` ON `psm` (`search_id` ASC);
 
 CREATE INDEX `peplynx_peptide_id` ON `psm` (`reported_peptide_id` ASC);
@@ -229,9 +225,9 @@ CREATE INDEX `type` ON `psm` (`type` ASC);
 
 CREATE INDEX `psm_scan_id_fk_idx` ON `psm` (`scan_id` ASC);
 
-CREATE INDEX `psm__search_id_rep_pep_id_q_value_idx` ON `psm` (`search_id` ASC, `reported_peptide_id` ASC, `q_value` ASC);
+CREATE INDEX `psm__search_id_rep_pep_id_q_value_idx` ON `psm` (`search_id` ASC, `reported_peptide_id` ASC);
 
-CREATE INDEX `psm__search_id_type_q_value_idx` ON `psm` (`search_id` ASC, `type` ASC, `q_value` ASC);
+CREATE INDEX `psm__search_id_type_q_value_idx` ON `psm` (`search_id` ASC, `type` ASC);
 
 
 -- -----------------------------------------------------
@@ -415,6 +411,7 @@ CREATE TABLE IF NOT EXISTS `dynamic_mod` (
   `matched_peptide_id` INT(10) UNSIGNED NOT NULL,
   `position` INT(10) UNSIGNED NOT NULL,
   `mass` DOUBLE NOT NULL,
+  `is_monolink` INT(1) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   CONSTRAINT `dynamic_mod_matched_peptide_id_fk`
     FOREIGN KEY (`matched_peptide_id`)
@@ -742,7 +739,6 @@ DROP TABLE IF EXISTS `search_reported_peptide` ;
 CREATE TABLE IF NOT EXISTS `search_reported_peptide` (
   `search_id` INT(10) UNSIGNED NOT NULL,
   `reported_peptide_id` INT(10) UNSIGNED NOT NULL,
-  `q_value` DOUBLE NULL,
   PRIMARY KEY (`search_id`, `reported_peptide_id`),
   CONSTRAINT `search_reported_peptide_ibfk_1`
     FOREIGN KEY (`search_id`)
@@ -757,11 +753,9 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
 COLLATE = latin1_swedish_ci;
 
-CREATE INDEX `q_value` ON `search_reported_peptide` (`q_value` ASC);
-
 CREATE INDEX `reported_peptide_id` ON `search_reported_peptide` (`reported_peptide_id` ASC);
 
-CREATE INDEX `search_reported_peptide__search_id_q_value_idx` ON `search_reported_peptide` (`search_id` ASC, `q_value` ASC);
+CREATE INDEX `search_reported_peptide__search_id_q_value_idx` ON `search_reported_peptide` (`search_id` ASC);
 
 
 -- -----------------------------------------------------
@@ -1043,245 +1037,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `kojak_file`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `kojak_file` ;
-
-CREATE TABLE IF NOT EXISTS `kojak_file` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `filename` VARCHAR(255) NOT NULL,
-  `path` VARCHAR(2000) NOT NULL,
-  `sha1sum` VARCHAR(255) NOT NULL,
-  `kojak_program_version` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
-
-CREATE INDEX `filename` ON `kojak_file` (`filename` ASC);
-
-
--- -----------------------------------------------------
--- Table `kojak_psm`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `kojak_psm` ;
-
-CREATE TABLE IF NOT EXISTS `kojak_psm` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `kojak_file_id` INT UNSIGNED NOT NULL,
-  `scan_number` INT NOT NULL,
-  `obs_mass` VARCHAR(200) NOT NULL,
-  `charge` SMALLINT NOT NULL,
-  `psm_mass` VARCHAR(200) NOT NULL,
-  `ppm_error` VARCHAR(200) NOT NULL,
-  `score` VARCHAR(200) NOT NULL,
-  `dscore` VARCHAR(200) NOT NULL,
-  `pep_diff` VARCHAR(200) NULL,
-  `peptide_1` VARCHAR(2000) NOT NULL,
-  `link_1` VARCHAR(200) NOT NULL,
-  `protein_1` VARCHAR(2000) NOT NULL,
-  `peptide_2` VARCHAR(2000) NOT NULL,
-  `link_2` VARCHAR(200) NOT NULL,
-  `protein_2` VARCHAR(2000) NOT NULL,
-  `linker_mass` VARCHAR(200) NOT NULL,
-  `corr` VARCHAR(200) NULL,
-  `label` VARCHAR(200) NULL,
-  `norm_rank` VARCHAR(200) NULL,
-  `mod_mass` VARCHAR(200) NULL,
-  `ret_time` VARCHAR(200) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_kojak_file_id_kojak_psm`
-    FOREIGN KEY (`kojak_file_id`)
-    REFERENCES `kojak_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `fk_kojak_file_id_kojak_psm_idx` ON `kojak_psm` (`kojak_file_id` ASC);
-
-CREATE INDEX `kojak_psm_scan_number_idx` ON `kojak_psm` (`scan_number` ASC, `kojak_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `kojakpsm_psm`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `kojakpsm_psm` ;
-
-CREATE TABLE IF NOT EXISTS `kojakpsm_psm` (
-  `kojakpsm_id` INT UNSIGNED NOT NULL,
-  `psm_id` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`kojakpsm_id`, `psm_id`),
-  CONSTRAINT `fk_kojakpsm_psm_kojakpsm_id`
-    FOREIGN KEY (`kojakpsm_id`)
-    REFERENCES `kojak_psm` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT,
-  CONSTRAINT `fk_kojakpsm_psm_psm_id`
-    FOREIGN KEY (`psm_id`)
-    REFERENCES `psm` (`id`)
-    ON DELETE CASCADE)
-ENGINE = InnoDB;
-
-CREATE INDEX `fk_kojakpsm_psm_psm_id_idx` ON `kojakpsm_psm` (`psm_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `kojak_file_scan_file`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `kojak_file_scan_file` ;
-
-CREATE TABLE IF NOT EXISTS `kojak_file_scan_file` (
-  `kojak_file_id` INT UNSIGNED NOT NULL,
-  `scan_file_id` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`kojak_file_id`, `scan_file_id`),
-  CONSTRAINT `fk_kojak_file_scan_file_kojak_file_id`
-    FOREIGN KEY (`kojak_file_id`)
-    REFERENCES `kojak_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT,
-  CONSTRAINT `fk_kojak_file_scan_file_scan_file_id`
-    FOREIGN KEY (`scan_file_id`)
-    REFERENCES `scan_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `fk_kojak_file_scan_file_scan_file_id_idx` ON `kojak_file_scan_file` (`scan_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `kojak_conf_file`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `kojak_conf_file` ;
-
-CREATE TABLE IF NOT EXISTS `kojak_conf_file` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `kojak_file_id` INT UNSIGNED NOT NULL,
-  `filename` VARCHAR(255) NOT NULL,
-  `path` VARCHAR(2000) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_kojak_conf_file_kojak_file_id`
-    FOREIGN KEY (`kojak_file_id`)
-    REFERENCES `kojak_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `filename` ON `kojak_conf_file` (`filename` ASC);
-
-CREATE INDEX `fk_kojak_conf_file_kojak_file_id_idx` ON `kojak_conf_file` (`kojak_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `kojak_conf_file_key_value`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `kojak_conf_file_key_value` ;
-
-CREATE TABLE IF NOT EXISTS `kojak_conf_file_key_value` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `kojak_conf_file_id` INT UNSIGNED NOT NULL,
-  `kojak_conf_file_key` VARCHAR(255) NOT NULL,
-  `value` VARCHAR(2000) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_kojak_conf_file_key_value_kojak_conf_file_id`
-    FOREIGN KEY (`kojak_conf_file_id`)
-    REFERENCES `kojak_conf_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `fk_kojak_conf_file_key_value_kojak_conf_file_id_idx` ON `kojak_conf_file_key_value` (`kojak_conf_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `kojak_conf_file_line`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `kojak_conf_file_line` ;
-
-CREATE TABLE IF NOT EXISTS `kojak_conf_file_line` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `kojak_conf_file_id` INT UNSIGNED NOT NULL,
-  `line` VARCHAR(2000) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_kojak_conf_file_line_kojak_conf_file_id`
-    FOREIGN KEY (`kojak_conf_file_id`)
-    REFERENCES `kojak_conf_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `fk_kojak_conf_file_line_kojak_conf_file_id_idx` ON `kojak_conf_file_line` (`kojak_conf_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `percolator_file`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `percolator_file` ;
-
-CREATE TABLE IF NOT EXISTS `percolator_file` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `search_id` INT(10) UNSIGNED NOT NULL,
-  `filename` VARCHAR(255) NOT NULL,
-  `path` VARCHAR(2000) NOT NULL,
-  `sha1sum` VARCHAR(40) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `percolator_file_search_id_fk`
-    FOREIGN KEY (`search_id`)
-    REFERENCES `search` (`id`)
-    ON DELETE CASCADE)
-ENGINE = InnoDB;
-
-CREATE INDEX `percolator_file_perc_run_id_fk_idx` ON `percolator_file` (`search_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `percolator_psm`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `percolator_psm` ;
-
-CREATE TABLE IF NOT EXISTS `percolator_psm` (
-  `psm_id` INT UNSIGNED NOT NULL,
-  `percolator_file_id` INT UNSIGNED NULL,
-  `q_value` DOUBLE NOT NULL,
-  `svm_score` DOUBLE NULL,
-  `calc_mass` DOUBLE NULL,
-  `pep` DOUBLE NULL,
-  `perc_psm_id` VARCHAR(2000) NOT NULL,
-  PRIMARY KEY (`psm_id`),
-  CONSTRAINT `percolator_psm_psm_id_fk`
-    FOREIGN KEY (`psm_id`)
-    REFERENCES `psm` (`id`)
-    ON DELETE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `percolator_search_reported_peptide`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `percolator_search_reported_peptide` ;
-
-CREATE TABLE IF NOT EXISTS `percolator_search_reported_peptide` (
-  `search_id` INT UNSIGNED NOT NULL,
-  `reported_peptide_id` INT UNSIGNED NOT NULL,
-  `q_value` DOUBLE NULL,
-  `svm_score` DOUBLE NULL,
-  `pep` DOUBLE NULL,
-  `calc_mass` DOUBLE NULL,
-  `p_value` DOUBLE NULL,
-  PRIMARY KEY (`search_id`, `reported_peptide_id`),
-  CONSTRAINT `percolator_search_reported_peptide_ibfk_1`
-    FOREIGN KEY (`search_id`)
-    REFERENCES `search` (`id`)
-    ON DELETE CASCADE,
-  CONSTRAINT `percolator_search_reported_peptide_ibfk_2`
-    FOREIGN KEY (`reported_peptide_id`)
-    REFERENCES `reported_peptide` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `percolator_search_reported_peptide_ibfk_2_idx` ON `percolator_search_reported_peptide` (`reported_peptide_id` ASC);
-
-
--- -----------------------------------------------------
 -- Table `search_linker`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `search_linker` ;
@@ -1302,273 +1057,6 @@ CREATE TABLE IF NOT EXISTS `search_linker` (
 ENGINE = InnoDB;
 
 CREATE INDEX `search_linker_linker_id_fk_idx` ON `search_linker` (`linker_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `xquest_file`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `xquest_file` ;
-
-CREATE TABLE IF NOT EXISTS `xquest_file` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `search_id` INT UNSIGNED NOT NULL,
-  `filename` VARCHAR(255) NOT NULL,
-  `path` VARCHAR(2000) NOT NULL,
-  `sha1sum` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `xquest_file__search_id_fk`
-    FOREIGN KEY (`search_id`)
-    REFERENCES `search` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-CREATE INDEX `filename` ON `xquest_file` (`filename` ASC);
-
-CREATE INDEX `xquest_file__search_id_fk_idx` ON `xquest_file` (`search_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `xquest_psm`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `xquest_psm` ;
-
-CREATE TABLE IF NOT EXISTS `xquest_psm` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `psm_id` INT UNSIGNED NOT NULL,
-  `xquest_file_id` INT UNSIGNED NOT NULL,
-  `type` VARCHAR(200) NULL,
-  `scan_number` VARCHAR(45) NULL,
-  `xquest_id` VARCHAR(2000) NULL,
-  `fdr` VARCHAR(200) NULL,
-  `charge` VARCHAR(200) NULL,
-  `seq1` VARCHAR(2000) NULL,
-  `seq2` VARCHAR(2000) NULL,
-  `xlinkposition` VARCHAR(200) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `xquest_psm_xquest_file_id_fk`
-    FOREIGN KEY (`xquest_file_id`)
-    REFERENCES `xquest_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT,
-  CONSTRAINT `xquest_psm_psm_id_fk`
-    FOREIGN KEY (`psm_id`)
-    REFERENCES `psm` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `xquest_psm_psm_id_fk_idx` ON `xquest_psm` (`psm_id` ASC);
-
-CREATE INDEX `xquest_psm_xquest_file_id_fk_idx` ON `xquest_psm` (`xquest_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `xquest_psm_spectrum_search_attr_value`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `xquest_psm_spectrum_search_attr_value` ;
-
-CREATE TABLE IF NOT EXISTS `xquest_psm_spectrum_search_attr_value` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `xquest_psm_id` INT UNSIGNED NULL,
-  `attr` VARCHAR(200) NULL,
-  `value` VARCHAR(2000) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `xquest_psm_attr_value_xquest_psm_id_fk`
-    FOREIGN KEY (`xquest_psm_id`)
-    REFERENCES `xquest_psm` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `xquest_psm_attr_value_xquest_psm_id_fk_idx` ON `xquest_psm_spectrum_search_attr_value` (`xquest_psm_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `xquest_psm_search_hit_attr_value`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `xquest_psm_search_hit_attr_value` ;
-
-CREATE TABLE IF NOT EXISTS `xquest_psm_search_hit_attr_value` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `xquest_psm_id` INT UNSIGNED NULL,
-  `attr` VARCHAR(200) NULL,
-  `value` VARCHAR(2000) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `xquest_psm_attr_value_xquest_psm_id_fk0`
-    FOREIGN KEY (`xquest_psm_id`)
-    REFERENCES `xquest_psm` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `xquest_psm_attr_value_xquest_psm_id_fk_idx` ON `xquest_psm_search_hit_attr_value` (`xquest_psm_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `xquest_defs_file`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `xquest_defs_file` ;
-
-CREATE TABLE IF NOT EXISTS `xquest_defs_file` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `xquest_file_id` INT UNSIGNED NOT NULL,
-  `filename` VARCHAR(255) NOT NULL,
-  `path` VARCHAR(2000) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `xquest_defs_file_xquest_file_id_fk`
-    FOREIGN KEY (`xquest_file_id`)
-    REFERENCES `xquest_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `xquest_defs_file_xquest_file_id_fk_idx` ON `xquest_defs_file` (`xquest_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `xquest_defs_file_key_value`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `xquest_defs_file_key_value` ;
-
-CREATE TABLE IF NOT EXISTS `xquest_defs_file_key_value` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `xquest_defs_file_id` INT UNSIGNED NOT NULL,
-  `xquest_defs_file_key` VARCHAR(255) NOT NULL,
-  `value` VARCHAR(2000) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `xquest_defs_file_key_value_xquest_defs_file_id_fk`
-    FOREIGN KEY (`xquest_defs_file_id`)
-    REFERENCES `xquest_defs_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `xquest_defs_file_key_value_xquest_defs_file_id_fk_idx` ON `xquest_defs_file_key_value` (`xquest_defs_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `xquest_defs_file_line`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `xquest_defs_file_line` ;
-
-CREATE TABLE IF NOT EXISTS `xquest_defs_file_line` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `xquest_defs_file_id` INT UNSIGNED NOT NULL,
-  `line` VARCHAR(2000) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `xquest_defs_file_line_xquest_defs_file_id_fk`
-    FOREIGN KEY (`xquest_defs_file_id`)
-    REFERENCES `xquest_defs_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `xquest_defs_file_line_xquest_defs_file_id_fk_idx` ON `xquest_defs_file_line` (`xquest_defs_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `xquest_xproph_defs_file`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `xquest_xproph_defs_file` ;
-
-CREATE TABLE IF NOT EXISTS `xquest_xproph_defs_file` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `xquest_file_id` INT UNSIGNED NOT NULL,
-  `filename` VARCHAR(255) NOT NULL,
-  `path` VARCHAR(2000) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `xquest_xproph_defs_file_xquest_file_id_fk`
-    FOREIGN KEY (`xquest_file_id`)
-    REFERENCES `xquest_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `xquest_xproph_defs_file_xquest_file_id_fk_idx` ON `xquest_xproph_defs_file` (`xquest_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `xquest_xproph_defs_file_key_value`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `xquest_xproph_defs_file_key_value` ;
-
-CREATE TABLE IF NOT EXISTS `xquest_xproph_defs_file_key_value` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `xquest_xproph_defs_file_id` INT UNSIGNED NOT NULL,
-  `xquest_xproph_defs_file_key` VARCHAR(255) NOT NULL,
-  `value` VARCHAR(2000) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `xquest_xproph_defs_file_key_value_xquest_xproph_defs_file_key_fk`
-    FOREIGN KEY (`xquest_xproph_defs_file_id`)
-    REFERENCES `xquest_xproph_defs_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `xquest_xproph_defs_file_key_value_xquest_xproph_defs_file_k_idx` ON `xquest_xproph_defs_file_key_value` (`xquest_xproph_defs_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `xquest_xproph_defs_file_line`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `xquest_xproph_defs_file_line` ;
-
-CREATE TABLE IF NOT EXISTS `xquest_xproph_defs_file_line` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `xquest_xproph_defs_file_id` INT UNSIGNED NOT NULL,
-  `line` VARCHAR(2000) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `xquest_xproph_defs_file_line_xquest_xproph_defs_file_id_fk`
-    FOREIGN KEY (`xquest_xproph_defs_file_id`)
-    REFERENCES `xquest_xproph_defs_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `xquest_xproph_defs_file_line_xquest_xproph_defs_file_id_fk_idx` ON `xquest_xproph_defs_file_line` (`xquest_xproph_defs_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `xquest_file_xquest_merger_attr_value`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `xquest_file_xquest_merger_attr_value` ;
-
-CREATE TABLE IF NOT EXISTS `xquest_file_xquest_merger_attr_value` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `xquest_file_id` INT UNSIGNED NOT NULL,
-  `attr` VARCHAR(200) NULL,
-  `value` VARCHAR(4000) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `xquest_file_xquest_merger_attr_value_xquest_file_id_fk`
-    FOREIGN KEY (`xquest_file_id`)
-    REFERENCES `xquest_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `xquest_file_xquest_merger_attr_value_xquest_file_id_fk_idx` ON `xquest_file_xquest_merger_attr_value` (`xquest_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `xquest_file_xquest_results_attr_value`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `xquest_file_xquest_results_attr_value` ;
-
-CREATE TABLE IF NOT EXISTS `xquest_file_xquest_results_attr_value` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `xquest_file_id` INT UNSIGNED NOT NULL,
-  `attr` VARCHAR(200) NULL,
-  `value` VARCHAR(4000) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `xquest_file_xquest_results_attr_value_xquest_file_id_fk`
-    FOREIGN KEY (`xquest_file_id`)
-    REFERENCES `xquest_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `xquest_file_xquest_merger_attr_value_xquest_file_id_fk_idx` ON `xquest_file_xquest_results_attr_value` (`xquest_file_id` ASC);
 
 
 -- -----------------------------------------------------
@@ -1630,6 +1118,7 @@ CREATE TABLE IF NOT EXISTS `static_mod` (
   `search_id` INT UNSIGNED NOT NULL,
   `residue` VARCHAR(45) NOT NULL,
   `mass` DECIMAL(18,9) NULL,
+  `mass_string` VARCHAR(45) NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `static_mod_search_id_fk`
     FOREIGN KEY (`search_id`)
@@ -1742,123 +1231,6 @@ CREATE INDEX `default_page_view_auth_user_id_fk_idx` ON `default_page_view` (`au
 
 
 -- -----------------------------------------------------
--- Table `search_for_xlinks_file`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_for_xlinks_file` ;
-
-CREATE TABLE IF NOT EXISTS `search_for_xlinks_file` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `search_id` INT UNSIGNED NOT NULL,
-  `filename` VARCHAR(255) NOT NULL,
-  `path` VARCHAR(2000) NOT NULL,
-  `sha1sum` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `search_for_xlinks_file_search_id`
-    FOREIGN KEY (`search_id`)
-    REFERENCES `search` (`id`)
-    ON DELETE CASCADE)
-ENGINE = InnoDB;
-
-CREATE INDEX `filename` ON `search_for_xlinks_file` (`filename` ASC);
-
-CREATE INDEX `search_for_xlinks_file_search_id_idx` ON `search_for_xlinks_file` (`search_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `search_for_xlinks_params_file`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_for_xlinks_params_file` ;
-
-CREATE TABLE IF NOT EXISTS `search_for_xlinks_params_file` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `search_for_xlinks_file_id` INT UNSIGNED NOT NULL,
-  `filename` VARCHAR(255) NOT NULL,
-  `path` VARCHAR(2000) NOT NULL,
-  `sha1sum` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `search_for_xlinks_file_search_for_xlinks_file_id`
-    FOREIGN KEY (`search_for_xlinks_file_id`)
-    REFERENCES `search_for_xlinks_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `filename` ON `search_for_xlinks_params_file` (`filename` ASC);
-
-CREATE INDEX `search_for_xlinks_file_search_for_xlinks_file_id_idx` ON `search_for_xlinks_params_file` (`search_for_xlinks_file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `search_for_xlinks_params_key_value`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_for_xlinks_params_key_value` ;
-
-CREATE TABLE IF NOT EXISTS `search_for_xlinks_params_key_value` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `file_id` INT UNSIGNED NOT NULL,
-  `data_key` VARCHAR(255) NOT NULL,
-  `value` VARCHAR(4000) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `search_for_xlinks_params_key_value_file_id`
-    FOREIGN KEY (`file_id`)
-    REFERENCES `search_for_xlinks_params_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `search_for_xlinks_params_key_value_file_id_idx` ON `search_for_xlinks_params_key_value` (`file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `search_for_xlinks_params_line`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_for_xlinks_params_line` ;
-
-CREATE TABLE IF NOT EXISTS `search_for_xlinks_params_line` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `file_id` INT UNSIGNED NOT NULL,
-  `line` VARCHAR(4000) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `search_for_xlinks_params_line_file_id`
-    FOREIGN KEY (`file_id`)
-    REFERENCES `search_for_xlinks_params_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `search_for_xlinks_params_key_value_file_id_idx` ON `search_for_xlinks_params_line` (`file_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `search_for_xlinks_psm`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_for_xlinks_psm` ;
-
-CREATE TABLE IF NOT EXISTS `search_for_xlinks_psm` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `file_id` INT UNSIGNED NOT NULL,
-  `psm_id` INT UNSIGNED NOT NULL,
-  `data_key` VARCHAR(255) NOT NULL,
-  `value` VARCHAR(4000) NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `search_for_xlinks_psm_psm_id_fk`
-    FOREIGN KEY (`psm_id`)
-    REFERENCES `psm` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT,
-  CONSTRAINT `search_for_xlinks_psm_file_id`
-    FOREIGN KEY (`file_id`)
-    REFERENCES `search_for_xlinks_file` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX `search_for_xlinks_psm_psm_id_fk_idx` ON `search_for_xlinks_psm` (`psm_id` ASC);
-
-CREATE INDEX `search_for_xlinks_psm_file_id_idx` ON `search_for_xlinks_psm` (`file_id` ASC);
-
-
--- -----------------------------------------------------
 -- Table `unified_reported_peptide_lookup`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `unified_reported_peptide_lookup` ;
@@ -1968,11 +1340,11 @@ CREATE UNIQUE INDEX `query_criteria_value_counts__field_value_unique_idx` ON `qu
 
 
 -- -----------------------------------------------------
--- Table `unified_rep_pep__reported_peptide__search_lookup`
+-- Table `unified_rep_pep__rep_pept__search_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `unified_rep_pep__reported_peptide__search_lookup` ;
+DROP TABLE IF EXISTS `unified_rep_pep__rep_pept__search_lookup` ;
 
-CREATE TABLE IF NOT EXISTS `unified_rep_pep__reported_peptide__search_lookup` (
+CREATE TABLE IF NOT EXISTS `unified_rep_pep__rep_pept__search_lookup` (
   `unified_reported_peptide_id` INT UNSIGNED NOT NULL,
   `reported_peptide_id` INT UNSIGNED NOT NULL,
   `search_id` INT UNSIGNED NOT NULL,
@@ -2005,13 +1377,13 @@ CREATE TABLE IF NOT EXISTS `unified_rep_pep__reported_peptide__search_lookup` (
     ON UPDATE RESTRICT)
 ENGINE = InnoDB;
 
-CREATE INDEX `unified_rp__reported_peptide__search__reported_peptide_id_f_idx` ON `unified_rep_pep__reported_peptide__search_lookup` (`reported_peptide_id` ASC);
+CREATE INDEX `unified_rp__reported_peptide__search__reported_peptide_id_f_idx` ON `unified_rep_pep__rep_pept__search_lookup` (`reported_peptide_id` ASC);
 
-CREATE INDEX `unified_rp__reported_peptide__search__search_id_fk_idx` ON `unified_rep_pep__reported_peptide__search_lookup` (`search_id` ASC);
+CREATE INDEX `unified_rp__reported_peptide__search__search_id_fk_idx` ON `unified_rep_pep__rep_pept__search_lookup` (`search_id` ASC);
 
-CREATE INDEX `unified_rp__rp__search__srch_type_bpsmqval_idx` ON `unified_rep_pep__reported_peptide__search_lookup` (`search_id` ASC, `link_type` ASC, `best_psm_q_value` ASC);
+CREATE INDEX `unified_rp__rp__search__srch_type_bpsmqval_idx` ON `unified_rep_pep__rep_pept__search_lookup` (`search_id` ASC, `link_type` ASC, `best_psm_q_value` ASC);
 
-CREATE INDEX `unified_rep_pep__reported_peptide__search_lookup__sample_ps_idx` ON `unified_rep_pep__reported_peptide__search_lookup` (`sample_psm_id` ASC);
+CREATE INDEX `unified_rep_pep__reported_peptide__search_lookup__sample_ps_idx` ON `unified_rep_pep__rep_pept__search_lookup` (`sample_psm_id` ASC);
 
 
 -- -----------------------------------------------------
@@ -2051,41 +1423,281 @@ DROP TABLE IF EXISTS `search_program` ;
 
 CREATE TABLE IF NOT EXISTS `search_program` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_id` INT UNSIGNED NOT NULL,
   `name` VARCHAR(200) NOT NULL,
-  `short_name` VARCHAR(100) NOT NULL,
   `display_name` VARCHAR(255) NOT NULL,
-  `description` VARCHAR(255) NULL,
-  `display_order` INT NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`))
+  `version` VARCHAR(200) NOT NULL,
+  `description` VARCHAR(4000) NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `search_program__search_id_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
 ENGINE = InnoDB;
 
 CREATE UNIQUE INDEX `search_program__name_unique_idx` ON `search_program` (`name` ASC);
 
-CREATE UNIQUE INDEX `search_program__short_name_unique_idx` ON `search_program` (`short_name` ASC);
+CREATE INDEX `search_program__search_id_fk_idx` ON `search_program` (`search_id` ASC);
 
 
 -- -----------------------------------------------------
--- Table `search__search_program`
+-- Table `Z_OLD_search__search_program`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search__search_program` ;
+DROP TABLE IF EXISTS `Z_OLD_search__search_program` ;
 
-CREATE TABLE IF NOT EXISTS `search__search_program` (
+CREATE TABLE IF NOT EXISTS `Z_OLD_search__search_program` (
   `search_id` INT UNSIGNED NOT NULL,
-  `search_program_id` INT UNSIGNED NOT NULL,
   `version` VARCHAR(100) NOT NULL,
-  PRIMARY KEY (`search_id`, `search_program_id`),
-  CONSTRAINT `search_program_version_search_program_id_fk`
-    FOREIGN KEY (`search_program_id`)
-    REFERENCES `search_program` (`id`)
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT,
+  PRIMARY KEY (`search_id`),
   CONSTRAINT `search_program_version__search_id_fk`
     FOREIGN KEY (`search_id`)
     REFERENCES `search` (`id`)
     ON DELETE CASCADE)
 ENGINE = InnoDB;
 
-CREATE INDEX `search_program_version_search_program_id_fk_idx` ON `search__search_program` (`search_program_id` ASC);
+
+-- -----------------------------------------------------
+-- Table `filter_direction_values`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `filter_direction_values` ;
+
+CREATE TABLE IF NOT EXISTS `filter_direction_values` (
+  `id` INT UNSIGNED NOT NULL,
+  `value_string` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `srch_pgm__filterable_psm_annotation_type`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `srch_pgm__filterable_psm_annotation_type` ;
+
+CREATE TABLE IF NOT EXISTS `srch_pgm__filterable_psm_annotation_type` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_program_id` INT UNSIGNED NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `filter_direction` INT(1) UNSIGNED NOT NULL,
+  `default_show` INT(1) UNSIGNED NOT NULL,
+  `default_filter` INT(1) NOT NULL,
+  `default_filter_value` VARCHAR(250) NULL,
+  `description` VARCHAR(4000) NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `sh_pgm_fltrbl_psm_ann_tp_srch_pgm_id_fk`
+    FOREIGN KEY (`search_program_id`)
+    REFERENCES `search_program` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `sh_pgm_fltrbl_psm_ann_tp_fil_dir`
+    FOREIGN KEY (`filter_direction`)
+    REFERENCES `filter_direction_values` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `sh_pgm_fltrbl_psm_ann_tp_srch_pgm_id_fk_idx` ON `srch_pgm__filterable_psm_annotation_type` (`search_program_id` ASC);
+
+CREATE INDEX `sh_pgm_fltrbl_psm_ann_tp_fil_dir_idx` ON `srch_pgm__filterable_psm_annotation_type` (`filter_direction` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `psm_filterable_annotation`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `psm_filterable_annotation` ;
+
+CREATE TABLE IF NOT EXISTS `psm_filterable_annotation` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `psm_id` INT UNSIGNED NOT NULL,
+  `psm_filterable_annotation_type_id` INT UNSIGNED NOT NULL,
+  `value` DOUBLE NOT NULL,
+  `value_string` VARCHAR(200) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `psm_filterable_annotation__psm_id_fk`
+    FOREIGN KEY (`psm_id`)
+    REFERENCES `psm` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `psm_flterbl_ann__sch_pgm_f_ann_id_fk`
+    FOREIGN KEY (`psm_filterable_annotation_type_id`)
+    REFERENCES `srch_pgm__filterable_psm_annotation_type` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `psm_filterable_annotation__psm_id_fk_idx` ON `psm_filterable_annotation` (`psm_id` ASC);
+
+CREATE INDEX `psm_flterbl_ann__sch_pgm_f_ann_id_fk_idx` ON `psm_filterable_annotation` (`psm_filterable_annotation_type_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `srch_pgm__descriptive_psm_annotation_type`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `srch_pgm__descriptive_psm_annotation_type` ;
+
+CREATE TABLE IF NOT EXISTS `srch_pgm__descriptive_psm_annotation_type` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_program_id` INT UNSIGNED NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `default_show` INT(1) UNSIGNED NOT NULL,
+  `description` VARCHAR(4000) NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `sh_pgm_descl_psm_ann_tp_srch_pgm_id_fk`
+    FOREIGN KEY (`search_program_id`)
+    REFERENCES `search_program` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `sh_pgm_fltrbl_psm_ann_tp_srch_pgm_id_fk_idx` ON `srch_pgm__descriptive_psm_annotation_type` (`search_program_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `psm_descriptive_annotation`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `psm_descriptive_annotation` ;
+
+CREATE TABLE IF NOT EXISTS `psm_descriptive_annotation` (
+  `psm_id` INT UNSIGNED NOT NULL,
+  `psm_descriptive_annotation_type_id` INT UNSIGNED NOT NULL,
+  `value` VARCHAR(4000) NULL,
+  PRIMARY KEY (`psm_id`),
+  CONSTRAINT `psm_desc_annotation_psm_id_fk`
+    FOREIGN KEY (`psm_id`)
+    REFERENCES `psm` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `psm_desc_annotation__sch_pgm_dsc_ann_id_fk`
+    FOREIGN KEY (`psm_descriptive_annotation_type_id`)
+    REFERENCES `srch_pgm__descriptive_psm_annotation_type` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+COMMENT = '			';
+
+CREATE INDEX `psm_desc_annotation__sch_pgm_dsc_ann_id_fk_idx` ON `psm_descriptive_annotation` (`psm_descriptive_annotation_type_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `srch_pgm__filterable_rep_peptide_annotation_type`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `srch_pgm__filterable_rep_peptide_annotation_type` ;
+
+CREATE TABLE IF NOT EXISTS `srch_pgm__filterable_rep_peptide_annotation_type` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_program_id` INT UNSIGNED NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `filter_direction` INT(1) UNSIGNED NOT NULL,
+  `default_show` INT(1) UNSIGNED NOT NULL,
+  `default_filter` INT(1) NOT NULL,
+  `default_filter_value` VARCHAR(250) NULL,
+  `description` VARCHAR(4000) NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `sh_pgm_fltrbl_pept_ann_tp_srch_pgm_id_fk`
+    FOREIGN KEY (`search_program_id`)
+    REFERENCES `search_program` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `sh_pgm_fltrbl_pept_ann_tp_fil_dir`
+    FOREIGN KEY (`filter_direction`)
+    REFERENCES `filter_direction_values` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `sh_pgm_fltrbl_psm_ann_tp_srch_pgm_id_fk_idx` ON `srch_pgm__filterable_rep_peptide_annotation_type` (`search_program_id` ASC);
+
+CREATE INDEX `sh_pgm_fltrbl_psm_ann_tp_fil_dir_idx` ON `srch_pgm__filterable_rep_peptide_annotation_type` (`filter_direction` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `srch__rep_pept__filterable_annotation`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `srch__rep_pept__filterable_annotation` ;
+
+CREATE TABLE IF NOT EXISTS `srch__rep_pept__filterable_annotation` (
+  `search_id` INT UNSIGNED NOT NULL,
+  `reported_peptide_id` INT UNSIGNED NOT NULL,
+  `peptide_filtertable_annotation_id` INT UNSIGNED NOT NULL,
+  `value` DOUBLE NOT NULL,
+  `value_string` VARCHAR(200) NOT NULL,
+  PRIMARY KEY (`search_id`),
+  CONSTRAINT `srch__rep_pept__filterable_annotation__search_id_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `srch__rep_pept__filterable_annotation__rep_pept_id`
+    FOREIGN KEY (`reported_peptide_id`)
+    REFERENCES `reported_peptide` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `srch_rep_pept_flterbl_ann__sch_pgm_f_ann_id_fk`
+    FOREIGN KEY ()
+    REFERENCES `srch_pgm__filterable_rep_peptide_annotation_type` ()
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX `search_reported_peptide_score__rep_pep_id_idx` ON `srch__rep_pept__filterable_annotation` (`reported_peptide_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `srch_pgm__descriptive_rep_peptide_annotation_type`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `srch_pgm__descriptive_rep_peptide_annotation_type` ;
+
+CREATE TABLE IF NOT EXISTS `srch_pgm__descriptive_rep_peptide_annotation_type` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_program_id` INT UNSIGNED NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `default_show` INT(1) UNSIGNED NOT NULL,
+  `description` VARCHAR(4000) NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `sh_pgm_descl_pept_ann_tp_srch_pgm_id_fk`
+    FOREIGN KEY (`search_program_id`)
+    REFERENCES `search_program` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `sh_pgm_fltrbl_psm_ann_tp_srch_pgm_id_fk_idx` ON `srch_pgm__descriptive_rep_peptide_annotation_type` (`search_program_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `srch__rep_pept__desc_annotation`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `srch__rep_pept__desc_annotation` ;
+
+CREATE TABLE IF NOT EXISTS `srch__rep_pept__desc_annotation` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_id` INT UNSIGNED NOT NULL,
+  `reported_peptide_id` INT UNSIGNED NOT NULL,
+  `peptide_filtertable_annotation_id` INT UNSIGNED NOT NULL,
+  `value` VARCHAR(4000) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `srch__rep_pept__filterable_annotation__search_id_fk0`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `srch__rep_pept__filterable_annotation__rep_pept_id0`
+    FOREIGN KEY (`reported_peptide_id`)
+    REFERENCES `reported_peptide` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `srch__rep_pept__desc_annotation__sch_pgm_d_ann_id_fk0`
+    FOREIGN KEY (`peptide_filtertable_annotation_id`)
+    REFERENCES `srch_pgm__descriptive_rep_peptide_annotation_type` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `srch__rep_pept__desc_annotation__rep_pep_id_idx` ON `srch__rep_pept__desc_annotation` (`reported_peptide_id` ASC);
+
+CREATE INDEX `srch__rep_pept__desc_annotation__sch_pgm_d_ann_id_fk0_idx` ON `srch__rep_pept__desc_annotation` (`peptide_filtertable_annotation_id` ASC);
+
+CREATE INDEX `srch__rep_pept__desc_annotation_srch_id_rep_pept_id_idex` ON `srch__rep_pept__desc_annotation` (`search_id` ASC, `reported_peptide_id` ASC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
