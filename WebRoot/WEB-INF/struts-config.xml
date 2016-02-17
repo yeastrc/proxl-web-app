@@ -241,7 +241,7 @@
     	<action path="/downloadMergedPSMsForPeptides"
 				type="org.yeastrc.xlink.www.actions.DownloadPSMsForMergedPeptidesAction"
 				scope="request"
-				name="mergedSearchViewCrosslinkPeptideForm"
+				name="mergedSearchViewPeptideForm"
 				validate="false">
 		</action>
   

@@ -25,9 +25,14 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.objects.AnnDisplayNameDescPeptPsmListsPair;
+import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
+import org.yeastrc.xlink.www.objects.AnnotationTypeDTOListForSearchId;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult;
@@ -35,15 +40,18 @@ import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePageWrapper
 import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
 import org.yeastrc.xlink.www.searcher.PeptideMergedWebPageSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.PsmAnnotationDataSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchModMassDistinctSearcher;
 import org.yeastrc.xlink.www.actions.PeptidesMergedCommonPageDownload.PeptidesMergedCommonPageDownloadResult;
+import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataDefaultDisplayInDisplayOrder;
 import org.yeastrc.xlink.www.constants.DynamicModificationsSelectionConstants;
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
@@ -231,6 +239,9 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 			
 			try {
 
+				Map<Integer, AnnotationTypeDTOListForSearchId> psmAnnotationTypeDataDefaultDisplayInDisplayOrder =
+						GetAnnotationTypeDataDefaultDisplayInDisplayOrder.getInstance()
+						.getPsmAnnotationTypeDataDefaultDisplayInDisplayOrder( searchIdsSet );
 				
 				////////     Get Merged Peptides
 
@@ -292,7 +303,32 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 				
 				writer.write( "SEARCH ID\tSCAN NUMBER\tPEPTIDE 1\tPOSITION 1\tMODS\tPEPTIDE 1\tPOSITION 2\tMODS\tLink Type" );
 				writer.write( "\tOBSERVED M/Z\tCHARGE\tRETENTION TIME (MINUTES)\tSCAN FILENAME" );
-				writer.write( "\tQ-VALUE\tPEP\tSVM SCORE\n" );
+
+
+				//  Process for each search id:
+
+				for ( Integer eachSearchIdToProcess : searchIdsListDeduppedSorted ) {
+					
+					AnnotationTypeDTOListForSearchId annotationTypeDTOListForSearchId = psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( eachSearchIdToProcess );
+
+					if ( annotationTypeDTOListForSearchId == null ) {
+						
+						String msg = "annotationTypeDTOListForSearchId not foudn for search id " + eachSearchIdToProcess;
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
+					}
+					
+					for ( AnnotationTypeDTO psmAnnotationTypeDTO : annotationTypeDTOListForSearchId.getAnnotationTypeDTOList() ) {
+					
+						writer.write( "\t" );
+						writer.write( psmAnnotationTypeDTO.getName() );
+						writer.write( "(SEARCH ID: " );
+						writer.write( Integer.toString( eachSearchIdToProcess ) );
+						writer.write( ")" );
+					}
+				}
+				
+				writer.write( "\n" );
 
 
 //		SEARCH ID
@@ -308,14 +344,7 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 //		CHARGE
 //		RETENTION TIME (MINUTES)
 //		SCAN FILENAME (THE MZML FILE)
-//		Q-VALUE
-//		PEP
-//		SVM SCORE
 				
-
-				List<Integer> searchIdsList = new ArrayList<>( searchIdsSet );
-
-				Collections.sort( searchIdsList );
 				
 				
 				for( WebMergedReportedPeptide link : peptidesMergedCommonPageDownloadResult.getWebMergedReportedPeptideList() ) {
@@ -328,7 +357,7 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 
 					//  Process for each search id:
 
-					for ( Integer eachSearchIdToProcess : searchIdsList ) {
+					for ( Integer eachSearchIdToProcess : searchIdsListDeduppedSorted ) {
 						
 						
 						
@@ -364,6 +393,8 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 											eachSearchIdToProcess, 
 											reportedPeptideId, 
 											searcherCutoffValuesSearchLevel);
+							
+							
 
 							for ( PsmWebDisplayWebServiceResult psmWebDisplay : psms ) {
 					
@@ -382,9 +413,7 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 //								CHARGE
 //								RETENTION TIME (MINUTES)
 //								SCAN FILENAME (THE MZML FILE)
-//								Q-VALUE
-//								PEP
-//								SVM SCORE
+
 					
 
 							writer.write( Integer.toString( eachSearchIdToProcess ) );
@@ -423,27 +452,131 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 							//  Scan data
 							
 							writer.write( "\t" );
-							writer.write( psmWebDisplay.getPreMZRounded() ); // OBSERVED M/Z
+							if ( StringUtils.isNotEmpty( psmWebDisplay.getPreMZRounded() ) ) {
+
+								writer.write( psmWebDisplay.getPreMZRounded() ); // OBSERVED M/Z
+							}
 							writer.write( "\t" );
 							if ( psmWebDisplay.getCharge() != null ) {
 								writer.write( Integer.toString( psmWebDisplay.getCharge() ) ); // CHARGE
 							}
 							writer.write( "\t" );
-							writer.write( psmWebDisplay.getRetentionTimeMinutesRoundedString() ); // RETENTION TIME (MINUTES)
+							if ( StringUtils.isNotEmpty( psmWebDisplay.getRetentionTimeMinutesRoundedString() ) ) {
+								writer.write( psmWebDisplay.getRetentionTimeMinutesRoundedString() ); // RETENTION TIME (MINUTES)
+							}
 							writer.write( "\t" );
 							if ( psmWebDisplay.getScanFilename() != null ) {
 								writer.write( psmWebDisplay.getScanFilename() );   /// SCAN FILENAME
 							}
-							writer.write( "\t" );
-							writer.write( Double.toString( psmWebDisplay.getPsmDTO().getqValue() ) );  // Q-VALUE
-							writer.write( "\t" );
-							if ( psmWebDisplay.getPsmDTO().getPercolatorPsm() != null ) {
-								writer.write( Double.toString( psmWebDisplay.getPsmDTO().getPercolatorPsm().getPep() ) );  // PEP
+							
+							
+
+							///  Fill in empty cells for other search ids before search id being processed
+
+							for ( Integer searchIdOtherThanSearchIdBeingProcessed : searchIdsListDeduppedSorted ) {
+								
+								if ( searchIdOtherThanSearchIdBeingProcessed >= eachSearchIdToProcess ) {
+									
+									//  Exit loop at eachSearchIdToProcess,  >= comparison since search ids in sorted order
+									
+									break;  // EARLY EXIT of loop
+								}
+
+								//  Fill in cells for search id searchIdOtherThanSearchIdBeingProcessed
+								
+								AnnotationTypeDTOListForSearchId annotationTypeDTOListFor_OTHER_SearchId = 
+										psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( searchIdOtherThanSearchIdBeingProcessed );
+
+								if ( annotationTypeDTOListFor_OTHER_SearchId == null ) {
+									
+									String msg = "annotationTypeDTOListFor_OTHER_SearchId not found for search id " + searchIdOtherThanSearchIdBeingProcessed;
+									log.error( msg );
+									throw new ProxlWebappDataException( msg );
+								}
+
+								for ( int counter = 0; counter < annotationTypeDTOListFor_OTHER_SearchId.getAnnotationTypeDTOList().size(); counter++ ) {
+									
+									writer.write( "\t" );
+								}
 							}
-							writer.write( "\t" );
-							if ( psmWebDisplay.getPsmDTO().getPercolatorPsm() != null ) {
-								writer.write( Double.toString( psmWebDisplay.getPsmDTO().getPercolatorPsm().getSvmScore() ) );  // SVM SCORE
+							
+
+							AnnotationTypeDTOListForSearchId annotationTypeDTOListForSearchId = 
+									psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( eachSearchIdToProcess );
+
+							if ( annotationTypeDTOListForSearchId == null ) {
+								
+								String msg = "annotationTypeDTOListForSearchId not found for search id " + eachSearchIdToProcess;
+								log.error( msg );
+								throw new ProxlWebappDataException( msg );
 							}
+							
+
+							//  Get set of annotation type ids for getting annotation data
+							
+							Set<Integer> annotationTypeIdsForGettingAnnotationData = new HashSet<>();
+
+							for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDTOListForSearchId.getAnnotationTypeDTOList() ) {
+								
+								annotationTypeIdsForGettingAnnotationData.add( annotationTypeDTO.getId() );
+							}
+							
+							Map<Integer, PsmAnnotationDTO> psmAnnotationDTOMapOnTypeId = new HashMap<>();
+							
+							List<PsmAnnotationDTO> psmAnnotationDataList = 
+									PsmAnnotationDataSearcher.getInstance()
+									.getPsmAnnotationDTOList( psmWebDisplay.getPsmDTO().getId(), annotationTypeIdsForGettingAnnotationData );
+
+							for ( PsmAnnotationDTO psmAnnotationDataItem : psmAnnotationDataList ) {
+
+								psmAnnotationDTOMapOnTypeId.put( psmAnnotationDataItem.getAnnotationTypeId(), psmAnnotationDataItem );
+							}
+
+							for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDTOListForSearchId.getAnnotationTypeDTOList() ) {
+								
+								PsmAnnotationDTO psmAnnotationDTO = psmAnnotationDTOMapOnTypeId.get( annotationTypeDTO.getId() );
+
+								if ( psmAnnotationDTO == null ) {
+									
+									String msg = "psmAnnotationDTO not foudn for annotation type id " +  annotationTypeDTO.getId();
+									log.error( msg );
+									throw new ProxlWebappDataException( msg );
+								}
+								
+								writer.write( "\t" );
+								writer.write( psmAnnotationDTO.getValueString() );
+							}
+							
+							
+							///  Fill in empty cells for other search ids After search id being processed
+
+							for ( Integer searchIdOtherThanSearchIdBeingProcessed : searchIdsListDeduppedSorted ) {
+								
+								if ( searchIdOtherThanSearchIdBeingProcessed <= eachSearchIdToProcess ) {
+									
+									//  skip to next entry at eachSearchIdToProcess,  <= comparison since search ids in sorted order
+									
+									continue;  // EARLY CONTINUE of loop, Skip to next entry
+								}
+
+								//  Fill in cells for search id searchIdOtherThanSearchIdBeingProcessed
+								
+								AnnotationTypeDTOListForSearchId annotationTypeDTOListFor_OTHER_SearchId = 
+										psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( searchIdOtherThanSearchIdBeingProcessed );
+
+								if ( annotationTypeDTOListFor_OTHER_SearchId == null ) {
+									
+									String msg = "annotationTypeDTOListFor_OTHER_SearchId not found for search id " + searchIdOtherThanSearchIdBeingProcessed;
+									log.error( msg );
+									throw new ProxlWebappDataException( msg );
+								}
+
+								for ( int counter = 0; counter < annotationTypeDTOListFor_OTHER_SearchId.getAnnotationTypeDTOList().size(); counter++ ) {
+									
+									writer.write( "\t" );
+								}
+							}
+							
 							
 							writer.write( "\n" );
 
@@ -461,11 +594,8 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 //							CHARGE
 //							RETENTION TIME (MINUTES)
 //							SCAN FILENAME (THE MZML FILE)
-//							Q-VALUE
-//							PEP
-//							SVM SCORE
 							
-						}
+							}
 						}
 					}
 
