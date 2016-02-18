@@ -30,7 +30,7 @@ function getLooplinkDataForSpecificLinkInGraph( params, link ) {
 			protein_position_2 : link.position2			
 	};
 	
-	var fcnToCallOnDisplay = function() {
+	context.fcnToCallOnDisplay = function() {
 
 		$length = $("#looplink_length");
 		$length.text( Math.round( link.length * 10 ) / 10 );
@@ -40,9 +40,7 @@ function getLooplinkDataForSpecificLinkInGraph( params, link ) {
 	var getLooplinkDataCommonParams = {
 			
 			context : requestContext,
-			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject,
-			
-			fcnToCallOnDisplay : fcnToCallOnDisplay
+			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject
 	};
 	
 	getLooplinkDataCommon( getLooplinkDataCommonParams );
@@ -138,7 +136,7 @@ function getCrosslinkDataForSpecificLinkInGraph( params, link ) {
 	}
 	
 
-	var fcnToCallOnDisplay = function() {
+	context.fcnToCallOnDisplay = function() {
 
 		$length = $("#crosslink_length");
 		$length.text( Math.round( link.length * 10 ) / 10 );
@@ -147,8 +145,7 @@ function getCrosslinkDataForSpecificLinkInGraph( params, link ) {
 	var getCrosslinkDataCommonParams = {
 			
 			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject,
-			context : context,
-			fcnToCallOnDisplay : fcnToCallOnDisplay
+			context : context
 	};
 
 	getCrosslinkDataCommon( getCrosslinkDataCommonParams );
