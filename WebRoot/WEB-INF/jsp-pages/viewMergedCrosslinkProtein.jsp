@@ -166,11 +166,7 @@
 			
 				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" 
 						href="${ contextPath }/mergedPeptide.do?<bean:write name="queryString" />">Peptide View</a>]
-											
 			
-				<span style="color:red; font-size: 24px;">Merged Coverage Report under construction </span>
-			
-				
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
 						href="${ contextPath }/mergedProteinCoverageReport.do?<bean:write name="queryString" />">Coverage Report</a>]
 
@@ -319,10 +315,6 @@
 
 			<div style="display:inline;">
 				[<a class="tool_tip_attached_jq" data-tooltip="View looplinks (instead of crosslinks)" href="${ contextPath }/mergedLooplinkProtein.do?<bean:write name="queryString" />">View Looplinks (<bean:write name="numLooplinks" />)</a>]
-				
-				
-				<span style="color: red;font-size: 18pt;">Links to Downloads Under Construction and will not work</span>
-				
 				[<a class="tool_tip_attached_jq" data-tooltip="Download all crosslinks as tab-delimited text" href="${ contextPath }/downloadMergedProteins.do?<bean:write name="queryString" />">Download Data (<bean:write name="numLinks" />)</a>]
 				[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="queryString" />">Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
 			</div>

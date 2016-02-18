@@ -286,11 +286,12 @@
 			<div style="display:inline;">
 				[<a class="tool_tip_attached_jq" data-tooltip="View looplinks (instead of crosslinks)" href="${ contextPath }/<proxl:defaultPageUrl pageName="looplinkProtein.do" searchId="${ search.id }">looplinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 						>View Looplinks (<bean:write name="numLooplinks" />)</a>]
-
-				<span style="color: red;font-size: 18pt;">Links to Downloads Under Construction and will not work</span>
-
-				[<a class="tool_tip_attached_jq" data-tooltip="Download all crosslinks as tab-delimited text" href="${ contextPath }/downloadMergedProteins.do?<bean:write name="mergedQueryString" />">Download Data (<bean:write name="numLinks" />)</a>]
-				[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="mergedQueryString" />">Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
+				[<a class="tool_tip_attached_jq" data-tooltip="Download all crosslinks as tab-delimited text" 
+					href="${ contextPath }/downloadMergedProteins.do?<bean:write name="mergedQueryString" />"
+					>Download Data (<bean:write name="numLinks" />)</a>]
+				[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" 
+					href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="mergedQueryString" />"
+					>Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
 			</div>
 			
 

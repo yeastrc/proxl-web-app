@@ -574,7 +574,7 @@ function getValuesFromForm() {
 
 
 //build a query string based on selections by user
-function updateURLHash( useSearchForm) {
+function updateURLHash( useSearchForm ) {
 
 	var items = { };
 
@@ -749,7 +749,7 @@ function updateURLHash( useSearchForm) {
 		items[ 'highlighted-proteins' ] = _highlightedProteins;
 	}
 
-	window.location.hash = encodeURI( JSON.stringify( items ) );
+	window.location.hash = encodeURIComponent( JSON.stringify( items ) );
 }
 
 
@@ -1773,6 +1773,8 @@ function loadDataFromService() {
 	        	populateSearchForm();
 	        	initializeViewer();
 	        	
+	        	updateURLHash( false /* useSearchForm */ );
+	        	
 	        	decrementSpinner();
 	        	
 	        	//  Find and show max protein length
@@ -1991,6 +1993,8 @@ function refreshViewerProteinSelects() {
 		
 }
 
+//////////////////
+
 
 function populateNavigation() {
 	
@@ -2000,18 +2004,6 @@ function populateNavigation() {
 	
 	var json = getJsonFromHash();
 	
-	
-	
-
-//	var project_id = $("#project_id").val();
-//	
-//	if ( project_id === undefined || project_id === null 
-//			|| project_id === "" ) {
-//		
-//		throw '$("#project_id").val() returned no value';
-//	}
-//	
-//	items.push( "project_id=" + project_id );
 	
 	
 	if ( _searches.length > 1 ) {
@@ -2092,10 +2084,7 @@ function populateNavigation() {
 	if ( _searches.length > 1 ) {
 		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
 		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
-		
-		html += ' <span style="color:red; font-size: 24px;">Merged Coverage Report under construction </span> ';
-		
-//		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
+		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
 	} else {
 		
 
@@ -2155,57 +2144,76 @@ function populateNavigation() {
 	}
 
 
+	var $navigation_links_except_structure = $("#navigation_links_except_structure"); 
 	
 	
-	$( "#navigation_links_except_structure" ).empty();
-	$( "#navigation_links_except_structure" ).html( html );
-	addToolTips( $( "#navigation_links_except_structure" ) );
+	$navigation_links_except_structure.empty();
+	$navigation_links_except_structure.html( html );
+	addToolTips( $navigation_links_except_structure );
 	
 	
 	var $structure_viewer_link_span = $("#structure_viewer_link_span");
 	
 	if ( $structure_viewer_link_span.length > 0 ) {
 
-		var structureQueryString = "?";
 
-		for ( var i = 0; i < _searchIds.length; i++ ) {
+		var structureNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View data on 3D structures\" " +
+			"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar;
 			
-			if ( i > 0 ) {
-				
-				structureQueryString += "&";
+			
+		var viewMergedStructureDefaultPageUrl = $("#viewMergedStructureDefaultPageUrl").val();
+		
+		
+		if ( viewMergedStructureDefaultPageUrl === undefined || viewMergedStructureDefaultPageUrl === "" ) {
+			      
+			var structureQueryString = "?";
+
+			for ( var i = 0; i < _searchIds.length; i++ ) {
+
+				if ( i > 0 ) {
+
+					structureQueryString += "&";
+				}
+
+				structureQueryString += "searchIds=" + _searchIds[ i ];
 			}
+
+			var structureJSON = { };
+
+//			add taxonomy exclusions
+			structureJSON[ 'excludeTaxonomy' ] = _excludeTaxonomy;
+
+//			add type exclusions
+			structureJSON[ 'excludeType' ] = _excludeType;
+
+			//  Add Filter cutoffs
+			structureJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
+
+
+//			add filter out non unique peptides
+			structureJSON[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
+
+			structureJSON[ 'filterOnlyOnePSM' ] = _filterOnlyOnePSM;
+			structureJSON[ 'filterOnlyOnePeptide' ] = _filterOnlyOnePeptide;
+
+			var structureJSONString = encodeURIComponent( JSON.stringify( structureJSON ) );
+
 			
-			structureQueryString += "searchIds=" + _searchIds[ i ];
+			structureNavHTML += "/structure.do" + structureQueryString + "#" + structureJSONString 
+
+
+		} else {
+			
+			structureNavHTML += viewMergedStructureDefaultPageUrl;
+			
 		}
-
-		var structureJSON = { };
-
-//		add taxonomy exclusions
-		structureJSON[ 'excludeTaxonomy' ] = _excludeTaxonomy;
-
-//		add type exclusions
-		structureJSON[ 'excludeType' ] = _excludeType;
-
-		//  Add Filter cutoffs
-		structureJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
 		
-
-//		add filter out non unique peptides
-		structureJSON[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
-
-		structureJSON[ 'filterOnlyOnePSM' ] = _filterOnlyOnePSM;
-		structureJSON[ 'filterOnlyOnePeptide' ] = _filterOnlyOnePeptide;
-
-		var structureJSONString = encodeURI( JSON.stringify( structureJSON ) );
-
-		var structureNavHTML = ' <span style="color:red; font-size: 24px;">[Merged Structure under construction]</span> ';
-		
-//		var structureNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View data on 3D structures\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/structure.do" 
-//				+ structureQueryString + "#" + structureJSONString + "\">Structure View</a>]</span>";
+		structureNavHTML += "\">Structure View</a>]</span>";
 
 		$structure_viewer_link_span.empty();
 		$structure_viewer_link_span.html( structureNavHTML );
 		addToolTips( $structure_viewer_link_span );
+
 	}
 	
 	

@@ -1482,9 +1482,6 @@
 											href="${ contextPath }/<proxl:defaultPageUrl pageName="image.do" searchId="${ search.id }">image.do?searchIds=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
 												>Image</a>]
 
-				<span style="color:red; font-size: 14px;">[Merged Structure under construction]</span> 
-
-<%-- 										
 										<c:choose>
 										 <c:when test="${ showStructureLink }">
 										
@@ -1501,7 +1498,6 @@
 										 </c:otherwise>
 										</c:choose>
 		
---%>
 			
 			
 										<c:if test="${authAccessLevel.searchDeleteAllowed}" >

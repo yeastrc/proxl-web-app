@@ -52,7 +52,7 @@
 	<c:choose>
 	 <c:when test="${ showStructureLink }">
 			
-		[<a class="tool_tip_attached_jq" data-tooltip="Graphical view of links between proteins" 
+		[<a class="tool_tip_attached_jq" data-tooltip="View data on 3D structures" 
 			href="${ contextPath }/${ structurePageURLFinal }"
 					
 					

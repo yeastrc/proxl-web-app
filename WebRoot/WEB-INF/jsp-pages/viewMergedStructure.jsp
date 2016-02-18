@@ -148,13 +148,13 @@
 	
 	<c:if test="${ not empty onlySingleSearchId }">
 	
-		<input class="tool_tip_attached_jq" data-tooltip="View peptides" type="hidden" id="viewSearchPeptideDefaultPageUrl" 
+		<input type="hidden" id="viewSearchPeptideDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="peptide.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
-		<input class="tool_tip_attached_jq" data-tooltip="View proteins" type="hidden" id="viewSearchCrosslinkProteinDefaultPageUrl" 
+		<input type="hidden" id="viewSearchCrosslinkProteinDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="crosslinkProtein.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
-		<input class="tool_tip_attached_jq" data-tooltip="View protein coverage report" type="hidden" id="viewProteinCoverageReportDefaultPageUrl" 
+		<input type="hidden" id="viewProteinCoverageReportDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="proteinCoverageReport.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
-		<input class="tool_tip_attached_jq" data-tooltip="Graphical view of links between proteins" type="hidden" id="viewviewMergedImageDefaultPageUrl" 
+		<input type="hidden" id="viewviewMergedImageDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="image.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 	</c:if>
 					
@@ -163,7 +163,11 @@
 	
 			<h2 style="margin-bottom:5px;">View <span id="merged_label_text_header" style="display: none;" >merged </span>search results:</h2>
 	
-			<div id="navigation-links"></div>
+			<div id="navigation-links">
+				<span id="navigation_links_except_image"></span>
+					
+				<span id="image_viewer_link_span"></span>
+			</div>
 			
 			
 			<%--  Hidden fields to pass data to JS --%>

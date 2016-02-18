@@ -419,8 +419,8 @@ function updateURLHash( useSearchForm) {
 		items[ 'udcl' ] = userDistanceConstraints.longDistance;
 	}
 	
-	
-	window.location.hash = encodeURI( JSON.stringify( items ) );
+
+	window.location.hash = encodeURIComponent( JSON.stringify( items ) );
 }
 
 
@@ -906,6 +906,9 @@ function loadDataFromService() {
 				populateSearchForm();
 				populatePDBFormArea();
 	        	
+
+	        	updateURLHash( false /* useSearchForm */ );
+	        	
 	        	decrementSpinner();
 	        	
 	        },
@@ -940,6 +943,8 @@ function findSearchesForCrosslink( protein1, protein2, position1, position2 ) {
 	return _proteinLinkPositions[ protein1 ][ protein2 ][ position1 ][ position2 ];
 }
 
+
+
 function populateNavigation() {
 	
 	var queryString = "?";
@@ -948,16 +953,6 @@ function populateNavigation() {
 	
 	var json = getJsonFromHash();
 	
-	
-	var project_id = $("#project_id").val();
-	
-	if ( project_id === undefined || project_id === null 
-			|| project_id === "" ) {
-		
-		throw '$("#project_id").val() returned no value';
-	}
-	
-	items.push( "project_id=" + project_id );
 	
 	
 	if ( _searches.length > 1 ) {
@@ -968,46 +963,90 @@ function populateNavigation() {
 		items.push( "searchId=" + _searchIds[ 0 ] );		
 	}
 
-	if ( json.excludeTaxonomy != undefined && json.excludeTaxonomy.length > 0 ) {
-		for ( var i = 0; i < json.excludeTaxonomy.length; i++ ) {
-			items.push( "excludeTaxonomy=" + json.excludeTaxonomy[ i ] );
-		}
+
+	//   Moved to inserto into JSON
+	
+//	if ( json.excludeTaxonomy != undefined && json.excludeTaxonomy.length > 0 ) {
+//		for ( var i = 0; i < json.excludeTaxonomy.length; i++ ) {
+//			items.push( "excludeTaxonomy=" + json.excludeTaxonomy[ i ] );
+//		}
+//	}
+	
+//	items.push( "psmQValueCutoff=" + json.psmQValueCutoff );
+//	items.push( "peptideQValueCutoff=" + json.peptideQValueCutoff );
+	
+
+	//   Moved to inserto into JSON
+	
+//	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
+//		items.push( "filterNonUniquePeptides=on" );
+//	}
+//	if ( json.filterOnlyOnePSM != undefined && json.filterOnlyOnePSM ) {
+//		items.push( "filterOnlyOnePSM=on" );
+//	}
+//	if ( json.filterOnlyOnePeptide != undefined && json.filterOnlyOnePeptide ) {
+//		items.push( "filterOnlyOnePeptide=on" );
+//	}
+	
+	
+	
+	///   Serialize cutoffs to JSON
+	
+	var cutoffs = json.cutoffs;
+	
+	//  Layout of baseJSONObject  matches Java class A_QueryBase_JSONRoot
+	
+	var baseJSONObject = { cutoffs : cutoffs };
+	
+	
+	//  Add to baseJSONObject
+	
+	if ( json.filterNonUniquePeptides !== undefined ) {
+		baseJSONObject.filterNonUniquePeptides = json.filterNonUniquePeptides;
+	}
+	if ( json.filterOnlyOnePSM !== undefined ) {
+		baseJSONObject.filterOnlyOnePSM = json.filterOnlyOnePSM;
+	}
+	if ( json.filterOnlyOnePeptide !== undefined ) {
+		baseJSONObject.filterOnlyOnePeptide = json.filterOnlyOnePeptide;
 	}
 	
-	items.push( "psmQValueCutoff=" + json.psmQValueCutoff );
-	items.push( "peptideQValueCutoff=" + json.peptideQValueCutoff );
 	
-	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
-		items.push( "filterNonUniquePeptides=on" );
-	}	
-	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
-		items.push( "filterOnlyOnePSM=on" );
+	if ( json.excludeTaxonomy !== undefined ) {
+		baseJSONObject.excludeTaxonomy = json.excludeTaxonomy;
 	}
-	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
-		items.push( "filterOnlyOnePeptide=on" );
-	}
+
+	
+	var psmPeptideCutoffsForSearchIds_JSONString = JSON.stringify( baseJSONObject );
+	
+	var psmPeptideCutoffsForSearchIds_JSONStringEncodedURIComponent = encodeURIComponent( psmPeptideCutoffsForSearchIds_JSONString ); 
+
+	//  Parameter name matches standard form parameter name for JSON
+	
+	items.push( "queryJSON=" + psmPeptideCutoffsForSearchIds_JSONStringEncodedURIComponent );
+
 	
 	queryString += items.join( "&" );
 
 	var html = "";
 
 	if ( _searches.length > 1 ) {
-		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/viewMergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
-		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/viewMergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
-		html += "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/viewMergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
+		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
+		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
+		
+		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
 	} else {
 		
 
-
 		//  Add Peptide Link
 		
-		html += "[<a class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" href='" + contextPathJSVar + "/";
+		html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" href='" + contextPathJSVar + "/";
         
 		var viewSearchPeptideDefaultPageUrl = $("#viewSearchPeptideDefaultPageUrl").val();
 		
 		if ( viewSearchPeptideDefaultPageUrl === undefined || viewSearchPeptideDefaultPageUrl === "" ) {
 			      
-			html += "viewSearchPeptide.do" + queryString;
+			html += "peptide.do" + queryString;
 
 		} else {
 			
@@ -1019,13 +1058,13 @@ function populateNavigation() {
 
 		//  Add Protein View Link
 		
-		html += "[<a class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" href='" + contextPathJSVar + "/";
+		html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" href='" + contextPathJSVar + "/";
         
 		var viewSearchCrosslinkProteinDefaultPageUrl = $("#viewSearchCrosslinkProteinDefaultPageUrl").val();
 		
 		if ( viewSearchCrosslinkProteinDefaultPageUrl === undefined || viewSearchCrosslinkProteinDefaultPageUrl === "" ) {
 			      
-			html += "viewSearchCrosslinkProtein.do" + queryString;
+			html += "crosslinkProtein.do" + queryString;
 
 		} else {
 			
@@ -1037,13 +1076,13 @@ function populateNavigation() {
 
 		//  Add Coverage Report Link
 		
-		html += "[<a class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" href='" + contextPathJSVar + "/";
+		html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" href='" + contextPathJSVar + "/";
         
 		var viewProteinCoverageReportDefaultPageUrl = $("#viewProteinCoverageReportDefaultPageUrl").val();
 		
 		if ( viewProteinCoverageReportDefaultPageUrl === undefined || viewProteinCoverageReportDefaultPageUrl === "" ) {
 			      
-			html += "viewProteinCoverageReport.do" + queryString;
+			html += "proteinCoverageReport.do" + queryString;
 
 		} else {
 			
@@ -1051,66 +1090,82 @@ function populateNavigation() {
 			
 		}
 		html += "'>Coverage Report</a>]";
+		
 	}
+
+	var $navigation_links_except_image = $("#navigation_links_except_image"); 
+	
+	
+	$navigation_links_except_image.empty();
+	$navigation_links_except_image.html( html );
+	addToolTips( $navigation_links_except_image );
+	
+	
 	
 
 	//  Add Merged Image Link
 	
-	
-	html += "[<a class=\"tool_tip_attached_jq\" data-tooltip=\"Graphical view of links between proteins\" href='" + contextPathJSVar + "/";
-    
-	var viewviewMergedImageDefaultPageUrl = $("#viewviewMergedImageDefaultPageUrl").val();
-	
-	if ( _searches.length > 1 || viewviewMergedImageDefaultPageUrl === undefined || viewviewMergedImageDefaultPageUrl === "" ) {
-		      
-		// "_searches.length > 1" means more than one search id and that is not supported for default Page URL
-		
-		
-		//  Create URL for Merged Image
 
+
+	var imageNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"Graphical view of links between proteins\" " + 
+		"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar;
 		
-		var imageQueryString = "?project_id=" + project_id;
-		
+
+	var viewMergedImageDefaultPageUrl = $("#viewMergedImageDefaultPageUrl").val();
+	
+	
+	if ( viewMergedImageDefaultPageUrl === undefined || viewMergedImageDefaultPageUrl === "" ) {
+		      
+
+		var imageQueryString = "?";
+
 		for ( var i = 0; i < _searchIds.length; i++ ) {
-			imageQueryString += "&searchIds=" + _searchIds[ i ];
+
+			if ( i > 0 ) {
+
+				imageQueryString += "&";
+			}
+
+			imageQueryString += "searchIds=" + _searchIds[ i ];
 		}
-		
 
 		var imageJSON = { };
 
-//			add taxonomy exclusions
+//		add taxonomy exclusions
 		imageJSON[ 'excludeTaxonomy' ] = _excludeTaxonomy;
 
-//			add type exclusions
+//		add type exclusions
 		imageJSON[ 'excludeType' ] = _excludeType;
 
 		//  Add Filter cutoffs
 		imageJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
 
-//			add filter out non unique peptides
+
+//		add filter out non unique peptides
 		imageJSON[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
+
 		imageJSON[ 'filterOnlyOnePSM' ] = _filterOnlyOnePSM;
 		imageJSON[ 'filterOnlyOnePeptide' ] = _filterOnlyOnePeptide;
 
-
 		var imageJSONString = encodeURI( JSON.stringify( imageJSON ) );
-		
 
-		
-		html += "viewMergedImage.do" + imageQueryString + "#" + imageJSONString ;
+		imageNavHTML += "/image.do" 
+		+ imageQueryString + "#" + imageJSONString
+
 
 	} else {
-		
-		html += viewviewMergedImageDefaultPageUrl;
-		
-	}
-	html += "'>Image View</a>]";
 
+		imageNavHTML += viewviewMergedImageDefaultPageUrl;
+
+	}
 	
-	$( "div#navigation-links" ).empty();
-	$( "div#navigation-links" ).html( html );
-	addToolTips( $( "div#navigation-links" ) );
-	
+	imageNavHTML += "\">Image View</a>]</span>";
+
+	var $image_viewer_link_span = $("#image_viewer_link_span");
+
+	$image_viewer_link_span.empty();
+	$image_viewer_link_span.html( imageNavHTML );
+	addToolTips( $image_viewer_link_span );
 	
 
 	if ( _searches.length === 1 ) {

@@ -126,13 +126,13 @@
 	
 	<c:if test="${ not empty onlySingleSearchId }">
 	
-		<input class="tool_tip_attached_jq" data-tooltip="View peptides" type="hidden" id="viewSearchPeptideDefaultPageUrl" 
+		<input type="hidden" id="viewSearchPeptideDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="peptide.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
-		<input class="tool_tip_attached_jq" data-tooltip="View proteins" type="hidden" id="viewSearchCrosslinkProteinDefaultPageUrl" 
+		<input type="hidden" id="viewSearchCrosslinkProteinDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="crosslinkProtein.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
-		<input class="tool_tip_attached_jq" data-tooltip="View protein coverage report" type="hidden" id="viewProteinCoverageReportDefaultPageUrl" 
+		<input type="hidden" id="viewProteinCoverageReportDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="proteinCoverageReport.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
-		<input class="tool_tip_attached_jq" data-tooltip="View data on 3D structures" type="hidden" id="viewMergedStructureDefaultPageUrl" 
+		<input type="hidden" id="viewMergedStructureDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="structure.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 	</c:if>
 					
