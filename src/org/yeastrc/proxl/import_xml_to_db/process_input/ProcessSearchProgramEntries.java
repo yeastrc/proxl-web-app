@@ -95,8 +95,6 @@ public class ProcessSearchProgramEntries {
 			
 			searchProgramEntryMap.put( searchProgramsPerSearchDTO.getName(), searchProgramEntry );
 			
-			
-			
 			processReportedPeptideAnnotationTypes( searchProgram, searchProgramEntry, searchProgramsPerSearchDTO.getId(), searchId, searchProgramInfo );
 
 			processPsmAnnotationTypes( searchProgram, searchProgramEntry, searchProgramsPerSearchDTO.getId(), searchId, searchProgramInfo );
@@ -145,12 +143,27 @@ public class ProcessSearchProgramEntries {
 		
 		String searchProgramName = searchProgram.getName();
 		
-		List<SearchAnnotation> reportedPeptideAnnotationSortOrderSearchAnnotationList = 
-				searchProgramInfo.getAnnotationSortOrder().getReportedPeptideAnnotationSortOrder().getSearchAnnotation();
-		
+		List<SearchAnnotation> reportedPeptideAnnotationSortOrderSearchAnnotationList = null;
+		List<SearchAnnotation> visibleReportedPeptideDefaultVisibleAnnotationsSearchAnnotationList = null;
 
-		List<SearchAnnotation> visibleReportedPeptideDefaultVisibleAnnotationsSearchAnnotationList = 
-				searchProgramInfo.getDefaultVisibleAnnotations().getVisibleReportedPeptideAnnotations().getSearchAnnotation();
+		if ( searchProgramInfo != null 
+				&& searchProgramInfo.getAnnotationSortOrder() != null 
+				&& searchProgramInfo.getAnnotationSortOrder().getReportedPeptideAnnotationSortOrder() != null 
+				&& searchProgramInfo.getAnnotationSortOrder().getReportedPeptideAnnotationSortOrder().getSearchAnnotation() != null ) {
+		
+			reportedPeptideAnnotationSortOrderSearchAnnotationList = 
+					searchProgramInfo.getAnnotationSortOrder().getReportedPeptideAnnotationSortOrder().getSearchAnnotation();
+		}
+
+		if ( searchProgramInfo != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations() != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisibleReportedPeptideAnnotations() != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisibleReportedPeptideAnnotations().getSearchAnnotation() != null ) {
+		
+			visibleReportedPeptideDefaultVisibleAnnotationsSearchAnnotationList = 
+					searchProgramInfo.getDefaultVisibleAnnotations().getVisibleReportedPeptideAnnotations().getSearchAnnotation();
+		}
+		
 		
 		
 		SearchProgram.ReportedPeptideAnnotationTypes reportedPeptideAnnotationTypes =
@@ -266,10 +279,20 @@ public class ProcessSearchProgramEntries {
 		
 		String searchProgramName = searchProgram.getName();
 		
+
+		List<SearchAnnotation> visibleReportedPeptideDefaultVisibleAnnotationsSearchAnnotationList = null;
+
+		
+		if ( searchProgramInfo != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations() != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisibleReportedPeptideAnnotations() != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisibleReportedPeptideAnnotations().getSearchAnnotation() != null ) {
+		
+			visibleReportedPeptideDefaultVisibleAnnotationsSearchAnnotationList = 
+					searchProgramInfo.getDefaultVisibleAnnotations().getVisibleReportedPeptideAnnotations().getSearchAnnotation();
+		}
 		
 
-		List<SearchAnnotation> visibleReportedPeptideDefaultVisibleAnnotationsSearchAnnotationList = 
-				searchProgramInfo.getDefaultVisibleAnnotations().getVisibleReportedPeptideAnnotations().getSearchAnnotation();
 		
 		
 		SearchProgram.ReportedPeptideAnnotationTypes reportedPeptideAnnotationTypes =
@@ -372,13 +395,29 @@ public class ProcessSearchProgramEntries {
 		
 		String searchProgramName = searchProgram.getName();
 		
-		List<SearchAnnotation> psmAnnotationSortOrderSearchAnnotationList = 
-				searchProgramInfo.getAnnotationSortOrder().getPsmAnnotationSortOrder().getSearchAnnotation();
 		
 
-		List<SearchAnnotation> visiblePsmAnnotationsSearchAnnotationList = 
-				searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmAnnotations().getSearchAnnotation();
+		List<SearchAnnotation> psmAnnotationSortOrderSearchAnnotationList = null;
+		List<SearchAnnotation> visiblePsmDefaultVisibleAnnotationsSearchAnnotationList = null;
+
+		if ( searchProgramInfo != null 
+				&& searchProgramInfo.getAnnotationSortOrder() != null 
+				&& searchProgramInfo.getAnnotationSortOrder().getPsmAnnotationSortOrder() != null 
+				&& searchProgramInfo.getAnnotationSortOrder().getPsmAnnotationSortOrder().getSearchAnnotation() != null ) {
 		
+			psmAnnotationSortOrderSearchAnnotationList = 
+					searchProgramInfo.getAnnotationSortOrder().getReportedPeptideAnnotationSortOrder().getSearchAnnotation();
+		}
+
+
+		if ( searchProgramInfo != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations() != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmAnnotations() != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmAnnotations().getSearchAnnotation() != null ) {
+		
+			visiblePsmDefaultVisibleAnnotationsSearchAnnotationList = 
+					searchProgramInfo.getDefaultVisibleAnnotations().getVisibleReportedPeptideAnnotations().getSearchAnnotation();
+		}
 		
 
 		
@@ -401,9 +440,9 @@ public class ProcessSearchProgramEntries {
 			
 			Integer annotationTypeSortOrder = getAnnotationTypeSortOrder( annotationTypeName, searchProgramName, psmAnnotationSortOrderSearchAnnotationList );
 			
-			boolean annotationTypeDefaultVisible = getAnnotationTypeDefaultVisible( annotationTypeName, searchProgramName, visiblePsmAnnotationsSearchAnnotationList );
+			boolean annotationTypeDefaultVisible = getAnnotationTypeDefaultVisible( annotationTypeName, searchProgramName, visiblePsmDefaultVisibleAnnotationsSearchAnnotationList );
 
-			Integer annotationTypeDisplayOrder = getAnnotationTypeDisplayOrder( annotationTypeName, searchProgramName, visiblePsmAnnotationsSearchAnnotationList );
+			Integer annotationTypeDisplayOrder = getAnnotationTypeDisplayOrder( annotationTypeName, searchProgramName, visiblePsmDefaultVisibleAnnotationsSearchAnnotationList );
 
 			
 			
@@ -474,9 +513,18 @@ public class ProcessSearchProgramEntries {
 		
 		String searchProgramName = searchProgram.getName();
 
-		List<SearchAnnotation> visiblePsmAnnotationsSearchAnnotationList = 
-				searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmAnnotations().getSearchAnnotation();
+
+
+		List<SearchAnnotation> visiblePsmDefaultVisibleAnnotationsSearchAnnotationList = null;
+
+		if ( searchProgramInfo != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations() != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmAnnotations() != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmAnnotations().getSearchAnnotation() != null ) {
 		
+			visiblePsmDefaultVisibleAnnotationsSearchAnnotationList = 
+					searchProgramInfo.getDefaultVisibleAnnotations().getVisibleReportedPeptideAnnotations().getSearchAnnotation();
+		}
 		
 
 		SearchProgram.PsmAnnotationTypes psmAnnotationTypes =
@@ -495,9 +543,9 @@ public class ProcessSearchProgramEntries {
 			
 			String annotationTypeName = descriptivePsmAnnotationType.getName();
 			
-			boolean annotationTypeDefaultVisible = getAnnotationTypeDefaultVisible( annotationTypeName, searchProgramName, visiblePsmAnnotationsSearchAnnotationList );
+			boolean annotationTypeDefaultVisible = getAnnotationTypeDefaultVisible( annotationTypeName, searchProgramName, visiblePsmDefaultVisibleAnnotationsSearchAnnotationList );
 
-			Integer annotationTypeDisplayOrder = getAnnotationTypeDisplayOrder( annotationTypeName, searchProgramName, visiblePsmAnnotationsSearchAnnotationList );
+			Integer annotationTypeDisplayOrder = getAnnotationTypeDisplayOrder( annotationTypeName, searchProgramName, visiblePsmDefaultVisibleAnnotationsSearchAnnotationList );
 			
 			
 			AnnotationTypeDTO item = new AnnotationTypeDTO();
@@ -537,6 +585,11 @@ public class ProcessSearchProgramEntries {
 	 */
 	private Integer getAnnotationTypeSortOrder( String annotationTypeName, String searchProgramName, List<SearchAnnotation> annotationSortOrderSearchAnnotationList ) {
 		
+		if ( annotationSortOrderSearchAnnotationList == null ) {
+			
+			return null;
+		}
+		
 		int orderPositionCounter = 0;
 		
 		for ( SearchAnnotation searchAnnotationSortOrder : annotationSortOrderSearchAnnotationList ) {
@@ -559,12 +612,17 @@ public class ProcessSearchProgramEntries {
 	 * 
 	 * @param annotationTypeName
 	 * @param searchProgramName
-	 * @param visibleReportedPeptideDefaultVisibleAnnotationsSearchAnnotationList
+	 * @param annotationDefaultVisibleSearchAnnotationList
 	 * @return Return true if in AnnotationTypeDefaultVisible or return false if not found
 	 */
-	private boolean getAnnotationTypeDefaultVisible( String annotationTypeName, String searchProgramName, List<SearchAnnotation> visibleReportedPeptideDefaultVisibleAnnotationsSearchAnnotationList ) {
+	private boolean getAnnotationTypeDefaultVisible( String annotationTypeName, String searchProgramName, List<SearchAnnotation> annotationDefaultVisibleSearchAnnotationList ) {
 
-		for ( SearchAnnotation searchAnnotationDefaultVisible : visibleReportedPeptideDefaultVisibleAnnotationsSearchAnnotationList ) {
+		if ( annotationDefaultVisibleSearchAnnotationList == null ) {
+			
+			return false;
+		}
+		
+		for ( SearchAnnotation searchAnnotationDefaultVisible : annotationDefaultVisibleSearchAnnotationList ) {
 			
 			if ( annotationTypeName.equals( searchAnnotationDefaultVisible.getAnnotationName() )
 					&& searchProgramName.equals( searchAnnotationDefaultVisible.getSearchProgram() ) ) {
@@ -587,6 +645,11 @@ public class ProcessSearchProgramEntries {
 	 * @return null if not found, otherwise the position in the list
 	 */
 	private Integer getAnnotationTypeDisplayOrder( String annotationTypeName, String searchProgramName, List<SearchAnnotation> annotationDefaultVisibleSearchAnnotationList ) {
+		
+		if ( annotationDefaultVisibleSearchAnnotationList == null ) {
+			
+			return null;
+		}
 		
 		int orderPositionCounter = 0;
 		

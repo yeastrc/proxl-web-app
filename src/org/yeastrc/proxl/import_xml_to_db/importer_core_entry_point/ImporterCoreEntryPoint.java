@@ -3,7 +3,6 @@ package org.yeastrc.proxl.import_xml_to_db.importer_core_entry_point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -61,6 +60,19 @@ public class ImporterCoreEntryPoint {
 
 		ProxlInput proxlInputForImport = null;
 
+		String importDirectory = null; 
+				
+		try {
+			importDirectory = mainXMLFileToImport.getCanonicalPath();
+			
+		} catch ( Exception e ) {
+			
+			String msg = "Error mainXMLFileToImport.getCanonicalPath()";
+			log.error( msg, e );
+			throw e;
+		}
+		
+		
 
 		//  Unmarshall the main import file
 
@@ -127,7 +139,7 @@ public class ImporterCoreEntryPoint {
 			}
 		}
 
-		doImportPassingDeserializedImportInputXML( projectId, proxlInputForImport, scanFileList );
+		doImportPassingDeserializedImportInputXML( projectId, proxlInputForImport, scanFileList, importDirectory );
 		
 	}
 		
@@ -142,7 +154,9 @@ public class ImporterCoreEntryPoint {
 
 			int projectId,
 			ProxlInput proxlInputForImport,
-			List<File> scanFileList 
+			List<File> scanFileList,
+			
+			String importDirectory
 
 			) throws Exception {
 
@@ -228,16 +242,8 @@ public class ImporterCoreEntryPoint {
 			//				throw new ProxlImporterDataException(msg);
 			//			}
 
-
-			Linker proxlInputLinker = proxlInputLinkers.getLinker();
-
-
-			//  Put in a list to support more than one linker later
-
-			List<Linker> proxlInputLinkerList = new ArrayList<>();
-
-			proxlInputLinkerList.add( proxlInputLinker );
-
+			
+			List<Linker> proxlInputLinkerList = proxlInputLinkers.getLinker();
 
 
 			//  TODO  !!!!!!!   Many places in the code need to be changed if this is removed.  Look for IsDynamicModMassAMonolink
@@ -278,7 +284,7 @@ public class ImporterCoreEntryPoint {
 
 			SearchDTO searchDTOInserted =
 
-					processProxlInput.processProxlInput( projectId, proxlInputForImport, scanFileList, nrseqDatabaseId );
+					processProxlInput.processProxlInput( projectId, proxlInputForImport, scanFileList, importDirectory, nrseqDatabaseId );
 
 			
 

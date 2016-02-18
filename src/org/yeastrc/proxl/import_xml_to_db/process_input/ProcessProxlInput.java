@@ -63,6 +63,8 @@ public class ProcessProxlInput {
 			ProxlInput proxlInput,
 			List<File> scanFileList,
 			
+			String importDirectory,
+			
 			int nrseqDatabaseId
 			
 			) throws Exception {
@@ -78,6 +80,8 @@ public class ProcessProxlInput {
 			
 			searchDTO.setFastaFilename( proxlInput.getFastaFilename() );
 			searchDTO.setProjectId( projectId );
+			
+			searchDTO.setPath( importDirectory );
 			
 			if ( StringUtils.isNotEmpty( proxlInput.getName() ) ) {
 			

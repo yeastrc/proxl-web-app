@@ -1,6 +1,5 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -78,14 +77,7 @@ public class ProcessReportedPeptidesAndPSMs {
 //		}
 		
 		
-		Linker proxlInputLinker = proxlInputLinkers.getLinker();
-
-		
-		//  Put in a list to support more than one linker later
-		
-		List<Linker> proxlInputLinkerList = new ArrayList<>();
-
-		proxlInputLinkerList.add( proxlInputLinker );
+		List<Linker> proxlInputLinkerList = proxlInputLinkers.getLinker();
 
 		
 		//////////////
