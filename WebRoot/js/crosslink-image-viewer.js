@@ -469,6 +469,9 @@ function getJsonFromHash() {
 	return json;
 }
 
+
+////
+
 function getCutoffDefaultsFromPage() {
 	
 
@@ -498,39 +501,6 @@ function getValuesFromForm() {
 
 	var items = { };
 
-//	var psmCutoff = parseFloat( $( "input#psmQValueCutoff" ).val() );
-//
-//	if ( isNaN( psmCutoff ) ) {
-//		
-//		destroySpinner();
-//		
-//		var $element = $("#error_message_invalid_psm_q_value_cutoff");
-//		
-//		showErrorMsg( $element );
-//
-////		alert( "Invalid value for PSM q-value cutoff." );
-//
-//		return null; //  EARLY EXIT  return null
-//	}
-//	items[ 'psmQValueCutoff' ] = psmCutoff;
-//
-//	var peptideCutoff = parseFloat( $( "input#peptideQValueCutoff" ).val() );
-//	if ( isNaN( peptideCutoff ) ) {
-//		
-//		destroySpinner();
-//		
-//		var $element = $("#error_message_invalid_peptide_q_value_cutoff");
-//		
-//		showErrorMsg( $element );
-//		
-////		alert( "Invalid value for Peptide q-value cutoff." );
-//
-//		return null; //  EARLY EXIT  return null;
-//	}
-//	
-//	items[ 'peptideQValueCutoff' ] = peptideCutoff;
-	
-//	var inputCutoffs = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
 	
 	var getCutoffsFromThePageResult = cutoffProcessingCommonCode.getCutoffsFromThePage(  {  } );
 	
@@ -623,12 +593,6 @@ function updateURLHash( useSearchForm) {
 //		add type exclusions
 		items[ 'excludeType' ] = _excludeType;
 
-//		add psm cutoff
-//		items[ 'psmQValueCutoff' ] = _psmQValueCutoff;
-
-//		add peptide cutoff 
-//		items[ 'peptideQValueCutoff' ] = _peptideQValueCutoff;
-		
 //		add psm/peptide cutoffs
 		items[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
 
@@ -821,10 +785,6 @@ function buildQueryStringFromHash() {
 		}
 	}
 	
-//	items.push( "psmQValueCutoff=" + json.psmQValueCutoff );
-//	items.push( "peptideQValueCutoff=" + json.peptideQValueCutoff );
-	
-	
 	
 	
 	///   Serialize cutoffs to JSON
@@ -889,7 +849,7 @@ function loadSequenceCoverageDataForProtein( protein, doDraw ) {
 	
 		if ( _ranges == undefined || _ranges[ protein ] == undefined ) {
 			
-			createSpinner();				// create spinner
+			incrementSpinner();				// create spinner
 			
 			var url = contextPathJSVar + "/services/sequenceCoverage/getDataForProtein";
 			url += buildQueryStringFromHash();
@@ -909,15 +869,15 @@ function loadSequenceCoverageDataForProtein( protein, doDraw ) {
 			        		_ranges[ protein ] = data[ 'ranges' ][ protein ];
 			        	}
 			        	
-			        	destroySpinner();
+			        	decrementSpinner();
 			        	loadDataAndDraw( doDraw );
 			        },
 			        failure: function(errMsg) {
-						destroySpinner();
+						decrementSpinner();
 			        	handleAJAXFailure( errMsg );
 			        },
 			        error: function(jqXHR, textStatus, errorThrown) {	
-							destroySpinner();
+							decrementSpinner();
 							handleAJAXError( jqXHR, textStatus, errorThrown );
 //							alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ", textStatus: " + textStatus );
 					}
@@ -934,7 +894,7 @@ function loadProteinSequenceDataForProtein( proteinIdsToGetSequence, doDraw ) {
 
 	console.log( "Loading protein sequence data for proteins: " + proteinIdsToGetSequence );
 
-	createSpinner();				// create spinner
+	incrementSpinner();				// create spinner
 	
 	var url = contextPathJSVar + "/services/proteinSequence/getDataForProtein";
 
@@ -978,15 +938,15 @@ function loadProteinSequenceDataForProtein( proteinIdsToGetSequence, doDraw ) {
 	    		}
 	    		
 	        	
-	        	destroySpinner();
+	        	decrementSpinner();
 	        	loadDataAndDraw( doDraw );
 	        },
 	        failure: function(errMsg) {
-				destroySpinner();
+				decrementSpinner();
 	        	handleAJAXFailure( errMsg );
 	        },
 	        error: function(jqXHR, textStatus, errorThrown) {	
-					destroySpinner();
+					decrementSpinner();
 					handleAJAXError( jqXHR, textStatus, errorThrown );
 //							alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ", textStatus: " + textStatus );
 			}
@@ -1002,7 +962,7 @@ function loadProteinTaxonomyIdDataForProtein( proteinIds, doDraw ) {
 
 	console.log( "Loading protein taxonomy id data for proteins: " + proteinIds );
 
-	createSpinner();				// create spinner
+	incrementSpinner();				// create spinner
 	
 	var url = contextPathJSVar + "/services/proteinTaxonomyId/getDataForProtein";
 
@@ -1049,15 +1009,15 @@ function loadProteinTaxonomyIdDataForProtein( proteinIds, doDraw ) {
 	    		}
 	    		
 	        	
-	        	destroySpinner();
+	        	decrementSpinner();
 	        	loadDataAndDraw( doDraw );
 	        },
 	        failure: function(errMsg) {
-				destroySpinner();
+				decrementSpinner();
 	        	handleAJAXFailure( errMsg );
 	        },
 	        error: function(jqXHR, textStatus, errorThrown) {	
-					destroySpinner();
+					decrementSpinner();
 					handleAJAXError( jqXHR, textStatus, errorThrown );
 //							alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ", textStatus: " + textStatus );
 			}
@@ -1545,7 +1505,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 		////////////////////
 		
 
-		createSpinner();				// create spinner
+		incrementSpinner();				// create spinner
 		
 
 
@@ -1557,7 +1517,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 			var doDraw = params.doDraw;
 
 
-			destroySpinner();
+			decrementSpinner();
 
 
 			loadDataAndDraw( doDraw );
@@ -1579,7 +1539,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 		
 
 
-			destroySpinner();
+			decrementSpinner();
 
 			$("#pgm_failed_annotation_data_overlay_annotation_type_header_text").text( annotationType_DisplayText_local );
 
@@ -1634,7 +1594,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 //			var doDraw = params.doDraw;
 
 
-//			destroySpinner();
+//			decrementSpinner();
 
 
 //			alert("Processing of one or more proteins for annotation type is required so there will be a delay in the availablity of viewing the data."
@@ -1669,7 +1629,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 			var doDraw = initialLoadAnnotationsParams.doDraw;
 
 
-			destroySpinner();
+			decrementSpinner();
 
 			$("#run_pgm_annotation_data_modal_dialog_overlay_background").hide();
 
@@ -1751,7 +1711,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 			//  return;  //  do return if put up blocking modal dialog with cancel
 		} else {
 			
-			destroySpinner();
+			decrementSpinner();
 
 		}
 	}
@@ -1769,7 +1729,7 @@ function loadDataFromService() {
 	
 	console.log( "Loading protein data." );
 	
-	createSpinner();				// create spinner
+	incrementSpinner();				// create spinner
 	
 	var url = contextPathJSVar + "/services/imageViewer/getProteinData";
 	url += buildQueryStringFromHash();
@@ -1796,10 +1756,7 @@ function loadDataFromService() {
 	        	_linkablePositions = data.linkablePositions;
 	        	
 	        	// handle other search parameters
-	        	
-//	        	_psmQValueCutoff = data.psmQValueCutoff;
-//	        	_peptideQValueCutoff = data.peptideQValueCutoff;
-	        	
+
 	        	_psmPeptideCutoffsRootObjectStorage.setPsmPeptideCutoffsRootObject( data.cutoffs );
 	        	
 	        	_excludeTaxonomy = data.excludeTaxonomy;
@@ -1816,7 +1773,7 @@ function loadDataFromService() {
 	        	populateSearchForm();
 	        	initializeViewer();
 	        	
-	        	destroySpinner();
+	        	decrementSpinner();
 	        	
 	        	//  Find and show max protein length
 	        	
@@ -1864,7 +1821,7 @@ function loadDataFromService() {
 	        	
 	        },
 	        failure: function(errMsg) {
-				destroySpinner();
+				decrementSpinner();
 	        	handleAJAXFailure( errMsg );
 	        },
 			error: function(jqXHR, textStatus, errorThrown) {
@@ -1903,9 +1860,6 @@ function populateHighlightedProtein() {
 
 function populateSearchForm() {
 	
-//	$( "input#psmQValueCutoff" ).val( _psmQValueCutoff );
-//	$( "input#peptideQValueCutoff" ).val( _peptideQValueCutoff );
-
 	cutoffProcessingCommonCode.putCutoffsOnThePage(  { cutoffs : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject() } );
 
 	
@@ -2232,12 +2186,7 @@ function populateNavigation() {
 //		add type exclusions
 		structureJSON[ 'excludeType' ] = _excludeType;
 
-//		add psm cutoff
-//		structureJSON[ 'psmQValueCutoff' ] = _psmQValueCutoff;
-
-//		add peptide cutoff 
-//		structureJSON[ 'peptideQValueCutoff' ] = _peptideQValueCutoff;
-		
+		//  Add Filter cutoffs
 		structureJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
 		
 
@@ -5774,7 +5723,7 @@ function initializeViewer()  {
 		
 		proteinAnnotationStore.cancelCheckForComplete();
 
-		destroySpinner();
+		decrementSpinner();
 
 		$("#run_pgm_annotation_data_modal_dialog_overlay_background").hide();
 		
@@ -5971,8 +5920,6 @@ function processClickOnCrossLink( clickThis  ) {
 
 	var params = {
 			clickThis : clickThis,
-//			psmQValueCutoff : _psmQValueCutoff,
-//			peptideQValueCutoff : _peptideQValueCutoff
 			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
 	};
 
@@ -6071,7 +6018,7 @@ function initPage() {
 
 	
 
-	createSpinner();				// create spinner
+	incrementSpinner();				// create spinner
 
 	
 	//	Validate that all the searches are accessible
@@ -6086,7 +6033,7 @@ function initPage() {
 		success: function(data)	{
 
 
-			destroySpinner();
+			decrementSpinner();
 
 			//  Searches have been validated so load the data for the page
 
@@ -6094,12 +6041,12 @@ function initPage() {
 
 		},
         failure: function(errMsg) {
-			destroySpinner();
+			decrementSpinner();
         	handleAJAXFailure( errMsg );
         },
 		error: function(jqXHR, textStatus, errorThrown) {	
 
-			destroySpinner();
+			decrementSpinner();
 			handleAJAXError( jqXHR, textStatus, errorThrown );
 		}
 	});

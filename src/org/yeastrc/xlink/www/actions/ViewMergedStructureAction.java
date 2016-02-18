@@ -7,9 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -19,10 +17,15 @@ import org.yeastrc.auth.dao.AuthSharedObjectDAO;
 import org.yeastrc.auth.dto.AuthSharedObjectDTO;
 import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.cutoff_processing_web.GetCutoffPageDisplayRoot;
+import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
+import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
+import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
@@ -30,6 +33,8 @@ import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Handle showing the user a web page for viewing and analyzing how
@@ -61,7 +66,7 @@ public class ViewMergedStructureAction extends Action {
 			 */
 			
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 			
 
 
@@ -145,10 +150,6 @@ public class ViewMergedStructureAction extends Action {
 
 			request.setAttribute( WebConstants.REQUEST_AUTH_ACCESS_LEVEL, authAccessLevel );
 
-
-
-			
-			
 			
 			request.setAttribute( "searchIds", searchIds );
 			
@@ -204,15 +205,71 @@ public class ViewMergedStructureAction extends Action {
 			}
 
 			
-			/*
-			 * END AUTHENTICATION
-			 */
+			///    Done Processing Auth Check and Auth Level
+
+			
+			//////////////////////////////
+
+
+			//  Jackson JSON Mapper object for JSON deserialization and serialization
+			
+			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
+
+
+			
 
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 	
 			
 			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
 	
+			
+
+			
+
+			String annotation_data_webservice_base_url = 
+					ConfigSystemDAO.getInstance().getConfigValueForConfigKey( ConfigSystemsKeysConstants.PROTEIN_ANNOTATION_WEBSERVICE_URL_KEY );
+			
+//			if ( annotation_data_webservice_base_url == null ) {
+//				
+//				String msg = "No System configuration found for key: " + ConfigSystemsKeysConstants.PROTEIN_ANNOTATION_WEBSERVICE_URL_KEY;
+//				log.error( msg );
+//				throw new Exception( msg );
+//			}
+			
+			request.setAttribute( "annotation_data_webservice_base_url", annotation_data_webservice_base_url );
+			
+			
+
+			/////////////////////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////////////////////
+			
+			////////   Generic Param processing
+			
+			
+
+			
+			
+			
+			CutoffValuesRootLevel cutoffValuesRootLevelCutoffDefaults = 
+					GetDefaultPsmPeptideCutoffs.getInstance()
+					.getDefaultPsmPeptideCutoffs( searchIdsCollection );
+
+
+			String cutoffValuesRootLevelCutoffDefaultsJSONString = jacksonJSON_Mapper.writeValueAsString( cutoffValuesRootLevelCutoffDefaults );
+
+			request.setAttribute( "cutoffValuesRootLevelCutoffDefaults", cutoffValuesRootLevelCutoffDefaultsJSONString );
+
+			
+			//  This builds an object for the cutoff selection block on the page
+			
+
+
+//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
+			
+			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsCollection, request );
+	
+			
 		
 		} catch ( Exception e ) {
 

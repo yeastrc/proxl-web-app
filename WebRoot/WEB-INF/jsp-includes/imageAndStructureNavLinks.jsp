@@ -49,9 +49,6 @@
 					
 				<%--  Structure Link --%>	
 
-		<span style="color:red; font-size: 24px;">[Merged Structure under construction]</span> 
-
-<%-- 
 	<c:choose>
 	 <c:when test="${ showStructureLink }">
 			
@@ -69,4 +66,4 @@
 							 	
 	 </c:otherwise>
 	</c:choose>
---%>						
+

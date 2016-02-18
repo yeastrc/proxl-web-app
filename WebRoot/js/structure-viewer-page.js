@@ -2,6 +2,13 @@
 
 
 
+///////////////   CONSTANTS  ////////////////////////
+
+
+//Default exclude link type "No Links"
+
+var EXCLUDE_LINK_TYPE_DEFAULT = [ 0 ];
+
 
 //From Page
 
@@ -39,8 +46,29 @@ var _ranges;
 
 //From JSON (probably round trips from the input fields to the JSON in the Hash in the URL to these variables)
 
-var _psmQValueCutoff;
-var _peptideQValueCutoff;
+var _psmPeptideCutoffsRootObjectStorage = {
+	
+	_psmPeptideCutoffsRootObject : null,
+	
+	setPsmPeptideCutoffsRootObject : function( psmPeptideCutoffsRootObject ) {
+		
+		this._psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
+		
+		viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+		viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+		viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+		
+		viewPsmsLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+	},
+
+	getPsmPeptideCutoffsRootObject : function( ) {
+
+		return this._psmPeptideCutoffsRootObject;
+	}
+};
+
+
+
 var _excludeTaxonomy;
 var _excludeType;
 var _filterNonUniquePeptides;
@@ -48,6 +76,7 @@ var _filterOnlyOnePSM;
 var _filterOnlyOnePeptide;
 
 var _distanceReportData = { };
+
 
 
 //get values for variables from the hash part of the URL as JSON
@@ -59,30 +88,101 @@ function getJsonFromHash() {
 	
 	if ( windowHash === "" || windowHash === "#" ) {
 		
-		return null;
+		//  Set cutoff defaults if not in JSON
+			
+		json = { 
+				cutoffs : getCutoffDefaultsFromPage(),
+				
+				'excludeType' : EXCLUDE_LINK_TYPE_DEFAULT
+		};
+		
+		return json;
+		
+//		return null;
 	}
+	
+	var windowHashContentsMinusHashChar = windowHash.slice( 1 );
 	
 	try {
 		
 		// if this works, the hash contains native (non encoded) JSON
-		json = JSON.parse( window.location.hash.slice( 1 ) );
+		json = JSON.parse( windowHashContentsMinusHashChar );
 	} catch( e ) {
 		
-		// if we got here, the hash contained URI-encoded JSON
-		json = JSON.parse( decodeURI( window.location.hash.slice( 1 ) ) );
+		// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURI( windowHashContentsMinusHashChar )
+		
+		var windowHashContentsMinusHashCharDecodeURI = decodeURI( windowHashContentsMinusHashChar );
+		
+		try {
+			json = JSON.parse( windowHashContentsMinusHashCharDecodeURI );
+		} catch( e2 ) {
+			
+
+			// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURIComponent( windowHashContentsMinusHashChar )
+			
+			var windowHashContentsMinusHashCharDecodeURIComponent = decodeURIComponent( windowHashContentsMinusHashChar );
+
+			try {
+				json = JSON.parse( windowHashContentsMinusHashCharDecodeURIComponent );
+			} catch( e3 ) {
+				
+
+				throw "Failed to parse window hash string as JSON and decodeURI and then parse as JSON.  windowHashContentsMinusHashChar: " 
+				+ windowHashContentsMinusHashChar;
+			}
+		}
 	}
 	
+	if ( json.cutoffs === undefined || json.cutoffs === null ) {
+
+		//  Set cutoff defaults if not in JSON
+		
+		json.cutoffs = getCutoffDefaultsFromPage();
+	}
+	
+	//  Set default for exclude link type
+	
+	if ( json[ 'excludeType' ] === undefined ) {
+		
+		json[ 'excludeType' ] = EXCLUDE_LINK_TYPE_DEFAULT;
+	}
+
 	
 	return json;
 }
 
 
+////
+
+function getCutoffDefaultsFromPage() {
+	
+
+	
+	var $cutoffValuesRootLevelCutoffDefaults = $("#cutoffValuesRootLevelCutoffDefaults");
+	
+	var cutoffValuesRootLevelCutoffDefaultsString = $cutoffValuesRootLevelCutoffDefaults.val();
+	
+	try {
+		var cutoffValuesRootLevelCutoffDefaults = JSON.parse( cutoffValuesRootLevelCutoffDefaultsString );
+	} catch( e2 ) {
+		
+		throw "Failed to parse cutoffValuesRootLevelCutoffDefaults string as JSON.  " +
+				"Error Message: " + e2.message +
+				".  cutoffValuesRootLevelCutoffDefaultsString: |" +
+				cutoffValuesRootLevelCutoffDefaultsString +
+				"|";
+	}
+
+	return cutoffValuesRootLevelCutoffDefaults;
+}
+
+
+
 
 function populateSearchForm() {
 	
-
-	$( "input#psmQValueCutoff" ).val( _psmQValueCutoff );
-	$( "input#peptideQValueCutoff" ).val( _peptideQValueCutoff );
+	cutoffProcessingCommonCode.putCutoffsOnThePage(  { cutoffs : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject() } );
+	
 	$( "input#filterNonUniquePeptides" ).prop('checked', _filterNonUniquePeptides);
 	$( "input#filterOnlyOnePSM" ).prop('checked', _filterOnlyOnePSM);
 	$( "input#filterOnlyOnePeptide" ).prop('checked', _filterOnlyOnePeptide);
@@ -131,22 +231,31 @@ function getValuesFromForm() {
 
 	var items = { };
 
-	var psmCutoff = parseFloat( $( "input#psmQValueCutoff" ).val() );
 
-	if ( isNaN( psmCutoff ) ) {
-		alert( "Invalid value for PSM q-value cutoff." );
-
-		return null; //  EARLY EXIT  return null
+	var getCutoffsFromThePageResult = cutoffProcessingCommonCode.getCutoffsFromThePage(  {  } );
+	
+	var getCutoffsFromThePageResult_FieldDataFailedValidation = getCutoffsFromThePageResult.getCutoffsFromThePageResult_FieldDataFailedValidation;
+	
+	if ( getCutoffsFromThePageResult_FieldDataFailedValidation ) {
+		
+		//  Cutoffs failed validation and error message was displayed
+		
+		//  EARLY EXIT from function
+		
+//		return { output_FieldDataFailedValidation : getCutoffsFromThePageResult_FieldDataFailedValidation };
+		
+		throw "Cutoffs are invalid so stop processing";
 	}
-	items[ 'psmQValueCutoff' ] = psmCutoff;
+	
+	var outputCutoffs = getCutoffsFromThePageResult.cutoffsBySearchId;
+	
 
-	var peptideCutoff = parseFloat( $( "input#peptideQValueCutoff" ).val() );
-	if ( isNaN( peptideCutoff ) ) {
-		alert( "Invalid value for Peptide q-value cutoff." );
-
-		return null; //  EARLY EXIT  return null;
-	}
-	items[ 'peptideQValueCutoff' ] = peptideCutoff;
+	
+	
+	items[ 'cutoffs' ] = outputCutoffs;
+	
+	
+	
 
 	if ( $( "input#filterNonUniquePeptides" ).is( ':checked' ) )
 		items[ 'filterNonUniquePeptides' ] = true;
@@ -210,11 +319,8 @@ function updateURLHash( useSearchForm) {
 //		add type exclusions
 		items[ 'excludeType' ] = _excludeType;
 
-//		add psm cutoff
-		items[ 'psmQValueCutoff' ] = _psmQValueCutoff;
-
-//		add peptide cutoff 
-		items[ 'peptideQValueCutoff' ] = _peptideQValueCutoff;
+//		add psm/peptide cutoffs
+		items[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
 
 //		add filter out non unique peptides
 		items[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
@@ -346,13 +452,32 @@ function buildQueryStringFromHash() {
 		}
 	}
 	
-	items.push( "psmQValueCutoff=" + json.psmQValueCutoff );
-	items.push( "peptideQValueCutoff=" + json.peptideQValueCutoff );
-	
 	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
 		items.push( "filterNonUniquePeptides=on" );
 	}
 	
+	if ( json.filterOnlyOnePSM != undefined && json.filterOnlyOnePSM ) {
+		items.push( "filterOnlyOnePSM=on" );
+	}
+	if ( json.filterOnlyOnePeptide != undefined && json.filterOnlyOnePeptide ) {
+		items.push( "filterOnlyOnePeptide=on" );
+	}
+	
+
+	
+	
+	///   Serialize cutoffs to JSON
+	
+	var cutoffs = json.cutoffs;
+	
+	var psmPeptideCutoffsForSearchIds_JSONString = JSON.stringify( cutoffs );
+
+	items.push( "psmPeptideCutoffsForSearchIds=" + psmPeptideCutoffsForSearchIds_JSONString );
+
+	
+	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
+		items.push( "filterNonUniquePeptides=on" );
+	}
 	if ( json.filterOnlyOnePSM != undefined && json.filterOnlyOnePSM ) {
 		items.push( "filterOnlyOnePSM=on" );
 	}
@@ -743,8 +868,9 @@ function loadDataFromService() {
 	        	_proteinNames = data.proteinNames;
 	        	
 	        	// handle other search parameters
-	        	_psmQValueCutoff = data.psmQValueCutoff;
-	        	_peptideQValueCutoff = data.peptideQValueCutoff;
+
+	        	_psmPeptideCutoffsRootObjectStorage.setPsmPeptideCutoffsRootObject( data.cutoffs );
+	        	
 	        	_excludeTaxonomy = data.excludeTaxonomy;
 	        	_excludeType = data.excludeType;
 	        	_filterNonUniquePeptides = data.filterNonUniquePeptides;
@@ -958,11 +1084,8 @@ function populateNavigation() {
 //			add type exclusions
 		imageJSON[ 'excludeType' ] = _excludeType;
 
-//			add psm cutoff
-		imageJSON[ 'psmQValueCutoff' ] = _psmQValueCutoff;
-
-//			add peptide cutoff 
-		imageJSON[ 'peptideQValueCutoff' ] = _peptideQValueCutoff;
+		//  Add Filter cutoffs
+		imageJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
 
 //			add filter out non unique peptides
 		imageJSON[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
@@ -2088,10 +2211,9 @@ var updateShownLinks = function () {
 	
 	$( '.reported-crosslink' ).click( function( e ) {
 		
-		var params = { };
-		params.psmQValueCutoff = _psmQValueCutoff;
-		params.peptideQValueCutoff = _peptideQValueCutoff;
-		
+		var params = { 
+				psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
+		};
 		
 		var index = $(e.currentTarget ).attr( 'data-crosslink-index' );
 		var link = _renderedLinks[ 'crosslinks' ][ index ];
@@ -2135,9 +2257,9 @@ var updateShownLinks = function () {
 	
 	$( '.reported-looplink' ).click( function( e ) {
 		
-		var params = { };
-		params.psmQValueCutoff = _psmQValueCutoff;
-		params.peptideQValueCutoff = _peptideQValueCutoff;
+		var params = { 
+				psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
+		};
 		
 		
 		var index = $(e.currentTarget ).attr( 'data-looplink-index' );
@@ -2706,9 +2828,9 @@ var viewerClicked = function( picked, e ) {
 	if( !( 'type' in picked.target() ) ) { return; }
 	var type = picked.target().type;
 	
-	var params = { };
-	params.psmQValueCutoff = _psmQValueCutoff;
-	params.peptideQValueCutoff = _peptideQValueCutoff;
+	var params = { 
+			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
+	};
 	
 	if( type == 'monolink' ) {
 		getMonolinkDataForSpecificLinkInGraph( params, picked.target() );

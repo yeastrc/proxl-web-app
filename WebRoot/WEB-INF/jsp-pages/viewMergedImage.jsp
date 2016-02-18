@@ -65,6 +65,8 @@
 
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js"></script>
 
+		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js"></script>
+
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-click-element-handlers.js"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer.js"></script> 
@@ -106,7 +108,6 @@
 		
 		<%@ include file="/WEB-INF/jsp-includes/viewPsmsLoadedFromWebServiceTemplateFragment.jsp" %>
 		
-			
 		<%@ include file="/WEB-INF/jsp-includes/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
 		<%@ include file="/WEB-INF/jsp-includes/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
 		<%@ include file="/WEB-INF/jsp-includes/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
@@ -197,40 +198,6 @@
 				
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inDataEntryForm.jsp" %>
 				
-<%-- 				
-				<tr>
-					<td style="white-space: nowrap">PSM Q-value cutoff:</td>
-					<td>
-					
-					  <div style="position: relative;">
-				  		<div class="error-message-container error_message_container_jq" id="error_message_invalid_psm_q_value_cutoff">
-				  			<div class="error-message-inner-container" style="width: 400px;" >
-				  				<div class="error-message-close-x error_message_close_x_jq">X</div>
-					  			<div class="error-message-text" >Invalid value for PSM q-value cutoff.</div>
-				  			</div>
-					  	</div>
-					  </div>
-									
-						<input type="text" style="width:40px;" id="psmQValueCutoff">
-					</td>
-				</tr>
-				
-				<tr>
-					<td style="white-space: nowrap">Peptide Q-value cutoff:</td>
-					<td>
-					  <div style="position: relative;">
-				  		<div class="error-message-container error_message_container_jq" id="error_message_invalid_peptide_q_value_cutoff">
-				  			<div class="error-message-inner-container" style="width: 400px;" >
-				  				<div class="error-message-close-x error_message_close_x_jq">X</div>
-					  			<div class="error-message-text" >Invalid value for Peptide q-value cutoff.</div>
-				  			</div>
-					  	</div>
-					  </div>
-												
-						<input type="text" style="width:40px;" id="peptideQValueCutoff">
-					</td>
-				</tr>
---%>				
 				<tr>
 					<td>Exclude links with:</td>
 					<td>
@@ -257,7 +224,7 @@
 						<label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-4">Crosslinks</span></label>
 						<label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-2">Looplinks</span></label>
 						<label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-1">Monolinks</span></label>
-						-%>
+						--%>
 						<%-- <label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-3">Dimers</span></label> --%>
 						<label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-0">No links</span></label>
 					</td>
@@ -649,285 +616,6 @@
 				  </div>
 
 
-			<%-- !!!!  Handlebars templates   !!!! --%>
-			
-			
-				<%-- !!!!   WARNING:   IE will drop any illegal text in the "style" attribute so cannot put conditionals in the "style" attribute  !!! 
-				
-											IE will drop the text inside the conditionals as well
-				--%>
-
-
-
-
-	<%--  Looplink Peptide Template --%>
-
-	<%-- This table is just a container and will not be placed into the final output --%>
-	<div id="looplink_peptide_block_template" style="display: none;" >
-
-		<%--  top level <div> in the template so can reference the inserted element with jQuery after insert it .
-				
-				var $looplink_peptide_block_template =  $(handlebarsSource_looplink_peptide_block_template).appendTo($peptide_data_container);
-				
-				$looplink_peptide_block_template can then be used.  If no top level <div> in the template, cannot use $looplink_peptide_block_template 
-				
-		--%>
-				
-		<div style="text-align: left;"> <%--  top level div in the template --%>
-			
-				<table class=" peptide_table_jq" style="margin-bottom: 10px; margin-top: 5px; width: 95%; margin-left: auto; margin-right: auto; text-align: left;" >
-				
-					<thead>
-					<tr>
-						<th style="text-align:left;font-weight:bold;">Reported peptide</th>
-						<th style="text-align:left;font-weight:bold;">Peptide</th>
-						<th class="integer-number-column-header" style="font-weight:bold;">Pos&nbsp;1</th>
-						<th class="integer-number-column-header" style="font-weight:bold;">Pos&nbsp;2</th>
-						<th style="text-align:left;font-weight:bold;"><span style="white-space: nowrap">Q-value</span></th>
-						<th class="integer-number-column-right-most-column-no-ts-header" style="font-weight:bold;">#&nbsp;PSMs</th>
-					</tr>
-					</thead>
-					<tbody></tbody>
-				</table>	
-				
-		</div>
-								
-	</div>
-			
-
-	<%--  Looplink Peptide Data Entry Template --%>
-
-	<%-- This table is just a container and will not be placed into the final output --%>
-	<table id="looplink_peptide_data_row_entry_template" style="display: none;" >
-		
-		<tr id="peptide_{{reportedPeptide.id}}"
-			style="cursor: pointer; "
-			onclick="viewPsmsLoadedFromWebServiceTemplate.showHidePsms( { clickedElement : this } )"
-			reported_peptide_id="{{ reportedPeptide.id }}"
-			search_id="{{ searchId }}"
-			project_id="${ project_id }"
-		>
-		
-			<td>{{reportedPeptide.sequence}}</td>
-			<td>{{peptide.sequence}}</td>
-			<td class="integer-number-column" style="" >{{peptidePosition1}}</td>
-			<td class="integer-number-column" style="" >{{peptidePosition2}}</td>
-			
-			<td style="text-align: left; " >{{qvalue}}</td>
-			
-			
-			<td class="integer-number-column-right-most-column-no-ts" style="" >
-				<a class="show-child-data-link   "
-					href="javascript:"
-					>{{numPsms}}<%-- << actual data in the cell --%><span class="toggle_visibility_expansion_span_jq" 								style="{{#if onlyOneEntry}} display: none; {{else}}{{/if}}" 
-								style="" 
-							><img src="${contextPath}/images/icon-expand-small.png" 
-								class=" icon-expand-contract-in-data-table "
-								></span><span class="toggle_visibility_contraction_span_jq" 
-									style="display: none;" 
-									><img src="${contextPath}/images/icon-collapse-small.png"
-										class=" icon-expand-contract-in-data-table "
-										></span>
-				</a>
-			</td>												
-		</tr>
-	</table>	
-			
-
-	<%--  Looplink Peptide Data Entry Template --%>
-
-	<%-- This table is just a container and will not be placed into the final output --%>
-	<table id="looplink_peptide_child_row_entry_template" style="display: none;" >
-			
-		<tr   class="expand-child  expand_child_jq "  style=" display: none; ">
-		
-			<td class="psm_data_container child_data_container_jq " colspan="6"  style="text-align: center;" >
-				
-
-			</td>
-		</tr>
-	</table>	
-	
-				
-			
-
-	<%--  Crosslink Peptide Template --%>
-
-	<%-- This table is just a container and will not be placed into the final output --%>
-	<div id="crosslink_peptide_block_template" style="display: none;" >
-
-		<%--  top level <div> in the template so can reference the inserted element with jQuery after insert it .
-				
-				var $crosslink_peptide_block_template = $(handlebarsSource_crosslink_peptide_block_template).appendTo($peptide_data_container);
-				
-				$crosslink_peptide_block_template can then be used.  If no top level <div> in the template, cannot use $crosslink_peptide_block_template 
-				
-		--%>
-				
-		<div style="" > <%--  top level div in the template --%>
-
-				<table class=" peptide_table_jq" style="margin-bottom: 10px; margin-top: 5px; width: 95%; margin-left: auto; margin-right: auto; text-align: left;  " > <%-- margin-left: auto; margin-right: auto; --%>
-				
-					<thead>
-					<tr>
-						<th style="text-align:left; font-weight:bold;">Reported peptide</th>
-						<th style="text-align:left; font-weight:bold;">Peptide 1</th>
-						<th class="integer-number-column-header" style=" font-weight:bold;">Pos</th>
-						<th style="text-align:left; font-weight:bold;">Peptide 2</th>
-						<th class="integer-number-column-header" style=" font-weight:bold;">Pos</th>
-						<th style="text-align:left; font-weight:bold;"><span style="white-space: nowrap">Q-value</span></th>
-						<th class="integer-number-column-right-most-column-no-ts-header" style="font-weight:bold;">#&nbsp;PSMs</th>
-					</tr>
-					</thead>
-					<tbody></tbody>
-				</table>			
-		</div>
-		
-	</div> <%--  end of  id="crosslink_peptide_block_template"  --%>
-
-
-	<%--  Crosslink Peptide Entry Template --%>
-
-	<%-- This table is just a container and will not be placed into the final output --%>
-	<table id="crosslink_peptide_data_row_entry_template" style="display: none;" >
-			   
-		<tr id="peptide_{{reportedPeptide.id}}"
-			style="cursor: pointer; "
-			onclick="viewPsmsLoadedFromWebServiceTemplate.showHidePsms( { clickedElement : this } )"
-			reported_peptide_id="{{ reportedPeptide.id }}"
-			search_id="{{ searchId }}"
-			project_id="${ project_id }"
-		>
-			<td>{{reportedPeptide.sequence}}</td>
-			<td style="text-align:left;" >{{peptide1.sequence}}</td>
-			<td class="integer-number-column" style="" >{{peptide1Position}}</td>
-			<td style="text-align:left;" >{{peptide2.sequence}}</td>
-			<td class="integer-number-column" style="" >{{peptide2Position}}</td>
-			<td style="text-align:left; white-space: nowrap" >{{qvalue}}</td>
-			
-			<td class="integer-number-column-right-most-column-no-ts" style="" >
-				<a class="show-child-data-link   "
-					href="javascript:"
-					>{{numPsms}}<%-- << actual data in the cell --%><span class="toggle_visibility_expansion_span_jq" 
-								style="" 
-							><img src="${contextPath}/images/icon-expand-small.png" 
-								class=" icon-expand-contract-in-data-table "
-								></span><span class="toggle_visibility_contraction_span_jq" 
-									style="display: none; " 
-									><img src="${contextPath}/images/icon-collapse-small.png"
-										class=" icon-expand-contract-in-data-table "
-										></span>
-				</a>
-			</td>												
-			
-		</tr>
-	</table>	
-		
-
-	<%--  Crosslink Peptide Child row Entry Template --%>
-
-	<%-- This table is just a container and will not be placed into the final output --%>
-	<table id="crosslink_peptide_child_row_entry_template" style="display: none;" >
-
-		
-		<tr   class="expand-child  expand_child_jq "  style="display: none; ">
-		
-			<td class="psm_data_container child_data_container_jq" colspan="7" style="text-align: center;" >
-				
-
-			</td>
-		</tr>
-	</table>	
-	
-	
-
-
-	<%--  Monolink Peptide Template --%>
-
-	<%-- This table is just a container and will not be placed into the final output --%>
-	<div id="monolink_peptide_block_template" style="display: none;" >
-
-		<%--  top level <div> in the template so can reference the inserted element with jQuery after insert it .
-				
-				var $monolink_peptide_block_template =  $(handlebarsSource_monolink_peptide_block_template).appendTo($peptide_data_container);
-				
-				$monolink_peptide_block_template can then be used.  If no top level <div> in the template, cannot use $monolink_peptide_block_template 
-				
-		--%>
-				
-		<div style=""> <%--  top level div in the template --%>
-		
-				<table class=" peptide_table_jq" style="margin-bottom: 10px; margin-top: 5px; width: 95%; margin-left: auto; margin-right: auto; text-align: left;" >
-				
-					<thead>
-					<tr>
-						<th style="text-align:left;font-weight:bold;">Reported peptide</th>
-						<th style="text-align:left;font-weight:bold;">Peptide</th>
-						<th class="integer-number-column-header" style="font-weight:bold;">Pos</th>
-						<th style="text-align:left;font-weight:bold;"><span style="white-space: nowrap">Q-value</span></th>
-						<th class="integer-number-column-right-most-column-no-ts-header" style="font-weight:bold;">#&nbsp;PSMs</th>
-					</tr>
-					</thead>
-					<tbody></tbody>
-				</table>	
-				
-		</div>
-								
-	</div>
-			
-
-	<%--  Monolink Peptide Data Row Entry Template --%>
-
-	<%-- This table is just a container and will not be placed into the final output --%>
-	<table id="monolink_peptide_data_row_entry_template" style="display: none;" >
-
-		<tr id="peptide_{{reportedPeptide.id}}"
-			style="cursor: pointer; "
-			onclick="viewPsmsLoadedFromWebServiceTemplate.showHidePsms( { clickedElement : this } )"
-			reported_peptide_id="{{ reportedPeptide.id }}"
-			search_id="{{ searchId }}"
-			project_id="${ project_id }"
-		>
-			<td>{{reportedPeptide.sequence}}</td>
-			<td>{{peptide.sequence}}</td>
-			<td class="integer-number-column" style="" >{{peptidePosition}}</td>
-			
-			<td style="text-align: left; white-space: nowrap" >{{qvalue}}</td>
-			
-			
-			<td class="integer-number-column-right-most-column-no-ts" style="" >
-				<a class="show-child-data-link   "
-					href="javascript:"
-					>{{numPsms}}<%-- << actual data in the cell --%><span class="toggle_visibility_expansion_span_jq" 								style="{{#if onlyOneEntry}} display: none; {{else}}{{/if}}" 
-								style="" 
-							><img src="${contextPath}/images/icon-expand-small.png" 
-								class=" icon-expand-contract-in-data-table "
-								></span><span class="toggle_visibility_contraction_span_jq" 
-									style=" display: none; " 
-									><img src="${contextPath}/images/icon-collapse-small.png"
-										class=" icon-expand-contract-in-data-table "
-										></span>
-				</a>
-			</td>												
-			
-		</tr>
-	</table>	
-		
-
-	<%--  Monolink Peptide Child Row Entry Template --%>
-
-	<%-- This table is just a container and will not be placed into the final output --%>
-	<table id="monolink_peptide_child_row_entry_template" style="display: none;" >
-		
-		<tr   class="expand-child  expand_child_jq "  style=" display: none; ">
-		
-			<td class="psm_data_container child_data_container_jq" colspan="5" style="text-align: center;" >
-				
-
-			</td>
-		</tr>
-	</table>	
-	
 					
 	
 			</div>  <%--  END  <div id="view-link-info-overlay-body" class="view-link-info-overlay-body" > --%>
