@@ -3,11 +3,11 @@ package org.yeastrc.xlink.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
+import org.yeastrc.xlink.enum_classes.AnnotationValueLocation;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 
 /**
@@ -38,13 +38,6 @@ public class PsmAnnotationDAO {
 
 		String sql = "SELECT * FROM psm_annotation WHERE id = ?";
 		
-//		CREATE TABLE IF NOT EXISTS `proxl_generic_fields`.`psm_annotation` (
-//				  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//				  `psm_id` INT UNSIGNED NOT NULL,
-//				  `filterable_descriptive_type` ENUM('filterable','descriptive') NOT NULL,
-//				  `annotation_type_id` INT UNSIGNED NOT NULL,
-//				  `value_double` DOUBLE NOT NULL,
-//				  `value_string` VARCHAR(4000) NOT NULL,
 		
 
 		try {
@@ -95,21 +88,33 @@ public class PsmAnnotationDAO {
 	/**
 	 * @param rs
 	 * @return
-	 * @throws SQLException
+	 * @throws Exception 
 	 */
 	public PsmAnnotationDTO populateFromResultSet(ResultSet rs)
-			throws SQLException {
+			throws Exception {
 	
 		
 		PsmAnnotationDTO item;
 		item = new PsmAnnotationDTO();
 		
+		AnnotationValueLocation annotationValueLocation = AnnotationValueLocation.fromValue( rs.getString( "value_location" )  );
+		
 		item.setId( rs.getInt( "id" ) );
 		item.setPsmId( rs.getInt( "psm_id" ) );
 		item.setFilterableDescriptiveAnnotationType( FilterableDescriptiveAnnotationType.fromValue( rs.getString( "filterable_descriptive_type" )  ) );
 		item.setAnnotationTypeId( rs.getInt( "annotation_type_id" ) );
+		item.setAnnotationValueLocation( annotationValueLocation );
 		item.setValueDouble( rs.getDouble( "value_double" ) );
 		item.setValueString( rs.getString( "value_string" ) );
+		
+		if ( annotationValueLocation == AnnotationValueLocation.LARGE_VALUE_TABLE ) {
+			
+			//  Get valueString from large value table instead
+			
+			String valueString = PsmAnnotationLargeValueDAO.getInstance().getValueString( item.getId() );
+			item.setValueString( valueString );
+		}
+		
 		return item;
 	}
 
@@ -140,15 +145,6 @@ public class PsmAnnotationDAO {
 		
 	}
 		
-
-	private final static String INSERT_SQL = 
-			"INSERT INTO psm_annotation "
-			
-			+ "(psm_id, filterable_descriptive_type, annotation_type_id, value_double, value_string ) "
-			
-			+ "VALUES (?, ?, ?, ?, ?)";
-	
-
 	
 	/**
 	 * This will INSERT the given PsmAnnotationDTO into the database
@@ -157,12 +153,62 @@ public class PsmAnnotationDAO {
 	 */
 	public void saveToDatabase( PsmAnnotationDTO item, Connection conn ) throws Exception {
 		
+		try {
+
+			try {
+				item.setAnnotationValueLocation( AnnotationValueLocation.LOCAL );
+
+				saveToDatabaseInternal( item, conn );
+
+			} catch ( Exception e ) {
+
+				//  Catch exception if valueString is too large for primary table 
+
+				//  change to store value string in "..._large_value" table instead
+
+
+				item.setAnnotationValueLocation( AnnotationValueLocation.LARGE_VALUE_TABLE );
+
+				saveToDatabaseInternal( item, conn );
+
+				PsmAnnotationLargeValueDAO.getInstance().saveToDatabase( item.getId(), item.getValueString(), conn);
+			}
+
+
+		
+		} catch ( Exception e ) {
+			
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + INSERT_SQL
+					+ ".  PsmAnnotationDTO item: " + item, e );
+			
+			throw e;
+		}
+	}
+
+
+	private final static String INSERT_SQL = 
+			"INSERT INTO psm_annotation "
+			
+			+ "(psm_id, filterable_descriptive_type, annotation_type_id, value_location, value_double, value_string ) "
+			
+			+ "VALUES (?, ?, ?, ?, ?, ?)";
+	
+
+	
+
+	/**
+	 * This will INSERT the given PsmAnnotationDTO into the database
+	 * @param item
+	 * @throws Exception
+	 */
+	private void saveToDatabaseInternal( PsmAnnotationDTO item, Connection conn ) throws Exception {
+		
 //		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
 		String sql = INSERT_SQL;
-
+		
 		try {
 			
 //			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
@@ -177,12 +223,25 @@ public class PsmAnnotationDAO {
 			pstmt.setString( counter, item.getFilterableDescriptiveAnnotationType().value() );
 			counter++;
 			pstmt.setInt( counter, item.getAnnotationTypeId() );
+			
+			counter++;
+			pstmt.setString( counter, item.getAnnotationValueLocation().value() );
+			
 			counter++;
 			pstmt.setDouble( counter, item.getValueDouble() );
-			counter++;
-			pstmt.setString( counter, item.getValueString() );
 			
+			counter++;
+			
+			if ( item.getAnnotationValueLocation() == AnnotationValueLocation.LOCAL ) {
+				pstmt.setString( counter, item.getValueString() );
+			} else {
+				
+				pstmt.setString( counter, "" ); // store empty string since value stored in .._large_value table
+			}
+			
+
 			pstmt.executeUpdate();
+			
 			
 			rs = pstmt.getGeneratedKeys();
 			if( rs.next() ) {
@@ -190,13 +249,6 @@ public class PsmAnnotationDAO {
 			} else
 				throw new Exception( "Failed to insert for " + item.getPsmId() );
 			
-			
-		} catch ( Exception e ) {
-			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql
-					+ ".  PsmAnnotationDTO item: " + item, e );
-			
-			throw e;
 			
 		} finally {
 			

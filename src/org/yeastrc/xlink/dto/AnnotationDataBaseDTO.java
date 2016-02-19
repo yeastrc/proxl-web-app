@@ -1,9 +1,10 @@
 package org.yeastrc.xlink.dto;
 
+import org.yeastrc.xlink.enum_classes.AnnotationValueLocation;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 
 /**
- * Base Class for PsmAnnotationDTO and 
+ * Base Class for PsmAnnotationDTO and SearchReportedPeptideAnnotationDTO
  *
  */
 public class AnnotationDataBaseDTO {
@@ -11,6 +12,7 @@ public class AnnotationDataBaseDTO {
 	protected int id;
 	protected FilterableDescriptiveAnnotationType filterableDescriptiveAnnotationType;
 	protected int annotationTypeId;
+	protected AnnotationValueLocation annotationValueLocation;
 	protected double valueDouble;
 	protected String valueString;
 	
@@ -46,5 +48,13 @@ public class AnnotationDataBaseDTO {
 	public void setValueString(String valueString) {
 		this.valueString = valueString;
 	}
+	public AnnotationValueLocation getAnnotationValueLocation() {
+		return annotationValueLocation;
+	}
+	public void setAnnotationValueLocation(
+			AnnotationValueLocation annotationValueLocation) {
+		this.annotationValueLocation = annotationValueLocation;
+	}
+
 
 }

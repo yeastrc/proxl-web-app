@@ -3,11 +3,11 @@ package org.yeastrc.xlink.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
+import org.yeastrc.xlink.enum_classes.AnnotationValueLocation;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 
 /**
@@ -156,12 +156,14 @@ public class SearchReportedPeptideAnnotationDAO {
 	/**
 	 * @param rs
 	 * @return
-	 * @throws SQLException
+	 * @throws Exception 
 	 */
-	public SearchReportedPeptideAnnotationDTO populateFromResultSet( ResultSet rs ) throws SQLException {
+	public SearchReportedPeptideAnnotationDTO populateFromResultSet( ResultSet rs ) throws Exception {
 		
 		SearchReportedPeptideAnnotationDTO item;
 		item = new SearchReportedPeptideAnnotationDTO();
+
+		AnnotationValueLocation annotationValueLocation = AnnotationValueLocation.fromValue( rs.getString( "value_location" )  );
 		
 		item.setId( rs.getInt( "id" ) );
 		item.setSearchId( rs.getInt( "search_id" ) );
@@ -170,8 +172,19 @@ public class SearchReportedPeptideAnnotationDAO {
 		item.setFilterableDescriptiveAnnotationType( FilterableDescriptiveAnnotationType.fromValue( rs.getString( "filterable_descriptive_type" ) ) );
 		
 		item.setAnnotationTypeId( rs.getInt( "annotation_type_id" ) );
+		item.setAnnotationValueLocation( annotationValueLocation );
+
 		item.setValueDouble( rs.getDouble( "value_double" ) );
 		item.setValueString( rs.getString( "value_string" ) );
+
+		if ( annotationValueLocation == AnnotationValueLocation.LARGE_VALUE_TABLE ) {
+			
+			//  Get valueString from large value table instead
+			
+			String valueString = SearchReportedPeptideAnnotationLargeValueDAO.getInstance().getValueString( item.getId() );
+			item.setValueString( valueString );
+		}
+		
 		return item;
 	}
 
@@ -204,13 +217,51 @@ public class SearchReportedPeptideAnnotationDAO {
 	}
 		
 
+	
+	/**
+	 * This will INSERT the given PsmAnnotationDTO into the database
+	 * @param item
+	 * @throws Exception
+	 */
+	public void saveToDatabase( SearchReportedPeptideAnnotationDTO item, Connection conn ) throws Exception {
+		
+		try {
+
+			try {
+				item.setAnnotationValueLocation( AnnotationValueLocation.LOCAL );
+
+				saveToDatabaseInternal( item, conn );
+
+			} catch ( Exception e ) {
+
+				//  Catch exception if valueString is too large for primary table 
+
+				//  change to store value string in "..._large_value" table instead
+
+
+				item.setAnnotationValueLocation( AnnotationValueLocation.LARGE_VALUE_TABLE );
+
+				saveToDatabaseInternal( item, conn );
+
+				SearchReportedPeptideAnnotationLargeValueDAO.getInstance().saveToDatabase( item.getId(), item.getValueString(), conn);
+			}
+
+		} catch ( Exception e ) {
+			
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + INSERT_SQL, e );
+			
+			throw e;
+		}
+	}
+
+
 	private final static String INSERT_SQL = 
 			"INSERT INTO srch__rep_pept__annotation "
 			
 			+ "(search_id, reported_peptide_id, "
-			+ 	" filterable_descriptive_type, annotation_type_id, value_double, value_string ) "
+			+ 	" filterable_descriptive_type, annotation_type_id, value_location, value_double, value_string ) "
 			
-			+ "VALUES (?, ?, ?, ?, ?, ?)";
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
 	
 
 	
@@ -219,14 +270,14 @@ public class SearchReportedPeptideAnnotationDAO {
 	 * @param item
 	 * @throws Exception
 	 */
-	public void saveToDatabase( SearchReportedPeptideAnnotationDTO item, Connection conn ) throws Exception {
+	private void saveToDatabaseInternal( SearchReportedPeptideAnnotationDTO item, Connection conn ) throws Exception {
 		
 //		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
 		String sql = INSERT_SQL;
-
+		
 		try {
 			
 //			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
@@ -243,11 +294,21 @@ public class SearchReportedPeptideAnnotationDAO {
 			pstmt.setString( counter, item.getFilterableDescriptiveAnnotationType().value() );
 			counter++;
 			pstmt.setInt( counter, item.getAnnotationTypeId() );
+
+			counter++;
+			pstmt.setString( counter, item.getAnnotationValueLocation().value() );
+			
 			counter++;
 			pstmt.setDouble( counter, item.getValueDouble() );
+
 			counter++;
-			pstmt.setString( counter, item.getValueString() );
 			
+			if ( item.getAnnotationValueLocation() == AnnotationValueLocation.LOCAL ) {
+				pstmt.setString( counter, item.getValueString() );
+			} else {
+				
+				pstmt.setString( counter, "" ); // store empty string since value stored in .._large_value table
+			}	
 			
 			pstmt.executeUpdate();
 			
@@ -258,11 +319,6 @@ public class SearchReportedPeptideAnnotationDAO {
 				throw new Exception( "Failed to insert for " + item.getSearchId() + ", " + item.getReportedPeptideId() );
 			
 			
-		} catch ( Exception e ) {
-			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
-			
-			throw e;
 			
 		} finally {
 			

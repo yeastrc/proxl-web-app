@@ -1453,8 +1453,9 @@ CREATE TABLE IF NOT EXISTS `psm_annotation` (
   `psm_id` INT UNSIGNED NOT NULL,
   `filterable_descriptive_type` ENUM('filterable','descriptive') NOT NULL,
   `annotation_type_id` INT UNSIGNED NOT NULL,
+  `value_location` ENUM('local','large_value_table') NOT NULL,
   `value_double` DOUBLE NOT NULL,
-  `value_string` VARCHAR(4000) NOT NULL,
+  `value_string` VARCHAR(50) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `psm_filterable_annotation__psm_id_fk`
     FOREIGN KEY (`psm_id`)
@@ -1488,8 +1489,9 @@ CREATE TABLE IF NOT EXISTS `srch__rep_pept__annotation` (
   `reported_peptide_id` INT(10) UNSIGNED NOT NULL,
   `filterable_descriptive_type` ENUM('filterable','descriptive') NOT NULL,
   `annotation_type_id` INT(10) UNSIGNED NOT NULL,
+  `value_location` ENUM('local','large_value_table') NOT NULL,
   `value_double` DOUBLE NOT NULL,
-  `value_string` VARCHAR(4000) NOT NULL,
+  `value_string` VARCHAR(50) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `srch__rep_pept__ann__rep_pept_id_fk`
     FOREIGN KEY (`reported_peptide_id`)
@@ -2158,6 +2160,70 @@ CREATE UNIQUE INDEX `Unique_srch_nrseq1_nrseq2_pos1_pos2_ann_type` ON `search_un
 CREATE INDEX `srch_ann_type_id_value` ON `search_unlinked_best_peptide_value_generic_lookup` (`search_id` ASC, `annotation_type_id` ASC, `best_peptide_value_for_ann_type_id` ASC);
 
 CREATE INDEX `search_unlinked_best_peptide_value_generic_lookup_primary_f_idx` ON `search_unlinked_best_peptide_value_generic_lookup` (`search_unlinked_generic_lookup_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `default_page_view_generic`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `default_page_view_generic` ;
+
+CREATE TABLE IF NOT EXISTS `default_page_view_generic` (
+  `search_id` INT UNSIGNED NOT NULL,
+  `page_name` VARCHAR(80) NOT NULL,
+  `auth_user_id` INT UNSIGNED NOT NULL,
+  `url` VARCHAR(6000) NOT NULL,
+  `query_json` VARCHAR(6000) NOT NULL,
+  PRIMARY KEY (`search_id`, `page_name`),
+  CONSTRAINT `default_page_view_generic_auth_user_id_fk`
+    FOREIGN KEY (`auth_user_id`)
+    REFERENCES `auth_user` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT `default_page_view_generic_search_id_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `default_page_view_search_id_fk_idx` ON `default_page_view_generic` (`search_id` ASC);
+
+CREATE INDEX `default_page_view_auth_user_id_fk_idx` ON `default_page_view_generic` (`auth_user_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `srch__rep_pept__annotation_large_value`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `srch__rep_pept__annotation_large_value` ;
+
+CREATE TABLE IF NOT EXISTS `srch__rep_pept__annotation_large_value` (
+  `srch__rep_pept__annotation_id` INT UNSIGNED NOT NULL,
+  `value_string` LONGTEXT NULL,
+  PRIMARY KEY (`srch__rep_pept__annotation_id`),
+  CONSTRAINT `srch__rep_pept__annotation_large_value__primary_id_fk`
+    FOREIGN KEY (`srch__rep_pept__annotation_id`)
+    REFERENCES `srch__rep_pept__annotation` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `psm_annotation_large_value`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `psm_annotation_large_value` ;
+
+CREATE TABLE IF NOT EXISTS `psm_annotation_large_value` (
+  `psm_annotation_id` INT UNSIGNED NOT NULL,
+  `value_string` LONGTEXT NOT NULL,
+  CONSTRAINT `psm_annotation_large_value_primary_id_fk`
+    FOREIGN KEY (`psm_annotation_id`)
+    REFERENCES `psm_annotation` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `psm_annotation_large_value_primary_id_fk_idx` ON `psm_annotation_large_value` (`psm_annotation_id` ASC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
