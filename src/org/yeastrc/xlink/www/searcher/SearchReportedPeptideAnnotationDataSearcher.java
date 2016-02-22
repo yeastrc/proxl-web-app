@@ -41,14 +41,14 @@ public class SearchReportedPeptideAnnotationDataSearcher {
 	 * @throws Exception
 	 */
 	public List<SearchReportedPeptideAnnotationDTO> getSearchReportedPeptideAnnotationDTOList( int searchId, int reportedPeptideId, Collection<Integer> annotationTypeIds  ) throws Exception {
+
+		List<SearchReportedPeptideAnnotationDTO> results = new ArrayList<SearchReportedPeptideAnnotationDTO>();
+		
 		
 		if ( annotationTypeIds == null || annotationTypeIds.isEmpty() ) {
 			
-			throw new IllegalArgumentException( "annotationTypeIds cannot be null or empty" );
+			return results;
 		}
-		
-		
-		List<SearchReportedPeptideAnnotationDTO> results = new ArrayList<SearchReportedPeptideAnnotationDTO>();
 		
 		
 

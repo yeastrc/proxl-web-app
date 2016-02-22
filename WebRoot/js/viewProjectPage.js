@@ -151,10 +151,13 @@ var _project_id = null;
 	 			/////////////////////////
 	 			
 	 			
-	 			
-	 			initQCPlotsClickHandlers();
-	 			
-	 			initQCPlotQValueCountClickHandlers();
+	 		   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+	 			  
+		 			
+		 			initQCPlotsClickHandlers();
+		 			
+		 			initQCPlotQValueCountClickHandlers();
+	 		   },10);
 	 			
 	 			
 	 			

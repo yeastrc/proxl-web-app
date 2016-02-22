@@ -16,6 +16,8 @@
 
 var CutoffProcessingCommonCode = function() {
 
+	
+	var _CUTOFF_VALUE__DATA__ = "cutoff_saved_value";
 			
 //			_query_json_field_Contents: Object
 //				cutoffs: Object
@@ -97,6 +99,9 @@ var CutoffProcessingCommonCode = function() {
 			var $inputField = $("#" + inputFieldId);
 
 			$inputField.val( inputCutoffValueEntryValue );
+			
+			//  Store value in data
+			$inputField.data( _CUTOFF_VALUE__DATA__, inputCutoffValueEntryValue );
 			
 			var $annotation_entry_root_tr_jq =  $inputField.closest(".annotation_entry_root_tr_jq");
 			
@@ -279,9 +284,16 @@ var CutoffProcessingCommonCode = function() {
 			var annotationTypeIdString = $item.attr("data-type_id");
 			var searchIdString = $item.attr("data-search_id");
 			
-			var cutoffValue = $item.val();
+//			var cutoffValue = $item.val();
 			
+			//  Get value in data
+			var cutoffValue = $item.data( _CUTOFF_VALUE__DATA__ );
 			
+			if ( cutoffValue === undefined || cutoffValue === null ) {
+				
+				cutoffValue = "";
+			}
+
 			
 			var searchId = parseInt( searchIdString, 10 );
 
@@ -329,29 +341,6 @@ var CutoffProcessingCommonCode = function() {
 				throw "Unable to parse annotation Type Id: " + annotationTypeIdString;
 			}
 			
-
-			
-			///   Validate the value for the cutoff is a valid decimal number
-			
-			//     Valid formats are:  
-			//			optional leading "-", one or more digits
-			//			optional leading "-", one or more digits followed by a decimal point followed by zero or more digits
-			//			optional leading "-", zero or more digits followed by a decimal point followed by one or more digits
-			
-			//  regex expressions
-			
-//			var validationRegexOneOrMoreDigits = /^-?[0-9]+$/;	//  optional leading "-", one or more digits
-//			var validationRegex_Gt_ZeroDigits_DP_GE_ZeroDigits = /^-?[0-9]+\.[0-9]*$/;	//  optional leading "-", one or more digits followed by a decimal point followed by zero or more digits
-//			var validationRegex_GE_ZeroDigits_DP_Gt_ZeroDigits = /^-?[0-9]*\.[0-9]+$/;  //  optional leading "-", zero or more digits followed by a decimal point followed by one or more digits	
-//			
-//			var validationRegexOneOrMoreDigitsResult = validationRegexOneOrMoreDigits.test( cutoffValue );
-//			var validationRegex_Gt_ZeroDigits_DP_GE_ZeroDigitsResult = validationRegex_Gt_ZeroDigits_DP_GE_ZeroDigits.test( cutoffValue );
-//			var validationRegex_GE_ZeroDigits_DP_Gt_ZeroDigitsResult = validationRegex_GE_ZeroDigits_DP_Gt_ZeroDigits.test( cutoffValue );
-//			
-//			if ( ( ( ! validationRegexOneOrMoreDigits.test( cutoffValue ) ) 
-//					&& ( ! validationRegex_Gt_ZeroDigits_DP_GE_ZeroDigits.test( cutoffValue ) ) 
-//					&& ( ! validationRegex_GE_ZeroDigits_DP_Gt_ZeroDigits.test( cutoffValue ) ) ) ) {
-
 			if ( cutoffValue !== "" ) {
 				
 				// only test for valid cutoff value if not empty string
@@ -404,62 +393,140 @@ var CutoffProcessingCommonCode = function() {
 	};
 	
 	
-	/////////////////////
+	//  "Save" button to save user entered values
 	
-	///   Handle toggling display and hide/clear the annotations
-	
-
-	this.showAnnotationInputField = function( params ) {
-
-		//  user clicked link of annotation name to show
-		
-		var clickedThis = params.clickedThis;
-		
-		var $clickedThis = $( clickedThis );
-		
-		var ann_type_id = $clickedThis.attr("data-type_id");
-		
-		var inputFieldId = "annotation_cutoff_input_field_ann_id_" + ann_type_id;
-		
-		var $inputField = $("#" + inputFieldId );
-		
-		var $annotation_entry_root_tr_jq = $inputField.closest(".annotation_entry_root_tr_jq");
-		
-		$annotation_entry_root_tr_jq.show();
-		
-		var $linkEnclosure = $clickedThis.closest(".add_annotation_link_enclosing_div_jq");
-		
-		$linkEnclosure.hide();
-	};
-	
-	///////////
-
-	this.hideAnnotationInputField = function( params ) {
-		
-		//  user clicked delete icon next to input field for annotation value
+	this.saveUserValues = function( params ) {
 
 		var clickedThis = params.clickedThis;
 		
 		var $clickedThis = $( clickedThis );
 
-		var ann_type_id = $clickedThis.attr("data-type_id");
-
-		var linkId = "add_annotation_cutoff_link_ann_id_" + ann_type_id;
+		var $cutoff_overlay_enclosing_block_jq = $clickedThis.closest(".cutoff_overlay_enclosing_block_jq");
 		
-		var $link = $("#" + linkId );
+		var $annotation_cutoff_input_field_jq = $cutoff_overlay_enclosing_block_jq.find(".annotation_cutoff_input_field_jq");
+		
+
+		$annotation_cutoff_input_field_jq.each( function( index, element ) {
+
+			//   The processing of input fields is stopped if an input value is not a valid decimal
+
+			var $inputField = $( this );
+			
+
+			var cutoffValue = $inputField.val();
+			
+			
+			//  Check for empty string since empty string does not get sent to the server.
+
+			if ( cutoffValue === "" ) {
 				
-		var $linkEnclosure = $link.closest(".add_annotation_link_enclosing_div_jq");
-		
-		$linkEnclosure.show();
+				return;  // EARLY EXIT from processing this input field since is empty string
+			}
+			
+			if ( cutoffValue !== "" ) {
+				
+				// only test for valid cutoff value if not empty string
 
-		
-		var $annotation_entry_root_tr_jq = $clickedThis.closest(".annotation_entry_root_tr_jq");
-		
-		$annotation_entry_root_tr_jq.hide();
-		
-	};
+				if ( !  /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/.test( cutoffValue ) ) {
+					
+					//  cutoff value is not a valid decimal number
+
+					if ( ! output_FieldDataFailedValidation ) {
+
+						//  Put focus on first error
+
+						$inputField.focus();
+					}
+
+
+					output_FieldDataFailedValidation = true;
+
+
+					//  For now, exit after find first error.  Can change to continue if flag errors visually on the page
+
+					return false;  //  EARLY EXIT of ".each" loop
+					//  Stop the loop from within the callback function by returning false.
+
+				}
+				
+				//  Store value in data
+				$inputField.data( _CUTOFF_VALUE__DATA__, cutoffValue );
+			}
+			
+			
+			
+		});
+			
+
+	};	
 	
 	
+	//  "Cancel" button to restore user entered values
+	
+	this.cancel_RestoreUserValues = function( params ) {
+
+		var clickedThis = params.clickedThis;
+		
+		var $clickedThis = $( clickedThis );
+
+		var $cutoff_overlay_enclosing_block_jq = $clickedThis.closest(".cutoff_overlay_enclosing_block_jq");
+		
+		var $annotation_cutoff_input_field_jq = $cutoff_overlay_enclosing_block_jq.find(".annotation_cutoff_input_field_jq");
+		
+
+		$annotation_cutoff_input_field_jq.each( function( index, element ) {
+
+			var $inputField = $( this );
+
+			//  get value in data
+			var cutoffValue = $inputField.data( _CUTOFF_VALUE__DATA__ );
+			
+			if ( cutoffValue === undefined || cutoffValue === null ) {
+				
+				cutoffValue = "";
+			}
+
+			$inputField.val( cutoffValue );
+			
+		});
+			
+
+	};	
+	
+
+	
+	//  "Set to Defaults" button to restore default values
+	
+	this.setToDefaultValues = function( params ) {
+
+		var clickedThis = params.clickedThis;
+		
+		var $clickedThis = $( clickedThis );
+
+		var $cutoff_overlay_enclosing_block_jq = $clickedThis.closest(".cutoff_overlay_enclosing_block_jq");
+		
+		var $annotation_cutoff_input_field_jq = $cutoff_overlay_enclosing_block_jq.find(".annotation_cutoff_input_field_jq");
+		
+
+		$annotation_cutoff_input_field_jq.each( function( index, element ) {
+
+			var $inputField = $( this );
+			
+			var $cutoff_input_field_block_jq = $inputField.closest(".cutoff_input_field_block_jq");
+			
+			var $annotation_cutoff_default_value_field_jq = $cutoff_input_field_block_jq.find(".annotation_cutoff_default_value_field_jq");
+			
+			var defaultValue = $annotation_cutoff_default_value_field_jq.val();
+
+			$inputField.val( defaultValue );
+
+			//  Store value in data
+//			$inputField.data( _CUTOFF_VALUE__DATA__, defaultValue );
+			
+		});
+			
+
+	};	
 	
 };
 
@@ -467,4 +534,3 @@ var CutoffProcessingCommonCode = function() {
 //   Instance of class
 
 var cutoffProcessingCommonCode = new CutoffProcessingCommonCode();
-

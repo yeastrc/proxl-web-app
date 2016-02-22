@@ -138,13 +138,17 @@ public class AnnotationTypeForSearchIdsSearcher {
 			
 			pstmt = conn.prepareStatement( sql );
 			
+			String psmPeptideAnnotationTypeString = psmPeptideAnnotationType.value();
+			
+			String filterableDescriptiveAnnotationTypeString = filterableDescriptiveAnnotationType.value();
+			
 			int paramCounter = 0;
 			
 			paramCounter++;
-			pstmt.setString(paramCounter, psmPeptideAnnotationType.value() );
+			pstmt.setString(paramCounter, psmPeptideAnnotationTypeString );
 
 			paramCounter++;
-			pstmt.setString(paramCounter, filterableDescriptiveAnnotationType.value() );
+			pstmt.setString(paramCounter, filterableDescriptiveAnnotationTypeString );
 			
 			
 			rs = pstmt.executeQuery();

@@ -23,6 +23,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 	var _handlebarsTemplate_psm_block_template = null;
 	var _handlebarsTemplate_psm_data_row_entry_template = null;
 	
+	var _psm_data_row_entry_no_annotation_data_no_scan_data_row_HTML = null;
 	
 	var _psmPeptideCutoffsRootObject = null;
 	
@@ -279,6 +280,11 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			_handlebarsTemplate_psm_data_row_entry_template = Handlebars.compile( handlebarsSource_psm_data_row_entry_template );
 		}
 		
+		if ( _psm_data_row_entry_no_annotation_data_no_scan_data_row_HTML === null ) {
+			
+			_psm_data_row_entry_no_annotation_data_no_scan_data_row_HTML = $("#psm_data_row_entry_no_annotation_data_no_scan_data_row").html();
+			
+		}
 
 		var scanDataAnyRows = false;
 		var chargeDataAnyRows = false;
@@ -359,16 +365,17 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			context.project_id = ajaxRequestData.project_id;
 			context.search_id = ajaxRequestData.search_id;
 
-			context.peptide_q_value_cutoff = ajaxRequestData.peptide_q_value_cutoff;
-			context.psm_q_value_cutoff = ajaxRequestData.psm_q_value_cutoff;
-			
 			context.reported_peptide_id = ajaxRequestData.reported_peptide_id;
 			
 			context.show_associated_peptides_link_true = show_associated_peptides_link_true;
 
-
-			
 			var html = _handlebarsTemplate_psm_data_row_entry_template(context);
+
+			if ( ! scanDataAnyRows && ! chargeDataAnyRows && annotationDisplayNameDescriptionList.length === 0 ) {
+
+				//  Nothing to display so show contents of this which for now is <tr><td>PSM</td></tr>
+				html = _psm_data_row_entry_no_annotation_data_no_scan_data_row_HTML;
+			}
 	
 	//		var $psm_entry = 
 			$(html).appendTo($psm_table_jq);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
@@ -136,7 +137,14 @@ public class SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSea
 					
 					int typeId = annotationTypeDTO.getId();
 					
-					AnnotationDataBaseDTO o1_AnnotationDataBaseDTO = o1.getPsmAnnotationDTOMap().get( typeId );
+					
+					 //  Map keyed on annotation type id of annotation data 
+					Map<Integer, AnnotationDataBaseDTO> o1_psmAnnotationDTOMap = o1.getPsmAnnotationDTOMap();
+					Map<Integer, AnnotationDataBaseDTO> o2_psmAnnotationDTOMap = o2.getPsmAnnotationDTOMap();
+
+
+
+					AnnotationDataBaseDTO o1_AnnotationDataBaseDTO = o1_psmAnnotationDTOMap.get( typeId );
 					if ( o1_AnnotationDataBaseDTO == null ) {
 						
 						String msg = "Unable to get PSM Filterable Annotation data for type id: " + typeId;
@@ -147,7 +155,7 @@ public class SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSea
 					double o1Value = o1_AnnotationDataBaseDTO.getValueDouble();
 					
 
-					AnnotationDataBaseDTO o2_AnnotationDataBaseDTO = o2.getPsmAnnotationDTOMap().get( typeId );
+					AnnotationDataBaseDTO o2_AnnotationDataBaseDTO = o2_psmAnnotationDTOMap.get( typeId );
 					if ( o2_AnnotationDataBaseDTO == null ) {
 						
 						String msg = "Unable to get PSM Filterable Annotation data for type id: " + typeId;

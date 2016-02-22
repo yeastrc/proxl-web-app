@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplaySearchLevel;
 import org.yeastrc.xlink.www.searcher.SearchProgramDisplaySearcher;
 
 /**
@@ -18,6 +19,13 @@ public class SearchDTODetailsDisplayWrapper {
 
 	private List<SearchProgramDisplay> searchProgramDisplayList; 
 	
+	/**
+	 * Not used on viewProject.jsp
+	 */
+	private CutoffPageDisplaySearchLevel cutoffPageDisplaySearchLevel;
+	
+
+
 	/**
 	 * @return
 	 * @throws Exception
@@ -92,5 +100,18 @@ public class SearchDTODetailsDisplayWrapper {
 		this.searchDTO = searchDTO;
 	}
 	
+
+	public CutoffPageDisplaySearchLevel getCutoffPageDisplaySearchLevel() {
+		return cutoffPageDisplaySearchLevel;
+	}
+
+
+
+	public void setCutoffPageDisplaySearchLevel(
+			CutoffPageDisplaySearchLevel cutoffPageDisplaySearchLevel) {
+		this.cutoffPageDisplaySearchLevel = cutoffPageDisplaySearchLevel;
+	}
+
+
 	
 }

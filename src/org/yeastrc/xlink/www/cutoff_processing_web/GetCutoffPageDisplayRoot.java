@@ -161,6 +161,25 @@ public class GetCutoffPageDisplayRoot {
 			Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_Psm_AnnotationType_DTOMap = srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap.get( searchId );
 			Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap = srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOListPerSearchIdMap.get( searchId );
 
+			if ( srchPgm_Filterable_Psm_AnnotationType_DTOMap == null ) {
+				
+				srchPgm_Filterable_Psm_AnnotationType_DTOMap = new HashMap<>();
+				
+//				String msg = "srchPgm_Filterable_Psm_AnnotationType_DTOMap == null for searchId: " + searchId;
+//				log.error( msg );
+//				throw new ProxlWebappDataException(msg);
+			}
+
+			if ( srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap == null ) {
+
+				srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap = new HashMap<>();
+
+//				String msg = "srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap == null for searchId: " + searchId;
+//				log.error( msg );
+//				throw new ProxlWebappDataException(msg);
+			}
+			
+			
 			processPSMs( srchPgm_Filterable_Psm_AnnotationType_DTOMap, cutoffPageDisplaySearchLevel, searchProgramsPerSearchDTOMap );
 
 			processPeptides( srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap, cutoffPageDisplaySearchLevel, searchProgramsPerSearchDTOMap );

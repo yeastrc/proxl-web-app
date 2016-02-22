@@ -133,7 +133,9 @@ var saveOrUpdateDefaultPageView = function( params ) {
 		pageUrl = getDefaultPageViewURL();  //  pageUrl is not provided so get it.
 	}
 	
-    var requestData = { searchId: searchId, pageName : pageName, pageUrl: pageUrl };
+	//   TODO  Populate pageQueryJSON
+	
+    var requestData = { searchId: searchId, pageName : pageName, pageUrl: pageUrl, pageQueryJSON : "TEMP" };
 
 	
 	if ( pageName ) {
@@ -407,5 +409,4 @@ function compareFormDataObject_ForDefaultPageView( currentFormDataObject, formDa
 	return true;
 
 }
-
 

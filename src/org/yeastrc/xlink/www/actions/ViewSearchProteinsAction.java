@@ -209,10 +209,6 @@ public class ViewSearchProteinsAction extends Action {
 			SearchDTO search = SearchDAO.getInstance().getSearch( searchId );
 			request.setAttribute( "search", search );
 
-			//  Populate request objects for Standard Search Display
-			
-			GetSearchDetailsData.getInstance().getSearchDetailsData( search, request );
-			
 
 			// build list of taxonomies to show in exclusion list
 			request.setAttribute("taxonomies", SearchTaxonomySearcher.getInstance().getTaxonomies( search ) );
@@ -308,11 +304,16 @@ public class ViewSearchProteinsAction extends Action {
 			
 			
 			
-//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
+			//  Populate request objects for Standard Search Display
 			
-			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRootSingleSearchId( searchId, request );
+			GetSearchDetailsData.getInstance().getSearchDetailsData( search, request );
+			
 
 			
+//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
+			
+//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRootSingleSearchId( searchId, request );
+
 			
 
 			String searchIdAsString = Integer.toString( searchId );

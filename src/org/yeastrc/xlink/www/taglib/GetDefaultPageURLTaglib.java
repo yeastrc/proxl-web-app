@@ -7,8 +7,8 @@ import javax.servlet.jsp.tagext.TagSupport;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.constants.DefaultPageViewConstants;
-import org.yeastrc.xlink.www.dao.DefaultPageViewDAO;
-import org.yeastrc.xlink.www.dto.DefaultPageViewDTO;
+import org.yeastrc.xlink.www.dao.DefaultPageViewGenericDAO;
+import org.yeastrc.xlink.www.dto.DefaultPageViewGenericDTO;
 
 /**
  * 
@@ -97,7 +97,7 @@ public class GetDefaultPageURLTaglib extends TagSupport {
 
         try { 
 
-        	DefaultPageViewDTO defaultPageViewDTO = DefaultPageViewDAO.getInstance().getForSearchIdPageName( searchIdInt, pageName );
+        	DefaultPageViewGenericDTO defaultPageViewDTO = DefaultPageViewGenericDAO.getInstance().getForSearchIdPageName( searchIdInt, pageName );
         	
         	if ( defaultPageViewDTO != null ) {
         		

@@ -44,6 +44,13 @@
 	</script>
 	
 	
+	<script id="psm_data_row_entry_no_annotation_data_no_scan_data_row"  type="text/x-handlebars-template">
+		<tr><td>PSM</td></tr>
+	
+	</script>
+	
+	
+	
 	<%-- include the overlay for when click on the "N" for is PSM Unique --%>
 	
 	<%@ include file="/WEB-INF/jsp-includes/viewPeptidesRelatedToPSMsByScanId.jsp" %>

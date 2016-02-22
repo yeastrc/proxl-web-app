@@ -289,13 +289,13 @@ QCChartRetentionTime.prototype.openScanRetentionTimeQCPlotOverlay = function(cli
 	
 	var $scan_retention_time_qc_plot_scan_file_id = $("#scan_retention_time_qc_plot_scan_file_id");
 
-	var $PEPTIDE_Q_VALUE_CUTOFF_DEFAULT = $("#PEPTIDE_Q_VALUE_CUTOFF_DEFAULT");
+	var $scan_retention_time_qc_plot_psm_score_cutoff = $("#scan_retention_time_qc_plot_psm_score_cutoff");
 	
-	var PEPTIDE_Q_VALUE_CUTOFF_DEFAULT = $PEPTIDE_Q_VALUE_CUTOFF_DEFAULT.val();
 	
-	var $scan_retention_time_qc_plot_psmQValueCutoff = $("#scan_retention_time_qc_plot_psmQValueCutoff");
 	
-	$scan_retention_time_qc_plot_psmQValueCutoff.val( PEPTIDE_Q_VALUE_CUTOFF_DEFAULT );
+	
+	
+	$scan_retention_time_qc_plot_psm_score_cutoff.val( ss ss );
 	
 	
 	//  initialize all "Scans for" checkboxes to checked
@@ -465,9 +465,9 @@ QCChartRetentionTime.prototype.createRetentionTimeCountChartFromPageParams = fun
 	
 	var scanFileName = $( "#scan_retention_time_qc_plot_scan_file_id option:selected" ).text();
 
-	var $scan_retention_time_qc_plot_psmQValueCutoff = $("#scan_retention_time_qc_plot_psmQValueCutoff");
+	var $scan_retention_time_qc_plot_psm_score_cutoff = $("#scan_retention_time_qc_plot_psm_score_cutoff");
 	
-	var psmQValueCutoff = $scan_retention_time_qc_plot_psmQValueCutoff.val();
+	var psmQValueCutoff = $scan_retention_time_qc_plot_psm_score_cutoff.val();
 	
 	
 	if ( isNaN( parseFloat( psmQValueCutoff ) ) ) {
@@ -927,4 +927,3 @@ QCChartRetentionTime.prototype.resetRetentionTimeCountChartMaxXMaxY = function()
 	$scan_retention_time_qc_plot_max_y.val( scan_retention_time_qc_plot_max_y_initial_value );
 
 };
-

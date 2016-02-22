@@ -2,8 +2,8 @@ package org.yeastrc.xlink.www.default_page_view;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.constants.DefaultPageViewConstants;
-import org.yeastrc.xlink.www.dao.DefaultPageViewDAO;
-import org.yeastrc.xlink.www.dto.DefaultPageViewDTO;
+import org.yeastrc.xlink.www.dao.DefaultPageViewGenericDAO;
+import org.yeastrc.xlink.www.dto.DefaultPageViewGenericDTO;
 
 public class DefaultPageViewSaveOrUpdate {
 
@@ -19,9 +19,9 @@ public class DefaultPageViewSaveOrUpdate {
 		return new DefaultPageViewSaveOrUpdate(); 
 	}
 	
-	public void defaultPageViewSaveOrUpdate( DefaultPageViewDTO defaultPageViewDTO ) throws Exception {
+	public void defaultPageViewSaveOrUpdate( DefaultPageViewGenericDTO defaultPageViewGenericDTO ) throws Exception {
 		
-		String pageName = defaultPageViewDTO.getPageName();
+		String pageName = defaultPageViewGenericDTO.getPageName();
 		
 		if ( ! DefaultPageViewConstants.ALLOWED_PAGE_NAMES_FOR_DEFAULT_PAGE_VIEWS.contains( pageName ) ) {
 			
@@ -30,7 +30,7 @@ public class DefaultPageViewSaveOrUpdate {
 			throw new Exception(msg);
 		}
 		
-		DefaultPageViewDAO.getInstance().saveOrUpdate(defaultPageViewDTO);
+		DefaultPageViewGenericDAO.getInstance().saveOrUpdate( defaultPageViewGenericDTO );
 		
 	}
 	

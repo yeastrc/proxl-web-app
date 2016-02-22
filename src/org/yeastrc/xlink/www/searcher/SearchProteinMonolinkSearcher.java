@@ -130,12 +130,15 @@ public class SearchProteinMonolinkSearcher {
 		int searchId = search.getId();
 
 
-		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
-				searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
-		
-		List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesList = 
-				searcherCutoffValuesSearchLevel.getPsmPerAnnotationCutoffsList();
 
+		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList =	null;
+		List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesList = null;
+
+		if ( searcherCutoffValuesSearchLevel != null ) {
+
+			peptideCutoffValuesList = searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
+			psmCutoffValuesList = searcherCutoffValuesSearchLevel.getPsmPerAnnotationCutoffsList();
+		}
 
 
 		//  If null, create empty lists

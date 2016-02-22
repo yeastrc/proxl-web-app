@@ -179,8 +179,10 @@
 				
 				<%--  The section at the top of the page with the cutoffs, in the user input section --%>
 
+<%-- 
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inDataEntryForm.jsp" %>
-			
+--%>				
+				
 
 				<tr>
 					<td>Exclude xlinks with:</td>

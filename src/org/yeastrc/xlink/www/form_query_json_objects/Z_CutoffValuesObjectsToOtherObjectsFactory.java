@@ -88,6 +88,8 @@ public class Z_CutoffValuesObjectsToOtherObjectsFactory {
 
 			if ( srchPgmFilterablePsmAnnotationTypeDTOMap == null ) {
 
+				srchPgmFilterablePsmAnnotationTypeDTOMap = new HashMap<>();
+				
 				String msg = "Failed to get Filterable PSM annotionation type records for Search Id: " + searchIdString;
 				log.error( msg );
 				throw new ProxlWebappDataException(msg);
@@ -95,10 +97,12 @@ public class Z_CutoffValuesObjectsToOtherObjectsFactory {
 			
 
 			if ( srchPgmFilterableReportedPeptideAnnotationTypeDTOMap == null ) {
+				
+				srchPgmFilterableReportedPeptideAnnotationTypeDTOMap = new HashMap<>();
 
-				String msg = "Failed to get Filterable Reported Peptide annotation type records for Search Id: " + searchIdString;
-				log.error( msg );
-				throw new ProxlWebappDataException(msg);
+//				String msg = "Failed to get Filterable Reported Peptide annotation type records for Search Id: " + searchIdString;
+//				log.error( msg );
+//				throw new ProxlWebappDataException(msg);
 			}
 			
 			

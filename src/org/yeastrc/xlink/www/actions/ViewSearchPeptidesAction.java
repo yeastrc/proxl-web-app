@@ -210,22 +210,18 @@ public class ViewSearchPeptidesAction extends Action {
 
 
 			SearchDTO search = SearchDAO.getInstance().getSearch( searchId );
+
+			
 			
 			//  Populate request objects for Standard Search Display
 
 			GetSearchDetailsData.getInstance().getSearchDetailsData( search, request );
-			
 
-
-			//  TODO   If form.psmQValueCutoff has a value, then this is old and needs to be re-mapped to the generic "q-value" annotation
-
-			
-			
 			//  This builds an object for the cutoff selection block on the page
 			
 //			CutoffPageDisplayRoot cutoffPageDisplayRoot =
 			
-			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRootSingleSearchId( searchId, request );
+//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRootSingleSearchId( searchId, request );
 
 			
 			
@@ -582,10 +578,18 @@ public class ViewSearchPeptidesAction extends Action {
 					GetAnnotationTypeDataDefaultDisplayInDisplayOrder.getInstance()
 					.getPeptide_AnnotationTypeDataDefaultDisplayInDisplayOrder( searchIdsSet );
 
+			
+			if ( peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap.isEmpty() ) {
+
+				String msg = "getPeptide_AnnotationTypeDataDefaultDisplayInDisplayOrder returned empty Map at searchId level, searchId: " + searchId;
+				log.error( msg );
+				throw new ProxlWebappDataException( msg );
+			}
+
 
 			if ( peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap.size() != 1 ) {
 
-				String msg = "getPeptide_AnnotationTypeDataDefaultDisplayInDisplayOrder returned other than 1 entry at searchId level ";
+				String msg = "getPeptide_AnnotationTypeDataDefaultDisplayInDisplayOrder returned other than 1 entry at searchId level , searchId: " + searchId;
 				log.error( msg );
 				throw new ProxlWebappDataException( msg );
 			}
@@ -631,12 +635,32 @@ public class ViewSearchPeptidesAction extends Action {
 				}
 			}
 
+			AnnotationTypeDTOListForSearchId peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_Main =
+					peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap.get( searchId );
 
+			if ( peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_Main == null ) {
+				
+				String msg = "peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_Main == null for searchId: " + searchId;
+				log.error( msg );
+				throw new ProxlWebappDataException( msg );
+			}
+			
+			AnnotationTypeDTOListForSearchId peptideAnnotationTypeDTO_DefaultDisplay_SortOrder_Main =
+					peptideAnnotationTypeDTO_SortOrder_MainMap.get( searchId );
+
+			if ( peptideAnnotationTypeDTO_DefaultDisplay_SortOrder_Main == null ) {
+				
+				String msg = "peptideAnnotationTypeDTO_DefaultDisplay_SortOrder_Main == null for searchId: " + searchId;
+				log.error( msg );
+				throw new ProxlWebappDataException( msg );
+			}
+			
+			
 			final List<AnnotationTypeDTO> reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List = 
-					peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap.get( searchId ).getAnnotationTypeDTOList();
+					peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_Main.getAnnotationTypeDTOList();
 
 			final List<AnnotationTypeDTO> reportedPeptide_AnnotationTypeDTO_SortOrder_List = 
-					peptideAnnotationTypeDTO_SortOrder_MainMap.get( searchId ).getAnnotationTypeDTOList();
+					peptideAnnotationTypeDTO_DefaultDisplay_SortOrder_Main.getAnnotationTypeDTOList();
 			
 			
 

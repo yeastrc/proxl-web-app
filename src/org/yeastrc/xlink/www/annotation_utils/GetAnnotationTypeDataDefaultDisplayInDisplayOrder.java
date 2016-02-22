@@ -118,27 +118,38 @@ public class GetAnnotationTypeDataDefaultDisplayInDisplayOrder {
 				log.warn( msg );
 
 				//  TODO  probably should throw exception
+
+				//   Create empty list and put in map
+
+				List<AnnotationTypeDTO> annotationTypeDTO_SortOrder_PerSearchIdList = new ArrayList<>( );
+
+				AnnotationTypeDTOListForSearchId annotationTypeDTOListForSearchId = new AnnotationTypeDTOListForSearchId();
+
+				annotationTypeDTOListForSearchId.setSearchId( searchId );
+				annotationTypeDTOListForSearchId.setAnnotationTypeDTOList( annotationTypeDTO_SortOrder_PerSearchIdList );
+
+				annotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap.put( searchId, annotationTypeDTOListForSearchId );
 				
 				continue;  //  EARLY Continue  
 			}
 			
 
-			if ( annotationTypeDataDescriptive == null ) {
-				
-				String msg = "No descriptive annotations found for psmPeptide: " + psmPeptideAnnotationType.value()
-						+ ", searchId: " + searchId;
-				log.warn( msg );
-
-				//  TODO  probably should throw exception
-				
-				continue;  //  EARLY Continue  
-			}
+//			if ( annotationTypeDataDescriptive == null ) {
+//				
+//				String msg = "No descriptive annotations found for psmPeptide: " + psmPeptideAnnotationType.value()
+//						+ ", searchId: " + searchId;
+//				log.warn( msg );
+//
+//				//  TODO  probably should throw exception
+//				
+//				continue;  //  EARLY Continue  
+//			}
 			
 			
 			
 			
 			List<AnnotationTypeDTO> annotationTypeDTO_DefaultDisplay_DisplayOrder_PerSearchIdList = 
-					new ArrayList<>( annotationTypeDataFilterable.size() + annotationTypeDataDescriptive.size() );
+					new ArrayList<>( annotationTypeDataFilterable.size() * 2 );
 
 			
 			
@@ -153,14 +164,16 @@ public class GetAnnotationTypeDataDefaultDisplayInDisplayOrder {
 			}
 			
 
-			
-			for ( Map.Entry<Integer, AnnotationTypeDTO> entry : annotationTypeDataDescriptive.entrySet() ) {
+			if ( annotationTypeDataDescriptive != null ) {
 
-				AnnotationTypeDTO item = entry.getValue();
+				for ( Map.Entry<Integer, AnnotationTypeDTO> entry : annotationTypeDataDescriptive.entrySet() ) {
 
-				if ( item.isDefaultVisible() ) {
-					
-					annotationTypeDTO_DefaultDisplay_DisplayOrder_PerSearchIdList.add( item );
+					AnnotationTypeDTO item = entry.getValue();
+
+					if ( item.isDefaultVisible() ) {
+
+						annotationTypeDTO_DefaultDisplay_DisplayOrder_PerSearchIdList.add( item );
+					}
 				}
 			}
 

@@ -151,8 +151,13 @@
 						
 			--%>
 			
-			<form action="javascript:viewSearchPeptidePageCode.updatePageForFormParams()" method="get" > <%-- id="form_get_for_updated_parameters" --%>
-			
+<%--
+		Moved JS call to the "Update" button
+		 			
+			<form action="javascript:viewSearchPeptidePageCode.updatePageForFormParams()" method="get" 
+
+				--%>	 <%-- id="form_get_for_updated_parameters" --%>
+		
 			
 			<table style="border-width:0px;">
 				<tr>
@@ -177,8 +182,9 @@
 				
 				<%--  The section at the top of the page with the cutoffs, in the user input section --%>
 
+<%-- 
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inDataEntryForm.jsp" %>
-				
+--%>				
 				
 				<tr>
 					<td>Type Filter:</td>
@@ -228,7 +234,12 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td colspan="5">
-						<input type="submit" value="Update" > <%-- onclick="searchFormUpdateButtonPressed()" --%>
+						
+<%--   WAS 						
+						<input type="submit" value="Update" >
+--%>						
+						<input type="button" value="Update"  onclick="viewSearchPeptidePageCode.updatePageForFormParams()" >
+						
 						<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
 							<input type="button" value="Save As Default" id="mergedImageSaveOrUpdateDefaultPageView"
 								onclick="saveOrUpdateDefaultPageView( { clickedThis : this, searchId: ${ viewSearchPeptidesPageDataRoot.searchId } } )">
@@ -237,8 +248,10 @@
 				</tr>
 			
 			</table>
+			
+<%-- 			
 			</form>
-
+--%>
 			
 	
 			<h3 style="display:inline;">Peptides (<c:out value="${ viewSearchPeptidesPageDataRoot.peptideListSize }"></c:out>):</h3>
@@ -461,5 +474,4 @@ if ( webappTiming != null ) {
 
 
 %>
-
 

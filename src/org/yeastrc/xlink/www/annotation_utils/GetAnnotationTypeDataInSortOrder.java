@@ -108,6 +108,17 @@ public class GetAnnotationTypeDataInSortOrder {
 
 				//  TODO  probably should throw exception
 				
+				//   Create empty list and put in map
+				
+				List<AnnotationTypeDTO> annotationTypeDTO_SortOrder_PerSearchIdList = new ArrayList<>( );
+
+				AnnotationTypeDTOListForSearchId annotationTypeDTOListForSearchId = new AnnotationTypeDTOListForSearchId();
+
+				annotationTypeDTOListForSearchId.setSearchId( searchId );
+				annotationTypeDTOListForSearchId.setAnnotationTypeDTOList( annotationTypeDTO_SortOrder_PerSearchIdList );
+
+				annotationTypeDTO_SortOrder_MainMap.put( searchId, annotationTypeDTOListForSearchId );
+				
 				continue;  //  EARLY Continue  
 			}
 			

@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -23,12 +22,14 @@ import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.default_page_view.DefaultPageViewSaveOrUpdate;
 import org.yeastrc.xlink.www.default_page_view.GetDefaultURLFromPageURL;
-import org.yeastrc.xlink.www.dto.DefaultPageViewDTO;
+import org.yeastrc.xlink.www.dto.DefaultPageViewGenericDTO;
 import org.yeastrc.xlink.www.objects.GenericWebserviceResult;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+
+
 
 @Path("/defaultPageView")
 public class DefaultPageViewService {
@@ -44,6 +45,7 @@ public class DefaultPageViewService {
 			@FormParam("searchId") int searchId, 
 			@FormParam("pageName") String pageName, 
 			@FormParam("pageUrl") String pageUrl, 
+			@FormParam("pageQueryJSON") String pageQueryJSON, 
 			@Context HttpServletRequest request ) throws Exception {
 
 
@@ -87,10 +89,23 @@ public class DefaultPageViewService {
 			    	        .build()
 			    	        );
 			}
+			if ( StringUtils.isEmpty( pageQueryJSON ) ) {
+
+				String msg = "pageQueryJSON is empty";
+
+				log.error( msg );
+
+			    throw new WebApplicationException(
+			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	        .entity( msg )
+			    	        .build()
+			    	        );
+			}
+			
 			
 
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 
 			
 			//   Get the project id for this search
@@ -172,10 +187,11 @@ public class DefaultPageViewService {
 				pageName = GetDefaultURLFromPageURL.getInstance().getPageNameFromStrutsActionInURL( pageUrl );
 			}
 			
-			DefaultPageViewDTO defaultPageViewDTO = new DefaultPageViewDTO();
+			DefaultPageViewGenericDTO defaultPageViewDTO = new DefaultPageViewGenericDTO();
 			
 			defaultPageViewDTO.setPageName( pageName );
 			defaultPageViewDTO.setUrl( defaultURLFromPageURLString );
+			defaultPageViewDTO.setQueryJSON( pageQueryJSON );
 			defaultPageViewDTO.setSearchId( searchId );
 			defaultPageViewDTO.setAuthUserId( userSessionObject.getUserDBObject().getAuthUser().getId() );
 			

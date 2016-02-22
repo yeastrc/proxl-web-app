@@ -42,13 +42,14 @@ public class PsmAnnotationDataSearcher {
 	 */
 	public List<PsmAnnotationDTO> getPsmAnnotationDTOList( int psmId, Collection<Integer> annotationTypeIdList  ) throws Exception {
 		
+
+		List<PsmAnnotationDTO> results = new ArrayList<PsmAnnotationDTO>();
+		
+		
 		if ( annotationTypeIdList == null || annotationTypeIdList.isEmpty() ) {
 			
-			throw new IllegalArgumentException( "annotationTypeIdList cannot be null or empty" );
+			return results;
 		}
-		
-		
-		List<PsmAnnotationDTO> results = new ArrayList<PsmAnnotationDTO>();
 		
 		
 

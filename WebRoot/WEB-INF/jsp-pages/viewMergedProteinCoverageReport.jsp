@@ -154,20 +154,10 @@
 				
 				<%--  The section at the top of the page with the cutoffs, in the user input section --%>
 
+<%-- 
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inDataEntryForm.jsp" %>
+--%>				
 				
-<%--				
-				<tr>
-					<td>PSM <span style="white-space: nowrap">Q-value</span> cutoff:</td>
-					<td><html:text property="psmQValueCutoff" styleId="psmQValueCutoff" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" ></html:text></td>
-				</tr>
-				
-				<tr>
-					<td>Peptide <span style="white-space: nowrap">Q-value</span> cutoff:</td>
-					<td><html:text property="peptideQValueCutoff" styleId="peptideQValueCutoff" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" ></html:text></td>
-				</tr>
---%>  				
-
 				<tr>
 					<td>Exclude xlinks with:</td>
 					<td>
