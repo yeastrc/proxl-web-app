@@ -18,6 +18,9 @@ var CutoffProcessingCommonCode = function() {
 
 	
 	var _CUTOFF_VALUE__DATA__ = "cutoff_saved_value";
+	
+	var _handlebarsTemplate_filter_single_value_display_template = null;
+	
 			
 //			_query_json_field_Contents: Object
 //				cutoffs: Object
@@ -42,6 +45,9 @@ var CutoffProcessingCommonCode = function() {
 	//  params is normally { cutoffs : _query_json_field_Contents.cutoffs }
 
 	this.putCutoffsOnThePage = function( params ) {
+		
+		var objectThis = this;
+		
 
 		var cutoffs = params.cutoffs;
 		
@@ -69,6 +75,18 @@ var CutoffProcessingCommonCode = function() {
 			
 			_putCutoffsOnThePagePerPsmPeptideType( { inputCutoffValues : inputCutoffValuesPeptide } );
 		}
+		
+		
+
+		var $cutoff_overlay_enclosing_block_jq__All = $(".cutoff_overlay_enclosing_block_jq");
+
+		$cutoff_overlay_enclosing_block_jq__All.each( function( index, element ) {
+			
+			var $cutoff_overlay_enclosing_block_jq = $( this ); 
+		
+			objectThis._storeFieldValuesAndUpdateCutoffDisplay( { $cutoff_overlay_enclosing_block_jq : $cutoff_overlay_enclosing_block_jq } );
+		});
+
 
 	};
 	
@@ -99,9 +117,6 @@ var CutoffProcessingCommonCode = function() {
 			var $inputField = $("#" + inputFieldId);
 
 			$inputField.val( inputCutoffValueEntryValue );
-			
-			//  Store value in data
-			$inputField.data( _CUTOFF_VALUE__DATA__, inputCutoffValueEntryValue );
 			
 			var $annotation_entry_root_tr_jq =  $inputField.closest(".annotation_entry_root_tr_jq");
 			
@@ -405,6 +420,9 @@ var CutoffProcessingCommonCode = function() {
 		
 		var $annotation_cutoff_input_field_jq = $cutoff_overlay_enclosing_block_jq.find(".annotation_cutoff_input_field_jq");
 		
+		var output_FieldDataFailedValidation = false;
+		
+		/////  Validate the field data
 
 		$annotation_cutoff_input_field_jq.each( function( index, element ) {
 
@@ -419,6 +437,9 @@ var CutoffProcessingCommonCode = function() {
 			//  Check for empty string since empty string does not get sent to the server.
 
 			if ( cutoffValue === "" ) {
+
+				//  Store value in data
+				$inputField.data( _CUTOFF_VALUE__DATA__, cutoffValue );
 				
 				return;  // EARLY EXIT from processing this input field since is empty string
 			}
@@ -431,12 +452,9 @@ var CutoffProcessingCommonCode = function() {
 					
 					//  cutoff value is not a valid decimal number
 
-					if ( ! output_FieldDataFailedValidation ) {
+					//  Put focus on first error
 
-						//  Put focus on first error
-
-						$inputField.focus();
-					}
+					$inputField.focus();
 
 
 					output_FieldDataFailedValidation = true;
@@ -448,17 +466,25 @@ var CutoffProcessingCommonCode = function() {
 					//  Stop the loop from within the callback function by returning false.
 
 				}
-				
-				//  Store value in data
-				$inputField.data( _CUTOFF_VALUE__DATA__, cutoffValue );
 			}
-			
-			
-			
 		});
-			
+		
+		
 
-	};	
+		if ( output_FieldDataFailedValidation ) {
+			
+			//   Validation failed so exit
+
+			
+			return;  //  EARLY EXIT
+		}
+		
+		this._storeFieldValuesAndUpdateCutoffDisplay( { $cutoff_overlay_enclosing_block_jq : $cutoff_overlay_enclosing_block_jq } );
+		
+		
+		//  TODO   Close Overlay
+	};
+	
 	
 	
 	//  "Cancel" button to restore user entered values
@@ -526,7 +552,123 @@ var CutoffProcessingCommonCode = function() {
 		});
 			
 
+	};
+	
+	
+
+	
+	///////////////////
+
+	//  Read input fields and store in .data and update associated cutoff display area
+	
+	this._storeFieldValuesAndUpdateCutoffDisplay = function( params ) {
+	
+		
+		var $cutoff_overlay_enclosing_block_jq = params.$cutoff_overlay_enclosing_block_jq;
+		
+
+		var $annotation_cutoff_input_field_jq = $cutoff_overlay_enclosing_block_jq.find(".annotation_cutoff_input_field_jq");
+		
+		
+		
+		var cutoffDataEntries = [];
+		
+
+		$annotation_cutoff_input_field_jq.each( function( index, element ) {
+
+
+			var $inputField = $( this );
+			
+
+			var cutoffValue = $inputField.val();
+
+			//  Store value in data
+			$inputField.data( _CUTOFF_VALUE__DATA__, cutoffValue );
+			
+			
+			//  Check for empty string since empty string get displayed on filter list
+
+			if ( cutoffValue === "" ) {
+
+				return;  // EARLY EXIT from processing this input field since is empty string
+			}
+
+			var $cutoff_input_field_block_jq = $inputField.closest(".cutoff_input_field_block_jq");
+
+			if ( $cutoff_input_field_block_jq.length === 0 ) {
+				
+				throw "failed to find element with class 'cutoff_input_field_block_jq'";
+			}
+			
+			var $annotation_display_name_field_jq = $cutoff_input_field_block_jq.find(".annotation_display_name_field_jq");
+			
+			if ( $annotation_display_name_field_jq.length === 0 ) {
+				
+				throw "failed to find element with class 'annotation_display_name_field_jq'";
+			}
+			
+			var annotation_display_name = $annotation_display_name_field_jq.val();
+
+			var $annotation_description_field_jq = $cutoff_input_field_block_jq.find(".annotation_description_field_jq");
+
+			if ( $annotation_description_field_jq.length === 0 ) {
+				
+				throw "failed to find element with class 'annotation_description_field_jq'";
+			}
+			
+			var annotation_description = $annotation_description_field_jq.val();
+
+			var cutoffData = { display_name : annotation_display_name, description : annotation_description, value : cutoffValue };
+			
+			cutoffDataEntries.push( cutoffData );
+
+		});
+		
+		
+		var associated_cutoffs_display_block_id = $cutoff_overlay_enclosing_block_jq.attr("data-associated_cutoffs_display_block_id");
+		
+		if ( associated_cutoffs_display_block_id === undefined 
+				|| associated_cutoffs_display_block_id === null
+				|| associated_cutoffs_display_block_id === "" ) {
+			
+			throw "Attribute 'data-associated_cutoffs_display_block_id' not set on element with class 'cutoff_overlay_enclosing_block_jq' ";
+		}
+		
+
+		if ( _handlebarsTemplate_filter_single_value_display_template === null ) {
+			
+			var handlebarsSource_filter_single_value_display_template = $( "#filter_single_value_display_template" ).html();
+
+			if ( handlebarsSource_filter_single_value_display_template === undefined ) {
+				throw "handlebarsSource_filter_single_value_display_template === undefined";
+			}
+			if ( handlebarsSource_filter_single_value_display_template === null ) {
+				throw "handlebarsSource_filter_single_value_display_template === null";
+			}
+			
+			_handlebarsTemplate_filter_single_value_display_template = Handlebars.compile( handlebarsSource_filter_single_value_display_template );
+		}
+		
+
+		var $associated_cutoffs_display_block = $("#" + associated_cutoffs_display_block_id );
+		
+		$associated_cutoffs_display_block.empty();
+		
+		for ( var cutoffDataIndex = 0; cutoffDataIndex < cutoffDataEntries.length ; cutoffDataIndex++ ) {
+
+			var cutoffData = cutoffDataEntries[ cutoffDataIndex ];
+
+			var context = { data : cutoffData };
+
+			var html = _handlebarsTemplate_filter_single_value_display_template( context );
+
+
+//			var $filter_single_value_display_template = 
+				$( html ).appendTo( $associated_cutoffs_display_block ); 
+		}
 	};	
+	
+	
 	
 };
 

@@ -160,7 +160,12 @@
 			--%>
 			
 			
-			<form action="javascript:viewSearchCrosslinkProteinPageCode.updatePageForFormParams()" method="get" > <%-- id="form_get_for_updated_parameters" --%>
+<%--
+		Moved JS call to the "Update" button
+		 						
+			<form action="javascript:viewSearchCrosslinkProteinPageCode.updatePageForFormParams()" method="get" > 
+			
+				--%>	 <%-- id="form_get_for_updated_parameters" --%>
 			
 			
 			
@@ -257,8 +262,12 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td>
+						
+<%--   WAS 						
 						<input type="submit" value="Update" onclick="searchFormUpdateButtonPressed()">
-
+--%>						
+						<input type="button" value="Update"  onclick="viewSearchCrosslinkProteinPageCode.updatePageForFormParams()" >
+						
 						<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
 							<input type="button" value="Save As Default" id="mergedImageSaveOrUpdateDefaultPageView"
 								onclick="saveOrUpdateDefaultPageView( { clickedThis : this, searchId: <bean:write name="search" property="id" /> } )">
@@ -269,8 +278,9 @@
 			</table>
 			
 			
+<%-- 			
 			</form>
-
+--%>
 	
 			<h3 style="display:inline;">Crosslinks (<bean:write name="numCrosslinks" />):</h3>
 			<div style="display:inline;">

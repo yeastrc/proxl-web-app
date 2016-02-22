@@ -4,40 +4,37 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.www.dto.DefaultPageViewDTO;
+import org.yeastrc.xlink.www.dto.DefaultPageViewGenericDTO;
 
 /**
- * DAO for default_page_view table
+ * DAO for default_page_view_generic table
  *
  */
-public class DefaultPageViewDAO {
+public class DefaultPageViewGenericDAO {
 	
-	private static final Logger log = Logger.getLogger(DefaultPageViewDAO.class);
+	private static final Logger log = Logger.getLogger(DefaultPageViewGenericDAO.class);
 
 	//  private constructor
-	private DefaultPageViewDAO() { }
+	private DefaultPageViewGenericDAO() { }
 	
 	/**
 	 * @return newly created instance
 	 */
-	public static DefaultPageViewDAO getInstance() { 
-		return new DefaultPageViewDAO(); 
+	public static DefaultPageViewGenericDAO getInstance() { 
+		return new DefaultPageViewGenericDAO(); 
 	}
 	
-	
-
-//	CREATE TABLE default_page_view (
-//	  search_id INT UNSIGNED NOT NULL,
-//	  page_name VARCHAR(80) NOT NULL,
-//	  auth_user_id INT UNSIGNED NOT NULL,
-//	  url VARCHAR(6000) NOT NULL,
-
+//	CREATE TABLE default_page_view_generic (
+//			  search_id INT UNSIGNED NOT NULL,
+//			  page_name VARCHAR(80) NOT NULL,
+//			  auth_user_id INT UNSIGNED NOT NULL,
+//			  url VARCHAR(6000) NOT NULL,
+//			  query_json VARCHAR(6000) NOT NULL,
 
 	
 	
@@ -50,23 +47,16 @@ public class DefaultPageViewDAO {
 	 * @return null if not found
 	 * @throws Exception
 	 */
-	public DefaultPageViewDTO getForSearchIdPageName( int searchId, String pageName ) throws Exception {
+	public DefaultPageViewGenericDTO getForSearchIdPageName( int searchId, String pageName ) throws Exception {
 
 
-		DefaultPageViewDTO returnItem = null;
+		DefaultPageViewGenericDTO returnItem = null;
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		final String sql = "SELECT * FROM default_page_view WHERE search_id = ? AND page_name = ?";
-
-//		CREATE TABLE default_page_view (
-//		  search_id INT UNSIGNED NOT NULL,
-//		  page_name VARCHAR(80) NOT NULL,
-//		  auth_user_id INT UNSIGNED NOT NULL,
-//		  url VARCHAR(6000) NOT NULL,
-
+		final String sql = "SELECT * FROM default_page_view_generic WHERE search_id = ? AND page_name = ?";
 
 		
 		try {
@@ -124,23 +114,16 @@ public class DefaultPageViewDAO {
 	 * @return 
 	 * @throws Exception
 	 */
-	public List<DefaultPageViewDTO> getForSearchId( int searchId ) throws Exception {
+	public List<DefaultPageViewGenericDTO> getForSearchId( int searchId ) throws Exception {
 
 
-		 List<DefaultPageViewDTO> results = new ArrayList<>();
+		 List<DefaultPageViewGenericDTO> results = new ArrayList<>();
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
 		final String sql = "SELECT * FROM project WHERE search_id = ? ";
-
-//		CREATE TABLE default_page_view (
-//		  search_id INT UNSIGNED NOT NULL,
-//		  page_name VARCHAR(80) NOT NULL,
-//		  auth_user_id INT UNSIGNED NOT NULL,
-//		  url VARCHAR(6000) NOT NULL,
-
 
 		
 		try {
@@ -154,7 +137,7 @@ public class DefaultPageViewDAO {
 			
 			while( rs.next() ) {
 				
-				DefaultPageViewDTO item = populateResultObject( rs );
+				DefaultPageViewGenericDTO item = populateResultObject( rs );
 				results.add( item );
 			}
 			
@@ -198,23 +181,18 @@ public class DefaultPageViewDAO {
 	 * @return
 	 * @throws SQLException
 	 */
-	private DefaultPageViewDTO populateResultObject(ResultSet rs) throws SQLException {
+	private DefaultPageViewGenericDTO populateResultObject(ResultSet rs) throws SQLException {
 		
-		DefaultPageViewDTO returnItem = new DefaultPageViewDTO();
+		DefaultPageViewGenericDTO returnItem = new DefaultPageViewGenericDTO();
 
 		returnItem.setSearchId( rs.getInt( "search_id" ) );
 		returnItem.setPageName( rs.getString( "page_name" ) );
 		returnItem.setAuthUserId( rs.getInt( "auth_user_id" ) );
 		returnItem.setUrl( rs.getString( "url" ) );
+		returnItem.setQueryJSON( rs.getString( "query_json" ) );
 		
 		return returnItem;
 	}
-//	CREATE TABLE default_page_view (
-//	  search_id INT UNSIGNED NOT NULL,
-//	  page_name VARCHAR(80) NOT NULL,
-//	  auth_user_id INT UNSIGNED NOT NULL,
-//	  url VARCHAR(6000) NOT NULL,
-
 
 
 
@@ -222,7 +200,7 @@ public class DefaultPageViewDAO {
 	 * @param item
 	 * @throws Exception
 	 */
-	public void saveOrUpdate( DefaultPageViewDTO item ) throws Exception {
+	public void saveOrUpdate( DefaultPageViewGenericDTO item ) throws Exception {
 		
 		
 		Connection dbConnection = null;
@@ -248,23 +226,17 @@ public class DefaultPageViewDAO {
 	 * @param item
 	 * @throws Exception
 	 */
-	public void saveOrUpdate( DefaultPageViewDTO item, Connection dbConnection ) throws Exception {
+	public void saveOrUpdate( DefaultPageViewGenericDTO item, Connection dbConnection ) throws Exception {
 		
 		PreparedStatement pstmt = null;
 
 
-//		CREATE TABLE default_page_view (
-//		  search_id INT UNSIGNED NOT NULL,
-//		  page_name VARCHAR(80) NOT NULL,
-//		  auth_user_id INT UNSIGNED NOT NULL,
-//		  url VARCHAR(6000) NOT NULL,
 
 
 
-
-		final String sql = "INSERT INTO default_page_view (search_id, page_name, auth_user_id, url ) " 
-				+ " VALUES ( ?, ?, ?, ? ) "
-				+ " ON DUPLICATE KEY UPDATE auth_user_id = ?, url = ?;";
+		final String sql = "INSERT INTO default_page_view_generic (search_id, page_name, auth_user_id, url, query_json ) " 
+				+ " VALUES ( ?, ?, ?, ?, ? ) "
+				+ " ON DUPLICATE KEY UPDATE auth_user_id = ?, url = ?, query_json = ?";
 		
 		try {
 			
@@ -283,11 +255,15 @@ public class DefaultPageViewDAO {
 			pstmt.setInt( counter, item.getAuthUserId() );
 			counter++;
 			pstmt.setString( counter, item.getUrl() );
+			counter++;
+			pstmt.setString( counter, item.getQueryJSON() );
 
 			counter++;
 			pstmt.setInt( counter, item.getAuthUserId() );
 			counter++;
 			pstmt.setString( counter, item.getUrl() );
+			counter++;
+			pstmt.setString( counter, item.getQueryJSON() );
 
 			pstmt.executeUpdate();
 			
@@ -336,82 +312,83 @@ public class DefaultPageViewDAO {
 
 
 	/**
-	 * Update url = ?, auth_user_id = ? 
+	 * UNUSED
+	 * 
+	 * 
+	 * Update url = ?, query_json = ?, auth_user_id = ?
 	 * @param id
 	 * @param url
 	 * @throws Exception
 	 */
-	public void updateUrlAuthUserId( DefaultPageViewDTO item ) throws Exception {
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		final String sql = "UPDATE default_page_view SET url = ?, auth_user_id = ? WHERE search_id = ? AND page_name = ?";
-
-		
-		try {
-			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
-
-
-//			CREATE TABLE default_page_view (
-//			  search_id INT UNSIGNED NOT NULL,
-//			  page_name VARCHAR(80) NOT NULL,
-//			  auth_user_id INT UNSIGNED NOT NULL,
-//			  url VARCHAR(6000) NOT NULL,
-
-
-			
-			pstmt = conn.prepareStatement( sql );
-			
-			int counter = 0;
-			
-			counter++;
-			pstmt.setString( counter, item.getUrl() );
-			
-			counter++;
-			pstmt.setInt( counter, item.getAuthUserId() );
-
-			
-			counter++;
-			pstmt.setInt( counter, item.getSearchId() );
-
-			counter++;
-			pstmt.setString( counter, item.getPageName() );
-			
-			
-			pstmt.executeUpdate();
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Failed to update url = ?, auth_user_id = ?, sql: " + sql;
-			
-			log.error( msg, e );
-			
-			throw e;
-			
-		} finally {
-			
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-			
-		}
-		
-	}
+//	public void updateUrlQueryJSONAuthUserId( DefaultPageViewGenericDTO item ) throws Exception {
+//		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		ResultSet rs = null;
+//
+//		final String sql = "UPDATE default_page_view SET url = ?, query_json = ?, auth_user_id = ? WHERE search_id = ? AND page_name = ?";
+//
+//		
+//		try {
+//			
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//
+//
+//
+//
+//			
+//			pstmt = conn.prepareStatement( sql );
+//			
+//			int counter = 0;
+//
+//			counter++;
+//			pstmt.setString( counter, item.getUrl() );
+//			
+//			counter++;
+//			pstmt.setString( counter, item.getQueryJSON() );
+//			
+//			counter++;
+//			pstmt.setInt( counter, item.getAuthUserId() );
+//
+//			
+//			counter++;
+//			pstmt.setInt( counter, item.getSearchId() );
+//
+//			counter++;
+//			pstmt.setString( counter, item.getPageName() );
+//			
+//			
+//			pstmt.executeUpdate();
+//			
+//		} catch ( Exception e ) {
+//			
+//			String msg = "Failed to update url = ?, auth_user_id = ?, sql: " + sql;
+//			
+//			log.error( msg, e );
+//			
+//			throw e;
+//			
+//		} finally {
+//			
+//			// be sure database handles are closed
+//			if( rs != null ) {
+//				try { rs.close(); } catch( Throwable t ) { ; }
+//				rs = null;
+//			}
+//			
+//			if( pstmt != null ) {
+//				try { pstmt.close(); } catch( Throwable t ) { ; }
+//				pstmt = null;
+//			}
+//			
+//			if( conn != null ) {
+//				try { conn.close(); } catch( Throwable t ) { ; }
+//				conn = null;
+//			}
+//			
+//		}
+//		
+//	}
 	
 
 

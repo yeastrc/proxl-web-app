@@ -204,7 +204,14 @@
 							
 							<input type="hidden" class=" annotation_cutoff_default_value_field_jq " 
 								value="<c:out value="${ psmAnnotationCutoffDataEntry.annotationDefaultValue }"></c:out>" >
-								
+
+									<input type="hidden" class=" annotation_display_name_field_jq "
+										value="<c:out value="${ psmAnnotationCutoffDataEntry.annotationName }"
+												></c:out> (<c:out value="${ psmAnnotationCutoffDataEntry.searchProgramDisplayName }"
+											></c:out>)" > 
+									
+									<input type="hidden" class=" annotation_description_field_jq "
+										value="<c:out value="${ psmAnnotationCutoffDataEntry.annotationDescription }"></c:out>" > 								
 						  </div>
 						  	
 						</td>
@@ -220,6 +227,13 @@
 
 				
 				</div>
+				
+			<div style="color:red; font-size: 18pt">
+				Should "Reset to Defaults" immediately close the dialog?  
+				If not, should clicking "Cancel" remove the effect of clicking "Reset to Defaults"?
+				It is coded to not close the dialog and not change the values if "Cancel" is clicked.  
+			</div>
+			
 				
 			</div>
 			<br>
@@ -285,7 +299,7 @@
 					<tr class= " annotation_entry_root_tr_jq " style=""> <%-- REMOVED hidden initially, displayed via Javascript --%>
 						<td>
 							<span style="white-space: nowrap;  ${ cutoff_input_annotation_name } "
-								class="   ${ class_string_tool_tip_attached_jq } "
+								class=" annotation_type_name_string_jq  ${ class_string_tool_tip_attached_jq } "
 								<c:if test="${ not empty peptideAnnotationCutoffDataEntry.annotationDescription }">
 									data-tooltip="Annotation Description: <c:out value="${ peptideAnnotationCutoffDataEntry.annotationDescription }"></c:out>"
 								</c:if>
@@ -307,6 +321,14 @@
 								
 									<input type="hidden" class=" annotation_cutoff_default_value_field_jq " 
 										value="<c:out value="${ peptideAnnotationCutoffDataEntry.annotationDefaultValue }"></c:out>" >
+										
+									<input type="hidden" class=" annotation_display_name_field_jq "
+										value="<c:out value="${ peptideAnnotationCutoffDataEntry.annotationName }"
+												></c:out> (<c:out value="${ peptideAnnotationCutoffDataEntry.searchProgramDisplayName }"
+											></c:out>)" > 
+									
+									<input type="hidden" class=" annotation_description_field_jq "
+										value="<c:out value="${ peptideAnnotationCutoffDataEntry.annotationDescription }"></c:out>" > 
 						  </div>
 						</td>
 					</tr>
@@ -343,8 +365,8 @@
 
 	<script id="filter_single_value_display_template"  type="text/x-handlebars-template">
 		
-		<span class="filter-single-value-display-block">{{ name }}{{#if searchProgramNameSet}}({{searchProgramName}}){{/if}}: {{value}} </span>
-	
+		<span class="filter-single-value-display-block">{{ data.display_name }}: {{ data.value }} </span>
+
 	</script >		
 	
 	

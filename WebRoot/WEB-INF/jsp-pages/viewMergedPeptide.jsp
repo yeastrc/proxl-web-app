@@ -167,10 +167,13 @@
 			
 			</html:form>
 			
-
+<%--
+		Moved JS call to the "Update" button
+		 			
 			<form action="javascript:viewMergedPeptidePageCode.updatePageForFormParams()" method="get" >
 						
-			
+--%>	
+							
 			<table style="border-width:0px;">
 				<tr>
 					<td valign="top">Searches:</td>
@@ -243,12 +246,22 @@
 					
 				<tr>
 					<td>&nbsp;</td>
-					<td><input type="submit" value="Update" ></td>  <%-- onclick="searchFormUpdateButtonPressed()" --%>
+					
+					<td>
+						
+<%--   WAS 						
+						<input type="submit" value="Update" >
+--%>						
+						<input type="button" value="Update"  onclick="viewMergedPeptidePageCode.updatePageForFormParams()" >
+											
+					</td>
 				</tr>
 			
 			</table>
 			
+<%-- 			
 			</form>
+--%>
 			
 			<div >
 	

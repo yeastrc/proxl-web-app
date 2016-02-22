@@ -1,18 +1,26 @@
 package org.yeastrc.xlink.www.dto;
 
 /**
- * table default_page_view
+ * table default_page_view_generic
  *
  */
-public class DefaultPageViewDTO {
+public class DefaultPageViewGenericDTO {
 
 	private int searchId;
 	private String pageName;
 	
 	private int authUserId;
 	private String url;
+	private String queryJSON;
 	
 	
+	
+	public String getQueryJSON() {
+		return queryJSON;
+	}
+	public void setQueryJSON(String queryJSON) {
+		this.queryJSON = queryJSON;
+	}
 	public int getAuthUserId() {
 		return authUserId;
 	}
@@ -43,10 +51,3 @@ public class DefaultPageViewDTO {
 	
 	
 }
-
-//CREATE TABLE default_page_view (
-//search_id INT UNSIGNED NOT NULL,
-//page_name VARCHAR(80) NOT NULL,
-//auth_user_id INT UNSIGNED NOT NULL,
-//url VARCHAR(6000) NOT NULL,
-

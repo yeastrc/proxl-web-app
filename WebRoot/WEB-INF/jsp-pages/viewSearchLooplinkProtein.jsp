@@ -154,7 +154,12 @@
 			--%>
 			
 			
-			<form action="javascript:viewSearchLooplinkProteinPageCode.updatePageForFormParams()" method="get" > <%-- id="form_get_for_updated_parameters" --%>
+<%--
+		Moved JS call to the "Update" button
+		 			
+			<form action="javascript:viewSearchLooplinkProteinPageCode.updatePageForFormParams()" method="get" > 
+			
+				--%>	 <%-- id="form_get_for_updated_parameters" --%>
 			
 			
 			
@@ -251,7 +256,12 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td>
+
+<%--   WAS 						
 						<input type="submit" value="Update" onclick="searchFormUpdateButtonPressed()">
+--%>						
+						<input type="button" value="Update"  onclick="viewSearchLooplinkProteinPageCode.updatePageForFormParams()" >
+														
 
 						<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
 							<input type="button" value="Save As Default" id="mergedImageSaveOrUpdateDefaultPageView"
@@ -263,7 +273,9 @@
 			</table>
 			
 			
+<%-- 			
 			</form>
+--%>
 			
 			
 			

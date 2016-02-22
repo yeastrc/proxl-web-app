@@ -212,8 +212,12 @@ public class ViewMergedSearchImageAction extends Action {
 
 			
 			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
-			
 
+
+//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
+			
+//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsCollection, request );
+	
 
 			
 			boolean showStructureLink = true;
@@ -273,11 +277,6 @@ public class ViewMergedSearchImageAction extends Action {
 			//  This builds an object for the cutoff selection block on the page
 			
 
-
-//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-			
-			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsCollection, request );
-	
 			
 		
 			return mapping.findForward( "Success" );

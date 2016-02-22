@@ -130,7 +130,12 @@
 			--%>
 			
 			
-			<form action="javascript:viewProteinCoverageReportPageCode.updatePageForFormParams()" method="get" > <%-- id="form_get_for_updated_parameters" --%>
+			<%--
+		Moved JS call to the "Update" button
+		 			
+			<form action="javascript:viewProteinCoverageReportPageCode.updatePageForFormParams()" method="get" > 
+			
+				--%>	 <%-- id="form_get_for_updated_parameters" --%>
 			
 			
 			<table style="border-width:0px;">
@@ -225,7 +230,11 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td>
-						<input type="submit" value="Update" onclick=""> <%-- searchFormUpdateButtonPressed() --%>
+						
+<%--   WAS 						
+						<input type="submit" value="Update" >
+--%>						
+						<input type="button" value="Update"  onclick="viewProteinCoverageReportPageCode.updatePageForFormParams()" >
 
 						<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
 							<input type="button" value="Save As Default" id="mergedImageSaveOrUpdateDefaultPageView"
@@ -236,9 +245,9 @@
 			
 			</table>
 			
-			
+<%-- 			
 			</form>
-	
+--%>
 	
 			<h3 style="display:inline;">Protein Coverage Report:</h3>
 

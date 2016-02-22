@@ -303,7 +303,12 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			
 			
 			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
-	
+
+
+//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
+			
+//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsCollection, request );
+
 			
 			
 
@@ -366,11 +371,6 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			////////   Generic Param processing
 			
 			
-
-
-//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-			
-			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsCollection, request );
 
 
 			////////////

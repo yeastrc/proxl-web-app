@@ -254,6 +254,20 @@ public class ViewMergedSearchProteinsAction extends Action {
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 
 
+			
+
+			//  Populate request objects for Standard Search Display
+						
+			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
+
+			//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
+
+			//  Set attribute in request object for Page Display of cutoffs
+//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsSet, request );
+
+
+			
+
 
 			// sort our searches by ID
 			Collections.sort( searches, new Comparator<SearchDTO>() {
@@ -275,14 +289,6 @@ public class ViewMergedSearchProteinsAction extends Action {
 				webappTiming.markPoint( "After Taxonomy Searcher:  SearchTaxonomySearcher.getInstance().getTaxonomies( search )" );
 			}
 			
-			
-
-			//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-
-			//  Set attribute in request object for Page Display of cutoffs
-			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsSet, request );
-
-
 			
 
 			
@@ -409,9 +415,8 @@ public class ViewMergedSearchProteinsAction extends Action {
 
 			request.setAttribute( "queryString", request.getQueryString() );
 			request.setAttribute( "searches", searches );
-
-			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
-
+			
+			
 			request.setAttribute( "numDistinctLinks",  XLinkWebAppUtils.getNumUDRs( crosslinks, looplinks ) );
 
 

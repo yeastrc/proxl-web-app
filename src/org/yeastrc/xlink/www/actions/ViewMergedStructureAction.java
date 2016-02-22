@@ -221,9 +221,6 @@ public class ViewMergedStructureAction extends Action {
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 	
 			
-			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
-	
-			
 
 			
 
@@ -260,14 +257,19 @@ public class ViewMergedStructureAction extends Action {
 
 			request.setAttribute( "cutoffValuesRootLevelCutoffDefaults", cutoffValuesRootLevelCutoffDefaultsJSONString );
 
+
+
+			//  Populate request objects for Standard Search Display
+						
+			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
+	
 			
 			//  This builds an object for the cutoff selection block on the page
 			
 
-
 //			CutoffPageDisplayRoot cutoffPageDisplayRoot =
 			
-			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsCollection, request );
+//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsCollection, request );
 	
 			
 		

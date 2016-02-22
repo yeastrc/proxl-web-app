@@ -1,5 +1,5 @@
 
-//          qcChartQValueCounts.js
+//          qcChartPSMCountsVsScore.js
 
 
 //  Quality Control chart
@@ -17,25 +17,25 @@
 //CONSTANTS
 
 
-var Q_VALUE__COUNT_CHART_WIDTH = 920;
-var Q_VALUE__COUNT_CHART_HEIGHT = 650;
+var PSM_COUNT_VS_SCORE_CHART_WIDTH = 920;
+var PSM_COUNT_VS_SCORE_CHART_HEIGHT = 650;
 
-var RELOAD_Q_VALUE_COUNT_CHART_TIMER_DELAY = 400;  // in Milliseconds
-
-
+var RELOAD_PSM_COUNT_VS_SCORE_CHART_TIMER_DELAY = 400;  // in Milliseconds
 
 
 
-var qcChartQValueCountInitialized = false;
+
+
+var qcChartPSMCountVsScoreInitialized = false;
 
 
 
 
 ///   Called when Google charts is initialized
 
-function initQCChartQValueCount() {
+function initQCChartPSMCountVsScore() {
 	
-	qcChartQValueCountInitialized = true;
+	qcChartPSMCountVsScoreInitialized = true;
 	
 	
 	
@@ -47,9 +47,9 @@ function initQCChartQValueCount() {
 ///   Called from viewProjectPage.js  initPage()  when page is ready
 
 
-function initQCPlotQValueCountClickHandlers() {	
+function initQCPlotPSMCountVsScoreClickHandlers() {	
 	
-	qcChartQValueCounts.init();
+	qcChartPSMCountVsScores.init();
 	
 	
 	
@@ -60,7 +60,7 @@ function initQCPlotQValueCountClickHandlers() {
 
 //  Constructor for QC chart for PSM Q Values
 
-var QCChartQValueCounts = function(  ) {
+var QCChartPSMCountVsScores = function(  ) {
 	
 	
 	this.globals = {
@@ -86,7 +86,7 @@ var QCChartQValueCounts = function(  ) {
 
 //  Create an instance from the constructor
 
-var qcChartQValueCounts = new QCChartQValueCounts();
+var qcChartPSMCountVsScores = new QCChartPSMCountVsScores();
 
 
 
@@ -94,54 +94,54 @@ var qcChartQValueCounts = new QCChartQValueCounts();
 //CONSTANTS
 
 
-QCChartQValueCounts.prototype.Q_VALUE__COUNT_CHART_WIDTH = Q_VALUE__COUNT_CHART_WIDTH;
-QCChartQValueCounts.prototype.Q_VALUE__COUNT_CHART_HEIGHT = Q_VALUE__COUNT_CHART_HEIGHT;
+QCChartPSMCountVsScores.prototype.PSM_COUNT_VS_SCORE_CHART_WIDTH = PSM_COUNT_VS_SCORE_CHART_WIDTH;
+QCChartPSMCountVsScores.prototype.PSM_COUNT_VS_SCORE_CHART_HEIGHT = PSM_COUNT_VS_SCORE_CHART_HEIGHT;
 
-QCChartQValueCounts.prototype.RELOAD_Q_VALUE_COUNT_CHART_TIMER_DELAY = RELOAD_Q_VALUE_COUNT_CHART_TIMER_DELAY;  // in Milliseconds
+QCChartPSMCountVsScores.prototype.RELOAD_PSM_COUNT_VS_SCORE_CHART_TIMER_DELAY = RELOAD_PSM_COUNT_VS_SCORE_CHART_TIMER_DELAY;  // in Milliseconds
 
 
-QCChartQValueCounts.prototype.Y_AXIS_CHOICE_PERCENTAGE = "PERCENTAGE";
+QCChartPSMCountVsScores.prototype.Y_AXIS_CHOICE_PERCENTAGE = "PERCENTAGE";
 
-QCChartQValueCounts.prototype.Y_AXIS_CHOICE_RAW_COUNTS = "RAW_COUNTS";
+QCChartPSMCountVsScores.prototype.Y_AXIS_CHOICE_RAW_COUNTS = "RAW_COUNTS";
 
 
 
 
 //////////
 
-QCChartQValueCounts.prototype.init = function() {
+QCChartPSMCountVsScores.prototype.init = function() {
 
 	var objectThis = this;
 
 	
 
-	$(".qc_plot_psm_q_value_count_link_jq").click(function(eventObject) {
+	$(".qc_plot_psm_count_vs_score_link_jq").click(function(eventObject) {
 
 		var clickThis = this;
 
-		objectThis.qvalueCountQCPlotClickHandler( clickThis, eventObject );
+		objectThis.psmCountVsScoreQCPlotClickHandler( clickThis, eventObject );
 		
 		return false;
 	});	 	
 	
-	$(".psm_q_value_count_qc_plot_overlay_close_parts_jq").click(function(eventObject) {
+	$(".psm_count_vs_score_qc_plot_overlay_close_parts_jq").click(function(eventObject) {
 
 		var clickThis = this;
 		
-		if ( objectThis.reloadQvalueCountChartTimerId ) {
+		if ( objectThis.reloadPSMCountVsScoreChartTimerId ) {
 			
-			clearTimeout( objectThis.reloadQvalueCountChartTimerId );
+			clearTimeout( objectThis.reloadPSMCountVsScoreChartTimerId );
 			
-			objectThis.reloadQvalueCountChartTimerId = null;
+			objectThis.reloadPSMCountVsScoreChartTimerId = null;
 		}
 
-		objectThis.closeQvalueCountQCPlotOverlay( clickThis, eventObject );
+		objectThis.closePSMCountVsScoreQCPlotOverlay( clickThis, eventObject );
 		
 		return false;
 	});
 
 	
-	$(".psm_q_value_count_qc_plot_on_change_jq").change(function(eventObject) {
+	$(".psm_count_vs_score_qc_plot_on_change_jq").change(function(eventObject) {
 		
 		objectThis.createChartFromPageParams( );
 		
@@ -149,27 +149,27 @@ QCChartQValueCounts.prototype.init = function() {
 	});
 	
 
-	$(".psm_q_value_count_qc_plot_on_change_jq").keyup(function(eventObject) {
+	$(".psm_count_vs_score_qc_plot_on_change_jq").keyup(function(eventObject) {
 		
-		if ( objectThis.reloadQvalueCountChartTimerId ) {
+		if ( objectThis.reloadPSMCountVsScoreChartTimerId ) {
 			
-			clearTimeout( objectThis.reloadQvalueCountChartTimerId );
+			clearTimeout( objectThis.reloadPSMCountVsScoreChartTimerId );
 			
-			objectThis.reloadQvalueCountChartTimerId = null;
+			objectThis.reloadPSMCountVsScoreChartTimerId = null;
 		}
 
 		
-		objectThis.reloadQvalueCountChartTimerId = setTimeout( function() {
+		objectThis.reloadPSMCountVsScoreChartTimerId = setTimeout( function() {
 				
 			objectThis.createChartFromPageParams( );
 				
-		}, objectThis.RELOAD_Q_VALUE_COUNT_CHART_TIMER_DELAY );
+		}, objectThis.RELOAD_PSM_COUNT_VS_SCORE_CHART_TIMER_DELAY );
 		
 		return false;
 	});
 	
 
-	$("#psm_q_value_count_qc_plot_max_reset_button").click(function(eventObject) {
+	$("#psm_count_vs_score_qc_plot_max_reset_button").click(function(eventObject) {
 
 		
 		objectThis.resetMaxXMaxY();
@@ -180,14 +180,14 @@ QCChartQValueCounts.prototype.init = function() {
 	});
 	
 		
-	$( "#psm_q_value_count_qc_plot_download_svg" ).click( function() {
+	$( "#psm_count_vs_score_qc_plot_download_svg" ).click( function() {
 		var d = new Date().toISOString().slice(0, 19).replace(/-/g, "");
-		var $svg_image_inner_container_div__svg_merged_image_svg_jq = $( "#psm_q_value_count_qc_plot_chartDiv svg " );
+		var $svg_image_inner_container_div__svg_merged_image_svg_jq = $( "#psm_count_vs_score_qc_plot_chartDiv svg " );
 		var svgContents = $svg_image_inner_container_div__svg_merged_image_svg_jq.html();
 		var fullSVG_String = "<svg id=\"svg\">" + svgContents +"</svg>";
 		var svgBase64Ecoded = Base64.encode( fullSVG_String );
 		var hrefString = "data:application/svg+xml;base64," + svgBase64Ecoded;
-		var downloadFilename = "psm_q_value_counts_" + d + ".svg";
+		var downloadFilename = "psm_count_vs_scores_" + d + ".svg";
 		$(this).attr("href", hrefString ).attr("download", downloadFilename );
 	});
 	
@@ -199,11 +199,11 @@ QCChartQValueCounts.prototype.init = function() {
 
 /////////////////
 
-QCChartQValueCounts.prototype.qvalueCountQCPlotClickHandler = function(clickThis, eventObject) {
+QCChartPSMCountVsScores.prototype.psmCountVsScoreQCPlotClickHandler = function(clickThis, eventObject) {
 
 	var objectThis = this;
 	
-	objectThis.openQvalueCountQCPlotOverlay(clickThis, eventObject);
+	objectThis.openPSMCountVsScoreQCPlotOverlay(clickThis, eventObject);
 
 	return;
 
@@ -211,7 +211,7 @@ QCChartQValueCounts.prototype.qvalueCountQCPlotClickHandler = function(clickThis
 
 ///////////
 
-QCChartQValueCounts.prototype.openQvalueCountQCPlotOverlay = function(clickThis, eventObject) {
+QCChartPSMCountVsScores.prototype.openPSMCountVsScoreQCPlotOverlay = function(clickThis, eventObject) {
 
 	var objectThis = this;
 
@@ -236,43 +236,43 @@ QCChartQValueCounts.prototype.openQvalueCountQCPlotOverlay = function(clickThis,
 	
 	var searchNameAndNumberInParens = search_name_display_jq + " " + search_number_in_parens_display_jq;
 	
-	var $psm_q_value_count_qc_plot_current_search_name_and_id = $("#psm_q_value_count_qc_plot_current_search_name_and_id");
+	var $psm_count_vs_score_qc_plot_current_search_name_and_id = $("#psm_count_vs_score_qc_plot_current_search_name_and_id");
 	
-	$psm_q_value_count_qc_plot_current_search_name_and_id.val( searchNameAndNumberInParens );
+	$psm_count_vs_score_qc_plot_current_search_name_and_id.val( searchNameAndNumberInParens );
 	
 	
 	// Position dialog over clicked link
 	
 	//  get position of div containing the dialog that is inline in the page
-	var $psm_q_value_count_qc_plot_overlay_containing_outermost_div_inline_div = $("#psm_q_value_count_qc_plot_overlay_containing_outermost_div_inline_div");
+	var $psm_count_vs_score_qc_plot_overlay_containing_outermost_div_inline_div = $("#psm_count_vs_score_qc_plot_overlay_containing_outermost_div_inline_div");
 	
-	var offset__containing_outermost_div_inline_div = $psm_q_value_count_qc_plot_overlay_containing_outermost_div_inline_div.offset();
+	var offset__containing_outermost_div_inline_div = $psm_count_vs_score_qc_plot_overlay_containing_outermost_div_inline_div.offset();
 	var offsetTop__containing_outermost_div_inline_div = offset__containing_outermost_div_inline_div.top;
 	
 
-	var $psm_q_value_count_qc_plot_overlay_container = $("#psm_q_value_count_qc_plot_overlay_container");
+	var $psm_count_vs_score_qc_plot_overlay_container = $("#psm_count_vs_score_qc_plot_overlay_container");
 	
 	var scrollTopWindow = $(window).scrollTop();
 	
 	var positionAdjust = scrollTopWindow - offsetTop__containing_outermost_div_inline_div + 10;
 
-	$psm_q_value_count_qc_plot_overlay_container.css( "top", positionAdjust );
+	$psm_count_vs_score_qc_plot_overlay_container.css( "top", positionAdjust );
 
 
 	
 	
 	
-	var $psm_q_value_count_qc_plot_current_search_id = $("#psm_q_value_count_qc_plot_current_search_id");
+	var $psm_count_vs_score_qc_plot_current_search_id = $("#psm_count_vs_score_qc_plot_current_search_id");
 	
-	var prevSearchId = $psm_q_value_count_qc_plot_current_search_id.val( );
+	var prevSearchId = $psm_count_vs_score_qc_plot_current_search_id.val( );
 	
 	if ( prevSearchId === searchId ) {
 		
 		////  Same Search Id as when last opened so just show it
 		
-		var $psm_q_value_count_qc_plot_overlay_background = $("#psm_q_value_count_qc_plot_overlay_background"); 
-		$psm_q_value_count_qc_plot_overlay_background.show();
-		$psm_q_value_count_qc_plot_overlay_container.show();
+		var $psm_count_vs_score_qc_plot_overlay_background = $("#psm_count_vs_score_qc_plot_overlay_background"); 
+		$psm_count_vs_score_qc_plot_overlay_background.show();
+		$psm_count_vs_score_qc_plot_overlay_container.show();
 		
 		return;  //  EARLY EXIT
 	}
@@ -283,7 +283,7 @@ QCChartQValueCounts.prototype.openQvalueCountQCPlotOverlay = function(clickThis,
 	
 	
 	
-	$psm_q_value_count_qc_plot_current_search_id.val( searchId );
+	$psm_count_vs_score_qc_plot_current_search_id.val( searchId );
 	
 	
 	objectThis.createChartFromPageParams( { 
@@ -294,9 +294,9 @@ QCChartQValueCounts.prototype.openQvalueCountQCPlotOverlay = function(clickThis,
 
 //////////	/
 
-QCChartQValueCounts.prototype.closeQvalueCountQCPlotOverlay = function(clickThis, eventObject) {
+QCChartPSMCountVsScores.prototype.closePSMCountVsScoreQCPlotOverlay = function(clickThis, eventObject) {
 
-	$(".psm_q_value_count_qc_plot_overlay_show_hide_parts_jq").hide();
+	$(".psm_count_vs_score_qc_plot_overlay_show_hide_parts_jq").hide();
 };
 			
 
@@ -308,18 +308,18 @@ QCChartQValueCounts.prototype.closeQvalueCountQCPlotOverlay = function(clickThis
 ///  
 ///  
 
-QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
+QCChartPSMCountVsScores.prototype.createChartFromPageParams = function( ) {
 
 
 	var objectThis = this;
 
 	
 	
-	if ( objectThis.reloadQvalueCountChartTimerId ) {
+	if ( objectThis.reloadPSMCountVsScoreChartTimerId ) {
 		
-		clearTimeout( objectThis.reloadQvalueCountChartTimerId );
+		clearTimeout( objectThis.reloadPSMCountVsScoreChartTimerId );
 		
-		objectThis.reloadQvalueCountChartTimerId = null;
+		objectThis.reloadPSMCountVsScoreChartTimerId = null;
 	}
 
 	
@@ -333,9 +333,9 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 	
 
 	
-	var $psm_q_value_count_qc_plot_max_x = $("#psm_q_value_count_qc_plot_max_x");
+	var $psm_count_vs_score_qc_plot_max_x = $("#psm_count_vs_score_qc_plot_max_x");
 	
-	var $psm_q_value_count_qc_plot_max_y = $("#psm_q_value_count_qc_plot_max_y");
+	var $psm_count_vs_score_qc_plot_max_y = $("#psm_count_vs_score_qc_plot_max_y");
 	
 	
 	if ( ! this.globals.currentSearchData ) {
@@ -347,23 +347,23 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 	
 	//  if Y Axis choice has changed, clear Y Axis Max input field
 	
-	if ( ( $("#psm_q_value_count_qc_plot_y_axis_as_percentage").prop("checked")
+	if ( ( $("#psm_count_vs_score_qc_plot_y_axis_as_percentage").prop("checked")
 			&& this.globals.prevYAxisChoice !== this.Y_AXIS_CHOICE_PERCENTAGE )
-			|| ( $("#psm_q_value_count_qc_plot_y_axis_as_raw_counts").prop("checked")
+			|| ( $("#psm_count_vs_score_qc_plot_y_axis_as_raw_counts").prop("checked")
 					&& this.globals.prevYAxisChoice !== this.Y_AXIS_CHOICE_RAW_COUNTS ) ) {
 			
-			$psm_q_value_count_qc_plot_max_y.val( "" );
+			$psm_count_vs_score_qc_plot_max_y.val( "" );
 	}
 	
 	
 	//  Set this.globals.prevYAxisChoice per current selected Y Axis choice
 
-	if ( $("#psm_q_value_count_qc_plot_y_axis_as_percentage").prop("checked") ) {
+	if ( $("#psm_count_vs_score_qc_plot_y_axis_as_percentage").prop("checked") ) {
 		
 		this.globals.prevYAxisChoice = this.Y_AXIS_CHOICE_PERCENTAGE;
 	}
 
-	if ( $("#psm_q_value_count_qc_plot_y_axis_as_raw_counts").prop("checked") ) {
+	if ( $("#psm_count_vs_score_qc_plot_y_axis_as_raw_counts").prop("checked") ) {
 		
 		this.globals.prevYAxisChoice = this.Y_AXIS_CHOICE_RAW_COUNTS;
 	}
@@ -371,8 +371,8 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 	
 	/////////////
 
-	var userInputMaxX = $psm_q_value_count_qc_plot_max_x.val();
-	var userInputMaxY = $psm_q_value_count_qc_plot_max_y.val();
+	var userInputMaxX = $psm_count_vs_score_qc_plot_max_x.val();
+	var userInputMaxY = $psm_count_vs_score_qc_plot_max_y.val();
 
 
 	if ( userInputMaxX !== "" ) {
@@ -381,17 +381,17 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 
 		if ( isNaN( userInputMaxXNum ) ) {
 
-			$(".psm_q_value_count_qc_plot_param_not_a_number_jq").show();
+			$(".psm_count_vs_score_qc_plot_param_not_a_number_jq").show();
 
-			$(".psm_q_value_count_qc_plot_no_data_jq").hide();
-			$(".psm_q_value_count_qc_plot_have_data_jq").hide();
+			$(".psm_count_vs_score_qc_plot_no_data_jq").hide();
+			$(".psm_count_vs_score_qc_plot_have_data_jq").hide();
 			
 			return;  //  EARLY EXIT
 		}
 		
 		if ( userInputMaxXNum < 0 ) {
 			
-			$psm_q_value_count_qc_plot_max_x.val( "0" );
+			$psm_count_vs_score_qc_plot_max_x.val( "0" );
 			
 			userInputMaxX = "0";
 		}
@@ -404,27 +404,27 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 		
 		if ( isNaN( userInputMaxYNum ) ) {
 
-			$(".psm_q_value_count_qc_plot_param_not_a_number_jq").show();
+			$(".psm_count_vs_score_qc_plot_param_not_a_number_jq").show();
 
-			$(".psm_q_value_count_qc_plot_no_data_jq").hide();
-			$(".psm_q_value_count_qc_plot_have_data_jq").hide();
+			$(".psm_count_vs_score_qc_plot_no_data_jq").hide();
+			$(".psm_count_vs_score_qc_plot_have_data_jq").hide();
 			
 			return;  //  EARLY EXIT
 		}
 		
 		if ( userInputMaxYNum < 0 ) {
 			
-			$psm_q_value_count_qc_plot_max_y.val( "0" );
+			$psm_count_vs_score_qc_plot_max_y.val( "0" );
 			
 			userInputMaxY = "0";
 		}
 
 		
-		if ( $("#psm_q_value_count_qc_plot_y_axis_as_percentage").prop("checked") ) {
+		if ( $("#psm_count_vs_score_qc_plot_y_axis_as_percentage").prop("checked") ) {
 			
 			if ( userInputMaxYNum > 100 ) {
 				
-				$psm_q_value_count_qc_plot_max_y.val( "100" );
+				$psm_count_vs_score_qc_plot_max_y.val( "100" );
 				
 				userInputMaxY = "100";
 			}
@@ -439,9 +439,9 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 
 
 
-	var $psm_q_value_count_qc_plot_current_search_id = $("#psm_q_value_count_qc_plot_current_search_id");
+	var $psm_count_vs_score_qc_plot_current_search_id = $("#psm_count_vs_score_qc_plot_current_search_id");
 	
-	var searchId = $psm_q_value_count_qc_plot_current_search_id.val( );
+	var searchId = $psm_count_vs_score_qc_plot_current_search_id.val( );
 
 	
 	var selectedLinkTypes = this._getLinkTypesChecked();
@@ -449,18 +449,18 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 	if ( selectedLinkTypes.length === 0 ) {
 		
 
-		$(".psm_q_value_count_qc_plot_no_data_jq").show();
+		$(".psm_count_vs_score_qc_plot_no_data_jq").show();
 		
-		$(".psm_q_value_count_qc_plot_param_not_a_number_jq").hide();
+		$(".psm_count_vs_score_qc_plot_param_not_a_number_jq").hide();
 		
-		$(".psm_q_value_count_qc_plot_have_data_jq").hide();
+		$(".psm_count_vs_score_qc_plot_have_data_jq").hide();
 		
 		return;  //  EARLY EXIT		
 		
 		
-//		var $psm_q_value_count_qc_plot_link_type_include_jq = $(".psm_q_value_count_qc_plot_link_type_include_jq");
+//		var $psm_count_vs_score_qc_plot_link_type_include_jq = $(".psm_count_vs_score_qc_plot_link_type_include_jq");
 //		
-//		$psm_q_value_count_qc_plot_link_type_include_jq.prop( "checked", true);
+//		$psm_count_vs_score_qc_plot_link_type_include_jq.prop( "checked", true);
 //
 //		selectedLinkTypes = this._getLinkTypesChecked();
 	}
@@ -476,13 +476,13 @@ QCChartQValueCounts.prototype.createChartFromPageParams = function( ) {
 
 //////////
 
-QCChartQValueCounts.prototype._getLinkTypesChecked = function(  ) {
+QCChartPSMCountVsScores.prototype._getLinkTypesChecked = function(  ) {
 	
 	var selectedLinkTypes = [];
 
-	var $psm_q_value_count_qc_plot_link_type_include_jq = $(".psm_q_value_count_qc_plot_link_type_include_jq");
+	var $psm_count_vs_score_qc_plot_link_type_include_jq = $(".psm_count_vs_score_qc_plot_link_type_include_jq");
 
-	$psm_q_value_count_qc_plot_link_type_include_jq.each( function(   ) {
+	$psm_count_vs_score_qc_plot_link_type_include_jq.each( function(   ) {
 
 		var $thisCheckbox = $( this );
 		
@@ -502,7 +502,7 @@ QCChartQValueCounts.prototype._getLinkTypesChecked = function(  ) {
 
 ///  
 
-QCChartQValueCounts.prototype.createChart = function( params ) {
+QCChartPSMCountVsScores.prototype.createChart = function( params ) {
 
 	var objectThis = this;
 
@@ -513,16 +513,16 @@ QCChartQValueCounts.prototype.createChart = function( params ) {
 
 	var userInputMaxXString = params.userInputMaxX;
 
-	if ( ! qcChartQValueCountInitialized ) {
+	if ( ! qcChartPSMCountVsScoreInitialized ) {
 		
-		throw "qcChartQValueCountInitialized is false"; 
+		throw "qcChartPSMCountVsScoreInitialized is false"; 
 	}
 	
 	
 	
-	var $psm_q_value_count_qc_plot_chartDiv = $("#psm_q_value_count_qc_plot_chartDiv");
+	var $psm_count_vs_score_qc_plot_chartDiv = $("#psm_count_vs_score_qc_plot_chartDiv");
 	
-	$psm_q_value_count_qc_plot_chartDiv.empty();
+	$psm_count_vs_score_qc_plot_chartDiv.empty();
 
 
 	var _URL = contextPathJSVar + "/services/qcplot/getPsmCountPerQValue";
@@ -573,13 +573,13 @@ QCChartQValueCounts.prototype.createChart = function( params ) {
 
 //////////
 
-QCChartQValueCounts.prototype.createChartResponse = function(requestData, responseData, originalParams) {
+QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, responseData, originalParams) {
 
 	var objectThis = this;
 
 	
 	
-	var $psm_q_value_count_qc_plot_chartDiv = $("#psm_q_value_count_qc_plot_chartDiv");
+	var $psm_count_vs_score_qc_plot_chartDiv = $("#psm_count_vs_score_qc_plot_chartDiv");
 	
 
 	var userInputMaxXString = originalParams.userInputMaxX;
@@ -630,19 +630,19 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 			|| ( unlinkedChartData && unlinkedChartData.chartBuckets.length > 0 )
 			|| ( alllinkChartData && alllinkChartData.chartBuckets.length > 0 ) ) {
 
-		$(".psm_q_value_count_qc_plot_no_data_jq").hide();
+		$(".psm_count_vs_score_qc_plot_no_data_jq").hide();
 		
-		$(".psm_q_value_count_qc_plot_param_not_a_number_jq").hide();
+		$(".psm_count_vs_score_qc_plot_param_not_a_number_jq").hide();
 		
-		$(".psm_q_value_count_qc_plot_have_data_jq").show();
+		$(".psm_count_vs_score_qc_plot_have_data_jq").show();
 
 	} else {
 		
-		$(".psm_q_value_count_qc_plot_no_data_jq").show();
+		$(".psm_count_vs_score_qc_plot_no_data_jq").show();
 		
-		$(".psm_q_value_count_qc_plot_have_data_jq").hide();
+		$(".psm_count_vs_score_qc_plot_have_data_jq").hide();
 		
-		$(".psm_q_value_count_qc_plot_param_not_a_number_jq").hide();
+		$(".psm_count_vs_score_qc_plot_param_not_a_number_jq").hide();
 		
 		return;  //  EARLY EXIT
 		
@@ -651,7 +651,7 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 	
 	var displayAsPercentage = false;
 	
-	if ( $("#psm_q_value_count_qc_plot_y_axis_as_percentage").prop("checked") ) {
+	if ( $("#psm_count_vs_score_qc_plot_y_axis_as_percentage").prop("checked") ) {
 		
 		displayAsPercentage = true;
 	}
@@ -688,6 +688,9 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 //	green: #53a553
 //	blue: #5353a5
 //	combined: #a5a5a5 (gray)
+	
+	ss ss
+	
 	
 	
 	var chartDataHeaderEntry = [ "q_value" ];
@@ -815,10 +818,10 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 		
 	}
 
-	var $psm_q_value_count_qc_plot_current_search_name_and_id = $("#psm_q_value_count_qc_plot_current_search_name_and_id");
+	var $psm_count_vs_score_qc_plot_current_search_name_and_id = $("#psm_count_vs_score_qc_plot_current_search_name_and_id");
 	
 	var searchNameAndNumberInParens = 
-		$psm_q_value_count_qc_plot_current_search_name_and_id.val( );
+		$psm_count_vs_score_qc_plot_current_search_name_and_id.val( );
 	
 
 	
@@ -892,8 +895,8 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 //			  bold: <boolean>,
 //			  italic: <boolean> }
 			
-			width : objectThis.Q_VALUE__COUNT_CHART_WIDTH, 
-			height : objectThis.Q_VALUE__COUNT_CHART_HEIGHT,   // width and height of chart, otherwise controlled by enclosing div
+			width : objectThis.PSM_COUNT_VS_SCORE_CHART_WIDTH, 
+			height : objectThis.PSM_COUNT_VS_SCORE_CHART_HEIGHT,   // width and height of chart, otherwise controlled by enclosing div
 			
 //			bar: { groupWidth: 5 },  // set bar width large to eliminate space between bars
 //			bar: { groupWidth: '100%' },  // set bar width large to eliminate space between bars
@@ -911,8 +914,8 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 //			isStacked: true
 
 			chartArea : { left : 140, top: 60, 
-				width: objectThis.Q_VALUE__COUNT_CHART_WIDTH - 200 ,  //  was 720 as measured in Chrome
-				height : objectThis.Q_VALUE__COUNT_CHART_HEIGHT - 120 }  //  was 530 as measured in Chrome
+				width: objectThis.PSM_COUNT_VS_SCORE_CHART_WIDTH - 200 ,  //  was 720 as measured in Chrome
+				height : objectThis.PSM_COUNT_VS_SCORE_CHART_HEIGHT - 120 }  //  was 530 as measured in Chrome
 			
 	};        
 	
@@ -922,18 +925,18 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 		optionsFullsize.vAxis.viewWindow = { max : userInputMaxY };
 	}
 	
-	var $psm_q_value_count_qc_plot_overlay_container = $("#psm_q_value_count_qc_plot_overlay_container");
+	var $psm_count_vs_score_qc_plot_overlay_container = $("#psm_count_vs_score_qc_plot_overlay_container");
 
-	var $psm_q_value_count_qc_plot_overlay_background = $("#psm_q_value_count_qc_plot_overlay_background"); 
-	$psm_q_value_count_qc_plot_overlay_background.show();
-	$psm_q_value_count_qc_plot_overlay_container.show();
+	var $psm_count_vs_score_qc_plot_overlay_background = $("#psm_count_vs_score_qc_plot_overlay_background"); 
+	$psm_count_vs_score_qc_plot_overlay_background.show();
+	$psm_count_vs_score_qc_plot_overlay_container.show();
 
 	
 	// create the chart
 
 	var data = google.visualization.arrayToDataTable( chartData );
 	
-	var chartFullsize = new google.visualization.LineChart( $psm_q_value_count_qc_plot_chartDiv[0] );
+	var chartFullsize = new google.visualization.LineChart( $psm_count_vs_score_qc_plot_chartDiv[0] );
 	
 	chartFullsize.draw( data, optionsFullsize );
 	
@@ -961,17 +964,17 @@ QCChartQValueCounts.prototype.createChartResponse = function(requestData, respon
 
 ///////////
 
-QCChartQValueCounts.prototype.resetMaxXMaxY = function() {
+QCChartPSMCountVsScores.prototype.resetMaxXMaxY = function() {
 
 //	var objectThis = this;
 
 
 
-	var $psm_q_value_count_qc_plot_max_x = $("#psm_q_value_count_qc_plot_max_x");
+	var $psm_count_vs_score_qc_plot_max_x = $("#psm_count_vs_score_qc_plot_max_x");
 
-	var $psm_q_value_count_qc_plot_max_y = $("#psm_q_value_count_qc_plot_max_y");
+	var $psm_count_vs_score_qc_plot_max_y = $("#psm_count_vs_score_qc_plot_max_y");
 
-	$psm_q_value_count_qc_plot_max_x.val( "" );
-	$psm_q_value_count_qc_plot_max_y.val( "" );
+	$psm_count_vs_score_qc_plot_max_x.val( "" );
+	$psm_count_vs_score_qc_plot_max_y.val( "" );
 
 };

@@ -207,8 +207,11 @@
 			</html:form>
 			
 
+<%--
+		Moved JS call to the "Update" button
+		 			
 			<form action="javascript:viewMergedLooplinkProteinPageCode.updatePageForFormParams()" method="get" >
-					
+--%>
 
 			<table style="border-width:0px;">
 				<tr>
@@ -303,14 +306,23 @@
 				
 				<tr>
 					<td>&nbsp;</td>
-					<td><input type="submit" value="Update" onclick="searchFormUpdateButtonPressed()"></td>
+					<td>
+
+<%--   WAS 						
+						<input type="submit" value="Update" >
+--%>						
+						<input type="button" value="Update"  onclick="viewMergedLooplinkProteinPageCode.updatePageForFormParams()" >
+											
+					
+					</td>
 				</tr>
 			
 			</table>
 			
 			
+<%-- 			
 			</form>
-	
+--%>
 			
 			<div >
 	

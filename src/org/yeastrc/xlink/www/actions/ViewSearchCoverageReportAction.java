@@ -197,10 +197,6 @@ public class ViewSearchCoverageReportAction extends Action {
 			SearchDTO search = SearchDAO.getInstance().getSearch( searchId );
 			request.setAttribute( "search", search );
 
-			//  Populate request objects for Standard Search Display
-			
-			GetSearchDetailsData.getInstance().getSearchDetailsData( search, request );
-			
 
 			
 			boolean showStructureLink = true;
@@ -373,15 +369,14 @@ public class ViewSearchCoverageReportAction extends Action {
 			
 			
 			
+
+			//  Populate request objects for Standard Search Display
 			
-
-			//  TODO   If form.psmQValueCutoff has a value, then this is old and needs to be re-mapped to the generic "q-value" annotation
-
+			GetSearchDetailsData.getInstance().getSearchDetailsData( search, request );
 			
-
 //			CutoffPageDisplayRoot cutoffPageDisplayRoot =
 			
-			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRootSingleSearchId( searchId, request );
+//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRootSingleSearchId( searchId, request );
 
 			
 			CutoffValuesRootLevel cutoffValuesRootLevel = proteinQueryJSONRoot.getCutoffs();

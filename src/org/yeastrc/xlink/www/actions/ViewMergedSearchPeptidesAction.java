@@ -257,6 +257,10 @@ public class ViewMergedSearchPeptidesAction extends Action {
 
 			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
 
+			//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
+
+//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsSet, request );
+
 
 			List<Double> modMassDistinctForSearchesList = SearchModMassDistinctSearcher.getInstance().getDistinctDynamicModMassesForSearchId( searchIds );
 
@@ -279,10 +283,6 @@ public class ViewMergedSearchPeptidesAction extends Action {
 
 
 
-
-			//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-
-			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsSet, request );
 
 			
 			////////     Get Merged Peptides
