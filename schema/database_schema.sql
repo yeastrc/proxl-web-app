@@ -1255,65 +1255,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `query_criteria_value_counts`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `query_criteria_value_counts` ;
-
-CREATE TABLE IF NOT EXISTS `query_criteria_value_counts` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `field` VARCHAR(45) NOT NULL,
-  `value` VARCHAR(45) NOT NULL,
-  `count` INT UNSIGNED NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
-
-CREATE UNIQUE INDEX `query_criteria_value_counts__field_value_unique_idx` ON `query_criteria_value_counts` (`field` ASC, `value` ASC);
-
-
--- -----------------------------------------------------
--- Table `unified_rep_pep__rep_pept__search_lookup`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `unified_rep_pep__rep_pept__search_lookup` ;
-
-CREATE TABLE IF NOT EXISTS `unified_rep_pep__rep_pept__search_lookup` (
-  `unified_reported_peptide_id` INT(10) UNSIGNED NOT NULL,
-  `reported_peptide_id` INT(10) UNSIGNED NOT NULL,
-  `search_id` INT(10) UNSIGNED NOT NULL,
-  `link_type` ENUM('looplink','crosslink','unlinked','dimer') NOT NULL,
-  `peptide_q_value_for_search` DOUBLE NULL DEFAULT NULL,
-  `best_psm_q_value` DOUBLE NULL DEFAULT NULL,
-  `has_dynamic_modifictions` TINYINT(3) UNSIGNED NOT NULL,
-  `has_monolinks` TINYINT(3) UNSIGNED NOT NULL,
-  `psm_num_at_pt_01_q_cutoff` INT(11) NOT NULL,
-  `sample_psm_id` INT(10) UNSIGNED NULL DEFAULT NULL,
-  PRIMARY KEY (`unified_reported_peptide_id`, `reported_peptide_id`, `search_id`),
-  CONSTRAINT `unified_rp__reported_peptide__search___sample_psm_id_fk`
-    FOREIGN KEY (`sample_psm_id`)
-    REFERENCES `psm` (`id`)
-    ON DELETE CASCADE,
-  CONSTRAINT `unified_rp__reported_peptide__search__reported_peptide_id_fk`
-    FOREIGN KEY (`reported_peptide_id`)
-    REFERENCES `reported_peptide` (`id`)
-    ON DELETE CASCADE,
-  CONSTRAINT `unified_rp__reported_peptide__search__unified_rp_id_fk`
-    FOREIGN KEY (`unified_reported_peptide_id`)
-    REFERENCES `unified_reported_peptide_lookup` (`id`)
-    ON DELETE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_general_ci;
-
-CREATE INDEX `unified_rp__reported_peptide__search__reported_peptide_id_f_idx` ON `unified_rep_pep__rep_pept__search_lookup` (`reported_peptide_id` ASC);
-
-CREATE INDEX `unified_rp__reported_peptide__search__search_id_fk_idx` ON `unified_rep_pep__rep_pept__search_lookup` (`search_id` ASC);
-
-CREATE INDEX `unified_rp__rp__search__srch_type_bpsmqval_idx` ON `unified_rep_pep__rep_pept__search_lookup` (`search_id` ASC, `link_type` ASC, `best_psm_q_value` ASC);
-
-CREATE INDEX `unified_rep_pep__reported_peptide__search_lookup__sample_ps_idx` ON `unified_rep_pep__rep_pept__search_lookup` (`sample_psm_id` ASC);
-
-
--- -----------------------------------------------------
 -- Table `search__reported_peptide__dynamic_mod_lookup`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `search__reported_peptide__dynamic_mod_lookup` ;
@@ -1728,6 +1669,11 @@ CREATE TABLE IF NOT EXISTS `psm_filterable_annotation__generic_lookup` (
   CONSTRAINT `psm_filterable_annotation__generic_lookup__psm_id_fk`
     FOREIGN KEY (`psm_id`)
     REFERENCES `psm` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `psm_filtrble_ann__generic_lkp_psm_ann_id_fk`
+    FOREIGN KEY (`psm_annotation_id`)
+    REFERENCES `psm_annotation` (`id`)
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB

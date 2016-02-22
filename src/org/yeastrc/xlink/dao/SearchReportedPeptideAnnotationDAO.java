@@ -236,6 +236,14 @@ public class SearchReportedPeptideAnnotationDAO {
 
 				//  Catch exception if valueString is too large for primary table 
 
+				if ( item.getFilterableDescriptiveAnnotationType() == FilterableDescriptiveAnnotationType.FILTERABLE ) {
+					
+					//  Filterable valueString must fit in the main table since it is copied from there to lookup tables.
+					
+					throw e;
+				}
+				
+
 				//  change to store value string in "..._large_value" table instead
 
 
