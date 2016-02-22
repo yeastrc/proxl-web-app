@@ -13,19 +13,19 @@ import org.yeastrc.xlink.dto.UnifiedRepPep_ReportedPeptide_Search_PeptideValue_G
 import org.yeastrc.xlink.dto.UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO;
 
 /**
- * 
- * 
+ * PopulateUnifiedReportedPeptideLevelFilterableAnnotationBySearchReptPeptide
+ * PopUnifRepPepLvlFltrblAnnBySrchReptPept
  */
-public class PopulateUnifiedReportedPeptideLevelFilterableAnnotationBySearchReptPeptide {
+public class PopUnifRepPepLvlFltrblAnnBySrchReptPept {
 	
-	private static final Logger log = Logger.getLogger(PopulateUnifiedReportedPeptideLevelFilterableAnnotationBySearchReptPeptide.class);
+	private static final Logger log = Logger.getLogger(PopUnifRepPepLvlFltrblAnnBySrchReptPept.class);
 	
 
 	// private constructor
-	private PopulateUnifiedReportedPeptideLevelFilterableAnnotationBySearchReptPeptide() { }
+	private PopUnifRepPepLvlFltrblAnnBySrchReptPept() { }
 	
-	public static PopulateUnifiedReportedPeptideLevelFilterableAnnotationBySearchReptPeptide getInstance() { 
-		return new PopulateUnifiedReportedPeptideLevelFilterableAnnotationBySearchReptPeptide(); 
+	public static PopUnifRepPepLvlFltrblAnnBySrchReptPept getInstance() { 
+		return new PopUnifRepPepLvlFltrblAnnBySrchReptPept(); 
 	}
 	
 	

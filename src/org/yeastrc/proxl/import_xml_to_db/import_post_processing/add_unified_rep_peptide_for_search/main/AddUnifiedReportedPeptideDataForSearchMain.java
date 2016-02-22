@@ -8,7 +8,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_unified_rep_peptide_for_search.populate_per_annotation.PopUnifRepPepLvlFltrblAnnBySrchReptPept;
-import org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_unified_rep_peptide_for_search.populate_per_annotation.PopUnifRepPeptLvlPsmFltrblAnnSumBySrchRepPept;
+import org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_unified_rep_peptide_for_search.populate_per_annotation.PopUnfRpPptLvPsmFltAnSmBSrcRpPpt;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.dao.SearchDynamicModMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.DoesReptPeptideForThisSearchMeetDefaultCutoffsSearcher;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetHasDynamicModificationsForPsmIdSearcher;
@@ -335,7 +335,7 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 				
 				//  Populate PSM roll ups table for PSM Filterable Annotations for this Search / Reported Peptide
 				
-				PopUnifRepPeptLvlPsmFltrblAnnSumBySrchRepPept.getInstance()
+				PopUnfRpPptLvPsmFltAnSmBSrcRpPpt.getInstance()
 				.insertAnnotationSpecificRecordsForSearchIdReportedPeptideId( unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO, srchPgmFilterablePsmAnnotationTypeDTOList );
 				
 				
