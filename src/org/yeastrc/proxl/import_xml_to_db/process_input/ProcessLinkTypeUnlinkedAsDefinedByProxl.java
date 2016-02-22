@@ -290,10 +290,6 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 			// a single unlinked entry
 			UnlinkedDTO unlinked = new UnlinkedDTO();
 
-			//			    		unlinked.setPsm( psm);
-			//			    		unlinked.setLinkerMass( linkerMass );
-
-
 			unlinked.setPeptideId( peptide.getId() );
 
 			unlinked.setProtein( protein );

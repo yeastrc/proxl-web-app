@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_unified_rep_peptide_for_search.populate_per_annotation.PopulateUnifiedReportedPeptideLevelFilterableAnnotationBySearchReptPeptide;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_unified_rep_peptide_for_search.populate_per_annotation.PopulateUnifiedReportedPeptideLevelPsmFilterableAnnotationSummaryBySearchReptPeptide;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.dao.SearchDynamicModMassDAO;
@@ -53,11 +54,17 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 
 	private static final Logger log = Logger.getLogger(AddUnifiedReportedPeptideDataForSearchMain.class);
 
+	
+	/**
+	 * Singleton
+	 */
+	private static AddUnifiedReportedPeptideDataForSearchMain _instance = new AddUnifiedReportedPeptideDataForSearchMain();
+	
 	// private constructor
 	private AddUnifiedReportedPeptideDataForSearchMain() { }
 	
 	public static AddUnifiedReportedPeptideDataForSearchMain getInstance() { 
-		return new AddUnifiedReportedPeptideDataForSearchMain(); 
+		return _instance; 
 	}
 	
 	
@@ -78,7 +85,7 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 	 * 
 	 * @param getUnifiedReportedPeptideFromSearchIdReportedPeptideIdObject
 	 */
-	public void setGetUnifiedReportedPeptideFromSearchIdReportedPeptideIdObject(
+	public void setConversionOnlyObjects(
 			IGetUnifiedReportedPeptideFromSearchIdReportedPeptideId getUnifiedReportedPeptideFromSearchIdReportedPeptideIdObject) {
 		this.getUnifiedReportedPeptideFromSearchIdReportedPeptideIdObject = getUnifiedReportedPeptideFromSearchIdReportedPeptideIdObject;
 	}
@@ -137,7 +144,7 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 			//  assume batch size is some multiple of the modulo value
 			if (  searchReportedPeptideOffset % 10000 == 0 ) {
 				
-				log.info( "Inserted " + searchReportedPeptideOffset + " unified reported peptide data records" );
+				log.info( "Processed " + searchReportedPeptideOffset + " searc_reported_peptide records for  unified reported peptide data" );
 			}
 		}
 		
@@ -258,27 +265,46 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 
 				UnifiedReportedPeptideObj unifiedReportedPeptideObj = new UnifiedReportedPeptideObj();
 
-				unifiedReportedPeptideObj.setLinkType( psmDTO.getType() );
-
-				List<UnifiedRpSinglePeptideObj> singlePeptides = get_singlePeptides( psmDTO );
-				unifiedReportedPeptideObj.setSinglePeptides( singlePeptides );
-
-				
 				UnifiedReportedPeptideLookupDTO unifiedReportedPeptideDTO = null;
-//ss
-//				if ( getUnifiedReportedPeptideFromSearchIdReportedPeptideIdObject != null ) {
+
+				if ( getUnifiedReportedPeptideFromSearchIdReportedPeptideIdObject != null ) {
 					
-					//  TODO   Is this really needed?  Does it help the conversion?
+					//  For Conversion Only
 					
-//				} else {
+					unifiedReportedPeptideDTO = 
+							getUnifiedReportedPeptideFromSearchIdReportedPeptideIdObject
+							.getUnifiedReportedPeptideFromSearchIdReportedPeptideId( searchId, reportedPeptideId );
+					
+					if ( unifiedReportedPeptideDTO == null ) {
+						
+						String msg =  "ERROR: getUnifiedReportedPeptideFromSearchIdReportedPeptideIdObject.getUnifiedReportedPeptideFromSearchIdReportedPeptideId( searchId, reportedPeptideId ) returned null for search id:  "
+								+ searchId + ", reportedPeptideId: " + reportedPeptideId
+								+ ".";
+						
+						log.error( msg );
+						
+						throw new ProxlImporterDataException(msg);
+						
+					}
+					
+					
+				} else {
+					
+
+					unifiedReportedPeptideObj.setLinkType( psmDTO.getType() );
+
+					List<UnifiedRpSinglePeptideObj> singlePeptides = get_singlePeptides( psmDTO );
+					unifiedReportedPeptideObj.setSinglePeptides( singlePeptides );
+
+					
 					
 					//  Standard processing.  Save the 
 				
 					unifiedReportedPeptideDTO = 
 							insertIfNotInDBUnifiedReportedPeptideAndChildren
-							.insertIfNotInDBUnifiedReportedPeptideAndChildren(unifiedReportedPeptideObj);
+							.insertIfNotInDBUnifiedReportedPeptideAndChildren( unifiedReportedPeptideObj );
 				
-//				}
+				}
 				
 				
 				UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO = new UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO();
@@ -313,8 +339,12 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 				.insertAnnotationSpecificRecordsForSearchIdReportedPeptideId( unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO, srchPgmFilterablePsmAnnotationTypeDTOList );
 				
 				
-				
-				saveToSearchReportedPeptideDynamicModMasses( unifiedReportedPeptideObj, unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO, uniqueDynamicModMasses );
+				if ( getUnifiedReportedPeptideFromSearchIdReportedPeptideIdObject == null ) {
+
+					//  Do only if not conversion
+					
+					saveToSearchReportedPeptideDynamicModMasses( unifiedReportedPeptideObj, unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO, uniqueDynamicModMasses );
+				}
 				
 				
 				

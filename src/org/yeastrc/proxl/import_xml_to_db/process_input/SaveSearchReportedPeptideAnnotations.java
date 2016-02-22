@@ -1,6 +1,7 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,7 @@ public class SaveSearchReportedPeptideAnnotations {
 	}
 
 	
+	
 
 	/**
 	 * @param reportedPeptide
@@ -53,15 +55,55 @@ public class SaveSearchReportedPeptideAnnotations {
 	 * @throws Exception
 	 */
 	private void saveReportedPeptideFilterableReportedPeptideAnnotations( ReportedPeptide reportedPeptide, int searchId, int reportedPeptideId, Map<String, SearchProgramEntry> searchProgramEntryMap ) throws Exception {
+
+
+		///  Build list of Filterable annotation type ids
 		
+		Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesOnId = new HashMap<>();
+		
+		for ( Map.Entry<String, SearchProgramEntry> searchProgramEntryMapEntry : searchProgramEntryMap.entrySet() ) {
+
+			SearchProgramEntry searchProgramEntry = searchProgramEntryMapEntry.getValue();
+
+			Map<String, AnnotationTypeDTO> reportedPeptideAnnotationTypeDTOMap =
+					searchProgramEntry.getReportedPeptideAnnotationTypeDTOMap();
+		
+			for ( Map.Entry<String, AnnotationTypeDTO> reportedPeptideAnnotationTypeDTOMapEntry : reportedPeptideAnnotationTypeDTOMap.entrySet() ) {
+
+				AnnotationTypeDTO reportedPeptideAnnotationTypeDTO = reportedPeptideAnnotationTypeDTOMapEntry.getValue();
+		
+				 if ( reportedPeptideAnnotationTypeDTO.getFilterableDescriptiveAnnotationType()
+						 == FilterableDescriptiveAnnotationType.FILTERABLE ) {
+				 
+					 filterableAnnotationTypesOnId.put( reportedPeptideAnnotationTypeDTO.getId(), reportedPeptideAnnotationTypeDTO );
+				 }
+				
+			}
+		}
+		
+		
+
 
 		ReportedPeptide.ReportedPeptideAnnotations reportedPeptideAnnotations =
 				reportedPeptide.getReportedPeptideAnnotations();
 
 		if ( reportedPeptideAnnotations == null ) {
 			
-			String msg = "No Reported Peptide annotations";
-			log.warn( msg );
+			if ( ! filterableAnnotationTypesOnId.isEmpty() ) {
+			
+				String msg = "No Reported Peptide Filterable annotations on this reported peptide."
+						+ "  Filterable annotations are required on all reported peptides."
+						+ "  ReportedPeptideString: " + reportedPeptide.getReportedPeptideString();
+				log.error( msg );
+				throw new ProxlImporterDataException( msg );
+			
+			} else {
+
+				String msg = "No Reported Peptide annotations."
+						+ "  ReportedPeptideString: " + reportedPeptide.getReportedPeptideString();
+
+				log.warn( msg );
+			}
 			
 		} else {
 
@@ -71,8 +113,24 @@ public class SaveSearchReportedPeptideAnnotations {
 
 			if ( filterableReportedPeptideAnnotations == null ) {
 
-				String msg = "No Filterable Reported Peptide annotations";
-				log.warn( msg );
+				if ( ! filterableAnnotationTypesOnId.isEmpty() ) {
+					
+
+					String msg = "No Filterable Reported Peptide Filterable annotations on this reported peptide."
+							+ "  Filterable annotations are required on all reported peptides."
+							+ "  ReportedPeptideString: " + reportedPeptide.getReportedPeptideString();
+					log.error( msg );
+					throw new ProxlImporterDataException( msg );
+
+
+				} else {
+
+					String msg = "No Filterable Reported Peptide annotations."
+							+ "  ReportedPeptideString: " + reportedPeptide.getReportedPeptideString();
+
+					log.warn( msg );
+
+				}
 
 			} else {
 
@@ -82,11 +140,30 @@ public class SaveSearchReportedPeptideAnnotations {
 
 				if ( filterableReportedPeptideAnnotationList == null || filterableReportedPeptideAnnotationList.isEmpty() ) {
 
-					String msg = "No Filterable Reported Peptide annotations";
-					log.warn( msg );
+					if ( ! filterableAnnotationTypesOnId.isEmpty() ) {
+
+
+						String msg = "No Filterable Reported Peptide Filterable annotations on this reported peptide."
+								+ "  Filterable annotations are required on all reported peptides."
+								+ "  ReportedPeptideString: " + reportedPeptide.getReportedPeptideString();
+						log.error( msg );
+						throw new ProxlImporterDataException( msg );
+
+
+					} else {
+
+						String msg = "No Filterable Reported Peptide annotations."
+								+ "  ReportedPeptideString: " + reportedPeptide.getReportedPeptideString();
+
+						log.warn( msg );
+
+
+					}
 
 				} else {
 
+					//  Process list of filterable annotations on input list
+					
 					for ( FilterableReportedPeptideAnnotation filterableReportedPeptideAnnotation : filterableReportedPeptideAnnotationList ) {
 
 						String searchProgram = filterableReportedPeptideAnnotation.getSearchProgram();
@@ -100,6 +177,10 @@ public class SaveSearchReportedPeptideAnnotations {
 										FilterableDescriptiveAnnotationType.FILTERABLE, 
 										searchProgramEntryMap );
 						
+						if ( filterableAnnotationTypesOnId.remove( annotationTypeId ) == null ) {
+							
+							//  Shouldn't get here
+						}
 						
 						SearchReportedPeptideAnnotationDTO searchReportedPeptideAnnotationDTO = new SearchReportedPeptideAnnotationDTO();
 
@@ -115,6 +196,18 @@ public class SaveSearchReportedPeptideAnnotations {
 					}
 				}
 			}
+		}
+		
+		if ( ! filterableAnnotationTypesOnId.isEmpty() ) {
+			
+			//  Filterable Annotations Types were not on the Filterable Annotations List
+			
+			String msg = "Not all Filterable Annotations Types were on the Filterable Annotations List "
+					+ " for ReportedPeptide.  "
+					+ " for reported peptide string :" 
+					+ reportedPeptide.getReportedPeptideString();
+			log.error( msg );
+			throw new ProxlImporterDataException(msg);
 		}
 	}
 	
@@ -235,11 +328,11 @@ public class SaveSearchReportedPeptideAnnotations {
 		Map<String, AnnotationTypeDTO> reportedPeptideAnnotationTypeDTOMap =
 				searchProgramEntry.getReportedPeptideAnnotationTypeDTOMap();
 		
-		AnnotationTypeDTO srchPgmFilterablePsmAnnotationTypeDTO = 
+		AnnotationTypeDTO reportedPeptideAnnotationTypeDTO = 
 				reportedPeptideAnnotationTypeDTOMap.get( annotationName );
 		
 
-		if ( srchPgmFilterablePsmAnnotationTypeDTO == null ) {
+		if ( reportedPeptideAnnotationTypeDTO == null ) {
 			
 			String msg = "Processing filterablePsmAnnotations: "
 					+ " annotation name String |"
@@ -251,7 +344,7 @@ public class SaveSearchReportedPeptideAnnotations {
 			throw new ProxlImporterDataException(msg);
 		}
 		
-		if ( filterableDescriptiveAnnotationType != srchPgmFilterablePsmAnnotationTypeDTO.getFilterableDescriptiveAnnotationType() ) {
+		if ( filterableDescriptiveAnnotationType != reportedPeptideAnnotationTypeDTO.getFilterableDescriptiveAnnotationType() ) {
 			
 			String msg = "Processing Reported PeptideAnnotations: "
 					+ "filterableDescriptiveAnnotationType for annotation name not same between types under <search_programs>"
@@ -265,7 +358,7 @@ public class SaveSearchReportedPeptideAnnotations {
 			throw new ProxlImporterDataException(msg);
 		}
 		
-		int id = srchPgmFilterablePsmAnnotationTypeDTO.getId();
+		int id = reportedPeptideAnnotationTypeDTO.getId();
 		
 		return id;
 	}

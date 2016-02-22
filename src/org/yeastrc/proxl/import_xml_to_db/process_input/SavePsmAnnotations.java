@@ -1,6 +1,7 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,25 +62,71 @@ public class SavePsmAnnotations {
 	 */
 	private void savePsmFilterablePsmAnnotations( Psm psm, PsmDTO psmDTO, Map<String, SearchProgramEntry> searchProgramEntryMap ) throws Exception {
 		
+
+		///  Build list of Filterable annotation type ids
+		
+		Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesOnId = new HashMap<>();
+		
+		for ( Map.Entry<String, SearchProgramEntry> searchProgramEntryMapEntry : searchProgramEntryMap.entrySet() ) {
+
+			SearchProgramEntry searchProgramEntry = searchProgramEntryMapEntry.getValue();
+
+			Map<String, AnnotationTypeDTO> psmAnnotationTypeDTOMap =
+					searchProgramEntry.getReportedPeptideAnnotationTypeDTOMap();
+		
+			for ( Map.Entry<String, AnnotationTypeDTO> psmAnnotationTypeDTOMapEntry : psmAnnotationTypeDTOMap.entrySet() ) {
+
+				AnnotationTypeDTO psmAnnotationTypeDTO = psmAnnotationTypeDTOMapEntry.getValue();
+		
+				 if ( psmAnnotationTypeDTO.getFilterableDescriptiveAnnotationType()
+						 == FilterableDescriptiveAnnotationType.FILTERABLE ) {
+				 
+					 filterableAnnotationTypesOnId.put( psmAnnotationTypeDTO.getId(), psmAnnotationTypeDTO );
+				 }
+				
+			}
+		}
+		
+		
+
 		FilterablePsmAnnotations filterablePsmAnnotations = psm.getFilterablePsmAnnotations();
 		
 		if ( filterablePsmAnnotations == null ) {
-			
-			String msg = "No Filterable PSM annotations";
-			log.warn( msg );
+
+			if ( ! filterableAnnotationTypesOnId.isEmpty() ) {
+
+				String msg = "No PSM Filterable annotations on this PSM."
+						+ "  Filterable annotations are required on all PSMs."
+						+ "  Scan Number: " + psm.getScanNumber();
+				log.error( msg );
+				throw new ProxlImporterDataException( msg );
+
+			} else {
+				String msg = "No Filterable PSM annotations";
+				log.warn( msg );
+			}
 			
 		} else {
 
-			List<FilterablePsmAnnotation> filterablePsmAnnotationList =
-					filterablePsmAnnotations.getFilterablePsmAnnotation();
+			List<FilterablePsmAnnotation> filterablePsmAnnotationList = filterablePsmAnnotations.getFilterablePsmAnnotation();
 			
 			if ( filterablePsmAnnotationList == null || filterablePsmAnnotationList.isEmpty() ) {
-				
-				String msg = "No Filterable PSM annotations";
-				log.warn( msg );
-				
+
+				if ( ! filterableAnnotationTypesOnId.isEmpty() ) {
+
+					String msg = "No PSM Filterable annotations on this PSM."
+							+ "  Filterable annotations are required on all PSMs."
+							+ "  Scan Number: " + psm.getScanNumber();
+					log.error( msg );
+					throw new ProxlImporterDataException( msg );
+
+				} else {
+					String msg = "No Filterable PSM annotations";
+					log.warn( msg );
+				}				
 			} else {
 				
+				//  Process list of filterable annotations on input list
 
 				for ( FilterablePsmAnnotation filterablePsmAnnotation : filterablePsmAnnotationList ) {
 
@@ -94,6 +141,11 @@ public class SavePsmAnnotations {
 									FilterableDescriptiveAnnotationType.FILTERABLE,
 									searchProgramEntryMap );
 
+					if ( filterableAnnotationTypesOnId.remove( annotationTypeId ) == null ) {
+						
+						//  Shouldn't get here
+					}
+					
 					PsmAnnotationDTO psmAnnotationDTO = new PsmAnnotationDTO();
 
 					psmAnnotationDTO.setPsmId( psmDTO.getId() );
@@ -108,6 +160,19 @@ public class SavePsmAnnotations {
 					PsmAnnotationDAO.getInstance().saveToDatabase(psmAnnotationDTO);
 				}
 			}
+		}
+		
+
+		if ( ! filterableAnnotationTypesOnId.isEmpty() ) {
+			
+			//  Filterable Annotations Types were not on the Filterable Annotations List
+			
+			String msg = "Not all Filterable Annotations Types were on the Filterable Annotations List "
+					+ " for Psm.  "
+					+ " for Scan Number :" 
+					+ psm.getScanNumber();
+			log.error( msg );
+			throw new ProxlImporterDataException(msg);
 		}
 	}
 	

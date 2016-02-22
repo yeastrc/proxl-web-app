@@ -219,8 +219,6 @@ public class ProcessLinkTypeLooplink {
 		
 		SavePerPeptideDataForPSM.getInstance().savePerPeptideDataForPSM( psmDTO, perPeptideData );
 
-//		MatchedPeptideDTO matchedPeptideDTO = perPeptideData.getMatchedPeptideDTO();
-
 		List<GetLooplinksResultItem> getLooplinksResultItemList = getLooplinksResult.getLooplinkResultItemList();
 		
 		for ( GetLooplinksResultItem getLooplinksResultItem : getLooplinksResultItemList ) {
@@ -230,6 +228,13 @@ public class ProcessLinkTypeLooplink {
 			looplinkDTO.setLinkerId( IsDynamicModMassAMonolink.getInstance().getLinkerDTO().getId() );
 			
 			BigDecimal linkerMass = psm.getLinkerMass();
+
+			if ( linkerMass == null ) {
+				
+				String msg = "Linker Mass cannot be null or empty for Looplink. PSM Scan Number: " + psm.getScanNumber();
+				log.error( msg );
+				throw new ProxlImporterDataException(msg);
+			}
 			
 			looplinkDTO.setLinkerMass( linkerMass );
 			
@@ -326,10 +331,6 @@ public class ProcessLinkTypeLooplink {
 				LooplinkDTO looplink = new LooplinkDTO();
 
 				looplink.setLinkerId( IsDynamicModMassAMonolink.getInstance().getLinkerDTO().getId() );
-
-				//			    		looplink.setPsm( psm);
-				//			    		looplink.setLinkerMass( linkerMass );
-
 
 				looplink.setPeptideId( peptide.getId() );
 				

@@ -255,6 +255,13 @@ public class ProcessLinkTypeCrosslink {
 			
 			BigDecimal linkerMass = psm.getLinkerMass();
 			
+			if ( linkerMass == null ) {
+				
+				String msg = "Linker Mass cannot be null or empty for Crosslink. PSM Scan Number: " + psm.getScanNumber();
+				log.error( msg );
+				throw new ProxlImporterDataException(msg);
+			}
+			
 			crosslinkDTO.setLinkerMass( linkerMass );
 			
 			crosslinkDTO.setPsm( psmDTO );
@@ -382,9 +389,6 @@ public class ProcessLinkTypeCrosslink {
 			    		
 			    		
 			    		crosslink.setLinkerId( IsDynamicModMassAMonolink.getInstance().getLinkerDTO().getId() );
-//			    		crosslink.setPsm( psm);
-//			    		crosslink.setLinkerMass( linkerMass );
-
 			    		
 			    		// insert the proteins in order of their nrseq_id
 			    		if( protein1.getNrseqId() < protein2.getNrseqId() ) {

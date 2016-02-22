@@ -8,20 +8,11 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
-import org.yeastrc.proxl_import.api.xml_dto.DescriptivePeptideAnnotationType;
-import org.yeastrc.proxl_import.api.xml_dto.DescriptivePeptideAnnotationTypes;
-import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmAnnotationType;
-import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmAnnotationTypes;
-import org.yeastrc.proxl_import.api.xml_dto.FilterablePeptideAnnotationType;
-import org.yeastrc.proxl_import.api.xml_dto.FilterablePeptideAnnotationTypes;
-import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmAnnotationType;
-import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmAnnotationTypes;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
 import org.yeastrc.proxl_import.api.xml_dto.Psm;
 import org.yeastrc.proxl_import.api.xml_dto.Psms;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptides;
-import org.yeastrc.proxl_import.api.xml_dto.SearchProgram;
 
 
 
@@ -47,6 +38,14 @@ public class ValidateScanFilenamesInXMLAreOnCommandLine {
 	 * @throws ProxlImporterDataException for data errors
 	 */
 	public void validateScanFilenamesInXMLAreOnCommandLine( ProxlInput proxlInput, List<File> scanFileList ) throws ProxlImporterDataException {
+		
+		
+		if ( scanFileList == null || scanFileList.isEmpty() ) {
+			
+			//  Exit if no scan files provided, which means no scans were chosen
+			
+			return;  //  EARLY RETURN
+		}
 		
 		
 		Set<String> scanFilenamesSet = new HashSet<>();

@@ -3,12 +3,17 @@ package org.yeastrc.proxl.import_xml_to_db.importer_core_entry_point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.constants.Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant;
 import org.yeastrc.proxl.import_xml_to_db.dao.FASTADatabaseLookup;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.PrintHelpOnlyException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
@@ -63,11 +68,30 @@ public class ImporterCoreEntryPoint {
 		String importDirectory = null; 
 				
 		try {
-			importDirectory = mainXMLFileToImport.getCanonicalPath();
+//			String mainXMLFileToImportAbsPath = mainXMLFileToImport.getAbsolutePath();
+			
+			File importFileCanonicalFile = mainXMLFileToImport.getCanonicalFile();
+			
+			if ( importFileCanonicalFile != null ) {
+
+				File importFileParent = importFileCanonicalFile.getParentFile();
+
+				if ( importFileParent != null ) {
+
+					importDirectory = importFileParent.getCanonicalPath();
+
+				} else {
+
+					importDirectory = importFileCanonicalFile.getCanonicalPath();
+				}
+			} else {
+				
+				importDirectory = mainXMLFileToImport.getCanonicalPath();
+			}
 			
 		} catch ( Exception e ) {
 			
-			String msg = "Error mainXMLFileToImport.getCanonicalPath()";
+			String msg = "Error mainXMLFileToImport.getCanonicalPath() or importFileCanonicalFile.getParentFile() or importFileParent.getCanonicalPath()";
 			log.error( msg, e );
 			throw e;
 		}
@@ -87,14 +111,35 @@ public class ImporterCoreEntryPoint {
 
 			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-			//  TODO  Uncomment to validate against schema
+			
+			if ( Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant.PROXL_XSD_XML_SCHEMA_VALIDATION_ENABLED ) {
 
-			//				URL xmlSchemaURL = this.getClass().getResource( "/proxl-xml-v1.0.xsd" );
-			//				
-			//				SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-			//				Schema schema = sf.newSchema( xmlSchemaURL );
-			//				
-			//				unmarshaller.setSchema(schema);
+				URL xmlSchemaURL = null;
+
+				try {
+
+					xmlSchemaURL = this.getClass().getResource( Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant.PROXL_XSD_XML_SCHEMA_FILENAME_WITH_PATH );
+
+				} catch ( Exception e ) {
+
+					String msg = "Exception Retrieving URL for Proxl XSD Schema file: " + Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant.PROXL_XSD_XML_SCHEMA_FILENAME_WITH_PATH;
+					log.error( msg, e );
+					throw e;
+				}
+
+				if ( xmlSchemaURL == null ) {
+
+					String msg = "Error retrieving URL for Proxl XSD Schema file: " + Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant.PROXL_XSD_XML_SCHEMA_FILENAME_WITH_PATH;
+					log.error( msg );
+					throw new Exception( msg );
+				}
+
+				SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
+				Schema schema = sf.newSchema( xmlSchemaURL );
+
+				unmarshaller.setSchema(schema);
+
+			}
 
 			Object unmarshalledObject = null;
 

@@ -19,7 +19,7 @@ public class ImportPostProcessingPerSearch {
 		
 
 		
-		System.out.println( "AddPsmGenericLookupRecordsPerSearchId..." );
+		System.out.println( "calling AddPsmGenericLookupRecordsPerSearchId " );
 		AddPsmGenericLookupRecordsPerSearchId.getInstance().addPsmGenericLookupRecordsPerSearchId( searchId );
 
 		

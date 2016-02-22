@@ -49,8 +49,6 @@ public class PopulateAndSavePsmDTO {
 			ReportedPeptideDTO reportedPeptideDTO, 
 			Psm psm ) throws ProxlImporterDataException, Exception {
 		
-		
-		psm.getLinkerMass();
 
 		PsmDTO psmDTO = new PsmDTO();
 

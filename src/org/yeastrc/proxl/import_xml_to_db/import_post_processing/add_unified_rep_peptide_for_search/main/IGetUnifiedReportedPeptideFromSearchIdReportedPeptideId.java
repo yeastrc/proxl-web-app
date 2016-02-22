@@ -18,6 +18,6 @@ public interface IGetUnifiedReportedPeptideFromSearchIdReportedPeptideId {
 	public UnifiedReportedPeptideLookupDTO getUnifiedReportedPeptideFromSearchIdReportedPeptideId(
 			
 			int searchId, int reportedPeptideId
-			);
+			) throws Exception;
 	
 }
