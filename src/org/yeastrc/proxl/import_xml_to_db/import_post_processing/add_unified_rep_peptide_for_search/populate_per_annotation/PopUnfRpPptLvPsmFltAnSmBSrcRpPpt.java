@@ -15,19 +15,20 @@ import org.yeastrc.xlink.dto.UnifiedRepPep_ReportedPeptide_Search__Generic_Looku
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 
 /**
+ * PopulateUnifiedReportedPeptideLevelPsmFilterableAnnotationSummaryBySearchReptPeptide
  * 
  * 
  */
-public class PopulateUnifiedReportedPeptideLevelPsmFilterableAnnotationSummaryBySearchReptPeptide {
+public class PopUnfRpPptLvPsmFltAnSmBSrcRpPpt {
 	
-	private static final Logger log = Logger.getLogger(PopulateUnifiedReportedPeptideLevelPsmFilterableAnnotationSummaryBySearchReptPeptide.class);
+	private static final Logger log = Logger.getLogger(PopUnfRpPptLvPsmFltAnSmBSrcRpPpt.class);
 	
 
 	// private constructor
-	private PopulateUnifiedReportedPeptideLevelPsmFilterableAnnotationSummaryBySearchReptPeptide() { }
+	private PopUnfRpPptLvPsmFltAnSmBSrcRpPpt() { }
 	
-	public static PopulateUnifiedReportedPeptideLevelPsmFilterableAnnotationSummaryBySearchReptPeptide getInstance() { 
-		return new PopulateUnifiedReportedPeptideLevelPsmFilterableAnnotationSummaryBySearchReptPeptide(); 
+	public static PopUnfRpPptLvPsmFltAnSmBSrcRpPpt getInstance() { 
+		return new PopUnfRpPptLvPsmFltAnSmBSrcRpPpt(); 
 	}
 	
 	
