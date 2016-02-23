@@ -31,6 +31,18 @@
 	  var contextPathJSVar = "${contextPath}";
 	  
 	  <%--
+	  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
+	  
+	  // Polyfill for String.trim() 
+	  //  Running the following code before any other code will create trim() if it's not natively available.
+		--%>	  
+	  if (!String.prototype.trim) {
+		  String.prototype.trim = function () {
+		    return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+		  };
+		}
+	  
+	  <%--
 	  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
 	  
 	  // Polyfill for Array.isArray() 

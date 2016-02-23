@@ -164,6 +164,9 @@
 			
 			
 			<table style="border-width:0px;">
+			
+			
+			
 				<tr>
 					<td valign="top">Search:</td>
 					<td>
@@ -178,9 +181,11 @@
 				</tr>
 
 				<%-- Spacer --%>  
+<%--				  
 				<tr>
 					<td style="height: 6px;"></td>
 				</tr>
+--%>
 				
 				<%--  The section at the top of the page with the cutoffs, in the user input section --%>
 

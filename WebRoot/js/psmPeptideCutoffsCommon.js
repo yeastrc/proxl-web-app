@@ -244,12 +244,6 @@ var CutoffProcessingCommonCode = function() {
 		};
 
 		
-		//  TODO  TEMP
-		
-//		alert( "output_FieldDataFailedValidation: " + output_FieldDataFailedValidation );
-//		
-//		throw "TEMP STOP";
-		
 		if ( output_FieldDataFailedValidation ) {
 
 			var $element = $("#error_message_cutoff_value_invalid");
@@ -431,7 +425,7 @@ var CutoffProcessingCommonCode = function() {
 			var $inputField = $( this );
 			
 
-			var cutoffValue = $inputField.val();
+			var cutoffValue = $inputField.val().trim();
 			
 			
 			//  Check for empty string since empty string does not get sent to the server.
@@ -469,20 +463,31 @@ var CutoffProcessingCommonCode = function() {
 			}
 		});
 		
+
+
+		var $cutoffs_overlay_container_jq = $clickedThis.closest(".cutoffs_overlay_container_jq");
 		
 
 		if ( output_FieldDataFailedValidation ) {
 			
 			//   Validation failed so exit
 
+			if ( output_FieldDataFailedValidation ) {
+
+				var $element = $cutoffs_overlay_container_jq.find(".error_message_cutoff_value_invalid_jq");
+			
+				showErrorMsg( $element );
+			}
+			
 			
 			return;  //  EARLY EXIT
 		}
 		
 		this._storeFieldValuesAndUpdateCutoffDisplay( { $cutoff_overlay_enclosing_block_jq : $cutoff_overlay_enclosing_block_jq } );
 		
+
+		this.closeCutoffOverlay( { $cutoffs_overlay_container_jq : $cutoffs_overlay_container_jq } );
 		
-		//  TODO   Close Overlay
 	};
 	
 	
@@ -495,9 +500,9 @@ var CutoffProcessingCommonCode = function() {
 		
 		var $clickedThis = $( clickedThis );
 
-		var $cutoff_overlay_enclosing_block_jq = $clickedThis.closest(".cutoff_overlay_enclosing_block_jq");
+		var $cutoffs_overlay_container_jq = $clickedThis.closest(".cutoffs_overlay_container_jq");
 		
-		var $annotation_cutoff_input_field_jq = $cutoff_overlay_enclosing_block_jq.find(".annotation_cutoff_input_field_jq");
+		var $annotation_cutoff_input_field_jq = $cutoffs_overlay_container_jq.find(".annotation_cutoff_input_field_jq");
 		
 
 		$annotation_cutoff_input_field_jq.each( function( index, element ) {
@@ -516,6 +521,9 @@ var CutoffProcessingCommonCode = function() {
 			
 		});
 			
+
+		this.closeCutoffOverlay( { $cutoffs_overlay_container_jq : $cutoffs_overlay_container_jq } );
+		
 
 	};	
 	
@@ -546,12 +554,14 @@ var CutoffProcessingCommonCode = function() {
 
 			$inputField.val( defaultValue );
 
+			//  DO NOT DO THIS:
 			//  Store value in data
 //			$inputField.data( _CUTOFF_VALUE__DATA__, defaultValue );
 			
 		});
 			
 
+		//  DO NOT Close Overlay
 	};
 	
 	
@@ -567,6 +577,10 @@ var CutoffProcessingCommonCode = function() {
 		var $cutoff_overlay_enclosing_block_jq = params.$cutoff_overlay_enclosing_block_jq;
 		
 
+		///    Get data from the input fields.  Store it in .data(...) and in an array
+		
+		
+		
 		var $annotation_cutoff_input_field_jq = $cutoff_overlay_enclosing_block_jq.find(".annotation_cutoff_input_field_jq");
 		
 		
@@ -618,7 +632,10 @@ var CutoffProcessingCommonCode = function() {
 			
 			var annotation_description = $annotation_description_field_jq.val();
 
-			var cutoffData = { display_name : annotation_display_name, description : annotation_description, value : cutoffValue };
+			var cutoffData = { 
+					display_name : annotation_display_name, 
+					description : annotation_description, 
+					value : cutoffValue };
 			
 			cutoffDataEntries.push( cutoffData );
 
@@ -654,6 +671,9 @@ var CutoffProcessingCommonCode = function() {
 		
 		$associated_cutoffs_display_block.empty();
 		
+		
+		/////   Take the field data in the array and update the main filter value(s) display on the main page (not in the overlay) 
+		
 		for ( var cutoffDataIndex = 0; cutoffDataIndex < cutoffDataEntries.length ; cutoffDataIndex++ ) {
 
 			var cutoffData = cutoffDataEntries[ cutoffDataIndex ];
@@ -665,10 +685,86 @@ var CutoffProcessingCommonCode = function() {
 
 //			var $filter_single_value_display_template = 
 				$( html ).appendTo( $associated_cutoffs_display_block ); 
+			
+				//  Append this to create a space between spans of filter values so that wrapping between filter values can occur
+			$( "<span style='font-size: 1px;'> </span>" ).appendTo( $associated_cutoffs_display_block ); 
 		}
+		
+		addToolTips( $associated_cutoffs_display_block );
 	};	
 	
+
+	//   Edit icon clicked
+
+	this.openCutoffOverlay = function( params ) {
+
+		var clickedThis = params.clickedThis;
+
+		var $clickedThis = $( clickedThis );
+		
+		var associated_overlay_container_id = $clickedThis.attr("data-associated_overlay_container_id");
+		
+		var $associated_overlay_container_id = $("#" + associated_overlay_container_id);
+		
+		if ( $associated_overlay_container_id.length === 0 ) {
+			
+			throw "Failed to find associated_overlay_container_id with id: " + associated_overlay_container_id;
+		}
+		
+		var $filter_cutoffs_modal_dialog_overlay_background_jq = $associated_overlay_container_id.find(".filter_cutoffs_modal_dialog_overlay_background_jq");
+		
+
+		if ( $filter_cutoffs_modal_dialog_overlay_background_jq.length === 0 ) {
+			
+			throw "Failed to find associated_overlay_container_id with class: filter_cutoffs_modal_dialog_overlay_background_jq";
+		}
+		
+		var $filter_cutoffs_modal_dialog_overlay_div_jq = $associated_overlay_container_id.find(".filter_cutoffs_modal_dialog_overlay_div_jq");
+
+		if ( $filter_cutoffs_modal_dialog_overlay_div_jq.length === 0 ) {
+			
+			throw "Failed to find associated_overlay_container_id with class: filter_cutoffs_modal_dialog_overlay_div_jq";
+		}
+		
+		
+		$filter_cutoffs_modal_dialog_overlay_background_jq.show();
+		
+		$filter_cutoffs_modal_dialog_overlay_div_jq.show();
+		
+	};
 	
+	
+
+
+	//   Close Overlay
+
+	this.closeCutoffOverlay = function( params ) {
+	
+		var $cutoffs_overlay_container_jq = params.$cutoffs_overlay_container_jq;
+		
+
+		var $filter_cutoffs_modal_dialog_overlay_background_jq = $cutoffs_overlay_container_jq.find(".filter_cutoffs_modal_dialog_overlay_background_jq");
+		
+
+		if ( $filter_cutoffs_modal_dialog_overlay_background_jq.length === 0 ) {
+			
+			throw "Failed to find associated_overlay_container_id with class: filter_cutoffs_modal_dialog_overlay_background_jq";
+		}
+		
+		var $filter_cutoffs_modal_dialog_overlay_div_jq = $cutoffs_overlay_container_jq.find(".filter_cutoffs_modal_dialog_overlay_div_jq");
+
+		if ( $filter_cutoffs_modal_dialog_overlay_div_jq.length === 0 ) {
+			
+			throw "Failed to find associated_overlay_container_id with class: filter_cutoffs_modal_dialog_overlay_div_jq";
+		}
+		
+		
+		$filter_cutoffs_modal_dialog_overlay_background_jq.hide();
+		
+		$filter_cutoffs_modal_dialog_overlay_div_jq.hide();
+		
+		
+	};
 	
 };
 

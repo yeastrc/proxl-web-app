@@ -12,364 +12,248 @@
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 
+<c:set var="singleSearch" value="${ true }" />
 
-<%--  TODO:  TEMP --%>
+<c:if test="${ fn:length( searches_details_list ) > 1 }">
+	<c:set var="singleSearch" value="${ false }" />
+</c:if>
 
-	<%--  use <c:set> since cannot have in page <style> inside a table --%>
-
-	<c:set var="cutoff_input_psm_peptide_label" >padding-left: 10px; font-weight: bold;</c:set>
-	<c:set var="cutoff_input_annotation_name">padding-left: 20px;</c:set>
-
-
-
-<c:forEach items="${ searches_details_list }" var="search_details"  varStatus="searchVarStatus">
+	<tr>
+	 <td style="vertical-align: top;" >Search<c:if test="${ not singleSearch }" >es</c:if>:</td>
+	 <td colspan="10">
+	 
+<%-- 	 
+	 
+<c:choose>
+<c:when test="${ singleSearch }" >
 	
+	<tr>
+	 <td style="vertical-align: top;" >Search:</td>
+	 <td colspan="10">
+		
+ </c:when>
+ <c:otherwise> 
+	<tr>
+	 <td style="vertical-align: top;" >Search<c:if test="${ not singleSearch }" >es</c:if>:</td>
+	 <td colspan="10">
+ </c:otherwise>	
+</c:choose>		
+
+--%>
+		
+  <c:forEach  var="search_details"  items="${ searches_details_list }" varStatus="searchVarStatus">
+			
 	<c:set var="search" value="${ search_details.searchDTO }"></c:set>
 	
-	<c:if test="${ showSearchColorBlock }">
-	
-		<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
-		<%@ include file="/WEB-INF/jsp-includes/mergedSearch_SearchIndexToSearchColorCSSClassName.jsp" %>
+				
+	 <table class="table-no-border-no-cell-spacing-no-cell-padding" style="border-width:0px;" >
+	  <tr>
+		<td style="vertical-align: top; padding-right: 3px;" >
 		
-	</c:if> 
-	
-	<div id="search_details_<bean:write name="search" property="id" />"
-			 <%--  Display Color block before the search if 'showSearchColorBlock' is true --%>
-	  	><c:if test="${ showSearchColorBlock }" 
-	  	><span style="margin-right:10px;padding-left:10px;padding-right:10px;" class="${ backgroundColorClassName }"></span
-	  	></c:if
-	  		><a href="javascript:"
-			onclick="toggleVisibility(this)"
-			 class="tool_tip_attached_jq" data-tooltip="Show or hide search details"
-			toggle_visibility_associated_element_id="search_details_<bean:write name="search" property="id" />"
-	  		><span class="toggle_visibility_expansion_span_jq" 
-					><img src="${contextPath}/images/icon-expand-small.png" 
-						class=" <%--  icon-expand-contract-in-data-table --%> "
-						></span><span class="toggle_visibility_contraction_span_jq" 
-							style=" display: none; " 
-							><img src="${contextPath}/images/icon-collapse-small.png"
+			<c:if test="${ showSearchColorBlock }">
+			
+				<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
+				<%@ include file="/WEB-INF/jsp-includes/mergedSearch_SearchIndexToSearchColorCSSClassName.jsp" %>
+				
+			</c:if> 
+					<%--  Display Color block before the search if 'showSearchColorBlock' is true --%>
+			<c:if test="${ showSearchColorBlock }" 
+			  	><span style="margin-right:10px;padding-left:10px;padding-right:10px;" class="${ backgroundColorClassName }"></span
+			  	></c:if
+			  		><a href="javascript:"
+					onclick="toggleVisibility(this)"
+					 class="tool_tip_attached_jq" data-tooltip="Show or hide search details"
+					toggle_visibility_associated_element_id="search_details_<bean:write name="search" property="id" />"
+			  		><span class="toggle_visibility_expansion_span_jq" 
+							><img src="${contextPath}/images/icon-expand-small.png" 
 								class=" <%--  icon-expand-contract-in-data-table --%> "
-								></span></a>&nbsp;<bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="id" />)</div>
-	
-	<div style="margin-left:20px;display:none;">
-		<table style="border-width:0px;">
-		  <c:if test="${ authAccessLevel.writeAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }" >
-			<tr>
-				<td>Path:</td>
-				<td><bean:write name="search" property="path" /></td>
-			</tr>
-		  </c:if>
-			<tr>
-				<td>Linker:</td>
-				<td><c:out value="${ search_details.linkersDisplayString }"></c:out></td>
-			</tr>							
-
-
-			<tr>
-				<td valign="top"  >
-					Search 
-					Program<c:if test="${ fn:length( search_details.searchPrograms ) > 1 }" >s</c:if>:
-				</td>
-				
-				 <c:choose>
-				  <c:when test="${ empty search_details.searchPrograms }">
-					<td  style="padding-top: 2px;">
-					  	Not Found
-					</td>
-				  </c:when>
-				  <c:otherwise>
-				    <td style="border-width:0px; padding: 0px;">
-
-					<table  style="border-width:0px; border-spacing: 0px; ">
-
-				   <c:forEach var="searchProgram" items="${ search_details.searchPrograms }">
-				     <tr>
-				      <td style="padding-right: 5px;">
-				     	<c:out value="${ searchProgram.displayName }"></c:out>
-				      </td>
-				      <td >
-				     	<c:out value="${ searchProgram.version }"></c:out>
-				      </td>
-				     </tr>
-				   </c:forEach>
-
-				    </table>
-				  
-					</td>
-				  </c:otherwise> 
-				 </c:choose>
-			</tr>								  
-										  
-
-			<tr>
-				<td>Upload&nbsp;date:</td>
-				<td><bean:write name="search" property="formattedLoadTime" /></td>
-			</tr>
-			<tr>
-				<td>FASTA&nbsp;file:</td>
-				<td><bean:write name="search" property="fastaFilename" /></td>
-			</tr>
-		</table>
-	</div>
-
-	 	<%--  Display Cutoff data --%>
-	
-
-	<c:set var="cutoffPageDisplayRootPerSearchDataListEntry" value="${ search_details.cutoffPageDisplaySearchLevel  }" />
+								></span><span class="toggle_visibility_contraction_span_jq" 
+									style=" display: none; " 
+									><img src="${contextPath}/images/icon-collapse-small.png"
+										class=" <%--  icon-expand-contract-in-data-table --%> "
+										></span></a>
+		</td>
+		<td>
 			
+		 <table class="table-no-border-no-cell-spacing-no-cell-padding" style="border-width:0px;" >
+		  <tr>
+		   <td style="<c:if test="${ not singleSearch }" > padding-bottom: 2px;</c:if>">
+			<div><bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="id" />)</div>
 
-	
-	<c:if test="${ not empty cutoffPageDisplayRootPerSearchDataListEntry }">
-		 
-	  <table >
-	  	
-	  	<%--   PSM Block --%>
-	  
-		<c:if test="${ not empty cutoffPageDisplayRootPerSearchDataListEntry.psmAnnotationCutoffData }" >
-			<tr>
-				<td style=" ${ cutoff_input_psm_peptide_label } ">
-					PSM Filters:
-					<a href="javascript:" >
-						<img src="/proxl_generic/images/icon-edit-small.png" 
-							onclick="alert('Under Construction')"
-							class="tool_tip_attached_jq" data-tooltip="Edit filter values" 
-							>
-					</a>
-				</td>
-				<td >
-					<%--  div updated with values from overlay --%>
-					<div id="psm_cutoffs_search_id_<bean:write name="search" property="id" />" class=" psm_cutoffs_jq "></div>
-				</td>
-			</tr>
-			<tr>
-				<td>  <%--  PSM Cutoffs Overlay Holder --%>
-
-
-		<div style="padding: 3px; border-style: solid; border-width: 2px; border-color: grey; ">
-	
-			<div style="padding: 3px; text-align: center;" >
-				Displayed in an overlay
+			<div id="search_details_<bean:write name="search" property="id" />"
+					 
+			  	>						
 			</div>
-			
-			<%--  This div encloses the fields and the buttons and marks what is part of this overlay --%>
-			<div
-				class=" cutoff_overlay_enclosing_block_jq "
-				 data-associated_cutoffs_display_block_id="psm_cutoffs_search_id_<bean:write name="search" property="id" />">
-						 
-			<table >
+			<div style="margin-left:20px;display:none;">
+				<table style="border-width:0px;">
+				  <c:if test="${ authAccessLevel.writeAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }" >
 					<tr>
-						<td style=" ${ cutoff_input_psm_peptide_label } ">
-							PSM Filters:
-						</td>
+						<td>Path:</td>
+						<td><bean:write name="search" property="path" /></td>
 					</tr>
-				
-				<c:forEach var="psmAnnotationCutoffDataEntry" items="${ cutoffPageDisplayRootPerSearchDataListEntry.psmAnnotationCutoffData  }">
-				
-					<c:set var="class_string_tool_tip_attached_jq"></c:set>
-				
-					<c:if test="${ not empty psmAnnotationCutoffDataEntry.annotationDescription }">
-						<c:set var="class_string_tool_tip_attached_jq"> tool_tip_attached_jq </c:set>
-					</c:if>
-					
-					<%--  TODO: consider adding searchProgramDisplayName to tooltip --%>
-											
-					<tr class= " annotation_entry_root_tr_jq " style="">
-						<td>
-							<span style="white-space: nowrap;  ${ cutoff_input_annotation_name } "
-								class="   ${ class_string_tool_tip_attached_jq }  "
-								<c:if test="${ not empty psmAnnotationCutoffDataEntry.annotationDescription }">
-									data-tooltip="Annotation Description: <c:out value="${ psmAnnotationCutoffDataEntry.annotationDescription }"></c:out>"
-								</c:if>
-							><c:out value="${ psmAnnotationCutoffDataEntry.annotationName }"
-							></c:out> (<c:out value="${ psmAnnotationCutoffDataEntry.searchProgramDisplayName }"
-							></c:out>)</span></td>
-							
-						<td style="padding-right: 5px;" >
+				  </c:if>
+					<tr>
+						<td>Linker:</td>
+						<td><c:out value="${ search_details.linkersDisplayString }"></c:out></td>
+					</tr>							
+		
+		
+					<tr>
+						<td style="vertical-align: top;"  >
+							Search 
+							Program<c:if test="${ fn:length( search_details.searchPrograms ) > 1 }" >s</c:if>:
+						</td>
 						
-						  <div class=" cutoff_input_field_block_jq ">
+						 <c:choose>
+						  <c:when test="${ empty search_details.searchPrograms }">
+							<td  style="padding-top: 2px;">
+							  	Not Found
+							</td>
+						  </c:when>
+						  <c:otherwise>
+						    <td style="border-width:0px; padding: 0px;">
+		
+							<table  style="border-width:0px; border-spacing: 0px; ">
+			
+							   <c:forEach var="searchProgram" items="${ search_details.searchPrograms }">
+							     <tr>
+							      <td style="padding-right: 5px;">
+							     	<c:out value="${ searchProgram.displayName }"></c:out>
+							      </td>
+							      <td >
+							     	<c:out value="${ searchProgram.version }"></c:out>
+							      </td>
+							     </tr>
+							   </c:forEach>
+		
+						    </table>
 						  
-							<input type="text" 
-								id="annotation_cutoff_input_field_ann_id_${ psmAnnotationCutoffDataEntry.annotationTypeId }"
-								class=" psm_annotation_cutoff_input_field_jq  annotation_cutoff_input_field_jq  ${ class_string_tool_tip_attached_jq }" 
-								data-type_id="${ psmAnnotationCutoffDataEntry.annotationTypeId }"
-								data-search_id="${ cutoffPageDisplayRootPerSearchDataListEntry.searchId }"
-								<c:if test="${ not empty psmAnnotationCutoffDataEntry.annotationDescription }">
-									data-tooltip="Annotation Description: <c:out value="${ psmAnnotationCutoffDataEntry.annotationDescription }"></c:out>"
-								</c:if> 
-								value="<%--- <c:out value="${ psmAnnotationCutoffDataEntry.annotationValue }"></c:out> --%>" />						
-						
-						<%-- 
-						<html:text property="psmQValueCutoff" styleId="psmQValueCutoff" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" ></html:text></td>
-						--%> 
-							
-							<input type="hidden" class=" annotation_cutoff_default_value_field_jq " 
-								value="<c:out value="${ psmAnnotationCutoffDataEntry.annotationDefaultValue }"></c:out>" >
-
-									<input type="hidden" class=" annotation_display_name_field_jq "
-										value="<c:out value="${ psmAnnotationCutoffDataEntry.annotationName }"
-												></c:out> (<c:out value="${ psmAnnotationCutoffDataEntry.searchProgramDisplayName }"
-											></c:out>)" > 
-									
-									<input type="hidden" class=" annotation_description_field_jq "
-										value="<c:out value="${ psmAnnotationCutoffDataEntry.annotationDescription }"></c:out>" > 								
-						  </div>
-						  	
-						</td>
+							</td>
+						  </c:otherwise> 
+						 </c:choose>
+					</tr>								  
+												  
+		
+					<tr>
+						<td>Upload&nbsp;date:</td>
+						<td><bean:write name="search" property="formattedLoadTime" /></td>
 					</tr>
-				
-				</c:forEach>
-				
+					<tr>
+						<td>FASTA&nbsp;file:</td>
+						<td><bean:write name="search" property="fastaFilename" /></td>
+					</tr>
 				</table>
-	
-				<input type="button" value="Save" onclick="cutoffProcessingCommonCode.saveUserValues( { clickedThis : this } )" >
-				<input type="button" value="Cancel" onclick="cutoffProcessingCommonCode.cancel_RestoreUserValues( { clickedThis : this } )" >
-				<input type="button" value="Reset to Defaults" onclick="cutoffProcessingCommonCode.setToDefaultValues( { clickedThis : this } )" >
+			</div>  <%--  End of Search data that is shown on demand --%>
+		   </td>
+		  </tr>
+		 </table>
+		 
 
-				
-				</div>
-				
-			<div style="color:red; font-size: 18pt">
-				Should "Reset to Defaults" immediately close the dialog?  
-				If not, should clicking "Cancel" remove the effect of clicking "Reset to Defaults"?
-				It is coded to not close the dialog and not change the values if "Cancel" is clicked.  
-			</div>
+			 	<%--  Display Cutoff data --%>
 			
-				
-			</div>
-			<br>
-
-
-				</td>
-			</tr>
-				
-		</c:if>
+	<c:if test="${ singleSearch }" >
 	
-
-	  	<%--   Peptide Block --%>
-	  
-		<c:if test="${ not empty cutoffPageDisplayRootPerSearchDataListEntry.peptideAnnotationCutoffData }" >
-
-			<tr>
-				<td style=" ${ cutoff_input_psm_peptide_label } ">
-					Peptide Filters: 
-					<a href="javascript:" >
-						<img src="/proxl_generic/images/icon-edit-small.png" 
-							onclick="alert('Under Construction')"
-							class="tool_tip_attached_jq" data-tooltip="Edit filter values" 
-							>
-					</a>
-				</td>
-				<td >
-					<%--  div updated with values from overlay --%>
-					<div id="peptide_cutoffs_search_id_<bean:write name="search" property="id" />" class=" psm_cutoffs_jq "></div>
-				</td>
-			</tr>
-			<tr>
-				<td>  <%--  Peptide Cutoffs Overlay Holder --%>
-
-
-		<div style="padding: 3px; border-style: solid; border-width: 2px; border-color: grey; ">
+		<%--  Single seach so close table to move search filter to outer table --%>
+	
+		</td>
+		</tr>
+		</table>
+		</td>
+		</tr>
+	
+	</c:if>
+			
+			<c:set var="cutoffPageDisplayRootPerSearchDataListEntry" value="${ search_details.cutoffPageDisplaySearchLevel  }" />
+					
+		
+			
+			<c:if test="${ not empty cutoffPageDisplayRootPerSearchDataListEntry }">
+				 
+<c:choose>
+ <c:when test="${ singleSearch }" >
 	
 
-			<div style="padding: 3px; text-align: center;" >
-				Displayed in an overlay
-			</div>
-
-			<%--  This div encloses the fields and the buttons and marks what is part of this overlay --%>
-			<div
-				class=" cutoff_overlay_enclosing_block_jq "
-				 data-associated_cutoffs_display_block_id="peptide_cutoffs_search_id_<bean:write name="search" property="id" />">
-						 
-			<table >			
-				<tr>
-					<td style=" ${ cutoff_input_psm_peptide_label } ">
-						Peptide Filters: 
-					</td>
-				</tr>
-
-				<c:forEach var="peptideAnnotationCutoffDataEntry" items="${ cutoffPageDisplayRootPerSearchDataListEntry.peptideAnnotationCutoffData  }">
+			  
 			
-					<c:set var="class_string_tool_tip_attached_jq"></c:set>
+	
+ </c:when>
+ <c:otherwise>
+
+	<table class="table-no-border-no-cell-spacing-no-cell-padding" style="" >
+
+ </c:otherwise>
+</c:choose>		
+				 
+			  	<%--   PSM Block --%>
+			  				 
+					<c:set var="filterTypeDisplay" >PSM</c:set>
+					<c:set var="filterTypeHTML_Id" >psm</c:set>
+					<c:set var="annotationCutoffDataList" value="${ cutoffPageDisplayRootPerSearchDataListEntry.psmAnnotationCutoffData }"/> 
+					
+					<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inCutoffOverlay.jsp" %>
 			
-					<c:if test="${ not empty peptideAnnotationCutoffDataEntry.annotationDescription }">
-						<c:set var="class_string_tool_tip_attached_jq"> tool_tip_attached_jq </c:set>
-					</c:if>
+			  	<%--   Peptide Block --%>
+			  	
+					<c:set var="filterTypeDisplay" >Peptide</c:set>
+					<c:set var="filterTypeHTML_Id" >peptide</c:set>
+					<c:set var="annotationCutoffDataList" value="${ cutoffPageDisplayRootPerSearchDataListEntry.peptideAnnotationCutoffData }"/> 
+		
+					<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inCutoffOverlay.jsp" %>
 						
 				
-					<tr class= " annotation_entry_root_tr_jq " style=""> <%-- REMOVED hidden initially, displayed via Javascript --%>
-						<td>
-							<span style="white-space: nowrap;  ${ cutoff_input_annotation_name } "
-								class=" annotation_type_name_string_jq  ${ class_string_tool_tip_attached_jq } "
-								<c:if test="${ not empty peptideAnnotationCutoffDataEntry.annotationDescription }">
-									data-tooltip="Annotation Description: <c:out value="${ peptideAnnotationCutoffDataEntry.annotationDescription }"></c:out>"
-								</c:if>
-								><c:out value="${ peptideAnnotationCutoffDataEntry.annotationName }"
-								></c:out> (<c:out value="${ peptideAnnotationCutoffDataEntry.searchProgramDisplayName }"
-							></c:out>)</span>
-						</td>
-						<td>
-						  <div class=" cutoff_input_field_block_jq ">
-							<input type="text" 
-								id="annotation_cutoff_input_field_ann_id_${ peptideAnnotationCutoffDataEntry.annotationTypeId }"
-								class=" peptide_annotation_cutoff_input_field_jq  annotation_cutoff_input_field_jq  ${ class_string_tool_tip_attached_jq } " 
-								data-type_id="${ peptideAnnotationCutoffDataEntry.annotationTypeId }"  
-								data-search_id="${ cutoffPageDisplayRootPerSearchDataListEntry.searchId }"  
-								<c:if test="${ not empty peptideAnnotationCutoffDataEntry.annotationDescription }">
-									data-tooltip="Annotation Description: <c:out value="${ peptideAnnotationCutoffDataEntry.annotationDescription }"></c:out>"
-								</c:if>
-								value="<%--- <c:out value="${ peptideAnnotationCutoffDataEntry.annotationValue }"></c:out> --%>" />
-								
-									<input type="hidden" class=" annotation_cutoff_default_value_field_jq " 
-										value="<c:out value="${ peptideAnnotationCutoffDataEntry.annotationDefaultValue }"></c:out>" >
-										
-									<input type="hidden" class=" annotation_display_name_field_jq "
-										value="<c:out value="${ peptideAnnotationCutoffDataEntry.annotationName }"
-												></c:out> (<c:out value="${ peptideAnnotationCutoffDataEntry.searchProgramDisplayName }"
-											></c:out>)" > 
-									
-									<input type="hidden" class=" annotation_description_field_jq "
-										value="<c:out value="${ peptideAnnotationCutoffDataEntry.annotationDescription }"></c:out>" > 
-						  </div>
-						</td>
-					</tr>
-					
-				</c:forEach>
+ 
+<c:choose>
+ <c:when test="${ singleSearch }" >
+	
 
-			</table>
-			<br>
-				<input type="button" value="Save" onclick="cutoffProcessingCommonCode.saveUserValues( { clickedThis : this } )" >
-				<input type="button" value="Cancel" onclick="cutoffProcessingCommonCode.cancel_RestoreUserValues( { clickedThis : this } )" >
-				<input type="button" value="Reset to Defaults" onclick="cutoffProcessingCommonCode.setToDefaultValues( { clickedThis : this } )" >
+			  
+			
+	
+ </c:when>
+ <c:otherwise>
 
-			</div>
-			
-			<div style="color:red; font-size: 18pt">
-				Should "Reset to Defaults" immediately close the dialog?  
-				If not, should clicking "Cancel" remove the effect of clicking "Reset to Defaults"?
-				It is coded to not close the dialog and not change the values if "Cancel" is clicked.  
-			</div>
-			
-			
-			</div>
-
-				</td>
-			</tr>
-				
-		</c:if>					
-			
-				
 		</table>
 
+ </c:otherwise>
+</c:choose>				
 
 	<%--  Handlebars template for displaying a Single Filter value --%>		
 
-	<script id="filter_single_value_display_template"  type="text/x-handlebars-template">
-		
-		<span class="filter-single-value-display-block">{{ data.display_name }}: {{ data.value }} </span>
+<script id="filter_single_value_display_template"  type="text/x-handlebars-template">
+			
+	<span class="filter-single-value-display-block {{#if data.description }} tool_tip_attached_jq {{/if}} " 
+		{{#if data.description }} data-tooltip="{{ data.description }}" {{/if}}
+				>{{ data.display_name }}: {{ data.value }}</span>
 
-	</script >		
+</script >		
 	
+			
+			</c:if>		
+			
+
+	<c:if test="${ not singleSearch }" >
 	
-	</c:if>
-	
-</c:forEach>
+		<%--  Single seach so close table to move search filter to outer table --%>
+					
+		</td>
+	  </tr>
+	 </table>
+	 
+	 </c:if>
+
+  </c:forEach>
+		
+
+
+							<div style="position: relative; ">
+						  		<div style="width: 400px;" class="error-message-container error_message_container_jq " id="error_message_cutoff_value_invalid" >
+						  			<div class="error-message-inner-container" >
+						  				<div class="error-message-close-x error_message_close_x_jq">X</div>
+							  			<div class="error-message-text" >Cutoff value is not valid</div>
+						  			</div>
+							  	</div>
+							</div>
+						
+	 </td>
+	</tr>
+		

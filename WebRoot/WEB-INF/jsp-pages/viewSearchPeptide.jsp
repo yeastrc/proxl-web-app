@@ -160,31 +160,15 @@
 		
 			
 			<table style="border-width:0px;">
-				<tr>
-					<td valign="top">Search:</td>
-					<td colspan="2">
+
 					
-					
-						<%--  Set to false to not show color block before search for key --%>
-						<c:set var="showSearchColorBlock" value="${ false }" />
+				<%--  Set to false to not show color block before search for key --%>
+				<c:set var="showSearchColorBlock" value="${ false }" />
 						
-						<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
-						<%@ include file="/WEB-INF/jsp-includes/searchDetailsBlock.jsp" %>
+				<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
+				<%@ include file="/WEB-INF/jsp-includes/searchDetailsBlock.jsp" %>
 
 
-					</td>
-				</tr>
-				
-				<%-- Spacer --%>  
-				<tr>
-					<td style="height: 6px;"></td>
-				</tr>
-				
-				<%--  The section at the top of the page with the cutoffs, in the user input section --%>
-
-<%-- 
-				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inDataEntryForm.jsp" %>
---%>				
 				
 				<tr>
 					<td>Type Filter:</td>
