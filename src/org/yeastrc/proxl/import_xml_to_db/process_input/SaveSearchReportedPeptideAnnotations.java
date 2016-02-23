@@ -1,12 +1,15 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptiveReportedPeptideAnnotation;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptiveReportedPeptideAnnotations;
@@ -178,8 +181,42 @@ public class SaveSearchReportedPeptideAnnotations {
 										searchProgramEntryMap );
 						
 						if ( filterableAnnotationTypesOnId.remove( annotationTypeId ) == null ) {
-							
+
 							//  Shouldn't get here
+							
+							String msg = "Internal Data mismatch error";
+							
+							log.error( msg );
+							
+							log.error( "filterableAnnotationTypesOnId.remove( annotationTypeId ) == null for annotationTypeId: " 
+									+ annotationTypeId + ", annotationName: " + annotationName );
+
+							List<String> filterablePsmAnnotationListNames = new ArrayList<>();
+							
+							for ( FilterableReportedPeptideAnnotation filterableReportedPeptideAnnotationTemp : filterableReportedPeptideAnnotationList ) {
+
+								String name = filterableReportedPeptideAnnotationTemp.getAnnotationName();
+								
+								filterablePsmAnnotationListNames.add(name);
+							}
+
+							log.error( "filterableAnnotationTypesOnId.remove( annotationTypeId ) == null for filterablePsmAnnotationList names: " + StringUtils.join(filterablePsmAnnotationListNames, ",") );
+
+
+							List<Integer> filterableAnnotationTypeIds = new ArrayList<>();
+							
+							for ( Map.Entry<Integer, AnnotationTypeDTO> entry : filterableAnnotationTypesOnId.entrySet() ) {
+								
+								int key = entry.getKey();
+//								AnnotationTypeDTO valueTemp = entry.getValue();
+								
+								filterableAnnotationTypeIds.add( key );
+							}
+
+							log.error( "filterableAnnotationTypesOnId.remove( annotationTypeId ) == null for filterableAnnotationTypeIds type ids: " + StringUtils.join(filterableAnnotationTypeIds, ",") );
+
+							
+							throw new ProxlImporterInteralException(msg);
 						}
 						
 						SearchReportedPeptideAnnotationDTO searchReportedPeptideAnnotationDTO = new SearchReportedPeptideAnnotationDTO();

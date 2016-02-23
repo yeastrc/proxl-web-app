@@ -1,12 +1,15 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmAnnotation;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmAnnotations;
@@ -72,7 +75,7 @@ public class SavePsmAnnotations {
 			SearchProgramEntry searchProgramEntry = searchProgramEntryMapEntry.getValue();
 
 			Map<String, AnnotationTypeDTO> psmAnnotationTypeDTOMap =
-					searchProgramEntry.getReportedPeptideAnnotationTypeDTOMap();
+					searchProgramEntry.getPsmAnnotationTypeDTOMap();
 		
 			for ( Map.Entry<String, AnnotationTypeDTO> psmAnnotationTypeDTOMapEntry : psmAnnotationTypeDTOMap.entrySet() ) {
 
@@ -142,8 +145,41 @@ public class SavePsmAnnotations {
 									searchProgramEntryMap );
 
 					if ( filterableAnnotationTypesOnId.remove( annotationTypeId ) == null ) {
-						
+
 						//  Shouldn't get here
+
+						String msg = "Internal Data mismatch error";
+						
+						log.error( msg );
+						
+						log.error( "filterableAnnotationTypesOnId.remove( annotationTypeId ) == null for annotationTypeId: " 
+								+ annotationTypeId + ", annotationName: " + annotationName );
+
+						List<String> filterablePsmAnnotationListNames = new ArrayList<>();
+						
+						for ( FilterablePsmAnnotation filterablePsmAnnotationTemp : filterablePsmAnnotationList ) {
+
+							String name = filterablePsmAnnotationTemp.getAnnotationName();
+							
+							filterablePsmAnnotationListNames.add(name);
+						}
+
+						log.error( "filterableAnnotationTypesOnId.remove( annotationTypeId ) == null for filterablePsmAnnotationList names: " + StringUtils.join(filterablePsmAnnotationListNames, ",") );
+
+
+						List<Integer> filterableAnnotationTypeIds = new ArrayList<>();
+						
+						for ( Map.Entry<Integer, AnnotationTypeDTO> entry : filterableAnnotationTypesOnId.entrySet() ) {
+							
+							int key = entry.getKey();
+//							AnnotationTypeDTO valueTemp = entry.getValue();
+							
+							filterableAnnotationTypeIds.add( key );
+						}
+
+						log.error( "filterableAnnotationTypesOnId.remove( annotationTypeId ) == null for filterableAnnotationTypeIds type ids: " + StringUtils.join(filterableAnnotationTypeIds, ",") );
+
+						throw new ProxlImporterInteralException(msg);
 					}
 					
 					PsmAnnotationDTO psmAnnotationDTO = new PsmAnnotationDTO();
@@ -167,9 +203,7 @@ public class SavePsmAnnotations {
 			
 			//  Filterable Annotations Types were not on the Filterable Annotations List
 			
-			String msg = "Not all Filterable Annotations Types were on the Filterable Annotations List "
-					+ " for Psm.  "
-					+ " for Scan Number :" 
+			String msg = "Not all Filterable Annotations Types were on the Filterable Annotations List for Psm. For Scan Number :" 
 					+ psm.getScanNumber();
 			log.error( msg );
 			throw new ProxlImporterDataException(msg);
