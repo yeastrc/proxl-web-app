@@ -209,11 +209,20 @@ QCChartPSMCountVsScores.prototype.psmCountVsScoreQCPlotClickHandler = function(c
 
 };
 
+
+///////////
+
+QCChartPSMCountVsScores.prototype.closePSMCountVsScoreQCPlotOverlay = function(clickThis, eventObject) {
+
+	$(".psm_count_vs_score_qc_plot_overlay_show_hide_parts_jq").hide();
+};
+
+
 ///////////
 
 QCChartPSMCountVsScores.prototype.openPSMCountVsScoreQCPlotOverlay = function(clickThis, eventObject) {
 
-	var objectThis = this;
+//	var objectThis = this;
 
 	
 	var $clickThis = $(clickThis);
@@ -258,8 +267,16 @@ QCChartPSMCountVsScores.prototype.openPSMCountVsScoreQCPlotOverlay = function(cl
 
 	$psm_count_vs_score_qc_plot_overlay_container.css( "top", positionAdjust );
 
-
 	
+	//  TODO  TEMP
+
+	var $psm_count_vs_score_qc_plot_overlay_container = $("#psm_count_vs_score_qc_plot_overlay_container");
+
+	var $psm_count_vs_score_qc_plot_overlay_background = $("#psm_count_vs_score_qc_plot_overlay_background"); 
+	$psm_count_vs_score_qc_plot_overlay_background.show();
+	$psm_count_vs_score_qc_plot_overlay_container.show();
+
+	////////////////
 	
 	
 	var $psm_count_vs_score_qc_plot_current_search_id = $("#psm_count_vs_score_qc_plot_current_search_id");
@@ -285,20 +302,137 @@ QCChartPSMCountVsScores.prototype.openPSMCountVsScoreQCPlotOverlay = function(cl
 	
 	$psm_count_vs_score_qc_plot_current_search_id.val( searchId );
 	
-	
-	objectThis.createChartFromPageParams( { 
+
+	this.getPSMFilterableAnnTypesForSearchId( { 
 		searchId: searchId
 	} );
 };
 
 
-//////////	/
 
-QCChartPSMCountVsScores.prototype.closePSMCountVsScoreQCPlotOverlay = function(clickThis, eventObject) {
 
-	$(".psm_count_vs_score_qc_plot_overlay_show_hide_parts_jq").hide();
+
+///  
+
+QCChartPSMCountVsScores.prototype.getPSMFilterableAnnTypesForSearchId = function( params ) {
+
+	var objectThis = this;
+
+
+	var searchId = params.searchId;
+
+
+
+
+	if ( ! qcChartsInitialized ) {
+
+		throw "qcChartsInitialized is false"; 
+	}
+
+
+	var _URL = contextPathJSVar + "/services/annotationTypes/getAnnotationTypesPsmFilterableForSearchId";
+
+	var requestData = {
+			searchId : searchId
+	};
+
+//	var request =
+	$.ajax({
+		type : "GET",
+		url : _URL,
+		data : requestData,
+		dataType : "json",
+		success : function(data) {
+
+
+			objectThis.getPSMFilterableAnnTypesForSearchIdResponse(requestData, data, params);
+		},
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+
+			handleAJAXError(jqXHR, textStatus, errorThrown);
+		}
+	});
+
+
+
 };
+
+///
+
+QCChartPSMCountVsScores.prototype.getPSMFilterableAnnTypesForSearchIdResponse = function(requestData, responseData, originalParams) {
+
+	var annTypes = responseData.annotationTypeDTOList;
+
+	if (  annTypes.length === 0 ) {
+
+		throw "annTypes.length === 0";
+	}
+
+
+
+	if ( ! this.globals.currentSearchData ) {
+
+		this.globals.currentSearchData = {};
+	}
+
+	var annTypesById = {};
+
+	for ( var annTypesIndex = 0; annTypesIndex < annTypes.length; annTypesIndex++ ) {
+
+		var annType = annTypes [ annTypesIndex ];
+
+		var annTypeId = annType.id.toString();  
+
+		annTypesById[ annTypeId ] = annType;
+	}
+
+	this.globals.currentSearchData.annotationTypeDataArray = annTypes;
+
+	this.globals.currentSearchData.annotationTypeDataById = annTypesById;
+	
+	
+	var annTypes = this.globals.currentSearchData.annotationTypeDataArray;
+	
+	var $psm_count_vs_score_qc_plot_score_type_id = $("#psm_count_vs_score_qc_plot_score_type_id");
+
+	$psm_count_vs_score_qc_plot_score_type_id.empty();
+	
+	var optionsHTMLarray = [];
+	
+	for ( var annTypesIndex = 0; annTypesIndex < annTypes.length; annTypesIndex++ ) {
+		
+		var annType = annTypes[ annTypesIndex ];
+		
+		var html = "<option value='" + annType.id + "'>" + annType.name + "</option>";
 			
+		optionsHTMLarray.push( html );
+	}
+	
+	var optionsHTML = optionsHTMLarray.join("");
+	
+	$psm_count_vs_score_qc_plot_score_type_id.append( optionsHTML );
+	
+	//  If an annotation type record has sort id of 1, then assign that annotation type id to the selector 
+	
+	for ( var annTypesIndex = 0; annTypesIndex < annTypes.length; annTypesIndex++ ) {
+		
+		var annType = annTypes [ annTypesIndex ];
+		
+		if ( annType.annotationTypeFilterableDTO && annType.annotationTypeFilterableDTO.sortOrder === 1 ) {
+			
+			$psm_count_vs_score_qc_plot_score_type_id.val( annType.id );
+		}
+	}
+
+	this.createChartFromPageParams( { 
+		searchId: originalParams.searchId
+	} );
+	
+};
+
 
 
 
@@ -442,6 +576,10 @@ QCChartPSMCountVsScores.prototype.createChartFromPageParams = function( ) {
 	var $psm_count_vs_score_qc_plot_current_search_id = $("#psm_count_vs_score_qc_plot_current_search_id");
 	
 	var searchId = $psm_count_vs_score_qc_plot_current_search_id.val( );
+	
+	var $psm_count_vs_score_qc_plot_score_type_id = $("#psm_count_vs_score_qc_plot_score_type_id");
+	
+	var annotationTypeId = $psm_count_vs_score_qc_plot_score_type_id.val();
 
 	
 	var selectedLinkTypes = this._getLinkTypesChecked();
@@ -468,6 +606,7 @@ QCChartPSMCountVsScores.prototype.createChartFromPageParams = function( ) {
 	
 	objectThis.createChart( {  
 		searchId : searchId,
+		annotationTypeId : annotationTypeId,
 		selectedLinkTypes : selectedLinkTypes,
 		userInputMaxX : userInputMaxX,
 		userInputMaxY : userInputMaxY } );
@@ -510,6 +649,7 @@ QCChartPSMCountVsScores.prototype.createChart = function( params ) {
 	
 	var searchId = params.searchId;
 	var selectedLinkTypes = params.selectedLinkTypes;
+	var annotationTypeId = params.annotationTypeId;
 
 	var userInputMaxXString = params.userInputMaxX;
 
@@ -525,19 +665,20 @@ QCChartPSMCountVsScores.prototype.createChart = function( params ) {
 	$psm_count_vs_score_qc_plot_chartDiv.empty();
 
 
-	var _URL = contextPathJSVar + "/services/qcplot/getPsmCountPerQValue";
+	var _URL = contextPathJSVar + "/services/qcplot/getPsmCountsVsScore";
 	
 	var requestData = {
 			selectedLinkTypes : selectedLinkTypes,
-			searchId : searchId
+			searchId : searchId,
+			annotationTypeId : annotationTypeId
 	};
 	
 
 	if ( userInputMaxXString !== "" ) {
 		
-		var psmQValueCutoff = userInputMaxXString;
+		var psmScoreCutoff = userInputMaxXString;
 	
-		requestData.psmQValueCutoff = psmQValueCutoff;
+		requestData.psmScoreCutoff = psmScoreCutoff;
 	}
 	
 
@@ -688,9 +829,6 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 //	green: #53a553
 //	blue: #5353a5
 //	combined: #a5a5a5 (gray)
-	
-	ss ss
-	
 	
 	
 	var chartDataHeaderEntry = [ "q_value" ];

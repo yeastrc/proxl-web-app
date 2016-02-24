@@ -156,7 +156,7 @@ var _project_id = null;
 		 			
 		 			initQCPlotsClickHandlers();
 		 			
-		 			initQCPlotQValueCountClickHandlers();
+		 			initQCPlotPSMCountVsScoreClickHandlers();
 	 		   },10);
 	 			
 	 			

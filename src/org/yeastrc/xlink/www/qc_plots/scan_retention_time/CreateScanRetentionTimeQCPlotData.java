@@ -4,9 +4,17 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-//import org.apache.log4j.Logger;
+
+
+
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.ScanRetentionTimeDAO;
+import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.ScanRetentionTimeDTO;
+import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.searcher.RetentionTimesFromScanTblSearcher;
 import org.yeastrc.xlink.www.web_utils.RetentionTimeScalingAndRounding;
 
@@ -18,7 +26,7 @@ import org.yeastrc.xlink.www.web_utils.RetentionTimeScalingAndRounding;
  */
 public class CreateScanRetentionTimeQCPlotData {
 	
-//	private static final Logger log = Logger.getLogger(CreateScanRetentionTimeQCPlotData.class);
+	private static final Logger log = Logger.getLogger(CreateScanRetentionTimeQCPlotData.class);
 	
 	
 
@@ -43,38 +51,77 @@ public class CreateScanRetentionTimeQCPlotData {
 	
 
 	/**
+	 * @param scansForSelectedLinkTypes
 	 * @param searchId
 	 * @param scanFileId
-	 * @param psmQValueCutoff
+	 * @param annotationTypeId
+	 * @param psmScoreCutoff
+	 * @param retentionTimeInSecondsCutoff
 	 * @return
 	 * @throws Exception
 	 */
-	public ScanRetentionTimeJSONRoot create( List<String> scansForSelectedLinkTypes,	int searchId, int scanFileId, double psmQValueCutoff, Double retentionTimeInSecondsCutoff ) throws Exception {
+	public ScanRetentionTimeJSONRoot create( 
+			
+			List<String> scansForSelectedLinkTypes,	
+			int searchId, 
+			int scanFileId, 
+			int annotationTypeId,
+			double psmScoreCutoff, 
+			Double retentionTimeInSecondsCutoff ) throws Exception {
 
 		List<BigDecimal> retentionTimeForPSMsthatMeetCriteriaList = null;
 		
 		if ( ! scansForSelectedLinkTypes.isEmpty() ) {
 
 			//  Process retention times for psms that meet criteria
+			
+			List<Integer> searchIds = new ArrayList<>( 1 );
+			
+			searchIds.add( searchId );
+			
+			Map<Integer, Map<Integer, AnnotationTypeDTO>> annotationTypeDataMappedOnSearchIdAnnTypeId =
+					GetAnnotationTypeData.getInstance().getAll_Psm_Filterable_ForSearchIds( searchIds );
+			
+			Map<Integer, AnnotationTypeDTO> annotationTypeDataMappedOnAnnTypeId = annotationTypeDataMappedOnSearchIdAnnTypeId.get( searchId );
+			
+			if ( annotationTypeDataMappedOnAnnTypeId == null ) {
+			
+				String msg = "No PSM Annotation Type data retrieved for search id: " + searchId;
+				log.error( msg );
+				throw new ProxlWebappDataException(msg);
+			}
+				
+			AnnotationTypeDTO annotationTypeDTO = annotationTypeDataMappedOnAnnTypeId.get( annotationTypeId );
 
+			if ( annotationTypeDTO == null ) {
+			
+				String msg = "No PSM Annotation Type data retrieved for search id: " + searchId + ", annotationTypeId: " + annotationTypeId;
+				log.error( msg );
+				throw new ProxlWebappDataException(msg);
+			}
+				
 			retentionTimeForPSMsthatMeetCriteriaList = 
-					RetentionTimesFromScanTblSearcher.getInstance().getRetentionTimes( scansForSelectedLinkTypes, searchId, scanFileId, psmQValueCutoff, retentionTimeInSecondsCutoff );
+					RetentionTimesFromScanTblSearcher.getInstance()
+					.getRetentionTimes( scansForSelectedLinkTypes, searchId, scanFileId, annotationTypeDTO, psmScoreCutoff, retentionTimeInSecondsCutoff );
 		
 		}
 		
-		return createScanRetentionTimeQCPlotData( scanFileId, psmQValueCutoff, retentionTimeInSecondsCutoff, retentionTimeForPSMsthatMeetCriteriaList );
+		return createScanRetentionTimeQCPlotData( scanFileId, retentionTimeInSecondsCutoff, retentionTimeForPSMsthatMeetCriteriaList );
 	}
-	
 	
 	
 	/**
 	 * @param scanFileId
-	 * @param psmQValueCutoff
+	 * @param retentionTimeInSecondsCutoff
 	 * @param retentionTimeForPSMsthatMeetCriteriaList
 	 * @return
 	 * @throws Exception
 	 */
-	private ScanRetentionTimeJSONRoot createScanRetentionTimeQCPlotData( int scanFileId, double psmQValueCutoff, Double retentionTimeInSecondsCutoff, List<BigDecimal> retentionTimeForPSMsthatMeetCriteriaList ) throws Exception {
+	private ScanRetentionTimeJSONRoot createScanRetentionTimeQCPlotData( 
+			
+			int scanFileId, 
+			Double retentionTimeInSecondsCutoff, 
+			List<BigDecimal> retentionTimeForPSMsthatMeetCriteriaList ) throws Exception {
 
 
 		int numScans = 0;

@@ -1998,13 +1998,16 @@
 						<tr>
 							<td>Filter PSMs by:</td>
 							<td>
-								<select id="scan_retention_time_qc_plot_score_type_id"  class="scan_retention_time_qc_plot_on_change_jq">
+								<select id="scan_retention_time_qc_plot_score_type_id" >
 									
 								</select>							
 							
 								<input type="text" id="scan_retention_time_qc_plot_psm_score_cutoff"  
 									class="scan_retention_time_qc_plot_on_change_jq"
 									size="4">
+									
+								(<span id="scan_retention_time_qc_plot_min_value_for_ann_type_id"
+									></span>, <span id="scan_retention_time_qc_plot_max_value_for_ann_type_id"></span>)
 							</td>
 						</tr>
 
@@ -2159,7 +2162,7 @@
 						>X</h1>
 						
 					<h1 id="psm_count_vs_score_qc_plot_overlay_header_text" class="qc-plot-overlay-header-text" 
-						>QC Plot: PSM <span id="psm_count_vs_score_qc_plot_overlay_header_text_count_type" >Q Value</span> Counts</h1>
+						>QC Plot: PSM <span id="psm_count_vs_score_qc_plot_overlay_header_text_count_type" ></span> Counts</h1>
 				</div>
 				<div id="psm_count_vs_score_qc_plot_overlay_body" class="qc-plot-overlay-body" >
 			
@@ -2177,8 +2180,11 @@
 						<tr>
 							<td>Choose score:</td>
 							<td>
-								Add Dropdown List of filterable PSM attributes
+								<select id="psm_count_vs_score_qc_plot_score_type_id" >
+									
+								</select>							
 							
+
 							</td>
 						</tr>
 						<tr>

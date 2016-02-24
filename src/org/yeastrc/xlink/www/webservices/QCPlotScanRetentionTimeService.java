@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -25,12 +24,11 @@ import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_plots.scan_retention_time.CreateScanRetentionTimeQCPlotData;
 import org.yeastrc.xlink.www.qc_plots.scan_retention_time.ScanRetentionTimeJSONRoot;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.constants.QueryCriteriaValueCountsFieldValuesConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.dao.QueryCriteriaValueCountsDAO;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+
+
 
 
 @Path("/qcplot")
@@ -41,11 +39,12 @@ public class QCPlotScanRetentionTimeService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getScanRetentionTime") 
-	public ScanRetentionTimeJSONRoot getViewerData( 
+	public ScanRetentionTimeJSONRoot getScanRetentionTime( 
 			@QueryParam( "scansForSelectedLinkTypes" ) List<String> scansForSelectedLinkTypes,			
 			@QueryParam( "searchId" ) int searchId,
 			@QueryParam( "scanFileId" ) int scanFileId,
-			@QueryParam( "psmQValueCutoff" ) Double psmQValueCutoff,
+			@QueryParam( "annotationTypeId" ) int annotationTypeId,
+			@QueryParam( "psmScoreCutoff" ) Double psmScoreCutoff,
 			@QueryParam( "retentionTimeInMinutesCutoff" ) Double retentionTimeInMinutesCutoff,
 			@Context HttpServletRequest request )
 	throws Exception {
@@ -77,10 +76,25 @@ public class QCPlotScanRetentionTimeService {
 		    	        .build()
 		    	        );
 		}
-		
-		if ( psmQValueCutoff == null ) {
 
-			String msg = ":  psmQValueCutoff is not provided";
+		
+		if ( annotationTypeId == 0 ) {
+
+			String msg = ": Provided annotationTypeId is zero";
+
+			log.error( msg );
+
+		    throw new WebApplicationException(
+		    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+		    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+		    	        .build()
+		    	        );
+		}
+		
+		
+		if ( psmScoreCutoff == null ) {
+
+			String msg = ":  psmScoreCutoff is not provided";
 
 			log.error( msg );
 
@@ -93,13 +107,9 @@ public class QCPlotScanRetentionTimeService {
 				
 		try {
 
-			
-			QueryCriteriaValueCountsDAO.getInstance().saveOrIncrement( 
-					QueryCriteriaValueCountsFieldValuesConstants.PSM_Q_VALUE_FIELD_VALUE, Double.toString( psmQValueCutoff ) );
-
 
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 
 
 			//   Get the project id for this search
@@ -143,7 +153,7 @@ public class QCPlotScanRetentionTimeService {
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 			
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
 
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 
@@ -170,6 +180,10 @@ public class QCPlotScanRetentionTimeService {
 						.build()
 						);
 			}
+			
+			
+			
+			
 
 			Double retentionTimeInSecondsCutoff = null;
 			
@@ -179,7 +193,8 @@ public class QCPlotScanRetentionTimeService {
 			}
 			
 			ScanRetentionTimeJSONRoot scanRetentionTimeJSONRoot = 
-					CreateScanRetentionTimeQCPlotData.getInstance().create( scansForSelectedLinkTypes, searchId, scanFileId, psmQValueCutoff, retentionTimeInSecondsCutoff );
+					CreateScanRetentionTimeQCPlotData.getInstance()
+					.create( scansForSelectedLinkTypes, searchId, scanFileId, annotationTypeId, psmScoreCutoff, retentionTimeInSecondsCutoff );
 			
 			return scanRetentionTimeJSONRoot;
 			

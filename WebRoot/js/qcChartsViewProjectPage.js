@@ -75,9 +75,24 @@ var QCChartRetentionTime = function(  ) {
 					maxX : undefined,
 					maxY : undefined
 				}
+				,
+				annotationTypeDataById : undefined,
+				annotationTypeDataArray : undefined
 			}
+//			,
+//			
+//			allSearchesData :
+//				{
+//					"<searchId>" : {
+//						
+//						annotationTypes : [ ]
+//					}
+//				
+//				}
 			
 	};
+	
+
 	
 };
 
@@ -133,6 +148,13 @@ QCChartRetentionTime.prototype.init = function() {
 		return false;
 	});
 
+	$("#scan_retention_time_qc_plot_score_type_id").change(function(eventObject) {
+		
+		objectThis.scoreTypeChanged( );
+		
+		return false;
+	});
+	
 	
 	$(".scan_retention_time_qc_plot_on_change_jq").change(function(eventObject) {
 		
@@ -216,6 +238,15 @@ QCChartRetentionTime.prototype.scanRetentionTimeQCPlotClickHandler = function(cl
 
 ///////////
 
+QCChartRetentionTime.prototype.closeScanRetentionTimeQCPlotOverlay = function(clickThis, eventObject) {
+
+	$(".scan_retention_time_qc_plot_overlay_show_hide_parts_jq").hide();
+};
+
+
+
+///////////
+
 QCChartRetentionTime.prototype.openScanRetentionTimeQCPlotOverlay = function(clickThis, eventObject) {
 
 	var objectThis = this;
@@ -227,6 +258,14 @@ QCChartRetentionTime.prototype.openScanRetentionTimeQCPlotOverlay = function(cli
 	var $search_root_jq = $clickThis.closest(".search_root_jq");
 
 	var searchId = $search_root_jq.attr("searchId");	
+	
+	
+	var $scan_retention_time_qc_plot_overlay_container = $("#scan_retention_time_qc_plot_overlay_container");
+
+	var $scan_retention_time_qc_plot_overlay_background = $("#scan_retention_time_qc_plot_overlay_background"); 
+	$scan_retention_time_qc_plot_overlay_background.show();
+	$scan_retention_time_qc_plot_overlay_container.show();
+
 	
 
 	// copy the search name to the overlay
@@ -287,16 +326,6 @@ QCChartRetentionTime.prototype.openScanRetentionTimeQCPlotOverlay = function(cli
 	
 	$scan_retention_time_qc_plot_current_search_id.val( searchId );
 	
-	var $scan_retention_time_qc_plot_scan_file_id = $("#scan_retention_time_qc_plot_scan_file_id");
-
-	var $scan_retention_time_qc_plot_psm_score_cutoff = $("#scan_retention_time_qc_plot_psm_score_cutoff");
-	
-	
-	
-	
-	
-	$scan_retention_time_qc_plot_psm_score_cutoff.val( ss ss );
-	
 	
 	//  initialize all "Scans for" checkboxes to checked
 
@@ -308,26 +337,230 @@ QCChartRetentionTime.prototype.openScanRetentionTimeQCPlotOverlay = function(cli
 
 	} );
 
+
+	var afterGetScanFileIdsForSearchId = function() {
 		
+		objectThis.getPSMFilterableAnnTypesForSearchId( { searchId : searchId } );
+	};
 	
-	objectThis.getScanFileIdsForSearchId( { 
+	
+	this.getScanFileIdsForSearchId( { 
 		searchId: searchId, 
-		$scanFileIdSelect : $scan_retention_time_qc_plot_scan_file_id,
-		callback: objectThis.createRetentionTimeCountChartFromPageParams,
-		callbackThis : objectThis } );
+		callback: afterGetScanFileIdsForSearchId } );
+	
 };
 
 
-//////////	/
+//////////
 
-QCChartRetentionTime.prototype.closeScanRetentionTimeQCPlotOverlay = function(clickThis, eventObject) {
+///  
 
-	$(".scan_retention_time_qc_plot_overlay_show_hide_parts_jq").hide();
+QCChartRetentionTime.prototype.getPSMFilterableAnnTypesForSearchId = function( params ) {
+
+	var objectThis = this;
+
+
+	var searchId = params.searchId;
+	
+	
+
+
+	if ( ! qcChartsInitialized ) {
+
+		throw "qcChartsInitialized is false"; 
+	}
+
+
+	var _URL = contextPathJSVar + "/services/annotationTypes/getAnnotationTypesPsmFilterableForSearchId";
+
+	var requestData = {
+			searchId : searchId
+	};
+
+//	var request =
+	$.ajax({
+		type : "GET",
+		url : _URL,
+		data : requestData,
+		dataType : "json",
+		success : function(data) {
+
+
+			objectThis.getPSMFilterableAnnTypesForSearchIdResponse(requestData, data, params);
+		},
+        failure: function(errMsg) {
+        	handleAJAXFailure( errMsg );
+        },
+		error : function(jqXHR, textStatus, errorThrown) {
+
+			handleAJAXError(jqXHR, textStatus, errorThrown);
+		}
+	});
+
+	
+	
 };
+
+///
+
+QCChartRetentionTime.prototype.getPSMFilterableAnnTypesForSearchIdResponse = function(requestData, responseData, originalParams) {
+	
+	var annTypes = responseData.annotationTypeDTOList;
+
+	if (  annTypes.length === 0 ) {
+		
+		throw "annTypes.length === 0";
+	}
+	
+	
+	
+	if ( ! this.globals.currentSearchData ) {
+		
+		this.globals.currentSearchData = {};
+	}
+	
+	var annTypesById = {};
+	
+	for ( var annTypesIndex = 0; annTypesIndex < annTypes.length; annTypesIndex++ ) {
+		
+		var annType = annTypes [ annTypesIndex ];
+		
+		var annTypeId = annType.id.toString();  
+		
+		annTypesById[ annTypeId ] = annType;
+	}
+	
+	this.globals.currentSearchData.annotationTypeDataArray = annTypes;
+	
+	this.globals.currentSearchData.annotationTypeDataById = annTypesById;
+	
+	
+	this.getPSMFilterableMaxMinValuesAnnTypes( { searchId : originalParams.searchId } );
+};
+	
+
+
+
+
+///  
+
+QCChartRetentionTime.prototype.getPSMFilterableMaxMinValuesAnnTypes = function( params ) {
+
+	var objectThis = this;
+
+	var searchId = params.searchId;
+
+	var annTypes = this.globals.currentSearchData.annotationTypeDataArray;
+
+
+
+	if ( ! qcChartsInitialized ) {
+
+		throw "qcChartsInitialized is false"; 
+	}
+	
+	
+	var annTypeIds = [];
+	
+	for ( var annTypesIndex = 0; annTypesIndex < annTypes.length; annTypesIndex++ ) {
+		
+		var annType = annTypes[ annTypesIndex ];
+		var annTypeId = annType.id;
+		
+		annTypeIds.push( annTypeId ); 
+	}
+
+
+	var _URL = contextPathJSVar + "/services/annotationTypes/getMinMaxValuesForPsmFilterableAnnTypeIdsSearchId";
+
+	var requestData = {
+			search_id : searchId,
+			ann_type_id : annTypeIds
+	};
+
+//	var request =
+	$.ajax({
+		type : "GET",
+		url : _URL,
+		data : requestData,
+
+		traditional: true,  //  Force traditional serialization of the data sent
+		//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+		//   So proteinIdsToGetSequence array is passed as "proteinIdsToGetSequence=<value>" which is what Jersey expects
+		
+		dataType : "json",
+		success : function(data) {
+
+			objectThis.getPSMFilterableMaxMinValuesAnnTypesResponse(requestData, data, params);
+		},
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+
+			handleAJAXError(jqXHR, textStatus, errorThrown);
+		}
+	});
+};
+
+///
+
+QCChartRetentionTime.prototype.getPSMFilterableMaxMinValuesAnnTypesResponse = function(requestData, responseData, originalParams) {
+
+	var minMaxValuesPerAnnType = responseData.minMaxValuesPerAnnType;
+
+	if ( ! this.globals.currentSearchData ) {
+
+		this.globals.currentSearchData = {};
+	}
+
+	this.globals.currentSearchData.minMaxValuesPerAnnType = minMaxValuesPerAnnType;
+	
+	this.populateAnnTypesSelect( { searchId : originalParams.searchId } );
+};
+
+
+///
+
+QCChartRetentionTime.prototype.populateAnnTypesSelect = function( params ) {
+
+	var annTypes = this.globals.currentSearchData.annotationTypeDataArray;
+	
+	var $scan_retention_time_qc_plot_score_type_id = $("#scan_retention_time_qc_plot_score_type_id");
+
+	$scan_retention_time_qc_plot_score_type_id.empty();
+	
+	var optionsHTMLarray = [];
+	
+	for ( var annTypesIndex = 0; annTypesIndex < annTypes.length; annTypesIndex++ ) {
+		
+		var annType = annTypes[ annTypesIndex ];
+		
+		var html = "<option value='" + annType.id + "'>" + annType.name + "</option>";
 			
-
-
-
+		optionsHTMLarray.push( html );
+	}
+	
+	var optionsHTML = optionsHTMLarray.join("");
+	
+	$scan_retention_time_qc_plot_score_type_id.append( optionsHTML );
+	
+	//  If an annotation type record has sort id of 1, then assign that annotation type id to the selector 
+	
+	for ( var annTypesIndex = 0; annTypesIndex < annTypes.length; annTypesIndex++ ) {
+		
+		var annType = annTypes [ annTypesIndex ];
+		
+		if ( annType.annotationTypeFilterableDTO && annType.annotationTypeFilterableDTO.sortOrder === 1 ) {
+			
+			$scan_retention_time_qc_plot_score_type_id.val( annType.id );
+		}
+	}
+	
+	//  Trigger change on annotation type selector
+	
+	$scan_retention_time_qc_plot_score_type_id.change();
+};
 
 //////////
 
@@ -397,7 +630,8 @@ QCChartRetentionTime.prototype.getScanFileIdsForSearchIdResponse = function(requ
 
 //	var searchId = originalParams.searchId;
 
-	var $scanFileIdSelect = originalParams.$scanFileIdSelect;
+	var $scan_retention_time_qc_plot_scan_file_id = $("#scan_retention_time_qc_plot_scan_file_id");
+	
 	var callback = originalParams.callback;
 	
 
@@ -406,7 +640,7 @@ QCChartRetentionTime.prototype.getScanFileIdsForSearchIdResponse = function(requ
 		throw "scanFileIds.length === 0";
 	}
 	
-	$scanFileIdSelect.empty();
+	$scan_retention_time_qc_plot_scan_file_id.empty();
 	
 	var optionsHTMLarray = [];
 	
@@ -421,18 +655,81 @@ QCChartRetentionTime.prototype.getScanFileIdsForSearchIdResponse = function(requ
 	
 	var optionsHTML = optionsHTMLarray.join("");
 	
-	$scanFileIdSelect.append( optionsHTML );
+	$scan_retention_time_qc_plot_scan_file_id.append( optionsHTML );
 	
 	
 	if ( callback ) {
 		
-		var callbackThis = originalParams.callbackThis;
-		
-		callback.call( callbackThis );  // set the "this" to callbackThis
+		callback();
 	}
 	
 };
 
+/////////////
+
+
+QCChartRetentionTime.prototype.scoreTypeChanged = function( ) {
+
+
+//	var objectThis = this;
+	
+
+	var annTypes = this.globals.currentSearchData.annotationTypeDataById;
+	
+	var minMaxValuesPerAnnType = this.globals.currentSearchData.minMaxValuesPerAnnType;
+		
+
+	var $scan_retention_time_qc_plot_score_type_id = $("#scan_retention_time_qc_plot_score_type_id");
+
+	var selectedAnnTypeId = $scan_retention_time_qc_plot_score_type_id.val( );
+	
+	var annTypeForSelectId = annTypes[ selectedAnnTypeId ];
+	
+	if ( annTypeForSelectId === undefined || annTypeForSelectId === null ) {
+		
+		throw "annType not found for id: " + selectedAnnTypeId;
+	}
+	
+	var minMaxValuesForSelectId = minMaxValuesPerAnnType[ selectedAnnTypeId ];
+
+	if ( minMaxValuesForSelectId === undefined || minMaxValuesForSelectId === null ) {
+		
+		throw "min max values not found for id: " + selectedAnnTypeId;
+	}
+	
+	var $scan_retention_time_qc_plot_min_value_for_ann_type_id = $("#scan_retention_time_qc_plot_min_value_for_ann_type_id");
+	var $scan_retention_time_qc_plot_max_value_for_ann_type_id = $("#scan_retention_time_qc_plot_max_value_for_ann_type_id");
+
+	$scan_retention_time_qc_plot_min_value_for_ann_type_id.text( minMaxValuesForSelectId.minValue );
+	$scan_retention_time_qc_plot_max_value_for_ann_type_id.text( minMaxValuesForSelectId.maxValue );
+	
+
+	var $scan_retention_time_qc_plot_psm_score_cutoff = $("#scan_retention_time_qc_plot_psm_score_cutoff");
+
+
+	var selectedAnnotationTypeFilterableDTO = annTypeForSelectId.annotationTypeFilterableDTO;
+
+	var defaultFilterBoolean = selectedAnnotationTypeFilterableDTO.defaultFilter;
+
+	if ( defaultFilterBoolean ) {
+
+		var newPsmScoreCutoff = selectedAnnotationTypeFilterableDTO.defaultFilterValueString;
+
+		$scan_retention_time_qc_plot_psm_score_cutoff.val( newPsmScoreCutoff );
+		
+		this.createRetentionTimeCountChartFromPageParams( );
+
+	} else {
+		
+		//  No default filter value so clear the input field and remove the chart
+		
+		$scan_retention_time_qc_plot_psm_score_cutoff.val( "" );
+		
+		//  Remove chart
+		
+		this.removeRetentionTimeCountChart();
+	}
+};
 
 
 //////////
@@ -464,13 +761,18 @@ QCChartRetentionTime.prototype.createRetentionTimeCountChartFromPageParams = fun
 	var scanFileId = $scan_retention_time_qc_plot_scan_file_id.val();
 	
 	var scanFileName = $( "#scan_retention_time_qc_plot_scan_file_id option:selected" ).text();
+	
+	var $scan_retention_time_qc_plot_score_type_id = $("#scan_retention_time_qc_plot_score_type_id");
+	
+	var annotationTypeId = $scan_retention_time_qc_plot_score_type_id.val();
+	
 
 	var $scan_retention_time_qc_plot_psm_score_cutoff = $("#scan_retention_time_qc_plot_psm_score_cutoff");
 	
-	var psmQValueCutoff = $scan_retention_time_qc_plot_psm_score_cutoff.val();
+	var psmScoreCutoff = $scan_retention_time_qc_plot_psm_score_cutoff.val();
 	
 	
-	if ( isNaN( parseFloat( psmQValueCutoff ) ) ) {
+	if ( isNaN( parseFloat( psmScoreCutoff ) ) ) {
 		
 //		alert( "psm cutoff not a number" );
 		
@@ -525,15 +827,29 @@ QCChartRetentionTime.prototype.createRetentionTimeCountChartFromPageParams = fun
 	} );
 
 	
-	objectThis.createRetentionTimeCountChart( { psmQValueCutoff : psmQValueCutoff, 
+	objectThis.createRetentionTimeCountChart( { 
+		psmScoreCutoff : psmScoreCutoff,
+		annotationTypeId : annotationTypeId,
 		searchId : searchId,
-		scanFileId : scanFileId, scanFileName : scanFileName,
+		scanFileId : scanFileId, 
+		scanFileName : scanFileName,
 		scansForSelectedLinkTypes : scansForSelectedLinkTypes,
 		userInputMaxX : userInputMaxX,
 		userInputMaxY : userInputMaxY } );
 };
 
 
+
+//////////
+
+///  
+
+QCChartRetentionTime.prototype.removeRetentionTimeCountChart = function(  ) {
+
+	var $scan_retention_time_qc_plot_chartDiv = $("#scan_retention_time_qc_plot_chartDiv");
+	
+	$scan_retention_time_qc_plot_chartDiv.empty();
+};
 
 //////////
 
@@ -547,7 +863,8 @@ QCChartRetentionTime.prototype.createRetentionTimeCountChart = function( params 
 	
 	var searchId = params.searchId;
 	var scanFileId = params.scanFileId;
-	var psmQValueCutoff = params.psmQValueCutoff;
+	var annotationTypeId = params.annotationTypeId;
+	var psmScoreCutoff = params.psmScoreCutoff;
 	var scansForSelectedLinkTypes = params.scansForSelectedLinkTypes;
 	var userInputMaxXString = params.userInputMaxX;
 	
@@ -557,19 +874,19 @@ QCChartRetentionTime.prototype.createRetentionTimeCountChart = function( params 
 	}
 	
 	
+	this.removeRetentionTimeCountChart();
 	
-	var $scan_retention_time_qc_plot_chartDiv = $("#scan_retention_time_qc_plot_chartDiv");
-	
-	$scan_retention_time_qc_plot_chartDiv.empty();
-
 
 	var _URL = contextPathJSVar + "/services/qcplot/getScanRetentionTime";
+	
+	
 	
 	var requestData = {
 			scansForSelectedLinkTypes : scansForSelectedLinkTypes,
 			searchId : searchId,
 			scanFileId : scanFileId,
-			psmQValueCutoff : psmQValueCutoff
+			annotationTypeId : annotationTypeId,
+			psmScoreCutoff : psmScoreCutoff
 	};
 	
 	if ( userInputMaxXString !== "" ) {

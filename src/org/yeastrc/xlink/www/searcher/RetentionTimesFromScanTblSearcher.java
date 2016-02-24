@@ -10,6 +10,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
+import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.enum_classes.FilterDirectionType;
+import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.constants.QCPlotConstants;
 
@@ -32,7 +35,15 @@ public class RetentionTimesFromScanTblSearcher {
 	
 	private static final String SQL_SUB_SELECT__SCAN_IDS_MAIN =
 			" SELECT psm.scan_id FROM psm  " 
-					+ " WHERE psm.search_id = ? AND psm.q_value <= ? ";
+					+ " INNER JOIN "
+			//  If slow, use psm_filterable_annotation__generic_lookup and put more limits in query on search, reported peptide, and maybe link type
+
+			+ " psm_filterable_annotation__generic_lookup" 
+			+ " ON "  
+			+ "psm.id = psm_filterable_annotation__generic_lookup.psm_id " 
+			+ " WHERE psm.search_id = ? "
+			+ 	" AND psm_filterable_annotation__generic_lookup.annotation_type_id = ? "
+			+ 	" AND psm_filterable_annotation__generic_lookup.value_double ";
 
 	private static final String SQL_SUB_SELECT__SCAN_IDS__START_WHERE_PSM_TYPE_IN = " AND psm.type IN ( "; 
 
@@ -41,10 +52,12 @@ public class RetentionTimesFromScanTblSearcher {
 
 
 	public List<BigDecimal> getRetentionTimes( 
+			
 			List<String> scansForSelectedLinkTypes, 
 			int searchId,
 			int scanFileId,
-			double psmQValueCutoff,
+			AnnotationTypeDTO annotationTypeDTO,
+			double psmScoreCutoff,
 			Double retentionTimeInSecondsCutoff
 			) throws Exception {
 		
@@ -92,6 +105,28 @@ public class RetentionTimesFromScanTblSearcher {
 		sqlSB.append( SQL_SELECT__MAIN );
 
 		sqlSB.append( SQL_SUB_SELECT__SCAN_IDS_MAIN );
+		
+
+		if ( annotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
+			
+			String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + annotationTypeDTO.getId();
+			log.error( msg );
+			throw new Exception(msg);
+		}
+		
+		if ( annotationTypeDTO.getAnnotationTypeFilterableDTO().getFilterDirectionType() == FilterDirectionType.ABOVE ) {
+
+			sqlSB.append( SearcherGeneralConstants.SQL_END_BIGGER_VALUE_BETTER );
+
+		} else {
+
+			sqlSB.append( SearcherGeneralConstants.SQL_END_SMALLER_VALUE_BETTER );
+
+		}
+
+		sqlSB.append( " ? " );
+
+		
 
 		if ( webLinkTypeCrosslink
 				&& webLinkTypeLooplink
@@ -189,8 +224,12 @@ public class RetentionTimesFromScanTblSearcher {
 			
 			paramCounter++;
 			pstmt.setInt( paramCounter, searchId );
+			
 			paramCounter++;
-			pstmt.setDouble( paramCounter, psmQValueCutoff );
+			pstmt.setInt( paramCounter, annotationTypeDTO.getId() );
+			
+			paramCounter++;
+			pstmt.setDouble( paramCounter, psmScoreCutoff );
 
 			
 			paramCounter++;
