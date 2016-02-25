@@ -7,8 +7,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
+import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.utils.XLinkUtils;
+import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.constants.QCPlotConstants;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDBDataOutOfSyncException;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.searcher.ScoreCountFromPsmTblSearcher;
 
 
@@ -57,6 +63,50 @@ public class CreatePsmCountsVsScoreQCPlotData {
 
 			throw new IllegalArgumentException( msg );
 		}
+		
+		List<Integer> searchIdsList = new ArrayList<>( 1 );
+		searchIdsList.add( searchId );
+		
+		Map<Integer, Map<Integer, AnnotationTypeDTO>> annotationTypeDataAllSearchIds = 
+				GetAnnotationTypeData.getInstance()
+				.getAll_Psm_Filterable_ForSearchIds( searchIdsList );
+		
+		Map<Integer, AnnotationTypeDTO> annotationTypeDataForSearchId = annotationTypeDataAllSearchIds.get( searchId );
+		
+		if ( annotationTypeDataForSearchId == null ) {
+			
+			String msg = "No Filterable PSM Annotation types for search id: " + searchId;
+			log.error(msg);
+			throw new ProxlWebappDataException(msg);
+		}
+		
+		AnnotationTypeDTO annotationTypeDTO = annotationTypeDataForSearchId.get( annotationTypeId );
+
+		if ( annotationTypeDTO == null ) {
+			
+			String msg = "No Filterable PSM Annotation type for search id: " + searchId + ", annotationTypeId: " + annotationTypeId;
+			log.error(msg);
+			throw new ProxlWebappDataException(msg);
+		}
+		
+		AnnotationTypeFilterableDTO annotationTypeFilterableDTO = annotationTypeDTO.getAnnotationTypeFilterableDTO();
+
+		if ( annotationTypeFilterableDTO == null ) {
+			
+			String msg = "No annotationTypeFilterableDTO for Filterable PSM Annotation type for search id: " + searchId + ", annotationTypeId: " + annotationTypeId;
+			log.error(msg);
+			throw new ProxlWebappDataException(msg);
+		}
+		
+		FilterDirectionType filterDirectionType = annotationTypeFilterableDTO.getFilterDirectionType();
+		
+		
+		if ( filterDirectionType != FilterDirectionType.ABOVE && filterDirectionType != FilterDirectionType.BELOW ) {
+			
+			String msg = "value for filterDirectionType is unexpected for search id: " + searchId + ", filterDirectionType: " + filterDirectionType.toString();
+			log.error(msg);
+			throw new ProxlWebappDBDataOutOfSyncException( msg );
+		}		
 		
 		
 		//  Keyed on Selected Link Type
@@ -248,22 +298,35 @@ public class CreatePsmCountsVsScoreQCPlotData {
 
 
 			List<PsmCountsVsScoreQCPlotDataJSONChartBucket> chartBuckets = new ArrayList<>();
+			
+			if ( filterDirectionType == FilterDirectionType.BELOW && scoreMinForPuttingInBins == 0 ) {
 
-			
-			
-			PsmCountsVsScoreQCPlotDataJSONChartBucket chartBucketMinValue = new PsmCountsVsScoreQCPlotDataJSONChartBucket();
-			chartBucketMinValue.setBinEnd( scoreMinForPuttingInBins );
-			chartBucketMinValue.setTotalCount( scoreValueMinValueCount );
-			
-			
-			chartBuckets.add( chartBucketMinValue );
+				//  Special case bucket for left edge, originally for Q-Value value of zero
+				
+				//  Only create if FilterDirectionType.BELOW and min value is zero
 
+				PsmCountsVsScoreQCPlotDataJSONChartBucket chartBucketMinValue = new PsmCountsVsScoreQCPlotDataJSONChartBucket();
+
+				chartBucketMinValue.setBinStart( scoreMinForPuttingInBins );
+				chartBucketMinValue.setBinEnd( scoreMinForPuttingInBins );
+
+				chartBucketMinValue.setTotalCount( scoreValueMinValueCount );
+
+
+				chartBuckets.add( chartBucketMinValue );
+			}
 
 
 			//  Take the data in the bins and  create "buckets" in the format required for the charting API
 
 			int totalScoreValueCount = 0;
 
+			// TODO
+			if ( filterDirectionType == FilterDirectionType.ABOVE ) {
+				
+				totalScoreValueCount = totalCountForType;
+			}
+			
 
 			for ( int binIndex = 0; binIndex < scoreValueCounts.length; binIndex++ ) {
 
@@ -273,13 +336,19 @@ public class CreatePsmCountsVsScoreQCPlotData {
 
 				int scoreValueCount = scoreValueCounts[ binIndex ];
 
-				totalScoreValueCount += scoreValueCount;
+
+				if ( filterDirectionType == FilterDirectionType.BELOW ) {
+						
+					//  Increment it before taking the value
+					
+					totalScoreValueCount += scoreValueCount;
+				}
 
 				double binStartDouble = ( ( binIndex * binSizeAsDouble ) + scoreMinForPuttingInBins );
 
-				if ( binIndex == 0 && binStartDouble < 0 ) {
+				if ( binIndex == 0 && binStartDouble < scoreMinForPuttingInBins ) {
 
-					chartBucket.setBinStart( 0 );
+					chartBucket.setBinStart( scoreMinForPuttingInBins );
 				} else { 
 
 					chartBucket.setBinStart( binStartDouble );
@@ -291,6 +360,13 @@ public class CreatePsmCountsVsScoreQCPlotData {
 				chartBucket.setBinEnd( binEnd );
 
 				chartBucket.setTotalCount( totalScoreValueCount );
+				
+				if ( filterDirectionType == FilterDirectionType.ABOVE ) {
+
+					//  Decrement it after taking the value
+					
+					totalScoreValueCount -= scoreValueCount;
+				}
 			}
 			
 			linkData.setChartBuckets( chartBuckets );
@@ -313,6 +389,15 @@ public class CreatePsmCountsVsScoreQCPlotData {
 		psmCountsVsScoreQCPlotDataJSONRoot.setCrosslinkData( crosslinkData );
 		psmCountsVsScoreQCPlotDataJSONRoot.setLooplinkData( looplinkData );
 		psmCountsVsScoreQCPlotDataJSONRoot.setUnlinkedData( unlinkedData );
+		
+		if ( filterDirectionType == FilterDirectionType.ABOVE ) {
+			
+			psmCountsVsScoreQCPlotDataJSONRoot.setSortDirectionAbove(true);
+			
+		} else if ( filterDirectionType == FilterDirectionType.BELOW ) {
+			
+			psmCountsVsScoreQCPlotDataJSONRoot.setSortDirectionBelow(true);
+		}
 
 		return psmCountsVsScoreQCPlotDataJSONRoot;
 	}

@@ -4,12 +4,12 @@ package org.yeastrc.xlink.www.objects;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
-import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
-import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
+//import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
+//import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
+//import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 
 
@@ -20,7 +20,7 @@ import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
  */
 public class SearchProteinDimer  {	
 	
-	private static final Logger log = Logger.getLogger(SearchProteinDimer.class);
+//	private static final Logger log = Logger.getLogger(SearchProteinDimer.class);
 	
 	public SearchProtein getProtein1() {
 		return protein1;
@@ -35,116 +35,118 @@ public class SearchProteinDimer  {
 		this.protein2 = protein2;
 	}
 
-	/**
-	 * Returns the number of PSMs found for this crosslink, given its cutoffs
-	 * @return
-	 * @throws Exception
-	 */
-	public int getNumPsms() throws Exception {
-
-		try {
-			if( this.numPsms == null ) {
-								
-				this.numPsms =
-						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForDimer(
-								this.getSearch().getId(),
-								this.getSearcherCutoffValuesSearchLevel(),
-								this.getProtein1().getNrProtein().getNrseqId(),
-								this.getProtein2().getNrProtein().getNrseqId() );
-
-			}
-
-			return this.numPsms;
-
-		} catch ( Exception e ) {
-
-			String msg = "Exception in getNumPsms()";
-
-			log.error( msg, e );
-
-			throw e;
-		}
-	}
-	
-	public int getNumLinkedPeptides() throws Exception {
-
-		try {
-			if( this.numLinkedPeptides == -1 ) {
-				
-				this.numLinkedPeptides = 
-						NumPeptidesForProteinCriteriaSearcher.getInstance()
-						.getNumLinkedPeptidesForDimer( 
-								this.getSearch().getId(),
-								this.getSearcherCutoffValuesSearchLevel(),
-								this.getProtein1().getNrProtein().getNrseqId(),
-								this.getProtein2().getNrProtein().getNrseqId() );
-			}
-
-			return this.numLinkedPeptides;
-
-		} catch ( Exception e ) {
-
-			String msg = "Exception in getNumLinkedPeptides()";
-
-			log.error( msg, e );
-
-			throw e;
-		}
-	}
-	
-	
-	public int getNumUniqueLinkedPeptides() throws Exception {
-
-		try {
-			if( this.numUniqueLinkedPeptides == -1 ) {
-				
-				this.numUniqueLinkedPeptides = 
-						NumPeptidesForProteinCriteriaSearcher.getInstance()
-						.getNumUniqueLinkedPeptidesForDimer(
-								this.getSearch().getId(),
-								this.getSearcherCutoffValuesSearchLevel(),
-								this.getProtein1().getNrProtein().getNrseqId(),
-								this.getProtein2().getNrProtein().getNrseqId(),
-								YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
-			}
-
-			return this.numUniqueLinkedPeptides;
-
-		} catch ( Exception e ) {
-
-			String msg = "Exception in getNumUniqueLinkedPeptides()";
-
-			log.error( msg, e );
-
-			throw e;
-		}
-	}
-
-	
-	
-	/**
-	 * Only set if the PSM and Peptide Cutoffs match
-	 * @param numPsms
-	 */
-	public void setNumPsms(Integer numPsms) {
-		this.numPsms = numPsms;
-	}
-	
-	/**
-	 * Only set if the PSM and Peptide Cutoffs match
-	 * @param numLinkedPeptides
-	 */
-	public void setNumLinkedPeptides(int numLinkedPeptides) {
-		this.numLinkedPeptides = numLinkedPeptides;
-	}
-	
-	/**
-	 * Only set if the PSM and Peptide Cutoffs match
-	 * @param numUniqueLinkedPeptides
-	 */
-	public void setNumUniqueLinkedPeptides(int numUniqueLinkedPeptides) {
-		this.numUniqueLinkedPeptides = numUniqueLinkedPeptides;
-	}
+	//  Not used.  The fields are not set for default annotation cutoffs
+//	
+//	/**
+//	 * Returns the number of PSMs found for this dimer, given its cutoffs
+//	 * @return
+//	 * @throws Exception
+//	 */
+//	public int getNumPsms() throws Exception {
+//
+//		try {
+//			if( this.numPsms == null ) {
+//								
+//				this.numPsms =
+//						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForDimer(
+//								this.getSearch().getId(),
+//								this.getSearcherCutoffValuesSearchLevel(),
+//								this.getProtein1().getNrProtein().getNrseqId(),
+//								this.getProtein2().getNrProtein().getNrseqId() );
+//
+//			}
+//
+//			return this.numPsms;
+//
+//		} catch ( Exception e ) {
+//
+//			String msg = "Exception in getNumPsms()";
+//
+//			log.error( msg, e );
+//
+//			throw e;
+//		}
+//	}
+//	
+//	public int getNumLinkedPeptides() throws Exception {
+//
+//		try {
+//			if( this.numLinkedPeptides == -1 ) {
+//				
+//				this.numLinkedPeptides = 
+//						NumPeptidesForProteinCriteriaSearcher.getInstance()
+//						.getNumLinkedPeptidesForDimer( 
+//								this.getSearch().getId(),
+//								this.getSearcherCutoffValuesSearchLevel(),
+//								this.getProtein1().getNrProtein().getNrseqId(),
+//								this.getProtein2().getNrProtein().getNrseqId() );
+//			}
+//
+//			return this.numLinkedPeptides;
+//
+//		} catch ( Exception e ) {
+//
+//			String msg = "Exception in getNumLinkedPeptides()";
+//
+//			log.error( msg, e );
+//
+//			throw e;
+//		}
+//	}
+//	
+//	
+//	public int getNumUniqueLinkedPeptides() throws Exception {
+//
+//		try {
+//			if( this.numUniqueLinkedPeptides == -1 ) {
+//				
+//				this.numUniqueLinkedPeptides = 
+//						NumPeptidesForProteinCriteriaSearcher.getInstance()
+//						.getNumUniqueLinkedPeptidesForDimer(
+//								this.getSearch().getId(),
+//								this.getSearcherCutoffValuesSearchLevel(),
+//								this.getProtein1().getNrProtein().getNrseqId(),
+//								this.getProtein2().getNrProtein().getNrseqId(),
+//								YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
+//			}
+//
+//			return this.numUniqueLinkedPeptides;
+//
+//		} catch ( Exception e ) {
+//
+//			String msg = "Exception in getNumUniqueLinkedPeptides()";
+//
+//			log.error( msg, e );
+//
+//			throw e;
+//		}
+//	}
+//
+//	
+//	
+//	/**
+//	 * Only set if the PSM and Peptide Cutoffs match
+//	 * @param numPsms
+//	 */
+//	public void setNumPsms(Integer numPsms) {
+//		this.numPsms = numPsms;
+//	}
+//	
+//	/**
+//	 * Only set if the PSM and Peptide Cutoffs match
+//	 * @param numLinkedPeptides
+//	 */
+//	public void setNumLinkedPeptides(int numLinkedPeptides) {
+//		this.numLinkedPeptides = numLinkedPeptides;
+//	}
+//	
+//	/**
+//	 * Only set if the PSM and Peptide Cutoffs match
+//	 * @param numUniqueLinkedPeptides
+//	 */
+//	public void setNumUniqueLinkedPeptides(int numUniqueLinkedPeptides) {
+//		this.numUniqueLinkedPeptides = numUniqueLinkedPeptides;
+//	}
 
 
 	public SearchDTO getSearch() {
@@ -246,11 +248,11 @@ public class SearchProteinDimer  {
 
 //	private List<SearchPeptideDimer> peptides;
 	
-	private Integer numPsms;
-
-	private int numLinkedPeptides = -1;
-	
-	private int numUniqueLinkedPeptides = -1;
+//	private Integer numPsms;
+//
+//	private int numLinkedPeptides = -1;
+//	
+//	private int numUniqueLinkedPeptides = -1;
 
 	
 	private SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel;

@@ -29,14 +29,24 @@ public class GetAnnotationTypeData {
 
 	
 	private static final int CACHE_MAX_SIZE = 60;
-	private static final int CACHE_TIMEOUT = 20; // in seconds
-	
+
+//	private static final int CACHE_TIMEOUT = 20; // in seconds
+
+	private static final int CACHE_TIMEOUT = 4; // in seconds
+
 	/**
 	 * This is the time after which the cache entry is replaced
 	 * 
 	 * currently 5 minutes
 	 */
-	private static final int CACHE__FORCED_TIMEOUT = 5 * 60 * 1000; // in milliseconds
+//	private static final int CACHE__FORCED_TIMEOUT = 5 * 60 * 1000; // in milliseconds
+	
+	/**
+	 * This is the time after which the cache entry is replaced
+	 * 
+	 * currently 10 seconds
+	 */
+	private static final int CACHE__FORCED_TIMEOUT = 10 * 1000; // in milliseconds
 	
 	
 	

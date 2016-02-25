@@ -17,6 +17,20 @@
 //CONSTANTS
 
 
+var PSM_COUNT_VS_SCORE_CHART_BIN_START_OR_END_TO_FIXED_VALUE = 2;
+
+var PSM_COUNT_VS_SCORE_CHART_PERCENTAGE_OF_MAX_TO_FIXED_VALUE = 1;
+
+
+//var PSM_COUNT_VS_SCORE_CHART_COMPARISON_DIRECTION_STRING_ABOVE = ">=";
+//var PSM_COUNT_VS_SCORE_CHART_COMPARISON_DIRECTION_STRING_BELOW = "<=";
+
+var PSM_COUNT_VS_SCORE_CHART_COMPARISON_DIRECTION_STRING_ABOVE = "\u2265"; // ">="
+var PSM_COUNT_VS_SCORE_CHART_COMPARISON_DIRECTION_STRING_BELOW = "\u2264"; // "<="
+
+
+
+
 var PSM_COUNT_VS_SCORE_CHART_WIDTH = 920;
 var PSM_COUNT_VS_SCORE_CHART_HEIGHT = 650;
 
@@ -277,8 +291,6 @@ QCChartPSMCountVsScores.prototype.openPSMCountVsScoreQCPlotOverlay = function(cl
 	$psm_count_vs_score_qc_plot_overlay_container.css( "top", positionAdjust );
 
 	
-	//  TODO  TEMP
-
 	var $psm_count_vs_score_qc_plot_overlay_container = $("#psm_count_vs_score_qc_plot_overlay_container");
 
 	var $psm_count_vs_score_qc_plot_overlay_background = $("#psm_count_vs_score_qc_plot_overlay_background"); 
@@ -836,6 +848,29 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 	}
 	
 	
+
+//	<xs:simpleType name="filter_direction_type">
+//	The direction a filterable annotation type is sorted in.  
+//	If set to "below", attributes with lower values are considered more significant (such as in the case of p-values). 
+//	If set to "above", attributes with higher values are considered more significant (such as in the case of XCorr).
+
+	
+	var comparisonDirectionString = "???";
+	
+	if ( chartDataParam.sortDirectionAbove ) {
+		
+		comparisonDirectionString = PSM_COUNT_VS_SCORE_CHART_COMPARISON_DIRECTION_STRING_ABOVE;
+		
+	} else if ( chartDataParam.sortDirectionBelow ) {
+		
+		comparisonDirectionString = PSM_COUNT_VS_SCORE_CHART_COMPARISON_DIRECTION_STRING_BELOW;
+	} else {
+		
+		throw "sortDirectionBelow or sortDirectionAbove must be true";
+	}
+	
+	
+	
 	var displayAsPercentage = false;
 	
 	if ( $("#psm_count_vs_score_qc_plot_y_axis_as_percentage").prop("checked") ) {
@@ -877,7 +912,7 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 //	combined: #a5a5a5 (gray)
 	
 	
-	var chartDataHeaderEntry = [ "q_value" ];
+	var chartDataHeaderEntry = [ selectedAnnotationTypeText ];
 	
 	if ( alllinkChartData ) {
 
@@ -920,15 +955,9 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 	}
 	
 	
-	
-	
 	chartData.push( chartDataHeaderEntry );
 
 
-	var _BIN_END_TO_FIXED_VALUE = 2;
-	
-	var _PERCENTAGE_OF_MAX_TO_FIXED_VALUE = 1;
-	
 	var processBucketForType = function( params ) {
 
 		var dataForType = params.dataForType;
@@ -942,7 +971,16 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 				
 				// Add position to chartDataEntry array if chartDataEntry is empty
 				
-				chartDataEntry.push( bucket.binEnd );
+				
+				if ( chartDataParam.sortDirectionAbove ) {
+					
+					chartDataEntry.push( bucket.binStart );	
+					
+				} else if ( chartDataParam.sortDirectionBelow ) {
+					
+					chartDataEntry.push( bucket.binEnd );	
+				}
+				
 			}
 			
 			var chartDataValue = bucket.totalCount;
@@ -953,8 +991,21 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 			}
 
 			chartDataEntry.push( chartDataValue );
+
+			//  For "above" display the left edge of the bucket, otherwise the right edge
 			
-			var binEndRounded = bucket.binEnd.toFixed( _BIN_END_TO_FIXED_VALUE );
+			var bucketStartOrEndForDisplayNumber; 
+			
+			if ( chartDataParam.sortDirectionAbove ) {
+				
+				bucketStartOrEndForDisplayNumber = bucket.binStart;
+				
+			} else {
+				
+				bucketStartOrEndForDisplayNumber = bucket.binEnd;
+			}			
+			
+			var bucketStartOrEndForDisplayNumberRounded = bucketStartOrEndForDisplayNumber.toFixed( PSM_COUNT_VS_SCORE_CHART_BIN_START_OR_END_TO_FIXED_VALUE );
 
 			var rawCount = bucket.totalCount;
 			
@@ -971,12 +1022,12 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 			
 			if ( displayAsPercentage ) {
 				
-				var chartDataValueRounded = chartDataValue.toFixed( _PERCENTAGE_OF_MAX_TO_FIXED_VALUE );
+				var chartDataValueRounded = chartDataValue.toFixed( PSM_COUNT_VS_SCORE_CHART_PERCENTAGE_OF_MAX_TO_FIXED_VALUE );
 			
 				tooltip += "<br>Percent of Max: " + chartDataValueRounded; 
 			}
 			
-			tooltip += "<br>" + selectedAnnotationTypeText + " <= " + binEndRounded + "</div>";
+			tooltip += "<br>" + selectedAnnotationTypeText + " " + comparisonDirectionString + " " + bucketStartOrEndForDisplayNumberRounded + "</div>";
 			
 			chartDataEntry.push( tooltip );
 		}
@@ -1012,7 +1063,7 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 	var chartTitle = "Cumulative PSM Count vs " + selectedAnnotationTypeText + "\n" + searchNameAndNumberInParens;
 	
 	
-	var yAxisLabel = "Cumulative PSM Count";
+	var yAxisLabel = "# PSM " + comparisonDirectionString + " " + selectedAnnotationTypeText;
 	
 
 	if ( displayAsPercentage ) {

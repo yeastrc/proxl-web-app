@@ -16,7 +16,25 @@ public class PsmCountsVsScoreQCPlotDataJSONRoot {
 	
 	private int dataArraySize;
 	
+	private boolean sortDirectionAbove;
+	private boolean sortDirectionBelow;
 	
+
+	public boolean isSortDirectionAbove() {
+		return sortDirectionAbove;
+	}
+
+	public void setSortDirectionAbove(boolean sortDirectionAbove) {
+		this.sortDirectionAbove = sortDirectionAbove;
+	}
+
+	public boolean isSortDirectionBelow() {
+		return sortDirectionBelow;
+	}
+
+	public void setSortDirectionBelow(boolean sortDirectionBelow) {
+		this.sortDirectionBelow = sortDirectionBelow;
+	}
 
 	public int getDataArraySize() {
 		return dataArraySize;

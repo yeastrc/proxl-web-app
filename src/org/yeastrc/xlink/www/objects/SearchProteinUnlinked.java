@@ -3,12 +3,12 @@ package org.yeastrc.xlink.www.objects;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
-import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
-import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
+//import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
+//import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
+//import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 
 /**
@@ -17,7 +17,7 @@ import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
  */
 public class SearchProteinUnlinked {
 
-	private static final Logger log = Logger.getLogger(SearchProteinUnlinked.class);
+//	private static final Logger log = Logger.getLogger(SearchProteinUnlinked.class);
 	
 	public SearchProtein getProtein() {
 		return protein;
@@ -57,49 +57,43 @@ public class SearchProteinUnlinked {
 	}
 
 
-	/**
-	 * Returns the number of PSMs found for this crosslink, given its cutoffs
-	 * @return
-	 * @throws Exception
-	 */
-	public int getNumPsms() throws Exception {
-		
-		try {
-			if( this.numPsms == null ) {
-				
-				this.numPsms =
-						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForUnlinked(
-								this.getSearch().getId(),
-								this.getSearcherCutoffValuesSearchLevel(),
-								this.getProtein().getNrProtein().getNrseqId() );
-
-			}
-
-			return this.numPsms;
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Exception in getNumPsms()";
-			
-			log.error( msg, e );
-			
-			throw e;
-		}
-	}
-
+	//  Not used.  The fields are not set for default annotation cutoffs
 	
-	public void setNumPsms(int numPsms) {
-		
-//		if ( true ) {
-//			
-//			throw new RuntimeException( "TEMP not supported" );
-//		}
+//	/**
+//	 * Returns the number of PSMs found for this crosslink, given its cutoffs
+//	 * @return
+//	 * @throws Exception
+//	 */
+//	public int getNumPsms() throws Exception {
 //		
+//		try {
+//			if( this.numPsms == null ) {
+//				
+//				this.numPsms =
+//						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForUnlinked(
+//								this.getSearch().getId(),
+//								this.getSearcherCutoffValuesSearchLevel(),
+//								this.getProtein().getNrProtein().getNrseqId() );
 //
-//		//  TODO TEMP COMMENT OUT
-		
-		this.numPsms = numPsms;
-	}
+//			}
+//
+//			return this.numPsms;
+//			
+//		} catch ( Exception e ) {
+//			
+//			String msg = "Exception in getNumPsms()";
+//			
+//			log.error( msg, e );
+//			
+//			throw e;
+//		}
+//	}
+//
+//	
+//	public void setNumPsms(int numPsms) {
+//		
+//		this.numPsms = numPsms;
+//	}
 	
 	
 	
@@ -120,100 +114,77 @@ public class SearchProteinUnlinked {
 //	
 //	public void setNumUniquePsms(int numUniquePsms) {
 //		
-//		if ( true ) {
-//			
-//			throw new RuntimeException( "TEMP not supported" );
-//		}
-//		
-//		
-//		//  TODO TEMP COMMENT OUT
 //		
 ////		this.numUniquePsms = numUniquePsms;
 //	}
-	
-	
-	
-
-	public void setNumPeptides(int numPeptides) {
-		
-//		if ( true ) {
-//			
-//			throw new RuntimeException( "TEMP not supported" );
-//		}
+//	
+//	
+//	
+//
+//	public void setNumPeptides(int numPeptides) {
 //		
-
-		//  TODO TEMP COMMENT OUT
-		
-		this.numPeptides = numPeptides;
-	}
-	
-	
-	public int getNumPeptides() throws Exception {
-		
-		try {
-			if( this.numPeptides == -1 ) {
-				
-				this.numPeptides = 
-						NumPeptidesForProteinCriteriaSearcher.getInstance()
-						.getNumPeptidesForUnlinked(
-								this.getSearch().getId(),
-								this.getSearcherCutoffValuesSearchLevel(),
-								this.getProtein().getNrProtein().getNrseqId() );
-			}
-
-			return this.numPeptides;
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Exception in getNumPeptides()";
-			
-			log.error( msg, e );
-			
-			throw e;
-		}
-	}
-
-	public void setNumUniquePeptides(int numUniquePeptides) {
-		
-		
-//		if ( true ) {
+//		
+//		this.numPeptides = numPeptides;
+//	}
+//	
+//	
+//	public int getNumPeptides() throws Exception {
+//		
+//		try {
+//			if( this.numPeptides == -1 ) {
+//				
+//				this.numPeptides = 
+//						NumPeptidesForProteinCriteriaSearcher.getInstance()
+//						.getNumPeptidesForUnlinked(
+//								this.getSearch().getId(),
+//								this.getSearcherCutoffValuesSearchLevel(),
+//								this.getProtein().getNrProtein().getNrseqId() );
+//			}
+//
+//			return this.numPeptides;
 //			
-//			throw new RuntimeException( "TEMP not supported" );
+//		} catch ( Exception e ) {
+//			
+//			String msg = "Exception in getNumPeptides()";
+//			
+//			log.error( msg, e );
+//			
+//			throw e;
 //		}
-		
-
-		//  TODO TEMP COMMENT OUT
-		
-		this.numUniquePeptides = numUniquePeptides;
-	}
-	
-	public int getNumUniquePeptides() throws Exception {
-		
-		try {
-			if( this.numUniquePeptides == -1 ) {
-				
-				
-
-				this.numUniquePeptides = 
-						NumPeptidesForProteinCriteriaSearcher.getInstance()
-						.getNumUniquePeptidesForUnlinked(
-								this.getSearch().getId(),
-								this.getSearcherCutoffValuesSearchLevel(),
-								this.getProtein().getNrProtein().getNrseqId(),
-								YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
-			}
-
-			return this.numUniquePeptides;
-
-		} catch ( Exception e ) {
-
-			String msg = "Exception in getNumUniquePeptides()";
-
-			log.error( msg, e );
-
-			throw e;
-		}
-	}
+//	}
+//
+//	public void setNumUniquePeptides(int numUniquePeptides) {
+//		
+//		this.numUniquePeptides = numUniquePeptides;
+//	}
+//	
+//	public int getNumUniquePeptides() throws Exception {
+//		
+//		try {
+//			if( this.numUniquePeptides == -1 ) {
+//				
+//				
+//
+//				this.numUniquePeptides = 
+//						NumPeptidesForProteinCriteriaSearcher.getInstance()
+//						.getNumUniquePeptidesForUnlinked(
+//								this.getSearch().getId(),
+//								this.getSearcherCutoffValuesSearchLevel(),
+//								this.getProtein().getNrProtein().getNrseqId(),
+//								YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
+//			}
+//
+//			return this.numUniquePeptides;
+//
+//		} catch ( Exception e ) {
+//
+//			String msg = "Exception in getNumUniquePeptides()";
+//
+//			log.error( msg, e );
+//
+//			throw e;
+//		}
+//	}
 
 	public List<String> getPsmAnnotationValueList() {
 		return psmAnnotationValueList;
@@ -268,11 +239,11 @@ public class SearchProteinUnlinked {
 	private SearchDTO search;
 	private int proteinPosition;
 	
-	private Integer numPsms;
+//	private Integer numPsms;
 //	private int numUniquePsms;
 
-	private int numPeptides = -1;
-	private int numUniquePeptides = -1;
+//	private int numPeptides = -1;
+//	private int numUniquePeptides = -1;
 
 	
 //	List<SearchPeptideUnlinked> peptides;

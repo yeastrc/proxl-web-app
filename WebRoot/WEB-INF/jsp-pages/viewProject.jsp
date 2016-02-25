@@ -2006,8 +2006,8 @@
 									class="scan_retention_time_qc_plot_on_change_jq"
 									size="4">
 									
-								(<span id="scan_retention_time_qc_plot_min_value_for_ann_type_id"
-									></span>, <span id="scan_retention_time_qc_plot_max_value_for_ann_type_id"></span>)
+								(min: <span id="scan_retention_time_qc_plot_min_value_for_ann_type_id"
+									></span>, max: <span id="scan_retention_time_qc_plot_max_value_for_ann_type_id"></span>)
 							</td>
 						</tr>
 

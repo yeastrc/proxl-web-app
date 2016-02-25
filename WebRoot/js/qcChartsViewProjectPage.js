@@ -709,9 +709,9 @@ QCChartRetentionTime.prototype.scoreTypeChanged = function( ) {
 
 	var selectedAnnotationTypeFilterableDTO = annTypeForSelectId.annotationTypeFilterableDTO;
 
-	var defaultFilterBoolean = selectedAnnotationTypeFilterableDTO.defaultFilter;
+	var defaultFilterValueString = selectedAnnotationTypeFilterableDTO.defaultFilterValueString;
 
-	if ( defaultFilterBoolean ) {
+	if ( defaultFilterValueString !== undefined && defaultFilterValueString !== null && defaultFilterValueString !== "" ) {
 
 		var newPsmScoreCutoff = selectedAnnotationTypeFilterableDTO.defaultFilterValueString;
 
