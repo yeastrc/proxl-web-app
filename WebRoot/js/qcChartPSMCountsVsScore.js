@@ -1068,7 +1068,7 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 
 	if ( displayAsPercentage ) {
 		
-		yAxisLabel = "Cumulative PSM Count (% of max)";
+		yAxisLabel = "# PSM " + comparisonDirectionString + " " + selectedAnnotationTypeText + " (% of max)";
 	}
 	
 	var optionsFullsize = {
