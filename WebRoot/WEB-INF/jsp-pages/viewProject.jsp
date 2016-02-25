@@ -2220,25 +2220,25 @@
 							  <label >
 								<input type="checkbox" class="psm_count_vs_score_qc_plot_link_type_include_jq psm_count_vs_score_qc_plot_on_change_jq"
 									checked="checked"
-									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__CROSSLINK_PSM%>" >
+									value="<%=QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__CROSSLINK_PSM%>" >
 								crosslinks
 							  </label>
 							  <label >
 								<input type="checkbox" class="psm_count_vs_score_qc_plot_link_type_include_jq psm_count_vs_score_qc_plot_on_change_jq"
 									checked="checked"
-									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__LOOPLINK_PSM%>" >
+									value="<%=QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__LOOPLINK_PSM%>" >
 								looplinks
 							  </label> 
 							  
 							  <label >
 								<input type="checkbox" class="psm_count_vs_score_qc_plot_link_type_include_jq psm_count_vs_score_qc_plot_on_change_jq"
 									checked="checked"
-									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__UNLINKED_PSM%>" >
+									value="<%=QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__UNLINKED_PSM%>" >
 								unlinked
 							  </label>
 							  <label >
 								<input type="checkbox" class="psm_count_vs_score_qc_plot_link_type_include_jq psm_count_vs_score_qc_plot_on_change_jq"
-									value="<%=QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__ALL_PSM%>" >
+									value="<%=QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__ALL_PSM%>" >
 								all
 							  </label> 							  
 <%-- 							  

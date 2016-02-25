@@ -1,10 +1,10 @@
-package org.yeastrc.xlink.www.qc_plots.psm_count_per_q_value;
+package org.yeastrc.xlink.www.qc_plots.psm_count_for_score;
 
 import java.util.List;
 
-public class PsmCountPerQValueQCPlotDataJSONPerType {
+public class PsmCountsVsScoreQCPlotDataJSONPerType {
 
-	private List<PsmCountPerQValueQCPlotDataJSONChartBucket> chartBuckets;
+	private List<PsmCountsVsScoreQCPlotDataJSONChartBucket> chartBuckets;
 	
 	private int totalCountForType;
 	
@@ -14,11 +14,11 @@ public class PsmCountPerQValueQCPlotDataJSONPerType {
 	public void setTotalCountForType(int totalCountForType) {
 		this.totalCountForType = totalCountForType;
 	}
-	public List<PsmCountPerQValueQCPlotDataJSONChartBucket> getChartBuckets() {
+	public List<PsmCountsVsScoreQCPlotDataJSONChartBucket> getChartBuckets() {
 		return chartBuckets;
 	}
 	public void setChartBuckets(
-			List<PsmCountPerQValueQCPlotDataJSONChartBucket> chartBuckets) {
+			List<PsmCountsVsScoreQCPlotDataJSONChartBucket> chartBuckets) {
 		this.chartBuckets = chartBuckets;
 	}
 

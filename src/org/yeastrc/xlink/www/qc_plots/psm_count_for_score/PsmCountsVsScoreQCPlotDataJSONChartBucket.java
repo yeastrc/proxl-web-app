@@ -1,6 +1,6 @@
-package org.yeastrc.xlink.www.qc_plots.psm_count_per_q_value;
+package org.yeastrc.xlink.www.qc_plots.psm_count_for_score;
 
-public class PsmCountPerQValueQCPlotDataJSONChartBucket {
+public class PsmCountsVsScoreQCPlotDataJSONChartBucket {
 
 	private double binStart;
 	private double binEnd;

@@ -4,11 +4,14 @@ package org.yeastrc.xlink.www.webservices;
 
 
 
-
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -21,35 +24,36 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.qc_plots.psm_count_for_score.CreatePsmCountsVsScoreQCPlotData;
-import org.yeastrc.xlink.www.qc_plots.psm_count_for_score.PsmCountsVsScoreQCPlotDataJSONRoot;
+import org.yeastrc.xlink.www.objects.PSMAnnotationFilterableTypesForSearchIdServiceResult;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
 
-@Path("/qcplot")
-public class QCPlotPsmCountsVsScoreService {
+@Path("/annotationTypes")
+public class AnnotationTypesForSearchIdService {
 
-	private static final Logger log = Logger.getLogger(QCPlotPsmCountsVsScoreService.class);
+	private static final Logger log = Logger.getLogger(AnnotationTypesForSearchIdService.class);
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/getPsmCountsVsScore") 
-	public PsmCountsVsScoreQCPlotDataJSONRoot getViewerData( 
-			@QueryParam( "selectedLinkTypes" ) Set<String> selectedLinkTypes,			
+	@Path("/getAnnotationTypesPsmFilterableForSearchId") 
+	public PSMAnnotationFilterableTypesForSearchIdServiceResult getPSMFilterableAnnTypesForSearchId( 
 			@QueryParam( "searchId" ) int searchId,
-			@QueryParam( "annotationTypeId" ) int annotationTypeId,
-			@QueryParam( "psmScoreCutoff" ) Double psmScoreCutoff,
 			@Context HttpServletRequest request )
 	throws Exception {
 		
 
+		
+		
+		
 		if ( searchId == 0 ) {
 
-			String msg = ": Provided searchId is zero or wasn't provided";
+			String msg = ": Provided searchId is zero";
 
 			log.error( msg );
 
@@ -59,27 +63,9 @@ public class QCPlotPsmCountsVsScoreService {
 		    	        .build()
 		    	        );
 		}
-		
-
-		if ( selectedLinkTypes == null || selectedLinkTypes.isEmpty() ) {
-
-			String msg = ": selectedLinkTypes is empty";
-
-			log.error( msg );
-
-		    throw new WebApplicationException(
-		    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
-		    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
-		    	        .build()
-		    	        );
-		}
-		
-		
-		
-		
 				
 		try {
-
+			
 
 			// Get the session first.  
 //			HttpSession session = request.getSession();
@@ -145,7 +131,7 @@ public class QCPlotPsmCountsVsScoreService {
 
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 
-				//  No Access Allowed for this search id
+				//  No Access Allowed for this project id
 
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
@@ -154,12 +140,52 @@ public class QCPlotPsmCountsVsScoreService {
 						);
 			}
 
+			////////   Auth complete
 			
-			PsmCountsVsScoreQCPlotDataJSONRoot psmCountPerQValueQCPlotDataJSONRoot = 
-					CreatePsmCountsVsScoreQCPlotData.getInstance()
-					.create( selectedLinkTypes, searchId, annotationTypeId, psmScoreCutoff );
+			//////////////////////////////////////////
+
+
 			
-			return psmCountPerQValueQCPlotDataJSONRoot;
+			//  Get  Annotation Type records for PSM
+			
+			//    Filterable annotations
+			
+			Map<Integer, Map<Integer, AnnotationTypeDTO>> srchPgmFilterablePsmAnnotationTypeDTOListPerSearchIdMap =
+					GetAnnotationTypeData.getInstance().getAll_Psm_Filterable_ForSearchIds( searchIdsCollection );
+			
+			
+			Map<Integer, AnnotationTypeDTO> srchPgmFilterablePsmAnnotationTypeDTOMap = 
+					srchPgmFilterablePsmAnnotationTypeDTOListPerSearchIdMap.get( searchId );
+			
+			if ( srchPgmFilterablePsmAnnotationTypeDTOMap == null ) {
+				
+				//  No records were found, probably an error   TODO
+				
+				srchPgmFilterablePsmAnnotationTypeDTOMap = new HashMap<>();
+			}
+			
+			
+			List<AnnotationTypeDTO> annotationTypeDTOList = new ArrayList<>( srchPgmFilterablePsmAnnotationTypeDTOMap.size() );
+			
+			for ( Map.Entry<Integer, AnnotationTypeDTO> entry : srchPgmFilterablePsmAnnotationTypeDTOMap.entrySet() ) {
+			
+				annotationTypeDTOList.add( entry.getValue() );
+			}
+			
+			Collections.sort( annotationTypeDTOList, new Comparator<AnnotationTypeDTO>() {
+
+				@Override
+				public int compare(AnnotationTypeDTO o1, AnnotationTypeDTO o2) {
+					// TODO Auto-generated method stub
+					return o1.getName().compareToIgnoreCase( o2.getName() );
+				}
+			});
+
+			PSMAnnotationFilterableTypesForSearchIdServiceResult result = new PSMAnnotationFilterableTypesForSearchIdServiceResult();
+			
+			result.setAnnotationTypeDTOList( annotationTypeDTOList );
+			
+			return result;
 			
 		} catch ( WebApplicationException e ) {
 

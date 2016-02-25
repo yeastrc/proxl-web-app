@@ -139,6 +139,15 @@ QCChartPSMCountVsScores.prototype.init = function() {
 		
 		return false;
 	});
+	
+	$("#psm_count_vs_score_qc_plot_score_type_id").change(function(eventObject) {
+		
+		objectThis.scoreTypeChanged( );
+		
+		return false;
+	});
+	
+
 
 	
 	$(".psm_count_vs_score_qc_plot_on_change_jq").change(function(eventObject) {
@@ -434,6 +443,38 @@ QCChartPSMCountVsScores.prototype.getPSMFilterableAnnTypesForSearchIdResponse = 
 };
 
 
+/////////////
+
+
+QCChartPSMCountVsScores.prototype.scoreTypeChanged = function( ) {
+
+
+//	var objectThis = this;
+
+
+	var annTypes = this.globals.currentSearchData.annotationTypeDataById;
+
+	var $psm_count_vs_score_qc_plot_score_type_id = $("#psm_count_vs_score_qc_plot_score_type_id");
+
+	var selectedAnnTypeId = $psm_count_vs_score_qc_plot_score_type_id.val( );
+
+	var annTypeForSelectId = annTypes[ selectedAnnTypeId ];
+
+	if ( annTypeForSelectId === undefined || annTypeForSelectId === null ) {
+
+		throw "annType not found for id: " + selectedAnnTypeId;
+	}
+	
+	var $psm_count_vs_score_qc_plot_max_x = $("#psm_count_vs_score_qc_plot_max_x");
+	var $psm_count_vs_score_qc_plot_max_y = $("#psm_count_vs_score_qc_plot_max_y");
+	
+	$psm_count_vs_score_qc_plot_max_x.val("");
+	$psm_count_vs_score_qc_plot_max_y.val("");
+
+	this.createChartFromPageParams( );
+
+};
+
 
 
 
@@ -580,6 +621,8 @@ QCChartPSMCountVsScores.prototype.createChartFromPageParams = function( ) {
 	var $psm_count_vs_score_qc_plot_score_type_id = $("#psm_count_vs_score_qc_plot_score_type_id");
 	
 	var annotationTypeId = $psm_count_vs_score_qc_plot_score_type_id.val();
+	
+	var selectedAnnotationTypeText = $("#psm_count_vs_score_qc_plot_score_type_id option:selected").text();
 
 	
 	var selectedLinkTypes = this._getLinkTypesChecked();
@@ -607,6 +650,7 @@ QCChartPSMCountVsScores.prototype.createChartFromPageParams = function( ) {
 	objectThis.createChart( {  
 		searchId : searchId,
 		annotationTypeId : annotationTypeId,
+		selectedAnnotationTypeText : selectedAnnotationTypeText,
 		selectedLinkTypes : selectedLinkTypes,
 		userInputMaxX : userInputMaxX,
 		userInputMaxY : userInputMaxY } );
@@ -721,7 +765,9 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 	
 	
 	var $psm_count_vs_score_qc_plot_chartDiv = $("#psm_count_vs_score_qc_plot_chartDiv");
+
 	
+	var selectedAnnotationTypeText = originalParams.selectedAnnotationTypeText;
 
 	var userInputMaxXString = originalParams.userInputMaxX;
 	var userInputMaxYString = originalParams.userInputMaxY;
@@ -930,7 +976,7 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 				tooltip += "<br>Percent of Max: " + chartDataValueRounded; 
 			}
 			
-			tooltip += "<br>Q-value <= " + binEndRounded + "</div>";
+			tooltip += "<br>" + selectedAnnotationTypeText + " <= " + binEndRounded + "</div>";
 			
 			chartDataEntry.push( tooltip );
 		}
@@ -963,7 +1009,7 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 	
 
 	
-	var chartTitle = 'Cumulative PSM Count vs Q-value\n' + searchNameAndNumberInParens;
+	var chartTitle = "Cumulative PSM Count vs " + selectedAnnotationTypeText + "\n" + searchNameAndNumberInParens;
 	
 	
 	var yAxisLabel = "Cumulative PSM Count";
@@ -979,7 +1025,7 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 			title: chartTitle, // Title above chart
 
 			//  X axis label below chart
-			hAxis: { title: 'Q-value', titleTextStyle: {color: 'black'}
+			hAxis: { title: selectedAnnotationTypeText, titleTextStyle: {color: 'black'}
 //						,ticks: [ 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 ], format:'#.##'
 //							,minValue: -.05
 //						,maxValue : maxDataX

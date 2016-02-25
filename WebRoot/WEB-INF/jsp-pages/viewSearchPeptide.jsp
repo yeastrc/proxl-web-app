@@ -13,6 +13,9 @@
  <c:set var="headerAdditions">
 
 		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js"></script> 
+		
+		
+		<script type="text/javascript" src="${ contextPath }/js/executeAfter_HTML_AboveMainTableRendered_Registry.js"></script> 
 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter.min.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
@@ -253,7 +256,7 @@
 			<%--  Create via javascript the parts that will be above the main table --%>
 			<script type="text/javascript">
 			
-			viewSearchPeptidePageCode.createPartsAboveMainTable();
+			executeAfter_HTML_AboveMainTableRendered_Registry.createPartsAboveMainTable();
 				
 			</script>
 			

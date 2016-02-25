@@ -4,11 +4,12 @@ package org.yeastrc.xlink.www.webservices;
 
 
 
-
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -21,35 +22,51 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.www.objects.AnnotationMinMaxFilterableValues;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.qc_plots.psm_count_for_score.CreatePsmCountsVsScoreQCPlotData;
-import org.yeastrc.xlink.www.qc_plots.psm_count_for_score.PsmCountsVsScoreQCPlotDataJSONRoot;
+import org.yeastrc.xlink.www.objects.AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdServiceResult;
+import org.yeastrc.xlink.www.objects.AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdServiceResult.AnnotationTypesMinMaxValuesEntry;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.PsmMinMaxForSearchIdAnnotationTypeIdSearcher;
+import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
 
-@Path("/qcplot")
-public class QCPlotPsmCountsVsScoreService {
+@Path("/annotationTypes")
+public class AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdService {
 
-	private static final Logger log = Logger.getLogger(QCPlotPsmCountsVsScoreService.class);
+	private static final Logger log = Logger.getLogger(AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdService.class);
 	
+	/**
+	 * Min and Max values for:
+	 * Search Id
+	 * PSM Filterable Annotation Type Ids
+	 * 
+	 * @param searchId
+	 * @param annotationTypeIds
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/getPsmCountsVsScore") 
-	public PsmCountsVsScoreQCPlotDataJSONRoot getViewerData( 
-			@QueryParam( "selectedLinkTypes" ) Set<String> selectedLinkTypes,			
-			@QueryParam( "searchId" ) int searchId,
-			@QueryParam( "annotationTypeId" ) int annotationTypeId,
-			@QueryParam( "psmScoreCutoff" ) Double psmScoreCutoff,
+	@Path("/getMinMaxValuesForPsmFilterableAnnTypeIdsSearchId") 
+	public AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdServiceResult getPSMFilterableAnnTypesForSearchId( 
+			@QueryParam( "search_id" ) int searchId,
+			@QueryParam( "ann_type_id" ) List<Integer> annotationTypeIds,
 			@Context HttpServletRequest request )
 	throws Exception {
 		
 
+		
+		
+		
 		if ( searchId == 0 ) {
 
-			String msg = ": Provided searchId is zero or wasn't provided";
+			String msg = ": search_id is zero or not provided";
 
 			log.error( msg );
 
@@ -61,9 +78,9 @@ public class QCPlotPsmCountsVsScoreService {
 		}
 		
 
-		if ( selectedLinkTypes == null || selectedLinkTypes.isEmpty() ) {
+		if ( annotationTypeIds == null || annotationTypeIds.isEmpty() ) {
 
-			String msg = ": selectedLinkTypes is empty";
+			String msg = ": No provided 'ann_type_id'";
 
 			log.error( msg );
 
@@ -73,13 +90,10 @@ public class QCPlotPsmCountsVsScoreService {
 		    	        .build()
 		    	        );
 		}
-		
-		
-		
-		
+				
 				
 		try {
-
+			
 
 			// Get the session first.  
 //			HttpSession session = request.getSession();
@@ -145,7 +159,7 @@ public class QCPlotPsmCountsVsScoreService {
 
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 
-				//  No Access Allowed for this search id
+				//  No Access Allowed for this project id
 
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
@@ -154,12 +168,79 @@ public class QCPlotPsmCountsVsScoreService {
 						);
 			}
 
+			////////   Auth complete
 			
-			PsmCountsVsScoreQCPlotDataJSONRoot psmCountPerQValueQCPlotDataJSONRoot = 
-					CreatePsmCountsVsScoreQCPlotData.getInstance()
-					.create( selectedLinkTypes, searchId, annotationTypeId, psmScoreCutoff );
+			//////////////////////////////////////////
+
+
 			
-			return psmCountPerQValueQCPlotDataJSONRoot;
+			//  Get  Annotation Type records for PSM
+			
+			//    Filterable annotations
+			
+			Map<Integer, Map<Integer, AnnotationTypeDTO>> srchPgmFilterablePsmAnnotationTypeDTOListPerSearchIdMap =
+					GetAnnotationTypeData.getInstance().getAll_Psm_Filterable_ForSearchIds( searchIdsCollection );
+			
+			
+			Map<Integer, AnnotationTypeDTO> srchPgmFilterablePsmAnnotationTypeDTOMap = 
+					srchPgmFilterablePsmAnnotationTypeDTOListPerSearchIdMap.get( searchId );
+			
+			if ( srchPgmFilterablePsmAnnotationTypeDTOMap == null ) {
+				
+				//  No records were found, probably an error   TODO
+				
+				srchPgmFilterablePsmAnnotationTypeDTOMap = new HashMap<>();
+			}
+
+			
+			///////
+			
+			//  Get annotation type DTO for each annotation type id in the parameter list
+			
+			List<AnnotationTypeDTO> annotationTypeDTOList = new ArrayList<>( srchPgmFilterablePsmAnnotationTypeDTOMap.size() );
+
+			
+			for ( Integer annotationTypeId : annotationTypeIds ) {
+
+				AnnotationTypeDTO annotationTypeDTO = srchPgmFilterablePsmAnnotationTypeDTOMap.get( annotationTypeId );
+
+				if ( annotationTypeDTO == null ) {
+
+					String msg = ": ann_type_id " + annotationTypeId + " not valid for search id";
+
+					log.error( msg );
+
+					throw new WebApplicationException(
+							Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+							.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+							.build()
+							);
+				}
+
+				annotationTypeDTOList.add( annotationTypeDTO );
+			}
+			
+			Map<Integer, AnnotationTypesMinMaxValuesEntry> minMaxValuesPerAnnType = new HashMap<>();
+			
+			for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDTOList ) {
+			
+				AnnotationMinMaxFilterableValues annotationMinMaxFilterableValues =
+						PsmMinMaxForSearchIdAnnotationTypeIdSearcher.getInstance()
+						.getPsmMinMaxForSearchIdAnnotationTypeIdSearcher( searchId, annotationTypeDTO.getId() );
+			
+				AnnotationTypesMinMaxValuesEntry annotationTypesMinMaxValuesEntry = new AnnotationTypesMinMaxValuesEntry();
+				
+				annotationTypesMinMaxValuesEntry.setMinValue( annotationMinMaxFilterableValues.getMinValue() );
+				annotationTypesMinMaxValuesEntry.setMaxValue( annotationMinMaxFilterableValues.getMaxValue() );
+			
+				minMaxValuesPerAnnType.put( annotationTypeDTO.getId(), annotationTypesMinMaxValuesEntry );
+			}
+
+			AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdServiceResult result = new AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdServiceResult();
+			
+			result.setMinMaxValuesPerAnnType( minMaxValuesPerAnnType );
+			
+			return result;
 			
 		} catch ( WebApplicationException e ) {
 

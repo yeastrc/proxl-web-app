@@ -1,41 +1,40 @@
-package org.yeastrc.xlink.www.qc_plots.psm_count_per_q_value;
+package org.yeastrc.xlink.www.qc_plots.psm_count_for_score;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.constants.QCPlotConstants;
-import org.yeastrc.xlink.www.searcher.QValuesFromPsmTblSearcher;
+import org.yeastrc.xlink.www.searcher.ScoreCountFromPsmTblSearcher;
 
 
 /**
  * 
  *
  */
-public class CreatePsmCountPerQValueQCPlotData {
+public class CreatePsmCountsVsScoreQCPlotData {
 
-	private static final Logger log = Logger.getLogger(CreatePsmCountPerQValueQCPlotData.class);
+	private static final Logger log = Logger.getLogger(CreatePsmCountsVsScoreQCPlotData.class);
 	
 	
 
 
 	private static final int BIN_COUNT = 100;  //  Number of points on the chart
 
-//	private static final double MIN_Q_VALUE = 0; // assumed zero
-	private static final double MAX_Q_VALUE = 1;
-	
 
 
 	/**
 	 * private constructor
 	 */
-	private CreatePsmCountPerQValueQCPlotData(){}
+	private CreatePsmCountsVsScoreQCPlotData(){}
 	
-	public static CreatePsmCountPerQValueQCPlotData getInstance( ) throws Exception {
+	public static CreatePsmCountsVsScoreQCPlotData getInstance( ) throws Exception {
 		
-		CreatePsmCountPerQValueQCPlotData instance = new CreatePsmCountPerQValueQCPlotData();
+		CreatePsmCountsVsScoreQCPlotData instance = new CreatePsmCountsVsScoreQCPlotData();
 		
 		return instance;
 	}
@@ -43,25 +42,12 @@ public class CreatePsmCountPerQValueQCPlotData {
 	/**
 	 * @param selectedLinkTypes
 	 * @param searchId
-	 * @param psmQValueCutoff
+	 * @param annotationTypeId
+	 * @param psmScoreCutoff
 	 * @return
 	 * @throws Exception
 	 */
-	public PsmCountPerQValueQCPlotDataJSONRoot create( Set<String> selectedLinkTypes,	int searchId, Double psmQValueCutoff ) throws Exception {
-
-		double psmQValueMaxForPuttingInBins = MAX_Q_VALUE;
-		
-		if ( psmQValueCutoff != null ) {
-			
-			psmQValueMaxForPuttingInBins = psmQValueCutoff;
-		}
-		
-
-
-		//  Process data into bins
-
-		double binSizeAsDouble = ( psmQValueMaxForPuttingInBins ) / BIN_COUNT;
-
+	public PsmCountsVsScoreQCPlotDataJSONRoot create( Set<String> selectedLinkTypes, int searchId, int annotationTypeId, Double psmScoreCutoff ) throws Exception {
 
 		if ( selectedLinkTypes == null || selectedLinkTypes.isEmpty() ) {
 
@@ -72,35 +58,29 @@ public class CreatePsmCountPerQValueQCPlotData {
 			throw new IllegalArgumentException( msg );
 		}
 		
-		PsmCountPerQValueQCPlotDataJSONPerType crosslinkData = null;
-		PsmCountPerQValueQCPlotDataJSONPerType looplinkData = null;
-		PsmCountPerQValueQCPlotDataJSONPerType unlinkedData = null;
 		
-		PsmCountPerQValueQCPlotDataJSONPerType alllinkData = null;
-
-		
-		int dataArraySize = 0;
-		
+		//  Keyed on Selected Link Type
+		Map<String, List<Double>> scoreValuesForSelectedTypesMap = new HashMap<>();
 
 		
 		for ( String selectedLinkType : selectedLinkTypes ) {
 
 			List<String> selectedDBLinkTypes = null;
 
-			if ( QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__ALL_PSM.equals( selectedLinkType ) ) {
+			if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__ALL_PSM.equals( selectedLinkType ) ) {
 				
 				
-			} else if ( QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__CROSSLINK_PSM.equals( selectedLinkType ) ) {
+			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__CROSSLINK_PSM.equals( selectedLinkType ) ) {
 				
 				selectedDBLinkTypes = new ArrayList<>();
 				selectedDBLinkTypes.add( XLinkUtils.CROSS_TYPE_STRING );
 				
-			} else if ( QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__LOOPLINK_PSM.equals( selectedLinkType ) ) {
+			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__LOOPLINK_PSM.equals( selectedLinkType ) ) {
 				
 				selectedDBLinkTypes = new ArrayList<>();
 				selectedDBLinkTypes.add( XLinkUtils.LOOP_TYPE_STRING );
 				
-			} else if ( QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__UNLINKED_PSM.equals( selectedLinkType ) ) {
+			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__UNLINKED_PSM.equals( selectedLinkType ) ) {
 				
 				selectedDBLinkTypes = new ArrayList<>();
 				selectedDBLinkTypes.add( XLinkUtils.DIMER_TYPE_STRING );
@@ -108,51 +88,145 @@ public class CreatePsmCountPerQValueQCPlotData {
 				
 			}
 		
-			List<Double> qValuesForPSMsthatMeetCriteriaList = 
-				QValuesFromPsmTblSearcher.getInstance().getQValues( selectedDBLinkTypes, searchId, psmQValueCutoff );
+			List<Double> scoreValuesForPSMsthatMeetCriteriaList = 
+				ScoreCountFromPsmTblSearcher.getInstance().getScoreValues( selectedDBLinkTypes, searchId, annotationTypeId, psmScoreCutoff );
 			
-			int totalCountForType = qValuesForPSMsthatMeetCriteriaList.size();
+			scoreValuesForSelectedTypesMap.put( selectedLinkType, scoreValuesForPSMsthatMeetCriteriaList );
 			
-			if ( psmQValueCutoff != null ) {
+		}
+		
+		double maxScore = 0;
+		double minScore = 0;
+		
+		boolean firstEntry = true;
+		
+		for ( Map.Entry<String, List<Double>> entry : scoreValuesForSelectedTypesMap.entrySet() ) {
+			
+			List<Double> scoreValuesForPSMsthatMeetCriteriaList = entry.getValue();
+			
+			for ( Double scoreValue : scoreValuesForPSMsthatMeetCriteriaList ) {
 				
-				totalCountForType = QValuesFromPsmTblSearcher.getInstance().getQValuesCount( selectedDBLinkTypes, searchId );
+				if ( firstEntry ) {
+
+					firstEntry = false;
+
+					maxScore = 0;
+					minScore = 0;
+
+				} else {
+					
+					if ( maxScore < scoreValue ) {
+						
+						maxScore = scoreValue;
+					}
+					
+					if ( minScore > scoreValue ) {
+						
+						minScore = scoreValue;
+					}
+				}
+			}
+		}
+		
+		
+	
+		double scoreMaxForPuttingInBins = maxScore;
+		
+		if ( psmScoreCutoff != null ) {
+			
+			scoreMaxForPuttingInBins = psmScoreCutoff;
+		}
+		
+
+		double scoreMinForPuttingInBins = minScore;
+		
+
+		//  Process data into bins
+
+		double binSizeAsDouble = ( scoreMaxForPuttingInBins - scoreMinForPuttingInBins ) / BIN_COUNT;
+
+
+
+		PsmCountsVsScoreQCPlotDataJSONPerType crosslinkData = null;
+		PsmCountsVsScoreQCPlotDataJSONPerType looplinkData = null;
+		PsmCountsVsScoreQCPlotDataJSONPerType unlinkedData = null;
+		
+		PsmCountsVsScoreQCPlotDataJSONPerType alllinkData = null;
+
+		
+		int dataArraySize = 0;
+
+		
+		for ( String selectedLinkType : selectedLinkTypes ) {
+
+			List<String> selectedDBLinkTypes = null;
+
+			if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__ALL_PSM.equals( selectedLinkType ) ) {
+				
+				
+			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__CROSSLINK_PSM.equals( selectedLinkType ) ) {
+				
+				selectedDBLinkTypes = new ArrayList<>();
+				selectedDBLinkTypes.add( XLinkUtils.CROSS_TYPE_STRING );
+				
+			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__LOOPLINK_PSM.equals( selectedLinkType ) ) {
+				
+				selectedDBLinkTypes = new ArrayList<>();
+				selectedDBLinkTypes.add( XLinkUtils.LOOP_TYPE_STRING );
+				
+			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__UNLINKED_PSM.equals( selectedLinkType ) ) {
+				
+				selectedDBLinkTypes = new ArrayList<>();
+				selectedDBLinkTypes.add( XLinkUtils.DIMER_TYPE_STRING );
+				selectedDBLinkTypes.add( XLinkUtils.UNLINKED_TYPE_STRING );
+				
+			}
+			
+			List<Double> scoreValuesForPSMsthatMeetCriteriaList = scoreValuesForSelectedTypesMap.get( selectedLinkType );
+			
+			
+			int totalCountForType = scoreValuesForPSMsthatMeetCriteriaList.size();
+			
+			if ( psmScoreCutoff != null ) {
+				
+				totalCountForType = ScoreCountFromPsmTblSearcher.getInstance().getScoreCount( selectedDBLinkTypes, searchId, annotationTypeId );
 			}
 
-			PsmCountPerQValueQCPlotDataJSONPerType linkData = null;
+			PsmCountsVsScoreQCPlotDataJSONPerType linkData = null;
 
-			if ( QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__ALL_PSM.equals( selectedLinkType ) ) {
+			if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__ALL_PSM.equals( selectedLinkType ) ) {
 
-				alllinkData = new PsmCountPerQValueQCPlotDataJSONPerType();
+				alllinkData = new PsmCountsVsScoreQCPlotDataJSONPerType();
 				linkData = alllinkData;
 
-			} else if ( QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__CROSSLINK_PSM.equals( selectedLinkType ) ) {
+			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__CROSSLINK_PSM.equals( selectedLinkType ) ) {
 
-				crosslinkData = new PsmCountPerQValueQCPlotDataJSONPerType();
+				crosslinkData = new PsmCountsVsScoreQCPlotDataJSONPerType();
 				linkData = crosslinkData;
 
-			} else if ( QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__LOOPLINK_PSM.equals( selectedLinkType ) ) {
+			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__LOOPLINK_PSM.equals( selectedLinkType ) ) {
 
-				looplinkData = new PsmCountPerQValueQCPlotDataJSONPerType();
+				looplinkData = new PsmCountsVsScoreQCPlotDataJSONPerType();
 				linkData = looplinkData;
 
-			} else if ( QCPlotConstants.Q_VALUE_PSM_COUNT_PLOT__UNLINKED_PSM.equals( selectedLinkType ) ) {
+			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__UNLINKED_PSM.equals( selectedLinkType ) ) {
 
-				unlinkedData = new PsmCountPerQValueQCPlotDataJSONPerType();
+				unlinkedData = new PsmCountsVsScoreQCPlotDataJSONPerType();
 				linkData = unlinkedData;
 			}
 			
 			
-			int qvalueZeroCount = 0;
+			int scoreValueMinValueCount = 0;
 
-			int[] qvalueCounts = new int[ BIN_COUNT ];
+			int[] scoreValueCounts = new int[ BIN_COUNT ];
 
 
-			for ( double qValue : qValuesForPSMsthatMeetCriteriaList ) {
+			for ( double scoreValue : scoreValuesForPSMsthatMeetCriteriaList ) {
 
-				double qValueFraction = qValue / psmQValueMaxForPuttingInBins;
+				double scoreValueFraction = ( scoreValue - scoreMinForPuttingInBins ) / ( scoreMaxForPuttingInBins - scoreMinForPuttingInBins );
 
 				
-				int bin = (int) ( (  qValueFraction ) * BIN_COUNT );
+				int bin = (int) ( (  scoreValueFraction ) * BIN_COUNT );
 
 				if ( bin < 0 ) {
 
@@ -163,44 +237,45 @@ public class CreatePsmCountPerQValueQCPlotData {
 					bin = BIN_COUNT - 1;
 				} 
 
-				qvalueCounts[ bin ]++;
+				scoreValueCounts[ bin ]++;
 
-				if ( qValue == 0 ) {
+				if ( scoreValue == scoreMinForPuttingInBins ) {
 
-					qvalueZeroCount++;
+					scoreValueMinValueCount++;
 				}
 
 			}
 
 
-			List<PsmCountPerQValueQCPlotDataJSONChartBucket> chartBuckets = new ArrayList<>();
+			List<PsmCountsVsScoreQCPlotDataJSONChartBucket> chartBuckets = new ArrayList<>();
 
 			
-			PsmCountPerQValueQCPlotDataJSONChartBucket chartBucketZero = new PsmCountPerQValueQCPlotDataJSONChartBucket();
-			chartBucketZero.setBinEnd( 0 );
-			chartBucketZero.setTotalCount( qvalueZeroCount );
+			
+			PsmCountsVsScoreQCPlotDataJSONChartBucket chartBucketMinValue = new PsmCountsVsScoreQCPlotDataJSONChartBucket();
+			chartBucketMinValue.setBinEnd( scoreMinForPuttingInBins );
+			chartBucketMinValue.setTotalCount( scoreValueMinValueCount );
 			
 			
-			chartBuckets.add( chartBucketZero );
+			chartBuckets.add( chartBucketMinValue );
 
 
 
 			//  Take the data in the bins and  create "buckets" in the format required for the charting API
 
-			int totalQValueCount = 0;
+			int totalScoreValueCount = 0;
 
 
-			for ( int binIndex = 0; binIndex < qvalueCounts.length; binIndex++ ) {
+			for ( int binIndex = 0; binIndex < scoreValueCounts.length; binIndex++ ) {
 
-				PsmCountPerQValueQCPlotDataJSONChartBucket chartBucket = new PsmCountPerQValueQCPlotDataJSONChartBucket();
+				PsmCountsVsScoreQCPlotDataJSONChartBucket chartBucket = new PsmCountsVsScoreQCPlotDataJSONChartBucket();
 
 				chartBuckets.add( chartBucket );
 
-				int qvalueCount = qvalueCounts[ binIndex ];
+				int scoreValueCount = scoreValueCounts[ binIndex ];
 
-				totalQValueCount += qvalueCount;
+				totalScoreValueCount += scoreValueCount;
 
-				double binStartDouble = ( ( binIndex * binSizeAsDouble ) );
+				double binStartDouble = ( ( binIndex * binSizeAsDouble ) + scoreMinForPuttingInBins );
 
 				if ( binIndex == 0 && binStartDouble < 0 ) {
 
@@ -211,11 +286,11 @@ public class CreatePsmCountPerQValueQCPlotData {
 				}
 
 
-				double binEnd = ( binIndex + 1 ) * binSizeAsDouble ;
+				double binEnd = ( binIndex + 1 ) * binSizeAsDouble + scoreMinForPuttingInBins ;
 
 				chartBucket.setBinEnd( binEnd );
 
-				chartBucket.setTotalCount( totalQValueCount );
+				chartBucket.setTotalCount( totalScoreValueCount );
 			}
 			
 			linkData.setChartBuckets( chartBuckets );
@@ -230,16 +305,16 @@ public class CreatePsmCountPerQValueQCPlotData {
 		
 		//  Populate objects to generate JSON
 		
-		PsmCountPerQValueQCPlotDataJSONRoot psmCountPerQValueQCPlotDataJSONRoot = new PsmCountPerQValueQCPlotDataJSONRoot();
+		PsmCountsVsScoreQCPlotDataJSONRoot psmCountsVsScoreQCPlotDataJSONRoot = new PsmCountsVsScoreQCPlotDataJSONRoot();
 		
-		psmCountPerQValueQCPlotDataJSONRoot.setDataArraySize( dataArraySize );
+		psmCountsVsScoreQCPlotDataJSONRoot.setDataArraySize( dataArraySize );
 		
-		psmCountPerQValueQCPlotDataJSONRoot.setAlllinkData( alllinkData );
-		psmCountPerQValueQCPlotDataJSONRoot.setCrosslinkData( crosslinkData );
-		psmCountPerQValueQCPlotDataJSONRoot.setLooplinkData( looplinkData );
-		psmCountPerQValueQCPlotDataJSONRoot.setUnlinkedData( unlinkedData );
+		psmCountsVsScoreQCPlotDataJSONRoot.setAlllinkData( alllinkData );
+		psmCountsVsScoreQCPlotDataJSONRoot.setCrosslinkData( crosslinkData );
+		psmCountsVsScoreQCPlotDataJSONRoot.setLooplinkData( looplinkData );
+		psmCountsVsScoreQCPlotDataJSONRoot.setUnlinkedData( unlinkedData );
 
-		return psmCountPerQValueQCPlotDataJSONRoot;
+		return psmCountsVsScoreQCPlotDataJSONRoot;
 	}
 
 
