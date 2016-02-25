@@ -14,29 +14,31 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
 
  *
  */
-public class QValuesFromPsmTblSearcher {
+public class ScoreCountFromPsmTblSearcher {
 
-	private static final Log log = LogFactory.getLog(QValuesFromPsmTblSearcher.class);
+	private static final Log log = LogFactory.getLog(ScoreCountFromPsmTblSearcher.class);
 	
-	private QValuesFromPsmTblSearcher() { }
-	private static final QValuesFromPsmTblSearcher _INSTANCE = new QValuesFromPsmTblSearcher();
-	public static QValuesFromPsmTblSearcher getInstance() { return _INSTANCE; }
+	private ScoreCountFromPsmTblSearcher() { }
+	private static final ScoreCountFromPsmTblSearcher _INSTANCE = new ScoreCountFromPsmTblSearcher();
+	public static ScoreCountFromPsmTblSearcher getInstance() { return _INSTANCE; }
 	
 
 	
 	/**
 	 * @param selectedDBLinkTypes - NULL for all
 	 * @param searchId
+	 * @param annotationTypeId
 	 * @return
 	 * @throws Exception
 	 */
-	public int getQValuesCount( 
+	public int getScoreCount( 
 			List<String> selectedDBLinkTypes, 
-			int searchId
+			int searchId,
+			int annotationTypeId
 			) throws Exception {
 		
 		
-		int getQValuesCount = 0;
+		int getScoreCount = 0;
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -45,11 +47,11 @@ public class QValuesFromPsmTblSearcher {
 
 		StringBuilder sqlSB = new StringBuilder( 10000 );
 
-		sqlSB.append( "SELECT COUNT(*) AS count FROM psm WHERE search_id = ? " );
+		sqlSB.append( "SELECT COUNT(*) AS count FROM psm_filterable_annotation__generic_lookup WHERE search_id = ? AND annotation_type_id = ? " );
 
 		if ( selectedDBLinkTypes != null && ! selectedDBLinkTypes.isEmpty() ) {
 
-			sqlSB.append( " AND psm.type IN ( " );
+			sqlSB.append( " AND psm_type IN ( " );
 
 			boolean firstWebLinkType = true;
 
@@ -86,15 +88,18 @@ public class QValuesFromPsmTblSearcher {
 			paramCounter++;
 			pstmt.setInt( paramCounter, searchId );
 
+			paramCounter++;
+			pstmt.setInt( paramCounter, annotationTypeId );
+
 			rs = pstmt.executeQuery();
 
 			if( rs.next() ) {
-				getQValuesCount = rs.getInt( "count" );
+				getScoreCount = rs.getInt( "count" );
 			}
 			
 		} catch ( Exception e ) {
 			
-			String msg = "getQValuesCount(), sql: " + sql;
+			String msg = "getScoreCount(...), sql: " + sql;
 			
 			log.error( msg, e );
 			
@@ -119,25 +124,27 @@ public class QValuesFromPsmTblSearcher {
 			}
 		}
 		
-		return getQValuesCount;
+		return getScoreCount;
 	}
 	
 	
 	/**
 	 * @param selectedDBLinkTypes - NULL for all
 	 * @param searchId
-	 * @param psmQValueCutoff - Not NULL if set
+	 * @param annotationTypeId
+	 * @param psmScoreCutoff - Not NULL if set
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Double> getQValues( 
+	public List<Double> getScoreValues( 
 			List<String> selectedDBLinkTypes, 
 			int searchId,
-			Double psmQValueCutoff
+			int annotationTypeId,
+			Double psmScoreCutoff
 			) throws Exception {
 		
 		
-		List<Double> qValueList = new ArrayList<Double>();
+		List<Double> scoreValueList = new ArrayList<Double>();
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -146,11 +153,11 @@ public class QValuesFromPsmTblSearcher {
 
 		StringBuilder sqlSB = new StringBuilder( 10000 );
 
-		sqlSB.append( "SELECT q_value FROM psm WHERE search_id = ? " );
+		sqlSB.append( "SELECT value_double FROM psm_filterable_annotation__generic_lookup WHERE search_id = ?  AND annotation_type_id = ? " );
 
 		if ( selectedDBLinkTypes != null && ! selectedDBLinkTypes.isEmpty() ) {
 
-			sqlSB.append( " AND psm.type IN ( " );
+			sqlSB.append( " AND psm_filterable_annotation__generic_lookup.psm_type IN ( " );
 
 			boolean firstWebLinkType = true;
 
@@ -172,9 +179,9 @@ public class QValuesFromPsmTblSearcher {
 
 		}
 		
-		if ( psmQValueCutoff != null ) {
+		if ( psmScoreCutoff != null ) {
 			
-			sqlSB.append( " AND q_value <= ? " );
+			sqlSB.append( " AND value_double <= ? " );
 		}
 		
 		String sql = sqlSB.toString();
@@ -188,25 +195,28 @@ public class QValuesFromPsmTblSearcher {
 			pstmt = conn.prepareStatement( sql );
 			
 			int paramCounter = 0;
-			
+
 			paramCounter++;
 			pstmt.setInt( paramCounter, searchId );
 
-			if ( psmQValueCutoff != null ) {
+			paramCounter++;
+			pstmt.setInt( paramCounter, annotationTypeId );
+
+			if ( psmScoreCutoff != null ) {
 			
 				paramCounter++;
-				pstmt.setDouble( paramCounter, psmQValueCutoff );
+				pstmt.setDouble( paramCounter, psmScoreCutoff );
 			}
 				
 			rs = pstmt.executeQuery();
 
 			while( rs.next() ) {
-				qValueList.add( rs.getDouble( "q_value" ) );
+				scoreValueList.add( rs.getDouble( "value_double" ) );
 			}
 			
 		} catch ( Exception e ) {
 			
-			String msg = "getQValues(), sql: " + sql;
+			String msg = "getScoreValues(), sql: " + sql;
 			
 			log.error( msg, e );
 			
@@ -234,7 +244,7 @@ public class QValuesFromPsmTblSearcher {
 		
 		
 		
-		return qValueList;
+		return scoreValueList;
 	}
 	
 	

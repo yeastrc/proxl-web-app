@@ -4,6 +4,9 @@
 //  /js/createTooltipForProteinNames.js
 
 //  Javascript for adding tooltip with PDR info to the protein names
+
+//   Search for this JS filename for companion Java class that must be called for every Action for pages that
+//   this JS file is included on.
  
 //		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js"></script>
 
@@ -17,42 +20,52 @@
 ////////////////////////////
 
 
+var _protein_listing_webservice_base_url = null;
+
 
 $(document).ready(function() { 
- 
-	  setTimeout( function() { // put in setTimeout so it doesn't run on the main page init thread
-		
-		  createTooltipForProteinNames();
-	  },10);
-	
+
+	setTimeout( function() { // put in setTimeout so it doesn't run on the main page init thread
+
+		createTooltipForProteinNames();
+	},10);
+
 	
 });
 
 
 var createTooltipForProteinNames = function() {
 	
-    setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-  	
-    	
-    	
-    	$('.proteinName').each(function() {
-    		
-    		var $elementToAddToolTipTo =  $(this);
-    		
-
-    		var htmlIdString = $elementToAddToolTipTo.attr( "id" );
-
-    		var proteinIdString = htmlIdString.replace( "protein-id-", "" );
-    		
-    		
-    		
-    		addSingleTooltipForProteinNameOnTopRight( {$elementToAddToolTipTo: $elementToAddToolTipTo, proteinIdString: proteinIdString } );
-        });
+	_protein_listing_webservice_base_url = $("#protein_listing_webservice_base_url").val();
+	
+	if ( _protein_listing_webservice_base_url === undefined 
+			|| _protein_listing_webservice_base_url === null
+			|| _protein_listing_webservice_base_url === "" ) {
+		
+		return;  //  EARLY exit since no URL configured for protein listings
+	}
 
 
-    },50);
+	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 
 
+
+		$('.proteinName').each(function() {
+
+			var $elementToAddToolTipTo =  $(this);
+
+
+			var htmlIdString = $elementToAddToolTipTo.attr( "id" );
+
+			var proteinIdString = htmlIdString.replace( "protein-id-", "" );
+
+
+
+			addSingleTooltipForProteinNameOnTopRight( {$elementToAddToolTipTo: $elementToAddToolTipTo, proteinIdString: proteinIdString } );
+		});
+
+
+	},50);
 
 };
 
@@ -95,6 +108,16 @@ var addSingleTooltipForProteinNameOnTopRight = function( params ) {
 
 var addSingleTooltipForProteinName = function( params ) {
 	
+
+	_protein_listing_webservice_base_url = $("#protein_listing_webservice_base_url").val();
+	
+	if ( _protein_listing_webservice_base_url === undefined 
+			|| _protein_listing_webservice_base_url === null
+			|| _protein_listing_webservice_base_url === "" ) {
+		
+		return;  //  EARLY exit since no URL configured for protein listings
+	}
+	
 	var  $elementToAddToolTipTo = params.$elementToAddToolTipTo;
 	
 	var tipPosition = params.tipPosition;
@@ -128,27 +151,36 @@ var addSingleTooltipForProteinName = function( params ) {
                 	  
                 	  } else {
 
-                		  var url = "http://www.yeastrc.org/pdr/services/proteinListingService/jsonp/" + proteinIdString + "?jsonpCallback=?";
+                		  if ( _protein_listing_webservice_base_url !== undefined 
+                				  && _protein_listing_webservice_base_url !== null
+                				  && _protein_listing_webservice_base_url !== "" ) {
 
-                		  $.ajax({
-                			  url: url,
-                			  dataType: 'jsonp'
-                		  })
-                		  .done(function(data) {
+                			  var url = _protein_listing_webservice_base_url + "proteinListingService/jsonp/" + proteinIdString + "?jsonpCallback=?";
 
-                			  var output = "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">Source: " + data.source + "</div>" 
-                			  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">Name: " + data.name + "</div>";
+                			  $.ajax({
+                				  url: url,
+                				  dataType: 'jsonp'
+                			  })
+                			  .done(function(data) {
 
-                			  if ( data.description !== undefined && data.description !== null ) {
-                				  output += "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">Description: " + data.description + "</div>";
-                			  }
+                				  var output = "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">Source: " + data.source + "</div>" 
+                				  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">Name: " + data.name + "</div>";
 
-                			  __proteinDataForToolTipFormattedHTMLCache[ proteinIdString ] = output;
+                				  if ( data.description !== undefined && data.description !== null ) {
+                					  output += "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">Description: " + data.description + "</div>";
+                				  }
 
-                			  api.set('content.text', output);
-                		  });
+                				  __proteinDataForToolTipFormattedHTMLCache[ proteinIdString ] = output;
 
-                		  return 'Loading from PDR...'; // Set some initial text
+                				  api.set('content.text', output);
+                			  });
+
+                			  return 'Loading listing information...'; // Set some initial text
+                		  
+                		  } else {
+                		  
+                			  return 'No listing information available';  //  Shouldn't get here
+                		  }
                 	  }
                   }
               },

@@ -53,6 +53,7 @@ import org.yeastrc.xlink.www.forms.SearchViewProteinsForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
+import org.yeastrc.xlink.www.web_utils.GetProteinListingTooltipConfigData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.URLEncodeDecodeAURL;
 import org.yeastrc.xlink.www.web_utils.XLinkWebAppUtils;
@@ -197,6 +198,9 @@ public class ViewSearchProteinsAction extends Action {
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 
 			
+			//  Populate request objects for Protein Name Tooltip JS
+			
+			GetProteinListingTooltipConfigData.getInstance().getProteinListingTooltipConfigData( request );
 
 			
 			request.setAttribute( "queryString",  request.getQueryString() );

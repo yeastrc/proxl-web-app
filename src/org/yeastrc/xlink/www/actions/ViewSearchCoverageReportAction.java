@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -71,6 +72,7 @@ import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
+import org.yeastrc.xlink.www.web_utils.GetProteinListingTooltipConfigData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.URLEncodeDecodeAURL;
 
@@ -192,7 +194,10 @@ public class ViewSearchCoverageReportAction extends Action {
 			
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 
+			//  Populate request objects for Protein Name Tooltip JS
 			
+			GetProteinListingTooltipConfigData.getInstance().getProteinListingTooltipConfigData( request );
+
 			
 			SearchDTO search = SearchDAO.getInstance().getSearch( searchId );
 			request.setAttribute( "search", search );

@@ -71,6 +71,11 @@
 
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer.js"></script> 
 		
+				<%-- 
+					The Struts Action for this page must call GetProteinNamesTooltipConfigData
+					This input is required on this page:
+					<input type="hidden" id="protein_listing_webservice_base_url" value="<c:out value="${ protein_listing_webservice_base_url }"></c:out>">
+				  --%>
 		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js"></script>
@@ -101,6 +106,10 @@
 
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
+	
+		<%--  protein name data webservice base URL, used by createTooltipForProteinNames.js --%>
+	<input type="hidden" id="protein_listing_webservice_base_url" value="<c:out value="${ protein_listing_webservice_base_url }"></c:out>">
+
 	
 		<%@ include file="/WEB-INF/jsp-includes/defaultPageViewFragment.jsp" %>
 		

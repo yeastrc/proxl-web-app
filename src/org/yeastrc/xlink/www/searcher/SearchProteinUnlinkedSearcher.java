@@ -77,11 +77,14 @@ public class SearchProteinUnlinkedSearcher {
 
 	private final String SQL_SEARCH_ON_SEARCH_ID_FIRST_PART = 
 
-		"SELECT search_unlinked_generic_lookup.nrseq_id, "
-
-			+ " search_unlinked_generic_lookup.num_psm_at_default_cutoff, "
-			+ " search_unlinked_generic_lookup.num_linked_peptides_at_default_cutoff, "
-			+ " search_unlinked_generic_lookup.num_unique_peptides_linked_at_default_cutoff ";
+		"SELECT search_unlinked_generic_lookup.nrseq_id"
+		
+			//  num... not set to a value in importer
+//			+ ","
+//			+ " search_unlinked_generic_lookup.num_psm_at_default_cutoff, "
+//			+ " search_unlinked_generic_lookup.num_linked_peptides_at_default_cutoff, "
+//			+ " search_unlinked_generic_lookup.num_unique_peptides_linked_at_default_cutoff "
+			;
 
 	private final String SQL_SEARCH_ON_SEARCH_ID_FROM_START = 	
 			
@@ -318,13 +321,15 @@ public class SearchProteinUnlinkedSearcher {
 
 				//  These counts are only valid for PSM and Peptide at default cutoffs
 
-				if ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs ) {
-
-					link.setNumPsms( rs.getInt( "num_psm_at_default_cutoff" ) );
-					link.setNumPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
-					link.setNumUniquePeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
-
-				}
+				//  REMOVED since fields are not set so are always NULL
+				
+//				if ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs ) {
+//
+//					link.setNumPsms( rs.getInt( "num_psm_at_default_cutoff" ) );
+//					link.setNumPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
+//					link.setNumUniquePeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
+//
+//				}
 				
 				
 
@@ -489,25 +494,27 @@ public class SearchProteinUnlinkedSearcher {
 //			+ "nrseq_id = ? AND protein_position_1 = ? AND protein_position_2 = ?";	
 	
 
-	private final String SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_FIRST_PART = 
+	private final String SQL_SEARCH_ON_SEARCH_ID_UNLINKED_FIRST_PART = 
 
-			"SELECT"
-//					+ " search_unlinked_generic_lookup.nrseq_id, "
+			"SELECT search_unlinked_generic_lookup.nrseq_id"
+			
+				//  num... not set to a value in importer
+//				+ ","
+//			+ " search_unlinked_generic_lookup.num_psm_at_default_cutoff, "
+//			+ " search_unlinked_generic_lookup.num_linked_peptides_at_default_cutoff, "
+//			+ " search_unlinked_generic_lookup.num_unique_peptides_linked_at_default_cutoff "
+			;
 
-			+ " search_unlinked_generic_lookup.num_psm_at_default_cutoff, "
-			+ " search_unlinked_generic_lookup.num_linked_peptides_at_default_cutoff, "
-			+ " search_unlinked_generic_lookup.num_unique_peptides_linked_at_default_cutoff ";
-
-			private static final String SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_FROM_START =
+			private static final String SQL_SEARCH_ON_SEARCH_ID_UNLINKED_FROM_START =
 
 			" FROM search_unlinked_generic_lookup";
 
 
-	private static final String SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_WHERE_START =  
+	private static final String SQL_SEARCH_ON_SEARCH_ID_UNLINKED_WHERE_START =  
 			" WHERE search_unlinked_generic_lookup.search_id = ? "
 			+ " AND search_unlinked_generic_lookup.nrseq_id = ?";
 			
-	private static final String SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_ORDER_BY =   
+	private static final String SQL_SEARCH_ON_SEARCH_ID_UNLINKED_ORDER_BY =   
 			" ORDER BY search_unlinked_generic_lookup.nrseq_id ";
 
 
@@ -629,10 +636,10 @@ public class SearchProteinUnlinkedSearcher {
 				psmCutoffValuesList,
 				onlyDefaultPeptideCutoffs, 
 				onlyDefaultPsmCutoffs, 
-				SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_FIRST_PART,
-				SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_FROM_START,
-				SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_WHERE_START, 
-				SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_ORDER_BY );
+				SQL_SEARCH_ON_SEARCH_ID_UNLINKED_FIRST_PART,
+				SQL_SEARCH_ON_SEARCH_ID_UNLINKED_FROM_START,
+				SQL_SEARCH_ON_SEARCH_ID_UNLINKED_WHERE_START, 
+				SQL_SEARCH_ON_SEARCH_ID_UNLINKED_ORDER_BY );
 		
 
 		
@@ -741,12 +748,14 @@ public class SearchProteinUnlinkedSearcher {
 
 				//  These counts are only valid for PSM and Peptide at default cutoffs
 
-				if ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs ) {
-
-					link.setNumPsms( rs.getInt( "num_psm_at_default_cutoff" ) );
-					link.setNumPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
-					link.setNumUniquePeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
-				}
+				//  REMOVED since fields are not set so are always NULL
+				
+//				if ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs ) {
+//
+//					link.setNumPsms( rs.getInt( "num_psm_at_default_cutoff" ) );
+//					link.setNumPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
+//					link.setNumUniquePeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
+//				}
 
 
 
@@ -1050,8 +1059,10 @@ public class SearchProteinUnlinkedSearcher {
 		// Process PSM Cutoffs for WHERE
 
 		{
-			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
-					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
+			// Not supported since search_unlinked_generic_lookup.num_psm_at_default_cutoff is not set to a value
+			
+//			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
+//					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 
 				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
 
@@ -1104,25 +1115,28 @@ public class SearchProteinUnlinkedSearcher {
 				}
 				
 
-			} else {
-
-				//   Only Default PSM Cutoffs chosen so criteria simply the Peptides where the PSM count for the default cutoffs is > zero
-
-
-				sqlSB.append( " AND " );
-
-
-				sqlSB.append( " search_unlinked_generic_lookup.num_psm_at_default_cutoff > 0 " );
-
-
-			}
+//			} else {
+//
+//				//   Only Default PSM Cutoffs chosen so criteria simply the Peptides where the PSM count for the default cutoffs is > zero
+//
+//
+//				sqlSB.append( " AND " );
+//
+//
+//				sqlSB.append( " search_unlinked_generic_lookup.num_psm_at_default_cutoff > 0 " );
+//
+//
+//			}
 		}
 		
 		//  Process Peptide Cutoffs for WHERE
 
 		{
-			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
-					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
+			
+			//  search_unlinked_generic_lookup.num_linked_peptides_at_default_cutoff is not set to a value
+			
+//			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
+//					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 
 				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
 
@@ -1173,15 +1187,15 @@ public class SearchProteinUnlinkedSearcher {
 					sqlSB.append( " ) " );
 				}
 
-			} else {
-
-				//   Only Default Peptide Cutoffs chosen so criteria simply the Peptides where the defaultPeptideCutoffs is yes
-
-				sqlSB.append( " AND " );
-
-
-				sqlSB.append( " search_unlinked_generic_lookup.num_linked_peptides_at_default_cutoff > 0 " );
-			}
+//			} else {
+//
+//				//   Only Default Peptide Cutoffs chosen so criteria simply the Peptides where the defaultPeptideCutoffs is yes
+//
+//				sqlSB.append( " AND " );
+//
+//
+//				sqlSB.append( " search_unlinked_generic_lookup.num_linked_peptides_at_default_cutoff > 0 " );
+//			}
 		}		
 		
 		

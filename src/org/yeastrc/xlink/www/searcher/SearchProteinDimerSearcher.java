@@ -81,11 +81,15 @@ public class SearchProteinDimerSearcher {
 	private final String SQL_SEARCH_ON_SEARCH_ID_FIRST_PART = 
 
 		"SELECT search_dimer_generic_lookup.nrseq_id_1, "
-			+ " search_dimer_generic_lookup.nrseq_id_2, "
+			+ " search_dimer_generic_lookup.nrseq_id_2"
 
-			+ " search_dimer_generic_lookup.num_psm_at_default_cutoff, "
-			+ " search_dimer_generic_lookup.num_linked_peptides_at_default_cutoff, "
-			+ " search_dimer_generic_lookup.num_unique_peptides_linked_at_default_cutoff ";
+			//  num... not set to a value in importer
+//			+ ", "
+//			+ " search_dimer_generic_lookup.num_psm_at_default_cutoff, "
+//			+ " search_dimer_generic_lookup.num_linked_peptides_at_default_cutoff, "
+//			+ " search_dimer_generic_lookup.num_unique_peptides_linked_at_default_cutoff "
+			
+			;
 
 	
 	private final String SQL_SEARCH_ON_SEARCH_ID_FROM_START = 			
@@ -326,13 +330,16 @@ public class SearchProteinDimerSearcher {
 				
 				//  These counts are only valid for PSM and Peptide at default cutoffs
 
-				if ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs ) {
-										
-					link.setNumPsms( rs.getInt( "num_psm_at_default_cutoff" ) );
-					link.setNumLinkedPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
-					link.setNumUniqueLinkedPeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
-
-				}
+				
+					//  REMOVED since fields are not set so are always NULL
+				
+//				if ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs ) {
+//										
+//					link.setNumPsms( rs.getInt( "num_psm_at_default_cutoff" ) );
+//					link.setNumLinkedPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
+//					link.setNumUniqueLinkedPeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
+//
+//				}
 				
 				
 				if ( ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs )
@@ -503,24 +510,30 @@ public class SearchProteinDimerSearcher {
 //			+ "nrseq_id_1 = ? AND nrseq_id_2 = ? AND protein_1_position = ? AND protein_2_position = ?";	
 	
 
-	private final String SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_FIRST_PART = 
-
-		"SELECT search_dimer_generic_lookup.num_psm_at_default_cutoff, "
-			+ " search_dimer_generic_lookup.num_linked_peptides_at_default_cutoff, "
-			+ " search_dimer_generic_lookup.num_unique_peptides_linked_at_default_cutoff ";
+	private final String SQL_SEARCH_ON_SEARCH_ID_DIMER_FIRST_PART = 
 
 
-	private final String SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_FROM_START = 			
+			"SELECT search_dimer_generic_lookup.nrseq_id_1"
+
+				//  num... not set to a value in importer
+//			+ ","
+//			+ "search_dimer_generic_lookup.num_psm_at_default_cutoff, "
+//			+ " search_dimer_generic_lookup.num_linked_peptides_at_default_cutoff, "
+//			+ " search_dimer_generic_lookup.num_unique_peptides_linked_at_default_cutoff "
+			;
+
+
+	private final String SQL_SEARCH_ON_SEARCH_ID_DIMER_FROM_START = 			
 					
 			" FROM search_dimer_generic_lookup";
 
 
-	private static final String SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_WHERE_START =  
+	private static final String SQL_SEARCH_ON_SEARCH_ID_DIMER_WHERE_START =  
 			" WHERE search_dimer_generic_lookup.search_id = ?   "
 			+ " AND search_dimer_generic_lookup.nrseq_id_1 = ? "
 			+ " AND search_dimer_generic_lookup.nrseq_id_2 = ? ";
 
-	private static final String SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_ORDER_BY =   
+	private static final String SQL_SEARCH_ON_SEARCH_ID_DIMER_ORDER_BY =   
 			"  ";
 
 	
@@ -654,10 +667,10 @@ public class SearchProteinDimerSearcher {
 						psmCutoffValuesList, 
 						onlyDefaultPeptideCutoffs, 
 						onlyDefaultPsmCutoffs, 
-						SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_FIRST_PART,
-						SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_FROM_START,
-						SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_WHERE_START, 
-						SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_ORDER_BY );
+						SQL_SEARCH_ON_SEARCH_ID_DIMER_FIRST_PART,
+						SQL_SEARCH_ON_SEARCH_ID_DIMER_FROM_START,
+						SQL_SEARCH_ON_SEARCH_ID_DIMER_WHERE_START, 
+						SQL_SEARCH_ON_SEARCH_ID_DIMER_ORDER_BY );
 		
 		try {
 			
@@ -763,12 +776,15 @@ public class SearchProteinDimerSearcher {
 
 				//  These counts are only valid for PSM and Peptide at default cutoffs
 
-				if ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs ) {
-										
-					link.setNumPsms( rs.getInt( "num_psm_at_default_cutoff" ) );
-					link.setNumLinkedPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
-					link.setNumUniqueLinkedPeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
-				}
+				//  REMOVED since fields are not set so are always NULL
+//				
+//
+//				if ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs ) {
+//										
+//					link.setNumPsms( rs.getInt( "num_psm_at_default_cutoff" ) );
+//					link.setNumLinkedPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
+//					link.setNumUniqueLinkedPeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
+//				}
 				
 
 				if ( ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs )

@@ -20,6 +20,8 @@ import org.yeastrc.xlink.www.user_web_utils.TruncateProjectTitleForDisplay;
 /**
  * This class is for putting data in the "request" scope for the page header 
  *
+ * This is for Data at the Header display at the top of the page
+ *
  */
 public class GetPageHeaderData {
 	
