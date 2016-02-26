@@ -38,14 +38,15 @@ import org.yeastrc.xlink.www.objects.ViewSearchPeptidesPageDataRoot;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortAnnotationDTORecords;
+import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataDefaultDisplayInDisplayOrder;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataInSortOrder;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.cutoff_processing_web.GetCutoffPageDisplayRoot;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.PeptideQueryJSONRoot;
@@ -220,13 +221,6 @@ public class ViewSearchPeptidesAction extends Action {
 			//  Populate request objects for Standard Search Display
 
 			GetSearchDetailsData.getInstance().getSearchDetailsData( search, request );
-
-			//  This builds an object for the cutoff selection block on the page
-			
-//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-			
-//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRootSingleSearchId( searchId, request );
-
 			
 			
 			///  Get list of all possible Dynamic Mod Masses.  Do here so if convert existing Query Param Data, have it here.
@@ -765,12 +759,86 @@ public class ViewSearchPeptidesAction extends Action {
 
 
 			}
+
+			/////////////////////////////////////////
+			
+			///   Create sets of annotation type ids that were searched for but are not displayed by default.
+			///   Those annotation values will be displayed after the default, in name order
+			
+			Set<Integer> peptideAnnotationTypesSearchedFor = new HashSet<>();
 			
 
-			////////////////
+			Map<String,CutoffValuesAnnotationLevel> peptideCutoffValues = cutoffValuesSearchLevel.getPeptideCutoffValues();
+			
+			if ( peptideCutoffValues != null ) {
+
+				for (  Map.Entry<String,CutoffValuesAnnotationLevel> peptideCutoffEntry : peptideCutoffValues.entrySet() ) {
+
+					CutoffValuesAnnotationLevel cutoffValuesAnnotationLevel = peptideCutoffEntry.getValue();
+
+					int annTypeId = cutoffValuesAnnotationLevel.getId();
+					peptideAnnotationTypesSearchedFor.add( annTypeId );
+				}
+			}
+
+			// Remove annotation type ids that are in default display
+
+			for ( AnnotationTypeDTO item : reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List ) {
+
+				peptideAnnotationTypesSearchedFor.remove( item.getId() );
+			}
+
+			//  Get AnnotationTypeDTO for ids not in default display and sort in name order
+			
+			List<AnnotationTypeDTO> peptideAnnotationTypesToAddFromQuery = new ArrayList<>();
+			
+			if ( ! peptideAnnotationTypesSearchedFor.isEmpty() ) {
+				
+				//   Add in Peptide annotation types the user searched for
+				
+				Map<Integer, Map<Integer, AnnotationTypeDTO>> peptideFilterableAnnotationTypesForSearchIds =
+				GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIdsSet );
+
+				Map<Integer, AnnotationTypeDTO> peptideFilterableAnnotationTypesForSearchId =
+						peptideFilterableAnnotationTypesForSearchIds.get( searchId );
+				
+				for ( Integer peptideAnnotationTypeToAdd : peptideAnnotationTypesSearchedFor ) {
+				
+					AnnotationTypeDTO annotationTypeDTO = peptideFilterableAnnotationTypesForSearchId.get( peptideAnnotationTypeToAdd );
+
+					if ( annotationTypeDTO == null ) {
+						
+						
+					}
+					
+					peptideAnnotationTypesToAddFromQuery.add( annotationTypeDTO );
+				}
+				
+				// sort on ann type name
+				Collections.sort( peptideAnnotationTypesToAddFromQuery, new Comparator<AnnotationTypeDTO>() {
+
+					@Override
+					public int compare(AnnotationTypeDTO o1,
+							AnnotationTypeDTO o2) {
+
+						return o1.getName().compareTo( o2.getName() );
+					}
+				} );
+			}
+			
+			//   Add the searched for but not in default display AnnotationTypeDTO 
+			//   to the default display list.
+			//   The annotation data will be loaded from the DB in the searcher since they were searched for
+			
+			for ( AnnotationTypeDTO annotationTypeDTO : peptideAnnotationTypesToAddFromQuery ) {
+				
+				reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List.add( annotationTypeDTO );
+			}
+
+
+			/////////////////////
 
 			//   Copy Annotation Display Name and Descriptions to output lists, used for table headers in the HTML
-
 
 			List<AnnotationDisplayNameDescription> peptideAnnotationDisplayNameDescriptionList = new ArrayList<>( reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List.size() );
 			List<AnnotationDisplayNameDescription> psmAnnotationDisplayNameDescriptionList = new ArrayList<>( psmCutoffsAnnotationTypeDTOListAnnotationDisplayOrderSorted.size() );
@@ -796,6 +864,7 @@ public class ViewSearchPeptidesAction extends Action {
 				psmAnnotationDisplayNameDescriptionList.add(output);
 			}
 
+			
 
 			viewSearchPeptidesPageDataRoot.setPeptideAnnotationDisplayNameDescriptionList( peptideAnnotationDisplayNameDescriptionList );
 			viewSearchPeptidesPageDataRoot.setPsmAnnotationDisplayNameDescriptionList( psmAnnotationDisplayNameDescriptionList );
@@ -858,9 +927,6 @@ public class ViewSearchPeptidesAction extends Action {
 						throw new ProxlWebappDataException(msg);
 					}
 
-
-					//				if ( peptideAnnotationDTOMap != null ) {
-
 					for ( AnnotationTypeDTO annotationTypeDTO : reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List ) {
 
 						AnnotationDataBaseDTO annotationDataBaseDTO = peptideAnnotationDTOMap.get( annotationTypeDTO.getId() );
@@ -874,14 +940,11 @@ public class ViewSearchPeptidesAction extends Action {
 
 						peptideAnnotationValueList.add( annotationDataBaseDTO.getValueString() );
 					}
-					//				}
 
 
 
 
 					// Add sorted Best PSM data to webDisplayItem from webDisplayItemWrapper
-
-					//				if ( psmAnnotationDTOMap != null ) {
 
 					for ( AnnotationTypeDTO annotationTypeDTO : psmCutoffsAnnotationTypeDTOListAnnotationDisplayOrderSorted ) {
 
@@ -896,7 +959,6 @@ public class ViewSearchPeptidesAction extends Action {
 
 						psmAnnotationValueList.add( annotationDataBaseDTO.getValueString() );
 					}
-					//				}
 
 
 

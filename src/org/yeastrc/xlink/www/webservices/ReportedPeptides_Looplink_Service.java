@@ -42,6 +42,7 @@ import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataInSortOrder;
 import org.yeastrc.xlink.www.searcher.SearchReportedPeptideAnnotationDataSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_PerSearchResult;
@@ -333,6 +334,7 @@ public class ReportedPeptides_Looplink_Service {
 					getAnnotationDataAndSort(
 							searchPeptideLooplinkList,
 							searchId, 
+							cutoffValuesSearchLevel,
 							srchPgmFilterableReportedPeptideAnnotationTypeDTOMap, 
 							srchPgmDescriptiveReportedPeptideAnnotationTypeDTOMap,
 							searcherCutoffValuesSearchLevel
@@ -392,6 +394,7 @@ public class ReportedPeptides_Looplink_Service {
 			List<SearchPeptideLooplinkAnnDataWrapper> searchPeptideLooplinkWrappedList, 
 
 			int searchId,
+			CutoffValuesSearchLevel cutoffValuesSearchLevel,
 			Map<Integer, AnnotationTypeDTO> srchPgmFilterableReportedPeptideAnnotationTypeDTOMap,
 			Map<Integer, AnnotationTypeDTO> srchPgmDescriptiveReportedPeptideAnnotationTypeDTOMap,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel
@@ -464,6 +467,87 @@ public class ReportedPeptides_Looplink_Service {
 		final List<AnnotationTypeDTO> reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List = peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap.get( searchId ).getAnnotationTypeDTOList();
 								
 		
+
+
+		/////////////////////////////////////////
+		
+		///   Create sets of annotation type ids that were searched for but are not displayed by default.
+		///   Those annotation values will be displayed after the default, in name order
+		
+		Set<Integer> peptideAnnotationTypesSearchedFor = new HashSet<>();
+		
+
+		Map<String,CutoffValuesAnnotationLevel> peptideCutoffValues = cutoffValuesSearchLevel.getPeptideCutoffValues();
+		
+		if ( peptideCutoffValues != null ) {
+
+			for (  Map.Entry<String,CutoffValuesAnnotationLevel> peptideCutoffEntry : peptideCutoffValues.entrySet() ) {
+
+				CutoffValuesAnnotationLevel cutoffValuesAnnotationLevel = peptideCutoffEntry.getValue();
+
+				int annTypeId = cutoffValuesAnnotationLevel.getId();
+				peptideAnnotationTypesSearchedFor.add( annTypeId );
+			}
+		}
+
+		// Remove annotation type ids that are in default display
+
+		for ( AnnotationTypeDTO item : reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List ) {
+
+			peptideAnnotationTypesSearchedFor.remove( item.getId() );
+		}
+
+		//  Get AnnotationTypeDTO for ids not in default display and sort in name order
+		
+		List<AnnotationTypeDTO> peptideAnnotationTypesToAddFromQuery = new ArrayList<>();
+		
+		if ( ! peptideAnnotationTypesSearchedFor.isEmpty() ) {
+			
+			//   Add in Peptide annotation types the user searched for
+			
+			Map<Integer, Map<Integer, AnnotationTypeDTO>> peptideFilterableAnnotationTypesForSearchIds =
+			GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIdsCollection );
+
+			Map<Integer, AnnotationTypeDTO> peptideFilterableAnnotationTypesForSearchId =
+					peptideFilterableAnnotationTypesForSearchIds.get( searchId );
+			
+			for ( Integer peptideAnnotationTypeToAdd : peptideAnnotationTypesSearchedFor ) {
+			
+				AnnotationTypeDTO annotationTypeDTO = peptideFilterableAnnotationTypesForSearchId.get( peptideAnnotationTypeToAdd );
+
+				if ( annotationTypeDTO == null ) {
+					
+					
+				}
+				
+				peptideAnnotationTypesToAddFromQuery.add( annotationTypeDTO );
+			}
+			
+			// sort on ann type name
+			Collections.sort( peptideAnnotationTypesToAddFromQuery, new Comparator<AnnotationTypeDTO>() {
+
+				@Override
+				public int compare(AnnotationTypeDTO o1,
+						AnnotationTypeDTO o2) {
+
+					return o1.getName().compareTo( o2.getName() );
+				}
+			} );
+		}
+		
+		//   Add the searched for but not in default display AnnotationTypeDTO 
+		//   to the default display list.
+		//   The annotation data will be loaded from the DB in the searcher since they were searched for
+		
+		for ( AnnotationTypeDTO annotationTypeDTO : peptideAnnotationTypesToAddFromQuery ) {
+			
+			reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List.add( annotationTypeDTO );
+		}
+
+
+		/////////////////////
+
+
 		
 
 

@@ -300,8 +300,6 @@
 				[<a class="tool_tip_attached_jq" data-tooltip="View crosslinks (instead of looplinks)" href="${ contextPath }/<proxl:defaultPageUrl pageName="crosslinkProtein.do" searchId="${ search.id }">crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 						>View Crosslinks (<bean:write name="numCrosslinks" />)</a>]
 
-				<span style="color: red;font-size: 18pt;">Links to Downloads Under Construction and will not work</span>
-
 				[<a class="tool_tip_attached_jq" data-tooltip="Download all looplinks as tab-delimited text" href="${ contextPath }/downloadMergedProteins.do?<bean:write name="mergedQueryString" />">Download Data (<bean:write name="numLinks" />)</a>]
 				[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="mergedQueryString" />">Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
 			</div>

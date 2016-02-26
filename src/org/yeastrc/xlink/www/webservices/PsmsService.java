@@ -38,6 +38,7 @@ import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataDefaultDispla
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataInSortOrder;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_PerSearchResult;
@@ -273,35 +274,35 @@ public class PsmsService {
 		
 		//    Filterable annotations
 		
-		Map<Integer, Map<Integer, AnnotationTypeDTO>> srchPgmFilterablePsmAnnotationTypeDTOListPerSearchIdMap =
+		Map<Integer, Map<Integer, AnnotationTypeDTO>> psmFilterableAnnotationTypeDTOListPerSearchIdMap =
 				GetAnnotationTypeData.getInstance().getAll_Psm_Filterable_ForSearchIds( searchIdsCollection );
 		
 		
-		Map<Integer, AnnotationTypeDTO> srchPgmFilterablePsmAnnotationTypeDTOMap = 
-				srchPgmFilterablePsmAnnotationTypeDTOListPerSearchIdMap.get( searchId );
+		Map<Integer, AnnotationTypeDTO> psmFilterableAnnotationTypeDTOMap = 
+				psmFilterableAnnotationTypeDTOListPerSearchIdMap.get( searchId );
 		
-		if ( srchPgmFilterablePsmAnnotationTypeDTOMap == null ) {
+		if ( psmFilterableAnnotationTypeDTOMap == null ) {
 			
 			//  No records were found, probably an error   TODO
 			
-			srchPgmFilterablePsmAnnotationTypeDTOMap = new HashMap<>();
+			psmFilterableAnnotationTypeDTOMap = new HashMap<>();
 		}
 		
 		//    Descriptive annotations
 		
 
-		Map<Integer, Map<Integer, AnnotationTypeDTO>> srchPgmDescriptivePsmAnnotationTypeDTOListPerSearchIdMap =
+		Map<Integer, Map<Integer, AnnotationTypeDTO>> psmDescriptiveAnnotationTypeDTOListPerSearchIdMap =
 				GetAnnotationTypeData.getInstance().getAll_Psm_Descriptive_ForSearchIds( searchIdsCollection );
 		
 		
-		Map<Integer, AnnotationTypeDTO> srchPgmDescriptivePsmAnnotationTypeDTOMap = 
-				srchPgmDescriptivePsmAnnotationTypeDTOListPerSearchIdMap.get( searchId );
+		Map<Integer, AnnotationTypeDTO> psmDescriptiveAnnotationTypeDTOMap = 
+				psmDescriptiveAnnotationTypeDTOListPerSearchIdMap.get( searchId );
 		
-		if ( srchPgmDescriptivePsmAnnotationTypeDTOMap == null ) {
+		if ( psmDescriptiveAnnotationTypeDTOMap == null ) {
 			
 			//  No records were found, probably an error   TODO
 			
-			srchPgmDescriptivePsmAnnotationTypeDTOMap = new HashMap<>();
+			psmDescriptiveAnnotationTypeDTOMap = new HashMap<>();
 		}
 		
 		
@@ -309,18 +310,18 @@ public class PsmsService {
 
 		//  Get  Annotation Type records for Reported Peptides
 		
-		Map<Integer, Map<Integer, AnnotationTypeDTO>> srchPgmFilterableReportedPeptideAnnotationTypeDTOListPerSearchIdMap =
+		Map<Integer, Map<Integer, AnnotationTypeDTO>> reportedPeptideFilterableAnnotationTypeDTOListPerSearchIdMap =
 				GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIdsCollection );
 		
 		
-		Map<Integer, AnnotationTypeDTO> srchPgmFilterableReportedPeptideAnnotationTypeDTOMap = 
-				srchPgmFilterableReportedPeptideAnnotationTypeDTOListPerSearchIdMap.get( searchId );
+		Map<Integer, AnnotationTypeDTO> reportedPeptideFilterableAnnotationTypeDTOMap = 
+				reportedPeptideFilterableAnnotationTypeDTOListPerSearchIdMap.get( searchId );
 		
-		if ( srchPgmFilterableReportedPeptideAnnotationTypeDTOMap == null ) {
+		if ( reportedPeptideFilterableAnnotationTypeDTOMap == null ) {
 			
 			//  No records were found, allowable for Reported Peptides
 			
-			srchPgmFilterableReportedPeptideAnnotationTypeDTOMap = new HashMap<>();
+			reportedPeptideFilterableAnnotationTypeDTOMap = new HashMap<>();
 		}
 		
 
@@ -361,7 +362,13 @@ public class PsmsService {
 		
 		
 		PsmsServiceResult psmsServiceResult =
-				getAnnotationDataAndSort( searchId, searchIdsCollection, srchPgmFilterablePsmAnnotationTypeDTOMap, srchPgmDescriptivePsmAnnotationTypeDTOMap, psmWebDisplayList);
+				getAnnotationDataAndSort( 
+						searchId, 
+						searchIdsCollection, 
+						cutoffValuesSearchLevel,
+						psmFilterableAnnotationTypeDTOMap, 
+						psmDescriptiveAnnotationTypeDTOMap, 
+						psmWebDisplayList );
 		
 		
 		
@@ -374,8 +381,8 @@ public class PsmsService {
 
 	/**
 	 * @param searchIdsCollection
-	 * @param srchPgmFilterablePsmAnnotationTypeDTOMap
-	 * @param srchPgmDescriptivePsmAnnotationTypeDTOMap
+	 * @param psmFilterableAnnotationTypeDTOMap
+	 * @param psmDescriptiveAnnotationTypeDTOMap
 	 * @param psmWebDisplayList
 	 * @return
 	 * @throws Exception
@@ -384,9 +391,10 @@ public class PsmsService {
 			
 			Integer searchId,
 			Collection<Integer> searchIdsCollection,
+			CutoffValuesSearchLevel cutoffValuesSearchLevel,
 			
-			Map<Integer, AnnotationTypeDTO> srchPgmFilterablePsmAnnotationTypeDTOMap,
-			Map<Integer, AnnotationTypeDTO> srchPgmDescriptivePsmAnnotationTypeDTOMap,
+			Map<Integer, AnnotationTypeDTO> psmFilterableAnnotationTypeDTOMap,
+			Map<Integer, AnnotationTypeDTO> psmDescriptiveAnnotationTypeDTOMap,
 			List<PsmWebDisplayWebServiceResult> psmWebDisplayList 
 			
 			) throws Exception {
@@ -432,6 +440,79 @@ public class PsmsService {
 		final List<AnnotationTypeDTO> psm_AnnotationTypeDTO_DefaultDisplay_List = 
 				annotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap.get( searchId ).getAnnotationTypeDTOList();
 				
+
+		/////////////////////////////////////////
+		
+		///   Create sets of annotation type ids that were searched for but are not displayed by default.
+		///   Those annotation values will be displayed after the default, in name order
+		
+		Set<Integer> peptideAnnotationTypesSearchedFor = new HashSet<>();
+		Set<Integer> psmAnnotationTypesSearchedFor = new HashSet<>();
+		
+		Map<String,CutoffValuesAnnotationLevel> psmCutoffValues = cutoffValuesSearchLevel.getPsmCutoffValues();
+		
+		if ( psmCutoffValues != null ) {
+
+			for (  Map.Entry<String,CutoffValuesAnnotationLevel> psmCutoffEntry : psmCutoffValues.entrySet() ) {
+
+				CutoffValuesAnnotationLevel cutoffValuesAnnotationLevel = psmCutoffEntry.getValue();
+
+				int annTypeId = cutoffValuesAnnotationLevel.getId();
+				psmAnnotationTypesSearchedFor.add( annTypeId );
+			}
+		}
+		
+		// Remove annotation type ids that are in default display
+
+		for ( AnnotationTypeDTO item : psm_AnnotationTypeDTO_DefaultDisplay_List ) {
+
+			psmAnnotationTypesSearchedFor.remove( item.getId() );
+		}
+
+		//  Get AnnotationTypeDTO for ids not in default display and sort in name order
+		
+		List<AnnotationTypeDTO> psmAnnotationTypesToAddFromQuery = new ArrayList<>();
+		
+
+		if ( ! psmAnnotationTypesSearchedFor.isEmpty() ) {
+			
+			//   Add in Psm annotation types the user searched for
+			
+			for ( Integer psmAnnotationTypeToAdd : psmAnnotationTypesSearchedFor ) {
+			
+				AnnotationTypeDTO annotationTypeDTO = psmFilterableAnnotationTypeDTOMap.get( psmAnnotationTypeToAdd );
+
+				if ( annotationTypeDTO == null ) {
+					
+					
+				}
+				
+				psmAnnotationTypesToAddFromQuery.add( annotationTypeDTO );
+			}
+			
+			// sort on ann type name
+			Collections.sort( psmAnnotationTypesToAddFromQuery, new Comparator<AnnotationTypeDTO>() {
+
+				@Override
+				public int compare(AnnotationTypeDTO o1,
+						AnnotationTypeDTO o2) {
+
+					return o1.getName().compareTo( o2.getName() );
+				}
+			} );
+		}
+		
+		//   Add the searched for but not in default display AnnotationTypeDTO 
+		//   to the default display list.
+		//   The annotation data will be loaded from the DB in the searcher since they were searched for
+		
+		for ( AnnotationTypeDTO annotationTypeDTO : psmAnnotationTypesToAddFromQuery ) {
+			
+			psm_AnnotationTypeDTO_DefaultDisplay_List.add( annotationTypeDTO );
+		}
+		
+		////////////////////////////////////
+		
 		
 		//  Get set of annotation type ids for getting annotation data
 		
