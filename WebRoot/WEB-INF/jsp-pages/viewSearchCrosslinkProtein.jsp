@@ -176,19 +176,13 @@
 			
 			
 			<table style="border-width:0px;">
-				<tr>
-					<td valign="top">Search:</td>
-					<td>
 					
-						<%--  Set to false to not show color block before search for key --%>
-						<c:set var="showSearchColorBlock" value="${ false }" />
-						
-						<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
-						<%@ include file="/WEB-INF/jsp-includes/searchDetailsBlock.jsp" %>
-
-					</td>
-				</tr>
+				<%--  Set to false to not show color block before search for key --%>
+				<c:set var="showSearchColorBlock" value="${ false }" />
 				
+				<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
+				<%@ include file="/WEB-INF/jsp-includes/searchDetailsBlock.jsp" %>
+
 
 				<tr>
 					<td>Exclude xlinks with:</td>
