@@ -429,6 +429,11 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 					SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = 
 							searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
 					
+					if ( searcherCutoffValuesSearchLevel == null ) {
+						
+						searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
+					}
+					
 					{
 						List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
 								SearchProteinCrosslinkSearcher.getInstance().searchOnSearchIdandCutoffs( search, searcherCutoffValuesSearchLevel );

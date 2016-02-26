@@ -329,7 +329,12 @@ public class ViewerProteinDataService {
 
 				SearcherCutoffValuesSearchLevel	searcherCutoffValuesSearchLevel =
 						searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
-
+				
+				if ( searcherCutoffValuesSearchLevel == null ) {
+					
+					searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
+				}
+				
 				//////////////////////////
 
 				///   Get Crosslink Proteins from DB

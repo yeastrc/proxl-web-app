@@ -46,7 +46,6 @@ import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.PeptideQueryJSONRoot;
@@ -85,6 +84,7 @@ public class ViewSearchPeptidesAction extends Action {
 			  HttpServletResponse response )
 					  throws Exception {
 
+		
 		WebappTiming webappTiming = null;
 		
 		if ( log.isDebugEnabled() ) {
@@ -767,18 +767,14 @@ public class ViewSearchPeptidesAction extends Action {
 			
 			Set<Integer> peptideAnnotationTypesSearchedFor = new HashSet<>();
 			
+			List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesPerAnnotationIdList =
+					searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
 
-			Map<String,CutoffValuesAnnotationLevel> peptideCutoffValues = cutoffValuesSearchLevel.getPeptideCutoffValues();
 			
-			if ( peptideCutoffValues != null ) {
+			for (  SearcherCutoffValuesAnnotationLevel peptideCutoffEntry : peptideCutoffValuesPerAnnotationIdList ) {
 
-				for (  Map.Entry<String,CutoffValuesAnnotationLevel> peptideCutoffEntry : peptideCutoffValues.entrySet() ) {
-
-					CutoffValuesAnnotationLevel cutoffValuesAnnotationLevel = peptideCutoffEntry.getValue();
-
-					int annTypeId = cutoffValuesAnnotationLevel.getId();
-					peptideAnnotationTypesSearchedFor.add( annTypeId );
-				}
+				int annTypeId = peptideCutoffEntry.getAnnotationTypeId();
+				peptideAnnotationTypesSearchedFor.add( annTypeId );
 			}
 
 			// Remove annotation type ids that are in default display

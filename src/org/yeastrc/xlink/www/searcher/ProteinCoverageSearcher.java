@@ -16,6 +16,7 @@ import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.linkable_positions.GetLinkablePositionsForLinkers;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.objects.MergedSearchProtein;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinLooplink;
@@ -167,9 +168,18 @@ public class ProteinCoverageSearcher {
 				}
 
 				{
+					
+					SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
+							searcherCutoffValuesRootLevel.getPerSearchCutoffs( search.getId() );
+					
+					if ( searcherCutoffValuesSearchLevel == null ) {
+						
+						searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
+					}
+
 					List<SearchProteinUnlinkedWrapper> wrappedUnlinkedLinks = 
 							SearchProteinUnlinkedSearcher.getInstance()
-							.searchOnSearchIdandCutoffs( search, searcherCutoffValuesRootLevel.getPerSearchCutoffs( search.getId() ) );
+							.searchOnSearchIdandCutoffs( search, searcherCutoffValuesSearchLevel );
 
 					for ( SearchProteinUnlinkedWrapper wrappedUnlinked : wrappedUnlinkedLinks ) {
 
