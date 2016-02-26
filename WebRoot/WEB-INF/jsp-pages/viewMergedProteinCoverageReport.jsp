@@ -9,6 +9,19 @@
 
  <c:set var="headerAdditions">
 
+		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js"></script> 
+		
+		
+		<!-- Handlebars templating library   -->
+		
+		<%--  
+		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.js"></script>
+		--%>
+		
+		<!-- use minimized version  -->
+		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
+
+		
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter.min.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
 				
