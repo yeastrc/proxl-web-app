@@ -821,9 +821,7 @@ function refreshData() {
 	
 	updateURLHash( true /* useSearchForm */ );
 	
-	searchFormUpdateButtonPressed();
-	
-	searchFormUpdateButtonPressed_ForDefaultPageView();
+	defaultPageView.searchFormUpdateButtonPressed_ForDefaultPageView();
 	
 
 
@@ -1804,20 +1802,6 @@ function loadDataFromService() {
 	        	/////////
 	        	
 	        	
-				
-				   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-						  
-						initNagUser();
-
-				   },10);
-				   
-					
-				   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-						
-						initDefaultPageView() ;
-				   },10);
-
-	        	
 	        	loadDataAndDraw( true /* doDraw */ );
 	        	
 	        	
@@ -1887,7 +1871,7 @@ function populateSearchForm() {
 	
 	$taxonomy_checkboxes.find("input").change(function() {
 		
-		searchFormChanged_ForNag();	searchFormChanged_ForDefaultPageView();
+		defaultPageView.searchFormChanged_ForDefaultPageView();;
 	});
 	
 	
@@ -1902,10 +1886,6 @@ function populateSearchForm() {
 			$( "input#exclude-type-" + _excludeType[ i ] ).prop( 'checked', true );
 		}
 	}
-	
-	saveCurrentSearchFormValues_ForNag();
-	
-	saveCurrentSearchFormValues_ForDefaultPageView();
 	
 }
 
@@ -1993,54 +1973,14 @@ function refreshViewerProteinSelects() {
 		
 }
 
-//////////////////
 
+function getNavigationJSON_Not_for_Image_Or_Structure() {
 
-function populateNavigation() {
-	
-	var queryString = "?";
-	var items = new Array();
-	
 	
 	var json = getJsonFromHash();
 	
 	
-	
-	if ( _searches.length > 1 ) {
-		for ( var i = 0; i < _searchIds.length; i++ ) {
-			items.push( "searchIds=" + _searchIds[ i ] );
-		}
-	} else {
-		items.push( "searchId=" + _searchIds[ 0 ] );		
-	}
 
-
-	//   Moved to inserto into JSON
-	
-//	if ( json.excludeTaxonomy != undefined && json.excludeTaxonomy.length > 0 ) {
-//		for ( var i = 0; i < json.excludeTaxonomy.length; i++ ) {
-//			items.push( "excludeTaxonomy=" + json.excludeTaxonomy[ i ] );
-//		}
-//	}
-	
-//	items.push( "psmQValueCutoff=" + json.psmQValueCutoff );
-//	items.push( "peptideQValueCutoff=" + json.peptideQValueCutoff );
-	
-
-	//   Moved to inserto into JSON
-	
-//	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
-//		items.push( "filterNonUniquePeptides=on" );
-//	}
-//	if ( json.filterOnlyOnePSM != undefined && json.filterOnlyOnePSM ) {
-//		items.push( "filterOnlyOnePSM=on" );
-//	}
-//	if ( json.filterOnlyOnePeptide != undefined && json.filterOnlyOnePeptide ) {
-//		items.push( "filterOnlyOnePeptide=on" );
-//	}
-	
-	
-	
 	///   Serialize cutoffs to JSON
 	
 	var cutoffs = json.cutoffs;
@@ -2067,8 +2007,33 @@ function populateNavigation() {
 		baseJSONObject.excludeTaxonomy = json.excludeTaxonomy;
 	}
 
+	return baseJSONObject;
+}
+
+//////////////////
+
+
+function populateNavigation() {
+	
+	var queryString = "?";
+	var items = new Array();
+	
+	
+	if ( _searches.length > 1 ) {
+		for ( var i = 0; i < _searchIds.length; i++ ) {
+			items.push( "searchIds=" + _searchIds[ i ] );
+		}
+	} else {
+		items.push( "searchId=" + _searchIds[ 0 ] );		
+	}
+
+	
+	var baseJSONObject = getNavigationJSON_Not_for_Image_Or_Structure();
+	
+	
 	
 	var psmPeptideCutoffsForSearchIds_JSONString = JSON.stringify( baseJSONObject );
+	
 	
 	var psmPeptideCutoffsForSearchIds_JSONStringEncodedURIComponent = encodeURIComponent( psmPeptideCutoffsForSearchIds_JSONString ); 
 
@@ -2158,7 +2123,7 @@ function populateNavigation() {
 
 
 		var structureNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View data on 3D structures\" " +
-			"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar;
+			"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/";
 			
 			
 		var viewMergedStructureDefaultPageUrl = $("#viewMergedStructureDefaultPageUrl").val();
@@ -2168,14 +2133,14 @@ function populateNavigation() {
 			      
 			var structureQueryString = "?";
 
-			for ( var i = 0; i < _searchIds.length; i++ ) {
+			for ( var j = 0; j < _searchIds.length; j++ ) {
 
-				if ( i > 0 ) {
+				if ( j > 0 ) {
 
 					structureQueryString += "&";
 				}
 
-				structureQueryString += "searchIds=" + _searchIds[ i ];
+				structureQueryString += "searchIds=" + _searchIds[ j ];
 			}
 
 			var structureJSON = { };
@@ -2199,7 +2164,7 @@ function populateNavigation() {
 			var structureJSONString = encodeURIComponent( JSON.stringify( structureJSON ) );
 
 			
-			structureNavHTML += "/structure.do" + structureQueryString + "#" + structureJSONString 
+			structureNavHTML += "structure.do" + structureQueryString + "#" + structureJSONString;
 
 
 		} else {
@@ -2215,16 +2180,6 @@ function populateNavigation() {
 		addToolTips( $structure_viewer_link_span );
 
 	}
-	
-	
-	if ( _searches.length === 1 ) {
-		
-		$("#mergedImageSaveOrUpdateDefaultPageView").show();
-	} else {
-		
-		$("#mergedImageSaveOrUpdateDefaultPageView").hide();
-	}
-	
 	
 }
 
@@ -6075,32 +6030,22 @@ function initPage() {
 	_proteinBarToolTip_template_HandlebarsTemplate = Handlebars.compile( proteinBarToolTip_template_handlebarsSource );
 
 	
-//	$( "input#psmQValueCutoff" ).change(function() {
-//		
-//		searchFormChanged_ForNag();	searchFormChanged_ForDefaultPageView();
-//	});
-//	$( "input#peptideQValueCutoff" ).change(function() {
-//		
-//		searchFormChanged_ForNag();	searchFormChanged_ForDefaultPageView();
-//	});
-	
-	
 	$( "input#filterNonUniquePeptides" ).change(function() {
 		
-		searchFormChanged_ForNag();	searchFormChanged_ForDefaultPageView();
+		defaultPageView.searchFormChanged_ForDefaultPageView();
 	});
 	$( "input#filterOnlyOnePSM" ).change(function() {
 		
-		searchFormChanged_ForNag();	searchFormChanged_ForDefaultPageView();
+		defaultPageView.searchFormChanged_ForDefaultPageView();
 	});
 	$( "input#filterOnlyOnePeptide" ).change(function() {
 		
-		searchFormChanged_ForNag();	searchFormChanged_ForDefaultPageView();
+		defaultPageView.searchFormChanged_ForDefaultPageView();
 	});		
 
 	$("#exclude_protein_types_block").find("input").change(function() {
 		
-		searchFormChanged_ForNag();	searchFormChanged_ForDefaultPageView();
+		defaultPageView.searchFormChanged_ForDefaultPageView();
 	});
 };
 
@@ -6108,26 +6053,22 @@ $(document).ready(function()  {
 	initPage();
 });
 
+///////////
 
-function mergedImageSaveOrUpdateDefaultPageView__( clickedThis ) {
-	
-	var search = _searches[ 0 ];
-	
-	var searchId = search.id;
-	
-	saveOrUpdateDefaultPageView( { clickedThis : clickedThis, searchId : searchId } );
-	 
+//   Object for passing to other objects
+
+var imageViewerPageObject = {
+
+		getQueryJSONString : function() {
+
+			var queryJSON = getNavigationJSON_Not_for_Image_Or_Structure();
+
+			var queryJSONString = JSON.stringify( queryJSON );
+
+			return queryJSONString;
+		}
 };
 
-
-
-//// not related to viewer
-//function toggleVisibility( item ) {
-//	var $jitem = $('#' + item).next();
-//
-//	if ( $jitem.is(":visible" ) ) { $jitem.hide(); }
-//	else { $jitem.show(); }
-//} 
 
 
 

@@ -52,8 +52,6 @@
 		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
 		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js"></script>
-				
-		<script type="text/javascript" src="${ contextPath }/js/nagWhenFormChangedButNotUpdated.js"></script>				
 		
 		
 				<%-- 
@@ -233,34 +231,20 @@
 					</td>
 				</tr>
 
-				<%-- Spacer --%>  
-<%--				  
-				<tr>
-					<td style="height: 6px;"></td>
-				</tr>
---%>
-				
-				<%--  The section at the top of the page with the cutoffs, in the user input section --%>
-				
-<%-- 
-				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inDataEntryForm.jsp" %>
---%>				
-				
-				
 				
 				<tr>
 					<td>Exclude xlinks with:</td>
 					<td>
 						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterNonUniquePeptides" > <%-- onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" --%> 					
+							<input type="checkbox" id="filterNonUniquePeptides"  > 					
 						 	 no unique peptides
 						 </span></label>
 						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterOnlyOnePSM" > <%--  onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" --%> 					
+							<input type="checkbox" id="filterOnlyOnePSM"   > 					
 						 	 only one PSM
 						 </span></label>
 						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterOnlyOnePeptide" > <%--  onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" --%> 					
+							<input type="checkbox" id="filterOnlyOnePeptide"   > 					
 						 	 only one peptide
 						 </span></label>
 					</td>
@@ -273,14 +257,14 @@
 						
 <%-- 						
 						 <label style="white-space: nowrap" >
-						  <html:multibox property="excludeTaxonomy" styleClass="excludeTaxonomy_jq" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" >
+						  <html:multibox property="excludeTaxonomy" styleClass="excludeTaxonomy_jq"  >
 						   <bean:write name="taxonomy" property="key"/> 
 						  </html:multibox> 
 						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
 						 </label> 
 --%>						 
 						 <label style="white-space: nowrap" >
-						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq "> <%-- onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" --%>  
+						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq "  >  
 						  
 						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
 						 </label> 						 
@@ -293,7 +277,7 @@
 					<td>
 						<%--  shortened property from "excludeProtein" to "excP" to shorten the URL  --%>
 						<%-- TODO   TEMP
-						<html:select property="excP" multiple="true" styleId="excludeProtein" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" >
+						<html:select property="excP" multiple="true" styleId="excludeProtein"  >
 							<html:options collection="proteins" property="nrProtein.nrseqId" labelProperty="name" />
 						</html:select>
 						--%>
@@ -303,7 +287,7 @@
 						
 						All <option> values must be parsable as integers:
 						--%>
-						<select name="excludedProteins" multiple="multiple" id="excludeProtein"> <!-- onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" -->  
+						<select name="excludedProteins" multiple="multiple" id="excludeProtein"  >  
 						  
 	  						<logic:iterate id="protein" name="allProteinsForCrosslinksAndLooplinksUnfilteredList">
 	  						  <option value="<c:out value="${ protein.nrProtein.nrseqId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
@@ -656,9 +640,6 @@ private List<String> peptideAnnotationValueList;
 
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
 
-			<%@ include file="/WEB-INF/jsp-includes/nagWhenFormChangedButNotUpdated_Overlay.jsp" %>
-	
-	
 
 
 		</div>

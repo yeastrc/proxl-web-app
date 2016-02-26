@@ -50,8 +50,6 @@
 		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
 		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js"></script>
-		
-		<script type="text/javascript" src="${ contextPath }/js/nagWhenFormChangedButNotUpdated.js"></script>				
 
 		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
 		
@@ -162,7 +160,7 @@
 			value="<proxl:defaultPageUrl pageName="crosslinkProtein.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 		<input type="hidden" id="viewProteinCoverageReportDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="proteinCoverageReport.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
-		<input type="hidden" id="viewviewMergedImageDefaultPageUrl" 
+		<input type="hidden" id="viewMergedImageDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="image.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 	</c:if>
 					
@@ -204,14 +202,6 @@
 					</td>
 				</tr>
 
-
-				<%--  The section at the top of the page with the cutoffs, in the user input section --%>
-				
-<%-- 
-				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inDataEntryForm.jsp" %>
---%>				
-				
-				
 				<tr>
 					<td>Exclude xlinks with:</td>
 					<td>
@@ -254,12 +244,20 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td>
-						<input type="button" value="Update From Database" onClick="javascript:refreshData()">
+
+						<c:set var="UpdateButtonText" value="Update From Database"/>
 						
-						<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
-							<input type="button" value="Save As Default" style="display: none;" id="mergedImageSaveOrUpdateDefaultPageView"
-								onclick="mergedImageSaveOrUpdateDefaultPageView__( this )">
+						<input type="button" value="${ UpdateButtonText }"  onclick="refreshData()" >
+
+						<c:if test="${ not empty onlySingleSearchId }">
+
+							<c:set var="searchId" value="${ onlySingleSearchId }"/>	
+								
+							<c:set var="page_JS_Object" value="structureViewerPageObject"/>
+							
+							<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
 						</c:if>
+															
 					</td>
 				</tr>
 			
@@ -566,8 +564,6 @@
 
 
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
-			
-			<%@ include file="/WEB-INF/jsp-includes/nagWhenFormChangedButNotUpdated_Overlay.jsp" %>
 			
 			<%@ include file="/WEB-INF/jsp-includes/pdb-upload-overlay.jsp" %>
 			<%@ include file="/WEB-INF/jsp-includes/pdb-map-protein-overlay.jsp" %>

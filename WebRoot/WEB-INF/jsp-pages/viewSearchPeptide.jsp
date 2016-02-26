@@ -55,8 +55,6 @@
 		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 
 		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js"></script>
-		
-		<script type="text/javascript" src="${ contextPath }/js/nagWhenFormChangedButNotUpdated.js"></script>				
 
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
@@ -188,16 +186,19 @@
 
 					  <label >
 						<input type="checkbox" class=" link_type_jq " 
+							onchange="defaultPageView.searchFormChanged_ForDefaultPageView();"
 							value="<%= PeptideViewLinkTypesConstants.CROSSLINK_PSM %>"   >
 						crosslinks
 					  </label>
 					  <label >
 						<input type="checkbox" class=" link_type_jq " 
+							onchange="defaultPageView.searchFormChanged_ForDefaultPageView();"
 							value="<%= PeptideViewLinkTypesConstants.LOOPLINK_PSM %>" >
 						looplinks
 					  </label> 
 					  <label >
 						<input type="checkbox" class=" link_type_jq " 
+							onchange="defaultPageView.searchFormChanged_ForDefaultPageView();"
 							value="<%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>" >
 						 unlinked
 					  </label>
@@ -209,6 +210,7 @@
 					<td colspan="2">
 					  <label >
 						<input type="checkbox" class=" mod_mass_filter_jq " 
+							onchange="defaultPageView.searchFormChanged_ForDefaultPageView();"
 							value="" >
 						No modifications
 					  </label>
@@ -217,6 +219,7 @@
 						
 						 <label style="white-space: nowrap" >
 							<input type="checkbox" class=" mod_mass_filter_jq " 
+								onchange="defaultPageView.searchFormChanged_ForDefaultPageView();"
 						  		value="<bean:write name="modMassFilter" />" > 
 						   <bean:write name="modMassFilter" />
 						 </label>
@@ -229,16 +232,17 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td colspan="5">
+					
+						<c:set var="UpdateButtonText" value="Update"/>
 						
-<%--   WAS 						
-						<input type="submit" value="Update" >
---%>						
-						<input type="button" value="Update"  onclick="viewSearchPeptidePageCode.updatePageForFormParams()" >
+						<input type="button" value="${ UpdateButtonText }"  onclick="viewSearchPeptidePageCode.updatePageForFormParams()" >
 						
-						<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
-							<input type="button" value="Save As Default" id="mergedImageSaveOrUpdateDefaultPageView"
-								onclick="saveOrUpdateDefaultPageView( { clickedThis : this, searchId: ${ viewSearchPeptidesPageDataRoot.searchId } } )">
-						</c:if>
+						<c:set var="searchId" value="${ viewSearchPeptidesPageDataRoot.searchId }"/>	
+
+						<c:set var="page_JS_Object" value="viewSearchPeptidePageCode"/>
+						
+						<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
+
 					</td>
 				</tr>
 			
@@ -445,8 +449,6 @@
 
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
 
-			<%@ include file="/WEB-INF/jsp-includes/nagWhenFormChangedButNotUpdated_Overlay.jsp" %>
-			
 		
 		</div>
 	

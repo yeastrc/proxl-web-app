@@ -42,6 +42,10 @@ $(document).ready(function()
 var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 
+	var _query_json_field_Contents = null;
+	
+	var _query_json_field_String = null;
+
 
 
 	///////////////
@@ -62,28 +66,16 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 			objectThis.updateUserInputFieldsWithDataIn_query_json_field_ContentsInHiddenField( params );
 
-//			createImageViewerLink();
-
-//			createStructureViewerLink();
-
-
-		},10);
-
-
-
-		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-
-//			initNagUser();
-		},10);
-
-		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-
-//			initDefaultPageView() ;
 		},10);
 
 
 	};
 
+	this.getQueryJSONString = function() {
+		
+		return _query_json_field_String;
+	};
+	
 
 	/////////////////
 
@@ -94,8 +86,6 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 		//  listOfObjectsToPassPsmPeptideCutoffsRootTo: an array of functions to call 
 		//                                                the function setPsmPeptideCriteria on 
 		//												  passing the parameter: psmPeptideCutoffsRootObject
-		
-		var query_json_field_Contents = null;
 
 
 		var $query_json_field =  $("#query_json_field_outside_form");
@@ -105,14 +95,14 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 			throw "No HTML field with id 'query_json_field'";
 		}
 
-		var query_json_field_String = $query_json_field.val();
+		_query_json_field_String = $query_json_field.val();
 
 		try {
-			query_json_field_Contents = JSON.parse( query_json_field_String );
+			_query_json_field_Contents = JSON.parse( _query_json_field_String );
 
 		} catch( e ) {
 
-			throw "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + query_json_field_String;
+			throw "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + _query_json_field_String;
 
 		}
 
@@ -124,11 +114,11 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 //		private int[] excludeProtein;
 
 
-		cutoffProcessingCommonCode.putCutoffsOnThePage( { cutoffs : query_json_field_Contents.cutoffs } );
+		cutoffProcessingCommonCode.putCutoffsOnThePage( { cutoffs : _query_json_field_Contents.cutoffs } );
 
 
 		this.passCutoffsToGetDataFromWebservicesJS( 
-				{ psmPeptideCutoffsRootObject : query_json_field_Contents.cutoffs,
+				{ psmPeptideCutoffsRootObject : _query_json_field_Contents.cutoffs,
 					listOfObjectsToPassPsmPeptideCutoffsRootTo : listOfObjectsToPassPsmPeptideCutoffsRootTo
 				} );
 
@@ -136,16 +126,16 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 		//  Mark check boxes for chosen links to exclude:  "no unique peptides", "only one PSM", "only one peptide"
 
-		if ( query_json_field_Contents.filterNonUniquePeptides ) {
+		if ( _query_json_field_Contents.filterNonUniquePeptides ) {
 
 			$("#filterNonUniquePeptides").prop('checked', true);
 		}
 
-		if ( query_json_field_Contents.filterOnlyOnePSM ) {
+		if ( _query_json_field_Contents.filterOnlyOnePSM ) {
 
 			$("#filterOnlyOnePSM").prop('checked', true);
 		}
-		if ( query_json_field_Contents.filterOnlyOnePeptide ) {
+		if ( _query_json_field_Contents.filterOnlyOnePeptide ) {
 
 			$("#filterOnlyOnePeptide").prop('checked', true);
 		}
@@ -153,7 +143,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 		//  Mark check boxes for chosen taxonomy to exclude
 
-		var excludeTaxonomy = query_json_field_Contents.excludeTaxonomy;
+		var excludeTaxonomy = _query_json_field_Contents.excludeTaxonomy;
 
 		if ( excludeTaxonomy !== undefined && excludeTaxonomy !== null ) {
 
@@ -192,7 +182,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 		//  Mark Multi <select> for chosen Proteins to exclude
 
-		var excludeProtein = query_json_field_Contents.excludeProtein;
+		var excludeProtein = _query_json_field_Contents.excludeProtein;
 
 		$("#excludeProtein").val( excludeProtein );
 

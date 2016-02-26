@@ -55,9 +55,6 @@
 				
 		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/nagWhenFormChangedButNotUpdated.js"></script>				
-		
-		
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This input is required on this page:
@@ -688,8 +685,6 @@ private List<String> peptideAnnotationValueList;
 
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
 
-			<%@ include file="/WEB-INF/jsp-includes/nagWhenFormChangedButNotUpdated_Overlay.jsp" %>
-			
 
 		</div>
 	

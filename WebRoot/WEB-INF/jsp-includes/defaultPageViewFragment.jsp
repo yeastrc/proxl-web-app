@@ -19,7 +19,7 @@
 		 id="current_url_saved_as_default_page_view_success">
 		 
 	<div class="success-message-inner-container" >
-		<div class="success-message-close-x " onclick="hideSaveOrUpdateDefaultPageViewMsg( this )">X</div>
+		<div class="success-message-close-x " onclick="defaultPageView.hideSaveOrUpdateDefaultPageViewMsg( this )">X</div>
 		<div class="success-message-text" >Default Saved</div>
 	</div>
 </div>

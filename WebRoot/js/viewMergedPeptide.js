@@ -39,24 +39,8 @@ var ViewMergedPeptidePageCode = function() {
 
 			objectThis.get_query_json_field_ContentsFromHiddenField();
 
-//			createImageViewerLink();
-
-//			createStructureViewerLink();
-
 			window.createVennDiagramIfNeeded();
 
-		},10);
-
-
-
-		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-
-//			initNagUser();
-		},10);
-
-		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-
-//			initDefaultPageView() ;
 		},10);
 
 

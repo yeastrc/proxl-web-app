@@ -483,7 +483,11 @@ var CutoffProcessingCommonCode = function() {
 			return;  //  EARLY EXIT
 		}
 		
-		this._storeFieldValuesAndUpdateCutoffDisplay( { $cutoff_overlay_enclosing_block_jq : $cutoff_overlay_enclosing_block_jq } );
+		this._storeFieldValuesAndUpdateCutoffDisplay( 
+				{ 
+					$cutoff_overlay_enclosing_block_jq : $cutoff_overlay_enclosing_block_jq,
+					saveUserValuesRequested : true 
+				} );
 		
 
 		this.closeCutoffOverlay( { $cutoffs_overlay_container_jq : $cutoffs_overlay_container_jq } );
@@ -576,6 +580,8 @@ var CutoffProcessingCommonCode = function() {
 		
 		var $cutoff_overlay_enclosing_block_jq = params.$cutoff_overlay_enclosing_block_jq;
 		
+		var saveUserValuesRequested = params.saveUserValuesRequested;
+		
 
 		///    Get data from the input fields.  Store it in .data(...) and in an array
 		
@@ -584,6 +590,7 @@ var CutoffProcessingCommonCode = function() {
 		var $annotation_cutoff_input_field_jq = $cutoff_overlay_enclosing_block_jq.find(".annotation_cutoff_input_field_jq");
 		
 		
+		var anyValuesChanged = false;
 		
 		var cutoffDataEntries = [];
 		
@@ -595,7 +602,21 @@ var CutoffProcessingCommonCode = function() {
 			
 
 			var cutoffValue = $inputField.val();
+			
+			
+			
+			//  Compare new value to prev value
+			
+			//  Get prev value in data
+			var prevCutoffValue = $inputField.data( _CUTOFF_VALUE__DATA__ );
+						
+			if ( cutoffValue !== prevCutoffValue ) {
 
+				anyValuesChanged = true;
+			}
+			
+			
+			
 			//  Store value in data
 			$inputField.data( _CUTOFF_VALUE__DATA__, cutoffValue );
 			
@@ -691,6 +712,16 @@ var CutoffProcessingCommonCode = function() {
 		}
 		
 		addToolTips( $associated_cutoffs_display_block );
+		
+		if ( anyValuesChanged && saveUserValuesRequested ) {
+			
+			if ( window.defaultPageView ) {
+			
+				defaultPageView.defaultPageView.searchFormChanged_ForDefaultPageView();
+			}
+		}
+		
+		
 	};	
 	
 

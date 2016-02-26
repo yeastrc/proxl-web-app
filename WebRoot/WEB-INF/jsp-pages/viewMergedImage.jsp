@@ -50,8 +50,6 @@
 		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
 		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js"></script>
-		
-		<script type="text/javascript" src="${ contextPath }/js/nagWhenFormChangedButNotUpdated.js"></script>				
 
 		
 		
@@ -197,20 +195,6 @@
 					</td>
 				</tr>
 
-
-				<%-- Spacer --%>  
-<%--				  
-				<tr>
-					<td style="height: 6px;"></td>
-				</tr>
---%>
-				
-				<%--  The section at the top of the page with the cutoffs, in the user input section --%>
-
-<%-- 
-				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inDataEntryForm.jsp" %>
---%>				
-				
 				<tr>
 					<td>Exclude links with:</td>
 					<td>
@@ -254,12 +238,20 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td>
-						<input type="button" value="Update From Database" onClick="javascript:refreshData()">
-				
-						<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
-							<input type="button" value="Save As Default" style="display: none;" id="mergedImageSaveOrUpdateDefaultPageView"
-								onclick="mergedImageSaveOrUpdateDefaultPageView__( this )">
+
+						<c:set var="UpdateButtonText" value="Update From Database"/>
+						
+						<input type="button" value="${ UpdateButtonText }"  onclick="refreshData()" >
+
+						<c:if test="${ not empty onlySingleSearchId }">
+
+							<c:set var="searchId" value="${ onlySingleSearchId }"/>	
+								
+							<c:set var="page_JS_Object" value="imageViewerPageObject"/>
+							
+							<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
 						</c:if>
+											
 					</td>
 				</tr>
 			
@@ -639,9 +631,6 @@
 			
 
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
-			
-			<%@ include file="/WEB-INF/jsp-includes/nagWhenFormChangedButNotUpdated_Overlay.jsp" %>
-			
 			
 	</div>  <%--  END  <div class="overall-enclosing-block"> --%>
 	

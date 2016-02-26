@@ -24,8 +24,6 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter.min.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
-				
-		<script type="text/javascript" src="${ contextPath }/js/nagWhenFormChangedButNotUpdated.js"></script>				
 
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
@@ -173,32 +171,19 @@
 					</td>
 				</tr>
 
-				<%-- Spacer --%>  
-<%--				  
-				<tr>
-					<td style="height: 6px;"></td>
-				</tr>
---%>
-				
-				<%--  The section at the top of the page with the cutoffs, in the user input section --%>
-
-<%-- 
-				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inDataEntryForm.jsp" %>
---%>				
-				
 				<tr>
 					<td>Exclude xlinks with:</td>
 					<td>
 						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterNonUniquePeptides" > <%-- onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" --%> 					
+							<input type="checkbox" id="filterNonUniquePeptides" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" > 					
 						 	 no unique peptides
 						 </span></label>
 						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterOnlyOnePSM" > <%--  onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" --%> 					
+							<input type="checkbox" id="filterOnlyOnePSM"  onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" > 					
 						 	 only one PSM
 						 </span></label>
 						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterOnlyOnePeptide" > <%--  onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" --%> 					
+							<input type="checkbox" id="filterOnlyOnePeptide"  onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" > 					
 						 	 only one peptide
 						 </span></label>
 					</td>
@@ -211,14 +196,14 @@
 						
 <%-- 						
 						 <label style="white-space: nowrap" >
-						  <html:multibox property="excludeTaxonomy" styleClass="excludeTaxonomy_jq" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" >
+						  <html:multibox property="excludeTaxonomy" styleClass="excludeTaxonomy_jq" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >
 						   <bean:write name="taxonomy" property="key"/> 
 						  </html:multibox> 
 						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
 						 </label> 
 --%>						 
 						 <label style="white-space: nowrap" >
-						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq "> <%-- onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" --%>  
+						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq " onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >  
 						  
 						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
 						 </label> 						 
@@ -231,7 +216,7 @@
 					<td>
 						<%--  shortened property from "excludeProtein" to "excP" to shorten the URL  --%>
 						<%-- TODO   TEMP
-						<html:select property="excP" multiple="true" styleId="excludeProtein" onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" >
+						<html:select property="excP" multiple="true" styleId="excludeProtein" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >
 							<html:options collection="proteins" property="nrProtein.nrseqId" labelProperty="name" />
 						</html:select>
 						--%>
@@ -241,7 +226,7 @@
 						
 						All <option> values must be parsable as integers:
 						--%>
-						<select name="excludedProteins" multiple="multiple" id="excludeProtein"> <!-- onchange="searchFormChanged_ForNag(); searchFormChanged_ForDefaultPageView();" -->  
+						<select name="excludedProteins" multiple="multiple" id="excludeProtein" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >  
 						  
 	  						<logic:iterate id="protein" name="proteins">
 	  						  <option value="<c:out value="${ protein.nrProtein.nrseqId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
@@ -253,16 +238,20 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td>
-						
-<%--   WAS 						
-						<input type="submit" value="Update" >
---%>						
-						<input type="button" value="Update"  onclick="viewProteinCoverageReportPageCode.updatePageForFormParams()" >
 
-						<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
-							<input type="button" value="Save As Default" id="mergedImageSaveOrUpdateDefaultPageView"
-								onclick="saveOrUpdateDefaultPageView( { clickedThis : this, searchId: <bean:write name="search" property="id" /> } )">
-						</c:if>
+						<c:set var="UpdateButtonText" value="Update"/>
+						
+						<input type="button" value="${ UpdateButtonText }"  onclick="viewProteinCoverageReportPageCode.updatePageForFormParams()" >
+
+						<c:if test="${ not mergedPage }"> 	
+							
+							<c:set var="searchId" value="${ search.id }"/>	
+	
+							<c:set var="page_JS_Object" value="viewSearchProteinPageCommonCrosslinkLooplinkCoverage"/>
+						
+							<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
+						
+						</c:if>						
 					</td>
 				</tr>
 			
@@ -548,10 +537,7 @@
 						
 					</tr>				
 				</table>
-								
 
-			<%@ include file="/WEB-INF/jsp-includes/nagWhenFormChangedButNotUpdated_Overlay.jsp" %>
-	
 		</div>
 	
 

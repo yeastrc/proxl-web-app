@@ -27,6 +27,8 @@ $(document).ready(function()
 var ViewSearchPeptidePageCode = function() {
 
 		var _query_json_field_Contents = null;
+		
+		var _query_json_field_String = null;
 
 		
 		//  function called after all HTML above main table is generated
@@ -38,29 +40,16 @@ var ViewSearchPeptidePageCode = function() {
 			   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 					  
 				   objectThis.get_query_json_field_ContentsFromHiddenField();
-
-//			 		createImageViewerLink();
-//			 		
-//			 		createStructureViewerLink();
-			 		
-					
+	
 			   },10);
 			  
-			
-			
-			   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-					  
-//					initNagUser();
-			   },10);
-			   
-			   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-					
-//					initDefaultPageView() ;
-			   },10);
-			   
-			   
 		};
 		
+		
+		this.getQueryJSONString = function() {
+			
+			return _query_json_field_String;
+		};
 		
 		
 		
@@ -85,14 +74,14 @@ var ViewSearchPeptidePageCode = function() {
 				throw "No HTML field with id '" + query_json_field_outside_form_id + "'";
 			}
 			
-			var query_json_field_String = $query_json_field.val();
+			_query_json_field_String = $query_json_field.val();
 			
 			try {
-				_query_json_field_Contents = JSON.parse( query_json_field_String );
+				_query_json_field_Contents = JSON.parse( _query_json_field_String );
 				
 			} catch( e ) {
 				
-				throw "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + query_json_field_String;
+				throw "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + _query_json_field_String;
 				
 			}
 
