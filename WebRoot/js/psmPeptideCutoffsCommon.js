@@ -717,7 +717,7 @@ var CutoffProcessingCommonCode = function() {
 			
 			if ( window.defaultPageView ) {
 			
-				defaultPageView.defaultPageView.searchFormChanged_ForDefaultPageView();
+				defaultPageView.searchFormChanged_ForDefaultPageView();
 			}
 		}
 		
