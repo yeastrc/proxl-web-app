@@ -29,7 +29,6 @@ import org.yeastrc.xlink.www.searcher.SearchModMassDistinctSearcher;
 import org.yeastrc.xlink.www.actions.PeptidesMergedCommonPageDownload.PeptidesMergedCommonPageDownloadResult;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.cutoff_processing_web.GetCutoffPageDisplayRoot;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
 import org.yeastrc.xlink.www.objects.SearchBooleanWrapper;
@@ -260,11 +259,9 @@ public class ViewMergedSearchPeptidesAction extends Action {
 
 			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
 
-			//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-
-//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsSet, request );
-
-
+			
+			
+			
 			List<Double> modMassDistinctForSearchesList = SearchModMassDistinctSearcher.getInstance().getDistinctDynamicModMassesForSearchId( searchIds );
 
 			if ( webappTiming != null ) {

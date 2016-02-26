@@ -3,7 +3,6 @@ package org.yeastrc.xlink.www.nav_links_image_structure;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.ImageStructureQueryJSONRoot;

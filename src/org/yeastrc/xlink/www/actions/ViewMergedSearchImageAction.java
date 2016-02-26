@@ -27,7 +27,6 @@ import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.cutoff_processing_web.GetCutoffPageDisplayRoot;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -215,13 +214,9 @@ public class ViewMergedSearchImageAction extends Action {
 			GetProteinListingTooltipConfigData.getInstance().getProteinListingTooltipConfigData( request );
 
 			
+			//  Populate request objects for Standard Search Display
+
 			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
-
-
-//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-			
-//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsCollection, request );
-	
 
 			
 			boolean showStructureLink = true;

@@ -36,7 +36,6 @@ import org.yeastrc.xlink.www.actions.ProteinsMergedCommonPageDownload.ProteinsMe
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.Struts_Config_Parameter_Values_Constants;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.cutoff_processing_web.GetCutoffPageDisplayRoot;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.objects.SearchCount;
@@ -263,14 +262,6 @@ public class ViewMergedSearchProteinsAction extends Action {
 						
 			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
 
-			//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-
-			//  Set attribute in request object for Page Display of cutoffs
-//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsSet, request );
-
-
-			
-
 
 			// sort our searches by ID
 			Collections.sort( searches, new Comparator<SearchDTO>() {
@@ -279,8 +270,6 @@ public class ViewMergedSearchProteinsAction extends Action {
 				}
 			});
 
-
-			
 			///////////////
 
 

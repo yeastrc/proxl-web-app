@@ -20,7 +20,6 @@ import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.cutoff_processing_web.GetCutoffPageDisplayRoot;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
@@ -262,20 +261,10 @@ public class ViewMergedStructureAction extends Action {
 			request.setAttribute( "cutoffValuesRootLevelCutoffDefaults", cutoffValuesRootLevelCutoffDefaultsJSONString );
 
 
-
 			//  Populate request objects for Standard Search Display
 						
 			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
-	
-			
-			//  This builds an object for the cutoff selection block on the page
-			
 
-//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-			
-//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsCollection, request );
-	
-			
 		
 		} catch ( Exception e ) {
 

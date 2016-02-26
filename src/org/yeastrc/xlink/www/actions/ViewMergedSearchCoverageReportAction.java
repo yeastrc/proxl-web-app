@@ -291,15 +291,10 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			request.setAttribute( "searches", searches );
 			
 			
+			
+			//  Populate request objects for Standard Search Display
+
 			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
-
-
-//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-			
-//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsCollection, request );
-
-			
-			
 
 			
 			//   Get Query JSON from the form and if not empty, deserialize it

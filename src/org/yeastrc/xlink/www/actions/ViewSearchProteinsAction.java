@@ -41,7 +41,6 @@ import org.yeastrc.xlink.www.objects.SearchProteinLooplinkWrapper;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.Struts_Config_Parameter_Values_Constants;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.cutoff_processing_web.GetCutoffPageDisplayRoot;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.PeptideQueryJSONRoot;
@@ -311,14 +310,7 @@ public class ViewSearchProteinsAction extends Action {
 			//  Populate request objects for Standard Search Display
 			
 			GetSearchDetailsData.getInstance().getSearchDetailsData( search, request );
-			
 
-			
-//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-			
-//			GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRootSingleSearchId( searchId, request );
-
-			
 
 			String searchIdAsString = Integer.toString( searchId );
 			
