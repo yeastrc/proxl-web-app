@@ -381,18 +381,13 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			}
 		}
 		
-		//  Does not seem to work so not run it
-//		if ( looplink_peptides.length > 0 ) {
-//			
-//			try {
-//				$looplink_peptide_block_template.tablesorter(); // gets exception if there are no data rows
-//			} catch (e) {
-//				
-//				var z = 0;
-//			}
-//		}
-
 		
+		//  If the function window.linkInfoOverlayWidthResizer() exists, call it to resize the overlay
+		
+		if ( window.linkInfoOverlayWidthResizer ) {
+			
+			window.linkInfoOverlayWidthResizer();
+		}
 	};
 	
 };

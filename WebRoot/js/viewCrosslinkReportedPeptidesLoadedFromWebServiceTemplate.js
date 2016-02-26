@@ -383,6 +383,13 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 
 		}
 		
+		//  If the function window.linkInfoOverlayWidthResizer() exists, call it to resize the overlay
+		
+		if ( window.linkInfoOverlayWidthResizer ) {
+			
+			window.linkInfoOverlayWidthResizer();
+		}
+		
 	};
 	
 };
