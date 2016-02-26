@@ -94,6 +94,19 @@
 		org.yeastrc.xlink.www.servlet_context.ServletContextAppListener
 		</listener-class>
 	</listener>
+	
+	<!-- ERROR pages -->
+	
+    <error-page>
+	    <!-- Uncaught exception -->
+	    <error-code>500</error-code>
+	    <location>/WEB-INF/jsp-pages/generalError.jsp</location>
+	</error-page>
+	<error-page>
+	    <!-- Unsupported servlet method -->
+	    <error-code>503</error-code>
+	    <location>/WEB-INF/jsp-pages/generalError.jsp</location>
+	</error-page>
   
 
 </web-app>
