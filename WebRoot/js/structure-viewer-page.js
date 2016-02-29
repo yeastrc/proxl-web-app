@@ -892,7 +892,7 @@ function loadDataFromService() {
 				populatePDBFormArea();
 	        	
 
-	        	updateURLHash( false /* useSearchForm */ );
+//	        	Cannot put this call here, it does not work right:    updateURLHash( false /* useSearchForm */ );
 	        	
 	        	decrementSpinner();
 	        	
