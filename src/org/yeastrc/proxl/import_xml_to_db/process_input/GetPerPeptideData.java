@@ -44,31 +44,37 @@ public class GetPerPeptideData {
 		perPeptideData.setMatchedPeptideDTO( matchedPeptideDTO );
 		matchedPeptideDTO.setPeptide_id( peptideDTO.getId() );
 		
-		
-		Modifications modifications = peptide.getModifications();
-		List<Modification> modificationList = modifications.getModification();
-		
 
 		List<DynamicModDTO> dynamicModDTOList_Peptide = new ArrayList<>();
 		List<Integer> monolinkPositionList = new ArrayList<>();
-		
+
 		perPeptideData.setDynamicModDTOList_Peptide( dynamicModDTOList_Peptide );
 		perPeptideData.setMonolinkPositionList( monolinkPositionList );
+
+		Modifications modifications = peptide.getModifications();
 		
-		for ( Modification modification : modificationList ) {
-			
-			int position = modification.getPosition().intValue();
-			BigDecimal mass = modification.getMass();
-			boolean monolink = modification.isIsMonolink();
-			
-			DynamicModDTO dynamicModDTO = new DynamicModDTO();
-			dynamicModDTO.setPosition( position );
-			dynamicModDTO.setMass( mass.doubleValue() );
-			dynamicModDTOList_Peptide.add( dynamicModDTO );
-			
-			if ( monolink ) {
-				
-				monolinkPositionList.add( position );
+		if ( modifications != null ) {
+
+			List<Modification> modificationList = modifications.getModification();
+
+			if ( modificationList != null ) {
+
+				for ( Modification modification : modificationList ) {
+
+					int position = modification.getPosition().intValue();
+					BigDecimal mass = modification.getMass();
+					boolean monolink = modification.isIsMonolink();
+
+					DynamicModDTO dynamicModDTO = new DynamicModDTO();
+					dynamicModDTO.setPosition( position );
+					dynamicModDTO.setMass( mass.doubleValue() );
+					dynamicModDTOList_Peptide.add( dynamicModDTO );
+
+					if ( monolink ) {
+
+						monolinkPositionList.add( position );
+					}
+				}
 			}
 		}
 		
