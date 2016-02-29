@@ -40,15 +40,38 @@ function getLooplinkDataCommon( params ) {
 	var requestContext = params.context;
 	
 
+	var search_ids = requestContext.searchesArray;
+	
+	//  Extract psm peptide cutoffs for search ids provided
+	
+	var psmPeptideCutoffsRootObjectForQuery = { searches : {} };
+	
+	var searches = psmPeptideCutoffsRootObject.searches;
+	
+	var querySearches = psmPeptideCutoffsRootObjectForQuery.searches;
+	
+	
+	for ( var search_idsIndex = 0; search_idsIndex < search_ids.length; search_idsIndex++ ) {
+		
+		var searchId = search_ids[ search_idsIndex ];
+		
+		var searchIdString = searchId.toString();
+		
+		var cutoffForSearchId = searches[ searchIdString ];
+		
+		querySearches[ searchIdString ] = cutoffForSearchId;
+	} 
+	
+	
 
 	///   Serialize cutoffs to JSON
-	
-	var psmPeptideCutoffsRootObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObject );
+
+	var psmPeptideCutoffsRootObjectForQueryObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObjectForQuery );
 
 	var ajaxRequestData = {
 
-			search_ids : requestContext.searchesArray,
-			psmPeptideCutoffsForSearchIds : psmPeptideCutoffsRootObject_JSONString,
+			search_ids : search_ids,
+			psmPeptideCutoffsForSearchIds : psmPeptideCutoffsRootObjectForQueryObject_JSONString,
 			
 			protein_id : requestContext.from_protein_id,
 			protein_position_1 : requestContext.protein_position_1,
@@ -342,19 +365,41 @@ function getCrosslinkDataCommon( params ) {
 	var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
 
 	var requestContext = params.context;
+	
+	var search_ids = requestContext.searchesArray;
+	
+	//  Extract psm peptide cutoffs for search ids provided
+	
+	var psmPeptideCutoffsRootObjectForQuery = { searches : {} };
+	
+	var searches = psmPeptideCutoffsRootObject.searches;
+	
+	var querySearches = psmPeptideCutoffsRootObjectForQuery.searches;
+	
+	
+	for ( var search_idsIndex = 0; search_idsIndex < search_ids.length; search_idsIndex++ ) {
+		
+		var searchId = search_ids[ search_idsIndex ];
+		
+		var searchIdString = searchId.toString();
+		
+		var cutoffForSearchId = searches[ searchIdString ];
+		
+		querySearches[ searchIdString ] = cutoffForSearchId;
+	} 
+	
+	
 
 	///   Serialize cutoffs to JSON
 
-	var psmPeptideCutoffsRootObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObject );
+	var psmPeptideCutoffsRootObjectForQueryObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObjectForQuery );
 
-
-	var _URL = contextPathJSVar + "/services/data/getCrosslinkProteinsPerSearchIdsProteinIdsPositions";
 
 	var ajaxRequestData = {
 
-			psmPeptideCutoffsForSearchIds : psmPeptideCutoffsRootObject_JSONString,
+			psmPeptideCutoffsForSearchIds : psmPeptideCutoffsRootObjectForQueryObject_JSONString,
 
-			search_ids: requestContext.searchesArray,
+			search_ids: search_ids,
 			protein_1_id: requestContext.protein1.protein_id_int,
 			protein_2_id: requestContext.protein2.protein_id_int,
 			protein_1_position: requestContext.protein1.protein_position,
@@ -362,6 +407,8 @@ function getCrosslinkDataCommon( params ) {
 	};
 
 
+
+	var _URL = contextPathJSVar + "/services/data/getCrosslinkProteinsPerSearchIdsProteinIdsPositions";
 
 	$.ajax({
 		type: "GET",
@@ -653,16 +700,39 @@ function getMonolinkDataCommon( params ) {
 	var requestContext = params.context;
 
 
+	var search_ids = requestContext.searchesArray;
+	
+	//  Extract psm peptide cutoffs for search ids provided
+	
+	var psmPeptideCutoffsRootObjectForQuery = { searches : {} };
+	
+	var searches = psmPeptideCutoffsRootObject.searches;
+	
+	var querySearches = psmPeptideCutoffsRootObjectForQuery.searches;
+	
+	
+	for ( var search_idsIndex = 0; search_idsIndex < search_ids.length; search_idsIndex++ ) {
+		
+		var searchId = search_ids[ search_idsIndex ];
+		
+		var searchIdString = searchId.toString();
+		
+		var cutoffForSearchId = searches[ searchIdString ];
+		
+		querySearches[ searchIdString ] = cutoffForSearchId;
+	} 
+	
+	
 
-//	/   Serialize cutoffs to JSON
+	///   Serialize cutoffs to JSON
 
-	var psmPeptideCutoffsRootObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObject );
+	var psmPeptideCutoffsRootObjectForQueryObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObjectForQuery );
 
 
 	var ajaxRequestData = {
 
-			search_ids : requestContext.searchesArray,
-			psmPeptideCutoffsForSearchIds : psmPeptideCutoffsRootObject_JSONString,
+			search_ids : search_ids,
+			psmPeptideCutoffsForSearchIds : psmPeptideCutoffsRootObjectForQueryObject_JSONString,
 
 			protein_id : requestContext.from_protein_id,
 			protein_position : requestContext.protein_position
