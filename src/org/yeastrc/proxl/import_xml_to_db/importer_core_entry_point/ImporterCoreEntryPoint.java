@@ -18,6 +18,7 @@ import org.yeastrc.proxl.import_xml_to_db.dao.FASTADatabaseLookup;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.PrintHelpOnlyException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.main.ImportPostProcessingPerSearch;
+import org.yeastrc.proxl.import_xml_to_db.objects.ProxlInputObjectContainer;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateAnnotationNamesUniqueWithinSearchProgramAndType;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateScanFilenamesInXMLAreOnCommandLine;
 import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput;
@@ -54,6 +55,12 @@ public class ImporterCoreEntryPoint {
 	}
 	
 	
+	/**
+	 * @param projectId
+	 * @param mainXMLFileToImport
+	 * @param scanFileList
+	 * @throws Exception
+	 */
 	public void doImport( 
 			
 			int projectId,
@@ -68,7 +75,6 @@ public class ImporterCoreEntryPoint {
 		String importDirectory = null; 
 				
 		try {
-//			String mainXMLFileToImportAbsPath = mainXMLFileToImport.getAbsolutePath();
 			
 			File importFileCanonicalFile = mainXMLFileToImport.getCanonicalFile();
 			
@@ -96,7 +102,6 @@ public class ImporterCoreEntryPoint {
 			throw e;
 		}
 		
-		
 
 		//  Unmarshall the main import file
 
@@ -106,6 +111,59 @@ public class ImporterCoreEntryPoint {
 		try {
 
 			inputStream = new FileInputStream( mainXMLFileToImport );
+
+			proxlInputForImport = deserializeProxlInputFromInputStream( inputStream );
+
+		} catch ( Exception e ) {
+
+			System.out.println( "Exception in deserializing the primary input XML file" );
+			System.err.println( "Exception in deserializing the primary input XML file" );
+
+			e.printStackTrace( System.out );
+			e.printStackTrace( System.err );
+
+			throw e;
+			
+		} finally {
+
+			if ( inputStream != null ) {
+
+				inputStream.close();
+			}
+		}
+		
+
+		ProxlInputObjectContainer proxlInputObjectContainer = new ProxlInputObjectContainer();
+		
+		proxlInputObjectContainer.setProxlInput( proxlInputForImport );
+		
+		proxlInputForImport = null; //  release this reference
+		
+		doImportPassingDeserializedProxlImportInputXML( projectId, proxlInputObjectContainer, scanFileList, importDirectory );
+		
+	}
+	
+
+	/**
+	 * Utility method to get the ProxlInput from an input stream
+	 * 
+	 * @param inputStream
+	 * @return
+	 * @throws Exception
+	 */
+	public ProxlInput deserializeProxlInputFromInputStream( 
+	
+			InputStream inputStream
+
+			) throws Exception {
+
+
+		//  Unmarshall the main import file
+
+
+		ProxlInput proxlInputForImport = null;
+
+		try {
 
 			JAXBContext jaxbContext = JAXBContext.newInstance( ProxlInput.class );
 
@@ -155,7 +213,7 @@ public class ImporterCoreEntryPoint {
 
 			if ( ! ( unmarshalledObject instanceof ProxlInput ) ) {
 
-				String msg = "Object unmarshalled from " + mainXMLFileToImport.getAbsolutePath() 
+				String msg = "Object unmarshalled "
 						+ " cannot be cast to ProxlInput.  unmarshalledObject.getClass().getCanonicalName(): " + unmarshalledObject.getClass().getCanonicalName();
 
 				System.err.println( msg );
@@ -176,29 +234,24 @@ public class ImporterCoreEntryPoint {
 
 			throw e;
 
-		} finally {
-
-			if ( inputStream != null ) {
-
-				inputStream.close();
-			}
 		}
-
-		doImportPassingDeserializedImportInputXML( projectId, proxlInputForImport, scanFileList, importDirectory );
 		
+		return proxlInputForImport;
 	}
 		
 
 	/**
+	 * 
 	 * @param projectId
-	 * @param proxlInputForImport
+	 * @param proxlInputObjectContainer
 	 * @param scanFileList
+	 * @param importDirectory - displayed on website in the "Path:" field for logged in users
 	 * @throws Exception
 	 */
-	public void doImportPassingDeserializedImportInputXML( 
+	public void doImportPassingDeserializedProxlImportInputXML( 
 
 			int projectId,
-			ProxlInput proxlInputForImport,
+			ProxlInputObjectContainer proxlInputObjectContainer,
 			List<File> scanFileList,
 			
 			String importDirectory
@@ -206,9 +259,12 @@ public class ImporterCoreEntryPoint {
 			) throws Exception {
 
 		
+		ProxlInput proxlInputForImport = proxlInputObjectContainer.getProxlInput();
 
 		try {
 
+			//  isImportingAllowForProject(...) prints it's own error message
+			
 			boolean isImportingAllowForProject = IsImportingAllowForProject.getInstance().isImportingAllowForProject( projectId );
 			
 			if ( ! isImportingAllowForProject ) {
@@ -338,6 +394,12 @@ public class ImporterCoreEntryPoint {
 			System.out.println( "Insert done for core tables for search ID " + searchDTOInserted.getId() + ".");
 
 			System.out.println( "!!!!");
+			
+
+			//  Set proxlInputForImport to null to release memory needed by ImportPostProcessingPerSearch
+			
+			proxlInputForImport = null;
+			proxlInputObjectContainer.setProxlInput( null );
 
 
 			System.out.println( "!!!!");
@@ -345,6 +407,7 @@ public class ImporterCoreEntryPoint {
 			System.out.println( "Starting Insert of lookup tables for search ID " + searchDTOInserted.getId() );
 
 			System.out.println( "!!!!");
+
 
 			
 			ImportPostProcessingPerSearch.importPostProcessingPerSearch( searchDTOInserted.getId() );
@@ -374,7 +437,7 @@ public class ImporterCoreEntryPoint {
 
 			System.out.println( "!!!!");
 			System.out.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
+			
 		} catch ( Exception e ) {
 
 			System.out.println( "Exception in processing" );
@@ -384,6 +447,8 @@ public class ImporterCoreEntryPoint {
 			e.printStackTrace( System.err );
 
 			if ( processProxlInput != null ) {
+				
+				//  processProxlInput was instantiated to process the input so get data from it
 
 				SearchDTO search = processProxlInput.getSearchDTOInserted();
 
