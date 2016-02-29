@@ -3,6 +3,8 @@ package org.yeastrc.xlink.www.actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
@@ -173,6 +175,16 @@ public class ViewMergedSearchImageAction extends Action {
 			
 
 
+
+			// sort our searches by ID
+			Collections.sort( searches, new Comparator<SearchDTO>() {
+				public int compare( SearchDTO r1, SearchDTO r2 ) {
+					return r1.getId() - r2.getId();
+				}
+			});
+			
+			
+			
 			ProjectDAO projectDAO = ProjectDAO.getInstance();
 
 

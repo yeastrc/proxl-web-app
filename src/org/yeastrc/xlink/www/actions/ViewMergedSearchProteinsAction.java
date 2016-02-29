@@ -246,6 +246,16 @@ public class ViewMergedSearchProteinsAction extends Action {
 			}
 
 
+			// Sort searches list
+			
+			Collections.sort( searches, new Comparator<SearchDTO>() {
+
+				@Override
+				public int compare(SearchDTO o1, SearchDTO o2) {
+					return o1.getId() - o2.getId();
+				}
+			});
+			
 
 
 			//  Populate request objects for Standard Header Display

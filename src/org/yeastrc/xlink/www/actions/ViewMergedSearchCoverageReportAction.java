@@ -244,6 +244,14 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 				searchesMapOnId.put( searchId, search );
 			}
 
+
+			// sort our searches by ID
+			Collections.sort( searches, new Comparator<SearchDTO>() {
+				public int compare( SearchDTO r1, SearchDTO r2 ) {
+					return r1.getId() - r2.getId();
+				}
+			});
+			
 			
 			
 
@@ -276,14 +284,6 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			
 
 
-
-			// sort our searches by ID
-			Collections.sort( searches, new Comparator<SearchDTO>() {
-				public int compare( SearchDTO r1, SearchDTO r2 ) {
-					return r1.getId() - r2.getId();
-				}
-			});
-			
 
 
 			// Set values for general page functionality

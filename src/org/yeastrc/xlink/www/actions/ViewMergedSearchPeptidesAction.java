@@ -3,6 +3,7 @@ package org.yeastrc.xlink.www.actions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -227,6 +228,17 @@ public class ViewMergedSearchPeptidesAction extends Action {
 				searchesMapOnId.put( searchId, search );
 			}
 
+			// Sort searches list
+			
+			Collections.sort( searches, new Comparator<SearchDTO>() {
+
+				@Override
+				public int compare(SearchDTO o1, SearchDTO o2) {
+					return o1.getId() - o2.getId();
+				}
+			});
+			
+			
 
 
 			//  Jackson JSON Mapper object for JSON deserialization and serialization
