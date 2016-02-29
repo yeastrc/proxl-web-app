@@ -73,7 +73,7 @@ public class Process_MzML_MzXml_File {
 		
 		String scanFileName = scanFileWithPath.getName();
 		
-//		String scanFilePath = GetPathForFile.getPathAsStringForFile( scanFileWithPath );
+		String scanFilePath = scanFileWithPath.getCanonicalFile().getParentFile().getCanonicalPath();
 		
 		String SHA1Sum = SHA1SumCalculator.getInstance().getSHA1Sum( scanFileWithPath );
 		
@@ -98,7 +98,7 @@ public class Process_MzML_MzXml_File {
 			scanFileDTO = new ScanFileDTO();
 
 			scanFileDTO.setFilename(scanFileName);
-//			scanFileDTO.setPath( scanFilePath );
+			scanFileDTO.setPath( scanFilePath );
 			scanFileDTO.setSha1sum( SHA1Sum );
 
 

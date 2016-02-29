@@ -1,5 +1,7 @@
 package org.yeastrc.proxl.import_xml_to_db.import_post_processing.main;
 
+import java.util.Date;
+
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_psm_generic_lookup_records.main.AddPsmGenericLookupRecordsPerSearchId;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_unified_rep_peptide_for_search.main.AddUnifiedReportedPeptideDataForSearchMain;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.populate__search_crosslink_looplink_lookup.PopulateSearchCrosslinkGenericLookupTable;
@@ -45,21 +47,27 @@ public class ImportPostProcessingPerSearch {
 //	    SearchMonolinkLookupDAO.getInstance().createEntriesForSearch( searchId );
 		
 
-	    System.out.println( "Saving search to Crosslink protein lookup cache..." );
+	    System.out.println( "Starting populating Search Crosslink lookup tables.  Now: " + new Date() );
 		PopulateSearchCrosslinkGenericLookupTable.getInstance().populateSearchCrosslinkGenericLookupTable( searchId );
+	    System.out.println( "Finished populating Search Crosslink lookup tables.  Now: " + new Date() );
 		
 
-	    System.out.println( "Saving search to Looplink protein lookup cache..." );
+	    System.out.println( "Starting populating Search Looplink lookup tables.  Now: " + new Date() );
 	    PopulateSearchLooplinkGenericLookupTable.getInstance().populateSearchLooplinkGenericLookupTable( searchId );
+	    System.out.println( "Finished populating Search Looplink lookup tables.  Now: " + new Date() );
 
-	    System.out.println( "Populating Search Monolink lookup tables" );
+	    System.out.println( "Starting populating Search Monolink lookup tables.  Now: " + new Date() );
 	    PopulateSearchMonolinkGenericLookupTable.getInstance().populateSearchMonolinkGenericLookupTable( searchId );
+	    System.out.println( "Finished populating Search Monolink lookup tables.  Now: " + new Date() );
 
-	    System.out.println( "Populating Search Dimer lookup tables" );
+	    System.out.println( "Starting populating Search Dimer lookup tables.  Now: " + new Date() );
 	    PopulateSearchDimerGenericLookupTable.getInstance().populateSearchDimerGenericLookupTable( searchId );
+	    System.out.println( "Finished populating Search Dimer lookup tables.  Now: " + new Date() );
 
-	    System.out.println( "Populating Search Unlinked lookup tables" );
+	    System.out.println( "Starting populating Search Unlinked lookup tables.  Now: " + new Date() );
 	    PopulateSearchUnlinkedGenericLookupTable.getInstance().populateSearchUnlinkedGenericLookupTable( searchId );
-	   
+	    System.out.println( "Finished populating Search Unlinked lookup tables.  Now: " + new Date() );
+
+	    System.out.println( "");
 	}
 }
