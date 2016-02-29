@@ -47,15 +47,15 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 		
 		//  TODO  TEMP for TESTING
 		
-		if ( DBConnectionFactory.CROSSLINKS.equals(db) ) {
-			
-			//  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			
-			//     Hard coding DB name 
-
-			db = "proxl_generic_fields";
-			
-		}
+//		if ( DBConnectionFactory.CROSSLINKS.equals(db) ) {
+//			
+//			//  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//			
+//			//     Hard coding DB name 
+//
+//			db = "proxl_generic_fields";
+//			
+//		}
 		
 		
 		
