@@ -207,7 +207,7 @@ public class ImporterDefaultMainProgramEntry {
 
 			for ( File scanFile : scanFileList ) {
 
-				System.out.println( scanFile.getAbsolutePath() );
+				System.out.println( scanFile.getCanonicalPath() );
 			}
 
 
@@ -305,7 +305,7 @@ public class ImporterDefaultMainProgramEntry {
 
 			for ( File scanFile : scanFileList ) {
 
-				System.out.println( scanFile.getAbsolutePath() );
+				System.out.println( scanFile.getCanonicalPath() );
 			}
 
 
