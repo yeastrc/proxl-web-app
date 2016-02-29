@@ -11,6 +11,12 @@ use proxl;
  VALUES ('protein_annotation_webservice_url', '');
 
 
+--  Used for accessing protein listing services.  
+
+ INSERT INTO config_system (config_key, config_value) 
+ VALUES ('protein_listing_webservice_url', '');
+
+
 
 -- !!!!!!!!!!!!!!!!!!
 

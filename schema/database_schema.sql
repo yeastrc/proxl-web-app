@@ -1931,9 +1931,9 @@ CREATE TABLE IF NOT EXISTS `search_dimer_generic_lookup` (
   `search_id` INT(10) UNSIGNED NOT NULL,
   `nrseq_id_1` INT(10) UNSIGNED NOT NULL,
   `nrseq_id_2` INT(10) UNSIGNED NOT NULL,
-  `num_psm_at_default_cutoff` INT UNSIGNED NOT NULL,
-  `num_linked_peptides_at_default_cutoff` INT UNSIGNED NOT NULL,
-  `num_unique_peptides_linked_at_default_cutoff` INT UNSIGNED NOT NULL,
+  `num_psm_at_default_cutoff` INT UNSIGNED NULL,
+  `num_linked_peptides_at_default_cutoff` INT UNSIGNED NULL,
+  `num_unique_peptides_linked_at_default_cutoff` INT UNSIGNED NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `search_dimer_generic_lookup_ibfk_10`
     FOREIGN KEY (`search_id`)
@@ -2025,9 +2025,9 @@ CREATE TABLE IF NOT EXISTS `search_unlinked_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `search_id` INT(10) UNSIGNED NOT NULL,
   `nrseq_id` INT(10) UNSIGNED NOT NULL,
-  `num_psm_at_default_cutoff` INT UNSIGNED NOT NULL,
-  `num_linked_peptides_at_default_cutoff` INT UNSIGNED NOT NULL,
-  `num_unique_peptides_linked_at_default_cutoff` INT UNSIGNED NOT NULL,
+  `num_psm_at_default_cutoff` INT UNSIGNED NULL,
+  `num_linked_peptides_at_default_cutoff` INT UNSIGNED NULL,
+  `num_unique_peptides_linked_at_default_cutoff` INT UNSIGNED NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `search_unlinked_generic_lookup_ibfk_100`
     FOREIGN KEY (`search_id`)
