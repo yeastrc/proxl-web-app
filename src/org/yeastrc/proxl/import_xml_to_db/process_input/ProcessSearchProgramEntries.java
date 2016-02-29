@@ -406,7 +406,7 @@ public class ProcessSearchProgramEntries {
 				&& searchProgramInfo.getAnnotationSortOrder().getPsmAnnotationSortOrder().getSearchAnnotation() != null ) {
 		
 			psmAnnotationSortOrderSearchAnnotationList = 
-					searchProgramInfo.getAnnotationSortOrder().getReportedPeptideAnnotationSortOrder().getSearchAnnotation();
+					searchProgramInfo.getAnnotationSortOrder().getPsmAnnotationSortOrder().getSearchAnnotation();
 		}
 
 
@@ -416,7 +416,7 @@ public class ProcessSearchProgramEntries {
 				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmAnnotations().getSearchAnnotation() != null ) {
 		
 			visiblePsmDefaultVisibleAnnotationsSearchAnnotationList = 
-					searchProgramInfo.getDefaultVisibleAnnotations().getVisibleReportedPeptideAnnotations().getSearchAnnotation();
+					searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmAnnotations().getSearchAnnotation();
 		}
 		
 
@@ -523,7 +523,7 @@ public class ProcessSearchProgramEntries {
 				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmAnnotations().getSearchAnnotation() != null ) {
 		
 			visiblePsmDefaultVisibleAnnotationsSearchAnnotationList = 
-					searchProgramInfo.getDefaultVisibleAnnotations().getVisibleReportedPeptideAnnotations().getSearchAnnotation();
+					searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmAnnotations().getSearchAnnotation();
 		}
 		
 
