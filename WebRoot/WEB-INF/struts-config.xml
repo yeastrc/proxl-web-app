@@ -14,6 +14,11 @@
   		<form-bean name="uploadPDBFileForm" type="org.yeastrc.xlink.www.forms.UploadPDBFileForm" />
   		<form-bean name="downloadStringAsFileForm" type="org.yeastrc.xlink.www.forms.DownloadStringAsFileForm" />
 
+
+		<!--    The following forms are for supporting old URLs before change to Generic -->
+
+		<form-bean name="preGenericPeptideForm" type="org.yeastrc.xlink.www.pre_generic_url_handling.PreGenericPeptideForm" />
+		<form-bean name="preGenericProteinForm" type="org.yeastrc.xlink.www.pre_generic_url_handling.PreGenericProteinForm" />
    </form-beans>
   
   <global-exceptions />
@@ -406,6 +411,115 @@
 				validate="false">
 		    <forward name="Success" path="/WEB-INF/jsp-pages/user_account/manageUsersPage.jsp" redirect="false"/>
 		</action>			
+		
+		
+		
+		
+	<!--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  -->
+	
+	<!--    The following actions are for supporting old URLs before change to Generic 
+	
+			The URL parameters will be processed and a URL for the new Generic processing generated and
+			a redirect to that URL will be returned to the browser.
+	-->
+	
+			<!-- parameter="XXXXXXXXX" is passed to the Action method in the value:   mapping.getParameter()  -->
+			
+			<!--  parameter="" is action to redirect to -->
+
+  		<action path="/viewSearchPeptide"
+				type="org.yeastrc.xlink.www.pre_generic_url_handling.PreGenericPeptideRedirectAction"
+				scope="request"
+				name="preGenericPeptideForm"
+				parameter="/peptide"
+				validate="false">
+		</action>
+
+  		<action path="/viewMergedPeptide"
+				type="org.yeastrc.xlink.www.pre_generic_url_handling.PreGenericPeptideRedirectAction"
+				scope="request"
+				name="preGenericPeptideForm"
+				parameter="/mergedPeptide"
+				validate="false">
+		</action>
+
+	
+  		<action path="/viewSearchCrosslinkProtein"
+				type="org.yeastrc.xlink.www.pre_generic_url_handling.PreGenericProteinRedirectAction"
+				scope="request"
+				name="preGenericProteinForm"
+				parameter="/crosslinkProtein"
+				validate="false">
+		</action>
+
+  		<action path="/viewSearchLooplinkProtein"
+				type="org.yeastrc.xlink.www.pre_generic_url_handling.PreGenericProteinRedirectAction"
+				scope="request"
+				name="preGenericProteinForm"
+				parameter="/looplinkProtein"
+				validate="false">
+		</action>
+
+
+  		<action path="/viewProteinCoverageReport"
+				type="org.yeastrc.xlink.www.pre_generic_url_handling.PreGenericProteinRedirectAction"
+				scope="request"
+				name="preGenericProteinForm"
+				parameter="/proteinCoverageReport"
+				validate="false">
+		</action>
+
+
+
+  		<action path="/viewMergedCrosslinkProtein"
+				type="org.yeastrc.xlink.www.pre_generic_url_handling.PreGenericProteinRedirectAction"
+				scope="request"
+				name="preGenericProteinForm"
+				parameter="/mergedCrosslinkProtein"
+				validate="false">
+		</action>
+
+  		<action path="/viewMergedLooplinkProtein"
+				type="org.yeastrc.xlink.www.pre_generic_url_handling.PreGenericProteinRedirectAction"
+				scope="request"
+				name="preGenericProteinForm"
+				parameter="/mergedLooplinkProtein"
+				validate="false">
+		</action>
+		
+		
+  		<action path="/viewMergedProteinCoverageReport"
+				type="org.yeastrc.xlink.www.pre_generic_url_handling.PreGenericProteinRedirectAction"
+				scope="request"
+				name="preGenericProteinForm"
+				parameter="/mergedProteinCoverageReport"
+				validate="false">
+		</action>
+  
+  
+  
+    	<action path="/viewMergedImage"
+				type="org.yeastrc.xlink.www.pre_generic_url_handling.PreGenericMergedImageMergedStructureAction"
+				name="preGenericProteinForm"
+				scope="request"
+				parameter="/image"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/special_redirect_pages\redirect_pre_generic_image_structure_ToGenericURL.jsp" redirect="false"/>
+		</action>
+
+    	<action path="/viewMergedStructure"
+				type="org.yeastrc.xlink.www.pre_generic_url_handling.PreGenericMergedImageMergedStructureAction"
+				name="preGenericProteinForm"
+				scope="request"
+				parameter="/structure"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/special_redirect_pages\redirect_pre_generic_image_structure_ToGenericURL.jsp" redirect="false"/>
+		</action>
+  
+	
+		
+		
+		
 		
 		
   </action-mappings>

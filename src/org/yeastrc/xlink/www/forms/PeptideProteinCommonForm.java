@@ -18,6 +18,32 @@ public class PeptideProteinCommonForm  extends ActionForm {
 	private String queryJSON;
 	
 	
+
+	//  Add to handle requests with "searchId" in the query string
+
+	public void setSearchId(int searchId) {
+		
+		this.searchIds = new int[ 1 ];
+		
+		this.searchIds[ 0 ] = searchId;
+	}
+
+	//  Add to handle requests with "searchId" in the query string
+
+	public int getSearchId() {
+		
+		if ( this.searchIds == null || this.searchIds.length == 0 ) {
+		
+			return 0;
+		}
+		
+		return this.searchIds[ 0 ];
+	}
+	
+	
+	
+	
+	
 	public int[] getSearchIds() {
 		return searchIds;
 	}
@@ -37,29 +63,6 @@ public class PeptideProteinCommonForm  extends ActionForm {
 
 	
 
-	//  Add to handle requests with "searchId" in the query string
-
-	public void setSearchId(int searchId) {
-		
-		this.searchIds = new int[ 1 ];
-		
-		this.searchIds[ 0 ] = searchId;
-		
-		int z = 0;
-	}
-
-	//  Add to handle requests with "searchId" in the query string
-
-	public int getSearchId() {
-		
-		if ( this.searchIds == null || this.searchIds.length == 0 ) {
-		
-			return 0;
-		}
-		
-		return this.searchIds[ 0 ];
-	}
-	
 	
 	
 }
