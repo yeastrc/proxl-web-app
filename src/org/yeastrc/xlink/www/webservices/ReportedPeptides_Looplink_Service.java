@@ -647,7 +647,7 @@ public class ReportedPeptides_Looplink_Service {
 
 					int typeId = psmAnnotationTypeDTO.getId();
 
-					AnnotationDataBaseDTO o1_PsmPeptideAnnotationDTO = o1.getPeptideAnnotationDTOMap().get( typeId );
+					AnnotationDataBaseDTO o1_PsmPeptideAnnotationDTO = o1.getPsmAnnotationDTOMap().get( typeId );
 					if ( o1_PsmPeptideAnnotationDTO == null ) {
 
 						String msg = "Unable to get Filterable Annotation data for type id: " + typeId;
@@ -658,7 +658,7 @@ public class ReportedPeptides_Looplink_Service {
 					double o1Value = o1_PsmPeptideAnnotationDTO.getValueDouble();
 
 
-					AnnotationDataBaseDTO o2_PsmPeptideAnnotationDTO = o2.getPeptideAnnotationDTOMap().get( typeId );
+					AnnotationDataBaseDTO o2_PsmPeptideAnnotationDTO = o2.getPsmAnnotationDTOMap().get( typeId );
 					if ( o2_PsmPeptideAnnotationDTO == null ) {
 
 						String msg = "Unable to get Filterable Annotation data for type id: " + typeId;
