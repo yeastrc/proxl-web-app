@@ -24,12 +24,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.dao.SearchProgramsPerSearchDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.dto.SearchProgramsPerSearchDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.PSMAnnotationFilterableTypesForSearchIdServiceResult;
+import org.yeastrc.xlink.www.objects.PSMAnnotationFilterableTypesForSearchIdServiceResult.PSMAnnotationFilterableTypesForSearchIdServiceResultEntry;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDBDataOutOfSyncException;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -164,26 +168,59 @@ public class AnnotationTypesForSearchIdService {
 				srchPgmFilterablePsmAnnotationTypeDTOMap = new HashMap<>();
 			}
 			
+
+			Map<Integer,SearchProgramsPerSearchDTO> searchProgramsPerSearchDTOMap = new HashMap<>();
 			
-			List<AnnotationTypeDTO> annotationTypeDTOList = new ArrayList<>( srchPgmFilterablePsmAnnotationTypeDTOMap.size() );
+			
+			List<PSMAnnotationFilterableTypesForSearchIdServiceResultEntry> annotationTypeList = new ArrayList<>( srchPgmFilterablePsmAnnotationTypeDTOMap.size() );
 			
 			for ( Map.Entry<Integer, AnnotationTypeDTO> entry : srchPgmFilterablePsmAnnotationTypeDTOMap.entrySet() ) {
 			
-				annotationTypeDTOList.add( entry.getValue() );
+				AnnotationTypeDTO annotationTypeDTO = entry.getValue();
+				
+				Integer searchProgramsPerSearchId = annotationTypeDTO.getSearchProgramsPerSearchId();
+				
+				PSMAnnotationFilterableTypesForSearchIdServiceResultEntry psmAnnotationFilterableTypesForSearchIdServiceResultEntry = new PSMAnnotationFilterableTypesForSearchIdServiceResultEntry();
+				
+				psmAnnotationFilterableTypesForSearchIdServiceResultEntry.setAnnotationTypeDTO( annotationTypeDTO );
+				
+				SearchProgramsPerSearchDTO searchProgramsPerSearchDTO = searchProgramsPerSearchDTOMap.get( searchProgramsPerSearchId );
+				
+
+				if ( searchProgramsPerSearchDTO == null ) {
+					
+					searchProgramsPerSearchDTO = SearchProgramsPerSearchDAO.getInstance().getSearchProgramDTOForId( searchProgramsPerSearchId ) ;
+					
+					if ( searchProgramsPerSearchDTO == null ) {
+						
+						String msg = "No searchProgramsPerSearchDTO record found for searchProgramsPerSearchId: " + searchProgramsPerSearchId;
+						log.error( msg );
+						
+						throw new ProxlWebappDBDataOutOfSyncException( msg );
+					}
+					
+					searchProgramsPerSearchDTOMap.put( searchProgramsPerSearchId, searchProgramsPerSearchDTO );
+					
+				}
+				
+				psmAnnotationFilterableTypesForSearchIdServiceResultEntry.setSearchProgramsPerSearchDTO( searchProgramsPerSearchDTO );
+				
+				
+				annotationTypeList.add( psmAnnotationFilterableTypesForSearchIdServiceResultEntry );
 			}
 			
-			Collections.sort( annotationTypeDTOList, new Comparator<AnnotationTypeDTO>() {
+			Collections.sort( annotationTypeList, new Comparator<PSMAnnotationFilterableTypesForSearchIdServiceResultEntry>() {
 
 				@Override
-				public int compare(AnnotationTypeDTO o1, AnnotationTypeDTO o2) {
-					// TODO Auto-generated method stub
-					return o1.getName().compareToIgnoreCase( o2.getName() );
+				public int compare(PSMAnnotationFilterableTypesForSearchIdServiceResultEntry o1, PSMAnnotationFilterableTypesForSearchIdServiceResultEntry o2) {
+					
+					return o1.getAnnotationTypeDTO().getName().compareToIgnoreCase( o2.getAnnotationTypeDTO().getName() );
 				}
 			});
 
 			PSMAnnotationFilterableTypesForSearchIdServiceResult result = new PSMAnnotationFilterableTypesForSearchIdServiceResult();
 			
-			result.setAnnotationTypeDTOList( annotationTypeDTOList );
+			result.setAnnotationTypeList( annotationTypeList );;
 			
 			return result;
 			

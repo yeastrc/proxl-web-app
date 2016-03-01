@@ -405,11 +405,11 @@ QCChartRetentionTime.prototype.getPSMFilterableAnnTypesForSearchId = function( p
 
 QCChartRetentionTime.prototype.getPSMFilterableAnnTypesForSearchIdResponse = function(requestData, responseData, originalParams) {
 	
-	var annTypes = responseData.annotationTypeDTOList;
+	var annTypesSearchProgramsPerSearch = responseData.annotationTypeList;
 
-	if (  annTypes.length === 0 ) {
+	if (  annTypesSearchProgramsPerSearch.length === 0 ) {
 		
-		throw "annTypes.length === 0";
+		throw "annTypesSearchProgramsPerSearch.length === 0";
 	}
 	
 	
@@ -419,11 +419,21 @@ QCChartRetentionTime.prototype.getPSMFilterableAnnTypesForSearchIdResponse = fun
 		this.globals.currentSearchData = {};
 	}
 	
+	var annTypes = [];
+	
 	var annTypesById = {};
 	
-	for ( var annTypesIndex = 0; annTypesIndex < annTypes.length; annTypesIndex++ ) {
+	for ( var annTypesSearchProgramsPerSearchIndex = 0; annTypesSearchProgramsPerSearchIndex < annTypesSearchProgramsPerSearch.length; annTypesSearchProgramsPerSearchIndex++ ) {
 		
-		var annType = annTypes [ annTypesIndex ];
+		var annTypeSearchProgramPerSearch = annTypesSearchProgramsPerSearch [ annTypesSearchProgramsPerSearchIndex ];
+		
+		var annType = annTypeSearchProgramPerSearch.annotationTypeDTO;
+		
+		var searchProgramPerSearch = annTypeSearchProgramPerSearch.searchProgramsPerSearchDTO;
+		
+		annType.searchProgramName = searchProgramPerSearch.displayName;
+		
+		annTypes.push( annType );
 		
 		var annTypeId = annType.id.toString();  
 		
@@ -536,7 +546,9 @@ QCChartRetentionTime.prototype.populateAnnTypesSelect = function( params ) {
 		
 		var annType = annTypes[ annTypesIndex ];
 		
-		var html = "<option value='" + annType.id + "'>" + annType.name + "</option>";
+		var html = "<option value='" + annType.id + "'>" + annType.name +
+			" (" + annType.searchProgramName + ")" +
+			"</option>";
 			
 		optionsHTMLarray.push( html );
 	}
