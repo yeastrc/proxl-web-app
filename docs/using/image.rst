@@ -325,7 +325,7 @@ Peptide Q-value cutoff
 Only peptides with a peptide-level q-value <= to this cutoff will be shown. If the pipeline used to
 generate the search results does not generate peptide-level q-values, this field has no effect.
 
-Exclude xlinks with
+Exclude links with
 --------------------
 Peptides with any of the checked attributes will not be shown. The attributes are:
 

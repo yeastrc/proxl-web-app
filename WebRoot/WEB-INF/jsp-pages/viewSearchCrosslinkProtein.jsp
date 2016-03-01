@@ -185,7 +185,7 @@
 
 
 				<tr>
-					<td>Exclude xlinks with:</td>
+					<td>Exclude links with:</td>
 					<td>
 						 <label><span style="white-space:nowrap;" >
 							<input type="checkbox" id="filterNonUniquePeptides" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" > 					

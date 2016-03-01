@@ -58,7 +58,7 @@ Only proteins that contain peptides that have a peptide-level q-value <= the val
 As not all software produces peptide-level q-values, this field will have no effect
 on those data.
 
-Exclude xlinks with
+Exclude links with
 -------------------------
 Crosslinks or looplinks that have any of the checked attributes will be excluded. The attributes are:
 
