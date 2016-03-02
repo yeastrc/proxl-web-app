@@ -229,8 +229,8 @@ public class SavePsmAnnotations {
 
 		if ( descriptivePsmAnnotations == null ) {
 			
-			String msg = "No Descriptive PSM annotations";
-			log.warn( msg );
+//			String msg = "No Descriptive PSM annotations";
+//			log.warn( msg );
 			
 		} else {
 
@@ -239,8 +239,8 @@ public class SavePsmAnnotations {
 
 			if ( descriptivePsmAnnotationList == null || descriptivePsmAnnotationList.isEmpty() ) {
 				
-				String msg = "No Descriptive PSM annotations";
-				log.warn( msg );
+//				String msg = "No Descriptive PSM annotations";
+//				log.warn( msg );
 				
 			} else {
 				

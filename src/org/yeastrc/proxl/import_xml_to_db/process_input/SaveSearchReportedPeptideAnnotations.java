@@ -270,8 +270,8 @@ public class SaveSearchReportedPeptideAnnotations {
 
 		if ( reportedPeptideAnnotations == null ) {
 			
-			String msg = "No Reported Peptide annotations";
-			log.warn( msg );
+//			String msg = "No Reported Peptide annotations";
+//			log.warn( msg );
 			
 		} else {
 
@@ -280,8 +280,8 @@ public class SaveSearchReportedPeptideAnnotations {
 
 			if ( descriptiveReportedPeptideAnnotations == null ) {
 
-				String msg = "No Descriptive Reported Peptide annotations";
-				log.warn( msg );
+//				String msg = "No Descriptive Reported Peptide annotations";
+//				log.warn( msg );
 
 			} else {
 
@@ -292,8 +292,8 @@ public class SaveSearchReportedPeptideAnnotations {
 
 				if ( descriptiveReportedPeptideAnnotationList == null || descriptiveReportedPeptideAnnotationList.isEmpty() ) {
 
-					String msg = "No Descriptive Reported Peptide annotations";
-					log.warn( msg );
+//					String msg = "No Descriptive Reported Peptide annotations";
+//					log.warn( msg );
 
 				} else {
 
@@ -352,7 +352,7 @@ public class SaveSearchReportedPeptideAnnotations {
 		
 		if ( searchProgramEntry == null ) {
 			
-			String msg = "Processing filterablePsmAnnotations: "
+			String msg = "Processing filterableReportedPeptideAnnotations: "
 					+ " search_program String |"
 					+ searchProgram 
 					+ "| on Reported Peptide not found under <search_programs> .";
@@ -371,10 +371,10 @@ public class SaveSearchReportedPeptideAnnotations {
 
 		if ( reportedPeptideAnnotationTypeDTO == null ) {
 			
-			String msg = "Processing filterablePsmAnnotations: "
+			String msg = "Processing filterableReportedPeptideAnnotations: "
 					+ " annotation name String |"
 					+ annotationName 
-					+ "| on Reported Peptide not found under <filterable_psm_annotation_types> under <search_programs> for search program: " + searchProgram;
+					+ "| on Reported Peptide not found under <filterable_peptide_annotation_types> under <search_programs> for search program: " + searchProgram;
 			
 			log.error( msg );
 			

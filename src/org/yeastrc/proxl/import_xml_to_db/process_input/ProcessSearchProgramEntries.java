@@ -527,17 +527,22 @@ public class ProcessSearchProgramEntries {
 		}
 		
 
-		SearchProgram.PsmAnnotationTypes psmAnnotationTypes =
-				searchProgram.getPsmAnnotationTypes();
+		SearchProgram.PsmAnnotationTypes psmAnnotationTypes = searchProgram.getPsmAnnotationTypes();
 
-		DescriptivePsmAnnotationTypes descriptivePsmAnnotationTypes =
-				psmAnnotationTypes.getDescriptivePsmAnnotationTypes();
+		DescriptivePsmAnnotationTypes descriptivePsmAnnotationTypes = psmAnnotationTypes.getDescriptivePsmAnnotationTypes();
 		
-		List<DescriptivePsmAnnotationType> descriptivePsmAnnotationTypeList =
-				descriptivePsmAnnotationTypes.getDescriptivePsmAnnotationType();
+		if ( descriptivePsmAnnotationTypes == null ) {
+			
+			//  No descriptive annotation types so exit 
+			
+			return;  //  EARLY EXIT
+		}
 		
-		AnnotationTypeDAO srchPgmDescriptivePsmAnnotationTypeDAO =
-				AnnotationTypeDAO.getInstance();
+		
+		
+		List<DescriptivePsmAnnotationType> descriptivePsmAnnotationTypeList = descriptivePsmAnnotationTypes.getDescriptivePsmAnnotationType();
+		
+		AnnotationTypeDAO srchPgmDescriptivePsmAnnotationTypeDAO = AnnotationTypeDAO.getInstance();
 		
 		for ( DescriptivePsmAnnotationType descriptivePsmAnnotationType : descriptivePsmAnnotationTypeList ) {
 			

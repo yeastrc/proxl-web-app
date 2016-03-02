@@ -41,16 +41,33 @@ public class GetPsmFilterableAnnotationBestValueByAnnTypeIdSearchReptPeptideSear
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		String orderDirection = null;
+//		String orderDirection = null;
+//		
+//
+//		if ( filterDirectionType == FilterDirectionType.ABOVE ) {
+//			
+//			orderDirection = "DESC";  //  Largest best so sort so largest is first
+//					
+//		} else if ( filterDirectionType == FilterDirectionType.BELOW ) {
+//			
+//			orderDirection = "ASC";  //  Smallest best so sort so smallest is first
+//			
+//		} else {
+//			
+//			throw new IllegalArgumentException( "filterDirection Unknown value" + filterDirectionType.toString() );
+//		}
+
+
+		String minMaxOfValue = null;
 		
 
 		if ( filterDirectionType == FilterDirectionType.ABOVE ) {
 			
-			orderDirection = "DESC";  //  Largest best so sort so largest is first
+			minMaxOfValue = "MAX";  //  Largest best so sort so largest is first
 					
 		} else if ( filterDirectionType == FilterDirectionType.BELOW ) {
 			
-			orderDirection = "ASC";  //  Smallest best so sort so smallest is first
+			minMaxOfValue = "MIN";  //  Smallest best so sort so smallest is first
 			
 		} else {
 			
@@ -59,11 +76,12 @@ public class GetPsmFilterableAnnotationBestValueByAnnTypeIdSearchReptPeptideSear
 
 		
 		final String sql = 
-				"SELECT value_double, value_string FROM psm_annotation " 
-						+ " INNER JOIN psm ON psm_annotation.psm_id = psm.id "
+				"SELECT "
+				+ minMaxOfValue 
+				+ "(value_double) AS value_double FROM psm_filterable_annotation__generic_lookup " 
 						+ " WHERE annotation_type_id = ? "
-						+ " AND  psm.search_id = ? AND psm.reported_peptide_id = ? " 
-						+ " ORDER BY value_double " + orderDirection + " LIMIT 1 ";
+						+ " AND  psm_filterable_annotation__generic_lookup.search_id = ? "
+						+ "AND psm_filterable_annotation__generic_lookup.reported_peptide_id = ? "; 
 		
 		try {
 			
@@ -84,7 +102,7 @@ public class GetPsmFilterableAnnotationBestValueByAnnTypeIdSearchReptPeptideSear
 				
 				
 				result.setBestValue( rs.getDouble( "value_double" ) );
-				result.setBestValueString( rs.getString( "value_string" ) );
+				result.setBestValueString( Double.toString( result.getBestValue() ) );
 			}
 			
 		} catch ( Exception e ) {

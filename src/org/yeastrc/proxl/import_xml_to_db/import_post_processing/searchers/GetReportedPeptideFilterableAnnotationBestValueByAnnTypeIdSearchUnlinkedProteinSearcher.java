@@ -42,16 +42,33 @@ public class GetReportedPeptideFilterableAnnotationBestValueByAnnTypeIdSearchUnl
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		String orderDirection = null;
+//		String orderDirection = null;
+//		
+//
+//		if ( filterDirectionType == FilterDirectionType.ABOVE ) {
+//			
+//			orderDirection = "DESC";  //  Largest best so sort so largest is first
+//					
+//		} else if ( filterDirectionType == FilterDirectionType.BELOW ) {
+//			
+//			orderDirection = "ASC";  //  Smallest best so sort so smallest is first
+//			
+//		} else {
+//			
+//			throw new IllegalArgumentException( "filterDirection Unknown value" + filterDirectionType.toString() );
+//		}
+
+
+		String minMaxOfValue = null;
 		
 
 		if ( filterDirectionType == FilterDirectionType.ABOVE ) {
 			
-			orderDirection = "DESC";  //  Largest best so sort so largest is first
+			minMaxOfValue = "MAX";  //  Largest best so sort so largest is first
 					
 		} else if ( filterDirectionType == FilterDirectionType.BELOW ) {
 			
-			orderDirection = "ASC";  //  Smallest best so sort so smallest is first
+			minMaxOfValue = "MIN";  //  Smallest best so sort so smallest is first
 			
 		} else {
 			
@@ -60,7 +77,9 @@ public class GetReportedPeptideFilterableAnnotationBestValueByAnnTypeIdSearchUnl
 
 		
 		final String sql = 
-				"SELECT value_double, value_string FROM srch__rep_pept__annotation " 
+				"SELECT "
+				+ minMaxOfValue 
+				+ "(value_double) AS value_double FROM srch__rep_pept__annotation " 
 						+ " INNER JOIN psm "
 						+ 	" ON srch__rep_pept__annotation.search_id = psm.search_id "
 						+ 	"    AND srch__rep_pept__annotation.reported_peptide_id = psm.reported_peptide_id  "
@@ -69,9 +88,7 @@ public class GetReportedPeptideFilterableAnnotationBestValueByAnnTypeIdSearchUnl
 						
 						+ " WHERE srch__rep_pept__annotation.annotation_type_id = ? "
 						+ " AND  psm.search_id = ? "
-						+ " AND  unlinked.nrseq_id = ? "
-
-						+ " ORDER BY value_double " + orderDirection + " LIMIT 1 ";
+						+ " AND  unlinked.nrseq_id = ? ";
 		
 		try {
 			
@@ -97,7 +114,7 @@ public class GetReportedPeptideFilterableAnnotationBestValueByAnnTypeIdSearchUnl
 				
 				
 				result.setBestValue( rs.getDouble( "value_double" ) );
-				result.setBestValueString( rs.getString( "value_string" ) );
+				result.setBestValueString( Double.toString( result.getBestValue() ) );
 			}
 			
 		} catch ( Exception e ) {
