@@ -101,6 +101,9 @@
 		
 		<%@ include file="/WEB-INF/jsp-includes/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
 				
+				
+			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
+				
 		<div class="overall-enclosing-block">
 			
 			
@@ -388,9 +391,6 @@
 					</logic:iterate>
 				</table>
 	
-
-
-			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
 
 		</div>
 

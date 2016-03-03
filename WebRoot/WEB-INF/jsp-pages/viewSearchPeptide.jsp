@@ -102,6 +102,8 @@
 		
 		<%@ include file="/WEB-INF/jsp-includes/viewPsmsLoadedFromWebServiceTemplateFragment.jsp" %>
 		
+			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
+		
 			
 		<div class="overall-enclosing-block">
 	
@@ -447,9 +449,6 @@
 	
 			
 
-			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
-
-		
 		</div>
 	
 

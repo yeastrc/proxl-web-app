@@ -102,6 +102,9 @@
 		
 		<%@ include file="/WEB-INF/jsp-includes/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
 		
+		
+			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
+		
 		<div class="overall-enclosing-block">
 	
 			<h2 style="margin-bottom:5px;">List search proteins:</h2>
@@ -404,9 +407,6 @@
 						
 					</logic:iterate>
 				</table>
-	
-
-			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
 
 		</div>
 	

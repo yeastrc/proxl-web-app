@@ -152,6 +152,9 @@
 
 	</script>
 	
+	
+			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
+	
 				
 		<%@ include file="/WEB-INF/jsp-includes/viewPsmsLoadedFromWebServiceTemplateFragment.jsp" %>
 		
@@ -718,8 +721,6 @@ private List<String> peptideAnnotationValueList;
 					</logic:iterate>
 				</table>
 	
-
-			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
 
 
 		</div>

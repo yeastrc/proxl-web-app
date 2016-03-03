@@ -121,6 +121,9 @@
 		<%@ include file="/WEB-INF/jsp-includes/viewPsmsLoadedFromWebServiceTemplateFragment.jsp" %>
 		<%@ include file="/WEB-INF/jsp-includes/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
 		
+
+			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
+		
 		
 	
 	<%--  Crosslink Protein Template --%>
@@ -638,10 +641,6 @@ private List<String> peptideAnnotationValueList;
 
 					</logic:iterate>
 				</table>
-
-	
-
-			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
 
 
 		</div>
