@@ -1918,7 +1918,7 @@ public class NumPeptidesForProteinCriteriaSearcher {
 					
 					//  If slow, use psm_filterable_annotation__generic_lookup and put more limits in query on search, reported peptide, and maybe link type
 
-					sqlSB.append( " psm_annotation AS psm_fltrbl_tbl_" );
+					sqlSB.append( " psm_filterable_annotation__generic_lookup AS psm_fltrbl_tbl_" );
 					sqlSB.append( Integer.toString( counter ) );
 
 					sqlSB.append( " ON "  );

@@ -115,7 +115,7 @@ public class AnnotationTypesForSearchIdPSMPeptideTypeSearcher {
 			
 			while( rs.next() ) {
 				
-				//  Can use this since only fields in result set are from table srch_pgm__filterable_psm_annotation_type
+				//  Can use this since only fields in result set are from table annotation_type
 				
 				AnnotationTypeDTO item = 
 						AnnotationTypeDAO.getInstance().populateFromResultSet( rs );
