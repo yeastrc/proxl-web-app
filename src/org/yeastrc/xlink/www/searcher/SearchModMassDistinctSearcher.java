@@ -33,12 +33,6 @@ public class SearchModMassDistinctSearcher {
 	private static final String sqlTwoSearchIds = sqlStartTwoOrMoreSearchIds + sqlMain + ",?" + sqlEnd;
 	
 	private static final String sqlStartMoreThanTwoSearchIds = sqlStartTwoOrMoreSearchIds + sqlMain;
-
-//	CREATE TABLE search__dynamic_mod_mass_lookup (
-//			  search_id INT UNSIGNED NOT NULL,
-//			  dynamic_mod_mass DOUBLE UNSIGNED NOT NULL,
-//			  search_id_dynamic_mod_mass_count INT UNSIGNED NOT NULL,
-			
 			
 	/**
 	 * Get distinct DynamicMod Masses for the searchIds 

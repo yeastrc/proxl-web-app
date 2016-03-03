@@ -334,8 +334,6 @@
 								onclick="viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.showHideLooplinkReportedPeptides( { clickedElement : this })"
 								search_id="${ search.id }"
 								project_id="${ projectId }"
-								peptide_q_value_cutoff="${ peptideQValueCutoff }"
-								psm_q_value_cutoff="${ psmQValueCutoff }"
 								protein_id="<bean:write name="looplink" property="protein.nrProtein.nrseqId" />"
 								protein_position_1="<bean:write name="looplink" property="proteinPosition1" />"
 								protein_position_2="<bean:write name="looplink" property="proteinPosition2" />"

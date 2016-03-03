@@ -67,11 +67,7 @@ public class PeptideMergedWebPageSearcher {
 		  " ) AS subquery_result  GROUP BY subquery_result.unified_reported_peptide_id ";
 		
 			
-			//  TODO  Update 'ORDER BY' when get sort order processing working
-			
-//		+ " ORDER BY peptide_q_value_for_search, best_psm_q_value, unified_rep_pep__reported_peptide__search_lookup.reported_peptide_id "
-		
-
+			//  No "ORDER BY".  Sorted in Java
 	
 
 	private final String SQL_EACH_UNION_FIRST_PART_PART = 
@@ -446,32 +442,6 @@ public class PeptideMergedWebPageSearcher {
 				}
 
 			}
-
-		
-//		CREATE TABLE unified_rp__rep_pept__search__generic_lookup (
-//		  unified_reported_peptide_id INT(10) UNSIGNED NOT NULL,
-//		  reported_peptide_id INT(10) UNSIGNED NOT NULL,
-//		  search_id INT(10) UNSIGNED NOT NULL,
-//		  link_type ENUM('looplink','crosslink','unlinked','dimer') NOT NULL,
-//		  has_dynamic_modifictions TINYINT(3) UNSIGNED NOT NULL,
-//		  has_monolinks TINYINT(3) UNSIGNED NOT NULL,
-//		  sample_psm_id INT(10) UNSIGNED NOT NULL,
-//		  psm_num_at_default_cutoff INT(10) UNSIGNED NOT NULL,
-
-//		CREATE TABLE unified_rp__rep_pept__search__best_psm_value_generic_lookup (
-//		  unified_reported_peptide_id INT(10) UNSIGNED NOT NULL,
-//		  reported_peptide_id INT(10) UNSIGNED NOT NULL,
-//		  search_id INT(10) UNSIGNED NOT NULL,
-//		  annotation_type_id INT(10) UNSIGNED NOT NULL,
-//		  link_type ENUM('looplink','crosslink','unlinked','dimer') NOT NULL,
-//		  has_dynamic_modifictions TINYINT(3) UNSIGNED NOT NULL,
-//		  has_monolinks TINYINT(3) UNSIGNED NOT NULL,
-//		  psm_num_at_default_cutoff INT(11) NOT NULL,
-//		  sample_psm_id INT(10) UNSIGNED NULL DEFAULT NULL,
-//		  best_psm_value_for_ann_type_id DOUBLE NOT NULL,
-//		  best_psm_value_string_for_ann_type_id VARCHAR(200) NOT NULL,
-				 
-//		CREATE TABLE srch__rep_pept__annotation (
 
 			{
 				if ( cutoffsPerSearchHolder.defaultPeptideCutoffs == Yes_No__NOT_APPLICABLE_Enum.NO ) {
@@ -980,17 +950,6 @@ public class PeptideMergedWebPageSearcher {
 					}
 				}
 				
-
-				//  TODO  Need to code this properly, if needed
-				
-//				Double peptideBestQValue = rs.getDouble( "min_q_value" );
-//				if ( rs.wasNull() ) {
-//					peptideBestQValue = null;
-//				}
-//				
-//				item.setBestPeptideQValue( peptideBestQValue );
-				
-
 				if ( XLinkUtils.CROSS_TYPE_STRING.equals(linkTypeFromDBField) ) {
 					
 					MergedSearchPeptideCrosslink link = new MergedSearchPeptideCrosslink();
@@ -1133,10 +1092,5 @@ public class PeptideMergedWebPageSearcher {
 		}
 		return searchesFoundInCurrentRecord;
 	}
-
-
-	
-
-			
 	
 }

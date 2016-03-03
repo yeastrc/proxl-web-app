@@ -4520,14 +4520,6 @@ function initPage() {
 	
 	
 	
-	$( "input#psmQValueCutoff" ).change(function() {
-		
-		defaultPageView.searchFormChanged_ForDefaultPageView();
-	});
-	$( "input#peptideQValueCutoff" ).change(function() {
-		
-		defaultPageView.searchFormChanged_ForDefaultPageView();
-	});
 	$( "input#filterNonUniquePeptides" ).change(function() {
 		
 		defaultPageView.searchFormChanged_ForDefaultPageView();

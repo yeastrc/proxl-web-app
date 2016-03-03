@@ -5,39 +5,6 @@
 
 
 
-<%-- 
-	bestPsmQValue: 0
-	numPsms: 1
-	pValue: 0
-	pValuePopulated: false
-	pep: 0
-	pepPopulated: false
-	peptide1: Object
-	peptide1Position: 1
-	peptide1ProteinPositions: Array[2]
-	peptide1ProteinPositionsString: "gi|24638940|ref|NP_726693.1|(136), Skp1dd-human(123)"
-	peptide2: Object
-	peptide2Position: 7
-	peptide2ProteinPositions: Array[2]
-	peptide2ProteinPositionsString: "gi|24638940|ref|NP_726693.1|(127), Skp1dd-human(114)"
-	peptideQValueCutoff: 0.01
-	psmQValueCutoff: 0.01
-	qvalue: 0
-	reportedPeptide: Object
-		c: "-"
-		id: 1012571
-		n: "-"
-	sequence: "TVANMIKGK(7)--KTFNIK(1)"
-	__proto__: Object
-	singlePsmId: 267427
-	svmScore: 0
-	svmScorePopulated: false
---%>
-
-<%-- 
-	Reported peptide	Peptide 1	Pos	Peptide 2	Pos	Protein 1	Protein 2	Q-value	# PSMs			
---%>
-
 	
 	<%--  Crosslink Peptide Template --%>
 

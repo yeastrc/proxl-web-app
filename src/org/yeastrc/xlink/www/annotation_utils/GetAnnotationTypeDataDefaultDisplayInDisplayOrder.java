@@ -113,11 +113,12 @@ public class GetAnnotationTypeDataDefaultDisplayInDisplayOrder {
 
 			if ( annotationTypeDataFilterable == null ) {
 				
-				String msg = "No filterable annotations found for psmPeptide: " + psmPeptideAnnotationType.value()
-						+ ", searchId: " + searchId;
-				log.warn( msg );
+				if ( psmPeptideAnnotationType == PsmPeptideAnnotationType.PSM ) {
 
-				//  TODO  probably should throw exception
+					String msg = "No filterable annotation type records found for psmPeptide: " + psmPeptideAnnotationType.value()
+							+ ", searchId: " + searchId;
+					log.warn( msg );
+				}
 
 				//   Create empty list and put in map
 
@@ -140,8 +141,6 @@ public class GetAnnotationTypeDataDefaultDisplayInDisplayOrder {
 //						+ ", searchId: " + searchId;
 //				log.warn( msg );
 //
-//				//  TODO  probably should throw exception
-//				
 //				continue;  //  EARLY Continue  
 //			}
 			

@@ -58,8 +58,6 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	<%--  Loaded in head_section_include_every_page.jsp   --%>
 	<%-- <script type="text/javascript" src="${ contextPath }/js/jquery-1.11.0.min.js"></script>  --%>
 	 
-	<%-- <script type="text/javascript" src="${ contextPath }/js/connectToNoOperationService.js"></script> --%>
-	
 	
 	
 	<script type="text/javascript" src="${ contextPath }/js/crosslinksCollapsible.js"></script>

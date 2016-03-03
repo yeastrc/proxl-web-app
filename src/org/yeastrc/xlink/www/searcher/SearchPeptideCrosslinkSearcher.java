@@ -103,7 +103,7 @@ public class SearchPeptideCrosslinkSearcher {
 
 			" GROUP BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
 
-//			+ " ORDER BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id"; // Sort in Java	
+			// Sort in Java	
 	
 	
 	

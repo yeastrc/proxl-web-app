@@ -102,9 +102,13 @@ public class GetAnnotationTypeDataInSortOrder {
 			
 			if ( annotationTypeData == null ) {
 				
-				String msg = "No annotations found for psmPeptide: " + psmPeptideAnnotationType.value()
-						+ ", searchId: " + searchId;
-				log.warn( msg );
+				if ( psmPeptideAnnotationType == PsmPeptideAnnotationType.PSM ) {
+
+					String msg = "No annotation type records found for psmPeptide: " + psmPeptideAnnotationType.value()
+							+ ", searchId: " + searchId;
+					log.warn( msg );
+					
+				}
 
 				//  TODO  probably should throw exception
 				

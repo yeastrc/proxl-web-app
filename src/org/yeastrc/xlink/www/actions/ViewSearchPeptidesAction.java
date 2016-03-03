@@ -388,12 +388,6 @@ public class ViewSearchPeptidesAction extends Action {
 
 			CutoffValuesSearchLevel cutoffValuesSearchLevel = peptideQueryJSONRoot.getCutoffs().getSearches().get( searchIdAsString );
 
-//			if ( cutoffValuesSearchLevel == null ) {
-//
-//				String msg = "Unable to get cutoffValuesSearchLevel for search id: " + searchIdAsString;
-//				log.error( msg );
-//				throw new ProxlWebappDataException(msg);
-//			}
 
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = null;
 			

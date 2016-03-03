@@ -273,8 +273,6 @@ public class DownloadProteinCoverageReportAction extends Action {
 					
 					
 					proteinQueryJSONRoot = new ProteinQueryJSONRoot();
-
-					//  TODO  only do this if not generic
 					
 					CutoffValuesRootLevel cutoffValuesRootLevel =
 							GetDefaultPsmPeptideCutoffs.getInstance()
@@ -284,17 +282,6 @@ public class DownloadProteinCoverageReportAction extends Action {
 					
 					
 				}
-
-
-
-				/////////////////////////////////////////////////////////////////////////////
-				/////////////////////////////////////////////////////////////////////////////
-				
-				////////   Generic Param processing
-				
-				//			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-				
-				GetCutoffPageDisplayRoot.getInstance().getCutoffPageDisplayRoot( searchIdsCollection, request );
 
 
 				////////////

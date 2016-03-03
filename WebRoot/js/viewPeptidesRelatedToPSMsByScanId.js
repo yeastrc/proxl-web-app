@@ -156,8 +156,6 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 
 		var $clickedElement = params.$clickedElement;
 
-
-		var project_id = $clickedElement.attr( "project_id" );
 		var search_id = $clickedElement.attr( "search_id" );
 		var psm_id = $clickedElement.attr( "psm_id" );
 		var scan_id = $clickedElement.attr( "scan_id" );
@@ -215,7 +213,6 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 		var ajaxRequestData = {
 
 				search_id : search_id,
-				project_id : project_id,
 				psm_id : psm_id,
 				scan_id : scan_id,
 				psmPeptideCutoffsForSearchId : psmPeptideCutoffsForSearchId_JSONString

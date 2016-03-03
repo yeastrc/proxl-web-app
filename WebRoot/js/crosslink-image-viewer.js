@@ -256,10 +256,6 @@ var _psmPeptideCutoffsRootObjectStorage = {
 		}
 };
 
-//	var _psmQValueCutoff;
-//	var _peptideQValueCutoff;
-
-
 
 var _excludeTaxonomy;
 var _excludeType;
@@ -5864,8 +5860,6 @@ function processClickOnLoopLink( clickThis  ) {
 
 	var params = {
 			clickThis : clickThis,
-//			psmQValueCutoff : _psmQValueCutoff,
-//			peptideQValueCutoff : _peptideQValueCutoff
 			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
 	};
 
@@ -5900,8 +5894,6 @@ function processClickOnMonoLink( clickThis  ) {
 
 	var params = {
 			clickThis : clickThis,
-//			psmQValueCutoff : _psmQValueCutoff,
-//			peptideQValueCutoff : _peptideQValueCutoff
 			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
 	};
 
@@ -5979,42 +5971,6 @@ function initPage() {
 		$("#merged_label_text_header").show();  //  Update text at top to show this is for "merged" since more than one search
 	}
 
-	
-
-	incrementSpinner();				// create spinner
-
-	
-	//	Validate that all the searches are accessible
-
-	var url = contextPathJSVar + "/services/authCheck/checkSearches";
-	url += buildQueryStringFromHash();
-
-	$.ajax({
-		type: "GET",
-		url: url,
-		dataType: "json",
-		success: function(data)	{
-
-
-			decrementSpinner();
-
-			//  Searches have been validated so load the data for the page
-
-			loadDataFromService();
-
-		},
-        failure: function(errMsg) {
-			decrementSpinner();
-        	handleAJAXFailure( errMsg );
-        },
-		error: function(jqXHR, textStatus, errorThrown) {	
-
-			decrementSpinner();
-			handleAJAXError( jqXHR, textStatus, errorThrown );
-		}
-	});
-
-
 	attachViewLinkInfoOverlayClickHandlers();
 	
 	
@@ -6047,7 +6003,13 @@ function initPage() {
 		
 		defaultPageView.searchFormChanged_ForDefaultPageView();
 	});
+	
+	
+
+	loadDataFromService();
 };
+
+
 
 $(document).ready(function()  { 
 	initPage();

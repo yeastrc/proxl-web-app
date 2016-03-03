@@ -60,8 +60,6 @@ var ViewSearchPeptidePageCode = function() {
 			viewPeptidesRelatedToPSMsByScanId.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
 		};
 		
-		//   Currently expect _psmPeptideCriteria = { peptideQValueCutoff: 0.01, psmQValueCutoff: 0.01   }; or other numbers
-		
 		
 		 this.get_query_json_field_ContentsFromHiddenField = function() {
 			

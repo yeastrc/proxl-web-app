@@ -41,14 +41,6 @@ public class MergedSearchCrosslinkPeptideSearcher {
 	private MergedSearchCrosslinkPeptideSearcher() { }
 	public static MergedSearchCrosslinkPeptideSearcher getInstance() { return new MergedSearchCrosslinkPeptideSearcher(); }
 
-//	String sql = "SELECT DISTINCT a.reported_peptide_id " +
-//			"FROM psm AS a INNER JOIN crosslink AS b ON a.id = b.psm_id " +
-//			"INNER JOIN search_reported_peptide AS c ON a.reported_peptide_id = c.reported_peptide_id " +
-//			"WHERE a.q_value <= ? AND a.search_id IN (#SEARCHES#) AND ( c.q_value <= ? OR c.q_value IS NULL ) " +
-//			"   AND c.search_id IN (#SEARCHES#) " +
-//			"   AND b.nrseq_id_1 = ? AND b.nrseq_id_2 = ? AND b.protein_1_position = ? AND b.protein_2_position = ?";
-
-	
 	private final String SQL_LINKED_PEPTIDES_FIRST_PART = 
 
 			"SELECT DISTINCT reported_peptide_id " 
@@ -255,17 +247,9 @@ public class MergedSearchCrosslinkPeptideSearcher {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
 			
-//			Collection<Integer> searchIds = new HashSet<Integer>();
-//			for( SearchDTO search : crosslink.getSearches() )
-//				searchIds.add( search.getId() );
-//			
-//			sql = sql.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
-			
 			pstmt = conn.prepareStatement( sql );
 			
 			setPstmtQueryParameters( crosslink, cutoffsPerSearchHolderList, pstmt );
-			
-
 			
 			rs = pstmt.executeQuery();
 
@@ -306,15 +290,6 @@ public class MergedSearchCrosslinkPeptideSearcher {
 	
 	
 	////////////////////////////////////////////////////////////////////////////////
-	
-	
-//	String sql = "SELECT COUNT(distinct a.reported_peptide_id) " +
-//			"FROM psm AS a INNER JOIN crosslink AS b ON a.id = b.psm_id " +
-//			"INNER JOIN search_reported_peptide AS c ON a.reported_peptide_id = c.reported_peptide_id " +
-//			"WHERE a.q_value <= ? AND a.search_id IN (#SEARCHES#) AND  ( c.q_value <= ? OR c.q_value IS NULL ) " +
-//			"   AND c.search_id IN (#SEARCHES#) " +
-//			"   AND b.nrseq_id_1 = ? AND b.nrseq_id_2 = ? AND b.protein_1_position = ? AND b.protein_2_position = ?";
-	
 	
 	private final String SQL_NUM_LINKED_PEPTIDES_FIRST_PART = 
 
@@ -362,8 +337,6 @@ public class MergedSearchCrosslinkPeptideSearcher {
 		List<SearchDTO> searches = new ArrayList<>( searchesParam );
 		
 		Collections.sort( searches ); //  ensure in id order
-		
-		
 		
 		
 		//  Copy cutoff values to lists (need to guarantee order since process same objects in multiple places)
@@ -527,22 +500,11 @@ public class MergedSearchCrosslinkPeptideSearcher {
 		try {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
-
-			
-//			Collection<Integer> searchIds = new HashSet<Integer>();
-//			for( SearchDTO search : crosslink.getSearches() )
-//				searchIds.add( search.getId() );
-//			
-//			sql = sql.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
-			
 			
 			pstmt = conn.prepareStatement( sql );
 			
-
 			setPstmtQueryParameters( crosslink, cutoffsPerSearchHolderList, pstmt );
-			
 
-			
 			rs = pstmt.executeQuery();
 			if( rs.next() )
 				count = rs.getInt( 1 );

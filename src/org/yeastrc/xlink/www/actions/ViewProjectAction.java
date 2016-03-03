@@ -33,7 +33,7 @@ import org.yeastrc.xlink.www.dto.ProjectDTO;
 
 /**
  * 
- *  Used to be ListPercolatorSearchesAction.java
+ * 
  */
 public class ViewProjectAction extends Action {
 	
@@ -230,24 +230,6 @@ public class ViewProjectAction extends Action {
 				
 				request.setAttribute( "otherProjectList", otherProjectList );
 			}
-			
-//			if ( authAccessLevel.isAssistantProjectOwnerAllowed() ) {
-//				
-//				GetXLinkUserDTOListForUsers getXLinkUserDTOListForUsers = GetXLinkUserDTOListForUsers.getInstance();
-//				
-//				List<XLinkUserDTO> adminList = getXLinkUserDTOListForUsers.getXLinkUserDTOListForAdminUsers();
-//
-//				request.setAttribute( "adminList", adminList );
-//				
-//				List<XLinkUserDTO> globalNoAccessList = getXLinkUserDTOListForUsers.getXLinkUserDTOListForGlobalNoAccessUsers();
-//
-//				request.setAttribute( "globalNoAccessList", globalNoAccessList );
-//				
-//				List<XLinkUserDTO> disabledUsersList = getXLinkUserDTOListForUsers.getXLinkUserDTOListForDisabledUsers();
-//				
-//				request.setAttribute( "disabledUsersList", disabledUsersList );
-//				
-//			}
 			
 			
 			ActionForward actionForward =  mapping.findForward( "Success" );

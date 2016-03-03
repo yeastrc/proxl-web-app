@@ -75,12 +75,6 @@ public class SearchProteinMonolinkSearcher {
 	
 	/////////////////////////////////////////////////////////////////
 	
-	
-//	String sql = "SELECT bestPSMQValue, bestPeptideQValue " +
-//			"FROM search_monolink_lookup WHERE search_id = ? AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  AND "
-//			+ "nrseq_id = ? AND protein_position = ?";	
-
-
 	private final String SQL_SEARCH_ON_SEARCH_ID_MONOLINK_FIRST_PART = 
 
 			"SELECT"

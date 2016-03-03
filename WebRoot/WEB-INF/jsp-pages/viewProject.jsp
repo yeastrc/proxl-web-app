@@ -3,7 +3,6 @@
 <%@page import="org.yeastrc.xlink.www.constants.StrutsActionPathsConstants"%>
 <%@page import="org.yeastrc.xlink.www.constants.WebConstants"%>
 <%@page import="org.yeastrc.xlink.www.constants.AuthAccessLevelConstants"%>
-<%@page import="org.yeastrc.xlink.www.constants.QValueCutoffDefaultConstants"%>
 <%@page import="org.yeastrc.xlink.www.constants.QCPlotConstants"%>
 
 <%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>

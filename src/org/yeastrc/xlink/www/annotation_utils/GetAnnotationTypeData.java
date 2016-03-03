@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 import org.yeastrc.xlink.enum_classes.PsmPeptideAnnotationType;
@@ -24,29 +24,29 @@ import com.google.common.cache.LoadingCache;
 public class GetAnnotationTypeData {
 
 
-	private static final Logger log = Logger.getLogger(GetAnnotationTypeData.class);
+//	private static final Logger log = Logger.getLogger(GetAnnotationTypeData.class);
 
 
 	
 	private static final int CACHE_MAX_SIZE = 60;
 
-//	private static final int CACHE_TIMEOUT = 20; // in seconds
+	private static final int CACHE_TIMEOUT = 20; // in seconds
 
-	private static final int CACHE_TIMEOUT = 4; // in seconds
+//	private static final int CACHE_TIMEOUT = 4; // in seconds
 
 	/**
 	 * This is the time after which the cache entry is replaced
 	 * 
 	 * currently 5 minutes
 	 */
-//	private static final int CACHE__FORCED_TIMEOUT = 5 * 60 * 1000; // in milliseconds
+	private static final int CACHE__FORCED_TIMEOUT = 5 * 60 * 1000; // in milliseconds
 	
 	/**
 	 * This is the time after which the cache entry is replaced
 	 * 
 	 * currently 10 seconds
 	 */
-	private static final int CACHE__FORCED_TIMEOUT = 10 * 1000; // in milliseconds
+//	private static final int CACHE__FORCED_TIMEOUT = 10 * 1000; // in milliseconds
 	
 	
 	
@@ -165,8 +165,6 @@ public class GetAnnotationTypeData {
 	 */
 	private GetAnnotationTypeData() {
 		
-//		private LoadingCache<LocalCacheKey, LocalCacheValue> annotationTypeDataCache = null;
-
 		annotationTypeDataCache = CacheBuilder.newBuilder()
 				
 				.expireAfterAccess( CACHE_TIMEOUT, TimeUnit.SECONDS )

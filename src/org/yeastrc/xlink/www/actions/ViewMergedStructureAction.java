@@ -258,10 +258,6 @@ public class ViewMergedStructureAction extends Action {
 			////////   Generic Param processing
 			
 			
-
-			
-			
-			
 			CutoffValuesRootLevel cutoffValuesRootLevelCutoffDefaults = 
 					GetDefaultPsmPeptideCutoffs.getInstance()
 					.getDefaultPsmPeptideCutoffs( searchIdsCollection );

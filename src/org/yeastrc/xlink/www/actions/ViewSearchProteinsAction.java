@@ -316,14 +316,6 @@ public class ViewSearchProteinsAction extends Action {
 			
 			CutoffValuesSearchLevel cutoffValuesSearchLevel = proteinQueryJSONRoot.getCutoffs().getSearches().get( searchIdAsString );
 			
-
-//			if ( cutoffValuesSearchLevel == null ) {
-//
-//				String msg = "Unable to get cutoffValuesSearchLevel for search id: " + searchIdAsString;
-//				log.error( msg );
-//				throw new ProxlWebappDataException(msg);
-//			}
-
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = null;
 			
 			if ( cutoffValuesSearchLevel == null ) {

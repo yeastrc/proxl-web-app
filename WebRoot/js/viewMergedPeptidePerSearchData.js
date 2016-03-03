@@ -307,35 +307,6 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 			_handlebarsTemplate_peptide_data_per_search_child_row_template = Handlebars.compile( handlebarsSource_peptide_data_per_search_child_row_template );
 		}
 
-		
-
-		
-//		var nameWidthPercent = 40;  // percentage width of table for Search Name
-//		var reportedPeptideWidthPercent = 50;  // percentage width of table for Reported Peptide Sequence String
-//			
-//		//  Reduce name and rep peptide width for q value, pep and svm if they are displayed.
-//		//     those fields are hard coded at 10% table width
-//		
-//		if ( anyLinksHavePeptideQValue ) {
-//			
-//			nameWidthPercent -= 4;
-//			reportedPeptideWidthPercent -= 3;
-//		}
-//
-//		if ( anyLinksHavePeptidePEPValue ) {
-//			
-//			nameWidthPercent -= 4;
-//			reportedPeptideWidthPercent -= 3;
-//		}
-//
-//		if ( anyLinksHavePeptideSVMValue ) {
-//			
-//			nameWidthPercent -= 4;
-//			reportedPeptideWidthPercent -= 3;
-//		}
-
-		
-		
 		////////////////////////////
 		
 		

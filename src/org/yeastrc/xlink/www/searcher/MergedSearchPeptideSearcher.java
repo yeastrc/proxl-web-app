@@ -41,23 +41,6 @@ public class MergedSearchPeptideSearcher {
 	private MergedSearchPeptideSearcher( ) { }
 	
 	
-
-//	String sql = "SELECT DISTINCT ndpp.peptide_id "
-//			+ ""
-//			+ " FROM nrseq_database_peptide_protein AS ndpp "
-//			
-//			+ "INNER JOIN psm_peptide ON ndpp.peptide_id = psm_peptide.peptide_id "
-//			
-//			+ "INNER JOIN psm ON psm_peptide.psm_id = psm.id "
-//			
-//			+ "INNER JOIN search_reported_peptide "
-//			+ 		" ON ( psm.search_id = search_reported_peptide.search_id "
-//			+ 			" AND psm.reported_peptide_id = search_reported_peptide.reported_peptide_id ) "
-//			
-//			+ "WHERE ndpp.nrseq_id = ? AND psm.search_id IN (#SEARCHES#) AND psm.q_value <= ? "
-//			+ 		" AND  ( search_reported_peptide.q_value <= ? OR search_reported_peptide.q_value IS NULL ) ";
-	
-
 	private final String SQL_FIRST_PART = 
 			
 
@@ -508,10 +491,6 @@ public class MergedSearchPeptideSearcher {
 		
 		//////////////////////////////////
 		
-		
-		
-		
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -519,37 +498,18 @@ public class MergedSearchPeptideSearcher {
 		try {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
-
-			
-			
-//			Collection<Integer> searchIds = new HashSet<Integer>();
-//			for( SearchDTO search : searchs )
-//				searchIds.add( search.getId() );
-//			
-//			sql = sql.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
-			
 			pstmt = conn.prepareStatement( sql );
-			
 
 			int paramCounter = 0;
 			
-
-
 			for ( CutoffsPerSearchHolder cutoffsPerSearchHolder : cutoffsPerSearchHolderList ) {
-
-
 
 				paramCounter++;
 				pstmt.setInt( paramCounter, protein.getNrseqId() );
-				
-				
 				paramCounter++;
 				pstmt.setInt( paramCounter, cutoffsPerSearchHolder.searchId );
-				
-				
 
 				// Process PSM Cutoffs for WHERE
-
 
 				{
 
@@ -574,11 +534,7 @@ public class MergedSearchPeptideSearcher {
 //					}
 				}
 
-
-
-
 				// Process Peptide Cutoffs for WHERE
-
 
 				{
 

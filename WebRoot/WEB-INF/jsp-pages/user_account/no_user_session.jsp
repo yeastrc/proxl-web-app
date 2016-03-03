@@ -20,8 +20,6 @@
 	<%--  Loaded in head_section_include_every_page.jsp   --%>
 	<%-- <script type="text/javascript" src="${ contextPath }/js/jquery-1.11.0.min.js"></script>  --%>
 	 
-	<%-- <script type="text/javascript" src="${ contextPath }/js/connectToNoOperationService.js"></script> --%>
-	
 	
 </head>
 <body class="login-page inset-page"> <%-- "inset-page" is for pages with an 'inset' look --%>

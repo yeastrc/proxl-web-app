@@ -11,7 +11,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.servlet_context.CurrentContext;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
@@ -22,7 +22,7 @@ import org.yeastrc.xlink.www.user_account.UserSessionObject;
  */
 public class InitialServletFilter implements Filter {
 
-	private static final Logger log = Logger.getLogger(InitialServletFilter.class);
+//	private static final Logger log = Logger.getLogger(InitialServletFilter.class);
 	
 	
 	@Override

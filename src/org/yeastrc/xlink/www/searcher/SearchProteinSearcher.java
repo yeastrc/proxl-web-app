@@ -13,7 +13,6 @@ import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.www.objects.SearchProtein;
 import org.yeastrc.xlink.www.objects.SearchProteinDoublePosition;
 import org.yeastrc.xlink.www.objects.SearchProteinPosition;
-import org.yeastrc.xlink.utils.XLinkUtils;
 
 public class SearchProteinSearcher {
 
@@ -264,98 +263,5 @@ public class SearchProteinSearcher {
 		return proteinPositions;
 	}
 	
-	/**
-	 * Determine whether or not the given position in the given protein has a given link type in the given search with the given cutoffs
-	 * @param nrseqId
-	 * @param position
-	 * @param search
-	 * @param type
-	 * @param psmQValueCutoff
-	 * @param peptideQValueCutoff
-	 * @return
-	 * @throws Exception
-	 */
-	public boolean isLinked( int nrseqId, int position, SearchDTO search, int type, double psmQValueCutoff, double peptideQValueCutoff ) throws Exception {
-		boolean isLinked = false;
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		try {
-						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
-			
-			if( type == XLinkUtils.TYPE_CROSSLINK ) {
-				String sql = "SELECT COUNT(*) FROM search_crosslink_lookup WHERE "
-						+ "( ( nrseq_id_1 = ? AND protein_1_position = ? ) OR ( nrseq_id_2 = ? AND protein_2_position = ? ) ) "
-						+ "AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  AND search_id = ?";
-				
-				pstmt = conn.prepareStatement( sql );
-				pstmt.setInt( 1,  nrseqId );
-				pstmt.setInt( 2,  position );
-				pstmt.setInt( 3,  nrseqId );
-				pstmt.setInt( 4,  position );
-				pstmt.setDouble( 5,  psmQValueCutoff );
-				pstmt.setDouble( 6,  peptideQValueCutoff );
-				pstmt.setInt( 7,  search.getId() );
-				
-			} else if( type == XLinkUtils.TYPE_LOOPLINK ) {
-				String sql = "SELECT COUNT(*) FROM search_looplink_lookup WHERE "
-						+ "nrseq_id = ? AND ( protein_position_1 = ? OR protein_position_2 = ? ) "
-						+ "AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  AND search_id = ?";
-				
-				pstmt = conn.prepareStatement( sql );
-				pstmt.setInt( 1,  nrseqId );
-				pstmt.setInt( 2,  position );
-				pstmt.setInt( 3,  position );
-				pstmt.setDouble( 4,  psmQValueCutoff );
-				pstmt.setDouble( 5,  peptideQValueCutoff );
-				pstmt.setInt( 6,  search.getId() );
-			} else if( type == XLinkUtils.TYPE_MONOLINK ) {
-				String sql = "SELECT COUNT(*) FROM search_monolink_lookup WHERE "
-						+ "nrseq_id = ? AND protein_position = ? "
-						+ "AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  AND search_id = ?";
-				
-				pstmt = conn.prepareStatement( sql );
-				pstmt.setInt( 1,  nrseqId );
-				pstmt.setInt( 2,  position );
-				pstmt.setDouble( 3,  psmQValueCutoff );
-				pstmt.setDouble( 4,  peptideQValueCutoff );
-				pstmt.setInt( 5,  search.getId() );
-			} else {
-				return false;
-			}
-
-			
-			rs = pstmt.executeQuery();
-			rs.next();
-			
-			if( rs.getInt( 1 ) > 0 )
-				isLinked = true;
-			
-			
-		} finally {
-			
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-			
-		}
-		
-		
-		return isLinked;
-	}
 	
 }

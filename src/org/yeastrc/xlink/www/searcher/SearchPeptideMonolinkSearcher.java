@@ -52,24 +52,9 @@ public class SearchPeptideMonolinkSearcher {
 //	private final boolean USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES = true;  //  UNTESTED for a value of "true"
 	
 	
-	
-	
 
 	private final String PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS = "psm_best_value_tbl_";
 	
-	
-	
-//	String sql = "SELECT a.reported_peptide_id, a.q_value, count(*) AS num_psms, min(b.q_value) AS best_psm_q_value " +
-//			  "FROM search_reported_peptide AS a INNER JOIN psm AS b " +
-//			  "ON (a.search_id = b.search_id AND a.reported_peptide_id = b.reported_peptide_id) " +
-//			  "INNER JOIN monolink AS c ON b.id = c.psm_id " +
-//			  "WHERE a.search_id = ? AND ( a.q_value <= ? OR a.q_value IS NULL )   AND b.q_value <=? AND b.type = ? " +
-//			  "AND c.nrseq_id = ? AND c.protein_position = ? " +
-//			  "GROUP BY a.reported_peptide_id " +
-//			  "ORDER BY a.q_value, a.reported_peptide_id";
-
-
-
 	private final String SQL_FIRST_PART = 
 			
 
@@ -99,7 +84,7 @@ public class SearchPeptideMonolinkSearcher {
 
 			" GROUP BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
 
-//			+ " ORDER BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id"; // Sort in Java	
+		//	Sort in Java	
 	
 	
 
@@ -531,11 +516,6 @@ public class SearchPeptideMonolinkSearcher {
 			
 			pstmt = conn.prepareStatement( sql );
 
-//			" WHERE unified_rp__rep_pept__search__generic_lookup.search_id = ? "
-//			+ " AND monolink.nrseq_id = ?  "
-//			+ " AND monolink.protein_position_1 = ? AND monolink.protein_position_2 = ?  ";
-
-
 			int paramCounter = 0;
 			
 			
@@ -549,7 +529,6 @@ public class SearchPeptideMonolinkSearcher {
 
 
 			// Process PSM Cutoffs for WHERE
-
 
 			{
 
@@ -575,11 +554,7 @@ public class SearchPeptideMonolinkSearcher {
 				}
 			}
 
-
-
-
 			// Process Peptide Cutoffs for WHERE
-
 
 			{
 				if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )

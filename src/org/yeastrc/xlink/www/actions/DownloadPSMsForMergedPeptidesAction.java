@@ -3,7 +3,6 @@ package org.yeastrc.xlink.www.actions;
 import java.io.BufferedOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,24 +29,17 @@ import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.www.objects.AnnDisplayNameDescPeptPsmListsPair;
-import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
 import org.yeastrc.xlink.www.objects.AnnotationTypeDTOListForSearchId;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult;
-import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePageWrapper;
 import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
-import org.yeastrc.xlink.www.searcher.PeptideMergedWebPageSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmAnnotationDataSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher;
-import org.yeastrc.xlink.www.searcher.ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.SearchModMassDistinctSearcher;
 import org.yeastrc.xlink.www.actions.PeptidesMergedCommonPageDownload.PeptidesMergedCommonPageDownloadResult;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataDefaultDisplayInDisplayOrder;
-import org.yeastrc.xlink.www.constants.DynamicModificationsSelectionConstants;
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
@@ -580,20 +572,6 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 							
 							writer.write( "\n" );
 
-
-//							SEARCH ID
-//							SCAN NUMBER
-//							PEPTIDE 1
-//							POSITION 1
-//							MODS
-//							PEPTIDE 1
-//							POSITION 2
-//							MODS
-//							Link Type
-//							OBSERVED M/Z
-//							CHARGE
-//							RETENTION TIME (MINUTES)
-//							SCAN FILENAME (THE MZML FILE)
 							
 							}
 						}

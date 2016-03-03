@@ -66,15 +66,6 @@ public class SearchProteinLooplinkSearcher {
 	private final String PEPTIDE_BEST_VALUE_FILTER_TABLE_ALIAS = "best_rep_pept_value_tbl_";
 	
 	
-	
-	
-//	String sql = "SELECT nrseq_id, protein_position_1, protein_position_2, bestPSMQValue, bestPeptideQValue, " 
-//			+ "num_psm_at_pt_01_q_cutoff, num_peptides_at_pt_01_q_cutoff, num_unique_peptides_at_pt_01_q_cutoff "
-//
-//			+ "FROM search_looplink_lookup WHERE search_id = ? AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  "
-//			+ "ORDER BY nrseq_id, protein_position_1, protein_position_2";			
-	
-
 	private final String SQL_SEARCH_ON_SEARCH_ID_FIRST_PART = 
 
 		"SELECT search_looplink_generic_lookup.nrseq_id, "
@@ -473,28 +464,13 @@ public class SearchProteinLooplinkSearcher {
 	}
 
 
-	
-	
 	/////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////
-
-	
 	
 	////////////     Retrieval of single SearchProteinLooplink based on provided criteria
 	
-
-	
 	/////////////////////////////////////////////////
 	
-//	String sql = "SELECT bestPSMQValue, bestPeptideQValue, " 
-//			+ "num_psm_at_pt_01_q_cutoff, num_peptides_at_pt_01_q_cutoff, num_unique_peptides_at_pt_01_q_cutoff "
-//
-//			+ "FROM search_looplink_lookup WHERE search_id = ? AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  AND "
-//			+ "nrseq_id = ? AND protein_position_1 = ? AND protein_position_2 = ?";	
-	
-
 	private final String SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_FIRST_PART = 
 
 			"SELECT"

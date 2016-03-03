@@ -147,11 +147,6 @@ public class MergedSearchProteinMonolink {
 			
 			this.numPsms = totalNumPsms;
 
-//			throw new Exception("Not Supported");
-
-//			if( this.numPsms == null )
-//				this.numPsms = MergedSearchPsmSearcher.getInstance().getNumPsms( this );
-
 			return this.numPsms;
 			
 		} catch ( Exception e ) {

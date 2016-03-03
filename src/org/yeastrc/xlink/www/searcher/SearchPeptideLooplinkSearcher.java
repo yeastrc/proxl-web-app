@@ -59,17 +59,6 @@ public class SearchPeptideLooplinkSearcher {
 	private final String PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS = "psm_best_value_tbl_";
 	
 	
-	
-//	String sql = "SELECT a.reported_peptide_id, a.q_value, count(*) AS num_psms, min(b.q_value) AS best_psm_q_value " +
-//			  "FROM search_reported_peptide AS a INNER JOIN psm AS b " +
-//			  "ON (a.search_id = b.search_id AND a.reported_peptide_id = b.reported_peptide_id) " +
-//			  "INNER JOIN looplink AS c ON b.id = c.psm_id " +
-//			  "WHERE a.search_id = ? AND ( a.q_value <= ? OR a.q_value IS NULL )   AND b.q_value <=? AND b.type = ? " +
-//			  "AND c.nrseq_id = ? AND c.protein_position_1 = ? AND c.protein_position_2 = ? " +
-//			  "GROUP BY a.reported_peptide_id " +
-//			  "ORDER BY a.q_value, a.reported_peptide_id";
-
-
 
 	private final String SQL_FIRST_PART = 
 			
@@ -101,7 +90,7 @@ public class SearchPeptideLooplinkSearcher {
 
 			" GROUP BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
 
-//			+ " ORDER BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id"; // Sort in Java	
+			// Sort in Java	
 	
 	
 	/**

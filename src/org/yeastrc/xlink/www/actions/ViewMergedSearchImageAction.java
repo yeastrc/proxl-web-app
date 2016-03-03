@@ -254,13 +254,6 @@ public class ViewMergedSearchImageAction extends Action {
 			String annotation_data_webservice_base_url = 
 					ConfigSystemDAO.getInstance().getConfigValueForConfigKey( ConfigSystemsKeysConstants.PROTEIN_ANNOTATION_WEBSERVICE_URL_KEY );
 			
-//			if ( annotation_data_webservice_base_url == null ) {
-//				
-//				String msg = "No System configuration found for key: " + ConfigSystemsKeysConstants.PROTEIN_ANNOTATION_WEBSERVICE_URL_KEY;
-//				log.error( msg );
-//				throw new Exception( msg );
-//			}
-			
 			request.setAttribute( "annotation_data_webservice_base_url", annotation_data_webservice_base_url );
 			
 			

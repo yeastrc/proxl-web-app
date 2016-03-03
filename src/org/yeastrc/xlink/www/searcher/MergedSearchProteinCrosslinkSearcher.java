@@ -20,7 +20,6 @@ import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.objects.MergedSearchProtein;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinCrosslink;
 
@@ -41,16 +40,6 @@ public class MergedSearchProteinCrosslinkSearcher {
 	
 	private final String SEARCH_ID_GROUP_SEPARATOR = ","; //  separator as search ids are combined by the group by
 
-	
-
-//	String sql = "SELECT nrseq_id_1, nrseq_id_2, protein_1_position, protein_2_position, min(bestPSMQValue), min(bestPeptideQValue), "
-//			+ " SUM( num_psm_at_pt_01_q_cutoff ) AS num_psm_at_pt_01_q_cutoff, "
-//			+ " GROUP_CONCAT( DISTINCT search_id SEPARATOR '" + SEARCH_ID_GROUP_SEPARATOR + "' ) AS search_ids "
-//	
-//			+ "FROM search_crosslink_lookup WHERE search_id IN (#SEARCHES#) AND bestPSMQValue <= ? AND ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL ) "
-//			+ "GROUP BY nrseq_id_1, protein_1_position, nrseq_id_2, protein_2_position "
-//			+ "ORDER BY nrseq_id_1, protein_1_position, nrseq_id_2, protein_2_position";
-	
 
 	private final String SQL_FIRST_PART = 
 			
@@ -711,15 +700,7 @@ public class MergedSearchProteinCrosslinkSearcher {
 				
 				link.setProtein1Position( rs.getInt( "protein_1_position" ) );
 				link.setProtein2Position( rs.getInt( "protein_2_position" ) );
-				
-//				link.setBestPSMQValue( rs.getDouble( 5 ) );
-
-//				link.setBestPeptideQValue( rs.getDouble( 6 ) );
-//				if ( rs.wasNull() ) {
-//					link.setBestPeptideQValue( null );
-//				}
-				
-				
+								
 				//  These counts are only valid for PSM and Peptide at default cutoffs
 
 				if ( onlyDefaultPsmCutoffsAllSearches 

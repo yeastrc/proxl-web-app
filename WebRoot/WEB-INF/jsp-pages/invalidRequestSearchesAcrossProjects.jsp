@@ -19,9 +19,6 @@
 	<%--  Loaded in head_section_include_every_page.jsp   --%>
 	<%-- <script type="text/javascript" src="${ contextPath }/js/jquery-1.11.0.min.js"></script>  --%>
 	 
-	<%-- <script type="text/javascript" src="${ contextPath }/js/connectToNoOperationService.js"></script> --%>
-	
-	
 	
 </head>
 

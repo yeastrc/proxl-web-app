@@ -36,14 +36,6 @@ public class MergedSearchProteinLooplinkSearcher {
 	
 	private final String SEARCH_ID_GROUP_SEPARATOR = ","; //  separator as search ids are combined by the group by
 
-//	String sql = "SELECT nrseq_id, protein_position_1, protein_position_2, min(bestPSMQValue), min(bestPeptideQValue), "
-//			+ " SUM( num_psm_at_pt_01_q_cutoff ) AS num_psm_at_pt_01_q_cutoff, "
-//			+ " GROUP_CONCAT( DISTINCT search_id SEPARATOR '" + SEARCH_ID_GROUP_SEPARATOR + "' ) AS search_ids "
-//			
-//			+ "FROM search_looplink_lookup WHERE search_id IN (#SEARCHES#) AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  "
-//			+ "GROUP BY nrseq_id, protein_position_1, protein_position_2 "
-//			+ "ORDER BY nrseq_id, protein_position_1, protein_position_2";
-
 	private final String SQL_FIRST_PART = 
 			
 			"SELECT subquery_result.nrseq_id, "
@@ -594,13 +586,6 @@ public class MergedSearchProteinLooplinkSearcher {
 			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
 
-			
-//			Collection<Integer> searchIds = new HashSet<Integer>();
-//			for( SearchDTO search : searches )
-//				searchIds.add( search.getId() );
-//			
-//			sql = sql.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
-						
 			pstmt = conn.prepareStatement( sql );
 			
 			
@@ -679,25 +664,11 @@ public class MergedSearchProteinLooplinkSearcher {
 
 				link.setSearcherCutoffValuesRootLevel( searcherCutoffValuesRootLevel );
 				
-//				link.setPsmCutoff( psmCutoff );
-//				link.setPeptideCutoff( peptideCutoff );
-				
 				link.setProtein( new MergedSearchProtein( searches, NRProteinDAO.getInstance().getNrProtein( rs.getInt( "nrseq_id" ) ) ) );
 				
 				link.setProteinPosition1( rs.getInt( "protein_position_1" ) );
 				link.setProteinPosition2( rs.getInt( "protein_position_2" ) );
 				
-								
-				
-//				link.setBestPSMQValue( rs.getDouble( 4 ) );
-//				
-//				link.setBestPeptideQValue( rs.getDouble( 5 ) );
-//				if ( rs.wasNull() ) {
-//					link.setBestPeptideQValue( null );
-//				}
-				
-
-
 				//  These counts are only valid for PSM and Peptide at default cutoffs
 
 				if ( onlyDefaultPsmCutoffsAllSearches 

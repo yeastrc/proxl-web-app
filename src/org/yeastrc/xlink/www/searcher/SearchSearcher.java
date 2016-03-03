@@ -14,7 +14,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.SearchDTO;
 
 /**
- * Return a list of all perc searches in the database, ordered by upload date
+ * Return a list of all searches in the database, ordered by upload date
  * @author Mike
  *
  */

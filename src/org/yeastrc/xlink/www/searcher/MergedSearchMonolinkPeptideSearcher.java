@@ -39,14 +39,6 @@ public class MergedSearchMonolinkPeptideSearcher {
 	private MergedSearchMonolinkPeptideSearcher() { }
 	public static MergedSearchMonolinkPeptideSearcher getInstance() { return new MergedSearchMonolinkPeptideSearcher(); }
 
-
-	
-//	String sql = "SELECT distinct a.reported_peptide_id " +
-//			"FROM psm AS a INNER JOIN monolink AS b ON a.id = b.psm_id " +
-//			"INNER JOIN search_reported_peptide AS c ON a.reported_peptide_id = c.reported_peptide_id " +
-//			"WHERE a.q_value <= ? AND a.search_id IN (#SEARCHES#) AND  ( c.q_value <= ? OR c.q_value IS NULL )  "
-//			+ "			AND c.search_id IN (#SEARCHES#) AND b.nrseq_id = ? AND b.protein_position = ? ";
-
 	
 	private final String SQL_PEPTIDES_FIRST_PART = 
 
@@ -252,13 +244,6 @@ public class MergedSearchMonolinkPeptideSearcher {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
 
-			
-//			Collection<Integer> searchIds = new HashSet<Integer>();
-//			for( SearchDTO search : monolink.getSearches() )
-//				searchIds.add( search.getId() );
-//			
-//			sql = sql.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
-			
 			pstmt = conn.prepareStatement( sql );
 			
 
@@ -297,13 +282,6 @@ public class MergedSearchMonolinkPeptideSearcher {
 
 	
 	////////////////////////////////////////////////////////////////////////////////
-	
-	
-//	String sql = "SELECT COUNT(distinct a.reported_peptide_id) " +
-//			"FROM psm AS a INNER JOIN monolink AS b ON a.id = b.psm_id " +
-//			"INNER JOIN search_reported_peptide AS c ON a.reported_peptide_id = c.reported_peptide_id " +
-//			"WHERE a.q_value <= ? AND a.search_id IN (#SEARCHES#) AND  ( c.q_value <= ? OR c.q_value IS NULL ) 
-//					AND c.search_id IN (#SEARCHES#) AND b.nrseq_id = ? AND b.protein_position = ? ";
 	
 	
 	private final String SQL_NUM_PEPTIDES_FIRST_PART = 
@@ -507,13 +485,6 @@ public class MergedSearchMonolinkPeptideSearcher {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
 
-			
-//			Collection<Integer> searchIds = new HashSet<Integer>();
-//			for( SearchDTO search : monolink.getSearches() )
-//				searchIds.add( search.getId() );
-//			
-//			sql = sql.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
-			
 			pstmt = conn.prepareStatement( sql );
 			
 

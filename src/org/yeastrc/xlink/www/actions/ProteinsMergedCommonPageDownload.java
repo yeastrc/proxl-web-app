@@ -292,13 +292,6 @@ public class ProteinsMergedCommonPageDownload {
 				searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
 			}
 
-			//				final List<AnnotationTypeDTO> reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List = 
-			//						peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap.get( searchId ).getAnnotationTypeDTOList();
-			//
-			//				final List<AnnotationTypeDTO> reportedPeptide_AnnotationTypeDTO_SortOrder_List = 
-			//						peptideAnnotationTypeDTO_SortOrder_MainMap.get( searchId ).getAnnotationTypeDTOList();
-
-
 			////////////
 
 			/////   Get annotation type data to sort and display data

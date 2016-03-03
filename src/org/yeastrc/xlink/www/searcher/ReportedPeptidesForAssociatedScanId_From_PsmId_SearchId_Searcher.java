@@ -41,17 +41,6 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 	
 	private static final String SQL_FIRST_PART = 
 		
-
-//			"SELECT unified_rep_pep__reported_peptide__search_lookup.reported_peptide_id, "
-//			
-//			+ " unified_rep_pep__reported_peptide__search_lookup.peptide_q_value_for_search, "
-//			
-//			+ " unified_rep_pep__reported_peptide__search_lookup.best_psm_q_value,"
-//			+ " unified_rep_pep__reported_peptide__search_lookup.link_type, "
-//			+ " unified_rep_pep__reported_peptide__search_lookup.psm_num_at_pt_01_q_cutoff "
-			
-
-
 			"SELECT unified_rp__rep_pept__search__generic_lookup.reported_peptide_id, "
 			
 			+ " unified_rp__rep_pept__search__generic_lookup.link_type, "
@@ -488,15 +477,6 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 				ReportedPeptideDTO reportedPeptideDTO = 
 						ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( reportedPeptideId );
 
-				
-//				item.setqValue( rs.getDouble( "peptide_q_value_for_search" ) );
-//				if ( rs.wasNull() ) {
-//					item.setqValue( null );
-//				}
-//
-//				item.setBestPsmQValue( rs.getDouble( "best_psm_q_value" ) );
-				
-				
 
 				if ( onlyDefaultPsmCutoffs ) {
 					

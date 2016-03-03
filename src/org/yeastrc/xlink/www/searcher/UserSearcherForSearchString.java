@@ -23,33 +23,12 @@ public class UserSearcherForSearchString {
 	public static UserSearcherForSearchString getInstance() { return _INSTANCE; }
 	
 	
-	
-	
-	
-
-	
 	/**
 	 * @param query
 	 * @return
 	 * @throws Exception
 	 */
 	public List<Integer> getAuthUserIdForQuery( String query ) throws Exception {
-		
-		//
-		//CREATE TABLE IF NOT EXISTS crosslinks.auth_user (
-//				  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//				  username VARCHAR(255) NOT NULL,
-//				  password_hashed VARCHAR(255) NOT NULL,
-//				  email VARCHAR(255) NOT NULL,
-//				  user_access_level SMALLINT(6) NULL DEFAULT NULL,
-//				  last_login DATETIME NOT NULL,
-		
-//		CREATE TABLE IF NOT EXISTS crosslinks.xl_user (
-//				  auth_user_id INT UNSIGNED NOT NULL,
-//				  first_name VARCHAR(255) NOT NULL,
-//				  last_name VARCHAR(255) NOT NULL,
-//				  organization VARCHAR(2000) NULL,
-
 		
 		String queryForLike = query + "%";
 		

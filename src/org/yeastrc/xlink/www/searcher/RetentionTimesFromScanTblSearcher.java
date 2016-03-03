@@ -36,7 +36,6 @@ public class RetentionTimesFromScanTblSearcher {
 	private static final String SQL_SUB_SELECT__SCAN_IDS_MAIN =
 			" SELECT psm.scan_id FROM psm  " 
 					+ " INNER JOIN "
-			//  If slow, use psm_filterable_annotation__generic_lookup and put more limits in query on search, reported peptide, and maybe link type
 
 			+ " psm_filterable_annotation__generic_lookup" 
 			+ " ON "  
@@ -205,13 +204,6 @@ public class RetentionTimesFromScanTblSearcher {
 
 		String sql = sqlSB.toString();
 
-
-
-//		if ( true ) {
-//			
-//			throw new Exception( "TEMP" );
-//		}
-		
 		
 		try {
 			

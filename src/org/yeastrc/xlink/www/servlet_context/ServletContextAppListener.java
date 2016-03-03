@@ -66,8 +66,6 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 			throw new RuntimeException( e );
 		} 
 		
-		
-//		LastLoginUpdaterThread.getInstance().start();
 
 		log.warn( "INFO:  !!!!!!!!!!!!!!!   Start up of web app  'Proxl' complete  !!!!!!!!!!!!!!!!!!!! " );
 

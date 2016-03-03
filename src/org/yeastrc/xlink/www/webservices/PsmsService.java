@@ -58,7 +58,6 @@ public class PsmsService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getPsms") 
 	public PsmsServiceResult getViewerData( @QueryParam( "search_id" ) Integer searchId,
-										  @QueryParam( "project_id" ) Integer projectIdParam,
 										  @QueryParam( "reported_peptide_id" ) Integer reportedPeptideId,
 										  @QueryParam( "psmPeptideCutoffsForSearchId" ) String psmPeptideCutoffsForSearchId_JSONString,
 										  @Context HttpServletRequest request )
@@ -446,7 +445,6 @@ public class PsmsService {
 		///   Create sets of annotation type ids that were searched for but are not displayed by default.
 		///   Those annotation values will be displayed after the default, in name order
 		
-		Set<Integer> peptideAnnotationTypesSearchedFor = new HashSet<>();
 		Set<Integer> psmAnnotationTypesSearchedFor = new HashSet<>();
 		
 		Map<String,CutoffValuesAnnotationLevel> psmCutoffValues = cutoffValuesSearchLevel.getPsmCutoffValues();

@@ -407,7 +407,7 @@ public class ProteinCoverageSearcher {
 								
 							} else {
 								
-								int z = 0;
+//								int z = 0;
 							}
 						}
 						

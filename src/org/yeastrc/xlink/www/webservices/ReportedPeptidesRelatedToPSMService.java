@@ -56,7 +56,6 @@ public class ReportedPeptidesRelatedToPSMService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/get") 
 	public ReportedPeptidesRelatedToPSMServiceResult get( @QueryParam( "search_id" ) Integer searchId,
-										  @QueryParam( "project_id" ) Integer projectIdParam,
 										  @QueryParam( "psmPeptideCutoffsForSearchId" ) String psmPeptideCutoffsForSearchId_JSONString,
 										  @QueryParam( "psm_id" ) Integer psmId,
 										  @QueryParam( "scan_id" ) Integer scanId,

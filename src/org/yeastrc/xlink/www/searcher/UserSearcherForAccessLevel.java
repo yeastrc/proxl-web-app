@@ -23,33 +23,12 @@ public class UserSearcherForAccessLevel {
 	public static UserSearcherForAccessLevel getInstance() { return _INSTANCE; }
 	
 	
-	
-	
-	
-
-	
 	/**
 	 * @param authAccessLevel
 	 * @return
 	 * @throws Exception
 	 */
 	public List<Integer> getAuthUserIdsForAuthAccessLevel( int authAccessLevel ) throws Exception {
-		
-		//
-		//CREATE TABLE IF NOT EXISTS crosslinks.auth_user (
-//				  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//				  username VARCHAR(255) NOT NULL,
-//				  password_hashed VARCHAR(255) NOT NULL,
-//				  email VARCHAR(255) NOT NULL,
-//				  user_access_level SMALLINT(6) NULL DEFAULT NULL,
-//				  last_login DATETIME NOT NULL,
-		
-//		CREATE TABLE IF NOT EXISTS crosslinks.xl_user (
-//				  auth_user_id INT UNSIGNED NOT NULL,
-//				  first_name VARCHAR(255) NOT NULL,
-//				  last_name VARCHAR(255) NOT NULL,
-//				  organization VARCHAR(2000) NULL,
-
 		
 		
 		List<Integer> userIds = new ArrayList<Integer>();

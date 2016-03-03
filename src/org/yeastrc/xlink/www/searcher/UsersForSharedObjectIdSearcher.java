@@ -25,28 +25,12 @@ public class UsersForSharedObjectIdSearcher {
 	public static UsersForSharedObjectIdSearcher getInstance() { return _INSTANCE; }
 	
 	
-	
-
-	
 	/**
 	 * @param sharedObjectId
 	 * @return
 	 * @throws Exception
 	 */
 	public List<Integer> getAuthUserIdsExcludeGlobalNoAccessDisabledAccountsForSharedObjectId( int sharedObjectId ) throws Exception {
-		
-
-		
-//		CREATE TABLE IF NOT EXISTS crosslinks.auth_shared_object (
-//				  shared_object_id INT UNSIGNED NOT NULL,
-//				  public_access_code_enabled TINYINT(1) NOT NULL DEFAULT false,
-//				  public_access_code VARCHAR(255) NULL,
-
-//		CREATE TABLE IF NOT EXISTS auth_shared_object_users (
-//				  shared_object_id INT UNSIGNED NOT NULL,
-//				  user_id INT UNSIGNED NOT NULL,
-//				  access_level SMALLINT UNSIGNED NOT NULL,
-			
 		
 		List<Integer> userIds = new ArrayList<Integer>();
 		

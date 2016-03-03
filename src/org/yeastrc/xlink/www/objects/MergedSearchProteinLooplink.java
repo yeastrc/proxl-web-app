@@ -80,37 +80,6 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 	}
 
 
-	/**
-	 * @return true if any child level link "Best Peptide Q-Value" is not null
-	 * @throws Exception 
-	 */
-	public boolean isAnyLinksHaveBestPeptideQValue() throws Exception {
-
-		return false;
-		
-		
-//		if ( anyLinksHaveBestPeptideQValueSet ) {
-//			
-//			return anyLinksHaveBestPeptideQValue;
-//		}
-//	
-//		/// Check if any child level link "Best Peptide Q-Value" is not null
-//
-//		for ( Map.Entry<SearchDTO, SearchProteinLooplink> searchProteinLooplinksEntry : this.getSearchProteinLooplinks().entrySet() ) { 
-//
-//			SearchProteinLooplink searchProteinLooplinkEntry = searchProteinLooplinksEntry.getValue();
-//
-//			if ( searchProteinLooplinkEntry.getBestPeptideQValue() != null ) {
-//
-//				anyLinksHaveBestPeptideQValue = true;
-//				break;
-//			}
-//		}
-//		
-//		anyLinksHaveBestPeptideQValueSet = true;
-//		
-//		return anyLinksHaveBestPeptideQValue;
-	}
 
 
 	
@@ -137,8 +106,6 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 		
 		if( this.numPsms == null ) {
 		
-//			this.numPsms = MergedSearchPsmSearcher.getInstance().getNumPsms( this );
-			
 
 			//  Use code in  SearchProteinLooplink.getNumPsms() for each search
 //			

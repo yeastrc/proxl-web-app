@@ -155,11 +155,11 @@ public class QCPlotPsmCountsVsScoreService {
 			}
 
 			
-			PsmCountsVsScoreQCPlotDataJSONRoot psmCountPerQValueQCPlotDataJSONRoot = 
+			PsmCountsVsScoreQCPlotDataJSONRoot psmCountsVsScoreQCPlotDataJSONRoot = 
 					CreatePsmCountsVsScoreQCPlotData.getInstance()
 					.create( selectedLinkTypes, searchId, annotationTypeId, psmScoreCutoff );
 			
-			return psmCountPerQValueQCPlotDataJSONRoot;
+			return psmCountsVsScoreQCPlotDataJSONRoot;
 			
 		} catch ( WebApplicationException e ) {
 

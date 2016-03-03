@@ -44,9 +44,6 @@ public class SendEmail {
 	private static final Logger log = Logger.getLogger(SendEmail.class);
 
 
-
-
-
 	private static final String TO = "to";
 	private static final String FROM = "from";
 	private static final String SUBJECT = "subject";

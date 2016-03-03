@@ -16,9 +16,6 @@
 		initial_scan_id="{{ initial_scan_id }}"  <%-- For the Related Peptides Overlay, this is the initial scan id clicked on  --%>
 		reported_peptide_id="{{ data.reportedPeptide_Id }}"
 		search_id="{{ searchId }}"
-		project_id="{{ projectId }}"
-		peptide_q_value_cutoff="{{ peptide_q_value_cutoff }}"
-		psm_q_value_cutoff="{{ psm_q_value_cutoff }}"
 		skip_associated_peptides_link="true"
 		>
 		

@@ -12,18 +12,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.auth.dto.AuthUserDTO;
-//import org.yeastrc.xlink.searchers.ProjectSearcher;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-//import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
-//import org.yeastrc.xlink.www.web_utils.RefreshAllowedReadAccessProjectIds;
-//import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
-//import org.yeastrc.xlink.www.dto.ProjectDTO;
 
 /**
  * 
@@ -106,66 +101,6 @@ public class ListProjectsAction extends Action {
 			
 			GetPageHeaderData.getInstance().getPageHeaderDataWithoutProjectId( request );
 			
-
-//			List<ProjectDTO> projects = null;
-//			
-//			AuthUserDTO authUser = null;
-//			
-//			if ( userSessionObject.getUserDBObject() != null && userSessionObject.getUserDBObject().getAuthUser() != null ) {
-//				
-//				authUser = userSessionObject.getUserDBObject().getAuthUser();
-//				
-//				///  Refresh with latest
-//				
-//				authUser = AuthUserDAO.getInstance().getAuthUserDTOForId( authUser.getId() );
-//				
-//				userSessionObject.getUserDBObject().setAuthUser( authUser );
-//				
-//
-//			}
-//			
-//			if ( authUser != null 
-//					&& authUser.getUserAccessLevel() != null
-//					&& authUser.getUserAccessLevel() == AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN ) {
-//				
-//				projects = ProjectSearcher.getInstance().getAllProjects();
-//				
-//			} else if ( authUser != null 
-//				&& authUser.getUserAccessLevel() != null
-//				&& authUser.getUserAccessLevel() == AuthAccessLevelConstants.ACCESS_LEVEL_NONE) {
-//			
-//
-//				request.setAttribute( "noAccess", true );
-//			
-//			} else {
-//				
-//				Integer authUserId = null;
-//				
-//				if ( authUser != null ) {
-//					
-//					authUserId = authUser.getId();
-//				}
-//				
-//				
-//				RefreshAllowedReadAccessProjectIds.refreshAllowedReadAccessProjectIds( userSessionObject );
-//
-//
-//				Set<Integer> allowedProjectIds = userSessionObject.getAllowedReadAccessProjectIds();
-//
-//
-//				if ( authUserId == null && ( allowedProjectIds == null || allowedProjectIds.isEmpty() ) ) {
-//
-//					projects = new ArrayList<ProjectDTO>();
-//
-//				} else {
-//
-//					projects = ProjectSearcher.getInstance().getProjectsForAuthUserIdORAllowedProjectIds( authUserId, allowedProjectIds );
-//				}
-//			}
-//			
-//			request.setAttribute( "projects", projects );
-
-
 			return mapping.findForward( "Success" );
 
 

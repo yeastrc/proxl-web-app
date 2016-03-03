@@ -67,17 +67,6 @@ public class SearchProteinDimerSearcher {
 
 	private final String PEPTIDE_BEST_VALUE_FILTER_TABLE_ALIAS = "best_rep_pept_value_tbl_";
 	
-	
-
-//	final String sql = "SELECT nrseq_id_1, nrseq_id_2, protein_1_position, protein_2_position, "
-//			+ "bestPSMQValue, bestPeptideQValue, "
-//			+ "num_psm_at_pt_01_q_cutoff, num_linked_peptides_at_pt_01_q_cutoff, num_unique_peptides_linked_at_pt_01_q_cutoff "
-//
-//			+ " FROM search_dimer_lookup WHERE search_id = ? AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  "
-//			+ "ORDER BY nrseq_id_1, nrseq_id_2, protein_1_position, protein_2_position";			
-	
-
-
 	private final String SQL_SEARCH_ON_SEARCH_ID_FIRST_PART = 
 
 		"SELECT search_dimer_generic_lookup.nrseq_id_1, "
@@ -490,25 +479,10 @@ public class SearchProteinDimerSearcher {
 		return searchedForPeptideAnnotationDTOFromQueryMap;
 	}
 
-
-	
-	
 	/////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////
-
-	
 	
 	////////////     Retrieval of single SearchProteinDimer based on provided criteria
-	
-
-//	String sql = "SELECT bestPSMQValue, bestPeptideQValue, "
-//			+ "num_psm_at_pt_01_q_cutoff, num_linked_peptides_at_pt_01_q_cutoff, num_unique_peptides_linked_at_pt_01_q_cutoff "
-//
-//			+ "FROM search_dimer_lookup WHERE search_id = ? AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  AND "
-//			+ "nrseq_id_1 = ? AND nrseq_id_2 = ? AND protein_1_position = ? AND protein_2_position = ?";	
-	
 
 	private final String SQL_SEARCH_ON_SEARCH_ID_DIMER_FIRST_PART = 
 

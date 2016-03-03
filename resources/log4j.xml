@@ -16,7 +16,7 @@
                 	  out to make the filename be controlled by the class specified by < rollingPolicy -->
                 
 			    <!--  Start RollingFileAppender file specification -->              
-                <param name="file" value="${catalina.base}/logs/proxl.log" />
+                <param name="file" value="${catalina.base}/logs/proxl_generic.log" />
 			    <param name="MaxFileSize" value="500KB"/>
 			    <!-- Number of backup files -->
 			    <param name="MaxBackupIndex" value="5"/>   
@@ -57,7 +57,7 @@
                 	  out to make the filename be controlled by the class specified by < rollingPolicy -->
                 
 			    <!--  Start RollingFileAppender file specification -->              
-                <param name="file" value="${catalina.base}/logs/proxl.errors.log" />
+                <param name="file" value="${catalina.base}/logs/proxl_generic.errors.log" />
 			    <param name="MaxFileSize" value="500KB"/>
 			    <!-- Number of backup files -->
 			    <param name="MaxBackupIndex" value="5"/>   

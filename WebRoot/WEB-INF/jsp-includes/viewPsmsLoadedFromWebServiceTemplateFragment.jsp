@@ -3,26 +3,6 @@
 
 <%-- viewPsmsLoadedFromWebServiceTemplateFragment.jsp --%>
 
-
-
-<%--
-//		psms: Array[4]
-//			0: Object
-//			calcMass: 0
-//			charge: 2
-//			chargeSet: true
-//			id: 382114
-//			pep: 0.0009191
-//			reportedPeptideId: 1012223
-//			searchId: 308
-//			psmId: "T-28418.pf.2015-01-08-Q_2013_1016_RJ_08-relD500odb-percolatorIn.txt"
-//			qValue: 0.001051
-//			scanId: 635969
-//			svmScore: 0.733
-//			type: 2
---%>					
-	
-	
 	<%--  PSM Table Template --%>
 
 

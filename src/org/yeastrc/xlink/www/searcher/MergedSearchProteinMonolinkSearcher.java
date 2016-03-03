@@ -40,15 +40,6 @@ public class MergedSearchProteinMonolinkSearcher {
 	
 	private final String SEARCH_ID_GROUP_SEPARATOR = ","; //  separator as search ids are combined by the group by
 
-	
-//	String sql = "SELECT nrseq_id, protein_position, min(bestPSMQValue), min(bestPeptideQValue) "
-//			+ "FROM search_monolink_lookup WHERE search_id IN (#SEARCHES#) AND bestPSMQValue <= ? AND  ( bestPeptideQValue <= ? OR bestPeptideQValue IS NULL )  "
-//			+ "GROUP BY nrseq_id, protein_position "
-//			+ "ORDER BY nrseq_id, protein_position";
-	
-	
-	
-
 	private final String SQL_FIRST_PART = 
 			
 			"SELECT subquery_result.nrseq_id, "
@@ -578,13 +569,6 @@ public class MergedSearchProteinMonolinkSearcher {
 			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
 
-			
-//			Collection<Integer> searchIds = new HashSet<Integer>();
-//			for( SearchDTO search : searches )
-//				searchIds.add( search.getId() );
-//			
-//			sql = sql.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
-						
 			pstmt = conn.prepareStatement( sql );
 			
 
@@ -685,34 +669,6 @@ public class MergedSearchProteinMonolinkSearcher {
 //					link.setNumLinkedPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
 //					link.setNumUniqueLinkedPeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
 				}
-
-//				link.setBestPSMQValue( rs.getDouble( 3 ) );
-//				
-//				link.setBestPeptideQValue( rs.getDouble( 4 ) );
-//				if ( rs.wasNull() ) {
-//					link.setBestPeptideQValue( null );
-//				}
-				
-				
-				//  TODO This probably should change
-//				
-//				// add search-level info for the protein monolinks:
-//				Map<SearchDTO, SearchProteinMonolink> searchMonolinks = new TreeMap<SearchDTO, SearchProteinMonolink>();
-//				
-//				for( SearchDTO search : searches ) {
-//					SearchProteinMonolink tlink = SearchProteinMonolinkSearcher.getInstance().search(search, 
-//																										 psmCutoff, 
-//																										 peptideCutoff, 
-//																										 link.getProtein().getNrProtein(),
-//																										 link.getProteinPosition()
-//																										);
-//
-//					if( tlink != null )
-//						searchMonolinks.put( search, tlink );
-//				}
-//				
-//				link.setSearchProteinMonolinks( searchMonolinks );
-				
 				
 				links.add( link );
 			}
