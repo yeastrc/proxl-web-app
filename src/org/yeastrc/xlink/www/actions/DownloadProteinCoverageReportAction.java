@@ -427,10 +427,6 @@ public class DownloadProteinCoverageReportAction extends Action {
 				}
 						
 				
-//				writer.write( "# PSM Q-value: " + psmQValueCutoff + "\n" );
-//				writer.write( "# Peptide Q-value: " +peptideQValueCutoff + "\n" );
-				
-				
 				writer.write( "# Filter out non-unique peptides: " + proteinQueryJSONRoot.isFilterNonUniquePeptides() + "\n" );
 				writer.write(
 						"PROTEIN\t# RESIDUES\tSEQUENCE COVERAGE\t#LINKABLE RESIDUES"

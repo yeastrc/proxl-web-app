@@ -264,11 +264,6 @@
 				validate="false">
 		</action>
 		
-		<action path="/modifiedLysineReport"
-				type="org.yeastrc.xlink.www.actions.ModifiedLysineReportAction"
-				scope="request"
-				validate="false">
-		</action>
 
   		<action path="/downloadMergedProteinUDRs"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedSearchUDRsAction"

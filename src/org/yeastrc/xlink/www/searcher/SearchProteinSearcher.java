@@ -4,15 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.yeastrc.xlink.dao.NRProteinDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
-import org.yeastrc.xlink.www.objects.MergedSearchProtein;
 import org.yeastrc.xlink.www.objects.SearchProtein;
 import org.yeastrc.xlink.www.objects.SearchProteinDoublePosition;
 import org.yeastrc.xlink.www.objects.SearchProteinPosition;
@@ -265,50 +262,6 @@ public class SearchProteinSearcher {
 		}
 		
 		return proteinPositions;
-	}
-	
-	/**
-	 * Get all proteins with the given types of links in the given search with the given cutoffs
-	 * @param search
-	 * @param types
-	 * @param psmQValueCutoff
-	 * @param peptideQValueCutoff
-	 * @return
-	 * @throws Exception
-	 */
-	public Collection<SearchProtein> getProteinsWithLinkType(SearchDTO search, Collection<Integer> types, double psmQValueCutoff, double peptideQValueCutoff) throws Exception {
-		Collection<SearchProtein> prps = new HashSet<SearchProtein>();
-		Collection<SearchDTO> searches = new HashSet<SearchDTO>();
-		searches.add( search );
-
-		Collection<MergedSearchProtein> mrps = MergedSearchProteinSearcher.getInstance().getProteinsWithLinkType(searches, types, psmQValueCutoff, peptideQValueCutoff);
-		for( MergedSearchProtein mrp : mrps ) {
-			prps.add( new SearchProtein( search, mrp.getNrProtein() ) );
-		}
-		
-		return prps;
-	}
-
-	/**
-	 * Get all proteins with the given type of links in the given search with the given cutoffs
-	 * @param search
-	 * @param type
-	 * @param psmQValueCutoff
-	 * @param peptideQValueCutoff
-	 * @return
-	 * @throws Exception
-	 */
-	public Collection<SearchProtein> getProteinsWithLinkType(SearchDTO search, int type, double psmQValueCutoff, double peptideQValueCutoff) throws Exception {
-		Collection<SearchProtein> prps = new HashSet<SearchProtein>();
-		Collection<SearchDTO> searches = new HashSet<SearchDTO>();
-		searches.add( search );
-
-		Collection<MergedSearchProtein> mrps = MergedSearchProteinSearcher.getInstance().getProteinsWithLinkType(searches, type, psmQValueCutoff, peptideQValueCutoff);
-		for( MergedSearchProtein mrp : mrps ) {
-			prps.add( new SearchProtein( search, mrp.getNrProtein() ) );
-		}
-		
-		return prps;
 	}
 	
 	/**
