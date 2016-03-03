@@ -34,19 +34,6 @@ public class ImportPostProcessingPerSearch {
 	    
 	    
 
-//	    System.out.println( "Saving search to protein lookup cache..." );
-//	    SearchProteinLookupDAO.getInstance().createEntriesForSearch( searchId );
-	    
-//	    System.out.println( "Saving search to crosslink lookup cache..." );
-//	    PopulateSearchCrosslinkLookupTable.getInstance().populateSearchCrosslinkLookupTable( searchId );
-//	    
-//	    System.out.println( "Saving search to looplink lookup cache..." );
-//	    PopulateSearchLooplinkLookupTable.getInstance().populateSearchLooplinkLookupTable( searchId );
-//	    
-//	    System.out.println( "Saving search to monolink lookup cache..." );
-//	    SearchMonolinkLookupDAO.getInstance().createEntriesForSearch( searchId );
-		
-
 	    System.out.println( "Starting populating Search Crosslink lookup tables.  Now: " + new Date() );
 		PopulateSearchCrosslinkGenericLookupTable.getInstance().populateSearchCrosslinkGenericLookupTable( searchId );
 	    System.out.println( "Finished populating Search Crosslink lookup tables.  Now: " + new Date() );
