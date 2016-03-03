@@ -229,18 +229,6 @@ public class NumPeptidesForProteinCriteriaSearcher {
 					+ " AND ndpp_2.nrseq_database_id = ?  " 
 					+ " AND ndpp_1.is_unique = 'Y' AND ndpp_2.is_unique='Y' ";
 	
-//	String sql = " SELECT COUNT(DISTINCT a.reported_peptide_id) "+
-//			 "FROM psm AS a INNER JOIN crosslink AS b ON a.id = b.psm_id "+
-//			 "INNER JOIN search_reported_peptide AS d ON a.reported_peptide_id = d.reported_peptide_id "+
-//			 "INNER JOIN nrseq_database_peptide_protein AS c1 ON b.peptide_1_id = c1.peptide_id "+
-//			 "INNER JOIN nrseq_database_peptide_protein AS c2 ON b.peptide_2_id = c2.peptide_id "+                
-//			 "WHERE a.q_value <= ? AND a.search_id = ? AND ( d.q_value <= ? OR d.q_value IS NULL )   AND d.search_id = ? AND b.nrseq_id_1 = ? AND b.nrseq_id_2 = ? " +
-//			 "AND b.protein_1_position = ? AND b.protein_2_position = ? AND "
-//			 + " c2.nrseq_database_id = ? AND " +
-//			 "c1.is_unique = 'Y' AND c2.is_unique='Y'";
-
-
-
 	/**
 	 * Get the number of peptides (pair of peptides) that UNIQUELY identified the pair of proteins+positions represented by this crosslink
 	 * 
@@ -418,12 +406,6 @@ public class NumPeptidesForProteinCriteriaSearcher {
 	
 	///////////////////////////////////////////////////
 
-//	final String sql = "SELECT COUNT(distinct a.reported_peptide_id) " +
-//			"FROM psm AS a INNER JOIN looplink AS b ON a.id = b.psm_id " +
-//			"INNER JOIN search_reported_peptide AS c ON a.reported_peptide_id = c.reported_peptide_id " +
-//			"WHERE a.q_value <= ? AND a.search_id = ? AND ( c.q_value <= ? OR c.q_value IS NULL )   AND c.search_id = ? AND b.nrseq_id = ? AND b.protein_position_1 = ? AND b.protein_position_2 = ?";
-
-
 	private final String SQL_LOOPLINK_FIRST_PART = 
 			"SELECT COUNT(distinct psm.reported_peptide_id) "
 
@@ -600,14 +582,6 @@ public class NumPeptidesForProteinCriteriaSearcher {
 
 	////////////////////////////////////////////////////////////////////////////////////
 	
-//	String sql = " SELECT COUNT(DISTINCT a.reported_peptide_id) "+
-//			 "FROM psm AS a INNER JOIN looplink AS b ON a.id = b.psm_id "+
-//			 "INNER JOIN search_reported_peptide AS d ON a.reported_peptide_id = d.reported_peptide_id "+
-//			 "INNER JOIN nrseq_database_peptide_protein AS c1 ON b.peptide_id = c1.peptide_id "+
-//			 "WHERE a.q_value <= ? AND a.search_id = ? AND ( d.q_value <= ? OR d.q_value IS NULL )   AND d.search_id = ? AND b.nrseq_id = ? " +
-//			 "AND b.protein_position_1 = ? AND b.protein_position_2 = ? AND c1.nrseq_database_id = ? AND " +
-//			 "c1.is_unique = 'Y'";
-
 	private final String SQL_LOOPLINK_UNIQUE_FIRST_PART = 
 
 			"SELECT COUNT(distinct psm.reported_peptide_id) " 
@@ -794,11 +768,6 @@ public class NumPeptidesForProteinCriteriaSearcher {
 	/////////////    MONOLINK
 
 	///////////////////////////////////////////////////
-
-//	final String sql = "SELECT COUNT(distinct a.reported_peptide_id) " +
-//			"FROM psm AS a INNER JOIN looplink AS b ON a.id = b.psm_id " +
-//			"INNER JOIN search_reported_peptide AS c ON a.reported_peptide_id = c.reported_peptide_id " +
-//			"WHERE a.q_value <= ? AND a.search_id = ? AND ( c.q_value <= ? OR c.q_value IS NULL )   AND c.search_id = ? AND b.nrseq_id = ? AND b.protein_position_1 = ? AND b.protein_position_2 = ?";
 
 	private final String SQL_MONOLINK_FIRST_PART = 
 			"SELECT COUNT(distinct psm.reported_peptide_id) " 
@@ -1343,17 +1312,6 @@ public class NumPeptidesForProteinCriteriaSearcher {
 					+ " AND ndpp_2.nrseq_database_id = ?  " 
 					+ " AND ndpp_1.is_unique = 'Y' AND ndpp_2.is_unique='Y' ";
 	
-//	String sql = " SELECT COUNT(DISTINCT a.reported_peptide_id) "+
-//			 "FROM psm AS a INNER JOIN dimer AS b ON a.id = b.psm_id "+
-//			 "INNER JOIN search_reported_peptide AS d ON a.reported_peptide_id = d.reported_peptide_id "+
-//			 "INNER JOIN nrseq_database_peptide_protein AS c1 ON b.peptide_1_id = c1.peptide_id "+
-//			 "INNER JOIN nrseq_database_peptide_protein AS c2 ON b.peptide_2_id = c2.peptide_id "+                
-//			 "WHERE a.q_value <= ? AND a.search_id = ? AND ( d.q_value <= ? OR d.q_value IS NULL )   AND d.search_id = ? AND b.nrseq_id_1 = ? AND b.nrseq_id_2 = ? " +
-//			 "AND b.protein_1_position = ? AND b.protein_2_position = ? AND "
-//			 + " c2.nrseq_database_id = ? AND " +
-//			 "c1.is_unique = 'Y' AND c2.is_unique='Y'";
-
-
 
 	/**
 	 * Get the number of peptides (pair of peptides) that UNIQUELY identified the pair of proteins+positions represented by this dimer
@@ -1525,11 +1483,6 @@ public class NumPeptidesForProteinCriteriaSearcher {
 	/////////////    UNLINKED
 
 	///////////////////////////////////////////////////
-
-//	final String sql = "SELECT COUNT(distinct a.reported_peptide_id) " +
-//			"FROM psm AS a INNER JOIN looplink AS b ON a.id = b.psm_id " +
-//			"INNER JOIN search_reported_peptide AS c ON a.reported_peptide_id = c.reported_peptide_id " +
-//			"WHERE a.q_value <= ? AND a.search_id = ? AND ( c.q_value <= ? OR c.q_value IS NULL )   AND c.search_id = ? AND b.nrseq_id = ? AND b.protein_position_1 = ? AND b.protein_position_2 = ?";
 
 	private final String SQL_UNLINKED_FIRST_PART = 
 			"SELECT COUNT(distinct psm.reported_peptide_id) " 
