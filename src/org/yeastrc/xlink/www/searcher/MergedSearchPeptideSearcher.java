@@ -292,7 +292,7 @@ public class MergedSearchPeptideSearcher {
 
 						sqlSB.append( " INNER JOIN " );
 
-						sqlSB.append( " psm_annotation AS psm_fltrbl_tbl_" );
+						sqlSB.append( " psm_filterable_annotation__generic_lookup AS psm_fltrbl_tbl_" );
 						sqlSB.append( Integer.toString( tableIndexCounter ) );
 
 						sqlSB.append( " ON "  );

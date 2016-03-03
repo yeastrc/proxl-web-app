@@ -39,7 +39,7 @@ public class Psm_ScanCountForAssociatedScanId_From_PsmId_SearchId_Searcher {
 			
 	private static final String SQL_PSM_SUBSELECT =
 			
-			 	" SELECT psm.id AS psm_id, search_id, reported_peptide_id  FROM psm ";
+			 	" SELECT psm.id AS psm_id, psm.search_id, psm.reported_peptide_id  FROM psm ";
 	
 	private static final String SQL_PSM_SUBSELECT_WHERE_START =
 			" WHERE psm.scan_id = ? AND psm.id <> ?  AND psm.search_id = ?  ";
@@ -114,7 +114,7 @@ public class Psm_ScanCountForAssociatedScanId_From_PsmId_SearchId_Searcher {
 
 				//  If slow, use psm_filterable_annotation__generic_lookup and put more limits in query on search, reported peptide, and maybe link type
 
-				sqlSB.append( " psm_annotation AS psm_fltrbl_tbl_" );
+				sqlSB.append( " psm_filterable_annotation__generic_lookup AS psm_fltrbl_tbl_" );
 				sqlSB.append( Integer.toString( counter ) );
 
 				sqlSB.append( " ON "  );
