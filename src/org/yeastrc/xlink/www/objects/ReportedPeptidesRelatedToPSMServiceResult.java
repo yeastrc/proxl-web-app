@@ -9,20 +9,32 @@ import java.util.List;
 public class ReportedPeptidesRelatedToPSMServiceResult {
 
 	
-	private List<AnnotationDisplayNameDescription> annotationDisplayNameDescriptionList;
-	
+
 	private List<WebReportedPeptideWebserviceWrapper> webReportedPeptideWebserviceWrapperList;
 
+	private List<AnnotationDisplayNameDescription> peptideAnnotationDisplayNameDescriptionList;
+
+	private List<AnnotationDisplayNameDescription> psmAnnotationDisplayNameDescriptionList;
+
 	
-	
-	public List<AnnotationDisplayNameDescription> getAnnotationDisplayNameDescriptionList() {
-		return annotationDisplayNameDescriptionList;
+	public List<AnnotationDisplayNameDescription> getPeptideAnnotationDisplayNameDescriptionList() {
+		return peptideAnnotationDisplayNameDescriptionList;
 	}
 
-	public void setAnnotationDisplayNameDescriptionList(
-			List<AnnotationDisplayNameDescription> annotationDisplayNameDescriptionList) {
-		this.annotationDisplayNameDescriptionList = annotationDisplayNameDescriptionList;
+	public void setPeptideAnnotationDisplayNameDescriptionList(
+			List<AnnotationDisplayNameDescription> peptideAnnotationDisplayNameDescriptionList) {
+		this.peptideAnnotationDisplayNameDescriptionList = peptideAnnotationDisplayNameDescriptionList;
 	}
+
+	public List<AnnotationDisplayNameDescription> getPsmAnnotationDisplayNameDescriptionList() {
+		return psmAnnotationDisplayNameDescriptionList;
+	}
+
+	public void setPsmAnnotationDisplayNameDescriptionList(
+			List<AnnotationDisplayNameDescription> psmAnnotationDisplayNameDescriptionList) {
+		this.psmAnnotationDisplayNameDescriptionList = psmAnnotationDisplayNameDescriptionList;
+	}
+
 
 	public List<WebReportedPeptideWebserviceWrapper> getWebReportedPeptideWebserviceWrapperList() {
 		return webReportedPeptideWebserviceWrapperList;

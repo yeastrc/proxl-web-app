@@ -15,37 +15,31 @@ public class WebReportedPeptideWebserviceWrapper {
 	
 	private static final Logger log = Logger.getLogger(WebReportedPeptideWebserviceWrapper.class);
 	
-	private String linkType;
 
 	private WebReportedPeptide webReportedPeptide;
 	
-	private List<String> annotationValues;
-	
-	
 	
 
-	public List<String> getAnnotationValues() {
-		return annotationValues;
-	}
-
-	public void setAnnotationValues(List<String> annotationValues) {
-		this.annotationValues = annotationValues;
-	}
-
+	
+	
 	public void setWebReportedPeptide(WebReportedPeptide webReportedPeptide) {
 		this.webReportedPeptide = webReportedPeptide;
 	}
 
+	
+	public List<String> getPsmAnnotationValueList() {
+		return this.webReportedPeptide.getPsmAnnotationValueList();
+	}
+
+
+	public List<String> getPeptideAnnotationValueList() {
+		return this.webReportedPeptide.getPeptideAnnotationValueList();
+	}
+
+	
 	public String getLinkType() {
-		return linkType;
+		return this.webReportedPeptide.getLinkType();
 	}
-
-
-	public void setLinkType(String linkType) {
-		this.linkType = linkType;
-	}
-
-
 
 
 	//////////////////////////////////////////////////////

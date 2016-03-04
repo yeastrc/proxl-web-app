@@ -61,6 +61,11 @@
 		{{/if}}
 		--%>
 
+	{{#each data.peptideAnnotationValueList}}
+		<td style="text-align: left; white-space: nowrap; "  class=" "  
+	 			>{{this}}</td>
+	{{/each}}		
+
 		<td class="integer-number-column {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
 			<a class="show-child-data-link  " 
 				href="javascript:"
@@ -84,5 +89,12 @@
 		<td class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " >{{ data.bestPsmQValue }}</td>
 		
 		--%>
+		
+
+	{{#each data.psmAnnotationValueList}}
+		<td style="text-align: left; white-space: nowrap; "  class=" "  
+	 			>{{this}}</td>
+	{{/each}}
+			
 	</tr>
 

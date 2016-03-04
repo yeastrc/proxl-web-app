@@ -3,13 +3,18 @@ package org.yeastrc.xlink.www.searcher;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
+import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
+import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -18,12 +23,12 @@ import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.XLinkUtils;
+import org.yeastrc.xlink.www.objects.ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem;
 import org.yeastrc.xlink.www.objects.SearchPeptideCrosslink;
 import org.yeastrc.xlink.www.objects.SearchPeptideDimer;
 import org.yeastrc.xlink.www.objects.SearchPeptideLooplink;
 import org.yeastrc.xlink.www.objects.SearchPeptideUnlink;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
-import org.yeastrc.xlink.www.objects.WebReportedPeptideWebserviceWrapper;
 
 /**
  * Is only this PSM associated with it's scan ids 
@@ -37,6 +42,30 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 
 	private static final Logger log = Logger.getLogger(ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher.class);
 	
+	
+
+	
+	/**
+	 * Should it use the optimization of Peptide and PSM defaults to skip joining the tables with the annotation values?
+	 */
+	private final boolean USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES = false;  // UNTESTED for a value of "true"
+	
+	
+	/**
+	 * UNTESTED for a value of "true"
+	 * 
+	 * If make true, need to change calling code since best PSM annotation values will not be populated
+	 * 
+	 * Also, test web page and/or webservice 
+	 */
+//	private final boolean USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES = true;  //  UNTESTED for a value of "true"
+	
+	
+	private final String PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS = "psm_fltrbl_tbl_";
+	
+
+//	private final String PEPTIDE_VALUE_FILTER_TABLE_ALIAS = "srch__rep_pept_fltrbl_tbl_";
+
 
 	
 	private static final String SQL_FIRST_PART = 
@@ -44,9 +73,11 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 			"SELECT unified_rp__rep_pept__search__generic_lookup.reported_peptide_id, "
 			
 			+ " unified_rp__rep_pept__search__generic_lookup.link_type, "
-			+ " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff "
+			+ " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff ";
 			
-			+ " FROM "
+
+	private final String SQL_MAIN_FROM_START = 		
+			" FROM "
 			
 			+ 	"psm  "
 			+ 	"INNER JOIN unified_rp__rep_pept__search__generic_lookup  "
@@ -70,10 +101,10 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<WebReportedPeptideWebserviceWrapper> reportedPeptideRecordsForAssociatedScanId( int psmId, int scanId, int searchId, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
+	public List<ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem> reportedPeptideRecordsForAssociatedScanId( int psmId, int scanId, int searchId, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
 		
 		
-		List<WebReportedPeptideWebserviceWrapper> results = new ArrayList<>();
+		List<ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem> results = new ArrayList<>();
 		
 		SearchDTO search = null;
 		
@@ -99,7 +130,38 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 		List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesList = 
 				searcherCutoffValuesSearchLevel.getPsmPerAnnotationCutoffsList();
 
+		
+		//  If null, create empty lists
+		
+		if ( peptideCutoffValuesList == null ) {
+			
+			peptideCutoffValuesList = new ArrayList<>();
+		}
+		
+		if ( psmCutoffValuesList == null ) {
+			
+			psmCutoffValuesList = new ArrayList<>();
+		}
 
+
+		List<AnnotationTypeDTO> peptideCutoffsAnnotationTypeDTOList = new ArrayList<>( psmCutoffValuesList.size() );
+
+		List<AnnotationTypeDTO> psmCutoffsAnnotationTypeDTOList = new ArrayList<>( psmCutoffValuesList.size() );
+
+		
+		for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesAnnotationLevel : peptideCutoffValuesList ) {
+
+			peptideCutoffsAnnotationTypeDTOList.add( searcherCutoffValuesAnnotationLevel.getAnnotationTypeDTO() );
+		}
+
+				
+		for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesAnnotationLevel : psmCutoffValuesList ) {
+
+			psmCutoffsAnnotationTypeDTOList.add( searcherCutoffValuesAnnotationLevel.getAnnotationTypeDTO() );
+		}
+
+		
+		
 		////////////
 		
 		//  All cutoffs are default?
@@ -137,15 +199,6 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 		
 		
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -169,9 +222,68 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 		sqlSB.append( SQL_FIRST_PART );
 		
 
+		///////   Add fields to result from best PSM annotation values
+		
 		{
 			
-			if ( ! onlyDefaultPsmCutoffs ) {
+			if ( ( ( ! onlyDefaultPsmCutoffs ) ) //  || ( ! onlyDefaultPeptideCutoffs ) )
+					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
+
+				
+				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
+
+
+				//  Add Field retrieval for each PSM cutoff
+
+				for ( int counter = 1; counter <= psmCutoffValuesList.size(); counter++ ) {
+
+					sqlSB.append( " , " );
+
+					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( ".annotation_type_id " );
+					sqlSB.append( " AS "  );
+					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( "_annotation_type_id " );
+
+					sqlSB.append( " , " );
+					
+					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( ".best_psm_value_for_ann_type_id " );
+					sqlSB.append( " AS "  );
+					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( "_best_psm_value_for_ann_type_id " );
+
+					sqlSB.append( " , " );
+					
+					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( ".best_psm_value_string_for_ann_type_id " );
+					sqlSB.append( " AS "  );
+					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
+					sqlSB.append( Integer.toString( counter ) );
+					sqlSB.append( "_best_psm_value_string_for_ann_type_id " );
+
+
+				}
+			}
+		}
+		
+
+
+		sqlSB.append( SQL_MAIN_FROM_START );
+		
+		
+		
+
+		{
+			
+			if ( ( ( ! onlyDefaultPsmCutoffs ) ) //  || ( ! onlyDefaultPeptideCutoffs ) )
+					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
+
 				
 				
 				//  Non-Default PSM cutoffs so have to query on the cutoffs
@@ -255,20 +367,8 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 
 		{
 
-			
-			if ( onlyDefaultPsmCutoffs ) {
-				
-				//   Only Default PSM Cutoffs chosen so criteria simply the Peptides where the PSM count for the default cutoffs is > zero
-				
-
-				sqlSB.append( " AND " );
-
-
-				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff > 0 " );
-
-				
-			} else {
-
+			if ( ( ( ! onlyDefaultPsmCutoffs ) ) // || ( ! onlyDefaultPeptideCutoffs ) )
+					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 				
 				//  Non-Default PSM cutoffs so have to query on the cutoffs
 
@@ -319,6 +419,21 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 
 					sqlSB.append( " ) " );
 				}
+
+				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
+
+
+			} else {
+				
+				//   Only Default PSM Cutoffs chosen so criteria simply the Peptides where the PSM count for the default cutoffs is > zero
+				
+
+				sqlSB.append( " AND " );
+
+
+				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff > 0 " );
+
+				
 			}
 		}
 		
@@ -407,11 +522,12 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 
 
 			{
-				
-				if ( ! onlyDefaultPsmCutoffs ) {
+				if ( ( ( ! onlyDefaultPsmCutoffs ) ) // || ( ! onlyDefaultPeptideCutoffs ) )
+						|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
+
 					
-					//  PSM Cutoffs are not the default 
-					
+					//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
+
 
 					for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesPsmAnnotationLevel : psmCutoffValuesList ) {
 
@@ -458,7 +574,14 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 			while( rs.next() ) {
 				
 
+				ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem webReportedPeptideWebserviceWrapper = new ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem();
+				
 				WebReportedPeptide item = new WebReportedPeptide();
+
+				webReportedPeptideWebserviceWrapper.setWebReportedPeptide( item );
+				
+				
+				
 				
 				item.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 				
@@ -486,6 +609,12 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 						item.setNumPsms( numPsmsForDefaultCutoffs );
 					}
 				}
+				
+
+				Map<Integer, AnnotationDataBaseDTO> bestPsmAnnotationDTOFromQueryMap =
+						getPSMBestValuesFromDBQuery( rs, psmCutoffsAnnotationTypeDTOList );
+
+				webReportedPeptideWebserviceWrapper.setPsmAnnotationDTOMap( bestPsmAnnotationDTOFromQueryMap );
 				
 				
 
@@ -541,11 +670,9 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 					continue;  //  EARLY CONTINUE:    skip over other types for now
 				}
 				
-				WebReportedPeptideWebserviceWrapper webReportedPeptideWebserviceWrapper = new WebReportedPeptideWebserviceWrapper();
 				
-				webReportedPeptideWebserviceWrapper.setWebReportedPeptide( item );
 				
-				webReportedPeptideWebserviceWrapper.setLinkType( linkType );
+				item.setLinkType( linkType );
 				
 				results.add( webReportedPeptideWebserviceWrapper );
 			}
@@ -579,5 +706,51 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 		
 		return results;		
 	}
+	
+	
+
+	//  Get PSM best values from DB query, since psm best value table was joined
+
+	/**
+	 * @param rs
+	 * @param psmCutoffsAnnotationTypeDTOList
+	 * @return
+	 * @throws SQLException
+	 */
+	private Map<Integer, AnnotationDataBaseDTO> getPSMBestValuesFromDBQuery( 
+
+
+			ResultSet rs,
+
+			List<AnnotationTypeDTO> psmCutoffsAnnotationTypeDTOList
+
+			) throws SQLException { 
+
+		Map<Integer, AnnotationDataBaseDTO> bestPsmAnnotationDTOFromQueryMap = new HashMap<>();
+
+		//  Add inner join for each PSM cutoff
+
+		for ( int counter = 1; counter <= psmCutoffsAnnotationTypeDTOList.size(); counter++ ) {
+
+			PsmAnnotationDTO item = new PsmAnnotationDTO();
+
+			String annotationTypeIdField = PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS + counter + "_annotation_type_id";
+
+			String valueDoubleField = PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS + counter + "_best_psm_value_for_ann_type_id";
+			String valueStringField = PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS + counter + "_best_psm_value_string_for_ann_type_id";
+
+			item.setAnnotationTypeId( rs.getInt( annotationTypeIdField ) );
+
+			item.setValueDouble( rs.getDouble( valueDoubleField ) );
+			item.setValueString( rs.getString( valueStringField ) );
+
+			bestPsmAnnotationDTOFromQueryMap.put( item.getAnnotationTypeId(),  item );
+
+		}
+		
+		return bestPsmAnnotationDTOFromQueryMap;
+	}
+
+
 	
 }

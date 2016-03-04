@@ -164,9 +164,6 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 		if ( ! search_id ) {
 			search_id = "";
 		}
-		if ( ! project_id ) {
-			project_id = "";
-		}
 		if ( ! psm_id ) {
 			psm_id = "";
 		}
@@ -267,7 +264,10 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 		
 		var $clickedElement = params.$clickedElement;
 
-		var annotationDisplayNameDescriptionList = ajaxResponseData.annotationDisplayNameDescriptionList;
+		var peptideAnnotationDisplayNameDescriptionList = ajaxResponseData.peptideAnnotationDisplayNameDescriptionList;
+		
+		var psmAnnotationDisplayNameDescriptionList = ajaxResponseData.psmAnnotationDisplayNameDescriptionList;
+		
 		var reportedPeptides = ajaxResponseData.webReportedPeptideWebserviceWrapperList;
 
 		var initial_reported_peptide_id = $clickedElement.attr( "initial_reported_peptide_id" );
@@ -333,24 +333,12 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 
 
 
-		// Search for qvalue being set in any row
-
-		var qvalueSetAnyRows = false;
-
-		for ( var reportedPeptideIndex = 0; reportedPeptideIndex < reportedPeptides.length ; reportedPeptideIndex++ ) {
-
-			var reportedPeptide = reportedPeptides[ reportedPeptideIndex ];
-
-			if ( reportedPeptide.qvalue !== undefined && reportedPeptide.qvalue !== null ) {
-
-				qvalueSetAnyRows = true;
-				break;
-			}
-		}
-
 
 		// create context for header row
-		var context = { qvalueSetAnyRows : qvalueSetAnyRows };
+		var context = { 
+				peptideAnnotationDisplayNameDescriptionList : peptideAnnotationDisplayNameDescriptionList,
+				psmAnnotationDisplayNameDescriptionList : psmAnnotationDisplayNameDescriptionList
+		};
 
 		var html = _handlebarsTemplate_peptides_related_to_psm_block_template(context);
 
@@ -379,10 +367,7 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 			var context = { 
 					data : reportedPeptide, 
 					initial_scan_id : ajaxRequestData.scan_id,
-					searchId : ajaxRequestData.search_id, 
-					peptide_q_value_cutoff : ajaxRequestData.peptide_q_value_cutoff, 
-					psm_q_value_cutoff : ajaxRequestData.psm_q_value_cutoff, 
-					qvalueSetAnyRows : qvalueSetAnyRows 
+					searchId : ajaxRequestData.search_id
 			};
 			
 

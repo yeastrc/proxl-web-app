@@ -37,9 +37,23 @@
 			{{/if}}
 			--%> <%-- tool_tip_attached_jq --%>
 			
+			
+				{{#each peptideAnnotationDisplayNameDescriptionList}}
+				 	<th style="text-align:left;font-weight:bold;"
+				 		><span style="white-space: nowrap" <%-- TODO Add Description as tool tip, {{this.description}} --%>
+				 			>{{this.displayName}}</span></th>
+				{{/each}}
+				
+			
 			<th data-tooltip="Number of PSMs matched to this peptide (or linked pair)" class=" <%-- tool_tip_attached_jq --%>  integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># PSMs</th>
 			<th data-tooltip="Number of scans that uniquely matched to this reported peptide" class=" <%-- tool_tip_attached_jq --%>  integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># Unique</th>
 			
+				{{#each psmAnnotationDisplayNameDescriptionList}}
+				 	<th style="text-align:left;font-weight:bold;"
+				 		><span style="white-space: nowrap">Best PSM</span>
+				 		<span style="white-space: nowrap" <%-- TODO Add Description as tool tip, {{this.description}} --%>
+				 			>{{this.displayName}}</span></th>
+				{{/each}}				
 			<%-- 
 			<th data-tooltip="Best q-value among PSMs that matched this peptide (or linked pair)" class=" tool_tip_attached_jq  " style="width:10%;font-weight:bold;">Best&nbsp;PSM <span style="white-space: nowrap">Q-value</span></th>
 			--%>

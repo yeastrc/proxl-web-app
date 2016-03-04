@@ -22,13 +22,19 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
+import org.yeastrc.xlink.www.objects.AnnotationTypeDTOListForSearchId;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.objects.ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesRelatedToPSMServiceResult;
+import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWebserviceWrapper;
+import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
@@ -37,7 +43,10 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher;
 import org.yeastrc.xlink.www.searcher.SearchReportedPeptideAnnotationDataSearcher;
+import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortAnnotationDTORecords;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
+import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataDefaultDisplayInDisplayOrder;
+import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataInSortOrder;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.DeserializeCutoffForWebservices;
@@ -280,68 +289,6 @@ public class ReportedPeptidesRelatedToPSMService {
 			Collection<Integer> searchIdsCollection ) throws Exception {
 		
 
-
-		//  Get Annotation Type records for PSM and Peptide
-		
-		
-		//  Get  Annotation Type records for PSM
-		
-		//    Filterable annotations
-		
-		Map<Integer, Map<Integer, AnnotationTypeDTO>> srchPgmFilterablePsmAnnotationTypeDTOListPerSearchIdMap =
-				GetAnnotationTypeData.getInstance().getAll_Psm_Filterable_ForSearchIds( searchIdsCollection );
-		
-		
-		Map<Integer, AnnotationTypeDTO> srchPgmFilterablePsmAnnotationTypeDTOMap = 
-				srchPgmFilterablePsmAnnotationTypeDTOListPerSearchIdMap.get( searchId );
-		
-		if ( srchPgmFilterablePsmAnnotationTypeDTOMap == null ) {
-			
-			//  No records were found, probably an error   TODO
-			
-			srchPgmFilterablePsmAnnotationTypeDTOMap = new HashMap<>();
-		}
-		
-		
-		
-		/////////////
-
-		//  Get  Annotation Type records for Reported Peptides
-		
-		Map<Integer, Map<Integer, AnnotationTypeDTO>> srchPgmFilterableReportedPeptideAnnotationTypeDTOListPerSearchIdMap =
-				GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIdsCollection );
-		
-		
-		Map<Integer, AnnotationTypeDTO> srchPgmFilterableReportedPeptideAnnotationTypeDTOMap = 
-				srchPgmFilterableReportedPeptideAnnotationTypeDTOListPerSearchIdMap.get( searchId );
-		
-		if ( srchPgmFilterableReportedPeptideAnnotationTypeDTOMap == null ) {
-			
-			//  No records were found, allowable for Reported Peptides
-			
-			srchPgmFilterableReportedPeptideAnnotationTypeDTOMap = new HashMap<>();
-		}
-
-
-		//    Descriptive annotations
-		
-
-		Map<Integer, Map<Integer, AnnotationTypeDTO>> srchPgmDescriptiveReportedPeptideAnnotationTypeDTOListPerSearchIdMap =
-				GetAnnotationTypeData.getInstance().getAll_Peptide_Descriptive_ForSearchIds( searchIdsCollection );
-		
-		
-		Map<Integer, AnnotationTypeDTO> srchPgmDescriptiveReportedPeptideAnnotationTypeDTOMap = 
-				srchPgmDescriptiveReportedPeptideAnnotationTypeDTOListPerSearchIdMap.get( searchId );
-		
-		if ( srchPgmDescriptiveReportedPeptideAnnotationTypeDTOMap == null ) {
-			
-			//  No records were found, probably an error   TODO
-			
-			srchPgmDescriptiveReportedPeptideAnnotationTypeDTOMap = new HashMap<>();
-		}
-		
-		
-
 		//  Copy cutoff data to searcher cutoff data
 		
 		
@@ -355,19 +302,50 @@ public class ReportedPeptidesRelatedToPSMService {
 		
 		//  Get Reported Peptides:
 		
-		List<WebReportedPeptideWebserviceWrapper> webReportedPeptideWebserviceWrapperList = 
+		List<ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem> webReportedPeptideWebserviceWrapperList = 
 				ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher.getInstance()
 				.reportedPeptideRecordsForAssociatedScanId( psmId, scanId, searchId, searcherCutoffValuesSearchLevel ); 
 
 		
+
+		
+		
+
+		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesPerAnnotationIdList =
+				searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
+
+		List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesList = 
+				searcherCutoffValuesSearchLevel.getPsmPerAnnotationCutoffsList();
+
+		////////////////////////
+
+		///    Get PSM AnnotationDTO Sorted In Display order 
+
+
+
+		final List<AnnotationTypeDTO> psmCutoffsAnnotationTypeDTOListAnnotationDisplayOrderSorted = new ArrayList<>( psmCutoffValuesList.size() );
+
+		for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesAnnotationLevel : psmCutoffValuesList ) {
+
+			psmCutoffsAnnotationTypeDTOListAnnotationDisplayOrderSorted.add( searcherCutoffValuesAnnotationLevel.getAnnotationTypeDTO() );
+		}
+
+		SortAnnotationDTORecords.getInstance()
+		.sortPsmAnnotationTypeDTOForBestPsmAnnotations_AnnotationDisplayOrder( psmCutoffsAnnotationTypeDTOListAnnotationDisplayOrderSorted );
+
+
+		
+		
 		///////////
+		
+		//   Get output using Reported Peptides from DB
 		
 		ReportedPeptidesRelatedToPSMServiceResult reportedPeptidesRelatedToPSMServiceResult =
 				getAnnotationDataAndSort( 
 						searchId, 
-						srchPgmFilterableReportedPeptideAnnotationTypeDTOMap, 
-						srchPgmDescriptiveReportedPeptideAnnotationTypeDTOMap, 
-						webReportedPeptideWebserviceWrapperList );
+						webReportedPeptideWebserviceWrapperList,
+						psmCutoffsAnnotationTypeDTOListAnnotationDisplayOrderSorted,
+						peptideCutoffValuesPerAnnotationIdList );
 		
 		
 		
@@ -379,8 +357,6 @@ public class ReportedPeptidesRelatedToPSMService {
 	
 	/**
 	 * @param searchId
-	 * @param srchPgmFilterableReportedPeptideAnnotationTypeDTOMap
-	 * @param srchPgmDescriptiveReportedPeptideAnnotationTypeDTOMap
 	 * @param webReportedPeptideWebserviceWrapperList
 	 * @return
 	 * @throws Exception
@@ -388,261 +364,360 @@ public class ReportedPeptidesRelatedToPSMService {
 	private ReportedPeptidesRelatedToPSMServiceResult getAnnotationDataAndSort(
 			
 			int searchId,
-			Map<Integer, AnnotationTypeDTO> srchPgmFilterableReportedPeptideAnnotationTypeDTOMap,
-			Map<Integer, AnnotationTypeDTO> srchPgmDescriptiveReportedPeptideAnnotationTypeDTOMap,
-			List<WebReportedPeptideWebserviceWrapper> webReportedPeptideWebserviceWrapperList 
+			List<ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem> webReportedPeptideSearcherResultList,
+			
+			List<AnnotationTypeDTO> psmCutoffsAnnotationTypeDTOListAnnotationDisplayOrderSorted,
+			List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesPerAnnotationIdList
 			
 			) throws Exception {
 		
 		
+		Set<Integer> searchIdsSet = new HashSet<>();
 		
-
-
-		
-		Set<Integer> annotationTypeIdsForAnnotationDataRetrieval = new HashSet<>(); 
+		searchIdsSet.add( searchId );
 
 		/////////////
 		
-		//   Create Annotation List for Sort Order and sort it on Sort order
+		//   Get Peptide Annotation Types List sorted on Sort Order 
 		
 
-		final List<AnnotationTypeDTO> reportedPeptide_AnnotationTypeDTO_SortOrder_List =
-				new ArrayList<>( srchPgmFilterableReportedPeptideAnnotationTypeDTOMap.size() );
-		
-		for ( Map.Entry<Integer, AnnotationTypeDTO> entry : srchPgmFilterableReportedPeptideAnnotationTypeDTOMap.entrySet() ) {
+		Map<Integer, AnnotationTypeDTOListForSearchId> peptideAnnotationTypeDTO_SortOrder_MainMap =
+				GetAnnotationTypeDataInSortOrder.getInstance()
+				.getPeptide_AnnotationTypeDataInSortOrder( searchIdsSet );
+
+
+		if ( peptideAnnotationTypeDTO_SortOrder_MainMap.size() != 1 ) {
 			
-			AnnotationTypeDTO item = entry.getValue();
-			
-			annotationTypeIdsForAnnotationDataRetrieval.add( item.getId() );
-			
-			if ( item.getAnnotationTypeFilterableDTO() != null 
-					&& item.getAnnotationTypeFilterableDTO().getSortOrder() != null ) {
-				
-				reportedPeptide_AnnotationTypeDTO_SortOrder_List.add( item );
-			}
+			String msg = "getPeptide_AnnotationTypeDataInSortOrder returned other than 1 entry at searchId level ";
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
 		}
+		
 
-		//  Sort Ann Type records on sort order
-		
-		
-		Collections.sort( reportedPeptide_AnnotationTypeDTO_SortOrder_List, new Comparator<AnnotationTypeDTO>() {
-
-			@Override
-			public int compare(AnnotationTypeDTO o1, AnnotationTypeDTO o2) {
-
-				return o1.getAnnotationTypeFilterableDTO().getSortOrder() - o2.getAnnotationTypeFilterableDTO().getSortOrder();
-			}
-		});
-		
-		
 		/////////////
-		
-		//   Create Annotation List for Display Order and sort it on Display order
-		
-		
-		final List<AnnotationTypeDTO> reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List =
-				new ArrayList<>( srchPgmFilterableReportedPeptideAnnotationTypeDTOMap.size() + srchPgmDescriptiveReportedPeptideAnnotationTypeDTOMap.size() );
-		
-		for ( Map.Entry<Integer, AnnotationTypeDTO> entry : srchPgmFilterableReportedPeptideAnnotationTypeDTOMap.entrySet() ) {
-			
-			AnnotationTypeDTO item = entry.getValue();
-			
-			annotationTypeIdsForAnnotationDataRetrieval.add( item.getId() );
-			
-			if ( item.isDefaultVisible() ) {
-				
-				reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List.add( item );
-			}
-		}
 
-		for ( Map.Entry<Integer, AnnotationTypeDTO> entry : srchPgmDescriptiveReportedPeptideAnnotationTypeDTOMap.entrySet() ) {
-			
-			AnnotationTypeDTO item = entry.getValue();
-			
-			annotationTypeIdsForAnnotationDataRetrieval.add( item.getId() );
-			
-			if ( item.isDefaultVisible() ) {
-				
-				reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List.add( item );
-			}
-		}
-		
+		//   Get Peptide Annotation Types List sorted on Display Order 
 
-		//  Sort Ann type records on display order
-		
-		
-		Collections.sort( reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List, new Comparator<AnnotationTypeDTO>() {
-
-			@Override
-			public int compare(AnnotationTypeDTO o1, AnnotationTypeDTO o2) {
-
-				return o1.getDisplayOrder() - o2.getDisplayOrder();
-			}
-		});
-		
+		Map<Integer, AnnotationTypeDTOListForSearchId> peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap = 
+				GetAnnotationTypeDataDefaultDisplayInDisplayOrder.getInstance()
+				.getPeptide_AnnotationTypeDataDefaultDisplayInDisplayOrder( searchIdsSet );
 
 		
-		
+		if ( peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap.isEmpty() ) {
 
-		
-		//  Get Annotation data
-		
-		//  Internal holder
-		
-		List<InternalReportedPeptideWebDisplayHolder> reportedPeptideWebDisplayHolder = new ArrayList<>( webReportedPeptideWebserviceWrapperList.size() );
-		
-		for ( WebReportedPeptideWebserviceWrapper webReportedPeptideWebserviceWrapperItem : webReportedPeptideWebserviceWrapperList ) {
-		
-			int reportedPeptideId = webReportedPeptideWebserviceWrapperItem.getReportedPeptide_Id();
-
-			Map<Integer, SearchReportedPeptideAnnotationDTO> annotationDTOMapOnTypeId = new HashMap<>();
-
-
-			//  Process annotation type ids to get annotation data
-
-			{
-				List<SearchReportedPeptideAnnotationDTO> searchReportedPeptideAnnotationDataList = 
-						SearchReportedPeptideAnnotationDataSearcher.getInstance().getSearchReportedPeptideAnnotationDTOList( searchId, reportedPeptideId, annotationTypeIdsForAnnotationDataRetrieval );
-
-				for ( SearchReportedPeptideAnnotationDTO searchReportedPeptideAnnotationDataItem : searchReportedPeptideAnnotationDataList ) {
-
-					annotationDTOMapOnTypeId.put( searchReportedPeptideAnnotationDataItem.getAnnotationTypeId(), searchReportedPeptideAnnotationDataItem );
-				}
-			}
-
-			InternalReportedPeptideWebDisplayHolder internalReportedPeptideWebDisplayHolder = new InternalReportedPeptideWebDisplayHolder();
-
-			internalReportedPeptideWebDisplayHolder.webReportedPeptideWebserviceWrapper = webReportedPeptideWebserviceWrapperItem;
-
-			internalReportedPeptideWebDisplayHolder.annotationDTOMapOnTypeId = annotationDTOMapOnTypeId;
-
-			reportedPeptideWebDisplayHolder.add( internalReportedPeptideWebDisplayHolder );
+			String msg = "getPeptide_AnnotationTypeDataDefaultDisplayInDisplayOrder returned empty Map at searchId level, searchId: " + searchId;
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
 		}
 
 
+		if ( peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap.size() != 1 ) {
 
-		//  Sort Peptide records on sort order
+			String msg = "getPeptide_AnnotationTypeDataDefaultDisplayInDisplayOrder returned other than 1 entry at searchId level , searchId: " + searchId;
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
+		}
 
-		Collections.sort( reportedPeptideWebDisplayHolder, new Comparator<InternalReportedPeptideWebDisplayHolder>() {
+		AnnotationTypeDTOListForSearchId peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_Main =
+				peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap.get( searchId );
 
-			@Override
-			public int compare(InternalReportedPeptideWebDisplayHolder o1, InternalReportedPeptideWebDisplayHolder o2) {
+		if ( peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_Main == null ) {
+			
+			String msg = "peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_Main == null for searchId: " + searchId;
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
+		}
+		
+		AnnotationTypeDTOListForSearchId peptideAnnotationTypeDTO_DefaultDisplay_SortOrder_Main =
+				peptideAnnotationTypeDTO_SortOrder_MainMap.get( searchId );
 
-				//  Loop through the annotation types (sorted on sort order), comparing the values
+		if ( peptideAnnotationTypeDTO_DefaultDisplay_SortOrder_Main == null ) {
+			
+			String msg = "peptideAnnotationTypeDTO_DefaultDisplay_SortOrder_Main == null for searchId: " + searchId;
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
+		}
+		
+		
+		final List<AnnotationTypeDTO> reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List = 
+				peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_Main.getAnnotationTypeDTOList();
 
-				for ( AnnotationTypeDTO srchPgmFilterableReportedPeptideAnnotationTypeDTO : reportedPeptide_AnnotationTypeDTO_SortOrder_List ) {
+		final List<AnnotationTypeDTO> reportedPeptide_AnnotationTypeDTO_SortOrder_List = 
+				peptideAnnotationTypeDTO_DefaultDisplay_SortOrder_Main.getAnnotationTypeDTOList();
+		
 
-					int typeId = srchPgmFilterableReportedPeptideAnnotationTypeDTO.getId();
+		/////////////////////////////////////////
+		
+		///   Create sets of annotation type ids that were searched for but are not displayed by default.
+		///   Those annotation values will be displayed after the default, in name order
+		
+		Set<Integer> peptideAnnotationTypesSearchedFor = new HashSet<>();
+		
+		
+		for (  SearcherCutoffValuesAnnotationLevel peptideCutoffEntry : peptideCutoffValuesPerAnnotationIdList ) {
 
-					SearchReportedPeptideAnnotationDTO o1_SearchReportedPeptideAnnotationDTO = o1.annotationDTOMapOnTypeId.get( typeId );
-					if ( o1_SearchReportedPeptideAnnotationDTO == null ) {
+			int annTypeId = peptideCutoffEntry.getAnnotationTypeId();
+			peptideAnnotationTypesSearchedFor.add( annTypeId );
+		}
 
-						String msg = "Unable to get Filterable Annotation data for type id: " + typeId;
-						log.error( msg );
-						throw new RuntimeException(msg);
-					}
+		// Remove annotation type ids that are in default display
 
-					double o1Value = o1_SearchReportedPeptideAnnotationDTO.getValueDouble();
+		for ( AnnotationTypeDTO item : reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List ) {
 
+			peptideAnnotationTypesSearchedFor.remove( item.getId() );
+		}
 
-					SearchReportedPeptideAnnotationDTO o2_SearchReportedPeptideAnnotationDTO = o2.annotationDTOMapOnTypeId.get( typeId );
-					if ( o2_SearchReportedPeptideAnnotationDTO == null ) {
+		//  Get AnnotationTypeDTO for ids not in default display and sort in name order
+		
+		List<AnnotationTypeDTO> peptideAnnotationTypesToAddFromQuery = new ArrayList<>();
+		
+		if ( ! peptideAnnotationTypesSearchedFor.isEmpty() ) {
+			
+			//   Add in Peptide annotation types the user searched for
+			
+			Map<Integer, Map<Integer, AnnotationTypeDTO>> peptideFilterableAnnotationTypesForSearchIds =
+			GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIdsSet );
 
-						String msg = "Unable to get Filterable Annotation data for type id: " + typeId;
-						log.error( msg );
-						throw new RuntimeException(msg);
-					}
+			Map<Integer, AnnotationTypeDTO> peptideFilterableAnnotationTypesForSearchId =
+					peptideFilterableAnnotationTypesForSearchIds.get( searchId );
+			
+			for ( Integer peptideAnnotationTypeToAdd : peptideAnnotationTypesSearchedFor ) {
+			
+				AnnotationTypeDTO annotationTypeDTO = peptideFilterableAnnotationTypesForSearchId.get( peptideAnnotationTypeToAdd );
 
-					double o2Value = o2_SearchReportedPeptideAnnotationDTO.getValueDouble();
-
-					if ( o1Value != o2Value ) {
-
-						if ( o1Value < o2Value ) {
-
-							return -1;
-						} else {
-							return 1;
-						}
-					}
-
-				}
-
-				//  If everything matches, sort on reported peptide id
-
-				try {
-					return o1.webReportedPeptideWebserviceWrapper.getReportedPeptide_Id() - o2.webReportedPeptideWebserviceWrapper.getReportedPeptide_Id();
-				} catch (Exception e) {
+				if ( annotationTypeDTO == null ) {
 					
-					throw new RuntimeException( e );
+					
+				}
+				
+				peptideAnnotationTypesToAddFromQuery.add( annotationTypeDTO );
+			}
+			
+			// sort on ann type name
+			Collections.sort( peptideAnnotationTypesToAddFromQuery, new Comparator<AnnotationTypeDTO>() {
+
+				@Override
+				public int compare(AnnotationTypeDTO o1,
+						AnnotationTypeDTO o2) {
+
+					return o1.getName().compareTo( o2.getName() );
+				}
+			} );
+		}
+		
+		//   Add the searched for but not in default display AnnotationTypeDTO 
+		//   to the default display list.
+		//   The annotation data will be loaded from the DB in the searcher since they were searched for
+		
+		for ( AnnotationTypeDTO annotationTypeDTO : peptideAnnotationTypesToAddFromQuery ) {
+			
+			reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List.add( annotationTypeDTO );
+		}
+		
+
+		//////////////////////
+
+		//  Get set of peptide annotation type ids to retrieve annotation data for
+
+
+		Set<Integer> peptideAnnotationTypeIdsForAnnotationDataRetrieval = new HashSet<>(); 
+
+
+		for ( AnnotationTypeDTO annotationTypeItem : reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List ) {
+
+			peptideAnnotationTypeIdsForAnnotationDataRetrieval.add( annotationTypeItem.getId() );
+		}
+
+		for ( AnnotationTypeDTO annotationTypeItem : reportedPeptide_AnnotationTypeDTO_SortOrder_List ) {
+
+			peptideAnnotationTypeIdsForAnnotationDataRetrieval.add( annotationTypeItem.getId() );
+		}
+
+
+		//////////////////////////////////////////
+
+		//  Get Peptide Annotation data for Sort and Display
+
+		for ( ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem webReportedPeptideSearcherResultItem : webReportedPeptideSearcherResultList ) {
+
+			WebReportedPeptide webReportedPeptide = webReportedPeptideSearcherResultItem.getWebReportedPeptide();
+
+
+			Map<Integer, AnnotationDataBaseDTO> peptideAnnotationDTOMap = webReportedPeptideSearcherResultItem.getPeptideAnnotationDTOMap();
+			
+			if ( peptideAnnotationDTOMap == null ) {
+				
+				peptideAnnotationDTOMap = new HashMap<>();
+				webReportedPeptideSearcherResultItem.setPeptideAnnotationDTOMap( peptideAnnotationDTOMap );
+			}
+
+			if ( reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List != null 
+					&& ( ! reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List.isEmpty() ) ) {
+
+				List<SearchReportedPeptideAnnotationDTO> searchReportedPeptideFilterableAnnotationDataList = 
+						SearchReportedPeptideAnnotationDataSearcher.getInstance()
+						.getSearchReportedPeptideAnnotationDTOList( 
+								searchId, webReportedPeptide.getReportedPeptideId(), peptideAnnotationTypeIdsForAnnotationDataRetrieval );
+
+
+				for ( SearchReportedPeptideAnnotationDTO searchReportedPeptideFilterableAnnotationDataItem : searchReportedPeptideFilterableAnnotationDataList ) {
+
+					peptideAnnotationDTOMap.put( searchReportedPeptideFilterableAnnotationDataItem.getAnnotationTypeId(), searchReportedPeptideFilterableAnnotationDataItem );
 				}
 			}
-		});
+
+		}
 
 
-		//  Build output list of ReportedPeptideWebDisplay
 
-		List<WebReportedPeptideWebserviceWrapper> webReportedPeptideWebserviceWrapperListOutput = new ArrayList<>( reportedPeptideWebDisplayHolder.size() );
+		/////////////////////
 
-		for ( InternalReportedPeptideWebDisplayHolder internalReportedPeptideWebDisplayHolder : reportedPeptideWebDisplayHolder ) {
+		//   Copy Annotation Display Name and Descriptions to output lists, used for table headers in the HTML
+
+		List<AnnotationDisplayNameDescription> peptideAnnotationDisplayNameDescriptionList = new ArrayList<>( reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List.size() );
+		List<AnnotationDisplayNameDescription> psmAnnotationDisplayNameDescriptionList = new ArrayList<>( psmCutoffsAnnotationTypeDTOListAnnotationDisplayOrderSorted.size() );
+
+		for ( AnnotationTypeDTO item : reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List ) {
+
+			AnnotationDisplayNameDescription output = new AnnotationDisplayNameDescription();
+
+			output.setDisplayName( item.getName() );
+			output.setDescription( item.getDescription() );
+
+			peptideAnnotationDisplayNameDescriptionList.add(output);
+		}
 
 
-			//  Get annotations
+		for ( AnnotationTypeDTO item : psmCutoffsAnnotationTypeDTOListAnnotationDisplayOrderSorted ) {
 
-			List<String> annotationValues = new ArrayList<>( reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List.size() );
+			AnnotationDisplayNameDescription output = new AnnotationDisplayNameDescription();
+
+			output.setDisplayName( item.getName() );
+			output.setDescription( item.getDescription() );
+
+			psmAnnotationDisplayNameDescriptionList.add(output);
+		}
 
 
-			for ( AnnotationTypeDTO annotationTypeDTO : reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List ) {
+		List<WebReportedPeptideWebserviceWrapper> webReportedPeptideWebserviceWrapperList = null;
+		
+		{
+			
+					
 
-				SearchReportedPeptideAnnotationDTO psmFilterableAnnotationDTO = 
-						internalReportedPeptideWebDisplayHolder.annotationDTOMapOnTypeId.get( annotationTypeDTO.getId() );
+			//////////////////////////////////////////
 
-				if ( psmFilterableAnnotationDTO == null ) {
+			//  Sort Peptides on sort order
+			
+			WebReportedPeptideWrapperSorter webReportedPeptideWrapperSorter = new WebReportedPeptideWrapperSorter();
+			
+			webReportedPeptideWrapperSorter.reportedPeptide_AnnotationTypeDTO_SortOrder_List = 
+					reportedPeptide_AnnotationTypeDTO_SortOrder_List;
 
-					String msg = "ERROR.  Cannot AnnotationDTO for type id: " + annotationTypeDTO.getId();
+			Collections.sort( webReportedPeptideSearcherResultList, webReportedPeptideWrapperSorter );
+			
+			
+			
+
+
+
+
+			//  Copy the links out of the wrappers for output - and Copy searched for peptide and psm annotations to link
+
+			webReportedPeptideWebserviceWrapperList = new ArrayList<>( webReportedPeptideSearcherResultList.size() );
+
+			for ( ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem fromSearcherResultItem : webReportedPeptideSearcherResultList ) {
+
+				WebReportedPeptide webReportedPeptide = fromSearcherResultItem.getWebReportedPeptide();
+
+
+				//  Copy searched for peptide and psm annotations to link
+
+
+				List<String> peptideAnnotationValueList = new ArrayList<>( reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List.size() );
+
+				List<String> psmAnnotationValueList = new ArrayList<>( 20 );
+
+				Map<Integer, AnnotationDataBaseDTO> peptideAnnotationDTOMap = fromSearcherResultItem.getPeptideAnnotationDTOMap();
+
+				Map<Integer, AnnotationDataBaseDTO> psmAnnotationDTOMap = fromSearcherResultItem.getPsmAnnotationDTOMap();
+
+
+				if (  peptideAnnotationDTOMap == null ) {
+
+					String msg = "  webReportedPeptideWrapper.getPeptideAnnotationDTOMap() is null ";
 					log.error( msg );
-					throw new Exception(msg);
+					throw new ProxlWebappDataException(msg);
+				}
+				if ( psmAnnotationDTOMap == null ) {
+
+					String msg = "  webReportedPeptideWrapper.getPsmAnnotationDTOMap() is null ";
+					log.error( msg );
+					throw new ProxlWebappDataException(msg);
 				}
 
-				annotationValues.add( psmFilterableAnnotationDTO.getValueString() );
+				for ( AnnotationTypeDTO annotationTypeDTO : reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List ) {
+
+					AnnotationDataBaseDTO annotationDataBaseDTO = peptideAnnotationDTOMap.get( annotationTypeDTO.getId() );
+
+					if ( annotationDataBaseDTO == null ) {
+
+						String msg = "Unable to find annotation data for type id: " + annotationTypeDTO.getId();
+						log.error( msg );
+						throw new ProxlWebappDataException(msg);
+					}
+
+					peptideAnnotationValueList.add( annotationDataBaseDTO.getValueString() );
+				}
+
+
+
+
+				// Add sorted Best PSM data to webDisplayItem from webDisplayItemWrapper
+
+				for ( AnnotationTypeDTO annotationTypeDTO : psmCutoffsAnnotationTypeDTOListAnnotationDisplayOrderSorted ) {
+
+					AnnotationDataBaseDTO annotationDataBaseDTO = psmAnnotationDTOMap.get( annotationTypeDTO.getId() );
+
+					if ( annotationDataBaseDTO == null ) {
+
+						String msg = "Unable to find annotation data for type id: " + annotationTypeDTO.getId();
+						log.error( msg );
+						throw new ProxlWebappDataException(msg);
+					}
+
+					psmAnnotationValueList.add( annotationDataBaseDTO.getValueString() );
+				}
+
+
+
+
+
+				webReportedPeptide.setPeptideAnnotationValueList( peptideAnnotationValueList );
+				webReportedPeptide.setPsmAnnotationValueList( psmAnnotationValueList );
+
+
+
+				WebReportedPeptideWebserviceWrapper webReportedPeptideWebserviceWrapper = new WebReportedPeptideWebserviceWrapper();
+
+				webReportedPeptideWebserviceWrapper.setWebReportedPeptide( webReportedPeptide );
+
+				webReportedPeptideWebserviceWrapperList.add( webReportedPeptideWebserviceWrapper );
 			}
 
-
-			WebReportedPeptideWebserviceWrapper webReportedPeptideWebserviceWrapper = internalReportedPeptideWebDisplayHolder.webReportedPeptideWebserviceWrapper;
-
-			webReportedPeptideWebserviceWrapper.setAnnotationValues( annotationValues );
-
-
-			webReportedPeptideWebserviceWrapperListOutput.add( webReportedPeptideWebserviceWrapper );
 		}
 
 
-
-
-
-
-
-		//  Get column headers data
-
-		List<AnnotationDisplayNameDescription> annotationDisplayNameDescriptionList = 
-				new ArrayList<>( reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List.size() );
-
-
-		for ( AnnotationTypeDTO annotationTypeDTO : reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List ) {
-
-			AnnotationDisplayNameDescription annotationDisplayNameDescription = new AnnotationDisplayNameDescription();
-
-			annotationDisplayNameDescription.setDisplayName( annotationTypeDTO.getName() );
-			annotationDisplayNameDescription.setDescription( annotationTypeDTO.getDescription() );
-
-			annotationDisplayNameDescriptionList.add( annotationDisplayNameDescription );
-		}
-
+		
 
 		///////////////
 
 		ReportedPeptidesRelatedToPSMServiceResult reportedPeptidesRelatedToPSMServiceResult = new ReportedPeptidesRelatedToPSMServiceResult();
 
-		reportedPeptidesRelatedToPSMServiceResult.setAnnotationDisplayNameDescriptionList( annotationDisplayNameDescriptionList );
+		reportedPeptidesRelatedToPSMServiceResult.setPeptideAnnotationDisplayNameDescriptionList( peptideAnnotationDisplayNameDescriptionList );
+		reportedPeptidesRelatedToPSMServiceResult.setPsmAnnotationDisplayNameDescriptionList( psmAnnotationDisplayNameDescriptionList );
+
+		
 		reportedPeptidesRelatedToPSMServiceResult.setWebReportedPeptideWebserviceWrapperList( webReportedPeptideWebserviceWrapperList );
 
 		return reportedPeptidesRelatedToPSMServiceResult;
@@ -650,16 +725,63 @@ public class ReportedPeptidesRelatedToPSMService {
 	
 
 
+	////////////////////////////////////////
+	
+	////////   Sorter Class to Sort Peptides
+
 	/**
 	 * 
 	 *
 	 */
-	private static class InternalReportedPeptideWebDisplayHolder {
-		
-		WebReportedPeptideWebserviceWrapper webReportedPeptideWebserviceWrapper;
-		
-		Map<Integer, SearchReportedPeptideAnnotationDTO> annotationDTOMapOnTypeId;
-		
+	private class WebReportedPeptideWrapperSorter implements Comparator<ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem> {
+
+		List<AnnotationTypeDTO> reportedPeptide_AnnotationTypeDTO_SortOrder_List;
+
+		@Override
+		public int compare(ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem o1, ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem o2) {
+
+			//  Loop through the annotation types (sorted on sort order), comparing the values
+
+			for ( AnnotationTypeDTO annotationTypeDTO : reportedPeptide_AnnotationTypeDTO_SortOrder_List ) {
+
+				int typeId = annotationTypeDTO.getId();
+
+				AnnotationDataBaseDTO o1_WebReportedPeptide = o1.getPeptideAnnotationDTOMap().get( typeId );
+				if ( o1_WebReportedPeptide == null ) {
+
+					String msg = "Unable to get Peptide Filterable Annotation data for type id: " + typeId;
+					log.error( msg );
+					throw new RuntimeException(msg);
+				}
+
+				double o1Value = o1_WebReportedPeptide.getValueDouble();
+
+
+				AnnotationDataBaseDTO o2_WebReportedPeptide = o2.getPeptideAnnotationDTOMap().get( typeId );
+				if ( o2_WebReportedPeptide == null ) {
+
+					String msg = "Unable to get Peptide Filterable Annotation data for type id: " + typeId;
+					log.error( msg );
+					throw new RuntimeException(msg);
+				}
+
+				double o2Value = o2_WebReportedPeptide.getValueDouble();
+
+				if ( o1Value != o2Value ) {
+
+					if ( o1Value < o2Value ) {
+
+						return -1;
+					} else {
+						return 1;
+					}
+				}
+
+			}
+
+			//  If everything matches, sort on reported peptide id
+
+			return o1.getWebReportedPeptide().getReportedPeptideId() - o2.getWebReportedPeptide().getReportedPeptideId();
+		}
 	}
-	
 }

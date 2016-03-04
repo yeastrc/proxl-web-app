@@ -15,6 +15,7 @@ import java.util.List;
 
 
 
+
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
@@ -516,6 +517,15 @@ public class WebReportedPeptide {
 	}
 
 
+
+	public String getLinkType() {
+		return linkType;
+	}
+
+
+	public void setLinkType(String linkType) {
+		this.linkType = linkType;
+	}
 	
 
 	
@@ -586,6 +596,10 @@ public class WebReportedPeptide {
 	private List<String> peptideAnnotationValueList;
 
 
+
+
+
+	private String linkType;
 
 
 
