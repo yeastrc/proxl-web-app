@@ -461,10 +461,10 @@
 
 										
 									<%--  Consider displaying the description somewhere   annotationDisplayNameDescription.description --%>
-								<th data-tooltip="Peptide-level <c:out value="${ annotationDisplayNameDescription.displayName }"></c:out> for this peptide (or linked pair)" 
+								<th data-tooltip="Best Peptide-level <c:out value="${ annotationDisplayNameDescription.displayName }"></c:out> for this peptide (or linked pair)" 
 										class=" ${ backgroundColorClassName }  tool_tip_attached_jq  " 
 										style="width:10%;font-weight:bold;">
-									<span style="white-space: nowrap">Peptide</span>
+									<span style="white-space: nowrap">Best Peptide</span>
 									<span style="white-space: nowrap"><c:out value="${ annotationDisplayNameDescription.displayName }"></c:out></span>
 								</th>
 								
