@@ -287,7 +287,7 @@
 						</th>
 						<th style="width:5%;text-align:left;font-weight:bold;" class=" tool_tip_attached_jq "
 								data-tooltip="Count of Linkable Residues" >
-							Linkable Count of Linkable Residues
+							Count of Linkable Residues
 						</th>
 						<th style="width:5%;text-align:left;font-weight:bold;" class=" tool_tip_attached_jq "
 								data-tooltip="Count of Linkable Residues covered by Sequence Coverage" >
