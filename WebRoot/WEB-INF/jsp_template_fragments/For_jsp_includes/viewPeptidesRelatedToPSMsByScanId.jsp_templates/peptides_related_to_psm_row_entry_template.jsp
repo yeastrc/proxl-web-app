@@ -42,7 +42,8 @@
 		<td class="integer-number-column {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >{{ data.peptide_2_Position }}</td>
 		<td class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " >
 		   {{#each data.peptide_1_ProteinPositions}}
-				<span class=" protein_name_jq " data-protein-id="{{ this.proteinId }}">
+				<span class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}  protein_name_jq " 
+					data-protein-id="{{ this.proteinId }}">
 					{{ this.name }}{{#if this.position_1 }}({{ this.position_1 }}{{#if this.position_2 }}, {{ this.position_2 }}{{/if}}){{/if}}
 				</span>
 		   {{/each}}
@@ -62,10 +63,11 @@
 		--%>
 
 	{{#each data.peptideAnnotationValueList}}
-		<td style="text-align: left; white-space: nowrap; "  class=" "  
+			<%--  "../" on "scanIdMatchesInitialScanId" to get to parent context outside of "each" loop --%>
+		<td style="text-align: left; white-space: nowrap; "  
+				class=" {{#if ../scanIdMatchesInitialScanId }}   highlight-row  {{/if}} "  
 	 			>{{this}}</td>
 	{{/each}}		
-
 		<td class="integer-number-column {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
 			<a class="show-child-data-link  " 
 				href="javascript:"
@@ -92,7 +94,9 @@
 		
 
 	{{#each data.psmAnnotationValueList}}
-		<td style="text-align: left; white-space: nowrap; "  class=" "  
+		<td style="text-align: left; white-space: nowrap; "  
+			<%--  "../" on "scanIdMatchesInitialScanId" to get to parent context outside of "each" loop --%>
+			class=" {{#if ../scanIdMatchesInitialScanId }}   highlight-row  {{/if}}  "  
 	 			>{{this}}</td>
 	{{/each}}
 			
