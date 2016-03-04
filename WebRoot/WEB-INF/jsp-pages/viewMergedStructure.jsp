@@ -155,13 +155,13 @@
 	<c:if test="${ not empty onlySingleSearchId }">
 	
 		<input type="hidden" id="viewSearchPeptideDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="peptide.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="/peptide" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 		<input type="hidden" id="viewSearchCrosslinkProteinDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="crosslinkProtein.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="/crosslinkProtein" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 		<input type="hidden" id="viewProteinCoverageReportDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="proteinCoverageReport.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="/proteinCoverageReport" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 		<input type="hidden" id="viewMergedImageDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="image.do" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="/image" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 	</c:if>
 					
 		

@@ -9,15 +9,15 @@ public class DefaultPageViewConstants {
 
 	public static final String[] ALLOWED_PAGE_NAMES_FOR_DEFAULT_PAGE_VIEWS_ARRAY = {
 		
-		"peptide.do",
+		"/peptide",
 		
-		"crosslinkProtein.do",
-		"looplinkProtein.do",
+		"/crosslinkProtein",
+		"/looplinkProtein",
 		
-		"proteinCoverageReport.do",
+		"/proteinCoverageReport",
 		
-		"image.do",
-		"structure.do"
+		"/image",
+		"/structure"
 		
 	};
 	

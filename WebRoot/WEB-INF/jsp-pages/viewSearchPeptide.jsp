@@ -111,14 +111,14 @@
 	
 			<div style="margin-bottom:20px;">
 				[<a class="tool_tip_attached_jq" data-tooltip="View proteins" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="crosslinkProtein.do" searchId="${ viewSearchPeptidesPageDataRoot.searchId }"
+					href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" searchId="${ viewSearchPeptidesPageDataRoot.searchId }"
 							>crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 					>Protein View</a>]
 					
 					
 					
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="proteinCoverageReport.do" searchId="${ viewSearchPeptidesPageDataRoot.searchId }"
+					href="${ contextPath }/<proxl:defaultPageUrl pageName="/proteinCoverageReport" searchId="${ viewSearchPeptidesPageDataRoot.searchId }"
 							>proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 													
 					>Coverage Report</a>]

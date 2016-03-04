@@ -32,9 +32,9 @@
 	
 			<%--  Single searches so look up default Page URL --%>
 		
-			<c:set var="imagePageURLFinal"><proxl:defaultPageUrl pageName="image.do" searchId="${ ImageAndStructureSingleSearchId }">${ imagePageURL }</proxl:defaultPageUrl></c:set>
+			<c:set var="imagePageURLFinal"><proxl:defaultPageUrl pageName="/image" searchId="${ ImageAndStructureSingleSearchId }">${ imagePageURL }</proxl:defaultPageUrl></c:set>
 
-			<c:set var="structurePageURLFinal"><proxl:defaultPageUrl pageName="structure.do" searchId="${ ImageAndStructureSingleSearchId }">${ structurePageURL }</proxl:defaultPageUrl></c:set>
+			<c:set var="structurePageURLFinal"><proxl:defaultPageUrl pageName="/structure" searchId="${ ImageAndStructureSingleSearchId }">${ structurePageURL }</proxl:defaultPageUrl></c:set>
 		
 		</c:when>
 	</c:choose>

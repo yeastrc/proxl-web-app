@@ -1468,15 +1468,15 @@
 									  <div style="float: right;" >
 										
 										[<a data-tooltip="View peptides found in search" class="tool_tip_attached_jq" 
-											href="${ contextPath }/<proxl:defaultPageUrl pageName="peptide.do" searchId="${ search.id }">peptide.do?searchId=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
+											href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" searchId="${ search.id }">peptide.do?searchId=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
 												>Peptides</a>]
 										
 										[<a data-tooltip="View proteins found in search" class="tool_tip_attached_jq" 
-											href="${ contextPath }/<proxl:defaultPageUrl pageName="crosslinkProtein.do" searchId="${ search.id }">crosslinkProtein.do?searchId=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
+											href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" searchId="${ search.id }">crosslinkProtein.do?searchId=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
 												>Proteins</a>]
 
 										[<a data-tooltip="Graphical view of links between proteins" class="tool_tip_attached_jq" 
-											href="${ contextPath }/<proxl:defaultPageUrl pageName="image.do" searchId="${ search.id }">image.do?searchIds=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
+											href="${ contextPath }/<proxl:defaultPageUrl pageName="/image" searchId="${ search.id }">image.do?searchIds=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
 												>Image</a>]
 
 										<c:choose>
@@ -1484,7 +1484,7 @@
 										
 
 											[<a data-tooltip="View data on 3D structures" class="tool_tip_attached_jq" 
-												href="${ contextPath }/<proxl:defaultPageUrl pageName="structure.do" searchId="${ search.id }">structure.do?searchIds=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
+												href="${ contextPath }/<proxl:defaultPageUrl pageName="/structure" searchId="${ search.id }">structure.do?searchIds=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
 													>Structure</a>]
 																							
 										 </c:when>
