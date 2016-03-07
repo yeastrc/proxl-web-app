@@ -22,6 +22,7 @@ import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
+import org.yeastrc.xlink.searchers.PsmCountForSearchIdReportedPeptideIdSearcher;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePage;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePageWrapper;
 
