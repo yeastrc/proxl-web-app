@@ -75,7 +75,7 @@ public class SearchDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		String sql = "SELECT path, directory_name, load_time, fasta_filename, name, project_id, insert_complete, search_program, display_order, no_scan_data FROM search WHERE id = ?";
+		String sql = "SELECT path, directory_name, load_time, fasta_filename, name, project_id, insert_complete, display_order, no_scan_data FROM search WHERE id = ?";
 
 
 		try {
@@ -116,7 +116,6 @@ public class SearchDAO {
 				}
 				
 				
-				search.setSearchProgram( rs.getString( "search_program" ) );
 				search.setDisplayOrder( rs.getInt( "display_order" ) );
 
 			}
@@ -259,7 +258,7 @@ public class SearchDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		String sql = "INSERT INTO search (path, directory_name, fasta_filename, name, project_id, insert_complete, search_program, no_scan_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO search (path, directory_name, fasta_filename, name, project_id, insert_complete, no_scan_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 		
 
 		try {
@@ -290,10 +289,6 @@ public class SearchDAO {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
 			}
 			
-			counter++;
-			pstmt.setString( counter, pr.getSearchProgram() );
-			
-
 			counter++;
 			if ( pr.isNoScanData() ) {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );

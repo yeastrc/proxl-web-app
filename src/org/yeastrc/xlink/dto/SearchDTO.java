@@ -206,12 +206,6 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	public void setDirectoryName(String directoryName) {
 		this.directoryName = directoryName;
 	}
-	public String getSearchProgram() {
-		return searchProgram;
-	}
-	public void setSearchProgram(String searchProgram) {
-		this.searchProgram = searchProgram;
-	}
 	public int getDisplayOrder() {
 		return displayOrder;
 	}
@@ -235,7 +229,6 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	private int projectId;
 	private boolean insertComplete;
 	private String directoryName;
-	private String searchProgram;
 	private int displayOrder;
 	private boolean noScanData;
 

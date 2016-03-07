@@ -3,7 +3,7 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 DROP SCHEMA IF EXISTS `proxl_generic_fields` ;
-CREATE SCHEMA IF NOT EXISTS `proxl_generic_fields` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+CREATE SCHEMA IF NOT EXISTS `proxl_generic_fields` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
 USE `proxl_generic_fields` ;
 
 -- -----------------------------------------------------
@@ -41,7 +41,8 @@ CREATE TABLE IF NOT EXISTS `auth_shared_object` (
   `public_access_code` VARCHAR(255) NULL,
   PRIMARY KEY (`shared_object_id`))
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_bin;
 
 CREATE UNIQUE INDEX `public_access_code_UNIQUE` ON `auth_shared_object` (`public_access_code` ASC);
 
@@ -105,7 +106,6 @@ CREATE TABLE IF NOT EXISTS `search` (
   `project_id` INT UNSIGNED NOT NULL,
   `insert_complete` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   `directory_name` VARCHAR(255) NULL,
-  `search_program` VARCHAR(200) NULL,
   `display_order` INT NOT NULL DEFAULT 0,
   `no_scan_data` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS `reported_peptide` (
   PRIMARY KEY (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
+COLLATE = latin1_bin;
 
 CREATE INDEX `sequence` ON `reported_peptide` (`sequence`(20) ASC);
 
@@ -158,7 +158,8 @@ CREATE TABLE IF NOT EXISTS `psm` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE INDEX `perc_run_id` ON `psm` (`search_id` ASC);
 
@@ -168,9 +169,9 @@ CREATE INDEX `type` ON `psm` (`type` ASC);
 
 CREATE INDEX `psm_scan_id_fk_idx` ON `psm` (`scan_id` ASC);
 
-CREATE INDEX `psm__search_id_rep_pep_id_q_value_idx` ON `psm` (`search_id` ASC, `reported_peptide_id` ASC);
+CREATE INDEX `psm__search_id_rep_pep_id` ON `psm` (`search_id` ASC, `reported_peptide_id` ASC);
 
-CREATE INDEX `psm__search_id_type_q_value_idx` ON `psm` (`search_id` ASC, `type` ASC);
+CREATE INDEX `psm__search_id_type_idx` ON `psm` (`search_id` ASC, `type` ASC);
 
 
 -- -----------------------------------------------------
@@ -184,7 +185,7 @@ CREATE TABLE IF NOT EXISTS `peptide` (
   PRIMARY KEY (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
+COLLATE = latin1_bin;
 
 CREATE INDEX `sequence` ON `peptide` (`sequence`(20) ASC);
 
@@ -228,7 +229,7 @@ CREATE TABLE IF NOT EXISTS `linker` (
   PRIMARY KEY (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
+COLLATE = latin1_bin;
 
 CREATE UNIQUE INDEX `abbr` ON `linker` (`abbr` ASC);
 
@@ -281,7 +282,7 @@ CREATE TABLE IF NOT EXISTS `crosslink` (
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
+COLLATE = latin1_bin;
 
 CREATE INDEX `nrseq_id_1` ON `crosslink` (`nrseq_id_1` ASC);
 
@@ -331,7 +332,7 @@ CREATE TABLE IF NOT EXISTS `dimer` (
     REFERENCES `peptide` (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
+COLLATE = latin1_bin;
 
 CREATE INDEX `nrseq_id_1` ON `dimer` (`nrseq_id_1` ASC);
 
@@ -363,7 +364,7 @@ CREATE TABLE IF NOT EXISTS `dynamic_mod` (
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
+COLLATE = latin1_bin;
 
 CREATE INDEX `dynamic_mod_matched_peptide_id_fk_idx` ON `dynamic_mod` (`matched_peptide_id` ASC);
 
@@ -384,7 +385,7 @@ CREATE TABLE IF NOT EXISTS `linker_monolink_mass` (
     ON DELETE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
+COLLATE = latin1_bin;
 
 CREATE UNIQUE INDEX `linker_monolink_mass__linker_id_mass_Unique_idx` ON `linker_monolink_mass` (`linker_id` ASC, `mass` ASC);
 
@@ -422,7 +423,7 @@ CREATE TABLE IF NOT EXISTS `looplink` (
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
+COLLATE = latin1_bin;
 
 CREATE INDEX `nrseq_id` ON `looplink` (`nrseq_id` ASC);
 
@@ -465,7 +466,7 @@ CREATE TABLE IF NOT EXISTS `monolink` (
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
+COLLATE = latin1_bin;
 
 CREATE INDEX `nrseq_id` ON `monolink` (`nrseq_id` ASC);
 
@@ -494,7 +495,7 @@ CREATE TABLE IF NOT EXISTS `nrseq_database_peptide_protein` (
     REFERENCES `peptide` (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
+COLLATE = latin1_bin;
 
 CREATE INDEX `peptide_id` ON `nrseq_database_peptide_protein` (`peptide_id` ASC);
 
@@ -555,7 +556,7 @@ CREATE TABLE IF NOT EXISTS `pdb_alignment` (
     ON DELETE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_general_ci;
+COLLATE = utf8_bin;
 
 CREATE UNIQUE INDEX `nrseq_id` ON `pdb_alignment` (`nrseq_id` ASC, `pdb_file_id` ASC, `chain_id` ASC);
 
@@ -593,90 +594,6 @@ CREATE INDEX `search_comment_user_fk_idx` ON `search_comment` (`auth_user_id` AS
 
 
 -- -----------------------------------------------------
--- Table `search_crosslink_lookup`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_crosslink_lookup` ;
-
-CREATE TABLE IF NOT EXISTS `search_crosslink_lookup` (
-  `search_id` INT(10) UNSIGNED NOT NULL,
-  `nrseq_id_1` INT(10) UNSIGNED NOT NULL,
-  `nrseq_id_2` INT(10) UNSIGNED NOT NULL,
-  `protein_1_position` INT(10) UNSIGNED NOT NULL,
-  `protein_2_position` INT(10) UNSIGNED NOT NULL,
-  `bestPSMQValue` DOUBLE NOT NULL,
-  `bestPeptideQValue` DOUBLE NULL,
-  `num_psm_at_pt_01_q_cutoff` INT UNSIGNED NOT NULL,
-  `num_linked_peptides_at_pt_01_q_cutoff` INT UNSIGNED NOT NULL,
-  `num_unique_peptides_linked_at_pt_01_q_cutoff` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`search_id`, `nrseq_id_1`, `nrseq_id_2`, `protein_1_position`, `protein_2_position`),
-  CONSTRAINT `search_crosslink_lookup_ibfk_1`
-    FOREIGN KEY (`search_id`)
-    REFERENCES `search` (`id`)
-    ON DELETE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
-
-CREATE INDEX `bestPSMQValue` ON `search_crosslink_lookup` (`bestPSMQValue` ASC);
-
-CREATE INDEX `bestPeptideQValue` ON `search_crosslink_lookup` (`bestPeptideQValue` ASC);
-
-
--- -----------------------------------------------------
--- Table `search_looplink_lookup`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_looplink_lookup` ;
-
-CREATE TABLE IF NOT EXISTS `search_looplink_lookup` (
-  `search_id` INT(10) UNSIGNED NOT NULL,
-  `nrseq_id` INT(10) UNSIGNED NOT NULL,
-  `protein_position_1` INT(10) UNSIGNED NOT NULL,
-  `protein_position_2` INT(10) UNSIGNED NOT NULL,
-  `bestPSMQValue` DOUBLE NOT NULL,
-  `bestPeptideQValue` DOUBLE NULL,
-  `num_psm_at_pt_01_q_cutoff` INT(10) UNSIGNED NOT NULL,
-  `num_peptides_at_pt_01_q_cutoff` INT(10) UNSIGNED NOT NULL,
-  `num_unique_peptides_at_pt_01_q_cutoff` INT(10) UNSIGNED NOT NULL,
-  PRIMARY KEY (`search_id`, `nrseq_id`, `protein_position_1`, `protein_position_2`),
-  CONSTRAINT `search_looplink_lookup_ibfk_1`
-    FOREIGN KEY (`search_id`)
-    REFERENCES `search` (`id`)
-    ON DELETE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
-
-CREATE INDEX `bestPSMQValue` ON `search_looplink_lookup` (`bestPSMQValue` ASC);
-
-CREATE INDEX `bestPeptideQValue` ON `search_looplink_lookup` (`bestPeptideQValue` ASC);
-
-
--- -----------------------------------------------------
--- Table `search_monolink_lookup`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_monolink_lookup` ;
-
-CREATE TABLE IF NOT EXISTS `search_monolink_lookup` (
-  `search_id` INT(10) UNSIGNED NOT NULL,
-  `nrseq_id` INT(10) UNSIGNED NOT NULL,
-  `protein_position` INT(10) UNSIGNED NOT NULL,
-  `bestPSMQValue` DOUBLE NOT NULL,
-  `bestPeptideQValue` DOUBLE NULL,
-  PRIMARY KEY (`search_id`, `nrseq_id`, `protein_position`),
-  CONSTRAINT `search_monolink_lookup_ibfk_1`
-    FOREIGN KEY (`search_id`)
-    REFERENCES `search` (`id`)
-    ON DELETE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
-
-CREATE INDEX `bestPSMQValue` ON `search_monolink_lookup` (`bestPSMQValue` ASC);
-
-CREATE INDEX `bestPeptideQValue` ON `search_monolink_lookup` (`bestPeptideQValue` ASC);
-
-
--- -----------------------------------------------------
 -- Table `search_reported_peptide`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `search_reported_peptide` ;
@@ -694,8 +611,6 @@ DEFAULT CHARACTER SET = latin1
 COLLATE = latin1_swedish_ci;
 
 CREATE INDEX `reported_peptide_id` ON `search_reported_peptide` (`reported_peptide_id` ASC);
-
-CREATE INDEX `search_reported_peptide__search_id_q_value_idx` ON `search_reported_peptide` (`search_id` ASC);
 
 
 -- -----------------------------------------------------
@@ -716,7 +631,7 @@ CREATE TABLE IF NOT EXISTS `psm_peptide` (
     REFERENCES `peptide` (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
+COLLATE = latin1_bin;
 
 CREATE INDEX `peptide_id` ON `psm_peptide` (`peptide_id` ASC);
 
@@ -1136,33 +1051,6 @@ CREATE INDEX `search_links_auth_user_id_fk_idx` ON `search_web_links` (`auth_use
 
 
 -- -----------------------------------------------------
--- Table `default_page_view`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `default_page_view` ;
-
-CREATE TABLE IF NOT EXISTS `default_page_view` (
-  `search_id` INT UNSIGNED NOT NULL,
-  `page_name` VARCHAR(80) NOT NULL,
-  `auth_user_id` INT UNSIGNED NOT NULL,
-  `url` VARCHAR(6000) NOT NULL,
-  PRIMARY KEY (`search_id`, `page_name`),
-  CONSTRAINT `default_page_view_auth_user_id_fk`
-    FOREIGN KEY (`auth_user_id`)
-    REFERENCES `auth_user` (`id`)
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT,
-  CONSTRAINT `default_page_view_search_id_fk`
-    FOREIGN KEY (`search_id`)
-    REFERENCES `search` (`id`)
-    ON DELETE CASCADE)
-ENGINE = InnoDB;
-
-CREATE INDEX `default_page_view_search_id_fk_idx` ON `default_page_view` (`search_id` ASC);
-
-CREATE INDEX `default_page_view_auth_user_id_fk_idx` ON `default_page_view` (`auth_user_id` ASC);
-
-
--- -----------------------------------------------------
 -- Table `unified_reported_peptide_lookup`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `unified_reported_peptide_lookup` ;
@@ -1278,29 +1166,7 @@ ENGINE = InnoDB;
 
 CREATE INDEX `search__rep_pep__dyn_mods_rep_pep_id_fk_idx` ON `search__reported_peptide__dynamic_mod_lookup` (`reported_peptide_id` ASC);
 
-CREATE INDEX `search__rep_pep__dyn_mods_search_id_lnk_tp_bpqv_idx` ON `search__reported_peptide__dynamic_mod_lookup` (`search_id` ASC, `link_type` ASC);
-
-CREATE INDEX `search__rep_pep__dyn_mods_search_id_bpqv_idx` ON `search__reported_peptide__dynamic_mod_lookup` (`search_id` ASC);
-
-
--- -----------------------------------------------------
--- Table `search_program`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_program` ;
-
-CREATE TABLE IF NOT EXISTS `search_program` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(200) NOT NULL,
-  `short_name` VARCHAR(100) NOT NULL,
-  `display_name` VARCHAR(255) NOT NULL,
-  `description` VARCHAR(255) NULL,
-  `display_order` INT(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
-
-CREATE UNIQUE INDEX `search_program__name_unique_idx` ON `search_program` (`name` ASC);
-
-CREATE UNIQUE INDEX `search_program__short_name_unique_idx` ON `search_program` (`short_name` ASC);
+CREATE INDEX `search__rep_pep__dyn_mods_search_id_lnk_tp_idx` ON `search__reported_peptide__dynamic_mod_lookup` (`search_id` ASC, `link_type` ASC);
 
 
 -- -----------------------------------------------------
@@ -1485,7 +1351,8 @@ CREATE TABLE IF NOT EXISTS `search_crosslink_generic_lookup` (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE UNIQUE INDEX `srch_crosslnk_gen_lkp_Unique` ON `search_crosslink_generic_lookup` (`search_id` ASC, `nrseq_id_1` ASC, `nrseq_id_2` ASC, `protein_1_position` ASC, `protein_2_position` ASC);
 
@@ -1518,7 +1385,8 @@ CREATE TABLE IF NOT EXISTS `search_crosslink_best_psm_value_generic_lookup` (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE UNIQUE INDEX `Unique_srch_nrseq1_nrseq2_pos1_pos2_ann_type` ON `search_crosslink_best_psm_value_generic_lookup` (`search_id` ASC, `nrseq_id_1` ASC, `nrseq_id_2` ASC, `protein_1_position` ASC, `protein_2_position` ASC, `annotation_type_id` ASC);
 
@@ -1555,7 +1423,8 @@ CREATE TABLE IF NOT EXISTS `search_crosslink_best_peptide_value_generic_lookup` 
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE INDEX `primary_ann_tp_fk_idx` ON `search_crosslink_best_peptide_value_generic_lookup` (`search_crosslink_generic_lookup_id` ASC);
 
@@ -1596,13 +1465,14 @@ CREATE TABLE IF NOT EXISTS `unified_rp__rep_pept__search__generic_lookup` (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE INDEX `unified_rp__reported_peptide__search__reported_peptide_id_f_idx` ON `unified_rp__rep_pept__search__generic_lookup` (`reported_peptide_id` ASC);
 
 CREATE INDEX `unified_rp__reported_peptide__search__search_id_fk_idx` ON `unified_rp__rep_pept__search__generic_lookup` (`search_id` ASC);
 
-CREATE INDEX `unified_rp__rp__search__srch_type_bpsmqval_idx` ON `unified_rp__rep_pept__search__generic_lookup` (`search_id` ASC, `link_type` ASC);
+CREATE INDEX `unified_rp__rp__search__srch_type_mts_dflt_idx` ON `unified_rp__rep_pept__search__generic_lookup` (`search_id` ASC, `link_type` ASC, `peptide_meets_default_cutoffs` ASC);
 
 CREATE INDEX `unified_rep_pep__reported_peptide__search_lookup__sample_ps_idx` ON `unified_rp__rep_pept__search__generic_lookup` (`sample_psm_id` ASC);
 
@@ -1677,7 +1547,8 @@ CREATE TABLE IF NOT EXISTS `psm_filterable_annotation__generic_lookup` (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE INDEX `psm_filterable_annotation__psm_id_fk_idx` ON `psm_filterable_annotation__generic_lookup` (`psm_id` ASC);
 
@@ -1749,7 +1620,8 @@ CREATE TABLE IF NOT EXISTS `search_looplink_generic_lookup` (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE INDEX `Unique_srch_nrseq_pos1_pos2` ON `search_looplink_generic_lookup` (`search_id` ASC, `nrseq_id` ASC, `protein_position_1` ASC, `protein_position_2` ASC);
 
@@ -1781,7 +1653,8 @@ CREATE TABLE IF NOT EXISTS `search_looplink_best_psm_value_generic_lookup` (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE INDEX `primary_ann_tp_fk_idx` ON `search_looplink_best_psm_value_generic_lookup` (`search_looplink_generic_lookup_id` ASC);
 
@@ -1817,7 +1690,8 @@ CREATE TABLE IF NOT EXISTS `search_looplink_best_peptide_value_generic_lookup` (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE INDEX `search_looplink_best_peptide_value_generic_lookup_primary_f_idx` ON `search_looplink_best_peptide_value_generic_lookup` (`search_looplink_generic_lookup_id` ASC);
 
@@ -1846,7 +1720,8 @@ CREATE TABLE IF NOT EXISTS `search_monolink_generic_lookup` (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE UNIQUE INDEX `Unique_srch_nrseq_pos_fk_idx` ON `search_monolink_generic_lookup` (`search_id` ASC, `nrseq_id` ASC, `protein_position` ASC);
 
@@ -1877,7 +1752,8 @@ CREATE TABLE IF NOT EXISTS `search_monolink_best_psm_value_generic_lookup` (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE INDEX `search_monolink_best_psm_value_generic_lookup_primary_fk_idx` ON `search_monolink_best_psm_value_generic_lookup` (`search_monolink_generic_lookup_id` ASC);
 
@@ -1912,7 +1788,8 @@ CREATE TABLE IF NOT EXISTS `search_monolink_best_peptide_value_generic_lookup` (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE INDEX `search_monolink_best_peptide_value_generic_lookup_primary_f_idx` ON `search_monolink_best_peptide_value_generic_lookup` (`search_monolink_generic_lookup_id` ASC);
 
@@ -1941,7 +1818,8 @@ CREATE TABLE IF NOT EXISTS `search_dimer_generic_lookup` (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE UNIQUE INDEX `srch_crosslnk_gen_lkp_Unique` ON `search_dimer_generic_lookup` (`search_id` ASC, `nrseq_id_1` ASC, `nrseq_id_2` ASC);
 
@@ -1972,7 +1850,8 @@ CREATE TABLE IF NOT EXISTS `search_dimer_best_psm_value_generic_lookup` (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE UNIQUE INDEX `Unique_srch_nrseq1_nrseq2_pos1_pos2_ann_type` ON `search_dimer_best_psm_value_generic_lookup` (`search_id` ASC, `nrseq_id_1` ASC, `nrseq_id_2` ASC, `annotation_type_id` ASC);
 
@@ -2007,7 +1886,8 @@ CREATE TABLE IF NOT EXISTS `search_dimer_best_peptide_value_generic_lookup` (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
 
 CREATE UNIQUE INDEX `Unique_srch_nrseq1_nrseq2_pos1_pos2_ann_type` ON `search_dimer_best_peptide_value_generic_lookup` (`search_id` ASC, `nrseq_id_1` ASC, `nrseq_id_2` ASC, `annotation_type_id` ASC);
 
