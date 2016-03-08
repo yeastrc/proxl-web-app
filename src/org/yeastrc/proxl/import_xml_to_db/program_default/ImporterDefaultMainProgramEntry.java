@@ -201,20 +201,34 @@ public class ImporterDefaultMainProgramEntry {
 			System.out.println( "project id: " + projectId );
 			System.out.println( "main XML File To Import file: " + mainXMLFileToImport.getAbsolutePath() );
 
-			System.out.println( " " );
+			if ( scanFileList == null || scanFileList.isEmpty() ) {
 
-			System.out.println( "Scan files full path:" );
+				System.out.println( " " );
 
-			for ( File scanFile : scanFileList ) {
+				System.out.println( "No Scan files" );
 
-				System.out.println( scanFile.getCanonicalPath() );
+
+				System.out.println( " " );
+
+				System.out.println( " " );
+				
+			} else {
+
+				System.out.println( " " );
+
+				System.out.println( "Scan files full path:" );
+
+				for ( File scanFile : scanFileList ) {
+
+					System.out.println( scanFile.getCanonicalPath() );
+				}
+
+
+				System.out.println( " " );
+
+				System.out.println( " " );
+
 			}
-
-
-			System.out.println( " " );
-
-			System.out.println( " " );
-
 
 
 
@@ -299,19 +313,34 @@ public class ImporterDefaultMainProgramEntry {
 			System.out.println( "project id: " + projectId );
 			System.out.println( "main XML File To Import file: " + mainXMLFileToImport.getAbsolutePath() );
 
-			System.out.println( " " );
+			if ( scanFileList == null || scanFileList.isEmpty() ) {
 
-			System.out.println( "Scan files full path:" );
+				System.out.println( " " );
 
-			for ( File scanFile : scanFileList ) {
+				System.out.println( "No Scan files" );
 
-				System.out.println( scanFile.getCanonicalPath() );
+
+				System.out.println( " " );
+
+				System.out.println( " " );
+				
+			} else {
+
+				System.out.println( " " );
+
+				System.out.println( "Scan files full path:" );
+
+				for ( File scanFile : scanFileList ) {
+
+					System.out.println( scanFile.getCanonicalPath() );
+				}
+
+
+				System.out.println( " " );
+
+				System.out.println( " " );
+
 			}
-
-
-			System.out.println( " " );
-
-			System.out.println( " " );
 
 
 
