@@ -1,4 +1,4 @@
-package org.yeastrc.xlink.searcher_result_objects;
+package org.yeastrc.xlink.number_peptides_psms;
 
 /**
  * result from NumPeptidesPSMsForProteinCriteriaSearcher

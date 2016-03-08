@@ -1,4 +1,4 @@
-package org.yeastrc.xlink.searchers;
+package org.yeastrc.xlink.number_peptides_psms;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,19 +15,20 @@ import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
 import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
+import org.yeastrc.xlink.searchers.PeptideUniqueSearcher;
+import org.yeastrc.xlink.searchers.PsmCountForSearchIdReportedPeptideIdSearcher;
 import org.yeastrc.xlink.utils.XLinkUtils;
 
 /**
  * 
  *
  */
-public class NumPeptidesPSMsForProteinCriteriaSearcher {
+public class NumPeptidesPSMsForProteinCriteria {
 
-	private NumPeptidesPSMsForProteinCriteriaSearcher() { }
-	public static NumPeptidesPSMsForProteinCriteriaSearcher getInstance() { return new NumPeptidesPSMsForProteinCriteriaSearcher(); }
+	private NumPeptidesPSMsForProteinCriteria() { }
+	public static NumPeptidesPSMsForProteinCriteria getInstance() { return new NumPeptidesPSMsForProteinCriteria(); }
 
-	private static final Logger log = Logger.getLogger(NumPeptidesPSMsForProteinCriteriaSearcher.class);
+	private static final Logger log = Logger.getLogger(NumPeptidesPSMsForProteinCriteria.class);
 	
 	
 	private static final String SQL_LINK_TABLE_ALIAS = "link_table";
