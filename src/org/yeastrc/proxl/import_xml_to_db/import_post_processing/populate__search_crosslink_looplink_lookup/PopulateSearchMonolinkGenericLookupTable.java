@@ -21,11 +21,11 @@ import org.yeastrc.xlink.dto.SearchMonolinkBestPSMValueGenericLookupDTO;
 import org.yeastrc.xlink.dto.SearchMonolinkBestPeptideValueGenericLookupDTO;
 import org.yeastrc.xlink.dto.SearchMonolinkGenericLookupDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.number_peptides_psms.NumPeptidesPSMsForProteinCriteriaResult;
+import org.yeastrc.xlink.number_peptides_psms.NumPeptidesPSMsForProteinCriteria;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_utils.CreateSearcherCutoffValuesSearchLevelFromDefaultsInTypeRecords;
-import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
 import org.yeastrc.xlink.searchers.AnnotationTypesForSearchIdPSMPeptideTypeSearcher;
-import org.yeastrc.xlink.searchers.NumPeptidesPSMsForProteinCriteriaSearcher;
 import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 /**
@@ -137,7 +137,7 @@ public class PopulateSearchMonolinkGenericLookupTable {
 
 
 				NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
-						NumPeptidesPSMsForProteinCriteriaSearcher.getInstance()
+						NumPeptidesPSMsForProteinCriteria.getInstance()
 						.getNumPeptidesPSMsForMonolink(
 								item.getSearchId(),
 								searcherCutoffValuesSearchLevel,
