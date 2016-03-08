@@ -23,9 +23,9 @@ import org.yeastrc.xlink.dto.SearchMonolinkGenericLookupDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_utils.CreateSearcherCutoffValuesSearchLevelFromDefaultsInTypeRecords;
+import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
 import org.yeastrc.xlink.searchers.AnnotationTypesForSearchIdPSMPeptideTypeSearcher;
-import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
-import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
+import org.yeastrc.xlink.searchers.NumPeptidesPSMsForProteinCriteriaSearcher;
 import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 /**
@@ -134,33 +134,24 @@ public class PopulateSearchMonolinkGenericLookupTable {
 								srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOList );
 
 				
-				
-				int numPsmAtDefaultCutoff = 
-						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForMonolink(
-								item.getSearchId(),
-								searcherCutoffValuesSearchLevel,
-								item.getNrseqId(),
-								item.getProteinPosition() );
-				
-				
 
-				int numLinkedPeptidesAtDefaultCutoff = 
-						NumPeptidesForProteinCriteriaSearcher.getInstance()
-						.getNumPeptidesForMonolink( 
-								item.getSearchId(),
-								searcherCutoffValuesSearchLevel,
-								item.getNrseqId(),
-								item.getProteinPosition() );
 
-				int numUniqueLinkedPeptidesAtDefaultCutoff = 
-						NumPeptidesForProteinCriteriaSearcher.getInstance()
-						.getNumUniquePeptidesForMonolink(
+				NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+						NumPeptidesPSMsForProteinCriteriaSearcher.getInstance()
+						.getNumPeptidesPSMsForMonolink(
 								item.getSearchId(),
 								searcherCutoffValuesSearchLevel,
 								item.getNrseqId(),
 								item.getProteinPosition(),
 								YRC_NRSEQUtils.getDatabaseIdFromName( searchDTO.getFastaFilename() ) );
 				
+				
+				int numPsmAtDefaultCutoff = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
+				
+				int numLinkedPeptidesAtDefaultCutoff = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
+
+				int numUniqueLinkedPeptidesAtDefaultCutoff = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
+
 				
 				item.setNumPsmAtDefaultCutoff( numPsmAtDefaultCutoff );
 				item.setNumLinkedPeptidesAtDefaultCutoff( numLinkedPeptidesAtDefaultCutoff );

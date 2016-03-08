@@ -23,9 +23,9 @@ import org.yeastrc.xlink.dto.SearchCrosslinkGenericLookupDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_utils.CreateSearcherCutoffValuesSearchLevelFromDefaultsInTypeRecords;
+import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
 import org.yeastrc.xlink.searchers.AnnotationTypesForSearchIdPSMPeptideTypeSearcher;
-import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
-import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
+import org.yeastrc.xlink.searchers.NumPeptidesPSMsForProteinCriteriaSearcher;
 import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 /**
@@ -135,32 +135,10 @@ public class PopulateSearchCrosslinkGenericLookupTable {
 								srchPgm_Filterable_Psm_AnnotationType_DTOList, 
 								srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOList );
 
-				
-				
-				int numPsmAtDefaultCutoff = 
-						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForCrosslink(
-								item.getSearchId(),
-								searcherCutoffValuesSearchLevel,
-								item.getNrseqId1(),
-								item.getNrseqId2(),
-								item.getProtein1Position(),
-								item.getProtein2Position() );
-				
-				
 
-				int numLinkedPeptidesAtDefaultCutoff = 
-						NumPeptidesForProteinCriteriaSearcher.getInstance()
-						.getNumLinkedPeptidesForCrosslink( 
-								item.getSearchId(),
-								searcherCutoffValuesSearchLevel,
-								item.getNrseqId1(),
-								item.getNrseqId2(),
-								item.getProtein1Position(),
-								item.getProtein2Position() );
-
-				int numUniqueLinkedPeptidesAtDefaultCutoff = 
-						NumPeptidesForProteinCriteriaSearcher.getInstance()
-						.getNumUniqueLinkedPeptidesForCrosslink(
+				NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+						NumPeptidesPSMsForProteinCriteriaSearcher.getInstance()
+						.getNumPeptidesPSMsForCrosslink(
 								item.getSearchId(),
 								searcherCutoffValuesSearchLevel,
 								item.getNrseqId1(),
@@ -168,6 +146,14 @@ public class PopulateSearchCrosslinkGenericLookupTable {
 								item.getProtein1Position(),
 								item.getProtein2Position(),
 								YRC_NRSEQUtils.getDatabaseIdFromName( searchDTO.getFastaFilename() ) );
+				
+				
+				int numPsmAtDefaultCutoff = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
+				
+				int numLinkedPeptidesAtDefaultCutoff = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
+
+				int numUniqueLinkedPeptidesAtDefaultCutoff = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
+
 				
 				
 				item.setNumPsmAtDefaultCutoff( numPsmAtDefaultCutoff );
