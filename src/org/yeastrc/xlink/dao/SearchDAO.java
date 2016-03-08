@@ -246,6 +246,12 @@ public class SearchDAO {
 	}
 		
 		
+	private static final String INSERT_SQL =
+			"INSERT INTO search "
+			+ " (path, directory_name, fasta_filename, name, project_id, insert_complete, no_scan_data) "
+			+ " VALUES (?, ?, ?, ?, ?, ?, ?)";
+			
+	
 	/**
 	 * This will INSERT the given SearchDTO into the database... even if an id is already set.
 	 * This will result in a new id being set in the object.
@@ -258,7 +264,7 @@ public class SearchDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		String sql = "INSERT INTO search (path, directory_name, fasta_filename, name, project_id, insert_complete, no_scan_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		String sql = INSERT_SQL;
 		
 
 		try {
