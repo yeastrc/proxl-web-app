@@ -9,8 +9,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
-import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
+import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
+import org.yeastrc.xlink.searchers.NumPeptidesPSMsForProteinCriteriaSearcher;
 import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 
@@ -87,16 +87,8 @@ public class SearchProteinLooplink implements IProteinLooplink {
 		try {
 			if( this.numPsms == null ) {
 
-				this.numPsms = 
-						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForLooplink(
-								this.getSearch().getId(),
-								this.getSearcherCutoffValuesSearchLevel(),
-								this.getProtein().getNrProtein().getNrseqId(),
-								this.getProteinPosition1(),
-								this.getProteinPosition2() );
+				populateNumPsmNumPeptideNumUniquePeptide();
 				
-				// WAS 
-				//  this.numPsms = SearchPsmSearcher.getInstance().getNumPsms( this );
 			}
 
 			return this.numPsms;
@@ -125,20 +117,8 @@ public class SearchProteinLooplink implements IProteinLooplink {
 		try {
 			if( this.numPeptides == -1 ) {
 
-				this.numPeptides = 
-						NumPeptidesForProteinCriteriaSearcher.getInstance()
-						.getNumPeptidesForLooplink(
-								this.getSearch().getId(),
-								this.getSearcherCutoffValuesSearchLevel(),
-								this.getProtein().getNrProtein().getNrseqId(),
-								this.getProteinPosition1(),
-								this.getProteinPosition2() );
-								
-//								searchId, psmCutoff, peptideCutoff, nrseqId_protein, protein_position_1, protein_position_2)
-				
-				//  WAS
-				
-				// this.numPeptides = SearchLooplinkPeptideSearcher.getInstance().getNumPeptides( this );
+				populateNumPsmNumPeptideNumUniquePeptide();
+
 			}
 
 			return this.numPeptides;
@@ -168,22 +148,8 @@ public class SearchProteinLooplink implements IProteinLooplink {
 		try {
 			if( this.numUniquePeptides == -1 ) {
 				
+				populateNumPsmNumPeptideNumUniquePeptide();
 
-				this.numUniquePeptides = 
-						NumPeptidesForProteinCriteriaSearcher.getInstance()
-						.getNumUniquePeptidesForLooplink(
-								this.getSearch().getId(),
-								this.getSearcherCutoffValuesSearchLevel(),
-								this.getProtein().getNrProtein().getNrseqId(),
-								this.getProteinPosition1(),
-								this.getProteinPosition2(),
-								YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
-								
-//								searchId, psmCutoff, peptideCutoff, nrseqId_protein, protein_position_1, protein_position_2)
-				
-				//  WAS
-				
-				// this.numUniquePeptides = SearchLooplinkPeptideSearcher.getInstance().getNumUniquePeptides( this );
 			}
 
 			return this.numUniquePeptides;
@@ -198,6 +164,38 @@ public class SearchProteinLooplink implements IProteinLooplink {
 		}
 	}
 
+	
+
+	private void populateNumPsmNumPeptideNumUniquePeptide() throws Exception {
+		
+		try {
+
+			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+					NumPeptidesPSMsForProteinCriteriaSearcher.getInstance()
+					.getNumPeptidesPSMsForLooplink(
+							this.getSearch().getId(),
+							this.getSearcherCutoffValuesSearchLevel(),
+							this.getProtein().getNrProtein().getNrseqId(),
+							this.getProteinPosition1(),
+							this.getProteinPosition2(),
+							YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
+			
+			this.numPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
+			this.numUniquePeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
+			
+			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
+
+		} catch ( Exception e ) {
+
+			String msg = "Exception in populateNumPsmNumPeptideNumUniquePeptide()";
+
+			log.error( msg, e );
+
+			throw e;
+		}
+		
+		
+	}
 
 	
 	//  WAS

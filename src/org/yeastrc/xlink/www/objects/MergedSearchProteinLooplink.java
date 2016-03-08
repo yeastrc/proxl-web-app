@@ -9,7 +9,9 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
+import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
+import org.yeastrc.xlink.searchers.NumPeptidesPSMsForProteinCriteriaSearcher;
+import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 import org.yeastrc.xlink.www.searcher.MergedSearchLooplinkPeptideSearcher;
 import org.yeastrc.xlink.www.searcher.SearchProteinLooplinkSearcher;
 
@@ -80,6 +82,12 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 	}
 
 
+	public void setSearchProteinLooplinks(
+			Map<SearchDTO, SearchProteinLooplink> searchProteinLooplinks) {
+		
+		this.searchProteinLooplinks = searchProteinLooplinks;
+	}
+
 
 
 	
@@ -108,13 +116,6 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 		
 
 			//  Use code in  SearchProteinLooplink.getNumPsms() for each search
-//			
-//			NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForLooplink(
-//					this.getSearch().getId(),
-//					searcherCutoffValuesSearchLevel,
-//					this.getProtein().getNrProtein().getNrseqId(),
-//					this.getProteinPosition1(),
-//					this.getProteinPosition2() );
 
 			int totalNumPsms = 0;
 			
@@ -131,15 +132,19 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 					throw new Exception(msg);
 				}
 				
+
+				NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+						NumPeptidesPSMsForProteinCriteriaSearcher.getInstance()
+						.getNumPeptidesPSMsForLooplink(
+								searchId,
+								searcherCutoffValuesSearchLevel,
+								this.getProtein().getNrProtein().getNrseqId(),
+								this.getProteinPosition1(),
+								this.getProteinPosition2(),
+								YRC_NRSEQUtils.getDatabaseIdFromName( search.getFastaFilename() ) );
 				
-				int numPsmsForSearch = NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForLooplink(
-						searchId,
-						searcherCutoffValuesSearchLevel,
-						this.getProtein().getNrProtein().getNrseqId(),
-						this.getProteinPosition1(),
-						this.getProteinPosition2() );
+				totalNumPsms += numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
 				
-				totalNumPsms += numPsmsForSearch;
 			}
 			
 			this.numPsms = totalNumPsms;

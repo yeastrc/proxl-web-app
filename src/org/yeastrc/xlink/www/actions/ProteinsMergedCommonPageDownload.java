@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
@@ -787,10 +788,13 @@ public class ProteinsMergedCommonPageDownload {
 				List<SearchDTO> searchesForThisItem = new ArrayList<>( searchesMapOnId.size() );
 				List<Integer> searchIdsForThisItem = new ArrayList<>( searchesMapOnId.size() );
 
+				Map<SearchDTO, SearchProteinCrosslink> searchProteinCrosslinksMapOnSearchDTOForThisItem = new TreeMap<SearchDTO, SearchProteinCrosslink>();
+
 
 				for ( Map.Entry<Integer, SearchProteinCrosslinkWrapper> crosslinksWrapperEntry : crosslinksWrapperMapOnSearchId.entrySet() ) {
 
 					Integer searchId = crosslinksWrapperEntry.getKey();
+					SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper = crosslinksWrapperEntry.getValue();
 
 					SearchDTO searchDTO = searchesMapOnId.get( searchId );
 
@@ -804,6 +808,10 @@ public class ProteinsMergedCommonPageDownload {
 					searchesForThisItem.add( searchDTO );
 
 					searchIdsForThisItem.add(searchId);
+
+					SearchProteinCrosslink searchProteinCrosslink = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
+
+					searchProteinCrosslinksMapOnSearchDTOForThisItem.put(searchDTO, searchProteinCrosslink );
 
 				}
 				
@@ -899,11 +907,15 @@ public class ProteinsMergedCommonPageDownload {
 
 				List<SearchDTO> searchesForThisItem = new ArrayList<>( searchesMapOnId.size() );
 				List<Integer> searchIdsForThisItem = new ArrayList<>( searchesMapOnId.size() );
+				
+				
+				Map<SearchDTO, SearchProteinCrosslink> searchProteinCrosslinksMapOnSearchDTOForThisItem = new TreeMap<SearchDTO, SearchProteinCrosslink>();
 
 
 				for ( Map.Entry<Integer, SearchProteinCrosslinkWrapper> crosslinksWrapperEntry : searchProteinCrosslinkWrapperWrapperMapOnSearchId.entrySet() ) {
 
 					Integer searchId = crosslinksWrapperEntry.getKey();
+					SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper = crosslinksWrapperEntry.getValue();
 
 					SearchDTO searchDTO = searchesMapOnId.get( searchId );
 
@@ -917,7 +929,10 @@ public class ProteinsMergedCommonPageDownload {
 					searchesForThisItem.add( searchDTO );
 
 					searchIdsForThisItem.add(searchId);
+					
+					SearchProteinCrosslink searchProteinCrosslink = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
 
+					searchProteinCrosslinksMapOnSearchDTOForThisItem.put(searchDTO, searchProteinCrosslink );
 				}
 				
 
@@ -942,6 +957,8 @@ public class ProteinsMergedCommonPageDownload {
 
 				mergedSearchProteinCrosslink.setSearches( searchesForThisItem );
 				mergedSearchProteinCrosslink.setSearcherCutoffValuesRootLevel( searcherCutoffValuesRootLevel );
+				
+				mergedSearchProteinCrosslink.setSearchProteinCrosslinks( searchProteinCrosslinksMapOnSearchDTOForThisItem );
 
 
 				//  Copy Peptide and PSM annotations to display lists 
@@ -1114,10 +1131,12 @@ public class ProteinsMergedCommonPageDownload {
 				List<SearchDTO> searchesForThisItem = new ArrayList<>( searchesMapOnId.size() );
 				List<Integer> searchIdsForThisItem = new ArrayList<>( searchesMapOnId.size() );
 
+				Map<SearchDTO, SearchProteinLooplink> searchProteinLooplinksMapOnSearchDTOForThisItem = new TreeMap<>();
 
 				for ( Map.Entry<Integer, SearchProteinLooplinkWrapper> looplinksWrapperEntry : looplinksWrapperMapOnSearchId.entrySet() ) {
 
 					Integer searchId = looplinksWrapperEntry.getKey();
+					SearchProteinLooplinkWrapper searchProteinLooplinkWrapper = looplinksWrapperEntry.getValue();
 
 					SearchDTO searchDTO = searchesMapOnId.get( searchId );
 
@@ -1131,6 +1150,10 @@ public class ProteinsMergedCommonPageDownload {
 					searchesForThisItem.add( searchDTO );
 
 					searchIdsForThisItem.add(searchId);
+
+					SearchProteinLooplink searchProteinLooplink = searchProteinLooplinkWrapper.getSearchProteinLooplink();
+
+					searchProteinLooplinksMapOnSearchDTOForThisItem.put(searchDTO, searchProteinLooplink );
 
 				}
 				
@@ -1155,7 +1178,7 @@ public class ProteinsMergedCommonPageDownload {
 				mergedSearchProteinLooplink.setSearches( searchesForThisItem );
 				mergedSearchProteinLooplink.setSearcherCutoffValuesRootLevel( searcherCutoffValuesRootLevel );
 
-
+				mergedSearchProteinLooplink.setSearchProteinLooplinks( searchProteinLooplinksMapOnSearchDTOForThisItem );
 			}
 
 
@@ -1224,10 +1247,12 @@ public class ProteinsMergedCommonPageDownload {
 				List<SearchDTO> searchesForThisItem = new ArrayList<>( searchesMapOnId.size() );
 				List<Integer> searchIdsForThisItem = new ArrayList<>( searchesMapOnId.size() );
 
+				Map<SearchDTO, SearchProteinLooplink> searchProteinLooplinksMapOnSearchDTOForThisItem = new TreeMap<>();
 
 				for ( Map.Entry<Integer, SearchProteinLooplinkWrapper> looplinksWrapperEntry : searchProteinLooplinkWrapperWrapperMapOnSearchId.entrySet() ) {
 
 					Integer searchId = looplinksWrapperEntry.getKey();
+					SearchProteinLooplinkWrapper searchProteinLooplinkWrapper = looplinksWrapperEntry.getValue();
 
 					SearchDTO searchDTO = searchesMapOnId.get( searchId );
 
@@ -1242,6 +1267,9 @@ public class ProteinsMergedCommonPageDownload {
 
 					searchIdsForThisItem.add(searchId);
 
+					SearchProteinLooplink searchProteinLooplink = searchProteinLooplinkWrapper.getSearchProteinLooplink();
+
+					searchProteinLooplinksMapOnSearchDTOForThisItem.put(searchDTO, searchProteinLooplink );
 				}
 				
 
@@ -1259,6 +1287,8 @@ public class ProteinsMergedCommonPageDownload {
 
 				mergedSearchProteinLooplink.setSearches( searchesForThisItem );
 				mergedSearchProteinLooplink.setSearcherCutoffValuesRootLevel( searcherCutoffValuesRootLevel );
+
+				mergedSearchProteinLooplink.setSearchProteinLooplinks( searchProteinLooplinksMapOnSearchDTOForThisItem );
 
 
 				//  Copy Peptide and PSM annotations to display lists 

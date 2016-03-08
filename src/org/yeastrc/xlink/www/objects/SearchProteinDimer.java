@@ -4,12 +4,15 @@ package org.yeastrc.xlink.www.objects;
 
 import java.util.List;
 
+
 //import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 //import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
 //import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
 //import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
+//import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
+//import org.yeastrc.xlink.searchers.NumPeptidesPSMsForProteinCriteriaSearcher;
 
 
 
@@ -47,12 +50,14 @@ public class SearchProteinDimer  {
 //		try {
 //			if( this.numPsms == null ) {
 //								
-//				this.numPsms =
-//						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForDimer(
-//								this.getSearch().getId(),
-//								this.getSearcherCutoffValuesSearchLevel(),
-//								this.getProtein1().getNrProtein().getNrseqId(),
-//								this.getProtein2().getNrProtein().getNrseqId() );
+//	populateNumPsmNumPeptideNumUniquePeptide();
+//	
+////				this.numPsms =
+////						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForDimer(
+////								this.getSearch().getId(),
+////								this.getSearcherCutoffValuesSearchLevel(),
+////								this.getProtein1().getNrProtein().getNrseqId(),
+////								this.getProtein2().getNrProtein().getNrseqId() );
 //
 //			}
 //
@@ -73,13 +78,15 @@ public class SearchProteinDimer  {
 //		try {
 //			if( this.numLinkedPeptides == -1 ) {
 //				
-//				this.numLinkedPeptides = 
-//						NumPeptidesForProteinCriteriaSearcher.getInstance()
-//						.getNumLinkedPeptidesForDimer( 
-//								this.getSearch().getId(),
-//								this.getSearcherCutoffValuesSearchLevel(),
-//								this.getProtein1().getNrProtein().getNrseqId(),
-//								this.getProtein2().getNrProtein().getNrseqId() );
+//	populateNumPsmNumPeptideNumUniquePeptide();
+//	
+////				this.numLinkedPeptides = 
+////						NumPeptidesForProteinCriteriaSearcher.getInstance()
+////						.getNumLinkedPeptidesForDimer( 
+////								this.getSearch().getId(),
+////								this.getSearcherCutoffValuesSearchLevel(),
+////								this.getProtein1().getNrProtein().getNrseqId(),
+////								this.getProtein2().getNrProtein().getNrseqId() );
 //			}
 //
 //			return this.numLinkedPeptides;
@@ -100,14 +107,16 @@ public class SearchProteinDimer  {
 //		try {
 //			if( this.numUniqueLinkedPeptides == -1 ) {
 //				
-//				this.numUniqueLinkedPeptides = 
-//						NumPeptidesForProteinCriteriaSearcher.getInstance()
-//						.getNumUniqueLinkedPeptidesForDimer(
-//								this.getSearch().getId(),
-//								this.getSearcherCutoffValuesSearchLevel(),
-//								this.getProtein1().getNrProtein().getNrseqId(),
-//								this.getProtein2().getNrProtein().getNrseqId(),
-//								YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
+//				populateNumPsmNumPeptideNumUniquePeptide();
+//	
+////				this.numUniqueLinkedPeptides = 
+////						NumPeptidesForProteinCriteriaSearcher.getInstance()
+////						.getNumUniqueLinkedPeptidesForDimer(
+////								this.getSearch().getId(),
+////								this.getSearcherCutoffValuesSearchLevel(),
+////								this.getProtein1().getNrProtein().getNrseqId(),
+////								this.getProtein2().getNrProtein().getNrseqId(),
+////								YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
 //			}
 //
 //			return this.numUniqueLinkedPeptides;
@@ -147,6 +156,40 @@ public class SearchProteinDimer  {
 //	public void setNumUniqueLinkedPeptides(int numUniqueLinkedPeptides) {
 //		this.numUniqueLinkedPeptides = numUniqueLinkedPeptides;
 //	}
+//	
+//
+//
+//	private void populateNumPsmNumPeptideNumUniquePeptide() throws Exception {
+//		
+//		try {
+//
+//			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+//					NumPeptidesPSMsForProteinCriteriaSearcher.getInstance()
+//					.getNumPeptidesPSMsForLooplink(
+//							this.getSearch().getId(),
+//							this.getSearcherCutoffValuesSearchLevel(),
+//							this.getProtein().getNrProtein().getNrseqId(),
+//							this.getProteinPosition1(),
+//							this.getProteinPosition2(),
+//							YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
+//			
+//			this.numPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
+//			this.numUniquePeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
+//			
+//			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
+//
+//		} catch ( Exception e ) {
+//
+//			String msg = "Exception in populateNumPsmNumPeptideNumUniquePeptide()";
+//
+//			log.error( msg, e );
+//
+//			throw e;
+//		}
+//		
+//		
+//	}
+	
 
 
 	public SearchDTO getSearch() {

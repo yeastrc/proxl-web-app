@@ -7,8 +7,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
-import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
+import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
+import org.yeastrc.xlink.searchers.NumPeptidesPSMsForProteinCriteriaSearcher;
 import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 
@@ -57,15 +57,8 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 		try {
 			if( this.numPsms == null ) {
 								
-				this.numPsms =
-						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForCrosslink(
-								this.getSearch().getId(),
-								this.getSearcherCutoffValuesSearchLevel(),
-								this.getProtein1().getNrProtein().getNrseqId(),
-								this.getProtein2().getNrProtein().getNrseqId(),
-								this.getProtein1Position(),
-								this.getProtein2Position() );
-
+				populateNumPsmNumPeptideNumUniquePeptide();
+				
 			}
 
 			return this.numPsms;
@@ -85,15 +78,8 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 		try {
 			if( this.numLinkedPeptides == -1 ) {
 				
-				this.numLinkedPeptides = 
-						NumPeptidesForProteinCriteriaSearcher.getInstance()
-						.getNumLinkedPeptidesForCrosslink( 
-								this.getSearch().getId(),
-								this.getSearcherCutoffValuesSearchLevel(),
-								this.getProtein1().getNrProtein().getNrseqId(),
-								this.getProtein2().getNrProtein().getNrseqId(),
-								this.getProtein1Position(),
-								this.getProtein2Position() );
+				populateNumPsmNumPeptideNumUniquePeptide();
+				
 			}
 
 			return this.numLinkedPeptides;
@@ -114,16 +100,7 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 		try {
 			if( this.numUniqueLinkedPeptides == -1 ) {
 				
-				this.numUniqueLinkedPeptides = 
-						NumPeptidesForProteinCriteriaSearcher.getInstance()
-						.getNumUniqueLinkedPeptidesForCrosslink(
-								this.getSearch().getId(),
-								this.getSearcherCutoffValuesSearchLevel(),
-								this.getProtein1().getNrProtein().getNrseqId(),
-								this.getProtein2().getNrProtein().getNrseqId(),
-								this.getProtein1Position(),
-								this.getProtein2Position(),
-								YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
+				populateNumPsmNumPeptideNumUniquePeptide();
 			}
 
 			return this.numUniqueLinkedPeptides;
@@ -137,6 +114,39 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 			throw e;
 		}
 	}
+	
+	
+	private void populateNumPsmNumPeptideNumUniquePeptide() throws Exception {
+		
+		try {
+
+			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+					NumPeptidesPSMsForProteinCriteriaSearcher.getInstance()
+					.getNumPeptidesPSMsForCrosslink(
+							this.getSearch().getId(),
+							this.getSearcherCutoffValuesSearchLevel(),
+							this.getProtein1().getNrProtein().getNrseqId(),
+							this.getProtein2().getNrProtein().getNrseqId(),
+							this.getProtein1Position(),
+							this.getProtein2Position(),
+							YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
+			
+			this.numLinkedPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
+			this.numUniqueLinkedPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
+			
+			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
+
+		} catch ( Exception e ) {
+
+			String msg = "Exception in populateNumPsmNumPeptideNumUniquePeptide()";
+
+			log.error( msg, e );
+
+			throw e;
+		}
+		
+		
+	}
 
 	
 	
@@ -145,6 +155,9 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 	 * @param numPsms
 	 */
 	public void setNumPsms(Integer numPsms) {
+	
+		//  TODO  TEMP
+		
 		this.numPsms = numPsms;
 	}
 	

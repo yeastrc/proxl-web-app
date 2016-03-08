@@ -3,11 +3,15 @@ package org.yeastrc.xlink.www.objects;
 
 import java.util.List;
 
+
 //import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 //import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
 //import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
+//import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
+//import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
+//import org.yeastrc.xlink.searchers.NumPeptidesPSMsForProteinCriteriaSearcher;
 //import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 
@@ -69,11 +73,13 @@ public class SearchProteinUnlinked {
 //		try {
 //			if( this.numPsms == null ) {
 //				
-//				this.numPsms =
-//						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForUnlinked(
-//								this.getSearch().getId(),
-//								this.getSearcherCutoffValuesSearchLevel(),
-//								this.getProtein().getNrProtein().getNrseqId() );
+//				populateNumPsmNumPeptideNumUniquePeptide();
+//				
+////				this.numPsms =
+////						NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForUnlinked(
+////								this.getSearch().getId(),
+////								this.getSearcherCutoffValuesSearchLevel(),
+////								this.getProtein().getNrProtein().getNrseqId() );
 //
 //			}
 //
@@ -133,12 +139,14 @@ public class SearchProteinUnlinked {
 //		try {
 //			if( this.numPeptides == -1 ) {
 //				
-//				this.numPeptides = 
-//						NumPeptidesForProteinCriteriaSearcher.getInstance()
-//						.getNumPeptidesForUnlinked(
-//								this.getSearch().getId(),
-//								this.getSearcherCutoffValuesSearchLevel(),
-//								this.getProtein().getNrProtein().getNrseqId() );
+//				populateNumPsmNumPeptideNumUniquePeptide();
+//				
+////				this.numPeptides = 
+////						NumPeptidesForProteinCriteriaSearcher.getInstance()
+////						.getNumPeptidesForUnlinked(
+////								this.getSearch().getId(),
+////								this.getSearcherCutoffValuesSearchLevel(),
+////								this.getProtein().getNrProtein().getNrseqId() );
 //			}
 //
 //			return this.numPeptides;
@@ -163,15 +171,16 @@ public class SearchProteinUnlinked {
 //		try {
 //			if( this.numUniquePeptides == -1 ) {
 //				
-//				
 //
-//				this.numUniquePeptides = 
-//						NumPeptidesForProteinCriteriaSearcher.getInstance()
-//						.getNumUniquePeptidesForUnlinked(
-//								this.getSearch().getId(),
-//								this.getSearcherCutoffValuesSearchLevel(),
-//								this.getProtein().getNrProtein().getNrseqId(),
-//								YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
+//				populateNumPsmNumPeptideNumUniquePeptide();
+////
+////				this.numUniquePeptides = 
+////						NumPeptidesForProteinCriteriaSearcher.getInstance()
+////						.getNumUniquePeptidesForUnlinked(
+////								this.getSearch().getId(),
+////								this.getSearcherCutoffValuesSearchLevel(),
+////								this.getProtein().getNrProtein().getNrseqId(),
+////								YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
 //			}
 //
 //			return this.numUniquePeptides;
@@ -185,7 +194,38 @@ public class SearchProteinUnlinked {
 //			throw e;
 //		}
 //	}
-
+//
+//
+//
+//	private void populateNumPsmNumPeptideNumUniquePeptide() throws Exception {
+//		
+//		try {
+//
+//			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+//					NumPeptidesPSMsForProteinCriteriaSearcher.getInstance()
+//					.getNumPeptidesPSMsForUnlinked(
+//							this.getSearch().getId(),
+//							this.getSearcherCutoffValuesSearchLevel(),
+//							this.getProtein().getNrProtein().getNrseqId(),
+//							YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
+//			
+//			this.numPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
+//			this.numUniquePeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
+//			
+//			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
+//
+//		} catch ( Exception e ) {
+//
+//			String msg = "Exception in populateNumPsmNumPeptideNumUniquePeptide()";
+//
+//			log.error( msg, e );
+//
+//			throw e;
+//		}
+//		
+//		
+//	}
+	
 	public List<String> getPsmAnnotationValueList() {
 		return psmAnnotationValueList;
 	}

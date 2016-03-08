@@ -9,7 +9,9 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
+import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
+import org.yeastrc.xlink.searchers.NumPeptidesPSMsForProteinCriteriaSearcher;
+import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 import org.yeastrc.xlink.www.searcher.MergedSearchCrosslinkPeptideSearcher;
 import org.yeastrc.xlink.www.searcher.SearchProteinCrosslinkSearcher;
 
@@ -42,7 +44,7 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 		
 		try {
 
-			//  Used in Action for isFilterOnlyOnePSM and isFilterOnlyOnePeptide
+			//  Used in Web service for isFilterOnlyOnePSM and isFilterOnlyOnePeptide
 
 
 			if ( searchProteinCrosslinks == null ) {
@@ -96,7 +98,13 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 		}
 	}
 
-	
+	public void setSearchProteinCrosslinks(
+			Map<SearchDTO, SearchProteinCrosslink> searchProteinCrosslinks) {
+		
+		this.searchProteinCrosslinks = searchProteinCrosslinks;
+	}
+
+
 
 	
 	
@@ -127,20 +135,14 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 	}
 	
 	public int getNumPsms() throws Exception {
-		
-		if( this.numPsms == null ) {
+
+		try {
+
+			if( this.numPsms == null ) {
 		
 			
 			//  Use code in  SearchProteinCrosslink.getNumPsms() for each search
-//			
-//			NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForCrosslink(
-//					this.getSearch().getId(),
-//					this.getSearcherCutoffValuesSearchLevel(),
-//					this.getProtein1().getNrProtein().getNrseqId(),
-//					this.getProtein2().getNrProtein().getNrseqId(),
-//					this.getProtein1Position(),
-//					this.getProtein2Position() );
-
+		
 			int totalNumPsms = 0;
 			
 			for ( SearchDTO search : searches ) {
@@ -156,22 +158,37 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 					throw new Exception(msg);
 				}
 				
+				NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+						NumPeptidesPSMsForProteinCriteriaSearcher.getInstance()
+						.getNumPeptidesPSMsForCrosslink(
+								searchId,
+								searcherCutoffValuesSearchLevel,
+								this.getProtein1().getNrProtein().getNrseqId(),
+								this.getProtein2().getNrProtein().getNrseqId(),
+								this.getProtein1Position(),
+								this.getProtein2Position(),
+								YRC_NRSEQUtils.getDatabaseIdFromName( search.getFastaFilename() ) );
 				
-				int numPsmsForSearch = NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForCrosslink(
-						searchId,
-						searcherCutoffValuesSearchLevel,
-						this.getProtein1().getNrProtein().getNrseqId(),
-						this.getProtein2().getNrProtein().getNrseqId(),
-						this.getProtein1Position(),
-						this.getProtein2Position() );
 				
-				totalNumPsms += numPsmsForSearch;
+				totalNumPsms += numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
+				
 			}
 			
 			this.numPsms = totalNumPsms;
 		}
 		
 		return this.numPsms;
+		
+
+		} catch ( Exception e ) {
+
+			String msg = "Exception in getNumPsms()";
+
+			log.error( msg, e );
+
+			throw e;
+		}
+		
 	}
 
 	public void setNumPsms(Integer numPsms) {
@@ -192,8 +209,16 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 		try {
 
 
-			if( this.numLinkedPeptides == -1 )
+			if( this.numLinkedPeptides == -1 ) {
+
+//				if ( true ) {
+//					
+//					throw new Exception("NOT IMPLEMENTED");
+//				}
+
 				this.numLinkedPeptides = MergedSearchCrosslinkPeptideSearcher.getInstance().getNumLinkedPeptides( this );
+				
+			}
 
 			return this.numLinkedPeptides;
 
@@ -277,6 +302,10 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 	
 
 	
+
+
+
+
 	private SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel;
 
 	/**

@@ -9,7 +9,9 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;
+import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
+import org.yeastrc.xlink.searchers.NumPeptidesPSMsForProteinCriteriaSearcher;
+import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 import org.yeastrc.xlink.www.searcher.MergedSearchMonolinkPeptideSearcher;
 import org.yeastrc.xlink.www.searcher.SearchProteinMonolinkSearcher;
 
@@ -111,14 +113,6 @@ public class MergedSearchProteinMonolink {
 			
 
 			//  Use code in  SearchProteinMonolink.getNumPsms() for each search
-//			
-//			NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForMonolink(
-//					this.getSearch().getId(),
-//					this.getSearcherCutoffValuesSearchLevel(),
-//					this.getProtein1().getNrProtein().getNrseqId(),
-//					this.getProtein2().getNrProtein().getNrseqId(),
-//					this.getProtein1Position(),
-//					this.getProtein2Position() );
 
 			int totalNumPsms = 0;
 			
@@ -135,14 +129,19 @@ public class MergedSearchProteinMonolink {
 					throw new Exception(msg);
 				}
 				
+
+
+				NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+						NumPeptidesPSMsForProteinCriteriaSearcher.getInstance()
+						.getNumPeptidesPSMsForMonolink(
+								searchId,
+								searcherCutoffValuesSearchLevel,
+								this.getProtein().getNrProtein().getNrseqId(),
+								this.getProteinPosition(),
+								YRC_NRSEQUtils.getDatabaseIdFromName( search.getFastaFilename() ) );
 				
-				int numPsmsForSearch = NumPsmsForProteinCriteriaSearcher.getInstance().getNumPsmsForMonolink(
-						searchId,
-						searcherCutoffValuesSearchLevel,
-						this.getProtein().getNrProtein().getNrseqId(),
-						this.getProteinPosition() );
-				
-				totalNumPsms += numPsmsForSearch;
+				totalNumPsms += numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
+
 			}
 			
 			this.numPsms = totalNumPsms;
