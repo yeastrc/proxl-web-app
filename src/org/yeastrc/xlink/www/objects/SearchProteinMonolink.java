@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.number_peptides_psms.NumPeptidesPSMsForProteinCriteria;
+import org.yeastrc.xlink.number_peptides_psms.NumPeptidesPSMsForProteinCriteriaResult;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
-import org.yeastrc.xlink.searchers.NumPeptidesPSMsForProteinCriteriaSearcher;
 import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 
@@ -154,7 +154,7 @@ public class SearchProteinMonolink {
 		try {
 
 			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
-					NumPeptidesPSMsForProteinCriteriaSearcher.getInstance()
+					NumPeptidesPSMsForProteinCriteria.getInstance()
 					.getNumPeptidesPSMsForMonolink(
 							this.getSearch().getId(),
 							this.getSearcherCutoffValuesSearchLevel(),

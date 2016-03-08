@@ -7,12 +7,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.number_peptides_psms.NumMergedPeptidesPSMsForProteinCriteria;
+import org.yeastrc.xlink.number_peptides_psms.NumPeptidesPSMsForProteinCriteriaResult;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
-import org.yeastrc.xlink.searchers.NumPeptidesPSMsForProteinCriteriaSearcher;
-import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
-import org.yeastrc.xlink.www.searcher.MergedSearchCrosslinkPeptideSearcher;
 import org.yeastrc.xlink.www.searcher.SearchProteinCrosslinkSearcher;
 
 /**
@@ -140,44 +138,10 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 
 			if( this.numPsms == null ) {
 		
-			
-			//  Use code in  SearchProteinCrosslink.getNumPsms() for each search
-		
-			int totalNumPsms = 0;
-			
-			for ( SearchDTO search : searches ) {
-								
-				int searchId = search.getId();
-				
-				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
-				
-				if ( searcherCutoffValuesSearchLevel == null ) {
-					
-					String msg = "No searcherCutoffValuesSearchLevel found in searcherCutoffValuesRootLevel for search id: " + searchId;
-					log.error( msg );
-					throw new Exception(msg);
-				}
-				
-				NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
-						NumPeptidesPSMsForProteinCriteriaSearcher.getInstance()
-						.getNumPeptidesPSMsForCrosslink(
-								searchId,
-								searcherCutoffValuesSearchLevel,
-								this.getProtein1().getNrProtein().getNrseqId(),
-								this.getProtein2().getNrProtein().getNrseqId(),
-								this.getProtein1Position(),
-								this.getProtein2Position(),
-								YRC_NRSEQUtils.getDatabaseIdFromName( search.getFastaFilename() ) );
-				
-				
-				totalNumPsms += numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
-				
+				populateNumPsmNumPeptideNumUniquePeptide();
 			}
-			
-			this.numPsms = totalNumPsms;
-		}
-		
-		return this.numPsms;
+
+			return this.numPsms;
 		
 
 		} catch ( Exception e ) {
@@ -211,13 +175,7 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 
 			if( this.numLinkedPeptides == -1 ) {
 
-//				if ( true ) {
-//					
-//					throw new Exception("NOT IMPLEMENTED");
-//				}
-
-				this.numLinkedPeptides = MergedSearchCrosslinkPeptideSearcher.getInstance().getNumLinkedPeptides( this );
-				
+				populateNumPsmNumPeptideNumUniquePeptide();
 			}
 
 			return this.numLinkedPeptides;
@@ -237,8 +195,10 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 		
 		try {
 			
-			if( this.numUniqueLinkedPeptides == -1 )
-				this.numUniqueLinkedPeptides = MergedSearchCrosslinkPeptideSearcher.getInstance().getNumUniqueLinkedPeptides( this );
+			if( this.numUniqueLinkedPeptides == -1 ) {
+				
+				populateNumPsmNumPeptideNumUniquePeptide();
+			}
 
 			return this.numUniqueLinkedPeptides;
 			
@@ -254,6 +214,40 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 		}
 
 	}
+	
+
+	
+	private void populateNumPsmNumPeptideNumUniquePeptide() throws Exception {
+		
+		try {
+
+			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+					NumMergedPeptidesPSMsForProteinCriteria.getInstance()
+					.getNumPeptidesPSMsForCrosslink(
+							searches,
+							this.getSearcherCutoffValuesRootLevel(),
+							this.getProtein1().getNrProtein().getNrseqId(),
+							this.getProtein2().getNrProtein().getNrseqId(),
+							this.getProtein1Position(),
+							this.getProtein2Position() );
+			
+			this.numLinkedPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
+			this.numUniqueLinkedPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
+			
+			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
+
+		} catch ( Exception e ) {
+
+			String msg = "Exception in populateNumPsmNumPeptideNumUniquePeptide()";
+
+			log.error( msg, e );
+
+			throw e;
+		}
+		
+		
+	}
+
 	
 	
 	public int getNumSearches() {

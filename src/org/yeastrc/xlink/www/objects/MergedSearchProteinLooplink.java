@@ -7,12 +7,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.number_peptides_psms.NumMergedPeptidesPSMsForProteinCriteria;
+import org.yeastrc.xlink.number_peptides_psms.NumPeptidesPSMsForProteinCriteriaResult;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searcher_result_objects.NumPeptidesPSMsForProteinCriteriaResult;
-import org.yeastrc.xlink.searchers.NumPeptidesPSMsForProteinCriteriaSearcher;
-import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
-import org.yeastrc.xlink.www.searcher.MergedSearchLooplinkPeptideSearcher;
 import org.yeastrc.xlink.www.searcher.SearchProteinLooplinkSearcher;
 
 public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSearchLink {
@@ -113,41 +111,7 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 	public int getNumPsms() throws Exception {
 		
 		if( this.numPsms == null ) {
-		
-
-			//  Use code in  SearchProteinLooplink.getNumPsms() for each search
-
-			int totalNumPsms = 0;
-			
-			for ( SearchDTO search : searches ) {
-				
-				int searchId = search.getId();
-				
-				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
-				
-				if ( searcherCutoffValuesSearchLevel == null ) {
-					
-					String msg = "No searcherCutoffValuesSearchLevel found in searcherCutoffValuesRootLevel for search id: " + searchId;
-					log.error( msg );
-					throw new Exception(msg);
-				}
-				
-
-				NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
-						NumPeptidesPSMsForProteinCriteriaSearcher.getInstance()
-						.getNumPeptidesPSMsForLooplink(
-								searchId,
-								searcherCutoffValuesSearchLevel,
-								this.getProtein().getNrProtein().getNrseqId(),
-								this.getProteinPosition1(),
-								this.getProteinPosition2(),
-								YRC_NRSEQUtils.getDatabaseIdFromName( search.getFastaFilename() ) );
-				
-				totalNumPsms += numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
-				
-			}
-			
-			this.numPsms = totalNumPsms;
+			populateNumPsmNumPeptideNumUniquePeptide();
 		}
 		
 		return this.numPsms;
@@ -171,7 +135,7 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 		try {
 
 			if( this.numPeptides == -1 )
-				this.numPeptides = MergedSearchLooplinkPeptideSearcher.getInstance().getNumPeptides( this );
+				populateNumPsmNumPeptideNumUniquePeptide();
 
 			return this.numPeptides;
 		
@@ -191,7 +155,7 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 		try {
 			
 			if( this.numUniquePeptides == -1 )
-				this.numUniquePeptides = MergedSearchLooplinkPeptideSearcher.getInstance().getNumUniquePeptides( this );
+				populateNumPsmNumPeptideNumUniquePeptide();
 
 			return this.numUniquePeptides;
 
@@ -207,7 +171,37 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 	}
 	
 	
-	
+
+	private void populateNumPsmNumPeptideNumUniquePeptide() throws Exception {
+		
+		try {
+
+			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+					NumMergedPeptidesPSMsForProteinCriteria.getInstance()
+					.getNumPeptidesPSMsForLooplink(
+							searches,
+							this.getSearcherCutoffValuesRootLevel(),
+							this.getProtein().getNrProtein().getNrseqId(),
+							this.getProteinPosition1(),
+							this.getProteinPosition2() );
+			
+			this.numPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
+			this.numUniquePeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
+			
+			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
+
+		} catch ( Exception e ) {
+
+			String msg = "Exception in populateNumPsmNumPeptideNumUniquePeptide()";
+
+			log.error( msg, e );
+
+			throw e;
+		}
+		
+		
+	}
+
 	
 
 	public int getNumSearches() {
