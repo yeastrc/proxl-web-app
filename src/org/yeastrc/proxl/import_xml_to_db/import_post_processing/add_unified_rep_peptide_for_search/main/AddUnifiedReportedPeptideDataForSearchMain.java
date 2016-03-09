@@ -15,6 +15,7 @@ import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetHa
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetHasMonolinksForPsmIdSearcher;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetPsmCountForAllAnnTypeIdsSearchReptPeptideDefaultCutoffSearcher;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetReportedPeptideRecordsSearcher;
+import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.PsmPeptideSearcher;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.unified_reported_peptide.main.InsertIfNotInDBUnifiedReportedPeptideAndChildren;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.unified_reported_peptide.objects.UnifiedReportedPeptideObj;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.unified_reported_peptide.objects.UnifiedRpSinglePeptideDynamicMod;
@@ -26,6 +27,7 @@ import org.yeastrc.xlink.dao.MatchedPeptideDAO;
 import org.yeastrc.xlink.dao.PeptideDAO;
 import org.yeastrc.xlink.dao.PsmDAO;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
+import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.dao.SearchReportedPeptideDynamicModLookupDAO;
 import org.yeastrc.xlink.dao.UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -36,13 +38,16 @@ import org.yeastrc.xlink.dto.MatchedPeptideDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
+import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideDynamicModLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.searchers.AnnotationTypesForSearchIdPSMPeptideTypeSearcher;
+import org.yeastrc.xlink.searchers.PeptideUniqueSearcher;
 import org.yeastrc.xlink.utils.XLinkUtils;
+import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 /**
  * Add Unified Reported Peptide Data for the passed in search ID
@@ -198,6 +203,16 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 			Integer endReportedPeptideId 	// optional, null if no value
 			) throws Exception {
 		
+		SearchDTO search = SearchDAO.getInstance().getSearch(searchId);
+
+		if ( search == null ) {
+
+			throw new Exception("No search record for searchId: " + searchId );
+		}
+
+		int fastaFileDatabaseId = 
+				YRC_NRSEQUtils.getDatabaseIdFromName( search.getFastaFilename() );
+
 		
 		List<SearchReportedPeptideDTO> searchReportedPeptideList = 
 				GetReportedPeptideRecordsSearcher.getInstance()
@@ -261,6 +276,25 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 				boolean hasDynamicModifications = GetHasDynamicModificationsForPsmIdSearcher.getInstance().getHasDynamicModificationsForPsmId( psmId );
 				boolean hasMonolinks = GetHasMonolinksForPsmIdSearcher.getInstance().getHasMonolinksForPsmId( psmId );
 
+
+				List<Integer> peptideIdsForPsmId =
+						PsmPeptideSearcher.getInstance().getPeptideIdsFromPsmId( samplePsmId );
+				
+				if ( peptideIdsForPsmId.isEmpty() ) {
+
+					throw new Exception( "No psm_peptide found for searchId: " + searchId
+							+ ", reportedPeptideId: " + reportedPeptideId );
+				}
+				
+				boolean allRelatedPeptidesUniqueForSearch = true;
+				
+				for ( Integer peptideId : peptideIdsForPsmId ) {
+
+					if ( ! PeptideUniqueSearcher.getInstance().isPeptideUniqueForDatabaseId( peptideId, fastaFileDatabaseId ) ) {
+					
+						allRelatedPeptidesUniqueForSearch = false;
+					}
+				}
 				
 
 				UnifiedReportedPeptideObj unifiedReportedPeptideObj = new UnifiedReportedPeptideObj();
@@ -307,6 +341,8 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 				}
 				
 				
+				
+				
 				UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO = new UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO();
 
 				unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO.setSearchId( searchId );
@@ -317,6 +353,8 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 				unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO.setHasDynamicModifications( hasDynamicModifications );
 				unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO.setHasMonolinks( hasMonolinks );
 				
+				unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO.setAllRelatedPeptidesUniqueForSearch( allRelatedPeptidesUniqueForSearch );
+								
 				unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO.setPsmNumAtDefaultCutoff( psmNumAtDefaultCutoff );
 				
 				unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO.setPeptideMeetsDefaultCutoffs( peptideMeetsDefaultCutoffs );
