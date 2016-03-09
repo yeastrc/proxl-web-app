@@ -601,7 +601,7 @@ private List<String> peptideAnnotationValueList;
 								<c:forEach var="annotationDisplayValue" 
 										items="${ peptidePsmAnnotationValueListsForASearch.peptideAnnotationValueList }">
 									<td  class=" ${ backgroundColorClassName }    " 
-											style="width:10%;font-weight:bold;">
+											style="width:10%;">
 										<span style="white-space: nowrap"><c:out value="${ annotationDisplayValue }"></c:out></span>
 									</td>
 								</c:forEach>
@@ -611,7 +611,7 @@ private List<String> peptideAnnotationValueList;
 								<c:forEach var="annotationDisplayValue" 
 										items="${ peptidePsmAnnotationValueListsForASearch.psmAnnotationValueList }">
 									<td class=" ${ backgroundColorClassName }  tool_tip_attached_jq  " 
-											style="width:10%;font-weight:bold;">
+											style="width:10%;">
 										<span style="white-space: nowrap"><c:out value="${ annotationDisplayValue }"></c:out></span>
 									</td>
 								</c:forEach>

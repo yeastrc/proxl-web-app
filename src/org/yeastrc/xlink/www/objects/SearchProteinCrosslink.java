@@ -151,29 +151,29 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 	
 	
 	/**
-	 * Only set if the PSM and Peptide Cutoffs match
+	 * Only set if the PSM and Peptide Cutoffs match the defaults
 	 * @param numPsms
 	 */
 	public void setNumPsms(Integer numPsms) {
 	
-		//  TODO  TEMP
-		
 		this.numPsms = numPsms;
 	}
 	
 	/**
-	 * Only set if the PSM and Peptide Cutoffs match
+	 * Only set if the PSM and Peptide Cutoffs match the defaults
 	 * @param numLinkedPeptides
 	 */
 	public void setNumLinkedPeptides(int numLinkedPeptides) {
+		
 		this.numLinkedPeptides = numLinkedPeptides;
 	}
 	
 	/**
-	 * Only set if the PSM and Peptide Cutoffs match
+	 * Only set if the PSM and Peptide Cutoffs match the defaults
 	 * @param numUniqueLinkedPeptides
 	 */
 	public void setNumUniqueLinkedPeptides(int numUniqueLinkedPeptides) {
+		
 		this.numUniqueLinkedPeptides = numUniqueLinkedPeptides;
 	}
 
