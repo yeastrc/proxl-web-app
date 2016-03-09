@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
@@ -23,10 +24,8 @@ import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searchers.PeptideUniqueSearcher;
 import org.yeastrc.xlink.searchers.PsmCountForSearchIdReportedPeptideIdSearcher;
 import org.yeastrc.xlink.utils.XLinkUtils;
-import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 /**
  * Version of NumPeptidesPSMsForProteinCriteriaSearcher for Merged Proteins
@@ -59,9 +58,6 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 			+ " AND " + SQL_LINK_TABLE_ALIAS + ".protein_1_position = ? "
 			+ " AND " + SQL_LINK_TABLE_ALIAS + ".protein_2_position = ? ";
 	
-
-	private final String SQL_CROSSLINK_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE = "peptide_1_id";
-	private final String SQL_CROSSLINK_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE = "peptide_2_id";
 
 	/**
 	 * Get the number of peptides (pair of peptides) that UNIQUELY identified the pair of proteins+positions represented by this crosslink
@@ -102,9 +98,7 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 				linkTableParams, 
 				XLinkUtils.CROSS_TYPE_STRING, 
 				SQL_CROSSLINK_TABLE_NAME, 
-				SQL_CROSSLINK_WHERE_FOR_LINK_TABLE,
-				SQL_CROSSLINK_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE,
-				SQL_CROSSLINK_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE ) ;
+				SQL_CROSSLINK_WHERE_FOR_LINK_TABLE ) ;
 		
 	}
 
@@ -124,10 +118,6 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 	"  " + SQL_LINK_TABLE_ALIAS + ".nrseq_id = ? "
 			+ " AND " + SQL_LINK_TABLE_ALIAS + ".protein_position_1 = ? "
 			+ " AND " + SQL_LINK_TABLE_ALIAS + ".protein_position_2 = ? ";
-	
-
-	private final String SQL_LOOPLINK_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE = "peptide_id";
-	private final String SQL_LOOPLINK_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE = null;
 
 	/**
 	 * Get the number of peptides (pair of peptides) that UNIQUELY identified the pair of proteins+positions represented by this looplink
@@ -164,9 +154,7 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 				linkTableParams, 
 				XLinkUtils.LOOP_TYPE_STRING, 
 				SQL_LOOPLINK_TABLE_NAME, 
-				SQL_LOOPLINK_WHERE_FOR_LINK_TABLE,
-				SQL_LOOPLINK_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE,
-				SQL_LOOPLINK_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE ) ;
+				SQL_LOOPLINK_WHERE_FOR_LINK_TABLE ) ;
 		
 	}
 
@@ -190,9 +178,6 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 	"  " + SQL_LINK_TABLE_ALIAS + ".nrseq_id = ? "
 			+ " AND " + SQL_LINK_TABLE_ALIAS + ".protein_position = ? ";
 
-
-	private final String SQL_MONOLINK_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE = "peptide_id";
-	private final String SQL_MONOLINK_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE = null;
 
 	/**
 	 * Get the number of peptides (pair of peptides) that UNIQUELY identified the pair of proteins+positions represented by this monolink
@@ -227,9 +212,7 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 				linkTableParams, 
 				null /* link type */, 
 				SQL_MONOLINK_TABLE_NAME, 
-				SQL_MONOLINK_WHERE_FOR_LINK_TABLE,
-				SQL_MONOLINK_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE,
-				SQL_MONOLINK_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE ) ;
+				SQL_MONOLINK_WHERE_FOR_LINK_TABLE ) ;
 		
 
 	}
@@ -245,9 +228,6 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 
 	"  " + SQL_LINK_TABLE_ALIAS + ".nrseq_id_1 = ? "
 			+ " AND " + SQL_LINK_TABLE_ALIAS + ".nrseq_id_2 = ? ";
-
-	private final String SQL_DIMER_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE = "peptide_1_id";
-	private final String SQL_DIMER_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE = "peptide_2_id";
 
 	/**
 	 * Get the number of peptides (pair of peptides) that UNIQUELY identified the pair of proteins+positions represented by this dimer
@@ -279,9 +259,7 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 				linkTableParams, 
 				XLinkUtils.DIMER_TYPE_STRING, 
 				SQL_DIMER_TABLE_NAME, 
-				SQL_DIMER_WHERE_FOR_LINK_TABLE,
-				SQL_DIMER_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE,
-				SQL_DIMER_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE ) ;
+				SQL_DIMER_WHERE_FOR_LINK_TABLE ) ;
 	}
 
 
@@ -298,10 +276,6 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 	private final String SQL_UNLINKED_WHERE_FOR_LINK_TABLE = 
 
 	"  " + SQL_LINK_TABLE_ALIAS + ".nrseq_id = ? ";
-
-
-	private final String SQL_UNLINKED_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE = "peptide_id";
-	private final String SQL_UNLINKED_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE = null;
 
 	/**
 	 * Get the number of peptides (pair of peptides) that UNIQUELY identified the pair of proteins+positions represented by this unlinked
@@ -331,9 +305,7 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 				linkTableParams, 
 				XLinkUtils.UNLINKED_TYPE_STRING, 
 				SQL_UNLINKED_TABLE_NAME, 
-				SQL_UNLINKED_WHERE_FOR_LINK_TABLE,
-				SQL_UNLINKED_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE,
-				SQL_UNLINKED_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE ) ;
+				SQL_UNLINKED_WHERE_FOR_LINK_TABLE ) ;
 	}
 
 
@@ -351,9 +323,7 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 			int[] linkTableParams,
 			String linkTypeString,  // null for monolink
 			String linkTableName,
-			String sqlWhereForlinkTable,
-			String peptide_1_fieldName,
-			String peptide_2_fieldName //  may be null
+			String sqlWhereForlinkTable
 			 ) throws Exception {
 
 		if ( linkTableParams == null ) {
@@ -415,9 +385,7 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 							linkTableParams, 
 							linkTypeString, 
 							linkTableName, 
-							sqlWhereForlinkTable, 
-							peptide_1_fieldName, 
-							peptide_2_fieldName );
+							sqlWhereForlinkTable );
 			
 			for ( SinglePeptidePerSearchData singlePeptidePerSearchData : resultsForSingleSearch ) {
 
@@ -481,17 +449,12 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 			int[] linkTableParams,
 			String linkTypeString,  // null for monolink
 			String linkTableName,
-			String sqlWhereForlinkTable,
-			String peptide_1_fieldName,
-			String peptide_2_fieldName //  may be null
+			String sqlWhereForlinkTable
 			
 			) throws Exception {
 		
 		
 		List<SinglePeptidePerSearchData> resultsForSingleSearch = new ArrayList<>();
-		
-		int fastaFileDatabaseId = 
-				YRC_NRSEQUtils.getDatabaseIdFromName( search.getFastaFilename() );
 		
 		int searchId = paramsPreProcesingResult.searchId;
 		
@@ -512,8 +475,6 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 				paramsPreProcesingResult, 
 				linkTypeString, 
 				linkTableName, 
-				peptide_1_fieldName,
-				peptide_2_fieldName, //  may be null
 				sqlWhereForlinkTable );
 		
 		try {
@@ -524,14 +485,18 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 
 			int paramCounter = 0;
 
-			paramCounter++;
-			pstmt.setInt( paramCounter,  searchId );
 
+			//  Subquery Join for link table
+			
 			for ( int linkTableParam : linkTableParams ) {
 
 				paramCounter++;
 				pstmt.setInt( paramCounter,  linkTableParam );
 			}
+			
+			paramCounter++;
+			pstmt.setInt( paramCounter,  searchId );
+
 
 			// Process PSM And Peptide Cutoffs for WHERE
 
@@ -557,64 +522,32 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 					log.error( msg );
 					throw new ProxlBaseDataException(msg);
 				}
-				
-				int psmCountForReportedPeptideSearchId = 
+
+				boolean allRelatedPeptidesUniqueForSearch = false;
+
+				int allRelatedPeptidesUniqueForSearchInt = rs.getInt( "related_peptides_unique_for_search" );
+
+				if ( Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE == allRelatedPeptidesUniqueForSearchInt ) {
+					allRelatedPeptidesUniqueForSearch = true;
+				}
+
+				int psmCountForReportedPeptideSearchId = rs.getInt( "psm_num_at_default_cutoff" );
+
+				if ( ! paramsPreProcesingResult.onlyDefaultPsmCutoffs ) {
+
+					psmCountForReportedPeptideSearchId = 
 						PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
 						.getPsmCountForSearchIdReportedPeptideId( reportedPeptideId, searchId, searcherCutoffValuesSearchLevel );
+				}
 				
 				if ( psmCountForReportedPeptideSearchId > 0 ) {
-					
-					//  Get if reported peptide is unique
-
-
-					boolean reportedPeptideIsUnique = false;
-					
-					boolean peptide_1_IsUnique = false;
-					boolean peptide_2_IsUnique = false;
-
-					int peptide_1_Id = rs.getInt( peptide_1_fieldName );
-
-					if ( isPeptideUnique( peptide_1_Id, fastaFileDatabaseId ) ) {
-						
-						peptide_1_IsUnique = true;
-					}
-					
-					if ( peptide_2_fieldName == null ) {
-						
-						if ( peptide_1_IsUnique ) {
-							
-							reportedPeptideIsUnique = true;
-						}
-						
-					} else {
-						
-
-						int peptide_2_Id = rs.getInt( peptide_2_fieldName );
-						
-						if ( peptide_2_Id == peptide_1_Id ) {
-							
-							 peptide_2_IsUnique = peptide_1_IsUnique;
-							 
-						} else {
-
-							if ( isPeptideUnique( peptide_2_Id, fastaFileDatabaseId ) ) {
-
-								peptide_2_IsUnique = true;
-							}
-						}
-						
-						if ( peptide_1_IsUnique && peptide_2_IsUnique ) {
-							
-							reportedPeptideIsUnique = true;
-						}
-					}
 
 					SinglePeptidePerSearchData singlePeptidePerSearchData = new SinglePeptidePerSearchData();
 
 					singlePeptidePerSearchData.searchId = searchId;
 					singlePeptidePerSearchData.reportedPeptideId = reportedPeptideId;
 					singlePeptidePerSearchData.psmCountForReportedPeptideSearchId += psmCountForReportedPeptideSearchId;
-					singlePeptidePerSearchData.isPeptideUnique = reportedPeptideIsUnique;
+					singlePeptidePerSearchData.isPeptideUnique = allRelatedPeptidesUniqueForSearch;
 					
 					resultsForSingleSearch.add( singlePeptidePerSearchData );
 				}
@@ -654,18 +587,6 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 	}
 	
 	
-	
-	/**
-	 * @param peptideId
-	 * @param fastaFileDatabaseId
-	 * @return
-	 * @throws Exception 
-	 */
-	private boolean isPeptideUnique( int peptideId, int fastaFileDatabaseId ) throws Exception {
-		
-		return PeptideUniqueSearcher.getInstance().isPeptideUniqueForDatabaseId( peptideId, fastaFileDatabaseId );
-	}
-
 	
 
 	
@@ -820,10 +741,6 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 			String linkTypeString, // null for monolink
 			
 			String linkTableName, 
-
-			String peptide_1_fieldName,
-			String peptide_2_fieldName, //  may be null
-
 			String sqlWhereForlinkTable
 			 ) throws Exception {
 		
@@ -835,27 +752,37 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 		boolean onlyDefaultPsmCutoffs = paramsPreProcesingResult.onlyDefaultPsmCutoffs;
 		
 		StringBuilder sqlSB = new StringBuilder( 1000 );
-		
+
 		sqlSB.append( "SELECT distinct unified_rp__rep_pept__search__generic_lookup.reported_peptide_id AS reported_peptide_id "  );
 		
-		sqlSB.append( " , " );
-		sqlSB.append( SQL_LINK_TABLE_ALIAS );
-		sqlSB.append( "." );
-		sqlSB.append( peptide_1_fieldName );
+		sqlSB.append( " , unified_rp__rep_pept__search__generic_lookup.related_peptides_unique_for_search " );
+		sqlSB.append( " , unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff " );
+		
+		
 
-		if ( peptide_2_fieldName != null ) {
-
-			sqlSB.append( " , " );
-			sqlSB.append( SQL_LINK_TABLE_ALIAS );
-			sqlSB.append( "." );
-			sqlSB.append( peptide_2_fieldName );
-		}
-
-		sqlSB.append( "  FROM unified_rp__rep_pept__search__generic_lookup  " );
+		sqlSB.append( " FROM unified_rp__rep_pept__search__generic_lookup  " );
+		
+		//  Join with link table subquery
+		
 		sqlSB.append( "INNER JOIN " );
+		
+		sqlSB.append( " ( " );
+		sqlSB.append( "SELECT distinct  "  );
+		sqlSB.append( SQL_LINK_TABLE_ALIAS );
+		sqlSB.append( ".psm_id " );
+				
+		sqlSB.append( " FROM " );
 		sqlSB.append( linkTableName );
 		sqlSB.append( " AS " );
 		sqlSB.append( SQL_LINK_TABLE_ALIAS );
+		sqlSB.append( " WHERE " );
+		sqlSB.append( sqlWhereForlinkTable );
+
+		sqlSB.append( " ) AS " );
+
+		sqlSB.append( SQL_LINK_TABLE_ALIAS );
+
+		
 		sqlSB.append( " ON unified_rp__rep_pept__search__generic_lookup.sample_psm_id = " );
 		sqlSB.append( SQL_LINK_TABLE_ALIAS );
 		sqlSB.append( ".psm_id " );
@@ -940,9 +867,7 @@ public class NumMergedPeptidesPSMsForProteinCriteria {
 
 		///////////
 		
-		sqlSB.append( " WHERE unified_rp__rep_pept__search__generic_lookup.search_id = ? AND " );
-		
-		sqlSB.append( sqlWhereForlinkTable );
+		sqlSB.append( " WHERE unified_rp__rep_pept__search__generic_lookup.search_id = ? " );
 		
 		
 		//////////

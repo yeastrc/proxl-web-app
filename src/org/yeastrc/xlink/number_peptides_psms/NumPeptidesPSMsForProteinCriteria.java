@@ -51,9 +51,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 			+ " AND " + SQL_LINK_TABLE_ALIAS + ".protein_2_position = ? ";
 	
 
-	private final String SQL_CROSSLINK_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE = "peptide_1_id";
-	private final String SQL_CROSSLINK_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE = "peptide_2_id";
-
 	/**
 	 * Get the number of peptides (pair of peptides) that UNIQUELY identified the pair of proteins+positions represented by this crosslink
 	 * 
@@ -96,8 +93,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 				XLinkUtils.CROSS_TYPE_STRING, 
 				SQL_CROSSLINK_TABLE_NAME, 
 				SQL_CROSSLINK_WHERE_FOR_LINK_TABLE,
-				SQL_CROSSLINK_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE,
-				SQL_CROSSLINK_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE,
 				fastaFileDatabaseId ) ;
 		
 	}
@@ -119,9 +114,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 			+ " AND " + SQL_LINK_TABLE_ALIAS + ".protein_position_1 = ? "
 			+ " AND " + SQL_LINK_TABLE_ALIAS + ".protein_position_2 = ? ";
 	
-
-	private final String SQL_LOOPLINK_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE = "peptide_id";
-	private final String SQL_LOOPLINK_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE = null;
 
 	/**
 	 * Get the number of peptides (pair of peptides) that UNIQUELY identified the pair of proteins+positions represented by this looplink
@@ -162,8 +154,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 				XLinkUtils.LOOP_TYPE_STRING, 
 				SQL_LOOPLINK_TABLE_NAME, 
 				SQL_LOOPLINK_WHERE_FOR_LINK_TABLE,
-				SQL_LOOPLINK_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE,
-				SQL_LOOPLINK_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE,
 				fastaFileDatabaseId ) ;
 		
 	}
@@ -188,9 +178,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 	"  " + SQL_LINK_TABLE_ALIAS + ".nrseq_id = ? "
 			+ " AND " + SQL_LINK_TABLE_ALIAS + ".protein_position = ? ";
 
-
-	private final String SQL_MONOLINK_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE = "peptide_id";
-	private final String SQL_MONOLINK_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE = null;
 
 	/**
 	 * Get the number of peptides (pair of peptides) that UNIQUELY identified the pair of proteins+positions represented by this monolink
@@ -229,8 +216,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 				null /* link type */, 
 				SQL_MONOLINK_TABLE_NAME, 
 				SQL_MONOLINK_WHERE_FOR_LINK_TABLE,
-				SQL_MONOLINK_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE,
-				SQL_MONOLINK_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE,
 				fastaFileDatabaseId ) ;
 		
 
@@ -247,9 +232,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 
 	"  " + SQL_LINK_TABLE_ALIAS + ".nrseq_id_1 = ? "
 			+ " AND " + SQL_LINK_TABLE_ALIAS + ".nrseq_id_2 = ? ";
-
-	private final String SQL_DIMER_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE = "peptide_1_id";
-	private final String SQL_DIMER_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE = "peptide_2_id";
 
 	/**
 	 * Get the number of peptides (pair of peptides) that UNIQUELY identified the pair of proteins+positions represented by this dimer
@@ -284,8 +266,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 				XLinkUtils.DIMER_TYPE_STRING, 
 				SQL_DIMER_TABLE_NAME, 
 				SQL_DIMER_WHERE_FOR_LINK_TABLE,
-				SQL_DIMER_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE,
-				SQL_DIMER_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE,
 				fastaFileDatabaseId ) ;
 	}
 
@@ -304,9 +284,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 
 	"  " + SQL_LINK_TABLE_ALIAS + ".nrseq_id = ? ";
 
-
-	private final String SQL_UNLINKED_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE = "peptide_id";
-	private final String SQL_UNLINKED_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE = null;
 
 	/**
 	 * Get the number of peptides (pair of peptides) that UNIQUELY identified the pair of proteins+positions represented by this unlinked
@@ -339,8 +316,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 				XLinkUtils.UNLINKED_TYPE_STRING, 
 				SQL_UNLINKED_TABLE_NAME, 
 				SQL_UNLINKED_WHERE_FOR_LINK_TABLE,
-				SQL_UNLINKED_PEPTIDE_ID_1_FIELD_NAME_FOR_LINK_TABLE,
-				SQL_UNLINKED_PEPTIDE_ID_2_FIELD_NAME_FOR_LINK_TABLE,
 				fastaFileDatabaseId ) ;
 	}
 
@@ -360,8 +335,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 			String linkTypeString,  // null for monolink
 			String linkTableName,
 			String sqlWhereForlinkTable,
-			String peptide_1_fieldName,
-			String peptide_2_fieldName, //  may be null
 			int fastaFileDatabaseId ) throws Exception {
 
 		if ( linkTableParams == null ) {
@@ -394,8 +367,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 				paramsPreProcesingResult, 
 				linkTypeString, 
 				linkTableName, 
-				peptide_1_fieldName,
-				peptide_2_fieldName, //  may be null
 				sqlWhereForlinkTable );
 		
 		try {
@@ -622,10 +593,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 			String linkTypeString, // null for monolink
 			
 			String linkTableName, 
-
-			String peptide_1_fieldName,
-			String peptide_2_fieldName, //  may be null
-
 			String sqlWhereForlinkTable
 			 ) throws Exception {
 		
