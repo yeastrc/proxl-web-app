@@ -17,6 +17,7 @@ public class UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO {
 	
 	private boolean hasDynamicModifications;
 	private boolean hasMonolinks;
+	private boolean allRelatedPeptidesUniqueForSearch;
 
 	private int psmNumAtDefaultCutoff;
 
@@ -26,6 +27,8 @@ public class UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO {
 	 * Not applicable if there are no Peptide filterable annotations
 	 */
 	private Yes_No__NOT_APPLICABLE_Enum peptideMeetsDefaultCutoffs;
+
+	
 
 	@Override
 	public String toString() {
@@ -41,6 +44,8 @@ public class UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO {
 				+ hasDynamicModifications
 				+ ", hasMonolinks="
 				+ hasMonolinks
+				+ ", allRelatedPeptidesUniqueForSearch="
+				+ allRelatedPeptidesUniqueForSearch
 				+ ", psmNumAtDefaultCutoff="
 				+ psmNumAtDefaultCutoff
 				+ ", samplePsmId="
@@ -49,7 +54,7 @@ public class UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO {
 				+ peptideMeetsDefaultCutoffs
 				+ "]";
 	}
-	
+
 
 	/**
 	 * Not applicable if there are no Peptide filterable annotations
@@ -67,6 +72,16 @@ public class UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO {
 	public void setPeptideMeetsDefaultCutoffs(
 			Yes_No__NOT_APPLICABLE_Enum peptideMeetsDefaultCutoffs) {
 		this.peptideMeetsDefaultCutoffs = peptideMeetsDefaultCutoffs;
+	}
+
+	public boolean isAllRelatedPeptidesUniqueForSearch() {
+		return allRelatedPeptidesUniqueForSearch;
+	}
+
+
+	public void setAllRelatedPeptidesUniqueForSearch(
+			boolean allRelatedPeptidesUniqueForSearch) {
+		this.allRelatedPeptidesUniqueForSearch = allRelatedPeptidesUniqueForSearch;
 	}
 
 	

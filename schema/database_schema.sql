@@ -1448,6 +1448,7 @@ CREATE TABLE IF NOT EXISTS `unified_rp__rep_pept__search__generic_lookup` (
   `sample_psm_id` INT(10) UNSIGNED NOT NULL,
   `psm_num_at_default_cutoff` INT(10) UNSIGNED NOT NULL,
   `peptide_meets_default_cutoffs` ENUM('yes','no','not_applicable') NOT NULL,
+  `related_peptides_unique_for_search` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`unified_reported_peptide_id`, `reported_peptide_id`, `search_id`),
   CONSTRAINT `unified_rp__rep_pept__search__generic_lookup__sample_psm_id_fk`
     FOREIGN KEY (`sample_psm_id`)

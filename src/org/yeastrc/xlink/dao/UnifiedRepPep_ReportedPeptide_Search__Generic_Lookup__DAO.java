@@ -133,7 +133,8 @@ public class UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO {
 //	  has_monolinks TINYINT(3) UNSIGNED NOT NULL,
 //	  psm_num_at_default_cutoff INT(10) UNSIGNED NOT NULL,
 //	  sample_psm_id INT(10) UNSIGNED NULL DEFAULT NULL,
-			  
+//	  peptide_meets_default_cutoffs enum('yes','no','not_applicable') NOT NULL,
+//	  related_peptides_unique_for_search tinyint(1) NOT NULL DEFAULT '0',			  
 
 	private static final String MONOLINK_TYPE_STRING = XLinkUtils.getTypeString( XLinkUtils.TYPE_MONOLINK ) ;
 
@@ -141,8 +142,9 @@ public class UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO {
 	private static final String SAVE_SQL =
 			"INSERT INTO unified_rp__rep_pept__search__generic_lookup "
 			+ 	"( unified_reported_peptide_id, reported_peptide_id, search_id, link_type, "
-			+  		 " has_dynamic_modifictions, has_monolinks, psm_num_at_default_cutoff, sample_psm_id, peptide_meets_default_cutoffs ) "
-			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )";
+			+  		" has_dynamic_modifictions, has_monolinks, psm_num_at_default_cutoff, "
+			+ 		" sample_psm_id, peptide_meets_default_cutoffs, related_peptides_unique_for_search ) "
+			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
 	
 	/**
@@ -225,7 +227,13 @@ public class UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO {
 			
 			counter++;
 			pstmt.setString( counter, item.getPeptideMeetsDefaultCutoffs().value() );
-		
+
+			counter++;
+			if ( item.isAllRelatedPeptidesUniqueForSearch() ) {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+			} else {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+			}
 			
 			pstmt.executeUpdate();
 			
