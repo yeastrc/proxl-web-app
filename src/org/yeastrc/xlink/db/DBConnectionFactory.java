@@ -19,7 +19,7 @@ public class DBConnectionFactory  {
 	private static final Logger log = Logger.getLogger(DBConnectionFactory.class);
 			
 
-	public static final String CROSSLINKS = "proxl";
+	public static final String PROXL = "proxl";
 	
 	
 	public static final String YRC_NRSEQ = "YRC_NRSEQ";

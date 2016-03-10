@@ -41,7 +41,7 @@ public class SearchWebLinksDAO {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );
 			pstmt.setInt( 1, webLinks.getSearchid() );
@@ -62,7 +62,7 @@ public class SearchWebLinksDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -101,7 +101,7 @@ public class SearchWebLinksDAO {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, id );
@@ -110,7 +110,7 @@ public class SearchWebLinksDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -164,7 +164,7 @@ public class SearchWebLinksDAO {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, id );
@@ -184,7 +184,7 @@ public class SearchWebLinksDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			

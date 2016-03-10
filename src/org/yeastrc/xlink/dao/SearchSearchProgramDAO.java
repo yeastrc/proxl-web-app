@@ -29,13 +29,13 @@ public class SearchSearchProgramDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			save( item, conn );
 
 		} catch ( Exception e ) {
 			
-			String msg = "ERROR inserting item. Error getting database connection: '" + DBConnectionFactory.CROSSLINKS + "'"
+			String msg = "ERROR inserting item. Error getting database connection: '" + DBConnectionFactory.PROXL + "'"
 					+ "\n item: " + item;
 			log.error( msg, e );
 			
@@ -73,7 +73,7 @@ public class SearchSearchProgramDAO {
 
 		try {
 			
-//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			
@@ -97,7 +97,7 @@ public class SearchSearchProgramDAO {
 			
 		} catch ( Exception e ) {
 			
-			String msg = "ERROR inserting item. database connection: '" + DBConnectionFactory.CROSSLINKS + "'"
+			String msg = "ERROR inserting item. database connection: '" + DBConnectionFactory.PROXL + "'"
 					+ "\n item: " + item
 					+ "\nsql: " + sql;
 			log.error( msg, e );

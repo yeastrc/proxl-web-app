@@ -35,7 +35,7 @@ public class ProjectLimitedInfoDAO {
 		
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			
 			pstmt = conn.prepareStatement( sql );
@@ -52,7 +52,7 @@ public class ProjectLimitedInfoDAO {
 
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -95,7 +95,7 @@ public class ProjectLimitedInfoDAO {
 		
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			
 			pstmt = conn.prepareStatement( sql );
@@ -112,7 +112,7 @@ public class ProjectLimitedInfoDAO {
 
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			

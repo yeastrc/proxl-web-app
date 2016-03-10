@@ -29,7 +29,7 @@ public class UnifiedReportedPeptideLookupDAO {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, id );
@@ -48,7 +48,7 @@ public class UnifiedReportedPeptideLookupDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -93,7 +93,7 @@ public class UnifiedReportedPeptideLookupDAO {
 	
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			id = getReportedPeptideIdForSequence( unified_sequence, conn );
 
@@ -139,7 +139,7 @@ public class UnifiedReportedPeptideLookupDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -163,83 +163,5 @@ public class UnifiedReportedPeptideLookupDAO {
 	}
 	
 	
-
-	public void saveToDatabase( UnifiedReportedPeptideLookupDTO unifiedReportedPeptide ) throws Exception {
-		
-		Connection conn = null;
-
-		try {
-			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
-			
-			saveToDatabase( unifiedReportedPeptide, conn );
-			
-		} catch ( Exception e ) {
-			
-			throw e;
-			
-		} finally {
-			
-			// be sure database handles are closed
-			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-			
-		}
-		
-		
-	}
-	
-
-
-	public void saveToDatabase( UnifiedReportedPeptideLookupDTO unifiedReportedPeptide, Connection conn ) throws Exception {
-		
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		String sql = "INSERT INTO unified_reported_peptide_lookup (unified_sequence, link_type, has_dynamic_modifictions ) VALUES (?,?,?)";
-
-		try {
-			
-			
-			pstmt = conn.prepareStatement( sql );
-			pstmt.setString( 1, unifiedReportedPeptide.getUnifiedSequence() );
-			pstmt.setString( 2, unifiedReportedPeptide.getLinkTypeString() );
-			pstmt.setBoolean( 3, unifiedReportedPeptide.isHasMods() );
-			
-			pstmt.executeUpdate();
-			
-			rs = pstmt.getGeneratedKeys();
-			if( rs.next() ) {
-				unifiedReportedPeptide.setId( rs.getInt( 1 ) );
-			} else
-				throw new Exception( "Failed to insert unified_reported_peptide_lookup for " + unifiedReportedPeptide.getUnifiedSequence() );
-			
-			
-		} catch ( Exception e ) {
-			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
-			
-			throw e;
-			
-		} finally {
-			
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-		}
-		
-		
-	}
 	
 }

@@ -40,7 +40,7 @@ public class UnlinkedDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, psmId );
@@ -54,7 +54,7 @@ public class UnlinkedDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -100,62 +100,5 @@ public class UnlinkedDAO {
 	}
 	
 	
-	/**
-	 * @param unlinked
-	 * @throws Exception
-	 */
-	public void save( UnlinkedDTO unlinked ) throws Exception {
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		String sql = "INSERT INTO unlinked (psm_id, nrseq_id, peptide_id) VALUES (?, ?, ?)";
-
-		try {
-			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
-			
-			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, unlinked.getPsm().getId() );
-			pstmt.setInt( 2, unlinked.getProtein().getNrseqId() );
-			pstmt.setInt( 3, unlinked.getPeptideId() );
-			
-			pstmt.executeUpdate();
-			
-			rs = pstmt.getGeneratedKeys();
-
-			if( rs.next() ) {
-				unlinked.setId( rs.getInt( 1 ) );
-			} else
-				throw new Exception( "Failed to insert unlinked" );
-			
-		} catch ( Exception e ) {
-			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
-			
-			throw e;
-			
-		} finally {
-			
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-			
-		}
-		
-	}
 	
 }

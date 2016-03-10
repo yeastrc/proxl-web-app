@@ -28,7 +28,7 @@ public class PsmDAO {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			
 			pstmt = conn.prepareStatement( sql );
@@ -67,7 +67,7 @@ public class PsmDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -116,7 +116,7 @@ public class PsmDAO {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			
 			pstmt = conn.prepareStatement( sql );
@@ -131,7 +131,7 @@ public class PsmDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -181,7 +181,7 @@ public class PsmDAO {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			
 			pstmt = conn.prepareStatement( sql );
@@ -220,7 +220,7 @@ public class PsmDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -272,7 +272,7 @@ public class PsmDAO {
 		try {
 
 
-			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			saveToDatabase( item, connection );
 			
@@ -306,7 +306,7 @@ public class PsmDAO {
 
 		try {
 			
-//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			int psmType = psm.getType();
 
@@ -373,7 +373,7 @@ public class PsmDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			

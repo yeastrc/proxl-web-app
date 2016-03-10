@@ -25,7 +25,7 @@ public class PeptideProteinSearcher {
 		ResultSet rs = null;
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			String sql = "SELECT nrseq_id FROM nrseq_database_peptide_protein WHERE nrseq_database_id = ? AND peptide_id = ?";
 			
 			pstmt = conn.prepareStatement( sql );

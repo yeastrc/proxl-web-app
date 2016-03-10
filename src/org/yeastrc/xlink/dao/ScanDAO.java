@@ -38,7 +38,7 @@ public class ScanDAO {
 		try {
 			
 
-			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 
 			pstmt = connection.prepareStatement( sqlStr );
@@ -90,7 +90,7 @@ public class ScanDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sqlStr, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sqlStr, e );
 			
 			throw e;
 			
@@ -139,7 +139,7 @@ public class ScanDAO {
 		try {
 			
 
-			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 
 			pstmt = connection.prepareStatement( sqlStr );
@@ -155,7 +155,7 @@ public class ScanDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sqlStr, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sqlStr, e );
 			
 			throw e;
 			
@@ -225,7 +225,7 @@ public class ScanDAO {
 
 		try {
 
-			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			save( item, saveSpectrumData, dbConnection );
 			

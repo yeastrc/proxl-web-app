@@ -34,7 +34,7 @@ public class PDBAlignmentSearcher {
 		ResultSet rs = null;
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			String sql = "SELECT id FROM pdb_alignment WHERE pdb_file_id = ? ORDER BY id";
 			
 			pstmt = conn.prepareStatement( sql );

@@ -40,7 +40,7 @@ public class CrosslinkDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, id );
@@ -54,7 +54,7 @@ public class CrosslinkDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -102,7 +102,7 @@ public class CrosslinkDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, psmId );
@@ -116,7 +116,7 @@ public class CrosslinkDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -173,110 +173,5 @@ public class CrosslinkDAO {
 	}
 	
 
-//	CREATE TABLE crosslink (
-//			  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-//			  psm_id INT(10) UNSIGNED NOT NULL,
-//			  nrseq_id_1 INT(10) UNSIGNED NOT NULL,
-//			  nrseq_id_2 INT(10) UNSIGNED NOT NULL,
-//			  protein_1_position INT(10) UNSIGNED NOT NULL,
-//			  protein_2_position INT(10) UNSIGNED NOT NULL,
-//			  peptide_1_id INT(10) UNSIGNED NOT NULL,
-//			  peptide_2_id INT(10) UNSIGNED NOT NULL,
-//			  peptide_1_position INT(10) UNSIGNED NOT NULL,
-//			  peptide_2_position INT(10) UNSIGNED NOT NULL,
-//			  peptide_1_matched_peptide_id INT UNSIGNED NOT NULL,
-//			  peptide_2_matched_peptide_id INT UNSIGNED NOT NULL,
-//			  linker_mass DECIMAL(18,9) NOT NULL,
-//	  		  linker_id INT UNSIGNED NOT NULL,
-
-	
-	private final String INSERT_SQL = 
-			"INSERT INTO crosslink (psm_id, nrseq_id_1, nrseq_id_2, protein_1_position, protein_2_position, "
-			+ " peptide_1_id, peptide_2_id, peptide_1_position, peptide_2_position, " 
-			+ " peptide_1_matched_peptide_id, peptide_2_matched_peptide_id, linker_mass, linker_id) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	
-	public void save( CrosslinkDTO crosslink ) throws Exception {
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		final String sql = INSERT_SQL;
-
-		try {
-			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
-			
-			pstmt = conn.prepareStatement( sql );
-			
-			int counter = 0;
-			
-			counter++;
-			pstmt.setInt( counter, crosslink.getPsm().getId() );
-			counter++;
-			pstmt.setInt( counter, crosslink.getProtein1().getNrseqId() );
-			counter++;
-			pstmt.setInt( counter, crosslink.getProtein2().getNrseqId() );
-			counter++;
-			pstmt.setInt( counter, crosslink.getProtein1Position() );
-			counter++;
-			pstmt.setInt( counter, crosslink.getProtein2Position() );
-			counter++;
-			pstmt.setInt( counter, crosslink.getPeptide1Id() );
-			counter++;
-			pstmt.setInt( counter, crosslink.getPeptide2Id() );
-			counter++;
-			pstmt.setInt( counter, crosslink.getPeptide1Position() );
-			counter++;
-			pstmt.setInt( counter, crosslink.getPeptide2Position() );
-			counter++;
-			pstmt.setInt( counter, crosslink.getPeptide1MatchedPeptideId() );
-			counter++;
-			pstmt.setInt( counter, crosslink.getPeptide2MatchedPeptideId() );
-			counter++;
-			pstmt.setBigDecimal( counter, crosslink.getLinkerMass() );
-			counter++;
-			pstmt.setInt( counter, crosslink.getLinkerId() );
-			
-			pstmt.executeUpdate();
-			
-			rs = pstmt.getGeneratedKeys();
-
-			if( rs.next() ) {
-				crosslink.setId( rs.getInt( 1 ) );
-			} else
-				throw new Exception( "Failed to insert crosslink" );
-			
-		} catch ( Exception e ) {
-			
-			String msg = "ERROR inserting crosslink. database connection: '" + DBConnectionFactory.CROSSLINKS + "'"
-					+ "\n crosslink: " + crosslink
-					+ "\nsql: " + sql;
-			log.error( msg, e );
-			
-			throw e;
-			
-		} finally {
-			
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-			
-		}
-		
-	}
 	
 }

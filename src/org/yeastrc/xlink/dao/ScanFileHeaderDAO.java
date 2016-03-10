@@ -32,7 +32,7 @@ public class ScanFileHeaderDAO {
 		try {
 
 
-			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			return save( item, connection );
 			
@@ -66,7 +66,7 @@ public class ScanFileHeaderDAO {
 
 		try {
 
-//			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = connection.prepareStatement( insertSQL );
 

@@ -25,7 +25,7 @@ public class SearchWebLinksSearcher {
 		ResultSet rs = null;
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			String sql = "SELECT id FROM search_web_links WHERE search_id = ? ORDER BY link_label";
 			
 			pstmt = conn.prepareStatement( sql );

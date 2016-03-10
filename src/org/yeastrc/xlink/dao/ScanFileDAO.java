@@ -43,7 +43,7 @@ public class ScanFileDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 //			CREATE TABLE scan_file (
 //			  id int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -63,7 +63,7 @@ public class ScanFileDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -110,7 +110,7 @@ public class ScanFileDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 //			CREATE TABLE scan_file (
 //			  id int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -132,7 +132,7 @@ public class ScanFileDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -188,7 +188,7 @@ public class ScanFileDAO {
 		try {
 
 
-			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			return getScanFileDTOListByFilenameSha1Sum( filename, sha1Sum, connection );
 			
@@ -242,7 +242,7 @@ public class ScanFileDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -280,7 +280,7 @@ public class ScanFileDAO {
 		try {
 
 
-			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			return save( item, connection );
 			
@@ -322,7 +322,7 @@ public class ScanFileDAO {
 		try {
 
 
-//			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = connection.prepareStatement( insertSQL );
 

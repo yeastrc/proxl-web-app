@@ -42,7 +42,7 @@ public class AnnotationTypeFilterableDAO {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, annotation_type_id );
@@ -55,7 +55,7 @@ public class AnnotationTypeFilterableDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -145,7 +145,7 @@ public class AnnotationTypeFilterableDAO {
 
 		try {
 			
-			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			saveToDatabase( item, dbConnection );
 
@@ -192,7 +192,7 @@ public class AnnotationTypeFilterableDAO {
 
 		try {
 			
-//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			
@@ -238,7 +238,7 @@ public class AnnotationTypeFilterableDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			

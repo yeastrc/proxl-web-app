@@ -40,7 +40,7 @@ public class MonolinkDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, psmId );
@@ -54,7 +54,7 @@ public class MonolinkDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -104,74 +104,5 @@ public class MonolinkDAO {
 		return result;
 	}
 	
-//	CREATE TABLE IF NOT EXISTS `proxl`.`monolink` (
-//			  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-//			  `psm_id` INT(10) UNSIGNED NOT NULL,
-//			  `nrseq_id` INT(10) UNSIGNED NOT NULL,
-//			  `protein_position` INT(10) UNSIGNED NOT NULL,
-//			  `peptide_id` INT(10) UNSIGNED NOT NULL,
-//			  `peptide_position` INT(10) UNSIGNED NOT NULL,
-//	  			linker_id INT UNSIGNED NOT NULL,
-
-	
-	
-	public void save( MonolinkDTO monolink ) throws Exception {
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		String sql = "INSERT INTO monolink (psm_id, nrseq_id, protein_position, peptide_id, peptide_position, linker_id) " +
-				"VALUES (?, ?, ?, ?, ?, ?)";
-
-		try {
-			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
-			
-			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, monolink.getPsm().getId() );
-			pstmt.setInt( 2, monolink.getProtein().getNrseqId() );
-			pstmt.setInt( 3, monolink.getProteinPosition() );
-			pstmt.setInt( 4, monolink.getPeptideId() );
-			pstmt.setInt( 5, monolink.getPeptidePosition() );
-			pstmt.setInt( 6, monolink.getLinkerId() );
-			
-			pstmt.executeUpdate();
-			
-			rs = pstmt.getGeneratedKeys();
-
-			if( rs.next() ) {
-				monolink.setId( rs.getInt( 1 ) );
-			} else
-				throw new Exception( "Failed to insert monolink" );
-			
-			
-		} catch ( Exception e ) {
-			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
-			
-			throw e;
-			
-		} finally {
-			
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-			
-		}
-		
-	}
 	
 }

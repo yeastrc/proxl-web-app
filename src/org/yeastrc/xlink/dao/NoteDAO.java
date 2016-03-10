@@ -62,7 +62,7 @@ public class NoteDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, noteId );
@@ -152,7 +152,7 @@ public class NoteDAO {
 
 		try {
 			
-			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			save( item, dbConnection );
 
@@ -270,7 +270,7 @@ public class NoteDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			//CREATE TABLE note (
 //			  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -344,7 +344,7 @@ public class NoteDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			//CREATE TABLE note (
 //			  id INT UNSIGNED NOT NULL AUTO_INCREMENT,

@@ -25,7 +25,7 @@ public class SearchCommentSearcher {
 		ResultSet rs = null;
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			String sql = "SELECT id FROM search_comment WHERE search_id = ? ORDER BY commentTimestamp";
 			
 			pstmt = conn.prepareStatement( sql );

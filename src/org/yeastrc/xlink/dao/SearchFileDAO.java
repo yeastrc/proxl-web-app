@@ -59,7 +59,7 @@ public class SearchFileDAO {
 		
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			
 			pstmt = conn.prepareStatement( sql );
@@ -77,7 +77,7 @@ public class SearchFileDAO {
 
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -124,7 +124,7 @@ public class SearchFileDAO {
 		
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			
 			pstmt = conn.prepareStatement( sql );
@@ -141,7 +141,7 @@ public class SearchFileDAO {
 
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -188,7 +188,7 @@ public class SearchFileDAO {
 		
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			
 			pstmt = conn.prepareStatement( sql );
@@ -205,7 +205,7 @@ public class SearchFileDAO {
 
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -275,7 +275,7 @@ public class SearchFileDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			stmt = conn.prepareStatement( sql );
 			stmt.setInt( 1, id );
@@ -292,7 +292,7 @@ public class SearchFileDAO {
 			
 		} catch ( Exception e ) {
 			
-			String msg = "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "'"
+			String msg = "ERROR: database connection: '" + DBConnectionFactory.PROXL + "'"
 					+ "\nsql: " + sql;
 			log.error( msg, e );
 			
@@ -342,13 +342,13 @@ public class SearchFileDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			save( item, conn );
 
 		} catch ( Exception e ) {
 			
-			String msg = "ERROR inserting item. Error getting database connection: '" + DBConnectionFactory.CROSSLINKS + "'"
+			String msg = "ERROR inserting item. Error getting database connection: '" + DBConnectionFactory.PROXL + "'"
 					+ "\n item: " + item;
 			log.error( msg, e );
 			
@@ -388,7 +388,7 @@ public class SearchFileDAO {
 
 		try {
 			
-//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			
@@ -421,7 +421,7 @@ public class SearchFileDAO {
 			
 		} catch ( Exception e ) {
 			
-			String msg = "ERROR inserting item. database connection: '" + DBConnectionFactory.CROSSLINKS + "'"
+			String msg = "ERROR inserting item. database connection: '" + DBConnectionFactory.PROXL + "'"
 					+ "\n item: " + item
 					+ "\nsql: " + sql;
 			log.error( msg, e );
@@ -462,13 +462,13 @@ public class SearchFileDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			saveData( id, fileContents, conn );
 
 		} catch ( Exception e ) {
 			
-			String msg = "ERROR saveData. Error getting database connection: '" + DBConnectionFactory.CROSSLINKS + "'";
+			String msg = "ERROR saveData. Error getting database connection: '" + DBConnectionFactory.PROXL + "'";
 			log.error( msg, e );
 			
 			throw e;
@@ -499,7 +499,7 @@ public class SearchFileDAO {
 
 		try {
 			
-//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 		
 			stmt = conn.prepareStatement( sql );
@@ -513,7 +513,7 @@ public class SearchFileDAO {
 			
 		} catch ( Exception e ) {
 			
-			String msg = "ERROR saveData. database connection: '" + DBConnectionFactory.CROSSLINKS + "'"
+			String msg = "ERROR saveData. database connection: '" + DBConnectionFactory.PROXL + "'"
 					+ "\nsql: " + sql;
 			log.error( msg, e );
 			
@@ -551,7 +551,7 @@ public class SearchFileDAO {
 		
 		try {
 			
-//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			stmt = conn.prepareStatement( sql );
 			stmt.setBinaryStream( 1, is, fileSize);
@@ -564,7 +564,7 @@ public class SearchFileDAO {
 			
 		} catch ( Exception e ) {
 			
-			String msg = "ERROR inserting item. database connection: '" + DBConnectionFactory.CROSSLINKS + "'"
+			String msg = "ERROR inserting item. database connection: '" + DBConnectionFactory.PROXL + "'"
 					+ "\nsql: " + sql;
 			log.error( msg, e );
 			
@@ -608,7 +608,7 @@ public class SearchFileDAO {
 		try {
 
 
-			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = connection.prepareStatement( sql );
 
@@ -680,7 +680,7 @@ public class SearchFileDAO {
 		try {
 
 
-			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = connection.prepareStatement( sql );
 
@@ -751,7 +751,7 @@ public class SearchFileDAO {
 		try {
 
 
-			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = connection.prepareStatement( sql );
 

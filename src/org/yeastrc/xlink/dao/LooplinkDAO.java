@@ -42,7 +42,7 @@ public class LooplinkDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, id );
@@ -56,7 +56,7 @@ public class LooplinkDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -104,7 +104,7 @@ public class LooplinkDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, psmId );
@@ -118,7 +118,7 @@ public class LooplinkDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -172,71 +172,5 @@ public class LooplinkDAO {
 	
 
 	
-	private static final String INSERT_SQL = 
-			"INSERT INTO looplink (psm_id, nrseq_id, protein_position_1, protein_position_2, peptide_id, "
-			+ "peptide_position_1, peptide_position_2, linker_mass, linker_id) " 
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-			
-			
-	public void save( LooplinkDTO looplink ) throws Exception {
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		final String sql = INSERT_SQL;
-
-		try {
-			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
-			
-			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, looplink.getPsm().getId() );
-			pstmt.setInt( 2, looplink.getProtein().getNrseqId() );
-			pstmt.setInt( 3, looplink.getProteinPosition1() );
-			pstmt.setInt( 4, looplink.getProteinPosition2() );
-			pstmt.setInt( 5, looplink.getPeptideId() );
-			pstmt.setInt( 6, looplink.getPeptidePosition1() );
-			pstmt.setInt( 7, looplink.getPeptidePosition2() );
-			pstmt.setBigDecimal( 8, looplink.getLinkerMass() );
-			pstmt.setInt( 9, looplink.getLinkerId() );
-			
-			pstmt.executeUpdate();
-			
-			rs = pstmt.getGeneratedKeys();
-
-			if( rs.next() ) {
-				looplink.setId( rs.getInt( 1 ) );
-			} else
-				throw new Exception( "Failed to insert looplink" );
-			
-			
-		} catch ( Exception e ) {
-			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
-			
-			throw e;
-			
-		} finally {
-			
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-			
-		}
-		
-	}
 	
 }

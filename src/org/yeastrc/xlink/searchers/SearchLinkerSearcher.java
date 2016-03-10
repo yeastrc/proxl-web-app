@@ -25,7 +25,7 @@ public class SearchLinkerSearcher {
 		ResultSet rs = null;
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			String sql = "SELECT linker_id FROM search_linker WHERE search_id = ?";
 			
 			pstmt = conn.prepareStatement( sql );

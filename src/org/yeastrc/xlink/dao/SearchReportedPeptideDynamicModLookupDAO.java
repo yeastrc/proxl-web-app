@@ -40,7 +40,7 @@ public class SearchReportedPeptideDynamicModLookupDAO {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			String linkTypeString = XLinkUtils.getTypeString( item.getLinkType() );
 

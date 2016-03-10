@@ -42,7 +42,7 @@ public class ScanRetentionTimeDAO {
 //		try {
 //			
 //
-//			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 //
 //
 //			pstmt = connection.prepareStatement( sqlStr );
@@ -85,7 +85,7 @@ public class ScanRetentionTimeDAO {
 //			
 //		} catch ( Exception e ) {
 //			
-//			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sqlStr, e );
+//			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sqlStr, e );
 //			
 //			throw e;
 //			
@@ -150,7 +150,7 @@ public class ScanRetentionTimeDAO {
 		try {
 			
 
-			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 
 			pstmt = connection.prepareStatement( sqlStr );
@@ -179,7 +179,7 @@ public class ScanRetentionTimeDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sqlStr, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sqlStr, e );
 			
 			throw e;
 			
@@ -272,7 +272,7 @@ public class ScanRetentionTimeDAO {
 		try {
 			
 
-			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 
 			pstmt = connection.prepareStatement( sqlStr );
@@ -293,7 +293,7 @@ public class ScanRetentionTimeDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sqlStr, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sqlStr, e );
 			
 			throw e;
 			
@@ -357,7 +357,7 @@ public class ScanRetentionTimeDAO {
 
 		try {
 
-			connection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			
 			pstmtSave = connection.prepareStatement( insertSQL );

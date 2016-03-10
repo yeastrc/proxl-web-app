@@ -29,7 +29,7 @@ public class PDBAlignmentDAO {
 		
 		try {
 
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, id );
@@ -86,7 +86,7 @@ public class PDBAlignmentDAO {
 		
 		try {
 
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 		
 			// if the pa has an ID, assume it's already in the database and update the database
 			// also assume the pdb_file_id, chain_id and nrseq_id are not changing if this is the
@@ -170,7 +170,7 @@ public class PDBAlignmentDAO {
 		
 		try {
 
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, alignmentId );

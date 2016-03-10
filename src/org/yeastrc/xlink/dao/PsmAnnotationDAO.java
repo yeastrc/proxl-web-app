@@ -42,7 +42,7 @@ public class PsmAnnotationDAO {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, id );
@@ -55,7 +55,7 @@ public class PsmAnnotationDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + sql, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
 			
 			throw e;
 			
@@ -130,7 +130,7 @@ public class PsmAnnotationDAO {
 
 		try {
 			
-			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			saveToDatabase( item, dbConnection );
 
@@ -186,7 +186,7 @@ public class PsmAnnotationDAO {
 		
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + INSERT_SQL
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + INSERT_SQL
 					+ ".  PsmAnnotationDTO item: " + item, e );
 			
 			throw e;
@@ -219,7 +219,7 @@ public class PsmAnnotationDAO {
 		
 		try {
 			
-//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			
