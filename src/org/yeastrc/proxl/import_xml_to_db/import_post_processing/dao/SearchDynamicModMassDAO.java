@@ -36,7 +36,7 @@ public class SearchDynamicModMassDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( SQL );
 			
@@ -47,7 +47,7 @@ public class SearchDynamicModMassDAO {
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' sql: " + SQL, e );
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + SQL, e );
 			
 			throw e;
 			

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.PsmPeptideDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnlinkedDAO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
@@ -18,7 +19,6 @@ import org.yeastrc.proxl_import.api.xml_dto.Peptides;
 import org.yeastrc.proxl_import.api.xml_dto.Psm;
 import org.yeastrc.proxl_import.api.xml_dto.Psms;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
-import org.yeastrc.xlink.dao.UnlinkedDAO;
 import org.yeastrc.xlink.dto.UnlinkedDTO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
@@ -237,7 +237,7 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 			
 			unlinkedDTO.setPsm( psmDTO );
 			
-			UnlinkedDAO.getInstance().save( unlinkedDTO );
+			DB_Insert_UnlinkedDAO.getInstance().save( unlinkedDTO );
 		}
 	}
 	

@@ -3,10 +3,10 @@ package org.yeastrc.proxl.import_xml_to_db.process_input;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_MonolinkDAO;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.xlink.dao.DynamicModDAO;
 import org.yeastrc.xlink.dao.MatchedPeptideDAO;
-import org.yeastrc.xlink.dao.MonolinkDAO;
 import org.yeastrc.xlink.dto.DynamicModDTO;
 import org.yeastrc.xlink.dto.MatchedPeptideDTO;
 import org.yeastrc.xlink.dto.MonolinkDTO;
@@ -65,7 +65,7 @@ public class SavePerPeptideDataForPSM {
 			
 			monolinkDTO.setPsm( psmDTO );
 			
-			MonolinkDAO.getInstance().save( monolinkDTO );
+			DB_Insert_MonolinkDAO.getInstance().save( monolinkDTO );
 		}
 		
 		

@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchDimerBestPSMValueGenericLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchDimerBestPeptideValueGenericLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchDimerGenericLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.objects.BestFilterableAnnotationValue;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetPsmFilterableAnnotationBestValueByAnnTypeIdSearchDimerProteinSearcher;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetReportedPeptideFilterableAnnotationBestValueByAnnTypeIdSearchDimerProteinSearcher;
-import org.yeastrc.xlink.dao.SearchDimerBestPSMValueGenericLookupDAO;
-import org.yeastrc.xlink.dao.SearchDimerBestPeptideValueGenericLookupDAO;
-import org.yeastrc.xlink.dao.SearchDimerGenericLookupDAO;
 import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -97,7 +97,7 @@ public class PopulateSearchDimerGenericLookupTable {
 
 		try {
 
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 //			st = conn.createStatement();
 //			st.execute( disableKeysSQL );
@@ -110,7 +110,7 @@ public class PopulateSearchDimerGenericLookupTable {
 			rs = pstmt.executeQuery();
 
 			
-			SearchDimerGenericLookupDAO searchDimerGenericLookupDAO = SearchDimerGenericLookupDAO.getInstance();
+			DB_Insert_SearchDimerGenericLookupDAO db_Insert_SearchDimerGenericLookupDAO = DB_Insert_SearchDimerGenericLookupDAO.getInstance();
 
 			while( rs.next() ) {
 
@@ -154,7 +154,7 @@ public class PopulateSearchDimerGenericLookupTable {
 				item.setNumLinkedPeptidesAtDefaultCutoff( numLinkedPeptidesAtDefaultCutoff );
 				item.setNumUniqueLinkedPeptidesAtDefaultCutoff( numUniqueLinkedPeptidesAtDefaultCutoff );
 				
-				searchDimerGenericLookupDAO.save( item );
+				db_Insert_SearchDimerGenericLookupDAO.save( item );
 				
 //				List<SearchDimerBestPSMValueGenericLookupDTO> insertedBestPSMValueRecords =
 				populateDimerBestPSMValue( item, srchPgm_Filterable_Psm_AnnotationType_DTOList );
@@ -169,7 +169,7 @@ public class PopulateSearchDimerGenericLookupTable {
 
 		} catch ( Exception e ) {
 
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' \n sql: " + sql
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' \n sql: " + sql
 //					+ "\n disableKeysSQL: " + disableKeysSQL
 //					+ "\n enableKeysSQL: " + enableKeysSQL
 					, e );
@@ -255,7 +255,7 @@ public class PopulateSearchDimerGenericLookupTable {
 				item.setBestPsmValueForAnnTypeId( bestPsmValueForAnnTypeId );
 				item.setBestPsmValueStringForAnnTypeId( bestPsmValueStringForAnnTypeId );
 
-				SearchDimerBestPSMValueGenericLookupDAO.getInstance().save( item );
+				DB_Insert_SearchDimerBestPSMValueGenericLookupDAO.getInstance().save( item );
 				
 				results.add( item );
 			}
@@ -326,7 +326,7 @@ public class PopulateSearchDimerGenericLookupTable {
 
 
 
-				SearchDimerBestPeptideValueGenericLookupDAO.getInstance().save( item );
+				DB_Insert_SearchDimerBestPeptideValueGenericLookupDAO.getInstance().save( item );
 
 				results.add( item );
 			}

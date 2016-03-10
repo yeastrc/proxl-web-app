@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.PsmPeptideDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_CrosslinkDAO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
@@ -19,7 +20,6 @@ import org.yeastrc.proxl_import.api.xml_dto.Peptides;
 import org.yeastrc.proxl_import.api.xml_dto.Psm;
 import org.yeastrc.proxl_import.api.xml_dto.Psms;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
-import org.yeastrc.xlink.dao.CrosslinkDAO;
 import org.yeastrc.xlink.dto.CrosslinkDTO;
 import org.yeastrc.xlink.dto.MatchedPeptideDTO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
@@ -266,7 +266,7 @@ public class ProcessLinkTypeCrosslink {
 			
 			crosslinkDTO.setPsm( psmDTO );
 			
-			CrosslinkDAO.getInstance().save( crosslinkDTO );
+			DB_Insert_CrosslinkDAO.getInstance().save( crosslinkDTO );
 			
 		}
 		
@@ -378,7 +378,7 @@ public class ProcessLinkTypeCrosslink {
 				for( NRProteinDTO protein2 : protein2Map.keySet() ) {
 										
 					for( int protein2Position : protein2Map.get( protein2 ) ) {
-						
+												
 						// a single crosslink entry
 			    		CrosslinkDTO crosslink = new CrosslinkDTO();
 			    		
@@ -472,8 +472,42 @@ public class ProcessLinkTypeCrosslink {
 			    		
 			    		getCrosslinksResultItem.setCrosslinkDTO( crosslink );
 			    		getCrosslinksResultItem.setPeptideOrder( peptideOrder );
-			    					    		
-			    		crosslinkResultItemList.add( getCrosslinksResultItem );
+			    		
+			    		//  Only add a record if it is not already in the list
+			    		
+//			    		boolean foundInList = false;
+//			    		
+//			    		for ( GetCrosslinksResultItem itemInList : crosslinkResultItemList ) {
+//			    			
+//			    			CrosslinkDTO crosslinkEntryInList = itemInList.getCrosslinkDTO();
+//
+//			    			if ( 	   crosslink.getProtein1().getNrseqId() == crosslinkEntryInList.getProtein1().getNrseqId()
+//			    					&& crosslink.getProtein2().getNrseqId() == crosslinkEntryInList.getProtein2().getNrseqId()
+//
+//			    					&& crosslink.getProtein1Position() == crosslinkEntryInList.getProtein1Position()
+//			    					&& crosslink.getProtein2Position() == crosslinkEntryInList.getProtein2Position()
+//			    					
+//			    					&& crosslink.getPeptide1Id() == crosslinkEntryInList.getPeptide1Id()
+//			    					&& crosslink.getPeptide2Id() == crosslinkEntryInList.getPeptide2Id()
+//
+//			    					&& crosslink.getPeptide1Position() == crosslinkEntryInList.getPeptide1Position()
+//			    					&& crosslink.getPeptide2Position() == crosslinkEntryInList.getPeptide2Position()
+//			    					
+//			    					) {
+//			    				
+//			    				foundInList = true;
+//			    				break;
+//			    				
+//			    			}
+//			    			
+//			    		}
+//			    		
+//			    		
+//			    				
+//			    		if ( ! foundInList ) {
+			    			
+			    			crosslinkResultItemList.add( getCrosslinksResultItem );
+//			    		}
 
 
 					}  //end looping over protein2positions

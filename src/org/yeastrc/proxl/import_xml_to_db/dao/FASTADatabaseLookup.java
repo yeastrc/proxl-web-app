@@ -4,10 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 
 public class FASTADatabaseLookup {
+	
+	private static Logger log = Logger.getLogger(FASTADatabaseLookup.class);
 
 	private static final FASTADatabaseLookup _INSTANCE = new FASTADatabaseLookup();
 	private FASTADatabaseLookup() { }
@@ -20,11 +23,14 @@ public class FASTADatabaseLookup {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		
+
+		String sql = "SELECT id FROM tblDatabase WHERE name = ?";
+		
 		try {
 			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.YRC_NRSEQ );
 			
-			String sql = "SELECT id FROM tblDatabase WHERE name = ?";
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setString( 1, FASTAFilename );
 			
@@ -36,6 +42,11 @@ public class FASTADatabaseLookup {
 				throw new Exception( "Could not find a database ID for " + FASTAFilename );
 			}
 			
+		} catch ( Exception e ) {
+			
+			String msg = "Error: sql: " + sql;
+			log.error(msg, e);
+			throw e;
 			
 		} finally {
 			

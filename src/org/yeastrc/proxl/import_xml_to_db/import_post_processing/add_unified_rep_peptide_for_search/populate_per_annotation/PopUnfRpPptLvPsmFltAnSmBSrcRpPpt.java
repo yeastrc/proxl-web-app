@@ -4,11 +4,11 @@ package org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_unified_re
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPep_ReportedPeptide_Search_BestPsmValue_Generic_Lookup__DAO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.objects.BestFilterableAnnotationValue;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetPsmCountByAnnTypeIdSearchReptPeptideDefaultCutoffSearcher;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetPsmFilterableAnnotationBestValueByAnnTypeIdSearchReptPeptideSearcher;
-import org.yeastrc.xlink.dao.UnifiedRepPep_ReportedPeptide_Search_BestPsmValue_Generic_Lookup__DAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPep_ReportedPeptide_Search_BestPsmValue_Generic_Lookup__DTO;
 import org.yeastrc.xlink.dto.UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO;
@@ -106,7 +106,7 @@ public class PopUnfRpPptLvPsmFltAnSmBSrcRpPpt {
 			unifiedRepPep_ReportedPeptide_Search_BestPsmValue_Generic_Lookup__DTO.setBestPsmValueForAnnTypeId( bestFilterableAnnotationValue.getBestValue() );
 			unifiedRepPep_ReportedPeptide_Search_BestPsmValue_Generic_Lookup__DTO.setBestPsmValueStringForAnnTypeId( bestFilterableAnnotationValue.getBestValueString() );
 			
-			UnifiedRepPep_ReportedPeptide_Search_BestPsmValue_Generic_Lookup__DAO.getInstance()
+			DB_Insert_UnifiedRepPep_ReportedPeptide_Search_BestPsmValue_Generic_Lookup__DAO.getInstance()
 			.saveToDatabase( unifiedRepPep_ReportedPeptide_Search_BestPsmValue_Generic_Lookup__DTO );
 			
 		} catch ( Exception e ) {

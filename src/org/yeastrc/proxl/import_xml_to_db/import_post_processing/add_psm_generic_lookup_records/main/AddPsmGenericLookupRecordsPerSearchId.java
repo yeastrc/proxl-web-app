@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.PsmFilterableAnnotationGenericLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_PsmFilterableAnnotationGenericLookupDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.PsmFilterableAnnotationGenericLookupDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
@@ -47,7 +47,7 @@ public class AddPsmGenericLookupRecordsPerSearchId {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			
 			pstmt = conn.prepareStatement( sql );
@@ -75,7 +75,9 @@ public class AddPsmGenericLookupRecordsPerSearchId {
 				item.setType( typeNumber );
 				
 				
-				PsmFilterableAnnotationGenericLookupDAO.getInstance().saveToDatabase( item , conn );
+//				PsmFilterableAnnotationGenericLookupDAO.getInstance().saveToDatabase( item , conn );
+				
+				DB_Insert_PsmFilterableAnnotationGenericLookupDAO.getInstance().saveToDatabase( item );
 			}
 			
 		} catch ( Exception e ) {

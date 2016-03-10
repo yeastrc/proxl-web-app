@@ -7,12 +7,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.UnifiedReportedPeptideLookupDAO;
-import org.yeastrc.xlink.dao.UnifiedRepPepDynamicModLookupDAO;
-import org.yeastrc.xlink.dao.UnifiedRepPepMatchedPeptideLookupDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepDynamicModLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepMatchedPeptideLookupDTO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPepDynamicModLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPepMatchedPeptideLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedReportedPeptideLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.unified_reported_peptide.objects.UnifiedReportedPeptideObj;
 
 /**
@@ -45,8 +46,10 @@ public class InsertIfNotInDBUnifiedReportedPeptideAndChildren {
 		
 		
 		UnifiedReportedPeptideLookupDAO unifiedReportedPeptideDAO = UnifiedReportedPeptideLookupDAO.getInstance();
-		UnifiedRepPepMatchedPeptideLookupDAO unifiedRpMatchedPeptideDAO = UnifiedRepPepMatchedPeptideLookupDAO.getInstance();
-		UnifiedRepPepDynamicModLookupDAO unifiedRpDynamicModDAO = UnifiedRepPepDynamicModLookupDAO.getInstance();
+		DB_Insert_UnifiedRepPepMatchedPeptideLookupDAO db_Insert_UnifiedRepPepMatchedPeptideLookupDAO = DB_Insert_UnifiedRepPepMatchedPeptideLookupDAO.getInstance();
+		DB_Insert_UnifiedRepPepDynamicModLookupDAO db_Insert_UnifiedRepPepDynamicModLookupDAO = DB_Insert_UnifiedRepPepDynamicModLookupDAO.getInstance();
+		
+		DB_Insert_UnifiedReportedPeptideLookupDAO db_Insert_UnifiedReportedPeptideLookupDAO = DB_Insert_UnifiedReportedPeptideLookupDAO.getInstance();
 		
 		Connection dbConnection = null;
 
@@ -86,7 +89,7 @@ public class InsertIfNotInDBUnifiedReportedPeptideAndChildren {
 			
 			try {
 
-				unifiedReportedPeptideDAO.saveToDatabase( unifiedReportedPeptideDTO, dbConnection );
+				db_Insert_UnifiedReportedPeptideLookupDAO.saveToDatabase( unifiedReportedPeptideDTO, dbConnection );
 			} catch( Exception eg ) {
 
 				String msg = "Failed to save unifiedReportedPeptideDTO.  unifiedReportedPeptideSequence: " + unifiedReportedPeptideSequence;
@@ -104,7 +107,7 @@ public class InsertIfNotInDBUnifiedReportedPeptideAndChildren {
 				
 				unifiedRpMatchedPeptideDTO.setUnifiedReportedPeptideId( unifiedReportedPeptideDTO.getId() );
 				
-				unifiedRpMatchedPeptideDAO.save( unifiedRpMatchedPeptideDTO, dbConnection );
+				db_Insert_UnifiedRepPepMatchedPeptideLookupDAO.save( unifiedRpMatchedPeptideDTO, dbConnection );
 
 
 				List<Z_Internal_UnifiedRpDynamicMod_Holder> unifiedRpDynamicMod_Holder_List
@@ -119,7 +122,7 @@ public class InsertIfNotInDBUnifiedReportedPeptideAndChildren {
 
 						unifiedRpDynamicModDTO.setRpMatchedPeptideId( unifiedRpMatchedPeptideDTO.getId() );
 
-						unifiedRpDynamicModDAO.save( unifiedRpDynamicModDTO, dbConnection );
+						db_Insert_UnifiedRepPepDynamicModLookupDAO.save( unifiedRpDynamicModDTO, dbConnection );
 					}
 				}
 			}
@@ -203,7 +206,7 @@ public class InsertIfNotInDBUnifiedReportedPeptideAndChildren {
 	 */
 	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
 		
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 		
 		dbConnection.setAutoCommit(false);
 		

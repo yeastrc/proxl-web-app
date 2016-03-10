@@ -15,7 +15,6 @@ import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProvider;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.PrintHelpOnlyException;
 import org.yeastrc.proxl.import_xml_to_db.importer_core_entry_point.ImporterCoreEntryPoint;
-import org.yeastrc.proxl.import_xml_to_db.utils.SHA1SumCalculator;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
@@ -29,7 +28,8 @@ public class ImporterDefaultMainProgramEntry {
 
 	private static final int PROGRAM_EXIT_CODE_DEFAULT_NO_SYTEM_EXIT_CALLED = 0;
 
-	private static final String DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING  = "db_config_filename_with_path";
+//	private static final String DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING  = "db_config_filename_with_path";
+	
 
 	//	private static final String PROTEIN_NAME_DECOY_PREFIX_CMD_LINE_PARAM_STRING  = "protein_name_decoy_prefix";
 
@@ -57,13 +57,6 @@ public class ImporterDefaultMainProgramEntry {
 	 */
 	public static void main(String[] args) throws Exception {
 		
-		
-		//  TODO   REMOVE
-		
-//		SHA1SumCalculator.setFakeSHA1Sum( "fakeSHA1Sum" );
-		
-		
-		
 
 		boolean successfulImport = false;
 
@@ -81,26 +74,24 @@ public class ImporterDefaultMainProgramEntry {
 
 			CmdLineParser.Option noScanFilesCommandLineOpt = cmdLineParser.addBooleanOption( 'n', "no_scan_files" );
 
-
+			
 			CmdLineParser.Option helpOpt = cmdLineParser.addBooleanOption('h', "help"); 
 
 
 			// parse command line options
 			try { cmdLineParser.parse(args); }
 			catch (IllegalOptionValueException e) {
-				System.err.println(e.getMessage());
 
+				System.err.println(e.getMessage());
 
 				programExitCode = 1;
 				throw new PrintHelpOnlyException();
-				//	            System.exit( 0 );
 			}
 			catch (UnknownOptionException e) {
 				System.err.println(e.getMessage());
 
 				programExitCode = 1;
 				throw new PrintHelpOnlyException();
-				//	            System.exit( 0 );
 			}
 
 			Boolean help = (Boolean) cmdLineParser.getOptionValue(helpOpt, Boolean.FALSE);
@@ -113,9 +104,6 @@ public class ImporterDefaultMainProgramEntry {
 			Integer projectId = (Integer)cmdLineParser.getOptionValue( projectIdOpt );
 
 			Boolean noScanFilesCommandLineOptChosen = (Boolean) cmdLineParser.getOptionValue( noScanFilesCommandLineOpt, Boolean.FALSE);
-
-
-
 
 			String[] remainingArgs = cmdLineParser.getRemainingArgs();
 
@@ -154,7 +142,6 @@ public class ImporterDefaultMainProgramEntry {
 
 				programExitCode = 1;
 				throw new PrintHelpOnlyException();
-				//					System.exit( 1 );
 			}
 
 			List<File> scanFileList = new ArrayList<>( remainingArgs.length -1 );
@@ -254,44 +241,17 @@ public class ImporterDefaultMainProgramEntry {
 				//				}
 
 				dbConnectionParametersProvider.init();
+				
+				ImportDBConnectionFactory importDBConnectionFactory = ImportDBConnectionFactory.getInstance();
 
-				ImportDBConnectionFactory.setDbConnectionParametersProvider( dbConnectionParametersProvider );
+				importDBConnectionFactory.setDbConnectionParametersProvider( dbConnectionParametersProvider );
+				
 
 
-				DBConnectionFactory.setDbConnectionFactoryImpl( new ImportDBConnectionFactory() );
+				DBConnectionFactory.setDbConnectionFactoryImpl( importDBConnectionFactory );
 
 				databaseConnectionFactoryCreated = true;
 			}
-
-
-
-
-			//			
-			//			if ( TestLoadOverridesConstants.TEST_LOAD_OVERRIDES ) {
-			//				
-			//				
-			////				throw new Exception( " TestLoadOverridesConstants.TEST_LOAD_OVERRIDES not currently supported properly ");
-			//				
-			//				System.out.println( "" );
-			//				System.out.println( "------------------------------------------------------------------------------" );
-			//				System.out.println( "" );
-			//				
-			//				System.out.println( "TestLoadOverridesConstants.TEST_LOAD_OVERRIDES is TRUE Forcing a fake SHA1 Sum" );
-			//
-			//				System.out.println( "" );
-			//				System.out.println( "------------------------------------------------------------------------------" );
-			//				System.out.println( "" );
-			//				
-			//				//  Force a fake SHA1Sum
-			//				
-			//				String fakeSHA1Sum = CreateFakeSHA1Sum.createFakeSHA1SumForString( percolatorFileList.get(0).getAbsolutePath() );
-			//				
-			//				SHA1SumCalculator.setFakeSHA1Sum( fakeSHA1Sum );
-			//			}
-
-
-
-
 
 
 			//////////////////////////////////////
@@ -411,32 +371,6 @@ public class ImporterDefaultMainProgramEntry {
 				throw e;
 			}
 
-
-			//			if ( TestLoadOverridesConstants.TEST_LOAD_OVERRIDES ) {
-			//
-			//				System.out.println( "" );
-			//				System.out.println( "------------------------------------------------------------------------------" );
-			//				System.out.println( "" );
-			//				
-			//				System.out.println( "TestLoadOverridesConstants.TEST_LOAD_OVERRIDES is TRUE so skipped some tests to speed up loading" );
-			//				
-			//
-			//				System.out.println( "" );
-			//				System.out.println( "------------------------------------------------------------------------------" );
-			//				System.out.println( "" );
-			//				
-			//				System.err.println( "" );
-			//				System.err.println( "------------------------------------------------------------------------------" );
-			//				System.err.println( "" );
-			//				
-			//				System.err.println( "TestLoadOverridesConstants.TEST_LOAD_OVERRIDES is TRUE so skipped some tests to speed up loading" );
-			//				
-			//
-			//				System.err.println( "" );
-			//				System.err.println( "------------------------------------------------------------------------------" );
-			//				System.err.println( "" );
-			//			}
-
 		}
 
 		if ( successfulImport ) {
@@ -450,26 +384,6 @@ public class ImporterDefaultMainProgramEntry {
 			System.out.println( "--------------------------------------" );
 			System.out.println( "" );
 		}
-
-
-
-
-		//		if ( TestLoadOverridesConstants.TEST_LOAD_OVERRIDES ) {
-		//
-		//			System.out.println( "" );
-		//			System.out.println( "------------------------------------------------------------------------------" );
-		//			System.out.println( "" );
-		//			
-		//			System.out.println( "TestLoadOverridesConstants.TEST_LOAD_OVERRIDES is TRUE so skipped some tests to speed up loading" );
-		//
-		//			System.out.println( "" );
-		//			System.out.println( "------------------------------------------------------------------------------" );
-		//			System.out.println( "" );
-		//			
-		//			System.exit( 1 ); //  Force different return code since TestLoadOverridesConstants.TEST_LOAD_OVERRIDES is TRUE
-		//			
-		//		}
-
 
 		if ( programExitCode != PROGRAM_EXIT_CODE_DEFAULT_NO_SYTEM_EXIT_CALLED ) {
 
@@ -485,11 +399,11 @@ public class ImporterDefaultMainProgramEntry {
 				+ " [ -n | --no_scan_files ] "
 				+ " <main xml file to import> [ <scan file to import> ... ]";
 
-		if ( createDatabaseConnectionFactory ) {
-
-			line += " [ --" + DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING + "=db_config_filename_and_path ] ";
-
-		}
+//		if ( createDatabaseConnectionFactory ) {
+//
+//			line += " [ --" + DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING + "=db_config_filename_and_path ] ";
+//
+//		}
 
 
 		System.err.println( line );
@@ -512,16 +426,16 @@ public class ImporterDefaultMainProgramEntry {
 
 
 		System.err.println( "" );
-
-		if ( createDatabaseConnectionFactory ) {
-
-			System.err.println( "" );
-			System.err.println( "The --" + DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING + " is optional.");
-			System.err.println( "If --" + DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING 
-					+ " is not provided, the filename '" 
-					+ DBConnectionParametersProvider.DB_CONFIG_FILENAME
-					+ "' will be searched for in the class path" );
-		}
+//
+//		if ( createDatabaseConnectionFactory ) {
+//
+//			System.err.println( "" );
+//			System.err.println( "The --" + DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING + " is optional.");
+//			System.err.println( "If --" + DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING 
+//					+ " is not provided, the filename '" 
+//					+ DBConnectionParametersProvider.DB_CONFIG_FILENAME
+//					+ "' will be searched for in the class path" );
+//		}
 
 
 //		System.err.println( "" );

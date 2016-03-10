@@ -4,9 +4,9 @@ package org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_unified_re
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPep_ReportedPeptide_Search_PeptideValue_Generic_Lookup__DAO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.xlink.dao.SearchReportedPeptideAnnotationDAO;
-import org.yeastrc.xlink.dao.UnifiedRepPep_ReportedPeptide_Search_PeptideValue_Generic_Lookup__DAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPep_ReportedPeptide_Search_PeptideValue_Generic_Lookup__DTO;
@@ -90,7 +90,7 @@ public class PopUnifRepPepLvlFltrblAnnBySrchReptPept {
 			unifiedRepPep_ReportedPeptide_Search_PeptideValue_Generic_Lookup__DTO.setPeptideValueForAnnTypeId( peptideValueForAnnTypeId );;
 			unifiedRepPep_ReportedPeptide_Search_PeptideValue_Generic_Lookup__DTO.setPeptideValueStringForAnnTypeId( peptideValueStringForAnnTypeId );;
 			
-			UnifiedRepPep_ReportedPeptide_Search_PeptideValue_Generic_Lookup__DAO.getInstance()
+			DB_Insert_UnifiedRepPep_ReportedPeptide_Search_PeptideValue_Generic_Lookup__DAO.getInstance()
 			.saveToDatabase( unifiedRepPep_ReportedPeptide_Search_PeptideValue_Generic_Lookup__DTO );
 			
 		} catch ( Exception e ) {

@@ -272,7 +272,7 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 	 */
 	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
 		
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 		
 		dbConnection.setAutoCommit(false);
 		

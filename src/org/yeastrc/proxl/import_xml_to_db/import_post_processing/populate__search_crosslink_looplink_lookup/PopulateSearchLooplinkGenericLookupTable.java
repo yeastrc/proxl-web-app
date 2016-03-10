@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchLooplinkBestPSMValueGenericLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchLooplinkBestPeptideValueGenericLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchLooplinkGenericLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.objects.BestFilterableAnnotationValue;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetPsmFilterableAnnotationBestValueByAnnTypeIdSearchLooplinkProteinSearcher;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetReportedPeptideFilterableAnnotationBestValueByAnnTypeIdSearchLooplinkProteinSearcher;
-import org.yeastrc.xlink.dao.SearchLooplinkBestPSMValueGenericLookupDAO;
-import org.yeastrc.xlink.dao.SearchLooplinkBestPeptideValueGenericLookupDAO;
-import org.yeastrc.xlink.dao.SearchLooplinkGenericLookupDAO;
 import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -97,7 +97,7 @@ public class PopulateSearchLooplinkGenericLookupTable {
 
 		try {
 
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 //			st = conn.createStatement();
 //			st.execute( disableKeysSQL );
@@ -110,7 +110,7 @@ public class PopulateSearchLooplinkGenericLookupTable {
 			rs = pstmt.executeQuery();
 
 			
-			SearchLooplinkGenericLookupDAO searchLooplinkGenericLookupDAO = SearchLooplinkGenericLookupDAO.getInstance();
+			DB_Insert_SearchLooplinkGenericLookupDAO db_Insert_SearchLooplinkGenericLookupDAO = DB_Insert_SearchLooplinkGenericLookupDAO.getInstance();
 
 			while( rs.next() ) {
 
@@ -159,7 +159,7 @@ public class PopulateSearchLooplinkGenericLookupTable {
 				item.setNumLinkedPeptidesAtDefaultCutoff( numLinkedPeptidesAtDefaultCutoff );
 				item.setNumUniqueLinkedPeptidesAtDefaultCutoff( numUniqueLinkedPeptidesAtDefaultCutoff );
 				
-				searchLooplinkGenericLookupDAO.save( item );
+				db_Insert_SearchLooplinkGenericLookupDAO.save( item );
 				
 
 
@@ -176,7 +176,7 @@ public class PopulateSearchLooplinkGenericLookupTable {
 
 		} catch ( Exception e ) {
 
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.CROSSLINKS + "' \n sql: " + sql
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' \n sql: " + sql
 //					+ "\n disableKeysSQL: " + disableKeysSQL
 //					+ "\n enableKeysSQL: " + enableKeysSQL
 					, e );
@@ -264,7 +264,7 @@ public class PopulateSearchLooplinkGenericLookupTable {
 				item.setBestPsmValueForAnnTypeId( bestPsmValueForAnnTypeId );
 				item.setBestPsmValueStringForAnnTypeId( bestPsmValueStringForAnnTypeId );
 
-				SearchLooplinkBestPSMValueGenericLookupDAO.getInstance().save( item );
+				DB_Insert_SearchLooplinkBestPSMValueGenericLookupDAO.getInstance().save( item );
 				
 				results.add( item );
 			}
@@ -338,7 +338,7 @@ public class PopulateSearchLooplinkGenericLookupTable {
 
 
 
-				SearchLooplinkBestPeptideValueGenericLookupDAO.getInstance().save( item );
+				DB_Insert_SearchLooplinkBestPeptideValueGenericLookupDAO.getInstance().save( item );
 
 				results.add( item );
 			}

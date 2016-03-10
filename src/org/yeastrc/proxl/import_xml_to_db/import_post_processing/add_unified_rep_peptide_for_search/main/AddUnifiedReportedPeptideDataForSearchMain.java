@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO;
+import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_unified_rep_peptide_for_search.populate_per_annotation.PopUnifRepPepLvlFltrblAnnBySrchReptPept;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_unified_rep_peptide_for_search.populate_per_annotation.PopUnfRpPptLvPsmFltAnSmBSrcRpPpt;
@@ -29,7 +31,6 @@ import org.yeastrc.xlink.dao.PsmDAO;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.dao.SearchReportedPeptideDynamicModLookupDAO;
-import org.yeastrc.xlink.dao.UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.CrosslinkDTO;
 import org.yeastrc.xlink.dto.DynamicModDTO;
@@ -330,9 +331,13 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 					List<UnifiedRpSinglePeptideObj> singlePeptides = get_singlePeptides( psmDTO );
 					unifiedReportedPeptideObj.setSinglePeptides( singlePeptides );
 
+					//  Commit any uncommitted inserts to the database first.
+					//  Required since locking tables this call to insert unified reported peptide and children
+					
+					ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
 					
 					
-					//  Standard processing.  Save the 
+					//  Standard processing.  Save the unifiedReportedPeptideObj and children
 				
 					unifiedReportedPeptideDTO = 
 							insertIfNotInDBUnifiedReportedPeptideAndChildren
@@ -363,7 +368,7 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 				unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO.setSamplePsmId( samplePsmId );
 
 				
-				UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO.getInstance().saveToDatabase( unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO );
+				DB_Insert_UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO.getInstance().saveToDatabase( unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO );
 
 				//  Populate Unified Reported Peptide Annotations Lookup table
 				
