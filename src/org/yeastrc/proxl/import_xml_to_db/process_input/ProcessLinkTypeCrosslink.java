@@ -473,41 +473,7 @@ public class ProcessLinkTypeCrosslink {
 			    		getCrosslinksResultItem.setCrosslinkDTO( crosslink );
 			    		getCrosslinksResultItem.setPeptideOrder( peptideOrder );
 			    		
-			    		//  Only add a record if it is not already in the list
-			    		
-//			    		boolean foundInList = false;
-//			    		
-//			    		for ( GetCrosslinksResultItem itemInList : crosslinkResultItemList ) {
-//			    			
-//			    			CrosslinkDTO crosslinkEntryInList = itemInList.getCrosslinkDTO();
-//
-//			    			if ( 	   crosslink.getProtein1().getNrseqId() == crosslinkEntryInList.getProtein1().getNrseqId()
-//			    					&& crosslink.getProtein2().getNrseqId() == crosslinkEntryInList.getProtein2().getNrseqId()
-//
-//			    					&& crosslink.getProtein1Position() == crosslinkEntryInList.getProtein1Position()
-//			    					&& crosslink.getProtein2Position() == crosslinkEntryInList.getProtein2Position()
-//			    					
-//			    					&& crosslink.getPeptide1Id() == crosslinkEntryInList.getPeptide1Id()
-//			    					&& crosslink.getPeptide2Id() == crosslinkEntryInList.getPeptide2Id()
-//
-//			    					&& crosslink.getPeptide1Position() == crosslinkEntryInList.getPeptide1Position()
-//			    					&& crosslink.getPeptide2Position() == crosslinkEntryInList.getPeptide2Position()
-//			    					
-//			    					) {
-//			    				
-//			    				foundInList = true;
-//			    				break;
-//			    				
-//			    			}
-//			    			
-//			    		}
-//			    		
-//			    		
-//			    				
-//			    		if ( ! foundInList ) {
-			    			
-			    			crosslinkResultItemList.add( getCrosslinksResultItem );
-//			    		}
+		    			crosslinkResultItemList.add( getCrosslinksResultItem );
 
 
 					}  //end looping over protein2positions
