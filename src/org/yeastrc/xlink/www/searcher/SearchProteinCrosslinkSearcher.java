@@ -227,7 +227,7 @@ public class SearchProteinCrosslinkSearcher {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			
@@ -643,7 +643,7 @@ public class SearchProteinCrosslinkSearcher {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = conn.prepareStatement( sql );
 			

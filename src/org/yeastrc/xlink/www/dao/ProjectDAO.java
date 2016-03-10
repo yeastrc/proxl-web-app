@@ -68,7 +68,7 @@ public class ProjectDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, projectId );
@@ -135,7 +135,7 @@ public class ProjectDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, authShareableObjectId );
@@ -200,7 +200,7 @@ public class ProjectDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, projectId );
@@ -290,7 +290,7 @@ public class ProjectDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, authUserId );
@@ -397,7 +397,7 @@ public class ProjectDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, projectId );
@@ -464,7 +464,7 @@ public class ProjectDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, projectId );
@@ -544,7 +544,7 @@ public class ProjectDAO {
 
 		try {
 			
-			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			save( item, dbConnection );
 
@@ -659,7 +659,7 @@ public class ProjectDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			//CREATE TABLE project (
 //			  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -732,7 +732,7 @@ public class ProjectDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			//CREATE TABLE project (
 //			  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -808,7 +808,7 @@ public class ProjectDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			//CREATE TABLE project (
 //			  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -878,7 +878,7 @@ public class ProjectDAO {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			//CREATE TABLE project (
 //			  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -958,7 +958,7 @@ public class ProjectDAO {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			//CREATE TABLE project (
 //			  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1034,7 +1034,7 @@ public class ProjectDAO {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			//CREATE TABLE project (
 //			  id INT UNSIGNED NOT NULL AUTO_INCREMENT,

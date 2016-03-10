@@ -61,7 +61,7 @@ public class DefaultPageViewGenericDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, searchId );
@@ -128,7 +128,7 @@ public class DefaultPageViewGenericDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, searchId );
@@ -207,7 +207,7 @@ public class DefaultPageViewGenericDAO {
 
 		try {
 			
-			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			saveOrUpdate( item, dbConnection );
 
@@ -331,7 +331,7 @@ public class DefaultPageViewGenericDAO {
 //		
 //		try {
 //			
-//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 //
 //
 //

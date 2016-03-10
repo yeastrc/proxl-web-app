@@ -497,7 +497,7 @@ public class MergedSearchPeptideSearcher {
 		
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
 
 			int paramCounter = 0;

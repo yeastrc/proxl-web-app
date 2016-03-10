@@ -84,7 +84,7 @@ public class DBConnectionFactoryWeb implements IDBConnectionFactory {
 			DataSource ds;
 			Connection conn;
 
-			if (db.equals(DBConnectionFactory.CROSSLINKS)) {
+			if (db.equals(DBConnectionFactory.PROXL)) {
 				
 				ds = (DataSource) ctx.lookup( proxlJNDIName );
 				

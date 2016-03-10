@@ -606,7 +606,7 @@ public class MergedSearchProteinCrosslinkSearcher {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			
 			

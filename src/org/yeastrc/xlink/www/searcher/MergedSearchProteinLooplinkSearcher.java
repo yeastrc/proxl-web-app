@@ -584,7 +584,7 @@ public class MergedSearchProteinLooplinkSearcher {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = conn.prepareStatement( sql );
 			

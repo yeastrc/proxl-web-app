@@ -69,7 +69,7 @@ public class XLinkUserDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setString( 1, lastName );
@@ -196,7 +196,7 @@ public class XLinkUserDAO {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, authUserDTO.getId() );
@@ -264,7 +264,7 @@ public class XLinkUserDAO {
 		Connection dbConnection = null;
 
 		try {
-			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			save( item, hashedPassword, dbConnection );
 			

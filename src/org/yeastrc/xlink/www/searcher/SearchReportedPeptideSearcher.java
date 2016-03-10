@@ -37,7 +37,7 @@ public class SearchReportedPeptideSearcher {
 		ResultSet rs = null;
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			String sql = "SELECT reported_peptide_id FROM search_reported_peptide WHERE unified_reported_peptide_id = ? AND search_id = ?";
 			

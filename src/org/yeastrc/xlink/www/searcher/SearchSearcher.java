@@ -57,7 +57,7 @@ public class SearchSearcher {
 
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			
 			pstmt = conn.prepareStatement( sql );
@@ -121,7 +121,7 @@ public class SearchSearcher {
 		ResultSet rs = null;
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			String sql = "SELECT id FROM search" +
 					" ORDER BY id DESC";
 			

@@ -554,7 +554,7 @@ public class SearchPeptideCrosslinkSearcher {
 		ResultSet rs = null;
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			
 	

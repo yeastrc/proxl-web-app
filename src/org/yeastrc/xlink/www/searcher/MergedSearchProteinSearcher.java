@@ -58,7 +58,7 @@ public class MergedSearchProteinSearcher {
 		ResultSet rs = null;
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			String sql = 
 						"(SELECT a.nrseq_id_1 AS nseq, a.protein_1_position AS pos " +
 						"FROM crosslink AS a INNER JOIN psm AS b ON a.psm_id = b.id " +
@@ -138,7 +138,7 @@ public class MergedSearchProteinSearcher {
 		ResultSet rs = null;
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			String sql = 
 						"SELECT DISTINCT a.nrseq_id AS nseq, a.protein_position_1 AS pos1, a.protein_position_2 AS pos2 " +
 						"FROM looplink AS a INNER JOIN psm AS b ON a.psm_id = b.id " +
@@ -204,7 +204,7 @@ public class MergedSearchProteinSearcher {
 		ResultSet rs = null;
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			String sql = 
 						"(SELECT DISTINCT a.nrseq_id AS nseq " +
 						"FROM unlinked AS a INNER JOIN psm AS b ON a.psm_id = b.id " +
@@ -265,7 +265,7 @@ public class MergedSearchProteinSearcher {
 		ResultSet rs = null;
 		try {
 						
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			String sql = 
 					"(SELECT a.nrseq_id_1 AS nseq " +
 					"FROM dimer AS a INNER JOIN psm AS b ON a.psm_id = b.id " +

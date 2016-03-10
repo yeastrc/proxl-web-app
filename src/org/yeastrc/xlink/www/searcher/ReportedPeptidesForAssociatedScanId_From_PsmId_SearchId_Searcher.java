@@ -503,7 +503,7 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = conn.prepareStatement( sql );
 			

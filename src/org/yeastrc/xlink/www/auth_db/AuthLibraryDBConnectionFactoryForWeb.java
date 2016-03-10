@@ -18,7 +18,7 @@ public class AuthLibraryDBConnectionFactoryForWeb implements IAuthLibraryDBConne
 	@Override
 	public Connection getConnection() throws Exception {
 
-		return DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+		return DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 	}
 
 }
