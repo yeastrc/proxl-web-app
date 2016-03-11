@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchDimerBestPSMValueGenericLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchDimerBestPeptideValueGenericLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchDimerGenericLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.objects.BestFilterableAnnotationValue;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetPsmFilterableAnnotationBestValueByAnnTypeIdSearchDimerProteinSearcher;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetReportedPeptideFilterableAnnotationBestValueByAnnTypeIdSearchDimerProteinSearcher;
@@ -66,6 +67,13 @@ public class PopulateSearchDimerGenericLookupTable {
 	 */
 	public void populateSearchDimerGenericLookupTable( int searchId ) throws Exception {
 		
+		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+	    
+	    
+	    
+	    
 		SearchDTO searchDTO = SearchDAO.getInstance().getSearch( searchId );
 
 

@@ -110,6 +110,9 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 
 		log.info( "Starting inserting unified reported peptide data" );
 		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+		
 		
 		List<AnnotationTypeDTO> srchPgmFilterableReportedPeptideAnnotationTypeDTOList =
 				AnnotationTypesForSearchIdPSMPeptideTypeSearcher.getInstance().get_Peptide_Filterable_ForSearchId( searchId );

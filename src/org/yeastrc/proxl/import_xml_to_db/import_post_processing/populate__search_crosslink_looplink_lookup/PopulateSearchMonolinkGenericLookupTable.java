@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchMonolinkBestPSMValueGenericLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchMonolinkBestPeptideValueGenericLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchMonolinkGenericLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.objects.BestFilterableAnnotationValue;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetPsmFilterableAnnotationBestValueByAnnTypeIdSearchMonolinkProteinSearcher;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers.GetReportedPeptideFilterableAnnotationBestValueByAnnTypeIdSearchMonolinkProteinSearcher;
@@ -66,6 +67,11 @@ public class PopulateSearchMonolinkGenericLookupTable {
 	 */
 	public void populateSearchMonolinkGenericLookupTable( int searchId ) throws Exception {
 		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+	    
+	    
+	    
 		SearchDTO searchDTO = SearchDAO.getInstance().getSearch( searchId );
 
 

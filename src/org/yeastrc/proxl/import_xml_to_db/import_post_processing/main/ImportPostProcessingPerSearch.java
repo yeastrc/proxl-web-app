@@ -3,6 +3,7 @@ package org.yeastrc.proxl.import_xml_to_db.import_post_processing.main;
 import java.util.Date;
 
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
+import org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_link_per_peptide_generic_lookup_records.main.AddLinkPerPeptideGenericLookupRecordsPerSearchId;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_psm_generic_lookup_records.main.AddPsmGenericLookupRecordsPerSearchId;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.add_unified_rep_peptide_for_search.main.AddUnifiedReportedPeptideDataForSearchMain;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.populate__search_crosslink_looplink_lookup.PopulateSearchCrosslinkGenericLookupTable;
@@ -21,23 +22,19 @@ public class ImportPostProcessingPerSearch {
 		
 		
 
-	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
-		
-		System.out.println( "calling AddPsmGenericLookupRecordsPerSearchId " );
+		System.out.println( "calling AddPsmGenericLookupRecordsPerSearchId   Now: " + new Date() );
 		AddPsmGenericLookupRecordsPerSearchId.getInstance().addPsmGenericLookupRecordsPerSearchId( searchId );
 
-	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
-		
-	    System.out.println( "Saving search to Unified Reported Peptide table" );
+	    System.out.println( "Saving search to Unified Reported Peptide table Now: " + new Date() );
 	    AddUnifiedReportedPeptideDataForSearchMain.getInstance().addUnifiedReportedPeptideDataForSearch( searchId );
 
 	    //  Moved to do inside AddUnifiedReportedPeptideDataForSearchMain
 //	    System.out.println( "Saving search to search__dynamic_mod_mass_lookup table" );
 //		SearchDynamicModMassPopulateForSearchIdDAO.getInstance().searchDynamicModMassPopulateForSearchId( searchId );
 	    
-	    
-	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
-	    
+		System.out.println( "calling AddLinkPerPeptideGenericLookupRecordsPerSearchId   Now: " + new Date() );
+		AddLinkPerPeptideGenericLookupRecordsPerSearchId.getInstance().addLinkPerPeptideGenericLookupRecordsPerSearchId( searchId );
+		
 
 	    System.out.println( "Starting populating Search Crosslink lookup tables.  Now: " + new Date() );
 		PopulateSearchCrosslinkGenericLookupTable.getInstance().populateSearchCrosslinkGenericLookupTable( searchId );
