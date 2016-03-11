@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 
 import javax.xml.XMLConstants;
@@ -392,6 +393,7 @@ public class ImporterCoreEntryPoint {
 			System.out.println( "!!!!");
 
 			System.out.println( "Insert done for core tables for search ID " + searchDTOInserted.getId() + ".");
+			System.out.println( "Now: " + new Date() );
 
 			System.out.println( "!!!!");
 			

@@ -29,9 +29,6 @@ public class ImporterDefaultMainProgramEntry {
 	private static final int PROGRAM_EXIT_CODE_DEFAULT_NO_SYTEM_EXIT_CALLED = 0;
 
 //	private static final String DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING  = "db_config_filename_with_path";
-	
-
-	//	private static final String PROTEIN_NAME_DECOY_PREFIX_CMD_LINE_PARAM_STRING  = "protein_name_decoy_prefix";
 
 	private static boolean databaseConnectionFactoryCreated = false;
 
@@ -183,6 +180,9 @@ public class ImporterDefaultMainProgramEntry {
 					scanFileList.add( scanFile );
 				}
 			}
+			
+			System.out.println( "Now: " + new Date() );
+			System.out.println( "" );
 
 			System.out.println( "Performing Proxl import for parameters:" );
 			System.out.println( "project id: " + projectId );
@@ -267,7 +267,9 @@ public class ImporterDefaultMainProgramEntry {
 			System.out.println( "" );
 			System.out.println( "--------------------------------------" );
 			System.out.println( "" );
-
+			System.out.println( "Now: " + new Date() );
+			System.out.println( "" );
+			
 			System.out.println( "Completed Proxl import for parameters:" );
 
 			System.out.println( "project id: " + projectId );
