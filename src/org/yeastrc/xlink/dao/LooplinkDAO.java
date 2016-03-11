@@ -84,14 +84,19 @@ public class LooplinkDAO {
 		return result;
 	}
 
-
 	/**
+	 * Gets a random CrosslinkDTO for psmId
+	 * 
+	 * Do Not Use the Protein data from this 
+	 * since there may be other crosslink records with different protein id and protein position data  
+	 * 
+	 * 
 	 * @param psmId
 	 * @return
 	 * @throws Exception
 	 */
-	public LooplinkDTO getLooplinkDTOByPsmId( int psmId ) throws Exception {
-		
+	public LooplinkDTO getARandomLooplinkDTOForPsmId( int psmId ) throws Exception {
+	
 		
 		LooplinkDTO result = null;
 		
@@ -112,7 +117,21 @@ public class LooplinkDAO {
 			rs = pstmt.executeQuery();
 			
 			if( rs.next() ) {
-				result = populateFromResultSet(rs);
+
+				result = new LooplinkDTO();
+				
+				result.setId( rs.getInt( "id" ) );
+				
+				result.setPeptideId( rs.getInt( "peptide_id" ) );
+
+				result.setPeptidePosition1( rs.getInt( "peptide_position_1" ) );
+//				result.setProteinPosition1( rs.getInt( "protein_position_1" ) );
+
+				result.setPeptidePosition2( rs.getInt( "peptide_position_2" ) );
+//				result.setProteinPosition2( rs.getInt( "protein_position_2" ) );
+				
+				result.setLinkerMass(  rs.getBigDecimal( "linker_mass" ) );
+				
 			}
 			
 			

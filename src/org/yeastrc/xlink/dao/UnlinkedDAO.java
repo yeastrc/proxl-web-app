@@ -22,11 +22,16 @@ public class UnlinkedDAO {
 
 
 	/**
+	 * Gets a random UnlinkedDTO for psmId
+	 * 
+	 * Do Not Use the Protein data from this 
+	 * since there may be other unlinked records with different protein id data  
+	 * 
 	 * @param psmId
 	 * @return
 	 * @throws Exception
 	 */
-	public UnlinkedDTO getUnlinkedDTOByPsmId( int psmId ) throws Exception {
+	public UnlinkedDTO getARandomUnlinkedDTOForPsmId( int psmId ) throws Exception {
 		
 		
 		UnlinkedDTO result = null;
@@ -48,7 +53,12 @@ public class UnlinkedDAO {
 			rs = pstmt.executeQuery();
 			
 			if( rs.next() ) {
-				result = populateFromResultSet(rs);
+
+				result = new UnlinkedDTO();
+				
+				result.setId( rs.getInt( "id" ) );
+				
+				result.setPeptideId( rs.getInt( "peptide_id" ) );
 			}
 			
 			

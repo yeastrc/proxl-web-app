@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.CrosslinkDTO;
+import org.yeastrc.xlink.dto.NRProteinDTO;
 
 /**
  * table crosslink
@@ -84,11 +85,17 @@ public class CrosslinkDAO {
 
 
 	/**
+	 * Gets a random CrosslinkDTO for psmId
+	 * 
+	 * Do Not Use the Protein data from this 
+	 * since there may be other crosslink records with different protein id and protein position data  
+	 * 
+	 * 
 	 * @param psmId
 	 * @return
 	 * @throws Exception
 	 */
-	public CrosslinkDTO getCrosslinkDTOByPsmId( int psmId ) throws Exception {
+	public CrosslinkDTO getARandomCrosslinkDTOForPsmId( int psmId ) throws Exception {
 		
 		
 		CrosslinkDTO result = null;
@@ -110,7 +117,36 @@ public class CrosslinkDAO {
 			rs = pstmt.executeQuery();
 			
 			if( rs.next() ) {
-				result = populateFromResultSet(rs);
+
+				result = new CrosslinkDTO();
+				
+				result.setId( rs.getInt( "id" ) );
+//				
+//				int proteinId_1 = rs.getInt( "nrseq_id_1" );
+//				int proteinId_2 = rs.getInt( "nrseq_id_2" );
+//				
+//				NRProteinDTO NRProteinDTO_1 = new NRProteinDTO();
+//				NRProteinDTO NRProteinDTO_2 = new NRProteinDTO();
+//				
+//				NRProteinDTO_1.setNrseqId(proteinId_1);
+//				NRProteinDTO_2.setNrseqId(proteinId_2);
+//				
+//				result.setProtein1(NRProteinDTO_1);
+//				result.setProtein2(NRProteinDTO_2);
+				
+				result.setPeptide1Id( rs.getInt( "peptide_1_id" ) );
+				result.setPeptide1Position( rs.getInt( "peptide_1_position" ) );
+				result.setPeptide1MatchedPeptideId( rs.getInt( "peptide_1_matched_peptide_id" ) );
+//				result.setProtein1Position( rs.getInt( "protein_1_position" ) );
+
+				result.setPeptide2Id( rs.getInt( "peptide_2_id" ) );
+				result.setPeptide2Position( rs.getInt( "peptide_2_position" ) );
+				result.setPeptide2MatchedPeptideId( rs.getInt( "peptide_2_matched_peptide_id" ) );
+//				result.setProtein2Position( rs.getInt( "protein_2_position" ) );
+				
+				result.setLinkerMass(  rs.getBigDecimal( "linker_mass" ) );
+				
+				return result;
 			}
 			
 			
@@ -156,6 +192,18 @@ public class CrosslinkDAO {
 		CrosslinkDTO result = new CrosslinkDTO();
 		
 		result.setId( rs.getInt( "id" ) );
+		
+		int proteinId_1 = rs.getInt( "nrseq_id_1" );
+		int proteinId_2 = rs.getInt( "nrseq_id_2" );
+		
+		NRProteinDTO NRProteinDTO_1 = new NRProteinDTO();
+		NRProteinDTO NRProteinDTO_2 = new NRProteinDTO();
+		
+		NRProteinDTO_1.setNrseqId(proteinId_1);
+		NRProteinDTO_2.setNrseqId(proteinId_2);
+		
+		result.setProtein1(NRProteinDTO_1);
+		result.setProtein2(NRProteinDTO_2);
 		
 		result.setPeptide1Id( rs.getInt( "peptide_1_id" ) );
 		result.setPeptide1Position( rs.getInt( "peptide_1_position" ) );

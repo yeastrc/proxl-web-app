@@ -22,11 +22,16 @@ public class MonolinkDAO {
 
 
 	/**
+	 * 	 * Gets a random MonolinkDTO for psmId
+	 * 
+	 * Do Not Use the Protein data from this 
+	 * since there may be other crosslink records with different protein id and protein position data  
+	 * 
 	 * @param psmId
 	 * @return
 	 * @throws Exception
 	 */
-	public MonolinkDTO getMonolinkDTOByPsmId( int psmId ) throws Exception {
+	public MonolinkDTO getARandomMonolinkDTOForPsmId( int psmId ) throws Exception {
 		
 		
 		MonolinkDTO result = null;
@@ -48,7 +53,14 @@ public class MonolinkDAO {
 			rs = pstmt.executeQuery();
 			
 			if( rs.next() ) {
-				result = populateFromResultSet(rs);
+
+				result = new MonolinkDTO();
+				
+				result.setId( rs.getInt( "id" ) );
+				
+				result.setPeptideId( rs.getInt( "peptide_id" ) );
+				result.setPeptidePosition( rs.getInt( "peptide_position" ) );
+//				result.setProteinPosition( rs.getInt( "protein_position" ) );
 			}
 			
 			

@@ -19,11 +19,17 @@ public class DimerDAO {
 
 
 	/**
+	 * 	 * Gets a random DimerDTO for psmId
+	 * 
+	 * Do Not Use the Protein data from this 
+	 * since there may be other dimer records with different protein id and protein position data  
+	 * 
+	 * 
 	 * @param psmId
 	 * @return
 	 * @throws Exception
 	 */
-	public DimerDTO getDimerDTOByPsmId( int psmId ) throws Exception {
+	public DimerDTO getARandomDimerDTOForPsmId( int psmId ) throws Exception {
 		
 		
 		DimerDTO result = null;
@@ -45,7 +51,17 @@ public class DimerDAO {
 			rs = pstmt.executeQuery();
 			
 			if( rs.next() ) {
-				result = populateFromResultSet(rs);
+
+				result = new DimerDTO();
+				
+				result.setId( rs.getInt( "id" ) );
+				
+				result.setPeptide1Id( rs.getInt( "peptide_1_id" ) );
+//				result.setProtein1Id( rs.getInt( "nrseq_id_1" ) );
+
+				result.setPeptide2Id( rs.getInt( "peptide_2_id" ) );
+//				result.setProtein2Id( rs.getInt( "nrseq_id_2" ) );
+				
 			}
 			
 			
