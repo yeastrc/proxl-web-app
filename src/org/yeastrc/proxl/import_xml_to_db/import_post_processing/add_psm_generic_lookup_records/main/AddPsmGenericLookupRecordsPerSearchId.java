@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_PsmFilterableAnnotationGenericLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.PsmFilterableAnnotationGenericLookupDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
@@ -26,6 +27,15 @@ public class AddPsmGenericLookupRecordsPerSearchId {
 	}
 	
 
+	private static final String SQL_COUNT = 
+			"SELECT COUNT(*) AS count "
+			+ " FROM psm_annotation " 
+			+ " INNER JOIN psm ON psm_annotation.psm_id = psm.id "
+					
+			+ " WHERE  psm.search_id = ? "
+			+ " AND filterable_descriptive_type = '" + FilterableDescriptiveAnnotationType.FILTERABLE.value() + "'"; 
+			
+			
 
 	private static final String SQL_MAIN = 
 			"SELECT psm_annotation.*, psm.search_id, psm.type, psm.reported_peptide_id"
@@ -33,12 +43,21 @@ public class AddPsmGenericLookupRecordsPerSearchId {
 			+ " INNER JOIN psm ON psm_annotation.psm_id = psm.id "
 					
 			+ " WHERE  psm.search_id = ? "
-			+ " AND filterable_descriptive_type = '" + FilterableDescriptiveAnnotationType.FILTERABLE + "'"; 
+			+ " AND filterable_descriptive_type = '" + FilterableDescriptiveAnnotationType.FILTERABLE.value() + "'"; 
 			
 	
+	
+	
+	/**
+	 * @param searchId
+	 * @throws Exception
+	 */
 	public void addPsmGenericLookupRecordsPerSearchId( int searchId ) throws Exception {
 		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
 		
+	    
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -49,6 +68,26 @@ public class AddPsmGenericLookupRecordsPerSearchId {
 			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
+
+			pstmt = conn.prepareStatement( SQL_COUNT );
+			
+			pstmt.setInt( 1, searchId );
+			
+			rs = pstmt.executeQuery();
+			
+			rs.next();
+			
+			int totalRecordCount = rs.getInt( "count" );
+
+			System.out.println( "AddPsmGenericLookupRecordsPerSearchId:  Record count to process: " + totalRecordCount );
+			
+			rs.close();
+			rs = null;
+			pstmt.close();
+			pstmt = null;
+			
+			
+			
 			
 			pstmt = conn.prepareStatement( sql );
 			
@@ -56,8 +95,37 @@ public class AddPsmGenericLookupRecordsPerSearchId {
 			
 			rs = pstmt.executeQuery();
 
+			int recordCount = 0;
+			
+			
+			
+			
+//			while ( rs.next() ) {
+//
+//				recordCount++;
+//
+//				if ( recordCount % 5000 == 0 ) {
+//					
+//					System.out.println( "Found " + recordCount + " of " + totalRecordCount );
+//				}
+//
+//				
+//			}
+//
+//			System.out.println( "AddPsmGenericLookupRecordsPerSearchId: Finished processing.  Processed  " + recordCount + " of " + totalRecordCount );
+//			
+//			if ( true ) {
+//				
+//				log.error( "!!!!!!!!!!!!!!!!!!!!!!!!!!!Force Program Exit Here For Testing " );
+//				
+//				throw new Exception( "!!!!!!!!!!!!!!!!!!!!!!!!!!!Force Program Exit Here For Testing " );
+//			}
+//			
+			
 			while ( rs.next() ) {
 
+				recordCount++;
+				
 				PsmFilterableAnnotationGenericLookupDTO item = new PsmFilterableAnnotationGenericLookupDTO();
 				
 				item.setPsmAnnotationId( rs.getInt( "id" ) );
@@ -78,11 +146,21 @@ public class AddPsmGenericLookupRecordsPerSearchId {
 //				PsmFilterableAnnotationGenericLookupDAO.getInstance().saveToDatabase( item , conn );
 				
 				DB_Insert_PsmFilterableAnnotationGenericLookupDAO.getInstance().saveToDatabase( item );
+				
+
+				if ( recordCount % 5000 == 0 ) {
+					
+					System.out.println( "processed " + recordCount + " of " + totalRecordCount );
+				}
 			}
+			
+
+			System.out.println( "AddPsmGenericLookupRecordsPerSearchId: Finished processing.  Processed  " + recordCount + " of " + totalRecordCount );
+			
 			
 		} catch ( Exception e ) {
 			
-			String msg = "getBestAnnotationValue(), sql: " + sql;
+			String msg = "addPsmGenericLookupRecordsPerSearchId(), sql: " + sql;
 			
 			log.error( msg, e );
 			
@@ -107,6 +185,9 @@ public class AddPsmGenericLookupRecordsPerSearchId {
 			}
 			
 		}
+		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
 		
 	}
 	
