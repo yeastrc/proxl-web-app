@@ -481,7 +481,7 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 		
 		if ( linkType == XLinkUtils.TYPE_CROSSLINK ) {
 			
-			CrosslinkDTO crosslinkDTO = CrosslinkDAO.getInstance().getCrosslinkDTOByPsmId( psmId );
+			CrosslinkDTO crosslinkDTO = CrosslinkDAO.getInstance().getARandomCrosslinkDTOForPsmId( psmId );
 			
 			if ( crosslinkDTO == null ) {
 
@@ -511,7 +511,7 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 		} else if ( linkType == XLinkUtils.TYPE_LOOPLINK ) {
 			
 
-			LooplinkDTO looplinkDTO = LooplinkDAO.getInstance().getLooplinkDTOByPsmId( psmId );
+			LooplinkDTO looplinkDTO = LooplinkDAO.getInstance().getARandomLooplinkDTOForPsmId( psmId );
 			
 			if ( looplinkDTO == null ) {
 
