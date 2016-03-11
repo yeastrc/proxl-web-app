@@ -1643,7 +1643,7 @@ var downloadChimeraScript = function() {
 	
 	
 	var distancesAdded = { };
-
+	var distanceConstraints = _linkColorHandler.getDistanceConstraints();
 	
 	// do looplinks
 	links = _renderedLinks.looplinks;
@@ -1659,8 +1659,8 @@ var downloadChimeraScript = function() {
 			var distance = calculateDistance( atom1.pos(), atom2.pos() );
 
 			var color = "red";
-			if( distance <= 25.0 ) { color = "green"; }
-			else if( distance <= 35 ) { color = "yellow"; }
+			if( distance <= distanceConstraints.shortDistance ) { color = "green"; }
+			else if( distance <= distanceConstraints.longDistance ) { color = "yellow"; }
 			
 			scriptText += "shape tube ";
 			scriptText += ":" + atom1.residue().num() + "." + atom1.residue().chain().name() + "@CA";
@@ -1696,8 +1696,8 @@ var downloadChimeraScript = function() {
 			var distance = calculateDistance( atom1.pos(), atom2.pos() );
 
 			var color = "red";
-			if( distance <= 25.0 ) { color = "green"; }
-			else if( distance <= 35 ) { color = "yellow"; }
+			if( distance <= distanceConstraints.shortDistance ) { color = "green"; }
+			else if( distance <= distanceConstraints.longDistance ) { color = "yellow"; }
 			
 			scriptText += "shape tube ";
 			scriptText += ":" + atom1.residue().num() + "." + atom1.residue().chain().name() + "@CA";
@@ -1757,6 +1757,7 @@ var downloadPymolScript = function() {
 	}
 	
 	var distancesAdded = { };
+	var distanceConstraints = _linkColorHandler.getDistanceConstraints();
 	
 	// do looplinks
 	links = _renderedLinks.looplinks;
@@ -1770,8 +1771,8 @@ var downloadPymolScript = function() {
 			var distance = calculateDistance( atom1.pos(), atom2.pos() );
 
 			var color = "red";
-			if( distance <= 25.0 ) { color = "green"; }
-			else if( distance <= 35 ) { color = "yellow"; }
+			if( distance <= distanceConstraints.shortDistance ) { color = "green"; }
+			else if( distance <= distanceConstraints.longDistance ) { color = "yellow"; }
 			
 			var nrseq1s = getNrseqProteinPositions( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
 			var nrseq2s = getNrseqProteinPositions( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
@@ -1814,8 +1815,8 @@ var downloadPymolScript = function() {
 			var distance = calculateDistance( atom1.pos(), atom2.pos() );
 
 			var color = "red";
-			if( distance <= 25.0 ) { color = "green"; }
-			else if( distance <= 35 ) { color = "yellow"; }
+			if( distance <= distanceConstraints.shortDistance ) { color = "green"; }
+			else if( distance <= distanceConstraints.longDistance ) { color = "yellow"; }
 						
 			var nrseq1s = getNrseqProteinPositions( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
 			var nrseq2s = getNrseqProteinPositions( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
