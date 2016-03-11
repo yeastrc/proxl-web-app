@@ -2,9 +2,9 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
-DROP SCHEMA IF EXISTS `proxl_generic_fields` ;
-CREATE SCHEMA IF NOT EXISTS `proxl_generic_fields` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
-USE `proxl_generic_fields` ;
+DROP SCHEMA IF EXISTS `proxl` ;
+CREATE SCHEMA IF NOT EXISTS `proxl` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
+USE `proxl` ;
 
 -- -----------------------------------------------------
 -- Table `auth_user`
@@ -2051,6 +2051,178 @@ CREATE TABLE IF NOT EXISTS `psm_annotation_large_value` (
 ENGINE = InnoDB;
 
 CREATE INDEX `psm_annotation_large_value_primary_id_fk_idx` ON `psm_annotation_large_value` (`psm_annotation_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `crosslink__rep_pept__search__generic_lookup`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `crosslink__rep_pept__search__generic_lookup` ;
+
+CREATE TABLE IF NOT EXISTS `crosslink__rep_pept__search__generic_lookup` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_id` INT(10) UNSIGNED NOT NULL,
+  `reported_peptide_id` INT(10) UNSIGNED NOT NULL,
+  `nrseq_id_1` INT(10) UNSIGNED NOT NULL,
+  `nrseq_id_2` INT(10) UNSIGNED NOT NULL,
+  `protein_1_position` INT(10) UNSIGNED NOT NULL,
+  `protein_2_position` INT(10) UNSIGNED NOT NULL,
+  `psm_num_at_default_cutoff` INT(10) UNSIGNED NOT NULL,
+  `peptide_meets_default_cutoffs` ENUM('yes','no','not_applicable') NOT NULL,
+  `related_peptides_unique_for_search` TINYINT(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `crosslink__rep_pept__search__generic_lookup_search_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `crosslink__rep_pept__search__generic_lookup_rep_pept`
+    FOREIGN KEY (`reported_peptide_id`)
+    REFERENCES `reported_peptide` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
+
+CREATE INDEX `crosslink__rep_pept__search__generic_lookup_rep_pept_idx` ON `crosslink__rep_pept__search__generic_lookup` (`reported_peptide_id` ASC);
+
+CREATE INDEX `all_but_id_must_start_with_search_id_idx` ON `crosslink__rep_pept__search__generic_lookup` (`search_id` ASC, `reported_peptide_id` ASC, `nrseq_id_1` ASC, `nrseq_id_2` ASC, `protein_1_position` ASC, `protein_2_position` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `monolink__rep_pept__search__generic_lookup`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `monolink__rep_pept__search__generic_lookup` ;
+
+CREATE TABLE IF NOT EXISTS `monolink__rep_pept__search__generic_lookup` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_id` INT(10) UNSIGNED NOT NULL,
+  `reported_peptide_id` INT(10) UNSIGNED NOT NULL,
+  `nrseq_id` INT(10) UNSIGNED NOT NULL,
+  `protein_position` INT(10) UNSIGNED NOT NULL,
+  `psm_num_at_default_cutoff` INT(10) UNSIGNED NOT NULL,
+  `peptide_meets_default_cutoffs` ENUM('yes','no','not_applicable') NOT NULL,
+  `related_peptides_unique_for_search` TINYINT(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `monolink__rep_pept__search__generic_lookup_rep_pept_fk`
+    FOREIGN KEY (`reported_peptide_id`)
+    REFERENCES `reported_peptide` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `monolink__rep_pept__search__generic_lookup_search_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
+
+CREATE INDEX `monolink__rep_pept__search__generic_lookup_rep_pept_fk_idx` ON `monolink__rep_pept__search__generic_lookup` (`reported_peptide_id` ASC);
+
+CREATE INDEX `all_but_id_must_start_with_search_id_idx` ON `monolink__rep_pept__search__generic_lookup` (`search_id` ASC, `reported_peptide_id` ASC, `nrseq_id` ASC, `protein_position` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `dimer__rep_pept__search__generic_lookup`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `dimer__rep_pept__search__generic_lookup` ;
+
+CREATE TABLE IF NOT EXISTS `dimer__rep_pept__search__generic_lookup` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_id` INT(10) UNSIGNED NOT NULL,
+  `reported_peptide_id` INT(10) UNSIGNED NOT NULL,
+  `nrseq_id_1` INT(10) UNSIGNED NOT NULL,
+  `nrseq_id_2` INT(10) UNSIGNED NOT NULL,
+  `psm_num_at_default_cutoff` INT(10) UNSIGNED NOT NULL,
+  `peptide_meets_default_cutoffs` ENUM('yes','no','not_applicable') NOT NULL,
+  `related_peptides_unique_for_search` TINYINT(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `dimer__rep_pept__search__generic_lookup_search_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `dimer__rep_pept__search__generic_lookup_rep_pept_fk`
+    FOREIGN KEY (`reported_peptide_id`)
+    REFERENCES `reported_peptide` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
+
+CREATE INDEX `dimer__rep_pept__search__generic_lookup_rep_pept_fk_idx` ON `dimer__rep_pept__search__generic_lookup` (`reported_peptide_id` ASC);
+
+CREATE INDEX `all_but_id_must_start_with_search_id_idx` ON `dimer__rep_pept__search__generic_lookup` (`search_id` ASC, `reported_peptide_id` ASC, `nrseq_id_1` ASC, `nrseq_id_2` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `looplink__rep_pept__search__generic_lookup`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `looplink__rep_pept__search__generic_lookup` ;
+
+CREATE TABLE IF NOT EXISTS `looplink__rep_pept__search__generic_lookup` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_id` INT(10) UNSIGNED NOT NULL,
+  `reported_peptide_id` INT(10) UNSIGNED NOT NULL,
+  `nrseq_id` INT(10) UNSIGNED NOT NULL,
+  `protein_position_1` INT(10) UNSIGNED NOT NULL,
+  `protein_position_2` INT(10) UNSIGNED NOT NULL,
+  `psm_num_at_default_cutoff` INT(10) UNSIGNED NOT NULL,
+  `peptide_meets_default_cutoffs` ENUM('yes','no','not_applicable') NOT NULL,
+  `related_peptides_unique_for_search` TINYINT(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `looplink__rep_pept__search__generic_lookup_search_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `looplink__rep_pept__search__generic_lookup_rep_pept_fk`
+    FOREIGN KEY (`reported_peptide_id`)
+    REFERENCES `reported_peptide` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
+
+CREATE INDEX `looplink__rep_pept__search__generic_lookup_rep_pept_fk_idx` ON `looplink__rep_pept__search__generic_lookup` (`reported_peptide_id` ASC);
+
+CREATE INDEX `all_but_id_must_start_with_search_id_idx` ON `looplink__rep_pept__search__generic_lookup` (`search_id` ASC, `reported_peptide_id` ASC, `nrseq_id` ASC, `protein_position_1` ASC, `protein_position_2` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `unlinked__rep_pept__search__generic_lookup`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `unlinked__rep_pept__search__generic_lookup` ;
+
+CREATE TABLE IF NOT EXISTS `unlinked__rep_pept__search__generic_lookup` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_id` INT(10) UNSIGNED NOT NULL,
+  `reported_peptide_id` INT(10) UNSIGNED NOT NULL,
+  `nrseq_id` INT(10) UNSIGNED NOT NULL,
+  `psm_num_at_default_cutoff` INT(10) UNSIGNED NOT NULL,
+  `peptide_meets_default_cutoffs` ENUM('yes','no','not_applicable') NOT NULL,
+  `related_peptides_unique_for_search` TINYINT(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `unlinked__rep_pept__search__generic_lookup_search_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `unlinked__rep_pept__search__generic_lookup_rep_pept_fk`
+    FOREIGN KEY (`reported_peptide_id`)
+    REFERENCES `reported_peptide` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
+
+CREATE INDEX `unlinked__rep_pept__search__generic_lookup_rep_pept_fk_idx` ON `unlinked__rep_pept__search__generic_lookup` (`reported_peptide_id` ASC);
+
+CREATE INDEX `all_but_id_must_start_with_search_id_idx` ON `unlinked__rep_pept__search__generic_lookup` (`search_id` ASC, `reported_peptide_id` ASC, `nrseq_id` ASC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

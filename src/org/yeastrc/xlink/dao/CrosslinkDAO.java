@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -180,6 +182,76 @@ public class CrosslinkDAO {
 		return result;
 	}
 
+	
+
+
+	/**
+	 * Gets all CrosslinkDTO for psmId
+	 * 
+	 * @param psmId
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CrosslinkDTO> getAllCrosslinkDTOForPsmId( int psmId ) throws Exception {
+		
+		
+		List<CrosslinkDTO> resultList = new ArrayList<>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		String sql = "SELECT * FROM crosslink WHERE psm_id = ?";
+		
+		
+		try {
+			
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+
+			pstmt = conn.prepareStatement( sql );
+			pstmt.setInt( 1, psmId );
+			
+			rs = pstmt.executeQuery();
+			
+			while( rs.next() ) {
+
+				CrosslinkDTO result = populateFromResultSet( rs );
+
+				resultList.add( result );
+			}
+			
+			
+		} catch ( Exception e ) {
+			
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
+			
+			throw e;
+			
+		} finally {
+			
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			
+			if( conn != null ) {
+				try { conn.close(); } catch( Throwable t ) { ; }
+				conn = null;
+			}
+			
+		}
+		
+		
+		return resultList;
+	}
+
+
 
 
 	/**
@@ -196,14 +268,14 @@ public class CrosslinkDAO {
 		int proteinId_1 = rs.getInt( "nrseq_id_1" );
 		int proteinId_2 = rs.getInt( "nrseq_id_2" );
 		
-		NRProteinDTO NRProteinDTO_1 = new NRProteinDTO();
-		NRProteinDTO NRProteinDTO_2 = new NRProteinDTO();
+		NRProteinDTO nrProteinDTO_1 = new NRProteinDTO();
+		NRProteinDTO nrProteinDTO_2 = new NRProteinDTO();
 		
-		NRProteinDTO_1.setNrseqId(proteinId_1);
-		NRProteinDTO_2.setNrseqId(proteinId_2);
+		nrProteinDTO_1.setNrseqId(proteinId_1);
+		nrProteinDTO_2.setNrseqId(proteinId_2);
 		
-		result.setProtein1(NRProteinDTO_1);
-		result.setProtein2(NRProteinDTO_2);
+		result.setProtein1(nrProteinDTO_1);
+		result.setProtein2(nrProteinDTO_2);
 		
 		result.setPeptide1Id( rs.getInt( "peptide_1_id" ) );
 		result.setPeptide1Position( rs.getInt( "peptide_1_position" ) );
