@@ -43,7 +43,7 @@ public class SearchPeptideLooplink {
 
 			//  Get looplink table entry for first psm.  assume the peptide position is the same for all.
 			
-			LooplinkDTO looplinkDTO = LooplinkDAO.getInstance().getLooplinkDTOByPsmId( psmId );
+			LooplinkDTO looplinkDTO = LooplinkDAO.getInstance().getARandomLooplinkDTOForPsmId( psmId );
 
 			if ( looplinkDTO == null ) {
 				

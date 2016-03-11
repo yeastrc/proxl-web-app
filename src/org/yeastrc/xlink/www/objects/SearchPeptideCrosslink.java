@@ -41,7 +41,7 @@ public class SearchPeptideCrosslink {
 			//  Get crosslink table entry for a psm.  assume the peptide position is the same for all.
 			
 
-			CrosslinkDTO crosslinkDTO = CrosslinkDAO.getInstance().getCrosslinkDTOByPsmId( psmId );
+			CrosslinkDTO crosslinkDTO = CrosslinkDAO.getInstance().getARandomCrosslinkDTOForPsmId( psmId );
 			
 			if ( crosslinkDTO == null ) {
 				

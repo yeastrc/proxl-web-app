@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+//import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -51,7 +51,6 @@ import org.yeastrc.xlink.www.lorikeet_dto.LorikeetVariableMod;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -94,7 +93,7 @@ public class LorikeetSpectrumService {
 			
 
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 
 
 			PsmDTO psmDTO = null;
@@ -171,7 +170,7 @@ public class LorikeetSpectrumService {
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 			
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
 
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 
@@ -447,7 +446,7 @@ public class LorikeetSpectrumService {
 		
 		int psmId = psmDTO.getId();
 		
-		CrosslinkDTO crosslinkDTO = CrosslinkDAO.getInstance().getCrosslinkDTOByPsmId( psmId );
+		CrosslinkDTO crosslinkDTO = CrosslinkDAO.getInstance().getARandomCrosslinkDTOForPsmId( psmId );
 		
 		
 		lorikeetCrossLinkData.setCrossLinkPos1( crosslinkDTO.getPeptide1Position() );
@@ -520,7 +519,7 @@ public class LorikeetSpectrumService {
 		
 		int psmId = psmDTO.getId();
 		
-		LooplinkDTO looplinkDTO = LooplinkDAO.getInstance().getLooplinkDTOByPsmId( psmId );
+		LooplinkDTO looplinkDTO = LooplinkDAO.getInstance().getARandomLooplinkDTOForPsmId( psmId );
 		
 		
 		lorikeetLoopLinkData.setLoopLinkPos1( looplinkDTO.getPeptidePosition1() );

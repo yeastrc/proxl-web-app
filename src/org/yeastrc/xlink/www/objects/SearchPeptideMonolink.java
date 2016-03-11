@@ -41,7 +41,7 @@ public class SearchPeptideMonolink {
 
 			//  Get monolink table entry for first psm.  assume the peptide position is the same for all.
 			
-			MonolinkDTO monolinkDTO = MonolinkDAO.getInstance().getMonolinkDTOByPsmId( psmId );
+			MonolinkDTO monolinkDTO = MonolinkDAO.getInstance().getARandomMonolinkDTOForPsmId( psmId );
 
 			if ( monolinkDTO == null ) {
 				

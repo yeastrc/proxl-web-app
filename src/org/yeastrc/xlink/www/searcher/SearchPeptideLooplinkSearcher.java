@@ -61,7 +61,11 @@ public class SearchPeptideLooplinkSearcher {
 	
 
 	private final String SQL_FIRST_PART = 
-			
+
+			//  Do not put a SUM(...) in this SQL in the SELECT 
+			//  since there may be more than one looplink record per psm 
+			//  for the given protein id and positions
+
 
 			"SELECT unified_rp__rep_pept__search__generic_lookup.reported_peptide_id, "
 			
@@ -88,6 +92,8 @@ public class SearchPeptideLooplinkSearcher {
 	
 	private final String SQL_LAST_PART = 
 
+			//   GROUP BY is required
+			
 			" GROUP BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
 
 			// Sort in Java	

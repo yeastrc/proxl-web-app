@@ -59,23 +59,12 @@ public class SearchPeptideCrosslinkSearcher {
 	private final String PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS = "psm_best_value_tbl_";
 	
 
-//	String sql = "SELECT a.reported_peptide_id AS reported_peptide_id, a.q_value AS q_value, count(*) AS num_psms, min(b.q_value) AS best_psm_q_value " +
-//			  
-//					" FROM search_reported_peptide AS a " +
-//					" INNER JOIN psm AS b ON (a.search_id = b.search_id AND a.reported_peptide_id = b.reported_peptide_id) " +
-//					" INNER JOIN crosslink AS c ON b.id = c.psm_id " +
-//
-//					" WHERE a.search_id = ? AND ( a.q_value <= ? OR a.q_value IS NULL )   AND b.q_value <=? AND b.type = ? " +
-//							" AND c.nrseq_id_1 = ? AND c.nrseq_id_2 = ? AND c.protein_1_position = ? AND c.protein_2_position = ? " +
-//					
-//					" GROUP BY a.reported_peptide_id " +
-//					
-//					" ORDER BY a.q_value, a.reported_peptide_id";		
-
-
 
 	private final String SQL_FIRST_PART = 
 			
+			//  Do not put a SUM(...) in this SQL in the SELECT 
+			//  since there may be more than one crosslink record per psm 
+			//  for the given protein ids and positions
 
 			"SELECT unified_rp__rep_pept__search__generic_lookup.reported_peptide_id, "
 			
@@ -90,7 +79,6 @@ public class SearchPeptideCrosslinkSearcher {
 
 			+ " INNER JOIN crosslink ON unified_rp__rep_pept__search__generic_lookup.sample_psm_id = crosslink.psm_id";
 
-
 	private final String SQL_MAIN_WHERE_START = 
 					
 			" WHERE unified_rp__rep_pept__search__generic_lookup.search_id = ? "
@@ -101,6 +89,8 @@ public class SearchPeptideCrosslinkSearcher {
 	
 	private final String SQL_LAST_PART = 
 
+			//   GROUP BY is required
+			
 			" GROUP BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
 
 			// Sort in Java	
