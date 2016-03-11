@@ -77,7 +77,7 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 
 	
 	
-	private static final int REPORTED_PEPTIDE_ID_BATCH_SIZE = 50;
+	private static final int REPORTED_PEPTIDE_ID_BATCH_SIZE = 5000;
 	
 	
 	/**
