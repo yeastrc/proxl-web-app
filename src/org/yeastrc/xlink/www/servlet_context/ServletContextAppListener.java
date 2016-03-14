@@ -31,7 +31,7 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 
 		///  Uncomment this for using the other database for old Crosslinks Runs
 		
-		DBConnectionFactoryWeb.setProxlJNDINameTo_proxl_generic_fields();
+//		DBConnectionFactoryWeb.setProxlJNDINameTo_proxl_generic_fields();
 		
 //		DBConnectionFactoryWeb.setProxlJNDINameTo_proxl_generic_fields_demo_feb_2016();
 		
