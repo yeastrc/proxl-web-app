@@ -16,7 +16,7 @@
 		<td style="  line-height: 1.3em; <c:if test="${ not singleSearch }" > <%-- padding-top: 3px; padding-bottom: 3px; --%> width: 125px;</c:if> ">
 			${ filterTypeDisplay } Filters:
 			<a href="javascript:" >
-				<img src="/proxl_generic/images/icon-edit-small.png" 
+				<img src="${contextPath}/images/icon-edit-small.png" 
 					onclick="cutoffProcessingCommonCode.openCutoffOverlay( { clickedThis : this } )"
 					data-associated_overlay_container_id="${ filterTypeHTML_Id }_cutoffs_overlay_container__search_id_<bean:write name="search" property="id" />"
 					class="tool_tip_attached_jq" data-tooltip="Edit filter values" 
