@@ -46,16 +46,25 @@ public class PopulateSearchCrosslinkGenericLookupTable {
 		return new PopulateSearchCrosslinkGenericLookupTable(); 
 	}
 
+//	private String PRIMARY_SELECT_SQL = 
+//			
+//			"SELECT crosslink.nrseq_id_1, crosslink.nrseq_id_2, crosslink.protein_1_position, crosslink.protein_2_position "
+//			
+//			+ " FROM crosslink "
+//			+ " INNER JOIN psm ON crosslink.psm_id = psm.id "
+//			
+//			+ " WHERE psm.search_id = ? "
+//			+ " GROUP BY crosslink.nrseq_id_1, crosslink.nrseq_id_2, crosslink.protein_1_position, crosslink.protein_2_position";
+
 
 	private String PRIMARY_SELECT_SQL = 
 			
-			"SELECT crosslink.nrseq_id_1, crosslink.nrseq_id_2, crosslink.protein_1_position, crosslink.protein_2_position "
+			"SELECT DISTINCT crosslink.nrseq_id_1, crosslink.nrseq_id_2, crosslink.protein_1_position, crosslink.protein_2_position "
 			
 			+ " FROM crosslink "
 			+ " INNER JOIN psm ON crosslink.psm_id = psm.id "
 			
-			+ " WHERE psm.search_id = ? "
-			+ " GROUP BY crosslink.nrseq_id_1, crosslink.nrseq_id_2, crosslink.protein_1_position, crosslink.protein_2_position";
+			+ " WHERE psm.search_id = ? ";
 
 
 

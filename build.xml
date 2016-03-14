@@ -105,6 +105,12 @@
     		<fileset dir="${config}" />
     	</copy>
     	
+    	<!-- Copy config_dir__do_not_check_contents_into_git to the classes directory -->
+    	<copy todir="${classes}">
+    		<fileset dir="config_dir__do_not_check_contents_into_git" />
+    	</copy>
+    	
+    	
 
   	  	<copy  todir="${classes}">
   	  		
