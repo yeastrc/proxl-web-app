@@ -609,6 +609,17 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 						item.setNumPsms( numPsmsForDefaultCutoffs );
 					}
 				}
+
+				if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
+						|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {
+					
+					if ( item.getNumPsms() <= 0 ) {
+
+						//  !!!!!!!   Number of PSMs is zero this this isn't really a peptide that meets the cutoffs
+						
+						continue;  //  EARY LOOP ENTRY EXIT
+					}
+				}
 				
 
 				Map<Integer, AnnotationDataBaseDTO> bestPsmAnnotationDTOFromQueryMap =

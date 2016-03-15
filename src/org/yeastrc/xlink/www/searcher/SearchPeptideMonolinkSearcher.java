@@ -622,6 +622,18 @@ public class SearchPeptideMonolinkSearcher {
 				}
 				
 
+				if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
+						|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {
+					
+					if ( link.getNumPsms() <= 0 ) {
+
+						//  !!!!!!!   Number of PSMs is zero this this isn't really a peptide that meets the cutoffs
+						
+						continue;  //  EARY LOOP ENTRY EXIT
+					}
+				}
+				
+
 				if ( ( ( ! onlyDefaultPeptideCutoffs )|| ( ! onlyDefaultPsmCutoffs ) )
 						|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 

@@ -1004,7 +1004,7 @@ public class PeptideWebPageSearcher {
 	 * @param searcherCutoffValuesSearchLevel
 	 * @param onlyDefaultPsmCutoffs - true if the only PSM cutoffs are default cutoffs at default cutoff values
 	 * @param sql
-	 * @return - null if link type unknown, otherwise a populated object 
+	 * @return - null if PSM count is zero or link type unknown, otherwise a populated object 
 	 * @throws SQLException
 	 * @throws Exception
 	 */
@@ -1071,6 +1071,18 @@ public class PeptideWebPageSearcher {
 				item.setNumUniquePsms( numUniquePsmsForDefaultCutoffs );
 			}
 			
+		}
+		
+
+		if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
+				|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {
+			
+			if ( item.getNumPsms() <= 0 ) {
+
+				//  !!!!!!!   Number of PSMs is zero this this isn't really a peptide that meets the cutoffs
+				
+				return null;  //  EARY EXIT
+			}
 		}
 		
 		

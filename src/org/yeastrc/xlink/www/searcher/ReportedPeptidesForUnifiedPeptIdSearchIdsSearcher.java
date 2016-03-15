@@ -659,7 +659,16 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 					reportedPeptideData.setNumPSMs( numPsms );
 				}
 				
+				if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
+						|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {
+					
+					if ( reportedPeptideData.getNumPSMs() <= 0 ) {
 
+						//  !!!!!!!   Number of PSMs is zero this this isn't really a peptide that meets the cutoffs
+						
+						continue;  //  EARY LOOP ENTRY EXIT
+					}
+				}
 
 
 				if ( ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs )
