@@ -32,6 +32,7 @@ import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.dao.SearchReportedPeptideDynamicModLookupDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
 import org.yeastrc.xlink.dto.CrosslinkDTO;
 import org.yeastrc.xlink.dto.DynamicModDTO;
 import org.yeastrc.xlink.dto.LooplinkDTO;
@@ -45,8 +46,11 @@ import org.yeastrc.xlink.dto.SearchReportedPeptideDynamicModLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.searchers.AnnotationTypesForSearchIdPSMPeptideTypeSearcher;
 import org.yeastrc.xlink.searchers.PeptideUniqueSearcher;
+import org.yeastrc.xlink.searchers.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
@@ -114,11 +118,89 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
 		
 		
-		List<AnnotationTypeDTO> srchPgmFilterableReportedPeptideAnnotationTypeDTOList =
+		List<AnnotationTypeDTO> reportedPeptideFilterableAnnotationTypeDTOList =
 				AnnotationTypesForSearchIdPSMPeptideTypeSearcher.getInstance().get_Peptide_Filterable_ForSearchId( searchId );
 		
-		List<AnnotationTypeDTO> srchPgmFilterablePsmAnnotationTypeDTOList = 
+		List<AnnotationTypeDTO> psmFilterableFilterableAnnotationTypeDTOList = 
 				AnnotationTypesForSearchIdPSMPeptideTypeSearcher.getInstance().get_PSM_Filterable_ForSearchId( searchId );
+
+
+		//  Build list of only Reported Peptide Default Filters
+		
+		List<AnnotationTypeDTO> reportedPeptideFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List =
+				new ArrayList<>( reportedPeptideFilterableAnnotationTypeDTOList.size() );
+				
+		for ( AnnotationTypeDTO annotationTypeDTO : reportedPeptideFilterableAnnotationTypeDTOList ) {
+
+			if ( annotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
+				
+				String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + annotationTypeDTO.getId();
+				log.error( msg );
+				throw new Exception(msg);
+			}
+
+			if ( annotationTypeDTO.getAnnotationTypeFilterableDTO().isDefaultFilter()
+					&& annotationTypeDTO.getAnnotationTypeFilterableDTO().getDefaultFilterValue() != null ) {
+				
+				reportedPeptideFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List.add( annotationTypeDTO );
+			}
+		}
+		
+		
+		//  Build list of only PSM Default Filters
+		
+		List<AnnotationTypeDTO> psmFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List =
+				new ArrayList<>( psmFilterableFilterableAnnotationTypeDTOList.size() );
+				
+		for ( AnnotationTypeDTO annotationTypeDTO : psmFilterableFilterableAnnotationTypeDTOList ) {
+
+			if ( annotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
+				
+				String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + annotationTypeDTO.getId();
+				log.error( msg );
+				throw new Exception(msg);
+			}
+
+			if ( annotationTypeDTO.getAnnotationTypeFilterableDTO().isDefaultFilter()
+					&& annotationTypeDTO.getAnnotationTypeFilterableDTO().getDefaultFilterValue() != null ) {
+				
+				psmFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List.add( annotationTypeDTO );
+			}
+		}
+		
+
+		SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
+		
+		for ( AnnotationTypeDTO annotationTypeDTO : reportedPeptideFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List ) {
+
+			AnnotationTypeFilterableDTO annotationTypeFilterableDTO = annotationTypeDTO.getAnnotationTypeFilterableDTO();
+			
+			Double defaultFilterValue = annotationTypeFilterableDTO.getDefaultFilterValue();
+
+			SearcherCutoffValuesAnnotationLevel perAnnotationCutoffs = new SearcherCutoffValuesAnnotationLevel();
+			perAnnotationCutoffs.setAnnotationCutoffValue( defaultFilterValue );
+			perAnnotationCutoffs.setAnnotationTypeDTO( annotationTypeDTO );
+			perAnnotationCutoffs.setAnnotationTypeId( annotationTypeDTO.getId() );
+
+			searcherCutoffValuesSearchLevel.addPeptidePerAnnotationCutoffs( perAnnotationCutoffs );
+		}
+		
+
+		for ( AnnotationTypeDTO annotationTypeDTO : psmFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List ) {
+
+			AnnotationTypeFilterableDTO annotationTypeFilterableDTO = annotationTypeDTO.getAnnotationTypeFilterableDTO();
+			
+			Double defaultFilterValue = annotationTypeFilterableDTO.getDefaultFilterValue();
+
+			SearcherCutoffValuesAnnotationLevel perAnnotationCutoffs = new SearcherCutoffValuesAnnotationLevel();
+			perAnnotationCutoffs.setAnnotationCutoffValue( defaultFilterValue );
+			perAnnotationCutoffs.setAnnotationTypeDTO( annotationTypeDTO );
+			perAnnotationCutoffs.setAnnotationTypeId( annotationTypeDTO.getId() );
+
+			searcherCutoffValuesSearchLevel.addPsmPerAnnotationCutoffs( perAnnotationCutoffs );
+		}
+		
+		
 		
 		
 
@@ -135,8 +217,15 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 							searchReportedPeptideOffset, 
 							REPORTED_PEPTIDE_ID_BATCH_SIZE, 
 							uniqueDynamicModMasses, 
-							srchPgmFilterableReportedPeptideAnnotationTypeDTOList, 
-							srchPgmFilterablePsmAnnotationTypeDTOList, 
+							
+							reportedPeptideFilterableAnnotationTypeDTOList, 
+							psmFilterableFilterableAnnotationTypeDTOList, 
+							
+							reportedPeptideFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List,
+							psmFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List,
+							
+							searcherCutoffValuesSearchLevel,
+							
 							null /* startReportedPeptideId */, 
 							null /* endReportedPeptideId */ );
 				
@@ -199,9 +288,17 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 			
 			Set<Double> uniqueDynamicModMasses, //  updated in this method
 			
-			List<AnnotationTypeDTO> srchPgmFilterableReportedPeptideAnnotationTypeDTOList,
+			List<AnnotationTypeDTO> reportedPeptideFilterableAnnotationTypeDTOList,
 			
-			List<AnnotationTypeDTO> srchPgmFilterablePsmAnnotationTypeDTOList,
+			List<AnnotationTypeDTO> psmFilterableFilterableAnnotationTypeDTOList,
+			
+
+			List<AnnotationTypeDTO> reportedPeptideFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List,
+			
+			List<AnnotationTypeDTO> psmFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List,
+			
+			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
+			
 			
 			Integer startReportedPeptideId,	// optional, null if no value 
 			Integer endReportedPeptideId 	// optional, null if no value
@@ -261,18 +358,23 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 				
 				int samplePsmId = psmId;
 
-
 				int psmNumAtDefaultCutoff = 
 						GetPsmCountForAllAnnTypeIdsSearchReptPeptideDefaultCutoffSearcher.getInstance()
-						.getPsmCountForAllDefaultFilterValues( srchPgmFilterablePsmAnnotationTypeDTOList, searchId, reportedPeptideId );
+						.getPsmCountForAllDefaultFilterValues( 
+								psmFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List, 
+								searchId, 
+								reportedPeptideId );
 				
+				int numUniquePsmAtDefaultCutoff = 
+						PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher.getInstance()
+						.getPsmCountForUniquePSM_SearchIdReportedPeptideId( reportedPeptideId, searchId, searcherCutoffValuesSearchLevel );
 				
 				//  Determine if this peptide meets the default peptide cutoffs (will be stored in DB)
 				
 				Yes_No__NOT_APPLICABLE_Enum peptideMeetsDefaultCutoffs = 
 						DoesReptPeptideForThisSearchMeetDefaultCutoffsSearcher.getInstance()
 						.doesReptPeptideForThisSearchMeetDefaultCutoffs( 
-								srchPgmFilterableReportedPeptideAnnotationTypeDTOList, 
+								reportedPeptideFilterableAnnotationTypeDTOList, 
 								searchId,
 								reportedPeptideDTO.getId() );
 				
@@ -365,6 +467,8 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 								
 				unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO.setPsmNumAtDefaultCutoff( psmNumAtDefaultCutoff );
 				
+				unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO.setNumUniquePsmAtDefaultCutoff( numUniquePsmAtDefaultCutoff );
+				
 				unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO.setPeptideMeetsDefaultCutoffs( peptideMeetsDefaultCutoffs );
 				
 				
@@ -376,13 +480,13 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 				//  Populate Unified Reported Peptide Annotations Lookup table
 				
 				PopUnifRepPepLvlFltrblAnnBySrchReptPept.getInstance()
-				.insertAnnotationSpecificRecordsForSearchIdReportedPeptideId( unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO, srchPgmFilterableReportedPeptideAnnotationTypeDTOList );
+				.insertAnnotationSpecificRecordsForSearchIdReportedPeptideId( unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO, reportedPeptideFilterableAnnotationTypeDTOList );
 				
 				
 				//  Populate PSM roll ups table for PSM Filterable Annotations for this Search / Reported Peptide
 				
 				PopUnfRpPptLvPsmFltAnSmBSrcRpPpt.getInstance()
-				.insertAnnotationSpecificRecordsForSearchIdReportedPeptideId( unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO, srchPgmFilterablePsmAnnotationTypeDTOList );
+				.insertAnnotationSpecificRecordsForSearchIdReportedPeptideId( unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO, psmFilterableFilterableAnnotationTypeDTOList );
 				
 				
 				if ( getUnifiedReportedPeptideFromSearchIdReportedPeptideIdObject == null ) {

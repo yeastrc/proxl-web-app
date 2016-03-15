@@ -67,8 +67,9 @@ public class DB_Insert_UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO
 			"INSERT INTO unified_rp__rep_pept__search__generic_lookup "
 			+ 	"( unified_reported_peptide_id, reported_peptide_id, search_id, link_type, "
 			+  		" has_dynamic_modifictions, has_monolinks, psm_num_at_default_cutoff, "
-			+ 		" sample_psm_id, peptide_meets_default_cutoffs, related_peptides_unique_for_search ) "
-			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
+			+ 		" sample_psm_id, peptide_meets_default_cutoffs, related_peptides_unique_for_search,"
+			+ 		" num_unique_psm_at_default_cutoff ) "
+			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
 	
 	/**
@@ -158,7 +159,10 @@ public class DB_Insert_UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO
 			} else {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
 			}
-			
+
+			counter++;
+			pstmt.setInt( counter, item.getNumUniquePsmAtDefaultCutoff() );
+					
 			pstmt.executeUpdate();
 			
 			

@@ -3,7 +3,6 @@ package org.yeastrc.proxl.import_xml_to_db.import_post_processing.searchers;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -38,34 +37,16 @@ public class GetPsmCountForAllAnnTypeIdsSearchReptPeptideDefaultCutoffSearcher {
 	 */
 	public int getPsmCountForAllDefaultFilterValues( 
 			
-			List<AnnotationTypeDTO> annotationTypeDTOList, 
+			List<AnnotationTypeDTO> psmFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List, 
 			int search_id, 
 			int reported_peptide_id ) throws Exception {
 		
 		
 		int result = 0;
 
-		//  Build list of only Default Filters, This is the only list that will be used in the rest of this method
 		
-		List<AnnotationTypeDTO> annotationTypeDTO_Default_Filters_Only_List =
-				new ArrayList<>( annotationTypeDTOList.size() );
-				
-		for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDTOList ) {
 
-			if ( annotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
-				
-				String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + annotationTypeDTO.getId();
-				log.error( msg );
-				throw new Exception(msg);
-			}
-
-			if ( annotationTypeDTO.getAnnotationTypeFilterableDTO().isDefaultFilter() ) {
-				
-				annotationTypeDTO_Default_Filters_Only_List.add( annotationTypeDTO );
-			}
-		}
-		
-		if ( annotationTypeDTO_Default_Filters_Only_List.isEmpty() ) {
+		if ( psmFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List.isEmpty() ) {
 			
 			//  No Default Filters so no records can be found
 			
@@ -85,7 +66,7 @@ public class GetPsmCountForAllAnnTypeIdsSearchReptPeptideDefaultCutoffSearcher {
 
 		{
 
-			for ( int counter = 1; counter <= annotationTypeDTO_Default_Filters_Only_List.size(); counter++ ) {
+			for ( int counter = 1; counter <= psmFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List.size(); counter++ ) {
 
 				if ( counter > 1 ) {
 
@@ -121,7 +102,7 @@ public class GetPsmCountForAllAnnTypeIdsSearchReptPeptideDefaultCutoffSearcher {
 		{
 			int counter = 0; 
 
-			for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDTO_Default_Filters_Only_List ) {
+			for ( AnnotationTypeDTO annotationTypeDTO : psmFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List ) {
 
 				counter++;
 
@@ -177,7 +158,7 @@ public class GetPsmCountForAllAnnTypeIdsSearchReptPeptideDefaultCutoffSearcher {
 			int pstmtCounter = 0;
 
 			
-			for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDTO_Default_Filters_Only_List ) {
+			for ( AnnotationTypeDTO annotationTypeDTO : psmFilterableFilterableAnnotationTypeDTO_Default_Filters_Only_List ) {
 			
 				pstmtCounter++;
 				pstmt.setInt( pstmtCounter, search_id );
