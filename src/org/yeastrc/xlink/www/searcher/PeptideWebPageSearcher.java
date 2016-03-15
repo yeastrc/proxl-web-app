@@ -78,7 +78,9 @@ public class PeptideWebPageSearcher {
 			
 			
 			+ " unified_rp__rep_pept__search__generic_lookup.link_type, "
-			+ " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff ";
+			+ " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff, "
+			+ " unified_rp__rep_pept__search__generic_lookup.num_unique_psm_at_default_cutoff ";
+	
 			
 	private final String SQL_MAIN_FROM_START = 			
 			
@@ -1062,6 +1064,13 @@ public class PeptideWebPageSearcher {
 			
 				item.setNumPsms( numPsmsForDefaultCutoffs );
 			}
+
+			int numUniquePsmsForDefaultCutoffs = rs.getInt( "num_unique_psm_at_default_cutoff" );
+			if ( ! rs.wasNull() ) {
+			
+				item.setNumUniquePsms( numUniquePsmsForDefaultCutoffs );
+			}
+			
 		}
 		
 		
