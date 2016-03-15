@@ -9,6 +9,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.auth_db.AuthLibraryDBConnectionFactoryForWeb;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.db_web.DBConnectionFactoryWeb;
+import org.yeastrc.xlink.www.db_web.DBSet_JNDI_Name_FromConfigFile;
 import org.yeastrc.xlink.www.send_email.GetEmailConfig;
 
 
@@ -29,13 +30,13 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		
 		log.warn( "INFO:  !!!!!!!!!!!!!!!   Start up of web app  'Proxl' beginning  !!!!!!!!!!!!!!!!!!!! " );
 
-		///  Uncomment this for using the other database for old Crosslinks Runs
-		
-//		DBConnectionFactoryWeb.setProxlJNDINameTo_proxl_generic_fields();
-		
-//		DBConnectionFactoryWeb.setProxlJNDINameTo_proxl_generic_fields_demo_feb_2016();
-		
-		
+
+		try {
+			DBSet_JNDI_Name_FromConfigFile.getInstance().dbSet_JNDI_Name_FromConfigFile();
+		} catch (Exception e) {
+			//  already logged
+			throw new RuntimeException( e );
+		} 
 		
 		//   Set   to use DBConnectionFactoryWeb;
 		
@@ -95,7 +96,6 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 //		}
 
 	}
-
 
 
 }

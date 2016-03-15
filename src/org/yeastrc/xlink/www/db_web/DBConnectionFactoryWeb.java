@@ -26,12 +26,8 @@ public class DBConnectionFactoryWeb implements IDBConnectionFactory {
 	
 	private static final String JNDI_NAME_SUFFIX_proxl = "proxl";
 	
-	private static final String JNDI_NAME_SUFFIX__proxl_generic_fields = "proxl_generic_fields";
-
 
 	private static final String JNDI_NAME_proxl = JNDI_NAME_PREFIX + JNDI_NAME_SUFFIX_proxl;
-	
-	private static final String JNDI_NAME_proxl_generic_fields = JNDI_NAME_PREFIX + JNDI_NAME_SUFFIX__proxl_generic_fields;
 	
 	
 
@@ -39,33 +35,16 @@ public class DBConnectionFactoryWeb implements IDBConnectionFactory {
 
 
 	/**
-	 * Change Proxl JNDI name to proxl_generic_fields (check the code for this string)
+	 * Change Proxl JNDI name 
 	 */
-	public static void setProxlJNDINameTo_proxl_generic_fields() {
+	public static void setProxlJNDIName( String newProxlJNDINameSuffix ) {
 		
-		proxlJNDIName = JNDI_NAME_proxl_generic_fields;
+		proxlJNDIName = JNDI_NAME_PREFIX + newProxlJNDINameSuffix;
 
 		if ( log.isInfoEnabled() ) {
-			log.info("setProxlJNDINameTo_proxl_generic_fields() called. proxlJNDIName now: " + proxlJNDIName);
+			log.info("setProxlJNDIName() called. proxlJNDIName now: " + proxlJNDIName);
 		}		
 	}
-	
-	
-
-	/**
-	 * Change Proxl JNDI name to proxl_generic_fields (check the code for this string)
-	 */
-	public static void setProxlJNDINameTo_proxl_generic_fields_demo_feb_2016() {
-		
-		proxlJNDIName = JNDI_NAME_PREFIX +  "proxl_generic_fields_demo_feb_2016";
-
-		if ( log.isInfoEnabled() ) {
-			log.info("setProxlJNDINameTo_proxl_generic_fields_demo_feb_2016() called. proxlJNDIName now: " + proxlJNDIName);
-		}		
-	}
-	
-	
-	
 	
 	
 	
