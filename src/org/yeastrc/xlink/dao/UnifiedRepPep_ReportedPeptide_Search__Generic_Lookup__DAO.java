@@ -125,6 +125,8 @@ public class UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO {
 
 
 		item.setPsmNumAtDefaultCutoff( rs.getInt( "psm_num_at_default_cutoff" ) );
+		item.setNumUniquePsmAtDefaultCutoff( rs.getInt( "num_unique_psm_at_default_cutoff" ) );
+
 		item.setSamplePsmId( rs.getInt( "sample_psm_id" ) );
 
 

@@ -1449,6 +1449,7 @@ CREATE TABLE IF NOT EXISTS `unified_rp__rep_pept__search__generic_lookup` (
   `psm_num_at_default_cutoff` INT(10) UNSIGNED NOT NULL,
   `peptide_meets_default_cutoffs` ENUM('yes','no','not_applicable') NOT NULL,
   `related_peptides_unique_for_search` TINYINT(1) NOT NULL DEFAULT 0,
+  `num_unique_psm_at_default_cutoff` INT(10) UNSIGNED NOT NULL,
   PRIMARY KEY (`unified_reported_peptide_id`, `reported_peptide_id`, `search_id`),
   CONSTRAINT `unified_rp__rep_pept__search__generic_lookup__sample_psm_id_fk`
     FOREIGN KEY (`sample_psm_id`)
@@ -2086,7 +2087,7 @@ COLLATE = latin1_bin;
 
 CREATE INDEX `crosslink__rep_pept__search__generic_lookup_rep_pept_idx` ON `crosslink__rep_pept__search__generic_lookup` (`reported_peptide_id` ASC);
 
-CREATE INDEX `all_but_id_must_start_with_search_id_idx` ON `crosslink__rep_pept__search__generic_lookup` (`search_id` ASC, `reported_peptide_id` ASC, `nrseq_id_1` ASC, `nrseq_id_2` ASC, `protein_1_position` ASC, `protein_2_position` ASC);
+CREATE INDEX `search_id_protein_data__search_id_must_be_first_idx` ON `crosslink__rep_pept__search__generic_lookup` (`search_id` ASC, `nrseq_id_1` ASC, `nrseq_id_2` ASC, `protein_1_position` ASC, `protein_2_position` ASC);
 
 
 -- -----------------------------------------------------
@@ -2120,7 +2121,7 @@ COLLATE = latin1_bin;
 
 CREATE INDEX `monolink__rep_pept__search__generic_lookup_rep_pept_fk_idx` ON `monolink__rep_pept__search__generic_lookup` (`reported_peptide_id` ASC);
 
-CREATE INDEX `all_but_id_must_start_with_search_id_idx` ON `monolink__rep_pept__search__generic_lookup` (`search_id` ASC, `reported_peptide_id` ASC, `nrseq_id` ASC, `protein_position` ASC);
+CREATE INDEX `search_id_protein_data__search_id_must_be_first_idx` ON `monolink__rep_pept__search__generic_lookup` (`search_id` ASC, `nrseq_id` ASC, `protein_position` ASC);
 
 
 -- -----------------------------------------------------
@@ -2154,7 +2155,7 @@ COLLATE = latin1_bin;
 
 CREATE INDEX `dimer__rep_pept__search__generic_lookup_rep_pept_fk_idx` ON `dimer__rep_pept__search__generic_lookup` (`reported_peptide_id` ASC);
 
-CREATE INDEX `all_but_id_must_start_with_search_id_idx` ON `dimer__rep_pept__search__generic_lookup` (`search_id` ASC, `reported_peptide_id` ASC, `nrseq_id_1` ASC, `nrseq_id_2` ASC);
+CREATE INDEX `search_id_protein_data__search_id_must_be_first_idx` ON `dimer__rep_pept__search__generic_lookup` (`search_id` ASC, `nrseq_id_1` ASC, `nrseq_id_2` ASC);
 
 
 -- -----------------------------------------------------
@@ -2189,7 +2190,7 @@ COLLATE = latin1_bin;
 
 CREATE INDEX `looplink__rep_pept__search__generic_lookup_rep_pept_fk_idx` ON `looplink__rep_pept__search__generic_lookup` (`reported_peptide_id` ASC);
 
-CREATE INDEX `all_but_id_must_start_with_search_id_idx` ON `looplink__rep_pept__search__generic_lookup` (`search_id` ASC, `reported_peptide_id` ASC, `nrseq_id` ASC, `protein_position_1` ASC, `protein_position_2` ASC);
+CREATE INDEX `search_id_protein_data__search_id_must_be_first_idx` ON `looplink__rep_pept__search__generic_lookup` (`search_id` ASC, `nrseq_id` ASC, `protein_position_1` ASC, `protein_position_2` ASC);
 
 
 -- -----------------------------------------------------
@@ -2222,7 +2223,7 @@ COLLATE = latin1_bin;
 
 CREATE INDEX `unlinked__rep_pept__search__generic_lookup_rep_pept_fk_idx` ON `unlinked__rep_pept__search__generic_lookup` (`reported_peptide_id` ASC);
 
-CREATE INDEX `all_but_id_must_start_with_search_id_idx` ON `unlinked__rep_pept__search__generic_lookup` (`search_id` ASC, `reported_peptide_id` ASC, `nrseq_id` ASC);
+CREATE INDEX `search_id_protein_data__search_id_must_be_first_idx` ON `unlinked__rep_pept__search__generic_lookup` (`search_id` ASC, `nrseq_id` ASC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

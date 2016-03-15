@@ -20,6 +20,7 @@ public class UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO {
 	private boolean allRelatedPeptidesUniqueForSearch;
 
 	private int psmNumAtDefaultCutoff;
+	private int numUniquePsmAtDefaultCutoff;
 
 	private int samplePsmId;
 	
@@ -133,5 +134,14 @@ public class UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO {
 	}
 	public void setSearchId(int searchId) {
 		this.searchId = searchId;
+	}
+
+	public int getNumUniquePsmAtDefaultCutoff() {
+		return numUniquePsmAtDefaultCutoff;
+	}
+
+
+	public void setNumUniquePsmAtDefaultCutoff(int numUniquePsmAtDefaultCutoff) {
+		this.numUniquePsmAtDefaultCutoff = numUniquePsmAtDefaultCutoff;
 	}
 }
