@@ -605,41 +605,26 @@ public class NumPeptidesPSMsForProteinCriteria {
 		
 		StringBuilder sqlSB = new StringBuilder( 1000 );
 		
-		sqlSB.append( "SELECT distinct unified_rp__rep_pept__search__generic_lookup.reported_peptide_id AS reported_peptide_id "  );
-		
-		sqlSB.append( " , unified_rp__rep_pept__search__generic_lookup.related_peptides_unique_for_search " );
-		sqlSB.append( " , unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff " );
-		
-		
 
-		sqlSB.append( " FROM unified_rp__rep_pept__search__generic_lookup  " );
+		sqlSB.append( "SELECT distinct " );
 		
-		//  Join with link table subquery
-		
-		sqlSB.append( "INNER JOIN " );
-		
-		sqlSB.append( " ( " );
-		sqlSB.append( "SELECT distinct  "  );
 		sqlSB.append( SQL_LINK_TABLE_ALIAS );
-		sqlSB.append( ".psm_id " );
-				
-		sqlSB.append( " FROM " );
+		sqlSB.append( ".reported_peptide_id AS reported_peptide_id "  );
+		
+		sqlSB.append( " , " ); 
+		sqlSB.append( SQL_LINK_TABLE_ALIAS );
+		sqlSB.append( ".related_peptides_unique_for_search " );
+
+		sqlSB.append( " , " ); 
+		sqlSB.append( SQL_LINK_TABLE_ALIAS );
+		sqlSB.append( ".psm_num_at_default_cutoff " );
+
+		sqlSB.append( " FROM  " );
+		
 		sqlSB.append( linkTableName );
+		sqlSB.append( "__rep_pept__search__generic_lookup  " );
 		sqlSB.append( " AS " );
 		sqlSB.append( SQL_LINK_TABLE_ALIAS );
-		sqlSB.append( " WHERE " );
-		sqlSB.append( sqlWhereForlinkTable );
-
-		sqlSB.append( " ) AS " );
-
-		sqlSB.append( SQL_LINK_TABLE_ALIAS );
-
-		
-		sqlSB.append( " ON unified_rp__rep_pept__search__generic_lookup.sample_psm_id = " );
-		sqlSB.append( SQL_LINK_TABLE_ALIAS );
-		sqlSB.append( ".psm_id " );
-		
-		
 
 		{
 
@@ -659,7 +644,8 @@ public class NumPeptidesPSMsForProteinCriteria {
 
 					sqlSB.append( " ON "  );
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.search_id = "  );
+					sqlSB.append( SQL_LINK_TABLE_ALIAS );
+					sqlSB.append( ".search_id = "  );
 
 					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
@@ -667,9 +653,9 @@ public class NumPeptidesPSMsForProteinCriteria {
 
 					sqlSB.append( " AND " );
 
-
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.reported_peptide_id = "  );
-
+					sqlSB.append( SQL_LINK_TABLE_ALIAS );
+					sqlSB.append( ".reported_peptide_id = "  );
+					
 					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( ".reported_peptide_id" );
@@ -697,17 +683,18 @@ public class NumPeptidesPSMsForProteinCriteria {
 
 					sqlSB.append( " ON "  );
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.search_id = "  );
-
+					sqlSB.append( SQL_LINK_TABLE_ALIAS );
+					sqlSB.append( ".search_id = "  );
+					
 					sqlSB.append( "srch__rep_pept_fltrbl_tbl_" );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( ".search_id" );
 
 					sqlSB.append( " AND " );
 
-
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.reported_peptide_id = "  );
-
+					sqlSB.append( SQL_LINK_TABLE_ALIAS );
+					sqlSB.append( ".reported_peptide_id = "  );
+					
 					sqlSB.append( "srch__rep_pept_fltrbl_tbl_" );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( ".reported_peptide_id" );
@@ -719,8 +706,15 @@ public class NumPeptidesPSMsForProteinCriteria {
 
 		///////////
 		
-		sqlSB.append( " WHERE unified_rp__rep_pept__search__generic_lookup.search_id = ? " );
+		sqlSB.append( " WHERE " );
 		
+
+		sqlSB.append( sqlWhereForlinkTable );
+		
+		sqlSB.append( " AND " );
+		
+		sqlSB.append( SQL_LINK_TABLE_ALIAS );
+		sqlSB.append( ".search_id = ?  " );
 		
 		
 		//////////
@@ -738,8 +732,8 @@ public class NumPeptidesPSMsForProteinCriteria {
 
 				sqlSB.append( " AND " );
 
-
-				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff > 0 " );
+				sqlSB.append( SQL_LINK_TABLE_ALIAS );
+				sqlSB.append( ".psm_num_at_default_cutoff > 0 " );
 
 				
 			} else {
@@ -811,26 +805,11 @@ public class NumPeptidesPSMsForProteinCriteria {
 
 				sqlSB.append( " AND " );
 
-
-				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.peptide_meets_default_cutoffs = '" );
+				sqlSB.append( SQL_LINK_TABLE_ALIAS );
+				sqlSB.append( ".peptide_meets_default_cutoffs = '" );
 				sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.YES.value() );
 				sqlSB.append( "' " );
-				
-				if ( linkTypeString != null ) {
-
-					sqlSB.append( " AND " );
-
-
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.link_type = '" );
-					sqlSB.append( linkTypeString );
-					sqlSB.append( "' " );
-					
-//					if ( log.isInfoEnabled() ) {
-//						log.info( "Using unified_rp__rep_pept__search__generic_lookup.link_type = '" + linkTypeString + "' ");
-//					}
-				}
-
-				
+								
 			} else if ( defaultPeptideCutoffs == Yes_No__NOT_APPLICABLE_Enum.NO ) {
 
 				
@@ -891,16 +870,6 @@ public class NumPeptidesPSMsForProteinCriteria {
 		
 		
 		String sql = sqlSB.toString();
-		
-
-//		if ( linkTypeString != null ) {
-//
-//			
-//			if ( log.isInfoEnabled() ) {
-//				log.info( "Using unified_rp__rep_pept__search__generic_lookup.link_type = '" + linkTypeString + "'. "
-//						+ " SQL:  " + sql );
-//			}
-//		}
 		
 		
 		return sql;
