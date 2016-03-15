@@ -303,6 +303,8 @@ public class SearchProteinLooplinkSearcher {
 				
 				SearchProteinLooplink link = new SearchProteinLooplink();
 				wrappedLink.setSearchProteinLooplink( link );
+
+				link.setSearch( search );
 				
 				link.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 				
@@ -323,7 +325,17 @@ public class SearchProteinLooplinkSearcher {
 
 				}
 				
-				
+
+				if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
+						|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {
+					
+					if ( link.getNumPsms() <= 0 ) {
+
+						//  !!!!!!!   Number of PSMs is zero this this isn't really a protein that meets the cutoffs
+						
+						continue;  //  EARY LOOP ENTRY EXIT
+					}
+				}
 
 
 				if ( ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs )
@@ -349,8 +361,6 @@ public class SearchProteinLooplinkSearcher {
 					wrappedLink.setPeptideAnnotationDTOMap( bestPeptideAnnotationDTOFromQueryMap );
 				}
 				
-				
-				link.setSearch( search );
 				
 				wrappedLinks.add( wrappedLink );
 			}
@@ -732,6 +742,9 @@ public class SearchProteinLooplinkSearcher {
 				SearchProteinLooplink link = new SearchProteinLooplink();
 				wrappedLink.setSearchProteinLooplink( link );
 
+				
+				link.setSearch( search );
+				
 				link.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 				
 				
@@ -750,7 +763,6 @@ public class SearchProteinLooplinkSearcher {
 					link.setNumPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
 					link.setNumUniquePeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
 				}
-
 
 
 				if ( ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs )
@@ -778,8 +790,6 @@ public class SearchProteinLooplinkSearcher {
 				
 							
 							
-				
-				link.setSearch( search );
 				
 				if( rs.next() )
 					throw new Exception( "Should only have gotten one row..." );

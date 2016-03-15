@@ -309,6 +309,10 @@ public class SearchProteinCrosslinkSearcher {
 				SearchProteinCrosslink link = new SearchProteinCrosslink();
 				wrappedLink.setSearchProteinCrosslink( link );
 				
+
+				
+				link.setSearch( search );
+				
 				link.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 				
 				link.setProtein1( new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( rs.getInt( "nrseq_id_1" ) ) ) );
@@ -326,6 +330,18 @@ public class SearchProteinCrosslinkSearcher {
 					link.setNumLinkedPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
 					link.setNumUniqueLinkedPeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
 
+				}
+				
+
+				if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
+						|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {
+					
+					if ( link.getNumPsms() <= 0 ) {
+
+						//  !!!!!!!   Number of PSMs is zero this this isn't really a Protein that meets the cutoffs
+						
+						continue;  //  EARY LOOP ENTRY EXIT
+					}
 				}
 				
 				
@@ -351,9 +367,6 @@ public class SearchProteinCrosslinkSearcher {
 					
 					wrappedLink.setPeptideAnnotationDTOMap( bestPeptideAnnotationDTOFromQueryMap );
 				}
-				
-				
-				link.setSearch( search );
 				
 				
 				wrappedLinks.add( wrappedLink );
@@ -754,6 +767,7 @@ public class SearchProteinCrosslinkSearcher {
 					link.setNumLinkedPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
 					link.setNumUniqueLinkedPeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
 				}
+				
 				
 
 				if ( ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs )
