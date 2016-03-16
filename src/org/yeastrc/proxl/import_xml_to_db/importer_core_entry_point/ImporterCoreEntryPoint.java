@@ -20,7 +20,7 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.PrintHelpOnlyException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.main.ImportPostProcessingPerSearch;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProxlInputObjectContainer;
-import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateAnnotationNamesUniqueWithinSearchProgramAndType;
+import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateAnnotationTypeRecords;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateScanFilenamesInXMLAreOnCommandLine;
 import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput;
 import org.yeastrc.proxl.import_xml_to_db.project_importable_validation.IsImportingAllowForProject;
@@ -289,7 +289,7 @@ public class ImporterCoreEntryPoint {
 
 
 			//   Throws Exception if data error found
-			ValidateAnnotationNamesUniqueWithinSearchProgramAndType.getInstance().validateAnnotationNamesUniqueWithinSearchProgramAndType( proxlInputForImport );
+			ValidateAnnotationTypeRecords.getInstance().validateAnnotationTypeRecords( proxlInputForImport );
 
 			
 			
