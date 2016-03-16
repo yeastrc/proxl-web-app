@@ -41,9 +41,7 @@ public class DBConnectionFactoryWeb implements IDBConnectionFactory {
 		
 		proxlJNDIName = JNDI_NAME_PREFIX + newProxlJNDINameSuffix;
 
-		if ( log.isInfoEnabled() ) {
-			log.info("setProxlJNDIName() called. proxlJNDIName now: " + proxlJNDIName);
-		}		
+		log.warn("INFO:  setProxlJNDIName() called. proxlJNDIName now: " + proxlJNDIName);
 	}
 	
 	
