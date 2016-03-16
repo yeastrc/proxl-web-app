@@ -27,8 +27,3 @@ INSERT INTO xl_user_access_level_label_description (xl_user_access_level_numeric
 	VALUES ( 9999, 'no access', 'at project level, no access to that project, at application wide level, no access to any project' );
 
 	
-
-INSERT INTO filter_direction_values (id, value_string) VALUES (1, 'above');
-INSERT INTO filter_direction_values (id, value_string) VALUES (2, 'below');
-	
-	
