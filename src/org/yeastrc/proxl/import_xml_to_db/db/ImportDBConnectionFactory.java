@@ -41,8 +41,6 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 	
 	private IDBConnectionParametersProvider dbConnectionParametersProvider = null;
 	
-	private String proxlDatabaseName = DBConnectionFactory.PROXL;
-	
 
 	/**
 	 * Allow setting a value for dbConnectionParametersProvider
@@ -52,6 +50,21 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 	public void setDbConnectionParametersProvider(
 			IDBConnectionParametersProvider dbConnectionParametersProvider) {
 		this.dbConnectionParametersProvider = dbConnectionParametersProvider;
+		
+
+		if ( StringUtils.isNotEmpty( dbConnectionParametersProvider.getProxlDbName() ) ) {
+
+			System.out.println( "Proxl DB Name from Connection Provider: " + dbConnectionParametersProvider.getProxlDbName() );
+			log.info( "Proxl DB Name from Connection Provider: " + dbConnectionParametersProvider.getProxlDbName() );
+		}
+		
+
+		if ( StringUtils.isNotEmpty( dbConnectionParametersProvider.getNrseqDbName() ) ) {
+
+			System.out.println( "YRC_NRSEQ DB Name from Connection Provider: " + dbConnectionParametersProvider.getNrseqDbName() );
+			log.info( "YRC_NRSEQ DB Name from Connection Provider: " + dbConnectionParametersProvider.getNrseqDbName() );
+		}
+
 	}
 	
 	public Connection getInsertControlCommitConnection() throws Exception {
@@ -92,17 +105,33 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 		
 		if ( dbConnectionParametersProvider == null ) {
 			
-			dbConnectionParametersProvider = new DBConnectionParametersProvider();
+			dbConnectionParametersProvider = new DBConnectionParametersProviderFromPropertiesFile();
 			
 			dbConnectionParametersProvider.init();
+			
+
+			if ( StringUtils.isNotEmpty( dbConnectionParametersProvider.getProxlDbName() ) ) {
+
+				System.out.println( "Proxl DB Name from Connection Provider: " + dbConnectionParametersProvider.getProxlDbName() );
+				log.info( "Proxl DB Name from Connection Provider: " + dbConnectionParametersProvider.getProxlDbName() );
+			}
+			
+
+			if ( StringUtils.isNotEmpty( dbConnectionParametersProvider.getNrseqDbName() ) ) {
+
+				System.out.println( "YRC_NRSEQ DB Name from Connection Provider: " + dbConnectionParametersProvider.getNrseqDbName() );
+				log.info( "YRC_NRSEQ DB Name from Connection Provider: " + dbConnectionParametersProvider.getNrseqDbName() );
+			}
 		}
 		
 		//  Allow change of database
 		
 		if ( DBConnectionFactory.PROXL.equals(db) ) {
 			
-			db = proxlDatabaseName;
-			
+			if ( StringUtils.isNotEmpty( dbConnectionParametersProvider.getProxlDbName() ) ) {
+
+				db = dbConnectionParametersProvider.getProxlDbName();
+			}
 		}
 		
 
@@ -203,12 +232,4 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 
 	
 
-	
-	public String getProxlDatabaseName() {
-		return proxlDatabaseName;
-	}
-
-	public void setProxlDatabaseName(String proxlDatabaseName) {
-		this.proxlDatabaseName = proxlDatabaseName;
-	}
 }

@@ -40,4 +40,18 @@ public interface IDBConnectionParametersProvider {
 	 */
 	public String getDBPort();
 	
+
+	/**
+	 * Database name for 'proxl'.  Return null to use Importer default of 'proxl'
+	 * @return
+	 */
+	public String getProxlDbName();
+
+	/**
+	 * Database name for 'YRC_NRSEQ'.  Return null to use Importer default of 'YRC_NRSEQ'
+	 * @return
+	 */
+	public String getNrseqDbName();
+	
+	
 }

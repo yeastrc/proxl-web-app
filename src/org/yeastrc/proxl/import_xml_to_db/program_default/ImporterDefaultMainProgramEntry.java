@@ -12,7 +12,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.ScanFilenameConstants;
-import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProvider;
+import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFile;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.PrintHelpOnlyException;
 import org.yeastrc.proxl.import_xml_to_db.importer_core_entry_point.ImporterCoreEntryPoint;
@@ -259,7 +259,7 @@ public class ImporterDefaultMainProgramEntry {
 
 			if ( createDatabaseConnectionFactory ) {
 
-				DBConnectionParametersProvider dbConnectionParametersProvider = new DBConnectionParametersProvider();
+				DBConnectionParametersProviderFromPropertiesFile dbConnectionParametersProvider = new DBConnectionParametersProviderFromPropertiesFile();
 
 				//				if ( dbConfigFile != null ) {
 				//
@@ -267,15 +267,16 @@ public class ImporterDefaultMainProgramEntry {
 				//				}
 
 				dbConnectionParametersProvider.init();
+
+				if ( StringUtils.isNotEmpty( proxlDatabaseName ) ) {
+				
+					dbConnectionParametersProvider.setProxlDbName( proxlDatabaseName );
+				}
 				
 				ImportDBConnectionFactory importDBConnectionFactory = ImportDBConnectionFactory.getInstance();
 
 				importDBConnectionFactory.setDbConnectionParametersProvider( dbConnectionParametersProvider );
 				
-				if ( StringUtils.isNotEmpty( proxlDatabaseName ) ) {
-				
-					importDBConnectionFactory.setProxlDatabaseName( proxlDatabaseName );
-				}
 
 				DBConnectionFactory.setDbConnectionFactoryImpl( importDBConnectionFactory );
 
