@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  * Default version of IDBConnectionParametersProvider that reads a property file
  *
  */
-public class DBConnectionParametersProvider implements IDBConnectionParametersProvider {
+public class DBConnectionParametersProviderFromPropertiesFile implements IDBConnectionParametersProvider {
 
 	public static String DB_CONFIG_FILENAME = "db_config_file.properties";
 	
@@ -23,8 +23,11 @@ public class DBConnectionParametersProvider implements IDBConnectionParametersPr
 	private static String PROPERTY_NAME__PASSWORD = "password";
 	private static String PROPERTY_NAME__DB_URL   = "dbURL";
 	private static String PROPERTY_NAME__DB_PORT  = "dbPort";
-	
-	private static Logger log = Logger.getLogger(DBConnectionParametersProvider.class);
+
+	private static String PROPERTY_NAME__PROXL_DB_NAME  = "proxl.db.name";
+	private static String PROPERTY_NAME__NRSEQ_DB_NAME  = "nrseq.db.name";
+
+	private static Logger log = Logger.getLogger(DBConnectionParametersProviderFromPropertiesFile.class);
 	
 	
 	private File configFile;
@@ -35,6 +38,8 @@ public class DBConnectionParametersProvider implements IDBConnectionParametersPr
 	private String dbURL;
 	private String dbPort;
 
+	private String proxlDbName;
+	private String nrseqDbName;
 	
 	
 	@Override
@@ -122,6 +127,9 @@ public class DBConnectionParametersProvider implements IDBConnectionParametersPr
 				 dbURL = configProps.getProperty( PROPERTY_NAME__DB_URL );
 				 dbPort = configProps.getProperty( PROPERTY_NAME__DB_PORT );
 				 
+				 proxlDbName = configProps.getProperty( PROPERTY_NAME__PROXL_DB_NAME );
+				 nrseqDbName = configProps.getProperty( PROPERTY_NAME__NRSEQ_DB_NAME );
+				 
 				 System.out.println( "Database connection parameters:");
 				 if ( StringUtils.isNotEmpty( username ) ) {
 					 
@@ -133,6 +141,15 @@ public class DBConnectionParametersProvider implements IDBConnectionParametersPr
 				 }
 				 System.out.println( "dbURL: " + dbURL );
 				 System.out.println( "dbPort: " + dbPort );
+				 
+				 if ( StringUtils.isNotEmpty( proxlDbName ) ) {
+					 
+					 System.out.println( PROPERTY_NAME__PROXL_DB_NAME + ": " + proxlDbName );
+				 }
+				 if ( StringUtils.isNotEmpty( nrseqDbName ) ) {
+					 
+					 System.out.println( PROPERTY_NAME__NRSEQ_DB_NAME + ": " + nrseqDbName );
+				 }
 //			}
 
 		} catch ( RuntimeException e ) {
@@ -169,6 +186,18 @@ public class DBConnectionParametersProvider implements IDBConnectionParametersPr
 		return dbPort;
 	}
 	
+	@Override
+	public String getProxlDbName() {
+		return proxlDbName;
+	}
+
+	@Override
+	public String getNrseqDbName() {
+		return nrseqDbName;
+	}
+	
+	
+
 	
 	
 	public File getConfigFile() {
@@ -179,5 +208,16 @@ public class DBConnectionParametersProvider implements IDBConnectionParametersPr
 	public void setConfigFile(File configFile) {
 		this.configFile = configFile;
 	}
+
+
+	public void setProxlDbName(String proxlDbName) {
+		this.proxlDbName = proxlDbName;
+	}
+
+
+	public void setNrseqDbName(String nrseqDbName) {
+		this.nrseqDbName = nrseqDbName;
+	}
+
 
 }
