@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -120,6 +121,18 @@ public class DBConnectionParametersProvider implements IDBConnectionParametersPr
 				 password = configProps.getProperty( PROPERTY_NAME__PASSWORD );
 				 dbURL = configProps.getProperty( PROPERTY_NAME__DB_URL );
 				 dbPort = configProps.getProperty( PROPERTY_NAME__DB_PORT );
+				 
+				 System.out.println( "Database connection parameters:");
+				 if ( StringUtils.isNotEmpty( username ) ) {
+					 
+					 System.out.println( "username has a value" );
+				 }
+				 if ( StringUtils.isNotEmpty( password ) ) {
+					 
+					 System.out.println( "password has a value" );
+				 }
+				 System.out.println( "dbURL: " + dbURL );
+				 System.out.println( "dbPort: " + dbPort );
 //			}
 
 		} catch ( RuntimeException e ) {

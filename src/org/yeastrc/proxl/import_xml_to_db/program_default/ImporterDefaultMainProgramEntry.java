@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.ScanFilenameConstants;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProvider;
@@ -29,6 +30,9 @@ public class ImporterDefaultMainProgramEntry {
 	private static final int PROGRAM_EXIT_CODE_DEFAULT_NO_SYTEM_EXIT_CALLED = 0;
 
 //	private static final String DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING  = "db_config_filename_with_path";
+	
+	
+	private static final String PROXL_DB_NAME_CMD_LINE_PARAM_STRING = "proxl_db_name";
 
 	private static boolean databaseConnectionFactoryCreated = false;
 
@@ -53,7 +57,18 @@ public class ImporterDefaultMainProgramEntry {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
+
+
+		System.out.println( "Processing " + args.length + " command line arguments." );
+
+		System.out.println( "Processing the following command line arguments:" );
 		
+		for ( String arg : args ) {
+			
+			System.out.println( arg );
+		}
+		
+		System.out.println( "End of command line arguments.");
 
 		boolean successfulImport = false;
 
@@ -71,6 +86,9 @@ public class ImporterDefaultMainProgramEntry {
 
 			CmdLineParser.Option noScanFilesCommandLineOpt = cmdLineParser.addBooleanOption( 'n', "no_scan_files" );
 
+			CmdLineParser.Option proxlDatabaseNameCommandLineOpt = cmdLineParser.addStringOption( 'Z', PROXL_DB_NAME_CMD_LINE_PARAM_STRING );
+
+			
 			
 			CmdLineParser.Option helpOpt = cmdLineParser.addBooleanOption('h', "help"); 
 
@@ -102,6 +120,8 @@ public class ImporterDefaultMainProgramEntry {
 
 			Boolean noScanFilesCommandLineOptChosen = (Boolean) cmdLineParser.getOptionValue( noScanFilesCommandLineOpt, Boolean.FALSE);
 
+			String proxlDatabaseName = (String)cmdLineParser.getOptionValue( proxlDatabaseNameCommandLineOpt );
+			
 			String[] remainingArgs = cmdLineParser.getRemainingArgs();
 
 			if( remainingArgs.length < 1 ) {
@@ -186,6 +206,12 @@ public class ImporterDefaultMainProgramEntry {
 
 			System.out.println( "Performing Proxl import for parameters:" );
 			System.out.println( "project id: " + projectId );
+			
+			if ( createDatabaseConnectionFactory && StringUtils.isNotEmpty( proxlDatabaseName ) ) {
+				System.out.println( "'--" + PROXL_DB_NAME_CMD_LINE_PARAM_STRING 
+						+ "=' specified so importing to database name: " + proxlDatabaseName );
+			}
+			
 			System.out.println( "main XML File To Import file: " + mainXMLFileToImport.getAbsolutePath() );
 
 			if ( scanFileList == null || scanFileList.isEmpty() ) {
@@ -246,7 +272,10 @@ public class ImporterDefaultMainProgramEntry {
 
 				importDBConnectionFactory.setDbConnectionParametersProvider( dbConnectionParametersProvider );
 				
-
+				if ( StringUtils.isNotEmpty( proxlDatabaseName ) ) {
+				
+					importDBConnectionFactory.setProxlDatabaseName( proxlDatabaseName );
+				}
 
 				DBConnectionFactory.setDbConnectionFactoryImpl( importDBConnectionFactory );
 
@@ -273,6 +302,13 @@ public class ImporterDefaultMainProgramEntry {
 			System.out.println( "Completed Proxl import for parameters:" );
 
 			System.out.println( "project id: " + projectId );
+			
+			if ( createDatabaseConnectionFactory && StringUtils.isNotEmpty( proxlDatabaseName ) ) {
+
+				System.out.println( "'--" + PROXL_DB_NAME_CMD_LINE_PARAM_STRING 
+						+ "=' specified so imported to database name: " + proxlDatabaseName );
+			}
+			
 			System.out.println( "main XML File To Import file: " + mainXMLFileToImport.getAbsolutePath() );
 
 			if ( scanFileList == null || scanFileList.isEmpty() ) {
@@ -399,6 +435,7 @@ public class ImporterDefaultMainProgramEntry {
 
 		String line = "Usage: <run jar script> -p project_id  "
 				+ " [ -n | --no_scan_files ] "
+//				+ " [ --" + PROXL_DB_NAME_CMD_LINE_PARAM_STRING + "=<proxl db name> ] "
 				+ " <main xml file to import> [ <scan file to import> ... ]";
 
 //		if ( createDatabaseConnectionFactory ) {
@@ -419,6 +456,9 @@ public class ImporterDefaultMainProgramEntry {
 		System.err.println( "" );
 		System.err.println( "\"-n\"  or \"--no_scan_files\" is required if there are no scan files.");
 		System.err.println( "" );
+//		System.err.println( "\"--" + PROXL_DB_NAME_CMD_LINE_PARAM_STRING + "\" is optional. "
+//				+ "The datase name defaults to 'proxl' which is the standard name if the database create scripts are not modified.");
+//		System.err.println( "" );
 		System.err.println( "The scan files must be either " + ScanFilenameConstants.MZ_ML_SUFFIX
 				+ " or " + ScanFilenameConstants.MZ_XML_SUFFIX 
 				+ " and have the correct filename suffix that matches the contents.");
