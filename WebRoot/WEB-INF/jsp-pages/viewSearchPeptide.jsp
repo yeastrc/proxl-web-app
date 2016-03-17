@@ -70,9 +70,9 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/viewSearchPeptide.js"></script>
-		
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/viewSearchPeptide.js"></script>
 		
 		
 		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
