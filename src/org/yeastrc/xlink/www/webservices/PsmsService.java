@@ -543,12 +543,32 @@ public class PsmsService {
 			//  Process annotation type ids to get annotation data
 
 			{
+				Set<Integer> notFoundAnnotationTypeIds = new HashSet<>( annotationTypeIdsForGettingAnnotationData );
+				
 				List<PsmAnnotationDTO> psmAnnotationDataList = 
 						PsmAnnotationDataSearcher.getInstance().getPsmAnnotationDTOList( psmId, annotationTypeIdsForGettingAnnotationData );
 
 				for ( PsmAnnotationDTO psmAnnotationDataItem : psmAnnotationDataList ) {
 
 					psmAnnotationDTOMapOnTypeId.put( psmAnnotationDataItem.getAnnotationTypeId(), psmAnnotationDataItem );
+					
+					notFoundAnnotationTypeIds.remove( psmAnnotationDataItem.getAnnotationTypeId() );
+				}
+				
+				//  Allow PSM Descriptive Annotations to be missing 
+				
+				for ( Map.Entry<Integer, AnnotationTypeDTO> entry : psmDescriptiveAnnotationTypeDTOMap.entrySet() ) {
+					
+					notFoundAnnotationTypeIds.remove( entry.getKey() );
+				}
+				
+				if ( ! notFoundAnnotationTypeIds.isEmpty() ) {
+					
+					String notFoundAnnotationTypeIdsString = StringUtils.join( notFoundAnnotationTypeIds, ", " );
+					
+					String msg = "PSM annotation records not found for these annotation type ids: " + notFoundAnnotationTypeIdsString;
+					log.error( msg );
+					throw new ProxlWebappDataException(msg);
 				}
 			}
 			
@@ -632,18 +652,33 @@ public class PsmsService {
 			
 			
 			for ( AnnotationTypeDTO annotationTypeDTO : psm_AnnotationTypeDTO_DefaultDisplay_List ) {
+				
+				Integer annotationTypeId = annotationTypeDTO.getId();
 			
 				PsmAnnotationDTO psmAnnotationDTO = 
-						internalPsmWebDisplayHolder.psmAnnotationDTOMapOnTypeId.get( annotationTypeDTO.getId() );
+						internalPsmWebDisplayHolder.psmAnnotationDTOMapOnTypeId.get( annotationTypeId );
 
-				if ( psmAnnotationDTO == null ) {
+				String annotationValueString = null;
+				
+				if ( psmAnnotationDTO != null ) {
+
+					annotationValueString = psmAnnotationDTO.getValueString();
+
+				} else {
 					
-					String msg = "ERROR.  Cannot find AnnotationDTO for type id: " + annotationTypeDTO.getId();
-					log.error( msg );
-					throw new Exception(msg);
+					if ( ! psmDescriptiveAnnotationTypeDTOMap.containsKey( annotationTypeId ) ) {
+						
+						String msg = "ERROR.  Cannot find AnnotationDTO for type id: " + annotationTypeDTO.getId();
+						log.error( msg );
+						throw new Exception(msg);
+					}
+
+					//  Allow PSM Descriptive Annotations to be missing 
+					
+					annotationValueString = "";
 				}
 				
-				psmAnnotationValueList.add( psmAnnotationDTO.getValueString() );
+				psmAnnotationValueList.add( annotationValueString );
 			}
 			
 			
