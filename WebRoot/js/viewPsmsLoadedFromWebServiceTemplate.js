@@ -299,7 +299,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 				scanDataAnyRows = true;
 			}
 
-			if (  psm.chargeSet ) {
+			if (  psm.charge ) {
 				
 				chargeDataAnyRows = true;
 			}

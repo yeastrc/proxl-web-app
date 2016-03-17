@@ -26,13 +26,16 @@
 			{{/if}}
 
 
-			{{#if chargeDataAnyRows}}
-				<th style="text-align:right;font-weight:bold;" class="integer-number-column"><span style="white-space: nowrap">Charge</span></th>
-			{{/if}}
-
 
 			{{#if scanDataAnyRows}}
 				<th style="text-align:right;font-weight:bold;" class="integer-number-column"><span style="white-space: nowrap">Obs. m/z</span></th>
+			{{/if}}
+
+			{{#if chargeDataAnyRows}}
+				<th style="text-align:right;font-weight:bold;" class="integer-number-column"><span style="white-space: nowrap">Charge</span></th>
+			{{/if}}
+			
+			{{#if scanDataAnyRows}}
 				<th style="text-align:right;font-weight:bold;" class="integer-number-column"><span style="white-space: nowrap">RT (min)<%-- Retention Time --%></span></th>
 				<th style="text-align:left;font-weight:bold;"><span style="white-space: nowrap">Scan Filename</span></th>
 			{{/if}}

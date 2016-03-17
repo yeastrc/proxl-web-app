@@ -55,16 +55,20 @@
 		</td>
 	{{/if}}
 	
+	{{#if scanDataAnyRows}}
+		<td style="text-align: right; white-space: nowrap; " class="integer-number-column{{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
+			{{preMZRounded}}
+		</td>
+	{{/if}}
+
 	{{#if chargeDataAnyRows}}
 		<td style="text-align: right; white-space: nowrap; " class="integer-number-column {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
 			{{charge}}
 		</td>
 	{{/if}}
 	
+
 	{{#if scanDataAnyRows}}
-		<td style="text-align: right; white-space: nowrap; " class="integer-number-column{{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
-			{{preMZRounded}}
-		</td>
 		<td style="text-align: right; white-space: nowrap; " class="integer-number-column{{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
 			{{retentionTimeMinutesRoundedString}}
 		</td>
