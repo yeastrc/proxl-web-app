@@ -102,10 +102,10 @@ public class SaveSearchReportedPeptideAnnotations {
 			
 			} else {
 
-				String msg = "No Reported Peptide annotations."
-						+ "  ReportedPeptideString: " + reportedPeptide.getReportedPeptideString();
-
-				log.warn( msg );
+//				String msg = "No Reported Peptide annotations."
+//						+ "  ReportedPeptideString: " + reportedPeptide.getReportedPeptideString();
+//
+//				log.warn( msg );
 			}
 			
 		} else {
