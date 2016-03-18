@@ -384,6 +384,12 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		var $openLorkeetLinks = $psm_table_jq.find(".view_spectrum_open_spectrum_link_jq");
 		
 		addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
+		
+		
+		
+		addToolTips( $psm_block_template );
+		
+		
 	
 		//  Does not seem to work so not run it
 //		if ( psms.length > 0 ) {

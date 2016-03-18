@@ -22,7 +22,10 @@
 			{{/if}}
 			
 			{{#if scanDataAnyRows}}
-				<th style="text-align:right;font-weight:bold;" class=""><span style="white-space: nowrap">U</span></th>
+				<th style="text-align:right;font-weight:bold;" class=" tool_tip_attached_jq "
+						data-tooltip="PSM is unique for scan"  
+					><span style="white-space: nowrap">U</span>
+				</th>
 			{{/if}}
 
 
@@ -43,7 +46,11 @@
 			
 			
 			{{#each annotationDisplayNameDescriptionList}}
-			 	<th style="text-align:left;font-weight:bold;"
+
+					<%--  Consider displaying the description somewhere   peptideAnnotationDisplayNameDescription.description --%>
+				<th data-tooltip="PSM-level {{this.displayName}} for this PSM (or linked pair)" 
+						class=" tool_tip_attached_jq " 
+				 		 style="text-align:left;font-weight:bold;"
 			 		><span style="white-space: nowrap" <%-- TODO Add Description as tool tip, {{this.description}} --%>
 			 			>{{this.displayName}}</span></th>
 			{{/each}}

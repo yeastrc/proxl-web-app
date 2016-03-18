@@ -339,9 +339,14 @@ function getLooplinkDataCommonProcessResponse( params ) {
 				$search_entry_data_row.click();
 			}
 
-		}  // END:  For Each Search Id
+		}  
+		
+		addToolTips( $protein_data_per_search_block );
+		
+	} // END:  For Each Search Id
 
-	}
+	
+	
 
 
 	linkInfoOverlayWidthResizer();
@@ -675,9 +680,13 @@ function getCrosslinkDataCommonProcessResponse( params ) {
 			}
 
 
-		}  // END:  For Each Search Id
+		}  
+		
+		addToolTips( $protein_data_per_search_block );
+		
+	} // END:  For Each Search Id
 
-	}
+	
 
 	linkInfoOverlayWidthResizer();
 
@@ -998,10 +1007,13 @@ function getMonolinkDataCommonProcessResponse( params ) {
 				$search_entry_data_row.click();
 			}
 
-		}  // END:  For Each Search Id
+		}  
 		
-	}
+		addToolTips( $protein_data_per_search_block );
+		
+	} // END:  For Each Search Id
 
+	
 
 	linkInfoOverlayWidthResizer();
 }
