@@ -86,7 +86,7 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 		
 		if ( _insertControlCommitConnectionGetCount > COMMIT_AFTER_500_INSERTS ) {
 			
-			commitInsertControlCommitConnection();
+			_insertControlCommitConnection.commit();
 			
 			_insertControlCommitConnectionGetCount = 0;
 		}
