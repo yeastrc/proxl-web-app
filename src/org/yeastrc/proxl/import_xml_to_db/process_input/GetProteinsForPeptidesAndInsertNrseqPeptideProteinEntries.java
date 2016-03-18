@@ -62,8 +62,13 @@ public class GetProteinsForPeptidesAndInsertNrseqPeptideProteinEntries {
 
 			proteinMatches = YRC_NRSEQUtils.getProteinsContainingPeptide( peptideSequence, nrseqDatabaseId );
 
-			if( proteinMatches == null || proteinMatches.size() < 1 )
-				throw new Exception( "Could not find any proteins for peptide: " + peptideSequence );
+			if( proteinMatches == null || proteinMatches.size() < 1 ) {
+			
+				String msg = "Could not find any proteins for peptide searching the protein sequences.  peptide sequence: " 
+						+ peptideSequence; 
+				log.error( msg );
+				throw new Exception( msg );
+			}
 
 			System.out.print( "\t\tFound proteins using YRC_NRSEQ: " );
 			for( NRProteinDTO p : proteinMatches ) { System.out.println( p.getNrseqId() + "," ); }
@@ -73,7 +78,7 @@ public class GetProteinsForPeptidesAndInsertNrseqPeptideProteinEntries {
 			if( proteinMatches.size() > 1 )
 				unique = false;
 
-			System.out.println( "\t\tSaving to nrseq_database_peptide_protein..." );
+			System.out.println( "\t\tSaving to nrseq_database_peptide_protein the peptide to protein mapping..." );
 			for( NRProteinDTO protein : proteinMatches ) {
 
 				NrseqDatabasePeptideProteinDTO prpp = new NrseqDatabasePeptideProteinDTO();
@@ -84,6 +89,17 @@ public class GetProteinsForPeptidesAndInsertNrseqPeptideProteinEntries {
 
 				NrseqDatabasePeptideProteinDAO.getInstance().save( prpp );
 			}
+		}
+		
+
+
+		if( proteinMatches.size() < 1 ) {
+			
+			String msg = "Could not find any proteins for peptide.   peptide sequence: "
+					+ peptideSequence;
+			log.error( msg );
+			
+			throw new Exception( msg );
 		}
 
 		if ( proteinNameDecoyPrefixList != null && ( ! proteinNameDecoyPrefixList.isEmpty() ) ) {
@@ -111,8 +127,14 @@ public class GetProteinsForPeptidesAndInsertNrseqPeptideProteinEntries {
 		}
 
 
-		if( proteinMatches.size() < 1 )
-			throw new Exception( "Could not find any proteins for peptide: " + peptideSequence );
+		if( proteinMatches.size() < 1 ) {
+			
+			String msg = "Could not find any proteins for peptide after removing decoy matches.   peptide sequence: "
+					+ peptideSequence;
+			log.error( msg );
+
+			throw new Exception( msg );
+		}
 
 		return proteinMatches;
 	}
