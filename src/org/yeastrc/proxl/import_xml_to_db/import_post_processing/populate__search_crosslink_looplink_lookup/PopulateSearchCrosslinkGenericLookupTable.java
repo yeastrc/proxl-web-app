@@ -223,7 +223,9 @@ public class PopulateSearchCrosslinkGenericLookupTable {
 
 		}
 		
-		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+
 	}
 	
 	

@@ -210,6 +210,11 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 			
 		}
 		
+		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+
+		
 	}
 
 	private void processCrosslink(

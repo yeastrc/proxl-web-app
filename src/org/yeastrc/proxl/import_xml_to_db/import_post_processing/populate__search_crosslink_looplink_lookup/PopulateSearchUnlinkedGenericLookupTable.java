@@ -208,7 +208,9 @@ public class PopulateSearchUnlinkedGenericLookupTable {
 
 		}
 		
-		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+
 	}
 	
 	

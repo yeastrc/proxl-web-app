@@ -67,6 +67,10 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 
 	}
 	
+	/**
+	 * @return
+	 * @throws Exception
+	 */
 	public Connection getInsertControlCommitConnection() throws Exception {
 		
 		if ( _insertControlCommitConnection == null ) {
@@ -74,6 +78,8 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 			_insertControlCommitConnection = getConnection( DBConnectionFactory.PROXL );
 			
 			_insertControlCommitConnection.setAutoCommit(false);
+
+			_insertControlCommitConnectionGetCount = 0;
 		}
 		
 		_insertControlCommitConnectionGetCount++;
@@ -88,6 +94,12 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 		return _insertControlCommitConnection;
 	}
 	
+	
+	
+	/**
+	 * call commit() on the insert connection and return the connection to the pool 
+	 * @throws Exception
+	 */
 	public void commitInsertControlCommitConnection() throws Exception {
 
 		if ( _insertControlCommitConnection == null ) {
@@ -96,6 +108,10 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 		}
 		
 		_insertControlCommitConnection.commit();
+		
+		_insertControlCommitConnection.close(); // Return connection to pool
+		
+		_insertControlCommitConnection = null;
 	}
 	
 

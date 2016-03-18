@@ -211,7 +211,9 @@ public class PopulateSearchMonolinkGenericLookupTable {
 
 		}
 		
-		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+
 	}
 	
 	

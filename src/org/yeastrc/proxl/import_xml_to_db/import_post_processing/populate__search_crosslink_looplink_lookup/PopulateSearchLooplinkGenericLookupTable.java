@@ -215,7 +215,9 @@ public class PopulateSearchLooplinkGenericLookupTable {
 
 		}
 		
-		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+
 	}
 	
 	

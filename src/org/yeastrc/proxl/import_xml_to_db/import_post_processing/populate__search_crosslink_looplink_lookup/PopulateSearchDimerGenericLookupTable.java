@@ -209,7 +209,9 @@ public class PopulateSearchDimerGenericLookupTable {
 
 		}
 		
-		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+
 	}
 	
 	

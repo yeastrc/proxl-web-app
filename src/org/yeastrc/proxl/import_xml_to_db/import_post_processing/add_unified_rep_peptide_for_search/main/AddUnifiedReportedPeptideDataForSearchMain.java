@@ -257,6 +257,10 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 		
 		log.info( "Done inserting search dynamic mod masses" );
 
+		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+
 	}
 	
 	
@@ -304,6 +308,10 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 			Integer endReportedPeptideId 	// optional, null if no value
 			) throws Exception {
 		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+
+		
 		SearchDTO search = SearchDAO.getInstance().getSearch(searchId);
 
 		if ( search == null ) {
@@ -322,6 +330,10 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 
 		if ( searchReportedPeptideList == null || searchReportedPeptideList.isEmpty() ) {
 			
+
+		    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+
+		    
 			return false; //  EARLY EXIT:  No records found so exit and return false
 		}
 		
@@ -524,6 +536,10 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 
 			
 		}
+		
+
+	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+
 		
 		
 		return true; // found records to process
