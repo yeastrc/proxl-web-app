@@ -34,7 +34,6 @@ import org.yeastrc.xlink.www.objects.ReportedPeptidesForAssociatedScanId_From_Ps
 import org.yeastrc.xlink.www.objects.ReportedPeptidesRelatedToPSMServiceResult;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWebserviceWrapper;
-import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
@@ -375,6 +374,37 @@ public class ReportedPeptidesRelatedToPSMService {
 		Set<Integer> searchIdsSet = new HashSet<>();
 		
 		searchIdsSet.add( searchId );
+		
+
+		Map<Integer, Map<Integer, AnnotationTypeDTO>> peptideFilterableAnnotationTypesForSearchIds =
+		GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIdsSet );
+
+		Map<Integer, AnnotationTypeDTO> peptideFilterableAnnotationTypesForSearchId =
+				peptideFilterableAnnotationTypesForSearchIds.get( searchId );
+
+		if ( peptideFilterableAnnotationTypesForSearchId == null ) {
+			
+			String msg = "peptideFilterableAnnotationTypesForSearchId == null for searchId: " + searchId;
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
+		}
+		
+
+		Map<Integer, Map<Integer, AnnotationTypeDTO>> peptideDescriptiveAnnotationTypesForSearchIds =
+		GetAnnotationTypeData.getInstance().getAll_Peptide_Descriptive_ForSearchIds( searchIdsSet );
+
+		Map<Integer, AnnotationTypeDTO> peptideDescriptiveAnnotationTypesForSearchId =
+				peptideDescriptiveAnnotationTypesForSearchIds.get( searchId );
+
+
+		if ( peptideDescriptiveAnnotationTypesForSearchId == null ) {
+			
+			peptideDescriptiveAnnotationTypesForSearchId = new HashMap<>();
+			
+//			String msg = "peptideDescriptiveAnnotationTypesForSearchId == null for searchId: " + searchId;
+//			log.error( msg );
+//			throw new ProxlWebappDataException( msg );
+		}		
 
 		/////////////
 		
@@ -474,12 +504,6 @@ public class ReportedPeptidesRelatedToPSMService {
 		if ( ! peptideAnnotationTypesSearchedFor.isEmpty() ) {
 			
 			//   Add in Peptide annotation types the user searched for
-			
-			Map<Integer, Map<Integer, AnnotationTypeDTO>> peptideFilterableAnnotationTypesForSearchIds =
-			GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIdsSet );
-
-			Map<Integer, AnnotationTypeDTO> peptideFilterableAnnotationTypesForSearchId =
-					peptideFilterableAnnotationTypesForSearchIds.get( searchId );
 			
 			for ( Integer peptideAnnotationTypeToAdd : peptideAnnotationTypesSearchedFor ) {
 			
@@ -658,16 +682,33 @@ public class ReportedPeptidesRelatedToPSMService {
 
 				for ( AnnotationTypeDTO annotationTypeDTO : reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List ) {
 
-					AnnotationDataBaseDTO annotationDataBaseDTO = peptideAnnotationDTOMap.get( annotationTypeDTO.getId() );
+					Integer annotationTypeId = annotationTypeDTO.getId();
+				
+					AnnotationDataBaseDTO annotationDataBaseDTO = peptideAnnotationDTOMap.get( annotationTypeId );
 
-					if ( annotationDataBaseDTO == null ) {
 
-						String msg = "Unable to find annotation data for type id: " + annotationTypeDTO.getId();
-						log.error( msg );
-						throw new ProxlWebappDataException(msg);
+					String annotationValueString = null;
+					
+					if ( annotationDataBaseDTO != null ) {
+
+						annotationValueString = annotationDataBaseDTO.getValueString();
+
+					} else {
+						
+						if ( ! peptideDescriptiveAnnotationTypesForSearchId.containsKey( annotationTypeId ) ) {
+							
+							String msg = "ERROR.  Cannot find AnnotationDTO for type id: " + annotationTypeDTO.getId();
+							log.error( msg );
+							throw new ProxlWebappDataException(msg);
+						}
+
+						//  Allow Peptide Descriptive Annotations to be missing 
+						
+						annotationValueString = "";
 					}
-
-					peptideAnnotationValueList.add( annotationDataBaseDTO.getValueString() );
+					
+					peptideAnnotationValueList.add( annotationValueString );
+					
 				}
 
 

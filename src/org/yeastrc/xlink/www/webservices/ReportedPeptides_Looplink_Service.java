@@ -426,6 +426,36 @@ public class ReportedPeptides_Looplink_Service {
 		}
 		
 
+
+		Map<Integer, Map<Integer, AnnotationTypeDTO>> peptideFilterableAnnotationTypesForSearchIds =
+		GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIdsCollection );
+
+		Map<Integer, AnnotationTypeDTO> peptideFilterableAnnotationTypesForSearchId =
+				peptideFilterableAnnotationTypesForSearchIds.get( searchId );
+
+		if ( peptideFilterableAnnotationTypesForSearchId == null ) {
+			
+			String msg = "peptideFilterableAnnotationTypesForSearchId == null for searchId: " + searchId;
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
+		}
+		
+
+		Map<Integer, Map<Integer, AnnotationTypeDTO>> peptideDescriptiveAnnotationTypesForSearchIds =
+		GetAnnotationTypeData.getInstance().getAll_Peptide_Descriptive_ForSearchIds( searchIdsCollection );
+
+		Map<Integer, AnnotationTypeDTO> peptideDescriptiveAnnotationTypesForSearchId =
+				peptideDescriptiveAnnotationTypesForSearchIds.get( searchId );
+
+
+		if ( peptideDescriptiveAnnotationTypesForSearchId == null ) {
+			
+			peptideDescriptiveAnnotationTypesForSearchId = new HashMap<>();
+			
+//			String msg = "peptideDescriptiveAnnotationTypesForSearchId == null for searchId: " + searchId;
+//			log.error( msg );
+//			throw new ProxlWebappDataException( msg );
+		}		
 		
 		
 		/////////////
@@ -501,12 +531,6 @@ public class ReportedPeptides_Looplink_Service {
 		if ( ! peptideAnnotationTypesSearchedFor.isEmpty() ) {
 			
 			//   Add in Peptide annotation types the user searched for
-			
-			Map<Integer, Map<Integer, AnnotationTypeDTO>> peptideFilterableAnnotationTypesForSearchIds =
-			GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIdsCollection );
-
-			Map<Integer, AnnotationTypeDTO> peptideFilterableAnnotationTypesForSearchId =
-					peptideFilterableAnnotationTypesForSearchIds.get( searchId );
 			
 			for ( Integer peptideAnnotationTypeToAdd : peptideAnnotationTypesSearchedFor ) {
 			
@@ -711,17 +735,32 @@ public class ReportedPeptides_Looplink_Service {
 
 				for ( AnnotationTypeDTO annotationTypeDTO : reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List ) {
 
+					Integer annotationTypeId = annotationTypeDTO.getId();
+				
 					AnnotationDataBaseDTO peptideAnnotationDTO = 
-							searchPeptideLooplinkWrapped.getPeptideAnnotationDTOMap().get( annotationTypeDTO.getId() );
+							searchPeptideLooplinkWrapped.getPeptideAnnotationDTOMap().get( annotationTypeId );
 
-					if ( peptideAnnotationDTO == null ) {
+					String annotationValueString = null;
+					
+					if ( peptideAnnotationDTO != null ) {
 
-						String msg = "ERROR.  Cannot AnnotationDTO for type id: " + annotationTypeDTO.getId();
-						log.error( msg );
-						throw new Exception(msg);
+						annotationValueString = peptideAnnotationDTO.getValueString();
+
+					} else {
+						
+						if ( ! peptideDescriptiveAnnotationTypesForSearchId.containsKey( annotationTypeId ) ) {
+							
+							String msg = "ERROR.  Cannot find AnnotationDTO for type id: " + annotationTypeDTO.getId();
+							log.error( msg );
+							throw new ProxlWebappDataException(msg);
+						}
+
+						//  Allow Peptide Descriptive Annotations to be missing 
+						
+						annotationValueString = "";
 					}
-
-					peptideAnnotationValues.add( peptideAnnotationDTO.getValueString() );
+					
+					peptideAnnotationValues.add( annotationValueString );
 				}
 
 				searchPeptideLooplinkWebserviceResult.setPeptideAnnotationValueList( peptideAnnotationValues );

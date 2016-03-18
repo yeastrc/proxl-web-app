@@ -670,7 +670,7 @@ public class PsmsService {
 						
 						String msg = "ERROR.  Cannot find AnnotationDTO for type id: " + annotationTypeDTO.getId();
 						log.error( msg );
-						throw new Exception(msg);
+						throw new ProxlWebappDataException(msg);
 					}
 
 					//  Allow PSM Descriptive Annotations to be missing 

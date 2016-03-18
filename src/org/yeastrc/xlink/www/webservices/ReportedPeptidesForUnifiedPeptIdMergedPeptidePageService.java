@@ -813,17 +813,32 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 
 						for ( AnnotationTypeDTO annotationTypeDTO : reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List ) {
 
+							Integer annotationTypeId = annotationTypeDTO.getId();
+						
 							SearchReportedPeptideAnnotationDTO peptideFilterableAnnotationDTO = 
-									internalReportedPeptideWebDisplayHolder.searchReportedPeptideAnnotationDTOMapOnTypeId.get( annotationTypeDTO.getId() );
+									internalReportedPeptideWebDisplayHolder.searchReportedPeptideAnnotationDTOMapOnTypeId.get( annotationTypeId );
 
-							if ( peptideFilterableAnnotationDTO == null ) {
+							String annotationValueString = null;
+							
+							if ( peptideFilterableAnnotationDTO != null ) {
 
-								String msg = "ERROR.  Cannot find AnnotationDTO for type id: " + annotationTypeDTO.getId();
-								log.error( msg );
-								throw new Exception(msg);
+								annotationValueString = peptideFilterableAnnotationDTO.getValueString();
+
+							} else {
+																
+								if ( ! srchPgmDescriptiveReportedPeptideAnnotationTypeDTOMap.containsKey( annotationTypeId ) ) {
+									
+									String msg = "ERROR.  Cannot find AnnotationDTO for type id: " + annotationTypeDTO.getId();
+									log.error( msg );
+									throw new ProxlWebappDataException(msg);
+								}
+
+								//  Allow Peptide Descriptive Annotations to be missing 
+								
+								annotationValueString = "";
 							}
-
-							peptideAnnotationValues.add( peptideFilterableAnnotationDTO.getValueString() );
+							
+							peptideAnnotationValues.add( annotationValueString );
 						}
 
 
