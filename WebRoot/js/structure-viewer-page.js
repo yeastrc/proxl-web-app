@@ -4625,7 +4625,9 @@ var structureViewerPageObject = {
 
 		getQueryJSONString : function() {
 
-			var queryJSON = getNavigationJSON_Not_for_Image_Or_Structure();
+//			var queryJSON = getNavigationJSON_Not_for_Image_Or_Structure();
+			
+			var queryJSON = getJsonFromHash();
 
 			var queryJSONString = JSON.stringify( queryJSON );
 
