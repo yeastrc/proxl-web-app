@@ -433,11 +433,14 @@ public class ReportedPeptides_Looplink_Service {
 		Map<Integer, AnnotationTypeDTO> peptideFilterableAnnotationTypesForSearchId =
 				peptideFilterableAnnotationTypesForSearchIds.get( searchId );
 
+
 		if ( peptideFilterableAnnotationTypesForSearchId == null ) {
 			
-			String msg = "peptideFilterableAnnotationTypesForSearchId == null for searchId: " + searchId;
-			log.error( msg );
-			throw new ProxlWebappDataException( msg );
+			peptideFilterableAnnotationTypesForSearchId = new HashMap<>();
+			
+//			String msg = "peptideFilterableAnnotationTypesForSearchId == null for searchId: " + searchId;
+//			log.error( msg );
+//			throw new ProxlWebappDataException( msg );
 		}
 		
 

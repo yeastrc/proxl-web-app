@@ -424,9 +424,11 @@ public class ViewSearchPeptidesAction extends Action {
 
 			if ( peptideFilterableAnnotationTypesForSearchId == null ) {
 				
-				String msg = "peptideFilterableAnnotationTypesForSearchId == null for searchId: " + searchId;
-				log.error( msg );
-				throw new ProxlWebappDataException( msg );
+				peptideFilterableAnnotationTypesForSearchId = new HashMap<>();
+				
+//				String msg = "peptideFilterableAnnotationTypesForSearchId == null for searchId: " + searchId;
+//				log.error( msg );
+//				throw new ProxlWebappDataException( msg );
 			}
 			
 
