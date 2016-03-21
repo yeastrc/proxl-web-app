@@ -81,6 +81,8 @@ CREATE TABLE IF NOT EXISTS `project` (
   `project_locked` TINYINT NOT NULL DEFAULT 0,
   `public_access_level` SMALLINT NULL,
   `public_access_locked` TINYINT NULL DEFAULT 0,
+  `marked_for_deletion_timestamp` TIMESTAMP NULL,
+  `marked_for_deletion_auth_user_id` INT UNSIGNED NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_auth_shareable_object_id`
     FOREIGN KEY (`auth_shareable_object_id`)
@@ -1998,12 +2000,15 @@ DROP TABLE IF EXISTS `default_page_view_generic` ;
 CREATE TABLE IF NOT EXISTS `default_page_view_generic` (
   `search_id` INT UNSIGNED NOT NULL,
   `page_name` VARCHAR(80) NOT NULL,
-  `auth_user_id` INT UNSIGNED NOT NULL,
+  `auth_user_id_created_record` INT UNSIGNED NOT NULL,
+  `auth_user_id_last_updated_record` INT UNSIGNED NOT NULL,
+  `date_record_created` DATETIME NULL,
+  `date_record_last_updated` DATETIME NULL,
   `url` VARCHAR(6000) NOT NULL,
   `query_json` VARCHAR(6000) NOT NULL,
   PRIMARY KEY (`search_id`, `page_name`),
   CONSTRAINT `default_page_view_generic_auth_user_id_fk`
-    FOREIGN KEY (`auth_user_id`)
+    FOREIGN KEY (`auth_user_id_created_record`)
     REFERENCES `auth_user` (`id`)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
@@ -2011,12 +2016,19 @@ CREATE TABLE IF NOT EXISTS `default_page_view_generic` (
     FOREIGN KEY (`search_id`)
     REFERENCES `search` (`id`)
     ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `default_page_view_generic_auth_lst_upd`
+    FOREIGN KEY (`auth_user_id_last_updated_record`)
+    REFERENCES `auth_user` (`id`)
+    ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB;
 
 CREATE INDEX `default_page_view_search_id_fk_idx` ON `default_page_view_generic` (`search_id` ASC);
 
-CREATE INDEX `default_page_view_auth_user_id_fk_idx` ON `default_page_view_generic` (`auth_user_id` ASC);
+CREATE INDEX `default_page_view_auth_user_id_fk_idx` ON `default_page_view_generic` (`auth_user_id_created_record` ASC);
+
+CREATE INDEX `default_page_view_generic_auth_lst_upd_idx` ON `default_page_view_generic` (`auth_user_id_last_updated_record` ASC);
 
 
 -- -----------------------------------------------------
