@@ -348,9 +348,9 @@ public class ValidateAnnotationTypeRecords {
 				if ( filterablePeptideAnnotationType.isDefaultFilter() ) {
 
 					foundPeptideDefaultFilterableAnnotationType = true;
+					
+					break;
 				}
-				
-				break;
 			}
 		}
 		
@@ -393,9 +393,10 @@ public class ValidateAnnotationTypeRecords {
 				if ( filterablePsmAnnotationType.isDefaultFilter() ) {
 
 					foundPsmDefaultFilterableAnnotationType = true;
+
+					break;
 				}
 				
-				break;
 			}
 		}
 
