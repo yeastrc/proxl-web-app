@@ -1,5 +1,7 @@
 package org.yeastrc.xlink.www.dto;
 
+import java.util.Date;
+
 /**
  * table project
  *
@@ -14,11 +16,14 @@ public class ProjectDTO {
 	
 	private boolean enabled;
 	private boolean markedForDeletion;
+	private Date markedForDeletionTimstamp;
+	private Integer markedForDeletionAuthUserId;
 	
 	private boolean projectLocked;
 	
 	private Integer publicAccessLevel;
 	private boolean publicAccessLocked;
+	
 	
 
 	
@@ -102,6 +107,18 @@ public class ProjectDTO {
 	}
 	public void setPublicAccessLocked(boolean publicAccessLocked) {
 		this.publicAccessLocked = publicAccessLocked;
+	}
+	public Date getMarkedForDeletionTimstamp() {
+		return markedForDeletionTimstamp;
+	}
+	public void setMarkedForDeletionTimstamp(Date markedForDeletionTimstamp) {
+		this.markedForDeletionTimstamp = markedForDeletionTimstamp;
+	}
+	public Integer getMarkedForDeletionAuthUserId() {
+		return markedForDeletionAuthUserId;
+	}
+	public void setMarkedForDeletionAuthUserId(Integer markedForDeletionAuthUserId) {
+		this.markedForDeletionAuthUserId = markedForDeletionAuthUserId;
 	}
 	
 }

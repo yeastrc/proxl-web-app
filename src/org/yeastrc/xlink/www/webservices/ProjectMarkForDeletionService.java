@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.webservices;
 
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+//import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -59,7 +59,7 @@ public class ProjectMarkForDeletionService {
 			
 
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 
 			//   Get the project id for this search
 			
@@ -110,8 +110,9 @@ public class ProjectMarkForDeletionService {
 						);
 			}
 			
+			int authUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
 			
-			projectDAO.updateSetEnabledZeroAndMarkToDeleteOne( projectId ); 
+			projectDAO.updateSetEnabledZeroAndMarkToDeleteOne( projectId, authUserId ); 
 
 			genericWebserviceResult.setStatus(true);
 

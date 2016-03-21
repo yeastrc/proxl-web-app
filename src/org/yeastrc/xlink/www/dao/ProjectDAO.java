@@ -43,6 +43,8 @@ public class ProjectDAO {
 //	  public_access_level SMALLINT NULL,
 //	  public_access_locked TINYINT NULL DEFAULT 0,
 	
+//ADD COLUMN `marked_for_deletion_timestamp` TIMESTAMP NULL DEFAULT NULL AFTER `public_access_locked`,
+//ADD COLUMN `marked_for_deletion_auth_user_id` INT(10) UNSIGNED NULL DEFAULT NULL AFTER `marked_for_deletion_timestamp`;
 
 
 	
@@ -356,6 +358,16 @@ public class ProjectDAO {
 		
 		returnItem.setEnabled( rs.getBoolean( "enabled" ) );
 		returnItem.setMarkedForDeletion( rs.getBoolean( "marked_for_deletion" ) );;
+
+		int markedForDeletionAuthUserId = rs.getInt( "marked_for_deletion_auth_user_id" );
+		
+		returnItem.setMarkedForDeletionTimstamp( rs.getDate( "marked_for_deletion_timestamp" ) );
+		
+		if (rs.wasNull()) {
+			returnItem.setMarkedForDeletionAuthUserId( null );
+		} else {
+			returnItem.setMarkedForDeletionAuthUserId( markedForDeletionAuthUserId );
+		}
 		
 		returnItem.setProjectLocked( rs.getBoolean( "project_locked" ) );
 		
@@ -797,13 +809,13 @@ public class ProjectDAO {
 	 * @param id
 	 * @throws Exception
 	 */
-	public void updateSetEnabledZeroAndMarkToDeleteOne( int id ) throws Exception {
+	public void updateSetEnabledZeroAndMarkToDeleteOne( int id, int authUserId ) throws Exception {
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		final String sql = "UPDATE project SET enabled = 0, marked_for_deletion = 1 WHERE id = ?";
+		final String sql = "UPDATE project SET enabled = 0, marked_for_deletion = 1, marked_for_deletion_auth_user_id = ?, marked_for_deletion_timestamp = NOW() WHERE id = ?";
 
 		
 		try {
@@ -820,11 +832,16 @@ public class ProjectDAO {
 //			  project_locked TINYINT NOT NULL DEFAULT 0,
 //			  public_access_level SMALLINT NULL,
 //			  public_access_locked TINYINT NULL DEFAULT 0,
+			//ADD COLUMN `marked_for_deletion_timestamp` TIMESTAMP NULL DEFAULT NULL AFTER `public_access_locked`,
+			//ADD COLUMN `marked_for_deletion_auth_user_id` INT(10) UNSIGNED NULL DEFAULT NULL AFTER `marked_for_deletion_timestamp`;
 
 			
 			pstmt = conn.prepareStatement( sql );
 			
 			int counter = 0;
+
+			counter++;
+			pstmt.setInt( counter, authUserId );
 			
 			counter++;
 			pstmt.setInt( counter, id );

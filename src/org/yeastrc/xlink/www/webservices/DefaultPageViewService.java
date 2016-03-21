@@ -193,7 +193,8 @@ public class DefaultPageViewService {
 			defaultPageViewDTO.setUrl( defaultURLFromPageURLString );
 			defaultPageViewDTO.setQueryJSON( pageQueryJSON );
 			defaultPageViewDTO.setSearchId( searchId );
-			defaultPageViewDTO.setAuthUserId( userSessionObject.getUserDBObject().getAuthUser().getId() );
+			defaultPageViewDTO.setAuthUserIdCreated( userSessionObject.getUserDBObject().getAuthUser().getId() );
+			defaultPageViewDTO.setAuthUserIdLastUpdated( userSessionObject.getUserDBObject().getAuthUser().getId() );
 			
 			DefaultPageViewSaveOrUpdate.getInstance().defaultPageViewSaveOrUpdate( defaultPageViewDTO );
 			

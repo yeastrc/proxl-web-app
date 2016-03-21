@@ -36,7 +36,7 @@ public class DefaultPageViewGenericDAO {
 //			  url VARCHAR(6000) NOT NULL,
 //			  query_json VARCHAR(6000) NOT NULL,
 
-	
+
 	
 	
 
@@ -187,13 +187,15 @@ public class DefaultPageViewGenericDAO {
 
 		returnItem.setSearchId( rs.getInt( "search_id" ) );
 		returnItem.setPageName( rs.getString( "page_name" ) );
-		returnItem.setAuthUserId( rs.getInt( "auth_user_id" ) );
+		returnItem.setAuthUserIdCreated( rs.getInt( "auth_user_id_created_record" ) );
+		returnItem.setAuthUserIdLastUpdated( rs.getInt( "auth_user_id_last_updated_record" ) );
+		returnItem.setDateCreated( rs.getDate( "date_record_created" ) );
+		returnItem.setDateLastUpdated( rs.getDate( "date_record_last_updated" ) );
 		returnItem.setUrl( rs.getString( "url" ) );
 		returnItem.setQueryJSON( rs.getString( "query_json" ) );
 		
 		return returnItem;
 	}
-
 
 
 	/**
@@ -222,6 +224,17 @@ public class DefaultPageViewGenericDAO {
 		
 	}
 
+
+	private final String INSERT_SQL = "INSERT INTO default_page_view_generic "
+			+ " (search_id, page_name, "
+			+ 	" auth_user_id_created_record, auth_user_id_last_updated_record, "
+			+ 	" date_record_created, date_record_last_updated, "
+			+ 	" url, query_json ) " 
+			+ " VALUES ( ?, ?, ?, ?, NOW(), NOW(), ?, ? ) "
+			+ " ON DUPLICATE KEY UPDATE auth_user_id_last_updated_record = ?, url = ?, query_json = ?, "
+			+ 		" date_record_last_updated = NOW() ";
+	
+	
 	/**
 	 * @param item
 	 * @throws Exception
@@ -232,12 +245,8 @@ public class DefaultPageViewGenericDAO {
 
 
 
+		final String sql = INSERT_SQL;
 
-
-		final String sql = "INSERT INTO default_page_view_generic (search_id, page_name, auth_user_id, url, query_json ) " 
-				+ " VALUES ( ?, ?, ?, ?, ? ) "
-				+ " ON DUPLICATE KEY UPDATE auth_user_id = ?, url = ?, query_json = ?";
-		
 		try {
 			
 			
@@ -252,14 +261,16 @@ public class DefaultPageViewGenericDAO {
 			counter++;
 			pstmt.setString( counter, item.getPageName() );
 			counter++;
-			pstmt.setInt( counter, item.getAuthUserId() );
+			pstmt.setInt( counter, item.getAuthUserIdCreated() );
+			counter++;
+			pstmt.setInt( counter, item.getAuthUserIdLastUpdated() );
 			counter++;
 			pstmt.setString( counter, item.getUrl() );
 			counter++;
 			pstmt.setString( counter, item.getQueryJSON() );
 
 			counter++;
-			pstmt.setInt( counter, item.getAuthUserId() );
+			pstmt.setInt( counter, item.getAuthUserIdLastUpdated() );
 			counter++;
 			pstmt.setString( counter, item.getUrl() );
 			counter++;
