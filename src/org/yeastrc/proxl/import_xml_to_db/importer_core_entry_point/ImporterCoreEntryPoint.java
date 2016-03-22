@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -18,21 +17,15 @@ import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant;
 import org.yeastrc.proxl.import_xml_to_db.dao.FASTADatabaseLookup;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.PrintHelpOnlyException;
-import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.main.ImportPostProcessingPerSearch;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProxlInputObjectContainer;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateAnnotationTypeRecords;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateScanFilenamesInXMLAreOnCommandLine;
 import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput;
 import org.yeastrc.proxl.import_xml_to_db.project_importable_validation.IsImportingAllowForProject;
-import org.yeastrc.proxl_import.api.xml_dto.Linker;
-import org.yeastrc.proxl_import.api.xml_dto.Linkers;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
-import org.yeastrc.xlink.dao.LinkerDAO;
 import org.yeastrc.xlink.dao.SearchDAO;
-import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
-import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 
 
 
@@ -322,72 +315,13 @@ public class ImporterCoreEntryPoint {
 				//System.exit( 0 );
 			}
 
-
-			//  Confirm Linkers are supported:
-
-			Linkers proxlInputLinkers = proxlInputForImport.getLinkers();
-
-			if ( proxlInputLinkers == null ) {
-
-				String msg = "at least one linker is required";
-				log.error( msg );
-
-				throw new ProxlImporterDataException(msg);
-			}
-
-			//			List<Linker> proxlInputLinkerList = proxlInputLinkers.getLinker();
-			//
-			//			if ( proxlInputLinkerList == null || proxlInputLinkerList.isEmpty() ) {
-			//					
-			//
-			//				String msg = "at least one linker is required";
-			//				log.error( msg );
-			//				
-			//				throw new ProxlImporterDataException(msg);
-			//			}
-
-			
-			List<Linker> proxlInputLinkerList = proxlInputLinkers.getLinker();
-
-			
-			List<LinkerDTO> linkerList = new ArrayList<>();
-
-			//  verify all linkers are supported in the code
-
-			for ( Linker proxlInputLinkerItem : proxlInputLinkerList ) {
-
-				String linkerAbbr = proxlInputLinkerItem.getName();
-
-				try {
-
-					GetLinkerFactory.getLinkerForAbbr( linkerAbbr );
-
-
-					LinkerDTO linkerDTOlocal = LinkerDAO.getInstance().getLinkerDTOForAbbr( linkerAbbr );
-					
-					if ( linkerDTOlocal == null ) {
-						
-						String msg = "No 'linker' record found for 'abbr': " + linkerAbbr;
-						throw new ProxlImporterDataException( msg );
-					}
-					
-					linkerList.add( linkerDTOlocal );
-
-				} catch ( Exception e ) {
-
-
-					throw e;
-				}
-			}
-
-
 			//  Process proxl Input
 
 			processProxlInput = ProcessProxlInput.getInstance();
 
 			SearchDTO searchDTOInserted =
 
-					processProxlInput.processProxlInput( projectId, proxlInputForImport, scanFileList, linkerList, importDirectory, nrseqDatabaseId );
+					processProxlInput.processProxlInput( projectId, proxlInputForImport, scanFileList, importDirectory, nrseqDatabaseId );
 
 			
 
