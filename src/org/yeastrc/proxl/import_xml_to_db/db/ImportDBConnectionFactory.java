@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -18,6 +18,9 @@ import org.yeastrc.xlink.db.IDBConnectionFactory;
 public class ImportDBConnectionFactory implements IDBConnectionFactory {
 
 	private static Logger log = Logger.getLogger(ImportDBConnectionFactory.class);
+	
+	private static final int MAX_TOTAL_DB_CONNECTIONS = 10;
+	
 	
 	private static final String _DEFAULT_PORT = "3306";
 	
@@ -41,6 +44,7 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 	
 	private IDBConnectionParametersProvider dbConnectionParametersProvider = null;
 	
+	private boolean databaseConnectionTestOnBorrow = false;
 
 	/**
 	 * Allow setting a value for dbConnectionParametersProvider
@@ -202,11 +206,19 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 
 			dataSource.setUsername( username );
 			dataSource.setPassword( password );
+			
+			dataSource.setMaxTotal( MAX_TOTAL_DB_CONNECTIONS );
 
 			dataSource.setValidationQuery("select 1 from dual");
-			dataSource.setTestOnBorrow( true );
-			dataSource.setMinEvictableIdleTimeMillis( 21600000 );
-			dataSource.setTimeBetweenEvictionRunsMillis( 30000 );
+			
+			dataSource.setTestOnBorrow( databaseConnectionTestOnBorrow );
+			dataSource.setTestWhileIdle( true );
+			
+			dataSource.setMinEvictableIdleTimeMillis   ( 21600000 );
+			dataSource.setTimeBetweenEvictionRunsMillis(   30000 );
+			dataSource.setNumTestsPerEvictionRun( MAX_TOTAL_DB_CONNECTIONS ); // Test all of them
+			
+			dataSource.setLifo( false );  // Set so is FIFO
 
 			_dataSources.put( db, dataSource );
 		}
@@ -244,6 +256,15 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 			
 		}
 		_dataSources = null;
+	}
+
+	public boolean isDatabaseConnectionTestOnBorrow() {
+		return databaseConnectionTestOnBorrow;
+	}
+
+	public void setDatabaseConnectionTestOnBorrow(
+			boolean databaseConnectionTestOnBorrow) {
+		this.databaseConnectionTestOnBorrow = databaseConnectionTestOnBorrow;
 	}
 
 	
