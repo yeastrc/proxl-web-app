@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,10 +28,11 @@ import org.yeastrc.proxl.import_xml_to_db.project_importable_validation.IsImport
 import org.yeastrc.proxl_import.api.xml_dto.Linker;
 import org.yeastrc.proxl_import.api.xml_dto.Linkers;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
+import org.yeastrc.xlink.dao.LinkerDAO;
 import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
-import org.yeastrc.xlink.utils.IsDynamicModMassAMonolink;
 
 
 
@@ -347,18 +349,8 @@ public class ImporterCoreEntryPoint {
 			
 			List<Linker> proxlInputLinkerList = proxlInputLinkers.getLinker();
 
-
-			//  TODO  !!!!!!!   Many places in the code need to be changed if this is removed.  Look for IsDynamicModMassAMonolink
-
-			if ( proxlInputLinkerList.size() > 1 ) {
-
-
-				String msg = "Only one linker is allowed at this time";
-				log.error( msg );
-
-				throw new ProxlImporterDataException(msg);
-
-			}
+			
+			List<LinkerDTO> linkerList = new ArrayList<>();
 
 			//  verify all linkers are supported in the code
 
@@ -370,7 +362,16 @@ public class ImporterCoreEntryPoint {
 
 					GetLinkerFactory.getLinkerForAbbr( linkerAbbr );
 
-					IsDynamicModMassAMonolink.init( linkerAbbr );
+
+					LinkerDTO linkerDTOlocal = LinkerDAO.getInstance().getLinkerDTOForAbbr( linkerAbbr );
+					
+					if ( linkerDTOlocal == null ) {
+						
+						String msg = "No 'linker' record found for 'abbr': " + linkerAbbr;
+						throw new ProxlImporterDataException( msg );
+					}
+					
+					linkerList.add( linkerDTOlocal );
 
 				} catch ( Exception e ) {
 
@@ -386,7 +387,7 @@ public class ImporterCoreEntryPoint {
 
 			SearchDTO searchDTOInserted =
 
-					processProxlInput.processProxlInput( projectId, proxlInputForImport, scanFileList, importDirectory, nrseqDatabaseId );
+					processProxlInput.processProxlInput( projectId, proxlInputForImport, scanFileList, linkerList, importDirectory, nrseqDatabaseId );
 
 			
 

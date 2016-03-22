@@ -27,7 +27,6 @@ import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
-import org.yeastrc.xlink.utils.IsDynamicModMassAMonolink;
 
 
 
@@ -224,8 +223,6 @@ public class ProcessLinkTypeLooplink {
 		for ( GetLooplinksResultItem getLooplinksResultItem : getLooplinksResultItemList ) {
 			
 			LooplinkDTO looplinkDTO = getLooplinksResultItem.getLooplinkDTO();
-
-			looplinkDTO.setLinkerId( IsDynamicModMassAMonolink.getInstance().getLinkerDTO().getId() );
 			
 			BigDecimal linkerMass = psm.getLinkerMass();
 
@@ -312,8 +309,7 @@ public class ProcessLinkTypeLooplink {
 			
 		if( proteinMap.keySet().size() < 1 ) {
 			String msg = "getLooplinks(...): No linkable protein positions found for " + peptide.getSequence() +
-					" at positions " + linkedPosition_1 + "," + linkedPosition_2 + " for " +
-					IsDynamicModMassAMonolink.getInstance().getLinkerDTO().getAbbr() + " linker.";
+					" at positions " + linkedPosition_1 + "," + linkedPosition_2 + ".";
 			log.error( msg );
 			
 			throw new Exception( msg );
@@ -329,8 +325,6 @@ public class ProcessLinkTypeLooplink {
 
 				// a single looplink entry
 				LooplinkDTO looplink = new LooplinkDTO();
-
-				looplink.setLinkerId( IsDynamicModMassAMonolink.getInstance().getLinkerDTO().getId() );
 
 				looplink.setPeptideId( peptide.getId() );
 				

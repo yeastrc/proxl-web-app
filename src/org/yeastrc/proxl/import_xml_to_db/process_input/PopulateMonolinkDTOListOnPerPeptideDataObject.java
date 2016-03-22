@@ -11,7 +11,6 @@ import org.yeastrc.xlink.dto.MonolinkDTO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
-import org.yeastrc.xlink.utils.IsDynamicModMassAMonolink;
 
 /**
  * 
@@ -84,8 +83,6 @@ public class PopulateMonolinkDTOListOnPerPeptideDataObject {
 					monolinkDTO.setProtein( protein );
 					monolinkDTO.setProteinPosition( proteinPosition );
 					
-					monolinkDTO.setLinkerId( IsDynamicModMassAMonolink.getInstance().getLinkerDTO().getId() );
-
 					monolinkDTOList.add(monolinkDTO);
 				}
 			}

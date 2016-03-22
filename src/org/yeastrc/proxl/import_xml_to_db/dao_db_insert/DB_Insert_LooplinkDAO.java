@@ -20,8 +20,8 @@ public class DB_Insert_LooplinkDAO {
 
 	private static final String INSERT_SQL = 
 			"INSERT INTO looplink (psm_id, nrseq_id, protein_position_1, protein_position_2, peptide_id, "
-			+ "peptide_position_1, peptide_position_2, linker_mass, linker_id) " 
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "peptide_position_1, peptide_position_2, linker_mass) " 
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 			
 			
 	public void save( LooplinkDTO looplink ) throws Exception {
@@ -47,7 +47,6 @@ public class DB_Insert_LooplinkDAO {
 			pstmt.setInt( 6, looplink.getPeptidePosition1() );
 			pstmt.setInt( 7, looplink.getPeptidePosition2() );
 			pstmt.setBigDecimal( 8, looplink.getLinkerMass() );
-			pstmt.setInt( 9, looplink.getLinkerId() );
 			
 			pstmt.executeUpdate();
 			

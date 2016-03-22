@@ -28,7 +28,6 @@ import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
-import org.yeastrc.xlink.utils.IsDynamicModMassAMonolink;
 
 
 
@@ -251,8 +250,6 @@ public class ProcessLinkTypeCrosslink {
 				
 			}
 			
-			crosslinkDTO.setLinkerId( IsDynamicModMassAMonolink.getInstance().getLinkerDTO().getId() );
-			
 			BigDecimal linkerMass = psm.getLinkerMass();
 			
 			if ( linkerMass == null ) {
@@ -388,8 +385,6 @@ public class ProcessLinkTypeCrosslink {
 			    		PeptideOrder peptideOrder = PeptideOrder.ONE_TO_ONE_AND_TWO_TO_TWO;
 			    		
 			    		
-			    		crosslink.setLinkerId( IsDynamicModMassAMonolink.getInstance().getLinkerDTO().getId() );
-			    		
 			    		// insert the proteins in order of their nrseq_id
 			    		if( protein1.getNrseqId() < protein2.getNrseqId() ) {
 			    			crosslink.setPeptide1Id( peptide_1.getId() );
@@ -463,9 +458,6 @@ public class ProcessLinkTypeCrosslink {
 			    			crosslink.setProtein2( protein1 );
 			    			crosslink.setProtein2Position( protein1Position );	
 			    		}
-			    		
-			    		crosslink.setLinkerId( IsDynamicModMassAMonolink.getInstance().getLinkerDTO().getId() );
-
 
 						
 			    		GetCrosslinksResultItem getCrosslinksResultItem = new GetCrosslinksResultItem(); 

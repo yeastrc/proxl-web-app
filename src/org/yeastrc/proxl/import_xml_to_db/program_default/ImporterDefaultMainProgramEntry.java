@@ -469,38 +469,7 @@ public class ImporterDefaultMainProgramEntry {
 
 
 		System.err.println( "" );
-//
-//		if ( createDatabaseConnectionFactory ) {
-//
-//			System.err.println( "" );
-//			System.err.println( "The --" + DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING + " is optional.");
-//			System.err.println( "If --" + DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING 
-//					+ " is not provided, the filename '" 
-//					+ DBConnectionParametersProvider.DB_CONFIG_FILENAME
-//					+ "' will be searched for in the class path" );
-//		}
 
-
-//		System.err.println( "" );
-//		System.err.println( "linkers available:" );
-//		System.err.println( "" );
-//		System.err.println( "abbr\tmonolink linker masses (the mass must match exactly for the variable mod to be identified as a monolink");
-//		System.err.println( "" );
-//
-//		List<LinkerDTO>  linkerList = LinkerDAO.getInstance().getAllLinkerDTO();
-//
-//		for ( LinkerDTO linkerDTO : linkerList ) {
-//
-//			System.err.println( linkerDTO.getAbbr() );
-//
-//			List<LinkerMonolinkMassDTO>  linkerMonolinkMassList = LinkerMonolinkMassDAO.getInstance().getLinkerMonolinkMassDTOForLinkerId( linkerDTO.getId() );
-//
-//			for ( LinkerMonolinkMassDTO linkerMonolinkMassDTO : linkerMonolinkMassList ) {
-//
-//				System.err.println( "\t" + linkerMonolinkMassDTO.getMass() );
-//			}
-//
-//		}
 	}
 
 

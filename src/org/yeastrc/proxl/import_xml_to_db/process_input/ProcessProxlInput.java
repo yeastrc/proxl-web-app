@@ -17,10 +17,10 @@ import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
 import org.yeastrc.xlink.dao.SearchCommentDAO;
 import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.dao.SearchLinkerDAO;
+import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.SearchCommentDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.dto.SearchLinkerDTO;
-import org.yeastrc.xlink.utils.IsDynamicModMassAMonolink;
 
 /**
  * 
@@ -62,6 +62,8 @@ public class ProcessProxlInput {
 			int projectId,
 			ProxlInput proxlInput,
 			List<File> scanFileList,
+			
+			List<LinkerDTO> linkerList,
 			
 			String importDirectory,
 			
@@ -113,15 +115,19 @@ public class ProcessProxlInput {
 			{
 				//  Save Linker mapping for search
 
-			    int linkerId = IsDynamicModMassAMonolink.getInstance().getLinkerDTO().getId();
 
-			    SearchLinkerDTO searchLinkerDTO = new SearchLinkerDTO();
-			    
-			    searchLinkerDTO.setSearchId( searchDTO.getId() );
-			    searchLinkerDTO.setLinkerId( linkerId );
-			    
-			    SearchLinkerDAO.getInstance().saveToDatabase( searchLinkerDTO );
-			    
+				
+				for ( LinkerDTO linkerDTO : linkerList ) {
+
+					int linkerId = linkerDTO.getId();
+
+					SearchLinkerDTO searchLinkerDTO = new SearchLinkerDTO();
+
+					searchLinkerDTO.setSearchId( searchDTO.getId() );
+					searchLinkerDTO.setLinkerId( linkerId );
+
+					SearchLinkerDAO.getInstance().saveToDatabase( searchLinkerDTO );
+				}
 			    
 			}
 			

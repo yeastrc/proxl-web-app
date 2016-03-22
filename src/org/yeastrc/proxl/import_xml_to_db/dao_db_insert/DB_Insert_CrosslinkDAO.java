@@ -25,8 +25,8 @@ public class DB_Insert_CrosslinkDAO {
 	private final String INSERT_SQL = 
 			"INSERT INTO crosslink (psm_id, nrseq_id_1, nrseq_id_2, protein_1_position, protein_2_position, "
 			+ " peptide_1_id, peptide_2_id, peptide_1_position, peptide_2_position, " 
-			+ " peptide_1_matched_peptide_id, peptide_2_matched_peptide_id, linker_mass, linker_id) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ " peptide_1_matched_peptide_id, peptide_2_matched_peptide_id, linker_mass) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	public void save( CrosslinkDTO crosslink ) throws Exception {
 		
@@ -70,8 +70,6 @@ public class DB_Insert_CrosslinkDAO {
 			pstmt.setInt( counter, crosslink.getPeptide2MatchedPeptideId() );
 			counter++;
 			pstmt.setBigDecimal( counter, crosslink.getLinkerMass() );
-			counter++;
-			pstmt.setInt( counter, crosslink.getLinkerId() );
 			
 			pstmt.executeUpdate();
 			

@@ -25,8 +25,8 @@ public class DB_Insert_MonolinkDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		String sql = "INSERT INTO monolink (psm_id, nrseq_id, protein_position, peptide_id, peptide_position, linker_id) " +
-				"VALUES (?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO monolink (psm_id, nrseq_id, protein_position, peptide_id, peptide_position) " +
+				"VALUES (?, ?, ?, ?, ?)";
 
 		try {
 
@@ -40,7 +40,6 @@ public class DB_Insert_MonolinkDAO {
 			pstmt.setInt( 3, monolink.getProteinPosition() );
 			pstmt.setInt( 4, monolink.getPeptideId() );
 			pstmt.setInt( 5, monolink.getPeptidePosition() );
-			pstmt.setInt( 6, monolink.getLinkerId() );
 			
 			pstmt.executeUpdate();
 			
