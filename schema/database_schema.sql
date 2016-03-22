@@ -2191,6 +2191,68 @@ CREATE INDEX `unlinked__rep_pept__search__generic_lookup_rep_pept_fk_idx` ON `un
 CREATE INDEX `search_id_protein_data__search_id_must_be_first_idx` ON `unlinked__rep_pept__search__generic_lookup` (`search_id` ASC, `nrseq_id` ASC);
 
 
+-- -----------------------------------------------------
+-- Table `linker_per_search_monolink_mass`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `linker_per_search_monolink_mass` ;
+
+CREATE TABLE IF NOT EXISTS `linker_per_search_monolink_mass` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `linker_id` INT UNSIGNED NOT NULL,
+  `search_id` INT UNSIGNED NOT NULL,
+  `monolink_mass_double` DOUBLE NOT NULL,
+  `monolink_mass_string` VARCHAR(200) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `linkr_pr_srch_monolnk_mss_linker_fk`
+    FOREIGN KEY (`linker_id`)
+    REFERENCES `linker` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT `linkr_pr_srch_monolnk_mss_search_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
+
+CREATE INDEX `linkr_pr_srch_monolnk_mss_linker_fk_idx` ON `linker_per_search_monolink_mass` (`linker_id` ASC);
+
+CREATE INDEX `linkr_pr_srch_monolnk_mss_search_fk_idx` ON `linker_per_search_monolink_mass` (`search_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `linker_per_search_crosslink_mass`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `linker_per_search_crosslink_mass` ;
+
+CREATE TABLE IF NOT EXISTS `linker_per_search_crosslink_mass` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `linker_id` INT UNSIGNED NOT NULL,
+  `search_id` INT UNSIGNED NOT NULL,
+  `crosslink_mass_double` DOUBLE NOT NULL,
+  `crosslink_mass_string` VARCHAR(200) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `linkr_pr_srch_crosslnk_mss_linker_fk`
+    FOREIGN KEY (`linker_id`)
+    REFERENCES `linker` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT `linkr_pr_srch_crosslnk_mss_search_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
+
+CREATE INDEX `linkr_pr_srch_crosslnk_mss_linker_fk_idx` ON `linker_per_search_crosslink_mass` (`linker_id` ASC);
+
+CREATE INDEX `linkr_pr_srch_crosslnk_mss_search_fk_idx` ON `linker_per_search_crosslink_mass` (`search_id` ASC);
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
