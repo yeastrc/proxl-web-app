@@ -38,12 +38,7 @@ public class MonolinkDTO {
 	public void setPeptidePosition(int peptidePosition) {
 		this.peptidePosition = peptidePosition;
 	}
-	public int getLinkerId() {
-		return linkerId;
-	}
-	public void setLinkerId(int linkerId) {
-		this.linkerId = linkerId;
-	}
+
 	
 	
 	
@@ -52,7 +47,7 @@ public class MonolinkDTO {
 		return "MonolinkDTO [id=" + id + ", psm=" + psm + ", protein="
 				+ protein + ", proteinPosition=" + proteinPosition
 				+ ", peptideId=" + peptideId + ", peptidePosition="
-				+ peptidePosition + ", linkerId=" + linkerId + "]";
+				+ peptidePosition + "]";
 	}
 
 
@@ -64,5 +59,4 @@ public class MonolinkDTO {
 	private int proteinPosition;
 	private int peptideId;
 	private int peptidePosition;
-	private int linkerId;
 }

@@ -220,23 +220,6 @@ CREATE INDEX `matched_peptide_psm_id_fk_idx` ON `matched_peptide` (`psm_id` ASC)
 
 
 -- -----------------------------------------------------
--- Table `linker`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `linker` ;
-
-CREATE TABLE IF NOT EXISTS `linker` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `abbr` VARCHAR(255) NOT NULL,
-  `name` VARCHAR(255) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_bin;
-
-CREATE UNIQUE INDEX `abbr` ON `linker` (`abbr` ASC);
-
-
--- -----------------------------------------------------
 -- Table `crosslink`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `crosslink` ;
@@ -255,7 +238,6 @@ CREATE TABLE IF NOT EXISTS `crosslink` (
   `peptide_1_matched_peptide_id` INT UNSIGNED NOT NULL,
   `peptide_2_matched_peptide_id` INT UNSIGNED NOT NULL,
   `linker_mass` DECIMAL(18,9) NOT NULL,
-  `linker_id` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `crosslink_ibfk_1`
     FOREIGN KEY (`psm_id`)
@@ -276,11 +258,6 @@ CREATE TABLE IF NOT EXISTS `crosslink` (
     FOREIGN KEY (`peptide_2_matched_peptide_id`)
     REFERENCES `matched_peptide` (`id`)
     ON DELETE CASCADE
-    ON UPDATE RESTRICT,
-  CONSTRAINT `crosslink_linker_id_fk`
-    FOREIGN KEY (`linker_id`)
-    REFERENCES `linker` (`id`)
-    ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
@@ -303,8 +280,6 @@ CREATE INDEX `peptide_2_id` ON `crosslink` (`peptide_2_id` ASC, `peptide_2_posit
 CREATE INDEX `crosslink_ibfk_4_idx` ON `crosslink` (`peptide_1_matched_peptide_id` ASC);
 
 CREATE INDEX `crosslink_ibfk_5_idx` ON `crosslink` (`peptide_2_matched_peptide_id` ASC);
-
-CREATE INDEX `crosslink_linker_id_fj_idx` ON `crosslink` (`linker_id` ASC);
 
 CREATE INDEX `crosslink_pr1prp1pr2prp2` ON `crosslink` (`nrseq_id_1` ASC, `protein_1_position` ASC, `nrseq_id_2` ASC, `protein_2_position` ASC);
 
@@ -372,26 +347,20 @@ CREATE INDEX `dynamic_mod_matched_peptide_id_fk_idx` ON `dynamic_mod` (`matched_
 
 
 -- -----------------------------------------------------
--- Table `linker_monolink_mass`
+-- Table `linker`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `linker_monolink_mass` ;
+DROP TABLE IF EXISTS `linker` ;
 
-CREATE TABLE IF NOT EXISTS `linker_monolink_mass` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `linker_id` INT(10) UNSIGNED NOT NULL,
-  `mass` DOUBLE NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `linker_monolink_mass_ibfk_1`
-    FOREIGN KEY (`linker_id`)
-    REFERENCES `linker` (`id`)
-    ON DELETE CASCADE)
+CREATE TABLE IF NOT EXISTS `linker` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `abbr` VARCHAR(255) NOT NULL,
+  `name` VARCHAR(255) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
 COLLATE = latin1_bin;
 
-CREATE UNIQUE INDEX `linker_monolink_mass__linker_id_mass_Unique_idx` ON `linker_monolink_mass` (`linker_id` ASC, `mass` ASC);
-
-CREATE INDEX `linker_id` ON `linker_monolink_mass` (`linker_id` ASC);
+CREATE UNIQUE INDEX `abbr` ON `linker` (`abbr` ASC);
 
 
 -- -----------------------------------------------------
@@ -409,7 +378,6 @@ CREATE TABLE IF NOT EXISTS `looplink` (
   `peptide_position_1` INT(10) UNSIGNED NOT NULL,
   `peptide_position_2` INT(10) UNSIGNED NOT NULL,
   `linker_mass` DECIMAL(18,9) NOT NULL,
-  `linker_id` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `looplink_ibfk_1`
     FOREIGN KEY (`psm_id`)
@@ -417,12 +385,7 @@ CREATE TABLE IF NOT EXISTS `looplink` (
     ON DELETE CASCADE,
   CONSTRAINT `looplink_ibfk_2`
     FOREIGN KEY (`peptide_id`)
-    REFERENCES `peptide` (`id`),
-  CONSTRAINT `looplink_linker_id_fk`
-    FOREIGN KEY (`linker_id`)
-    REFERENCES `linker` (`id`)
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
+    REFERENCES `peptide` (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
 COLLATE = latin1_bin;
@@ -437,8 +400,6 @@ CREATE INDEX `protein_position_2` ON `looplink` (`protein_position_2` ASC);
 
 CREATE INDEX `peptide_id` ON `looplink` (`peptide_id` ASC);
 
-CREATE INDEX `looplink_linker_id_fk_idx` ON `looplink` (`linker_id` ASC);
-
 
 -- -----------------------------------------------------
 -- Table `monolink`
@@ -452,7 +413,6 @@ CREATE TABLE IF NOT EXISTS `monolink` (
   `protein_position` INT(10) UNSIGNED NOT NULL,
   `peptide_id` INT(10) UNSIGNED NOT NULL,
   `peptide_position` INT(10) UNSIGNED NOT NULL,
-  `linker_id` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `monolink_ibfk_1`
     FOREIGN KEY (`psm_id`)
@@ -460,12 +420,7 @@ CREATE TABLE IF NOT EXISTS `monolink` (
     ON DELETE CASCADE,
   CONSTRAINT `monolink_ibfk_2`
     FOREIGN KEY (`peptide_id`)
-    REFERENCES `peptide` (`id`),
-  CONSTRAINT `monolink_linker_id_fk`
-    FOREIGN KEY (`linker_id`)
-    REFERENCES `linker` (`id`)
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
+    REFERENCES `peptide` (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
 COLLATE = latin1_bin;
@@ -477,8 +432,6 @@ CREATE INDEX `psm_id` ON `monolink` (`psm_id` ASC);
 CREATE INDEX `protein_position` ON `monolink` (`protein_position` ASC);
 
 CREATE INDEX `peptide_id` ON `monolink` (`peptide_id` ASC);
-
-CREATE INDEX `monolink_linker_id_fk_idx` ON `monolink` (`linker_id` ASC);
 
 
 -- -----------------------------------------------------

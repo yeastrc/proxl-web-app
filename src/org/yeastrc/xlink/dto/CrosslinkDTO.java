@@ -89,12 +89,6 @@ public class CrosslinkDTO {
 	public void setLinkerMass(BigDecimal linkerMass) {
 		this.linkerMass = linkerMass;
 	}
-	public int getLinkerId() {
-		return linkerId;
-	}
-	public void setLinkerId(int linkerId) {
-		this.linkerId = linkerId;
-	}
 	
 	@Override
 	public String toString() {
@@ -106,7 +100,7 @@ public class CrosslinkDTO {
 				+ ", peptide2Position=" + peptide2Position
 				+ ", peptide1MatchedPeptideId=" + peptide1MatchedPeptideId
 				+ ", peptide2MatchedPeptideId=" + peptide2MatchedPeptideId
-				+ ", linkerMass=" + linkerMass + ", linkerId=" + linkerId + "]";
+				+ ", linkerMass=" + linkerMass + "]";
 	}
 
 	private int id;
@@ -123,7 +117,6 @@ public class CrosslinkDTO {
 	private int peptide2MatchedPeptideId;
 
 	private BigDecimal linkerMass;
-	private int linkerId;
 
 
 }

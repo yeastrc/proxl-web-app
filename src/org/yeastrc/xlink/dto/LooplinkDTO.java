@@ -62,12 +62,6 @@ public class LooplinkDTO {
 	public void setLinkerMass(BigDecimal linkerMass) {
 		this.linkerMass = linkerMass;
 	}
-	public int getLinkerId() {
-		return linkerId;
-	}
-	public void setLinkerId(int linkerId) {
-		this.linkerId = linkerId;
-	}
 	
 	private int id;
 	private PsmDTO psm;
@@ -78,5 +72,4 @@ public class LooplinkDTO {
 	private int peptidePosition1;
 	private int peptidePosition2;
 	private BigDecimal linkerMass;
-	private int linkerId;
 }
