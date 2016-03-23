@@ -26,10 +26,19 @@ public class DynamicModDTO {
 	public void setMass(double mass) {
 		this.mass = mass;
 	}
+	public boolean isMonolink() {
+		return isMonolink;
+	}
+	public void setMonolink(boolean isMonolink) {
+		this.isMonolink = isMonolink;
+	}
+
+	
 	
 	private int id;
 	private int matched_peptide_id;
 
 	private int position;
 	private double mass;
+	private boolean isMonolink;
 }

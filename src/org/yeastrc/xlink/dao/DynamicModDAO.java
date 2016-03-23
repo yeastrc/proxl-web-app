@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.DynamicModDTO;
 
@@ -103,7 +104,15 @@ public class DynamicModDAO {
 		returnItem.setMatched_peptide_id( rs.getInt( "matched_peptide_id" ) );
 		returnItem.setPosition( rs.getInt( "position" ) );
 		returnItem.setMass( rs.getDouble( "mass" ) );
-
+		
+		int isMonolinkInt = rs.getInt( "insert_complete" );
+		
+		if ( Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE == isMonolinkInt ) {
+			returnItem.setMonolink( false );
+		} else {
+			returnItem.setMonolink( true );
+		}
+		
 		return returnItem;
 	}
 	
@@ -117,7 +126,7 @@ public class DynamicModDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		String sql = "INSERT INTO dynamic_mod (matched_peptide_id, position, mass) VALUES (?, ?, ?)";
+		String sql = "INSERT INTO dynamic_mod (matched_peptide_id, position, mass, is_monolink) VALUES (?, ?, ?, ?)";
 		
 		try {
 			
@@ -127,6 +136,13 @@ public class DynamicModDAO {
 			pstmt.setInt( 1,  dmod.getMatched_peptide_id() );
 			pstmt.setInt( 2,  dmod.getPosition() );
 			pstmt.setDouble( 3,  dmod.getMass() );
+
+			if ( dmod.isMonolink() ) {
+				pstmt.setInt( 4, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+			} else {
+				pstmt.setInt( 4, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+			}
+
 			
 			pstmt.executeUpdate();
 			
