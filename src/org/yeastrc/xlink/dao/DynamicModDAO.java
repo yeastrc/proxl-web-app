@@ -105,7 +105,7 @@ public class DynamicModDAO {
 		returnItem.setPosition( rs.getInt( "position" ) );
 		returnItem.setMass( rs.getDouble( "mass" ) );
 		
-		int isMonolinkInt = rs.getInt( "insert_complete" );
+		int isMonolinkInt = rs.getInt( "is_monolink" );
 		
 		if ( Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE == isMonolinkInt ) {
 			returnItem.setMonolink( false );
