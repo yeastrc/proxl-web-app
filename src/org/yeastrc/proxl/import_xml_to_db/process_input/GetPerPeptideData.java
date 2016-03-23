@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
+
+
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl_import.api.xml_dto.Modification;
 import org.yeastrc.proxl_import.api.xml_dto.Modifications;
@@ -20,7 +22,7 @@ import org.yeastrc.xlink.dto.PeptideDTO;
  */
 public class GetPerPeptideData {
 
-	private static final Logger log = Logger.getLogger(GetPerPeptideData.class);
+//	private static final Logger log = Logger.getLogger(GetPerPeptideData.class);
 
 	private GetPerPeptideData() { }
 	public static GetPerPeptideData getInstance() { return new GetPerPeptideData(); }
@@ -63,14 +65,16 @@ public class GetPerPeptideData {
 
 					int position = modification.getPosition().intValue();
 					BigDecimal mass = modification.getMass();
-					boolean monolink = modification.isIsMonolink();
+					Boolean monolink = modification.isIsMonolink();
 
 					DynamicModDTO dynamicModDTO = new DynamicModDTO();
 					dynamicModDTO.setPosition( position );
 					dynamicModDTO.setMass( mass.doubleValue() );
 					dynamicModDTOList_Peptide.add( dynamicModDTO );
 
-					if ( monolink ) {
+					if ( monolink != null && monolink ) {
+						
+						dynamicModDTO.setMonolink( true );
 
 						monolinkPositionList.add( position );
 					}
