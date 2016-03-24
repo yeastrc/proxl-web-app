@@ -32,17 +32,17 @@ public class SearcherCutoffValuesAnnotationLevel {
 			return false;
 		}
 		
-		if ( ! annotationTypeDTO.getAnnotationTypeFilterableDTO().isDefaultFilter() ) {
+		if ( ! annotationTypeDTO.getAnnotationTypeFilterableDTO().isDefaultFilterAtDatabaseLoad() ) {
 			
 			return false;
 		}
 		
-		if ( annotationTypeDTO.getAnnotationTypeFilterableDTO().getDefaultFilterValue() == null ) {
+		if ( annotationTypeDTO.getAnnotationTypeFilterableDTO().getDefaultFilterValueAtDatabaseLoad() == null ) {
 			
 			return false;
 		}
 		
-		return ( annotationCutoffValue == annotationTypeDTO.getAnnotationTypeFilterableDTO().getDefaultFilterValue().doubleValue() );
+		return ( annotationCutoffValue == annotationTypeDTO.getAnnotationTypeFilterableDTO().getDefaultFilterValueAtDatabaseLoad().doubleValue() );
 	}
 	
 
