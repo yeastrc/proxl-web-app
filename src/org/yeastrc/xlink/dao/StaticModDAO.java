@@ -103,16 +103,11 @@ public class StaticModDAO {
 		returnItem.setSearch_id( rs.getInt( "search_id" ) );
 		returnItem.setResidue( rs.getString( "residue" ) );
 		returnItem.setMass( rs.getBigDecimal( "mass" ) );
+		returnItem.setMassString( rs.getString( "mass_string" ) );
 
 		return returnItem;
 	}
 	
-//	CREATE TABLE static_mod (
-//			  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-//			  search_id INT(10) UNSIGNED NOT NULL,
-//			  residue VARCHAR(45) NOT NULL,
-//			  mass DECIMAL(18,9) NULL DEFAULT NULL,
-
 	
 	/**
 	 * @param item
@@ -124,7 +119,7 @@ public class StaticModDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		String sql = "INSERT INTO static_mod ( search_id, residue, mass) VALUES (?, ?, ?)";
+		String sql = "INSERT INTO static_mod ( search_id, residue, mass, mass_string) VALUES (?, ?, ?, ?)";
 		
 		try {
 			
@@ -134,6 +129,7 @@ public class StaticModDAO {
 			pstmt.setInt( 1,  item.getSearch_id() );
 			pstmt.setString( 2,  item.getResidue() );
 			pstmt.setBigDecimal( 3,  item.getMass() );
+			pstmt.setString( 4, item.getMassString() );
 			
 			pstmt.executeUpdate();
 			

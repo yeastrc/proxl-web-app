@@ -4,17 +4,14 @@ import java.math.BigDecimal;
 
 public class StaticModDTO {
 	
-	@Override
-	public String toString() {
-		return "StaticModDTO [id=" + id + ", search_id=" + search_id
-				+ ", residue=" + residue + ", mass=" + mass + "]";
-	}
+
 	
 	
 	private int id;
 	private int search_id;
 	private String residue;
 	private BigDecimal mass;
+	private String massString;
 	
 	
 	public String getResidue() {
@@ -40,5 +37,17 @@ public class StaticModDTO {
 	}
 	public void setMass(BigDecimal mass) {
 		this.mass = mass;
+	}
+	public String getMassString() {
+		return massString;
+	}
+	public void setMassString(String massString) {
+		this.massString = massString;
+	}
+	@Override
+	public String toString() {
+		return "StaticModDTO [id=" + id + ", search_id=" + search_id
+				+ ", residue=" + residue + ", mass=" + mass + ", massString="
+				+ massString + "]";
 	}
 }
