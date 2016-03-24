@@ -2,7 +2,9 @@ package org.yeastrc.proxl.import_xml_to_db.process_input;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
+
+
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
 import org.yeastrc.proxl_import.api.xml_dto.StaticModification;
 import org.yeastrc.proxl_import.api.xml_dto.StaticModifications;
@@ -15,7 +17,7 @@ import org.yeastrc.xlink.dto.StaticModDTO;
  */
 public class ProcessStaticModifications {
 	
-	private static final Logger log = Logger.getLogger( ProcessStaticModifications.class );
+//	private static final Logger log = Logger.getLogger( ProcessStaticModifications.class );
 	
 	/**
 	 * private constructor
@@ -54,6 +56,7 @@ public class ProcessStaticModifications {
 
 					StaticModDTO.setResidue( staticModification.getAminoAcid() );
 					StaticModDTO.setMass( staticModification.getMassChange() );
+					StaticModDTO.setMassString( staticModification.getMassChange().toString() );
 
 					StaticModDAO.getInstance().save( StaticModDTO );
 				}
