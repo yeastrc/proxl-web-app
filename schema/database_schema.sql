@@ -1196,6 +1196,9 @@ CREATE TABLE IF NOT EXISTS `annotation_type_filterable` (
   `default_filter_value` DOUBLE NULL,
   `default_filter_value_string` VARCHAR(45) NULL,
   `sort_order` INT UNSIGNED NULL,
+  `default_filter_at_database_load` INT(1) NOT NULL DEFAULT 0,
+  `default_filter_value_at_database_load` DOUBLE NULL,
+  `default_filter_value_string_at_database_load` VARCHAR(45) NULL,
   PRIMARY KEY (`annotation_type_id`),
   CONSTRAINT `ann_type_fltrbl__annotation_type_id_fk`
     FOREIGN KEY (`annotation_type_id`)
@@ -2248,9 +2251,9 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
 COLLATE = latin1_bin;
 
-CREATE INDEX `linkr_pr_srch_crosslnk_mss_linker_fk_idx` ON `linker_per_search_crosslink_mass` (`linker_id` ASC);
+CREATE INDEX `linkr_pr_srch_monolnk_mss_linker_fk_idx` ON `linker_per_search_crosslink_mass` (`linker_id` ASC);
 
-CREATE INDEX `linkr_pr_srch_crosslnk_mss_search_fk_idx` ON `linker_per_search_crosslink_mass` (`search_id` ASC);
+CREATE INDEX `linkr_pr_srch_monolnk_mss_search_fk_idx` ON `linker_per_search_crosslink_mass` (`search_id` ASC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

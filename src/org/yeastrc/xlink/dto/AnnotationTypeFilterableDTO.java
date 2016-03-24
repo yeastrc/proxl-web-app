@@ -19,7 +19,10 @@ public class AnnotationTypeFilterableDTO {
 	private boolean defaultFilter;
 	private Double defaultFilterValue;
 	private String defaultFilterValueString;
-	
+
+	private boolean defaultFilterAtDatabaseLoad;
+	private Double defaultFilterValueAtDatabaseLoad;
+	private String defaultFilterValueStringAtDatabaseLoad;
 
 	private Integer sortOrder;
 
@@ -81,6 +84,38 @@ public class AnnotationTypeFilterableDTO {
 
 	public void setSortOrder(Integer sortOrder) {
 		this.sortOrder = sortOrder;
+	}
+
+
+	public boolean isDefaultFilterAtDatabaseLoad() {
+		return defaultFilterAtDatabaseLoad;
+	}
+
+
+	public void setDefaultFilterAtDatabaseLoad(boolean defaultFilterAtDatabaseLoad) {
+		this.defaultFilterAtDatabaseLoad = defaultFilterAtDatabaseLoad;
+	}
+
+
+	public Double getDefaultFilterValueAtDatabaseLoad() {
+		return defaultFilterValueAtDatabaseLoad;
+	}
+
+
+	public void setDefaultFilterValueAtDatabaseLoad(
+			Double defaultFilterValueAtDatabaseLoad) {
+		this.defaultFilterValueAtDatabaseLoad = defaultFilterValueAtDatabaseLoad;
+	}
+
+
+	public String getDefaultFilterValueStringAtDatabaseLoad() {
+		return defaultFilterValueStringAtDatabaseLoad;
+	}
+
+
+	public void setDefaultFilterValueStringAtDatabaseLoad(
+			String defaultFilterValueStringAtDatabaseLoad) {
+		this.defaultFilterValueStringAtDatabaseLoad = defaultFilterValueStringAtDatabaseLoad;
 	}
 	
 }

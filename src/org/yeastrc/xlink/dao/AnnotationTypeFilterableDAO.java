@@ -121,6 +121,28 @@ public class AnnotationTypeFilterableDAO {
 		
 		item.setDefaultFilterValueString( rs.getString( "default_filter_value_string" ) );
 		
+		
+
+		//  Values when the record was first inserted into the DB
+
+		int defaultFilterAtDatabaseLoadInt = rs.getInt( "default_filter_at_database_load" );
+		
+		if ( Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE == defaultFilterAtDatabaseLoadInt ) {
+			item.setDefaultFilterAtDatabaseLoad( false );
+		} else {
+			item.setDefaultFilterAtDatabaseLoad( true );
+		}
+
+
+		double defaultFilterValueAtDatabaseLoad = rs.getDouble( "default_filter_value_at_database_load" );
+		if ( ! rs.wasNull() ) {
+			
+			item.setDefaultFilterValueAtDatabaseLoad( defaultFilterValueAtDatabaseLoad );
+		}
+		
+		item.setDefaultFilterValueStringAtDatabaseLoad( rs.getString( "default_filter_value_string_at_database_load" ) );
+		
+		
 
 		int sortOrder = rs.getInt( "sort_order" );
 		if ( ! rs.wasNull() ) {
@@ -167,9 +189,11 @@ public class AnnotationTypeFilterableDAO {
 			
 			+ "( annotation_type_id, filter_direction, "
 			+ 	" default_filter, "
-			+ 	" default_filter_value, default_filter_value_string, sort_order ) "
+			+ 	" default_filter_value, default_filter_value_string, sort_order,"
+			+ 	" default_filter_at_database_load, default_filter_value_at_database_load,"
+			+ 	" default_filter_value_string_at_database_load ) "
 			
-			+ "VALUES ( ?, ?, ?, ?, ?, ? )";
+			+ "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 	
 		
 	/**
@@ -231,6 +255,24 @@ public class AnnotationTypeFilterableDAO {
 				pstmt.setNull( counter, java.sql.Types.INTEGER );
 			}
 
+
+			counter++;
+			if ( item.isDefaultFilterAtDatabaseLoad() ) {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+			} else {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+			}
+			
+			counter++;
+			if ( item.getDefaultFilterValueAtDatabaseLoad() != null ) {
+				pstmt.setDouble( counter, item.getDefaultFilterValue() );
+			} else {
+				pstmt.setNull( counter, java.sql.Types.DOUBLE );
+			}
+
+			counter++;
+			pstmt.setString( counter, item.getDefaultFilterValueStringAtDatabaseLoad() );
+			
 
 			pstmt.executeUpdate();
 			
