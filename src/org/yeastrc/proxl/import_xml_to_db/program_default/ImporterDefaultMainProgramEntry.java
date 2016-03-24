@@ -16,6 +16,7 @@ import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromP
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.PrintHelpOnlyException;
 import org.yeastrc.proxl.import_xml_to_db.importer_core_entry_point.ImporterCoreEntryPoint;
+import org.yeastrc.proxl.import_xml_to_db.objects.ImportResults;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
@@ -57,7 +58,21 @@ public class ImporterDefaultMainProgramEntry {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-
+		
+		importerDefaultMainProgramEntry( args );
+	}
+	
+	
+	/**
+	 * @param args
+	 * @return insertedSearchId
+	 * @throws Exception 
+	 */
+	public static ImportResults importerDefaultMainProgramEntry( String[] args  ) throws Exception {
+		
+		
+		ImportResults importResults = new ImportResults();
+		
 
 		System.out.println( "Processing " + args.length + " command line arguments." );
 
@@ -152,6 +167,10 @@ public class ImporterDefaultMainProgramEntry {
 
 			File mainXMLFileToImport = new File( mainXMLFilenameToImport );
 
+			
+			importResults.setImportedProxlXMLFile( mainXMLFileToImport );
+			
+			
 
 			if( ! mainXMLFileToImport.exists() ) {
 
@@ -200,6 +219,11 @@ public class ImporterDefaultMainProgramEntry {
 					scanFileList.add( scanFile );
 				}
 			}
+			
+			
+			importResults.setScanFileList( scanFileList );
+			
+			
 			
 			System.out.println( "Now: " + new Date() );
 			System.out.println( "" );
@@ -288,11 +312,14 @@ public class ImporterDefaultMainProgramEntry {
 
 			//////////   Do the import
 
-			ImporterCoreEntryPoint.getInstance().doImport( 
-					projectId, 
-					mainXMLFileToImport, 
-					scanFileList );
+			int insertedSearchId = 
+					ImporterCoreEntryPoint.getInstance().doImport( 
+							projectId, 
+							mainXMLFileToImport, 
+							scanFileList );
 
+			importResults.setSearchId( insertedSearchId );
+			
 
 			System.out.println( "" );
 			System.out.println( "--------------------------------------" );
@@ -428,6 +455,8 @@ public class ImporterDefaultMainProgramEntry {
 
 			System.exit( programExitCode );
 		}
+		
+		return importResults;
 	}
 
 

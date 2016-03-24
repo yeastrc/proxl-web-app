@@ -55,16 +55,16 @@ public class ImporterCoreEntryPoint {
 	 * @param projectId
 	 * @param mainXMLFileToImport
 	 * @param scanFileList
+	 * @return insertedSearchId
 	 * @throws Exception
 	 */
-	public void doImport( 
+	public int doImport( 
 			
 			int projectId,
 			File mainXMLFileToImport,
 			List<File> scanFileList 
 			
 			) throws Exception {
-		
 
 		ProxlInput proxlInputForImport = null;
 
@@ -135,7 +135,9 @@ public class ImporterCoreEntryPoint {
 		
 		proxlInputForImport = null; //  release this reference
 		
-		doImportPassingDeserializedProxlImportInputXML( projectId, proxlInputObjectContainer, scanFileList, importDirectory );
+		int insertedSearchId = doImportPassingDeserializedProxlImportInputXML( projectId, proxlInputObjectContainer, scanFileList, importDirectory );
+		
+		return insertedSearchId;
 		
 	}
 	
@@ -242,9 +244,10 @@ public class ImporterCoreEntryPoint {
 	 * @param proxlInputObjectContainer
 	 * @param scanFileList
 	 * @param importDirectory - displayed on website in the "Path:" field for logged in users
+	 * @return insertedSearchId
 	 * @throws Exception
 	 */
-	public void doImportPassingDeserializedProxlImportInputXML( 
+	public int doImportPassingDeserializedProxlImportInputXML( 
 
 			int projectId,
 			ProxlInputObjectContainer proxlInputObjectContainer,
@@ -253,7 +256,6 @@ public class ImporterCoreEntryPoint {
 			String importDirectory
 
 			) throws Exception {
-
 		
 		ProxlInput proxlInputForImport = proxlInputObjectContainer.getProxlInput();
 
@@ -374,6 +376,11 @@ public class ImporterCoreEntryPoint {
 
 			System.out.println( "!!!!");
 			System.out.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			
+			int insertedSearchId = searchDTOInserted.getId();
+			
+			return insertedSearchId;
+			
 			
 		} catch ( Exception e ) {
 
