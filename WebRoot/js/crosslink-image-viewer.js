@@ -5543,7 +5543,7 @@ function initializeViewer()  {
 	$("#vertical_spacing_slider_div").slider({
 	      value:_singleProteinBarOverallHeight,
 	      min: 80,
-	      max: 160,
+	      max: 320,
 //	      step: 50,
 	      slide: function( event, ui ) {
 	    	  $("#vertical_spacing_value").text( ui.value );
