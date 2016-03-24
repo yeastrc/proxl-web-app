@@ -233,13 +233,17 @@ public class ProcessSearchProgramEntries {
 			annotationTypeFilterableDTO.setFilterDirectionType( filterDirectionType );
 			
 			annotationTypeFilterableDTO.setDefaultFilter( filterablePeptideAnnotationType.isDefaultFilter() );
-			
+			annotationTypeFilterableDTO.setDefaultFilterAtDatabaseLoad( filterablePeptideAnnotationType.isDefaultFilter() );
+
 			BigDecimal defaultFilterValue = filterablePeptideAnnotationType.getDefaultFilterValue();
 			
 			if ( defaultFilterValue != null ) {
 
 				annotationTypeFilterableDTO.setDefaultFilterValue( defaultFilterValue.doubleValue() );
 				annotationTypeFilterableDTO.setDefaultFilterValueString( defaultFilterValue.toString() );
+				
+				annotationTypeFilterableDTO.setDefaultFilterValueAtDatabaseLoad( defaultFilterValue.doubleValue() );
+				annotationTypeFilterableDTO.setDefaultFilterValueStringAtDatabaseLoad( defaultFilterValue.toString() );
 			}
 			
 			annotationTypeFilterableDTO.setSortOrder( annotationTypeSortOrder );
@@ -468,6 +472,7 @@ public class ProcessSearchProgramEntries {
 			annotationTypeFilterableDTO.setFilterDirectionType( filterDirectionType );
 			
 			annotationTypeFilterableDTO.setDefaultFilter( filterablePsmAnnotationType.isDefaultFilter() );
+			annotationTypeFilterableDTO.setDefaultFilterAtDatabaseLoad( filterablePsmAnnotationType.isDefaultFilter() );
 
 
 			BigDecimal defaultFilterValue = filterablePsmAnnotationType.getDefaultFilterValue();
@@ -476,6 +481,9 @@ public class ProcessSearchProgramEntries {
 
 				annotationTypeFilterableDTO.setDefaultFilterValue( defaultFilterValue.doubleValue() );
 				annotationTypeFilterableDTO.setDefaultFilterValueString( defaultFilterValue.toString() );
+
+				annotationTypeFilterableDTO.setDefaultFilterValueAtDatabaseLoad( defaultFilterValue.doubleValue() );
+				annotationTypeFilterableDTO.setDefaultFilterValueStringAtDatabaseLoad( defaultFilterValue.toString() );
 			}
 
 			annotationTypeFilterableDTO.setSortOrder( annotationTypeSortOrder );
