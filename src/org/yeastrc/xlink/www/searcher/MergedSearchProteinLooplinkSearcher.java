@@ -183,7 +183,7 @@ public class MergedSearchProteinLooplinkSearcher {
 					throw new Exception(msg);
 				}
 				
-				if ( item.getAnnotationTypeDTO().getAnnotationTypeFilterableDTO().isDefaultFilter() ) {
+				if ( item.getAnnotationTypeDTO().getAnnotationTypeFilterableDTO().isDefaultFilterAtDatabaseLoad() ) {
 					
 					defaultPeptideCutoffs = Yes_No__NOT_APPLICABLE_Enum.YES;
 					break;
