@@ -909,6 +909,8 @@ ENGINE = InnoDB;
 
 CREATE INDEX `scan_retention_time_scan_file_id_fk_idx` ON `scan_retention_time` (`scan_file_id` ASC);
 
+CREATE UNIQUE INDEX `scan_retention_time_unique` ON `scan_retention_time` (`scan_file_id` ASC, `scan_number` ASC);
+
 
 -- -----------------------------------------------------
 -- Table `static_mod`

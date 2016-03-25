@@ -16,7 +16,14 @@ public class ScanRetentionTimeDTO {
 	private int scanLevel;
 	private BigDecimal retentionTime;
     
-    
+	@Override
+	public String toString() {
+		return "ScanRetentionTimeDTO [id=" + id + ", scanFileId=" + scanFileId
+				+ ", scanNumber=" + scanNumber + ", precursorScanNumber="
+				+ precursorScanNumber + ", scanLevel=" + scanLevel
+				+ ", retentionTime=" + retentionTime + "]";
+	}
+
     
     public int getPrecursorScanNumber() {
 		return precursorScanNumber;
