@@ -76,8 +76,10 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 	 */
 	public void addLinkPerPeptideGenericLookupRecordsPerSearchId( int searchId ) throws Exception {
 		
-		
-		System.out.println( "Starting addLinkPerPeptideGenericLookupRecordsPerSearchId for search id: " + searchId );
+		if ( log.isInfoEnabled() ) {
+
+			log.info( "Starting addLinkPerPeptideGenericLookupRecordsPerSearchId for search id: " + searchId );
+		}
 
 	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
 
@@ -134,7 +136,10 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 			pstmt.close();
 			pstmt = null;
 			
-			System.out.println( "addLinkPerPeptideGenericLookupRecordsPerSearchId:  Record count to process: " + totalRecordCount );
+			if ( log.isInfoEnabled() ) {
+
+				log.info( "addLinkPerPeptideGenericLookupRecordsPerSearchId:  Record count to process: " + totalRecordCount );
+			}
 			
 			pstmt = conn.prepareStatement( sql );
 			
@@ -177,7 +182,10 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 
 				if ( recordCount % 5000 == 0 ) {
 					
-					System.out.println( "processed " + recordCount + " of " + totalRecordCount );
+					if ( log.isInfoEnabled() ) {
+
+						log.info( "processed " + recordCount + " of " + totalRecordCount );
+					}
 				}
 
 			}

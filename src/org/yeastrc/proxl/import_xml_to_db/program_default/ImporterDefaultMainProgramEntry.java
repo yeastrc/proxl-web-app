@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.ScanFilenameConstants;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFile;
@@ -35,7 +37,7 @@ public class ImporterDefaultMainProgramEntry {
 	
 	private static final String PROXL_DB_NAME_CMD_LINE_PARAM_STRING = "proxl_db_name";
 
-	private static boolean databaseConnectionFactoryCreated = false;
+//	private static boolean databaseConnectionFactoryCreated = false;
 
 
 
@@ -49,7 +51,7 @@ public class ImporterDefaultMainProgramEntry {
 
 		createDatabaseConnectionFactory = false;
 
-		databaseConnectionFactoryCreated = true;
+//		databaseConnectionFactoryCreated = true;
 	}
 
 
@@ -73,18 +75,7 @@ public class ImporterDefaultMainProgramEntry {
 		
 		ImportResults importResults = new ImportResults();
 		
-
-		System.out.println( "Processing " + args.length + " command line arguments." );
-
-		System.out.println( "Processing the following command line arguments:" );
 		
-		for ( String arg : args ) {
-			
-			System.out.println( arg );
-		}
-		
-		System.out.println( "End of command line arguments.");
-
 		boolean successfulImport = false;
 
 		int programExitCode = PROGRAM_EXIT_CODE_DEFAULT_NO_SYTEM_EXIT_CALLED;
@@ -103,7 +94,9 @@ public class ImporterDefaultMainProgramEntry {
 
 			CmdLineParser.Option proxlDatabaseNameCommandLineOpt = cmdLineParser.addStringOption( 'Z', PROXL_DB_NAME_CMD_LINE_PARAM_STRING );
 
-			
+
+			CmdLineParser.Option verboseOpt = cmdLineParser.addBooleanOption('V', "verbose"); 
+
 			
 			CmdLineParser.Option helpOpt = cmdLineParser.addBooleanOption('h', "help"); 
 
@@ -130,6 +123,29 @@ public class ImporterDefaultMainProgramEntry {
 				programExitCode = 1;
 				throw new PrintHelpOnlyException();
 			}
+			
+			Boolean verbose = (Boolean) cmdLineParser.getOptionValue(verboseOpt, Boolean.FALSE);
+			
+			if ( verbose ) {
+
+				LogManager.getRootLogger().setLevel(Level.DEBUG);
+			}
+			
+			if ( log.isInfoEnabled() ) {
+				
+				System.out.println( "Processing " + args.length + " command line arguments." );
+
+				System.out.println( "Processing the following command line arguments:" );
+				
+				for ( String arg : args ) {
+					
+					System.out.println( arg );
+				}
+				
+				System.out.println( "End of command line arguments.");
+
+			}
+			
 
 			Integer projectId = (Integer)cmdLineParser.getOptionValue( projectIdOpt );
 
@@ -224,9 +240,12 @@ public class ImporterDefaultMainProgramEntry {
 			importResults.setScanFileList( scanFileList );
 			
 			
-			
-			System.out.println( "Now: " + new Date() );
-			System.out.println( "" );
+
+			if ( log.isInfoEnabled() ) {
+				
+				System.out.println( "Now: " + new Date() );
+				System.out.println( "" );
+			}
 
 			System.out.println( "Performing Proxl import for parameters:" );
 			System.out.println( "project id: " + projectId );
@@ -304,7 +323,7 @@ public class ImporterDefaultMainProgramEntry {
 
 				DBConnectionFactory.setDbConnectionFactoryImpl( importDBConnectionFactory );
 
-				databaseConnectionFactoryCreated = true;
+//				databaseConnectionFactoryCreated = true;
 			}
 
 
@@ -484,7 +503,7 @@ public class ImporterDefaultMainProgramEntry {
 
 		System.err.println( "The -p is required.");
 		System.err.println( "" );
-		System.err.println( "\"-n\"  or \"--no_scan_files\" is required if there are no scan files.");
+		System.err.println( "'-n'  or '--no_scan_files' is required if there are no scan files.");
 		System.err.println( "" );
 //		System.err.println( "\"--" + PROXL_DB_NAME_CMD_LINE_PARAM_STRING + "\" is optional. "
 //				+ "The datase name defaults to 'proxl' which is the standard name if the database create scripts are not modified.");
@@ -493,7 +512,9 @@ public class ImporterDefaultMainProgramEntry {
 				+ " or " + ScanFilenameConstants.MZ_XML_SUFFIX 
 				+ " and have the correct filename suffix that matches the contents.");
 
-		System.err.println( "" );
+//		System.err.println( "" );
+//		
+//		System.err.println( "'-V' or '--verbose' for more output");
 
 
 
@@ -560,8 +581,10 @@ public class ImporterDefaultMainProgramEntry {
 			}
 
 
+			if ( log.isInfoEnabled() ) {
 
-			System.out.println( "ImportProgramShutdown::run() exiting now(): " + new Date() );
+				log.info( "ImportProgramShutdown::run() exiting now(): " + new Date() );
+			}
 
 		}
 

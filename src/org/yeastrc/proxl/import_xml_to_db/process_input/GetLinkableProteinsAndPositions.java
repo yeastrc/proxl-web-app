@@ -82,10 +82,14 @@ public class GetLinkableProteinsAndPositions {
 					
 					retMap.get( protein ).add( linkedPosition );
 				} else {
-					String msg = "Warning: Skipping link for protein " + protein.getNrseqId() + " for peptide " + peptide.getSequence() + " at position " +
-							position + " because it was not a linkable residue in the protein at position "+
-							linkedPosition + ".";
-				log.warn( msg );
+					
+					if ( log.isInfoEnabled() ) {
+
+						String msg = " Skipping link for protein " + protein.getNrseqId() + " for peptide " + peptide.getSequence() + " at position " +
+								position + " because it was not a linkable residue in the protein at position "+
+								linkedPosition + ".";
+						log.info( msg );
+					}
 				}
 			}
 		}

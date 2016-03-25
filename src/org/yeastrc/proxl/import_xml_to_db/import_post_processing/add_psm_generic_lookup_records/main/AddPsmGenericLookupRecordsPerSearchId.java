@@ -79,7 +79,10 @@ public class AddPsmGenericLookupRecordsPerSearchId {
 			
 			int totalRecordCount = rs.getInt( "count" );
 
-			System.out.println( "AddPsmGenericLookupRecordsPerSearchId:  Record count to process: " + totalRecordCount );
+			if ( log.isInfoEnabled() ) {
+
+				log.info( "AddPsmGenericLookupRecordsPerSearchId:  Record count to process: " + totalRecordCount );
+			}
 			
 			rs.close();
 			rs = null;
@@ -150,12 +153,18 @@ public class AddPsmGenericLookupRecordsPerSearchId {
 
 				if ( recordCount % 5000 == 0 ) {
 					
-					System.out.println( "processed " + recordCount + " of " + totalRecordCount );
+					if ( log.isInfoEnabled() ) {
+
+						log.info( "processed " + recordCount + " of " + totalRecordCount );
+					}
 				}
 			}
 			
 
-			System.out.println( "AddPsmGenericLookupRecordsPerSearchId: Finished processing.  Processed  " + recordCount + " of " + totalRecordCount );
+			if ( log.isInfoEnabled() ) {
+
+				log.info( "AddPsmGenericLookupRecordsPerSearchId: Finished processing.  Processed  " + recordCount + " of " + totalRecordCount );
+			}
 			
 			
 		} catch ( Exception e ) {

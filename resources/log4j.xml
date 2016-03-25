@@ -17,12 +17,12 @@
   
         <!-- Loggers to filter out various class paths -->
 
-
+<!--
         <logger name="org.yeastrc" additivity="false">
                 <level value="info"/>
                 <appender-ref ref="console" />
         </logger>
-
+ -->
         <!-- Debugging loggers -->
 
         <!-- Uncomment to enable debug on org.jobmanager code only -->

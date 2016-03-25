@@ -341,8 +341,10 @@ public class Process_MzML_MzXml_File {
     			
     			if ( scansReadBlockCounter > 20000 ) {
     				
-    				System.out.print( "Number of scans (ms1, ms2, ?) read so far: "  );
-    				System.out.println( numberFormatInsertedScansCounter.format( scanCounter ) );
+    				if ( log.isInfoEnabled() ) {
+    					log.info( "Number of scans (ms1, ms2, ?) read so far: " 
+    							+ numberFormatInsertedScansCounter.format( scanCounter ) );
+    				}
     				
     				scansReadBlockCounter = 0;
     			}
@@ -420,8 +422,10 @@ public class Process_MzML_MzXml_File {
                     			
                     			if ( insertedScansBlockCounter > 5000 ) {
                     				
-                    				System.out.print( "Number of ms2 scans (also ms1 scans being inserted) inserted so far: "  );
-                    				System.out.println( numberFormatInsertedScansCounter.format( insertedScansCounter ) );
+                    				if ( log.isInfoEnabled() ) {
+                    					log.info( "Number of ms2 scans (also ms1 scans being inserted) inserted so far: " 
+                    							+ numberFormatInsertedScansCounter.format( insertedScansCounter ) );
+                    				}
                     				
                     				insertedScansBlockCounter = 0;
                     			}
@@ -503,19 +507,19 @@ public class Process_MzML_MzXml_File {
 		}
 		
 		
-		System.out.println( "" );
 		
-		System.out.println( "Done processing the MzML or MzXml scan file: " + scanFileWithPath.getAbsolutePath() );
-		
-		System.out.print( "Number of scans (ms1, ms2, ?) read: "  );
-		System.out.println( numberFormatInsertedScansCounter.format( scanCounter ) );
-		
-		System.out.print( "Number of ms2 scans read: "  );
-		System.out.println( numberFormatInsertedScansCounter.format( ms2ScanCounter ) );
+		if ( log.isInfoEnabled() ) {
+			log.info( "Done processing the MzML or MzXml scan file: " + scanFileWithPath.getAbsolutePath() );
 
-		System.out.print( "Number of ms2 scans (also ms1 scans being inserted) inserted: "  );
-		System.out.println( numberFormatInsertedScansCounter.format( insertedScansCounter ) );
+			log.info( "Number of scans (ms1, ms2, ?) read: " 
+					+ numberFormatInsertedScansCounter.format( scanCounter ) );
 
+			log.info( "Number of ms2 scans read: "  
+					+ numberFormatInsertedScansCounter.format( ms2ScanCounter ) );
+
+			log.info( "Number of ms2 scans (also ms1 scans being inserted) inserted: "  
+					+ numberFormatInsertedScansCounter.format( insertedScansCounter ) );
+		}
 
 		return mapOfScanNumbersToScanIds;
 	}

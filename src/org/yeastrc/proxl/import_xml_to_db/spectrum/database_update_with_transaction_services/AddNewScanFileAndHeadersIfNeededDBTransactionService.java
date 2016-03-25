@@ -71,10 +71,12 @@ public class AddNewScanFileAndHeadersIfNeededDBTransactionService {
 					throw new Exception( msg );  // EARLY EXIT  throw exception
 				}
 				
-				System.out.println( "Importing MzMl or MzXml file.  The file:  " + scanFileDTO.getFilename()
+				if ( log.isInfoEnabled() ) {
+
+					log.info( "Importing MzMl or MzXml file.  The file:  " + scanFileDTO.getFilename()
 						+ " for path: " + scanFileDTO.getPath()
 						+ "  has already been loaded so processing to ensure all scans for this proxl xml file are loaded."  );
-
+				}
 				
 				//  Filename and SHA1Sum combination is in database, so use existing record
 				

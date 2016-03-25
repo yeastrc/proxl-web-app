@@ -171,8 +171,11 @@ public class ProcessSearchProgramEntries {
 
 		if ( reportedPeptideAnnotationTypes == null ) {
 			
-			String msg = "No Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
-			log.warn(msg);
+			if ( log.isInfoEnabled() ) {
+				String msg = "No Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
+			
 			return;
 		}
 		
@@ -181,8 +184,11 @@ public class ProcessSearchProgramEntries {
 
 		if ( filterablePeptideAnnotationTypes == null ) {
 			
-			String msg = "No Reported Peptide Filterable Annotation Types for search program name: " + searchProgram.getName();
-			log.warn(msg);
+			if ( log.isInfoEnabled() ) {
+				String msg = "No Reported Peptide Filterable Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
+			
 			return;
 		}
 		
@@ -192,8 +198,11 @@ public class ProcessSearchProgramEntries {
 
 		if ( filterablePeptideAnnotationTypeList == null ) {
 			
-			String msg = "No Reported Peptide Filterable Annotation Types for search program name: " + searchProgram.getName();
-			log.warn(msg);
+			if ( log.isInfoEnabled() ) {
+				
+				String msg = "No Reported Peptide Filterable Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
 			return;
 		}
 		
@@ -304,8 +313,12 @@ public class ProcessSearchProgramEntries {
 
 		if ( reportedPeptideAnnotationTypes == null ) {
 			
-			String msg = "No Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
-			log.warn(msg);
+			if ( log.isInfoEnabled() ) {
+				
+				String msg = "No Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
+			
 			return;
 		}
 		
@@ -314,8 +327,12 @@ public class ProcessSearchProgramEntries {
 
 		if ( descriptivePeptideAnnotationTypes == null ) {
 			
-			String msg = "No Reported Peptide Descriptive Annotation Types for search program name: " + searchProgram.getName();
-			log.warn(msg);
+			if ( log.isInfoEnabled() ) {
+				
+				String msg = "No Reported Peptide Descriptive Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
+			
 			return;
 		}
 		
@@ -324,8 +341,12 @@ public class ProcessSearchProgramEntries {
 		
 		if ( descriptivePeptideAnnotationTypeList == null ) {
 			
-			String msg = "No Reported Peptide Descriptive Annotation Types for search program name: " + searchProgram.getName();
-			log.warn(msg);
+			if ( log.isInfoEnabled() ) {
+				
+				String msg = "No Reported Peptide Descriptive Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
+			
 			return;
 		}
 		

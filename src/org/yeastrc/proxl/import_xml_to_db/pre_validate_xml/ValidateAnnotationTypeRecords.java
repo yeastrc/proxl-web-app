@@ -87,8 +87,12 @@ public class ValidateAnnotationTypeRecords {
 		
 		if ( reportedPeptideAnnotationTypes == null ) {
 			
-			String msg = "No Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
-			log.warn(msg);
+			if ( log.isInfoEnabled() ) {
+
+				String msg = "No Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
+			
 			return;
 		}
 
@@ -98,9 +102,12 @@ public class ValidateAnnotationTypeRecords {
 				reportedPeptideAnnotationTypes.getFilterablePeptideAnnotationTypes();
 
 		if ( filterablePeptideAnnotationTypes == null ) {
-			
-			String msg = "No Filterable Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
-			log.warn(msg);
+
+			if ( log.isInfoEnabled() ) {
+
+				String msg = "No Filterable Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
 			
 		} else {
 
@@ -109,8 +116,11 @@ public class ValidateAnnotationTypeRecords {
 
 			if ( filterablePeptideAnnotationTypeList == null || filterablePeptideAnnotationTypeList.isEmpty() ) {
 
-				String msg = "No Filterable Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
-				log.warn(msg);
+				if ( log.isInfoEnabled() ) {
+
+					String msg = "No Filterable Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
+					log.info(msg);
+				}
 
 			} else {
 
@@ -139,10 +149,13 @@ public class ValidateAnnotationTypeRecords {
 				reportedPeptideAnnotationTypes.getDescriptivePeptideAnnotationTypes();
 
 		if ( descriptivePeptideAnnotationTypes == null ) {
-			
-			String msg = "No Descriptive Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
-			log.warn(msg);
 
+			if ( log.isInfoEnabled() ) {
+
+				String msg = "No Descriptive Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
+			
 		} else {
 
 			List<DescriptivePeptideAnnotationType> descriptivePeptideAnnotationTypeList =
@@ -150,8 +163,11 @@ public class ValidateAnnotationTypeRecords {
 
 			if ( descriptivePeptideAnnotationTypeList == null || descriptivePeptideAnnotationTypeList.isEmpty() ) {
 
-				String msg = "No Descriptive Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
-				log.warn(msg);
+				if ( log.isInfoEnabled() ) {
+
+					String msg = "No Descriptive Reported Peptide Annotation Types for search program name: " + searchProgram.getName();
+					log.info(msg);
+				}
 
 			} else {
 
@@ -192,8 +208,12 @@ public class ValidateAnnotationTypeRecords {
 
 		if ( psmAnnotationTypes == null ) {
 			
-			String msg = "No Psm Annotation Types for search program name: " + searchProgram.getName();
-			log.warn(msg);
+			if ( log.isInfoEnabled() ) {
+
+				String msg = "No Psm Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
+				
 			return;
 		}
 
@@ -206,8 +226,11 @@ public class ValidateAnnotationTypeRecords {
 
 		if ( filterablePsmAnnotationTypes == null ) {
 			
-			String msg = "No Filterable Psm Annotation Types for search program name: " + searchProgram.getName();
-			log.warn(msg);
+			if ( log.isInfoEnabled() ) {
+			
+				String msg = "No Filterable Psm Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
 			
 		} else {
 
@@ -216,9 +239,12 @@ public class ValidateAnnotationTypeRecords {
 
 			if ( filterablePsmAnnotationTypeList == null || filterablePsmAnnotationTypeList.isEmpty() ) {
 
-				String msg = "No Filterable Psm Annotation Types for search program name: " + searchProgram.getName();
-				log.warn(msg);
+				if ( log.isInfoEnabled() ) {
 
+					String msg = "No Filterable Psm Annotation Types for search program name: " + searchProgram.getName();
+					log.info(msg);
+				}
+				
 			} else {
 
 				for ( FilterablePsmAnnotationType filterablePsmAnnotationType : filterablePsmAnnotationTypeList ) {
@@ -245,8 +271,11 @@ public class ValidateAnnotationTypeRecords {
 
 		if ( descriptivePsmAnnotationTypes == null ) {
 			
-			String msg = "No Descriptive Psm Annotation Types for search program name: " + searchProgram.getName();
-			log.warn(msg);
+			if ( log.isInfoEnabled() ) {
+
+				String msg = "No Descriptive Psm Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
 			
 		} else {
 
@@ -255,9 +284,12 @@ public class ValidateAnnotationTypeRecords {
 
 			if ( descriptivePsmAnnotationTypeList == null || descriptivePsmAnnotationTypeList.isEmpty() ) {
 
-				String msg = "No Descriptive Psm Annotation Types for search program name: " + searchProgram.getName();
-				log.warn(msg);
+				if ( log.isInfoEnabled() ) {
 
+					String msg = "No Descriptive Psm Annotation Types for search program name: " + searchProgram.getName();
+					log.info(msg);
+				}
+				
 			} else {
 
 				for ( DescriptivePsmAnnotationType descriptivePsmAnnotationType : descriptivePsmAnnotationTypeList ) {

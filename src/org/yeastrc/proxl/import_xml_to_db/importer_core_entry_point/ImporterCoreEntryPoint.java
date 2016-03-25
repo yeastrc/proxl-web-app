@@ -313,8 +313,6 @@ public class ImporterCoreEntryPoint {
 				System.err.println( "Is the name correct? Has it been parsed?" );
 
 				throw e;
-
-				//System.exit( 0 );
 			}
 
 			//  Process proxl Input
@@ -326,14 +324,15 @@ public class ImporterCoreEntryPoint {
 					processProxlInput.processProxlInput( projectId, proxlInputForImport, scanFileList, importDirectory, nrseqDatabaseId );
 
 			
+			if ( log.isInfoEnabled() ) {
 
-			System.out.println( "!!!!");
+				System.out.println( "!!!!");
 
-			System.out.println( "Insert done for core tables for search ID " + searchDTOInserted.getId() + ".");
-			System.out.println( "Now: " + new Date() );
+				System.out.println( "Insert done for core tables for search ID " + searchDTOInserted.getId() + ".");
+				System.out.println( "Now: " + new Date() );
 
-			System.out.println( "!!!!");
-			
+				System.out.println( "!!!!");
+			}
 
 			//  Set proxlInputForImport to null to release memory needed by ImportPostProcessingPerSearch
 			
@@ -341,12 +340,14 @@ public class ImporterCoreEntryPoint {
 			proxlInputObjectContainer.setProxlInput( null );
 
 
-			System.out.println( "!!!!");
+			if ( log.isInfoEnabled() ) {
 
-			System.out.println( "Starting Insert of lookup tables for search ID " + searchDTOInserted.getId() );
+				System.out.println( "!!!!");
 
-			System.out.println( "!!!!");
+				System.out.println( "Starting Insert of lookup tables for search ID " + searchDTOInserted.getId() );
 
+				System.out.println( "!!!!");
+			}
 
 			
 			ImportPostProcessingPerSearch.importPostProcessingPerSearch( searchDTOInserted.getId() );
@@ -368,14 +369,20 @@ public class ImporterCoreEntryPoint {
 				throw e;
 		    }
 			
-			
-			System.out.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			System.out.println( "!!!!");
+
+			if ( log.isInfoEnabled() ) {
+				
+				System.out.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				System.out.println( "!!!!");
+			}
 
 			System.out.println( "Insert of search ID " + searchDTOInserted.getId() + " is complete and successful.");
 
-			System.out.println( "!!!!");
-			System.out.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			if ( log.isInfoEnabled() ) {
+
+				System.out.println( "!!!!");
+				System.out.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			}
 			
 			int insertedSearchId = searchDTOInserted.getId();
 			

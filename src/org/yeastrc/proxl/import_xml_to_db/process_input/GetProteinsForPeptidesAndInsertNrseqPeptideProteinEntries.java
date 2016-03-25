@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.NrseqDatabasePeptideProteinDAO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
@@ -49,13 +48,19 @@ public class GetProteinsForPeptidesAndInsertNrseqPeptideProteinEntries {
 
 		String peptideSequence = peptideDTO.getSequence();
 
-		System.out.println( "\t\tPeptide protein assocation not cached, caching..." );
-
+		if ( log.isDebugEnabled() ) {
+			System.out.println( "\t\tPeptide protein assocation not cached, caching..." );
+		}
+		
 		Collection<NRProteinDTO> proteinMatches = PeptideProteinSearcher.getInstance().getProteinsContainingPeptide( peptideDTO, nrseqDatabaseId );		    			
 
 		if( proteinMatches != null && proteinMatches.size() >= 1 ) {
-			System.out.print( "\t\tFound proteins using nrseq_database_peptide_protein: " );
-			for( NRProteinDTO p : proteinMatches ) { System.out.println( p.getNrseqId() + "," ); }
+			if ( log.isDebugEnabled() ) {
+				System.out.print( "\t\tFound proteins using nrseq_database_peptide_protein: " );
+				for( NRProteinDTO p : proteinMatches ) { 
+					System.out.println( p.getNrseqId() + "," ); 
+				}
+			}
 		}
 
 		if( proteinMatches == null || proteinMatches.size() < 1 ) {
@@ -70,15 +75,24 @@ public class GetProteinsForPeptidesAndInsertNrseqPeptideProteinEntries {
 				throw new Exception( msg );
 			}
 
-			System.out.print( "\t\tFound proteins using YRC_NRSEQ: " );
-			for( NRProteinDTO p : proteinMatches ) { System.out.println( p.getNrseqId() + "," ); }
+			if ( log.isDebugEnabled() ) {
+
+				System.out.print( "\t\tFound proteins using YRC_NRSEQ: " );
+				for( NRProteinDTO p : proteinMatches ) { 
+					System.out.println( p.getNrseqId() + "," ); 
+				}
+			}
 
 			// save these associations in the database
 			boolean unique = true;
 			if( proteinMatches.size() > 1 )
 				unique = false;
 
-			System.out.println( "\t\tSaving to nrseq_database_peptide_protein the peptide to protein mapping..." );
+			if ( log.isDebugEnabled() ) {
+
+				System.out.println( "\t\tSaving to nrseq_database_peptide_protein the peptide to protein mapping..." );
+			}
+			
 			for( NRProteinDTO protein : proteinMatches ) {
 
 				NrseqDatabasePeptideProteinDTO prpp = new NrseqDatabasePeptideProteinDTO();
@@ -120,7 +134,11 @@ public class GetProteinsForPeptidesAndInsertNrseqPeptideProteinEntries {
 
 			for( NRProteinDTO protein : decoyMatches ) {
 				String name = YRC_NRSEQUtils.getProteinNameFromId( protein.getNrseqId(), nrseqDatabaseId);
-				System.out.println( "Ignoring hit to " + name + " for peptide sequence: " + peptideSequence );
+				
+				if ( log.isDebugEnabled() ) {
+					System.out.println( "Ignoring hit to " + name + " for peptide sequence: " + peptideSequence );
+				}
+				
 				proteinMatches.remove( protein );
 			}
 

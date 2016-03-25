@@ -4,8 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.security.MessageDigest;
 
+import org.apache.log4j.Logger;
+
 public class SHA1SumCalculator {
 
+	private static final Logger log = Logger.getLogger( SHA1SumCalculator.class );
+			
+			
 	private static String fakeSHA1Sum = null;
 	
 	public static String getFakeSHA1Sum() {
@@ -27,7 +32,10 @@ public class SHA1SumCalculator {
 	
 	public String getSHA1Sum( File f ) throws Exception {
 
-		System.out.println( "Computing SHA1 Sum for file: " + f.getAbsolutePath() );
+		if ( log.isInfoEnabled() ) {
+
+			log.info( "Computing SHA1 Sum for file: " + f.getAbsolutePath() );
+		}
 		
 		String result = null;
 		
@@ -69,7 +77,10 @@ public class SHA1SumCalculator {
 		}
 		
 		
-		System.out.println( "SHA1 Sum for file: " + f.getAbsolutePath() + " is: " + result );
+		if ( log.isInfoEnabled() ) {
+
+			log.info( "SHA1 Sum for file: " + f.getAbsolutePath() + " is: " + result );
+		}
 		
 		
 	    return result;
