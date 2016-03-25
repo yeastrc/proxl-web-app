@@ -1,10 +1,13 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 //import org.apache.log4j.Logger;
 
 
+
+import org.yeastrc.proxl.import_xml_to_db.utils.RoundDecimalFieldsIfNecessary;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
 import org.yeastrc.proxl_import.api.xml_dto.StaticModification;
 import org.yeastrc.proxl_import.api.xml_dto.StaticModifications;
@@ -50,12 +53,15 @@ public class ProcessStaticModifications {
 
 				for ( StaticModification staticModification : staticModificationList ) {
 
+					BigDecimal mass = RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( staticModification.getMassChange() );
+					
+					
 					StaticModDTO StaticModDTO = new StaticModDTO();
 
 					StaticModDTO.setSearch_id( searchId );
 
 					StaticModDTO.setResidue( staticModification.getAminoAcid() );
-					StaticModDTO.setMass( staticModification.getMassChange() );
+					StaticModDTO.setMass( mass );
 					StaticModDTO.setMassString( staticModification.getMassChange().toString() );
 
 					StaticModDAO.getInstance().save( StaticModDTO );

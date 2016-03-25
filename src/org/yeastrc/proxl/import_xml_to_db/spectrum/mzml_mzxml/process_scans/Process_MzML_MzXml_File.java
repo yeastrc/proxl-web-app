@@ -2,6 +2,7 @@ package org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.process_scans;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import org.yeastrc.proxl.import_xml_to_db.spectrum.database_update_with_transact
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.dto.MzML_MzXmlHeader;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.dto.MzML_MzXmlScan;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.reader.MzMl_MzXml_FileReader;
+import org.yeastrc.proxl.import_xml_to_db.utils.RoundDecimalFieldsIfNecessary;
 import org.yeastrc.proxl.import_xml_to_db.utils.SHA1SumCalculator;
 
 /**
@@ -349,6 +351,10 @@ public class Process_MzML_MzXml_File {
     				scansReadBlockCounter = 0;
     			}
     			
+    			BigDecimal retentionTime = 
+    					RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( scanIn.getRetentionTime() );
+    			
+    			
     			
     			//  Save every scan to table scan_retention_time
     			
@@ -358,7 +364,7 @@ public class Process_MzML_MzXml_File {
     			scanRetentionTimeDTO.setScanNumber( scanIn.getStartScanNum() );
     			scanRetentionTimeDTO.setScanLevel( scanIn.getMsLevel() );
     			scanRetentionTimeDTO.setPrecursorScanNumber( scanIn.getPrecursorScanNum() );
-    			scanRetentionTimeDTO.setRetentionTime( scanIn.getRetentionTime() );
+    			scanRetentionTimeDTO.setRetentionTime( retentionTime );
     			
     			
     			ScanRetentionTimeDAO.save( scanRetentionTimeDTO );

@@ -1,5 +1,6 @@
 package org.yeastrc.proxl.import_xml_to_db.spectrum.database_update_with_transaction_services;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -16,6 +17,7 @@ import org.yeastrc.xlink.dto.ScanFileDTO;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.common.searchers.ScanTableScanFileIdScanNumberGetIdSearcher;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.common.utils.IsCentroidNumberToCharConversion;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.dto.MzML_MzXmlScan;
+import org.yeastrc.proxl.import_xml_to_db.utils.RoundDecimalFieldsIfNecessary;
 
 /**
  * Service for adding a new Scan and prev scan data as a single DB transaction
@@ -208,6 +210,13 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 	 */
 	private ScanDTO createScanDTO(MzML_MzXmlScan scanIn, ScanFileDTO scanFileDTO) {
 		
+
+		BigDecimal retentionTime = 
+				RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( scanIn.getRetentionTime() );
+		
+		BigDecimal preMZ = RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( scanIn.getPrecursorMz() );
+		
+		
 		ScanDTO scanDTO = new ScanDTO();
 
 		scanDTO.setScanFileId( scanFileDTO.getId() );
@@ -217,10 +226,10 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 		scanDTO.setStartScanNumber( scanIn.getStartScanNum() );
 		scanDTO.setEndScanNumber( scanIn.getEndScanNum() );
 		
-		scanDTO.setPreMZ( scanIn.getPrecursorMz() );
+		scanDTO.setPreMZ( preMZ );
 		
 		scanDTO.setPrecursorScanNum( scanIn.getPrecursorScanNum() );
-		scanDTO.setRetentionTime( scanIn.getRetentionTime() );
+		scanDTO.setRetentionTime( retentionTime );
 		scanDTO.setFragmentationType( scanIn.getFragmentationType() );
 		
 		scanDTO.setPeakCount( scanIn.getPeakCount() );

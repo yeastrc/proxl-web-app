@@ -12,6 +12,7 @@ import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_CrosslinkDAO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
+import org.yeastrc.proxl.import_xml_to_db.utils.RoundDecimalFieldsIfNecessary;
 import org.yeastrc.proxl_import.api.xml_dto.LinkedPosition;
 import org.yeastrc.proxl_import.api.xml_dto.LinkedPositions;
 import org.yeastrc.proxl_import.api.xml_dto.Linker;
@@ -258,6 +259,9 @@ public class ProcessLinkTypeCrosslink {
 				log.error( msg );
 				throw new ProxlImporterDataException(msg);
 			}
+			
+			linkerMass = RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( linkerMass );
+			
 			
 			crosslinkDTO.setLinkerMass( linkerMass );
 			
