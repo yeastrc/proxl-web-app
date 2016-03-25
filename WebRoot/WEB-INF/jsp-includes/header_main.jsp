@@ -106,14 +106,22 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
   	  
   	   <div class="header-right-icons" style="position: relative;">
 	  	    
+	  		<a href="http://proxl-web-app.readthedocs.org/"  target="_help_window" id="help_header_link" 
+	  			><img src="${ contextPath }/images/icon-help.png" 
+	  		></a>
+	  		
 	  		<a href="${ contextPath }/user_loginPage.do?useDefaultURL=yes"  id="signin_header_link" 
 	  			><img src="${ contextPath }/images/icon-login.png" 
 	  		></a>
 	   </div>  	  
 	  	<%--  Simulated tool tips, absolutely positioned divs --%>
+  		<div class="header-icon-tool-tips" id="help_header_tooltip" >
+  			View ProXL Documentation
+  		</div>
   		<div class="header-icon-tool-tips" id="signin_header_tooltip" >
   			Signin
   		</div>
+  		
 	   
 	   <%--  images/icon-login.png and images/icon-login-small.png --%>
 	   
