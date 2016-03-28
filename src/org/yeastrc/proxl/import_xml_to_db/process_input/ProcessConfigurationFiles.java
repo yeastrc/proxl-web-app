@@ -53,10 +53,12 @@ public class ProcessConfigurationFiles {
 
 				for ( ConfigurationFile configurationFile : configurationFileList ) {
 
-					;
-
-					;
-
+					long fileSize = 0;
+					
+					if ( configurationFile.getFileContent() != null ) {
+						
+						fileSize = configurationFile.getFileContent().length;
+					}
 
 					SearchFileDTO searchFileDTO = new SearchFileDTO();
 
@@ -66,6 +68,9 @@ public class ProcessConfigurationFiles {
 					searchFileDTO.setMimeType( ConfigFileMimeType.CONFIG_FILE_MIME_TYPE );
 					searchFileDTO.setFilename( configurationFile.getFileName() );
 
+					searchFileDTO.setFileSize( fileSize );
+					
+					
 					// TODO  Set Search program on configuration file
 					//				configurationFile.getSearchProgram();
 					//				searchFileDTO.set
