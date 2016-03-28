@@ -1,5 +1,5 @@
 ===========================================
-Installing ProXL
+ProXL Installation Guide
 ===========================================
 
 This is a guide for downloading and installing your own instance of ProXL

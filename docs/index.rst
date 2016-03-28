@@ -31,7 +31,7 @@ Here you will find documentation for both using and installing ProXL.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Installing ProXL
+   :caption: Proxl Administration
    
    install/intro
    install/import
