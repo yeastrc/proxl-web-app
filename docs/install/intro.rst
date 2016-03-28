@@ -155,7 +155,8 @@ restart Tomcat to force it to deploy.
 ==========================================================
 Your web application should now be available at http://your.host:8080/proxl/
 (Depending on how you have configured your web server, the ``:8080`` may not be different or
-not required.) You should be able to log in with username: ``initial_proxl_user`` and
+not required.) If you have a firewall running, will need to allow access through this port.
+You should be able to log in with username: ``initial_proxl_user`` and
 password: ``FJS483792nzmv,xc4#&@(!VMKSDL``  You should change this information at your soonest
 convenience by logging in and clicking the "Manage Account" icon at the top-right of any page
 (gear-shaped icon). You may add initial users by creating projects and inviting users to those projects.
