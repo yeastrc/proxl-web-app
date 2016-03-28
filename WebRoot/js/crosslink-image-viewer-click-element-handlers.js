@@ -40,7 +40,7 @@ function getLooplinkDataForSpecificLinkInGraph( params ) {
 
 	var searchesArray = searchIdsCommaDelimString.split(",");
 
-	var requestContext = {
+	var context = {
 			
 			searchesArray : searchesArray,
 			
@@ -53,7 +53,7 @@ function getLooplinkDataForSpecificLinkInGraph( params ) {
 	
 	var getLooplinkDataCommonParams = {
 			
-			context : requestContext,
+			context : context,
 			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject
 	};
 	
@@ -197,7 +197,7 @@ function getMonolinkDataForSpecificLinkInGraph( params ) {
 
 	var searchesArray = searchIdsCommaDelimString.split(",");
 
-	var requestContext = {
+	var context = {
 			
 			searchesArray : searchesArray,
 			
@@ -208,7 +208,7 @@ function getMonolinkDataForSpecificLinkInGraph( params ) {
 	
 	var getMonolinkDataCommonParams = {
 			
-			context : requestContext,
+			context : context,
 			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject
 	};
 	

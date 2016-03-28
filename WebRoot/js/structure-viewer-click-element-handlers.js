@@ -20,26 +20,26 @@ function getLooplinkDataForSpecificLinkInGraph( params, link ) {
 
 	incrementSpinner();				// create spinner
 
-	var requestContext = {
+	var context = {
 			
 			searchesArray : link.searchIds,
 			
 			from_protein_id : link.protein1,
 			from_protein_name : _proteinNames[ link.protein1 ],
 			protein_position_1 : link.position1,
-			protein_position_2 : link.position2			
-	};
-	
-	context.fcnToCallOnDisplay = function() {
+			protein_position_2 : link.position2,
+			
+			fcnToCallOnDisplay : function() {
 
-		$length = $("#looplink_length");
-		$length.text( Math.round( link.length * 10 ) / 10 );
+				$length = $("#looplink_length");
+				$length.text( Math.round( link.length * 10 ) / 10 );
+			}
 	};
 	
 	
 	var getLooplinkDataCommonParams = {
 			
-			context : requestContext,
+			context : context,
 			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject
 	};
 	
@@ -119,7 +119,14 @@ function getCrosslinkDataForSpecificLinkInGraph( params, link ) {
 			},
 
 			searchesCommaDelim: searchesCommaDelim,
-			searchesArray: searchesArray
+			searchesArray: searchesArray,
+			
+
+			fcnToCallOnDisplay : function() {
+
+				$length = $("#crosslink_length");
+				$length.text( Math.round( link.length * 10 ) / 10 );
+			}
 	};
 	
 	
@@ -136,11 +143,6 @@ function getCrosslinkDataForSpecificLinkInGraph( params, link ) {
 	}
 	
 
-	context.fcnToCallOnDisplay = function() {
-
-		$length = $("#crosslink_length");
-		$length.text( Math.round( link.length * 10 ) / 10 );
-	};
 
 	var getCrosslinkDataCommonParams = {
 			
@@ -166,7 +168,7 @@ function getMonolinkDataForSpecificLinkInGraph( params, link ) {
 	
 	incrementSpinner();				// create spinner
 
-	var requestContext = {
+	var context = {
 			
 			searchesArray : link.searchIds,
 			
@@ -177,7 +179,7 @@ function getMonolinkDataForSpecificLinkInGraph( params, link ) {
 	
 	var getMonolinkDataCommonParams = {
 			
-			context : requestContext,
+			context : context,
 			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject
 	};
 	
