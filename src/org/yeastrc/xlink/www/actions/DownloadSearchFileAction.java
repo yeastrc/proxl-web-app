@@ -151,13 +151,20 @@ public class DownloadSearchFileAction extends Action {
 			
 			byte[] fileContents = SearchFileDAO.getInstance().getDataFileData( fileId );
 			
+			int fileSize = 0;
+			
+			if ( fileContents != null ) {
+				
+				fileSize = fileContents.length;
+			}
+			
 
 			// generate file name
 			String filename = searchFileDTO.getFilename();
 
 			response.setContentType( searchFileDTO.getMimeType() );
 			response.setHeader("Content-Disposition", "attachment; filename=" + filename);
-			response.setContentLength( (int) searchFileDTO.getFileSize() );
+			response.setContentLength( fileSize );
 
 			BufferedOutputStream bos = null;
 			
