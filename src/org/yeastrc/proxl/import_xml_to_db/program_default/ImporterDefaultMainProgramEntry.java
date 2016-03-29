@@ -4,10 +4,13 @@ import jargs.gnu.CmdLineParser;
 import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
@@ -32,9 +35,13 @@ public class ImporterDefaultMainProgramEntry {
 
 
 	private static final int PROGRAM_EXIT_CODE_DEFAULT_NO_SYTEM_EXIT_CALLED = 0;
-
-//	private static final String DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING  = "db_config_filename_with_path";
 	
+	private static final int PROGRAM_EXIT_CODE_INVALID_INPUT = 1;
+	
+	private static final int PROGRAM_EXIT_CODE_HELP = 1;
+	
+	private static final String FOR_HELP_STRING = "For help, run without any parameters, -h, or --help";
+
 	
 	private static final String PROXL_DB_NAME_CMD_LINE_PARAM_STRING = "proxl_db_name";
 
@@ -83,6 +90,13 @@ public class ImporterDefaultMainProgramEntry {
 
 
 		try {
+			
+			if ( args.length == 0 ) {
+				
+	            printHelp();
+	            
+	            System.exit( PROGRAM_EXIT_CODE_HELP );
+			}
 
 
 
@@ -91,7 +105,11 @@ public class ImporterDefaultMainProgramEntry {
 
 			CmdLineParser.Option projectIdOpt = cmdLineParser.addIntegerOption( 'p', "project" );	
 
-			CmdLineParser.Option noScanFilesCommandLineOpt = cmdLineParser.addBooleanOption( 'n', "no_scan_files" );
+			CmdLineParser.Option inputProxlFileStringCommandLineOpt = cmdLineParser.addStringOption( 'i', "import-file" );
+
+			CmdLineParser.Option noScanFilesCommandLineOpt = cmdLineParser.addBooleanOption( 'n', "no-scan-files" );
+
+			CmdLineParser.Option inputScanFileStringCommandLineOpt = cmdLineParser.addStringOption( 's', "scan-file" );
 
 
 			CmdLineParser.Option dbConfigFileNameCommandLineOpt = cmdLineParser.addStringOption( 'c', "config" );
@@ -111,22 +129,28 @@ public class ImporterDefaultMainProgramEntry {
 			catch (IllegalOptionValueException e) {
 
 				System.err.println(e.getMessage());
-
-				programExitCode = 1;
-				throw new PrintHelpOnlyException();
+				
+				System.err.println( "" );
+				System.err.println( FOR_HELP_STRING );
+				
+				System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
 			}
 			catch (UnknownOptionException e) {
+				
 				System.err.println(e.getMessage());
-
-				programExitCode = 1;
-				throw new PrintHelpOnlyException();
+				
+				System.err.println( "" );
+				System.err.println( FOR_HELP_STRING );
+				
+				System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
 			}
 
 			Boolean help = (Boolean) cmdLineParser.getOptionValue(helpOpt, Boolean.FALSE);
 			if(help) {
 
-				programExitCode = 1;
-				throw new PrintHelpOnlyException();
+	            printHelp();
+	            
+	            System.exit( PROGRAM_EXIT_CODE_HELP );
 			}
 			
 			Boolean verbose = (Boolean) cmdLineParser.getOptionValue(verboseOpt, Boolean.FALSE);
@@ -171,30 +195,51 @@ public class ImporterDefaultMainProgramEntry {
 			
 			String dbConfigFileName = (String)cmdLineParser.getOptionValue( dbConfigFileNameCommandLineOpt );
 			
+
+			String inputProxlFileString = (String)cmdLineParser.getOptionValue( inputProxlFileStringCommandLineOpt );
+			
+	        @SuppressWarnings("rawtypes")
+	        Vector inputScanFileStringVector = cmdLineParser.getOptionValues( inputScanFileStringCommandLineOpt );
+
+			
+			
 			String[] remainingArgs = cmdLineParser.getRemainingArgs();
 
-			if( remainingArgs.length < 1 ) {
-				System.err.println( "Got unexpected number of arguments.\n" );
+			if( remainingArgs.length > 0 ) {
 
-				programExitCode = 1;
-				throw new PrintHelpOnlyException();
+				System.out.println( "Unexpected command line parameters:");
+				
+				for ( String remainingArg : remainingArgs ) {
+				
+					System.out.println( remainingArg );
+				}
+				
+				System.err.println( "" );
+				System.err.println( FOR_HELP_STRING );
+				
+				System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
 			}
+			
 
 
-			if( noScanFilesCommandLineOptChosen != null 
-					&& ( ! noScanFilesCommandLineOptChosen )
-					&& remainingArgs.length < 2 ) {
+			if( ( noScanFilesCommandLineOptChosen == null || ( ! noScanFilesCommandLineOptChosen ) )
+					&& ( inputScanFileStringVector == null || ( inputScanFileStringVector.isEmpty() ) ) ) {
+				
 				System.err.println( "At least one scan file is required since 'no scan files' param not specified.\n" );
 
-				programExitCode = 1;
-				throw new PrintHelpOnlyException();
+				System.err.println( "" );
+				System.err.println( FOR_HELP_STRING );
+				
+				System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
 			}
 
 			if( projectId == null || projectId == 0 ) {
 				System.err.println( "Must specify a project id using -p\n" );
 
-				programExitCode = 1;
-				throw new PrintHelpOnlyException();
+				System.err.println( "" );
+				System.err.println( FOR_HELP_STRING );
+				
+				System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
 			}
 			
 			
@@ -210,14 +255,15 @@ public class ImporterDefaultMainProgramEntry {
 
 					System.err.println( "Could not find DB Config File: " + dbConfigFile.getAbsolutePath() );
 
-					programExitCode = 1;
-					throw new PrintHelpOnlyException();
+					System.err.println( "" );
+					System.err.println( FOR_HELP_STRING );
+					
+					System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
 				}
 			}			
 
-			String mainXMLFilenameToImport = remainingArgs[ 0 ];
 
-			File mainXMLFileToImport = new File( mainXMLFilenameToImport );
+			File mainXMLFileToImport = new File( inputProxlFileString );
 
 			
 			importResults.setImportedProxlXMLFile( mainXMLFileToImport );
@@ -228,21 +274,41 @@ public class ImporterDefaultMainProgramEntry {
 
 				System.err.println( "Could not find main XML File To Import file: " + mainXMLFileToImport.getAbsolutePath() );
 
-				programExitCode = 1;
-				throw new PrintHelpOnlyException();
+				System.err.println( "" );
+				System.err.println( FOR_HELP_STRING );
+				
+				System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
 			}
 
-			List<File> scanFileList = new ArrayList<>( remainingArgs.length -1 );
+			List<File> scanFileList = new ArrayList<>(  );
+			
+			if ( inputScanFileStringVector != null && ( ! inputScanFileStringVector.isEmpty() ) ) {
 
-			if ( remainingArgs.length > 1 ) {
+				for ( Object inputScanFileStringObject : inputScanFileStringVector ) {
 
-				for ( int index = 1; index < remainingArgs.length; index++ ) {
+					if ( ! (  inputScanFileStringObject instanceof String ) ) {
 
-					String scanFilename = remainingArgs[ index ];
+						System.err.println( "Internal ERROR:  inputScanFileStringObject is not a String object." );
+						System.err.println( "" );
+						System.err.println( FOR_HELP_STRING );
+
+						System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
+					}
+
+					String inputScanFileString = (String) inputScanFileStringObject;
+
+					if( inputScanFileString == null || inputScanFileString.equals( "" ) ) {
+
+						System.err.println( "Internal ERROR:  inputScanFileStringObject is empty or null." );
+						System.err.println( "" );
+						System.err.println( FOR_HELP_STRING );
+
+						System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
+					}
 
 
-					if ( ! ( scanFilename.endsWith( ScanFilenameConstants.MZ_ML_SUFFIX ) 
-							|| scanFilename.endsWith( ScanFilenameConstants.MZ_XML_SUFFIX ) ) ) {
+					if ( ! ( inputScanFileString.endsWith( ScanFilenameConstants.MZ_ML_SUFFIX ) 
+							|| inputScanFileString.endsWith( ScanFilenameConstants.MZ_XML_SUFFIX ) ) ) {
 
 						System.err.println( "Scan file name must end with '"
 								+ ScanFilenameConstants.MZ_ML_SUFFIX 
@@ -250,29 +316,29 @@ public class ImporterDefaultMainProgramEntry {
 								+ ScanFilenameConstants.MZ_XML_SUFFIX
 								+ "' and have the correct contents to match the filename suffix.");
 
-						System.err.println( "" );
-
-						programExitCode = 1;
-						throw new PrintHelpOnlyException();
+			        	System.err.println( "" );
+						System.err.println( FOR_HELP_STRING );
+						
+						System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
 					}
 
-					File scanFile = new File( scanFilename );
+					File scanFile = new File( inputScanFileString );
 
 					if( ! scanFile.exists() ) {
 
 						System.err.println( "Could not find scan file: " + scanFile.getAbsolutePath() );
-
-						programExitCode = 1;
-						throw new PrintHelpOnlyException();
-						//					System.exit( 1 );
+						
+			        	System.err.println( "" );
+						System.err.println( FOR_HELP_STRING );
+						
+						System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
 					}
 
 
 					scanFileList.add( scanFile );
 				}
 			}
-			
-			
+
 			importResults.setScanFileList( scanFileList );
 			
 			
@@ -453,9 +519,10 @@ public class ImporterDefaultMainProgramEntry {
 
 		} catch ( PrintHelpOnlyException e ) {
 
-			//  land here when only need to print the help
-
-			printHelp();
+			System.err.println( "" );
+			System.err.println( FOR_HELP_STRING );
+			
+			System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
 
 
 		} catch ( Exception e ) {
@@ -537,44 +604,21 @@ public class ImporterDefaultMainProgramEntry {
 
 	private static void printHelp() throws Exception {
 
-		String line = "Usage: <run jar script> -p project_id  "
-				+ " [ -n | --no_scan_files ] ";
-	
-
-		
-		if ( createDatabaseConnectionFactory ) {
-
-			line += " [ -c | --config ] ";
-
+		try( BufferedReader br = 
+				new BufferedReader(
+						new InputStreamReader( 
+								ImporterDefaultMainProgramEntry.class
+								.getResourceAsStream( "/help_output_import_proxl_xml.txt" ) ) ) ) {
+			
+			String line = null;
+			while ( ( line = br.readLine() ) != null )
+				System.out.println( line );				
+			
+		} catch ( Exception e ) {
+			System.out.println( "Error printing help." );
 		}
 		
-		line +=  " <main xml file to import> [ <scan file to import> ... ]";
-
-
-
-		System.err.println( line );
-
-		System.err.println( "E.g.:  java -jar <name of main jar>  -p 5 -no_scan_files /path/to/main_import_xml.xml " );
-		System.err.println( "" );
-		System.err.println( "<run jar script> is the appropriate script for your language to run the main jar with the other jars on the java class path" );
-		System.err.println( "" );
-
-		System.err.println( "The -p is required.");
-		System.err.println( "" );
-		System.err.println( "'-n'  or '--no_scan_files' is required if there are no scan files.");
-		System.err.println( "" );
-		System.err.println( "The scan files must be either " + ScanFilenameConstants.MZ_ML_SUFFIX
-				+ " or " + ScanFilenameConstants.MZ_XML_SUFFIX 
-				+ " and have the correct filename suffix that matches the contents.");
-
-//		System.err.println( "" );
-//		
-//		System.err.println( "'-V' or '--verbose' for more output");
-
-
-
-		System.err.println( "" );
-
+		
 	}
 
 

@@ -1,0 +1,34 @@
+Usage: java -jar importProxlXML.jar -p project_id  \
+									-i proxl_import_file.xml
+                                     [ -c db_connection.properties ] [ -n | --no-scan-files ] 
+                                     -s scan_file.mzML \
+								  	
+
+Examples:
+
+	To import only a Proxl XML file:
+	java -jar importProxlXML.jar -p 1 -i proxlInput.xml
+
+	To import a Proxl XML file and related scan files:
+	java -jar importProxlXML.jar -p 1 -i proxlInput.xml
+	
+	To import only a Proxl XML file and set the database connection parameters properties file:
+	java -jar importProxlXML.jar -p 1 -i proxlInput.xml -c db_connection.properties
+	
+	
+Parameters:
+
+	-p  : [Required] : The project id in the database to import this file into.
+
+	-i (--import-file=) : [Required] : The Proxl XML file to import, with it's relative or absolute path.
+	
+	-c (--config=) : [Required] : The Database configuration file, with it's relative or absolute path.
+	
+	-s (--scan-file=) : [Optional] : The scan file ( mzML or mzXML ), with it's relative or absolute path.
+								  
+								  -s can be repeated multiple times if multiple scan files will be imported.
+								  
+	-n (--no-scan-files) : [Optional] : Must be set if no Scan files are present, the Proxl XML file
+										will be imported without any scan files. May not be set if
+										-s is used.
+										
