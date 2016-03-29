@@ -15,6 +15,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.ScanFilenameConstants;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFile;
+import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFileException;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.PrintHelpOnlyException;
 import org.yeastrc.proxl.import_xml_to_db.importer_core_entry_point.ImporterCoreEntryPoint;
@@ -92,10 +93,14 @@ public class ImporterDefaultMainProgramEntry {
 
 			CmdLineParser.Option noScanFilesCommandLineOpt = cmdLineParser.addBooleanOption( 'n', "no_scan_files" );
 
+
+			CmdLineParser.Option dbConfigFileNameCommandLineOpt = cmdLineParser.addStringOption( 'c', "config" );
+
 			CmdLineParser.Option proxlDatabaseNameCommandLineOpt = cmdLineParser.addStringOption( 'Z', PROXL_DB_NAME_CMD_LINE_PARAM_STRING );
 
 
 			CmdLineParser.Option verboseOpt = cmdLineParser.addBooleanOption('V', "verbose"); 
+			CmdLineParser.Option debugOpt = cmdLineParser.addBooleanOption('D', "debug"); 
 
 			
 			CmdLineParser.Option helpOpt = cmdLineParser.addBooleanOption('h', "help"); 
@@ -126,10 +131,18 @@ public class ImporterDefaultMainProgramEntry {
 			
 			Boolean verbose = (Boolean) cmdLineParser.getOptionValue(verboseOpt, Boolean.FALSE);
 			
-			if ( verbose ) {
+			Boolean debugValue = (Boolean) cmdLineParser.getOptionValue(debugOpt, Boolean.FALSE);
+			
+			if ( verbose != null &&  verbose ) {
+
+				LogManager.getRootLogger().setLevel(Level.INFO);
+			}
+			
+			if ( debugValue != null &&  debugValue ) {
 
 				LogManager.getRootLogger().setLevel(Level.DEBUG);
 			}
+			
 			
 			if ( log.isInfoEnabled() ) {
 				
@@ -146,12 +159,17 @@ public class ImporterDefaultMainProgramEntry {
 
 			}
 			
+			
+//			log.warn( "Log msg to WARN" );
+//			log.error( "Log msg to ERROR" );
 
 			Integer projectId = (Integer)cmdLineParser.getOptionValue( projectIdOpt );
 
 			Boolean noScanFilesCommandLineOptChosen = (Boolean) cmdLineParser.getOptionValue( noScanFilesCommandLineOpt, Boolean.FALSE);
 
 			String proxlDatabaseName = (String)cmdLineParser.getOptionValue( proxlDatabaseNameCommandLineOpt );
+			
+			String dbConfigFileName = (String)cmdLineParser.getOptionValue( dbConfigFileNameCommandLineOpt );
 			
 			String[] remainingArgs = cmdLineParser.getRemainingArgs();
 
@@ -178,6 +196,24 @@ public class ImporterDefaultMainProgramEntry {
 				programExitCode = 1;
 				throw new PrintHelpOnlyException();
 			}
+			
+			
+			File dbConfigFile = null;
+			
+			if ( StringUtils.isNotEmpty( dbConfigFileName ) ) {
+
+				dbConfigFile = new File( dbConfigFileName );
+
+
+
+				if( ! dbConfigFile.exists() ) {
+
+					System.err.println( "Could not find DB Config File: " + dbConfigFile.getAbsolutePath() );
+
+					programExitCode = 1;
+					throw new PrintHelpOnlyException();
+				}
+			}			
 
 			String mainXMLFilenameToImport = remainingArgs[ 0 ];
 
@@ -304,13 +340,30 @@ public class ImporterDefaultMainProgramEntry {
 
 				DBConnectionParametersProviderFromPropertiesFile dbConnectionParametersProvider = new DBConnectionParametersProviderFromPropertiesFile();
 
-				//				if ( dbConfigFile != null ) {
-				//
-				//					dbConnectionParametersProvider.setConfigFile( dbConfigFile );
-				//				}
+				if ( dbConfigFile != null ) {
 
-				dbConnectionParametersProvider.init();
+					dbConnectionParametersProvider.setConfigFile( dbConfigFile );
+				}
+				
+				try {
 
+					dbConnectionParametersProvider.init();
+
+				} catch ( DBConnectionParametersProviderFromPropertiesFileException e ) {
+
+					
+					
+					System.exit( 1 );
+					
+					
+					
+				} catch ( Exception e ) {
+					
+					System.err.println( "Failed processing DB config file." );
+					
+					System.exit( 1 );
+				}
+					
 				if ( StringUtils.isNotEmpty( proxlDatabaseName ) ) {
 				
 					dbConnectionParametersProvider.setProxlDbName( proxlDatabaseName );
@@ -419,18 +472,20 @@ public class ImporterDefaultMainProgramEntry {
 		} finally {
 
 
+			if ( log.isDebugEnabled() ) {
 
-
-			log.info( "Main Thread:  Calling DBConnectionFactory.closeAllConnections(); on main thread.");
-
+				log.debug( "Main Thread:  Calling DBConnectionFactory.closeAllConnections(); on main thread.");
+			}
 
 			try {
 				// free up our db resources
 				DBConnectionFactory.closeAllConnections();
 
 
-				log.info( "COMPLETE:  Main Thread:  Calling DBConnectionFactory.closeAllConnections(); on main thread.");
+				if ( log.isDebugEnabled() ) {
 
+					log.debug( "COMPLETE:  Main Thread:  Calling DBConnectionFactory.closeAllConnections(); on main thread.");
+				}
 
 			} catch ( Exception e ) {
 
@@ -483,15 +538,18 @@ public class ImporterDefaultMainProgramEntry {
 	private static void printHelp() throws Exception {
 
 		String line = "Usage: <run jar script> -p project_id  "
-				+ " [ -n | --no_scan_files ] "
-//				+ " [ --" + PROXL_DB_NAME_CMD_LINE_PARAM_STRING + "=<proxl db name> ] "
-				+ " <main xml file to import> [ <scan file to import> ... ]";
+				+ " [ -n | --no_scan_files ] ";
+	
 
-//		if ( createDatabaseConnectionFactory ) {
-//
-//			line += " [ --" + DB_CONFIG_FILENAME_WITH_PATH_CMD_LINE_PARAM_STRING + "=db_config_filename_and_path ] ";
-//
-//		}
+		
+		if ( createDatabaseConnectionFactory ) {
+
+			line += " [ -c | --config ] ";
+
+		}
+		
+		line +=  " <main xml file to import> [ <scan file to import> ... ]";
+
 
 
 		System.err.println( line );
@@ -505,9 +563,6 @@ public class ImporterDefaultMainProgramEntry {
 		System.err.println( "" );
 		System.err.println( "'-n'  or '--no_scan_files' is required if there are no scan files.");
 		System.err.println( "" );
-//		System.err.println( "\"--" + PROXL_DB_NAME_CMD_LINE_PARAM_STRING + "\" is optional. "
-//				+ "The datase name defaults to 'proxl' which is the standard name if the database create scripts are not modified.");
-//		System.err.println( "" );
 		System.err.println( "The scan files must be either " + ScanFilenameConstants.MZ_ML_SUFFIX
 				+ " or " + ScanFilenameConstants.MZ_XML_SUFFIX 
 				+ " and have the correct filename suffix that matches the contents.");
@@ -539,24 +594,32 @@ public class ImporterDefaultMainProgramEntry {
 		 */
 		public void run() {
 
-			log.info( "ImportProgramShutdown::run() called now(): " + new Date());
+			if ( log.isDebugEnabled() ) {
 
+				log.debug( "ImportProgramShutdown::run() called now(): " + new Date());
+			}
+			
 			Thread thisThread = Thread.currentThread();
 
 			thisThread.setName( "Thread-Process-Shutdown-Request" );
 
 
 
-			log.info( "Calling DBConnectionFactory.closeAllConnections(); on shutdown thread to ensure connections closed.");
+			if ( log.isDebugEnabled() ) {
 
+				log.debug( "Calling DBConnectionFactory.closeAllConnections(); on shutdown thread to ensure connections closed.");
+			}
+			
 			//  Ensure database connections get closed before program dies.
 
 			try {
 				// free up our db resources
 				DBConnectionFactory.closeAllConnections();
 
-				log.info( "COMPLETE:  Calling DBConnectionFactory.closeAllConnections(); on shutdown thread to ensure connections closed.");
+				if ( log.isDebugEnabled() ) {
 
+					log.debug( "COMPLETE:  Calling DBConnectionFactory.closeAllConnections(); on shutdown thread to ensure connections closed.");
+				}
 
 			} catch ( Exception e ) {
 
@@ -581,9 +644,9 @@ public class ImporterDefaultMainProgramEntry {
 			}
 
 
-			if ( log.isInfoEnabled() ) {
+			if ( log.isDebugEnabled() ) {
 
-				log.info( "ImportProgramShutdown::run() exiting now(): " + new Date() );
+				log.debug( "ImportProgramShutdown::run() exiting now(): " + new Date() );
 			}
 
 		}

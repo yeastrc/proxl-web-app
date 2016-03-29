@@ -16,16 +16,22 @@ import org.apache.log4j.Logger;
  */
 public class DBConnectionParametersProviderFromPropertiesFile implements IDBConnectionParametersProvider {
 
-	public static String DB_CONFIG_FILENAME = "db_config_file.properties";
+	
+	private static final String NO_PROPERTIES_FILE_ERROR_MESSAGE = "No DB Connection Properties file found.";
+	
+	private static final String DB_CONFIG_FILENAME = "db_config_file.properties";
 	
 	
-	private static String PROPERTY_NAME__USERNAME = "username";
-	private static String PROPERTY_NAME__PASSWORD = "password";
-	private static String PROPERTY_NAME__DB_URL   = "dbURL";
-	private static String PROPERTY_NAME__DB_PORT  = "dbPort";
+	private static final String PROPERTY_NAME__USERNAME = "username";
+	private static final String PROPERTY_NAME__PASSWORD = "password";
+	private static final String PROPERTY_NAME__DB_URL   = "dbURL";
+	private static final String PROPERTY_NAME__DB_PORT  = "dbPort";
 
-	private static String PROPERTY_NAME__PROXL_DB_NAME  = "proxl.db.name";
-	private static String PROPERTY_NAME__NRSEQ_DB_NAME  = "nrseq.db.name";
+	private static final String PROPERTY_NAME__PROXL_DB_NAME  = "proxl.db.name";
+	private static final String PROPERTY_NAME__NRSEQ_DB_NAME  = "nrseq.db.name";
+	
+	
+	
 
 	private static Logger log = Logger.getLogger(DBConnectionParametersProviderFromPropertiesFile.class);
 	
@@ -57,9 +63,12 @@ public class DBConnectionParametersProviderFromPropertiesFile implements IDBConn
 				
 				if ( ! configFile.exists() ) {
 
+					System.err.println( NO_PROPERTIES_FILE_ERROR_MESSAGE );
+					
 					String msg = "Properties file not found: " + configFile.getAbsolutePath();
-					log.error( msg );
-					throw new Exception( msg );
+//					log.error( msg );
+
+					throw new DBConnectionParametersProviderFromPropertiesFileException( msg );
 				}
 				
 				try {
@@ -67,10 +76,13 @@ public class DBConnectionParametersProviderFromPropertiesFile implements IDBConn
 					propertiesFileAsStream = new FileInputStream(configFile);
 					
 				} catch ( FileNotFoundException e ) {
+					
+					System.err.println( NO_PROPERTIES_FILE_ERROR_MESSAGE );
 
 					String msg = "Properties file not found: " + configFile.getAbsolutePath() + " exception: " + e.toString();
-					log.error( msg, e );
-					throw new Exception( msg, e );
+//					log.error( msg, e );
+
+					throw new DBConnectionParametersProviderFromPropertiesFileException( msg );
 				}
 				
 			} else {
@@ -84,13 +96,19 @@ public class DBConnectionParametersProviderFromPropertiesFile implements IDBConn
 
 				if ( configPropFile == null ) {
 
+					System.err.println( NO_PROPERTIES_FILE_ERROR_MESSAGE );
+
 					String msg = "Properties file '" + DB_CONFIG_FILENAME + "' not found in class path.";
-					log.error( msg );
-					throw new Exception( msg );
+//					log.error( msg );
+
+					throw new DBConnectionParametersProviderFromPropertiesFileException( msg );
 
 				} else {
 
-					log.info( "Properties file '" + DB_CONFIG_FILENAME + "' found, load path = " + configPropFile.getFile() );
+					if ( log.isInfoEnabled() ) {
+
+						log.info( "Properties file '" + DB_CONFIG_FILENAME + "' found, load path = " + configPropFile.getFile() );
+					}
 				}
 				
 				propertiesFileAsStream = thisClassLoader.getResourceAsStream( DB_CONFIG_FILENAME );
@@ -98,59 +116,72 @@ public class DBConnectionParametersProviderFromPropertiesFile implements IDBConn
 
 				if ( propertiesFileAsStream == null ) {
 
+					System.err.println( NO_PROPERTIES_FILE_ERROR_MESSAGE );
+
 					String msg = "Properties file '" + DB_CONFIG_FILENAME + "' not found in class path.";
 
-					log.error( msg );
+//					log.error( msg );
 
-					throw new Exception( msg );
+					throw new DBConnectionParametersProviderFromPropertiesFileException( msg );
 				}
 			}
 
-//			if ( propertiesFileAsStream == null ) {
-//
-//				//  Should not get this error here but extra protection if code above didn't catch it.
-//				
-//				String msg = "Properties file not found.";
-//
-//				log.error( msg );
-//
-//				throw new Exception( msg );
-//				
-//			} else {
 
-				Properties configProps = new Properties();
+			Properties configProps = new Properties();
 
-				configProps.load(propertiesFileAsStream);
-				
-				 username = configProps.getProperty( PROPERTY_NAME__USERNAME );
-				 password = configProps.getProperty( PROPERTY_NAME__PASSWORD );
-				 dbURL = configProps.getProperty( PROPERTY_NAME__DB_URL );
-				 dbPort = configProps.getProperty( PROPERTY_NAME__DB_PORT );
-				 
-				 proxlDbName = configProps.getProperty( PROPERTY_NAME__PROXL_DB_NAME );
-				 nrseqDbName = configProps.getProperty( PROPERTY_NAME__NRSEQ_DB_NAME );
-				 
-				 System.out.println( "Database connection parameters:");
-				 if ( StringUtils.isNotEmpty( username ) ) {
-					 
-					 System.out.println( "username has a value" );
-				 }
-				 if ( StringUtils.isNotEmpty( password ) ) {
-					 
-					 System.out.println( "password has a value" );
-				 }
-				 System.out.println( "dbURL: " + dbURL );
-				 System.out.println( "dbPort: " + dbPort );
-				 
-				 if ( StringUtils.isNotEmpty( proxlDbName ) ) {
-					 
-					 System.out.println( PROPERTY_NAME__PROXL_DB_NAME + ": " + proxlDbName );
-				 }
-				 if ( StringUtils.isNotEmpty( nrseqDbName ) ) {
-					 
-					 System.out.println( PROPERTY_NAME__NRSEQ_DB_NAME + ": " + nrseqDbName );
-				 }
-//			}
+			configProps.load(propertiesFileAsStream);
+
+			username = configProps.getProperty( PROPERTY_NAME__USERNAME );
+			password = configProps.getProperty( PROPERTY_NAME__PASSWORD );
+			dbURL = configProps.getProperty( PROPERTY_NAME__DB_URL );
+			dbPort = configProps.getProperty( PROPERTY_NAME__DB_PORT );
+
+			proxlDbName = configProps.getProperty( PROPERTY_NAME__PROXL_DB_NAME );
+			nrseqDbName = configProps.getProperty( PROPERTY_NAME__NRSEQ_DB_NAME );
+
+			if ( StringUtils.isEmpty( username ) ) {
+
+				String msg = "No provided DB username or DB username is empty string.";
+				System.err.println( msg );
+				throw new DBConnectionParametersProviderFromPropertiesFileException(msg);
+			}
+
+			if ( StringUtils.isEmpty( password ) ) {
+				String msg = "No provided DB password or DB password is empty string.";
+				System.err.println( msg );
+				throw new DBConnectionParametersProviderFromPropertiesFileException(msg);
+			}
+
+			if ( StringUtils.isEmpty( dbURL ) ) {
+				String msg = "No provided DB URL or DB URL is empty string.";
+				System.err.println( msg );
+				throw new DBConnectionParametersProviderFromPropertiesFileException(msg);
+			}
+			
+
+			if ( log.isInfoEnabled() ) {
+
+				System.out.println( "Database connection parameters:");
+				if ( StringUtils.isNotEmpty( username ) ) {
+
+					System.out.println( "username has a value" );
+				}
+				if ( StringUtils.isNotEmpty( password ) ) {
+
+					System.out.println( "password has a value" );
+				}
+				System.out.println( "dbURL: " + dbURL );
+				System.out.println( "dbPort: " + dbPort );
+
+				if ( StringUtils.isNotEmpty( proxlDbName ) ) {
+
+					System.out.println( PROPERTY_NAME__PROXL_DB_NAME + ": " + proxlDbName );
+				}
+				if ( StringUtils.isNotEmpty( nrseqDbName ) ) {
+
+					System.out.println( PROPERTY_NAME__NRSEQ_DB_NAME + ": " + nrseqDbName );
+				}
+			}
 
 		} catch ( RuntimeException e ) {
 

@@ -58,15 +58,21 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 
 		if ( StringUtils.isNotEmpty( dbConnectionParametersProvider.getProxlDbName() ) ) {
 
-			System.out.println( "Proxl DB Name from Connection Provider: " + dbConnectionParametersProvider.getProxlDbName() );
-			log.info( "Proxl DB Name from Connection Provider: " + dbConnectionParametersProvider.getProxlDbName() );
+			if ( log.isInfoEnabled() ) {
+
+				System.out.println( "Proxl DB Name from Connection Provider: " + dbConnectionParametersProvider.getProxlDbName() );
+				log.info( "Proxl DB Name from Connection Provider: " + dbConnectionParametersProvider.getProxlDbName() );
+			}
 		}
 		
 
 		if ( StringUtils.isNotEmpty( dbConnectionParametersProvider.getNrseqDbName() ) ) {
 
-			System.out.println( "YRC_NRSEQ DB Name from Connection Provider: " + dbConnectionParametersProvider.getNrseqDbName() );
-			log.info( "YRC_NRSEQ DB Name from Connection Provider: " + dbConnectionParametersProvider.getNrseqDbName() );
+			if ( log.isInfoEnabled() ) {
+
+				System.out.println( "YRC_NRSEQ DB Name from Connection Provider: " + dbConnectionParametersProvider.getNrseqDbName() );
+				log.info( "YRC_NRSEQ DB Name from Connection Provider: " + dbConnectionParametersProvider.getNrseqDbName() );
+			}
 		}
 
 	}
@@ -132,15 +138,21 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 
 			if ( StringUtils.isNotEmpty( dbConnectionParametersProvider.getProxlDbName() ) ) {
 
-				System.out.println( "Proxl DB Name from Connection Provider: " + dbConnectionParametersProvider.getProxlDbName() );
-				log.info( "Proxl DB Name from Connection Provider: " + dbConnectionParametersProvider.getProxlDbName() );
+				if ( log.isInfoEnabled() ) {
+
+					System.out.println( "Proxl DB Name from Connection Provider: " + dbConnectionParametersProvider.getProxlDbName() );
+					log.info( "Proxl DB Name from Connection Provider: " + dbConnectionParametersProvider.getProxlDbName() );
+				}
 			}
 			
 
 			if ( StringUtils.isNotEmpty( dbConnectionParametersProvider.getNrseqDbName() ) ) {
 
-				System.out.println( "YRC_NRSEQ DB Name from Connection Provider: " + dbConnectionParametersProvider.getNrseqDbName() );
-				log.info( "YRC_NRSEQ DB Name from Connection Provider: " + dbConnectionParametersProvider.getNrseqDbName() );
+				if ( log.isInfoEnabled() ) {
+
+					System.out.println( "YRC_NRSEQ DB Name from Connection Provider: " + dbConnectionParametersProvider.getNrseqDbName() );
+					log.info( "YRC_NRSEQ DB Name from Connection Provider: " + dbConnectionParametersProvider.getNrseqDbName() );
+				}
 			}
 		}
 		
