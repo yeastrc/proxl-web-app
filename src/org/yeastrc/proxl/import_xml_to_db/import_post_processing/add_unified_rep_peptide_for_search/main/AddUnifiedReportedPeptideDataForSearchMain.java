@@ -112,8 +112,10 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 	 */
 	public void addUnifiedReportedPeptideDataForSearch( int searchId ) throws Exception {
 
-		log.info( "Starting inserting unified reported peptide data" );
-		
+		if ( log.isInfoEnabled() ) {
+
+			log.info( "Starting inserting unified reported peptide data" );
+		}
 
 	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
 		
@@ -242,21 +244,33 @@ public class AddUnifiedReportedPeptideDataForSearchMain {
 			//  assume batch size is some multiple of the modulo value
 			if (  searchReportedPeptideOffset % 10000 == 0 ) {
 				
-				log.info( "Processed " + searchReportedPeptideOffset + " searc_reported_peptide records for  unified reported peptide data" );
+				if ( log.isInfoEnabled() ) {
+
+					log.info( "Processed " + searchReportedPeptideOffset + " searc_reported_peptide records for  unified reported peptide data" );
+				}
 			}
 		}
 		
-		log.info( "Done inserting unified reported peptide data" );
+		if ( log.isInfoEnabled() ) {
+
+			log.info( "Done inserting unified reported peptide data" );
+		}
 		
-		log.info( "Starting inserting search dynamic mod masses" );
+		
+		if ( log.isInfoEnabled() ) {
+		
+			log.info( "Starting inserting search dynamic mod masses" );
+		}
 
 		for ( Double dynamicModMass : uniqueDynamicModMasses ) {
 
 			SearchDynamicModMassDAO.getInstance().saveSearchDynamicModMass( searchId, dynamicModMass );
 		}
 		
-		log.info( "Done inserting search dynamic mod masses" );
+		if ( log.isInfoEnabled() ) {
 
+			log.info( "Done inserting search dynamic mod masses" );
+		}
 		
 
 	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();

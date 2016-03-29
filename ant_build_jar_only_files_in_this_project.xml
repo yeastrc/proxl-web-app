@@ -9,7 +9,9 @@
 	<property name="java_source" value="1.7"/>
 		
 	<property name="java.source.character.set" value="iso-8859-1"/>
-	
+
+	<property name="jar.main.class" value="org.yeastrc.proxl.import_xml_to_db.program_default.ImporterDefaultMainProgramEntry" />
+
 
 		
 	<property name="output_jar" value="proxlImportXMLToDB.jar"/>
@@ -45,6 +47,8 @@
 	<!-- ================================================================================== -->
 	<target name="manifest" depends="prepare">
 		<manifest file="${basedir}/MANIFEST.MF">
+			<attribute name="Main-Class" value="${jar.main.class}" />
+
 			<attribute name="Date" value="${build-info.current-date}" />
 			<attribute name="Time" value="${build-info.current-time}" />
 		</manifest>
