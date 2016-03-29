@@ -85,16 +85,15 @@ http://git.eclipse.org/c/jdt/eclipse.jdt.ui.git/plain/org.eclipse.jdt.ui/jar%20i
 MySQL Connector/J
 ------------------------------
 https://www.mysql.com/products/connector/
+Redistributed with an Apache 2.0 License, pursuant to the FOSS License Exception described
+at https://www.mysql.com/about/legal/licensing/foss-exception/
 
-
+Copyright (c) 1998, 2016, Oracle and/or its affiliates. All rights reserved.
 
 Joda-Time
 ------------------------------
 http://www.joda.org/joda-time/
 [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
-
-
-
 
 ProXL Import API
 ------------------------------
