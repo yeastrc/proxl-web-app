@@ -35,5 +35,6 @@ Here you will find documentation for both using and installing ProXL.
    
    install/intro
    install/import
+   install/converter_guide
    install/paws
    

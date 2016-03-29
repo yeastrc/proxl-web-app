@@ -1,4 +1,3 @@
-PAWS Guide
+ProXL XML Converter Development Guide
 ===========================================
 
-Coming soon.
