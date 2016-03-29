@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'ProXL DB'
-copyright = u'2015, Michael Riffle'
+copyright = u'2016, Michael Riffle'
 author = u'Michael Riffle'
 
 # The version info for the project you're documenting, acts as replacement for
