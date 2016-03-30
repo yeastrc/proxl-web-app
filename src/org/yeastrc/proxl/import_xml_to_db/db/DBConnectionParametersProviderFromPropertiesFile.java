@@ -24,7 +24,7 @@ public class DBConnectionParametersProviderFromPropertiesFile implements IDBConn
 	
 	private static final String PROPERTY_NAME__USERNAME = "username";
 	private static final String PROPERTY_NAME__PASSWORD = "password";
-	private static final String PROPERTY_NAME__DB_URL   = "dbURL";
+	private static final String PROPERTY_NAME__DB_HOST   = "dbHost";
 	private static final String PROPERTY_NAME__DB_PORT  = "dbPort";
 
 	private static final String PROPERTY_NAME__PROXL_DB_NAME  = "proxl.db.name";
@@ -41,7 +41,7 @@ public class DBConnectionParametersProviderFromPropertiesFile implements IDBConn
 
 	private String username;
 	private String password;
-	private String dbURL;
+	private String dbHost;
 	private String dbPort;
 
 	private String proxlDbName;
@@ -133,7 +133,7 @@ public class DBConnectionParametersProviderFromPropertiesFile implements IDBConn
 
 			username = configProps.getProperty( PROPERTY_NAME__USERNAME );
 			password = configProps.getProperty( PROPERTY_NAME__PASSWORD );
-			dbURL = configProps.getProperty( PROPERTY_NAME__DB_URL );
+			dbHost = configProps.getProperty( PROPERTY_NAME__DB_HOST );
 			dbPort = configProps.getProperty( PROPERTY_NAME__DB_PORT );
 
 			proxlDbName = configProps.getProperty( PROPERTY_NAME__PROXL_DB_NAME );
@@ -141,19 +141,19 @@ public class DBConnectionParametersProviderFromPropertiesFile implements IDBConn
 
 			if ( StringUtils.isEmpty( username ) ) {
 
-				String msg = "No provided DB username or DB username is empty string.";
+				String msg = "For Database connection parameters file: parameter '" + PROPERTY_NAME__USERNAME + "' is not provided or is empty string.";
 				System.err.println( msg );
 				throw new DBConnectionParametersProviderFromPropertiesFileException(msg);
 			}
 
 			if ( StringUtils.isEmpty( password ) ) {
-				String msg = "No provided DB password or DB password is empty string.";
+				String msg = "For Database connection parameters file: parameter '" + PROPERTY_NAME__PASSWORD + "' is not provided or is empty string.";
 				System.err.println( msg );
 				throw new DBConnectionParametersProviderFromPropertiesFileException(msg);
 			}
 
-			if ( StringUtils.isEmpty( dbURL ) ) {
-				String msg = "No provided DB URL or DB URL is empty string.";
+			if ( StringUtils.isEmpty( dbHost ) ) {
+				String msg = "For Database connection parameters file: parameter '" + PROPERTY_NAME__DB_HOST + "' is not provided or is empty string.";
 				System.err.println( msg );
 				throw new DBConnectionParametersProviderFromPropertiesFileException(msg);
 			}
@@ -164,14 +164,14 @@ public class DBConnectionParametersProviderFromPropertiesFile implements IDBConn
 				System.out.println( "Database connection parameters:");
 				if ( StringUtils.isNotEmpty( username ) ) {
 
-					System.out.println( "username has a value" );
+					System.out.println( PROPERTY_NAME__USERNAME + " has a value" );
 				}
 				if ( StringUtils.isNotEmpty( password ) ) {
 
-					System.out.println( "password has a value" );
+					System.out.println( PROPERTY_NAME__PASSWORD + " has a value" );
 				}
-				System.out.println( "dbURL: " + dbURL );
-				System.out.println( "dbPort: " + dbPort );
+				System.out.println( PROPERTY_NAME__DB_HOST + ": " + dbHost );
+				System.out.println( PROPERTY_NAME__DB_PORT + ": " + dbPort );
 
 				if ( StringUtils.isNotEmpty( proxlDbName ) ) {
 
@@ -208,7 +208,7 @@ public class DBConnectionParametersProviderFromPropertiesFile implements IDBConn
 	@Override
 	public String getDBURL() {
 		
-		return dbURL;
+		return dbHost;
 	}
 
 	@Override
