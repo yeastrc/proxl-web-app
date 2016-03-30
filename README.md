@@ -64,7 +64,7 @@ The properties are:
 
 Running the importer
 ------------------------------
-Download the latest release of the importer from `<https://github.com/yeastrc/proxl-import-xml-to-db/releases>`_. Use
+Download the latest release of the importer from https://github.com/yeastrc/proxl-import-xml-to-db/releases. Use
 Java to run the importer from the command line as: ``java -jar importProxlXML.jar``. Running with no arguments will
 show help for the importer, which is given below:
 
