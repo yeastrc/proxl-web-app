@@ -15,7 +15,7 @@ Examples:
 	
 Parameters:
 
-    -p  : [Required] : The project id in the database to import this file into.
+    -p  : [Required] : The id for the ProXL project into which the data are being loaded.
 
     -i (--import-file=) : [Required] : The Proxl XML file to import, with it's relative or absolute path.
 	
