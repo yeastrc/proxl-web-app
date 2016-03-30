@@ -21,7 +21,7 @@ Parameters:
 	
     -c (--config=) : [Required] : The Database configuration file, with it's relative or absolute path.
     
-                                  File should contain the following key/value pairs:
+                                  File must contain the following key/value pairs:
                                   
                                   username=your_db_username
                                   password=your_db_password
