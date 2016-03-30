@@ -14,10 +14,10 @@ To simplify support for as many software pipelines as possible, we have develope
 
 Converters for several major protein cross-linking mass spectrometry pipelines have already been developed. For your convenience, links to the respective importers are provided below. Please be sure to review the [import documentation](http://proxl-web-app.readthedocs.org/en/latest/install/import.html) for more information.
 
-    * [Kojak](https://github.com/yeastrc/proxl-import-kojak)
-    * [Crux] (https://github.com/yeastrc/proxl-import-crux)
-    * [pLink](https://github.com/yeastrc/proxl-import-plink)
-    * [StavroX](https://github.com/yeastrc/proxl-import-stavrox)
-    * [xQuest](https://github.com/yeastrc/proxl-import-xquest)
+* [Kojak](https://github.com/yeastrc/proxl-import-kojak)
+* [Crux](https://github.com/yeastrc/proxl-import-crux)
+* [pLink](https://github.com/yeastrc/proxl-import-plink)
+* [StavroX](https://github.com/yeastrc/proxl-import-stavrox)
+* [xQuest](https://github.com/yeastrc/proxl-import-xquest)
 
 Please send any questions, suggestions, or any other feedback to proxl-help@yeastrc.org.
