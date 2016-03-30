@@ -14,23 +14,23 @@ followed the ProXL installation instructions found at
 
 To set up a MySQL account for the importer:
 
-|	Log in to MySQL as root:
-|	``shell> mysql -u root mysql``
-|	
-|	Create the MySQL user:
-|	``mysql> CREATE USER 'proxl_importer'@'localhost' IDENTIFIED BY 'password';``	
-|
-|	Replace ``proxl_importer`` with the username you would prefer, ``localhost`` with the
-|	relative hostname of the machine connecting to the MySQL database (usually localhost),
-|	and ``password`` with your preferred password.
-|
-|	Grant the necessary privileges in MySQL:
-|	``GRANT ALL ON proxl.* TO 'proxl_importer'@'localhost'``	
-|	``GRANT SELECT ON YRC_NRSEQ.* TO 'proxl_user'@'localhost'``
-|
-|	Replace ``proxl_importer`` and ``localhost`` with the username and hostname you used
-|	when creating the user.
-|
+	Log in to MySQL as root:
+	``shell> mysql -u root mysql``
+
+	Create the MySQL user:
+	``mysql> CREATE USER 'proxl_importer'@'localhost' IDENTIFIED BY 'password';``	
+
+	Replace ``proxl_importer`` with the username you would prefer, ``localhost`` with the
+	relative hostname of the machine connecting to the MySQL database (usually localhost),
+	and ``password`` with your preferred password.
+
+	Grant the necessary privileges in MySQL:
+	``GRANT ALL ON proxl.* TO 'proxl_importer'@'localhost'``	
+	``GRANT SELECT ON YRC_NRSEQ.* TO 'proxl_user'@'localhost'``
+
+	Replace ``proxl_importer`` and ``localhost`` with the username and hostname you used
+	when creating the user.
+
 
 
 Database config file
