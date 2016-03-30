@@ -10,27 +10,27 @@ The importer reads from and inserts data into the proxl database.
 Access to the database must be set up before the importer can be run.
 This only needs to be done once. These instructions assume you have
 followed the ProXL installation instructions found at
-`<http://proxl-web-app.readthedocs.org/en/latest/>`_.
+http://proxl-web-app.readthedocs.org/en/latest/.
 
 To set up a MySQL account for the importer:
 
-	Log in to MySQL as root:
-	``shell> mysql -u root mysql``
+Log in to MySQL as root:
+``shell> mysql -u root mysql``
 
-	Create the MySQL user:
-	``mysql> CREATE USER 'proxl_importer'@'localhost' IDENTIFIED BY 'password';``	
+Create the MySQL user:
+``mysql> CREATE USER 'proxl_importer'@'localhost' IDENTIFIED BY 'password';``	
 
-	Replace ``proxl_importer`` with the username you would prefer, ``localhost`` with the
-	relative hostname of the machine connecting to the MySQL database (usually localhost),
-	and ``password`` with your preferred password.
+Replace ``proxl_importer`` with the username you would prefer, ``localhost`` with the
+relative hostname of the machine connecting to the MySQL database (usually localhost),
+and ``password`` with your preferred password.
 
-	Grant the necessary privileges in MySQL:
-	``GRANT ALL ON proxl.* TO 'proxl_importer'@'localhost'``	
-	``GRANT SELECT ON YRC_NRSEQ.* TO 'proxl_user'@'localhost'``
+Grant the necessary privileges in MySQL:
 
-	Replace ``proxl_importer`` and ``localhost`` with the username and hostname you used
+``GRANT ALL ON proxl.* TO 'proxl_importer'@'localhost'``	
+``GRANT SELECT ON YRC_NRSEQ.* TO 'proxl_user'@'localhost'``
+
+Replace ``proxl_importer`` and ``localhost`` with the username and hostname you used
 	when creating the user.
-
 
 
 Database config file
@@ -38,8 +38,6 @@ Database config file
 The database config file is a simple text file containing the information necessary for the
 importer to connect to the database (i.e., where the database is and login credentials). The
 location of this file is passed into the importer when it is run. The format of this file is:
-
-.. code-block:: properties
 	
 	# db connection parameters
 	username=proxl_importer
@@ -69,8 +67,6 @@ Running the importer
 Download the latest release of the importer from `<https://github.com/yeastrc/proxl-import-xml-to-db/releases>`_. Use
 Java to run the importer from the command line as: ``java -jar importProxlXML.jar``. Running with no arguments will
 show help for the importer, which is given below:
-
-.. code-block:: none
 
 	Usage: java -jar importProxlXML.jar -p project_id  \
 	                                    -i import_file.proxl.xml \
