@@ -21,6 +21,7 @@
 	<property name="classes" value="classes" />	
 
 	
+	<available file=".git" type="dir" property="git.present"/>
 	
 			
 			
@@ -63,7 +64,7 @@
 	<!-- ================================================================================== -->
 	<!-- Build the jar -->
 	<!-- ================================================================================== -->
-	<target name="build_jar" depends="compile,manifest"
+	<target name="build_jar" depends="compile,git.revision"
 			description="Packages the project as a jar file">
 		
 		
@@ -72,6 +73,14 @@
 			basedir="${basedir}${file.separator}${classes}"
 			manifest="${basedir}/MANIFEST.MF">
 
+			<manifest>
+            	<attribute name="GIT-last-tag-commit-hash" value="${git.last.tag.and.commit.hash}"/>
+            	<attribute name="GIT-commit-hash" value="${git.last.commit.hash}"/>
+			
+				<attribute name="Date" value="${build-info.current-date}" />
+				<attribute name="Time" value="${build-info.current-time}" />
+			</manifest>
+
 			<!--  			excludes="*.*"  --> 
 			
 		</jar>
@@ -79,6 +88,52 @@
 
 		
 	</target>
+	
+
+	<target name="git.revision" 
+			description="Store git revision in ${git.last.tag.and.commit.hash} and ${git.last.commit.hash}" 
+			if="git.present">
+		
+		<exec executable="git" outputproperty="git.last.tag.and.commit.hash.from.cmd" failifexecutionfails="false" errorproperty="">
+			<arg value="describe"/>
+			<arg value="--tags"/>
+			<arg value="--always"/>
+			<arg value="HEAD"/>
+		</exec>
+		
+		<echo message="git.last.tag.and.commit.hash.from.cmd: ${git.last.tag.and.commit.hash.from.cmd}"/>
+		
+		<condition property="git.last.tag.and.commit.hash" value="${git.last.tag.and.commit.hash.from.cmd}" else="unknown">
+			<and>
+				<isset property="git.last.tag.and.commit.hash.from.cmd"/>
+				<length string="${git.last.tag.and.commit.hash.from.cmd}" trim="yes" length="0" when="greater"/>
+			</and>
+		</condition>
+		
+		<echo message="git.last.tag.and.commit.hash: ${git.last.tag.and.commit.hash}"/>
+
+
+		<exec executable="git" outputproperty="git.last.commit.hash.from.cmd" failifexecutionfails="false" errorproperty="">
+			<arg value="describe"/>
+			<arg value="--always"/>
+			<arg value="HEAD"/>
+		</exec>
+				
+
+		<echo message="git.last.commit.hash.from.cmd: ${git.last.commit.hash.from.cmd}"/>
+		
+		<condition property="git.last.commit.hash" value="${git.last.commit.hash.from.cmd}" else="unknown">
+			<and>
+				<isset property="git.last.commit.hash.from.cmd"/>
+				<length string="${git.last.commit.hash.from.cmd}" trim="yes" length="0" when="greater"/>
+			</and>
+		</condition>
+		
+		<echo message="git.last.commit.hash: ${git.last.commit.hash}"/>
+	
+	</target>
+				
+		
 	
 	<!-- ================================================================================== -->
 	<!-- Clean the build directory -->
