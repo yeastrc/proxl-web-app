@@ -179,9 +179,8 @@ The total number of PSMs (peptide spectrum matches) meeting the cutoff that iden
 # Peptides
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The total number of identified crosslinked (crosslink view) or looplinked (looplink view) peptides
-that mapped to the reported proteins and positions. Only peptides with a peptide-level
-q-value <= the requested cutoff (if applicable) AND having at least one PSM having a
-psm-level cutoff <= the requested cutoff are counted.
+that mapped to the reported proteins and positions. Only peptides that meet the current filtering
+criteria are counted.
 
 **Note**: The individual peptides may be viewed by clicking a row in the table to view a
 table of peptides. Rows in that peptide table may also be viewed to view the underlying
@@ -192,19 +191,21 @@ PSMs and view spectra. See :ref:`protein-view-peptides-label`.
 Of the # of peptides, the total number that uniquely mapped to this protein pair (crosslink view) or
 protein (looplink view).
 
-Best Peptide Q-value
+Best Peptide-level Scores
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Of the peptides describe above, the best peptide-level q-value found for those peptides (if available).
+If peptide-level filters are being used, the best score from all peptides matching to the indicated proteins and positions
+will be displayed for each filter. 
 
-Best PSM Q-value
+Best PSM-level Scores
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The best PSM-level q-value among the PSMs described above.
+If PSM-level filters are being used, the best score from all PSMs matching to the indicated proteins and positions
+will be displayed for each filter. 
 
 .. _protein-view-peptides-label:
 
 View Peptides
 =========================
-All peptides that meet the q-value cutoffs that were mapped to a protein-level crosslink
+All peptides that meet the current filters that were mapped to a protein-level crosslink
 or looplink may be seen by clicking on the respective row in the table. Additionally, all rows
 of this peptide table may clicked to view all PSMs associated with that peptide identification. (See :ref:`protein-view-psms-label`.)
 
@@ -234,20 +235,25 @@ Pos 1 and 2 (Looplink-only)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The positions in the peptide that were looplinked.
 
-Q-value
+Scores
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-The peptide-level q-value for this peptide identification (if available)
+A column for each peptide-level score is shown.
 
 # PSMs
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 The number of PSMs that meet the cutoff criteria that identified this peptide.
 
+Best PSM-level Scores
+^^^^^^^^^^^^^^^^^^^^^^^^^
+If PSM-level filters are being used, the best score from all PSMs matching to this peptide for each score on which PSMs are being filtered.
+
 .. _protein-view-psms-label:
 
 View PSMs
 =========================
-All PSMs with a q-value <= the specified PSM-level cutoff may be viewed for a peptide by clicking on a row
-in the peptide table that is shown when clicking a row in the main protein table.
+All PSMs meeting the current filtering criteria that map to a given peptide can by shown by
+clicking on the table row containing that peptide.
+
 
 .. image:: /images/protein-page-view-psms.png
 
@@ -275,17 +281,10 @@ Scan Filename
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 The filename of the scan file.
 
-Q-value
+Scores
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-The q-value for the PSM.
+A column for each PSM-level score or annotation.
 
-PEP
-^^^^^^^^^^^^^^^^^^^^^^^^^
-The posterior error probabiliy for this PSM, if available.
-
-SVM Score
-^^^^^^^^^^^^^^^^^^^^^^^^^
-The support vector machine score for this PSM, if available.
 
 View Spectra
 -------------------------

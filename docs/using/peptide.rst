@@ -166,23 +166,20 @@ The protein(s) to which the second peptide matches, and the position in that
 protein to which the linker position in that peptide matched. Mouse-over
 the protein name to get a description.
 
-Q-value
+Peptide-level Scores
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-The peptide-level q-value, if available.
+If peptide-level scores are available for this search, the scores will appear as separate columns.
 
-# PSMs
+Best PSM-level Scores
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-The number of PSMs that have a q-value <= the specified PSM-level cutoff that identified this peptide. Note: click
-the table row containing the peptide to see all the PSMs.
-
-Best PSM Q-value
-^^^^^^^^^^^^^^^^^^^^^^^^^
-The best q-value among the PSMs with a q-value <= the specified PSM-level cutoff that identified this peptide.
+Columns will appear for each PSM-level score on which the results are currently being filtered. Each of these columns will
+show the best PSM-level score for each respective PSM-level filters. E.g., if p-value is being used as a PSM-level score,
+the best PSM p-value will be displayed for each peptide.
 
 View PSMs
 =========================
-All PSMs with a q-value <= the specified PSM-level cutoff may be viewed for a peptide by clicking on the table row
-containing that peptide.
+All PSMs meeting the current filtering criteria that map to a given peptide can by shown by
+clicking on the table row containing that peptide.
 
 .. image:: /images/peptide-page-view-psms.png
 
@@ -210,17 +207,9 @@ Scan Filename
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 The filename of the scan file.
 
-Q-value
+PSM-level scores
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-The q-value for the PSM.
-
-PEP
-^^^^^^^^^^^^^^^^^^^^^^^^^
-The posterior error probabiliy for this PSM, if available.
-
-SVM Score
-^^^^^^^^^^^^^^^^^^^^^^^^^
-The support vector machine score for this PSM, if available.
+Each PSM-level score will appear as a separate column.
 
 View Spectra
 -------------------------

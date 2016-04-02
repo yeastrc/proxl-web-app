@@ -29,21 +29,67 @@ version number of the PSM search software used. "Upload date" is the date the da
 uploaded into ProXL. "FASTA file" is the name of the FASTA file used to perform the
 PSM search.
 
+Search Filter
+---------------------------
+Each search is filtered separately, according to its own native score types. To change the filters
+for each search, click the pencil icon next to "PSM Filters:" or "Peptide Filters:" next to each search.
+
+PSM Filters
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The filters to apply at the PSM level. Only results which have at least one PSM that meets all of the selected
+critiera will be listed. When listing PSMs associated with peptides, only PSMs that meet all of the selected
+critiera will be listed.
+
+To change the PSM-level filters, first click the pencil icon next to "PSM Filters":
+
+.. image:: /images/filter-change-psm-filter-merged.png
+
+This opens an overlay with the containing the possible score types to use as PSM filters for this search. To change
+the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
+
+.. image:: /images/filter-change-psm-filter2.png
+
+To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
+
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+to the database. This typically represents the suggested cutoffs by the author of the respective search program.
+
+*Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
+the "Save" button, you must click the "Update" button on the page to apply any new PSM- or peptide-level
+filters.
+
+.. image:: /images/filter-update-from-database-merged.png
+
+
+Peptide Filters
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The filters to apply at the peptide level. Only results which have at least one peptide that meets all of the selected
+critiera will be listed.
+
+To change the peptide-level filters, first click the pencil icon next to "Peptide Filters":
+
+.. image:: /images/filter-change-peptide-filter-merged.png
+
+This opens an overlay with the containing the possible score types to use as peptide-level filters for this search. To change
+the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
+
+.. image:: /images/filter-change-peptide-filter2.png
+
+To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
+
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+to the database. This typically represents the suggested cutoffs by the author of the respective search program.
+
+*Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
+the "Save" button, you must click the "Update" button on the page to apply any new PSM- or peptide-level
+filters.
+
+.. image:: /images/filter-update-from-database-merged.png
+
 Filter Data
 =========================
-The data presented may be filtered according to the following criteria. Note: Only peptides
-that meet ALL of the specified criteria are returned.
-
-PSM q-value cutoff
--------------------------
-Only peptides that were identified by at least one PSM with a q-value <= to the value
-specified will be shown.
-
-Peptide q-value cutoff
--------------------------
-Only peptides that have a peptide-level q-value <= the value specified will be shown.
-As not all software produces peptide-level q-values, this field will have no effect
-on those data.
 
 Type filter
 -------------------------
@@ -68,8 +114,11 @@ on monolinks is included here.
 
 Update
 -------------------------
-In order to apply new filter parameters to the shown data, the "Update" button must be clicked. This will
-fetch filtered data from the ProXL server and display the data on the web page.
+*Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
+the "Save" button, you must click the "Update" button on the page to apply any new PSM- or peptide-level
+filters.
+
+.. image:: /images/filter-update-from-database-merged.png
 
 Euler diagram
 ======================================
@@ -159,20 +208,20 @@ The protein(s) to which the second peptide matches, and the position in that
 protein to which the linker position in that peptide matched. Mouse-over
 the protein name to get a description.
 
-Best Q-value
-^^^^^^^^^^^^^^^^^^^^^^^^^
-The best peptide-level q-value from the searches, if available.
-
 # PSMs
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-The total number of PSMs from the searches for this peptide that have a q-value <= the specified PSM-level cutoff that identified this peptide. Note: click
-the table row containing the peptide to see all the PSMs.
+The total number of combined PSMs from each search for this peptide that meet the filtering critera. Note: click
+the table row containing the peptide to see the PSMs.
+
+Best PSM- and Peptide-level Scores
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Separate columns, color-coded for each search, display the best PSM- and peptide-level scores currently being used to filter the data from each search.
 
 View PSMs
 =========================
 To view PSMs for a given peptide, first click on a row in the table to expand and view the peptide-level statistics for a given
 peptide from each search in which it was found (at the given cutoffs). Each of these searches may be clicked to expand and view all
-PSMs with a q-value <= the specified PSM-level cutoff. 
+PSMs that meet the current filtering criteria.
 
 Columns
 -------------------------
@@ -182,13 +231,13 @@ Scan Num.
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 The scan number from the spectral file (e.g., mzML file)
 
-Charge
-^^^^^^^^^^^^^^^^^^^^^^^^^
-The predicted charge state of the precursor ion.
-
 Obs. m/z
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 The observed m/z of the precursor ion.
+
+Charge
+^^^^^^^^^^^^^^^^^^^^^^^^^
+The predicted charge state of the precursor ion.
 
 RT (min)
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -198,17 +247,10 @@ Scan Filename
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 The filename of the scan file.
 
-Q-value
+Scores
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-The q-value for the PSM.
+A column for each PSM-level score from the respective search.
 
-PEP
-^^^^^^^^^^^^^^^^^^^^^^^^^
-The posterior error probabiliy for this PSM, if available.
-
-SVM Score
-^^^^^^^^^^^^^^^^^^^^^^^^^
-The support vector machine score for this PSM, if available.
 
 View Spectra
 -------------------------
