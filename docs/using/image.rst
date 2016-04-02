@@ -315,15 +315,60 @@ Filter Data
 The data presented in the viewer may be filtered using the form at the top of the page. The
 filtering options are:
 
-PSM Q-value cutoff
+PSM Filters
 --------------------
-Only peptides with at least one peptide spectrum match (PSM) with a q-value <= to this cutoff will be shown.
-Additionally, when viewing PSMs for peptides, only PSMs with with a q-value <= to this cutoff will be shown.
+The filters to apply at the PSM level. Only results which have at least one PSM that meets all of the selected
+critiera will be listed. When listing PSMs associated with peptides, only PSMs that meet all of the selected
+critiera will be listed.
 
-Peptide Q-value cutoff
+To change the PSM-level filters, first click the pencil icon next to "PSM Filters":
+
+.. image:: /images/filter-change-psm-filter1.png
+
+This opens an overlay with the containing the possible score types to use as PSM filters for this search. To change
+the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
+
+.. image:: /images/filter-change-psm-filter2.png
+
+To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
+
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+to the database. This typically represents the suggested cutoffs by the author of the respective search program.
+
+*Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
+the "Save" button, you must click the "Update From Database" button on the page to apply any new PSM- or peptide-level
+filters.
+
+.. image:: /images/filter-update-from-database.png
+
+
+Peptide Filters
 -----------------------
-Only peptides with a peptide-level q-value <= to this cutoff will be shown. If the pipeline used to
-generate the search results does not generate peptide-level q-values, this field has no effect.
+The filters to apply at the peptide level. Only results which have at least one peptide that meets all of the selected
+critiera will be listed.
+
+To change the peptide-level filters, first click the pencil icon next to "Peptide Filters":
+
+.. image:: /images/filter-change-peptide-filter1.png
+
+This opens an overlay with the containing the possible score types to use as peptide-level filters for this search. To change
+the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
+
+.. image:: /images/filter-change-peptide-filter2.png
+
+To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
+
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+to the database. This typically represents the suggested cutoffs by the author of the respective search program.
+
+*Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
+the "Save" button, you must click the "Update From Database" button on the page to apply any new PSM- or peptide-level
+filters.
+
+.. image:: /images/filter-update-from-database.png
+
 
 Exclude links with
 --------------------

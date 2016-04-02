@@ -195,19 +195,25 @@ in the top right of the window, or anywhere in the browser outside the chart win
 
 The chart options are:
 	* Scan File - If multiple spectral files were searched, each will be listed here. The data in the chart reflect the selected spectral file.
-	* PSM Q-value cutoff - Counts for "Filtered PSMs" will only include scans that resulted in a PSM with this q-value or lower.
+	* Filter PSMs by - Select the score type and cutoff value for that score to be used to plot the number of PSMs meeting those filtering criteria (red bars). The minimum and maximum values for the selected score type are given in parentheses.
 	* Scans with - Counts for "Filtered PSMs" will only include scans that resulted in a PSM where the peptide was of a type that is checked here. E.g., if only "crosslinks" is checked, only scans that resulted in crosslinked peptides will be used to for "Fitlered PSMs" counts. If "looplinks" and "crosslinks" are checked, only PSMs resulting in crosslinked or looplinked peptides will be counted.
 	* Max - Values entered here will be the maximum value on the X or Y axis--used for rescaling the chart.
 
-Cumulative PSM Count vs/ Q-value QC Plot
+Cumulative PSM Count vs/ score QC plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Clicking the "[PSM Q Values]" link next to "QC Plots:" produces a plot of cumulative PSM count vs/ q-value cutoff:
+Clicking the "[PSM Count vs/ Score]" link next to "QC Plots:" produces a plot of cumulative PSM count vs/ a chosen score type:
 
-.. image:: /images/project-overview-psm-count-over-qvalue-qc.png
+.. image:: /images/project-overview-qc-psm-count-by-score-value.png
 
-Q-value cutoff is presented on the x-axis, and y-values are the total number of PSMs found in this search with that q-value or lower. Each class
+Possible values for the chosen score type are presented along the x-axis. Scores for which lower values are more significant, the
+y-value represents the number of PSMs with the value on the x-axis or lower. Score for which higher values are more significant, the
+y-value represents the number of PSMs with the value on the x-axis or higher.
+
+Each class
 of PSM is presented as a separate line: crosslinks, looplinks, and unlinked. A line for all PSM types combined may optionally be displayed by checking "all"
 in the "PSMs with:" options. 
+
+The "Choose score:" option allows choosing which score from the search is used to generate the plot.
 
 The "View as:" option allows switching between raw counts (default) and percentage. The "raw counts" option uses the raw PSM counts for the respective types.
 The percentage option displays the PSM counts as the percentage the total PSMs of the respective type, and so applies the same scale to all lines, which will
