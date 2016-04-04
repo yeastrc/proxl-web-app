@@ -762,6 +762,12 @@ QCChartRetentionTime.prototype.createRetentionTimeCountChartFromPageParams = fun
 		objectThis.reloadRetentionTimeCountChartTimerId = null;
 	}
 
+
+	$(".scan_retention_time_qc_plot_filter_psms_by_param_not_a_number_jq").hide();
+
+	$(".scan_retention_time_qc_plot_param_not_a_number_jq").hide();
+	
+	$(".scan_retention_time_qc_plot_have_data_jq").hide();
 	
 	
 	var $scan_retention_time_qc_plot_current_search_id = $("#scan_retention_time_qc_plot_current_search_id");
@@ -783,12 +789,19 @@ QCChartRetentionTime.prototype.createRetentionTimeCountChartFromPageParams = fun
 	
 	var psmScoreCutoff = $scan_retention_time_qc_plot_psm_score_cutoff.val();
 	
-	
-	if ( isNaN( parseFloat( psmScoreCutoff ) ) ) {
-		
-//		alert( "psm cutoff not a number" );
+
+	if ( ! /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/.test( psmScoreCutoff ) ) {
+
+		//  psmScoreCutoff value is not a valid decimal number
+
+		this.removeRetentionTimeCountChart();
+
+		$(".scan_retention_time_qc_plot_filter_psms_by_param_not_a_number_jq").show();
+
+		$scan_retention_time_qc_plot_psm_score_cutoff.focus();
 		
 		return;  //  EARLY EXIT
+		
 	}
 	
 
@@ -820,6 +833,43 @@ QCChartRetentionTime.prototype.createRetentionTimeCountChartFromPageParams = fun
 	var userInputMaxX = $scan_retention_time_qc_plot_max_x.val();
 	var userInputMaxY = $scan_retention_time_qc_plot_max_y.val();
 
+	if ( userInputMaxX !== "" ) {
+
+		// only test for valid Max X value if not empty string
+
+		if ( ! /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/.test( userInputMaxX ) ) {
+			
+			//  Max X value is not a valid decimal number
+
+			this.removeRetentionTimeCountChart();
+
+			$(".scan_retention_time_qc_plot_param_not_a_number_jq").show();
+			
+			$scan_retention_time_qc_plot_max_x.focus();
+			
+			return;  //  EARLY EXIT
+		}
+	}
+	
+	if ( userInputMaxY !== "" ) {
+
+		// only test for valid Max Y value if not empty string
+
+		if ( ! /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/.test( userInputMaxY ) ) {
+			
+			//  Max X value is not a valid decimal number
+			
+
+			this.removeRetentionTimeCountChart();
+
+			$(".scan_retention_time_qc_plot_param_not_a_number_jq").show();
+			
+			$scan_retention_time_qc_plot_max_y.focus();
+			
+			return;  //  EARLY EXIT
+		}
+	}
+	
 	
 	
 	var scansForSelectedLinkTypes = [];
@@ -958,24 +1008,38 @@ QCChartRetentionTime.prototype.createRetentionTimeCountChartResponse = function(
 	var userInputMaxX = undefined;
 	
 	if ( userInputMaxXString !== "" ) {
-		
-		userInputMaxX = parseFloat( userInputMaxXString );
-		
-		if ( isNaN( userInputMaxX ) ) {
+
+		// only test for valid Max X value if not empty string
+
+		if ( /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/.test( userInputMaxXString ) ) {
 			
-			userInputMaxX = undefined;
+			//  Max X value is a valid decimal number
+
+			userInputMaxX = parseFloat( userInputMaxXString );
+
+			if ( isNaN( userInputMaxX ) ) {
+
+				userInputMaxX = undefined;
+			}
 		}
 	}
 	
 	var userInputMaxY = undefined;
 	
 	if ( userInputMaxYString !== "" ) {
-		
-		userInputMaxY = parseFloat( userInputMaxYString );
-		
-		if ( isNaN( userInputMaxY ) ) {
+
+		// only test for valid Max Y value if not empty string
+
+		if ( /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/.test( userInputMaxYString ) ) {
 			
-			userInputMaxY = undefined;
+			//  Max X value is a valid decimal number
+
+			userInputMaxY = parseFloat( userInputMaxYString );
+
+			if ( isNaN( userInputMaxY ) ) {
+
+				userInputMaxY = undefined;
+			}
 		}
 	}
 	

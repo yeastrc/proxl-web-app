@@ -576,50 +576,62 @@ QCChartPSMCountVsScores.prototype.createChartFromPageParams = function( ) {
 
 	if ( userInputMaxX !== "" ) {
 
-		var userInputMaxXNum = parseFloat( userInputMaxX ); 
+		// only test for valid Max X value if not empty string
 
-		if ( isNaN( userInputMaxXNum ) ) {
+		if ( !  /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/.test( userInputMaxX ) ) {
+			
+			//  Max X value is not a valid decimal number
+
 
 			$(".psm_count_vs_score_qc_plot_param_not_a_number_jq").show();
 
 			$(".psm_count_vs_score_qc_plot_no_data_jq").hide();
 			$(".psm_count_vs_score_qc_plot_have_data_jq").hide();
 			
+			$psm_count_vs_score_qc_plot_max_x.focus();
+			
 			return;  //  EARLY EXIT
 		}
 		
-		if ( userInputMaxXNum < 0 ) {
-			
-			$psm_count_vs_score_qc_plot_max_x.val( "0" );
-			
-			userInputMaxX = "0";
-		}
+//		if ( userInputMaxXNum < 0 ) {
+//			
+//			$psm_count_vs_score_qc_plot_max_x.val( "0" );
+//			
+//			userInputMaxX = "0";
+//		}
 
 	}	
 
 	if ( userInputMaxY !== "" ) {
 
-		var userInputMaxYNum = parseFloat( userInputMaxY ); 
-		
-		if ( isNaN( userInputMaxYNum ) ) {
+
+		// only test for valid Max Y value if not empty string
+
+		if ( !  /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/.test( userInputMaxY ) ) {
+			
+			//  Max Y value is not a valid decimal number
 
 			$(".psm_count_vs_score_qc_plot_param_not_a_number_jq").show();
 
 			$(".psm_count_vs_score_qc_plot_no_data_jq").hide();
 			$(".psm_count_vs_score_qc_plot_have_data_jq").hide();
+
+			$psm_count_vs_score_qc_plot_max_y.focus();
 			
 			return;  //  EARLY EXIT
 		}
 		
-		if ( userInputMaxYNum < 0 ) {
-			
-			$psm_count_vs_score_qc_plot_max_y.val( "0" );
-			
-			userInputMaxY = "0";
-		}
-
 		
 		if ( $("#psm_count_vs_score_qc_plot_y_axis_as_percentage").prop("checked") ) {
+
+			var userInputMaxYNum = parseFloat( userInputMaxY ); 
+			
+			if ( userInputMaxYNum < 0 ) {
+				
+				$psm_count_vs_score_qc_plot_max_y.val( "0" );
+				
+				userInputMaxY = "0";
+			}
 			
 			if ( userInputMaxYNum > 100 ) {
 				

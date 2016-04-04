@@ -2053,32 +2053,46 @@
 					</table>
 
 
-					<div style="float: right; padding-right: 110px; "
-						class="scan_retention_time_qc_plot_have_data_jq" >
-						
-						<div >
-							<svg width="10" height="10">
-								<rect x="0" y="0" width="10" height="10" stroke="none" stroke-width="0" fill="#fff0f0"></rect>
-							</svg>
-							
-							Scans
-						</div>
-											
-						<div >
-							<svg width="10" height="10">
-								<rect x="0" y="0" width="10" height="10" stroke="none" stroke-width="0" fill="#a55353"></rect>
-							</svg>
-							Filtered PSMs
-							
-						</div>
+					<h1 class="scan_retention_time_qc_plot_filter_psms_by_param_not_a_number_jq" 
+						style="display: none;  ">
+					
+						"Filter PSMs by" is not a number
+					</h1>
 
+					<h1 class="scan_retention_time_qc_plot_param_not_a_number_jq" 
+						style="display: none;  ">
 					
-					</div>
-					
-					
-					<a style="font-size:10pt;white-space:nowrap;" href="javascript:" id="scan_retention_time_qc_plot_download_svg"
-							title="Download a SVG file of the image">[Download SVG]</a>
-					
+						Max X or Max Y is not empty and is not a number
+					</h1>
+
+
+					<div class="scan_retention_time_qc_plot_have_data_jq" >
+	
+						<div style="float: right; padding-right: 110px; ">
+							
+							<div >
+								<svg width="10" height="10">
+									<rect x="0" y="0" width="10" height="10" stroke="none" stroke-width="0" fill="#fff0f0"></rect>
+								</svg>
+								
+								Scans
+							</div>
+												
+							<div >
+								<svg width="10" height="10">
+									<rect x="0" y="0" width="10" height="10" stroke="none" stroke-width="0" fill="#a55353"></rect>
+								</svg>
+								Filtered PSMs
+								
+							</div>
+	
+						
+						</div>
+							
+						
+						<a style="font-size:10pt;white-space:nowrap;" href="javascript:" id="scan_retention_time_qc_plot_download_svg"
+								title="Download a SVG file of the image">[Download SVG]</a>
+					</div>						
 					
 					<div style="clear: both; " >
 					
