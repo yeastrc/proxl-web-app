@@ -13,7 +13,7 @@
  
 <c:if test="${ not empty annotationCutoffDataList }" >
 	<tr style=" vertical-align: top; ">
-		<td style="  line-height: 1.3em; <c:if test="${ not singleSearch }" > <%-- padding-top: 3px; padding-bottom: 3px; --%> width: 125px;</c:if> ">
+		<td style="  line-height: 1.3em; white-space: nowrap; <c:if test="${ not singleSearch }" > <%-- padding-top: 3px; padding-bottom: 3px; --%> width: 125px;</c:if> ">
 			${ filterTypeDisplay } Filters:
 			<a href="javascript:" >
 				<img src="${contextPath}/images/icon-edit-small.png" 
