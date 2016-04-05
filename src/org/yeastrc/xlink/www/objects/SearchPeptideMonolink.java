@@ -3,7 +3,6 @@ package org.yeastrc.xlink.www.objects;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.MonolinkDAO;
 import org.yeastrc.xlink.dao.PeptideDAO;
 import org.yeastrc.xlink.dto.MonolinkDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
@@ -12,6 +11,8 @@ import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.searchers.PsmCountForSearchIdReportedPeptideIdSearcher;
 import org.yeastrc.xlink.searchers.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.searcher.MonolinkSearcher;
 import org.yeastrc.xlink.www.searcher.SearchPsmSearcher;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -39,20 +40,45 @@ public class SearchPeptideMonolink {
 		
 		try {
 
-			//  Get monolink table entry for first psm.  assume the peptide position is the same for all.
+			List<MonolinkDTO> monolinkList = 
+					MonolinkSearcher.getInstance()
+					.getForPsmIdProteinIdProteinPosition( psmId, nrseqProteinId, proteinPosition );
 			
-			MonolinkDTO monolinkDTO = MonolinkDAO.getInstance().getARandomMonolinkDTOForPsmId( psmId );
-
-			if ( monolinkDTO == null ) {
+			if ( monolinkList.isEmpty() ) {
 				
-
-				String msg = "monolinkDTO == null for psmId: " + psmId;
+				String msg = "monolinkList is empty  for psmId: " + psmId 
+						+ ", nrseqProteinId: " + nrseqProteinId
+						+ ", proteinPosition: " + proteinPosition;
 
 				log.error( msg );
 
-				throw new Exception( msg );
-				
+				throw new ProxlWebappDataException( msg );
 			}
+			
+
+			if ( monolinkList.size() > 1 ) {
+				
+				MonolinkDTO firstMonolinkDTO = monolinkList.get( 0 );
+				
+				for ( int index = 1; index < monolinkList.size(); index++ ) {
+
+					MonolinkDTO compareMonolinkDTO = monolinkList.get( index );
+					
+					if ( firstMonolinkDTO.getPeptideId() != compareMonolinkDTO.getPeptideId()
+							|| firstMonolinkDTO.getPeptidePosition() != compareMonolinkDTO.getPeptidePosition() ) {
+
+						String msg = "monolinkList has more than one entry and the peptide data don't match for psmId: " + psmId 
+								+ ", nrseqProteinId: " + nrseqProteinId
+								+ ", proteinPosition: " + proteinPosition;
+
+						log.error( msg );
+
+						throw new ProxlWebappDataException( msg );
+					}
+				}
+			}
+
+			MonolinkDTO monolinkDTO = monolinkList.get( 0 );
 
 			int position = monolinkDTO.getPeptidePosition();
 
@@ -253,6 +279,24 @@ public class SearchPeptideMonolink {
 	}
 
 
+
+	public int getProteinPosition() {
+		return proteinPosition;
+	}
+
+	public void setProteinPosition(int proteinPosition) {
+		this.proteinPosition = proteinPosition;
+	}
+	public int getNrseqProteinId() {
+		return nrseqProteinId;
+	}
+
+	public void setNrseqProteinId(int nrseqProteinId) {
+		this.nrseqProteinId = nrseqProteinId;
+	}
+
+
+
 	
 	private ReportedPeptideDTO reportedPeptide;
 	private PeptideDTO peptide;
@@ -277,7 +321,19 @@ public class SearchPeptideMonolink {
 	private boolean numUniquePsmsSet;
 	
 
+	/**
+	 * Used to get the correct monolink record
+	 */
+	private int proteinPosition;
+	
+	/**
+	 * Used to get the correct monolink record
+	 */
+	private int nrseqProteinId;
 
+	
+	
+	
 	/**
 	 * Used for display on web page
 	 */
@@ -288,5 +344,6 @@ public class SearchPeptideMonolink {
 	 * Used for display on web page
 	 */
 	private List<String> peptideAnnotationValueList;
+
 
 }

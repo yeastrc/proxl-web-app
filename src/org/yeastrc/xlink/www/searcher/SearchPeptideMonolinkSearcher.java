@@ -607,6 +607,9 @@ public class SearchPeptideMonolinkSearcher {
 				
 				link.setSearch( searchDTO );
 				
+				link.setNrseqProteinId( proteinId );
+				link.setProteinPosition( proteinPosition );
+				
 				link.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 
 				link.setReportedPeptide( ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( rs.getInt( "reported_peptide_id" ) ) );
