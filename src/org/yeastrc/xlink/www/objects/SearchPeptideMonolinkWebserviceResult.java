@@ -39,9 +39,7 @@ public class SearchPeptideMonolinkWebserviceResult {
 
 	private ReportedPeptideDTO reportedPeptide;
 	private PeptideDTO peptide;
-	private PeptideDTO peptide2;
 	private int peptidePosition = -1;
-	private int peptidePosition2 = -1;
 	
 	
 	private int numPsms;
@@ -77,29 +75,6 @@ public class SearchPeptideMonolinkWebserviceResult {
 		this.peptide = peptide;
 	}
 
-	public PeptideDTO getPeptide2() {
-		return peptide2;
-	}
-
-	public void setPeptide2(PeptideDTO peptide2) {
-		this.peptide2 = peptide2;
-	}
-
-	public int getPeptidePosition1() {
-		return peptidePosition;
-	}
-
-	public void setPeptidePosition1(int peptidePosition1) {
-		this.peptidePosition = peptidePosition1;
-	}
-
-	public int getPeptidePosition2() {
-		return peptidePosition2;
-	}
-
-	public void setPeptidePosition2(int peptidePosition2) {
-		this.peptidePosition2 = peptidePosition2;
-	}
 
 	public int getNumPsms() {
 		return numPsms;
@@ -132,6 +107,14 @@ public class SearchPeptideMonolinkWebserviceResult {
 	public void setPeptideAnnotationValueList(
 			List<String> peptideAnnotationValueList) {
 		this.peptideAnnotationValueList = peptideAnnotationValueList;
+	}
+
+	public int getPeptidePosition() {
+		return peptidePosition;
+	}
+
+	public void setPeptidePosition(int peptidePosition) {
+		this.peptidePosition = peptidePosition;
 	}
 	
 	
