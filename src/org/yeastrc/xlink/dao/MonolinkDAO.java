@@ -187,7 +187,7 @@ public class MonolinkDAO {
 		result.setProtein(nrProteinDTO);
 		
 		result.setPeptideId( rs.getInt( "peptide_id" ) );
-		result.setPeptidePosition( rs.getInt( "peptide_id" ) );
+		result.setPeptidePosition( rs.getInt( "peptide_position" ) );
 		result.setProteinPosition( rs.getInt( "protein_position" ) );
 		
 		return result;
