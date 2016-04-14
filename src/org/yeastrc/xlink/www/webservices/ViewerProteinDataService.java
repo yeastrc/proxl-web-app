@@ -523,15 +523,14 @@ public class ViewerProteinDataService {
 
 				for ( MergedSearchProtein item : proteins ) {
 
-					for( int taxy : excludeTaxonomy ) {
-
-						if( item.getNrProtein().getTaxonomyId() == taxy ) {
-
-							continue; //  EARLY CONTINUE - Drop "item" from output list
-						}
+					Integer itemTaxonomyId = item.getNrProtein().getTaxonomyId();
+					
+					if ( excludeTaxonomy.contains( itemTaxonomyId ) ) {
+						
+						continue; //  EARLY CONTINUE - Drop "item" from output list
 					}
 
-					proteinsWithTaxonomyRemoved.add(item);  //  Not excluded so add to this list
+					proteinsWithTaxonomyRemoved.add( item );  //  Not excluded so add to this list
 				}
 
 				proteins = proteinsWithTaxonomyRemoved;  // Copy to original list for further processing
