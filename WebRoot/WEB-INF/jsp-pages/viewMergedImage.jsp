@@ -6,6 +6,8 @@
  <c:set var="pageTitle">View Search</c:set>
 
  <c:set var="pageBodyClass" >project-page view-merged-image-page</c:set>
+ 
+ <c:set var="helpURLExtensionForSpecificPage" >en/latest/using/image.html</c:set>
 
  <c:set var="headerAdditions">
  

@@ -19,6 +19,8 @@
 
  <c:set var="pageBodyClass" >project-page</c:set>
 
+ <c:set var="helpURLExtensionForSpecificPage" >en/latest/using/project.html</c:set>
+
  <c:set var="headerAdditions">
  
 

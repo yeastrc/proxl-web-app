@@ -17,7 +17,15 @@
 			
 			
 				<div id="view-spectra-overlay-header" class="view-spectra-overlay-header" style="width:100%; " >
+
 					<h1 id="view-spectra-overlay-X-for-exit-overlay" class="view-spectra-overlay-X-for-exit-overlay" >X</h1>
+
+					<div style="float: right; padding-right: 5px; padding-top: 10px;">
+				  		<a href="http://proxl-web-app.readthedocs.org/en/latest/using/spectrum-viewer.html"  target="_help_window" id="help_header_link" 
+				  			><img src="${ contextPath }/images/icon-help.png" 
+				  		></a>
+					</div>
+										
 					<h1 id="view-spectra-overlay-header-text" class="view-spectra-overlay-header-text" >Spectrum Viewer</h1>
 				</div>
 				<div id="view-spectra-overlay-body" class="view-spectra-overlay-body" >

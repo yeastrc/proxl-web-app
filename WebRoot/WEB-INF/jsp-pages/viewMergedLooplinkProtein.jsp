@@ -9,6 +9,8 @@
  <c:set var="pageTitle">View Search</c:set>
 
  <c:set var="pageBodyClass" >project-page</c:set>
+ 
+ <c:set var="helpURLExtensionForSpecificPage" >en/latest/using/merged-protein.html</c:set>
 
  <c:set var="headerAdditions">
  

@@ -6,6 +6,8 @@
 
  <c:set var="pageBodyClass" >project-page view-merged-structure-page</c:set>
 
+ <c:set var="helpURLExtensionForSpecificPage" >en/latest/using/structure.html</c:set>
+
  <c:set var="headerAdditions">
  
 		<script type="text/javascript" src="${ contextPath }/js/libs/spin.min.js"></script> 

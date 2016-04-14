@@ -10,6 +10,8 @@
 
  <c:set var="pageBodyClass" >project-page</c:set>
 
+ <c:set var="helpURLExtensionForSpecificPage" >en/latest/using/peptide.html</c:set>
+
  <c:set var="headerAdditions">
 
 		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js"></script> 

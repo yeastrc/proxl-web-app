@@ -11,6 +11,11 @@
 	    
 	  One of those 2 methods is required to be called for every page this header is included on
 
+
+
+	Page variable "helpURLExtensionForSpecificPage" specifies the extension to the Help URL for the specific page
+	
+	Page variable "helpURLExtensionForSpecificPage" is used in 2 places in this file.
 --%>
 
 
@@ -106,7 +111,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
   	  
   	   <div class="header-right-icons" style="position: relative;">
 	  	    
-	  		<a href="http://proxl-web-app.readthedocs.org/"  target="_help_window" id="help_header_link" 
+	  		<a href="http://proxl-web-app.readthedocs.org/${ helpURLExtensionForSpecificPage }"  target="_help_window" id="help_header_link" 
 	  			><img src="${ contextPath }/images/icon-help.png" 
 	  		></a>
 	  		
@@ -131,7 +136,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
   	 	<%--  icons will be to the right of username --%>
   	   <div class="header-right-icons" style="position: relative;">
 
-	  		<a href="http://proxl-web-app.readthedocs.org/"  target="_help_window" id="help_header_link" 
+	  		<a href="http://proxl-web-app.readthedocs.org/${ helpURLExtensionForSpecificPage }"  target="_help_window" id="help_header_link" 
 	  			><img src="${ contextPath }/images/icon-help.png" 
 	  		></a>
 	  	    
