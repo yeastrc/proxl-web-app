@@ -36,6 +36,16 @@ use proxl;
 
 
 
+--  (!Important!) Items on Web Pages configuration
 
+--  (Optional) HTML displayed at bottom center of page  
+--  HTML that will be displayed at the bottom center of the page.
+
+--  Example: Managed by Michael Riffle (mriffle@uw.edu) 
+
+--  Only read on Web app startup
+
+ INSERT INTO config_system (config_key, config_value) 
+ VALUES ('footer_center_of_page_html', '');
 
 

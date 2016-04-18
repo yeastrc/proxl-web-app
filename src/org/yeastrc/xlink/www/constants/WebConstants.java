@@ -11,8 +11,13 @@ public class WebConstants {
 	 */
 	public static final String APP_CONTEXT_CONTEXT_PATH = "contextPath";
 	
-	
 
+	/**
+	 * HTML to be inserted into the footer and centered 
+	 */
+	public static final String FOOTER_CENTER_OF_PAGE_HTML_KEY = "footer_center_of_page_html";
+	
+	
 
 	//////////  Cookie Key values
 

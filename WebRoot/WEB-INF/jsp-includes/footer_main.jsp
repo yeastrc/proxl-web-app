@@ -19,7 +19,7 @@
 		</div>
 		<div class="footer-center-outer-container">
 			<div class="footer-center-container">
-				Managed by Michael Riffle (mriffle@uw.edu)
+				<c:out value="${ footer_center_of_page_html }" escapeXml="false"></c:out>
 			</div>
 		</div>
 	

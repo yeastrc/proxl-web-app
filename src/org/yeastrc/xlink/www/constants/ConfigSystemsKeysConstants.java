@@ -17,4 +17,10 @@ public class ConfigSystemsKeysConstants {
 	public static final String EMAIL_SMTP_SERVER_URL_KEY = "email_smtp_server_url";
 	public static final String EMAIL_FROM_ADDRESS_URL_KEY = "email_from_address";
 	
+	
+	///   Page Content Config
+	
+	public static final String FOOTER_CENTER_OF_PAGE_HTML_KEY = "footer_center_of_page_html";
+	
+	
 }
