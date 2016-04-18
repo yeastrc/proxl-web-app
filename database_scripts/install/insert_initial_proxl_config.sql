@@ -41,9 +41,9 @@ use proxl;
 --  (Optional) HTML displayed at bottom center of page  
 --  HTML that will be displayed at the bottom center of the page.
 
---  Example: Managed by Michael Riffle (mriffle@uw.edu) 
+--  Example: Managed by Michael Riffle (<a href="mailto:mriffle@uw.edu" target="_top">mriffle@uw.edu</a>) 
 
---  Only read on Web app startup
+--  Cached in memory so if change database, need to wait or change in web app
 
  INSERT INTO config_system (config_key, config_value) 
  VALUES ('footer_center_of_page_html', '');

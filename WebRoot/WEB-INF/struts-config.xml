@@ -66,7 +66,18 @@
 		    <forward name="Success" path="/WEB-INF/jsp-pages/home.jsp" redirect="false"/>
 		</action>	
 -->		
+
 		
+		<!--  Manage Configuration  -->
+		
+		<action path="/manageConfiguration"
+				type="org.yeastrc.xlink.www.actions.ManageConfigurationPageInitAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/manageConfiguration.jsp" redirect="false"/>
+		</action>			
+				
+				
 		<action
 		   path="/user_noSession"
 		   forward="/WEB-INF/jsp-pages/user_account/no_user_session.jsp">
