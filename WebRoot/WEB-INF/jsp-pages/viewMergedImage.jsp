@@ -48,12 +48,10 @@
 <%--  End of Lorikeet Core Parts --%>		
 
 		
-			<%--  On this page also used by crosslink-image-viewer.js and crosslink-image-viewer-click-element-handlers.js --%>				
+			<%--  On this page Snap also used by crosslink-image-viewer.js and crosslink-image-viewer-click-element-handlers.js --%>				
 		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
 		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js"></script>
-
-		
 		
 		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js"></script> 
 		 
@@ -317,11 +315,7 @@
 							</c:if>
 						</select>
 					</span>
-
-					<%--
-					<a style="font-size:10pt;white-space:nowrap;" href="#" class="download-svg">[Download SVG]</a>
-					--%>
-					
+				
 					<%--  Keep these next two items together on the same line --%>
 					
 					<span style="white-space:nowrap;" >
@@ -330,16 +324,17 @@
 							>[Reset Proteins]</a>
 						<a class="tool_tip_attached_jq" data-tooltip="Orients all proteins with N-terminus on left-hand side" style="font-size:10pt;white-space:nowrap;" href="javascript:resetProteinsReversed()"
 							>[Reset Protein Flipping]</a>							
-						<%-- 
-						<input type="button" value="Reset Proteins" onClick="resetProteinOffsets()"
-							title="Align all the proteins to the left edge">
-						--%>
-							
-							
-							
-						<a data-tooltip="Download current image as SVG document, suitable for import into software that supports vector graphics, such as Adobe Illustrator." style="font-size:10pt;white-space:nowrap;" href="#" class="tool_tip_attached_jq download-svg">[Download SVG]</a>
-					</span>
 
+						<a id="download_svg_link"
+								data-tooltip="Download current image as SVG document, suitable for import into software that supports vector graphics, such as Adobe Illustrator." style="font-size:10pt;white-space:nowrap;" 
+								href="#" class="tool_tip_attached_jq download-svg">[Download SVG]</a>
+
+						<span id="download_svg_not_supported"
+								data-tooltip="Not supported in this browser." 
+								style="font-size:10pt;white-space:nowrap; display: none;" 
+								class="tool_tip_attached_jq download-svg-link-non-link">[Download SVG]</span>
+						
+					</span>
 				</div>	
 									
 					

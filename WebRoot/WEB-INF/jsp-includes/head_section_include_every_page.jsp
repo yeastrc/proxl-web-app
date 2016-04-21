@@ -17,7 +17,10 @@
 	--%>
 
 	<script type="text/javascript" src="${ contextPath }/js/libs/jquery-1.11.0.min.js"></script>
-	
+<%-- 
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.js"></script>
+--%>	
+
 	<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
 
 	<script type="text/javascript" src="${ contextPath }/js/genericToolTip.js"></script>

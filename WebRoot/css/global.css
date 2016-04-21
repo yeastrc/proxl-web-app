@@ -112,6 +112,8 @@ input[type="button"]:disabled, input[type="submit"]:disabled, .disabled-checkbox
 /* input[type="button"] */
 .submit-button:disabled { opacity:0.6;filter:alpha(opacity=60); }
 
+.download-svg-link-non-link  { opacity:0.6;filter:alpha(opacity=60); }
+
 .structure-link-non-link  { opacity:0.6;filter:alpha(opacity=60); }
 
 

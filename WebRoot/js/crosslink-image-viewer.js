@@ -203,6 +203,14 @@ var _PROTEIN_BAR_PROTEIN_NAME_LABEL_CLASS = "protein_bar_protein_name_jq";
 
 ///////////////    GLOBAL VARIABLES  ////////////////////////////////////
 
+
+//   General
+
+var _testThatCanGetSVGasString = true;
+
+
+
+
 //  From Page
 
 
@@ -789,9 +797,11 @@ function buildQueryStringFromHash() {
 	
 	var psmPeptideCutoffsForSearchIds_JSONString = JSON.stringify( cutoffs );
 
-	items.push( "psmPeptideCutoffsForSearchIds=" + psmPeptideCutoffsForSearchIds_JSONString );
+	var psmPeptideCutoffsForSearchIds_JSONStringEncoded = encodeURIComponent( psmPeptideCutoffsForSearchIds_JSONString );
 
-	
+	items.push( "psmPeptideCutoffsForSearchIds=" + psmPeptideCutoffsForSearchIds_JSONStringEncoded );
+
+
 	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
 		items.push( "filterNonUniquePeptides=on" );
 	}
@@ -3156,7 +3166,33 @@ function drawSvg() {
 	}
 	*/
 	
+	
+	if ( _testThatCanGetSVGasString ) {
 
+		//////////////////
+
+		//   disable download SVG if not able to get SVG as String
+
+
+		var getSVGContentsAsStringResults = getSVGContentsAsString();
+
+		if ( getSVGContentsAsStringResults.noPageElement ) {
+			
+			alert( "No Page Element " );  //  TODO   Remove
+		
+		} else {
+
+			_testThatCanGetSVGasString = false;  // Only test once
+
+			if ( getSVGContentsAsStringResults.error ) {
+
+				//  Cannot get SVG contents as string so disable "Download SVG" link
+
+				$( "#download_svg_link" ).hide();
+				$( "#download_svg_not_supported" ).show();
+			}
+		}
+	}
 }
 
 
@@ -5501,11 +5537,82 @@ function makeArcPath( direction, startx, starty, endx, endy ) {
 	return path;
 }
 
-function downloadSvg() {
+/////////////////////////////
+
+function downloadSvg( params ) {
 	
-	var uriContent = "data:application/svg+xml," + encodeURIComponent( "<svg id=\"svg\">" + $( "svg#svg" ).html() +"</svg>");
-	var myWindow = window.open(uriContent, "crosslink.svg");
-	myWindow.focus();
+	var clickedThis = params.clickedThis;
+	
+	var $clickedThis = $( clickedThis );
+	
+	var getSVGContentsAsStringResult = getSVGContentsAsString();
+	
+	if ( getSVGContentsAsStringResult.noPageElement ) {
+		
+		return;
+	}
+
+	if ( getSVGContentsAsStringResult.error ) {
+		
+		//  TODO Display ERROR Message
+		
+		//  Cannot get SVG contents as string so disable "Download SVG" link
+
+		$( "#download_svg_link" ).hide();
+		$( "#download_svg_not_supported" ).show();
+		
+		return;
+	}
+	 
+	var fullSVG_String = getSVGContentsAsStringResult.fullSVG_String;
+		
+	var svgBase64Ecoded = Base64.encode( fullSVG_String );
+	var hrefString = "data:application/svg+xml;base64," + svgBase64Ecoded;
+
+	var dateForFilename = new Date().toISOString().slice(0, 19).replace(/-/g, "");
+
+	var downloadFilename = "crosslinks-" + dateForFilename + ".svg";
+
+	$clickedThis.attr("href", hrefString ).attr("download", downloadFilename );
+
+	
+	//  OLD
+	
+//	var uriContent = "data:application/svg+xml," + encodeURIComponent( "<svg id=\"svg\">" + $( "svg#svg" ).html() +"</svg>");
+//	var myWindow = window.open(uriContent, "crosslink.svg");
+//	myWindow.focus();
+}
+
+
+function getSVGContentsAsString() {
+
+	try {
+
+		var $svg_image_inner_container_div__svg_merged_image_svg_jq = $( "#svg_image_inner_container_div svg.merged_image_svg_jq " );
+
+		if ( $svg_image_inner_container_div__svg_merged_image_svg_jq.length === 0 ) {
+
+			//  No SVG element found
+
+			return { noPageElement : true };   //  EARLY EXIT
+		}
+
+		// In Edge, svgElement.innerHTML === undefined    This causes .html() to fail with exception
+		
+		//  svgContents contains the inner contents of the <svg> element
+		
+		var svgContents = $svg_image_inner_container_div__svg_merged_image_svg_jq.html();
+		
+		var fullSVG_String = "<svg id=\"svg\">" + svgContents +"</svg>";
+		
+		return { fullSVG_String : fullSVG_String};
+
+	} catch( e ) {
+		
+		//  Not all browsers have svgElement.innerHTML which .html() tries to use, causing an exception
+		
+		return { error : true };
+	}
 }
 
 
@@ -5665,15 +5772,9 @@ function initializeViewer()  {
 		drawSvg();
 	});
 
-	$( "a.download-svg" ).click( function() {
-		var d = new Date().toISOString().slice(0, 19).replace(/-/g, "");
-		var $svg_image_inner_container_div__svg_merged_image_svg_jq = $( "#svg_image_inner_container_div svg.merged_image_svg_jq " );
-		var svgContents = $svg_image_inner_container_div__svg_merged_image_svg_jq.html();
-		var fullSVG_String = "<svg id=\"svg\">" + svgContents +"</svg>";
-		var svgBase64Ecoded = Base64.encode( fullSVG_String );
-		var hrefString = "data:application/svg+xml;base64," + svgBase64Ecoded;
-		var downloadFilename = "crosslinks-" + d + ".svg";
-		$(this).attr("href", hrefString ).attr("download", downloadFilename );
+	$( "#download_svg_link" ).click( function() {
+		
+		downloadSvg( { clickedThis : this } );
 	});
 	
 	
