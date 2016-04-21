@@ -53,23 +53,39 @@ var getListConfiguration = function() {
 
 var getListConfigurationResponse = function(requestData, responseData) {
 
-	var $invited_people = $("#invited_people_current_users");
+	var configList = responseData.configList;
+	
+	var $config_key_footer_center_of_page_html = $( "#config_key_footer_center_of_page_html" );
+	var $config_key_email_from_address = $( "#config_key_email_from_address" );
+	var $config_key_email_smtp_server_url = $( "#config_key_email_smtp_server_url" );
 
-	$invited_people.empty();
+	var config_key_footer_center_of_page_html_Val = $config_key_footer_center_of_page_html.val();
+	var config_key_email_from_address_Val = $config_key_email_from_address.val();
+	var config_key_email_smtp_server_url_Val = $config_key_email_smtp_server_url.val();
+	
+	
+	var $input_footer_center_of_page_html = $( "#input_footer_center_of_page_html" );
+	var $input_email_from_address = $( "#input_email_from_address" );
+	var $input_email_smtp_server_url = $( "#input_email_smtp_server_url" );
 
-	if (responseData && responseData.length > 0) {
-
-		var access_level_id_administrator_String = $("#access_level_id_administrator").val();
-		var access_level_id_user_String = $("#access_level_id_user").val();
-
-		if ( access_level_id_administrator_String === undefined || 
-				access_level_id_administrator_String === null || 
-				access_level_id_administrator_String === "" ) {
-
-			throw "No value for hidden field with id 'access_level_id_administrator'";
+	for ( var configListIndex = 0; configListIndex < configList.length; configListIndex++ ) {
+	
+		var configListItem = configList[ configListIndex ];
+		
+		if ( configListItem.configKey === config_key_footer_center_of_page_html_Val ) {
+			
+			$input_footer_center_of_page_html.val( configListItem.configValue );
+			
+		} else if ( configListItem.configKey === config_key_email_from_address_Val ) {
+			
+			$input_email_from_address.val( configListItem.configValue );
+			
+		} else if ( configListItem.configKey === config_key_email_smtp_server_url_Val ) {
+			
+			$input_email_smtp_server_url.val( configListItem.configValue );
 		}
-
 	}
+
 };
 
 
@@ -77,87 +93,26 @@ var getListConfigurationResponse = function(requestData, responseData) {
 
 
 
-function initAdmin() {
-
-	var $logged_in_user_id = $("#logged_in_user_id");
-
-
-	if ( $logged_in_user_id.length === 0 ) {
-
-		throw "Unable to find hidden field '#logged_in_user_id'";
-	}
-
-	var logged_in_user_id = $("#logged_in_user_id").val();
-
-	if (logged_in_user_id === undefined || logged_in_user_id === null
-			|| logged_in_user_id.length === 0) {
-
-		throw "No value in hidden field '#logged_in_user_id' ";
-	}
-
-	try {
-		adminGlobals.logged_in_user_id = parseInt(logged_in_user_id, 10);
-	} catch (ex) {
-
-		throw "failed to parse logged_in_user_id: " + logged_in_user_id;
-	}
-
-	if ( isNaN( adminGlobals.logged_in_user_id ) ) {
-
-		throw "failed to parse logged_in_user_id (parse to NaN): " + logged_in_user_id;
-	}
-
-
-	$("#invite_user_button").click(function(eventObject) {
+function initPage() {
+	
+//	<input type="button" value="Save" id="save_button">
+//	<input type="button" value="Reset" id="reset_button">
+	
+	$("#save_button").click(function(eventObject) {
 
 		var clickThis = this;
 
-		invitePerson( clickThis );
-
 		return false;
 	});
 
-	$(".invite_user_expand_link_jq").click(function(eventObject) {
-
-		$("#invite_user_collapsed").hide();
-		$("#invite_user_expanded").show();
-
-		return false;
-	});
-
-
-	$(".invite_user_cancel_button_jq").click(function(eventObject) {
-
-		clearInviteUserField();
-
-		$("#invite_user_collapsed").show();
-		$("#invite_user_expanded").hide();
-
-		return false;
-	});
-
-
-
-	$("#revoke_invite_to_project_confirm_button").click(function(eventObject) {
+	$("#reset_button").click(function(eventObject) {
 
 		var clickThis = this;
 
-		revokePersonInviteConfirmed( clickThis, eventObject );
-
 		return false;
 	});
 
-	$(".revoke_invite_to_project_overlay_show_hide_parts_jq").click(function(eventObject) {
-
-		var clickThis = this;
-
-		closeRevokePersonInviteOverlay( clickThis, eventObject );
-
-		return false;
-	});
-
-
-	updateInvitedPeopleCurrentUsersLists();
+	getListConfiguration();
 
 };
 
@@ -166,6 +121,6 @@ function initAdmin() {
 
 $(document).ready(function() {
 
-	initAdmin();
+	initPage();
 
 });

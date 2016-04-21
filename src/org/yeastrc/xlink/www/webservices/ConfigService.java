@@ -1,5 +1,7 @@
 package org.yeastrc.xlink.www.webservices;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 // import javax.servlet.http.HttpSession;
 
@@ -14,6 +16,8 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
+import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
+import org.yeastrc.xlink.www.dto.ConfigSystemDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -84,8 +88,12 @@ public class ConfigService {
 
 			//////////////////////////////////////////
 
+			
 			ConfigListResult configListResult = new ConfigListResult();
 			
+			List<ConfigSystemDTO> configList = ConfigSystemDAO.getInstance().getAll();
+			
+			configListResult.setConfigList( configList );
 			
 			return configListResult;
 
@@ -133,7 +141,15 @@ public class ConfigService {
 	 */
 	private static class ConfigListResult {
 		
-		
+		private List<ConfigSystemDTO> configList;
+
+		public List<ConfigSystemDTO> getConfigList() {
+			return configList;
+		}
+
+		public void setConfigList(List<ConfigSystemDTO> configList) {
+			this.configList = configList;
+		}
 	}
 	
 }
