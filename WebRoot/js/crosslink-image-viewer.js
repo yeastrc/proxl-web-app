@@ -50,6 +50,7 @@ var PROTEIN_SELECTOR_HANDLEBARS_STRING = "\t<option value=\"{{ proteinId }}\">{{
 var PROTEIN_BAR_DATA_ARRAY_INDEX_ATTR_NAME = "data-protein_bars_data_array_index";
 
 
+
 //////  Code flow constants
 
 //   These turn on and off certain features under consideration
@@ -210,6 +211,100 @@ var _PROTEIN_BAR_PROTEIN_NAME_LABEL_CLASS = "protein_bar_protein_name_jq";
 var _PROTEIN_BAR_GROUP_ON_TOP_OF_MAIN_RECTANGLE_LABEL_CLASS = "protein_bar_group_on_top_of_main_rectangle_jq";
 
 
+////////////////////////////////////////////////////////////////////////
+
+//  Mapping to/from JSON put on Hash in URL
+
+
+//  Hash properties.  
+
+//  The property names are referenced in this code
+//  The property values are used as the property names in the JSON stored on the Hash
+
+//  !!  Important !!  	Two properties cannot have the same value.
+//	A value cannot be re-used for a new property 
+
+var HASH_OBJECT_PROPERTIES = {
+
+		excludeTaxonomy : "a",
+		excludeType : "b",
+		cutoffs : "c",
+
+		filterNonUniquePeptides : "d",
+		filterOnlyOnePSM : "e",
+		filterOnlyOnePeptide : "f",
+
+		"show-self-crosslinks" : "g",
+		"show-crosslinks" : "h",
+		"show-looplinks" : "i",
+		"show-monolinks" : "k",
+		"show-protein-termini" : "l",
+		"show-linkable-positions" : "m",
+		"show-tryptic-cleavage-positions" : "n",
+		"show-scalebar" : "o",
+
+		"shade-by-counts" : "p",
+		"color-by-search" : "q",
+		"automatic-sizing" : "r",
+		"protein_names_position" /* PROTEIN_NAMES_POSITION_HASH_JSON_PROPERTY_NAME */ : "s",
+		"annotation_type" : "t",
+		"vertical-bar-spacing" : "u",
+		"horizontal-bar-scaling" : "v",
+		"protein_bar_data" : "w",
+
+		"selected-proteins" : "x"
+
+};
+
+
+
+var hashObjectManager = {
+
+		hashObject : {},
+
+		resetHashObject : function() {
+
+			this.hashObject = {};
+
+		},
+
+		setOnHashObject : function( property, value ) {
+
+			if ( property === undefined || property === null ) {
+				
+				throw "property not found in 'HASH_OBJECT_PROPERTIES' ";
+			}
+
+			this.hashObject[ property ] = value;
+		},
+		
+		getFromHashObject : function( property ) {
+
+			if ( property === undefined || property === null ) {
+				
+				throw "property not found in 'HASH_OBJECT_PROPERTIES' ";
+			}
+			
+			return this.hashObject[ property ];
+
+		},
+		
+		getHashObject : function() {
+			
+			return this.hashObject;
+		},
+
+		setHashObject : function( hashObject ) {
+			
+			this.hashObject = hashObject;
+		},
+		
+		
+
+};
+
+
+
 
 /////////////////////////////////////////////////////////////////////////
 
@@ -226,9 +321,11 @@ var _proteinBarRegionSelectionsOverlayCode = ProteinBarRegionSelectionsOverlayCo
 
 
 
+
 //   General
 
 var _testThatCanGetSVGasString = true;
+
 
 
 
@@ -416,54 +513,83 @@ function getCurrentRightmostProteinEdge( ) {
 // get values for variables from the hash part of the URL as JSON
 function getJsonFromHash() {
 	
-	var json;
+	var jsonFromHash;
 
 	var windowHash = window.location.hash;
 	
 	if ( windowHash === "" || windowHash === "#" ) {
 		
-		//  Set cutoff defaults if not in JSON
-			
-		json = { 
+		//  No Hash value so set defaults and return
+		
+		jsonFromHash = { 
 				cutoffs : getCutoffDefaultsFromPage(),
 				
 				'excludeType' : EXCLUDE_LINK_TYPE_DEFAULT
 		};
 		
-		return json;
-		
-//		return null;
+		return jsonFromHash;
 	}
 	
 	var windowHashContentsMinusHashChar = windowHash.slice( 1 );
-	
-	try {
-		
-		// if this works, the hash contains native (non encoded) JSON
-		json = JSON.parse( windowHashContentsMinusHashChar );
-	} catch( e ) {
-		
-		// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURI( windowHashContentsMinusHashChar )
-		
-		var windowHashContentsMinusHashCharDecodeURI = decodeURI( windowHashContentsMinusHashChar );
-		
-		try {
-			json = JSON.parse( windowHashContentsMinusHashCharDecodeURI );
-		} catch( e2 ) {
-			
 
-			// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURIComponent( windowHashContentsMinusHashChar )
-			
-			var windowHashContentsMinusHashCharDecodeURIComponent = decodeURIComponent( windowHashContentsMinusHashChar );
+
+	// Try first:  the hash contained Compressed URI-encoded JSON, try decoding using decodeURIComponent( windowHashContentsMinusHashChar )
+
+	var windowHashContentsMinusHashCharDecompressedDecodeURIComponent = LZString.decompressFromEncodedURIComponent( windowHashContentsMinusHashChar );
+
+	jsonFromHash = JSON.parse( windowHashContentsMinusHashCharDecompressedDecodeURIComponent );
+	
+	if ( jsonFromHash === null || jsonFromHash === undefined ) {
+
+		try {
+
+			// if this works, the hash contains native (non encoded) JSON
+			jsonFromHash = JSON.parse( windowHashContentsMinusHashChar );
+		} catch( e ) {
+
+			// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURI( windowHashContentsMinusHashChar )
+
+			var windowHashContentsMinusHashCharDecodeURI = decodeURI( windowHashContentsMinusHashChar );
 
 			try {
-				json = JSON.parse( windowHashContentsMinusHashCharDecodeURIComponent );
-			} catch( e3 ) {
-				
+				jsonFromHash = JSON.parse( windowHashContentsMinusHashCharDecodeURI );
+			} catch( e2 ) {
 
-				throw "Failed to parse window hash string as JSON and decodeURI and then parse as JSON.  windowHashContentsMinusHashChar: " 
-				+ windowHashContentsMinusHashChar;
+
+				// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURIComponent( windowHashContentsMinusHashChar )
+
+				var windowHashContentsMinusHashCharDecodeURIComponent = decodeURIComponent( windowHashContentsMinusHashChar );
+
+				try {
+					jsonFromHash = JSON.parse( windowHashContentsMinusHashCharDecodeURIComponent );
+				} catch( e3 ) {
+
+					throw "Failed to parse window hash string as JSON and decodeURI and then parse as JSON.  windowHashContentsMinusHashChar: " 
+					+ windowHashContentsMinusHashChar;
+
+				}
 			}
+		}
+	}
+	
+	//   Transform json on hash to expected object for rest of the code
+	
+	var json = jsonFromHash;
+	
+	
+	var hashPropertiesConstantsKeys = Object.keys( HASH_OBJECT_PROPERTIES );
+
+	for ( var hashPropertiesConstantsKeysIndex = 0; hashPropertiesConstantsKeysIndex < hashPropertiesConstantsKeys.length; hashPropertiesConstantsKeysIndex++ ) {
+
+		var jsonPropertyKey = hashPropertiesConstantsKeys[ hashPropertiesConstantsKeysIndex ];
+
+		var hashPropertyKey = HASH_OBJECT_PROPERTIES[ jsonPropertyKey ];
+		
+		var valueForHashPropertyKey = jsonFromHash[ hashPropertyKey ];
+		
+		if ( valueForHashPropertyKey !== undefined ) {
+
+			json[ jsonPropertyKey ] = valueForHashPropertyKey;
 		}
 	}
 	
@@ -522,7 +648,11 @@ function getCutoffDefaultsFromPage() {
 
 function getValuesFromForm() {
 
-	var items = { };
+	
+	///// Called before this function is called
+	
+//	hashObjectManager.resetHashObject();
+
 
 	
 	var getCutoffsFromThePageResult = cutoffProcessingCommonCode.getCutoffsFromThePage(  {  } );
@@ -544,26 +674,26 @@ function getValuesFromForm() {
 	
 
 	
-	
-	items[ 'cutoffs' ] = outputCutoffs;
-	
-	
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.cutoffs, outputCutoffs );
 
-	if ( $( "input#filterNonUniquePeptides" ).is( ':checked' ) )
-		items[ 'filterNonUniquePeptides' ] = true;
-	else
-		items[ 'filterNonUniquePeptides' ] = false;
 
-	if ( $( "input#filterOnlyOnePSM" ).is( ':checked' ) )
-		items[ 'filterOnlyOnePSM' ] = true;
-	else
-		items[ 'filterOnlyOnePSM' ] = false;
+	if ( $( "input#filterNonUniquePeptides" ).is( ':checked' ) ) {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterNonUniquePeptides, true );
+	} else {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterNonUniquePeptides, false );
+	}
 
-	if ( $( "input#filterOnlyOnePeptide" ).is( ':checked' ) )
-		items[ 'filterOnlyOnePeptide' ] = true;
-	else
-		items[ 'filterOnlyOnePeptide' ] = false;
+	if ( $( "input#filterOnlyOnePSM" ).is( ':checked' ) ) {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePSM, true );
+	} else {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePSM, false );
+	}
 
+	if ( $( "input#filterOnlyOnePeptide" ).is( ':checked' ) ) {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePeptide, true );
+	} else {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePeptide, false );
+	}
 
 	var xTax = new Array();
 	var taxKeys = Object.keys( _taxonomies );
@@ -577,7 +707,8 @@ function getValuesFromForm() {
 		}
 	}
 
-	items[ 'excludeTaxonomy' ] = xTax;		
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.excludeTaxonomy, xTax );
+
 
 	var xType = new Array();
 	for ( var excludeTypeIndex = 0; excludeTypeIndex < 5; excludeTypeIndex++ ) {			
@@ -585,10 +716,8 @@ function getValuesFromForm() {
 			xType.push( excludeTypeIndex );
 		}
 	}
-
-	items[ 'excludeType' ] = xType;	
-
-	return items;
+	
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.excludeType, xType );
 }
 
 
@@ -599,147 +728,144 @@ function getValuesFromForm() {
 //build a query string based on selections by user
 function updateURLHash( useSearchForm ) {
 
-	var items = { };
-
-
-//	DO NOT put anything in "items" before this "if" statement.
-//	The "else" of this "if" replaces the contents of "items"
-
+	hashObjectManager.resetHashObject();
 
 	if ( ! useSearchForm ) {
 
 //		build hash string from previous search, they've just updated the drawing
 
 //		add taxonomy exclusions
-		items[ 'excludeTaxonomy' ] = _excludeTaxonomy;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.excludeTaxonomy, _excludeTaxonomy );
 
 //		add type exclusions
-		items[ 'excludeType' ] = _excludeType;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.excludeType, _excludeType );
 
 //		add psm/peptide cutoffs
-		items[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.cutoffs, _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject() );
 
 //		add filter out non unique peptides
-		items[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterNonUniquePeptides, _filterNonUniquePeptides );
 
 //		add filter out non unique peptides
-		items[ 'filterOnlyOnePSM' ] = _filterOnlyOnePSM;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePSM, _filterOnlyOnePSM );
 
 //		add filter out non unique peptides
-		items[ 'filterOnlyOnePeptide' ] = _filterOnlyOnePeptide;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePeptide, _filterOnlyOnePeptide );
 
 	} else {
 
 //		build hash string from values in form, they've requested a data refresh
 
-		var formValues = getValuesFromForm();
-
-		if ( formValues === null ) {
-
-			return null;  //  EARLY EXIT
-		}
-
-//		nothing in items yet so just copy
-
-		items = formValues;
-
+		getValuesFromForm();
 	}
 
 
 //	load in settings from viewer section
 	if ( $( "input#show-self-crosslinks" ).is( ':checked' ) ) {
-		items[ 'show-self-crosslinks' ] = true;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-self-crosslinks"], true );
 	} else {
-		items[ 'show-self-crosslinks' ] = false;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-self-crosslinks"], false );
 	}
 
 	if ( $( "input#show-crosslinks" ).is( ':checked' ) ) {
-		items[ 'show-crosslinks' ] = true;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-crosslinks"], true );
 	} else {
-		items[ 'show-crosslinks' ] = false;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-crosslinks"], false );
 	}
 
 	if ( $( "input#show-looplinks" ).is( ':checked' ) ) {
-		items[ 'show-looplinks' ] = true;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-looplinks"], true );
 	} else {
-		items[ 'show-looplinks' ] = false;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-looplinks"], false );
 	}
 
 	if ( $( "input#show-monolinks" ).is( ':checked' ) ) {
-		items[ 'show-monolinks' ] = true;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-monolinks"], true );
 	} else {
-		items[ 'show-monolinks' ] = false;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-monolinks"], false );
 	}
 	
 
 	if ( $( "input#show-protein-termini" ).is( ':checked' ) ) {
-		items[ 'show-protein-termini' ] = true;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-protein-termini"], true );
 	} else {
-		items[ 'show-protein-termini' ] = false;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-protein-termini"], false );
 	}
 	
 
 	if ( $( "input#show-linkable-positions" ).is( ':checked' ) ) {
-		items[ 'show-linkable-positions' ] = true;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-linkable-positions"], true );
 	} else {
-		items[ 'show-linkable-positions' ] = false;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-linkable-positions"], false );
 	}
 	
 	if ( $( "input#show-tryptic-cleavage-positions" ).is( ':checked' ) ) {
-		items[ 'show-tryptic-cleavage-positions' ] = true;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-tryptic-cleavage-positions"], true );
 	} else {
-		items[ 'show-tryptic-cleavage-positions' ] = false;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-tryptic-cleavage-positions"], false );
 	}	
 
 	if ( $( "input#show-scalebar" ).is( ':checked' ) ) {
-		items[ 'show-scalebar' ] = true;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-scalebar"], true );
 	} else {
-		items[ 'show-scalebar' ] = false;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["show-scalebar"], false );
 	}
 
-//	if ( $( "input#show-coverage" ).is( ':checked' ) ) {
-//		items[ 'show-coverage' ] = true;
-//	} else {
-//		items[ 'show-coverage' ] = false;
-//	}
-
 	if ( $( "input#shade-by-counts" ).is( ':checked' ) ) {
-		items[ 'shade-by-counts' ] = true;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["shade-by-counts"], true );
 	}
 
 	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
-		items[ 'color-by-search' ] = true;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["color-by-search"], true );
 	}
 
 	if ( !isSizingAutomatic() ) {
-		items[ 'automatic-sizing' ] = false;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["automatic-sizing"], false );
 	}
 
 	if ( $( "input#protein_names_position_left" ).is( ':checked' ) ) {
-		items[ PROTEIN_NAMES_POSITION_HASH_JSON_PROPERTY_NAME ] = PROTEIN_NAMES_POSITION_LEFT;
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["protein_names_position"], PROTEIN_NAMES_POSITION_LEFT );
 	}
 	
 	
-	items[ 'annotation_type' ] = $("#annotation_type").val();
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["annotation_type"], $("#annotation_type").val() );
 
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["vertical-bar-spacing"], _singleProteinBarOverallHeight );
 
-	items[ 'vertical-bar-spacing' ] = _singleProteinBarOverallHeight;
-	
-	items[ 'horizontal-bar-scaling' ] = _horizontalScalingPercent;
-	
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["horizontal-bar-scaling"], _horizontalScalingPercent );
+
 	
 	//  Add in protein bar data
-	items[ 'protein_bar_data' ] = _imageProteinBarDataManager.getArrayOfObjectsForHash();
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["protein_bar_data"], _imageProteinBarDataManager.getArrayOfObjectsForHash() );
 	
 //	add in the selected proteins
-	items[ 'selected-proteins' ] = getAllSelectedProteins();
-	
-	
-	var newHash = JSON.stringify( items );
-	
-	var newHashEncoded = encodeURIComponent( newHash );
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["selected-proteins"], getAllSelectedProteins() );
 
-	window.location.hash = newHashEncoded;
+	
+	
+	var hashObject = hashObjectManager.getHashObject();
+	
+	var newHash = JSON.stringify( hashObject );
+
+//	var newHashLength = newHash.length;
+	
+	var newHashEncodedToEncodedURIComponent = LZString.compressToEncodedURIComponent( newHash );
+	
+//	var newHashEncodedToEncodedURIComponentLength = newHashEncodedToEncodedURIComponent.length;
+	
+	try {
+
+		window.location.hash = newHashEncodedToEncodedURIComponent;
+		
+	} catch ( e ) {
+
+		//  TODO  Need to handle this error.  
+		
+		//     The user really shouldn't continue since the settings are not being stored in the Hash
+		
+		console.log( "Update window.location.hash Failed: e: " + e );
+	}
+
 }
 
 
@@ -4870,6 +4996,22 @@ function addSingleProteinBarGroup( i, protein, proteinNamePositionLeftSelected, 
 	///   function to create the tool tip contents and update the tool tip.  Called on mouseover and mousemove.
 	
 	var proteinBarOverlayRectangleToolTipTextFcn = function( eventObject, qtipAPI /* qtip "api" variable/property */ ) {
+		
+		//  eventObject  is a jQuery object.
+		
+		
+		//  Another option for getting the offset left for the protein bar overlay rectangle.
+		
+		//     This appears to produce the correct result but not fully researched or tested.
+		
+//		var eventTarget = eventObject.target;
+//		
+//		var $eventTarget = $( eventTarget );
+//		
+//		var eventTargetOffset = $eventTarget.offset();
+//		
+//		var eventTargetOffsetLeft = eventTargetOffset.left;
+		
 		
 		// get mouse position, not using the "Y" axis value
 		var eventpageX = eventObject.pageX;

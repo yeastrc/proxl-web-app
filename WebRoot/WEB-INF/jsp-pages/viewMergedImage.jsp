@@ -15,8 +15,20 @@
 		<script type="text/javascript" src="${ contextPath }/js/libs/spin.min.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/base64.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
-		
 
+		<%--  Compression --%>
+		
+		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/lz-string.min.js"></script>
+		
+		<%--  Non-Minified version --%>
+		<%-- 
+		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/lz-string.js"></script>
+		--%>
+		
+		<%--  Used by lz-string.min.js --%>
+		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/base64-string.js"></script>
+
+		
 		
 		<!-- Handlebars templating library   -->
 		
@@ -332,15 +344,10 @@
 							href="javascript:resetProteinsReversed()"
 							>[Reset Protein Flipping]</a>							
 
-
 						<a class="tool_tip_attached_jq" data-tooltip="Protein Selection Regions Management" style="font-size:10pt;white-space:nowrap;" 
 							href="javascript:" onclick="_proteinBarRegionSelectionsOverlayCode.openOverlay()"
 							>[Manage Protein Selections]</a>							
 							
-							
-							
-						<a data-tooltip="Download current image as SVG document, suitable for import into software that supports vector graphics, such as Adobe Illustrator." style="font-size:10pt;white-space:nowrap;" href="#" class="tool_tip_attached_jq download-svg">[Download SVG]</a>
-					</span>
 
 
 						<a id="download_svg_link"

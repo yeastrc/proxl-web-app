@@ -1034,13 +1034,66 @@ ImageProteinBarData.prototype.getHashDataObject = function() {
 	
 	hashDataObject.proteinId = this.proteinId;
 	
-	hashDataObject.proteinBarHighlightedAll = this.proteinBarHighlightedAll;
-	hashDataObject.proteinBarHighlightedRegions = this.proteinBarHighlightedRegions;
-	hashDataObject.proteinReversed = this.proteinReversed;
-	hashDataObject.proteinOffset = this.proteinOffset;
+	hashDataObject.pHlhAll = this.proteinBarHighlightedAll;
+	hashDataObject.pHlghRgns = this.proteinBarHighlightedRegions;
+	hashDataObject.pRvrs = this.proteinReversed;
+	hashDataObject.pOffst = this.proteinOffset;
 	
 	return hashDataObject;
 };
+
+
+
+///  Construct object of type ImageProteinBarData from hashDataObject.  The parameter hashDataObject comes from the Hash
+
+ImageProteinBarData.constructImageProteinBarDataFromHashDataObject = function( hashDataObject ) {
+
+//	Create an instance from the constructor
+
+	var imageProteinBarData = new ImageProteinBarData();
+
+	if ( hashDataObject ) {
+
+//		Copy data from hashDataObject
+
+		imageProteinBarData.proteinId = hashDataObject.proteinId;
+		imageProteinBarData.proteinIdIsSelected = true;  //  always true for values from hash
+
+		imageProteinBarData.proteinBarHighlightedAll = hashDataObject.pHlhAll;
+		imageProteinBarData.proteinBarHighlightedRegions = hashDataObject.pHlghRgns;
+
+		imageProteinBarData.proteinReversed = hashDataObject.pRvrs;
+		imageProteinBarData.proteinOffset  = hashDataObject.pOffst;
+		
+		//  Backwards compatible:
+		
+		if ( hashDataObject.proteinBarHighlightedAll ) {
+
+			imageProteinBarData.proteinBarHighlightedAll = hashDataObject.proteinBarHighlightedAll;
+		}
+		if ( hashDataObject.proteinBarHighlightedAll ) {
+
+			imageProteinBarData.proteinBarHighlightedRegions = hashDataObject.proteinBarHighlightedRegions;
+		}
+
+		if ( hashDataObject.proteinReversed ) {
+
+			imageProteinBarData.proteinReversed = hashDataObject.proteinReversed;
+		}
+		if ( hashDataObject.proteinOffset !== undefined ) {
+
+			imageProteinBarData.proteinOffset  = hashDataObject.proteinOffset;
+		}
+		
+		if ( imageProteinBarData.proteinOffset === undefined ) {
+			
+			imageProteinBarData.proteinOffset = 0;
+		}
+	}
+
+	return imageProteinBarData;
+};
+
 
 
 //////////
@@ -1055,34 +1108,6 @@ ImageProteinBarData.constructEmptyImageProteinBarData = function(  ) {
 	
 	imageProteinBarData.proteinOffset = 0;
 
-	return imageProteinBarData;
-};
-
-
-//////////
-
-///  Construct object of type ImageProteinBarData from hashDataObject.  The parameter hashDataObject comes from the Hash
-
-ImageProteinBarData.constructImageProteinBarDataFromHashDataObject = function( hashDataObject ) {
-	
-	//	Create an instance from the constructor
-
-	var imageProteinBarData = new ImageProteinBarData();
-
-	if ( hashDataObject ) {
-		
-		//  Copy data from hashDataObject
-		
-		imageProteinBarData.proteinId = hashDataObject.proteinId;
-		imageProteinBarData.proteinIdIsSelected = true;  //  always true for values from hash
-
-		imageProteinBarData.proteinBarHighlightedAll = hashDataObject.proteinBarHighlightedAll;
-		imageProteinBarData.proteinBarHighlightedRegions = hashDataObject.proteinBarHighlightedRegions;
-
-		imageProteinBarData.proteinReversed = hashDataObject.proteinReversed;
-		imageProteinBarData.proteinOffset  = hashDataObject.proteinOffset;
-	}
-	
 	return imageProteinBarData;
 };
 
