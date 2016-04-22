@@ -67,6 +67,10 @@
 
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-click-element-handlers.js"></script>
 
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-per-protein-bar-data.js"></script> 
+
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-region-selections.js"></script> 
+
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer.js"></script> 
 		
 				<%-- 
@@ -263,7 +267,7 @@
 				
 				<div >
 
-					<span class="tool_tip_attached_jq" data-tooltip="Add a selector for adding another protein bar to the image" style="margin-left:10px;" id="svg-protein-selector_location"><a href="javascript:addProteinSelect()">+Protein</a></span>
+					<span class="tool_tip_attached_jq" data-tooltip="Add a selector for adding another protein bar to the image" style="margin-left:10px;" id="svg-protein-selector_location"><a href="javascript:" onclick="addProteinSelect()">+Protein</a></span>
 				</div>
 
 
@@ -320,10 +324,24 @@
 					
 					<span style="white-space:nowrap;" >
 
-						<a class="tool_tip_attached_jq" data-tooltip="Reset left edge of all protein bars to default position" style="font-size:10pt;white-space:nowrap;" href="javascript:resetProteinOffsets()"
+						<a class="tool_tip_attached_jq" 
+							data-tooltip="Reset Proteins highlighting, flipping, positioning, and horizontal scaling"  
+							href="javascript:resetProteins()"  style="font-size:10pt;white-space:nowrap;"
 							>[Reset Proteins]</a>
-						<a class="tool_tip_attached_jq" data-tooltip="Orients all proteins with N-terminus on left-hand side" style="font-size:10pt;white-space:nowrap;" href="javascript:resetProteinsReversed()"
+						<a class="tool_tip_attached_jq" data-tooltip="Orients all proteins with N-terminus on left-hand side" style="font-size:10pt;white-space:nowrap;" 
+							href="javascript:resetProteinsReversed()"
 							>[Reset Protein Flipping]</a>							
+
+
+						<a class="tool_tip_attached_jq" data-tooltip="Protein Selection Regions Management" style="font-size:10pt;white-space:nowrap;" 
+							href="javascript:" onclick="_proteinBarRegionSelectionsOverlayCode.openOverlay()"
+							>[Manage Protein Selections]</a>							
+							
+							
+							
+						<a data-tooltip="Download current image as SVG document, suitable for import into software that supports vector graphics, such as Adobe Illustrator." style="font-size:10pt;white-space:nowrap;" href="#" class="tool_tip_attached_jq download-svg">[Download SVG]</a>
+					</span>
+
 
 						<a id="download_svg_link"
 								data-tooltip="Download current image as SVG document, suitable for import into software that supports vector graphics, such as Adobe Illustrator." style="font-size:10pt;white-space:nowrap;" 
@@ -379,7 +397,7 @@
 			
 		</div>
 
-		<%-- !!!   Handlebars templates for SVG image addtions and Tool Tips  !!!!!!!!!   --%>
+		<%-- !!!   Handlebars templates for SVG image additions and Tool Tips  !!!!!!!!!   --%>
 		
 
 
@@ -622,6 +640,102 @@
 		</div>  <%--  END  <div id="view_link_info_overlay_div" class=" view-link-info-overlay-div " style="display: none; "  > --%>
 	
 			
+			
+		<%--  --------------------------------------------------------------------  --%>
+	
+
+			<%--  View Protein Bar Highlighting Overlay Div,  this overlay div is for setting highlighting regions --%>
+
+			
+				<%--  View Protein Bar Highlighting Overlay Background --%>
+			
+			
+			<div id="view_protein_bar_highlighting_modal_dialog_overlay_background" class="view-protein-bar-highlighting-modal-dialog-overlay-background" style="display: none;"  >
+			
+			</div>
+			
+			
+				<%--  View Protein Bar Highlighting Overlay Div --%>
+			
+			<div id="view_protein_bar_highlighting_overlay_div" class=" view-protein-bar-highlighting-overlay-div " style="display: none; "  >
+			
+			
+				<div id="view_protein_bar_highlighting_overlay_header" class="view-protein-bar-highlighting-overlay-header" style="width:100%; " >
+					<h1 id="view_protein_bar_highlighting_overlay_X_for_exit_overlay" class="view-protein-bar-highlighting-overlay-X-for-exit-overlay" >X</h1>
+					<h1 id="view_protein_bar_highlighting_overlay_header_text" class="view-protein-bar-highlighting-overlay-header-text" >Proten Bar Region Selections</h1>
+				</div>
+				<div id="view_protein_bar_highlighting_overlay_body" class="view-protein-bar-highlighting-overlay-body" >
+				
+				
+				
+				  <div style="margin-bottom: 5px; font-weight: bold;" >
+				  
+				  	
+				  	<div id="view_protein_bar_highlighting_overlay_protein_bars_data_div">
+				  	
+				  	</div>
+				  	
+				  	<input type="button" value="Save" id="view_protein_bar_highlighting_overlay_protein_bars_save_button"
+				  		 class="tool_tip_attached_jq" data-tooltip="Save above selected regions.">
+				  	<input type="button" value="Cancel" id="view_protein_bar_highlighting_overlay_protein_bars_cancel_button"
+				  		 class="tool_tip_attached_jq" data-tooltip="Cancel without changing selected regions.">
+				  	<input type="button" value="Reset" id="view_protein_bar_highlighting_overlay_protein_bars_reset_button"
+				  		 class="tool_tip_attached_jq" data-tooltip="Reset regions to those shown in diagram.">
+				  	<input type="button" value="Clear All" id="view_protein_bar_highlighting_overlay_protein_bars_clear_all_button"
+				  		 class="tool_tip_attached_jq" data-tooltip="Remove all selected regions, make all proteins visible.">
+					
+				</div>
+				
+			</div>  <%--  END  <div id="view-protein-bar-highlighting-overlay-body" class="view-protein-bar-highlighting-overlay-body" > --%>
+
+
+		</div>  <%--  END  <div id="view_protein_bar_highlighting_overlay_div" class=" view-protein-bar-highlighting-overlay-div " style="display: none; "  > --%>
+	
+	
+
+
+		<%-- !!!   Handlebars template Manage Protein Bar Regions  !!!!!!!!!   --%>
+		
+		
+		<script id="view_protein_bar_highlighting_overlay_single_bar_template"  type="text/x-handlebars-template">
+
+			<%--  include the template text  --%>
+			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedImage.jsp_page_templates/viewMergedImageManageProteinBarSingleBarRegionTemplate.jsp" %>
+
+		</script>
+	
+
+		<script id="view_protein_bar_highlighting_overlay_bar_region_template"  type="text/x-handlebars-template">
+	
+			<div class=" bar_region_jq " style="padding-top: 2px; position: relative;" > <%--  position: relative; to support positioning error messages --%>
+
+				start: <input type="text" style="width: 30px;" value="{{start}}" class=" start_jq ">  
+				End: <input type="text" style="width: 30px;" value="{{end}}" class=" end_jq ">  
+
+				<input type="image" src="${ contextPath }/images/icon-delete-small.png"  
+					class=" view_protein_bar_highlighting_region_remove_button_jq tool_tip_attached_jq" 
+					data-tooltip="Remove region" > 
+
+		  		<div class="error-message-container error_message_container_jq invalid_number_error_msg_jq " >
+		  			<div class="error-message-inner-container" >
+		  				<div class="error-message-close-x error_message_close_x_jq">X</div>
+			  			<div class="error-message-text" >Not a valid number</div>
+		  			</div>
+			  	</div>
+
+		  		<div class="error-message-container error_message_container_jq end_before_start_error_msg_jq " >
+		  			<div class="error-message-inner-container" >
+		  				<div class="error-message-close-x error_message_close_x_jq">X</div>
+			  			<div class="error-message-text" >The End cannot be before the Start</div>
+		  			</div>
+			  	</div>
+
+			</div>
+
+		</script>
+		
+		<%-- !!!   END   Handlebars template Manage Protein Bar Regions  !!!!!!!!!   --%>
+								
 
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
 			

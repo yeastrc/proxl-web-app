@@ -191,7 +191,7 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 		
 		openLorikeetOverlayBackground();
 
-		$("#view-spectra-overlay-div").show();
+		$view_spectra_overlay_div.show();
 		
 		
 		
@@ -203,7 +203,7 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 		};
 
 
-		var overlayZIndex = $("#view-spectra-overlay-div").css("z-index");
+		var overlayZIndex = $view_spectra_overlay_div.css("z-index");
 
 		//  overlayZIndex is a string so this is the equivalent to ( overlayZIndex * 10 ) + 2
 		//   which achieves the desired affect of lorikeetOptions.tooltipZIndex > overlayZIndex
