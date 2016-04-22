@@ -89,6 +89,13 @@ var getListConfigurationResponse = function(requestData, responseData) {
 };
 
 
+function saveListConfiguration() {
+	
+	
+	
+	
+}
+
 
 
 
@@ -101,6 +108,8 @@ function initPage() {
 	$("#save_button").click(function(eventObject) {
 
 		var clickThis = this;
+		
+		saveListConfiguration();
 
 		return false;
 	});
@@ -109,6 +118,8 @@ function initPage() {
 
 		var clickThis = this;
 
+		getListConfiguration();
+		
 		return false;
 	});
 

@@ -359,16 +359,19 @@ var updateInvitedPersonAccessLevel = function(params) {
 
 	var _URL = contextPathJSVar + "/services/user/updateInviteAccessLevel";
 
-	var ajaxParams = {
+	var requestData = {
 			inviteId : invited_person_entry_user_id,
 			personAccessLevel : newAccessLevel
 	};
 
+	var requestDataJSON = JSON.stringify( requestData );
+	
 //	var request =
 	$.ajax({
 		type : "POST",
 		url : _URL,
-		data : ajaxParams,
+	    data: requestDataJSON,
+	    contentType: "application/json; charset=utf-8",
 		dataType : "json",
 		success : function(data) {
 
