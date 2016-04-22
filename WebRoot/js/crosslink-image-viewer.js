@@ -3943,6 +3943,11 @@ function drawSvg() {
 //	var maxProteinLength = 0;
 
 	if ( selectedProteins === undefined || selectedProteins.length < 1 ) { 
+		
+		var newHeightContainingDivEmpty = 4;
+		
+		$svg_image_inner_container_div.css( { height : newHeightContainingDivEmpty } );
+
 	
 		return;  //  EARLY EXIT of function if no proteins to display 
 	}
@@ -3958,11 +3963,14 @@ function drawSvg() {
 		
 //	svgRootSnapSVGObject.clear();  //  switched to using jQuery .empty() on parent element since jQuery properly removes attached event handlers on the objects.
 
-	if ( selectedProteins.length < 1 ) {
-		return;
-	}
-	
 	if ( _proteins.length < 1 ) {
+		
+		//  No Proteins Data loaded
+
+		var newHeightContainingDivEmpty = 4;
+		
+		$svg_image_inner_container_div.css( { height : newHeightContainingDivEmpty } );
+
 		return;
 	}
 
@@ -4083,6 +4091,9 @@ function drawSvg() {
 	
 	svgRootSnapSVGObject.attr( { width: newWidth } );
 
+	var newHeightContainingDiv = newHeight + 4;
+	
+	$svg_image_inner_container_div.css( { height : newHeightContainingDiv } );
 	
 	/*
 	// for testing, show all protein positions
