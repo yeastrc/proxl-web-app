@@ -454,7 +454,10 @@ public class ImporterDefaultMainProgramEntry {
 					ImporterCoreEntryPoint.getInstance().doImport( 
 							projectId, 
 							mainXMLFileToImport, 
-							scanFileList );
+							scanFileList,
+							
+							null /* dropPeptidePSMCutoffValues */
+							);
 
 			importResults.setSearchId( insertedSearchId );
 			

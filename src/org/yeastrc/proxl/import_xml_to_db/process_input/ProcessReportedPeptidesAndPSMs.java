@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptideAndOrPSMForCmdLineCutoffs;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DroppedPeptideCount;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl_import.api.xml_dto.LinkType;
@@ -55,6 +58,9 @@ public class ProcessReportedPeptidesAndPSMs {
 			int nrseqDatabaseId, 
 			List<String> proteinNameDecoyPrefixList, 
 			int searchId, 
+
+			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
+			
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
 			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds ) throws Exception {
 		
@@ -95,7 +101,16 @@ public class ProcessReportedPeptidesAndPSMs {
 
 
 				for ( ReportedPeptide reportedPeptide : reportedPeptideList ) {
+					
 
+					if ( DropPeptideAndOrPSMForCmdLineCutoffs.getInstance()
+							.dropPeptideForCmdLineCutoffs( reportedPeptide, dropPeptidePSMCutoffValues ) ) {
+						
+						DroppedPeptideCount.incrementDroppedPeptideCount();
+						
+						continue;  // EARLY continue to next record
+					}
+					
 					String reportedPeptideString =
 							reportedPeptide.getReportedPeptideString();
 					
@@ -143,6 +158,9 @@ public class ProcessReportedPeptidesAndPSMs {
 								linkTypeNumber, 
 								reportedPeptideDTO, 
 								searchId, 
+
+								dropPeptidePSMCutoffValues,
+								
 								searchProgramEntryMap,
 								mapOfScanFilenamesMapsOfScanNumbersToScanIds );
 
@@ -159,6 +177,9 @@ public class ProcessReportedPeptidesAndPSMs {
 								linkTypeNumber, 
 								reportedPeptideDTO, 
 								searchId, 
+								
+								dropPeptidePSMCutoffValues,
+								
 								searchProgramEntryMap,
 								mapOfScanFilenamesMapsOfScanNumbersToScanIds);
 						 
@@ -176,6 +197,9 @@ public class ProcessReportedPeptidesAndPSMs {
 								linkTypeNumber, 
 								reportedPeptideDTO, 
 								searchId, 
+								
+								dropPeptidePSMCutoffValues,
+								
 								searchProgramEntryMap,
 								mapOfScanFilenamesMapsOfScanNumbersToScanIds );
 						 
@@ -200,7 +224,9 @@ public class ProcessReportedPeptidesAndPSMs {
 	 * @param linkTypeNumber
 	 * @param reportedPeptideDTO
 	 * @param searchId
+	 * @param dropPeptidePSMCutoffValues
 	 * @param searchProgramEntryMap
+	 * @param mapOfScanFilenamesMapsOfScanNumbersToScanIds
 	 * @throws Exception
 	 */
 	public void processXML_LinkType_Unlinked( 
@@ -216,6 +242,8 @@ public class ProcessReportedPeptidesAndPSMs {
 			int linkTypeNumber, 
 			ReportedPeptideDTO reportedPeptideDTO, 
 			int searchId, 
+			
+			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
 			
@@ -254,6 +282,9 @@ public class ProcessReportedPeptidesAndPSMs {
 					linkTypeNumber, 
 					reportedPeptideDTO, 
 					searchId, 
+					
+					dropPeptidePSMCutoffValues,
+					
 					searchProgramEntryMap,
 					mapOfScanFilenamesMapsOfScanNumbersToScanIds );
 			
@@ -271,6 +302,9 @@ public class ProcessReportedPeptidesAndPSMs {
 					linkTypeNumber, 
 					reportedPeptideDTO, 
 					searchId, 
+					
+					dropPeptidePSMCutoffValues,
+					
 					searchProgramEntryMap,
 					mapOfScanFilenamesMapsOfScanNumbersToScanIds );
 		}

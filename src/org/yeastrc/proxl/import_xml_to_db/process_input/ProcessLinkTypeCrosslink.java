@@ -9,7 +9,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.PsmPeptideDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_CrosslinkDAO;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptideAndOrPSMForCmdLineCutoffs;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DroppedPeptideCount;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl.import_xml_to_db.utils.RoundDecimalFieldsIfNecessary;
@@ -56,12 +60,14 @@ public class ProcessLinkTypeCrosslink {
 	/**
 	 * @param reportedPeptide
 	 * @param proxlInputLinkerList
-	 * @param proteinNameDecoyPrefix
+	 * @param proteinNameDecoyPrefixList
 	 * @param nrseqDatabaseId
 	 * @param linkTypeNumber
 	 * @param reportedPeptideDTO
 	 * @param searchId
+	 * @param dropPeptidePSMCutoffValues
 	 * @param searchProgramEntryMap
+	 * @param mapOfScanFilenamesMapsOfScanNumbersToScanIds
 	 * @throws Exception
 	 */
 	public void processCrosslink( 
@@ -77,6 +83,8 @@ public class ProcessLinkTypeCrosslink {
 			int linkTypeNumber, 
 			ReportedPeptideDTO reportedPeptideDTO, 
 			int searchId, 
+			
+			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
 			
@@ -170,8 +178,18 @@ public class ProcessLinkTypeCrosslink {
 
 		List<Psm> psmList = psms.getPsm();
 
+		boolean saveAnyPSMs = false;
+		
 		for ( Psm psm : psmList ) {
 
+			if ( DropPeptideAndOrPSMForCmdLineCutoffs.getInstance()
+					.dropPSMForCmdLineCutoffs( psm, dropPeptidePSMCutoffValues ) ) {
+				
+				DroppedPeptideCount.incrementDroppedPsmCount();
+				
+				continue;  // EARLY continue to next record
+			}
+			
 			PsmDTO psmDTO = 
 					PopulateAndSavePsmDTO.getInstance().populateAndSavePSMDTO( 
 							
@@ -197,6 +215,15 @@ public class ProcessLinkTypeCrosslink {
 			PsmPeptideDAO.getInstance().saveToDatabase( psmDTO.getId(), perPeptideData_1.getPeptideDTO().getId() );
 			PsmPeptideDAO.getInstance().saveToDatabase( psmDTO.getId(), perPeptideData_2.getPeptideDTO().getId() );
 
+			saveAnyPSMs = true;
+		}
+		
+		if ( ! saveAnyPSMs ) {
+			
+			String msg = "No PSMs saved for this reported peptide: " + 
+					reportedPeptide.getReportedPeptideString();
+			log.error( msg );
+			throw new ProxlImporterInteralException(msg);
 		}
 	}
 	

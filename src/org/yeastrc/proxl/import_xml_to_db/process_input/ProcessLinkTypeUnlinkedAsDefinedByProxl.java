@@ -8,7 +8,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.PsmPeptideDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnlinkedDAO;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptideAndOrPSMForCmdLineCutoffs;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DroppedPeptideCount;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl_import.api.xml_dto.LinkedPosition;
@@ -74,6 +78,8 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 			int linkTypeNumber, 
 			ReportedPeptideDTO reportedPeptideDTO, 
 			int searchId, 
+			
+			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
 			
@@ -176,8 +182,18 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 
 		List<Psm> psmList = psms.getPsm();
 
+		boolean saveAnyPSMs = false;
+		
 		for ( Psm psm : psmList ) {
+			
+			if ( DropPeptideAndOrPSMForCmdLineCutoffs.getInstance()
+					.dropPSMForCmdLineCutoffs( psm, dropPeptidePSMCutoffValues ) ) {
+				
+				DroppedPeptideCount.incrementDroppedPsmCount();
 
+				continue;  // EARLY continue to next record
+			}
+			
 			PsmDTO psmDTO = 
 					PopulateAndSavePsmDTO.getInstance().populateAndSavePSMDTO( 
 							
@@ -199,7 +215,16 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 			//  Save PsmDTO.id PeptideDTO.id mapping
 			
 			PsmPeptideDAO.getInstance().saveToDatabase( psmDTO.getId(), perPeptideData.getPeptideDTO().getId() );
+
+			saveAnyPSMs = true;
+		}
+		
+		if ( ! saveAnyPSMs ) {
 			
+			String msg = "No PSMs saved for this reported peptide: " + 
+					reportedPeptide.getReportedPeptideString();
+			log.error( msg );
+			throw new ProxlImporterInteralException(msg);
 		}
 	}
 	

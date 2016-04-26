@@ -16,6 +16,8 @@ import javax.xml.validation.SchemaFactory;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant;
 import org.yeastrc.proxl.import_xml_to_db.dao.FASTADatabaseLookup;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMPopulateFilterDirection;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.PrintHelpOnlyException;
 import org.yeastrc.proxl.import_xml_to_db.import_post_processing.main.ImportPostProcessingPerSearch;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProxlInputObjectContainer;
@@ -62,13 +64,20 @@ public class ImporterCoreEntryPoint {
 			
 			int projectId,
 			File mainXMLFileToImport,
-			List<File> scanFileList 
+			List<File> scanFileList,
+			
+			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues
 			
 			) throws Exception {
 
 		ProxlInput proxlInputForImport = null;
 
 		String importDirectory = null; 
+		
+		if ( dropPeptidePSMCutoffValues == null ) {
+			
+			dropPeptidePSMCutoffValues = new DropPeptidePSMCutoffValues();
+		}
 				
 		try {
 			
@@ -128,6 +137,8 @@ public class ImporterCoreEntryPoint {
 			}
 		}
 		
+		
+		DropPeptidePSMPopulateFilterDirection.getInstance().populateFilterDirection( dropPeptidePSMCutoffValues, proxlInputForImport );
 
 		ProxlInputObjectContainer proxlInputObjectContainer = new ProxlInputObjectContainer();
 		
@@ -135,7 +146,7 @@ public class ImporterCoreEntryPoint {
 		
 		proxlInputForImport = null; //  release this reference
 		
-		int insertedSearchId = doImportPassingDeserializedProxlImportInputXML( projectId, proxlInputObjectContainer, scanFileList, importDirectory );
+		int insertedSearchId = doImportPassingDeserializedProxlImportInputXML( projectId, proxlInputObjectContainer, scanFileList, importDirectory, dropPeptidePSMCutoffValues );
 		
 		return insertedSearchId;
 		
@@ -253,7 +264,9 @@ public class ImporterCoreEntryPoint {
 			ProxlInputObjectContainer proxlInputObjectContainer,
 			List<File> scanFileList,
 			
-			String importDirectory
+			String importDirectory,
+			
+			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues
 
 			) throws Exception {
 		
@@ -315,13 +328,23 @@ public class ImporterCoreEntryPoint {
 				throw e;
 			}
 
+			
+			
+
 			//  Process proxl Input
 
 			processProxlInput = ProcessProxlInput.getInstance();
 
 			SearchDTO searchDTOInserted =
 
-					processProxlInput.processProxlInput( projectId, proxlInputForImport, scanFileList, importDirectory, nrseqDatabaseId );
+					processProxlInput.processProxlInput( 
+							projectId, 
+							proxlInputForImport, 
+							scanFileList, 
+							importDirectory, 
+							nrseqDatabaseId, 
+							dropPeptidePSMCutoffValues
+							 );
 
 			
 			if ( log.isInfoEnabled() ) {

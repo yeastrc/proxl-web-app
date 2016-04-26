@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCrosslinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchMonolinkMassDAO;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.process_scans.Process_MzML_MzXml_File;
@@ -78,7 +79,11 @@ public class ProcessProxlInput {
 			
 			String importDirectory,
 			
-			int nrseqDatabaseId
+			int nrseqDatabaseId,
+			
+
+			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues
+			
 			
 			) throws Exception {
 		
@@ -143,7 +148,8 @@ public class ProcessProxlInput {
 
 				//  Scan Numbers in the input XML that need to be read from the scan files and inserted into the DB
 				Map<String, Set<Integer>> mapOfScanFilenamesSetsOfScanNumbers = 
-						GetScanFilenamesAndScanNumbersToInsert.getInstance().getScanFilenamesAndScanNumbersToInsert( proxlInput );
+						GetScanFilenamesAndScanNumbersToInsert.getInstance()
+						.getScanFilenamesAndScanNumbersToInsert( proxlInput, dropPeptidePSMCutoffValues );
 				
 				if ( scanFileList.size() == 1 ) {
 					
@@ -247,6 +253,9 @@ public class ProcessProxlInput {
 					nrseqDatabaseId, 
 					proteinNameDecoyPrefixList, 
 					searchDTO.getId(), 
+
+					dropPeptidePSMCutoffValues,
+					
 					searchProgramEntryMap,
 					mapOfScanFilenamesMapsOfScanNumbersToScanIds );
 		

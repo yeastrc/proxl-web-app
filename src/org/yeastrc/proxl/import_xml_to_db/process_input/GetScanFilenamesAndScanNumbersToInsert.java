@@ -7,7 +7,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptideAndOrPSMForCmdLineCutoffs;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
 import org.yeastrc.proxl_import.api.xml_dto.Psm;
 import org.yeastrc.proxl_import.api.xml_dto.Psms;
@@ -41,8 +44,9 @@ public class GetScanFilenamesAndScanNumbersToInsert {
 	 * 
 	 * @return 
 	 * @throws ProxlImporterDataException 
+	 * @throws ProxlImporterInteralException 
 	 */
-	public Map<String, Set<Integer>> getScanFilenamesAndScanNumbersToInsert( ProxlInput proxlInput ) throws ProxlImporterDataException  {
+	public Map<String, Set<Integer>> getScanFilenamesAndScanNumbersToInsert( ProxlInput proxlInput, DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues ) throws ProxlImporterDataException, ProxlImporterInteralException  {
 		
 		Map<String, Set<Integer>> mapOfScanFilenamesSetsOfScanNumbers = new HashMap<String, Set<Integer>>();
 		
@@ -61,12 +65,25 @@ public class GetScanFilenamesAndScanNumbersToInsert {
 		
 
 			for ( ReportedPeptide reportedPeptide : reportedPeptideList ) {
+				
+				if ( DropPeptideAndOrPSMForCmdLineCutoffs.getInstance()
+						.dropPeptideForCmdLineCutoffs( reportedPeptide, dropPeptidePSMCutoffValues ) ) {
+					
+					continue;  // EARLY continue to next record
+				}
 
 				Psms psms =	reportedPeptide.getPsms();
 				
 				List<Psm> psmList = psms.getPsm();
 				
 				for ( Psm psm : psmList ) {
+					
+					if ( DropPeptideAndOrPSMForCmdLineCutoffs.getInstance()
+							.dropPSMForCmdLineCutoffs( psm, dropPeptidePSMCutoffValues ) ) {
+						
+						continue;  // EARLY continue to next record
+					}
+				
 					
 					String scanFileName = psm.getScanFileName();
 					
