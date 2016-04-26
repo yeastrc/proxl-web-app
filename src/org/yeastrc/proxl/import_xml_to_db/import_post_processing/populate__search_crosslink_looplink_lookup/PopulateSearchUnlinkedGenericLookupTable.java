@@ -102,6 +102,8 @@ public class PopulateSearchUnlinkedGenericLookupTable {
 		
 		String sql = PRIMARY_SELECT_SQL;
 
+		int processedRecordCount = 0;
+		
 		try {
 
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
@@ -121,6 +123,8 @@ public class PopulateSearchUnlinkedGenericLookupTable {
 
 			while( rs.next() ) {
 
+				processedRecordCount++;
+				
 				SearchUnlinkedGenericLookupDTO item = new SearchUnlinkedGenericLookupDTO();
 
 				item.setSearchId( searchId );
@@ -168,6 +172,13 @@ public class PopulateSearchUnlinkedGenericLookupTable {
 //				List<SearchUnlinkedBestPeptideValueGenericLookupDTO> insertedBestPeptideValueRecords = 
 				populateUnlinkedBestPeptideValue( item, srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOList );
 
+				if ( log.isInfoEnabled() ) {
+
+					if ( ( processedRecordCount % 100000 ) == 0 ) {
+
+						log.info( "populateSearchUnlinkedGenericLookupTable: processed " + processedRecordCount + " records." );
+					}
+				}
 
 			}
 
@@ -210,6 +221,11 @@ public class PopulateSearchUnlinkedGenericLookupTable {
 		
 
 	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+
+		if ( log.isInfoEnabled() ) {
+
+			log.info( "populateSearchUnlinkedGenericLookupTable: Record Count Total: " + processedRecordCount );
+		}
 
 	}
 	

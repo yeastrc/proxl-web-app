@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_CrossLinkRepPeptSearchGenericLookupDAO;
@@ -15,21 +13,13 @@ import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_MonoLinkRepPep
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnlinkedRepPeptSearchGenericLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
-import org.yeastrc.xlink.dao.CrosslinkDAO;
-import org.yeastrc.xlink.dao.DimerDAO;
-import org.yeastrc.xlink.dao.LooplinkDAO;
 import org.yeastrc.xlink.dao.UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO;
-import org.yeastrc.xlink.dao.UnlinkedDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.dto.CrosslinkDTO;
 import org.yeastrc.xlink.dto.CrosslinkRepPeptSearchGenericLookupDTO;
-import org.yeastrc.xlink.dto.DimerDTO;
 import org.yeastrc.xlink.dto.DimerRepPeptSearchGenericLookupDTO;
-import org.yeastrc.xlink.dto.LooplinkDTO;
 import org.yeastrc.xlink.dto.LooplinkRepPeptSearchGenericLookupDTO;
 import org.yeastrc.xlink.dto.MonolinkRepPeptSearchGenericLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO;
-import org.yeastrc.xlink.dto.UnlinkedDTO;
 import org.yeastrc.xlink.dto.UnlinkedRepPeptSearchGenericLookupDTO;
 import org.yeastrc.xlink.utils.XLinkUtils;
 
@@ -68,8 +58,8 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 					
 			+ " WHERE  psm.search_id = ? AND psm.reported_peptide_id = ? ";
 			
-
 	
+
 	/**
 	 * @param searchId
 	 * @throws Exception
@@ -87,12 +77,7 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 
 		UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO unifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO =
 				UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DAO.getInstance();
-		
-		CrosslinkDAO crosslinkDAO = CrosslinkDAO.getInstance();
-		LooplinkDAO looplinkDAO = LooplinkDAO.getInstance();
-		DimerDAO dimerDAO = DimerDAO.getInstance();
-		UnlinkedDAO unlinkedDAO = UnlinkedDAO.getInstance();
-		
+				
 		DB_Insert_CrossLinkRepPeptSearchGenericLookupDAO db_Insert_CrossLinkRepPeptSearchGenericLookupDAO =
 				DB_Insert_CrossLinkRepPeptSearchGenericLookupDAO.getInstance();
 
@@ -110,38 +95,42 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 				DB_Insert_MonoLinkRepPeptSearchGenericLookupDAO.getInstance();
 		
 	    
-		Connection conn = null;
+		Connection dbConnection = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
 		final String sql = SQL_MAIN;
 		
 		try {
-			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
-			pstmt = conn.prepareStatement( SQL_COUNT );
 			
-			pstmt.setInt( 1, searchId );
-			
-			rs = pstmt.executeQuery();
-			
-			rs.next();
-			
-			int totalRecordCount = rs.getInt( "count" );
-			
-			rs.close();
-			rs = null;
-			pstmt.close();
-			pstmt = null;
-			
+			int totalRecordCount = 0;
+
 			if ( log.isInfoEnabled() ) {
+
+
+				pstmt = dbConnection.prepareStatement( SQL_COUNT );
+
+				pstmt.setInt( 1, searchId );
+
+				rs = pstmt.executeQuery();
+
+				rs.next();
+
+				totalRecordCount = rs.getInt( "count" );
+
+				rs.close();
+				rs = null;
+				pstmt.close();
+				pstmt = null;
+			
 
 				log.info( "addLinkPerPeptideGenericLookupRecordsPerSearchId:  Record count to process: " + totalRecordCount );
 			}
 			
-			pstmt = conn.prepareStatement( sql );
+			pstmt = dbConnection.prepareStatement( sql );
 			
 			pstmt.setInt( 1, searchId );
 			
@@ -161,30 +150,38 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 				
 				if ( lookupItem.getLinkType() == XLinkUtils.TYPE_CROSSLINK ) {
 					
-					processCrosslink( searchId, crosslinkDAO, db_Insert_CrossLinkRepPeptSearchGenericLookupDAO, lookupItem );
+					processCrosslink( searchId, dbConnection, db_Insert_CrossLinkRepPeptSearchGenericLookupDAO, lookupItem );
 
 				} else if ( lookupItem.getLinkType() == XLinkUtils.TYPE_LOOPLINK ) {
 
-					processLooplink( searchId, looplinkDAO, db_Insert_LoopLinkRepPeptSearchGenericLookupDAO, lookupItem );
+					processLooplink( searchId, dbConnection, db_Insert_LoopLinkRepPeptSearchGenericLookupDAO, lookupItem );
 
 				} else if ( lookupItem.getLinkType() == XLinkUtils.TYPE_DIMER ) {
 
-					processDimer( searchId, dimerDAO, db_Insert_DimerRepPeptSearchGenericLookupDAO, lookupItem );
+					processDimer( searchId, dbConnection, db_Insert_DimerRepPeptSearchGenericLookupDAO, lookupItem );
 
 				} else if ( lookupItem.getLinkType() == XLinkUtils.TYPE_UNLINKED ) {
 
-					processUnlinked( searchId, unlinkedDAO, db_Insert_UnlinkedRepPeptSearchGenericLookupDAO, lookupItem );
+					processUnlinked( searchId, dbConnection, db_Insert_UnlinkedRepPeptSearchGenericLookupDAO, lookupItem );
 
+				} else {
+					
+					String linkTypeSTring = XLinkUtils.getTypeString( lookupItem.getLinkType() );
+					
+					String msg = "Unknown Link Type: " + linkTypeSTring;
+					log.error( msg );
+					
+					throw new ProxlImporterDataException( msg );
 				}
 				
-				processMonolink( searchId, db_Insert_MonoLinkRepPeptSearchGenericLookupDAO, conn, lookupItem );
+				processMonolink( searchId, db_Insert_MonoLinkRepPeptSearchGenericLookupDAO, dbConnection, lookupItem );
 				
 
-				if ( recordCount % 5000 == 0 ) {
+				if ( log.isInfoEnabled() ) {
 					
-					if ( log.isInfoEnabled() ) {
-
-						log.info( "processed " + recordCount + " of " + totalRecordCount );
+					if ( recordCount % 5000 == 0 ) {
+					
+						log.info( "addLinkPerPeptideGenericLookupRecordsPerSearchId:  processed " + recordCount + " of " + totalRecordCount );
 					}
 				}
 
@@ -211,9 +208,9 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 				pstmt = null;
 			}
 			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
+			if( dbConnection != null ) {
+				try { dbConnection.close(); } catch( Throwable t ) { ; }
+				dbConnection = null;
 			}
 			
 		}
@@ -222,231 +219,488 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 
 	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
 
+		if ( log.isInfoEnabled() ) {
+
+			log.info( "Finished addLinkPerPeptideGenericLookupRecordsPerSearchId for search id: " + searchId );
+		}
 		
 	}
 
+	
+	
+	//  SELECT DISTINCT to remove duplicates that exist in the crosslink table
+	
+	private static final String SQL_CROSSLINK = 
+			"SELECT DISTINCT nrseq_id_1, nrseq_id_2, protein_1_position, protein_2_position FROM crosslink WHERE psm_id = ?";
+
+//	private static final String SQL_CROSSLINK_COUNT = 
+//			"SELECT COUNT( DISTINCT nrseq_id_1, nrseq_id_2, protein_1_position, protein_2_position ) AS count FROM crosslink WHERE psm_id = ?";
+		
+	
+	/**
+	 * @param searchId
+	 * @param dbConnection
+	 * @param db_Insert_CrossLinkRepPeptSearchGenericLookupDAO
+	 * @param lookupItem
+	 * @throws Exception
+	 * @throws ProxlImporterDataException
+	 */
 	private void processCrosslink(
+			
 			int searchId,
-			CrosslinkDAO crosslinkDAO,
+			
+			Connection dbConnection,
+			
 			DB_Insert_CrossLinkRepPeptSearchGenericLookupDAO db_Insert_CrossLinkRepPeptSearchGenericLookupDAO,
 			UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO lookupItem)
 			throws Exception, ProxlImporterDataException {
-		List<CrosslinkDTO> linkDTOList = crosslinkDAO.getAllCrosslinkDTOForPsmId( lookupItem.getSamplePsmId() );
 		
-		if ( linkDTOList.isEmpty() ) {
+		
+//		int totalRecordCount = -1;
+				
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		String sql = SQL_CROSSLINK;
+		
+		int foundRecordCount = 0;
+		
+		try {
+
+			//  Get a count of the records to process
+//			if ( log.isInfoEnabled() ) {
+//
+//				pstmt = dbConnection.prepareStatement( SQL_CROSSLINK_COUNT );
+//
+//				pstmt.setInt( 1, lookupItem.getSamplePsmId() );
+//
+//				rs = pstmt.executeQuery();
+//
+//				rs.next();
+//
+//				totalRecordCount = rs.getInt( "count" );
+//
+//				rs.close();
+//				rs = null;
+//				pstmt.close();
+//				pstmt = null;
+//			
+//
+//				log.info( "processCrosslink: Reported Peptide Id: \t" + lookupItem.getReportedPeptideId()
+//						+ "\t, Record count to process: \t" + totalRecordCount );
+//			}
+			
+			pstmt = dbConnection.prepareStatement( sql );
+			
+			pstmt.setInt( 1, lookupItem.getSamplePsmId() );
+			
+			rs = pstmt.executeQuery();
+			
+			
+			while ( rs.next() ) {
+				
+				foundRecordCount++;
+
+				CrosslinkRepPeptSearchGenericLookupDTO insertItem = new CrosslinkRepPeptSearchGenericLookupDTO();
+				
+				insertItem.setSearchId( searchId );
+				insertItem.setReportedPeptideId( lookupItem.getReportedPeptideId() );
+				insertItem.setProteinId_1( rs.getInt( "nrseq_id_1" ) );
+				insertItem.setProteinId_2( rs.getInt( "nrseq_id_2" ) );
+				insertItem.setProtein_1_position( rs.getInt( "protein_1_position" ) );
+				insertItem.setProtein_2_position( rs.getInt( "protein_2_position" ) );
+
+				insertItem.setAllRelatedPeptidesUniqueForSearch( lookupItem.isAllRelatedPeptidesUniqueForSearch() );
+				insertItem.setPsmNumAtDefaultCutoff( lookupItem.getPsmNumAtDefaultCutoff() );
+				insertItem.setPeptideMeetsDefaultCutoffs( lookupItem.getPeptideMeetsDefaultCutoffs() );
+
+				db_Insert_CrossLinkRepPeptSearchGenericLookupDAO.saveToDatabase( insertItem );
+
+
+				if ( log.isInfoEnabled() ) {
+					
+					if ( foundRecordCount % 100000 == 0 ) {
+						
+						String logMsg =  "processCrosslink:  processed " + foundRecordCount + ",  Reported Peptide Id: \t" + lookupItem.getReportedPeptideId();
+					
+//						if ( totalRecordCount > 0 ) {
+//							
+//							logMsg += " of " + totalRecordCount;
+//						}
+
+						log.info( logMsg );
+					}
+				}
+
+
+			}
+
+		} catch ( Exception e ) {
+			
+			String msg = "processCrosslink(), sql: " + sql;
+			
+			log.error( msg, e );
+			
+			throw e;
+			
+		} finally {
+			
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+
+			//  Skip Close DB Connection, done elsewhere
+		}
+		
+		if ( foundRecordCount == 0 ) {
 			
 			String msg = "no crosslink records found for psmId: " + lookupItem.getSamplePsmId();
 			log.error( msg );
 			throw new ProxlImporterDataException(msg);
 		}
 		
-		List<CrosslinkRepPeptSearchGenericLookupDTO> insertedItems = new ArrayList<>();
 		
-		for ( CrosslinkDTO linkDTO : linkDTOList ) {
+		if ( log.isInfoEnabled() ) {
 
-			CrosslinkRepPeptSearchGenericLookupDTO insertItem = new CrosslinkRepPeptSearchGenericLookupDTO();
-
-			insertItem.setSearchId( searchId );
-			insertItem.setReportedPeptideId( lookupItem.getReportedPeptideId() );
-			insertItem.setProteinId_1( linkDTO.getProtein1().getNrseqId() );
-			insertItem.setProteinId_2( linkDTO.getProtein2().getNrseqId() );
-			insertItem.setProtein_1_position( linkDTO.getProtein1Position() );
-			insertItem.setProtein_2_position( linkDTO.getProtein2Position() );
-
-			insertItem.setAllRelatedPeptidesUniqueForSearch( lookupItem.isAllRelatedPeptidesUniqueForSearch() );
-			insertItem.setPsmNumAtDefaultCutoff( lookupItem.getPsmNumAtDefaultCutoff() );
-			insertItem.setPeptideMeetsDefaultCutoffs( lookupItem.getPeptideMeetsDefaultCutoffs() );
-			
-			//  Don't insert the same item twice.  The link table has duplicates
-			
-			boolean itemAlreadyInserted = false;
-			
-			for ( CrosslinkRepPeptSearchGenericLookupDTO alreadyInserted : insertedItems ) {
-				
-				if ( 	   alreadyInserted.getProteinId_1() == insertItem.getProteinId_1()
-						&& alreadyInserted.getProteinId_2() == insertItem.getProteinId_2()
-						&& alreadyInserted.getProtein_1_position() == insertItem.getProtein_1_position()
-						&& alreadyInserted.getProtein_2_position() == insertItem.getProtein_2_position()
-						) {
-				
-					itemAlreadyInserted = true;
-				}
+			if ( foundRecordCount > 10000 ) {
+				log.info( "processCrosslink: > 10,000 crosslink records processed. Reported Peptide Id: \t" + lookupItem.getReportedPeptideId()
+						+ "\t, Record count processed: \t" + foundRecordCount );
 			}
-			
-			if ( itemAlreadyInserted ) {
-				
-				continue;  // Skip inserting insertItem
-			}
-
-			db_Insert_CrossLinkRepPeptSearchGenericLookupDAO.saveToDatabase( insertItem );
-			
-			insertedItems.add( insertItem );
-		}
+		}		
 	}
 
+	
+	
+	//  SELECT DISTINCT to remove duplicates that exist in the table
+	
+	private static final String SQL_LOOPLINK =   
+			"SELECT DISTINCT nrseq_id, protein_position_1, protein_position_2 FROM looplink WHERE psm_id = ?";
+
+	/**
+	 * @param searchId
+	 * @param dbConnection
+	 * @param db_Insert_LoopLinkRepPeptSearchGenericLookupDAO
+	 * @param lookupItem
+	 * @throws Exception
+	 * @throws ProxlImporterDataException
+	 */
 	private void processLooplink(
 			int searchId,
-			LooplinkDAO looplinkDAO,
+			
+			Connection dbConnection,
+			
 			DB_Insert_LoopLinkRepPeptSearchGenericLookupDAO db_Insert_LoopLinkRepPeptSearchGenericLookupDAO,
 			UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO lookupItem)
+	
 			throws Exception, ProxlImporterDataException {
-		List<LooplinkDTO> linkDTOList = looplinkDAO.getAllLooplinkDTOForPsmId( lookupItem.getSamplePsmId() );
+		
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		String sql = SQL_LOOPLINK;
+		
+		int foundRecordCount = 0;
+		
+		try {
+			
+			pstmt = dbConnection.prepareStatement( sql );
+			
+			pstmt.setInt( 1, lookupItem.getSamplePsmId() );
+			
+			rs = pstmt.executeQuery();
 
-		if ( linkDTOList.isEmpty() ) {
+			while ( rs.next() ) {
+
+				foundRecordCount++;
+				
+				LooplinkRepPeptSearchGenericLookupDTO insertItem = new LooplinkRepPeptSearchGenericLookupDTO();
+
+				insertItem.setSearchId( searchId );
+				insertItem.setReportedPeptideId( lookupItem.getReportedPeptideId() );
+				
+				insertItem.setProteinId( rs.getInt( "nrseq_id" ) );
+				insertItem.setProteinPosition_1( rs.getInt( "protein_position_1" ) );
+				insertItem.setProteinPosition_2( rs.getInt( "protein_position_2" ) );
+
+				insertItem.setAllRelatedPeptidesUniqueForSearch( lookupItem.isAllRelatedPeptidesUniqueForSearch() );
+				insertItem.setPsmNumAtDefaultCutoff( lookupItem.getPsmNumAtDefaultCutoff() );
+				insertItem.setPeptideMeetsDefaultCutoffs( lookupItem.getPeptideMeetsDefaultCutoffs() );
+
+				if ( log.isInfoEnabled() ) {
+					
+					if ( foundRecordCount % 100000 == 0 ) {
+						
+						String logMsg =  "processLooplink:  processed " + foundRecordCount + ",  Reported Peptide Id: \t" + lookupItem.getReportedPeptideId();
+					
+//						if ( totalRecordCount > 0 ) {
+//							
+//							logMsg += " of " + totalRecordCount;
+//						}
+
+						log.info( logMsg );
+					}
+				}
+				
+				db_Insert_LoopLinkRepPeptSearchGenericLookupDAO.saveToDatabase( insertItem );
+			}
+
+		} catch ( Exception e ) {
+			
+			String msg = "processLooplink(), sql: " + sql;
+			
+			log.error( msg, e );
+			
+			throw e;
+			
+		} finally {
+			
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			
+			//  Skip Close DB Connection, done elsewhere
+		}
+
+		if ( foundRecordCount == 0 ) {
 
 			String msg = "no looplink records found for psmId: " + lookupItem.getSamplePsmId();
 			log.error( msg );
 			throw new ProxlImporterDataException(msg);
 		}
 
-		List<LooplinkRepPeptSearchGenericLookupDTO> insertedItems = new ArrayList<>();
-
-		for ( LooplinkDTO linkDTO : linkDTOList ) {
-
-			LooplinkRepPeptSearchGenericLookupDTO insertItem = new LooplinkRepPeptSearchGenericLookupDTO();
-
-			insertItem.setSearchId( searchId );
-			insertItem.setReportedPeptideId( lookupItem.getReportedPeptideId() );
-			insertItem.setProteinId( linkDTO.getProtein().getNrseqId() );
-			insertItem.setProteinPosition_1( linkDTO.getProteinPosition1() );
-			insertItem.setProteinPosition_2( linkDTO.getProteinPosition2() );
-
-			insertItem.setAllRelatedPeptidesUniqueForSearch( lookupItem.isAllRelatedPeptidesUniqueForSearch() );
-			insertItem.setPsmNumAtDefaultCutoff( lookupItem.getPsmNumAtDefaultCutoff() );
-			insertItem.setPeptideMeetsDefaultCutoffs( lookupItem.getPeptideMeetsDefaultCutoffs() );
-
-			//  Don't insert the same item twice.  The link table has duplicates
-
-			boolean itemAlreadyInserted = false;
-
-			for ( LooplinkRepPeptSearchGenericLookupDTO alreadyInserted : insertedItems ) {
-
-				if ( 	   alreadyInserted.getProteinId() == insertItem.getProteinId()
-						&& alreadyInserted.getProteinPosition_1() == insertItem.getProteinPosition_1()
-						&& alreadyInserted.getProteinPosition_2() == insertItem.getProteinPosition_2()
-						) {
-
-					itemAlreadyInserted = true;
-				}
-			}
-
-			if ( itemAlreadyInserted ) {
-
-				continue;  // Skip inserting insertItem
-			}
-
-			db_Insert_LoopLinkRepPeptSearchGenericLookupDAO.saveToDatabase( insertItem );
-
-			insertedItems.add( insertItem );
+		if ( foundRecordCount > 10000 ) {
+			log.info( "processLooplink: > 10,000 crosslink records processed. Reported Peptide Id: \t" + lookupItem.getReportedPeptideId()
+					+ "\t, Record count processed: \t" + foundRecordCount );
 		}
 	}
+	
+	
+	
 
+	
+	//  SELECT DISTINCT to remove duplicates that exist in the dimer table
+	
+	private static final String SQL_DIMER = 
+			"SELECT DISTINCT nrseq_id_1, nrseq_id_2 FROM dimer WHERE psm_id = ?";
+
+	/**
+	 * @param searchId
+	 * @param dbConnection
+	 * @param db_Insert_DimerRepPeptSearchGenericLookupDAO
+	 * @param lookupItem
+	 * @throws Exception
+	 * @throws ProxlImporterDataException
+	 */
 	private void processDimer(
+			
 			int searchId,
-			DimerDAO dimerDAO,
+			Connection dbConnection,
 			DB_Insert_DimerRepPeptSearchGenericLookupDAO db_Insert_DimerRepPeptSearchGenericLookupDAO,
 			UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO lookupItem)
 			throws Exception, ProxlImporterDataException {
-		List<DimerDTO> linkDTOList = dimerDAO.getAllDimerDTOForPsmId( lookupItem.getSamplePsmId() );
 		
-		if ( linkDTOList.isEmpty() ) {
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		String sql = SQL_DIMER;
+		
+		int foundRecordCount = 0;
+		
+		try {
+
+			pstmt = dbConnection.prepareStatement( sql );
+			
+			pstmt.setInt( 1, lookupItem.getSamplePsmId() );
+			
+			rs = pstmt.executeQuery();
+			
+			
+			while ( rs.next() ) {
+				
+				foundRecordCount++;
+
+				DimerRepPeptSearchGenericLookupDTO insertItem = new DimerRepPeptSearchGenericLookupDTO();
+
+				insertItem.setSearchId( searchId );
+				insertItem.setReportedPeptideId( lookupItem.getReportedPeptideId() );
+				insertItem.setProteinId_1( rs.getInt( "nrseq_id_1" ) );
+				insertItem.setProteinId_2( rs.getInt( "nrseq_id_2" ) );
+
+				insertItem.setAllRelatedPeptidesUniqueForSearch( lookupItem.isAllRelatedPeptidesUniqueForSearch() );
+				insertItem.setPsmNumAtDefaultCutoff( lookupItem.getPsmNumAtDefaultCutoff() );
+				insertItem.setPeptideMeetsDefaultCutoffs( lookupItem.getPeptideMeetsDefaultCutoffs() );
+
+				db_Insert_DimerRepPeptSearchGenericLookupDAO.saveToDatabase( insertItem );
+
+				if ( log.isInfoEnabled() ) {
+					
+					if ( foundRecordCount % 100000 == 0 ) {
+						
+						String logMsg =  "processDimer:  processed " + foundRecordCount + ",  Reported Peptide Id: \t" + lookupItem.getReportedPeptideId();
+					
+//						if ( totalRecordCount > 0 ) {
+//							
+//							logMsg += " of " + totalRecordCount;
+//						}
+
+						log.info( logMsg );
+					}
+				}
+			}
+
+		} catch ( Exception e ) {
+			
+			String msg = "processDimer(), sql: " + sql;
+			
+			log.error( msg, e );
+			
+			throw e;
+			
+		} finally {
+			
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+
+			//  Skip Close DB Connection, done elsewhere
+		}
+		
+		if ( foundRecordCount == 0 ) {
 			
 			String msg = "no dimer records found for psmId: " + lookupItem.getSamplePsmId();
 			log.error( msg );
 			throw new ProxlImporterDataException(msg);
 		}
-		
-		List<DimerRepPeptSearchGenericLookupDTO> insertedItems = new ArrayList<>();
-		
-		for ( DimerDTO linkDTO : linkDTOList ) {
 
-			DimerRepPeptSearchGenericLookupDTO insertItem = new DimerRepPeptSearchGenericLookupDTO();
-
-			insertItem.setSearchId( searchId );
-			insertItem.setReportedPeptideId( lookupItem.getReportedPeptideId() );
-			insertItem.setProteinId_1( linkDTO.getProtein1().getNrseqId() );
-			insertItem.setProteinId_2( linkDTO.getProtein2().getNrseqId() );
-
-			insertItem.setAllRelatedPeptidesUniqueForSearch( lookupItem.isAllRelatedPeptidesUniqueForSearch() );
-			insertItem.setPsmNumAtDefaultCutoff( lookupItem.getPsmNumAtDefaultCutoff() );
-			insertItem.setPeptideMeetsDefaultCutoffs( lookupItem.getPeptideMeetsDefaultCutoffs() );
-			
-			//  Don't insert the same item twice.  The link table has duplicates
-			
-			boolean itemAlreadyInserted = false;
-			
-			for ( DimerRepPeptSearchGenericLookupDTO alreadyInserted : insertedItems ) {
-				
-				if ( 	   alreadyInserted.getProteinId_1() == insertItem.getProteinId_1()
-						&& alreadyInserted.getProteinId_2() == insertItem.getProteinId_2()
-						) {
-				
-					itemAlreadyInserted = true;
-				}
-			}
-			
-			if ( itemAlreadyInserted ) {
-				
-				continue;  // Skip inserting insertItem
-			}
-
-			db_Insert_DimerRepPeptSearchGenericLookupDAO.saveToDatabase( insertItem );
-			
-			insertedItems.add( insertItem );
+		if ( foundRecordCount > 10000 ) {
+			log.info( "processDimer: > 10,000 crosslink records processed. Reported Peptide Id: \t" + lookupItem.getReportedPeptideId()
+					+ "\t, Record count processed: \t" + foundRecordCount );
 		}
-	}
 
+	}
+	
+
+	//  SELECT DISTINCT to remove duplicates that exist in the table
+	
+	private static final String SQL_UNLINKED =   
+			"SELECT DISTINCT nrseq_id FROM unlinked WHERE psm_id = ?";
+
+	
 	private void processUnlinked(
 			int searchId,
-			UnlinkedDAO unlinkedDAO,
+			
+			Connection dbConnection,
+			
 			DB_Insert_UnlinkedRepPeptSearchGenericLookupDAO db_Insert_UnlinkedRepPeptSearchGenericLookupDAO,
 			UnifiedRepPep_ReportedPeptide_Search__Generic_Lookup__DTO lookupItem)
 			throws Exception, ProxlImporterDataException {
-		List<UnlinkedDTO> linkDTOList = unlinkedDAO.getAllUnlinkedDTOForPsmId( lookupItem.getSamplePsmId() );
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		String sql = SQL_UNLINKED;
+		
+		int foundRecordCount = 0;
+		
+		try {
+			
+			pstmt = dbConnection.prepareStatement( sql );
+			
+			pstmt.setInt( 1, lookupItem.getSamplePsmId() );
+			
+			rs = pstmt.executeQuery();
+
+			while ( rs.next() ) {
+
+				foundRecordCount++;
+
+				UnlinkedRepPeptSearchGenericLookupDTO insertItem = new UnlinkedRepPeptSearchGenericLookupDTO();
+
+				insertItem.setSearchId( searchId );
+				insertItem.setReportedPeptideId( lookupItem.getReportedPeptideId() );
+				insertItem.setProteinId( rs.getInt( "nrseq_id" ) );
+
+				insertItem.setAllRelatedPeptidesUniqueForSearch( lookupItem.isAllRelatedPeptidesUniqueForSearch() );
+				insertItem.setPsmNumAtDefaultCutoff( lookupItem.getPsmNumAtDefaultCutoff() );
+				insertItem.setPeptideMeetsDefaultCutoffs( lookupItem.getPeptideMeetsDefaultCutoffs() );
+
+				db_Insert_UnlinkedRepPeptSearchGenericLookupDAO.saveToDatabase( insertItem );
 				
-		if ( linkDTOList.isEmpty() ) {
+
+				if ( log.isInfoEnabled() ) {
+					
+					if ( foundRecordCount % 100000 == 0 ) {
+						
+						String logMsg =  "processUnlinked:  processed " + foundRecordCount + ",  Reported Peptide Id: \t" + lookupItem.getReportedPeptideId();
+					
+//						if ( totalRecordCount > 0 ) {
+//							
+//							logMsg += " of " + totalRecordCount;
+//						}
+
+						log.info( logMsg );
+					}
+				}
+			}
+
+		} catch ( Exception e ) {
+			
+			String msg = "processUnlinked(), sql: " + sql;
+			
+			log.error( msg, e );
+			
+			throw e;
+			
+		} finally {
+			
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			
+			//  Skip Close DB Connection, done elsewhere
+		}
+
+		if ( foundRecordCount == 0 ) {
 
 			String msg = "no unlinked records found for psmId: " + lookupItem.getSamplePsmId();
 			log.error( msg );
 			throw new ProxlImporterDataException(msg);
 		}
 
-		List<UnlinkedRepPeptSearchGenericLookupDTO> insertedItems = new ArrayList<>();
-
-		for ( UnlinkedDTO linkDTO : linkDTOList ) {
-
-			UnlinkedRepPeptSearchGenericLookupDTO insertItem = new UnlinkedRepPeptSearchGenericLookupDTO();
-
-			insertItem.setSearchId( searchId );
-			insertItem.setReportedPeptideId( lookupItem.getReportedPeptideId() );
-			insertItem.setProteinId( linkDTO.getProtein().getNrseqId() );
-
-			insertItem.setAllRelatedPeptidesUniqueForSearch( lookupItem.isAllRelatedPeptidesUniqueForSearch() );
-			insertItem.setPsmNumAtDefaultCutoff( lookupItem.getPsmNumAtDefaultCutoff() );
-			insertItem.setPeptideMeetsDefaultCutoffs( lookupItem.getPeptideMeetsDefaultCutoffs() );
-
-			//  Don't insert the same item twice.  The link table has duplicates
-
-			boolean itemAlreadyInserted = false;
-
-			for ( UnlinkedRepPeptSearchGenericLookupDTO alreadyInserted : insertedItems ) {
-
-				if ( 	   alreadyInserted.getProteinId() == insertItem.getProteinId()
-						) {
-
-					itemAlreadyInserted = true;
-				}
-			}
-
-			if ( itemAlreadyInserted ) {
-
-				continue;  // Skip inserting insertItem
-			}
-
-			db_Insert_UnlinkedRepPeptSearchGenericLookupDAO.saveToDatabase( insertItem );
-
-			insertedItems.add( insertItem );
+		if ( foundRecordCount > 10000 ) {
+			log.info( "processUnlinked: > 10,000 crosslink records processed. Reported Peptide Id: \t" + lookupItem.getReportedPeptideId()
+					+ "\t, Record count processed: \t" + foundRecordCount );
 		}
+
 	}
 
 	private void processMonolink(
@@ -460,6 +714,9 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 		
 		final String sqlMonolink = SQL_MONOLINK;
 		
+
+		int foundRecordCount = 0;
+		
 		try {
 			
 			
@@ -472,6 +729,8 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 
 			while ( rsMonolink.next() ) {
 
+				foundRecordCount++;
+				
 				int nrseqId = rsMonolink.getInt( "nrseq_id" );
 				int proteinPosition = rsMonolink.getInt( "protein_position" );
 				
@@ -487,6 +746,18 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 				insertItem.setPeptideMeetsDefaultCutoffs( lookupItem.getPeptideMeetsDefaultCutoffs() );
 
 				db_Insert_MonoLinkRepPeptSearchGenericLookupDAO.saveToDatabase( insertItem );
+				
+
+
+				if ( log.isInfoEnabled() ) {
+					
+					if ( foundRecordCount % 100000 == 0 ) {
+						
+						String logMsg =  "processUnlinked:  processed " + foundRecordCount + ",  Reported Peptide Id: \t" + lookupItem.getReportedPeptideId();
+					
+						log.info( logMsg );
+					}
+				}
 			}
 
 		} finally {
@@ -502,6 +773,11 @@ public class AddLinkPerPeptideGenericLookupRecordsPerSearchId {
 				pstmtMonolink = null;
 			}
 			
+		}
+		
+		if ( foundRecordCount > 10000 ) {
+			log.info( "processUnlinked: > 10,000 crosslink records processed. Reported Peptide Id: \t" + lookupItem.getReportedPeptideId()
+					+ "\t, Record count processed: \t" + foundRecordCount );
 		}
 	}
 }

@@ -110,6 +110,8 @@ public class PopulateSearchCrosslinkGenericLookupTable {
 		ResultSet rs = null;
 		
 		String sql = PRIMARY_SELECT_SQL;
+		
+		int processedRecordCount = 0;
 
 		try {
 
@@ -128,7 +130,10 @@ public class PopulateSearchCrosslinkGenericLookupTable {
 			
 			DB_Insert_SearchCrosslinkGenericLookupDAO db_Insert_SearchCrosslinkGenericLookupDAO = DB_Insert_SearchCrosslinkGenericLookupDAO.getInstance();
 
+			
 			while( rs.next() ) {
+				
+				processedRecordCount++;
 
 				SearchCrosslinkGenericLookupDTO item = new SearchCrosslinkGenericLookupDTO();
 
@@ -184,6 +189,13 @@ public class PopulateSearchCrosslinkGenericLookupTable {
 //				List<SearchCrosslinkBestPeptideValueGenericLookupDTO> insertedBestPeptideValueRecords = 
 				populateCrosslinkBestPeptideValue( item, srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOList );
 
+				if ( log.isInfoEnabled() ) {
+
+					if ( ( processedRecordCount % 100000 ) == 0 ) {
+
+						log.info( "populateSearchCrosslinkGenericLookupTable: processed " + processedRecordCount + " records." );
+					}
+				}
 			}
 
 //			st.execute( enableKeysSQL );
@@ -222,9 +234,14 @@ public class PopulateSearchCrosslinkGenericLookupTable {
 			}
 
 		}
-		
+
 
 	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+
+		if ( log.isInfoEnabled() ) {
+
+			log.info( "populateSearchCrosslinkGenericLookupTable: Record Count Total: " + processedRecordCount );
+		}
 
 	}
 	

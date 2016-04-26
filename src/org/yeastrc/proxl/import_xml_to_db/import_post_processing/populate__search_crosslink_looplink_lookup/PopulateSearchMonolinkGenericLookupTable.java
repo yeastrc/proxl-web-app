@@ -101,6 +101,8 @@ public class PopulateSearchMonolinkGenericLookupTable {
 		
 		String sql = PRIMARY_SELECT_SQL;
 
+		int processedRecordCount = 0;
+		
 		try {
 
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
@@ -120,6 +122,8 @@ public class PopulateSearchMonolinkGenericLookupTable {
 
 			while( rs.next() ) {
 
+				processedRecordCount++;
+				
 				SearchMonolinkGenericLookupDTO item = new SearchMonolinkGenericLookupDTO();
 
 				item.setSearchId( searchId );
@@ -171,6 +175,13 @@ public class PopulateSearchMonolinkGenericLookupTable {
 //				List<SearchMonolinkBestPeptideValueGenericLookupDTO> insertedBestPeptideValueRecords = 
 				populateMonolinkBestPeptideValue( item, srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOList );
 
+				if ( log.isInfoEnabled() ) {
+
+					if ( ( processedRecordCount % 100000 ) == 0 ) {
+
+						log.info( "populateSearchMonolinkGenericLookupTable: processed " + processedRecordCount + " records." );
+					}
+				}
 
 			}
 
@@ -210,10 +221,13 @@ public class PopulateSearchMonolinkGenericLookupTable {
 			}
 
 		}
-		
 
 	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
 
+		if ( log.isInfoEnabled() ) {
+
+			log.info( "populateSearchMonolinkGenericLookupTable: Record Count Total: " + processedRecordCount );
+		}
 	}
 	
 	

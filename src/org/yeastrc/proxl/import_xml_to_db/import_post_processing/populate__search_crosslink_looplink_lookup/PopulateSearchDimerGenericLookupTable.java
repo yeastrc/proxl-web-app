@@ -103,6 +103,8 @@ public class PopulateSearchDimerGenericLookupTable {
 		
 		String sql = PRIMARY_SELECT_SQL;
 
+		int processedRecordCount = 0;
+		
 		try {
 
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
@@ -121,6 +123,8 @@ public class PopulateSearchDimerGenericLookupTable {
 			DB_Insert_SearchDimerGenericLookupDAO db_Insert_SearchDimerGenericLookupDAO = DB_Insert_SearchDimerGenericLookupDAO.getInstance();
 
 			while( rs.next() ) {
+
+				processedRecordCount++;
 
 				SearchDimerGenericLookupDTO item = new SearchDimerGenericLookupDTO();
 
@@ -170,6 +174,13 @@ public class PopulateSearchDimerGenericLookupTable {
 //				List<SearchDimerBestPeptideValueGenericLookupDTO> insertedBestPeptideValueRecords = 
 				populateDimerBestPeptideValue( item, srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOList );
 
+				if ( log.isInfoEnabled() ) {
+
+					if ( ( processedRecordCount % 100000 ) == 0 ) {
+
+						log.info( "populateSearchDimerGenericLookupTable: processed " + processedRecordCount + " records." );
+					}
+				}
 			}
 
 //			st.execute( enableKeysSQL );
@@ -212,6 +223,10 @@ public class PopulateSearchDimerGenericLookupTable {
 
 	    ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
 
+		if ( log.isInfoEnabled() ) {
+
+			log.info( "populateSearchDimerGenericLookupTable: Record Count Total: " + processedRecordCount );
+		}
 	}
 	
 	
