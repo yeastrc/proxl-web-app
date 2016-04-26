@@ -131,60 +131,60 @@ public class DropPeptidePSMPopulateFilterDirection {
 							}
 						}
 					}
+				}
 					
 
-					if ( dropPsmCutoffValueList != null && ( ! dropPsmCutoffValueList.isEmpty() ) ) {
+				if ( dropPsmCutoffValueList != null && ( ! dropPsmCutoffValueList.isEmpty() ) ) {
 
-						PsmAnnotationTypes psmAnnotationTypes = searchProgram.getPsmAnnotationTypes();
+					PsmAnnotationTypes psmAnnotationTypes = searchProgram.getPsmAnnotationTypes();
 
-						if ( psmAnnotationTypes != null ) {
+					if ( psmAnnotationTypes != null ) {
 
-							FilterablePsmAnnotationTypes filterablePsmAnnotationTypes = 
-									psmAnnotationTypes.getFilterablePsmAnnotationTypes();
+						FilterablePsmAnnotationTypes filterablePsmAnnotationTypes = 
+								psmAnnotationTypes.getFilterablePsmAnnotationTypes();
 
-							if ( filterablePsmAnnotationTypes != null ) {
+						if ( filterablePsmAnnotationTypes != null ) {
 
-								List<FilterablePsmAnnotationType> filterablePsmAnnotationTypeList = 
-										filterablePsmAnnotationTypes.getFilterablePsmAnnotationType();
+							List<FilterablePsmAnnotationType> filterablePsmAnnotationTypeList = 
+									filterablePsmAnnotationTypes.getFilterablePsmAnnotationType();
 
-								if ( filterablePsmAnnotationTypeList != null && ( ! filterablePsmAnnotationTypeList.isEmpty() ) ) {
+							if ( filterablePsmAnnotationTypeList != null && ( ! filterablePsmAnnotationTypeList.isEmpty() ) ) {
 
-									for ( FilterablePsmAnnotationType filterablePsmAnnotationType : filterablePsmAnnotationTypeList ) {
+								for ( FilterablePsmAnnotationType filterablePsmAnnotationType : filterablePsmAnnotationTypeList ) {
 
-										for ( DropPeptidePSMCutoffValue dropPsmCutoffValue : dropPsmCutoffValueList ) {
+									for ( DropPeptidePSMCutoffValue dropPsmCutoffValue : dropPsmCutoffValueList ) {
 
-											if ( dropPsmCutoffValue.getAnnotationName().equals( filterablePsmAnnotationType.getName() ) ) {
+										if ( dropPsmCutoffValue.getAnnotationName().equals( filterablePsmAnnotationType.getName() ) ) {
 
-												if ( dropPsmCutoffValue.getAnnotationTypeFilterDirection() != null ) {
+											if ( dropPsmCutoffValue.getAnnotationTypeFilterDirection() != null ) {
 
-													String msg = " Filter direction already assigned for annotation name '"
-															+ filterablePsmAnnotationType.getName() 
-															+ "'.  Drop records currently not supported for annotation names that are the same"
-															+ " in more than one search program.";
-													log.error( msg );
-													throw new ProxlImporterDataException(msg);
-												}
-												
-												if ( filterablePsmAnnotationType.getFilterDirection() 
-														== org.yeastrc.proxl_import.api.xml_dto.FilterDirectionType.ABOVE ) {
-												
-													dropPsmCutoffValue.setAnnotationTypeFilterDirection( FilterDirectionType.ABOVE );
-													
-												} else if ( filterablePsmAnnotationType.getFilterDirection() 
-														== org.yeastrc.proxl_import.api.xml_dto.FilterDirectionType.BELOW ) {
-												
-													dropPsmCutoffValue.setAnnotationTypeFilterDirection( FilterDirectionType.BELOW );
-													
-												} else {
+												String msg = " Filter direction already assigned for annotation name '"
+														+ filterablePsmAnnotationType.getName() 
+														+ "'.  Drop records currently not supported for annotation names that are the same"
+														+ " in more than one search program.";
+												log.error( msg );
+												throw new ProxlImporterDataException(msg);
+											}
 
-													String msg = " Unknown value for Filter direction for annotation name '"
-															+ filterablePsmAnnotationType.getName()
-															+ "'.  Filter direction value: " + 
-															filterablePsmAnnotationType.getFilterDirection() ;
-													log.error( msg );
-													throw new ProxlImporterDataException(msg);
-													
-												}
+											if ( filterablePsmAnnotationType.getFilterDirection() 
+													== org.yeastrc.proxl_import.api.xml_dto.FilterDirectionType.ABOVE ) {
+
+												dropPsmCutoffValue.setAnnotationTypeFilterDirection( FilterDirectionType.ABOVE );
+
+											} else if ( filterablePsmAnnotationType.getFilterDirection() 
+													== org.yeastrc.proxl_import.api.xml_dto.FilterDirectionType.BELOW ) {
+
+												dropPsmCutoffValue.setAnnotationTypeFilterDirection( FilterDirectionType.BELOW );
+
+											} else {
+
+												String msg = " Unknown value for Filter direction for annotation name '"
+														+ filterablePsmAnnotationType.getName()
+														+ "'.  Filter direction value: " + 
+														filterablePsmAnnotationType.getFilterDirection() ;
+												log.error( msg );
+												throw new ProxlImporterDataException(msg);
+
 											}
 										}
 									}
@@ -195,6 +195,7 @@ public class DropPeptidePSMPopulateFilterDirection {
 				}
 			}
 		}
+		
 		
 		//  Make sure all drop values have a direction
 		
