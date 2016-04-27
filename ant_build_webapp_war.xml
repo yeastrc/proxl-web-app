@@ -17,12 +17,12 @@
     <property name="deployablename" value="proxl.war" />
 
     <property name="src" value="src" />
-    <property name="build_dir" value="build_dir" />
+    <property name="zz_build_dir" value="zz_build_dir" />
     <property name="build" value="build" />
-    <property name="classesweb" value="build_dir/WEB-INF/classes" />
+    <property name="classesweb" value="zz_build_dir/WEB-INF/classes" />
     <property name="deploy" value="deploy" />
     <property name="config" value="resources" />
-    <property name="libweb" value="build_dir/WEB-INF/lib" />
+    <property name="libweb" value="zz_build_dir/WEB-INF/lib" />
   </target>
 
 
@@ -72,12 +72,12 @@
 	
   <target name="clean" depends="init">
     <delete dir="${classesweb}" />
-  	<delete dir="${build_dir}" />
+  	<delete dir="${zz_build_dir}" />
     <delete dir="${deploy}" />
   </target>
 
   <target name="prepare" depends="clean">
-  	<mkdir dir="${build_dir}" />
+  	<mkdir dir="${zz_build_dir}" />
     <mkdir dir="${classesweb}" />
     <mkdir dir="${deploy}" />
   </target>
@@ -136,7 +136,7 @@
 
   	<!--  Copy in everything under WebRoot except under 'classes' -->
 
-	<copy  todir="build_dir">
+	<copy  todir="zz_build_dir">
 	    <fileset dir="WebRoot">
 			<exclude name="WEB-INF/classes/**" />
 			<exclude name="META-INF/**" />
@@ -185,7 +185,7 @@
 		
 		description="Packages the project as a deployable war file">
 
-		<war jarfile="${deploy}/${deployablename}" webxml="build_dir/WEB-INF/web.xml">
+		<war jarfile="${deploy}/${deployablename}" webxml="zz_build_dir/WEB-INF/web.xml">
 			<manifest>
 
 	        	<attribute name="GIT-last-tag-commit-hash" value="${git.last.tag.and.commit.hash}"/>
@@ -195,7 +195,7 @@
 				<attribute name="Time" value="${build-info.current-time}" />
 			</manifest>			
 	
-	    	<fileset dir="build_dir">
+	    	<fileset dir="zz_build_dir">
 
 	     	</fileset>
 	
@@ -210,7 +210,7 @@
 	
 	<path id="classpath">
 
-		<fileset dir="build_dir/WEB-INF/lib">
+		<fileset dir="zz_build_dir/WEB-INF/lib">
 			<include name="**/*.jar"/>
 		</fileset>
 

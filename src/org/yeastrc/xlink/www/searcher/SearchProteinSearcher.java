@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.xlink.dao.NRProteinDAO;
@@ -34,9 +36,9 @@ public class SearchProteinSearcher {
 			String sql = 
 						"(SELECT DISTINCT a.nrseq_id AS nseq " +
 						"FROM unlinked AS a INNER JOIN psm AS b ON a.psm_id = b.id " +
-						"WHERE b.search_id = ? AND a.peptide_id = ?) " +
+						"WHERE b.search_id = ? AND a.peptide_id = ?) ";
 
-						"ORDER BY nseq";
+//						"ORDER BY nseq";
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, search.getId() );
@@ -51,6 +53,17 @@ public class SearchProteinSearcher {
 				proteinPositions.add( prpp );
 			}
 			
+
+			//  Sort on nrseq id
+			
+			Collections.sort( proteinPositions, new Comparator<SearchProteinPosition>() {
+
+				@Override
+				public int compare(SearchProteinPosition o1, SearchProteinPosition o2) {
+					
+					return o1.getProtein().getNrProtein().getNrseqId() - o2.getProtein().getNrProtein().getNrseqId();
+				}
+			});;
 			
 		} finally {
 			
@@ -95,9 +108,9 @@ public class SearchProteinSearcher {
 
 					"(SELECT a.nrseq_id_2 AS nseq " +
 					"FROM dimer AS a INNER JOIN psm AS b ON a.psm_id = b.id " +
-					"WHERE b.search_id = ? AND a.peptide_2_id = ? ) " +
+					"WHERE b.search_id = ? AND a.peptide_2_id = ? ) ";
 
-					"ORDER BY nseq";
+//					"ORDER BY nseq";
 			
 			
 			pstmt = conn.prepareStatement( sql );
@@ -114,7 +127,17 @@ public class SearchProteinSearcher {
 				
 				proteinPositions.add( prpp );
 			}
+
+			//  Sort on nrseq id
 			
+			Collections.sort( proteinPositions, new Comparator<SearchProteinPosition>() {
+
+				@Override
+				public int compare(SearchProteinPosition o1, SearchProteinPosition o2) {
+					
+					return o1.getProtein().getNrProtein().getNrseqId() - o2.getProtein().getNrProtein().getNrseqId();
+				}
+			});;
 			
 		} finally {
 			
@@ -159,9 +182,9 @@ public class SearchProteinSearcher {
 
 						"(SELECT a.nrseq_id_2 AS nseq, a.protein_2_position AS pos " +
 						"FROM crosslink AS a INNER JOIN psm AS b ON a.psm_id = b.id " +
-						"WHERE b.search_id = ? AND a.peptide_2_id = ? AND a.peptide_2_position = ?) " +
+						"WHERE b.search_id = ? AND a.peptide_2_id = ? AND a.peptide_2_position = ?) "; 
 
-						"ORDER BY nseq, pos";
+//						+ "ORDER BY nseq, pos";
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, search.getId() );
@@ -181,6 +204,20 @@ public class SearchProteinSearcher {
 				proteinPositions.add( prpp );
 			}
 			
+			//  Sort on nrseq id, position
+			
+			Collections.sort( proteinPositions, new Comparator<SearchProteinPosition>() {
+
+				@Override
+				public int compare(SearchProteinPosition o1, SearchProteinPosition o2) {
+					
+					if ( o1.getProtein().getNrProtein().getNrseqId() != o2.getProtein().getNrProtein().getNrseqId() ) {
+						
+						return o1.getProtein().getNrProtein().getNrseqId() - o2.getProtein().getNrProtein().getNrseqId();
+					}
+					return o1.getPosition() - o2.getPosition();
+				}
+			});;
 			
 		} finally {
 			
@@ -217,9 +254,9 @@ public class SearchProteinSearcher {
 			String sql = 
 						"SELECT DISTINCT a.nrseq_id AS nseq, a.protein_position_1 AS pos1, a.protein_position_2 AS pos2 " +
 						"FROM looplink AS a INNER JOIN psm AS b ON a.psm_id = b.id " +
-						"WHERE b.search_id = ? AND a.peptide_id = ? AND a.peptide_position_1 = ? AND a.peptide_position_2 = ? " +
+						"WHERE b.search_id = ? AND a.peptide_id = ? AND a.peptide_position_1 = ? AND a.peptide_position_2 = ? ";
 
-						"ORDER BY nseq, pos1, pos2";
+//						"ORDER BY nseq, pos1, pos2";
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, search.getId() );
@@ -239,6 +276,23 @@ public class SearchProteinSearcher {
 				proteinPositions.add( prpp );
 			}
 			
+			//  Sort on nrseq id, protein_position_1, protein_position_2
+			
+			Collections.sort( proteinPositions, new Comparator<SearchProteinDoublePosition>() {
+
+				@Override
+				public int compare(SearchProteinDoublePosition o1, SearchProteinDoublePosition o2) {
+					
+					if ( o1.getProtein().getNrProtein().getNrseqId() != o2.getProtein().getNrProtein().getNrseqId() ) {
+						
+						return o1.getProtein().getNrProtein().getNrseqId() - o2.getProtein().getNrProtein().getNrseqId();
+					}
+					if ( o1.getPosition1() != o2.getPosition1() ) {
+						return o1.getPosition1() - o2.getPosition1();
+					}
+					return o1.getPosition1() - o2.getPosition1();
+				}
+			});;
 			
 		} finally {
 			
