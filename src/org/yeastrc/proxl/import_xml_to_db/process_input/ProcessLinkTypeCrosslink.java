@@ -173,6 +173,18 @@ public class ProcessLinkTypeCrosslink {
 
 			return;  //  EARLY EXIT   No crosslink records for this reported peptide in this search 
 		}
+		
+		
+		if ( log.isInfoEnabled() ) {
+
+			if ( getCrosslinksResultItemList != null && getCrosslinksResultItemList.size() > 50000 ) {
+			
+				log.info( "Number of 'crosslink' table records for reported peptide exceeds 50,000."
+						+ "  Number of 'crosslink' table records for reported peptide: " +  getCrosslinksResultItemList.size()
+						+ ".  reportedPeptide Sequence: " + reportedPeptide.getReportedPeptideString() );
+			}
+		}
+		
 
 		Psms psms =	reportedPeptide.getPsms();
 
