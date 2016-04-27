@@ -21,7 +21,7 @@
 					<h1 id="view-spectra-overlay-X-for-exit-overlay" class="view-spectra-overlay-X-for-exit-overlay" >X</h1>
 
 					<div style="float: right; padding-right: 5px; padding-top: 10px;">
-				  		<a href="http://proxl-web-app.readthedocs.org/en/latest/using/spectrum-viewer.html"  target="_help_window" id="help_header_link" 
+				  		<a href="http://proxl-web-app.readthedocs.io/en/latest/using/spectrum-viewer.html"  target="_help_window" id="help_header_link" 
 				  			><img src="${ contextPath }/images/icon-help.png" 
 				  		></a>
 					</div>

@@ -111,7 +111,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
   	  
   	   <div class="header-right-icons" style="position: relative;">
 	  	    
-	  		<a href="http://proxl-web-app.readthedocs.org/${ helpURLExtensionForSpecificPage }"  target="_help_window" id="help_header_link" 
+	  		<a href="http://proxl-web-app.readthedocs.io/${ helpURLExtensionForSpecificPage }"  target="_help_window" id="help_header_link" 
 	  			><img src="${ contextPath }/images/icon-help.png" 
 	  		></a>
 	  		
@@ -136,7 +136,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
   	 	<%--  icons will be to the right of username --%>
   	   <div class="header-right-icons" style="position: relative;">
 
-	  		<a href="http://proxl-web-app.readthedocs.org/${ helpURLExtensionForSpecificPage }"  target="_help_window" id="help_header_link" 
+	  		<a href="http://proxl-web-app.readthedocs.io/${ helpURLExtensionForSpecificPage }"  target="_help_window" id="help_header_link" 
 	  			><img src="${ contextPath }/images/icon-help.png" 
 	  		></a>
 	  	    
