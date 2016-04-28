@@ -7,6 +7,7 @@ import jargs.gnu.CmdLineParser.UnknownOptionException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +21,8 @@ import org.yeastrc.proxl.import_xml_to_db.constants.ScanFilenameConstants;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFile;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFileException;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValue;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.PrintHelpOnlyException;
 import org.yeastrc.proxl.import_xml_to_db.importer_core_entry_point.ImporterCoreEntryPoint;
 import org.yeastrc.proxl.import_xml_to_db.objects.ImportResults;
@@ -116,6 +119,10 @@ public class ImporterDefaultMainProgramEntry {
 
 			CmdLineParser.Option proxlDatabaseNameCommandLineOpt = cmdLineParser.addStringOption( 'Z', PROXL_DB_NAME_CMD_LINE_PARAM_STRING );
 
+			//  'Q' is arbitrary and won't be suggested to user
+			CmdLineParser.Option dropPeptideCutoffValueOpt = cmdLineParser.addStringOption( 'Q', "drop-peptide-cutoff" );
+			CmdLineParser.Option dropPsmCutoffValueOpt = cmdLineParser.addStringOption( 'Q', "drop-psm-cutoff" );
+			
 
 			CmdLineParser.Option verboseOpt = cmdLineParser.addBooleanOption('V', "verbose"); 
 			CmdLineParser.Option debugOpt = cmdLineParser.addBooleanOption('D', "debug"); 
@@ -201,7 +208,13 @@ public class ImporterDefaultMainProgramEntry {
 	        @SuppressWarnings("rawtypes")
 	        Vector inputScanFileStringVector = cmdLineParser.getOptionValues( inputScanFileStringCommandLineOpt );
 
+			@SuppressWarnings("rawtypes")
+			Vector  dropPeptideCutoffValueVector = cmdLineParser.getOptionValues( dropPeptideCutoffValueOpt );
 			
+			@SuppressWarnings("rawtypes")
+			Vector  dropPsmCutoffValueVector = cmdLineParser.getOptionValues( dropPsmCutoffValueOpt );
+			
+
 			
 			String[] remainingArgs = cmdLineParser.getRemainingArgs();
 
@@ -357,6 +370,147 @@ public class ImporterDefaultMainProgramEntry {
 						+ "=' specified so importing to database name: " + proxlDatabaseName );
 			}
 			
+			
+			
+
+	        
+	        /////////////////////////
+	        
+	        //   Peptide and PSM cutoffs 
+
+	        final String PEPTIDE_PSM_CUTOFF_SEPARATOR = ":";
+	        
+	        
+	        
+	        DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues = new DropPeptidePSMCutoffValues();
+	        
+	        List<DropPeptidePSMCutoffValue> dropPeptideCutoffValueList = new ArrayList<>();
+	        dropPeptidePSMCutoffValues.setDropPeptideCutoffValueList( dropPeptideCutoffValueList );
+
+	        
+	        for ( Object dropPeptideCutoffValueStringObject : dropPeptideCutoffValueVector ) {
+	        	
+	        	if ( ! (  dropPeptideCutoffValueStringObject instanceof String ) ) {
+
+		        	System.err.println( "dropPeptideCutoffValueStringObject is not a String object\n" );
+					System.err.println( "" );
+					System.err.println( FOR_HELP_STRING );
+
+					System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
+	        	}
+	        	
+	        	String dropPeptideCutoffValueString = (String) dropPeptideCutoffValueStringObject;
+
+	        	if( dropPeptideCutoffValueString == null || dropPeptideCutoffValueString.equals( "" ) ) {
+
+		        	System.err.println( "'--drop-peptide-cutoff' must have a value" );
+					System.err.println( "" );
+					System.err.println( FOR_HELP_STRING );
+
+					System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
+	        	}
+	        	
+	        	String[] dropPeptideCutoffValueStringSplit = dropPeptideCutoffValueString.split( PEPTIDE_PSM_CUTOFF_SEPARATOR );
+	        	
+	        	if ( dropPeptideCutoffValueStringSplit.length != 2 ) {
+
+	        		System.err.println( "'--drop-peptide-cutoff' must have 2 values (annotation name;cutoff value)" 
+	        				+ " separated by '" + PEPTIDE_PSM_CUTOFF_SEPARATOR + "'" );	
+					System.err.println( "" );
+					System.err.println( FOR_HELP_STRING );
+
+					System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
+	        	}
+	        	
+	        	String annotationName = dropPeptideCutoffValueStringSplit[ 0 ];
+	        	String cutoffValueString = dropPeptideCutoffValueStringSplit[ 1 ];
+
+	        	DropPeptidePSMCutoffValue dropPeptidePSMCutoffValue = new DropPeptidePSMCutoffValue();
+	        	
+	        	dropPeptidePSMCutoffValue.setAnnotationName( annotationName );
+	        	try {
+	        		BigDecimal cutoffValue = new BigDecimal( cutoffValueString );
+	        		dropPeptidePSMCutoffValue.setCutoffValue( cutoffValue );
+	        	} catch ( Exception e ) {
+	        		
+	        		System.err.println( "The second value (cutoff) for '--drop-peptide-cutoff' must be a valid decimal number."
+	        				+ " Invalid cutoff value: " + cutoffValueString ); 
+					System.err.println( "" );
+					System.err.println( FOR_HELP_STRING );
+
+					System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
+	        	}
+	        	
+	        	dropPeptideCutoffValueList.add( dropPeptidePSMCutoffValue );
+	        }
+	        
+
+	        List<DropPeptidePSMCutoffValue> dropPsmCutoffValueList = new ArrayList<>();
+	        dropPeptidePSMCutoffValues.setDropPSMCutoffValueList( dropPsmCutoffValueList );
+
+	        
+	        for ( Object dropPsmCutoffValueStringObject : dropPsmCutoffValueVector ) {
+	        	
+	        	if ( ! (  dropPsmCutoffValueStringObject instanceof String ) ) {
+
+		        	System.err.println( "dropPsmCutoffValueStringObject is not a String object\n" );
+					System.err.println( "" );
+					System.err.println( FOR_HELP_STRING );
+
+					System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
+	        	}
+	        	
+	        	String dropPsmCutoffValueString = (String) dropPsmCutoffValueStringObject;
+
+	        	if( dropPsmCutoffValueString == null || dropPsmCutoffValueString.equals( "" ) ) {
+
+		        	System.err.println( "'--drop-peptide-cutoff' must have a value" );
+					System.err.println( "" );
+					System.err.println( FOR_HELP_STRING );
+
+					System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
+	        	}
+	        	
+	        	String[] dropPsmCutoffValueStringSplit = dropPsmCutoffValueString.split( PEPTIDE_PSM_CUTOFF_SEPARATOR );
+	        	
+	        	if ( dropPsmCutoffValueStringSplit.length != 2 ) {
+
+	        		System.err.println( "'--drop-peptide-cutoff' must have 2 values (annotation name;cutoff value)" 
+	        				+ " separated by '" + PEPTIDE_PSM_CUTOFF_SEPARATOR + "'" );	
+					System.err.println( "" );
+					System.err.println( FOR_HELP_STRING );
+
+					System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
+	        	}
+	        	
+	        	String annotationName = dropPsmCutoffValueStringSplit[ 0 ];
+	        	String cutoffValueString = dropPsmCutoffValueStringSplit[ 1 ];
+
+	        	DropPeptidePSMCutoffValue dropPeptidePSMCutoffValue = new DropPeptidePSMCutoffValue();
+	        	
+	        	dropPeptidePSMCutoffValue.setAnnotationName( annotationName );
+	        	try {
+	        		BigDecimal cutoffValue = new BigDecimal( cutoffValueString );
+	        		dropPeptidePSMCutoffValue.setCutoffValue( cutoffValue );
+	        	} catch ( Exception e ) {
+	        		
+	        		System.err.println( "The second value (cutoff) for '--drop-peptide-cutoff' must be a valid decimal number."
+	        				+ " Invalid cutoff value: " + cutoffValueString ); 
+					System.err.println( "" );
+					System.err.println( FOR_HELP_STRING );
+
+					System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
+	        	}
+	        	
+	        	dropPsmCutoffValueList.add( dropPeptidePSMCutoffValue );
+	        }
+	        
+
+			
+			/////////////////////////
+	        
+	        
+			
 			System.out.println( "main XML File To Import file: " + mainXMLFileToImport.getAbsolutePath() );
 
 			if ( scanFileList == null || scanFileList.isEmpty() ) {
@@ -456,7 +610,7 @@ public class ImporterDefaultMainProgramEntry {
 							mainXMLFileToImport, 
 							scanFileList,
 							
-							null /* dropPeptidePSMCutoffValues */
+							dropPeptidePSMCutoffValues /* dropPeptidePSMCutoffValues */
 							);
 
 			importResults.setSearchId( insertedSearchId );
