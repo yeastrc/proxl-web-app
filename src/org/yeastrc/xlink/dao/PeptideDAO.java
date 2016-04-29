@@ -3,6 +3,7 @@ package org.yeastrc.xlink.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -173,7 +174,7 @@ public class PeptideDAO {
 			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
-			pstmt = conn.prepareStatement( sql );
+			pstmt = conn.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );
 			pstmt.setString( 1, peptide.getSequence() );
 			
 			pstmt.executeUpdate();

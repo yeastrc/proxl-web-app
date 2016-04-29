@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 
 import org.apache.log4j.Logger;
@@ -272,7 +273,7 @@ public class ScanDAO {
 
 		try {
 			
-			pstmtSave = dbConnection.prepareStatement( insertSQL );
+			pstmtSave = dbConnection.prepareStatement( insertSQL, Statement.RETURN_GENERATED_KEYS );
 
 			int counter = 0;
 

@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -390,7 +391,7 @@ public class SearchFileDAO {
 			
 //			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
-			pstmt = conn.prepareStatement( sql );
+			pstmt = conn.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );
 			
 			int counter = 0;
 			

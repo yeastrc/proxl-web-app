@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -267,7 +268,7 @@ public class ScanRetentionTimeDAO {
 			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			
-			pstmtSave = connection.prepareStatement( insertSQL );
+			pstmtSave = connection.prepareStatement( insertSQL, Statement.RETURN_GENERATED_KEYS );
 
 			int counter = 0;
 

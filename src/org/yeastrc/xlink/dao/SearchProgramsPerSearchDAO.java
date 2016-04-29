@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -161,7 +162,7 @@ public class SearchProgramsPerSearchDAO {
 			
 //			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
-			pstmt = conn.prepareStatement( sql );
+			pstmt = conn.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );
 			
 			int counter = 0;
 			
