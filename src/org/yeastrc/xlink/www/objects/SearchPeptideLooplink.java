@@ -70,6 +70,12 @@ public class SearchPeptideLooplink {
 				this.setPeptidePosition1( position2 );
 				this.setPeptidePosition2( position1 );
 			}
+			
+			
+			this.peptideProteinPositions = 
+					SearchProteinSearcher.getInstance().
+					getProteinDoublePositions( psmId, this.getPeptide().getId(), this.getPeptidePosition1(), this.getPeptidePosition2(), this.search );
+
 
 		} catch ( Exception e ) {
 
@@ -307,7 +313,7 @@ public class SearchPeptideLooplink {
 		try {
 
 			if( this.peptideProteinPositions == null )
-				this.peptideProteinPositions = SearchProteinSearcher.getInstance().getProteinDoublePositions( this.search, this.getPeptide(), this.getPeptidePosition1(), this.getPeptidePosition2() );
+				populatePeptides();
 
 			return peptideProteinPositions;
 

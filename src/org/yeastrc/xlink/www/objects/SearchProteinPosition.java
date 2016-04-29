@@ -23,6 +23,33 @@ public class SearchProteinPosition {
 		this.position = position;
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + position;
+		result = prime * result + protein.getNrProtein().getNrseqId();
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SearchProteinPosition other = (SearchProteinPosition) obj;
+		if (position != other.position)
+			return false;
+		if (protein.getNrProtein().getNrseqId() != other.protein.getNrProtein().getNrseqId()) {
+			return false;
+		}
+		return true;
+	}
+	
+
 	private SearchProtein protein;
 	private int position;
 	

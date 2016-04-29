@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.objects;
 
+
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -39,30 +40,30 @@ public class SearchPeptideCrosslink {
 		try {
 			
 			//  Get crosslink table entry for a psm.  assume the peptide position is the same for all.
-			
+
 
 			CrosslinkDTO crosslinkDTO = CrosslinkDAO.getInstance().getARandomCrosslinkDTOForPsmId( psmId );
-			
+
 			if ( crosslinkDTO == null ) {
-				
+
 
 				String msg = "crosslinkDTO == null for psmId: " + psmId;
 
 				log.error( msg );
 
 				throw new Exception( msg );
-				
+
 			}
-			
+
 			if( crosslinkDTO.getPeptide1Id() == crosslinkDTO.getPeptide2Id() ) {
-				
+
 				//  Same peptide
-				
+
 				int position1 = crosslinkDTO.getPeptide1Position();
 				int position2 = crosslinkDTO.getPeptide2Position();
 
 				PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( crosslinkDTO.getPeptide1Id() );
-				
+
 				this.setPeptide1( peptideDTO );
 				this.setPeptide2( peptideDTO );
 
@@ -73,9 +74,9 @@ public class SearchPeptideCrosslink {
 					this.setPeptide1Position( position2 );
 					this.setPeptide2Position( position1 );
 				}
-				
+
 			} else {
-				
+
 				//  different peptides
 
 				PeptideDTO peptideDTO1 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( crosslinkDTO.getPeptide1Id() );
@@ -85,7 +86,7 @@ public class SearchPeptideCrosslink {
 				int position2 = crosslinkDTO.getPeptide2Position();
 
 
-				
+
 				if( peptideDTO1.getId() <= peptideDTO2.getId() ) {
 					this.setPeptide1( peptideDTO1 );
 					this.setPeptide1Position( position1 );
@@ -101,6 +102,14 @@ public class SearchPeptideCrosslink {
 					this.setPeptide2Position( position1 );
 				}
 			}
+
+			this.peptide1ProteinPositions = 
+					SearchProteinSearcher.getInstance()
+					.getProteinPositions( psmId, this.getPeptide1().getId(), this.getPeptide1Position(), search );
+
+			this.peptide2ProteinPositions = 
+					SearchProteinSearcher.getInstance()
+					.getProteinPositions( psmId, this.getPeptide2().getId(), this.getPeptide2Position(), search );
 
 		} catch ( Exception e ) {
 
@@ -266,8 +275,10 @@ public class SearchPeptideCrosslink {
 		
 		try {
 
-			if( this.peptide1ProteinPositions == null )
-				this.peptide1ProteinPositions = SearchProteinSearcher.getInstance().getProteinPositions( this.search, this.getPeptide1(), this.getPeptide1Position() );
+			if( this.peptide1ProteinPositions == null ) {
+				
+				populatePeptides();
+			}
 
 			return peptide1ProteinPositions;
 
@@ -304,8 +315,10 @@ public class SearchPeptideCrosslink {
 		
 		try {
 
-			if( this.peptide2ProteinPositions == null )
-				this.peptide2ProteinPositions = SearchProteinSearcher.getInstance().getProteinPositions( this.search, this.getPeptide2(), this.getPeptide2Position() );
+			if( this.peptide2ProteinPositions == null ) {
+				
+				populatePeptides();
+			}
 
 			return peptide2ProteinPositions;
 

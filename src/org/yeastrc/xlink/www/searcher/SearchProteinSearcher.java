@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.yeastrc.xlink.dao.NRProteinDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.www.objects.SearchProtein;
 import org.yeastrc.xlink.www.objects.SearchProteinDoublePosition;
@@ -24,25 +23,27 @@ public class SearchProteinSearcher {
 	public static SearchProteinSearcher getInstance() { return _INSTANCE; }
 	
 
-	public List<SearchProteinPosition> getProteinForUnlinked( SearchDTO search, PeptideDTO peptide ) throws Exception {
+	public List<SearchProteinPosition> getProteinForUnlinked( int psmId, int peptideId, SearchDTO search ) throws Exception {
 		List<SearchProteinPosition> proteinPositions = new ArrayList<SearchProteinPosition>();
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		
+		String sql = 
+		"(SELECT DISTINCT nrseq_id AS nseq " +
+		" FROM unlinked " +
+		" WHERE psm_id = ? AND peptide_id = ?) "; 
+				
 		try {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			String sql = 
-						"(SELECT DISTINCT a.nrseq_id AS nseq " +
-						"FROM unlinked AS a INNER JOIN psm AS b ON a.psm_id = b.id " +
-						"WHERE b.search_id = ? AND a.peptide_id = ?) ";
 
-//						"ORDER BY nseq";
+
 			
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, search.getId() );
-			pstmt.setInt( 2, peptide.getId() );
+			pstmt.setInt( 1, psmId );
+			pstmt.setInt( 2, peptideId );
 			
 			rs = pstmt.executeQuery();
 			
@@ -90,34 +91,36 @@ public class SearchProteinSearcher {
 	
 	
 
-	public List<SearchProteinPosition> getProteinForDimer( SearchDTO search, PeptideDTO peptide ) throws Exception {
+	public List<SearchProteinPosition> getProteinForDimer( int psmId, int peptideId, SearchDTO search ) throws Exception {
+		
 		List<SearchProteinPosition> proteinPositions = new ArrayList<SearchProteinPosition>();
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		
+
+		final String sql = 
+					"(SELECT nrseq_id_1 AS nseq " +
+					" FROM dimer " +
+					" WHERE psm_id = ? AND peptide_1_id = ?) " +
+
+					"UNION " +
+
+					"(SELECT nrseq_id_2 AS nseq " +
+					"FROM dimer " +
+					"WHERE psm_id = ? AND peptide_2_id = ?) "; 
+
+		
 		try {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			String sql = 
-					"(SELECT a.nrseq_id_1 AS nseq " +
-					"FROM dimer AS a INNER JOIN psm AS b ON a.psm_id = b.id " +
-					"WHERE b.search_id = ? AND a.peptide_1_id = ? ) " +
-
-					"UNION DISTINCT " +
-
-					"(SELECT a.nrseq_id_2 AS nseq " +
-					"FROM dimer AS a INNER JOIN psm AS b ON a.psm_id = b.id " +
-					"WHERE b.search_id = ? AND a.peptide_2_id = ? ) ";
-
-//					"ORDER BY nseq";
-			
 			
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, search.getId() );
-			pstmt.setInt( 2, peptide.getId() );
-			pstmt.setInt( 3, search.getId() );
-			pstmt.setInt( 4, peptide.getId() );
+			pstmt.setInt( 1, psmId );
+			pstmt.setInt( 2, peptideId );
+			pstmt.setInt( 3, psmId );
+			pstmt.setInt( 4, peptideId );
 			
 			rs = pstmt.executeQuery();
 			
@@ -164,34 +167,38 @@ public class SearchProteinSearcher {
 	
 	
 	
-	public List<SearchProteinPosition> getProteinPositions( SearchDTO search, PeptideDTO peptide, int position ) throws Exception {
+	public List<SearchProteinPosition> getProteinPositions( int psmId, int peptideId, int position, SearchDTO search ) throws Exception {
+		
 		List<SearchProteinPosition> proteinPositions = new ArrayList<SearchProteinPosition>();
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		
+
+		final String sql = 
+					"(SELECT nrseq_id_1 AS nseq, protein_1_position AS pos " +
+					" FROM crosslink " +
+					" WHERE psm_id = ? AND peptide_1_id = ? AND peptide_1_position = ?) " +
+
+					"UNION " +
+
+					"(SELECT nrseq_id_2 AS nseq, protein_2_position AS pos " +
+					"FROM crosslink " +
+					"WHERE psm_id = ? AND peptide_2_id = ? AND peptide_2_position = ?) "; 
+
+		
 		try {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			String sql = 
-						"(SELECT a.nrseq_id_1 AS nseq, a.protein_1_position AS pos " +
-						"FROM crosslink AS a INNER JOIN psm AS b ON a.psm_id = b.id " +
-						"WHERE b.search_id = ? AND a.peptide_1_id = ? AND a.peptide_1_position = ?) " +
-
-						"UNION " +
-
-						"(SELECT a.nrseq_id_2 AS nseq, a.protein_2_position AS pos " +
-						"FROM crosslink AS a INNER JOIN psm AS b ON a.psm_id = b.id " +
-						"WHERE b.search_id = ? AND a.peptide_2_id = ? AND a.peptide_2_position = ?) "; 
-
 //						+ "ORDER BY nseq, pos";
 			
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, search.getId() );
-			pstmt.setInt( 2, peptide.getId() );
+			pstmt.setInt( 1, psmId );
+			pstmt.setInt( 2, peptideId );
 			pstmt.setInt( 3, position );
-			pstmt.setInt( 4, search.getId() );
-			pstmt.setInt( 5, peptide.getId() );
+			pstmt.setInt( 4, psmId );
+			pstmt.setInt( 5, peptideId );
 			pstmt.setInt( 6, position );
 			
 			rs = pstmt.executeQuery();
@@ -242,31 +249,33 @@ public class SearchProteinSearcher {
 		return proteinPositions;
 	}
 	
-	public List<SearchProteinDoublePosition> getProteinDoublePositions( SearchDTO search, PeptideDTO peptide, int position1, int position2 ) throws Exception {
+	public List<SearchProteinDoublePosition> getProteinDoublePositions( int psmId, int peptideId, int position1, int position2, SearchDTO search ) throws Exception {
+		
 		List<SearchProteinDoublePosition> proteinPositions = new ArrayList<SearchProteinDoublePosition>();
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		
+		final String sql = 
+				"SELECT DISTINCT nrseq_id AS nseq, protein_position_1 AS pos1, protein_position_2 AS pos2 " +
+				"FROM looplink " +
+				"WHERE psm_id = ? AND peptide_id = ? AND peptide_position_1 = ? AND peptide_position_2 = ? ";
+
 		try {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			String sql = 
-						"SELECT DISTINCT a.nrseq_id AS nseq, a.protein_position_1 AS pos1, a.protein_position_2 AS pos2 " +
-						"FROM looplink AS a INNER JOIN psm AS b ON a.psm_id = b.id " +
-						"WHERE b.search_id = ? AND a.peptide_id = ? AND a.peptide_position_1 = ? AND a.peptide_position_2 = ? ";
 
-//						"ORDER BY nseq, pos1, pos2";
-			
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, search.getId() );
-			pstmt.setInt( 2, peptide.getId() );
+			pstmt.setInt( 1, psmId);
+			pstmt.setInt( 2, peptideId );
 			pstmt.setInt( 3, position1 );
 			pstmt.setInt( 4, position2 );
 			
 			rs = pstmt.executeQuery();
 			
 			while( rs.next() ) {
+				
 				SearchProteinDoublePosition prpp = new SearchProteinDoublePosition();
 
 				prpp.setProtein( new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( rs.getInt( 1 ) ) ) );

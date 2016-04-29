@@ -48,6 +48,8 @@ public class SearchPeptideUnlink {
 			PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( results.get(0).getPeptide_id() );
 
 			this.setPeptide( peptideDTO );
+			
+			this.peptideProteinPositions = SearchProteinSearcher.getInstance().getProteinForUnlinked( psmId, this.peptide.getId(), this.search);
 
 		} catch ( Exception e ) {
 
@@ -165,7 +167,7 @@ public class SearchPeptideUnlink {
 		try {
 
 			if( this.peptideProteinPositions == null )
-				this.peptideProteinPositions = SearchProteinSearcher.getInstance().getProteinForUnlinked( this.search, this.peptide);
+				populatePeptides();
 
 			return peptideProteinPositions;
 

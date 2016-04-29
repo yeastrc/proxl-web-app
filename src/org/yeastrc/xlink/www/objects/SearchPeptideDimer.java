@@ -57,6 +57,16 @@ public class SearchPeptideDimer {
 			PeptideDTO peptideDTO2 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( results.get(1).getPeptide_id() );
 
 			this.setPeptide2( peptideDTO2 );
+			
+
+			this.peptide1ProteinPositions = 
+					SearchProteinSearcher.getInstance()
+					.getProteinForDimer( psmId, this.getPeptide1().getId(), search );
+
+			this.peptide2ProteinPositions = 
+					SearchProteinSearcher.getInstance()
+					.getProteinForDimer( psmId, this.getPeptide2().getId(), search );
+
 
 
 		} catch ( Exception e ) {
@@ -198,7 +208,7 @@ public class SearchPeptideDimer {
 		try {
 
 			if( this.peptide1ProteinPositions == null )
-				this.peptide1ProteinPositions = SearchProteinSearcher.getInstance().getProteinForDimer( this.search, this.peptide1);
+				populatePeptides();
 
 			return peptide1ProteinPositions;
 
@@ -218,7 +228,7 @@ public class SearchPeptideDimer {
 		try {
 
 			if( this.peptide2ProteinPositions == null )
-				this.peptide2ProteinPositions = SearchProteinSearcher.getInstance().getProteinForDimer( this.search, this.peptide2);
+				populatePeptides();
 
 			return peptide2ProteinPositions;
 
