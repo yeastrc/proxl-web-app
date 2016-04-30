@@ -3,6 +3,7 @@ package org.yeastrc.proxl.import_xml_to_db.dao_db_insert;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
@@ -46,7 +47,7 @@ public class DB_Insert_SearchLooplinkGenericLookupDAO {
 			
 			conn = ImportDBConnectionFactory.getInstance().getInsertControlCommitConnection();
 			
-			pstmt = conn.prepareStatement( sql );
+			pstmt = conn.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );
 			
 			
 			int counter = 0;
