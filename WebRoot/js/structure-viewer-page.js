@@ -2417,16 +2417,16 @@ var calculateNumUDRs = function() {
 							if( to > from ) { continue; }		// only consider UDRs once
 							
 							if( to == from ) {
-								/*
-								if( countCrosslinkToSelfAsUDR( protein1 ) ) {
-								console.log( "Counting " + protein1 + " (" + toPosition + ") to " + protein1 + " (" + toPosition + ") -- protein appears more than once in structure." );								
-								} else {
-								console.log( "NOT counting " + protein1 + " (" + toPosition + ") to " + protein1 + " (" + toPosition + ") -- protein appears once in structure." );								
-								continue;
-								}
-								 */
 								
-								continue;		// do not currently count positions in a protein to the same position in that protein
+								if( countCrosslinkToSelfAsUDR( protein1 ) ) {
+									console.log( "Counting " + protein1 + " (" + to + ") to " + protein1 + " (" + to + ") -- protein appears more than once in structure." );								
+								} else {
+									console.log( "NOT counting " + protein1 + " (" + to + ") to " + protein1 + " (" + to + ") -- protein appears once in structure." );								
+									continue;
+								}
+								
+								
+								//continue;		// do not currently count positions in a protein to the same position in that protein
 							}
 
 						}
@@ -2608,9 +2608,7 @@ var countCrosslinkToSelfAsUDR = function( protein ) {
 		if( visibleChains[ i ] && visibleChains[ i ].length > 0 ) {
 			
 			var chain = visibleChains[ i ];
-			
-			console.log( chain );
-			
+						
 			for( var j = 0; j < visibleChainMap[ chain ].length; j++ ) {
 								
 				if( protein == visibleChainMap[ chain ][ j ] ) {
