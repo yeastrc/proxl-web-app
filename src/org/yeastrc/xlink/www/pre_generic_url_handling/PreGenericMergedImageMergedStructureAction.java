@@ -124,19 +124,41 @@ public class PreGenericMergedImageMergedStructureAction extends Action {
 						peptideFilterableAnnotationType_DTOMapPerSearchIdMap.get( searchId );
 				
 				
-				processPsmOrPeptideAnnotationType(
-						"psm",// psmOrPeptideType
-						searchId,
-						null,
-						psmFilterableAnnotationType_DTOMap,
-						psmCutoffValuesMap );
+				if ( psmFilterableAnnotationType_DTOMap == null ) {
+					
+					String msg = "No PSM filterable Annotation types for search id: " + searchId
+							+ ", queryString: " + request.getQueryString();
+					log.error( msg );
 
-				processPsmOrPeptideAnnotationType(
-						"peptide", // psmOrPeptideType
-						searchId,
-						null,
-						peptideFilterableAnnotationType_DTOMap,
-						peptideCutoffValuesMap );
+					throw new ProxlWebappDataException(msg);
+					
+				} else {
+				
+					processPsmOrPeptideAnnotationType(
+							"psm",// psmOrPeptideType
+							searchId,
+							null,
+							psmFilterableAnnotationType_DTOMap,
+							psmCutoffValuesMap );
+				}
+
+				if ( peptideFilterableAnnotationType_DTOMap == null ) {
+					
+					String msg = "No Peptide filterable Annotation types for search id: " + searchId
+							+ ", queryString: " + request.getQueryString();
+					log.error( msg );
+					
+					throw new ProxlWebappDataException(msg);
+					
+				} else {
+
+					processPsmOrPeptideAnnotationType(
+							"peptide", // psmOrPeptideType
+							searchId,
+							null,
+							peptideFilterableAnnotationType_DTOMap,
+							peptideCutoffValuesMap );
+				}
 			}
 
 
