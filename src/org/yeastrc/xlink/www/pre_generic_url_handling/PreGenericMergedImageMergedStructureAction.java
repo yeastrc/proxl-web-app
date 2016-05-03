@@ -185,7 +185,7 @@ public class PreGenericMergedImageMergedStructureAction extends Action {
 
 		} catch ( Exception e ) {
 
-			String msg = "Exception caught: " + e.toString();
+			String msg = "Exception caught: " + e.toString() + ", queryString: " + request.getQueryString();
 
 			log.error( msg, e );
 
