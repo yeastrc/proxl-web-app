@@ -4125,9 +4125,9 @@ function drawSvg() {
 
 	if ( selectedProteins === undefined || selectedProteins.length < 1 ) { 
 		
-		var newHeightContainingDivEmpty = 4;
+		//  No proteins so remove CSS height attribute
 		
-		$svg_image_inner_container_div.css( { height : newHeightContainingDivEmpty } );
+		$svg_image_inner_container_div.css( { height : '' } );
 
 	
 		return;  //  EARLY EXIT of function if no proteins to display 
