@@ -120,6 +120,8 @@ var addSingleTooltipForProteinName = function( params ) {
 	
 	var  $elementToAddToolTipTo = params.$elementToAddToolTipTo;
 	
+	var proteinDisplayName = params.proteinDisplayName;
+	
 	var tooltipDelay = params.tooltipDelay;    //  milliseconds
 	
 	var tipPosition = params.tipPosition;
@@ -147,11 +149,21 @@ var addSingleTooltipForProteinName = function( params ) {
             	  
                   text: function(event, api) {
                 	  
-                	  var proteinDataFormattedHTM = __proteinDataForToolTipFormattedHTMLCache[ proteinIdString ];
+                	  var mainProteinDataFormattedHTML = __proteinDataForToolTipFormattedHTMLCache[ proteinIdString ];
                 	  
-                	  if ( proteinDataFormattedHTM !== undefined ) {
+                	  if ( mainProteinDataFormattedHTML !== undefined ) {
                 		  
-                		  return proteinDataFormattedHTM;  //   EARLY Function RETURN
+        				  if ( proteinDisplayName ) {
+        					  
+        					  //  Prepend Protein Display name
+        					  
+        					  mainProteinDataFormattedHTML = "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
+        						  + "<span class='is-tooltip-label'>Displayed name:</span> " 
+        						  + proteinDisplayName + "</div>"
+        						  + mainProteinDataFormattedHTML;
+        				  }
+        				  
+                		  return mainProteinDataFormattedHTML;  //   EARLY Function RETURN
                 	  
                 	  } else {
 
@@ -167,14 +179,30 @@ var addSingleTooltipForProteinName = function( params ) {
                 			  })
                 			  .done(function(data) {
 
-                				  var output = "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">Source: " + data.source + "</div>" 
-                				  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">Name: " + data.name + "</div>";
+
+                				  var mainProteinDataFormattedHTML = "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
+                					  + "<span class='is-tooltip-label'>Source:</span> " + data.source + "</div>" 
+                					  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
+                					  + "<span class='is-tooltip-label'>Name:</span> " + data.name + "</div>";
 
                 				  if ( data.description !== undefined && data.description !== null ) {
-                					  output += "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">Description: " + data.description + "</div>";
+                					  output += "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
+                					  		+ "<span class='is-tooltip-label'>Description:</span> " + data.description + "</div>";
                 				  }
 
-                				  __proteinDataForToolTipFormattedHTMLCache[ proteinIdString ] = output;
+                				  __proteinDataForToolTipFormattedHTMLCache[ proteinIdString ] = mainProteinDataFormattedHTML;
+                				  
+
+                				  var output = mainProteinDataFormattedHTML;
+
+                				  if ( proteinDisplayName ) {
+                					  
+                					  output = "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
+                						  + "<span class='is-tooltip-label'>Displayed name:</span> " 
+                						  + proteinDisplayName + "</div>"
+                						  + mainProteinDataFormattedHTML;
+                				  }
+                				  
 
                 				  api.set('content.text', output);
                 			  });

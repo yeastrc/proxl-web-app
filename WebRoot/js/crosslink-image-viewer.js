@@ -2311,8 +2311,23 @@ function showSelectedProteins() {
 			
 			var selectedProteinHTML = selectedProteinEntry_HandlebarsTemplate( selectedProteinEntryValue );
 
-//			var $newEntry = 
-			$( selectedProteinHTML ).appendTo( $selected_proteins_container );
+			var $newEntry = 
+				$( selectedProteinHTML ).appendTo( $selected_proteins_container );
+			
+			var $protein_select_text_container_jq_Items =  $newEntry.find(".protein_select_text_container_jq");
+			
+			$protein_select_text_container_jq_Items.each( function() {
+				
+				var $protein_select_text_container_jq = $( this );
+				
+				//  Add specific tool tip for the protein name
+				
+				addSingleTooltipForProteinName( { 
+					$elementToAddToolTipTo : $protein_select_text_container_jq, 
+					proteinIdString : proteinId,
+					proteinDisplayName : proteinName
+				} );
+			} );
 		}
 		
 	}
@@ -2327,21 +2342,7 @@ function showSelectedProteins() {
 	} );
 	
 	
-	var $protein_select_text_container_jq_Items =  $selected_proteins_container.find(".protein_select_text_container_jq");
-	
-	$protein_select_text_container_jq_Items.each( function() {
-		
-		var $protein_select_text_container_jq = $( this );
-		
-		var protein_select_jq_protein_id = $protein_select_text_container_jq.attr("data-protein_id");
-		
-		//  Add specific tool tip for the protein name
-		
-		addSingleTooltipForProteinName( { 
-			$elementToAddToolTipTo : $protein_select_text_container_jq, 
-			proteinIdString : protein_select_jq_protein_id
-		} );
-	} );
+
 
 	//  Select Delete icon of each Selected protein
 
@@ -6608,44 +6609,42 @@ function populateSelectProteinSelect( ) {
 	var proteinEntry_HandlebarsTemplate = Handlebars.compile( proteinEntry_template_handlebarsSource );
 
 	for ( var i = 0; i < _proteins.length; i++ ) {
+		
+		var proteinId = _proteins[ i ];
+		
+		var proteinName = getProteinName( proteinId );
 
-		var proteinLinkValue = { proteinId : _proteins[ i ], proteinName : getProteinName( _proteins[ i ] ) };
+		var proteinLinkValue = { proteinId : proteinId, proteinName : proteinName };
 		
 		//  Use Handlebars libary to convert the template into HTML, performing substitutions using proteinLinkValue
 		
 		var proteinLinkHTML = proteinEntry_HandlebarsTemplate( proteinLinkValue );
 		
-//		var $newEntry = 
+		var $newEntry = 
 			$( proteinLinkHTML ).appendTo( $protein_list_container );
 		
+		//  Add click handler for changing the protein
 		
+		$newEntry.click( function( eventObject ) {
+			
+			processClickOnSelectProtein( { clickedThis : this } );
+		} );
+		
+		//  Add Protein Name Tool Tip
+		
+		$newEntry.each( function() {
+			
+			var $protein_select_jq = $( this );
+			
+			addSingleTooltipForProteinName( { 
+				$elementToAddToolTipTo : $protein_select_jq, 
+				proteinIdString : proteinId,
+				proteinDisplayName : proteinName,
+				tooltipDelay : 500  //  milliseconds
+			} );
+		} );
 	}
 
-	//  Select Text of each Selected protein
-	
-	var $protein_select_jq_Items = $protein_list_container.find(".protein_select_jq");
-	
-	//  Add click handler for changing the protein
-	
-	$protein_select_jq_Items.click( function( eventObject ) {
-		
-		processClickOnSelectProtein( { clickedThis : this } );
-	} );
-	
-	//  Add Protein Name Tool Tip
-	
-	$protein_select_jq_Items.each( function() {
-		
-		var $protein_select_jq = $( this );
-		
-		var protein_select_jq_protein_id = $protein_select_jq.attr("data-protein_id");
-		
-		addSingleTooltipForProteinName( { 
-			$elementToAddToolTipTo : $protein_select_jq, 
-			proteinIdString : protein_select_jq_protein_id,
-			tooltipDelay : 500  //  milliseconds
-		} );
-	} );
 }
 
 

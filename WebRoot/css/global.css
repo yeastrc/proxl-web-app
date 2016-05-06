@@ -146,6 +146,7 @@ input[type="button"]:disabled, input[type="submit"]:disabled, .disabled-checkbox
 
 .hidden { display:none; }
 .isTooltip { font-size:11px;font-family:sans-serif; }
+.is-tooltip-label { font-weight: bold; }
 
 img.edit-icon { max-width:12px;margin-left:2px;margin-right:5px;opacity:0.8;filter:alpha(opacity=80);border-width:0px; }
 
