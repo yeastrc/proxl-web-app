@@ -2364,10 +2364,9 @@ function showSelectedProteins() {
 		//  On sort start, call this function
         start : processSortStartSelectedProteins,
 		
-		//  On sort stop, call this function
+		//  This event is triggered when the user stopped sorting and the DOM position has changed.
 		//        (User released the item they were dragging and items are now in "after sort" order)
-		stop : processSortStopSelectedProteins
-		
+        update : processSortUpdateSelectedProteins		
 	} );
 }
 
@@ -2386,7 +2385,9 @@ function processSortStartSelectedProteins( event, ui ) {
 	$protein_select_text_container_jq.qtip('toggle', false); // Immediately hide all tooltips belonging to the selected elements
 }
 
-function processSortStopSelectedProteins( event, ui ) {
+function processSortUpdateSelectedProteins( event, ui ) {
+	
+	console.log("processSortUpdateSelectedProteins");
 	
 	//   Update the Selected Proteins with their current index.
 	
