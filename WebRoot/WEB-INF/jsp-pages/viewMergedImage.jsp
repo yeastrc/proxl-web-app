@@ -276,17 +276,32 @@
 
 		<div>
 			<div>
-				
-				<div >
 
-					<span class="tool_tip_attached_jq" data-tooltip="Add a selector for adding another protein bar to the image" style="margin-left:10px;" id="svg-protein-selector_location"><a href="javascript:" onclick="addProteinSelect()">+Protein</a></span>
+				<%-- !!!   Handlebars template Select Protein  !!!!!!!!!   --%>
+		
+				<%--  Protein Item to put in Overlay --%>		
+				<script id="selected_protein_entry_template"  type="text/x-handlebars-template">
+
+					<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedImage.jsp_page_templates/viewMergedImageSelectedProteinItemTemplate.jsp" %>
+
+				</script>
+				
+								
+				<div id="selected_proteins_outer_container">
+				  <div id="selected_proteins_container" class="selected-proteins-container">
+				  </div>
+				</div>
+				
+				<div style="float: left;">
+				  <div >
+					<input type="button" class="tool_tip_attached_jq" data-tooltip="Add another protein bar to the image" 
+						id="svg-protein-selector_location"
+						onclick="openSelectProteinSelect( { clickedThis : this } )" value="Add Protein">
+				  </div>
 				</div>
 
 
-
-
-
-				<div style="margin-top: 5px;">
+				<div style="margin-top: 5px; clear: both; ">
 					
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle showing inter-protein crosslinks" style="white-space:nowrap;" ><input type="checkbox" id="show-crosslinks" checked>Show crosslinks</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle showing intra-protein crosslinks" style="white-space:nowrap;" ><input type="checkbox" id="show-self-crosslinks" checked>Show self-crosslinks</span></label>
@@ -452,6 +467,54 @@
 	<%--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --%>
 	
 	
+	
+		<%--  Select Protein Overlay --%>
+		
+
+			<%--  Select Protein Overlay Background --%>
+			
+			
+			<div id="select_protein_modal_dialog_overlay_background" class="select-protein-modal-dialog-overlay-background" style="display: none;"  >
+			
+			</div>
+			
+			
+			<%--  Select Protein Overlay Div --%>
+			
+			<div id="select_protein_overlay_div" class=" select-protein-overlay-div " style="display: none; "  >
+			
+				<div id="select_protein_overlay_header" class="select-protein-overlay-header" style="width:100%; " >
+					<h1 id="select_protein_overlay_X_for_exit_overlay" class="select-protein-overlay-X-for-exit-overlay" >X</h1>
+					<h1 id="select_protein_overlay_header_text" class="select-protein-overlay-header-text" >Select Protein</h1>
+				</div>
+				<div id="select_protein_overlay_body" class="select-protein-overlay-body" >
+				
+					<div id="protein_list_container" class=" protein-list-container">
+					</div>
+					
+				</div> <%--  END  <div id="select_protein_overlay_body"  --%>
+				
+			</div>  <%--  END  <div id="select_protein_overlay_div"  --%>
+
+		
+
+		<%-- !!!   Handlebars template Select Protein  !!!!!!!!!   --%>
+
+		<%--  Protein Item to put in Overlay --%>		
+		<script id="select_protein_overlay_protein_entry_template"  type="text/x-handlebars-template">
+		  <div class=" protein_select_jq single-protein-select-item " data-protein_id="{{proteinId}}" >
+			{{proteinName}}
+		  </div>
+		</script>
+
+		<%--  Protein Item for main display --%>
+		<script id="select_protein_overlay_bar_region_template"  type="text/x-handlebars-template">
+		
+		</script>
+		
+			
+		<%--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --%>
+		
 
 			<%--  Running Program to Create Annotation Data  Overlay Div,  
 			

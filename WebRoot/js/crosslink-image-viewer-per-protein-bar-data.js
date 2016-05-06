@@ -95,11 +95,20 @@ ImageProteinBarDataManager.prototype.addEntry = function( params ) {
 		
 	} else {
 
-		var newEntry = ImageProteinBarData.constructEmptyImageProteinBarData();
-		
-		newEntry.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
-		
-		this.imageProteinBarDataList.push( newEntry );
+		if ( entry ) {
+
+			entry.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
+			
+			this.imageProteinBarDataList.push( entry );
+
+		} else {
+
+			var newEntry = ImageProteinBarData.constructEmptyImageProteinBarData();
+
+			newEntry.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
+
+			this.imageProteinBarDataList.push( newEntry );
+		}
 	}
 	
 	this._rebuild_imageProteinBarData_ProteinIdSelected_List();
@@ -158,6 +167,41 @@ ImageProteinBarDataManager.prototype.putItemByProteinSelectorIndex = function( p
 	this._rebuild_imageProteinBarData_ProteinIdSelected_List();
 };
 
+
+ImageProteinBarDataManager.prototype.removeItemByProteinSelectorIndex = function( params ) {
+	
+	var proteinSelectorIndexInt = params.proteinSelectorIndexInt;
+	
+//	var removedItem = 
+	this.imageProteinBarDataList.splice( proteinSelectorIndexInt, 1 );
+	
+	this._rebuild_imageProteinBarData_ProteinIdSelected_List();
+};
+
+ImageProteinBarDataManager.prototype.updateItemOrder = function( params ) {
+	
+	var elementPrevPositions = params.elementPrevPositions;
+	
+	var newImageProteinBarDataList = [];
+	
+	
+	for ( var newPosition = 0; newPosition < elementPrevPositions.length; newPosition++ ) {
+		
+		var elementPrevPositionObj = elementPrevPositions[ newPosition ];
+		
+		var elementPrevPositionInt = elementPrevPositionObj.prevPosition;
+		
+		var elementAtPrevPosition = this.imageProteinBarDataList[ elementPrevPositionInt ];
+		
+		newImageProteinBarDataList.push( elementAtPrevPosition );
+	}
+	
+	this.imageProteinBarDataList = newImageProteinBarDataList;
+
+	this._rebuild_imageProteinBarData_ProteinIdSelected_List();
+};
+
+
 ImageProteinBarDataManager.prototype.clearItems = function( params ) {
 	
 	this.imageProteinBarDataList = [];
@@ -200,6 +244,23 @@ ImageProteinBarDataManager.prototype.getArrayOfObjectsForHash = function( ) {
 ImageProteinBarDataManager.prototype.replaceInternalObjectsWithObjectsInHash = function( params ) {
 	
 	var proteinBarData = params.proteinBarData;
+	var currentProteinIdsArray = params.currentProteinIdsArray;
+	
+	//  Copy curretn protein ids into an object/map for easier searching
+	
+	var currentProteinIdsObject = {};
+	
+	if ( currentProteinIdsArray ) {
+
+		for ( var currentProteinIdsArrayIndex = 0; currentProteinIdsArrayIndex < currentProteinIdsArray.length; currentProteinIdsArrayIndex++ ) {
+			
+			var currentProteinIdsArrayEntry = currentProteinIdsArray[ currentProteinIdsArrayIndex ];
+			
+			var currentProteinIdsArrayEntryString = currentProteinIdsArrayEntry.toString();
+			
+			currentProteinIdsObject[ currentProteinIdsArrayEntryString ] = true;
+		}
+	}
 	
 	this.imageProteinBarDataList = [];
 	
@@ -212,6 +273,16 @@ ImageProteinBarDataManager.prototype.replaceInternalObjectsWithObjectsInHash = f
 			var proteinBarDataItem = 
 				ImageProteinBarData.constructImageProteinBarDataFromHashDataObject( proteinBarDataHashItem ); 
 
+			//  If protein id in proteinBarDataItem is not in currentProteinIdsArray
+			//   Drop the proteinBarDataItem
+			
+			if ( ! currentProteinIdsObject[ proteinBarDataItem.getProteinId() ] ) {
+				
+				continue;  // EARLY continue
+			}
+				
+
+			
 			proteinBarDataItem.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
 
 			this.imageProteinBarDataList.push( proteinBarDataItem );

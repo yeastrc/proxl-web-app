@@ -120,7 +120,11 @@ var addSingleTooltipForProteinName = function( params ) {
 	
 	var  $elementToAddToolTipTo = params.$elementToAddToolTipTo;
 	
+	var tooltipDelay = params.tooltipDelay;    //  milliseconds
+	
 	var tipPosition = params.tipPosition;
+	
+	
 	
 	if ( tipPosition === undefined || tipPosition === null ) {
 		
@@ -184,7 +188,11 @@ var addSingleTooltipForProteinName = function( params ) {
                 	  }
                   }
               },
-              position: tipPosition
+              position: tipPosition,
+              show: {
+            	  delay: tooltipDelay  //  milliseconds
+              }
+                      
           });
 	
 };
