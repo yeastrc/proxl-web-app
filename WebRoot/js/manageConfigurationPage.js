@@ -65,8 +65,11 @@ var getListConfigurationResponse = function(requestData, responseData) {
 	
 	
 	var $input_footer_center_of_page_html = $( "#input_footer_center_of_page_html" );
+	var $input_footer_center_of_page_html_comment = $("#input_footer_center_of_page_html_comment");
 	var $input_email_from_address = $( "#input_email_from_address" );
+	var $input_email_from_address_comment = $("#input_email_from_address_comment");
 	var $input_email_smtp_server_url = $( "#input_email_smtp_server_url" );
+	var $input_email_smtp_server_url_comment = $("#input_email_smtp_server_url_comment");
 
 	for ( var configListIndex = 0; configListIndex < configList.length; configListIndex++ ) {
 	
@@ -75,14 +78,17 @@ var getListConfigurationResponse = function(requestData, responseData) {
 		if ( configListItem.configKey === config_key_footer_center_of_page_html_Val ) {
 			
 			$input_footer_center_of_page_html.val( configListItem.configValue );
+			$input_footer_center_of_page_html_comment.val( configListItem.comment );
 			
 		} else if ( configListItem.configKey === config_key_email_from_address_Val ) {
 			
 			$input_email_from_address.val( configListItem.configValue );
+			$input_email_from_address_comment.val( configListItem.comment );
 			
 		} else if ( configListItem.configKey === config_key_email_smtp_server_url_Val ) {
 			
 			$input_email_smtp_server_url.val( configListItem.configValue );
+			$input_email_smtp_server_url_comment.val( configListItem.comment );
 		}
 	}
 
@@ -91,11 +97,95 @@ var getListConfigurationResponse = function(requestData, responseData) {
 
 function saveListConfiguration() {
 	
+
+	var $config_key_footer_center_of_page_html = $( "#config_key_footer_center_of_page_html" );
+	var $config_key_email_from_address = $( "#config_key_email_from_address" );
+	var $config_key_email_smtp_server_url = $( "#config_key_email_smtp_server_url" );
+
+	var config_key_footer_center_of_page_html_Val = $config_key_footer_center_of_page_html.val();
+	var config_key_email_from_address_Val = $config_key_email_from_address.val();
+	var config_key_email_smtp_server_url_Val = $config_key_email_smtp_server_url.val();
+	
+	
+	var $input_footer_center_of_page_html = $( "#input_footer_center_of_page_html" );
+	var $input_footer_center_of_page_html_comment = $("#input_footer_center_of_page_html_comment");
+	var $input_email_from_address = $( "#input_email_from_address" );
+	var $input_email_from_address_comment = $("#input_email_from_address_comment");
+	var $input_email_smtp_server_url = $( "#input_email_smtp_server_url" );
+	var $input_email_smtp_server_url_comment = $("#input_email_smtp_server_url_comment");
+
+	
+	var input_footer_center_of_page_html_Val = $input_footer_center_of_page_html.val();
+	var input_footer_center_of_page_html_comment_Val = $input_footer_center_of_page_html_comment.val();
+	var input_email_from_address_Val = $input_email_from_address.val();
+	var input_email_from_address_comment_Val = $input_email_from_address_comment.val();
+	var input_email_smtp_server_url_Val = $input_email_smtp_server_url.val();
+	var input_email_smtp_server_url_comment_Val = $input_email_smtp_server_url_comment.val();
+
+	
+
+	var configList = [];
+	
+	var configListItem;
+	
+	
+	configListItem = { 
+			configKey: config_key_footer_center_of_page_html_Val,
+			configValue : input_footer_center_of_page_html_Val, 
+			comment : input_footer_center_of_page_html_comment_Val };
+	configList.push( configListItem );
+	
+	configListItem = {
+			configKey: config_key_email_from_address_Val,
+			configValue : input_email_from_address_Val, 
+			comment : input_email_from_address_comment_Val };
+	configList.push( configListItem );
+
+	configListItem = { 
+			configKey: config_key_email_smtp_server_url_Val,
+			configValue : input_email_smtp_server_url_Val, 
+			comment : input_email_smtp_server_url_comment_Val };
+	configList.push( configListItem );
+
+	var requestObj = { configList : configList };
+	
+	var requestData = JSON.stringify( requestObj );
+
+	var _URL = contextPathJSVar + "/services/config/save";
+
+//	var request =
+	$.ajax({
+		type : "POST",
+		url : _URL,
+		data : requestData,
+	    contentType: "application/json; charset=utf-8",
+		dataType : "json",
+		success : function(data) {
+
+			saveListConfigurationResponse(requestData, data);
+		},
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+
+			handleAJAXError(jqXHR, textStatus, errorThrown);
+
+//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
+//			textStatus: " + textStatus );
+		}
+	});
+	
+}
+
+
+function saveListConfigurationResponse(requestData, data) {
+	
+	alert("values saved.");
 	
 	
 	
 }
-
 
 
 

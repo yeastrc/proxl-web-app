@@ -41,17 +41,32 @@
 	
 	<div class="top-level-label-bottom-border" ></div>
 
-	<div style="margin-bottom: 3px;">
+	<div style="margin-bottom: 10px;">
+	  <div style="margin-bottom: 3px;">
 		HTML to put at center of bottom of web page: <input type="text" id="input_footer_center_of_page_html" style="width: 450px;"> 
+	  </div> 
+	  <div style="margin-left: 50px;">
+	  	comment: <input type="text" id="input_footer_center_of_page_html_comment" style="width: 450px;">
+	  </div> 
 	</div>
 
-	<div style="margin-bottom: 3px;" >
-		From Address for emails sent: <input type="text" id="input_email_from_address" style="width: 450px;"> 
+	<div style="margin-bottom: 10px;" >
+	  <div style="margin-bottom: 3px;">
+		From Address for emails sent: <input type="text" id="input_email_from_address" style="width: 450px;">
+	  </div>
+	  <div style="margin-left: 50px;">
+	  	comment: <input type="text" id="input_email_from_address_comment" style="width: 450px;">
+	  </div> 
 	</div>
 					
 
-	<div style="margin-bottom: 3px;" >
+	<div style="margin-bottom: 10px;" >
+	  <div style="margin-bottom: 3px;">
 		SMTP Server URL for emails sent: <input type="text" id="input_email_smtp_server_url" style="width: 450px;"> 
+	  </div> 
+	  <div style="margin-left: 50px;">
+	  	comment: <input type="text" id="input_email_smtp_server_url_comment" style="width: 450px;">
+	  </div> 
 	</div>
 	
 	<div >

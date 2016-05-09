@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.ConfigSystemDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 
 /**
  * DAO for config_system table
@@ -164,6 +165,102 @@ public class ConfigSystemDAO {
 		}
 		
 		return configValue;
+	}
+	
+	
+	
+
+	/**
+	 * @param configList
+	 * @throws Exception
+	 */
+	public void save( List<ConfigSystemDTO> configList  ) throws Exception {
+		
+		Connection conn = null;
+		
+		PreparedStatement queryPstmt = null;
+		ResultSet queryRS = null;
+
+		PreparedStatement updatePstmt = null;
+		
+		final String querySQL = "SELECT id FROM config_system WHERE config_key = ?";
+
+		final String updateSQL = "UPDATE config_system SET config_value = ?, comment = ? WHERE config_key = ?";
+
+		
+		try {
+			
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			
+			conn.setAutoCommit(false);
+
+			queryPstmt = conn.prepareStatement( querySQL );
+			
+			updatePstmt = conn.prepareStatement( updateSQL );
+			
+			for ( ConfigSystemDTO configItem : configList ) {
+
+				queryPstmt.setString( 1, configItem.getConfigKey()  );
+
+				queryRS = queryPstmt.executeQuery();
+				
+				if( ! queryRS.next() ) {
+
+					String msg = "Config key '" + configItem.getConfigKey() 
+							+ "' not found in database.";
+					log.error( msg );
+
+					throw new ProxlWebappDataException( msg );
+				}
+
+				updatePstmt.setString( 1, configItem.getConfigValue() );
+				updatePstmt.setString( 2, configItem.getComment() );
+				updatePstmt.setString( 3, configItem.getConfigKey() );
+
+//				int updatedRecordCount = 
+				updatePstmt.executeUpdate();
+			}
+			
+			conn.commit();
+			
+		} catch ( Exception e ) {
+			
+			conn.rollback();
+			
+			String msg = "Failed to update config_system, updateSQL: " + updateSQL;
+			
+			log.error( msg, e );
+			
+			throw e;
+			
+
+		} finally {
+			
+			// be sure database handles are closed
+			if( queryRS != null ) {
+				try { queryRS.close(); } catch( Throwable t ) { ; }
+				queryRS = null;
+			}
+
+			if( queryPstmt != null ) {
+				try { queryPstmt.close(); } catch( Throwable t ) { ; }
+				queryPstmt = null;
+			}
+			
+			if( updatePstmt != null ) {
+				try { updatePstmt.close(); } catch( Throwable t ) { ; }
+				updatePstmt = null;
+			}
+			
+			conn.setAutoCommit(true);
+			
+			if( conn != null ) {
+				try { conn.close(); } catch( Throwable t ) { ; }
+				conn = null;
+			}
+			
+		}
+		
 	}
 	
 	

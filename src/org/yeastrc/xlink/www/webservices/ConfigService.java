@@ -194,15 +194,12 @@ public class ConfigService {
 			//////////////////////////////////////////
 
 			
+			List<ConfigSystemDTO> configList = saveRequest.getConfigList();
 			
-			
+			ConfigSystemDAO.getInstance().save( configList );
 			
 			
 			SaveResult saveResult = new SaveResult();
-			
-			
-			
-			
 			
 			return saveResult;
 			
@@ -250,6 +247,15 @@ public class ConfigService {
 	private static class SaveRequest {
 		
 		
+		private List<ConfigSystemDTO> configList;
+
+		public List<ConfigSystemDTO> getConfigList() {
+			return configList;
+		}
+
+		public void setConfigList(List<ConfigSystemDTO> configList) {
+			this.configList = configList;
+		}
 	}
 	
 
@@ -259,7 +265,15 @@ public class ConfigService {
 	 */
 	private static class SaveResult {
 		
-		
+		private String status;
+
+		public String getStatus() {
+			return status;
+		}
+
+		public void setStatus(String status) {
+			this.status = status;
+		}
 	}
 	
 	/**
