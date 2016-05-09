@@ -13,9 +13,9 @@ public class WebConstants {
 	
 
 	/**
-	 * HTML to be inserted into the footer and centered 
+	 * specific config_system table values
 	 */
-	public static final String FOOTER_CENTER_OF_PAGE_HTML_KEY = "footer_center_of_page_html";
+	public static final String CONFIG_SYSTEM_VALUES_HTML_KEY = "configSystemValues";
 	
 	
 

@@ -18,8 +18,9 @@
 			© 2016 University of Washington
 		</div>
 		<div class="footer-center-outer-container">
-			<div class="footer-center-container">
-				<c:out value="${ footer_center_of_page_html }" escapeXml="false"></c:out>
+			<%--  'id' used by manage configuration to update this div with admin entered data --%>
+			<div id="footer_center_container" class="footer-center-container">
+				<c:out value="${ configSystemValues.footerCenterOfPageHTML }" escapeXml="false"></c:out>
 			</div>
 		</div>
 	

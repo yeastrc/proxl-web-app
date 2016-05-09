@@ -180,7 +180,11 @@ function saveListConfiguration() {
 		dataType : "json",
 		success : function(data) {
 
-			saveListConfigurationResponse(requestData, data);
+			saveListConfigurationResponse( { 
+				requestData : requestData, 
+				responseData : data, 
+				input_footer_center_of_page_html_Val : input_footer_center_of_page_html_Val
+			} );
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -197,11 +201,22 @@ function saveListConfiguration() {
 }
 
 
-function saveListConfigurationResponse( requestData, data ) {
+function saveListConfigurationResponse( params ) {
 
+//	var requestData = params.requestData;
+//	var responseData = params.responseData;
+	var input_footer_center_of_page_html_Val = params.input_footer_center_of_page_html_Val;
+	
+	
 	var $element = $("#success_message_values_updated");
 	
 	showErrorMsg( $element );  //  Used for success messages as well
+	
+	//  Update footer text on current page
+	
+	var $footer_center_container = $("#footer_center_container");
+	
+	$footer_center_container.html( input_footer_center_of_page_html_Val );
 }
 
 
@@ -214,7 +229,7 @@ function initPage() {
 	
 	$("#save_button").click(function(eventObject) {
 
-		var clickThis = this;
+//		var clickThis = this;
 		
 		saveListConfiguration();
 
@@ -223,7 +238,7 @@ function initPage() {
 
 	$("#reset_button").click(function(eventObject) {
 
-		var clickThis = this;
+//		var clickThis = this;
 
 		getListConfiguration();
 		

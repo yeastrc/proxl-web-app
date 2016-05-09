@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 import org.yeastrc.xlink.www.dto.ConfigSystemDTO;
@@ -198,6 +199,8 @@ public class ConfigService {
 			
 			ConfigSystemDAO.getInstance().updateValueOnlyOnConfigKey( configList );
 			
+			//  Clear the cached values
+			ConfigSystemCaching.getInstance().clearCache();
 			
 			SaveResult saveResult = new SaveResult();
 			
@@ -253,6 +256,7 @@ public class ConfigService {
 			return configList;
 		}
 
+		@SuppressWarnings("unused")
 		public void setConfigList(List<ConfigSystemDTO> configList) {
 			this.configList = configList;
 		}
@@ -267,10 +271,12 @@ public class ConfigService {
 		
 		private String status;
 
+		@SuppressWarnings("unused")
 		public String getStatus() {
 			return status;
 		}
 
+		@SuppressWarnings("unused")
 		public void setStatus(String status) {
 			this.status = status;
 		}
@@ -284,6 +290,7 @@ public class ConfigService {
 		
 		private List<ConfigSystemDTO> configList;
 
+		@SuppressWarnings("unused")
 		public List<ConfigSystemDTO> getConfigList() {
 			return configList;
 		}
