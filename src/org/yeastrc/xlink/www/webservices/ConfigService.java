@@ -196,7 +196,7 @@ public class ConfigService {
 			
 			List<ConfigSystemDTO> configList = saveRequest.getConfigList();
 			
-			ConfigSystemDAO.getInstance().save( configList );
+			ConfigSystemDAO.getInstance().updateValueOnlyOnConfigKey( configList );
 			
 			
 			SaveResult saveResult = new SaveResult();

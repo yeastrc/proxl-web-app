@@ -174,7 +174,7 @@ public class ConfigSystemDAO {
 	 * @param configList
 	 * @throws Exception
 	 */
-	public void save( List<ConfigSystemDTO> configList  ) throws Exception {
+	public void updateValueOnlyOnConfigKey( List<ConfigSystemDTO> configList  ) throws Exception {
 		
 		Connection conn = null;
 		
@@ -185,7 +185,7 @@ public class ConfigSystemDAO {
 		
 		final String querySQL = "SELECT id FROM config_system WHERE config_key = ?";
 
-		final String updateSQL = "UPDATE config_system SET config_value = ?, comment = ? WHERE config_key = ?";
+		final String updateSQL = "UPDATE config_system SET config_value = ? WHERE config_key = ?";
 
 		
 		try {
@@ -214,8 +214,7 @@ public class ConfigSystemDAO {
 				}
 
 				updatePstmt.setString( 1, configItem.getConfigValue() );
-				updatePstmt.setString( 2, configItem.getComment() );
-				updatePstmt.setString( 3, configItem.getConfigKey() );
+				updatePstmt.setString( 2, configItem.getConfigKey() );
 
 //				int updatedRecordCount = 
 				updatePstmt.executeUpdate();

@@ -58,18 +58,21 @@ var getListConfigurationResponse = function(requestData, responseData) {
 	var $config_key_footer_center_of_page_html = $( "#config_key_footer_center_of_page_html" );
 	var $config_key_email_from_address = $( "#config_key_email_from_address" );
 	var $config_key_email_smtp_server_url = $( "#config_key_email_smtp_server_url" );
+	var $config_key_protein_annotation_webservice_url = $( "#config_key_protein_annotation_webservice_url" );
+	var $config_key_protein_listing_webservice_url = $( "#config_key_protein_listing_webservice_url" );
 
 	var config_key_footer_center_of_page_html_Val = $config_key_footer_center_of_page_html.val();
 	var config_key_email_from_address_Val = $config_key_email_from_address.val();
 	var config_key_email_smtp_server_url_Val = $config_key_email_smtp_server_url.val();
+	var config_key_protein_annotation_webservice_url_Val = $config_key_protein_annotation_webservice_url.val();
+	var config_key_protein_listing_webservice_url_Val = $config_key_protein_listing_webservice_url.val();
 	
 	
 	var $input_footer_center_of_page_html = $( "#input_footer_center_of_page_html" );
-	var $input_footer_center_of_page_html_comment = $("#input_footer_center_of_page_html_comment");
 	var $input_email_from_address = $( "#input_email_from_address" );
-	var $input_email_from_address_comment = $("#input_email_from_address_comment");
 	var $input_email_smtp_server_url = $( "#input_email_smtp_server_url" );
-	var $input_email_smtp_server_url_comment = $("#input_email_smtp_server_url_comment");
+	var $input_protein_annotation_webservice_url = $( "#input_protein_annotation_webservice_url" );
+	var $input_protein_listing_webservice_url = $( "#input_protein_listing_webservice_url" );
 
 	for ( var configListIndex = 0; configListIndex < configList.length; configListIndex++ ) {
 	
@@ -78,49 +81,57 @@ var getListConfigurationResponse = function(requestData, responseData) {
 		if ( configListItem.configKey === config_key_footer_center_of_page_html_Val ) {
 			
 			$input_footer_center_of_page_html.val( configListItem.configValue );
-			$input_footer_center_of_page_html_comment.val( configListItem.comment );
 			
 		} else if ( configListItem.configKey === config_key_email_from_address_Val ) {
 			
 			$input_email_from_address.val( configListItem.configValue );
-			$input_email_from_address_comment.val( configListItem.comment );
 			
 		} else if ( configListItem.configKey === config_key_email_smtp_server_url_Val ) {
 			
 			$input_email_smtp_server_url.val( configListItem.configValue );
-			$input_email_smtp_server_url_comment.val( configListItem.comment );
+			
+
+		} else if ( configListItem.configKey === config_key_protein_annotation_webservice_url_Val ) {
+			
+			$input_protein_annotation_webservice_url.val( configListItem.configValue );
+
+		} else if ( configListItem.configKey === config_key_protein_listing_webservice_url_Val ) {
+			
+			$input_protein_listing_webservice_url.val( configListItem.configValue );
 		}
+		
 	}
 
 };
 
 
 function saveListConfiguration() {
-	
 
 	var $config_key_footer_center_of_page_html = $( "#config_key_footer_center_of_page_html" );
 	var $config_key_email_from_address = $( "#config_key_email_from_address" );
 	var $config_key_email_smtp_server_url = $( "#config_key_email_smtp_server_url" );
+	var $config_key_protein_annotation_webservice_url = $( "#config_key_protein_annotation_webservice_url" );
+	var $config_key_protein_listing_webservice_url = $( "#config_key_protein_listing_webservice_url" );
 
 	var config_key_footer_center_of_page_html_Val = $config_key_footer_center_of_page_html.val();
 	var config_key_email_from_address_Val = $config_key_email_from_address.val();
 	var config_key_email_smtp_server_url_Val = $config_key_email_smtp_server_url.val();
+	var config_key_protein_annotation_webservice_url_Val = $config_key_protein_annotation_webservice_url.val();
+	var config_key_protein_listing_webservice_url_Val = $config_key_protein_listing_webservice_url.val();
 	
 	
 	var $input_footer_center_of_page_html = $( "#input_footer_center_of_page_html" );
-	var $input_footer_center_of_page_html_comment = $("#input_footer_center_of_page_html_comment");
 	var $input_email_from_address = $( "#input_email_from_address" );
-	var $input_email_from_address_comment = $("#input_email_from_address_comment");
 	var $input_email_smtp_server_url = $( "#input_email_smtp_server_url" );
-	var $input_email_smtp_server_url_comment = $("#input_email_smtp_server_url_comment");
+	var $input_protein_annotation_webservice_url = $( "#input_protein_annotation_webservice_url" );
+	var $input_protein_listing_webservice_url = $( "#input_protein_listing_webservice_url" );
 
 	
 	var input_footer_center_of_page_html_Val = $input_footer_center_of_page_html.val();
-	var input_footer_center_of_page_html_comment_Val = $input_footer_center_of_page_html_comment.val();
 	var input_email_from_address_Val = $input_email_from_address.val();
-	var input_email_from_address_comment_Val = $input_email_from_address_comment.val();
 	var input_email_smtp_server_url_Val = $input_email_smtp_server_url.val();
-	var input_email_smtp_server_url_comment_Val = $input_email_smtp_server_url_comment.val();
+	var input_protein_annotation_webservice_url_Val = $input_protein_annotation_webservice_url.val();
+	var input_protein_listing_webservice_url_Val = $input_protein_listing_webservice_url.val();
 
 	
 
@@ -131,20 +142,27 @@ function saveListConfiguration() {
 	
 	configListItem = { 
 			configKey: config_key_footer_center_of_page_html_Val,
-			configValue : input_footer_center_of_page_html_Val, 
-			comment : input_footer_center_of_page_html_comment_Val };
+			configValue : input_footer_center_of_page_html_Val };
 	configList.push( configListItem );
 	
 	configListItem = {
 			configKey: config_key_email_from_address_Val,
-			configValue : input_email_from_address_Val, 
-			comment : input_email_from_address_comment_Val };
+			configValue : input_email_from_address_Val };
 	configList.push( configListItem );
 
 	configListItem = { 
 			configKey: config_key_email_smtp_server_url_Val,
-			configValue : input_email_smtp_server_url_Val, 
-			comment : input_email_smtp_server_url_comment_Val };
+			configValue : input_email_smtp_server_url_Val };
+	configList.push( configListItem );
+
+	configListItem = { 
+			configKey: config_key_protein_annotation_webservice_url_Val,
+			configValue : input_protein_annotation_webservice_url_Val };
+	configList.push( configListItem );
+
+	configListItem = { 
+			configKey: config_key_protein_listing_webservice_url_Val,
+			configValue : input_protein_listing_webservice_url_Val };
 	configList.push( configListItem );
 
 	var requestObj = { configList : configList };
@@ -179,12 +197,11 @@ function saveListConfiguration() {
 }
 
 
-function saveListConfigurationResponse(requestData, data) {
+function saveListConfigurationResponse( requestData, data ) {
+
+	var $element = $("#success_message_values_updated");
 	
-	alert("values saved.");
-	
-	
-	
+	showErrorMsg( $element );  //  Used for success messages as well
 }
 
 
