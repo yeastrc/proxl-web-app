@@ -157,10 +157,11 @@ var addSingleTooltipForProteinName = function( params ) {
         					  
         					  //  Prepend Protein Display name
         					  
-        					  mainProteinDataFormattedHTML = "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
-        						  + "<span class='is-tooltip-label'>Displayed name:</span> " 
-        						  + proteinDisplayName + "</div>"
-        						  + mainProteinDataFormattedHTML;
+        					  var HTML_Addition_DisplayedProteinName =
+        						  _addSingleTooltipForProteinName_HTML_Addition_DisplayedProteinName( { displayedProteinName : proteinDisplayName } );
+        							
+        					  mainProteinDataFormattedHTML = 
+        						  HTML_Addition_DisplayedProteinName + mainProteinDataFormattedHTML;
         				  }
         				  
                 		  return mainProteinDataFormattedHTML;  //   EARLY Function RETURN
@@ -196,11 +197,13 @@ var addSingleTooltipForProteinName = function( params ) {
                 				  var output = mainProteinDataFormattedHTML;
 
                 				  if ( proteinDisplayName ) {
+
+                					  var HTML_Addition_DisplayedProteinName =
+                						  _addSingleTooltipForProteinName_HTML_Addition_DisplayedProteinName( { displayedProteinName : proteinDisplayName } );
+                							
+                					  output = 
+                						  HTML_Addition_DisplayedProteinName + mainProteinDataFormattedHTML;
                 					  
-                					  output = "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
-                						  + "<span class='is-tooltip-label'>Displayed name:</span> " 
-                						  + proteinDisplayName + "</div>"
-                						  + mainProteinDataFormattedHTML;
                 				  }
                 				  
 
@@ -224,5 +227,24 @@ var addSingleTooltipForProteinName = function( params ) {
           });
 	
 };
+
+
+// tool tip HTML Addition to add the displayed protein name 
+
+var _addSingleTooltipForProteinName_HTML_Addition_DisplayedProteinName = function ( params ) {
+	
+	var displayedProteinName = params.displayedProteinName;
+	
+	var html = "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
+	  + "<span class='is-tooltip-label'>Displayed name:</span> " 
+	  + displayedProteinName 
+	  + "</div>"
+	  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
+	  + "<span class='is-tooltip-label'>From YRC PDR:</span> " 
+	  + "</div>";
+	
+	return html;
+};
+
 
 
