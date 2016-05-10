@@ -74,10 +74,6 @@ public class ImporterCoreEntryPoint {
 
 		String importDirectory = null; 
 		
-		if ( dropPeptidePSMCutoffValues == null ) {
-			
-			dropPeptidePSMCutoffValues = new DropPeptidePSMCutoffValues();
-		}
 				
 		try {
 			
@@ -138,8 +134,6 @@ public class ImporterCoreEntryPoint {
 		}
 		
 		
-		DropPeptidePSMPopulateFilterDirection.getInstance().populateFilterDirection( dropPeptidePSMCutoffValues, proxlInputForImport );
-
 		ProxlInputObjectContainer proxlInputObjectContainer = new ProxlInputObjectContainer();
 		
 		proxlInputObjectContainer.setProxlInput( proxlInputForImport );
@@ -271,6 +265,12 @@ public class ImporterCoreEntryPoint {
 			) throws Exception {
 		
 		ProxlInput proxlInputForImport = proxlInputObjectContainer.getProxlInput();
+		
+
+		if ( dropPeptidePSMCutoffValues == null ) {
+			
+			dropPeptidePSMCutoffValues = new DropPeptidePSMCutoffValues();
+		}
 
 		try {
 
@@ -307,7 +307,9 @@ public class ImporterCoreEntryPoint {
 			//   Throws Exception if data error found
 			ValidateScanFilenamesInXMLAreOnCommandLine.getInstance().validateScanFilenamesInXMLAreOnCommandLine( proxlInputForImport, scanFileList );
 
-			
+			//   Throws Exception if data error found
+			DropPeptidePSMPopulateFilterDirection.getInstance().populateFilterDirection( dropPeptidePSMCutoffValues, proxlInputForImport );
+
 			
 			String fastaFilename = proxlInputForImport.getFastaFilename();
 

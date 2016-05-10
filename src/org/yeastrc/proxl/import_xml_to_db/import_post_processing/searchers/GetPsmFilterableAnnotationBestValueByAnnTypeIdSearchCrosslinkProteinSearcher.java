@@ -23,6 +23,40 @@ public class GetPsmFilterableAnnotationBestValueByAnnTypeIdSearchCrosslinkProtei
 	public static GetPsmFilterableAnnotationBestValueByAnnTypeIdSearchCrosslinkProteinSearcher getInstance() { return _INSTANCE; }
 	
 	
+	private static final String MAX_FCN = "MAX";
+	private static final String MIN_FCN = "MIN";
+	
+	private static final String MAIN_SQL = 
+			"(best_psm_value_for_ann_type_id) AS value_double "
+					+ " FROM crosslink__rep_pept__search__generic_lookup AS crpsgl "
+					+ " INNER JOIN unified_rp__rep_pept__search__best_psm_value_generic_lookup AS urrpsbpvgl "
+					+ 	" ON crpsgl.search_id =  urrpsbpvgl.search_id "
+					+ 		" AND crpsgl.reported_peptide_id =  urrpsbpvgl.reported_peptide_id "
+
+			 + " WHERE  "
+			 + " crpsgl.search_id = ? AND urrpsbpvgl.search_id = ? "
+			 + " AND  urrpsbpvgl. annotation_type_id = ?  "
+			 + " AND crpsgl.nrseq_id_1 = ? AND crpsgl.nrseq_id_2 = ? "
+			 + " AND crpsgl.protein_1_position  = ? AND crpsgl.protein_2_position  = ? ";
+	
+	// WAS
+//	private static final String MAIN_SQL = 
+//			 "(value_double) AS value_double FROM psm_filterable_annotation__generic_lookup " 
+//			+ " INNER JOIN crosslink ON crosslink.psm_id "
+//			+ 		" = psm_filterable_annotation__generic_lookup.psm_id "
+//			+ " WHERE annotation_type_id = ? "
+//			+ " AND  psm_filterable_annotation__generic_lookup.search_id = ? "
+//			+ " AND  crosslink.nrseq_id_1 = ? AND crosslink.nrseq_id_2 = ?  "
+//			+ " AND crosslink.protein_1_position  = ? AND crosslink.protein_2_position  = ? ";
+
+	
+	
+	private static final String SQL_FOR_MAX = "SELECT " + MAX_FCN + MAIN_SQL;
+	private static final String SQL_FOR_MIN = "SELECT " + MIN_FCN + MAIN_SQL;
+	
+	
+	
+
 
 	/**
 	 * Get "best" value from psm_annotation for annotation_type_id, searchCrosslinkGenericLookupDTO
@@ -41,51 +75,22 @@ public class GetPsmFilterableAnnotationBestValueByAnnTypeIdSearchCrosslinkProtei
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-//		String orderDirection = null;
-//		
-//
-//		if ( filterDirectionType == FilterDirectionType.ABOVE ) {
-//			
-//			orderDirection = "DESC";  //  Largest best so sort so largest is first
-//					
-//		} else if ( filterDirectionType == FilterDirectionType.BELOW ) {
-//			
-//			orderDirection = "ASC";  //  Smallest best so sort so smallest is first
-//			
-//		} else {
-//			
-//			throw new IllegalArgumentException( "filterDirection Unknown value" + filterDirectionType.toString() );
-//		}
-		
-		
-
-		String minMaxOfValue = null;
+		String sql = null;
 		
 
 		if ( filterDirectionType == FilterDirectionType.ABOVE ) {
 			
-			minMaxOfValue = "MAX";  //  Largest best so sort so largest is first
+			sql = SQL_FOR_MAX;  //  Largest best so sort so largest is first
 					
 		} else if ( filterDirectionType == FilterDirectionType.BELOW ) {
 			
-			minMaxOfValue = "MIN";  //  Smallest best so sort so smallest is first
+			sql = SQL_FOR_MIN;  //  Smallest best so sort so smallest is first
 			
 		} else {
 			
 			throw new IllegalArgumentException( "filterDirection Unknown value" + filterDirectionType.toString() );
 		}
 
-		
-		final String sql = 
-				"SELECT "
-				+ minMaxOfValue 
-				+ "(value_double) AS value_double FROM psm_filterable_annotation__generic_lookup " 
-						+ " INNER JOIN crosslink ON crosslink.psm_id "
-						+ 		" = psm_filterable_annotation__generic_lookup.psm_id "
-						+ " WHERE annotation_type_id = ? "
-						+ " AND  psm_filterable_annotation__generic_lookup.search_id = ? "
-						+ " AND  crosslink.nrseq_id_1 = ? AND crosslink.nrseq_id_2 = ?  "
-						+ " AND crosslink.protein_1_position  = ? AND crosslink.protein_2_position  = ? ";
 		
 		try {
 			
@@ -97,9 +102,11 @@ public class GetPsmFilterableAnnotationBestValueByAnnTypeIdSearchCrosslinkProtei
 			int paramCounter = 0;
 			
 			paramCounter++;
-			pstmt.setInt( paramCounter, annotation_type_id );
+			pstmt.setInt( paramCounter, searchCrosslinkGenericLookupDTO.getSearchId() );
 			paramCounter++;
 			pstmt.setInt( paramCounter, searchCrosslinkGenericLookupDTO.getSearchId() );
+			paramCounter++;
+			pstmt.setInt( paramCounter, annotation_type_id );
 			paramCounter++;
 			pstmt.setInt( paramCounter, searchCrosslinkGenericLookupDTO.getNrseqId1() );
 			paramCounter++;
@@ -108,6 +115,20 @@ public class GetPsmFilterableAnnotationBestValueByAnnTypeIdSearchCrosslinkProtei
 			pstmt.setInt( paramCounter, searchCrosslinkGenericLookupDTO.getProtein1Position() );
 			paramCounter++;
 			pstmt.setInt( paramCounter, searchCrosslinkGenericLookupDTO.getProtein2Position() );
+			
+			//  WAS
+//			paramCounter++;
+//			pstmt.setInt( paramCounter, annotation_type_id );
+//			paramCounter++;
+//			pstmt.setInt( paramCounter, searchCrosslinkGenericLookupDTO.getSearchId() );
+//			paramCounter++;
+//			pstmt.setInt( paramCounter, searchCrosslinkGenericLookupDTO.getNrseqId1() );
+//			paramCounter++;
+//			pstmt.setInt( paramCounter, searchCrosslinkGenericLookupDTO.getNrseqId2() );
+//			paramCounter++;
+//			pstmt.setInt( paramCounter, searchCrosslinkGenericLookupDTO.getProtein1Position() );
+//			paramCounter++;
+//			pstmt.setInt( paramCounter, searchCrosslinkGenericLookupDTO.getProtein2Position() );
 			
 			rs = pstmt.executeQuery();
 

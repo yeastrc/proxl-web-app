@@ -19,7 +19,9 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 
 	private static Logger log = Logger.getLogger(ImportDBConnectionFactory.class);
 	
-	private static final int MAX_TOTAL_DB_CONNECTIONS = 10;
+	private static final int MAX_TOTAL_OTHER_DB_CONNECTIONS = 1;
+	private static final int MAX_TOTAL_NRSEQ_DB_CONNECTIONS = 1;
+	private static final int MAX_TOTAL_PROXL_DB_CONNECTIONS = 2;
 	
 	
 	private static final String _DEFAULT_PORT = "3306";
@@ -85,7 +87,7 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 		
 		if ( _insertControlCommitConnection == null ) {
 			
-			_insertControlCommitConnection = getConnection( DBConnectionFactory.PROXL );
+			_insertControlCommitConnection = getConnectionInternal( DBConnectionFactory.PROXL, true /* inserterConnection */ );
 			
 			_insertControlCommitConnection.setAutoCommit(false);
 
@@ -128,6 +130,16 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 	// get a connection to the requested database
 	@Override
 	public Connection getConnection( String db ) throws Exception {
+		
+		
+		return getConnectionInternal( db, false /* inserterConnection */ );
+	}
+	
+
+
+	// get a connection to the requested database
+	
+	private Connection getConnectionInternal( String db, boolean inserterConnection ) throws Exception {
 		
 		if ( dbConnectionParametersProvider == null ) {
 			
@@ -174,12 +186,57 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 
 			Class.forName("com.mysql.jdbc.Driver");
 		}
+		
+		
+		String dbNameForMapLookup = db;
+		
+		if ( inserterConnection ) {
+			
+			dbNameForMapLookup += "__INSERTER";  //  Use different data source for Inserter
+		}
+		
+		
 
-		BasicDataSource dataSource = _dataSources.get( db );
+		BasicDataSource dataSource = _dataSources.get( dbNameForMapLookup );
+		
 
 		if ( dataSource == null ) {
 
 			//  create datasource for this db name 
+			
+			
+			
+			int maxDBConnections = MAX_TOTAL_PROXL_DB_CONNECTIONS;
+			
+
+			boolean poolPreparedStatements = true;
+			int maxOpenPreparedStatements = 10;
+			
+
+			if ( inserterConnection ) {
+				
+				maxDBConnections = 1;
+				maxOpenPreparedStatements = 10;
+
+			} else if ( ! ( DBConnectionFactory.PROXL.equals( db ) 
+					|| ( dbConnectionParametersProvider.getProxlDbName() != null 
+						&& dbConnectionParametersProvider.getProxlDbName().equals( db ) ) ) ) {
+				
+				if ( DBConnectionFactory.YRC_NRSEQ.equals(db) 
+						|| ( dbConnectionParametersProvider.getNrseqDbName() != null 
+								&& dbConnectionParametersProvider.getNrseqDbName().equals( db ) ) ) {
+					
+					maxDBConnections = MAX_TOTAL_NRSEQ_DB_CONNECTIONS;
+					
+					maxOpenPreparedStatements = 10;
+				} else {
+					
+					maxDBConnections = MAX_TOTAL_OTHER_DB_CONNECTIONS;
+					
+					maxOpenPreparedStatements = 1;
+				}
+				
+			}
 
 
 			String username = dbConnectionParametersProvider.getUsername(); 
@@ -214,28 +271,75 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 
 			dataSource = new BasicDataSource();
 			dataSource.setUrl("jdbc:mysql://" + dbURL + ":" + dbPort + "/" + db +
-					"?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8" );
+					"?useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8" );  // removed autoReconnect=true&
 
 			dataSource.setUsername( username );
 			dataSource.setPassword( password );
 			
-			dataSource.setMaxTotal( MAX_TOTAL_DB_CONNECTIONS );
+			dataSource.setMaxTotal( maxDBConnections );
+			dataSource.setInitialSize( maxDBConnections );
+			dataSource.setMaxIdle( maxDBConnections );
+			dataSource.setMinIdle( 1 );
+			
+			dataSource.setMaxWaitMillis(100);
 
-			dataSource.setValidationQuery("select 1 from dual");
+//			dataSource.setValidationQuery("select 1 from dual");
+//			
+//			dataSource.setTestOnBorrow( databaseConnectionTestOnBorrow );  // databaseConnectionTestOnBorrow is default to false;
+//			dataSource.setTestWhileIdle( true );
 			
-			dataSource.setTestOnBorrow( databaseConnectionTestOnBorrow );
-			dataSource.setTestWhileIdle( true );
-			
-			dataSource.setMinEvictableIdleTimeMillis   ( 21600000 );
-			dataSource.setTimeBetweenEvictionRunsMillis(   30000 );
-			dataSource.setNumTestsPerEvictionRun( MAX_TOTAL_DB_CONNECTIONS ); // Test all of them
-			
-			dataSource.setLifo( false );  // Set so is FIFO
 
-			_dataSources.put( db, dataSource );
+//			dataSource.setMinEvictableIdleTimeMillis   ( 21600000 );
+//			dataSource.setTimeBetweenEvictionRunsMillis(   30000 );
+//			dataSource.setNumTestsPerEvictionRun( maxDBConnections ); // Test all of them
+			
+
+			dataSource.setMinEvictableIdleTimeMillis   ( 72000000 );  // 20 minutes
+			dataSource.setTimeBetweenEvictionRunsMillis(   300000 );  //  5 minutes
+			dataSource.setNumTestsPerEvictionRun( maxDBConnections ); // Test all of them, expensive if you also have setTestWhileIdle( true );
+			
+			
+//			dataSource.setMinEvictableIdleTimeMillis   ( 5000 );
+//			dataSource.setTimeBetweenEvictionRunsMillis(   3000 );
+//			dataSource.setNumTestsPerEvictionRun( maxDBConnections ); // Test all of them
+			
+//			dataSource.setLifo( false );  // Set so is FIFO
+
+			
+//			dataSource.setLogAbandoned(true); //  Adds significant overhead
+			
+			
+			dataSource.setMaxConnLifetimeMillis( 14400000 ); //  4 hours //  The maximum lifetime in milliseconds of a connection. 
+			
+			dataSource.setLogExpiredConnections(true);  //  Log connections that are removed for maxConnLifetimeMillis
+
+			
+			//  Pool prepared statements
+			
+			
+//			dataSource.setPoolPreparedStatements( poolPreparedStatements );  // activate 
+//			dataSource.setMaxOpenPreparedStatements( maxOpenPreparedStatements ); //  set max Open
+			
+			
+
+			_dataSources.put( dbNameForMapLookup, dataSource );
 		}
+		
+		
+//		Exception e = new Exception();
+//		
+//		e.printStackTrace();
 
-		return dataSource.getConnection();
+		try {
+		
+			return dataSource.getConnection();
+			
+		} catch ( Throwable t ) {
+			
+			log.error( "Failed to get connection for database: " + db, t );
+			
+			throw t;
+		}
 	}
 	
 	// close them all
@@ -279,6 +383,7 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 		this.databaseConnectionTestOnBorrow = databaseConnectionTestOnBorrow;
 	}
 
+	
 	
 
 }
