@@ -324,6 +324,13 @@
 							<input type="checkbox" disabled="disabled">Color by search
 						</span>
 					</label>
+					<label >
+						<span class="tool_tip_attached_jq" 
+							data-tooltip='<div style="margin-bottom: 3px;">Toggle coloring of links based on the selection region.</div><div>Ignored if "Color by search" is checked.</div>' 
+							style="white-space:nowrap;"   >
+							<input type="checkbox" id="color-by-region" >Color by region
+						</span>
+					</label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle display of scale bar" style="white-space:nowrap;" ><input type="checkbox" id="show-scalebar" checked>Show scalebar</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle automatic sizing of protein bars. Uncheck to allow manual horizontal sizing and vertical spacing." style="white-space:nowrap;" ><input type="checkbox" id="automatic-sizing" checked>Automatic sizing</span></label>
 					<label><span style="white-space:nowrap;"

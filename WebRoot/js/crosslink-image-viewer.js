@@ -249,8 +249,9 @@ var HASH_OBJECT_PROPERTIES = {
 		"horizontal-bar-scaling" : "v",
 		"protein_bar_data" : "w",
 
-		"selected-proteins" : "x"
-
+		"selected-proteins" : "x",
+		
+		"color-by-region" : "y"
 };
 
 
@@ -387,7 +388,7 @@ var _filterNonUniquePeptides;
 var _filterOnlyOnePSM;
 var _filterOnlyOnePeptide;
 
-var _colorLinesByRegion = true;
+var _colorLinesByRegion = undefined;
 
 //  working data (does round trip to the JSON in the Hash in the URL)
 
@@ -841,6 +842,15 @@ function updateURLHash( useSearchForm ) {
 	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["color-by-search"], true );
 	}
+	if ( $( "input#color-by-region" ).is( ':checked' ) ) {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["color-by-region"], true );
+		
+		_colorLinesByRegion = true;
+	} else {
+		
+		_colorLinesByRegion = false;
+	}
+	
 
 	if ( !isSizingAutomatic() ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["automatic-sizing"], false );
@@ -2214,8 +2224,16 @@ function populateViewerCheckBoxes() {
 	$( "input#show-protein-termini" ).prop('checked', json[ 'show-protein-termini' ] );
 	
 	$( "input#show-scalebar" ).prop('checked', json[ 'show-scalebar' ] );
-//	$( "input#show-coverage" ).prop('checked', json[ 'show-coverage' ] );
+
 	$( "input#color-by-search" ).prop('checked', json[ 'color-by-search' ] );
+	$( "input#color-by-region" ).prop('checked', json[ 'color-by-region' ] );
+	
+	if (  json[ 'color-by-region' ] ) {
+		_colorLinesByRegion = true;
+	} else {
+		_colorLinesByRegion = false;
+	}
+	
 	
 	if ( json[ PROTEIN_NAMES_POSITION_HASH_JSON_PROPERTY_NAME ] === PROTEIN_NAMES_POSITION_LEFT ) {
 		
@@ -3416,6 +3434,13 @@ function annotationColorOverrideForUnselected( params ) {
 
 ////////////
 
+function getColorForIndex( i ) {
+	
+	return _LINE_COLORS [ i % _LINE_COLORS.length ];
+}
+
+////////////
+
 function getColorForProteinBarRowIndexPosition( params ) {
 
 	var proteinBarRowIndex = params.proteinBarRowIndex;
@@ -4548,6 +4573,14 @@ function drawSvg() {
 
 function drawSequenceCoverage( selectedProteins, svgRootSnapSVGObject ) {
 	
+	var colorBySearch = false;
+
+	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+
+		colorBySearch = true;
+	}
+	
+	
 	var isAnyProteinBarsHighlighted = _imageProteinBarDataManager.isAnyProteinBarsHighlighted();
 	
 	
@@ -4582,6 +4615,14 @@ function drawSequenceCoverage( selectedProteins, svgRootSnapSVGObject ) {
 						//  The sequence coverage block is outside of any selected regions so set the block color for Unhighlighted
 						
 						blockColor = _NOT_HIGHLIGHTED_LINE_COLOR;
+					}
+				}
+
+				if ( blockColor === undefined ) {
+				
+					if ( colorBySearch ) {
+						
+						blockColor = getColorForIndex( proteinBarRowIndex );
 					}
 				}
 
@@ -5921,6 +5962,13 @@ function drawScaleBar( selectedProteins, scalebarIncrement, svgRootSnapSVGObject
 
 function drawInterProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject ) {
 
+	var colorBySearch = false;
+
+	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+
+		colorBySearch = true;
+	}
+	
 	for ( var fromSelectedProteinsIndex = 0; fromSelectedProteinsIndex < selectedProteins.length; fromSelectedProteinsIndex++ ) {
 		
 		var fromProteinId = selectedProteins[ fromSelectedProteinsIndex ];
@@ -5978,7 +6026,7 @@ function drawInterProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject 
 							toProteinPosition : toPp 
 					};
 
-					if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+					if ( colorBySearch ) {
 
 						findSearchesForCrosslink__response = 
 							findSearchesForCrosslink( 
@@ -6102,6 +6150,13 @@ function addClickHandler__InterProteinCrosslinkLines( $SVGNativeObject ) {
 
 function drawSelfProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject ) {
 
+	var colorBySearch = false;
+
+	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+
+		colorBySearch = true;
+	}
+	
 	for ( var i = 0; i < selectedProteins.length; i++ ) {
 		
 		var proteinBarProteinId = selectedProteins[ i ];
@@ -6186,7 +6241,7 @@ function drawSelfProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject )
 						toProteinPosition : toProteinPositionInt
 				};
 
-				if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+				if ( colorBySearch ) {
 					
 					var searchList = findSearchesForCrosslink( proteinBarProteinId, proteinBarProteinId, fromProteinPosition, toProteinPosition );
 					
@@ -6277,6 +6332,14 @@ function addClickHandler__SelfProteinCrosslinkLines( $SVGNativeObject ) {
 // draw looplinks
 function drawProteinLooplinkLines( selectedProteins, svgRootSnapSVGObject ) {
 
+	var colorBySearch = false;
+
+	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+
+		colorBySearch = true;
+	}
+	
+	
 	for ( var i = 0; i < selectedProteins.length; i++ ) {
 
 		var proteinBarProteinId = selectedProteins[ i ];
@@ -6329,7 +6392,7 @@ function drawProteinLooplinkLines( selectedProteins, svgRootSnapSVGObject ) {
 						toProteinPosition : toProteinPositionInt
 				};
 
-				if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+				if ( colorBySearch ) {
 					
 					var searchList = findSearchesForLooplink( proteinBarProteinId, fromProteinPosition, toProteinPosition );
 					
@@ -6422,6 +6485,14 @@ function addClickHandler__ProteinLooplinkLines( $SVGNativeObject ) {
 //draw monolinks		
 function drawProteinMonolinkLines( selectedProteins, svgRootSnapSVGObject ) {
 
+	var colorBySearch = false;
+
+	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+
+		colorBySearch = true;
+	}
+	
+	
 	for ( var i = 0; i < selectedProteins.length; i++ ) {
 
 		var proteinBarProteinId = selectedProteins[ i ];
@@ -6462,7 +6533,7 @@ function drawProteinMonolinkLines( selectedProteins, svgRootSnapSVGObject ) {
 					fromProteinPosition : proteinPositionInt  
 			};
 
-			if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+			if ( colorBySearch ) {
 				
 				var searchList = findSearchesForMonolink( proteinBarProteinId, proteinPosition ) ;
 				
@@ -7554,6 +7625,12 @@ function initializeViewer()  {
 		updateURLHash( false /* useSearchForm */ );
 		drawSvg();
 	});
+
+	$( "input#color-by-region" ).change( function() {
+		updateURLHash( false /* useSearchForm */ );
+		drawSvg();
+	});
+	
 
 	$( "input#shade-by-counts" ).change( function() {
 		updateURLHash( false /* useSearchForm */ );
