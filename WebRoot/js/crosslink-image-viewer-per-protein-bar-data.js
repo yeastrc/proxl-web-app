@@ -604,7 +604,7 @@ ImageProteinBarData.prototype.addToProteinOffset = function( params ) {
 //  protein bar highlighted
 
 
-//  Is all of the protein bar highlighted
+//  Is any of the protein bar highlighted
 
 ImageProteinBarData.prototype.isAnyOfProteinBarHighlighted = function( ) {
 
@@ -634,6 +634,23 @@ ImageProteinBarData.prototype.isAllOfProteinBarHighlighted = function( ) {
 	return false;
 };
 
+
+//   Selected Region count.   Return 1 if all of protein bar highlighted
+
+ImageProteinBarData.prototype.getProteinBarHighlightedRegionCount = function( ) {
+
+	if ( this.proteinBarHighlightedAll ) {
+
+		return 1;
+	}
+
+	if ( this.proteinBarHighlightedRegions && this.proteinBarHighlightedRegions.length > 0 ) {
+
+		return this.proteinBarHighlightedRegions.length;
+	}
+
+	return 0;
+};
 
 ///////////////////////////
 
@@ -714,6 +731,23 @@ ImageProteinBarData.prototype.isProteinBarHighlightedAtPosition = function( para
 //  Internal.    Is the protein bar highlighted for this single position
 
 ImageProteinBarData.prototype._isProteinBarHighlightedAtSinglePosition = function( position ) {
+
+	var regionIndexContainingPosition = this.indexOfProteinBarHighlightedRegionAtSinglePosition( position );
+	
+	if ( regionIndexContainingPosition !== -1 ) {
+		
+		return true;
+	}
+
+	return false;
+};
+
+
+//  Index of the protein bar highlighted region for this single position
+
+//   Index means the region number starting at zero for the number of regions on the protein bar
+
+ImageProteinBarData.prototype.indexOfProteinBarHighlightedRegionAtSinglePosition = function( position ) {
 	
 	for ( var index = 0; index < this.proteinBarHighlightedRegions.length; index++ ) {
 		
@@ -722,12 +756,12 @@ ImageProteinBarData.prototype._isProteinBarHighlightedAtSinglePosition = functio
 		if ( proteinBarHighlightedRegionsEntry.start <= position 
 				&& proteinBarHighlightedRegionsEntry.end >= position ) {
 			
-			return true;
+			return index;
 		}
 		;
 	}
 	
-	return false;
+	return -1;
 };
 
 
@@ -742,48 +776,74 @@ ImageProteinBarData.prototype.isProteinBarHighlightedAnywhereBetweenPositions = 
 	var position_1 = params.position_1;
 	var position_2 = params.position_2;
 
+	var regionIndex = 
+		this.indexOfProteinBarHighlightedRegionAnywhereBetweenPositionsInclusive( { position_1 : position_1, position_2 : position_2 } );
+	
+	if ( regionIndex === -1 ) {
+		
+		return false;
+	}
+	
+	return true;
+};
+
+
+
+///////////////////////////
+
+
+//  Index of the First protein bar highlighted region between these 2 positions, inclusive of the positions
+
+//  Index means the region number starting at zero for the number of regions on the protein bar
+
+ImageProteinBarData.prototype.indexOfProteinBarHighlightedRegionAnywhereBetweenPositionsInclusive = function( params ) {
+
+	var position_1 = params.position_1;
+	var position_2 = params.position_2;
+
 	if ( this.proteinBarHighlightedAll ) {
 
-//		This protein bar is All highlighted so return true
+//		This protein bar is All highlighted so return 0
 
-		return true;
+		return 0;
 	}
 
 	if ( this.proteinBarHighlightedRegions === undefined
 			|| this.proteinBarHighlightedRegions === null
 			|| this.proteinBarHighlightedRegions.length === 0 ) {
 
-//		There are no highlighted regions so return false
+//		There are no highlighted regions so return -1
 
-		return false;
+		return -1;
 	}
 
 //	Only get here if this bar is not fully highlighted 
 //	and there is at least one highlighted region in this bar
 
 	for ( var index = 0; index < this.proteinBarHighlightedRegions.length; index++ ) {
-		
+
 		var proteinBarHighlightedRegionsEntry = this.proteinBarHighlightedRegions[ index ];
-				
+
 		if ( ( proteinBarHighlightedRegionsEntry.start <= position_1 
 				&& proteinBarHighlightedRegionsEntry.end >= position_1 ) //  The select block contains position_1
-			|| ( proteinBarHighlightedRegionsEntry.start <= position_2 
+				|| ( proteinBarHighlightedRegionsEntry.start <= position_2 
 						&& proteinBarHighlightedRegionsEntry.end >= position_2 ) //  The select block contains position_2
-			|| ( proteinBarHighlightedRegionsEntry.start >= position_1
-					&& proteinBarHighlightedRegionsEntry.end <= position_2 ) //  The select block is within position_1 and position_2
-					)
+						|| ( proteinBarHighlightedRegionsEntry.start >= position_1
+								&& proteinBarHighlightedRegionsEntry.end <= position_2 ) //  The select block is within position_1 and position_2
+		)
 		{
-			
-			//  Either position_1 or position_2 is within a selected region
-			//    or a selected region is within position_1 and position_2 so return true
-			
-			return true;
+
+//			Either position_1 or position_2 is within a selected region
+//			or a selected region is within position_1 and position_2 so return true
+
+			return index;
 		}
 		;
 	}
 
-	return false;
+	return -1;
 };
+
 
 
 //  Get highlighted values as array.  Only use for drawing rectangles to display selected regions

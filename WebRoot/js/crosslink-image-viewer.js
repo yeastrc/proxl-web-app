@@ -387,6 +387,8 @@ var _filterNonUniquePeptides;
 var _filterOnlyOnePSM;
 var _filterOnlyOnePeptide;
 
+var _colorLinesByRegion = true;
+
 //  working data (does round trip to the JSON in the Hash in the URL)
 
 var _userScaleFactor;
@@ -3412,12 +3414,222 @@ function annotationColorOverrideForUnselected( params ) {
 	return _NOT_HIGHLIGHTED_LINE_COLOR;
 }
 
+////////////
 
-function getColorForIndex( i ) {
+function getColorForProteinBarRowIndexPosition( params ) {
+
+	var proteinBarRowIndex = params.proteinBarRowIndex;
+	var singlePosition = params.singlePosition;
 	
-	return _LINE_COLORS [ i % _LINE_COLORS.length ];
+	//  Used for: Links within same protein bar (Self Crosslink or Looplink)
+	var position_1 = params.position_1;
+	var position_2 = params.position_1;
+	
+	if ( _colorLinesByRegion
+			&& ( _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) {
+		
+		if ( singlePosition !== undefined ) {
+			
+			var lineColorIndex = 
+				getColorIndexForProteinBarRowIndexPosition__SinglePosition( { proteinBarRowIndex : proteinBarRowIndex, singlePosition : singlePosition } );
+			
+			if ( lineColorIndex !== -1 ) {
+				
+				return _LINE_COLORS [ lineColorIndex % _LINE_COLORS.length ];
+			}
+			
+			throw "getColorForProteinBarRowIndexPosition: singlePosition: lineColorIndex === -1";
+			
+//			return _NOT_HIGHLIGHTED_LINE_COLOR;
+		}
+		
+
+		if ( position_1 !== undefined && position_2 !== undefined ) {
+			
+			var lineColorIndexPosition_1 = 
+				getColorIndexForProteinBarRowIndexPosition__SinglePosition( { proteinBarRowIndex : proteinBarRowIndex, singlePosition : position_1 } );
+			
+			if ( lineColorIndexPosition_1 !== -1 ) {
+				
+				return _LINE_COLORS [ lineColorIndexPosition_1 % _LINE_COLORS.length ];
+			}
+
+			var lineColorIndexPosition_2 = 
+				getColorIndexForProteinBarRowIndexPosition__SinglePosition( { proteinBarRowIndex : proteinBarRowIndex, singlePosition : position_2 } );
+			
+			if ( lineColorIndexPosition_2 !== -1 ) {
+				
+				return _LINE_COLORS [ lineColorIndexPosition_2 % _LINE_COLORS.length ];
+			}
+			
+			throw "getColorForProteinBarRowIndexPosition: singlePosition: lineColorIndex === -1";
+			
+//			return _NOT_HIGHLIGHTED_LINE_COLOR;
+		}
+	} 
+	
+	return _LINE_COLORS [ proteinBarRowIndex % _LINE_COLORS.length ];
 }
 
+/////////////////////////
+
+function getColorIndexForProteinBarRowIndexPosition__SinglePosition( params ) {
+
+	var proteinBarRowIndex = params.proteinBarRowIndex;
+	
+	var singlePosition = params.singlePosition;
+	
+	//  Loop through protein bars selected regions incrementing a counter to get an index into the colors array
+
+	var proteinBarsSelectedRegionsCounter = 0;
+	
+	var imageProteinBarDataEntryArray = _imageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
+	
+	if ( proteinBarRowIndex >= imageProteinBarDataEntryArray.length ) {
+		
+		throw "ERROR: in getColorForProteinBarRowIndexPosition__SinglePosition(...): proteinBarRowIndex >= imageProteinBarDataEntryArray.length ";
+	}
+	
+	for ( var imageProteinBarDataEntryArrayIndex = 0; imageProteinBarDataEntryArrayIndex < imageProteinBarDataEntryArray.length; imageProteinBarDataEntryArrayIndex++ ) {
+		
+		var imageProteinBarDataEntry = imageProteinBarDataEntryArray[ imageProteinBarDataEntryArrayIndex ];
+		
+		if ( proteinBarRowIndex === imageProteinBarDataEntryArrayIndex ) {
+			
+			//  position is in this index so find this position in a region and exit.
+						
+			if ( imageProteinBarDataEntry.isAllOfProteinBarHighlighted() ) {
+				
+				//  Whole protein bar highlighted so a single region
+				
+				return proteinBarsSelectedRegionsCounter;
+			}
+			
+			var regionIndexContainingPosition = 
+				imageProteinBarDataEntry.indexOfProteinBarHighlightedRegionAtSinglePosition( singlePosition );
+			
+			if ( regionIndexContainingPosition === -1 ) {
+				
+				return -1;
+			}
+			
+			proteinBarsSelectedRegionsCounter += ( regionIndexContainingPosition );
+			
+			return proteinBarsSelectedRegionsCounter;
+		}
+		
+		
+		if ( imageProteinBarDataEntry.isAllOfProteinBarHighlighted() ) {
+			
+			//  Whole protein bar highlighted so a single region
+			
+			proteinBarsSelectedRegionsCounter++;
+		
+		} else {
+			
+			var proteinBarHighlightedRegionCount = 
+				imageProteinBarDataEntry.getProteinBarHighlightedRegionCount();
+			
+			proteinBarsSelectedRegionsCounter += proteinBarHighlightedRegionCount;
+		}
+	}
+}
+
+////////////
+
+function getColorForProteinBarRowIndexBlockPositions( params ) {
+
+	var proteinBarRowIndex = params.proteinBarRowIndex;
+
+	var block_position_1 = params.block_position_1;
+	var block_position_2 = params.block_position_2;
+
+	if ( _colorLinesByRegion
+			&& ( _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) {
+
+		if ( block_position_1 !== undefined && block_position_2 !== undefined ) {
+
+			//  Loop through protein bars selected regions incrementing a counter to get an index into the colors array
+
+			var foundProteinBarsSelectedRegion = false;
+			
+			var proteinBarsSelectedRegionsCounter = 0;
+			
+			var imageProteinBarDataEntryArray = _imageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
+			
+			if ( proteinBarRowIndex >= imageProteinBarDataEntryArray.length ) {
+				
+				throw "ERROR: in getColorForProteinBarRowIndexBlockPositions(...): proteinBarRowIndex >= imageProteinBarDataEntryArray.length ";
+			}
+			
+			for ( var imageProteinBarDataEntryArrayIndex = 0; imageProteinBarDataEntryArrayIndex < imageProteinBarDataEntryArray.length; imageProteinBarDataEntryArrayIndex++ ) {
+				
+				var imageProteinBarDataEntry = imageProteinBarDataEntryArray[ imageProteinBarDataEntryArrayIndex ];
+				
+				if ( proteinBarRowIndex === imageProteinBarDataEntryArrayIndex ) {
+					
+					//  block positions are in this index so find this position in a region and exit.
+								
+					if ( imageProteinBarDataEntry.isAllOfProteinBarHighlighted() ) {
+						
+						//  Whole protein bar highlighted so a single region
+						
+						foundProteinBarsSelectedRegion = true;
+						
+						break;  // EARLY EXIT LOOP
+					}
+					
+					var regionIndexContainingPosition = 
+						imageProteinBarDataEntry.indexOfProteinBarHighlightedRegionAnywhereBetweenPositionsInclusive( {
+							position_1 : block_position_1,
+							position_2 : block_position_2
+						} );
+					
+					if ( regionIndexContainingPosition === -1 ) {
+						
+						proteinBarsSelectedRegionsCounter = -1;
+						
+						break;  // EARLY EXIT LOOP
+					}
+					
+					proteinBarsSelectedRegionsCounter += ( regionIndexContainingPosition );
+					
+					foundProteinBarsSelectedRegion = true;
+					
+					break;
+				}
+				
+				
+				if ( imageProteinBarDataEntry.isAllOfProteinBarHighlighted() ) {
+					
+					//  Whole protein bar highlighted so a single region
+					
+					proteinBarsSelectedRegionsCounter++;
+				
+				} else {
+					
+					var proteinBarHighlightedRegionCount = 
+						imageProteinBarDataEntry.getProteinBarHighlightedRegionCount();
+					
+					proteinBarsSelectedRegionsCounter += proteinBarHighlightedRegionCount;
+				}
+			}
+			
+			if ( ! foundProteinBarsSelectedRegion ) {
+	
+				throw "ERROR: in getColorForProteinBarRowIndexBlockPositions(...): ! foundProteinBarsSelectedRegion ";
+			}
+
+
+			return _LINE_COLORS [ proteinBarsSelectedRegionsCounter % _LINE_COLORS.length ];
+		}
+	} 
+
+	return _LINE_COLORS [ proteinBarRowIndex % _LINE_COLORS.length ];
+}
+
+
+/////////
 
 
 //  get the color that should be used for a link, based on that links presence in the supplied searches
@@ -3491,7 +3703,7 @@ function getLineColorSingleProteinBar( params ) {
 			return getColorForSearchesForIndexAndSearchList( proteinIndex, searchList );
 		}
 		
-		return getColorForIndex( proteinIndex );
+		return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : proteinIndex } ); 
 	}
 
 	var imageProteinBarDataProtein =  _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : proteinIndex } );
@@ -3507,15 +3719,13 @@ function getLineColorSingleProteinBar( params ) {
 				return getColorForSearchesForIndexAndSearchList( proteinIndex, searchList );
 			}
 			
-			return getColorForIndex( proteinIndex );
+			return  getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : proteinIndex, singlePosition : fromProteinPosition } );
 		}
 		
 	} else {
 		
 		//  Self Crosslink or Looplink
 		
-		
-
 		if ( imageProteinBarDataProtein.isProteinBarHighlightedAtPosition( { position_1 : fromProteinPosition, position_2 : toProteinPosition } )  ) {
 		
 			if ( searchList ) {
@@ -3523,7 +3733,7 @@ function getLineColorSingleProteinBar( params ) {
 				return getColorForSearchesForIndexAndSearchList( proteinIndex, searchList );
 			}
 			
-			return getColorForIndex( proteinIndex );
+			return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : proteinIndex, position_1 : fromProteinPosition, position_2 : toProteinPosition } );
 		}
 	}
 
@@ -3550,7 +3760,7 @@ function getCrosslinkLineColor( params ) {
 			return getColorForSearchesForIndexAndSearchList( fromProteinIndex, searchList );
 		}
 		
-		return getColorForIndex( fromProteinIndex );
+		return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : fromProteinIndex } );
 	}
 
 	
@@ -3568,7 +3778,7 @@ function getCrosslinkLineColor( params ) {
 				return getColorForSearchesForIndexAndSearchList( fromProteinIndex, searchList );
 			}
 			
-			return getColorForIndex( fromProteinIndex ); 
+			return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : fromProteinIndex, singlePosition : fromProteinPosition } ); 
 			
 		} else if ( imageProteinBarDataToProtein.isProteinBarHighlightedAtPosition( { position_1 : toProteinPosition } )  ) {
 
@@ -3577,7 +3787,7 @@ function getCrosslinkLineColor( params ) {
 				return getColorForSearchesForIndexAndSearchList( toProteinIndex, searchList );
 			}
 			
-			return getColorForIndex( toProteinIndex ); 
+			return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : toProteinIndex, singlePosition : toProteinIndex } ); 
 		}
 
 		return _NOT_HIGHLIGHTED_LINE_COLOR;
@@ -3592,7 +3802,7 @@ function getCrosslinkLineColor( params ) {
 			return getColorForSearchesForIndexAndSearchList( fromProteinIndex, searchList );
 		}
 		
-		return getColorForIndex( fromProteinIndex ); 
+		return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : fromProteinIndex, singlePosition : fromProteinPosition } ); 
 	}
 
 	return _NOT_HIGHLIGHTED_LINE_COLOR;
@@ -4356,8 +4566,7 @@ function drawSequenceCoverage( selectedProteins, svgRootSnapSVGObject ) {
 				var start = segment.start;
 				var end = segment.end;
 				
-
-				var blockColor = getColorForIndex( proteinBarRowIndex );
+				var blockColor = undefined;
 					
 				if ( isAnyProteinBarsHighlighted ) {
 
@@ -4376,6 +4585,12 @@ function drawSequenceCoverage( selectedProteins, svgRootSnapSVGObject ) {
 					}
 				}
 
+				if ( blockColor === undefined ) {
+				
+					blockColor = getColorForProteinBarRowIndexBlockPositions( { proteinBarRowIndex : proteinBarRowIndex, block_position_1 : start, block_position_2 : end } );
+				}
+					
+				
 				var drawAnnotationRectangle_Params = {
 						
 						 protein : protein,
@@ -5914,6 +6129,36 @@ function drawSelfProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject )
 				
 				var toProteinPosition = toProteinPositionKeys[ kk ];
 				var toProteinPositionInt =  parseInt( toProteinPosition );
+				
+				if ( fromProteinPositionInt > toProteinPositionInt ) {
+					
+					//  Drawing line from right to left.  
+					//  Likely line already drawn for same positions from left to right.
+					
+					//  Check for line already drawn between From and To positions
+					
+					var toPositionsUsingToPositionAsFromPosition = _proteinLinkPositions[ proteinBarProteinId ][ proteinBarProteinId ][ toProteinPosition ];
+					
+					if ( toPositionsUsingToPositionAsFromPosition !== undefined ) {
+						
+						//  toPosition found as a from position 
+						//  so now check if the fromPosition is a to position in that sub-array
+						
+						if ( toPositionsUsingToPositionAsFromPosition[ fromProteinPosition ] !== undefined ) {
+							
+							//  fromPosition is a to position in that sub-array
+							//  so a line has already been drawn from left to right
+							//  for these positions
+							
+							//  Skip drawing this line
+							
+							continue;  //  EARLY CONTINUE
+							
+						}
+						
+					}
+					
+				}
 				
 				var x2 = translatePositionToXCoordinate( { position : toProteinPositionInt, proteinId : proteinBarProteinId, proteinBarIndex : i } );
 				var y2 = toY;
