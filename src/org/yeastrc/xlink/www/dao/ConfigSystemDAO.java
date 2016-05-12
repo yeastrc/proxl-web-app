@@ -168,7 +168,14 @@ public class ConfigSystemDAO {
 	}
 	
 	
-	
+	//  Insert, on duplicate update
+
+	private static final String INSERT_UPDATE_SQL = 
+			
+			"INSERT INTO config_system (config_key, config_value, comment)"
+			+ "VALUES (?, ?, ?)"
+					
+			+ " ON DUPLICATE KEY UPDATE config_value = ?";
 
 	/**
 	 * @param configList
@@ -177,16 +184,9 @@ public class ConfigSystemDAO {
 	public void updateValueOnlyOnConfigKey( List<ConfigSystemDTO> configList  ) throws Exception {
 		
 		Connection conn = null;
+
+		PreparedStatement pstmt = null;
 		
-		PreparedStatement queryPstmt = null;
-		ResultSet queryRS = null;
-
-		PreparedStatement updatePstmt = null;
-		
-		final String querySQL = "SELECT id FROM config_system WHERE config_key = ?";
-
-		final String updateSQL = "UPDATE config_system SET config_value = ? WHERE config_key = ?";
-
 		
 		try {
 			
@@ -194,30 +194,23 @@ public class ConfigSystemDAO {
 			
 			conn.setAutoCommit(false);
 
-			queryPstmt = conn.prepareStatement( querySQL );
-			
-			updatePstmt = conn.prepareStatement( updateSQL );
+			pstmt = conn.prepareStatement( INSERT_UPDATE_SQL );
 			
 			for ( ConfigSystemDTO configItem : configList ) {
 
-				queryPstmt.setString( 1, configItem.getConfigKey()  );
-
-				queryRS = queryPstmt.executeQuery();
+				int counter = 0;
 				
-				if( ! queryRS.next() ) {
-
-					String msg = "Config key '" + configItem.getConfigKey() 
-							+ "' not found in database.";
-					log.error( msg );
-
-					throw new ProxlWebappDataException( msg );
-				}
-
-				updatePstmt.setString( 1, configItem.getConfigValue() );
-				updatePstmt.setString( 2, configItem.getConfigKey() );
+				counter++;
+				pstmt.setString( counter, configItem.getConfigKey() );
+				counter++;
+				pstmt.setString( counter, configItem.getConfigValue() );
+				counter++;
+				pstmt.setString( counter, configItem.getComment() );
+				counter++;
+				pstmt.setString( counter, configItem.getConfigValue() );
 
 //				int updatedRecordCount = 
-				updatePstmt.executeUpdate();
+				pstmt.executeUpdate();
 			}
 			
 			conn.commit();
@@ -226,7 +219,7 @@ public class ConfigSystemDAO {
 			
 			conn.rollback();
 			
-			String msg = "Failed to update config_system, updateSQL: " + updateSQL;
+			String msg = "Failed to insert or update config_system, SQL: " + INSERT_UPDATE_SQL;
 			
 			log.error( msg, e );
 			
@@ -236,22 +229,16 @@ public class ConfigSystemDAO {
 		} finally {
 			
 			// be sure database handles are closed
-			if( queryRS != null ) {
-				try { queryRS.close(); } catch( Throwable t ) { ; }
-				queryRS = null;
-			}
-
-			if( queryPstmt != null ) {
-				try { queryPstmt.close(); } catch( Throwable t ) { ; }
-				queryPstmt = null;
+			
+			
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
 			}
 			
-			if( updatePstmt != null ) {
-				try { updatePstmt.close(); } catch( Throwable t ) { ; }
-				updatePstmt = null;
-			}
-			
-			conn.setAutoCommit(true);
+			try {
+				conn.setAutoCommit(true);
+			 } catch( Throwable t ) { ; }
 			
 			if( conn != null ) {
 				try { conn.close(); } catch( Throwable t ) { ; }

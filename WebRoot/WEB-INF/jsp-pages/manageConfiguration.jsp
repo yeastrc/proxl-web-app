@@ -62,6 +62,13 @@
 	
 	<div style="margin-bottom: 10px;" >
 	  <div style="margin-bottom: 3px;">
+		Google Analytics Tracking Code: <input type="text" id="input_google_analytics_tracking_code" style="width: 450px;"> 
+	  </div> 
+	</div>
+	
+	
+	<div style="margin-bottom: 10px;" >
+	  <div style="margin-bottom: 3px;">
 		Protein Annotation Service URL: <input type="text" id="input_protein_annotation_webservice_url" style="width: 450px;"> 
 	  </div> 
 	</div>
@@ -106,6 +113,7 @@
 
 	<input type="hidden" id="config_key_protein_listing_webservice_url" value="<%= ConfigSystemsKeysConstants.PROTEIN_LISTING_WEBSERVICE_URL_KEY %>">
 
+	<input type="hidden" id="config_key_google_analytics_tracking_code" value="<%= ConfigSystemsKeysConstants.GOOGLE_ANALYTICS_TRACKING_CODE_KEY %>">
 
   </div>  <%--  Close <div class="overall-enclosing-block">  --%>
 

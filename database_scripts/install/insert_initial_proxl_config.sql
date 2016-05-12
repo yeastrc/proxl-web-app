@@ -20,7 +20,14 @@ use proxl;
 
  INSERT INTO config_system (config_key, config_value) 
  VALUES ('email_from_address', '');
- 
+
+
+--  (Optional) Used for adding the Google Analytics Javascript containing the configured tracking code to the footer of every page.  
+--  Default, not set
+ INSERT INTO config_system (config_key, config_value) 
+ VALUES ('google_analytics_tracking_code', '' );
+
+
 
 --  (Optional) Used for accessing protein annotations services.  
 --  Default, the Yeast Resource Center will provide real-time protein annotation

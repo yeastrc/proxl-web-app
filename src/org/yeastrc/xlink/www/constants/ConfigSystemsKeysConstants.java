@@ -22,5 +22,7 @@ public class ConfigSystemsKeysConstants {
 	
 	public static final String FOOTER_CENTER_OF_PAGE_HTML_KEY = "footer_center_of_page_html";
 	
+	public static final String GOOGLE_ANALYTICS_TRACKING_CODE_KEY = "google_analytics_tracking_code";
+	
 	
 }

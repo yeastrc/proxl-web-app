@@ -60,12 +60,14 @@ var getListConfigurationResponse = function(requestData, responseData) {
 	var $config_key_email_smtp_server_url = $( "#config_key_email_smtp_server_url" );
 	var $config_key_protein_annotation_webservice_url = $( "#config_key_protein_annotation_webservice_url" );
 	var $config_key_protein_listing_webservice_url = $( "#config_key_protein_listing_webservice_url" );
-
+	var $config_key_google_analytics_tracking_code = $( "#config_key_google_analytics_tracking_code" );
+	
 	var config_key_footer_center_of_page_html_Val = $config_key_footer_center_of_page_html.val();
 	var config_key_email_from_address_Val = $config_key_email_from_address.val();
 	var config_key_email_smtp_server_url_Val = $config_key_email_smtp_server_url.val();
 	var config_key_protein_annotation_webservice_url_Val = $config_key_protein_annotation_webservice_url.val();
 	var config_key_protein_listing_webservice_url_Val = $config_key_protein_listing_webservice_url.val();
+	var config_key_google_analytics_tracking_code_Val = $config_key_google_analytics_tracking_code.val();
 	
 	
 	var $input_footer_center_of_page_html = $( "#input_footer_center_of_page_html" );
@@ -73,6 +75,7 @@ var getListConfigurationResponse = function(requestData, responseData) {
 	var $input_email_smtp_server_url = $( "#input_email_smtp_server_url" );
 	var $input_protein_annotation_webservice_url = $( "#input_protein_annotation_webservice_url" );
 	var $input_protein_listing_webservice_url = $( "#input_protein_listing_webservice_url" );
+	var $input_google_analytics_tracking_code = $( "#input_google_analytics_tracking_code" );
 
 	for ( var configListIndex = 0; configListIndex < configList.length; configListIndex++ ) {
 	
@@ -98,6 +101,10 @@ var getListConfigurationResponse = function(requestData, responseData) {
 		} else if ( configListItem.configKey === config_key_protein_listing_webservice_url_Val ) {
 			
 			$input_protein_listing_webservice_url.val( configListItem.configValue );
+
+		} else if ( configListItem.configKey === config_key_google_analytics_tracking_code_Val ) {
+			
+			$input_google_analytics_tracking_code.val( configListItem.configValue );
 		}
 		
 	}
@@ -107,17 +114,20 @@ var getListConfigurationResponse = function(requestData, responseData) {
 
 function saveListConfiguration() {
 
+
 	var $config_key_footer_center_of_page_html = $( "#config_key_footer_center_of_page_html" );
 	var $config_key_email_from_address = $( "#config_key_email_from_address" );
 	var $config_key_email_smtp_server_url = $( "#config_key_email_smtp_server_url" );
 	var $config_key_protein_annotation_webservice_url = $( "#config_key_protein_annotation_webservice_url" );
 	var $config_key_protein_listing_webservice_url = $( "#config_key_protein_listing_webservice_url" );
-
+	var $config_key_google_analytics_tracking_code = $( "#config_key_google_analytics_tracking_code" );
+	
 	var config_key_footer_center_of_page_html_Val = $config_key_footer_center_of_page_html.val();
 	var config_key_email_from_address_Val = $config_key_email_from_address.val();
 	var config_key_email_smtp_server_url_Val = $config_key_email_smtp_server_url.val();
 	var config_key_protein_annotation_webservice_url_Val = $config_key_protein_annotation_webservice_url.val();
 	var config_key_protein_listing_webservice_url_Val = $config_key_protein_listing_webservice_url.val();
+	var config_key_google_analytics_tracking_code_Val = $config_key_google_analytics_tracking_code.val();
 	
 	
 	var $input_footer_center_of_page_html = $( "#input_footer_center_of_page_html" );
@@ -125,6 +135,7 @@ function saveListConfiguration() {
 	var $input_email_smtp_server_url = $( "#input_email_smtp_server_url" );
 	var $input_protein_annotation_webservice_url = $( "#input_protein_annotation_webservice_url" );
 	var $input_protein_listing_webservice_url = $( "#input_protein_listing_webservice_url" );
+	var $input_google_analytics_tracking_code = $( "#input_google_analytics_tracking_code" );
 
 	
 	var input_footer_center_of_page_html_Val = $input_footer_center_of_page_html.val();
@@ -132,6 +143,7 @@ function saveListConfiguration() {
 	var input_email_smtp_server_url_Val = $input_email_smtp_server_url.val();
 	var input_protein_annotation_webservice_url_Val = $input_protein_annotation_webservice_url.val();
 	var input_protein_listing_webservice_url_Val = $input_protein_listing_webservice_url.val();
+	var input_google_analytics_tracking_code_Val = $input_google_analytics_tracking_code.val();
 
 	
 
@@ -164,6 +176,12 @@ function saveListConfiguration() {
 			configKey: config_key_protein_listing_webservice_url_Val,
 			configValue : input_protein_listing_webservice_url_Val };
 	configList.push( configListItem );
+
+	configListItem = { 
+			configKey: config_key_google_analytics_tracking_code_Val,
+			configValue : input_google_analytics_tracking_code_Val };
+	configList.push( configListItem );
+	
 
 	var requestObj = { configList : configList };
 	

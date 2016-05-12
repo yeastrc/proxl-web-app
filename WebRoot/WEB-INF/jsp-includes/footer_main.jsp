@@ -25,6 +25,20 @@
 		</div>
 	
 	</div>
+	
+	<%--  Add Google Analytics if a tracking code is in the config  --%>
+  <c:if test="${ not empty configSystemValues.googleAnalyticsTrackingCode }">
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	  ga('create', '<c:out value="${ configSystemValues.googleAnalyticsTrackingCode }"></c:out>', 'auto');
+	  ga('send', 'pageview');
+	
+	</script>	
+  </c:if>
 
   </div>  <%--  End of <div class="crosslinks-page-main-outermost-div">  in the header  --%>
  

@@ -28,7 +28,27 @@ public class AppContextConfigSystemValuesRetrieval {
 			String msg = "Exception getting configSystem value for getFooterCenterOfPageHTML()";
 			log.error( msg, e );
 
-			return("UNABLE_TO_RETRIEVE_VALUE");
+			return "UNABLE_TO_RETRIEVE_VALUE";
+		}
+	}
+	
+
+	/**
+	 * @return
+	 */
+	public String getGoogleAnalyticsTrackingCode() {
+
+		try {
+
+			return ConfigSystemCaching.getInstance()
+					.getConfigValueForConfigKey( ConfigSystemsKeysConstants.GOOGLE_ANALYTICS_TRACKING_CODE_KEY );
+
+		} catch ( Exception e ) {
+			
+			String msg = "Exception getting configSystem value for getGoogleAnalyticsTrackingCode()";
+			log.error( msg, e );
+
+			return null;
 		}
 	}
 }
