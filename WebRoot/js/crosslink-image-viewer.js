@@ -3456,7 +3456,7 @@ function getColorForProteinBarRowIndexPosition( params ) {
 	
 	//  Used for: Links within same protein bar (Self Crosslink or Looplink)
 	var position_1 = params.position_1;
-	var position_2 = params.position_1;
+	var position_2 = params.position_2;
 	
 	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_REGION
 			&& ( _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) {
