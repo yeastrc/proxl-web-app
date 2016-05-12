@@ -3460,7 +3460,7 @@ function getColorForProteinBarRowIndexPosition( params ) {
 			
 			if ( lineColorIndex !== -1 ) {
 				
-				return _LINE_COLORS [ lineColorIndex % _LINE_COLORS.length ];
+				return getColorForIndex( lineColorIndex );
 			}
 			
 			throw "getColorForProteinBarRowIndexPosition: singlePosition: lineColorIndex === -1";
@@ -3476,7 +3476,7 @@ function getColorForProteinBarRowIndexPosition( params ) {
 			
 			if ( lineColorIndexPosition_1 !== -1 ) {
 				
-				return _LINE_COLORS [ lineColorIndexPosition_1 % _LINE_COLORS.length ];
+				return getColorForIndex( lineColorIndexPosition_1 );
 			}
 
 			var lineColorIndexPosition_2 = 
@@ -3484,7 +3484,7 @@ function getColorForProteinBarRowIndexPosition( params ) {
 			
 			if ( lineColorIndexPosition_2 !== -1 ) {
 				
-				return _LINE_COLORS [ lineColorIndexPosition_2 % _LINE_COLORS.length ];
+				return getColorForIndex( lineColorIndexPosition_2 );
 			}
 			
 			throw "getColorForProteinBarRowIndexPosition: singlePosition: lineColorIndex === -1";
@@ -3493,7 +3493,7 @@ function getColorForProteinBarRowIndexPosition( params ) {
 		}
 	} 
 	
-	return _LINE_COLORS [ proteinBarRowIndex % _LINE_COLORS.length ];
+	return getColorForIndex( proteinBarRowIndex );
 }
 
 /////////////////////////
@@ -3646,11 +3646,11 @@ function getColorForProteinBarRowIndexBlockPositions( params ) {
 			}
 
 
-			return _LINE_COLORS [ proteinBarsSelectedRegionsCounter % _LINE_COLORS.length ];
+			return getColorForIndex( proteinBarsSelectedRegionsCounter );
 		}
 	} 
 
-	return _LINE_COLORS [ proteinBarRowIndex % _LINE_COLORS.length ];
+	return getColorForIndex( proteinBarRowIndex );
 }
 
 
