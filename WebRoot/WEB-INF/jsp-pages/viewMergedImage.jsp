@@ -311,26 +311,7 @@
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle marking trypic positions in proteins" style="white-space:nowrap;" ><input type="checkbox" id="show-tryptic-cleavage-positions">Show tryptic positions</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle showing protein termini labels" style="white-space:nowrap;" ><input type="checkbox" id="show-protein-termini">Show protein termini</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle shading of links based on spectrum counts" style="white-space:nowrap;" ><input type="checkbox" id="shade-by-counts">Shade by counts</span></label>
-					<label id="color_by_search_outer_container">
-						<span class="tool_tip_attached_jq" data-tooltip="Toggle coloring of links based on search in which it was found" style="white-space:nowrap;"   >
-							<input type="checkbox" id="color-by-search" >Color by search
-						</span>
-					</label>
-					<%-- disabled version for when the number of searches exceeds the number supported by 'Color by search' --%>
-					<label id="color_by_search_disabled_outer_container"  style="white-space:nowrap; display: none;" >
-						<span style="white-space:nowrap;" 
-								class="disabled-checkbox tool_tip_attached_jq"
-								data-tooltip="'Color by search' unavailable for more than 3 searches" >
-							<input type="checkbox" disabled="disabled">Color by search
-						</span>
-					</label>
-					<label >
-						<span class="tool_tip_attached_jq" 
-							data-tooltip='<div style="margin-bottom: 3px;">Toggle coloring of links based on the selection region.</div><div>Ignored if "Color by search" is checked.</div>' 
-							style="white-space:nowrap;"   >
-							<input type="checkbox" id="color-by-region" >Color by region
-						</span>
-					</label>
+					
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle display of scale bar" style="white-space:nowrap;" ><input type="checkbox" id="show-scalebar" checked>Show scalebar</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle automatic sizing of protein bars. Uncheck to allow manual horizontal sizing and vertical spacing." style="white-space:nowrap;" ><input type="checkbox" id="automatic-sizing" checked>Automatic sizing</span></label>
 					<label><span style="white-space:nowrap;"
@@ -338,9 +319,35 @@
 							><input type="checkbox" id="protein_names_position_left" 
 								>Protein Names On Left</span></label>
 
+					<%--  Select for "color by" with options of by search or by region  --%>
 					&nbsp;&nbsp;&nbsp;&nbsp;
 					<span style="white-space: nowrap;">
-						<span class="tool_tip_attached_jq" data-tooltip="Choose one to view graphical feature annotations for protein sequences">Show Feature Annotations:</span> 
+						<span class="tool_tip_attached_jq" data-tooltip="Choose alternate link coloring"
+								>Color by:</span> 
+								
+						<select id="color_by">
+							<option value="">Protein</option>
+							
+							<%--  These option values must be kept in sync with Javascript.
+								  These values must be kept backward compatible or 
+								    Javascript must be written to convert
+							--%>
+							
+							<option value="region">Region</option>
+							
+							<c:if test="${ fn:length( searchIds ) <= 3 }">
+							
+								<%-- Only shown when the number of searches is <= the number supported by 'Color by search' --%>
+								<option value="search">Search</option>
+							</c:if>
+						</select>
+					</span>
+								
+					&nbsp;
+					<span style="white-space: nowrap;">
+						<span class="tool_tip_attached_jq" data-tooltip="Choose one to view graphical feature annotations for protein sequences"
+								>Show Feature Annotations:</span>
+								 
 						<select id="annotation_type">
 							<option></option>
 							<option value="sequence_coverage">Sequence Coverage</option>

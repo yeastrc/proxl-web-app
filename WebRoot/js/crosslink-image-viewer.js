@@ -68,6 +68,11 @@ var SELECT_ELEMENT_ANNOTATION_TYPE_PSIPRED3 = "psired3";
 
 
 
+//Matches the "value" for the <select id="color_by">
+
+var SELECT_ELEMENT_COLOR_BY_REGION = "region";
+var SELECT_ELEMENT_COLOR_BY_SEARCH = "search";
+
 //////////////////////////
 
 //  Visible Constants
@@ -103,6 +108,10 @@ var _LINE_COLORS = [
                   "#878906",	// mustard yellow
                   ];
 
+
+//  If the number of searches supported by search colors changes, change the conditional in the JSP
+//    for the option:   <option value="search">search</option>
+
 // colors to use for search-based coloring, based on 
 // RYB subractive color model
 
@@ -121,11 +130,6 @@ var _SEARCH_COLORS_TWO_SEARCHES = {
 					2:		"#0000FF",
 					12:		"#00FF00",
 };
-
-
-
-var _MAX_NUMBER_SEARCHES_SUPPORTED_FOR_COLOR_BY_SEARCHES = 3;  // driven by the values in the variable _SEARCH_COLORS above
-
 
 
 //  height and width for when initially attach to <svg> element 
@@ -241,7 +245,9 @@ var HASH_OBJECT_PROPERTIES = {
 		"show-scalebar" : "o",
 
 		"shade-by-counts" : "p",
-		"color-by-search" : "q",
+		
+		"color-by-search" : "q",  //  Not used, only for backwards compatibility
+		
 		"automatic-sizing" : "r",
 		"protein_names_position" /* PROTEIN_NAMES_POSITION_HASH_JSON_PROPERTY_NAME */ : "s",
 		"annotation_type" : "t",
@@ -251,7 +257,7 @@ var HASH_OBJECT_PROPERTIES = {
 
 		"selected-proteins" : "x",
 		
-		"color-by-region" : "y"
+		"color_by" : "y"
 };
 
 
@@ -388,7 +394,9 @@ var _filterNonUniquePeptides;
 var _filterOnlyOnePSM;
 var _filterOnlyOnePeptide;
 
-var _colorLinesByRegion = undefined;
+
+var _colorLinesBy = undefined;
+
 
 //  working data (does round trip to the JSON in the Hash in the URL)
 
@@ -839,18 +847,13 @@ function updateURLHash( useSearchForm ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["shade-by-counts"], true );
 	}
 
-	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
-		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["color-by-search"], true );
-	}
-	if ( $( "input#color-by-region" ).is( ':checked' ) ) {
-		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["color-by-region"], true );
-		
-		_colorLinesByRegion = true;
-	} else {
-		
-		_colorLinesByRegion = false;
-	}
+	_colorLinesBy = $("#color_by").val();
 	
+	if ( _colorLinesBy !== "" ) {
+
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["color_by"], _colorLinesBy );
+	}
+
 
 	if ( !isSizingAutomatic() ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["automatic-sizing"], false );
@@ -2225,15 +2228,20 @@ function populateViewerCheckBoxes() {
 	
 	$( "input#show-scalebar" ).prop('checked', json[ 'show-scalebar' ] );
 
-	$( "input#color-by-search" ).prop('checked', json[ 'color-by-search' ] );
-	$( "input#color-by-region" ).prop('checked', json[ 'color-by-region' ] );
+	_colorLinesBy = json[ 'color_by' ];
+
+	// Backwards compatable color-by-search
 	
-	if (  json[ 'color-by-region' ] ) {
-		_colorLinesByRegion = true;
-	} else {
-		_colorLinesByRegion = false;
+	if ( json[ 'color-by-search' ] ) {
+		
+		_colorLinesBy = SELECT_ELEMENT_COLOR_BY_SEARCH;
+	}
+		
+	if ( _colorLinesBy != undefined ) {
+		$("#color_by").val( _colorLinesBy );
 	}
 	
+		
 	
 	if ( json[ PROTEIN_NAMES_POSITION_HASH_JSON_PROPERTY_NAME ] === PROTEIN_NAMES_POSITION_LEFT ) {
 		
@@ -3450,7 +3458,7 @@ function getColorForProteinBarRowIndexPosition( params ) {
 	var position_1 = params.position_1;
 	var position_2 = params.position_1;
 	
-	if ( _colorLinesByRegion
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_REGION
 			&& ( _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) {
 		
 		if ( singlePosition !== undefined ) {
@@ -3569,7 +3577,7 @@ function getColorForProteinBarRowIndexBlockPositions( params ) {
 	var block_position_1 = params.block_position_1;
 	var block_position_2 = params.block_position_2;
 
-	if ( _colorLinesByRegion
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_REGION
 			&& ( _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) {
 
 		if ( block_position_1 !== undefined && block_position_2 !== undefined ) {
@@ -4482,7 +4490,7 @@ function drawSvg() {
 	}
 	
 	// draw the legend, if they're coloring by search
-	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_SEARCH ) {
 		
 		var drawColorBySearchLegendResponse = drawColorBySearchLegend(  selectedProteins, bottomOfLowestItemDrawn, svgRootSnapSVGObject );
 
@@ -4575,7 +4583,7 @@ function drawSequenceCoverage( selectedProteins, svgRootSnapSVGObject ) {
 	
 	var colorBySearch = false;
 
-	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_SEARCH ) {
 
 		colorBySearch = true;
 	}
@@ -5964,7 +5972,7 @@ function drawInterProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject 
 
 	var colorBySearch = false;
 
-	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_SEARCH ) {
 
 		colorBySearch = true;
 	}
@@ -6152,7 +6160,7 @@ function drawSelfProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject )
 
 	var colorBySearch = false;
 
-	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_SEARCH ) {
 
 		colorBySearch = true;
 	}
@@ -6334,7 +6342,7 @@ function drawProteinLooplinkLines( selectedProteins, svgRootSnapSVGObject ) {
 
 	var colorBySearch = false;
 
-	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_SEARCH ) {
 
 		colorBySearch = true;
 	}
@@ -6487,7 +6495,7 @@ function drawProteinMonolinkLines( selectedProteins, svgRootSnapSVGObject ) {
 
 	var colorBySearch = false;
 
-	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_SEARCH ) {
 
 		colorBySearch = true;
 	}
@@ -7529,17 +7537,6 @@ function initializeViewer()  {
 	
 	populateViewerCheckBoxes();
 
-	
-	
-	if ( _searches.length > _MAX_NUMBER_SEARCHES_SUPPORTED_FOR_COLOR_BY_SEARCHES ) {
-		
-		//  The number of searches is > number supported for "Color by search" 
-		//    so switch to showing the disabled checkbox for "Color by search"
-		
-		$("#color_by_search_outer_container").hide();
-		$("#color_by_search_disabled_outer_container").show();
-	}
-
 
 	
 	$("#vertical_spacing_value").text( _singleProteinBarOverallHeight );
@@ -7621,12 +7618,8 @@ function initializeViewer()  {
 		drawSvg();
 	});
 	
-	$( "input#color-by-search" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		drawSvg();
-	});
 
-	$( "input#color-by-region" ).change( function() {
+	$( "#color_by" ).change( function() {
 		updateURLHash( false /* useSearchForm */ );
 		drawSvg();
 	});
@@ -7636,12 +7629,7 @@ function initializeViewer()  {
 		updateURLHash( false /* useSearchForm */ );
 		loadDataAndDraw( true /* doDraw */ );
 	});
-	
-//	$( "input#show-coverage" ).change( function() {
-//		updateURLHash( false /* useSearchForm */ );
-//		loadDataAndDraw( true /* doDraw */ );
-//	});
-	
+
 	
 	$( "#annotation_type" ).change( function() {
 		updateURLHash( false /* useSearchForm */ );
