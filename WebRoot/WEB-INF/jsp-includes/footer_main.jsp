@@ -34,7 +34,7 @@
 	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 	  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 	
-	  ga('create', '<c:out value="${ configSystemValues.googleAnalyticsTrackingCode }"></c:out>', 'auto');
+	  ga('create', '<c:out value="${ configSystemValues.googleAnalyticsTrackingCode }" escapeXml="false"></c:out>', 'auto');
 	  ga('send', 'pageview');
 	
 	</script>	
