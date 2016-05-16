@@ -41,11 +41,8 @@
 var EXCLUDE_LINK_TYPE_DEFAULT = [ 0 ];
 
 
-var PROTEIN_SELECTOR_NO_PROTEIN_SELECTED_PROTEIN_ID = "0";
-
 
 var PROTEIN_SELECTOR_HANDLEBARS_STRING = "\t<option value=\"{{ proteinId }}\">{{ proteinName }}</option>\n";
-
 
 var PROTEIN_BAR_DATA_ARRAY_INDEX_ATTR_NAME = "data-protein_bars_data_array_index";
 
@@ -70,6 +67,11 @@ var SELECT_ELEMENT_ANNOTATION_TYPE_DISOPRED3 = "disopred3";
 var SELECT_ELEMENT_ANNOTATION_TYPE_PSIPRED3 = "psired3";
 
 
+
+//Matches the "value" for the <select id="color_by">
+
+var SELECT_ELEMENT_COLOR_BY_REGION = "region";
+var SELECT_ELEMENT_COLOR_BY_SEARCH = "search";
 
 //////////////////////////
 
@@ -106,6 +108,10 @@ var _LINE_COLORS = [
                   "#878906",	// mustard yellow
                   ];
 
+
+//  If the number of searches supported by search colors changes, change the conditional in the JSP
+//    for the option:   <option value="search">search</option>
+
 // colors to use for search-based coloring, based on 
 // RYB subractive color model
 
@@ -124,11 +130,6 @@ var _SEARCH_COLORS_TWO_SEARCHES = {
 					2:		"#0000FF",
 					12:		"#00FF00",
 };
-
-
-
-var _MAX_NUMBER_SEARCHES_SUPPORTED_FOR_COLOR_BY_SEARCHES = 3;  // driven by the values in the variable _SEARCH_COLORS above
-
 
 
 //  height and width for when initially attach to <svg> element 
@@ -244,7 +245,9 @@ var HASH_OBJECT_PROPERTIES = {
 		"show-scalebar" : "o",
 
 		"shade-by-counts" : "p",
-		"color-by-search" : "q",
+		
+		"color-by-search" : "q",  //  Not used, only for backwards compatibility
+		
 		"automatic-sizing" : "r",
 		"protein_names_position" /* PROTEIN_NAMES_POSITION_HASH_JSON_PROPERTY_NAME */ : "s",
 		"annotation_type" : "t",
@@ -252,8 +255,9 @@ var HASH_OBJECT_PROPERTIES = {
 		"horizontal-bar-scaling" : "v",
 		"protein_bar_data" : "w",
 
-		"selected-proteins" : "x"
-
+		"selected-proteins" : "x",
+		
+		"color_by" : "y"
 };
 
 
@@ -390,6 +394,10 @@ var _filterNonUniquePeptides;
 var _filterOnlyOnePSM;
 var _filterOnlyOnePeptide;
 
+
+var _colorLinesBy = undefined;
+
+
 //  working data (does round trip to the JSON in the Hash in the URL)
 
 var _userScaleFactor;
@@ -403,9 +411,6 @@ var _horizontalScalingPercent = 100;
 var _proteinBarsLeftEdge = _PADDING_OVERALL_IMAGE_LEFT_SIDE;
 
 var _proteinBarToolTip_template_HandlebarsTemplate = null;  ///  Compiled Handlebars template for the protein bar tool tip
-
-var _proteinSelectorOptionEntry_HandlebarsTemplate = null;  ///  Compiled Handlebars template for the protein <option> of the <select>
-
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -513,7 +518,7 @@ function getCurrentRightmostProteinEdge( ) {
 // get values for variables from the hash part of the URL as JSON
 function getJsonFromHash() {
 	
-	var jsonFromHash;
+	var jsonFromHash = null;
 
 	var windowHash = window.location.hash;
 	
@@ -535,9 +540,22 @@ function getJsonFromHash() {
 
 	// Try first:  the hash contained Compressed URI-encoded JSON, try decoding using decodeURIComponent( windowHashContentsMinusHashChar )
 
-	var windowHashContentsMinusHashCharDecompressedDecodeURIComponent = LZString.decompressFromEncodedURIComponent( windowHashContentsMinusHashChar );
+	try {
+		//  LZString.decompressFromEncodedURIComponent(...) returns null if unable to decompress
+		var windowHashContentsMinusHashCharDecompressedDecodeURIComponent = LZString.decompressFromEncodedURIComponent( windowHashContentsMinusHashChar );
 
-	jsonFromHash = JSON.parse( windowHashContentsMinusHashCharDecompressedDecodeURIComponent );
+		if ( windowHashContentsMinusHashCharDecompressedDecodeURIComponent !== null 
+				&& windowHashContentsMinusHashCharDecompressedDecodeURIComponent !== undefined ) {
+
+			jsonFromHash = JSON.parse( windowHashContentsMinusHashCharDecompressedDecodeURIComponent );
+		} else {
+			
+			jsonFromHash = undefined;
+		}
+	} catch( e ) {
+		
+		jsonFromHash = undefined;
+	}
 	
 	if ( jsonFromHash === null || jsonFromHash === undefined ) {
 
@@ -547,29 +565,43 @@ function getJsonFromHash() {
 			jsonFromHash = JSON.parse( windowHashContentsMinusHashChar );
 		} catch( e ) {
 
+			jsonFromHash = undefined;
+		}
+	}
+	
+
+	if ( jsonFromHash === null || jsonFromHash === undefined ) {
+
+		try {
 			// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURI( windowHashContentsMinusHashChar )
 
 			var windowHashContentsMinusHashCharDecodeURI = decodeURI( windowHashContentsMinusHashChar );
 
-			try {
-				jsonFromHash = JSON.parse( windowHashContentsMinusHashCharDecodeURI );
-			} catch( e2 ) {
+			jsonFromHash = JSON.parse( windowHashContentsMinusHashCharDecodeURI );
+		} catch( e ) {
 
-
-				// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURIComponent( windowHashContentsMinusHashChar )
-
-				var windowHashContentsMinusHashCharDecodeURIComponent = decodeURIComponent( windowHashContentsMinusHashChar );
-
-				try {
-					jsonFromHash = JSON.parse( windowHashContentsMinusHashCharDecodeURIComponent );
-				} catch( e3 ) {
-
-					throw "Failed to parse window hash string as JSON and decodeURI and then parse as JSON.  windowHashContentsMinusHashChar: " 
-					+ windowHashContentsMinusHashChar;
-
-				}
-			}
+			jsonFromHash = undefined;
 		}
+	}
+
+	if ( jsonFromHash === null || jsonFromHash === undefined ) {
+
+		try {
+			// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURIComponent( windowHashContentsMinusHashChar )
+
+			var windowHashContentsMinusHashCharDecodeURIComponent = decodeURIComponent( windowHashContentsMinusHashChar );
+
+			jsonFromHash = JSON.parse( windowHashContentsMinusHashCharDecodeURIComponent );
+		} catch( e ) {
+
+			jsonFromHash = undefined;
+		}
+	}
+
+	if ( jsonFromHash === null || jsonFromHash === undefined ) {
+
+		throw "Failed to parse window hash string as JSON and decodeURI and then parse as JSON.  windowHashContentsMinusHashChar: " 
+		+ windowHashContentsMinusHashChar;
 	}
 	
 	//   Transform json on hash to expected object for rest of the code
@@ -815,9 +847,13 @@ function updateURLHash( useSearchForm ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["shade-by-counts"], true );
 	}
 
-	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
-		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["color-by-search"], true );
+	_colorLinesBy = $("#color_by").val();
+	
+	if ( _colorLinesBy !== "" ) {
+
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["color_by"], _colorLinesBy );
 	}
+
 
 	if ( !isSizingAutomatic() ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["automatic-sizing"], false );
@@ -838,8 +874,10 @@ function updateURLHash( useSearchForm ) {
 	//  Add in protein bar data
 	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["protein_bar_data"], _imageProteinBarDataManager.getArrayOfObjectsForHash() );
 	
+	
+	//  Now covered in the 'protein_bar_data'
 //	add in the selected proteins
-	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["selected-proteins"], getAllSelectedProteins() );
+//	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["selected-proteins"], getAllSelectedProteins() );
 
 	
 	
@@ -1352,7 +1390,6 @@ function loadCrosslinkData( doDraw ) {
 			        	_proteinLinkPositions = data.proteinLinkPositions;
 			        	
 			        	decrementSpinner();
-			        	markInvalidProteins();
 			        	
 			        	reportLinkDataLoadComplete( 'crosslinks', doDraw );
 			        	
@@ -1540,7 +1577,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 	
 	// only load sequences for visible proteins
 
-	var selectedProteins = getSelectedProteins();
+	var selectedProteins = getAllSelectedProteins();
 	
 	var proteinIdsToGetSequence = [];
 	
@@ -1597,7 +1634,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 	
 	// only load annotation data ( other than Sequence Coverage ) for visible proteins
 	
-	var selectedProteins = getSelectedProteins();
+	var selectedProteins = getAllSelectedProteins();
 
 	var annotationType = $("#annotation_type").val();
 	
@@ -1892,6 +1929,10 @@ function loadDataFromService() {
 	        	//  Populate from local variables
 	        	populateSearchForm();
 	        	
+	        	
+
+	        	populateSelectProteinSelect();
+	        	
 	        	initializeViewer();
 	        	
 	        	updateURLHash( false /* useSearchForm */ );
@@ -1959,9 +2000,15 @@ function populateFromHash_imageProteinBarDataManager(){
 	
 	if ( proteinBarData !== undefined ) {
 		
-		_imageProteinBarDataManager.replaceInternalObjectsWithObjectsInHash( { proteinBarData : proteinBarData } );
+		_imageProteinBarDataManager.replaceInternalObjectsWithObjectsInHash( { 
+			proteinBarData : proteinBarData,
+			currentProteinIdsArray : _proteins
+		} );
 	
 	} else {
+
+		//  Backwards compatibility Support
+		
 		
 		
 		//   IMPORTANT
@@ -2180,8 +2227,21 @@ function populateViewerCheckBoxes() {
 	$( "input#show-protein-termini" ).prop('checked', json[ 'show-protein-termini' ] );
 	
 	$( "input#show-scalebar" ).prop('checked', json[ 'show-scalebar' ] );
-//	$( "input#show-coverage" ).prop('checked', json[ 'show-coverage' ] );
-	$( "input#color-by-search" ).prop('checked', json[ 'color-by-search' ] );
+
+	_colorLinesBy = json[ 'color_by' ];
+
+	// Backwards compatable color-by-search
+	
+	if ( json[ 'color-by-search' ] ) {
+		
+		_colorLinesBy = SELECT_ELEMENT_COLOR_BY_SEARCH;
+	}
+		
+	if ( _colorLinesBy != undefined ) {
+		$("#color_by").val( _colorLinesBy );
+	}
+	
+		
 	
 	if ( json[ PROTEIN_NAMES_POSITION_HASH_JSON_PROPERTY_NAME ] === PROTEIN_NAMES_POSITION_LEFT ) {
 		
@@ -2221,58 +2281,209 @@ function populateViewerCheckBoxes() {
 	handleScaleFactorVisibility( true /* supressRedraw */ );
 	
 }
-	
-function refreshViewerProteinSelects() {
-	
-	var json = getJsonFromHash();
+
+
+
+function showSelectedProteins() {
 
 	
-	// add and populate the appropriate selected proteins
+	// add the appropriate selected proteins
 	
-	$( "select.svg-protein-select" ).remove();
+	var $selected_proteins_container = $("#selected_proteins_container");
 	
-	var selectedProteinIds = json[ 'selected-proteins' ];
+	var $protein_select_text_container_jq = $selected_proteins_container.find(".protein_select_text_container_jq");
+	
+	$protein_select_text_container_jq.qtip('destroy', true); // Immediately destroy all tooltips belonging to the selected elements
+
+	var $tool_tip_attached_jq_Children = $selected_proteins_container.find(".tool_tip_attached_jq");
+
+	$tool_tip_attached_jq_Children.qtip('destroy', true); // Immediately destroy all tooltips belonging to the selected elements
+
+	
+	$selected_proteins_container.empty();
+	
+	
+	
+	var selectedProteinIds = getAllSelectedProteins();
 	
 	if ( !selectedProteinIds || selectedProteinIds.length < 1 || _proteins.length < 1 ) {
 				
-		addProteinSelect();
-		
-	} else if ( selectedProteinIds ) {
+		return;
+	}
+
+	var $selected_protein_entry_template = $("#selected_protein_entry_template");
+	
+
+	
+	var selectedProteinEntry_template_handlebarsSource = $selected_protein_entry_template.text();
+
+	if ( selectedProteinEntry_template_handlebarsSource === undefined ) {
+		throw "selectedProteinEntry_template_handlebarsSource === undefined";
+	}
+	if ( selectedProteinEntry_template_handlebarsSource === null ) {
+		throw "selectedProteinEntry_template_handlebarsSource === null";
+	}
+
+	var selectedProteinEntry_HandlebarsTemplate = Handlebars.compile( selectedProteinEntry_template_handlebarsSource );
+
+	
+	if ( selectedProteinIds ) {
 		
 		for ( var i = 0; i < selectedProteinIds.length; i++ ) {
-			
-			var $newSelector = addProteinSelect( { addFromHash : true } );
-			
-			var proteinIdForSelector = selectedProteinIds[ i ];
-			
-			var optionValueExists = false;
-			
-			$newSelector.children("option").each(function(){
-				
-				if ( this.value == proteinIdForSelector ) {
-					optionValueExists = true;
-					return false; // exit .each() loop
-				}
-			});
-			
-			if ( optionValueExists ) {
 
-				//  The selector contains the protein id, so set the just added selector value to the protein id
-				
-				$newSelector.val( proteinIdForSelector );
-				
-			} else {
-
-				//  set to default so "Select a protein" is displayed
-				$newSelector.val( PROTEIN_SELECTOR_NO_PROTEIN_SELECTED_PROTEIN_ID );
-			}
+			var proteinId = selectedProteinIds[ i ];
 			
+			var proteinName = getProteinName( proteinId );
 
-			update_imageProteinBarDisplayedItem_ForProteinIdChange( { $proteinSelector : $newSelector } );
+			var selectedProteinEntryValue = { positionIndex : i, proteinId : proteinId , proteinName : proteinName };
+			
+			var selectedProteinHTML = selectedProteinEntry_HandlebarsTemplate( selectedProteinEntryValue );
+
+			var $newEntry = 
+				$( selectedProteinHTML ).appendTo( $selected_proteins_container );
+			
+			var $protein_select_text_container_jq_Items =  $newEntry.find(".protein_select_text_container_jq");
+			
+			$protein_select_text_container_jq_Items.each( function() {
+				
+				var $protein_select_text_container_jq = $( this );
+				
+				//  Add specific tool tip for the protein name
+				
+				addSingleTooltipForProteinName( { 
+					$elementToAddToolTipTo : $protein_select_text_container_jq, 
+					proteinIdString : proteinId,
+					proteinDisplayName : proteinName
+				} );
+			} );
 		}
 		
 	}
+
+	//  Select Protein item and sort handle block of each Selected protein
+
+	var $protein_select_protein_item_and_sort_handle_block_jq_Items = $selected_proteins_container.find(".protein_select_protein_item_and_sort_handle_block_jq");
+
+	$protein_select_protein_item_and_sort_handle_block_jq_Items.click( function( eventObject ) {
 		
+		openSelectProteinSelect( { clickedThis : this } );
+	} );
+	
+	
+
+
+	//  Select Delete icon of each Selected protein
+
+	var $protein_delete_icon_jq_Items = $selected_proteins_container.find(".protein_delete_icon_jq");
+
+	//  Add click handler for removing the protein
+	
+	$protein_delete_icon_jq_Items.click( function( eventObject ) {
+		
+		processClickOnRemoveSelectedProtein( { clickedThis : this } );
+	} );
+	
+	// Add General tool tips to everything in the container.  (including on Delete icon)
+	
+	addToolTips( $selected_proteins_container );
+	
+	
+	$selected_proteins_container.sortable( {
+
+		//  On sort start, call this function
+        start : processSortStartSelectedProteins,
+		
+		//  This event is triggered when the user stopped sorting and the DOM position has changed.
+		//        (User released the item they were dragging and items are now in "after sort" order)
+        update : processSortUpdateSelectedProteins		
+	} );
+}
+
+function processSortStartSelectedProteins( event, ui ) {
+		
+	var $item = ui.item;
+	
+	//  ui.item is  <div class="outer-float  protein_select_outer_block_jq" style="" >
+	
+	var $sort_handle_jq = $item.find(".sort_handle_jq");
+	
+	$sort_handle_jq.qtip('toggle', false); // Immediately hide all tooltips belonging to the selected elements
+	
+	var $protein_select_text_container_jq = $item.find(".protein_select_text_container_jq");
+	
+	$protein_select_text_container_jq.qtip('toggle', false); // Immediately hide all tooltips belonging to the selected elements
+}
+
+function processSortUpdateSelectedProteins( event, ui ) {
+	
+	console.log("processSortUpdateSelectedProteins");
+	
+	//   Update the Selected Proteins with their current index.
+	
+	var $selected_proteins_container = $("#selected_proteins_container");
+	
+	var $protein_select_outer_block_jq_Items = $selected_proteins_container.find(".protein_select_outer_block_jq");
+	
+	var elementPrevPositions = [];
+	
+	$protein_select_outer_block_jq_Items.each( function( index, element ) {
+	
+		var $this = $( this );
+		
+		var element_data_position_index = $this.attr("data-position_index");
+		
+		var element_data_position_index_Int = parseInt( element_data_position_index, 10 );
+		
+		if ( isNaN( element_data_position_index_Int ) ) {
+			
+			throw "element_data_position_index is not an integer: " + element_data_position_index;
+		}
+		
+		var elementPrevPosition = { prevPosition : element_data_position_index_Int };
+		
+		elementPrevPositions.push( elementPrevPosition );
+	} );
+	
+	_imageProteinBarDataManager.updateItemOrder( { elementPrevPositions : elementPrevPositions } );
+	
+	updateURLHash( false /* useSearchForm */ );
+	
+	showSelectedProteins();
+	
+	drawSvg();
+}
+
+
+
+function processClickOnRemoveSelectedProtein( params ) {
+	
+	var clickedThis = params.clickedThis;
+	
+	var $clickedThis = $( clickedThis );
+	
+	$clickedThis.qtip('destroy', true); // Immediately destroy all tooltips belonging to the selected elements
+
+
+	
+//	var protein_id = $clickedThis.attr("data-protein_id");
+	
+	var positionIndex = $clickedThis.attr("data-position_index");
+
+	var positionIndexInt = parseInt( positionIndex, 10 );
+	
+	if ( isNaN( positionIndexInt ) ) {
+		
+		throw "positionIndex is not a number.  is: " + positionIndex;
+	}
+	
+	_imageProteinBarDataManager.removeItemByProteinSelectorIndex( { proteinSelectorIndexInt : positionIndexInt } );
+	
+	updateURLHash( false /* useSearchForm */ );
+	
+	showSelectedProteins();
+	
+	drawSvg();
+
 }
 
 
@@ -3229,12 +3440,229 @@ function annotationColorOverrideForUnselected( params ) {
 	return _NOT_HIGHLIGHTED_LINE_COLOR;
 }
 
+////////////
 
 function getColorForIndex( i ) {
 	
 	return _LINE_COLORS [ i % _LINE_COLORS.length ];
 }
 
+////////////
+
+function getColorForProteinBarRowIndexPosition( params ) {
+
+	var proteinBarRowIndex = params.proteinBarRowIndex;
+	var singlePosition = params.singlePosition;
+	
+	//  Used for: Links within same protein bar (Self Crosslink or Looplink)
+	var position_1 = params.position_1;
+	var position_2 = params.position_2;
+	
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_REGION
+			&& ( _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) {
+		
+		if ( singlePosition !== undefined ) {
+			
+			var lineColorIndex = 
+				getColorIndexForProteinBarRowIndexPosition__SinglePosition( { proteinBarRowIndex : proteinBarRowIndex, singlePosition : singlePosition } );
+			
+			if ( lineColorIndex !== -1 ) {
+				
+				return getColorForIndex( lineColorIndex );
+			}
+			
+			throw "getColorForProteinBarRowIndexPosition: singlePosition: lineColorIndex === -1";
+			
+//			return _NOT_HIGHLIGHTED_LINE_COLOR;
+		}
+		
+
+		if ( position_1 !== undefined && position_2 !== undefined ) {
+			
+			var lineColorIndexPosition_1 = 
+				getColorIndexForProteinBarRowIndexPosition__SinglePosition( { proteinBarRowIndex : proteinBarRowIndex, singlePosition : position_1 } );
+			
+			if ( lineColorIndexPosition_1 !== -1 ) {
+				
+				return getColorForIndex( lineColorIndexPosition_1 );
+			}
+
+			var lineColorIndexPosition_2 = 
+				getColorIndexForProteinBarRowIndexPosition__SinglePosition( { proteinBarRowIndex : proteinBarRowIndex, singlePosition : position_2 } );
+			
+			if ( lineColorIndexPosition_2 !== -1 ) {
+				
+				return getColorForIndex( lineColorIndexPosition_2 );
+			}
+			
+			throw "getColorForProteinBarRowIndexPosition: singlePosition: lineColorIndex === -1";
+			
+//			return _NOT_HIGHLIGHTED_LINE_COLOR;
+		}
+	} 
+	
+	return getColorForIndex( proteinBarRowIndex );
+}
+
+/////////////////////////
+
+function getColorIndexForProteinBarRowIndexPosition__SinglePosition( params ) {
+
+	var proteinBarRowIndex = params.proteinBarRowIndex;
+	
+	var singlePosition = params.singlePosition;
+	
+	//  Loop through protein bars selected regions incrementing a counter to get an index into the colors array
+
+	var proteinBarsSelectedRegionsCounter = 0;
+	
+	var imageProteinBarDataEntryArray = _imageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
+	
+	if ( proteinBarRowIndex >= imageProteinBarDataEntryArray.length ) {
+		
+		throw "ERROR: in getColorForProteinBarRowIndexPosition__SinglePosition(...): proteinBarRowIndex >= imageProteinBarDataEntryArray.length ";
+	}
+	
+	for ( var imageProteinBarDataEntryArrayIndex = 0; imageProteinBarDataEntryArrayIndex < imageProteinBarDataEntryArray.length; imageProteinBarDataEntryArrayIndex++ ) {
+		
+		var imageProteinBarDataEntry = imageProteinBarDataEntryArray[ imageProteinBarDataEntryArrayIndex ];
+		
+		if ( proteinBarRowIndex === imageProteinBarDataEntryArrayIndex ) {
+			
+			//  position is in this index so find this position in a region and exit.
+						
+			if ( imageProteinBarDataEntry.isAllOfProteinBarHighlighted() ) {
+				
+				//  Whole protein bar highlighted so a single region
+				
+				return proteinBarsSelectedRegionsCounter;
+			}
+			
+			var regionIndexContainingPosition = 
+				imageProteinBarDataEntry.indexOfProteinBarHighlightedRegionAtSinglePosition( singlePosition );
+			
+			if ( regionIndexContainingPosition === -1 ) {
+				
+				return -1;
+			}
+			
+			proteinBarsSelectedRegionsCounter += ( regionIndexContainingPosition );
+			
+			return proteinBarsSelectedRegionsCounter;
+		}
+		
+		
+		if ( imageProteinBarDataEntry.isAllOfProteinBarHighlighted() ) {
+			
+			//  Whole protein bar highlighted so a single region
+			
+			proteinBarsSelectedRegionsCounter++;
+		
+		} else {
+			
+			var proteinBarHighlightedRegionCount = 
+				imageProteinBarDataEntry.getProteinBarHighlightedRegionCount();
+			
+			proteinBarsSelectedRegionsCounter += proteinBarHighlightedRegionCount;
+		}
+	}
+}
+
+////////////
+
+function getColorForProteinBarRowIndexBlockPositions( params ) {
+
+	var proteinBarRowIndex = params.proteinBarRowIndex;
+
+	var block_position_1 = params.block_position_1;
+	var block_position_2 = params.block_position_2;
+
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_REGION
+			&& ( _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) {
+
+		if ( block_position_1 !== undefined && block_position_2 !== undefined ) {
+
+			//  Loop through protein bars selected regions incrementing a counter to get an index into the colors array
+
+			var foundProteinBarsSelectedRegion = false;
+			
+			var proteinBarsSelectedRegionsCounter = 0;
+			
+			var imageProteinBarDataEntryArray = _imageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
+			
+			if ( proteinBarRowIndex >= imageProteinBarDataEntryArray.length ) {
+				
+				throw "ERROR: in getColorForProteinBarRowIndexBlockPositions(...): proteinBarRowIndex >= imageProteinBarDataEntryArray.length ";
+			}
+			
+			for ( var imageProteinBarDataEntryArrayIndex = 0; imageProteinBarDataEntryArrayIndex < imageProteinBarDataEntryArray.length; imageProteinBarDataEntryArrayIndex++ ) {
+				
+				var imageProteinBarDataEntry = imageProteinBarDataEntryArray[ imageProteinBarDataEntryArrayIndex ];
+				
+				if ( proteinBarRowIndex === imageProteinBarDataEntryArrayIndex ) {
+					
+					//  block positions are in this index so find this position in a region and exit.
+								
+					if ( imageProteinBarDataEntry.isAllOfProteinBarHighlighted() ) {
+						
+						//  Whole protein bar highlighted so a single region
+						
+						foundProteinBarsSelectedRegion = true;
+						
+						break;  // EARLY EXIT LOOP
+					}
+					
+					var regionIndexContainingPosition = 
+						imageProteinBarDataEntry.indexOfProteinBarHighlightedRegionAnywhereBetweenPositionsInclusive( {
+							position_1 : block_position_1,
+							position_2 : block_position_2
+						} );
+					
+					if ( regionIndexContainingPosition === -1 ) {
+						
+						proteinBarsSelectedRegionsCounter = -1;
+						
+						break;  // EARLY EXIT LOOP
+					}
+					
+					proteinBarsSelectedRegionsCounter += ( regionIndexContainingPosition );
+					
+					foundProteinBarsSelectedRegion = true;
+					
+					break;
+				}
+				
+				
+				if ( imageProteinBarDataEntry.isAllOfProteinBarHighlighted() ) {
+					
+					//  Whole protein bar highlighted so a single region
+					
+					proteinBarsSelectedRegionsCounter++;
+				
+				} else {
+					
+					var proteinBarHighlightedRegionCount = 
+						imageProteinBarDataEntry.getProteinBarHighlightedRegionCount();
+					
+					proteinBarsSelectedRegionsCounter += proteinBarHighlightedRegionCount;
+				}
+			}
+			
+			if ( ! foundProteinBarsSelectedRegion ) {
+	
+				throw "ERROR: in getColorForProteinBarRowIndexBlockPositions(...): ! foundProteinBarsSelectedRegion ";
+			}
+
+
+			return getColorForIndex( proteinBarsSelectedRegionsCounter );
+		}
+	} 
+
+	return getColorForIndex( proteinBarRowIndex );
+}
+
+
+/////////
 
 
 //  get the color that should be used for a link, based on that links presence in the supplied searches
@@ -3308,7 +3736,7 @@ function getLineColorSingleProteinBar( params ) {
 			return getColorForSearchesForIndexAndSearchList( proteinIndex, searchList );
 		}
 		
-		return getColorForIndex( proteinIndex );
+		return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : proteinIndex } ); 
 	}
 
 	var imageProteinBarDataProtein =  _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : proteinIndex } );
@@ -3324,15 +3752,13 @@ function getLineColorSingleProteinBar( params ) {
 				return getColorForSearchesForIndexAndSearchList( proteinIndex, searchList );
 			}
 			
-			return getColorForIndex( proteinIndex );
+			return  getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : proteinIndex, singlePosition : fromProteinPosition } );
 		}
 		
 	} else {
 		
 		//  Self Crosslink or Looplink
 		
-		
-
 		if ( imageProteinBarDataProtein.isProteinBarHighlightedAtPosition( { position_1 : fromProteinPosition, position_2 : toProteinPosition } )  ) {
 		
 			if ( searchList ) {
@@ -3340,7 +3766,7 @@ function getLineColorSingleProteinBar( params ) {
 				return getColorForSearchesForIndexAndSearchList( proteinIndex, searchList );
 			}
 			
-			return getColorForIndex( proteinIndex );
+			return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : proteinIndex, position_1 : fromProteinPosition, position_2 : toProteinPosition } );
 		}
 	}
 
@@ -3367,7 +3793,7 @@ function getCrosslinkLineColor( params ) {
 			return getColorForSearchesForIndexAndSearchList( fromProteinIndex, searchList );
 		}
 		
-		return getColorForIndex( fromProteinIndex );
+		return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : fromProteinIndex } );
 	}
 
 	
@@ -3385,7 +3811,7 @@ function getCrosslinkLineColor( params ) {
 				return getColorForSearchesForIndexAndSearchList( fromProteinIndex, searchList );
 			}
 			
-			return getColorForIndex( fromProteinIndex ); 
+			return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : fromProteinIndex, singlePosition : fromProteinPosition } ); 
 			
 		} else if ( imageProteinBarDataToProtein.isProteinBarHighlightedAtPosition( { position_1 : toProteinPosition } )  ) {
 
@@ -3394,7 +3820,7 @@ function getCrosslinkLineColor( params ) {
 				return getColorForSearchesForIndexAndSearchList( toProteinIndex, searchList );
 			}
 			
-			return getColorForIndex( toProteinIndex ); 
+			return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : toProteinIndex, singlePosition : toProteinIndex } ); 
 		}
 
 		return _NOT_HIGHLIGHTED_LINE_COLOR;
@@ -3409,7 +3835,7 @@ function getCrosslinkLineColor( params ) {
 			return getColorForSearchesForIndexAndSearchList( fromProteinIndex, searchList );
 		}
 		
-		return getColorForIndex( fromProteinIndex ); 
+		return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : fromProteinIndex, singlePosition : fromProteinPosition } ); 
 	}
 
 	return _NOT_HIGHLIGHTED_LINE_COLOR;
@@ -3944,9 +4370,9 @@ function drawSvg() {
 
 	if ( selectedProteins === undefined || selectedProteins.length < 1 ) { 
 		
-		var newHeightContainingDivEmpty = 4;
+		//  No proteins so remove CSS height attribute
 		
-		$svg_image_inner_container_div.css( { height : newHeightContainingDivEmpty } );
+		$svg_image_inner_container_div.css( { height : '' } );
 
 	
 		return;  //  EARLY EXIT of function if no proteins to display 
@@ -4064,7 +4490,7 @@ function drawSvg() {
 	}
 	
 	// draw the legend, if they're coloring by search
-	if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_SEARCH ) {
 		
 		var drawColorBySearchLegendResponse = drawColorBySearchLegend(  selectedProteins, bottomOfLowestItemDrawn, svgRootSnapSVGObject );
 
@@ -4155,6 +4581,14 @@ function drawSvg() {
 
 function drawSequenceCoverage( selectedProteins, svgRootSnapSVGObject ) {
 	
+	var colorBySearch = false;
+
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_SEARCH ) {
+
+		colorBySearch = true;
+	}
+	
+	
 	var isAnyProteinBarsHighlighted = _imageProteinBarDataManager.isAnyProteinBarsHighlighted();
 	
 	
@@ -4173,8 +4607,7 @@ function drawSequenceCoverage( selectedProteins, svgRootSnapSVGObject ) {
 				var start = segment.start;
 				var end = segment.end;
 				
-
-				var blockColor = getColorForIndex( proteinBarRowIndex );
+				var blockColor = undefined;
 					
 				if ( isAnyProteinBarsHighlighted ) {
 
@@ -4193,6 +4626,20 @@ function drawSequenceCoverage( selectedProteins, svgRootSnapSVGObject ) {
 					}
 				}
 
+				if ( blockColor === undefined ) {
+				
+					if ( colorBySearch ) {
+						
+						blockColor = getColorForIndex( proteinBarRowIndex );
+					}
+				}
+
+				if ( blockColor === undefined ) {
+				
+					blockColor = getColorForProteinBarRowIndexBlockPositions( { proteinBarRowIndex : proteinBarRowIndex, block_position_1 : start, block_position_2 : end } );
+				}
+					
+				
 				var drawAnnotationRectangle_Params = {
 						
 						 protein : protein,
@@ -5523,6 +5970,13 @@ function drawScaleBar( selectedProteins, scalebarIncrement, svgRootSnapSVGObject
 
 function drawInterProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject ) {
 
+	var colorBySearch = false;
+
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_SEARCH ) {
+
+		colorBySearch = true;
+	}
+	
 	for ( var fromSelectedProteinsIndex = 0; fromSelectedProteinsIndex < selectedProteins.length; fromSelectedProteinsIndex++ ) {
 		
 		var fromProteinId = selectedProteins[ fromSelectedProteinsIndex ];
@@ -5580,7 +6034,7 @@ function drawInterProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject 
 							toProteinPosition : toPp 
 					};
 
-					if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+					if ( colorBySearch ) {
 
 						findSearchesForCrosslink__response = 
 							findSearchesForCrosslink( 
@@ -5704,6 +6158,13 @@ function addClickHandler__InterProteinCrosslinkLines( $SVGNativeObject ) {
 
 function drawSelfProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject ) {
 
+	var colorBySearch = false;
+
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_SEARCH ) {
+
+		colorBySearch = true;
+	}
+	
 	for ( var i = 0; i < selectedProteins.length; i++ ) {
 		
 		var proteinBarProteinId = selectedProteins[ i ];
@@ -5732,6 +6193,36 @@ function drawSelfProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject )
 				var toProteinPosition = toProteinPositionKeys[ kk ];
 				var toProteinPositionInt =  parseInt( toProteinPosition );
 				
+				if ( fromProteinPositionInt > toProteinPositionInt ) {
+					
+					//  Drawing line from right to left.  
+					//  Likely line already drawn for same positions from left to right.
+					
+					//  Check for line already drawn between From and To positions
+					
+					var toPositionsUsingToPositionAsFromPosition = _proteinLinkPositions[ proteinBarProteinId ][ proteinBarProteinId ][ toProteinPosition ];
+					
+					if ( toPositionsUsingToPositionAsFromPosition !== undefined ) {
+						
+						//  toPosition found as a from position 
+						//  so now check if the fromPosition is a to position in that sub-array
+						
+						if ( toPositionsUsingToPositionAsFromPosition[ fromProteinPosition ] !== undefined ) {
+							
+							//  fromPosition is a to position in that sub-array
+							//  so a line has already been drawn from left to right
+							//  for these positions
+							
+							//  Skip drawing this line
+							
+							continue;  //  EARLY CONTINUE
+							
+						}
+						
+					}
+					
+				}
+				
 				var x2 = translatePositionToXCoordinate( { position : toProteinPositionInt, proteinId : proteinBarProteinId, proteinBarIndex : i } );
 				var y2 = toY;
 
@@ -5758,7 +6249,7 @@ function drawSelfProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject )
 						toProteinPosition : toProteinPositionInt
 				};
 
-				if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+				if ( colorBySearch ) {
 					
 					var searchList = findSearchesForCrosslink( proteinBarProteinId, proteinBarProteinId, fromProteinPosition, toProteinPosition );
 					
@@ -5849,6 +6340,14 @@ function addClickHandler__SelfProteinCrosslinkLines( $SVGNativeObject ) {
 // draw looplinks
 function drawProteinLooplinkLines( selectedProteins, svgRootSnapSVGObject ) {
 
+	var colorBySearch = false;
+
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_SEARCH ) {
+
+		colorBySearch = true;
+	}
+	
+	
 	for ( var i = 0; i < selectedProteins.length; i++ ) {
 
 		var proteinBarProteinId = selectedProteins[ i ];
@@ -5901,7 +6400,7 @@ function drawProteinLooplinkLines( selectedProteins, svgRootSnapSVGObject ) {
 						toProteinPosition : toProteinPositionInt
 				};
 
-				if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+				if ( colorBySearch ) {
 					
 					var searchList = findSearchesForLooplink( proteinBarProteinId, fromProteinPosition, toProteinPosition );
 					
@@ -5994,6 +6493,14 @@ function addClickHandler__ProteinLooplinkLines( $SVGNativeObject ) {
 //draw monolinks		
 function drawProteinMonolinkLines( selectedProteins, svgRootSnapSVGObject ) {
 
+	var colorBySearch = false;
+
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_SEARCH ) {
+
+		colorBySearch = true;
+	}
+	
+	
 	for ( var i = 0; i < selectedProteins.length; i++ ) {
 
 		var proteinBarProteinId = selectedProteins[ i ];
@@ -6034,7 +6541,7 @@ function drawProteinMonolinkLines( selectedProteins, svgRootSnapSVGObject ) {
 					fromProteinPosition : proteinPositionInt  
 			};
 
-			if ( $( "input#color-by-search" ).is( ':checked' ) ) {
+			if ( colorBySearch ) {
 				
 				var searchList = findSearchesForMonolink( proteinBarProteinId, proteinPosition ) ;
 				
@@ -6396,243 +6903,495 @@ function getScaleBarPositionForPixel( x ) {
 }
 
 
-function addProteinSelect( params ) {
 
-	var addFromHash = false;
-		
-	if ( params ) {
+/////////////////////////////////////////
 
-		addFromHash = params.addFromHash;
-	}
+
+//   Protein Select
+
+
+function populateSelectProteinSelect( ) {
 	
 
-	var nextProteinSelectIndex = 0;
+	var $protein_list_container = $("#protein_list_container");
+	
+	$protein_list_container.empty();
+	
+	var $select_protein_overlay_protein_entry_template = $("#select_protein_overlay_protein_entry_template");
+	
 
-	// the existing element after which we are inserting our select box
+	
+	var proteinEntry_template_handlebarsSource = $select_protein_overlay_protein_entry_template.text();
 
-	var $select_svg_protein_select = $("select.svg-protein-select");
-
-	if ( $select_svg_protein_select.length > 0 ) { 
-
-		var $lastItem = $select_svg_protein_select.last();
-
-		var lastProteinSelectIndexString = $lastItem.attr( PROTEIN_BAR_DATA_ARRAY_INDEX_ATTR_NAME );
-		var lastProteinSelectIndexInt = parseInt( lastProteinSelectIndexString );
-
-		nextProteinSelectIndex = lastProteinSelectIndexInt + 1;
+	if ( proteinEntry_template_handlebarsSource === undefined ) {
+		throw "proteinEntry_template_handlebarsSource === undefined";
 	}
-
-	if ( ! addFromHash ) {
-
-		_imageProteinBarDataManager.addEntry( { arrayIndexInt : nextProteinSelectIndex } );
+	if ( proteinEntry_template_handlebarsSource === null ) {
+		throw "proteinEntry_template_handlebarsSource === null";
 	}
 	
-	
-	var newId = "svg-protein-select-" + nextProteinSelectIndex;
-
-	var html = "<select id=\"" + newId + "\"" +
-			PROTEIN_BAR_DATA_ARRAY_INDEX_ATTR_NAME + "=\"" + nextProteinSelectIndex + "\"" +
-			" class=\"svg-protein-select\">\n";
-
-	html += "\t<option value=\"" + PROTEIN_SELECTOR_NO_PROTEIN_SELECTED_PROTEIN_ID + "\">Select a protein</option>\n";
+	var proteinEntry_HandlebarsTemplate = Handlebars.compile( proteinEntry_template_handlebarsSource );
 
 	for ( var i = 0; i < _proteins.length; i++ ) {
-//		html+= "\t<option value=\"" + _proteins[ i ] + "\">" + getProteinName( _proteins[ i ] ) + "</option>\n";
+		
+		var proteinId = _proteins[ i ];
+		
+		var proteinName = getProteinName( proteinId );
 
-//		var PROTEIN_SELECTOR_HANDLEBARS_STRING = "\t<option value=\"{{ proteinId }}\">{{ proteinName }}</option>\n";
-
-		var optionValue = { proteinId : _proteins[ i ], proteinName : getProteinName( _proteins[ i ] ) };
+		var proteinLinkValue = { proteinId : proteinId, proteinName : proteinName };
 		
-		//  Use Handlebars libary to convert the template into HTML, performing substitutions using optionValue
+		//  Use Handlebars libary to convert the template into HTML, performing substitutions using proteinLinkValue
 		
-		var optionValueHTML = _proteinSelectorOptionEntry_HandlebarsTemplate( optionValue );
+		var proteinLinkHTML = proteinEntry_HandlebarsTemplate( proteinLinkValue );
 		
-		html += optionValueHTML;
-	}
-
-
-	var $newSelector = $( html ).insertBefore( $( "span#svg-protein-selector_location" ) );
-
-	
-	$newSelector.change( function() {
+		var $newEntry = 
+			$( proteinLinkHTML ).appendTo( $protein_list_container );
 		
-		var $this = $( this );
+		//  Add click handler for changing the protein
 		
-		update_imageProteinBarDisplayedItem_ForProteinIdChange( { $proteinSelector : $this } );
-		
-		//  Currently NOT doing this
-		
-		//  Remove this selector if choose no actual protein
-		
-//		var thisValue = $this.val();
-//		
-//		if ( thisValue === PROTEIN_SELECTOR_NO_PROTEIN_SELECTED_PROTEIN_ID ) {
-//			
-//			//    Need to do a lot more here
-//			
-//			$this.remove();
-//			markInvalidProteins();
-//			
-//			
-//			
-//		} else {
-		
-			markInvalidProteinsExcludeSelect( $this );
-//		}
+		$newEntry.click( function( eventObject ) {
 			
-		updateURLHash( false /* useSearchForm */ );
-		loadDataAndDraw( true /* doDraw */ );
-	});
-
-	markInvalidProteinsInSelect( $newSelector );
-
-	return $newSelector;
-}
-
-
-function update_imageProteinBarDisplayedItem_ForProteinIdChange( params ) {
-	
-	var $proteinSelector = params.$proteinSelector;
-
-	var thisProteinId = $proteinSelector.val();
-
-	var thisProteinSelectIndexString = $proteinSelector.attr( PROTEIN_BAR_DATA_ARRAY_INDEX_ATTR_NAME );
-	var thisProteinSelectIndexInt = parseInt( thisProteinSelectIndexString );
-	
-	if ( isNaN( thisProteinSelectIndexInt ) ) {
+			processClickOnSelectProtein( { clickedThis : this } );
+		} );
 		
-		throw "Array index in '" + PROTEIN_BAR_DATA_ARRAY_INDEX_ATTR_NAME + "' is not a number, is: " + thisProteinSelectIndexString;
-	}
+		//  Add Protein Name Tool Tip
+		
+		$newEntry.each( function() {
 			
-	var imageProteinBarDisplayedItem = _imageProteinBarDataManager.getItemByProteinSelectorIndex( { arrayIndexInt : thisProteinSelectIndexInt } );
-	
-	var proteinIdIsSelected = true;
-	
-	if ( thisProteinId === PROTEIN_SELECTOR_NO_PROTEIN_SELECTED_PROTEIN_ID ) {
-		proteinIdIsSelected =  false;
+			var $protein_select_jq = $( this );
+			
+			addSingleTooltipForProteinName( { 
+				$elementToAddToolTipTo : $protein_select_jq, 
+				proteinIdString : proteinId,
+				proteinDisplayName : proteinName,
+				tooltipDelay : 500  //  milliseconds
+			} );
+		} );
 	}
 
-	var thisProteinLength = undefined;
+}
+
+
+
+function closeAddProteinSelect( params ) {
 	
-	if ( _proteinLengths ) {
+	var $select_protein_modal_dialog_overlay_background = $("#select_protein_modal_dialog_overlay_background");
+
+	$select_protein_modal_dialog_overlay_background.hide();
+
+	var $select_protein_overlay_div = $("#select_protein_overlay_div");
+
+	$select_protein_overlay_div.hide();
+	
+}
+
+
+
+function openSelectProteinSelect( params ) {
+	
+	if ( ! params ) {
 		
-		thisProteinLength = _proteinLengths[ thisProteinId ];
+		throw "params is empty";
 	}
 	
-	imageProteinBarDisplayedItem.setProteinId( { proteinId : thisProteinId, proteinIdIsSelected : proteinIdIsSelected, proteinLength : thisProteinLength } );
+	var clickedThis = params.clickedThis;
+	
+	if ( ! clickedThis ) {
+		
+		throw "clickedThis is empty";
+	}
+
+	var $clickedThis = $( clickedThis );
+
+	$clickedThis.qtip('toggle', false); // Immediately hide all tooltips belonging to the selected elements
+	
+	var $tool_tip_attached_jq_Parent = $clickedThis.closest(".tool_tip_attached_jq");
+
+	$tool_tip_attached_jq_Parent.qtip('toggle', false); // Immediately hide all tooltips belonging to the selected elements
+
+
+	var $tool_tip_attached_jq_Children = $clickedThis.find(".tool_tip_attached_jq");
+
+	$tool_tip_attached_jq_Children.qtip('toggle', false); // Immediately hide all tooltips belonging to the selected elements
+
+	var $protein_select_text_container_jq = $clickedThis.find(".protein_select_text_container_jq");
+
+	$protein_select_text_container_jq.qtip('toggle', false); // Immediately hide all tooltips belonging to the selected elements
+	
+	
+
+	var positionIndexSelectedProtein = $clickedThis.attr("data-position_index");
+	var proteinIdSelectedProtein = $clickedThis.attr("data-protein_id");
+	
+	
+	if ( positionIndexSelectedProtein === undefined ) {
+		positionIndexSelectedProtein = null;
+	}
+
+	if ( proteinIdSelectedProtein === undefined ) {
+		proteinIdSelectedProtein = null;
+	}
+
+	$("#select_protein_modal_dialog_overlay_background").show();
+
+	var $select_protein_overlay_div = $("#select_protein_overlay_div");
+	
+	$select_protein_overlay_div.show();
+	
+	
+	var $protein_list_container = $("#protein_list_container");
+	
+	//  Save off values from clicked Selected Protein.  Will be undefined for Add Protein
+	
+	$protein_list_container.data( { positionIndex: positionIndexSelectedProtein, proteinIdSelectedProtein : proteinIdSelectedProtein } );
+	
+	//  Highlight the currently selected protein
+	
+	var $protein_select_jq_Items = $protein_list_container.find(".protein_select_jq");
+	
+	$protein_select_jq_Items.removeClass("single-protein-select-item-highlight");
+	
+	if ( proteinIdSelectedProtein !== undefined && proteinIdSelectedProtein !== null ) {
+		
+		$protein_select_jq_Items.each( function( index, element ) {
+			
+			var $protein_select_jq = $( this );
+			
+			var element_protein_id =  $protein_select_jq.attr("data-protein_id");
+			
+			if ( element_protein_id === proteinIdSelectedProtein ) {
+				
+				$protein_select_jq.addClass("single-protein-select-item-highlight");
+				
+				//  Scroll to highlighted protein
+				
+				try {
+
+					var protein_select_jq_PositionTop = $protein_select_jq.position().top;
+
+					$protein_list_container.scrollTop( protein_select_jq_PositionTop - 20 );
+				
+				} catch ( e ) {
+					
+					
+				}
+				
+//				return false;  //  Exit .each(...) processing
+			}
+		} );
+		
+	} else {
+		
+		//  Position at top for add protein
+		
+		$protein_list_container.scrollTop( 0 );
+	}
+	
+	
+	markInvalidProteinsInProteinSelector( { positionIndexSelectedProtein : positionIndexSelectedProtein } );
+
+	
+	//  Position and Set Size of overlay
+
+	var OVERLAY_STANDARD_WIDTH = 400;
+	var OVERLAY_MINIMUM_WIDTH = 300;
+	
+	var OVERLAY_MINIMUM_LEFT_BUFFER = 5;
+	var OVERLAY_MINIMUM_RIGHT_BUFFER = 5;
+	
+	
+	var $window = $( window );
+	
+	var windowScrollTop = $window.scrollTop();
+	
+	var windowScrollLeft = $window.scrollLeft();
+
+//	var viewportHeight = $window.height();
+	var viewportWidth = $window.width();
+	
+	
+	var leftEdgeOfPageinViewport = windowScrollLeft;
+	var rightEdgeOfPageinViewport = windowScrollLeft + viewportWidth;
+	
+	//  Click Item position
+	
+	var clickedItemOffset = $clickedThis.offset();
+	var clickedItemOffsetLeft = clickedItemOffset.left;
+//	var clickedItemOffsetTop = clickedItemOffset.top;
+	
+	var overlayNewOffsetLeft = clickedItemOffsetLeft - 10;
 	
 	
 	
-}
+	
+	//  Position Overlay horizontally and set width
+	
+	var overlayNewWidth = OVERLAY_STANDARD_WIDTH;
+	
+	if ( overlayNewOffsetLeft < leftEdgeOfPageinViewport + OVERLAY_MINIMUM_LEFT_BUFFER ) {
+		
+		overlayNewOffsetLeft = leftEdgeOfPageinViewport + OVERLAY_MINIMUM_LEFT_BUFFER;
+		
+	}
+	
+	if ( ( overlayNewOffsetLeft + overlayNewWidth + OVERLAY_MINIMUM_RIGHT_BUFFER ) > ( rightEdgeOfPageinViewport ) ) {
+		
+		// overlay at overlayNewOffsetLeft and overlayNewWidth will overflow right edge
+		
+		if ( overlayNewWidth + leftEdgeOfPageinViewport + OVERLAY_MINIMUM_LEFT_BUFFER + OVERLAY_MINIMUM_RIGHT_BUFFER < rightEdgeOfPageinViewport ) {
 
-
-
-function markInvalidProteins() {
-
-	$("select.svg-protein-select").each( function() {
-		markInvalidProteinsInSelect( $( this ) );
-	});
-}
-
-
-function markInvalidProteinsExcludeSelect( $select ) {
-
-	$("select.svg-protein-select").each( function() {
-
-		if ( $select.attr( "id" ) == $( this ).attr( "id" ) ) {
-			return true;
-		}
-
-		markInvalidProteinsInSelect( $( this ) );			
-	});
-}
-
-function markInvalidProteinsInSelect( $select ) {
-
-	//if ( getSelectedProteins().length == 0 ) { return; }
-	var validProteins = getValidProteins( $select );
-
-	$select.children().each( function() {
-
-		if ( $( this ).val() == 0 ) { return true; }
-
-		if ( $( "input#show-crosslinks" ).is( ':checked' ) && $.inArray( $( this ).val(), validProteins ) == -1 ) {
-			$(this).css('color', '#969696');
+			//  Can move overlay left
+			
+			overlayNewOffsetLeft = 
+				rightEdgeOfPageinViewport - ( overlayNewWidth + OVERLAY_MINIMUM_LEFT_BUFFER + OVERLAY_MINIMUM_RIGHT_BUFFER );
+			
 		} else {
-			$(this).css('color', '#000000');
+			
+			//  Must move overlay left and shrink it
+			
+			overlayNewOffsetLeft = leftEdgeOfPageinViewport + OVERLAY_MINIMUM_LEFT_BUFFER;
+			
+			overlayNewWidth = rightEdgeOfPageinViewport - ( leftEdgeOfPageinViewport + OVERLAY_MINIMUM_LEFT_BUFFER + OVERLAY_MINIMUM_RIGHT_BUFFER );
+			
+			if ( overlayNewWidth < OVERLAY_MINIMUM_WIDTH ) {
+				
+				overlayNewWidth = OVERLAY_MINIMUM_WIDTH;
+			}
+			
 		}
-	});
-
-
-}
-
-
-// remove the protein select box w/ the given id from the DOM
-//function removeProteinSelect( id ) {
-//	
-//	//   Not Used.   If start using this, need to add more code for new per protein bar data list
-//	
-//	$("select#" + id ).remove();
-//}
-
-// get an array of the currently-selected proteins
-function getSelectedProteins( $select_to_exclude ) {
+		
+	}
 	
-	var proteinsLocalVar = new Array();
+	//  Position Overlay Vertically
 
-	$("select.svg-protein-select").each( function() {
+	var overlayNewTop = windowScrollTop + 5;
 
-		if ( $select_to_exclude != undefined && $select_to_exclude.attr( "id" ) == $( this ).attr( "id" ) ) { return true; }
+	//  Apply position to overlay
+	
+	$select_protein_overlay_div.css( { left : overlayNewOffsetLeft + "px", width : overlayNewWidth + "px", top : overlayNewTop + "px" } );
+	
+}
 
-		var value = $( this ).val();			
-		if ( value != 0 && $.inArray(value, proteinsLocalVar) == -1 ) {
-			proteinsLocalVar.push( value );
+
+
+function processClickOnSelectProtein( params ) {
+	
+	var clickedThis = params.clickedThis;
+	
+	var $clickedThis = $( clickedThis );
+	
+
+	var $protein_list_container = $("#protein_list_container");
+	
+	var protein_list_container_Data = $protein_list_container.data();
+	
+	var positionIndex = protein_list_container_Data.positionIndex;
+	var proteinIdSelectedProtein = protein_list_container_Data.proteinIdSelectedProtein;
+	
+	
+	var selectedProteinId = $clickedThis.attr("data-protein_id");
+	
+	if ( selectedProteinId === proteinIdSelectedProtein ) {
+		
+		//  No protein id change so just close the overlay
+		
+		closeAddProteinSelect();
+		
+		return;
+	}
+	
+	if ( positionIndex === undefined || positionIndex === null ) {
+		
+		//  Add a new protein bar entry
+		
+		var newImageProteinBarData = ImageProteinBarData.constructEmptyImageProteinBarData();
+		
+		newImageProteinBarData.setProteinId( { proteinId : selectedProteinId, proteinIdIsSelected : true } );
+		
+		var proteinLength = _proteinLengths[ selectedProteinId ];
+		
+		newImageProteinBarData.setProteinLength( { proteinLength : proteinLength } );
+		
+		_imageProteinBarDataManager.addEntry( { entry : newImageProteinBarData } );
+		
+		
+	} else {
+
+		//  Update an existing entry using the selected protein id
+
+		var positionIndexInt = parseInt( positionIndex, 10 );
+
+		if ( isNaN( positionIndexInt ) ) {
+
+			throw "positionIndex is not an integer,  positionIndex: '" + positionIndex + "'";
 		}
 
-	});
-
-	return proteinsLocalVar;
+		var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : positionIndexInt } );
+		
+		imageProteinBarDataItem.setProteinId( { proteinId : selectedProteinId, proteinIdIsSelected : true } );
+	}
+	
+	closeAddProteinSelect();
+	
+	updateURLHash( false /* useSearchForm */ );
+	
+	showSelectedProteins();
+	
+	loadDataAndDraw( true /* doDraw */ );
 }
+
+
+
+
 
 // get an array of all the currently-selected proteins, can contain same
 // protein multiple times
 function getAllSelectedProteins() {
+
+	var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
 	
-	var proteinsLocalVar = new Array();
 
-	$("select.svg-protein-select").each( function() {
+	var proteinsLocalVar = [];
+	
+	for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
 
-		var value = $( this ).val();			
-		if ( value != 0 ) { //  0 is the value when a protein has not been selected
-			proteinsLocalVar.push( value );
-		}
+		var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
 
-	});
+		var imageProteinBarDataEntryProteinId = imageProteinBarDataEntry.getProteinId();
 
+		proteinsLocalVar.push( imageProteinBarDataEntryProteinId );
+	}
+	
 	return proteinsLocalVar;
+	
 }
 
 
 
+
+//get an array of all the currently-selected proteins, can contain same
+//protein multiple times
+function getSelectedProteinsExcludingPositionIndex( params ) {
+	
+	var positionIndex = params.positionIndex;
+
+	var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
+	
+
+	var proteinsLocalVar = [];
+	
+	for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
+
+		if ( imageProteinBarDataItemsIndex === positionIndex ) {
+			
+			//   Skip provided positionIndex
+			
+			continue;  //  EARLY continue
+		}
+		
+		var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
+
+		var imageProteinBarDataEntryProteinId = imageProteinBarDataEntry.getProteinId();
+
+		proteinsLocalVar.push( imageProteinBarDataEntryProteinId );
+	}
+	
+	return proteinsLocalVar;
+	
+}
+
+
+function markInvalidProteinsInProteinSelector( params ) {
+	
+	var positionIndexSelectedProtein = params.positionIndexSelectedProtein;
+
+	var validProteins = getValidProteins( { positionIndexSelectedProtein : positionIndexSelectedProtein } );
+
+	var $protein_list_container = $("#protein_list_container");
+	
+	var $protein_select_jq_Items = $protein_list_container.find(".protein_select_jq");
+	
+	$protein_select_jq_Items.removeClass("select-protein-overlay-dimmed-protein-select-text");
+	
+	$protein_select_jq_Items.each( function() {
+		
+		var $protein_select_jq = $( this );
+		
+		var protein_select_jq_protein_id = $protein_select_jq.attr("data-protein_id");
+
+		if ( $( "input#show-crosslinks" ).is( ':checked' ) && $.inArray( protein_select_jq_protein_id, validProteins ) == -1 ) {
+			$(this).addClass("select-protein-overlay-dimmed-protein-select-text");
+		}
+	});
+}
+
+
 // get an array of "valid" proteins--proteins with crosslinks with
 // any of the currently-selected proteins
-function getValidProteins( $select ) {
+function getValidProteins( params ) {
+	
+	var positionIndexSelectedProtein = params.positionIndexSelectedProtein;
+	
+	///  Producing a list of protein ids that the other selected protein ids link to
+	
+	
+	//  $select is current selector
+	
+	//  TODO   Rewrite this
+	
 	
 	if ( _proteinLinkPositions == undefined ) {
+		
+		//  If _proteinLinkPositions == undefined, return all protein ids
+		
 		return _proteins;
 	}
 	
-	var sProteins = getSelectedProteins( $select );
+	var selectedProteins = null;
+	
+	if ( positionIndexSelectedProtein !== undefined && positionIndexSelectedProtein !== null ) {
+
+		//  Get selected proteins, excluding current selector value
+
+		selectedProteins = getSelectedProteinsExcludingPositionIndex( { positionIndex : positionIndexSelectedProtein } );
+			
+	} else {
+		
+		//  Get all proteins since no current selector
+		selectedProteins = getAllSelectedProteins();
+	}
+	
 	var vProteins = new Array();
 
-	if ( sProteins.length == 0 ) { return Object.keys( _proteinLinkPositions ); }
+	if ( selectedProteins.length == 0 ) { 
+		
+		// If there no selected proteins other than current select, return all possible crosslink proteins
+		
+		return Object.keys( _proteinLinkPositions ); 
+	}
 
-	for ( var i = 0; i < sProteins.length; i++ ) {
-		if ( _proteinLinkPositions[ sProteins[ i ] ] == undefined ) { continue; }
-		var partners = Object.keys( _proteinLinkPositions[ sProteins[ i ] ]  );
+	for ( var i = 0; i < selectedProteins.length; i++ ) {
+
+		//  for each selected protein from other than current selector
+		
+		var selectedProteinId = selectedProteins[ i ];
+		
+		if ( _proteinLinkPositions[ selectedProteinId ] == undefined ) {
+			
+			//  No linkable protein positions so continue to next selected protein id
+			
+			continue; 
+		}
+		
+		//  Get an array of the protein ids that the selected protein id links to
+		
+		var partners = Object.keys( _proteinLinkPositions[ selectedProteinId ]  );
 
 		for ( var k = 0; k < partners.length; k++ ) {
 			if ( $.inArray( partners[ k ], vProteins ) == -1 ) {
+				
+				//  The linked to protein id is not already in the output array so add it 
+				
 				vProteins.push( partners[ k ] );
 			}
 		}
@@ -6640,6 +7399,10 @@ function getValidProteins( $select ) {
 
 	return vProteins;
 }
+
+
+
+///////////////////////////////////////////////
 
 
 function makeArcPath( direction, startx, starty, endx, endy ) {
@@ -6764,7 +7527,7 @@ var viewerInitialized = false;
 
 function initializeViewer()  { 
 
-	refreshViewerProteinSelects();
+	showSelectedProteins();
 	
 	if ( viewerInitialized ) { 
 		return; 
@@ -6773,17 +7536,6 @@ function initializeViewer()  {
 	viewerInitialized = true;
 	
 	populateViewerCheckBoxes();
-
-	
-	
-	if ( _searches.length > _MAX_NUMBER_SEARCHES_SUPPORTED_FOR_COLOR_BY_SEARCHES ) {
-		
-		//  The number of searches is > number supported for "Color by search" 
-		//    so switch to showing the disabled checkbox for "Color by search"
-		
-		$("#color_by_search_outer_container").hide();
-		$("#color_by_search_disabled_outer_container").show();
-	}
 
 
 	
@@ -6834,7 +7586,6 @@ function initializeViewer()  {
 	$( "input#show-crosslinks" ).change( function() {
 		updateURLHash( false /* useSearchForm */ );
 		loadDataAndDraw( true /* doDraw */ );
-		markInvalidProteins();
 	});
 	
 	$( "input#show-self-crosslinks" ).change( function() {
@@ -6867,21 +7618,18 @@ function initializeViewer()  {
 		drawSvg();
 	});
 	
-	$( "input#color-by-search" ).change( function() {
+
+	$( "#color_by" ).change( function() {
 		updateURLHash( false /* useSearchForm */ );
 		drawSvg();
 	});
+	
 
 	$( "input#shade-by-counts" ).change( function() {
 		updateURLHash( false /* useSearchForm */ );
 		loadDataAndDraw( true /* doDraw */ );
 	});
-	
-//	$( "input#show-coverage" ).change( function() {
-//		updateURLHash( false /* useSearchForm */ );
-//		loadDataAndDraw( true /* doDraw */ );
-//	});
-	
+
 	
 	$( "#annotation_type" ).change( function() {
 		updateURLHash( false /* useSearchForm */ );
@@ -7230,9 +7978,6 @@ function initPage() {
 	
 	_proteinBarToolTip_template_HandlebarsTemplate = Handlebars.compile( proteinBarToolTip_template_handlebarsSource );
 
-	_proteinSelectorOptionEntry_HandlebarsTemplate = Handlebars.compile( PROTEIN_SELECTOR_HANDLEBARS_STRING );
-
-	
 	
 	$( "input#filterNonUniquePeptides" ).change(function() {
 		
@@ -7251,6 +7996,13 @@ function initPage() {
 		
 		defaultPageView.searchFormChanged_ForDefaultPageView();
 	});
+	
+	$("#select_protein_modal_dialog_overlay_background").click( function( eventObject ) {
+		closeAddProteinSelect();
+	} );
+	$("#select_protein_overlay_X_for_exit_overlay").click( function( eventObject ) {
+		closeAddProteinSelect();
+	} );
 	
 	_proteinBarRegionSelectionsOverlayCode.init();
 	

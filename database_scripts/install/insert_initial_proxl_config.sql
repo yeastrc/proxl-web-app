@@ -20,7 +20,14 @@ use proxl;
 
  INSERT INTO config_system (config_key, config_value) 
  VALUES ('email_from_address', '');
- 
+
+
+--  (Optional) Used for adding the Google Analytics Javascript containing the configured tracking code to the footer of every page.  
+--  Default, not set
+ INSERT INTO config_system (config_key, config_value) 
+ VALUES ('google_analytics_tracking_code', '' );
+
+
 
 --  (Optional) Used for accessing protein annotations services.  
 --  Default, the Yeast Resource Center will provide real-time protein annotation
@@ -36,6 +43,16 @@ use proxl;
 
 
 
+--  (!Important!) Items on Web Pages configuration
 
+--  (Optional) HTML displayed at bottom center of page  
+--  HTML that will be displayed at the bottom center of the page.
+
+--  Example: Managed by Michael Riffle (<a href="mailto:mriffle@uw.edu" target="_top">mriffle@uw.edu</a>) 
+
+--  Cached in memory so if change database, need to wait or change in web app
+
+ INSERT INTO config_system (config_key, config_value) 
+ VALUES ('footer_center_of_page_html', '');
 
 

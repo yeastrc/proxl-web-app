@@ -1544,8 +1544,7 @@
 
 											<tr>
 												<td valign="top"  >
-													Search 
-													Program<c:if test="${ fn:length( search_wrapper.searchPrograms ) > 1 }" >s</c:if>:
+													Search Program<c:if test="${ fn:length( search_wrapper.searchPrograms ) > 1 }" >s</c:if>:
 												</td>
 												
 												 <c:choose>
@@ -1581,6 +1580,46 @@
 												<td>Upload:</td>
 												<td><bean:write name="search" property="formattedLoadTime" /></td>
 											</tr>
+											
+											<%--  Copy  'search_wrapper' to 'search_details' to use here --%>
+											
+											<c:set var="search_details" value="${ search_wrapper }"/>
+						
+											<c:if test="${ not empty search_details.cutoffsAppliedOnImportList }">
+											  <tr>
+													<td style="vertical-align: top; padding-top: 3px; padding-right: 5px; " >Cutoffs Applied On Import:</td>
+													
+												    <td style="border-width:0px; padding: 0px; padding-top: 3px;">
+								
+													<table  style="border-width:0px; border-spacing: 0px; ">
+									
+													   <c:forEach var="cutoffsAppliedOnImport" items="${ search_details.cutoffsAppliedOnImportList }">
+													     <tr>
+													      <td style="padding-right: 5px; ">
+													       <c:choose>
+													        <c:when test="${ cutoffsAppliedOnImport.peptideCutoff }">
+													        	<span style="white-space: nowrap;" >Peptide Cutoff:</span>
+													        </c:when>
+													        <c:otherwise>
+													        	<span style="white-space: nowrap;" >PSM Cutoff:</span>
+													        </c:otherwise>
+													       </c:choose>
+													      </td>
+													      <td style="padding-right: 5px;">
+													     	<c:out value="${ cutoffsAppliedOnImport.annotationName }"></c:out>
+													      </td>
+													      <td >
+													     	<c:out value="${ cutoffsAppliedOnImport.cutoffValue }"></c:out>
+													      </td>
+													     </tr>
+													   </c:forEach>
+								
+												    </table>
+												  
+													</td>						
+											  </tr>
+											</c:if>
+																						
 											
 											<tr>
 												<td>QC Plots:</td>

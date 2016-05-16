@@ -276,17 +276,32 @@
 
 		<div>
 			<div>
-				
-				<div >
 
-					<span class="tool_tip_attached_jq" data-tooltip="Add a selector for adding another protein bar to the image" style="margin-left:10px;" id="svg-protein-selector_location"><a href="javascript:" onclick="addProteinSelect()">+Protein</a></span>
+				<%-- !!!   Handlebars template Select Protein  !!!!!!!!!   --%>
+		
+				<%--  Protein Item to put in Overlay --%>		
+				<script id="selected_protein_entry_template"  type="text/x-handlebars-template">
+
+					<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedImage.jsp_page_templates/viewMergedImageSelectedProteinItemTemplate.jsp" %>
+
+				</script>
+				
+								
+				<div id="selected_proteins_outer_container">
+				  <div id="selected_proteins_container" class="selected-proteins-container">
+				  </div>
+				</div>
+				
+				<div style="float: left;">
+				  <div >
+					<input type="button" class="tool_tip_attached_jq" data-tooltip="Add another protein bar to the image" 
+						id="svg-protein-selector_location"
+						onclick="openSelectProteinSelect( { clickedThis : this } )" value="Add Protein">
+				  </div>
 				</div>
 
 
-
-
-
-				<div style="margin-top: 5px;">
+				<div style="margin-top: 5px; clear: both; ">
 					
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle showing inter-protein crosslinks" style="white-space:nowrap;" ><input type="checkbox" id="show-crosslinks" checked>Show crosslinks</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle showing intra-protein crosslinks" style="white-space:nowrap;" ><input type="checkbox" id="show-self-crosslinks" checked>Show self-crosslinks</span></label>
@@ -296,19 +311,7 @@
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle marking trypic positions in proteins" style="white-space:nowrap;" ><input type="checkbox" id="show-tryptic-cleavage-positions">Show tryptic positions</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle showing protein termini labels" style="white-space:nowrap;" ><input type="checkbox" id="show-protein-termini">Show protein termini</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle shading of links based on spectrum counts" style="white-space:nowrap;" ><input type="checkbox" id="shade-by-counts">Shade by counts</span></label>
-					<label id="color_by_search_outer_container">
-						<span class="tool_tip_attached_jq" data-tooltip="Toggle coloring of links based on search in which it was found" style="white-space:nowrap;"   >
-							<input type="checkbox" id="color-by-search" >Color by search
-						</span>
-					</label>
-					<%-- disabled version for when the number of searches exceeds the number supported by 'Color by search' --%>
-					<label id="color_by_search_disabled_outer_container"  style="white-space:nowrap; display: none;" >
-						<span style="white-space:nowrap;" 
-								class="disabled-checkbox tool_tip_attached_jq"
-								data-tooltip="'Color by search' unavailable for more than 3 searches" >
-							<input type="checkbox" disabled="disabled">Color by search
-						</span>
-					</label>
+					
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle display of scale bar" style="white-space:nowrap;" ><input type="checkbox" id="show-scalebar" checked>Show scalebar</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle automatic sizing of protein bars. Uncheck to allow manual horizontal sizing and vertical spacing." style="white-space:nowrap;" ><input type="checkbox" id="automatic-sizing" checked>Automatic sizing</span></label>
 					<label><span style="white-space:nowrap;"
@@ -316,9 +319,35 @@
 							><input type="checkbox" id="protein_names_position_left" 
 								>Protein Names On Left</span></label>
 
+					<%--  Select for "color by" with options of by search or by region  --%>
 					&nbsp;&nbsp;&nbsp;&nbsp;
 					<span style="white-space: nowrap;">
-						<span class="tool_tip_attached_jq" data-tooltip="Choose one to view graphical feature annotations for protein sequences">Show Feature Annotations:</span> 
+						<span class="tool_tip_attached_jq" data-tooltip="Choose alternate link coloring"
+								>Color by:</span> 
+								
+						<select id="color_by">
+							<option value="">Protein</option>
+							
+							<%--  These option values must be kept in sync with Javascript.
+								  These values must be kept backward compatible or 
+								    Javascript must be written to convert
+							--%>
+							
+							<option value="region">Region</option>
+							
+							<c:if test="${ fn:length( searchIds ) <= 3 }">
+							
+								<%-- Only shown when the number of searches is <= the number supported by 'Color by search' --%>
+								<option value="search">Search</option>
+							</c:if>
+						</select>
+					</span>
+								
+					&nbsp;
+					<span style="white-space: nowrap;">
+						<span class="tool_tip_attached_jq" data-tooltip="Choose one to view graphical feature annotations for protein sequences"
+								>Show Feature Annotations:</span>
+								 
 						<select id="annotation_type">
 							<option></option>
 							<option value="sequence_coverage">Sequence Coverage</option>
@@ -452,6 +481,54 @@
 	<%--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --%>
 	
 	
+	
+		<%--  Select Protein Overlay --%>
+		
+
+			<%--  Select Protein Overlay Background --%>
+			
+			
+			<div id="select_protein_modal_dialog_overlay_background" class="select-protein-modal-dialog-overlay-background" style="display: none;"  >
+			
+			</div>
+			
+			
+			<%--  Select Protein Overlay Div --%>
+			
+			<div id="select_protein_overlay_div" class=" select-protein-overlay-div " style="display: none; "  >
+			
+				<div id="select_protein_overlay_header" class="select-protein-overlay-header" style="width:100%; " >
+					<h1 id="select_protein_overlay_X_for_exit_overlay" class="select-protein-overlay-X-for-exit-overlay" >X</h1>
+					<h1 id="select_protein_overlay_header_text" class="select-protein-overlay-header-text" >Select Protein</h1>
+				</div>
+				<div id="select_protein_overlay_body" class="select-protein-overlay-body" >
+				
+					<div id="protein_list_container" class=" protein-list-container">
+					</div>
+					
+				</div> <%--  END  <div id="select_protein_overlay_body"  --%>
+				
+			</div>  <%--  END  <div id="select_protein_overlay_div"  --%>
+
+		
+
+		<%-- !!!   Handlebars template Select Protein  !!!!!!!!!   --%>
+
+		<%--  Protein Item to put in Overlay --%>		
+		<script id="select_protein_overlay_protein_entry_template"  type="text/x-handlebars-template">
+		  <div class=" protein_select_jq single-protein-select-item " data-protein_id="{{proteinId}}" >
+			{{proteinName}}
+		  </div>
+		</script>
+
+		<%--  Protein Item for main display --%>
+		<script id="select_protein_overlay_bar_region_template"  type="text/x-handlebars-template">
+		
+		</script>
+		
+			
+		<%--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --%>
+		
 
 			<%--  Running Program to Create Annotation Data  Overlay Div,  
 			

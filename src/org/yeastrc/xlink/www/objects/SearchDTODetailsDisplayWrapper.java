@@ -2,11 +2,19 @@ package org.yeastrc.xlink.www.objects;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
+import org.yeastrc.xlink.www.dto.CutoffsAppliedOnImportDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplaySearchLevel;
+import org.yeastrc.xlink.www.searcher.CutoffsAppliedOnImportSearcher;
 import org.yeastrc.xlink.www.searcher.SearchProgramDisplaySearcher;
 
 /**
@@ -14,10 +22,16 @@ import org.yeastrc.xlink.www.searcher.SearchProgramDisplaySearcher;
  *
  */
 public class SearchDTODetailsDisplayWrapper {
+	
+	private static final Logger log = Logger.getLogger( SearchDTODetailsDisplayWrapper.class );
+	
+	
 
 	private SearchDTO searchDTO;
 
 	private List<SearchProgramDisplay> searchProgramDisplayList; 
+	
+	private List<CutoffsAppliedOnImportWebDisplay> cutoffsAppliedOnImportList;
 	
 	/**
 	 * Not used on viewProject.jsp
@@ -90,6 +104,125 @@ public class SearchDTODetailsDisplayWrapper {
 	
 	
 	
+
+	public List<CutoffsAppliedOnImportWebDisplay> getCutoffsAppliedOnImportList() throws Exception {
+		
+		if ( cutoffsAppliedOnImportList != null ) {
+			
+			return cutoffsAppliedOnImportList;
+		}
+		
+		if ( searchDTO == null ) {
+			
+			throw new IllegalStateException( "searchDTO == null");
+		}
+		
+
+		cutoffsAppliedOnImportList = new ArrayList<>();
+		
+
+		Integer searchId = searchDTO.getId();
+		
+		////////  List of cutoffs applied on import
+		
+		List<CutoffsAppliedOnImportDTO> cutoffsAppliedOnImportDTOList = 
+				CutoffsAppliedOnImportSearcher.getInstance().getCutoffsAppliedOnImportDTOForSearchId( searchId );
+		
+		if ( ! cutoffsAppliedOnImportDTOList.isEmpty() ) {
+			
+			List<Integer> searchIds = new ArrayList<>( 1 );
+			
+			searchIds.add( searchId );
+
+			Map<Integer, Map<Integer, AnnotationTypeDTO>> all_Peptide_Filterable_ForSearchIds =
+					GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIds );
+			
+			Map<Integer, Map<Integer, AnnotationTypeDTO>> all_Psm_Filterable_ForSearchIds =
+					GetAnnotationTypeData.getInstance().getAll_Psm_Filterable_ForSearchIds( searchIds );
+			
+			if ( all_Peptide_Filterable_ForSearchIds == null ) {
+				
+				String msg = "ERROR: all_Peptide_Filterable_ForSearchIds == null ";
+				log.error( msg );
+				throw new ProxlWebappDataException( msg );
+			}
+
+			if ( all_Psm_Filterable_ForSearchIds == null ) {
+				
+				String msg = "ERROR: all_Psm_Filterable_ForSearchIds == null ";
+				log.error( msg );
+				throw new ProxlWebappDataException( msg );
+			}
+			
+			Map<Integer, AnnotationTypeDTO> all_Peptide_Filterable_PerSearchId = all_Peptide_Filterable_ForSearchIds.get( searchId );
+			Map<Integer, AnnotationTypeDTO> all_Psm_Filterable_PerSearchId = all_Psm_Filterable_ForSearchIds.get( searchId );
+			
+			
+			for ( CutoffsAppliedOnImportDTO cutoffsAppliedOnImportDTO : cutoffsAppliedOnImportDTOList ) {
+				
+				AnnotationTypeDTO peptideAnnotationTypeDTO = all_Peptide_Filterable_PerSearchId.get( cutoffsAppliedOnImportDTO.getAnnotationTypeId() );
+				AnnotationTypeDTO psmAnnotationTypeDTO = all_Psm_Filterable_PerSearchId.get( cutoffsAppliedOnImportDTO.getAnnotationTypeId() );
+				
+				
+				CutoffsAppliedOnImportWebDisplay cutoffsAppliedOnImportWebDisplay = new CutoffsAppliedOnImportWebDisplay();
+
+				cutoffsAppliedOnImportWebDisplay.setCutoffValue( cutoffsAppliedOnImportDTO.getCutoffValueString() );
+
+				if ( peptideAnnotationTypeDTO != null ) {
+					
+					cutoffsAppliedOnImportWebDisplay.setAnnotationName( peptideAnnotationTypeDTO.getName() );
+					cutoffsAppliedOnImportWebDisplay.setPeptideCutoff( true );
+					
+				} else if ( psmAnnotationTypeDTO != null ) {
+
+					cutoffsAppliedOnImportWebDisplay.setAnnotationName( psmAnnotationTypeDTO.getName() );
+					cutoffsAppliedOnImportWebDisplay.setPeptideCutoff( false );
+				
+				} else {
+
+					String msg = "ERROR: cutoffsAppliedOnImportDTO AnnotationTypeId not found in Peptide or PSM. "
+							+ "  AnnotationTypeId: " + cutoffsAppliedOnImportDTO.getAnnotationTypeId()
+							+ ", Search id: " + searchId;
+					
+					log.error( msg );
+					throw new ProxlWebappDataException( msg );
+				}
+				
+				cutoffsAppliedOnImportList.add( cutoffsAppliedOnImportWebDisplay );
+			}
+			
+			//  Sort on Peptide then PSM and by name within each
+			
+			Collections.sort( cutoffsAppliedOnImportList, new Comparator<CutoffsAppliedOnImportWebDisplay>() {
+
+				@Override
+				public int compare(CutoffsAppliedOnImportWebDisplay o1, CutoffsAppliedOnImportWebDisplay o2) {
+
+					if ( o1.isPeptideCutoff() != o2.isPeptideCutoff() ) {
+						
+						//  Sort peptide before PSM
+						
+						if ( o1.isPeptideCutoff() ) {
+							
+							return -1;
+						} else {
+							
+							return 1;
+						}
+					}
+					
+					return o1.getAnnotationName().compareTo( o2.getAnnotationName() );
+				}
+			});
+			
+			
+		}
+		
+		return cutoffsAppliedOnImportList;
+	}
+
+	
+	
 	//  Getters & Setters
 	
 	public SearchDTO getSearchDTO() {
@@ -111,6 +244,7 @@ public class SearchDTODetailsDisplayWrapper {
 			CutoffPageDisplaySearchLevel cutoffPageDisplaySearchLevel) {
 		this.cutoffPageDisplaySearchLevel = cutoffPageDisplaySearchLevel;
 	}
+
 
 
 	

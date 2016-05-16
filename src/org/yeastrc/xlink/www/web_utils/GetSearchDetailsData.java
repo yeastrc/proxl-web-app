@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+//import org.apache.log4j.Logger;
+
 import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetCutoffPageDisplayRoot;
@@ -18,6 +20,8 @@ import org.yeastrc.xlink.www.objects.SearchDTODetailsDisplayWrapper;
  */
 public class GetSearchDetailsData {
 
+//	private static final Logger log = Logger.getLogger( GetSearchDetailsData.class );
+			
 	private static final GetSearchDetailsData instance = new GetSearchDetailsData();
 	
 	private GetSearchDetailsData() { }
@@ -51,6 +55,8 @@ public class GetSearchDetailsData {
 		
 		for ( SearchDTO search : searches ) {
 		
+			Integer searchId = search.getId();
+			
 			SearchDTODetailsDisplayWrapper searchDTODetailsDisplayWrapper = new SearchDTODetailsDisplayWrapper();
 			
 			searchDTODetailsDisplayWrapper.setSearchDTO(search);
@@ -59,7 +65,7 @@ public class GetSearchDetailsData {
 			CutoffPageDisplaySearchLevel cutoffPageDisplaySearchLevel = null;
 			
 			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-					getCutoffPageDisplayRoot.getCutoffPageDisplayRootSingleSearchId( search.getId(), request );
+					getCutoffPageDisplayRoot.getCutoffPageDisplayRootSingleSearchId( searchId, request );
 			
 			List<CutoffPageDisplaySearchLevel> cutoffsPerSearchDataList = cutoffPageDisplayRoot.getPerSearchDataList();
 			
@@ -69,8 +75,9 @@ public class GetSearchDetailsData {
 				
 				cutoffPageDisplaySearchLevel = cutoffsPerSearchDataList.get( 0 );
 			}
-			
+
 			searchDTODetailsDisplayWrapper.setCutoffPageDisplaySearchLevel( cutoffPageDisplaySearchLevel );
+			
 			
 			searchDTODetailsList.add(searchDTODetailsDisplayWrapper);
 		}

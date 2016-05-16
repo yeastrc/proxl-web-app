@@ -2,14 +2,13 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
-DROP SCHEMA IF EXISTS `proxl` ;
 CREATE SCHEMA IF NOT EXISTS `proxl` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
 USE `proxl` ;
 
 -- -----------------------------------------------------
 -- Table `auth_user`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `auth_user` ;
+
 
 CREATE TABLE IF NOT EXISTS `auth_user` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -33,7 +32,7 @@ CREATE UNIQUE INDEX `email_UNIQUE` ON `auth_user` (`email` ASC);
 -- -----------------------------------------------------
 -- Table `auth_shared_object`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `auth_shared_object` ;
+
 
 CREATE TABLE IF NOT EXISTS `auth_shared_object` (
   `shared_object_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -50,7 +49,7 @@ CREATE UNIQUE INDEX `public_access_code_UNIQUE` ON `auth_shared_object` (`public
 -- -----------------------------------------------------
 -- Table `xl_user`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `xl_user` ;
+
 
 CREATE TABLE IF NOT EXISTS `xl_user` (
   `auth_user_id` INT UNSIGNED NOT NULL,
@@ -69,7 +68,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `project`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `project` ;
+
 
 CREATE TABLE IF NOT EXISTS `project` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -97,7 +96,7 @@ CREATE INDEX `fk_auth_shareable_object_id_idx` ON `project` (`auth_shareable_obj
 -- -----------------------------------------------------
 -- Table `search`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search` ;
+
 
 CREATE TABLE IF NOT EXISTS `search` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -124,7 +123,7 @@ CREATE INDEX `fk_project_id_idx` ON `search` (`project_id` ASC);
 -- -----------------------------------------------------
 -- Table `reported_peptide`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `reported_peptide` ;
+
 
 CREATE TABLE IF NOT EXISTS `reported_peptide` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -140,7 +139,7 @@ CREATE INDEX `sequence` ON `reported_peptide` (`sequence`(20) ASC);
 -- -----------------------------------------------------
 -- Table `psm`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `psm` ;
+
 
 CREATE TABLE IF NOT EXISTS `psm` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -179,7 +178,7 @@ CREATE INDEX `psm__search_id_type_idx` ON `psm` (`search_id` ASC, `type` ASC);
 -- -----------------------------------------------------
 -- Table `peptide`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `peptide` ;
+
 
 CREATE TABLE IF NOT EXISTS `peptide` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -195,7 +194,7 @@ CREATE INDEX `sequence` ON `peptide` (`sequence`(20) ASC);
 -- -----------------------------------------------------
 -- Table `matched_peptide`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `matched_peptide` ;
+
 
 CREATE TABLE IF NOT EXISTS `matched_peptide` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -222,7 +221,7 @@ CREATE INDEX `matched_peptide_psm_id_fk_idx` ON `matched_peptide` (`psm_id` ASC)
 -- -----------------------------------------------------
 -- Table `crosslink`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `crosslink` ;
+
 
 CREATE TABLE IF NOT EXISTS `crosslink` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -287,7 +286,7 @@ CREATE INDEX `crosslink_pr1prp1pr2prp2` ON `crosslink` (`nrseq_id_1` ASC, `prote
 -- -----------------------------------------------------
 -- Table `dimer`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `dimer` ;
+
 
 CREATE TABLE IF NOT EXISTS `dimer` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -325,7 +324,7 @@ CREATE INDEX `psm_id` ON `dimer` (`psm_id` ASC);
 -- -----------------------------------------------------
 -- Table `dynamic_mod`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `dynamic_mod` ;
+
 
 CREATE TABLE IF NOT EXISTS `dynamic_mod` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -349,7 +348,7 @@ CREATE INDEX `dynamic_mod_matched_peptide_id_fk_idx` ON `dynamic_mod` (`matched_
 -- -----------------------------------------------------
 -- Table `linker`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `linker` ;
+
 
 CREATE TABLE IF NOT EXISTS `linker` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -366,7 +365,7 @@ CREATE UNIQUE INDEX `abbr` ON `linker` (`abbr` ASC);
 -- -----------------------------------------------------
 -- Table `looplink`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `looplink` ;
+
 
 CREATE TABLE IF NOT EXISTS `looplink` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -404,7 +403,7 @@ CREATE INDEX `peptide_id` ON `looplink` (`peptide_id` ASC);
 -- -----------------------------------------------------
 -- Table `monolink`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `monolink` ;
+
 
 CREATE TABLE IF NOT EXISTS `monolink` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -437,7 +436,7 @@ CREATE INDEX `peptide_id` ON `monolink` (`peptide_id` ASC);
 -- -----------------------------------------------------
 -- Table `nrseq_database_peptide_protein`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `nrseq_database_peptide_protein` ;
+
 
 CREATE TABLE IF NOT EXISTS `nrseq_database_peptide_protein` (
   `nrseq_database_id` INT(10) UNSIGNED NOT NULL,
@@ -462,7 +461,7 @@ CREATE INDEX `is_unique` ON `nrseq_database_peptide_protein` (`is_unique` ASC);
 -- -----------------------------------------------------
 -- Table `pdb_file`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `pdb_file` ;
+
 
 CREATE TABLE IF NOT EXISTS `pdb_file` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -495,7 +494,7 @@ CREATE INDEX `project_id` ON `pdb_file` (`project_id` ASC);
 -- -----------------------------------------------------
 -- Table `pdb_alignment`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `pdb_alignment` ;
+
 
 CREATE TABLE IF NOT EXISTS `pdb_alignment` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -521,7 +520,7 @@ CREATE INDEX `pdb_file_id` ON `pdb_alignment` (`pdb_file_id` ASC, `chain_id` ASC
 -- -----------------------------------------------------
 -- Table `search_comment`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_comment` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_comment` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -551,7 +550,7 @@ CREATE INDEX `search_comment_user_fk_idx` ON `search_comment` (`auth_user_id` AS
 -- -----------------------------------------------------
 -- Table `search_reported_peptide`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_reported_peptide` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_reported_peptide` (
   `search_id` INT(10) UNSIGNED NOT NULL,
@@ -571,7 +570,7 @@ CREATE INDEX `reported_peptide_id` ON `search_reported_peptide` (`reported_pepti
 -- -----------------------------------------------------
 -- Table `psm_peptide`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `psm_peptide` ;
+
 
 CREATE TABLE IF NOT EXISTS `psm_peptide` (
   `psm_id` INT(10) UNSIGNED NOT NULL,
@@ -594,7 +593,7 @@ CREATE INDEX `peptide_id` ON `psm_peptide` (`peptide_id` ASC);
 -- -----------------------------------------------------
 -- Table `taxonomy`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `taxonomy` ;
+
 
 CREATE TABLE IF NOT EXISTS `taxonomy` (
   `id` INT(10) UNSIGNED NOT NULL,
@@ -608,7 +607,7 @@ CREATE INDEX `name` ON `taxonomy` (`name` ASC);
 -- -----------------------------------------------------
 -- Table `note`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `note` ;
+
 
 CREATE TABLE IF NOT EXISTS `note` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -638,7 +637,7 @@ CREATE INDEX `fk_auth_user_id_idx` ON `note` (`auth_user_id_created` ASC);
 -- -----------------------------------------------------
 -- Table `auth_forgot_password_tracking`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `auth_forgot_password_tracking` ;
+
 
 CREATE TABLE IF NOT EXISTS `auth_forgot_password_tracking` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -664,7 +663,7 @@ CREATE INDEX `forgot_pwd_trk_auth_user_id_fk_idx` ON `auth_forgot_password_track
 -- -----------------------------------------------------
 -- Table `auth_shared_object_users`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `auth_shared_object_users` ;
+
 
 CREATE TABLE IF NOT EXISTS `auth_shared_object_users` (
   `shared_object_id` INT UNSIGNED NOT NULL,
@@ -688,7 +687,7 @@ CREATE INDEX `idx_shared_objects_user_id` ON `auth_shared_object_users` (`user_i
 -- -----------------------------------------------------
 -- Table `auth_user_invite_tracking`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `auth_user_invite_tracking` ;
+
 
 CREATE TABLE IF NOT EXISTS `auth_user_invite_tracking` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -748,7 +747,7 @@ CREATE INDEX `user_invite_trk_used_auth_user_id_fk_idx` ON `auth_user_invite_tra
 -- -----------------------------------------------------
 -- Table `xl_user_access_level_label_description`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `xl_user_access_level_label_description` ;
+
 
 CREATE TABLE IF NOT EXISTS `xl_user_access_level_label_description` (
   `xl_user_access_level_numeric_value` INT UNSIGNED NOT NULL,
@@ -761,7 +760,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `scan_file`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `scan_file` ;
+
 
 CREATE TABLE IF NOT EXISTS `scan_file` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -777,7 +776,7 @@ CREATE UNIQUE INDEX `filename` ON `scan_file` (`filename` ASC, `sha1sum` ASC);
 -- -----------------------------------------------------
 -- Table `scan_file_header`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `scan_file_header` ;
+
 
 CREATE TABLE IF NOT EXISTS `scan_file_header` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -798,7 +797,7 @@ CREATE INDEX `fk_scan_file_header_scan_file_id_idx` ON `scan_file_header` (`scan
 -- -----------------------------------------------------
 -- Table `scan`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `scan` ;
+
 
 CREATE TABLE IF NOT EXISTS `scan` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -829,7 +828,7 @@ CREATE INDEX `fk_scan_scan_file_id_idx` ON `scan` (`scan_file_id` ASC);
 -- -----------------------------------------------------
 -- Table `scan_spectrum_data`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `scan_spectrum_data` ;
+
 
 CREATE TABLE IF NOT EXISTS `scan_spectrum_data` (
   `scan_id` INT UNSIGNED NOT NULL,
@@ -841,7 +840,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `search_linker`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_linker` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_linker` (
   `search_id` INT UNSIGNED NOT NULL,
@@ -864,7 +863,7 @@ CREATE INDEX `search_linker_linker_id_fk_idx` ON `search_linker` (`linker_id` AS
 -- -----------------------------------------------------
 -- Table `search_file`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_file` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_file` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -890,7 +889,7 @@ CREATE INDEX `search_file_search_id_fk_idx` ON `search_file` (`search_id` ASC);
 -- -----------------------------------------------------
 -- Table `scan_retention_time`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `scan_retention_time` ;
+
 
 CREATE TABLE IF NOT EXISTS `scan_retention_time` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -915,7 +914,7 @@ CREATE UNIQUE INDEX `scan_retention_time_unique` ON `scan_retention_time` (`scan
 -- -----------------------------------------------------
 -- Table `static_mod`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `static_mod` ;
+
 
 CREATE TABLE IF NOT EXISTS `static_mod` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -936,7 +935,7 @@ CREATE INDEX `static_mod_search_id_fk_idx` ON `static_mod` (`search_id` ASC);
 -- -----------------------------------------------------
 -- Table `unlinked`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `unlinked` ;
+
 
 CREATE TABLE IF NOT EXISTS `unlinked` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -965,7 +964,7 @@ CREATE INDEX `peptide_id` ON `unlinked` (`peptide_id` ASC);
 -- -----------------------------------------------------
 -- Table `config_system`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `config_system` ;
+
 
 CREATE TABLE IF NOT EXISTS `config_system` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -981,7 +980,7 @@ CREATE UNIQUE INDEX `config_system_config_key_idx` ON `config_system` (`config_k
 -- -----------------------------------------------------
 -- Table `search_web_links`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_web_links` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_web_links` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1010,7 +1009,7 @@ CREATE INDEX `search_links_auth_user_id_fk_idx` ON `search_web_links` (`auth_use
 -- -----------------------------------------------------
 -- Table `unified_reported_peptide_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `unified_reported_peptide_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `unified_reported_peptide_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1028,7 +1027,7 @@ CREATE INDEX `unified_reported_peptide__unified_sequence_idx` ON `unified_report
 -- -----------------------------------------------------
 -- Table `unified_rep_pep_matched_peptide_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `unified_rep_pep_matched_peptide_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `unified_rep_pep_matched_peptide_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1058,7 +1057,7 @@ CREATE INDEX `unified_matched_peptide__peptide_id_fk_idx` ON `unified_rep_pep_ma
 -- -----------------------------------------------------
 -- Table `unified_rep_pep_dynamic_mod_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `unified_rep_pep_dynamic_mod_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `unified_rep_pep_dynamic_mod_lookup` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1085,7 +1084,7 @@ CREATE INDEX `unified_rp_dynamic_mod__rp_matched_peptide_id_fk_idx` ON `unified_
 -- -----------------------------------------------------
 -- Table `search__dynamic_mod_mass_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search__dynamic_mod_mass_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search__dynamic_mod_mass_lookup` (
   `search_id` INT UNSIGNED NOT NULL,
@@ -1102,7 +1101,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `search__reported_peptide__dynamic_mod_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search__reported_peptide__dynamic_mod_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search__reported_peptide__dynamic_mod_lookup` (
   `search_id` INT UNSIGNED NOT NULL,
@@ -1129,7 +1128,7 @@ CREATE INDEX `search__rep_pep__dyn_mods_search_id_lnk_tp_idx` ON `search__report
 -- -----------------------------------------------------
 -- Table `search_programs_per_search`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_programs_per_search` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_programs_per_search` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1154,7 +1153,7 @@ CREATE INDEX `search_program__search_id_fk_idx` ON `search_programs_per_search` 
 -- -----------------------------------------------------
 -- Table `annotation_type`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `annotation_type` ;
+
 
 CREATE TABLE IF NOT EXISTS `annotation_type` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1189,7 +1188,7 @@ CREATE UNIQUE INDEX `annotation_type_Unique_idx` ON `annotation_type` (`search_i
 -- -----------------------------------------------------
 -- Table `annotation_type_filterable`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `annotation_type_filterable` ;
+
 
 CREATE TABLE IF NOT EXISTS `annotation_type_filterable` (
   `annotation_type_id` INT UNSIGNED NOT NULL,
@@ -1213,7 +1212,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `psm_annotation`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `psm_annotation` ;
+
 
 CREATE TABLE IF NOT EXISTS `psm_annotation` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1248,7 +1247,7 @@ CREATE INDEX `psm_annotation_psm_id_ann_typ_f_d_idx` ON `psm_annotation` (`psm_i
 -- -----------------------------------------------------
 -- Table `srch__rep_pept__annotation`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `srch__rep_pept__annotation` ;
+
 
 CREATE TABLE IF NOT EXISTS `srch__rep_pept__annotation` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1292,7 +1291,7 @@ CREATE INDEX `srch__rep_pept_srch_id_reppeptid_ann_tp__idx` ON `srch__rep_pept__
 -- -----------------------------------------------------
 -- Table `search_crosslink_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_crosslink_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_crosslink_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1320,7 +1319,7 @@ CREATE UNIQUE INDEX `srch_crosslnk_gen_lkp_Unique` ON `search_crosslink_generic_
 -- -----------------------------------------------------
 -- Table `search_crosslink_best_psm_value_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_crosslink_best_psm_value_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_crosslink_best_psm_value_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1358,7 +1357,7 @@ CREATE INDEX `primary_ann_tp_fk_idx` ON `search_crosslink_best_psm_value_generic
 -- -----------------------------------------------------
 -- Table `search_crosslink_best_peptide_value_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_crosslink_best_peptide_value_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_crosslink_best_peptide_value_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1396,7 +1395,7 @@ CREATE INDEX `srch_ann_type_id_value` ON `search_crosslink_best_peptide_value_ge
 -- -----------------------------------------------------
 -- Table `unified_rp__rep_pept__search__generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `unified_rp__rep_pept__search__generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `unified_rp__rep_pept__search__generic_lookup` (
   `unified_reported_peptide_id` INT(10) UNSIGNED NOT NULL,
@@ -1442,7 +1441,7 @@ CREATE INDEX `unified_rep_pep__reported_peptide__search_lookup__sample_ps_idx` O
 -- -----------------------------------------------------
 -- Table `unified_rp__rep_pept__search__best_psm_value_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `unified_rp__rep_pept__search__best_psm_value_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `unified_rp__rep_pept__search__best_psm_value_generic_lookup` (
   `unified_reported_peptide_id` INT(10) UNSIGNED NOT NULL,
@@ -1487,7 +1486,7 @@ CREATE INDEX `unified_rep_pep__reported_peptide__search_lookup__sample_ps_idx` O
 -- -----------------------------------------------------
 -- Table `psm_filterable_annotation__generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `psm_filterable_annotation__generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `psm_filterable_annotation__generic_lookup` (
   `psm_annotation_id` INT UNSIGNED NOT NULL,
@@ -1520,7 +1519,7 @@ CREATE INDEX `psm_filtrble_ann__generic_lkup__srch_rep_pep_anntpid_value` ON `ps
 -- -----------------------------------------------------
 -- Table `unified_rp__rep_pept__search__peptide_fltbl_value_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `unified_rp__rep_pept__search__peptide_fltbl_value_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `unified_rp__rep_pept__search__peptide_fltbl_value_generic_lookup` (
   `unified_reported_peptide_id` INT(10) UNSIGNED NOT NULL,
@@ -1564,7 +1563,7 @@ CREATE INDEX `unified_rep_pep__reported_peptide__search_lookup__sample_ps_idx` O
 -- -----------------------------------------------------
 -- Table `search_looplink_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_looplink_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_looplink_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1591,7 +1590,7 @@ CREATE INDEX `Unique_srch_nrseq_pos1_pos2` ON `search_looplink_generic_lookup` (
 -- -----------------------------------------------------
 -- Table `search_looplink_best_psm_value_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_looplink_best_psm_value_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_looplink_best_psm_value_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1628,7 +1627,7 @@ CREATE INDEX `srch_ann_type_id_value` ON `search_looplink_best_psm_value_generic
 -- -----------------------------------------------------
 -- Table `search_looplink_best_peptide_value_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_looplink_best_peptide_value_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_looplink_best_peptide_value_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1665,7 +1664,7 @@ CREATE INDEX `srch_ann_type_id_value` ON `search_looplink_best_peptide_value_gen
 -- -----------------------------------------------------
 -- Table `search_monolink_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_monolink_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_monolink_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1691,7 +1690,7 @@ CREATE UNIQUE INDEX `Unique_srch_nrseq_pos_fk_idx` ON `search_monolink_generic_l
 -- -----------------------------------------------------
 -- Table `search_monolink_best_psm_value_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_monolink_best_psm_value_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_monolink_best_psm_value_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1727,7 +1726,7 @@ CREATE INDEX `srch_ann_type_id_value` ON `search_monolink_best_psm_value_generic
 -- -----------------------------------------------------
 -- Table `search_monolink_best_peptide_value_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_monolink_best_peptide_value_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_monolink_best_peptide_value_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1763,7 +1762,7 @@ CREATE INDEX `srch_ann_type_id_value` ON `search_monolink_best_peptide_value_gen
 -- -----------------------------------------------------
 -- Table `search_dimer_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_dimer_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_dimer_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1789,7 +1788,7 @@ CREATE UNIQUE INDEX `srch_crosslnk_gen_lkp_Unique` ON `search_dimer_generic_look
 -- -----------------------------------------------------
 -- Table `search_dimer_best_psm_value_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_dimer_best_psm_value_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_dimer_best_psm_value_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1825,7 +1824,7 @@ CREATE INDEX `search_dimer_best_psm_value_generic_lookup_primary_fk0_idx` ON `se
 -- -----------------------------------------------------
 -- Table `search_dimer_best_peptide_value_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_dimer_best_peptide_value_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_dimer_best_peptide_value_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1861,7 +1860,7 @@ CREATE INDEX `search_dimer_best_peptide_value_generic_lookup_primary_fk0_idx` ON
 -- -----------------------------------------------------
 -- Table `search_unlinked_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_unlinked_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_unlinked_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1885,7 +1884,7 @@ CREATE UNIQUE INDEX `srch_crosslnk_gen_lkp_Unique` ON `search_unlinked_generic_l
 -- -----------------------------------------------------
 -- Table `search_unlinked_best_psm_value_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_unlinked_best_psm_value_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_unlinked_best_psm_value_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1919,7 +1918,7 @@ CREATE INDEX `search_unlinked_best_psm_value_generic_lookup_primary_fk_idx` ON `
 -- -----------------------------------------------------
 -- Table `search_unlinked_best_peptide_value_generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `search_unlinked_best_peptide_value_generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `search_unlinked_best_peptide_value_generic_lookup` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1953,7 +1952,7 @@ CREATE INDEX `search_unlinked_best_peptide_value_generic_lookup_primary_f_idx` O
 -- -----------------------------------------------------
 -- Table `default_page_view_generic`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `default_page_view_generic` ;
+
 
 CREATE TABLE IF NOT EXISTS `default_page_view_generic` (
   `search_id` INT UNSIGNED NOT NULL,
@@ -1992,7 +1991,7 @@ CREATE INDEX `default_page_view_generic_auth_lst_upd_idx` ON `default_page_view_
 -- -----------------------------------------------------
 -- Table `srch__rep_pept__annotation_large_value`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `srch__rep_pept__annotation_large_value` ;
+
 
 CREATE TABLE IF NOT EXISTS `srch__rep_pept__annotation_large_value` (
   `srch__rep_pept__annotation_id` INT UNSIGNED NOT NULL,
@@ -2009,7 +2008,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `psm_annotation_large_value`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `psm_annotation_large_value` ;
+
 
 CREATE TABLE IF NOT EXISTS `psm_annotation_large_value` (
   `psm_annotation_id` INT UNSIGNED NOT NULL,
@@ -2027,7 +2026,7 @@ CREATE INDEX `psm_annotation_large_value_primary_id_fk_idx` ON `psm_annotation_l
 -- -----------------------------------------------------
 -- Table `crosslink__rep_pept__search__generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `crosslink__rep_pept__search__generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `crosslink__rep_pept__search__generic_lookup` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -2063,7 +2062,7 @@ CREATE INDEX `search_id_protein_data__search_id_must_be_first_idx` ON `crosslink
 -- -----------------------------------------------------
 -- Table `monolink__rep_pept__search__generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `monolink__rep_pept__search__generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `monolink__rep_pept__search__generic_lookup` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -2097,7 +2096,7 @@ CREATE INDEX `search_id_protein_data__search_id_must_be_first_idx` ON `monolink_
 -- -----------------------------------------------------
 -- Table `dimer__rep_pept__search__generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `dimer__rep_pept__search__generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `dimer__rep_pept__search__generic_lookup` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -2131,7 +2130,7 @@ CREATE INDEX `search_id_protein_data__search_id_must_be_first_idx` ON `dimer__re
 -- -----------------------------------------------------
 -- Table `looplink__rep_pept__search__generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `looplink__rep_pept__search__generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `looplink__rep_pept__search__generic_lookup` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -2166,7 +2165,7 @@ CREATE INDEX `search_id_protein_data__search_id_must_be_first_idx` ON `looplink_
 -- -----------------------------------------------------
 -- Table `unlinked__rep_pept__search__generic_lookup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `unlinked__rep_pept__search__generic_lookup` ;
+
 
 CREATE TABLE IF NOT EXISTS `unlinked__rep_pept__search__generic_lookup` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -2199,7 +2198,7 @@ CREATE INDEX `search_id_protein_data__search_id_must_be_first_idx` ON `unlinked_
 -- -----------------------------------------------------
 -- Table `linker_per_search_monolink_mass`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `linker_per_search_monolink_mass` ;
+
 
 CREATE TABLE IF NOT EXISTS `linker_per_search_monolink_mass` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -2230,7 +2229,7 @@ CREATE INDEX `linkr_pr_srch_monolnk_mss_search_fk_idx` ON `linker_per_search_mon
 -- -----------------------------------------------------
 -- Table `linker_per_search_crosslink_mass`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `linker_per_search_crosslink_mass` ;
+
 
 CREATE TABLE IF NOT EXISTS `linker_per_search_crosslink_mass` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -2256,6 +2255,35 @@ COLLATE = latin1_bin;
 CREATE INDEX `linkr_pr_srch_monolnk_mss_linker_fk_idx` ON `linker_per_search_crosslink_mass` (`linker_id` ASC);
 
 CREATE INDEX `linkr_pr_srch_monolnk_mss_search_fk_idx` ON `linker_per_search_crosslink_mass` (`search_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `cutoffs_applied_on_import`
+-- -----------------------------------------------------
+
+
+CREATE TABLE IF NOT EXISTS `cutoffs_applied_on_import` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `search_id` INT UNSIGNED NOT NULL,
+  `annotation_type_id` INT UNSIGNED NOT NULL,
+  `cutoff_value_string` VARCHAR(255) NOT NULL,
+  `cutoff_value_double` DOUBLE NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `cutoffs_applied_on_import_ann_type_id_fk`
+    FOREIGN KEY (`annotation_type_id`)
+    REFERENCES `annotation_type` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `cutoffs_applied_on_import_search_id_fk`
+    FOREIGN KEY (`search_id`)
+    REFERENCES `search` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX `cutoffs_at_import_ann_type_id_fk_idx` ON `cutoffs_applied_on_import` (`annotation_type_id` ASC);
+
+CREATE INDEX `cutoffs_applied_on_import_search_id_fk_idx` ON `cutoffs_applied_on_import` (`search_id` ASC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

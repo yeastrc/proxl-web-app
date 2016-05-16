@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.auth.db.AuthLibraryDBConnectionFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.auth_db.AuthLibraryDBConnectionFactoryForWeb;
+import org.yeastrc.xlink.www.config_system_table.AppContextConfigSystemValuesRetrieval;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.db_web.DBConnectionFactoryWeb;
 import org.yeastrc.xlink.www.db_web.DBSet_JNDI_Name_FromConfigFile;
@@ -67,7 +68,14 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 			throw new RuntimeException( e );
 		} 
 		
+		
+		AppContextConfigSystemValuesRetrieval appContextConfigSystemValuesRetrieval = 
+				new AppContextConfigSystemValuesRetrieval();
 
+		context.setAttribute( WebConstants.CONFIG_SYSTEM_VALUES_HTML_KEY, appContextConfigSystemValuesRetrieval );
+
+		
+		
 		log.warn( "INFO:  !!!!!!!!!!!!!!!   Start up of web app  'Proxl' complete  !!!!!!!!!!!!!!!!!!!! " );
 
 		log.warn( "INFO: Application context values set.  Key = " + WebConstants.APP_CONTEXT_CONTEXT_PATH + ": value = " + contextPath

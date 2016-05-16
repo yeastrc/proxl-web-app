@@ -11,8 +11,13 @@ public class WebConstants {
 	 */
 	public static final String APP_CONTEXT_CONTEXT_PATH = "contextPath";
 	
-	
 
+	/**
+	 * specific config_system table values
+	 */
+	public static final String CONFIG_SYSTEM_VALUES_HTML_KEY = "configSystemValues";
+	
+	
 
 	//////////  Cookie Key values
 
