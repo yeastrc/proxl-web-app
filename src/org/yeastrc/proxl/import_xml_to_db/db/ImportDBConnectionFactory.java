@@ -271,7 +271,7 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 
 			dataSource = new BasicDataSource();
 			dataSource.setUrl("jdbc:mysql://" + dbURL + ":" + dbPort + "/" + db +
-					"?useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8" );  // removed autoReconnect=true&
+					"?useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8&useSSL=false" );  // removed autoReconnect=true&
 
 			dataSource.setUsername( username );
 			dataSource.setPassword( password );
