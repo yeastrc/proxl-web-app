@@ -141,12 +141,15 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	  		></a>
 	  	    
 	  		<a href="${ contextPath }/accountPage.do"  id="account_settings_header_link" 
-	  			><img src="${ contextPath }/images/icon-settings.png" 
+	  			><img src="${ contextPath }/images/icon-user-settings.png" 
 	  		></a>
 	  		
 		  <c:if test="${headerUserIsAdmin}" >
 	  		<a href="${ contextPath }/manageUsersPage.do" id="manage_users_header_link" 
 		  		><img src="${ contextPath }/images/icon-users.png" 
+	  		></a>
+	  		<a href="${ contextPath }/manageConfiguration.do"  id="manage_proxl_settings_header_link" 
+	  			><img src="${ contextPath }/images/icon-proxl-config.png" 
 	  		></a>
 	  	  </c:if>
 	  		
@@ -154,20 +157,25 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	  			><img src="${ contextPath }/images/icon-logout.png" class="header-logout-image" 
 	  		></a>
 	  		
-	  	<%--  Simulated tool tips, absolutely positioned divs --%>
-  		<div class="header-icon-tool-tips" id="account_settings_header_tooltip" >
-  			Account Settings
-  		</div>
-  		<div class="header-icon-tool-tips" id="manage_users_tooltip_header" >
-  			Manage Users
-  		</div>
-  		<div class="header-icon-tool-tips" id="sign_out_header_tooltip" >
-  			Sign Out
-  		</div>
-  		<div class="header-icon-tool-tips" id="help_header_tooltip" >
-  			View ProXL Documentation
-  		</div>
-  		
+		  	<%--  Simulated tool tips, absolutely positioned divs --%>
+	  		<div class="header-icon-tool-tips" id="account_settings_header_tooltip" >
+	  			Account Settings
+	  		</div>
+		  <c:if test="${headerUserIsAdmin}" >
+	  		<div class="header-icon-tool-tips" id="manage_users_tooltip_header" >
+	  			Manage Users
+	  		</div>
+	  		<div class="header-icon-tool-tips" id="manage_config_tooltip_header" >
+	  			Manage Proxl Configuration
+	  		</div>
+	  	  </c:if>
+	  		<div class="header-icon-tool-tips" id="sign_out_header_tooltip" >
+	  			Sign Out
+	  		</div>
+	  		<div class="header-icon-tool-tips" id="help_header_tooltip" >
+	  			View ProXL Documentation
+	  		</div>
+	  		
   	   </div>
   	     	  
   	   <div  class="header-user-name-container"> 

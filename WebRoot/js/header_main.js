@@ -102,6 +102,16 @@ var initHeaderMain = function() {
 		
 	} );
 	
+	$("#manage_proxl_settings_header_link").mouseenter( function( eventObject  ) {
+		
+		$("#manage_config_tooltip_header").show();
+		
+	} ).mouseleave( function( eventObject  ) {
+		
+		$("#manage_config_tooltip_header").hide();
+		
+	} );	
+	
 	$("#sign_out_header_link").mouseenter( function( eventObject  ) {
 		
 		$("#sign_out_header_tooltip").show();

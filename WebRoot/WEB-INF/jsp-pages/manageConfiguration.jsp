@@ -37,7 +37,7 @@
   <div class="overall-enclosing-block">
 
 	
-	<div class="top-level-label">Manage Configuration</div>
+	<div class="top-level-label manage-config-title">Manage Configuration</div>
 	
 	<div class="top-level-label-bottom-border" ></div>
 

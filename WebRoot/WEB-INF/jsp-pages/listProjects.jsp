@@ -72,9 +72,6 @@
 		
 		</div>		
 	
-	<br>
-	<br>
-	
 	<div class="top-level-label your-projects-title" >Your Projects</div>	
 	
 	

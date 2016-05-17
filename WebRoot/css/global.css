@@ -759,12 +759,22 @@ body.view-merged-image-page   .selected-proteins-container .sort-handle-float { 
 body.view-merged-image-page   .selected-proteins-container .text-float {float: left; margin-right: 3px; max-width: 200px;overflow: hidden; text-overflow: ellipsis; }
 body.view-merged-image-page   .selected-proteins-container .delete-icon-float {float: left; padding-top: 1px; padding-right: 3px; } 
 
+
+
+
+/*****   Proxl Management Pages  *****/
 	
+	
+  /*  Proxl Config Page */
+
+body.manage-configuration-page .manage-config-title { margin-top: 20px; margin-bottom: 10px; font-weight: bold; }
+
+  	
 
 
 
 
-/*  User Account Management Pages */
+/*****  User Account Management Pages ****/
 
 /*  User Account Page  */
 
