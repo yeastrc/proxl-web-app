@@ -287,18 +287,7 @@
 				</script>
 				
 								
-				<div id="selected_proteins_outer_container">
-				  <div id="selected_proteins_container" class="selected-proteins-container">
-				  </div>
-				</div>
-				
-				<div style="float: left;">
-				  <div >
-					<input type="button" class="tool_tip_attached_jq" data-tooltip="Add another protein bar to the image" 
-						id="svg-protein-selector_location"
-						onclick="openSelectProteinSelect( { clickedThis : this, addProteinsClicked : true } )" value="Add Protein">
-				  </div>
-				</div>
+
 
 
 				<div style="margin-top: 5px; clear: both; ">
@@ -406,14 +395,44 @@
 					<span id="horizontal_scaling_value" >100</span>%
 
 				</div>
+				
+				<div style="margin-top: 10px;">
+					<div id="selected_proteins_outer_container">
+					  <div id="selected_proteins_container" class="selected-proteins-container">
+					  </div>
+					</div>
+					
+					<div style="float: left;">
+					  <div >
+						<input type="button" class="tool_tip_attached_jq" data-tooltip="Add another protein bar to the image" 
+							id="svg-protein-selector_location"
+							onclick="openSelectProteinSelect( { clickedThis : this, addProteinsClicked : true } )" value="Add Protein">
+					  </div>
+					</div>
+				</div>		
+				
+				<div style="clear: both;"></div>		
 					
 			</div>
 		
+				<%--  Only shown when no proteins selected --%>
+				
+			<div id="no_proteins_add_protein_outer_container" style="display: none;">
+			
+				<div class="no-proteins-add-protein-block"
+					onclick="openSelectProteinSelect( { clickedThis : this, addProteinsClicked : true } )" >
+
+						Click to Add Protein
+				</div>
+			
+			</div>
+						
+
 
 			<%-- !!!!!!!!!!!! The image  !!!!!!!!!!! --%>
 			
 			<div id="svg_image_outer_container_div" 
-				style="width:100%;  margin-top: 10px; overflow-x: auto;">  
+				style="width:100%;  margin-top: 10px; overflow-x: auto; display: none;">  
 						<%-- overflow-x: auto; padding: 4px; border-style: solid; border-color: #CCCCCC; border-width: 1px;  --%>
 						<%--   Took out the overflow-x since the svg has too much white space on the right side for this to work and look ok --%>
 
