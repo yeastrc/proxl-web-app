@@ -2313,9 +2313,19 @@ function showSelectedProteins() {
 	var selectedProteinIds = getAllSelectedProteins();
 	
 	if ( !selectedProteinIds || selectedProteinIds.length < 1 || _proteins.length < 1 ) {
-				
+
+		$("#no_proteins_add_protein_outer_container").show();
+		$("#svg_image_outer_container_div").hide();
+		
 		return;
+
+	} else {
+		
+		$("#svg_image_outer_container_div").show();
+		$("#no_proteins_add_protein_outer_container").hide();
 	}
+	
+	
 
 	var $selected_protein_entry_template = $("#selected_protein_entry_template");
 	
@@ -2330,11 +2340,11 @@ function showSelectedProteins() {
 		throw "selectedProteinEntry_template_handlebarsSource === null";
 	}
 
-	var selectedProteinEntry_HandlebarsTemplate = Handlebars.compile( selectedProteinEntry_template_handlebarsSource );
-
 	
 	if ( selectedProteinIds ) {
-		
+
+		var selectedProteinEntry_HandlebarsTemplate = Handlebars.compile( selectedProteinEntry_template_handlebarsSource );
+
 		for ( var i = 0; i < selectedProteinIds.length; i++ ) {
 
 			var proteinId = selectedProteinIds[ i ];
@@ -7654,7 +7664,7 @@ function getSVGContentsAsString() {
 
 var viewerInitialized = false;
 
-function initializeViewer()  { 
+function initializeViewer()  {
 
 	showSelectedProteins();
 	
