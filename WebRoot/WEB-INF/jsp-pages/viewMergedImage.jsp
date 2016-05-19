@@ -296,7 +296,7 @@
 				  <div >
 					<input type="button" class="tool_tip_attached_jq" data-tooltip="Add another protein bar to the image" 
 						id="svg-protein-selector_location"
-						onclick="openSelectProteinSelect( { clickedThis : this } )" value="Add Protein">
+						onclick="openSelectProteinSelect( { clickedThis : this, addProteinsClicked : true } )" value="Add Protein">
 				  </div>
 				</div>
 
@@ -499,12 +499,31 @@
 			
 				<div id="select_protein_overlay_header" class="select-protein-overlay-header" style="width:100%; " >
 					<h1 id="select_protein_overlay_X_for_exit_overlay" class="select-protein-overlay-X-for-exit-overlay" >X</h1>
-					<h1 id="select_protein_overlay_header_text" class="select-protein-overlay-header-text" >Select Protein</h1>
+					<h1 id="select_protein_overlay_header_text" class="select-protein-overlay-header-text" 
+						><span id="select_protein_add_proteins_overlay_header_text" >Add Protein(s)</span
+						><span id="select_protein_change_protein_overlay_header_text" >Change Protein</span
+						></h1>
 				</div>
 				<div id="select_protein_overlay_body" class="select-protein-overlay-body" >
 				
+				  <div style=" margin-bottom: 10px;" >
+					<div id="select_protein_add_proteins_overlay_body_text">
+						Choose protein(s) and click "Add"
+					</div>
+				
+					<div id="select_protein_change_protein_overlay_body_text">
+						Choose a protein
+					</div>
+				  </div>
+				
 					<div id="protein_list_container" class=" protein-list-container">
 					</div>
+					
+					<div id="select_protein_add_proteins_overlay_add_button_container"
+						style=" margin-top: 10px;" >
+						<input type="button" value="Add"  id="select_protein_add_proteins_overlay_add_button" 
+							 class="tool_tip_attached_jq" data-tooltip="Add selected proteins" />
+					</div> 
 					
 				</div> <%--  END  <div id="select_protein_overlay_body"  --%>
 				

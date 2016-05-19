@@ -212,6 +212,12 @@ var _PROTEIN_BAR_PROTEIN_NAME_LABEL_CLASS = "protein_bar_protein_name_jq";
 var _PROTEIN_BAR_GROUP_ON_TOP_OF_MAIN_RECTANGLE_LABEL_CLASS = "protein_bar_group_on_top_of_main_rectangle_jq";
 
 
+
+///   CSS Class name constants for processing Protein Selection Overlay
+
+var _PROTEIN_OVERLAY_PROTEIN_SELECTED = "select-protein-overlay-user-selected-protein";
+
+
 ////////////////////////////////////////////////////////////////////////
 
 //  Mapping to/from JSON put on Hash in URL
@@ -6996,9 +7002,16 @@ function openSelectProteinSelect( params ) {
 	
 	var clickedThis = params.clickedThis;
 	
+	var addProteinsClicked = params.addProteinsClicked;
+	
 	if ( ! clickedThis ) {
 		
 		throw "clickedThis is empty";
+	}
+	
+	if ( addProteinsClicked === undefined ) {
+		
+		addProteinsClicked = false;
 	}
 
 	var $clickedThis = $( clickedThis );
@@ -7018,8 +7031,6 @@ function openSelectProteinSelect( params ) {
 
 	$protein_select_text_container_jq.qtip('toggle', false); // Immediately hide all tooltips belonging to the selected elements
 	
-	
-
 	var positionIndexSelectedProtein = $clickedThis.attr("data-position_index");
 	var proteinIdSelectedProtein = $clickedThis.attr("data-protein_id");
 	
@@ -7031,6 +7042,39 @@ function openSelectProteinSelect( params ) {
 	if ( proteinIdSelectedProtein === undefined ) {
 		proteinIdSelectedProtein = null;
 	}
+	
+	
+	
+	if ( addProteinsClicked ) {
+		
+		//  "Add Protein" button clicked
+		
+		positionIndexSelectedProtein = null;
+		proteinIdSelectedProtein = null;
+		
+		$("#select_protein_add_proteins_overlay_header_text").show();
+		$("#select_protein_change_protein_overlay_header_text").hide();
+
+		$("#select_protein_add_proteins_overlay_body_text").show();
+		$("#select_protein_change_protein_overlay_body_text").hide();
+		
+		$("#select_protein_add_proteins_overlay_add_button_container").show();
+
+	} else {
+		
+		//  An existing protein is clicked
+		
+		$("#select_protein_change_protein_overlay_header_text").show();
+		$("#select_protein_add_proteins_overlay_header_text").hide();
+		
+		$("#select_protein_change_protein_overlay_body_text").show();
+		$("#select_protein_add_proteins_overlay_body_text").hide();
+	
+		$("#select_protein_add_proteins_overlay_add_button_container").hide();
+		
+	}
+	
+	
 
 	$("#select_protein_modal_dialog_overlay_background").show();
 
@@ -7041,15 +7085,24 @@ function openSelectProteinSelect( params ) {
 	
 	var $protein_list_container = $("#protein_list_container");
 	
-	//  Save off values from clicked Selected Protein.  Will be undefined for Add Protein
+	//  Save off values from clicked Selected Protein.  Will be null for Add Protein
 	
-	$protein_list_container.data( { positionIndex: positionIndexSelectedProtein, proteinIdSelectedProtein : proteinIdSelectedProtein } );
+	$protein_list_container.data( { 
+		positionIndex: positionIndexSelectedProtein, 
+		proteinIdSelectedProtein : proteinIdSelectedProtein,
+		addProteinsClicked : addProteinsClicked } );
 	
 	//  Highlight the currently selected protein
 	
 	var $protein_select_jq_Items = $protein_list_container.find(".protein_select_jq");
 	
+
+	//  Clean up to remove all highlighted protein names
+	
 	$protein_select_jq_Items.removeClass("single-protein-select-item-highlight");
+	
+	$protein_select_jq_Items.removeClass( _PROTEIN_OVERLAY_PROTEIN_SELECTED );
+	
 	
 	if ( proteinIdSelectedProtein !== undefined && proteinIdSelectedProtein !== null ) {
 		
@@ -7096,6 +7149,8 @@ function openSelectProteinSelect( params ) {
 	var OVERLAY_STANDARD_WIDTH = 400;
 	var OVERLAY_MINIMUM_WIDTH = 300;
 	
+	var OVERLAY_MINIMUM_HEIGTH = 150;
+	
 	var OVERLAY_MINIMUM_LEFT_BUFFER = 5;
 	var OVERLAY_MINIMUM_RIGHT_BUFFER = 5;
 	
@@ -7106,7 +7161,7 @@ function openSelectProteinSelect( params ) {
 	
 	var windowScrollLeft = $window.scrollLeft();
 
-//	var viewportHeight = $window.height();
+	var viewportHeight = $window.height();
 	var viewportWidth = $window.width();
 	
 	
@@ -7131,7 +7186,6 @@ function openSelectProteinSelect( params ) {
 	if ( overlayNewOffsetLeft < leftEdgeOfPageinViewport + OVERLAY_MINIMUM_LEFT_BUFFER ) {
 		
 		overlayNewOffsetLeft = leftEdgeOfPageinViewport + OVERLAY_MINIMUM_LEFT_BUFFER;
-		
 	}
 	
 	if ( ( overlayNewOffsetLeft + overlayNewWidth + OVERLAY_MINIMUM_RIGHT_BUFFER ) > ( rightEdgeOfPageinViewport ) ) {
@@ -7159,24 +7213,45 @@ function openSelectProteinSelect( params ) {
 			}
 			
 		}
-		
 	}
+	
+	//   Set overlay height to viewport - 40px or at minimum height
+
+	var overlayHeight = viewportHeight - 40;
+	
+	var current_select_protein_overlay_div_Heigth = $select_protein_overlay_div.height();
+
+	var overlayHeightDiff = overlayHeight - current_select_protein_overlay_div_Heigth;
+	
+	var current_protein_list_container_Height = $protein_list_container.height();
+	
+	var new_current_protein_list_container_Height = current_protein_list_container_Height + overlayHeightDiff;
+	
+	if ( new_current_protein_list_container_Height < OVERLAY_MINIMUM_HEIGTH ) {
+		
+		new_current_protein_list_container_Height = OVERLAY_MINIMUM_HEIGTH ;
+	}
+	
 	
 	//  Position Overlay Vertically
 
-	var overlayNewTop = windowScrollTop + 5;
+	var overlayNewTop = windowScrollTop + 10;
 
 	//  Apply position to overlay
 	
-	$select_protein_overlay_div.css( { left : overlayNewOffsetLeft + "px", width : overlayNewWidth + "px", top : overlayNewTop + "px" } );
+	$select_protein_overlay_div.css( { 
+		left : overlayNewOffsetLeft + "px", 
+		top : overlayNewTop + "px",
+		width : overlayNewWidth + "px" } );
 	
+	$protein_list_container.css( { height : new_current_protein_list_container_Height + "px" } ); 
 }
 
 
 
 function processClickOnSelectProtein( params ) {
 	
-	var clickedThis = params.clickedThis;
+	var clickedThis = params.clickedThis; //  HTML <div> object for clicked protein name
 	
 	var $clickedThis = $( clickedThis );
 	
@@ -7187,6 +7262,8 @@ function processClickOnSelectProtein( params ) {
 	
 	var positionIndex = protein_list_container_Data.positionIndex;
 	var proteinIdSelectedProtein = protein_list_container_Data.proteinIdSelectedProtein;
+	
+	var addProteinsClicked = protein_list_container_Data.addProteinsClicked;
 	
 	
 	var selectedProteinId = $clickedThis.attr("data-protein_id");
@@ -7200,20 +7277,19 @@ function processClickOnSelectProtein( params ) {
 		return;
 	}
 	
-	if ( positionIndex === undefined || positionIndex === null ) {
+	if ( addProteinsClicked ) {
 		
-		//  Add a new protein bar entry
+		//  Adding proteins so mark this protein as selected, unless it is selected and then mark as unselected
 		
-		var newImageProteinBarData = ImageProteinBarData.constructEmptyImageProteinBarData();
+		if ( $clickedThis.hasClass( _PROTEIN_OVERLAY_PROTEIN_SELECTED ) ) {
+			
+			 $clickedThis.removeClass( _PROTEIN_OVERLAY_PROTEIN_SELECTED );
+		} else {
+			
+			 $clickedThis.addClass( _PROTEIN_OVERLAY_PROTEIN_SELECTED );
+		}
 		
-		newImageProteinBarData.setProteinId( { proteinId : selectedProteinId, proteinIdIsSelected : true } );
-		
-		var proteinLength = _proteinLengths[ selectedProteinId ];
-		
-		newImageProteinBarData.setProteinLength( { proteinLength : proteinLength } );
-		
-		_imageProteinBarDataManager.addEntry( { entry : newImageProteinBarData } );
-		
+		markInvalidProteinsInProteinSelector( { positionIndexSelectedProtein : positionIndex } );
 		
 	} else {
 
@@ -7229,7 +7305,44 @@ function processClickOnSelectProtein( params ) {
 		var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : positionIndexInt } );
 		
 		imageProteinBarDataItem.setProteinId( { proteinId : selectedProteinId, proteinIdIsSelected : true } );
+		
+
+		closeAddProteinSelect();
+		
+		updateURLHash( false /* useSearchForm */ );
+		
+		showSelectedProteins();
+		
+		loadDataAndDraw( true /* doDraw */ );
 	}
+	
+}
+
+
+function processClickOnAddProteins( ) {
+	
+
+	//  Add one or more new protein bar entries
+	
+	var $selectedEntries = $("#protein_list_container ." + _PROTEIN_OVERLAY_PROTEIN_SELECTED );
+	
+	$selectedEntries.each( function( index, element ) {
+	
+		var $this = $( this );
+		
+		var selectedProteinId = $this.attr("data-protein_id");
+		
+		var newImageProteinBarData = ImageProteinBarData.constructEmptyImageProteinBarData();
+		
+		newImageProteinBarData.setProteinId( { proteinId : selectedProteinId, proteinIdIsSelected : true } );
+		
+		var proteinLength = _proteinLengths[ selectedProteinId ];
+		
+		newImageProteinBarData.setProteinLength( { proteinLength : proteinLength } );
+		
+		_imageProteinBarDataManager.addEntry( { entry : newImageProteinBarData } );
+		
+	} );
 	
 	closeAddProteinSelect();
 	
@@ -7238,8 +7351,8 @@ function processClickOnSelectProtein( params ) {
 	showSelectedProteins();
 	
 	loadDataAndDraw( true /* doDraw */ );
+	
 }
-
 
 
 
@@ -7305,6 +7418,9 @@ function markInvalidProteinsInProteinSelector( params ) {
 	
 	var positionIndexSelectedProtein = params.positionIndexSelectedProtein;
 
+	//  validProteins contains array of protein ids that the selected protein ids link to, 
+	//    excluding the protein id at position positionIndexSelectedProtein ( null or undefined for add )
+	
 	var validProteins = getValidProteins( { positionIndexSelectedProtein : positionIndexSelectedProtein } );
 
 	var $protein_list_container = $("#protein_list_container");
@@ -7319,7 +7435,9 @@ function markInvalidProteinsInProteinSelector( params ) {
 		
 		var protein_select_jq_protein_id = $protein_select_jq.attr("data-protein_id");
 
-		if ( $( "input#show-crosslinks" ).is( ':checked' ) && $.inArray( protein_select_jq_protein_id, validProteins ) == -1 ) {
+		if ( $( "input#show-crosslinks" ).is( ':checked' ) 
+				&& $.inArray( protein_select_jq_protein_id, validProteins ) == -1 ) {
+			
 			$(this).addClass("select-protein-overlay-dimmed-protein-select-text");
 		}
 	});
@@ -7333,12 +7451,6 @@ function getValidProteins( params ) {
 	var positionIndexSelectedProtein = params.positionIndexSelectedProtein;
 	
 	///  Producing a list of protein ids that the other selected protein ids link to
-	
-	
-	//  $select is current selector
-	
-	//  TODO   Rewrite this
-	
 	
 	if ( _proteinLinkPositions == undefined ) {
 		
@@ -7360,6 +7472,23 @@ function getValidProteins( params ) {
 		//  Get all proteins since no current selector
 		selectedProteins = getAllSelectedProteins();
 	}
+	
+	//  Add in proteins already selected in the protein selection overlay
+		
+	var $selectedEntries = $("#protein_list_container ." + _PROTEIN_OVERLAY_PROTEIN_SELECTED );
+
+	$selectedEntries.each( function( index, element ) {
+
+		var $this = $( this );
+
+		var selectedProteinId = $this.attr("data-protein_id");
+
+		if ( $.inArray( selectedProteinId, selectedProteins ) == -1 ) {
+		
+			selectedProteins.push( selectedProteinId );
+		}
+	
+	} );	
 	
 	var vProteins = new Array();
 
@@ -7997,12 +8126,18 @@ function initPage() {
 		defaultPageView.searchFormChanged_ForDefaultPageView();
 	});
 	
-	$("#select_protein_modal_dialog_overlay_background").click( function( eventObject ) {
-		closeAddProteinSelect();
-	} );
+	//  select_protein_modal_dialog_overlay_background
+	
 	$("#select_protein_overlay_X_for_exit_overlay").click( function( eventObject ) {
 		closeAddProteinSelect();
 	} );
+	
+	
+	$("#select_protein_add_proteins_overlay_add_button").click( function( eventObject ) {
+		processClickOnAddProteins();
+	} );
+	
+	
 	
 	_proteinBarRegionSelectionsOverlayCode.init();
 	

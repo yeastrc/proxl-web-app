@@ -941,14 +941,20 @@ manage users:
 	overflow-y: auto; 
 }
 
-div.single-protein-select-item { color: black; padding: 3px;  cursor: pointer; overflow-x: hidden; text-overflow: ellipsis; } /* max-width: 400px; */
+.single-protein-select-item { color: black; padding: 4px;  cursor: pointer; overflow-x: hidden; text-overflow: ellipsis; } /* max-width: 400px; */
 
-div.single-protein-select-item:hover { color: #FFFFFF; background-color: #A55353; padding: 2px; border-style: solid; border-color: #D3D3D3; border-width: 1px; }
+div.single-protein-select-item:hover { color: black; background-color: #FFF0F0; padding: 2px; border-style: solid; border-color: #A55353; border-width: 2px; }
 
 /* Used to show currently selected protein */
-div.single-protein-select-item-highlight { color: black; background-color: #FFF0F0; padding: 2px; border-style: solid; border-color: #D3D3D3; border-width: 1px;  }
+div.single-protein-select-item-highlight  { color: #FFFFFF; background-color: #A55353; padding: 4px; }
 
-div.select-protein-overlay-dimmed-protein-select-text { color: #969696; }
+
+.select-protein-overlay-dimmed-protein-select-text { color: #969696; }
+div.select-protein-overlay-dimmed-protein-select-text:hover { color: #969696; }
+
+/* Used to show clicked on, selected protein */
+div.select-protein-overlay-user-selected-protein  { color: #FFFFFF; background-color: #A55353; padding: 4px; }
+div.select-protein-overlay-user-selected-protein:hover { background-color: #FFF0F0;  }
 
 
 
