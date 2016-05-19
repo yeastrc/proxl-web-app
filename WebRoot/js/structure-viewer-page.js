@@ -2692,7 +2692,11 @@ var listChains = function( doDraw ) {
 		html = "<div style=\"margin-top:10px;\" id=\"chain-" + chains[ i ].name() + "-div\"><span style=\"font-size:14pt;\">Chain: " + chains[ i ].name() + "</span>\n";
 
 		if( _PDB_FILES[ pdbFile.id ][ 'canEdit' ] ) {
-			html += "<a class=\"tool_tip_attached_jq\" data-tooltip=\"Map this chain's sequence to the sequence of a protein found in the search\" href=\"javascript:mapProtein( '" + chains[ i ].name() + "')\">[Map Protein]</a>";
+			if( PDBChainIsProtein( chains[ i ].name() ) ) {
+				html += "<a class=\"tool_tip_attached_jq\" data-tooltip=\"Map this chain's sequence to the sequence of a protein found in the search\" href=\"javascript:mapProtein( '" + chains[ i ].name() + "')\">[Map Protein]</a>";
+			} else {
+				html += "[Chain is not a peptide]";
+			}
 		}
 		
 		// list out the proteins we've aligned to this chain previously, which are also in this experiment
@@ -3951,6 +3955,27 @@ var getNrseqProteinPositions = function( alignments, pdbPosition ) {
 	}
 	
 	return nrseqProteinPositions;	
+};
+
+/**
+ * Returns true if the supplied chain is a protein sequence (all
+ * residues are amino acids). False otherwise.
+ */
+var PDBChainIsProtein = function( chainName ) {
+	
+	if( !_STRUCTURE ) { return false; }
+	if( !_STRUCTURE.chainByName( chainName ) ) { return false; }
+	
+	var residues = _STRUCTURE.chainByName( chainName ).residues();
+	if( !residues ) { return false; }
+	
+	for( var i = 0; i < residues.length; i++ ) {
+		if( !residues[ i ].isAminoacid() ) {
+			return false;
+		}
+	}
+	
+	return true;
 };
 
 
