@@ -55,7 +55,7 @@ To set up this database, first download :download:`create_empty_database.sql <..
 To run this SQL script, do one of the following:
     * Log into your MySQL server and paste in the file contents.
     * Source the file by logging into MySQL and typing the following at the MySQL prompt: ``source /location/to/create_empty_database.sql``. (Be sure MYSQL has read access to the file).
-    * At the command line: ``cat /location/to/create_empty_database.sql | mysql -u your_username -p``
+    * At the command line (on macos or linux): ``cat /location/to/create_empty_database.sql | mysql -u your_username -p``
 
 Populate the ``proxl`` database with needed data.
 -------------------------------------------------------
@@ -69,7 +69,7 @@ To run this SQL script, do one of the following:
 Add in initial ProXL configuration.
 -------------------------------------------------------
 Configuration in ProXL is done via the ``config_system`` table in the ``proxl`` database. To populate
-this table with initial configuration information, first download :download:`insert_initial_data.sql <../../database_scripts/install/insert_initial_proxl_config.sql>`.
+this table with initial configuration information, first download :download:`insert_initial_proxl_config.sql <../../database_scripts/install/insert_initial_proxl_config.sql>`.
 Edit this file in a text editor, and change the value for your SMTP server (if necessary). This is a server through which email is sent, and such a service is likely
 already running on your server (localhost), or is provided to you by your institution (e.g., smtp.uw.edu). Also be sure to configure the "from" address, from which
 ProXL emails will be sent (e.g., proxl@your.institution.edu). No other values need be changed.
@@ -77,16 +77,16 @@ ProXL emails will be sent (e.g., proxl@your.institution.edu). No other values ne
 Once changed, run this SQL script by doing one of the following:
     * Log into your MySQL server and paste in the file contents.
     * Source the file by logging into MySQL and typing the following at the MySQL prompt: ``source /location/to/insert_initial_proxl_config.sql``. (Be sure MYSQL has read access to the file).
-    * At the command line: ``cat /location/to/insert_initial_proxl_config.sql | mysql -u your_username -p``
+    * At the command line (on macos or linux): ``cat /location/to/insert_initial_proxl_config.sql | mysql -u your_username -p``
 
 (Optional) Populate the ``taxonomy`` table.
 -------------------------------------------------------
 In order to provide functionality based on taxonomy (such as filtering searches based on taxonomy of hit proteins), the
-``taxonomy`` table must be populated. To populate this table, download :download:`insert_initial_data.sql <../../database_scripts/install/create_taxonomy_table.sql>` and
+``taxonomy`` table must be populated. To populate this table, download :download:`create_taxonomy_table.sql <../../database_scripts/install/create_taxonomy_table.sql>` and
 execute the SQL script doing one of the following (note, file is too big to paste in the contents from a text editor):
 
     * Source the file by logging into MySQL and typing the following at the MySQL prompt: ``source /location/to/create_taxonomy_table.sql``. (Be sure MYSQL has read access to the file).
-    * At the command line: ``cat /location/to/create_taxonomy_table.sql | mysql -u your_username -p``
+    * At the command line (on macos or linux): ``cat /location/to/create_taxonomy_table.sql | mysql -u your_username -p``
 
 
 4. Install and configure the web application
@@ -97,7 +97,7 @@ Add MySQL user for Tomcat access
 Follow these instructions to set up access for Tomcat to access the MySQL databases.
 
 |	Log in to MySQL as root:
-|	``shell> mysql -u root mysql``
+|	``shell> mysql -u root -p``
 |	
 |	Create the MySQL user:
 |	``mysql> CREATE USER 'proxl_user'@'localhost' IDENTIFIED BY 'password';``	
