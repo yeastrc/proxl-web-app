@@ -13,7 +13,7 @@ data. While projects serve to logically organize data by theme or aim,
 they also serve to organize the data by who you would like to have access
 to those data. All data are associated with projects and, by default, only the researchers
 associated with a project may view data associated with that project. (These permissions
-by be changed, see :ref:`public-access-label`.)
+can be changed, see :ref:`public-access-label`.)
 
 
 Gaining Access

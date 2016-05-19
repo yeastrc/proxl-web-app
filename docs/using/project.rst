@@ -160,7 +160,7 @@ Explore Data
 
 This section lists each of the searches associated with this project. A "search" in this context
 is a run of Kojak, XQuest or some other peptide-spectrum match software pipeline run against spectral
-data. Project owners may change the name of these searches by clicking the pencil icon to the
+data. Project researchers may change the name of these searches by clicking the pencil icon to the
 right of the current search name. To the right of the search name the search ID number is listed
 in parentheses as a standard way to refer to specific searches.
 
