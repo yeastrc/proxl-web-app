@@ -324,11 +324,17 @@
 							
 							<option value="region">Region</option>
 							
-							<c:if test="${ fn:length( searchIds ) <= 3 }">
+							<c:choose>
+							  <c:when test="${ fn:length( searchIds ) <= 3 }">
 							
 								<%-- Only shown when the number of searches is <= the number supported by 'Color by search' --%>
 								<option value="search">Search</option>
-							</c:if>
+							  </c:when>
+							  <c:otherwise>
+							  	<%--  Disable the color by search option --%>
+							  	<option value="search_disabled" disabled="disabled">Search</option>
+							  </c:otherwise>
+							</c:choose>
 						</select>
 					</span>
 								

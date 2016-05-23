@@ -9,6 +9,32 @@
 
 var EXCLUDE_LINK_TYPE_DEFAULT = [ 0 ];
 
+//  Link Length constants
+
+var LINK_LENGTH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR = "SAVED_BACKGROUND_COLOR";
+var LINK_LENGTH_COLOR_BLOCK__DATA__COLOR_BLOCK_LENGTH_LABEL = "COLOR_BLOCK_LENGTH_LABEL";
+
+var LINK_LENGTH_INTERNAL_STRING_SHORT = "SHORT";
+var LINK_LENGTH_INTERNAL_STRING_MEDIUM = "MEDIUM";
+var LINK_LENGTH_INTERNAL_STRING_LONG = "LONG";
+
+//  Link Type constants
+
+var LINK_TYPE_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR = "SAVED_BACKGROUND_COLOR";
+var LINK_TYPE_COLOR_BLOCK__DATA__COLOR_BLOCK_TYPE_LABEL = "COLOR_BLOCK_TYPE_LABEL";
+
+var LINK_TYPE_INTERNAL_STRING_CROSSLINK = "CROSSLINK";
+var LINK_TYPE_INTERNAL_STRING_LOOPLINK = "LOOPLINK";
+var LINK_TYPE_INTERNAL_STRING_MONOLINK = "MONOLINK";
+
+
+//  Color By Search constants
+
+var COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR = "SAVED_BACKGROUND_COLOR";
+var COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS = "SEARCH_IDS";
+
+
+///////////////   Global variables  ////////////////////////
 
 //From Page
 
@@ -407,6 +433,15 @@ function updateURLHash( useSearchForm) {
 	if( isDistanceReportVisible() ) {
 		items[ 'distance-report-visible' ] = true;
 	}
+	
+	// include user-defined coloring of distance constraints based on search
+	items[ 'ucbs' ] = _linkColorHandler.getUserColorBySearch();
+	
+	// include user-defined coloring of distance constraints based on link type
+	items[ 'ucbt' ] = _linkColorHandler.getUserColorByType();
+	
+	// include user-defined coloring of distance constraints based on length
+	items[ 'ucbl' ] = _linkColorHandler.getUserColorByLength();
 	
 	// include user-defined distance constraints for coloring
 	var userDistanceConstraints = _linkColorHandler.getUserDistanceConstraints();
@@ -1247,6 +1282,12 @@ var populatePDBFormArea = function() {
 	if( 'udcs' in json && 'udcl' in json ) {		
 		_linkColorHandler.setUserDistanceConstraints(parseInt( json.udcs), parseInt( json.udcl ) );		
 	}
+
+	_linkColorHandler.setUserColorBySearch( json[ 'ucbs' ] );
+	
+	_linkColorHandler.setUserColorByType( json[ 'ucbt' ] );
+	
+	_linkColorHandler.setUserColorByLength( json[ 'ucbl' ] );
 	
 	drawLegend();
 	
@@ -3560,85 +3601,429 @@ var drawStructure = function() {
 var drawLegend = function() {
 	
 	var $legendDiv = $( '#legend-div' );
-	$legendDiv.empty();	
+	
+	var $legend_by_link_length = $("#legend_by_link_length");
+	var $legend_by_link_type = $("#legend_by_link_type");
+	var $legend_by_search = $("#legend_by_search");
+	
+	$legend_by_link_length.hide();
+	$legend_by_link_type.hide();
+	$legend_by_search.hide();
+	
+	$legendDiv.show();
+	
 	
 	var mode = getLinkColorMode();
 	
 	
-	var html = "<h2 style=\"display:inline;font-size:12pt;margin-top:5px;\">Legend:</h2>";
-	
-	html += "<div id=\"legend-label\" style=\"font-size:10pt;margin-left:20px;\">\n";
-	
 	if( mode === 'type' ) {
 		
-		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.typeColors.crosslink + "\"></span> Crosslinks";
-		html += "</span>\n";
+		$legend_by_link_type.show();
 		
-		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.typeColors.looplink + "\"></span> Looplinks";
-		html += "</span>\n";
+		//  Set color of blocks on legend
 		
-		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.typeColors.monolink + "\"></span> Monolinks";
-		html += "</span>\n";
+		var $legend_by_link_type_crosslink_color_block = $("#legend_by_link_type_crosslink_color_block");
+		var $legend_by_link_type_looplink_color_block = $("#legend_by_link_type_looplink_color_block");
+		var $legend_by_link_type_monolink_color_block = $("#legend_by_link_type_monolink_color_block");
+		
+		var colorCrosslink = _linkColorHandler.getColorByLinkTypeLabel( _linkColorHandler._CONSTANTS.typeColorsProperties.CROSSLINK );
+		var colorLooplink = _linkColorHandler.getColorByLinkTypeLabel( _linkColorHandler._CONSTANTS.typeColorsProperties.LOOPLINK );
+		var colorMonolink = _linkColorHandler.getColorByLinkTypeLabel( _linkColorHandler._CONSTANTS.typeColorsProperties.MONOLINK );
+		
+		$legend_by_link_type_crosslink_color_block.css( { 'background-color' : colorCrosslink } );
+		$legend_by_link_type_crosslink_color_block.data( LINK_TYPE_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorCrosslink );
+		$legend_by_link_type_crosslink_color_block.data( LINK_TYPE_COLOR_BLOCK__DATA__COLOR_BLOCK_TYPE_LABEL, LINK_TYPE_INTERNAL_STRING_CROSSLINK );
+		
+		$legend_by_link_type_looplink_color_block.css( { 'background-color' : colorLooplink } );
+		$legend_by_link_type_looplink_color_block.data( LINK_TYPE_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorLooplink );
+		$legend_by_link_type_looplink_color_block.data( LINK_TYPE_COLOR_BLOCK__DATA__COLOR_BLOCK_TYPE_LABEL, LINK_TYPE_INTERNAL_STRING_LOOPLINK );
+		
+		$legend_by_link_type_monolink_color_block.css( { 'background-color' : colorMonolink } );
+		$legend_by_link_type_monolink_color_block.data( LINK_TYPE_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorMonolink );
+		$legend_by_link_type_monolink_color_block.data( LINK_TYPE_COLOR_BLOCK__DATA__COLOR_BLOCK_TYPE_LABEL, LINK_TYPE_INTERNAL_STRING_MONOLINK );
 		
 	}
 	
 	else if( mode === 'search' ) {
 		
+		$("#legend_by_search  .legend_by_search_container_for_search_jq").hide();
+
+		// color blocks for single search ids
+		
 		for ( var i = 0; i < _searches.length; i++ ) {
-			html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-			html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler.getColorForSearches( [ _searches[ i ].id ] ) + "\"></span> Search: " + _searches[ i ].id;
-			html += "</span>\n";
+			
+			var searchId = _searches[ i ].id;
+			
+			var searchIds = [ searchId ];
+			
+			var colorForBlock = _linkColorHandler.getColorForSearches( searchIds ); 
+				
+			var searchPositionNumber = ( i + 1 );
+			
+			var $legend_by_search_container_for_search_X = $( "#legend_by_search_container_for_search_" + searchPositionNumber );
+			var $legend_by_search_color_block_for_search_X = $( "#legend_by_search_color_block_for_search_" + searchPositionNumber );
+			var $legend_by_search_search_id_for_search_X_jq = $( ".legend_by_search_search_id_for_search_" + searchPositionNumber + "_jq");
+
+			$legend_by_search_container_for_search_X.show();
+			$legend_by_search_color_block_for_search_X.css({ "background-color" : colorForBlock } );
+			$legend_by_search_search_id_for_search_X_jq.text( searchId );
+			
+			$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorForBlock );
+			$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, searchIds );
 		}
+		
+		// color blocks for pairs of search ids
 		
 		for( var i = 0; i < _searches.length; i++ ) {
+			
 			for( var k = 0; k < _searches.length; k++ ) {
-				if( _searches[ i ].id >= _searches[ k ].id ) { continue; }
-								
-				html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-				html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler.getColorForSearches( [ _searches[ i ].id, _searches[ k ].id ] ) + "\"></span> Search: " + _searches[ i ].id + ", " + _searches[ k ].id;
-				html += "</span>\n";
 				
+				if( _searches[ i ].id >= _searches[ k ].id ) { 
+					continue; 
+				}
+
+				var searchId_A = _searches[ i ].id;
+				var searchId_B = _searches[ k ].id;
+				
+				var searchIds = [ searchId_A, searchId_B ];
+				
+				var colorForBlock = _linkColorHandler.getColorForSearches( searchIds ); 
+
+				var searchPositionNumber_A = ( i + 1 );
+				var searchPositionNumber_B = ( k + 1 );
+				
+				var $legend_by_search_container_for_search_X = 
+					$( "#legend_by_search_container_for_search_" + searchPositionNumber_A + "_" + searchPositionNumber_B );
+				var $legend_by_search_color_block_for_search_X = 
+					$( "#legend_by_search_color_block_for_search_" + searchPositionNumber_A + "_" + searchPositionNumber_B );
+
+				$legend_by_search_container_for_search_X.show();
+				$legend_by_search_color_block_for_search_X.css({ "background-color" : colorForBlock } );
+				$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorForBlock );
+				$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, searchIds );
+
 			}
 		}
-		
-		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		
+
 		if( _searches.length === 3 ) {
-			html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler.getColorForSearches( [ _searches[ 0 ].id, _searches[ 1 ].id, _searches[ 2 ].id ] ) + "\"></span> Search: " + _searches[ 0 ].id + ", " + _searches[ 1 ].id + ", " + _searches[ 2 ].id + "</span>\n";
+			
+			var searchIds = [ _searches[ 0 ].id, _searches[ 1 ].id, _searches[ 2 ].id ];
+			
+			var colorForBlock = _linkColorHandler.getColorForSearches( searchIds ); 
+			
+			var $legend_by_search_container_for_search_1_2_3 = $("#legend_by_search_container_for_search_1_2_3");
+			var $legend_by_search_color_block_for_search_1_2_3 = $("#legend_by_search_color_block_for_search_1_2_3");
+			
+			$legend_by_search_container_for_search_1_2_3.show();
+			$legend_by_search_color_block_for_search_1_2_3.css({ "background-color" : colorForBlock } );
+			$legend_by_search_color_block_for_search_1_2_3.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorForBlock );
+			$legend_by_search_color_block_for_search_1_2_3.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, searchIds );
 		}
 
+		$legend_by_search.show();
+		
+		
+//		var html = "";
+//		
+//		for ( var i = 0; i < _searches.length; i++ ) {
+//			html += "<span style=\"white-space:nowrap;margin-left:15px;\">"
+//				+ "<span style=\"display:inline-block;width:11px;height:11px;background-color:" 
+//				+ _linkColorHandler.getColorForSearches( [ _searches[ i ].id ] ) 
+//				+ "\"></span> Search: " + _searches[ i ].id
+//				+ "</span>";
+//		}
+//		
+//		for( var i = 0; i < _searches.length; i++ ) {
+//			
+//			for( var k = 0; k < _searches.length; k++ ) {
+//				
+//				if( _searches[ i ].id >= _searches[ k ].id ) { 
+//					continue; 
+//				}
+//								
+//				html += "<span style=\"white-space:nowrap;margin-left:15px;\">"
+//				+ "<span style=\"display:inline-block;width:11px;height:11px;background-color:" 
+//				+ _linkColorHandler.getColorForSearches( [ _searches[ i ].id, _searches[ k ].id ] ) 
+//				+ "\"></span> Search: " + _searches[ i ].id + ", " + _searches[ k ].id
+//				+ "</span>\n";
+//				
+//			}
+//		}
+//		
+//		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
+//		
+//		if( _searches.length === 3 ) {
+//			html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler.getColorForSearches( [ _searches[ 0 ].id, _searches[ 1 ].id, _searches[ 2 ].id ] ) + "\"></span> Search: " + _searches[ 0 ].id + ", " + _searches[ 1 ].id + ", " + _searches[ 2 ].id + "</span>\n";
+//		}
+//		
+//		$legend_by_search.html( html );
+//
+//		$legend_by_search.show();
 	}
 	
 	else {
 	
-		// color by length
-		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.short + "\"></span> <= " + _linkColorHandler.getDistanceConstraints().shortDistance + " &Aring; ";
-		html += "</span>\n";
+		// Color by Length  Legend
 		
-		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.medium + "\"></span> <= " + _linkColorHandler.getDistanceConstraints().longDistance + " &Aring; ";
-		html += "</span>\n";
-	
-		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-		html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.long + "\"></span> > " + _linkColorHandler.getDistanceConstraints().longDistance + " &Aring; ";
-		html += "</span>\n";
+		$legend_by_link_length.show();
 		
-		html += "<span style=\"margin-left:15px\">[<a href=\"javascript:userChangeDistanceConstraintsInterface()\">Customize</a>]</span>";
+
+		$("#legend_by_link_length_main").show();
+		$("#legend_by_link_length_change_cutoffs").hide();
 		
-		if( _linkColorHandler.getUserDistanceConstraints() ) {
-			html += "<span style=\"margin-left:2px\">[<a href=\"javascript:removeUserDistanceConstraints()\">Reset</a>]</span>";
-		}
+		//  Set text for cutoff values in legend
 		
+		var cutoff_shortDistance = _linkColorHandler.getDistanceConstraints().shortDistance;
+		var cutoff_longDistance = _linkColorHandler.getDistanceConstraints().longDistance;
+		
+		var $legend_by_link_length_cutoff_1 = $("#legend_by_link_length_cutoff_1");
+		var $legend_by_link_length_cutoff_2 = $("#legend_by_link_length_cutoff_2");
+		var $legend_by_link_length_cutoff_3 = $("#legend_by_link_length_cutoff_3");
+		
+		$legend_by_link_length_cutoff_1.text( cutoff_shortDistance );
+		$legend_by_link_length_cutoff_2.text( cutoff_longDistance );
+		$legend_by_link_length_cutoff_3.text( cutoff_longDistance );
+		
+		//  Set color of blocks on legend
+		
+		var $legend_by_link_length_color_block_short = $("#legend_by_link_length_color_block_short");
+		var $legend_by_link_length_color_block_medium = $("#legend_by_link_length_color_block_medium");
+		var $legend_by_link_length_color_block_long = $("#legend_by_link_length_color_block_long");
+		
+		var colorShort = _linkColorHandler.getColorByLinkLengthLabel( _linkColorHandler._CONSTANTS.lengthColorProperties.SHORT );
+		var colorMedium = _linkColorHandler.getColorByLinkLengthLabel( _linkColorHandler._CONSTANTS.lengthColorProperties.MEDIUM );
+		var colorLong = _linkColorHandler.getColorByLinkLengthLabel( _linkColorHandler._CONSTANTS.lengthColorProperties.LONG );
+		
+		
+		$legend_by_link_length_color_block_short.css( { 'background-color' : colorShort } );
+		$legend_by_link_length_color_block_short.data( LINK_LENGTH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorShort );
+		$legend_by_link_length_color_block_short.data( LINK_LENGTH_COLOR_BLOCK__DATA__COLOR_BLOCK_LENGTH_LABEL, LINK_LENGTH_INTERNAL_STRING_SHORT );
+		
+		$legend_by_link_length_color_block_medium.css( { 'background-color' : colorMedium } );
+		$legend_by_link_length_color_block_medium.data( LINK_LENGTH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorMedium );
+		$legend_by_link_length_color_block_medium.data( LINK_LENGTH_COLOR_BLOCK__DATA__COLOR_BLOCK_LENGTH_LABEL, LINK_LENGTH_INTERNAL_STRING_MEDIUM );
+		
+		$legend_by_link_length_color_block_long.css( { 'background-color' : colorLong } );
+		$legend_by_link_length_color_block_long.data( LINK_LENGTH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorLong );
+		$legend_by_link_length_color_block_long.data( LINK_LENGTH_COLOR_BLOCK__DATA__COLOR_BLOCK_LENGTH_LABEL, LINK_LENGTH_INTERNAL_STRING_LONG );
+
+		////////////////////////
+		
+		//   Update color of blocks used in User change cutoffs block
+		
+		var colorShort = _linkColorHandler.getColorByLinkLengthLabel( _linkColorHandler._CONSTANTS.lengthColorProperties.SHORT );
+		var colorMedium = _linkColorHandler.getColorByLinkLengthLabel( _linkColorHandler._CONSTANTS.lengthColorProperties.MEDIUM );
+		var colorLong = _linkColorHandler.getColorByLinkLengthLabel( _linkColorHandler._CONSTANTS.lengthColorProperties.LONG );
+
+		$("#userConstraintFormShortDistance_color_block").css( { 'background-color' : colorShort } );
+		$("#userConstraintFormMediumDistance_color_block").css( { 'background-color' : colorMedium } );
+		$("#userConstraintFormLongDistance_color_block").css( { 'background-color' : colorLong } );
+
 	}
 	
-	html += "</div>\n";
-	$legendDiv.html( html );
 };
 
+
+//////////////////
+
+//   User Color by Link Length
+
+
+var clearUserColorByLength = function() {
+	
+	_linkColorHandler.clearUserColorByLength();
+	
+	updateURLHash( false /* useSearchForm */ );
+	
+	drawStructure();
+	redrawDistanceReport();
+	drawLegend();
+};
+
+///
+
+function saveChangedColorLinkByLength() {
+	
+	//  process all the color pickers, saving their values as user defined
+	
+	var $color_picker_link_length_jq = $(".color_picker_link_length_jq");
+
+	$color_picker_link_length_jq.each( function( index, element ) {
+		
+		var $htmlElement = $( this );
+
+		var blockColor = $htmlElement.data( LINK_LENGTH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR ); // get color in .data
+	
+		var colorBlockLengthLabel = $htmlElement.data( LINK_LENGTH_COLOR_BLOCK__DATA__COLOR_BLOCK_LENGTH_LABEL );
+		var colorBlockLengthLabelForColorHandler = _linkColorHandler._CONSTANTS.lengthColorProperties.SHORT;
+
+		if ( colorBlockLengthLabel === LINK_LENGTH_INTERNAL_STRING_MEDIUM ) {
+			colorBlockLengthLabelForColorHandler = _linkColorHandler._CONSTANTS.lengthColorProperties.MEDIUM;
+		}
+
+		if ( colorBlockLengthLabel === LINK_LENGTH_INTERNAL_STRING_LONG ) {
+			colorBlockLengthLabelForColorHandler = _linkColorHandler._CONSTANTS.lengthColorProperties.LONG;
+		}
+
+		//  Call function to update User defined colors in object
+		
+		_linkColorHandler.setUserColorByLengthSingleColor( { 
+			linkLengthLabel : colorBlockLengthLabelForColorHandler,
+			linkColor : blockColor
+		} );
+	} );
+	
+	////////////////////////
+	
+	//   Update color of blocks used in User change cutoffs block
+	
+	var colorShort = _linkColorHandler.getColorByLinkLengthLabel( _linkColorHandler._CONSTANTS.lengthColorProperties.SHORT );
+	var colorMedium = _linkColorHandler.getColorByLinkLengthLabel( _linkColorHandler._CONSTANTS.lengthColorProperties.MEDIUM );
+	var colorLong = _linkColorHandler.getColorByLinkLengthLabel( _linkColorHandler._CONSTANTS.lengthColorProperties.LONG );
+
+	$("#userConstraintFormShortDistance_color_block").css( { 'background-color' : colorShort } );
+	$("#userConstraintFormMediumDistance_color_block").css( { 'background-color' : colorMedium } );
+	$("#userConstraintFormLongDistance_color_block").css( { 'background-color' : colorLong } );
+
+	///////////////////////
+	
+	//   Update Hash and redraw
+	
+	updateURLHash( false /* useSearchForm */ );
+	
+	drawStructure();
+	redrawDistanceReport();
+	drawLegend();
+}
+
+
+
+
+//////////////////
+
+//  User Color by Link Type
+
+
+var clearUserColorByLinkType = function() {
+
+	_linkColorHandler.clearUserColorByType();
+
+	updateURLHash( false /* useSearchForm */ );
+
+	drawStructure();
+	redrawDistanceReport();
+	drawLegend();
+};
+
+///
+
+function saveChangedColorLinkByType() {
+
+//	process all the color pickers, saving their values as user defined
+
+	var $color_picker_link_type_jq = $(".color_picker_link_type_jq");
+
+	$color_picker_link_type_jq.each( function( index, element ) {
+
+		var $htmlElement = $( this );
+
+		var blockColor = $htmlElement.data( LINK_TYPE_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR ); // get color in .data
+
+		var colorBlockTypeLabel = $htmlElement.data( LINK_TYPE_COLOR_BLOCK__DATA__COLOR_BLOCK_TYPE_LABEL );
+		var colorBlockTypeLabelForColorHandler = _linkColorHandler._CONSTANTS.typeColorsProperties.CROSSLINK;
+
+		if ( colorBlockTypeLabel === LINK_TYPE_INTERNAL_STRING_LOOPLINK ) {
+			colorBlockTypeLabelForColorHandler = _linkColorHandler._CONSTANTS.typeColorsProperties.LOOPLINK;
+		}
+
+		if ( colorBlockTypeLabel === LINK_TYPE_INTERNAL_STRING_MONOLINK ) {
+			colorBlockTypeLabelForColorHandler = _linkColorHandler._CONSTANTS.typeColorsProperties.MONOLINK;
+		}
+
+//		Call function to update User defined colors in object
+
+		_linkColorHandler.setUserColorByTypeSingleColor( { 
+			linkTypeLabel : colorBlockTypeLabelForColorHandler,
+			linkColor : blockColor
+		} );
+	} );
+
+
+	///////////////////////
+
+	//	Update Hash and redraw
+
+	updateURLHash( false /* useSearchForm */ );
+
+	drawStructure();
+	redrawDistanceReport();
+	drawLegend();
+}
+
+
+
+
+
+//  User Color by Search
+
+
+var clearUserColorBySearch = function() {
+
+	_linkColorHandler.clearUserColorBySearch();
+
+	updateURLHash( false /* useSearchForm */ );
+
+	drawStructure();
+	redrawDistanceReport();
+	drawLegend();
+};
+
+///
+
+function saveChangedColorLinkBySearch() {
+
+//	process all the color pickers, saving their values as user defined
+
+	var $color_picker_link_type_jq = $(".color_picker_by_search_jq");
+
+	$color_picker_link_type_jq.each( function( index, element ) {
+
+		var $htmlElement = $( this );
+
+		var blockColor = $htmlElement.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR ); // get color in .data
+
+		var colorBlockSearchIdsArray = $htmlElement.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS );
+		
+		if ( colorBlockSearchIdsArray ) {
+
+			//  Skip this element if there are no search ids in the data.
+			
+//			Call function to update User defined colors in object
+
+			_linkColorHandler.setUserColorBySearchSingleColor( { 
+				searchIdsArray : colorBlockSearchIdsArray,
+				linkColor : blockColor
+			} );
+		}
+	} );
+
+
+///////////////////////
+
+//	Update Hash and redraw
+
+	updateURLHash( false /* useSearchForm */ );
+
+	drawStructure();
+	redrawDistanceReport();
+	drawLegend();
+}
+
+
+
+
+
+//////////////////
 
 var updateUserDistanceConstraints = function() {
 	
@@ -3680,6 +4065,7 @@ var updateUserDistanceConstraints = function() {
 };
 
 var removeUserDistanceConstraints = function() {
+	
 	_linkColorHandler.removeUserDistanceConstraints();
 	
 	updateURLHash( false /* useSearchForm */ );
@@ -3691,25 +4077,14 @@ var removeUserDistanceConstraints = function() {
 
 var userChangeDistanceConstraintsInterface = function() {
 	
-	var html = "<span>Fill in new distance cutoffs for color coding:</span><form id=\"userDistanceConstraintsForm\">";
+	var shortDistance = _linkColorHandler.getDistanceConstraints().shortDistance;
+	var longDistance = _linkColorHandler.getDistanceConstraints().longDistance;
 	
-	html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-	html += "<span style=\"display:inline-block;width:22px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.short + "\"></span> ";
-	html += "<input id=\"userConstraintFormShortDistance\" type=\"text\" style=\"width:30px;\" value=\"" + _linkColorHandler.getDistanceConstraints().shortDistance + "\">&Aring; ";
-	html += "<span style=\"display:inline-block;width:22px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.medium + "\"></span> ";
-	html += "<input id=\"userConstraintFormLongDistance\" type=\"text\" style=\"width:30px;\" value=\"" + _linkColorHandler.getDistanceConstraints().longDistance + "\">&Aring; ";
-	html += "<span style=\"display:inline-block;width:22px;height:11px;background-color:" + _linkColorHandler._CONSTANTS.lengthColors.long + "\"></span>";
+	$("#userConstraintFormShortDistance").val( shortDistance );
+	$("#userConstraintFormLongDistance").val( longDistance );
 	
-	html += "<span style=\"margin-left:15px\">[<a href=\"javascript:updateUserDistanceConstraints()\">Update</a>]</span>";
-	html += "<span style=\"margin-left:5px\">[<a href=\"javascript:drawLegend()\">Cancel</a>]</span>";
-	
-	html += "</span>\n";
-	html += "</form>";	
-	html += "<span style=\"margin-left:15px;\" id=\"userConstraintsErrorSpan\"></span>\n";
-	
-	var $legendLabelDiv = $( '#legend-label' );
-	$legendLabelDiv.empty();	
-	$legendLabelDiv.html( html );
+	$("#legend_by_link_length_main").hide();
+	$("#legend_by_link_length_change_cutoffs").show();
 	
 };
 
@@ -4595,8 +4970,120 @@ function initPage() {
 	});
 	
 
+	///////
+	
+	//   Link Color by link length
+	
+	//  Add color picker to color block for link color 
+	
+
+	$('.color_picker_link_length_jq').ColorPicker({
+		onSubmit: function(hsbColor, hexColor, rgbColor, htmlElement ) {
+			
+			// update block on page with selected color 
+			
+			var $htmlElement = $( htmlElement );
+			
+			$htmlElement.css('backgroundColor', '#' + hexColor); // set HTML block color on page
+			
+			$htmlElement.data( LINK_LENGTH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, '#' + hexColor ); // store color in .data
+
+			$htmlElement.ColorPickerHide();
+			
+
+			saveChangedColorLinkByLength();
+			
+		},
+		onBeforeShow: function () {
+			var $this = $(this);
+			var thisColor = $this.data( LINK_LENGTH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR );
+			$this.ColorPickerSetColor( thisColor );
+		},
+		onHide: function() {
+			//  called when hidden
+			// alert("On Hide");
+		}
+	});
+		
+
+	///////
+	
+	//   Link Color by link type
+	
+	//  Add color picker to color block for link color 
+	
+
+	$('.color_picker_link_type_jq').ColorPicker({
+		onSubmit: function(hsbColor, hexColor, rgbColor, htmlElement ) {
+			
+			// update block on page with selected color 
+			
+			var $htmlElement = $( htmlElement );
+			
+			$htmlElement.css('backgroundColor', '#' + hexColor); // set HTML block color on page
+			
+			$htmlElement.data( LINK_TYPE_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, '#' + hexColor ); // store color in .data
+
+			$htmlElement.ColorPickerHide();
+			
+
+			saveChangedColorLinkByType();
+			
+		},
+		onBeforeShow: function () {
+			var $this = $(this);
+			var thisColor = $this.data( LINK_TYPE_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR );
+			$this.ColorPickerSetColor( thisColor );
+		},
+		onHide: function() {
+			//  called when hidden
+			// alert("On Hide");
+		}
+	});
+
+	///////
+	
+	//   Link Color by Search
+	
+	//  Add color picker to color block for link color 
+	
+
+	$('.color_picker_by_search_jq').ColorPicker({
+		onSubmit: function(hsbColor, hexColor, rgbColor, htmlElement ) {
+			
+			// update block on page with selected color 
+			
+			var $htmlElement = $( htmlElement );
+			
+			$htmlElement.css('backgroundColor', '#' + hexColor); // set HTML block color on page
+			
+			$htmlElement.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, '#' + hexColor ); // store color in .data
+
+			$htmlElement.ColorPickerHide();
+			
+
+			saveChangedColorLinkBySearch();
+			
+		},
+		onBeforeShow: function () {
+			var $this = $(this);
+			var thisColor = $this.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR );
+			$this.ColorPickerSetColor( thisColor );
+		},
+		onHide: function() {
+			//  called when hidden
+			// alert("On Hide");
+		}
+	});
+		
+
 	loadDataFromService();
 };
+
+
+
+
+
 
 $(document).ready(function()  { 
 	initPage();

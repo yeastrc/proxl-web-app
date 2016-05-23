@@ -13,10 +13,11 @@
 		<script type="text/javascript" src="${ contextPath }/js/libs/spin.min.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/base64.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
-			
-		
 
-		
+		<%--  Color Picker --%>
+		<script type="text/javascript" src="${ contextPath }/js/libs/colorpicker/colorpicker.js"></script>
+
+
 		<!-- Handlebars templating library   -->
 		
 		<%--  
@@ -92,6 +93,14 @@
 		
 		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		
+		<%--  Color Picker --%>
+		<%--
+		<link rel="stylesheet" media="screen" type="text/css" href="${ contextPath }/css/libs/colorpicker.css" />
+		--%>
+		
+		<link rel="stylesheet" media="screen" type="text/css" href="${ contextPath }/css/libs/colorpicker_custom_colors.css" />
+		
+		
 
 		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/lorikeet.css">
 		
@@ -156,6 +165,9 @@
 	
 	<c:if test="${ not empty onlySingleSearchId }">
 	
+		<%--  Only one search id so get Default Page URL values for that search id for links to other pages for navigation.
+			  Javascript will use these values for the navigation if these hidden input fields are not empty. 
+		--%>
 		<input type="hidden" id="viewSearchPeptideDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="/peptide" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
 		<input type="hidden" id="viewSearchCrosslinkProteinDefaultPageUrl" 
@@ -285,7 +297,7 @@
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle showing looplinks on structure" style="white-space:nowrap;" ><input type="checkbox" id="show-looplinks">Show looplinks</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle showing monolinks on structure" style="white-space:nowrap;" ><input type="checkbox" id="show-monolinks">Show monolinks</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle marking possible positions where crosslinker(s) may react " style="white-space:nowrap;" ><input type="checkbox" id="show-linkable-positions" checked>Show linkable positions</span></label>
-					<label><span class="tool_tip_attached_jq" data-tooltip="Recommended - checking this causes only the shortest instance of a UDR to be shown. Unchecking attempts to show all discrete instances of all UDRs. See the help pages (? at top left of page) for more details." style="white-space:nowrap;" ><input type="checkbox" id="show-unique-udrs" checked>Show UDRs once</span></label>
+					<label><span class="tool_tip_attached_jq" data-tooltip="Recommended - checking this causes only the shortest instance of a UDR to be shown. Unchecking attempts to show all discrete instances of all UDRs. See the help pages (? at top right of page) for more details." style="white-space:nowrap;" ><input type="checkbox" id="show-unique-udrs" checked>Show UDRs once</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Shade links drawn on structure by spectrum count" style="white-space:nowrap;" ><input type="checkbox" id="shade-by-counts">Shade by counts</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Color structure of backbone to indicate sequence coverage" style="white-space:nowrap;" ><input type="checkbox" id="show-coverage">Show sequence coverage</span></label>
 
@@ -293,7 +305,18 @@
 						<select id="select-link-color-mode">
 							<option value="length">Length</option>
 							<option value="type">Type</option>
-							<option value="search">Search/Run</option>
+
+							<c:choose>
+							  <c:when test="${ fn:length( searchIds ) <= 3 }">
+							
+								<%-- Only shown when the number of searches is <= the number supported by 'Color by search' --%>
+								<option value="search">Search/Run</option>
+							  </c:when>
+							  <c:otherwise>
+							  	<%--  Disable the color by search option --%>
+							  	<option value="search_disabled" disabled="disabled">Search/Run</option>
+							  </c:otherwise>
+							</c:choose>
 						</select>
 					</span>
 
@@ -304,7 +327,7 @@
 							<option value="trace">Trace</option>
 							<option value="lines">Lines (slow)</option>
 							<option value="points">Points (slow)</option>
-							<!-- <option value="spheres">Spheres (unstable?)</option> -->
+							<%-- <option value="spheres">Spheres (unstable?)</option> --%>
 						</select>
 					</span>
 					
@@ -336,7 +359,202 @@
 						<div style="width:500px;height:500px;border-width:1px;border-style:solid;border-color:#A55353;">
 							<div id="glmol-div" style="width:500px;height:500px;display:inline;"></div>
 						</div>
-						<div id="legend-div" style="margin-top:5px;vertical-align:top;"></div>
+						
+						<%-- Legend --%>
+						
+						<div id="legend-div" style="margin-top:5px;vertical-align:top; display: none;">
+
+						  <h2 style="display:inline;font-size:12pt;margin-top:5px;">Legend:</h2>
+						  
+						  <div id="legend_by_link_length" style="">
+						  
+							<div id="legend_by_link_length_main" style="font-size:10pt;margin-left:20px; margin-top: 5px;">
+							
+							 <div >
+							  <span style="white-space:nowrap;">
+							 	<span id="legend_by_link_length_color_block_short" 
+							 		class=" tool_tip_attached_jq color_picker_link_length_jq " 
+							 		data-tooltip="Click to change the color"
+							 		style="display:inline-block;width:15px;height:15px; cursor: pointer;"></span> 
+							 	&lt;= <span id="legend_by_link_length_cutoff_1"></span> Å 
+							  </span>
+							  <span style="white-space:nowrap;margin-left:15px;">
+							 	<span id="legend_by_link_length_color_block_medium"
+							 		class=" tool_tip_attached_jq color_picker_link_length_jq " 
+							 		data-tooltip="Click to change the color"
+							 		style="display:inline-block;width:15px;height:15px; cursor: pointer;"></span> 
+							 	&lt;= <span id="legend_by_link_length_cutoff_2"></span> Å 
+							  </span>
+							  <span style="white-space:nowrap;margin-left:15px;">
+							 	<span id="legend_by_link_length_color_block_long" 
+							 		class=" tool_tip_attached_jq color_picker_link_length_jq " 
+							 		data-tooltip="Click to change the color"
+							 		style="display:inline-block;width:15px;height:15px; cursor: pointer;"></span>
+							 	&gt; <span id="legend_by_link_length_cutoff_3"></span> Å 
+							  </span>
+							  <span style="margin-left:15px; white-space: nowrap;">
+							 	[<a href="javascript:" onclick="userChangeDistanceConstraintsInterface()"
+							 		>Change cutoffs</a>]</span>
+
+<%-- 							 		
+							  <span style="margin-left:2px; white-space: nowrap;">
+							 	[<a href="javascript:" onclick="removeUserDistanceConstraints()"
+							 		>Reset cutoffs</a>]</span>
+--%>							 		
+							 </div>
+							 <div style="font-size:10pt; margin-top: 5px;">
+							  	Click color to change
+								
+								<span style="margin-left:2px; white-space: nowrap;">
+								 	[<a href="javascript:" onclick="clearUserColorByLength()"
+								 		>Reset legend colors</a>]</span>	
+							 </div>
+							 		
+							 								 		
+							</div>
+
+							<div id="legend_by_link_length_change_cutoffs" style="font-size:10pt;margin-left:20px; display: none;">
+							
+								<span>Fill in new distance cutoffs for color coding:</span>
+								<span style="white-space:nowrap;margin-left:15px;">
+									
+									<span id="userConstraintFormShortDistance_color_block"
+										style="display:inline-block;width:22px;height:11px;"></span>
+										
+									<input id="userConstraintFormShortDistance" type="text" style="width:30px;" value="">Å
+									 
+									<span id="userConstraintFormMediumDistance_color_block" 
+										style="display:inline-block;width:22px;height:11px;"></span> 
+										
+									<input id="userConstraintFormLongDistance" type="text" style="width:30px;" value="">Å
+									 
+									<span id="userConstraintFormLongDistance_color_block"  
+										style="display:inline-block;width:22px;height:11px;"></span>
+									
+									<span style="margin-left:15px">
+										[<a href="javascript:" onclick="updateUserDistanceConstraints()">Update</a>]
+									</span>
+									<span style="margin-left:5px">
+										[<a href="javascript:" onclick="drawLegend()">Cancel</a>]
+									</span>
+								</span>
+								<span style="margin-left:15px;" id="userConstraintsErrorSpan"></span>
+						
+							</div>
+													  
+						  </div> <%-- End legend by link length --%>
+						
+						  <div id="legend_by_link_type" style="font-size:10pt;margin-left:20px; margin-top: 5px;">
+
+							 <div>							
+
+							    <span style="white-space:nowrap;">
+									<span id="legend_by_link_type_crosslink_color_block" 
+								 		class=" tool_tip_attached_jq color_picker_link_type_jq " 
+								 		data-tooltip="Click to change the color"
+										style="display:inline-block;width:15px;height:15px; cursor: pointer;" ></span>
+									Crosslinks
+								</span>
+							    <span style="white-space:nowrap;margin-left:15px;">
+									<span id="legend_by_link_type_looplink_color_block" 
+								 		class=" tool_tip_attached_jq color_picker_link_type_jq " 
+								 		data-tooltip="Click to change the color"
+										style="display:inline-block;width:15px;height:15px; cursor: pointer;" ></span>
+									Looplinks
+								</span>
+							    <span style="white-space:nowrap;margin-left:15px;">
+									<span id="legend_by_link_type_monolink_color_block" 
+								 		class=" tool_tip_attached_jq color_picker_link_type_jq " 
+								 		data-tooltip="Click to change the color"
+										style="display:inline-block;width:15px;height:15px; cursor: pointer;" ></span>
+									Monolinks
+								</span>
+							 </div>							
+							 <div style="font-size:10pt; margin-top: 5px;">
+							  	Click color to change
+								
+								<span style="margin-left:2px; white-space: nowrap;">
+								 	[<a href="javascript:" onclick="clearUserColorByLinkType()"
+								 		>Reset legend colors</a>]</span>	
+							 </div>							
+						  </div> <%-- End legend by link type --%>
+
+						  <div id="legend_by_search" style="font-size:10pt;margin-top: 5px;">
+						  
+						   <div>
+							<span id="legend_by_search_container_for_search_1" class=" legend_by_search_container_for_search_jq "
+								style="white-space:nowrap;margin-left:15px;">
+								<span id="legend_by_search_color_block_for_search_1"
+								 		class=" tool_tip_attached_jq color_picker_by_search_jq " 
+								 		data-tooltip="Click to change the color"
+										style="display:inline-block;width:15px;height:15px; cursor: pointer;" ></span>
+								Search: <span class=" legend_by_search_search_id_for_search_1_jq " ></span>
+							</span>
+							<span id="legend_by_search_container_for_search_2" class=" legend_by_search_container_for_search_jq "
+								style="white-space:nowrap;margin-left:15px;">
+								<span id="legend_by_search_color_block_for_search_2"
+								 		class=" tool_tip_attached_jq color_picker_by_search_jq " 
+								 		data-tooltip="Click to change the color"
+										style="display:inline-block;width:15px;height:15px; cursor: pointer;" ></span>
+								Search: <span class=" legend_by_search_search_id_for_search_2_jq " ></span>
+							</span>
+							<span id="legend_by_search_container_for_search_3" class=" legend_by_search_container_for_search_jq "
+								style="white-space:nowrap;margin-left:15px;">
+								<span id="legend_by_search_color_block_for_search_3"
+								 		class=" tool_tip_attached_jq color_picker_by_search_jq " 
+								 		data-tooltip="Click to change the color"
+										style="display:inline-block;width:15px;height:15px; cursor: pointer;" ></span>
+								Search: <span class=" legend_by_search_search_id_for_search_3_jq " ></span>
+							</span>
+							<span id="legend_by_search_container_for_search_1_2" class=" legend_by_search_container_for_search_jq "
+								style="white-space:nowrap;margin-left:15px;">
+								<span id="legend_by_search_color_block_for_search_1_2"
+								 		class=" tool_tip_attached_jq color_picker_by_search_jq " 
+								 		data-tooltip="Click to change the color"
+										style="display:inline-block;width:15px;height:15px; cursor: pointer;" ></span>
+								Search: <span class=" legend_by_search_search_id_for_search_1_jq " ></span>,
+									<span class=" legend_by_search_search_id_for_search_2_jq " ></span>
+							</span>
+							<span id="legend_by_search_container_for_search_1_3" class=" legend_by_search_container_for_search_jq "
+								style="white-space:nowrap;margin-left:15px;">
+								<span id="legend_by_search_color_block_for_search_1_3"
+								 		class=" tool_tip_attached_jq color_picker_by_search_jq " 
+								 		data-tooltip="Click to change the color"
+										style="display:inline-block;width:15px;height:15px; cursor: pointer;" ></span>
+								Search: <span class=" legend_by_search_search_id_for_search_1_jq " ></span>,
+									<span class=" legend_by_search_search_id_for_search_3_jq " ></span>
+							</span>
+							<span id="legend_by_search_container_for_search_2_3" class=" legend_by_search_container_for_search_jq "
+								style="white-space:nowrap;margin-left:15px;">
+								<span id="legend_by_search_color_block_for_search_2_3"
+								 		class=" tool_tip_attached_jq color_picker_by_search_jq " 
+								 		data-tooltip="Click to change the color"
+										style="display:inline-block;width:15px;height:15px; cursor: pointer;" ></span>
+								Search: <span class=" legend_by_search_search_id_for_search_2_jq " ></span>,
+									<span class=" legend_by_search_search_id_for_search_3_jq " ></span>
+							</span>
+							<span id="legend_by_search_container_for_search_1_2_3" class=" legend_by_search_container_for_search_jq "
+								style="white-space:nowrap;margin-left:15px;">
+								<span id="legend_by_search_color_block_for_search_1_2_3"
+								 		class=" tool_tip_attached_jq color_picker_by_search_jq " 
+								 		data-tooltip="Click to change the color"
+										style="display:inline-block;width:15px;height:15px; cursor: pointer;" ></span>
+								Search: 
+									<span class=" legend_by_search_search_id_for_search_1_jq " ></span>,
+									<span class=" legend_by_search_search_id_for_search_2_jq " ></span>,
+									<span class=" legend_by_search_search_id_for_search_3_jq " ></span>
+							</span>
+						   </div>
+						   <div style="font-size:10pt; margin-top: 5px;margin-left:15px;">
+							  	Click color to change
+								
+								<span style="margin-left:2px; white-space: nowrap;">
+								 	[<a href="javascript:" onclick="clearUserColorBySearch()"
+								 		>Reset legend colors</a>]</span>	
+							</div>							  
+						  </div> <%-- End legend by search --%>
+
+						</div>
 					</td>
 					<td style="vertical-align:top;min-width:500px;width:auto;">
 					

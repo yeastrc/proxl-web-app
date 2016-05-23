@@ -78,6 +78,14 @@ LinkColorHandler.prototype._CONSTANTS = {
 			monolink  : "#A243E4",
 			unknown   : "#000000",
 		},
+
+		typeColorsProperties : { //  Keep these values the same as the property names under 'typeColors'
+			
+			CROSSLINK : "crosslink",
+			LOOPLINK : "looplink",
+			MONOLINK : "monolink",
+			UNKNOWN : "unknown"
+		},
 		
 		lengthColors : {
 			short : "#00B428",			// greenish
@@ -85,8 +93,190 @@ LinkColorHandler.prototype._CONSTANTS = {
 			long : "#D33333"			// reddish
 		},
 		
+		lengthColorProperties : { //  Keep these values the same as the property names under 'lengthColors'
+			
+			SHORT : "short",
+			MEDIUM : "medium",
+			LONG : "long"
+		},
+		
 		defaultOpacity : 0.9,			// default opacity to use for links		
 };
+
+
+////////////////
+
+//  User Color by Type
+
+
+LinkColorHandler.prototype.clearUserColorByType = function() {
+	this.userColorByType = undefined;
+};
+
+LinkColorHandler.prototype.setUserColorByTypeSingleColor = function( params ) {
+	
+	var linkTypeLabel = params.linkTypeLabel;
+	var linkColor = params.linkColor;
+	
+			
+	if ( linkTypeLabel !== this._CONSTANTS.typeColorsProperties.CROSSLINK
+			&& linkTypeLabel !== this._CONSTANTS.typeColorsProperties.LOOPLINK
+			&& linkTypeLabel !== this._CONSTANTS.typeColorsProperties.MONOLINK
+			&& linkTypeLabel !== this._CONSTANTS.typeColorsProperties.UNKNOWN ) {
+		
+		throw "setUserColorByTypeSingleColor(..): value for 'linkTypeLabel' invalid: " + linkTypeLabel;
+	}
+	
+	if ( ! this.userColorByType ) {
+		
+		this.userColorByType = {};
+	}
+	
+	this.userColorByType[ linkTypeLabel ] = linkColor;
+};
+
+
+LinkColorHandler.prototype.setUserColorByType = function( userColorByType ) {
+
+	this.userColorByType = userColorByType;
+};
+
+LinkColorHandler.prototype.getUserColorByType = function() {
+
+	return this.userColorByType;
+};
+
+
+LinkColorHandler.prototype.getColorByLinkTypeLabel = function( linkTypeLabel ) {
+
+	if ( linkTypeLabel !== this._CONSTANTS.typeColorsProperties.CROSSLINK
+			&& linkTypeLabel !== this._CONSTANTS.typeColorsProperties.LOOPLINK
+			&& linkTypeLabel !== this._CONSTANTS.typeColorsProperties.MONOLINK
+			&& linkTypeLabel !== this._CONSTANTS.typeColorsProperties.UNKNOWN ) {
+
+		throw "getColorByLinkTypeLabel(..): value for 'linkTypeLabel' invalid: " + linkTypeLabel;
+	}
+	
+	if ( this.userColorByType && this.userColorByType[ linkTypeLabel ] ) {
+		return this.userColorByType[ linkTypeLabel ];
+	}
+	
+	return this._CONSTANTS.typeColors[ linkTypeLabel ];
+};
+
+
+/////////////
+
+//  User Color by Length
+
+LinkColorHandler.prototype.clearUserColorByLength = function() {
+	this.userColorByLength = undefined;
+};
+
+LinkColorHandler.prototype.setUserColorByLengthSingleColor = function( params ) {
+	
+	var linkLengthLabel = params.linkLengthLabel;
+	var linkColor = params.linkColor;
+	
+	if ( linkLengthLabel !== this._CONSTANTS.lengthColorProperties.SHORT
+			&& linkLengthLabel !== this._CONSTANTS.lengthColorProperties.MEDIUM
+			&& linkLengthLabel !== this._CONSTANTS.lengthColorProperties.LONG ) {
+		
+		throw "setUserColorByLengthSingleColor(..): value for 'linkLengthLabel' invalid: " + linkLengthLabel;
+	}
+	
+	if ( ! this.userColorByLength ) {
+		
+		this.userColorByLength = {};
+	}
+	
+	this.userColorByLength[ linkLengthLabel ] = linkColor;
+};
+
+
+LinkColorHandler.prototype.setUserColorByLength = function( userColorByLength ) {
+
+	this.userColorByLength = userColorByLength;
+};
+
+LinkColorHandler.prototype.getUserColorByLength = function() {
+
+	return this.userColorByLength;
+};
+
+
+LinkColorHandler.prototype.getColorByLinkLengthLabel = function( linkLengthLabel ) {
+
+	if ( linkLengthLabel !== this._CONSTANTS.lengthColorProperties.SHORT
+			&& linkLengthLabel !== this._CONSTANTS.lengthColorProperties.MEDIUM
+			&& linkLengthLabel !== this._CONSTANTS.lengthColorProperties.LONG ) {
+
+		throw "getColorByLinkLengthLabel(..): value for 'linkLengthLabel' invalid: " + linkLengthLabel;
+	}
+	
+	if ( this.userColorByLength && this.userColorByLength[ linkLengthLabel ] ) {
+		return this.userColorByLength[ linkLengthLabel ];
+	}
+	
+	return this._CONSTANTS.lengthColors[ linkLengthLabel ];
+};
+
+
+/////////////
+
+//  User Color by Search
+
+LinkColorHandler.prototype.clearUserColorBySearch = function() {
+	this.userColorBySearch = undefined;
+};
+
+LinkColorHandler.prototype.setUserColorBySearchSingleColor = function( params ) {
+	
+	var searchIdsArray = params.searchIdsArray;
+	var linkColor = params.linkColor;
+
+	if ( ! this.userColorBySearch ) {
+
+		this.userColorBySearch = {};
+	}
+	
+	var colorPropertyObjectKey = this.getColorPropertyNameLabelForSearches( searchIdsArray );
+
+	this.userColorBySearch[ colorPropertyObjectKey ] = linkColor;
+};
+
+
+LinkColorHandler.prototype.setUserColorBySearch = function( userColorBySearch ) {
+
+	this.userColorBySearch = userColorBySearch;
+};
+
+LinkColorHandler.prototype.getUserColorBySearch = function() {
+
+	return this.userColorBySearch;
+};
+
+
+LinkColorHandler.prototype.getColorByColorPropertyObjectKey = function( colorPropertyObjectKey ) {
+
+	if ( this.userColorBySearch && this.userColorBySearch[ colorPropertyObjectKey ] ) {
+		return this.userColorBySearch[ colorPropertyObjectKey ];
+	}
+
+	//  No User defined color so return default color
+	
+	if( _searches.length === 2 ) {
+		
+		//  different set of colors for 2 searches being merged 
+		
+		return this._CONSTANTS.searchColors_2searches[ colorPropertyObjectKey ];
+	}
+	
+	return this._CONSTANTS.searchColors_3searches[ colorPropertyObjectKey ];
+};
+
+
+///////////////////////
 
 /**
  * Get the color for the specified link.
@@ -165,7 +355,7 @@ LinkColorHandler.prototype.hexToName = function( hex ) {
 		return "white";
 	}
 	
-}
+};
 
 /**
  * Get the color to use for the given link, based on length
@@ -181,17 +371,17 @@ LinkColorHandler.prototype.getLinkColorByLength = function( link ) {
 		console.log( link );
 		console.log( colorFormat );
 	}
-	
+
 	if( length <= constraints.shortDistance ) {
-		return this._CONSTANTS.lengthColors.short;
+		return this.getColorByLinkLengthLabel( this._CONSTANTS.lengthColorProperties.SHORT );
 	}
 	
 	if( length <= constraints.longDistance ) {
-		return this._CONSTANTS.lengthColors.medium;
+		return this.getColorByLinkLengthLabel( this._CONSTANTS.lengthColorProperties.MEDIUM );
 	}
 	
-	return this._CONSTANTS.lengthColors.long;
-}
+	return this.getColorByLinkLengthLabel( this._CONSTANTS.lengthColorProperties.LONG );
+};
 
 /**
  * Get the color to use for the given link, based on link type
@@ -200,13 +390,19 @@ LinkColorHandler.prototype.getLinkColorByLength = function( link ) {
 LinkColorHandler.prototype.getLinkColorByType = function( link ) {
 	
 	// color by the type (e.g. cross-link, loop-link, and mono-link)
-	if( link.type === 'crosslink' ) { return this._CONSTANTS.typeColors.crosslink; }
-	if( link.type === 'looplink' ) { return this._CONSTANTS.typeColors.looplink; }
-	if( link.type === 'monolink' ) { return this._CONSTANTS.typeColors.monolink; }		
+	if( link.type === 'crosslink' ) { 
+		return this.getColorByLinkTypeLabel( _linkColorHandler._CONSTANTS.typeColorsProperties.CROSSLINK ); 
+	}
+	if( link.type === 'looplink' ) { 
+		return this.getColorByLinkTypeLabel( _linkColorHandler._CONSTANTS.typeColorsProperties.LOOPLINK ); 
+	}
+	if( link.type === 'monolink' ) { 
+		return this.getColorByLinkTypeLabel( _linkColorHandler._CONSTANTS.typeColorsProperties.MONOLINK ); 
+	}		
 	
 	console.log( "ERROR: link.type is not recognized." );
 	return this._CONSTANTS.typeColors.unknown;
-}
+};
 
 
 /**
@@ -232,30 +428,75 @@ LinkColorHandler.prototype.getLinkColorBySearches = function( link ) {
 	}
 	
 	return this.getColorForSearches( searches );
-}
+};
 
 /**
- * Get the color to use for the list of searches passed in
+ * Get the color to use for the array of searches passed in
  * @param searches
  */
 LinkColorHandler.prototype.getColorForSearches = function( searches ) {
-	var colorIndex = "";
+	
+	//  colorPropertyLookup is a string.  
+	//  It is a concatenation of the positions of the search id positions ( One based )
+	//  Which is used to retrieve colors based on properties that match that set of positions 
+	
+	//  The variable _searches  is defined and populated in the Javascript file "structure-viewer-page.js"
+	
+	var colorPropertyObjectKey = this.getColorPropertyNameLabelForSearches( searches );
+	
+	return this.getColorByColorPropertyObjectKey( colorPropertyObjectKey );
+	
+//	if( _searches.length === 2 ) {
+//		
+//		//  different set of colors for 2 searches being merged 
+//		
+//		return this._CONSTANTS.searchColors_2searches[ colorPropertyObjectKey ];
+//	}
+//	
+//	return this._CONSTANTS.searchColors_3searches[ colorPropertyObjectKey ];
+};
+
+
+
+/**
+ * Get the color property name/value to use for the array of searches passed in
+ * @param searches
+ */
+LinkColorHandler.prototype.getColorPropertyNameLabelForSearches = function( searches ) {
+	
+	//  colorPropertyLookup is a string.  
+	//  It is a concatenation of the positions of the search id positions ( One based )
+	//  Which is used to retrieve colors based on properties that match that set of positions 
+	
+	//  The variable _searches  is defined and populated in the Javascript file "structure-viewer-page.js"
+	
+	var colorPropertyLookup = "";
 	
 	for ( var i = 0; i < _searches.length; i++ ) {
+		
+		//  Loop through all searches being merged
+		
 		for ( var k = 0; k < searches.length; k++ ) {
+			
+			//  Loop through the search ids getting a color for
+			
 			if ( _searches[i]['id'] === searches[ k ] ) {
-				colorIndex += ( i + 1 );
+				
+				//  If the search id from "all searches being merged" 
+				//    matches the search id getting the color for,
+				//    String Append the position in the "all searches being merged" array
+				//    to the property lookup
+				
+				colorPropertyLookup += ( i + 1 );  //  " + 1" to make it One based instead of zero based
 				break;
 			}
 		}
 	}
 	
-	if( _searches.length === 2 ) {
-		return this._CONSTANTS.searchColors_2searches[ colorIndex ];
-	}
-	
-	return this._CONSTANTS.searchColors_3searches[ colorIndex ];
-}
+	return colorPropertyLookup;
+};
+
+
 
 
 /**
@@ -322,23 +563,23 @@ LinkColorHandler.prototype.getOpacity = function( link ) {
 	}
 	
 	return opacity;
-}
+};
 
 LinkColorHandler.prototype.removeUserDistanceConstraints = function() {
 	this.userDistanceConstraint = undefined;
-}
+};
 
 LinkColorHandler.prototype.setUserDistanceConstraints = function(short, long) {
 	this.userDistanceConstraint = {
 		shortDistance : short,
 		longDistance : long
 	};
-}
+};
 
 LinkColorHandler.prototype.getUserDistanceConstraints = function() {
 	if( !( 'userDistanceConstraint' in this ) ) { return undefined; }
 	return this.userDistanceConstraint;
-}
+};
 
 /**
  * Get the distance restraints to use for coloring, given the linkers used in the current
