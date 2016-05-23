@@ -108,7 +108,7 @@ var _distanceReportData = { };
 //get values for variables from the hash part of the URL as JSON
 function getJsonFromHash() {
 	
-	var json;
+	var jsonFromHash = null;
 
 	var windowHash = window.location.hash;
 	
@@ -116,48 +116,86 @@ function getJsonFromHash() {
 		
 		//  Set cutoff defaults if not in JSON
 			
-		json = { 
+		jsonFromHash = { 
 				cutoffs : getCutoffDefaultsFromPage(),
 				
 				'excludeType' : EXCLUDE_LINK_TYPE_DEFAULT
 		};
 		
-		return json;
-		
-//		return null;
+		return jsonFromHash;
 	}
 	
 	var windowHashContentsMinusHashChar = windowHash.slice( 1 );
-	
+
+	// Try first:  the hash contained Compressed URI-encoded JSON, try decoding using decodeURIComponent( windowHashContentsMinusHashChar )
+
 	try {
-		
-		// if this works, the hash contains native (non encoded) JSON
-		json = JSON.parse( windowHashContentsMinusHashChar );
+		//  LZString.decompressFromEncodedURIComponent(...) returns null if unable to decompress
+		var windowHashContentsMinusHashCharDecompressedDecodeURIComponent = LZString.decompressFromEncodedURIComponent( windowHashContentsMinusHashChar );
+
+		if ( windowHashContentsMinusHashCharDecompressedDecodeURIComponent !== null 
+				&& windowHashContentsMinusHashCharDecompressedDecodeURIComponent !== undefined ) {
+
+			jsonFromHash = JSON.parse( windowHashContentsMinusHashCharDecompressedDecodeURIComponent );
+		} else {
+			
+			jsonFromHash = undefined;
+		}
 	} catch( e ) {
 		
+		jsonFromHash = undefined;
+	}
+	
+	if ( jsonFromHash === null || jsonFromHash === undefined ) {
+
+		try {
+
+			// if this works, the hash contains native (non encoded) JSON
+			jsonFromHash = JSON.parse( windowHashContentsMinusHashChar );
+		} catch( e ) {
+
+			jsonFromHash = undefined;
+		}
+	}
+	
+	if ( jsonFromHash === null || jsonFromHash === undefined ) {
+
 		// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURI( windowHashContentsMinusHashChar )
 		
 		var windowHashContentsMinusHashCharDecodeURI = decodeURI( windowHashContentsMinusHashChar );
 		
 		try {
-			json = JSON.parse( windowHashContentsMinusHashCharDecodeURI );
+			jsonFromHash = JSON.parse( windowHashContentsMinusHashCharDecodeURI );
 		} catch( e2 ) {
-			
 
-			// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURIComponent( windowHashContentsMinusHashChar )
-			
-			var windowHashContentsMinusHashCharDecodeURIComponent = decodeURIComponent( windowHashContentsMinusHashChar );
-
-			try {
-				json = JSON.parse( windowHashContentsMinusHashCharDecodeURIComponent );
-			} catch( e3 ) {
-				
-
-				throw "Failed to parse window hash string as JSON and decodeURI and then parse as JSON.  windowHashContentsMinusHashChar: " 
-				+ windowHashContentsMinusHashChar;
-			}
+			jsonFromHash = undefined;
 		}
 	}
+
+	if ( jsonFromHash === null || jsonFromHash === undefined ) {
+
+		// if we got here, the hash contained URI-encoded JSON, try decoding using decodeURIComponent( windowHashContentsMinusHashChar )
+
+		var windowHashContentsMinusHashCharDecodeURIComponent = decodeURIComponent( windowHashContentsMinusHashChar );
+
+		try {
+			jsonFromHash = JSON.parse( windowHashContentsMinusHashCharDecodeURIComponent );
+		} catch( e3 ) {
+
+			jsonFromHash = undefined;
+		}
+	}
+
+	if ( jsonFromHash === null || jsonFromHash === undefined ) {
+
+		throw "Failed to parse window hash string as JSON and decodeURI and then parse as JSON.  windowHashContentsMinusHashChar: " 
+		+ windowHashContentsMinusHashChar;
+	}
+
+	//   Transform json on hash to expected object for rest of the code
+	
+	var json = jsonFromHash;
+	
 	
 	if ( json.cutoffs === undefined || json.cutoffs === null ) {
 
@@ -449,9 +487,27 @@ function updateURLHash( useSearchForm) {
 		items[ 'udcs' ] = userDistanceConstraints.shortDistance;
 		items[ 'udcl' ] = userDistanceConstraints.longDistance;
 	}
+
+	var newHash = JSON.stringify( items );
+
+//	var newHashLength = newHash.length;
+	
+	var newHashEncodedToEncodedURIComponent = LZString.compressToEncodedURIComponent( newHash );
 	
 
-	window.location.hash = encodeURIComponent( JSON.stringify( items ) );
+	try {
+
+		window.location.hash = newHashEncodedToEncodedURIComponent;
+		
+	} catch ( e ) {
+
+		//  TODO  Need to handle this error.  
+		
+		//     The user really shouldn't continue since the settings are not being stored in the Hash
+		
+		console.log( "Update window.location.hash Failed: e: " + e );
+	}
+
 }
 
 
@@ -5075,7 +5131,6 @@ function initPage() {
 			// alert("On Hide");
 		}
 	});
-		
 
 	loadDataFromService();
 };

@@ -14,9 +14,23 @@
 		<script type="text/javascript" src="${ contextPath }/js/libs/base64.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
 
-		<%--  Color Picker --%>
+		<%--  Color Picker - jQuery Plugin --%>
 		<script type="text/javascript" src="${ contextPath }/js/libs/colorpicker/colorpicker.js"></script>
 
+
+		<%--  Compression --%>
+		
+		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/lz-string.min.js"></script>
+		
+		<%--  Non-Minified version --%>
+		<%-- 
+		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/lz-string.js"></script>
+		--%>
+		
+		<%--  Used by lz-string.min.js --%>
+		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/base64-string.js"></script>
+
+		
 
 		<!-- Handlebars templating library   -->
 		
