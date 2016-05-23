@@ -258,7 +258,7 @@
 			
 	<span class="filter-single-value-display-block {{#if data.description }} tool_tip_attached_jq {{/if}} " 
 		{{#if data.description }} data-tooltip="{{ data.description }}" {{/if}}
-		 style=" cursor: pointer;" 
+		 style=" cursor: pointer;" onclick="cutoffProcessingCommonCode.openCutoffOverlay( { clickedThis : this } )"
 				>{{ data.display_name }}: {{ data.value }}</span>
 
 </script >		
