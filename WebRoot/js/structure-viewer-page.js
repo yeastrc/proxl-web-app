@@ -4448,8 +4448,8 @@ var getNrseqProteinPositions = function( alignments, pdbPosition ) {
 };
 
 /**
- * Returns true if the supplied chain is a protein sequence (all
- * residues are amino acids). False otherwise.
+ * Returns true if the supplied chain is a protein sequence (at least one
+ * residue has an alpha carbon). False otherwise.
  */
 var PDBChainIsProtein = function( chainName ) {
 	
@@ -4460,17 +4460,12 @@ var PDBChainIsProtein = function( chainName ) {
 	if( !residues ) { return false; }
 	
 	for( var i = 0; i < residues.length; i++ ) {
-		if( !residues[ i ].atom( 'CA' ) ) {
-		
-			console.log( "Chain: " + chainName );
-			console.log( "Non-amino acid residue: " );
-			console.log( residues[ i ] );
-			
-			return false;
+		if( residues[ i ].atom( 'CA' ) ) {
+			return true;
 		}
 	}
 	
-	return true;
+	return false;
 };
 
 
