@@ -38,23 +38,6 @@ LinkColorHandler.prototype._CONSTANTS = {
 
 		},
 		
-		// for use w/ the chimera and pymol script generator, use
-		// color names for the hex codes... colors must be supported
-		// by both viewers
-		colorNames : {
-			"#ff0000" : "red",
-			"#00b428" : "green",
-			"#e3e602" : "yellow",
-			"#d33333" : "red",
-			"#0000ff" : "blue",
-			"#00ff00" : "green",
-			"#000000" : "white",		// show this as white, since pymol and chimera use black backgrounds
-			"#006600" : "green",
-			"#ff6600" : "orange",
-			"#8a51ff" : "purple",
-			"#dcd900" : "yellow",
-		},
-		
 		searchColors_3searches : {
 			1:		"#FF0000",			// red, for items belonging only to first search
 			2:		"#0000FF",			// blue, for items belonging only to second search
@@ -88,9 +71,9 @@ LinkColorHandler.prototype._CONSTANTS = {
 		},
 		
 		lengthColors : {
-			short : "#00B428",			// greenish
-			medium : "#E3E602",			// yellowish
-			long : "#D33333"			// reddish
+			short : "#00c224",			// greenish
+			medium : "#e3c903",			// yellowish
+			long : "#8f8f8f"			// grey
 		},
 		
 		lengthColorProperties : { //  Keep these values the same as the property names under 'lengthColors'
@@ -338,23 +321,6 @@ LinkColorHandler.prototype.getLinkColor = function( link, colorFormat ) {
 	console.log( colorFormat );
 	
 	return;
-};
-
-/**
- * Get the name (e.g. 'red') corresponding to supplied hex value (e.g., '#ff0000')
- * Only the subset of hexes used in this handler are supported
- * @param hex The hex code (including the #) of the color
- */
-LinkColorHandler.prototype.hexToName = function( hex ) {
-	hex = hex.toLowerCase();
-		
-	if( hex in this._CONSTANTS.colorNames ) {
-		return this._CONSTANTS.colorNames[ hex ];
-	} else {
-		console.log( "Could not find color name for: " + hex + ". Returning white." );
-		return "white";
-	}
-	
 };
 
 /**
