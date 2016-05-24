@@ -12,6 +12,7 @@ import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.db_web.DBConnectionFactoryWeb;
 import org.yeastrc.xlink.www.db_web.DBSet_JNDI_Name_FromConfigFile;
 import org.yeastrc.xlink.www.send_email.GetEmailConfig;
+import org.yeastrc.xlink.www.web_utils.GetJsCssCacheBustString;
 
 
 /**
@@ -56,6 +57,10 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 
 		CurrentContext.setCurrentWebAppContext( contextPath );
 		
+		String jsCssCacheBustString = GetJsCssCacheBustString.getInstance().getJsCssCacheBustString();
+
+		context.setAttribute( WebConstants.APP_CONTEXT_JS_CSS_CACHE_BUST, jsCssCacheBustString );
+
 		
 		AuthLibraryDBConnectionFactoryForWeb dbConnectFactory = new AuthLibraryDBConnectionFactoryForWeb();
 		

@@ -12,7 +12,7 @@
 
  <c:set var="headerAdditions">
 
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter.min.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
@@ -28,10 +28,10 @@
 		<script src="${contextPath}/js/lorikeet/jquery.flot.js"></script>
 		<script src="${contextPath}/js/lorikeet/jquery.flot.selection.js"></script>
 		
-		<script src="${contextPath}/js/lorikeet/specview.js"></script>
-		<script src="${contextPath}/js/lorikeet/peptide.js"></script>
-		<script src="${contextPath}/js/lorikeet/aminoacid.js"></script>
-		<script src="${contextPath}/js/lorikeet/ion.js"></script>		
+		<script src="${contextPath}/js/lorikeet/specview.js?x=${cacheBustValue}"></script>
+		<script src="${contextPath}/js/lorikeet/peptide.js?x=${cacheBustValue}"></script>
+		<script src="${contextPath}/js/lorikeet/aminoacid.js?x=${cacheBustValue}"></script>
+		<script src="${contextPath}/js/lorikeet/ion.js?x=${cacheBustValue}"></script>		
 		
 <%--  End of Lorikeet Core Parts --%>		
 
@@ -51,9 +51,9 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 
-		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
 		
 				
 				<%-- 
@@ -61,19 +61,19 @@
 					This input is required on this page:
 					<input type="hidden" id="protein_listing_webservice_base_url" value="<c:out value="${ protein_listing_webservice_base_url }"></c:out>">
 				  --%>
-		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
 				
-		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 
 			
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/viewSearchCrosslinkProteinPage.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewSearchCrosslinkProteinPage.js?x=${cacheBustValue}"></script>
 
 	
 		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />

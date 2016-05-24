@@ -25,7 +25,7 @@
 
 
 	
-	<script type="text/javascript" src="${ contextPath }/js/listProjectsPage.js"></script>
+	<script type="text/javascript" src="${ contextPath }/js/listProjectsPage.js?x=${cacheBustValue}"></script>
 
  </c:set>
 

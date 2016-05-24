@@ -21,9 +21,9 @@
 			<!-- use minimized version  -->
 			<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
 			
-	<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js"></script> 
+	<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 
-	<script type="text/javascript" src="${ contextPath }/js/user_account/manageUsersPage.js"></script> 
+	<script type="text/javascript" src="${ contextPath }/js/user_account/manageUsersPage.js?x=${cacheBustValue}"></script> 
 
  </c:set>
 

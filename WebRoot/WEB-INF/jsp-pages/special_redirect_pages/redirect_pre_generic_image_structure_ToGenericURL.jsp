@@ -22,7 +22,7 @@
 	  
 	<input type="hidden" id="cutoffValuesRootLevelJSONRootString" value="<c:out value="${ cutoffValuesRootLevelJSONRootString }"></c:out>">
 
- 	<script type="text/javascript" src="${contextPath}/js/z_redirect_pre_generic_image_structure_ToGenericURL.js"></script>
+ 	<script type="text/javascript" src="${contextPath}/js/z_redirect_pre_generic_image_structure_ToGenericURL.js?x=${cacheBustValue}"></script>
 
  
  </body>

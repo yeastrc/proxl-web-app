@@ -10,7 +10,7 @@
 	  var contextPathJSVar = "${contextPath}";
 	  </script>
 	  
- 	<script type="text/javascript" src="${contextPath}/js/z_redirect_searchIdsFromHashToQueryString.js"></script>
+ 	<script type="text/javascript" src="${contextPath}/js/z_redirect_searchIdsFromHashToQueryString.js?x=${cacheBustValue}"></script>
 
  
  </body>
