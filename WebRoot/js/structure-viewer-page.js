@@ -2397,7 +2397,7 @@ var updateShownLinks = function () {
 	var $shownCrosslinksDiv = $( '#shown-crosslinks-text' );
 	if( !$shownCrosslinksDiv || $shownCrosslinksDiv.length < 1 ) { return; }
 	
-	var html = "<div style=\"font-size:14pt;margin-top:15px;\">Shown Crosslinks:</div>\n";
+	var html = "<div style=\"font-size:14pt;margin-top:15px;\">Shown Crosslinks:</div>";
 	
 
 	if( _renderedLinks[ 'crosslinks' ] && _renderedLinks[ 'crosslinks' ].length > 0 ) {
@@ -2412,11 +2412,13 @@ var updateShownLinks = function () {
 			var color = _linkColorHandler.getLinkColor( link, 'rgb' );
 			var rgbaString = "rgba(" + color.r + "," + color.g + "," + color.b + ",0.15)";			
 			
-			html += "<tr class=\"reported-crosslink\" data-crosslink-index=\"" + i + "\" style=\"background-color:" + rgbaString + "\">\n";		
+			html += "<tr class=\" reported_crosslink_jq tool_tip_attached_jq \" data-crosslink-index=\"" + i + "\" " 
+				+ " data-tooltip=\"Click for Details\""
+				+ " style=\"cursor: pointer; background-color:" + rgbaString + "\">";		
 			html += "<td style=\"width:180px;\">" + _proteinNames[ link.protein1 ] + " (" + link.position1 + ")</td>";
 			html += "<td style=\"width:180px;\">" + _proteinNames[ link.protein2 ] + " (" + link.position2 + ")</td>";
 			html += "<td style=\"width:100px;\">" + link.length.toFixed( 1 ) + "</td>";
-			html += "</tr>\n";
+			html += "</tr>";
 			
 		}
 		
@@ -2429,8 +2431,9 @@ var updateShownLinks = function () {
 	
 	$shownCrosslinksDiv.html( html );
 	
+	var $reported_crosslink_jq = $( '.reported_crosslink_jq' );
 	
-	$( '.reported-crosslink' ).click( function( e ) {
+	$reported_crosslink_jq.click( function( e ) {
 		
 		var params = { 
 				psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
@@ -2442,6 +2445,8 @@ var updateShownLinks = function () {
 		
 		getCrosslinkDataForSpecificLinkInGraph( params, link.link );
 	});
+	
+	addToolTips( $shownCrosslinksDiv );
 	
 	var $shownLooplinksDiv = $( '#shown-looplinks-text' );
 	if( !$shownLooplinksDiv || $shownLooplinksDiv.length < 1 ) { return; }
