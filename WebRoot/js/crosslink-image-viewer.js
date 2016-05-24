@@ -3831,7 +3831,7 @@ function getCrosslinkLineColor( params ) {
 				return getColorForSearchesForIndexAndSearchList( toProteinIndex, searchList );
 			}
 			
-			return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : toProteinIndex, singlePosition : toProteinIndex } ); 
+			return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : toProteinIndex, singlePosition : toProteinPosition } ); 
 		}
 
 		return _NOT_HIGHLIGHTED_LINE_COLOR;
