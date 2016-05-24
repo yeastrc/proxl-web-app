@@ -65,9 +65,9 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	 
 	
 	
-	<script type="text/javascript" src="${ contextPath }/js/crosslinksCollapsible.js"></script>
+	<script type="text/javascript" src="${ contextPath }/js/crosslinksCollapsible.js?x=${cacheBustValue}"></script>
 	
-	<script type="text/javascript" src="${ contextPath }/js/header_main.js"></script>
+	<script type="text/javascript" src="${ contextPath }/js/header_main.js?x=${cacheBustValue}"></script>
 
 	
 	<style >
@@ -83,7 +83,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 
 
 	<link rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" type="text/css" media="print, projection, screen" />
-	<link rel="stylesheet" href="${ contextPath }/css/global.css" type="text/css" media="print, projection, screen" />
+	<link rel="stylesheet" href="${ contextPath }/css/global.css?x=${cacheBustValue}" type="text/css" media="print, projection, screen" />
 
 
 </head>

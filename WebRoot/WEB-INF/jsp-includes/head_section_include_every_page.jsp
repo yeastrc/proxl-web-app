@@ -23,7 +23,7 @@
 
 	<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
 
-	<script type="text/javascript" src="${ contextPath }/js/genericToolTip.js"></script>
+	<script type="text/javascript" src="${ contextPath }/js/genericToolTip.js?x=${cacheBustValue}"></script>
 
 
 	
@@ -75,9 +75,9 @@
 	  
 	</script>	
 	
-	<script type="text/javascript" src="${contextPath}/js/crosslinks_constants_every_page.js"></script>
+	<script type="text/javascript" src="${contextPath}/js/crosslinks_constants_every_page.js?x=${cacheBustValue}"></script>
 	
-	<script type="text/javascript" src="${contextPath}/js/showHideErrorMessage.js"></script>
+	<script type="text/javascript" src="${contextPath}/js/showHideErrorMessage.js?x=${cacheBustValue}"></script>
 	
 	
 	

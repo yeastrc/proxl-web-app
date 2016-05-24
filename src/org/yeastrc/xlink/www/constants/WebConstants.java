@@ -11,6 +11,12 @@ public class WebConstants {
 	 */
 	public static final String APP_CONTEXT_CONTEXT_PATH = "contextPath";
 	
+	
+	/**
+	 * Something to append to JS and CSS file query string to force re-download on web app startup
+	 */
+	public static final String APP_CONTEXT_JS_CSS_CACHE_BUST = "cacheBustValue";
+	
 
 	/**
 	 * specific config_system table values

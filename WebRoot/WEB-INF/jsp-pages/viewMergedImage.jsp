@@ -49,13 +49,13 @@
 		<%--  Only load the excanvas.min.js if it is IE 8 or lower.  IE 8 does not support HTML5 so this is a way to have HTML5 canvas support --%>
 		<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="${contextPath}/js/lorikeet_google_code/excanvas.min.js"></script><![endif]-->
 		
-		<script src="${contextPath}/js/lorikeet/jquery.flot.js"></script>
-		<script src="${contextPath}/js/lorikeet/jquery.flot.selection.js"></script>
+		<script src="${contextPath}/js/lorikeet/jquery.flot.js?x=${cacheBustValue}"></script>
+		<script src="${contextPath}/js/lorikeet/jquery.flot.selection.js?x=${cacheBustValue}"></script>
 		
-		<script src="${contextPath}/js/lorikeet/specview.js"></script>
-		<script src="${contextPath}/js/lorikeet/peptide.js"></script>
-		<script src="${contextPath}/js/lorikeet/aminoacid.js"></script>
-		<script src="${contextPath}/js/lorikeet/ion.js"></script>		
+		<script src="${contextPath}/js/lorikeet/specview.js?x=${cacheBustValue}"></script>
+		<script src="${contextPath}/js/lorikeet/peptide.js?x=${cacheBustValue}"></script>
+		<script src="${contextPath}/js/lorikeet/aminoacid.js?x=${cacheBustValue}"></script>
+		<script src="${contextPath}/js/lorikeet/ion.js?x=${cacheBustValue}"></script>		
 		
 <%--  End of Lorikeet Core Parts --%>		
 
@@ -63,44 +63,44 @@
 			<%--  On this page Snap also used by crosslink-image-viewer.js and crosslink-image-viewer-click-element-handlers.js --%>				
 		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
-		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 		 
-		<script type="text/javascript" src="${ contextPath }/js/spinner.js"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/spinner.js?x=${cacheBustValue}"></script> 
 		
-		<script type="text/javascript" src="${ contextPath }/js/trypsinCutPointsForSequence.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/trypsinCutPointsForSequence.js?x=${cacheBustValue}"></script>
 		 
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-protein-annotation.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-protein-annotation.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-click-element-handlers.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-per-protein-bar-data.js"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-per-protein-bar-data.js?x=${cacheBustValue}"></script> 
 
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-region-selections.js"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-region-selections.js?x=${cacheBustValue}"></script> 
 
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer.js"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer.js?x=${cacheBustValue}"></script> 
 		
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This input is required on this page:
 					<input type="hidden" id="protein_listing_webservice_base_url" value="<c:out value="${ protein_listing_webservice_base_url }"></c:out>">
 				  --%>
-		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
 		
 		
-		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		
 		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />

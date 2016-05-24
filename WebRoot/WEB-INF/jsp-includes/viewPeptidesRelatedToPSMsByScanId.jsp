@@ -2,7 +2,7 @@
 <%--  viewPeptidesRelatedToPSMsByScanId.jsp  --%>
 
 
-		<script type="text/javascript" src="${ contextPath }/js/viewPeptidesRelatedToPSMsByScanId.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewPeptidesRelatedToPSMsByScanId.js?x=${cacheBustValue}"></script>
 	
 
 		

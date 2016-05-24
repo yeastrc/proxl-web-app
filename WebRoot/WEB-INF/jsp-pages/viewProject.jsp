@@ -32,9 +32,9 @@
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
 		
 
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}?x=${cacheBustValue}"></script> 
 		
-		<script type="text/javascript" src="${ contextPath }/js/viewProjectPage.js"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/viewProjectPage.js?x=${cacheBustValue}?x=${cacheBustValue}"></script> 
 		
 		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
 		
@@ -2418,7 +2418,7 @@
 			<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
 			
 	
-			<script type="text/javascript" src="${ contextPath }/js/viewProject_ProjectAdminSection.js"></script>
+			<script type="text/javascript" src="${ contextPath }/js/viewProject_ProjectAdminSection.js?x=${cacheBustValue}"></script>
 
 		</c:if> 
 		
@@ -2426,7 +2426,7 @@
 		<%--  If project owner, include the Javascript for Project Lock admin --%>
 		<c:if test="${authAccessLevel.projectOwnerAllowed or authAccessLevel.projectOwnerIfProjectNotLockedAllowed}" >
 			
-			<script type="text/javascript" src="${ contextPath }/js/viewProject_ProjectLockAdmin.js"></script>
+			<script type="text/javascript" src="${ contextPath }/js/viewProject_ProjectLockAdmin.js?x=${cacheBustValue}"></script>
 		
 		</c:if>
 
@@ -2462,8 +2462,8 @@
 </script>		
 
 	
-			<script type="text/javascript" src="${ contextPath }/js/qcChartsViewProjectPage.js"></script>
-			<script type="text/javascript" src="${ contextPath }/js/qcChartPSMCountsVsScore.js"></script>
+			<script type="text/javascript" src="${ contextPath }/js/qcChartsViewProjectPage.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="${ contextPath }/js/qcChartPSMCountsVsScore.js?x=${cacheBustValue}"></script>
 	
 
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>

@@ -24,9 +24,9 @@
 			<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
 --%>
 			
-	<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js"></script> 
+	<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 
-	<script type="text/javascript" src="${ contextPath }/js/manageConfigurationPage.js"></script> 
+	<script type="text/javascript" src="${ contextPath }/js/manageConfigurationPage.js?x=${cacheBustValue}"></script> 
 
  </c:set>
 

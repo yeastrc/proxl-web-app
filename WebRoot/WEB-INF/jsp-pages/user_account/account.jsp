@@ -12,7 +12,7 @@
 
  <c:set var="headerAdditions">
 	
-	<script type="text/javascript" src="${ contextPath }/js/user_account/accountManagementPage.js"></script>
+	<script type="text/javascript" src="${ contextPath }/js/user_account/accountManagementPage.js?x=${cacheBustValue}"></script>
 
  </c:set>
 
