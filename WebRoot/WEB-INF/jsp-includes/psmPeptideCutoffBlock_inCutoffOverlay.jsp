@@ -13,13 +13,14 @@
  
 <c:if test="${ not empty annotationCutoffDataList }" >
 	<tr style=" vertical-align: top;"
-		onclick="cutoffProcessingCommonCode.openCutoffOverlay( { clickedThis : this } )"
+		class=" cutoff_per_search_block_tr_jq "
 		data-associated_overlay_container_id="${ filterTypeHTML_Id }_cutoffs_overlay_container__search_id_<bean:write name="search" property="id" />"
 	>
 		<td style="  line-height: 1.3em; white-space: nowrap; <c:if test="${ not singleSearch }" > <%-- padding-top: 3px; padding-bottom: 3px; --%> width: 125px;</c:if> ">
-		  <span style=" cursor: pointer;" class="tool_tip_attached_jq" data-tooltip="Edit filter values" >
+		  <span style=" cursor: pointer;" class="tool_tip_attached_jq" data-tooltip="Edit filter values" 
+		  	onclick="cutoffProcessingCommonCode.openCutoffOverlay( { clickedThis : this } )" >
 			${ filterTypeDisplay } Filters:
-			<img src="${contextPath}/images/icon-edit-small.png" >
+			<img src="${contextPath}/images/icon-edit-small.png" onclick="cutoffProcessingCommonCode.openCutoffOverlay( { clickedThis : this } )" >
 		  </span>
 		</td>
 		<td style=" line-height: 1.3em; <c:if test="${ not singleSearch }" > <%-- padding-top: 3px; padding-bottom: 3px; --%> </c:if>">

@@ -725,7 +725,7 @@ var CutoffProcessingCommonCode = function() {
 	};	
 	
 
-	//   Edit icon clicked
+	//   Edit icon, label, or value clicked
 
 	this.openCutoffOverlay = function( params ) {
 
@@ -733,7 +733,10 @@ var CutoffProcessingCommonCode = function() {
 
 		var $clickedThis = $( clickedThis );
 		
-		var associated_overlay_container_id = $clickedThis.attr("data-associated_overlay_container_id");
+		//  Gen enclosing <tr> with data value
+		var $cutoff_per_search_block_tr_jq = $clickedThis.closest(".cutoff_per_search_block_tr_jq");
+		
+		var associated_overlay_container_id = $cutoff_per_search_block_tr_jq.attr("data-associated_overlay_container_id");
 		
 		var $associated_overlay_container_id = $("#" + associated_overlay_container_id);
 		
