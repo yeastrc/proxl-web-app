@@ -1964,7 +1964,14 @@ var downloadPymolScript = function() {
 				console.log( "WARNING: Got anomolous readings for second protein in link." );
 			}
 			
-			var uniqueId = _proteinNames[ nrseq1s[ 0 ].nrseqId ] + "_" + nrseq1s[ 0 ].position + "C" + _proteinNames[ nrseq2s[ 0 ].nrseqId ] + "_" + nrseq2s[ 0 ].position;
+			// if protein names contain commas, only keep what's before the first comma
+			var proteinName1 = _proteinNames[ nrseq1s[ 0 ].nrseqId ];
+			proteinName1 = proteinName1.split(",")[ 0 ];
+			
+			var proteinName2 = _proteinNames[ nrseq2s[ 0 ].nrseqId ];
+			proteinName2 = proteinName2.split(",")[ 0 ];
+			
+			var uniqueId = proteinName1 + "_" + nrseq1s[ 0 ].position + "L" + proteinName2 + "_" + nrseq2s[ 0 ].position;
 
 			// ensure a distance is only added once (ie, don't want same distance added for a looplink and crosslink on same atoms)
 			var distanceId = atom1.residue().chain().name() + "-" + atom1.residue().num() + "-" + atom2.residue().chain().name() + "-" + atom2.residue().num();	
@@ -2021,7 +2028,14 @@ var downloadPymolScript = function() {
 				console.log( "WARNING: Got anomolous readings for second protein in link." );
 			}
 			
-			var uniqueId = _proteinNames[ nrseq1s[ 0 ].nrseqId ] + "_" + nrseq1s[ 0 ].position + "C" + _proteinNames[ nrseq2s[ 0 ].nrseqId ] + "_" + nrseq2s[ 0 ].position;
+			// if protein names contain commas, only keep what's before the first comma
+			var proteinName1 = _proteinNames[ nrseq1s[ 0 ].nrseqId ];
+			proteinName1 = proteinName1.split(",")[ 0 ];
+			
+			var proteinName2 = _proteinNames[ nrseq2s[ 0 ].nrseqId ];
+			proteinName2 = proteinName2.split(",")[ 0 ];
+			
+			var uniqueId = proteinName1 + "_" + nrseq1s[ 0 ].position + "C" + proteinName2 + "_" + nrseq2s[ 0 ].position;
 			
 			// ensure a distance is only added once (ie, don't want same distance added for a looplink and crosslink on same atoms)
 			var distanceId = atom1.residue().chain().name() + "-" + atom1.residue().num() + "-" + atom2.residue().chain().name() + "-" + atom2.residue().num();	
