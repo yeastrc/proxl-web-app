@@ -154,7 +154,7 @@ ProteinBarRegionSelectionsOverlayCode.prototype._populate = function( params ) {
 	
 	var noProteinBarsSelected = true;
 	
-	var isAnyProteinBarsHighlighted = _imageProteinBarDataManager.isAnyProteinBarsHighlighted();
+	var isAnyProteinBarsHighlighted = this.imageProteinBarDataManager.isAnyProteinBarsHighlighted();
 	
 	if ( isAnyProteinBarsHighlighted ) {
 		
@@ -162,7 +162,7 @@ ProteinBarRegionSelectionsOverlayCode.prototype._populate = function( params ) {
 	}
 	
 	
-	var imageProteinBarDataItemsArray = _imageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
+	var imageProteinBarDataItemsArray = this.imageProteinBarDataManager.getAllItems();
 
 	for ( var index = 0; index < imageProteinBarDataItemsArray.length; index++ ) {
 
@@ -355,7 +355,7 @@ ProteinBarRegionSelectionsOverlayCode.prototype.save = function( params ) {
 		var proteinLength = parseInt( proteinLengthString, 10 );
 		
 		var imageProteinBarDataItem =
-			objectThis.imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : itemIndex } );
+			objectThis.imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : itemIndex } );
 		
 		if ( proteinIdString !== imageProteinBarDataItem.getProteinId() ) {
 			

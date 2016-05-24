@@ -2045,7 +2045,7 @@ function populateFromHash_imageProteinBarDataManager(){
 				
 				var newEntry = ImageProteinBarData.constructEmptyImageProteinBarData();
 				
-				newEntry.setProteinId( { proteinId : selectedProteinId, proteinIdIsSelected : true, proteinLength : selectedProteinLength } );
+				newEntry.setProteinId( { proteinId : selectedProteinId, proteinLength : selectedProteinLength } );
 				
 				_imageProteinBarDataManager.addEntry( { arrayIndexInt : selectedProteinIdsIndex, entry : newEntry } );
 			}
@@ -2063,7 +2063,7 @@ function populateFromHash_imageProteinBarDataManager(){
 						
 						//  Try/Catch since the index may not be valid
 						
-						var entry = _imageProteinBarDataManager.getItemByProteinSelectorIndex( { arrayIndexInt : highlightedProteinProteinBarPositionIndex } );
+						var entry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : highlightedProteinProteinBarPositionIndex } );
 						
 						entry.setProteinBarHighlightedAll();
 						
@@ -2084,7 +2084,7 @@ function populateFromHash_imageProteinBarDataManager(){
 
 	if ( proteinsReversedObject !== undefined && proteinsReversedObject !== null ) {
 
-		var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
+		var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
 		
 		var proteinsReversedKeys = Object.keys( proteinsReversedObject );
 		
@@ -2125,7 +2125,7 @@ function populateFromHash_imageProteinBarDataManager(){
 
 	if ( proteinsOffsetsObject !== undefined && proteinsOffsetsObject !== null ) {
 
-		var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
+		var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
 		
 		var proteinsOffsetsKeys = Object.keys( proteinsOffsetsObject );
 		
@@ -2478,8 +2478,6 @@ function processClickOnRemoveSelectedProtein( params ) {
 	var $clickedThis = $( clickedThis );
 	
 	$clickedThis.qtip('destroy', true); // Immediately destroy all tooltips belonging to the selected elements
-
-
 	
 //	var protein_id = $clickedThis.attr("data-protein_id");
 	
@@ -2492,22 +2490,19 @@ function processClickOnRemoveSelectedProtein( params ) {
 		throw "positionIndex is not a number.  is: " + positionIndex;
 	}
 	
-	_imageProteinBarDataManager.removeItemByProteinSelectorIndex( { proteinSelectorIndexInt : positionIndexInt } );
+	_imageProteinBarDataManager.removeItemByIndex( { arrayIndexInt : positionIndexInt } );
 	
 	updateURLHash( false /* useSearchForm */ );
 	
 	showSelectedProteins();
 	
 	drawSvg();
-
 }
 
 
 function getNavigationJSON_Not_for_Image_Or_Structure() {
 
-	
 	var json = getJsonFromHash();
-	
 	
 
 	///   Serialize cutoffs to JSON
@@ -2754,7 +2749,7 @@ function getProteinOffset( params ) {
 
 	var proteinBarIndex = params.proteinBarIndex;
 	
-	var entry = _imageProteinBarDataManager.getItemByProteinSelectorIndex( { arrayIndexInt : proteinBarIndex } );
+	var entry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarIndex } );
 	
 	var proteinOffset = entry.getProteinOffset();
 
@@ -2778,7 +2773,7 @@ function isProteinReversed( params ) {
 //	var proteinId = params.proteinId;
 	var proteinBarIndex = params.proteinBarIndex;
 	
-	var entry = _imageProteinBarDataManager.getItemByProteinSelectorIndex( { arrayIndexInt : proteinBarIndex } );
+	var entry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarIndex } );
 	
 	var proteinReversed = entry.getProteinReversed();
 
@@ -2965,7 +2960,7 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 		// only do this if they actually moved the protein bar group, or moved bar and tool tips were destroyed
 		if ( ( Math.abs( amountElementMoved ) > 0 ) || tooltipsDestroyed ) {
 		
-			var entry = _imageProteinBarDataManager.getItemByProteinSelectorIndex( { arrayIndexInt : proteinBarIndex } );
+			var entry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarIndex } );
 			
 			var prevOffset = entry.getProteinOffset();
 
@@ -3217,7 +3212,7 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 		var selectionRegion = { start: startX_SequencePositionOneBased, end: endX_SequencePositionOneBased };
 		
 		var imageProteinBarDataEntry = 
-			_imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : proteinBarIndex } );
+			_imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarIndex } );
 		
 		if ( shiftKeyDown ) {
 			
@@ -3270,7 +3265,7 @@ function removeHighlightedProteinRegion( params ) {
 		sequencePositionOneBased = proteinSequenceLength - sequencePositionOneBased + 1;
 	}
 
-	var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : proteinBarIndex } );
+	var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarIndex } );
 	
 	imageProteinBarDataEntry.removeProteinBarHighlightedRegion( { position : sequencePositionOneBased } );
 	
@@ -3371,7 +3366,7 @@ function clearHighlightedProteins() {
 // whether or not the supplied selected protein index is currently highlighted
 function isHighlightedProtein( i ) {
 
-	var imageProteinBarData =  _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : i } );
+	var imageProteinBarData =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : i } );
 
 	if ( imageProteinBarData.isAllOfProteinBarHighlighted()  ) {
 		
@@ -3388,7 +3383,7 @@ function toggleHighlightedProtein( i, shouldClearFirst ) {
 		
 		clearHighlightedProteins();
 
-		var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : i } );
+		var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : i } );
 		
 		imageProteinBarDataItem.setProteinBarHighlightedAll();
 		
@@ -3396,7 +3391,7 @@ function toggleHighlightedProtein( i, shouldClearFirst ) {
 		
 		if ( isHighlightedProtein( i ) ) {
 			
-			var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : i } );
+			var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : i } );
 			
 			imageProteinBarDataItem.clearProteinBarHighlighted();
 			
@@ -3405,7 +3400,7 @@ function toggleHighlightedProtein( i, shouldClearFirst ) {
 				clearHighlightedProteins(); 
 			}
 
-			var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : i } );
+			var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : i } );
 			
 			imageProteinBarDataItem.setProteinBarHighlightedAll();
 		}
@@ -3418,7 +3413,7 @@ function toggleHighlightedProtein( i, shouldClearFirst ) {
 //Reverse the protein 
 function toggleReversedProtein( i, protein ) {
 
-	var entry = _imageProteinBarDataManager.getItemByProteinSelectorIndex( { arrayIndexInt : i } );
+	var entry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : i } );
 	
 	var proteinReversed = entry.getProteinReversed();
 	
@@ -3443,7 +3438,7 @@ function annotationColorOverrideForUnselected( params ) {
 	var annotationEndPosition = params.annotationEndPosition;
 	
 
-	var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByProteinSelectorIndex( { arrayIndexInt : proteinBarPositionIndex } );
+	var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarPositionIndex } );
 	
 	if ( imageProteinBarDataEntry.isProteinBarHighlightedAtPosition( { position_1 : annotationStartPosition } )
 			|| imageProteinBarDataEntry.isProteinBarHighlightedAtPosition( { position_1 : annotationEndPosition } ) ) {
@@ -3532,7 +3527,7 @@ function getColorIndexForProteinBarRowIndexPosition__SinglePosition( params ) {
 
 	var proteinBarsSelectedRegionsCounter = 0;
 	
-	var imageProteinBarDataEntryArray = _imageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
+	var imageProteinBarDataEntryArray = _imageProteinBarDataManager.getAllItems();
 	
 	if ( proteinBarRowIndex >= imageProteinBarDataEntryArray.length ) {
 		
@@ -3604,7 +3599,7 @@ function getColorForProteinBarRowIndexBlockPositions( params ) {
 			
 			var proteinBarsSelectedRegionsCounter = 0;
 			
-			var imageProteinBarDataEntryArray = _imageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
+			var imageProteinBarDataEntryArray = _imageProteinBarDataManager.getAllItems();
 			
 			if ( proteinBarRowIndex >= imageProteinBarDataEntryArray.length ) {
 				
@@ -3755,7 +3750,7 @@ function getLineColorSingleProteinBar( params ) {
 		return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : proteinIndex } ); 
 	}
 
-	var imageProteinBarDataProtein =  _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : proteinIndex } );
+	var imageProteinBarDataProtein =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinIndex } );
 
 	if ( toProteinPosition === undefined || toProteinPosition === null ) {
 		
@@ -3813,9 +3808,9 @@ function getCrosslinkLineColor( params ) {
 	}
 
 	
-	var imageProteinBarDataFromProtein =  _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : fromProteinIndex } );
+	var imageProteinBarDataFromProtein =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : fromProteinIndex } );
 
-	var imageProteinBarDataToProtein =  _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : toProteinIndex } );
+	var imageProteinBarDataToProtein =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : toProteinIndex } );
 	
 	
 	if ( _imageProteinBarDataManager.exactly_One_ProteinBar_Highlighted() ) {
@@ -3950,7 +3945,7 @@ function getLineOpacitySingleProteinBar( params ) {
 	}
 
 
-	var imageProteinBarDataProtein =  _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : proteinIndex } );
+	var imageProteinBarDataProtein =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinIndex } );
 
 	if ( toProteinPosition === undefined || toProteinPosition === null ) {
 
@@ -3990,9 +3985,9 @@ function getCrosslinkLineOpacity( params ) {
 	}
 
 	
-	var imageProteinBarDataFromProtein =  _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : fromProteinIndex } );
+	var imageProteinBarDataFromProtein =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : fromProteinIndex } );
 
-	var imageProteinBarDataToProtein =  _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : toProteinIndex } );
+	var imageProteinBarDataToProtein =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : toProteinIndex } );
 	
 	
 	if ( _imageProteinBarDataManager.exactly_One_ProteinBar_Highlighted() ) {
@@ -4627,7 +4622,7 @@ function drawSequenceCoverage( selectedProteins, svgRootSnapSVGObject ) {
 					
 				if ( isAnyProteinBarsHighlighted ) {
 
-					var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : proteinBarRowIndex } );
+					var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarRowIndex } );
 
 					var isProteinBarHighlightedAnywhereBetweenPositionsParams = {
 							position_1 : start,
@@ -4789,7 +4784,7 @@ function drawDisopred_3_AnnotationData( selectedProteins, svgRootSnapSVGObject )
 
 					if ( isAnyProteinBarsHighlighted ) {
 
-						var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : proteinBarRowIndex } );
+						var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarRowIndex } );
 
 						var isProteinBarHighlightedAnywhereBetweenPositionsParams = {
 								position_1 : start,
@@ -4934,7 +4929,7 @@ function drawPsipred_3_AnnotationData( selectedProteins, svgRootSnapSVGObject ) 
 
 					if ( isAnyProteinBarsHighlighted ) {
 
-						var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : proteinBarRowIndex } );
+						var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarRowIndex } );
 
 						var isProteinBarHighlightedAnywhereBetweenPositionsParams = {
 								position_1 : start,
@@ -5088,7 +5083,7 @@ function addSingleProteinBarGroup( i, protein, proteinNamePositionLeftSelected, 
 	
 
 	var imageProteinBarDataEntry = 
-		_imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : i } );
+		_imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : i } );
 	
 
 
@@ -7312,9 +7307,9 @@ function processClickOnSelectProtein( params ) {
 			throw "positionIndex is not an integer,  positionIndex: '" + positionIndex + "'";
 		}
 
-		var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByBarPositionIndex( { positionIndexInt : positionIndexInt } );
+		var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : positionIndexInt } );
 		
-		imageProteinBarDataItem.setProteinId( { proteinId : selectedProteinId, proteinIdIsSelected : true } );
+		imageProteinBarDataItem.setProteinId( { proteinId : selectedProteinId } );
 		
 
 		closeAddProteinSelect();
@@ -7344,7 +7339,7 @@ function processClickOnAddProteins( ) {
 		
 		var newImageProteinBarData = ImageProteinBarData.constructEmptyImageProteinBarData();
 		
-		newImageProteinBarData.setProteinId( { proteinId : selectedProteinId, proteinIdIsSelected : true } );
+		newImageProteinBarData.setProteinId( { proteinId : selectedProteinId } );
 		
 		var proteinLength = _proteinLengths[ selectedProteinId ];
 		
@@ -7371,7 +7366,7 @@ function processClickOnAddProteins( ) {
 // protein multiple times
 function getAllSelectedProteins() {
 
-	var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
+	var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
 	
 
 	var proteinsLocalVar = [];
@@ -7398,7 +7393,7 @@ function getSelectedProteinsExcludingPositionIndex( params ) {
 	
 	var positionIndex = params.positionIndex;
 
-	var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
+	var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
 	
 
 	var proteinsLocalVar = [];

@@ -31,10 +31,6 @@
 var ImageProteinBarDataManager = function() {
 		
 	this.imageProteinBarDataList = [];
-	
-	//  Only the items from imageProteinBarDataList where the protein id was a selected value
-	
-	this.imageProteinBarData_ProteinIdSelected_List = [];
 };
 
 var ImageProteinBarDataManagerContructor = function() { 
@@ -42,21 +38,6 @@ var ImageProteinBarDataManagerContructor = function() {
 	return new ImageProteinBarDataManager();
 };
 		
-
-ImageProteinBarDataManager.prototype._rebuild_imageProteinBarData_ProteinIdSelected_List = function( ) {
-
-	this.imageProteinBarData_ProteinIdSelected_List = [];
-
-	for ( var arrayIndex = 0; arrayIndex < this.imageProteinBarDataList.length; arrayIndex++ ) {
-		
-		var imageProteinBarDataEntry = this.imageProteinBarDataList[ arrayIndex ];
-		
-		if ( imageProteinBarDataEntry.getProteinIdIsSelected() ) {
-			
-			this.imageProteinBarData_ProteinIdSelected_List.push( imageProteinBarDataEntry );
-		}
-	}
-};
 
 ImageProteinBarDataManager.prototype.addEntry = function( params ) {
 
@@ -110,37 +91,18 @@ ImageProteinBarDataManager.prototype.addEntry = function( params ) {
 			this.imageProteinBarDataList.push( newEntry );
 		}
 	}
-	
-	this._rebuild_imageProteinBarData_ProteinIdSelected_List();
 };
 
 
-//  Get all items with selected protein ids
+//  Get all items
 
-ImageProteinBarDataManager.prototype.getAllItemsWithSelectedProteinIds = function( ) {
+ImageProteinBarDataManager.prototype.getAllItems = function( ) {
 
-	return this.imageProteinBarData_ProteinIdSelected_List;
+	return this.imageProteinBarDataList;
 },
 
 
-//  The index of the position in the list of displayed bars, first position is zero index
-
-ImageProteinBarDataManager.prototype.getItemByBarPositionIndex = function( params ) {
-
-	var positionIndexInt = params.positionIndexInt;
-	
-	var item = this.imageProteinBarData_ProteinIdSelected_List[ positionIndexInt ];
-	
-	if ( ! item ) {
-		
-		throw "entry not found in imageProteinBarData_ProteinIdSelected_List for index: " + positionIndexInt;
-	}
-	
-	return item;
-},
-
-
-ImageProteinBarDataManager.prototype.getItemByProteinSelectorIndex = function( params ) {
+ImageProteinBarDataManager.prototype.getItemByIndex = function( params ) {
 
 	var arrayIndexInt = params.arrayIndexInt;
 	
@@ -154,28 +116,12 @@ ImageProteinBarDataManager.prototype.getItemByProteinSelectorIndex = function( p
 	return item;
 },
 
-ImageProteinBarDataManager.prototype.putItemByProteinSelectorIndex = function( params ) {
-	
-	var imageProteinBarData = params.imageProteinBarData;
+ImageProteinBarDataManager.prototype.removeItemByIndex = function( params ) {
 	
 	var arrayIndexInt = params.arrayIndexInt;
 	
-	this.imageProteinBarDataList[ arrayIndexInt ] = imageProteinBarData;
-
-	imageProteinBarData.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
-
-	this._rebuild_imageProteinBarData_ProteinIdSelected_List();
-};
-
-
-ImageProteinBarDataManager.prototype.removeItemByProteinSelectorIndex = function( params ) {
-	
-	var proteinSelectorIndexInt = params.proteinSelectorIndexInt;
-	
 //	var removedItem = 
-	this.imageProteinBarDataList.splice( proteinSelectorIndexInt, 1 );
-	
-	this._rebuild_imageProteinBarData_ProteinIdSelected_List();
+	this.imageProteinBarDataList.splice( arrayIndexInt, 1 );
 };
 
 ImageProteinBarDataManager.prototype.updateItemOrder = function( params ) {
@@ -197,16 +143,12 @@ ImageProteinBarDataManager.prototype.updateItemOrder = function( params ) {
 	}
 	
 	this.imageProteinBarDataList = newImageProteinBarDataList;
-
-	this._rebuild_imageProteinBarData_ProteinIdSelected_List();
 };
 
 
 ImageProteinBarDataManager.prototype.clearItems = function( params ) {
 	
 	this.imageProteinBarDataList = [];
-	
-	this._rebuild_imageProteinBarData_ProteinIdSelected_List();
 };
 
 
@@ -219,22 +161,15 @@ ImageProteinBarDataManager.prototype.clearItems = function( params ) {
 
 ImageProteinBarDataManager.prototype.getArrayOfObjectsForHash = function( ) {
 	
-	//   Return only the elements for where the protein id is a selected value.
-	
 	var imageProteinBarDataListResult = [];
-	
 	
 	for ( var index = 0; index < this.imageProteinBarDataList.length; index++ ) {
 		
 		var imageProteinBarDataEntry = this.imageProteinBarDataList[ index ];
 		
-		if ( imageProteinBarDataEntry.getProteinIdIsSelected() ) {
-			
-			var imageProteinBarDataForHash = imageProteinBarDataEntry.getHashDataObject();
-			
-			imageProteinBarDataListResult.push( imageProteinBarDataForHash );
-		}
-		
+		var imageProteinBarDataForHash = imageProteinBarDataEntry.getHashDataObject();
+
+		imageProteinBarDataListResult.push( imageProteinBarDataForHash );
 	}
 	
 	return imageProteinBarDataListResult;
@@ -246,7 +181,7 @@ ImageProteinBarDataManager.prototype.replaceInternalObjectsWithObjectsInHash = f
 	var proteinBarData = params.proteinBarData;
 	var currentProteinIdsArray = params.currentProteinIdsArray;
 	
-	//  Copy curretn protein ids into an object/map for easier searching
+	//  Copy current protein ids into an object/map for easier searching
 	
 	var currentProteinIdsObject = {};
 	
@@ -288,8 +223,6 @@ ImageProteinBarDataManager.prototype.replaceInternalObjectsWithObjectsInHash = f
 			this.imageProteinBarDataList.push( proteinBarDataItem );
 		}
 	}
-	
-	this._rebuild_imageProteinBarData_ProteinIdSelected_List();
 };
 	
 ////////
@@ -506,7 +439,6 @@ ImageProteinBarData.prototype.getProteinId = function( ) {
 ImageProteinBarData.prototype.setProteinId = function( params ) {
 	
 	var proteinId = params.proteinId;
-	var proteinIdIsSelected = params.proteinIdIsSelected;
 	var proteinLength = params.proteinLength;
 	
 	if ( this.proteinId !== proteinId ) {
@@ -515,24 +447,7 @@ ImageProteinBarData.prototype.setProteinId = function( params ) {
 	}
 	
 	this.proteinId = proteinId;
-	this.proteinIdIsSelected = proteinIdIsSelected;
 	this.proteinLength = proteinLength;
-	
-	if ( this.containingImageProteinBarDataManager ) {
-
-		this.containingImageProteinBarDataManager._rebuild_imageProteinBarData_ProteinIdSelected_List();
-	}
-	;
-};
-
-
-
-//  protein id Is Selected - Selector value is an actual protein id, not the "Please select a protein
-
-
-ImageProteinBarData.prototype.getProteinIdIsSelected = function( ) {
-	
-	return this.proteinIdIsSelected;
 };
 
 ////////////////
@@ -864,7 +779,7 @@ ImageProteinBarData.prototype.setProteinBarHighlightedAll = function( ) {
 	
 	//  If this is the only bar, unhighlight it.
 	
-	var imageProteinBarDataItems = this.containingImageProteinBarDataManager.getAllItemsWithSelectedProteinIds();
+	var imageProteinBarDataItems = this.containingImageProteinBarDataManager.getAllItems();
 	
 	if ( ( ! imageProteinBarDataItems ) 
 			|| imageProteinBarDataItems.length === 0 
@@ -1188,7 +1103,6 @@ ImageProteinBarData.constructImageProteinBarDataFromHashDataObject = function( h
 //		Copy data from hashDataObject
 
 		imageProteinBarData.proteinId = hashDataObject.proteinId;
-		imageProteinBarData.proteinIdIsSelected = true;  //  always true for values from hash
 
 		imageProteinBarData.proteinBarHighlightedAll = hashDataObject.pHlhAll;
 		imageProteinBarData.proteinBarHighlightedRegions = hashDataObject.pHlghRgns;
