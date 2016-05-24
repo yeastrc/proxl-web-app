@@ -2466,7 +2466,9 @@ var updateShownLinks = function () {
 			var color = _linkColorHandler.getLinkColor( link, 'rgb' );
 			var rgbaString = "rgba(" + color.r + "," + color.g + "," + color.b + ",0.15)";			
 			
-			html += "<tr class=\"reported-looplink\" data-looplink-index=\"" + i + "\" style=\"background-color:" + rgbaString + "\">\n";			
+			html += "<tr class=\" reported_looplink_jq  tool_tip_attached_jq \" data-looplink-index=\"" + i + "\" "
+				+ " data-tooltip=\"Click for Details\""
+				+ " style=\"cursor: pointer; background-color:" + rgbaString + "\">\n";			
 			html += "<td style=\"width:180px;\">" + _proteinNames[ link.protein1 ] + " (" + link.position1 + ", " + link.position2 + ")</td>";
 			html += "<td style=\"width:100px;\">" + link.length.toFixed( 1 ) + "</td>";
 			html += "</tr>\n";
@@ -2481,7 +2483,7 @@ var updateShownLinks = function () {
 	
 	$shownLooplinksDiv.html( html );
 	
-	$( '.reported-looplink' ).click( function( e ) {
+	$( '.reported_looplink_jq' ).click( function( e ) {
 		
 		var params = { 
 				psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
@@ -2494,6 +2496,9 @@ var updateShownLinks = function () {
 		
 		getLooplinkDataForSpecificLinkInGraph( params, link.link );
 	});
+	
+
+	addToolTips( $shownLooplinksDiv );
 };
 
 
