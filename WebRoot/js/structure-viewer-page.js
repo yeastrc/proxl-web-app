@@ -1819,12 +1819,25 @@ function endsWith(str, suffix) {
 }
 
 /*
+ * Used by the pymol and chimera scripts to get custom color names
+ */
+var getCustomColorName = function( customColorHash, color ) {
+	if( !( color in customColorHash ) ) {
+		var name = "CustomColor" + Object.keys( customColorHash ).length;
+		customColorHash[ color ] = name;
+	}
+	
+	return customColorHash[ color ];
+}
+
+/*
  * Create and download a text script for drawing the currently-shown links in the Pymol viewer for the
  * currently shown PDB file.
  */
 var downloadPymolScript = function() {
 	
 	var fullpdbName = getSelectedPDBFile().filename;
+	var customColorHash = { };
 
 	// strip off any extension
 	var pdbName = fullpdbName.substr(0, fullpdbName.lastIndexOf('.')) || fullpdbName;
@@ -1842,7 +1855,23 @@ var downloadPymolScript = function() {
 			
 			var atom = links[ i ].atom1;
 			
-			scriptText += "color green, /" + pdbName + "//" + atom.residue().chain().name() + "/" + atom.residue().num() + "/ca\n";
+			var hexColor = _linkColorHandler.getLinkColor( links[ i ].link, 'hex' );
+			var colorName;
+			if( !( hexColor in customColorHash ) ) {
+				colorName = getCustomColorName( customColorHash, hexColor );
+				var rgbaColor = _linkColorHandler.hexToRgbaDecimalArray( hexColor, 1 );
+				
+				scriptText += "set_color " + colorName + ", [" + rgbaColor[ 0 ] + ", " + rgbaColor[ 1 ] + "," + rgbaColor[ 2 ] + "]\n";
+			} else {
+				colorName = getCustomColorName( customColorHash, hexColor );
+			}
+			
+			if( !colorName ) {
+				console.log( "ERROR: Could not get a color name for link: " );
+				console.log( link );
+			}
+			
+			scriptText += "color " + colorName + ", /" + pdbName + "//" + atom.residue().chain().name() + "/" + atom.residue().num() + "/ca\n";
 			scriptText += "show sphere, /" + pdbName + "//" + atom.residue().chain().name() + "/" + atom.residue().num() + "/ca\n";
 	
 		}
@@ -1860,8 +1889,23 @@ var downloadPymolScript = function() {
 			var atom2 = links[ i ].atom2;
 			
 			var distance = calculateDistance( atom1.pos(), atom2.pos() );
-
-			var color = _linkColorHandler.getLinkColor( links[ i ].link, 'name' );
+			
+			var hexColor = _linkColorHandler.getLinkColor( links[ i ].link, 'hex' );
+			var colorName;
+			if( !( hexColor in customColorHash ) ) {
+				colorName = getCustomColorName( customColorHash, hexColor );
+				var rgbaColor = _linkColorHandler.hexToRgbaDecimalArray( hexColor, 1 );
+				
+				scriptText += "set_color " + colorName + ", [" + rgbaColor[ 0 ] + ", " + rgbaColor[ 1 ] + "," + rgbaColor[ 2 ] + "]\n";
+			} else {
+				colorName = getCustomColorName( customColorHash, hexColor );
+			}
+			
+			if( !colorName ) {
+				console.log( "ERROR: Could not get a color name for link: " );
+				console.log( link );
+			}
+			
 			
 			var nrseq1s = getNrseqProteinPositions( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
 			var nrseq2s = getNrseqProteinPositions( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
@@ -1887,7 +1931,7 @@ var downloadPymolScript = function() {
 			scriptText += "(/" + pdbName + "//" + atom1.residue().chain().name() + "/" + atom1.residue().num() + "/ca), ";
 			scriptText += "(/" + pdbName + "//" + atom2.residue().chain().name() + "/" + atom2.residue().num() + "/ca)\n";
 			
-			scriptText += "color " + color +", " + uniqueId + "\n";			
+			scriptText += "color " + colorName +", " + uniqueId + "\n";			
 		}
 	}
 	
@@ -1903,7 +1947,22 @@ var downloadPymolScript = function() {
 			
 			var distance = calculateDistance( atom1.pos(), atom2.pos() );
 
-			var color = _linkColorHandler.getLinkColor( links[ i ].link, 'name' );
+			var hexColor = _linkColorHandler.getLinkColor( links[ i ].link, 'hex' );
+			var colorName;
+			if( !( hexColor in customColorHash ) ) {
+				colorName = getCustomColorName( customColorHash, hexColor );
+				var rgbaColor = _linkColorHandler.hexToRgbaDecimalArray( hexColor, 1 );
+				
+				scriptText += "set_color " + colorName + ", [" + rgbaColor[ 0 ] + ", " + rgbaColor[ 1 ] + "," + rgbaColor[ 2 ] + "]\n";
+			} else {
+				colorName = getCustomColorName( customColorHash, hexColor );
+			}
+			
+			if( !colorName ) {
+				console.log( "ERROR: Could not get a color name for link: " );
+				console.log( link );
+			}
+
 						
 			var nrseq1s = getNrseqProteinPositions( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
 			var nrseq2s = getNrseqProteinPositions( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
@@ -1929,7 +1988,7 @@ var downloadPymolScript = function() {
 			scriptText += "(/" + pdbName + "//" + atom1.residue().chain().name() + "/" + atom1.residue().num() + "/ca), ";
 			scriptText += "(/" + pdbName + "//" + atom2.residue().chain().name() + "/" + atom2.residue().num() + "/ca)\n";
 			
-			scriptText += "color " + color +", " + uniqueId + "\n";			
+			scriptText += "color " + colorName +", " + uniqueId + "\n";			
 		}
 	}
 	
@@ -4401,7 +4460,12 @@ var PDBChainIsProtein = function( chainName ) {
 	if( !residues ) { return false; }
 	
 	for( var i = 0; i < residues.length; i++ ) {
-		if( !residues[ i ].isAminoacid() ) {
+		if( !residues[ i ].atom( 'CA' ) ) {
+		
+			console.log( "Chain: " + chainName );
+			console.log( "Non-amino acid residue: " );
+			console.log( residues[ i ] );
+			
 			return false;
 		}
 	}
