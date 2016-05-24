@@ -1719,6 +1719,8 @@ var downloadChimeraScript = function() {
 	
 	console.log( "downloadChimeraScript called." );
 	
+	var customColorHash = { };
+	
 	var scriptText = "";
 		
 	// do monolinks
@@ -1731,9 +1733,25 @@ var downloadChimeraScript = function() {
 			
 			var atom = links[ i ].atom1;
 			
+			var hexColor = _linkColorHandler.getLinkColor( links[ i ].link, 'hex' );
+			var colorName;
+			if( !( hexColor in customColorHash ) ) {
+				colorName = getCustomColorName( customColorHash, hexColor );
+				var rgbaColor = _linkColorHandler.hexToRgbaDecimalArray( hexColor, 1 );
+				
+				scriptText += "colordef " + colorName + " " + rgbaColor[ 0 ] + " " + rgbaColor[ 1 ] + " " + rgbaColor[ 2 ] + "\n";
+			} else {
+				colorName = getCustomColorName( customColorHash, hexColor );
+			}
+			
+			if( !colorName ) {
+				console.log( "ERROR: Could not get a color name for link: " );
+				console.log( link );
+			}
+			
 			scriptText += "shape sphere ";
 			scriptText += "center :" + atom.residue().num() + "." + atom.residue().chain().name() + "@CA ";
-			scriptText += "radius 1.5 color blue modelName monolinks modelId 4\n";
+			scriptText += "radius 1.5 color " + colorName + " modelName monolinks modelId 4\n";
 			
 		}
 	}
@@ -1754,12 +1772,26 @@ var downloadChimeraScript = function() {
 			
 			var distance = calculateDistance( atom1.pos(), atom2.pos() );
 
-			var color = _linkColorHandler.getLinkColor( links[ i ].link, 'name' );
+			var hexColor = _linkColorHandler.getLinkColor( links[ i ].link, 'hex' );
+			var colorName;
+			if( !( hexColor in customColorHash ) ) {
+				colorName = getCustomColorName( customColorHash, hexColor );
+				var rgbaColor = _linkColorHandler.hexToRgbaDecimalArray( hexColor, 1 );
+				
+				scriptText += "colordef " + colorName + " " + rgbaColor[ 0 ] + " " + rgbaColor[ 1 ] + " " + rgbaColor[ 2 ] + "\n";
+			} else {
+				colorName = getCustomColorName( customColorHash, hexColor );
+			}
+			
+			if( !colorName ) {
+				console.log( "ERROR: Could not get a color name for link: " );
+				console.log( link );
+			}
 			
 			scriptText += "shape tube ";
 			scriptText += ":" + atom1.residue().num() + "." + atom1.residue().chain().name() + "@CA";
 			scriptText += ":" + atom2.residue().num() + "." + atom2.residue().chain().name() + "@CA ";
-			scriptText += "radius .75 color " + color + " modelName looplinks modelId 3\n";
+			scriptText += "radius .75 color " + colorName + " modelName looplinks modelId 3\n";
 			
 			// ensure a distance is only added once (ie, don't want same distance added for a looplink and crosslink on same atoms)
 			var distanceId = atom1.residue().chain().name() + "-" + atom1.residue().num() + "-" + atom2.residue().chain().name() + "-" + atom2.residue().num();	
@@ -1789,12 +1821,26 @@ var downloadChimeraScript = function() {
 			
 			var distance = calculateDistance( atom1.pos(), atom2.pos() );
 
-			var color = _linkColorHandler.getLinkColor( links[ i ].link, 'name' );
+			var hexColor = _linkColorHandler.getLinkColor( links[ i ].link, 'hex' );
+			var colorName;
+			if( !( hexColor in customColorHash ) ) {
+				colorName = getCustomColorName( customColorHash, hexColor );
+				var rgbaColor = _linkColorHandler.hexToRgbaDecimalArray( hexColor, 1 );
+				
+				scriptText += "colordef " + colorName + " " + rgbaColor[ 0 ] + " " + rgbaColor[ 1 ] + " " + rgbaColor[ 2 ] + "\n";
+			} else {
+				colorName = getCustomColorName( customColorHash, hexColor );
+			}
+			
+			if( !colorName ) {
+				console.log( "ERROR: Could not get a color name for link: " );
+				console.log( link );
+			}
 			
 			scriptText += "shape tube ";
 			scriptText += ":" + atom1.residue().num() + "." + atom1.residue().chain().name() + "@CA";
 			scriptText += ":" + atom2.residue().num() + "." + atom2.residue().chain().name() + "@CA ";
-			scriptText += "radius .75 color " + color + " modelName crosslinks modelId 2\n";
+			scriptText += "radius .75 color " + colorName + " modelName crosslinks modelId 2\n";
 			
 			// ensure a distance is only added once (ie, don't want same distance added for a looplink and crosslink on same atoms)
 			var distanceId = atom1.residue().chain().name() + "-" + atom1.residue().num() + "-" + atom2.residue().chain().name() + "-" + atom2.residue().num();	
