@@ -88,9 +88,10 @@ public class SearchProteinCrosslinkSearcher {
 	private static final String SQL_SEARCH_ON_SEARCH_ID_WHERE_START =  
 			" WHERE search_crosslink_generic_lookup.search_id = ?   ";
 			
+	//  Replaced by Java Sort where needed
 	
-	private static final String SQL_SEARCH_ON_SEARCH_ID_ORDER_BY =   
-			" ORDER BY nrseq_id_1, nrseq_id_2, protein_1_position, protein_2_position ";
+//	private static final String SQL_SEARCH_ON_SEARCH_ID_ORDER_BY =   
+//			" ORDER BY nrseq_id_1, nrseq_id_2, protein_1_position, protein_2_position ";
 
 
 	/**
@@ -221,8 +222,12 @@ public class SearchProteinCrosslinkSearcher {
 				onlyDefaultPsmCutoffs, 
 				SQL_SEARCH_ON_SEARCH_ID_FIRST_PART,
 				SQL_SEARCH_ON_SEARCH_ID_FROM_START,
-				SQL_SEARCH_ON_SEARCH_ID_WHERE_START, 
-				SQL_SEARCH_ON_SEARCH_ID_ORDER_BY );
+				SQL_SEARCH_ON_SEARCH_ID_WHERE_START
+//				, 
+				//  Replaced by Java Sort where needed
+//				SQL_SEARCH_ON_SEARCH_ID_ORDER_BY 
+				);
+
 
 		
 		try {
@@ -298,6 +303,7 @@ public class SearchProteinCrosslinkSearcher {
 			}
 			
 			
+			Map<Integer, SearchProtein> searchProtein_KeyOn_NRSEQ_ID_Map = new HashMap<>();
 			
 			
 			rs = pstmt.executeQuery();
@@ -315,8 +321,45 @@ public class SearchProteinCrosslinkSearcher {
 				
 				link.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 				
-				link.setProtein1( new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( rs.getInt( "nrseq_id_1" ) ) ) );
-				link.setProtein2( new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( rs.getInt( "nrseq_id_2" ) ) ) );
+				//  Replace this with next code that caches SearchProtein objects by NRSEQ Id in searchProtein_KeyOn_NRSEQ_ID_Map
+				
+//				link.setProtein1( new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( rs.getInt( "nrseq_id_1" ) ) ) );
+//				link.setProtein2( new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( rs.getInt( "nrseq_id_2" ) ) ) );
+				
+
+				Integer nrSeqId_1 = rs.getInt( "nrseq_id_1" );
+				Integer nrSeqId_2 = rs.getInt( "nrseq_id_2" );
+				
+				SearchProtein searchProtein_1 = searchProtein_KeyOn_NRSEQ_ID_Map.get( nrSeqId_1 );
+				
+				
+				if ( searchProtein_1 == null ) {
+					
+					searchProtein_1 = new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( nrSeqId_1 ) );
+					
+					searchProtein_KeyOn_NRSEQ_ID_Map.put( nrSeqId_1, searchProtein_1 );
+				}
+				
+				SearchProtein searchProtein_2 = null;
+				
+				if ( nrSeqId_1.intValue() == nrSeqId_2.intValue() ) {
+					
+					searchProtein_2 = searchProtein_1;
+					
+				} else {
+					
+					searchProtein_2 = searchProtein_KeyOn_NRSEQ_ID_Map.get( nrSeqId_2 );
+
+					if ( searchProtein_2 == null ) {
+						searchProtein_2 = new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( nrSeqId_2 ) );
+
+						searchProtein_KeyOn_NRSEQ_ID_Map.put( nrSeqId_2, searchProtein_2 );
+					}
+				}
+				
+				link.setProtein1( searchProtein_1 );
+				link.setProtein2( searchProtein_2 );
+				
 				
 				link.setProtein1Position( rs.getInt( "protein_1_position" ) );
 				link.setProtein2Position( rs.getInt( "protein_2_position" ) );
@@ -329,7 +372,6 @@ public class SearchProteinCrosslinkSearcher {
 					link.setNumPsms( rs.getInt( "num_psm_at_default_cutoff" ) );
 					link.setNumLinkedPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
 					link.setNumUniqueLinkedPeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
-
 				}
 				
 
@@ -515,8 +557,9 @@ public class SearchProteinCrosslinkSearcher {
 			+ " AND search_crosslink_generic_lookup.protein_1_position = ? "
 			+ " AND search_crosslink_generic_lookup.protein_2_position = ? ";
 
-	private static final String SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_ORDER_BY =   
-			"  ";
+	//  Not Needed
+//	private static final String SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_ORDER_BY =   
+//			"  ";
 
 	
 	
@@ -651,8 +694,12 @@ public class SearchProteinCrosslinkSearcher {
 						onlyDefaultPsmCutoffs, 
 						SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_FIRST_PART,
 						SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_FROM_START,
-						SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_WHERE_START, 
-						SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_ORDER_BY );
+						SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_WHERE_START
+						
+					//  Not Needed
+//						, 
+//						SQL_SEARCH_ON_SEARCH_ID_CROSS_LINK_ORDER_BY
+						);
 		
 		try {
 			
@@ -856,9 +903,15 @@ public class SearchProteinCrosslinkSearcher {
 			boolean onlyDefaultPsmCutoffs, 
 			String sqlFirstPart,
 			String sqlFromStart, 
-			String sqlWhereStart, 
-			String sqlOrderBy) throws Exception {
+			String sqlWhereStart
+
+			//  Replaced by Java Sort where needed
+//			, 
+//			String sqlOrderBy
+			
+			) throws Exception {
 		
+
 		
 		//////////////////////
 		
@@ -1257,8 +1310,9 @@ public class SearchProteinCrosslinkSearcher {
 			}
 		}		
 		
+	//  Replaced by Java Sort where needed
 		
-		sqlSB.append( sqlOrderBy );
+//		sqlSB.append( sqlOrderBy );
 		
 		
 		

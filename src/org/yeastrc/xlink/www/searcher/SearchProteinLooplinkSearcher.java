@@ -83,9 +83,11 @@ public class SearchProteinLooplinkSearcher {
 
 	private static final String SQL_SEARCH_ON_SEARCH_ID_WHERE_START =  
 			" WHERE search_looplink_generic_lookup.search_id = ?   ";
-			
-	private static final String SQL_SEARCH_ON_SEARCH_ID_ORDER_BY =   
-			" ORDER BY nrseq_id, protein_position_1, protein_position_2 ";
+	
+//  Replaced by Java Sort where needed
+
+//	private static final String SQL_SEARCH_ON_SEARCH_ID_ORDER_BY =   
+//			" ORDER BY nrseq_id, protein_position_1, protein_position_2 ";
 
 
 	
@@ -209,8 +211,14 @@ public class SearchProteinLooplinkSearcher {
 				onlyDefaultPsmCutoffs, 
 				SQL_SEARCH_ON_SEARCH_ID_FIRST_PART,
 				SQL_SEARCH_ON_SEARCH_ID_FROM_START,
-				SQL_SEARCH_ON_SEARCH_ID_WHERE_START, 
-				SQL_SEARCH_ON_SEARCH_ID_ORDER_BY );
+				SQL_SEARCH_ON_SEARCH_ID_WHERE_START
+				
+			//  Replaced by Java Sort where needed
+
+//				, 
+//				SQL_SEARCH_ON_SEARCH_ID_ORDER_BY 
+				
+				);
 		
 
 		
@@ -294,6 +302,8 @@ public class SearchProteinLooplinkSearcher {
 			}
 			
 			
+			Map<Integer, SearchProtein> searchProtein_KeyOn_NRSEQ_ID_Map = new HashMap<>();
+			
 			
 			rs = pstmt.executeQuery();
 
@@ -307,9 +317,27 @@ public class SearchProteinLooplinkSearcher {
 				link.setSearch( search );
 				
 				link.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
+
+				
+				
+				//  Replace this with next code that caches SearchProtein objects by NRSEQ Id in searchProtein_KeyOn_NRSEQ_ID_Map
+
+//				link.setProtein( new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( rs.getInt( "nrseq_id" ) ) ) );
 				
 
-				link.setProtein( new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( rs.getInt( "nrseq_id" ) ) ) );
+				Integer nrSeqId = rs.getInt( "nrseq_id" );
+				
+				SearchProtein searchProtein = searchProtein_KeyOn_NRSEQ_ID_Map.get( nrSeqId );
+				
+				if ( searchProtein == null ) {
+					
+					searchProtein = new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( nrSeqId ) );
+					
+					searchProtein_KeyOn_NRSEQ_ID_Map.put( nrSeqId, searchProtein );
+				}
+				
+				link.setProtein( searchProtein );
+				
 				
 				link.setProteinPosition1( rs.getInt( "protein_position_1" ) );
 				link.setProteinPosition2( rs.getInt( "protein_position_2" ) );
@@ -322,9 +350,7 @@ public class SearchProteinLooplinkSearcher {
 					link.setNumPsms( rs.getInt( "num_psm_at_default_cutoff" ) );
 					link.setNumPeptides( rs.getInt( "num_linked_peptides_at_default_cutoff" ) );
 					link.setNumUniquePeptides( rs.getInt( "num_unique_peptides_linked_at_default_cutoff" ) );
-
 				}
-				
 
 				if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
 						|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {
@@ -503,10 +529,10 @@ public class SearchProteinLooplinkSearcher {
 			+ " AND search_looplink_generic_lookup.protein_position_1 = ? "
 			+ " AND search_looplink_generic_lookup.protein_position_2 = ?  ";
 			
-	private static final String SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_ORDER_BY =   
-			" ORDER BY search_looplink_generic_lookup.nrseq_id, "
-			+ " search_looplink_generic_lookup.protein_position_1, "
-			+ " search_looplink_generic_lookup.protein_position_2 ";
+
+	
+//	private static final String SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_ORDER_BY =   
+//			"  ";
 
 
 	
@@ -637,8 +663,12 @@ public class SearchProteinLooplinkSearcher {
 				onlyDefaultPsmCutoffs, 
 				SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_FIRST_PART,
 				SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_FROM_START,
-				SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_WHERE_START, 
-				SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_ORDER_BY );
+				SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_WHERE_START
+				
+				//  Replaced by Java Sort where needed
+//				, 
+//				SQL_SEARCH_ON_SEARCH_ID_LOOPLINK_ORDER_BY 
+				);
 		
 
 		
@@ -858,8 +888,12 @@ public class SearchProteinLooplinkSearcher {
 			boolean onlyDefaultPsmCutoffs, 
 			String sqlFirstPart,
 			String sqlFromStart, 
-			String sqlWhereStart, 
-			String sqlOrderBy) throws Exception {
+			String sqlWhereStart
+			
+		//  Replaced by Java Sort where needed
+//			, 
+//			String sqlOrderBy
+			) throws Exception {
 		
 
 
@@ -1230,7 +1264,9 @@ public class SearchProteinLooplinkSearcher {
 		}		
 		
 		
-		sqlSB.append( sqlOrderBy );
+		//  Replaced by Java Sort where needed
+
+//		sqlSB.append( sqlOrderBy );
 		
 		
 		

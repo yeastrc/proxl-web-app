@@ -386,7 +386,6 @@ public class ViewSearchProteinsAction extends Action {
 			List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
 					SearchProteinCrosslinkSearcher.getInstance().searchOnSearchIdandCutoffs( search, searcherCutoffValuesSearchLevel );
 			
-			
 
 			if ( webappTiming != null ) {
 				
@@ -685,6 +684,45 @@ public class ViewSearchProteinsAction extends Action {
 				//	For  Struts config action mapping:     parameter="crosslink"
 
 
+				//  Sort "wrappedCrosslinks" since removed ORDER BY from SQL
+				
+
+//				private static final String SQL_SEARCH_ON_SEARCH_ID_ORDER_BY =   
+//						" ORDER BY nrseq_id_1, nrseq_id_2, protein_1_position, protein_2_position ";
+
+				
+				Collections.sort( wrappedCrosslinks, new Comparator<SearchProteinCrosslinkWrapper>() {
+
+					@Override
+					public int compare(SearchProteinCrosslinkWrapper o1,
+							SearchProteinCrosslinkWrapper o2) {
+
+						if ( o1.getSearchProteinCrosslink().getProtein1().getNrProtein().getNrseqId()
+								!= o2.getSearchProteinCrosslink().getProtein1().getNrProtein().getNrseqId() ) {
+							
+							return o1.getSearchProteinCrosslink().getProtein1().getNrProtein().getNrseqId() 
+									- o2.getSearchProteinCrosslink().getProtein1().getNrProtein().getNrseqId();
+						}
+						
+						if ( o1.getSearchProteinCrosslink().getProtein2().getNrProtein().getNrseqId()
+								!= o2.getSearchProteinCrosslink().getProtein2().getNrProtein().getNrseqId() ) {
+							
+							return o1.getSearchProteinCrosslink().getProtein2().getNrProtein().getNrseqId() 
+									- o2.getSearchProteinCrosslink().getProtein2().getNrProtein().getNrseqId();
+						}
+
+						if ( o1.getSearchProteinCrosslink().getProtein1Position()
+								!= o2.getSearchProteinCrosslink().getProtein1Position() ) {
+							
+							return o1.getSearchProteinCrosslink().getProtein1Position() 
+									- o2.getSearchProteinCrosslink().getProtein1Position();
+						}
+
+						return o1.getSearchProteinCrosslink().getProtein2Position() 
+								- o2.getSearchProteinCrosslink().getProtein2Position();
+					}
+				} );
+				
 
 
 				////   Crosslinks  - Prepare for Web display
@@ -770,6 +808,35 @@ public class ViewSearchProteinsAction extends Action {
 				looplinks = new ArrayList<>( wrappedLooplinks.size() );
 
 
+//				private static final String SQL_SEARCH_ON_SEARCH_ID_ORDER_BY =   
+//						" ORDER BY nrseq_id, protein_position_1, protein_position_2 ";
+
+
+				Collections.sort( wrappedLooplinks, new Comparator<SearchProteinLooplinkWrapper>() {
+
+					@Override
+					public int compare(SearchProteinLooplinkWrapper o1,
+							SearchProteinLooplinkWrapper o2) {
+
+						if ( o1.getSearchProteinLooplink().getProtein().getNrProtein().getNrseqId()
+								!= o2.getSearchProteinLooplink().getProtein().getNrProtein().getNrseqId() ) {
+							
+							return o1.getSearchProteinLooplink().getProtein().getNrProtein().getNrseqId() 
+									- o2.getSearchProteinLooplink().getProtein().getNrProtein().getNrseqId();
+						}
+						
+						if ( o1.getSearchProteinLooplink().getProteinPosition1()
+								!= o2.getSearchProteinLooplink().getProteinPosition1() ) {
+							
+							return o1.getSearchProteinLooplink().getProteinPosition1() 
+									- o2.getSearchProteinLooplink().getProteinPosition1();
+						}
+
+						return o1.getSearchProteinLooplink().getProteinPosition2() 
+								- o2.getSearchProteinLooplink().getProteinPosition2();
+					}
+				} );
+				
 				//      Get Annotation data and Sort by Annotation data
 
 				SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult sortLooplinksResult =
