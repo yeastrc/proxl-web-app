@@ -1,11 +1,12 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.NrseqDatabasePeptideProteinDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_NrseqDatabasePeptideProteinDAO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
 import org.yeastrc.xlink.dto.NrseqDatabasePeptideProteinDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
@@ -93,6 +94,10 @@ public class GetProteinsForPeptidesAndInsertNrseqPeptideProteinEntries {
 				System.out.println( "\t\tSaving to nrseq_database_peptide_protein the peptide to protein mapping..." );
 			}
 			
+			//  Build list of NrseqDatabasePeptideProteinDTO and save them in 1 DAO call to save as single DB transaction
+			
+			List<NrseqDatabasePeptideProteinDTO> nrseqDatabasePeptideProteinDTOList = new ArrayList<>( proteinMatches.size() );
+			
 			for( NRProteinDTO protein : proteinMatches ) {
 
 				NrseqDatabasePeptideProteinDTO prpp = new NrseqDatabasePeptideProteinDTO();
@@ -101,8 +106,10 @@ public class GetProteinsForPeptidesAndInsertNrseqPeptideProteinEntries {
 				prpp.setNrseqDatabaseId( nrseqDatabaseId );
 				prpp.setUnique( unique );
 
-				NrseqDatabasePeptideProteinDAO.getInstance().save( prpp );
+				nrseqDatabasePeptideProteinDTOList.add( prpp );
 			}
+			
+			DB_Insert_NrseqDatabasePeptideProteinDAO.getInstance().saveListAsSingleTransaction( nrseqDatabasePeptideProteinDTOList );
 		}
 		
 
