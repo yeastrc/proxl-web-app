@@ -6,8 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
@@ -22,6 +24,7 @@ import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.objects.SearchPeptideMonolink;
 import org.yeastrc.xlink.www.objects.SearchPeptideMonolinkAnnDataWrapper;
 
@@ -86,9 +89,11 @@ public class SearchPeptideMonolinkSearcher {
 	
 	private final String SQL_LAST_PART = 
 
-			//   GROUP BY is required
-			
-			" GROUP BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
+			"";
+	// Removed since not needed.  
+	// A WARN log message will be written if duplicate reported_peptide_id are found in the result set
+
+//			" GROUP BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
 
 		//	Sort in Java	
 	
@@ -597,7 +602,30 @@ public class SearchPeptideMonolinkSearcher {
 			searchDTO = SearchDAO.getInstance().getSearch( searchId );
 			
 
+
+			Set<Integer> retrieved_reported_peptide_id_values_Set = new HashSet<>();
+			
+			
+			
 			while( rs.next() ) {
+
+				
+				int reportedPeptideId = rs.getInt( "reported_peptide_id" );
+
+				
+				if ( ! retrieved_reported_peptide_id_values_Set.add( reportedPeptideId ) ) {
+					
+					String msg = "Already processed result entry for reportedPeptideId: " + reportedPeptideId;
+
+					log.warn( msg );
+					
+					continue;  //   EARY CONTINUE
+					
+//					log.error( msg );
+//					throw new ProxlWebappDataException(msg);
+				}
+
+				
 				
 				SearchPeptideMonolinkAnnDataWrapper wrappedLink = new SearchPeptideMonolinkAnnDataWrapper();
 				
@@ -612,9 +640,10 @@ public class SearchPeptideMonolinkSearcher {
 				
 				link.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 
-				link.setReportedPeptide( ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( rs.getInt( "reported_peptide_id" ) ) );
+				link.setReportedPeptide( ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( reportedPeptideId ) );
 
 
+				
 				if ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs ) {
 					
 					int numPsmsForDefaultCutoffs = rs.getInt( "psm_num_at_default_cutoff" );

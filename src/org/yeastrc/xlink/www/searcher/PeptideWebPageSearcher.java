@@ -6,8 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
@@ -21,6 +23,7 @@ import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.www.constants.DynamicModificationsSelectionConstants;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.objects.SearchPeptideCrosslink;
 import org.yeastrc.xlink.www.objects.SearchPeptideDimer;
 import org.yeastrc.xlink.www.objects.SearchPeptideLooplink;
@@ -91,7 +94,11 @@ public class PeptideWebPageSearcher {
 
 	private final String SQL_LAST_PART = 
 
-			" GROUP BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
+			"";
+	
+	// Removed since not needed.  
+	// A WARN log message will be written if duplicate reported_peptide_id are found in the result set
+//			" GROUP BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
 
 	
 	
@@ -945,6 +952,10 @@ public class PeptideWebPageSearcher {
 			
 			
 			rs = pstmt.executeQuery();
+			
+			
+			Set<Integer> retrieved_reported_peptide_id_values_Set = new HashSet<>();
+			
 
 			while( rs.next() ) {
 
@@ -961,8 +972,23 @@ public class PeptideWebPageSearcher {
 						sql );
 				
 				if ( item != null ) {
+					
+					int itemReportedPeptideId = item.getWebReportedPeptide().getReportedPeptideId();
+					
+					if ( ! retrieved_reported_peptide_id_values_Set.add( itemReportedPeptideId ) ) {
+						
+						String msg = "Already processed result entry for itemReportedPeptideId: " + itemReportedPeptideId;
 
-					wrappedLinks.add( item );
+						log.warn( msg );
+						
+//						log.error( msg );
+//						throw new ProxlWebappDataException(msg);
+						
+					} else {
+
+						wrappedLinks.add( item );
+						
+					}
 				}
 			}
 			

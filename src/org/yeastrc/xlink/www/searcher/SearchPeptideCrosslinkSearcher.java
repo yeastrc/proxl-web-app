@@ -6,8 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.SearchDAO;
@@ -22,6 +24,7 @@ import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.XLinkUtils;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.objects.SearchPeptideCrosslink;
 import org.yeastrc.xlink.www.objects.SearchPeptideCrosslinkAnnDataWrapper;
 
@@ -89,9 +92,12 @@ public class SearchPeptideCrosslinkSearcher {
 	
 	private final String SQL_LAST_PART = 
 
-			//   GROUP BY is required
+			"";
 			
-			" GROUP BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
+	// Removed since not needed.  
+	// A WARN log message will be written if duplicate reported_peptide_id are found in the result set
+
+//			" GROUP BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
 
 			// Sort in Java	
 	
@@ -636,7 +642,29 @@ public class SearchPeptideCrosslinkSearcher {
 			searchDTO = SearchDAO.getInstance().getSearch( searchId );
 			
 
+			Set<Integer> retrieved_reported_peptide_id_values_Set = new HashSet<>();
+			
+
 			while( rs.next() ) {
+				
+				
+				int reportedPeptideId = rs.getInt( "reported_peptide_id" );
+
+				
+				if ( ! retrieved_reported_peptide_id_values_Set.add( reportedPeptideId ) ) {
+					
+					String msg = "Already processed result entry for reportedPeptideId: " + reportedPeptideId;
+
+					log.warn( msg );
+					
+					continue;  //   EARY CONTINUE
+					
+//					log.error( msg );
+//					throw new ProxlWebappDataException(msg);
+				}
+
+				
+				
 				
 				SearchPeptideCrosslinkAnnDataWrapper wrappedLink = new SearchPeptideCrosslinkAnnDataWrapper();
 				
@@ -649,7 +677,9 @@ public class SearchPeptideCrosslinkSearcher {
 				
 				link.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 				
-				link.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
+				link.setReportedPeptideId( reportedPeptideId );
+				
+
 				
 				
 				if ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs ) {
