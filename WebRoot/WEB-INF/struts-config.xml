@@ -241,7 +241,7 @@
 				name="mergedSearchViewProteinForm"
 				scope="request"
 				validate="false">
-			<forward name="Success" path="/WEB-INF/jsp-pages/viewMergedImage.jsp" redirect="false" />
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewCirclePlot.jsp" redirect="false" />
 			<forward name="NoSearchIds" path="/WEB-INF/jsp-pages/special_redirect_pages/redirect_searchIdsFromHashToQueryString.jsp" redirect="false" />
 		</action>
 
