@@ -52,6 +52,21 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 	this.setPsmPeptideCriteria = function( psmPeptideCutoffsRootObject ) {
 		
 		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
+		
+		try {
+		
+			//  Propagate to viewPeptidesRelatedToPSMsByScanId object
+
+			if ( viewPeptidesRelatedToPSMsByScanId !== undefined 
+					&& viewPeptidesRelatedToPSMsByScanId !== null ) {
+
+				viewPeptidesRelatedToPSMsByScanId.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+			}
+
+		} catch (e) {
+			
+			
+		}
 	};
 	
 	
