@@ -184,7 +184,7 @@ var _imageProteinBarDataManager = ImageProteinBarDataManagerContructor();
 
 var _proteinBarRegionSelectionsOverlayCode = ProteinBarRegionSelectionsOverlayCodeContructor( { imageProteinBarDataManager : _imageProteinBarDataManager });
 
-
+var _circlePlotViewer = new circlePlotViewer();
 
 
 
@@ -2590,7 +2590,7 @@ function findSearchesForCrosslink( protein1, protein2, position1, position2 ) {
 
 
 function drawSvg() {
-	
+	_circlePlotViewer.draw();
 }
 
 /////////////////////////////////////////
