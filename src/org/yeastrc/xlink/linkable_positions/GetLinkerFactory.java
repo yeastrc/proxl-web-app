@@ -10,6 +10,7 @@ import org.yeastrc.xlink.linkable_positions.linkers.BS3;
 import org.yeastrc.xlink.linkable_positions.linkers.DSG;
 import org.yeastrc.xlink.linkable_positions.linkers.DSS;
 import org.yeastrc.xlink.linkable_positions.linkers.EDC;
+import org.yeastrc.xlink.linkable_positions.linkers.DFDNB;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 
 public class GetLinkerFactory {
@@ -21,12 +22,14 @@ public class GetLinkerFactory {
 	public static final String BUILT_IN_LINKER_DSG = "dsg";
 	public static final String BUILT_IN_LINKER_DSS = "dss";
 	public static final String BUILT_IN_LINKER_EDC = "edc";
+	public static final String BUILT_IN_LINKER_DFDNB = "dfdnb";
 
 	private static ILinker LINKER_BS2 = new BS2();
 	private static ILinker LINKER_BS3 = new BS3();
 	private static ILinker LINKER_DSG = new DSG();
 	private static ILinker LINKER_DSS = new DSS();
 	private static ILinker LINKER_EDC = new EDC();
+	private static ILinker LINKER_DFDNB = new DFDNB();
 	
 	private static Map<String,ILinker> linkers = new HashMap<String, ILinker>();
 	
@@ -37,6 +40,7 @@ public class GetLinkerFactory {
 		linkers.put( BUILT_IN_LINKER_DSG, LINKER_DSG );
 		linkers.put( BUILT_IN_LINKER_DSS, LINKER_DSS );
 		linkers.put( BUILT_IN_LINKER_EDC, LINKER_EDC );
+		linkers.put( BUILT_IN_LINKER_DFDNB, LINKER_DFDNB );
 	}
 	
 	/**
