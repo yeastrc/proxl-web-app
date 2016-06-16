@@ -83,15 +83,4 @@ public class NoteDTO {
 		this.noteText = noteText;
 	}
 	
-	}
-
-
-//CREATE TABLE note (
-//		  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//		  project_id INT UNSIGNED NOT NULL,
-//		  auth_user_id_created INT UNSIGNED NOT NULL,
-//		  created_date_time DATETIME NOT NULL,
-//		  auth_user_id_last_updated INT UNSIGNED NOT NULL,
-//		  last_updated_date_time DATETIME NOT NULL,
-//		  note_text TEXT NULL,
-
+}

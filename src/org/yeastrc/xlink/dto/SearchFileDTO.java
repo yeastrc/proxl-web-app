@@ -104,16 +104,3 @@ public class SearchFileDTO {
 	
 }
 
-
-
-//		CREATE TABLE search_file (
-//		id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-//		search_id INT(10) UNSIGNED NOT NULL,
-//		filename VARCHAR(255) NOT NULL,
-//		path VARCHAR(2000) NULL DEFAULT NULL,
-//		filesize INT(11) NOT NULL,
-//		mime_type VARCHAR(500) NULL DEFAULT NULL,
-//		description VARCHAR(2500) NULL DEFAULT NULL,
-//		upload_date DATETIME NOT NULL,
-//		file_contents LONGBLOB NULL DEFAULT NULL,
-

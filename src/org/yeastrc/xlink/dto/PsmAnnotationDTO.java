@@ -25,7 +25,4 @@ public class PsmAnnotationDTO extends AnnotationDataBaseDTO {
 	public void setPsmId(int psmId) {
 		this.psmId = psmId;
 	}
-
-	
-	
 }

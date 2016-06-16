@@ -31,8 +31,6 @@ public class ScanDTO {
 	/**
 	 * The data that gets put in the field spectrum_data
 	 */
-//	private List<MzInt> mzIntList;
-    
     private List<Peak> peakList;
     
 	private String mzIntListAsString;

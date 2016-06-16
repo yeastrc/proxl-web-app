@@ -1,5 +1,7 @@
 package org.yeastrc.xlink.dto;
 
+import java.math.BigDecimal;
+
 /**
  * Table psm
  *
@@ -7,12 +9,12 @@ package org.yeastrc.xlink.dto;
 public class PsmDTO {
 	
 
-	
 	@Override
 	public String toString() {
 		return "PsmDTO [id=" + id + ", searchId=" + searchId + ", scanId="
-				+ scanId + ", type=" + type + ", reportedPeptideId="
-				+ reportedPeptideId + ", charge=" + charge + "]";
+				+ scanId + ", reportedPeptideId="
+				+ reportedPeptideId + ", charge=" + charge + ", linkerMass="
+				+ linkerMass + "]";
 	}
 	
 	
@@ -27,12 +29,6 @@ public class PsmDTO {
 	}
 	public void setSearchId(int searchId) {
 		this.searchId = searchId;
-	}
-	public int getType() {
-		return type;
-	}
-	public void setType(int type) {
-		this.type = type;
 	}
 	public int getReportedPeptideId() {
 		return reportedPeptideId;
@@ -49,9 +45,14 @@ public class PsmDTO {
 	public Integer getCharge() {
 		return charge;
 	}
-
 	public void setCharge(Integer charge) {
 		this.charge = charge;
+	}
+	public BigDecimal getLinkerMass() {
+		return linkerMass;
+	}
+	public void setLinkerMass(BigDecimal linkerMass) {
+		this.linkerMass = linkerMass;
 	}
 
 
@@ -59,8 +60,8 @@ public class PsmDTO {
 	private int id;
 	private int searchId;
 	private Integer scanId;
-	private int type;
 	private int reportedPeptideId;
 	private Integer charge;
+	private BigDecimal linkerMass;
 
 }
