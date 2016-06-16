@@ -21,6 +21,9 @@ circlePlotViewer.prototype.CONSTANTS = {
 		_GAP_BETWEEN_BARS_AND_LINKS : 2, // gap in pixels between protein bars and start of drawn links
 		_MINIMUM_CROSSLINK_LOOP_HEIGHT: 60, // minimum height of crosslink loops in pixels
 		_MONOLINK_HEIGHT:15,			// height of monolinks in pixels
+		
+		_LINKABLE_POSITION_COLOR:"#ffffff",	// color to use for linkable positions
+		_LINKABLE_POSITION_OPACITY:0.5,	// opacity to use for linkable positions
 };
 
 /**
@@ -36,8 +39,13 @@ circlePlotViewer.prototype.draw  = function(  ) {
 		return;
 	}
 	
-	this.setViewerDimensions( svgRootSnapSVGObject );	
+	this.setViewerDimensions( svgRootSnapSVGObject );
+	
 	this.drawProteinBars( svgRootSnapSVGObject );
+	
+	if ( $( "input#show-linkable-positions" ).is( ':checked' ) ) {
+		this.drawLinkablePositions( svgRootSnapSVGObject );
+	}
 	
 	if ( $( "input#show-self-crosslinks" ).is( ':checked' ) ) {
 		this.drawSelfCrosslinks( svgRootSnapSVGObject );
@@ -55,13 +63,86 @@ circlePlotViewer.prototype.draw  = function(  ) {
 		this.drawMonolinks( svgRootSnapSVGObject );
 	}
 	
-	//var bigCircle = svgRootSnapSVGObject.path( this.getCurvedBarPath( 400, 400, 400, 40, 0, 178 ) );
-	
+	if ( $( "input#show-tryptic-cleavage-positions" ).is( ':checked' ) ) {
+		this.drawTrypticPositions( svgRootSnapSVGObject );
+	}
 	
 	
 	
 };
 
+/**
+ * Draw all tryptic positions in all proteins
+ * 
+ * @param svgRootSnapSVGObject
+ */
+circlePlotViewer.prototype.drawTrypticPositions = function( svgRootSnapSVGObject ) {
+	var selectedProteins = getAllSelectedProteins();
+	var radius = this.getProteinBarRadii();
+	var center = this.getCenterCoords();
+	
+	for( var i = 0; i < selectedProteins.length; i++ ) {
+		var proteinId = selectedProteins[ i ];
+		
+		var positions = _proteinSequenceTrypsinCutPoints[ proteinId ];
+		if( positions != undefined ) {
+			
+			for( var p = 0; p < positions.length; p++ ) {
+				var angle = this.getAngleForProteinPosition( i, positions[ p ] );
+				var start = this.polarToCartesian( center.x, center.y, radius.inner, angle );
+				var end   = this.polarToCartesian( center.x, center.y, radius.outer, angle );
+				
+				var pathString = "M" + start.x + "," + start.y;
+				pathString +=    "L" + end.x + "," + end.y;
+				
+				var path = svgRootSnapSVGObject.path( pathString );
+				
+				path.attr( {
+					stroke:this.CONSTANTS._LINKABLE_POSITION_COLOR,
+					"stroke-opacity":this.CONSTANTS._LINKABLE_POSITION_OPACITY,
+					"stroke-dasharray":"4,2"
+				})
+			}
+			
+		}
+	}
+};
+
+/**
+ * Draw all linkable positions in all proteins
+ * 
+ * @param svgRootSnapSVGObject
+ */
+circlePlotViewer.prototype.drawLinkablePositions = function( svgRootSnapSVGObject ) {
+	var selectedProteins = getAllSelectedProteins();
+	var radius = this.getProteinBarRadii();
+	var center = this.getCenterCoords();
+	
+	for( var i = 0; i < selectedProteins.length; i++ ) {
+		var proteinId = selectedProteins[ i ];
+		
+		var positions = _linkablePositions[ proteinId ];
+		if( positions != undefined ) {
+			
+			for( var p = 0; p < positions.length; p++ ) {
+				var angle = this.getAngleForProteinPosition( i, positions[ p ] );
+				var start = this.polarToCartesian( center.x, center.y, radius.inner, angle );
+				var end   = this.polarToCartesian( center.x, center.y, radius.outer, angle );
+				
+				var pathString = "M" + start.x + "," + start.y;
+				pathString +=    "L" + end.x + "," + end.y;
+				
+				var path = svgRootSnapSVGObject.path( pathString );
+				
+				path.attr( {
+					stroke:this.CONSTANTS._LINKABLE_POSITION_COLOR,
+					"stroke-opacity":this.CONSTANTS._LINKABLE_POSITION_OPACITY
+				})
+			}
+			
+		}
+	}
+};
 
 /**
  * Draw all monolinks
@@ -96,12 +177,13 @@ circlePlotViewer.prototype.drawMonolinks = function( svgRootSnapSVGObject ) {
 circlePlotViewer.prototype.drawMonolink = function( index, position, svgRootSnapSVGObject ) {
 	
 	var angle = this.getAngleForProteinPosition( index, position );
+	var center = this.getCenterCoords();
 	
-	var radius1 = this.radius - this.CONSTANTS._HEIGHT_OF_PROTEIN_BARS - this.CONSTANTS._GAP_BETWEEN_BARS_AND_LINKS;
+	var radius1 = this.getProteinBarRadii().inner - this.CONSTANTS._GAP_BETWEEN_BARS_AND_LINKS;
 	var radius2 = radius1 - this.CONSTANTS._MONOLINK_HEIGHT;
 	
-	var point1 = this.polarToCartesian( this.centerX, this.centerY, radius1, angle );
-	var point2 = this.polarToCartesian( this.centerX, this.centerY, radius2, angle );
+	var point1 = this.polarToCartesian( center.x, center.y, radius1, angle );
+	var point2 = this.polarToCartesian( center.x, center.y, radius2, angle );
 	
 	var pathString = "M" + point1.x + "," + point1.y;
 	pathString += "L" + point2.x + "," + point2.y;
@@ -259,6 +341,8 @@ circlePlotViewer.prototype.drawSelfCrosslinks = function( svgRootSnapSVGObject )
  */
 circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, toIndex, toPosition, svgRootSnapSVGObject ) {
 	
+	var center = this.getCenterCoords();
+	
 	var fromCoords = this.getCrosslinkTerminus( fromIndex, fromPosition );
 	var toCoords = this.getCrosslinkTerminus( toIndex, toPosition );
 
@@ -279,10 +363,10 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
 	
 	var ratio = diffAngle / 180;
 	
-	var radius = this.radius - this.CONSTANTS._HEIGHT_OF_PROTEIN_BARS - this.CONSTANTS._GAP_BETWEEN_BARS_AND_LINKS - this.CONSTANTS._MINIMUM_CROSSLINK_LOOP_HEIGHT;
+	var radius = this.getProteinBarRadii().inner - this.CONSTANTS._GAP_BETWEEN_BARS_AND_LINKS - this.CONSTANTS._MINIMUM_CROSSLINK_LOOP_HEIGHT;
 	radius -= radius * ratio;
 		
-	var loopPeakCoordinates = this.polarToCartesian( this.centerX, this.centerY, radius, midAngle );
+	var loopPeakCoordinates = this.polarToCartesian( center.x, center.y, radius, midAngle );
 	
 	
     var pathString = "M" + fromCoords.x + "," + fromCoords.y;
@@ -311,6 +395,8 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
 circlePlotViewer.prototype.getCrosslinkTerminus = function( proteinIndex, position ) {
 	var selectedProteins = getAllSelectedProteins();
 	
+	var center = this.getCenterCoords();
+	
 	var totalGapDegrees = selectedProteins.length * this.CONSTANTS._GAP_BETWEEN_BARS;
 	var workingDegrees = 360 - totalGapDegrees;
 	
@@ -330,9 +416,9 @@ circlePlotViewer.prototype.getCrosslinkTerminus = function( proteinIndex, positi
 
 			var degrees = currentStartDegrees + (position * degreesPerResidue - (0.5 * degreesPerResidue ) );
 			
-			return this.polarToCartesian( this.centerX,
-										  this.centerY,
-										  this.radius - this.CONSTANTS._HEIGHT_OF_PROTEIN_BARS - this.CONSTANTS._GAP_BETWEEN_BARS_AND_LINKS,
+			return this.polarToCartesian( center.x,
+										  center.y,
+										  this.getProteinBarRadii().inner - this.CONSTANTS._GAP_BETWEEN_BARS_AND_LINKS,
 										  degrees
 										 );
 			 
@@ -427,10 +513,10 @@ circlePlotViewer.prototype.drawProteinBars = function( svgRootSnapSVGObject ) {
  */
 circlePlotViewer.prototype.drawProteinBar = function( svgRootSnapSVGObject, proteinId, index, startDegrees, rotationDegrees ) {
 	
-	var path = this.getCurvedBarPath( this.centerX, 
-									  this.centerY,
-									  this.radius,
-									  this.CONSTANTS._HEIGHT_OF_PROTEIN_BARS,
+	var center = this.getCenterCoords();
+	
+	var path = this.getCurvedBarPath( center.x, 
+									  center.y,
 									  startDegrees,
 									  startDegrees + rotationDegrees
 									 );
@@ -453,10 +539,10 @@ circlePlotViewer.prototype.drawProteinBar = function( svgRootSnapSVGObject, prot
  */
 circlePlotViewer.prototype.drawProteinBarLabel = function( svgRootSnapSVGObject, proteinId, index, startDegrees, rotationDegrees ) {
 	
-	var path = this.getCurvedPathForLabel( this.centerX, 
-									  this.centerY,
-									  this.radius,
-									  this.CONSTANTS._HEIGHT_OF_PROTEIN_BARS,
+	var center = this.getCenterCoords();
+	
+	var path = this.getCurvedPathForLabel( center.x, 
+									  center.y,
 									  startDegrees,
 									  startDegrees + rotationDegrees
 									 );
@@ -578,9 +664,12 @@ circlePlotViewer.prototype.polarToCartesian = function(centerX, centerY, radius,
 };
 
 
-circlePlotViewer.prototype.getCurvedPathForLabel = function(centerX, centerY, outerRadius, barHeight, startAngle, endAngle){
+circlePlotViewer.prototype.getCurvedPathForLabel = function(centerX, centerY, startAngle, endAngle){
 	
-	var innerRadius = outerRadius - barHeight;
+	var radii = this.getProteinBarRadii();
+	
+	var outerRadius = radii.outer;
+	var innerRadius = radii.inner;
 	
     var outerStart = this.polarToCartesian(centerX, centerY, outerRadius, endAngle);
     var outerEnd = this.polarToCartesian(centerX, centerY, outerRadius, startAngle);
@@ -610,9 +699,12 @@ circlePlotViewer.prototype.getCurvedPathForLabel = function(centerX, centerY, ou
  * @param endAngle The end angle in degrees
  * @returns {String}
  */
-circlePlotViewer.prototype.getCurvedBarPath = function(centerX, centerY, outerRadius, barHeight, startAngle, endAngle){
+circlePlotViewer.prototype.getCurvedBarPath = function(centerX, centerY, startAngle, endAngle){
 	
-	var innerRadius = outerRadius - barHeight;
+	var radii = this.getProteinBarRadii();
+	
+	var outerRadius = radii.outer;
+	var innerRadius = radii.inner;
 	
     var outerStart = this.polarToCartesian(centerX, centerY, outerRadius, endAngle);
     var outerEnd = this.polarToCartesian(centerX, centerY, outerRadius, startAngle);
@@ -644,6 +736,35 @@ circlePlotViewer.prototype.getCurvedBarPath = function(centerX, centerY, outerRa
 }
 
 /**
+ * Get the radii to use for protein bars
+ * 
+ * @returns { outer: outer radius, inner: inner radius
+ */
+circlePlotViewer.prototype.getProteinBarRadii = function() {
+	
+	var radii = { };
+	
+	radii.outer = this.radius;
+	radii.inner = radii.outer - this.CONSTANTS._HEIGHT_OF_PROTEIN_BARS;
+	
+	return radii;
+};
+
+/**
+ * Get the center of the circle
+ * @returns { x: x coord of center, y: y coord of center }
+ */
+circlePlotViewer.prototype.getCenterCoords = function() {
+	
+	var center = { };
+	
+	center.x = this.centerX;
+	center.y = this.centerY;
+	
+	return center;
+};
+
+/**
  * Get the color for the given index, given the total number of proteins
  * @param index
  * @returns
@@ -672,6 +793,6 @@ circlePlotViewer.prototype.getDistanceBetweenPoints = function( fromCoords, toCo
 };
 
 circlePlotViewer.prototype.getMaxCrosslinkDistance = function( ) {
-	reutrn ( this.radius - this.CONSTANTS._HEIGHT_OF_PROTEIN_BARS - this.CONSTANTS._GAP_BETWEEN_BARS_AND_LINKS ) * 2;
+	reutrn ( this.getProteinBarRadii().inner - this.CONSTANTS._GAP_BETWEEN_BARS_AND_LINKS ) * 2;
 };
 
