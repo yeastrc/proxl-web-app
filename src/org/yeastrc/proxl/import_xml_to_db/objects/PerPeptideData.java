@@ -2,11 +2,11 @@ package org.yeastrc.proxl.import_xml_to_db.objects;
 
 import java.util.List;
 
-import org.yeastrc.xlink.dto.DynamicModDTO;
-import org.yeastrc.xlink.dto.MatchedPeptideDTO;
-import org.yeastrc.xlink.dto.MonolinkDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptNrseqIdPosMonolinkDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptDynamicModDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
-import org.yeastrc.xlink.dto.PsmDTO;
+
 
 /**
  * Importer Internal
@@ -19,42 +19,24 @@ import org.yeastrc.xlink.dto.PsmDTO;
  */
 public class PerPeptideData {
 	
-	private PsmDTO psmDTO;
-
 	private PeptideDTO peptideDTO;
+
+	private SrchRepPeptPeptideDTO srchRepPeptPeptideDTO;
 	
-	private MatchedPeptideDTO matchedPeptideDTO;
-	
-	private List<DynamicModDTO> dynamicModDTOList_Peptide;
+	private List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_Peptide;
 	
 	private List<Integer> monolinkPositionList;
 	
-	private List<MonolinkDTO> monolinkDTOList;
-
+	private List<SrchRepPeptNrseqIdPosMonolinkDTO> srchRepPeptNrseqIdPosMonolinkDTOList;
 	
-	
-	public List<MonolinkDTO> getMonolinkDTOList() {
-		return monolinkDTOList;
+
+	public List<SrchRepPeptNrseqIdPosMonolinkDTO> getSrchRepPeptNrseqIdPosMonolinkDTOList() {
+		return srchRepPeptNrseqIdPosMonolinkDTOList;
 	}
 
-	public void setMonolinkDTOList(List<MonolinkDTO> monolinkDTOList) {
-		this.monolinkDTOList = monolinkDTOList;
-	}
-
-	public List<Integer> getMonolinkPositionList() {
-		return monolinkPositionList;
-	}
-
-	public void setMonolinkPositionList(List<Integer> monolinkPositionList) {
-		this.monolinkPositionList = monolinkPositionList;
-	}
-
-	public PsmDTO getPsmDTO() {
-		return psmDTO;
-	}
-
-	public void setPsmDTO(PsmDTO psmDTO) {
-		this.psmDTO = psmDTO;
+	public void setSrchRepPeptNrseqIdPosMonolinkDTOList(
+			List<SrchRepPeptNrseqIdPosMonolinkDTO> srchRepPeptNrseqIdPosMonolinkDTOList) {
+		this.srchRepPeptNrseqIdPosMonolinkDTOList = srchRepPeptNrseqIdPosMonolinkDTOList;
 	}
 
 	public PeptideDTO getPeptideDTO() {
@@ -65,21 +47,29 @@ public class PerPeptideData {
 		this.peptideDTO = peptideDTO;
 	}
 
-	public MatchedPeptideDTO getMatchedPeptideDTO() {
-		return matchedPeptideDTO;
+	public List<SrchRepPeptPeptDynamicModDTO> getSrchRepPeptPeptDynamicModDTOList_Peptide() {
+		return srchRepPeptPeptDynamicModDTOList_Peptide;
 	}
 
-	public void setMatchedPeptideDTO(MatchedPeptideDTO matchedPeptideDTO) {
-		this.matchedPeptideDTO = matchedPeptideDTO;
+	public void setSrchRepPeptPeptDynamicModDTOList_Peptide(
+			List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_Peptide) {
+		this.srchRepPeptPeptDynamicModDTOList_Peptide = srchRepPeptPeptDynamicModDTOList_Peptide;
 	}
 
-	public List<DynamicModDTO> getDynamicModDTOList_Peptide() {
-		return dynamicModDTOList_Peptide;
+	public List<Integer> getMonolinkPositionList() {
+		return monolinkPositionList;
 	}
 
-	public void setDynamicModDTOList_Peptide(
-			List<DynamicModDTO> dynamicModDTOList_Peptide) {
-		this.dynamicModDTOList_Peptide = dynamicModDTOList_Peptide;
+	public void setMonolinkPositionList(List<Integer> monolinkPositionList) {
+		this.monolinkPositionList = monolinkPositionList;
+	}
+
+	public SrchRepPeptPeptideDTO getSrchRepPeptPeptideDTO() {
+		return srchRepPeptPeptideDTO;
+	}
+
+	public void setSrchRepPeptPeptideDTO(SrchRepPeptPeptideDTO srchRepPeptPeptideDTO) {
+		this.srchRepPeptPeptideDTO = srchRepPeptPeptideDTO;
 	}
 	
 	

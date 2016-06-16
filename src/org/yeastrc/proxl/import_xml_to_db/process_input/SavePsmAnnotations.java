@@ -36,67 +36,73 @@ public class SavePsmAnnotations {
 	 */
 	private SavePsmAnnotations(){}
 	
-	public static SavePsmAnnotations getInstance() {
+	/**
+	 * @param searchProgramEntryMap
+	 * @return
+	 */
+	public static SavePsmAnnotations getInstance( Map<String, SearchProgramEntry> searchProgramEntryMap, Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesOnId ) {
 		
-		return new SavePsmAnnotations();
+
+		SavePsmAnnotations savePsmAnnotations = new SavePsmAnnotations();
+		
+		savePsmAnnotations.searchProgramEntryMap = searchProgramEntryMap;
+		savePsmAnnotations.filterableAnnotationTypesOnIdMasterCopy = filterableAnnotationTypesOnId;
+		
+		return savePsmAnnotations;
 	}
+	
+	private Map<String, SearchProgramEntry> searchProgramEntryMap;
+	private Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesOnIdMasterCopy;
+	
+	
 
 	/**
+	 * Returns list of inserted Filterable PsmAnnotationDTO
+	 * 
 	 * @param psm
 	 * @param psmDTO
-	 * @param searchProgramEntryMap
+	 * @return
 	 * @throws Exception
 	 */
-	public void savePsmAnnotations( Psm psm, PsmDTO psmDTO, Map<String, SearchProgramEntry> searchProgramEntryMap ) throws Exception {
+	public List<PsmAnnotationDTO> savePsmAnnotations( Psm psm, PsmDTO psmDTO ) throws Exception {
 		
-		
-		savePsmFilterablePsmAnnotations( psm, psmDTO, searchProgramEntryMap );
+		List<PsmAnnotationDTO> psmAnnotationDTO_Filterable_List = 
+				savePsmFilterablePsmAnnotations( psm, psmDTO );
 
-		savePsmDescriptivePsmAnnotations( psm, psmDTO, searchProgramEntryMap );
+		savePsmDescriptivePsmAnnotations( psm, psmDTO );
 
+		return psmAnnotationDTO_Filterable_List;
 	}
 	
 
 	/**
 	 * @param psm
 	 * @param psmDTO
-	 * @param searchProgramEntryMap
 	 * @throws Exception 
 	 */
-	private void savePsmFilterablePsmAnnotations( Psm psm, PsmDTO psmDTO, Map<String, SearchProgramEntry> searchProgramEntryMap ) throws Exception {
+	private List<PsmAnnotationDTO> savePsmFilterablePsmAnnotations( Psm psm, PsmDTO psmDTO ) throws Exception {
+		
+		List<PsmAnnotationDTO> psmAnnotationDTO_Filterable_List = new ArrayList<>();
+		
 		
 
-		///  Build list of Filterable annotation type ids
+		//  Make local copy of filterableAnnotationTypesOnIdMasterCopy
+		//    since remove entries from it.
 		
 		Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesOnId = new HashMap<>();
 		
-		for ( Map.Entry<String, SearchProgramEntry> searchProgramEntryMapEntry : searchProgramEntryMap.entrySet() ) {
-
-			SearchProgramEntry searchProgramEntry = searchProgramEntryMapEntry.getValue();
-
-			Map<String, AnnotationTypeDTO> psmAnnotationTypeDTOMap =
-					searchProgramEntry.getPsmAnnotationTypeDTOMap();
-		
-			for ( Map.Entry<String, AnnotationTypeDTO> psmAnnotationTypeDTOMapEntry : psmAnnotationTypeDTOMap.entrySet() ) {
-
-				AnnotationTypeDTO psmAnnotationTypeDTO = psmAnnotationTypeDTOMapEntry.getValue();
-		
-				 if ( psmAnnotationTypeDTO.getFilterableDescriptiveAnnotationType()
-						 == FilterableDescriptiveAnnotationType.FILTERABLE ) {
-				 
-					 filterableAnnotationTypesOnId.put( psmAnnotationTypeDTO.getId(), psmAnnotationTypeDTO );
-				 }
-				
-			}
+		for ( Map.Entry<Integer, AnnotationTypeDTO> entry : filterableAnnotationTypesOnIdMasterCopy.entrySet() ) {
+			
+			filterableAnnotationTypesOnId.put( entry.getKey(), entry.getValue() );
 		}
-		
-		
+
+		//  Process PSM Filterable Annotation Entries
 
 		FilterablePsmAnnotations filterablePsmAnnotations = psm.getFilterablePsmAnnotations();
 		
 		if ( filterablePsmAnnotations == null ) {
 
-			if ( ! filterableAnnotationTypesOnId.isEmpty() ) {
+			if ( ! filterableAnnotationTypesOnIdMasterCopy.isEmpty() ) {
 
 				String msg = "No PSM Filterable annotations on this PSM."
 						+ "  Filterable annotations are required on all PSMs."
@@ -115,7 +121,7 @@ public class SavePsmAnnotations {
 			
 			if ( filterablePsmAnnotationList == null || filterablePsmAnnotationList.isEmpty() ) {
 
-				if ( ! filterableAnnotationTypesOnId.isEmpty() ) {
+				if ( ! filterableAnnotationTypesOnIdMasterCopy.isEmpty() ) {
 
 					String msg = "No PSM Filterable annotations on this PSM."
 							+ "  Filterable annotations are required on all PSMs."
@@ -130,7 +136,7 @@ public class SavePsmAnnotations {
 			} else {
 				
 				//  Process list of filterable annotations on input list
-
+					
 				for ( FilterablePsmAnnotation filterablePsmAnnotation : filterablePsmAnnotationList ) {
 
 					String searchProgram = filterablePsmAnnotation.getSearchProgram();
@@ -141,8 +147,7 @@ public class SavePsmAnnotations {
 							getPsmAnnotationTypeId( 
 									searchProgram, 
 									annotationName, 
-									FilterableDescriptiveAnnotationType.FILTERABLE,
-									searchProgramEntryMap );
+									FilterableDescriptiveAnnotationType.FILTERABLE );
 
 					if ( filterableAnnotationTypesOnId.remove( annotationTypeId ) == null ) {
 
@@ -194,8 +199,11 @@ public class SavePsmAnnotations {
 					psmAnnotationDTO.setValueString( value.toString() );
 
 					PsmAnnotationDAO.getInstance().saveToDatabase(psmAnnotationDTO);
+					
+					psmAnnotationDTO_Filterable_List.add(psmAnnotationDTO);
 				}
 			}
+			
 		}
 		
 
@@ -208,6 +216,9 @@ public class SavePsmAnnotations {
 			log.error( msg );
 			throw new ProxlImporterDataException(msg);
 		}
+		
+
+		return psmAnnotationDTO_Filterable_List;
 	}
 	
 	
@@ -220,10 +231,9 @@ public class SavePsmAnnotations {
 	/**
 	 * @param psm
 	 * @param psmDTO
-	 * @param searchProgramEntryMap
 	 * @throws Exception 
 	 */
-	private void savePsmDescriptivePsmAnnotations( Psm psm, PsmDTO psmDTO, Map<String, SearchProgramEntry> searchProgramEntryMap ) throws Exception {
+	private void savePsmDescriptivePsmAnnotations( Psm psm, PsmDTO psmDTO ) throws Exception {
 		
 		DescriptivePsmAnnotations descriptivePsmAnnotations = psm.getDescriptivePsmAnnotations();
 
@@ -255,8 +265,7 @@ public class SavePsmAnnotations {
 							getPsmAnnotationTypeId( 
 									searchProgram, 
 									annotationName, 
-									FilterableDescriptiveAnnotationType.DESCRIPTIVE, 
-									searchProgramEntryMap );
+									FilterableDescriptiveAnnotationType.DESCRIPTIVE );
 
 					PsmAnnotationDTO psmAnnotationDTO = new PsmAnnotationDTO();
 
@@ -287,9 +296,8 @@ public class SavePsmAnnotations {
 			
 			String searchProgram, 
 			String annotationName, 
-			FilterableDescriptiveAnnotationType filterableDescriptiveAnnotationType,
-			
-			Map<String, SearchProgramEntry> searchProgramEntryMap ) throws ProxlImporterDataException {
+			FilterableDescriptiveAnnotationType filterableDescriptiveAnnotationType
+			) throws ProxlImporterDataException {
 		
 		SearchProgramEntry searchProgramEntry =
 				searchProgramEntryMap.get( searchProgram );
@@ -343,5 +351,6 @@ public class SavePsmAnnotations {
 		
 		return id;
 	}
+
 		
 }

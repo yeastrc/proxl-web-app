@@ -7,13 +7,13 @@ import java.util.List;
 //import org.apache.log4j.Logger;
 
 
+
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl_import.api.xml_dto.Modification;
 import org.yeastrc.proxl_import.api.xml_dto.Modifications;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.xlink.dao.PeptideDAO;
-import org.yeastrc.xlink.dto.DynamicModDTO;
-import org.yeastrc.xlink.dto.MatchedPeptideDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 
 /**
@@ -33,7 +33,7 @@ public class GetPerPeptideData {
 	 * @return
 	 * @throws Exception 
 	 */
-	public PerPeptideData getPerPeptideData( Peptide peptide, int nrseqDatabaseId ) throws Exception {
+	public PerPeptideData getPerPeptideData( Peptide peptide ) throws Exception {
 		
 		PerPeptideData perPeptideData = new PerPeptideData();
 		
@@ -42,15 +42,10 @@ public class GetPerPeptideData {
 
 		perPeptideData.setPeptideDTO( peptideDTO );
 		
-		MatchedPeptideDTO matchedPeptideDTO = new MatchedPeptideDTO();
-		perPeptideData.setMatchedPeptideDTO( matchedPeptideDTO );
-		matchedPeptideDTO.setPeptide_id( peptideDTO.getId() );
-		
-
-		List<DynamicModDTO> dynamicModDTOList_Peptide = new ArrayList<>();
+		List<SrchRepPeptPeptDynamicModDTO> dynamicModDTOList_Peptide = new ArrayList<>();
 		List<Integer> monolinkPositionList = new ArrayList<>();
 
-		perPeptideData.setDynamicModDTOList_Peptide( dynamicModDTOList_Peptide );
+		perPeptideData.setSrchRepPeptPeptDynamicModDTOList_Peptide( dynamicModDTOList_Peptide );
 		perPeptideData.setMonolinkPositionList( monolinkPositionList );
 
 		Modifications modifications = peptide.getModifications();
@@ -67,14 +62,14 @@ public class GetPerPeptideData {
 					BigDecimal mass = modification.getMass();
 					Boolean monolink = modification.isIsMonolink();
 
-					DynamicModDTO dynamicModDTO = new DynamicModDTO();
-					dynamicModDTO.setPosition( position );
-					dynamicModDTO.setMass( mass.doubleValue() );
-					dynamicModDTOList_Peptide.add( dynamicModDTO );
+					SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO = new SrchRepPeptPeptDynamicModDTO();
+					srchRepPeptPeptDynamicModDTO.setPosition( position );
+					srchRepPeptPeptDynamicModDTO.setMass( mass.doubleValue() );
+					dynamicModDTOList_Peptide.add( srchRepPeptPeptDynamicModDTO );
 
 					if ( monolink != null && monolink ) {
 						
-						dynamicModDTO.setMonolink( true );
+						srchRepPeptPeptDynamicModDTO.setMonolink( true );
 
 						monolinkPositionList.add( position );
 					}

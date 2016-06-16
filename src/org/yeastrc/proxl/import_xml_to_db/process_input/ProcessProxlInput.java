@@ -9,10 +9,12 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCrosslinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchMonolinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSM_InsertToDB;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.process_scans.Process_MzML_MzXml_File;
@@ -27,13 +29,11 @@ import org.yeastrc.proxl_import.api.xml_dto.MonolinkMasses;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
 import org.yeastrc.xlink.dao.LinkerDAO;
 import org.yeastrc.xlink.dao.SearchCommentDAO;
-import org.yeastrc.xlink.dao.SearchDAO;
 import org.yeastrc.xlink.dao.SearchLinkerDAO;
 import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchMonolinkMassDTO;
 import org.yeastrc.xlink.dto.SearchCommentDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.dto.SearchLinkerDTO;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 
@@ -255,7 +255,7 @@ public class ProcessProxlInput {
 					proxlInput, 
 					nrseqDatabaseId, 
 					proteinNameDecoyPrefixList, 
-					searchDTO.getId(), 
+					searchDTO, 
 
 					dropPeptidePSMCutoffValues,
 					

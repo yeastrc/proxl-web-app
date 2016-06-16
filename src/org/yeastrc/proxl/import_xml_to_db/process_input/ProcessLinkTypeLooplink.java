@@ -1,37 +1,30 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.proxl.import_xml_to_db.dao.PsmPeptideDAO;
-import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LooplinkDAO;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptideAndOrPSMForCmdLineCutoffs;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DroppedPeptideCount;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReportedPeptideDynamicModLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptNrseqIdPosLooplinkDAO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDynamicModLookupDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptNrseqIdPosLooplinkDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptDynamicModDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
-import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
-import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
-import org.yeastrc.proxl.import_xml_to_db.utils.RoundDecimalFieldsIfNecessary;
 import org.yeastrc.proxl_import.api.xml_dto.LinkedPosition;
 import org.yeastrc.proxl_import.api.xml_dto.LinkedPositions;
-import org.yeastrc.proxl_import.api.xml_dto.Linker;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.Peptides;
-import org.yeastrc.proxl_import.api.xml_dto.Psm;
-import org.yeastrc.proxl_import.api.xml_dto.Psms;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
-import org.yeastrc.xlink.dto.LooplinkDTO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
-import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
-import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
+import org.yeastrc.xlink.utils.XLinkUtils;
 
 
 
@@ -52,40 +45,71 @@ public class ProcessLinkTypeLooplink {
 	
 	public static ProcessLinkTypeLooplink getInstance() { return new ProcessLinkTypeLooplink(); }
 	
+
+	/**
+	 * result from getLooplinkMappings method
+	 *
+	 */
+	public static class GetLooplinkProteinMappingsResult {
+		
+		private boolean noProteinMappings;
+		
+		private PerPeptideData perPeptideData;
+		
+		private List<SrchRepPeptNrseqIdPosLooplinkDTO> srchRepPeptNrseqIdPosLooplinkDTOList;
+
+
+		/** 
+		 * No Protein mappings for peptide
+		 * @return
+		 */
+		public boolean isNoProteinMappings() {
+			return noProteinMappings;
+		}
+
+		public void setNoProteinMappings(boolean noProteinMappings) {
+			this.noProteinMappings = noProteinMappings;
+		}
+
+	}
+	
+	
 	
 
 	/**
+	 * Get Protein Mappings for looplink reported peptide
+	 * 
+	 * The PeptideDTO is saved to the DB in this step since used for Protein Mappings
+	 * 
 	 * @param reportedPeptide
-	 * @param proxlInputLinkerList
-	 * @param proteinNameDecoyPrefix
+	 * @param linkerList
+	 * @param linkerListStringForErrorMsgs
+	 * @param proteinNameDecoyPrefixList
 	 * @param nrseqDatabaseId
-	 * @param linkTypeNumber
-	 * @param reportedPeptideDTO
-	 * @param searchId
-	 * @param searchProgramEntryMap
+	 * @return
 	 * @throws Exception
 	 */
-	public void processLooplink( 
+	public GetLooplinkProteinMappingsResult getLooplinkroteinMappings( 
 			
 			ReportedPeptide reportedPeptide, 
-			
-			List<Linker> proxlInputLinkerList,
 
+			List<ILinker> linkerList,
+			String linkerListStringForErrorMsgs,
+			
 			List<String> proteinNameDecoyPrefixList,
 			
-			int nrseqDatabaseId,
-			
-			int linkTypeNumber, 
-			ReportedPeptideDTO reportedPeptideDTO, 
-			int searchId, 
-
-			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
-			
-			Map<String, SearchProgramEntry> searchProgramEntryMap,
-			
-			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds
+			int nrseqDatabaseId
 			
 			) throws Exception {
+		
+		
+
+		GetLooplinkProteinMappingsResult getLooplinkMappingsResult = new GetLooplinkProteinMappingsResult();
+		
+		List<SrchRepPeptNrseqIdPosLooplinkDTO> srchRepPeptNrseqIdPosLooplinkDTOList = new ArrayList<>();
+		getLooplinkMappingsResult.srchRepPeptNrseqIdPosLooplinkDTOList = srchRepPeptNrseqIdPosLooplinkDTOList;
+		
+		
 		
 		Peptides peptides =
 				reportedPeptide.getPeptides();
@@ -107,222 +131,45 @@ public class ProcessLinkTypeLooplink {
 		
 		Peptide peptide = peptideList.get( 0 );
 		
-		PerPeptideData perPeptideData = GetPerPeptideData.getInstance().getPerPeptideData( peptide, nrseqDatabaseId );
+		PerPeptideData perPeptideData = GetPerPeptideData.getInstance().getPerPeptideData( peptide );
 
+		getLooplinkMappingsResult.perPeptideData = perPeptideData;
+		
+		
+		
 		int[] linkedPositions = getLooplinkLinkedPositions( peptide, "1", reportedPeptide );
 
 		int linkedPosition_1 = linkedPositions[ 0 ];
 		int linkedPosition_2 = linkedPositions[ 1 ];
 
+		//  Order linked positions so smaller one is first
 		
-		List<ILinker> linkerList = new ArrayList<>();
-		
-		String linkerListStringForErrorMsgs = null;
-		
-		
-		for ( Linker proxlInputLinker : proxlInputLinkerList ) {
-
-			String proxlInputLinkerName = proxlInputLinker.getName();
-
-			ILinker linker = GetLinkerFactory.getLinkerForAbbr( proxlInputLinkerName );
-			if( linker == null ) {
-				String msg = "processLooplink(...): Could not get an ILinker for linker abbreviation: " 
-						+ proxlInputLinkerName;
-				log.error( msg );
-
-				throw new Exception( msg );
-			}
-
-			linkerList.add( linker );
+		if ( linkedPosition_1 > linkedPosition_2  ) {
 			
-			if ( linkerListStringForErrorMsgs == null ) {
-				
-				linkerListStringForErrorMsgs = proxlInputLinkerName;
-			} else {
-				
-				linkerListStringForErrorMsgs += ", " + proxlInputLinkerName;
-			}
+			int linkedPosition_temp = linkedPosition_1;
+			linkedPosition_2 = linkedPosition_1;
+			linkedPosition_1 = linkedPosition_temp;
 		}
 		
-		GetLooplinksResult getLooplinksResult =
-				
-				getLooplinks( 
-						nrseqDatabaseId, 
-						linkerList, 
-						linkerListStringForErrorMsgs,
-						proteinNameDecoyPrefixList, 
-						perPeptideData, 
-						linkedPosition_1, 
-						linkedPosition_2 );
-
-
-
-
-		List<GetLooplinksResultItem> getLooplinksResultItemList = getLooplinksResult.getLooplinkResultItemList();
-		
-		if ( getLooplinksResultItemList == null || getLooplinksResultItemList.isEmpty() ) {
-		
-			log.warn( "No Mapped Proteins for this reported peptide so not inserting any PSMs: " + 
-					reportedPeptide.getReportedPeptideString() );
-
-			return;  //  EARLY EXIT   No looplink records for this reported peptide in this search 
-		}
-		
-
-		Psms psms =	reportedPeptide.getPsms();
-
-		List<Psm> psmList = psms.getPsm();
-		
-		boolean saveAnyPSMs = false;
-
-		for ( Psm psm : psmList ) {
-
-			if ( DropPeptideAndOrPSMForCmdLineCutoffs.getInstance()
-					.dropPSMForCmdLineCutoffs( psm, dropPeptidePSMCutoffValues ) ) {
-				
-				DroppedPeptideCount.incrementDroppedPsmCount();
-
-				continue;  // EARLY continue to next record
-			}
-			
-			PsmDTO psmDTO = 
-					PopulateAndSavePsmDTO.getInstance().populateAndSavePSMDTO( 
-							
-							searchId, 
-							mapOfScanFilenamesMapsOfScanNumbersToScanIds, 
-							linkTypeNumber, 
-							reportedPeptideDTO, 
-							psm );
-			
-			
-			SavePsmAnnotations.getInstance().savePsmAnnotations( psm, psmDTO, searchProgramEntryMap );
-
-			savePSMChildrenAndLooplinkDTORecords( 
-					psm, 
-					psmDTO, 						
-					perPeptideData, 
-					getLooplinksResult );
-			
-
-			
-			//  Save PsmDTO.id PeptideDTO.id mapping
-			
-			PsmPeptideDAO.getInstance().saveToDatabase( psmDTO.getId(), perPeptideData.getPeptideDTO().getId() );
-			
-			saveAnyPSMs = true;
-		}
-		
-		if ( ! saveAnyPSMs ) {
-			
-			String msg = "No PSMs saved for this reported peptide: " + 
-					reportedPeptide.getReportedPeptideString();
-			log.error( msg );
-			throw new ProxlImporterInteralException(msg);
-		}
-	}
-	
-	
-	
-
-	/**
-	 * @param psm
-	 * @param psmDTO
-	 * @param perPeptideData_1
-	 * @param perPeptideData_2
-	 * @param getLooplinksResult
-	 * @throws Exception
-	 */
-	private void savePSMChildrenAndLooplinkDTORecords(
-			
-			Psm psm,
-			PsmDTO psmDTO,
-			PerPeptideData perPeptideData,
-			GetLooplinksResult getLooplinksResult
-			
-			) throws Exception {
-		
-		//  Save PSM children
-		
-		SavePerPeptideDataForPSM.getInstance().savePerPeptideDataForPSM( psmDTO, perPeptideData );
-
-		List<GetLooplinksResultItem> getLooplinksResultItemList = getLooplinksResult.getLooplinkResultItemList();
-		
-		for ( GetLooplinksResultItem getLooplinksResultItem : getLooplinksResultItemList ) {
-			
-			LooplinkDTO looplinkDTO = getLooplinksResultItem.getLooplinkDTO();
-			
-			BigDecimal linkerMass = psm.getLinkerMass();
-
-			if ( linkerMass == null ) {
-				
-				String msg = "Linker Mass cannot be null or empty for Looplink. PSM Scan Number: " + psm.getScanNumber();
-				log.error( msg );
-				throw new ProxlImporterDataException(msg);
-			}
-			
-			linkerMass = RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( linkerMass );
-			
-			
-			looplinkDTO.setLinkerMass( linkerMass );
-			
-			looplinkDTO.setPsm( psmDTO );
-			
-			DB_Insert_LooplinkDAO.getInstance().save( looplinkDTO );
-			
-		}
-		
-	}
-	
-	
-
-
-	/**
-	 * @param nrseqDatabaseId
-	 * @param linkerList
-	 * @param linkerListStringForErrorMsgs
-	 * @param proteinNameDecoyPrefix
-	 * @param perPeptideData
-	 * @param linkedPosition_1
-	 * @param linkedPosition_2
-	 * @return
-	 * @throws Exception
-	 */
-	private GetLooplinksResult getLooplinks(
-			
-			int nrseqDatabaseId,
-			
-			List<ILinker> linkerList,
-			String linkerListStringForErrorMsgs,
-			
-			List<String> proteinNameDecoyPrefixList,
-			
-			PerPeptideData perPeptideData,
-			
-			int linkedPosition_1,
-			int linkedPosition_2
-
-
-			) throws Exception {
 		
 		
-		GetLooplinksResult getLooplinksResult = new GetLooplinksResult();
-		
-		List<GetLooplinksResultItem> looplinkResultItemList = new ArrayList<>();
-		getLooplinksResult.setLooplinkResultItemList( looplinkResultItemList );
+		PeptideDTO peptideDTO = perPeptideData.getPeptideDTO();
 		
 		
+		//  Create partial SrchRepPeptPeptideDTO peptide level record
+
+		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO = new SrchRepPeptPeptideDTO();
 		
-		PeptideDTO peptide = perPeptideData.getPeptideDTO();
+		srchRepPeptPeptideDTO.setPeptideId( peptideDTO.getId() );
+		srchRepPeptPeptideDTO.setPeptidePosition_1( linkedPosition_1 );
+		srchRepPeptPeptideDTO.setPeptidePosition_2( linkedPosition_2 );
 		
+		
+		perPeptideData.setSrchRepPeptPeptideDTO( srchRepPeptPeptideDTO );
 		
 		Collection<NRProteinDTO> proteinMatches_Peptide = 
 				GetProteinsForPeptidesAndInsertNrseqPeptideProteinEntries.getInstance()
-				.getProteinsForPeptidesAndInsertNrseqPeptideProteinEntries( peptide, proteinNameDecoyPrefixList, nrseqDatabaseId );
-		
-		
-		PopulateMonolinkDTOListOnPerPeptideDataObject.getInstance()
-		.populateMonolinkDTOListOnPerPeptideDataObject( perPeptideData, linkerList, proteinMatches_Peptide );
-
+				.getProteinsForPeptidesAndInsertNrseqPeptideProteinEntries( peptideDTO, proteinNameDecoyPrefixList, nrseqDatabaseId );
 		
 		
 		
@@ -330,16 +177,17 @@ public class ProcessLinkTypeLooplink {
 
 				GetLinkableProteinsAndPositions.getInstance()
 				.getLinkableProteinsAndPositionsForLooplink( 
-						peptide, 
+						peptideDTO, 
 						linkedPosition_1, 
 						linkedPosition_2 , 
 						linkerList, 
 						proteinMatches_Peptide );
 		
 			
-		if( proteinMap.keySet().size() < 1 ) {
-			String msg = "getLooplinks(...): No linkable protein positions found for " + peptide.getSequence() +
-					" at positions " + linkedPosition_1 + "," + linkedPosition_2 + ".";
+		if( proteinMap.size() < 1 ) {
+			String msg = "getLooplinks(...): No linkable protein positions found for " + peptideDTO.getSequence() 
+					+ " at positions " + linkedPosition_1 + "," + linkedPosition_2 
+					+ ".  reportedPeptide sequence: " + reportedPeptide.getReportedPeptideString();
 			log.error( msg );
 			
 			throw new Exception( msg );
@@ -347,42 +195,124 @@ public class ProcessLinkTypeLooplink {
 		
 		
 		
-		for( NRProteinDTO protein : proteinMap.keySet() ) {
+		for( Map.Entry<NRProteinDTO, Collection<List<Integer>>> proteinMapEntry : proteinMap.entrySet() ) {
+				
+			NRProteinDTO protein = proteinMapEntry.getKey();
 
-			Collection<List<Integer>> proteinPositions = proteinMap.get( protein );
+			Collection<List<Integer>> proteinPositions = proteinMapEntry.getValue();
 			
-			for( List<Integer> matches : proteinPositions ) {
+			for( List<Integer> proteinPositions_1_2 : proteinPositions ) {
 
+				if ( proteinPositions_1_2.size() != 2 ) {
+					
+					String msg = "List<Integer> in Map<NRProteinDTO, Collection<List<Integer>>> must contain 2 entries.";
+					log.error( msg );
+					throw new Exception(msg);
+				}
+				
 				// a single looplink entry
-				LooplinkDTO looplink = new LooplinkDTO();
+				SrchRepPeptNrseqIdPosLooplinkDTO looplink = new SrchRepPeptNrseqIdPosLooplinkDTO();
 
-				looplink.setPeptideId( peptide.getId() );
+				looplink.setNrseqId( protein.getNrseqId() );
+				looplink.setNrseqPosition_1( proteinPositions_1_2.get( 0 ) );
+				looplink.setNrseqPosition_2( proteinPositions_1_2.get( 1 ) );
 				
-				looplink.setPeptidePosition1( linkedPosition_1 );
-				looplink.setPeptidePosition2( linkedPosition_2 );
-				
-				looplink.setProtein( protein );
-				looplink.setProteinPosition1( matches.get( 0 ) );
-				looplink.setProteinPosition2( matches.get( 1 ) );
-
-
-				GetLooplinksResultItem getLooplinksResultItem = new GetLooplinksResultItem(); 
-
-				getLooplinksResultItem.setLooplinkDTO( looplink );
-
-				
-				looplinkResultItemList.add( getLooplinksResultItem );
-
+				srchRepPeptNrseqIdPosLooplinkDTOList.add( looplink );
 
 			}  //end looping over proteinpositions
 		
 		}  //end looping over proteins
 		
+
+		if ( srchRepPeptNrseqIdPosLooplinkDTOList == null || srchRepPeptNrseqIdPosLooplinkDTOList.isEmpty() ) {
+
+			getLooplinkMappingsResult.noProteinMappings = true; 
+		}
 		
-		return getLooplinksResult;
+
+		PopulateSrchRepPeptNrseqIdPosMonolinkDTOListOnPerPeptideDataObject.getInstance()
+		.populateSrchRepPeptNrseqIdPosMonolinkDTOListOnPerPeptideDataObject( perPeptideData, linkerList, proteinMatches_Peptide );
+
+		
+		
+		
+		return getLooplinkMappingsResult;
 	
 	}
 
+
+
+	/**
+	 * Save looplink data to DB
+	 * 
+	 * @param reportedPeptideDTO
+	 * @param searchId
+	 * @param getLooplinkProteinMappingsResult
+	 * @throws Exception
+	 */
+	public List<PerPeptideData> saveLooplinkData( 
+			
+			ReportedPeptideDTO reportedPeptideDTO, 
+			int searchId, 
+
+			GetLooplinkProteinMappingsResult getLooplinkProteinMappingsResult,
+			
+			Set<Double> uniqueDynamicModMassesForTheSearch
+			
+			) throws Exception {
+
+		PerPeptideData perPeptideData = getLooplinkProteinMappingsResult.perPeptideData;
+
+
+		
+		//  Save SrchRepPeptPeptideDTO, SrchRepPeptPeptDynamicModDTO, SrchRepPeptNrseqIdPosMonolinkDTO
+		
+		SavePerPeptideData.getInstance().savePerPeptideData( perPeptideData, searchId, reportedPeptideDTO );
+
+		
+		//  srchRepPeptPeptideDTO saved in savePerPeptideData(...)
+		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO = perPeptideData.getSrchRepPeptPeptideDTO();
+
+		int searchReportedPeptidepeptideId = srchRepPeptPeptideDTO.getId();
+
+		//  Save Looplink Protein Mappings 
+		
+		for ( SrchRepPeptNrseqIdPosLooplinkDTO srchRepPeptNrseqIdPosLooplinkDTO : getLooplinkProteinMappingsResult.srchRepPeptNrseqIdPosLooplinkDTOList ) {
+			
+			srchRepPeptNrseqIdPosLooplinkDTO.setSearchId( searchId );
+			srchRepPeptNrseqIdPosLooplinkDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
+			srchRepPeptNrseqIdPosLooplinkDTO.setSearchReportedPeptidepeptideId( searchReportedPeptidepeptideId );
+			
+			DB_Insert_SrchRepPeptNrseqIdPosLooplinkDAO.getInstance().save( srchRepPeptNrseqIdPosLooplinkDTO );
+		}
+
+		//  Save Dynamic Mod Masses into Lookup table and into Set for Search level lookup
+		
+		for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide() ) {
+		
+			SearchReportedPeptideDynamicModLookupDTO item = new SearchReportedPeptideDynamicModLookupDTO();
+			
+			item.setDynamicModMass( srchRepPeptPeptDynamicModDTO.getMass() );
+			item.setLinkType( XLinkUtils.TYPE_LOOPLINK );
+			item.setReportedPeptideId( reportedPeptideDTO.getId() );
+			item.setSearchId( searchId );
+			
+			DB_Insert_SearchReportedPeptideDynamicModLookupDAO.getInstance().saveToDatabaseIgnoreDuplicates( item );
+			
+			//  Accumulate mod mass values across the search 
+			uniqueDynamicModMassesForTheSearch.add( srchRepPeptPeptDynamicModDTO.getMass() );
+		}
+		
+
+		List<PerPeptideData> perPeptideDataList = new ArrayList<>( 1 );
+		
+		perPeptideDataList.add( perPeptideData );
+		
+
+		return perPeptideDataList;
+	}
+	
+	
 
 
 
@@ -426,45 +356,4 @@ public class ProcessLinkTypeLooplink {
 	
 
 
-	/**
-	 * Internal result from getLooplinks method
-	 *
-	 */
-	private class GetLooplinksResult {
-		
-
-		private List<GetLooplinksResultItem> looplinkResultItemList;
-
-		public List<GetLooplinksResultItem> getLooplinkResultItemList() {
-			return looplinkResultItemList;
-		}
-
-		public void setLooplinkResultItemList(
-				List<GetLooplinksResultItem> looplinkResultItemList) {
-			this.looplinkResultItemList = looplinkResultItemList;
-		}
-
-	}
-	
-	
-	
-	/**
-	 * Single entry in Internal result from getLooplinks method
-	 *
-	 */
-	private class GetLooplinksResultItem {
-		
-
-		private LooplinkDTO looplinkDTO;
-		
-				
-		public LooplinkDTO getLooplinkDTO() {
-			return looplinkDTO;
-		}
-
-		public void setLooplinkDTO(LooplinkDTO looplinkDTO) {
-			this.looplinkDTO = looplinkDTO;
-		}
-
-	}
 }

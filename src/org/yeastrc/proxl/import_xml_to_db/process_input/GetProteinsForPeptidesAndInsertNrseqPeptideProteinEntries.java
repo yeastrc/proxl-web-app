@@ -7,10 +7,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_NrseqDatabasePeptideProteinDAO;
+import org.yeastrc.proxl.import_xml_to_db.dto.NrseqDatabasePeptideProteinDTO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
-import org.yeastrc.xlink.dto.NrseqDatabasePeptideProteinDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
-import org.yeastrc.xlink.searchers.PeptideProteinSearcher;
+import org.yeastrc.proxl.import_xml_to_db.searchers.PeptideProteinSearcher;
 import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 /**

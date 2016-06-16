@@ -38,8 +38,20 @@
 		    <flattenmapper />
 		</pathconvert>
 
-    	
-    	<property name="final.classpath" value="./ ${output_jar_this_project} ${jars.classpath}"/>
+
+		<path id="lib_proxl_jars_dir">
+		  <fileset dir="lib_proxl_jars">
+		    <include name="**/*.jar" />
+		  </fileset>
+		</path>
+
+		<!-- convert classpath to a flat list/string for use in manifest task -->
+		<pathconvert property="lib_proxl_jars_dir.classpath" pathsep=" ">
+		    <path refid="lib_proxl_jars_dir" />
+		    <flattenmapper />
+		</pathconvert>
+
+    	<property name="final.classpath" value="./ ${output_jar_this_project} ${jars.classpath} ${lib_proxl_jars_dir.classpath}"/>
     	
     	
 		<echo >Classpath for runnable jar ${final.classpath}</echo>
@@ -65,6 +77,8 @@
             <zipfileset src="jar-in-jar-loader.zip"/>
             <zipfileset dir="${jar_this_project_dir}" />
         	<zipfileset dir="lib" />
+        	<zipfileset dir="lib_proxl_jars" />
+
         </jar>
     </target>
 	
@@ -187,6 +201,9 @@
 	<!-- classpath  -->
     <path id="compile.classpath">
     	<fileset dir="lib">
+        	<include name="**/*.jar"/>
+      	</fileset>
+    	<fileset dir="lib_proxl_jars">
         	<include name="**/*.jar"/>
       	</fileset>
     </path>

@@ -40,11 +40,14 @@ public class SaveSearchReportedPeptideAnnotations {
 		return new SaveSearchReportedPeptideAnnotations();
 	}
 	
-	public void saveReportedPeptideAnnotations( ReportedPeptide reportedPeptide, int searchId, int reportedPeptideId, Map<String, SearchProgramEntry> searchProgramEntryMap ) throws Exception {
+	public List<SearchReportedPeptideAnnotationDTO> saveReportedPeptideAnnotations( ReportedPeptide reportedPeptide, int searchId, int reportedPeptideId, Map<String, SearchProgramEntry> searchProgramEntryMap, Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnId ) throws Exception {
 		
-		saveReportedPeptideFilterableReportedPeptideAnnotations( reportedPeptide, searchId, reportedPeptideId, searchProgramEntryMap );
+		List<SearchReportedPeptideAnnotationDTO> searchReportedPeptideFilterableAnnotationDTOList = 
+				saveReportedPeptideFilterableReportedPeptideAnnotations( reportedPeptide, searchId, reportedPeptideId, searchProgramEntryMap, filterableReportedPeptideAnnotationTypesOnId );
 		
 		saveReportedPeptideDescriptiveReportedPeptideAnnotations( reportedPeptide, searchId, reportedPeptideId, searchProgramEntryMap );
+		
+		return searchReportedPeptideFilterableAnnotationDTOList;
 	}
 
 	
@@ -57,42 +60,37 @@ public class SaveSearchReportedPeptideAnnotations {
 	 * @param searchProgramEntryMap
 	 * @throws Exception
 	 */
-	private void saveReportedPeptideFilterableReportedPeptideAnnotations( ReportedPeptide reportedPeptide, int searchId, int reportedPeptideId, Map<String, SearchProgramEntry> searchProgramEntryMap ) throws Exception {
+	private List<SearchReportedPeptideAnnotationDTO> saveReportedPeptideFilterableReportedPeptideAnnotations( 
+			
+			ReportedPeptide reportedPeptide, 
+			int searchId, 
+			int reportedPeptideId, 
+			Map<String, SearchProgramEntry> searchProgramEntryMap,
+			Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnIdParamMasterCopy ) throws Exception {
 
 
-		///  Build list of Filterable annotation type ids
+		List<SearchReportedPeptideAnnotationDTO> searchReportedPeptideFilterableAnnotationDTOList = new ArrayList<>();
+
+
+
+		//  Make local copy of filterableAnnotationTypesOnIdMasterCopy
+		//    since remove entries from it.
 		
-		Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesOnId = new HashMap<>();
+		Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnId = new HashMap<>();
 		
-		for ( Map.Entry<String, SearchProgramEntry> searchProgramEntryMapEntry : searchProgramEntryMap.entrySet() ) {
-
-			SearchProgramEntry searchProgramEntry = searchProgramEntryMapEntry.getValue();
-
-			Map<String, AnnotationTypeDTO> reportedPeptideAnnotationTypeDTOMap =
-					searchProgramEntry.getReportedPeptideAnnotationTypeDTOMap();
-		
-			for ( Map.Entry<String, AnnotationTypeDTO> reportedPeptideAnnotationTypeDTOMapEntry : reportedPeptideAnnotationTypeDTOMap.entrySet() ) {
-
-				AnnotationTypeDTO reportedPeptideAnnotationTypeDTO = reportedPeptideAnnotationTypeDTOMapEntry.getValue();
-		
-				 if ( reportedPeptideAnnotationTypeDTO.getFilterableDescriptiveAnnotationType()
-						 == FilterableDescriptiveAnnotationType.FILTERABLE ) {
-				 
-					 filterableAnnotationTypesOnId.put( reportedPeptideAnnotationTypeDTO.getId(), reportedPeptideAnnotationTypeDTO );
-				 }
-				
-			}
+		for ( Map.Entry<Integer, AnnotationTypeDTO> entry : filterableReportedPeptideAnnotationTypesOnIdParamMasterCopy.entrySet() ) {
+			
+			filterableReportedPeptideAnnotationTypesOnId.put( entry.getKey(), entry.getValue() );
 		}
+
 		
 		
-
-
 		ReportedPeptide.ReportedPeptideAnnotations reportedPeptideAnnotations =
 				reportedPeptide.getReportedPeptideAnnotations();
 
 		if ( reportedPeptideAnnotations == null ) {
 			
-			if ( ! filterableAnnotationTypesOnId.isEmpty() ) {
+			if ( ! filterableReportedPeptideAnnotationTypesOnId.isEmpty() ) {
 			
 				String msg = "No Reported Peptide Filterable annotations on this reported peptide."
 						+ "  Filterable annotations are required on all reported peptides."
@@ -116,7 +114,7 @@ public class SaveSearchReportedPeptideAnnotations {
 
 			if ( filterableReportedPeptideAnnotations == null ) {
 
-				if ( ! filterableAnnotationTypesOnId.isEmpty() ) {
+				if ( ! filterableReportedPeptideAnnotationTypesOnId.isEmpty() ) {
 					
 
 					String msg = "No Filterable Reported Peptide Filterable annotations on this reported peptide."
@@ -143,7 +141,7 @@ public class SaveSearchReportedPeptideAnnotations {
 
 				if ( filterableReportedPeptideAnnotationList == null || filterableReportedPeptideAnnotationList.isEmpty() ) {
 
-					if ( ! filterableAnnotationTypesOnId.isEmpty() ) {
+					if ( ! filterableReportedPeptideAnnotationTypesOnId.isEmpty() ) {
 
 
 						String msg = "No Filterable Reported Peptide Filterable annotations on this reported peptide."
@@ -180,7 +178,7 @@ public class SaveSearchReportedPeptideAnnotations {
 										FilterableDescriptiveAnnotationType.FILTERABLE, 
 										searchProgramEntryMap );
 						
-						if ( filterableAnnotationTypesOnId.remove( annotationTypeId ) == null ) {
+						if ( filterableReportedPeptideAnnotationTypesOnId.remove( annotationTypeId ) == null ) {
 
 							//  Shouldn't get here
 							
@@ -188,7 +186,7 @@ public class SaveSearchReportedPeptideAnnotations {
 							
 							log.error( msg );
 							
-							log.error( "filterableAnnotationTypesOnId.remove( annotationTypeId ) == null for annotationTypeId: " 
+							log.error( "filterableReportedPeptideAnnotationTypesOnId.remove( annotationTypeId ) == null for annotationTypeId: " 
 									+ annotationTypeId + ", annotationName: " + annotationName );
 
 							List<String> filterablePsmAnnotationListNames = new ArrayList<>();
@@ -200,12 +198,12 @@ public class SaveSearchReportedPeptideAnnotations {
 								filterablePsmAnnotationListNames.add(name);
 							}
 
-							log.error( "filterableAnnotationTypesOnId.remove( annotationTypeId ) == null for filterablePsmAnnotationList names: " + StringUtils.join(filterablePsmAnnotationListNames, ",") );
+							log.error( "filterableReportedPeptideAnnotationTypesOnId.remove( annotationTypeId ) == null for filterablePsmAnnotationList names: " + StringUtils.join(filterablePsmAnnotationListNames, ",") );
 
 
 							List<Integer> filterableAnnotationTypeIds = new ArrayList<>();
 							
-							for ( Map.Entry<Integer, AnnotationTypeDTO> entry : filterableAnnotationTypesOnId.entrySet() ) {
+							for ( Map.Entry<Integer, AnnotationTypeDTO> entry : filterableReportedPeptideAnnotationTypesOnId.entrySet() ) {
 								
 								int key = entry.getKey();
 //								AnnotationTypeDTO valueTemp = entry.getValue();
@@ -213,7 +211,7 @@ public class SaveSearchReportedPeptideAnnotations {
 								filterableAnnotationTypeIds.add( key );
 							}
 
-							log.error( "filterableAnnotationTypesOnId.remove( annotationTypeId ) == null for filterableAnnotationTypeIds type ids: " + StringUtils.join(filterableAnnotationTypeIds, ",") );
+							log.error( "filterableReportedPeptideAnnotationTypesOnId.remove( annotationTypeId ) == null for filterableAnnotationTypeIds type ids: " + StringUtils.join(filterableAnnotationTypeIds, ",") );
 
 							
 							throw new ProxlImporterInteralException(msg);
@@ -230,12 +228,13 @@ public class SaveSearchReportedPeptideAnnotations {
 
 						SearchReportedPeptideAnnotationDAO.getInstance().saveToDatabase(searchReportedPeptideAnnotationDTO);
 						
+						searchReportedPeptideFilterableAnnotationDTOList.add(searchReportedPeptideAnnotationDTO);
 					}
 				}
 			}
 		}
 		
-		if ( ! filterableAnnotationTypesOnId.isEmpty() ) {
+		if ( ! filterableReportedPeptideAnnotationTypesOnId.isEmpty() ) {
 			
 			//  Filterable Annotations Types were not on the Filterable Annotations List
 			
@@ -246,6 +245,8 @@ public class SaveSearchReportedPeptideAnnotations {
 			log.error( msg );
 			throw new ProxlImporterDataException(msg);
 		}
+		
+		return searchReportedPeptideFilterableAnnotationDTOList;
 	}
 	
 	

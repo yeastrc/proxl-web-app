@@ -3,33 +3,25 @@ package org.yeastrc.proxl.import_xml_to_db.process_input;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.proxl.import_xml_to_db.dao.PsmPeptideDAO;
-import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnlinkedDAO;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptideAndOrPSMForCmdLineCutoffs;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DroppedPeptideCount;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReportedPeptideDynamicModLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptNrseqIdPosUnlinkedDimerDAO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDynamicModLookupDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptNrseqIdPosUnlinkedDimerDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptDynamicModDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
-import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
-import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
-import org.yeastrc.proxl_import.api.xml_dto.LinkedPosition;
-import org.yeastrc.proxl_import.api.xml_dto.LinkedPositions;
-import org.yeastrc.proxl_import.api.xml_dto.Linker;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.Peptides;
-import org.yeastrc.proxl_import.api.xml_dto.Psm;
-import org.yeastrc.proxl_import.api.xml_dto.Psms;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
-import org.yeastrc.xlink.dto.UnlinkedDTO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
-import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
-import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
+import org.yeastrc.xlink.utils.XLinkUtils;
 
 
 
@@ -53,330 +45,226 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 	
 
 	/**
+	 * result from getUnlinkedMappings method
+	 *
+	 */
+	public static class GetUnlinkedProteinMappingsResult {
+		
+		private boolean noProteinMappings;
+		
+		private PerPeptideData perPeptideData;
+		
+		private List<SrchRepPeptNrseqIdPosUnlinkedDimerDTO> srchRepPeptNrseqIdPosUnlinkedDimerDTOList;
+
+
+		/** 
+		 * No Protein mappings for peptide
+		 * @return
+		 */
+		public boolean isNoProteinMappings() {
+			return noProteinMappings;
+		}
+
+		public void setNoProteinMappings(boolean noProteinMappings) {
+			this.noProteinMappings = noProteinMappings;
+		}
+
+	}
+	
+	
+	
+
+	/**
 	 * Proxl internal "Unlinked" is a single peptide that is not a unlinked
 	 * 
+	 * Get Protein Mappings for unlinked reported peptide
+	 * 
+	 * The PeptideDTO is saved to the DB in this step since used for Protein Mappings
+	 * 
 	 * @param reportedPeptide
-	 * @param proxlInputLinkerList
-	 * @param proteinNameDecoyPrefix
-	 * @param nrseqDatabaseId
-	 * @param linkTypeNumber
-	 * @param reportedPeptideDTO
-	 * @param searchId
-	 * @param searchProgramEntryMap
-	 * @throws Exception
-	 */
-	public void processUnlinked( 
-			
-			ReportedPeptide reportedPeptide, 
-			
-			List<Linker> proxlInputLinkerList,
-
-			List<String> proteinNameDecoyPrefixList,
-			
-			int nrseqDatabaseId,
-			
-			int linkTypeNumber, 
-			ReportedPeptideDTO reportedPeptideDTO, 
-			int searchId, 
-			
-			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
-			
-			Map<String, SearchProgramEntry> searchProgramEntryMap,
-			
-			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds
-			
-			) throws Exception {
-		
-		Peptides peptides =
-				reportedPeptide.getPeptides();
-
-		//  Already validated so just throw illegal argument exception here
-		
-		if ( peptides == null ) {
-			String msg = "'peptides' parameter cannot be null.  reported peptide: " + reportedPeptide.getReportedPeptideString();
-			log.error( msg );
-			throw new IllegalArgumentException(msg);
-		}
-		
-		List<Peptide> peptideList = peptides.getPeptide();
-
-		if ( peptideList == null || ( peptideList.size() != 1 ) ) {
-			String msg = "'peptideList' parameter cannot be null and must have one element.  reported peptide: " + reportedPeptide.getReportedPeptideString();
-			log.error( msg );
-			throw new IllegalArgumentException(msg);
-		}
-		
-		Peptide peptide = peptideList.get( 0 );
-
-		PerPeptideData perPeptideData = GetPerPeptideData.getInstance().getPerPeptideData( peptide, nrseqDatabaseId );
-
-		LinkedPositions linkedPositions = peptide.getLinkedPositions();
-
-		if ( linkedPositions != null ) {
-
-			List<LinkedPosition> LinkedPositionList = linkedPositions.getLinkedPosition();
-			if ( LinkedPositionList != null && ( ! LinkedPositionList.isEmpty() ) ) {
-
-				String msg = "Unlinked:  There must be NO linked positions " 
-						+ " for peptide sequence '" + peptide.getSequence() + "'"
-						+ " for Unlinked reported peptide: " + reportedPeptide.getReportedPeptideString();
-				log.error( msg );
-				throw new ProxlImporterDataException(msg);
-			}
-		}
-
-		
-		List<ILinker> linkerList = new ArrayList<>();
-		
-		String linkerListStringForErrorMsgs = null;
-		
-		
-		for ( Linker proxlInputLinker : proxlInputLinkerList ) {
-
-			String proxlInputLinkerName = proxlInputLinker.getName();
-
-			ILinker linker = GetLinkerFactory.getLinkerForAbbr( proxlInputLinkerName );
-			if( linker == null ) {
-				String msg = "processUnlinked(...): Could not get an ILinker for linker abbreviation: " 
-						+ proxlInputLinkerName;
-				log.error( msg );
-
-				throw new Exception( msg );
-			}
-
-			linkerList.add( linker );
-			
-			if ( linkerListStringForErrorMsgs == null ) {
-				
-				linkerListStringForErrorMsgs = proxlInputLinkerName;
-			} else {
-				
-				linkerListStringForErrorMsgs += ", " + proxlInputLinkerName;
-			}
-		}
-		
-		GetUnlinkedResult getUnlinkedResult =
-				
-				getUnlinked( 
-						nrseqDatabaseId, 
-						linkerList,
-						linkerListStringForErrorMsgs,
-						proteinNameDecoyPrefixList, 
-						perPeptideData );
-
-
-
-
-		List<GetUnlinkedResultItem> getUnlinkedResultItemList = getUnlinkedResult.getUnlinkedResultItemList();
-		
-		if ( getUnlinkedResultItemList == null || getUnlinkedResultItemList.isEmpty() ) {
-			
-			log.warn( "No Mapped Proteins for this reported peptide so not inserting any PSMs: " + 
-					reportedPeptide.getReportedPeptideString() );
-			
-			return;  //  EARLY EXIT   No unlinked records for this reported peptide in this search 
-		}
-		
-		
-		Psms psms =	reportedPeptide.getPsms();
-
-		List<Psm> psmList = psms.getPsm();
-
-		boolean saveAnyPSMs = false;
-		
-		for ( Psm psm : psmList ) {
-			
-			if ( DropPeptideAndOrPSMForCmdLineCutoffs.getInstance()
-					.dropPSMForCmdLineCutoffs( psm, dropPeptidePSMCutoffValues ) ) {
-				
-				DroppedPeptideCount.incrementDroppedPsmCount();
-
-				continue;  // EARLY continue to next record
-			}
-			
-			PsmDTO psmDTO = 
-					PopulateAndSavePsmDTO.getInstance().populateAndSavePSMDTO( 
-							
-							searchId, 
-							mapOfScanFilenamesMapsOfScanNumbersToScanIds, 
-							linkTypeNumber, 
-							reportedPeptideDTO, 
-							psm );
-			
-			SavePsmAnnotations.getInstance().savePsmAnnotations( psm, psmDTO, searchProgramEntryMap );
-
-			savePSMChildrenAndUnlinkedDTORecords( 
-					psm, 
-					psmDTO, 						
-					perPeptideData, 
-					getUnlinkedResult );
-			
-			
-			//  Save PsmDTO.id PeptideDTO.id mapping
-			
-			PsmPeptideDAO.getInstance().saveToDatabase( psmDTO.getId(), perPeptideData.getPeptideDTO().getId() );
-
-			saveAnyPSMs = true;
-		}
-		
-		if ( ! saveAnyPSMs ) {
-			
-			String msg = "No PSMs saved for this reported peptide: " + 
-					reportedPeptide.getReportedPeptideString();
-			log.error( msg );
-			throw new ProxlImporterInteralException(msg);
-		}
-	}
-	
-	
-	
-
-	/**
-	 * @param psm
-	 * @param psmDTO
-	 * @param perPeptideData_1
-	 * @param perPeptideData_2
-	 * @param getUnlinkedResult
-	 * @throws Exception
-	 */
-	private void savePSMChildrenAndUnlinkedDTORecords(
-			
-			Psm psm,
-			PsmDTO psmDTO,
-			PerPeptideData perPeptideData,
-			GetUnlinkedResult getUnlinkedResult
-			
-			) throws Exception {
-		
-		//  Save PSM children
-		
-		SavePerPeptideDataForPSM.getInstance().savePerPeptideDataForPSM( psmDTO, perPeptideData );
-
-//		MatchedPeptideDTO matchedPeptideDTO = perPeptideData.getMatchedPeptideDTO();
-
-		List<GetUnlinkedResultItem> getUnlinkedResultItemList = getUnlinkedResult.getUnlinkedResultItemList();
-		
-		for ( GetUnlinkedResultItem getUnlinkedResultItem : getUnlinkedResultItemList ) {
-			
-			UnlinkedDTO unlinkedDTO = getUnlinkedResultItem.getUnlinkedDTO();
-			
-			unlinkedDTO.setPsm( psmDTO );
-			
-			DB_Insert_UnlinkedDAO.getInstance().save( unlinkedDTO );
-		}
-	}
-	
-	
-
-	/**
-	 * @param nrseqDatabaseId
 	 * @param linkerList
 	 * @param linkerListStringForErrorMsgs
 	 * @param proteinNameDecoyPrefixList
-	 * @param perPeptideData
+	 * @param nrseqDatabaseId
 	 * @return
 	 * @throws Exception
 	 */
-	private GetUnlinkedResult getUnlinked(
+	public GetUnlinkedProteinMappingsResult getUnlinkedroteinMappings( 
 			
-			int nrseqDatabaseId,
-			
-			List<ILinker> linkerList, //  Used for Monolinks
+			ReportedPeptide reportedPeptide, 
+
+			List<ILinker> linkerList,
 			String linkerListStringForErrorMsgs,
 			
 			List<String> proteinNameDecoyPrefixList,
 			
-			PerPeptideData perPeptideData
+			int nrseqDatabaseId
 			
 			) throws Exception {
 		
 		
-		GetUnlinkedResult getUnlinkedResult = new GetUnlinkedResult();
+
+		GetUnlinkedProteinMappingsResult getUnlinkedMappingsResult = new GetUnlinkedProteinMappingsResult();
 		
-		List<GetUnlinkedResultItem> unlinkedResultItemList = new ArrayList<>();
-		getUnlinkedResult.setUnlinkedResultItemList( unlinkedResultItemList );
+		List<SrchRepPeptNrseqIdPosUnlinkedDimerDTO> srchRepPeptNrseqIdPosUnlinkedDimerDTOList = new ArrayList<>();
+		getUnlinkedMappingsResult.srchRepPeptNrseqIdPosUnlinkedDimerDTOList = srchRepPeptNrseqIdPosUnlinkedDimerDTOList;
 		
 		
 		
-		PeptideDTO peptide = perPeptideData.getPeptideDTO();
+		Peptides peptides =
+				reportedPeptide.getPeptides();
+
+		if ( peptides == null ) {
+			String msg = "There must be 1 peptide for Unlinked reported peptide: " + reportedPeptide.getReportedPeptideString();
+			log.error( msg );
+			throw new ProxlImporterDataException(msg);
+		}
 		
+		List<Peptide> peptideList = peptides.getPeptide();
+
+		if ( peptideList == null || peptideList.size() != 1 ) {
+			String msg = "There must be 1 peptide for Unlinked for reported peptide: " + reportedPeptide.getReportedPeptideString();
+			log.error( msg );
+			throw new ProxlImporterDataException(msg);
+		}
+		
+		
+		Peptide peptide = peptideList.get( 0 );
+		
+		PerPeptideData perPeptideData = GetPerPeptideData.getInstance().getPerPeptideData( peptide );
+
+		getUnlinkedMappingsResult.perPeptideData = perPeptideData;
+		
+		
+		PeptideDTO peptideDTO = perPeptideData.getPeptideDTO();
+		
+		
+		//  Create partial peptide level record
+
+		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO = new SrchRepPeptPeptideDTO();
+		
+		srchRepPeptPeptideDTO.setPeptideId( peptideDTO.getId() );
+		
+		
+		perPeptideData.setSrchRepPeptPeptideDTO( srchRepPeptPeptideDTO );
 		
 		Collection<NRProteinDTO> proteinMatches_Peptide = 
 				GetProteinsForPeptidesAndInsertNrseqPeptideProteinEntries.getInstance()
-				.getProteinsForPeptidesAndInsertNrseqPeptideProteinEntries( peptide, proteinNameDecoyPrefixList, nrseqDatabaseId );
+				.getProteinsForPeptidesAndInsertNrseqPeptideProteinEntries( peptideDTO, proteinNameDecoyPrefixList, nrseqDatabaseId );
 		
 		
-		PopulateMonolinkDTOListOnPerPeptideDataObject.getInstance()
-		.populateMonolinkDTOListOnPerPeptideDataObject( perPeptideData, linkerList, proteinMatches_Peptide );
-
+					
+		if( proteinMatches_Peptide.size() < 1 ) {
+			String msg = "getUnlinkedroteinMappings(...): No protein positions found for " + peptideDTO.getSequence() 
+					+ ".  reportedPeptide sequence: " + reportedPeptide.getReportedPeptideString();
+			log.error( msg );
+			
+			throw new Exception( msg );
+		}
+		
+		
 		
 		for( NRProteinDTO protein : proteinMatches_Peptide ) {
 
 			// a single unlinked entry
-			UnlinkedDTO unlinked = new UnlinkedDTO();
+			SrchRepPeptNrseqIdPosUnlinkedDimerDTO unlinked = new SrchRepPeptNrseqIdPosUnlinkedDimerDTO();
 
-			unlinked.setPeptideId( peptide.getId() );
+			unlinked.setNrseqId( protein.getNrseqId() );
 
-			unlinked.setProtein( protein );
-
-
-			GetUnlinkedResultItem getUnlinkedResultItem = new GetUnlinkedResultItem(); 
-
-			getUnlinkedResultItem.setUnlinkedDTO( unlinked );
-
-
-			unlinkedResultItemList.add( getUnlinkedResultItem );
+			srchRepPeptNrseqIdPosUnlinkedDimerDTOList.add( unlinked );
 
 		}  //end looping over proteins
 		
+
+		if ( srchRepPeptNrseqIdPosUnlinkedDimerDTOList == null || srchRepPeptNrseqIdPosUnlinkedDimerDTOList.isEmpty() ) {
+
+			getUnlinkedMappingsResult.noProteinMappings = true; 
+		}
 		
-		return getUnlinkedResult;
+
+		PopulateSrchRepPeptNrseqIdPosMonolinkDTOListOnPerPeptideDataObject.getInstance()
+		.populateSrchRepPeptNrseqIdPosMonolinkDTOListOnPerPeptideDataObject( perPeptideData, linkerList, proteinMatches_Peptide );
+
+		
+		
+		
+		return getUnlinkedMappingsResult;
 	
 	}
-
-
 
 
 
 	/**
-	 * Internal result from getUnlinked method
-	 *
+	 * Save unlinked data to DB
+	 * 
+	 * @param reportedPeptideDTO
+	 * @param searchId
+	 * @param getUnlinkedProteinMappingsResult
+	 * @throws Exception
 	 */
-	private class GetUnlinkedResult {
+	public List<PerPeptideData> saveUnlinkedData( 
+			
+			ReportedPeptideDTO reportedPeptideDTO, 
+			int searchId, 
+
+			GetUnlinkedProteinMappingsResult getUnlinkedProteinMappingsResult,
+			
+			Set<Double> uniqueDynamicModMassesForTheSearch
+			
+			) throws Exception {
+
+
+		PerPeptideData perPeptideData = getUnlinkedProteinMappingsResult.perPeptideData;
+
+
+		//  Save SrchRepPeptPeptideDTO, SrchRepPeptPeptDynamicModDTO, SrchRepPeptNrseqIdPosMonolinkDTO
+		
+		SavePerPeptideData.getInstance().savePerPeptideData( perPeptideData, searchId, reportedPeptideDTO );
+
+		
+		//  srchRepPeptPeptideDTO saved in savePerPeptideData(...)
+		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO = perPeptideData.getSrchRepPeptPeptideDTO();
+
+		int searchReportedPeptidepeptideId = srchRepPeptPeptideDTO.getId();
+
+		//  Save Unlinked Protein Mappings 
+		
+		for ( SrchRepPeptNrseqIdPosUnlinkedDimerDTO srchRepPeptNrseqIdPosUnlinkedDimerDTO : getUnlinkedProteinMappingsResult.srchRepPeptNrseqIdPosUnlinkedDimerDTOList ) {
+			
+			srchRepPeptNrseqIdPosUnlinkedDimerDTO.setSearchId( searchId );
+			srchRepPeptNrseqIdPosUnlinkedDimerDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
+			srchRepPeptNrseqIdPosUnlinkedDimerDTO.setSearchReportedPeptidepeptideId( searchReportedPeptidepeptideId );
+			
+			DB_Insert_SrchRepPeptNrseqIdPosUnlinkedDimerDAO.getInstance().save( srchRepPeptNrseqIdPosUnlinkedDimerDTO );
+		}
 		
 
-		private List<GetUnlinkedResultItem> unlinkedResultItemList;
-
-		public List<GetUnlinkedResultItem> getUnlinkedResultItemList() {
-			return unlinkedResultItemList;
+		//  Save Dynamic Mod Masses into Lookup table and into Set for Search level lookup
+		
+		for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide() ) {
+		
+			SearchReportedPeptideDynamicModLookupDTO item = new SearchReportedPeptideDynamicModLookupDTO();
+			
+			item.setDynamicModMass( srchRepPeptPeptDynamicModDTO.getMass() );
+			item.setLinkType( XLinkUtils.TYPE_UNLINKED );
+			item.setReportedPeptideId( reportedPeptideDTO.getId() );
+			item.setSearchId( searchId );
+			
+			DB_Insert_SearchReportedPeptideDynamicModLookupDAO.getInstance().saveToDatabaseIgnoreDuplicates( item );
+			
+			//  Accumulate mod mass values across the search 
+			uniqueDynamicModMassesForTheSearch.add( srchRepPeptPeptDynamicModDTO.getMass() );
 		}
+		
 
-		public void setUnlinkedResultItemList(
-				List<GetUnlinkedResultItem> unlinkedResultItemList) {
-			this.unlinkedResultItemList = unlinkedResultItemList;
-		}
 
+		List<PerPeptideData> perPeptideDataList = new ArrayList<>( 1 );
+
+		perPeptideDataList.add( perPeptideData );
+		
+		return perPeptideDataList;
 	}
 	
 	
-	
-	/**
-	 * Single entry in Internal result from getUnlinked method
-	 *
-	 */
-	private class GetUnlinkedResultItem {
-		
-
-		private UnlinkedDTO unlinkedDTO;
-		
-				
-		public UnlinkedDTO getUnlinkedDTO() {
-			return unlinkedDTO;
-		}
-
-		public void setUnlinkedDTO(UnlinkedDTO unlinkedDTO) {
-			this.unlinkedDTO = unlinkedDTO;
-		}
 
 	}
-}

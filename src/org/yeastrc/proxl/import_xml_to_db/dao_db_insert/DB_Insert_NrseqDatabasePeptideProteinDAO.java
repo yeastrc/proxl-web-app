@@ -5,8 +5,8 @@ import java.sql.PreparedStatement;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.dto.NrseqDatabasePeptideProteinDTO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.dto.NrseqDatabasePeptideProteinDTO;
 
 /**
  * table nrseq_database_peptide_protein

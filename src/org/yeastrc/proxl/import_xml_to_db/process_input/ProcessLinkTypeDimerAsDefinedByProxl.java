@@ -3,30 +3,23 @@ package org.yeastrc.proxl.import_xml_to_db.process_input;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.proxl.import_xml_to_db.dao.PsmPeptideDAO;
-import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_DimerDAO;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptideAndOrPSMForCmdLineCutoffs;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DroppedPeptideCount;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReportedPeptideDynamicModLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptNrseqIdPosUnlinkedDimerDAO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDynamicModLookupDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptNrseqIdPosUnlinkedDimerDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptDynamicModDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
-import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
-import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
-import org.yeastrc.proxl_import.api.xml_dto.Linker;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.Peptides;
-import org.yeastrc.proxl_import.api.xml_dto.Psm;
-import org.yeastrc.proxl_import.api.xml_dto.Psms;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
-import org.yeastrc.xlink.dto.DimerDTO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
-import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
-import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 import org.yeastrc.xlink.utils.XLinkUtils;
 
@@ -35,7 +28,7 @@ import org.yeastrc.xlink.utils.XLinkUtils;
 
 
 /**
- * Proxl internal "Dimer" is two peptides that are not a dimer (not linked to each other)
+ * Proxl internal "Dimer" is two peptides that are not a crosslink (not linked to each other)
  *
  */
 public class ProcessLinkTypeDimerAsDefinedByProxl {
@@ -50,45 +43,76 @@ public class ProcessLinkTypeDimerAsDefinedByProxl {
 	public static ProcessLinkTypeDimerAsDefinedByProxl getInstance() { return new ProcessLinkTypeDimerAsDefinedByProxl(); }
 	
 
-//	private static enum PeptideOrder { ONE_TO_ONE_AND_TWO_TO_TWO, ONE_TO_TWO_AND_TWO_TO_ONE };
-	
 
+	/**
+	 * result from GetDimerProteinMappingsSinglePeptideData method
+	 *
+	 */
+	public static class GetDimerProteinMappingsResult {
+		
+		private boolean noProteinMappings;
+		
+		private List<GetDimerProteinMappingsSinglePeptideData> getDimerroteinMappingsSinglePeptideDataList = new ArrayList<>();
+		
+		/** 
+		 * No Protein mappings (Either peptide has No Protein mappings) 
+		 * @return
+		 */
+		public boolean isNoProteinMappings() {
+			return noProteinMappings;
+		}
+
+		public void setNoProteinMappings(boolean noProteinMappings) {
+			this.noProteinMappings = noProteinMappings;
+		}
+
+	}
 	
 	/**
-	 * Proxl internal "Dimer" is two peptides that are not a dimer (not linked to each other)
+	 * Data for each peptide in the dimer
+	 *
+	 */
+	private static class GetDimerProteinMappingsSinglePeptideData {
+
+		private boolean noProteinMappings;
+		
+		private List<SrchRepPeptNrseqIdPosUnlinkedDimerDTO> srchRepPeptNrseqIdPosUnlinkedDimerDTOList_Peptide;
+		private PerPeptideData perPeptideData;
+	}
+	
+	
+	
+	
+
+	/**
+	 * Get Protein Mappings for dimer reported peptide
+	 * 
+	 * The PeptideDTO entries are saved to the DB in this step since used for Protein Mappings
 	 * 
 	 * @param reportedPeptide
-	 * @param proxlInputLinkerList
-	 * @param proteinNameDecoyPrefix
+	 * @param linkerList
+	 * @param linkerListStringForErrorMsgs
+	 * @param proteinNameDecoyPrefixList
 	 * @param nrseqDatabaseId
-	 * @param linkTypeNumber
-	 * @param reportedPeptideDTO
-	 * @param searchId
-	 * @param searchProgramEntryMap
+	 * @return
 	 * @throws Exception
 	 */
-	public void processDimer( 
+	public GetDimerProteinMappingsResult getDimerProteinMappings( 
 			
 			ReportedPeptide reportedPeptide, 
-			
-			List<Linker> proxlInputLinkerList,	//  Keep for Monolinks
 
+			List<ILinker> linkerList,
+			String linkerListStringForErrorMsgs,
+			
 			List<String> proteinNameDecoyPrefixList,
 			
-			int nrseqDatabaseId,
-			
-			int linkTypeNumberParam, 
-			ReportedPeptideDTO reportedPeptideDTO, 
-			int searchId, 
-
-			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
-			
-			Map<String, SearchProgramEntry> searchProgramEntryMap,
-			
-			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds
+			int nrseqDatabaseId
 			
 			) throws Exception {
 		
+		
+
+		GetDimerProteinMappingsResult getDimerMappingsResult = new GetDimerProteinMappingsResult();
 		
 		Peptides peptides =
 				reportedPeptide.getPeptides();
@@ -107,345 +131,217 @@ public class ProcessLinkTypeDimerAsDefinedByProxl {
 			throw new ProxlImporterDataException(msg);
 		}
 		
+		int peptideNumberInt = 0;
 		
-		Peptide peptide_1 = peptideList.get( 0 );
-		Peptide peptide_2 = peptideList.get( 1 );
+		for ( Peptide peptide : peptideList ) {
 		
-		PerPeptideData perPeptideData_1 = GetPerPeptideData.getInstance().getPerPeptideData( peptide_1, nrseqDatabaseId );
-		PerPeptideData perPeptideData_2 = GetPerPeptideData.getInstance().getPerPeptideData( peptide_2, nrseqDatabaseId );
-
-
-		//  Keep for Monolinks
-		List<ILinker> linkerList = new ArrayList<>();
-		
-		String linkerListStringForErrorMsgs = null;
-		
-		
-		for ( Linker proxlInputLinker : proxlInputLinkerList ) {
-
-			String proxlInputLinkerName = proxlInputLinker.getName();
-
-			ILinker linker = GetLinkerFactory.getLinkerForAbbr( proxlInputLinkerName );
-			if( linker == null ) {
-				String msg = "saveDimers(...): Could not get an ILinker for linker abbreviation: " 
-						+ proxlInputLinkerName;
-				log.error( msg );
-
-				throw new Exception( msg );
-			}
-
-			linkerList.add( linker );
+			peptideNumberInt++;
 			
-			if ( linkerListStringForErrorMsgs == null ) {
+			GetDimerProteinMappingsSinglePeptideData getDimerroteinMappingsSinglePeptideData =
+					getProteinMappingForSinglePeptide( 
+							peptide, 
+							nrseqDatabaseId, 
+							linkerList, 
+							linkerListStringForErrorMsgs, 
+							proteinNameDecoyPrefixList, 
+							reportedPeptide, 
+							Integer.toString( peptideNumberInt ) );
+			
+			getDimerMappingsResult.getDimerroteinMappingsSinglePeptideDataList.add( getDimerroteinMappingsSinglePeptideData );
+			
+			if ( getDimerroteinMappingsSinglePeptideData.noProteinMappings ) {
 				
-				linkerListStringForErrorMsgs = proxlInputLinkerName;
-			} else {
-				
-				linkerListStringForErrorMsgs += ", " + proxlInputLinkerName;
+				getDimerMappingsResult.noProteinMappings = true;
 			}
 		}
 		
-		GetDimersResult getDimersResult =
-				
-				getDimers( 
-						nrseqDatabaseId, 
-						linkerList, 
-						linkerListStringForErrorMsgs,
-						proteinNameDecoyPrefixList, 
-						perPeptideData_1, 
-						perPeptideData_2 );
-
-
-		List<GetDimersResultItem> getDimersResultItemList = getDimersResult.getDimerResultItemList();
-		
-		if ( getDimersResultItemList == null || getDimersResultItemList.isEmpty() ) {
-		
-			log.warn( "No Mapped Proteins for this reported peptide so not inserting any PSMs: " + 
-					reportedPeptide.getReportedPeptideString() );
-
-			return;  //  EARLY EXIT   No dimer records for this reported peptide in this search 
-		}
-		
-		
-		//  Hard code link type number to dimer since parameter to method is for UNLINKED 
-		int linkTypeNumberForDimer = XLinkUtils.TYPE_DIMER;
-		
-
-		Psms psms =	reportedPeptide.getPsms();
-
-		List<Psm> psmList = psms.getPsm();
-
-		boolean saveAnyPSMs = false;
-		
-		for ( Psm psm : psmList ) {
-
-			if ( DropPeptideAndOrPSMForCmdLineCutoffs.getInstance()
-					.dropPSMForCmdLineCutoffs( psm, dropPeptidePSMCutoffValues ) ) {
-				
-				DroppedPeptideCount.incrementDroppedPsmCount();
-
-				continue;  // EARLY continue to next record
-			}
-
-			PsmDTO psmDTO = 
-					PopulateAndSavePsmDTO.getInstance().populateAndSavePSMDTO( 
-							
-							searchId, 
-							mapOfScanFilenamesMapsOfScanNumbersToScanIds, 
-							linkTypeNumberForDimer, 
-							reportedPeptideDTO, 
-							psm );
-			
-			SavePsmAnnotations.getInstance().savePsmAnnotations( psm, psmDTO, searchProgramEntryMap );
-
-			savePSMChildrenAndDimerDTORecords( 
-					psm, 
-					psmDTO, 						
-					perPeptideData_1, 
-					perPeptideData_2, 
-					getDimersResult );
-			
-
-			
-			//  Save PsmDTO.id PeptideDTO.id mapping
-			
-			PsmPeptideDAO.getInstance().saveToDatabase( psmDTO.getId(), perPeptideData_1.getPeptideDTO().getId() );
-			PsmPeptideDAO.getInstance().saveToDatabase( psmDTO.getId(), perPeptideData_2.getPeptideDTO().getId() );
-
-			saveAnyPSMs = true;
-		}
-		
-		if ( ! saveAnyPSMs ) {
-			
-			String msg = "No PSMs saved for this reported peptide: " + 
-					reportedPeptide.getReportedPeptideString();
-			log.error( msg );
-			throw new ProxlImporterInteralException(msg);
-		}
+		return getDimerMappingsResult;
 	}
 	
 	
 	
-
 	/**
-	 * @param psm
-	 * @param psmDTO
-	 * @param perPeptideData_1
-	 * @param perPeptideData_2
-	 * @param getDimersResult
-	 * @throws Exception
-	 */
-	private void savePSMChildrenAndDimerDTORecords(
-			
-			Psm psm,
-			PsmDTO psmDTO,
-			PerPeptideData perPeptideData_1,
-			PerPeptideData perPeptideData_2,
-			GetDimersResult getDimersResult
-			
-			) throws Exception {
-		
-		//  Save PSM children
-		
-		SavePerPeptideDataForPSM.getInstance().savePerPeptideDataForPSM( psmDTO, perPeptideData_1 );
-
-		SavePerPeptideDataForPSM.getInstance().savePerPeptideDataForPSM( psmDTO, perPeptideData_2 );
-
-//		MatchedPeptideDTO matchedPeptideDTO_1 = perPeptideData_1.getMatchedPeptideDTO();
-//
-//		MatchedPeptideDTO matchedPeptideDTO_2 = perPeptideData_2.getMatchedPeptideDTO();
-
-		List<GetDimersResultItem> getDimersResultItemList = getDimersResult.getDimerResultItemList();
-		
-		for ( GetDimersResultItem getDimersResultItem : getDimersResultItemList ) {
-			
-			DimerDTO dimerDTO = getDimersResultItem.getDimerDTO();
-			
-//			PeptideOrder peptideOrder = getDimersResultItem.getPeptideOrder();
-			
-			dimerDTO.setPsm( psmDTO );
-			
-			DB_Insert_DimerDAO.getInstance().save( dimerDTO );
-			
-		}
-		
-	}
-	
-	
-
-
-	/**
+	 * @param peptide
 	 * @param nrseqDatabaseId
 	 * @param linkerList
 	 * @param linkerListStringForErrorMsgs
-	 * @param proteinNameDecoyPrefix
-	 * @param perPeptideData_1
-	 * @param perPeptideData_2
+	 * @param proteinNameDecoyPrefixList
+	 * @param reportedPeptide
+	 * @param peptideNumber
 	 * @return
 	 * @throws Exception
 	 */
-	private GetDimersResult getDimers(
+	private GetDimerProteinMappingsSinglePeptideData getProteinMappingForSinglePeptide( 
+			
+			Peptide peptide, 
 			
 			int nrseqDatabaseId,
-			
 			List<ILinker> linkerList,
 			String linkerListStringForErrorMsgs,
 			
 			List<String> proteinNameDecoyPrefixList,
 			
-			PerPeptideData perPeptideData_1,
-			PerPeptideData perPeptideData_2
-
-
+			ReportedPeptide reportedPeptide,
+			String peptideNumber
 			) throws Exception {
 		
 		
-		GetDimersResult getDimersResult = new GetDimersResult();
+		GetDimerProteinMappingsSinglePeptideData getDimerroteinMappingsSinglePeptideData = new GetDimerProteinMappingsSinglePeptideData();
+
 		
-		List<GetDimersResultItem> dimerResultItemList = new ArrayList<>();
-		getDimersResult.setDimerResultItemList( dimerResultItemList );
+		PerPeptideData perPeptideData = GetPerPeptideData.getInstance().getPerPeptideData( peptide );
+
+		getDimerroteinMappingsSinglePeptideData.perPeptideData = perPeptideData;
+
+		PeptideDTO peptideDTO = perPeptideData.getPeptideDTO();
+
+
+		//  Create partial SrchRepPeptPeptideDTO peptide level record
+
+		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO = new SrchRepPeptPeptideDTO();
+		
+		srchRepPeptPeptideDTO.setPeptideId( peptideDTO.getId() );
+
+		perPeptideData.setSrchRepPeptPeptideDTO( srchRepPeptPeptideDTO );
+
 		
 		
-		
-		PeptideDTO peptide_1 = perPeptideData_1.getPeptideDTO();
-		PeptideDTO peptide_2 = perPeptideData_2.getPeptideDTO();
-		
-		
-		Collection<NRProteinDTO> proteinMatches_Peptide_1 = 
+		Collection<NRProteinDTO> proteinMatches = 
 				GetProteinsForPeptidesAndInsertNrseqPeptideProteinEntries.getInstance()
-				.getProteinsForPeptidesAndInsertNrseqPeptideProteinEntries( peptide_1, proteinNameDecoyPrefixList, nrseqDatabaseId );
+				.getProteinsForPeptidesAndInsertNrseqPeptideProteinEntries( peptideDTO, proteinNameDecoyPrefixList, nrseqDatabaseId );
 		
-		Collection<NRProteinDTO> proteinMatches_Peptide_2 = null;
 		
-		if ( peptide_1.getSequence().equals( peptide_2.getSequence() ) ) {
+
+		if( proteinMatches.size() < 1 ) {
+			String msg = "getProteinMappingForSinglePeptide(...): No proteins found for " + peptide.getSequence() +
+					" for "
+					 + " linker.  reportedPeptide sequence: " + reportedPeptide.getReportedPeptideString();
+			log.error( msg );
 			
-			proteinMatches_Peptide_2 = proteinMatches_Peptide_1;
-			
-		} else {
-			
-			proteinMatches_Peptide_2 =
-				GetProteinsForPeptidesAndInsertNrseqPeptideProteinEntries.getInstance()
-				.getProteinsForPeptidesAndInsertNrseqPeptideProteinEntries( peptide_2, proteinNameDecoyPrefixList, nrseqDatabaseId );
+			throw new Exception( msg );
 		}
 		
-		PopulateMonolinkDTOListOnPerPeptideDataObject.getInstance()
-		.populateMonolinkDTOListOnPerPeptideDataObject( perPeptideData_1, linkerList, proteinMatches_Peptide_1 );
-
+		List <SrchRepPeptNrseqIdPosUnlinkedDimerDTO> srchRepPeptNrseqIdPosUnlinkedDimerDTOList = new ArrayList<>();
 		
-		PopulateMonolinkDTOListOnPerPeptideDataObject.getInstance()
-		.populateMonolinkDTOListOnPerPeptideDataObject( perPeptideData_2, linkerList, proteinMatches_Peptide_2 );
+		for( NRProteinDTO protein : proteinMatches ) {
+
+			SrchRepPeptNrseqIdPosUnlinkedDimerDTO srchRepPeptNrseqIdPosUnlinkedDimerDTO = new SrchRepPeptNrseqIdPosUnlinkedDimerDTO();
+
+			srchRepPeptNrseqIdPosUnlinkedDimerDTO.setNrseqId( protein.getNrseqId() );
+
+			srchRepPeptNrseqIdPosUnlinkedDimerDTOList.add( srchRepPeptNrseqIdPosUnlinkedDimerDTO );
+
+		}  //end looping over proteins
 		
+
+		if ( srchRepPeptNrseqIdPosUnlinkedDimerDTOList == null || srchRepPeptNrseqIdPosUnlinkedDimerDTOList.isEmpty() ) {
+
+			getDimerroteinMappingsSinglePeptideData.noProteinMappings = true; 
+		}
 		
-		
-		
-		for( NRProteinDTO protein1 : proteinMatches_Peptide_1 ) {
-						
-			for( NRProteinDTO protein2 : proteinMatches_Peptide_2 ) {
 
-				// a single dimer entry
-				DimerDTO dimer = new DimerDTO();
+		PopulateSrchRepPeptNrseqIdPosMonolinkDTOListOnPerPeptideDataObject.getInstance()
+		.populateSrchRepPeptNrseqIdPosMonolinkDTOListOnPerPeptideDataObject( perPeptideData, linkerList, proteinMatches );
 
-				//  peptideOrder default to peptide 1 is going into dimer.peptide1Id
-				//    and peptide 2 is going into dimer.peptide2Id
-
-//				PeptideOrder peptideOrder = PeptideOrder.ONE_TO_ONE_AND_TWO_TO_TWO;
-
-				// insert the proteins in order of their nrseq_id
-				if( protein1.getNrseqId() <= protein2.getNrseqId() ) {
-					dimer.setPeptide1Id( peptide_1.getId() );    			    			
-					dimer.setPeptide2Id( peptide_2.getId() );
-
-					dimer.setProtein1( protein1 );
-					dimer.setProtein2( protein2 );
-				} else {
-					
-
-    				//  peptideOrder changed since peptide 1 on dimer is set to peptide 2 
-    				//                              and peptide 2 on dimer is set to peptide 1
-    				
-//    				peptideOrder = PeptideOrder.ONE_TO_TWO_AND_TWO_TO_ONE;
-    				
-    				
-					dimer.setPeptide1Id( peptide_2.getId() );    			    			
-					dimer.setPeptide2Id( peptide_1.getId() );
-
-					dimer.setProtein1( protein2 );
-					dimer.setProtein2( protein1 );
-				}
-				
-
-				
-	    		GetDimersResultItem getDimersResultItem = new GetDimersResultItem(); 
-	    		
-	    		getDimersResultItem.setDimerDTO( dimer );
-//	    		getDimersResultItem.setPeptideOrder( peptideOrder );
-	    					    		
-	    		dimerResultItemList.add( getDimersResultItem );
-	    		
-				
-			}  //end looping over protein2
-			
-		}  //end looping over protein1
+		getDimerroteinMappingsSinglePeptideData.srchRepPeptNrseqIdPosUnlinkedDimerDTOList_Peptide =
+				srchRepPeptNrseqIdPosUnlinkedDimerDTOList;
 		
 		
-		return getDimersResult;
-	
+		return getDimerroteinMappingsSinglePeptideData;
 	}
-
-
-
-
+		
 
 	/**
-	 * Internal result from getDimers method
-	 *
+	 * Save dimer data to DB
+	 * 
+	 * @param reportedPeptideDTO
+	 * @param searchId
+	 * @param getDimerMappingsResult
+	 * @throws Exception
 	 */
-	private class GetDimersResult {
-		
+	public  List<PerPeptideData> saveDimerData( 
+			
+			ReportedPeptideDTO reportedPeptideDTO, 
+			int searchId, 
 
-		private List<GetDimersResultItem> dimerResultItemList;
+			GetDimerProteinMappingsResult getDimerMappingsResult,
+			
+			Set<Double> uniqueDynamicModMassesForTheSearch
+			
+			) throws Exception {
 
-		public List<GetDimersResultItem> getDimerResultItemList() {
-			return dimerResultItemList;
+		List<PerPeptideData> perPeptideDataList = new ArrayList<>( 2 );
+
+		for ( GetDimerProteinMappingsSinglePeptideData getDimerroteinMappingsSinglePeptideData : 
+			getDimerMappingsResult.getDimerroteinMappingsSinglePeptideDataList ) {
+			
+			saveDimerDataSinglePeptide( reportedPeptideDTO, searchId, getDimerroteinMappingsSinglePeptideData, uniqueDynamicModMassesForTheSearch );
+
+			perPeptideDataList.add( getDimerroteinMappingsSinglePeptideData.perPeptideData );
 		}
 
-		public void setDimerResultItemList(
-				List<GetDimersResultItem> dimerResultItemList) {
-			this.dimerResultItemList = dimerResultItemList;
-		}
-
+		return perPeptideDataList;
 	}
 	
-	
-	
+
 	/**
-	 * Single entry in Internal result from getDimers method
-	 *
+	 * @param reportedPeptideDTO
+	 * @param searchId
+	 * @param getDimerroteinMappingsSinglePeptideData
+	 * @throws Exception
 	 */
-	private class GetDimersResultItem {
+	private void saveDimerDataSinglePeptide( 
+			
+			ReportedPeptideDTO reportedPeptideDTO, 
+			int searchId, 
+
+			GetDimerProteinMappingsSinglePeptideData getDimerroteinMappingsSinglePeptideData,
+
+			Set<Double> uniqueDynamicModMassesForTheSearch
+			
+			) throws Exception {
 		
-		private DimerDTO dimerDTO;
+
+		PerPeptideData perPeptideData = getDimerroteinMappingsSinglePeptideData.perPeptideData;
+
+		//  Save SrchRepPeptPeptideDTO, SrchRepPeptPeptDynamicModDTO, SrchRepPeptNrseqIdPosMonolinkDTO
+		
+		SavePerPeptideData.getInstance().savePerPeptideData( perPeptideData, searchId, reportedPeptideDTO );
+
+		
+		//  srchRepPeptPeptideDTO saved in savePerPeptideData(...)
+		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO = perPeptideData.getSrchRepPeptPeptideDTO();
+
+		int searchReportedPeptidepeptideId = srchRepPeptPeptideDTO.getId();
+
+		//  Save Dimer Protein Mappings 
+		
+		for ( SrchRepPeptNrseqIdPosUnlinkedDimerDTO srchRepPeptNrseqIdPosUnlinkedDimerDTO : getDimerroteinMappingsSinglePeptideData.srchRepPeptNrseqIdPosUnlinkedDimerDTOList_Peptide ) {
+			
+			srchRepPeptNrseqIdPosUnlinkedDimerDTO.setSearchId( searchId );
+			srchRepPeptNrseqIdPosUnlinkedDimerDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
+			srchRepPeptNrseqIdPosUnlinkedDimerDTO.setSearchReportedPeptidepeptideId( searchReportedPeptidepeptideId );
+			
+			DB_Insert_SrchRepPeptNrseqIdPosUnlinkedDimerDAO.getInstance().save( srchRepPeptNrseqIdPosUnlinkedDimerDTO );
+		}
 		
 
-//		private PeptideOrder peptideOrder;
-//		
-//
-//		
-//		public PeptideOrder getPeptideOrder() {
-//			return peptideOrder;
-//		}
-//
-//		public void setPeptideOrder(PeptideOrder peptideOrder) {
-//			this.peptideOrder = peptideOrder;
-//		}
-
-		public DimerDTO getDimerDTO() {
-			return dimerDTO;
+		//  Save Dynamic Mod Masses into Lookup table and into Set for Search level lookup
+		
+		for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide() ) {
+		
+			SearchReportedPeptideDynamicModLookupDTO item = new SearchReportedPeptideDynamicModLookupDTO();
+			
+			item.setDynamicModMass( srchRepPeptPeptDynamicModDTO.getMass() );
+			item.setLinkType( XLinkUtils.TYPE_DIMER );
+			item.setReportedPeptideId( reportedPeptideDTO.getId() );
+			item.setSearchId( searchId );
+			
+			DB_Insert_SearchReportedPeptideDynamicModLookupDAO.getInstance().saveToDatabaseIgnoreDuplicates( item );
+			
+			//  Accumulate mod mass values across the search 
+			uniqueDynamicModMassesForTheSearch.add( srchRepPeptPeptDynamicModDTO.getMass() );
 		}
-
-		public void setDimerDTO(DimerDTO dimerDTO) {
-			this.dimerDTO = dimerDTO;
-		}
-
 	}
+	
 }

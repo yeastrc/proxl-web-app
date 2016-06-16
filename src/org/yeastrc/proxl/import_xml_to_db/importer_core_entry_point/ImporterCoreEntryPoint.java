@@ -16,18 +16,18 @@ import javax.xml.validation.SchemaFactory;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant;
 import org.yeastrc.proxl.import_xml_to_db.dao.FASTADatabaseLookup;
+import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO;
+import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMPopulateFilterDirection;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.PrintHelpOnlyException;
-import org.yeastrc.proxl.import_xml_to_db.import_post_processing.main.ImportPostProcessingPerSearch;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProxlInputObjectContainer;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateAnnotationTypeRecords;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateScanFilenamesInXMLAreOnCommandLine;
 import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput;
 import org.yeastrc.proxl.import_xml_to_db.project_importable_validation.IsImportingAllowForProject;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
-import org.yeastrc.xlink.dao.SearchDAO;
-import org.yeastrc.xlink.dto.SearchDTO;
 
 
 
@@ -365,19 +365,20 @@ public class ImporterCoreEntryPoint {
 			proxlInputObjectContainer.setProxlInput( null );
 
 
-			if ( log.isInfoEnabled() ) {
-
-				System.out.println( "!!!!");
-
-				System.out.println( "Starting Insert of lookup tables for search ID " + searchDTOInserted.getId() );
-
-				System.out.println( "!!!!");
-			}
-
-			
-			ImportPostProcessingPerSearch.importPostProcessingPerSearch( searchDTOInserted.getId() );
+//			if ( log.isInfoEnabled() ) {
+//
+//				System.out.println( "!!!!");
+//
+//				System.out.println( "Starting Insert of lookup tables for search ID " + searchDTOInserted.getId() );
+//
+//				System.out.println( "!!!!");
+//			}
 
 			
+//			ImportPostProcessingPerSearch.importPostProcessingPerSearch( searchDTOInserted.getId() );
+
+			
+			ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
 
 			try {
 				

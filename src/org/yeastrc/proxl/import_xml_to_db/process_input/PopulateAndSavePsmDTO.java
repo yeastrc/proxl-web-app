@@ -1,13 +1,16 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_PsmDAO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
+import org.yeastrc.proxl.import_xml_to_db.utils.RoundDecimalFieldsIfNecessary;
 import org.yeastrc.proxl_import.api.xml_dto.Psm;
-import org.yeastrc.xlink.dao.PsmDAO;
 import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
+import org.yeastrc.xlink.utils.XLinkUtils;
 
 /**
  * Populate and Save PSM record to the DB
@@ -55,7 +58,26 @@ public class PopulateAndSavePsmDTO {
 		psmDTO.setSearchId( searchId );
 		psmDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
 
-		psmDTO.setType( linkTypeNumber );
+		if ( psm.getLinkerMass() != null ) {
+			
+			BigDecimal linkerMass = RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( psm.getLinkerMass() );
+
+			psmDTO.setLinkerMass( linkerMass );
+			
+		} else {
+			
+			//  linker mass cannot be null for crosslink or looplink
+
+			if ( linkTypeNumber == XLinkUtils.TYPE_CROSSLINK 
+					|| linkTypeNumber == XLinkUtils.TYPE_LOOPLINK ) {
+				
+				String msg = "Linker mass cannot be null for Crosslink or Looplink.  " 
+						+ "  Psm Scanfilename: " + psm.getScanFileName()
+						+ ", Psm ScanNumber: " + psm.getScanNumber();
+				log.error( msg );
+				throw new ProxlImporterDataException( msg );
+			}
+		}
 
 		if ( psm.getPrecursorCharge() != null ) {
 
@@ -117,7 +139,7 @@ public class PopulateAndSavePsmDTO {
 
 
 
-		PsmDAO.getInstance().saveToDatabase( psmDTO );
+		DB_Insert_PsmDAO.getInstance().saveToDatabase( psmDTO );
 
 		return psmDTO;
 	}

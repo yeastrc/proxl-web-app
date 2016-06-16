@@ -47,6 +47,8 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 	private IDBConnectionParametersProvider dbConnectionParametersProvider = null;
 	
 	private boolean databaseConnectionTestOnBorrow = false;
+	
+	private int maxDBConnectionsProxl = MAX_TOTAL_PROXL_DB_CONNECTIONS;
 
 	/**
 	 * Allow setting a value for dbConnectionParametersProvider
@@ -206,7 +208,7 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 			
 			
 			
-			int maxDBConnections = MAX_TOTAL_PROXL_DB_CONNECTIONS;
+			int maxDBConnections = maxDBConnectionsProxl;
 			
 
 			boolean poolPreparedStatements = true;
@@ -381,6 +383,14 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 	public void setDatabaseConnectionTestOnBorrow(
 			boolean databaseConnectionTestOnBorrow) {
 		this.databaseConnectionTestOnBorrow = databaseConnectionTestOnBorrow;
+	}
+
+	public int getMaxDBConnectionsProxl() {
+		return maxDBConnectionsProxl;
+	}
+
+	public void setMaxDBConnectionsProxl(int maxDBConnectionsProxl) {
+		this.maxDBConnectionsProxl = maxDBConnectionsProxl;
 	}
 
 	
