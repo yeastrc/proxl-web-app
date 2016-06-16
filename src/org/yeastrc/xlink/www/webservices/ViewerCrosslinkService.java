@@ -2,6 +2,7 @@ package org.yeastrc.xlink.www.webservices;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,13 +22,14 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.SearchDAO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.MergedSearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
-import org.yeastrc.xlink.www.searcher.MergedSearchProteinCrosslinkSearcher;
+import org.yeastrc.xlink.www.objects.SearchProteinCrosslinkWrapper;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -230,13 +232,28 @@ public class ViewerCrosslinkService {
 
 
 			ImageViewerData ivd = new ImageViewerData();
+			
+			
+			
 
-			if( excludeTaxonomy == null ) 
-				excludeTaxonomy = new ArrayList<Integer>();
+			////////////
+			
+			//  Copy Exclude Taxonomy Set for lookup
 
+			Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
+
+
+			if( excludeTaxonomy != null ) { 
+				excludeTaxonomy_Ids_Set_UserInput.addAll( excludeTaxonomy );
+			}
+			
+			
+			List<Integer> searchIdsListSorted = new ArrayList<Integer>( searchIdsSet );
+			
+			Collections.sort( searchIdsListSorted );
 
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
-			for( int searchId : searchIds ) {
+			for( int searchId : searchIdsListSorted ) {
 				
 				SearchDTO search = SearchDAO.getInstance().getSearch( searchId );
 				
@@ -271,158 +288,172 @@ public class ViewerCrosslinkService {
 				filterOnlyOnePeptide = true;
 
 			
-			List<MergedSearchProteinCrosslink> crosslinks = MergedSearchProteinCrosslinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
+			Map<Integer, List<SearchProteinCrosslinkWrapper>> wrappedCrosslinks_MappedOnSearchId = new HashMap<>();
 
-			// Filter out links if requested
-			if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
-					|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
-				
-				List<MergedSearchProteinCrosslink> linksCopy = new ArrayList<MergedSearchProteinCrosslink>();
-				linksCopy.addAll( crosslinks );
+			for ( SearchDTO searchDTO : searches ) {
 
-				for( MergedSearchProteinCrosslink link : linksCopy ) {
-					
-//					int proteinId1 = link.getProtein1().getNrProtein().getNrseqId();
-//					int proteinId2 = link.getProtein2().getNrProtein().getNrseqId();
-//					
-//					if ( proteinId1 == 23980491 || proteinId2 == 23980492 ) {
-//						
-//						int z = 0;
-//					}
-					
-					
-					
+				Integer searchId = searchDTO.getId();
 
-					// did they request to removal of non unique peptides?
-					if( filterNonUniquePeptides ) {
-						
-						if( link.getNumUniqueLinkedPeptides() < 1 ) {
-							crosslinks.remove( link );
-							continue;
-						}
-					}
-//
-//					
-//						link.getNumPsms() <= 1 WILL NOT WORK if more than one search since it is across all searches
-//					
-//					// did they request to removal of links with only one PSM?
-					if( filterOnlyOnePSM ) {
-						
-						boolean foundSearchWithMoreThanOnePSM = false;
+				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
+						searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
 
-						Map<SearchDTO, SearchProteinCrosslink> searchCrosslinks = link.getSearchProteinCrosslinks();
+				if ( searcherCutoffValuesSearchLevel == null ) {
 
-						for ( Map.Entry<SearchDTO, SearchProteinCrosslink> searchEntry : searchCrosslinks.entrySet() ) {
-
-							SearchProteinCrosslink searchProteinCrosslink = searchEntry.getValue();
-
-							int psmCountForSearchId = searchProteinCrosslink.getNumPsms();
-
-							if ( psmCountForSearchId > 1 ) {
-
-								foundSearchWithMoreThanOnePSM = true;
-								break;
-							}
-						}
-						
-						if (  ! foundSearchWithMoreThanOnePSM ) {
-							crosslinks.remove( link );
-							continue;
-						}
-
-					}
-					
-					// did they request to removal of links with only one Reported Peptide?
-					if( filterOnlyOnePeptide ) {
-						
-						boolean foundSearchWithMoreThanOneReportedPeptide = false;
-
-						Map<SearchDTO, SearchProteinCrosslink> searchCrosslinks = link.getSearchProteinCrosslinks();
-
-						for ( Map.Entry<SearchDTO, SearchProteinCrosslink> searchEntry : searchCrosslinks.entrySet() ) {
-
-							SearchProteinCrosslink searchProteinCrosslink = searchEntry.getValue();
-
-							int peptideCountForSearchId = searchProteinCrosslink.getNumLinkedPeptides();
-
-							if ( peptideCountForSearchId > 1 ) {
-
-								foundSearchWithMoreThanOneReportedPeptide = true;
-								break;
-							}
-						}
-						
-						if (  ! foundSearchWithMoreThanOneReportedPeptide ) {
-							crosslinks.remove( link );
-							continue;
-						}
-					}
-					
-
-					// did they request removal of certain taxonomy IDs?
-					if( excludeTaxonomy != null && excludeTaxonomy.size() > 0 ) {
-						
-						for( int tid : excludeTaxonomy ) {
-							
-							if( link.getProtein1().getNrProtein().getTaxonomyId() == tid ||
-									link.getProtein2().getNrProtein().getTaxonomyId() == tid ) {
-								crosslinks.remove( link );
-								continue;
-							}
-						}
-					}
+					searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
 				}
+
+
+				//	List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
+				//		SearchProteinCrosslinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
+
+				List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
+						CrosslinkLinkedPositions.getInstance()
+						.getSearchProteinCrosslinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+
+
+				//				List<MergedSearchProteinCrosslink> crosslinks = MergedSearchProteinCrosslinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
+
+				// Filter out links if requested
+				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
+						|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
+
+
+
+					///////  Output Lists, Results After Filtering
+
+					List<SearchProteinCrosslinkWrapper> wrappedCrosslinksAfterFilter = new ArrayList<>( wrappedCrosslinks.size() );
+
+
+					for ( SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper : wrappedCrosslinks ) {
+
+						SearchProteinCrosslink link = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
+
+
+						// did user request removal of certain taxonomy IDs?
+
+						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
+
+							int taxonomyId_1 = link.getProtein1().getNrProtein().getTaxonomyId();
+							int taxonomyId_2 = link.getProtein2().getNrProtein().getTaxonomyId();
+
+							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_1 ) 
+									|| excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_2 ) ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+						}
+
+
+						// did they request to removal of non unique peptides?
+
+						if( filterNonUniquePeptides  ) {
+
+							if( link.getNumUniqueLinkedPeptides() < 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+						}
+
+
+						//	did they request to removal of links with only one PSM?
+						if( filterOnlyOnePSM  ) {
+
+							int psmCountForSearchId = link.getNumPsms();
+
+							if ( psmCountForSearchId <= 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+
+						}
+
+
+						// did they request to removal of links with only one Reported Peptide?
+						if( filterOnlyOnePeptide ) {
+
+							int peptideCountForSearchId = link.getNumLinkedPeptides();
+
+							if ( peptideCountForSearchId <= 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+
+						}
+
+
+						wrappedCrosslinksAfterFilter.add( searchProteinCrosslinkWrapper );
+
+					}
+
+					//  Copy new filtered list to original input variable name to overlay it
+
+					wrappedCrosslinks = wrappedCrosslinksAfterFilter;
+				}
+				
+				
+				wrappedCrosslinks_MappedOnSearchId.put( searchId, wrappedCrosslinks );
 			}
+			
+			
+			
+			
+			
 
 			// build the JSON data structure for crosslinks
-			Map<Integer, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>> proteinLinkPositions = new HashMap<Integer, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>>();
-			for( MergedSearchProteinCrosslink link : crosslinks ) {
+			
+			//  Build a Map of maps of <from prot id>, <to prot id>, <from prot position>, <to prot position>, <set of search ids>
+			
+			Map<Integer, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>> proteinLinkPositions = new HashMap<>();
+			
+			for ( Map.Entry<Integer, List<SearchProteinCrosslinkWrapper>> wrappedCrosslinks_MappedOnSearchId_Entry :
+				wrappedCrosslinks_MappedOnSearchId.entrySet() ) {
+				
+				Integer searchIdForEntry = wrappedCrosslinks_MappedOnSearchId_Entry.getKey();
+				
+				List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = wrappedCrosslinks_MappedOnSearchId_Entry.getValue();
+				
+				for ( SearchProteinCrosslinkWrapper wrappedCrosslink : wrappedCrosslinks ) {
 
-				int fromId = link.getProtein1().getNrProtein().getNrseqId();
-				int toId = link.getProtein2().getNrProtein().getNrseqId();
-				
-				int from = link.getProtein1Position();
-				int to = link.getProtein2Position();
-				
-				Set<Integer> searchIdSet = new HashSet<Integer>();
-				for( SearchDTO search : link.getSearches() ) {
-					searchIdSet.add( search.getId() );
+					SearchProteinCrosslink searchProteinCrosslink = wrappedCrosslink.getSearchProteinCrosslink();
+					
+					addToProteinLinkPositions(  
+							searchIdForEntry,
+							
+							searchProteinCrosslink.getProtein1().getNrProtein().getNrseqId(), // fromProtId
+							searchProteinCrosslink.getProtein2().getNrProtein().getNrseqId(), // toProtId
+							searchProteinCrosslink.getProtein1Position(), // fromProtPosition
+							searchProteinCrosslink.getProtein2Position(),  // toProtPosition
+							
+							proteinLinkPositions  //  Map to Add to
+							);
+					
+					//  Add a second time with prot and pos 1 and 2 switched
+
+					addToProteinLinkPositions(  
+							searchIdForEntry,
+							
+							searchProteinCrosslink.getProtein2().getNrProtein().getNrseqId(), // fromProtId
+							searchProteinCrosslink.getProtein1().getNrProtein().getNrseqId(), // toProtId
+							searchProteinCrosslink.getProtein2Position(), // fromProtPosition
+							searchProteinCrosslink.getProtein1Position(),  // toProtPosition
+							
+							proteinLinkPositions  //  Map to Add to
+							);
+					
+					
 				}
 				
-				if( !proteinLinkPositions.containsKey( fromId) )
-					proteinLinkPositions.put( fromId, new HashMap<Integer, Map<Integer, Map<Integer, Set<Integer>>>>() );
-
-				if( !proteinLinkPositions.containsKey( toId ) )
-					proteinLinkPositions.put( toId, new HashMap<Integer, Map<Integer, Map<Integer, Set<Integer>>>>() );
-				
-				Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> pMap = proteinLinkPositions.get( fromId );
-				if( !pMap.containsKey( toId ) )
-					pMap.put( toId, new HashMap<Integer, Map<Integer, Set<Integer>>>() );
-				
-				if( !pMap.get( toId ).containsKey( from ) )
-					pMap.get( toId ).put( from, new HashMap<Integer, Set<Integer>>() );
-				
-				pMap.get( toId ).get( from ).put( to, searchIdSet );
-				
-				fromId = link.getProtein2().getNrProtein().getNrseqId();
-				toId = link.getProtein1().getNrProtein().getNrseqId();
-				
-				from = link.getProtein2Position();
-				to = link.getProtein1Position();
-				
-				
-				if( !proteinLinkPositions.containsKey( fromId ) )
-					proteinLinkPositions.put( fromId, new HashMap<Integer, Map<Integer, Map<Integer, Set<Integer>>>>() );
-				
-				pMap = proteinLinkPositions.get( fromId );
-				if( !pMap.containsKey( toId ) )
-					pMap.put( toId, new HashMap<Integer, Map<Integer, Set<Integer>>>() );
-				
-				if( !pMap.get( toId ).containsKey( from ) )
-					pMap.get( toId ).put( from, new HashMap<Integer, Set<Integer>>() );
-				
-				pMap.get( toId ).get( from ).put( to, searchIdSet );	
 			}
+			
+			
 			
 			ivd.setProteinLinkPositions( proteinLinkPositions );
 
@@ -444,6 +475,58 @@ public class ViewerCrosslinkService {
 		}
 
 
+	}
+	
+
+	
+	private void addToProteinLinkPositions(  
+			
+			Integer searchId,
+			
+			Integer fromProtId,
+			Integer toProtId,
+			
+			Integer fromProtPosition,
+			Integer toProtPosition,
+			
+			//  Map of maps of <from prot id>, <to prot id>, <from prot position>, <to prot position>, <set of search ids>
+			Map<Integer, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>> proteinLinkPositions  //  Map to Add to
+			) {
+		
+		Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> map_keyed_by_toProtId =
+				proteinLinkPositions.get( fromProtId );
+		
+		if ( map_keyed_by_toProtId == null ) {
+			
+			map_keyed_by_toProtId = new HashMap<>();
+			proteinLinkPositions.put( fromProtId, map_keyed_by_toProtId );
+		}
+		
+		Map<Integer, Map<Integer, Set<Integer>>> map_keyed_by_fromProtPosition = map_keyed_by_toProtId.get( toProtId );
+
+		if ( map_keyed_by_fromProtPosition == null ) {
+			
+			map_keyed_by_fromProtPosition = new HashMap<>();
+			map_keyed_by_toProtId.put( toProtId, map_keyed_by_fromProtPosition );
+		}
+		
+		Map<Integer, Set<Integer>> map_keyed_by_toProtPosition = map_keyed_by_fromProtPosition.get( fromProtPosition );
+
+		if ( map_keyed_by_toProtPosition == null ) {
+			
+			map_keyed_by_toProtPosition = new HashMap<>();
+			map_keyed_by_fromProtPosition.put( fromProtPosition, map_keyed_by_toProtPosition );
+		}
+		
+		Set<Integer> searchIdSet = map_keyed_by_toProtPosition.get( toProtPosition );
+		
+		if ( searchIdSet == null ) {
+			
+			searchIdSet = new HashSet<>();
+			map_keyed_by_toProtPosition.put( toProtPosition, searchIdSet );
+		}
+		
+		searchIdSet.add( searchId );
 	}
 	
 	
@@ -622,10 +705,17 @@ public class ViewerCrosslinkService {
 			ImageViewerData ivd = new ImageViewerData();
 
 			
-			
-			if( excludeTaxonomy == null ) 
-				excludeTaxonomy = new ArrayList<Integer>();
 
+			////////////
+			
+			//  Copy Exclude Taxonomy Set for lookup
+
+			Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
+
+
+			if( excludeTaxonomy != null ) { 
+				excludeTaxonomy_Ids_Set_UserInput.addAll( excludeTaxonomy );
+			}
 			
 
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
@@ -664,157 +754,176 @@ public class ViewerCrosslinkService {
 				filterOnlyOnePeptide = true;
 
 			
-			List<MergedSearchProteinCrosslink> crosslinks = MergedSearchProteinCrosslinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
 
-			// Filter out links if requested
-			if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
-					|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
-				
-				List<MergedSearchProteinCrosslink> linksCopy = new ArrayList<MergedSearchProteinCrosslink>();
-				linksCopy.addAll( crosslinks );
+			Map<Integer, List<SearchProteinCrosslinkWrapper>> wrappedCrosslinks_MappedOnSearchId = new HashMap<>();
 
-				for( MergedSearchProteinCrosslink link : linksCopy ) {
-					
-//					int proteinId1 = link.getProtein1().getNrProtein().getNrseqId();
-//					int proteinId2 = link.getProtein2().getNrProtein().getNrseqId();
-//					
-//					if ( proteinId1 == 23980491 || proteinId2 == 23980492 ) {
-//						
-//						int z = 0;
-//					}
-					
-					
-					
+			for ( SearchDTO searchDTO : searches ) {
 
-					// did they request to removal of non unique peptides?
-					if( filterNonUniquePeptides ) {
-						
-						if( link.getNumUniqueLinkedPeptides() < 1 ) {
-							crosslinks.remove( link );
-							continue;
-						}
-					}
-//
-//					
-//						link.getNumPsms() <= 1 WILL NOT WORK if more than one search since it is across all searches
-//					
-//					// did they request to removal of links with only one PSM?
-					if( filterOnlyOnePSM ) {
-						
-						boolean foundSearchWithMoreThanOnePSM = false;
+				Integer searchId = searchDTO.getId();
 
-						Map<SearchDTO, SearchProteinCrosslink> searchCrosslinks = link.getSearchProteinCrosslinks();
+				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
+						searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
 
-						for ( Map.Entry<SearchDTO, SearchProteinCrosslink> searchEntry : searchCrosslinks.entrySet() ) {
+				if ( searcherCutoffValuesSearchLevel == null ) {
 
-							SearchProteinCrosslink searchProteinCrosslink = searchEntry.getValue();
-
-							int psmCountForSearchId = searchProteinCrosslink.getNumPsms();
-
-							if ( psmCountForSearchId > 1 ) {
-
-								foundSearchWithMoreThanOnePSM = true;
-								break;
-							}
-						}
-						
-						if (  ! foundSearchWithMoreThanOnePSM ) {
-							crosslinks.remove( link );
-							continue;
-						}
-
-					}
-					
-					// did they request to removal of links with only one Reported Peptide?
-					if( filterOnlyOnePeptide ) {
-						
-						boolean foundSearchWithMoreThanOneReportedPeptide = false;
-
-						Map<SearchDTO, SearchProteinCrosslink> searchCrosslinks = link.getSearchProteinCrosslinks();
-
-						for ( Map.Entry<SearchDTO, SearchProteinCrosslink> searchEntry : searchCrosslinks.entrySet() ) {
-
-							SearchProteinCrosslink searchProteinCrosslink = searchEntry.getValue();
-
-							int peptideCountForSearchId = searchProteinCrosslink.getNumLinkedPeptides();
-
-							if ( peptideCountForSearchId > 1 ) {
-
-								foundSearchWithMoreThanOneReportedPeptide = true;
-								break;
-							}
-						}
-						
-						if (  ! foundSearchWithMoreThanOneReportedPeptide ) {
-							crosslinks.remove( link );
-							continue;
-						}
-					}
-					
-
-					// did they request removal of certain taxonomy IDs?
-					if( excludeTaxonomy != null && excludeTaxonomy.size() > 0 ) {
-						
-						for( int tid : excludeTaxonomy ) {
-							
-							if( link.getProtein1().getNrProtein().getTaxonomyId() == tid ||
-									link.getProtein2().getNrProtein().getTaxonomyId() == tid ) {
-								crosslinks.remove( link );
-								continue;
-							}
-						}
-					}
+					searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
 				}
-			}
 
-			// build the JSON data structure for crosslinks
-			Map<Integer, Map<Integer, Map<Integer, Map<Integer, Integer>>>> proteinLinkPositions = new HashMap<Integer, Map<Integer, Map<Integer, Map<Integer, Integer>>>>();
-			for( MergedSearchProteinCrosslink link : crosslinks ) {
 
-				int fromId = link.getProtein1().getNrProtein().getNrseqId();
-				int toId = link.getProtein2().getNrProtein().getNrseqId();
-				
-				int from = link.getProtein1Position();
-				int to = link.getProtein2Position();
-				
-				int numPsms = link.getNumPsms();
-				
-				if( !proteinLinkPositions.containsKey( fromId) )
-					proteinLinkPositions.put( fromId, new HashMap<Integer, Map<Integer, Map<Integer, Integer>>>() );
+				//	List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
+				//		SearchProteinCrosslinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
 
-				if( !proteinLinkPositions.containsKey( toId ) )
-					proteinLinkPositions.put( toId, new HashMap<Integer, Map<Integer, Map<Integer, Integer>>>() );
+				List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
+						CrosslinkLinkedPositions.getInstance()
+						.getSearchProteinCrosslinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+
+
+				//				List<MergedSearchProteinCrosslink> crosslinks = MergedSearchProteinCrosslinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
+
+				// Filter out links if requested
+				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
+						|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
+
+
+
+					///////  Output Lists, Results After Filtering
+
+					List<SearchProteinCrosslinkWrapper> wrappedCrosslinksAfterFilter = new ArrayList<>( wrappedCrosslinks.size() );
+
+
+					for ( SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper : wrappedCrosslinks ) {
+
+						SearchProteinCrosslink link = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
+
+
+						// did user request removal of certain taxonomy IDs?
+
+						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
+
+							int taxonomyId_1 = link.getProtein1().getNrProtein().getTaxonomyId();
+							int taxonomyId_2 = link.getProtein2().getNrProtein().getTaxonomyId();
+
+							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_1 ) 
+									|| excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_2 ) ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+						}
+
+
+						// did they request to removal of non unique peptides?
+
+						if( filterNonUniquePeptides  ) {
+
+							if( link.getNumUniqueLinkedPeptides() < 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+						}
+
+
+						//	did they request to removal of links with only one PSM?
+						if( filterOnlyOnePSM  ) {
+
+							int psmCountForSearchId = link.getNumPsms();
+
+							if ( psmCountForSearchId <= 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+
+						}
+
+
+						// did they request to removal of links with only one Reported Peptide?
+						if( filterOnlyOnePeptide ) {
+
+							int peptideCountForSearchId = link.getNumLinkedPeptides();
+
+							if ( peptideCountForSearchId <= 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+
+						}
+
+
+						wrappedCrosslinksAfterFilter.add( searchProteinCrosslinkWrapper );
+
+					}
+
+					//  Copy new filtered list to original input variable name to overlay it
+
+					wrappedCrosslinks = wrappedCrosslinksAfterFilter;
+				}
 				
-				Map<Integer, Map<Integer, Map<Integer, Integer>>> pMap = proteinLinkPositions.get( fromId );
-				if( !pMap.containsKey( toId ) )
-					pMap.put( toId, new HashMap<Integer, Map<Integer, Integer>>() );
 				
-				if( !pMap.get( toId ).containsKey( from ) )
-					pMap.get( toId ).put( from, new HashMap<Integer, Integer>() );
-				
-				pMap.get( toId ).get( from ).put( to, numPsms );
-				
-				fromId = link.getProtein2().getNrProtein().getNrseqId();
-				toId = link.getProtein1().getNrProtein().getNrseqId();
-				
-				from = link.getProtein2Position();
-				to = link.getProtein1Position();
-				
-				
-				if( !proteinLinkPositions.containsKey( fromId ) )
-					proteinLinkPositions.put( fromId, new HashMap<Integer, Map<Integer, Map<Integer, Integer>>>() );
-				
-				pMap = proteinLinkPositions.get( fromId );
-				if( !pMap.containsKey( toId ) )
-					pMap.put( toId, new HashMap<Integer, Map<Integer, Integer>>() );
-				
-				if( !pMap.get( toId ).containsKey( from ) )
-					pMap.get( toId ).put( from, new HashMap<Integer, Integer>() );
-				
-				pMap.get( toId ).get( from ).put( to, numPsms );	
+				wrappedCrosslinks_MappedOnSearchId.put( searchId, wrappedCrosslinks );
 			}
 			
-			ivd.setCrosslinkPSMCounts( proteinLinkPositions );
+			
+			
+			
+			
+
+			// build the JSON data structure for crosslinks
+			
+			//  Build a Map of maps of <from prot id>, <to prot id>, <from prot position>, <to prot position>, <psm count>
+			
+			Map<Integer, Map<Integer, Map<Integer, Map<Integer, Integer>>>> proteinLinkPositionPsmCount = new HashMap<Integer, Map<Integer, Map<Integer, Map<Integer, Integer>>>>();
+
+			for ( Map.Entry<Integer, List<SearchProteinCrosslinkWrapper>> wrappedCrosslinks_MappedOnSearchId_Entry :
+				wrappedCrosslinks_MappedOnSearchId.entrySet() ) {
+				
+				List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = wrappedCrosslinks_MappedOnSearchId_Entry.getValue();
+				
+				for ( SearchProteinCrosslinkWrapper wrappedCrosslink : wrappedCrosslinks ) {
+
+					SearchProteinCrosslink searchProteinCrosslink = wrappedCrosslink.getSearchProteinCrosslink();
+					
+					Integer numPsms = searchProteinCrosslink.getNumPsms();
+
+					addToProteinLinkPositionPsmCount(  
+							
+							numPsms,
+							
+							searchProteinCrosslink.getProtein1().getNrProtein().getNrseqId(), // fromProtId
+							searchProteinCrosslink.getProtein2().getNrProtein().getNrseqId(), // toProtId
+							searchProteinCrosslink.getProtein1Position(), // fromProtPosition
+							searchProteinCrosslink.getProtein2Position(),  // toProtPosition
+							
+							proteinLinkPositionPsmCount  //  Map to Add to
+							);
+					
+					//  Add a second time with prot and pos 1 and 2 switched
+
+					addToProteinLinkPositionPsmCount(
+							
+							numPsms,
+							
+							searchProteinCrosslink.getProtein2().getNrProtein().getNrseqId(), // fromProtId
+							searchProteinCrosslink.getProtein1().getNrProtein().getNrseqId(), // toProtId
+							searchProteinCrosslink.getProtein2Position(), // fromProtPosition
+							searchProteinCrosslink.getProtein1Position(),  // toProtPosition
+							
+							proteinLinkPositionPsmCount  //  Map to Add to
+							);
+					
+					
+				}
+				
+			}
+			
+			
+			ivd.setCrosslinkPSMCounts( proteinLinkPositionPsmCount );
 
 
 			return ivd;
@@ -852,6 +961,52 @@ public class ViewerCrosslinkService {
 
 
 	}
+	
+	
+
+	private void addToProteinLinkPositionPsmCount(  
+			
+			Integer psmCount,
+			
+			Integer fromProtId,
+			Integer toProtId,
+			
+			Integer fromProtPosition,
+			Integer toProtPosition,
+			
+			//  Map of maps of <from prot id>, <to prot id>, <from prot position>, <to prot position>, <psm count>
+			Map<Integer, Map<Integer, Map<Integer, Map<Integer, Integer>>>> proteinLinkPositions  //  Map to Add to
+			) {
+		
+		Map<Integer, Map<Integer, Map<Integer, Integer>>> map_keyed_by_toProtId =
+				proteinLinkPositions.get( fromProtId );
+		
+		if ( map_keyed_by_toProtId == null ) {
+			
+			map_keyed_by_toProtId = new HashMap<>();
+			proteinLinkPositions.put( fromProtId, map_keyed_by_toProtId );
+		}
+		
+		Map<Integer, Map<Integer, Integer>> map_keyed_by_fromProtPosition = map_keyed_by_toProtId.get( toProtId );
+
+		if ( map_keyed_by_fromProtPosition == null ) {
+			
+			map_keyed_by_fromProtPosition = new HashMap<>();
+			map_keyed_by_toProtId.put( toProtId, map_keyed_by_fromProtPosition );
+		}
+		
+		Map<Integer, Integer> map_keyed_by_toProtPosition = map_keyed_by_fromProtPosition.get( fromProtPosition );
+
+		if ( map_keyed_by_toProtPosition == null ) {
+			
+			map_keyed_by_toProtPosition = new HashMap<>();
+			map_keyed_by_fromProtPosition.put( fromProtPosition, map_keyed_by_toProtPosition );
+		}
+		
+		map_keyed_by_toProtPosition.put( toProtPosition, psmCount );
+		
+	}
+	
 	
 	
 }

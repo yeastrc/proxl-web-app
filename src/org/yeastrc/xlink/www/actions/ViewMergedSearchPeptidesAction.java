@@ -20,8 +20,8 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.xlink.dao.SearchDAO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureNavLinks;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.IMergedSearchLink;
@@ -255,13 +255,6 @@ public class ViewMergedSearchPeptidesAction extends Action {
 
 
 			//  Search Ids already sorted
-
-			// sort our searches by ID
-			//			Collections.sort( searches, new Comparator<SearchDTO>() {
-			//				public int compare( SearchDTO r1, SearchDTO r2 ) {
-			//					return r1.getId() - r2.getId();
-			//				}
-			//			});
 
 			request.setAttribute( "searches", searches );
 

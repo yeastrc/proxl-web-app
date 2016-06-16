@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
@@ -26,6 +26,8 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.form_utils.GetProteinQueryJSONRootFromFormData;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
+import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
 import org.yeastrc.xlink.www.objects.AnnDisplayNameDescPeptPsmListsPair;
 import org.yeastrc.xlink.www.objects.AnnValuePeptPsmListsPair;
 import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
@@ -40,8 +42,6 @@ import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
 import org.yeastrc.xlink.www.objects.SearchProteinLooplinkWrapper;
-import org.yeastrc.xlink.www.searcher.SearchProteinCrosslinkSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinLooplinkSearcher;
 
 /**
  * 
@@ -344,27 +344,23 @@ public class ProteinsMergedCommonPageDownload {
 
 
 
+			//////////////////   Get Crosslinks data from DATABASE  from database
 
 			/////////////////////////////////////////////////////////////
 
-			//////////////////   Get Crosslinks data from DATABASE  from database
-
-
-
 			List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
-					SearchProteinCrosslinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
-
+					CrosslinkLinkedPositions.getInstance()
+					.getSearchProteinCrosslinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+			
 
 			/////////////////////////////////////////////////////////////
 
 			//////////////////   Get Looplinks data from DATABASE   from database
 
-
-
 			List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
-					SearchProteinLooplinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
-
-
+					LooplinkLinkedPositions.getInstance()
+					.getSearchProteinLooplinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+			
 			
 			/////////////////////////////////////////////////////////
 			
@@ -450,7 +446,7 @@ public class ProteinsMergedCommonPageDownload {
 
 				///////  Output Lists, Results After Filtering
 
-				List<SearchProteinCrosslinkWrapper> wrappedCrosslinksAfterFilter = new ArrayList<>( wrappedLooplinks.size() );
+				List<SearchProteinCrosslinkWrapper> wrappedCrosslinksAfterFilter = new ArrayList<>( wrappedCrosslinks.size() );
 
 				List<SearchProteinLooplinkWrapper> wrappedLooplinksAfterFilter = new ArrayList<>( wrappedLooplinks.size() );
 
@@ -462,6 +458,39 @@ public class ProteinsMergedCommonPageDownload {
 
 					SearchProteinCrosslink link = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
 
+
+					// did user request removal of certain taxonomy IDs?
+					
+					if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
+
+						int taxonomyId_1 = link.getProtein1().getNrProtein().getTaxonomyId();
+						int taxonomyId_2 = link.getProtein2().getNrProtein().getTaxonomyId();
+						
+						if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_1 ) 
+								|| excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_2 ) ) {
+
+							//  Skip to next entry in list, dropping this entry from output list
+
+							continue;  // EARLY CONTINUE
+						}
+					}
+
+					// did user request removal of certain protein IDs?
+					
+					if( ! excludeProtein_Ids_Set_UserInput.isEmpty() ) {
+
+						int proteinId_1 = link.getProtein1().getNrProtein().getNrseqId();
+						int proteinId_2 = link.getProtein2().getNrProtein().getNrseqId();
+						
+						if ( excludeProtein_Ids_Set_UserInput.contains( proteinId_1 ) 
+								|| excludeProtein_Ids_Set_UserInput.contains( proteinId_2 ) ) {
+
+							//  Skip to next entry in list, dropping this entry from output list
+
+							continue;  // EARLY CONTINUE
+						}
+					}		
+					
 					// did they request to removal of non unique peptides?
 
 					if( proteinQueryJSONRoot.isFilterNonUniquePeptides()  ) {
@@ -505,39 +534,7 @@ public class ProteinsMergedCommonPageDownload {
 							continue;  // EARLY CONTINUE
 						}
 
-					}
-
-					// did user request removal of certain taxonomy IDs?
-					
-					if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
-
-						int taxonomyId_1 = link.getProtein1().getNrProtein().getTaxonomyId();
-						int taxonomyId_2 = link.getProtein2().getNrProtein().getTaxonomyId();
-						
-						if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_1 ) 
-								|| excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_2 ) ) {
-
-							//  Skip to next entry in list, dropping this entry from output list
-
-							continue;  // EARLY CONTINUE
-						}
-					}
-
-					// did user request removal of certain protein IDs?
-					
-					if( ! excludeProtein_Ids_Set_UserInput.isEmpty() ) {
-
-						int proteinId_1 = link.getProtein1().getNrProtein().getNrseqId();
-						int proteinId_2 = link.getProtein2().getNrProtein().getNrseqId();
-						
-						if ( excludeProtein_Ids_Set_UserInput.contains( proteinId_1 ) 
-								|| excludeProtein_Ids_Set_UserInput.contains( proteinId_2 ) ) {
-
-							//  Skip to next entry in list, dropping this entry from output list
-
-							continue;  // EARLY CONTINUE
-						}
-					}					
+					}			
 
 					wrappedCrosslinksAfterFilter.add( searchProteinCrosslinkWrapper );
 				}
@@ -551,6 +548,36 @@ public class ProteinsMergedCommonPageDownload {
 
 					SearchProteinLooplink link = searchProteinLooplinkWrapper.getSearchProteinLooplink();
 
+
+					// did user request removal of certain taxonomy IDs?
+					
+					if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
+
+						int taxonomyId = link.getProtein().getNrProtein().getTaxonomyId();
+						
+						if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
+
+							//  Skip to next entry in list, dropping this entry from output list
+
+							continue;  // EARLY CONTINUE
+						}
+					}
+
+					// did user request removal of certain protein IDs?
+					
+					if( ! excludeProtein_Ids_Set_UserInput.isEmpty() ) {
+
+						int proteinId = link.getProtein().getNrProtein().getNrseqId();
+						
+						if ( excludeProtein_Ids_Set_UserInput.contains( proteinId ) ) {
+
+							//  Skip to next entry in list, dropping this entry from output list
+
+							continue;  // EARLY CONTINUE
+						}
+					}									
+					
+					
 					// did they request to removal of non unique peptides?
 
 					if( proteinQueryJSONRoot.isFilterNonUniquePeptides()  ) {
@@ -597,35 +624,6 @@ public class ProteinsMergedCommonPageDownload {
 					}
 
 
-					// did user request removal of certain taxonomy IDs?
-					
-					if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
-
-						int taxonomyId = link.getProtein().getNrProtein().getTaxonomyId();
-						
-						if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
-
-							//  Skip to next entry in list, dropping this entry from output list
-
-							continue;  // EARLY CONTINUE
-						}
-					}
-
-					// did user request removal of certain protein IDs?
-					
-					if( ! excludeProtein_Ids_Set_UserInput.isEmpty() ) {
-
-						int proteinId = link.getProtein().getNrProtein().getNrseqId();
-						
-						if ( excludeProtein_Ids_Set_UserInput.contains( proteinId ) ) {
-
-							//  Skip to next entry in list, dropping this entry from output list
-
-							continue;  // EARLY CONTINUE
-						}
-					}									
-					
-
 					wrappedLooplinksAfterFilter.add( searchProteinLooplinkWrapper );
 				}
 
@@ -660,7 +658,16 @@ public class ProteinsMergedCommonPageDownload {
 					crosslinksWrapperMapOnCrosslinkKeySearchId.put( crosslinkPrimaryKey, crosslinksWrapperMapOnSearchId );
 				}
 
-				crosslinksWrapperMapOnSearchId.put( searchId, searchProteinCrosslinkWrapper );
+				SearchProteinCrosslinkWrapper prevSearchProteinCrosslinkWrapper =
+						crosslinksWrapperMapOnSearchId.put( searchId, searchProteinCrosslinkWrapper );
+				
+				if ( prevSearchProteinCrosslinkWrapper != null ) {
+					
+					String msg = "crosslinksWrapperMapOnSearchId already contains entry for search id: " + searchId
+							+ ", crosslinkPrimaryKey: " + crosslinkPrimaryKey;
+					log.error( msg );
+					throw new ProxlWebappDataException(msg);
+				}
 			}
 
 			///   Add the SearchProteinLooplinkWrapper to the map on looplink primary key and search id
@@ -681,7 +688,16 @@ public class ProteinsMergedCommonPageDownload {
 					looplinksWrapperMapOnLooplinkKeySearchId.put( looplinkPrimaryKey, looplinksWrapperMapOnSearchId );
 				}
 
-				looplinksWrapperMapOnSearchId.put( searchId, searchProteinLooplinkWrapper );
+				SearchProteinLooplinkWrapper prevSearchProteinLooplinkWrapper =
+						looplinksWrapperMapOnSearchId.put( searchId, searchProteinLooplinkWrapper );
+
+				if ( prevSearchProteinLooplinkWrapper != null ) {
+					
+					String msg = "looplinksWrapperMapOnSearchId already contains entry for search id: " + searchId
+							+ ", looplinkPrimaryKey: " + looplinkPrimaryKey;
+					log.error( msg );
+					throw new ProxlWebappDataException(msg);
+				}
 			}
 
 		}  //  End processing by Search Id
@@ -790,12 +806,17 @@ public class ProteinsMergedCommonPageDownload {
 
 				Map<SearchDTO, SearchProteinCrosslink> searchProteinCrosslinksMapOnSearchDTOForThisItem = new TreeMap<SearchDTO, SearchProteinCrosslink>();
 
+				SearchProteinCrosslinkWrapper anySearchProteinCrosslinkWrapper = null;
 
 				for ( Map.Entry<Integer, SearchProteinCrosslinkWrapper> crosslinksWrapperEntry : crosslinksWrapperMapOnSearchId.entrySet() ) {
 
 					Integer searchId = crosslinksWrapperEntry.getKey();
 					SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper = crosslinksWrapperEntry.getValue();
 
+					
+					anySearchProteinCrosslinkWrapper = searchProteinCrosslinkWrapper;
+					
+					
 					SearchDTO searchDTO = searchesMapOnId.get( searchId );
 
 					if ( searchDTO == null ) {
@@ -815,8 +836,7 @@ public class ProteinsMergedCommonPageDownload {
 
 				}
 				
-				SearchProteinCrosslinkWrapper anySearchProteinCrosslinkWrapper = crosslinksWrapperMapOnSearchId.entrySet().iterator().next().getValue();
-
+				
 				SearchProteinCrosslink anySearchProteinCrosslink = anySearchProteinCrosslinkWrapper.getSearchProteinCrosslink();
 
 				
@@ -848,12 +868,12 @@ public class ProteinsMergedCommonPageDownload {
 		} else {
     
 			
-			////     Collect Annotation data for Crosslinks and sort
+			////     Collect Annotation data, set Peptide, unique Peptide, and PSM counts for Crosslinks and sort
 			
 
 			/////////////////////
 
-			//   Transfer Crosslinks into a list
+			//   Transfer Crosslinks into a list of MergedSearchProteinCrosslinkWrapper
 
 
 
@@ -892,6 +912,8 @@ public class ProteinsMergedCommonPageDownload {
 
 
 			//  Create Merged Crosslink Protein object
+			
+			//     set Peptide, unique Peptide, and PSM counts 
 
 			//  Copy Peptide and PSM annotations to display lists
 
@@ -911,6 +933,11 @@ public class ProteinsMergedCommonPageDownload {
 				
 				Map<SearchDTO, SearchProteinCrosslink> searchProteinCrosslinksMapOnSearchDTOForThisItem = new TreeMap<SearchDTO, SearchProteinCrosslink>();
 
+				int numPsms = 0;
+				
+				Set<Integer> associatedReportedPeptideIdsMergedSet = new HashSet<>();
+				Set<Integer> associatedReportedPeptideIdsRelatedPeptidesUniqueMergedSet = new HashSet<>();
+
 
 				for ( Map.Entry<Integer, SearchProteinCrosslinkWrapper> crosslinksWrapperEntry : searchProteinCrosslinkWrapperWrapperMapOnSearchId.entrySet() ) {
 
@@ -928,9 +955,13 @@ public class ProteinsMergedCommonPageDownload {
 
 					searchesForThisItem.add( searchDTO );
 
-					searchIdsForThisItem.add(searchId);
+					searchIdsForThisItem.add( searchId );
 					
 					SearchProteinCrosslink searchProteinCrosslink = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
+					
+					numPsms += searchProteinCrosslink.getNumPsms();
+					associatedReportedPeptideIdsMergedSet.addAll( searchProteinCrosslink.getAssociatedReportedPeptideIds() );
+					associatedReportedPeptideIdsRelatedPeptidesUniqueMergedSet.addAll( searchProteinCrosslink.getAssociatedReportedPeptideIdsRelatedPeptidesUnique() );
 
 					searchProteinCrosslinksMapOnSearchDTOForThisItem.put(searchDTO, searchProteinCrosslink );
 				}
@@ -959,6 +990,10 @@ public class ProteinsMergedCommonPageDownload {
 				mergedSearchProteinCrosslink.setSearcherCutoffValuesRootLevel( searcherCutoffValuesRootLevel );
 				
 				mergedSearchProteinCrosslink.setSearchProteinCrosslinks( searchProteinCrosslinksMapOnSearchDTOForThisItem );
+				
+				mergedSearchProteinCrosslink.setNumPsms( numPsms );
+				mergedSearchProteinCrosslink.setNumLinkedPeptides( associatedReportedPeptideIdsMergedSet.size() );
+				mergedSearchProteinCrosslink.setNumUniqueLinkedPeptides( associatedReportedPeptideIdsRelatedPeptidesUniqueMergedSet.size() );
 
 
 				//  Copy Peptide and PSM annotations to display lists 
@@ -1132,12 +1167,16 @@ public class ProteinsMergedCommonPageDownload {
 				List<Integer> searchIdsForThisItem = new ArrayList<>( searchesMapOnId.size() );
 
 				Map<SearchDTO, SearchProteinLooplink> searchProteinLooplinksMapOnSearchDTOForThisItem = new TreeMap<>();
+				
+				SearchProteinLooplinkWrapper anySearchProteinLooplinkWrapper = null;
 
 				for ( Map.Entry<Integer, SearchProteinLooplinkWrapper> looplinksWrapperEntry : looplinksWrapperMapOnSearchId.entrySet() ) {
 
 					Integer searchId = looplinksWrapperEntry.getKey();
 					SearchProteinLooplinkWrapper searchProteinLooplinkWrapper = looplinksWrapperEntry.getValue();
 
+					anySearchProteinLooplinkWrapper = searchProteinLooplinkWrapper;
+					
 					SearchDTO searchDTO = searchesMapOnId.get( searchId );
 
 					if ( searchDTO == null ) {
@@ -1157,8 +1196,7 @@ public class ProteinsMergedCommonPageDownload {
 
 				}
 				
-				SearchProteinLooplinkWrapper anySearchProteinLooplinkWrapper = looplinksWrapperMapOnSearchId.entrySet().iterator().next().getValue();
-
+				
 				SearchProteinLooplink anySearchProteinLooplink = anySearchProteinLooplinkWrapper.getSearchProteinLooplink();
 
 				
@@ -1232,6 +1270,8 @@ public class ProteinsMergedCommonPageDownload {
 
 			//  Create Merged Looplink Protein object
 
+			//     set Peptide, unique Peptide, and PSM counts 
+			
 			//  Copy Peptide and PSM annotations to display lists
 
 			for ( MergedSearchProteinLooplinkWrapper mergedSearchProteinLooplinkWrapper : mergedSearchProteinLooplinkWrapperList ) {
@@ -1249,6 +1289,12 @@ public class ProteinsMergedCommonPageDownload {
 
 				Map<SearchDTO, SearchProteinLooplink> searchProteinLooplinksMapOnSearchDTOForThisItem = new TreeMap<>();
 
+				int numPsms = 0;
+				
+				Set<Integer> associatedReportedPeptideIdsMergedSet = new HashSet<>();
+				Set<Integer> associatedReportedPeptideIdsRelatedPeptidesUniqueMergedSet = new HashSet<>();
+
+				
 				for ( Map.Entry<Integer, SearchProteinLooplinkWrapper> looplinksWrapperEntry : searchProteinLooplinkWrapperWrapperMapOnSearchId.entrySet() ) {
 
 					Integer searchId = looplinksWrapperEntry.getKey();
@@ -1265,9 +1311,13 @@ public class ProteinsMergedCommonPageDownload {
 
 					searchesForThisItem.add( searchDTO );
 
-					searchIdsForThisItem.add(searchId);
+					searchIdsForThisItem.add( searchId );
 
 					SearchProteinLooplink searchProteinLooplink = searchProteinLooplinkWrapper.getSearchProteinLooplink();
+
+					numPsms += searchProteinLooplink.getNumPsms();
+					associatedReportedPeptideIdsMergedSet.addAll( searchProteinLooplink.getAssociatedReportedPeptideIds() );
+					associatedReportedPeptideIdsRelatedPeptidesUniqueMergedSet.addAll( searchProteinLooplink.getAssociatedReportedPeptideIdsRelatedPeptidesUnique() );
 
 					searchProteinLooplinksMapOnSearchDTOForThisItem.put(searchDTO, searchProteinLooplink );
 				}
@@ -1291,6 +1341,11 @@ public class ProteinsMergedCommonPageDownload {
 				mergedSearchProteinLooplink.setSearchProteinLooplinks( searchProteinLooplinksMapOnSearchDTOForThisItem );
 
 
+				mergedSearchProteinLooplink.setNumPsms( numPsms );
+				mergedSearchProteinLooplink.setNumPeptides( associatedReportedPeptideIdsMergedSet.size() );
+				mergedSearchProteinLooplink.setNumUniquePeptides( associatedReportedPeptideIdsRelatedPeptidesUniqueMergedSet.size() );
+
+				
 				//  Copy Peptide and PSM annotations to display lists 
 
 				List<AnnValuePeptPsmListsPair> peptidePsmAnnotationValueListsForEachSearch = new ArrayList<>( searchIdsListDeduppedSorted.size() );
@@ -1500,6 +1555,14 @@ public class ProteinsMergedCommonPageDownload {
 				return false;
 			return true;
 		}
+
+		@Override
+		public String toString() {
+			return "CrosslinkPrimaryKey [proteinId_1=" + proteinId_1
+					+ ", proteinId_2=" + proteinId_2 + ", protein_1_Position="
+					+ protein_1_Position + ", protein_2_Position="
+					+ protein_2_Position + "]";
+		}
 	}
 
 
@@ -1556,6 +1619,14 @@ public class ProteinsMergedCommonPageDownload {
 			if (proteinPosition_2 != other.proteinPosition_2)
 				return false;
 			return true;
+		}
+
+
+		@Override
+		public String toString() {
+			return "LooplinkPrimaryKey [proteinId=" + proteinId
+					+ ", proteinPosition_1=" + proteinPosition_1
+					+ ", proteinPosition_2=" + proteinPosition_2 + "]";
 		}
 
 

@@ -20,10 +20,10 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searchers.PsmCountForSearchIdReportedPeptideIdSearcher;
-import org.yeastrc.xlink.searchers.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
+import org.yeastrc.xlink.www.searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
+import org.yeastrc.xlink.www.searcher.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
 
 
 
@@ -526,7 +526,13 @@ public class WebReportedPeptide {
 	public void setLinkType(String linkType) {
 		this.linkType = linkType;
 	}
-	
+
+	public SearchPeptideMonolink getSearchPeptideMonolink() {
+		return searchPeptideMonolink;
+	}
+	public void setSearchPeptideMonolink(SearchPeptideMonolink searchPeptideMonolink) {
+		this.searchPeptideMonolink = searchPeptideMonolink;
+	}
 
 	
 	/////////////////////////////////////////////////
@@ -541,6 +547,8 @@ public class WebReportedPeptide {
 
 	private SearchPeptideUnlink searchPeptideUnlinked;
 	private SearchPeptideDimer searchPeptideDimer;
+	
+	private SearchPeptideMonolink searchPeptideMonolink;
 
 
 	private int searchId = -999;
@@ -600,6 +608,7 @@ public class WebReportedPeptide {
 
 
 	private String linkType;
+
 
 
 

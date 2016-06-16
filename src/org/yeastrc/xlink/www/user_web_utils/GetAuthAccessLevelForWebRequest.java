@@ -14,7 +14,7 @@ import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.cookie_mgmt.main.ProxlDataCookieManagement;
 import org.yeastrc.xlink.www.cookie_mgmt.main.PublicAccessCodeSessionManagement;
-import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;

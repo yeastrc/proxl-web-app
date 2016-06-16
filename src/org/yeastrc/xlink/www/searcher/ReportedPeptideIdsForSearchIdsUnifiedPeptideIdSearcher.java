@@ -34,7 +34,7 @@ public class ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher {
 		ResultSet rs = null;
 		
 		
-		final String sqlMain = " SELECT reported_peptide_id, search_id FROM unified_rp__rep_pept__search__generic_lookup "
+		final String sqlMain = " SELECT reported_peptide_id, search_id FROM unified_rp__search__rep_pept__generic_lookup "
 				 + " WHERE unified_reported_peptide_id = ? AND search_id IN (";
 		
 		final String sqlEnd = ")  ";

@@ -1,9 +1,12 @@
 package org.yeastrc.xlink.www.objects;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -12,11 +15,12 @@ import org.yeastrc.xlink.dao.UnifiedReportedPeptideLookupDAO;
 import org.yeastrc.xlink.dao.UnifiedRepPepDynamicModLookupDAO;
 import org.yeastrc.xlink.dao.UnifiedRepPepMatchedPeptideLookupDAO;
 import org.yeastrc.xlink.dto.PeptideDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepDynamicModLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepMatchedPeptideLookupDTO;
-import org.yeastrc.xlink.www.searcher.MergedSearchProteinSearcher;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.searcher.SearchProteinSearcher;
 import org.yeastrc.xlink.www.web_utils.FormatDynamicModsToString;
 
 
@@ -221,12 +225,13 @@ public class MergedSearchPeptideCrosslink implements IMergedSearchLink {
 		return StringUtils.join( this.getPeptide1ProteinPositions(), ", " );
 	}
 	public List<MergedSearchProteinPosition> getPeptide1ProteinPositions() throws Exception {
+
 		if( this.peptide1ProteinPositions == null ) {
 
-			this.peptide1ProteinPositions = MergedSearchProteinSearcher.getInstance().getProteinPositions( this.getSearches(), this.getPeptide1(), this.peptide1Position);
-
+			this.peptide1ProteinPositions = getCrosslinkPeptideProteinPositions( this.getPeptide1(), this.peptide1Position);
+			
 			//  WAS
-//			this.peptide1ProteinPositions = MergedSearchProteinSearcher.getInstance().getProteinPositions( this.searchCrosslinks.keySet(), this.getPeptide1(), this.peptide1Position);
+//			this.peptide1ProteinPositions = MergedSearchProteinSearcher.getInstance().getProteinPositions( this.getSearches(), this.getPeptide1(), this.peptide1Position);
 		}
 				
 		return peptide1ProteinPositions;
@@ -240,9 +245,7 @@ public class MergedSearchPeptideCrosslink implements IMergedSearchLink {
 		
 		if( this.peptide2ProteinPositions == null ) { 
 			
-			//  TODO  New Implementation
-
-			this.peptide2ProteinPositions = MergedSearchProteinSearcher.getInstance().getProteinPositions( this.getSearches(), this.getPeptide2(), this.peptide2Position);
+			this.peptide2ProteinPositions = getCrosslinkPeptideProteinPositions( this.getPeptide2(), this.peptide2Position);
 
 			// WAS
 //			this.peptide2ProteinPositions = MergedSearchProteinSearcher.getInstance().getProteinPositions( this.searchCrosslinks.keySet(), this.getPeptide2(), this.peptide2Position);
@@ -252,7 +255,124 @@ public class MergedSearchPeptideCrosslink implements IMergedSearchLink {
 	}
 	
 	
+	private List<MergedSearchProteinPosition> getCrosslinkPeptideProteinPositions( PeptideDTO peptide, int position ) throws Exception {
+		
+		try {
 
+			Map<Integer, Map<Integer, MergedSearchProteinPosition>> mergedSearchProteinPosition_MappedOn_ProtIdPos = new HashMap<>();
+
+			for ( SearchDTO search : searches ) {
+
+				Integer reportedPeptideIdForSearchId =
+						reportedPeptideIds_KeyedOnSearchId_Map.get( search.getId() );
+
+				if ( reportedPeptideIdForSearchId == null ) {
+
+					String msg = "reportedPeptideIdForSearchId == null for getCrosslinkPeptideProteinPositions()."
+							+ ", search.getId(): " + search.getId();
+					log.error( msg );
+					throw new ProxlWebappDataException(msg);
+				}
+
+				List<SearchProteinPosition> resultPerSearch =
+						SearchProteinSearcher.getInstance()
+						.getProteinPositions( search, reportedPeptideIdForSearchId, peptide.getId(), position );
+
+				for ( SearchProteinPosition searchProteinPosition : resultPerSearch ) {
+
+					Integer proteinId = searchProteinPosition.getProtein().getNrProtein().getNrseqId();
+					Integer proteinPosition = searchProteinPosition.getPosition();
+
+					//  get MergedSearchProteinPosition for protein id, position
+					
+					
+					Map<Integer, MergedSearchProteinPosition> mergedSearchProteinPosition_MappedOn_Pos = 
+							mergedSearchProteinPosition_MappedOn_ProtIdPos.get( proteinId );
+
+					if ( mergedSearchProteinPosition_MappedOn_Pos == null ) {
+						
+						mergedSearchProteinPosition_MappedOn_Pos = new HashMap<>();
+						mergedSearchProteinPosition_MappedOn_ProtIdPos.put( proteinId, mergedSearchProteinPosition_MappedOn_Pos );
+					}
+
+					MergedSearchProteinPosition mergedSearchProteinPosition = mergedSearchProteinPosition_MappedOn_Pos.get( proteinPosition );
+
+					if ( mergedSearchProteinPosition == null ) {
+						
+						mergedSearchProteinPosition = new MergedSearchProteinPosition();
+						mergedSearchProteinPosition_MappedOn_Pos.put( proteinPosition, mergedSearchProteinPosition );
+						
+						List<SearchDTO> searches = new ArrayList<>();
+						MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searches, searchProteinPosition.getProtein().getNrProtein() );
+						mergedSearchProteinPosition.setProtein( mergedSearchProtein );
+						mergedSearchProteinPosition.setPosition( searchProteinPosition.getPosition() );
+					}
+					
+					//  If search is not in searches, add it
+						
+					Collection<SearchDTO> searches = mergedSearchProteinPosition.getProtein().getSearchs();
+					
+					boolean searchFound = false;
+					
+					for ( SearchDTO searchInSearches : searches ) {
+						
+						if ( search.getId() == searchInSearches.getId() ) {
+							
+							searchFound = true;
+							break;
+						}
+					}
+					
+					if ( ! searchFound ) {
+						
+						searches.add( search );
+					}
+				}
+			}
+			
+			//  Transfer to a list;
+
+			List<MergedSearchProteinPosition> mergedSearchProteinPositionList = new ArrayList<>();
+
+			for ( Map.Entry<Integer, Map<Integer, MergedSearchProteinPosition>> mergedSearchProteinPosition_MappedOn_ProtIdPosEntry :
+				mergedSearchProteinPosition_MappedOn_ProtIdPos.entrySet() ) {
+				
+				for ( Map.Entry<Integer, MergedSearchProteinPosition> mergedSearchProteinPosition_MappedOn_PosEntry :
+					mergedSearchProteinPosition_MappedOn_ProtIdPosEntry.getValue().entrySet() ) {
+					
+					MergedSearchProteinPosition mergedSearchProteinPosition = mergedSearchProteinPosition_MappedOn_PosEntry.getValue();
+					
+					mergedSearchProteinPositionList.add( mergedSearchProteinPosition );
+				}
+			}
+			
+			//  Sort list
+			
+			Collections.sort( mergedSearchProteinPositionList, new Comparator<MergedSearchProteinPosition>() {
+
+				@Override
+				public int compare(MergedSearchProteinPosition o1, MergedSearchProteinPosition o2) {
+					
+					if ( o1.getProtein().getNrProtein().getNrseqId() != o2.getProtein().getNrProtein().getNrseqId() ) {
+						
+						return o1.getProtein().getNrProtein().getNrseqId() - o2.getProtein().getNrProtein().getNrseqId();
+					}
+					
+					return o1.getPosition() - o2.getPosition();
+				}
+			});
+
+			return mergedSearchProteinPositionList;
+
+		} catch ( Exception e ) {
+			
+			String msg = "Exception in populatePeptides(): " + e.toString();
+			log.error( msg, e );
+			
+			throw e;
+		}
+		
+	}
 
 
 
@@ -274,6 +394,18 @@ public class MergedSearchPeptideCrosslink implements IMergedSearchLink {
 	public String getModsStringPeptide2() {
 		return modsStringPeptide2;
 	}
+
+
+
+	public Map<Integer, Integer> getReportedPeptideIds_KeyedOnSearchId_Map() {
+		return reportedPeptideIds_KeyedOnSearchId_Map;
+	}
+
+	public void setReportedPeptideIds_KeyedOnSearchId_Map(
+			Map<Integer, Integer> reportedPeptideIds_KeyedOnSearchId_Map) {
+		this.reportedPeptideIds_KeyedOnSearchId_Map = reportedPeptideIds_KeyedOnSearchId_Map;
+	}
+
 
 
 
@@ -304,6 +436,8 @@ public class MergedSearchPeptideCrosslink implements IMergedSearchLink {
 	
 	private Collection<SearchDTO> searches;
 
+	
+	private Map<Integer, Integer> reportedPeptideIds_KeyedOnSearchId_Map;
 
 	
 }

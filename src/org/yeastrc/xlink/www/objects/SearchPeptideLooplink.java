@@ -4,18 +4,19 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.LooplinkDAO;
 import org.yeastrc.xlink.dao.PeptideDAO;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
-import org.yeastrc.xlink.dto.LooplinkDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searchers.PsmCountForSearchIdReportedPeptideIdSearcher;
-import org.yeastrc.xlink.searchers.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
+import org.yeastrc.xlink.www.searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
+import org.yeastrc.xlink.www.searcher.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
+import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.searcher.SearchProteinSearcher;
 import org.yeastrc.xlink.www.searcher.SearchPsmSearcher;
+import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -27,39 +28,36 @@ public class SearchPeptideLooplink {
 	private static final Logger log = Logger.getLogger(SearchPeptideLooplink.class);
 
 	private void populatePeptides() throws Exception {
-		
-		Integer psmId = getSinglePsmId();
-		
-		
-		if ( psmId == null ) {
-			
-			log.warn( "No PSMs for search.id : " + search.getId() 
-					+ ", this.getReportedPeptideId(): " + this.getReportedPeptideId() );
+
+		if ( populatePeptidesCalled ) {
 			
 			return;
 		}
 		
+		populatePeptidesCalled = true;
+		
 		try {
+			List<SrchRepPeptPeptideDTO> results = 
+					SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
+					.getForSearchIdReportedPeptideId( this.getSearch().getId(), this.getReportedPeptideId() );
 
-			//  Get looplink table entry for first psm.  assume the peptide position is the same for all.
-			
-			LooplinkDTO looplinkDTO = LooplinkDAO.getInstance().getARandomLooplinkDTOForPsmId( psmId );
+			if ( results.size() != 1 ) {
 
-			if ( looplinkDTO == null ) {
-				
 
-				String msg = "looplinkDTO == null for psmId: " + psmId;
+				String msg = "List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " +this.getSearch().getId()
+						+ ", ReportedPeptideId: " + this.getReportedPeptideId() ;
 
 				log.error( msg );
 
-				throw new Exception( msg );
-				
+				throw new ProxlWebappDataException( msg );
 			}
+			
+			SrchRepPeptPeptideDTO result = results.get( 0 );
 
-			int position1 = looplinkDTO.getPeptidePosition1();
-			int position2 = looplinkDTO.getPeptidePosition2();
+			int position1 = result.getPeptidePosition_1();
+			int position2 = result.getPeptidePosition_2();
 
-			PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( looplinkDTO.getPeptideId() );
+			PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( result.getPeptideId() );
 
 			this.setPeptide( peptideDTO );
 
@@ -72,11 +70,6 @@ public class SearchPeptideLooplink {
 			}
 			
 			
-			this.peptideProteinPositions = 
-					SearchProteinSearcher.getInstance().
-					getProteinDoublePositions( psmId, this.getPeptide().getId(), this.getPeptidePosition1(), this.getPeptidePosition2(), this.search );
-
-
 		} catch ( Exception e ) {
 
 			String msg = "Exception in populatePeptides()";
@@ -164,9 +157,10 @@ public class SearchPeptideLooplink {
 		
 		try {
 
-			if( this.peptide == null )
+			if ( peptidePosition1 == -1 ) {
 				populatePeptides();
-
+			}
+			
 			return peptidePosition1;
 
 		} catch ( Exception e ) {
@@ -184,9 +178,10 @@ public class SearchPeptideLooplink {
 	public int getPeptidePosition2() throws Exception {
 		
 		try {
-
-			if( this.peptide == null )
+			if ( peptidePosition2 == -1 ) {
+				
 				populatePeptides();
+			}
 
 			return peptidePosition2;
 
@@ -312,8 +307,14 @@ public class SearchPeptideLooplink {
 		
 		try {
 
-			if( this.peptideProteinPositions == null )
+			if( this.peptideProteinPositions == null ) {
+
 				populatePeptides();
+
+				this.peptideProteinPositions = 
+						SearchProteinSearcher.getInstance().
+						getProteinDoublePositions( this.search, this.getReportedPeptideId(), this.getPeptide().getId(), this.getPeptidePosition1(), this.getPeptidePosition2() );
+			}
 
 			return peptideProteinPositions;
 
@@ -366,7 +367,8 @@ public class SearchPeptideLooplink {
 
 	private ReportedPeptideDTO reportedPeptide;
 	
-	
+	private boolean populatePeptidesCalled = false;
+
 	private PeptideDTO peptide;
 	private int peptidePosition1 = -1;
 	private int peptidePosition2 = -1;

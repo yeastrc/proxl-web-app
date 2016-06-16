@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 //import org.apache.log4j.Logger;
 
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetCutoffPageDisplayRoot;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplayRoot;

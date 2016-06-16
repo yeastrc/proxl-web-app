@@ -4,15 +4,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.PeptideDAO;
-import org.yeastrc.xlink.dto.MonolinkDTO;
+import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searchers.PsmCountForSearchIdReportedPeptideIdSearcher;
-import org.yeastrc.xlink.searchers.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
+import org.yeastrc.xlink.www.searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
+import org.yeastrc.xlink.www.searcher.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.searcher.MonolinkSearcher;
 import org.yeastrc.xlink.www.searcher.SearchPsmSearcher;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,79 +23,49 @@ public class SearchPeptideMonolink {
 	private static final Logger log = Logger.getLogger(SearchPeptideMonolink.class);
 
 
-	private void populatePeptides() throws Exception {
-		
-		Integer psmId = getSinglePsmId();
-		
-		
-		if ( psmId == null ) {
-			
-			log.warn( "No PSMs for search.id : " + search.getId() 
-					+ ", this.getReportedPeptide().getId(): " + this.getReportedPeptide().getId() 
-					+ ", this.getReportedPeptide().getSequence(): " + this.getReportedPeptide().getSequence() );
-			
-			return;
-		}
-		
-		try {
-
-			List<MonolinkDTO> monolinkList = 
-					MonolinkSearcher.getInstance()
-					.getForPsmIdProteinIdProteinPosition( psmId, nrseqProteinId, proteinPosition );
-			
-			if ( monolinkList.isEmpty() ) {
-				
-				String msg = "monolinkList is empty  for psmId: " + psmId 
-						+ ", nrseqProteinId: " + nrseqProteinId
-						+ ", proteinPosition: " + proteinPosition;
-
-				log.error( msg );
-
-				throw new ProxlWebappDataException( msg );
-			}
-			
-
-			if ( monolinkList.size() > 1 ) {
-				
-				MonolinkDTO firstMonolinkDTO = monolinkList.get( 0 );
-				
-				for ( int index = 1; index < monolinkList.size(); index++ ) {
-
-					MonolinkDTO compareMonolinkDTO = monolinkList.get( index );
-					
-					if ( firstMonolinkDTO.getPeptideId() != compareMonolinkDTO.getPeptideId()
-							|| firstMonolinkDTO.getPeptidePosition() != compareMonolinkDTO.getPeptidePosition() ) {
-
-						String msg = "monolinkList has more than one entry and the peptide data don't match for psmId: " + psmId 
-								+ ", nrseqProteinId: " + nrseqProteinId
-								+ ", proteinPosition: " + proteinPosition;
-
-						log.error( msg );
-
-						throw new ProxlWebappDataException( msg );
-					}
-				}
-			}
-
-			MonolinkDTO monolinkDTO = monolinkList.get( 0 );
-
-			int position = monolinkDTO.getPeptidePosition();
-
-			PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( monolinkDTO.getPeptideId() );
-
-			this.setPeptide( peptideDTO );
-
-			this.setPeptidePosition( position );
-
-		} catch ( Exception e ) {
-
-			String msg = "Exception in populatePeptides()";
-
-			log.error( msg, e );
-
-			throw e;
-		}
-	}
+//	private void populatePeptides() throws Exception {
+//
+//		if ( populatePeptidesCalled ) {
+//			
+//			return;
+//		}
+//		
+//		populatePeptidesCalled = true;
+//		
+//		
+//		try {
+//			List<SrchRepPeptPeptideDTO> results = 
+//					SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
+//					.getForSearchIdReportedPeptideId( this.getSearch().getId(), this.getReportedPeptideId() );
+//
+//			if ( results.size() != 1 ) {
+//
+//
+//				String msg = "List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " +this.getSearch().getId()
+//						+ ", ReportedPeptideId: " + this.getReportedPeptideId() ;
+//
+//				log.error( msg );
+//
+//				throw new ProxlWebappDataException( msg );
+//			}
+//			
+//			SrchRepPeptPeptideDTO result = results.get( 0 );
+//
+//			PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( result.getPeptideId() );
+//
+//			this.setPeptide( peptideDTO );
+//
+////			this.setPeptidePosition(  );  //  Peptide Position already set from the srch_rep_pept__nrseq_id_pos_monolink record
+//
+//		} catch ( Exception e ) {
+//
+//			String msg = "Exception in populatePeptides()";
+//
+//			log.error( msg, e );
+//
+//			throw e;
+//		}
+//	}
 	
 	@JsonIgnore // Don't serialize to JSON
 	public SearchDTO getSearch() {
@@ -106,20 +75,47 @@ public class SearchPeptideMonolink {
 		this.search = search;
 	}
 	
-	
-	public ReportedPeptideDTO getReportedPeptide() {
-		return reportedPeptide;
+
+	public ReportedPeptideDTO getReportedPeptide() throws Exception {
+		
+		try {
+			if ( reportedPeptide == null ) {
+
+				reportedPeptide = 
+						ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( reportedPeptideId );
+			}
+
+			return reportedPeptide;
+
+		} catch ( Exception e ) {
+
+			log.error( "getReportedPeptide() Exception: " + e.toString(), e );
+
+			throw e;
+		}
+			
 	}
+
 	public void setReportedPeptide(ReportedPeptideDTO reportedPeptide) {
 		this.reportedPeptide = reportedPeptide;
+		
+		if ( reportedPeptide != null ) {
+			this.reportedPeptideId = reportedPeptide.getId();
+		}
 	}
+	
+	
 	public PeptideDTO getPeptide() throws Exception {
 		
 		try {
 
-			if( this.peptide == null )
-				populatePeptides();
+			if( this.peptide == null ) {
+				
+				PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( this.getPeptideId() );
 
+				this.setPeptide( peptideDTO );
+			}
+			
 			return peptide;
 
 		} catch ( Exception e ) {
@@ -138,8 +134,13 @@ public class SearchPeptideMonolink {
 		
 		try {
 
-			if( this.peptide == null )
-				populatePeptides();
+			if ( peptidePosition == -1 ) {
+				
+				String msg = "Peptide Position Not Set.  Search Id: " + search.getId()
+						+ ", reported peptide id: " + reportedPeptideId;
+				log.error( msg );
+				throw new ProxlWebappDataException(msg);
+			}
 
 			return peptidePosition;
 
@@ -223,7 +224,7 @@ public class SearchPeptideMonolink {
 
 		numPsms = 
 				PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
-				.getPsmCountForSearchIdReportedPeptideId( reportedPeptide.getId(), search.getId(), searcherCutoffValuesSearchLevel );
+				.getPsmCountForSearchIdReportedPeptideId( reportedPeptideId, search.getId(), searcherCutoffValuesSearchLevel );
 
 		numPsmsSet = true;
 
@@ -296,7 +297,28 @@ public class SearchPeptideMonolink {
 	}
 
 
+	public int getReportedPeptideId() {
+		return reportedPeptideId;
+	}
 
+	public void setReportedPeptideId(int reportedPeptideId) {
+		this.reportedPeptideId = reportedPeptideId;
+	}
+
+	public int getPeptideId() {
+		return peptideId;
+	}
+
+	public void setPeptideId(int peptideId) {
+		this.peptideId = peptideId;
+	}
+
+
+//	private boolean populatePeptidesCalled;
+	
+
+	private int reportedPeptideId = -999;
+	private int peptideId = -999;
 	
 	private ReportedPeptideDTO reportedPeptide;
 	private PeptideDTO peptide;
@@ -344,6 +366,7 @@ public class SearchPeptideMonolink {
 	 * Used for display on web page
 	 */
 	private List<String> peptideAnnotationValueList;
+
 
 
 }

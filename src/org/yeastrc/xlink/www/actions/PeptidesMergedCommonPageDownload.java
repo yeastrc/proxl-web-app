@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
@@ -38,6 +38,7 @@ import org.yeastrc.xlink.www.objects.WebMergedReportedPeptideWrapper;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
 import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher;
+import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher.ReturnOnlyReportedPeptidesWithMonolinks;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -254,13 +255,6 @@ public class PeptidesMergedCommonPageDownload {
 				searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
 			}
 			
-//				final List<AnnotationTypeDTO> reportedPeptide_AnnotationTypeDTO_DefaultDisplay_List = 
-//						peptideAnnotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap.get( searchId ).getAnnotationTypeDTOList();
-//
-//				final List<AnnotationTypeDTO> reportedPeptide_AnnotationTypeDTO_SortOrder_List = 
-//						peptideAnnotationTypeDTO_SortOrder_MainMap.get( searchId ).getAnnotationTypeDTOList();
-
-
 			////////////
 			
 			/////   Get annotation type data to sort and display data
@@ -322,7 +316,7 @@ public class PeptidesMergedCommonPageDownload {
 					
 					PeptideWebPageSearcher.getInstance()
 					.searchOnSearchIdPsmCutoffPeptideCutoff( 
-							searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery );
+							searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, ReturnOnlyReportedPeptidesWithMonolinks.NO );
 			
 			
 			
@@ -473,10 +467,18 @@ public class PeptidesMergedCommonPageDownload {
 			List<SearchDTO> searchesForThisItem = new ArrayList<>( searchesMapOnId.size() );
 			List<Integer> searchIdsForThisItem = new ArrayList<>( searchesMapOnId.size() );
 			
+			Map<Integer, Integer> reportedPeptideIds_KeyedOnSearchId_Map = new HashMap<>();
 
 			for ( Map.Entry<Integer, WebReportedPeptideWrapper> webReportedPeptideWrapperEntry : webReportedPeptideWrapperMapOnSearchId.entrySet() ) {
 
+				WebReportedPeptideWrapper webReportedPeptideWrapper = webReportedPeptideWrapperEntry.getValue();
+				WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
+				
 				Integer searchId = webReportedPeptideWrapperEntry.getKey();
+				
+				Integer reportedPeptideId = webReportedPeptide.getReportedPeptideId();
+				
+				reportedPeptideIds_KeyedOnSearchId_Map.put( searchId, reportedPeptideId );
 
 				SearchDTO searchDTO = searchesMapOnId.get( searchId );
 
@@ -510,6 +512,7 @@ public class PeptidesMergedCommonPageDownload {
 				MergedSearchPeptideCrosslink mergedSearchPeptideCrosslink = new MergedSearchPeptideCrosslink();
 				mergedSearchPeptideCrosslink.setUnifiedReportedPeptideId( webMergedReportedPeptideWrapper.getUnifiedReportedPeptideId() );
 				mergedSearchPeptideCrosslink.setSearches( searchesForThisItem );
+				mergedSearchPeptideCrosslink.setReportedPeptideIds_KeyedOnSearchId_Map( reportedPeptideIds_KeyedOnSearchId_Map );
 				
 				webMergedReportedPeptide.setMergedSearchPeptideCrosslink( mergedSearchPeptideCrosslink );
 			
@@ -518,6 +521,7 @@ public class PeptidesMergedCommonPageDownload {
 				MergedSearchPeptideLooplink mergedSearchPeptideLooplink = new MergedSearchPeptideLooplink();
 				mergedSearchPeptideLooplink.setUnifiedReportedPeptideId( webMergedReportedPeptideWrapper.getUnifiedReportedPeptideId() );
 				mergedSearchPeptideLooplink.setSearches( searchesForThisItem );
+				mergedSearchPeptideLooplink.setReportedPeptideIds_KeyedOnSearchId_Map( reportedPeptideIds_KeyedOnSearchId_Map );
 				
 				webMergedReportedPeptide.setMergedSearchPeptideLooplink( mergedSearchPeptideLooplink );
 
@@ -526,6 +530,7 @@ public class PeptidesMergedCommonPageDownload {
 				MergedSearchPeptideDimer mergedSearchPeptideDimer = new MergedSearchPeptideDimer();
 				mergedSearchPeptideDimer.setUnifiedReportedPeptideId( webMergedReportedPeptideWrapper.getUnifiedReportedPeptideId() );
 				mergedSearchPeptideDimer.setSearches( searchesForThisItem );
+				mergedSearchPeptideDimer.setReportedPeptideIds_KeyedOnSearchId_Map( reportedPeptideIds_KeyedOnSearchId_Map );
 				
 				webMergedReportedPeptide.setMergedSearchPeptideDimer( mergedSearchPeptideDimer );
 
@@ -534,7 +539,8 @@ public class PeptidesMergedCommonPageDownload {
 				MergedSearchPeptideUnlinked mergedSearchPeptideUnlinked = new MergedSearchPeptideUnlinked();
 				mergedSearchPeptideUnlinked.setUnifiedReportedPeptideId( webMergedReportedPeptideWrapper.getUnifiedReportedPeptideId() );
 				mergedSearchPeptideUnlinked.setSearches( searchesForThisItem );
-				
+				mergedSearchPeptideUnlinked.setReportedPeptideIds_KeyedOnSearchId_Map( reportedPeptideIds_KeyedOnSearchId_Map );
+
 				webMergedReportedPeptide.setMergedSearchPeptideUnlinked( mergedSearchPeptideUnlinked );
 			}
 

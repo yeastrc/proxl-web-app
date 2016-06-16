@@ -25,8 +25,8 @@ import org.apache.struts.action.ActionMapping;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.yeastrc.xlink.dao.SearchDAO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
@@ -45,8 +45,8 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.objects.ProteinCoverageData;
+import org.yeastrc.xlink.www.protein_coverage.ProteinCoverageCompute;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.ProteinCoverageSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -327,7 +327,7 @@ public class DownloadProteinCoverageReportAction extends Action {
 				
 
 
-				ProteinCoverageSearcher pcs = new ProteinCoverageSearcher();
+				ProteinCoverageCompute pcs = new ProteinCoverageCompute();
 
 				pcs.setExcludedProteinIds( proteinQueryJSONRoot.getExcludeProtein() );
 				pcs.setExcludedTaxonomyIds( proteinQueryJSONRoot.getExcludeTaxonomy() );

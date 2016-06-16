@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.PDBFileDAO;
+import org.yeastrc.xlink.www.dao.PDBFileDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.constants.PDBFileConstants;
 import org.yeastrc.xlink.www.objects.WWWPDBFile;

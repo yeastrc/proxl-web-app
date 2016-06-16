@@ -35,7 +35,7 @@ import org.yeastrc.xlink.www.objects.SearchPeptideCrosslink;
 import org.yeastrc.xlink.www.objects.SearchPeptideCrosslinkAnnDataWrapper;
 import org.yeastrc.xlink.www.objects.SearchPeptideCrosslinkWebserviceResult;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.SearchPeptideCrosslinkSearcher;
+import org.yeastrc.xlink.www.searcher.SearchPeptideCrosslink_LinkedPosition_Searcher;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataDefaultDisplayInDisplayOrder;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataInSortOrder;
@@ -333,12 +333,15 @@ public class ReportedPeptides_Crosslink_Service {
 
 			
 			
-			List<SearchPeptideCrosslinkAnnDataWrapper> searchPeptideCrosslinkList = 
-					SearchPeptideCrosslinkSearcher.getInstance().searchOnSearchProteinCrosslink( 
-							searchId, searcherCutoffValuesSearchLevel, protein1Id, protein2Id, protein1Position, protein2Position );
+//			List<SearchPeptideCrosslinkAnnDataWrapper> searchPeptideCrosslinkList = 
+//					SearchPeptideCrosslinkSearcher.getInstance().searchOnSearchProteinCrosslink( 
+//							searchId, searcherCutoffValuesSearchLevel, protein1Id, protein2Id, protein1Position, protein2Position );
 					
-			
-			
+			List<SearchPeptideCrosslinkAnnDataWrapper> searchPeptideCrosslinkList = 
+					SearchPeptideCrosslink_LinkedPosition_Searcher.getInstance()
+					.searchOnSearchProteinCrosslink( 
+							searchId, searcherCutoffValuesSearchLevel, 
+							protein1Id, protein2Id, protein1Position, protein2Position );
 			
 			
 			GetCrosslinkReportedPeptidesServiceResult getCrosslinkReportedPeptidesServiceResult =

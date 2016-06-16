@@ -2,13 +2,11 @@ package org.yeastrc.xlink.www.objects;
 
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dto.SearchDTO;
-import org.yeastrc.xlink.number_peptides_psms.NumPeptidesPSMsForProteinCriteria;
-import org.yeastrc.xlink.number_peptides_psms.NumPeptidesPSMsForProteinCriteriaResult;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 
 /**
@@ -103,7 +101,13 @@ public class SearchProteinMonolink {
 		try {
 			if( this.numPeptides == -1 ) {
 				
-				populateNumPsmNumPeptideNumUniquePeptide();
+				if ( this.associatedReportedPeptideIds != null ) {
+					
+					this.numPeptides = this.associatedReportedPeptideIds.size();
+
+				} else {
+					populateNumPsmNumPeptideNumUniquePeptide();
+				}
 
 			}
 
@@ -129,8 +133,14 @@ public class SearchProteinMonolink {
 		try {
 			if( this.numUniquePeptides == -1 ) {
 				
+				if ( this.associatedReportedPeptideIdsRelatedPeptidesUnique != null ) {
+					
+					this.numUniquePeptides = this.associatedReportedPeptideIdsRelatedPeptidesUnique.size();
 				
-				populateNumPsmNumPeptideNumUniquePeptide();
+				} else {
+
+					populateNumPsmNumPeptideNumUniquePeptide();
+				}
 				
 			}
 
@@ -152,20 +162,21 @@ public class SearchProteinMonolink {
 	private void populateNumPsmNumPeptideNumUniquePeptide() throws Exception {
 		
 		try {
+			throw new Exception( "Removing calls to NumPeptidesPSMsForProteinCriteria.getNumPeptidesPSMsForMonolink" );
 
-			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
-					NumPeptidesPSMsForProteinCriteria.getInstance()
-					.getNumPeptidesPSMsForMonolink(
-							this.getSearch().getId(),
-							this.getSearcherCutoffValuesSearchLevel(),
-							this.getProtein().getNrProtein().getNrseqId(),
-							this.getProteinPosition(),
-							YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
-			
-			this.numPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
-			this.numUniquePeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
-			
-			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
+//			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+//					NumPeptidesPSMsForProteinCriteria.getInstance()
+//					.getNumPeptidesPSMsForMonolink(
+//							this.getSearch().getId(),
+//							this.getSearcherCutoffValuesSearchLevel(),
+//							this.getProtein().getNrProtein().getNrseqId(),
+//							this.getProteinPosition(),
+//							YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
+//			
+//			this.numPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
+//			this.numUniquePeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
+//			
+//			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
 
 		} catch ( Exception e ) {
 
@@ -192,6 +203,23 @@ public class SearchProteinMonolink {
 			List<String> peptideAnnotationValueList) {
 		this.peptideAnnotationValueList = peptideAnnotationValueList;
 	}
+	
+
+	public Set<Integer> getAssociatedReportedPeptideIds() {
+		return associatedReportedPeptideIds;
+	}
+	public void setAssociatedReportedPeptideIds(
+			Set<Integer> associatedReportedPeptideIds) {
+		this.associatedReportedPeptideIds = associatedReportedPeptideIds;
+	}
+	public Set<Integer> getAssociatedReportedPeptideIdsRelatedPeptidesUnique() {
+		return associatedReportedPeptideIdsRelatedPeptidesUnique;
+	}
+	public void setAssociatedReportedPeptideIdsRelatedPeptidesUnique(
+			Set<Integer> associatedReportedPeptideIdsRelatedPeptidesUnique) {
+		this.associatedReportedPeptideIdsRelatedPeptidesUnique = associatedReportedPeptideIdsRelatedPeptidesUnique;
+	}
+	
 
 	////////////////////////////////////////////////
 	
@@ -238,6 +266,10 @@ public class SearchProteinMonolink {
 	private int numPeptides = -1;
 	private int numUniquePeptides = -1;
 
+
+	private Set<Integer> associatedReportedPeptideIds;
+	private Set<Integer> associatedReportedPeptideIdsRelatedPeptidesUnique;
+
 	
 //	List<SearchPeptideMonolink> peptides;
 	
@@ -256,5 +288,6 @@ public class SearchProteinMonolink {
 	 * Used for display on web page
 	 */
 	private List<String> peptideAnnotationValueList;
+
 
 }

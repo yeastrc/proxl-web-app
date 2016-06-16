@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.database_update_with_transaction_services;
 import java.sql.Connection;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 

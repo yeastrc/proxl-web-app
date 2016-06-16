@@ -1,6 +1,7 @@
 package org.yeastrc.xlink.www.objects;
 
-import org.yeastrc.xlink.dto.PDBFileDTO;
+import org.yeastrc.xlink.www.dto.PDBFileDTO;
+
 
 public class WWWPDBFile {
 

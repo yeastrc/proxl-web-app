@@ -16,14 +16,13 @@ import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.www.constants.DynamicModificationsSelectionConstants;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.objects.SearchPeptideCrosslink;
 import org.yeastrc.xlink.www.objects.SearchPeptideDimer;
 import org.yeastrc.xlink.www.objects.SearchPeptideLooplink;
@@ -48,6 +47,10 @@ public class PeptideWebPageSearcher {
 	public static PeptideWebPageSearcher getInstance() { return _INSTANCE; }
 	
 	
+	public static enum ReturnOnlyReportedPeptidesWithMonolinks {
+		
+		YES, NO
+	}
 	
 	/**
 	 * Should it use the optimization of Peptide and PSM defaults to skip joining the tables with the annotation values?
@@ -75,21 +78,21 @@ public class PeptideWebPageSearcher {
 	private final String SQL_FIRST_PART = 
 			
 
-			"SELECT unified_rp__rep_pept__search__generic_lookup.reported_peptide_id, "
+			"SELECT unified_rp__search__rep_pept__generic_lookup.reported_peptide_id, "
 			
-			+ " unified_rp__rep_pept__search__generic_lookup.unified_reported_peptide_id, "
+			+ " unified_rp__search__rep_pept__generic_lookup.unified_reported_peptide_id, "
 			
 			
-			+ " unified_rp__rep_pept__search__generic_lookup.link_type, "
-			+ " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff, "
-			+ " unified_rp__rep_pept__search__generic_lookup.num_unique_psm_at_default_cutoff ";
+			+ " unified_rp__search__rep_pept__generic_lookup.link_type, "
+			+ " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff, "
+			+ " unified_rp__search__rep_pept__generic_lookup.num_unique_psm_at_default_cutoff ";
 	
 			
 	private final String SQL_MAIN_FROM_START = 			
 			
 			" FROM "
 			
-			+ " unified_rp__rep_pept__search__generic_lookup ";
+			+ " unified_rp__search__rep_pept__generic_lookup ";
 
 
 	private final String SQL_LAST_PART = 
@@ -98,7 +101,7 @@ public class PeptideWebPageSearcher {
 	
 	// Removed since not needed.  
 	// A WARN log message will be written if duplicate reported_peptide_id are found in the result set
-//			" GROUP BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
+//			" GROUP BY unified_rp__search__rep_pept__generic_lookup.reported_peptide_id ";
 
 	
 	
@@ -107,25 +110,25 @@ public class PeptideWebPageSearcher {
 	 */
 	private final String SQL_MAIN_WHERE_START = 
 					
-			" WHERE unified_rp__rep_pept__search__generic_lookup.search_id = ? ";
+			" WHERE unified_rp__search__rep_pept__generic_lookup.search_id = ? ";
 
 
 	//  If Dynamic Mods are selected, one of these three gets added after the main where clause 
 	
 	//  No Mods Only
 	private static final String SQL_NO_MODS_ONLY__MAIN_WHERE_CLAUSE = 
-			" AND  unified_rp__rep_pept__search__generic_lookup.has_dynamic_modifictions  = " 
+			" AND  unified_rp__search__rep_pept__generic_lookup.has_dynamic_modifictions  = " 
 					+ Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE + " ";
 
 	//  Yes Mods Only
 	private static final String SQL_YES_MODS_ONLY_MAIN_WHERE_CLAUSE = 
-			" AND  unified_rp__rep_pept__search__generic_lookup.has_dynamic_modifictions  = " 
+			" AND  unified_rp__search__rep_pept__generic_lookup.has_dynamic_modifictions  = " 
 					+	 Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE + " ";
 
 	private static final String SQL_NO_AND_YES_MODS__MAIN_WHERE_CLAUSE = 
 			" AND ( "
 			// 		 No Mods
-			+ 		"unified_rp__rep_pept__search__generic_lookup.has_dynamic_modifictions  = " 
+			+ 		"unified_rp__search__rep_pept__generic_lookup.has_dynamic_modifictions  = " 
 			+ 		Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE 
 
 			+ 		" OR "
@@ -133,13 +136,20 @@ public class PeptideWebPageSearcher {
 			//  	 Yes Mods: 
 			//				need srch_id_rep_pep_id_for_mod_masses.search_id IS NOT NULL 
 			//				since doing LEFT OUTER JOIN when both Yes and No Mods
-			+ 			" ( unified_rp__rep_pept__search__generic_lookup.has_dynamic_modifictions  = " 
+			+ 			" ( unified_rp__search__rep_pept__generic_lookup.has_dynamic_modifictions  = " 
 			+ 				Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE 
 			+ 				" AND"
 			+ 				" srch_id_rep_pep_id_for_mod_masses.search_id IS NOT NULL "
 			+     		 " ) " 
 			+ " ) ";
 	
+
+	
+
+	//  Yes Monolinks Only
+	private static final String SQL_YES_MOONOLINKS_ONLY_MAIN_WHERE_CLAUSE = 
+			" AND  unified_rp__search__rep_pept__generic_lookup.has_monolinks  = " 
+					+	 Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE + " ";
 
 	
 	
@@ -150,7 +160,7 @@ public class PeptideWebPageSearcher {
 	
 	//  Additional SQL parts
 
-	private static final String SQL_LINK_TYPE_START = "  unified_rp__rep_pept__search__generic_lookup.link_type IN ( ";
+	private static final String SQL_LINK_TYPE_START = "  unified_rp__search__rep_pept__generic_lookup.link_type IN ( ";
 	private static final String SQL_LINK_TYPE_END = " ) ";
 
 
@@ -186,8 +196,8 @@ public class PeptideWebPageSearcher {
 
 	private static final String SQL_DYNAMIC_MOD_JOIN_END = 
 			" ) AS srch_id_rep_pep_id_for_mod_masses "
-			+ " ON unified_rp__rep_pept__search__generic_lookup.search_id = srch_id_rep_pep_id_for_mod_masses.search_id "
-			+ "    AND unified_rp__rep_pept__search__generic_lookup.reported_peptide_id = srch_id_rep_pep_id_for_mod_masses.reported_peptide_id";
+			+ " ON unified_rp__search__rep_pept__generic_lookup.search_id = srch_id_rep_pep_id_for_mod_masses.search_id "
+			+ "    AND unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = srch_id_rep_pep_id_for_mod_masses.reported_peptide_id";
 	
 	
 	
@@ -197,6 +207,7 @@ public class PeptideWebPageSearcher {
 	 * @param searcherCutoffValuesSearchLevel - PSM and Peptide cutoffs for a search id
 	 * @param linkTypes Which link types to include in the results
 	 * @param modMassSelections Which modified masses to include.  Null if include all. element "" means no modifications
+	 * @param returnOnlyReportedPeptidesWithMonolinks - Only return Reported Peptides with Monolinks
 	 * @return
 	 * @throws Exception
 	 */
@@ -204,7 +215,8 @@ public class PeptideWebPageSearcher {
 			SearchDTO search, 
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel, 
 			String[] linkTypes, 
-			String[] modMassSelections ) throws Exception {
+			String[] modMassSelections, 
+			ReturnOnlyReportedPeptidesWithMonolinks returnOnlyReportedPeptidesWithMonolinks ) throws Exception {
 
 		List<WebReportedPeptideWrapper> wrappedLinks = new ArrayList<>();
 		
@@ -390,17 +402,6 @@ public class PeptideWebPageSearcher {
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( "_best_psm_value_for_ann_type_id " );
 
-					sqlSB.append( " , " );
-					
-					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
-					sqlSB.append( Integer.toString( counter ) );
-					sqlSB.append( ".best_psm_value_string_for_ann_type_id " );
-					sqlSB.append( " AS "  );
-					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
-					sqlSB.append( Integer.toString( counter ) );
-					sqlSB.append( "_best_psm_value_string_for_ann_type_id " );
-
-
 				}
 			}
 		}
@@ -477,14 +478,14 @@ public class PeptideWebPageSearcher {
 
 					sqlSB.append( " INNER JOIN " );
 
-					sqlSB.append( " unified_rp__rep_pept__search__best_psm_value_generic_lookup AS " );
+					sqlSB.append( " unified_rp__search__rep_pept__best_psm_value_generic_lookup AS " );
 					
 					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 
 					sqlSB.append( " ON "  );
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.search_id = "  );
+					sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.search_id = "  );
 
 					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
@@ -493,7 +494,7 @@ public class PeptideWebPageSearcher {
 					sqlSB.append( " AND " );
 
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.reported_peptide_id = "  );
+					sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = "  );
 
 					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
@@ -523,7 +524,7 @@ public class PeptideWebPageSearcher {
 
 					sqlSB.append( " ON "  );
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.search_id = "  );
+					sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.search_id = "  );
 
 					sqlSB.append( PEPTIDE_VALUE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
@@ -532,7 +533,7 @@ public class PeptideWebPageSearcher {
 					sqlSB.append( " AND " );
 
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.reported_peptide_id = "  );
+					sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = "  );
 
 					sqlSB.append( PEPTIDE_VALUE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
@@ -722,6 +723,13 @@ public class PeptideWebPageSearcher {
 			sqlSB.append( SQL_YES_MODS_ONLY_MAIN_WHERE_CLAUSE );
 		}
 
+
+		//  add only containing monolinks condition on unified_rep_pep__reported_peptide__search_lookup to main where clause
+		
+		if ( returnOnlyReportedPeptidesWithMonolinks == ReturnOnlyReportedPeptidesWithMonolinks.YES ) {
+		
+			sqlSB.append( SQL_YES_MOONOLINKS_ONLY_MAIN_WHERE_CLAUSE );
+		}
 		
 		
 		// Process PSM Cutoffs for WHERE
@@ -786,7 +794,7 @@ public class PeptideWebPageSearcher {
 				sqlSB.append( " AND " );
 
 
-				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff > 0 " );
+				sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff > 0 " );
 
 				
 			}
@@ -850,7 +858,7 @@ public class PeptideWebPageSearcher {
 				sqlSB.append( " AND " );
 
 
-				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.peptide_meets_default_cutoffs = '" );
+				sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.peptide_meets_default_cutoffs = '" );
 				sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.YES.value() );
 				sqlSB.append( "' " );
 
@@ -885,7 +893,7 @@ public class PeptideWebPageSearcher {
 
 			}
 
-			//   For:   unified_rp__rep_pept__search__generic_lookup.search_id = ? 
+			//   For:   unified_rp__search__rep_pept__generic_lookup.search_id = ? 
 
 			paramCounter++;
 			pstmt.setInt( paramCounter, searchId );
@@ -1261,12 +1269,13 @@ public class PeptideWebPageSearcher {
 			String annotationTypeIdField = PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS + counter + "_annotation_type_id";
 
 			String valueDoubleField = PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS + counter + "_best_psm_value_for_ann_type_id";
-			String valueStringField = PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS + counter + "_best_psm_value_string_for_ann_type_id";
 
 			item.setAnnotationTypeId( rs.getInt( annotationTypeIdField ) );
 
-			item.setValueDouble( rs.getDouble( valueDoubleField ) );
-			item.setValueString( rs.getString( valueStringField ) );
+			double valueDouble = rs.getDouble( valueDoubleField );
+			
+			item.setValueDouble( valueDouble );
+			item.setValueString( Double.toString( valueDouble ) );
 
 			bestPsmAnnotationDTOFromQueryMap.put( item.getAnnotationTypeId(),  item );
 

@@ -18,13 +18,16 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.MonolinkLinkedPositions;
 import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult;
@@ -37,9 +40,6 @@ import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.SearchProteinMonolink;
 import org.yeastrc.xlink.www.objects.SearchProteinMonolinkWrapper;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinCrosslinkSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinLooplinkSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinMonolinkSearcher;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -302,14 +302,29 @@ public class ProteinsService {
 				NRProteinDTO nrProteinDTO_2 = new NRProteinDTO();
 				nrProteinDTO_2.setNrseqId( protein2Id );
 			
+
+				
+//				SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper =
+//						SearchProteinCrosslinkSearcher.getInstance().search( search, 
+//								searcherCutoffValuesSearchLevel, 
+//								nrProteinDTO_1,
+//								nrProteinDTO_2,
+//								protein1Position,
+//								protein2Position
+//								);
+				
 				SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper =
-						SearchProteinCrosslinkSearcher.getInstance().search( search, 
+						CrosslinkLinkedPositions.getInstance()
+						.getSearchProteinCrosslinkWrapperForSearchCutoffsProtIdsPositions(
+								search, 
 								searcherCutoffValuesSearchLevel, 
 								nrProteinDTO_1,
 								nrProteinDTO_2,
 								protein1Position,
 								protein2Position
 								);
+				
+				
 
 				if( searchProteinCrosslinkWrapper != null ) {
 
@@ -657,13 +672,25 @@ public class ProteinsService {
 				NRProteinDTO nrProteinDTO = new NRProteinDTO();
 				nrProteinDTO.setNrseqId( proteinId );
 				
-				SearchProteinLooplinkWrapper searchProteinLooplinkWrapper = SearchProteinLooplinkSearcher.getInstance().search( search, 
-						searcherCutoffValuesSearchLevel, 
-						 nrProteinDTO,
-						 proteinPosition1,
-						 proteinPosition2
-						);
+				
+				
+//				SearchProteinLooplinkWrapper searchProteinLooplinkWrapper = SearchProteinLooplinkSearcher.getInstance().search( search, 
+//						searcherCutoffValuesSearchLevel, 
+//						 nrProteinDTO,
+//						 proteinPosition1,
+//						 proteinPosition2
+//						);
 
+				
+				SearchProteinLooplinkWrapper searchProteinLooplinkWrapper =
+						LooplinkLinkedPositions.getInstance()
+						.getSearchProteinLooplinkWrapperForSearchCutoffsProtIdsPositions(
+								search, 
+								searcherCutoffValuesSearchLevel, 
+								nrProteinDTO,
+								proteinPosition1,
+								proteinPosition2
+								);
 				
 
 				if( searchProteinLooplinkWrapper != null ) {
@@ -1005,8 +1032,17 @@ public class ProteinsService {
 				nrProteinDTO.setNrseqId( proteinId );
 				
 			
+//				SearchProteinMonolinkWrapper searchProteinMonolinkWrapper =
+//						SearchProteinMonolinkSearcher.getInstance().searchOnSearch( search, 
+//								searcherCutoffValuesSearchLevel, 
+//								nrProteinDTO,
+//								proteinPosition
+//								);
+				
 				SearchProteinMonolinkWrapper searchProteinMonolinkWrapper =
-						SearchProteinMonolinkSearcher.getInstance().searchOnSearch( search, 
+						MonolinkLinkedPositions.getInstance()
+						.getSearchProteinMonolinkWrapperForSearchCutoffsProtIdsPositions(
+								search, 
 								searcherCutoffValuesSearchLevel, 
 								nrProteinDTO,
 								proteinPosition

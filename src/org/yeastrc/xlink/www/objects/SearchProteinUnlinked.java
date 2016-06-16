@@ -5,7 +5,7 @@ import java.util.List;
 
 
 //import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 //import org.yeastrc.xlink.searchers.NumPeptidesForProteinCriteriaSearcher;
 //import org.yeastrc.xlink.searchers.NumPsmsForProteinCriteriaSearcher;

@@ -1,4 +1,4 @@
-package org.yeastrc.xlink.www.objects;
+package org.yeastrc.xlink.www.protein_coverage;
 
 import java.util.Set;
 

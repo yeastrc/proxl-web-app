@@ -3,15 +3,10 @@ package org.yeastrc.xlink.www.objects;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dto.SearchDTO;
-import org.yeastrc.xlink.number_peptides_psms.NumMergedPeptidesPSMsForProteinCriteria;
-import org.yeastrc.xlink.number_peptides_psms.NumPeptidesPSMsForProteinCriteriaResult;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
-import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.www.searcher.SearchProteinLooplinkSearcher;
 
 public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSearchLink {
 	
@@ -34,49 +29,62 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 
 
 	public Map<SearchDTO, SearchProteinLooplink> getSearchProteinLooplinks() throws Exception {
-		
-		if ( searchProteinLooplinks == null ) {
 
-			// add search-level info for the protein looplinks:
-			
-			searchProteinLooplinks = new TreeMap<SearchDTO, SearchProteinLooplink>();
-			
+		try {
 
-			for ( SearchDTO search : searches ) {
+			if ( searchProteinLooplinks == null ) {
 
-				int searchId = search.getId(); 
+				throw new Exception( "searchProteinCrosslinks == null, no longer looking up the data" );
 
-				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
+				// add search-level info for the protein looplinks:
+//
+//				searchProteinLooplinks = new TreeMap<SearchDTO, SearchProteinLooplink>();
+//
+//
+//				for ( SearchDTO search : searches ) {
+//
+//					int searchId = search.getId(); 
+//
+//					SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
+//
+//					if ( searcherCutoffValuesSearchLevel == null ) {
+//
+//						String msg = "No searcherCutoffValuesSearchLevel found in searcherCutoffValuesRootLevel for search id: " + searchId;
+//						log.error( msg );
+//						throw new Exception(msg);
+//					}
+//
+//					SearchProteinLooplinkWrapper searchProteinLooplinkWrapper = 
+//							SearchProteinLooplinkSearcher.getInstance().search(
+//									search, 
+//									searcherCutoffValuesSearchLevel, 
+//									this.getProtein().getNrProtein(),
+//									this.getProteinPosition1(),
+//									this.getProteinPosition2()
+//									);
+//
+//					if ( searchProteinLooplinkWrapper != null ) {
+//
+//						SearchProteinLooplink tlink = searchProteinLooplinkWrapper.getSearchProteinLooplink(); 
+//
+//						if( tlink != null ) {
+//							searchProteinLooplinks.put( search, tlink );
+//						}
+//					}
+//				}
 
-				if ( searcherCutoffValuesSearchLevel == null ) {
-
-					String msg = "No searcherCutoffValuesSearchLevel found in searcherCutoffValuesRootLevel for search id: " + searchId;
-					log.error( msg );
-					throw new Exception(msg);
-				}
-
-				SearchProteinLooplinkWrapper searchProteinLooplinkWrapper = 
-						SearchProteinLooplinkSearcher.getInstance().search(
-								search, 
-								searcherCutoffValuesSearchLevel, 
-								this.getProtein().getNrProtein(),
-								this.getProteinPosition1(),
-								this.getProteinPosition2()
-								);
-				
-				if ( searchProteinLooplinkWrapper != null ) {
-
-					SearchProteinLooplink tlink = searchProteinLooplinkWrapper.getSearchProteinLooplink(); 
-
-					if( tlink != null ) {
-						searchProteinLooplinks.put( search, tlink );
-					}
-				}
 			}
-			
+
+			return searchProteinLooplinks;
+
+		} catch (Exception e ) {
+
+			String msg = "Error in getSearchProteinLooplinks(): " + e.toString();
+
+			log.error( msg, e );
+
+			throw e;
 		}
-		
-		return searchProteinLooplinks;
 	}
 
 
@@ -122,12 +130,12 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 	}
 
 	
-	public int getNumUniquePsms() {
-		return numUniquePsms;
-	}
-	public void setNumUniquePsms(int numUniquePsms) {
-		this.numUniquePsms = numUniquePsms;
-	}
+//	public int getNumUniquePsms() {
+//		return numUniquePsms;
+//	}
+//	public void setNumUniquePsms(int numUniquePsms) {
+//		this.numUniquePsms = numUniquePsms;
+//	}
 	
 	
 	public int getNumPeptides() throws Exception {
@@ -176,19 +184,21 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 		
 		try {
 
-			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
-					NumMergedPeptidesPSMsForProteinCriteria.getInstance()
-					.getNumPeptidesPSMsForLooplink(
-							searches,
-							this.getSearcherCutoffValuesRootLevel(),
-							this.getProtein().getNrProtein().getNrseqId(),
-							this.getProteinPosition1(),
-							this.getProteinPosition2() );
-			
-			this.numPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
-			this.numUniquePeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
-			
-			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
+			throw new Exception( "Removing calls to NumMergedPeptidesPSMsForProteinCriteria.getNumPeptidesPSMsForLooplink" );
+
+//			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+//					NumMergedPeptidesPSMsForProteinCriteria.getInstance()
+//					.getNumPeptidesPSMsForLooplink(
+//							searches,
+//							this.getSearcherCutoffValuesRootLevel(),
+//							this.getProtein().getNrProtein().getNrseqId(),
+//							this.getProteinPosition1(),
+//							this.getProteinPosition2() );
+//			
+//			this.numPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
+//			this.numUniquePeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
+//			
+//			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
 
 		} catch ( Exception e ) {
 
@@ -228,6 +238,14 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 		this.peptidePsmAnnotationValueListsForEachSearch = peptidePsmAnnotationValueListsForEachSearch;
 	}
 
+	public void setNumPeptides(int numPeptides) {
+		this.numPeptides = numPeptides;
+	}
+
+	public void setNumUniquePeptides(int numUniquePeptides) {
+		this.numUniquePeptides = numUniquePeptides;
+	}
+
 
 	private List<SearchDTO> searches;
 	
@@ -244,7 +262,7 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 
 
 	private Integer numPsms;
-	private int numUniquePsms;
+//	private int numUniquePsms;
 
 	private int numPeptides = -1;
 	
@@ -255,5 +273,6 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 	 * For web display
 	 */
 	private List<AnnValuePeptPsmListsPair> peptidePsmAnnotationValueListsForEachSearch;
+
 
 }

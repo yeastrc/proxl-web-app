@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.objects;
 
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 
 public class SearchBooleanWrapper {
 

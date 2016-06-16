@@ -21,19 +21,11 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.spectrum.common.dto.Peak;
 import org.yeastrc.xlink.base.spectrum.common.utils.StringToPeaks;
-import org.yeastrc.xlink.dao.CrosslinkDAO;
-import org.yeastrc.xlink.dao.DynamicModDAO;
-import org.yeastrc.xlink.dao.LooplinkDAO;
-import org.yeastrc.xlink.dao.MatchedPeptideDAO;
 import org.yeastrc.xlink.dao.PeptideDAO;
-import org.yeastrc.xlink.dao.PsmDAO;
+import org.yeastrc.xlink.www.dao.PsmDAO;
 import org.yeastrc.xlink.dao.ScanDAO;
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.dao.StaticModDAO;
-import org.yeastrc.xlink.dto.CrosslinkDTO;
-import org.yeastrc.xlink.dto.DynamicModDTO;
-import org.yeastrc.xlink.dto.LooplinkDTO;
-import org.yeastrc.xlink.dto.MatchedPeptideDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.ScanDTO;
@@ -50,7 +42,13 @@ import org.yeastrc.xlink.www.lorikeet_dto.LorikeetStaticMod;
 import org.yeastrc.xlink.www.lorikeet_dto.LorikeetVariableMod;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
+import org.yeastrc.xlink.www.dto.SrchRepPeptPeptDynamicModDTO;
+import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.SearchReportedPeptideLinkTypeSearcher;
+import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
+import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -371,23 +369,33 @@ public class LorikeetSpectrumService {
 	        lorikeetRootData.setStaticMods( staticModsLorikeet );
 	        
 	        
+	        Integer linkTypeNumber =
+	        		SearchReportedPeptideLinkTypeSearcher.getInstance()
+	        		.getSearchReportedPeptideLinkTypeNumber( searchId, psmDTO.getReportedPeptideId() );
 	        
+	        if ( linkTypeNumber == null ) {
+	        	
+	        	String msg = "Failed to get linkTypeNumber for searchId: " + searchId
+	        			+ ", reportedPeptideId: " + psmDTO.getReportedPeptideId() ;
+	        	log.error( msg );
+	        	throw new ProxlWebappDataException(msg);
+	        }
 	        
         	
-        	if ( psmDTO.getType() == XLinkUtils.TYPE_CROSSLINK ) {
+        	if ( linkTypeNumber == XLinkUtils.TYPE_CROSSLINK ) {
         		
         		LorikeetCrossLinkData lorikeetCrossLinkData = getCrossLinkData( psmDTO );
         		
         		lorikeetRootData.setCrossLinkDataInputFormat( lorikeetCrossLinkData );
         		
-        	} else if ( psmDTO.getType() == XLinkUtils.TYPE_LOOPLINK ) {
+        	} else if ( linkTypeNumber == XLinkUtils.TYPE_LOOPLINK ) {
         		
         		LorikeetLoopLinkData lorikeetLoopLinkData = getLoopLinkData( psmDTO );
         		
         		lorikeetRootData.setLoopLinkDataInputFormat( lorikeetLoopLinkData );
         	
 
-        	} else if ( psmDTO.getType() == XLinkUtils.TYPE_UNLINKED ) {  //  Monolink is also unlinked on the psm
+        	} else if ( linkTypeNumber == XLinkUtils.TYPE_UNLINKED ) {  //  Monolink is also unlinked on the psm
         		
         		LorikeetPerPeptideData lorikeetPerPeptideData = getUnlinkData( psmDTO );
         		
@@ -395,7 +403,7 @@ public class LorikeetSpectrumService {
         		lorikeetRootData.setVariableMods( lorikeetPerPeptideData.getVariableMods() );
         		
 
-        	} else if ( psmDTO.getType() == XLinkUtils.TYPE_DIMER ) {  
+        	} else if ( linkTypeNumber == XLinkUtils.TYPE_DIMER ) {  
         		
 
         		LorikeetDimerData dimerDataInputFormat = getDimerData( psmDTO );
@@ -404,7 +412,7 @@ public class LorikeetSpectrumService {
         		
         	} else {
         		
-        		String msg = "psmDTO.getType() is other than Unlinked, Cross Link or Loop Link.  psmDTO.getType(): " + psmDTO.getType();
+        		String msg = "linkTypeNumber is other than Unlinked, Cross Link or Loop Link.  linkTypeNumber: " + linkTypeNumber;
         		
         		log.error( msg );
         		throw new Exception(msg);
@@ -444,20 +452,31 @@ public class LorikeetSpectrumService {
 		
 		LorikeetCrossLinkData lorikeetCrossLinkData = new LorikeetCrossLinkData();
 		
-		int psmId = psmDTO.getId();
+		lorikeetCrossLinkData.setLinkerMass(  psmDTO.getLinkerMass() );
 		
-		CrosslinkDTO crosslinkDTO = CrosslinkDAO.getInstance().getARandomCrosslinkDTOForPsmId( psmId );
-		
-		
-		lorikeetCrossLinkData.setCrossLinkPos1( crosslinkDTO.getPeptide1Position() );
-		lorikeetCrossLinkData.setCrossLinkPos2( crosslinkDTO.getPeptide2Position() );
+		List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = 
+				SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
+				.getForSearchIdReportedPeptideId( psmDTO.getSearchId(), psmDTO.getReportedPeptideId() );
+				
 
-		lorikeetCrossLinkData.setLinkerMass(  crosslinkDTO.getLinkerMass() );
+		if ( srchRepPeptPeptideDTOList.size() != 2 ) {
+
+			String msg = "List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + psmDTO.getSearchId()
+					+ ", ReportedPeptideId: " + psmDTO.getReportedPeptideId() ;
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
+		}
 		
-		LorikeetPerPeptideData peptideData1 = getLorikeetPerPeptideData( crosslinkDTO.getPeptide1MatchedPeptideId(), psmId );
+		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO_1 = srchRepPeptPeptideDTOList.get( 0 );
+		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO_2 = srchRepPeptPeptideDTOList.get( 1 );
+		
+		lorikeetCrossLinkData.setCrossLinkPos1( srchRepPeptPeptideDTO_1.getPeptidePosition_1() );
+		lorikeetCrossLinkData.setCrossLinkPos2( srchRepPeptPeptideDTO_2.getPeptidePosition_1() );
+
+		LorikeetPerPeptideData peptideData1 = getLorikeetPerPeptideData( srchRepPeptPeptideDTO_1 );
 		lorikeetCrossLinkData.setPeptideData1( peptideData1 );
 
-		LorikeetPerPeptideData peptideData2 = getLorikeetPerPeptideData( crosslinkDTO.getPeptide2MatchedPeptideId(), psmId );
+		LorikeetPerPeptideData peptideData2 = getLorikeetPerPeptideData( srchRepPeptPeptideDTO_2 );
 		lorikeetCrossLinkData.setPeptideData2( peptideData2 );
 
 		return lorikeetCrossLinkData;
@@ -474,34 +493,26 @@ public class LorikeetSpectrumService {
 		
 		LorikeetDimerData lorikeetDimerData = new LorikeetDimerData();
 		
-		int psmId = psmDTO.getId();
-		
-//		DimerDTO dimerDTO = DimerDAO.getInstance().getDimerDTOByPsmId( psmId );
-		
-		List<MatchedPeptideDTO> matchedPeptideDTOList = MatchedPeptideDAO.getInstance().getMatchedPeptideDTOForPsmId( psmId );
-		
-		if ( matchedPeptideDTOList.size() != 2 ) {
-			
-			String msg = "Dimer requires 2 entries in MatchedPeptide table, number of records found: " + matchedPeptideDTOList.size()
-					+ ", psmId = " + psmId;
-			
+		List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = 
+				SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
+				.getForSearchIdReportedPeptideId( psmDTO.getSearchId(), psmDTO.getReportedPeptideId() );
+
+		if ( srchRepPeptPeptideDTOList.size() != 2 ) {
+
+			String msg = "List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + psmDTO.getSearchId()
+					+ ", ReportedPeptideId: " + psmDTO.getReportedPeptideId() ;
 			log.error( msg );
-			
-			throw new Exception( msg );
+			throw new ProxlWebappDataException( msg );
 		}
 		
-		MatchedPeptideDTO matchedPeptideDTO_1 = matchedPeptideDTOList.get( 0 );
-		MatchedPeptideDTO matchedPeptideDTO_2 = matchedPeptideDTOList.get( 1 );
-		
-		int matchedPeptideId_1 = matchedPeptideDTO_1.getId();
-		int matchedPeptideId_2 = matchedPeptideDTO_2.getId();
+		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO_1 = srchRepPeptPeptideDTOList.get( 0 );
+		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO_2 = srchRepPeptPeptideDTOList.get( 1 );
 		
 		
-		
-		LorikeetPerPeptideData peptideData1 = getLorikeetPerPeptideData( matchedPeptideId_1, psmId );
+		LorikeetPerPeptideData peptideData1 = getLorikeetPerPeptideData( srchRepPeptPeptideDTO_1 );
 		lorikeetDimerData.setPeptideData1( peptideData1 );
 
-		LorikeetPerPeptideData peptideData2 = getLorikeetPerPeptideData( matchedPeptideId_2, psmId );
+		LorikeetPerPeptideData peptideData2 = getLorikeetPerPeptideData( srchRepPeptPeptideDTO_2 );
 		lorikeetDimerData.setPeptideData2( peptideData2 );
 
 		return lorikeetDimerData;
@@ -516,34 +527,27 @@ public class LorikeetSpectrumService {
 	private LorikeetLoopLinkData getLoopLinkData( PsmDTO psmDTO ) throws Exception {
 		
 		LorikeetLoopLinkData lorikeetLoopLinkData = new LorikeetLoopLinkData();
-		
-		int psmId = psmDTO.getId();
-		
-		LooplinkDTO looplinkDTO = LooplinkDAO.getInstance().getARandomLooplinkDTOForPsmId( psmId );
-		
-		
-		lorikeetLoopLinkData.setLoopLinkPos1( looplinkDTO.getPeptidePosition1() );
-		lorikeetLoopLinkData.setLoopLinkPos2( looplinkDTO.getPeptidePosition2() );
 
-		lorikeetLoopLinkData.setLinkerMass(  looplinkDTO.getLinkerMass() );
+		lorikeetLoopLinkData.setLinkerMass(  psmDTO.getLinkerMass() );
 		
-		List<MatchedPeptideDTO> matchedPeptideDTOList = MatchedPeptideDAO.getInstance().getMatchedPeptideDTOForPsmId( psmId );
-		
-		if ( matchedPeptideDTOList.isEmpty() ) {
-			String msg = "getLoopLinkData(...): Unable to find matched peptide record for psmId: " + psmId;
+		List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = 
+				SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
+				.getForSearchIdReportedPeptideId( psmDTO.getSearchId(), psmDTO.getReportedPeptideId() );
+				
+		if ( srchRepPeptPeptideDTOList.size() != 1 ) {
+
+			String msg = "List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " + psmDTO.getSearchId()
+					+ ", ReportedPeptideId: " + psmDTO.getReportedPeptideId() ;
 			log.error( msg );
-			throw new Exception(msg);
+			throw new ProxlWebappDataException( msg );
 		}
 		
-		if ( matchedPeptideDTOList.size() > 1 ) {
-			String msg = "getLoopLinkData(...): Found more than one matched peptide record for Loop Link using psmId: " + psmId;
-			log.error( msg );
-			throw new Exception(msg);
-		}
-
-		MatchedPeptideDTO matchedPeptideDTO = matchedPeptideDTOList.get( 0 );
+		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO = srchRepPeptPeptideDTOList.get( 0 );
 		
-		LorikeetPerPeptideData peptideData = getLorikeetPerPeptideData( matchedPeptideDTO.getId(), psmId );
+		lorikeetLoopLinkData.setLoopLinkPos1( srchRepPeptPeptideDTO.getPeptidePosition_1() );
+		lorikeetLoopLinkData.setLoopLinkPos2( srchRepPeptPeptideDTO.getPeptidePosition_2() );
+
+		LorikeetPerPeptideData peptideData = getLorikeetPerPeptideData( srchRepPeptPeptideDTO );
 		lorikeetLoopLinkData.setPeptideData( peptideData );
 
 		return lorikeetLoopLinkData;
@@ -556,53 +560,24 @@ public class LorikeetSpectrumService {
 	 * @throws Exception
 	 */
 	private LorikeetPerPeptideData getUnlinkData( PsmDTO psmDTO ) throws Exception {
-		
-		int psmId = psmDTO.getId();
-		
-		List<MatchedPeptideDTO> matchedPeptideDTOList = MatchedPeptideDAO.getInstance().getMatchedPeptideDTOForPsmId( psmId );
-		
-		if ( matchedPeptideDTOList.isEmpty() ) {
-			String msg = "getUnlinkData(...): Unable to find matched peptide record for psmId: " + psmId;
-			log.error( msg );
-			throw new Exception(msg);
-		}
-		
-		if ( matchedPeptideDTOList.size() > 1 ) {
-			String msg = "getUnlinkData(...): Found more than one matched peptide record for Unlinked Link using psmId: " + psmId;
-			log.error( msg );
-			throw new Exception(msg);
-		}
 
-		MatchedPeptideDTO matchedPeptideDTO = matchedPeptideDTOList.get( 0 );
+		List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = 
+				SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
+				.getForSearchIdReportedPeptideId( psmDTO.getSearchId(), psmDTO.getReportedPeptideId() );
+				
+		if ( srchRepPeptPeptideDTOList.size() != 1 ) {
+
+			String msg = "List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " + psmDTO.getSearchId()
+					+ ", ReportedPeptideId: " + psmDTO.getReportedPeptideId() ;
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
+		}
 		
-		LorikeetPerPeptideData peptideData = getLorikeetPerPeptideData( matchedPeptideDTO.getId(), psmId );
+		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO = srchRepPeptPeptideDTOList.get( 0 );
+		
+		LorikeetPerPeptideData peptideData = getLorikeetPerPeptideData( srchRepPeptPeptideDTO );
 
 		return peptideData;
-	}
-	
-	
-	
-	
-	/**
-	 * @param matchedPeptideId
-	 * @return
-	 * @throws Exception
-	 */
-	private LorikeetPerPeptideData getLorikeetPerPeptideData( int matchedPeptideId, int psmId ) throws Exception {
-		
-		
-		MatchedPeptideDTO matchedPeptideDTO = MatchedPeptideDAO.getInstance().getMatchedPeptideDTOForId( matchedPeptideId );
-
-		if ( matchedPeptideDTO == null ) {
-			
-			String msg = "Unable to find matchedPeptideDTO for matchedPeptideId: " + matchedPeptideId + ", psmId: " + psmId;
-			log.error( msg );
-			throw new Exception(msg);
-		}
-		
-		LorikeetPerPeptideData lorikeetPerPeptideData = getLorikeetPerPeptideData( matchedPeptideDTO );
-		
-		return lorikeetPerPeptideData;
 	}
 	
 	
@@ -614,17 +589,16 @@ public class LorikeetSpectrumService {
 	 * @return
 	 * @throws Exception
 	 */
-	private LorikeetPerPeptideData getLorikeetPerPeptideData( MatchedPeptideDTO matchedPeptideDTO ) throws Exception {
+	private LorikeetPerPeptideData getLorikeetPerPeptideData( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO ) throws Exception {
 		
 		LorikeetPerPeptideData lorikeetPerPeptideData = new LorikeetPerPeptideData();
 
-		int peptideId = matchedPeptideDTO.getPeptide_id();
+		int peptideId = srchRepPeptPeptideDTO.getPeptideId();
 
-		List<DynamicModDTO> dynamicModResults = null;
-
-		dynamicModResults = 
-				DynamicModDAO.getInstance().getDynamicModDTOForMatchedPeptideId( matchedPeptideDTO.getId() );
-
+		List<SrchRepPeptPeptDynamicModDTO> dynamicModList = 
+				SrchRepPeptPeptDynamicModSearcher.getInstance()
+				.getSrchRepPeptPeptDynamicModForSrchRepPeptPeptideId( srchRepPeptPeptideDTO.getId() );
+		
 		// Load our peptide
 
 		PeptideDTO peptide = PeptideDAO.getInstance().getPeptideDTOFromDatabase( peptideId );
@@ -644,19 +618,19 @@ public class LorikeetSpectrumService {
 
 		String sequence = peptide.getSequence();
 
-        List<LorikeetVariableMod> variableMods = new ArrayList<>( dynamicModResults.size() );
+        List<LorikeetVariableMod> variableMods = new ArrayList<>( dynamicModList.size() );
         
-        for ( DynamicModDTO dynamicModDTO : dynamicModResults ) {
+        for ( SrchRepPeptPeptDynamicModDTO dynamicMod : dynamicModList ) {
         	
-        	int dynamicModPosition = dynamicModDTO.getPosition();
+        	int dynamicModPosition = dynamicMod.getPosition();
         	
         	String aminoAcid = sequence.substring( dynamicModPosition - 1 /* chg to zero based */, dynamicModPosition );
 
         	
         	LorikeetVariableMod lorikeetVariableMod = new LorikeetVariableMod();
         	
-        	lorikeetVariableMod.setIndex( dynamicModDTO.getPosition() );
-        	lorikeetVariableMod.setModMass( dynamicModDTO.getMass() );
+        	lorikeetVariableMod.setIndex( dynamicMod.getPosition() );
+        	lorikeetVariableMod.setModMass( dynamicMod.getMass() );
         	lorikeetVariableMod.setAminoAcid( aminoAcid );
         	
         	variableMods.add( lorikeetVariableMod );

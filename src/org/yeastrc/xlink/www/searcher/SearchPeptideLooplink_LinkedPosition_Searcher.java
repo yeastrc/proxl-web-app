@@ -12,34 +12,38 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.ReportedPeptideDAO;
-import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.XLinkUtils;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.objects.SearchPeptideLooplink;
 import org.yeastrc.xlink.www.objects.SearchPeptideLooplinkAnnDataWrapper;
 
 
 
-public class SearchPeptideLooplinkSearcher {
+/**
+ * Version of SearchPeptideLooplinkSearcher for Linked Position tables
+ *
+ */
+public class SearchPeptideLooplink_LinkedPosition_Searcher {
 	
-	private static final Logger log = Logger.getLogger( SearchPeptideLooplinkSearcher.class );
+	private static final Logger log = Logger.getLogger( SearchPeptideLooplink_LinkedPosition_Searcher.class );
 
-	private SearchPeptideLooplinkSearcher() { }
-	private static final SearchPeptideLooplinkSearcher _INSTANCE = new SearchPeptideLooplinkSearcher();
-	public static SearchPeptideLooplinkSearcher getInstance() { return _INSTANCE; }
+	private SearchPeptideLooplink_LinkedPosition_Searcher() { }
+	private static final SearchPeptideLooplink_LinkedPosition_Searcher _INSTANCE = new SearchPeptideLooplink_LinkedPosition_Searcher();
+	public static SearchPeptideLooplink_LinkedPosition_Searcher getInstance() { return _INSTANCE; }
 	
 
+	
 	/**
 	 * Should it use the optimization of Peptide and PSM defaults to skip joining the tables with the annotation values?
 	 */
@@ -57,51 +61,55 @@ public class SearchPeptideLooplinkSearcher {
 	
 	
 	
-	
 
 	private final String PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS = "psm_best_value_tbl_";
+
+	private final String PEPTIDE_FILTER_TABLE_ALIAS = "pept_value_tbl_";
 	
 	
+	
+
 
 	private final String SQL_FIRST_PART = 
-
-			//  Do not put a SUM(...) in this SQL in the SELECT 
-			//  since there may be more than one looplink record per psm 
-			//  for the given protein id and positions
-
-
-			"SELECT unified_rp__rep_pept__search__generic_lookup.reported_peptide_id, "
 			
-			+ " unified_rp__rep_pept__search__generic_lookup.link_type, "
-			+ " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff ";
-	
+			"SELECT unified_rp__search__rep_pept__generic_lookup.reported_peptide_id, "
+			
+			+ " unified_rp__search__rep_pept__generic_lookup.link_type, "
+			+ " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff ";
 
 	private final String SQL_MAIN_FROM_START = 
-
+			
 			" FROM "
+			
+			+ " srch_rep_pept__nrseq_id_pos_looplink AS srpnipl "
 
-			+ " unified_rp__rep_pept__search__generic_lookup "
-
-			+ " INNER JOIN looplink ON unified_rp__rep_pept__search__generic_lookup.sample_psm_id = looplink.psm_id";
+			+ " INNER JOIN unified_rp__search__rep_pept__generic_lookup "
+			+ 	" ON srpnipl.search_id = unified_rp__search__rep_pept__generic_lookup.search_id "
+			+ 		" AND srpnipl.reported_peptide_id "
+			+ 			" = unified_rp__search__rep_pept__generic_lookup.reported_peptide_id ";
 
 
 	private final String SQL_MAIN_WHERE_START = 
 					
-			" WHERE unified_rp__rep_pept__search__generic_lookup.search_id = ? "
-			+ " AND unified_rp__rep_pept__search__generic_lookup.link_type = '" + XLinkUtils.LOOP_TYPE_STRING + "' "
-			+ " AND looplink.nrseq_id = ?  "
-			+ " AND looplink.protein_position_1 = ? AND looplink.protein_position_2 = ?  ";
+			" WHERE unified_rp__search__rep_pept__generic_lookup.search_id = ? "
+			+ " AND unified_rp__search__rep_pept__generic_lookup.link_type = '" + XLinkUtils.LOOP_TYPE_STRING + "' "
+			+ " AND srpnipl.nrseq_id = ? AND srpnipl.nrseq_position_1 = ? "
+			+ " AND srpnipl.nrseq_position_2 = ?  ";
 
 	
 	private final String SQL_LAST_PART = 
 
 			"";
+			
 	// Removed since not needed.  
 	// A WARN log message will be written if duplicate reported_peptide_id are found in the result set
 
-//			" GROUP BY unified_rp__rep_pept__search__generic_lookup.reported_peptide_id ";
+//			" GROUP BY unified_rp__search__rep_pept__generic_lookup.reported_peptide_id ";
 
 			// Sort in Java	
+	
+	
+	
 	
 	
 	/**
@@ -123,17 +131,17 @@ public class SearchPeptideLooplinkSearcher {
 			int proteinPosition2
 			
 			) throws Exception {
+	
 		
 		List<SearchPeptideLooplinkAnnDataWrapper> wrappedLinks = new ArrayList<>();
 
-		
-		
+
 		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
 				searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
 		
 		List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesList = 
 				searcherCutoffValuesSearchLevel.getPsmPerAnnotationCutoffsList();
-
+		
 
 		//  If null, create empty lists
 		
@@ -146,6 +154,7 @@ public class SearchPeptideLooplinkSearcher {
 			
 			psmCutoffValuesList = new ArrayList<>();
 		}
+
 
 
 		List<AnnotationTypeDTO> peptideCutoffsAnnotationTypeDTOList = new ArrayList<>( psmCutoffValuesList.size() );
@@ -219,7 +228,6 @@ public class SearchPeptideLooplinkSearcher {
 		}		
 		
 		
-		
 
 		//////////////////////
 		
@@ -235,8 +243,8 @@ public class SearchPeptideLooplinkSearcher {
 
 		sqlSB.append( SQL_FIRST_PART );
 		
-		
 
+		
 		///////   Add fields to result from best PSM annotation values
 		
 		{
@@ -275,29 +283,50 @@ public class SearchPeptideLooplinkSearcher {
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( "_best_psm_value_for_ann_type_id " );
 
-					sqlSB.append( " , " );
-					
-					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
-					sqlSB.append( Integer.toString( counter ) );
-					sqlSB.append( ".best_psm_value_string_for_ann_type_id " );
-					sqlSB.append( " AS "  );
-					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
-					sqlSB.append( Integer.toString( counter ) );
-					sqlSB.append( "_best_psm_value_string_for_ann_type_id " );
-
-
 				}
+			}
+			
+
+			//  Add Field retrieval for each Peptide cutoff
+
+			for ( int counter = 1; counter <= peptideCutoffValuesList.size(); counter++ ) {
+				
+				sqlSB.append( " , " );
+
+				sqlSB.append( PEPTIDE_FILTER_TABLE_ALIAS );
+				sqlSB.append( Integer.toString( counter ) );
+				sqlSB.append( ".annotation_type_id " );
+				sqlSB.append( " AS "  );
+				sqlSB.append( PEPTIDE_FILTER_TABLE_ALIAS );
+				sqlSB.append( Integer.toString( counter ) );
+				sqlSB.append( "_annotation_type_id " );
+
+				sqlSB.append( " , " );
+				
+				sqlSB.append( PEPTIDE_FILTER_TABLE_ALIAS );
+				sqlSB.append( Integer.toString( counter ) );
+				sqlSB.append( ".peptide_value_for_ann_type_id " );
+				sqlSB.append( " AS "  );
+				sqlSB.append( PEPTIDE_FILTER_TABLE_ALIAS );
+				sqlSB.append( Integer.toString( counter ) );
+				sqlSB.append( "_peptide_value_for_ann_type_id " );
+
 			}
 		}
 		
 		
 		
 		
-
+		
+		
 		sqlSB.append( SQL_MAIN_FROM_START );
 		
-
+		
+		
 		{
+			
+
+			
 			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
 					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 
@@ -311,23 +340,24 @@ public class SearchPeptideLooplinkSearcher {
 
 					sqlSB.append( " INNER JOIN " );
 					
-					sqlSB.append( " unified_rp__rep_pept__search__best_psm_value_generic_lookup AS psm_best_value_tbl_" );
+					sqlSB.append( " unified_rp__search__rep_pept__best_psm_value_generic_lookup AS " );
+					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 
 					sqlSB.append( " ON "  );
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.search_id = "  );
+					sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.search_id = "  );
 
-					sqlSB.append( "psm_best_value_tbl_" );
+					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( ".search_id" );
 
 					sqlSB.append( " AND " );
 
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.reported_peptide_id = "  );
+					sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = "  );
 
-					sqlSB.append( "psm_best_value_tbl_" );
+					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( ".reported_peptide_id" );
 
@@ -337,6 +367,8 @@ public class SearchPeptideLooplinkSearcher {
 		
 		
 		{
+			
+
 			
 			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
 					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
@@ -351,14 +383,15 @@ public class SearchPeptideLooplinkSearcher {
 
 					sqlSB.append( " INNER JOIN " );
 			
-					sqlSB.append( " unified_rp__rep_pept__search__peptide_fltbl_value_generic_lookup AS pept_value_tbl_" );
+					sqlSB.append( " unified_rp__search_reported_peptide_fltbl_value_generic_lookup AS " );
+					sqlSB.append( PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 
 					sqlSB.append( " ON "  );
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.search_id = "  );
+					sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.search_id = "  );
 
-					sqlSB.append( "pept_value_tbl_" );
+					sqlSB.append( PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( ".search_id" );
 
@@ -366,9 +399,9 @@ public class SearchPeptideLooplinkSearcher {
 
 
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.reported_peptide_id = "  );
+					sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = "  );
 
-					sqlSB.append( "pept_value_tbl_" );
+					sqlSB.append( PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( ".reported_peptide_id" );
 
@@ -377,6 +410,9 @@ public class SearchPeptideLooplinkSearcher {
 		}
 		
 
+		
+		
+		
 		//////////
 		
 		sqlSB.append( SQL_MAIN_WHERE_START );
@@ -389,11 +425,14 @@ public class SearchPeptideLooplinkSearcher {
 
 		{
 			
+
+			
 			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
 					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 
 				
 				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
+
 
 				int counter = 0; 
 
@@ -409,15 +448,15 @@ public class SearchPeptideLooplinkSearcher {
 					sqlSB.append( " ( " );
 
 
-					sqlSB.append( "psm_best_value_tbl_" );
+					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( ".search_id = ? AND " );
 
-					sqlSB.append( "psm_best_value_tbl_" );
+					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( ".annotation_type_id = ? AND " );
 
-					sqlSB.append( "psm_best_value_tbl_" );
+					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( ".best_psm_value_for_ann_type_id " );
 
@@ -436,25 +475,29 @@ public class SearchPeptideLooplinkSearcher {
 
 					sqlSB.append( " ) " );
 				}
-				
+
 			} else {
+
+				//   Only Default PSM Cutoffs chosen so criteria simply the Peptides where the PSM count for the default cutoffs is > zero
+				
 
 				sqlSB.append( " AND " );
 
 
-				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff > 0 " );
+				sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff > 0 " );
 
-
-			}
+				
+			} 
 		}
 		
 		//  Process Peptide Cutoffs for WHERE
 
 		{
 
-
 			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
 					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
+
+				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
 
 				int counter = 0; 
 
@@ -469,15 +512,15 @@ public class SearchPeptideLooplinkSearcher {
 					sqlSB.append( " ( " );
 
 
-					sqlSB.append( "pept_value_tbl_" );
+					sqlSB.append( PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( ".search_id = ? AND " );
 
-					sqlSB.append( "pept_value_tbl_" );
+					sqlSB.append( PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( ".annotation_type_id = ? AND " );
 
-					sqlSB.append( "pept_value_tbl_" );
+					sqlSB.append( PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( ".peptide_value_for_ann_type_id " );
 
@@ -496,8 +539,8 @@ public class SearchPeptideLooplinkSearcher {
 
 					sqlSB.append( " ) " );
 				}
-				
 
+				
 			} else {
 
 				//   Only Default Peptide Cutoffs chosen so criteria simply the Peptides where the defaultPeptideCutoffs is yes
@@ -505,7 +548,7 @@ public class SearchPeptideLooplinkSearcher {
 				sqlSB.append( " AND " );
 
 
-				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.peptide_meets_default_cutoffs = '" );
+				sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.peptide_meets_default_cutoffs = '" );
 				sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.YES.value() );
 				sqlSB.append( "' " );
 				
@@ -525,6 +568,7 @@ public class SearchPeptideLooplinkSearcher {
 		
 		
 		
+		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -532,12 +576,11 @@ public class SearchPeptideLooplinkSearcher {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
-			pstmt = conn.prepareStatement( sql );
+			
+	
 
-//			" WHERE unified_rp__rep_pept__search__generic_lookup.search_id = ? "
-//			+ " AND unified_rp__rep_pept__search__generic_lookup.link_type = '" + XLinkUtils.CROSS_TYPE_STRING + "' "
-//			+ " AND looplink.nrseq_id = ?  "
-//			+ " AND looplink.protein_position_1 = ? AND looplink.protein_position_2 = ?  ";
+			pstmt = conn.prepareStatement( sql );
+			
 
 
 			int paramCounter = 0;
@@ -545,7 +588,7 @@ public class SearchPeptideLooplinkSearcher {
 			
 			paramCounter++;
 			pstmt.setInt( paramCounter, searchId );
-
+			
 			paramCounter++;
 			pstmt.setInt( paramCounter, proteinId );
 			paramCounter++;
@@ -558,7 +601,6 @@ public class SearchPeptideLooplinkSearcher {
 
 
 			{
-
 				if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
 						|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 
@@ -580,7 +622,7 @@ public class SearchPeptideLooplinkSearcher {
 					}
 				}
 			}
-
+			
 
 
 
@@ -592,7 +634,6 @@ public class SearchPeptideLooplinkSearcher {
 						|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 
 					//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
-					
 
 					for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesReportedPeptideAnnotationLevel : peptideCutoffValuesList ) {
 
@@ -609,13 +650,9 @@ public class SearchPeptideLooplinkSearcher {
 					}
 				}
 			}
-
-
-			
 			
 			
 			rs = pstmt.executeQuery();
-			
 			
 			SearchDTO searchDTO = null;
 			
@@ -624,9 +661,9 @@ public class SearchPeptideLooplinkSearcher {
 
 			Set<Integer> retrieved_reported_peptide_id_values_Set = new HashSet<>();
 			
-			
-			while( rs.next() ) {
 
+			while( rs.next() ) {
+				
 				
 				int reportedPeptideId = rs.getInt( "reported_peptide_id" );
 
@@ -644,21 +681,26 @@ public class SearchPeptideLooplinkSearcher {
 				}
 
 				
+				
+				
 				SearchPeptideLooplinkAnnDataWrapper wrappedLink = new SearchPeptideLooplinkAnnDataWrapper();
 				
 				SearchPeptideLooplink link = new SearchPeptideLooplink();
 				
 				wrappedLink.setSearchPeptideLooplink( link );
 				
+
 				link.setSearch( searchDTO );
 				
 				link.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
+				
+				link.setReportedPeptideId( reportedPeptideId );
+				
 
-				link.setReportedPeptide( ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( reportedPeptideId ) );
-
-
+				
+				
 				if ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs ) {
-					
+										
 					int numPsmsForDefaultCutoffs = rs.getInt( "psm_num_at_default_cutoff" );
 					if ( ! rs.wasNull() ) {
 					
@@ -688,6 +730,14 @@ public class SearchPeptideLooplinkSearcher {
 							getPSMBestValuesFromDBQuery( rs, psmCutoffsAnnotationTypeDTOList );
 
 					wrappedLink.setPsmAnnotationDTOMap( bestPsmAnnotationDTOFromQueryMap );
+					
+
+					//  Get Peptide values from DB query, since Peptide value table was joined
+
+					Map<Integer, AnnotationDataBaseDTO> peptideAnnotationDTOFromQueryMap =
+							getPeptideValuesFromDBQuery( rs, peptideCutoffsAnnotationTypeDTOList );
+
+					wrappedLink.setPeptideAnnotationDTOMap(  peptideAnnotationDTOFromQueryMap );
 				}
 				
 				wrappedLinks.add( wrappedLink );
@@ -716,8 +766,8 @@ public class SearchPeptideLooplinkSearcher {
 		return wrappedLinks;
 	}
 	
-	
-	
+
+
 
 	//  Get PSM best values from DB query, since psm best value table was joined
 
@@ -747,12 +797,11 @@ public class SearchPeptideLooplinkSearcher {
 			String annotationTypeIdField = PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS + counter + "_annotation_type_id";
 
 			String valueDoubleField = PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS + counter + "_best_psm_value_for_ann_type_id";
-			String valueStringField = PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS + counter + "_best_psm_value_string_for_ann_type_id";
 
 			item.setAnnotationTypeId( rs.getInt( annotationTypeIdField ) );
 
 			item.setValueDouble( rs.getDouble( valueDoubleField ) );
-			item.setValueString( rs.getString( valueStringField ) );
+			item.setValueString( Double.toString( item.getValueDouble() ) );
 
 			bestPsmAnnotationDTOFromQueryMap.put( item.getAnnotationTypeId(),  item );
 
@@ -761,5 +810,49 @@ public class SearchPeptideLooplinkSearcher {
 		return bestPsmAnnotationDTOFromQueryMap;
 	}
 
+	
+
+	//  Get Peptide values from DB query, since Peptide value table was joined
+
+	/**
+	 * @param rs
+	 * @param psmCutoffsAnnotationTypeDTOList
+	 * @return
+	 * @throws SQLException
+	 */
+	private Map<Integer, AnnotationDataBaseDTO> getPeptideValuesFromDBQuery( 
+
+
+			ResultSet rs,
+
+			List<AnnotationTypeDTO> psmCutoffsAnnotationTypeDTOList
+
+			) throws SQLException { 
+
+		Map<Integer, AnnotationDataBaseDTO> peptideAnnotationDTOFromQueryMap = new HashMap<>();
+
+		//  Add inner join for each PSM cutoff
+
+		for ( int counter = 1; counter <= psmCutoffsAnnotationTypeDTOList.size(); counter++ ) {
+
+			SearchReportedPeptideAnnotationDTO item = new SearchReportedPeptideAnnotationDTO();
+
+			String annotationTypeIdField = PEPTIDE_FILTER_TABLE_ALIAS + counter + "_annotation_type_id";
+
+			String valueDoubleField = PEPTIDE_FILTER_TABLE_ALIAS + counter + "_peptide_value_for_ann_type_id";
+
+			item.setAnnotationTypeId( rs.getInt( annotationTypeIdField ) );
+
+			item.setValueDouble( rs.getDouble( valueDoubleField ) );
+			item.setValueString( Double.toString( item.getValueDouble() ) );
+
+			peptideAnnotationDTOFromQueryMap.put( item.getAnnotationTypeId(),  item );
+
+		}
+		
+		return peptideAnnotationDTOFromQueryMap;
+	}
+
+	
 	
 }

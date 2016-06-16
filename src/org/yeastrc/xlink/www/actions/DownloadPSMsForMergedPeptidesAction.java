@@ -23,10 +23,10 @@ import org.apache.struts.action.ActionMapping;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.objects.AnnotationTypeDTOListForSearchId;
@@ -127,33 +127,6 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 			int projectId = projectIdsFromSearchIds.get( 0 );
 			
 			request.setAttribute( "projectId", projectId ); 
-			
-
-			
-//			String project_id_from_query_string = request.getParameter( WebConstants.PARAMETER_PROJECT_ID );
-//			
-//
-//			if ( StringUtils.isEmpty( project_id_from_query_string ) ) {
-//
-//				//  copy the project from the searches to the URL and redirect to that new URL.
-//				
-//				String getRequestURI = request.getRequestURI();
-//				
-//				String getQueryString = request.getQueryString();
-//				
-//				String newURL = getRequestURI + "?" + WebConstants.PARAMETER_PROJECT_ID + "=" + projectId + "&" + getQueryString;
-//
-//				if ( log.isInfoEnabled() ) {
-//					
-//					log.info( "Redirecting to new URL to add '" + WebConstants.PARAMETER_PROJECT_ID + "=" + projectId + "' to query string.  new URL: " + newURL );
-//				}
-//				
-//				response.sendRedirect( newURL );
-//				
-//				return null;
-//			}
-			
-			
 			
 
 			///////////////////////

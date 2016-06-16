@@ -20,16 +20,17 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchModMassDistinctSearcher;
 import org.yeastrc.xlink.www.searcher.SearchReportedPeptideAnnotationDataSearcher;
+import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher.ReturnOnlyReportedPeptidesWithMonolinks;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureNavLinks;
 import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
@@ -425,10 +426,6 @@ public class ViewSearchPeptidesAction extends Action {
 			if ( peptideFilterableAnnotationTypesForSearchId == null ) {
 				
 				peptideFilterableAnnotationTypesForSearchId = new HashMap<>();
-				
-//				String msg = "peptideFilterableAnnotationTypesForSearchId == null for searchId: " + searchId;
-//				log.error( msg );
-//				throw new ProxlWebappDataException( msg );
 			}
 			
 
@@ -442,10 +439,6 @@ public class ViewSearchPeptidesAction extends Action {
 			if ( peptideDescriptiveAnnotationTypesForSearchId == null ) {
 				
 				peptideDescriptiveAnnotationTypesForSearchId = new HashMap<>();
-				
-//				String msg = "peptideDescriptiveAnnotationTypesForSearchId == null for searchId: " + searchId;
-//				log.error( msg );
-//				throw new ProxlWebappDataException( msg );
 			}
 			
 			
@@ -508,7 +501,7 @@ public class ViewSearchPeptidesAction extends Action {
 
 			List<WebReportedPeptideWrapper> wrappedlinks =
 					PeptideWebPageSearcher.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff( 
-							search, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery );
+							search, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, ReturnOnlyReportedPeptidesWithMonolinks.NO );
 
 			
 			

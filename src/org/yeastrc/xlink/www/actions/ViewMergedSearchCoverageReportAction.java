@@ -17,15 +17,23 @@ import javax.servlet.http.HttpServletResponse;
 //import javax.servlet.http.HttpSession;
 
 
+
+
+
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping;
+import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping.UnlinkedDimerPeptideProteinMappingResult;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureNavLinks;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.MergedSearchProtein;
@@ -39,10 +47,6 @@ import org.yeastrc.xlink.www.objects.SearchProteinLooplinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinked;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinkedWrapper;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinCrosslinkSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinDimerSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinLooplinkSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinUnlinkedSearcher;
 import org.yeastrc.xlink.www.searcher.SearchTaxonomySearcher;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
@@ -57,7 +61,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.objects.ProteinCoverageData;
-import org.yeastrc.xlink.www.searcher.ProteinCoverageSearcher;
+import org.yeastrc.xlink.www.protein_coverage.ProteinCoverageCompute;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
@@ -393,8 +397,9 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
 			
 
+			//   Get the Protein Coverage Data
 
-			ProteinCoverageSearcher pcs = new ProteinCoverageSearcher();
+			ProteinCoverageCompute pcs = new ProteinCoverageCompute();
 
 			pcs.setExcludedProteinIds( proteinQueryJSONRoot.getExcludeProtein() );
 			pcs.setExcludedTaxonomyIds( proteinQueryJSONRoot.getExcludeTaxonomy() );
@@ -413,7 +418,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 
 
 
-			//  TODO  Build list of proteins for the protein Exclusion list
+			//   Build list of proteins for the protein Exclusion list
 			
 			{
 
@@ -436,8 +441,9 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 					
 					{
 						List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
-								SearchProteinCrosslinkSearcher.getInstance().searchOnSearchIdandCutoffs( search, searcherCutoffValuesSearchLevel );
-
+								CrosslinkLinkedPositions.getInstance()
+								.getSearchProteinCrosslinkWrapperList( search, searcherCutoffValuesSearchLevel );
+						
 
 						for ( SearchProteinCrosslinkWrapper wrappedCrosslink : wrappedCrosslinks ) {
 
@@ -481,9 +487,10 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 
 					{
 						List<SearchProteinLooplinkWrapper> wrappedLooplinkLinks = 
-								SearchProteinLooplinkSearcher.getInstance()
-								.searchOnSearchIdandCutoffs( search, searcherCutoffValuesSearchLevel );
-
+								LooplinkLinkedPositions.getInstance()
+								.getSearchProteinLooplinkWrapperList( search, searcherCutoffValuesSearchLevel );
+						
+						
 						for ( SearchProteinLooplinkWrapper wrappedLooplink : wrappedLooplinkLinks ) {
 
 							SearchProteinLooplink looplink = wrappedLooplink.getSearchProteinLooplink();
@@ -508,10 +515,15 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 					}
 					
 					{
-						List<SearchProteinDimerWrapper> wrappedDimerLinks = 
-								SearchProteinDimerSearcher.getInstance()
-								.searchOnSearchIdandCutoffs( search, searcherCutoffValuesSearchLevel );
 
+						UnlinkedDimerPeptideProteinMappingResult unlinkedDimerPeptideProteinMappingResult =
+								UnlinkedDimerPeptideProteinMapping.getInstance()
+								.getSearchProteinUnlinkedAndDimerWrapperLists( search, searcherCutoffValuesSearchLevel );
+						
+						
+						List<SearchProteinDimerWrapper> wrappedDimerLinks = 
+								unlinkedDimerPeptideProteinMappingResult.getSearchProteinDimerWrapperList();
+						
 						for ( SearchProteinDimerWrapper wrappedDimer : wrappedDimerLinks ) {
 
 							SearchProteinDimer dimer = wrappedDimer.getSearchProteinDimer();
@@ -550,13 +562,11 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 							}
 							
 						}
-					}
 
-					{
+						
 						List<SearchProteinUnlinkedWrapper> wrappedUnlinkedLinks = 
-								SearchProteinUnlinkedSearcher.getInstance()
-								.searchOnSearchIdandCutoffs( search, searcherCutoffValuesSearchLevel );
-
+								unlinkedDimerPeptideProteinMappingResult.getSearchProteinUnlinkedWrapperList();
+						
 						for ( SearchProteinUnlinkedWrapper wrappedUnlinked : wrappedUnlinkedLinks ) {
 
 							SearchProteinUnlinked unlinked = wrappedUnlinked.getSearchProteinUnlinked();

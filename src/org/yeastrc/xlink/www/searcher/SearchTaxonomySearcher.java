@@ -9,19 +9,30 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.dto.SearchDTO;
-import org.yeastrc.xlink.utils.TaxonomyUtils;
+import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.web_utils.TaxonomyUtils;
 
 /**
- * Get the taxonomies present in a percolator search
+ * Get the taxonomies present in a search
  * @author Mike
  *
  */
 public class SearchTaxonomySearcher {
+	
+	private static final Logger log = Logger.getLogger( SearchTaxonomySearcher.class );
 
 	private SearchTaxonomySearcher() { }
 	public static SearchTaxonomySearcher getInstance() { return new SearchTaxonomySearcher(); }
+	
+	
+	private static final String SINGLE_SEARCH_SQL =
+			"SELECT  tblProtein.speciesID "
+			+ " FROM YRC_NRSEQ.tblProtein AS tblProtein"
+			+ " INNER JOIN srch_rep_pept__nrseq_id_pos_crosslink AS srpnipc "
+			+ 	" ON tblProtein.id = srpnipc.nrseq_id "
+			+ " WHERE srpnipc.search_id = ? ";
 	
 	/**
 	 * Get the taxonomies present in the percolator search
@@ -36,16 +47,15 @@ public class SearchTaxonomySearcher {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		
+		final String sql = SINGLE_SEARCH_SQL;
+		
 		try {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			String sql = "SELECT  a.speciesID FROM YRC_NRSEQ.tblProtein AS a INNER JOIN crosslink AS b ON a.id = b.nrseq_id_1 INNER JOIN psm AS c ON b.psm_id = c.id WHERE c.search_id = ? " +
-						 "UNION DISTINCT " +
-						 "SELECT  a.speciesID FROM YRC_NRSEQ.tblProtein AS a INNER JOIN crosslink AS b ON a.id = b.nrseq_id_1 INNER JOIN psm AS c ON b.psm_id = c.id WHERE c.search_id = ?";
-			
+
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, search.getId() );
-			pstmt.setInt( 2, search.getId() );
 			
 			rs = pstmt.executeQuery();
 
@@ -53,7 +63,15 @@ public class SearchTaxonomySearcher {
 				if( !taxonomies.containsKey( rs.getInt( 1 ) ) )
 					taxonomies.put( rs.getInt(1), TaxonomyUtils.getTaxonomyName( rs.getInt( 1 ) ) );
 			}
-						
+
+		} catch ( Exception e ) {
+			
+			String msg = "getTaxonomies(), sql: " + sql;
+			
+			log.error( msg, e );
+			
+			throw e;
+				
 		} finally {
 			
 			// be sure database handles are closed
@@ -79,6 +97,14 @@ public class SearchTaxonomySearcher {
 		
 	}
 	
+
+	private static final String MULTIPLE_SEARCHES_SQL =
+			"SELECT  tblProtein.speciesID "
+			+ " FROM YRC_NRSEQ.tblProtein AS tblProtein"
+			+ " INNER JOIN srch_rep_pept__nrseq_id_pos_crosslink AS srpnipc "
+			+ 	" ON tblProtein.id = srpnipc.nrseq_id "
+			+ " WHERE srpnipc.search_id  IN (#SEARCHES#) ";
+	
 	/**
 	 * Get the taxonomies present in the percolator search
 	 * @param search The search
@@ -92,27 +118,38 @@ public class SearchTaxonomySearcher {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+
+		Collection<Integer> searchIds = new HashSet<Integer>();
+		for( SearchDTO search : searches ) {
+			searchIds.add( search.getId() );
+		}
+		String sql = MULTIPLE_SEARCHES_SQL.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
+
 		try {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			String sql = "SELECT DISTINCT a.speciesID FROM YRC_NRSEQ.tblProtein AS a INNER JOIN crosslink AS b ON a.id = b.nrseq_id_1 INNER JOIN psm AS c ON b.psm_id = c.id WHERE c.search_id IN (#SEARCHES#) " +
-						 "UNION " +
-						 "SELECT DISTINCT a.speciesID FROM YRC_NRSEQ.tblProtein AS a INNER JOIN crosslink AS b ON a.id = b.nrseq_id_1 INNER JOIN psm AS c ON b.psm_id = c.id WHERE c.search_id IN (#SEARCHES#)";
 
-			Collection<Integer> searchIds = new HashSet<Integer>();
-			for( SearchDTO search : searches )
-				searchIds.add( search.getId() );
-			sql = sql.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
-			
 			pstmt = conn.prepareStatement( sql );
 			
 			rs = pstmt.executeQuery();
 
 			while( rs.next() ) {
-				if( !taxonomies.containsKey( rs.getInt( 1 ) ) )
-					taxonomies.put( rs.getInt(1), TaxonomyUtils.getTaxonomyName( rs.getInt( 1 ) ) );
+				
+				Integer taxonomyId = rs.getInt( 1 );
+				
+				if( !taxonomies.containsKey( taxonomyId ) ) {
+					taxonomies.put( taxonomyId, TaxonomyUtils.getTaxonomyName( taxonomyId ) );
+				}
 			}
-						
+
+		} catch ( Exception e ) {
+			
+			String msg = "getTaxonomies(), sql: " + sql;
+			
+			log.error( msg, e );
+			
+			throw e;
+			
 		} finally {
 			
 			// be sure database handles are closed

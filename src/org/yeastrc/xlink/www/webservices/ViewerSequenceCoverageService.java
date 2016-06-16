@@ -2,7 +2,6 @@ package org.yeastrc.xlink.www.webservices;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -25,14 +24,11 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.NRProteinDAO;
-import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.dto.NRProteinDTO;
-import org.yeastrc.xlink.dto.PeptideDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.ProteinSequenceCoverage;
-import org.yeastrc.xlink.www.searcher.MergedSearchPeptideSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -41,6 +37,8 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.objects.SequenceCoverageData;
 import org.yeastrc.xlink.www.objects.SequenceCoverageRange;
+import org.yeastrc.xlink.www.protein_coverage.ProteinSequenceCoverage;
+import org.yeastrc.xlink.www.protein_coverage.ProteinSequenceCoverageFactory;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -284,12 +282,8 @@ public class ViewerSequenceCoverageService {
 			// first get all distinct proteins that have at least one linked peptide, given the search parameters
 			NRProteinDTO protein = NRProteinDAO.getInstance().getNrProtein( proteinId );
 
-			ProteinSequenceCoverage cov = new ProteinSequenceCoverage( protein );
-
-			Collection<PeptideDTO> peptides = MergedSearchPeptideSearcher.getInstance().getPeptides( protein, searches, searcherCutoffValuesRootLevel);
-			for( PeptideDTO peptide : peptides ) {
-				cov.addPeptide( peptide.getSequence() );
-			}
+			ProteinSequenceCoverage cov = 
+					ProteinSequenceCoverageFactory.getInstance().getProteinSequenceCoverage(protein, searches, searcherCutoffValuesRootLevel);
 
 			coverages.put( protein.getNrseqId(), cov.getSequenceCoverage() );
 

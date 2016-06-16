@@ -26,7 +26,7 @@ public class SearchPeptideMonolinkAnnDataWrapper extends SortDisplayRecordsWrapp
 	@Override
 	public int getFinalSortOrderKey() {
 		
-		return searchPeptideMonolink.getReportedPeptide().getId();
+		return searchPeptideMonolink.getReportedPeptideId();
 	}
 	
 

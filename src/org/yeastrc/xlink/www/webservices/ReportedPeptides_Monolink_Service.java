@@ -35,7 +35,7 @@ import org.yeastrc.xlink.www.objects.SearchPeptideMonolink;
 import org.yeastrc.xlink.www.objects.SearchPeptideMonolinkAnnDataWrapper;
 import org.yeastrc.xlink.www.objects.SearchPeptideMonolinkWebserviceResult;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.SearchPeptideMonolinkSearcher;
+import org.yeastrc.xlink.www.searcher.SearchPeptideMonolink_LinkedPosition_Searcher;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataDefaultDisplayInDisplayOrder;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataInSortOrder;
@@ -67,7 +67,7 @@ public class ReportedPeptides_Monolink_Service {
 			@QueryParam( "protein_id" ) Integer proteinId,
 			@QueryParam( "protein_position" ) Integer proteinPosition,
 			@Context HttpServletRequest request )
-	throws Exception {
+	throws WebApplicationException {
 		
 		if ( searchId == null ) {
 
@@ -308,11 +308,18 @@ public class ReportedPeptides_Monolink_Service {
 			
 			
 
-			List<SearchPeptideMonolinkAnnDataWrapper> searchPeptideMonolinkList = 
-					SearchPeptideMonolinkSearcher.getInstance().searchOnSearchProteinMonolink( 
-							searchId, searcherCutoffValuesSearchLevel, proteinId, proteinPosition );
+//			List<SearchPeptideMonolinkAnnDataWrapper> searchPeptideMonolinkList = 
+//					SearchPeptideMonolinkSearcher.getInstance().searchOnSearchProteinMonolink( 
+//							searchId, searcherCutoffValuesSearchLevel, proteinId, proteinPosition );
 					
 			
+			List<SearchPeptideMonolinkAnnDataWrapper> searchPeptideMonolinkList = 
+					SearchPeptideMonolink_LinkedPosition_Searcher.getInstance()
+					.searchOnSearchProteinMonolink( 
+							searchId, searcherCutoffValuesSearchLevel, 
+							proteinId, proteinPosition );
+			
+	
 			GetMonolinkReportedPeptidesServiceResult getMonolinkReportedPeptidesServiceResult =
 					getAnnotationDataAndSort(
 							searchPeptideMonolinkList,

@@ -25,10 +25,14 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.NRProteinDAO;
-import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.dto.LinkerDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.linkable_positions.GetLinkablePositionsForLinkers;
+import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping;
+import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping.UnlinkedDimerPeptideProteinMappingResult;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.MergedSearchProtein;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
@@ -40,14 +44,10 @@ import org.yeastrc.xlink.www.objects.SearchProteinCrosslinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinked;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinkedWrapper;
 import org.yeastrc.xlink.www.searcher.LinkersForSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinCrosslinkSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinDimerSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinLooplinkSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinUnlinkedSearcher;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.utils.TaxonomyUtils;
+import org.yeastrc.xlink.www.web_utils.TaxonomyUtils;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -340,9 +340,15 @@ public class ViewerProteinDataService {
 				///   Get Crosslink Proteins from DB
 
 
-				List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
-						SearchProteinCrosslinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
+//				List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
+//						SearchProteinCrosslinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
 
+
+				List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
+						CrosslinkLinkedPositions.getInstance()
+						.getSearchProteinCrosslinkWrapperList( search, searcherCutoffValuesSearchLevel );
+				
+				
 				for ( SearchProteinCrosslinkWrapper wrappedItem : wrappedCrosslinks ) {
 
 					SearchProteinCrosslink item = wrappedItem.getSearchProteinCrosslink();
@@ -378,9 +384,15 @@ public class ViewerProteinDataService {
 
 				///   Get Looplink Proteins from DB
 
-				List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
-						SearchProteinLooplinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
+//				List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
+//						SearchProteinLooplinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
 
+				
+				List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
+						LooplinkLinkedPositions.getInstance()
+						.getSearchProteinLooplinkWrapperList( search, searcherCutoffValuesSearchLevel );
+				
+				
 				for ( SearchProteinLooplinkWrapper wrappedItem : wrappedLooplinks ) {
 
 					SearchProteinLooplink item = wrappedItem.getSearchProteinLooplink();
@@ -414,11 +426,19 @@ public class ViewerProteinDataService {
 
 					//////////////////////////
 
-					///   Get Dimer Proteins from DB
+					///   Get Dimer and Unlinked Proteins from DB
+					
+					
+					UnlinkedDimerPeptideProteinMappingResult unlinkedDimerPeptideProteinMappingResult =
+							UnlinkedDimerPeptideProteinMapping.getInstance()
+							.getSearchProteinUnlinkedAndDimerWrapperLists( searchDTO, searcherCutoffValuesSearchLevel );
 
 
+//					List<SearchProteinDimerWrapper> wrappedDimers = 
+//							SearchProteinDimerSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
+					
 					List<SearchProteinDimerWrapper> wrappedDimers = 
-							SearchProteinDimerSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
+							unlinkedDimerPeptideProteinMappingResult.getSearchProteinDimerWrapperList();
 
 					for ( SearchProteinDimerWrapper wrappedItem : wrappedDimers ) {
 
@@ -459,8 +479,11 @@ public class ViewerProteinDataService {
 					///   Get Unlinked Proteins from DB
 
 
+//					List<SearchProteinUnlinkedWrapper> wrappedUnlinkeds = 
+//							SearchProteinUnlinkedSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
+					
 					List<SearchProteinUnlinkedWrapper> wrappedUnlinkeds = 
-							SearchProteinUnlinkedSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
+							unlinkedDimerPeptideProteinMappingResult.getSearchProteinUnlinkedWrapperList();
 
 					for ( SearchProteinUnlinkedWrapper wrappedItem : wrappedUnlinkeds ) {
 

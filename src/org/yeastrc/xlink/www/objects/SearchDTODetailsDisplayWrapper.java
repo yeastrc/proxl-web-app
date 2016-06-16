@@ -9,7 +9,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.LinkerDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.dto.CutoffsAppliedOnImportDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;

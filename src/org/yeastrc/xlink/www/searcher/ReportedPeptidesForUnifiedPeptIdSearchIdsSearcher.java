@@ -11,18 +11,18 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
-import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searchers.PsmCountForSearchIdReportedPeptideIdSearcher;
+import org.yeastrc.xlink.www.searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePage;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePageWrapper;
 
@@ -71,16 +71,16 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 
 			"SELECT"
 
-//					+ " unified_rp__rep_pept__search__generic_lookup.reported_peptide_id, "
+//					+ " unified_rp__search__rep_pept__generic_lookup.reported_peptide_id, "
 			
-//			+ " unified_rp__rep_pept__search__generic_lookup.link_type, "
-			+ " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff ";
+//			+ " unified_rp__search__rep_pept__generic_lookup.link_type, "
+			+ " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff ";
 	
 	private final String SQL_FROM_PART = 
 			
 			" FROM "
 			
-			+ " unified_rp__rep_pept__search__generic_lookup ";
+			+ " unified_rp__search__rep_pept__generic_lookup ";
 
 
 
@@ -91,8 +91,8 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 	
 	private final String SQL_MAIN_WHERE_START = 
 					
-			" WHERE unified_rp__rep_pept__search__generic_lookup.search_id = ? "
-			+ 	" AND unified_rp__rep_pept__search__generic_lookup.reported_peptide_id = ? ";
+			" WHERE unified_rp__search__rep_pept__generic_lookup.search_id = ? "
+			+ 	" AND unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = ? ";
 
 
 
@@ -256,18 +256,6 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
 					sqlSB.append( Integer.toString( counter ) );
 					sqlSB.append( "_best_psm_value_for_ann_type_id " );
-
-					sqlSB.append( " , " );
-					
-					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
-					sqlSB.append( Integer.toString( counter ) );
-					sqlSB.append( ".best_psm_value_string_for_ann_type_id " );
-					sqlSB.append( " AS "  );
-					sqlSB.append( PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS );
-					sqlSB.append( Integer.toString( counter ) );
-					sqlSB.append( "_best_psm_value_string_for_ann_type_id " );
-
-
 				}
 			}
 		}
@@ -296,12 +284,12 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 
 					sqlSB.append( " INNER JOIN " );
 
-					sqlSB.append( " unified_rp__rep_pept__search__best_psm_value_generic_lookup AS psm_fltrbl_tbl_" );
+					sqlSB.append( " unified_rp__search__rep_pept__best_psm_value_generic_lookup AS psm_fltrbl_tbl_" );
 					sqlSB.append( Integer.toString( counter ) );
 
 					sqlSB.append( " ON "  );
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.search_id = "  );
+					sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.search_id = "  );
 
 					sqlSB.append( "psm_fltrbl_tbl_" );
 					sqlSB.append( Integer.toString( counter ) );
@@ -310,7 +298,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 					sqlSB.append( " AND " );
 
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.reported_peptide_id = "  );
+					sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = "  );
 
 					sqlSB.append( "psm_fltrbl_tbl_" );
 					sqlSB.append( Integer.toString( counter ) );
@@ -338,7 +326,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 
 					sqlSB.append( " ON "  );
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.search_id = "  );
+					sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.search_id = "  );
 
 					sqlSB.append( "srch__rep_pept_fltrbl_tbl_" );
 					sqlSB.append( Integer.toString( counter ) );
@@ -347,7 +335,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 					sqlSB.append( " AND " );
 
 
-					sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.reported_peptide_id = "  );
+					sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = "  );
 
 					sqlSB.append( "srch__rep_pept_fltrbl_tbl_" );
 					sqlSB.append( Integer.toString( counter ) );
@@ -430,7 +418,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 				sqlSB.append( " AND " );
 
 
-				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff > 0 " );
+				sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff > 0 " );
 
 				
 			}
@@ -500,7 +488,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 				sqlSB.append( " AND " );
 
 
-				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.peptide_meets_default_cutoffs = '" );
+				sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.peptide_meets_default_cutoffs = '" );
 				sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.YES.value() );
 				sqlSB.append( "' " );
 			}
@@ -751,12 +739,11 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 			String annotationTypeIdField = PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS + counter + "_annotation_type_id";
 
 			String valueDoubleField = PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS + counter + "_best_psm_value_for_ann_type_id";
-			String valueStringField = PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS + counter + "_best_psm_value_string_for_ann_type_id";
 
 			item.setAnnotationTypeId( rs.getInt( annotationTypeIdField ) );
 
 			item.setValueDouble( rs.getDouble( valueDoubleField ) );
-			item.setValueString( rs.getString( valueStringField ) );
+			item.setValueString( Double.toString( item.getValueDouble() ) );
 
 			bestPsmAnnotationDTOFromQueryMap.put( item.getAnnotationTypeId(),  item );
 

@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.auth.exceptions.AuthSharedObjectRecordNotFoundException;
 import org.yeastrc.auth.services.GetAuthLevel;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
-import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;

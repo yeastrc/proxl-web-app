@@ -2,6 +2,7 @@ package org.yeastrc.xlink.www.webservices;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,13 +22,14 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.SearchDAO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.MergedSearchProteinLooplink;
 import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
-import org.yeastrc.xlink.www.searcher.MergedSearchProteinLooplinkSearcher;
+import org.yeastrc.xlink.www.objects.SearchProteinLooplinkWrapper;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -137,7 +139,7 @@ public class ViewerLooplinkService {
 			
 			if ( projectIdsFromSearchIds.size() > 1 ) {
 				
-				//  Invalid request, searches across projects
+				//  Invalid request, searches aloop projects
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_STATUS_CODE )  //  Send HTTP code
 						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_TEXT ) // This string will be passed to the client
@@ -238,13 +240,24 @@ public class ViewerLooplinkService {
 			ImageViewerData ivd = new ImageViewerData();
 
 
-			if( excludeTaxonomy == null ) 
-				excludeTaxonomy = new ArrayList<Integer>();
+			////////////
+			
+			//  Copy Exclude Taxonomy Set for lookup
 
+			Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
+
+
+			if( excludeTaxonomy != null ) { 
+				excludeTaxonomy_Ids_Set_UserInput.addAll( excludeTaxonomy );
+			}
 			
 			
+			List<Integer> searchIdsListSorted = new ArrayList<Integer>( searchIdsSet );
+			
+			Collections.sort( searchIdsListSorted );
+
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
-			for( int searchId : searchIds ) {
+			for( int searchId : searchIdsListSorted ) {
 				
 				SearchDTO search = SearchDAO.getInstance().getSearch( searchId );
 				
@@ -279,128 +292,179 @@ public class ViewerLooplinkService {
 				filterOnlyOnePeptide = true;
 
 			
-			
-			// our looplinks
-			List<MergedSearchProteinLooplink> looplinks = MergedSearchProteinLooplinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
 
-			// if requested, filter out looplinks that shouldn't be included
-			if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
-					|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
-				
-				List<MergedSearchProteinLooplink> linksCopy = new ArrayList<MergedSearchProteinLooplink>();
-				linksCopy.addAll( looplinks );
+			Map<Integer, List<SearchProteinLooplinkWrapper>> wrappedLooplinks_MappedOnSearchId = new HashMap<>();
 
-				for( MergedSearchProteinLooplink link : linksCopy ) {
+			for ( SearchDTO searchDTO : searches ) {
 
-					// did they request to removal of non unique peptides?
-					if( filterNonUniquePeptides ) {
-						
-						if( link.getNumUniquePeptides() < 1 ) {
-							looplinks.remove( link );
-							continue;
-						}
-					}
+				Integer searchId = searchDTO.getId();
 
-					//
-//					
-//						link.getNumPsms() <= 1 WILL NOT WORK if more than one search since it is across all searches
-//					
-//					// did they request to removal of links with only one PSM?
-					if( filterOnlyOnePSM ) {
-						
-						boolean foundSearchWithMoreThanOnePSM = false;
-						
+				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
+						searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
 
-						Map<SearchDTO, SearchProteinLooplink> searchLooplinks = link.getSearchProteinLooplinks();
+				if ( searcherCutoffValuesSearchLevel == null ) {
 
-						for ( Map.Entry<SearchDTO, SearchProteinLooplink> searchEntry : searchLooplinks.entrySet() ) {
-
-							SearchProteinLooplink searchProteinLooplink = searchEntry.getValue();
-
-							int psmCountForSearchId = searchProteinLooplink.getNumPsms();
-
-							if ( psmCountForSearchId > 1 ) {
-
-								foundSearchWithMoreThanOnePSM = true;
-								break;
-							}
-						}
-						
-						if (  ! foundSearchWithMoreThanOnePSM ) {
-							looplinks.remove( link );
-							continue;
-						}
-
-					}
-					
-					
-					// did they request to removal of links with only one Reported Peptide?
-					if( filterOnlyOnePeptide ) {
-						
-						boolean foundSearchWithMoreThanOneReportedPeptide = false;
-
-						Map<SearchDTO, SearchProteinLooplink> searchLooplinks = link.getSearchProteinLooplinks();
-
-						for ( Map.Entry<SearchDTO, SearchProteinLooplink> searchEntry : searchLooplinks.entrySet() ) {
-
-							SearchProteinLooplink searchProteinLooplink = searchEntry.getValue();
-
-							int peptideCountForSearchId = searchProteinLooplink.getNumPeptides();
-
-							if ( peptideCountForSearchId > 1 ) {
-
-								foundSearchWithMoreThanOneReportedPeptide = true;
-								break;
-							}
-						}
-						
-						if (  ! foundSearchWithMoreThanOneReportedPeptide ) {
-							looplinks.remove( link );
-							continue;
-						}
-					}
-					
-					
-					// did they request removal of certain taxonomy IDs?
-					if( excludeTaxonomy != null && excludeTaxonomy.size() > 0 ) {
-						
-						for( int tid : excludeTaxonomy ) {
-							if( link.getProtein().getNrProtein().getTaxonomyId() == tid ) {
-								looplinks.remove( link );
-								continue;
-							}
-						}
-					}
+					searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
 				}
+
+
+				//	List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
+				//		SearchProteinLooplinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
+
+				List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
+						LooplinkLinkedPositions.getInstance()
+						.getSearchProteinLooplinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+
+
+				//				List<MergedSearchProteinLooplink> looplinks = MergedSearchProteinLooplinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
+
+				// Filter out links if requested
+				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
+						|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
+
+
+
+					///////  Output Lists, Results After Filtering
+
+					List<SearchProteinLooplinkWrapper> wrappedLooplinksAfterFilter = new ArrayList<>( wrappedLooplinks.size() );
+
+
+					for ( SearchProteinLooplinkWrapper searchProteinLooplinkWrapper : wrappedLooplinks ) {
+
+						SearchProteinLooplink link = searchProteinLooplinkWrapper.getSearchProteinLooplink();
+
+
+						// did user request removal of certain taxonomy IDs?
+
+						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
+
+							int taxonomyId = link.getProtein().getNrProtein().getTaxonomyId();
+
+							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+						}
+
+
+						// did they request to removal of non unique peptides?
+
+						if( filterNonUniquePeptides  ) {
+
+							if( link.getNumUniquePeptides() < 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+						}
+
+
+						//	did they request to removal of links with only one PSM?
+						if( filterOnlyOnePSM  ) {
+
+							int psmCountForSearchId = link.getNumPsms();
+
+							if ( psmCountForSearchId <= 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+
+						}
+
+
+						// did they request to removal of links with only one Reported Peptide?
+						if( filterOnlyOnePeptide ) {
+
+							int peptideCountForSearchId = link.getNumPeptides();
+
+							if ( peptideCountForSearchId <= 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+
+						}
+
+
+						wrappedLooplinksAfterFilter.add( searchProteinLooplinkWrapper );
+
+					}
+
+					//  Copy new filtered list to original input variable name to overlay it
+
+					wrappedLooplinks = wrappedLooplinksAfterFilter;
+				}
+				
+				
+				wrappedLooplinks_MappedOnSearchId.put( searchId, wrappedLooplinks );
 			}
-
+			
+			
 			// build the JSON data structure for looplinks
-			Map<Integer, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>> proteinLinkPositions = new HashMap<Integer, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>>();
-			for( MergedSearchProteinLooplink link : looplinks ) {
-				int fromId = link.getProtein().getNrProtein().getNrseqId();
-				int toId = fromId;
-				
-				int from = link.getProteinPosition1();
-				int to = link.getProteinPosition2();
-				
-				if( !proteinLinkPositions.containsKey( fromId) )
-					proteinLinkPositions.put( fromId, new HashMap<Integer, Map<Integer, Map<Integer, Set<Integer>>>>() );
-				
-				Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> pMap = proteinLinkPositions.get( fromId );
-				if( !pMap.containsKey( toId ) )
-					pMap.put( toId, new HashMap<Integer, Map<Integer, Set<Integer>>>() );
-				
-				if( !pMap.get( toId ).containsKey( from ) )
-					pMap.get( toId ).put( from, new HashMap<Integer, Set<Integer>>() );
 
+			//  Build a Map of maps of <from prot id>, <to prot id>, <from prot position>, <to prot position>, <set of search ids>
+			
+			Map<Integer, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>> proteinLinkPositions = new HashMap<>();
+
+			for ( Map.Entry<Integer, List<SearchProteinLooplinkWrapper>> wrappedLooplinks_MappedOnSearchId_Entry :
+				wrappedLooplinks_MappedOnSearchId.entrySet() ) {
+
+				Integer searchIdForEntry = wrappedLooplinks_MappedOnSearchId_Entry.getKey();
 				
-				Set<Integer> searchIdSet = new HashSet<Integer>();
-				for( SearchDTO search : link.getSearches() ) {
-					searchIdSet.add( search.getId() );
+				List<SearchProteinLooplinkWrapper> wrappedLooplinks = wrappedLooplinks_MappedOnSearchId_Entry.getValue();
+
+				for ( SearchProteinLooplinkWrapper wrappedLooplink : wrappedLooplinks ) {
+
+					SearchProteinLooplink searchProteinLooplink = wrappedLooplink.getSearchProteinLooplink();
+
+					int fromProtId = searchProteinLooplink.getProtein().getNrProtein().getNrseqId();
+					int toProtId = fromProtId;
+
+					int fromProtPosition = searchProteinLooplink.getProteinPosition1();
+					int toProtPosition = searchProteinLooplink.getProteinPosition2();
+				
+
+					Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> map_keyed_by_toProtId =
+							proteinLinkPositions.get( fromProtId );
+					
+					if ( map_keyed_by_toProtId == null ) {
+						
+						map_keyed_by_toProtId = new HashMap<>();
+						proteinLinkPositions.put( fromProtId, map_keyed_by_toProtId );
+					}
+					
+					Map<Integer, Map<Integer, Set<Integer>>> map_keyed_by_fromProtPosition = map_keyed_by_toProtId.get( toProtId );
+
+					if ( map_keyed_by_fromProtPosition == null ) {
+						
+						map_keyed_by_fromProtPosition = new HashMap<>();
+						map_keyed_by_toProtId.put( toProtId, map_keyed_by_fromProtPosition );
+					}
+					
+					Map<Integer, Set<Integer>> map_keyed_by_toProtPosition = map_keyed_by_fromProtPosition.get( fromProtPosition );
+
+					if ( map_keyed_by_toProtPosition == null ) {
+						
+						map_keyed_by_toProtPosition = new HashMap<>();
+						map_keyed_by_fromProtPosition.put( fromProtPosition, map_keyed_by_toProtPosition );
+					}
+					
+					Set<Integer> searchIdSet = map_keyed_by_toProtPosition.get( toProtPosition );
+					
+					if ( searchIdSet == null ) {
+						
+						searchIdSet = new HashSet<>();
+						map_keyed_by_toProtPosition.put( toProtPosition, searchIdSet );
+					}
+					
+					searchIdSet.add( searchIdForEntry );
 				}
-				
-				pMap.get( toId ).get( from ).put( to, searchIdSet );
-				
 			}
 					
 			ivd.setProteinLoopLinkPositions( proteinLinkPositions );
@@ -471,6 +535,7 @@ public class ViewerLooplinkService {
 		    	        .build()
 		    	        );
 		}
+		
 
 		if ( StringUtils.isEmpty( psmPeptideCutoffsForSearchIds_JSONString ) ) {
 
@@ -485,6 +550,7 @@ public class ViewerLooplinkService {
 					);
 		}
 
+		
 		try {
 
 			// Get the session first.  
@@ -532,7 +598,7 @@ public class ViewerLooplinkService {
 			
 			if ( projectIdsFromSearchIds.size() > 1 ) {
 				
-				//  Invalid request, searches across projects
+				//  Invalid request, searches aloop projects
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_STATUS_CODE )  //  Send HTTP code
 						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_TEXT ) // This string will be passed to the client
@@ -577,8 +643,8 @@ public class ViewerLooplinkService {
 						);
 
 			}
-			
 
+			
 
 
 			////////   Auth complete
@@ -621,23 +687,36 @@ public class ViewerLooplinkService {
 
 			Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 					Z_CutoffValuesObjectsToOtherObjectsFactory.createSearcherCutoffValuesRootLevel( 
-							searchIdsSet, cutoffValuesRootLevel ); 
+							searchIdsSet, cutoffValuesRootLevel );
 			
 			
 			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
 			
 			
 			
-
+			
 
 			ImageViewerData ivd = new ImageViewerData();
 
-			if( excludeTaxonomy == null ) 
-				excludeTaxonomy = new ArrayList<Integer>();
 
+			////////////
 			
+			//  Copy Exclude Taxonomy Set for lookup
+
+			Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
+
+
+			if( excludeTaxonomy != null ) { 
+				excludeTaxonomy_Ids_Set_UserInput.addAll( excludeTaxonomy );
+			}
+			
+			
+			List<Integer> searchIdsListSorted = new ArrayList<Integer>( searchIdsSet );
+			
+			Collections.sort( searchIdsListSorted );
+
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
-			for( int searchId : searchIds ) {
+			for( int searchId : searchIdsListSorted ) {
 				
 				SearchDTO search = SearchDAO.getInstance().getSearch( searchId );
 				
@@ -672,126 +751,176 @@ public class ViewerLooplinkService {
 				filterOnlyOnePeptide = true;
 
 			
-			
-			// our looplinks
-			List<MergedSearchProteinLooplink> looplinks = MergedSearchProteinLooplinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
 
-			// if requested, filter out looplinks that shouldn't be included
-			if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
-					|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
+			Map<Integer, List<SearchProteinLooplinkWrapper>> wrappedLooplinks_MappedOnSearchId = new HashMap<>();
+
+			for ( SearchDTO searchDTO : searches ) {
+
+				Integer searchId = searchDTO.getId();
+
+				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
+						searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
+
+				if ( searcherCutoffValuesSearchLevel == null ) {
+
+					searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
+				}
+
+
+				//	List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
+				//		SearchProteinLooplinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
+
+				List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
+						LooplinkLinkedPositions.getInstance()
+						.getSearchProteinLooplinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+
+
+				//				List<MergedSearchProteinLooplink> looplinks = MergedSearchProteinLooplinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
+
+				// Filter out links if requested
+				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
+						|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
+
+
+
+					///////  Output Lists, Results After Filtering
+
+					List<SearchProteinLooplinkWrapper> wrappedLooplinksAfterFilter = new ArrayList<>( wrappedLooplinks.size() );
+
+
+					for ( SearchProteinLooplinkWrapper searchProteinLooplinkWrapper : wrappedLooplinks ) {
+
+						SearchProteinLooplink link = searchProteinLooplinkWrapper.getSearchProteinLooplink();
+
+
+						// did user request removal of certain taxonomy IDs?
+
+						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
+
+							int taxonomyId = link.getProtein().getNrProtein().getTaxonomyId();
+
+							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+						}
+
+
+						// did they request to removal of non unique peptides?
+
+						if( filterNonUniquePeptides  ) {
+
+							if( link.getNumUniquePeptides() < 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+						}
+
+
+						//	did they request to removal of links with only one PSM?
+						if( filterOnlyOnePSM  ) {
+
+							int psmCountForSearchId = link.getNumPsms();
+
+							if ( psmCountForSearchId <= 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+
+						}
+
+
+						// did they request to removal of links with only one Reported Peptide?
+						if( filterOnlyOnePeptide ) {
+
+							int peptideCountForSearchId = link.getNumPeptides();
+
+							if ( peptideCountForSearchId <= 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+
+						}
+
+
+						wrappedLooplinksAfterFilter.add( searchProteinLooplinkWrapper );
+
+					}
+
+					//  Copy new filtered list to original input variable name to overlay it
+
+					wrappedLooplinks = wrappedLooplinksAfterFilter;
+				}
 				
-				List<MergedSearchProteinLooplink> linksCopy = new ArrayList<MergedSearchProteinLooplink>();
-				linksCopy.addAll( looplinks );
+				
+				wrappedLooplinks_MappedOnSearchId.put( searchId, wrappedLooplinks );
+			}
+			
+			
+			// build the JSON data structure for looplinks
 
-				for( MergedSearchProteinLooplink link : linksCopy ) {
+			//  Build a Map of maps of <from prot id>, <to prot id>, <from prot position>, <to prot position>, <set of search ids>
+			
+			Map<Integer, Map<Integer, Map<Integer, Map<Integer, Integer>>>> proteinLinkPositionPsmCount = new HashMap<>();
 
-					// did they request to removal of non unique peptides?
-					if( filterNonUniquePeptides ) {
+			for ( Map.Entry<Integer, List<SearchProteinLooplinkWrapper>> wrappedLooplinks_MappedOnSearchId_Entry :
+				wrappedLooplinks_MappedOnSearchId.entrySet() ) {
+
+//				Integer searchIdForEntry = wrappedLooplinks_MappedOnSearchId_Entry.getKey();
+				
+				List<SearchProteinLooplinkWrapper> wrappedLooplinks = wrappedLooplinks_MappedOnSearchId_Entry.getValue();
+
+				for ( SearchProteinLooplinkWrapper wrappedLooplink : wrappedLooplinks ) {
+
+					SearchProteinLooplink searchProteinLooplink = wrappedLooplink.getSearchProteinLooplink();
+
+					Integer numPsms = searchProteinLooplink.getNumPsms();
+					
+					int fromProtId = searchProteinLooplink.getProtein().getNrProtein().getNrseqId();
+					int toProtId = fromProtId;
+
+					int fromProtPosition = searchProteinLooplink.getProteinPosition1();
+					int toProtPosition = searchProteinLooplink.getProteinPosition2();
+				
+
+					Map<Integer, Map<Integer, Map<Integer, Integer>>> map_keyed_by_toProtId =
+							proteinLinkPositionPsmCount.get( fromProtId );
+					
+					if ( map_keyed_by_toProtId == null ) {
 						
-						if( link.getNumUniquePeptides() < 1 ) {
-							looplinks.remove( link );
-							continue;
-						}
-					}
-
-					//
-//					
-//						link.getNumPsms() <= 1 WILL NOT WORK if more than one search since it is across all searches
-//					
-//					// did they request to removal of links with only one PSM?
-					if( filterOnlyOnePSM ) {
-						
-						boolean foundSearchWithMoreThanOnePSM = false;
-						
-
-						Map<SearchDTO, SearchProteinLooplink> searchLooplinks = link.getSearchProteinLooplinks();
-
-						for ( Map.Entry<SearchDTO, SearchProteinLooplink> searchEntry : searchLooplinks.entrySet() ) {
-
-							SearchProteinLooplink searchProteinLooplink = searchEntry.getValue();
-
-							int psmCountForSearchId = searchProteinLooplink.getNumPsms();
-
-							if ( psmCountForSearchId > 1 ) {
-
-								foundSearchWithMoreThanOnePSM = true;
-								break;
-							}
-						}
-						
-						if (  ! foundSearchWithMoreThanOnePSM ) {
-							looplinks.remove( link );
-							continue;
-						}
-
+						map_keyed_by_toProtId = new HashMap<>();
+						proteinLinkPositionPsmCount.put( fromProtId, map_keyed_by_toProtId );
 					}
 					
-					
-					// did they request to removal of links with only one Reported Peptide?
-					if( filterOnlyOnePeptide ) {
+					Map<Integer, Map<Integer, Integer>> map_keyed_by_fromProtPosition = map_keyed_by_toProtId.get( toProtId );
+
+					if ( map_keyed_by_fromProtPosition == null ) {
 						
-						boolean foundSearchWithMoreThanOneReportedPeptide = false;
-
-						Map<SearchDTO, SearchProteinLooplink> searchLooplinks = link.getSearchProteinLooplinks();
-
-						for ( Map.Entry<SearchDTO, SearchProteinLooplink> searchEntry : searchLooplinks.entrySet() ) {
-
-							SearchProteinLooplink searchProteinLooplink = searchEntry.getValue();
-
-							int peptideCountForSearchId = searchProteinLooplink.getNumPeptides();
-
-							if ( peptideCountForSearchId > 1 ) {
-
-								foundSearchWithMoreThanOneReportedPeptide = true;
-								break;
-							}
-						}
-						
-						if (  ! foundSearchWithMoreThanOneReportedPeptide ) {
-							looplinks.remove( link );
-							continue;
-						}
+						map_keyed_by_fromProtPosition = new HashMap<>();
+						map_keyed_by_toProtId.put( toProtId, map_keyed_by_fromProtPosition );
 					}
 					
-					
-					// did they request removal of certain taxonomy IDs?
-					if( excludeTaxonomy != null && excludeTaxonomy.size() > 0 ) {
+					Map<Integer, Integer> map_keyed_by_toProtPosition = map_keyed_by_fromProtPosition.get( fromProtPosition );
+
+					if ( map_keyed_by_toProtPosition == null ) {
 						
-						for( int tid : excludeTaxonomy ) {
-							if( link.getProtein().getNrProtein().getTaxonomyId() == tid ) {
-								looplinks.remove( link );
-								continue;
-							}
-						}
+						map_keyed_by_toProtPosition = new HashMap<>();
+						map_keyed_by_fromProtPosition.put( fromProtPosition, map_keyed_by_toProtPosition );
 					}
+					
+					map_keyed_by_toProtPosition.put( toProtPosition, numPsms );
 				}
 			}
-
-			// build the JSON data structure for looplinks
-			Map<Integer, Map<Integer, Map<Integer, Map<Integer, Integer>>>> proteinLinkPositions = new HashMap<Integer, Map<Integer, Map<Integer, Map<Integer, Integer>>>>();
-			for( MergedSearchProteinLooplink link : looplinks ) {
-				int fromId = link.getProtein().getNrProtein().getNrseqId();
-				int toId = fromId;
-				
-				int from = link.getProteinPosition1();
-				int to = link.getProteinPosition2();
-				
-				if( !proteinLinkPositions.containsKey( fromId) )
-					proteinLinkPositions.put( fromId, new HashMap<Integer, Map<Integer, Map<Integer, Integer>>>() );
-				
-				Map<Integer, Map<Integer, Map<Integer, Integer>>> pMap = proteinLinkPositions.get( fromId );
-				if( !pMap.containsKey( toId ) )
-					pMap.put( toId, new HashMap<Integer, Map<Integer, Integer>>() );
-				
-				if( !pMap.get( toId ).containsKey( from ) )
-					pMap.get( toId ).put( from, new HashMap<Integer, Integer>() );
-
-				
-				pMap.get( toId ).get( from ).put( to, link.getNumPsms() );
-				
-			}
 					
-			ivd.setLooplinkPSMCounts( proteinLinkPositions );
+			ivd.setLooplinkPSMCounts( proteinLinkPositionPsmCount );
 
 			return ivd;
 
@@ -826,6 +955,7 @@ public class ViewerLooplinkService {
 					.build()
 					);
 		}
+
 
 
 	}

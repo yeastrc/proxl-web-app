@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.objects;
 
 import java.util.Collection;
 
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 
 /**
  * generic to merged search links, currently in m

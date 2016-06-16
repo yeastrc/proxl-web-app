@@ -5,13 +5,11 @@ package org.yeastrc.xlink.www.objects;
 
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dto.SearchDTO;
-import org.yeastrc.xlink.number_peptides_psms.NumPeptidesPSMsForProteinCriteria;
-import org.yeastrc.xlink.number_peptides_psms.NumPeptidesPSMsForProteinCriteriaResult;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 
 
@@ -117,7 +115,13 @@ public class SearchProteinLooplink implements IProteinLooplink {
 		try {
 			if( this.numPeptides == -1 ) {
 
-				populateNumPsmNumPeptideNumUniquePeptide();
+				if ( this.associatedReportedPeptideIds != null ) {
+					
+					this.numPeptides = this.associatedReportedPeptideIds.size();
+
+				} else {
+					populateNumPsmNumPeptideNumUniquePeptide();
+				}
 
 			}
 
@@ -147,8 +151,15 @@ public class SearchProteinLooplink implements IProteinLooplink {
 		
 		try {
 			if( this.numUniquePeptides == -1 ) {
+
+				if ( this.associatedReportedPeptideIdsRelatedPeptidesUnique != null ) {
+					
+					this.numUniquePeptides = this.associatedReportedPeptideIdsRelatedPeptidesUnique.size();
 				
-				populateNumPsmNumPeptideNumUniquePeptide();
+				} else {
+
+					populateNumPsmNumPeptideNumUniquePeptide();
+				}
 
 			}
 
@@ -170,20 +181,22 @@ public class SearchProteinLooplink implements IProteinLooplink {
 		
 		try {
 
-			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
-					NumPeptidesPSMsForProteinCriteria.getInstance()
-					.getNumPeptidesPSMsForLooplink(
-							this.getSearch().getId(),
-							this.getSearcherCutoffValuesSearchLevel(),
-							this.getProtein().getNrProtein().getNrseqId(),
-							this.getProteinPosition1(),
-							this.getProteinPosition2(),
-							YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
-			
-			this.numPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
-			this.numUniquePeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
-			
-			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
+			throw new Exception( "Removing calls to NumPeptidesPSMsForProteinCriteria.getNumPeptidesPSMsForLooplink" );
+
+//			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
+//					NumPeptidesPSMsForProteinCriteria.getInstance()
+//					.getNumPeptidesPSMsForLooplink(
+//							this.getSearch().getId(),
+//							this.getSearcherCutoffValuesSearchLevel(),
+//							this.getProtein().getNrProtein().getNrseqId(),
+//							this.getProteinPosition1(),
+//							this.getProteinPosition2(),
+//							YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
+//			
+//			this.numPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
+//			this.numUniquePeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
+//			
+//			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
 
 		} catch ( Exception e ) {
 
@@ -253,6 +266,21 @@ public class SearchProteinLooplink implements IProteinLooplink {
 	}
 
 
+	public Set<Integer> getAssociatedReportedPeptideIds() {
+		return associatedReportedPeptideIds;
+	}
+	public void setAssociatedReportedPeptideIds(
+			Set<Integer> associatedReportedPeptideIds) {
+		this.associatedReportedPeptideIds = associatedReportedPeptideIds;
+	}
+	public Set<Integer> getAssociatedReportedPeptideIdsRelatedPeptidesUnique() {
+		return associatedReportedPeptideIdsRelatedPeptidesUnique;
+	}
+	public void setAssociatedReportedPeptideIdsRelatedPeptidesUnique(
+			Set<Integer> associatedReportedPeptideIdsRelatedPeptidesUnique) {
+		this.associatedReportedPeptideIdsRelatedPeptidesUnique = associatedReportedPeptideIdsRelatedPeptidesUnique;
+	}
+
 	public SearcherCutoffValuesSearchLevel getSearcherCutoffValuesSearchLevel() {
 		return searcherCutoffValuesSearchLevel;
 	}
@@ -280,7 +308,11 @@ public class SearchProteinLooplink implements IProteinLooplink {
 	private int numPeptides = -1;
 	
 	private int numUniquePeptides = -1;
-	
+
+	private Set<Integer> associatedReportedPeptideIds;
+	private Set<Integer> associatedReportedPeptideIdsRelatedPeptidesUnique;
+
+
 	private SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel;
 
 

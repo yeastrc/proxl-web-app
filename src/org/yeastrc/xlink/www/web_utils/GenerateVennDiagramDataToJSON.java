@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 //import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.objects.IMergedSearchLink;
 import org.yeastrc.xlink.www.objects.VennDiagramDataToJSON;
 import org.yeastrc.xlink.www.objects.VennDiagramDataToJSON.VennDiagramDataAreaEntry;

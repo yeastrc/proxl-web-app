@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.objects;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.NRProteinDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.searcher.SearchUtils;
 
 public class SearchProtein implements IProtein {

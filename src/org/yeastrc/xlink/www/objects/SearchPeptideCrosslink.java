@@ -5,18 +5,19 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.CrosslinkDAO;
 import org.yeastrc.xlink.dao.PeptideDAO;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
-import org.yeastrc.xlink.dto.CrosslinkDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.searchers.PsmCountForSearchIdReportedPeptideIdSearcher;
-import org.yeastrc.xlink.searchers.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
+import org.yeastrc.xlink.www.searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
+import org.yeastrc.xlink.www.searcher.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
+import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.searcher.SearchProteinSearcher;
 import org.yeastrc.xlink.www.searcher.SearchPsmSearcher;
+import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher;
 
 
 
@@ -27,42 +28,40 @@ public class SearchPeptideCrosslink {
 
 	private void populatePeptides() throws Exception {
 		
-		Integer psmId = getSinglePsmId();
-		
-		if ( psmId == null ) {
-			
-			log.warn( "No PSMs for search.id : " + this.search.getId() 
-					+ ", this.getReportedPeptideId(): " + this.getReportedPeptideId() );
+		if ( populatePeptidesCalled ) {
 			
 			return;
 		}
 		
+		populatePeptidesCalled = true;
+		
 		try {
-			
-			//  Get crosslink table entry for a psm.  assume the peptide position is the same for all.
+			List<SrchRepPeptPeptideDTO> results = 
+					SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
+					.getForSearchIdReportedPeptideId( this.getSearchId(), this.getReportedPeptideId() );
+
+			if ( results.size() != 2 ) {
 
 
-			CrosslinkDTO crosslinkDTO = CrosslinkDAO.getInstance().getARandomCrosslinkDTOForPsmId( psmId );
-
-			if ( crosslinkDTO == null ) {
-
-
-				String msg = "crosslinkDTO == null for psmId: " + psmId;
+				String msg = "List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + this.getSearchId()
+						+ ", ReportedPeptideId: " + this.getReportedPeptideId() ;
 
 				log.error( msg );
 
-				throw new Exception( msg );
-
+				throw new ProxlWebappDataException( msg );
 			}
+			
+			SrchRepPeptPeptideDTO result_1 = results.get( 0 );
+			SrchRepPeptPeptideDTO result_2 = results.get( 1 );
 
-			if( crosslinkDTO.getPeptide1Id() == crosslinkDTO.getPeptide2Id() ) {
+			if( result_1.getPeptideId() == result_2.getPeptideId() ) {
 
 				//  Same peptide
 
-				int position1 = crosslinkDTO.getPeptide1Position();
-				int position2 = crosslinkDTO.getPeptide2Position();
+				int position1 = result_1.getPeptidePosition_1();
+				int position2 = result_2.getPeptidePosition_1();
 
-				PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( crosslinkDTO.getPeptide1Id() );
+				PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( result_1.getPeptideId() );
 
 				this.setPeptide1( peptideDTO );
 				this.setPeptide2( peptideDTO );
@@ -79,11 +78,11 @@ public class SearchPeptideCrosslink {
 
 				//  different peptides
 
-				PeptideDTO peptideDTO1 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( crosslinkDTO.getPeptide1Id() );
-				PeptideDTO peptideDTO2 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( crosslinkDTO.getPeptide2Id() );
+				PeptideDTO peptideDTO1 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( result_1.getPeptideId() );
+				PeptideDTO peptideDTO2 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( result_2.getPeptideId() );
 
-				int position1 = crosslinkDTO.getPeptide1Position();
-				int position2 = crosslinkDTO.getPeptide2Position();
+				int position1 = result_1.getPeptidePosition_1();
+				int position2 = result_2.getPeptidePosition_1();
 
 
 
@@ -102,14 +101,6 @@ public class SearchPeptideCrosslink {
 					this.setPeptide2Position( position1 );
 				}
 			}
-
-			this.peptide1ProteinPositions = 
-					SearchProteinSearcher.getInstance()
-					.getProteinPositions( psmId, this.getPeptide1().getId(), this.getPeptide1Position(), search );
-
-			this.peptide2ProteinPositions = 
-					SearchProteinSearcher.getInstance()
-					.getProteinPositions( psmId, this.getPeptide2().getId(), this.getPeptide2Position(), search );
 
 		} catch ( Exception e ) {
 
@@ -278,6 +269,11 @@ public class SearchPeptideCrosslink {
 			if( this.peptide1ProteinPositions == null ) {
 				
 				populatePeptides();
+
+				this.peptide1ProteinPositions = 
+						SearchProteinSearcher.getInstance()
+						.getProteinPositions( search, this.getReportedPeptideId(), this.getPeptide1().getId(), this.getPeptide1Position() );
+
 			}
 
 			return peptide1ProteinPositions;
@@ -318,6 +314,11 @@ public class SearchPeptideCrosslink {
 			if( this.peptide2ProteinPositions == null ) {
 				
 				populatePeptides();
+
+				this.peptide2ProteinPositions = 
+						SearchProteinSearcher.getInstance()
+						.getProteinPositions( search, this.getReportedPeptideId(), this.getPeptide2().getId(), this.getPeptide2Position() );
+
 			}
 
 			return peptide2ProteinPositions;
@@ -460,6 +461,9 @@ public class SearchPeptideCrosslink {
 
 	private ReportedPeptideDTO reportedPeptide;
 	
+	
+	
+	private boolean populatePeptidesCalled = false;
 	
 	private PeptideDTO peptide1;
 	private PeptideDTO peptide2;

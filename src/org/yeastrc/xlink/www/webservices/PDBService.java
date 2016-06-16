@@ -19,8 +19,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.PDBFileDAO;
-import org.yeastrc.xlink.dto.PDBFileDTO;
+import org.yeastrc.xlink.www.dao.PDBFileDAO;
+import org.yeastrc.xlink.www.dto.PDBFileDTO;
 import org.yeastrc.xlink.www.constants.PDBFileConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;

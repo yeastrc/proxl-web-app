@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.PsmDAO;
+import org.yeastrc.xlink.www.dao.PsmDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -167,7 +167,7 @@ public class PsmWebDisplaySearcher {
 //				sqlSB.append( " AND " );
 //
 //
-//				sqlSB.append( " unified_rp__rep_pept__search__generic_lookup.psm_num_at_default_cutoff > 0 " );
+//				sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff > 0 " );
 //
 //				
 //			} else {

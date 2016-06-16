@@ -35,7 +35,7 @@ import org.yeastrc.xlink.www.objects.SearchPeptideLooplink;
 import org.yeastrc.xlink.www.objects.SearchPeptideLooplinkAnnDataWrapper;
 import org.yeastrc.xlink.www.objects.SearchPeptideLooplinkWebserviceResult;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.SearchPeptideLooplinkSearcher;
+import org.yeastrc.xlink.www.searcher.SearchPeptideLooplink_LinkedPosition_Searcher;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataDefaultDisplayInDisplayOrder;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataInSortOrder;
@@ -68,7 +68,7 @@ public class ReportedPeptides_Looplink_Service {
 			@QueryParam( "protein_position_1" ) Integer proteinPosition1,
 			@QueryParam( "protein_position_2" ) Integer proteinPosition2,
 			@Context HttpServletRequest request )
-	throws Exception {
+	throws WebApplicationException {
 		
 		if ( searchId == null ) {
 
@@ -324,10 +324,16 @@ public class ReportedPeptides_Looplink_Service {
 			
 			
 
-			List<SearchPeptideLooplinkAnnDataWrapper> searchPeptideLooplinkList = 
-					SearchPeptideLooplinkSearcher.getInstance().searchOnSearchProteinLooplink( 
-							searchId, searcherCutoffValuesSearchLevel, proteinId, proteinPosition1, proteinPosition2 );
+//			List<SearchPeptideLooplinkAnnDataWrapper> searchPeptideLooplinkList = 
+//					SearchPeptideLooplinkSearcher.getInstance().searchOnSearchProteinLooplink( 
+//							searchId, searcherCutoffValuesSearchLevel, proteinId, proteinPosition1, proteinPosition2 );
 					
+			List<SearchPeptideLooplinkAnnDataWrapper> searchPeptideLooplinkList = 
+					SearchPeptideLooplink_LinkedPosition_Searcher.getInstance()
+					.searchOnSearchProteinLooplink( 
+							searchId, searcherCutoffValuesSearchLevel, 
+							proteinId, proteinPosition1, proteinPosition2 );
+	
 			
 			GetLooplinkReportedPeptidesServiceResult getLooplinkReportedPeptidesServiceResult =
 					getAnnotationDataAndSort(

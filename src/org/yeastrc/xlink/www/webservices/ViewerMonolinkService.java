@@ -21,13 +21,14 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.SearchDAO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
+import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.linked_positions.MonolinkLinkedPositions;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.MergedSearchProteinMonolink;
 import org.yeastrc.xlink.www.objects.SearchProteinMonolink;
-import org.yeastrc.xlink.www.searcher.MergedSearchProteinMonolinkSearcher;
+import org.yeastrc.xlink.www.objects.SearchProteinMonolinkWrapper;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -233,11 +234,18 @@ public class ViewerMonolinkService {
 
 			ImageViewerData ivd = new ImageViewerData();
 
+			////////////
 			
-			if( excludeTaxonomy == null ) 
-				excludeTaxonomy = new ArrayList<Integer>();
+			//  Copy Exclude Taxonomy Set for lookup
+
+			Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
 
 
+			if( excludeTaxonomy != null ) { 
+				excludeTaxonomy_Ids_Set_UserInput.addAll( excludeTaxonomy );
+			}
+			
+			
 
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
 			for( int searchId : searchIds ) {
@@ -278,114 +286,157 @@ public class ViewerMonolinkService {
 
 			
 
-			// our monolinks
-			List<MergedSearchProteinMonolink> monolinks = MergedSearchProteinMonolinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
+			Map<Integer, List<SearchProteinMonolinkWrapper>> wrappedMonolinks_MappedOnSearchId = new HashMap<>();
 
-			// if requested, filter out looplinks that shouldn't be included
-			if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
-					|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
-				
-				List<MergedSearchProteinMonolink> linksCopy = new ArrayList<MergedSearchProteinMonolink>();
-				linksCopy.addAll( monolinks );
+			for ( SearchDTO searchDTO : searches ) {
 
-				for( MergedSearchProteinMonolink link : linksCopy ) {
+				Integer searchId = searchDTO.getId();
 
-					// did they request to removal of non unique peptides?
-					if( filterNonUniquePeptides ) {
-						
-						if( link.getNumUniquePeptides() < 1 ) {
-							monolinks.remove( link );
-							continue;
-						}
-					}
+				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
+						searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
 
-//					
-//						link.getNumPsms() <= 1 WILL NOT WORK if more than one search since it is across all searches
-//					
-//					// did they request to removal of links with only one PSM?
-					if( filterOnlyOnePSM ) {
-						
-						boolean foundSearchWithMoreThanOnePSM = false;
-						
+				if ( searcherCutoffValuesSearchLevel == null ) {
 
-						Map<SearchDTO, SearchProteinMonolink> searchMonolinks = link.getSearchProteinMonolinks();
-
-						for ( Map.Entry<SearchDTO, SearchProteinMonolink> searchEntry : searchMonolinks.entrySet() ) {
-
-							SearchProteinMonolink searchProteinMonolink = searchEntry.getValue();
-
-							int psmCountForSearchId = searchProteinMonolink.getNumPsms();
-
-							if ( psmCountForSearchId > 1 ) {
-
-								foundSearchWithMoreThanOnePSM = true;
-								break;
-							}
-						}
-						
-						if (  ! foundSearchWithMoreThanOnePSM ) {
-							monolinks.remove( link );
-							continue;
-						}
-
-					}
-					
-					
-					// did they request to removal of links with only one Reported Peptide?
-					if( filterOnlyOnePeptide ) {
-						
-						boolean foundSearchWithMoreThanOneReportedPeptide = false;
-
-						Map<SearchDTO, SearchProteinMonolink> searchMonolinks = link.getSearchProteinMonolinks();
-
-						for ( Map.Entry<SearchDTO, SearchProteinMonolink> searchEntry : searchMonolinks.entrySet() ) {
-
-							SearchProteinMonolink searchProteinMonolink = searchEntry.getValue();
-
-							int peptideCountForSearchId = searchProteinMonolink.getNumPeptides();
-
-							if ( peptideCountForSearchId > 1 ) {
-
-								foundSearchWithMoreThanOneReportedPeptide = true;
-								break;
-							}
-						}
-						
-						if (  ! foundSearchWithMoreThanOneReportedPeptide ) {
-							monolinks.remove( link );
-							continue;
-						}
-					}
-					
-					
-					// did they request removal of certain taxonomy IDs?
-					if( excludeTaxonomy != null && excludeTaxonomy.size() > 0 ) {
-						for( int tid : excludeTaxonomy ) {
-							if( link.getProtein().getNrProtein().getTaxonomyId() == tid ) {
-								monolinks.remove( link );
-								continue;
-							}
-						}
-					}
-				}
-			}
-
-			// build the JSON data structure for looplinks
-			Map<Integer, Map<Integer, Set<Integer>>> monolinkPositions = new HashMap<Integer, Map<Integer, Set<Integer>>>();
-			for( MergedSearchProteinMonolink link : monolinks ) {
-				int pid = link.getProtein().getNrProtein().getNrseqId();
-				int pos = link.getProteinPosition();
-				
-				Set<Integer> searchIdSet = new HashSet<Integer>();
-				for( SearchDTO search : link.getSearches() ) {
-					searchIdSet.add( search.getId() );
+					searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
 				}
 
-				if( !monolinkPositions.containsKey( pid ) )
-					monolinkPositions.put( pid,  new HashMap<Integer, Set<Integer>>() );
+
+				List<SearchProteinMonolinkWrapper> wrappedMonolinks = 
+						MonolinkLinkedPositions.getInstance()
+						.getSearchProteinMonolinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+
+
+				// Filter out links if requested
+				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
+						|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
+
+
+
+					///////  Output Lists, Results After Filtering
+
+					List<SearchProteinMonolinkWrapper> wrappedMonolinksAfterFilter = new ArrayList<>( wrappedMonolinks.size() );
+
+
+					for ( SearchProteinMonolinkWrapper searchProteinMonolinkWrapper : wrappedMonolinks ) {
+
+						SearchProteinMonolink link = searchProteinMonolinkWrapper.getSearchProteinMonolink();
+
+
+						// did user request removal of certain taxonomy IDs?
+
+						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
+
+							int taxonomyId = link.getProtein().getNrProtein().getTaxonomyId();
+
+							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+						}
+
+
+						// did they request to removal of non unique peptides?
+
+						if( filterNonUniquePeptides  ) {
+
+							if( link.getNumUniquePeptides() < 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+						}
+
+
+						//	did they request to removal of links with only one PSM?
+						if( filterOnlyOnePSM  ) {
+
+							int psmCountForSearchId = link.getNumPsms();
+
+							if ( psmCountForSearchId <= 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+
+						}
+
+
+						// did they request to removal of links with only one Reported Peptide?
+						if( filterOnlyOnePeptide ) {
+
+							int peptideCountForSearchId = link.getNumPeptides();
+
+							if ( peptideCountForSearchId <= 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+
+						}
+
+
+						wrappedMonolinksAfterFilter.add( searchProteinMonolinkWrapper );
+
+					}
+
+					//  Copy new filtered list to original input variable name to overlay it
+
+					wrappedMonolinks = wrappedMonolinksAfterFilter;
+				}
 				
-				monolinkPositions.get( pid ).put( pos, searchIdSet );
+				
+				wrappedMonolinks_MappedOnSearchId.put( searchId, wrappedMonolinks );
 			}
+			
+			// build the JSON data structure for monolinks
+			
+
+			//  Build a Map of maps of <prot id>, <prot position>, <set of search ids>
+			
+			Map<Integer, Map<Integer, Set<Integer>>> monolinkPositions = new HashMap<>();
+
+			for ( Map.Entry<Integer, List<SearchProteinMonolinkWrapper>> wrappedMonolinks_MappedOnSearchId_Entry :
+				wrappedMonolinks_MappedOnSearchId.entrySet() ) {
+
+				Integer searchIdForEntry = wrappedMonolinks_MappedOnSearchId_Entry.getKey();
+				
+				List<SearchProteinMonolinkWrapper> wrappedMonolinks = wrappedMonolinks_MappedOnSearchId_Entry.getValue();
+
+				for ( SearchProteinMonolinkWrapper wrappedMonolink : wrappedMonolinks ) {
+
+					SearchProteinMonolink searchProteinMonolink = wrappedMonolink.getSearchProteinMonolink();
+
+					int protId = searchProteinMonolink.getProtein().getNrProtein().getNrseqId();
+
+					int protPosition = searchProteinMonolink.getProteinPosition();
+				
+
+					Map<Integer, Set<Integer>> map_keyed_by_protPosition = monolinkPositions.get( protId );
+
+					if ( map_keyed_by_protPosition == null ) {
+						
+						map_keyed_by_protPosition = new HashMap<>();
+						monolinkPositions.put( protId, map_keyed_by_protPosition );
+					}
+					
+					
+					Set<Integer> searchIdSet = map_keyed_by_protPosition.get( protPosition );
+					
+					if ( searchIdSet == null ) {
+						
+						searchIdSet = new HashSet<>();
+						map_keyed_by_protPosition.put( protPosition, searchIdSet );
+					}
+					
+					searchIdSet.add( searchIdForEntry );
+				}
+			}
+			
 			
 			ivd.setProteinMonoLinkPositions( monolinkPositions );
 
@@ -614,11 +665,17 @@ public class ViewerMonolinkService {
 
 			ImageViewerData ivd = new ImageViewerData();
 
-			
-			
-			if( excludeTaxonomy == null ) 
-				excludeTaxonomy = new ArrayList<Integer>();
 
+			////////////
+			
+			//  Copy Exclude Taxonomy Set for lookup
+
+			Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
+
+
+			if( excludeTaxonomy != null ) { 
+				excludeTaxonomy_Ids_Set_UserInput.addAll( excludeTaxonomy );
+			}
 			
 			
 
@@ -661,112 +718,157 @@ public class ViewerMonolinkService {
 
 			
 
-			// our monolinks
-			List<MergedSearchProteinMonolink> monolinks = MergedSearchProteinMonolinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
+			Map<Integer, List<SearchProteinMonolinkWrapper>> wrappedMonolinks_MappedOnSearchId = new HashMap<>();
 
-			// if requested, filter out looplinks that shouldn't be included
-			if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
-					|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
-				
-				List<MergedSearchProteinMonolink> linksCopy = new ArrayList<MergedSearchProteinMonolink>();
-				linksCopy.addAll( monolinks );
+			for ( SearchDTO searchDTO : searches ) {
 
-				for( MergedSearchProteinMonolink link : linksCopy ) {
+				Integer searchId = searchDTO.getId();
 
-					// did they request to removal of non unique peptides?
-					if( filterNonUniquePeptides ) {
-						
-						if( link.getNumUniquePeptides() < 1 ) {
-							monolinks.remove( link );
-							continue;
-						}
-					}
+				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
+						searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
 
-//					
-//						link.getNumPsms() <= 1 WILL NOT WORK if more than one search since it is across all searches
-//					
-//					// did they request to removal of links with only one PSM?
-					if( filterOnlyOnePSM ) {
-						
-						boolean foundSearchWithMoreThanOnePSM = false;
-						
+				if ( searcherCutoffValuesSearchLevel == null ) {
 
-						Map<SearchDTO, SearchProteinMonolink> searchMonolinks = link.getSearchProteinMonolinks();
-
-						for ( Map.Entry<SearchDTO, SearchProteinMonolink> searchEntry : searchMonolinks.entrySet() ) {
-
-							SearchProteinMonolink searchProteinMonolink = searchEntry.getValue();
-
-							int psmCountForSearchId = searchProteinMonolink.getNumPsms();
-
-							if ( psmCountForSearchId > 1 ) {
-
-								foundSearchWithMoreThanOnePSM = true;
-								break;
-							}
-						}
-						
-						if (  ! foundSearchWithMoreThanOnePSM ) {
-							monolinks.remove( link );
-							continue;
-						}
-
-					}
-					
-					
-					// did they request to removal of links with only one Reported Peptide?
-					if( filterOnlyOnePeptide ) {
-						
-						boolean foundSearchWithMoreThanOneReportedPeptide = false;
-
-						Map<SearchDTO, SearchProteinMonolink> searchMonolinks = link.getSearchProteinMonolinks();
-
-						for ( Map.Entry<SearchDTO, SearchProteinMonolink> searchEntry : searchMonolinks.entrySet() ) {
-
-							SearchProteinMonolink searchProteinMonolink = searchEntry.getValue();
-
-							int peptideCountForSearchId = searchProteinMonolink.getNumPeptides();
-
-							if ( peptideCountForSearchId > 1 ) {
-
-								foundSearchWithMoreThanOneReportedPeptide = true;
-								break;
-							}
-						}
-						
-						if (  ! foundSearchWithMoreThanOneReportedPeptide ) {
-							monolinks.remove( link );
-							continue;
-						}
-					}
-					
-					
-					// did they request removal of certain taxonomy IDs?
-					if( excludeTaxonomy != null && excludeTaxonomy.size() > 0 ) {
-						for( int tid : excludeTaxonomy ) {
-							if( link.getProtein().getNrProtein().getTaxonomyId() == tid ) {
-								monolinks.remove( link );
-								continue;
-							}
-						}
-					}
+					searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
 				}
-			}
 
-			// build the JSON data structure for looplinks
-			Map<Integer, Map<Integer, Integer>> monolinkPositions = new HashMap<Integer, Map<Integer, Integer>>();
-			for( MergedSearchProteinMonolink link : monolinks ) {
-				int pid = link.getProtein().getNrProtein().getNrseqId();
-				int pos = link.getProteinPosition();
-				
 
-				if( !monolinkPositions.containsKey( pid ) )
-					monolinkPositions.put( pid,  new HashMap<Integer, Integer>() );
+				//	List<SearchProteinMonolinkWrapper> wrappedMonolinks = 
+				//		SearchProteinMonolinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
+
+				List<SearchProteinMonolinkWrapper> wrappedMonolinks = 
+						MonolinkLinkedPositions.getInstance()
+						.getSearchProteinMonolinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+
+
+				//				List<MergedSearchProteinMonolink> looplinks = MergedSearchProteinMonolinkSearcher.getInstance().search( searches, searcherCutoffValuesRootLevel );
+
+				// Filter out links if requested
+				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
+						|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
+
+
+
+					///////  Output Lists, Results After Filtering
+
+					List<SearchProteinMonolinkWrapper> wrappedMonolinksAfterFilter = new ArrayList<>( wrappedMonolinks.size() );
+
+
+					for ( SearchProteinMonolinkWrapper searchProteinMonolinkWrapper : wrappedMonolinks ) {
+
+						SearchProteinMonolink link = searchProteinMonolinkWrapper.getSearchProteinMonolink();
+
+
+						// did user request removal of certain taxonomy IDs?
+
+						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
+
+							int taxonomyId = link.getProtein().getNrProtein().getTaxonomyId();
+
+							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+						}
+
+
+						// did they request to removal of non unique peptides?
+
+						if( filterNonUniquePeptides  ) {
+
+							if( link.getNumUniquePeptides() < 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+						}
+
+
+						//	did they request to removal of links with only one PSM?
+						if( filterOnlyOnePSM  ) {
+
+							int psmCountForSearchId = link.getNumPsms();
+
+							if ( psmCountForSearchId <= 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+
+						}
+
+
+						// did they request to removal of links with only one Reported Peptide?
+						if( filterOnlyOnePeptide ) {
+
+							int peptideCountForSearchId = link.getNumPeptides();
+
+							if ( peptideCountForSearchId <= 1 ) {
+
+								//  Skip to next entry in list, dropping this entry from output list
+
+								continue;  // EARLY CONTINUE
+							}
+
+						}
+
+
+						wrappedMonolinksAfterFilter.add( searchProteinMonolinkWrapper );
+
+					}
+
+					//  Copy new filtered list to original input variable name to overlay it
+
+					wrappedMonolinks = wrappedMonolinksAfterFilter;
+				}
 				
-				monolinkPositions.get( pid ).put( pos, link.getNumPsms() );
+				
+				wrappedMonolinks_MappedOnSearchId.put( searchId, wrappedMonolinks );
 			}
 			
-			ivd.setMonolinkPSMCounts( monolinkPositions );
+			// build the JSON data structure for monolinks
+			
+
+			//  Build a Map of maps of <prot id>, <prot position>, <set of search ids>
+			
+			Map<Integer, Map<Integer, Integer>> proteinLinkPositionPsmCount = new HashMap<>();
+
+			for ( Map.Entry<Integer, List<SearchProteinMonolinkWrapper>> wrappedMonolinks_MappedOnSearchId_Entry :
+				wrappedMonolinks_MappedOnSearchId.entrySet() ) {
+
+//				Integer searchIdForEntry = wrappedMonolinks_MappedOnSearchId_Entry.getKey();
+				
+				List<SearchProteinMonolinkWrapper> wrappedMonolinks = wrappedMonolinks_MappedOnSearchId_Entry.getValue();
+
+				for ( SearchProteinMonolinkWrapper wrappedMonolink : wrappedMonolinks ) {
+
+					SearchProteinMonolink searchProteinMonolink = wrappedMonolink.getSearchProteinMonolink();
+
+					Integer numPsms = searchProteinMonolink.getNumPsms();
+					
+					int protId = searchProteinMonolink.getProtein().getNrProtein().getNrseqId();
+
+					int protPosition = searchProteinMonolink.getProteinPosition();
+				
+
+					Map<Integer, Integer> map_keyed_by_protPosition = proteinLinkPositionPsmCount.get( protId );
+
+					if ( map_keyed_by_protPosition == null ) {
+						
+						map_keyed_by_protPosition = new HashMap<>();
+						proteinLinkPositionPsmCount.put( protId, map_keyed_by_protPosition );
+					}
+					
+					map_keyed_by_protPosition.put( protPosition, numPsms );
+					
+				}
+			}
+			
+			ivd.setMonolinkPSMCounts( proteinLinkPositionPsmCount );
 
 			return ivd;
 			

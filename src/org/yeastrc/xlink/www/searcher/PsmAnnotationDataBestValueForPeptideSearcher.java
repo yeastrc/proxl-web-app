@@ -15,7 +15,7 @@ import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 
 /**
  * 
- * FROM unified_rp__rep_pept__search__best_psm_value_generic_lookup
+ * FROM unified_rp__search__rep_pept__best_psm_value_generic_lookup
  */
 public class PsmAnnotationDataBestValueForPeptideSearcher {
 
@@ -31,14 +31,14 @@ public class PsmAnnotationDataBestValueForPeptideSearcher {
 	private static final String SQL_MAIN = 
 			"SELECT * "
 					
-			+ " FROM unified_rp__rep_pept__search__best_psm_value_generic_lookup  "
+			+ " FROM unified_rp__search__rep_pept__best_psm_value_generic_lookup  "
 
 			+ " WHERE search_id = ? AND reported_peptide_id = ? AND annotation_type_id IN  ";
 			
 	
 	
 	/**
-	 * FROM unified_rp__rep_pept__search__best_psm_value_generic_lookup
+	 * FROM unified_rp__search__rep_pept__best_psm_value_generic_lookup
 	 * 
 	 * @param searchId
 	 * @param reportedPeptideId

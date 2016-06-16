@@ -3,15 +3,16 @@ package org.yeastrc.xlink.www.objects;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.MatchedPeptideDAO;
 import org.yeastrc.xlink.dao.PeptideDAO;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
-import org.yeastrc.xlink.dto.MatchedPeptideDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.searcher.SearchProteinSearcher;
 import org.yeastrc.xlink.www.searcher.SearchPsmSearcher;
+import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -20,52 +21,58 @@ public class SearchPeptideDimer {
 	private static final Logger log = Logger.getLogger(SearchPeptideDimer.class);
 
 	private void populatePeptides() throws Exception {
-		
-		Integer psmId = getSinglePsmId();
-		
-		if ( psmId == null ) {
-			
-			log.warn( "No PSMs for search.id : " + search.getId() 
-					+ ", this.getReportedPeptideId(): " + this.getReportedPeptideId() );
+
+		if ( populatePeptidesCalled ) {
 			
 			return;
 		}
 		
+		populatePeptidesCalled = true;
+		
 		try {
+			List<SrchRepPeptPeptideDTO> results = 
+					SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
+					.getForSearchIdReportedPeptideId( this.getSearch().getId(), this.getReportedPeptideId() );
 
-			//  Get MatchedPeptide table entries for a psm.
-			
-			List<MatchedPeptideDTO> results = MatchedPeptideDAO.getInstance().getMatchedPeptideDTOForPsmId(  psmId );
+			if ( results.size() != 2 ) {
 
-			if ( results.size() < 2 ) {
-				
 
-				String msg = "results.size() < 2 for psmId: " + psmId;
+				String msg = "List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + this.getSearch().getId()
+						+ ", ReportedPeptideId: " + this.getReportedPeptideId() ;
 
 				log.error( msg );
 
-				throw new Exception( msg );
-				
+				throw new ProxlWebappDataException( msg );
 			}
 			
+			SrchRepPeptPeptideDTO result_1 = results.get( 0 );
+			SrchRepPeptPeptideDTO result_2 = results.get( 1 );
 
-			PeptideDTO peptideDTO1 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( results.get(0).getPeptide_id() );
 
-			this.setPeptide1( peptideDTO1 );
+			if( result_1.getPeptideId() == result_2.getPeptideId() ) {
+
+				PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( result_1.getPeptideId() );
+
+				this.setPeptide1( peptideDTO );
+				this.setPeptide2( peptideDTO );
+				
+			} else {
+
+				PeptideDTO peptideDTO1 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( result_1.getPeptideId() );
+				this.setPeptide1( peptideDTO1 );
 			
-
-			PeptideDTO peptideDTO2 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( results.get(1).getPeptide_id() );
-
-			this.setPeptide2( peptideDTO2 );
+				PeptideDTO peptideDTO2 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( result_2.getPeptideId() );
+				this.setPeptide2( peptideDTO2 );
+			}
 			
 
 			this.peptide1ProteinPositions = 
 					SearchProteinSearcher.getInstance()
-					.getProteinForDimer( psmId, this.getPeptide1().getId(), search );
+					.getProteinForDimer( search, this.getReportedPeptideId(), this.getPeptide1().getId() );
 
 			this.peptide2ProteinPositions = 
 					SearchProteinSearcher.getInstance()
-					.getProteinForDimer( psmId, this.getPeptide2().getId(), search );
+					.getProteinForDimer( search, this.getReportedPeptideId(), this.getPeptide2().getId() );
 
 
 
@@ -247,6 +254,8 @@ public class SearchPeptideDimer {
 	
 
 	private int reportedPeptideId = -999;
+	
+	private boolean populatePeptidesCalled;
 
 
 	private ReportedPeptideDTO reportedPeptide;

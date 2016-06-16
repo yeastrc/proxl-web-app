@@ -18,19 +18,19 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.xlink.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinCrosslinkSearcher;
-import org.yeastrc.xlink.www.searcher.SearchProteinLooplinkSearcher;
 import org.yeastrc.xlink.www.searcher.SearchTaxonomySearcher;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureNavLinks;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.SearchProtein;
@@ -380,11 +380,10 @@ public class ViewSearchProteinsAction extends Action {
 			/////////////////////////////////////////////////////////////
 			
 			//////////////////   Get Crosslinks data from DATABASE  from database
-			
-
 
 			List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
-					SearchProteinCrosslinkSearcher.getInstance().searchOnSearchIdandCutoffs( search, searcherCutoffValuesSearchLevel );
+					CrosslinkLinkedPositions.getInstance()
+					.getSearchProteinCrosslinkWrapperList( search, searcherCutoffValuesSearchLevel );
 			
 
 			if ( webappTiming != null ) {
@@ -397,12 +396,10 @@ public class ViewSearchProteinsAction extends Action {
 			
 			//////////////////   Get Looplinks data from DATABASE   from database
 			
-
-
 			List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
-					SearchProteinLooplinkSearcher.getInstance().searchOnSearchIdandCutoffs( search, searcherCutoffValuesSearchLevel );
+					LooplinkLinkedPositions.getInstance()
+					.getSearchProteinLooplinkWrapperList( search, searcherCutoffValuesSearchLevel );
 
-			
 			if ( webappTiming != null ) {
 				
 				webappTiming.markPoint( "After Looplink Searcher:  SearchProteinLooplinkSearcher.getInstance().search( ... )" );
@@ -470,13 +467,8 @@ public class ViewSearchProteinsAction extends Action {
 							continue;  // EARLY CONTINUE
 						}
 					}
-					
 
-//
-//					
-//						link.getNumPsms() <= 1 WILL NOT WORK if more than one search since it is across all searches
-//					
-//					// did they request to removal of links with only one PSM?
+					// did they request to removal of links with only one PSM?
 					if( proteinQueryJSONRoot.isFilterOnlyOnePSM()  ) {
 
 						int psmCountForSearchId = link.getNumPsms();
@@ -560,13 +552,8 @@ public class ViewSearchProteinsAction extends Action {
 							continue;  // EARLY CONTINUE
 						}
 					}
-					
 
-//
-//					
-//						link.getNumPsms() <= 1 WILL NOT WORK if more than one search since it is across all searches
-//					
-//					// did they request to removal of links with only one PSM?
+					// did they request to removal of links with only one PSM?
 					if( proteinQueryJSONRoot.isFilterOnlyOnePSM()  ) {
 
 						int psmCountForSearchId = link.getNumPsms();
@@ -593,8 +580,6 @@ public class ViewSearchProteinsAction extends Action {
 						}
 
 					}
-					
-
 
 					// did user request removal of certain taxonomy IDs?
 					
@@ -623,13 +608,10 @@ public class ViewSearchProteinsAction extends Action {
 							continue;  // EARLY CONTINUE
 						}
 					}									
-						
+
 					
 					wrappedLooplinksAfterFilter.add( searchProteinLooplinkWrapper );
 				}
-				
-				
-				
 				
 				
 				
@@ -686,11 +668,6 @@ public class ViewSearchProteinsAction extends Action {
 
 				//  Sort "wrappedCrosslinks" since removed ORDER BY from SQL
 				
-
-//				private static final String SQL_SEARCH_ON_SEARCH_ID_ORDER_BY =   
-//						" ORDER BY nrseq_id_1, nrseq_id_2, protein_1_position, protein_2_position ";
-
-				
 				Collections.sort( wrappedCrosslinks, new Comparator<SearchProteinCrosslinkWrapper>() {
 
 					@Override
@@ -737,14 +714,9 @@ public class ViewSearchProteinsAction extends Action {
 								peptideCutoffsAnnotationTypeDTOList, 
 								psmCutoffsAnnotationTypeDTOList );
 
-
 				request.setAttribute( "peptideAnnotationDisplayNameDescriptionList", sortCrosslinksResult.getPeptideAnnotationDisplayNameDescriptionList() );
 				
 				request.setAttribute( "psmAnnotationDisplayNameDescriptionList", sortCrosslinksResult.getPsmAnnotationDisplayNameDescriptionList() );
-				
-				
-				
-
 				
 				
 				crosslinks = new ArrayList<>( wrappedCrosslinks.size() );
@@ -758,26 +730,16 @@ public class ViewSearchProteinsAction extends Action {
 					crosslinks.add( searchProteinCrosslink );
 
 				}
-
-
-
 				
 			}
-			
 
 			/////////////////////////////////////////////////////////////
 			
 			//////////////////   Get Looplinks data
 			
-
-			
-
 			List<SearchProteinLooplink> looplinks = null;
 			
-			
-
 			if ( ! Struts_Config_Parameter_Values_Constants.STRUTS__PARAMETER__LOOPLINK.equals( strutsActionMappingParameter ) ) {
-
 
 				//  NOT Looplink page:    Struts config action mapping:    NOT parameter="looplink"
 				
@@ -789,28 +751,16 @@ public class ViewSearchProteinsAction extends Action {
 					
 					looplinks.add( searchProteinLooplinkWrapper.getSearchProteinLooplink() );
 				}
-				
-				
+
 			} else {
 
-			
-
 				//	For  Struts config action mapping:     parameter="looplink"
-
-
-
 
 				////   Looplinks  - Prepare for Web display
 
 				//      Get Annotation data and Sort by Annotation data
 
-
 				looplinks = new ArrayList<>( wrappedLooplinks.size() );
-
-
-//				private static final String SQL_SEARCH_ON_SEARCH_ID_ORDER_BY =   
-//						" ORDER BY nrseq_id, protein_position_1, protein_position_2 ";
-
 
 				Collections.sort( wrappedLooplinks, new Comparator<SearchProteinLooplinkWrapper>() {
 
@@ -865,11 +815,7 @@ public class ViewSearchProteinsAction extends Action {
 				}
 			}			
 			
-			
-			
 			///////////////////////////////////////////////////////
-
-			
 			
 			Collection<SearchProtein> prProteins2 = new HashSet<SearchProtein>();
 			prProteins2.addAll( prProteins );
@@ -889,35 +835,23 @@ public class ViewSearchProteinsAction extends Action {
 					}
 				}
 			}
-			
-			
 
 			List<SearchProtein> sortedProteins = new ArrayList<SearchProtein>();
 			sortedProteins.addAll( prProteins );
 			Collections.sort( sortedProteins, new SortSearchProtein() );
-			
-			
 
 			request.setAttribute( "proteins", sortedProteins );
-			
-			
-			request.setAttribute( "numCrosslinks", crosslinks.size() );
-			
-			
-			int numDistinctLinks =  XLinkWebAppUtils.getNumUDRs( crosslinks, looplinks );
 
+			request.setAttribute( "numCrosslinks", crosslinks.size() );
+
+			int numDistinctLinks =  XLinkWebAppUtils.getNumUDRs( crosslinks, looplinks );
 			
 			request.setAttribute( "numLooplinks", looplinks.size() );
 			request.setAttribute( "numLinks", looplinks.size() + crosslinks.size() );
 			request.setAttribute( "numDistinctLinks", numDistinctLinks );
-
-			
 			
 			request.setAttribute( "crosslinks", crosslinks );
-						
 			request.setAttribute( "looplinks", looplinks );
-			
-			
 
 			/////////////////////
 			
@@ -925,14 +859,11 @@ public class ViewSearchProteinsAction extends Action {
 
 			form.setQueryJSON( "" );
 
-			
-
 			/////////////////////
 			
 			////  Put Updated queryJSON on the page
 			
 			{
-			
 				try {
 					
 					String queryJSONToForm = jacksonJSON_Mapper.writeValueAsString( proteinQueryJSONRoot );
@@ -953,17 +884,13 @@ public class ViewSearchProteinsAction extends Action {
 					log.error( msg, e );
 					throw new ProxlWebappDataException( msg, e );
 				}
-			
 			}
 			
-
-
 			/////////////////////
 			
 			////  Put queryJSON for Peptide Link on the page
 			
 			{
-			
 				try {
 					
 					PeptideQueryJSONRoot peptideQueryJSONRoot = new PeptideQueryJSONRoot();
@@ -1013,8 +940,6 @@ public class ViewSearchProteinsAction extends Action {
 			.populateRequestDataForImageAndStructureNavLinksForProtein( proteinQueryJSONRoot, projectId, authAccessLevel, form, request );
 						
 
-			
-			
 			if ( webappTiming != null ) {
 				
 				webappTiming.markPoint( "Before send to JSP" );

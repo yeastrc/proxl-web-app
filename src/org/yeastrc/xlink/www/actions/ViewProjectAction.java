@@ -27,7 +27,7 @@ import org.yeastrc.xlink.www.web_utils.GetProjectPublicAccessData;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.dto.NoteDTO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
 
 

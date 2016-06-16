@@ -133,19 +133,7 @@ public class GetAnnotationTypeDataDefaultDisplayInDisplayOrder {
 				
 				continue;  //  EARLY Continue  
 			}
-			
 
-//			if ( annotationTypeDataDescriptive == null ) {
-//				
-//				String msg = "No descriptive annotations found for psmPeptide: " + psmPeptideAnnotationType.value()
-//						+ ", searchId: " + searchId;
-//				log.warn( msg );
-//
-//				continue;  //  EARLY Continue  
-//			}
-			
-			
-			
 			
 			List<AnnotationTypeDTO> annotationTypeDTO_DefaultDisplay_DisplayOrder_PerSearchIdList = 
 					new ArrayList<>( annotationTypeDataFilterable.size() * 2 );

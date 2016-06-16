@@ -17,8 +17,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.auth.dao.AuthSharedObjectDAO;
 import org.yeastrc.auth.dto.AuthSharedObjectDTO;
-import org.yeastrc.xlink.dao.SearchDAO;
-import org.yeastrc.xlink.dto.SearchDTO;
+import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
@@ -241,12 +241,6 @@ public class ViewMergedStructureAction extends Action {
 			String annotation_data_webservice_base_url = 
 					ConfigSystemDAO.getInstance().getConfigValueForConfigKey( ConfigSystemsKeysConstants.PROTEIN_ANNOTATION_WEBSERVICE_URL_KEY );
 			
-//			if ( annotation_data_webservice_base_url == null ) {
-//				
-//				String msg = "No System configuration found for key: " + ConfigSystemsKeysConstants.PROTEIN_ANNOTATION_WEBSERVICE_URL_KEY;
-//				log.error( msg );
-//				throw new Exception( msg );
-//			}
 			
 			request.setAttribute( "annotation_data_webservice_base_url", annotation_data_webservice_base_url );
 			
