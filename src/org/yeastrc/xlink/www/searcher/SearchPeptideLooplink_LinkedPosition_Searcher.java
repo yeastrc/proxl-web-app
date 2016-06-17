@@ -670,9 +670,9 @@ public class SearchPeptideLooplink_LinkedPosition_Searcher {
 				
 				if ( ! retrieved_reported_peptide_id_values_Set.add( reportedPeptideId ) ) {
 					
-					String msg = "Already processed result entry for reportedPeptideId: " + reportedPeptideId;
-
-					log.warn( msg );
+//					String msg = "Already processed result entry for reportedPeptideId: " + reportedPeptideId;
+//
+//					log.warn( msg );
 					
 					continue;  //   EARY CONTINUE
 					

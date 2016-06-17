@@ -985,9 +985,9 @@ public class PeptideWebPageSearcher {
 					
 					if ( ! retrieved_reported_peptide_id_values_Set.add( itemReportedPeptideId ) ) {
 						
-						String msg = "Already processed result entry for itemReportedPeptideId: " + itemReportedPeptideId;
-
-						log.warn( msg );
+//						String msg = "Already processed result entry for itemReportedPeptideId: " + itemReportedPeptideId;
+//
+//						log.warn( msg );
 						
 //						log.error( msg );
 //						throw new ProxlWebappDataException(msg);
