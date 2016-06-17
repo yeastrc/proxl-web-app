@@ -601,7 +601,7 @@ var CutoffProcessingCommonCode = function() {
 			var $inputField = $( this );
 			
 
-			var cutoffValue = $inputField.val();
+			var cutoffValue = $inputField.val().trim();
 			
 			
 			
