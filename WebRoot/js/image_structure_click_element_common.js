@@ -1108,13 +1108,25 @@ var attachViewLinkInfoOverlayClickHandlers = function (  ) {
 
 var linkInfoOverlayWidthResizer = function() {
 	
-	var $link_info_table = $("#link_info_table__tbody");
+	var $link_info_table__tbody_jq_Entries = $(".link_info_table__tbody_jq");
+	
+	var max_link_info_table_width = 0;
+	
+	$link_info_table__tbody_jq_Entries.each( function( index, element ) {
+		
+		var $link_info_table__tbody_jq_Entry = $( this ); 
 
-	var link_info_table_width = $link_info_table.outerWidth( true /* [ includeMargin ] */ );
-
+		var link_info_table_width = $link_info_table__tbody_jq_Entry.outerWidth( true /* [ includeMargin ] */ );
+		
+		if ( max_link_info_table_width < link_info_table_width ) {
+			
+			max_link_info_table_width = link_info_table_width;
+		}
+	});
+	
 	//  Adjust width of link info overlay to be 40 pixels wider than the link info table
 	
-	var view_link_info_overlay_div = link_info_table_width + 40;
+	var view_link_info_overlay_div = max_link_info_table_width + 40;
 
 	$("#view_link_info_overlay_div").css( {"width": view_link_info_overlay_div } );
 };
