@@ -77,14 +77,14 @@
 
 		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/circle-plot/circle-plot-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/circle-plot/circle-plot-viewer-per-protein-bar-data.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-per-protein-bar-data.js?x=${cacheBustValue}"></script> 
 
-		<script type="text/javascript" src="${ contextPath }/js/circle-plot/circle-plot-viewer-region-selections.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-region-selections.js?x=${cacheBustValue}"></script> 
 
 		<script type="text/javascript" src="${ contextPath }/js/circle-plot/circle-plot-viewer.js?x=${cacheBustValue}"></script> 
-		<script type="text/javascript" src="${ contextPath }/js/circle-plot/circle-plot-viewer-old.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer.js?x=${cacheBustValue}"></script> 
 		
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
