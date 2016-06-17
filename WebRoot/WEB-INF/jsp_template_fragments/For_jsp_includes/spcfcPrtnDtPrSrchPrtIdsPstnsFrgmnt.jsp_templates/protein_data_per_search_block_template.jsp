@@ -47,7 +47,7 @@
 				{{/each}}						
 		</tr>
 		</thead>
-		<tbody id="link_info_table__tbody"></tbody>
+		<tbody class=" link_info_table__tbody_jq "></tbody>
 	</table>
 
 
