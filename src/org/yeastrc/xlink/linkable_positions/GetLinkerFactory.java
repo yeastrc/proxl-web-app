@@ -1,6 +1,8 @@
 package org.yeastrc.xlink.linkable_positions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -77,6 +79,21 @@ public class GetLinkerFactory {
 		}
 		
 		linkers.put( linkerAbbr, linker );
+	}
+	
+	/**
+	 * @return
+	 */
+	public static List<String> getLinkerAbbrList() {
+		
+		List<String> linkerAbbrList = new ArrayList<>();
+		
+		for ( Map.Entry<String,ILinker> entry : linkers.entrySet() ) {
+			
+			linkerAbbrList.add( entry.getKey() );
+		}
+		
+		return linkerAbbrList;
 	}
 	
 //	/**
