@@ -83,7 +83,7 @@
 
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-region-selections.js?x=${cacheBustValue}"></script> 
 
-		<script type="text/javascript" src="${ contextPath }/js/circle-plot/circle-plot-viewer.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/circle-plot-viewer.js?x=${cacheBustValue}"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer.js?x=${cacheBustValue}"></script> 
 		
 				<%-- 
