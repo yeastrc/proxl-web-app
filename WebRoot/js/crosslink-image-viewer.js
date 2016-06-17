@@ -328,7 +328,7 @@ var _imageProteinBarDataManager = ImageProteinBarDataManagerContructor();
 
 var _proteinBarRegionSelectionsOverlayCode = ProteinBarRegionSelectionsOverlayCodeContructor( { imageProteinBarDataManager : _imageProteinBarDataManager });
 
-
+var _circlePlotViewer = new circlePlotViewer();
 
 
 
@@ -1421,7 +1421,7 @@ function loadCrosslinkPSMCounts( doDraw ) {
 	
 	console.log( "Loading crosslink PSM counts." );
 	
-	if ( $( "input#show-crosslinks" ).is( ':checked' ) &&  $( "input#shade-by-counts" ).is( ':checked' ) ) {
+	if ( ( $( "input#show-self-crosslinks" ).is( ':checked' ) || $( "input#show-crosslinks" ).is( ':checked' ) ) &&  $( "input#shade-by-counts" ).is( ':checked' ) ) {
 		if ( _linkPSMCounts.crosslink != undefined ) {
 			reportLinkDataLoadComplete( 'crosslinkPSMs', doDraw );
 		} else {
@@ -4334,6 +4334,9 @@ function precomputeMultiplier__CallOnlyFrom__precomputeMultiplierAndOtherValuesF
 
 
 function drawSvg() {
+	
+	_circlePlotViewer.draw();
+	return;
 	
 	var svgRootSnapSVGObject;  // the Snap SVG object for the SVG
 

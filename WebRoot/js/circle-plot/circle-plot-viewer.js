@@ -24,6 +24,11 @@ circlePlotViewer.prototype.CONSTANTS = {
 		
 		_LINKABLE_POSITION_COLOR:"#ffffff",	// color to use for linkable positions
 		_LINKABLE_POSITION_OPACITY:0.5,	// opacity to use for linkable positions
+		
+		_SCALE_BAR_HEIGHT:10,		// height of scale bar in pixels
+		_SCALE_BAR_FONT_HEIGHT:12,	// height of scale bar font in pixles
+		_GAP_BETWEEN_SCALE_BAR_AND_TEXT:5,	// gap (in pixels) between scale bar and scale bar label
+		_GAP_BETWEEN_SCALE_BAR_AND_PROTEIN_BAR:5,	// gap (in pixels) between scale bar and protein bar
 };
 
 /**
@@ -42,6 +47,10 @@ circlePlotViewer.prototype.draw  = function(  ) {
 	this.setViewerDimensions( svgRootSnapSVGObject );
 	
 	this.drawProteinBars( svgRootSnapSVGObject );
+	
+	if ( $( "input#show-scalebar" ).is( ':checked' ) ) {
+		this.drawScaleBars( svgRootSnapSVGObject );
+	}
 	
 	if ( $( "input#show-linkable-positions" ).is( ':checked' ) ) {
 		this.drawLinkablePositions( svgRootSnapSVGObject );
@@ -70,6 +79,206 @@ circlePlotViewer.prototype.draw  = function(  ) {
 	
 	
 };
+
+
+
+/**
+ * Draw scale bar outside of each protein bar
+ * 
+ * @param svgRootSnapSVGObject
+ */
+circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
+	
+	var center = this.getCenterCoords();
+	var selectedProteins = getAllSelectedProteins();
+	var degreesPerResidue = this.getDegreesPerResidue();
+	
+	// determine frequency and factor of tic marks
+	var testFactors = [ 1, 5, 10, 25, 50, 100, 250, 500, 1000, 2000, 5000, 10000 ];
+	
+	var factor;				// number of residues per tick mark
+	var degreesPerTick;		// number of degrees between tick marks
+	
+	for( var i = 0; i < testFactors.length; i++ ) {
+		degreesPerTick = testFactors[ i ] * degreesPerResidue;
+		
+		if( degreesPerTick >= 5 ) {
+			factor = testFactors[ i ];
+			break;
+		}
+	}
+
+	// loop over all proteins, draw their scale bars
+	for( var i = 0; i < selectedProteins.length; i++ ) {
+
+		var proteinId = selectedProteins[ i ];
+		
+		// group to hold the scale bar
+		var group = svgRootSnapSVGObject.g();
+
+		
+		var startAngle = this.getAngleForProteinPosition( i, 1 );
+		var endAngle = this.getAngleForProteinPosition( i, _proteinLengths[ proteinId ] );
+		
+		
+		
+		
+		// draw base line of scale bar
+		var radius = this.radius;
+		radius -= this.CONSTANTS._SCALE_BAR_FONT_HEIGHT;
+		radius -= this.CONSTANTS._GAP_BETWEEN_SCALE_BAR_AND_TEXT;
+		radius -= this.CONSTANTS._SCALE_BAR_HEIGHT / 2;
+		
+		var startPoint = this.polarToCartesian( center.x, center.y, radius , startAngle)
+		var endPoint = this.polarToCartesian( center.x, center.y, radius , endAngle)
+		
+		
+	    var arcSweep = endAngle - startAngle <= 180 ? "0" : "1";
+	    
+	    var d = [
+	             "M", endPoint.x, endPoint.y, 
+	             "A", radius, radius, 0, arcSweep, 0, startPoint.x, startPoint.y
+	         ].join(" ");
+		
+		var path = svgRootSnapSVGObject.path( d );
+		path.attr({
+			stroke:this.getColorForIndex( i ),
+			fill:"none"
+		});
+		
+		group.add( path );
+		
+		
+		
+		// draw start tick
+		var radius1 = this.radius;
+		radius1 -= this.CONSTANTS._SCALE_BAR_FONT_HEIGHT;
+		radius1 -= this.CONSTANTS._GAP_BETWEEN_SCALE_BAR_AND_TEXT;
+		
+		var radius2 = radius1 - this.CONSTANTS._SCALE_BAR_HEIGHT;
+		
+		startPoint = this.polarToCartesian( center.x, center.y, radius1 , startAngle)
+		endPoint = this.polarToCartesian( center.x, center.y, radius2 , startAngle)
+		
+		d = [
+             "M", startPoint.x, startPoint.y, 
+             "L", endPoint.x, endPoint.y
+         ].join(" ");
+		
+		path = svgRootSnapSVGObject.path( d );
+		path.attr({
+			stroke:this.getColorForIndex( i ),
+			fill:"none"
+		});
+		group.add( path );
+		
+		
+		
+		// draw end tick
+		startPoint = this.polarToCartesian( center.x, center.y, radius1 , endAngle)
+		endPoint = this.polarToCartesian( center.x, center.y, radius2 , endAngle)
+		
+		d = [
+             "M", startPoint.x, startPoint.y, 
+             "L", endPoint.x, endPoint.y
+         ].join(" ");
+		
+		path = svgRootSnapSVGObject.path( d );
+		path.attr({
+			stroke:this.getColorForIndex( i ),
+			fill:"none"
+		});
+		group.add( path );
+		
+		
+
+		// draw interval ticks
+		for( var k = factor; k < _proteinLengths[ proteinId ]; k += factor ) {
+			
+			var angle = startAngle + ( k * degreesPerResidue );
+			
+			startPoint = this.polarToCartesian( center.x, center.y, radius1 , angle)
+			endPoint = this.polarToCartesian( center.x, center.y, radius2 , angle)
+			
+			d = [
+	             "M", startPoint.x, startPoint.y, 
+	             "L", endPoint.x, endPoint.y
+	         ].join(" ");
+			
+			path = svgRootSnapSVGObject.path( d );
+			path.attr({
+				stroke:this.getColorForIndex( i ),
+				fill:"none"
+			});
+			group.add( path );
+			
+			
+		}
+		
+		// draw labels, start with 2nd tick and label every other tick
+		// draw interval ticks
+		
+		radius = this.radius;
+		radius -= this.CONSTANTS._SCALE_BAR_FONT_HEIGHT;
+		
+		for( var k = factor; k < _proteinLengths[ proteinId ]; k += factor * 2 ) {
+			
+			// create the path on which we are drawing our label
+			
+			angle = startAngle + ( k * degreesPerResidue );
+			
+			var startAdjustment = 0.5;
+			var endAdjustment = 1;
+			
+			if( k >= 10 ) {
+				startAdjustment = 1;
+				endAdjustment = 2;
+			}
+			if( k >= 100 ) {
+				var startAdjustment = 1.5;
+				var endAdjustment = 2;
+			}
+			if( k > 1000 ) {
+				var startAdjustment = 2;
+				var endAdjustment = 3;
+			}
+			
+			startPoint = this.polarToCartesian( center.x, center.y, radius , angle - startAdjustment);
+			endPoint = this.polarToCartesian( center.x, center.y, radius , angle + endAdjustment );
+			
+			d = [
+	             "M", startPoint.x, startPoint.y, 
+	             "A", radius, radius, 0, 0, 1, endPoint.x, endPoint.y
+	         ].join(" ");
+		
+			var path = svgRootSnapSVGObject.path( d );
+			path.attr({
+				stroke:"none",
+				fill:"none",
+				"startOffset":"50%",
+			});
+		
+			group.add( path );
+			
+			var text = svgRootSnapSVGObject.text( 0, 0, k + "" );
+			
+			text.attr( {
+				"textpath" : path,
+				"font-size": this.CONSTANTS._SCALE_BAR_FONT_HEIGHT + "px",
+				stroke:this.getColorForIndex( i ),
+				fill:"none",
+				"stroke-opacity":"0.9",
+			});
+			
+			group.add( text );
+
+		}
+		
+		
+	}//end looping over proteins
+};
+
+
 
 /**
  * Draw all tryptic positions in all proteins
@@ -162,7 +371,13 @@ circlePlotViewer.prototype.drawMonolinks = function( svgRootSnapSVGObject ) {
 		for( var k = 0; k < positions.length; k++ ) {
 			var position = positions[ k ];
 			
-			this.drawMonolink( i, position, svgRootSnapSVGObject );
+			var link = { };
+			link.type = "monolink";
+			link.protein1 = proteinId;
+			link.position1 = position;
+			
+			
+			this.drawMonolink( i, link, svgRootSnapSVGObject );
 		}
 	
 	}
@@ -171,12 +386,12 @@ circlePlotViewer.prototype.drawMonolinks = function( svgRootSnapSVGObject ) {
 /**
  * Draw a monolink
  * @param index
- * @param position
+ * @param link
  * @param svgRootSnapSVGObject
  */
-circlePlotViewer.prototype.drawMonolink = function( index, position, svgRootSnapSVGObject ) {
+circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGObject ) {
 	
-	var angle = this.getAngleForProteinPosition( index, position );
+	var angle = this.getAngleForProteinPosition( index, link.position1 );
 	var center = this.getCenterCoords();
 	
 	var radius1 = this.getProteinBarRadii().inner - this.CONSTANTS._GAP_BETWEEN_BARS_AND_LINKS;
@@ -190,10 +405,13 @@ circlePlotViewer.prototype.drawMonolink = function( index, position, svgRootSnap
 	
 	var path = svgRootSnapSVGObject.path( pathString );
 	
+	var opacity = getOpacityForIndexAndLink( index, link );
+	
     path.attr( {
 		stroke:this.getColorForIndex( index ),
 		"stroke-dasharray":"4,2",
-		fill:"none"
+		fill:"none",
+		"stroke-opacity":opacity,
 	});
 }
 
@@ -235,7 +453,14 @@ circlePlotViewer.prototype.drawLooplinks = function( svgRootSnapSVGObject ) {
 				if( key in drawnLinks ) { continue; }
 				else { drawnLinks[ key ] = 1; }
 				
-				var looplink = this.drawCrosslink( i, fromPosition, i, toPosition, svgRootSnapSVGObject );
+				
+				var link = { };
+				link.type = "looplink",
+				link.protein1 = proteinId;
+				link.position1 = toPosition;
+				link.position2 = fromPosition;
+				
+				var looplink = this.drawCrosslink( i, fromPosition, i, toPosition, link, svgRootSnapSVGObject );
 				looplink.attr( { "stroke-dasharray":"4,2" });
 			}
 			
@@ -273,7 +498,14 @@ circlePlotViewer.prototype.drawCrosslinks = function( svgRootSnapSVGObject ) {
 				for( var toPositionIndex = 0; toPositionIndex < toPositions.length; toPositionIndex++ ) {
 					var toPosition = parseInt( toPositions [ toPositionIndex ] );
 
-					this.drawCrosslink( i, fromPosition, j, toPosition, svgRootSnapSVGObject );				
+					var link = { };
+					link.type = "crosslink";
+					link.protein1 = proteinId1;
+					link.position1 = fromPosition;
+					link.protein2 = proteinId2;
+					link.position2 = toPosition;
+					
+					this.drawCrosslink( i, fromPosition, j, toPosition, link, svgRootSnapSVGObject );				
 				}
 				
 			}
@@ -292,38 +524,46 @@ circlePlotViewer.prototype.drawCrosslinks = function( svgRootSnapSVGObject ) {
  */
 circlePlotViewer.prototype.drawSelfCrosslinks = function( svgRootSnapSVGObject ) {
 	var selectedProteins = getAllSelectedProteins();
-	
+		
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId = selectedProteins[ i ];
-		
+				
 		var drawnLinks = { };
 		
 		if ( _proteinLinkPositions[ proteinId ] == undefined ) { continue; }
 		if ( _proteinLinkPositions[ proteinId ][ proteinId ] == undefined ) { continue; }
 		
-		var fromPositions = Object.keys( _proteinLinkPositions[ proteinId ][ proteinId ] );
+		
+		
+		var fromPositions = Object.keys( _proteinLinkPositions[ proteinId ][ proteinId ] );		
 		
 		for( var fromPositionIndex = 0; fromPositionIndex < fromPositions.length; fromPositionIndex++ ) {
 			var fromPosition = parseInt( fromPositions[ fromPositionIndex ] );
-			
+						
 			var toPositions = Object.keys( _proteinLinkPositions[ proteinId ][ proteinId ][ fromPosition ] );
-			
+						
 			for( var toPositionIndex = 0; toPositionIndex < toPositions.length; toPositionIndex++ ) {
 				var toPosition = parseInt( toPositions [ toPositionIndex ] );
-				
+								
 				// prevent drawing the same links twice
-				var tmp;
-				if( toPosition > fromPosition ) {
-					tmp = toPosition;
-					toPosition = fromPosition;
-					fromPosition = tmp;
+				var key;
+				if( toPosition >= fromPosition ) {
+					key = toPosition + "-" + fromPosition;
+				} else {
+					key = fromPosition + "-" + toPosition;
 				}
 				
-				var key = toPosition + "-" + fromPosition;
 				if( key in drawnLinks ) { continue; }
 				else { drawnLinks[ key ] = 1; }
 				
-				this.drawCrosslink( i, fromPosition, i, toPosition, svgRootSnapSVGObject );				
+				var link = { };
+				link.type = "crosslink",
+				link.protein1 = proteinId;
+				link.protein2 = proteinId;
+				link.position1 = fromPosition;
+				link.position2 = toPosition;
+				
+				this.drawCrosslink( i, fromPosition, i, toPosition, link, svgRootSnapSVGObject );				
 			}
 			
 		}		
@@ -339,7 +579,7 @@ circlePlotViewer.prototype.drawSelfCrosslinks = function( svgRootSnapSVGObject )
  * @param toPosition
  * @param svgRootSnapSVGObject
  */
-circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, toIndex, toPosition, svgRootSnapSVGObject ) {
+circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, toIndex, toPosition, link, svgRootSnapSVGObject ) {
 	
 	var center = this.getCenterCoords();
 	
@@ -368,6 +608,7 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
 		
 	var loopPeakCoordinates = this.polarToCartesian( center.x, center.y, radius, midAngle );
 	
+	var opacity = getOpacityForIndexAndLink( fromIndex, link );
 	
     var pathString = "M" + fromCoords.x + "," + fromCoords.y;
     pathString += "Q" + loopPeakCoordinates.x + "," + loopPeakCoordinates.y;
@@ -376,7 +617,8 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
     var path = svgRootSnapSVGObject.path( pathString );
     path.attr( {
 		stroke:this.getColorForIndex( fromIndex ),
-		fill:"none"
+		fill:"none",
+		"stroke-opacity":opacity,
 	});
     
     return path;
@@ -745,6 +987,14 @@ circlePlotViewer.prototype.getProteinBarRadii = function() {
 	var radii = { };
 	
 	radii.outer = this.radius;
+	
+	if( this.isScaleBarSelected() ) {
+		radii.outer -= ( this.CONSTANTS._SCALE_BAR_HEIGHT + 
+						 this.CONSTANTS._SCALE_BAR_FONT_HEIGHT +
+						 this.CONSTANTS._GAP_BETWEEN_SCALE_BAR_AND_TEXT +
+						 this.CONSTANTS._GAP_BETWEEN_SCALE_BAR_AND_PROTEIN_BAR );
+	}
+	
 	radii.inner = radii.outer - this.CONSTANTS._HEIGHT_OF_PROTEIN_BARS;
 	
 	return radii;
@@ -792,7 +1042,41 @@ circlePlotViewer.prototype.getDistanceBetweenPoints = function( fromCoords, toCo
 	return Math.sqrt( Math.pow( fromCoords.x - toCoords.x, 2) + Math.pow( fromCoords.x - toCoords.x, 2 ) );
 };
 
+/**
+ * Maximum possible drawn crosslink distance
+ */
 circlePlotViewer.prototype.getMaxCrosslinkDistance = function( ) {
 	reutrn ( this.getProteinBarRadii().inner - this.CONSTANTS._GAP_BETWEEN_BARS_AND_LINKS ) * 2;
+};
+
+/**
+ * Whether or not the scale bars are enabled
+ * @returns {Boolean}
+ */
+circlePlotViewer.prototype.isScaleBarSelected  = function() {
+	if ( $( "input#show-scalebar" ).is( ':checked' ) ) {
+		return true;
+	}
+	
+	return false;
+};
+
+/**
+ * Get the number of degrees that represents a single residue in the graphic
+ * @returns {Number}
+ */
+circlePlotViewer.prototype.getDegreesPerResidue = function() {
+	var selectedProteins = getAllSelectedProteins();
+	
+	var totalGapDegrees = selectedProteins.length * this.CONSTANTS._GAP_BETWEEN_BARS;
+	var workingDegrees = 360 - totalGapDegrees;
+	
+	var totalProteinLength = 0;
+	for( var i = 0; i < selectedProteins.length; i++ ) {
+		totalProteinLength += _proteinLengths[ selectedProteins[ i ] ];
+	}
+	
+	// number of degrees per protein residue
+	return workingDegrees / totalProteinLength;
 };
 
