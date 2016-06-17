@@ -71,7 +71,7 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/trypsinCutPointsForSequence.js?x=${cacheBustValue}"></script>
 		 
-		<script type="text/javascript" src="${ contextPath }/js/circle-plot/circle-plot-viewer-protein-annotation.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-protein-annotation.js?x=${cacheBustValue}"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 

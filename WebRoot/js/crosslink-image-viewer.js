@@ -3876,7 +3876,15 @@ function getOpacityForIndexAndLink( i, link ) {
 
 			} else if( link.type == 'looplink' ) {
 
-				numPsms = _linkPSMCounts[ 'looplink' ][ link.protein1 ][ link.protein1 ][ link.position1 ][ link.position2 ];	
+				try {
+					numPsms = _linkPSMCounts[ 'looplink' ][ link.protein1 ][ link.protein1 ][ link.position1 ][ link.position2 ];
+				} catch( err ) { }
+				
+				if( !numPsms ) {
+					try {
+						numPsms = _linkPSMCounts[ 'looplink' ][ link.protein1 ][ link.protein1 ][ link.position2 ][ link.position1 ];
+					} catch( err ) { }
+				}
 
 			} else if( link.type == 'monolink' ) {
 
@@ -4026,7 +4034,23 @@ function findSearchesForMonolink( protein, position ) {
 //returns a list of searches for the given link
 function findSearchesForLooplink( protein, position1, position2 ) {
 	
-	return _proteinLooplinkPositions[ protein ][protein][ position1 ][ position2 ];
+	var searches;
+	
+	try {
+		searches = _proteinLooplinkPositions[ protein ][protein][ position1 ][ position2 ];
+	} catch( err ) { }
+	
+	if( !searches ) {
+		try {
+			searches = _proteinLooplinkPositions[ protein ][protein][ position2 ][ position1 ];
+		} catch( err ) { }
+	}
+	
+	if( !searches ) {
+		console.log( "WARNING: could not find any searches for looplink. protein: " + protein + " position1 " + position1 + " position2: " + position2 );
+	}
+	
+	return searches;
 }
 
 //returns a list of searches for the given link

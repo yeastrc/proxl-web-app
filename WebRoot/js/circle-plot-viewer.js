@@ -29,6 +29,19 @@ circlePlotViewer.prototype.CONSTANTS = {
 		_SCALE_BAR_FONT_HEIGHT:12,	// height of scale bar font in pixles
 		_GAP_BETWEEN_SCALE_BAR_AND_TEXT:5,	// gap (in pixels) between scale bar and scale bar label
 		_GAP_BETWEEN_SCALE_BAR_AND_PROTEIN_BAR:5,	// gap (in pixels) between scale bar and protein bar
+		
+		// colors to use when coloring by search
+		_SEARCH_COLORS: {
+			"1" : "#995d5d",	// redish
+			"2" : "#5d6499",	// blueish
+			"3" : "#98995d",	// yellowish
+			
+			"12" : "#cd83c7",	// purpleish
+			"13" : "#997e5d",	// orangeish
+			"23" : "#5d9960",	// greenish
+			
+			"123" : "#3a3a3a",	// grey
+		},
 };
 
 /**
@@ -442,14 +455,13 @@ circlePlotViewer.prototype.drawLooplinks = function( svgRootSnapSVGObject ) {
 				var toPosition = parseInt( toPositions [ toPositionIndex ] );
 				
 				// prevent drawing the same links twice
-				var tmp;
-				if( toPosition > fromPosition ) {
-					tmp = toPosition;
-					toPosition = fromPosition;
-					fromPosition = tmp;
+				var key;
+				if( toPosition >= fromPosition ) {
+					key = toPosition + "-" + fromPosition;
+				} else {
+					key = fromPosition + "-" + toPosition;
 				}
 				
-				var key = toPosition + "-" + fromPosition;
 				if( key in drawnLinks ) { continue; }
 				else { drawnLinks[ key ] = 1; }
 				
@@ -616,7 +628,7 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
         
     var path = svgRootSnapSVGObject.path( pathString );
     path.attr( {
-		stroke:this.getColorForIndex( fromIndex ),
+		stroke:this.getColorForLink( fromIndex, link ),
 		fill:"none",
 		"stroke-opacity":opacity,
 	});
@@ -806,22 +818,6 @@ circlePlotViewer.prototype.drawProteinBarLabel = function( svgRootSnapSVGObject,
 		dx:"5px",
 	});
 }
-
-/*
-circlePlotViewer.prototype.drawProteinBarLabel = function( svgRootSnapSVGObject, svgPath, proteinId ) {
-	
-	var proteinLabelTextSnapSVGObject = svgRootSnapSVGObject.text( 0, 0, _proteinNames[ proteinId ] );
-	
-	proteinLabelTextSnapSVGObject.attr({
-		fill:"#ffffff",
-		"font-size":"14px",
-		textpath: svgPath,
-		dy:"-15px",
-		dx:"5px",
-	});
-	
-};
-*/
 
 circlePlotViewer.prototype.inializeSVGObject = function() {
 
@@ -1015,6 +1011,34 @@ circlePlotViewer.prototype.getCenterCoords = function() {
 };
 
 /**
+ * Get the color to use for the given link and originating index
+ * @param index
+ * @param link
+ */
+circlePlotViewer.prototype.getColorForLink = function( index, link ) {
+	
+	var searches;
+	
+	// are we coloring by search?
+	if( this.isColorBySearch() ) {
+		if( link.type === "crosslink" ) { searches = findSearchesForCrosslink( link.protein1, link.protein2, link.position1, link.position2 ); }
+		else if( link.type === "looplink" ) { searches = findSearchesForLooplink( link.protein1, link.position1, link.position2 ); }
+		else if( link.type === "monolink" ) { searches = findSearchesForMonolink( link.protein1, link.position1 ); }
+		else {
+			console.log( "ERROR in getColorForLink, can't type type of link to find searches:" );
+			console.log( link );
+			return "#000000";
+		}
+				
+		return this.getColorForSearches( searches );
+	}
+
+	// color by "originating" protein is default
+	return this.getColorForIndex( index );
+	
+}
+
+/**
  * Get the color for the given index, given the total number of proteins
  * @param index
  * @returns
@@ -1030,6 +1054,28 @@ circlePlotViewer.prototype.getColorForIndex = function( index ) {
 		
 	var color = Snap.hsb2rgb( hue, saturation, brightness );
 	return color.hex;
+};
+
+/**
+ * Get the color to use for an array of searches when coloring by search
+ * @param searches
+ * @returns
+ */
+circlePlotViewer.prototype.getColorForSearches = function( searches ) {
+
+	var colorIndex = "";
+	
+	for ( var i = 0; i < _searches.length; i++ ) {
+		for ( var k = 0; k < searches.length; k++ ) {
+			if ( _searches[i]['id'] === searches[ k ] ) {
+				colorIndex += ( i + 1 );
+				break;
+			}
+		}
+	}
+	
+	return this.CONSTANTS._SEARCH_COLORS[ colorIndex ];
+	
 };
 
 /**
@@ -1060,6 +1106,21 @@ circlePlotViewer.prototype.isScaleBarSelected  = function() {
 	
 	return false;
 };
+
+/**
+ * Whether or not links should be colored by search
+ * @returns {Boolean}
+ */
+circlePlotViewer.prototype.isColorBySearch  = function() {
+	var colorBy = $("#color_by").val();
+	
+	if( colorBy === "search" ) {
+		return true;
+	}
+	
+	return false;
+};
+
 
 /**
  * Get the number of degrees that represents a single residue in the graphic
