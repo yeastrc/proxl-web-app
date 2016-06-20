@@ -28,7 +28,7 @@ public class SearchTaxonomySearcher {
 	
 	
 	private static final String SINGLE_SEARCH_SQL =
-			"SELECT  tblProtein.speciesID "
+			"SELECT DISTINCT  tblProtein.speciesID "
 			+ " FROM YRC_NRSEQ.tblProtein AS tblProtein"
 			+ " INNER JOIN srch_rep_pept__nrseq_id_pos_crosslink AS srpnipc "
 			+ 	" ON tblProtein.id = srpnipc.nrseq_id "
