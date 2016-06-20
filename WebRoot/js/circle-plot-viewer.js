@@ -30,14 +30,21 @@ circlePlotViewer.prototype.CONSTANTS = {
 		_GAP_BETWEEN_SCALE_BAR_AND_TEXT:5,	// gap (in pixels) between scale bar and scale bar label
 		_GAP_BETWEEN_SCALE_BAR_AND_PROTEIN_BAR:5,	// gap (in pixels) between scale bar and protein bar
 		
+		_LEGEND_WIDTH:200,			// width to allocate for the legend when coloring by search
+		_LEGEND_GAP:10,				// space between legend and drawing
+		_LEGEND_HEADER_HEIGHT:16,	// height of the font of the legend header
+		_LEGEND_FONT_HEIGHT:14,		// height of the font of the legend text
+		_LEGEND_INDENT:5,			// indentation for legend items under header
+		_LEGEND_RADIUS:7,			// pixels of radius of legend indicator (circle)
+		
 		// colors to use when coloring by search
 		_SEARCH_COLORS: {
 			"1" : "#995d5d",	// redish
 			"2" : "#5d6499",	// blueish
-			"3" : "#98995d",	// yellowish
+			"3" : "#b5af00",	// yellowish
 			
 			"12" : "#cd83c7",	// purpleish
-			"13" : "#997e5d",	// orangeish
+			"13" : "#35bec0",	// orangeish
 			"23" : "#5d9960",	// greenish
 			
 			"123" : "#3a3a3a",	// grey
@@ -89,11 +96,102 @@ circlePlotViewer.prototype.draw  = function(  ) {
 		this.drawTrypticPositions( svgRootSnapSVGObject );
 	}
 	
+	if( this.isColorBySearch() ) {
+		this.drawLegend( svgRootSnapSVGObject );
+	}
+	
 	
 	
 };
 
+/**
+ * Draw the legend when coloring by search
+ * 
+ * @param svgRootSnapSVGObject
+ */
+circlePlotViewer.prototype.drawLegend = function( svgRootSnapSVGObject ) {
 
+	var g = svgRootSnapSVGObject.g();
+	
+	var p = svgRootSnapSVGObject.text( this.radius * 2 + this.CONSTANTS._LEGEND_GAP, this.CONSTANTS._LEGEND_HEADER_HEIGHT, "Line Legend" );
+	p.attr({
+		"font-size":this.CONSTANTS._LEGEND_HEADER_HEIGHT + "px",
+		"font-weight":"bold",
+		"fill-opacity":"0.7"
+	});
+	g.add( p );
+	
+	// get all possible combination of searches as arrays
+	var searchArrays = [ ];
+	
+	for( var i = 0; i < _searches.length; i++ ) {
+		searchArrays.push( [ _searches[ i ].id ] );
+	}
+	
+	for( var i = 0; i < _searches.length; i++ ) {
+		for( var j = 0; j < _searches.length; j++ ) {
+			if( i >= j ) { continue; }
+			
+			searchArrays.push( [ _searches[ i ].id, _searches[ j ].id ] );
+		}
+	}
+	
+	if( _searches.length > 2 ) {
+		searchArrays.push( [ _searches[ 0 ].id, _searches[ 1 ].id, _searches[ 2 ].id ] );
+	}
+
+
+	// the left edge of the legend area
+	var x = this.radius * 2 + this.CONSTANTS._LEGEND_GAP + this.CONSTANTS._LEGEND_INDENT;
+
+	// draw each legend item
+	for( var i = 0; i < searchArrays.length; i++ ) {
+		
+		var color = this.getColorForSearches( searchArrays[ i ] );
+		
+		var y = this.CONSTANTS._LEGEND_HEADER_HEIGHT + this.CONSTANTS._LEGEND_GAP;
+		y += i * ( this.CONSTANTS._LEGEND_FONT_HEIGHT + this.CONSTANTS._LEGEND_GAP );
+		y += this.CONSTANTS._LEGEND_FONT_HEIGHT;
+
+		// center of the circle to use as the legend item graphic
+		var circleY = y - this.CONSTANTS._LEGEND_RADIUS;
+		var circleX = x + this.CONSTANTS._LEGEND_RADIUS;
+		
+		p = svgRootSnapSVGObject.circle( circleX, circleY, this.CONSTANTS._LEGEND_RADIUS );
+		p.attr( {
+			"stroke":"none",
+			"fill":color,
+		})
+		g.add( p );
+		
+
+		// the left edge of the associated text
+		var textX = x + (this.CONSTANTS._LEGEND_RADIUS * 2 ) + this.CONSTANTS._LEGEND_INDENT;
+		
+		
+		var text = searchArrays[ i ].join( ", " );
+		if( searchArrays[ i ].length < 2 ) {
+			text = "Search " + text;
+		} else {
+			text = "Searches " + text;
+		}		
+		
+		p = svgRootSnapSVGObject.text( textX, y - 2, text );
+		p.attr( {
+			"font-size": this.CONSTANTS._LEGEND_FONT_HEIGHT + "px",
+			fill:color,
+			"fill-opacity":"0.9",
+			"font-weight":"600",
+		});
+		
+		g.add( p );
+		
+	};
+	
+	
+	
+	
+}
 
 /**
  * Draw scale bar outside of each protein bar
@@ -869,13 +967,20 @@ circlePlotViewer.prototype.inializeSVGObject = function() {
 
 
 circlePlotViewer.prototype.setViewerDimensions = function(svgRootSnapSVGObject) {
-		
-	svgRootSnapSVGObject.attr( { width: this.CONSTANTS._DEFAULT_VIEWPORT_WIDTH } );
-	svgRootSnapSVGObject.attr( { height: this.CONSTANTS._DEFAULT_VIEWPORT_HEIGHT } );
 	
 	this.centerX = this.CONSTANTS._DEFAULT_VIEWPORT_WIDTH / 2;
 	this.centerY = this.centerX;
 	this.radius = this.centerX;
+	
+	var width = this.CONSTANTS._DEFAULT_VIEWPORT_WIDTH;
+	var height = this.CONSTANTS._DEFAULT_VIEWPORT_HEIGHT;
+	
+	if( this.isColorBySearch() ) {
+		width += this.CONSTANTS._LEGEND_WIDTH + this.CONSTANTS._LEGEND_GAP;
+	}
+	
+	svgRootSnapSVGObject.attr( { width: width } );
+	svgRootSnapSVGObject.attr( { height: height } );
 
 };
 
