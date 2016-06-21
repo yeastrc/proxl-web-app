@@ -249,6 +249,7 @@ var HASH_OBJECT_PROPERTIES = {
 		"show-linkable-positions" : "m",
 		"show-tryptic-cleavage-positions" : "n",
 		"show-scalebar" : "o",
+		"view-as-circle-plot" : "cir",
 
 		"shade-by-counts" : "p",
 		
@@ -328,7 +329,7 @@ var _imageProteinBarDataManager = ImageProteinBarDataManagerContructor();
 
 var _proteinBarRegionSelectionsOverlayCode = ProteinBarRegionSelectionsOverlayCodeContructor( { imageProteinBarDataManager : _imageProteinBarDataManager });
 
-
+var _circlePlotViewer = new circlePlotViewer();
 
 
 
@@ -853,6 +854,12 @@ function updateURLHash( useSearchForm ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["shade-by-counts"], true );
 	}
 
+	if ( $( "input#view-as-circle-plot" ).is( ':checked' ) ) {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["view-as-circle-plot"], true );
+	} else {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["view-as-circle-plot"], false );
+	}
+	
 	_colorLinesBy = $("#color_by").val();
 	
 	if ( _colorLinesBy !== "" ) {
@@ -1421,7 +1428,7 @@ function loadCrosslinkPSMCounts( doDraw ) {
 	
 	console.log( "Loading crosslink PSM counts." );
 	
-	if ( $( "input#show-crosslinks" ).is( ':checked' ) &&  $( "input#shade-by-counts" ).is( ':checked' ) ) {
+	if ( ( $( "input#show-self-crosslinks" ).is( ':checked' ) || $( "input#show-crosslinks" ).is( ':checked' ) ) &&  $( "input#shade-by-counts" ).is( ':checked' ) ) {
 		if ( _linkPSMCounts.crosslink != undefined ) {
 			reportLinkDataLoadComplete( 'crosslinkPSMs', doDraw );
 		} else {
@@ -2233,6 +2240,8 @@ function populateViewerCheckBoxes() {
 	$( "input#show-protein-termini" ).prop('checked', json[ 'show-protein-termini' ] );
 	
 	$( "input#show-scalebar" ).prop('checked', json[ 'show-scalebar' ] );
+	
+	$( "input#view-as-circle-plot" ).prop('checked', json[ 'view-as-circle-plot' ] );
 
 	_colorLinesBy = json[ 'color_by' ];
 
@@ -3876,7 +3885,15 @@ function getOpacityForIndexAndLink( i, link ) {
 
 			} else if( link.type == 'looplink' ) {
 
-				numPsms = _linkPSMCounts[ 'looplink' ][ link.protein1 ][ link.protein1 ][ link.position1 ][ link.position2 ];	
+				try {
+					numPsms = _linkPSMCounts[ 'looplink' ][ link.protein1 ][ link.protein1 ][ link.position1 ][ link.position2 ];
+				} catch( err ) { }
+				
+				if( !numPsms ) {
+					try {
+						numPsms = _linkPSMCounts[ 'looplink' ][ link.protein1 ][ link.protein1 ][ link.position2 ][ link.position1 ];
+					} catch( err ) { }
+				}
 
 			} else if( link.type == 'monolink' ) {
 
@@ -4026,7 +4043,23 @@ function findSearchesForMonolink( protein, position ) {
 //returns a list of searches for the given link
 function findSearchesForLooplink( protein, position1, position2 ) {
 	
-	return _proteinLooplinkPositions[ protein ][protein][ position1 ][ position2 ];
+	var searches;
+	
+	try {
+		searches = _proteinLooplinkPositions[ protein ][protein][ position1 ][ position2 ];
+	} catch( err ) { }
+	
+	if( !searches ) {
+		try {
+			searches = _proteinLooplinkPositions[ protein ][protein][ position2 ][ position1 ];
+		} catch( err ) { }
+	}
+	
+	if( !searches ) {
+		console.log( "WARNING: could not find any searches for looplink. protein: " + protein + " position1 " + position1 + " position2: " + position2 );
+	}
+	
+	return searches;
 }
 
 //returns a list of searches for the given link
@@ -4334,6 +4367,13 @@ function precomputeMultiplier__CallOnlyFrom__precomputeMultiplierAndOtherValuesF
 
 
 function drawSvg() {
+	
+	if(  $( "input#view-as-circle-plot" ).is( ':checked' )  ) {
+		_circlePlotViewer.draw();
+		return;
+	}
+	
+	
 	
 	var svgRootSnapSVGObject;  // the Snap SVG object for the SVG
 
@@ -7752,6 +7792,10 @@ function initializeViewer()  {
 		drawSvg();
 	});
 	
+	$( "input#view-as-circle-plot" ).change( function() {
+		updateURLHash( false /* useSearchForm */ );
+		loadDataAndDraw( true /* doDraw */ );
+	});
 
 	$( "#color_by" ).change( function() {
 		updateURLHash( false /* useSearchForm */ );
