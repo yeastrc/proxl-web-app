@@ -13,8 +13,8 @@ circlePlotViewer.prototype.initialize  = function(  ) {
 
 circlePlotViewer.prototype.CONSTANTS = { 
 
-		_DEFAULT_VIEWPORT_HEIGHT : 750,
-		_DEFAULT_VIEWPORT_WIDTH : 750,
+		_DEFAULT_VIEWPORT_HEIGHT : 800,
+		_DEFAULT_VIEWPORT_WIDTH : 800,
 		
 		_GAP_BETWEEN_BARS : 2,			// gap between proteins bars in degrees
 		_HEIGHT_OF_PROTEIN_BARS : 40,	// height of protein bars in pixels
@@ -1086,9 +1086,7 @@ circlePlotViewer.prototype.inializeSVGObject = function() {
 	var svg_image_template_div__html = $svg_image_template_div.html();
 	var $svg_image_inner_container_div = $("#svg_image_inner_container_div");
 	
-	//  select the <svg> element
-	var $merged_image_svg_jq__BeforeEmpty = $svg_image_inner_container_div.find("svg.merged_image_svg_jq");
-	
+	//  select the <svg> element	
 	$svg_image_inner_container_div.empty();  //  remove the <svg> element.  jQuery will also properly remove all the handlers attached to those elements
 	$svg_image_inner_container_div.html( svg_image_template_div__html );  // insert new <svg> as copied from the template
 	
@@ -1109,13 +1107,17 @@ circlePlotViewer.prototype.inializeSVGObject = function() {
 	}
 		
 	svgRootSnapSVGObject = Snap( merged_image_svg_element );  // pass in HTML element
-		
+	
+	
+	
 	if ( _proteins.length < 1 ) {
 		
 		//  No Proteins Data loaded
 		var newHeightContainingDivEmpty = 4;
 		$svg_image_inner_container_div.css( { height : newHeightContainingDivEmpty } );
 		return;
+	} else {
+		$svg_image_inner_container_div.css( { height : this.CONSTANTS._DEFAULT_VIEWPORT_HEIGHT + 4 + "px" } );
 	}
 	
 	return svgRootSnapSVGObject;
@@ -1137,8 +1139,9 @@ circlePlotViewer.prototype.setViewerDimensions = function(svgRootSnapSVGObject) 
 		width += this.CONSTANTS._LEGEND_WIDTH + this.CONSTANTS._LEGEND_GAP;
 	}
 	
-	svgRootSnapSVGObject.attr( { width: width } );
-	svgRootSnapSVGObject.attr( { height: height } );
+	svgRootSnapSVGObject.attr({  width: width,
+								 height: height
+							});
 
 };
 

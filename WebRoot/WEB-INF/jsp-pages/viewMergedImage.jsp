@@ -309,6 +309,10 @@
 							class="tool_tip_attached_jq" data-tooltip="Toggle showing protein names to left of protein bars" 
 							><input type="checkbox" id="protein_names_position_left" 
 								>Protein Names On Left</span></label>
+					<label><span style="white-space:nowrap;"
+							class="tool_tip_attached_jq" data-tooltip="Toggle showing image as a circle plot" 
+							><input type="checkbox" id="view-as-circle-plot" 
+								>View as Circle Plot</span></label>
 
 					<%--  Select for "color by" with options of by search or by region  --%>
 					&nbsp;&nbsp;&nbsp;&nbsp;

@@ -249,6 +249,7 @@ var HASH_OBJECT_PROPERTIES = {
 		"show-linkable-positions" : "m",
 		"show-tryptic-cleavage-positions" : "n",
 		"show-scalebar" : "o",
+		"view-as-circle-plot" : "cir",
 
 		"shade-by-counts" : "p",
 		
@@ -853,6 +854,12 @@ function updateURLHash( useSearchForm ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["shade-by-counts"], true );
 	}
 
+	if ( $( "input#view-as-circle-plot" ).is( ':checked' ) ) {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["view-as-circle-plot"], true );
+	} else {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["view-as-circle-plot"], false );
+	}
+	
 	_colorLinesBy = $("#color_by").val();
 	
 	if ( _colorLinesBy !== "" ) {
@@ -2233,6 +2240,8 @@ function populateViewerCheckBoxes() {
 	$( "input#show-protein-termini" ).prop('checked', json[ 'show-protein-termini' ] );
 	
 	$( "input#show-scalebar" ).prop('checked', json[ 'show-scalebar' ] );
+	
+	$( "input#view-as-circle-plot" ).prop('checked', json[ 'view-as-circle-plot' ] );
 
 	_colorLinesBy = json[ 'color_by' ];
 
@@ -4359,8 +4368,12 @@ function precomputeMultiplier__CallOnlyFrom__precomputeMultiplierAndOtherValuesF
 
 function drawSvg() {
 	
-	_circlePlotViewer.draw();
-	return;
+	if(  $( "input#view-as-circle-plot" ).is( ':checked' )  ) {
+		_circlePlotViewer.draw();
+		return;
+	}
+	
+	
 	
 	var svgRootSnapSVGObject;  // the Snap SVG object for the SVG
 
@@ -7779,6 +7792,10 @@ function initializeViewer()  {
 		drawSvg();
 	});
 	
+	$( "input#view-as-circle-plot" ).change( function() {
+		updateURLHash( false /* useSearchForm */ );
+		loadDataAndDraw( true /* doDraw */ );
+	});
 
 	$( "#color_by" ).change( function() {
 		updateURLHash( false /* useSearchForm */ );
