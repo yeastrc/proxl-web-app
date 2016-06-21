@@ -49,6 +49,11 @@ circlePlotViewer.prototype.CONSTANTS = {
 			
 			"123" : "#3a3a3a",	// grey
 		},
+		
+		_FEATURE_ANNOTATION_HEIGHT:15,	// height of the feature annotation bar
+		_DISOPRED_COLOR: "#3a3a3a",			// color to use for disopred annotations
+		_PSIPRED_ALPHA_COLOR: "#5d9960",	// color to use for alpha helices in psipred annotations
+		_PSIPRED_BETA_COLOR: "#5d6499"		// color to use for beta sheets in psipred annotations
 };
 
 /**
@@ -68,6 +73,11 @@ circlePlotViewer.prototype.draw  = function(  ) {
 	
 	this.drawProteinBars( svgRootSnapSVGObject );
 	
+	
+	if( this.isFeatureAnnotationShown() ) {
+		this.drawFeatureAnnotationData( svgRootSnapSVGObject );
+	}
+		
 	if ( $( "input#show-scalebar" ).is( ':checked' ) ) {
 		this.drawScaleBars( svgRootSnapSVGObject );
 	}
@@ -103,6 +113,154 @@ circlePlotViewer.prototype.draw  = function(  ) {
 	
 	
 };
+
+/**
+ * Draw the selected annotation data on the image
+ * @param svgRootSnapSVGObject
+ */
+circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGObject ) {
+	var selectedProteins = getAllSelectedProteins();
+	var annoType = $("#annotation_type").val();	
+	var radii = this.getFeatureAnnotationRadii();		// the radii to use for drawing the feature annotation curved bars
+	
+	for( var i = 0; i < selectedProteins.length; i++ ) {
+		
+		var segments;
+		if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_DISOPRED3 ) {
+		
+			segments = getDisorderedRegionsDisopred_3( selectedProteins[ i ] );
+
+		} else if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_PSIPRED3 ) {
+			
+			segments = getSecondaryStructureRegions( selectedProteins[ i ] );
+			
+		} else if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE ) {
+			
+			segments = _ranges[ selectedProteins[ i ] ];
+			
+		} else {
+			console.log( "Error, unknown feature annotation type selected." );
+			return;
+		}
+		
+		if( segments == undefined ) {
+			console.log( "Error, got undefined for segments." );
+			
+			console.log( "protein: " + selectedProteins[ i ] );
+			consoloe.log( "annoType: " + annoType );
+			
+			return;
+		}
+		
+		// draw the segments
+		for( var s = 0; s < segments.length; s++ ) {
+			
+			var segment = segments[ s ];
+
+			// get the color to use for this segment
+			var color;
+			if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_DISOPRED3 ) {
+				
+				color = this.CONSTANTS._DISOPRED_COLOR;
+
+			} else if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_PSIPRED3 ) {
+				
+				if ( segment.type === BETA_SHEET ) {
+					color = this.CONSTANTS._PSIPRED_BETA_COLOR;
+				} else {
+					color = this.CONSTANTS._PSIPRED_ALPHA_COLOR;
+				}
+								
+			} else if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE ) {
+				
+				color = this.getColorForIndex( i );
+				
+			}
+			
+			// draw this segment
+			var pathText;
+			if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE ) {
+				pathText = this.getPathForSegment( i, segment.start, segment.end );			
+			} else {
+				pathText = this.getPathForSegment( i, segment.startPosition, segment.endPosition )
+			}
+			
+			var p = svgRootSnapSVGObject.path( pathText );
+			p.attr({
+				fill:color,
+				"fill-opacity":"0.8"
+			});
+			
+		}
+		
+	}
+	
+	
+}
+
+/**
+ * Get the string to use for the path for a feature annotation segment
+ * 
+ * @param proteinIndex
+ * @param segment
+ */
+circlePlotViewer.prototype.getPathForSegment = function( proteinIndex, startPosition, endPosition ) {
+	
+	var startAngle = this.getAngleForProteinPosition( proteinIndex, startPosition );
+	var endAngle = this.getAngleForProteinPosition( proteinIndex, endPosition );
+	
+	var radii = this.getFeatureAnnotationRadii();
+	var center = this.getCenterCoords();
+	
+    var outerStart = this.polarToCartesian(center.x, center.y, radii.outer, endAngle);
+    var outerEnd = this.polarToCartesian(center.x, center.y, radii.outer, startAngle);
+
+    var innerStart = this.polarToCartesian(center.x, center.y, radii.inner, endAngle);
+    var innerEnd = this.polarToCartesian(center.x, center.y, radii.inner, startAngle);
+    
+    var arcSweep = endAngle - startAngle <= 180 ? "0" : "1";
+    
+    var d = [
+             "M", innerEnd.x, innerEnd.y, 
+             "A", radii.inner, radii.inner, 0, arcSweep, 1, innerStart.x, innerStart.y,
+             "L", outerStart.x, outerStart.y,
+             "A", radii.outer, radii.outer, 0, arcSweep, 0, outerEnd.x, outerEnd.y,
+             "L", innerEnd.x, innerEnd.y
+         ].join(" ");
+	
+	return d;
+}
+
+
+
+/**
+ * The radii to use for the feature annotation bars
+ */
+circlePlotViewer.prototype.getFeatureAnnotationRadii = function() {
+	
+	var innerRadius, outerRadius;
+	
+	if( this.isScaleBarSelected() ) {
+		outerRadius =  this.radius;
+		
+		// subtract total height of scale bar plus gap between layers
+		outerRadius -= this.CONSTANTS._SCALE_BAR_HEIGHT;
+		outerRadius -= this.CONSTANTS._SCALE_BAR_FONT_HEIGHT;
+		outerRadius -= this.CONSTANTS._GAP_BETWEEN_SCALE_BAR_AND_PROTEIN_BAR;
+		outerRadius -= this.CONSTANTS._GAP_BETWEEN_SCALE_BAR_AND_TEXT;
+		
+		innerRadius = outerRadius - this.CONSTANTS._FEATURE_ANNOTATION_HEIGHT;
+	} else {
+		outerRadius =  this.radius;
+		innerRadius = outerRadius - this.CONSTANTS._FEATURE_ANNOTATION_HEIGHT;
+	}
+	
+	return {
+		inner:innerRadius,
+		outer:outerRadius
+	};
+	
+}
 
 /**
  * Draw the legend when coloring by search
@@ -1089,7 +1247,11 @@ circlePlotViewer.prototype.getProteinBarRadii = function() {
 	
 	radii.outer = this.radius;
 	
-	if( this.isScaleBarSelected() ) {
+	if( this.isFeatureAnnotationShown() ) {
+		radii.outer = this.getFeatureAnnotationRadii()[ 'inner' ];
+		radii.outer -= this.CONSTANTS._GAP_BETWEEN_SCALE_BAR_AND_PROTEIN_BAR
+
+	} else if( this.isScaleBarSelected() ) {
 		radii.outer -= ( this.CONSTANTS._SCALE_BAR_HEIGHT + 
 						 this.CONSTANTS._SCALE_BAR_FONT_HEIGHT +
 						 this.CONSTANTS._GAP_BETWEEN_SCALE_BAR_AND_TEXT +
@@ -1220,6 +1382,19 @@ circlePlotViewer.prototype.isColorBySearch  = function() {
 	var colorBy = $("#color_by").val();
 	
 	if( colorBy === "search" ) {
+		return true;
+	}
+	
+	return false;
+};
+
+/**
+ * Whether or not feature annotations are being shown
+ * @returns {Boolean}
+ */
+circlePlotViewer.prototype.isFeatureAnnotationShown  = function() {
+	
+	if( $("#annotation_type").val() ) {
 		return true;
 	}
 	
