@@ -147,7 +147,7 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
 			console.log( "Error, got undefined for segments." );
 			
 			console.log( "protein: " + selectedProteins[ i ] );
-			consoloe.log( "annoType: " + annoType );
+			console.log( "annoType: " + annoType );
 			
 			return;
 		}
