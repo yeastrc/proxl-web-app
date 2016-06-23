@@ -110,8 +110,6 @@ circlePlotViewer.prototype.draw  = function(  ) {
 		this.drawLegend( svgRootSnapSVGObject );
 	}
 	
-	
-	
 };
 
 /**
@@ -1167,6 +1165,70 @@ circlePlotViewer.prototype.polarToCartesian = function(centerX, centerY, radius,
 	  };
 };
 
+/**
+ * Find and return the number of degrees (starting with 0 degrees being straight up)
+ * around a circle centered at centerX and centerY we have to go before drawing a ray
+ * that intersected the supplied coordinates.
+ * 
+ * @param centerCoords {x : x coord, y: y coord}
+ * @param testCoords {x : x coord, y: y coord}
+ */
+circlePlotViewer.prototype.cartesianToPolar = function( centerCoords, testCoords ) {
+	
+	var deltaX = testCoords.x - centerCoords.x;
+	var deltaY = centerCoords.y - testCoords.y;
+	
+	if( deltaX === 0 && deltaY === 0 ) {
+		console.log( "Warning, called cartesianToPolar, but point was the center of the circle. Returning undefined." );
+		return;
+	}
+	
+	
+	var degrees;
+	if( deltaX == 0 ) {
+		degrees = 90;
+	} else {
+		degrees = Math.atan( Math.abs( deltaY ) / Math.abs( deltaX ) );
+		degrees = degrees * (180 / Math.PI);	// convert from radians to degrees
+	}
+	
+	// convert to degrees rotation to the right, where 0 degrees is straight up
+	if( deltaX >= 0 && deltaY >= 0 ) {
+		degrees = 90 - degrees;
+	} else if( deltaX >= 0 && deltaY < 0 ) {
+		degrees = 90 + degrees;
+	} else if( deltaX < 0 && deltaY < 0 ) {
+		degrees = 270 - degrees;
+	} else {
+		degrees = 270 + degrees;
+	}
+	
+	return degrees;
+	
+}
+
+/**
+ * Find the amino acid position (starting at 1) represented by the coordinates in testCoords
+ * for the given protein index in the image. Note, there is no guarantee that the returned
+ * position does not exceed the length of the protein at the given index.
+ * 
+ * @param proteinIndex
+ * @param testCoords {x : x coord, y: y coord}
+ */
+circlePlotViewer.prototype.getProteinIndexPosition = function( proteinIndex, testCoords ) {
+	
+	var startingAngle = this.getAngleForProteinPosition( proteinIndex, 1 );
+	var testingAngle = this.cartesianToPolar( this.getCenterCoords(), testCoords );
+	var degreesPerResidue = this.getDegreesPerResidue();
+	
+	startingAngle -= degreesPerResidue / 2;
+	
+	var angleDiff = testingAngle - startingAngle;
+	
+	var position = Math.floor( 1 + angleDiff / degreesPerResidue );
+	
+	return position;
+}
 
 circlePlotViewer.prototype.getCurvedPathForLabel = function(centerX, centerY, startAngle, endAngle){
 	
