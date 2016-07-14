@@ -22,9 +22,6 @@ public class DBConnectionFactory  {
 	public static final String PROXL = "proxl";
 	
 	
-	public static final String YRC_NRSEQ = "YRC_NRSEQ";
-
-	
 		
 	/**
 	 * Instance variable holding the IDBConnectionFactory we want serving

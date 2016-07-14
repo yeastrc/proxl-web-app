@@ -1,12 +1,12 @@
 package org.yeastrc.xlink.utils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 //import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dto.NRProteinDTO;
-import org.yeastrc.xlink.dto.PeptideDTO;
+
+
+
 
 public class XLinkUtils {
 	
@@ -61,54 +61,5 @@ public class XLinkUtils {
 	}
 	
 	
-	
-	
-	
-	/**
-	 * Given the protein, peptide and the position of a link in a peptide, return the position(s) of that link
-	 * in the protein
-	 * @param protein
-	 * @param peptide
-	 * @param peptideposition (1 == beginning of sequence)
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<Integer> getProteinPosition( NRProteinDTO protein, PeptideDTO peptide, int peptidePosition ) throws Exception {
-		List<Integer> positions = new ArrayList<Integer>();
-		String proteinSequence = YRC_NRSEQUtils.getSequence( protein.getNrseqId() );
-		
-        // iterate over all matches of the peptide sequence in the protein sequence
-        for (int i = -1; (i = proteinSequence.indexOf(peptide.getSequence(), i + 1)) != -1; )
-        	positions.add( i + peptidePosition );
-		
-		return positions;
-	}
-	
-	/**
-	 * Given the parameters return a list of lists, each with two elements, which are all the corresponding matches to the
-	 * protein sequence by the peptide sequence, and where the two linked spots on the peptide match to the protein sequence
-	 * @param protein
-	 * @param peptide
-	 * @param peptidePosition1
-	 * @param peptidePosition2
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<List<Integer>> getLooplinkProteinPosition( NRProteinDTO protein, PeptideDTO peptide, int peptidePosition1, int peptidePosition2 ) throws Exception {
-		List<List<Integer>> positions = new ArrayList<List<Integer>>();
-		String proteinSequence = YRC_NRSEQUtils.getSequence( protein.getNrseqId() );
-		
-        // iterate over all matches of the peptide sequence in the protein sequence
-        for (int i = -1; (i = proteinSequence.indexOf(peptide.getSequence(), i + 1)) != -1; ) {
-
-        	List<Integer> l = new ArrayList<Integer>(2);
-        	l.add( i + peptidePosition1 );
-        	l.add( i + peptidePosition2 );
-		
-        	positions.add( l );
-        }
-        	
-		return positions;
-	}
 	
 }
