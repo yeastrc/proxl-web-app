@@ -64,8 +64,8 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 ////							SearchProteinCrosslinkSearcher.getInstance().search(
 ////									search, 
 ////									searcherCutoffValuesSearchLevel, 
-////									this.getProtein1().getNrProtein(),
-////									this.getProtein2().getNrProtein(),
+////									this.getProtein1().getProteinSequenceObject(),
+////									this.getProtein2().getProteinSequenceObject(),
 ////									this.getProtein1Position(),
 ////									this.getProtein2Position()
 ////									);
@@ -75,8 +75,8 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 //							.getSearchProteinCrosslinkWrapperForSearchCutoffsProtIdsPositions(
 //									search, 
 //									searcherCutoffValuesSearchLevel, 
-//									this.getProtein1().getNrProtein(),
-//									this.getProtein2().getNrProtein(),
+//									this.getProtein1().getProteinSequenceObject(),
+//									this.getProtein2().getProteinSequenceObject(),
 //									this.getProtein1Position(),
 //									this.getProtein2Position()
 //									);
@@ -199,8 +199,8 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 		} catch ( Exception e ) {
 
 			String msg = "Exception in getNumLinkedPeptides( MergedSearchProteinCrosslink crosslink ): " 
-					+ " this.getProtein1().getNrProtein().getNrseqId(): " + this.getProtein1().getNrProtein().getNrseqId()
-					+ " this.getProtein2().getNrProtein().getNrseqId(): " + this.getProtein2().getNrProtein().getNrseqId();
+					+ " this.getProtein1().getProteinSequenceObject().getProteinSequenceId(): " + this.getProtein1().getProteinSequenceObject().getProteinSequenceId()
+					+ " this.getProtein2().getProteinSequenceObject().getProteinSequenceId(): " + this.getProtein2().getProteinSequenceObject().getProteinSequenceId();
 
 			log.error( msg, e );
 
@@ -227,8 +227,8 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 		} catch ( Exception e ) {
 			
 			String msg = "Exception in getNumUniqueLinkedPeptides( MergedSearchProteinCrosslink crosslink ): " 
-					+ " this.getProtein1().getNrProtein().getNrseqId(): " + this.getProtein1().getNrProtein().getNrseqId()
-					+ " this.getProtein2().getNrProtein().getNrseqId(): " + this.getProtein2().getNrProtein().getNrseqId();
+					+ " this.getProtein1().getProteinSequenceObject().getProteinSequenceId(): " + this.getProtein1().getProteinSequenceObject().getProteinSequenceId()
+					+ " this.getProtein2().getProteinSequenceObject().getProteinSequenceId(): " + this.getProtein2().getProteinSequenceObject().getProteinSequenceId();
 			
 			log.error( msg, e );
 			
@@ -250,8 +250,8 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 //					.getNumPeptidesPSMsForCrosslink(
 //							searches,
 //							this.getSearcherCutoffValuesRootLevel(),
-//							this.getProtein1().getNrProtein().getNrseqId(),
-//							this.getProtein2().getNrProtein().getNrseqId(),
+//							this.getProtein1().getProteinSequenceObject().getProteinSequenceId(),
+//							this.getProtein2().getProteinSequenceObject().getProteinSequenceId(),
 //							this.getProtein1Position(),
 //							this.getProtein2Position() );
 //			

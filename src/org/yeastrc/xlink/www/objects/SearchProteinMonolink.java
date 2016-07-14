@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 
 
@@ -56,7 +57,7 @@ public class SearchProteinMonolink {
 
 
 	/**
-	 * Returns the number of PSMs found for this crosslink, given its cutoffs
+	 * Returns the number of PSMs found for this monolink, given its cutoffs
 	 * @return
 	 * @throws Exception
 	 */
@@ -64,9 +65,7 @@ public class SearchProteinMonolink {
 		
 		try {
 			if( this.numPsms == null ) {
-				
-				populateNumPsmNumPeptideNumUniquePeptide();
-				
+				throw new ProxlWebappInternalErrorException( "numPsms is not populated" );
 			}
 
 			return this.numPsms;
@@ -106,7 +105,7 @@ public class SearchProteinMonolink {
 					this.numPeptides = this.associatedReportedPeptideIds.size();
 
 				} else {
-					populateNumPsmNumPeptideNumUniquePeptide();
+					throw new ProxlWebappInternalErrorException( "numPeptides is not populated" );
 				}
 
 			}
@@ -138,8 +137,7 @@ public class SearchProteinMonolink {
 					this.numUniquePeptides = this.associatedReportedPeptideIdsRelatedPeptidesUnique.size();
 				
 				} else {
-
-					populateNumPsmNumPeptideNumUniquePeptide();
+					throw new ProxlWebappInternalErrorException( "numUniquePeptides is not populated" );
 				}
 				
 			}
@@ -154,40 +152,6 @@ public class SearchProteinMonolink {
 
 			throw e;
 		}
-	}
-	
-	
-
-
-	private void populateNumPsmNumPeptideNumUniquePeptide() throws Exception {
-		
-		try {
-			throw new Exception( "Removing calls to NumPeptidesPSMsForProteinCriteria.getNumPeptidesPSMsForMonolink" );
-
-//			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
-//					NumPeptidesPSMsForProteinCriteria.getInstance()
-//					.getNumPeptidesPSMsForMonolink(
-//							this.getSearch().getId(),
-//							this.getSearcherCutoffValuesSearchLevel(),
-//							this.getProtein().getNrProtein().getNrseqId(),
-//							this.getProteinPosition(),
-//							YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
-//			
-//			this.numPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
-//			this.numUniquePeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
-//			
-//			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
-
-		} catch ( Exception e ) {
-
-			String msg = "Exception in populateNumPsmNumPeptideNumUniquePeptide()";
-
-			log.error( msg, e );
-
-			throw e;
-		}
-		
-		
 	}
 
 	public List<String> getPsmAnnotationValueList() {

@@ -31,9 +31,10 @@ import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.io.PDBFileReader;
 import org.yeastrc.xlink.www.dao.PDBAlignmentDAO;
 import org.yeastrc.xlink.www.dao.PDBFileDAO;
+import org.yeastrc.xlink.www.dao.ProteinSequenceDAO;
 import org.yeastrc.xlink.www.dto.PDBAlignmentDTO;
 import org.yeastrc.xlink.www.dto.PDBFileDTO;
-import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
+import org.yeastrc.xlink.www.dto.ProteinSequenceDTO;
 import org.yeastrc.xlink.www.constants.PDBFileConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -63,7 +64,7 @@ public class PairwiseSequenceAlignmentService {
 		try {
 
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 
 			
 			PDBFileDTO pdbFile = PDBFileDAO.getInstance().getPDBFile( pdbFileId );
@@ -82,7 +83,7 @@ public class PairwiseSequenceAlignmentService {
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 			
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
 
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 
@@ -141,49 +142,56 @@ public class PairwiseSequenceAlignmentService {
 			Structure structure = pdbReader.getStructure( new ByteArrayInputStream( pdbFile.getContent().getBytes() ) );
 			String pdbSequence = structure.getChainByPDB( chain ).getAtomSequence();
 			
-			// get sequence for nrseq protein
-			String nrseqSequence = YRC_NRSEQUtils.getSequence( proteinId );
+			// get sequence for protein protein
+			String proteinSequence = null;
+			
+			ProteinSequenceDTO proteinSequenceDTO = 
+					ProteinSequenceDAO.getInstance().getProteinSequenceDTOFromDatabase( proteinId );
+
+			if ( proteinSequenceDTO != null ) {
+				proteinSequence = proteinSequenceDTO.getSequence();
+			}
 			
 			
 			// do alignment
 			ProteinSequence pdbPS = new ProteinSequence( pdbSequence );
-			ProteinSequence nrseqPS = new ProteinSequence( nrseqSequence );
+			ProteinSequence experimentalProteinPS = new ProteinSequence( proteinSequence );
 			
 			PDBAlignmentDTO pa = new PDBAlignmentDTO();
 			
-			double ratio = (double)pdbSequence.length() / (double)nrseqSequence.length();
+			double ratio = (double)pdbSequence.length() / (double)proteinSequence.length();
 			if( ratio < 0.5 ) {
 				
-				// pdb sequence is less than half as long as the nrseq sequence
-				// set nrsequence as target and pdb sequence as query
+				// pdb sequence is less than half as long as the experimental protein sequence
+				// set experimental protein sequence as target and pdb sequence as query
 				// use Needleman-Wunsch (global) alignment
 				
 				SubstitutionMatrix<AminoAcidCompound> matrix = SubstitutionMatrixHelper.getBlosum62();
-				SequencePair<ProteinSequence, AminoAcidCompound> pair = Alignments.getPairwiseAlignment(pdbPS, nrseqPS,
+				SequencePair<ProteinSequence, AminoAcidCompound> pair = Alignments.getPairwiseAlignment(pdbPS, experimentalProteinPS,
 		                PairwiseSequenceAlignerType.GLOBAL, new SimpleGapPenalty(), matrix);
 				
 				pa.setPdbFileId( pdbFileId );
 				pa.setChainId( chain );
-				pa.setNrseqId( proteinId );
+				pa.setProteinSequenceId( proteinId );
 				
 				pa.setAlignedPDBSequence( pair.getQuery().toString() );
-				pa.setAlignedNrseqSequence( pair.getTarget().toString() );
+				pa.setAlignedExperimentalSequence( pair.getTarget().toString() );
 				
 			} else if( ratio > 2.0 ) {
 				
-				// pdb sequence is more than twice as long as the nrseq sequence
-				// set pdb sequence as target, nrseq sequence as query
+				// pdb sequence is more than twice as long as the experimental protein sequence
+				// set pdb sequence as target, experimental protein sequence as query
 				// use Needleman-Wunsch (global) alignment
 				
 				SubstitutionMatrix<AminoAcidCompound> matrix = SubstitutionMatrixHelper.getBlosum62();
-				SequencePair<ProteinSequence, AminoAcidCompound> pair = Alignments.getPairwiseAlignment(nrseqPS, pdbPS,
+				SequencePair<ProteinSequence, AminoAcidCompound> pair = Alignments.getPairwiseAlignment(experimentalProteinPS, pdbPS,
 		                PairwiseSequenceAlignerType.GLOBAL, new SimpleGapPenalty(), matrix);
 				
 				pa.setPdbFileId( pdbFileId );
 				pa.setChainId( chain );
-				pa.setNrseqId( proteinId );
+				pa.setProteinSequenceId( proteinId );
 				
-				pa.setAlignedNrseqSequence( pair.getQuery().toString() );
+				pa.setAlignedExperimentalSequence( pair.getQuery().toString() );
 				pa.setAlignedPDBSequence( pair.getTarget().toString() );
 				
 				
@@ -198,29 +206,29 @@ public class PairwiseSequenceAlignmentService {
 					// use pdb as target
 					
 					SubstitutionMatrix<AminoAcidCompound> matrix = SubstitutionMatrixHelper.getBlosum85();
-					SequencePair<ProteinSequence, AminoAcidCompound> pair = Alignments.getPairwiseAlignment(nrseqPS, pdbPS,
+					SequencePair<ProteinSequence, AminoAcidCompound> pair = Alignments.getPairwiseAlignment(experimentalProteinPS, pdbPS,
 			                PairwiseSequenceAlignerType.GLOBAL, new SimpleGapPenalty(), matrix);
 					
 					pa.setPdbFileId( pdbFileId );
 					pa.setChainId( chain );
-					pa.setNrseqId( proteinId );
+					pa.setProteinSequenceId( proteinId );
 					
-					pa.setAlignedNrseqSequence( pair.getQuery().toString() );
+					pa.setAlignedExperimentalSequence( pair.getQuery().toString() );
 					pa.setAlignedPDBSequence( pair.getTarget().toString() );
 				} else {
 					
-					// use nrseq as target
+					// use experimental protein sequence as target
 				
 					SubstitutionMatrix<AminoAcidCompound> matrix = SubstitutionMatrixHelper.getBlosum85();
-					SequencePair<ProteinSequence, AminoAcidCompound> pair = Alignments.getPairwiseAlignment(pdbPS, nrseqPS,
+					SequencePair<ProteinSequence, AminoAcidCompound> pair = Alignments.getPairwiseAlignment(pdbPS, experimentalProteinPS,
 			                PairwiseSequenceAlignerType.GLOBAL, new SimpleGapPenalty(), matrix);
 					
 					pa.setPdbFileId( pdbFileId );
 					pa.setChainId( chain );
-					pa.setNrseqId( proteinId );
+					pa.setProteinSequenceId( proteinId );
 					
 					pa.setAlignedPDBSequence( pair.getQuery().toString() );
-					pa.setAlignedNrseqSequence( pair.getTarget().toString() );
+					pa.setAlignedExperimentalSequence( pair.getTarget().toString() );
 				}
 			}			
 			
@@ -256,8 +264,8 @@ public class PairwiseSequenceAlignmentService {
 			@FormParam("pdbFileId") int pdbFileId,
 			@FormParam("chainId") String chainId,
 			@FormParam("alignedPDBSequence") String alignedPDBSequence,
-			@FormParam("nrseqId") int nrseqId,
-			@FormParam("alignedNrseqSequence") String alignedNrseqSequence,
+			@FormParam("proteinSequenceId") int proteinSequenceId,
+			@FormParam("alignedExperimentalSequence") String alignedExperimentalSequence,
 			@Context HttpServletRequest request ) throws Exception {
 
 
@@ -337,10 +345,10 @@ public class PairwiseSequenceAlignmentService {
 
 			PDBAlignmentDTO pa = new PDBAlignmentDTO();
 			pa.setId( id );
-			pa.setAlignedNrseqSequence( alignedNrseqSequence );
+			pa.setAlignedExperimentalSequence( alignedExperimentalSequence );
 			pa.setAlignedPDBSequence( alignedPDBSequence );
 			pa.setChainId( chainId );
-			pa.setNrseqId( nrseqId );
+			pa.setProteinSequenceId( proteinSequenceId );
 			pa.setPdbFileId( pdbFileId );
 			
 			PDBAlignmentDAO.getInstance().savePDBAlignment( pa );

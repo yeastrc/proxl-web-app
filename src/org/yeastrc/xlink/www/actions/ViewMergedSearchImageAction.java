@@ -35,8 +35,8 @@ import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
-import org.yeastrc.xlink.www.web_utils.GetProteinListingTooltipConfigData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
+import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -223,7 +223,7 @@ public class ViewMergedSearchImageAction extends Action {
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 
 			//  Populate request objects for Protein Name Tooltip JS
-			GetProteinListingTooltipConfigData.getInstance().getProteinListingTooltipConfigData( request );
+			ProteinListingTooltipConfigUtil.getInstance().putProteinListingTooltipConfigForPage( searchIdsCollection, request );
 
 			
 			//  Populate request objects for Standard Search Display

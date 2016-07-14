@@ -8,30 +8,30 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.www.dto.SrchRepPeptNrseqIdPosLooplinkDTO;
+import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosCrosslinkDTO;
 
-public class SearchReportedPeptideNrseqPositionLooplinkSearcher {
+public class SearchReportedPeptideProteinSequencePositionCrosslinkSearcher {
 
-	private static final Logger log = Logger.getLogger( SearchReportedPeptideNrseqPositionLooplinkSearcher.class );
+	private static final Logger log = Logger.getLogger( SearchReportedPeptideProteinSequencePositionCrosslinkSearcher.class );
 	
-	private SearchReportedPeptideNrseqPositionLooplinkSearcher() { }
-	private static final SearchReportedPeptideNrseqPositionLooplinkSearcher _INSTANCE = new SearchReportedPeptideNrseqPositionLooplinkSearcher();
-	public static SearchReportedPeptideNrseqPositionLooplinkSearcher getInstance() { return _INSTANCE; }
+	private SearchReportedPeptideProteinSequencePositionCrosslinkSearcher() { }
+	private static final SearchReportedPeptideProteinSequencePositionCrosslinkSearcher _INSTANCE = new SearchReportedPeptideProteinSequencePositionCrosslinkSearcher();
+	public static SearchReportedPeptideProteinSequencePositionCrosslinkSearcher getInstance() { return _INSTANCE; }
 	
 	
-	private static final String getSrchRepPeptNrseqIdPosDTOList_SQL = 
-			"SELECT * FROM srch_rep_pept__nrseq_id_pos_looplink WHERE search_id = ? AND reported_peptide_id = ?";
+	private static final String getSrchRepPeptProtSeqIdPosCrosslinkDTOList_SQL = 
+			"SELECT * FROM srch_rep_pept__prot_seq_id_pos_crosslink WHERE search_id = ? AND reported_peptide_id = ?";
 
-	public List<SrchRepPeptNrseqIdPosLooplinkDTO> getSrchRepPeptNrseqIdPosLooplinkDTOList( int searchId, int reportedPeptideId ) throws Exception {
+	public List<SrchRepPeptProtSeqIdPosCrosslinkDTO> getSrchRepPeptProtSeqIdPosCrosslinkDTOList( int searchId, int reportedPeptideId ) throws Exception {
 		
-		List<SrchRepPeptNrseqIdPosLooplinkDTO> results = new ArrayList<>();
+		List<SrchRepPeptProtSeqIdPosCrosslinkDTO> results = new ArrayList<>();
 
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		final String sql = getSrchRepPeptNrseqIdPosDTOList_SQL;
+		final String sql = getSrchRepPeptProtSeqIdPosCrosslinkDTOList_SQL;
 
 		
 		try {
@@ -52,23 +52,22 @@ public class SearchReportedPeptideNrseqPositionLooplinkSearcher {
 
 			while( rs.next() ) {
 		
-				SrchRepPeptNrseqIdPosLooplinkDTO item = new SrchRepPeptNrseqIdPosLooplinkDTO();
+				SrchRepPeptProtSeqIdPosCrosslinkDTO item = new SrchRepPeptProtSeqIdPosCrosslinkDTO();
 		
 				item.setId( rs.getInt( "id" ) );
 				item.setSearchId( rs.getInt( "search_id" ) );
 				item.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
 				item.setSearchReportedPeptidepeptideId( rs.getInt( "search_reported_peptide_peptide_id" ) );
-				item.setNrseqId( rs.getInt( "nrseq_id" ) );
+				item.setProteinSequenceId( rs.getInt( "protein_sequence_id" ) );
 				
-				item.setNrseqPosition_1( rs.getInt( "nrseq_position_1" ) );
-				item.setNrseqPosition_2( rs.getInt( "nrseq_position_2" ) );
+				item.setProteinSequencePosition( rs.getInt( "protein_sequence_position" ) );
 
 				results.add( item );
 			}
 
 		} catch ( Exception e ) {
 
-			String msg = "Exception in getSrchRepPeptNrseqIdPosLooplinkDTOList( SearchDTO search, ... ), sql: " + sql;
+			String msg = "Exception in getSrchRepPeptProtSeqIdPosCrosslinkDTOList( SearchDTO search, ... ), sql: " + sql;
 			
 			log.error( msg, e );
 			

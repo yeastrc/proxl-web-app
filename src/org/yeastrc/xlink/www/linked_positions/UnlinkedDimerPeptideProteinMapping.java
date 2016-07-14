@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.NRProteinDAO;
+import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
@@ -18,7 +18,7 @@ import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
-import org.yeastrc.xlink.www.dto.SrchRepPeptNrseqIdPosUnlinkedDimerDTO;
+import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosUnlinkedDimerDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.objects.SearchProtein;
 import org.yeastrc.xlink.www.objects.SearchProteinDimer;
@@ -29,7 +29,7 @@ import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
 import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher;
 import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher.ReturnOnlyReportedPeptidesWithMonolinks;
-import org.yeastrc.xlink.www.searcher.SearchReportedPeptideNrseqPositionUnlinkedDimerSearcher;
+import org.yeastrc.xlink.www.searcher.SearchReportedPeptideProteinSequencePositionUnlinkedDimerSearcher;
 
 /**
  *  Build lists of various objects for unlinked and dimer data from peptide to protein mapping tables
@@ -99,7 +99,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 		
 		//  DIMER
 		
-		//  Build a structure of SrchRepPeptNrseqIdPosDTO
+		//  Build a structure of SrchRepPeptProtSeqIdPosDTO
 		//  Mapped on Reported Peptide Id, searchReportedPeptidepeptideId (PK table srch_rep_pept__peptide)
 		
 		//  Process into Map of protein 1, protein 2  objects
@@ -113,7 +113,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 		//  UNLINKED
 		
 
-		//  Build a structure of SrchRepPeptNrseqIdPosDTO
+		//  Build a structure of SrchRepPeptProtSeqIdPosDTO
 		//  Mapped on Reported Peptide Id, searchReportedPeptidepeptideId (PK table srch_rep_pept__peptide)
 		
 		//  Process into Map of protein objects
@@ -133,17 +133,17 @@ public class UnlinkedDimerPeptideProteinMapping {
 			
 			Integer reportedPeptideId = webReportedPeptide.getReportedPeptideId();
 			
-			List<SrchRepPeptNrseqIdPosUnlinkedDimerDTO> srchRepPeptNrseqIdPosUnlinkedDimerDTOList = 
-					SearchReportedPeptideNrseqPositionUnlinkedDimerSearcher.getInstance()
-					.getSrchRepPeptNrseqIdPosUnlinkedDimerDTOList( searchId, reportedPeptideId );
+			List<SrchRepPeptProtSeqIdPosUnlinkedDimerDTO> srchRepPeptProtSeqIdPosUnlinkedDimerDTOList = 
+					SearchReportedPeptideProteinSequencePositionUnlinkedDimerSearcher.getInstance()
+					.getSrchRepPeptProtSeqIdPosUnlinkedDimerDTOList( searchId, reportedPeptideId );
 			
-			Map<Integer,List<SrchRepPeptNrseqIdPosUnlinkedDimerDTO>> protIdPosMap_On_SrchRepPeptPeptId = new HashMap<>();
+			Map<Integer,List<SrchRepPeptProtSeqIdPosUnlinkedDimerDTO>> protIdPosMap_On_SrchRepPeptPeptId = new HashMap<>();
 			
-			for ( SrchRepPeptNrseqIdPosUnlinkedDimerDTO srchRepPeptNrseqIdPosUnlinkedDimerDTO : srchRepPeptNrseqIdPosUnlinkedDimerDTOList ) {
+			for ( SrchRepPeptProtSeqIdPosUnlinkedDimerDTO srchRepPeptProtSeqIdPosUnlinkedDimerDTO : srchRepPeptProtSeqIdPosUnlinkedDimerDTOList ) {
 				
-				Integer searchReportedPeptidepeptideId = srchRepPeptNrseqIdPosUnlinkedDimerDTO.getSearchReportedPeptidepeptideId();
+				Integer searchReportedPeptidepeptideId = srchRepPeptProtSeqIdPosUnlinkedDimerDTO.getSearchReportedPeptidepeptideId();
 
-				List<SrchRepPeptNrseqIdPosUnlinkedDimerDTO> protIdPosList =
+				List<SrchRepPeptProtSeqIdPosUnlinkedDimerDTO> protIdPosList =
 						protIdPosMap_On_SrchRepPeptPeptId.get( searchReportedPeptidepeptideId );
 				
 				if ( protIdPosList == null ) {
@@ -153,7 +153,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 					protIdPosMap_On_SrchRepPeptPeptId.put( searchReportedPeptidepeptideId, protIdPosList );
 				}
 				
-				protIdPosList.add( srchRepPeptNrseqIdPosUnlinkedDimerDTO );
+				protIdPosList.add( srchRepPeptProtSeqIdPosUnlinkedDimerDTO );
 			}
 
 			if ( webReportedPeptide.getSearchPeptideDimer() != null ) {
@@ -183,7 +183,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 		
 		////////////////////////////
 		
-		Map<Integer, SearchProtein> searchProtein_KeyOn_NRSEQ_ID_Map = new HashMap<>();
+		Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map = new HashMap<>();
 		
 
 
@@ -191,14 +191,14 @@ public class UnlinkedDimerPeptideProteinMapping {
 				search,
 				searcherCutoffValuesSearchLevel,
 				dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2,
-				searchProtein_KeyOn_NRSEQ_ID_Map );
+				searchProtein_KeyOn_PROT_SEQ_ID_Map );
 		
 		List<SearchProteinUnlinkedWrapper> searchProteinUnlinkedWrapperList = 
 				getSearchProteinUnlinkedWrapperList( 
 						search, 
 						searcherCutoffValuesSearchLevel, 
 						unlinked__repPept_Stage_1_Wrapper_MappedProt, 
-						searchProtein_KeyOn_NRSEQ_ID_Map );
+						searchProtein_KeyOn_PROT_SEQ_ID_Map );
 
 		UnlinkedDimerPeptideProteinMappingResult unlinkedDimerPeptideProteinMappingResult = new UnlinkedDimerPeptideProteinMappingResult();
 		
@@ -215,7 +215,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 	 * @param search
 	 * @param searcherCutoffValuesSearchLevel
 	 * @param dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2
-	 * @param searchProtein_KeyOn_NRSEQ_ID_Map
+	 * @param searchProtein_KeyOn_PROT_SEQ_ID_Map
 	 * @return
 	 * @throws Exception
 	 */
@@ -223,7 +223,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 			SearchDTO search,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
 			Map<Integer, Map<Integer, RepPept_Stage_1_Wrapper>> dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2,
-			Map<Integer, SearchProtein> searchProtein_KeyOn_NRSEQ_ID_Map)
+			Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map)
 			throws Exception {
 		
 		
@@ -262,7 +262,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 								searcherCutoffValuesSearchLevel,
 								proteinId_1, 
 								proteinId_2,
-								searchProtein_KeyOn_NRSEQ_ID_Map,
+								searchProtein_KeyOn_PROT_SEQ_ID_Map,
 								repPept_Stage_1_Wrapper );
 
 
@@ -287,7 +287,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 	 * @param search
 	 * @param searcherCutoffValuesSearchLevel
 	 * @param unlinked__repPept_Stage_1_Wrapper_MappedProt
-	 * @param searchProtein_KeyOn_NRSEQ_ID_Map
+	 * @param searchProtein_KeyOn_PROT_SEQ_ID_Map
 	 * @return
 	 * @throws Exception
 	 */
@@ -295,7 +295,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 			SearchDTO search,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
 			Map<Integer, RepPept_Stage_1_Wrapper> unlinked__repPept_Stage_1_Wrapper_MappedProt,
-			Map<Integer, SearchProtein> searchProtein_KeyOn_NRSEQ_ID_Map)
+			Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map)
 			throws Exception {
 		
 		
@@ -325,7 +325,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 							search, 
 							searcherCutoffValuesSearchLevel,
 							proteinId, 
-							searchProtein_KeyOn_NRSEQ_ID_Map,
+							searchProtein_KeyOn_PROT_SEQ_ID_Map,
 							repPept_Stage_1_Wrapper );
 
 
@@ -356,46 +356,46 @@ public class UnlinkedDimerPeptideProteinMapping {
 			Map<Integer, Map<Integer, RepPept_Stage_1_Wrapper>> dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2,
 			WebReportedPeptideWrapper wrappedPeptidelink,
 			Integer reportedPeptideId,
-			Map<Integer,List<SrchRepPeptNrseqIdPosUnlinkedDimerDTO>> protIdPosMap_On_SrchRepPeptPeptId 
+			Map<Integer,List<SrchRepPeptProtSeqIdPosUnlinkedDimerDTO>> protIdPosMap_On_SrchRepPeptPeptId 
 			
 			) {
 		
 
 		if ( protIdPosMap_On_SrchRepPeptPeptId.size() != 2 ) {
 			
-			//  Did not find entries in srch_rep_pept__nrseq_id_pos related to both entries in srch_rep_pept__peptide so skip
+			//  Did not find entries in srch_rep_pept__prot_seq_id_unlinked_dimer related to both entries in srch_rep_pept__peptide so skip
 			
 			return;  //  EARLY RETURN
 		}
 		
-		Iterator<Map.Entry<Integer,List<SrchRepPeptNrseqIdPosUnlinkedDimerDTO>>> protIdPosMap_On_SrchRepPeptPeptId_Iterator =
+		Iterator<Map.Entry<Integer,List<SrchRepPeptProtSeqIdPosUnlinkedDimerDTO>>> protIdPosMap_On_SrchRepPeptPeptId_Iterator =
 				protIdPosMap_On_SrchRepPeptPeptId.entrySet().iterator();
 		
-		Map.Entry<Integer,List<SrchRepPeptNrseqIdPosUnlinkedDimerDTO>> protIdPosMap_On_SrchRepPeptPeptId_Entry_A =
+		Map.Entry<Integer,List<SrchRepPeptProtSeqIdPosUnlinkedDimerDTO>> protIdPosMap_On_SrchRepPeptPeptId_Entry_A =
 				protIdPosMap_On_SrchRepPeptPeptId_Iterator.next();
 
-		Map.Entry<Integer,List<SrchRepPeptNrseqIdPosUnlinkedDimerDTO>> protIdPosMap_On_SrchRepPeptPeptId_Entry_B =
+		Map.Entry<Integer,List<SrchRepPeptProtSeqIdPosUnlinkedDimerDTO>> protIdPosMap_On_SrchRepPeptPeptId_Entry_B =
 				protIdPosMap_On_SrchRepPeptPeptId_Iterator.next();
 
 //		Integer searchReportedPeptidepeptideId_Entry_A = protIdPosMap_On_SrchRepPeptPeptId_Entry_A.getKey();
 //		Integer searchReportedPeptidepeptideId_Entry_B = protIdPosMap_On_SrchRepPeptPeptId_Entry_B.getKey();
 		
-		for ( SrchRepPeptNrseqIdPosUnlinkedDimerDTO srchRepPeptNrseqIdPosUnlinkedDimerDTO_Entry_A_Item : protIdPosMap_On_SrchRepPeptPeptId_Entry_A.getValue() ) {
+		for ( SrchRepPeptProtSeqIdPosUnlinkedDimerDTO srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Entry_A_Item : protIdPosMap_On_SrchRepPeptPeptId_Entry_A.getValue() ) {
 		
-			for ( SrchRepPeptNrseqIdPosUnlinkedDimerDTO srchRepPeptNrseqIdPosUnlinkedDimerDTO_Entry_B_Item : protIdPosMap_On_SrchRepPeptPeptId_Entry_B.getValue() ) {
+			for ( SrchRepPeptProtSeqIdPosUnlinkedDimerDTO srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Entry_B_Item : protIdPosMap_On_SrchRepPeptPeptId_Entry_B.getValue() ) {
 			
-				SrchRepPeptNrseqIdPosUnlinkedDimerDTO srchRepPeptNrseqIdPosUnlinkedDimerDTO_Item_1 = srchRepPeptNrseqIdPosUnlinkedDimerDTO_Entry_A_Item;
-				SrchRepPeptNrseqIdPosUnlinkedDimerDTO srchRepPeptNrseqIdPosUnlinkedDimerDTO_Item_2 = srchRepPeptNrseqIdPosUnlinkedDimerDTO_Entry_B_Item;
+				SrchRepPeptProtSeqIdPosUnlinkedDimerDTO srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Item_1 = srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Entry_A_Item;
+				SrchRepPeptProtSeqIdPosUnlinkedDimerDTO srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Item_2 = srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Entry_B_Item;
 				
 
 				//  Order so:  ( id1 <= id2 )
 				
-				if ( ( srchRepPeptNrseqIdPosUnlinkedDimerDTO_Item_1.getNrseqId() > srchRepPeptNrseqIdPosUnlinkedDimerDTO_Item_2.getNrseqId() ) ) {
+				if ( ( srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Item_1.getProteinSequenceId() > srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Item_2.getProteinSequenceId() ) ) {
 
 					//  Swap order for consistency of displayed data and to match order the dimer records were inserted in
 					
-					srchRepPeptNrseqIdPosUnlinkedDimerDTO_Item_1 = srchRepPeptNrseqIdPosUnlinkedDimerDTO_Entry_B_Item;
-					srchRepPeptNrseqIdPosUnlinkedDimerDTO_Item_2 = srchRepPeptNrseqIdPosUnlinkedDimerDTO_Entry_A_Item;
+					srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Item_1 = srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Entry_B_Item;
+					srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Item_2 = srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Entry_A_Item;
 				}
 				
 				
@@ -404,21 +404,21 @@ public class UnlinkedDimerPeptideProteinMapping {
 				// Map<Integer,Map<Integer,Map<Integer,Map<Integer,RepPept_Stage_1_Wrapper>>>> repPept_Stage_1_Wrapper_MappedProt1Prot2 = new HashMap<>();
 				
 				Map<Integer,RepPept_Stage_1_Wrapper> repPept_Stage_1_Wrapper_MappedProt2 =
-						dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2.get( srchRepPeptNrseqIdPosUnlinkedDimerDTO_Item_1.getNrseqId() );
+						dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2.get( srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Item_1.getProteinSequenceId() );
 				
 				if ( repPept_Stage_1_Wrapper_MappedProt2 == null ) {
 					
 					repPept_Stage_1_Wrapper_MappedProt2 = new HashMap<>();
-					dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2.put( srchRepPeptNrseqIdPosUnlinkedDimerDTO_Item_1.getNrseqId(), repPept_Stage_1_Wrapper_MappedProt2 );
+					dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2.put( srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Item_1.getProteinSequenceId(), repPept_Stage_1_Wrapper_MappedProt2 );
 				}
 
 				RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper =
-						repPept_Stage_1_Wrapper_MappedProt2.get( srchRepPeptNrseqIdPosUnlinkedDimerDTO_Item_2.getNrseqId() );
+						repPept_Stage_1_Wrapper_MappedProt2.get( srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Item_2.getProteinSequenceId() );
 				
 				if ( repPept_Stage_1_Wrapper == null ) {
 					
 					repPept_Stage_1_Wrapper = new RepPept_Stage_1_Wrapper();
-					repPept_Stage_1_Wrapper_MappedProt2.put( srchRepPeptNrseqIdPosUnlinkedDimerDTO_Item_2.getNrseqId(), repPept_Stage_1_Wrapper );
+					repPept_Stage_1_Wrapper_MappedProt2.put( srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Item_2.getProteinSequenceId(), repPept_Stage_1_Wrapper );
 				}
 
 				boolean reportedPeptideIdAlreadyInList = false;
@@ -456,39 +456,39 @@ public class UnlinkedDimerPeptideProteinMapping {
 			Map<Integer, RepPept_Stage_1_Wrapper> unlinked__repPept_Stage_1_Wrapper_MappedProt,
 			WebReportedPeptideWrapper wrappedPeptidelink,
 			Integer reportedPeptideId,
-			Map<Integer,List<SrchRepPeptNrseqIdPosUnlinkedDimerDTO>> protIdPosMap_On_SrchRepPeptPeptId 
+			Map<Integer,List<SrchRepPeptProtSeqIdPosUnlinkedDimerDTO>> protIdPosMap_On_SrchRepPeptPeptId 
 			
 			) {
 		
 
 		if ( protIdPosMap_On_SrchRepPeptPeptId.size() != 1 ) {
 			
-			//  Did not find entries in srch_rep_pept__nrseq_id_pos related to both entries in srch_rep_pept__peptide so skip
+			//  Did not find entries in srch_rep_pept__prot_seq_id_unlinked_dimer related to the entry in srch_rep_pept__peptide so skip
 			
 			return;  //  EARLY RETURN
 		}
 		
-		Iterator<Map.Entry<Integer,List<SrchRepPeptNrseqIdPosUnlinkedDimerDTO>>> protIdPosMap_On_SrchRepPeptPeptId_Iterator =
+		Iterator<Map.Entry<Integer,List<SrchRepPeptProtSeqIdPosUnlinkedDimerDTO>>> protIdPosMap_On_SrchRepPeptPeptId_Iterator =
 				protIdPosMap_On_SrchRepPeptPeptId.entrySet().iterator();
 		
-		Map.Entry<Integer,List<SrchRepPeptNrseqIdPosUnlinkedDimerDTO>> protIdPosMap_On_SrchRepPeptPeptId_Entry_A =
+		Map.Entry<Integer,List<SrchRepPeptProtSeqIdPosUnlinkedDimerDTO>> protIdPosMap_On_SrchRepPeptPeptId_Entry_A =
 				protIdPosMap_On_SrchRepPeptPeptId_Iterator.next();
 
 //		Integer searchReportedPeptidepeptideId_Entry_A = protIdPosMap_On_SrchRepPeptPeptId_Entry_A.getKey();
 
-		for ( SrchRepPeptNrseqIdPosUnlinkedDimerDTO srchRepPeptNrseqIdPosUnlinkedDimerDTO_Item : protIdPosMap_On_SrchRepPeptPeptId_Entry_A.getValue() ) {
+		for ( SrchRepPeptProtSeqIdPosUnlinkedDimerDTO srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Item : protIdPosMap_On_SrchRepPeptPeptId_Entry_A.getValue() ) {
 
 			//  Process into Map of protein objects
 
 			// Map<Integer, RepPept_Stage_1_Wrapper> unlinked__repPept_Stage_1_Wrapper_MappedProt,
 
 			RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper =
-					unlinked__repPept_Stage_1_Wrapper_MappedProt.get( srchRepPeptNrseqIdPosUnlinkedDimerDTO_Item.getNrseqId() );
+					unlinked__repPept_Stage_1_Wrapper_MappedProt.get( srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Item.getProteinSequenceId() );
 
 			if ( repPept_Stage_1_Wrapper == null ) {
 
 				repPept_Stage_1_Wrapper = new RepPept_Stage_1_Wrapper();
-				unlinked__repPept_Stage_1_Wrapper_MappedProt.put( srchRepPeptNrseqIdPosUnlinkedDimerDTO_Item.getNrseqId(), repPept_Stage_1_Wrapper );
+				unlinked__repPept_Stage_1_Wrapper_MappedProt.put( srchRepPeptProtSeqIdPosUnlinkedDimerDTO_Item.getProteinSequenceId(), repPept_Stage_1_Wrapper );
 			}
 
 			boolean reportedPeptideIdAlreadyInList = false;
@@ -516,7 +516,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 	 * @param search
 	 * @param searcherCutoffValuesSearchLevel
 	 * @param searchId
-	 * @param searchProtein_KeyOn_NRSEQ_ID_Map
+	 * @param searchProtein_KeyOn_PROT_SEQ_ID_Map
 	 * @param proteinId_1
 	 * @param proteinId_2
 	 * @param repPept_Stage_1_Wrapper
@@ -528,7 +528,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
 			Integer proteinId_1, 
 			Integer proteinId_2, 
-			Map<Integer, SearchProtein> searchProtein_KeyOn_NRSEQ_ID_Map,
+			Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map,
 			RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper) throws Exception {
 		
 		
@@ -585,14 +585,14 @@ public class UnlinkedDimerPeptideProteinMapping {
 		searchProteinDimer.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 
 
-		SearchProtein searchProtein_1 = searchProtein_KeyOn_NRSEQ_ID_Map.get( proteinId_1 );
+		SearchProtein searchProtein_1 = searchProtein_KeyOn_PROT_SEQ_ID_Map.get( proteinId_1 );
 
 
 		if ( searchProtein_1 == null ) {
 
-			searchProtein_1 = new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( proteinId_1 ) );
+			searchProtein_1 = new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId_1 ) );
 
-			searchProtein_KeyOn_NRSEQ_ID_Map.put( proteinId_1, searchProtein_1 );
+			searchProtein_KeyOn_PROT_SEQ_ID_Map.put( proteinId_1, searchProtein_1 );
 		}
 
 		SearchProtein searchProtein_2 = null;
@@ -603,12 +603,12 @@ public class UnlinkedDimerPeptideProteinMapping {
 
 		} else {
 
-			searchProtein_2 = searchProtein_KeyOn_NRSEQ_ID_Map.get( proteinId_2 );
+			searchProtein_2 = searchProtein_KeyOn_PROT_SEQ_ID_Map.get( proteinId_2 );
 
 			if ( searchProtein_2 == null ) {
-				searchProtein_2 = new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( proteinId_2 ) );
+				searchProtein_2 = new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId_2 ) );
 
-				searchProtein_KeyOn_NRSEQ_ID_Map.put( proteinId_2, searchProtein_2 );
+				searchProtein_KeyOn_PROT_SEQ_ID_Map.put( proteinId_2, searchProtein_2 );
 			}
 		}
 
@@ -635,7 +635,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 	 * @param search
 	 * @param searcherCutoffValuesSearchLevel
 	 * @param searchId
-	 * @param searchProtein_KeyOn_NRSEQ_ID_Map
+	 * @param searchProtein_KeyOn_PROT_SEQ_ID_Map
 	 * @param proteinId
 	 * @param repPept_Stage_1_Wrapper
 	 * @return
@@ -645,7 +645,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 			SearchDTO search,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
 			Integer proteinId,  
-			Map<Integer, SearchProtein> searchProtein_KeyOn_NRSEQ_ID_Map,
+			Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map,
 			RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper) throws Exception {
 		
 		
@@ -702,14 +702,14 @@ public class UnlinkedDimerPeptideProteinMapping {
 		searchProteinUnlinked.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 
 
-		SearchProtein searchProtein = searchProtein_KeyOn_NRSEQ_ID_Map.get( proteinId );
+		SearchProtein searchProtein = searchProtein_KeyOn_PROT_SEQ_ID_Map.get( proteinId );
 
 
 		if ( searchProtein == null ) {
 
-			searchProtein = new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( proteinId ) );
+			searchProtein = new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId ) );
 
-			searchProtein_KeyOn_NRSEQ_ID_Map.put( proteinId, searchProtein );
+			searchProtein_KeyOn_PROT_SEQ_ID_Map.put( proteinId, searchProtein );
 		}
 
 		searchProteinUnlinked.setProtein( searchProtein );

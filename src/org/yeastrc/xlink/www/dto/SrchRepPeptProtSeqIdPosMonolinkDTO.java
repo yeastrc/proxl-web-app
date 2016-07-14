@@ -2,25 +2,27 @@ package org.yeastrc.xlink.www.dto;
 
 
 /**
- * Unlinked or Dimer (Half of a Dimer)
+ * Monolink
  * 
- * table srch_rep_pept__nrseq_id_pos_unlinked_dimer
+ * table srch_rep_pept__prot_seq_id_pos_monolink
  *
  */
-public class SrchRepPeptNrseqIdPosUnlinkedDimerDTO {
+public class SrchRepPeptProtSeqIdPosMonolinkDTO {
 
 	private int id;
 	private int searchId;
 	private int reportedPeptideId;
 	private int searchReportedPeptidepeptideId;
-	private int nrseqId;
+	private int proteinSequenceId;
+	private int proteinSequencePosition;
 	
 	@Override
 	public String toString() {
-		return "SrchRepPeptNrseqIdPosCrosslinkDTO [id=" + id + ", searchId="
+		return "SrchRepPeptProtSeqIdPosMonolinkDTO [id=" + id + ", searchId="
 				+ searchId + ", reportedPeptideId=" + reportedPeptideId
 				+ ", searchReportedPeptidepeptideId="
-				+ searchReportedPeptidepeptideId + ", nrseqId=" + nrseqId + "]";
+				+ searchReportedPeptidepeptideId + ", proteinSequenceId=" + proteinSequenceId
+				+ ", proteinSequencePosition=" + proteinSequencePosition + "]";
 	}
 	
 	
@@ -48,12 +50,17 @@ public class SrchRepPeptNrseqIdPosUnlinkedDimerDTO {
 	public void setSearchReportedPeptidepeptideId(int searchReportedPeptidepeptideId) {
 		this.searchReportedPeptidepeptideId = searchReportedPeptidepeptideId;
 	}
-	public int getNrseqId() {
-		return nrseqId;
+	public int getProteinSequenceId() {
+		return proteinSequenceId;
 	}
-	public void setNrseqId(int nrseqId) {
-		this.nrseqId = nrseqId;
+	public void setProteinSequenceId(int proteinSequenceId) {
+		this.proteinSequenceId = proteinSequenceId;
 	}
-
+	public int getProteinSequencePosition() {
+		return proteinSequencePosition;
+	}
+	public void setProteinSequencePosition(int proteinSequencePosition) {
+		this.proteinSequencePosition = proteinSequencePosition;
+	}
 		
 }

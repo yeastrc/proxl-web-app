@@ -21,6 +21,9 @@ import javax.servlet.http.HttpServletResponse;
 
 
 
+
+
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -28,7 +31,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.dao.SearchDAO;
-import org.yeastrc.xlink.dto.NRProteinDTO;
+import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
 import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
@@ -65,9 +68,10 @@ import org.yeastrc.xlink.www.protein_coverage.ProteinCoverageCompute;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
+import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
-import org.yeastrc.xlink.www.web_utils.GetProteinListingTooltipConfigData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
+import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import org.yeastrc.xlink.www.web_utils.URLEncodeDecodeAURL;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -266,9 +270,8 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 
 			//  Populate request objects for Protein Name Tooltip JS
-			
-			GetProteinListingTooltipConfigData.getInstance().getProteinListingTooltipConfigData( request );
-			
+			ProteinListingTooltipConfigUtil.getInstance().putProteinListingTooltipConfigForPage( searchIdsCollection, request );
+
 
 			
 			boolean showStructureLink = true;
@@ -379,9 +382,13 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 				}
 			}
 
-			if ( proteinQueryJSONRoot.getExcludeProtein() != null ) {
+			//  First convert the protein sequence ids that come from the JS code to standard integers and put
+			//   in the property excludeProteinSequenceIds
+			ProteinsMergedProteinsCommon.getInstance().processExcludeProteinSequenceIdsFromJS( proteinQueryJSONRoot );
 
-				for ( Integer proteinId : proteinQueryJSONRoot.getExcludeProtein() ) {
+			if ( proteinQueryJSONRoot.getExcludeProteinSequenceIds() != null ) {
+
+				for ( Integer proteinId : proteinQueryJSONRoot.getExcludeProteinSequenceIds() ) {
 
 					excludeProtein_Ids_Set_UserInput.add( proteinId );
 				}
@@ -401,7 +408,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 
 			ProteinCoverageCompute pcs = new ProteinCoverageCompute();
 
-			pcs.setExcludedProteinIds( proteinQueryJSONRoot.getExcludeProtein() );
+			pcs.setExcludedProteinSequenceIds( proteinQueryJSONRoot.getExcludeProteinSequenceIds() );
 			pcs.setExcludedTaxonomyIds( proteinQueryJSONRoot.getExcludeTaxonomy() );
 			
 			pcs.setFilterNonUniquePeptides( proteinQueryJSONRoot.isFilterNonUniquePeptides() );
@@ -452,8 +459,8 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 							SearchProtein searchProtein_1 = crosslink.getProtein1();
 							SearchProtein searchProtein_2 = crosslink.getProtein2();
 							
-							Integer searchProtein_id_1 = searchProtein_1.getNrProtein().getNrseqId();
-							Integer searchProtein_id_2 = searchProtein_2.getNrProtein().getNrseqId();
+							Integer searchProtein_id_1 = searchProtein_1.getProteinSequenceObject().getProteinSequenceId();
+							Integer searchProtein_id_2 = searchProtein_2.getProteinSequenceObject().getProteinSequenceId();
 												
 							{
 								Set<Integer> searchIdsForProtein_1 =
@@ -496,7 +503,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 							SearchProteinLooplink looplink = wrappedLooplink.getSearchProteinLooplink();
 							
 							SearchProtein searchProtein = looplink.getProtein();
-							Integer searchProtein_id = searchProtein.getNrProtein().getNrseqId();
+							Integer searchProtein_id = searchProtein.getProteinSequenceObject().getProteinSequenceId();
 
 							{
 								Set<Integer> searchIdsForProtein =
@@ -531,8 +538,8 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 							SearchProtein searchProtein_1 = dimer.getProtein1();
 							SearchProtein searchProtein_2 = dimer.getProtein2();
 							
-							Integer searchProtein_id_1 = searchProtein_1.getNrProtein().getNrseqId();
-							Integer searchProtein_id_2 = searchProtein_2.getNrProtein().getNrseqId();
+							Integer searchProtein_id_1 = searchProtein_1.getProteinSequenceObject().getProteinSequenceId();
+							Integer searchProtein_id_2 = searchProtein_2.getProteinSequenceObject().getProteinSequenceId();
 												
 							{
 								Set<Integer> searchIdsForProtein_1 =
@@ -572,7 +579,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 							SearchProteinUnlinked unlinked = wrappedUnlinked.getSearchProteinUnlinked();
 							
 							SearchProtein searchProtein = unlinked.getProtein();
-							Integer searchProtein_id = searchProtein.getNrProtein().getNrseqId();
+							Integer searchProtein_id = searchProtein.getProteinSequenceObject().getProteinSequenceId();
 
 							{
 								Set<Integer> searchIdsForProtein =
@@ -616,19 +623,46 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 						searchesForProtein.add(searchForProtein);
 					}
 				
-					NRProteinDTO nrProteinDTO = new NRProteinDTO();
-					nrProteinDTO.setNrseqId( proteinId );
+					ProteinSequenceObject ProteinSequenceObject = new ProteinSequenceObject();
+					ProteinSequenceObject.setProteinSequenceId( proteinId );
 
-					MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searchesForProtein, nrProteinDTO );
+					MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searchesForProtein, ProteinSequenceObject );
+
+					//  Exclude protein if excluded for all searches
 					
-					int mergedSearchProteinTaxonomyId = mergedSearchProtein.getNrProtein().getTaxonomyId(); 
+					boolean excludeTaxonomyIdAllSearches = true;
+					
+					for ( SearchDTO searchDTO : searchesForProtein ) {
 
-					if ( excludeTaxonomy_Ids_Set_UserInput.contains( mergedSearchProteinTaxonomyId ) ) {
-						
+						boolean excludeOnProtein =
+								ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
+								.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+										excludeTaxonomy_Ids_Set_UserInput, 
+										mergedSearchProtein.getProteinSequenceObject(), 
+										searchDTO.getId() );
+
+						if ( ! excludeOnProtein ) {
+							
+							excludeTaxonomyIdAllSearches = false;
+							break;
+						}
+					}
+					
+					if ( excludeTaxonomyIdAllSearches ) {
+
 						//////////  Taxonomy Id in list of excluded taxonomy ids so drop the record
 						
 						continue;  //   EARLY Continue
 					}
+					
+//					int mergedSearchProteinTaxonomyId = mergedSearchProtein.getProteinSequenceObject().getTaxonomyId(); 
+//
+//					if ( excludeTaxonomy_Ids_Set_UserInput.contains( mergedSearchProteinTaxonomyId ) ) {
+//						
+//						//////////  Taxonomy Id in list of excluded taxonomy ids so drop the record
+//						
+//						continue;  //   EARLY Continue
+//					}
 					
 					allProteinsUnfilteredList.add( mergedSearchProtein );
 				}

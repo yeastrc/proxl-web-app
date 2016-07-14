@@ -10,20 +10,20 @@ public class MergedSearchProteinPosition {
 		MergedSearchProteinPosition mrpp = (MergedSearchProteinPosition) o;
 		
 		if( this.getPosition() != mrpp.getPosition() ) return false;
-		if( this.getProtein().getNrProtein() != mrpp.getProtein().getNrProtein() ) return false;
+		if( this.getProtein().getProteinSequenceObject() != mrpp.getProtein().getProteinSequenceObject() ) return false;
 		
 		return true;
 	}
 	
 	public int hashCode() {
-		return ( "" + position + this.getProtein().getNrProtein().getNrseqId() ).hashCode();
+		return ( "" + position + this.getProtein().getProteinSequenceObject().getProteinSequenceId() ).hashCode();
 	}
 	
 	public String toString() {
 		try {
 			return protein.getName() + "(" + position + ")";
 		} catch( Exception e ) {
-			return "Error with protein: " + protein.getNrProtein().getNrseqId();
+			return "Error with protein: " + protein.getProteinSequenceObject().getProteinSequenceId();
 		}
 	}
 	

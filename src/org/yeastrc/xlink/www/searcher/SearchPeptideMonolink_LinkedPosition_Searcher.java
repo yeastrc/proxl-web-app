@@ -83,7 +83,7 @@ public class SearchPeptideMonolink_LinkedPosition_Searcher {
 			
 			" FROM "
 			
-			+ " srch_rep_pept__nrseq_id_pos_monolink AS srpnipm "
+			+ " srch_rep_pept__prot_seq_id_pos_monolink AS srpnipm "
 
 			+ " INNER JOIN unified_rp__search__rep_pept__generic_lookup "
 			+ 	" ON srpnipm.search_id = unified_rp__search__rep_pept__generic_lookup.search_id "
@@ -99,7 +99,7 @@ public class SearchPeptideMonolink_LinkedPosition_Searcher {
 			" WHERE unified_rp__search__rep_pept__generic_lookup.search_id = ? "
 			+ " AND unified_rp__search__rep_pept__generic_lookup.has_monolinks = '" 
 					+ Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE + "' "
-			+ " AND srpnipm.nrseq_id = ? AND srpnipm.nrseq_position = ? ";
+			+ " AND srpnipm.search_id = ? AND srpnipm.protein_sequence_id = ? AND srpnipm.protein_sequence_position = ? ";
 
 	
 	private final String SQL_LAST_PART = 
@@ -587,6 +587,9 @@ public class SearchPeptideMonolink_LinkedPosition_Searcher {
 			int paramCounter = 0;
 			
 			
+			paramCounter++;
+			pstmt.setInt( paramCounter, searchId );
+
 			paramCounter++;
 			pstmt.setInt( paramCounter, searchId );
 			

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 
 
@@ -55,8 +56,7 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 		try {
 			if( this.numPsms == null ) {
 								
-				populateNumPsmNumPeptideNumUniquePeptide();
-				
+				throw new ProxlWebappInternalErrorException( "numPsms is not populated" );
 			}
 
 			return this.numPsms;
@@ -81,8 +81,7 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 					this.numLinkedPeptides = this.associatedReportedPeptideIds.size();
 				
 				} else {
-				
-					populateNumPsmNumPeptideNumUniquePeptide();
+					throw new ProxlWebappInternalErrorException( "numLinkedPeptides is not populated" );
 				}
 				
 			}
@@ -111,7 +110,7 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 				
 				} else {
 
-					populateNumPsmNumPeptideNumUniquePeptide();
+					throw new ProxlWebappInternalErrorException( "numUniqueLinkedPeptides is not populated" );
 				}
 			}
 
@@ -127,41 +126,6 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 		}
 	}
 	
-	
-	private void populateNumPsmNumPeptideNumUniquePeptide() throws Exception {
-		
-		try {
-			
-			throw new Exception( "Removing calls to NumPeptidesPSMsForProteinCriteria.getNumPeptidesPSMsForCrosslink" );
-
-//			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
-//					NumPeptidesPSMsForProteinCriteria.getInstance()
-//					.getNumPeptidesPSMsForCrosslink(
-//							this.getSearch().getId(),
-//							this.getSearcherCutoffValuesSearchLevel(),
-//							this.getProtein1().getNrProtein().getNrseqId(),
-//							this.getProtein2().getNrProtein().getNrseqId(),
-//							this.getProtein1Position(),
-//							this.getProtein2Position(),
-//							YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
-//			
-//			this.numLinkedPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
-//			this.numUniqueLinkedPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
-//			
-//			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
-
-		} catch ( Exception e ) {
-
-			String msg = "Exception in populateNumPsmNumPeptideNumUniquePeptide()";
-
-			log.error( msg, e );
-
-			throw e;
-		}
-		
-		
-	}
-
 	
 	
 	/**
@@ -277,8 +241,8 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 //					.searchOnSearchProteinCrosslink( 
 //							this.getSearch().getId(),
 //							this.searcherCutoffValuesSearchLevel,
-//							this.getProtein1().getNrProtein().getNrseqId(),
-//							this.getProtein2().getNrProtein().getNrseqId(),
+//							this.getProtein1().getProteinSequenceObject().getProteinSequenceId(),
+//							this.getProtein2().getProteinSequenceObject().getProteinSequenceId(),
 //							this.getProtein1Position(),
 //							this.getProtein2Position() );
 //			}

@@ -40,8 +40,8 @@ import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.GenerateVennDiagramDataToJSON;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
-import org.yeastrc.xlink.www.web_utils.GetProteinListingTooltipConfigData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
+import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import org.yeastrc.xlink.www.webapp_timing.WebappTiming;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -251,7 +251,7 @@ public class ViewMergedSearchPeptidesAction extends Action {
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 
 			//  Populate request objects for Protein Name Tooltip JS
-			GetProteinListingTooltipConfigData.getInstance().getProteinListingTooltipConfigData( request );
+			ProteinListingTooltipConfigUtil.getInstance().putProteinListingTooltipConfigForPage( searchIdsSet, request );
 
 
 			//  Search Ids already sorted

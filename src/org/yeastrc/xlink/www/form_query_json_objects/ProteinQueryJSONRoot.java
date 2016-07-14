@@ -16,42 +16,56 @@ public class ProteinQueryJSONRoot extends A_QueryBase_JSONRoot {
 	private boolean filterOnlyOnePSM;
 	private boolean filterOnlyOnePeptide;
 
-	private int[] excludeProtein;
-
+	/**
+	 * 
+	 */
+	private int[] excludeProteinSequenceIds;
 
 	/**
 	 * Exclude Protein Encoded
 	 */
-	private String exclProtEnc;
+	private String exclProteinSequenceIdsEncoded;
+	
+	/**
+	 * Exclude Protein Separator
+	 */
+	private String exclProteinSequenceIdsEncodedSeparator;
 	
 	/**
 	 * Base X RADIX encoding for exclProtEnc
 	 */
-	private int exclProtEncRadix;
+	private int exclProteinSequenceIdsEncodedRadix;
+
+	/**
+	 * OLD  Nrseq Protein Ids
+	 */
+	private int[] excludeProtein;
 
 	
 	
 	//  Consider populating this instead as an optimization when many proteins are excluded
 //	private int[] includeProtein;
 	
+
+	/**
+	 * OLD  Nrseq Protein Ids
+	 * 
+	 * @return
+	 */
+	public int[] getExcludeProtein() {
+		return excludeProtein;
+	}
+
+	/**
+	 * OLD  Nrseq Protein Ids
+	 * 
+	 * @param excludeProtein
+	 */
+	public void setExcludeProtein(int[] excludeProtein) {
+		this.excludeProtein = excludeProtein;
+	}
 	
-	
 
-	public int getExclProtEncRadix() {
-		return exclProtEncRadix;
-	}
-
-	public void setExclProtEncRadix(int exclProtEncRadix) {
-		this.exclProtEncRadix = exclProtEncRadix;
-	}
-
-	public String getExclProtEnc() {
-		return exclProtEnc;
-	}
-
-	public void setExclProtEnc(String exclProtEnc) {
-		this.exclProtEnc = exclProtEnc;
-	}
 
 	public int[] getExcludeTaxonomy() {
 		return excludeTaxonomy;
@@ -85,12 +99,40 @@ public class ProteinQueryJSONRoot extends A_QueryBase_JSONRoot {
 		this.filterOnlyOnePeptide = filterOnlyOnePeptide;
 	}
 
-	public int[] getExcludeProtein() {
-		return excludeProtein;
+
+	public String getExclProteinSequenceIdsEncoded() {
+		return exclProteinSequenceIdsEncoded;
 	}
 
-	public void setExcludeProtein(int[] excludeProtein) {
-		this.excludeProtein = excludeProtein;
+	public void setExclProteinSequenceIdsEncoded(
+			String exclProteinSequenceIdsEncoded) {
+		this.exclProteinSequenceIdsEncoded = exclProteinSequenceIdsEncoded;
+	}
+
+	public int getExclProteinSequenceIdsEncodedRadix() {
+		return exclProteinSequenceIdsEncodedRadix;
+	}
+
+	public void setExclProteinSequenceIdsEncodedRadix(
+			int exclProteinSequenceIdsEncodedRadix) {
+		this.exclProteinSequenceIdsEncodedRadix = exclProteinSequenceIdsEncodedRadix;
+	}
+
+	public String getExclProteinSequenceIdsEncodedSeparator() {
+		return exclProteinSequenceIdsEncodedSeparator;
+	}
+
+	public void setExclProteinSequenceIdsEncodedSeparator(
+			String exclProteinSequenceIdsEncodedSeparator) {
+		this.exclProteinSequenceIdsEncodedSeparator = exclProteinSequenceIdsEncodedSeparator;
+	}
+
+	public int[] getExcludeProteinSequenceIds() {
+		return excludeProteinSequenceIds;
+	}
+
+	public void setExcludeProteinSequenceIds(int[] excludeProteinSequenceIds) {
+		this.excludeProteinSequenceIds = excludeProteinSequenceIds;
 	}
 	
 }

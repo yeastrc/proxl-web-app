@@ -23,9 +23,9 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.NRProteinDAO;
+import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
 import org.yeastrc.xlink.www.dao.SearchDAO;
-import org.yeastrc.xlink.dto.NRProteinDTO;
+import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -280,12 +280,12 @@ public class ViewerSequenceCoverageService {
 //			scd.setSearches( searches );
 
 			// first get all distinct proteins that have at least one linked peptide, given the search parameters
-			NRProteinDTO protein = NRProteinDAO.getInstance().getNrProtein( proteinId );
+			ProteinSequenceObject protein = ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId );
 
 			ProteinSequenceCoverage cov = 
 					ProteinSequenceCoverageFactory.getInstance().getProteinSequenceCoverage(protein, searches, searcherCutoffValuesRootLevel);
 
-			coverages.put( protein.getNrseqId(), cov.getSequenceCoverage() );
+			coverages.put( protein.getProteinSequenceId(), cov.getSequenceCoverage() );
 
 			Set<Range<Integer>> coverageRanges = cov.getRanges();
 			
@@ -342,7 +342,7 @@ public class ViewerSequenceCoverageService {
 				sequenceCoverageRangesOutputList.add( prevSequenceCoverageRange );
 			}
 			
-			ranges.put( protein.getNrseqId(), sequenceCoverageRangesOutputList );
+			ranges.put( protein.getProteinSequenceId(), sequenceCoverageRangesOutputList );
 
 			scd.setCoverages( coverages );
 			scd.setRanges( ranges );

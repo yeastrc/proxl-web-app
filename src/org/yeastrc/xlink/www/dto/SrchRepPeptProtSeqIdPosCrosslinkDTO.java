@@ -2,27 +2,27 @@ package org.yeastrc.xlink.www.dto;
 
 
 /**
- * Monolink
+ * Crosslink  (Half of a Crosslink)
  * 
- * table srch_rep_pept__nrseq_id_pos_monolink
+ * table srch_rep_pept__prot_seq_id_pos_crosslink
  *
  */
-public class SrchRepPeptNrseqIdPosMonolinkDTO {
+public class SrchRepPeptProtSeqIdPosCrosslinkDTO {
 
 	private int id;
 	private int searchId;
 	private int reportedPeptideId;
 	private int searchReportedPeptidepeptideId;
-	private int nrseqId;
-	private int nrseqPosition;
+	private int proteinSequenceId;
+	private int proteinSequencePosition;
 	
 	@Override
 	public String toString() {
-		return "SrchRepPeptNrseqIdPosMonolinkDTO [id=" + id + ", searchId="
+		return "SrchRepPeptProtSeqIdPosCrosslinkDTO [id=" + id + ", searchId="
 				+ searchId + ", reportedPeptideId=" + reportedPeptideId
 				+ ", searchReportedPeptidepeptideId="
-				+ searchReportedPeptidepeptideId + ", nrseqId=" + nrseqId
-				+ ", nrseqPosition=" + nrseqPosition + "]";
+				+ searchReportedPeptidepeptideId + ", proteinSequenceId=" + proteinSequenceId
+				+ ", proteinSequencePosition=" + proteinSequencePosition + "]";
 	}
 	
 	
@@ -50,17 +50,17 @@ public class SrchRepPeptNrseqIdPosMonolinkDTO {
 	public void setSearchReportedPeptidepeptideId(int searchReportedPeptidepeptideId) {
 		this.searchReportedPeptidepeptideId = searchReportedPeptidepeptideId;
 	}
-	public int getNrseqId() {
-		return nrseqId;
+	public int getProteinSequenceId() {
+		return proteinSequenceId;
 	}
-	public void setNrseqId(int nrseqId) {
-		this.nrseqId = nrseqId;
+	public void setProteinSequenceId(int proteinSequenceId) {
+		this.proteinSequenceId = proteinSequenceId;
 	}
-	public int getNrseqPosition() {
-		return nrseqPosition;
+	public int getProteinSequencePosition() {
+		return proteinSequencePosition;
 	}
-	public void setNrseqPosition(int nrseqPosition) {
-		this.nrseqPosition = nrseqPosition;
+	public void setProteinSequencePosition(int proteinSequencePosition) {
+		this.proteinSequencePosition = proteinSequencePosition;
 	}
 		
 }

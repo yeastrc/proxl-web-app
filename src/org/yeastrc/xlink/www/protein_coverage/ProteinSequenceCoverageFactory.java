@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dto.NRProteinDTO;
-import org.yeastrc.xlink.dto.PeptideDTO;
+import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.dto.PeptideDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
@@ -36,9 +36,9 @@ public class ProteinSequenceCoverageFactory {
 	 * @return
 	 * @throws Exception
 	 */
-	public ProteinSequenceCoverage getProteinSequenceCoverage( NRProteinDTO protein, Collection<SearchDTO> searches, SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel ) throws Exception {
+	public ProteinSequenceCoverage getProteinSequenceCoverage( ProteinSequenceObject protein, Collection<SearchDTO> searches, SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel ) throws Exception {
 		
-		List<NRProteinDTO> proteinList = new ArrayList<>( 1 );
+		List<ProteinSequenceObject> proteinList = new ArrayList<>( 1 );
 		
 		proteinList.add(protein);
 		
@@ -46,11 +46,11 @@ public class ProteinSequenceCoverageFactory {
 		Map<Integer, ProteinSequenceCoverage> proteinSequenceCoverages =
 				getProteinSequenceCoveragesForProteins( proteinList, searches, searcherCutoffValuesRootLevel );
 		
-		ProteinSequenceCoverage proteinSequenceCoverage = proteinSequenceCoverages.get( protein.getNrseqId() );
+		ProteinSequenceCoverage proteinSequenceCoverage = proteinSequenceCoverages.get( protein.getProteinSequenceId() );
 		
 		if ( proteinSequenceCoverage == null ) {
 			
-			String msg = "Internal Proxl Error, proteinSequenceCoverage == null for protein.getNrseqId(): " + protein.getNrseqId();
+			String msg = "Internal Proxl Error, proteinSequenceCoverage == null for protein.getProteinSequenceId(): " + protein.getProteinSequenceId();
 			log.error( msg );
 			throw new ProxlWebappDataException(msg);
 		}
@@ -65,15 +65,15 @@ public class ProteinSequenceCoverageFactory {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<Integer, ProteinSequenceCoverage> getProteinSequenceCoveragesForProteins( List<NRProteinDTO> proteinList, Collection<SearchDTO> searches, SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel ) throws Exception {
+	public Map<Integer, ProteinSequenceCoverage> getProteinSequenceCoveragesForProteins( List<ProteinSequenceObject> proteinList, Collection<SearchDTO> searches, SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel ) throws Exception {
 		
 		Map<Integer, ProteinSequenceCoverage> proteinSequenceCoverages_KeyedOnProtId_Map = new HashMap<>();
 
-		for ( NRProteinDTO protein : proteinList ) {
+		for ( ProteinSequenceObject protein : proteinList ) {
 
 			ProteinSequenceCoverage proteinSequenceCoverage = new ProteinSequenceCoverage( protein );
 
-			proteinSequenceCoverages_KeyedOnProtId_Map.put( protein.getNrseqId(), proteinSequenceCoverage );
+			proteinSequenceCoverages_KeyedOnProtId_Map.put( protein.getProteinSequenceId(), proteinSequenceCoverage );
 		}
 		
 		
@@ -140,7 +140,7 @@ public class ProteinSequenceCoverageFactory {
 		for ( WebProteinPosition webProteinPosition : webProteinPositionList ) {
 			
 			ProteinSequenceCoverage proteinSequenceCoverage = 
-					proteinSequenceCoverages_KeyedOnProtId_Map.get( webProteinPosition.getProtein().getNrProtein().getNrseqId() );
+					proteinSequenceCoverages_KeyedOnProtId_Map.get( webProteinPosition.getProtein().getProteinSequenceObject().getProteinSequenceId() );
 					
 			if ( proteinSequenceCoverage != null ) {
 

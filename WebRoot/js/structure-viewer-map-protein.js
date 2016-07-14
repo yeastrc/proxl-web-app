@@ -85,13 +85,14 @@ var showProteinSelectInOverlay = function( chainId ) {
 	
 	var content = $("#pdb-map-protein-overlay-protein-step-one" ).html();
 	
-	// get all nrseq ids already mapped to this chain
+	// get all protein sequence ids already mapped to this chain
 	var alignments = getAllAlignmentsForChain( chainId );
 	var alignedProteins = new Array();
 	if( alignments && alignments.length > 0 ) {
 		for( var i = 0; i < alignments.length; i++ ) {
-		
-			alignedProteins.push( alignments[ i ][ 'nrseqId' ] );			
+			var alignment = alignments[ i ];
+			var alignmentProteinSequenceId = alignment.proteinSequenceId;
+			alignedProteins.push( alignmentProteinSequenceId );			
 		}
 	}	
 	
@@ -105,11 +106,16 @@ var showProteinSelectInOverlay = function( chainId ) {
 	content = "<select id=\"pdb-map-protein-overlay-protein-select\">";
 	content += "<option value=\"0\">Select protein:</option>\n";
 	
+	//  Only show proteins that are not already mapped to this chain
+	
 	for( var i = 0; i < _proteins.length; i++ ) {
 		
 		var found = false;
 		for( var k = 0; k < alignedProteins.length; k++ ) {
-			if( _proteins[ i ] == alignedProteins[ k ] ) { found = true; break; }
+			if( _proteins[ i ] == alignedProteins[ k ] ) { 
+				found = true; 
+				break; 
+			}
 		}
 
 		if( !found ) {
@@ -153,35 +159,48 @@ var showAlignment = function( alignment, showSave ) {
 	var $showAlignmentDiv = $( "#pdb-show-alignment-overlay-body" );
 	$showAlignmentDiv.empty();
 	
-	var html = "<div style=\"margin-top:20px;margin-bottom:20px;font-size:14pt;\">Showing alignment for " +  _proteinNames[ alignment.nrseqId ] + " and " + pdbFile.name + " (Chain " + alignment.chainId + "):</div>\n";
-	
-	
-	html += "<div style=\"overflow:scroll;\">\n";
-	html += "<table>";
-	html += "<tr>";
-	html += "<td style=\"white-space:nowrap;font-weight:bold;\">" + _proteinNames[ alignment.nrseqId ] + "</td>";
-	html += "<td style=\"white-space:nowrap;font-size:11pt;font-family:monospace;\">" + alignment.alignedNrseqSequence + "</td>";
-	html += "</tr>";
-	
-	html += "<tr>";
-	html += "<td style=\"white-space:nowrap;font-weight:bold;\">" + pdbFile.name + "(" + alignment.chainId + ")</td>";
-	html += "<td style=\"white-space:nowrap;font-size:11pt;font-family:monospace;\">" + alignment.alignedPDBSequence + "</td>";
-	html += "</tr>";
-	html += "</table>";
-	html += "</div>\n";
-	
-	html += "<div style=\"margin-top:20px;\">\n";
-	
+	var saveButtonHTML = "";
+	var editButtonHTML = "";
+
 	if( showSave ) {
-		html += "<input type=\"button\" value=\"Save\" id=\"saveAlignmentButton\" />";
+		saveButtonHTML = "<input type=\"button\" value=\"Save\" id=\"saveAlignmentButton\" />";
 	}
 	
 	if( _PDB_FILES[ pdbFile.id ][ 'canEdit' ] ) {
-		html += "<input type=\"button\" value=\"Edit\" id=\"editAlignmentButton\" />";
+		editButtonHTML = "<input type=\"button\" value=\"Edit\" id=\"editAlignmentButton\" />";
 	}
 	
-	html += "<input type=\"button\" value=\"Cancel\" onClick=\"closePDBShowAlignmentOverlay()\" />";	
-	html += "</div>\n";
+	
+	var proteinNameForProteinId = _proteinNames[ alignment.proteinSequenceId ];
+	
+	var html = 
+		"<div style=\"margin-top:20px;margin-bottom:20px;font-size:14pt;\">Showing alignment for "
+		+ _proteinNames[ alignment.proteinSequenceId ] 
+		+ " and " 
+		+ pdbFile.name + " (Chain " + alignment.chainId + "):</div>\n"
+	
+	
+	+ "<div style=\"overflow:scroll;\">\n"
+	+ "<table>"
+	+ "<tr>"
+	+ "<td style=\"white-space:nowrap;font-weight:bold;\">" + proteinNameForProteinId + "</td>"
+	+ "<td style=\"white-space:nowrap;font-size:11pt;font-family:monospace;\">" + alignment.alignedExperimentalSequence + "</td>"
+	+ "</tr>"
+	
+	+ "<tr>"
+	+ "<td style=\"white-space:nowrap;font-weight:bold;\">" + pdbFile.name + "(" + alignment.chainId + ")</td>"
+	+ "<td style=\"white-space:nowrap;font-size:11pt;font-family:monospace;\">" + alignment.alignedPDBSequence + "</td>"
+	+ "</tr>"
+	+ "</table>"
+	+ "</div>\n"
+	
+	+ "<div style=\"margin-top:20px;\">\n"
+
+	+ saveButtonHTML  //  Empty string if not applicable
+	+ editButtonHTML  //  Empty string if not applicable
+	
+	+ "<input type=\"button\" value=\"Cancel\" onClick=\"closePDBShowAlignmentOverlay()\" />"	
+	+ "</div>\n";
 	
 	$showAlignmentDiv.html( html );
 	
@@ -203,26 +222,32 @@ var showEditAlignmentOverlay = function( alignment ) {
 	var $overlayDiv = $("#pdb-show-alignment-overlay-body");
 	$overlayDiv.empty();
 	
-	var html = "<div style=\"margin-top:20px;margin-bottom:20px;font-size:14pt;\">Editing alignment for " +  _proteinNames[ alignment.nrseqId ] + " and " + pdbFile.name + " (Chain " + alignment.chainId + "):</div>\n";
+	var proteinNameForAlignment  = _proteinNames[ alignment.proteinSequenceId ];
 	
-	
-	html += "<div>\n";
-	html += "<textarea id=\"edit-alignment-textarea\" style=\"white-space:nowrap;overflow:scroll;width:95%;height:4em;\">";
-	
-	html += alignment.alignedNrseqSequence + "\n" + alignment.alignedPDBSequence;
-	
-	html += "</textarea>";
-	html += "</div>\n";
-	
-	html += "<div style=\"margin-top:20px;\">\n";
-	
-	html += "<input type=\"button\" value=\"Save\" id=\"saveEditedAlignmentButton\" />";
-	html += "<input type=\"button\" value=\"Cancel\" onClick=\"closePDBShowAlignmentOverlay()\" />";	
-	html += "</div>\n";
-	
-	html += "<div style=\"margin-top:20px;\">Instructions: Sequence for " + _proteinNames[ alignment.nrseqId ] + " is on the top and " + pdbFile.name + " (Chain " + alignment.chainId + ") " +
-			" is on the bottom. Replace the text above with a new alignment and click &quot;Save.&quot;</div>";
-	
+	var html = 
+		"<div style=\"margin-top:20px;margin-bottom:20px;font-size:14pt;\">Editing alignment for " 
+		+  proteinNameForAlignment + " and " 
+		+ pdbFile.name + " (Chain " + alignment.chainId + "):</div>\n"
+
+
+		+ "<div>\n"
+		+ "<textarea id=\"edit-alignment-textarea\" style=\"white-space:nowrap;overflow:scroll;width:95%;height:4em;\">"
+
+		+ alignment.alignedExperimentalSequence + "\n" + alignment.alignedPDBSequence
+
+		+ "</textarea>"
+		+ "</div>\n"
+
+		+ "<div style=\"margin-top:20px;\">\n"
+
+		+ "<input type=\"button\" value=\"Save\" id=\"saveEditedAlignmentButton\" />"
+		+ "<input type=\"button\" value=\"Cancel\" onClick=\"closePDBShowAlignmentOverlay()\" />"	
+		+ "</div>\n"
+
+		+ "<div style=\"margin-top:20px;\">Instructions: Sequence for " + proteinNameForAlignment
+		+ " is on the top and " + pdbFile.name + " (Chain " + alignment.chainId + ") " 
+		+ " is on the bottom. Replace the text above with a new alignment and click &quot;Save.&quot;</div>";
+
 	
 	$overlayDiv.html( html );
 	
@@ -236,31 +261,40 @@ var showEditAlignmentOverlay = function( alignment ) {
 
 var saveEditedAlignment = function( alignment ) {
 	
-	var rawText = $("#edit-alignment-textarea").val();	
-	rawText = rawText.trim().replace(/(\r\n|\r)/gm, "\n");	// ensure we know what we're working with
-		
+	var rawAlignmentFieldText = $("#edit-alignment-textarea").val();	
+	
+	// Convert all possible "new line" to "\n" for simplified splitting on new line
+	
+	var rawAlignmentFieldTextStandardNewLine = rawAlignmentFieldText.trim().replace(/(\r\n|\r)/gm, "\n");	
+
+	//  The text area input field has 2 lines so split on new line
+	
+	var seqs = rawAlignmentFieldTextStandardNewLine.split( "\n" );
+
 	// verify the new alignments
-	var seqs = rawText.split( "\n" );
-		
+	
 	if( seqs.length != 2 ) {
 		alert( "Detected something other than 2 lines. The input must contain exactly two lines, the protein sequence you're aligning on the first line and the sequence for the PDB chain on the second.");
 		return;
 	}
 	
-	var nrseqSequence = seqs[ 0 ].trim();
+	//  Get the protein sequence the user is aligning 
+	var experimentalSequence = seqs[ 0 ].trim();
+	
+	//  Get the PDB sequence the user is aligning
 	var pdbSequence = seqs[ 1 ].trim();
 	
-	if( nrseqSequence.length != pdbSequence.length ) {
+	if( experimentalSequence.length != pdbSequence.length ) {
 		alert( "Aligned sequences must be the same length. Use hyphens to indicate insertions in the sequences." );
 		return;
 	}
 	
-	var tmpNrseqSequence = nrseqSequence.replace( /-/g, "" );
+	var tmpExperimentalSequence = experimentalSequence.replace( /-/g, "" );
 	var tmpPdbSequence = pdbSequence.replace( /-/g, "" );
 	
-	var rawNrseqSequence = alignment.alignedNrseqSequence.replace( /-/g, "" );
-	if( tmpNrseqSequence !== rawNrseqSequence ) {
-		var proteinName = _proteinNames[ alignment.nrseqId ];
+	var rawExperimentalSequence = alignment.alignedExperimentalSequence.replace( /-/g, "" );
+	if( tmpExperimentalSequence !== rawExperimentalSequence ) {
+		var proteinName = _proteinNames[ alignment.proteinSequenceId ];
 		
 		alert( "Sequence given for " + proteinName + " does not match sequence on file for that protein." );
 		return;
@@ -273,12 +307,12 @@ var saveEditedAlignment = function( alignment ) {
 	}
 
 	
-	if( alignment.alignedNrseqSequence == nrseqSequence && alignment.alignedPDBSequence == pdbSequence ) {
+	if( alignment.alignedExperimentalSequence == experimentalSequence && alignment.alignedPDBSequence == pdbSequence ) {
 		alert( "The alignments were not changed." );
 	} else {
 
 		// looks good, can save it
-		alignment.alignedNrseqSequence = nrseqSequence;
+		alignment.alignedExperimentalSequence = experimentalSequence;
 		alignment.alignedPDBSequence = pdbSequence;
 		
 		saveAlignment( alignment );
@@ -294,8 +328,8 @@ var saveAlignment = function( alignment ) {
 	        type: "POST",
 	        url: _URL,
 	        data: { 'id' : alignment.id, 'pdbFileId' : alignment.pdbFileId, 'chainId' : alignment.chainId,
-	        	'alignedPDBSequence' : alignment.alignedPDBSequence, 'nrseqId' : alignment.nrseqId,
-	        	'alignedNrseqSequence' : alignment.alignedNrseqSequence },
+	        	'alignedPDBSequence' : alignment.alignedPDBSequence, 'proteinSequenceId' : alignment.proteinSequenceId,
+	        	'alignedExperimentalSequence' : alignment.alignedExperimentalSequence },
 	        dataType: "json",
 	        success: function(data)	{
 

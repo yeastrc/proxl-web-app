@@ -182,7 +182,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 		//  Mark Multi <select> for chosen Proteins to exclude
 
-		var excludeProtein = _query_json_field_Contents.excludeProtein;
+		var excludeProtein = _query_json_field_Contents.excludeProteinSequenceIds;
 
 		$("#excludeProtein").val( excludeProtein );
 
@@ -295,6 +295,54 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 		var outputExcludeProteinsAsStrings = $("#excludeProtein").val( );
 
+		var getEncodedExcludeProteinsResult = this.getEncodedExcludeProteins( outputExcludeProteinsAsStrings );
+
+		var output_query_json_field_Contents = { 
+
+				cutoffs : outputCutoffs, 
+
+				filterNonUniquePeptides : filterNonUniquePeptides,
+				filterOnlyOnePSM : filterOnlyOnePSM,
+				filterOnlyOnePeptide : filterOnlyOnePeptide,
+
+				excludeTaxonomy : outputExcludeTaxonomy,  
+
+//				excludeProteinSequenceIds : outputExcludeProteinsAsInts
+				
+				exclProteinSequenceIdsEncoded : getEncodedExcludeProteinsResult.encodedExcludeProteins,
+				exclProteinSequenceIdsEncodedRadix : getEncodedExcludeProteinsResult.exclProtEncRadix,
+				exclProteinSequenceIdsEncodedSeparator : getEncodedExcludeProteinsResult.exclProtEncSeparator
+		};
+
+		//  Create the JSON of the page parameters and store it on the page
+
+		try {
+			var output_query_json_field_String = JSON.stringify( output_query_json_field_Contents );
+
+			$query_json_field.val( output_query_json_field_String );
+
+		} catch( e ) {
+
+			throw "Failed to stringify JSON to HTML field with id 'query_json_field'.";
+
+		}
+		
+	};
+
+
+
+//	///////////////////////
+
+	this.getEncodedExcludeProteins = function( outputExcludeProteinsAsStrings ) {
+
+		
+		var TO_STRING_RADIX = 32;
+		
+		var SEPARATOR = "Z";
+		
+		var encodedExcludeProteins = "";
+		
+
 		var outputExcludeProteinsAsInts = null;
 
 		if ( outputExcludeProteinsAsStrings !== undefined && outputExcludeProteinsAsStrings != null ) {
@@ -315,106 +363,48 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 				outputExcludeProteinsAsInts.push( outputExcludeProteinInt );
 			}
 		}
+
+
+		if ( outputExcludeProteinsAsInts && outputExcludeProteinsAsInts.length > 0 ) {
+			
+			if ( outputExcludeProteinsAsInts.length === 1 ) {
+			
+				encodedExcludeProteins = outputExcludeProteinsAsInts[ 0 ].toString( TO_STRING_RADIX );
 		
+			} else {
 
-		//  Not currently used.  An experiment
-		
-//		var getEncodedExcludeProteinsResult = this.getEncodedExcludeProteins( outputExcludeProteinsAsInts );
+				//  sort numerically
 
-		var output_query_json_field_Contents = { 
+				outputExcludeProteinsAsInts.sort(function(a, b) {
+					return a - b;
+				});
 
-				cutoffs : outputCutoffs, 
-
-				filterNonUniquePeptides : filterNonUniquePeptides,
-				filterOnlyOnePSM : filterOnlyOnePSM,
-				filterOnlyOnePeptide : filterOnlyOnePeptide,
-
-
-				excludeTaxonomy : outputExcludeTaxonomy,  
-				excludeProtein : outputExcludeProteinsAsInts
+				var firstValue = outputExcludeProteinsAsInts[ 0 ].toString( TO_STRING_RADIX ); 
 				
+				var outputAsOffsets = [ firstValue ];
 
-				//  Not currently used.  An experiment
-//				,
-//				
-//				exclProtEnc : getEncodedExcludeProteinsResult.encodedExcludeProteins,
-//				exclProtEncRadix : getEncodedExcludeProteinsResult.exclProtEncRadix
-		};
+				//  start at second entry in array
+				
+				for ( var index = 1; index < outputExcludeProteinsAsInts.length; index++ ) {
+					
+					var offsetFromPrevValueInt = outputExcludeProteinsAsInts[ index ] - outputExcludeProteinsAsInts[ index - 1 ];
+					
+					var offsetFromPrevValue = ( offsetFromPrevValueInt ).toString( TO_STRING_RADIX );
+					
+					outputAsOffsets.push( offsetFromPrevValue );
+				}
 
-		//  Create the JSON of the page parameters and store it on the page
-
-		try {
-			var output_query_json_field_String = JSON.stringify( output_query_json_field_Contents );
-
-			$query_json_field.val( output_query_json_field_String );
-
-		} catch( e ) {
-
-			throw "Failed to stringify JSON to HTML field with id 'query_json_field'.";
-
+				encodedExcludeProteins = outputAsOffsets.join( SEPARATOR );  // SEPARATOR separator
+			}
 		}
 		
+		return {
+			outputExcludeProteinsAsInts : outputExcludeProteinsAsInts,
+			encodedExcludeProteins : encodedExcludeProteins, 
+			exclProtEncRadix : TO_STRING_RADIX, 
+			exclProtEncSeparator : SEPARATOR };
 	};
-
-	//  Not currently used.  An experiment
 	
-//	///////////////////////
-//
-//	this.getEncodedExcludeProteins = function( outputExcludeProteinsAsInts ) {
-//
-//		
-//		var TO_STRING_RADIX = 32;
-//		
-//		//  TODO  TEMP
-//		
-//		var encodedExcludeProteins = "";
-//
-//		if ( outputExcludeProteinsAsInts && outputExcludeProteinsAsInts.length > 0 ) {
-//			
-//			if ( outputExcludeProteinsAsInts.length === 1 ) {
-//			
-//				encodedExcludeProteins = outputExcludeProteinsAsInts[ 0 ].toString( TO_STRING_RADIX );
-//		
-//			} else {
-//
-//				//  sort numerically
-//
-//				outputExcludeProteinsAsInts.sort(function(a, b) {
-//					return a - b;
-//				});
-//
-//				var firstValue = outputExcludeProteinsAsInts[ 0 ].toString( TO_STRING_RADIX ); 
-//				
-//				var outputAsOffsets = [ firstValue ];
-//
-//				//  start at second entry in array
-//				
-//				for ( var index = 1; index < outputExcludeProteinsAsInts.length; index++ ) {
-//					
-//					var offsetFromPrevValue = ( outputExcludeProteinsAsInts[ index ] - outputExcludeProteinsAsInts[ index - 1 ] ).toString( TO_STRING_RADIX );
-//					
-//					outputAsOffsets.push( offsetFromPrevValue );
-//				}
-//
-//				encodedExcludeProteins = outputAsOffsets.join( ',' );  // comma separate
-//			}
-//		}
-//		
-//		return { encodedExcludeProteins : encodedExcludeProteins, exclProtEncRadix : TO_STRING_RADIX };
-//	};
-
-
-	///////////////////////
-
-//	this.encodeExcludeProteinAndPlaceInFormField = function( outputExcludeProteinsAsInts ) {
-//	
-//		ss ss
-//		
-//		exclude_protein_ids_encoded
-//	
-//	
-//	};
-
 	///////////////////////
 
 	this.updatePageForFormParams = function() {

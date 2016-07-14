@@ -12,6 +12,9 @@
 "use strict";
 
 
+//    All references to proteinId are actually referencing the protein sequence id
+
+
 var DEBUG_CONFIRMS = false;  
 // var DEBUG_CONFIRMS = true;  //  if true, confirm popups at key points will happen to force code behaviour for testing 
 
@@ -26,7 +29,7 @@ var ProteinAnnotationStore = function() {
 	
 	this.annotationData = {};
 	
-	this.annotationSequenceIds = {}; // keyed on nrSeqProteinId
+	this.annotationSequenceIds = {}; // keyed on ProteinSequenceId
 	
 	this.currentLoadIdentifierForSubmit = undefined;  // uses Date.now();
 

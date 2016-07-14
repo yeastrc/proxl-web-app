@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 
 
@@ -84,9 +85,7 @@ public class SearchProteinLooplink implements IProteinLooplink {
 		
 		try {
 			if( this.numPsms == null ) {
-
-				populateNumPsmNumPeptideNumUniquePeptide();
-				
+				throw new ProxlWebappInternalErrorException( "numPsms is not populated" );
 			}
 
 			return this.numPsms;
@@ -120,7 +119,7 @@ public class SearchProteinLooplink implements IProteinLooplink {
 					this.numPeptides = this.associatedReportedPeptideIds.size();
 
 				} else {
-					populateNumPsmNumPeptideNumUniquePeptide();
+					throw new ProxlWebappInternalErrorException( "numPeptides is not populated" );
 				}
 
 			}
@@ -157,8 +156,7 @@ public class SearchProteinLooplink implements IProteinLooplink {
 					this.numUniquePeptides = this.associatedReportedPeptideIdsRelatedPeptidesUnique.size();
 				
 				} else {
-
-					populateNumPsmNumPeptideNumUniquePeptide();
+					throw new ProxlWebappInternalErrorException( "numUniquePeptides is not populated" );
 				}
 
 			}
@@ -176,80 +174,6 @@ public class SearchProteinLooplink implements IProteinLooplink {
 	}
 
 	
-
-	private void populateNumPsmNumPeptideNumUniquePeptide() throws Exception {
-		
-		try {
-
-			throw new Exception( "Removing calls to NumPeptidesPSMsForProteinCriteria.getNumPeptidesPSMsForLooplink" );
-
-//			NumPeptidesPSMsForProteinCriteriaResult numPeptidesPSMsForProteinCriteriaResult =
-//					NumPeptidesPSMsForProteinCriteria.getInstance()
-//					.getNumPeptidesPSMsForLooplink(
-//							this.getSearch().getId(),
-//							this.getSearcherCutoffValuesSearchLevel(),
-//							this.getProtein().getNrProtein().getNrseqId(),
-//							this.getProteinPosition1(),
-//							this.getProteinPosition2(),
-//							YRC_NRSEQUtils.getDatabaseIdFromName( this.getSearch().getFastaFilename() ) );
-//			
-//			this.numPeptides = numPeptidesPSMsForProteinCriteriaResult.getNumPeptides();
-//			this.numUniquePeptides = numPeptidesPSMsForProteinCriteriaResult.getNumUniquePeptides();
-//			
-//			this.numPsms = numPeptidesPSMsForProteinCriteriaResult.getNumPSMs();
-
-		} catch ( Exception e ) {
-
-			String msg = "Exception in populateNumPsmNumPeptideNumUniquePeptide()";
-
-			log.error( msg, e );
-
-			throw e;
-		}
-		
-		
-	}
-
-	
-	//  WAS
-	
-	/**
-	 * WAS
-	 * Used by Javascript in Merged Image and Merged Structure pages
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-//	public List<SearchPeptideLooplink> getPeptides() throws Exception {
-//		
-//		try {
-//			if( this.peptides == null ) {
-//
-//				this.peptides = 
-//				SearchPeptideLooplinkSearcher.getInstance()
-//				.searchOnSearchProteinLooplink(
-//						this.getSearch().getId(),
-//						searcherCutoffValuesSearchLevel,
-//						this.getProtein().getNrProtein().getNrseqId(),
-//						this.getProteinPosition1(),
-//						this.getProteinPosition2() );
-//
-//			}
-//
-//			return this.peptides;
-//			
-//		} catch ( Exception e ) {
-//			
-//			String msg = "Exception in getPeptides()";
-//			
-//			log.error( msg, e );
-//			
-//			throw e;
-//		}
-//	}
-	
-	
-
 
 	public List<String> getPsmAnnotationValueList() {
 		return psmAnnotationValueList;

@@ -20,6 +20,8 @@
 "use strict";
 
 
+//   All references to proteinId or protein_id are actually referencing the protein sequence id
+
 
 ////////////////////////////
 
@@ -175,6 +177,9 @@ ImageProteinBarDataManager.prototype.getArrayOfObjectsForHash = function( ) {
 	return imageProteinBarDataListResult;
 };
 	
+////
+
+//  Update Internal ProteinBarData objects with objects in the Page Hash
 
 ImageProteinBarDataManager.prototype.replaceInternalObjectsWithObjectsInHash = function( params ) {
 	
@@ -208,14 +213,18 @@ ImageProteinBarDataManager.prototype.replaceInternalObjectsWithObjectsInHash = f
 			var proteinBarDataItem = 
 				ImageProteinBarData.constructImageProteinBarDataFromHashDataObject( proteinBarDataHashItem ); 
 
-			//  If protein id in proteinBarDataItem is not in currentProteinIdsArray
-			//   Drop the proteinBarDataItem
-			
-			if ( ! currentProteinIdsObject[ proteinBarDataItem.getProteinId() ] ) {
+			if ( currentProteinIdsArray ) {
 				
-				continue;  // EARLY continue
+				//  Only do if currentProteinIdsArray is passed in
+
+				//  If protein id in proteinBarDataItem is not in currentProteinIdsArray
+				//   Drop the proteinBarDataItem
+
+				if ( ! currentProteinIdsObject[ proteinBarDataItem.getProteinId() ] ) {
+
+					continue;  // EARLY continue
+				}
 			}
-				
 
 			
 			proteinBarDataItem.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
@@ -362,6 +371,8 @@ ImageProteinBarDataManager.prototype.moreThan_One_ProteinBar_Highlighted = funct
 	return false;
 };
 
+///
+
 ImageProteinBarDataManager.prototype.clearAllProteinBarsHighlighted = function(  ) {
 	
 	for ( var index = 0; index < this.imageProteinBarDataList.length; index++ ) {
@@ -372,9 +383,28 @@ ImageProteinBarDataManager.prototype.clearAllProteinBarsHighlighted = function( 
 	}
 };
 
+///////////
 
-		
-		
+//   For Conversion from NRSEQ Protein Id to Protein Sequence Id
+
+
+//  return true if any imageProteinBarDataListEntry contains 
+
+ImageProteinBarDataManager.prototype.contains_OLD_NrseqProteinId = function(  ) {
+	
+	for ( var index = 0; index < this.imageProteinBarDataList.length; index++ ) {
+
+		var imageProteinBarDataListEntry = this.imageProteinBarDataList[ index ];
+
+		if ( imageProteinBarDataListEntry.getOLD_NrseqProteinId() ) {
+			
+			return true;
+		}
+	}
+	
+	return false;
+};
+	
 
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -430,7 +460,7 @@ ImageProteinBarData.prototype.setContainingImageProteinBarDataManager = function
 };
 
 
-//  Protein Id
+//  Protein Id - This is actually now a Protein Sequence Id
 
 ImageProteinBarData.prototype.getProteinId = function( ) {
 	
@@ -448,6 +478,26 @@ ImageProteinBarData.prototype.setProteinId = function( params ) {
 	
 	this.proteinId = proteinId;
 	this.proteinLength = proteinLength;
+};
+
+ImageProteinBarData.prototype.setProteinIdNoOtherChanges = function( params ) {
+	
+	var proteinId = params.proteinId;
+	this.proteinId = proteinId;
+};
+
+//////////////////////
+
+//    OLD NRSEQ Protein Id
+
+ImageProteinBarData.prototype.getOLD_NrseqProteinId = function( ) {
+	
+	return this.nrseqProteinId;
+};
+ImageProteinBarData.prototype.setOLD_NrseqProteinId = function( params ) {
+	
+	var nrseqProteinId = params.nrseqProteinId;
+	this.nrseqProteinId = nrseqProteinId;
 };
 
 ////////////////
@@ -1078,7 +1128,7 @@ ImageProteinBarData.prototype.getHashDataObject = function() {
 	
 	var hashDataObject = {};
 	
-	hashDataObject.proteinId = this.proteinId;
+	hashDataObject.protSeqId = this.proteinId;
 	
 	hashDataObject.pHlhAll = this.proteinBarHighlightedAll;
 	hashDataObject.pHlghRgns = this.proteinBarHighlightedRegions;
@@ -1102,7 +1152,7 @@ ImageProteinBarData.constructImageProteinBarDataFromHashDataObject = function( h
 
 //		Copy data from hashDataObject
 
-		imageProteinBarData.proteinId = hashDataObject.proteinId;
+		imageProteinBarData.proteinId = hashDataObject.protSeqId;
 
 		imageProteinBarData.proteinBarHighlightedAll = hashDataObject.pHlhAll;
 		imageProteinBarData.proteinBarHighlightedRegions = hashDataObject.pHlghRgns;
@@ -1111,6 +1161,11 @@ ImageProteinBarData.constructImageProteinBarDataFromHashDataObject = function( h
 		imageProteinBarData.proteinOffset  = hashDataObject.pOffst;
 		
 		//  Backwards compatible:
+		
+		if ( hashDataObject.proteinId ) {
+			
+			imageProteinBarData.nrseqProteinId = hashDataObject.proteinId; // Store off for conversion to protein sequence id
+		}
 		
 		if ( hashDataObject.proteinBarHighlightedAll ) {
 
@@ -1129,6 +1184,8 @@ ImageProteinBarData.constructImageProteinBarDataFromHashDataObject = function( h
 
 			imageProteinBarData.proteinOffset  = hashDataObject.proteinOffset;
 		}
+		
+		
 		
 		if ( imageProteinBarData.proteinOffset === undefined ) {
 			

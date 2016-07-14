@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.xlink.dao.NRProteinDAO;
+import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.objects.SearchProtein;
@@ -36,11 +36,11 @@ public class SearchProteinSearcher {
 		ResultSet rs = null;
 
 		final String sql = 
-				"SELECT DISTINCT nrseq_id " 
+				"SELECT DISTINCT protein_sequence_id " 
 						+ " FROM srch_rep_pept__peptide "
-						+ "  INNER JOIN srch_rep_pept__nrseq_id_pos_unlinked_dimer "
+						+ "  INNER JOIN srch_rep_pept__prot_seq_id_unlinked_dimer "
 						+ 	" ON srch_rep_pept__peptide.id = "
-						+ 		" srch_rep_pept__nrseq_id_pos_unlinked_dimer.search_reported_peptide_peptide_id" 
+						+ 		" srch_rep_pept__prot_seq_id_unlinked_dimer.search_reported_peptide_peptide_id" 
 						+ " WHERE srch_rep_pept__peptide.search_id = ? "
 						+ 	" AND srch_rep_pept__peptide.reported_peptide_id = ? "
 						+ 	" AND srch_rep_pept__peptide.peptide_id = ? ";
@@ -67,20 +67,20 @@ public class SearchProteinSearcher {
 			while( rs.next() ) {
 				
 				SearchProteinPosition prpp = new SearchProteinPosition();
-				prpp.setProtein( new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( rs.getInt( 1 ) ) ) );
+				prpp.setProtein( new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( rs.getInt( 1 ) ) ) );
 				
 				proteinPositions.add( prpp );
 			}
 			
 
-			//  Sort on nrseq id
+			//  Sort on protein sequence id
 			
 			Collections.sort( proteinPositions, new Comparator<SearchProteinPosition>() {
 
 				@Override
 				public int compare(SearchProteinPosition o1, SearchProteinPosition o2) {
 					
-					return o1.getProtein().getNrProtein().getNrseqId() - o2.getProtein().getNrProtein().getNrseqId();
+					return o1.getProtein().getProteinSequenceObject().getProteinSequenceId() - o2.getProtein().getProteinSequenceObject().getProteinSequenceId();
 				}
 			});;
 			
@@ -120,11 +120,11 @@ public class SearchProteinSearcher {
 		
 
 		final String sql = 
-					"SELECT DISTINCT nrseq_id " 
+					"SELECT DISTINCT protein_sequence_id " 
 					+ " FROM srch_rep_pept__peptide "
-					+ "  INNER JOIN srch_rep_pept__nrseq_id_pos_unlinked_dimer "
+					+ "  INNER JOIN srch_rep_pept__prot_seq_id_unlinked_dimer "
 					+ 	" ON srch_rep_pept__peptide.id = "
-					+ 		" srch_rep_pept__nrseq_id_pos_unlinked_dimer.search_reported_peptide_peptide_id" 
+					+ 		" srch_rep_pept__prot_seq_id_unlinked_dimer.search_reported_peptide_peptide_id" 
 					+ " WHERE srch_rep_pept__peptide.search_id = ? "
 					+ 	" AND srch_rep_pept__peptide.reported_peptide_id = ? "
 					+ 	" AND srch_rep_pept__peptide.peptide_id = ? ";
@@ -150,19 +150,19 @@ public class SearchProteinSearcher {
 			
 			while( rs.next() ) {
 				SearchProteinPosition prpp = new SearchProteinPosition();
-				prpp.setProtein( new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( rs.getInt( "nrseq_id" ) ) ) );
+				prpp.setProtein( new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( rs.getInt( "protein_sequence_id" ) ) ) );
 				
 				proteinPositions.add( prpp );
 			}
 
-			//  Sort on nrseq id
+			//  Sort on protein sequence id
 			
 			Collections.sort( proteinPositions, new Comparator<SearchProteinPosition>() {
 
 				@Override
 				public int compare(SearchProteinPosition o1, SearchProteinPosition o2) {
 					
-					return o1.getProtein().getNrProtein().getNrseqId() - o2.getProtein().getNrProtein().getNrseqId();
+					return o1.getProtein().getProteinSequenceObject().getProteinSequenceId() - o2.getProtein().getProteinSequenceObject().getProteinSequenceId();
 				}
 			});;
 			
@@ -200,11 +200,11 @@ public class SearchProteinSearcher {
 		
 
 		final String sql = 
-					"SELECT DISTINCT nrseq_id, nrseq_position " 
+					"SELECT DISTINCT protein_sequence_id, protein_sequence_position " 
 					+ " FROM srch_rep_pept__peptide "
-					+ "  INNER JOIN srch_rep_pept__nrseq_id_pos_crosslink "
+					+ "  INNER JOIN srch_rep_pept__prot_seq_id_pos_crosslink "
 					+ 	" ON srch_rep_pept__peptide.id = "
-					+ 		" srch_rep_pept__nrseq_id_pos_crosslink.search_reported_peptide_peptide_id" 
+					+ 		" srch_rep_pept__prot_seq_id_pos_crosslink.search_reported_peptide_peptide_id" 
 					+ " WHERE srch_rep_pept__peptide.search_id = ? "
 					+ 	" AND srch_rep_pept__peptide.reported_peptide_id = ? "
 					+ 	" AND srch_rep_pept__peptide.peptide_id = ? "
@@ -232,22 +232,22 @@ public class SearchProteinSearcher {
 			
 			while( rs.next() ) {
 				SearchProteinPosition prpp = new SearchProteinPosition();
-				prpp.setPosition( rs.getInt( "nrseq_position" ) );
-				prpp.setProtein( new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( rs.getInt( "nrseq_id" ) ) ) );
+				prpp.setPosition( rs.getInt( "protein_sequence_position" ) );
+				prpp.setProtein( new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( rs.getInt( "protein_sequence_id" ) ) ) );
 				
 				proteinPositions.add( prpp );
 			}
 			
-			//  Sort on nrseq id, position
+			//  Sort on protein sequence id, position
 			
 			Collections.sort( proteinPositions, new Comparator<SearchProteinPosition>() {
 
 				@Override
 				public int compare(SearchProteinPosition o1, SearchProteinPosition o2) {
 					
-					if ( o1.getProtein().getNrProtein().getNrseqId() != o2.getProtein().getNrProtein().getNrseqId() ) {
+					if ( o1.getProtein().getProteinSequenceObject().getProteinSequenceId() != o2.getProtein().getProteinSequenceObject().getProteinSequenceId() ) {
 						
-						return o1.getProtein().getNrProtein().getNrseqId() - o2.getProtein().getNrProtein().getNrseqId();
+						return o1.getProtein().getProteinSequenceObject().getProteinSequenceId() - o2.getProtein().getProteinSequenceObject().getProteinSequenceId();
 					}
 					return o1.getPosition() - o2.getPosition();
 				}
@@ -303,11 +303,11 @@ public class SearchProteinSearcher {
 		
 
 		final String sql = 
-					"SELECT DISTINCT nrseq_id, nrseq_position_1, nrseq_position_2 " 
+					"SELECT DISTINCT protein_sequence_id, protein_sequence_position_1, protein_sequence_position_2 " 
 					+ " FROM srch_rep_pept__peptide "
-					+ "  INNER JOIN srch_rep_pept__nrseq_id_pos_looplink "
+					+ "  INNER JOIN srch_rep_pept__prot_seq_id_pos_looplink "
 					+ 	" ON srch_rep_pept__peptide.id = "
-					+ 		" srch_rep_pept__nrseq_id_pos_looplink.search_reported_peptide_peptide_id" 
+					+ 		" srch_rep_pept__prot_seq_id_pos_looplink.search_reported_peptide_peptide_id" 
 					+ " WHERE srch_rep_pept__peptide.search_id = ? "
 					+ 	" AND srch_rep_pept__peptide.reported_peptide_id = ? "
 					+ 	" AND srch_rep_pept__peptide.peptide_id = ? "
@@ -341,23 +341,23 @@ public class SearchProteinSearcher {
 				
 				SearchProteinDoublePosition prpp = new SearchProteinDoublePosition();
 
-				prpp.setProtein( new SearchProtein( search, NRProteinDAO.getInstance().getNrProtein( rs.getInt( "nrseq_id" ) ) ) );
-				prpp.setPosition1( rs.getInt( "nrseq_position_1" ) );
-				prpp.setPosition2( rs.getInt( "nrseq_position_2" ) );
+				prpp.setProtein( new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( rs.getInt( "protein_sequence_id" ) ) ) );
+				prpp.setPosition1( rs.getInt( "protein_sequence_position_1" ) );
+				prpp.setPosition2( rs.getInt( "protein_sequence_position_2" ) );
 				
 				proteinPositions.add( prpp );
 			}
 			
-			//  Sort on nrseq id, protein_position_1, protein_position_2
+			//  Sort on protein sequence id, protein_position_1, protein_position_2
 			
 			Collections.sort( proteinPositions, new Comparator<SearchProteinDoublePosition>() {
 
 				@Override
 				public int compare(SearchProteinDoublePosition o1, SearchProteinDoublePosition o2) {
 					
-					if ( o1.getProtein().getNrProtein().getNrseqId() != o2.getProtein().getNrProtein().getNrseqId() ) {
+					if ( o1.getProtein().getProteinSequenceObject().getProteinSequenceId() != o2.getProtein().getProteinSequenceObject().getProteinSequenceId() ) {
 						
-						return o1.getProtein().getNrProtein().getNrseqId() - o2.getProtein().getNrProtein().getNrseqId();
+						return o1.getProtein().getProteinSequenceObject().getProteinSequenceId() - o2.getProtein().getProteinSequenceObject().getProteinSequenceId();
 					}
 					if ( o1.getPosition1() != o2.getPosition1() ) {
 						return o1.getPosition1() - o2.getPosition1();

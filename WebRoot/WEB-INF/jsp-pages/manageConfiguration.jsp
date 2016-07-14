@@ -75,7 +75,7 @@
 	
 	<div style="margin-bottom: 10px;" >
 	  <div style="margin-bottom: 3px;">
-		Protein Listing Service URL: <input type="text" id="input_protein_listing_webservice_url" style="width: 450px;"> 
+		Protein Listing Service URL: <input type="text" id="input_protein_listing_from_sequence_taxonomy_webservice_url" style="width: 450px;"> 
 	  </div> 
 	</div>
 	
@@ -111,7 +111,7 @@
 
 	<input type="hidden" id="config_key_protein_annotation_webservice_url" value="<%= ConfigSystemsKeysConstants.PROTEIN_ANNOTATION_WEBSERVICE_URL_KEY %>">
 
-	<input type="hidden" id="config_key_protein_listing_webservice_url" value="<%= ConfigSystemsKeysConstants.PROTEIN_LISTING_WEBSERVICE_URL_KEY %>">
+	<input type="hidden" id="config_key_protein_listing_from_sequence_taxonomy_webservice_url" value="<%= ConfigSystemsKeysConstants.PROTEIN_LISTING_FROM_SEQUENCE_TAXONOMY_WEBSERVICE_URL_KEY %>">
 
 	<input type="hidden" id="config_key_google_analytics_tracking_code" value="<%= ConfigSystemsKeysConstants.GOOGLE_ANALYTICS_TRACKING_CODE_KEY %>">
 

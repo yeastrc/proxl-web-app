@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.PeptideDAO;
+import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
-import org.yeastrc.xlink.dto.PeptideDTO;
+import org.yeastrc.xlink.www.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;

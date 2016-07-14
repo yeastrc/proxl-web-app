@@ -128,7 +128,7 @@
 		</action>		
 	    
   		<action path="/deleteSearch"
-				type="org.yeastrc.xlink.www.actions.DeletePercolatorSearchAction"
+				type="org.yeastrc.xlink.www.actions.DeleteSearchAction"
 				scope="request"
 				validate="false">
 			<!-- This forward is used as a template, the project id will be appended to it  -->

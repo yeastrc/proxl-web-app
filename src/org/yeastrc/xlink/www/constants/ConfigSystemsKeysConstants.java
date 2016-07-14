@@ -8,7 +8,8 @@ public class ConfigSystemsKeysConstants {
 
 	public static final String PROTEIN_ANNOTATION_WEBSERVICE_URL_KEY = "protein_annotation_webservice_url";
 
-	public static final String PROTEIN_LISTING_WEBSERVICE_URL_KEY = "protein_listing_webservice_url";
+	public static final String PROTEIN_LISTING_FROM_SEQUENCE_TAXONOMY_WEBSERVICE_URL_KEY = 
+			"protein_listing_from_sequence_taxonomy_webservice_url";
 
 	/////////   Email Config
 	

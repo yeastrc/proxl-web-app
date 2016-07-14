@@ -168,7 +168,7 @@ public class WebReportedPeptideWebserviceWrapper {
 		public int getProteinId() throws Exception {
 			
 			try {
-				return webProteinPosition.getProtein().getNrProtein().getNrseqId();
+				return webProteinPosition.getProtein().getProteinSequenceObject().getProteinSequenceId();
 				
 			} catch ( Exception e ) {
 				

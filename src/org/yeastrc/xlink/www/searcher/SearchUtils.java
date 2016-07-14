@@ -6,50 +6,73 @@ import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 import org.yeastrc.xlink.www.objects.SearchProtein;
 
 public class SearchUtils {
 
 	private static final Logger log = Logger.getLogger(SearchUtils.class);
 			
+
+	private static final String NAME_SQL =
+			"SELECT DISTINCT  annotation.name "
+					+ " FROM annotation "
+					+ " INNER JOIN search_protein_sequence_annotation AS spsa "
+					+ " ON annotation.id = spsa.annotation_id "
+			+ " WHERE spsa.search_id = ? AND spsa.protein_sequence_id = ? ";
+	
 	/**
-	 * Get the name for this protein in the context of its search (based on the
-	 * FASTA file used to do the search.
+	 * Get the name for this protein in the context of its search 
 	 * @param prprotein
 	 * @return
 	 * @throws Exception
 	 */
 	public static String getProteinNameForSearch( SearchProtein prprotein ) throws Exception {
 		
-		String name = null;
+		String result = null;
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		
 
-		String sql = "SELECT GROUP_CONCAT(accessionString) FROM tblProteinDatabase WHERE proteinID = ? AND databaseID = ? GROUP BY proteinID";
+//		String sql = "SELECT GROUP_CONCAT(accessionString) FROM tblProteinDatabase WHERE proteinID = ? AND databaseID = ? GROUP BY proteinID";
+		
+
+		String sql = NAME_SQL;
 		
 		try {
 			
-			int proteinNrseqId = prprotein.getNrProtein().getNrseqId();
-			String fastaFilename = prprotein.getSearch().getFastaFilename();
-			int fastaFilenameDatabaseId = YRC_NRSEQUtils.getDatabaseIdFromName( fastaFilename  );
+			int searchId = prprotein.getSearch().getId();
+			int proteinSequenceId = prprotein.getProteinSequenceObject().getProteinSequenceId();
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.YRC_NRSEQ );
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, proteinNrseqId );
-			pstmt.setInt( 2, fastaFilenameDatabaseId );
+			pstmt.setInt( 1, searchId );
+			pstmt.setInt( 2, proteinSequenceId );
 			
 			rs = pstmt.executeQuery();
+			
+			StringBuilder resultsSB = new StringBuilder( 1000 );
 
-			if( rs.next() )
-				name = rs.getString( 1 );
+			while( rs.next() ) {
+				
+				if ( resultsSB.length() > 0 ) {
+					
+					resultsSB.append( "," );
+				}
+				
+				resultsSB.append( rs.getString( "name" ) );
+			}
+			
+			if ( resultsSB.length() > 0 ) {
+				
+				result = resultsSB.toString();
+			}
 			
 		} catch ( Exception e ) {
 			
-			log.error( "ERROR getting protein name for search. database connection: '" + DBConnectionFactory.YRC_NRSEQ + "' sql: " + sql, e );
+			log.error( "ERROR getting protein name for search.  sql: " + sql, e );
 			
 			throw e;
 			
@@ -73,8 +96,16 @@ public class SearchUtils {
 			
 		}
 		
-		return name;		
+		return result;		
 	}
+	
+
+	private static final String DESCRIPTION_SQL =
+			"SELECT DISTINCT  annotation.description "
+					+ " FROM annotation "
+					+ " INNER JOIN search_protein_sequence_annotation AS spsa "
+					+ " ON annotation.id = spsa.annotation_id "
+			+ " WHERE spsa.search_id = ? AND spsa.protein_sequence_id = ? ";
 	
 	/**
 	 * Get the description for this protein in the context of its search (based on
@@ -84,26 +115,49 @@ public class SearchUtils {
 	 * @throws Exception
 	 */
 	public static String getProteinDescriptionForSearch( SearchProtein prprotein ) throws Exception {
-		
-		String name = null;
+
+		String result = null;
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		
+
+//		String sql = "SELECT description FROM tblProteinDatabase WHERE proteinID = ? AND databaseID = ? AND description IS NOT NULL AND description <> ''";
+		
+
+		String sql = DESCRIPTION_SQL;
+		
 		try {
 			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.YRC_NRSEQ );
-			String sql = "SELECT description FROM tblProteinDatabase WHERE proteinID = ? AND databaseID = ? AND description IS NOT NULL AND description <> ''";
+			int searchId = prprotein.getSearch().getId();
+			int proteinSequenceId = prprotein.getProteinSequenceObject().getProteinSequenceId();
+			
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, prprotein.getNrProtein().getNrseqId() );
-			pstmt.setInt( 2, YRC_NRSEQUtils.getDatabaseIdFromName( prprotein.getSearch().getFastaFilename() ) );
+			pstmt.setInt( 1, searchId );
+			pstmt.setInt( 2, proteinSequenceId );
 			
 			rs = pstmt.executeQuery();
-
-			if( rs.next() )
-				name = rs.getString( 1 );
 			
+			StringBuilder resultsSB = new StringBuilder( 1000 );
+
+			while( rs.next() ) {
+				
+				if ( resultsSB.length() > 0 ) {
+					
+					resultsSB.append( ", " );
+				}
+				
+				resultsSB.append( rs.getString( "name" ) );
+			}
+			
+			if ( resultsSB.length() > 0 ) {
+				
+				result = resultsSB.toString();
+			}
+
 		} finally {
 			
 			// be sure database handles are closed
@@ -124,10 +178,10 @@ public class SearchUtils {
 			
 		}
 		
-		if( name == null || name.equals( "" ) )
-			name = "No description in FASTA.";
+		if( result == null || result.equals( "" ) )
+			result = "No description in FASTA.";
 		
-		return name;		
+		return result;		
 	}
 	
 }

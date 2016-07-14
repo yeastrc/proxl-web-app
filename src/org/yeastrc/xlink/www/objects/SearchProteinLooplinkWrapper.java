@@ -17,7 +17,7 @@ public class SearchProteinLooplinkWrapper extends SortDisplayRecordsWrapperBase 
 	@Override
 	public int getFinalSortOrderKey() {
 
-		return searchProteinLooplink.getProtein().getNrProtein().getNrseqId();
+		return searchProteinLooplink.getProtein().getProteinSequenceObject().getProteinSequenceId();
 	}
 
 	/////////////////

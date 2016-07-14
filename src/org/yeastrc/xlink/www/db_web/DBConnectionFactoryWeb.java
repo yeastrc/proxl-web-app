@@ -64,15 +64,9 @@ public class DBConnectionFactoryWeb implements IDBConnectionFactory {
 			if (db.equals(DBConnectionFactory.PROXL)) {
 				
 				ds = (DataSource) ctx.lookup( proxlJNDIName );
-				
-			} else if (db.equals(DBConnectionFactory.YRC_NRSEQ)) {
-				
-				ds = (DataSource) ctx.lookup("java:comp/env/jdbc/nrseq");
-			}
 
-			else {
-				throw new SQLException(
-						"Invalid database name passed into DBConnectionManager.  db: " + db );
+			} else {
+				throw new SQLException( "Invalid database name passed into DBConnectionManager.  db: " + db );
 			}
 
 			if (ds != null) {

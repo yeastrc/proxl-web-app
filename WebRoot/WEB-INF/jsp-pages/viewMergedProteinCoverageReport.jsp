@@ -27,8 +27,8 @@
 
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
-					This input is required on this page:
-					<input type="hidden" id="protein_listing_webservice_base_url" value="<c:out value="${ protein_listing_webservice_base_url }"></c:out>">
+					This include is required on this page:
+					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
 		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
 
@@ -54,8 +54,8 @@
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
 
-		<%--  protein name data webservice base URL, used by createTooltipForProteinNames.js --%>
-	<input type="hidden" id="protein_listing_webservice_base_url" value="<c:out value="${ protein_listing_webservice_base_url }"></c:out>">
+	<%--  used by createTooltipForProteinNames.js --%>
+	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
 
 	
 		<%@ include file="/WEB-INF/jsp-includes/defaultPageViewFragment.jsp" %>
@@ -211,7 +211,7 @@
 						<%--  shortened property from "excludeProtein" to "excP" to shorten the URL  --%>
 						<%-- TODO   TEMP
 						<html:select property="excP" multiple="true" styleId="excludeProtein" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >
-							<html:options collection="proteins" property="nrProtein.nrseqId" labelProperty="name" />
+							<html:options collection="proteins" property="proteinSequenceObject.proteinSequenceId" labelProperty="name" />
 						</html:select>
 						--%>
 						
@@ -223,7 +223,7 @@
 						<select name="excludedProteins" multiple="multiple" id="excludeProtein" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >  
 						  
 	  						<logic:iterate id="protein" name="proteins">
-	  						  <option value="<c:out value="${ protein.nrProtein.nrseqId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
+	  						  <option value="<c:out value="${ protein.proteinSequenceObject.proteinSequenceId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
 	  						</logic:iterate>
 	  					</select>
 					</td>

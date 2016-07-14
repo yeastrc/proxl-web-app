@@ -60,8 +60,8 @@
 
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
-					This input is required on this page:
-					<input type="hidden" id="protein_listing_webservice_base_url" value="<c:out value="${ protein_listing_webservice_base_url }"></c:out>">
+					This include is required on this page:
+					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
 		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
 		
@@ -96,8 +96,8 @@
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
 
-			<%--  protein name data webservice base URL, used by createTooltipForProteinNames.js --%>
-	<input type="hidden" id="protein_listing_webservice_base_url" value="<c:out value="${ protein_listing_webservice_base_url }"></c:out>">
+	<%--  used by createTooltipForProteinNames.js --%>
+	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
 
 		
 		<%@ include file="/WEB-INF/jsp-includes/defaultPageViewFragment.jsp" %>
@@ -356,7 +356,7 @@
 								<td>
 								  <c:if test="${ not empty peptideEntry.peptide1ProteinPositions }">
 									<logic:iterate id="pp" name="peptideEntry" property="peptide1ProteinPositions">
-										<span class="proteinName" id="protein-id-<bean:write name="pp" property="protein.nrProtein.nrseqId" />">
+										<span class="proteinName" id="protein-id-<bean:write name="pp" property="protein.proteinSequenceObject.proteinSequenceId" />">
 											<bean:write name="pp" property="protein.name" 
 												/><c:if test="${ not empty pp.position1 }"
 														>(<bean:write name="pp" property="position1" 
@@ -370,7 +370,7 @@
 								<td>
 								  <c:if test="${ not empty peptideEntry.peptide2ProteinPositions }">
 									<logic:iterate id="pp" name="peptideEntry" property="peptide2ProteinPositions">
-										<span class="proteinName" id="protein-id-<bean:write name="pp" property="protein.nrProtein.nrseqId" />">
+										<span class="proteinName" id="protein-id-<bean:write name="pp" property="protein.proteinSequenceObject.proteinSequenceId" />">
 											<bean:write name="pp" property="protein.name" 
 												/><c:if test="${ not empty pp.position1 }"
 														>(<bean:write name="pp" property="position1" 

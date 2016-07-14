@@ -3,10 +3,10 @@ package org.yeastrc.xlink.www.objects;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.PeptideDAO;
+import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
-import org.yeastrc.xlink.dto.PeptideDTO;
+import org.yeastrc.xlink.www.dto.PeptideDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
@@ -20,8 +20,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class SearchPeptideMonolink {
 	
+
 	private static final Logger log = Logger.getLogger(SearchPeptideMonolink.class);
 
+
+	/**
+	 * Constructor
+	 */
+	public SearchPeptideMonolink() {}
 
 //	private void populatePeptides() throws Exception {
 //
@@ -55,7 +61,7 @@ public class SearchPeptideMonolink {
 //
 //			this.setPeptide( peptideDTO );
 //
-////			this.setPeptidePosition(  );  //  Peptide Position already set from the srch_rep_pept__nrseq_id_pos_monolink record
+////			this.setPeptidePosition(  );  //  Peptide Position already set from the srch_rep_pept__prot_seq_id_pos_monolink record
 //
 //		} catch ( Exception e ) {
 //
@@ -280,23 +286,6 @@ public class SearchPeptideMonolink {
 	}
 
 
-
-	public int getProteinPosition() {
-		return proteinPosition;
-	}
-
-	public void setProteinPosition(int proteinPosition) {
-		this.proteinPosition = proteinPosition;
-	}
-	public int getNrseqProteinId() {
-		return nrseqProteinId;
-	}
-
-	public void setNrseqProteinId(int nrseqProteinId) {
-		this.nrseqProteinId = nrseqProteinId;
-	}
-
-
 	public int getReportedPeptideId() {
 		return reportedPeptideId;
 	}
@@ -341,17 +330,6 @@ public class SearchPeptideMonolink {
 
 	private Integer numUniquePsms;
 	private boolean numUniquePsmsSet;
-	
-
-	/**
-	 * Used to get the correct monolink record
-	 */
-	private int proteinPosition;
-	
-	/**
-	 * Used to get the correct monolink record
-	 */
-	private int nrseqProteinId;
 
 	
 	

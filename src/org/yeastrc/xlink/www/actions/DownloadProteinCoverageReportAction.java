@@ -302,9 +302,13 @@ public class DownloadProteinCoverageReportAction extends Action {
 					}
 				}
 
-				if ( proteinQueryJSONRoot.getExcludeProtein() != null ) {
+				//  First convert the protein sequence ids that come from the JS code to standard integers and put
+				//   in the property excludeProteinSequenceIds
+				ProteinsMergedProteinsCommon.getInstance().processExcludeProteinSequenceIdsFromJS( proteinQueryJSONRoot );
 
-					for ( Integer proteinId : proteinQueryJSONRoot.getExcludeProtein() ) {
+				if ( proteinQueryJSONRoot.getExcludeProteinSequenceIds() != null ) {
+
+					for ( Integer proteinId : proteinQueryJSONRoot.getExcludeProteinSequenceIds() ) {
 
 						excludeProtein_Ids_Set_UserInput.add( proteinId );
 					}
@@ -329,7 +333,7 @@ public class DownloadProteinCoverageReportAction extends Action {
 
 				ProteinCoverageCompute pcs = new ProteinCoverageCompute();
 
-				pcs.setExcludedProteinIds( proteinQueryJSONRoot.getExcludeProtein() );
+				pcs.setExcludedProteinSequenceIds( proteinQueryJSONRoot.getExcludeProteinSequenceIds() );
 				pcs.setExcludedTaxonomyIds( proteinQueryJSONRoot.getExcludeTaxonomy() );
 				
 				pcs.setFilterNonUniquePeptides( proteinQueryJSONRoot.isFilterNonUniquePeptides() );

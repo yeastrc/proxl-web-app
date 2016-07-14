@@ -75,6 +75,9 @@
 
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 
+
+		<script type="text/javascript" src="${ contextPath }/js/nrseqProteinIdToProteinSequenceIdLookup.js?x=${cacheBustValue}"></script>
+
 		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
@@ -89,8 +92,8 @@
 		
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
-					This input is required on this page:
-					<input type="hidden" id="protein_listing_webservice_base_url" value="<c:out value="${ protein_listing_webservice_base_url }"></c:out>">
+					This include is required on this page:
+					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
 		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
 		
@@ -123,8 +126,8 @@
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
 	
-		<%--  protein name data webservice base URL, used by createTooltipForProteinNames.js --%>
-	<input type="hidden" id="protein_listing_webservice_base_url" value="<c:out value="${ protein_listing_webservice_base_url }"></c:out>">
+	<%--  used by createTooltipForProteinNames.js --%>
+	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
 
 	
 		<%@ include file="/WEB-INF/jsp-includes/defaultPageViewFragment.jsp" %>

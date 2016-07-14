@@ -6,10 +6,13 @@ public class PDBAlignmentDTO {
 	
 	private int pdbFileId;
 	private String chainId;
+	private int proteinSequenceId;
 	private String alignedPDBSequence;
 	
-	private int nrseqId;
-	private String alignedNrseqSequence;
+	private String alignedExperimentalSequence;
+	
+	
+	
 	
 	public int getPdbFileId() {
 		return pdbFileId;
@@ -29,24 +32,27 @@ public class PDBAlignmentDTO {
 	public void setAlignedPDBSequence(String alignedPDBSequence) {
 		this.alignedPDBSequence = alignedPDBSequence;
 	}
-	public int getNrseqId() {
-		return nrseqId;
-	}
-	public void setNrseqId(int nrseqId) {
-		this.nrseqId = nrseqId;
-	}
-	public String getAlignedNrseqSequence() {
-		return alignedNrseqSequence;
-	}
-	public void setAlignedNrseqSequence(String alignedNrseqSequence) {
-		this.alignedNrseqSequence = alignedNrseqSequence;
-	}
+
+
 	public int getId() {
 		return id;
 	}
 	public void setId(int id) {
 		this.id = id;
 	}
+	public int getProteinSequenceId() {
+		return proteinSequenceId;
+	}
+	public void setProteinSequenceId(int proteinSequenceId) {
+		this.proteinSequenceId = proteinSequenceId;
+	}
+	public String getAlignedExperimentalSequence() {
+		return alignedExperimentalSequence;
+	}
+	public void setAlignedExperimentalSequence(String alignedExperimentalSequence) {
+		this.alignedExperimentalSequence = alignedExperimentalSequence;
+	}
+
 	
 	
 }

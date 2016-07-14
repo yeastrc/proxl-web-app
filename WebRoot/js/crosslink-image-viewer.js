@@ -10,11 +10,14 @@
 "use strict";
 
 
-//  The actual svg image is drawn in the function drawSvg()
+//   All references to proteinId are actually referencing the protein sequence id
 
 
+//   A plain "protein" variable is the protein sequence id
 
-//   A plain "protein" variable is the protein id
+
+//The actual svg image is drawn in the function drawSvg()
+
 
 
 //    Snap.svg  Info
@@ -41,24 +44,6 @@
 var EXCLUDE_LINK_TYPE_DEFAULT = [ 0 ];
 
 
-
-var PROTEIN_SELECTOR_HANDLEBARS_STRING = "\t<option value=\"{{ proteinId }}\">{{ proteinName }}</option>\n";
-
-var PROTEIN_BAR_DATA_ARRAY_INDEX_ATTR_NAME = "data-protein_bars_data_array_index";
-
-
-
-//////  Code flow constants
-
-//   These turn on and off certain features under consideration
-
-//  Not currently used:
-//	  This has been replaced with a tool tip in a floating div 
-//  	This is for showing info embedded into the main SVG image.
-// var _SHOW_SEQUENCE_POSITION_TOOLTIP_ON_PROTEIN_BARS = false;
-// var _SHOW_SEQUENCE_POSITION_TOOLTIP_ON_PROTEIN_BARS = true;
-
-
 //  Matches the "value" for the <select id="annotation_type">
 
 var SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE = "sequence_coverage";
@@ -68,7 +53,7 @@ var SELECT_ELEMENT_ANNOTATION_TYPE_PSIPRED3 = "psired3";
 
 
 
-//Matches the "value" for the <select id="color_by">
+//  Matches the "value" for the <select id="color_by">
 
 var SELECT_ELEMENT_COLOR_BY_REGION = "region";
 var SELECT_ELEMENT_COLOR_BY_SEARCH = "search";
@@ -426,6 +411,347 @@ var _proteinBarToolTip_template_HandlebarsTemplate = null;  ///  Compiled Handle
 
 
 
+
+
+//   Convert OLD JSON if necessary
+
+//   Will immediately return after converting JSON or will call initPage() again after converting JSON
+
+//   Unable to return immediately if need to use webservice to get data from server.
+
+function convertOldJSONIfNecessaryReturnTrueIfExit() {
+
+	var json = getRawJsonFromHash();
+
+	if ( convertProteinDataBarDataToProteinSequenceIds( json ) ) {
+
+		return true;  // force main code to wait for async
+	}
+
+
+}
+
+/////
+
+function convertProteinDataBarDataToProteinSequenceIds( json ) {
+
+
+	hashObjectManager.setHashObject( json );
+	
+	var proteinBarData = hashObjectManager.getFromHashObject(HASH_OBJECT_PROPERTIES["protein_bar_data"]);
+		
+
+	if ( proteinBarData !== undefined ) {
+		
+		//  Next load the data into _imageProteinBarDataManager so it can check for and replace NRSEQ Protein Ids
+		
+		_imageProteinBarDataManager.replaceInternalObjectsWithObjectsInHash( { 
+			proteinBarData : proteinBarData,
+			currentProteinIdsArray : undefined
+		} );
+	}
+	
+	//  Convert from before "protein_bar_data"
+	
+	convertProteinHashDataPre_protein_bar_data( json );
+	
+	
+
+	if ( proteinBarData !== undefined ) {
+		
+		//  Next load the data into _imageProteinBarDataManager so it can check for and replace NRSEQ Protein Ids
+		
+		_imageProteinBarDataManager.replaceInternalObjectsWithObjectsInHash( { 
+			proteinBarData : proteinBarData,
+			currentProteinIdsArray : undefined
+		} );
+	}
+	
+
+	if ( ! _imageProteinBarDataManager.contains_OLD_NrseqProteinId() ) {
+		
+		//  No NRSEQ Protein Ids so return false;
+		
+		return false;
+	}
+		
+		
+
+	console.log( "Converting nrseq protein ids to protein sequence ids: " );
+
+
+	var nrseqProteinIds = [];
+
+
+	var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
+
+	//  Iterate through entries in _imageProteinBarDataManager and extract NRSEQ Protein Ids 
+
+	for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
+
+		var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
+
+		var nrseqProteinId = imageProteinBarDataEntry.getOLD_NrseqProteinId();
+
+		nrseqProteinIds.push( nrseqProteinId );
+	}	
+	
+
+	var callback = function( params ) {
+
+		convertProteinDataBarDataToProteinSequenceIdsProcessReponse( params );
+	};
+
+
+
+	var params = {
+
+			nrseqProteinIds : nrseqProteinIds,
+			callback : callback
+	};
+
+	var response = getProteinSequenceIdsForNrseqProteinIds( params );
+
+	if ( response.calledAJAX ) {
+
+		return true;
+	}
+
+	return false;
+}
+
+
+function convertProteinDataBarDataToProteinSequenceIdsProcessReponse( responseParams ) {
+
+	var proteinIdsMapping = responseParams.proteinIdsMapping;
+	var calledAJAX = responseParams.calledAJAX;
+
+
+	var json = getRawJsonFromHash();
+
+	hashObjectManager.setHashObject( json );
+	
+	var proteinBarData = hashObjectManager.getFromHashObject(HASH_OBJECT_PROPERTIES["protein_bar_data"]);
+		
+	if ( proteinBarData !== undefined ) {
+		
+		//  Next load the data into _imageProteinBarDataManager so it can check for and replace NRSEQ Protein Ids
+		
+		_imageProteinBarDataManager.replaceInternalObjectsWithObjectsInHash( { 
+			proteinBarData : proteinBarData,
+			currentProteinIdsArray : undefined
+		} );
+	}
+	
+
+	//  Convert from before "protein_bar_data"
+	
+	convertProteinHashDataPre_protein_bar_data( json );
+	
+
+
+	if ( ! _imageProteinBarDataManager.contains_OLD_NrseqProteinId() ) {
+		
+		//  No NRSEQ Protein Ids so return false;
+		
+		return false;
+	}
+
+
+	var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
+
+	//  Iterate through entries in _imageProteinBarDataManager and lookup NRSEQ Protein Ids to get protein sequence ids
+	
+	for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
+
+		var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
+
+		var nrseqProteinId = imageProteinBarDataEntry.getOLD_NrseqProteinId();
+
+		var matchingProteinSequenceId = proteinIdsMapping[ nrseqProteinId ];
+
+		if ( matchingProteinSequenceId === undefined || matchingProteinSequenceId === null ) {
+
+			throw "Matching protein sequence id not found for nrseq protein id: " + visibleChainNRSEQProteinIdEntry;
+		}
+
+		imageProteinBarDataEntry.setProteinIdNoOtherChanges( { proteinId : matchingProteinSequenceId } );
+	}	
+	
+	
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["protein_bar_data"], _imageProteinBarDataManager.getArrayOfObjectsForHash() );
+
+	
+	
+//	Update Hash with updated JSON
+
+	updateURLHashWithJSONObject( json );
+
+
+	if ( calledAJAX ) {
+
+		//   Re call initPage() since on AJAX callback thread;
+
+		initPage();
+	}
+}
+
+
+function convertProteinHashDataPre_protein_bar_data( json ) {
+
+	//  Backwards compatibility Support
+
+
+
+	//   IMPORTANT
+
+	//  If items[ 'protein_bar_data' ] is undefined, it needs to be built from old/previous values 
+	//                to be backwards compatible
+
+	//  Build from other sources
+
+
+	var proteinBarData = json['protein_bar_data'];
+
+	if ( proteinBarData === undefined && _imageProteinBarDataManager.getAllItems().length === 0 ) {
+
+
+		var selectedProteinIds = json[ 'selected-proteins' ];
+
+		if ( selectedProteinIds !== undefined && selectedProteinIds !== null ) {
+
+			for ( var selectedProteinIdsIndex = 0; selectedProteinIdsIndex < selectedProteinIds.length; selectedProteinIdsIndex++ ) {
+
+				var selectedProteinId = selectedProteinIds[ selectedProteinIdsIndex ];
+
+				var newEntry = ImageProteinBarData.constructEmptyImageProteinBarData();
+
+				newEntry.setOLD_NrseqProteinId( { nrseqProteinId : selectedProteinId } );
+
+				_imageProteinBarDataManager.addEntry( { arrayIndexInt : selectedProteinIdsIndex, entry : newEntry } );
+			}
+
+
+		}
+	}
+
+//	More conversion from old data
+	
+
+	var highlightedProteins = json['highlighted-proteins'];  //   Array of the indexes of the highlighted proteins
+
+	if ( highlightedProteins !== undefined && highlightedProteins !== null ) {
+
+		for ( var highlightedProteinsIndex = 0; highlightedProteinsIndex < highlightedProteins.length; highlightedProteinsIndex++ ) {
+
+			var highlightedProteinProteinBarPositionIndex = highlightedProteins[ highlightedProteinsIndex ];
+
+			try {
+
+				//  Try/Catch since the index may not be valid
+
+				var entry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : highlightedProteinProteinBarPositionIndex } );
+
+				entry.setProteinBarHighlightedAll();
+
+			} catch ( e ) {
+
+
+			}
+		}
+	}			
+
+//	Object. Property keys are nrseq protein ids.  The reversed proteins have a value of true
+
+	var proteinsReversedObject = json['proteins-reversed'];  
+
+	if ( proteinsReversedObject !== undefined && proteinsReversedObject !== null ) {
+
+		var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
+
+		var proteinsReversedKeys = Object.keys( proteinsReversedObject );
+
+		for ( var proteinsReversedKeysIndex = 0; proteinsReversedKeysIndex < proteinsReversedKeys.length; proteinsReversedKeysIndex++ ) {
+
+			var reversedProtein_Key = proteinsReversedKeys[ proteinsReversedKeysIndex ];
+
+			var reversedProtein_Value = proteinsReversedObject[ reversedProtein_Key ];
+
+			if ( reversedProtein_Value ) {
+
+				//  value is true so this protein id is reversed
+
+				var reversedProtein_ProteinId = reversedProtein_Key;
+
+				//  Find all entries in _imageProteinBarDataManager with this protein id and set the protein reversed property to true
+
+				for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
+
+					var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
+
+					var imageProteinBarDataEntryProteinId = imageProteinBarDataEntry.getOLD_NrseqProteinId();
+
+					if ( imageProteinBarDataEntryProteinId === reversedProtein_ProteinId ) {
+
+						imageProteinBarDataEntry.setProteinReversed( { proteinReversed : true } );
+					}
+				}
+			}
+		}
+	}
+
+
+
+//	Object. Property keys are nrseq protein ids.  Value are from the left edge
+
+	var proteinsOffsetsObject = json['protein-offsets'];  
+
+	if ( proteinsOffsetsObject !== undefined && proteinsOffsetsObject !== null ) {
+
+		var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
+
+		var proteinsOffsetsKeys = Object.keys( proteinsOffsetsObject );
+
+		for ( var proteinsOffsetsKeysIndex = 0; proteinsOffsetsKeysIndex < proteinsOffsetsKeys.length; proteinsOffsetsKeysIndex++ ) {
+
+			var offsetProtein_Key = proteinsOffsetsKeys[ proteinsOffsetsKeysIndex ];
+
+			var offsetProtein_Value = proteinsOffsetsObject[ offsetProtein_Key ];
+
+			if ( offsetProtein_Value !== undefined && offsetProtein_Value !== null ) {
+
+				//  value is a number so use it
+
+				var offsetProtein_ProteinId = offsetProtein_Key;
+
+				//  Find all entries in _imageProteinBarDataManager with this protein id and set the protein offset property to the value
+
+				for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
+
+					var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
+
+					var imageProteinBarDataEntryProteinId = imageProteinBarDataEntry.getOLD_NrseqProteinId();
+
+					if ( imageProteinBarDataEntryProteinId === offsetProtein_ProteinId ) {
+
+						imageProteinBarDataEntry.setProteinOffset( { proteinOffset : offsetProtein_Value } );
+					}
+				}
+			}
+		}
+	}
+
+
+	
+}
+
+
+
+////////////////////////////////////////////
+
+//////////////   MAIN CODE
+
+
 function get_MAX_WIDTH() {
 	
 //	_MAX_WIDTH = $(window).width() - 100;
@@ -523,7 +849,7 @@ function getCurrentRightmostProteinEdge( ) {
 
 
 // get values for variables from the hash part of the URL as JSON
-function getJsonFromHash() {
+function getRawJsonFromHash() {
 	
 	var jsonFromHash = null;
 
@@ -615,6 +941,15 @@ function getJsonFromHash() {
 	
 	var json = jsonFromHash;
 	
+	return json;
+}
+
+
+
+//get values for variables from the hash part of the URL as JSON
+function getJsonFromHash() {
+	
+	var json = getRawJsonFromHash();
 	
 	var hashPropertiesConstantsKeys = Object.keys( HASH_OBJECT_PROPERTIES );
 
@@ -624,7 +959,7 @@ function getJsonFromHash() {
 
 		var hashPropertyKey = HASH_OBJECT_PROPERTIES[ jsonPropertyKey ];
 		
-		var valueForHashPropertyKey = jsonFromHash[ hashPropertyKey ];
+		var valueForHashPropertyKey = json[ hashPropertyKey ];
 		
 		if ( valueForHashPropertyKey !== undefined ) {
 
@@ -896,14 +1231,22 @@ function updateURLHash( useSearchForm ) {
 	
 	var hashObject = hashObjectManager.getHashObject();
 	
-	var newHash = JSON.stringify( hashObject );
+	updateURLHashWithJSONObject( hashObject );
+
+}
+
+
+
+function updateURLHashWithJSONObject( jsonObject ) {
+	
+
+	var newHash = JSON.stringify( jsonObject );
 
 //	var newHashLength = newHash.length;
 	
 	var newHashEncodedToEncodedURIComponent = LZString.compressToEncodedURIComponent( newHash );
 	
-//	var newHashEncodedToEncodedURIComponentLength = newHashEncodedToEncodedURIComponent.length;
-	
+
 	try {
 
 		window.location.hash = newHashEncodedToEncodedURIComponent;
@@ -917,9 +1260,8 @@ function updateURLHash( useSearchForm ) {
 		console.log( "Update window.location.hash Failed: e: " + e );
 	}
 
+	
 }
-
-
 
 
 
@@ -1133,18 +1475,8 @@ function loadProteinTaxonomyIdDataForProtein( proteinIds, doDraw ) {
 	
 	var url = contextPathJSVar + "/services/proteinTaxonomyId/getDataForProtein";
 
-
-	var project_id = $("#project_id").val();
-	
-	if ( project_id === undefined || project_id === null 
-			|| project_id === "" ) {
-		
-		throw '$("#project_id").val() returned no value';
-	}
-	
-
 	var ajaxRequestData = {
-			project_id : project_id,
+			searchIds : _searchIds,
 			proteinIds: proteinIds
 	};
 
@@ -1167,6 +1499,11 @@ function loadProteinTaxonomyIdDataForProtein( proteinIds, doDraw ) {
 	        	// copy the returned taxonomy ids into the global object
 	        	
 	    		var returnedProteinIdsAndTaxonomyIds_Keys = Object.keys( returnedProteinIdsAndTaxonomyIds );
+	    		
+	    		if ( returnedProteinIdsAndTaxonomyIds_Keys.length === 0 ) {
+	    			
+	    			throw "No taxonomy ids returned. proteinIds: " + proteinIds;
+	    		}
 	    		
 	    		for ( var keysIndex = 0; keysIndex < returnedProteinIdsAndTaxonomyIds_Keys.length; keysIndex++ ) {
 	    			
@@ -1630,7 +1967,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 	
 	for ( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId = selectedProteins[ i ];
-		if ( _proteinTaxonomyIds[ proteinId ] == undefined ) {
+		if ( _proteinTaxonomyIds[ proteinId ] === undefined ) {
 			
 			proteinIdsToGetTaxonomyIds.push( proteinId );
 		}
@@ -2018,154 +2355,11 @@ function populateFromHash_imageProteinBarDataManager(){
 			currentProteinIdsArray : _proteins
 		} );
 	
-	} else {
-
-		//  Backwards compatibility Support
+//	} else {
+//
+//		throw "json['protein_bar_data'] missing";
 		
-		
-		
-		//   IMPORTANT
-
-		//  If items[ 'protein_bar_data' ] is undefined, it needs to be built from old/previous values 
-		//                to be backwards compatible
-		
-		//  Build from other sources
-		
-		
-		
-		var selectedProteinIds = json[ 'selected-proteins' ];
-
-		if ( selectedProteinIds !== undefined && selectedProteinIds !== null ) {
-
-			for ( var selectedProteinIdsIndex = 0; selectedProteinIdsIndex < selectedProteinIds.length; selectedProteinIdsIndex++ ) {
-
-				var selectedProteinId = selectedProteinIds[ selectedProteinIdsIndex ];
-				
-				//  _proteinLengths may not be populated at this point
-				
-				var selectedProteinLength = undefined;
-				
-				if ( _proteinLengths ) {
-					
-					selectedProteinLength = _proteinLengths[ selectedProteinId ];
-				}
-				
-				var newEntry = ImageProteinBarData.constructEmptyImageProteinBarData();
-				
-				newEntry.setProteinId( { proteinId : selectedProteinId, proteinLength : selectedProteinLength } );
-				
-				_imageProteinBarDataManager.addEntry( { arrayIndexInt : selectedProteinIdsIndex, entry : newEntry } );
-			}
-			
-
-			var highlightedProteins = json['highlighted-proteins'];  //   Array of the indexes of the highlighted proteins
-			
-			if ( highlightedProteins !== undefined && highlightedProteins !== null ) {
-
-				for ( var highlightedProteinsIndex = 0; highlightedProteinsIndex < highlightedProteins.length; highlightedProteinsIndex++ ) {
-
-					var highlightedProteinProteinBarPositionIndex = highlightedProteins[ highlightedProteinsIndex ];
-
-					try {
-						
-						//  Try/Catch since the index may not be valid
-						
-						var entry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : highlightedProteinProteinBarPositionIndex } );
-						
-						entry.setProteinBarHighlightedAll();
-						
-					} catch ( e ) {
-						
-						
-					}
-				}
-			}			
-		}
 	}
-	
-	//  More conversion from old data
-	
-	//  Object. Property keys are protein ids.  The reversed proteins have a value of true
-
-	var proteinsReversedObject = json['proteins-reversed'];  
-
-	if ( proteinsReversedObject !== undefined && proteinsReversedObject !== null ) {
-
-		var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
-		
-		var proteinsReversedKeys = Object.keys( proteinsReversedObject );
-		
-		for ( var proteinsReversedKeysIndex = 0; proteinsReversedKeysIndex < proteinsReversedKeys.length; proteinsReversedKeysIndex++ ) {
-		
-			var reversedProtein_Key = proteinsReversedKeys[ proteinsReversedKeysIndex ];
-			
-			var reversedProtein_Value = proteinsReversedObject[ reversedProtein_Key ];
-			
-			if ( reversedProtein_Value ) {
-
-				//  value is true so this protein id is reversed
-
-				var reversedProtein_ProteinId = reversedProtein_Key;
-
-				//  Find all entries in _imageProteinBarDataManager with this protein id and set the protein reversed property to true
-
-				for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
-
-					var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
-
-					var imageProteinBarDataEntryProteinId = imageProteinBarDataEntry.getProteinId();
-
-					if ( imageProteinBarDataEntryProteinId === reversedProtein_ProteinId ) {
-
-						imageProteinBarDataEntry.setProteinReversed( { proteinReversed : true } );
-					}
-				}
-			}
-		}
-	}
-	
-	
-
-	//  Object. Property keys are protein ids.  Value are from the left edge
-
-	var proteinsOffsetsObject = json['protein-offsets'];  
-
-	if ( proteinsOffsetsObject !== undefined && proteinsOffsetsObject !== null ) {
-
-		var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
-		
-		var proteinsOffsetsKeys = Object.keys( proteinsOffsetsObject );
-		
-		for ( var proteinsOffsetsKeysIndex = 0; proteinsOffsetsKeysIndex < proteinsOffsetsKeys.length; proteinsOffsetsKeysIndex++ ) {
-		
-			var offsetProtein_Key = proteinsOffsetsKeys[ proteinsOffsetsKeysIndex ];
-			
-			var offsetProtein_Value = proteinsOffsetsObject[ offsetProtein_Key ];
-			
-			if ( offsetProtein_Value !== undefined && offsetProtein_Value !== null ) {
-
-				//  value is a number so use it
-
-				var offsetProtein_ProteinId = offsetProtein_Key;
-
-				//  Find all entries in _imageProteinBarDataManager with this protein id and set the protein offset property to the value
-
-				for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
-
-					var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
-
-					var imageProteinBarDataEntryProteinId = imageProteinBarDataEntry.getProteinId();
-
-					if ( imageProteinBarDataEntryProteinId === offsetProtein_ProteinId ) {
-
-						imageProteinBarDataEntry.setProteinOffset( { proteinOffset : offsetProtein_Value } );
-					}
-				}
-			}
-		}
-	}
-	
-	
 }
 
 
@@ -4545,12 +4739,17 @@ function drawSvg() {
 		
 		var drawColorBySearchLegendResponse = drawColorBySearchLegend(  selectedProteins, bottomOfLowestItemDrawn, svgRootSnapSVGObject );
 
-		var rightMostEdgeOfAllElementsDrawColorBySearchLegendResponse = drawColorBySearchLegendResponse.rightMostEdgeOfAllElementsThisFunction;
-		if ( rightMostEdgeOfAllElementsDrawColorBySearchLegendResponse > rightMostEdgeOfAllElements ) {
-			rightMostEdgeOfAllElements = rightMostEdgeOfAllElementsDrawColorBySearchLegendResponse;
-		} 
+		//  drawColorBySearchLegendResponse === null if nothing drawn
 		
-		bottomOfLowestItemDrawn += 50;  // adjust bottomOfLowestItemDrawn for this item
+		if ( drawColorBySearchLegendResponse ) {
+
+			var rightMostEdgeOfAllElementsDrawColorBySearchLegendResponse = drawColorBySearchLegendResponse.rightMostEdgeOfAllElementsThisFunction;
+			if ( rightMostEdgeOfAllElementsDrawColorBySearchLegendResponse > rightMostEdgeOfAllElements ) {
+				rightMostEdgeOfAllElements = rightMostEdgeOfAllElementsDrawColorBySearchLegendResponse;
+			} 
+
+			bottomOfLowestItemDrawn = drawColorBySearchLegendResponse.bottomOfLowestItemDrawn;  // adjust bottomOfLowestItemDrawn for this item
+		}
 	};
 	
 	
@@ -6697,157 +6896,286 @@ function addClickHandler__ProteinMonolinkLines( $SVGNativeObject ) {
 
 ///////////////////////////////////////////////
 
+
+var _COLOR_BY_SEARCH_LEGEND_TEXT_LEFT_FROM_STARTX_PX = -4;
+var _COLOR_BY_SEARCH_LEGEND_TEXT_RIGHT_SIDE_SPACING_PX = 10;
+var _COLOR_BY_SEARCH_MIN_SPACING_PX = 10;
+
+var _COLOR_BY_SEARCH_LEGEND_FIRST_ROW_HEIGHT = 40;
+var _COLOR_BY_SEARCH_LEGEND_FIRST_ROW_VERTICAL_OFFSET = 30;
+
+var _COLOR_BY_SEARCH_LEGEND_ADDNL_ROW_HEIGHT = 30;
+var _COLOR_BY_SEARCH_LEGEND_ADDNL_ROW_VERTICAL_OFFSET = 20;
+
+var _COLOR_BY_SEARCH_LEGEND_COLOR_BLOCK_WIDTH = 20;
+var _COLOR_BY_SEARCH_LEGEND_COLOR_BLOCK_HEIGHT = 20;
+
+/////
+
 function drawColorBySearchLegend(  selectedProteins, bottomOfLowestItemDrawn, svgRootSnapSVGObject ) {
+
+	//  This legend, like the rest of 'Color by search' only supports up to 3 search
 	
+	if ( _searches.length > 3 ) {
+		
+		return null;
+	}
 	
 	var rightMostEdgeOfAllElementsThisFunction = 0;
 	
 	
-	//  This legend, like the rest of 'Color by search' only supports up to 3 search
+	var maxSvgImageWidth = get_MAX_WIDTH();
 	
-//	var basey = _OFFSET_FROM_TOP + 60 + ( selectedProteins.length * _singleProteinBarOverallHeight );
+	//  Base basey of the bottom of previous drawn items.  This way it adjusts for when the scale bar is not drawn
+	var basey = bottomOfLowestItemDrawn + _COLOR_BY_SEARCH_LEGEND_FIRST_ROW_VERTICAL_OFFSET;
 	
-	//  Change to base basey of the bottom of previous drawn items.  This way it adjusts for when the scale bar is not drawn
-	var basey = bottomOfLowestItemDrawn + 30;
-	
-	
+	bottomOfLowestItemDrawn += _COLOR_BY_SEARCH_LEGEND_FIRST_ROW_HEIGHT;  // adjust bottomOfLowestItemDrawn for this item
+
 	
 	var startx = translateScaleBarPositionToXCoordinate( 1 );
 	
-	var searchBlocksLeftMargin = startx + 60;
+	var legendLabelLeftEdge = startx + _COLOR_BY_SEARCH_LEGEND_TEXT_LEFT_FROM_STARTX_PX;
 	
-	var g = svgRootSnapSVGObject.g();
+	var groupSnapSVGForSearchLegend = svgRootSnapSVGObject.g();
 	
-	var legendText = svgRootSnapSVGObject.text( startx - 4 , basey, "Legend:" );
-	g.add( legendText );
+	var legendLabelSnapSVGObject = svgRootSnapSVGObject.text( legendLabelLeftEdge , basey, "Legend:" );
+	groupSnapSVGForSearchLegend.add( legendLabelSnapSVGObject );
 	
-	var legendCounter = 0;
+	var legendLabelSnapSVGObjectBBox = legendLabelSnapSVGObject.getBBox();
+	var legendLabelSnapSVGObjectWidth = legendLabelSnapSVGObjectBBox.width;
+
+
+	var searchItemsLeftMargin = legendLabelLeftEdge + legendLabelSnapSVGObjectWidth + _COLOR_BY_SEARCH_LEGEND_TEXT_RIGHT_SIDE_SPACING_PX;
+
 	
-	var wrapLegendToNextLineAsNeeded = function() {
+	var searchItemsNextPosition = searchItemsLeftMargin;
 		
-		var searchBlockRightEdge = searchBlocksLeftMargin + ( (legendCounter + 1 ) * _COLOR_BY_SEARCH_OUTER_WIDTH );
+	var maxWidthOfLegendItem = 0;
+	
+	
+	var updateMaxItemWidthAndDelete = function( groupSnapSVGForSearchLegendGroup ) {
+
+		var groupSnapSVGForSearchLegendGroupBBox = groupSnapSVGForSearchLegendGroup.getBBox();
+		var groupSnapSVGForSearchLegendGroupWidth = groupSnapSVGForSearchLegendGroupBBox.width;
+
+		//  Remove temporary text object inserted to get it's size
 		
-		if ( searchBlockRightEdge > get_MAX_WIDTH() ) {
+		groupSnapSVGForSearchLegendGroup.remove();
+		
+		if ( maxWidthOfLegendItem < groupSnapSVGForSearchLegendGroupWidth ) {
+			
+			maxWidthOfLegendItem = groupSnapSVGForSearchLegendGroupWidth;
+		}
+	};
+	
+
+	var advanceToNextItemPosition = function( params ) {
+		
+		var forceNextLine = false;
+		
+		if ( params && params.forceNextLine ) {
+			
+			forceNextLine = true; //  Added for adding item with 3 search Ids and need to force to next line
+		}
+		
+		searchItemsNextPosition += maxWidthOfLegendItem;
+		
+		var searchItemRightEdge = searchItemsNextPosition + maxWidthOfLegendItem;
+		
+		if ( ( searchItemRightEdge > maxSvgImageWidth ) || forceNextLine ) {
 			
 			//  Move the rest of the search blocks to another row
+			basey = bottomOfLowestItemDrawn + _COLOR_BY_SEARCH_LEGEND_ADDNL_ROW_VERTICAL_OFFSET;
 			
-			basey = bottomOfLowestItemDrawn + 10;
+			bottomOfLowestItemDrawn += _COLOR_BY_SEARCH_LEGEND_ADDNL_ROW_HEIGHT;  // adjust bottomOfLowestItemDrawn for this item
 			
-			bottomOfLowestItemDrawn = basey + 20;  // adjust bottomOfLowestItemDrawn for this item
-			
-			legendCounter = 0;  // reset to left edge
+			//  Start at left edge on next row
+			searchItemsNextPosition = searchItemsLeftMargin;
 		}
 	};
 	
 	
-	
-	
-	for ( var i = 0; i < _searches.length; i++ ) {
+	var addLegendItem = function( searchesArray ) {
 		
-		//  A legend part for up to 3 searches, each search alone
-		
-		if ( i > 2 ) { 
-			break;  //  EARLY LOOP EXIT after processing the first 3
+		var searchLabel = "Search";
+			
+		if ( searchesArray.length > 1 ) {
+			
+			searchLabel = "Searches";
 		}
 		
-		wrapLegendToNextLineAsNeeded();
-					
-		var legendRectangle = svgRootSnapSVGObject.rect( searchBlocksLeftMargin + (legendCounter * _COLOR_BY_SEARCH_OUTER_WIDTH ), basey - 15, 20, 20 );
+		var searchIdsAsCommaDelimText = searchesArray.join();
+			
+
+		var groupSnapSVGForSearchLegendGroup = svgRootSnapSVGObject.g();
+		
+		var legendPerItemRectangle_Y_Position = basey - 15;
+									
+		var legendRectangle = svgRootSnapSVGObject.rect( 
+				searchItemsNextPosition, legendPerItemRectangle_Y_Position, 
+				_COLOR_BY_SEARCH_LEGEND_COLOR_BLOCK_WIDTH, _COLOR_BY_SEARCH_LEGEND_COLOR_BLOCK_HEIGHT );
+		
 		legendRectangle.attr( {
-			fill: getColorForSearchesForLegend( [ _searches[ i ][ 'id' ], ] )
+			fill: getColorForSearchesForLegend( searchesArray )
 		});
 		
-		legendText = svgRootSnapSVGObject.text( searchBlocksLeftMargin + 23 + (legendCounter * _COLOR_BY_SEARCH_OUTER_WIDTH ) , basey, " = Search: " + _searches[ i ][ 'id' ] );			
+		var legendPerItemText_X_Position = searchItemsNextPosition + 23;
+		var legendPerItemText_Y_Position = basey;
 		
-		g.add( legendRectangle );
-		g.add( legendText );
+		var legendText = svgRootSnapSVGObject.text( 
+				legendPerItemText_X_Position, legendPerItemText_Y_Position, " " + searchLabel + ": " + searchIdsAsCommaDelimText );
 		
-		legendCounter++;
+		groupSnapSVGForSearchLegendGroup.add( legendRectangle );
+		groupSnapSVGForSearchLegendGroup.add( legendText );
 		
-		
-		
-		var legendTextBBox = legendText.getBBox();
-		var legendTextRightSide = legendTextBBox.x2;
-		
-		if ( legendTextRightSide > rightMostEdgeOfAllElementsThisFunction ) {
-			
-			rightMostEdgeOfAllElementsThisFunction = legendTextRightSide;
-		} 
-
-
-	}
+		return groupSnapSVGForSearchLegendGroup;
+	};
 	
-	if ( _searches.length > 1 ) {
+	var addItemsForOneAndTwoSearchIds = function( params ) {
 		
-		//  A legend part for all combinations of 2 searches
-		
+		var onlyMeasureWidth = params.onlyMeasureWidth;
+
 		for ( var i = 0; i < _searches.length; i++ ) {
-			for ( var k = i + 1; k < _searches.length; k++ ) {
-				
-				wrapLegendToNextLineAsNeeded();
 
-				var legendSearchArray = [ _searches[ i ][ 'id' ], _searches[ k ][ 'id' ] ];
-				
-				legendRectangle = svgRootSnapSVGObject.rect( searchBlocksLeftMargin + (legendCounter * _COLOR_BY_SEARCH_OUTER_WIDTH ), basey - 15, 20, 20 );
-				legendRectangle.attr( {
-					fill: getColorForSearchesForLegend( legendSearchArray )
-				});
-				
-				legendText = svgRootSnapSVGObject.text( searchBlocksLeftMargin + 23 + (legendCounter * _COLOR_BY_SEARCH_OUTER_WIDTH ) , basey, " = Searches: " + legendSearchArray.join() );			
-				
-				g.add( legendRectangle );
-				g.add( legendText );
-				
-				legendCounter++;
-				
-				
-				
-				var legendTextBBox = legendText.getBBox();
-				var legendTextRightSide = legendTextBBox.x2;
-				
-				if ( legendTextRightSide > rightMostEdgeOfAllElementsThisFunction ) {
-					
-					rightMostEdgeOfAllElementsThisFunction = legendTextRightSide;
-				} 
+			var search = _searches[ i ];
+			if ( search === undefined ) {
+				throw "search not found in _searches for index: " + i;
+			}
+			var searchId = search[ 'id' ];
+			if ( searchId === undefined ) {
+				throw "searchId not found in _searches for index: " + i;
+			}
 
+			if ( ! onlyMeasureWidth && i !== 0 ) {
+				
+				//  Skip for first entry
+				
+				advanceToNextItemPosition();
+			}
+			
+			var groupSnapSVGForSearchLegendGroup = addLegendItem( [ searchId ] );
+
+			if ( onlyMeasureWidth ) {
+				
+				updateMaxItemWidthAndDelete( groupSnapSVGForSearchLegendGroup );
+			} else {
+				
+				groupSnapSVGForSearchLegend.add( groupSnapSVGForSearchLegendGroup );
 
 			}
 		}
-	}
+
+		if ( _searches.length > 1 ) {
+
+			//  A legend part for all combinations of 2 searches
+
+			for ( var i = 0; i < _searches.length; i++ ) {
+
+				var search_1 = _searches[ i ];
+				if ( search_1 === undefined ) {
+					throw "search not found in _searches for index: " + i;
+				}
+				var searchId_1 = search_1[ 'id' ];
+				if ( searchId_1 === undefined ) {
+					throw "searchId not found in _searches for index: " + i;
+				}
+
+				for ( var k = i + 1; k < _searches.length; k++ ) {
+
+					var search_2 = _searches[ k ];
+					if ( search_2 === undefined ) {
+						throw "search not found in _searches for index: " + k;
+					}
+					var searchId_2 = search_2[ 'id' ];
+					if ( searchId_2 === undefined ) {
+						throw "searchId not found in _searches for index: " + k;
+					}
+
+					if ( ! onlyMeasureWidth ) {
+
+						advanceToNextItemPosition();
+					}
+					
+					var groupSnapSVGForSearchLegendGroup = addLegendItem( [ searchId_1, searchId_2 ] );
+
+					if ( onlyMeasureWidth ) {
+						
+						updateMaxItemWidthAndDelete( groupSnapSVGForSearchLegendGroup );
+					} else {
+						
+						groupSnapSVGForSearchLegend.add( groupSnapSVGForSearchLegendGroup );
+						
+
+						var groupSnapSVGForSearchLegendGroupBBox = groupSnapSVGForSearchLegendGroup.getBBox();
+						var groupSnapSVGForSearchLegendGroupRightSide = groupSnapSVGForSearchLegendGroupBBox.x2;
+						
+						if ( groupSnapSVGForSearchLegendGroupRightSide > rightMostEdgeOfAllElementsThisFunction ) {
+							
+							rightMostEdgeOfAllElementsThisFunction = groupSnapSVGForSearchLegendGroupRightSide;
+						} 
+					}
+				}
+			}
+		}
+		
+	};
+	
+	//  add, measure for max, delete
+	addItemsForOneAndTwoSearchIds( { onlyMeasureWidth : true } );
+	
+	//  Add so there is space between items
+	maxWidthOfLegendItem += _COLOR_BY_SEARCH_MIN_SPACING_PX;
+	
+	//  add
+	addItemsForOneAndTwoSearchIds( { onlyMeasureWidth : false } );
+	
+	
+	//  
 	
 	if ( _searches.length > 2 ) {
 		
 		//  A legend part for the color for all 3 searches combined 
 		
-		wrapLegendToNextLineAsNeeded();
+		advanceToNextItemPosition();
 
-		legendSearchArray = [ _searches[ 0 ][ 'id' ], _searches[ 1 ][ 'id' ], _searches[ 2 ][ 'id' ] ];
+		var legendItemSearchArray = [ _searches[ 0 ][ 'id' ], _searches[ 1 ][ 'id' ], _searches[ 2 ][ 'id' ] ];
 		
-		legendRectangle = svgRootSnapSVGObject.rect( searchBlocksLeftMargin + (legendCounter * _COLOR_BY_SEARCH_OUTER_WIDTH ), basey - 15, 20, 20 );
-		legendRectangle.attr( {
-			fill: getColorForSearchesForLegend( legendSearchArray )
-		});
+
+		var groupSnapSVGForSearchLegendGroup = addLegendItem( legendItemSearchArray );
+	
+		var groupSnapSVGForSearchLegendGroupBBox = groupSnapSVGForSearchLegendGroup.getBBox();
+		var groupSnapSVGForSearchLegendGroupRightSide = groupSnapSVGForSearchLegendGroupBBox.x2;
 		
-		legendText = svgRootSnapSVGObject.text( searchBlocksLeftMargin + 23 + (legendCounter * _COLOR_BY_SEARCH_OUTER_WIDTH ) , basey, " = Searches: " + legendSearchArray.join() );			
+		if ( groupSnapSVGForSearchLegendGroupRightSide > maxSvgImageWidth ) {
 		
-		g.add( legendRectangle );
-		g.add( legendText );
-		
-		legendCounter++;
-		
-		
-		var legendTextBBox = legendText.getBBox();
-		var legendTextRightSide = legendTextBBox.x2;
-		
-		if ( legendTextRightSide > rightMostEdgeOfAllElementsThisFunction ) {
+			//  Item for 3 searches extends past max width so delete it and add it on the next line
 			
-			rightMostEdgeOfAllElementsThisFunction = legendTextRightSide;
+			groupSnapSVGForSearchLegendGroup.remove();
+			
+			advanceToNextItemPosition( { forceNextLine : true } );
+
+			var groupSnapSVGForSearchLegendGroup = addLegendItem( legendItemSearchArray );
+		}
+		
+		groupSnapSVGForSearchLegend.add( groupSnapSVGForSearchLegendGroup );
+
+		//  recompute bbox in case changed
+		groupSnapSVGForSearchLegendGroupBBox = groupSnapSVGForSearchLegendGroup.getBBox();
+		groupSnapSVGForSearchLegendGroupRightSide = groupSnapSVGForSearchLegendGroupBBox.x2;
+		
+		if ( rightMostEdgeOfAllElementsThisFunction < groupSnapSVGForSearchLegendGroupRightSide ) {
+			
+			rightMostEdgeOfAllElementsThisFunction = groupSnapSVGForSearchLegendGroupRightSide;
 		} 
 	}
+	
+	
+	
 
 	var functionResponseObject = {
 
-			rightMostEdgeOfAllElementsThisFunction : rightMostEdgeOfAllElementsThisFunction
+			rightMostEdgeOfAllElementsThisFunction : rightMostEdgeOfAllElementsThisFunction,
+			bottomOfLowestItemDrawn : bottomOfLowestItemDrawn
 	};
 
 	return functionResponseObject;
@@ -8077,6 +8405,8 @@ function processClickOnMonoLink( clickThis  ) {
 
 function initPage() {
 
+	
+	convertOldJSONIfNecessaryReturnTrueIfExit();
 
 	console.log( "Initializing the page." );
 	

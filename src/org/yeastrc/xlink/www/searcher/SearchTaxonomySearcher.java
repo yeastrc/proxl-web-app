@@ -27,12 +27,64 @@ public class SearchTaxonomySearcher {
 	public static SearchTaxonomySearcher getInstance() { return new SearchTaxonomySearcher(); }
 	
 	
+	//  SQL for taxonomy ids for all link types, including unlinked and dimer
+
+//	private static final String SINGLE_SEARCH_SQL =
+//	
+//	"SELECT DISTINCT annotation.taxonomy "
+//	+ " FROM annotation "
+//	+ " INNER JOIN search_protein_sequence_annotation AS spsa "
+//	+ " ON annotation.id = spsa.annotation_id "
+//	+ " WHERE spsa.search_id = ? "
+	
+	
+	//  SQL for taxonomy ids for cross links and looplinks
+	
 	private static final String SINGLE_SEARCH_SQL =
-			"SELECT DISTINCT  tblProtein.speciesID "
-			+ " FROM YRC_NRSEQ.tblProtein AS tblProtein"
-			+ " INNER JOIN srch_rep_pept__nrseq_id_pos_crosslink AS srpnipc "
-			+ 	" ON tblProtein.id = srpnipc.nrseq_id "
-			+ " WHERE srpnipc.search_id = ? ";
+			
+			"SELECT   annotation.taxonomy "
+			+ " FROM annotation "
+			+ " INNER JOIN search_protein_sequence_annotation AS spsa "
+			+ 	" ON annotation.id = spsa.annotation_id "
+			+ " INNER JOIN srch_rep_pept__prot_seq_id_pos_crosslink AS srpppsipc "
+			+	" ON spsa.protein_sequence_id = srpppsipc.protein_sequence_id "
+			+ " WHERE spsa.search_id = ? AND srpppsipc.search_id = ? "
+			
+			+ " UNION DISTINCT "
+
+			+ "SELECT   annotation.taxonomy "
+			+ " FROM annotation "
+			+ " INNER JOIN search_protein_sequence_annotation AS spsa "
+			+ 	" ON annotation.id = spsa.annotation_id "
+			+ " INNER JOIN srch_rep_pept__prot_seq_id_pos_looplink AS srpppsipl "
+			+	" ON spsa.protein_sequence_id = srpppsipl.protein_sequence_id "
+			+ " WHERE spsa.search_id = ? AND srpppsipl.search_id = ? "
+			;
+	
+	
+//	CREATE TABLE IF NOT EXISTS `proxl`.`srch_rep_pept__prot_seq_id_pos_crosslink` (
+//			  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+//			  `search_id` INT UNSIGNED NOT NULL,
+//			  `reported_peptide_id` INT UNSIGNED NOT NULL,
+//			  `search_reported_peptide_peptide_id` INT UNSIGNED NOT NULL,
+//			  `protein_sequence_id` INT UNSIGNED NOT NULL,
+//			  `protein_sequence_position` INT UNSIGNED NOT NULL,
+//	
+//	CREATE TABLE IF NOT EXISTS `proxl`.`srch_rep_pept__prot_seq_id_pos_looplink` (
+//	  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+//	  `search_id` INT UNSIGNED NOT NULL,
+//	  `reported_peptide_id` INT UNSIGNED NOT NULL,
+//	  `search_reported_peptide_peptide_id` INT UNSIGNED NOT NULL,
+//	  `protein_sequence_id` INT UNSIGNED NOT NULL,
+//	  `protein_sequence_position_1` INT UNSIGNED NOT NULL,
+//	  `protein_sequence_position_2` INT UNSIGNED NOT NULL,
+//	  
+//	CREATE TABLE IF NOT EXISTS `proxl`.`search_protein_sequence_annotation` (
+//			  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+//			  `search_id` INT UNSIGNED NOT NULL,
+//			  `protein_sequence_id` INT UNSIGNED NOT NULL,
+//			  `annotation_id` INT UNSIGNED NOT NULL,
+//			  
 	
 	/**
 	 * Get the taxonomies present in the percolator search
@@ -55,7 +107,21 @@ public class SearchTaxonomySearcher {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, search.getId() );
+			
+			int paramCounter = 0;
+			
+			paramCounter++;
+			pstmt.setInt( paramCounter, search.getId() );
+
+			paramCounter++;
+			pstmt.setInt( paramCounter, search.getId() );
+			
+			paramCounter++;
+			pstmt.setInt( paramCounter, search.getId() );
+			
+			paramCounter++;
+			pstmt.setInt( paramCounter, search.getId() );
+			
 			
 			rs = pstmt.executeQuery();
 
@@ -98,12 +164,41 @@ public class SearchTaxonomySearcher {
 	}
 	
 
+	//  SQL for taxonomy ids for all link types, including unlinked and dimer
+	
+//	private static final String MULTIPLE_SEARCHES_SQL =
+//			"SELECT DISTINCT  annotation.taxonomy "
+//					+ " FROM  annotation "
+//					+ " INNER JOIN search_protein_sequence_annotation AS spsa "
+//					+ " ON annotation.id = spsa.annotation_id "
+//			+ " WHERE spsa.search_id IN (#SEARCHES#) ";
+	
+
+
+	
+	//  SQL for taxonomy ids for cross links and looplinks
+	
 	private static final String MULTIPLE_SEARCHES_SQL =
-			"SELECT  tblProtein.speciesID "
-			+ " FROM YRC_NRSEQ.tblProtein AS tblProtein"
-			+ " INNER JOIN srch_rep_pept__nrseq_id_pos_crosslink AS srpnipc "
-			+ 	" ON tblProtein.id = srpnipc.nrseq_id "
-			+ " WHERE srpnipc.search_id  IN (#SEARCHES#) ";
+			
+			"SELECT   annotation.taxonomy "
+			+ " FROM annotation "
+			+ " INNER JOIN search_protein_sequence_annotation AS spsa "
+			+ 	" ON annotation.id = spsa.annotation_id "
+			+ " INNER JOIN srch_rep_pept__prot_seq_id_pos_crosslink AS srpppsipc "
+			+	" ON spsa.protein_sequence_id = srpppsipc.protein_sequence_id "
+			+ " WHERE spsa.search_id IN (#SEARCHES#) AND srpppsipc.search_id IN (#SEARCHES#) "
+			
+			+ " UNION DISTINCT "
+
+			+ "SELECT   annotation.taxonomy "
+			+ " FROM annotation "
+			+ " INNER JOIN search_protein_sequence_annotation AS spsa "
+			+ 	" ON annotation.id = spsa.annotation_id "
+			+ " INNER JOIN srch_rep_pept__prot_seq_id_pos_looplink AS srpppsipl "
+			+	" ON spsa.protein_sequence_id = srpppsipl.protein_sequence_id "
+			+ " WHERE spsa.search_id IN (#SEARCHES#) AND srpppsipl.search_id IN (#SEARCHES#) "
+			;
+	
 	
 	/**
 	 * Get the taxonomies present in the percolator search

@@ -39,6 +39,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.objects.ImageViewerData;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -333,11 +334,27 @@ public class ViewerCrosslinkService {
 
 						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 
-							int taxonomyId_1 = link.getProtein1().getNrProtein().getTaxonomyId();
-							int taxonomyId_2 = link.getProtein2().getNrProtein().getTaxonomyId();
+							boolean excludeOnProtein_1 =
+									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+											excludeTaxonomy_Ids_Set_UserInput, 
+											link.getProtein1().getProteinSequenceObject(), 
+											searchId );
 
-							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_1 ) 
-									|| excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_2 ) ) {
+							boolean excludeOnProtein_2 =
+									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+											excludeTaxonomy_Ids_Set_UserInput, 
+											link.getProtein2().getProteinSequenceObject(), 
+											searchId );
+
+							if ( excludeOnProtein_1 || excludeOnProtein_2 ) {
+							
+//							int taxonomyId_1 = link.getProtein1().getProteinSequenceObject().getTaxonomyId();
+//							int taxonomyId_2 = link.getProtein2().getProteinSequenceObject().getTaxonomyId();
+//
+//							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_1 ) 
+//									|| excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_2 ) ) {
 
 								//  Skip to next entry in list, dropping this entry from output list
 
@@ -427,8 +444,8 @@ public class ViewerCrosslinkService {
 					addToProteinLinkPositions(  
 							searchIdForEntry,
 							
-							searchProteinCrosslink.getProtein1().getNrProtein().getNrseqId(), // fromProtId
-							searchProteinCrosslink.getProtein2().getNrProtein().getNrseqId(), // toProtId
+							searchProteinCrosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId(), // fromProtId
+							searchProteinCrosslink.getProtein2().getProteinSequenceObject().getProteinSequenceId(), // toProtId
 							searchProteinCrosslink.getProtein1Position(), // fromProtPosition
 							searchProteinCrosslink.getProtein2Position(),  // toProtPosition
 							
@@ -440,8 +457,8 @@ public class ViewerCrosslinkService {
 					addToProteinLinkPositions(  
 							searchIdForEntry,
 							
-							searchProteinCrosslink.getProtein2().getNrProtein().getNrseqId(), // fromProtId
-							searchProteinCrosslink.getProtein1().getNrProtein().getNrseqId(), // toProtId
+							searchProteinCrosslink.getProtein2().getProteinSequenceObject().getProteinSequenceId(), // fromProtId
+							searchProteinCrosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId(), // toProtId
 							searchProteinCrosslink.getProtein2Position(), // fromProtPosition
 							searchProteinCrosslink.getProtein1Position(),  // toProtPosition
 							
@@ -800,11 +817,29 @@ public class ViewerCrosslinkService {
 
 						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 
-							int taxonomyId_1 = link.getProtein1().getNrProtein().getTaxonomyId();
-							int taxonomyId_2 = link.getProtein2().getNrProtein().getTaxonomyId();
+							boolean excludeOnProtein_1 =
+									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+											excludeTaxonomy_Ids_Set_UserInput, 
+											link.getProtein1().getProteinSequenceObject(), 
+											searchId );
 
-							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_1 ) 
-									|| excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_2 ) ) {
+							boolean excludeOnProtein_2 =
+									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+											excludeTaxonomy_Ids_Set_UserInput, 
+											link.getProtein2().getProteinSequenceObject(), 
+											searchId );
+
+
+							if ( excludeOnProtein_1 || excludeOnProtein_2 ) {
+								
+							
+//							int taxonomyId_1 = link.getProtein1().getProteinSequenceObject().getTaxonomyId();
+//							int taxonomyId_2 = link.getProtein2().getProteinSequenceObject().getTaxonomyId();
+//
+//							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_1 ) 
+//									|| excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_2 ) ) {
 
 								//  Skip to next entry in list, dropping this entry from output list
 
@@ -895,8 +930,8 @@ public class ViewerCrosslinkService {
 							
 							numPsms,
 							
-							searchProteinCrosslink.getProtein1().getNrProtein().getNrseqId(), // fromProtId
-							searchProteinCrosslink.getProtein2().getNrProtein().getNrseqId(), // toProtId
+							searchProteinCrosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId(), // fromProtId
+							searchProteinCrosslink.getProtein2().getProteinSequenceObject().getProteinSequenceId(), // toProtId
 							searchProteinCrosslink.getProtein1Position(), // fromProtPosition
 							searchProteinCrosslink.getProtein2Position(),  // toProtPosition
 							
@@ -909,8 +944,8 @@ public class ViewerCrosslinkService {
 							
 							numPsms,
 							
-							searchProteinCrosslink.getProtein2().getNrProtein().getNrseqId(), // fromProtId
-							searchProteinCrosslink.getProtein1().getNrProtein().getNrseqId(), // toProtId
+							searchProteinCrosslink.getProtein2().getProteinSequenceObject().getProteinSequenceId(), // fromProtId
+							searchProteinCrosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId(), // toProtId
 							searchProteinCrosslink.getProtein2Position(), // fromProtPosition
 							searchProteinCrosslink.getProtein1Position(),  // toProtPosition
 							

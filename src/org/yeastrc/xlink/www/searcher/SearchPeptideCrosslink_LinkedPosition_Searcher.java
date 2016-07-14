@@ -82,9 +82,9 @@ public class SearchPeptideCrosslink_LinkedPosition_Searcher {
 			
 			" FROM "
 			
-			+ " srch_rep_pept__nrseq_id_pos_crosslink AS srpnipc_1 "
+			+ " srch_rep_pept__prot_seq_id_pos_crosslink AS srpnipc_1 "
 			+ " INNER JOIN "
-			+ " srch_rep_pept__nrseq_id_pos_crosslink AS srpnipc_2 "
+			+ " srch_rep_pept__prot_seq_id_pos_crosslink AS srpnipc_2 "
 			+ " ON srpnipc_1.reported_peptide_id = srpnipc_2.reported_peptide_id"
 			+ 	" AND  srpnipc_1.search_reported_peptide_peptide_id "
 			+ 		" != srpnipc_2.search_reported_peptide_peptide_id "
@@ -99,8 +99,8 @@ public class SearchPeptideCrosslink_LinkedPosition_Searcher {
 					
 			" WHERE unified_rp__search__rep_pept__generic_lookup.search_id = ? "
 			+ " AND unified_rp__search__rep_pept__generic_lookup.link_type = '" + XLinkUtils.CROSS_TYPE_STRING + "' "
-			+ " AND srpnipc_1.nrseq_id = ? AND srpnipc_1.nrseq_position = ? "
-			+ " AND srpnipc_2.nrseq_id = ? AND srpnipc_2.nrseq_position = ?  ";
+			+ " AND srpnipc_1.search_id = ? AND srpnipc_1.protein_sequence_id = ? AND srpnipc_1.protein_sequence_position = ? "
+			+ " AND srpnipc_2.search_id = ? AND srpnipc_2.protein_sequence_id = ? AND srpnipc_2.protein_sequence_position = ?  ";
 
 	
 	private final String SQL_LAST_PART = 
@@ -597,9 +597,16 @@ public class SearchPeptideCrosslink_LinkedPosition_Searcher {
 			pstmt.setInt( paramCounter, searchId );
 			
 			paramCounter++;
+			pstmt.setInt( paramCounter, searchId );
+
+			paramCounter++;
 			pstmt.setInt( paramCounter, protein1Id );
 			paramCounter++;
 			pstmt.setInt( paramCounter, protein1Position );
+
+			paramCounter++;
+			pstmt.setInt( paramCounter, searchId );
+			
 			paramCounter++;
 			pstmt.setInt( paramCounter, protein2Id );
 			paramCounter++;

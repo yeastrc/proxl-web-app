@@ -81,7 +81,7 @@ public class SearchPeptideLooplink_LinkedPosition_Searcher {
 			
 			" FROM "
 			
-			+ " srch_rep_pept__nrseq_id_pos_looplink AS srpnipl "
+			+ " srch_rep_pept__prot_seq_id_pos_looplink AS srpnipl "
 
 			+ " INNER JOIN unified_rp__search__rep_pept__generic_lookup "
 			+ 	" ON srpnipl.search_id = unified_rp__search__rep_pept__generic_lookup.search_id "
@@ -93,8 +93,8 @@ public class SearchPeptideLooplink_LinkedPosition_Searcher {
 					
 			" WHERE unified_rp__search__rep_pept__generic_lookup.search_id = ? "
 			+ " AND unified_rp__search__rep_pept__generic_lookup.link_type = '" + XLinkUtils.LOOP_TYPE_STRING + "' "
-			+ " AND srpnipl.nrseq_id = ? AND srpnipl.nrseq_position_1 = ? "
-			+ " AND srpnipl.nrseq_position_2 = ?  ";
+			+ " AND srpnipl.search_id = ? AND srpnipl.protein_sequence_id = ? AND srpnipl.protein_sequence_position_1 = ? "
+			+ " AND srpnipl.protein_sequence_position_2 = ?  ";
 
 	
 	private final String SQL_LAST_PART = 
@@ -586,6 +586,9 @@ public class SearchPeptideLooplink_LinkedPosition_Searcher {
 			int paramCounter = 0;
 			
 			
+			paramCounter++;
+			pstmt.setInt( paramCounter, searchId );
+
 			paramCounter++;
 			pstmt.setInt( paramCounter, searchId );
 			

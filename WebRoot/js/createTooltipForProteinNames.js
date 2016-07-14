@@ -20,7 +20,9 @@
 ////////////////////////////
 
 
-var _protein_listing_webservice_base_url = null;
+var _protein_listing_webservice_base_url_set = null;
+
+var _searchIds_protein_listing = null;
 
 
 $(document).ready(function() { 
@@ -36,15 +38,26 @@ $(document).ready(function() {
 
 var createTooltipForProteinNames = function() {
 	
-	_protein_listing_webservice_base_url = $("#protein_listing_webservice_base_url").val();
+	_protein_listing_webservice_base_url_set = $("#protein_listing_webservice_base_url_set").val();
 	
-	if ( _protein_listing_webservice_base_url === undefined 
-			|| _protein_listing_webservice_base_url === null
-			|| _protein_listing_webservice_base_url === "" ) {
+	if ( _protein_listing_webservice_base_url_set === undefined 
+			|| _protein_listing_webservice_base_url_set === null
+			|| _protein_listing_webservice_base_url_set === "" ) {
 		
 		return;  //  EARLY exit since no URL configured for protein listings
 	}
 
+	_searchIds_protein_listing = [];
+	
+	$(".search_id_input_field_protein_listing_tooltip_jq").each( function() {
+		
+		var $this = $( this );
+		
+		var searchId = $this.val();
+		
+		_searchIds_protein_listing.push( searchId );
+	});
+	
 
 	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 
@@ -109,14 +122,29 @@ var addSingleTooltipForProteinNameOnTopRight = function( params ) {
 var addSingleTooltipForProteinName = function( params ) {
 	
 
-	_protein_listing_webservice_base_url = $("#protein_listing_webservice_base_url").val();
+	_protein_listing_webservice_base_url_set = $("#protein_listing_webservice_base_url_set").val();
 	
-	if ( _protein_listing_webservice_base_url === undefined 
-			|| _protein_listing_webservice_base_url === null
-			|| _protein_listing_webservice_base_url === "" ) {
+	if ( _protein_listing_webservice_base_url_set === undefined 
+			|| _protein_listing_webservice_base_url_set === null
+			|| _protein_listing_webservice_base_url_set === "" ) {
 		
 		return;  //  EARLY exit since no URL configured for protein listings
 	}
+	
+	if ( _searchIds_protein_listing === null ) {
+
+		_searchIds_protein_listing = [];
+
+		$(".search_id_input_field_protein_listing_tooltip_jq").each( function() {
+			
+			var $this = $( this );
+			
+			var searchId = $this.val();
+			
+			_searchIds_protein_listing.push( searchId );
+		});
+	}
+	
 	
 	var  $elementToAddToolTipTo = params.$elementToAddToolTipTo;
 	
@@ -168,15 +196,28 @@ var addSingleTooltipForProteinName = function( params ) {
                 	  
                 	  } else {
 
-                		  if ( _protein_listing_webservice_base_url !== undefined 
-                				  && _protein_listing_webservice_base_url !== null
-                				  && _protein_listing_webservice_base_url !== "" ) {
+                		  if ( _protein_listing_webservice_base_url_set !== undefined 
+                				  && _protein_listing_webservice_base_url_set !== null
+                				  && _protein_listing_webservice_base_url_set !== "" ) {
 
-                			  var url = _protein_listing_webservice_base_url + "proteinListingService/jsonp/" + proteinIdString + "?jsonpCallback=?";
+                				var requestData = {
+
+                						searchId : _searchIds_protein_listing,
+                						proteinSequenceId : proteinIdString
+                				};
+
+                			  var _URL = contextPathJSVar + "/services/proteinNameForTooltip/getData";
 
                 			  $.ajax({
-                				  url: url,
-                				  dataType: 'jsonp'
+                					type : "GET",
+                					url : _URL,
+                					data : requestData,
+                					dataType : "json",
+
+                					traditional: true  //  Force traditional serialization of the data sent
+                					//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+                					//   So proteinIdsToGetSequence array is passed as "proteinIdsToGetSequence=<value>" which is what Jersey expects
+
                 			  })
                 			  .done(function(data) {
 

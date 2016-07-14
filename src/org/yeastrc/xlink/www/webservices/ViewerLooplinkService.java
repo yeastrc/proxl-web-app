@@ -39,6 +39,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.objects.ImageViewerData;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -338,9 +339,15 @@ public class ViewerLooplinkService {
 
 						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 
-							int taxonomyId = link.getProtein().getNrProtein().getTaxonomyId();
-
-							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
+							if ( ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+											excludeTaxonomy_Ids_Set_UserInput, 
+											link.getProtein().getProteinSequenceObject(), 
+											searchId ) ) {
+							
+//							int taxonomyId = link.getProtein().getProteinSequenceObject().getTaxonomyId();
+//
+//							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
 
 								//  Skip to next entry in list, dropping this entry from output list
 
@@ -423,7 +430,7 @@ public class ViewerLooplinkService {
 
 					SearchProteinLooplink searchProteinLooplink = wrappedLooplink.getSearchProteinLooplink();
 
-					int fromProtId = searchProteinLooplink.getProtein().getNrProtein().getNrseqId();
+					int fromProtId = searchProteinLooplink.getProtein().getProteinSequenceObject().getProteinSequenceId();
 					int toProtId = fromProtId;
 
 					int fromProtPosition = searchProteinLooplink.getProteinPosition1();
@@ -797,9 +804,15 @@ public class ViewerLooplinkService {
 
 						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 
-							int taxonomyId = link.getProtein().getNrProtein().getTaxonomyId();
+							if ( ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+											excludeTaxonomy_Ids_Set_UserInput, 
+											link.getProtein().getProteinSequenceObject(), 
+											searchId ) ) {
 
-							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
+//							int taxonomyId = link.getProtein().getProteinSequenceObject().getTaxonomyId();
+//
+//							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
 
 								//  Skip to next entry in list, dropping this entry from output list
 
@@ -884,7 +897,7 @@ public class ViewerLooplinkService {
 
 					Integer numPsms = searchProteinLooplink.getNumPsms();
 					
-					int fromProtId = searchProteinLooplink.getProtein().getNrProtein().getNrseqId();
+					int fromProtId = searchProteinLooplink.getProtein().getProteinSequenceObject().getProteinSequenceId();
 					int toProtId = fromProtId;
 
 					int fromProtPosition = searchProteinLooplink.getProteinPosition1();

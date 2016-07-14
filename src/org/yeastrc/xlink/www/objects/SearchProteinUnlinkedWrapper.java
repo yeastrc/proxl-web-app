@@ -17,7 +17,7 @@ public class SearchProteinUnlinkedWrapper extends SortDisplayRecordsWrapperBase 
 	@Override
 	public int getFinalSortOrderKey() {
 
-		return searchProteinUnlinked.getProtein().getNrProtein().getNrseqId();
+		return searchProteinUnlinked.getProtein().getProteinSequenceObject().getProteinSequenceId();
 	}
 
 	/////////////////

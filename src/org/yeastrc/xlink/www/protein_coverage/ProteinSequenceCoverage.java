@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.protein_coverage;
 
 import java.util.Set;
 
-import org.yeastrc.xlink.dto.NRProteinDTO;
+import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
@@ -10,7 +10,7 @@ import com.google.common.collect.TreeRangeSet;
 
 public class ProteinSequenceCoverage {
 
-	public ProteinSequenceCoverage( NRProteinDTO protein ) {
+	public ProteinSequenceCoverage( ProteinSequenceObject protein ) {
 		this.protein = protein;
 		this.sequenceCoverage = 0.0;
 	}
@@ -81,12 +81,12 @@ public class ProteinSequenceCoverage {
 	 * Get the protein covered by this sequence coverage
 	 * @return
 	 */
-	public NRProteinDTO getProtein() {
+	public ProteinSequenceObject getProtein() {
 		return protein;
 	}
 
 
-	private final NRProteinDTO protein;
+	private final ProteinSequenceObject protein;
 	private Double sequenceCoverage;
 	private RangeSet<Integer> ranges;
 }

@@ -40,10 +40,14 @@ public class PDBAlignmentDAO {
 				throw new Exception( "could not find pdb alignment with id: " + id );
 			
 			pa.setId( id );
-			pa.setAlignedNrseqSequence( rs.getString( "aligned_nrseq_sequence" ) );
+			
+			
+			//  Change to aligned_experimental_sequence after field rename
+			pa.setAlignedExperimentalSequence( rs.getString( "aligned_nrseq_sequence" ) );
+			
 			pa.setAlignedPDBSequence( rs.getString( "aligned_pdb_sequence" ) );
 			pa.setChainId( rs.getString( "chain_id" ) );
-			pa.setNrseqId( rs.getInt( "nrseq_id" ) );
+			pa.setProteinSequenceId( rs.getInt( "protein_sequence_id" ) );
 			pa.setPdbFileId( rs.getInt( "pdb_file_id" ) );
 
 		} catch ( Exception e ) {
@@ -76,11 +80,15 @@ public class PDBAlignmentDAO {
 	}
 	
 	
+	/**
+	 * @param pa
+	 * @return
+	 * @throws Exception
+	 */
 	public int savePDBAlignment( PDBAlignmentDTO pa ) throws Exception {
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-		Statement stmt = null;
 		ResultSet rs = null;
 	
 		
@@ -93,10 +101,12 @@ public class PDBAlignmentDAO {
 			// case
 			if( pa.getId() != 0 ) {
 				
+				//  Change from aligned_nrseq_sequence to aligned_experimental_sequence after field rename
+				
 				String sql = "UPDATE pdb_alignment SET aligned_pdb_sequence = ?, aligned_nrseq_sequence = ? WHERE id = ?";
 				pstmt = conn.prepareStatement( sql );
 				pstmt.setString( 1, pa.getAlignedPDBSequence() );
-				pstmt.setString( 2,  pa.getAlignedNrseqSequence() );
+				pstmt.setString( 2,  pa.getAlignedExperimentalSequence() );
 				pstmt.setInt( 3, pa.getId() );
 				
 				pstmt.executeUpdate();
@@ -107,22 +117,42 @@ public class PDBAlignmentDAO {
 				
 				// inserting a new PDB alignment
 				
-				stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+
+				//  Change from aligned_nrseq_sequence to aligned_experimental_sequence after field rename
+
+				final String sql = "INSERT INTO pdb_alignment"
+						+ " (pdb_file_id, chain_id, protein_sequence_id, aligned_pdb_sequence, aligned_nrseq_sequence ) " 
+						+ " VALUES ( ?, ?, ?, ?, ? )";
+
+				pstmt = conn.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );
 				
-				String sql = "SELECT * FROM pdb_alignment WHERE id = 0";
-				rs = stmt.executeQuery(sql);
-				rs.moveToInsertRow();
+				int counter = 0;
+
+				counter++;
+				pstmt.setInt( counter, pa.getPdbFileId() );
+				counter++;
+				pstmt.setString( counter, pa.getChainId() );
+				counter++;
+				pstmt.setInt( counter, pa.getProteinSequenceId() );
+				counter++;
+				pstmt.setString( counter, pa.getAlignedPDBSequence() );
+				counter++;
+				pstmt.setString( counter, pa.getAlignedExperimentalSequence() );
 				
-				rs.updateInt( "pdb_file_id", pa.getPdbFileId() );
-				rs.updateString( "chain_id",  pa.getChainId() );
-				rs.updateString( "aligned_pdb_sequence", pa.getAlignedPDBSequence() );
-				rs.updateInt( "nrseq_id", pa.getNrseqId() );
-				rs.updateString( "aligned_nrseq_sequence", pa.getAlignedNrseqSequence() );
+				pstmt.executeUpdate();
 				
-				rs.insertRow();
-				rs.last();
-				
-				pa.setId( rs.getInt( "id" ) );
+				rs = pstmt.getGeneratedKeys();
+
+				if( rs.next() ) {
+					pa.setId( rs.getInt( 1 ) );
+				} else {
+					
+					String msg = "Failed to insert PDBAlignmentDTO, generated key not found.";
+					
+					log.error( msg );
+					
+					throw new Exception( msg );
+				}
 				
 				return pa.getId();
 			}
@@ -147,11 +177,6 @@ public class PDBAlignmentDAO {
 				pstmt = null;
 			}
 
-			if( stmt != null ) {
-				try { stmt.close(); } catch( Throwable t ) { ; }
-				stmt = null;
-			}
-			
 			if( conn != null ) {
 				try { conn.close(); } catch( Throwable t ) { ; }
 				conn = null;
@@ -160,6 +185,10 @@ public class PDBAlignmentDAO {
 	}
 	
 	
+	/**
+	 * @param alignmentId
+	 * @throws Exception
+	 */
 	public void deletePDBAlignment( int alignmentId ) throws Exception {
 		
 		Connection conn = null;

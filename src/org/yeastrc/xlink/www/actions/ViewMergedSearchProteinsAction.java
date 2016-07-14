@@ -22,7 +22,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.dao.SearchDAO;
-import org.yeastrc.xlink.dto.NRProteinDTO;
+import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureNavLinks;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -42,10 +42,11 @@ import org.yeastrc.xlink.www.objects.SearchCount;
 import org.yeastrc.xlink.www.objects.VennDiagramDataToJSON;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
 import org.yeastrc.xlink.www.web_utils.GenerateVennDiagramDataToJSON;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
-import org.yeastrc.xlink.www.web_utils.GetProteinListingTooltipConfigData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
+import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import org.yeastrc.xlink.www.web_utils.XLinkWebAppUtils;
 import org.yeastrc.xlink.www.webapp_timing.WebappTiming;
 
@@ -264,7 +265,7 @@ public class ViewMergedSearchProteinsAction extends Action {
 
 			//  Populate request objects for Protein Name Tooltip JS
 			
-			GetProteinListingTooltipConfigData.getInstance().getProteinListingTooltipConfigData( request );
+			ProteinListingTooltipConfigUtil.getInstance().putProteinListingTooltipConfigForPage( searchIdsSet, request );
 
 			
 
@@ -382,19 +383,48 @@ public class ViewMergedSearchProteinsAction extends Action {
 					searchesForProtein.add(searchForProtein);
 				}
 			
-				NRProteinDTO nrProteinDTO = new NRProteinDTO();
-				nrProteinDTO.setNrseqId( proteinId );
+				ProteinSequenceObject ProteinSequenceObject = new ProteinSequenceObject();
+				ProteinSequenceObject.setProteinSequenceId( proteinId );
 
-				MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searchesForProtein, nrProteinDTO );
+				MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searchesForProtein, ProteinSequenceObject );
 				
-				int mergedSearchProteinTaxonomyId = mergedSearchProtein.getNrProtein().getTaxonomyId(); 
+				//  Exclude protein if excluded for all searches
+				
+				boolean excludeTaxonomyIdAllSearches = true;
+				
+				for ( SearchDTO searchDTO : searchesForProtein ) {
 
-				if ( proteinsMergedCommonPageDownloadResult.getExcludeTaxonomy_Ids_Set_UserInput().contains( mergedSearchProteinTaxonomyId ) ) {
-					
+					boolean excludeOnProtein =
+							ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
+							.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+									proteinsMergedCommonPageDownloadResult.getExcludeTaxonomy_Ids_Set_UserInput(), 
+									mergedSearchProtein.getProteinSequenceObject(), 
+									searchDTO.getId() );
+
+					if ( ! excludeOnProtein ) {
+						
+						excludeTaxonomyIdAllSearches = false;
+						break;
+					}
+				}
+				
+				if ( excludeTaxonomyIdAllSearches ) {
+
 					//////////  Taxonomy Id in list of excluded taxonomy ids so drop the record
 					
 					continue;  //   EARLY Continue
 				}
+				
+				
+				
+//				int mergedSearchProteinTaxonomyId = mergedSearchProtein.getProteinSequenceObject().getTaxonomyId(); 
+//
+//				if ( proteinsMergedCommonPageDownloadResult.getExcludeTaxonomy_Ids_Set_UserInput().contains( mergedSearchProteinTaxonomyId ) ) {
+//					
+//					//////////  Taxonomy Id in list of excluded taxonomy ids so drop the record
+//					
+//					continue;  //   EARLY Continue
+//				}
 				
 				allProteinsForCrosslinksAndLooplinksUnfilteredList.add( mergedSearchProtein );
 			}

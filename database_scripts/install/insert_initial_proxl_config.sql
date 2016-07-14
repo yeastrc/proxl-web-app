@@ -39,7 +39,7 @@ use proxl;
 --  (Optional) Used for accessing protein listing services.  
 
  INSERT INTO config_system (config_key, config_value) 
- VALUES ('protein_listing_webservice_url', '');
+ VALUES ('protein_listing_from_sequence_taxonomy_webservice_url', '');
 
 
 

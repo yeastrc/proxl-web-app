@@ -10,11 +10,11 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.PeptideDAO;
+import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.dao.UnifiedReportedPeptideLookupDAO;
 import org.yeastrc.xlink.dao.UnifiedRepPepDynamicModLookupDAO;
 import org.yeastrc.xlink.dao.UnifiedRepPepMatchedPeptideLookupDAO;
-import org.yeastrc.xlink.dto.PeptideDTO;
+import org.yeastrc.xlink.www.dto.PeptideDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepDynamicModLookupDTO;
@@ -218,7 +218,7 @@ public class MergedSearchPeptideLooplink implements IMergedSearchLink {
 
 				for ( SearchProteinDoublePosition searchProteinDoublePosition : resultPerSearch ) {
 
-					Integer proteinId = searchProteinDoublePosition.getProtein().getNrProtein().getNrseqId();
+					Integer proteinId = searchProteinDoublePosition.getProtein().getProteinSequenceObject().getProteinSequenceId();
 					Integer proteinPosition_1 = searchProteinDoublePosition.getPosition1();
 					Integer proteinPosition_2 = searchProteinDoublePosition.getPosition2();
 
@@ -252,7 +252,7 @@ public class MergedSearchPeptideLooplink implements IMergedSearchLink {
 						mergedSearchProteinDoublePosition_MappedOn_Pos2.put( proteinPosition_2, mergedSearchProteinDoublePosition );
 						
 						List<SearchDTO> searches = new ArrayList<>();
-						MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searches, searchProteinDoublePosition.getProtein().getNrProtein() );
+						MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searches, searchProteinDoublePosition.getProtein().getProteinSequenceObject() );
 						mergedSearchProteinDoublePosition.setProtein( mergedSearchProtein );
 						mergedSearchProteinDoublePosition.setPosition1( proteinPosition_1 );
 						mergedSearchProteinDoublePosition.setPosition2( proteinPosition_2 );
@@ -307,9 +307,9 @@ public class MergedSearchPeptideLooplink implements IMergedSearchLink {
 				@Override
 				public int compare(MergedSearchProteinDoublePosition o1, MergedSearchProteinDoublePosition o2) {
 					
-					if ( o1.getProtein().getNrProtein().getNrseqId() != o2.getProtein().getNrProtein().getNrseqId() ) {
+					if ( o1.getProtein().getProteinSequenceObject().getProteinSequenceId() != o2.getProtein().getProteinSequenceObject().getProteinSequenceId() ) {
 						
-						return o1.getProtein().getNrProtein().getNrseqId() - o2.getProtein().getNrProtein().getNrseqId();
+						return o1.getProtein().getProteinSequenceObject().getProteinSequenceId() - o2.getProtein().getProteinSequenceObject().getProteinSequenceId();
 					}
 					
 					if ( o1.getPosition1() != o2.getPosition1() ) {

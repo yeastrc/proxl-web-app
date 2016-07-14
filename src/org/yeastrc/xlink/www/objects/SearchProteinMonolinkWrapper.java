@@ -17,7 +17,7 @@ public class SearchProteinMonolinkWrapper extends SortDisplayRecordsWrapperBase 
 	@Override
 	public int getFinalSortOrderKey() {
 
-		return searchProteinMonolink.getProtein().getNrProtein().getNrseqId();
+		return searchProteinMonolink.getProtein().getProteinSequenceObject().getProteinSequenceId();
 	}
 
 	/////////////////

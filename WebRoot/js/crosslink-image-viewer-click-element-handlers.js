@@ -9,6 +9,10 @@
 
 
 
+
+//   All references to proteinId are actually referencing the protein sequence id
+
+
 ///////////////////////////////////////////////////////////////////////////
 
 ////////////    Click handlers for the links ( Lines that show the links )

@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.PeptideDAO;
+import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.dao.UnifiedReportedPeptideLookupDAO;
 import org.yeastrc.xlink.dao.UnifiedRepPepDynamicModLookupDAO;
 import org.yeastrc.xlink.dao.UnifiedRepPepMatchedPeptideLookupDAO;
-import org.yeastrc.xlink.dto.PeptideDTO;
+import org.yeastrc.xlink.www.dto.PeptideDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepDynamicModLookupDTO;
@@ -183,7 +183,7 @@ public class MergedSearchPeptideDimer implements IMergedSearchLink {
 
 				for ( SearchProteinPosition searchProteinPosition : resultPerSearch ) {
 
-					Integer proteinId = searchProteinPosition.getProtein().getNrProtein().getNrseqId();
+					Integer proteinId = searchProteinPosition.getProtein().getProteinSequenceObject().getProteinSequenceId();
 
 					//  get MergedSearchProteinPosition for protein id, position
 					
@@ -196,7 +196,7 @@ public class MergedSearchPeptideDimer implements IMergedSearchLink {
 						mergedSearchProteinPosition_MappedOn_ProtId.put( proteinId, mergedSearchProteinPosition );
 						
 						List<SearchDTO> searches = new ArrayList<>();
-						MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searches, searchProteinPosition.getProtein().getNrProtein() );
+						MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searches, searchProteinPosition.getProtein().getProteinSequenceObject() );
 						mergedSearchProteinPosition.setProtein( mergedSearchProtein );
 					}
 					
@@ -241,7 +241,7 @@ public class MergedSearchPeptideDimer implements IMergedSearchLink {
 				@Override
 				public int compare(MergedSearchProteinPosition o1, MergedSearchProteinPosition o2) {
 					
-					return o1.getProtein().getNrProtein().getNrseqId() - o2.getProtein().getNrProtein().getNrseqId();
+					return o1.getProtein().getProteinSequenceObject().getProteinSequenceId() - o2.getProtein().getProteinSequenceObject().getProteinSequenceId();
 				}
 			});
 

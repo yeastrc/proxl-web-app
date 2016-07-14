@@ -26,9 +26,9 @@ import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 
-public class DeletePercolatorSearchAction extends Action {
+public class DeleteSearchAction extends Action {
 	
-	private static final Logger log = Logger.getLogger(DeletePercolatorSearchAction.class);
+	private static final Logger log = Logger.getLogger(DeleteSearchAction.class);
 	
 
 	public ActionForward execute( ActionMapping mapping,

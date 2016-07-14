@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.objects;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dto.NRProteinDTO;
+import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.searcher.SearchUtils;
 
@@ -10,19 +10,19 @@ public class SearchProtein implements IProtein {
 	private static final Logger log = Logger.getLogger(SearchProtein.class);
 			
 	// Instantiate SearchProtein
-	public SearchProtein( SearchDTO search, NRProteinDTO protein ) {
+	public SearchProtein( SearchDTO search, ProteinSequenceObject protein ) {
 		this.search = search;
-		this.nrProtein = protein;
+		this.proteinSequenceObject = protein;
 	}
 	
 	public int hashCode() {
-		return ("" + this.getNrProtein().getNrseqId() + "-" + this.getSearch().getId() ).hashCode();
+		return ("" + this.getProteinSequenceObject().getProteinSequenceId() + "-" + this.getSearch().getId() ).hashCode();
 	}
 	
 	public boolean equals( Object o ) {
 		if( !( o instanceof SearchProtein ) ) return false;
 		
-		if( ((SearchProtein)o).getNrProtein().getNrseqId() != this.getNrProtein().getNrseqId() )
+		if( ((SearchProtein)o).getProteinSequenceObject().getProteinSequenceId() != this.getProteinSequenceObject().getProteinSequenceId() )
 			return false;
 		
 		if( ((SearchProtein)o).getSearch().getId() != this.getSearch().getId() )
@@ -68,12 +68,12 @@ public class SearchProtein implements IProtein {
 		}
 	}
 	
-	public NRProteinDTO getNrProtein() {
-		return nrProtein;
+	public ProteinSequenceObject getProteinSequenceObject() {
+		return proteinSequenceObject;
 	}
 
-	public void setNrProtein(NRProteinDTO nrProtein) {
-		this.nrProtein = nrProtein;
+	public void setProteinSequenceObject(ProteinSequenceObject proteinSequenceObject) {
+		this.proteinSequenceObject = proteinSequenceObject;
 	}
 	
 	public SearchDTO getSearch() {
@@ -85,7 +85,7 @@ public class SearchProtein implements IProtein {
 	}
 
 
-	private NRProteinDTO nrProtein;
+	private ProteinSequenceObject proteinSequenceObject;
 	private SearchDTO search;
 	private String name;
 	private String description;

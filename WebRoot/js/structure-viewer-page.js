@@ -1,11 +1,27 @@
 "use strict";
 
 
+//   All references to proteinId or protein_id are actually referencing the protein sequence id
+
+
 
 ///////////////   CONSTANTS  ////////////////////////
 
+//   Property keys in the JSON on the Hash of the URL
 
-//Default exclude link type "No Links"
+//  Current property_keys
+
+var HASH_PROPERTY_VISIBLE_CHAINS_WITH_PROTEIN_SEQUENCE_IDS = "visible_chains_w_prot_seq_ids";
+
+
+//  Prev property_keys - no longer used, used for conversions
+
+var HASH_PROPERTY_PREV__VISIBLE_CHAINS = "visible-chains";
+
+
+
+
+//  Default exclude link type "No Links"
 
 var EXCLUDE_LINK_TYPE_DEFAULT = [ 0 ];
 
@@ -36,7 +52,7 @@ var COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS = "SEARCH_IDS";
 
 ///////////////   Global variables  ////////////////////////
 
-//From Page
+//  From Page
 
 
 var _searchIds = {};
@@ -104,8 +120,153 @@ var _filterOnlyOnePeptide;
 var _distanceReportData = { };
 
 
+/////////////////////////////////////////////////////////
 
-//get values for variables from the hash part of the URL as JSON
+
+
+//   Convert OLD JSON if necessary
+
+//   Will immediately return after converting JSON or will call initPage() again after converting JSON
+
+//   Unable to return immediately if need to use webservice to get data from server.
+
+function convertOldJSONIfNecessaryReturnTrueIfExit() {
+
+	var json = getJsonFromHash();
+
+	if ( convertVisibleChainsToProteinSequenceIds( json ) ) {
+		
+		return true;  // force main code to wait for async
+	}
+
+
+}
+
+/////
+
+function convertVisibleChainsToProteinSequenceIds( json ) {
+	
+	if ( ! ( HASH_PROPERTY_PREV__VISIBLE_CHAINS  in json ) ) {
+		
+		return false;
+	}
+	
+
+	console.log( "Converting nrseq protein ids to protein sequence ids: " );
+
+	
+	var nrseqProteinIds = [];
+	
+	var visibleChains = json[ HASH_PROPERTY_PREV__VISIBLE_CHAINS ];
+
+	var visibleChains_Keys = Object.keys( visibleChains );
+	
+	for ( var keysIndex = 0; keysIndex < visibleChains_Keys.length; keysIndex++ ) {
+		
+		var visibleChains_Key = visibleChains_Keys[ keysIndex ];
+		
+		var visibleChainNRSEQProteinIdsArray = visibleChains[ visibleChains_Key ];
+		
+		for ( var visibleChainNRSEQProteinIdsArrayIndex = 0; visibleChainNRSEQProteinIdsArrayIndex < visibleChainNRSEQProteinIdsArray.length; visibleChainNRSEQProteinIdsArrayIndex++ ) {
+			
+			var visibleChainNRSEQProteinIdEntry = visibleChainNRSEQProteinIdsArray[ visibleChainNRSEQProteinIdsArrayIndex ];
+			
+			nrseqProteinIds.push( visibleChainNRSEQProteinIdEntry );
+		}
+	}	
+	
+	var callback = function( params ) {
+		
+		convertVisibleChainsToProteinSequenceIdsProcessReponse( params );
+	};
+	
+	
+	
+	var params = {
+			
+			nrseqProteinIds : nrseqProteinIds,
+			callback : callback
+	};
+	
+	var response = getProteinSequenceIdsForNrseqProteinIds( params );
+	
+	if ( response.calledAJAX ) {
+	
+		return true;
+	}
+	
+	return false;
+}
+
+/////
+
+function convertVisibleChainsToProteinSequenceIdsProcessReponse( responseParams ) {
+
+	var proteinIdsMapping = responseParams.proteinIdsMapping;
+	var calledAJAX = responseParams.calledAJAX;
+	
+
+	var json = getJsonFromHash();
+
+	if ( ! ( HASH_PROPERTY_PREV__VISIBLE_CHAINS  in json ) ) {
+		
+		return false;
+	}
+	
+
+	var visibleChains = json[ HASH_PROPERTY_PREV__VISIBLE_CHAINS ];
+
+	var visibleChains_Keys = Object.keys( visibleChains );
+	
+	for ( var keysIndex = 0; keysIndex < visibleChains_Keys.length; keysIndex++ ) {
+		
+		var visibleChains_Key = visibleChains_Keys[ keysIndex ];
+		
+		var visibleChainNRSEQProteinIdsArray = visibleChains[ visibleChains_Key ];
+		
+		for ( var visibleChainNRSEQProteinIdsArrayIndex = 0; visibleChainNRSEQProteinIdsArrayIndex < visibleChainNRSEQProteinIdsArray.length; visibleChainNRSEQProteinIdsArrayIndex++ ) {
+			
+			var visibleChainNRSEQProteinIdEntry = visibleChainNRSEQProteinIdsArray[ visibleChainNRSEQProteinIdsArrayIndex ];
+			
+			var matchingProteinSequenceId = proteinIdsMapping[ visibleChainNRSEQProteinIdEntry ];
+			
+			if ( matchingProteinSequenceId === undefined || matchingProteinSequenceId === null ) {
+				
+				throw "Matching protein sequence id not found for nrseq protein id: " + visibleChainNRSEQProteinIdEntry;
+			}
+			
+			visibleChainNRSEQProteinIdsArray[ visibleChainNRSEQProteinIdsArrayIndex ] = matchingProteinSequenceId;
+		}
+	}	
+
+	//  Copy to new property name and remove old property name.
+	
+	json[ HASH_PROPERTY_VISIBLE_CHAINS_WITH_PROTEIN_SEQUENCE_IDS ] = json[ HASH_PROPERTY_PREV__VISIBLE_CHAINS ];
+	
+	delete json[ HASH_PROPERTY_PREV__VISIBLE_CHAINS ]; //  Remove old property
+	
+	//  Update Hash with updated JSON
+	
+	updateURLHashWithJSONObject( json );
+	
+
+	if ( calledAJAX ) {
+
+		//   Re call initPage() since on AJAX callback thread;
+
+		initPage();
+	}
+}
+
+
+
+
+////////////////////////////////////////
+
+
+
+//  get values for variables from the hash part of the URL as JSON
+
 function getJsonFromHash() {
 	
 	var jsonFromHash = null;
@@ -453,7 +614,7 @@ function updateURLHash( useSearchForm) {
 	var visibleChains = getVisibleChains();
 	
 	if( visibleChains ) {
-		items[ 'visible-chains' ] = visibleChains;
+		items[ HASH_PROPERTY_VISIBLE_CHAINS_WITH_PROTEIN_SEQUENCE_IDS ] = visibleChains;
 	}
 	
 	items[ 'render-mode' ] = getRenderMode();
@@ -488,7 +649,15 @@ function updateURLHash( useSearchForm) {
 		items[ 'udcl' ] = userDistanceConstraints.longDistance;
 	}
 
-	var newHash = JSON.stringify( items );
+	updateURLHashWithJSONObject( items );
+}
+
+
+
+function updateURLHashWithJSONObject( jsonObject ) {
+	
+
+	var newHash = JSON.stringify( jsonObject );
 
 //	var newHashLength = newHash.length;
 	
@@ -508,6 +677,7 @@ function updateURLHash( useSearchForm) {
 		console.log( "Update window.location.hash Failed: e: " + e );
 	}
 
+	
 }
 
 
@@ -1702,7 +1872,9 @@ var getAlignmentByChainAndProtein = function ( chainId, proteinId ) {
 	
 	for( var j = 0; j < _ALIGNMENTS[ chainId ].length; j++ ) {
 		
-		if( proteinId == _ALIGNMENTS[ chainId ][ j ][ 'nrseqId' ] ) {
+		var alignment = _ALIGNMENTS[ chainId ][ j ];
+		
+		if( proteinId == alignment.proteinSequenceId ) {
 			return _ALIGNMENTS[ chainId ][ j ];
 		}
 		
@@ -1934,7 +2106,7 @@ var downloadPymolScript = function() {
 			var atom1 = links[ i ].atom1;
 			var atom2 = links[ i ].atom2;
 			
-			var distance = calculateDistance( atom1.pos(), atom2.pos() );
+//			var distance = calculateDistance( atom1.pos(), atom2.pos() );
 			
 			var hexColor = _linkColorHandler.getLinkColor( links[ i ].link, 'hex' );
 			var colorName;
@@ -1952,26 +2124,34 @@ var downloadPymolScript = function() {
 				console.log( link );
 			}
 			
+			//  Get Experiment Protein Sequence Id and Position data for the atoms and process them
 			
-			var nrseq1s = getNrseqProteinPositions( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
-			var nrseq2s = getNrseqProteinPositions( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
+			var atom1_ExpProteinSequenceIdPositionPairs = getExpProteinSequenceIdPositionPairs( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
+			var atom2_ExpProteinSequenceIdPositionPairs = getExpProteinSequenceIdPositionPairs( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
 			
-			if( !nrseq1s || nrseq1s.length != 1 ) {
+			if( !atom1_ExpProteinSequenceIdPositionPairs || atom1_ExpProteinSequenceIdPositionPairs.length != 1 ) {
 				console.log( "WARNING: Got anomolous readings for first protein in link." );
 			}
 			
-			if( !nrseq2s || nrseq2s.length != 1 ) {
+			if( !atom2_ExpProteinSequenceIdPositionPairs || atom2_ExpProteinSequenceIdPositionPairs.length != 1 ) {
 				console.log( "WARNING: Got anomolous readings for second protein in link." );
 			}
 			
+			var atom1_ExpProteinSequenceIdPositionPair = atom1_ExpProteinSequenceIdPositionPairs[ 0 ];
+			var atom2_ExpProteinSequenceIdPositionPair = atom2_ExpProteinSequenceIdPositionPairs[ 0 ];
+			
 			// if protein names contain commas, only keep what's before the first comma
-			var proteinName1 = _proteinNames[ nrseq1s[ 0 ].nrseqId ];
+			var proteinName1 = _proteinNames[ atom1_ExpProteinSequenceIdPositionPair.proteinSequenceId ];
 			proteinName1 = proteinName1.split(",")[ 0 ];
 			
-			var proteinName2 = _proteinNames[ nrseq2s[ 0 ].nrseqId ];
+			var proteinName2 = _proteinNames[ atom2_ExpProteinSequenceIdPositionPair.proteinSequenceId ];
 			proteinName2 = proteinName2.split(",")[ 0 ];
 			
-			var uniqueId = proteinName1 + "_" + nrseq1s[ 0 ].position + "L" + proteinName2 + "_" + nrseq2s[ 0 ].position;
+			var uniqueId = 
+				proteinName1 + "_" 
+				+ atom1_ExpProteinSequenceIdPositionPair.position 
+				+ "L" + proteinName2 + "_" 
+				+ atom2_ExpProteinSequenceIdPositionPair.position;
 
 			// ensure a distance is only added once (ie, don't want same distance added for a looplink and crosslink on same atoms)
 			var distanceId = atom1.residue().chain().name() + "-" + atom1.residue().num() + "-" + atom2.residue().chain().name() + "-" + atom2.residue().num();	
@@ -1998,7 +2178,7 @@ var downloadPymolScript = function() {
 			var atom1 = links[ i ].atom1;
 			var atom2 = links[ i ].atom2;
 			
-			var distance = calculateDistance( atom1.pos(), atom2.pos() );
+//			var distance = calculateDistance( atom1.pos(), atom2.pos() );
 
 			var hexColor = _linkColorHandler.getLinkColor( links[ i ].link, 'hex' );
 			var colorName;
@@ -2016,26 +2196,37 @@ var downloadPymolScript = function() {
 				console.log( link );
 			}
 
-						
-			var nrseq1s = getNrseqProteinPositions( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
-			var nrseq2s = getNrseqProteinPositions( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
+			//  Get Experiment Protein Sequence Id and Position data for the atoms and process them
 			
-			if( !nrseq1s || nrseq1s.length != 1 ) {
+			var atom1_ExpProteinSequenceIdPositionPairs = getExpProteinSequenceIdPositionPairs( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
+			var atom2_ExpProteinSequenceIdPositionPairs = getExpProteinSequenceIdPositionPairs( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
+			
+			
+			if( !atom1_ExpProteinSequenceIdPositionPairs || atom1_ExpProteinSequenceIdPositionPairs.length != 1 ) {
 				console.log( "WARNING: Got anomolous readings for first protein in link." );
 			}
 			
-			if( !nrseq2s || nrseq2s.length != 1 ) {
+			if( !atom2_ExpProteinSequenceIdPositionPairs || atom2_ExpProteinSequenceIdPositionPairs.length != 1 ) {
 				console.log( "WARNING: Got anomolous readings for second protein in link." );
 			}
 			
+
+			var atom1_ExpProteinSequenceIdPositionPair = atom1_ExpProteinSequenceIdPositionPairs[ 0 ];
+			var atom2_ExpProteinSequenceIdPositionPair = atom2_ExpProteinSequenceIdPositionPairs[ 0 ];
+			
+			
 			// if protein names contain commas, only keep what's before the first comma
-			var proteinName1 = _proteinNames[ nrseq1s[ 0 ].nrseqId ];
+			var proteinName1 = _proteinNames[ atom1_ExpProteinSequenceIdPositionPair.proteinSequenceId ];
 			proteinName1 = proteinName1.split(",")[ 0 ];
 			
-			var proteinName2 = _proteinNames[ nrseq2s[ 0 ].nrseqId ];
+			var proteinName2 = _proteinNames[ atom2_ExpProteinSequenceIdPositionPair.proteinSequenceId ];
 			proteinName2 = proteinName2.split(",")[ 0 ];
 			
-			var uniqueId = proteinName1 + "_" + nrseq1s[ 0 ].position + "C" + proteinName2 + "_" + nrseq2s[ 0 ].position;
+			var uniqueId = 
+				proteinName1 + "_" 
+				+ atom1_ExpProteinSequenceIdPositionPair.position 
+				+ "C" + proteinName2 
+				+ "_" + atom2_ExpProteinSequenceIdPositionPair.position;
 			
 			// ensure a distance is only added once (ie, don't want same distance added for a looplink and crosslink on same atoms)
 			var distanceId = atom1.residue().chain().name() + "-" + atom1.residue().num() + "-" + atom2.residue().chain().name() + "-" + atom2.residue().num();	
@@ -2932,20 +3123,28 @@ var listChains = function( doDraw ) {
 			
 			for( var k = 0; k < _ALIGNMENTS[ chains[ i ].name() ].length; k++ ) {
 				
-				var proteinId = _ALIGNMENTS[ chains[ i ].name() ][ k ][ 'nrseqId' ];
+				var alignment = _ALIGNMENTS[ chains[ i ].name() ][ k ];
+				
+				var proteinId = alignment.proteinSequenceId;
 				
 				// limit the list to proteins in this experiment
 				if( _proteinNames[ proteinId ] ) {
 					html += "<span style=\"white-space:nowrap;margin-right:10px;\"><input ";
 					
-					if( 'visible-chains' in json && chains[ i ].name() in json[ 'visible-chains' ] ) {
-						var prots = json[ 'visible-chains' ][ chains[ i ].name() ];
-						console.log( "prots:" );
-						console.log( prots );
-						if( prots.length > 0 ) {
-							for( var protsIndex = 0; protsIndex < prots.length; protsIndex++ ) {
-								if( prots[ protsIndex ] == proteinId ) {
-									html+= "checked ";
+					if( HASH_PROPERTY_VISIBLE_CHAINS_WITH_PROTEIN_SEQUENCE_IDS in json ) {
+						
+						var chainsElemName = chains[ i ].name();
+						
+						if ( chainsElemName in json[ HASH_PROPERTY_VISIBLE_CHAINS_WITH_PROTEIN_SEQUENCE_IDS ] ) {
+							
+							var prots = json[ HASH_PROPERTY_VISIBLE_CHAINS_WITH_PROTEIN_SEQUENCE_IDS ][ chains[ i ].name() ];
+							console.log( "prots:" );
+							console.log( prots );
+							if( prots.length > 0 ) {
+								for( var protsIndex = 0; protsIndex < prots.length; protsIndex++ ) {
+									if( prots[ protsIndex ] == proteinId ) {
+										html+= "checked ";
+									}
 								}
 							}
 						}
@@ -4366,87 +4565,87 @@ var _INACTIVE_RESIDUE_COLOR = [ 190/255, 190/255, 190/255, 0.75 ];
  */
 function getSequenceCoverageColorOp() {
 	
-	  return new pv.color.ColorOp(function(atom, out, index) {
-		  
+	  return new pv.color.ColorOp( function(atom, out, index) {
+
 		  // get residue of this atom
 		  var residue = atom.residue();
 
 		  // this can only happen when rendering as lines or points, which attempts
 		  // to draw all atoms, even those that are not peptide residues
 		  if( !residue.isAminoacid() ) {
-			  
+
 			  // color as inactive
-		      out[index+0] = _INACTIVE_RESIDUE_COLOR[ 0 ]; out[index+1] = _INACTIVE_RESIDUE_COLOR[ 1 ];
-		      out[index+2] = _INACTIVE_RESIDUE_COLOR[ 2 ]; out[index+3] = _INACTIVE_RESIDUE_COLOR[ 3 ];
-			  
+			  out[index+0] = _INACTIVE_RESIDUE_COLOR[ 0 ]; out[index+1] = _INACTIVE_RESIDUE_COLOR[ 1 ];
+			  out[index+2] = _INACTIVE_RESIDUE_COLOR[ 2 ]; out[index+3] = _INACTIVE_RESIDUE_COLOR[ 3 ];
+
 			  return;
 		  }
-		  
+
 		  // get position of residue in the PDB
 		  var pdbPosition = residue.index() + 1;
-		  
+
 		  // get chain of this atom
 		  var chain = residue.chain();
-		  
+
 		  // get the alignments visible for this chain
 		  var alignments = getVisibleAlignmentsForChain( chain.name() );
-		  
+
 		  if( !alignments || alignments.length < 1 ) {
 			  //console.log( "Got no visible alignments for chain: " + chain.name() );
-			  
+
 			  // color as inactive
-		      out[index+0] = _INACTIVE_RESIDUE_COLOR[ 0 ]; out[index+1] = _INACTIVE_RESIDUE_COLOR[ 1 ];
-		      out[index+2] = _INACTIVE_RESIDUE_COLOR[ 2 ]; out[index+3] = _INACTIVE_RESIDUE_COLOR[ 3 ];
-			  
+			  out[index+0] = _INACTIVE_RESIDUE_COLOR[ 0 ]; out[index+1] = _INACTIVE_RESIDUE_COLOR[ 1 ];
+			  out[index+2] = _INACTIVE_RESIDUE_COLOR[ 2 ]; out[index+3] = _INACTIVE_RESIDUE_COLOR[ 3 ];
+
 			  return;
 		  }
-		  
+
 		  //console.log( "Got " + alignments.length + " visible alignments for chain: " + chain.name() );
-		  
-		  // get a map of nrseq:positions for these alignments and the given pdb position
-		  var nrseqProteinPositions = getNrseqProteinPositions( alignments, pdbPosition );
-		  
-		  if( !nrseqProteinPositions || nrseqProteinPositions.length < 1 ) {
-			  
+
+		  // get a map of proteinSequenceId:position pairs that correspond to the supplied pdbPosition in the supplied alignments
+		  var expProteinSequenceIdPositionPairs = getExpProteinSequenceIdPositionPairs( alignments, pdbPosition );
+
+		  if( !expProteinSequenceIdPositionPairs || expProteinSequenceIdPositionPairs.length < 1 ) {
+
 			  console.log( atom );
 			  //console.log( "Got no nrseq proteins positions for chain " + chain.name() );
-			  
+
 			  // color as not covered
-		      out[index+0] = _UNCOVERED_RESIDUE_COLOR[ 0 ]; out[index+1] = _UNCOVERED_RESIDUE_COLOR[ 1 ];
-		      out[index+2] = _UNCOVERED_RESIDUE_COLOR[ 2 ]; out[index+3] = _UNCOVERED_RESIDUE_COLOR[ 3 ];
-			  
+			  out[index+0] = _UNCOVERED_RESIDUE_COLOR[ 0 ]; out[index+1] = _UNCOVERED_RESIDUE_COLOR[ 1 ];
+			  out[index+2] = _UNCOVERED_RESIDUE_COLOR[ 2 ]; out[index+3] = _UNCOVERED_RESIDUE_COLOR[ 3 ];
+
 			  return;
 		  }
-		  
-		  
-		  if( nrseqProteinPositions.length > 1 ) {
+
+
+		  if( expProteinSequenceIdPositionPairs.length > 1 ) {
 			  //console.log( "WARNING: Got more than 1 nrseq:position for chain " + chain.name() + " at " + pdbPosition + ". Only using first one." );
 		  }
-		  
-		  var nrseqId = nrseqProteinPositions[ 0 ].nrseqId;
-		  var position = nrseqProteinPositions[ 0 ].position;
-		  
-		  if( isProteinPositionCovered( nrseqId, position ) ) {
-			  
-			  //console.log( nrseqId + " at position " + position + " is a covered position." );
-			  
+
+		  var proteinSequenceId = expProteinSequenceIdPositionPairs[ 0 ].proteinSequenceId;
+		  var position = expProteinSequenceIdPositionPairs[ 0 ].position;
+
+		  if( isProteinPositionCovered( proteinSequenceId, position ) ) {
+
+			  //console.log( proteinSequenceId + " at position " + position + " is a covered position." );
+
 			  // color as a covered position
-		      out[index+0] = _COVERED_RESIDUE_COLOR[ 0 ]; out[index+1] = _COVERED_RESIDUE_COLOR[ 1 ];
-		      out[index+2] = _COVERED_RESIDUE_COLOR[ 2 ]; out[index+3] = _COVERED_RESIDUE_COLOR[ 3 ];
-			  
-			  
+			  out[index+0] = _COVERED_RESIDUE_COLOR[ 0 ]; out[index+1] = _COVERED_RESIDUE_COLOR[ 1 ];
+			  out[index+2] = _COVERED_RESIDUE_COLOR[ 2 ]; out[index+3] = _COVERED_RESIDUE_COLOR[ 3 ];
+
+
 		  } else {
-			  
-			  //console.log( nrseqId + " at position " + position + " is not a covered position." );
-			  
-		      out[index+0] = _UNCOVERED_RESIDUE_COLOR[ 0 ]; out[index+1] = _UNCOVERED_RESIDUE_COLOR[ 1 ];
-		      out[index+2] = _UNCOVERED_RESIDUE_COLOR[ 2 ]; out[index+3] = _UNCOVERED_RESIDUE_COLOR[ 3 ];
-			  
+
+			  //console.log( proteinSequenceId + " at position " + position + " is not a covered position." );
+
+			  out[index+0] = _UNCOVERED_RESIDUE_COLOR[ 0 ]; out[index+1] = _UNCOVERED_RESIDUE_COLOR[ 1 ];
+			  out[index+2] = _UNCOVERED_RESIDUE_COLOR[ 2 ]; out[index+3] = _UNCOVERED_RESIDUE_COLOR[ 3 ];
+
 		  }
-		  
-		  
+
+
 	  });
-	}
+}
 
 
 function getVisibleAlignmentsForChain( chainId ) {
@@ -4496,25 +4695,28 @@ function getAllAlignmentsForChain( chainId ) {
 }
 
 /**
- * Get all nrseqId:positions that correspond to the supplied pdbPosition in the supplied alignments
+ * Get all proteinSequenceId:position pairs that correspond to the supplied pdbPosition in the supplied alignments
+ * 
+ * This is for the "experimental" protein sequence from the experiment
  */
-var getNrseqProteinPositions = function( alignments, pdbPosition ) {
+var getExpProteinSequenceIdPositionPairs = function( alignments, pdbPosition ) {
 	
-	var nrseqProteinPositions = new Array();
+	var expProteinSequenceIdPositionPairs = new Array();
 	
 	for( var i = 0; i < alignments.length; i++ ) {
-		var nrseqPosition = findNrseqPositionForPDBPosition( alignments[ i ], pdbPosition );
+		var expProteinPosition = findExpPositionForPDBPosition( alignments[ i ], pdbPosition );
 		
-		if( nrseqPosition ) {
-			var nrseqProteinPosition = { };
-			nrseqProteinPosition.nrseqId = alignments[ i ].nrseqId;
-			nrseqProteinPosition.position = nrseqPosition;
+		if( expProteinPosition ) {
+			var expProteinSequenceIdPositionPair = { 
+					proteinSequenceId : alignments[ i ].proteinSequenceId,
+					position : expProteinPosition
+			};
 			
-			nrseqProteinPositions.push( nrseqProteinPosition );
+			expProteinSequenceIdPositionPairs.push( expProteinSequenceIdPositionPair );
 		}
 	}
 	
-	return nrseqProteinPositions;	
+	return expProteinSequenceIdPositionPairs;	
 };
 
 /**
@@ -4625,35 +4827,35 @@ var findCAAtoms = function( proteinId, position, chains ) {
 };
 
 /**
- * For the given alignment and PDB position, find the position in the nrseq protein that corresponds to it
+ * For the given alignment and PDB position, find the position in the experimental protein that corresponds to it
  */
-var findNrseqPositionForPDBPosition = function( alignment, position ) {
+var findExpPositionForPDBPosition = function( alignment, position ) {
 	
-	var nrseqPosition = 0;
+	var expPosition = 0;
 	var pdbPosition = 0;
 	
 	//console.log( "position: " + position );
-	//console.log( alignment.alignedNrseqSequence );
+	//console.log( alignment.alignedExperimentalSequence );
 	//console.log( alignment.alignedPDBSequence );
 	
 	for( var i = 0; i < alignment.alignedPDBSequence.length; i++ ) {
 
-		if( alignment.alignedNrseqSequence[ i ] != '-' ) { nrseqPosition++; }
+		if( alignment.alignedExperimentalSequence[ i ] != '-' ) { expPosition++; }
 		if( alignment.alignedPDBSequence[ i ] != '-' ) { pdbPosition++; }
 		
 		if( pdbPosition == position ) {
-			if( alignment.alignedNrseqSequence[ i ] == '-' ) {
+			if( alignment.alignedExperimentalSequence[ i ] == '-' ) {
 				//console.log( "Found no Nrseq position for position " + position + " in chain " + alignment.chainId );
 				return undefined;
 			}
 			else {
-				//console.log( "Found Nrseq position " + nrseqPosition + " for position " + position + " in chain " + alignment.chainId );
-				return nrseqPosition;
+				//console.log( "Found Experimental position " + expPosition + " for position " + position + " in chain " + alignment.chainId );
+				return expPosition;
 			}
 		}
 	}
 	
-	console.log( "MAJOR WARNING: DID NOT FIND POSITION " + position + " FOR PROTEIN " + alignment.nrseqId + " IN CHAIN " + alignment.chainId );
+	console.log( "MAJOR WARNING: DID NOT FIND POSITION " + position + " FOR PROTEIN " + alignment.proteinSequenceId + " IN CHAIN " + alignment.chainId );
 	console.log( alignment );
 	return null;
 };
@@ -4662,14 +4864,14 @@ var findPDBResidueFromAlignment = function(proteinId, position, chain) {
 		
 	var alignment = getAlignmentByChainAndProtein( chain, proteinId );
 	
-	var nrseqPosition = 0;
+	var expPosition = 0;
 	var pdbPosition = 0;
-	for( var i = 0; i < alignment.alignedNrseqSequence.length; i++ ) {
+	for( var i = 0; i < alignment.alignedExperimentalSequence.length; i++ ) {
 
-		if( alignment.alignedNrseqSequence[ i ] != '-' ) { nrseqPosition++; }
+		if( alignment.alignedExperimentalSequence[ i ] != '-' ) { expPosition++; }
 		if( alignment.alignedPDBSequence[ i ] != '-' ) { pdbPosition++; }
 		
-		if( nrseqPosition == position ) {
+		if( expPosition == position ) {
 			if( alignment.alignedPDBSequence[ position - 1 ] == '-' ) {
 				//console.log( "Found no PDB position for position " + position + " in protein " + proteinId );
 				return undefined;
@@ -4993,7 +5195,28 @@ function mouseoutChain( chainId ) {
 function initPage() {
 
 
+
+	var json = getJsonFromHash();
+
+	if ( json === null ) {
+
+		$("#invalid_url_no_data_after_hash_div").show();
+		throw "Invalid URL, no data after the hash '#'";
+	}
+
+	
+	//  Will immediately return after converting JSON or will call initPage() again after converting JSON
+	if ( convertOldJSONIfNecessaryReturnTrueIfExit() ) {
+		
+		//  convertOldJSONIfNecessaryReturnTrueIfExit needs to wait for async so exit
+		
+		return;
+	}
+
+	
+	
 	console.log( "Initializing the page." );
+	
 	
 	
 	//  Set up nag overlay for text for Merged Image page
@@ -5032,14 +5255,6 @@ function initPage() {
 	});
 	
 	
-	var json = getJsonFromHash();
-
-	if ( json === null ) {
-
-		$("#invalid_url_no_data_after_hash_div").show();
-		throw "Invalid URL, no data after the hash '#'";
-	}
-
 	
 	if ( json.searches && json.searches.length > 1 ) {
 		

@@ -11,20 +11,20 @@ public class MergedSearchProteinDoublePosition {
 		
 		if( this.getPosition1() != mrpp.getPosition1() ) return false;
 		if( this.getPosition2() != mrpp.getPosition2() ) return false;
-		if( this.getProtein().getNrProtein() != mrpp.getProtein().getNrProtein() ) return false;
+		if( this.getProtein().getProteinSequenceObject() != mrpp.getProtein().getProteinSequenceObject() ) return false;
 		
 		return true;
 	}
 	
 	public int hashCode() {
-		return ( "" + position1 + position2 + this.getProtein().getNrProtein().getNrseqId() ).hashCode();
+		return ( "" + position1 + position2 + this.getProtein().getProteinSequenceObject().getProteinSequenceId() ).hashCode();
 	}
 	
 	public String toString() {
 		try {
 			return protein.getName() + "(" + position1 + "," + position2 + ")";
 		} catch( Exception e ) {
-			return "Error with protein: " + protein.getNrProtein().getNrseqId();
+			return "Error with protein: " + protein.getProteinSequenceObject().getProteinSequenceId();
 		}
 	}
 	

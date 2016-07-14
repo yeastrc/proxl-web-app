@@ -55,8 +55,8 @@
 				
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
-					This input is required on this page:
-					<input type="hidden" id="protein_listing_webservice_base_url" value="<c:out value="${ protein_listing_webservice_base_url }"></c:out>">
+					This include is required on this page:
+					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
 		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
 		
@@ -117,8 +117,9 @@
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
 
-	<%--  protein name data webservice base URL, used by createTooltipForProteinNames.js --%>
-	<input type="hidden" id="protein_listing_webservice_base_url" value="<c:out value="${ protein_listing_webservice_base_url }"></c:out>">
+	<%--  used by createTooltipForProteinNames.js --%>
+	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
+	
 
 		<%@ include file="/WEB-INF/jsp-includes/viewPsmsLoadedFromWebServiceTemplateFragment.jsp" %>
 		<%@ include file="/WEB-INF/jsp-includes/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
@@ -272,7 +273,7 @@
 						<%--  shortened property from "excludeProtein" to "excP" to shorten the URL  --%>
 						<%-- TODO   TEMP
 						<html:select property="excP" multiple="true" styleId="excludeProtein" >
-							<html:options collection="proteins" property="nrProtein.nrseqId" labelProperty="name" />
+							<html:options collection="proteins" property="proteinSequenceObject.proteinSequenceId" labelProperty="name" />
 						</html:select>
 						--%>
 						
@@ -284,7 +285,7 @@
 						<select name="excludedProteins" multiple="multiple" id="excludeProtein" >  
 						  
 	  						<logic:iterate id="protein" name="allProteinsForCrosslinksAndLooplinksUnfilteredList">
-	  						  <option value="<c:out value="${ protein.nrProtein.nrseqId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
+	  						  <option value="<c:out value="${ protein.proteinSequenceObject.proteinSequenceId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
 	  						</logic:iterate>
 	  					</select>
 									
@@ -501,8 +502,8 @@
 								onclick="viewCrosslinkProteinsLoadedFromWebServiceTemplate.showHideCrosslinkProteins( { clickedElement : this })"
 								project_id="${ projectId }"
 								search_ids="<c:forEach var="searchEntryForThisRow" items="${ proteinEntry.searches }">,${ searchEntryForThisRow.id }</c:forEach>"
-								protein_1_id="<bean:write name="proteinEntry" property="protein1.nrProtein.nrseqId" />"
-								protein_2_id="<bean:write name="proteinEntry" property="protein2.nrProtein.nrseqId" />"
+								protein_1_id="<bean:write name="proteinEntry" property="protein1.proteinSequenceObject.proteinSequenceId" />"
+								protein_2_id="<bean:write name="proteinEntry" property="protein2.proteinSequenceObject.proteinSequenceId" />"
 								protein_1_position="<bean:write name="proteinEntry" property="protein1Position" />"
 								protein_2_position="<bean:write name="proteinEntry" property="protein2Position" />"
 							>
@@ -538,9 +539,9 @@
 									</a>
 								</td>								
 								
-								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein1.nrProtein.nrseqId" />"><bean:write name="proteinEntry" property="protein1.name" /></span></td>
+								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein1.proteinSequenceObject.proteinSequenceId" />"><bean:write name="proteinEntry" property="protein1.name" /></span></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="protein1Position" /></td>
-								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein2.nrProtein.nrseqId" />"><bean:write name="proteinEntry" property="protein2.name" /></span></td>
+								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein2.proteinSequenceObject.proteinSequenceId" />"><bean:write name="proteinEntry" property="protein2.name" /></span></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="protein2Position" /></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="numPsms" /></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="numLinkedPeptides" /></td>

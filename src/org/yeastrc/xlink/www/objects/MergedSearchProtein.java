@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.yeastrc.xlink.dto.NRProteinDTO;
+import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.searcher.SearchUtils;
 
@@ -19,9 +19,9 @@ public class MergedSearchProtein implements IProtein {
 	 * @param searches The searches that provide a context for the naming of this protein
 	 * @param protein The protein
 	 */
-	public MergedSearchProtein( Collection<SearchDTO> searches, NRProteinDTO protein ) {
+	public MergedSearchProtein( Collection<SearchDTO> searches, ProteinSequenceObject protein ) {
 		this.searchs = searches;
-		this.nrProtein = protein;
+		this.proteinSequenceObject = protein;
 	}
 
 	// Get the name(s) for this protein from the searches
@@ -44,7 +44,7 @@ public class MergedSearchProtein implements IProtein {
 			Set<String> names = new HashSet<String>();
 
 			for( SearchDTO search : searchs ) {
-				String name = SearchUtils.getProteinNameForSearch( new SearchProtein( search, nrProtein ) );
+				String name = SearchUtils.getProteinNameForSearch( new SearchProtein( search, proteinSequenceObject ) );
 				if( name != null )
 					names.add( name );
 			}
@@ -65,7 +65,7 @@ public class MergedSearchProtein implements IProtein {
 		Set<String> descriptions = new HashSet<String>();
 		
 		for( SearchDTO search : searchs ) {
-			String description = SearchUtils.getProteinDescriptionForSearch( new SearchProtein( search, nrProtein ) );
+			String description = SearchUtils.getProteinDescriptionForSearch( new SearchProtein( search, proteinSequenceObject ) );
 			if( description != null )
 				descriptions.add( description );
 		}
@@ -74,8 +74,8 @@ public class MergedSearchProtein implements IProtein {
 	}
 	
 
-	public NRProteinDTO getNrProtein() {
-		return nrProtein;
+	public ProteinSequenceObject getProteinSequenceObject() {
+		return proteinSequenceObject;
 	}
 
 	public Collection<SearchDTO> getSearchs() {
@@ -91,7 +91,7 @@ public class MergedSearchProtein implements IProtein {
 	
 
 	
-	private final NRProteinDTO nrProtein;
+	private final ProteinSequenceObject proteinSequenceObject;
 	private final Collection<SearchDTO> searchs;
 	
 }

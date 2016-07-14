@@ -24,7 +24,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.NRProteinDAO;
+import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
@@ -45,6 +45,7 @@ import org.yeastrc.xlink.www.objects.SearchProteinUnlinked;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinkedWrapper;
 import org.yeastrc.xlink.www.searcher.LinkersForSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.TaxonomyIdsForProtSeqIdSearchIdSearcher;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.web_utils.TaxonomyUtils;
@@ -155,6 +156,21 @@ public class ViewerProteinDataService {
 			if( "on".equals( filterOnlyOnePeptideString ) )
 				filterOnlyOnePeptide = true;
 
+			
+			
+			//  Copy Exclude Taxonomy and Exclude Protein Sets for lookup
+
+			Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
+
+			if ( excludeTaxonomy != null ) {
+
+				for ( Integer taxonomyId : excludeTaxonomy ) {
+				
+					excludeTaxonomy_Ids_Set_UserInput.add( taxonomyId );
+				}
+			}
+
+			
 			
 
 			if ( searchIdsParam.isEmpty() ) {
@@ -299,8 +315,8 @@ public class ViewerProteinDataService {
 
 			// Create collection with all possible proteins included in this set of  searches for this type
 
-			//  Keyed on proteinNRSEQ_Id
-			Map<Integer, List<SearchDTO>> searchDTOsKeyedOnProteinNRSEQ_IdsMap = new HashMap<>();
+			//  Keyed on proteinSequenceId
+			Map<Integer, List<SearchDTO>> searchDTOsKeyedOnProteinSequenceIdsMap = new HashMap<>();
 			
 			
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
@@ -339,11 +355,6 @@ public class ViewerProteinDataService {
 
 				///   Get Crosslink Proteins from DB
 
-
-//				List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
-//						SearchProteinCrosslinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
-
-
 				List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
 						CrosslinkLinkedPositions.getInstance()
 						.getSearchProteinCrosslinkWrapperList( search, searcherCutoffValuesSearchLevel );
@@ -353,27 +364,27 @@ public class ViewerProteinDataService {
 
 					SearchProteinCrosslink item = wrappedItem.getSearchProteinCrosslink();
 					
-					Integer proteinId_1 = item.getProtein1().getNrProtein().getNrseqId();
-					Integer proteinId_2 = item.getProtein2().getNrProtein().getNrseqId();
+					Integer proteinId_1 = item.getProtein1().getProteinSequenceObject().getProteinSequenceId();
+					Integer proteinId_2 = item.getProtein2().getProteinSequenceObject().getProteinSequenceId();
 
 					{
-						List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinNRSEQ_IdsMap.get( proteinId_1 );
+						List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinSequenceIdsMap.get( proteinId_1 );
 
 						if ( searchDTOListForProteinId == null ) {
 
 							searchDTOListForProteinId = new ArrayList<>();
-							searchDTOsKeyedOnProteinNRSEQ_IdsMap.put( proteinId_1, searchDTOListForProteinId );
+							searchDTOsKeyedOnProteinSequenceIdsMap.put( proteinId_1, searchDTOListForProteinId );
 						}
 
 						searchDTOListForProteinId.add(searchDTO);
 					}
 					{
-						List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinNRSEQ_IdsMap.get( proteinId_2 );
+						List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinSequenceIdsMap.get( proteinId_2 );
 
 						if ( searchDTOListForProteinId == null ) {
 
 							searchDTOListForProteinId = new ArrayList<>();
-							searchDTOsKeyedOnProteinNRSEQ_IdsMap.put( proteinId_2, searchDTOListForProteinId );
+							searchDTOsKeyedOnProteinSequenceIdsMap.put( proteinId_2, searchDTOListForProteinId );
 						}
 
 						searchDTOListForProteinId.add(searchDTO);
@@ -384,10 +395,6 @@ public class ViewerProteinDataService {
 
 				///   Get Looplink Proteins from DB
 
-//				List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
-//						SearchProteinLooplinkSearcher.getInstance().searchOnSearchIdandCutoffs( searchDTO, searcherCutoffValuesSearchLevel );
-
-				
 				List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
 						LooplinkLinkedPositions.getInstance()
 						.getSearchProteinLooplinkWrapperList( search, searcherCutoffValuesSearchLevel );
@@ -397,14 +404,14 @@ public class ViewerProteinDataService {
 
 					SearchProteinLooplink item = wrappedItem.getSearchProteinLooplink();
 					
-					Integer proteinId = item.getProtein().getNrProtein().getNrseqId();
+					Integer proteinId = item.getProtein().getProteinSequenceObject().getProteinSequenceId();
 
-					List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinNRSEQ_IdsMap.get( proteinId );
+					List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinSequenceIdsMap.get( proteinId );
 
 					if ( searchDTOListForProteinId == null ) {
 
 						searchDTOListForProteinId = new ArrayList<>();
-						searchDTOsKeyedOnProteinNRSEQ_IdsMap.put( proteinId, searchDTOListForProteinId );
+						searchDTOsKeyedOnProteinSequenceIdsMap.put( proteinId, searchDTOListForProteinId );
 					}
 
 					searchDTOListForProteinId.add(searchDTO);
@@ -444,27 +451,27 @@ public class ViewerProteinDataService {
 
 						SearchProteinDimer item = wrappedItem.getSearchProteinDimer();
 						
-						Integer proteinId_1 = item.getProtein1().getNrProtein().getNrseqId();
-						Integer proteinId_2 = item.getProtein2().getNrProtein().getNrseqId();
+						Integer proteinId_1 = item.getProtein1().getProteinSequenceObject().getProteinSequenceId();
+						Integer proteinId_2 = item.getProtein2().getProteinSequenceObject().getProteinSequenceId();
 
 						{
-							List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinNRSEQ_IdsMap.get( proteinId_1 );
+							List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinSequenceIdsMap.get( proteinId_1 );
 
 							if ( searchDTOListForProteinId == null ) {
 
 								searchDTOListForProteinId = new ArrayList<>();
-								searchDTOsKeyedOnProteinNRSEQ_IdsMap.put( proteinId_1, searchDTOListForProteinId );
+								searchDTOsKeyedOnProteinSequenceIdsMap.put( proteinId_1, searchDTOListForProteinId );
 							}
 
 							searchDTOListForProteinId.add(searchDTO);
 						}
 						{
-							List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinNRSEQ_IdsMap.get( proteinId_2 );
+							List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinSequenceIdsMap.get( proteinId_2 );
 
 							if ( searchDTOListForProteinId == null ) {
 
 								searchDTOListForProteinId = new ArrayList<>();
-								searchDTOsKeyedOnProteinNRSEQ_IdsMap.put( proteinId_2, searchDTOListForProteinId );
+								searchDTOsKeyedOnProteinSequenceIdsMap.put( proteinId_2, searchDTOListForProteinId );
 							}
 
 							searchDTOListForProteinId.add(searchDTO);
@@ -489,14 +496,14 @@ public class ViewerProteinDataService {
 
 						SearchProteinUnlinked item = wrappedItem.getSearchProteinUnlinked();
 						
-						Integer proteinId = item.getProtein().getNrProtein().getNrseqId();
+						Integer proteinId = item.getProtein().getProteinSequenceObject().getProteinSequenceId();
 
-						List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinNRSEQ_IdsMap.get( proteinId );
+						List<SearchDTO> searchDTOListForProteinId = searchDTOsKeyedOnProteinSequenceIdsMap.get( proteinId );
 
 						if ( searchDTOListForProteinId == null ) {
 
 							searchDTOListForProteinId = new ArrayList<>();
-							searchDTOsKeyedOnProteinNRSEQ_IdsMap.put( proteinId, searchDTOListForProteinId );
+							searchDTOsKeyedOnProteinSequenceIdsMap.put( proteinId, searchDTOListForProteinId );
 						}
 
 						searchDTOListForProteinId.add(searchDTO);
@@ -515,10 +522,10 @@ public class ViewerProteinDataService {
 
 			Collection<MergedSearchProtein> proteins = new ArrayList<MergedSearchProtein>();
 			
-			for ( Map.Entry<Integer, List<SearchDTO>> item : searchDTOsKeyedOnProteinNRSEQ_IdsMap.entrySet() ) {
+			for ( Map.Entry<Integer, List<SearchDTO>> item : searchDTOsKeyedOnProteinSequenceIdsMap.entrySet() ) {
 
 				MergedSearchProtein mergedSearchProtein =
-						new MergedSearchProtein( item.getValue(), NRProteinDAO.getInstance().getNrProtein( item.getKey() ) );
+						new MergedSearchProtein( item.getValue(), ProteinSequenceObjectFactory.getProteinSequenceObject( item.getKey() ) );
 
 				proteins.add( mergedSearchProtein );
 			}
@@ -526,10 +533,22 @@ public class ViewerProteinDataService {
 			// build list of taxonomies to show in exclusion list
 			Map<Integer, String> taxonomies = new HashMap<Integer,String>();
 			for( MergedSearchProtein mp : proteins ) {
-				if( taxonomies.containsKey( mp.getNrProtein().getTaxonomyId() ) ) { 
-					continue;
+				
+				for ( SearchDTO searchDTO : mp.getSearchs() ) {
+
+					//  Get all taxonomy ids for protein sequence id and search id
+
+					Set<Integer> taxonomyIds = 
+							TaxonomyIdsForProtSeqIdSearchIdSearcher.getInstance().getTaxonomyIdsSingleSearch( mp.getProteinSequenceObject(), searchDTO.getId() );
+
+					for ( Integer taxonomyId : taxonomyIds ) {
+
+						if( taxonomies.containsKey( taxonomyId ) ) { 
+							continue;
+						}
+						taxonomies.put( taxonomyId, TaxonomyUtils.getTaxonomyName( taxonomyId ) );
+					}
 				}
-				taxonomies.put( mp.getNrProtein().getTaxonomyId(), TaxonomyUtils.getTaxonomyName( mp.getNrProtein().getTaxonomyId() ) );
 			}
 			ivd.setTaxonomies( taxonomies );
 
@@ -546,10 +565,31 @@ public class ViewerProteinDataService {
 
 				for ( MergedSearchProtein item : proteins ) {
 
-					Integer itemTaxonomyId = item.getNrProtein().getTaxonomyId();
-					
-					if ( excludeTaxonomy.contains( itemTaxonomyId ) ) {
+					boolean excludeForAllSearches = true;
+
+					for ( SearchDTO searchDTO : item.getSearchs() ) {
+
+						//  Get all taxonomy ids for protein sequence id and search id
+
+						Set<Integer> taxonomyIds = 
+								TaxonomyIdsForProtSeqIdSearchIdSearcher.getInstance().getTaxonomyIdsSingleSearch( item.getProteinSequenceObject(), searchDTO.getId() );
+
+						for ( Integer taxonomyId : taxonomyIds ) {
+
+							if( ! excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) { 
+								excludeForAllSearches = false;
+								break;
+							}
+						}
 						
+						if ( ! excludeForAllSearches ) {
+							
+							break;
+						}
+					}
+					
+					if ( excludeForAllSearches ) {
+					
 						continue; //  EARLY CONTINUE - Drop "item" from output list
 					}
 
@@ -600,11 +640,11 @@ public class ViewerProteinDataService {
 
 			for( MergedSearchProtein mp : proteins ) {
 
-				String proteinSequence = mp.getNrProtein().getSequence();
+				String proteinSequence = mp.getProteinSequenceObject().getSequence();
 
 				Collection<Integer> linkablePositionsForProtein = GetLinkablePositionsForLinkers.getLinkablePositionsForProteinSequenceAndLinkerAbbrSet( proteinSequence, linkerAbbrSet );
 				
-				proteinIdslinkablePositionsMap.put( mp.getNrProtein().getNrseqId(), linkablePositionsForProtein );
+				proteinIdslinkablePositionsMap.put( mp.getProteinSequenceObject().getProteinSequenceId(), linkablePositionsForProtein );
 			}
 			ivd.setLinkablePositions( proteinIdslinkablePositionsMap ); 
 
@@ -613,8 +653,8 @@ public class ViewerProteinDataService {
 			Map<Integer, String> proteinNames = new HashMap<Integer, String>();
 
 			for( MergedSearchProtein mp : proteins ) {
-				proteinLengths.put( mp.getNrProtein().getNrseqId(), mp.getNrProtein().getSequence().length() );
-				proteinNames.put( mp.getNrProtein().getNrseqId(), mp.getName() );
+				proteinLengths.put( mp.getProteinSequenceObject().getProteinSequenceId(), mp.getProteinSequenceObject().getSequence().length() );
+				proteinNames.put( mp.getProteinSequenceObject().getProteinSequenceId(), mp.getName() );
 			}
 
 			// sort the proteinNames map by value

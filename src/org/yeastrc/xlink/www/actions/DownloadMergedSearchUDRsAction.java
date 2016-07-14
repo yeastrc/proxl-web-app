@@ -227,27 +227,27 @@ public class DownloadMergedSearchUDRsAction extends Action {
 
 				// map for naming purposes
 				for( MergedSearchProteinCrosslink link : crosslinks ) {
-					proteinNames.put( link.getProtein1().getNrProtein().getNrseqId(), link.getProtein1().getName() );
-					proteinNames.put( link.getProtein2().getNrProtein().getNrseqId(), link.getProtein2().getName() );
+					proteinNames.put( link.getProtein1().getProteinSequenceObject().getProteinSequenceId(), link.getProtein1().getName() );
+					proteinNames.put( link.getProtein2().getProteinSequenceObject().getProteinSequenceId(), link.getProtein2().getName() );
 				}
 				for( MergedSearchProteinLooplink link : looplinks ) {
-					proteinNames.put( link.getProtein().getNrProtein().getNrseqId(), link.getProtein().getName() );
+					proteinNames.put( link.getProtein().getProteinSequenceObject().getProteinSequenceId(), link.getProtein().getName() );
 				}
 
 				// get map of all UDRs
 				Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> udrMap = XLinkWebAppUtils.getUDRs( crosslinks, looplinks );
 				
-				for( int nrseqId1 : udrMap.keySet() ) {
-					for( int pos1 : udrMap.get( nrseqId1 ).keySet() ) {
-						for( int nrseqId2 : udrMap.get( nrseqId1 ).get( pos1 ).keySet() ) {
-							for( int pos2 : udrMap.get( nrseqId1 ).get( pos1 ).get( nrseqId2 ) ) {
+				for( int proteinSequenceId1 : udrMap.keySet() ) {
+					for( int pos1 : udrMap.get( proteinSequenceId1 ).keySet() ) {
+						for( int proteinSequenceId2 : udrMap.get( proteinSequenceId1 ).get( pos1 ).keySet() ) {
+							for( int pos2 : udrMap.get( proteinSequenceId1 ).get( pos1 ).get( proteinSequenceId2 ) ) {
 								StringBuffer line = new StringBuffer();
 
-								line.append( proteinNames.get( nrseqId1 ) + "\t" );
+								line.append( proteinNames.get( proteinSequenceId1 ) + "\t" );
 								line.append( pos1 + "\t" );
-								line.append( proteinNames.get( nrseqId2 ) + "\t" );
+								line.append( proteinNames.get( proteinSequenceId2 ) + "\t" );
 								line.append( pos2 + "\t" );
-								line.append( StringUtils.join( getSearchesForLinks( crosslinks, looplinks, nrseqId1, nrseqId2, pos1, pos2 ), "," ) + "\n" );
+								line.append( StringUtils.join( getSearchesForLinks( crosslinks, looplinks, proteinSequenceId1, proteinSequenceId2, pos1, pos2 ), "," ) + "\n" );
 
 								writer.write( line.toString() );
 							}
@@ -310,8 +310,8 @@ public class DownloadMergedSearchUDRsAction extends Action {
 		
 		for( MergedSearchProteinCrosslink link : crosslinks ) {
 			
-			if( ( link.getProtein1().getNrProtein().getNrseqId() == protein1 && link.getProtein2().getNrProtein().getNrseqId() == protein2 && link.getProtein1Position() == position1 && link.getProtein2Position() == position2 ) ||
-				( link.getProtein1().getNrProtein().getNrseqId() == protein2 && link.getProtein2().getNrProtein().getNrseqId() == protein1 && link.getProtein1Position() == position2 && link.getProtein2Position() == position1 ) ) {
+			if( ( link.getProtein1().getProteinSequenceObject().getProteinSequenceId() == protein1 && link.getProtein2().getProteinSequenceObject().getProteinSequenceId() == protein2 && link.getProtein1Position() == position1 && link.getProtein2Position() == position2 ) ||
+				( link.getProtein1().getProteinSequenceObject().getProteinSequenceId() == protein2 && link.getProtein2().getProteinSequenceObject().getProteinSequenceId() == protein1 && link.getProtein1Position() == position2 && link.getProtein2Position() == position1 ) ) {
 				
 				for( SearchDTO search : link.getSearches() ) {
 					searchIds.add( search.getId() );
@@ -322,7 +322,7 @@ public class DownloadMergedSearchUDRsAction extends Action {
 		
 		for( MergedSearchProteinLooplink link : looplinks ) {
 			
-			if( link.getProtein().getNrProtein().getNrseqId() == protein1 && link.getProtein().getNrProtein().getNrseqId() == protein2 && 
+			if( link.getProtein().getProteinSequenceObject().getProteinSequenceId() == protein1 && link.getProtein().getProteinSequenceObject().getProteinSequenceId() == protein2 && 
 				( ( link.getProteinPosition1() == position1 && link.getProteinPosition2() == position2 ) || ( link.getProteinPosition1() == position2 && link.getProteinPosition2() == position1 ) ) ) {
 				
 				for( SearchDTO search : link.getSearches() ) {
