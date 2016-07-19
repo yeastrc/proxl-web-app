@@ -13,8 +13,8 @@ import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl_import.api.xml_dto.Modification;
 import org.yeastrc.proxl_import.api.xml_dto.Modifications;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
-import org.yeastrc.xlink.dao.PeptideDAO;
-import org.yeastrc.xlink.dto.PeptideDTO;
+import org.yeastrc.proxl.import_xml_to_db.dao.PeptideDAO;
+import org.yeastrc.proxl.import_xml_to_db.dto.PeptideDTO;
 
 /**
  * 
@@ -38,7 +38,8 @@ public class GetPerPeptideData {
 		PerPeptideData perPeptideData = new PerPeptideData();
 		
 		//  Add the peptide sequence if not in DB, otherwise retrieve existing record.
-		PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTO( peptide.getSequence() );
+		PeptideDTO peptideDTO = 
+				PeptideDAO.getInstance().getPeptideDTOFromSequenceInsertIfNotInTable( peptide.getSequence() );
 
 		perPeptideData.setPeptideDTO( peptideDTO );
 		

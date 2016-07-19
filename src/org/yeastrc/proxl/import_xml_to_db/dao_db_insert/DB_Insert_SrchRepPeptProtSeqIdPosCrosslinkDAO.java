@@ -7,28 +7,28 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
-import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptNrseqIdPosCrosslinkDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosCrosslinkDTO;
 
 
 /**
  * Crosslink  (Half of a Crosslink)
  *   
- * table srch_rep_pept__nrseq_id_pos_crosslink
+ * table srch_rep_pept__prot_seq_id_pos_crosslink
  *
  */
-public class DB_Insert_SrchRepPeptNrseqIdPosCrosslinkDAO {
+public class DB_Insert_SrchRepPeptProtSeqIdPosCrosslinkDAO {
 
 
-	private static final Logger log = Logger.getLogger(DB_Insert_SrchRepPeptNrseqIdPosCrosslinkDAO.class);
+	private static final Logger log = Logger.getLogger(DB_Insert_SrchRepPeptProtSeqIdPosCrosslinkDAO.class);
 
-	private DB_Insert_SrchRepPeptNrseqIdPosCrosslinkDAO() { }
-	public static DB_Insert_SrchRepPeptNrseqIdPosCrosslinkDAO getInstance() { return new DB_Insert_SrchRepPeptNrseqIdPosCrosslinkDAO(); }
+	private DB_Insert_SrchRepPeptProtSeqIdPosCrosslinkDAO() { }
+	public static DB_Insert_SrchRepPeptProtSeqIdPosCrosslinkDAO getInstance() { return new DB_Insert_SrchRepPeptProtSeqIdPosCrosslinkDAO(); }
 
 
-	private static final String INSERT_SQL = "INSERT INTO srch_rep_pept__nrseq_id_pos_crosslink "
+	private static final String INSERT_SQL = "INSERT INTO srch_rep_pept__prot_seq_id_pos_crosslink "
 
 			+ " ( search_id, reported_peptide_id, search_reported_peptide_peptide_id, "
-			+   " nrseq_id, nrseq_position )"
+			+   " protein_sequence_id, protein_sequence_position )"
 
 			+ " VALUES ( ?, ?, ?, ?, ? )";
 
@@ -37,7 +37,7 @@ public class DB_Insert_SrchRepPeptNrseqIdPosCrosslinkDAO {
 	 * @param item
 	 * @throws Exception
 	 */
-	public void save( SrchRepPeptNrseqIdPosCrosslinkDTO item ) throws Exception {
+	public void save( SrchRepPeptProtSeqIdPosCrosslinkDTO item ) throws Exception {
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -63,10 +63,10 @@ public class DB_Insert_SrchRepPeptNrseqIdPosCrosslinkDAO {
 			counter++;
 			pstmt.setInt( counter,  item.getSearchReportedPeptidepeptideId() );
 			counter++;
-			pstmt.setInt( counter,  item.getNrseqId() );
+			pstmt.setInt( counter,  item.getProteinSequenceId() );
 			
 			counter++;
-			pstmt.setInt( counter,  item.getNrseqPosition() );
+			pstmt.setInt( counter,  item.getProteinSequencePosition() );
 
 			pstmt.executeUpdate();
 

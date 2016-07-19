@@ -26,6 +26,7 @@ import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoff
 import org.yeastrc.proxl.import_xml_to_db.exceptions.PrintHelpOnlyException;
 import org.yeastrc.proxl.import_xml_to_db.importer_core_entry_point.ImporterCoreEntryPoint;
 import org.yeastrc.proxl.import_xml_to_db.objects.ImportResults;
+import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
@@ -83,7 +84,26 @@ public class ImporterDefaultMainProgramEntry {
 	 */
 	public static ImportResults importerDefaultMainProgramEntry( String[] args  ) throws Exception {
 		
+		ProxlInput proxlInputForImportParam = null;
 		
+		return importerDefaultMainProgramEntryPassingArgsAndProxlXMLObject( args, proxlInputForImportParam );
+	}
+	
+
+	/**
+	 * @param args
+	 * @return insertedSearchId
+	 * @throws Exception 
+	 */
+	public static ImportResults importerDefaultMainProgramEntryPassingArgsAndProxlXMLObject( 
+			
+			String[] args, 
+			ProxlInput proxlInputForImportParam
+			
+			) throws Exception {
+		
+		
+	
 		ImportResults importResults = new ImportResults();
 		
 		
@@ -608,10 +628,12 @@ public class ImporterDefaultMainProgramEntry {
 					ImporterCoreEntryPoint.getInstance().doImport( 
 							projectId, 
 							mainXMLFileToImport, 
+							proxlInputForImportParam,
 							scanFileList,
 							
 							dropPeptidePSMCutoffValues /* dropPeptidePSMCutoffValues */
 							);
+			
 
 			importResults.setSearchId( insertedSearchId );
 			

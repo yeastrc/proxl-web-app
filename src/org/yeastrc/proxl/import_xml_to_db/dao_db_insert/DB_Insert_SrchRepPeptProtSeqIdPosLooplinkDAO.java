@@ -7,28 +7,28 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
-import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptNrseqIdPosMonolinkDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosLooplinkDTO;
 
 
 /**
- * Monolink  
- *   
- * table srch_rep_pept__nrseq_id_pos_monolink
+ * Looplink
+ * 
+ * table srch_rep_pept__prot_seq_id_pos_looplink
  *
  */
-public class DB_Insert_SrchRepPeptNrseqIdPosMonolinkDAO {
+public class DB_Insert_SrchRepPeptProtSeqIdPosLooplinkDAO {
 
 
-	private static final Logger log = Logger.getLogger(DB_Insert_SrchRepPeptNrseqIdPosMonolinkDAO.class);
+	private static final Logger log = Logger.getLogger(DB_Insert_SrchRepPeptProtSeqIdPosLooplinkDAO.class);
 
-	private DB_Insert_SrchRepPeptNrseqIdPosMonolinkDAO() { }
-	public static DB_Insert_SrchRepPeptNrseqIdPosMonolinkDAO getInstance() { return new DB_Insert_SrchRepPeptNrseqIdPosMonolinkDAO(); }
+	private DB_Insert_SrchRepPeptProtSeqIdPosLooplinkDAO() { }
+	public static DB_Insert_SrchRepPeptProtSeqIdPosLooplinkDAO getInstance() { return new DB_Insert_SrchRepPeptProtSeqIdPosLooplinkDAO(); }
 
 
-	private static final String INSERT_SQL = "INSERT INTO srch_rep_pept__nrseq_id_pos_monolink "
+	private static final String INSERT_SQL = "INSERT INTO srch_rep_pept__prot_seq_id_pos_looplink "
 
 			+ " ( search_id, reported_peptide_id, search_reported_peptide_peptide_id, "
-			+   " peptide_position, nrseq_id, nrseq_position )"
+			+   " protein_sequence_id, protein_sequence_position_1, protein_sequence_position_2 )"
 
 			+ " VALUES ( ?, ?, ?, ?, ?, ? )";
 
@@ -37,7 +37,7 @@ public class DB_Insert_SrchRepPeptNrseqIdPosMonolinkDAO {
 	 * @param item
 	 * @throws Exception
 	 */
-	public void save( SrchRepPeptNrseqIdPosMonolinkDTO item ) throws Exception {
+	public void save( SrchRepPeptProtSeqIdPosLooplinkDTO item ) throws Exception {
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -62,15 +62,14 @@ public class DB_Insert_SrchRepPeptNrseqIdPosMonolinkDAO {
 			pstmt.setInt( counter,  item.getReportedPeptideId());
 			counter++;
 			pstmt.setInt( counter,  item.getSearchReportedPeptidepeptideId() );
+			counter++;
+			pstmt.setInt( counter,  item.getProteinSequenceId() );
 			
 			counter++;
-			pstmt.setInt( counter,  item.getPeptidePosition() );
-			
+			pstmt.setInt( counter,  item.getProteinSequencePosition_1() );
+
 			counter++;
-			pstmt.setInt( counter,  item.getNrseqId() );
-			
-			counter++;
-			pstmt.setInt( counter,  item.getNrseqPosition() );
+			pstmt.setInt( counter,  item.getProteinSequencePosition_2() );
 
 			pstmt.executeUpdate();
 

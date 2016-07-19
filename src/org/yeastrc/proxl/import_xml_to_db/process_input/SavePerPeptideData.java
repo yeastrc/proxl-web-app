@@ -3,17 +3,19 @@ package org.yeastrc.proxl.import_xml_to_db.process_input;
 
 // import org.apache.log4j.Logger;
 
-import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptNrseqIdPosMonolinkDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptProtSeqIdPosMonolinkDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptPeptDynamicModDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptPeptideDAO;
-import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptNrseqIdPosMonolinkDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosMonolinkDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
+import org.yeastrc.proxl.import_xml_to_db.objects.MonolinkContainer;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
+import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 
 /**
- * Save Per Peptide data: SrchRepPeptPeptideDTO, SrchRepPeptPeptDynamicModDTO, SrchRepPeptNrseqIdPosMonolinkDTO
+ * Save Per Peptide data: SrchRepPeptPeptideDTO, SrchRepPeptPeptDynamicModDTO, SrchRepPeptProtSeqIdPosMonolinkDTO
  *
  */
 public class SavePerPeptideData {
@@ -31,7 +33,7 @@ public class SavePerPeptideData {
 
 	
 	/**
-	 * Save SrchRepPeptPeptideDTO, SrchRepPeptPeptDynamicModDTO, SrchRepPeptNrseqIdPosMonolinkDTO
+	 * Save SrchRepPeptPeptideDTO, SrchRepPeptPeptDynamicModDTO, SrchRepPeptProtSeqIdPosMonolinkDTO
 	 * 
 	 * @param perPeptideData
 	 * @param searchId
@@ -69,15 +71,21 @@ public class SavePerPeptideData {
 			DB_Insert_SrchRepPeptPeptDynamicModDAO.getInstance().save( srchRepPeptPeptDynamicModDTO );
 		}
 		
-		//  Save SrchRepPeptNrseqIdPosMonolinkDTO
+		//  Save SrchRepPeptProtSeqIdPosMonolinkDTO
 		
-		for ( SrchRepPeptNrseqIdPosMonolinkDTO srchRepPeptNrseqIdPosMonolinkDTO : perPeptideData.getSrchRepPeptNrseqIdPosMonolinkDTOList() ) {
+		for ( MonolinkContainer monolinkContainer : perPeptideData.getMonolinkContainerList() ) {
 			
-			srchRepPeptNrseqIdPosMonolinkDTO.setSearchId( searchId );
-			srchRepPeptNrseqIdPosMonolinkDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
-			srchRepPeptNrseqIdPosMonolinkDTO.setSearchReportedPeptidepeptideId( searchReportedPeptidepeptideId );
+			SrchRepPeptProtSeqIdPosMonolinkDTO srchRepPeptProtSeqIdPosMonolinkDTO = monolinkContainer.getSrchRepPeptProtSeqIdPosMonolinkDTO();
+			ProteinImporterContainer proteinImporterContainer = monolinkContainer.getProteinImporterContainer();
 			
-			DB_Insert_SrchRepPeptNrseqIdPosMonolinkDAO.getInstance().save( srchRepPeptNrseqIdPosMonolinkDTO );
+			srchRepPeptProtSeqIdPosMonolinkDTO.setSearchId( searchId );
+			srchRepPeptProtSeqIdPosMonolinkDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
+			srchRepPeptProtSeqIdPosMonolinkDTO.setSearchReportedPeptidepeptideId( searchReportedPeptidepeptideId );
+			
+			srchRepPeptProtSeqIdPosMonolinkDTO.setProteinSequenceId( proteinImporterContainer.getProteinSequenceDTO().getId() );
+
+			
+			DB_Insert_SrchRepPeptProtSeqIdPosMonolinkDAO.getInstance().save( srchRepPeptProtSeqIdPosMonolinkDTO );
 		}
 	}
 		

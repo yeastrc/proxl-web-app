@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dto.NRProteinDTO;
-import org.yeastrc.xlink.dto.PeptideDTO;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
+import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
+import org.yeastrc.proxl.import_xml_to_db.utils.ProteinPositionUtils;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
-import org.yeastrc.xlink.utils.XLinkUtils;
 
 /**
  * 
@@ -39,23 +39,26 @@ public class GetLinkableProteinsAndPositions {
 	 * are found will be inclue (ie, no empty collections for protein keys)
 	 * 
 	 * @param peptide
-	 * @param position
+	 * @param peptidePosition
 	 * @param linker
 	 * @param peptideProteins
 	 * @return
 	 * @throws Exception
 	 */
-	public  Map<NRProteinDTO, Collection<Integer>> getLinkableProteinsAndPositions( 
-			PeptideDTO peptide, 
-			int position, 
+	public  Map<ProteinImporterContainer, Collection<Integer>> getLinkableProteinsAndPositions( 
+			String peptideSequence, 
+			int peptidePosition, 
 			List<ILinker> linkerList, 
-			Collection<NRProteinDTO> proteins ) throws Exception {
+			Collection<ProteinImporterContainer> proteinImporterContainerCollection ) throws Exception {
 		
-		Map<NRProteinDTO, Collection<Integer>> retMap = new HashMap<NRProteinDTO, Collection<Integer>>();
+		Map<ProteinImporterContainer, Collection<Integer>> results = new HashMap<>();
 		
-		for( NRProteinDTO protein : proteins ) {
+		for( ProteinImporterContainer proteinImporterContainer : proteinImporterContainerCollection ) {
 			
-			List<Integer> linkedPositions = XLinkUtils.getProteinPosition( protein, peptide, position );
+			String proteinSequence = proteinImporterContainer.getProteinSequenceDTO().getSequence();
+			
+			
+			List<Integer> linkedPositions = ProteinPositionUtils.getProteinPosition( proteinSequence, peptideSequence, peptidePosition );
 			
 			//  Get linkable positions for all the linkers
 			
@@ -63,7 +66,7 @@ public class GetLinkableProteinsAndPositions {
 			
 			for ( ILinker linker : linkerList ) {
 			
-				Collection<Integer> linkablePositionsCollectionForLinker = linker.getLinkablePositions( protein.getSequence() );
+				Collection<Integer> linkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
 				
 				linkablePositionsCollection.addAll( linkablePositionsCollectionForLinker );
 			}
@@ -72,29 +75,47 @@ public class GetLinkableProteinsAndPositions {
 			sortedLinkablePositions.addAll( linkablePositionsCollection );
 			Collections.sort( sortedLinkablePositions );
 			
-			for( int i = 0; i < linkedPositions.size(); i++ ) {
-				int linkedPosition = linkedPositions.get( i );
+			List<Integer> proteinPositionList = null;
+			
+			for( Integer linkedPosition : linkedPositions ) {
 				
 				if( Collections.binarySearch( sortedLinkablePositions, linkedPosition ) >= 0 ) {
-					if( !retMap.containsKey( protein ) ) {
-						retMap.put( protein, new ArrayList<Integer>() );
+					
+					if ( proteinPositionList == null ) {
+						
+						//  First position found, create list and put in map
+						
+						proteinPositionList = new ArrayList<>();
+						
+						Collection<Integer> proteinPositionListPrev =
+								results.put(proteinImporterContainer, proteinPositionList);
+						
+						if ( proteinPositionListPrev != null ) {
+							
+							String msg = "proteinImporterContainer already in map. protein sequence: "
+									+ proteinImporterContainer.getProteinSequenceDTO().getSequence();
+							log.error( msg );
+							throw new ProxlImporterInteralException(msg);
+						}
 					}
 					
-					retMap.get( protein ).add( linkedPosition );
+					proteinPositionList.add( linkedPosition );
 				} else {
 					
 					if ( log.isInfoEnabled() ) {
 
-						String msg = " Skipping link for protein " + protein.getNrseqId() + " for peptide " + peptide.getSequence() + " at position " +
-								position + " because it was not a linkable residue in the protein at position "+
-								linkedPosition + ".";
+						String msg = " Skipping link for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence() 
+								+ " for peptide " + peptideSequence 
+								+ " at position " + peptidePosition 
+								+ " because it was not a linkable residue in the protein at position "
+								+ linkedPosition + ".";
 						log.info( msg );
 					}
 				}
 			}
 		}
 		
-		return retMap;
+		return results;
 	}
 
 	
@@ -112,21 +133,21 @@ public class GetLinkableProteinsAndPositions {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<NRProteinDTO, Collection<List<Integer>>> getLinkableProteinsAndPositionsForLooplink( 
-			
-			PeptideDTO peptide, 
-			int position1, 
-			int position2, 
+	public  Map<ProteinImporterContainer, Collection<List<Integer>>> getLinkableProteinsAndPositionsForLooplink( 
+			String peptideSequence, 
+			int peptidePosition1, 
+			int peptidePosition2, 
 			List<ILinker> linkerList, 
-			
-			Collection<NRProteinDTO> proteins ) throws Exception {
-		
-		Map<NRProteinDTO, Collection<List<Integer>>> retMap = new HashMap<NRProteinDTO, Collection<List<Integer>>>();
-		
-		
-		for( NRProteinDTO protein : proteins ) {
+			Collection<ProteinImporterContainer> proteinImporterContainerCollection ) throws Exception {
 
-			List<List<Integer>> proteinPositions = XLinkUtils.getLooplinkProteinPosition( protein, peptide, position1, position2 );
+		Map<ProteinImporterContainer, Collection<List<Integer>>> results = new HashMap<>();
+		
+		for( ProteinImporterContainer proteinImporterContainer : proteinImporterContainerCollection ) {
+			
+			String proteinSequence = proteinImporterContainer.getProteinSequenceDTO().getSequence();
+						
+			List<List<Integer>> proteinPositions = 
+					ProteinPositionUtils.getLooplinkProteinPosition( proteinSequence, peptideSequence, peptidePosition1, peptidePosition2 );
 			
 			//  Get linkable positions for all the linkers
 			
@@ -134,7 +155,7 @@ public class GetLinkableProteinsAndPositions {
 			
 			for ( ILinker linker : linkerList ) {
 			
-				Collection<Integer> linkablePositionsCollectionForLinker = linker.getLinkablePositions( protein.getSequence() );
+				Collection<Integer> linkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
 				
 				linkablePositionsCollection.addAll( linkablePositionsCollectionForLinker );
 			}
@@ -143,31 +164,52 @@ public class GetLinkableProteinsAndPositions {
 			sortedLinkablePositions.addAll( linkablePositionsCollection );
 			Collections.sort( sortedLinkablePositions );
 			
+
+			List<List<Integer>> proteinPosition_1_2_List = null;
 			
-			for( int i = 0; i < proteinPositions.size(); i++ ) {
-				int linkedPosition1 = proteinPositions.get( i ).get( 0 );
-				int linkedPosition2 = proteinPositions.get( i ).get( 1 );
+			for( List<Integer> linkedPositions_1_2 : proteinPositions ) {
+			
+				int linkedPosition1 = linkedPositions_1_2.get( 0 );
+				int linkedPosition2 = linkedPositions_1_2.get( 1 );
 				
 				if( Collections.binarySearch( sortedLinkablePositions, linkedPosition1 ) >= 0 &&
 						Collections.binarySearch( sortedLinkablePositions, linkedPosition2 ) >= 0	) {
-					if( !retMap.containsKey( protein ) ) {
-						retMap.put( protein, new ArrayList<List<Integer>>() );
+
+					if ( proteinPosition_1_2_List == null ) {
+						
+						//  First position found, create list and put in map
+						
+						proteinPosition_1_2_List = new ArrayList<>();
+						
+						Object proteinPositionListPrev =
+								results.put(proteinImporterContainer, proteinPosition_1_2_List);
+						
+						if ( proteinPositionListPrev != null ) {
+							
+							String msg = "proteinImporterContainer already in map. protein sequence: "
+									+ proteinImporterContainer.getProteinSequenceDTO().getSequence();
+							log.error( msg );
+							throw new ProxlImporterInteralException(msg);
+						}
 					}
 					
-					List<Integer> pps = new ArrayList<Integer>( 2 );
-					pps.add( linkedPosition1 );
-					pps.add( linkedPosition2 );
+					List<Integer> proteinPositions_1_2_list = new ArrayList<Integer>( 2 );
+					proteinPositions_1_2_list.add( linkedPosition1 );
+					proteinPositions_1_2_list.add( linkedPosition2 );
 					
-					retMap.get( protein ).add( pps );
+					proteinPosition_1_2_List.add( proteinPositions_1_2_list );
+					
 				} else {
-					String msg = "Warning: Skipping looplink for protein " + protein.getNrseqId() + " for peptide " + peptide.getSequence() + " at positions " +
-								position1 + " and " + position2 + " because they were not linkable residues in the protein at positions "+
-								linkedPosition1 + " and " + linkedPosition2 + ".";
+					String msg = "Warning: Skipping looplink for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence()
+							+ " for peptide " + peptideSequence 
+							+ " at positions " + peptidePosition1 + " and " + peptidePosition2 
+							+ " because they were not linkable residues in the protein at positions "
+							+ linkedPosition1 + " and " + linkedPosition2 + ".";
 					log.warn( msg );
 				}
 			}
 		}
 		
-		return retMap;
+		return results;
 	}
 }

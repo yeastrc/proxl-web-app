@@ -2,27 +2,26 @@ package org.yeastrc.proxl.import_xml_to_db.dto;
 
 
 /**
- * Crosslink  (Half of a Crosslink)
+ * Unlinked or Dimer (Half of a Dimer)
  * 
- * table srch_rep_pept__nrseq_id_pos_crosslink
+ * table srch_rep_pept__prot_seq_id_unlinked_dimer
  *
  */
-public class SrchRepPeptNrseqIdPosCrosslinkDTO {
+public class SrchRepPeptProtSeqIdPosUnlinkedDimerDTO {
 
 	private int id;
 	private int searchId;
 	private int reportedPeptideId;
 	private int searchReportedPeptidepeptideId;
-	private int nrseqId;
-	private int nrseqPosition;
+	private int proteinSequenceId;
 	
 	@Override
 	public String toString() {
-		return "SrchRepPeptNrseqIdPosCrosslinkDTO [id=" + id + ", searchId="
-				+ searchId + ", reportedPeptideId=" + reportedPeptideId
-				+ ", searchReportedPeptidepeptideId="
-				+ searchReportedPeptidepeptideId + ", nrseqId=" + nrseqId
-				+ ", nrseqPosition=" + nrseqPosition + "]";
+		return "SrchRepPeptProteinSequenceIdPosUnlinkedDimerDTO [id=" + id
+				+ ", searchId=" + searchId + ", reportedPeptideId="
+				+ reportedPeptideId + ", searchReportedPeptidepeptideId="
+				+ searchReportedPeptidepeptideId + ", proteinSequenceId=" + proteinSequenceId
+				+ "]";
 	}
 	
 	
@@ -50,17 +49,13 @@ public class SrchRepPeptNrseqIdPosCrosslinkDTO {
 	public void setSearchReportedPeptidepeptideId(int searchReportedPeptidepeptideId) {
 		this.searchReportedPeptidepeptideId = searchReportedPeptidepeptideId;
 	}
-	public int getNrseqId() {
-		return nrseqId;
+	public int getProteinSequenceId() {
+		return proteinSequenceId;
 	}
-	public void setNrseqId(int nrseqId) {
-		this.nrseqId = nrseqId;
+	public void setProteinSequenceId(int proteinSequenceId) {
+		this.proteinSequenceId = proteinSequenceId;
 	}
-	public int getNrseqPosition() {
-		return nrseqPosition;
-	}
-	public void setNrseqPosition(int nrseqPosition) {
-		this.nrseqPosition = nrseqPosition;
-	}
+
+
 		
 }

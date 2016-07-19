@@ -1,7 +1,6 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +19,6 @@ import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.process_scans.Process_MzML_MzXml_File;
 import org.yeastrc.proxl_import.api.xml_dto.CrosslinkMass;
 import org.yeastrc.proxl_import.api.xml_dto.CrosslinkMasses;
-import org.yeastrc.proxl_import.api.xml_dto.DecoyLabel;
-import org.yeastrc.proxl_import.api.xml_dto.DecoyLabels;
 import org.yeastrc.proxl_import.api.xml_dto.Linker;
 import org.yeastrc.proxl_import.api.xml_dto.Linkers;
 import org.yeastrc.proxl_import.api.xml_dto.MonolinkMass;
@@ -68,7 +65,6 @@ public class ProcessProxlInput {
 	 * @param projectId
 	 * @param proxlInput
 	 * @param scanFileList
-	 * @param nrseqDatabaseId
 	 * @return
 	 * @throws Exception
 	 */
@@ -79,8 +75,6 @@ public class ProcessProxlInput {
 			List<File> scanFileList,
 			
 			String importDirectory,
-			
-			int nrseqDatabaseId,
 			
 
 			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues
@@ -219,30 +213,6 @@ public class ProcessProxlInput {
 				}
 			}
 			
-			//  create String list of decoy prefixes
-			
-			
-			List<String> proteinNameDecoyPrefixList = new ArrayList<>();
-			
-			
-			DecoyLabels decoyLabels = proxlInput.getDecoyLabels();
-			
-			if ( decoyLabels != null ) {
-				
-				List<DecoyLabel> decoyLabelList = decoyLabels.getDecoyLabel();
-				
-				if ( decoyLabelList != null && ( ! decoyLabelList.isEmpty() ) ) {
-					
-					for ( DecoyLabel decoyLabel : decoyLabelList ) {
-					
-						String decoyLabelPrefixString = decoyLabel.getPrefix();
-						
-						proteinNameDecoyPrefixList.add( decoyLabelPrefixString );
-					}
-				}
-			}
-			
-			
 
 			Map<String, SearchProgramEntry> searchProgramEntryMap =
 					ProcessSearchProgramEntries.getInstance()
@@ -253,8 +223,6 @@ public class ProcessProxlInput {
 
 			ProcessReportedPeptidesAndPSMs.getInstance().processReportedPeptides( 
 					proxlInput, 
-					nrseqDatabaseId, 
-					proteinNameDecoyPrefixList, 
 					searchDTO, 
 
 					dropPeptidePSMCutoffValues,

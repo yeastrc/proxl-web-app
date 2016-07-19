@@ -2,10 +2,9 @@ package org.yeastrc.proxl.import_xml_to_db.objects;
 
 import java.util.List;
 
-import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptNrseqIdPosMonolinkDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
-import org.yeastrc.xlink.dto.PeptideDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.PeptideDTO;
 
 
 /**
@@ -14,7 +13,7 @@ import org.yeastrc.xlink.dto.PeptideDTO;
  * Data from processing Peptide data.
  *
  * All of these entries will be updated with the IDs in other objects before they are saved 
- * on a per PSM basis
+ * on a per Reported Peptide basis
  * 
  */
 public class PerPeptideData {
@@ -22,22 +21,36 @@ public class PerPeptideData {
 	private PeptideDTO peptideDTO;
 
 	private SrchRepPeptPeptideDTO srchRepPeptPeptideDTO;
-	
+		
 	private List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_Peptide;
 	
 	private List<Integer> monolinkPositionList;
 	
-	private List<SrchRepPeptNrseqIdPosMonolinkDTO> srchRepPeptNrseqIdPosMonolinkDTOList;
+	private List<MonolinkContainer> monolinkContainerList;
+	
+	/**
+	 * Only maps to 1 protein
+	 */
+	private boolean peptideIdMapsToOnlyOneProtein;
 	
 
-	public List<SrchRepPeptNrseqIdPosMonolinkDTO> getSrchRepPeptNrseqIdPosMonolinkDTOList() {
-		return srchRepPeptNrseqIdPosMonolinkDTOList;
+	/**
+	 * Only maps to 1 protein
+	 * @return
+	 */
+	public boolean isPeptideIdMapsToOnlyOneProtein() {
+		return peptideIdMapsToOnlyOneProtein;
 	}
 
-	public void setSrchRepPeptNrseqIdPosMonolinkDTOList(
-			List<SrchRepPeptNrseqIdPosMonolinkDTO> srchRepPeptNrseqIdPosMonolinkDTOList) {
-		this.srchRepPeptNrseqIdPosMonolinkDTOList = srchRepPeptNrseqIdPosMonolinkDTOList;
+	/**
+	 * Only maps to 1 protein
+	 * 
+	 * @param peptideIdMapsToOnlyOneProtein
+	 */
+	public void setPeptideIdMapsToOnlyOneProtein(boolean peptideIdMapsToOnlyOneProtein) {
+		this.peptideIdMapsToOnlyOneProtein = peptideIdMapsToOnlyOneProtein;
 	}
+
 
 	public PeptideDTO getPeptideDTO() {
 		return peptideDTO;
@@ -70,6 +83,15 @@ public class PerPeptideData {
 
 	public void setSrchRepPeptPeptideDTO(SrchRepPeptPeptideDTO srchRepPeptPeptideDTO) {
 		this.srchRepPeptPeptideDTO = srchRepPeptPeptideDTO;
+	}
+
+	public List<MonolinkContainer> getMonolinkContainerList() {
+		return monolinkContainerList;
+	}
+
+	public void setMonolinkContainerList(
+			List<MonolinkContainer> monolinkContainerList) {
+		this.monolinkContainerList = monolinkContainerList;
 	}
 	
 	

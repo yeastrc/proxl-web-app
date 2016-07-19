@@ -19,8 +19,8 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 
 	private static Logger log = Logger.getLogger(ImportDBConnectionFactory.class);
 	
-	private static final int MAX_TOTAL_OTHER_DB_CONNECTIONS = 1;
-	private static final int MAX_TOTAL_NRSEQ_DB_CONNECTIONS = 1;
+	private static final int MAX_TOTAL_OTHER_DB_CONNECTIONS = 2;
+//	private static final int MAX_TOTAL_NRSEQ_DB_CONNECTIONS = 1;
 	private static final int MAX_TOTAL_PROXL_DB_CONNECTIONS = 2;
 	
 	
@@ -224,19 +224,19 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 					|| ( dbConnectionParametersProvider.getProxlDbName() != null 
 						&& dbConnectionParametersProvider.getProxlDbName().equals( db ) ) ) ) {
 				
-				if ( DBConnectionFactory.YRC_NRSEQ.equals(db) 
-						|| ( dbConnectionParametersProvider.getNrseqDbName() != null 
-								&& dbConnectionParametersProvider.getNrseqDbName().equals( db ) ) ) {
-					
-					maxDBConnections = MAX_TOTAL_NRSEQ_DB_CONNECTIONS;
-					
-					maxOpenPreparedStatements = 10;
-				} else {
+//				if ( DBConnectionFactory.YRC_NRSEQ.equals(db) 
+//						|| ( dbConnectionParametersProvider.getNrseqDbName() != null 
+//								&& dbConnectionParametersProvider.getNrseqDbName().equals( db ) ) ) {
+//					
+//					maxDBConnections = MAX_TOTAL_NRSEQ_DB_CONNECTIONS;
+//					
+//					maxOpenPreparedStatements = 10;
+//				} else {
 					
 					maxDBConnections = MAX_TOTAL_OTHER_DB_CONNECTIONS;
 					
 					maxOpenPreparedStatements = 1;
-				}
+//				}
 				
 			}
 

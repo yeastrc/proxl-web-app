@@ -15,15 +15,16 @@ import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant;
-import org.yeastrc.proxl.import_xml_to_db.dao.FASTADatabaseLookup;
 import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMPopulateFilterDirection;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.PrintHelpOnlyException;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProxlInputObjectContainer;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateAnnotationTypeRecords;
+import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateMatchedProteinSection;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateScanFilenamesInXMLAreOnCommandLine;
 import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput;
 import org.yeastrc.proxl.import_xml_to_db.project_importable_validation.IsImportingAllowForProject;
@@ -64,6 +65,9 @@ public class ImporterCoreEntryPoint {
 			
 			int projectId,
 			File mainXMLFileToImport,
+			
+			ProxlInput proxlInputForImportParam,
+			
 			List<File> scanFileList,
 			
 			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues
@@ -71,6 +75,11 @@ public class ImporterCoreEntryPoint {
 			) throws Exception {
 
 		ProxlInput proxlInputForImport = null;
+		
+		if ( proxlInputForImportParam != null ) {
+			
+			proxlInputForImport = proxlInputForImportParam;
+		}
 
 		String importDirectory = null; 
 		
@@ -103,33 +112,36 @@ public class ImporterCoreEntryPoint {
 			throw e;
 		}
 		
+		
+		if ( proxlInputForImport == null ) {
 
-		//  Unmarshall the main import file
+			//  main import file not provided as an object so unmarshall the file
 
 
-		InputStream inputStream = null;
+			InputStream inputStream = null;
 
-		try {
+			try {
 
-			inputStream = new FileInputStream( mainXMLFileToImport );
+				inputStream = new FileInputStream( mainXMLFileToImport );
 
-			proxlInputForImport = deserializeProxlInputFromInputStream( inputStream );
+				proxlInputForImport = deserializeProxlInputFromInputStream( inputStream );
 
-		} catch ( Exception e ) {
+			} catch ( Exception e ) {
 
-			System.out.println( "Exception in deserializing the primary input XML file" );
-			System.err.println( "Exception in deserializing the primary input XML file" );
+				System.out.println( "Exception in deserializing the primary input XML file" );
+				System.err.println( "Exception in deserializing the primary input XML file" );
 
-			e.printStackTrace( System.out );
-			e.printStackTrace( System.err );
+				e.printStackTrace( System.out );
+				e.printStackTrace( System.err );
 
-			throw e;
-			
-		} finally {
+				throw e;
 
-			if ( inputStream != null ) {
+			} finally {
 
-				inputStream.close();
+				if ( inputStream != null ) {
+
+					inputStream.close();
+				}
 			}
 		}
 		
@@ -266,6 +278,17 @@ public class ImporterCoreEntryPoint {
 		
 		ProxlInput proxlInputForImport = proxlInputObjectContainer.getProxlInput();
 		
+		
+		if ( proxlInputForImport.getMatchedProteins() == null ) {
+		
+			String msg = "<matched_proteins> is not populated.";
+			
+			log.error( msg );
+			
+			throw new ProxlImporterDataException(msg);
+		}
+		
+		///////////
 
 		if ( dropPeptidePSMCutoffValues == null ) {
 			
@@ -302,6 +325,8 @@ public class ImporterCoreEntryPoint {
 			ValidateAnnotationTypeRecords.getInstance().validateAnnotationTypeRecords( proxlInputForImport );
 
 			
+			//   Throws Exception if data error found
+			ValidateMatchedProteinSection.getInstance().validateMatchedProteinSection( proxlInputForImport );
 			
 
 			//   Throws Exception if data error found
@@ -309,28 +334,6 @@ public class ImporterCoreEntryPoint {
 
 			//   Throws Exception if data error found
 			DropPeptidePSMPopulateFilterDirection.getInstance().populateFilterDirection( dropPeptidePSMCutoffValues, proxlInputForImport );
-
-			
-			String fastaFilename = proxlInputForImport.getFastaFilename();
-
-
-			//  Confirm Fasta file is in the YRC_NRSEQ DB
-
-			int nrseqDatabaseId = 0;
-
-
-			try {
-				//  throws Exception if fasta filename is not found
-				nrseqDatabaseId = FASTADatabaseLookup.getInstance().lookupDatabase( fastaFilename );
-			} catch( Exception e ) {
-				System.err.println( "Could not find a parsed FASTA file named: " + fastaFilename );
-				System.err.println( "Error: " + e.getMessage() );
-				System.err.println( "Is the name correct? Has it been parsed?" );
-
-				throw e;
-			}
-
-			
 			
 
 			//  Process proxl Input
@@ -344,7 +347,6 @@ public class ImporterCoreEntryPoint {
 							proxlInputForImport, 
 							scanFileList, 
 							importDirectory, 
-							nrseqDatabaseId, 
 							dropPeptidePSMCutoffValues
 							 );
 

@@ -31,6 +31,7 @@ import org.yeastrc.proxl.import_xml_to_db.unified_reported_peptide.main.InsertIf
 import org.yeastrc.proxl_import.api.xml_dto.LinkType;
 import org.yeastrc.proxl_import.api.xml_dto.Linker;
 import org.yeastrc.proxl_import.api.xml_dto.Linkers;
+import org.yeastrc.proxl_import.api.xml_dto.MatchedProteins;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.Peptides;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
@@ -52,9 +53,7 @@ import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
-import org.yeastrc.proxl.import_xml_to_db.searchers.PeptideUniqueSearcher;
 import org.yeastrc.xlink.utils.XLinkUtils;
-import org.yeastrc.xlink.utils.YRC_NRSEQUtils;
 
 
 /**
@@ -76,10 +75,9 @@ public class ProcessReportedPeptidesAndPSMs {
 	}
 
 
+
 	/**
 	 * @param proxlInput
-	 * @param nrseqDatabaseId
-	 * @param proteinNameDecoyPrefixList
 	 * @param search
 	 * @param dropPeptidePSMCutoffValues
 	 * @param searchProgramEntryMap
@@ -89,8 +87,6 @@ public class ProcessReportedPeptidesAndPSMs {
 	public void processReportedPeptides( 
 
 			ProxlInput proxlInput, 
-			int nrseqDatabaseId, 
-			List<String> proteinNameDecoyPrefixList, 
 			 
 			SearchDTO search,
 			
@@ -102,9 +98,11 @@ public class ProcessReportedPeptidesAndPSMs {
 
 		int searchId = search.getId();
 		
-		int fastaFileDatabaseId = 
-				YRC_NRSEQUtils.getDatabaseIdFromName( search.getFastaFilename() );
-
+		
+		// Put MatchedProteins in Singleton class GetProteinsForPeptides
+		MatchedProteins matchedProteinsFromProxlXML = proxlInput.getMatchedProteins();
+		GetProteinsForPeptide.getInstance().setMatchedProteinsFromProxlXML( matchedProteinsFromProxlXML );
+		
 		
 		Linkers proxlInputLinkers = proxlInput.getLinkers();
 
@@ -163,7 +161,6 @@ public class ProcessReportedPeptidesAndPSMs {
 		//////////////
 
 
-
 		ReportedPeptides reportedPeptides = proxlInput.getReportedPeptides();
 
 		if ( reportedPeptides != null ) {
@@ -181,10 +178,7 @@ public class ProcessReportedPeptidesAndPSMs {
 					
 					processSingleReportedPeptide( 
 							reportedPeptide, 
-							nrseqDatabaseId, 
-							proteinNameDecoyPrefixList, 
 							searchId, 
-							fastaFileDatabaseId,
 							linkerList, 
 							linkerListStringForErrorMsgs, 
 							dropPeptidePSMCutoffValues, 
@@ -198,8 +192,6 @@ public class ProcessReportedPeptidesAndPSMs {
 				insertUniqueDynamicModMassesForTheSearch( uniqueDynamicModMassesForTheSearch, searchId );
 			}
 		}
-		
-		
 		
 	}
 	
@@ -217,26 +209,26 @@ public class ProcessReportedPeptidesAndPSMs {
 		}	
 	}
 	
+	
+	
 	/**
 	 * @param reportedPeptide
-	 * @param nrseqDatabaseId
-	 * @param proteinNameDecoyPrefixList
 	 * @param searchId
 	 * @param linkerList
 	 * @param linkerListStringForErrorMsgs
 	 * @param dropPeptidePSMCutoffValues
 	 * @param searchProgramEntryMap
+	 * @param filterableReportedPeptideAnnotationTypesOnId
+	 * @param filterablePsmAnnotationTypesOnId
 	 * @param mapOfScanFilenamesMapsOfScanNumbersToScanIds
+	 * @param uniqueDynamicModMassesForTheSearch
 	 * @throws Exception
 	 */
 	private void processSingleReportedPeptide(
 			
 			ReportedPeptide reportedPeptide,
 			
-			int nrseqDatabaseId, 
-			List<String> proteinNameDecoyPrefixList, 
 			int searchId, 
-			int fastaFileDatabaseId,
 
 			
 			List<ILinker> linkerList,
@@ -315,9 +307,7 @@ public class ProcessReportedPeptidesAndPSMs {
 					.getCrosslinkProteinMappings( 
 							reportedPeptide, 				// from XML input 
 							linkerList, 
-							linkerListStringForErrorMsgs, 
-							proteinNameDecoyPrefixList, 
-							nrseqDatabaseId );
+							linkerListStringForErrorMsgs );
 
 			if ( getCrosslinkProteinMappingsResult.isNoProteinMappings() ) {
 
@@ -331,9 +321,7 @@ public class ProcessReportedPeptidesAndPSMs {
 					.getLooplinkroteinMappings( 
 							reportedPeptide, 				// from XML input 
 							linkerList, 
-							linkerListStringForErrorMsgs, 
-							proteinNameDecoyPrefixList, 
-							nrseqDatabaseId );
+							linkerListStringForErrorMsgs );
 
 			if ( getLooplinkProteinMappingsResult.isNoProteinMappings() ) {
 
@@ -344,7 +332,7 @@ public class ProcessReportedPeptidesAndPSMs {
 		} else if ( linkTypeNumber == XLinkUtils.TYPE_UNLINKED ) {
 
 			getProteinMappings_For_XML_LinkType_Unlinked_Result =
-					getProteinMappings_For_XML_LinkType_Unlinked( reportedPeptide, proteinNameDecoyPrefixList, nrseqDatabaseId, linkerList, linkerListStringForErrorMsgs) ;
+					getProteinMappings_For_XML_LinkType_Unlinked( reportedPeptide, linkerList, linkerListStringForErrorMsgs) ;
 
 			if ( getProteinMappings_For_XML_LinkType_Unlinked_Result.noProteinMappings ) {
 
@@ -462,7 +450,6 @@ public class ProcessReportedPeptidesAndPSMs {
 		
 		
 		saveUnifiedReportedPeptideAndPsmAndReportedPeptideLookupRecords( 
-				fastaFileDatabaseId,
 				searchId,
 				reportedPeptideId,
 				linkTypeNumber, 
@@ -470,6 +457,7 @@ public class ProcessReportedPeptidesAndPSMs {
 				psmStatisticsAndBestValues, 
 				perPeptideDataList,
 				filterableReportedPeptideAnnotationTypesOnId );
+		
 	}
 
 	
@@ -484,8 +472,6 @@ public class ProcessReportedPeptidesAndPSMs {
 	 * @throws Exception
 	 */
 	private void saveUnifiedReportedPeptideAndPsmAndReportedPeptideLookupRecords( 
-			
-			int fastaFileDatabaseId,
 			
 			int searchId,
 			int reportedPeptideId,
@@ -514,7 +500,7 @@ public class ProcessReportedPeptidesAndPSMs {
 
 		for ( PerPeptideData perPeptideData : perPeptideDataList ) {
 
-			if ( ! PeptideUniqueSearcher.getInstance().isPeptideUniqueForDatabaseId( perPeptideData.getPeptideDTO().getId(), fastaFileDatabaseId ) ) {
+			if ( ! perPeptideData.isPeptideIdMapsToOnlyOneProtein() ) {
 			
 				allRelatedPeptidesUniqueForSearch = false;
 			}
@@ -617,6 +603,7 @@ public class ProcessReportedPeptidesAndPSMs {
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setReportedPeptideId( reportedPeptideId );
 
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setAllRelatedPeptidesUniqueForSearch( allRelatedPeptidesUniqueForSearch );
+		
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setHasDynamicModifications( hasDynamicModifications );
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setHasMonolinks( hasMonolinks );
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setLinkType( linkTypeNumber );
@@ -686,8 +673,6 @@ public class ProcessReportedPeptidesAndPSMs {
 
 	/**
 	 * @param reportedPeptide
-	 * @param proteinNameDecoyPrefixList
-	 * @param nrseqDatabaseId
 	 * @param linkerList
 	 * @param linkerListStringForErrorMsgs
 	 * @return
@@ -697,9 +682,6 @@ public class ProcessReportedPeptidesAndPSMs {
 
 			ReportedPeptide reportedPeptide, 
 
-			List<String> proteinNameDecoyPrefixList,
-
-			int nrseqDatabaseId,
 			List<ILinker> linkerList,
 			String linkerListStringForErrorMsgs
 			) throws Exception {
@@ -736,9 +718,7 @@ public class ProcessReportedPeptidesAndPSMs {
 					.getUnlinkedroteinMappings( 
 							reportedPeptide, 
 							linkerList, 
-							linkerListStringForErrorMsgs, 
-							proteinNameDecoyPrefixList, 
-							nrseqDatabaseId );
+							linkerListStringForErrorMsgs );
 
 			if ( getProteinMappings_For_XML_LinkType_Unlinked_Result.getUnlinkedProteinMappingsResult.isNoProteinMappings() ) {
 
@@ -754,9 +734,7 @@ public class ProcessReportedPeptidesAndPSMs {
 					.getDimerProteinMappings( 
 							reportedPeptide, 
 							linkerList, 
-							linkerListStringForErrorMsgs, 
-							proteinNameDecoyPrefixList, 
-							nrseqDatabaseId );
+							linkerListStringForErrorMsgs );
 
 			if ( getProteinMappings_For_XML_LinkType_Unlinked_Result.getDimerProteinMappingsResult.isNoProteinMappings() ) {
 

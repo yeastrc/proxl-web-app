@@ -4,29 +4,28 @@ package org.yeastrc.proxl.import_xml_to_db.dto;
 /**
  * Monolink
  * 
- * table srch_rep_pept__nrseq_id_pos_monolink
+ * table srch_rep_pept__prot_seq_id_pos_monolink
  *
  */
-public class SrchRepPeptNrseqIdPosMonolinkDTO {
+public class SrchRepPeptProtSeqIdPosMonolinkDTO {
 
 	private int id;
 	private int searchId;
 	private int reportedPeptideId;
 	private int searchReportedPeptidepeptideId;
 	private int peptidePosition;
-	private int nrseqId;
-	private int nrseqPosition;
+	private int proteinSequenceId;
+	private int proteinSequencePosition;
 	
 	@Override
 	public String toString() {
-		return "SrchRepPeptNrseqIdPosMonolinkDTO [id=" + id + ", searchId="
+		return "SrchRepPeptProteinSequenceIdPosMonolinkDTO [id=" + id + ", searchId="
 				+ searchId + ", reportedPeptideId=" + reportedPeptideId
 				+ ", searchReportedPeptidepeptideId="
 				+ searchReportedPeptidepeptideId + ", peptidePosition="
-				+ peptidePosition + ", nrseqId=" + nrseqId + ", nrseqPosition="
-				+ nrseqPosition + "]";
+				+ peptidePosition + ", proteinSequenceId=" + proteinSequenceId
+				+ ", proteinSequencePosition=" + proteinSequencePosition + "]";
 	}
-
 	
 	public int getId() {
 		return id;
@@ -52,23 +51,24 @@ public class SrchRepPeptNrseqIdPosMonolinkDTO {
 	public void setSearchReportedPeptidepeptideId(int searchReportedPeptidepeptideId) {
 		this.searchReportedPeptidepeptideId = searchReportedPeptidepeptideId;
 	}
-	public int getNrseqId() {
-		return nrseqId;
-	}
-	public void setNrseqId(int nrseqId) {
-		this.nrseqId = nrseqId;
-	}
-	public int getNrseqPosition() {
-		return nrseqPosition;
-	}
-	public void setNrseqPosition(int nrseqPosition) {
-		this.nrseqPosition = nrseqPosition;
-	}
 	public int getPeptidePosition() {
 		return peptidePosition;
 	}
 	public void setPeptidePosition(int peptidePosition) {
 		this.peptidePosition = peptidePosition;
 	}
+	public int getProteinSequenceId() {
+		return proteinSequenceId;
+	}
+	public void setProteinSequenceId(int proteinSequenceId) {
+		this.proteinSequenceId = proteinSequenceId;
+	}
+	public int getProteinSequencePosition() {
+		return proteinSequencePosition;
+	}
+	public void setProteinSequencePosition(int proteinSequencePosition) {
+		this.proteinSequencePosition = proteinSequencePosition;
+	}
+
 		
 }
