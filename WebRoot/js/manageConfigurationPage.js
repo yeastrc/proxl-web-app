@@ -55,133 +55,131 @@ var getListConfigurationResponse = function(requestData, responseData) {
 
 	var configList = responseData.configList;
 	
-	var $config_key_footer_center_of_page_html = $( "#config_key_footer_center_of_page_html" );
-	var $config_key_email_from_address = $( "#config_key_email_from_address" );
-	var $config_key_email_smtp_server_url = $( "#config_key_email_smtp_server_url" );
-	var $config_key_protein_annotation_webservice_url = $( "#config_key_protein_annotation_webservice_url" );
-	var $config_key_protein_listing_from_sequence_taxonomy_webservice_url = $( "#config_key_protein_listing_from_sequence_taxonomy_webservice_url" );
-	var $config_key_google_analytics_tracking_code = $( "#config_key_google_analytics_tracking_code" );
+	//  Process text inputs
 	
-	var config_key_footer_center_of_page_html_Val = $config_key_footer_center_of_page_html.val();
-	var config_key_email_from_address_Val = $config_key_email_from_address.val();
-	var config_key_email_smtp_server_url_Val = $config_key_email_smtp_server_url.val();
-	var config_key_protein_annotation_webservice_url_Val = $config_key_protein_annotation_webservice_url.val();
-	var config_key_protein_listing_from_sequence_taxonomy_webservice_url_Val = $config_key_protein_listing_from_sequence_taxonomy_webservice_url.val();
-	var config_key_google_analytics_tracking_code_Val = $config_key_google_analytics_tracking_code.val();
+	var $config_text_inputs_jq = $(".config_text_inputs_jq");
 	
-	
-	var $input_footer_center_of_page_html = $( "#input_footer_center_of_page_html" );
-	var $input_email_from_address = $( "#input_email_from_address" );
-	var $input_email_smtp_server_url = $( "#input_email_smtp_server_url" );
-	var $input_protein_annotation_webservice_url = $( "#input_protein_annotation_webservice_url" );
-	var $input_protein_listing_from_sequence_taxonomy_webservice_url = $( "#input_protein_listing_from_sequence_taxonomy_webservice_url" );
-	var $input_google_analytics_tracking_code = $( "#input_google_analytics_tracking_code" );
-
-	for ( var configListIndex = 0; configListIndex < configList.length; configListIndex++ ) {
-	
-		var configListItem = configList[ configListIndex ];
+	$config_text_inputs_jq.each( function( index, element ) {
 		
-		if ( configListItem.configKey === config_key_footer_center_of_page_html_Val ) {
-			
-			$input_footer_center_of_page_html.val( configListItem.configValue );
-			
-		} else if ( configListItem.configKey === config_key_email_from_address_Val ) {
-			
-			$input_email_from_address.val( configListItem.configValue );
-			
-		} else if ( configListItem.configKey === config_key_email_smtp_server_url_Val ) {
-			
-			$input_email_smtp_server_url.val( configListItem.configValue );
-			
+		var $configTextInput = $( this );
+		
+		var configKeyForInput = $configTextInput.attr("data-config-key");
+		
+//		var foundConfigValueForField = false;
 
-		} else if ( configListItem.configKey === config_key_protein_annotation_webservice_url_Val ) {
-			
-			$input_protein_annotation_webservice_url.val( configListItem.configValue );
+		for ( var configListIndex = 0; configListIndex < configList.length; configListIndex++ ) {
 
-		} else if ( configListItem.configKey === config_key_protein_listing_from_sequence_taxonomy_webservice_url_Val ) {
-			
-			$input_protein_listing_from_sequence_taxonomy_webservice_url.val( configListItem.configValue );
+			var configListItem = configList[ configListIndex ];
 
-		} else if ( configListItem.configKey === config_key_google_analytics_tracking_code_Val ) {
-			
-			$input_google_analytics_tracking_code.val( configListItem.configValue );
+			if ( configListItem.configKey === configKeyForInput ) {
+
+				$configTextInput.val( configListItem.configValue );
+				
+//				foundConfigValueForField = true;
+			}
 		}
-		
-	}
+	} );
+	
+	//  Process checkbox inputs
 
+	var $config_checkbox_inputs_jq = $(".config_checkbox_inputs_jq");
+	
+	$config_checkbox_inputs_jq.each( function( index, element ) {
+		
+		var $configCheckboxInput = $( this );
+		
+		var configKeyForInput = $configCheckboxInput.attr("data-config-key");
+		
+//		var foundConfigValueForField = false;
+
+		for ( var configListIndex = 0; configListIndex < configList.length; configListIndex++ ) {
+
+			var configListItem = configList[ configListIndex ];
+
+			if ( configListItem.configKey === configKeyForInput ) {
+
+				var dataValueChecked = $configCheckboxInput.attr("data-value-checked");
+//				var dataValueNOTChecked = $configCheckboxInput.attr("data-value-not-checked");
+				
+				if ( configListItem.configValue === dataValueChecked ) {
+					
+					$configCheckboxInput.prop( "checked", true );
+					
+				} else {
+					
+					$configCheckboxInput.prop( "checked", false );
+				}
+				
+//				foundConfigValueForField = true;
+			}
+		}
+	} );
 };
 
 
 function saveListConfiguration() {
 
 
-	var $config_key_footer_center_of_page_html = $( "#config_key_footer_center_of_page_html" );
-	var $config_key_email_from_address = $( "#config_key_email_from_address" );
-	var $config_key_email_smtp_server_url = $( "#config_key_email_smtp_server_url" );
-	var $config_key_protein_annotation_webservice_url = $( "#config_key_protein_annotation_webservice_url" );
-	var $config_key_protein_listing_from_sequence_taxonomy_webservice_url = $( "#config_key_protein_listing_from_sequence_taxonomy_webservice_url" );
-	var $config_key_google_analytics_tracking_code = $( "#config_key_google_analytics_tracking_code" );
-	
-	var config_key_footer_center_of_page_html_Val = $config_key_footer_center_of_page_html.val();
-	var config_key_email_from_address_Val = $config_key_email_from_address.val();
-	var config_key_email_smtp_server_url_Val = $config_key_email_smtp_server_url.val();
-	var config_key_protein_annotation_webservice_url_Val = $config_key_protein_annotation_webservice_url.val();
-	var config_key_protein_listing_from_sequence_taxonomy_webservice_url_Val = $config_key_protein_listing_from_sequence_taxonomy_webservice_url.val();
-	var config_key_google_analytics_tracking_code_Val = $config_key_google_analytics_tracking_code.val();
-	
-	
-	var $input_footer_center_of_page_html = $( "#input_footer_center_of_page_html" );
-	var $input_email_from_address = $( "#input_email_from_address" );
-	var $input_email_smtp_server_url = $( "#input_email_smtp_server_url" );
-	var $input_protein_annotation_webservice_url = $( "#input_protein_annotation_webservice_url" );
-	var $input_protein_listing_from_sequence_taxonomy_webservice_url = $( "#input_protein_listing_from_sequence_taxonomy_webservice_url" );
-	var $input_google_analytics_tracking_code = $( "#input_google_analytics_tracking_code" );
-
-	
-	var input_footer_center_of_page_html_Val = $input_footer_center_of_page_html.val();
-	var input_email_from_address_Val = $input_email_from_address.val();
-	var input_email_smtp_server_url_Val = $input_email_smtp_server_url.val();
-	var input_protein_annotation_webservice_url_Val = $input_protein_annotation_webservice_url.val();
-	var input_protein_listing_from_sequence_taxonomy_webservice_url_Val = $input_protein_listing_from_sequence_taxonomy_webservice_url.val();
-	var input_google_analytics_tracking_code_Val = $input_google_analytics_tracking_code.val();
-
-	
-
 	var configList = [];
 	
-	var configListItem;
 	
+	var input_footer_center_of_page_html_Val = null;
 	
-	configListItem = { 
-			configKey: config_key_footer_center_of_page_html_Val,
-			configValue : input_footer_center_of_page_html_Val };
-	configList.push( configListItem );
+
+	//  Process text inputs
 	
-	configListItem = {
-			configKey: config_key_email_from_address_Val,
-			configValue : input_email_from_address_Val };
-	configList.push( configListItem );
-
-	configListItem = { 
-			configKey: config_key_email_smtp_server_url_Val,
-			configValue : input_email_smtp_server_url_Val };
-	configList.push( configListItem );
-
-	configListItem = { 
-			configKey: config_key_protein_annotation_webservice_url_Val,
-			configValue : input_protein_annotation_webservice_url_Val };
-	configList.push( configListItem );
-
-	configListItem = { 
-			configKey: config_key_protein_listing_from_sequence_taxonomy_webservice_url_Val,
-			configValue : input_protein_listing_from_sequence_taxonomy_webservice_url_Val };
-	configList.push( configListItem );
-
-	configListItem = { 
-			configKey: config_key_google_analytics_tracking_code_Val,
-			configValue : input_google_analytics_tracking_code_Val };
-	configList.push( configListItem );
+	var $config_text_inputs_jq = $(".config_text_inputs_jq");
 	
+	$config_text_inputs_jq.each( function( index, element ) {
+		
+		var $configTextInput = $( this );
+		
+		var configKeyForInput = $configTextInput.attr("data-config-key");
+
+		var valueInInput = $configTextInput.val( );
+
+		var configListItem = { 
+				configKey: configKeyForInput,
+				configValue : valueInInput };
+		configList.push( configListItem );
+		
+		//  save special data for data-FOOTER_CENTER_OF_PAGE_HTML
+		
+		var data_FOOTER_CENTER_OF_PAGE_HTML_val = $configTextInput.attr("data-FOOTER_CENTER_OF_PAGE_HTML");
+		
+		if ( data_FOOTER_CENTER_OF_PAGE_HTML_val === "true" ) {
+			
+			input_footer_center_of_page_html_Val = valueInInput;
+		}
+	} );
+	
+	//  Process checkbox inputs
+
+	var $config_checkbox_inputs_jq = $(".config_checkbox_inputs_jq");
+	
+	$config_checkbox_inputs_jq.each( function( index, element ) {
+		
+		var $configCheckboxInput = $( this );
+		
+		var configKeyForInput = $configCheckboxInput.attr("data-config-key");
+		
+		var dataValueChecked = $configCheckboxInput.attr("data-value-checked");
+		var dataValueNOTChecked = $configCheckboxInput.attr("data-value-not-checked");
+
+		var valueToSaveToConfig = dataValueNOTChecked;
+		
+		if ( $configCheckboxInput.prop( "checked" ) ) {
+			
+			valueToSaveToConfig = dataValueChecked;
+		}
+
+		var configListItem = { 
+				configKey: configKeyForInput,
+				configValue : valueToSaveToConfig };
+		configList.push( configListItem );
+
+	} );
+
 
 	var requestObj = { configList : configList };
 	
@@ -230,11 +228,14 @@ function saveListConfigurationResponse( params ) {
 	
 	showErrorMsg( $element );  //  Used for success messages as well
 	
-	//  Update footer text on current page
+	if ( input_footer_center_of_page_html_Val !== null ) {
 	
-	var $footer_center_container = $("#footer_center_container");
-	
-	$footer_center_container.html( input_footer_center_of_page_html_Val );
+		//  Update footer text on current page
+
+		var $footer_center_container = $("#footer_center_container");
+
+		$footer_center_container.html( input_footer_center_of_page_html_Val );
+	}
 }
 
 

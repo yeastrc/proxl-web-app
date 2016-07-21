@@ -103,9 +103,14 @@
   <div class="bottom-tab">
 		<a href="user_resetPasswordPage.do" >Reset Password</a>  		
   </div>
-
+  
+  <c:if test="${ userSignupAllowWithoutInvite }">  
+  	<div class="bottom-tab" style="border-right-width: 0px;">
+		<a href="user_signupPage.do" >Signup</a>
+	</div>
+  </c:if>
   
  </div>
 </div>
-  
+
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>

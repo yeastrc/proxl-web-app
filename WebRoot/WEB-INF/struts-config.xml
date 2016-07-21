@@ -370,6 +370,15 @@
 		</action>		
 		
 		
+		<action path="/user_signupPage"
+				type="org.yeastrc.xlink.www.user_account.UserSignupPageInitAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/user_account/userSignup.jsp" redirect="false"/>
+		    <forward name="NotAllowed" path="/WEB-INF/jsp-pages/user_account/userSignupNotAllowed.jsp" redirect="false"/>
+		</action>	
+		
+		
 		
 		<!--   User Invite processing  -->
 

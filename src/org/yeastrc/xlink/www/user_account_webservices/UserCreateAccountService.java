@@ -23,8 +23,11 @@ import org.yeastrc.auth.dto.AuthUserInviteTrackingDTO;
 import org.yeastrc.auth.hash_password.HashedPasswordProcessing;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.AddNewUserUsingDBTransactionService;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
+import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
+import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.FieldLengthConstants;
+import org.yeastrc.xlink.www.constants.UserSignupConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.objects.CreateAccountResult;
@@ -34,13 +37,69 @@ import org.yeastrc.xlink.www.web_utils.GetMessageTextFromKeyFrom_web_app_applica
 
 
 
+/**
+ * Create User Account
+ * 
+ * 2 methods:
+ * 
+ * 	Create account without invite code - requires config for allow user signup without invite
+ * 
+ * 	Create account with invite code
+ * 
+ * 
+ *
+ */
 @Path("/user")
-public class UserInviteCreateAccountService {
+public class UserCreateAccountService {
 
-	private static final Logger log = Logger.getLogger(UserInviteCreateAccountService.class);
+	private static final Logger log = Logger.getLogger(UserCreateAccountService.class);
+	
+
+	///////////////////////////////////////////
+	
+	//    Create Account from Page NOT using Invite Code
+	
+	@POST
+	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/createAccountNoInvite") 
+	
+	public CreateAccountResult createAccountWithoutInviteService(
+			
+			@FormParam( "firstName" ) String firstName,
+			@FormParam( "lastName" ) String lastName,
+			@FormParam( "organization" ) String organization,
+			@FormParam( "email" ) String email,
+			@FormParam( "username" ) String username,
+			@FormParam( "password" ) String password,
+			
+			@Context HttpServletRequest request )
+	
+	throws Exception {
+
+		String userSignupAllowWithoutInviteConfigValue =
+				ConfigSystemCaching.getInstance()
+				.getConfigValueForConfigKey( ConfigSystemsKeysConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY );
+
+		if ( ! UserSignupConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY__TRUE.equals( userSignupAllowWithoutInviteConfigValue ) ) {
+
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+					.build()
+					);
+		}
+		
+		return createAccountCommonInternal( null /* inviteCode */, firstName, lastName, organization, email, username, password, request );
+
+		
+	}
 	
 	
+	///////////////////////////////////////////
 	
+	//            Create Account from Page using Invite Code
+
 	@POST
 	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
 	@Produces(MediaType.APPLICATION_JSON)
@@ -58,8 +117,7 @@ public class UserInviteCreateAccountService {
 			@Context HttpServletRequest request )
 	throws Exception {
 		
-		CreateAccountResult createAccountResult = new CreateAccountResult();
-
+		
 
 		if ( StringUtils.isEmpty( inviteCode ) ) {
 
@@ -72,6 +130,40 @@ public class UserInviteCreateAccountService {
 					);
 		}
 		
+		return createAccountCommonInternal( inviteCode, firstName, lastName, organization, email, username, password, request );
+	}
+	
+	
+	
+	/**
+	 * Common create account code
+	 * 
+	 * @param inviteCode
+	 * @param firstName
+	 * @param lastName
+	 * @param organization
+	 * @param email
+	 * @param username
+	 * @param password
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	private CreateAccountResult createAccountCommonInternal(
+			
+			String inviteCode,
+			String firstName,
+			String lastName,
+			String organization,
+			String email,
+			String username,
+			String password,
+			@Context HttpServletRequest request )
+	throws Exception {
+		
+		CreateAccountResult createAccountResult = new CreateAccountResult();
+
+
 
 		if ( StringUtils.isEmpty( firstName ) ) {
 
@@ -210,27 +302,32 @@ public class UserInviteCreateAccountService {
 
 		try {
 
+			AuthUserInviteTrackingDTO authUserInviteTrackingDTO = null;
 			
-			ValidateUserInviteTrackingCode validateUserInviteTrackingCode = ValidateUserInviteTrackingCode.getInstance( inviteCode );
-
-			if ( ! validateUserInviteTrackingCode.validateInviteTrackingCode() ) {
-
-				String errorMsgKey = validateUserInviteTrackingCode.getErrorMsgKey();
-	
-
-				String errorMessage = GetMessageTextFromKeyFrom_web_app_application_properties.getInstance().getMessageForKey( errorMsgKey );
-
-
-				createAccountResult.setStatus(false);
-		        
-				createAccountResult.setErrorMessage( errorMessage );
+			if ( StringUtils.isNotEmpty( inviteCode ) ) {
 				
-				return createAccountResult;  //  !!!!!  EARLY EXIT
+				//  Only process if have invite code
 
+				ValidateUserInviteTrackingCode validateUserInviteTrackingCode = ValidateUserInviteTrackingCode.getInstance( inviteCode );
+
+				if ( ! validateUserInviteTrackingCode.validateInviteTrackingCode() ) {
+
+					String errorMsgKey = validateUserInviteTrackingCode.getErrorMsgKey();
+
+
+					String errorMessage = GetMessageTextFromKeyFrom_web_app_application_properties.getInstance().getMessageForKey( errorMsgKey );
+
+
+					createAccountResult.setStatus(false);
+
+					createAccountResult.setErrorMessage( errorMessage );
+
+					return createAccountResult;  //  !!!!!  EARLY EXIT
+
+				}
+
+				authUserInviteTrackingDTO = validateUserInviteTrackingCode.getAuthUserInviteTrackingDTO();
 			}
-			
-			AuthUserInviteTrackingDTO authUserInviteTrackingDTO = validateUserInviteTrackingCode.getAuthUserInviteTrackingDTO();
-			
 			
 			String hashedPassword = HashedPasswordProcessing.getInstance().createNewHashedPasswordHex( password );
 
@@ -241,7 +338,7 @@ public class UserInviteCreateAccountService {
 
 			authUserDTO.setEmail( email );
 
-			if ( authUserInviteTrackingDTO.getInvitedSharedObjectId() == null ) {
+			if ( authUserInviteTrackingDTO != null && authUserInviteTrackingDTO.getInvitedSharedObjectId() == null ) {
 				
 				//  Invite not tied to a project so the access level in the invite is used as the user level
 
@@ -266,25 +363,33 @@ public class UserInviteCreateAccountService {
 
 
 			try {
+				
+				if ( authUserInviteTrackingDTO != null ) {
 
-				if ( authUserInviteTrackingDTO.getInvitedSharedObjectId() == null ) {
+					if ( authUserInviteTrackingDTO.getInvitedSharedObjectId() == null ) {
 
-					//  user is not linked to a project so just add the user
+						//  user is not linked to a project so just add the user
 
-					AddNewUserUsingDBTransactionService.getInstance().addNewUserForUserInvite( xLinkUserDTO, hashedPassword, authUserInviteTrackingDTO );
+						AddNewUserUsingDBTransactionService.getInstance().addNewUserForUserInvite( xLinkUserDTO, hashedPassword, authUserInviteTrackingDTO );
+
+					} else {
+
+						//  A shared object id is associated so create and save records for that as well
+
+						AuthSharedObjectUsersDTO authSharedObjectUsersDTO = new AuthSharedObjectUsersDTO();
+
+						authSharedObjectUsersDTO.setSharedObjectId( authUserInviteTrackingDTO.getInvitedSharedObjectId() );
+						authSharedObjectUsersDTO.setAccessLevel( authUserInviteTrackingDTO.getInvitedUserAccessLevel() );
+
+						AddNewUserUsingDBTransactionService.getInstance().addNewUserAddAuthSharedObjectUsersDTOForUserInvite( xLinkUserDTO, hashedPassword, authSharedObjectUsersDTO, authUserInviteTrackingDTO );
+					}
 
 				} else {
 
-					//  A shared object id is associated so create and save records for that as well
+					//  user is not linked to a project so just add the user
 
-					AuthSharedObjectUsersDTO authSharedObjectUsersDTO = new AuthSharedObjectUsersDTO();
-
-					authSharedObjectUsersDTO.setSharedObjectId( authUserInviteTrackingDTO.getInvitedSharedObjectId() );
-					authSharedObjectUsersDTO.setAccessLevel( authUserInviteTrackingDTO.getInvitedUserAccessLevel() );
-
-					AddNewUserUsingDBTransactionService.getInstance().addNewUserAddAuthSharedObjectUsersDTOForUserInvite( xLinkUserDTO, hashedPassword, authSharedObjectUsersDTO, authUserInviteTrackingDTO );
+					AddNewUserUsingDBTransactionService.getInstance().addNewUserForUserInvite( xLinkUserDTO, hashedPassword, null /* authUserInviteTrackingDTO */ );
 				}
-				
 				
 
 				UserSessionObject userSessionObject = new UserSessionObject();
@@ -341,7 +446,7 @@ public class UserInviteCreateAccountService {
 			
 		} catch ( Exception e ) {
 			
-			String msg = "changePasswordService(...) Exception caught: " + e.toString();
+			String msg = "createAccountCommonInternal(...) Exception caught: " + e.toString();
 			
 			log.error( msg, e );
 			

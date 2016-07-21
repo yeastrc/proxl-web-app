@@ -151,14 +151,16 @@ public class AddNewUserUsingDBTransactionService {
 
 			addNewUserInternal( xLinkUserDTO, hashedPassword, dbConnection );
 			
-			int authUserInviteTrackingId = authUserInviteTrackingDTO.getId();
-			
-			int authUserIdUsingInvite = xLinkUserDTO.getAuthUser().getId();
-			
-			String authUserInviteTrackingUseIP = authUserInviteTrackingDTO.getUseIP();
-			
-			AuthUserInviteTrackingDAO.getInstance().updateUsedInviteFields( authUserInviteTrackingId, authUserIdUsingInvite, authUserInviteTrackingUseIP, dbConnection );
+			if ( authUserInviteTrackingDTO != null ) {
 
+				int authUserInviteTrackingId = authUserInviteTrackingDTO.getId();
+
+				int authUserIdUsingInvite = xLinkUserDTO.getAuthUser().getId();
+
+				String authUserInviteTrackingUseIP = authUserInviteTrackingDTO.getUseIP();
+
+				AuthUserInviteTrackingDAO.getInstance().updateUsedInviteFields( authUserInviteTrackingId, authUserIdUsingInvite, authUserInviteTrackingUseIP, dbConnection );
+			}
 			
 			dbConnection.commit();
 			

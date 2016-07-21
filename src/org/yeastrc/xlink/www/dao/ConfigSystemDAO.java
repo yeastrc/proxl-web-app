@@ -9,7 +9,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.ConfigSystemDTO;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 
 /**
  * DAO for config_system table

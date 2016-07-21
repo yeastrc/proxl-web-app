@@ -1,4 +1,5 @@
 <%@page import="org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants"%>
+<%@page import="org.yeastrc.xlink.www.constants.UserSignupConstants"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %><%-- Always put this directive at the very top of the page --%>
 <%@page import="org.yeastrc.xlink.www.constants.AuthAccessLevelConstants"%>
 <%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
@@ -43,39 +44,62 @@
 
 	<div style="margin-bottom: 10px;">
 	  <div style="margin-bottom: 3px;">
-		HTML to put at center of bottom of web page: <input type="text" id="input_footer_center_of_page_html" style="width: 450px;"> 
+		Allow Account Registration WITHOUT Invite: 
+		<input type="checkbox" class=" config_checkbox_inputs_jq " id="input_user_signup_allow_without_invite" 
+			data-config-key="<%= ConfigSystemsKeysConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY %>"
+			data-value-checked="<%= UserSignupConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY__TRUE %>" 
+			data-value-not-checked="<%= UserSignupConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY__FALSE %>" > 
+	  </div> 
+	</div>
+	
+	<div style="margin-bottom: 10px;">
+	  <div style="margin-bottom: 3px;">
+		HTML to put at center of bottom of web page: 
+		<input type="text" class=" config_text_inputs_jq " id="input_footer_center_of_page_html" style="width: 450px;"
+			data-config-key="<%= ConfigSystemsKeysConstants.FOOTER_CENTER_OF_PAGE_HTML_KEY %>"
+			data-FOOTER_CENTER_OF_PAGE_HTML="true"> 
 	  </div> 
 	</div>
 
 	<div style="margin-bottom: 10px;" >
 	  <div style="margin-bottom: 3px;">
-		From Address for emails sent: <input type="text" id="input_email_from_address" style="width: 450px;">
+		From Address for emails sent: 
+		<input type="text" class=" config_text_inputs_jq " id="input_email_from_address" style="width: 450px;"
+			data-config-key="<%= ConfigSystemsKeysConstants.EMAIL_FROM_ADDRESS_URL_KEY %>">
 	  </div>
 	</div>
 					
 
 	<div style="margin-bottom: 10px;" >
 	  <div style="margin-bottom: 3px;">
-		SMTP Server URL for emails sent: <input type="text" id="input_email_smtp_server_url" style="width: 450px;"> 
+		SMTP Server URL for emails sent: 
+		<input type="text" class=" config_text_inputs_jq " id="input_email_smtp_server_url" style="width: 450px;"
+			data-config-key="<%= ConfigSystemsKeysConstants.EMAIL_SMTP_SERVER_URL_KEY %>"> 
 	  </div> 
 	</div>
 	
 	<div style="margin-bottom: 10px;" >
 	  <div style="margin-bottom: 3px;">
-		Google Analytics Tracking Code: <input type="text" id="input_google_analytics_tracking_code" style="width: 450px;"> 
+		Google Analytics Tracking Code: 
+		<input type="text" class=" config_text_inputs_jq " id="input_google_analytics_tracking_code" style="width: 450px;"
+			data-config-key="<%= ConfigSystemsKeysConstants.GOOGLE_ANALYTICS_TRACKING_CODE_KEY %>"> 
 	  </div> 
 	</div>
 	
 	
 	<div style="margin-bottom: 10px;" >
 	  <div style="margin-bottom: 3px;">
-		Protein Annotation Service URL: <input type="text" id="input_protein_annotation_webservice_url" style="width: 450px;"> 
+		Protein Annotation Service URL: 
+		<input type="text" class=" config_text_inputs_jq " id="input_protein_annotation_webservice_url" style="width: 450px;"
+			data-config-key="<%= ConfigSystemsKeysConstants.PROTEIN_ANNOTATION_WEBSERVICE_URL_KEY %>"> 
 	  </div> 
 	</div>
 	
 	<div style="margin-bottom: 10px;" >
 	  <div style="margin-bottom: 3px;">
-		Protein Listing Service URL: <input type="text" id="input_protein_listing_from_sequence_taxonomy_webservice_url" style="width: 450px;"> 
+		Protein Listing Service URL: 
+		<input type="text" class=" config_text_inputs_jq " id="input_protein_listing_from_sequence_taxonomy_webservice_url" style="width: 450px;"
+			data-config-key="<%= ConfigSystemsKeysConstants.PROTEIN_LISTING_FROM_SEQUENCE_TAXONOMY_WEBSERVICE_URL_KEY %>"> 
 	  </div> 
 	</div>
 	
@@ -101,20 +125,7 @@
 	 	</div>	  
 	  </div>
 	</div>
-						
-	<%-- For the javascript to read --%>
-	<input type="hidden" id="config_key_footer_center_of_page_html" value="<%= ConfigSystemsKeysConstants.FOOTER_CENTER_OF_PAGE_HTML_KEY %>">
-	
-	<input type="hidden" id="config_key_email_from_address" value="<%= ConfigSystemsKeysConstants.EMAIL_FROM_ADDRESS_URL_KEY %>">
-
-	<input type="hidden" id="config_key_email_smtp_server_url" value="<%= ConfigSystemsKeysConstants.EMAIL_SMTP_SERVER_URL_KEY %>">
-
-	<input type="hidden" id="config_key_protein_annotation_webservice_url" value="<%= ConfigSystemsKeysConstants.PROTEIN_ANNOTATION_WEBSERVICE_URL_KEY %>">
-
-	<input type="hidden" id="config_key_protein_listing_from_sequence_taxonomy_webservice_url" value="<%= ConfigSystemsKeysConstants.PROTEIN_LISTING_FROM_SEQUENCE_TAXONOMY_WEBSERVICE_URL_KEY %>">
-
-	<input type="hidden" id="config_key_google_analytics_tracking_code" value="<%= ConfigSystemsKeysConstants.GOOGLE_ANALYTICS_TRACKING_CODE_KEY %>">
-
+			
   </div>  <%--  Close <div class="overall-enclosing-block">  --%>
 
   

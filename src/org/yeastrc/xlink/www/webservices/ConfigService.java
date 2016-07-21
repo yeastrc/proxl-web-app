@@ -18,6 +18,8 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
+import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
+import org.yeastrc.xlink.www.constants.UserSignupConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 import org.yeastrc.xlink.www.dto.ConfigSystemDTO;
@@ -196,6 +198,52 @@ public class ConfigService {
 
 			
 			List<ConfigSystemDTO> configList = saveRequest.getConfigList();
+			
+			///  Validate config keys and values (from checkboxes) are valid
+			
+			for ( ConfigSystemDTO item : configList ) {
+			
+				if ( ! ConfigSystemsKeysConstants.textConfigKeys.contains( item.getConfigKey() ) ) {
+					
+					//  Not one of the text config keys so validate the config keys with specific values
+					
+					if ( ConfigSystemsKeysConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY.equals( item.getConfigKey() ) ) {
+						
+						if ( ( ! UserSignupConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY__TRUE.equals( item.getConfigValue() ) )
+								&& ( ! UserSignupConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY__FALSE.equals( item.getConfigValue() ) ) ) {
+
+							//  Invalid value for config key found
+
+							String msg = "Invalid value for config key: " + item.getConfigKey();
+							log.error( msg );
+
+							throw new WebApplicationException(
+									Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+									.entity( msg )
+									.build()
+									);		
+						}
+						
+					} else {
+						
+						//  Invalid config key found
+						
+						String msg = "Invalid config key: " + item.getConfigKey();
+						log.error( msg );
+
+						throw new WebApplicationException(
+								Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+								.entity( msg )
+								.build()
+								);		
+					}
+					
+					
+				}
+			}
+			
+			
+			//  Save values to DB
 			
 			ConfigSystemDAO.getInstance().updateValueOnlyOnConfigKey( configList );
 			

@@ -4,6 +4,14 @@
 
 use proxl;
 
+--   User Signup Process Configuration
+
+--  user_signup_allow_without_invite:  values  'false'  'true'
+
+ INSERT INTO config_system (config_key, config_value) 
+ VALUES ('user_signup_allow_without_invite', 'false');
+ 
+
 --  (!Important!) Email configuration
 
 --  (Required) The address of the SMTP server, through which to send email.

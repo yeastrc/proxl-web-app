@@ -17,9 +17,9 @@ import org.yeastrc.xlink.www.constants.UserSignupConstants;
  * 
  *
  */
-public class UserLoginPageInitAction  extends Action {
+public class UserSignupPageInitAction  extends Action {
 	
-	private static final Logger log = Logger.getLogger(UserLoginPageInitAction.class);
+	private static final Logger log = Logger.getLogger(UserSignupPageInitAction.class);
 
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
@@ -37,11 +37,12 @@ public class UserLoginPageInitAction  extends Action {
 					ConfigSystemCaching.getInstance()
 					.getConfigValueForConfigKey( ConfigSystemsKeysConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY );
 
-			if ( UserSignupConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY__TRUE.equals( userSignupAllowWithoutInviteConfigValue ) ) {
+			if ( ! UserSignupConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY__TRUE.equals( userSignupAllowWithoutInviteConfigValue ) ) {
 				
-				request.setAttribute( "userSignupAllowWithoutInvite", true );
+				return mapping.findForward( "generalError" ); //  Config not allow this page so show general error
 			}
-
+			
+			
 			return mapping.findForward( "Success" );
 
 

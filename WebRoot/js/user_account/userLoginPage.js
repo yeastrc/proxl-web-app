@@ -206,7 +206,7 @@ var loginComplete = function(requestData, responseData) {
 		var currentURL = document.URL;
 		
 		
-		var currentURLindexOfLoginPageURLFragment = currentURL.indexOf( PAGE_CONSTANTS.UUSER_LOGIN_PAGE_URL_FRAGMENT );
+		var currentURLindexOfLoginPageURLFragment = currentURL.indexOf( PAGE_CONSTANTS.USER_LOGIN_PAGE_URL_FRAGMENT );
 
 
 		if ( currentURLindexOfLoginPageURLFragment != -1 ) {
