@@ -10,6 +10,8 @@ public class CreateAccountResult {
 	
 	private boolean duplicateUsername = false;
 	private boolean duplicateEmail = false;
+	
+	private boolean userTestValidated = false;
 
 	private String errorMessage;
 	
@@ -43,6 +45,14 @@ public class CreateAccountResult {
 
 	public void setStatus(boolean status) {
 		this.status = status;
+	}
+
+	public boolean isUserTestValidated() {
+		return userTestValidated;
+	}
+
+	public void setUserTestValidated(boolean userTestValidated) {
+		this.userTestValidated = userTestValidated;
 	}
 
 }

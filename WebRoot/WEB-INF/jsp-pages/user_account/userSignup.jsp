@@ -30,6 +30,9 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/user_account/userSignup.js?x=${cacheBustValue}"></script>
 		
+		<c:if test="${ configSystemValues.googleRecaptchaConfigured }">
+			<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+		</c:if>
 </head>
 
 <body class="create-user-page inset-page"> <%-- "inset-page" is for pages with an 'inset' look --%>
@@ -48,6 +51,12 @@
 
   	
   	<div  style="position: relative;" class="page-label">
+  		<div class="error-message-container error_message_container_jq" id="error_message_recaptcha_required">
+  			<div class="error-message-inner-container" >
+	  			<span class="error-message-text" >Recaptcha must be completed
+		  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+		  	</div>
+	  	</div>
   		<div class="error-message-container error_message_container_jq" id="error_message_all_fields_required">
   			<div class="error-message-inner-container" >
 	  			<span class="error-message-text" >All fields are required
@@ -115,19 +124,31 @@
   	
 	<form action="javascript:createAccountFormSubmit()" >
 	
-		<input type="hidden" id="code" value="<c:out value="${ param.code }" />"/>
-		
 		<%--  size of input fields controlled by CSS, was size="20"  --%>
 
 		<input type="text" id="firstName" placeholder="First name" class="input-field input_field_jq" maxlength="40"/><br>
 		<input type="text" id="lastName" placeholder="Last name" class="input-field input_field_jq" maxlength="60" /><br>
 		<input type="text" id="organization" placeholder="Organization" class="input-field input_field_jq" maxlength="2000" /><br>
+		
 		<input type="text" id="email" placeholder="Email address" class="input-field input_field_jq" maxlength="255" /><br>
 
 		<input type="text" id="username" placeholder="Username" class="input-field input_field_jq" maxlength="40" /><br>
 
 		<input type="password" id="password" placeholder="Password" class="input-field input_field_jq" maxlength="40" /><br>
 		<input type="password" id="passwordConfirm" placeholder="Confirm Password" class="input-field input_field_jq" maxlength="40" /><br>
+		
+		
+		<c:if test="${ configSystemValues.googleRecaptchaConfigured }">
+
+		  <div style="text-align: center;" id="proxl_google_recaptcha_container_div"> <%--  div "id" is used in JS code --%>
+		   <div class="page-text">
+			 <div class="g-recaptcha"  
+			 	data-sitekey="<c:out value="${ configSystemValues.googleRecaptchaSiteCode }"></c:out>"></div>
+		   </div>
+		  </div>
+
+		</c:if>
+		
 		
 	 	<INPUT TYPE="submit" class="submit-button" VALUE="Create Account" id="create_account_button">
 	</form>
@@ -153,6 +174,8 @@
   
  </div>
 </div>
+
+
 
 			  	
 	<%-- submitted by the javascript if the account is successfully created --%>

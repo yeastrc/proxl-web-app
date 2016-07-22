@@ -170,7 +170,7 @@ body.inset-page .page-label { font-size:20px; margin-top: 20px; margin-bottom: 1
 body.inset-page .page-text { font-size: 14px; text-align: left; }
 
 
-body.inset-page .input-field,body.inset-page div.page-text, body.inset-page .submit-button { display: inline-block; width: 275px; margin-bottom: 4px; }
+body.inset-page .input-field,body.inset-page div.page-text, body.inset-page .submit-button { display: inline-block; width: 302px; margin-bottom: 4px; }
 
 body.inset-page .input-field {  font-size:21px; color: #000000; opacity:0.8;filter:alpha(opacity=80); }
 

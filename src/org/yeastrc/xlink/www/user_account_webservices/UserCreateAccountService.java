@@ -23,6 +23,8 @@ import org.yeastrc.auth.dto.AuthUserInviteTrackingDTO;
 import org.yeastrc.auth.hash_password.HashedPasswordProcessing;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.AddNewUserUsingDBTransactionService;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
+import org.yeastrc.xlink.www.captcha_google_api.CaptchaGoogleValidateUserResponseToken;
+import org.yeastrc.xlink.www.captcha_google_api.IsGoogleRecaptchaConfigured;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
@@ -72,6 +74,8 @@ public class UserCreateAccountService {
 			@FormParam( "email" ) String email,
 			@FormParam( "username" ) String username,
 			@FormParam( "password" ) String password,
+			@FormParam( "recaptchaValue" ) String recaptchaValue,
+			
 			
 			@Context HttpServletRequest request )
 	
@@ -89,8 +93,24 @@ public class UserCreateAccountService {
 					.build()
 					);
 		}
+
+		if ( IsGoogleRecaptchaConfigured.getInstance().isGoogleRecaptchaConfigured() ) {
+
+			if ( StringUtils.isEmpty( recaptchaValue ) ) {
+
+				log.warn( "AccountMaintService:  recaptchaValue empty" );
+
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+		}
 		
-		return createAccountCommonInternal( null /* inviteCode */, firstName, lastName, organization, email, username, password, request );
+		
+		
+		return createAccountCommonInternal( null /* inviteCode */, firstName, lastName, organization, email, username, password, recaptchaValue, request );
 
 		
 	}
@@ -130,7 +150,7 @@ public class UserCreateAccountService {
 					);
 		}
 		
-		return createAccountCommonInternal( inviteCode, firstName, lastName, organization, email, username, password, request );
+		return createAccountCommonInternal( inviteCode, firstName, lastName, organization, email, username, password, null /* recaptchaValue */, request );
 	}
 	
 	
@@ -158,6 +178,7 @@ public class UserCreateAccountService {
 			String email,
 			String username,
 			String password,
+			String recaptchaValue,  //  Only for without invite code
 			@Context HttpServletRequest request )
 	throws Exception {
 		
@@ -297,8 +318,52 @@ public class UserCreateAccountService {
 					.build()
 					);
 		}
-
 		
+		//  Pre-check for username and email already exist
+		
+		{
+			AuthUserDAO authUserDAO = AuthUserDAO.getInstance();
+
+			AuthUserDTO authUserDTOFromEmail = authUserDAO.getAuthUserDTOForEmail( email );
+
+			if ( authUserDTOFromEmail != null ) {
+
+				createAccountResult.setStatus(false);
+				createAccountResult.setDuplicateEmail(true);
+				
+				return createAccountResult;  //  !!!!!  EARLY EXIT
+			}
+
+
+			AuthUserDTO authUserDTOFromUsername = authUserDAO.getAuthUserDTOForUsername( username );
+
+			if ( authUserDTOFromUsername != null ) {
+
+				createAccountResult.setStatus(false);
+				createAccountResult.setDuplicateUsername(true);
+				
+				return createAccountResult;  //  !!!!!  EARLY EXIT
+			}
+		}
+		
+
+		if( StringUtils.isNotEmpty( recaptchaValue ) ) {
+			
+			createAccountResult.setUserTestValidated( true );
+
+			if ( ! CaptchaGoogleValidateUserResponseToken.getInstance().isCaptchaUserResponseTokenValid( recaptchaValue, request.getRemoteHost() ) ) {
+				
+
+				String errorMessage = "captcha validation failed";
+
+
+				createAccountResult.setStatus(false);
+
+				createAccountResult.setErrorMessage( errorMessage );
+
+				return createAccountResult;  //  !!!!!  EARLY EXIT
+			}
+		}
 
 		try {
 

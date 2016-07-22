@@ -10,10 +10,19 @@ import java.util.Set;
 public class ConfigSystemsKeysConstants {
 	
 	
+	//////   Any plain text inputs need to be added to textConfigKeys in the "static {}" at the bottom
+	
+	
 	////  User sign up procedure keys  -  Specific Values allowed
 
 	public static final String USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY = "user_signup_allow_without_invite";
 
+
+	////  Google Recaptcha keys
+
+	public static final String GOOGLE_RECAPTCHA_SITE_KEY_KEY = "google_recaptcha_site_key";
+
+	public static final String GOOGLE_RECAPTCHA_SECRET_KEY_KEY = "google_recaptcha_secret_key";
 	
 	
 	
@@ -44,6 +53,8 @@ public class ConfigSystemsKeysConstants {
 	public static final Set<String> textConfigKeys = new HashSet<>();
 	
 	static {
+		textConfigKeys.add( GOOGLE_RECAPTCHA_SITE_KEY_KEY );
+		textConfigKeys.add( GOOGLE_RECAPTCHA_SECRET_KEY_KEY );
 		
 		textConfigKeys.add( PROTEIN_ANNOTATION_WEBSERVICE_URL_KEY );
 		textConfigKeys.add( PROTEIN_LISTING_FROM_SEQUENCE_TAXONOMY_WEBSERVICE_URL_KEY );
@@ -52,7 +63,7 @@ public class ConfigSystemsKeysConstants {
 		textConfigKeys.add( EMAIL_FROM_ADDRESS_URL_KEY );
 		textConfigKeys.add( FOOTER_CENTER_OF_PAGE_HTML_KEY );
 		textConfigKeys.add( GOOGLE_ANALYTICS_TRACKING_CODE_KEY );
-		
+	
 	}
 	
 }

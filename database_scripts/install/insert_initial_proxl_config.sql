@@ -11,6 +11,17 @@ use proxl;
  INSERT INTO config_system (config_key, config_value) 
  VALUES ('user_signup_allow_without_invite', 'false');
  
+ 
+ --  Google Recaptcha for user signup without invite
+
+--   Both values must be configured for this to be active
+ 
+ INSERT INTO config_system (config_key, config_value) 
+ VALUES ('google_recaptcha_site_key', '');
+ 
+ INSERT INTO config_system (config_key, config_value) 
+ VALUES ('google_recaptcha_secret_key', '');
+ 
 
 --  (!Important!) Email configuration
 

@@ -52,10 +52,34 @@
 	  </div> 
 	</div>
 	
+	
+	<div style="margin-bottom: 10px;">
+	  <div style="margin-bottom: 3px;">
+	  	<div>
+			Google Recaptcha (Not used if either not configured):
+		</div>
+		<div style="margin-left: 20px;">
+		
+			<div style="margin-bottom: 3px;">
+				Site key: 
+				<input type="text" class=" config_text_inputs_jq " style="width: 450px;"
+					data-config-key="<%= ConfigSystemsKeysConstants.GOOGLE_RECAPTCHA_SITE_KEY_KEY %>"
+					data-FOOTER_CENTER_OF_PAGE_HTML="true">
+			</div>
+			<div>
+				Secret key: 
+				<input type="text" class=" config_text_inputs_jq " style="width: 450px;"
+					data-config-key="<%= ConfigSystemsKeysConstants.GOOGLE_RECAPTCHA_SECRET_KEY_KEY %>"
+					data-FOOTER_CENTER_OF_PAGE_HTML="true">
+			</div>
+		</div>
+	  </div> 
+	</div>
+	
 	<div style="margin-bottom: 10px;">
 	  <div style="margin-bottom: 3px;">
 		HTML to put at center of bottom of web page: 
-		<input type="text" class=" config_text_inputs_jq " id="input_footer_center_of_page_html" style="width: 450px;"
+		<input type="text" class=" config_text_inputs_jq " id="input_footer_center_of_page_html" style="width: 650px;"
 			data-config-key="<%= ConfigSystemsKeysConstants.FOOTER_CENTER_OF_PAGE_HTML_KEY %>"
 			data-FOOTER_CENTER_OF_PAGE_HTML="true"> 
 	  </div> 

@@ -23,12 +23,20 @@ var PAGE_CONSTANTS = {
 };
 
 
+var globalVars = {
+		
+		usernameConfirmedNotInDB : false,
+		emailConfirmedNotInDB : false
+};
+
 ///////////////////
 
 var createAccountFormSubmit = function() {
 
 	createAccount();
 };
+
+
 
 
 //////////////////////
@@ -132,7 +140,27 @@ var createAccount = function(clickThis, eventObject) {
 		return;  //  !!!  EARLY EXIT
 
 	} 
+	
+	var recaptchaValue = "";
 
+	var $proxl_google_recaptcha_container_div = $("#proxl_google_recaptcha_container_div");
+	
+	if ( $proxl_google_recaptcha_container_div.length > 0 ) {
+		
+		//  Google Recaptcha included so get the user's response
+		
+		recaptchaValue = grecaptcha.getResponse();
+		
+		if ( recaptchaValue === "" || recaptchaValue === null || recaptchaValue === undefined ) {
+			
+	
+			var $element = $("#error_message_recaptcha_required");
+	
+			showErrorMsg( $element );
+	
+			return;  //  !!!  EARLY EXIT
+		}
+	}
 	
 	var requestData = {
 			firstName : firstName,
@@ -140,7 +168,8 @@ var createAccount = function(clickThis, eventObject) {
 			organization :  organization,
 			email :  email,
 			username :  username,
-			password :  password
+			password :  password,
+			recaptchaValue : recaptchaValue
 	};
 
 	var _URL = contextPathJSVar + "/services/user/createAccountNoInvite";
@@ -194,6 +223,8 @@ var createAccountComplete = function( params ) {
 			var $element = $("#error_message_username_email_taken");
 
 			showErrorMsg( $element );
+			
+			$("#email").focus();
 
 		} else if ( responseData.duplicateUsername ) {
 
@@ -201,11 +232,17 @@ var createAccountComplete = function( params ) {
 
 			showErrorMsg( $element );
 			
+			$("#username").focus();
+
+			
 		} else if ( responseData.duplicateEmail ) {
 			
 			var $element = $("#error_message_email_taken");
 
 			showErrorMsg( $element );
+			
+			$("#email").focus();
+
 			
 		} else if ( responseData.errorMessage ) {
 
@@ -221,7 +258,16 @@ var createAccountComplete = function( params ) {
 
 			showErrorMsg( $element );
 		}
+		
+		if ( responseData.userTestValidated ) {
+		
+			//  Reset captcha widget so user is requested to verify captcha again
 
+			//   The user's previous captcha response cannot be used again
+
+			grecaptcha.reset(); 
+		}
+		
 		return;
 
 	} 
