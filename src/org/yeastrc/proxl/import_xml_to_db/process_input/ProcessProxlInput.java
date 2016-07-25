@@ -77,7 +77,9 @@ public class ProcessProxlInput {
 			String importDirectory,
 			
 
-			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues
+			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
+			
+			Boolean skipPopulatingPathOnSearchLineOptChosen
 			
 			
 			) throws Exception {
@@ -94,7 +96,11 @@ public class ProcessProxlInput {
 			searchDTO.setFastaFilename( proxlInput.getFastaFilename() );
 			searchDTO.setProjectId( projectId );
 			
-			searchDTO.setPath( importDirectory );
+			if ( ( skipPopulatingPathOnSearchLineOptChosen == null ) 
+					|| ( ! skipPopulatingPathOnSearchLineOptChosen ) ) {
+			
+				searchDTO.setPath( importDirectory );
+			}
 			
 			if ( StringUtils.isNotEmpty( proxlInput.getName() ) ) {
 			

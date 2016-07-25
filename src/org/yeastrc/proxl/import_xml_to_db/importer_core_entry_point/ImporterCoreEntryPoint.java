@@ -70,7 +70,9 @@ public class ImporterCoreEntryPoint {
 			
 			List<File> scanFileList,
 			
-			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues
+			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
+			
+			Boolean skipPopulatingPathOnSearchLineOptChosen
 			
 			) throws Exception {
 
@@ -152,7 +154,7 @@ public class ImporterCoreEntryPoint {
 		
 		proxlInputForImport = null; //  release this reference
 		
-		int insertedSearchId = doImportPassingDeserializedProxlImportInputXML( projectId, proxlInputObjectContainer, scanFileList, importDirectory, dropPeptidePSMCutoffValues );
+		int insertedSearchId = doImportPassingDeserializedProxlImportInputXML( projectId, proxlInputObjectContainer, scanFileList, importDirectory, dropPeptidePSMCutoffValues, skipPopulatingPathOnSearchLineOptChosen );
 		
 		return insertedSearchId;
 		
@@ -272,7 +274,9 @@ public class ImporterCoreEntryPoint {
 			
 			String importDirectory,
 			
-			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues
+			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
+			
+			Boolean skipPopulatingPathOnSearchLineOptChosen
 
 			) throws Exception {
 		
@@ -347,7 +351,8 @@ public class ImporterCoreEntryPoint {
 							proxlInputForImport, 
 							scanFileList, 
 							importDirectory, 
-							dropPeptidePSMCutoffValues
+							dropPeptidePSMCutoffValues,
+							skipPopulatingPathOnSearchLineOptChosen
 							 );
 
 			

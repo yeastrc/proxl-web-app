@@ -46,7 +46,9 @@ public class ImporterDefaultMainProgramEntry {
 	
 	private static final String FOR_HELP_STRING = "For help, run without any parameters, -h, or --help";
 
-	
+
+	private static final String SKIP_POPULATING_PATH_ON_SEARCH_CMD_LINE_PARAM_STRING = "skip_populating_path_on_search";
+
 	private static final String PROXL_DB_NAME_CMD_LINE_PARAM_STRING = "proxl_db_name";
 
 //	private static boolean databaseConnectionFactoryCreated = false;
@@ -137,8 +139,12 @@ public class ImporterDefaultMainProgramEntry {
 
 			CmdLineParser.Option dbConfigFileNameCommandLineOpt = cmdLineParser.addStringOption( 'c', "config" );
 
+
+			CmdLineParser.Option skipPopulatingPathOnSearchLineOpt = cmdLineParser.addStringOption( 'Z', SKIP_POPULATING_PATH_ON_SEARCH_CMD_LINE_PARAM_STRING );
+
 			CmdLineParser.Option proxlDatabaseNameCommandLineOpt = cmdLineParser.addStringOption( 'Z', PROXL_DB_NAME_CMD_LINE_PARAM_STRING );
 
+			
 			//  'Q' is arbitrary and won't be suggested to user
 			CmdLineParser.Option dropPeptideCutoffValueOpt = cmdLineParser.addStringOption( 'Q', "drop-peptide-cutoff" );
 			CmdLineParser.Option dropPsmCutoffValueOpt = cmdLineParser.addStringOption( 'Q', "drop-psm-cutoff" );
@@ -217,7 +223,11 @@ public class ImporterDefaultMainProgramEntry {
 			Integer projectId = (Integer)cmdLineParser.getOptionValue( projectIdOpt );
 
 			Boolean noScanFilesCommandLineOptChosen = (Boolean) cmdLineParser.getOptionValue( noScanFilesCommandLineOpt, Boolean.FALSE);
-
+			
+			
+			
+			Boolean skipPopulatingPathOnSearchLineOptChosen = (Boolean) cmdLineParser.getOptionValue( skipPopulatingPathOnSearchLineOpt, Boolean.FALSE);
+			
 			String proxlDatabaseName = (String)cmdLineParser.getOptionValue( proxlDatabaseNameCommandLineOpt );
 			
 			String dbConfigFileName = (String)cmdLineParser.getOptionValue( dbConfigFileNameCommandLineOpt );
@@ -631,7 +641,9 @@ public class ImporterDefaultMainProgramEntry {
 							proxlInputForImportParam,
 							scanFileList,
 							
-							dropPeptidePSMCutoffValues /* dropPeptidePSMCutoffValues */
+							dropPeptidePSMCutoffValues,
+							
+							skipPopulatingPathOnSearchLineOptChosen
 							);
 			
 
