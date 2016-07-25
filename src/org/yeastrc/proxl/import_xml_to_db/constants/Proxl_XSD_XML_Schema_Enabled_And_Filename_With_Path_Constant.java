@@ -12,13 +12,7 @@ public class Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant {
 	/**
 	 * The "/" specifies to start at the root of the package path
 	 */
-//	public static final String PROXL_XSD_XML_SCHEMA_FILENAME_WITH_PATH = "/proxl-xml-v1.3.xsd";
-	
-	// TODO  TEMP   temporary use "proxl-xml-v1.3.xsd_TEMP" to 
-	//	allow the "matched_proteins" element to not be in the file
-	//    to be backwards compatible
-	
-	public static final String PROXL_XSD_XML_SCHEMA_FILENAME_WITH_PATH = "/proxl-xml-v1.3.xsd_TEMP";
+	public static final String PROXL_XSD_XML_SCHEMA_FILENAME_WITH_PATH = "/proxl-xml-v1.3.xsd";
 	
 	
 }
