@@ -140,7 +140,7 @@ public class ImporterDefaultMainProgramEntry {
 			CmdLineParser.Option dbConfigFileNameCommandLineOpt = cmdLineParser.addStringOption( 'c', "config" );
 
 
-			CmdLineParser.Option skipPopulatingPathOnSearchLineOpt = cmdLineParser.addStringOption( 'Z', SKIP_POPULATING_PATH_ON_SEARCH_CMD_LINE_PARAM_STRING );
+			CmdLineParser.Option skipPopulatingPathOnSearchLineOpt = cmdLineParser.addBooleanOption( 'Z', SKIP_POPULATING_PATH_ON_SEARCH_CMD_LINE_PARAM_STRING );
 
 			CmdLineParser.Option proxlDatabaseNameCommandLineOpt = cmdLineParser.addStringOption( 'Z', PROXL_DB_NAME_CMD_LINE_PARAM_STRING );
 
