@@ -160,8 +160,18 @@ public class SearchDTODetailsDisplayWrapper {
 			
 			for ( CutoffsAppliedOnImportDTO cutoffsAppliedOnImportDTO : cutoffsAppliedOnImportDTOList ) {
 				
-				AnnotationTypeDTO peptideAnnotationTypeDTO = all_Peptide_Filterable_PerSearchId.get( cutoffsAppliedOnImportDTO.getAnnotationTypeId() );
-				AnnotationTypeDTO psmAnnotationTypeDTO = all_Psm_Filterable_PerSearchId.get( cutoffsAppliedOnImportDTO.getAnnotationTypeId() );
+				AnnotationTypeDTO peptideAnnotationTypeDTO = null;
+				AnnotationTypeDTO psmAnnotationTypeDTO = null;
+				
+				if ( all_Peptide_Filterable_PerSearchId != null ) {
+				
+					peptideAnnotationTypeDTO = all_Peptide_Filterable_PerSearchId.get( cutoffsAppliedOnImportDTO.getAnnotationTypeId() );
+				}
+
+				if ( all_Psm_Filterable_PerSearchId != null ) {
+				
+					psmAnnotationTypeDTO = all_Psm_Filterable_PerSearchId.get( cutoffsAppliedOnImportDTO.getAnnotationTypeId() );
+				}
 				
 				
 				CutoffsAppliedOnImportWebDisplay cutoffsAppliedOnImportWebDisplay = new CutoffsAppliedOnImportWebDisplay();
