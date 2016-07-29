@@ -581,63 +581,20 @@ public class PsmsService {
 			
 			psmWebDisplayHolderList.add( internalPsmWebDisplayHolder );
 		}
+		
+		
+		
 
 		
 		//  Sort PSMs on sort order
 		
-		Collections.sort( psmWebDisplayHolderList, new Comparator<InternalPsmWebDisplayHolder>() {
-
-			@Override
-			public int compare(InternalPsmWebDisplayHolder o1, InternalPsmWebDisplayHolder o2) {
-				
-				//  Loop through the annotation types (sorted on sort order), comparing the values
-
-				for ( AnnotationTypeDTO annotationTypeDTO : psm_AnnotationTypeDTO_SortOrder_List ) {
-					
-					int typeId = annotationTypeDTO.getId();
-					
-					PsmAnnotationDTO o1_PsmAnnotationDTO = o1.psmAnnotationDTOMapOnTypeId.get( typeId );
-					if ( o1_PsmAnnotationDTO == null ) {
-						
-						String msg = "Unable to get PSM Filterable Annotation data for type id: " + typeId;
-						log.error( msg );
-						throw new RuntimeException(msg);
-					}
-					
-					double o1Value = o1_PsmAnnotationDTO.getValueDouble();
-					
-
-					PsmAnnotationDTO o2_PsmAnnotationDTO = o2.psmAnnotationDTOMapOnTypeId.get( typeId );
-					if ( o2_PsmAnnotationDTO == null ) {
-						
-						String msg = "Unable to get PSM Filterable Annotation data for type id: " + typeId;
-						log.error( msg );
-						throw new RuntimeException(msg);
-					}
-					
-					double o2Value = o2_PsmAnnotationDTO.getValueDouble();
-					
-					if ( o1Value != o2Value ) {
-						
-						if ( o1Value < o2Value ) {
-							
-							return -1;
-						} else {
-							return 1;
-						}
-					}
-					
-				}
-				
-				//  If everything matches, sort on psm.id
-				
-				return o1.psmWebDisplay.getPsmDTO().getId() - o2.psmWebDisplay.getPsmDTO().getId();
-			}
-		});
+		InternalPsmWebDisplayHolderSorter internalPsmWebDisplayHolderSorter = new InternalPsmWebDisplayHolderSorter();
 		
-
+		internalPsmWebDisplayHolderSorter.psm_AnnotationTypeDTO_SortOrder_List = psm_AnnotationTypeDTO_SortOrder_List;
 		
+		Collections.sort( psmWebDisplayHolderList, internalPsmWebDisplayHolderSorter );
 		
+				
 		
 		//  Build output list of PsmWebDisplay
 		
@@ -723,6 +680,64 @@ public class PsmsService {
 		
 
 		return psmsServiceResult;
+	}
+	
+	
+	
+	/**
+	 *   Sort PSMs on sort order
+	 *
+	 */
+	private static class InternalPsmWebDisplayHolderSorter implements Comparator<InternalPsmWebDisplayHolder> {
+
+		private List<AnnotationTypeDTO> psm_AnnotationTypeDTO_SortOrder_List;
+
+		@Override
+		public int compare(InternalPsmWebDisplayHolder o1, InternalPsmWebDisplayHolder o2) {
+
+			//  Loop through the annotation types (sorted on sort order), comparing the values
+
+			for ( AnnotationTypeDTO annotationTypeDTO : psm_AnnotationTypeDTO_SortOrder_List ) {
+
+				int typeId = annotationTypeDTO.getId();
+
+				PsmAnnotationDTO o1_PsmAnnotationDTO = o1.psmAnnotationDTOMapOnTypeId.get( typeId );
+				if ( o1_PsmAnnotationDTO == null ) {
+
+					String msg = "Unable to get PSM Filterable Annotation data for type id: " + typeId;
+					log.error( msg );
+					throw new RuntimeException(msg);
+				}
+
+				double o1Value = o1_PsmAnnotationDTO.getValueDouble();
+
+
+				PsmAnnotationDTO o2_PsmAnnotationDTO = o2.psmAnnotationDTOMapOnTypeId.get( typeId );
+				if ( o2_PsmAnnotationDTO == null ) {
+
+					String msg = "Unable to get PSM Filterable Annotation data for type id: " + typeId;
+					log.error( msg );
+					throw new RuntimeException(msg);
+				}
+
+				double o2Value = o2_PsmAnnotationDTO.getValueDouble();
+
+				if ( o1Value != o2Value ) {
+
+					if ( o1Value < o2Value ) {
+
+						return -1;
+					} else {
+						return 1;
+					}
+				}
+
+			}
+
+			//  If everything matches, sort on psm.id
+
+			return o1.psmWebDisplay.getPsmDTO().getId() - o2.psmWebDisplay.getPsmDTO().getId();
+		}
 	}
 	
 	

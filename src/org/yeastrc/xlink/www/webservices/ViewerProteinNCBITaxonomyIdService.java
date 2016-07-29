@@ -1,8 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,7 +19,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
@@ -167,11 +164,6 @@ public class ViewerProteinNCBITaxonomyIdService {
 			//////////////////////////////////////////
 			
 			
-			List<Integer> searchIdsListDedupedSorted = new ArrayList<>( searchIdsSet );
-
-			
-			Collections.sort( searchIdsListDedupedSorted );
-			
 			
 			
 			Map<Integer, Integer> proteinIdsTaxonomyIdsMap = new HashMap<Integer, Integer>();
@@ -185,53 +177,66 @@ public class ViewerProteinNCBITaxonomyIdService {
 					ProteinSequenceObject proteinSequenceObject = 
 							ProteinSequenceObjectFactory.getProteinSequenceObject( proteinSequenceId );
 
+					//  Get a taxonomy id for protein sequence id and search id
+
+					
+					boolean foundTaxonomyIdZero = false;
+					
+					
+					final int taxonomyIdSmallestNonZeroInitialValue = Integer.MAX_VALUE;
+					
+					int taxonomyIdSmallestNonZero = taxonomyIdSmallestNonZeroInitialValue;
+
 					//  Get all taxonomy ids for protein sequence id and search id
 
-					Set<Integer> taxonomyIds = null;
 					
-					for ( Integer searchId : searchIdsListDedupedSorted ) {
+					for ( Integer searchId : searchIdsSet ) {
 					
-						taxonomyIds = TaxonomyIdsForProtSeqIdSearchIdSearcher.getInstance()
+						Set<Integer> taxonomyIds = TaxonomyIdsForProtSeqIdSearchIdSearcher.getInstance()
 								.getTaxonomyIdsSingleSearch( proteinSequenceObject, searchId );
 
-						if ( ! taxonomyIds.isEmpty() ) {
+						if ( taxonomyIds.isEmpty() ) {
 
-							//  Found at least 1 taxonomy id so exit
-							break;
+							//  did not find any taxonomy id so skip to next search id
+							
+							continue;  //  EARLY CONTINUE
+						}
+						
+
+						for ( int taxonomyIdInList : taxonomyIds ) {
+							
+							if ( taxonomyIdInList == 0 ) {
+								
+								foundTaxonomyIdZero = true;
+							
+							} else if ( taxonomyIdSmallestNonZero > taxonomyIdInList ) {
+								taxonomyIdSmallestNonZero = taxonomyIdInList;
+							}
 						}
 					}
+					
 
-					if ( taxonomyIds == null || taxonomyIds.isEmpty() ) {
+					if ( ( ! foundTaxonomyIdZero ) && taxonomyIdSmallestNonZero == taxonomyIdSmallestNonZeroInitialValue ) {
 
 						String msg = "Failed to find a taxonomy id for proteinSequenceId: " + proteinSequenceId
-								+ ", all search ids: " + searchIdsListDedupedSorted;
+								+ ", all search ids: " + searchIdsSet;
 						log.error( msg );
-						throw new ProxlWebappDataException(msg);
+
+						throw new WebApplicationException(
+								Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+								.entity( msg )
+								.build()
+								);
 					}
 					
-					// Use the taxonomy id with the smallest non-zero value, unless they are all zero 
+					int taxonomyId = taxonomyIdSmallestNonZero;
 					
-					List<Integer> taxonomyIdsSortedList = new ArrayList<>( taxonomyIds );
 					
-					Collections.sort( taxonomyIdsSortedList );
-					
-					Integer taxonomyId = null;
-					
-					for ( Integer taxonomyIdInSortedList : taxonomyIdsSortedList ) {
+					if ( ( foundTaxonomyIdZero ) && taxonomyIdSmallestNonZero == taxonomyIdSmallestNonZeroInitialValue ) {
 						
-						if ( taxonomyIdInSortedList.intValue() != 0 ) {
-							
-							taxonomyId = taxonomyIdInSortedList;
-							break;
-						}
+						taxonomyId = 0;
 					}
 					
-					if ( taxonomyId == null ) {
-						
-						//  All zero so use first one
-					
-						taxonomyIdsSortedList.get( 0 );
-					}
 					
 					proteinIdsTaxonomyIdsMap.put( proteinSequenceId, taxonomyId );
 					

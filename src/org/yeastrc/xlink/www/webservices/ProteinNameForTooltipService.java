@@ -3,7 +3,6 @@ package org.yeastrc.xlink.www.webservices;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -203,17 +202,6 @@ public class ProteinNameForTooltipService {
 			//////////////////////////////////////////
 			
 			
-			List<Integer> searchIdsListDedupedSorted = new ArrayList<>( searchIdsSet );
-
-			
-			Collections.sort( searchIdsListDedupedSorted );
-			
-			
-			// Using the search id with the smallest value 
-			
-			Integer searchIdForTaxonomyIdRetrieval = searchIdsListDedupedSorted.get( 0 );
-			
-
 
 			ProteinSequenceObject proteinSequenceObject = 
 					ProteinSequenceObjectFactory.getProteinSequenceObject( proteinSequenceId );
@@ -236,27 +224,48 @@ public class ProteinNameForTooltipService {
 			
 			//   Get a taxonomy id for the protein sequence id and search id to send to the PDR
 			
+			
+			boolean foundTaxonomyIdZero = false;
+			
+
+			final int taxonomyIdSmallestNonZeroInitialValue = Integer.MAX_VALUE;
+			
+			
+			int taxonomyIdSmallestNonZero = taxonomyIdSmallestNonZeroInitialValue;
 
 			//  Get all taxonomy ids for protein sequence id and search id
 
-			Set<Integer> taxonomyIds = null;
 			
-			for ( Integer searchId : searchIdsListDedupedSorted ) {
+			for ( Integer searchId : searchIdsSet ) {
 			
-				taxonomyIds = TaxonomyIdsForProtSeqIdSearchIdSearcher.getInstance()
+				Set<Integer> taxonomyIds = TaxonomyIdsForProtSeqIdSearchIdSearcher.getInstance()
 						.getTaxonomyIdsSingleSearch( proteinSequenceObject, searchId );
 
-				if ( ! taxonomyIds.isEmpty() ) {
+				if ( taxonomyIds.isEmpty() ) {
 
-					//  Found at least 1 taxonomy id so exit
-					break;
+					//  did not find any taxonomy id so skip to next search id
+					
+					continue;  //  EARLY CONTINUE
+				}
+				
+
+				for ( int taxonomyIdInList : taxonomyIds ) {
+					
+					if ( taxonomyIdInList == 0 ) {
+						
+						foundTaxonomyIdZero = true;
+					
+					} else if ( taxonomyIdSmallestNonZero > taxonomyIdInList ) {
+						taxonomyIdSmallestNonZero = taxonomyIdInList;
+					}
 				}
 			}
+			
 
-			if ( taxonomyIds == null || taxonomyIds.isEmpty() ) {
+			if ( ( ! foundTaxonomyIdZero ) && taxonomyIdSmallestNonZero == taxonomyIdSmallestNonZeroInitialValue ) {
 
 				String msg = "Failed to find a taxonomy id for proteinSequenceId: " + proteinSequenceId
-						+ ", all search ids: " + searchIdsListDedupedSorted;
+						+ ", all search ids: " + searchIdsSet;
 				log.error( msg );
 
 				throw new WebApplicationException(
@@ -266,30 +275,16 @@ public class ProteinNameForTooltipService {
 						);
 			}
 			
-			// Use the taxonomy id with the smallest non-zero value, unless they are all zero 
+			int taxonomyId = taxonomyIdSmallestNonZero;
 			
-			List<Integer> taxonomyIdsSortedList = new ArrayList<>( taxonomyIds );
 			
-			Collections.sort( taxonomyIdsSortedList );
-			
-			Integer taxonomyId = null;
-			
-			for ( Integer taxonomyIdInSortedList : taxonomyIdsSortedList ) {
+			if ( ( foundTaxonomyIdZero ) && taxonomyIdSmallestNonZero == taxonomyIdSmallestNonZeroInitialValue ) {
 				
-				if ( taxonomyIdInSortedList.intValue() != 0 ) {
-					
-					taxonomyId = taxonomyIdInSortedList;
-					break;
-				}
+				taxonomyId = 0;
 			}
 			
-			if ( taxonomyId == null ) {
-				
-				//  All zero so use first one
 			
-				taxonomyIdsSortedList.get( 0 );
-			}
-
+			
 			//  Use taxonomyId to send to PDR webservice
 			
 			
@@ -305,7 +300,7 @@ public class ProteinNameForTooltipService {
 				
 				List <NameValuePair> nvps = new ArrayList <NameValuePair>();
 				
-				nvps.add(new BasicNameValuePair("taxonomyId", taxonomyId.toString() ) );
+				nvps.add(new BasicNameValuePair("taxonomyId", Integer.toString( taxonomyId ) ) );
 				nvps.add(new BasicNameValuePair("proteinSequence", proteinSequence ) );
 				
 				httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
