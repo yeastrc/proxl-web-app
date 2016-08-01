@@ -148,7 +148,7 @@ public class ProcessLinkTypeLooplink {
 		
 		if ( linkedPosition_1 > linkedPosition_2  ) {
 			
-			int linkedPosition_temp = linkedPosition_1;
+			int linkedPosition_temp = linkedPosition_2;
 			linkedPosition_2 = linkedPosition_1;
 			linkedPosition_1 = linkedPosition_temp;
 		}
