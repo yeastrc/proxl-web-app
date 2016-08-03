@@ -10,19 +10,7 @@ some working proficiency with the command line and some knowledge of databases
 ProXL comprises a database component and a web application component. Downloading,
 installing, and configuring these components are described below.
 
-1. Install nrseq-fasta-importer.
-==========================================================
-ProXL makes use of the ``nrseq-fasta-importer`` web application and its associated databases
-to process FASTA files and associate peptides, reported protein names, and link positions with
-full protein sequences. This system provides independence from any particular naming database and
-allows results to be compared between experiments regardless of which protein naming
-database was used in each experiment.
-
-Instructions for installing and using the ``nrseq-fasta-importer`` web application and databases are
-available at at `<http://nrseq-fasta-importer.readthedocs.org/en/latest/>`_.
-
-
-2. Install MySQL, Java, and Apache Tomcat (if necessary)
+1. Install MySQL, Java, and Apache Tomcat (if necessary)
 ==========================================================
 
 This documentation assumes that `Java <http://www.java.com/>`_ (JDK version, 1.7 or later) and the
@@ -45,7 +33,7 @@ You may need to download and install the MySQL JDBC driver. This is available fr
 the downloaded jar file into ``$CATALINA_HOME/lib`` directory on the server on which Apache Tomcat
 is installed (e.g. /usr/local/apache-tomcat-7.0.65/lib) and restart Tomcat.
 
-3. Set up the proxl database
+2. Set up the proxl database
 ==========================================================
 
 Create the ``proxl`` database.
@@ -89,7 +77,7 @@ execute the SQL script doing one of the following (note, file is too big to past
     * At the command line (on macos or linux): ``cat /location/to/create_taxonomy_table.sql | mysql -u your_username -p``
 
 
-4. Install and configure the web application
+3. Install and configure the web application
 ==========================================================
 
 Add MySQL user for Tomcat access
@@ -108,10 +96,9 @@ Follow these instructions to set up access for Tomcat to access the MySQL databa
 |
 |	Grant the necessary privileges in MySQL:
 |	``GRANT ALL ON proxl.* TO 'proxl_user'@'localhost'``	
-|	``GRANT SELECT ON YRC_NRSEQ.* TO 'proxl_user'@'localhost'``
 |
 |	Replace ``proxl_user`` and ``localhost`` with the username and hostname you used
-|	when creating the user. Note that ``YRC_NRSEQ`` was installed as part of the nrseq-fasta-importer setup.
+|	when creating the user.
 |
 
 Configure Tomcat to access proxl database
@@ -151,7 +138,7 @@ from `<https://github.com/yeastrc/proxl-web-app/releases>`_. Then copy this file
 see a ``proxl`` directory created in the webapps directory. If it does not automatically deploy,
 restart Tomcat to force it to deploy.
 
-5. Start using ProXL
+4. Start using ProXL
 ==========================================================
 Your web application should now be available at http://your.host:8080/proxl/
 (Depending on how you have configured your web server, the ``:8080`` may not be different or
