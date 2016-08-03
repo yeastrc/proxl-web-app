@@ -24,6 +24,7 @@ represented as ProXL XML.
 Converters have been developed for several cross-linking proteomics pipelines. Click on the name of the
 software, below, to learn more about the respective converter.
 
+    * `iProphet (TPP) <https://github.com/yeastrc/proxl-import-iprophet>`_
     * `Kojak <https://github.com/yeastrc/proxl-import-kojak>`_
     * `Crux <https://github.com/yeastrc/proxl-import-crux>`_
     * `pLink <https://github.com/yeastrc/proxl-import-plink>`_
@@ -36,15 +37,6 @@ have any questions running any of these software, please email us at proxl-help@
 
 If you are not using one of the software packages listed above, please visit our
 :doc:`/install/converter_guide` page.
-
-Parse the FASTA file
---------------------------------------
-Before data may be uploaded, the FASTA file used to generate those data must be parsed.
-This need only be done once for a given FASTA file. To simplify this process, we have
-developed a FAST parsing web application called ``nrseq-fasta-importer``. If you have
-followed our installation instructions (:doc:`/install/intro`), this will already be
-installed. For information on using (or installing) ``nrseq-fasta-importer``, see
-`<http://nrseq-fasta-importer.readthedocs.org/en/latest/>`_.
 
 Run the import program
 --------------------------------------
