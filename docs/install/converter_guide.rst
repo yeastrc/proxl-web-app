@@ -30,123 +30,122 @@ program and two peptides were identified, one of of which includes a cross-link.
 
 .. code-block:: xml
 
-	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-	<proxl_input fasta_filename="gTuSC-parsimonious-plusRev.fasta">
-	    <search_program_info>
-	        <search_programs>
-	            <search_program name="StavroX" display_name="StavroX" version="3">
-	                <psm_annotation_types>
-	                    <filterable_psm_annotation_types>
-	                        <filterable_psm_annotation_type name="score" description="StavroX Score" filter_direction="above" default_filter="false" default_filter_value="50"/>
-	                        <filterable_psm_annotation_type name="FDR" description="False discovery rate" filter_direction="below" default_filter="true" default_filter_value="0.01"/>
-	                        <filterable_psm_annotation_type name="rank" description="Rank of PSM for scan" filter_direction="below" default_filter="true" default_filter_value="1"/>
-	                    </filterable_psm_annotation_types>
-	                    <descriptive_psm_annotation_types>
-	                        <descriptive_psm_annotation_type name="m/z" description="m/z"/>
-	                        <descriptive_psm_annotation_type name="obs. mass" description="obs. mass"/>
-	                        <descriptive_psm_annotation_type name="cand. mass" description="cand. mass"/>
-	                        <descriptive_psm_annotation_type name="deviation" description="deviation"/>
-	                        <descriptive_psm_annotation_type name="scan num." description="scan num."/>
-	                    </descriptive_psm_annotation_types>
-	                </psm_annotation_types>
-	            </search_program>
-	        </search_programs>
-	        <default_visible_annotations>
-	            <visible_psm_annotations>
-	                <search_annotation search_program="StavroX" annotation_name="scan num."/>
-	                <search_annotation search_program="StavroX" annotation_name="rank"/>
-	                <search_annotation search_program="StavroX" annotation_name="score"/>
-	                <search_annotation search_program="StavroX" annotation_name="FDR"/>
-	                <search_annotation search_program="StavroX" annotation_name="m/z"/>
-	                <search_annotation search_program="StavroX" annotation_name="obs. mass"/>
-	                <search_annotation search_program="StavroX" annotation_name="cand. mass"/>
-	                <search_annotation search_program="StavroX" annotation_name="deviation"/>
-	            </visible_psm_annotations>
-	        </default_visible_annotations>
-	    </search_program_info>
-	    <linkers>
-	        <linker name="dss">
-	            <crosslink_masses>
-	                <crosslink_mass mass="138.0681"/>
-	            </crosslink_masses>
-	        </linker>
-	    </linkers>
-	    <reported_peptides>
-	        <reported_peptide reported_peptide_string="[SFSLEKISAPDQR](K6)" type="unlinked">
-	            <peptides>
-	                <peptide sequence="SFSLEKISAPDQR">
-	                    <modifications>
-	                        <modification mass="138.0681" position="6" isMonolink="true"/>
-	                    </modifications>
-	                </peptide>
-	            </peptides>
-	            <psms>
-	                <psm scan_file_name="Q_2013_1010_RJ_07.mzML" scan_number="25982" precursor_charge="3">
-	                    <filterable_psm_annotations>
-	                        <filterable_psm_annotation search_program="StavroX" annotation_name="score" value="23"/>
-	                        <filterable_psm_annotation search_program="StavroX" annotation_name="rank" value="1"/>
-	                        <filterable_psm_annotation search_program="StavroX" annotation_name="FDR" value="0.0200"/>
-	                    </filterable_psm_annotations>
-	                    <descriptive_psm_annotations>
-	                        <descriptive_psm_annotation search_program="StavroX" annotation_name="m/z" value="545.2862"/>
-	                        <descriptive_psm_annotation search_program="StavroX" annotation_name="obs. mass" value="1633.8440"/>
-	                        <descriptive_psm_annotation search_program="StavroX" annotation_name="cand. mass" value="1633.8432"/>
-	                        <descriptive_psm_annotation search_program="StavroX" annotation_name="deviation" value="0.4885"/>
-	                        <descriptive_psm_annotation search_program="StavroX" annotation_name="scan num." value="25982"/>
-	                    </descriptive_psm_annotations>
-	                </psm>
-	            </psms>
-	        </reported_peptide>
-	        <reported_peptide reported_peptide_string="[KDVLLR](K1)--[TNQSSQEDFNNFMDSMKNESSLHLR](K17)" type="crosslink">
-	            <peptides>
-	                <peptide sequence="KDVLLR">
-	                    <linked_positions>
-	                        <linked_position position="1"/>
-	                    </linked_positions>
-	                </peptide>
-	                <peptide sequence="TNQSSQEDFNNFMDSMKNESSLHLR">
-	                    <linked_positions>
-	                        <linked_position position="17"/>
-	                    </linked_positions>
-	                </peptide>
-	            </peptides>
-	            <psms>
-	                <psm scan_file_name="Q_2013_1010_RJ_07.mzML" scan_number="29178" precursor_charge="5" linker_mass="138.0681">
-	                    <filterable_psm_annotations>
-	                        <filterable_psm_annotation search_program="StavroX" annotation_name="score" value="28"/>
-	                        <filterable_psm_annotation search_program="StavroX" annotation_name="rank" value="1"/>
-	                        <filterable_psm_annotation search_program="StavroX" annotation_name="FDR" value="0.0000"/>
-	                    </filterable_psm_annotations>
-	                    <descriptive_psm_annotations>
-	                        <descriptive_psm_annotation search_program="StavroX" annotation_name="m/z" value="768.7731"/>
-	                        <descriptive_psm_annotation search_program="StavroX" annotation_name="obs. mass" value="3839.8366"/>
-	                        <descriptive_psm_annotation search_program="StavroX" annotation_name="cand. mass" value="3839.8327"/>
-	                        <descriptive_psm_annotation search_program="StavroX" annotation_name="deviation" value="1.0017"/>
-	                        <descriptive_psm_annotation search_program="StavroX" annotation_name="scan num." value="29178"/>
-	                    </descriptive_psm_annotations>
-	                </psm>
-	            </psms>
-	        </reported_peptide>
-	    </reported_peptides>
-		<matched_proteins>
-		    <protein sequence="MEIKEVDDRAELLRYTNNIPLLGKLVNHQPLWSTNPKLKSFSLEKISAPDQRRVQEALVVKDLLNVLIGLEGTYIRYFNDYEPSDPETPIEFKIAKKMDPSFKTFSRRIVRYGKQYMILTRAYEKWSDTSFGMVLQRFAYEIRRFLEDVYLKTLVERLERDFNKVPNFSIRELEQIINETEVNKQMELLYNIYEEIFREIEERRTNQSSQEDFNNFMDSMKNESSLHLRLMVAFDTTVYPVPKGGAILKIFQQKILENLGDRSSVMFLKKLLNNISQDYCTMLYEWLTQGILNDPYQEFMTYDDLEGKTDNIFDTRDRAWDTQYFIRKDVLLRDCDSEEDKNLLFKMLRTGILLKVVRASLQIPTIPSNSSDITIQEINDFADLMEGSNLELYVDKCYSRANEIFLKLFFQGYDLINVLKHLQQIFLGYQSGHNVLKFLTKNMGELTKHYRNDNNANYDKLLQNFELERQSENPNNLMRQLLMIQFDTETLPQVLSHYLQIYPEVPENNSANDDSDPLMHANNFKNMNAILFDELSKERTGAYHGSNLELYTPKSAIYHLKFDINIPYPLNIIISRTCMIKYQIILRYQLVLQYHSRLLDETWMDLNKTPSWKYRGYSHTVKRRIVRATRVLHAKMNHFIKTIMEYFNQNVIDKEVYSLEKCYRNPTLAVAIQNELEGGLTNIMTNRCLSDLIPLQLQIFDIVYKFCKFIKSMRAKLCQLDPVLYEKHKSGMMKTLNEGYRTNNGGQEDVGYQEDAALELIQKLIEYISNASSIFRKCLINFTQELSTEKFDFYDSSSVDAAGIERVLYSIVPPRSASASSQR">
-		        <protein_annotation name="Spc97-yeast"/>
-	       </protein>
-		   <protein sequence="MELEPTLFGIIEALAPQLLSQSHLQTFVSDVVNLLRSSTKSATQLGPLIDFYKLQSLDSPETTIMWHKIEKFLDALFGIQNTDDMVKYLSVFQSLLPSNYRAKIVQKSSGLNMENLANHEHLLSPVRAPSIYTEASFENMDRFSERRSMVSSPNRYVPSSTYSSVTLRQLSNPYYVNTIPEEDILKYVSYTLLATTSALFPFDHEQIQIPSKIPNFESGLLHLIFEAGLLYQSLGYKVEKFRMLNISPMKKALIIEISEELQNYTAFVNNLVSSGTVVSLKSLYREIYENIIRLRIYCRFTEHLEELSGDTFLIELNIFKSHGDLTIRKIATNLFNSMISLYYEYLMNWLTKGLLRATYGEFFIAENTDTNGTDDDFIYHIPIEFNQERVPAFIPKELAYKIFMIGKSYIFLEKYCKEVQWTNEFSKKYHVLYQSNSYRGISTNFFEIINDQYSEIVNHTNQILNQKFHYRDVVFALKNILLMGKSDFMDALIEKANDILATPSDSLPNYKLTRVLQEAVQLSSLRHLMNSPRNSSVINGLDARVLDLGHGSVGWDVFTLDYILYPPLSLVLNVNRPFGRKEYLRIFNFLWRFKKNNYFYQKEMLKSNDIIRSFKKIRGYNPLIRDIINKLSRISILRTQFQQFNSKMESYYLNCIIEENFKEMTRKLQRTENKSQNQFDLIRLNNGTIELNGILTPKAEVLTKSSSSKPQKHAIEKTLNIDELESVHNTFLTNILSHKLFATNTSEISVGDYSGQPYPTSLVLLLNSVYEFVKVYCNLNDIGYEIFIKMNLNDHEASNGLLGKFNTNLKEIVSQYKNFKDRLYIFRADLKNDGDEELFLLSKSLR">
-		        <protein_annotation name="Spc98-yeast"/>
-		    </protein>
-		    <protein sequence="MHHHHHHGKPIPNPLLGLDSTENLYFQGIDPFTMGGEIITLQAGQCGNHVGKFLWSQLAKEHAIGTDGLSQLPDSSTERDDDTKPFFRENSRNKFTPRAIMMDSEPSVIADVENTFRGFFDPRNTWVASDGASAGNSWANGYDIGTRNQDDILNKIDKEIDSTDNFEGFQLLHSVAGGTGSGLGSNLLEALCDRYPKKILTTYSVFPARSSEVVVQSYNTILALRRLIEDSDATVVFDNASLLNISGKVFRNPNIDLQHTNQLISTIISSVTNSIRFPSYMYSSMSSIYSTLIPSPELHFLSPSFTPFTSDYIHDDIAHKGHSSYDVMLDLLDPSNSLVSTAMNNPTYFNVYNTIIGNVEPRQISRAMTKLQQRIKFPSWSSSAMHVNIGRRSPYLPLQPNENEVSGMMLSNMSTVVNVFENACNTFDKVFAKGAFLNNYNVGDLFQSMQNVQDEFAESREVVQSLMEDYVAAEQDSYLDDVLVDDENMVGELEEDLDADGDHKLV">
-		         <protein_annotation name="His-TEV-Tub4-yeast"/>
-		    </protein>
-		    </matched_proteins>
-
-	    <static_modifications>
-	        <static_modification amino_acid="C" mass_change="57.0215"/>
-	    </static_modifications>
-	    <decoy_labels>
-	        <decoy_label prefix="random_seq"/>
-	    </decoy_labels>
-	</proxl_input>
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <proxl_input fasta_filename="gTuSC-parsimonious-plusRev.fasta">
+        <search_program_info>
+            <search_programs>
+                <search_program name="StavroX" display_name="StavroX" version="3">
+                    <psm_annotation_types>
+                        <filterable_psm_annotation_types>
+                            <filterable_psm_annotation_type name="score" description="StavroX Score" filter_direction="above" default_filter="false" default_filter_value="50"/>
+                            <filterable_psm_annotation_type name="FDR" description="False discovery rate" filter_direction="below" default_filter="true" default_filter_value="0.01"/>
+                            <filterable_psm_annotation_type name="rank" description="Rank of PSM for scan" filter_direction="below" default_filter="true" default_filter_value="1"/>
+                        </filterable_psm_annotation_types>
+                        <descriptive_psm_annotation_types>
+                            <descriptive_psm_annotation_type name="m/z" description="m/z"/>
+                            <descriptive_psm_annotation_type name="obs. mass" description="obs. mass"/>
+                            <descriptive_psm_annotation_type name="cand. mass" description="cand. mass"/>
+                            <descriptive_psm_annotation_type name="deviation" description="deviation"/>
+                            <descriptive_psm_annotation_type name="scan num." description="scan num."/>
+                        </descriptive_psm_annotation_types>
+                    </psm_annotation_types>
+                </search_program>
+            </search_programs>
+            <default_visible_annotations>
+                <visible_psm_annotations>
+                    <search_annotation search_program="StavroX" annotation_name="scan num."/>
+                    <search_annotation search_program="StavroX" annotation_name="rank"/>
+                    <search_annotation search_program="StavroX" annotation_name="score"/>
+                    <search_annotation search_program="StavroX" annotation_name="FDR"/>
+                    <search_annotation search_program="StavroX" annotation_name="m/z"/>
+                    <search_annotation search_program="StavroX" annotation_name="obs. mass"/>
+                    <search_annotation search_program="StavroX" annotation_name="cand. mass"/>
+                    <search_annotation search_program="StavroX" annotation_name="deviation"/>
+                </visible_psm_annotations>
+            </default_visible_annotations>
+        </search_program_info>
+        <linkers>
+            <linker name="dss">
+                <crosslink_masses>
+                    <crosslink_mass mass="138.0681"/>
+                </crosslink_masses>
+            </linker>
+        </linkers>
+        <reported_peptides>
+            <reported_peptide reported_peptide_string="[SFSLEKISAPDQR](K6)" type="unlinked">
+                <peptides>
+                    <peptide sequence="SFSLEKISAPDQR">
+                        <modifications>
+                            <modification mass="138.0681" position="6" isMonolink="true"/>
+                        </modifications>
+                    </peptide>
+                </peptides>
+                <psms>
+                    <psm scan_file_name="Q_2013_1010_RJ_07.mzML" scan_number="25982" precursor_charge="3">
+                        <filterable_psm_annotations>
+                            <filterable_psm_annotation search_program="StavroX" annotation_name="score" value="23"/>
+                            <filterable_psm_annotation search_program="StavroX" annotation_name="rank" value="1"/>
+                            <filterable_psm_annotation search_program="StavroX" annotation_name="FDR" value="0.0200"/>
+                        </filterable_psm_annotations>
+                        <descriptive_psm_annotations>
+                            <descriptive_psm_annotation search_program="StavroX" annotation_name="m/z" value="545.2862"/>
+                            <descriptive_psm_annotation search_program="StavroX" annotation_name="obs. mass" value="1633.8440"/>
+                            <descriptive_psm_annotation search_program="StavroX" annotation_name="cand. mass" value="1633.8432"/>
+                            <descriptive_psm_annotation search_program="StavroX" annotation_name="deviation" value="0.4885"/>
+                            <descriptive_psm_annotation search_program="StavroX" annotation_name="scan num." value="25982"/>
+                        </descriptive_psm_annotations>
+                    </psm>
+                </psms>
+            </reported_peptide>
+            <reported_peptide reported_peptide_string="[KDVLLR](K1)--[TNQSSQEDFNNFMDSMKNESSLHLR](K17)" type="crosslink">
+                <peptides>
+                    <peptide sequence="KDVLLR">
+                        <linked_positions>
+                            <linked_position position="1"/>
+                        </linked_positions>
+                    </peptide>
+                    <peptide sequence="TNQSSQEDFNNFMDSMKNESSLHLR">
+                        <linked_positions>
+                            <linked_position position="17"/>
+                        </linked_positions>
+                    </peptide>
+                </peptides>
+                <psms>
+                    <psm scan_file_name="Q_2013_1010_RJ_07.mzML" scan_number="29178" precursor_charge="5" linker_mass="138.0681">
+                        <filterable_psm_annotations>
+                            <filterable_psm_annotation search_program="StavroX" annotation_name="score" value="28"/>
+                            <filterable_psm_annotation search_program="StavroX" annotation_name="rank" value="1"/>
+                            <filterable_psm_annotation search_program="StavroX" annotation_name="FDR" value="0.0000"/>
+                        </filterable_psm_annotations>
+                        <descriptive_psm_annotations>
+                            <descriptive_psm_annotation search_program="StavroX" annotation_name="m/z" value="768.7731"/>
+                            <descriptive_psm_annotation search_program="StavroX" annotation_name="obs. mass" value="3839.8366"/>
+                            <descriptive_psm_annotation search_program="StavroX" annotation_name="cand. mass" value="3839.8327"/>
+                            <descriptive_psm_annotation search_program="StavroX" annotation_name="deviation" value="1.0017"/>
+                            <descriptive_psm_annotation search_program="StavroX" annotation_name="scan num." value="29178"/>
+                        </descriptive_psm_annotations>
+                    </psm>
+                </psms>
+            </reported_peptide>
+        </reported_peptides>
+        <matched_proteins>
+            <protein sequence="MEIKEVDDRAELLRYTNNIPLLGKLVNHQPLWSTNPKLKSFSLEKISAPDQRRVQEALVVKDLLNVLIGLEGTYIRYFNDYEPSDPETPIEFKIAKKMDPSFKTFSRRIVRYGKQYMILTRAYEKWSDTSFGMVLQRFAYEIRRFLEDVYLKTLVERLERDFNKVPNFSIRELEQIINETEVNKQMELLYNIYEEIFREIEERRTNQSSQEDFNNFMDSMKNESSLHLRLMVAFDTTVYPVPKGGAILKIFQQKILENLGDRSSVMFLKKLLNNISQDYCTMLYEWLTQGILNDPYQEFMTYDDLEGKTDNIFDTRDRAWDTQYFIRKDVLLRDCDSEEDKNLLFKMLRTGILLKVVRASLQIPTIPSNSSDITIQEINDFADLMEGSNLELYVDKCYSRANEIFLKLFFQGYDLINVLKHLQQIFLGYQSGHNVLKFLTKNMGELTKHYRNDNNANYDKLLQNFELERQSENPNNLMRQLLMIQFDTETLPQVLSHYLQIYPEVPENNSANDDSDPLMHANNFKNMNAILFDELSKERTGAYHGSNLELYTPKSAIYHLKFDINIPYPLNIIISRTCMIKYQIILRYQLVLQYHSRLLDETWMDLNKTPSWKYRGYSHTVKRRIVRATRVLHAKMNHFIKTIMEYFNQNVIDKEVYSLEKCYRNPTLAVAIQNELEGGLTNIMTNRCLSDLIPLQLQIFDIVYKFCKFIKSMRAKLCQLDPVLYEKHKSGMMKTLNEGYRTNNGGQEDVGYQEDAALELIQKLIEYISNASSIFRKCLINFTQELSTEKFDFYDSSSVDAAGIERVLYSIVPPRSASASSQR">
+                <protein_annotation name="Spc97-yeast"/>
+            </protein>
+            <protein sequence="MELEPTLFGIIEALAPQLLSQSHLQTFVSDVVNLLRSSTKSATQLGPLIDFYKLQSLDSPETTIMWHKIEKFLDALFGIQNTDDMVKYLSVFQSLLPSNYRAKIVQKSSGLNMENLANHEHLLSPVRAPSIYTEASFENMDRFSERRSMVSSPNRYVPSSTYSSVTLRQLSNPYYVNTIPEEDILKYVSYTLLATTSALFPFDHEQIQIPSKIPNFESGLLHLIFEAGLLYQSLGYKVEKFRMLNISPMKKALIIEISEELQNYTAFVNNLVSSGTVVSLKSLYREIYENIIRLRIYCRFTEHLEELSGDTFLIELNIFKSHGDLTIRKIATNLFNSMISLYYEYLMNWLTKGLLRATYGEFFIAENTDTNGTDDDFIYHIPIEFNQERVPAFIPKELAYKIFMIGKSYIFLEKYCKEVQWTNEFSKKYHVLYQSNSYRGISTNFFEIINDQYSEIVNHTNQILNQKFHYRDVVFALKNILLMGKSDFMDALIEKANDILATPSDSLPNYKLTRVLQEAVQLSSLRHLMNSPRNSSVINGLDARVLDLGHGSVGWDVFTLDYILYPPLSLVLNVNRPFGRKEYLRIFNFLWRFKKNNYFYQKEMLKSNDIIRSFKKIRGYNPLIRDIINKLSRISILRTQFQQFNSKMESYYLNCIIEENFKEMTRKLQRTENKSQNQFDLIRLNNGTIELNGILTPKAEVLTKSSSSKPQKHAIEKTLNIDELESVHNTFLTNILSHKLFATNTSEISVGDYSGQPYPTSLVLLLNSVYEFVKVYCNLNDIGYEIFIKMNLNDHEASNGLLGKFNTNLKEIVSQYKNFKDRLYIFRADLKNDGDEELFLLSKSLR">
+                <protein_annotation name="Spc98-yeast"/>
+            </protein>
+            <protein sequence="MHHHHHHGKPIPNPLLGLDSTENLYFQGIDPFTMGGEIITLQAGQCGNHVGKFLWSQLAKEHAIGTDGLSQLPDSSTERDDDTKPFFRENSRNKFTPRAIMMDSEPSVIADVENTFRGFFDPRNTWVASDGASAGNSWANGYDIGTRNQDDILNKIDKEIDSTDNFEGFQLLHSVAGGTGSGLGSNLLEALCDRYPKKILTTYSVFPARSSEVVVQSYNTILALRRLIEDSDATVVFDNASLLNISGKVFRNPNIDLQHTNQLISTIISSVTNSIRFPSYMYSSMSSIYSTLIPSPELHFLSPSFTPFTSDYIHDDIAHKGHSSYDVMLDLLDPSNSLVSTAMNNPTYFNVYNTIIGNVEPRQISRAMTKLQQRIKFPSWSSSAMHVNIGRRSPYLPLQPNENEVSGMMLSNMSTVVNVFENACNTFDKVFAKGAFLNNYNVGDLFQSMQNVQDEFAESREVVQSLMEDYVAAEQDSYLDDVLVDDENMVGELEEDLDADGDHKLV">
+                <protein_annotation name="His-TEV-Tub4-yeast"/>
+            </protein>
+        </matched_proteins>
+        <static_modifications>
+            <static_modification amino_acid="C" mass_change="57.0215"/>
+        </static_modifications>
+        <decoy_labels>
+            <decoy_label prefix="random_seq"/>
+        </decoy_labels>
+    </proxl_input>
 
 
 Writing the conversion software
@@ -158,7 +157,7 @@ language, so long as valid ProXL XML is produced.
 We have developed several open-source converters in Java, which may be used as examples. Follow
 the links below to access the source code associated with each converter:
 
-	* `iProphet (TPP) <https://github.com/yeastrc/proxl-import-iprophet>`_
+    * `iProphet (TPP) <https://github.com/yeastrc/proxl-import-iprophet>`_
     * `Kojak <https://github.com/yeastrc/proxl-import-kojak>`_
     * `Crux <https://github.com/yeastrc/proxl-import-crux>`_
     * `pLink <https://github.com/yeastrc/proxl-import-plink>`_
