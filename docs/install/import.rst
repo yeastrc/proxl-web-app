@@ -4,8 +4,7 @@ How to Import Data
 The high-level procedure for importing data into ProXL is:
 
     1. Convert output to ProXL XML.
-    2. Ensure the FASTA file has been parsed.
-    3. Run the import program.
+    2. Run the import program.
     
 More details follow below.
 
