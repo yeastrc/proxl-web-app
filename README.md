@@ -27,7 +27,6 @@ and ``password`` with your preferred password.
 Grant the necessary privileges in MySQL:
 
 ``GRANT ALL ON proxl.* TO 'proxl_importer'@'localhost'``	
-``GRANT SELECT ON YRC_NRSEQ.* TO 'proxl_user'@'localhost'``
 
 Replace ``proxl_importer`` and ``localhost`` with the username and hostname you used
 	when creating the user.
@@ -49,7 +48,6 @@ location of this file is passed into the importer when it is run. The format of 
 	
 	#  override database names if changed from defaults
 	proxl.db.name=
-	nrseq.db.name=
 
 Save the above as a file (e.g., db_config_file.properties), and edit and change values as necessary.
 The properties are:
@@ -59,7 +57,6 @@ The properties are:
     * dbHost : The hostname of your MySQL server. Usually localhost (if on the same machine).
     * dbPort : The port of your MySQL server. Probably 3306, which is the default port for MySQL.
     * (optional) proxl.db.name : If for some reason you changed the name of the proxl database, it goes here.
-    * (optional) nrseq.db.name : If for some reason you changed the name of the YRC_NRSEQ database, it goes here.
 
 
 Running the importer
