@@ -11,7 +11,6 @@ import org.yeastrc.xlink.www.config_system_table.AppContextConfigSystemValuesRet
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.db_web.DBConnectionFactoryWeb;
 import org.yeastrc.xlink.www.db_web.DBSet_JNDI_Name_FromConfigFile;
-import org.yeastrc.xlink.www.send_email.GetEmailConfig;
 import org.yeastrc.xlink.www.web_utils.GetJsCssCacheBustString;
 
 
@@ -66,12 +65,15 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		
 		AuthLibraryDBConnectionFactory.setDbConnectionFactoryImpl(dbConnectFactory);
 
-		try {
-			GetEmailConfig.validateEmailConfig(); // throws Exception if error
-		} catch (Exception e) {
-			//  already logged
-			throw new RuntimeException( e );
-		} 
+		
+		//  Remove validation so web app will start up with no configuration records
+		
+//		try {
+//			GetEmailConfig.validateEmailConfig(); // throws Exception if error
+//		} catch (Exception e) {
+//			//  already logged
+//			throw new RuntimeException( e );
+//		} 
 		
 		
 		AppContextConfigSystemValuesRetrieval appContextConfigSystemValuesRetrieval = 
