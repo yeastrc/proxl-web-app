@@ -382,11 +382,20 @@
 							>[Manage Protein Selections]</a>							
 							
 
-
-						<a id="download_svg_link"
-								data-tooltip="Download current image as SVG document, suitable for import into software that supports vector graphics, such as Adobe Illustrator." style="font-size:10pt;white-space:nowrap;" 
-								href="#" class="tool_tip_attached_jq download-svg">[Download SVG]</a>
-
+						<span id="svg-download">
+							<a id="download_as_link"
+									data-tooltip="Download current image as file." style="font-size:10pt;white-space:nowrap;" 
+									href="#" class="tool_tip_attached_jq download-svg">[Download Image]</a>
+								
+							<span id="svg-download-options">
+								Choose file format:
+								<a data-tooltip="Download as a JPEG image file." id="svg-download-jpeg" class="svg-download-option tool_tip_attached_jq" href="javascript:" style="margin-top:5px;">JPEG</a>
+								<a data-tooltip="Download as PDF file suitable for use in Adobe Illustrator or printing." id="svg-download-pdf" class="svg-download-option tool_tip_attached_jq" href="javascript:">PDF</a>
+								<a data-tooltip="Download as PNG image file." id="svg-download-png" class="svg-download-option tool_tip_attached_jq" href="javascript:">PNG</a>
+								<a data-tooltip="Download as scalable vector graphics file suitable for use in Inkskape or other compatible software." id="svg-download-svg" class="svg-download-option tool_tip_attached_jq" href="javascript:">SVG</a>
+							</span>
+						</span>
+						
 						<span id="download_svg_not_supported"
 								data-tooltip="Not supported in this browser." 
 								style="font-size:10pt;white-space:nowrap; display: none;" 

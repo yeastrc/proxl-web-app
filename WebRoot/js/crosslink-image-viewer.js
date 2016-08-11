@@ -138,6 +138,8 @@ var _BORDER_OVERALL_IMAGE_ON_ONE_SIDE = 0;
 // var _MAX_WIDTH_EXTRA_SUBTRACT_VALUE = 10;
  var _MAX_WIDTH_EXTRA_SUBTRACT_VALUE = 20; 
 
+ // the snap svg object
+ var _GLOBAL_SNAP_SVG_OBJECT;
  
  //  Vertical constants
  
@@ -4567,12 +4569,6 @@ function drawSvg() {
 		return;
 	}
 	
-	
-	
-	var svgRootSnapSVGObject;  // the Snap SVG object for the SVG
-
-
-	
 	//  First remove and add the "<svg>" element from the template
 	
 	var $svg_image_template_div = $("#svg_image_template_div");
@@ -4626,8 +4622,9 @@ function drawSvg() {
 
 //	svgRootSnapSVGObject = Snap("#svg"); //  now using CSS selector, no longer has that "id" 
 	
-	svgRootSnapSVGObject = Snap( merged_image_svg_element );  // pass in HTML element
-	
+	var svgRootSnapSVGObject = Snap( merged_image_svg_element );  // pass in HTML element
+	_GLOBAL_SNAP_SVG_OBJECT = svgRootSnapSVGObject;
+
 	
 	svgRootSnapSVGObject.attr( { width: _DEFAULT_VIEWPORT_WIDTH } );
 	svgRootSnapSVGObject.attr( { height: _DEFAULT_VIEWPORT_HEIGHT } );
@@ -4751,13 +4748,6 @@ function drawSvg() {
 			bottomOfLowestItemDrawn = drawColorBySearchLegendResponse.bottomOfLowestItemDrawn;  // adjust bottomOfLowestItemDrawn for this item
 		}
 	};
-	
-	
-	//  Test to show where the value of bottomOfLowestItemDrawn falls
-//	var rectangleAtBottom = svgRootSnapSVGObject.rect( 100, bottomOfLowestItemDrawn, 20, 20 );
-//	rectangleAtBottom.attr( {
-//		fill: "pink"
-//	});
 
 	var newHeight = bottomOfLowestItemDrawn + 5;  //  Add 60 to be conservative to not cut anything off 
 	
@@ -4771,57 +4761,6 @@ function drawSvg() {
 	
 	$svg_image_inner_container_div.css( { height : newHeightContainingDiv } );
 	
-	/*
-	// for testing, show all protein positions
-	for ( var i = 0; i < selectedProteins.length; i++ ) {
-
-		console.log( "Length: " + _proteinLengths[ selectedProteins[ i ] ] );
-		
-		var fromY = _OFFSET_FROM_TOP + ( 80 * i ) + _SINGLE_PROTEIN_BAR_HEIGHT - 17;
-		var toY = _OFFSET_FROM_TOP + ( 80 * i ) - 10;
-
-		for ( var k = 1; k <= _proteinLengths[ selectedProteins[ i ] ]; k++ ) {
-			var x = translatePositionToXCoordinate( { position : k, proteinId : selectedProteins[ i ], proteinBarIndex : XXX } );
-				
-			var line = svgRootSnapSVGObject.line( x, fromY, x, toY );
-			line.attr({
-				stroke:'red',
-				strokeWidth:1,
-				fill: "none"
-			});
-			
-			//svgRootSnapSVGObject.text( x -5 , toY - 8, k );
-		}
-	}
-	*/
-	
-	
-	if ( _testThatCanGetSVGasString ) {
-
-		//////////////////
-
-		//   disable download SVG if not able to get SVG as String
-
-
-		var getSVGContentsAsStringResults = getSVGContentsAsString();
-
-		if ( getSVGContentsAsStringResults.noPageElement ) {
-			
-			alert( "No Page Element " );  //  TODO   Remove
-		
-		} else {
-
-			_testThatCanGetSVGasString = false;  // Only test once
-
-			if ( getSVGContentsAsStringResults.error ) {
-
-				//  Cannot get SVG contents as string so disable "Download SVG" link
-
-				$( "#download_svg_link" ).hide();
-				$( "#download_svg_not_supported" ).show();
-			}
-		}
-	}
 }
 
 
@@ -7946,71 +7885,33 @@ function makeArcPath( direction, startx, starty, endx, endy ) {
 
 /////////////////////////////
 
-function downloadSvg( params ) {
-	
-	var clickedThis = params.clickedThis;
-	
-	var $clickedThis = $( clickedThis );
+function downloadSvg( type ) {
 	
 	var getSVGContentsAsStringResult = getSVGContentsAsString();
+	var svgString = getSVGContentsAsStringResult.fullSVG_String;
+
+	convertAndDownloadSVG( svgString, type );
 	
-	if ( getSVGContentsAsStringResult.noPageElement ) {
-		
-		return;
-	}
-
-	if ( getSVGContentsAsStringResult.error ) {
-		
-		//  TODO Display ERROR Message
-		
-		//  Cannot get SVG contents as string so disable "Download SVG" link
-
-		$( "#download_svg_link" ).hide();
-		$( "#download_svg_not_supported" ).show();
-		
-		return;
-	}
-	 
-	var fullSVG_String = getSVGContentsAsStringResult.fullSVG_String;
-		
-	var svgBase64Ecoded = Base64.encode( fullSVG_String );
-	var hrefString = "data:application/svg+xml;base64," + svgBase64Ecoded;
-
-	var dateForFilename = new Date().toISOString().slice(0, 19).replace(/-/g, "");
-
-	var downloadFilename = "crosslinks-" + dateForFilename + ".svg";
-
-	$clickedThis.attr("href", hrefString ).attr("download", downloadFilename );
-
-	
-	//  OLD
-	
-//	var uriContent = "data:application/svg+xml," + encodeURIComponent( "<svg id=\"svg\">" + $( "svg#svg" ).html() +"</svg>");
-//	var myWindow = window.open(uriContent, "crosslink.svg");
-//	myWindow.focus();
+	updateURLHash( false /* useSearchForm */ );
 }
 
 
 function getSVGContentsAsString() {
-
+	
 	try {
 
-		var $svg_image_inner_container_div__svg_merged_image_svg_jq = $( "#svg_image_inner_container_div svg.merged_image_svg_jq " );
-
-		if ( $svg_image_inner_container_div__svg_merged_image_svg_jq.length === 0 ) {
+		if ( !_GLOBAL_SNAP_SVG_OBJECT ) {
 
 			//  No SVG element found
 
 			return { noPageElement : true };   //  EARLY EXIT
 		}
-
-		// In Edge, svgElement.innerHTML === undefined    This causes .html() to fail with exception
+				
+		var fullSVG_String = "<?xml version=\"1.0\" standalone=\"no\"?>\n";
+		fullSVG_String += "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
 		
-		//  svgContents contains the inner contents of the <svg> element
-		
-		var svgContents = $svg_image_inner_container_div__svg_merged_image_svg_jq.html();
-		
-		var fullSVG_String = "<svg id=\"svg\">" + svgContents +"</svg>";
+		fullSVG_String += _GLOBAL_SNAP_SVG_OBJECT.toString();
+			
 		
 		return { fullSVG_String : fullSVG_String};
 
@@ -8167,11 +8068,11 @@ function initializeViewer()  {
 		updateURLHash( false /* useSearchForm */ );
 		drawSvg();
 	});
-
-	$( "#download_svg_link" ).click( function() {
-		
-		downloadSvg( { clickedThis : this } );
-	});
+	
+	$( "#svg-download-jpeg" ).click( function() { downloadSvg( 'jpeg' ); });
+	$( "#svg-download-png" ).click( function() { downloadSvg( 'png' ); });
+	$( "#svg-download-pdf" ).click( function() { downloadSvg( 'pdf' ); });
+	$( "#svg-download-svg" ).click( function() { downloadSvg( 'svg' ); });
 	
 	
 	$("#run_pgm_annotation_data_overlay_cancel_button").click( function() { 
@@ -8547,6 +8448,42 @@ var imageViewerPageObject = {
 			return queryJSONString;
 		}
 };
+
+/**
+ * Convert and download the conversion of the supplied SVG to the supplied type
+ * As of this writing, the type must be "pdf", "png", "jpeg", or "svg"
+ */
+var convertAndDownloadSVG = function( svgString, typeString ) {	
+	
+	console.log( "convertAndDownloadSVG called." );
+	
+	var form = document.createElement( "form" );
+	
+	$( form ).hide();
+	
+    form.setAttribute( "method", "post" );
+    form.setAttribute( "action", contextPathJSVar + "/convertAndDownloadSVG.do" );
+    //form.setAttribute( "target", "_blank" );
+
+    var svgStringField = document.createElement( "input" );
+    svgStringField.setAttribute("name", "svgString");
+    svgStringField.setAttribute("value", svgString);
+
+    var fileTypeField = document.createElement( "input" );
+    fileTypeField.setAttribute("name", "fileType");
+    fileTypeField.setAttribute("value", typeString);
+
+    form.appendChild( svgStringField );
+    form.appendChild( fileTypeField );
+    
+    document.body.appendChild(form);    // Not entirely sure if this is necessary			
+
+    form.submit();
+	
+    document.body.removeChild( form );
+	
+};
+
 
 
 

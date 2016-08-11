@@ -69,6 +69,8 @@ circlePlotViewer.prototype.draw  = function(  ) {
 		return;
 	}
 	
+	_GLOBAL_SNAP_SVG_OBJECT = svgRootSnapSVGObject;
+	
 	this.setViewerDimensions( svgRootSnapSVGObject );
 	
 	this.drawProteinBars( svgRootSnapSVGObject );
