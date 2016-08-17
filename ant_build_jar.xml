@@ -41,16 +41,7 @@
 	</target>
 
 	
-	<!-- ================================================================================== -->
-	<!-- Create a Manifest.MF file with the SVN info -->
-	<!-- ================================================================================== -->
-	<target name="manifest" depends="prepare">
-		<manifest file="${basedir}/MANIFEST.MF">
-			<attribute name="Date" value="${build-info.current-date}" />
-			<attribute name="Time" value="${build-info.current-time}" />
-		</manifest>
-	</target>
-	
+
 	<!-- Check timestamp on files -->
     <target name="prepare">
     	<tstamp prefix="build-info">
@@ -64,14 +55,13 @@
 	<!-- ================================================================================== -->
 	<!-- Build the jar -->
 	<!-- ================================================================================== -->
-	<target name="build_jar" depends="compile,git.revision"
+	<target name="build_jar" depends="compile,git.revision,prepare"
 			description="Packages the project as a jar file">
 		
 		
 		<!-- exclude everything in the default package-->
 		<jar destfile="${basedir}${file.separator}${deploy}${file.separator}${output_jar}" 
-			basedir="${basedir}${file.separator}${classes}"
-			manifest="${basedir}/MANIFEST.MF">
+			basedir="${basedir}${file.separator}${classes}">
 
 			<manifest>
             	<attribute name="GIT-last-tag-commit-hash" value="${git.last.tag.and.commit.hash}"/>
