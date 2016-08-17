@@ -19,6 +19,8 @@ import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
 import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher;
 import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher.ReturnOnlyReportedPeptidesWithMonolinks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * 
  *
@@ -31,6 +33,8 @@ public class ProteinSequenceCoverageFactory {
 	public static ProteinSequenceCoverageFactory getInstance() { return new ProteinSequenceCoverageFactory(); }
 	
 	/**
+	 * Get the protein sequence coverage object for a single protein
+	 * 
 	 * @param protein
 	 * @param searcherCutoffValuesRootLevel
 	 * @return
@@ -60,9 +64,11 @@ public class ProteinSequenceCoverageFactory {
 	
 
 	/**
+	 * Get the protein sequence coverage objects for multiple proteins
+	 * 
 	 * @param protein
 	 * @param searcherCutoffValuesRootLevel
-	 * @return
+	 * @return A map, keyed on protein ID of the protein sequence coverage objects
 	 * @throws Exception
 	 */
 	public Map<Integer, ProteinSequenceCoverage> getProteinSequenceCoveragesForProteins( List<ProteinSequenceObject> proteinList, Collection<SearchDTO> searches, SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel ) throws Exception {
@@ -84,9 +90,19 @@ public class ProteinSequenceCoverageFactory {
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
 					searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
 			
+			
+			ObjectMapper mapper = new ObjectMapper();
+			String jsonInString = mapper.writeValueAsString(searcherCutoffValuesSearchLevel);
+			System.out.println( jsonInString );
+			
+			System.out.println( searcherCutoffValuesSearchLevel.toString() );
+			System.out.println( searcherCutoffValuesSearchLevel.hashCode() );
+
+			
 			if ( searcherCutoffValuesSearchLevel == null ) {
 				
 				searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
+				
 			}
 
 			List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
