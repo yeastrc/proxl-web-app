@@ -1,7 +1,9 @@
 Usage: java -jar importProxlXML.jar -p project_id  \
                                     -i import_file.proxl.xml \
                                     -c db_connection.properties \
-                                    [ -n ] [ -s scan_file.mzML ]
+                                    [ --no-scan-files ] 
+                                    [ -s scan_file.mzML ]
+                                    [ --output-data-errors-file=filename ]
 								  	
 
 Examples:
@@ -39,4 +41,6 @@ Parameters:
     -n (--no-scan-files) : [Optional] : Must be set if no Scan files are present, the Proxl XML file
                                         will be imported without any scan files. May not be set if
                                         -s is used.
-										
+                                        
+	--output-data-errors-file= : [Optional] : The file data errors are written to.
+						

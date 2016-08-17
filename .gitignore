@@ -11,3 +11,10 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 /bin
+/deploy/importProxlXML.jar
+/deploy_run_importer/runImportProxlXML.jar
+/jar_this_project_main_importer/proxl_import_XML_main.jar
+/proxlRunImportSharedWithWebapp_jar/runImportProxlXMLSharedWithWebapp.jar
+/proxlRunImporter_jar/proxlRunImporter.jar
+/proxlRunImportSharedWithWebapp_jar/proxlRunImportSharedWithWebapp.jar
+/proxlRunImporter_jar/proxlRunImporter_this_project.jar
