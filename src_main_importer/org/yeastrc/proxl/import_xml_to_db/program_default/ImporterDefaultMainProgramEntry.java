@@ -1352,15 +1352,15 @@ public class ImporterDefaultMainProgramEntry {
 			
 		} catch ( ProxlImporterProxlXMLDeserializeFailException e ) {
 
+			String exceptionMessage = e.getMessage();
+			
+			String errorMessage = "The Proxl XML File has XML structure problems and failed to parse."
+					+ "  Please update the program that generated the Proxl XML File"
+					+ " or ensure that the correct version is being used."
+					+ "  Parse error message: " 
+					+ exceptionMessage;
+			
 			if ( outputDataErrorsFileName != null ) {
-
-				String exceptionMessage = e.getMessage();
-				
-				String errorMessage = "The Proxl XML File has XML structure problems and failed to parse."
-						+ "  Please update the program that generated the Proxl XML File"
-						+ " or ensure that the correct version is being used."
-						+ "  Parse error message: " 
-						+ exceptionMessage;
 				
 				writeDataErrorToFile( errorMessage, e, outputDataErrorsFileName );
 			}
@@ -1380,18 +1380,13 @@ public class ImporterDefaultMainProgramEntry {
 
 
 			if ( proxlXMLFileImportTrackingRunDTO != null ) {
-				
-				System.out.println(" ProxlImporterDataException:"
-						+ " Update proxlXMLFileImportTrackingRunDTO with"
-						+ " ProxlXMLFileImportStatus.FAILED,"
-						+ " setDataErrorText: " + e.getMessage() );
-				
+								
 				proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
 
-				proxlXMLFileImportTrackingRunDTO.setDataErrorText( e.getMessage() );
+				proxlXMLFileImportTrackingRunDTO.setDataErrorText( errorMessage );
 				
 				// TODO   Maybe populate this with something else
-				proxlXMLFileImportTrackingRunDTO.setImportResultText( e.getMessage() );
+				proxlXMLFileImportTrackingRunDTO.setImportResultText( errorMessage );
 				
 				ProxlXMLFileImportTrackingRun_Base_DAO.getInstance()
 				.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
@@ -1404,7 +1399,9 @@ public class ImporterDefaultMainProgramEntry {
 
 			if ( outputDataErrorsFileName != null ) {
 
-				writeDataErrorToFile( e.getMessage(), e, outputDataErrorsFileName );
+				writeDataErrorToFile( 
+						"The upload can no longer be inserted into this project." + e.getMessage(), 
+						e, outputDataErrorsFileName );
 			}
 			
 			importResults.setImportSuccessStatus( false) ;
@@ -1423,12 +1420,7 @@ public class ImporterDefaultMainProgramEntry {
 			if ( proxlXMLFileImportTrackingRunDTO != null ) {
 				
 				String dataErrorText = "The upload can no longer be inserted into this project.";
-				
-				System.out.println("ProxlImporterProjectNotAllowImportException:"
-						+ " Update proxlXMLFileImportTrackingRunDTO with"
-						+ " ProxlXMLFileImportStatus.FAILED,"
-						+ " setDataErrorText: " + dataErrorText );
-				
+								
 				proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
 
 				proxlXMLFileImportTrackingRunDTO.setDataErrorText( dataErrorText );
@@ -1441,7 +1433,6 @@ public class ImporterDefaultMainProgramEntry {
 			}
 
 			
-
 			return importResults;  //  EARLY EXIT
 
 		} catch ( ProxlImporterDataException e) {
@@ -1465,11 +1456,6 @@ public class ImporterDefaultMainProgramEntry {
 			}
 
 			if ( proxlXMLFileImportTrackingRunDTO != null ) {
-				
-				System.out.println(" ProxlImporterDataException:"
-						+ " Update proxlXMLFileImportTrackingRunDTO with"
-						+ " ProxlXMLFileImportStatus.FAILED,"
-						+ " setDataErrorText: " + e.getMessage() );
 				
 				proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
 
