@@ -44,6 +44,9 @@ public class ProxlXMLFileImportTrackingRun_PopulateDTO {
 		
 		//  importer_sub_status_id
 		
+		returnItem.setImportResultText( rs.getString( "import_result_text" ) );
+		returnItem.setDataErrorText( rs.getString( "data_error_text" ) );
+		
 		returnItem.setStartDateTime( rs.getDate( "start_date_time" ) );
 		returnItem.setLastUpdatedDateTime( rs.getDate( "last_updated_date_time" ) );
 		
