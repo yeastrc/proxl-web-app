@@ -3,6 +3,7 @@ package org.yeastrc.xlink.www.config_system_table;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTableGetValue;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 
 import com.google.common.cache.CacheBuilder;
@@ -16,7 +17,7 @@ import com.google.common.cache.LoadingCache;
  * 
  * Singleton instance
  */
-public class ConfigSystemCaching {
+public class ConfigSystemCaching implements IConfigSystemTableGetValue {
 
 
 	private static final Logger log = Logger.getLogger(ConfigSystemCaching.class);

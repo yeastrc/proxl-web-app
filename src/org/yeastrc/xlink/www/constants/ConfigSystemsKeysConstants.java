@@ -13,7 +13,9 @@ public class ConfigSystemsKeysConstants {
 	//////   Any plain text inputs need to be added to textConfigKeys in the "static {}" at the bottom
 	
 	
-	////  User sign up procedure keys  -  Specific Values allowed
+	
+	
+	////  User sign up procedure key  -  Specific Values allowed
 
 	public static final String USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY = "user_signup_allow_without_invite";
 

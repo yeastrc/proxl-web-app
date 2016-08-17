@@ -1,0 +1,137 @@
+package org.yeastrc.xlink.www.proxl_xml_file_import.database_insert_with_transaction_services;
+
+import java.sql.Connection;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.yeastrc.xlink.db.DBConnectionFactory;
+import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingDTO;
+import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingSingleFileDTO;
+import org.yeastrc.xlink.www.proxl_xml_file_import.dao.ProxlXMLFileImportTrackingSingleFile_ForWebAppDAO;
+import org.yeastrc.xlink.www.proxl_xml_file_import.dao.ProxlXMLFileImportTracking_ForWebAppDAO;
+
+/**
+ * 
+ *
+ */
+public class SaveImportTrackingAndChildrenSingleDBTransaction {
+
+	private static final Logger log = Logger.getLogger(SaveImportTrackingAndChildrenSingleDBTransaction.class);
+	
+
+	//  private constructor
+	private SaveImportTrackingAndChildrenSingleDBTransaction() { }
+	
+	/**
+	 * @return newly created instance
+	 */
+	public static SaveImportTrackingAndChildrenSingleDBTransaction getInstance() { 
+		return new SaveImportTrackingAndChildrenSingleDBTransaction(); 
+	}
+	
+	
+	/**
+	 * @param trackingItem
+	 * @param singleFileDTOList
+	 * @throws Exception 
+	 */
+	public void saveImportTrackingAndChildrenInSingleDBTransaction( 
+			
+			ProxlXMLFileImportTrackingDTO trackingItem,
+			List<ProxlXMLFileImportTrackingSingleFileDTO> singleFileDTOList
+			) throws Exception {
+		
+
+		Connection dbConnection = null;
+
+		try {
+
+			dbConnection = getConnectionWithAutocommitTurnedOff();
+						
+			ProxlXMLFileImportTracking_ForWebAppDAO.getInstance().save(trackingItem, dbConnection);
+		 	
+			for ( ProxlXMLFileImportTrackingSingleFileDTO singleFileItem : singleFileDTOList ) {
+				
+				singleFileItem.setProxlXmlFileImportTrackingId( trackingItem.getId() );
+				
+				ProxlXMLFileImportTrackingSingleFile_ForWebAppDAO.getInstance()
+				.save( singleFileItem, dbConnection );
+			}
+			
+			
+			dbConnection.commit();
+			
+		} catch ( Exception e ) {
+			
+			String msg = "Failed saveImportTrackingAndChildrenInSingleDBTransaction(...)";
+
+
+			System.out.println( msg );
+			System.err.println( msg );
+			
+			log.error( msg , e);
+
+			if ( dbConnection != null ) {
+				
+				try {
+					dbConnection.rollback();
+					
+				} catch (Exception ex) {
+					
+					String msgRollback = "Rollback Exception:  saveImportTrackingAndChildrenInSingleDBTransaction(...) Exception:  See Syserr or Sysout for original exception: Rollback Exception, tables 'scan' and 'scan_spectrum_data' are in an inconsistent state. '" + ex.toString();
+
+					System.out.println( msgRollback );
+					System.err.println( msgRollback );
+					
+					log.error( msgRollback, ex );
+
+					throw new Exception( msgRollback, ex );
+				}
+			}
+			
+			throw e;
+			
+		} finally {
+
+			if( dbConnection != null ) {
+
+				try {
+					dbConnection.setAutoCommit(true);  /// reset for next user of connection
+				} catch (Exception ex) {
+					String msg = "Failed dbConnection.setAutoCommit(true) in saveImportTrackingAndChildrenInSingleDBTransaction(...)";
+
+					System.out.println( msg );
+					System.err.println( msg );
+
+					throw new Exception(msg);
+				}
+
+				try { dbConnection.close(); } 
+				catch(Throwable t ) { ; }
+				dbConnection = null;
+			}
+
+		}
+		
+		
+		
+		
+	}
+	
+	
+
+	/**
+	 * @return
+	 * @throws Exception
+	 */
+	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
+		
+		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+		
+		dbConnection.setAutoCommit(false);
+		
+		return dbConnection;
+	}
+	
+	
+}

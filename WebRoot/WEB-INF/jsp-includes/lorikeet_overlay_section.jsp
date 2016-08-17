@@ -51,9 +51,11 @@
 									<div><span id="lorikeet_looplink_sequence"></span></div>
 									
 									<div ><span id="lorikeet_looplink_vertical_lines_space_before"></span
-											>|<span id="lorikeet_looplink_vertical_lines_space_inside"></span>|</div>
+											>|<span id="lorikeet_looplink_vertical_lines_space_inside"></span
+											><span id="lorikeet_looplink_second_vert_bar">|</span></div>
 									<div ><span id="lorikeet_looplink_dashes_space_before"></span
-											>+<span id="lorikeet_looplink_dashes_inside"></span>+</div>
+											>+<span id="lorikeet_looplink_dashes_inside"></span
+											><span id="lorikeet_looplink_second_plus">+</span></div>
 								</div>
 								
 								<div id="lorikeet_looplink_svg_based_visual" style=" display: none;" >

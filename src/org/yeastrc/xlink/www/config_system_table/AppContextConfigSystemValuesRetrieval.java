@@ -3,6 +3,7 @@ package org.yeastrc.xlink.www.config_system_table;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.captcha_google_api.IsGoogleRecaptchaConfigured;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
+import org.yeastrc.xlink.www.proxl_xml_file_import.utils.IsProxlXMLFileImportFullyConfigured;
 
 /**
  * For placement in the Application context of the web app
@@ -86,5 +87,16 @@ public class AppContextConfigSystemValuesRetrieval {
 
 			return null;
 		}
+	}
+	
+	
+
+	/**
+	 * @return
+	 */
+	public boolean isProxlXMLFileImportFullyConfigured() {
+		
+		return IsProxlXMLFileImportFullyConfigured.getInstance().isProxlXMLFileImportFullyConfigured();
+		
 	}
 }

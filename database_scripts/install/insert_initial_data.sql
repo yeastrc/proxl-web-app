@@ -29,6 +29,32 @@ INSERT INTO xl_user_access_level_label_description (xl_user_access_level_numeric
 	VALUES ( 9999, 'no access', 'at project level, no access to that project, at application wide level, no access to any project' );
 
 	
+--  Import via web app lookup values	
+
+	--  These values must be kept in sync with the values in the Java class ProxlXMLFileImportFileType
+	
+INSERT INTO proxl_xml_file_import_tracking_single_file_type_lookup (id, display_text) VALUES ( 1, 'Proxl XML File' );
+INSERT INTO proxl_xml_file_import_tracking_single_file_type_lookup (id, display_text) VALUES ( 2, 'Scan File' );
+
+	--  These values must be kept in sync with the values in the Java class ProxlXMLFileImportFileUploadStatus
+	
+INSERT INTO proxl_xml_file_import_tracking_single_file_upload_status_lookup (id, display_text) VALUES ( 1, 'Record Inserted' );
+INSERT INTO proxl_xml_file_import_tracking_single_file_upload_status_lookup (id, display_text) VALUES ( 2, 'File Upload Started' );
+INSERT INTO proxl_xml_file_import_tracking_single_file_upload_status_lookup (id, display_text) VALUES ( 3, 'File Upload Complete' );
+
+
+
+
+	--  These values must be kept in sync with the values in the Java class ProxlXMLFileImportStatus
+    
+INSERT INTO proxl_xml_file_import_tracking_status_values_lookup (id, display_text) VALUES ( 1, 'init_insert_pre_queued' );
+INSERT INTO proxl_xml_file_import_tracking_status_values_lookup (id, display_text) VALUES ( 2, 'queued' );
+INSERT INTO proxl_xml_file_import_tracking_status_values_lookup (id, display_text) VALUES ( 3, 're-queued' );
+INSERT INTO proxl_xml_file_import_tracking_status_values_lookup (id, display_text) VALUES ( 4, 'started' );
+INSERT INTO proxl_xml_file_import_tracking_status_values_lookup (id, display_text) VALUES ( 5, 'complete' );
+INSERT INTO proxl_xml_file_import_tracking_status_values_lookup (id, display_text) VALUES ( 6, 'failed' );
+
+	
 --  INSERT SUPPORTED CROSS-LINKERS
 
 INSERT INTO linker(abbr,name)VALUES( 'dss','disuccinimidyl suberate' );

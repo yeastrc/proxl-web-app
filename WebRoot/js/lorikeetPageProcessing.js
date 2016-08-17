@@ -299,8 +299,14 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 			var $lorikeet_looplink_svg_based_visual = $("#lorikeet_looplink_svg_based_visual");
 
 			
+			var svgSupportedSnapLoaded = false;
 			
 			if ( typeof Modernizr !== 'undefined' && Modernizr.svg && typeof Snap !== 'undefined' ) {
+				
+				svgSupportedSnapLoaded = true;
+			}
+			
+			if ( svgSupportedSnapLoaded ) {
 				
 				//  SVG supported and Snap SVG library is loaded, create a SVG based visual
 				
@@ -327,158 +333,321 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 				var pos_2_ZeroBased = linkPosition2 - 1;
 				
 				
-				var seqBefore = sequence.substring( 0, pos_1_ZeroBased );
-				var seqPos1 = sequence.substring( pos_1_ZeroBased, pos_1_ZeroBased + 1 );
-				var seqBetween = sequence.substring( pos_1_ZeroBased + 1, pos_2_ZeroBased );
-				var seqPos2 = sequence.substring( pos_2_ZeroBased, pos_2_ZeroBased + 1 );
-				var seqAfter = sequence.substring( pos_2_ZeroBased + 1 );
 
- 
-
-
-				$lorikeet_looplink_svg_based_visual.empty();
-				
-				var $svg_element = $('<svg width="5" height="5">').appendTo( $lorikeet_looplink_svg_based_visual );
-				
-				var svgElement = $svg_element[0];
-				
-				var svgRootSnapSVGObject = Snap( svgElement );  // pass in HTML element
-				
-				var outerGroup = svgRootSnapSVGObject.g();
-				
-				var textX = 1;
-				var textY = 8;
-
-				var sequenceTextSnapSVGObject = svgRootSnapSVGObject.text( textX, textY, [ seqBefore, seqPos1, seqBetween, seqPos2, seqAfter ] );
-
-				sequenceTextSnapSVGObject.attr( { "dy": "0.35em"} );
-				
-//				var sequenceTextSnapSVGObject_bbox_Initial = sequenceTextSnapSVGObject.getBBox();
-				
-				
-				var sequenceTextSnapSVGObject_bbox = sequenceTextSnapSVGObject.getBBox();
-
-				var sequenceText_X = sequenceTextSnapSVGObject_bbox.x;
-				var sequenceText_Y = sequenceTextSnapSVGObject_bbox.y;
-				var sequenceText_Height = sequenceTextSnapSVGObject_bbox.height;
-				
-
-				var lorikeet_loop_link_seqBefore_SnapSVGObject = sequenceTextSnapSVGObject.select("tspan:nth-child(1)"); //  !!! This selector must match the position in the array above
-				var lorikeet_loop_link_seqBetween_SnapSVGObject = sequenceTextSnapSVGObject.select("tspan:nth-child(3)"); //  !!! This selector must match the position in the array above
-				var lorikeet_loop_link_seqAfter_SnapSVGObject = sequenceTextSnapSVGObject.select("tspan:nth-child(5)"); //  !!! This selector must match the position in the array above
-
-				lorikeet_loop_link_seqBefore_SnapSVGObject.attr( { "dy": "0.35em"} );
-//				lorikeet_loop_link_seqBetween_SnapSVGObject.attr( { "dy": "0.35em"} );
-//				lorikeet_loop_link_seqAfter_SnapSVGObject.attr( { "dy": "0.35em"} );
-				
-				var lorikeet_loop_link_seqBefore_PlainSVGObject = lorikeet_loop_link_seqBefore_SnapSVGObject.node;
-				var lorikeet_loop_link_seqBetween_PlainSVGObject = lorikeet_loop_link_seqBetween_SnapSVGObject.node;
-				var lorikeet_loop_link_seqAfter_PlainSVGObject = lorikeet_loop_link_seqAfter_SnapSVGObject.node;
-
-//				var lorikeet_loop_link_seqBefore_textLength = lorikeet_loop_link_seqBefore_PlainSVGObject.textLength.baseVal.value;
-//				var lorikeet_loop_link_seqBetween_textLength = lorikeet_loop_link_seqBetween_PlainSVGObject.textLength.baseVal.value;
-//				var lorikeet_loop_link_seqAfter_textLength = lorikeet_loop_link_seqAfter_PlainSVGObject.textLength.baseVal.value;
-
-				var lorikeet_loop_link_seqBefore_textLength = lorikeet_loop_link_seqBefore_PlainSVGObject.getComputedTextLength();
-				var lorikeet_loop_link_seqBetween_textLength = lorikeet_loop_link_seqBetween_PlainSVGObject.getComputedTextLength();
-				var lorikeet_loop_link_seqAfter_textLength = lorikeet_loop_link_seqAfter_PlainSVGObject.getComputedTextLength();
-
-//				http://www.w3.org/TR/SVG/text.html#__svg__SVGTextContentElement__getComputedTextLength
-//				Note: getComputedTextLength(); get's the width of the actual characters, not the bounding box of the tspans. 
-//						The font characters can be slightly larger than the tspan bounding box.
-				
-				
-				
-				var lorikeet_loop_link_pos_1_SnapSVGObject = sequenceTextSnapSVGObject.select("tspan:nth-child(2)"); //  !!! This selector must match the position in the array above
-				lorikeet_loop_link_pos_1_SnapSVGObject.addClass("lorikeet_loop_link_pos_1_jq");
-
-//				lorikeet_loop_link_pos_1_SnapSVGObject.attr( { "dy": "0.35em"} );
-				
-				var lorikeet_loop_link_pos_2_SnapSVGObject = sequenceTextSnapSVGObject.select("tspan:nth-child(4)"); //  !!! This selector must match the position in the array above
-				lorikeet_loop_link_pos_2_SnapSVGObject.addClass("lorikeet_loop_link_pos_2_jq");
-				
-//				lorikeet_loop_link_pos_2_SnapSVGObject.attr( { "dy": "0.35em"} );
-				
-				outerGroup.add( sequenceTextSnapSVGObject );
-
-				
-//				var lorikeet_loop_link_pos_1_bbox = lorikeet_loop_link_pos_1_SnapSVGObject.getBBox(); //  is bbox of entire text element
-//				var lorikeet_loop_link_pos_2_bbox = lorikeet_loop_link_pos_2_SnapSVGObject.getBBox(); //  is bbox of entire text element
-				
-				
-				var lorikeet_loop_link_pos_1_PlainSVGObject = lorikeet_loop_link_pos_1_SnapSVGObject.node;
-				var lorikeet_loop_link_pos_2_PlainSVGObject = lorikeet_loop_link_pos_2_SnapSVGObject.node;
+				if ( pos_1_ZeroBased === pos_2_ZeroBased ) {
 					
-//				var lorikeet_loop_link_pos_1_textLength = lorikeet_loop_link_pos_1_PlainSVGObject.textLength.baseVal.value;
-//				var lorikeet_loop_link_pos_2_textLength = lorikeet_loop_link_pos_2_PlainSVGObject.textLength.baseVal.value;
-				
-				var lorikeet_loop_link_pos_1_textLength = lorikeet_loop_link_pos_1_PlainSVGObject.getComputedTextLength();
-				var lorikeet_loop_link_pos_2_textLength = lorikeet_loop_link_pos_2_PlainSVGObject.getComputedTextLength();
-				
-				var pos1X = sequenceText_X + lorikeet_loop_link_seqBefore_textLength;
-				var pos1Width = lorikeet_loop_link_pos_1_textLength;
-				var pos1CenterX = pos1X + ( pos1Width / 2 );
-				
+					//  Special case of looplink to itself
 
-				var pos2X = sequenceText_X + lorikeet_loop_link_seqBefore_textLength + lorikeet_loop_link_pos_1_textLength + lorikeet_loop_link_seqBetween_textLength;
-				var pos2Width = lorikeet_loop_link_pos_2_textLength;
-				var pos2CenterX = pos2X + ( pos2Width / 2 );
+					var seqBefore = sequence.substring( 0, pos_1_ZeroBased );
+					var seqPos1 = sequence.substring( pos_1_ZeroBased, pos_1_ZeroBased + 1 );
+					var seqAfter = sequence.substring( pos_2_ZeroBased + 1 );
 
-				
-				var x1 = pos1CenterX;
-				var y1 = sequenceText_Y + sequenceText_Height;
-				var x2 = pos2CenterX;
-				var y2 = y1;
 
-				var arc = svgRootSnapSVGObject.path( makeArcPathLorikeetPageProcessing( _MAKE_ARC_PATH_DIRECTION_DOWN__LORIKEET_PAGE_PROCESSING, x1, y1, x2, y2 ) );
-				arc.attr({
-					stroke: _LOOP_LINK_LINE_COLOR__LORIKEET_PAGE_PROCESSING,
-					strokeWidth:1,
-					//"stroke-dasharray":"1,1",
-					fill: "none"
-				});
 
-				
-				var arc_bbox = arc.getBBox();
-				
-				var arc_Y2 = arc_bbox.y2;
-				
-				var sequenceTextSnapSVGObject_bbox_X2 = sequenceTextSnapSVGObject_bbox.x2;
-				
-				var imageWidth = Math.ceil( sequenceTextSnapSVGObject_bbox_X2 + 10 );
-				var imageHeight = Math.ceil( arc_Y2 + 10 );
-				
-				svgRootSnapSVGObject.attr( { width: imageWidth } );
-				svgRootSnapSVGObject.attr( { height: imageHeight } );
-				
 
+					$lorikeet_looplink_svg_based_visual.empty();
+
+					var $svg_element = $('<svg width="5" height="5">').appendTo( $lorikeet_looplink_svg_based_visual );
+
+					var svgElement = $svg_element[0];
+
+					var svgRootSnapSVGObject = Snap( svgElement );  // pass in HTML element
+
+					var outerGroup = svgRootSnapSVGObject.g();
+
+					var textX = 1;
+					var textY = 8;
+
+					var sequenceTextSnapSVGObject = svgRootSnapSVGObject.text( textX, textY, [ seqBefore, seqPos1, seqAfter ] );
+
+					sequenceTextSnapSVGObject.attr( { "dy": "0.35em"} );
+
+//					var sequenceTextSnapSVGObject_bbox_Initial = sequenceTextSnapSVGObject.getBBox();
+
+
+					var sequenceTextSnapSVGObject_bbox = sequenceTextSnapSVGObject.getBBox();
+
+					var sequenceText_X = sequenceTextSnapSVGObject_bbox.x;
+					var sequenceText_Y = sequenceTextSnapSVGObject_bbox.y;
+					var sequenceText_Height = sequenceTextSnapSVGObject_bbox.height;
+
+
+					var lorikeet_loop_link_seqBefore_SnapSVGObject = sequenceTextSnapSVGObject.select("tspan:nth-child(1)"); //  !!! This selector must match the position in the array above
+//					var lorikeet_loop_link_seqAfter_SnapSVGObject = sequenceTextSnapSVGObject.select("tspan:nth-child(3)"); //  !!! This selector must match the position in the array above
+
+					lorikeet_loop_link_seqBefore_SnapSVGObject.attr( { "dy": "0.35em"} );
+//					lorikeet_loop_link_seqAfter_SnapSVGObject.attr( { "dy": "0.35em"} );
+
+					var lorikeet_loop_link_seqBefore_PlainSVGObject = lorikeet_loop_link_seqBefore_SnapSVGObject.node;
+//					var lorikeet_loop_link_seqAfter_PlainSVGObject = lorikeet_loop_link_seqAfter_SnapSVGObject.node;
+
+//					var lorikeet_loop_link_seqBefore_textLength = lorikeet_loop_link_seqBefore_PlainSVGObject.textLength.baseVal.value;
+//					var lorikeet_loop_link_seqBetween_textLength = lorikeet_loop_link_seqBetween_PlainSVGObject.textLength.baseVal.value;
+//					var lorikeet_loop_link_seqAfter_textLength = lorikeet_loop_link_seqAfter_PlainSVGObject.textLength.baseVal.value;
+
+					var lorikeet_loop_link_seqBefore_textLength = lorikeet_loop_link_seqBefore_PlainSVGObject.getComputedTextLength();
+//					var lorikeet_loop_link_seqAfter_textLength = lorikeet_loop_link_seqAfter_PlainSVGObject.getComputedTextLength();
+
+//					http://www.w3.org/TR/SVG/text.html#__svg__SVGTextContentElement__getComputedTextLength
+//					Note: getComputedTextLength(); get's the width of the actual characters, not the bounding box of the tspans. 
+//					The font characters can be slightly larger than the tspan bounding box.
+
+
+
+					var lorikeet_loop_link_pos_1_SnapSVGObject = sequenceTextSnapSVGObject.select("tspan:nth-child(2)"); //  !!! This selector must match the position in the array above
+					lorikeet_loop_link_pos_1_SnapSVGObject.addClass("lorikeet_loop_link_pos_1_jq");
+
+//					lorikeet_loop_link_pos_1_SnapSVGObject.attr( { "dy": "0.35em"} );
+
+
+					outerGroup.add( sequenceTextSnapSVGObject );
+
+
+//					var lorikeet_loop_link_pos_1_bbox = lorikeet_loop_link_pos_1_SnapSVGObject.getBBox(); //  is bbox of entire text element
+
+
+					var lorikeet_loop_link_pos_1_PlainSVGObject = lorikeet_loop_link_pos_1_SnapSVGObject.node;
+
+//					var lorikeet_loop_link_pos_1_textLength = lorikeet_loop_link_pos_1_PlainSVGObject.textLength.baseVal.value;
+
+					var lorikeet_loop_link_pos_1_textLength = lorikeet_loop_link_pos_1_PlainSVGObject.getComputedTextLength();
+
+					var pos1X = sequenceText_X + lorikeet_loop_link_seqBefore_textLength;
+					var pos1Width = lorikeet_loop_link_pos_1_textLength;
+					var pos1CenterX = pos1X + ( pos1Width / 2 );
+
+					var x1 = pos1CenterX;
+					var y1 = sequenceText_Y + sequenceText_Height;
+					
+					var height = 20;
+					
+
+					var lineSnapSVGObject = svgRootSnapSVGObject.line( x1, y1, x1, y1 + height );
+					lineSnapSVGObject.attr({
+						stroke: _LOOP_LINK_LINE_COLOR__LORIKEET_PAGE_PROCESSING,
+						strokeWidth: 1,
+						fill: "none"
+					});
+
+//					var arc = svgRootSnapSVGObject.path( makeArcPathLorikeetPageProcessing( _MAKE_ARC_PATH_DIRECTION_DOWN__LORIKEET_PAGE_PROCESSING, x1, y1, x1, y1 ) );
+//					arc.attr({
+//						stroke: _LOOP_LINK_LINE_COLOR__LORIKEET_PAGE_PROCESSING,
+//						strokeWidth:1,
+//						//"stroke-dasharray":"1,1",
+//						fill: "none"
+//					});
+//
+//
+//					var arc_bbox = arc.getBBox();
+//
+//					var arc_Y1 = arc_bbox.y1;
+
+					var sequenceTextSnapSVGObject_bbox_X2 = sequenceTextSnapSVGObject_bbox.x2;
+
+					var imageWidth = Math.ceil( sequenceTextSnapSVGObject_bbox_X2 + 10 );
+					var imageHeight = Math.ceil( height + 10 );
+
+					svgRootSnapSVGObject.attr( { width: imageWidth } );
+					svgRootSnapSVGObject.attr( { height: imageHeight } );
+
+				//  END:  "Special case of looplink to itself"
+					
+				} else {
+					
+					//  Standard case of a looplink between two positions
+
+					var seqBefore = sequence.substring( 0, pos_1_ZeroBased );
+					var seqPos1 = sequence.substring( pos_1_ZeroBased, pos_1_ZeroBased + 1 );
+					var seqBetween = sequence.substring( pos_1_ZeroBased + 1, pos_2_ZeroBased );
+					var seqPos2 = sequence.substring( pos_2_ZeroBased, pos_2_ZeroBased + 1 );
+					var seqAfter = sequence.substring( pos_2_ZeroBased + 1 );
+
+
+
+
+					$lorikeet_looplink_svg_based_visual.empty();
+
+					var $svg_element = $('<svg width="5" height="5">').appendTo( $lorikeet_looplink_svg_based_visual );
+
+					var svgElement = $svg_element[0];
+
+					var svgRootSnapSVGObject = Snap( svgElement );  // pass in HTML element
+
+					var outerGroup = svgRootSnapSVGObject.g();
+
+					var textX = 1;
+					var textY = 8;
+
+					var sequenceTextSnapSVGObject = svgRootSnapSVGObject.text( textX, textY, [ seqBefore, seqPos1, seqBetween, seqPos2, seqAfter ] );
+
+					sequenceTextSnapSVGObject.attr( { "dy": "0.35em"} );
+
+//					var sequenceTextSnapSVGObject_bbox_Initial = sequenceTextSnapSVGObject.getBBox();
+
+
+					var sequenceTextSnapSVGObject_bbox = sequenceTextSnapSVGObject.getBBox();
+
+					var sequenceText_X = sequenceTextSnapSVGObject_bbox.x;
+					var sequenceText_Y = sequenceTextSnapSVGObject_bbox.y;
+					var sequenceText_Height = sequenceTextSnapSVGObject_bbox.height;
+
+
+					var lorikeet_loop_link_seqBefore_SnapSVGObject = sequenceTextSnapSVGObject.select("tspan:nth-child(1)"); //  !!! This selector must match the position in the array above
+					var lorikeet_loop_link_seqBetween_SnapSVGObject = sequenceTextSnapSVGObject.select("tspan:nth-child(3)"); //  !!! This selector must match the position in the array above
+//					var lorikeet_loop_link_seqAfter_SnapSVGObject = sequenceTextSnapSVGObject.select("tspan:nth-child(5)"); //  !!! This selector must match the position in the array above
+
+					lorikeet_loop_link_seqBefore_SnapSVGObject.attr( { "dy": "0.35em"} );
+//					lorikeet_loop_link_seqBetween_SnapSVGObject.attr( { "dy": "0.35em"} );
+//					lorikeet_loop_link_seqAfter_SnapSVGObject.attr( { "dy": "0.35em"} );
+
+					var lorikeet_loop_link_seqBefore_PlainSVGObject = lorikeet_loop_link_seqBefore_SnapSVGObject.node;
+					var lorikeet_loop_link_seqBetween_PlainSVGObject = lorikeet_loop_link_seqBetween_SnapSVGObject.node;
+//					var lorikeet_loop_link_seqAfter_PlainSVGObject = lorikeet_loop_link_seqAfter_SnapSVGObject.node;
+
+//					var lorikeet_loop_link_seqBefore_textLength = lorikeet_loop_link_seqBefore_PlainSVGObject.textLength.baseVal.value;
+//					var lorikeet_loop_link_seqBetween_textLength = lorikeet_loop_link_seqBetween_PlainSVGObject.textLength.baseVal.value;
+//					var lorikeet_loop_link_seqAfter_textLength = lorikeet_loop_link_seqAfter_PlainSVGObject.textLength.baseVal.value;
+
+					var lorikeet_loop_link_seqBefore_textLength = lorikeet_loop_link_seqBefore_PlainSVGObject.getComputedTextLength();
+					var lorikeet_loop_link_seqBetween_textLength = lorikeet_loop_link_seqBetween_PlainSVGObject.getComputedTextLength();
+//					var lorikeet_loop_link_seqAfter_textLength = lorikeet_loop_link_seqAfter_PlainSVGObject.getComputedTextLength();
+
+//					http://www.w3.org/TR/SVG/text.html#__svg__SVGTextContentElement__getComputedTextLength
+//					Note: getComputedTextLength(); get's the width of the actual characters, not the bounding box of the tspans. 
+//					The font characters can be slightly larger than the tspan bounding box.
+
+
+
+					var lorikeet_loop_link_pos_1_SnapSVGObject = sequenceTextSnapSVGObject.select("tspan:nth-child(2)"); //  !!! This selector must match the position in the array above
+					lorikeet_loop_link_pos_1_SnapSVGObject.addClass("lorikeet_loop_link_pos_1_jq");
+
+//					lorikeet_loop_link_pos_1_SnapSVGObject.attr( { "dy": "0.35em"} );
+
+					var lorikeet_loop_link_pos_2_SnapSVGObject = sequenceTextSnapSVGObject.select("tspan:nth-child(4)"); //  !!! This selector must match the position in the array above
+					lorikeet_loop_link_pos_2_SnapSVGObject.addClass("lorikeet_loop_link_pos_2_jq");
+
+//					lorikeet_loop_link_pos_2_SnapSVGObject.attr( { "dy": "0.35em"} );
+
+					outerGroup.add( sequenceTextSnapSVGObject );
+
+
+//					var lorikeet_loop_link_pos_1_bbox = lorikeet_loop_link_pos_1_SnapSVGObject.getBBox(); //  is bbox of entire text element
+//					var lorikeet_loop_link_pos_2_bbox = lorikeet_loop_link_pos_2_SnapSVGObject.getBBox(); //  is bbox of entire text element
+
+
+					var lorikeet_loop_link_pos_1_PlainSVGObject = lorikeet_loop_link_pos_1_SnapSVGObject.node;
+					var lorikeet_loop_link_pos_2_PlainSVGObject = lorikeet_loop_link_pos_2_SnapSVGObject.node;
+
+//					var lorikeet_loop_link_pos_1_textLength = lorikeet_loop_link_pos_1_PlainSVGObject.textLength.baseVal.value;
+//					var lorikeet_loop_link_pos_2_textLength = lorikeet_loop_link_pos_2_PlainSVGObject.textLength.baseVal.value;
+
+					var lorikeet_loop_link_pos_1_textLength = lorikeet_loop_link_pos_1_PlainSVGObject.getComputedTextLength();
+					var lorikeet_loop_link_pos_2_textLength = lorikeet_loop_link_pos_2_PlainSVGObject.getComputedTextLength();
+
+					var pos1X = sequenceText_X + lorikeet_loop_link_seqBefore_textLength;
+					var pos1Width = lorikeet_loop_link_pos_1_textLength;
+					var pos1CenterX = pos1X + ( pos1Width / 2 );
+
+
+					var pos2X = sequenceText_X + lorikeet_loop_link_seqBefore_textLength + lorikeet_loop_link_pos_1_textLength + lorikeet_loop_link_seqBetween_textLength;
+					var pos2Width = lorikeet_loop_link_pos_2_textLength;
+					var pos2CenterX = pos2X + ( pos2Width / 2 );
+
+
+					var x1 = pos1CenterX;
+					var y1 = sequenceText_Y + sequenceText_Height;
+					var x2 = pos2CenterX;
+					var y2 = y1;
+
+					var arc = svgRootSnapSVGObject.path( makeArcPathLorikeetPageProcessing( _MAKE_ARC_PATH_DIRECTION_DOWN__LORIKEET_PAGE_PROCESSING, x1, y1, x2, y2 ) );
+					arc.attr({
+						stroke: _LOOP_LINK_LINE_COLOR__LORIKEET_PAGE_PROCESSING,
+						strokeWidth:1,
+						//"stroke-dasharray":"1,1",
+						fill: "none"
+					});
+
+
+					var arc_bbox = arc.getBBox();
+
+					var arc_Y2 = arc_bbox.y2;
+
+					var sequenceTextSnapSVGObject_bbox_X2 = sequenceTextSnapSVGObject_bbox.x2;
+
+					var imageWidth = Math.ceil( sequenceTextSnapSVGObject_bbox_X2 + 10 );
+					var imageHeight = Math.ceil( arc_Y2 + 10 );
+
+					svgRootSnapSVGObject.attr( { width: imageWidth } );
+					svgRootSnapSVGObject.attr( { height: imageHeight } );
+					
+					//  END:  ELSE of "Special case of looplink to itself"
+
+				}
+
+				//  END:  SVG supported and Snap SVG library is loaded, create a SVG based visual
+				
 			} else {
+				
+				//  Create Text representation of Looplink
 
 				$lorikeet_looplink_character_based_visual.show();
 				$lorikeet_looplink_svg_based_visual.hide();
 
-				var spaceBeforeFirstLink_string = "";
-				var spaceInsideLink_string = "";
-				var dashesInsideLink_string = "";
 
-				for ( var counter = 1; counter < linkPosition1; counter++ ) {
+				if ( linkPosition1 === linkPosition2 ) {
+					
+					//  Special case of looplink to itself
 
-					spaceBeforeFirstLink_string += "&nbsp;";
+					var spaceBeforeFirstLink_string = "";
+
+					for ( var counter = 1; counter < linkPosition1; counter++ ) {
+
+						spaceBeforeFirstLink_string += "&nbsp;";
+					}
+
+
+					$("#lorikeet_looplink_sequence").text( lorikeetOptions.loopLinkDataInputFormat.peptideData.sequence );
+
+					$("#lorikeet_looplink_vertical_lines_space_before").html( spaceBeforeFirstLink_string );
+					$("#lorikeet_looplink_dashes_space_before").html( spaceBeforeFirstLink_string );
+
+					$("#lorikeet_looplink_second_vert_bar").hide();
+					$("#lorikeet_looplink_second_plus").hide();
+					
+					//  END:  "Special case of looplink to itself"
+					
+				} else {
+		
+					//  Standard case of a looplink between two positions
+
+					var spaceBeforeFirstLink_string = "";
+					var spaceInsideLink_string = "";
+					var dashesInsideLink_string = "";
+
+					for ( var counter = 1; counter < linkPosition1; counter++ ) {
+
+						spaceBeforeFirstLink_string += "&nbsp;";
+					}
+
+					for ( var counter = linkPosition1 + 1; counter < linkPosition2; counter++ ) {
+
+						spaceInsideLink_string += "&nbsp;";
+						dashesInsideLink_string += "-";
+					}
+
+					$("#lorikeet_looplink_sequence").text( lorikeetOptions.loopLinkDataInputFormat.peptideData.sequence );
+
+					$("#lorikeet_looplink_vertical_lines_space_before").html( spaceBeforeFirstLink_string );
+					$("#lorikeet_looplink_dashes_space_before").html( spaceBeforeFirstLink_string );
+
+					$("#lorikeet_looplink_vertical_lines_space_inside").html( spaceInsideLink_string );
+					$("#lorikeet_looplink_dashes_inside").html( dashesInsideLink_string );
+
+					//  END: Standard case of a looplink between two positions
+					
 				}
-
-				for ( var counter = linkPosition1 + 1; counter < linkPosition2; counter++ ) {
-
-					spaceInsideLink_string += "&nbsp;";
-					dashesInsideLink_string += "-";
-				}
-
-				$("#lorikeet_looplink_sequence").text( lorikeetOptions.loopLinkDataInputFormat.peptideData.sequence );
-
-				$("#lorikeet_looplink_vertical_lines_space_before").html( spaceBeforeFirstLink_string );
-				$("#lorikeet_looplink_dashes_space_before").html( spaceBeforeFirstLink_string );
-
-				$("#lorikeet_looplink_vertical_lines_space_inside").html( spaceInsideLink_string );
-				$("#lorikeet_looplink_dashes_inside").html( dashesInsideLink_string );
+				
+				//  END:  Create Text representation of Looplink
 				
 			} //  else of if ( Modernizr && Modernizr.svg && Snap ) {
 				

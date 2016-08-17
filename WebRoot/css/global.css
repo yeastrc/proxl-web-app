@@ -496,6 +496,11 @@ body.project-page .invite-user-expand-link { text-decoration: none; }
 body.project-page .invited-person-invite-date-block { padding-left: 20px; }	
 
 
+
+body.project-page .upload-search-block { margin-left: 30px; }
+
+
+
 body.project-page .searches-block { margin-left: 10px; }
 
 body.project-page .search-entry-bottom-border {
@@ -615,28 +620,156 @@ body.project-page .delete-search-web-link-overlay-container {   }
 
 
 
+/* -----   upload Proxl XML file modal dialog background ----- */
+
+
+	/* upload Proxl XML file modal dialog background */
+.proxl-xml-file-upload-modal-dialog-overlay-background {
+	
+
+	/* cursor: pointer; */ /* set mouse to pointer so user knows they can click on it */
+
+	  z-index: 1001;
+	  
+	  background-color: black;
+	opacity: .80;
+	filter: Alpha(Opacity=80);
+
+	  /*  Moved to inline style in header so context is not hard coded
+	background: #666 url(/???context???/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
+	*/
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+
+/*  Proxl XML file upload Overlay    */
+
+
+div.proxl-xml-file-upload-overlay-div {
+
+	opacity: 1;
+	filter: Alpha(Opacity=100);
+
+	background-color:white;
+	outline: 0px;
+
+	position: absolute;
+	
+	/* 
+	position: fixed;
+	top: 30px;
+	left: 30px;
+	 */
+
+	/*
+	height: 400px;
+
+	border: 3px;
+	border-style: solid;
+	*/
+
+
+	display: block;
+	z-index: 1002;
+
+	width: 800px;
+
+
+}
+
+.proxl-xml-file-upload-overlay-header { background-color: #A55353; padding-bottom: 5px; }
+
+.proxl-xml-file-upload-overlay-X-for-exit-overlay { float: right; border-color: #000000; background-color: white; color: #A55353; padding: 3px; margin: 0px;  cursor: pointer;  }
+
+.proxl-xml-file-upload-overlay-header-text { color: white; padding: 3px; margin: 0px; text-align: center;  }
+
+.proxl-xml-file-upload-overlay-body {  padding: 20px; }
+
+.proxl-xml-file-upload-overlay-link { margin-right: 20px;  }
+
+
+.proxl-xml-file-upload-filename-containing-div { padding-top: 3px; }
+
+    /*  upload progress bar  */
+.import-proxl-xml-file-progress-bar-container { width: 180px; }
+.import-proxl-xml-file-progress-outer { border: 1px solid #000;  text-align: center; }
+		/*  JS code adjusts the width so the background color is shown */
+.import-proxl-xml-file-progress { width: 0%; background-color: #FFF0F0; height: 17px; }
+
+
+
+	/* display upload error dialog */
+
+body.project-page .import-proxl-xml-file-upload-error-overlay-containing-outermost-div { width: 100%; height: 0px;   }
+body.project-page .import-proxl-xml-file-upload-error-overlay-containing-outer-div { position: relative; display: inline-block; }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .import-proxl-xml-file-upload-error-overlay-containing-outer-div, body.project-page .import-proxl-xml-file-upload-error-overlay-container { width: 600px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .import-proxl-xml-file-upload-error-overlay-container { position: fixed; top: 30px; left: 30px;  }
+
+
+	/* display file choose error dialog */
+
+body.project-page .import-proxl-xml-choose-file-error-overlay-containing-outermost-div { width: 100%; height: 0px;   }
+body.project-page .import-proxl-xml-choose-file-error-overlay-containing-outer-div { position: relative; display: inline-block; }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .import-proxl-xml-choose-file-error-overlay-containing-outer-div, body.project-page .import-proxl-xml-choose-file-error-overlay-container { width: 600px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .import-proxl-xml-choose-file-error-overlay-container { position: fixed; top: 30px; left: 30px;  }
+
+	/* confirm abandon upload dialog */
+
+body.project-page .import-proxl-xml-file-confirm-abandon-upload-overlay-containing-outermost-div { width: 100%; height: 0px;   }
+body.project-page .import-proxl-xml-file-confirm-abandon-upload-overlay-containing-outer-div { position: relative; display: inline-block; }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .import-proxl-xml-file-confirm-abandon-upload-overlay-containing-outer-div, body.project-page .import-proxl-xml-file-confirm-abandon-upload-overlay-container { width: 600px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .import-proxl-xml-file-confirm-abandon-upload-overlay-container { position: fixed; top: 30px; left: 30px;  }
+
+
+	/* confirm remove upload dialog */
+
+body.project-page .import-proxl-xml-file-confirm-remove-upload-overlay-containing-outermost-div { width: 100%; height: 0px;   }
+body.project-page .import-proxl-xml-file-confirm-remove-upload-overlay-containing-outer-div { position: relative; display: inline-block; }
+
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .import-proxl-xml-file-confirm-remove-upload-overlay-containing-outer-div, body.project-page .import-proxl-xml-file-confirm-remove-upload-overlay-container { width: 600px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .import-proxl-xml-file-confirm-remove-upload-overlay-container { position: fixed; top: 30px; left: 30px;  }
+
+
+
+
+
+
+
+
+	/* modal dialog for notifying user that the status has changed on one of the Proxl XML Import items */
+
+body.project-page .proxl-xml-file-upload-status-changed-overlay-containing-outer-div { position: relative; }
+
+body.project-page .proxl-xml-file-upload-status-changed-overlay-container { width: 450px; position: fixed; top: 100px; left: 100px; }
+
+
+
+
+
 
 
 /* -----------------------------  */
 
 /*   Modal Dialogs with Title Bar and "X" for close at top right
-
-
-	/* QC Plots modal dialog */
-/*
-body.project-page .qc-plot-overlay-containing-outermost-div {  }
-body.project-page .qc-plot-overlay-containing-outer-div { }
-*/
-/* These 2 divs MUST have the same width so set width for both together */
-/*
-body.project-page .qc-plot-overlay-containing-outer-div, body.project-page .qc-plot-overlay-container { width: 900px;  }
-*/
-/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
-/*
-body.project-page .qc-plot-overlay-container {   }
-*/
-
-
 
 
 
@@ -654,10 +787,6 @@ body.project-page .qc-plot-overlay-background {
 
 	  /*  Moved to inline style in header so context is not hard coded
 	background: #666 url(/???context???/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
-	*/
-	/*  
-	opacity: .50;
-	filter: Alpha(Opacity=50);
 	*/
 	position: fixed;
 	top: 0;
@@ -1612,81 +1741,6 @@ div.filter-cutoffs-modal-dialog-overlay-div {
 
 
 .filter-single-value-display-block { padding-top: 1px; padding-bottom: 1px; padding-left: 3px; padding-right: 3px; margin-right: 3px; white-space:nowrap; background-color: #FFF0F0; border-style: solid; border-color:  #D3D3D3; border-width: 1px; }
-
-
-
-
-
-/* -----   Nag User  modal dialog background ----- */
-
-
-	/* Nag User modal dialog background */
-.nag-user-modal-dialog-overlay-background {
-	
-
-	cursor: pointer; /* set mouse to pointer */
-
-	  z-index: 1001;
-	  
-	  background-color: black;
-	opacity: .80;
-	filter: Alpha(Opacity=80);
-
-	  /*  Moved to inline style in header so context is not hard coded
-	background: #666 url(/???context???/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
-	*/
-	/*  
-	opacity: .50;
-	filter: Alpha(Opacity=50);
-	*/
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-}
-
-
-/*  Nag User Overlay    */
-
-
-div.nag-user-overlay-div {
-
-	opacity: 1;
-	filter: Alpha(Opacity=100);
-
-	background-color:white;
-	outline: 0px;
-
-	position: absolute;
-	top: 50px;
-	left: 50px;
-
-	/*
-	height: 400px;
-
-	border: 3px;
-	border-style: solid;
-	*/
-
-
-	display: block;
-	z-index: 1002;
-
-	width: 1000px;
-
-
-}
-
-.nag-user-overlay-header { background-color: black; padding-bottom: 5px; }
-
-.nag-user-overlay-X-for-exit-overlay { float: right; border-color: #000000; background-color: white; color: #A55353; padding: 3px; margin: 0px;  cursor: pointer;  }
-
-.nag-user-overlay-header-text { color: white; padding: 3px; margin: 0px; text-align: center;  }
-
-.nag-user-overlay-body {  padding: 20px; }
-
-.nag-user-overlay-link { margin-right: 20px;  }
 
 
 

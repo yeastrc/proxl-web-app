@@ -219,19 +219,36 @@ var addSingleTooltipForProteinName = function( params ) {
                 					//   So proteinIdsToGetSequence array is passed as "proteinIdsToGetSequence=<value>" which is what Jersey expects
 
                 			  })
-                			  .done(function(data) {
+                			  .done( function( data ) {
+                				  
+                				  //  first set to html for "not found" 
+                				  
+                				  var mainProteinDataFormattedHTML =
+                					  "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
+                					  + "<span class='is-tooltip-label'>From YRC PDR:</span> " 
+                					  + "</div>"
+                					  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
+                					  + "<span class='is-tooltip-label'>Not Found</span>"
+                					  + "</div>";
 
 
-                				  var mainProteinDataFormattedHTML = "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
-                					  + "<span class='is-tooltip-label'>Source:</span> " + data.source + "</div>" 
-                					  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
-                					  + "<span class='is-tooltip-label'>Name:</span> " + data.name + "</div>";
+                				  if ( data.dataFound ) {
 
-                				  if ( data.description !== undefined && data.description !== null ) {
-                					  output += "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
-                					  		+ "<span class='is-tooltip-label'>Description:</span> " + data.description + "</div>";
+                					  mainProteinDataFormattedHTML = 
+                    					  "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
+                    					  + "<span class='is-tooltip-label'>From YRC PDR:</span> " 
+                    					  + "</div>"
+                    					  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
+                    					  + "<span class='is-tooltip-label'>Source:</span> " + data.source + "</div>" 
+                    					  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
+                    					  + "<span class='is-tooltip-label'>Name:</span> " + data.name + "</div>";
+
+                					  if ( data.description !== undefined && data.description !== null ) {
+                						  output += "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
+                							  + "<span class='is-tooltip-label'>Description:</span> " + data.description + "</div>";
+                					  }
                 				  }
-
+                				  
                 				  __proteinDataForToolTipFormattedHTMLCache[ proteinIdString ] = mainProteinDataFormattedHTML;
                 				  
 
@@ -249,7 +266,7 @@ var addSingleTooltipForProteinName = function( params ) {
                 				  
 
                 				  api.set('content.text', output);
-                			  });
+                			  } );
 
                 			  return 'Loading listing information...'; // Set some initial text
                 		  
@@ -277,11 +294,8 @@ var _addSingleTooltipForProteinName_HTML_Addition_DisplayedProteinName = functio
 	var displayedProteinName = params.displayedProteinName;
 	
 	var html = "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
-	  + "<span class='is-tooltip-label'>Displayed name:</span> " 
+	  + "<span class='is-tooltip-label'>Full name:</span> " 
 	  + displayedProteinName 
-	  + "</div>"
-	  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
-	  + "<span class='is-tooltip-label'>From YRC PDR:</span> " 
 	  + "</div>";
 	
 	return html;

@@ -32,14 +32,27 @@
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
 		
 
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}?x=${cacheBustValue}"></script> 
+
+		<!-- Handlebars templating library   -->
 		
-		<script type="text/javascript" src="${ contextPath }/js/viewProjectPage.js?x=${cacheBustValue}?x=${cacheBustValue}"></script> 
+		<%--  
+		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.js"></script>
+		--%>
+		
+		<!-- use minimized version  -->
+		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
+		
+			
+		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
+		
+		<script type="text/javascript" src="${ contextPath }/js/viewProjectPage.js?x=${cacheBustValue}"></script> 
 		
 		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
 		
 		
 		<%--  Project Admin Javascript is added at the bottom of the page --%>
+
+		<%--  Project Upload Proxl XML File to import Javascript is added at the bottom of the page --%>
 
 </c:set>
 
@@ -52,38 +65,6 @@
 
 		<%--  This is set in the filter so this can/should go on every page --%>
 		<input type="hidden" id="logged_in_user_id" value="${ loggedInUserId }" >
-	
-		
-		<div id="ajax_error_no_session_msg" style="display: none;" >
-		
-			<h1 style="color: red;">Sign in Session Expired</h1>
-			
-			Your sign in session has expired.<br><br>
-			
-			<form action="user_loginPage.do" id="ajax_error_no_session_form" >
-			
-				<input id="ajax_error_no_session_saved_url" name="requestedURL" type="hidden">
-			</form>
-
-			<a id="ajax_error_no_session_login_link" href="javascript:" onclick="$('#ajax_error_no_session_form').submit()" >sign in</a><br><br>
-		
-			<br><br>
-			<br><br>
-
-		
-		</div>
-		
-	
-		<div id="ajax_error_not_authorized_msg" style="display: none;" >
-		
-			<h1 style="color: red;">Access Not Authorized</h1>
-			
-			Access to this data is not authorized.<br><br>
-			
-			<br><br>
-			<br><br>
-		
-		</div>		
 	
 	
 		<div>
@@ -953,9 +934,12 @@
 																
 				<div class="top-level-label">
 					Public Access 
-						(<span class="show_when_public_access_or_public_access_code_enabled_jq" style="${show_when_public_access_code_enabled_div_style_display_control}"
+						(<span class="show_when_public_access_or_public_access_code_enabled_jq" 
+							style="${show_when_public_access_code_enabled_div_style_display_control}"
 							 >Enabled</span
-							><span class="show_when_public_access_or_public_access_code_disabled_jq" style="${show_when_public_access_code_disabled_div_style_display_control}" >Disabled</span>)</div>
+							><span class="show_when_public_access_or_public_access_code_disabled_jq" 
+								style="${show_when_public_access_code_disabled_div_style_display_control}" 
+							 	>Disabled</span>)</div>
 
 				<div class="top-level-label-bottom-border" ></div>
 									
@@ -1141,6 +1125,125 @@
 				
 			</c:if>	  <%-- END  <c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" >  --%>
 
+
+
+		<c:if test="${ configSystemValues.proxlXMLFileImportFullyConfigured }" >
+		
+		  <c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" >
+							
+			<!--  Upload Data -->
+
+			<div id="upload_data_top_level_container" <%--  style="display: none;" --%>
+				class="top-level-container " >
+			
+				<div  class="collapsable-link-container top-level-collapsable-link-container " style="">
+					<a href="javascript:" class="top-level-collapsable-link " style="display: none;"
+						id="upload_data_collapse_hide_data"
+						><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					<a href="javascript:" class="top-level-collapsable-link " 
+						id="upload_data_expand_show_data"
+						><img  src="${ contextPath }/images/icon-expand.png"></a>
+				
+				</div>
+					
+				<div class="top-level-label" >
+					Upload Data
+						<span id="upload_data_pending_block" >
+						 (Pending <span id="upload_data_pending_number">${ proxlXMLFileImportTrackingPendingCount }</span>)</span>
+				</div>
+	
+				<div class="top-level-label-bottom-border" ></div>
+
+				<div class="upload-search-block " id="upload_data_main_collapsable_jq" style="display: none;">
+															
+				  <c:if test="${authAccessLevel.projectOwnerAllowed}" >
+
+					<div style="margin-bottom: 10px;">
+						<input type="button" value="Import Proxl XML File" 
+							class=" open_proxl_file_upload_overlay_jq tool_tip_attached_jq "
+							data-tooltip="Upload a Proxl XML file to this project" >
+					</div>
+					
+					<div class="top-level-label-bottom-border"></div>
+
+				  </c:if>
+				  
+				  <div id="upload_data_items_block">
+				  
+				   <table id="upload_data_items_table" border="0" width="100%" >
+				   
+				   	<tr><td>LOADING</td></tr>
+				   	
+				   </table>
+				  
+				  </div>
+
+										  
+				</div>
+				
+			</div>
+
+			<!--  END  Upload Data -->
+			
+		  </c:if>
+		  
+		  <%--  Only project owner allowed to cancel queued or remove failed --%>
+		  <c:if test="${authAccessLevel.projectOwnerAllowed}" >			
+			
+			<!-- Modal dialog Confirm remove upload item overlay -->
+			
+			<!--  Div behind modal dialog div -->
+			
+			<div class="modal-dialog-overlay-background   import_proxl_xml_file_confirm_remove_upload_overlay_show_hide_parts_jq import_proxl_xml_file_confirm_remove_upload_overlay_cancel_parts_jq  overlay_show_hide_parts_jq" 
+				id="import_proxl_xml_file_confirm_remove_upload_overlay_background" ></div>
+			
+					<!--  Inline div for positioning modal dialog on page -->
+			<div class="import-proxl-xml-file-confirm-remove-upload-overlay-containing-outermost-div " id="import_proxl_xml_file_confirm_remove_upload_overlay_containing_outermost_div_inline_div"  >
+			
+			  <div class="import-proxl-xml-file-confirm-remove-upload-overlay-containing-outer-div " >
+			
+			
+					<!--  Div overlay for confirming canceling file import -->
+				<div class="modal-dialog-overlay-container import-proxl-xml-file-confirm-remove-upload-overlay-container   import_proxl_xml_file_confirm_remove_upload_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
+					 id="import_proxl_xml_file_confirm_remove_upload_overlay_container" >
+			
+					<div class="top-level-label" style="margin-left: 0px;">
+						<span  class=" cancel_queued_item_jq any_item_jq ">Cancel Queued Item?</span>
+						<span  class=" cancel_re_queued_item_jq any_item_jq ">Cancel Re-queued Item?</span>
+						<span  class=" remove_failed_item_jq any_item_jq ">Remove Failed Item?</span>
+					</div>
+			
+					<div class="top-level-label-bottom-border" ></div>
+					
+					<div >
+					
+						<div>
+							<span  class=" cancel_queued_item_jq any_item_jq ">Cancel Queued Item?</span>
+							<span  class=" cancel_re_queued_item_jq any_item_jq ">Cancel Re-queued Item?</span>
+							<span  class=" remove_failed_item_jq any_item_jq ">Remove Failed Item?</span>
+						</div>
+						
+						<div style="margin-top: 10px">
+							<input type="button" value="Yes"  class=" cancel_queued_item_yes_button_jq any_item_jq " >
+							<input type="button" value="Yes"  class=" cancel_re_queued_item_yes_button_jq any_item_jq " >
+							<input type="button" value="Yes"  class=" remove_failed_item_yes_button_jq any_item_jq " >
+							<input type="button" value="Cancel" class="import_proxl_xml_file_confirm_remove_upload_overlay_cancel_parts_jq" >
+						</div>
+							
+					</div>
+					
+				</div>
+			
+			  </div>
+			</div>
+			
+			<!-- END:  Modal dialog Confirm remove upload item overlay -->
+		  
+		  </c:if>
+
+		</c:if>
+							
+	
 
 		<%-- Place outside of submitted form --%>
 		<input type="hidden" id="project_id" value="<c:out value="${project_id}" />" />
@@ -1447,8 +1550,7 @@
 				
 						</div>
 					</c:if>
-					
-					
+
 					<div>
 					    
 						<logic:iterate id="search_wrapper" name="SearchDTODetailsDisplayWrapperList">
@@ -1530,10 +1632,12 @@
 										<table class="search-details" id="search-details-<bean:write name="search" property="id" />" style="display:none;margin-left:15px;">
 
 										  <c:if test="${ authAccessLevel.writeAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }" >
+										   <c:if test="${ not empty search.path }" >
 											<tr>
 												<td>Path:</td>
 												<td><bean:write name="search" property="path" /></td>
 											</tr>
+										   </c:if>
 										  </c:if>
 											
 											
@@ -2399,25 +2503,94 @@
 	
 	
 	
+		<%--   Overlay for uploading Proxl XML file, and Javascript includes --%>
+
+
+		<c:if test="${ configSystemValues.proxlXMLFileImportFullyConfigured }" >
+		
+		  <c:if test="${authAccessLevel.projectOwnerAllowed}" >
+		  <%--
+		  <c:if test="${authAccessLevel.assistantProjectOwnerAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }" >
+		  --%>			
+
+			<%@ include file="/WEB-INF/jsp-includes/proxl_XML_Upload_Overlay.jsp" %>
+
+			<script type="text/javascript" src="${ contextPath }/js/proxlXMLFileImport.js?x=${cacheBustValue}"></script>
+		
+			<%--  Separate JS for Project owner to cancel queued or remove failed import tracking item --%>
+		
+			<script type="text/javascript" src="${ contextPath }/js/proxlXMLFileImportUserUpdates.js?x=${cacheBustValue}"></script>
+		  </c:if>
+		  
+		</c:if>
+		
+		
+		<%--  Overlay and JS for notifying user that the status has changed on one of the Proxl XML Import items --%>
+		<c:if test="${authAccessLevel.assistantProjectOwnerAllowed }" >
+
+
+
+			 <!--  Modal dialog for notifying user that the status has changed on one of the Proxl XML Import items -->
+	
+				<!--  Div behind modal dialog div -->
+	
+			 <div class="modal-dialog-overlay-background   proxl_xml_file_upload_status_changed_overlay_show_hide_parts_jq proxl_xml_file_upload_status_changed_overlay_cancel_parts_jq  overlay_show_hide_parts_jq" 
+				id="proxl_xml_file_upload_status_changed_overlay_background" ></div>
+			
+					<!--  Inline div for positioning modal dialog on page -->
+			 <div class="proxl-xml-file-upload-status-changed-overlay-containing-outermost-div " id="proxl_xml_file_upload_status_changed_overlay_containing_outermost_div_inline_div"  >
+	
+			  <div class="proxl-xml-file-upload-status-changed-overlay-containing-outer-div " >
+			
+	
+					<!--  Div overlay for confirming removing a search -->
+				<div class="modal-dialog-overlay-container proxl-xml-file-upload-status-changed-overlay-container   proxl_xml_file_upload_status_changed_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
+					 id="proxl_xml_file_upload_status_changed_overlay_container" >
+	
+					<div class="top-level-label" style="margin-left: 0px;">Import Status Changed</div>
+	
+					<div class="top-level-label-bottom-border" ></div>
+					
+					<div >
+					
+						<div >The status changed on one of the Proxl XML imports has changed.</div>
+						
+						<div style="margin-top: 10px">
+							<input type="button" value="Refresh Page" id="proxl_xml_file_upload_status_changed_refresh_page_button" >
+							<input type="button" value="Cancel" class="proxl_xml_file_upload_status_changed_overlay_cancel_parts_jq" >
+						</div>
+							
+					</div>
+					
+				</div>
+			
+			  </div>
+			 </div>
+			
+			
+			 <!-- END:   Modal dialog for notifying user that the status has changed on one of the Proxl XML Import items -->
+			
+			<script type="text/javascript" src="${ contextPath }/js/proxlXMLFileImportStatusDisplay.js?x=${cacheBustValue}"></script>
+		
+	
+		
+			<%--  Proxl XML File Import Entry Template --%>
+					
+			<script id="proxl_xml_import_item_template"  type="text/x-handlebars-template">
+
+				<%--  include the template text  --%>
+				<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/proxlXMLFileImportItem.jsp" %>
+
+			</script>	
+									
+		</c:if>
+		
+		
 	
 	
 		<%--  If admin section rendered, include the Javascript for it --%>
 		<c:if test="${authAccessLevel.assistantProjectOwnerAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed}" >
-	
-			<%-- --%>	
-	
-	
-	
-			<!-- Handlebars templating library   -->
-			
-			<%--  
-			<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.js"></script>
-			--%>
-			
-			<!-- use minimized version  -->
-			<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
-			
-	
+		
 			<script type="text/javascript" src="${ contextPath }/js/viewProject_ProjectAdminSection.js?x=${cacheBustValue}"></script>
 
 		</c:if> 
@@ -2430,6 +2603,8 @@
 		
 		</c:if>
 
+
+
 	
 	</div>
 	
@@ -2439,7 +2614,7 @@
 	
 	
 
-<%-- Google Chart API import, for use on experimentDetails.jsp  --%>
+<%-- Google Chart API import --%>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
   google.load("visualization", "1", {packages:["corechart"]});

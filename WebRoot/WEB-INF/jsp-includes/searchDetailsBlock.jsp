@@ -86,11 +86,13 @@
 			</div>
 			<div style="margin-left:20px;display:none;">
 				<table style="border-width:0px;">
-				  <c:if test="${ authAccessLevel.writeAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }" >
+				  <c:if test="${ ( authAccessLevel.writeAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed ) }" >
+				   <c:if test="${ not empty search.path }" >
 					<tr>
 						<td>Path:</td>
 						<td><bean:write name="search" property="path" /></td>
 					</tr>
+				   </c:if>
 				  </c:if>
 					<tr>
 						<td>Linker:</td>

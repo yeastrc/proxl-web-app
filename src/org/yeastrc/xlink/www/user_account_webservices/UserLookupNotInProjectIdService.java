@@ -263,13 +263,13 @@ public class UserLookupNotInProjectIdService {
 	
 	//////////////////////////////////////////////
 	
-	///////    !!!!!!!!!!!!!! OLD
+	///////    !!!!!!!!!!!!!! OLD, Not Currently Used
 	
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/lookupNotInProjectId") 
-	public UserQueryResult getViewerData( @QueryParam( "query" ) String query,
+	public UserQueryResult lookupNotInProjectId( @QueryParam( "query" ) String query,
 										  @QueryParam( "projectId" ) Integer projectId,
 										  @Context HttpServletRequest request )
 	throws Exception {

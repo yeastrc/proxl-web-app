@@ -32,6 +32,44 @@ function handleAJAXFailure( errMsg ) {
 	showAjaxErrorMsgFromMsg( { errorMsg : "Connecting to server failed: " + errorMsg } );
 }
 
+
+/////////////////////
+
+//  Handle when AJAX call gets error, non-jQuery Direct use of var xhr = new XMLHttpRequest();
+
+function handleRawAJAXError( xhr ) {
+
+	var status = xhr.status;
+	var response = xhr.response;
+	
+
+	
+	if ( status === AJAX_RESPONSE_NO_SESSION_STATUS_CODE &&
+			response === AJAX_RESPONSE_NO_SESSION_TEXT ) { 
+		
+
+		//  reload current URL
+		
+		window.location.reload(true);
+		
+		return true;
+
+
+	} else if ( status === AJAX_RESPONSE_NOT_AUTHORIZED_STATUS_CODE &&
+			response === AJAX_RESPONSE_NOT_AUTHORIZED_TEXT ) { 
+
+
+		//  reload current URL
+
+		window.location.reload(true);
+
+		return true;
+	}
+
+	return false;
+}
+
+
 /////////////////////
 
 //  Handle when AJAX call gets error
@@ -54,25 +92,6 @@ function handleAJAXError( jqXHR, textStatus, errorThrown ) {
 		
 		return;
 		
-
-//					$("#ajax_error_no_session_saved_url").val( document.URL );
-//							
-//					var $msg = $("#ajax_error_no_session_msg");
-//					
-//					if ( $msg.length === 0 ) {
-//						
-//						alert("User session has expired or does not exist.");
-//						
-//					} else {
-//						
-//						$(".overlay_show_hide_parts_jq").hide();
-//						
-//						$msg.show();
-//						
-//						window.scroll(0, 0);
-//					}
-		
-		
 		
 	} else if ( jqXHR_statusCode === AJAX_RESPONSE_NOT_AUTHORIZED_STATUS_CODE &&
 				jqXHR_responseText === AJAX_RESPONSE_NOT_AUTHORIZED_TEXT ) { 
@@ -83,22 +102,6 @@ function handleAJAXError( jqXHR, textStatus, errorThrown ) {
 		window.location.reload(true);
 		
 		return;
-		
-		
-//					var $msg = $("#ajax_error_not_authorized_msg");
-//					
-//					if ( $msg.length === 0 ) {
-//						
-//						alert("User is not authorized for this request.");
-//						
-//					} else {
-//						
-//						$(".overlay_show_hide_parts_jq").hide();
-//						
-//						$msg.show();
-//						
-//						window.scroll(0, 0);
-//					}
 		
 		
 	} else if ( jqXHR_statusCode === AJAX_RESPONSE_INVALID_SEARCH_LIST_ACROSS_PROJECTS_STATUS_CODE &&

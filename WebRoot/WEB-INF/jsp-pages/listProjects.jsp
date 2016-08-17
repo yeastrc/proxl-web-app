@@ -34,43 +34,6 @@
 
 
 <div class="overall-enclosing-block">
-
-	
-		<div id="ajax_error_no_session_msg" style="display: none;" >
-		
-			<h1 style="color: red;">Sign in Session Expired</h1>
-			
-			Your sign in session has expired.<br><br>
-			
-			<form action="user_loginPage.do" id="ajax_error_no_session_form" >
-			
-				<input id="ajax_error_no_session_saved_url" name="requestedURL" type="hidden">
-			</form>
-
-			<a id="ajax_error_no_session_login_link" href="javascript:" onclick="$('#ajax_error_no_session_form').submit()" >sign in</a><br><br>
-
-<%-- 			
-			<a id="ajax_error_no_session_login_link" href="user_loginPage.do" >sign in</a><br><br>
---%>			
-			<br><br>
-			<br><br>
-			<%-- 
-			Click this <a href="javascript:" >sign in</a> link to preserve your login
-			--%>
-		
-		</div>
-		
-	
-		<div id="ajax_error_not_authorized_msg" style="display: none;" >
-		
-			<h1 style="color: red;">Access Not Authorized</h1>
-			
-			Access to this data is not authorized.<br><br>
-			
-			<br><br>
-			<br><br>
-		
-		</div>		
 	
 	<div class="top-level-label your-projects-title" >Your Projects</div>	
 	

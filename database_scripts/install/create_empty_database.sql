@@ -3,7 +3,7 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 DROP SCHEMA IF EXISTS proxl ;
-CREATE SCHEMA IF NOT EXISTS proxl DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
+CREATE SCHEMA proxl DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
 USE proxl ;
 
 -- -----------------------------------------------------
@@ -11,7 +11,7 @@ USE proxl ;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS auth_user ;
 
-CREATE TABLE  auth_user (
+CREATE TABLE auth_user (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   username VARCHAR(255) NOT NULL,
   password_hashed VARCHAR(255) NOT NULL,
@@ -35,7 +35,7 @@ CREATE UNIQUE INDEX email_UNIQUE ON auth_user (email ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS auth_shared_object ;
 
-CREATE TABLE  auth_shared_object (
+CREATE TABLE auth_shared_object (
   shared_object_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   public_access_code_enabled TINYINT NOT NULL DEFAULT 0,
   public_access_code VARCHAR(255) NULL,
@@ -52,7 +52,7 @@ CREATE UNIQUE INDEX public_access_code_UNIQUE ON auth_shared_object (public_acce
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS xl_user ;
 
-CREATE TABLE  xl_user (
+CREATE TABLE xl_user (
   auth_user_id INT UNSIGNED NOT NULL,
   first_name VARCHAR(255) NOT NULL,
   last_name VARCHAR(255) NOT NULL,
@@ -71,7 +71,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS project ;
 
-CREATE TABLE  project (
+CREATE TABLE project (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   auth_shareable_object_id INT UNSIGNED NOT NULL,
   title VARCHAR(255) NULL,
@@ -99,7 +99,7 @@ CREATE INDEX fk_auth_shareable_object_id_idx ON project (auth_shareable_object_i
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS linker ;
 
-CREATE TABLE  linker (
+CREATE TABLE linker (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   abbr VARCHAR(255) NOT NULL,
   name VARCHAR(255) NULL DEFAULT NULL,
@@ -116,7 +116,7 @@ CREATE UNIQUE INDEX abbr ON linker (abbr ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS reported_peptide ;
 
-CREATE TABLE  reported_peptide (
+CREATE TABLE reported_peptide (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   sequence VARCHAR(2000) NOT NULL,
   PRIMARY KEY (id))
@@ -132,7 +132,7 @@ CREATE INDEX sequence ON reported_peptide (sequence(20) ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS pdb_file ;
 
-CREATE TABLE  pdb_file (
+CREATE TABLE pdb_file (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL,
   description VARCHAR(2000) NULL DEFAULT NULL,
@@ -165,7 +165,7 @@ CREATE INDEX project_id ON pdb_file (project_id ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS pdb_alignment ;
 
-CREATE TABLE  pdb_alignment (
+CREATE TABLE pdb_alignment (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   pdb_file_id INT(10) UNSIGNED NOT NULL,
   chain_id CHAR(1) NULL DEFAULT NULL,
@@ -193,7 +193,7 @@ CREATE UNIQUE INDEX unique_prot_seq_id_chain_id_pdb_file_id ON pdb_alignment (pr
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS peptide ;
 
-CREATE TABLE  peptide (
+CREATE TABLE peptide (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   sequence VARCHAR(2000) NOT NULL,
   PRIMARY KEY (id))
@@ -209,7 +209,7 @@ CREATE INDEX sequence ON peptide (sequence(20) ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS search ;
 
-CREATE TABLE  search (
+CREATE TABLE search (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   path VARCHAR(2000) NULL,
   fasta_filename VARCHAR(2000) NOT NULL,
@@ -236,7 +236,7 @@ CREATE INDEX fk_project_id_idx ON search (project_id ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS search_comment ;
 
-CREATE TABLE  search_comment (
+CREATE TABLE search_comment (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT(10) UNSIGNED NOT NULL,
   comment VARCHAR(2000) NOT NULL,
@@ -266,7 +266,7 @@ CREATE INDEX search_comment_user_fk_idx ON search_comment (auth_user_id ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS search_reported_peptide ;
 
-CREATE TABLE  search_reported_peptide (
+CREATE TABLE search_reported_peptide (
   search_id INT(10) UNSIGNED NOT NULL,
   reported_peptide_id INT(10) UNSIGNED NOT NULL,
   link_type ENUM('looplink','crosslink','unlinked','dimer') NULL,
@@ -288,7 +288,7 @@ CREATE INDEX reported_peptide_id ON search_reported_peptide (reported_peptide_id
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS psm ;
 
-CREATE TABLE  psm (
+CREATE TABLE psm (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT(10) UNSIGNED NOT NULL,
   scan_id INT UNSIGNED NULL,
@@ -325,7 +325,7 @@ CREATE INDEX psm__search_id_type_idx ON psm (search_id ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS taxonomy ;
 
-CREATE TABLE  taxonomy (
+CREATE TABLE taxonomy (
   id INT(10) UNSIGNED NOT NULL,
   name VARCHAR(255) NOT NULL,
   PRIMARY KEY (id))
@@ -339,7 +339,7 @@ CREATE INDEX name ON taxonomy (name ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS note ;
 
-CREATE TABLE  note (
+CREATE TABLE note (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   project_id INT UNSIGNED NOT NULL,
   auth_user_id_created INT UNSIGNED NOT NULL,
@@ -369,7 +369,7 @@ CREATE INDEX fk_auth_user_id_idx ON note (auth_user_id_created ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS auth_forgot_password_tracking ;
 
-CREATE TABLE  auth_forgot_password_tracking (
+CREATE TABLE auth_forgot_password_tracking (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   auth_user_id INT UNSIGNED NOT NULL,
   create_date DATETIME NOT NULL,
@@ -395,7 +395,7 @@ CREATE INDEX forgot_pwd_trk_auth_user_id_fk_idx ON auth_forgot_password_tracking
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS auth_shared_object_users ;
 
-CREATE TABLE  auth_shared_object_users (
+CREATE TABLE auth_shared_object_users (
   shared_object_id INT UNSIGNED NOT NULL,
   user_id INT UNSIGNED NOT NULL,
   access_level SMALLINT UNSIGNED NOT NULL,
@@ -419,7 +419,7 @@ CREATE INDEX idx_shared_objects_user_id ON auth_shared_object_users (user_id ASC
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS auth_user_invite_tracking ;
 
-CREATE TABLE  auth_user_invite_tracking (
+CREATE TABLE auth_user_invite_tracking (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   submitting_auth_user_id INT UNSIGNED NOT NULL,
   submit_ip VARCHAR(255) NOT NULL,
@@ -479,7 +479,7 @@ CREATE INDEX user_invite_trk_used_auth_user_id_fk_idx ON auth_user_invite_tracki
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS xl_user_access_level_label_description ;
 
-CREATE TABLE  xl_user_access_level_label_description (
+CREATE TABLE xl_user_access_level_label_description (
   xl_user_access_level_numeric_value INT UNSIGNED NOT NULL,
   label VARCHAR(255) NOT NULL,
   description VARCHAR(255) NULL,
@@ -492,7 +492,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS scan_file ;
 
-CREATE TABLE  scan_file (
+CREATE TABLE scan_file (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   filename VARCHAR(255) NOT NULL,
   path VARCHAR(2000) NULL,
@@ -508,7 +508,7 @@ CREATE UNIQUE INDEX filename ON scan_file (filename ASC, sha1sum ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS scan_file_header ;
 
-CREATE TABLE  scan_file_header (
+CREATE TABLE scan_file_header (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   scan_file_id INT UNSIGNED NOT NULL,
   header VARCHAR(255) NOT NULL,
@@ -529,7 +529,7 @@ CREATE INDEX fk_scan_file_header_scan_file_id_idx ON scan_file_header (scan_file
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS scan ;
 
-CREATE TABLE  scan (
+CREATE TABLE scan (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   scan_file_id INT UNSIGNED NOT NULL,
   start_scan_number INT UNSIGNED NOT NULL,
@@ -560,7 +560,7 @@ CREATE INDEX fk_scan_scan_file_id_idx ON scan (scan_file_id ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS scan_spectrum_data ;
 
-CREATE TABLE  scan_spectrum_data (
+CREATE TABLE scan_spectrum_data (
   scan_id INT UNSIGNED NOT NULL,
   spectrum_data LONGBLOB NULL,
   PRIMARY KEY (scan_id),
@@ -577,7 +577,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS search_linker ;
 
-CREATE TABLE  search_linker (
+CREATE TABLE search_linker (
   search_id INT UNSIGNED NOT NULL,
   linker_id INT UNSIGNED NOT NULL,
   PRIMARY KEY (search_id, linker_id),
@@ -600,7 +600,7 @@ CREATE INDEX search_linker_linker_id_fk_idx ON search_linker (linker_id ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS search_file ;
 
-CREATE TABLE  search_file (
+CREATE TABLE search_file (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   filename VARCHAR(255) NOT NULL,
@@ -626,7 +626,7 @@ CREATE INDEX search_file_search_id_fk_idx ON search_file (search_id ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS scan_retention_time ;
 
-CREATE TABLE  scan_retention_time (
+CREATE TABLE scan_retention_time (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   scan_file_id INT UNSIGNED NOT NULL,
   scan_number INT NOT NULL,
@@ -651,7 +651,7 @@ CREATE UNIQUE INDEX scan_retention_time_unique ON scan_retention_time (scan_file
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS static_mod ;
 
-CREATE TABLE  static_mod (
+CREATE TABLE static_mod (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   residue VARCHAR(45) NOT NULL,
@@ -672,7 +672,7 @@ CREATE INDEX static_mod_search_id_fk_idx ON static_mod (search_id ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS config_system ;
 
-CREATE TABLE  config_system (
+CREATE TABLE config_system (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   config_key VARCHAR(255) NOT NULL,
   config_value VARCHAR(4000) NULL,
@@ -688,7 +688,7 @@ CREATE UNIQUE INDEX config_system_config_key_idx ON config_system (config_key AS
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS search_web_links ;
 
-CREATE TABLE  search_web_links (
+CREATE TABLE search_web_links (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   auth_user_id INT UNSIGNED NULL,
@@ -717,7 +717,7 @@ CREATE INDEX search_links_auth_user_id_fk_idx ON search_web_links (auth_user_id 
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS unified_reported_peptide_lookup ;
 
-CREATE TABLE  unified_reported_peptide_lookup (
+CREATE TABLE unified_reported_peptide_lookup (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   unified_sequence VARCHAR(2000) NOT NULL,
   link_type ENUM('looplink','crosslink','unlinked','dimer') NOT NULL,
@@ -735,7 +735,7 @@ CREATE INDEX unified_reported_peptide__unified_sequence_idx ON unified_reported_
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS unified_rep_pep_matched_peptide_lookup ;
 
-CREATE TABLE  unified_rep_pep_matched_peptide_lookup (
+CREATE TABLE unified_rep_pep_matched_peptide_lookup (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   unified_reported_peptide_id INT UNSIGNED NOT NULL,
   peptide_id INT UNSIGNED NOT NULL,
@@ -765,7 +765,7 @@ CREATE INDEX unified_matched_peptide__peptide_id_fk_idx ON unified_rep_pep_match
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS unified_rep_pep_dynamic_mod_lookup ;
 
-CREATE TABLE  unified_rep_pep_dynamic_mod_lookup (
+CREATE TABLE unified_rep_pep_dynamic_mod_lookup (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   rp_matched_peptide_id INT(10) UNSIGNED NOT NULL,
   position INT(10) UNSIGNED NOT NULL,
@@ -792,7 +792,7 @@ CREATE INDEX unified_rp_dynamic_mod__rp_matched_peptide_id_fk_idx ON unified_rep
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS search__dynamic_mod_mass_lookup ;
 
-CREATE TABLE  search__dynamic_mod_mass_lookup (
+CREATE TABLE search__dynamic_mod_mass_lookup (
   search_id INT UNSIGNED NOT NULL,
   dynamic_mod_mass DOUBLE NOT NULL,
   PRIMARY KEY (search_id, dynamic_mod_mass),
@@ -808,7 +808,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS search__reported_peptide__dynamic_mod_lookup ;
 
-CREATE TABLE  search__reported_peptide__dynamic_mod_lookup (
+CREATE TABLE search__reported_peptide__dynamic_mod_lookup (
   search_id INT UNSIGNED NOT NULL,
   reported_peptide_id INT UNSIGNED NOT NULL,
   dynamic_mod_mass DOUBLE NOT NULL,
@@ -835,7 +835,7 @@ CREATE INDEX search__rep_pep__dyn_mods_search_id_lnk_tp_idx ON search__reported_
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS search_programs_per_search ;
 
-CREATE TABLE  search_programs_per_search (
+CREATE TABLE search_programs_per_search (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   name VARCHAR(200) NOT NULL,
@@ -860,7 +860,7 @@ CREATE INDEX search_program__search_id_fk_idx ON search_programs_per_search (sea
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS annotation_type ;
 
-CREATE TABLE  annotation_type (
+CREATE TABLE annotation_type (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   search_programs_per_search_id INT(10) UNSIGNED NOT NULL,
@@ -888,7 +888,7 @@ CREATE UNIQUE INDEX annotation_type_Unique_idx ON annotation_type (search_id ASC
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS annotation_type_filterable ;
 
-CREATE TABLE  annotation_type_filterable (
+CREATE TABLE annotation_type_filterable (
   annotation_type_id INT UNSIGNED NOT NULL,
   filter_direction ENUM('above','below') NOT NULL,
   default_filter INT(1) NOT NULL,
@@ -912,7 +912,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS psm_annotation ;
 
-CREATE TABLE  psm_annotation (
+CREATE TABLE psm_annotation (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   psm_id INT UNSIGNED NOT NULL,
   filterable_descriptive_type ENUM('filterable','descriptive') NOT NULL,
@@ -940,7 +940,7 @@ CREATE INDEX psm_annotation_psm_id_ann_typ_f_d_idx ON psm_annotation (psm_id ASC
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS srch__rep_pept__annotation ;
 
-CREATE TABLE  srch__rep_pept__annotation (
+CREATE TABLE srch__rep_pept__annotation (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT(10) UNSIGNED NOT NULL,
   reported_peptide_id INT(10) UNSIGNED NOT NULL,
@@ -979,7 +979,7 @@ CREATE INDEX srch__rep_pept_srch_id_reppeptid_ann_tp__idx ON srch__rep_pept__ann
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS psm_filterable_annotation__generic_lookup ;
 
-CREATE TABLE  psm_filterable_annotation__generic_lookup (
+CREATE TABLE psm_filterable_annotation__generic_lookup (
   psm_annotation_id INT UNSIGNED NOT NULL,
   psm_id INT UNSIGNED NOT NULL,
   annotation_type_id INT UNSIGNED NOT NULL,
@@ -1007,7 +1007,7 @@ CREATE INDEX psm_filtrble_ann__generic_lkup__psm_id_idx ON psm_filterable_annota
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS default_page_view_generic ;
 
-CREATE TABLE  default_page_view_generic (
+CREATE TABLE default_page_view_generic (
   search_id INT UNSIGNED NOT NULL,
   page_name VARCHAR(80) NOT NULL,
   auth_user_id_created_record INT UNSIGNED NOT NULL,
@@ -1046,7 +1046,7 @@ CREATE INDEX default_page_view_generic_auth_lst_upd_idx ON default_page_view_gen
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS srch__rep_pept__annotation_large_value ;
 
-CREATE TABLE  srch__rep_pept__annotation_large_value (
+CREATE TABLE srch__rep_pept__annotation_large_value (
   srch__rep_pept__annotation_id INT UNSIGNED NOT NULL,
   value_string LONGTEXT NULL,
   PRIMARY KEY (srch__rep_pept__annotation_id),
@@ -1063,7 +1063,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS psm_annotation_large_value ;
 
-CREATE TABLE  psm_annotation_large_value (
+CREATE TABLE psm_annotation_large_value (
   psm_annotation_id INT UNSIGNED NOT NULL,
   value_string LONGTEXT NOT NULL,
   CONSTRAINT psm_annotation_large_value_primary_id_fk
@@ -1081,7 +1081,7 @@ CREATE INDEX psm_annotation_large_value_primary_id_fk_idx ON psm_annotation_larg
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS linker_per_search_monolink_mass ;
 
-CREATE TABLE  linker_per_search_monolink_mass (
+CREATE TABLE linker_per_search_monolink_mass (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   linker_id INT UNSIGNED NOT NULL,
   search_id INT UNSIGNED NOT NULL,
@@ -1112,7 +1112,7 @@ CREATE INDEX linkr_pr_srch_monolnk_mss_search_fk_idx ON linker_per_search_monoli
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS linker_per_search_crosslink_mass ;
 
-CREATE TABLE  linker_per_search_crosslink_mass (
+CREATE TABLE linker_per_search_crosslink_mass (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   linker_id INT UNSIGNED NOT NULL,
   search_id INT UNSIGNED NOT NULL,
@@ -1143,7 +1143,7 @@ CREATE INDEX linkr_pr_srch_monolnk_mss_search_fk_idx ON linker_per_search_crossl
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS cutoffs_applied_on_import ;
 
-CREATE TABLE  cutoffs_applied_on_import (
+CREATE TABLE cutoffs_applied_on_import (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   annotation_type_id INT UNSIGNED NOT NULL,
@@ -1169,7 +1169,7 @@ CREATE UNIQUE INDEX cutoffs_applied_on_import_search_ann_type_unique ON cutoffs_
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS srch_rep_pept__peptide ;
 
-CREATE TABLE  srch_rep_pept__peptide (
+CREATE TABLE srch_rep_pept__peptide (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   reported_peptide_id INT UNSIGNED NOT NULL,
@@ -1206,7 +1206,7 @@ CREATE INDEX srch_rep_pept_pept_peptide_id_fk_idx ON srch_rep_pept__peptide (pep
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS srch_rep_pept__pept__dynamic_mod ;
 
-CREATE TABLE  srch_rep_pept__pept__dynamic_mod (
+CREATE TABLE srch_rep_pept__pept__dynamic_mod (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   search_reported_peptide_peptide_id INT(10) UNSIGNED NOT NULL,
   position INT(10) UNSIGNED NOT NULL,
@@ -1230,7 +1230,7 @@ CREATE INDEX srch_rp_ppt_ppt_dn_md_schrptpeppep_fk_idx ON srch_rep_pept__pept__d
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS unified_rp__search__rep_pept__generic_lookup ;
 
-CREATE TABLE  unified_rp__search__rep_pept__generic_lookup (
+CREATE TABLE unified_rp__search__rep_pept__generic_lookup (
   search_id INT(10) UNSIGNED NOT NULL,
   reported_peptide_id INT(10) UNSIGNED NOT NULL,
   unified_reported_peptide_id INT(10) UNSIGNED NOT NULL,
@@ -1275,7 +1275,7 @@ CREATE INDEX unified_rp__search__rep_pept__generic_lookup_unified_rp_id__idx ON 
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS unified_rp__search_reported_peptide_fltbl_value_generic_lookup ;
 
-CREATE TABLE  unified_rp__search_reported_peptide_fltbl_value_generic_lookup (
+CREATE TABLE unified_rp__search_reported_peptide_fltbl_value_generic_lookup (
   search_id INT(10) UNSIGNED NOT NULL,
   reported_peptide_id INT(10) UNSIGNED NOT NULL,
   annotation_type_id INT(10) UNSIGNED NOT NULL,
@@ -1315,7 +1315,7 @@ CREATE INDEX unified_rp_srch_rep_pept_fltbl_vl_gnrc_lkp_unified_rp_id_fk_idx ON 
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS unified_rp__search__rep_pept__best_psm_value_generic_lookup ;
 
-CREATE TABLE  unified_rp__search__rep_pept__best_psm_value_generic_lookup (
+CREATE TABLE unified_rp__search__rep_pept__best_psm_value_generic_lookup (
   search_id INT(10) UNSIGNED NOT NULL,
   reported_peptide_id INT(10) UNSIGNED NOT NULL,
   annotation_type_id INT(10) UNSIGNED NOT NULL,
@@ -1356,7 +1356,7 @@ CREATE INDEX unified_rp_srch_rp_ppt_bst_psm_vl_gnrc_lkp_unified_rp_pept__idx ON 
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS srch_rep_pept__prot_seq_id_pos_monolink ;
 
-CREATE TABLE  srch_rep_pept__prot_seq_id_pos_monolink (
+CREATE TABLE srch_rep_pept__prot_seq_id_pos_monolink (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   reported_peptide_id INT UNSIGNED NOT NULL,
@@ -1382,7 +1382,7 @@ CREATE INDEX srch_rppp_prt_sq_d_ps_mnlnk_srch_rppptpptd ON srch_rep_pept__prot_s
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS srch_rep_pept__prot_seq_id_pos_crosslink ;
 
-CREATE TABLE  srch_rep_pept__prot_seq_id_pos_crosslink (
+CREATE TABLE srch_rep_pept__prot_seq_id_pos_crosslink (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   reported_peptide_id INT UNSIGNED NOT NULL,
@@ -1407,7 +1407,7 @@ CREATE INDEX srch_rppp_prt_sq_d_ps_crslnk_srch_rppptpptd_idx ON srch_rep_pept__p
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS srch_rep_pept__prot_seq_id_pos_looplink ;
 
-CREATE TABLE  srch_rep_pept__prot_seq_id_pos_looplink (
+CREATE TABLE srch_rep_pept__prot_seq_id_pos_looplink (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   reported_peptide_id INT UNSIGNED NOT NULL,
@@ -1433,7 +1433,7 @@ CREATE INDEX srch_rppp_prt_sq_d_ps_lplnk_srch_rppptpptd ON srch_rep_pept__prot_s
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS srch_rep_pept__prot_seq_id_unlinked_dimer ;
 
-CREATE TABLE  srch_rep_pept__prot_seq_id_unlinked_dimer (
+CREATE TABLE srch_rep_pept__prot_seq_id_unlinked_dimer (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   reported_peptide_id INT UNSIGNED NOT NULL,
@@ -1457,7 +1457,7 @@ CREATE INDEX srch_rppp_prt_sq_d_ps_unlnkd_srch_rppptpptd ON srch_rep_pept__prot_
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS protein_sequence ;
 
-CREATE TABLE  protein_sequence (
+CREATE TABLE protein_sequence (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   sequence MEDIUMTEXT NOT NULL,
   PRIMARY KEY (id))
@@ -1473,7 +1473,7 @@ CREATE INDEX sequence ON protein_sequence (sequence(500) ASC);
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS annotation ;
 
-CREATE TABLE  annotation (
+CREATE TABLE annotation (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   taxonomy INT(10) UNSIGNED NULL,
   name VARCHAR(2000) NOT NULL,
@@ -1493,7 +1493,7 @@ CREATE INDEX tax_name_desc ON annotation (taxonomy ASC, name(100) ASC, descripti
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS search_protein_sequence_annotation ;
 
-CREATE TABLE  search_protein_sequence_annotation (
+CREATE TABLE search_protein_sequence_annotation (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   protein_sequence_id INT UNSIGNED NOT NULL,
@@ -1530,11 +1530,224 @@ CREATE INDEX srch_prt_sqnc_annttn_annotation_id_idx ON search_protein_sequence_a
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS z_mapping__nrseq_prot_id__prot_seq_id ;
 
-CREATE TABLE  z_mapping__nrseq_prot_id__prot_seq_id (
+CREATE TABLE z_mapping__nrseq_prot_id__prot_seq_id (
   nrseq_protein_id INT UNSIGNED NOT NULL,
   protein_sequence_id INT UNSIGNED NOT NULL,
   PRIMARY KEY (nrseq_protein_id))
 ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table proxl_xml_file_import_tracking_id_creator
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS proxl_xml_file_import_tracking_id_creator ;
+
+CREATE TABLE proxl_xml_file_import_tracking_id_creator (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (id))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table proxl_xml_file_import_tracking_status_values_lookup
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS proxl_xml_file_import_tracking_status_values_lookup ;
+
+CREATE TABLE proxl_xml_file_import_tracking_status_values_lookup (
+  id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  display_text VARCHAR(100) NOT NULL,
+  PRIMARY KEY (id))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table proxl_xml_file_import_tracking
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS proxl_xml_file_import_tracking ;
+
+CREATE TABLE proxl_xml_file_import_tracking (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT UNSIGNED NOT NULL,
+  auth_user_id INT UNSIGNED NOT NULL,
+  hash_identifier VARCHAR(45) NOT NULL,
+  status_id TINYINT UNSIGNED NOT NULL,
+  remote_user_ip_address VARCHAR(45) NOT NULL,
+  marked_for_deletion TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  search_name VARCHAR(2000) NULL,
+  insert_request_url VARCHAR(255) NOT NULL,
+  record_insert_date_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_updated_date_time TIMESTAMP NOT NULL,
+  upload_date_time DATETIME NULL,
+  deleted_by_auth_user_id INT NULL,
+  deleted_date_time DATETIME NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT proxl_xml_file_import_tracking_auth_user_id
+    FOREIGN KEY (auth_user_id)
+    REFERENCES auth_user (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT proxl_xml_file_import_tracking_status_id
+    FOREIGN KEY (status_id)
+    REFERENCES proxl_xml_file_import_tracking_status_values_lookup (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX proxl_xml_file_import_tracking_auth_user_id_idx ON proxl_xml_file_import_tracking (auth_user_id ASC);
+
+CREATE INDEX project_id_status_id ON proxl_xml_file_import_tracking (project_id ASC, status_id ASC);
+
+CREATE INDEX proxl_xml_file_import_tracking_status_id_idx ON proxl_xml_file_import_tracking (status_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table proxl_xml_file_import_tracking_run
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS proxl_xml_file_import_tracking_run ;
+
+CREATE TABLE proxl_xml_file_import_tracking_run (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  proxl_xml_file_import_tracking_id INT UNSIGNED NOT NULL,
+  status_id TINYINT UNSIGNED NOT NULL,
+  importer_sub_status_id TINYINT NULL,
+  importer_percent_psms_processed TINYINT NULL,
+  inserted_search_id INT UNSIGNED NULL,
+  import_result_text MEDIUMTEXT NULL,
+  data_error_text MEDIUMTEXT NULL,
+  start_date_time TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  last_updated_date_time TIMESTAMP NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT prxl_xml_fl_imprt_trkng_run_id
+    FOREIGN KEY (proxl_xml_file_import_tracking_id)
+    REFERENCES proxl_xml_file_import_tracking (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX prxl_xml_fl_imprt_trkng_stats_hist_id_idx ON proxl_xml_file_import_tracking_run (proxl_xml_file_import_tracking_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table proxl_xml_file_import_tracking_status_history
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS proxl_xml_file_import_tracking_status_history ;
+
+CREATE TABLE proxl_xml_file_import_tracking_status_history (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  proxl_xml_file_import_tracking_id INT UNSIGNED NOT NULL,
+  status_id TINYINT UNSIGNED NOT NULL,
+  status_timestamp TIMESTAMP NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT prxl_xml_fl_imprt_trkng_stats_hist_id
+    FOREIGN KEY (proxl_xml_file_import_tracking_id)
+    REFERENCES proxl_xml_file_import_tracking (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX prxl_xml_fl_imprt_trkng_stats_hist_id_idx ON proxl_xml_file_import_tracking_status_history (proxl_xml_file_import_tracking_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table proxl_xml_file_import_tracking_single_file_type_lookup
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS proxl_xml_file_import_tracking_single_file_type_lookup ;
+
+CREATE TABLE proxl_xml_file_import_tracking_single_file_type_lookup (
+  id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  display_text VARCHAR(100) NOT NULL,
+  PRIMARY KEY (id))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table proxl_xml_file_import_tracking_single_file_upload_status_lookup
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS proxl_xml_file_import_tracking_single_file_upload_status_lookup ;
+
+CREATE TABLE proxl_xml_file_import_tracking_single_file_upload_status_lookup (
+  id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  display_text VARCHAR(100) NOT NULL,
+  PRIMARY KEY (id))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table proxl_xml_file_import_tracking_single_file
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS proxl_xml_file_import_tracking_single_file ;
+
+CREATE TABLE proxl_xml_file_import_tracking_single_file (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  proxl_xml_file_import_tracking_id INT UNSIGNED NOT NULL,
+  file_type_id TINYINT UNSIGNED NOT NULL,
+  file_upload_status_id TINYINT UNSIGNED NOT NULL,
+  filename_in_upload VARCHAR(500) NOT NULL,
+  filename_on_disk VARCHAR(500) NOT NULL,
+  sha1_sum VARCHAR(255) NULL,
+  file_size INT(20) NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT prxl_xml_fl_imprt_trkng_sngl_fl_id
+    FOREIGN KEY (proxl_xml_file_import_tracking_id)
+    REFERENCES proxl_xml_file_import_tracking (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT prxl_xml_fl_imprt_trkng_sngl_fl_type_id
+    FOREIGN KEY (file_type_id)
+    REFERENCES proxl_xml_file_import_tracking_single_file_type_lookup (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT prxl_xml_fl_imprt_trkng_sngl_fl_up_st_id
+    FOREIGN KEY (file_upload_status_id)
+    REFERENCES proxl_xml_file_import_tracking_single_file_upload_status_lookup (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX prxl_xml_fl_imprt_trkng_stats_hist_id_idx ON proxl_xml_file_import_tracking_single_file (proxl_xml_file_import_tracking_id ASC);
+
+CREATE INDEX prxl_xml_fl_imprt_trkng_sngl_fl_type_id_idx ON proxl_xml_file_import_tracking_single_file (file_type_id ASC);
+
+CREATE INDEX prxl_xml_fl_imprt_trkng_sngl_fl_up_st_id_idx ON proxl_xml_file_import_tracking_single_file (file_upload_status_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table proxl_xml_file_import_tracking_sngl_fl_del_web_user
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS proxl_xml_file_import_tracking_sngl_fl_del_web_user ;
+
+CREATE TABLE proxl_xml_file_import_tracking_sngl_fl_del_web_user (
+  id INT UNSIGNED NOT NULL,
+  proxl_xml_file_import_tracking_id INT UNSIGNED NOT NULL,
+  file_type_id TINYINT UNSIGNED NOT NULL,
+  file_upload_status_id TINYINT UNSIGNED NOT NULL,
+  filename_in_upload VARCHAR(500) NOT NULL,
+  filename_on_disk VARCHAR(500) NOT NULL,
+  sha1_sum VARCHAR(255) NULL,
+  file_size INT(20) NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT prxl_xml_fl_imprt_trkng_sngl_fl_id0
+    FOREIGN KEY (proxl_xml_file_import_tracking_id)
+    REFERENCES proxl_xml_file_import_tracking (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT prxl_xml_fl_imprt_trkng_sngl_fl_type_id0
+    FOREIGN KEY (file_type_id)
+    REFERENCES proxl_xml_file_import_tracking_single_file_type_lookup (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT prxl_xml_fl_imprt_trkng_sngl_fl_up_st_id0
+    FOREIGN KEY (file_upload_status_id)
+    REFERENCES proxl_xml_file_import_tracking_single_file_upload_status_lookup (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX prxl_xml_fl_imprt_trkng_stats_hist_id_idx ON proxl_xml_file_import_tracking_sngl_fl_del_web_user (proxl_xml_file_import_tracking_id ASC);
+
+CREATE INDEX prxl_xml_fl_imprt_trkng_sngl_fl_type_id_idx ON proxl_xml_file_import_tracking_sngl_fl_del_web_user (file_type_id ASC);
+
+CREATE INDEX prxl_xml_fl_imprt_trkng_sngl_fl_up_st_id_idx ON proxl_xml_file_import_tracking_sngl_fl_del_web_user (file_upload_status_id ASC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

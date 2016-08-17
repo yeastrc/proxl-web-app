@@ -14,6 +14,8 @@ import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.ProjectPublicAccessData;
 import org.yeastrc.xlink.www.objects.SearchDTODetailsDisplayWrapper;
+import org.yeastrc.xlink.www.proxl_xml_file_import.searchers.ProxlXMLFileImportTracking_PendingCount_Searcher;
+import org.yeastrc.xlink.www.proxl_xml_file_import.utils.IsProxlXMLFileImportFullyConfigured;
 import org.yeastrc.xlink.www.searcher.NoteSearcher;
 import org.yeastrc.xlink.www.searcher.SearchSearcher;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
@@ -195,6 +197,23 @@ public class ViewProjectAction extends Action {
 				searchDTODetailsDisplayWrapper.setSearchDTO(search);
 				SearchDTODetailsDisplayWrapperList.add(searchDTODetailsDisplayWrapper);
 			}
+			
+			
+
+			//  If user is Researcher or better and Proxl XML File Import is Fully Configured, 
+			//  get submitted Proxl XML files
+
+			if ( authAccessLevel.isAssistantProjectOwnerAllowed() 
+					&& IsProxlXMLFileImportFullyConfigured.getInstance().isProxlXMLFileImportFullyConfigured() ) {
+			
+
+				int pendingCount = 
+						ProxlXMLFileImportTracking_PendingCount_Searcher.getInstance().getPendingCountForProject( projectId );
+				
+				request.setAttribute( "proxlXMLFileImportTrackingPendingCount", pendingCount );
+				
+			}
+			
 
 			request.setAttribute( "project", projectDTO );
 			

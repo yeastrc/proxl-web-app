@@ -1,13 +1,18 @@
 package org.yeastrc.xlink.www.servlet_context;
 
+import java.util.Properties;
+
 import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.auth.db.AuthLibraryDBConnectionFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
+import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTableGetValueCommon;
+import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTableGetValue;
 import org.yeastrc.xlink.www.auth_db.AuthLibraryDBConnectionFactoryForWeb;
 import org.yeastrc.xlink.www.config_system_table.AppContextConfigSystemValuesRetrieval;
+import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.db_web.DBConnectionFactoryWeb;
 import org.yeastrc.xlink.www.db_web.DBSet_JNDI_Name_FromConfigFile;
@@ -31,6 +36,19 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		
 		log.warn( "INFO:  !!!!!!!!!!!!!!!   Start up of web app  'Proxl' beginning  !!!!!!!!!!!!!!!!!!!! " );
 
+
+		boolean isDevEnv = false;
+
+		Properties prop = System.getProperties();
+
+
+		String devEnv = prop.getProperty("devEnv");
+
+		if ( "Y".equals(devEnv ) )
+		{
+			isDevEnv = true;
+		}
+		
 
 		try {
 			DBSet_JNDI_Name_FromConfigFile.getInstance().dbSet_JNDI_Name_FromConfigFile();
@@ -57,6 +75,11 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		CurrentContext.setCurrentWebAppContext( contextPath );
 		
 		String jsCssCacheBustString = GetJsCssCacheBustString.getInstance().getJsCssCacheBustString();
+		
+		if ( isDevEnv ) {
+			
+			jsCssCacheBustString = "devEnv";
+		}
 
 		context.setAttribute( WebConstants.APP_CONTEXT_JS_CSS_CACHE_BUST, jsCssCacheBustString );
 
@@ -75,7 +98,19 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 //			throw new RuntimeException( e );
 //		} 
 		
+
+		//  Set iConfigSystemTableGetValue on ConfigSystemTableGetValueCommon
 		
+		try {
+			IConfigSystemTableGetValue iConfigSystemTableGetValue = ConfigSystemCaching.getInstance();
+			
+			ConfigSystemTableGetValueCommon.getInstance().setIConfigSystemTableGetValue( iConfigSystemTableGetValue );
+			
+		} catch (Exception e) {
+			//  already logged
+			throw new RuntimeException( e );
+		} 
+
 		AppContextConfigSystemValuesRetrieval appContextConfigSystemValuesRetrieval = 
 				new AppContextConfigSystemValuesRetrieval();
 
