@@ -1,7 +1,7 @@
 package org.yeastrc.proxl.import_xml_to_db_runner_pgm.get_import_and_process_thread;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.proxl.import_xml_to_db_runner_pgm.dao.ProxlXMLFileImportTracking_For_ImporterRunner_DAO;
+import org.yeastrc.proxl.import_xml_to_db.dao.ProxlXMLFileImportTracking_For_ImporterRunner_DAO;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.process_import.ProcessProxlXMLImport;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingDTO;
 

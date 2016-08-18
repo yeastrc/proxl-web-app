@@ -1,11 +1,11 @@
-package org.yeastrc.proxl.import_xml_to_db_runner_pgm.dao;
+package org.yeastrc.proxl.import_xml_to_db.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.base.proxl_xml_file_import.dao.ProxlXMLFileImportTracking_Base_DAO;
+import org.yeastrc.xlink.base.proxl_xml_file_import.dao.ProxlXMLFileImportTrackingHistoryDAO;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingDTO;
@@ -77,7 +77,7 @@ public class ProxlXMLFileImportTracking_For_ImporterRunner_DAO {
 					
 					result.setStatus( ProxlXMLFileImportStatus.STARTED );
 
-					ProxlXMLFileImportTracking_Base_DAO.getInstance().updateStatus( result.getStatus(), result.getId(), dbConnection );
+					updateStatusStarted( result.getId(), dbConnection );
 					
 				} else {
 					
@@ -146,5 +146,145 @@ public class ProxlXMLFileImportTracking_For_ImporterRunner_DAO {
 		return result;
 	}
 	
+
+	/**
+	 * @param id
+	 * @throws Exception
+	 */
+	public void updateStatusStarted( int id, Connection dbConnection ) throws Exception {
+		
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		final String sql = "UPDATE proxl_xml_file_import_tracking SET status_id = "
+				+ ProxlXMLFileImportStatus.STARTED.value() 
+				+ ", import_start_date_time = NOW(), last_updated_date_time = NOW() WHERE id = ?";
+
+		
+		try {
+			
+			pstmt = dbConnection.prepareStatement( sql );
+			
+			int counter = 0;
+			
+			counter++;
+			pstmt.setInt( counter, id );
+			
+			pstmt.executeUpdate();
+			
+		} catch ( Exception e ) {
+			
+			String msg = "Failed to update status, sql: " + sql;
+			
+			log.error( msg, e );
+			
+			throw e;
+			
+		} finally {
+			
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			
+			
+		}
+		
+		ProxlXMLFileImportTrackingHistoryDAO.getInstance().save( ProxlXMLFileImportStatus.STARTED, id /* ProxlXMLFileImportTrackingId */, dbConnection );		
+	}
+	
+	
+
+
+	/**
+	 * @param status
+	 * @param id
+	 * @throws Exception
+	 */
+	public void updateStatusAtImportEnd( ProxlXMLFileImportStatus status, int id ) throws Exception {
+		
+		
+		Connection dbConnection = null;
+
+		try {
+			
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+
+			updateStatusAtImportEnd( status, id, dbConnection );
+
+		} finally {
+			
+			if( dbConnection != null ) {
+				try { dbConnection.close(); } catch( Throwable t ) { ; }
+				dbConnection = null;
+			}
+			
+		}
+		
+	}
+	
+	
+	/**
+	 * @param status
+	 * @param id
+	 * @throws Exception
+	 */
+	public void updateStatusAtImportEnd( ProxlXMLFileImportStatus status, int id, Connection dbConnection ) throws Exception {
+		
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		final String sql = "UPDATE proxl_xml_file_import_tracking SET status_id = ?"
+				+ ", import_end_date_time = NOW(), last_updated_date_time = NOW() WHERE id = ?";
+
+		
+		try {
+			
+			pstmt = dbConnection.prepareStatement( sql );
+			
+			int counter = 0;
+
+			counter++;
+			pstmt.setInt( counter, status.value() );
+			
+			counter++;
+			pstmt.setInt( counter, id );
+			
+			pstmt.executeUpdate();
+			
+		} catch ( Exception e ) {
+			
+			String msg = "Failed to update status, sql: " + sql;
+			
+			log.error( msg, e );
+			
+			throw e;
+			
+		} finally {
+			
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			
+			
+		}
+		
+		ProxlXMLFileImportTrackingHistoryDAO.getInstance().save( ProxlXMLFileImportStatus.STARTED, id /* ProxlXMLFileImportTrackingId */, dbConnection );		
+	}
+	
+
 
 }
