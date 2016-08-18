@@ -37,6 +37,8 @@ import org.yeastrc.xlink.base.proxl_xml_file_import.utils.Proxl_XML_ImporterWrkD
  */
 public class ProcessProxlXMLImport {
 
+	
+	private static final String ERROR_MSG_SYSTEM_ERROR = "System Error";
 
 
 	private static final Logger log = Logger.getLogger(ProcessProxlXMLImport.class);
@@ -69,11 +71,17 @@ public class ProcessProxlXMLImport {
 			log.info( "Processing import for tracking id: " + proxlXMLFileImportTrackingDTO.getId() );
 		}
 		
+
 		
+		//  Create a "run" db record
+
+		ProxlXMLFileImportTrackingRunDTO proxlXMLFileImportTrackingRunDTO = new ProxlXMLFileImportTrackingRunDTO();
 		
-		//  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		proxlXMLFileImportTrackingRunDTO.setProxlXmlFileImportTrackingId( proxlXMLFileImportTrackingDTO.getId() );
+		proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.STARTED );
 		
-		//  TODO  If Fail due to missing directory, need to set something on the DB record to indicate the specific error
+		ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO.getInstance().save( proxlXMLFileImportTrackingRunDTO );
+		
 		
 		
 		File proxl_XML_Importer_Work_Directory =
@@ -93,18 +101,58 @@ public class ProcessProxlXMLImport {
 			
 			String msg = "subdirForThisTrackingId does not exist: " + subdirForThisTrackingId.getCanonicalPath();
 			log.error( msg );
+			
+
+			ProxlXMLFileImportTracking_Base_DAO.getInstance()
+			.updateStatus( ProxlXMLFileImportStatus.FAILED, proxlXMLFileImportTrackingDTO.getId() );
+
+
+			proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
+
+			proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
+			proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
+
+			ProxlXMLFileImportTrackingRun_Base_DAO.getInstance()
+			.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
+			
+			
 			throw new ProxlImporterInteralException(msg);
 		}
-				
-		//  Create a "run" db record
+		
+		
 
-		ProxlXMLFileImportTrackingRunDTO proxlXMLFileImportTrackingRunDTO = new ProxlXMLFileImportTrackingRunDTO();
+		final String importJarWithPath = ImporterRunnerConfigData.getImporterJarWithPath();
 		
-		proxlXMLFileImportTrackingRunDTO.setProxlXmlFileImportTrackingId( proxlXMLFileImportTrackingDTO.getId() );
-		proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.STARTED );
+		File importJarWithPathFileObj = new File( subdirForThisTrackingId, importJarWithPath );
 		
-		ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO.getInstance().save( proxlXMLFileImportTrackingRunDTO );
-		
+		if ( ( ! importJarWithPathFileObj.exists() ) 
+				|| ( ! importJarWithPathFileObj.isFile() ) ) {
+
+			String errorMsg = "Import Jar with Path is not found, "
+					+ "using the subdirectory that the command will be run in as the starting point."
+					+ " Import Jar with Path in config file: "
+					+ importJarWithPath
+					+ ".  Import Jar with Path combined with the subdirectory that the command will be run in: "
+					+ importJarWithPathFileObj.getCanonicalPath();
+			
+			log.error( errorMsg ) ;
+
+			ProxlXMLFileImportTracking_Base_DAO.getInstance()
+			.updateStatus( ProxlXMLFileImportStatus.FAILED, proxlXMLFileImportTrackingDTO.getId() );
+
+
+			proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
+
+			proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
+			proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
+
+			ProxlXMLFileImportTrackingRun_Base_DAO.getInstance()
+			.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
+			
+			throw new ProxlImporterInteralException(errorMsg);
+		}
+		 
+		 
 		
 		//   Create a params file that is passed to the importer
 		
@@ -171,7 +219,6 @@ public class ProcessProxlXMLImport {
 			javaCommand = ImporterRunnerConfigData.getJavaExecutableWithPath();
 		}
 	
-		final String importJarWithPath = ImporterRunnerConfigData.getImporterJarWithPath();
 		
 		List<String> commandAndItsArgumentsAsList = new ArrayList<>( 20 );
 		
@@ -275,8 +322,13 @@ public class ProcessProxlXMLImport {
 					.updateStatus( ProxlXMLFileImportStatus.FAILED, proxlXMLFileImportTrackingDTO.getId() );
 
 
-					ProxlXMLFileImportTracking_Base_DAO.getInstance()
-					.updateStatus( ProxlXMLFileImportStatus.FAILED, proxlXMLFileImportTrackingDTO.getId() );
+					 proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
+					 
+					 proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
+					 proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
+
+					 ProxlXMLFileImportTrackingRun_Base_DAO.getInstance()
+					.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
 				}				
 			}
 			
@@ -291,7 +343,10 @@ public class ProcessProxlXMLImport {
 
 			
 			 proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
-			
+
+			 proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
+			 proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
+
 			 ProxlXMLFileImportTrackingRun_Base_DAO.getInstance()
 			.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
 			
