@@ -130,7 +130,7 @@ public class ProteinSequenceCoverageCacheManager {
 			
 			ObjectMapper mapper = new ObjectMapper();	// our json serializer/de-serializer
 			
-			String sql = "SELECT search_param_hash_code, search_param_hash_idx, search_param_json, sequence_coverage_json FROM sequence_coverage_cache WHERE search_param_hash_code = ?";
+			String sql = "SELECT search_param_hash_code, search_param_hash_idx, search_param_json, sequence_coverage_json, search_id FROM sequence_coverage_cache WHERE search_param_hash_code = ?";
 			int maxIdx = 0;	// if there is a collision on the hashCode, use this as a secondary index
 			
 			boolean updatedEntry = false;		// whether or not we updated an existing entry
@@ -182,6 +182,7 @@ public class ProteinSequenceCoverageCacheManager {
 				
 				rs.updateInt( "search_param_hash_code", searchParameters.hashCode() );
 				rs.updateInt( "search_param_hash_idx", maxIdx + 1 );
+				rs.updateInt( "search_id", searchParameters.getSearchId() );
 				rs.updateString( "search_param_json", mapper.writeValueAsString( searchParameters ) );
 				
 				ProteinSequenceCoverageResultsBean coverageResultsBean = new ProteinSequenceCoverageResultsBean();
