@@ -62,9 +62,10 @@ public class ProxlXMLFileImportTracking_PopulateDTO {
 		
 		returnItem.setInsertRequestURL( rs.getString( "insert_request_url" ) );
 		
-		returnItem.setRecordInsertDateTime( rs.getDate( "record_insert_date_time" ) );
-		returnItem.setUploadDateTime( rs.getDate( "upload_date_time" ) );
-		returnItem.setLastUpdatedDateTime( rs.getDate( "last_updated_date_time" ) );
+		returnItem.setRecordInsertDateTime( rs.getTimestamp("record_insert_date_time" ) );
+		returnItem.setImportStartDateTime( rs.getTimestamp( "import_start_date_time" ) );
+		returnItem.setImportEndDateTime( rs.getTimestamp( "import_end_date_time" ) );
+		returnItem.setLastUpdatedDateTime( rs.getTimestamp( "last_updated_date_time" ) );
 		
 		int DeletedByAuthUserId = rs.getInt( "deleted_by_auth_user_id" );
 		

@@ -23,7 +23,8 @@ public class ProxlXMLFileImportTrackingDTO {
 	private String insertRequestURL;
 	
 	private Date recordInsertDateTime;
-	private Date uploadDateTime;
+	private Date importStartDateTime;
+	private Date importEndDateTime;
 	private Date lastUpdatedDateTime;
 
 	private Integer deletedByAuthUserId;
@@ -38,11 +39,14 @@ public class ProxlXMLFileImportTrackingDTO {
 				+ ", markedForDeletion=" + markedForDeletion + ", searchName="
 				+ searchName + ", insertRequestURL=" + insertRequestURL
 				+ ", recordInsertDateTime=" + recordInsertDateTime
-				+ ", uploadDateTime=" + uploadDateTime
+				+ ", importStartDateTime=" + importStartDateTime
+				+ ", importEndDateTime=" + importEndDateTime
 				+ ", lastUpdatedDateTime=" + lastUpdatedDateTime
 				+ ", deletedByAuthUserId=" + deletedByAuthUserId
 				+ ", deletedDateTime=" + deletedDateTime + "]";
 	}
+
+
 	
 
 	
@@ -57,12 +61,6 @@ public class ProxlXMLFileImportTrackingDTO {
 	}
 	public void setInsertRequestURL(String insertRequestURL) {
 		this.insertRequestURL = insertRequestURL;
-	}
-	public Date getUploadDateTime() {
-		return uploadDateTime;
-	}
-	public void setUploadDateTime(Date uploadDateTime) {
-		this.uploadDateTime = uploadDateTime;
 	}
 	public Date getLastUpdatedDateTime() {
 		return lastUpdatedDateTime;
@@ -140,7 +138,18 @@ public class ProxlXMLFileImportTrackingDTO {
 	public void setRecordInsertDateTime(Date recordInsertDateTime) {
 		this.recordInsertDateTime = recordInsertDateTime;
 	}
-
+	public Date getImportStartDateTime() {
+		return importStartDateTime;
+	}
+	public void setImportStartDateTime(Date importStartDateTime) {
+		this.importStartDateTime = importStartDateTime;
+	}
+	public Date getImportEndDateTime() {
+		return importEndDateTime;
+	}
+	public void setImportEndDateTime(Date importEndDateTime) {
+		this.importEndDateTime = importEndDateTime;
+	}
 
 
 }

@@ -5,9 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.base.proxl_xml_file_import.dao.ProxlXMLFileImportTrackingHistoryDAO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingDTO;
-import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportStatus;
 import org.yeastrc.xlink.base.proxl_xml_file_import.populate_dto_from_result.ProxlXMLFileImportTracking_PopulateDTO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
@@ -35,7 +33,7 @@ public class ProxlXMLFileImportTracking_Base_DAO {
 	}
 
 	/**
-	 * Get the given proxl_xml_file_import_tracking_run from the database
+	 * Get the given proxl_xml_file_import_tracking from the database
 	 * 
 	 * @param id
 	 * @return
@@ -96,87 +94,5 @@ public class ProxlXMLFileImportTracking_Base_DAO {
 	}
 	
 
-	/**
-	 * @param status
-	 * @param id
-	 * @throws Exception
-	 */
-	public void updateStatus( ProxlXMLFileImportStatus status, int id ) throws Exception {
-		
-		
-		Connection dbConnection = null;
-
-		try {
-			
-			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-
-			updateStatus( status, id, dbConnection );
-
-		} finally {
-			
-			if( dbConnection != null ) {
-				try { dbConnection.close(); } catch( Throwable t ) { ; }
-				dbConnection = null;
-			}
-			
-		}
-		
-	}
-	
-	
-	/**
-	 * @param status
-	 * @param id
-	 * @throws Exception
-	 */
-	public void updateStatus( ProxlXMLFileImportStatus status, int id, Connection dbConnection ) throws Exception {
-		
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		final String sql = "UPDATE proxl_xml_file_import_tracking SET status_id = ?, last_updated_date_time = NOW() WHERE id = ?";
-
-		
-		try {
-			
-			pstmt = dbConnection.prepareStatement( sql );
-			
-			int counter = 0;
-			
-			counter++;
-			pstmt.setInt( counter, status.value() );
-			
-			counter++;
-			pstmt.setInt( counter, id );
-			
-			pstmt.executeUpdate();
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Failed to update status, sql: " + sql;
-			
-			log.error( msg, e );
-			
-			throw e;
-			
-		} finally {
-			
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-			
-		}
-		
-		ProxlXMLFileImportTrackingHistoryDAO.getInstance().save( status, id /* ProxlXMLFileImportTrackingId */, dbConnection );		
-	}
-	
 		
 }
