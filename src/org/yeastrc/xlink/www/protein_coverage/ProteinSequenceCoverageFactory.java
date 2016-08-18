@@ -1,25 +1,21 @@
 package org.yeastrc.xlink.www.protein_coverage;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
-import org.yeastrc.xlink.www.dto.PeptideDTO;
-import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.dto.PeptideDTO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
 import org.yeastrc.xlink.www.objects.WebProteinPosition;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
 import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher;
 import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher.ReturnOnlyReportedPeptidesWithMonolinks;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 
@@ -80,6 +76,8 @@ public class ProteinSequenceCoverageFactory {
 		ProteinSequenceCoverage coverage = ProteinSequenceCoverageCacheManager.getInstance().getProteinSequenceCoverageFromCache( protein.getProteinSequenceId(), searcherCutoffValuesSearchLevel );
 		if( coverage != null )
 			return coverage;
+		else
+			System.out.println( "Got null for coverage." );
 
 			
 		/*

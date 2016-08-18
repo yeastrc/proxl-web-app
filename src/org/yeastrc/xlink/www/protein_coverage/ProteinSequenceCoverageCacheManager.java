@@ -58,7 +58,7 @@ public class ProteinSequenceCoverageCacheManager {
 		
 		// try memory cache first
 		if( this._MEMORY_CACHE.containsKey( searchParameters ) ) {
-			System.out.println( "Using memory cache." );
+			System.out.println( "Getting seq. cov. from mem cache for protein:" + proteinId + " search:" + scvsl.getSearchId() );
 			return this._MEMORY_CACHE.get( searchParameters );
 		}
 		
@@ -76,7 +76,7 @@ public class ProteinSequenceCoverageCacheManager {
 			// no reason to die if an exception occurred, as protein sequence can be calculated w/o the cache
 			// however, we'd like to know about it, so log it
 			log.error( e.getMessage(), e );
-			
+			e.printStackTrace();
 		}
 		
 		return coverage;
@@ -107,7 +107,6 @@ public class ProteinSequenceCoverageCacheManager {
 			
 			// don't die if there is a database error, but log it
 			log.error( e.getMessage(), e );	
-			
 		}
 
 	}
@@ -153,8 +152,22 @@ public class ProteinSequenceCoverageCacheManager {
 					
 					updatedEntry = true;
 					
-					String jsonCoverage = mapper.writeValueAsString( coverage );
-					rs.updateString( "sequence_coverage_json", jsonCoverage );
+					ProteinSequenceCoverageResultsBean coverageResultsBean = new ProteinSequenceCoverageResultsBean();
+					coverageResultsBean.setProteinId( coverage.getProtein().getProteinSequenceId() );
+					
+					/*
+					 * Guava Range doesn't serialize well (at all). Load data from the ranges into my own objects
+					 * and serialize those as json in the database.
+					 */
+					Set<CoverageRangeBean> ranges = new HashSet<>();
+					for( Range<Integer> r : coverage.getRanges() ) {
+						CoverageRangeBean crb = new CoverageRangeBean( r.lowerEndpoint(), r.upperEndpoint() );
+						ranges.add( crb );
+					}
+					coverageResultsBean.setRanges( ranges );
+					
+					rs.updateString( "sequence_coverage_json", mapper.writeValueAsString( coverageResultsBean ) );
+					
 					rs.updateRow();
 					
 					break;
@@ -254,7 +267,7 @@ public class ProteinSequenceCoverageCacheManager {
 				if( !searchParameters.equals( dbParams ) )
 					continue;
 				
-				System.out.println( "Using db cache." );
+				System.out.println( "Getting seq. cov. from db cache for protein:" + searchParameters.getProteinId() + " search:" + searchParameters.getSearchId() );
 
 				
 				// de-serialize the ProteinSequenceCoverage from the database
