@@ -12,25 +12,6 @@ public class ProteinSequenceCoverage {
 
 	public ProteinSequenceCoverage( ProteinSequenceObject protein ) {
 		this.protein = protein;
-		this.sequenceCoverage = 0.0;
-	}
-	
-	/**
-	 * Calculate the current sequence coverage of this protein given the peptides that have been
-	 * added.
-	 */
-	private void calculateSequenceCoverage() throws Exception {
-		int totalResidues = 0;
-		
-		if( this.ranges == null )
-			this.ranges = TreeRangeSet.create();
-
-		
-		for( Range<Integer> r : this.ranges.asRanges() ) {
-			totalResidues += r.upperEndpoint() - r.lowerEndpoint() + 1;
-		}
-		
-		this.sequenceCoverage = (double)totalResidues / (double)this.getProtein().getSequence().length();
 	}
 	
 	
@@ -52,7 +33,45 @@ public class ProteinSequenceCoverage {
         	this.ranges.add( r );
         }
 		
-		this.calculateSequenceCoverage();
+	}
+	
+	/**
+	 * Add the supplied start and end coordinates as a sequence coverage range
+	 * @param start
+	 * @param end
+	 * @throws Exception
+	 */
+	public void addStartEndBoundary( int start, int end ) throws Exception {
+
+		if( this.ranges == null )
+			this.ranges = TreeRangeSet.create();
+		
+		Range<Integer> r = Range.closed( start, end );
+		this.ranges.add( r );
+		
+	}
+	
+	/**
+	 * Add another protein sequence coverage object's ranges to this one's
+	 * 
+	 * @param coverageToAdd
+	 */
+	public void addSequenceCoverageObject( ProteinSequenceCoverage coverageToAdd ) throws Exception {
+		
+		if( this.ranges == null )
+			this.ranges = TreeRangeSet.create();
+		
+		if( this.getProtein().getProteinSequenceId() != coverageToAdd.getProtein().getProteinSequenceId() )
+			throw new Exception( "Attempted to add two coverage objects that do not describe the same protein." );
+		
+		if( coverageToAdd.getRanges() == null )
+			return;
+		
+		
+		for( Range<Integer> r : coverageToAdd.getRanges() ) {
+			this.ranges.add( r );
+		}
+		
 	}
 	
 	/**
@@ -67,14 +86,23 @@ public class ProteinSequenceCoverage {
 		
 		return ranges.asRanges();
 	}
-	
+
 	/**
 	 * Get the sequence coverage of this protein given the peptides that have
 	 * been added
 	 * @return
 	 */
-	public Double getSequenceCoverage() {
-		return sequenceCoverage;
+	public Double getSequenceCoverage() throws Exception {
+		int totalResidues = 0;
+
+		if( this.ranges == null )
+			this.ranges = TreeRangeSet.create();
+		
+		for( Range<Integer> r : this.ranges.asRanges() ) {
+			totalResidues += r.upperEndpoint() - r.lowerEndpoint() + 1;
+		}
+		
+		return (double)totalResidues / (double)this.getProtein().getSequence().length();
 	}
 	
 	/**
@@ -87,6 +115,5 @@ public class ProteinSequenceCoverage {
 
 
 	private final ProteinSequenceObject protein;
-	private Double sequenceCoverage;
 	private RangeSet<Integer> ranges;
 }

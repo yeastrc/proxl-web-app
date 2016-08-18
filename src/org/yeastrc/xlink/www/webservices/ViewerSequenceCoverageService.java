@@ -271,19 +271,11 @@ public class ViewerSequenceCoverageService {
 				searches.add( search );
 			}
 
-			
-			
 
-			// add these to the SCD so that we have context for the results
-			scd.setExcludeTaxonomy( excludeTaxonomy );
-			scd.setFilterNonUniquePeptides( filterNonUniquePeptides );
-//			scd.setSearches( searches );
-
-			// first get all distinct proteins that have at least one linked peptide, given the search parameters
 			ProteinSequenceObject protein = ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId );
 
 			ProteinSequenceCoverage cov = 
-					ProteinSequenceCoverageFactory.getInstance().getProteinSequenceCoverage(protein, searches, searcherCutoffValuesRootLevel);
+					ProteinSequenceCoverageFactory.getInstance().getProteinSequenceCoverageForOneProteinForMultSearches(protein, searches, searcherCutoffValuesRootLevel);
 
 			coverages.put( protein.getProteinSequenceId(), cov.getSequenceCoverage() );
 
@@ -346,8 +338,7 @@ public class ViewerSequenceCoverageService {
 
 			scd.setCoverages( coverages );
 			scd.setRanges( ranges );
-
-
+			
 			return scd;
 			
 		} catch ( WebApplicationException e ) {

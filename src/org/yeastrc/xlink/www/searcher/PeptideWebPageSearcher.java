@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.dbcp.DelegatingPreparedStatement;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -873,7 +874,6 @@ public class PeptideWebPageSearcher {
 		
 		final String sql = sqlSB.toString();
 		
-		
 		try {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
@@ -958,6 +958,7 @@ public class PeptideWebPageSearcher {
 			}
 			
 			
+			//System.out.println( ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
 			
 			rs = pstmt.executeQuery();
 			
