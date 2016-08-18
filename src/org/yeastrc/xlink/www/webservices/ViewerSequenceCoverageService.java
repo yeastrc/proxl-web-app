@@ -275,7 +275,7 @@ public class ViewerSequenceCoverageService {
 			ProteinSequenceObject protein = ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId );
 
 			ProteinSequenceCoverage cov = 
-					ProteinSequenceCoverageFactory.getInstance().getProteinSequenceCoverage(protein, searches, searcherCutoffValuesRootLevel);
+					ProteinSequenceCoverageFactory.getInstance().getProteinSequenceCoverageForOneProteinForMultSearches(protein, searches, searcherCutoffValuesRootLevel);
 
 			coverages.put( protein.getProteinSequenceId(), cov.getSequenceCoverage() );
 

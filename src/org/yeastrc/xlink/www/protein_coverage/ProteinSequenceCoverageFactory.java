@@ -40,27 +40,105 @@ public class ProteinSequenceCoverageFactory {
 	 * @return
 	 * @throws Exception
 	 */
-	public ProteinSequenceCoverage getProteinSequenceCoverage( ProteinSequenceObject protein, Collection<SearchDTO> searches, SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel ) throws Exception {
+	public ProteinSequenceCoverage getProteinSequenceCoverageForOneProteinForMultSearches( ProteinSequenceObject protein, Collection<SearchDTO> searches, SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel ) throws Exception {
 		
-		List<ProteinSequenceObject> proteinList = new ArrayList<>( 1 );
+		ProteinSequenceCoverage coverage = new ProteinSequenceCoverage( protein );
 		
-		proteinList.add(protein);
-		
-		
-		Map<Integer, ProteinSequenceCoverage> proteinSequenceCoverages =
-				getProteinSequenceCoveragesForProteins( proteinList, searches, searcherCutoffValuesRootLevel );
-		
-		ProteinSequenceCoverage proteinSequenceCoverage = proteinSequenceCoverages.get( protein.getProteinSequenceId() );
-		
-		if ( proteinSequenceCoverage == null ) {
-			
-			String msg = "Internal Proxl Error, proteinSequenceCoverage == null for protein.getProteinSequenceId(): " + protein.getProteinSequenceId();
-			log.error( msg );
-			throw new ProxlWebappDataException(msg);
+		for( SearchDTO searchDTO : searches ) {
+			coverage.addSequenceCoverageObject(
+					getProteinSequenceCoverageForProteinForOneSearch( 
+							protein, 
+							searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchDTO.getId() ), 
+							searchDTO 
+					) 
+			 );
 		}
 		
-		return proteinSequenceCoverage;
+		return coverage;
 	}
+	
+	
+	/**
+	 * Get the protein sequence coverage object for single protein for a single search, given
+	 * the supplied filter parameters
+	 * 
+	 * @param protein The protein
+	 * @param searcherCutoffValuesRootLevel The filter parameters
+	 * @return
+	 * @throws Exception
+	 */
+	public ProteinSequenceCoverage getProteinSequenceCoverageForProteinForOneSearch( ProteinSequenceObject protein, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel, SearchDTO searchDTO ) throws Exception {
+		
+		if ( searcherCutoffValuesSearchLevel == null ) {
+			log.error( "Got null for search parameters." );
+			throw new Exception( "Got null for search parameters." );
+		}
+		
+		/*
+		 * check the cache first
+		 */
+		ProteinSequenceCoverage coverage = ProteinSequenceCoverageCacheManager.getInstance().getProteinSequenceCoverageFromCache( protein.getProteinSequenceId(), searcherCutoffValuesSearchLevel );
+		if( coverage != null )
+			return coverage;
+
+			
+		/*
+		 * if we get here, we couldn't get it from the cache
+		 */
+		
+		coverage = new ProteinSequenceCoverage( protein );
+
+		// get all peptides from the search, given the search parameters
+		List<WebReportedPeptideWrapper> wrappedLinksPerForSearch = PeptideWebPageSearcher.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff( 
+			searchDTO, 
+			searcherCutoffValuesSearchLevel, 
+			null /* linkTypesForDBQuery */, 
+			null /* modsForDBQuery */, 
+			ReturnOnlyReportedPeptidesWithMonolinks.NO );
+		
+		
+		
+		
+		// iterate over those peptides and add to coverage object
+		for ( WebReportedPeptideWrapper webReportedPeptideWrapper : wrappedLinksPerForSearch ) {
+				
+			WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
+				
+			PeptideDTO peptideDTO_1 = webReportedPeptide.getPeptide1();
+			PeptideDTO peptideDTO_2 = webReportedPeptide.getPeptide2();
+				
+			if ( peptideDTO_1 != null ) {
+				
+				for( WebProteinPosition wpp : webReportedPeptide.getPeptide1ProteinPositions() ) {
+					if( wpp.getProtein().getProteinSequenceObject().getProteinSequenceId() == protein.getProteinSequenceId() ) {
+						coverage.addPeptide( peptideDTO_1.getSequence() );
+						break;
+					}
+				}
+				
+			}
+
+			if ( peptideDTO_2 != null ) {
+				
+				for( WebProteinPosition wpp : webReportedPeptide.getPeptide2ProteinPositions() ) {
+					if( wpp.getProtein().getProteinSequenceObject().getProteinSequenceId() == protein.getProteinSequenceId() ) {
+						coverage.addPeptide( peptideDTO_1.getSequence() );
+						break;
+					}
+				}
+				
+			}
+
+		}
+		
+		/*
+		 * add coverage object to the cache
+		 */
+		ProteinSequenceCoverageCacheManager.getInstance().addProteinSequenceCoverageToCache( protein.getProteinSequenceId(), searcherCutoffValuesSearchLevel, coverage);
+		
+		return coverage;
+	}
+	
 	
 
 	/**
@@ -90,19 +168,9 @@ public class ProteinSequenceCoverageFactory {
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
 					searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
 			
-			
-			ObjectMapper mapper = new ObjectMapper();
-			String jsonInString = mapper.writeValueAsString(searcherCutoffValuesSearchLevel);
-			System.out.println( jsonInString );
-			
-			System.out.println( searcherCutoffValuesSearchLevel.toString() );
-			System.out.println( searcherCutoffValuesSearchLevel.hashCode() );
-
-			
 			if ( searcherCutoffValuesSearchLevel == null ) {
 				
 				searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
-				
 			}
 
 			List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
