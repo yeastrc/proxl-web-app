@@ -11,8 +11,6 @@
 //  If the status changes in the DB, prompt the user to refresh the page with an overlay
 
 
-//  !!!!!!!!!   The setTimeout for recheck is currently commented out
-
 
 $(document).ready(function() {
 	
@@ -446,7 +444,11 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCountProces
 		//  Have History to display
 
 		$("#upload_data_history_items_block").show();
-		
+		$("#upload_data_history_items_container").show();
+
+		$("#upload_data_history_items_hide_link").show();
+		$("#upload_data_history_items_show_link").hide();
+
 		var $upload_data_history_items_table = $("#upload_data_history_items_table");
 
 		var $filename_status_cell_jq_ALL = $upload_data_history_items_table.find(".filename_status_cell_jq");
@@ -530,6 +532,9 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCountProces
 		if ( ! dataShowing ) {
 		
 			$("#upload_data_history_items_container").hide();
+
+			$("#upload_data_history_items_hide_link").hide();
+			$("#upload_data_history_items_show_link").show();
 		}
 	}
 
