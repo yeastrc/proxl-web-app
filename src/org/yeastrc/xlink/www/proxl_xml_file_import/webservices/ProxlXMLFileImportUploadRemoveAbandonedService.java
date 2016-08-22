@@ -140,7 +140,7 @@ public class ProxlXMLFileImportUploadRemoveAbandonedService {
 			
 			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
 
-			if ( ! authAccessLevel.isAssistantProjectOwnerAllowed() ) {
+			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 
 				//  No Access Allowed for this project id
 

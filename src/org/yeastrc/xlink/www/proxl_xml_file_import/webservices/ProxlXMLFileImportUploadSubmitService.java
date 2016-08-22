@@ -6,7 +6,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -161,7 +163,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 			
 			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
 
-			if ( ! authAccessLevel.isAssistantProjectOwnerAllowed() ) {
+			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 
 				//  No Access Allowed for this project id
 
@@ -379,6 +381,9 @@ public class ProxlXMLFileImportUploadSubmitService {
 		    	        );
 		}
 		
+		//  use filenamesSet to find duplicate filenames
+		Set<String> filenamesSet = new HashSet<>();
+		
 
 		for ( UploadSubmitRequestFileItem requestFileItem : requestFileItemList ) {
 
@@ -420,33 +425,46 @@ public class ProxlXMLFileImportUploadSubmitService {
 			    	        .build()
 			    	        );
 			}
-
 			
+			if ( ! filenamesSet.add( requestFileItem.uploadedFilename ) ) {
+
+				String msg = "Duplicate filename: " + requestFileItem.uploadedFilename;
+
+				log.warn( msg );
+
+			    throw new WebApplicationException(
+			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	        .entity( msg )
+			    	        .build()
+			    	        );
+			}
 		}
 		
 		
 		//  Process files from tempSubdir, matching to request
 		
-		List<ProxlUploadTempDataFileContents> proxlUploadTempDataFileContents_OnDisk_List =
+		List<ProxlUploadTempDataFileContentsAndAssocData> proxlUploadTempDataFileContentsAndAssocData_OnDisk_List =
 				getProxlUploadTempDataFileContentsListForTempSubdir( tempSubdir );
 		
 		
 		//  Only process files sent in submit request
 
-		List<ProxlUploadTempDataFileContents> proxlUploadTempDataFileContentsList = new ArrayList<>( proxlUploadTempDataFileContents_OnDisk_List.size() );
-
+		List<ProxlUploadTempDataFileContentsAndAssocData> proxlUploadTempDataFileContentsAndAssocDataList = new ArrayList<>( proxlUploadTempDataFileContentsAndAssocData_OnDisk_List.size() );
 
 		for ( UploadSubmitRequestFileItem requestFileItem : requestFileItemList ) {
 			
-			ProxlUploadTempDataFileContents proxlUploadTempDataFileContentsForRequestFileItem = null;
+			ProxlUploadTempDataFileContentsAndAssocData proxlUploadTempDataFileContentsAndAssocDataForRequestFileItem = null;
 			
-			for (  ProxlUploadTempDataFileContents proxlUploadTempDataFileContents : proxlUploadTempDataFileContents_OnDisk_List ) {
+			for ( ProxlUploadTempDataFileContentsAndAssocData proxlUploadTempDataFileContentsAndAssocData  : 
+				proxlUploadTempDataFileContentsAndAssocData_OnDisk_List ) {
 
+				ProxlUploadTempDataFileContents proxlUploadTempDataFileContents = proxlUploadTempDataFileContentsAndAssocData.proxlUploadTempDataFileContents;
+				
 				if ( requestFileItem.getFileIndex().intValue() == proxlUploadTempDataFileContents.getFileIndex() 
 						&& requestFileItem.getFileType().intValue() == proxlUploadTempDataFileContents.getFileType().value() 
 						&& requestFileItem.getUploadedFilename().equals( proxlUploadTempDataFileContents.getUploadedFilename() ) ) { 
 					
-					if ( proxlUploadTempDataFileContentsForRequestFileItem != null ) {
+					if ( proxlUploadTempDataFileContentsAndAssocDataForRequestFileItem != null ) {
 						
 						String msg = "Found more than one file on disk match for file index: " + requestFileItem.getFileIndex().intValue() 
 								+ ", file type: " + requestFileItem.getFileType().intValue()
@@ -455,12 +473,12 @@ public class ProxlXMLFileImportUploadSubmitService {
 						throw new ProxlWebappFileUploadFileSystemException(msg);
 					}
 					
-					proxlUploadTempDataFileContentsForRequestFileItem = proxlUploadTempDataFileContents;
+					proxlUploadTempDataFileContentsAndAssocDataForRequestFileItem = proxlUploadTempDataFileContentsAndAssocData;
 				}
 			}
 			
 
-			if ( proxlUploadTempDataFileContentsForRequestFileItem == null ) {
+			if ( proxlUploadTempDataFileContentsAndAssocDataForRequestFileItem == null ) {
 				
 				String msg = "No file on disk matched for file index: " + requestFileItem.getFileIndex().intValue() 
 						+ ", file type: " + requestFileItem.getFileType().intValue()
@@ -469,14 +487,16 @@ public class ProxlXMLFileImportUploadSubmitService {
 				throw new ProxlWebappFileUploadFileSystemException(msg);
 			}
 			
-			proxlUploadTempDataFileContentsList.add( proxlUploadTempDataFileContentsForRequestFileItem );
+			proxlUploadTempDataFileContentsAndAssocDataList.add( proxlUploadTempDataFileContentsAndAssocDataForRequestFileItem );
 		}
 		
 		//  Ensure exactly one Proxl XML file is processed
 		
 		boolean processedProxlXMLFile = false;
 		
-		for (  ProxlUploadTempDataFileContents proxlUploadTempDataFileContents : proxlUploadTempDataFileContentsList ) {
+		for (  ProxlUploadTempDataFileContentsAndAssocData proxlUploadTempDataFileContentsAndAssocData : proxlUploadTempDataFileContentsAndAssocDataList ) {
+
+			ProxlUploadTempDataFileContents proxlUploadTempDataFileContents = proxlUploadTempDataFileContentsAndAssocData.proxlUploadTempDataFileContents;
 			
 			if ( proxlUploadTempDataFileContents.getFileType() == ProxlXMLFileImportFileType.PROXL_XML_FILE ) {
 				
@@ -567,8 +587,10 @@ public class ProxlXMLFileImportUploadSubmitService {
 
 			//  Get Search name from Proxl XML file if it is set
 
-			for (  ProxlUploadTempDataFileContents proxlUploadTempDataFileContents : proxlUploadTempDataFileContentsList ) {
+			for (  ProxlUploadTempDataFileContentsAndAssocData proxlUploadTempDataFileContentsAndAssocData : proxlUploadTempDataFileContentsAndAssocDataList ) {
 
+				ProxlUploadTempDataFileContents proxlUploadTempDataFileContents = proxlUploadTempDataFileContentsAndAssocData.proxlUploadTempDataFileContents;
+				
 				if ( proxlUploadTempDataFileContents.getFileType() == ProxlXMLFileImportFileType.PROXL_XML_FILE ) {
 
 					searchName = proxlUploadTempDataFileContents.getSearchNameInProxlXMLFile();
@@ -579,8 +601,10 @@ public class ProxlXMLFileImportUploadSubmitService {
 		
 		///   move the uploaded file(s) into importer work dir.
 
-		for (  ProxlUploadTempDataFileContents proxlUploadTempDataFileContents : proxlUploadTempDataFileContentsList ) {
-		
+		for (  ProxlUploadTempDataFileContentsAndAssocData proxlUploadTempDataFileContentsAndAssocData : proxlUploadTempDataFileContentsAndAssocDataList ) {
+
+			ProxlUploadTempDataFileContents proxlUploadTempDataFileContents = proxlUploadTempDataFileContentsAndAssocData.proxlUploadTempDataFileContents;
+			
 			File uploadedTempFileOnDisk = new File( tempSubdir, proxlUploadTempDataFileContents.getSavedToDiskFilename() );
 			File uploadedFile_In_dirForImportTrackingId = new File( dirForImportTrackingId, proxlUploadTempDataFileContents.getSavedToDiskFilename() );
 
@@ -639,14 +663,17 @@ public class ProxlXMLFileImportUploadSubmitService {
 		//  proxlXMLFileImportTrackingSingleFileDTO entry for Uploaded file(s)
 		
 
-		for (  ProxlUploadTempDataFileContents proxlUploadTempDataFileContents : proxlUploadTempDataFileContentsList ) {
+		for (  ProxlUploadTempDataFileContentsAndAssocData proxlUploadTempDataFileContentsAndAssocData : proxlUploadTempDataFileContentsAndAssocDataList ) {
 
+			ProxlUploadTempDataFileContents proxlUploadTempDataFileContents = proxlUploadTempDataFileContentsAndAssocData.proxlUploadTempDataFileContents;
+			
 			proxlXMLFileImportTrackingSingleFileDTO = new ProxlXMLFileImportTrackingSingleFileDTO();
 			proxlXMLFileImportTrackingSingleFileDTOList.add( proxlXMLFileImportTrackingSingleFileDTO );
 
 			proxlXMLFileImportTrackingSingleFileDTO.setFilenameInUpload( proxlUploadTempDataFileContents.getUploadedFilename() );
 			proxlXMLFileImportTrackingSingleFileDTO.setFilenameOnDisk( proxlUploadTempDataFileContents.getSavedToDiskFilename() );
 			proxlXMLFileImportTrackingSingleFileDTO.setFileType( proxlUploadTempDataFileContents.getFileType() );
+			proxlXMLFileImportTrackingSingleFileDTO.setFileSize( proxlUploadTempDataFileContentsAndAssocData.fileLength );
 			proxlXMLFileImportTrackingSingleFileDTO.setFileUploadStatus( ProxlXMLImportSingleFileUploadStatus.FILE_UPLOAD_COMPLETE );
 		}
 		
@@ -667,9 +694,9 @@ public class ProxlXMLFileImportUploadSubmitService {
 	 * @throws ProxlWebappFileUploadFileSystemException 
 	 * @throws IOException 
 	 */
-	private List<ProxlUploadTempDataFileContents> getProxlUploadTempDataFileContentsListForTempSubdir( File tempSubdir ) throws JAXBException, ProxlWebappFileUploadFileSystemException, IOException {
+	private List<ProxlUploadTempDataFileContentsAndAssocData> getProxlUploadTempDataFileContentsListForTempSubdir( File tempSubdir ) throws JAXBException, ProxlWebappFileUploadFileSystemException, IOException {
 
-		List<ProxlUploadTempDataFileContents> proxlUploadTempDataFileContentsList = new ArrayList<>();
+		List<ProxlUploadTempDataFileContentsAndAssocData> proxlUploadTempDataFileContentsAndAssocDataList = new ArrayList<>();
 		
 
 		File[] tempSubdirFiles = tempSubdir.listFiles();
@@ -734,15 +761,53 @@ public class ProxlXMLFileImportUploadSubmitService {
 					}
 
 					
-					proxlUploadTempDataFileContentsList.add( proxlUploadTempDataFileContents );
+					ProxlUploadTempDataFileContentsAndAssocData proxlUploadTempDataFileContentsAndAssocData = new ProxlUploadTempDataFileContentsAndAssocData(); 
+					
+					proxlUploadTempDataFileContentsAndAssocData.proxlUploadTempDataFileContents = proxlUploadTempDataFileContents;
+					
+					//  Get length of uploaded file
+					
+					File uploadedFile = null;
+					
+					try {
+
+						uploadedFile = new File( tempSubdir, proxlUploadTempDataFileContents.getSavedToDiskFilename() );
+
+						proxlUploadTempDataFileContentsAndAssocData.fileLength = uploadedFile.length();
+
+					} catch ( Exception e ) {
+
+						String msg = "Error getting length of uploaded file: " + uploadedFile.getAbsolutePath();
+						log.error( msg );
+						throw new ProxlWebappFileUploadFileSystemException(msg, e);
+					}
+					
+					proxlUploadTempDataFileContentsAndAssocDataList.add( proxlUploadTempDataFileContentsAndAssocData );
 
 				}
 
 			}
 		}
 		
-		return proxlUploadTempDataFileContentsList;
+		return proxlUploadTempDataFileContentsAndAssocDataList;
 	}
+	
+	/////////////////////////////////
+	
+	/////   Classes for internal holders
+	
+	private static class ProxlUploadTempDataFileContentsAndAssocData {
+
+		ProxlUploadTempDataFileContents proxlUploadTempDataFileContents;
+	
+		long fileLength;
+	
+	}
+	
+	
+	/////////////////////////////////
+	
+	/////   Classes for webservice request and response
 	
 	/**
 	 * 

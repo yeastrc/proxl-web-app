@@ -1,7 +1,9 @@
 package org.yeastrc.xlink.www.proxl_xml_file_import.webservices;
 
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,12 +18,16 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dao.ProxlXMLFileImportTrackingSingleFileDAO;
+import org.yeastrc.xlink.base.proxl_xml_file_import.dao.ProxlXMLFileImportTracking_Base_DAO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingDTO;
+import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingRunDTO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingSingleFileDTO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingStatusValLkupDTO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportFileType;
+import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportStatus;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.XLinkUserDAO;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
@@ -30,7 +36,10 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.proxl_xml_file_import.dao.ProxlXMLFileImportTrackingStatusValuesLookupDAO;
 import org.yeastrc.xlink.www.proxl_xml_file_import.display_objects.ProxlXMLFileImportTrackingDisplay;
+import org.yeastrc.xlink.www.proxl_xml_file_import.searchers.ProxlXMLFileImportTrackingRun_LatestForParent_Searcher;
 import org.yeastrc.xlink.www.proxl_xml_file_import.searchers.ProxlXMLFileImportTracking_All_Searcher;
+import org.yeastrc.xlink.www.proxl_xml_file_import.searchers.ProxlXMLFileImportTracking_PendingCount_Searcher;
+import org.yeastrc.xlink.www.proxl_xml_file_import.searchers.ProxlXMLFileImportTracking_PendingTrackingIdsAllProjects_Searcher;
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.IsProxlXMLFileImportFullyConfigured;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -48,7 +57,7 @@ public class ProxlXMLFileImportTrackingDataService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/trackingDataList")
-	public List<ProxlXMLFileImportTrackingDisplay>  listProjects( 
+	public ListImportsAndGetPendingCountResponse listImportsAndGetPendingCount( 
 			@QueryParam( "project_id" ) Integer projectId,
 			@Context HttpServletRequest request ) throws Exception {
 
@@ -108,7 +117,7 @@ public class ProxlXMLFileImportTrackingDataService {
 			
 			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
 
-			if ( ! authAccessLevel.isAssistantProjectOwnerAllowed() ) {
+			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 
 				//  No Access Allowed for this project id
 
@@ -137,11 +146,11 @@ public class ProxlXMLFileImportTrackingDataService {
 			    	        .build()
 			    	        );
 			}
+
+			ListImportsAndGetPendingCountResponse listImportsAndGetPendingCountResponse = 
+					getProxlXMLFileImportingDataForPage( projectId );
 			
-			
-			List<ProxlXMLFileImportTrackingDisplay> displayList = getProxlXMLFileImportingDataForPage( projectId );
-			
-			return displayList;
+			return listImportsAndGetPendingCountResponse;
 
 		} catch ( WebApplicationException e ) {
 
@@ -186,12 +195,15 @@ public class ProxlXMLFileImportTrackingDataService {
 	 * @throws Exception
 	 * @throws ProxlWebappInternalErrorException
 	 */
-	private List<ProxlXMLFileImportTrackingDisplay> getProxlXMLFileImportingDataForPage(int projectId)
+	private ListImportsAndGetPendingCountResponse getProxlXMLFileImportingDataForPage(int projectId)
 			throws Exception, ProxlWebappInternalErrorException {
 		
-
-		List<ProxlXMLFileImportTrackingDisplay> displayList = new ArrayList<>();
+		List<ProxlXMLFileImportTrackingDisplay> pendingItemsList = new ArrayList<>();
+		List<ProxlXMLFileImportTrackingDisplay> historyItemsList = new ArrayList<>();
 		
+		List<Integer> completeSuccessTrackingIdList = new ArrayList<>();
+		
+		ArrayList<Integer> pendingTrackingIdsAllProjectsList = null;
 		
 		
 		List<ProxlXMLFileImportTrackingDTO> proxlXMLFileImportTrackingList = 
@@ -200,8 +212,9 @@ public class ProxlXMLFileImportTrackingDataService {
 		if ( ! proxlXMLFileImportTrackingList.isEmpty() ) {
 			
 
-			DateFormat dateFormat = DateFormat.getDateInstance();
-			
+			DateFormat dateTimeFormat = DateFormat.getDateTimeInstance( DateFormat.LONG, DateFormat.LONG );
+
+			NumberFormat numberFormat = NumberFormat.getInstance();
 			
 			List<ProxlXMLFileImportTrackingStatusValLkupDTO>  statusTextList = 
 					ProxlXMLFileImportTrackingStatusValuesLookupDAO.getInstance().getAll();
@@ -215,11 +228,121 @@ public class ProxlXMLFileImportTrackingDataService {
 			}
 			
 			
+			/////////////
 			
+			//   Copy Tracking Records to internal holder to match up with other data
+			
+			List<InternalHolder> internalHolderList = new ArrayList<>( proxlXMLFileImportTrackingList.size() ); 
+			
+			//  At the same time, check for tracking records have status QUEUED or RE_QUEUED
+			//     get all tracking id for status QUEUED or RE_QUEUED
+			//     so can put queue position on the display objects
+			
+			// check for any tracking records have status QUEUED or RE_QUEUED
+			
+			boolean foundQueuedOrReQueued = false;
 			
 			for ( ProxlXMLFileImportTrackingDTO trackingItem : proxlXMLFileImportTrackingList ) {
 				
+				InternalHolder internalHolder = new InternalHolder();
+				internalHolderList.add( internalHolder );
+				
+				internalHolder.trackingItem = trackingItem;
+				
+				if ( trackingItem.getStatus() == ProxlXMLFileImportStatus.QUEUED
+						|| trackingItem.getStatus() == ProxlXMLFileImportStatus.RE_QUEUED ) {
+					
+					foundQueuedOrReQueued = true;
+				}
+				
+				if ( trackingItem.getStatus() == ProxlXMLFileImportStatus.FAILED ) {
+
+					ProxlXMLFileImportTrackingRunDTO latestRunForTrackingItem =
+							ProxlXMLFileImportTrackingRun_LatestForParent_Searcher.getInstance()
+							.getLatestRunForProxlXMLFileImportTrackingDTO( trackingItem.getId() );
+
+					if ( latestRunForTrackingItem == null ) {
+
+						String msg = "Proxl XML Import Tracking Processing: Failed to get latest run for Tracking Item status FAILED. "
+								+ "Tracking Item Id: " + trackingItem.getId();
+						log.error( msg );
+						throw new ProxlWebappInternalErrorException( msg );
+					}
+					
+					if ( latestRunForTrackingItem.getRunStatus() != ProxlXMLFileImportStatus.FAILED ) {
+
+						String msg = "Proxl XML Import Tracking Processing: Latest run status is not FAILED for Tracking Item status FAILED. "
+								+ "Tracking Item Id: " + trackingItem.getId();
+						log.error( msg );
+						throw new ProxlWebappInternalErrorException( msg );
+					}
+
+					internalHolder.latestRunForTrackingItem = latestRunForTrackingItem;
+				}
+			}
+			
+			if ( foundQueuedOrReQueued ) {
+				
+				//  Found status QUEUED or RE_QUEUED so get tracking ids for all
+				
+				pendingTrackingIdsAllProjectsList =
+						ProxlXMLFileImportTracking_PendingTrackingIdsAllProjects_Searcher.getInstance()
+						.getPendingTrackingIdsAllProjects();
+			}
+			
+			
+			////////
+			
+			//   Main processing of tracking records
+			
+			for ( InternalHolder internalHolder : internalHolderList ) {
+				
+				ProxlXMLFileImportTrackingDTO trackingItem = internalHolder.trackingItem;
+				
 				ProxlXMLFileImportTrackingDisplay displayItem = new ProxlXMLFileImportTrackingDisplay();
+				
+
+				//  Set Pending queue position
+				
+				if ( trackingItem.getStatus() == ProxlXMLFileImportStatus.QUEUED
+						|| trackingItem.getStatus() == ProxlXMLFileImportStatus.RE_QUEUED ) {
+				
+					if ( pendingTrackingIdsAllProjectsList == null || pendingTrackingIdsAllProjectsList.isEmpty() ) {
+						
+						String msg = "pendingTrackingIdsAllProjectsList is null or empty when tracking status is QUEUED or RE_QUEUED."
+								+ "  trackingItem id: " + trackingItem.getId();
+						log.error( msg );
+						throw new ProxlWebappInternalErrorException(msg);
+					}
+
+					int queueIndex = Collections.binarySearch( pendingTrackingIdsAllProjectsList, trackingItem.getId() );
+
+					if ( queueIndex < 0 )  {
+						
+						//  Was not found in all pending.  Must no longer be pending. Get from DB again
+						
+						trackingItem = ProxlXMLFileImportTracking_Base_DAO.getInstance().getItem( trackingItem.getId() );
+						
+
+						if ( trackingItem.getStatus() == ProxlXMLFileImportStatus.QUEUED
+								|| trackingItem.getStatus() == ProxlXMLFileImportStatus.RE_QUEUED ) {
+
+							String msg = "Tracking item is not in all pending for tracking status QUEUED or RE_QUEUED"
+									+ " after re-get from DB."
+									+ "  trackingItem id: " + trackingItem.getId();
+							log.error( msg );
+							throw new ProxlWebappInternalErrorException(msg);
+						}
+						
+					} else {
+
+						int queuePosition = queueIndex + 1;
+
+						displayItem.setQueuePosition( queuePosition );
+						displayItem.setQueuePositionFmt( numberFormat.format( queuePosition ) );
+					}
+				}
+				
 				
 				displayItem.setTrackingId( trackingItem.getId() );
 				
@@ -236,6 +359,11 @@ public class ProxlXMLFileImportTrackingDataService {
 				}
 				
 				displayItem.setStatus( statusText );
+				
+				if ( trackingItem.getStatus() == ProxlXMLFileImportStatus.FAILED ) {
+
+					displayItem.setStatusFailedMsg( internalHolder.latestRunForTrackingItem.getDataErrorText() );
+				}
 				
 				List<ProxlXMLFileImportTrackingSingleFileDTO> fileDataList = 
 						ProxlXMLFileImportTrackingSingleFileDAO.getInstance()
@@ -259,17 +387,16 @@ public class ProxlXMLFileImportTrackingDataService {
 						
 						proxlXMLFileEntry = fileDataEntry;
 
-//						scanFileEntryList.add( fileDataEntry );  // TODO  REMOVE
-//						scanFileEntryList.add( fileDataEntry );  // TODO  REMOVE
-//						scanFileEntryList.add( fileDataEntry );  // TODO  REMOVE
-						
 					} else if ( fileDataEntry.getFileType() == ProxlXMLFileImportFileType.SCAN_FILE ) {
 						
 						scanFileEntryList.add( fileDataEntry );
 						
 					} else {
-						
-						
+
+						String msg = "Proxl XML Import Tracking Processing: Unknown file type for single file id: " 
+								+ fileDataEntry.getId();
+						log.error( msg );
+						throw new ProxlWebappInternalErrorException( msg );
 					}
 				}
 
@@ -294,17 +421,37 @@ public class ProxlXMLFileImportTrackingDataService {
 					scanFilenames.add( scanFilename );
 				}
 				
+				String scanfileNamesCommaDelim = StringUtils.join( scanFilenames, ", " );
+				
 				
 				displayItem.setScanFilenames( scanFilenames );
 				
-				String uploadDateTimeString = null;
+				displayItem.setScanfileNamesCommaDelim( scanfileNamesCommaDelim );
 				
-				if ( trackingItem.getUploadDateTime() != null ) {
 
-					dateFormat.format( trackingItem.getUploadDateTime() );
+				if ( trackingItem.getRecordInsertDateTime() != null ) {
+					
+					displayItem.setImportSubmitDateTime( dateTimeFormat.format( trackingItem.getRecordInsertDateTime() ) );
 				}
-				
-				displayItem.setUploadDateTime( uploadDateTimeString );
+
+				if ( trackingItem.getStatus() == ProxlXMLFileImportStatus.STARTED 
+						|| trackingItem.getStatus() == ProxlXMLFileImportStatus.COMPLETE
+						|| trackingItem.getStatus() == ProxlXMLFileImportStatus.FAILED ) {
+								
+					if ( trackingItem.getImportStartDateTime() != null ) {
+
+						displayItem.setImportStartDateTime( dateTimeFormat.format( trackingItem.getImportStartDateTime() ) );
+					}
+				}
+
+				if ( trackingItem.getStatus() == ProxlXMLFileImportStatus.COMPLETE
+						|| trackingItem.getStatus() == ProxlXMLFileImportStatus.FAILED ) {
+								
+					if ( trackingItem.getImportEndDateTime() != null ) {
+
+						displayItem.setImportEndDateTime( dateTimeFormat.format( trackingItem.getImportEndDateTime() ) );
+					}
+				}
 				
 				String searchName = trackingItem.getSearchName();
 				
@@ -329,15 +476,103 @@ public class ProxlXMLFileImportTrackingDataService {
 				String nameOfUploadUser = xlinkUserDTO.getFirstName() + " " + xlinkUserDTO.getLastName();
 				
 				displayItem.setNameOfUploadUser( nameOfUploadUser );
+
+				if ( trackingItem.getStatus() == ProxlXMLFileImportStatus.COMPLETE
+						|| trackingItem.getStatus() == ProxlXMLFileImportStatus.FAILED ) {
+
+					historyItemsList.add( displayItem );
+					
+				} else {
+					
+					pendingItemsList.add( displayItem );
+				}
+
 				
-				
-				displayList.add( displayItem );
+				if ( trackingItem.getStatus() == ProxlXMLFileImportStatus.COMPLETE ) {
+
+					completeSuccessTrackingIdList.add( trackingItem.getId() );
+				}
 			}
 			
 		}
 		
-		return displayList;
+		
+		Collections.sort( completeSuccessTrackingIdList );
+		
+
+		int pendingCount = 
+				ProxlXMLFileImportTracking_PendingCount_Searcher.getInstance().getPendingCountForProject( projectId );
+		
+		ListImportsAndGetPendingCountResponse listImportsAndGetPendingCountResponse = new ListImportsAndGetPendingCountResponse();
+		
+		listImportsAndGetPendingCountResponse.pendingCount = pendingCount;
+		
+		listImportsAndGetPendingCountResponse.pendingItemsList = pendingItemsList;
+		listImportsAndGetPendingCountResponse.historyItemsList = historyItemsList;
+		
+		listImportsAndGetPendingCountResponse.completeSuccessTrackingIdList = completeSuccessTrackingIdList;
+		
+		return listImportsAndGetPendingCountResponse;
+	}
+	
+	
+	/**
+	 * 
+	 *
+	 */
+	private static class InternalHolder {
+
+		ProxlXMLFileImportTrackingDTO trackingItem;
+		ProxlXMLFileImportTrackingRunDTO latestRunForTrackingItem;
 	}
 
+	/**
+	 * 
+	 *
+	 */
+	public static class ListImportsAndGetPendingCountResponse {
+		
+		int pendingCount;
+		List<ProxlXMLFileImportTrackingDisplay> pendingItemsList;
+		List<ProxlXMLFileImportTrackingDisplay> historyItemsList;
+		
+		List<Integer> completeSuccessTrackingIdList;
+
+		public int getPendingCount() {
+			return pendingCount;
+		}
+
+		public void setPendingCount(int pendingCount) {
+			this.pendingCount = pendingCount;
+		}
+
+		public List<ProxlXMLFileImportTrackingDisplay> getPendingItemsList() {
+			return pendingItemsList;
+		}
+
+		public void setPendingItemsList(
+				List<ProxlXMLFileImportTrackingDisplay> pendingItemsList) {
+			this.pendingItemsList = pendingItemsList;
+		}
+
+		public List<ProxlXMLFileImportTrackingDisplay> getHistoryItemsList() {
+			return historyItemsList;
+		}
+
+		public void setHistoryItemsList(
+				List<ProxlXMLFileImportTrackingDisplay> historyItemsList) {
+			this.historyItemsList = historyItemsList;
+		}
+
+		public List<Integer> getCompleteSuccessTrackingIdList() {
+			return completeSuccessTrackingIdList;
+		}
+
+		public void setCompleteSuccessTrackingIdList(
+				List<Integer> completeSuccessTrackingIdList) {
+			this.completeSuccessTrackingIdList = completeSuccessTrackingIdList;
+		}
+		
+	}
 
 }

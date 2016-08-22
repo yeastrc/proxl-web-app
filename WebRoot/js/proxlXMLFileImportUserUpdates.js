@@ -108,7 +108,33 @@ ProxlXMLFileImportUserUpdates.prototype.addClickHandlers  = function(  ) {
 	});
 
 
+	$(".proxl_xml_import_item_remove_completed_jq").click(function(eventObject) {
+
+		var clickThis = this;
+
+		objectThis.removeCompletedItemClicked( clickThis, eventObject );
+
+		return false;
+	});
+
+	$(".remove_completed_item_yes_button_jq").click(function(eventObject) {
+
+		var clickThis = this;
+
+		objectThis.removeCompletedItemConfirmedClicked( clickThis, eventObject );
+
+		return false;
+	});
+
 	
+	$(".import_proxl_xml_file_confirm_remove_upload_overlay_cancel_parts_jq").click(function(eventObject) {
+
+//		var clickThis = this;
+
+		$(".import_proxl_xml_file_confirm_remove_upload_overlay_show_hide_parts_jq").hide();
+
+		return false;
+	});
 
 };
 
@@ -138,8 +164,14 @@ ProxlXMLFileImportUserUpdates.prototype.cancelQueuedItemClicked  = function( par
 	var tracking_id =  $proxl_xml_import_item_row_jq.attr("data-tracking_id");
 
 	var status_id =  $proxl_xml_import_item_row_jq.attr("data-status_id");
+	
+	var filename = $proxl_xml_import_item_row_jq.attr("data-filename");
 
 	var $import_proxl_xml_file_confirm_remove_upload_overlay_container = $("#import_proxl_xml_file_confirm_remove_upload_overlay_container");
+
+	var $filename_jq = $import_proxl_xml_file_confirm_remove_upload_overlay_container.find(".filename_jq");
+	
+	$filename_jq.text( filename );
 	
 	var $any_item_jq = $import_proxl_xml_file_confirm_remove_upload_overlay_container.find(".any_item_jq");
 	
@@ -246,8 +278,7 @@ ProxlXMLFileImportUserUpdates.prototype.cancelQueuedItemClickedProcessAjaxRespon
 		
 	$(".import_proxl_xml_file_confirm_remove_upload_overlay_show_hide_parts_jq").hide();
 
-	proxlXMLFileImportStatusDisplay.populatePendingCount();
-	proxlXMLFileImportStatusDisplay.populateDataBlock();
+	proxlXMLFileImportStatusDisplay.populateDataBlockAndPendingCount();
 	
 };
 
@@ -267,7 +298,13 @@ ProxlXMLFileImportUserUpdates.prototype.removeFailedItemClicked  = function( cli
 
 	var tracking_id =  $proxl_xml_import_item_row_jq.attr("data-tracking_id");
 
+	var filename = $proxl_xml_import_item_row_jq.attr("data-filename");
+
 	var $import_proxl_xml_file_confirm_remove_upload_overlay_container = $("#import_proxl_xml_file_confirm_remove_upload_overlay_container");
+
+	var $filename_jq = $import_proxl_xml_file_confirm_remove_upload_overlay_container.find(".filename_jq");
+	
+	$filename_jq.text( filename );
 	
 	var $any_item_jq = $import_proxl_xml_file_confirm_remove_upload_overlay_container.find(".any_item_jq");
 	
@@ -349,7 +386,115 @@ ProxlXMLFileImportUserUpdates.prototype.removeFailedItemClickedProcessAjaxRespon
 	$(".import_proxl_xml_file_confirm_remove_upload_overlay_show_hide_parts_jq").hide();
 
 
-	proxlXMLFileImportStatusDisplay.populateDataBlock();
+	proxlXMLFileImportStatusDisplay.populateDataBlockAndPendingCount();
+};
+
+
+
+///////////////////////////////
+///////////////////////////////
+
+
+//  User clicked the "Remove Completed" link 
+
+ProxlXMLFileImportUserUpdates.prototype.removeCompletedItemClicked  = function( clickThis, eventObject ) {
+
+//	var objectThis = this;
+
+	var $clickThis = $( clickThis );
+
+	var $proxl_xml_import_item_row_jq = $clickThis.closest(".proxl_xml_import_item_row_jq");
+
+	var tracking_id =  $proxl_xml_import_item_row_jq.attr("data-tracking_id");
+
+	var filename = $proxl_xml_import_item_row_jq.attr("data-filename");
+
+	var $import_proxl_xml_file_confirm_remove_upload_overlay_container = $("#import_proxl_xml_file_confirm_remove_upload_overlay_container");
+
+	var $filename_jq = $import_proxl_xml_file_confirm_remove_upload_overlay_container.find(".filename_jq");
+	
+	$filename_jq.text( filename );
+	
+	var $any_item_jq = $import_proxl_xml_file_confirm_remove_upload_overlay_container.find(".any_item_jq");
+
+	$any_item_jq.hide();
+
+	var $remove_completed_item_jq = $import_proxl_xml_file_confirm_remove_upload_overlay_container.find(".remove_completed_item_jq");
+
+	$remove_completed_item_jq.show();
+
+	var $remove_completed_item_yes_button_jq = $import_proxl_xml_file_confirm_remove_upload_overlay_container.find(".remove_completed_item_yes_button_jq");
+
+	$remove_completed_item_yes_button_jq.show();
+
+	$remove_completed_item_yes_button_jq.data( { tracking_id : tracking_id } );
+
+	$(".import_proxl_xml_file_confirm_remove_upload_overlay_show_hide_parts_jq").show();
+
+
+};
+
+
+//  User clicked the "Remove Completed" link 
+
+ProxlXMLFileImportUserUpdates.prototype.removeCompletedItemConfirmedClicked  = function( clickThis, eventObject ) {
+
+	var objectThis = this;
+
+	var $clickThis = $( clickThis );
+
+	var tracking_id =  $clickThis.data("tracking_id");
+
+	var requestData = { tracking_id : tracking_id };
+
+
+	var _URL = contextPathJSVar + "/services/proxl_xml_file_import/removeCompletedImport";
+
+	$.ajax({
+		type: "POST",
+		url: _URL,
+		data: requestData,
+		dataType: "json",
+		success: function( responseData )	{
+
+			var responseParams = {
+					responseData : responseData,
+					clickThis : clickThis,
+					tracking_id : tracking_id
+			};
+
+			objectThis.removeFailedItemClickedProcessAjaxResponse( responseParams );
+		},
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
+		error: function(jqXHR, textStatus, errorThrown) {	
+
+			handleAJAXError( jqXHR, textStatus, errorThrown );
+		}
+	});
+
+};
+
+ProxlXMLFileImportUserUpdates.prototype.removeFailedItemClickedProcessAjaxResponse  = function( responseParams ) {
+
+//	var responseData = responseParams.responseData;
+//	var clickThis = responseParams.clickThis;
+//	var tracking_id = responseParams.tracking_id;
+
+//	if ( responseData.success ) {
+
+//	alert("Successful removal" );
+//	}
+
+//	if ( responseData.statusNotFailed ) {
+
+//	alert("Unable to remove since status is no longer failed" );
+//	}
+
+	$(".import_proxl_xml_file_confirm_remove_upload_overlay_show_hide_parts_jq").hide();
+
+	proxlXMLFileImportStatusDisplay.populateDataBlockAndPendingCount();
 };
 
 ///////////////

@@ -79,8 +79,8 @@ public class ProxlXMLFileImportTrackingSingleFile_ForWebAppDAO {
 
 		final String sql = "INSERT INTO proxl_xml_file_import_tracking_single_file "
 				+ "( proxl_xml_file_import_tracking_id, file_type_id, file_upload_status_id, "
-				+ " filename_in_upload, filename_on_disk )"
-				+ " VALUES ( ?, ?, ?, ?, ? )";
+				+ " filename_in_upload, filename_on_disk, file_size )"
+				+ " VALUES ( ?, ?, ?, ?, ?, ? )";
 
 		try {
 			
@@ -100,6 +100,9 @@ public class ProxlXMLFileImportTrackingSingleFile_ForWebAppDAO {
 			pstmt.setString( counter, item.getFilenameInUpload() );
 			counter++;
 			pstmt.setString( counter, item.getFilenameOnDisk() );
+
+			counter++;
+			pstmt.setLong( counter, item.getFileSize() );
 			
 			pstmt.executeUpdate();
 			

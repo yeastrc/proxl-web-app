@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.proxl_xml_file_import.constants;
 
-import java.text.NumberFormat;
+//import java.text.NumberFormat;
 
 public class ProxlXMLFileUploadWebConstants {
 
@@ -15,10 +15,18 @@ public class ProxlXMLFileUploadWebConstants {
 //	public static final int MAX_SCAN_FILE_UPLOAD_SIZE = ( 2 * 10 * 1000  ); // temp smaller max of 20KB
 	
 
-	public static final String MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED = NumberFormat.getInstance().format(MAX_PROXL_XML_FILE_UPLOAD_SIZE);
+	//  !!!!   Must keep these in sync with the numbers above
+	
+	public static final String MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED = "150MB";
 
 	
-	public static final String MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED = NumberFormat.getInstance().format(MAX_SCAN_FILE_UPLOAD_SIZE);
+	public static final String MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED = "10GB";
+
+
+//	public static final String MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED = NumberFormat.getInstance().format(MAX_PROXL_XML_FILE_UPLOAD_SIZE);
+//
+//	
+//	public static final String MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED = NumberFormat.getInstance().format(MAX_SCAN_FILE_UPLOAD_SIZE);
 
 	
 	//   PROXL_XML

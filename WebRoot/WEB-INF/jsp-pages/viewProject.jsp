@@ -1,3 +1,4 @@
+<%@page import="org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportStatus"%>
 <%@page import="org.yeastrc.xlink.www.constants.QCPlotConstants"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 <%@page import="org.yeastrc.xlink.www.constants.StrutsActionPathsConstants"%>
@@ -1129,12 +1130,11 @@
 
 		<c:if test="${ configSystemValues.proxlXMLFileImportFullyConfigured }" >
 		
-		  <c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" >
+		  <c:if test="${authAccessLevel.projectOwnerAllowed}" >
 							
 			<!--  Upload Data -->
 
-			<div id="upload_data_top_level_container" <%--  style="display: none;" --%>
-				class="top-level-container " >
+			<div id="upload_data_top_level_container" class="top-level-container " >
 			
 				<div  class="collapsable-link-container top-level-collapsable-link-container " style="">
 					<a href="javascript:" class="top-level-collapsable-link " style="display: none;"
@@ -1162,26 +1162,121 @@
 						<input type="button" value="Import Proxl XML File" 
 							class=" open_proxl_file_upload_overlay_jq tool_tip_attached_jq "
 							data-tooltip="Upload a Proxl XML file to this project" >
+							
+						<input type="button" value="Refresh" 
+							id="upload_data_refresh_data"
+							class="  tool_tip_attached_jq "
+							data-tooltip="Refresh this list" >
 					</div>
 					
-					<div class="top-level-label-bottom-border"></div>
+					
 
 				  </c:if>
 				  
-				  <div id="upload_data_items_block">
+				  <%-- Pending and History --%>
 				  
-				   <table id="upload_data_items_table" border="0" width="100%" >
-				   
-				   	<tr><td>LOADING</td></tr>
-				   	
-				   </table>
+				  <div   id="upload_data_pending_and_history_items_block"> <%-- Keep div with this id, used in JS --%>
 				  
-				  </div>
+				   <div   id="upload_data_pending_items_block"> <%-- Keep div with this id, used in JS --%>
+
+					<div style="font-size: 18px;">
+						<a  id="upload_data_pending_items_show_link"
+							class="tool_tip_attached_jq " 
+							data-tooltip="Show pending" 
+							style="display: none;" 
+							><img src="${ contextPath }/images/icon-expand-small.png"
+								style="cursor: pointer;"
+							></a>
+
+						<a id="upload_data_pending_items_hide_link"
+							class="tool_tip_attached_jq " 
+							data-tooltip="Hide pending" 
+							style="" 
+							><img src="${ contextPath }/images/icon-collapse-small.png"
+								style="cursor: pointer;"
+							></a>
+														
+							Pending
+					</div>
+					
+					<div class="top-level-label-bottom-border"></div>
+					
+					<div  id="upload_data_pending_items_container" style="padding-bottom: 10px; padding-left: 17px;">
+					
+					  <div id="upload_data_pending_items_no_pending_text" >
+					  	No uploads pending
+					  </div>
+					  
+					  
+					  <div style="">
+					   <table id="upload_data_pending_items_table" style="width: 100%;">
+					   
+					   	<tr><td>LOADING</td></tr>
+					   	
+					   </table>
+					 </div>
+					</div>
+
+				   </div>  <%-- END <div   id="upload_data_pending_items_block">  --%>
+
+				   <div   id="upload_data_history_items_block"> <%-- Keep div with this id, used in JS --%>
+
+					<div style="font-size: 18px;">
+						<a  id="upload_data_history_items_show_link"
+							class="tool_tip_attached_jq " 
+							data-tooltip="Show history" 
+							><img src="${ contextPath }/images/icon-expand-small.png"
+								style="cursor: pointer;"
+							></a>
+
+						<a id="upload_data_history_items_hide_link"
+							class="tool_tip_attached_jq " 
+							data-tooltip="Hide history" 
+							style="display: none;" 
+							><img src="${ contextPath }/images/icon-collapse-small.png"
+								style="cursor: pointer;"
+							></a>
+								
+								History						
+							
+					</div>				
+					
+					<div class="top-level-label-bottom-border"></div>	  
+					   
+					<div  id="upload_data_history_items_container" >
+						<%--  Spacer for icon --%>
+					  <div  style="padding-left: 17px;">
+					   <table id="upload_data_history_items_table" style="width: 100%;" >
+					   
+					   	<tr><td>LOADING</td></tr>
+					   	
+					   </table>
+
+					   </div>					   
+					</div>					  
+					  			
+				   </div>  <%-- END <div   id="upload_data_history_items_block">  --%>
+
 
 										  
-				</div>
-				
-			</div>
+				  </div>  <%-- END Pending and History --%>
+			
+			  </div>	<%--  END  <div class="upload-search-block " id="upload_data_main_collapsable_jq" --%>
+			  
+			</div>  <%--  END   <div id="upload_data_top_level_container"  class="top-level-container " > --%>
+
+
+					
+			<%--  Tooltip HTML --%>
+					
+			<script id="proxl_xml_import_item_tooltip_template"  type="text/x-handlebars-template">
+
+				<%--  include the template text  --%>
+				<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/proxlXMLFileImportItemTooltip.jsp" %>
+
+			</script>
+	
+
 
 			<!--  END  Upload Data -->
 			
@@ -1208,9 +1303,12 @@
 					 id="import_proxl_xml_file_confirm_remove_upload_overlay_container" >
 			
 					<div class="top-level-label" style="margin-left: 0px;">
-						<span  class=" cancel_queued_item_jq any_item_jq ">Cancel Queued Item?</span>
-						<span  class=" cancel_re_queued_item_jq any_item_jq ">Cancel Re-queued Item?</span>
-						<span  class=" remove_failed_item_jq any_item_jq ">Remove Failed Item?</span>
+						<span  class=" cancel_queued_item_jq cancel_re_queued_item_jq  any_item_jq ">
+							Cancel Upload Request?
+						</span>
+						<span  class=" remove_failed_item_jq remove_completed_item_jq  any_item_jq ">
+							Remove From History?
+						</span>
 					</div>
 			
 					<div class="top-level-label-bottom-border" ></div>
@@ -1218,16 +1316,23 @@
 					<div >
 					
 						<div>
-							<span  class=" cancel_queued_item_jq any_item_jq ">Cancel Queued Item?</span>
-							<span  class=" cancel_re_queued_item_jq any_item_jq ">Cancel Re-queued Item?</span>
-							<span  class=" remove_failed_item_jq any_item_jq ">Remove Failed Item?</span>
+							<span  class=" cancel_queued_item_jq cancel_re_queued_item_jq any_item_jq ">
+								Remove <span class=" filename_jq " ></span> 
+								from upload queue?
+							</span>
+							<span  class=" remove_failed_item_jq remove_completed_item_jq any_item_jq ">
+								Remove <span class=" filename_jq " ></span> 
+								from upload history?
+							</span>  
 						</div>
 						
 						<div style="margin-top: 10px">
 							<input type="button" value="Yes"  class=" cancel_queued_item_yes_button_jq any_item_jq " >
 							<input type="button" value="Yes"  class=" cancel_re_queued_item_yes_button_jq any_item_jq " >
 							<input type="button" value="Yes"  class=" remove_failed_item_yes_button_jq any_item_jq " >
-							<input type="button" value="Cancel" class="import_proxl_xml_file_confirm_remove_upload_overlay_cancel_parts_jq" >
+							<input type="button" value="Yes"  class=" remove_completed_item_yes_button_jq any_item_jq " >
+							<input type="button" value="Cancel" 
+								class="import_proxl_xml_file_confirm_remove_upload_overlay_cancel_parts_jq" >
 						</div>
 							
 					</div>
@@ -2503,8 +2608,8 @@
 	
 	
 	
-		<%--   Overlay for uploading Proxl XML file, and Javascript includes --%>
-
+		<%--   Overlays for Proxl XML file uploading and status display --%>
+	
 
 		<c:if test="${ configSystemValues.proxlXMLFileImportFullyConfigured }" >
 		
@@ -2512,6 +2617,8 @@
 		  <%--
 		  <c:if test="${authAccessLevel.assistantProjectOwnerAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }" >
 		  --%>			
+
+			<%--   Overlay for uploading Proxl XML file, and Javascript includes --%>
 
 			<%@ include file="/WEB-INF/jsp-includes/proxl_XML_Upload_Overlay.jsp" %>
 
@@ -2522,42 +2629,53 @@
 			<script type="text/javascript" src="${ contextPath }/js/proxlXMLFileImportUserUpdates.js?x=${cacheBustValue}"></script>
 		  </c:if>
 		  
-		</c:if>
-		
-		
-		<%--  Overlay and JS for notifying user that the status has changed on one of the Proxl XML Import items --%>
-		<c:if test="${authAccessLevel.assistantProjectOwnerAllowed }" >
+		  <%--  Overlay and JS for notifying user that one the Proxl XML Import items imported successfully --%>
+		  
+		  <c:if test="${authAccessLevel.projectOwnerAllowed }" >
 
+			<input type="hidden" id="proxl_xml_file_upload_complete_successfully_status_id_queued"
+				value="<%= ProxlXMLFileImportStatus.QUEUED.value() %>">
 
+			<input type="hidden" id="proxl_xml_file_upload_complete_successfully_status_id_re_queued"
+				value="<%= ProxlXMLFileImportStatus.RE_QUEUED.value() %>">
 
-			 <!--  Modal dialog for notifying user that the status has changed on one of the Proxl XML Import items -->
+			<input type="hidden" id="proxl_xml_file_upload_complete_successfully_status_id_started"
+				value="<%= ProxlXMLFileImportStatus.STARTED.value() %>">
+
+			<input type="hidden" id="proxl_xml_file_upload_complete_successfully_status_id_complete"
+				value="<%= ProxlXMLFileImportStatus.COMPLETE.value() %>">
+
+			<input type="hidden" id="proxl_xml_file_upload_complete_successfully_status_id_failed"
+				value="<%= ProxlXMLFileImportStatus.FAILED.value() %>">
+																
+			 <!--  Modal dialog for notifying user that one the Proxl XML Import items imported successfully -->
 	
 				<!--  Div behind modal dialog div -->
 	
-			 <div class="modal-dialog-overlay-background   proxl_xml_file_upload_status_changed_overlay_show_hide_parts_jq proxl_xml_file_upload_status_changed_overlay_cancel_parts_jq  overlay_show_hide_parts_jq" 
-				id="proxl_xml_file_upload_status_changed_overlay_background" ></div>
+			 <div class="modal-dialog-overlay-background   proxl_xml_file_upload_complete_successfully_overlay_show_hide_parts_jq proxl_xml_file_upload_complete_successfully_overlay_cancel_parts_jq  overlay_show_hide_parts_jq" 
+				id="proxl_xml_file_upload_complete_successfully_overlay_background" ></div>
 			
 					<!--  Inline div for positioning modal dialog on page -->
-			 <div class="proxl-xml-file-upload-status-changed-overlay-containing-outermost-div " id="proxl_xml_file_upload_status_changed_overlay_containing_outermost_div_inline_div"  >
+			 <div class="proxl-xml-file-upload-complete-successfully-overlay-containing-outermost-div " id="proxl_xml_file_upload_complete_successfully_overlay_containing_outermost_div_inline_div"  >
 	
-			  <div class="proxl-xml-file-upload-status-changed-overlay-containing-outer-div " >
+			  <div class="proxl-xml-file-upload-complete-successfully-overlay-containing-outer-div " >
 			
 	
 					<!--  Div overlay for confirming removing a search -->
-				<div class="modal-dialog-overlay-container proxl-xml-file-upload-status-changed-overlay-container   proxl_xml_file_upload_status_changed_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
-					 id="proxl_xml_file_upload_status_changed_overlay_container" >
+				<div class="modal-dialog-overlay-container proxl-xml-file-upload-complete-successfully-overlay-container   proxl_xml_file_upload_complete_successfully_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
+					 id="proxl_xml_file_upload_complete_successfully_overlay_container" >
 	
-					<div class="top-level-label" style="margin-left: 0px;">Import Status Changed</div>
+					<div class="top-level-label" style="margin-left: 0px;">Import Completed</div>
 	
 					<div class="top-level-label-bottom-border" ></div>
 					
 					<div >
 					
-						<div >The status changed on one of the Proxl XML imports has changed.</div>
+						<div >An import has completed.  Refresh page to view the search.</div>
 						
 						<div style="margin-top: 10px">
-							<input type="button" value="Refresh Page" id="proxl_xml_file_upload_status_changed_refresh_page_button" >
-							<input type="button" value="Cancel" class="proxl_xml_file_upload_status_changed_overlay_cancel_parts_jq" >
+							<input type="button" value="Refresh Page" id="proxl_xml_file_upload_complete_successfully_refresh_page_button" >
+							<input type="button" value="Cancel" class="proxl_xml_file_upload_complete_successfully_overlay_cancel_parts_jq" >
 						</div>
 							
 					</div>
@@ -2583,7 +2701,9 @@
 
 			</script>	
 									
-		</c:if>
+		  </c:if> <%--  END test="${ authAccessLevel.assistantProjectOwnerAllowed }"  --%>
+		  
+		</c:if> <%--  END test="${ configSystemValues.proxlXMLFileImportFullyConfigured }"  --%>
 		
 		
 	

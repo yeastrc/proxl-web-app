@@ -552,6 +552,8 @@ ProxlXMLFileImport.prototype.closeClicked  = function( clickThis, eventObject ) 
 
 ProxlXMLFileImport.prototype.closeOverlay  = function( clickThis, eventObject ) {
 
+	//  Not always provided:  clickThis, eventObject
+	
 	var allFileData = this.getAllFileData();
 	
 	var fileDataKeys = Object.keys( allFileData );
@@ -609,16 +611,13 @@ ProxlXMLFileImport.prototype.resetOverlay  = function(  ) {
 	
 	this.resetOverlayProxlXMLSection();
 	
-
-	$("#import_proxl_xml_file_main_import_block").show();
-	$("#import_proxl_xml_file_submit_import_success_block").hide();
+	$("#import_proxl_xml_file_search_name").val("");
 	
-	
-	$("#import_proxl_xml_scan_file_field").val();
+	$("#import_proxl_xml_scan_file_field").val("");
 
 	$("#import_proxl_xml_scan_files_block").empty();
 
-	this.disableImportFileButton();
+	this.disableSubmitUploadButton();
 	
 	$("#import_proxl_xml_file_file_sent_confirmation_block").hide();
 	$("#import_proxl_xml_file_error_message_block").hide();
@@ -643,8 +642,8 @@ ProxlXMLFileImport.prototype.proxlXMLFileDialogChanged  = function( changeThis, 
 //	var objectThis = this;
 	
 	
-	this.disableImportFileButton();
-
+	this.disableSubmitUploadButton();
+	
 	
 	var $fileElement = $( changeThis );  //  $("#import_proxl_xml_proxl_xml_file_field");
 
@@ -769,7 +768,7 @@ ProxlXMLFileImport.prototype.removeProxlXMLFile  = function( params ) {
 //	var eventObject = params.eventObject;
 	var doAbortIfNeeded = params.doAbortIfNeeded;
 
-	this.disableImportFileButton();
+	this.disableSubmitUploadButton();
 	
 	$("#import_proxl_xml_choose_scan_file_block").hide(); // Hide since need to upload proxl xml file first
 
@@ -827,6 +826,9 @@ ProxlXMLFileImport.prototype.removeScanFile  = function( params ) {
 	this.removeFileData( { fileIndex : fileIndex } );
 
 	$import_proxl_xml_file_scan_file_entry_block_jq.remove();
+
+	this.enableDisableSubmitUploadButtonAndAddScanFileLinkConditional();
+	
 };
 
 
@@ -1009,7 +1011,7 @@ ProxlXMLFileImport.prototype.scanFileDialogChanged  = function( changeThis, even
 	
 
 
-	this.disableImportFileButton();
+	this.disableSubmitUploadButton();
 	
 	$("#import_proxl_xml_choose_scan_file_block").hide();
 	
@@ -1052,11 +1054,11 @@ ProxlXMLFileImport.prototype.scanFileDialogChanged  = function( changeThis, even
 	
 	var $scanFileEntry = $(html).appendTo( $import_proxl_xml_scan_files_block );
 	
-	var $upload_file_remove_button_jq = $scanFileEntry.find(".upload_file_remove_button_jq");
+	var $scan_file_remove_button_jq = $scanFileEntry.find(".scan_file_remove_button_jq");
 	
 	//  Remove The Scan file, aborting the upload if in progress
 
-	$upload_file_remove_button_jq.click(function( eventObject ) {
+	$scan_file_remove_button_jq.click(function( eventObject ) {
 
 		var clickThis = this;
 
@@ -1591,7 +1593,10 @@ ProxlXMLFileImport.prototype.successfulFileUpload = function( params ) {
 	var $progress_bar_container_jq = $containingBlock.find(".progress_bar_container_jq");
 	
 	$progress_bar_container_jq.hide();
+	
+	var $upload_complete_msg_jq = $containingBlock.find(".upload_complete_msg_jq");
 
+	$upload_complete_msg_jq.show();
 
 	proxlXMLFileImportFileData.setUploadedToServer( true );
 
@@ -1603,7 +1608,9 @@ ProxlXMLFileImport.prototype.successfulFileUpload = function( params ) {
 	
 	$("#import_proxl_xml_choose_scan_file_block").show();
 	
-	this.enableImportFileButton();
+//	this.enableSubmitUploadButton();
+	
+	this.enableDisableSubmitUploadButtonAndAddScanFileLinkConditional();
 };
 
 /////
@@ -1640,6 +1647,10 @@ ProxlXMLFileImport.prototype.progressBarClear = function( params ) {
 
 	var $containingBlock = params.$containingBlock;
 	
+	var $upload_complete_msg_jq = $containingBlock.find(".upload_complete_msg_jq");
+
+	$upload_complete_msg_jq.hide();
+
 	var $progress_bar_container_jq = $containingBlock.find(".progress_bar_container_jq");
 	
 	$progress_bar_container_jq.show();
@@ -1814,69 +1825,73 @@ ProxlXMLFileImport.prototype.submitClickedProcessServerResponse  = function( par
 	
 	this.clearFileData();
 	
-
-	$("#import_proxl_xml_file_main_import_block").hide();
-	$("#import_proxl_xml_file_submit_import_success_block").show();
+	proxlXMLFileImportStatusDisplay.populateDataBlockAndPendingCount();
 	
-
-	var $import_proxl_xml_file_submit_import_success_scan_filename_container =
-		$("#import_proxl_xml_file_submit_import_success_scan_filename_container");
-	
-	$import_proxl_xml_file_submit_import_success_scan_filename_container.empty();
-
-	
-
-	//  Populate filenames
-	
-	var fileItems = requestObj.fileItems;
-	
-	var scanFilenameTemplate = undefined;
-	
-	for ( var index = 0, fileItem; fileItem = fileItems[ index ]; index++ ) {
-		
-		var uploadedFilename = fileItem.uploadedFilename;
-		
-		if ( fileItem.isProxlXMLFile ) {
-			
-			// process Proxl XML file
-			
-			$("#import_proxl_xml_file_submit_import_success_proxl_xml_filename").text( uploadedFilename );
-			
-		} else {
-			
-			// process scan file
-			
-			if ( ! scanFilenameTemplate ) {
-				
-				scanFilenameTemplate = $("#import_proxl_xml_file_scan_file_submitted_entry_template").html();
-			}
-			
-			var $scanFilenameHTML = $( scanFilenameTemplate );
-			
-			$import_proxl_xml_file_submit_import_success_scan_filename_container.append( $scanFilenameHTML );
-			
-			var $scan_filename_jq = $scanFilenameHTML.find(".scan_filename_jq");
-			
-			$scan_filename_jq.text( uploadedFilename );
-		}
-		
-	}
-	
-	proxlXMLFileImportStatusDisplay.populatePendingCount();
-	
-	proxlXMLFileImportStatusDisplay.populateDataBlock();
-	
+	this.closeOverlay();
 };
 
 
 
-ProxlXMLFileImport.prototype.enableImportFileButton  = function () {
+ProxlXMLFileImport.prototype.enableDisableSubmitUploadButtonAndAddScanFileLinkConditional = function () {
+
+	//  Enable Submit Upload button and show Add Scan Files Link
+	//  if Proxl XML file is uploaded and all scan files are uploaded.
+
+	var proxlXMLfileUploaded = false;
+	var allScanFilesUploadedOrNoScanFiles = true;
+	
+	var allFileData = this.getAllFileData();
+	
+	var fileDataKeys = Object.keys( allFileData );
+	
+	for( var index = 0; index < fileDataKeys.length; index++ ) {
+		
+		var fileDataKey = fileDataKeys[ index ];
+		
+		var proxlXMLFileImportFileData = allFileData[ fileDataKey ];
+		
+		if ( proxlXMLFileImportFileData.isIsProxlXMLFile() ) {
+			
+			if ( proxlXMLFileImportFileData.isUploadedToServer() ) {
+				
+				proxlXMLfileUploaded = true;
+			}
+			
+		} else {
+			
+			if ( proxlXMLFileImportFileData.isUploadedToServer() ) {
+				
+			} else {
+				
+				allScanFilesUploadedOrNoScanFiles = false;
+			}
+			
+		}
+	}
+	
+	if ( proxlXMLfileUploaded && allScanFilesUploadedOrNoScanFiles ) {
+		
+		this.enableSubmitUploadButton();
+		
+		$("#import_proxl_xml_choose_scan_file_block").show();
+	
+	} else {
+		
+		this.disableSubmitUploadButton();
+		
+		$("#import_proxl_xml_choose_scan_file_block").hide();
+	}
+	
+};
+
+
+ProxlXMLFileImport.prototype.enableSubmitUploadButton  = function () {
 
 	$("#import_proxl_xml_file_submit_button").prop( "disabled", false );
 	$("#import_proxl_xml_file_submit_button_disabled_overlay").hide();
 };
 
-ProxlXMLFileImport.prototype.disableImportFileButton  = function () {
+ProxlXMLFileImport.prototype.disableSubmitUploadButton  = function () {
 
 	$("#import_proxl_xml_file_submit_button_disabled_overlay").show();
 	$("#import_proxl_xml_file_submit_button").prop( "disabled", true );

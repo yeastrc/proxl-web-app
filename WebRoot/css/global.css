@@ -500,6 +500,20 @@ body.project-page .invited-person-invite-date-block { padding-left: 20px; }
 body.project-page .upload-search-block { margin-left: 30px; }
 
 
+body.project-page .upload-search-block tr:hover { background-color: #FFF0F0; }
+
+
+body.project-page .upload-search-tooltip {
+	text-align: left;
+	width: 800px;
+	max-width: 800px;
+}	
+
+body.project-page .upload-search-tooltip-table { max-width: 780px; }
+
+body.project-page .upload-search-tooltip-table td { vertical-align: top; padding-top: 2px; padding-bottom: 2px; }
+
+body.project-page .upload-search-tooltip-table .label-cell { white-space: nowrap; padding-right: 10px; }
 
 body.project-page .searches-block { margin-left: 10px; }
 
@@ -689,10 +703,22 @@ div.proxl-xml-file-upload-overlay-div {
 
 .proxl-xml-file-upload-overlay-body {  padding: 20px; }
 
-.proxl-xml-file-upload-overlay-link { margin-right: 20px;  }
 
+.proxl-xml-file-upload-overlay-main-table { width: 100%; border-spacing: 0px; margin: 0px; padding: 0px; }
 
-.proxl-xml-file-upload-filename-containing-div { padding-top: 3px; }
+	/*  The columns must have "width" property.  Multiple tables must align */
+.proxl-xml-file-upload-overlay-main-table td { padding: 0px; margin: 0px; }
+.proxl-xml-file-upload-overlay-main-table td.column-1 { width: 20px; padding-right: 3px; } /* width of delete icon */
+.proxl-xml-file-upload-overlay-main-table td.column-2 { padding-right: 10px; vertical-align: text-top;  }
+.proxl-xml-file-upload-overlay-main-table td.column-3 {  } /* no width: to get rest of table width */ 
+
+.proxl-xml-file-upload-overlay-main-table td.column-2, 
+.proxl-xml-file-upload-filename-containing-div { width: 300px; max-width: 300px;}
+
+.proxl-xml-file-upload-filename-containing-div { overflow-x: auto; padding-top: 3px;  }
+
+.proxl-xml-file-upload-overlay-main-table td.column-filename  { vertical-align: text-top; }
+
 
     /*  upload progress bar  */
 .import-proxl-xml-file-progress-bar-container { width: 180px; }
@@ -700,7 +726,7 @@ div.proxl-xml-file-upload-overlay-div {
 		/*  JS code adjusts the width so the background color is shown */
 .import-proxl-xml-file-progress { width: 0%; background-color: #FFF0F0; height: 17px; }
 
-
+.import-proxl-xml-file-upload-complete { font-style: italic; }
 
 	/* display upload error dialog */
 
@@ -755,11 +781,11 @@ body.project-page .import-proxl-xml-file-confirm-remove-upload-overlay-container
 
 
 
-	/* modal dialog for notifying user that the status has changed on one of the Proxl XML Import items */
+	/* Modal dialog for notifying user that one the Proxl XML Import items imported successfully */
 
-body.project-page .proxl-xml-file-upload-status-changed-overlay-containing-outer-div { position: relative; }
+body.project-page .proxl-xml-file-upload-complete-successfully-overlay-containing-outer-div { position: relative; }
 
-body.project-page .proxl-xml-file-upload-status-changed-overlay-container { width: 450px; position: fixed; top: 100px; left: 100px; }
+body.project-page .proxl-xml-file-upload-complete-successfully-overlay-container { width: 450px; position: fixed; top: 100px; left: 100px; }
 
 
 

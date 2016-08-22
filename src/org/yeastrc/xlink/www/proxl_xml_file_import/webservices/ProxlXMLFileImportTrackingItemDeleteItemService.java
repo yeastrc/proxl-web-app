@@ -661,5 +661,276 @@ public class ProxlXMLFileImportTrackingItemDeleteItemService {
 		
 	}
 
+	
 
+	
+	///////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////
+
+
+	@POST
+	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/removeCompletedImport") 
+	public RemoveCompletedImport removeCompletedImport(   
+			@FormParam( "tracking_id" ) Integer trackingId,
+			@Context HttpServletRequest request ) throws Exception {
+
+
+		try {
+
+			if ( trackingId == null ) {
+
+				String msg = "missing tracking_id ";
+
+				log.error( msg );
+
+				throw new WebApplicationException(
+						Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+						.entity( msg )
+						.build()
+						);
+			}
+
+			if ( trackingId == 0 ) {
+
+				String msg = "Provided tracking_id is zero, is = " + trackingId;
+
+				log.error( msg );
+
+				throw new WebApplicationException(
+						Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+						.entity( msg )
+						.build()
+						);
+			}
+
+
+			// Get the session first.  
+			//			HttpSession session = request.getSession();
+
+			//   Get the project id for this tracking id
+
+
+			ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO = 
+					ProxlXMLFileImportTracking_Base_DAO.getInstance().getItem( trackingId );
+
+			if ( proxlXMLFileImportTrackingDTO == null ) {
+
+				log.warn( "tracking_id is not in database: " + trackingId );
+
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+
+
+
+			int projectId = proxlXMLFileImportTrackingDTO.getProjectId();
+
+
+
+			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
+					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+
+			//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+
+			if ( accessAndSetupWebSessionResult.isNoSession() ) {
+
+				//  No User session 
+
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+
+			//  Test access to the project id
+
+			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+
+			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
+
+				//  No Access Allowed for this project id
+
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+
+			RemoveCompletedImport removeCompletedImportResult = checkDBForMarkDeleteCompletedRecord(proxlXMLFileImportTrackingDTO);
+
+			if ( removeCompletedImportResult != null ) {
+
+				//  Either no update needed since marked for deletion or status not failed
+
+				return removeCompletedImportResult;
+			}
+			
+
+			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			
+			if ( userSessionObject == null ) {
+				
+				
+			}
+			
+			int authUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+			
+			boolean recordUpdated =
+					ProxlXMLFileImportTracking_ForWebAppDAO.getInstance()
+					.updateMarkedForDeletionForIdStatus( 
+							true /* markedForDeletion */, ProxlXMLFileImportStatus.COMPLETE, trackingId, authUserId );
+
+			if ( recordUpdated ) {
+
+				removeCompletedImportResult = new RemoveCompletedImport();
+
+				removeCompletedImportResult.success = true;
+
+				return removeCompletedImportResult;
+			}
+
+			//  No record updated so re-fetch the record to get current data for checking
+
+			proxlXMLFileImportTrackingDTO = 
+					ProxlXMLFileImportTracking_Base_DAO.getInstance().getItem( trackingId );
+
+			removeCompletedImportResult = checkDBForMarkDeleteCompletedRecord(proxlXMLFileImportTrackingDTO);
+
+
+			if ( removeCompletedImportResult != null ) {
+
+				//  Either no update needed since marked for deletion or status not failed
+
+				return removeCompletedImportResult;
+			}
+
+			//  If got here, this is a system error
+
+			String msg = "removeCompletedImport(...) trackingId" + trackingId 
+					+ ".  Record not updated but status is failed.";
+
+			log.error( msg );
+
+
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
+					.build()
+					);
+
+
+
+		} catch ( WebApplicationException e ) {
+
+			throw e;
+
+
+		} catch ( ProxlWebappDataException e ) {
+
+			String msg = "Exception processing request data, msg: " + e.toString();
+
+			log.error( msg, e );
+
+			throw new WebApplicationException(
+					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					.entity( msg )
+					.build()
+					);			
+
+
+		} catch ( Exception e ) {
+
+			String msg = "Exception caught: " + e.toString();
+
+			log.error( msg, e );
+
+
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
+					.build()
+					);
+		}
+
+	}
+
+
+	/**
+	 * @param proxlXMLFileImportTrackingDTO
+	 * @return null if next update the db
+	 */
+	private RemoveCompletedImport checkDBForMarkDeleteCompletedRecord( ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO ) {
+
+
+		if ( proxlXMLFileImportTrackingDTO.getStatus() != ProxlXMLFileImportStatus.COMPLETE ) {
+
+			//  error since no longer failed
+
+			RemoveCompletedImport removeCompletedImportResult = new RemoveCompletedImport();
+			
+			removeCompletedImportResult.success = false;
+			removeCompletedImportResult.statusNotCompleted = true;
+			
+			return removeCompletedImportResult; // early return;
+		}
+
+
+		if ( proxlXMLFileImportTrackingDTO.isMarkedForDeletion() ) {
+
+			//  already marked for deletion so ok
+
+			RemoveCompletedImport removeCompletedImportResult = new RemoveCompletedImport();
+			
+			removeCompletedImportResult.success = true;
+			removeCompletedImportResult.alreadyMarkedForDeletion = true;
+
+			return removeCompletedImportResult; // early return;
+		}
+		
+		return null;
+	}
+
+	/**
+	 * 
+	 *
+	 */
+	private static class RemoveCompletedImport {
+
+		boolean success;
+		boolean statusNotCompleted;
+		boolean alreadyMarkedForDeletion;
+		
+		@SuppressWarnings("unused")
+		public boolean isSuccess() {
+			return success;
+		}
+		@SuppressWarnings("unused")
+		public void setSuccess(boolean success) {
+			this.success = success;
+		}
+		@SuppressWarnings("unused")
+		public boolean isStatusNotCompleted() {
+			return statusNotCompleted;
+		}
+		@SuppressWarnings("unused")
+		public void setStatusNotCompleted(boolean statusNotCompleted) {
+			this.statusNotCompleted = statusNotCompleted;
+		}
+		@SuppressWarnings("unused")
+		public boolean isAlreadyMarkedForDeletion() {
+			return alreadyMarkedForDeletion;
+		}
+		@SuppressWarnings("unused")
+		public void setAlreadyMarkedForDeletion(boolean alreadyMarkedForDeletion) {
+			this.alreadyMarkedForDeletion = alreadyMarkedForDeletion;
+		}
+		
+	}
 }
