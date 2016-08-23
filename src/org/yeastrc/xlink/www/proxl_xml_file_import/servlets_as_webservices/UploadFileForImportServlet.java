@@ -1007,7 +1007,7 @@ public class UploadFileForImportServlet extends HttpServlet {
 
 //			cleanupOnError( uploadFileTempSubDirForThisRequestFileObj );
 			
-		} catch (Exception ex){
+		} catch (Throwable ex){
 
 			log.error( "Exception: " + ex.toString(), ex );
 			

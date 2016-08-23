@@ -116,6 +116,7 @@
 -->
         <!-- Loggers to filter out various class paths -->
 
+<!--
 
         <logger name="org.yeastrc.xlink" additivity="false">
         
@@ -124,14 +125,14 @@
                 <appender-ref ref="ROLL" />
 
                 <appender-ref ref="ROLL_ERROR" />
-<!--
-                <appender-ref ref="EMAIL" />
--->
+
 
 
         </logger>
 
+-->
 
+<!--
         <logger name="org.yeastrc.auth" additivity="false">
         
                 <level value="INFO"/>
@@ -139,12 +140,11 @@
                 <appender-ref ref="ROLL" />
 
                 <appender-ref ref="ROLL_ERROR" />
-<!--
-                <appender-ref ref="EMAIL" />
--->
+
 
 
         </logger>
+ -->
         
         
         <!-- Debugging loggers -->
