@@ -16,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
@@ -203,7 +204,8 @@ public class ConfigService {
 			
 			for ( ConfigSystemDTO item : configList ) {
 			
-				if ( ! ConfigSystemsKeysConstants.textConfigKeys.contains( item.getConfigKey() ) ) {
+				if ( ( ! ConfigSystemsKeysConstants.textConfigKeys.contains( item.getConfigKey() ) )
+						&& ( ! ConfigSystemsKeysSharedConstants.textConfigKeys.contains( item.getConfigKey() ) ) ) {
 					
 					//  Not one of the text config keys so validate the config keys with specific values
 					

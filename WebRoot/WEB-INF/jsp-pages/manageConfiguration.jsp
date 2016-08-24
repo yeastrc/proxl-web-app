@@ -1,3 +1,5 @@
+<%@page import="org.yeastrc.xlink.www.constants.ConfigSystemsValuesConstants"%>
+<%@page import="org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants"%>
 <%@page import="org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants"%>
 <%@page import="org.yeastrc.xlink.www.constants.UserSignupConstants"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %><%-- Always put this directive at the very top of the page --%>
@@ -128,7 +130,31 @@
 	</div>
 	
 	
-	
+
+	<div style="margin-bottom: 10px;">
+	  <div style="margin-bottom: 3px;">
+	  	<div>
+			Submit Search Upload on Website (Requires running the "Run Importer" process):
+		</div>
+		<div style="margin-left: 20px;">
+		
+			<div style="margin-bottom: 3px;">
+				Run Importer Workspace: 
+				<input type="text" class=" config_text_inputs_jq " style="width: 650px;"
+					data-config-key="<%= ConfigSystemsKeysSharedConstants.PROXL_XML_FILE_IMPORT_TEMP_DIR_KEY %>"
+					>
+			</div>
+			<div>
+				Allow Scan file Upload: 
+				<input type="checkbox" class=" config_checkbox_inputs_jq "  
+					data-config-key="<%= ConfigSystemsKeysSharedConstants.SCAN_FILE_IMPORT_ALLOWED_VIA_WEB_SUBMIT_KEY %>"
+					data-value-checked="<%= ConfigSystemsValuesConstants.TRUE %>" 
+					data-value-not-checked="<%= ConfigSystemsValuesConstants.FALSE %>" > 
+			
+			</div>
+		</div>
+	  </div> 
+	</div>	
 	
 	<div >
 		<input type="button" value="Save" id="save_button">

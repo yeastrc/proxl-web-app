@@ -45,6 +45,7 @@ import org.yeastrc.xlink.www.proxl_xml_file_import.database_insert_with_transact
 import org.yeastrc.xlink.www.proxl_xml_file_import.objects.ProxlUploadTempDataFileContents;
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.DeleteDirectoryAndContentsUtil;
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.IsProxlXMLFileImportFullyConfigured;
+import org.yeastrc.xlink.www.proxl_xml_file_import.utils.IsScanFileImportAllowedViaWebSubmit;
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.Proxl_XML_Importer_Work_Directory_And_SubDirs_Web;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -452,6 +453,17 @@ public class ProxlXMLFileImportUploadSubmitService {
 		List<ProxlUploadTempDataFileContentsAndAssocData> proxlUploadTempDataFileContentsAndAssocDataList = new ArrayList<>( proxlUploadTempDataFileContentsAndAssocData_OnDisk_List.size() );
 
 		for ( UploadSubmitRequestFileItem requestFileItem : requestFileItemList ) {
+			
+
+			if ( requestFileItem.getFileType().intValue() == ProxlXMLFileImportFileType.SCAN_FILE.value() 
+					&& ( ! IsScanFileImportAllowedViaWebSubmit.getInstance().isScanFileImportAllowedViaWebSubmit() ) ) {
+				
+				uploadSubmitResponse.setStatusSuccess(false);
+
+				uploadSubmitResponse.scanFileNotAllowed = true;
+				
+				return uploadSubmitResponse;  //  EARLY EXIT
+			}
 			
 			ProxlUploadTempDataFileContentsAndAssocData proxlUploadTempDataFileContentsAndAssocDataForRequestFileItem = null;
 			
@@ -900,6 +912,8 @@ public class ProxlXMLFileImportUploadSubmitService {
 		private boolean statusSuccess;
 
 		private boolean projectLocked;
+		
+		private boolean scanFileNotAllowed;
 
 		public boolean isStatusSuccess() {
 			return statusSuccess;
@@ -915,6 +929,14 @@ public class ProxlXMLFileImportUploadSubmitService {
 
 		public void setProjectLocked(boolean projectLocked) {
 			this.projectLocked = projectLocked;
+		}
+
+		public boolean isScanFileNotAllowed() {
+			return scanFileNotAllowed;
+		}
+
+		public void setScanFileNotAllowed(boolean scanFileNotAllowed) {
+			this.scanFileNotAllowed = scanFileNotAllowed;
 		} 
 	}
 }

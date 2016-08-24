@@ -12,10 +12,27 @@
 
 
 
-$(document).ready(function() {
+$(document).ready( function() {
 
 	proxlXMLFileImport.initOnDocumentReady();
 
+});
+
+//  Deprecated and removed in jQuery 3.0
+//  $(window).unload( function( eventObject ) {
+	
+	
+//$(window).on( "unload", function( eventObject ) {
+//
+//	//  Seemed to work but now doesn't work to clean up the temp dir
+//	
+//	proxlXMLFileImport.pageUnload( eventObject );
+//	
+//} );
+
+window.addEventListener("beforeunload", function (event) {
+	
+	proxlXMLFileImport.pageUnload( event );
 });
 
 
@@ -114,6 +131,8 @@ ProxlXMLFileImportFileData.factory = function( params ) {
 
 var ProxlXMLFileImport = function() {	
 
+	this.uploadingScanFiles = undefined;
+	
 	this.maxProxlXMLFileUploadSize = undefined;
 	this.maxProxlXMLFileUploadSizeFormatted = undefined;
 	this.maxScanFileUploadSize = undefined;
@@ -285,6 +304,29 @@ ProxlXMLFileImport.prototype.initOnDocumentReady  = function(  ) {
 
 	var objectThis = this;
 	
+	
+	
+	//  Get uploading scan files
+	
+	
+	this.uploadingScanFiles = false;
+
+	var $proxl_xml_file_upload_overlay_upload_scan_files = $("#proxl_xml_file_upload_overlay_upload_scan_files");
+
+	if ( $proxl_xml_file_upload_overlay_upload_scan_files.length > 0 ) {
+		
+		var proxl_xml_file_upload_overlay_upload_scan_files_text = $proxl_xml_file_upload_overlay_upload_scan_files.val();
+		
+		if ( proxl_xml_file_upload_overlay_upload_scan_files_text !== "" ) {
+			
+			//  Only populated when true
+			
+			this.uploadingScanFiles = true;
+		}
+	}
+	
+	
+	
 
 	//  Get max Proxl XML upload size
 
@@ -318,7 +360,7 @@ ProxlXMLFileImport.prototype.initOnDocumentReady  = function(  ) {
 		throw "#proxl_xml_file_max_file_upload_size_formatted input field empty";
 	}
 	
-	if ( true ) {  //  TODO  Need to only scan scan max if allowing scan uploads
+	if ( this.uploadingScanFiles ) {  
 
 		//  Get max Scan upload size
 
@@ -530,6 +572,17 @@ ProxlXMLFileImport.prototype.initOnDocumentReady  = function(  ) {
 };
 
 
+//  Called on Page unload
+
+ProxlXMLFileImport.prototype.pageUnload  = function( eventObject ) {
+	
+	//  Seemed to work but now doesn't work to clean up the temp dir
+	
+	//  Call to remove partial upload if one is set up or in progress
+	
+	this.closeOverlay( { eventObject : eventObject } );
+};
+
 
 //User clicked the "Close" button or the close "X"
 
@@ -545,14 +598,18 @@ ProxlXMLFileImport.prototype.closeClicked  = function( clickThis, eventObject ) 
 		return;
 	}
 
-	this.closeOverlay( clickThis, eventObject );
+	this.closeOverlay( { clickThis : clickThis, eventObject : eventObject } );
 
 };
 
 
-ProxlXMLFileImport.prototype.closeOverlay  = function( clickThis, eventObject ) {
+ProxlXMLFileImport.prototype.closeOverlay  = function( params ) {
 
 	//  Not always provided:  clickThis, eventObject
+	
+//	var clickThis = params.clickThis;
+//	var eventObject = params.eventObject;
+	
 	
 	var allFileData = this.getAllFileData();
 	
@@ -880,6 +937,11 @@ ProxlXMLFileImport.prototype.abortXMLHttpRequestSend  = function( params ) {
 //  User chose a file in the Scan file dialog, or it is empty
 
 ProxlXMLFileImport.prototype.scanFileDialogChanged  = function( changeThis, eventObject ) {
+	
+	if ( ! this.uploadingScanFiles ) {
+		
+		throw "scanFileDialogChanged(...): Scan files not allowed, should not enter this";
+	}
 
 	var objectThis = this;
 
@@ -1410,6 +1472,17 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 								filename : filename,
 								$containingBlock : $containingBlock } );
 					
+
+				} else if ( resp.scanFileNotAllowed ) {
+
+					var errorMessage = "Scan files are no longer allowed.  Please refresh the page.";
+
+					objectThis.failedFileUpload( 
+							{ isProxlXMLFile : isProxlXMLFile,
+								errorMessage :  errorMessage,
+								filename : filename,
+								$containingBlock : $containingBlock } );
+					
 				} else {
 
 					var errorMessage = "File NOT Uploaded, input data error, status 400";
@@ -1802,7 +1875,7 @@ ProxlXMLFileImport.prototype.submitClickedProcessServerResponse  = function( par
 	
 	var statusSuccess = responseData.statusSuccess;
 	var projectLocked = responseData.projectLocked;
-
+	var scanFileNotAllowed = responseData.scanFileNotAllowed;
 	//
 	
 	if ( ! statusSuccess ) {
@@ -1814,9 +1887,26 @@ ProxlXMLFileImport.prototype.submitClickedProcessServerResponse  = function( par
 			//  reload current URL
 			
 			window.location.reload(true);
+			
+			return;
+		}
+		
+		if ( scanFileNotAllowed ) {
+
+			//  Scan files are no longer allowed.  reload the page to reflect that.
+
+			//  reload current URL
+			
+			window.location.reload(true);
+			
+			return;
 		}
 		
 		//  Probably shouldn't get here
+
+		window.location.reload(true);
+		
+		return;
 		
 		throw "statusSuccess is false";  ///  TODO  Need to display error
 	}

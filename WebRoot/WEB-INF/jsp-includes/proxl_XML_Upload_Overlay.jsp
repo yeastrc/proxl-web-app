@@ -7,13 +7,20 @@
 
 <%--   proxl_XML_Upload_Overlay.jsp --%>
 
+<c:if test="${ configSystemValues.scanFileImportAllowedViaWebSubmit }" >
+
+	<%-- Only populated when true so the string in the "value" doesn't matter, just cannot be empty string --%>
+	<input type="hidden" id="proxl_xml_file_upload_overlay_upload_scan_files" value="true">
+
+</c:if>
   
 <input type="hidden" id="proxl_xml_file_max_file_upload_size" value="<%=ProxlXMLFileUploadWebConstants.get_MAX_PROXL_XML_FILE_UPLOAD_SIZE_AS_STRING()%>">
 <input type="hidden" id="proxl_xml_file_max_file_upload_size_formatted" value="<%=ProxlXMLFileUploadWebConstants.get_MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED()%>">
 
-<input type="hidden" id="proxl_import_scan_file_max_file_upload_size" value="<%=ProxlXMLFileUploadWebConstants.get_MAX_SCAN_FILE_UPLOAD_SIZE_AS_STRING()%>">
-<input type="hidden" id="proxl_import_scan_file_max_file_upload_size_formatted" value="<%=ProxlXMLFileUploadWebConstants.get_MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED()%>">
-
+<c:if test="${ configSystemValues.scanFileImportAllowedViaWebSubmit }" >
+  <input type="hidden" id="proxl_import_scan_file_max_file_upload_size" value="<%=ProxlXMLFileUploadWebConstants.get_MAX_SCAN_FILE_UPLOAD_SIZE_AS_STRING()%>">
+  <input type="hidden" id="proxl_import_scan_file_max_file_upload_size_formatted" value="<%=ProxlXMLFileUploadWebConstants.get_MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED()%>">
+</c:if>
 
 
 <!--  Modal dialog for uploading a Proxl XML file  -->
@@ -39,7 +46,11 @@
 		
 		
 		<h3>
-			Upload a Proxl XML file and optional associated scan files for import
+			Upload a Proxl XML file 
+			<c:if test="${ configSystemValues.scanFileImportAllowedViaWebSubmit }" >
+			 and optional associated scan files 
+			</c:if> 
+			for import
 		</h3>
 		
 		
@@ -140,37 +151,41 @@
 		 </tr>
 		</table>
 		
-		<%--  Table uploaded scan files will be displayed in --%>
-			
-		<table id="import_proxl_xml_scan_files_block" style="padding-top: 10px;" 
-			class="proxl-xml-file-upload-overlay-main-table"  >
-			
-		</table>
-		  
-
-			<%--  Scan File Choose File --%>
-		<table id="import_proxl_xml_choose_scan_file_block" class="proxl-xml-file-upload-overlay-main-table"
-			style="display: none;">
-		 <tr  >
-		  <td class="column-1">
-		  </td>
-		  <td class="column-2">
-		    <div >
-	    	  <a href="javascript:"  id="import_proxl_xml_choose_scan_file_button"
-		    		 >+Add Scan File</a>
-			</div>
-			<div style="font-size: 80%;">
-					(Max filesize: <%=ProxlXMLFileUploadWebConstants.get_MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED()%>)
-		    		 
-				<input type="file" accept=".mzML,.mzXML"  
-					id="import_proxl_xml_scan_file_field" style="display: none;"
-					data-file_type="<%=ProxlXMLFileImportFileType.SCAN_FILE.value()%>"/>
-			</div>
-		  </td>
-		  <td class="column-3">
-		  </td>
-		 </tr>
-		</table> 
+		<c:if test="${ configSystemValues.scanFileImportAllowedViaWebSubmit }" >
+	
+			<%--  Table uploaded scan files will be displayed in --%>
+				
+			<table id="import_proxl_xml_scan_files_block" style="padding-top: 10px;" 
+				class="proxl-xml-file-upload-overlay-main-table"  >
+				
+			</table>
+			  
+	
+				<%--  Scan File Choose File --%>
+			<table id="import_proxl_xml_choose_scan_file_block" class="proxl-xml-file-upload-overlay-main-table"
+				style="display: none;">
+			 <tr  >
+			  <td class="column-1">
+			  </td>
+			  <td class="column-2">
+			    <div >
+		    	  <a href="javascript:"  id="import_proxl_xml_choose_scan_file_button"
+			    		 >+Add Scan File</a>
+				</div>
+				<div style="font-size: 80%;">
+						(Max filesize: <%=ProxlXMLFileUploadWebConstants.get_MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED()%>)
+			    		 
+					<input type="file" accept=".mzML,.mzXML"  
+						id="import_proxl_xml_scan_file_field" style="display: none;"
+						data-file_type="<%=ProxlXMLFileImportFileType.SCAN_FILE.value()%>"/>
+				</div>
+			  </td>
+			  <td class="column-3">
+			  </td>
+			 </tr>
+			</table>
+			 
+		</c:if>
 				  
 
 			<%--  Submit and Cancel buttons --%>
@@ -180,7 +195,16 @@
 		  <td class="column-1">
 		  </td>
 		  <td >	<%-- class="column-2" --%>  
-			  <div style="display:inline-block;position:relative;"> <%-- outer div to support overlay div when button disabled --%>
+		  
+		    <%--  tooltip for overlay when submit button disabled --%>
+		    
+		    <c:set var="submitDisabledTooltip">Submit. Enabled when Proxl XML file is uploaded</c:set>
+		    
+		    <c:if test="${ configSystemValues.scanFileImportAllowedViaWebSubmit }" >
+		       <c:set var="submitDisabledTooltip">Submit. Enabled when Proxl XML file is uploaded and scan files are uploaded if any are selected</c:set>
+		    </c:if>
+		    
+			<div style="display:inline-block;position:relative;"> <%-- outer div to support overlay div when button disabled --%>
 			  
 					<input type="button" value="Submit Upload" disabled="disabled"  id="import_proxl_xml_file_submit_button">
 					
@@ -188,15 +212,11 @@
 					<div id="import_proxl_xml_file_submit_button_disabled_overlay"
 							style="position:absolute;left:0;right:0;top:0;bottom:0;" 
 							class="tool_tip_attached_jq "
-							data-tooltip="Submit. Enabled when Proxl XML file is uploaded and scan files are uploaded if any are selected" ></div>
-				</div>
+							data-tooltip="<c:out value="${ submitDisabledTooltip }"></c:out>" ></div>
+			</div>
 				
-				<input type="button" value="Cancel" id="import_proxl_xml_file_close_button">
+			<input type="button" value="Cancel" id="import_proxl_xml_file_close_button">
 		  </td>
-		  <%-- 
-		  <td class="column-3">
-		  </td>
-		  --%>
 		 </tr>
 		</table> 
 
@@ -206,6 +226,7 @@
 	
 	<!-- END:   Modal dialog for uploading a Proxl XML file -->
 	
+<c:if test="${ configSystemValues.scanFileImportAllowedViaWebSubmit }" >
 	
 	<%--  Per Scan File listing --%>
 			
@@ -215,7 +236,8 @@
 			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_includes/proxl_XML_Upload_Overlay.jsp/perUploadFileTemplate.jsp" %>
 
 	</script>
-	
+
+</c:if>	
 
 <!--  Modal dialog for display upload error -->
 

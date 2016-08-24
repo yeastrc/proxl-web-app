@@ -1,3 +1,4 @@
+<%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 
 		<%-- !!!   Handlebars template   !!!!!!!!!   --%>
@@ -19,7 +20,7 @@ containing <script> id:  proxl_xml_import_item_tooltip_template
 		<td>{{ uploadedFilename }}</td>
 	  </tr>
 	  
-	  <%-- TODO  Need to not show this block if scan file uploads are not allowed --%>
+	  <c:if test="${ configSystemValues.scanFileImportAllowedViaWebSubmit }" >
 	  <tr>
   	 	<td class="label-cell">Scan file(s):</td>
   	 	{{#if scanfileNamesCommaDelim }}
@@ -28,6 +29,7 @@ containing <script> id:  proxl_xml_import_item_tooltip_template
 			<td>None</td>
 		{{/if}}	 
 	  </tr>
+	  </c:if>
 	  
 	  
  	{{#if searchName }}

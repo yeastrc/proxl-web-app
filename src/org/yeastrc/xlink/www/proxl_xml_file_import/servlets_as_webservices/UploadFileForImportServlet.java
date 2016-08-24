@@ -42,6 +42,7 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappFileUploadFileSystemException
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.proxl_xml_file_import.constants.ProxlXMLFileUploadWebConstants;
 import org.yeastrc.xlink.www.proxl_xml_file_import.objects.ProxlUploadTempDataFileContents;
+import org.yeastrc.xlink.www.proxl_xml_file_import.utils.IsScanFileImportAllowedViaWebSubmit;
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.Proxl_XML_Importer_Work_Directory_And_SubDirs_Web;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -192,6 +193,38 @@ public class UploadFileForImportServlet extends HttpServlet {
 				throw new FailResponseSentException();
 				
 			}
+			
+			if ( fileType == ProxlXMLFileImportFileType.SCAN_FILE 
+					&& ( ! IsScanFileImportAllowedViaWebSubmit.getInstance().isScanFileImportAllowedViaWebSubmit() ) ) {
+				
+
+				response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
+
+				JSON_Servlet_Response_Object importFileServletResponse = new JSON_Servlet_Response_Object();
+
+				importFileServletResponse.setStatusSuccess(false);
+
+				importFileServletResponse.scanFileNotAllowed = true;
+
+				//			private boolean scanFilenameSuffixNotValid;
+				//			private boolean scanFileFailsInitialParse;
+				//			private boolean scanFilerootXMLNodeIncorrect;
+
+
+				OutputStream responseOutputStream = response.getOutputStream();
+
+
+				// send the JSON response 
+				ObjectMapper mapper = new ObjectMapper();  //  Jackson JSON library object
+				mapper.writeValue( responseOutputStream, importFileServletResponse ); // where first param can be File, OutputStream or Writer
+
+				responseOutputStream.flush();
+				responseOutputStream.close();
+
+				throw new FailResponseSentException();
+			}
+							
+			
 
 			if ( StringUtils.isEmpty( projectIdString ) ) {
 				
@@ -1227,6 +1260,7 @@ public class UploadFileForImportServlet extends HttpServlet {
 		private boolean proxlXMLFileFailsInitialParse;
 		private boolean proxlXMLFilerootXMLNodeIncorrect;
 		
+		private boolean scanFileNotAllowed;
 
 		private boolean scanFilenameSuffixNotValid;
 		private boolean scanFileFailsInitialParse;
@@ -1348,6 +1382,14 @@ public class UploadFileForImportServlet extends HttpServlet {
 		@SuppressWarnings("unused")
 		public void setScanFilerootXMLNodeIncorrect(boolean scanFilerootXMLNodeIncorrect) {
 			this.scanFilerootXMLNodeIncorrect = scanFilerootXMLNodeIncorrect;
+		}
+		@SuppressWarnings("unused")
+		public boolean isScanFileNotAllowed() {
+			return scanFileNotAllowed;
+		}
+		@SuppressWarnings("unused")
+		public void setScanFileNotAllowed(boolean scanFileNotAllowed) {
+			this.scanFileNotAllowed = scanFileNotAllowed;
 		}
 
 		
