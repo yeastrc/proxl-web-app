@@ -41,9 +41,8 @@ public class ProxlXMLFileImportTracking_PopulateDTO {
 		returnItem.setId( rs.getInt( "id" ) );
 		
 		returnItem.setProjectId( rs.getInt( "project_id" ) );
+		returnItem.setPriority( rs.getInt( "priority" ) );
 		returnItem.setAuthUserId( rs.getInt( "auth_user_id" ) );
-
-		returnItem.setHashIdentifier( rs.getString( "hash_identifier" ) );
 
 		returnItem.setStatus( ProxlXMLFileImportStatus.fromValue( rs.getInt( "status_id" ) ) );
 		

@@ -14,9 +14,10 @@ public class ProxlXMLFileImportTrackingDTO {
 
 	private int id;
 	private int projectId;
+	private int priority;
 	private int authUserId;
-	private String hashIdentifier;
 	private ProxlXMLFileImportStatus status;
+	
 	private String remoteUserIpAddress;
 	private boolean markedForDeletion;
 	private String searchName;
@@ -33,11 +34,11 @@ public class ProxlXMLFileImportTrackingDTO {
 	@Override
 	public String toString() {
 		return "ProxlXMLFileImportTrackingDTO [id=" + id + ", projectId="
-				+ projectId + ", authUserId=" + authUserId
-				+ ", hashIdentifier=" + hashIdentifier + ", status=" + status
-				+ ", remoteUserIpAddress=" + remoteUserIpAddress
-				+ ", markedForDeletion=" + markedForDeletion + ", searchName="
-				+ searchName + ", insertRequestURL=" + insertRequestURL
+				+ projectId + ", priority=" + priority + ", authUserId="
+				+ authUserId + ", status=" + status + ", remoteUserIpAddress="
+				+ remoteUserIpAddress + ", markedForDeletion="
+				+ markedForDeletion + ", searchName=" + searchName
+				+ ", insertRequestURL=" + insertRequestURL
 				+ ", recordInsertDateTime=" + recordInsertDateTime
 				+ ", importStartDateTime=" + importStartDateTime
 				+ ", importEndDateTime=" + importEndDateTime
@@ -46,8 +47,6 @@ public class ProxlXMLFileImportTrackingDTO {
 				+ ", deletedDateTime=" + deletedDateTime + "]";
 	}
 
-
-	
 
 	
 	public int getId() {
@@ -120,12 +119,6 @@ public class ProxlXMLFileImportTrackingDTO {
 	public void setDeletedDateTime(Date deletedDateTime) {
 		this.deletedDateTime = deletedDateTime;
 	}
-	public String getHashIdentifier() {
-		return hashIdentifier;
-	}
-	public void setHashIdentifier(String hashIdentifier) {
-		this.hashIdentifier = hashIdentifier;
-	}
 	public String getRemoteUserIpAddress() {
 		return remoteUserIpAddress;
 	}
@@ -150,6 +143,11 @@ public class ProxlXMLFileImportTrackingDTO {
 	public void setImportEndDateTime(Date importEndDateTime) {
 		this.importEndDateTime = importEndDateTime;
 	}
-
+	public int getPriority() {
+		return priority;
+	}
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
 
 }

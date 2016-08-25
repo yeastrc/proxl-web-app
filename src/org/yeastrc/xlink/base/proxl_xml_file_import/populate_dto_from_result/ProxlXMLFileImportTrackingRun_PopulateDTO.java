@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
+
+import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 //import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingRunDTO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportStatus;
@@ -38,6 +40,15 @@ public class ProxlXMLFileImportTrackingRun_PopulateDTO {
 		
 		returnItem.setId( rs.getInt( "id" ) );
 
+		int currentRunInt = rs.getInt( "current_run" );
+		
+		if ( currentRunInt == Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE ) {
+
+			returnItem.setCurrentRun( true );
+		} else {
+			returnItem.setCurrentRun( false );
+		}
+		
 		returnItem.setProxlXmlFileImportTrackingId( rs.getInt( "proxl_xml_file_import_tracking_id" ) );
 		
 		returnItem.setRunStatus( ProxlXMLFileImportStatus.fromValue( rs.getInt( "status_id" ) ) );
@@ -53,16 +64,4 @@ public class ProxlXMLFileImportTrackingRun_PopulateDTO {
 		return returnItem;
 	}
 	
-//	CREATE TABLE IF NOT EXISTS proxl_xml_file_import_tracking_run (
-//			  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//			  proxl_xml_file_import_tracking_id INT UNSIGNED NOT NULL,
-//			  status_id TINYINT UNSIGNED NOT NULL,
-//			  importer_sub_status_id TINYINT NULL,
-//			  importer_percent_psms_processed TINYINT NULL,
-//			  inserted_search_id INT UNSIGNED NULL,
-//			  import_result_text MEDIUMTEXT NULL,
-//			  data_error_text MEDIUMTEXT NULL,
-//			  start_date_time TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-//			  last_updated_date_time TIMESTAMP NULL,
-
 }

@@ -2,6 +2,7 @@ package org.yeastrc.xlink.base.proxl_xml_file_import.dto;
 
 import java.util.Date;
 
+import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportRunSubStatus;
 import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportStatus;
 
 /**
@@ -14,16 +15,18 @@ public class ProxlXMLFileImportTrackingRunDTO {
 
 	private int proxlXmlFileImportTrackingId;
 	
+	private boolean currentRun;
+	
 	private ProxlXMLFileImportStatus runStatus;
 	
-	// TODO  Not populated yet:  importer_sub_status_id
-	
+	private ProxlXMLFileImportRunSubStatus runSubStatus;
+
 	// TODO  Not populated yet:  importer_percent_psms_processed
 	
 	private Integer insertedSearchId;
 	
 	/**
-	 * TODO  Not currently populated
+	 * TODO  currently populated with same as dataErrorText when data error
 	 */
 	private String importResultText;
 	
@@ -32,28 +35,41 @@ public class ProxlXMLFileImportTrackingRunDTO {
 
 	private Date startDateTime;
 	private Date lastUpdatedDateTime;
+
 	
 	@Override
 	public String toString() {
+
+		Integer runSubStatusId = null;
+		
+		if ( runSubStatus != null ) {
+			
+			runSubStatusId = runSubStatus.value();
+		}
+		
 		return "ProxlXMLFileImportTrackingRunDTO [id=" + id
 				+ ", proxlXmlFileImportTrackingId="
-				+ proxlXmlFileImportTrackingId + ", runStatus=" + runStatus
+				+ proxlXmlFileImportTrackingId + ", currentRun=" + currentRun
+				+ ", runStatus=" + runStatus 
+				+ ", runSubStatus=" + runSubStatus
+				+ ", runSubStatusId=" + runSubStatusId
 				+ ", insertedSearchId=" + insertedSearchId
 				+ ", importResultText=" + importResultText + ", dataErrorText="
 				+ dataErrorText + ", startDateTime=" + startDateTime
 				+ ", lastUpdatedDateTime=" + lastUpdatedDateTime + "]";
 	}
+
 	
 	
 	/**
-	 * TODO  Not currently populated
+	 * TODO  currently populated with same as dataErrorText when data error
 	 * @return
 	 */
 	public String getImportResultText() {
 		return importResultText;
 	}
 	/**
-	 * TODO  Not currently populated
+	 * TODO  currently populated with same as dataErrorText when data error
 	 * @param importResultText
 	 */
 	public void setImportResultText(String importResultText) {
@@ -102,6 +118,26 @@ public class ProxlXMLFileImportTrackingRunDTO {
 	}
 	public void setStartDateTime(Date startDateTime) {
 		this.startDateTime = startDateTime;
+	}
+
+
+	public ProxlXMLFileImportRunSubStatus getRunSubStatus() {
+		return runSubStatus;
+	}
+
+
+	public void setRunSubStatus(ProxlXMLFileImportRunSubStatus runSubStatus) {
+		this.runSubStatus = runSubStatus;
+	}
+
+
+	public boolean isCurrentRun() {
+		return currentRun;
+	}
+
+
+	public void setCurrentRun(boolean currentRun) {
+		this.currentRun = currentRun;
 	}
 
 	
