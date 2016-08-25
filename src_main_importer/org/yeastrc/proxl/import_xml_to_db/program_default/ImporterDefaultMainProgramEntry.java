@@ -30,7 +30,7 @@ import org.yeastrc.proxl.import_xml_to_db.constants.DataErrorsFileConstants;
 import org.yeastrc.proxl.import_xml_to_db.constants.ImporterProgramExitCodes;
 import org.yeastrc.proxl.import_xml_to_db.constants.ScanFilenameConstants;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO;
-import org.yeastrc.proxl.import_xml_to_db.dao.ProxlXMLFileImportTracking_For_ImporterRunner_DAO;
+import org.yeastrc.proxl.import_xml_to_db.database_update_with_transaction_services.UpdateTrackingTrackingRunRecordsDBTransaction;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFile;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderPropertiesFileContentsErrorException;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderPropertiesFileErrorException;
@@ -57,6 +57,7 @@ import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTracki
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingRunDTO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingSingleFileDTO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportFileType;
+import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportRunSubStatus;
 import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportStatus;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
@@ -1337,23 +1338,21 @@ public class ImporterDefaultMainProgramEntry {
 			
 			//  Update records for import submitted by web app
 
-			if ( proxlXMLFileImportTrackingRunDTO != null ) {
+			if ( proxlXMLFileImportTrackingDTO != null && proxlXMLFileImportTrackingRunDTO != null ) {
 				
 				proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.COMPLETE );
 				
 				proxlXMLFileImportTrackingRunDTO.setInsertedSearchId( insertedSearchId );
 
+				UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
+				.updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
+						ProxlXMLFileImportStatus.COMPLETE, 
+						proxlXMLFileImportTrackingDTO.getId(), 
+						proxlXMLFileImportTrackingRunDTO );
+				
 				ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO.getInstance()
 				.updateInsertedSearchId( proxlXMLFileImportTrackingRunDTO );
 				
-				ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO.getInstance()
-				.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
-			}
-
-			if ( proxlXMLFileImportTrackingDTO != null ) {
-				
-				ProxlXMLFileImportTracking_For_ImporterRunner_DAO.getInstance()
-				.updateStatusAtImportEnd( ProxlXMLFileImportStatus.COMPLETE, proxlXMLFileImportTrackingDTO.getId() );
 			}
 			
 		} catch ( ProxlImporterProxlXMLDeserializeFailException e ) {
@@ -1378,24 +1377,24 @@ public class ImporterDefaultMainProgramEntry {
 
 			//  Update records for import submitted by web app
 
-			if ( proxlXMLFileImportTrackingDTO != null ) {
-				
-				ProxlXMLFileImportTracking_For_ImporterRunner_DAO.getInstance()
-				.updateStatusAtImportEnd( ProxlXMLFileImportStatus.FAILED, proxlXMLFileImportTrackingDTO.getId() );
-			}
-
-
-			if ( proxlXMLFileImportTrackingRunDTO != null ) {
+			if ( proxlXMLFileImportTrackingDTO != null && proxlXMLFileImportTrackingRunDTO != null ) {
 								
 				proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
+				
+				proxlXMLFileImportTrackingRunDTO.setRunSubStatus( ProxlXMLFileImportRunSubStatus.DATA_ERROR );
 
 				proxlXMLFileImportTrackingRunDTO.setDataErrorText( errorMessage );
 				
 				// TODO   Maybe populate this with something else
 				proxlXMLFileImportTrackingRunDTO.setImportResultText( errorMessage );
 				
-				ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO.getInstance()
-				.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
+
+				UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
+				.updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
+						ProxlXMLFileImportStatus.FAILED, 
+						proxlXMLFileImportTrackingDTO.getId(), 
+						proxlXMLFileImportTrackingRunDTO );
+				
 			}
 
 			return importResults;  //  EARLY EXIT
@@ -1417,25 +1416,26 @@ public class ImporterDefaultMainProgramEntry {
 
 			//  Update records for import submitted by web app
 
-			if ( proxlXMLFileImportTrackingDTO != null ) {
-				
-				ProxlXMLFileImportTracking_For_ImporterRunner_DAO.getInstance()
-				.updateStatusAtImportEnd( ProxlXMLFileImportStatus.FAILED, proxlXMLFileImportTrackingDTO.getId() );
-			}
-
-			if ( proxlXMLFileImportTrackingRunDTO != null ) {
+			if ( proxlXMLFileImportTrackingDTO != null && proxlXMLFileImportTrackingRunDTO != null ) {
 				
 				String dataErrorText = "The upload can no longer be inserted into this project.";
 								
 				proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
+
+				proxlXMLFileImportTrackingRunDTO.setRunSubStatus( ProxlXMLFileImportRunSubStatus.PROJECT_NOT_ALLOW_IMPORT );
 
 				proxlXMLFileImportTrackingRunDTO.setDataErrorText( dataErrorText );
 				
 				// TODO   Maybe populate this with something else
 				proxlXMLFileImportTrackingRunDTO.setImportResultText( dataErrorText );
 				
-				ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO.getInstance()
-				.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
+
+				UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
+				.updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
+						ProxlXMLFileImportStatus.FAILED, 
+						proxlXMLFileImportTrackingDTO.getId(), 
+						proxlXMLFileImportTrackingRunDTO );
+				
 			}
 
 			
@@ -1455,23 +1455,23 @@ public class ImporterDefaultMainProgramEntry {
 
 			//  Update records for import submitted by web app
 
-			if ( proxlXMLFileImportTrackingDTO != null ) {
-				
-				ProxlXMLFileImportTracking_For_ImporterRunner_DAO.getInstance()
-				.updateStatusAtImportEnd( ProxlXMLFileImportStatus.FAILED, proxlXMLFileImportTrackingDTO.getId() );
-			}
-
-			if ( proxlXMLFileImportTrackingRunDTO != null ) {
+			if ( proxlXMLFileImportTrackingDTO != null && proxlXMLFileImportTrackingRunDTO != null ) {
 				
 				proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
+
+				proxlXMLFileImportTrackingRunDTO.setRunSubStatus( ProxlXMLFileImportRunSubStatus.DATA_ERROR );
 
 				proxlXMLFileImportTrackingRunDTO.setDataErrorText( e.getMessage() );
 				
 				// TODO   Maybe populate this with something else
 				proxlXMLFileImportTrackingRunDTO.setImportResultText( e.getMessage() );
+
+				UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
+				.updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
+						ProxlXMLFileImportStatus.FAILED, 
+						proxlXMLFileImportTrackingDTO.getId(), 
+						proxlXMLFileImportTrackingRunDTO );
 				
-				ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO.getInstance()
-				.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
 			}
 
 			return importResults;  //  EARLY EXIT

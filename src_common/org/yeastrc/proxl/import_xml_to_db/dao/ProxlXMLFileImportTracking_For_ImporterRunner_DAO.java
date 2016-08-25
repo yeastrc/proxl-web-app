@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dao.ProxlXMLFileImportTrackingHistoryDAO;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
-import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingDTO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportStatus;
 import org.yeastrc.xlink.base.proxl_xml_file_import.populate_dto_from_result.ProxlXMLFileImportTracking_PopulateDTO;
@@ -32,36 +31,38 @@ public class ProxlXMLFileImportTracking_For_ImporterRunner_DAO {
 		return new ProxlXMLFileImportTracking_For_ImporterRunner_DAO(); 
 	}
 	
+	
+	private static final String GET_NEXT_QUEUED_SQL = 
+			
+			"SELECT * FROM proxl_xml_file_import_tracking "
+			+ " WHERE status_id IN ( " 
+			+ 		ProxlXMLFileImportStatus.QUEUED.value()
+			+	  "," + ProxlXMLFileImportStatus.RE_QUEUED.value()
+			+ 	") AND marked_for_deletion != " + Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE
+			+   " AND priority <= ? "
+			+ " ORDER BY priority, ID LIMIT 1 FOR UPDATE";
 
 	/**
 	 * Get next import tracking item that is queued or re-queued
 	 * @return
 	 * @throws Exception
 	 */
-	public ProxlXMLFileImportTrackingDTO getNextQueued( ) throws Exception {
+	public ProxlXMLFileImportTrackingDTO getNextQueued( int maxPriority, Connection dbConnection ) throws Exception {
 
 
 		ProxlXMLFileImportTrackingDTO result = null;
 		
-		Connection dbConnection = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		final String sql = "SELECT * FROM proxl_xml_file_import_tracking "
-				+ " WHERE status_id IN ( " 
-				+ 		ProxlXMLFileImportStatus.QUEUED.value()
-				+	  "," + ProxlXMLFileImportStatus.RE_QUEUED.value()
-				+ 	") AND marked_for_deletion != " + Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE
-				+ " ORDER BY ID LIMIT 1 FOR UPDATE";
+		final String sql = GET_NEXT_QUEUED_SQL;
 		
 		
 		try {
 			
-			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-
-			dbConnection.setAutoCommit(false);
-			
 			pstmt = dbConnection.prepareStatement( sql );
+			
+			pstmt.setInt( 1, maxPriority );
 			
 			rs = pstmt.executeQuery();
 			
@@ -70,41 +71,11 @@ public class ProxlXMLFileImportTracking_For_ImporterRunner_DAO {
 				result = ProxlXMLFileImportTracking_PopulateDTO.getInstance().populateResultObject( rs );
 			}
 			
-			if ( result != null ) {
-			
-				if ( ProxlXMLFileImportStatus.QUEUED == result.getStatus()
-						|| ProxlXMLFileImportStatus.RE_QUEUED == result.getStatus() ) {
-					
-					result.setStatus( ProxlXMLFileImportStatus.STARTED );
-
-					updateStatusStarted( result.getId(), dbConnection );
-					
-				} else {
-					
-					result = null;
-				}
-
-			}
-
-			dbConnection.commit();
-			
 		} catch ( Exception e ) {
 			
 			String msg = "Failed to select ProxlXMLFileImportTrackingDTO, sql: " + sql;
 			
 			log.error( msg, e );
-			
-			
-			if ( dbConnection != null ) {
-				
-				try {
-					dbConnection.rollback();
-				} catch (Exception ex) {
-					String msg2 = "Failed dbConnection.rollback() in getNextQueued(...)";
-
-					log.error( msg2, ex );
-				}
-			}
 			
 			throw e;
 			
@@ -121,26 +92,6 @@ public class ProxlXMLFileImportTracking_For_ImporterRunner_DAO {
 				try { pstmt.close(); } catch( Throwable t ) { ; }
 				pstmt = null;
 			}
-			
-
-			if( dbConnection != null ) {
-
-
-				try {
-					dbConnection.setAutoCommit(true);  /// reset for next user of connection
-				} catch (Exception ex) {
-					String msg = "Failed dbConnection.setAutoCommit(true) in getNextQueued(...)";
-
-					log.error( msg, ex );
-				}
-
-				if( dbConnection != null ) {
-					try { dbConnection.close(); } catch( Throwable t ) { ; }
-					dbConnection = null;
-				}
-
-			}
-			
 		}
 		
 		return result;
@@ -207,28 +158,28 @@ public class ProxlXMLFileImportTracking_For_ImporterRunner_DAO {
 	 * @param id
 	 * @throws Exception
 	 */
-	public void updateStatusAtImportEnd( ProxlXMLFileImportStatus status, int id ) throws Exception {
-		
-		
-		Connection dbConnection = null;
-
-		try {
-			
-			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-
-			updateStatusAtImportEnd( status, id, dbConnection );
-
-		} finally {
-			
-			if( dbConnection != null ) {
-				try { dbConnection.close(); } catch( Throwable t ) { ; }
-				dbConnection = null;
-			}
-			
-		}
-		
-	}
-	
+//	public void updateStatusAtImportEnd( ProxlXMLFileImportStatus status, int id ) throws Exception {
+//		
+//		
+//		Connection dbConnection = null;
+//
+//		try {
+//			
+//			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+//
+//			updateStatusAtImportEnd( status, id, dbConnection );
+//
+//		} finally {
+//			
+//			if( dbConnection != null ) {
+//				try { dbConnection.close(); } catch( Throwable t ) { ; }
+//				dbConnection = null;
+//			}
+//			
+//		}
+//		
+//	}
+//	
 	
 	/**
 	 * @param status

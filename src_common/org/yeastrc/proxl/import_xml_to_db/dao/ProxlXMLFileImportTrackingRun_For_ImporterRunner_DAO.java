@@ -7,6 +7,7 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
+import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingRunDTO;
 
 /**
@@ -35,28 +36,37 @@ public class ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO {
 	 * @param item
 	 * @throws Exception
 	 */
-	public void save( ProxlXMLFileImportTrackingRunDTO item ) throws Exception {
-		
-		
-		Connection dbConnection = null;
+//	public void save( ProxlXMLFileImportTrackingRunDTO item ) throws Exception {
+//		
+//		
+//		Connection dbConnection = null;
+//
+//		try {
+//			
+//			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+//
+//			save( item, dbConnection );
+//
+//		} finally {
+//			
+//			if( dbConnection != null ) {
+//				try { dbConnection.close(); } catch( Throwable t ) { ; }
+//				dbConnection = null;
+//			}
+//			
+//		}
+//		
+//	}
 
-		try {
-			
-			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-
-			save( item, dbConnection );
-
-		} finally {
-			
-			if( dbConnection != null ) {
-				try { dbConnection.close(); } catch( Throwable t ) { ; }
-				dbConnection = null;
-			}
-			
-		}
-		
-	}
-
+	
+	private static final String SAVE_SQL = "INSERT INTO proxl_xml_file_import_tracking_run ( "
+			+ "proxl_xml_file_import_tracking_id, status_id,"
+			+ " current_run, "
+			+ " last_updated_date_time )"
+			+ " VALUES ( ?, ?, "
+			+  /* current_run */	Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE
+			+  /* last_updated_date_time */ " , NOW() )";
+	
 	/**
 	 * @param item
 	 * @throws Exception
@@ -67,24 +77,7 @@ public class ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO {
 		ResultSet rs = null;
 		
 
-
-//CREATE TABLE IF NOT EXISTS proxl_xml_file_import_tracking_run (
-//  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//  proxl_xml_file_import_tracking_id INT UNSIGNED NOT NULL,
-//  status_id TINYINT UNSIGNED NOT NULL,
-//  importer_sub_status_id TINYINT NULL,
-//  importer_percent_psms_processed TINYINT NULL,
-//  inserted_search_id INT UNSIGNED NULL,
-//  import_result_text MEDIUMTEXT NULL,
-//  data_error_text MEDIUMTEXT NULL,
-//  start_date_time TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-//  last_updated_date_time TIMESTAMP NULL,
-
-
-
-		final String sql = "INSERT INTO proxl_xml_file_import_tracking_run ( "
-				+ "proxl_xml_file_import_tracking_id, status_id, last_updated_date_time )"
-				+ " VALUES ( ?, ?, NOW() )";
+		final String sql = SAVE_SQL;
 
 		try {
 			
@@ -142,6 +135,59 @@ public class ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO {
 		
 	}
 
+	
+
+	/**
+	 * @param trackingId
+	 * @throws Exception
+	 */
+	public void updateClearCurrentRunForTrackingId( int trackingId, Connection dbConnection ) throws Exception {
+		
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		final String sql = "UPDATE proxl_xml_file_import_tracking_run "
+				+ "SET current_run = " + Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE
+				+ " WHERE proxl_xml_file_import_tracking_id = ?";
+
+		
+		try {
+			
+			pstmt = dbConnection.prepareStatement( sql );
+			
+			int counter = 0;
+			
+			counter++;
+			pstmt.setInt( counter, trackingId );
+			
+			pstmt.executeUpdate();
+			
+		} catch ( Exception e ) {
+			
+			String msg = "Failed updateClearCurrentRunForTrackingId(id), trackingId: " + trackingId + ", sql: " + sql;
+			
+			log.error( msg, e );
+			
+			throw e;
+			
+		} finally {
+			
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			
+			
+		}
+				
+	}
+	
 
 
 
@@ -150,27 +196,27 @@ public class ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO {
 	 * @param id
 	 * @throws Exception
 	 */
-	public void updateStatusResultTexts( ProxlXMLFileImportTrackingRunDTO item ) throws Exception {
-		
-		
-		Connection dbConnection = null;
-
-		try {
-			
-			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-
-			updateStatusResultTexts( item, dbConnection );
-
-		} finally {
-			
-			if( dbConnection != null ) {
-				try { dbConnection.close(); } catch( Throwable t ) { ; }
-				dbConnection = null;
-			}
-			
-		}
-		
-	}
+//	public void updateStatusResultTexts( ProxlXMLFileImportTrackingRunDTO item ) throws Exception {
+//		
+//		
+//		Connection dbConnection = null;
+//
+//		try {
+//			
+//			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+//
+//			updateStatusResultTexts( item, dbConnection );
+//
+//		} finally {
+//			
+//			if( dbConnection != null ) {
+//				try { dbConnection.close(); } catch( Throwable t ) { ; }
+//				dbConnection = null;
+//			}
+//			
+//		}
+//		
+//	}
 	
 	
 	/**
@@ -184,7 +230,7 @@ public class ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO {
 		ResultSet rs = null;
 
 		final String sql = "UPDATE proxl_xml_file_import_tracking_run "
-				+ "SET status_id = ?, import_result_text = ?, data_error_text = ?, "
+				+ "SET status_id = ?, importer_sub_status_id = ?, import_result_text = ?, data_error_text = ?, "
 				+ " last_updated_date_time = NOW() WHERE id = ?";
 
 		
@@ -197,7 +243,17 @@ public class ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO {
 			counter++;
 			pstmt.setInt( counter, item.getRunStatus().value() );
 
+			counter++;
 			
+			if ( item.getRunSubStatus() != null ) {
+
+				pstmt.setInt( counter, item.getRunSubStatus().value() );
+				
+			} else {
+				
+				pstmt.setNull(counter, java.sql.Types.INTEGER );
+			}
+						
 			counter++;
 			pstmt.setString( counter, item.getImportResultText() );
 			
@@ -211,7 +267,7 @@ public class ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO {
 			
 		} catch ( Exception e ) {
 			
-			String msg = "Failed to update status, sql: " + sql;
+			String msg = "Failed updateStatusResultTexts(item), item: " + item + ", sql: " + sql;
 			
 			log.error( msg, e );
 			

@@ -1,9 +1,9 @@
 package org.yeastrc.proxl.import_xml_to_db_runner_pgm.get_import_and_process_thread;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.proxl.import_xml_to_db.dao.ProxlXMLFileImportTracking_For_ImporterRunner_DAO;
+import org.yeastrc.proxl.import_xml_to_db.database_update_with_transaction_services.GetNextTrackingToProcessDBTransaction;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.process_import.ProcessProxlXMLImport;
-import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingDTO;
+import org.yeastrc.xlink.base.proxl_xml_file_import.objects.TrackingDTOTrackingRunDTOPair;
 
 /**
  * Get the next import and process it thread
@@ -20,6 +20,8 @@ public class GetImportAndProcessThread extends Thread {
 	private volatile boolean keepRunning = true;
 	
 	private volatile ProcessProxlXMLImport processProxlXMLImport;
+	
+	private int maxTrackingRecordPriorityToRetrieve;
 
 
 	/**
@@ -82,17 +84,17 @@ public class GetImportAndProcessThread extends Thread {
 
 			try {
 				
-				ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO =
-						ProxlXMLFileImportTracking_For_ImporterRunner_DAO.getInstance().getNextQueued();
-
-				if ( proxlXMLFileImportTrackingDTO != null ) {
+				TrackingDTOTrackingRunDTOPair trackingDTOTrackingRunDTOPair =
+						GetNextTrackingToProcessDBTransaction.getInstance().getNextTrackingToProcess( maxTrackingRecordPriorityToRetrieve );
+				
+				if ( trackingDTOTrackingRunDTOPair != null ) {
 
 					synchronized (this) {
 
 						processProxlXMLImport = ProcessProxlXMLImport.getInstance();
 					}
 					
-					processProxlXMLImport.processProxlXMLImport( proxlXMLFileImportTrackingDTO );
+					processProxlXMLImport.processProxlXMLImport( trackingDTOTrackingRunDTOPair );
 					
 				} else {
 
@@ -168,6 +170,17 @@ public class GetImportAndProcessThread extends Thread {
 		awaken();
 
 		log.warn( "Exiting shutdown()" );
+	}
+
+
+	public int getMaxTrackingRecordPriorityToRetrieve() {
+		return maxTrackingRecordPriorityToRetrieve;
+	}
+
+
+	public void setMaxTrackingRecordPriorityToRetrieve(
+			int maxTrackingRecordPriorityToRetrieve) {
+		this.maxTrackingRecordPriorityToRetrieve = maxTrackingRecordPriorityToRetrieve;
 	}
 
 

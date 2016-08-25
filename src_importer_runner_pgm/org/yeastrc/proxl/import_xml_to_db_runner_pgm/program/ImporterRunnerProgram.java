@@ -43,6 +43,9 @@ public class ImporterRunnerProgram {
 
 	private static final String PROXL_DB_NAME_CMD_LINE_PARAM_STRING = "proxl_db_name";
 
+	private static final String MAX_TRACKING_RECORD_PRIORITY_TO_RETRIEVE_CMD_LINE_PARAM_STRING = "max_tracking_record_priority_to_retrieve";
+
+	
 
 
 	/**
@@ -51,6 +54,8 @@ public class ImporterRunnerProgram {
 	 */
 	public static void main(String[] args) throws Exception {
 
+		
+		int maxTrackingRecordPriorityToRetrieve = Integer.MAX_VALUE;
 		
 		ImportRunnerProgramShutdown importRunnerProgramShutdown = null;
 
@@ -69,8 +74,12 @@ public class ImporterRunnerProgram {
 			CmdLineParser cmdLineParser = new CmdLineParser();
 
 			CmdLineParser.Option configFileFromCommandLineFileNameCommandLineOpt = cmdLineParser.addStringOption( 'c', "config" );
+			
 			CmdLineParser.Option proxlDatabaseNameCommandLineOpt = cmdLineParser.addStringOption( 'Z', PROXL_DB_NAME_CMD_LINE_PARAM_STRING );
 
+			CmdLineParser.Option maxTrackingRecordPriorityToRetrieveCommandLineOpt = cmdLineParser.addStringOption( 'Z', MAX_TRACKING_RECORD_PRIORITY_TO_RETRIEVE_CMD_LINE_PARAM_STRING );
+			
+			
 
 
 			CmdLineParser.Option helpOpt = cmdLineParser.addBooleanOption('h', "help"); 
@@ -115,7 +124,33 @@ public class ImporterRunnerProgram {
 
 			String proxlDatabaseName = (String)cmdLineParser.getOptionValue( proxlDatabaseNameCommandLineOpt );
 
+			String maxTrackingRecordPriorityToRetrieveString = (String)cmdLineParser.getOptionValue( maxTrackingRecordPriorityToRetrieveCommandLineOpt );
 
+			if ( StringUtils.isNotEmpty( maxTrackingRecordPriorityToRetrieveString ) ) {
+				
+				try {
+					
+					int maxTrackingRecordPriorityToRetrieveCmdLineInt = Integer.parseInt( maxTrackingRecordPriorityToRetrieveString );
+					
+					maxTrackingRecordPriorityToRetrieve = maxTrackingRecordPriorityToRetrieveCmdLineInt;
+
+				} catch ( Exception e ) {
+
+					System.err.println( "--" + MAX_TRACKING_RECORD_PRIORITY_TO_RETRIEVE_CMD_LINE_PARAM_STRING
+							+ "  option must be an integer.  Value passed: " + maxTrackingRecordPriorityToRetrieveString );
+
+					System.err.println( "" );
+					System.err.println( FOR_HELP_STRING );
+
+					System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
+				}
+				
+				System.out.println( "processed command line parameter: --" + MAX_TRACKING_RECORD_PRIORITY_TO_RETRIEVE_CMD_LINE_PARAM_STRING 
+						+ "=" + maxTrackingRecordPriorityToRetrieve );
+				
+			}
+			
+			
 			File configFileFromCommandLine = null;
 
 			if ( StringUtils.isNotEmpty( configFileFromCommandLineFileName ) ) {
@@ -206,7 +241,7 @@ public class ImporterRunnerProgram {
 			//   Main Processing
 			
 			
-			importerRunnerMain.importerRunnerMain();
+			importerRunnerMain.importerRunnerMain( maxTrackingRecordPriorityToRetrieve );
 			
 			
 			

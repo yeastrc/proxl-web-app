@@ -44,6 +44,10 @@ public class ManagerThread extends Thread {
 	private volatile boolean stopProxlRunImporterProgram = false;;
 	
 	
+
+	private int maxTrackingRecordPriorityToRetrieve;
+
+	
 	private ImporterRunnerMain importerRunnerMain;
 
 
@@ -137,7 +141,8 @@ public class ManagerThread extends Thread {
 
 			getImportAndProcessThread = new GetImportAndProcessThread( GET_IMPORT_AND_PROCESS_THREAD /* name */ );
 
-
+			getImportAndProcessThread.setMaxTrackingRecordPriorityToRetrieve( maxTrackingRecordPriorityToRetrieve );
+			
 			getImportAndProcessThread.start();
 
 			runProcessLoop( );  // Call main processing loop that will run while keepRunning == true
@@ -746,6 +751,17 @@ public class ManagerThread extends Thread {
 
 	public void setImporterRunnerMain(ImporterRunnerMain importerRunnerMain) {
 		this.importerRunnerMain = importerRunnerMain;
+	}
+
+
+	public int getMaxTrackingRecordPriorityToRetrieve() {
+		return maxTrackingRecordPriorityToRetrieve;
+	}
+
+
+	public void setMaxTrackingRecordPriorityToRetrieve(
+			int maxTrackingRecordPriorityToRetrieve) {
+		this.maxTrackingRecordPriorityToRetrieve = maxTrackingRecordPriorityToRetrieve;
 	}
 
 

@@ -11,8 +11,7 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.proxl.import_xml_to_db.dao.ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO;
-import org.yeastrc.proxl.import_xml_to_db.dao.ProxlXMLFileImportTracking_For_ImporterRunner_DAO;
+import org.yeastrc.proxl.import_xml_to_db.database_update_with_transaction_services.UpdateTrackingTrackingRunRecordsDBTransaction;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dao.ProxlXMLFileImportTracking_Base_DAO;
 import org.yeastrc.proxl.import_xml_to_db.proxl_xml_file_import.run_importer_to_importer_file_data.RunImporterToImporterFileRoot;
@@ -25,7 +24,9 @@ import org.yeastrc.proxl.import_xml_to_db_runner_pgm.run_system_command.RunSyste
 import org.yeastrc.xlink.base.proxl_xml_file_import.constants.ProxlXMLFileUploadCommonConstants;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingDTO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingRunDTO;
+import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportRunSubStatus;
 import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportStatus;
+import org.yeastrc.xlink.base.proxl_xml_file_import.objects.TrackingDTOTrackingRunDTOPair;
 import org.yeastrc.xlink.base.proxl_xml_file_import.utils.Proxl_XML_ImporterWrkDirAndSbDrsCmmn;
 
 
@@ -61,10 +62,12 @@ public class ProcessProxlXMLImport {
 	
 
 	/**
-	 * @param proxlXMLFileImportTrackingDTO
+	 * @param trackingDTOTrackingRunDTOPair
 	 * @throws Exception 
 	 */
-	public void processProxlXMLImport( ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO ) throws Exception {
+	public void processProxlXMLImport( TrackingDTOTrackingRunDTOPair trackingDTOTrackingRunDTOPair ) throws Exception {
+		
+		ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO = trackingDTOTrackingRunDTOPair.getProxlXMLFileImportTrackingDTO();
 		
 		if ( log.isInfoEnabled() ) {
 
@@ -72,17 +75,7 @@ public class ProcessProxlXMLImport {
 		}
 		
 
-		
-		//  Create a "run" db record
-
-		ProxlXMLFileImportTrackingRunDTO proxlXMLFileImportTrackingRunDTO = new ProxlXMLFileImportTrackingRunDTO();
-		
-		proxlXMLFileImportTrackingRunDTO.setProxlXmlFileImportTrackingId( proxlXMLFileImportTrackingDTO.getId() );
-		proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.STARTED );
-		
-		ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO.getInstance().save( proxlXMLFileImportTrackingRunDTO );
-		
-		
+		ProxlXMLFileImportTrackingRunDTO proxlXMLFileImportTrackingRunDTO = trackingDTOTrackingRunDTOPair.getProxlXMLFileImportTrackingRunDTO();
 		
 		File proxl_XML_Importer_Work_Directory =
 				Proxl_XML_ImporterWrkDirAndSbDrsCmmn.getInstance().get_Proxl_XML_Importer_Work_Directory();
@@ -100,18 +93,19 @@ public class ProcessProxlXMLImport {
 			String msg = "subdirForThisTrackingId does not exist: " + subdirForThisTrackingId.getCanonicalPath();
 			log.error( msg );
 			
-
-			ProxlXMLFileImportTracking_For_ImporterRunner_DAO.getInstance()
-			.updateStatusAtImportEnd( ProxlXMLFileImportStatus.FAILED, proxlXMLFileImportTrackingDTO.getId() );
-
-
 			proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
+			
+			proxlXMLFileImportTrackingRunDTO.setRunSubStatus( ProxlXMLFileImportRunSubStatus.SYSTEM_ERROR );
 
 			proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
 			proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
 
-			ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO.getInstance()
-			.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
+
+			UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
+			.updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
+					ProxlXMLFileImportStatus.FAILED, 
+					proxlXMLFileImportTrackingDTO.getId(), 
+					proxlXMLFileImportTrackingRunDTO );
 			
 			
 			throw new ProxlImporterInteralException(msg);
@@ -136,17 +130,19 @@ public class ProcessProxlXMLImport {
 			
 			log.error( errorMsg ) ;
 
-			ProxlXMLFileImportTracking_For_ImporterRunner_DAO.getInstance()
-			.updateStatusAtImportEnd( ProxlXMLFileImportStatus.FAILED, proxlXMLFileImportTrackingDTO.getId() );
-
-
 			proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
+			
+			proxlXMLFileImportTrackingRunDTO.setRunSubStatus( ProxlXMLFileImportRunSubStatus.SYSTEM_ERROR );
 
 			proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
 			proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
 
-			ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO.getInstance()
-			.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
+			UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
+			.updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
+					ProxlXMLFileImportStatus.FAILED, 
+					proxlXMLFileImportTrackingDTO.getId(), 
+					proxlXMLFileImportTrackingRunDTO );
+			
 			
 			throw new ProxlImporterInteralException(errorMsg);
 		}
@@ -277,13 +273,14 @@ public class ProcessProxlXMLImport {
 				log.warn( "command was aborted for run importer program shutdown: " + commandAndItsArgumentsAsList
 						+ ", subdirForThisTrackingId:  " + subdirForThisTrackingId.getCanonicalPath() );
 				
-				ProxlXMLFileImportTracking_For_ImporterRunner_DAO.getInstance()
-				.updateStatusAtImportEnd( ProxlXMLFileImportStatus.RE_QUEUED, proxlXMLFileImportTrackingDTO.getId() );
-
 				 proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.RE_QUEUED );
-				
-				 ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO.getInstance()
-				.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
+
+				 UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
+				 .updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
+						 ProxlXMLFileImportStatus.RE_QUEUED, 
+						 proxlXMLFileImportTrackingDTO.getId(), 
+						 proxlXMLFileImportTrackingRunDTO );
+					
 				
 			} else {
 
@@ -317,17 +314,18 @@ public class ProcessProxlXMLImport {
 							+ commandAndItsArgumentsAsList
 							+ ", subdirForThisTrackingId:  " + subdirForThisTrackingId.getCanonicalPath() );
 
-					ProxlXMLFileImportTracking_For_ImporterRunner_DAO.getInstance()
-					.updateStatusAtImportEnd( ProxlXMLFileImportStatus.FAILED, proxlXMLFileImportTrackingDTO.getId() );
-
-
 					 proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
-					 
+						
+					 proxlXMLFileImportTrackingRunDTO.setRunSubStatus( ProxlXMLFileImportRunSubStatus.SYSTEM_ERROR );
+
 					 proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
 					 proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
 
-					 ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO.getInstance()
-					.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
+					 UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
+					 .updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
+							 ProxlXMLFileImportStatus.FAILED, 
+							 proxlXMLFileImportTrackingDTO.getId(), 
+							 proxlXMLFileImportTrackingRunDTO );
 				}				
 			}
 			
@@ -337,17 +335,16 @@ public class ProcessProxlXMLImport {
 			log.error( "command failed: " + commandAndItsArgumentsAsList
 					+ ", subdirForThisTrackingId:  " + subdirForThisTrackingId.getCanonicalPath() );
 			
-			ProxlXMLFileImportTracking_For_ImporterRunner_DAO.getInstance()
-			.updateStatusAtImportEnd( ProxlXMLFileImportStatus.FAILED, proxlXMLFileImportTrackingDTO.getId() );
-
-			
 			 proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
 
 			 proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
 			 proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
 
-			 ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO.getInstance()
-			.updateStatusResultTexts( proxlXMLFileImportTrackingRunDTO );
+			 UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
+			 .updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
+					 ProxlXMLFileImportStatus.FAILED, 
+					 proxlXMLFileImportTrackingDTO.getId(), 
+					 proxlXMLFileImportTrackingRunDTO );
 			
 			throw new Exception( e );
 			

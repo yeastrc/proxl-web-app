@@ -40,7 +40,7 @@ public class ImporterRunnerMain {
 	private ManagerThread managerThread;
 
 
-	public void importerRunnerMain() {
+	public void importerRunnerMain( int maxTrackingRecordPriorityToRetrieve ) {
 
 
 		try {
@@ -51,6 +51,9 @@ public class ImporterRunnerMain {
 //			currentThread = Thread.currentThread();
 
 			managerThread = new ManagerThread( );
+			
+
+			managerThread.setMaxTrackingRecordPriorityToRetrieve( maxTrackingRecordPriorityToRetrieve );
 
 			managerThread.setImporterRunnerMain( this );
 
