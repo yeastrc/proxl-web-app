@@ -53,7 +53,7 @@ public class ProxlXMLFileImportTracking_All_Searcher {
 			+ " AND "
 			
 			+ " marked_for_deletion != " + Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE
-			+ " AND project_id = ? ORDER BY id DESC"
+			+ " AND project_id = ? ORDER BY priority, id DESC"
 			;
 	
 	public List<ProxlXMLFileImportTrackingDTO> getAllForWebDisplayForProject( int projectId ) throws Exception {
@@ -134,7 +134,7 @@ public class ProxlXMLFileImportTracking_All_Searcher {
 	
 	
 
-	public List<ProxlXMLFileTrackingIdStatusId> getAllStatusExceptForProject( int projectId ) throws Exception {
+	public List<ProxlXMLFileTrackingIdStatusId> getAllStatusExceptInitInsertForProject( int projectId ) throws Exception {
 		
 		List<ProxlXMLFileTrackingIdStatusId> resultList = new ArrayList<>();
 		

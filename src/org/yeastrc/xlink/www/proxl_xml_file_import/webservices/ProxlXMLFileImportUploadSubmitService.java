@@ -647,6 +647,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 
 		proxlXMLFileImportTrackingDTO.setStatus( ProxlXMLFileImportStatus.QUEUED );
 		
+		proxlXMLFileImportTrackingDTO.setPriority( ProxlXMLFileUploadCommonConstants.PRIORITY_STANDARD );
 		
 		proxlXMLFileImportTrackingDTO.setProjectId( projectId );
 		proxlXMLFileImportTrackingDTO.setAuthUserId( authUserId );
@@ -658,13 +659,6 @@ public class ProxlXMLFileImportUploadSubmitService {
 		
 		
 		proxlXMLFileImportTrackingDTO.setRemoteUserIpAddress( remoteUserIpAddress );
-		
-		//  Generate a UNIQUE hash
-		
-		String hashIdentifier = "NotUsableHash";
-		
-		
-		proxlXMLFileImportTrackingDTO.setHashIdentifier( hashIdentifier );
 		
 		
 		

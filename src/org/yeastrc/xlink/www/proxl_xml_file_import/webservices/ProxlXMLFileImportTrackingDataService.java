@@ -315,8 +315,8 @@ public class ProxlXMLFileImportTrackingDataService {
 						throw new ProxlWebappInternalErrorException(msg);
 					}
 
-					int queueIndex = Collections.binarySearch( pendingTrackingIdsAllProjectsList, trackingItem.getId() );
-
+					int queueIndex = pendingTrackingIdsAllProjectsList.indexOf( trackingItem.getId() );
+					
 					if ( queueIndex < 0 )  {
 						
 						//  Was not found in all pending.  Must no longer be pending. Get from DB again
@@ -336,7 +336,7 @@ public class ProxlXMLFileImportTrackingDataService {
 						
 					} else {
 
-						int queuePosition = queueIndex + 1;
+						int queuePosition = queueIndex + 1; // add 1 since queueIndex is zero based
 
 						displayItem.setQueuePosition( queuePosition );
 						displayItem.setQueuePositionFmt( numberFormat.format( queuePosition ) );

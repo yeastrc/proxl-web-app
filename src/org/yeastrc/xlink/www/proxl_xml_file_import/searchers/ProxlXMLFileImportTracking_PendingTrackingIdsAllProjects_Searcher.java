@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
@@ -52,7 +51,7 @@ public class ProxlXMLFileImportTracking_PendingTrackingIdsAllProjects_Searcher {
 					+ ")"
 					+ " AND "
 					+ " marked_for_deletion != " + Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE
-					+ " ORDER BY id ";
+					+ " ORDER BY priority, id ";
 
 
 

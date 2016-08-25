@@ -1,4 +1,3 @@
-
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
@@ -1555,7 +1554,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS proxl_xml_file_import_tracking_status_values_lookup ;
 
 CREATE TABLE  proxl_xml_file_import_tracking_status_values_lookup (
-  id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  id TINYINT UNSIGNED NOT NULL,
   display_text VARCHAR(100) NOT NULL,
   PRIMARY KEY (id))
 ENGINE = InnoDB;
@@ -1569,15 +1568,15 @@ DROP TABLE IF EXISTS proxl_xml_file_import_tracking ;
 CREATE TABLE  proxl_xml_file_import_tracking (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   project_id INT UNSIGNED NOT NULL,
+  priority TINYINT NOT NULL,
   auth_user_id INT UNSIGNED NOT NULL,
-  hash_identifier VARCHAR(45) NOT NULL,
   status_id TINYINT UNSIGNED NOT NULL,
   remote_user_ip_address VARCHAR(45) NOT NULL,
   marked_for_deletion TINYINT UNSIGNED NOT NULL DEFAULT 0,
   search_name VARCHAR(2000) NULL,
   insert_request_url VARCHAR(255) NOT NULL,
   record_insert_date_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  last_updated_date_time TIMESTAMP NOT NULL,
+  last_updated_date_time TIMESTAMP NULL,
   import_start_date_time DATETIME NULL,
   import_end_date_time DATETIME NULL,
   deleted_by_auth_user_id INT NULL,
@@ -1603,6 +1602,18 @@ CREATE INDEX proxl_xml_file_import_tracking_status_id_idx ON proxl_xml_file_impo
 
 
 -- -----------------------------------------------------
+-- Table proxl_xml_file_import_tracking_run_sub_status_values_lookup
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS proxl_xml_file_import_tracking_run_sub_status_values_lookup ;
+
+CREATE TABLE  proxl_xml_file_import_tracking_run_sub_status_values_lookup (
+  id TINYINT UNSIGNED NOT NULL,
+  display_text VARCHAR(100) NOT NULL,
+  PRIMARY KEY (id))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table proxl_xml_file_import_tracking_run
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS proxl_xml_file_import_tracking_run ;
@@ -1610,8 +1621,9 @@ DROP TABLE IF EXISTS proxl_xml_file_import_tracking_run ;
 CREATE TABLE  proxl_xml_file_import_tracking_run (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   proxl_xml_file_import_tracking_id INT UNSIGNED NOT NULL,
+  current_run TINYINT UNSIGNED NULL,
   status_id TINYINT UNSIGNED NOT NULL,
-  importer_sub_status_id TINYINT NULL,
+  importer_sub_status_id TINYINT UNSIGNED NULL,
   importer_percent_psms_processed TINYINT NULL,
   inserted_search_id INT UNSIGNED NULL,
   import_result_text MEDIUMTEXT NULL,
@@ -1623,10 +1635,24 @@ CREATE TABLE  proxl_xml_file_import_tracking_run (
     FOREIGN KEY (proxl_xml_file_import_tracking_id)
     REFERENCES proxl_xml_file_import_tracking (id)
     ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT prxl_xml_fl_imprt_trkng_run_status_id
+    FOREIGN KEY (status_id)
+    REFERENCES proxl_xml_file_import_tracking_status_values_lookup (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT prxl_xml_fl_imprt_trkng_run_sub_status
+    FOREIGN KEY (importer_sub_status_id)
+    REFERENCES proxl_xml_file_import_tracking_run_sub_status_values_lookup (id)
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 CREATE INDEX prxl_xml_fl_imprt_trkng_stats_hist_id_idx ON proxl_xml_file_import_tracking_run (proxl_xml_file_import_tracking_id ASC);
+
+CREATE INDEX prxl_xml_fl_imprt_trkng_run_status_id_idx ON proxl_xml_file_import_tracking_run (status_id ASC);
+
+CREATE INDEX prxl_xml_fl_imprt_trkng_run_sub_status_idx ON proxl_xml_file_import_tracking_run (importer_sub_status_id ASC);
 
 
 -- -----------------------------------------------------
@@ -1656,7 +1682,7 @@ CREATE INDEX prxl_xml_fl_imprt_trkng_stats_hist_id_idx ON proxl_xml_file_import_
 DROP TABLE IF EXISTS proxl_xml_file_import_tracking_single_file_type_lookup ;
 
 CREATE TABLE  proxl_xml_file_import_tracking_single_file_type_lookup (
-  id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  id TINYINT UNSIGNED NOT NULL,
   display_text VARCHAR(100) NOT NULL,
   PRIMARY KEY (id))
 ENGINE = InnoDB;
@@ -1668,7 +1694,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS proxl_xml_file_import_tracking_single_file_upload_status_lookup ;
 
 CREATE TABLE  proxl_xml_file_import_tracking_single_file_upload_status_lookup (
-  id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  id TINYINT UNSIGNED NOT NULL,
   display_text VARCHAR(100) NOT NULL,
   PRIMARY KEY (id))
 ENGINE = InnoDB;

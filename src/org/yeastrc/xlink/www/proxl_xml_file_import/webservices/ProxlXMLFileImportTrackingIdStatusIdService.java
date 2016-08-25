@@ -108,7 +108,7 @@ public class ProxlXMLFileImportTrackingIdStatusIdService {
 			
 			
 			List<ProxlXMLFileTrackingIdStatusId> proxlXMLFIleTrackingIdStatusId =
-					ProxlXMLFileImportTracking_All_Searcher.getInstance().getAllStatusExceptForProject( projectId );
+					ProxlXMLFileImportTracking_All_Searcher.getInstance().getAllStatusExceptInitInsertForProject( projectId );
 			
 			return proxlXMLFIleTrackingIdStatusId;
 

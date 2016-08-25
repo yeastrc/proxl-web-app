@@ -149,30 +149,11 @@ public class ProxlXMLFileImportTracking_ForWebAppDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-
-
-		//CREATE TABLE IF NOT EXISTS proxl_xml_file_import_tracking (
-//		  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//		  project_id INT UNSIGNED NOT NULL,
-//		  auth_user_id INT UNSIGNED NOT NULL,
-//		  hash_identifier VARCHAR(45) NOT NULL,
-//		  status_id TINYINT UNSIGNED NOT NULL,
-//		  remote_user_ip_address VARCHAR(45) NOT NULL,
-//		  marked_for_deletion TINYINT UNSIGNED NOT NULL DEFAULT 0,
-//		  search_name VARCHAR(2000) NULL,
-//		  insert_request_url VARCHAR(255) NOT NULL,
-//		  record_insert_date_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-//		  last_updated_date_time TIMESTAMP NOT NULL,
-//		  upload_date_time DATETIME NULL,
-//		  deleted_by_auth_user_id INT NULL,
-//		  deleted_date_time DATETIME NULL,
-
-
 		//  Insert field "id" since not autoincrement
 
 		final String sql = "INSERT INTO proxl_xml_file_import_tracking ( "
-				+ " id, status_id, marked_for_deletion, insert_request_url, "
-				+ " search_name, project_id, auth_user_id, hash_identifier, "
+				+ " id, project_id, priority, status_id, marked_for_deletion, insert_request_url, "
+				+ " search_name, auth_user_id,  "
 				+ " remote_user_ip_address, last_updated_date_time )"
 				+ " VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW() )";
 
@@ -186,6 +167,11 @@ public class ProxlXMLFileImportTracking_ForWebAppDAO {
 			
 			counter++;
 			pstmt.setInt( counter, item.getId() );
+			counter++;
+			pstmt.setInt( counter, item.getProjectId() );
+			counter++;
+			pstmt.setInt( counter, item.getPriority() );
+
 			counter++;
 			pstmt.setInt( counter, item.getStatus().value() );
 			
@@ -205,12 +191,8 @@ public class ProxlXMLFileImportTracking_ForWebAppDAO {
 			pstmt.setString( counter, item.getSearchName() );
 			
 			counter++;
-			pstmt.setInt( counter, item.getProjectId() );
-			counter++;
 			pstmt.setInt( counter, item.getAuthUserId() );
 			
-			counter++;
-			pstmt.setString( counter, item.getHashIdentifier() );
 			counter++;
 			pstmt.setString( counter, item.getRemoteUserIpAddress() );
 			

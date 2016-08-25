@@ -54,6 +54,13 @@ INSERT INTO proxl_xml_file_import_tracking_status_values_lookup (id, display_tex
 INSERT INTO proxl_xml_file_import_tracking_status_values_lookup (id, display_text) VALUES ( 5, 'complete' );
 INSERT INTO proxl_xml_file_import_tracking_status_values_lookup (id, display_text) VALUES ( 6, 'failed' );
 
+
+	--  These values must be kept in sync with the values in the Java class ProxlXMLFileImportRunSubStatus
+    
+INSERT INTO proxl_xml_file_import_tracking_run_sub_status_values_lookup (id, display_text) VALUES ( 1, 'system error' );
+INSERT INTO proxl_xml_file_import_tracking_run_sub_status_values_lookup (id, display_text) VALUES ( 2, 'data error' );
+INSERT INTO proxl_xml_file_import_tracking_run_sub_status_values_lookup (id, display_text) VALUES ( 3, 'project not allow import' );
+
 	
 --  INSERT SUPPORTED CROSS-LINKERS
 
