@@ -260,7 +260,6 @@ public class ScanDAO {
 			String msg = "ERROR: ScanDAO.save(item): isCentroid is not a valid value:  is:" + item.getIsCentroid();
 			
 			log.error( msg );
-			System.err.println( msg );
 			
 			throw new IllegalArgumentException(msg);
 		}
@@ -346,10 +345,6 @@ public class ScanDAO {
 		} catch (Exception sqlEx) {
 			
 			String msg = "save:Exception '" + sqlEx.toString() + ".\nSQL = " + insertSQL;
-
-
-			System.out.println( msg );
-			System.err.println( msg );
 			
 			log.error( msg , sqlEx);
 

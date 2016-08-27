@@ -304,10 +304,7 @@ public class ScanRetentionTimeDAO {
 					+ ".  Data being inserted: " + item
 					+ ".\nSQL = " + insertSQL;
 
-
-			System.out.println( msg );
-			System.err.println( msg );
-			
+		
 			log.error( msg , sqlEx);
 
 			
