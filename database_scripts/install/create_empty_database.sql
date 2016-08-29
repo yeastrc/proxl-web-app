@@ -1787,7 +1787,7 @@ CREATE TABLE  sequence_coverage_cache (
   search_param_hash_code INT(11) NOT NULL,
   search_param_hash_idx INT(11) NOT NULL,
   search_id INT(11) UNSIGNED NOT NULL,
-  search_param_json text TEXT NOT NULL,
+  search_param_json TEXT NOT NULL,
   sequence_coverage_json TEXT NOT NULL,
   PRIMARY KEY (search_param_hash_code, search_param_hash_idx),
   CONSTRAINT fk_sequence_coverage_srch_id
