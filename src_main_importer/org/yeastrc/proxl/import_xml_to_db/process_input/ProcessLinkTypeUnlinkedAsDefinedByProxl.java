@@ -17,6 +17,7 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
+import org.yeastrc.proxl.import_xml_to_db.peptide_protein_position.CreateAndSave_PeptideProteinPositionDTO_Unlinked_Dimer;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.Peptides;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
@@ -248,6 +249,9 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 
 		int searchReportedPeptidepeptideId = srchRepPeptPeptideDTO.getId();
 
+		PeptideDTO peptideDTO = perPeptideData.getPeptideDTO();
+		
+		
 		//  Save Unlinked Protein Mappings 
 		
 
@@ -266,6 +270,17 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 			srchRepPeptProtSeqIdPosUnlinkedDimerDTO.setSearchReportedPeptidepeptideId( searchReportedPeptidepeptideId );
 			
 			DB_Insert_SrchRepPeptProtSeqIdPosUnlinkedDimerDAO.getInstance().save( srchRepPeptProtSeqIdPosUnlinkedDimerDTO );
+			
+			
+
+			//  Insert PeptideProteinPositionDTO record for protein coverage
+
+			CreateAndSave_PeptideProteinPositionDTO_Unlinked_Dimer.getInstance()
+			.createAndSave_PeptideProteinPositionDTO_Unlinked_Dimer(
+					reportedPeptideDTO, 
+					searchId, 
+					peptideDTO,
+					proteinImporterContainer);
 		}
 		
 
@@ -348,7 +363,6 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 		
 		return perPeptideDataList;
 	}
-	
-	
+
 
 	}

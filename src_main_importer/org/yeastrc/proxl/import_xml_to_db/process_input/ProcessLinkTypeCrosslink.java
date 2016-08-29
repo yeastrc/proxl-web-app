@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProteinImporterContainerDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReportedPeptideDynamicModLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptProtSeqIdPosCrosslinkDAO;
+import org.yeastrc.proxl.import_xml_to_db.dto.PeptideProteinPositionDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDynamicModLookupDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosCrosslinkDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptDynamicModDTO;
@@ -19,6 +20,7 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
+import org.yeastrc.proxl.import_xml_to_db.peptide_protein_position.PeptideProteinPositionDTO_SaveToDB_NoDups;
 import org.yeastrc.proxl_import.api.xml_dto.LinkedPosition;
 import org.yeastrc.proxl_import.api.xml_dto.LinkedPositions;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
@@ -345,6 +347,13 @@ public class ProcessLinkTypeCrosslink {
 		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO = perPeptideData.getSrchRepPeptPeptideDTO();
 
 		int searchReportedPeptidepeptideId = srchRepPeptPeptideDTO.getId();
+		
+		PeptideDTO peptideDTO = perPeptideData.getPeptideDTO();
+		
+		int peptideLength = peptideDTO.getSequence().length();
+		
+		int peptidePosition = srchRepPeptPeptideDTO.getPeptidePosition_1();
+		
 
 		//  Save Crosslink Protein Mappings 
 		
@@ -365,6 +374,27 @@ public class ProcessLinkTypeCrosslink {
 			srchRepPeptProtSeqIdPosCrosslinkDTO.setSearchReportedPeptidepeptideId( searchReportedPeptidepeptideId );
 			
 			DB_Insert_SrchRepPeptProtSeqIdPosCrosslinkDAO.getInstance().save( srchRepPeptProtSeqIdPosCrosslinkDTO );
+			
+			
+			
+			//  Insert PeptideProteinPositionDTO record for protein coverage
+						
+			int proteinSequencePosition = srchRepPeptProtSeqIdPosCrosslinkDTO.getProteinSequencePosition();
+			
+			int proteinStartPosition = proteinSequencePosition - peptidePosition + 1;
+			
+			int proteinEndPosition = proteinStartPosition + peptideLength - 1;
+			
+			PeptideProteinPositionDTO peptideProteinPositionDTO = new PeptideProteinPositionDTO();
+			
+			peptideProteinPositionDTO.setSearchId( searchId );
+			peptideProteinPositionDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
+			peptideProteinPositionDTO.setPeptideId( peptideDTO.getId() );
+			peptideProteinPositionDTO.setProteinSequenceId( proteinImporterContainer.getProteinSequenceDTO().getId() );
+			peptideProteinPositionDTO.setProteinStartPosition( proteinStartPosition );
+			peptideProteinPositionDTO.setProteinEndPosition( proteinEndPosition );
+			
+			PeptideProteinPositionDTO_SaveToDB_NoDups.getInstance().peptideProteinPositionDTO_SaveToDB_NoDups( peptideProteinPositionDTO );
 		}
 		
 		//  Save Dynamic Mod Masses into Lookup table and into Set for Search level lookup
