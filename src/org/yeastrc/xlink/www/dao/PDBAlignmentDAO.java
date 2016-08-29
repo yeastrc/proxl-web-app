@@ -42,8 +42,7 @@ public class PDBAlignmentDAO {
 			pa.setId( id );
 			
 			
-			//  Change to aligned_experimental_sequence after field rename
-			pa.setAlignedExperimentalSequence( rs.getString( "aligned_nrseq_sequence" ) );
+			pa.setAlignedExperimentalSequence( rs.getString( "aligned_experimental_sequence" ) );
 			
 			pa.setAlignedPDBSequence( rs.getString( "aligned_pdb_sequence" ) );
 			pa.setChainId( rs.getString( "chain_id" ) );
@@ -101,9 +100,7 @@ public class PDBAlignmentDAO {
 			// case
 			if( pa.getId() != 0 ) {
 				
-				//  Change from aligned_nrseq_sequence to aligned_experimental_sequence after field rename
-				
-				String sql = "UPDATE pdb_alignment SET aligned_pdb_sequence = ?, aligned_nrseq_sequence = ? WHERE id = ?";
+				String sql = "UPDATE pdb_alignment SET aligned_pdb_sequence = ?, aligned_experimental_sequence = ? WHERE id = ?";
 				pstmt = conn.prepareStatement( sql );
 				pstmt.setString( 1, pa.getAlignedPDBSequence() );
 				pstmt.setString( 2,  pa.getAlignedExperimentalSequence() );
@@ -116,12 +113,9 @@ public class PDBAlignmentDAO {
 			} else {
 				
 				// inserting a new PDB alignment
-				
-
-				//  Change from aligned_nrseq_sequence to aligned_experimental_sequence after field rename
 
 				final String sql = "INSERT INTO pdb_alignment"
-						+ " (pdb_file_id, chain_id, protein_sequence_id, aligned_pdb_sequence, aligned_nrseq_sequence ) " 
+						+ " (pdb_file_id, chain_id, protein_sequence_id, aligned_pdb_sequence, aligned_experimental_sequence ) " 
 						+ " VALUES ( ?, ?, ?, ?, ? )";
 
 				pstmt = conn.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );

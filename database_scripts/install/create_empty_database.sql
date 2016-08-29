@@ -171,7 +171,7 @@ CREATE TABLE  pdb_alignment (
   chain_id CHAR(1) NULL DEFAULT NULL,
   protein_sequence_id INT(10) UNSIGNED NOT NULL,
   aligned_pdb_sequence VARCHAR(10000) NULL,
-  aligned_nrseq_sequence VARCHAR(10000) NULL,
+  aligned_experimental_sequence VARCHAR(10000) NULL,
   PRIMARY KEY (id),
   CONSTRAINT pdb_alignment_ibfk_1
     FOREIGN KEY (pdb_file_id)
