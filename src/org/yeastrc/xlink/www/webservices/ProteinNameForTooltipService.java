@@ -308,7 +308,11 @@ public class ProteinNameForTooltipService {
 				HttpResponse httpResponse = httpclient.execute(httpPost);
 
 				try {
-					System.out.println(httpResponse.getStatusLine());
+					if ( log.isDebugEnabled() ) {
+
+						log.debug( "httpResponse.getStatusLine(): " + httpResponse.getStatusLine() );
+					}
+					
 					HttpEntity httpEntity = httpResponse.getEntity();
 					
 					// do something useful with the response body

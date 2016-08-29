@@ -62,13 +62,13 @@ public class ViewerSequenceCoverageService {
 
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
 			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
-			@QueryParam( "proteinId" ) int proteinId,
+			@QueryParam( "proteinSequenceId" ) List<Integer> proteinSequenceIdList,
 			@Context HttpServletRequest request )
 	throws Exception {
 
 		if ( searchIds == null || searchIds.isEmpty() ) {
 
-			String msg = "Provided searchIds is null or empty, searchIds = " + searchIds;
+			String msg = "Provided searchIds is null or empty";
 
 			log.error( msg );
 
@@ -78,6 +78,21 @@ public class ViewerSequenceCoverageService {
 		    	        .build()
 		    	        );
 		}
+		
+
+		if ( proteinSequenceIdList == null || proteinSequenceIdList.isEmpty() ) {
+
+			String msg = "Provided proteinId is null or empty";
+
+			log.error( msg );
+
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	        .entity( msg )
+		    	        .build()
+		    	        );
+		}
+
 
 		if ( StringUtils.isEmpty( psmPeptideCutoffsForSearchIds_JSONString ) ) {
 
@@ -240,16 +255,6 @@ public class ViewerSequenceCoverageService {
 
 			SequenceCoverageData scd = new SequenceCoverageData();
 
-
-			if( excludeTaxonomy == null ) 
-				excludeTaxonomy = new ArrayList<Integer>();
-
-			boolean filterNonUniquePeptides = false;
-			if( filterNonUniquePeptidesString != null && filterNonUniquePeptidesString.equals( "on" ) )
-				filterNonUniquePeptides = true;
-
-			
-
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
 			for( int searchId : searchIds ) {
 				
@@ -271,71 +276,87 @@ public class ViewerSequenceCoverageService {
 				searches.add( search );
 			}
 
-
-			ProteinSequenceObject protein = ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId );
-
-			ProteinSequenceCoverage cov = 
-					ProteinSequenceCoverageFactory.getInstance().getProteinSequenceCoverageForOneProteinForMultSearches(protein, searches, searcherCutoffValuesRootLevel);
-
-			coverages.put( protein.getProteinSequenceId(), cov.getSequenceCoverage() );
-
-			Set<Range<Integer>> coverageRanges = cov.getRanges();
 			
-			List<SequenceCoverageRange> sequenceCoverageRangesTempList = new ArrayList<SequenceCoverageRange>( coverageRanges.size() );
+			
+			List<ProteinSequenceObject> proteinSequenceObjectList = new ArrayList<>( proteinSequenceIdList.size() );
+					
+			for ( Integer proteinId : proteinSequenceIdList ) {
 
-			for( Range<Integer> r : cov.getRanges() ) {
-				SequenceCoverageRange scr = new SequenceCoverageRange();
-				scr.setStart( r.lowerEndpoint() );
-				scr.setEnd( r.upperEndpoint() );
-
-				sequenceCoverageRangesTempList.add( scr );
+				ProteinSequenceObject protein = ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId );
+				proteinSequenceObjectList.add(protein);
 			}
 			
-			Collections.sort( sequenceCoverageRangesTempList, new Comparator<SequenceCoverageRange>() {
+			Map<Integer, ProteinSequenceCoverage> proteinSequenceCoveragesKeyedOnProtSeqIdMap = 
+					ProteinSequenceCoverageFactory.getInstance()
+					.getProteinSequenceCoveragesForProteins( proteinSequenceObjectList, searches, searcherCutoffValuesRootLevel );
 
-				@Override
-				public int compare(SequenceCoverageRange o1, SequenceCoverageRange o2) {
+			
+			for ( Map.Entry<Integer, ProteinSequenceCoverage> entry : proteinSequenceCoveragesKeyedOnProtSeqIdMap.entrySet() ) { 
+				
+				Integer proteinSequenceId = entry.getKey();
 
-					return o1.getStart() - o2.getStart();
+				ProteinSequenceCoverage cov = entry.getValue();
+				
+				coverages.put( proteinSequenceId, cov.getSequenceCoverage() );
+
+				Set<Range<Integer>> coverageRanges = cov.getRanges();
+
+				List<SequenceCoverageRange> sequenceCoverageRangesTempList = new ArrayList<SequenceCoverageRange>( coverageRanges.size() );
+
+				for( Range<Integer> r : cov.getRanges() ) {
+					SequenceCoverageRange scr = new SequenceCoverageRange();
+					scr.setStart( r.lowerEndpoint() );
+					scr.setEnd( r.upperEndpoint() );
+
+					sequenceCoverageRangesTempList.add( scr );
 				}
-			} );
-			
-			List<SequenceCoverageRange> sequenceCoverageRangesOutputList = new ArrayList<SequenceCoverageRange>( coverageRanges.size() );
 
-			SequenceCoverageRange prevSequenceCoverageRange = null;
-			
-			for ( SequenceCoverageRange sequenceCoverageRange : sequenceCoverageRangesTempList ) {
-			
-				if ( prevSequenceCoverageRange == null ) {
-					
-					prevSequenceCoverageRange = sequenceCoverageRange;
-					
-				} else {
-					
-					if ( ( prevSequenceCoverageRange.getEnd() + 1 ) == sequenceCoverageRange.getStart() ) {
-						
-						//  adjoining ranges so combine them
-						
-						prevSequenceCoverageRange.setEnd( sequenceCoverageRange.getEnd() );
-					
-					} else {
-						
-						//  NON adjoining ranges so add prev to list and move current to prev
-						
-						sequenceCoverageRangesOutputList.add( prevSequenceCoverageRange );
-						
+				Collections.sort( sequenceCoverageRangesTempList, new Comparator<SequenceCoverageRange>() {
+
+					@Override
+					public int compare(SequenceCoverageRange o1, SequenceCoverageRange o2) {
+
+						return o1.getStart() - o2.getStart();
+					}
+				} );
+
+				List<SequenceCoverageRange> sequenceCoverageRangesOutputList = new ArrayList<SequenceCoverageRange>( coverageRanges.size() );
+
+				SequenceCoverageRange prevSequenceCoverageRange = null;
+
+				for ( SequenceCoverageRange sequenceCoverageRange : sequenceCoverageRangesTempList ) {
+
+					if ( prevSequenceCoverageRange == null ) {
+
 						prevSequenceCoverageRange = sequenceCoverageRange;
+
+					} else {
+
+						if ( ( prevSequenceCoverageRange.getEnd() + 1 ) == sequenceCoverageRange.getStart() ) {
+
+							//  adjoining ranges so combine them
+
+							prevSequenceCoverageRange.setEnd( sequenceCoverageRange.getEnd() );
+
+						} else {
+
+							//  NON adjoining ranges so add prev to list and move current to prev
+
+							sequenceCoverageRangesOutputList.add( prevSequenceCoverageRange );
+
+							prevSequenceCoverageRange = sequenceCoverageRange;
+						}
 					}
 				}
-			}
-			
-			if ( prevSequenceCoverageRange != null ) {
-				//  Add last entry
-				sequenceCoverageRangesOutputList.add( prevSequenceCoverageRange );
-			}
-			
-			ranges.put( protein.getProteinSequenceId(), sequenceCoverageRangesOutputList );
 
+				if ( prevSequenceCoverageRange != null ) {
+					//  Add last entry
+					sequenceCoverageRangesOutputList.add( prevSequenceCoverageRange );
+				}
+
+				ranges.put( proteinSequenceId, sequenceCoverageRangesOutputList );
+			}
+			
 			scd.setCoverages( coverages );
 			scd.setRanges( ranges );
 			

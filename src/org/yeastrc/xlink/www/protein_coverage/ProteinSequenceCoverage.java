@@ -15,25 +15,6 @@ public class ProteinSequenceCoverage {
 	}
 	
 	
-	/**
-	 * Added the supplied peptide sequence to the peptides being used to determine
-	 * this protein's sequence coverage
-	 * @param sequence
-	 * @throws Exception
-	 */
-	public void addPeptide( String peptideSequence ) throws Exception {
-		
-		// find all locations that this peptide maps onto the sequence and add those ranges to the RangeSet
-		if( this.ranges == null )
-			this.ranges = TreeRangeSet.create();
-		
-        // iterate over all matches of the peptide sequence in the protein sequence
-        for (int i = -1; (i = this.protein.getSequence().indexOf(peptideSequence, i + 1)) != -1; ) {
-        	Range<Integer> r = Range.closed( i + 1, i + peptideSequence.length() );
-        	this.ranges.add( r );
-        }
-		
-	}
 	
 	/**
 	 * Add the supplied start and end coordinates as a sequence coverage range

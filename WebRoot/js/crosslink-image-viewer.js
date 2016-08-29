@@ -1354,48 +1354,59 @@ function refreshData() {
 ///////////////////
 
 // Load protein sequence coverage data for a specific protein
-function loadSequenceCoverageDataForProtein( protein, doDraw ) {
+function loadSequenceCoverageDataForProtein( selProteinsForSeqCov, doDraw ) {
+
+	incrementSpinner();				// create spinner
+
+	var url = contextPathJSVar + "/services/sequenceCoverage/getDataForProtein";
+	url += buildQueryStringFromHash();
+
+	var urlAdditionProteinSequenceIds = "";
+
+	for ( var index = 0; index < selProteinsForSeqCov.length; index++ ) {
+
+		var protein = selProteinsForSeqCov[ index ];
+		urlAdditionProteinSequenceIds += "&proteinSequenceId=" + protein;
+	}
 	
-	console.log( "Loading sequence coverage data for protein: " + protein );
-	
-		if ( _ranges == undefined || _ranges[ protein ] == undefined ) {
-			
-			incrementSpinner();				// create spinner
-			
-			var url = contextPathJSVar + "/services/sequenceCoverage/getDataForProtein";
-			url += buildQueryStringFromHash();
-			url += "&proteinId=" + protein;
-			
-			 $.ajax({
-			        type: "GET",
-			        url: url,
-			        dataType: "json",
-			        success: function(data)	{
-			        
-			        	if ( _ranges == undefined ) {
-			        		_coverages = data.coverages;
-			        		_ranges = data.ranges;
-			        	} else {
-			        		_coverages[ protein ] = data[ 'coverages' ][ protein ];
-			        		_ranges[ protein ] = data[ 'ranges' ][ protein ];
-			        	}
-			        	
-			        	decrementSpinner();
-			        	loadDataAndDraw( doDraw );
-			        },
-			        failure: function(errMsg) {
-						decrementSpinner();
-			        	handleAJAXFailure( errMsg );
-			        },
-			        error: function(jqXHR, textStatus, errorThrown) {	
-							decrementSpinner();
-							handleAJAXError( jqXHR, textStatus, errorThrown );
-//							alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ", textStatus: " + textStatus );
-					}
-			  });	
-		} else {
+	url += urlAdditionProteinSequenceIds;
+
+	console.log( "Loading sequence coverage data for selProteinsForSeqCov: " + urlAdditionProteinSequenceIds );
+
+
+	$.ajax({
+		type: "GET",
+		url: url,
+		dataType: "json",
+
+		success: function(data)	{
+
+			if ( _ranges == undefined ) {
+				_coverages = data.coverages;
+				_ranges = data.ranges;
+			} else {
+
+				for ( var index = 0; index < selProteinsForSeqCov.length; index++ ) {
+
+					var protein = selProteinsForSeqCov[ index ];
+					_coverages[ protein ] = data[ 'coverages' ][ protein ];
+					_ranges[ protein ] = data[ 'ranges' ][ protein ];
+				}
+			}
+
+			decrementSpinner();
 			loadDataAndDraw( doDraw );
+		},
+		failure: function(errMsg) {
+			decrementSpinner();
+			handleAJAXFailure( errMsg );
+		},
+		error: function(jqXHR, textStatus, errorThrown) {	
+			decrementSpinner();
+			handleAJAXError( jqXHR, textStatus, errorThrown );
+//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ", textStatus: " + textStatus );
 		}
+	});	
 
 }
 
@@ -1995,11 +2006,36 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 	
 	if ( annotationType === SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE ) {
 		
+		//  Call loadSequenceCoverageDataForProtein with proteins that need sequence coverage
+		//     loaded from server
+		
+		var selProtsFrSeqCov = [];
+		
 		for ( var i = 0; i < selectedProteins.length; i++ ) {
-			var prot = selectedProteins[ i ];
-			if ( _ranges == undefined || _ranges[ prot ] == undefined ) {
-				return loadSequenceCoverageDataForProtein( prot, doDraw );
+			var selectedProtein = selectedProteins[ i ];
+			if ( _ranges == undefined || _ranges[ selectedProtein ] == undefined ) {
+				
+				var foundSelectedProteinInSelProtsFrSeqCov = false;
+				
+				//  If not already in selProtsFrSeqCov, add it
+				for ( var spfscIndex = 0; spfscIndex < selProtsFrSeqCov.length; spfscIndex++ ) {
+					var selProtFrSeqCov = selProtsFrSeqCov[ spfscIndex ];
+					if ( selProtFrSeqCov === selectedProtein ) {
+						
+						foundSelectedProteinInSelProtsFrSeqCov = true;
+					}
+				}
+				
+				if ( ! foundSelectedProteinInSelProtsFrSeqCov ) {
+					
+					selProtsFrSeqCov.push( selectedProtein );
+				} 
+				
 			}
+		}
+		
+		if ( selProtsFrSeqCov.length > 0 ) {
+			return loadSequenceCoverageDataForProtein( selProtsFrSeqCov, doDraw );
 		}
 	
 	} else if ( annotationType !== undefined && annotationType !== "" ) {

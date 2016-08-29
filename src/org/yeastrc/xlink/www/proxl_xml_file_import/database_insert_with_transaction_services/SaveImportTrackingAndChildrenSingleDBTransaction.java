@@ -64,10 +64,6 @@ public class SaveImportTrackingAndChildrenSingleDBTransaction {
 		} catch ( Exception e ) {
 			
 			String msg = "Failed saveImportTrackingAndChildrenInSingleDBTransaction(...)";
-
-
-			System.out.println( msg );
-			System.err.println( msg );
 			
 			log.error( msg , e);
 
@@ -79,9 +75,6 @@ public class SaveImportTrackingAndChildrenSingleDBTransaction {
 				} catch (Exception ex) {
 					
 					String msgRollback = "Rollback Exception:  saveImportTrackingAndChildrenInSingleDBTransaction(...) Exception:  See Syserr or Sysout for original exception: Rollback Exception, tables 'scan' and 'scan_spectrum_data' are in an inconsistent state. '" + ex.toString();
-
-					System.out.println( msgRollback );
-					System.err.println( msgRollback );
 					
 					log.error( msgRollback, ex );
 
@@ -100,8 +93,7 @@ public class SaveImportTrackingAndChildrenSingleDBTransaction {
 				} catch (Exception ex) {
 					String msg = "Failed dbConnection.setAutoCommit(true) in saveImportTrackingAndChildrenInSingleDBTransaction(...)";
 
-					System.out.println( msg );
-					System.err.println( msg );
+					log.error( msg );
 
 					throw new Exception(msg);
 				}

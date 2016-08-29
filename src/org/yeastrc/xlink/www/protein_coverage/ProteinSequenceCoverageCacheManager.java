@@ -58,7 +58,12 @@ public class ProteinSequenceCoverageCacheManager {
 		
 		// try memory cache first
 		if( this._MEMORY_CACHE.containsKey( searchParameters ) ) {
-			System.out.println( "Getting seq. cov. from mem cache for protein:" + proteinId + " search:" + scvsl.getSearchId() );
+			
+			if ( log.isInfoEnabled() ) {
+
+				log.info( "Getting seq. cov. from mem cache for protein:" + proteinId + " search:" + scvsl.getSearchId() );
+			}
+			
 			return this._MEMORY_CACHE.get( searchParameters );
 		}
 		
@@ -106,7 +111,7 @@ public class ProteinSequenceCoverageCacheManager {
 		} catch ( Exception e ) {
 			
 			// don't die if there is a database error, but log it
-			log.error( e.getMessage(), e );	
+			log.error( "addProteinSequenceCoverageToCache(...): " + e.getMessage(), e );	
 		}
 
 	}
@@ -206,6 +211,12 @@ public class ProteinSequenceCoverageCacheManager {
 				
 			}
 			
+		} catch ( Exception e ) {
+			
+			
+			log.error( "addProteinSequenceCoverageToDbCache(...): " + e.getMessage(), e );	
+
+			throw e;
 			
 		} finally {
 			
@@ -265,11 +276,14 @@ public class ProteinSequenceCoverageCacheManager {
 
 				// if the search parameters aren't the same, that means we have a hashCode collision. Try
 				// next one in database, if it exists.
-				if( !searchParameters.equals( dbParams ) )
+				if( !searchParameters.equals( dbParams ) ) {
 					continue;
+				}
 				
-				System.out.println( "Getting seq. cov. from db cache for protein:" + searchParameters.getProteinId() + " search:" + searchParameters.getSearchId() );
+				if ( log.isInfoEnabled() ) {
 
+					log.info( "Getting seq. cov. from db cache for protein:" + searchParameters.getProteinId() + " search:" + searchParameters.getSearchId() );
+				}
 				
 				// de-serialize the ProteinSequenceCoverage from the database
 				ProteinSequenceCoverageResultsBean coverageResultsBean = mapper.readValue( rs.getString( 2 ), ProteinSequenceCoverageResultsBean.class );
@@ -283,6 +297,13 @@ public class ProteinSequenceCoverageCacheManager {
 				}
 				
 			}
+
+		} catch ( Exception e ) {
+			
+			
+			log.error( "getProteinSequenceCoverageFromDbCache(...): " + e.getMessage(), e );	
+
+			throw e;
 			
 		} finally {
 			

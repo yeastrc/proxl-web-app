@@ -1802,6 +1802,32 @@ COLLATE = utf8_bin;
 CREATE INDEX fk_sequence_coverage_srch_id_idx ON sequence_coverage_cache (search_id ASC);
 
 
+-- -----------------------------------------------------
+-- Table peptide_protein_position
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS peptide_protein_position ;
+
+CREATE TABLE  peptide_protein_position (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  search_id INT UNSIGNED NOT NULL,
+  reported_peptide_id INT UNSIGNED NOT NULL,
+  peptide_id INT UNSIGNED NOT NULL,
+  protein_sequence_id INT UNSIGNED NOT NULL,
+  protein_start_position INT UNSIGNED NOT NULL,
+  protein_end_position INT UNSIGNED NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT peptide_protein_position_search_id
+    FOREIGN KEY (search_id)
+    REFERENCES search (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX peptide_protein_position_search_id_idx ON peptide_protein_position (search_id ASC);
+
+CREATE INDEX search_id_protein_seq_id ON peptide_protein_position (search_id ASC, protein_sequence_id ASC);
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

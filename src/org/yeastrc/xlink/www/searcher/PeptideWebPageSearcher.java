@@ -958,7 +958,10 @@ public class PeptideWebPageSearcher {
 			}
 			
 			
-			//System.out.println( ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
+			if ( log.isDebugEnabled() ) {
+
+				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
+			}
 			
 			rs = pstmt.executeQuery();
 			
