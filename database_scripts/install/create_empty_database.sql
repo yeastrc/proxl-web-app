@@ -269,7 +269,7 @@ DROP TABLE IF EXISTS search_reported_peptide ;
 CREATE TABLE  search_reported_peptide (
   search_id INT(10) UNSIGNED NOT NULL,
   reported_peptide_id INT(10) UNSIGNED NOT NULL,
-  link_type ENUM('looplink','crosslink','unlinked','dimer') NULL,
+  link_type ENUM('looplink','crosslink','unlinked','dimer') NOT NULL,
   PRIMARY KEY (search_id, reported_peptide_id),
   CONSTRAINT search_reported_peptide_ibfk_1
     FOREIGN KEY (search_id)
