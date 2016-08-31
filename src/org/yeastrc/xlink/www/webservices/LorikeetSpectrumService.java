@@ -27,7 +27,7 @@ import org.yeastrc.xlink.dao.ScanDAO;
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.dao.StaticModDAO;
 import org.yeastrc.xlink.www.dto.PeptideDTO;
-import org.yeastrc.xlink.dto.PsmDTO;
+import org.yeastrc.xlink.www.dto.PsmDTO;
 import org.yeastrc.xlink.dto.ScanDTO;
 import org.yeastrc.xlink.dto.ScanFileDTO;
 import org.yeastrc.xlink.dto.StaticModDTO;

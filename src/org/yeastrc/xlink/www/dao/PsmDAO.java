@@ -3,10 +3,11 @@ package org.yeastrc.xlink.www.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.dto.PsmDTO;
+import org.yeastrc.xlink.www.dto.PsmDTO;
 
 /**
  * Table psm
@@ -40,29 +41,7 @@ public class PsmDAO {
 			rs = pstmt.executeQuery();
 			
 			if( rs.next() ) {
-				psm = new PsmDTO();
-				
-				psm.setId( id );
-				psm.setSearchId( rs.getInt( "search_id" ) );
-				
-				int scanId = rs.getInt( "scan_id" );
-				if ( ! rs.wasNull() ) {
-					
-					psm.setScanId( scanId );
-				}
-				
-
-				int charge = rs.getInt( "charge" );
-				if ( ! rs.wasNull() ) {
-					
-					psm.setCharge( charge );
-				}
-
-				psm.setLinkerMass( rs.getBigDecimal( "linker_mass" ) );  //  Can be NULL
-				
-				
-				psm.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
-				
+				psm = populateFromResultSet( rs );
 			}
 			
 		} catch ( Exception e ) {
@@ -191,27 +170,8 @@ public class PsmDAO {
 			rs = pstmt.executeQuery();
 			
 			if ( rs.next() ) {
-				psm = new PsmDTO();
 				
-				psm.setId( rs.getInt( "id" ) );
-				psm.setSearchId( rs.getInt( "search_id" ) );
-				
-				int scanId = rs.getInt( "scan_id" );
-				if ( ! rs.wasNull() ) {
-					
-					psm.setScanId( scanId );
-				}
-				
-
-				int charge = rs.getInt( "charge" );
-				if ( ! rs.wasNull() ) {
-					
-					psm.setCharge( charge );
-				}
-				
-				
-				psm.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
-				
+				psm = populateFromResultSet( rs );
 			}
 			
 		} catch ( Exception e ) {
@@ -245,5 +205,52 @@ public class PsmDAO {
 	}
 	
 	
+
+	
+	/**
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	public PsmDTO populateFromResultSet( ResultSet rs) throws SQLException {
+		
+		
+		PsmDTO psm = new PsmDTO();
+		
+		psm.setId( rs.getInt( "id" ) );
+		psm.setSearchId( rs.getInt( "search_id" ) );
+		
+		int scanId = rs.getInt( "scan_id" );
+		if ( ! rs.wasNull() ) {
+			
+			psm.setScanId( scanId );
+		}
+		
+
+		int charge = rs.getInt( "charge" );
+		if ( ! rs.wasNull() ) {
+			
+			psm.setCharge( charge );
+		}
+
+		psm.setLinkerMass( rs.getBigDecimal( "linker_mass" ) );  //  Can be NULL
+		
+		
+		psm.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
+		
+
+		int scanNumber = rs.getInt( "scan_number" );
+		if ( ! rs.wasNull() ) {
+			
+			psm.setScanNumber( scanNumber );
+		}
+
+		int searchScanFilenameId = rs.getInt( "search_scan_filename_id" );
+		if ( ! rs.wasNull() ) {
+			
+			psm.setSearchScanFilenameId( searchScanFilenameId );;
+		}
+		return psm;
+	}
 	
 }

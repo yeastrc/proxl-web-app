@@ -302,6 +302,10 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		}
 
 		var scanDataAnyRows = false;
+		
+		var scanNumberAnyRows = false;
+		var scanFilenameAnyRows = false;
+
 		var chargeDataAnyRows = false;
 		
 
@@ -314,22 +318,45 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 				scanDataAnyRows = true;
 			}
 
+			if (  psm.scanNumber ) {
+				
+				scanNumberAnyRows = true;
+			}
+			if (  psm.scanFilename ) {
+				
+				scanFilenameAnyRows = true;
+			}
+			
 			if (  psm.charge ) {
 				
 				chargeDataAnyRows = true;
 			}
 			
 		}
+		
+		//  Context for creating column headings HTML
 
 		var context = {
 				
-				annotationDisplayNameDescriptionList : annotationDisplayNameDescriptionList
+				annotationDisplayNameDescriptionList : annotationDisplayNameDescriptionList,
 				
+				scanDataAnyRows : scanDataAnyRows,
+				
+				scanNumberAnyRows : scanNumberAnyRows,
+				scanFilenameAnyRows : scanFilenameAnyRows,
+				
+				chargeDataAnyRows : chargeDataAnyRows
 		};
 		
+
 		context.scanDataAnyRows = scanDataAnyRows;
+		
+		context.scanNumberAnyRows = scanNumberAnyRows;
+		context.scanFilenameAnyRows = scanFilenameAnyRows;
+		
 		context.chargeDataAnyRows = chargeDataAnyRows;
 		
+
 		var html = _handlebarsTemplate_psm_block_template(context);
 
 	
@@ -355,11 +382,19 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 				
 				psm.chargeDisplay = psm.charge;
 			}
-						
-			var context = psm;
 			
-			context.scanDataAnyRows = scanDataAnyRows;
-			context.chargeDataAnyRows = chargeDataAnyRows;
+			//  Context for creating data row HTML
+						
+			var context = { psm : psm,
+
+					scanDataAnyRows : scanDataAnyRows,
+
+					scanNumberAnyRows : scanNumberAnyRows,
+					scanFilenameAnyRows : scanFilenameAnyRows,
+
+					chargeDataAnyRows : chargeDataAnyRows
+			};
+			
 			
 			//  psm.psmCountForOtherAssocScanId is count of psms with same scan id, excluding current psm
 			

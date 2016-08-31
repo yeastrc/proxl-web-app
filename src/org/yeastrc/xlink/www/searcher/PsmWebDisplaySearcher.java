@@ -11,7 +11,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dao.PsmDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.dto.PsmDTO;
+import org.yeastrc.xlink.www.dto.PsmDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
@@ -35,10 +35,11 @@ public class PsmWebDisplaySearcher {
 	
 
 	private static final String SQL_MAIN = 
-			"SELECT psm.id AS psm_id, psm.charge, scan.start_scan_number AS scan_number, scan.retention_time, "
-			+        "  scan.preMZ, scan_file.filename AS scan_filename "
+			"SELECT psm.id AS psm_id, psm.charge, psm.scan_number AS scan_number, scan.retention_time, "
+			+        "  scan.preMZ, search_scan_filename.filename AS scan_filename "
 					
 			+ " FROM psm  "
+			+ " LEFT OUTER JOIN search_scan_filename ON psm.search_scan_filename_id = search_scan_filename.id "
 			+ " LEFT OUTER JOIN scan ON psm.scan_id = scan.id "
 			+ " LEFT OUTER JOIN scan_file ON scan.scan_file_id = scan_file.id ";
 

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dto.PsmDTO;
+import org.yeastrc.xlink.www.dto.PsmDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortDisplayRecordsWrapperBase;
 import org.yeastrc.xlink.www.searcher.Psm_ScanCountForAssociatedScanId_From_PsmId_SearchId_Searcher;

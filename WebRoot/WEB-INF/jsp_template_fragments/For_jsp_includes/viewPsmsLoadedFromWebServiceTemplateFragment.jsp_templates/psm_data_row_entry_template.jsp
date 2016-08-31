@@ -11,75 +11,77 @@
   --%>
 
 	{{#if scanDataAnyRows}}
-		<td style="white-space: nowrap; "  class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} "  
-			><a href="javascript:" psmId="{{psmDTO.id}}" class="view_spectrum_open_spectrum_link_jq" 
-					psm_type="{{psmDTO.type}}"
+		<td style="white-space: nowrap; "  class=" {{#if psm.scanIdMatchesInitialScanId }}   highlight-row  {{/if}} "  
+			><a href="javascript:" psmId="{{ psm.psmDTO.id }}" class="view_spectrum_open_spectrum_link_jq" 
+					psm_type="{{ psmDTO.type }}"
 				>View Spectrum</a></td>
 	{{/if}}
 <%-- 
-			<td style="text-align: left; white-space: nowrap; " class=" percolatorPsm_columns_jq " >{{psmDTO.percolatorPsm.psmId}}</td>
+			<td style="text-align: left; white-space: nowrap; " class=" percolatorPsm_columns_jq " >{{ psm.psmDTO.percolatorPsm.psmId}}</td>
 --%>			
-	{{#if scanDataAnyRows}}
-		<td style="text-align: right; white-space: nowrap; "  class="integer-number-column {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}">
-			{{scanNumber}}
+	{{#if scanNumberAnyRows}}
+		<td style="text-align: right; white-space: nowrap; "  class="integer-number-column {{#if  psm.scanIdMatchesInitialScanId }}   highlight-row  {{/if}}">
+			{{  psm.scanNumber }}
 		</td>
 	{{/if}}
 	
 	{{#if scanDataAnyRows}}
-		<td style="text-align: right; white-space: nowrap; "  class="integer-number-column {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}">
-			{{#if uniquePSM}}
+		<td style="text-align: right; white-space: nowrap; "  class="integer-number-column {{#if  psm.scanIdMatchesInitialScanId }}   highlight-row  {{/if}}">
+			{{#if  uniquePSM }}
 			
 			<%--  TEMP --%>
 			<%-- 
-				{{#if show_associated_peptides_link_true }}
-				 {{#if psmDTO.scanId }}
-				  <a href="javascript:" psm_id="{{ psmDTO.id }}" scan_id="{{ psmDTO.scanId }}" 
-				  	initial_reported_peptide_id="{{ reported_peptide_id }}"
-					peptide_q_value_cutoff="{{ peptide_q_value_cutoff }}" psm_q_value_cutoff="{{ psm_q_value_cutoff }}"
-					project_id="{{ project_id }}" search_id="{{ search_id }}"
+				{{#if  psm.show_associated_peptides_link_true }}
+				 {{#if  psm.psmDTO.scanId }}
+				  <a href="javascript:" psm_id="{{  psm.psmDTO.id }}" scan_id="{{  psm.psmDTO.scanId }}" 
+				  	initial_reported_peptide_id="{{  psm.reported_peptide_id }}"
+					peptide_q_value_cutoff="{{  psm.peptide_q_value_cutoff }}" psm_q_value_cutoff="{{  psm.psm_q_value_cutoff }}"
+					project_id="{{  psm.project_id }}" search_id="{{  psm.search_id }}"
 				 	onclick="viewPeptidesRelatedToPSMsByScanId.openOverlayForPeptidesRelatedToPSMsByScanId( { clickedElement : this } )"
-				 	>{{/if}}{{/if}}TEMP_N{{#if show_associated_peptides_link_true }}{{#if psmDTO.scanId }}</a>{{/if}}{{/if}}
+				 	>{{/if}}{{/if}}TEMP_N{{#if  psm.show_associated_peptides_link_true }}{{#if  psm.psmDTO.scanId }}</a>{{/if}}{{/if}}
 			--%>
 			<%-- 
 			--%>
 				Y
 			{{else}}
-				{{#if show_associated_peptides_link_true }}
-				  <a href="javascript:" psm_id="{{ psmDTO.id }}" scan_id="{{ psmDTO.scanId }}" 
-				  	initial_reported_peptide_id="{{ reported_peptide_id }}"
-					peptide_q_value_cutoff="{{ peptide_q_value_cutoff }}" psm_q_value_cutoff="{{ psm_q_value_cutoff }}"
-					project_id="{{ project_id }}" search_id="{{ search_id }}"
+				{{#if  show_associated_peptides_link_true }}
+				  <a href="javascript:" psm_id="{{  psm.psmDTO.id }}" scan_id="{{  psm.psmDTO.scanId }}" 
+				  	initial_reported_peptide_id="{{  reported_peptide_id }}"
+					project_id="{{  project_id }}" search_id="{{  search_id }}"
 				 	onclick="viewPeptidesRelatedToPSMsByScanId.openOverlayForPeptidesRelatedToPSMsByScanId( { clickedElement : this } )"
-				 	>{{/if}}N{{#if show_associated_peptides_link_true }}</a>{{/if}}
+				 	>{{/if}}N{{#if  show_associated_peptides_link_true }}</a>{{/if}}
 			{{/if}}
 		</td>
 	{{/if}}
 	
 	{{#if scanDataAnyRows}}
-		<td style="text-align: right; white-space: nowrap; " class="integer-number-column{{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
-			{{preMZRounded}}
+		<td style="text-align: right; white-space: nowrap; " class="integer-number-column{{#if  psm.scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
+			{{ psm.preMZRounded }}
 		</td>
 	{{/if}}
 
 	{{#if chargeDataAnyRows}}
-		<td style="text-align: right; white-space: nowrap; " class="integer-number-column {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
-			{{charge}}
+		<td style="text-align: right; white-space: nowrap; " class="integer-number-column {{#if  psm.scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
+			{{  psm.charge }}
 		</td>
 	{{/if}}
 	
 
 	{{#if scanDataAnyRows}}
-		<td style="text-align: right; white-space: nowrap; " class="integer-number-column{{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
-			{{retentionTimeMinutesRoundedString}}
-		</td>
-		<td style="text-align: left; white-space: nowrap; " >
-			{{scanFilename}}
+		<td style="text-align: right; white-space: nowrap; " class="integer-number-column{{#if  psm.scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
+			{{  psm.retentionTimeMinutesRoundedString }}
 		</td>
 	{{/if}}
 
-	{{#each psmAnnotationValueList}}
-		<td style="text-align: left; white-space: nowrap; "  class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} "  
-	 			>{{this}}</td>
+	{{#if scanFilenameAnyRows}}
+		<td style="text-align: left; white-space: nowrap; " >
+			{{ psm.scanFilename }}
+		</td>
+	{{/if}}
+
+	{{#each  psm.psmAnnotationValueList }}
+		<td style="text-align: left; white-space: nowrap; "  class=" {{#if  psm.scanIdMatchesInitialScanId }}   highlight-row  {{/if}} "  
+	 			>{{ this }}</td>
 	{{/each}}
 			
 

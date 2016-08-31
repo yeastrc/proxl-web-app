@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.dto.PsmDTO;
+import org.yeastrc.xlink.www.dto.PsmDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;

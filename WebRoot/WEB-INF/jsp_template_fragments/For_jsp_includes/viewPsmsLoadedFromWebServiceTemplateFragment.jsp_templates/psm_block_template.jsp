@@ -17,7 +17,7 @@
 <%-- 					
 					<th style="text-align:left;font-weight:bold;" class=" percolatorPsm_columns_jq " >PSM ID</th>
 --%>					
-			{{#if scanDataAnyRows}}
+			{{#if scanNumberAnyRows}}
 				<th style="text-align:right;font-weight:bold;" class="integer-number-column"><span style="white-space: nowrap">Scan Num.</span></th>
 			{{/if}}
 			
@@ -40,6 +40,9 @@
 			
 			{{#if scanDataAnyRows}}
 				<th style="text-align:right;font-weight:bold;" class="integer-number-column"><span style="white-space: nowrap">RT (min)<%-- Retention Time --%></span></th>
+			{{/if}}
+				
+			{{#if scanFilenameAnyRows}}
 				<th style="text-align:left;font-weight:bold;"><span style="white-space: nowrap">Scan Filename</span></th>
 			{{/if}}
 
