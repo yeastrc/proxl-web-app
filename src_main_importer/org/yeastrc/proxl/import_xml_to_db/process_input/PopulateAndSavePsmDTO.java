@@ -3,12 +3,15 @@ package org.yeastrc.proxl.import_xml_to_db.process_input;
 import java.math.BigDecimal;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_PsmDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchScanFilenameDAO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.utils.RoundDecimalFieldsIfNecessary;
 import org.yeastrc.proxl_import.api.xml_dto.Psm;
-import org.yeastrc.xlink.dto.PsmDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.PsmDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchScanFilenameDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.utils.XLinkUtils;
 
@@ -50,7 +53,11 @@ public class PopulateAndSavePsmDTO {
 			Map<String, Map<Integer, Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds,
 			int linkTypeNumber, 
 			ReportedPeptideDTO reportedPeptideDTO, 
-			Psm psm ) throws ProxlImporterDataException, Exception {
+			Psm psm,
+
+			Map<String, SearchScanFilenameDTO> scanFilenamesOnPSMsKeyedOnScanFilename
+
+			) throws ProxlImporterDataException, Exception {
 		
 
 		PsmDTO psmDTO = new PsmDTO();
@@ -83,8 +90,35 @@ public class PopulateAndSavePsmDTO {
 
 			psmDTO.setCharge( psm.getPrecursorCharge().intValue() );
 		}
+		
+		if ( psm.getScanNumber() != null ) {
+			
+			psmDTO.setScanNumber( psm.getScanNumber().intValue() );
+		}
+		
+		if ( StringUtils.isNotEmpty( psm.getScanFileName() ) ) {
 
-		if ( mapOfScanFilenamesMapsOfScanNumbersToScanIds != null 
+			
+			SearchScanFilenameDTO searchScanFilenameDTO = scanFilenamesOnPSMsKeyedOnScanFilename.get( psm.getScanFileName() );
+			
+			if ( searchScanFilenameDTO == null ) {
+			
+				searchScanFilenameDTO = new SearchScanFilenameDTO();
+
+				searchScanFilenameDTO.setSearchId( searchId );
+				searchScanFilenameDTO.setFilename( psm.getScanFileName() );
+				
+				DB_Insert_SearchScanFilenameDAO.getInstance().saveToDatabase( searchScanFilenameDTO );
+
+				scanFilenamesOnPSMsKeyedOnScanFilename.put( psm.getScanFileName(), searchScanFilenameDTO );
+			}
+			
+			psmDTO.setSearchScanFilenameId( searchScanFilenameDTO.getId() );
+		}
+		
+
+		if ( psm.getScanNumber() != null
+				&& mapOfScanFilenamesMapsOfScanNumbersToScanIds != null 
 				&& ( ! mapOfScanFilenamesMapsOfScanNumbersToScanIds.isEmpty() ) ) {
 			
 			

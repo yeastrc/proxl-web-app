@@ -20,6 +20,7 @@ import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoff
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DroppedPeptideCount;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchScanFilenameDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic_Lookup__DTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.UnifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO;
@@ -43,7 +44,7 @@ import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
-import org.yeastrc.xlink.dto.PsmDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.PsmDTO;
 import org.yeastrc.xlink.dto.PsmFilterableAnnotationGenericLookupDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
@@ -156,6 +157,12 @@ public class ProcessReportedPeptidesAndPSMs {
 			throw new ProxlImporterInteralException(msg);
 		}
 		
+		
+
+		Map<String, SearchScanFilenameDTO> scanFilenamesOnPSMsKeyedOnScanFilename = new HashMap<>();
+		
+
+		
 		//////////////
 
 
@@ -184,7 +191,8 @@ public class ProcessReportedPeptidesAndPSMs {
 							filterableReportedPeptideAnnotationTypesOnId,
 							filterablePsmAnnotationTypesOnId,
 							mapOfScanFilenamesMapsOfScanNumbersToScanIds,
-							uniqueDynamicModMassesForTheSearch );
+							uniqueDynamicModMassesForTheSearch,
+							scanFilenamesOnPSMsKeyedOnScanFilename );
 				}
 				
 				insertUniqueDynamicModMassesForTheSearch( uniqueDynamicModMassesForTheSearch, searchId );
@@ -238,7 +246,9 @@ public class ProcessReportedPeptidesAndPSMs {
 			Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnId,
 			Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId,
 			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds,
-			Set<Double> uniqueDynamicModMassesForTheSearch
+			Set<Double> uniqueDynamicModMassesForTheSearch,
+
+			Map<String, SearchScanFilenameDTO> scanFilenamesOnPSMsKeyedOnScanFilename
 			
 			) throws Exception {
 		
@@ -444,7 +454,8 @@ public class ProcessReportedPeptidesAndPSMs {
 						reportedPeptideDTO, 
 						dropPeptidePSMCutoffValues, 
 						searchProgramEntryMap,
-						filterablePsmAnnotationTypesOnId );
+						filterablePsmAnnotationTypesOnId,
+						scanFilenamesOnPSMsKeyedOnScanFilename );
 		
 		
 		saveUnifiedReportedPeptideAndPsmAndReportedPeptideLookupRecords( 
@@ -769,7 +780,12 @@ public class ProcessReportedPeptidesAndPSMs {
 
 			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
-			Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId
+			Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId,
+			
+
+			Map<String, SearchScanFilenameDTO> scanFilenamesOnPSMsKeyedOnScanFilename
+			
+
 			) throws ProxlImporterDataException, Exception {
 
 
@@ -822,7 +838,8 @@ public class ProcessReportedPeptidesAndPSMs {
 							mapOfScanFilenamesMapsOfScanNumbersToScanIds, 
 							linkTypeNumber, 
 							reportedPeptideDTO, 
-							psm );
+							psm,
+							scanFilenamesOnPSMsKeyedOnScanFilename );
 
 
 			List<PsmAnnotationDTO> currentPsm_psmAnnotationDTO_Filterable_List = 

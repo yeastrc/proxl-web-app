@@ -7,18 +7,18 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.proxl.import_xml_to_db.dto.PsmDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchScanFilenameDTO;
 
 /**
- * table psm
+ * table search_scan_filename
  *
  */
-public class DB_Insert_PsmDAO {
+public class DB_Insert_SearchScanFilenameDAO {
 
-	private static final Logger log = Logger.getLogger(DB_Insert_PsmDAO.class);
+	private static final Logger log = Logger.getLogger(DB_Insert_SearchScanFilenameDAO.class);
 
-	private DB_Insert_PsmDAO() { }
-	public static DB_Insert_PsmDAO getInstance() { return new DB_Insert_PsmDAO(); }
+	private DB_Insert_SearchScanFilenameDAO() { }
+	public static DB_Insert_SearchScanFilenameDAO getInstance() { return new DB_Insert_SearchScanFilenameDAO(); }
 
 
 	/**
@@ -26,7 +26,7 @@ public class DB_Insert_PsmDAO {
 	 * @return
 	 * @throws Throwable
 	 */
-	public void saveToDatabase(PsmDTO item ) throws Exception {
+	public void saveToDatabase(SearchScanFilenameDTO item ) throws Exception {
 
 		Connection connection = null;
 
@@ -51,17 +51,16 @@ public class DB_Insert_PsmDAO {
 	
 	private static final String INSERT_SQL =
 			
-			"INSERT INTO psm "
-			+ "( search_id, scan_id, charge, linker_mass, reported_peptide_id,"
-			+ " scan_number, search_scan_filename_id ) "
-			+ "VALUES ( ?, ?, ?, ?, ?, ?, ? )";
+			"INSERT INTO search_scan_filename "
+			+ "( search_id, filename ) "
+			+ "VALUES ( ?, ? )";
 	
 	/**
 	 * @param psm
 	 * @param conn
 	 * @throws Exception
 	 */
-	public void saveToDatabase( PsmDTO psm, Connection conn ) throws Exception {
+	public void saveToDatabase( SearchScanFilenameDTO psm, Connection conn ) throws Exception {
 		
 //		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -82,47 +81,10 @@ public class DB_Insert_PsmDAO {
 			counter++;
 			pstmt.setInt( counter, psm.getSearchId() );
 
-			counter++;
-			
-			if ( psm.getScanId() != null ) {
-				pstmt.setInt( counter, psm.getScanId() );
-			} else {
-				pstmt.setNull( counter, java.sql.Types.INTEGER );
-			}
-			
 
 			counter++;
-			
-			if ( psm.getCharge() != null ) {
-				pstmt.setInt( counter, psm.getCharge() );
-			} else {
-				pstmt.setNull( counter, java.sql.Types.INTEGER );
-			}
+			pstmt.setString( counter, psm.getFilename() );
 
-			counter++;
-			pstmt.setBigDecimal( counter, psm.getLinkerMass() );
-
-			counter++;
-			pstmt.setInt( counter, psm.getReportedPeptideId() );
-			
-
-			counter++;
-			
-			if ( psm.getScanNumber() != null ) {
-				pstmt.setInt( counter, psm.getScanNumber() );
-			} else {
-				pstmt.setNull( counter, java.sql.Types.INTEGER );
-			}
-			
-
-			counter++;
-			
-			if ( psm.getSearchScanFilenameId()!= null ) {
-				pstmt.setInt( counter, psm.getSearchScanFilenameId() );
-			} else {
-				pstmt.setNull( counter, java.sql.Types.INTEGER );
-			}
-			
 			pstmt.executeUpdate();
 			
 			rs = pstmt.getGeneratedKeys();

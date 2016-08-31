@@ -19,7 +19,7 @@ import org.yeastrc.proxl_import.api.xml_dto.Psm;
 import org.yeastrc.xlink.dao.PsmAnnotationDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
-import org.yeastrc.xlink.dto.PsmDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.PsmDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 
 /**
