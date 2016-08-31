@@ -230,7 +230,7 @@ CREATE TABLE  search (
   name VARCHAR(2000) NULL,
   directory_name VARCHAR(255) NULL,
   display_order INT NOT NULL DEFAULT 0,
-  no_scan_data TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  has_scan_data TINYINT UNSIGNED NOT NULL DEFAULT 1,
   marked_for_deletion_auth_user_id INT UNSIGNED NULL,
   marked_for_deletion_timestamp DATETIME NULL,
   PRIMARY KEY (id),
@@ -322,6 +322,8 @@ CREATE TABLE  psm (
   reported_peptide_id INT(10) UNSIGNED NOT NULL,
   charge SMALLINT NULL,
   linker_mass DECIMAL(18,9) NULL,
+  scan_number INT UNSIGNED NULL,
+  search_scan_filename_id INT UNSIGNED NULL,
   PRIMARY KEY (id),
   CONSTRAINT psm_ibfk_1
     FOREIGN KEY (search_id)
@@ -1853,6 +1855,26 @@ ENGINE = InnoDB;
 CREATE INDEX peptide_protein_position_search_id_idx ON peptide_protein_position (search_id ASC);
 
 CREATE INDEX search_id_protein_seq_id ON peptide_protein_position (search_id ASC, protein_sequence_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table search_scan_filename
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS search_scan_filename ;
+
+CREATE TABLE  search_scan_filename (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  search_id INT UNSIGNED NOT NULL,
+  filename VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT search_scan_filename_search_fk
+    FOREIGN KEY (search_id)
+    REFERENCES search (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE UNIQUE INDEX unique_search_id_filename ON search_scan_filename (search_id ASC, filename ASC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
