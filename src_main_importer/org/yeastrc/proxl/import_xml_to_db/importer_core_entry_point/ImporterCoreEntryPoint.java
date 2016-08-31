@@ -32,6 +32,7 @@ import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateScanFilenames
 import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput;
 import org.yeastrc.proxl.import_xml_to_db.project_importable_validation.IsImportingAllowForProject;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
+import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
 
 
 
@@ -414,11 +415,13 @@ public class ImporterCoreEntryPoint {
 
 			try {
 				
-				SearchDAO.getInstance().updateInsertComplete( searchDTOInserted.getId(), true /* insertComplete */ );
+				SearchDAO.getInstance().updateStatus( searchDTOInserted.getId(), SearchRecordStatus.IMPORT_COMPLETE_VIEW );
 			}  catch ( Exception e ) {
 		    	
 
-				String msg = "Failed to mark the Search as InsertComplete, search id: " + searchDTOInserted.getId() ;
+				String msg = "Failed to mark the Search as ImportComplete, search id: " + searchDTOInserted.getId() ;
+				
+				log.error( msg );
 
 				System.err.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 				System.err.println( msg );
@@ -483,6 +486,23 @@ public class ImporterCoreEntryPoint {
 						System.err.println( "----");
 						System.err.println( "----------------------------------------");
 
+
+						try {
+							
+							SearchDAO.getInstance().updateStatus( search.getId(), SearchRecordStatus.IMPORT_FAIL );
+						}  catch ( Exception eUpd ) {
+					    	
+
+							String msgeUpd = "Failed to mark the Search as ImportComplete, search id: " + search.getId() ;
+							
+							log.error( msgeUpd, eUpd );
+
+							System.err.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+							System.err.println( msgeUpd );
+							System.err.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+					    }
+						
 					}
 
 				}

@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
+import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
 
 /**
  * table search
@@ -147,12 +148,12 @@ public class SearchDAO {
 	
 
 	/**
-	 * Update the project_id associated with this search
+	 * Update the status_id associated with this search
 	 * @param searchId
 	 * @param insertComplete
 	 * @throws Exception
 	 */
-	public void updateInsertComplete( int searchId, boolean insertComplete ) throws Exception {
+	public void updateStatus( int searchId, SearchRecordStatus status ) throws Exception {
 		
 		
 		Connection dbConnection = null;
@@ -161,7 +162,7 @@ public class SearchDAO {
 			
 			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
-			updateInsertComplete( searchId, insertComplete, dbConnection );
+			updateStatus( searchId, status, dbConnection );
 			
 		} finally {
 			
@@ -177,29 +178,24 @@ public class SearchDAO {
 
 	
 	/**
-	 * Update the project_id associated with this search
+	 * Update the status_id associated with this search
 	 * @param searchId
 	 * @param newProjectId
 	 * @throws Exception
 	 */
-	public void updateInsertComplete( int searchId, boolean insertComplete, Connection dbConnection ) throws Exception {
+	public void updateStatus( int searchId, SearchRecordStatus status, Connection dbConnection ) throws Exception {
 		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		String sql = "UPDATE search SET insert_complete = ? WHERE id = ?";
+		String sql = "UPDATE search SET status_id = ?, import_end_timestamp = NOW() WHERE id = ?";
 
 		try {
 			
 			
 			pstmt = dbConnection.prepareStatement( sql );
-			
 
-			if ( insertComplete ) {
-				pstmt.setInt( 1, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
-			} else {
-				pstmt.setInt( 1, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
-			}
+			pstmt.setInt( 1, status.value() );
 			
 			pstmt.setInt( 2, searchId );
 			
