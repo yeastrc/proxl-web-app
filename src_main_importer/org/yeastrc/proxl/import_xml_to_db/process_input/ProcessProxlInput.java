@@ -109,8 +109,9 @@ public class ProcessProxlInput {
 			}
 			
 			if ( scanFileFileContainerList == null || scanFileFileContainerList.isEmpty() ) {
-
-				searchDTO.setNoScanData( true );
+				searchDTO.setHasScanData( false );
+			} else {
+				searchDTO.setHasScanData( true );
 			}
 			
 			SearchDAO.getInstance().saveToDatabase( searchDTO );

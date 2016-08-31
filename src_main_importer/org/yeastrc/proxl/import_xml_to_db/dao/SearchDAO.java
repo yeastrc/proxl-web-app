@@ -54,8 +54,9 @@ public class SearchDAO {
 		
 	private static final String INSERT_SQL =
 			"INSERT INTO search "
-			+ " (path, directory_name, fasta_filename, name, project_id, insert_complete, no_scan_data) "
-			+ " VALUES (?, ?, ?, ?, ?, ?, ?)";
+			+ " (path, directory_name, fasta_filename, name, project_id, has_scan_data, status_id ) "
+			+ " VALUES (?, ?, ?, ?, ?, ?, " +  SearchRecordStatus.IMPORTING.value()
+			+ " )";
 			
 	
 	/**
@@ -95,14 +96,7 @@ public class SearchDAO {
 			pstmt.setInt( counter, item.getProjectId() );
 			
 			counter++;
-			if ( item.isInsertComplete() ) {
-				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
-			} else {
-				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
-			}
-			
-			counter++;
-			if ( item.isNoScanData() ) {
+			if ( item.isHasScanData() ) {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
 			} else {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
