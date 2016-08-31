@@ -212,12 +212,13 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	public void setDisplayOrder(int displayOrder) {
 		this.displayOrder = displayOrder;
 	}
-	public boolean isNoScanData() {
-		return noScanData;
+	public boolean isHasScanData() {
+		return hasScanData;
 	}
-	public void setNoScanData(boolean noScanData) {
-		this.noScanData = noScanData;
+	public void setHasScanData(boolean hasScanData) {
+		this.hasScanData = hasScanData;
 	}
+
 
 
 
@@ -229,7 +230,9 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	private int projectId;
 	private String directoryName;
 	private int displayOrder;
-	private boolean noScanData;
+	private boolean hasScanData;
+
+
 
 
 

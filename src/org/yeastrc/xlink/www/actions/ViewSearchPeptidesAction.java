@@ -823,7 +823,7 @@ public class ViewSearchPeptidesAction extends Action {
 			/////////////////////////////////
 			
 			
-			if ( ! search.isNoScanData() ) {
+			if ( search.isHasScanData() ) {
 			
 				viewSearchPeptidesPageDataRoot.setShowNumberUniquePSMs( true );
 			}

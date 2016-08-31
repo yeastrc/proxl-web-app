@@ -225,7 +225,7 @@ public class SearchPeptideLooplink {
 			}
 			
 			
-			if ( this.search.isNoScanData() ) {
+			if ( ! this.search.isHasScanData() ) {
 				
 				numUniquePsms = null;
 				

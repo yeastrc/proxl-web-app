@@ -1833,7 +1833,7 @@
 											<tr>
 												<td>QC Plots:</td>
 												<td>
-													<c:if test="${ not search.noScanData }" >
+													<c:if test="${ search.hasScanData }" >
 														[<a href="javascript:" data-tooltip="View scan counts as function of retention time" class="tool_tip_attached_jq qc_plot_scan_retention_time_link_jq" >Retention Time</a>]
 													</c:if>
 												

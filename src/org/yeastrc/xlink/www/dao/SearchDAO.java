@@ -76,7 +76,7 @@ public class SearchDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		String sql = "SELECT path, directory_name, load_time, fasta_filename, name, project_id, display_order, no_scan_data FROM search WHERE id = ?";
+		String sql = "SELECT path, directory_name, load_time, fasta_filename, name, project_id, display_order, has_scan_data FROM search WHERE id = ?";
 
 
 		try {
@@ -99,12 +99,12 @@ public class SearchDAO {
 				search.setName( rs.getString( "name" ) );
 				search.setProjectId( rs.getInt( "project_id" ) );
 				
-				int noScanDataInt = rs.getInt( "no_scan_data" );
+				int hasScanDataInt = rs.getInt( "has_scan_data" );
 				
-				if ( Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE == noScanDataInt ) {
-					search.setNoScanData( false );
+				if ( Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE == hasScanDataInt ) {
+					search.setHasScanData( false );
 				} else {
-					search.setNoScanData( true );
+					search.setHasScanData( true );
 				}
 				
 				

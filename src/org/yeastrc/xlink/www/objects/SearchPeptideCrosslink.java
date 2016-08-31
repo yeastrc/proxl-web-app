@@ -357,7 +357,7 @@ public class SearchPeptideCrosslink {
 				return numUniquePsms;
 			}
 			
-			if ( this.search.isNoScanData() ) {
+			if ( ! this.search.isHasScanData() ) {
 				
 				numUniquePsms = null;
 				
