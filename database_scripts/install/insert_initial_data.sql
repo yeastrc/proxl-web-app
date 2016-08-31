@@ -29,6 +29,20 @@ INSERT INTO xl_user_access_level_label_description (xl_user_access_level_numeric
 	VALUES ( 9999, 'no access', 'at project level, no access to that project, at application wide level, no access to any project' );
 
 	
+	
+
+
+--  Search table status values (in field status_id)	
+
+	--  These values must be kept in sync with the values in the Java class SearchRecordStatus
+	
+INSERT INTO search_record_status_lookup (id, display_text) VALUES ( 1, 'importing' );
+INSERT INTO search_record_status_lookup (id, display_text) VALUES ( 2, 'import complete/view' );
+INSERT INTO search_record_status_lookup (id, display_text) VALUES ( 3, 'import fail' );
+INSERT INTO search_record_status_lookup (id, display_text) VALUES ( 4, 'import canceled/incomplete' );
+INSERT INTO search_record_status_lookup (id, display_text) VALUES ( 5, 'marked for deletion' );
+
+
 --  Import via web app lookup values	
 
 	--  These values must be kept in sync with the values in the Java class ProxlXMLFileImportFileType

@@ -181,8 +181,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_bin;
 
-CREATE UNIQUE INDEX nrseq_id ON pdb_alignment (pdb_file_id ASC, chain_id ASC);
-
 CREATE INDEX pdb_file_id ON pdb_alignment (pdb_file_id ASC, chain_id ASC);
 
 CREATE UNIQUE INDEX unique_prot_seq_id_chain_id_pdb_file_id ON pdb_alignment (protein_sequence_id ASC, chain_id ASC, pdb_file_id ASC);
@@ -205,30 +203,59 @@ CREATE INDEX sequence ON peptide (sequence(20) ASC);
 
 
 -- -----------------------------------------------------
+-- Table search_record_status_lookup
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS search_record_status_lookup ;
+
+CREATE TABLE  search_record_status_lookup (
+  id TINYINT UNSIGNED NOT NULL,
+  display_text VARCHAR(100) NOT NULL,
+  PRIMARY KEY (id))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table search
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS search ;
 
 CREATE TABLE  search (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT UNSIGNED NOT NULL,
+  status_id TINYINT UNSIGNED NOT NULL DEFAULT 1,
   path VARCHAR(2000) NULL,
   fasta_filename VARCHAR(2000) NOT NULL,
   load_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  import_end_timestamp TIMESTAMP NULL,
   name VARCHAR(2000) NULL,
-  project_id INT UNSIGNED NOT NULL,
-  insert_complete TINYINT UNSIGNED NOT NULL DEFAULT 0,
   directory_name VARCHAR(255) NULL,
   display_order INT NOT NULL DEFAULT 0,
   no_scan_data TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  marked_for_deletion_auth_user_id INT UNSIGNED NULL,
+  marked_for_deletion_timestamp DATETIME NULL,
   PRIMARY KEY (id),
   CONSTRAINT fk_project_id
     FOREIGN KEY (project_id)
     REFERENCES project (id)
     ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT search_status_id_fk
+    FOREIGN KEY (status_id)
+    REFERENCES search_record_status_lookup (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT search__marked_for_deletion_auth_user_id
+    FOREIGN KEY (marked_for_deletion_auth_user_id)
+    REFERENCES auth_user (id)
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 CREATE INDEX fk_project_id_idx ON search (project_id ASC);
+
+CREATE INDEX search_status_id_fk_idx ON search (status_id ASC);
+
+CREATE INDEX search__marked_for_deletion_auth_user_id_idx ON search (marked_for_deletion_auth_user_id ASC);
 
 
 -- -----------------------------------------------------

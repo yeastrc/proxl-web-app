@@ -108,18 +108,20 @@ public class DeleteSearchAction extends Action {
 
 
 
-			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
+//			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 			
-			
+
+			AuthUserDTO authUserDTO = userSessionObject.getUserDBObject().getAuthUser();
+		
 			
 			SearchDTO search = SearchDAO.getInstance().getSearch( searchId );
 
-			SearchDAO.getInstance().deleteSearch( searchId );
+//			SearchDAO.getInstance().deleteSearch( searchId );
+			
+			SearchDAO.getInstance().markAsDeleted( searchId, authUserDTO.getId() );
 			
 			try {
 				
-				AuthUserDTO authUserDTO = userSessionObject.getUserDBObject().getAuthUser();
-			
 				String msg = "Search id " + searchId 
 						+ " successfully deleted by user (username: " +  authUserDTO.getUsername() 
 						+ ", user id: " + authUserDTO.getId() 

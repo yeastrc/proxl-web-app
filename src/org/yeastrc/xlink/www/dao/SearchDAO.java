@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
+import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 
 /**
@@ -21,44 +22,44 @@ public class SearchDAO {
 	private SearchDAO() { }
 	public static SearchDAO getInstance() { return new SearchDAO(); }
 	
-	public void deleteSearch( int id ) throws Exception {
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-
-		String sql = "DELETE FROM search WHERE id = ?";
-
-		try {
-			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			
-			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, id );
-			
-			pstmt.executeUpdate();			
-			
-		} catch ( Exception e ) {
-			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
-			
-			throw e;
-			
-		} finally {
-			
-			// be sure database handles are closed
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-			
-		}
-		
-	}
+//	public void deleteSearch( int id ) throws Exception {
+//		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//
+//		String sql = "DELETE FROM search WHERE id = ?";
+//
+//		try {
+//			
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+//			
+//			pstmt = conn.prepareStatement( sql );
+//			pstmt.setInt( 1, id );
+//			
+//			pstmt.executeUpdate();			
+//			
+//		} catch ( Exception e ) {
+//			
+//			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
+//			
+//			throw e;
+//			
+//		} finally {
+//			
+//			// be sure database handles are closed
+//			if( pstmt != null ) {
+//				try { pstmt.close(); } catch( Throwable t ) { ; }
+//				pstmt = null;
+//			}
+//			
+//			if( conn != null ) {
+//				try { conn.close(); } catch( Throwable t ) { ; }
+//				conn = null;
+//			}
+//			
+//		}
+//		
+//	}
 	
 
 	/**
@@ -75,7 +76,7 @@ public class SearchDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		String sql = "SELECT path, directory_name, load_time, fasta_filename, name, project_id, insert_complete, display_order, no_scan_data FROM search WHERE id = ?";
+		String sql = "SELECT path, directory_name, load_time, fasta_filename, name, project_id, display_order, no_scan_data FROM search WHERE id = ?";
 
 
 		try {
@@ -98,15 +99,6 @@ public class SearchDAO {
 				search.setName( rs.getString( "name" ) );
 				search.setProjectId( rs.getInt( "project_id" ) );
 				
-				int insertCompleteInt = rs.getInt( "insert_complete" );
-				
-				if ( Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE == insertCompleteInt ) {
-					search.setInsertComplete( false );
-				} else {
-					search.setInsertComplete( true );
-				}
-				
-
 				int noScanDataInt = rs.getInt( "no_scan_data" );
 				
 				if ( Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE == noScanDataInt ) {
@@ -338,6 +330,69 @@ public class SearchDAO {
 			if( pstmt != null ) {
 				try { pstmt.close(); } catch( Throwable t ) { ; }
 				pstmt = null;
+			}
+			
+		}
+		
+		
+	}
+	
+
+
+	
+	/**
+	 * Mark search as deleted
+	 * @param searchId
+	 * @param deletionAuthUserId
+	 * @throws Exception
+	 */
+	public void markAsDeleted( int searchId, int deletionAuthUserId ) throws Exception {
+		
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+
+		Connection dbConnection = null;
+
+		String sql = "UPDATE search SET status_id = " + SearchRecordStatus.MARKED_FOR_DELETION.value()
+				+ ", marked_for_deletion_auth_user_id = ?, marked_for_deletion_timestamp = NOW() "
+				+ " WHERE id = ?";
+
+		try {
+
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+
+			
+			pstmt = dbConnection.prepareStatement( sql );
+
+			pstmt.setInt( 1, deletionAuthUserId );
+			
+			pstmt.setInt( 2, searchId );
+			
+			pstmt.executeUpdate();
+			
+		} catch ( Exception e ) {
+			
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
+			
+			throw e;
+			
+		} finally {
+			
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+
+			if( dbConnection != null ) {
+				try { dbConnection.close(); } catch( Throwable t ) { ; }
+				dbConnection = null;
 			}
 			
 		}

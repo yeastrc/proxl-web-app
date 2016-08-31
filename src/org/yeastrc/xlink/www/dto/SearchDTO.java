@@ -194,12 +194,6 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	public void setProjectId(int projectId) {
 		this.projectId = projectId;
 	}
-	public boolean isInsertComplete() {
-		return insertComplete;
-	}
-	public void setInsertComplete(boolean insertComplete) {
-		this.insertComplete = insertComplete;
-	}
 	public String getPath() {
 		return path;
 	}
@@ -233,7 +227,6 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	private String fastaFilename;
 	private String name;
 	private int projectId;
-	private boolean insertComplete;
 	private String directoryName;
 	private int displayOrder;
 	private boolean noScanData;

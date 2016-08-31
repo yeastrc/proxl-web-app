@@ -8,9 +8,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
+import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 
 /**
@@ -51,7 +51,7 @@ public class SearchSearcher {
 
 			+ " INNER JOIN project ON search.project_id = project.id   "
 
-			+ " WHERE project.id = ? AND insert_complete = " + Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE
+			+ " WHERE project.id = ? AND status_id = " + SearchRecordStatus.IMPORT_COMPLETE_VIEW.value()
 
 			+ " ORDER BY search.display_order , search.id DESC";
 
