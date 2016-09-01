@@ -180,8 +180,9 @@ public class DownloadPDBFileAction extends Action {
 
 		} catch ( Exception e ) {
 
-			String msg = "Exception caught: " + e.toString();
-
+			String msg = "Exception:  RemoteAddr: " + request.getRemoteAddr()  
+					+ ", Exception caught: " + e.toString();
+			
 			log.error( msg, e );
 
 			throw e;

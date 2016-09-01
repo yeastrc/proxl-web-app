@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 //import javax.servlet.http.HttpSession;
 
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -203,8 +204,9 @@ public class DownloadSearchFileAction extends Action {
 
 		} catch ( Exception e ) {
 
-			String msg = "Exception caught: " + e.toString();
-
+			String msg = "Exception:  RemoteAddr: " + request.getRemoteAddr()  
+					+ ", Exception caught: " + e.toString();
+			
 			log.error( msg, e );
 
 			throw e;
