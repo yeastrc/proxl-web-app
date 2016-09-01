@@ -123,7 +123,6 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		var initial_scan_id = $clickedElement.attr( "initial_scan_id" );
 		var reported_peptide_id = $clickedElement.attr( "reported_peptide_id" );
 		var search_id = $clickedElement.attr( "search_id" );
-		var project_id = $clickedElement.attr( "project_id" );
 		
 
 		var skip_associated_peptides_link = $clickedElement.attr( "skip_associated_peptides_link" );
@@ -142,9 +141,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		if ( ! search_id ) {
 			search_id = "";
 		}
-		if ( ! project_id ) {
-			project_id = "";
-		}
+
 		
 		
 
@@ -184,7 +181,6 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 
 				reported_peptide_id : reported_peptide_id,
 				search_id : search_id,
-				project_id : project_id,
 				psmPeptideCutoffsForSearchId : psmPeptideCutoffsForSearchId_JSONString
 		};
 		
@@ -239,14 +235,14 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		
 		var show_associated_peptides_link_true = params.otherData.show_associated_peptides_link_true;
 		
-		var initial_scan_id = params.otherData.initial_scan_id;
+		var initial_scan_id_String = params.otherData.initial_scan_id;
 
 
 		var annotationDisplayNameDescriptionList = ajaxResponseData.annotationDisplayNameDescriptionList;
 		
 		var psms = ajaxResponseData.psmWebDisplayList;
 		
-		initial_scan_id = parseInt( initial_scan_id, 10 );
+		var initial_scan_id = parseInt( initial_scan_id_String, 10 );
 		
 		if ( isNaN( initial_scan_id ) ) {
 			
@@ -376,55 +372,64 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 	
 		for ( var psmIndex = 0; psmIndex < psms.length ; psmIndex++ ) {
 	
-			var psm = psms[ psmIndex ];
-	
-			if (  psm.chargeSet ) {
-				
-				psm.chargeDisplay = psm.charge;
-			}
+
+			var html = null;
 			
-			//  Context for creating data row HTML
-						
-			var context = { psm : psm,
-
-					scanDataAnyRows : scanDataAnyRows,
-
-					scanNumberAnyRows : scanNumberAnyRows,
-					scanFilenameAnyRows : scanFilenameAnyRows,
-
-					chargeDataAnyRows : chargeDataAnyRows
-			};
-			
-			
-			//  psm.psmCountForOtherAssocScanId is count of psms with same scan id, excluding current psm
-			
-			if ( psm.psmCountForOtherAssocScanId < 1 ) {
-				
-				context.uniquePSM = true;
-			}
-			
-
-			if ( psm.psmDTO.scanId !== undefined
-					&& psm.psmDTO.scanId !== null
-					&& initial_scan_id !== null 
-					&& psm.psmDTO.scanId === initial_scan_id ) {
-				
-				context.scanIdMatchesInitialScanId = true;
-			}
-
-			context.project_id = ajaxRequestData.project_id;
-			context.search_id = ajaxRequestData.search_id;
-
-			context.reported_peptide_id = ajaxRequestData.reported_peptide_id;
-			
-			context.show_associated_peptides_link_true = show_associated_peptides_link_true;
-
-			var html = _handlebarsTemplate_psm_data_row_entry_template(context);
-
-			if ( ! scanDataAnyRows && ! chargeDataAnyRows && annotationDisplayNameDescriptionList.length === 0 ) {
+			if ( ! scanDataAnyRows && ! chargeDataAnyRows 
+					&& ! scanNumberAnyRows && ! scanFilenameAnyRows 
+					&& annotationDisplayNameDescriptionList.length === 0 ) {
 
 				//  Nothing to display so show contents of this which for now is <tr><td>PSM</td></tr>
 				html = _psm_data_row_entry_no_annotation_data_no_scan_data_row_HTML;
+				
+			} else {
+
+				var psm = psms[ psmIndex ];
+
+				if (  psm.chargeSet ) {
+
+					psm.chargeDisplay = psm.charge;
+				}
+
+				//  Context for creating data row HTML
+
+				var context = { psm : psm,
+
+						scanDataAnyRows : scanDataAnyRows,
+
+						scanNumberAnyRows : scanNumberAnyRows,
+						scanFilenameAnyRows : scanFilenameAnyRows,
+
+						chargeDataAnyRows : chargeDataAnyRows
+				};
+
+
+				//  psm.psmCountForOtherAssocScanId is count of psms with same scan id, excluding current psm
+
+				if ( psm.psmCountForOtherAssocScanId < 1 ) {
+
+					context.uniquePSM = true;
+				}
+
+
+				if ( psm.psmDTO.scanId !== undefined
+						&& psm.psmDTO.scanId !== null
+						&& initial_scan_id !== null 
+						&& psm.psmDTO.scanId === initial_scan_id ) {
+
+					context.scanIdMatchesInitialScanId = true;
+				}
+
+				context.project_id = ajaxRequestData.project_id;
+				context.search_id = ajaxRequestData.search_id;
+
+				context.reported_peptide_id = ajaxRequestData.reported_peptide_id;
+
+				context.show_associated_peptides_link_true = show_associated_peptides_link_true;
+
+
+				html = _handlebarsTemplate_psm_data_row_entry_template(context);
+
 			}
 	
 	//		var $psm_entry = 

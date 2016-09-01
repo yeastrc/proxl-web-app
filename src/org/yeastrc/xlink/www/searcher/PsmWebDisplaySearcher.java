@@ -40,8 +40,7 @@ public class PsmWebDisplaySearcher {
 					
 			+ " FROM psm  "
 			+ " LEFT OUTER JOIN search_scan_filename ON psm.search_scan_filename_id = search_scan_filename.id "
-			+ " LEFT OUTER JOIN scan ON psm.scan_id = scan.id "
-			+ " LEFT OUTER JOIN scan_file ON scan.scan_file_id = scan_file.id ";
+			+ " LEFT OUTER JOIN scan ON psm.scan_id = scan.id ";
 
 	private static final String SQL_WHERE_START =  " WHERE psm.search_id = ? AND psm.reported_peptide_id = ?  ";
 			
