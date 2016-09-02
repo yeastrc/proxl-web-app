@@ -489,11 +489,22 @@ public class ImporterCoreEntryPoint {
 
 						try {
 							
+							//  First commit the last insert transaction if needed
+
+							ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+							
+						}  catch ( Exception eUpd ) {
+					    	
+							//  Just ignore any exception
+					    }
+						
+						try {
+							
 							SearchDAO.getInstance().updateStatus( search.getId(), SearchRecordStatus.IMPORT_FAIL );
 						}  catch ( Exception eUpd ) {
 					    	
 
-							String msgeUpd = "Failed to mark the Search as ImportComplete, search id: " + search.getId() ;
+							String msgeUpd = "Failed to mark the Search as ImportFail, search id: " + search.getId() ;
 							
 							log.error( msgeUpd, eUpd );
 

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProteinImporterContainerDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReportedPeptideDynamicModLookupDAO;
@@ -15,8 +16,10 @@ import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDynamicModLoo
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosLooplinkDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosMonolinkDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
+import org.yeastrc.proxl.import_xml_to_db.objects.MonolinkContainer;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
 import org.yeastrc.proxl.import_xml_to_db.peptide_protein_position.PeptideProteinPositionDTO_SaveToDB_NoDups;
@@ -141,23 +144,26 @@ public class ProcessLinkTypeLooplink {
 		
 		
 		
-		int[] linkedPositions = getLooplinkLinkedPositions( peptide, "1", reportedPeptide );
+		int[] peptideLinkedPositions = getLooplinkLinkedPositions( peptide, "1", reportedPeptide );
 
-		int linkedPosition_1 = linkedPositions[ 0 ];
-		int linkedPosition_2 = linkedPositions[ 1 ];
+		int peptideLinkedPosition_1 = peptideLinkedPositions[ 0 ];
+		int peptideLinkedPosition_2 = peptideLinkedPositions[ 1 ];
 
 		//  Order linked positions so smaller one is first
 		
-		if ( linkedPosition_1 > linkedPosition_2  ) {
+		if ( peptideLinkedPosition_1 > peptideLinkedPosition_2  ) {
 			
-			int linkedPosition_temp = linkedPosition_2;
-			linkedPosition_2 = linkedPosition_1;
-			linkedPosition_1 = linkedPosition_temp;
+			int linkedPosition_temp = peptideLinkedPosition_2;
+			peptideLinkedPosition_2 = peptideLinkedPosition_1;
+			peptideLinkedPosition_1 = linkedPosition_temp;
 		}
 		
 		
 		
 		PeptideDTO peptideDTO = perPeptideData.getPeptideDTO();
+		
+		Set<Integer> peptideMonolinkPositions = 
+				GetPeptideMonolinkPositions.getInstance().getPeptideMonolinkPositions( peptide );
 		
 		
 		//  Create partial SrchRepPeptPeptideDTO peptide level record
@@ -165,8 +171,8 @@ public class ProcessLinkTypeLooplink {
 		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO = new SrchRepPeptPeptideDTO();
 		
 		srchRepPeptPeptideDTO.setPeptideId( peptideDTO.getId() );
-		srchRepPeptPeptideDTO.setPeptidePosition_1( linkedPosition_1 );
-		srchRepPeptPeptideDTO.setPeptidePosition_2( linkedPosition_2 );
+		srchRepPeptPeptideDTO.setPeptidePosition_1( peptideLinkedPosition_1 );
+		srchRepPeptPeptideDTO.setPeptidePosition_2( peptideLinkedPosition_2 );
 		
 		
 		perPeptideData.setSrchRepPeptPeptideDTO( srchRepPeptPeptideDTO );
@@ -178,22 +184,51 @@ public class ProcessLinkTypeLooplink {
 		Map<ProteinImporterContainer, Collection<List<Integer>>> proteinMap = 
 
 				GetLinkableProteinsAndPositions.getInstance()
-				.getLinkableProteinsAndPositionsForLooplink( 
+				.getLooplinkLinkableProteinsAndPositionsForLooplink( 
+						reportedPeptide,
+						peptide,
 						peptideDTO.getSequence(), 
-						linkedPosition_1, 
-						linkedPosition_2 , 
+						peptideLinkedPosition_1, 
+						peptideLinkedPosition_2,
+						peptideMonolinkPositions,
 						linkerList, 
 						proteinMatches_Peptide );
 		
 			
 		if( proteinMap.size() < 1 ) {
-			String msg = "Could not map this peptide and link positions to any protein in the Proxl XML file for " + peptideDTO.getSequence() 
-					+ " at positions " + linkedPosition_1 + "," + linkedPosition_2 
-					+ ".  reportedPeptide sequence: " + reportedPeptide.getReportedPeptideString();
+			
+			String msg = null;
+			
+			if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
+
+				msg = "Could not map this peptide and link position and monolink positions to any protein in the Proxl XML file for peptide " 
+					+ peptide.getSequence()
+					+ " at looplink positions: " + peptideLinkedPosition_1 + "," + peptideLinkedPosition_2 
+					+ ", monolink position(s): " + StringUtils.join( peptideMonolinkPositions, ", " )
+					+ " for "
+					 + " linker(s).  reportedPeptide sequence: " + reportedPeptide.getReportedPeptideString();
+				
+			} else {
+
+				msg = "Could not map this peptide and link position to any protein in the Proxl XML file for " 
+					+ peptide.getSequence()
+					+ " at looplink positions: " + peptideLinkedPosition_1 + "," + peptideLinkedPosition_2 
+					+ " for "
+					 + " linker(s).  reportedPeptide sequence: " + reportedPeptide.getReportedPeptideString();
+			}
 			log.error( "getLooplinks(...): " + msg );
 			
 			throw new ProxlImporterDataException( msg );
 		}
+		
+		
+
+		///  Data in perPeptideData for Monolinks
+		
+		List<MonolinkContainer> monolinkContainerList = new ArrayList<>();
+		perPeptideData.setMonolinkContainerList( monolinkContainerList );
+
+		List<Integer> peptideMonolinkPositionList = perPeptideData.getMonolinkPositionList();
 		
 		
 		
@@ -212,12 +247,15 @@ public class ProcessLinkTypeLooplink {
 					throw new ProxlImporterInteralException(msg);
 				}
 				
+				int proteinPositions_1 = proteinPositions_1_2.get( 0 );
+				int proteinPositions_2 = proteinPositions_1_2.get( 1 );
+				
 				// a single looplink entry
 				SrchRepPeptProtSeqIdPosLooplinkDTO srchRepPeptProtSeqIdPosLooplinkDTO = new SrchRepPeptProtSeqIdPosLooplinkDTO();
 
 				
-				srchRepPeptProtSeqIdPosLooplinkDTO.setProteinSequencePosition_1( proteinPositions_1_2.get( 0 ) );
-				srchRepPeptProtSeqIdPosLooplinkDTO.setProteinSequencePosition_2( proteinPositions_1_2.get( 1 ) );
+				srchRepPeptProtSeqIdPosLooplinkDTO.setProteinSequencePosition_1( proteinPositions_1 );
+				srchRepPeptProtSeqIdPosLooplinkDTO.setProteinSequencePosition_2( proteinPositions_2 );
 				
 				SrchRepPeptProtSeqIdPosLooplinkDTO_ProteinImporterContainer_Pair srchRepPeptProtSeqIdPosLooplinkDTO_ProteinImporterContainer_Pair = new SrchRepPeptProtSeqIdPosLooplinkDTO_ProteinImporterContainer_Pair();
 				
@@ -226,6 +264,31 @@ public class ProcessLinkTypeLooplink {
 				
 				srchRepPeptProtSeqIdPosLooplinkDTO_ProteinImporterContainer_PairList.add( srchRepPeptProtSeqIdPosLooplinkDTO_ProteinImporterContainer_Pair );
 
+				
+
+				//  Process the monolink positions
+
+				for ( Integer peptideMonolinkPosition : peptideMonolinkPositionList ) {
+
+					//  Convert peptide monolink position to protein position
+					
+					int proteinMonolinkPosition = proteinPositions_1 - peptideLinkedPosition_1 + peptideMonolinkPosition; 
+					
+					SrchRepPeptProtSeqIdPosMonolinkDTO srchRepPeptProtSeqIdPosMonolinkDTO = new SrchRepPeptProtSeqIdPosMonolinkDTO();
+
+					srchRepPeptProtSeqIdPosMonolinkDTO.setPeptidePosition( peptideMonolinkPosition );
+
+					srchRepPeptProtSeqIdPosMonolinkDTO.setProteinSequencePosition( proteinMonolinkPosition );
+					
+					MonolinkContainer monolinkContainer = new MonolinkContainer();
+					
+					monolinkContainer.setProteinImporterContainer( proteinImporterContainer );
+					monolinkContainer.setSrchRepPeptProtSeqIdPosMonolinkDTO( srchRepPeptProtSeqIdPosMonolinkDTO );
+
+					monolinkContainerList.add( monolinkContainer );
+				}
+
+				
 			}  //end looping over protein positions
 		
 		}  //end looping over proteins
@@ -235,13 +298,7 @@ public class ProcessLinkTypeLooplink {
 
 			getLooplinkMappingsResult.noProteinMappings = true; 
 		}
-		
-
-		PopulateSrchRepPeptProtSeqIdPosMonolinkDTOListOnPerPeptideDataObject.getInstance()
-		.populateSrchRepPeptProtSeqIdPosMonolinkDTOListOnPerPeptideDataObject( perPeptideData, linkerList, proteinMatches_Peptide );
-
-		
-		
+				
 		
 		return getLooplinkMappingsResult;
 	

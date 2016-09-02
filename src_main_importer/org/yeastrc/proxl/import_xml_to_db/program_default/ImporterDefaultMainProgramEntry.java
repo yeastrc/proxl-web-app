@@ -1509,7 +1509,7 @@ public class ImporterDefaultMainProgramEntry {
 
 				if ( log.isDebugEnabled() ) {
 
-					log.debug( "COMPLETE:  Main Thread:  Calling DBConnectionFactory.closeAllConnections(); on main thread.");
+					log.debug( "Main Thread:  Call to DBConnectionFactory.closeAllConnections(); on main thread Completed.");
 				}
 
 			} catch ( Exception e ) {

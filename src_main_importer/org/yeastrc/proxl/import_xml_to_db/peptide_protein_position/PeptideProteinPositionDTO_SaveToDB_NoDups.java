@@ -30,7 +30,7 @@ public class PeptideProteinPositionDTO_SaveToDB_NoDups {
 		
 		if ( savedRecords.add(item) ) {
 			
-			DB_Insert_PeptideProteinPositionDAO.getInstance().save(item);
+			DB_Insert_PeptideProteinPositionDAO.getInstance().save( item );
 			
 		}
 	}
