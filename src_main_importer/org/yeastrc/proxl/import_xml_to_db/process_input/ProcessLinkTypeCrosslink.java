@@ -31,7 +31,6 @@ import org.yeastrc.proxl_import.api.xml_dto.Peptides;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
 import org.yeastrc.proxl.import_xml_to_db.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
-import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 import org.yeastrc.xlink.utils.XLinkUtils;
 
@@ -260,7 +259,7 @@ public class ProcessLinkTypeCrosslink {
 			
 			log.error( msg );
 			
-			throw new ProxlBaseDataException( "getCrosslinks(...): " + msg );
+			throw new ProxlImporterDataException( "getCrosslinks(...): " + msg );
 		}
 		
 		///  Data in perPeptideData for Monolinks

@@ -60,6 +60,7 @@ import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImp
 import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportRunSubStatus;
 import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportStatus;
 import org.yeastrc.xlink.db.DBConnectionFactory;
+import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
 
 
 
@@ -1443,39 +1444,28 @@ public class ImporterDefaultMainProgramEntry {
 
 		} catch ( ProxlImporterDataException e) {
 
-			if ( outputDataErrorsFileName != null ) {
-
-				writeDataErrorToFile( e.getMessage(), e, outputDataErrorsFileName );
-			}
-
-			importResults.setImportSuccessStatus( false) ;
+			processImporterDataException(
+					
+					importResults,
+					proxlXMLFileImportTrackingDTO,
+					proxlXMLFileImportTrackingRunDTO, 
+					outputDataErrorsFileName,
+					e );
 			
-			importResults.setProgramExitCode( ImporterProgramExitCodes.PROGRAM_EXIT_CODE_DATA_ERROR );
+			return importResults;
+
+		} catch ( ProxlBaseDataException e) {
+
+			processBaseDataException(
+					
+					importResults,
+					proxlXMLFileImportTrackingDTO,
+					proxlXMLFileImportTrackingRunDTO, 
+					outputDataErrorsFileName,
+					e );
 			
-
-			//  Update records for import submitted by web app
-
-			if ( proxlXMLFileImportTrackingDTO != null && proxlXMLFileImportTrackingRunDTO != null ) {
-				
-				proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
-
-				proxlXMLFileImportTrackingRunDTO.setRunSubStatus( ProxlXMLFileImportRunSubStatus.DATA_ERROR );
-
-				proxlXMLFileImportTrackingRunDTO.setDataErrorText( e.getMessage() );
-				
-				// TODO   Maybe populate this with something else
-				proxlXMLFileImportTrackingRunDTO.setImportResultText( e.getMessage() );
-
-				UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
-				.updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
-						ProxlXMLFileImportStatus.FAILED, 
-						proxlXMLFileImportTrackingDTO.getId(), 
-						proxlXMLFileImportTrackingRunDTO );
-				
-			}
-
-			return importResults;  //  EARLY EXIT
-
+			return importResults;
+			
 		} catch ( Exception e ) {
 
 			if ( ! shutdownReceivedViaShutdownHook ) {
@@ -1552,6 +1542,109 @@ public class ImporterDefaultMainProgramEntry {
 
 		return importResults;
 	}
+
+
+
+	/**
+	 * @param importResults
+	 * @param proxlXMLFileImportTrackingDTO
+	 * @param proxlXMLFileImportTrackingRunDTO
+	 * @param outputDataErrorsFileName
+	 * @param exception
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	private void processImporterDataException(
+			ImportResults importResults,
+			ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO,
+			ProxlXMLFileImportTrackingRunDTO proxlXMLFileImportTrackingRunDTO,
+			String outputDataErrorsFileName, 
+			ProxlImporterDataException exception )
+			throws IOException, Exception {
+		
+		processDataException_call_Importer_or_BaseExceptionProcessing( importResults, proxlXMLFileImportTrackingDTO, proxlXMLFileImportTrackingRunDTO, outputDataErrorsFileName, exception );
+	}
+	
+	/**
+	 * @param importResults
+	 * @param proxlXMLFileImportTrackingDTO
+	 * @param proxlXMLFileImportTrackingRunDTO
+	 * @param outputDataErrorsFileName
+	 * @param exception
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	private void processBaseDataException(
+			ImportResults importResults,
+			ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO,
+			ProxlXMLFileImportTrackingRunDTO proxlXMLFileImportTrackingRunDTO,
+			String outputDataErrorsFileName, 
+			ProxlBaseDataException exception )
+			throws IOException, Exception {
+		
+		processDataException_call_Importer_or_BaseExceptionProcessing( importResults, proxlXMLFileImportTrackingDTO, proxlXMLFileImportTrackingRunDTO, outputDataErrorsFileName, exception );
+	}
+	
+	
+	//  Only call this method by the prev 2 methods
+
+	/**
+	 * @param importResults
+	 * @param proxlXMLFileImportTrackingDTO
+	 * @param proxlXMLFileImportTrackingRunDTO
+	 * @param outputDataErrorsFileName
+	 * @param exception
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	private void processDataException_call_Importer_or_BaseExceptionProcessing(
+			ImportResults importResults,
+			ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO,
+			ProxlXMLFileImportTrackingRunDTO proxlXMLFileImportTrackingRunDTO,
+			String outputDataErrorsFileName, 
+			Exception exception )
+			throws IOException, Exception {
+		
+		if ( ( ! ( exception instanceof ProxlImporterDataException ) )
+				&& ( ! ( exception instanceof ProxlImporterDataException ) ) ) {
+
+			String msg = "exception not ProxlImporterDataException or ProxlImporterDataException";
+			log.error( msg );
+			throw new IllegalArgumentException( msg );
+		}
+		
+		if ( outputDataErrorsFileName != null ) {
+
+			writeDataErrorToFile( exception.getMessage(), exception, outputDataErrorsFileName );
+		}
+
+		importResults.setImportSuccessStatus( false) ;
+		
+		importResults.setProgramExitCode( ImporterProgramExitCodes.PROGRAM_EXIT_CODE_DATA_ERROR );
+		
+
+		//  Update records for import submitted by web app
+
+		if ( proxlXMLFileImportTrackingDTO != null && proxlXMLFileImportTrackingRunDTO != null ) {
+			
+			proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
+
+			proxlXMLFileImportTrackingRunDTO.setRunSubStatus( ProxlXMLFileImportRunSubStatus.DATA_ERROR );
+
+			proxlXMLFileImportTrackingRunDTO.setDataErrorText( exception.getMessage() );
+			
+			// TODO   Maybe populate this with something else
+			proxlXMLFileImportTrackingRunDTO.setImportResultText( exception.getMessage() );
+
+			UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
+			.updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
+					ProxlXMLFileImportStatus.FAILED, 
+					proxlXMLFileImportTrackingDTO.getId(), 
+					proxlXMLFileImportTrackingRunDTO );
+			
+		}
+
+	}
 	
 	
 	/**
@@ -1607,6 +1700,7 @@ public class ImporterDefaultMainProgramEntry {
 		
 		//  exception is maybe:
 		
+		// ProxlBaseDataException 
 		// ProxlImporterDataException 
 		// ProxlImporterProjectNotAllowImportException
 		// ProxlImporterProxlXMLDeserializeFailException
