@@ -4,7 +4,7 @@ Spectrum Viewer
 
 ProXL uses a version of the `Lorikeet spectrum viewer <https://github.com/UWPR/Lorikeet>`_ that has been modified to support crosslinked
 and looplinked spectra. Lorikeet is a pure-HTML and Javascript viewer that requires no 3rd party plugins to use.  (Source code of the customized
-version of Lorikeet may be found `here <https://github.com/yeastrc/proxl-web-app/tree/master/WebRoot/js/lorikeet>`_.)
+version of Lorikeet may be found `here <https://github.com/yeastrc/proxl-web-app/tree/master/proxl_web_app/WebRoot/js/lorikeet>`_.)
 Some knowledge of interpreting tandem mass spectra is assumed in this document.
 
 Overview
