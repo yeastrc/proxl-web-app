@@ -22,3 +22,12 @@ hs_err_pid*
 _build
 #  MySQL Workbench backup files
 *.mwb.bak
+/proxl_submit_import/jar_this_project
+/proxl_submit_import/.classpath
+/proxl_submit_import/.project
+/proxl_submit_import/bin
+/proxl_submit_import/classes
+/proxl_submit_import/deploy
+/proxl_web_app/.settings
+/proxl_web_app/.classpath
+/proxl_web_app/.project

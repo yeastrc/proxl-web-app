@@ -1,0 +1,47 @@
+Usage: java -jar importProxlXML.jar -i import_file.proxl.xml 
+                                    [ --no-scan-files ]  
+                                    [ -s scan_file.mzML ]
+                                    [ -c db_connection.properties ] 
+                                    [-p project_id  ]
+                                    [ --username-password-file=proxl_username_password_file ]
+                                    [ --username=xxx  ]
+                                    [ --password=xxx  ]
+								  	
+
+Examples:
+
+    To import a Proxl XML file (with no scans):
+    java -jar importProxlXML.jar -p 1 -i proxlInput.xml -n -c /path/to/db.properties
+
+    To import a Proxl XML file and related scan file:
+    java -jar importProxlXML.jar -p 1 -i proxlInput.xml -s /path/to/file.mzML -c /path/to/db.properties
+	
+	
+Parameters:
+
+    -c (--config=) : [Required] : The configuration file, with it's relative or absolute path.
+    					***  Not required if config data file embedded in executed JAR file
+    
+
+    -i (--import-file=) : [Required] : The Proxl XML file to import, with it's relative or absolute path.
+	
+    -s (--scan-file=) : [Optional] : The scan file ( mzML or mzXML ), with it's relative or absolute path.
+								  
+                                     -s can be repeated multiple times if multiple scan files will be imported.
+	
+    -n (--no-scan-files) : [Optional] : Must be set if no Scan files are present, the Proxl XML file
+                                        will be imported without any scan files. May not be set if
+                                        -s is used.
+
+    -p  : [Optional] : The id for the ProXL project into which the data are being loaded.
+    					***  If not on command line, will be prompted for it choosing from a list of projects.
+
+   	--username-password-file= : [Optional] : File containing Proxl username and password.
+   				If present, the file is read and the Proxl username and password are used
+
+   	--username= : [Optional] : Proxl username and password. If present, overrides the value in "--username-password-file=" 
+   	--password= : [Optional] : Proxl username and password. If present, overrides the value in "--username-password-file=" 
+   	
+   				If no username or password is on the command line or in the file, 
+   				they will be prompted for when the program is run.
+   				                        
