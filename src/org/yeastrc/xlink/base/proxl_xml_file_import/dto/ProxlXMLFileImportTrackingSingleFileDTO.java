@@ -19,6 +19,9 @@ public class ProxlXMLFileImportTrackingSingleFileDTO {
 	private String filenameInUpload;
 	private String filenameOnDisk;
 	
+	private String filenameOnDiskWithPathSubSameMachine;
+
+	
 	private String sha1Sum;
 	private Long fileSize;
 	
@@ -30,10 +33,11 @@ public class ProxlXMLFileImportTrackingSingleFileDTO {
 				+ proxlXmlFileImportTrackingId + ", fileType=" + fileType
 				+ ", fileUploadStatus=" + fileUploadStatus
 				+ ", filenameInUpload=" + filenameInUpload
-				+ ", filenameOnDisk=" + filenameOnDisk + ", sha1Sum=" + sha1Sum
+				+ ", filenameOnDisk=" + filenameOnDisk
+				+ ", filenameOnDiskWithPathSubSameMachine="
+				+ filenameOnDiskWithPathSubSameMachine + ", sha1Sum=" + sha1Sum
 				+ ", fileSize=" + fileSize + "]";
 	}
-
 
 	
 	public int getId() {
@@ -92,6 +96,19 @@ public class ProxlXMLFileImportTrackingSingleFileDTO {
 
 	public void setFileSize(Long fileSize) {
 		this.fileSize = fileSize;
+	}
+
+
+
+	public String getFilenameOnDiskWithPathSubSameMachine() {
+		return filenameOnDiskWithPathSubSameMachine;
+	}
+
+
+
+	public void setFilenameOnDiskWithPathSubSameMachine(
+			String filenameOnDiskWithPathSubSameMachine) {
+		this.filenameOnDiskWithPathSubSameMachine = filenameOnDiskWithPathSubSameMachine;
 	}
 
 

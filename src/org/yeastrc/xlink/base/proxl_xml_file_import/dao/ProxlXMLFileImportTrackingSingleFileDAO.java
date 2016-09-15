@@ -180,20 +180,10 @@ public class ProxlXMLFileImportTrackingSingleFileDAO {
 		
 		returnItem.setFilenameInUpload( rs.getString( "filename_in_upload" ) );
 		returnItem.setFilenameOnDisk( rs.getString( "filename_on_disk" ) );
+		returnItem.setFilenameOnDiskWithPathSubSameMachine( rs.getString( "filename_on_disk_with_path_sub_same_machine" ) );
 		
 		return returnItem;
 	}
 	
-//	CREATE TABLE IF NOT EXISTS proxl_xml_file_import_tracking_single_file (
-//			  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//			  proxl_xml_file_import_tracking_id INT UNSIGNED NOT NULL,
-//			  file_type_id TINYINT UNSIGNED NOT NULL,
-//			  file_upload_status_id TINYINT UNSIGNED NOT NULL,
-//			  filename_in_upload VARCHAR(500) NOT NULL,
-//			  filename_on_disk VARCHAR(500) NOT NULL,
-//			  sha1_sum VARCHAR(255) NULL,
-//			  file_size INT(20) NULL,
-
-
 
 }
