@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,8 +36,8 @@ import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromP
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderPropertiesFileContentsErrorException;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderPropertiesFileErrorException;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValue;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValue;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.exception.ProxlImporterProjectNotAllowImportException;
 import org.yeastrc.proxl.import_xml_to_db.exception.ProxlImporterProxlXMLDeserializeFailException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
@@ -294,6 +295,11 @@ public class ImporterDefaultMainProgramEntry {
 			CmdLineParser.Option dropPsmCutoffValueOpt = cmdLineParser.addStringOption( 'Z', "drop-psm-cutoff" );
 
 
+			//  'Z' is arbitrary and won't be suggested to user
+			CmdLineParser.Option filenameWithSearchIdToCreateOnSuccessInsertOpt = cmdLineParser.addStringOption( 'Z', "filename-w-srch-id-create-on-success" );
+
+			
+			
 			CmdLineParser.Option verboseOpt = cmdLineParser.addBooleanOption('V', "verbose"); 
 			CmdLineParser.Option debugOpt = cmdLineParser.addBooleanOption('D', "debug"); 
 
@@ -410,6 +416,8 @@ public class ImporterDefaultMainProgramEntry {
 			String proxlDatabaseName = (String)cmdLineParser.getOptionValue( proxlDatabaseNameCommandLineOpt );
 
 			String dbConfigFileName = (String)cmdLineParser.getOptionValue( dbConfigFileNameCommandLineOpt );
+			
+			String filenameWithSearchIdToCreateOnSuccessInsert = (String)cmdLineParser.getOptionValue( filenameWithSearchIdToCreateOnSuccessInsertOpt );
 
 
 			File dbConfigFile = null;
@@ -707,37 +715,78 @@ public class ImporterDefaultMainProgramEntry {
 					throw new ProxlImporterInteralException( msg ); 
 				}
 				
-				
-				String getProxlXMLFilenameOnDiskToImport = proxlXMLFileDBRecord.getFilenameOnDisk();
-				
-				
-				File mainXMLFileToImport = new File( getProxlXMLFilenameOnDiskToImport );
-				
+
 				mainXMLFileToImportContainer = new ProxlXMLFileFileContainer();
 				
-				mainXMLFileToImportContainer.setMainXMLFileToImport( mainXMLFileToImport );
+				File mainXMLFileToImport = null;
+
+				if ( StringUtils.isNotEmpty( proxlXMLFileDBRecord.getFilenameOnDiskWithPathSubSameMachine() ) ) {
+
+					//  Populate Path on Search when submit on same machine
+					
+					skipPopulatingPathOnSearchLineOptChosen = false;
+					
+					String getProxlXMLFilenameOnDiskToImport = proxlXMLFileDBRecord.getFilenameOnDiskWithPathSubSameMachine();
+					mainXMLFileToImport = new File( getProxlXMLFilenameOnDiskToImport );
+
+					mainXMLFileToImportContainer.setMainXMLFileToImport( mainXMLFileToImport );
+
+					importResults.setImportedProxlXMLFile( mainXMLFileToImport );
+
+					if( ! mainXMLFileToImport.exists() ) {
+						
+						//  The User provided the path to this file 
+						//  when the import was submitted, so this is considered a data error
+
+						String msg = "Could not find Proxl XML File To Import: " + mainXMLFileToImport.getCanonicalPath();
+						
+						System.err.println( msg );
+
+						throw new ProxlImporterDataException(msg);
+
+//						importResults.setImportSuccessStatus( false ) ;
+//						
+//						//  TODO	Consider different exit code since the import tracking tables 
+//						//  		are out of sync with the filesystem.
+//						
+//						importResults.setProgramExitCode( ImporterProgramExitCodes.PROGRAM_EXIT_CODE_INVALID_COMMAND_LINE_PARAMETER_VALUES );
+//
+//						return importResults;  //  EARLY EXIT
+					}
+					
+					
+				} else {
+
+					String getProxlXMLFilenameOnDiskToImport = proxlXMLFileDBRecord.getFilenameOnDisk();
+					mainXMLFileToImport = new File( getProxlXMLFilenameOnDiskToImport );
+
+					mainXMLFileToImportContainer.setMainXMLFileToImport( mainXMLFileToImport );
+					
+
+
+					importResults.setImportedProxlXMLFile( mainXMLFileToImport );
+
+					if( ! mainXMLFileToImport.exists() ) {
+
+						System.err.println( "Could not find mainXMLFileToImport File: " + mainXMLFileToImport.getCanonicalPath() );
+
+						System.err.println( "" );
+						System.err.println( FOR_HELP_STRING );
+
+						importResults.setImportSuccessStatus( false ) ;
+						
+						//  TODO	Consider different exit code since the import tracking tables 
+						//  		are out of sync with the filesystem.
+						
+						importResults.setProgramExitCode( ImporterProgramExitCodes.PROGRAM_EXIT_CODE_INVALID_COMMAND_LINE_PARAMETER_VALUES );
+
+						return importResults;  //  EARLY EXIT
+					}
+				}				
+				
 				
 
-				importResults.setImportedProxlXMLFile( mainXMLFileToImport );
-
 				
-
-				if( ! mainXMLFileToImport.exists() ) {
-
-					System.err.println( "Could not find mainXMLFileToImport File: " + mainXMLFileToImport.getAbsolutePath() );
-
-					System.err.println( "" );
-					System.err.println( FOR_HELP_STRING );
-
-					importResults.setImportSuccessStatus( false) ;
-					
-					//  TODO	Consider different exit code since the import tracking tables 
-					//  		are out of sync with the filesystem.
-					
-					importResults.setProgramExitCode( ImporterProgramExitCodes.PROGRAM_EXIT_CODE_INVALID_COMMAND_LINE_PARAMETER_VALUES );
-
-					return importResults;  //  EARLY EXIT
-				}
 				
 				long mainXMLFileToImportFileSize = mainXMLFileToImport.length();
 				
@@ -761,55 +810,103 @@ public class ImporterDefaultMainProgramEntry {
 					
 					for ( ProxlXMLFileImportTrackingSingleFileDTO scanFileDBRecord : scanFilesDBRecords ) {
 
-						String inputScanFileString = scanFileDBRecord.getFilenameOnDisk();
-
-						String errorStringScanSuffixValidation = validateScanFileSuffix( inputScanFileString );
-						
-						if ( errorStringScanSuffixValidation != null ) {
-
+						if ( StringUtils.isNotEmpty( scanFileDBRecord.getFilenameOnDiskWithPathSubSameMachine() ) ) {
 							
-							System.err.println( errorStringScanSuffixValidation );
+							String scanFileString = scanFileDBRecord.getFilenameOnDiskWithPathSubSameMachine();
 
-							System.err.println( "" );
-							System.err.println( FOR_HELP_STRING );
-
-							importResults.setImportSuccessStatus( false) ;
+							File scanFile = new File( scanFileString );
 							
-							importResults.setProgramExitCode( ImporterProgramExitCodes.PROGRAM_EXIT_CODE_INVALID_COMMAND_LINE_PARAMETER_VALUES );
+							String scanFilename = scanFile.getName();
 
-							return importResults;  //  EARLY EXIT
+							String errorStringScanSuffixValidation = validateScanFileSuffix( scanFilename );
+
+							if ( errorStringScanSuffixValidation != null ) {
+
+								System.err.println( errorStringScanSuffixValidation );
+
+								throw new ProxlImporterDataException( errorStringScanSuffixValidation );
+
+							}
+							
+							if( ! scanFile.exists() ) {
+								
+								//  The User provided the path to this file 
+								//  when the import was submitted, so this is considered a data error
+
+								String msg = "Could not find Scan File To Import: " + scanFile.getCanonicalPath();
+								
+								System.err.println( msg );
+
+								throw new ProxlImporterDataException(msg);
+
+//								importResults.setImportSuccessStatus( false ) ;
+//								
+//								importResults.setProgramExitCode( ImporterProgramExitCodes.PROGRAM_EXIT_CODE_INVALID_COMMAND_LINE_PARAMETER_VALUES );
+//
+//								return importResults;  //  EARLY EXIT
+							}
+
+
+							ScanFileFileContainer scanFileFileContainer = new ScanFileFileContainer();
+
+							scanFileFileContainer.setScanFile( scanFile );
+
+							scanFileFileContainer.setScanFileDBRecord( scanFileDBRecord );
+
+							scanFileFileContainerList.add( scanFileFileContainer );
+							
+							
+						} else {
+
+							String inputScanFileString = scanFileDBRecord.getFilenameOnDisk();
+
+							String errorStringScanSuffixValidation = validateScanFileSuffix( inputScanFileString );
+
+							if ( errorStringScanSuffixValidation != null ) {
+
+
+								System.err.println( errorStringScanSuffixValidation );
+
+								System.err.println( "" );
+								System.err.println( FOR_HELP_STRING );
+
+								importResults.setImportSuccessStatus( false) ;
+
+								importResults.setProgramExitCode( ImporterProgramExitCodes.PROGRAM_EXIT_CODE_INVALID_COMMAND_LINE_PARAMETER_VALUES );
+
+								return importResults;  //  EARLY EXIT
+							}
+
+							File scanFile = new File( inputScanFileString );
+
+							if( ! scanFile.exists() ) {
+
+								System.err.println( "Could not find scan file: " + scanFile.getAbsolutePath() );
+
+								System.err.println( "" );
+								System.err.println( FOR_HELP_STRING );
+
+
+								importResults.setImportSuccessStatus( false) ;
+
+								importResults.setProgramExitCode( ImporterProgramExitCodes.PROGRAM_EXIT_CODE_INVALID_COMMAND_LINE_PARAMETER_VALUES );
+
+								//  TODO	Consider different exit code since the import tracking tables 
+								//  		are out of sync with the filesystem.
+
+								return importResults;  //  EARLY EXIT
+							}
+
+
+							ScanFileFileContainer scanFileFileContainer = new ScanFileFileContainer();
+
+							scanFileFileContainer.setScanFile( scanFile );
+
+							scanFileFileContainer.setScanFileDBRecord( scanFileDBRecord );
+
+							scanFileFileContainerList.add( scanFileFileContainer );
 						}
-					
-						File scanFile = new File( inputScanFileString );
-
-						if( ! scanFile.exists() ) {
-
-							System.err.println( "Could not find scan file: " + scanFile.getAbsolutePath() );
-
-							System.err.println( "" );
-							System.err.println( FOR_HELP_STRING );
-
-
-							importResults.setImportSuccessStatus( false) ;
-							
-							importResults.setProgramExitCode( ImporterProgramExitCodes.PROGRAM_EXIT_CODE_INVALID_COMMAND_LINE_PARAMETER_VALUES );
-
-							//  TODO	Consider different exit code since the import tracking tables 
-							//  		are out of sync with the filesystem.
-							
-							return importResults;  //  EARLY EXIT
-						}
-						
-
-						ScanFileFileContainer scanFileFileContainer = new ScanFileFileContainer();
-						
-						scanFileFileContainer.setScanFile( scanFile );
-						
-						scanFileFileContainer.setScanFileDBRecord( scanFileDBRecord );
-
-						scanFileFileContainerList.add( scanFileFileContainer );
-					}
-					
+					}					
 
 					scanFileList = new ArrayList<>( scanFileFileContainerList.size() );
 					
@@ -1027,7 +1124,7 @@ public class ImporterDefaultMainProgramEntry {
 				
 
 				List<DropPeptidePSMCutoffValue> dropPeptideCutoffValueList = new ArrayList<>();
-				dropPeptidePSMCutoffValues.setDropPeptideCutoffValueList( dropPeptideCutoffValueList );
+				dropPeptidePSMCutoffValues.setDropPeptideCutoffValuesCommandLineList( dropPeptideCutoffValueList );
 
 
 				for ( Object dropPeptideCutoffValueStringObject : dropPeptideCutoffValueVector ) {
@@ -1106,7 +1203,7 @@ public class ImporterDefaultMainProgramEntry {
 
 
 				List<DropPeptidePSMCutoffValue> dropPsmCutoffValueList = new ArrayList<>();
-				dropPeptidePSMCutoffValues.setDropPSMCutoffValueList( dropPsmCutoffValueList );
+				dropPeptidePSMCutoffValues.setDropPSMCutoffValuesCommandLineList( dropPsmCutoffValueList );
 
 
 				for ( Object dropPsmCutoffValueStringObject : dropPsmCutoffValueVector ) {
@@ -1192,7 +1289,7 @@ public class ImporterDefaultMainProgramEntry {
 
 
 			System.out.println( "main XML File To Import file: " 
-					+ mainXMLFileToImportContainer.getMainXMLFileToImport().getAbsolutePath() );
+					+ mainXMLFileToImportContainer.getMainXMLFileToImport().getCanonicalPath() );
 
 			if ( scanFileList == null || scanFileList.isEmpty() ) {
 
@@ -1330,6 +1427,37 @@ public class ImporterDefaultMainProgramEntry {
 			System.out.println( "--------------------------------------" );
 
 			System.out.println( " " );
+			
+			
+			if ( StringUtils.isNotEmpty( filenameWithSearchIdToCreateOnSuccessInsert ) ) {
+				
+				try {
+					
+					String filenameWithSearchIdToCreateOnSuccessInsertActual = filenameWithSearchIdToCreateOnSuccessInsert + insertedSearchId;
+					
+					FileWriter writer = null;
+					try {
+						writer = new FileWriter( filenameWithSearchIdToCreateOnSuccessInsertActual );
+						
+						writer.write( "Inserted search id: " + insertedSearchId );
+						
+					} finally {
+						
+						if ( writer != null ) {
+							
+							writer.close();
+						}
+						
+					}
+					
+					
+					
+				} catch ( Throwable t ) {
+					
+					//  just eat it
+				}
+				
+			}
 
 
 			successfulImport = true;

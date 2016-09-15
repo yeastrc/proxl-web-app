@@ -1,5 +1,6 @@
 package org.yeastrc.proxl.import_xml_to_db.proxl_xml_file_import.run_importer_to_importer_file_data;
 
+
 /**
  * 
  *
@@ -14,6 +15,13 @@ public class RunImporterToImporterParameterNamesConstants {
 	 * 
 	 */
 	public static final String RUN_IMPORTER_PARAMS_FILE_PARAM_STRING = "run_importer_params_file";
+
+	
+
+	public static final String RUN_IMPORTER_PARAMS_CREATE_FILE_ON_SUCCESS_STRING = "filename-w-srch-id-create-on-success";
+
+	public static final String RUN_IMPORTER_PARAM_VALUE_CREATE_FILE_ON_SUCCESS_STRING = "inserted_search_id_";
+
 
 
 }

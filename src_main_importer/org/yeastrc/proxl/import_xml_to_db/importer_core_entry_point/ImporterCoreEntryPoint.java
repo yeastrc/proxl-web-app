@@ -18,8 +18,8 @@ import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant;
 import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMPopulateFilterDirection;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMPopulateFromProxlXMLInput;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
 import org.yeastrc.proxl.import_xml_to_db.exception.ProxlImporterProjectNotAllowImportException;
 import org.yeastrc.proxl.import_xml_to_db.exception.ProxlImporterProxlXMLDeserializeFailException;
@@ -375,8 +375,11 @@ public class ImporterCoreEntryPoint {
 			//   Throws ProxlImporterDataException if data error found
 			ValidateScanFilenamesInXMLAreOnCommandLine.getInstance().validateScanFilenamesInXMLAreOnCommandLine( proxlInputForImport, scanFileFileContainerList );
 
+			
+			
+			
 			//   Throws ProxlImporterDataException if data error found
-			DropPeptidePSMPopulateFilterDirection.getInstance().populateFilterDirection( dropPeptidePSMCutoffValues, proxlInputForImport );
+			DropPeptidePSMPopulateFromProxlXMLInput.getInstance().populateFromProxlXMLInput( dropPeptidePSMCutoffValues, proxlInputForImport );
 			
 
 			//  Process proxl Input

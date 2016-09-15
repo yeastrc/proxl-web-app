@@ -1,4 +1,4 @@
-package org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs;
+package org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs;
 
 public class DroppedPeptideCount {
 

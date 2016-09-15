@@ -15,9 +15,9 @@ import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReported
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic_Lookup__DAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptideAndOrPSMForCmdLineCutoffs;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DroppedPeptideCount;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptideAndOrPSMForCutoffs;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DroppedPeptideCount;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchScanFilenameDTO;
@@ -269,7 +269,7 @@ public class ProcessReportedPeptidesAndPSMs {
 		}
 		
 		
-		if ( DropPeptideAndOrPSMForCmdLineCutoffs.getInstance()
+		if ( DropPeptideAndOrPSMForCutoffs.getInstance()
 				.dropPeptideForCmdLineCutoffs( reportedPeptide, dropPeptidePSMCutoffValues ) ) {
 
 			DroppedPeptideCount.incrementDroppedPeptideCount();
@@ -823,7 +823,7 @@ public class ProcessReportedPeptidesAndPSMs {
 
 		for ( Psm psm : psmList ) {
 
-			if ( DropPeptideAndOrPSMForCmdLineCutoffs.getInstance()
+			if ( DropPeptideAndOrPSMForCutoffs.getInstance()
 					.dropPSMForCmdLineCutoffs( psm, dropPeptidePSMCutoffValues ) ) {
 
 				DroppedPeptideCount.incrementDroppedPsmCount();

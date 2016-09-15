@@ -1,5 +1,6 @@
 package org.yeastrc.proxl.import_xml_to_db_runner_pgm.process_import;
 
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -230,6 +231,10 @@ public class ProcessProxlXMLImport {
 		commandAndItsArgumentsAsList.add( 
 				"--" + RunImporterToImporterParameterNamesConstants.RUN_IMPORTER_PARAMS_FILE_PARAM_STRING 
 				+ "=" + runImporterParamsFilename );
+
+		commandAndItsArgumentsAsList.add( 
+				"--" + RunImporterToImporterParameterNamesConstants.RUN_IMPORTER_PARAMS_CREATE_FILE_ON_SUCCESS_STRING
+				+ "=" + RunImporterToImporterParameterNamesConstants.RUN_IMPORTER_PARAM_VALUE_CREATE_FILE_ON_SUCCESS_STRING );
 		
 
 		if ( ImporterRunnerConfigData.getImporterDbConfigWithPath() != null ) {
@@ -237,6 +242,7 @@ public class ProcessProxlXMLImport {
 			commandAndItsArgumentsAsList.add( "-c" );
 			commandAndItsArgumentsAsList.add( ImporterRunnerConfigData.getImporterDbConfigWithPath() );
 		}
+		
 
 
 		String filenameToWriteSysoutTo = 

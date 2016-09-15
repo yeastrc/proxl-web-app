@@ -1,7 +1,6 @@
 package org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.process_scans;
 
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import org.yeastrc.xlink.dto.ScanFileDTO;
 import org.yeastrc.xlink.dto.ScanFileHeaderDTO;
 import org.yeastrc.xlink.dto.ScanRetentionTimeDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ScanFileFileContainer;
 import org.yeastrc.proxl.import_xml_to_db.proxl_xml_file_import.dao.ProxlXMLFileImportTrackingSingleFile_Importer_DAO;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.database_update_with_transaction_services.AddNewScanFileAndHeadersIfNeededDBTransactionService;
@@ -144,7 +144,7 @@ public class Process_MzML_MzXml_File {
 
 				log.error( msg, t );
 
-				throw new Exception( msg, t );
+				throw new ProxlImporterInteralException( msg, t );
 			}
 
 			
@@ -174,6 +174,24 @@ public class Process_MzML_MzXml_File {
 			mapOfScanNumbersToScanIds =
 					processAllScan( scanFileReader, scanNumbersToLoad, scanFileWithPath, scanFileDTO, newScanFileRecord );
 
+			
+		} catch ( ProxlImporterInteralException e ) {
+			
+			throw e;
+			
+		} catch ( Exception e ) {
+			
+
+			String msg = "Error Exception processing mzML or mzXml Scan file: " + scanFileWithPath.getAbsolutePath()
+					+ ",  Throwing Data error since probably error in file format.";
+			log.error( msg, e );
+			
+			String msgForException = "Error processing Scan file: " + scanFileWithPath.getAbsolutePath()
+					+ ".  Please check the file to ensure it contains the correct contents for "
+					+ "a scan file based on the suffix of the file ('mzML' or 'mzXML')";
+			
+			throw new ProxlImporterDataException( msgForException );
+			
 		} finally {
 
 			if ( scanFileReader != null ) {
@@ -495,11 +513,24 @@ public class Process_MzML_MzXml_File {
 			
 			
 
-		} catch (IOException e) {
+//		} catch (IOException e) {
+//
+//			String msg = "Error IOException processing mzML or MzXml Scan file: " + scanFileWithPath.getAbsolutePath();
+//			log.error( msg, e );
+//			throw new ProxlImporterInteralException( msg, e );
+		
+		} catch ( Exception e ) {
 
-			String msg = "Error processing mzML or MzXml file: " + scanFileWithPath.getAbsolutePath();
+			String msg = "Error Exception processing mzML or mzXml Scan file: " + scanFileWithPath.getAbsolutePath()
+					+ ",  Throwing Data error since probably error in file format.";
 			log.error( msg, e );
-			throw new Exception( msg, e );
+			
+			String msgForException = "Error processing Scan file: " + scanFileWithPath.getAbsolutePath()
+					+ ".  Please check the file to ensure it contains the correct contents for "
+					+ "a scan file based on the suffix of the file ('mzML' or 'mzXML')";
+			
+			throw new ProxlImporterDataException( msgForException );
+			
 		}
 		
 

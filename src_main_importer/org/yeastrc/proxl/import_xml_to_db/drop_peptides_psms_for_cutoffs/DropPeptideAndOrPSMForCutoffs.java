@@ -1,7 +1,8 @@
-package org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs;
+package org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
@@ -20,23 +21,24 @@ import org.yeastrc.xlink.enum_classes.FilterDirectionType;
  * 
  *
  */
-public class DropPeptideAndOrPSMForCmdLineCutoffs {
+public class DropPeptideAndOrPSMForCutoffs {
 
-	private static final Logger log = Logger.getLogger(DropPeptideAndOrPSMForCmdLineCutoffs.class);
+	private static final Logger log = Logger.getLogger(DropPeptideAndOrPSMForCutoffs.class);
 
 	//  private constructor
-	private DropPeptideAndOrPSMForCmdLineCutoffs() { }
+	private DropPeptideAndOrPSMForCutoffs() { }
 	
-	public static DropPeptideAndOrPSMForCmdLineCutoffs getInstance() { return new DropPeptideAndOrPSMForCmdLineCutoffs(); }
+	public static DropPeptideAndOrPSMForCutoffs getInstance() { return new DropPeptideAndOrPSMForCutoffs(); }
 	
 	
 	public boolean dropPeptideForCmdLineCutoffs( ReportedPeptide reportedPeptide, DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues  ) throws ProxlImporterInteralException, ProxlImporterDataException {
 		
 		//  first process the peptide level annotations
 		
-		List<DropPeptidePSMCutoffValue> dropPeptideCutoffValueList = dropPeptidePSMCutoffValues.getDropPeptideCutoffValueList();
+		Map<String,Map<String,DropPeptidePSMCutoffValue>> dropPeptideCutoffValueKeyedOnSearchPgmNameAnnName = 
+				dropPeptidePSMCutoffValues.getDropPeptideCutoffValueKeyedOnSearchPgmNameAnnName();
 		
-		if ( dropPeptideCutoffValueList != null && ( ! dropPeptideCutoffValueList.isEmpty() ) ) {
+		if ( dropPeptideCutoffValueKeyedOnSearchPgmNameAnnName != null && ( ! dropPeptideCutoffValueKeyedOnSearchPgmNameAnnName.isEmpty() ) ) {
 
 			ReportedPeptideAnnotations reportedPeptideAnnotations = reportedPeptide.getReportedPeptideAnnotations();
 
@@ -54,11 +56,18 @@ public class DropPeptideAndOrPSMForCmdLineCutoffs {
 
 						for ( FilterableReportedPeptideAnnotation filterableReportedPeptideAnnotation : filterableReportedPeptideAnnotationList ) {
 							
+							String searchProgramName = filterableReportedPeptideAnnotation.getSearchProgram();
+							
 							String annotationName = filterableReportedPeptideAnnotation.getAnnotationName();
 							
-							for ( DropPeptidePSMCutoffValue dropPeptideCutoffValue : dropPeptideCutoffValueList ) {
+							Map<String,DropPeptidePSMCutoffValue> dropPeptideCutoffValueKeyedOnAnnName =
+									dropPeptideCutoffValueKeyedOnSearchPgmNameAnnName.get( searchProgramName );
+							
+							if ( dropPeptideCutoffValueKeyedOnAnnName != null ) {
 								
-								if ( annotationName.equals( dropPeptideCutoffValue.getAnnotationName() ) ) {
+								DropPeptidePSMCutoffValue dropPeptideCutoffValue = dropPeptideCutoffValueKeyedOnAnnName.get( annotationName );
+							
+								if ( dropPeptideCutoffValue != null ) {
 									
 									BigDecimal filterableReportedPeptideAnnotationValue = filterableReportedPeptideAnnotation.getValue();
 									BigDecimal dropPeptideCutoffValueValue = dropPeptideCutoffValue.getCutoffValue();
@@ -149,11 +158,18 @@ public class DropPeptideAndOrPSMForCmdLineCutoffs {
 	
 
 	
+	/**
+	 * @param psm
+	 * @param dropPeptidePSMCutoffValues
+	 * @return
+	 * @throws ProxlImporterInteralException
+	 */
 	public boolean dropPSMForCmdLineCutoffs( Psm psm, DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues  ) throws ProxlImporterInteralException {
 
-		List<DropPeptidePSMCutoffValue> dropPsmCutoffValueList = dropPeptidePSMCutoffValues.getDropPSMCutoffValueList();
-
-		if ( dropPsmCutoffValueList != null && ( ! dropPsmCutoffValueList.isEmpty() ) ) {
+		 Map<String,Map<String,DropPeptidePSMCutoffValue>> dropPSMCutoffValueKeyedOnSearchPgmNameAnnName =
+				 dropPeptidePSMCutoffValues.getDropPSMCutoffValueKeyedOnSearchPgmNameAnnName();
+		 
+		if ( dropPSMCutoffValueKeyedOnSearchPgmNameAnnName != null && ( ! dropPSMCutoffValueKeyedOnSearchPgmNameAnnName.isEmpty() ) ) {
 
 			FilterablePsmAnnotations filterablePsmAnnotations = 
 					psm.getFilterablePsmAnnotations();
@@ -167,12 +183,19 @@ public class DropPeptideAndOrPSMForCmdLineCutoffs {
 
 					for ( FilterablePsmAnnotation filterablePsmAnnotation : filterablePsmAnnotationList ) {
 
+						String searchProgramName = filterablePsmAnnotation.getSearchProgram();
+
 						String annotationName = filterablePsmAnnotation.getAnnotationName();
 
-						for ( DropPeptidePSMCutoffValue dropPsmCutoffValue : dropPsmCutoffValueList ) {
+						Map<String,DropPeptidePSMCutoffValue> dropPSMCutoffValueKeyedOnAnnName =
+								dropPSMCutoffValueKeyedOnSearchPgmNameAnnName.get( searchProgramName );
 
-							if ( annotationName.equals( dropPsmCutoffValue.getAnnotationName() ) ) {
+						if ( dropPSMCutoffValueKeyedOnAnnName != null ) {
 
+							DropPeptidePSMCutoffValue dropPsmCutoffValue = dropPSMCutoffValueKeyedOnAnnName.get( annotationName );
+
+							if ( dropPsmCutoffValue != null ) {
+										
 								BigDecimal filterablePsmAnnotationValue = filterablePsmAnnotation.getValue();
 								BigDecimal dropPsmCutoffValueValue = dropPsmCutoffValue.getCutoffValue();
 

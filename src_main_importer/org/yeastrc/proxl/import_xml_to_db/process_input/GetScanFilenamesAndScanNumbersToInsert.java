@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptideAndOrPSMForCmdLineCutoffs;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cmd_line_cutoffs.DropPeptidePSMCutoffValues;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptideAndOrPSMForCutoffs;
+import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
@@ -66,7 +66,7 @@ public class GetScanFilenamesAndScanNumbersToInsert {
 
 			for ( ReportedPeptide reportedPeptide : reportedPeptideList ) {
 				
-				if ( DropPeptideAndOrPSMForCmdLineCutoffs.getInstance()
+				if ( DropPeptideAndOrPSMForCutoffs.getInstance()
 						.dropPeptideForCmdLineCutoffs( reportedPeptide, dropPeptidePSMCutoffValues ) ) {
 					
 					continue;  // EARLY continue to next record
@@ -78,7 +78,7 @@ public class GetScanFilenamesAndScanNumbersToInsert {
 				
 				for ( Psm psm : psmList ) {
 					
-					if ( DropPeptideAndOrPSMForCmdLineCutoffs.getInstance()
+					if ( DropPeptideAndOrPSMForCutoffs.getInstance()
 							.dropPSMForCmdLineCutoffs( psm, dropPeptidePSMCutoffValues ) ) {
 						
 						continue;  // EARLY continue to next record
