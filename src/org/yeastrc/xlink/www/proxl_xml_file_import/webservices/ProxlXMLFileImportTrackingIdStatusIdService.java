@@ -20,7 +20,6 @@ import org.yeastrc.xlink.www.proxl_xml_file_import.objects.ProxlXMLFileTrackingI
 import org.yeastrc.xlink.www.proxl_xml_file_import.searchers.ProxlXMLFileImportTracking_All_Searcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import org.yeastrc.xlink.www.webservices.ProjectListForCurrentUserService;
 
 
 @Path("/proxl_xml_file_import")
@@ -28,7 +27,7 @@ public class ProxlXMLFileImportTrackingIdStatusIdService {
 
 	
 
-	private static final Logger log = Logger.getLogger(ProjectListForCurrentUserService.class);
+	private static final Logger log = Logger.getLogger(ProxlXMLFileImportTrackingIdStatusIdService.class);
 
 
 	@GET

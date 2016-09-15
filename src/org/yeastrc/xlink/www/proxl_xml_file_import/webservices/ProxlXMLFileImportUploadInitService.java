@@ -2,6 +2,7 @@ package org.yeastrc.xlink.www.proxl_xml_file_import.webservices;
 
 
 import java.io.File;
+import java.io.FileWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -22,13 +23,13 @@ import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappFileUploadFileSystemException;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.proxl_xml_file_import.constants.ProxlXMLFileUploadSubmitterPgmSameMachineConstants;
 import org.yeastrc.xlink.www.proxl_xml_file_import.constants.ProxlXMLFileUploadWebConstants;
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.IsProxlXMLFileImportFullyConfigured;
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.Proxl_XML_Importer_Work_Directory_And_SubDirs_Web;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import org.yeastrc.xlink.www.webservices.ProjectListForCurrentUserService;
 
 
 
@@ -41,9 +42,9 @@ import org.yeastrc.xlink.www.webservices.ProjectListForCurrentUserService;
 @Path("/proxl_xml_file_import")
 public class ProxlXMLFileImportUploadInitService {
 
+	private static final Logger log = Logger.getLogger(ProxlXMLFileImportUploadInitService.class);
 	
-
-	private static final Logger log = Logger.getLogger(ProjectListForCurrentUserService.class);
+	private static final String SUBMITTER_SAME_MACHINE_TRUE = Boolean.TRUE.toString();
 
 
 	@POST
@@ -52,8 +53,10 @@ public class ProxlXMLFileImportUploadInitService {
 	@Path("/uploadInit")
 	public UploadInitResponse  uploadInit( 
 			@FormParam( "project_id" ) Integer projectId,
+			@FormParam( "submitter_same_machine" ) String submitterSameMachineString,
 			@Context HttpServletRequest request ) throws Exception {
 
+		boolean submitterSameMachine = false;
 
 		try {
 
@@ -81,6 +84,11 @@ public class ProxlXMLFileImportUploadInitService {
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
+			}
+			
+			if ( SUBMITTER_SAME_MACHINE_TRUE.equals( submitterSameMachineString ) ) {
+				
+				submitterSameMachine = true;
 			}
 			
 
@@ -270,6 +278,79 @@ public class ProxlXMLFileImportUploadInitService {
 			String uploadKeyString = Long.toString( uploadKey );
 			
 			
+			
+			if ( submitterSameMachine ) {
+				
+				//  A program running on the same machine is submitting:
+				
+				//   Pass it the upload directory
+				//   Pass it the filename that will contain the key required when 
+				//        the submitter passes full filename paths to the files to process.
+				
+				
+				//  Generate a random string
+				
+
+				StringBuilder submitterKeySB = new StringBuilder( 200 );
+				
+				for ( int i = 0; i < 15; i++ ) {
+
+					double submitterKeyMultiplier = Math.random();
+
+					if ( submitterKeyMultiplier < 0.5 ) {
+
+						submitterKeyMultiplier += 0.5;
+					}
+
+
+					long submitterKeyLong = (long) ( System.currentTimeMillis() * submitterKeyMultiplier );
+
+					submitterKeySB.append( Long.toHexString( submitterKeyLong ) );
+				}
+				
+				String submitterKey = submitterKeySB.toString();
+				
+				
+				//   Write the string to the file
+
+				File submitterKeyFile = new File( 
+						createdSubDir, 
+						ProxlXMLFileUploadSubmitterPgmSameMachineConstants.SUBMITTER_KEY_FILENAME );
+				
+				FileWriter fileWriter = null;
+				
+				try {
+					
+					fileWriter = new FileWriter( submitterKeyFile );
+					
+					fileWriter.write( submitterKey );
+					
+				} catch ( Exception e ) {
+					
+				} finally {
+					
+					try {
+						if ( fileWriter != null ) {
+
+							fileWriter.close();
+						}
+					} catch ( Exception e ) {
+						
+						
+					}
+				}
+				
+				//  Update the response with the subdirectory name 
+
+				uploadInitResponse.uploadTempSubdir = createdSubDir.getName();
+				
+			}
+
+			
+			
+			
+			
+			
 			uploadInitResponse.statusSuccess = true;
 			
 			uploadInitResponse.uploadKey = uploadKeyString;
@@ -321,7 +402,11 @@ public class ProxlXMLFileImportUploadInitService {
 
 		private boolean projectLocked; 
 		
-
+		//  Added for processing submit from same machine
+		
+		private String uploadTempSubdir;
+		
+		
 		public String getUploadKey() {
 			return uploadKey;
 		}
@@ -345,5 +430,16 @@ public class ProxlXMLFileImportUploadInitService {
 		public void setProjectLocked(boolean projectLocked) {
 			this.projectLocked = projectLocked;
 		}
+
+		public String getUploadTempSubdir() {
+			return uploadTempSubdir;
+		}
+
+		public void setUploadTempSubdir(String uploadTempSubdir) {
+			this.uploadTempSubdir = uploadTempSubdir;
+		}
+
+
+
 	}
 }

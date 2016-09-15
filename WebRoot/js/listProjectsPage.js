@@ -51,6 +51,8 @@ var getProjectList = function() {
 };
 
 var getProjectListResponse = function(requestData, responseData) {
+	
+	var projectList = responseData.projectList;
 
 	var $project_list = $("#project_list");
 	
@@ -63,7 +65,7 @@ var getProjectListResponse = function(requestData, responseData) {
 	$project_separator_row_jq_List.remove();
 	
 
-	if (responseData && responseData.length > 0) {
+	if (projectList && projectList.length > 0) {
 		
 		var source = $("#project_template tbody").html();
 
@@ -77,9 +79,9 @@ var getProjectListResponse = function(requestData, responseData) {
 		var template = Handlebars.compile(source);
 		
 		
-		for (var index = 0; index < responseData.length; index++) {
+		for (var index = 0; index < projectList.length; index++) {
 
-			var responseDataItem = responseData[index];
+			var responseDataItem = projectList[index];
 
 			var context = responseDataItem;
 

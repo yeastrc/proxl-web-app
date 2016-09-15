@@ -20,7 +20,6 @@ import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.objects.ProjectWithUserAccessLevel;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -36,7 +35,7 @@ public class ProjectListForCurrentUserService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/listForCurrentUser")
-	public List<ProjectWithUserAccessLevel>  listProjects( 
+	public ProjectListForCurrentUserServiceResponse listProjects( 
 			@Context HttpServletRequest request ) throws Exception {
 
 		try {
@@ -94,12 +93,12 @@ public class ProjectListForCurrentUserService {
 				
 			}
 			
-			List<ProjectWithUserAccessLevel> results = new ArrayList<ProjectWithUserAccessLevel>( projects.size() );
+			List<ProjectWithUserAccessLevel> projectList = new ArrayList<ProjectWithUserAccessLevel>( projects.size() );
 			
 			for ( ProjectDTO project : projects ) {
 				
 				ProjectWithUserAccessLevel projectWithUserAccessLevel = new ProjectWithUserAccessLevel();
-				results.add( projectWithUserAccessLevel );
+				projectList.add( projectWithUserAccessLevel );
 				
 				projectWithUserAccessLevel.setProject( project );
 				
@@ -113,10 +112,18 @@ public class ProjectListForCurrentUserService {
 					//  Delete access allowed to Project Owner or Admin
 
 					projectWithUserAccessLevel.setCanDelete(true);
+					
+					//  Upload access allowed to Project Owner or Admin
+					
+					projectWithUserAccessLevel.setCanUpload(true);
 				}
 			}
 			
-			return results;
+			ProjectListForCurrentUserServiceResponse projectListForCurrentUserServiceResponse = new ProjectListForCurrentUserServiceResponse();
+			
+			projectListForCurrentUserServiceResponse.projectList = projectList;
+			
+			return projectListForCurrentUserServiceResponse;
 
 		} catch ( WebApplicationException e ) {
 
@@ -133,4 +140,48 @@ public class ProjectListForCurrentUserService {
 
 
 	}
+	
+	public static class ProjectListForCurrentUserServiceResponse {
+		
+		
+		List<ProjectWithUserAccessLevel> projectList;
+
+		public List<ProjectWithUserAccessLevel> getProjectList() {
+			return projectList;
+		}
+
+		public void setProjectList(List<ProjectWithUserAccessLevel> projectList) {
+			this.projectList = projectList;
+		}
+	}
+	
+	
+
+	public static class ProjectWithUserAccessLevel {
+
+		private ProjectDTO project;
+		private boolean canDelete;
+		private boolean canUpload;
+
+
+		public ProjectDTO getProject() {
+			return project;
+		}
+		public void setProject(ProjectDTO project) {
+			this.project = project;
+		}
+		public boolean isCanDelete() {
+			return canDelete;
+		}
+		public void setCanDelete(boolean canDelete) {
+			this.canDelete = canDelete;
+		}
+		public boolean isCanUpload() {
+			return canUpload;
+		}
+		public void setCanUpload(boolean canUpload) {
+			this.canUpload = canUpload;
+		}
+	}
+
 }

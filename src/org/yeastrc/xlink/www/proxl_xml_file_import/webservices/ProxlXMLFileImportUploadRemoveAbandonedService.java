@@ -26,7 +26,6 @@ import org.yeastrc.xlink.www.proxl_xml_file_import.utils.Proxl_XML_Importer_Work
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import org.yeastrc.xlink.www.webservices.ProjectListForCurrentUserService;
 
 
 /**
@@ -38,7 +37,7 @@ public class ProxlXMLFileImportUploadRemoveAbandonedService {
 
 	
 
-	private static final Logger log = Logger.getLogger(ProjectListForCurrentUserService.class);
+	private static final Logger log = Logger.getLogger(ProxlXMLFileImportUploadRemoveAbandonedService.class);
 
 
 	@POST

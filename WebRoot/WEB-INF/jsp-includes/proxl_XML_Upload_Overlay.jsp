@@ -1,4 +1,5 @@
 
+<%@page import="org.yeastrc.xlink.www.proxl_xml_file_import.constants.ProxlXMLFileUploadMaxFileSizeConstants"%>
 <%@page import="org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportFileType"%>
 <%@page import="org.yeastrc.xlink.www.proxl_xml_file_import.constants.ProxlXMLFileUploadWebConstants"%>
 <%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
@@ -14,12 +15,12 @@
 
 </c:if>
   
-<input type="hidden" id="proxl_xml_file_max_file_upload_size" value="<%=ProxlXMLFileUploadWebConstants.get_MAX_PROXL_XML_FILE_UPLOAD_SIZE_AS_STRING()%>">
-<input type="hidden" id="proxl_xml_file_max_file_upload_size_formatted" value="<%=ProxlXMLFileUploadWebConstants.get_MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED()%>">
+<input type="hidden" id="proxl_xml_file_max_file_upload_size" value="<%=ProxlXMLFileUploadMaxFileSizeConstants.get_MAX_PROXL_XML_FILE_UPLOAD_SIZE_AS_STRING()%>">
+<input type="hidden" id="proxl_xml_file_max_file_upload_size_formatted" value="<%=ProxlXMLFileUploadMaxFileSizeConstants.get_MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED()%>">
 
 <c:if test="${ configSystemValues.scanFileImportAllowedViaWebSubmit }" >
-  <input type="hidden" id="proxl_import_scan_file_max_file_upload_size" value="<%=ProxlXMLFileUploadWebConstants.get_MAX_SCAN_FILE_UPLOAD_SIZE_AS_STRING()%>">
-  <input type="hidden" id="proxl_import_scan_file_max_file_upload_size_formatted" value="<%=ProxlXMLFileUploadWebConstants.get_MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED()%>">
+  <input type="hidden" id="proxl_import_scan_file_max_file_upload_size" value="<%=ProxlXMLFileUploadMaxFileSizeConstants.get_MAX_SCAN_FILE_UPLOAD_SIZE_AS_STRING()%>">
+  <input type="hidden" id="proxl_import_scan_file_max_file_upload_size_formatted" value="<%=ProxlXMLFileUploadMaxFileSizeConstants.get_MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED()%>">
 </c:if>
 
 
@@ -92,7 +93,7 @@
 		    		 >+Add Proxl XML File</a>
 		    </div>
 			<div style="font-size: 80%;">
-				(Max filesize: <%=ProxlXMLFileUploadWebConstants.get_MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED()%>)
+				(Max filesize: <%=ProxlXMLFileUploadMaxFileSizeConstants.get_MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED()%>)
 			</div>
 		    		 <%-- Hidden input file element --%>
 			<input type="file"  accept=".xml"
@@ -173,7 +174,7 @@
 			    		 >+Add Scan File</a>
 				</div>
 				<div style="font-size: 80%;">
-						(Max filesize: <%=ProxlXMLFileUploadWebConstants.get_MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED()%>)
+						(Max filesize: <%=ProxlXMLFileUploadMaxFileSizeConstants.get_MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED()%>)
 			    		 
 					<input type="file" accept=".mzML,.mzXML"  
 						id="import_proxl_xml_scan_file_field" style="display: none;"

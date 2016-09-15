@@ -1473,7 +1473,7 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 								$containingBlock : $containingBlock } );
 					
 
-				} else if ( resp.scanFileNotAllowed ) {
+				} else if ( resp.submittedScanFileNotAllowed ) {
 
 					var errorMessage = "Scan files are no longer allowed.  Please refresh the page.";
 

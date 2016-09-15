@@ -1,8 +1,12 @@
 package org.yeastrc.xlink.www.proxl_xml_file_import.webservices;
 
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -39,6 +43,7 @@ import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappFileUploadFileSystemException;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.proxl_xml_file_import.constants.ProxlXMLFileUploadSubmitterPgmSameMachineConstants;
 import org.yeastrc.xlink.www.proxl_xml_file_import.constants.ProxlXMLFileUploadWebConstants;
 import org.yeastrc.xlink.www.proxl_xml_file_import.dao.ProxlXMLFIleImportTrackingFileIdCreatorDAO;
 import org.yeastrc.xlink.www.proxl_xml_file_import.database_insert_with_transaction_services.SaveImportTrackingAndChildrenSingleDBTransaction;
@@ -46,11 +51,11 @@ import org.yeastrc.xlink.www.proxl_xml_file_import.objects.ProxlUploadTempDataFi
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.DeleteDirectoryAndContentsUtil;
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.IsProxlXMLFileImportFullyConfigured;
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.IsScanFileImportAllowedViaWebSubmit;
+import org.yeastrc.xlink.www.proxl_xml_file_import.utils.Minimal_Validate_ProxlXMLFile_AndGetSearchNameIfInFile;
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.Proxl_XML_Importer_Work_Directory_And_SubDirs_Web;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import org.yeastrc.xlink.www.webservices.ProjectListForCurrentUserService;
 
 
 /**
@@ -62,7 +67,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 
 	
 
-	private static final Logger log = Logger.getLogger(ProjectListForCurrentUserService.class);
+	private static final Logger log = Logger.getLogger(ProxlXMLFileImportUploadSubmitService.class);
 
 
 	@POST
@@ -129,6 +134,20 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "Provided uploadKey is invalid";
 
 				log.error( msg );
+
+			    throw new WebApplicationException(
+			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	        .entity( msg )
+			    	        .build()
+			    	        );
+			}
+			
+			if ( uploadSubmitRequest.submitterSameMachine 
+					&& ( StringUtils.isEmpty( uploadSubmitRequest.submitterKey ) ) ) {
+
+				String msg = "submitterKey cannot be empty if submitterSameMachine is true";
+
+				log.warn( msg );
 
 			    throw new WebApplicationException(
 			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -366,6 +385,10 @@ public class ProxlXMLFileImportUploadSubmitService {
 		
 		UploadSubmitResponse uploadSubmitResponse = new UploadSubmitResponse();
 		
+		
+		boolean isScanFileImportAllowed = IsScanFileImportAllowedViaWebSubmit.getInstance().isScanFileImportAllowedViaWebSubmit();
+		
+		
 
 		List<UploadSubmitRequestFileItem> requestFileItemList = uploadSubmitRequest.fileItems;
 
@@ -385,6 +408,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 		//  use filenamesSet to find duplicate filenames
 		Set<String> filenamesSet = new HashSet<>();
 		
+		boolean foundProxlXMLFile = false;
 
 		for ( UploadSubmitRequestFileItem requestFileItem : requestFileItemList ) {
 
@@ -404,6 +428,47 @@ public class ProxlXMLFileImportUploadSubmitService {
 			if ( requestFileItem.fileType == null ) {
 
 				String msg = "requestFileItem.fileType == null";
+
+				log.warn( msg );
+
+			    throw new WebApplicationException(
+			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	        .entity( msg )
+			    	        .build()
+			    	        );
+			}
+
+			if ( requestFileItem.getFileType().intValue() == ProxlXMLFileImportFileType.PROXL_XML_FILE.value() ) {
+				
+				if ( foundProxlXMLFile ) {
+
+					String msg = "More than one Proxl XML file";
+
+					log.warn( msg );
+
+				    throw new WebApplicationException(
+				    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+				    	        .entity( msg )
+				    	        .build()
+				    	        );
+				}
+				
+				foundProxlXMLFile = true;
+				
+			} else if ( requestFileItem.getFileType().intValue() == ProxlXMLFileImportFileType.SCAN_FILE.value() ) {
+
+				if ( ! isScanFileImportAllowed ) {
+					
+					uploadSubmitResponse.statusSuccess = false;
+					
+					uploadSubmitResponse.submittedScanFileNotAllowed = true;
+					
+					return uploadSubmitResponse;  //  EARLY EXIT
+				}
+				
+			} else {
+
+				String msg = "File Type is unknown: " + requestFileItem.getFileType().intValue();
 
 				log.warn( msg );
 
@@ -439,8 +504,312 @@ public class ProxlXMLFileImportUploadSubmitService {
 			    	        .build()
 			    	        );
 			}
+			
+
+		}
+
+		
+		//  Determine search name, starting with search name in Submit request
+
+		String searchName = uploadSubmitRequest.getSearchName();
+
+		if ( StringUtils.isEmpty( searchName ) ) {
+
+			//  No Search name in upload request
+
+			searchName = null; // make null if it is the empty string
+		}
+
+		
+		List<ProxlXMLFileImportTrackingSingleFileDTO> proxlXMLFileImportTrackingSingleFileDTOList = new ArrayList<>( 1 );
+		
+
+		List<ProxlUploadTempDataFileContentsAndAssocData> proxlUploadTempDataFileContentsAndAssocDataList = null;
+		
+		if ( ! uploadSubmitRequest.submitterSameMachine ) {
+		
+			ProcessFilesInTempUploadDirResult processFilesInTempUploadDirResult =
+					processFilesInTempUploadDir(
+							tempSubdir, requestFileItemList);
+
+			proxlUploadTempDataFileContentsAndAssocDataList =
+					processFilesInTempUploadDirResult.proxlUploadTempDataFileContentsAndAssocDataList;
+
+			ProxlXMLFileImportTrackingSingleFileDTO proxlXMLFileImportTrackingSingleFileDTO = null;
+			
+			//  proxlXMLFileImportTrackingSingleFileDTO entry for Uploaded file(s)
+
+			for (  ProxlUploadTempDataFileContentsAndAssocData proxlUploadTempDataFileContentsAndAssocData : proxlUploadTempDataFileContentsAndAssocDataList ) {
+
+				ProxlUploadTempDataFileContents proxlUploadTempDataFileContents = proxlUploadTempDataFileContentsAndAssocData.proxlUploadTempDataFileContents;
+
+				proxlXMLFileImportTrackingSingleFileDTO = new ProxlXMLFileImportTrackingSingleFileDTO();
+				proxlXMLFileImportTrackingSingleFileDTOList.add( proxlXMLFileImportTrackingSingleFileDTO );
+
+				proxlXMLFileImportTrackingSingleFileDTO.setFilenameInUpload( proxlUploadTempDataFileContents.getUploadedFilename() );
+				proxlXMLFileImportTrackingSingleFileDTO.setFilenameOnDisk( proxlUploadTempDataFileContents.getSavedToDiskFilename() );
+				proxlXMLFileImportTrackingSingleFileDTO.setFileType( proxlUploadTempDataFileContents.getFileType() );
+				proxlXMLFileImportTrackingSingleFileDTO.setFileSize( proxlUploadTempDataFileContentsAndAssocData.fileLength );
+				proxlXMLFileImportTrackingSingleFileDTO.setFileUploadStatus( ProxlXMLImportSingleFileUploadStatus.FILE_UPLOAD_COMPLETE );
+				
+
+				if ( proxlUploadTempDataFileContents.getFileType() == ProxlXMLFileImportFileType.PROXL_XML_FILE ) {
+
+					String searchNameFromProxlXMLFile = proxlUploadTempDataFileContents.getSearchNameInProxlXMLFile();
+
+					if ( StringUtils.isEmpty( searchName )
+							&& ( StringUtils.isNotEmpty( searchNameFromProxlXMLFile ) )) {
+
+						//  No Search name in upload request AND Search name in Proxl XML file
+
+						searchName = searchNameFromProxlXMLFile;
+					}
+				}
+			}
+			
+		} else {
+			
+			 //  uploadSubmitRequest.submitterSameMachine true
+
+			// validate submitterKey
+
+			boolean isValid = validateSubmitterKeyForSubmitSameMachine( uploadSubmitRequest.submitterKey, tempSubdir );
+
+			if ( ! isValid ) {
+
+				//  Submitter Key is not valid so remove the tmp upload subdir, making the upload key unusable
+				
+				//   This will remove the submitter key file, making the submitter key unusable
+				
+				DeleteDirectoryAndContentsUtil.getInstance().deleteDirectoryAndContents( tempSubdir );
+
+				String msg = "Submitter Key Not Valid";
+
+				log.warn( msg );
+
+			    throw new WebApplicationException(
+			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	        .entity( msg )
+			    	        .build()
+			    	        );
+			}
+			
+			
+			//  Validate that submitted files exist and add to proxlXMLFileImportTrackingSingleFileDTOList
+			
+			List<UploadSubmitRequestFileItem> fileItemList = uploadSubmitRequest.fileItems;
+
+			for ( UploadSubmitRequestFileItem fileItem : fileItemList ) {
+
+				ProxlXMLFileImportFileType proxlXMLFileImportFileType = null;
+
+				try {
+
+					proxlXMLFileImportFileType = ProxlXMLFileImportFileType.fromValue( fileItem.fileType );
+				} catch ( Exception e ) {
+
+					String msg = "File Type is unknown: " + fileItem.fileType;
+					log.warn( msg );
+					throw new WebApplicationException(
+							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+							.entity( msg )
+							.build()
+							);
+				}
+
+				File fileItemFile = new File( fileItem.filenameOnDiskWithPathSubSameMachine );
+
+				if ( ! fileItemFile.exists() ) {
+
+					String msg = "File not found: " + fileItemFile.getCanonicalPath();
+					log.warn( msg );
+					throw new WebApplicationException(
+							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+							.entity( msg )
+							.build()
+							);
+				}
+
+				long fileSize = fileItemFile.length();
+				
+
+				if ( proxlXMLFileImportFileType == ProxlXMLFileImportFileType.PROXL_XML_FILE ) {
+
+					//  Do minimal validation of Proxl XML file and get search name if in the file
+					
+					String searchNameFromProxlXMLFile =
+							Minimal_Validate_ProxlXMLFile_AndGetSearchNameIfInFile.getInstance()
+							.minimal_Validate_ProxlXMLFile_AndGetSearchNameIfInFile( fileItemFile );
+
+					if ( StringUtils.isEmpty( searchName )
+							&& ( StringUtils.isNotEmpty( searchNameFromProxlXMLFile ) )) {
+
+						//  Search name in Proxl XML file
+
+						searchName = searchNameFromProxlXMLFile;
+					}
+				}
+				
+
+				ProxlXMLFileImportTrackingSingleFileDTO proxlXMLFileImportTrackingSingleFileDTO = new ProxlXMLFileImportTrackingSingleFileDTO();
+
+				proxlXMLFileImportTrackingSingleFileDTOList.add( proxlXMLFileImportTrackingSingleFileDTO );
+
+				proxlXMLFileImportTrackingSingleFileDTO.setFilenameInUpload( fileItemFile.getName() );
+				proxlXMLFileImportTrackingSingleFileDTO.setFilenameOnDisk( fileItemFile.getName() );
+
+				proxlXMLFileImportTrackingSingleFileDTO.setFilenameOnDiskWithPathSubSameMachine( fileItem.filenameOnDiskWithPathSubSameMachine );
+
+				proxlXMLFileImportTrackingSingleFileDTO.setFileType( proxlXMLFileImportFileType );
+				proxlXMLFileImportTrackingSingleFileDTO.setFileSize( fileSize );
+				proxlXMLFileImportTrackingSingleFileDTO.setFileUploadStatus( ProxlXMLImportSingleFileUploadStatus.FILE_UPLOAD_COMPLETE );
+			}
+		}
+
+		//  Get the File object for the Base Subdir used to store the files in this request 
+		
+		File importFilesBaseDir = new File( importer_Work_Directory, ProxlXMLFileUploadCommonConstants.IMPORT_BASE_DIR );
+		
+		if ( ! importFilesBaseDir.exists() ) {
+			
+//				boolean mkdirResult = 
+			importFilesBaseDir.mkdir();
 		}
 		
+		if ( ! importFilesBaseDir.exists() ) {
+			
+			String msg = "importFilesBaseDir does not exist after testing for it and attempting to create it.  importFilesBaseDir: " 
+					+ importFilesBaseDir.getAbsolutePath();
+			log.error( msg );
+			
+			throw new ProxlWebappFileUploadFileSystemException(msg);
+		}
+		
+		
+		
+		int importTrackingId = ProxlXMLFIleImportTrackingFileIdCreatorDAO.getInstance().getNextId();
+		
+		String dirNameForImportTrackingId =
+				Proxl_XML_ImporterWrkDirAndSbDrsCmmn.getInstance().getDirForImportTrackingId( importTrackingId );
+		
+		File dirForImportTrackingId  =  new File( importFilesBaseDir , dirNameForImportTrackingId );
+		
+		if ( dirForImportTrackingId.exists() ) {
+			
+			String msg = "dirForImportTrackingId already exists: " + dirForImportTrackingId.getAbsolutePath();
+			log.error( msg );
+			throw new Exception(msg);
+		}
+		
+		if ( ! dirForImportTrackingId.mkdir() ) {
+			
+			String msg = "Failed to make dirForImportTrackingId: " + dirForImportTrackingId.getAbsolutePath();
+			log.error( msg );
+			throw new Exception(msg);
+		}
+		
+		
+		if ( uploadSubmitRequest.submitterSameMachine ) {
+
+			//  submitterSameMachine  true so create file with list of file names with paths to be imported
+			
+			File importFileListFile = 
+					new File( dirForImportTrackingId, ProxlXMLFileUploadWebConstants.IMPORT_FILE_LIST_FILE );
+			
+			BufferedWriter writer = null;
+			
+			try {
+
+				writer = new BufferedWriter( new FileWriter( importFileListFile ) );
+				
+				writer.write( "List of files to be imported" );
+				
+				writer.newLine();
+				
+				for ( ProxlXMLFileImportTrackingSingleFileDTO item : proxlXMLFileImportTrackingSingleFileDTOList ) {
+					
+					writer.write( item.getFilenameOnDiskWithPathSubSameMachine() );
+					writer.newLine();
+				}
+				
+			} finally {
+				if ( writer != null ) {
+					writer.close();
+				}
+			}
+		}
+
+		if ( ! uploadSubmitRequest.submitterSameMachine ) {
+			
+			//  Files were uploaded so move from temp dir to import dir (import dir name based on tracking id) 
+		
+			moveUploadedFilesToWorkDirectory(
+					tempSubdir,
+					proxlUploadTempDataFileContentsAndAssocDataList,
+					dirForImportTrackingId );
+		}
+		
+		//  Remove the subdir the uploaded file(s) were in
+		
+		DeleteDirectoryAndContentsUtil.getInstance().deleteDirectoryAndContents( tempSubdir );
+		
+		
+		
+		ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO = new ProxlXMLFileImportTrackingDTO();
+		
+		proxlXMLFileImportTrackingDTO.setId( importTrackingId );
+
+		proxlXMLFileImportTrackingDTO.setStatus( ProxlXMLFileImportStatus.QUEUED );
+		
+		proxlXMLFileImportTrackingDTO.setPriority( ProxlXMLFileUploadCommonConstants.PRIORITY_STANDARD );
+		
+		proxlXMLFileImportTrackingDTO.setProjectId( projectId );
+		proxlXMLFileImportTrackingDTO.setAuthUserId( authUserId );
+		
+		proxlXMLFileImportTrackingDTO.setSearchName( searchName );
+		
+		
+		proxlXMLFileImportTrackingDTO.setInsertRequestURL( requestURL );
+		
+		
+		proxlXMLFileImportTrackingDTO.setRemoteUserIpAddress( remoteUserIpAddress );
+		
+		
+
+		SaveImportTrackingAndChildrenSingleDBTransaction.getInstance()
+		.saveImportTrackingAndChildrenInSingleDBTransaction( proxlXMLFileImportTrackingDTO, proxlXMLFileImportTrackingSingleFileDTOList );
+
+
+		if ( uploadSubmitRequest.submitterSameMachine ) {
+			
+			//  submitterSameMachine true, return the subdir name for import
+		
+			uploadSubmitResponse.importerSubDir = dirNameForImportTrackingId;
+		}
+		
+		
+		uploadSubmitResponse.statusSuccess = true;
+		
+		return uploadSubmitResponse;
+	}
+	
+
+	/**
+	 * @param tempSubdir
+	 * @param requestFileItemList
+	 * @return
+	 * @throws JAXBException
+	 * @throws ProxlWebappFileUploadFileSystemException
+	 * @throws IOException
+	 */
+	private ProcessFilesInTempUploadDirResult processFilesInTempUploadDir(
+			File tempSubdir, 
+			List<UploadSubmitRequestFileItem> requestFileItemList )
+	
+			throws JAXBException, ProxlWebappFileUploadFileSystemException, IOException {
+		
+		
+		ProcessFilesInTempUploadDirResult processFilesInTempUploadDirResult = new ProcessFilesInTempUploadDirResult();
 		
 		//  Process files from tempSubdir, matching to request
 		
@@ -453,17 +822,6 @@ public class ProxlXMLFileImportUploadSubmitService {
 		List<ProxlUploadTempDataFileContentsAndAssocData> proxlUploadTempDataFileContentsAndAssocDataList = new ArrayList<>( proxlUploadTempDataFileContentsAndAssocData_OnDisk_List.size() );
 
 		for ( UploadSubmitRequestFileItem requestFileItem : requestFileItemList ) {
-			
-
-			if ( requestFileItem.getFileType().intValue() == ProxlXMLFileImportFileType.SCAN_FILE.value() 
-					&& ( ! IsScanFileImportAllowedViaWebSubmit.getInstance().isScanFileImportAllowedViaWebSubmit() ) ) {
-				
-				uploadSubmitResponse.setStatusSuccess(false);
-
-				uploadSubmitResponse.scanFileNotAllowed = true;
-				
-				return uploadSubmitResponse;  //  EARLY EXIT
-			}
 			
 			ProxlUploadTempDataFileContentsAndAssocData proxlUploadTempDataFileContentsAndAssocDataForRequestFileItem = null;
 			
@@ -482,7 +840,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 								+ ", file type: " + requestFileItem.getFileType().intValue()
 								+ ", uploaded filename: " + requestFileItem.getUploadedFilename();
 						log.error( msg );
-						throw new ProxlWebappFileUploadFileSystemException(msg);
+						throw new ProxlWebappFileUploadFileSystemException( msg );
 					}
 					
 					proxlUploadTempDataFileContentsAndAssocDataForRequestFileItem = proxlUploadTempDataFileContentsAndAssocData;
@@ -542,74 +900,26 @@ public class ProxlXMLFileImportUploadSubmitService {
 		    	        );
 		}
 		
+		processFilesInTempUploadDirResult.proxlUploadTempDataFileContentsAndAssocDataList = proxlUploadTempDataFileContentsAndAssocData_OnDisk_List;
 		
+		return processFilesInTempUploadDirResult;
+	}
 
-		//  Get the File object for the Base Subdir used to store the files in this request 
-		
-		File importFilesBaseDir = new File( importer_Work_Directory, ProxlXMLFileUploadCommonConstants.IMPORT_BASE_DIR );
-		
-		if ( ! importFilesBaseDir.exists() ) {
-			
-//				boolean mkdirResult = 
-			importFilesBaseDir.mkdir();
-		}
-		
-		if ( ! importFilesBaseDir.exists() ) {
-			
-			String msg = "importFilesBaseDir does not exist after testing for it and attempting to create it.  importFilesBaseDir: " 
-					+ importFilesBaseDir.getAbsolutePath();
-			log.error( msg );
-			
-			throw new ProxlWebappFileUploadFileSystemException(msg);
-		}
-		
-		
-		
-		int importTrackingId = ProxlXMLFIleImportTrackingFileIdCreatorDAO.getInstance().getNextId();
-		
-		String dirNameForImportTrackingId =
-				Proxl_XML_ImporterWrkDirAndSbDrsCmmn.getInstance().getDirForImportTrackingId( importTrackingId );
-		
-		File dirForImportTrackingId  =  new File( importFilesBaseDir , dirNameForImportTrackingId );
-		
-		if ( dirForImportTrackingId.exists() ) {
-			
-			String msg = "dirForImportTrackingId already exists: " + dirForImportTrackingId.getAbsolutePath();
-			log.error( msg );
-			throw new Exception(msg);
-		}
-		
-		if ( ! dirForImportTrackingId.mkdir() ) {
-			
-			String msg = "Failed to make dirForImportTrackingId: " + dirForImportTrackingId.getAbsolutePath();
-			log.error( msg );
-			throw new Exception(msg);
-		}
-		
-		
-		
-		
-		String searchName = uploadSubmitRequest.getSearchName();
-		
-		if ( StringUtils.isEmpty( searchName ) ) {
-			
-			//  No Search name in upload request
-		
-			searchName = null; // make null if it is the empty string
+	
+	
 
-			//  Get Search name from Proxl XML file if it is set
-
-			for (  ProxlUploadTempDataFileContentsAndAssocData proxlUploadTempDataFileContentsAndAssocData : proxlUploadTempDataFileContentsAndAssocDataList ) {
-
-				ProxlUploadTempDataFileContents proxlUploadTempDataFileContents = proxlUploadTempDataFileContentsAndAssocData.proxlUploadTempDataFileContents;
-				
-				if ( proxlUploadTempDataFileContents.getFileType() == ProxlXMLFileImportFileType.PROXL_XML_FILE ) {
-
-					searchName = proxlUploadTempDataFileContents.getSearchNameInProxlXMLFile();
-				}
-			}
-		}
-
+	/**
+	 * @param tempSubdir
+	 * @param proxlUploadTempDataFileContentsAndAssocDataList
+	 * @param dirForImportTrackingId
+	 * @throws ProxlWebappFileUploadFileSystemException
+	 */
+	private void moveUploadedFilesToWorkDirectory(
+			File tempSubdir,
+			List<ProxlUploadTempDataFileContentsAndAssocData> proxlUploadTempDataFileContentsAndAssocDataList,
+			File dirForImportTrackingId)
+			throws ProxlWebappFileUploadFileSystemException {
+		
 		
 		///   move the uploaded file(s) into importer work dir.
 
@@ -634,62 +944,6 @@ public class ProxlXMLFileImportUploadSubmitService {
 				throw new ProxlWebappFileUploadFileSystemException(msg, e);
 			}
 		}
-		
-		//  Remove the subdir the uploaded file(s) were in
-		
-		DeleteDirectoryAndContentsUtil.getInstance().deleteDirectoryAndContents( tempSubdir );
-		
-		
-		
-		ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO = new ProxlXMLFileImportTrackingDTO();
-		
-		proxlXMLFileImportTrackingDTO.setId( importTrackingId );
-
-		proxlXMLFileImportTrackingDTO.setStatus( ProxlXMLFileImportStatus.QUEUED );
-		
-		proxlXMLFileImportTrackingDTO.setPriority( ProxlXMLFileUploadCommonConstants.PRIORITY_STANDARD );
-		
-		proxlXMLFileImportTrackingDTO.setProjectId( projectId );
-		proxlXMLFileImportTrackingDTO.setAuthUserId( authUserId );
-		
-		proxlXMLFileImportTrackingDTO.setSearchName( searchName );
-		
-		
-		proxlXMLFileImportTrackingDTO.setInsertRequestURL( requestURL );
-		
-		
-		proxlXMLFileImportTrackingDTO.setRemoteUserIpAddress( remoteUserIpAddress );
-		
-		
-		
-		List<ProxlXMLFileImportTrackingSingleFileDTO> proxlXMLFileImportTrackingSingleFileDTOList = new ArrayList<>( 1 );
-		
-		ProxlXMLFileImportTrackingSingleFileDTO proxlXMLFileImportTrackingSingleFileDTO = null;
-		
-		//  proxlXMLFileImportTrackingSingleFileDTO entry for Uploaded file(s)
-		
-
-		for (  ProxlUploadTempDataFileContentsAndAssocData proxlUploadTempDataFileContentsAndAssocData : proxlUploadTempDataFileContentsAndAssocDataList ) {
-
-			ProxlUploadTempDataFileContents proxlUploadTempDataFileContents = proxlUploadTempDataFileContentsAndAssocData.proxlUploadTempDataFileContents;
-			
-			proxlXMLFileImportTrackingSingleFileDTO = new ProxlXMLFileImportTrackingSingleFileDTO();
-			proxlXMLFileImportTrackingSingleFileDTOList.add( proxlXMLFileImportTrackingSingleFileDTO );
-
-			proxlXMLFileImportTrackingSingleFileDTO.setFilenameInUpload( proxlUploadTempDataFileContents.getUploadedFilename() );
-			proxlXMLFileImportTrackingSingleFileDTO.setFilenameOnDisk( proxlUploadTempDataFileContents.getSavedToDiskFilename() );
-			proxlXMLFileImportTrackingSingleFileDTO.setFileType( proxlUploadTempDataFileContents.getFileType() );
-			proxlXMLFileImportTrackingSingleFileDTO.setFileSize( proxlUploadTempDataFileContentsAndAssocData.fileLength );
-			proxlXMLFileImportTrackingSingleFileDTO.setFileUploadStatus( ProxlXMLImportSingleFileUploadStatus.FILE_UPLOAD_COMPLETE );
-		}
-		
-		SaveImportTrackingAndChildrenSingleDBTransaction.getInstance()
-		.saveImportTrackingAndChildrenInSingleDBTransaction( proxlXMLFileImportTrackingDTO, proxlXMLFileImportTrackingSingleFileDTOList );
-		
-		
-		uploadSubmitResponse.statusSuccess = true;
-		
-		return uploadSubmitResponse;
 	}
 	
 
@@ -798,6 +1052,79 @@ public class ProxlXMLFileImportUploadSubmitService {
 		return proxlUploadTempDataFileContentsAndAssocDataList;
 	}
 	
+	
+	
+	/**
+	 * @param submitterKey
+	 * @param tempSubdir
+	 * @return - true if valid, false if invalid
+	 * @throws Exception
+	 */
+	private boolean validateSubmitterKeyForSubmitSameMachine( String submitterKey, File tempSubdir ) throws Exception {
+		
+		File submitterKeyFile = new File( 
+				tempSubdir, 
+				ProxlXMLFileUploadSubmitterPgmSameMachineConstants.SUBMITTER_KEY_FILENAME );
+		
+		if ( ! submitterKeyFile.exists() ) {
+
+			String msg = "No Submitter key on server when submitterSameMachine is true.";
+
+			log.warn( msg );
+			
+			return false;
+
+//		    throw new WebApplicationException(
+//		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity( msg )
+//		    	        .build()
+//		    	        );
+		}
+		
+		String submitterKeyFileLine = null;
+		
+		BufferedReader reader = null;
+		
+		try {
+			reader = new BufferedReader( new FileReader(submitterKeyFile));
+			
+			submitterKeyFileLine = reader.readLine();
+			
+		} catch ( Exception e ) {
+			
+			
+			String msg = "Exception reading submitter key in file.";
+			log.error( msg, e );
+			throw e;
+			
+		} finally {
+			
+			if ( reader != null ) {
+				
+				reader.close();
+			}
+		}
+		
+		if ( ! submitterKey.equals( submitterKeyFileLine ) ) {
+
+			String msg = "Submitter key on server does not match submitter key in request.";
+
+			log.warn( msg );
+
+			return false;
+			
+//		    throw new WebApplicationException(
+//		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity( msg )
+//		    	        .build()
+//		    	        );
+		}
+		
+		return true;
+	}
+	
+	
+	
 	/////////////////////////////////
 	
 	/////   Classes for internal holders
@@ -809,6 +1136,14 @@ public class ProxlXMLFileImportUploadSubmitService {
 		long fileLength;
 	
 	}
+	
+
+	private static class ProcessFilesInTempUploadDirResult {
+		
+		List<ProxlUploadTempDataFileContentsAndAssocData> proxlUploadTempDataFileContentsAndAssocDataList;
+		
+	}
+
 	
 	
 	/////////////////////////////////
@@ -823,6 +1158,15 @@ public class ProxlXMLFileImportUploadSubmitService {
 		
 		Integer projectId;
 		String uploadKey;
+		
+		/**
+		 * For submitting on same machine
+		 */
+		boolean submitterSameMachine;
+		/**
+		 * For submitting on same machine
+		 */
+		String submitterKey;
 		
 		String searchName;
 		
@@ -859,6 +1203,22 @@ public class ProxlXMLFileImportUploadSubmitService {
 		public void setFileItems(List<UploadSubmitRequestFileItem> fileItems) {
 			this.fileItems = fileItems;
 		}
+
+		public String getSubmitterKey() {
+			return submitterKey;
+		}
+
+		public void setSubmitterKey(String submitterKey) {
+			this.submitterKey = submitterKey;
+		}
+
+		public boolean isSubmitterSameMachine() {
+			return submitterSameMachine;
+		}
+
+		public void setSubmitterSameMachine(boolean submitterSameMachine) {
+			this.submitterSameMachine = submitterSameMachine;
+		}
 		
 		
 	}
@@ -869,6 +1229,11 @@ public class ProxlXMLFileImportUploadSubmitService {
 		private Integer fileType;
 		private Integer fileIndex;
 		private Boolean isProxlXMLFile;
+		
+		//  Following are only for submitting on same machine
+		
+		private String filenameOnDiskWithPathSubSameMachine;
+		
 		
 		
 		public String getUploadedFilename() {
@@ -895,6 +1260,13 @@ public class ProxlXMLFileImportUploadSubmitService {
 		public void setIsProxlXMLFile(Boolean isProxlXMLFile) {
 			this.isProxlXMLFile = isProxlXMLFile;
 		}
+		public String getFilenameOnDiskWithPathSubSameMachine() {
+			return filenameOnDiskWithPathSubSameMachine;
+		}
+		public void setFilenameOnDiskWithPathSubSameMachine(
+				String filenameOnDiskWithPathSubSameMachine) {
+			this.filenameOnDiskWithPathSubSameMachine = filenameOnDiskWithPathSubSameMachine;
+		}
 	}
 
 	/**
@@ -907,7 +1279,9 @@ public class ProxlXMLFileImportUploadSubmitService {
 
 		private boolean projectLocked;
 		
-		private boolean scanFileNotAllowed;
+		private boolean submittedScanFileNotAllowed;
+		
+		private String importerSubDir;
 
 		public boolean isStatusSuccess() {
 			return statusSuccess;
@@ -925,12 +1299,21 @@ public class ProxlXMLFileImportUploadSubmitService {
 			this.projectLocked = projectLocked;
 		}
 
-		public boolean isScanFileNotAllowed() {
-			return scanFileNotAllowed;
+		public boolean isSubmittedScanFileNotAllowed() {
+			return submittedScanFileNotAllowed;
 		}
 
-		public void setScanFileNotAllowed(boolean scanFileNotAllowed) {
-			this.scanFileNotAllowed = scanFileNotAllowed;
-		} 
+		public void setSubmittedScanFileNotAllowed(boolean submittedScanFileNotAllowed) {
+			this.submittedScanFileNotAllowed = submittedScanFileNotAllowed;
+		}
+
+		public String getImporterSubDir() {
+			return importerSubDir;
+		}
+
+		public void setImporterSubDir(String importerSubDir) {
+			this.importerSubDir = importerSubDir;
+		}
+
 	}
 }

@@ -618,7 +618,8 @@ CREATE TABLE  search_linker (
   CONSTRAINT search_linker_search_id_fk
     FOREIGN KEY (search_id)
     REFERENCES search (id)
-    ON DELETE CASCADE)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
 ENGINE = InnoDB;
 
 CREATE INDEX search_linker_linker_id_fk_idx ON search_linker (linker_id ASC);
@@ -1743,6 +1744,7 @@ CREATE TABLE  proxl_xml_file_import_tracking_single_file (
   filename_on_disk VARCHAR(500) NOT NULL,
   file_size BIGINT(20) UNSIGNED NULL,
   sha1_sum VARCHAR(255) NULL,
+  filename_on_disk_with_path_sub_same_machine VARCHAR(4000) NULL,
   PRIMARY KEY (id),
   CONSTRAINT prxl_xml_fl_imprt_trkng_sngl_fl_id
     FOREIGN KEY (proxl_xml_file_import_tracking_id)

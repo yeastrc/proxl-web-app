@@ -1,13 +1,9 @@
 package org.yeastrc.xlink.www.proxl_xml_file_import.servlets_as_webservices;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -16,13 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -31,7 +20,6 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.proxl_import.xsd_element_attr_names_constants.XSD_ElementAttributeNamesConstants;
 import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportFileType;
 import org.yeastrc.xlink.base.proxl_xml_file_import.utils.Proxl_XML_ImporterWrkDirAndSbDrsCmmn;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -40,9 +28,11 @@ import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappFileUploadFileSystemException;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.proxl_xml_file_import.constants.ProxlXMLFileUploadMaxFileSizeConstants;
 import org.yeastrc.xlink.www.proxl_xml_file_import.constants.ProxlXMLFileUploadWebConstants;
 import org.yeastrc.xlink.www.proxl_xml_file_import.objects.ProxlUploadTempDataFileContents;
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.IsScanFileImportAllowedViaWebSubmit;
+import org.yeastrc.xlink.www.proxl_xml_file_import.utils.Minimal_Validate_ProxlXMLFile_AndGetSearchNameIfInFile;
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.Proxl_XML_Importer_Work_Directory_And_SubDirs_Web;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -293,13 +283,13 @@ public class UploadFileForImportServlet extends HttpServlet {
 
 			if ( fileType == ProxlXMLFileImportFileType.PROXL_XML_FILE ) {
 			
-				maxFileSize = ProxlXMLFileUploadWebConstants.MAX_PROXL_XML_FILE_UPLOAD_SIZE;
-				maxFileSizeFormatted = ProxlXMLFileUploadWebConstants.MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED;
+				maxFileSize = ProxlXMLFileUploadMaxFileSizeConstants.MAX_PROXL_XML_FILE_UPLOAD_SIZE;
+				maxFileSizeFormatted = ProxlXMLFileUploadMaxFileSizeConstants.MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED;
 
 			} else if ( fileType == ProxlXMLFileImportFileType.SCAN_FILE ) {
 				
-				maxFileSize = ProxlXMLFileUploadWebConstants.MAX_SCAN_FILE_UPLOAD_SIZE;
-				maxFileSizeFormatted = ProxlXMLFileUploadWebConstants.MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED;
+				maxFileSize = ProxlXMLFileUploadMaxFileSizeConstants.MAX_SCAN_FILE_UPLOAD_SIZE;
+				maxFileSizeFormatted = ProxlXMLFileUploadMaxFileSizeConstants.MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED;
 				
 			} else {
 
@@ -796,7 +786,9 @@ public class UploadFileForImportServlet extends HttpServlet {
 					
 					//  It will return null if there is no "name" attr on root element
 					
-					searchNameInProxlXMLFile = processUploadedProxlXMLFile_ValidateAndGetNameIfInFile( uploadedFileOnDisk );
+					searchNameInProxlXMLFile = 
+							Minimal_Validate_ProxlXMLFile_AndGetSearchNameIfInFile.getInstance()
+							.minimal_Validate_ProxlXMLFile_AndGetSearchNameIfInFile( uploadedFileOnDisk );
 
 				} catch ( ProxlWebappDataException e ) {
 
@@ -1092,147 +1084,9 @@ public class UploadFileForImportServlet extends HttpServlet {
 	}
 
 
-	/**
-	 * @param uploadedFileOnDisk
-	 * @return
-	 * @throws FileNotFoundException
-	 * @throws FactoryConfigurationError
-	 * @throws XMLStreamException
-	 * @throws IOException
-	 * @throws ProxlWebappDataException 
-	 */
-	private String processUploadedProxlXMLFile_ValidateAndGetNameIfInFile( File uploadedFileOnDisk ) 
-			throws FileNotFoundException,
-			FactoryConfigurationError, XMLStreamException, IOException, ProxlWebappDataException {
-		
-		
-		String searchName = null;
-		
-		InputStream uploadedFileOnDiskInputStream = null;
-		
-		XMLEventReader xmlEventReader = null;
-		
-		try {
-		
-			uploadedFileOnDiskInputStream = new FileInputStream( uploadedFileOnDisk );
-
-			XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-
-			xmlEventReader = xmlInputFactory.createXMLEventReader( uploadedFileOnDiskInputStream );
-
-
-			while ( xmlEventReader.hasNext() ) {
-
-				XMLEvent event = xmlEventReader.nextEvent();
-
-				if (event.isStartElement()) {
-
-					StartElement startElement = event.asStartElement();
-
-					if ( ! startElement.getName().getLocalPart().equals( XSD_ElementAttributeNamesConstants.ROOT_ELEMENT_PROXL_INPUT__NAME ) ) {
-
-						//  The first element found is not the root element in the XSD so this is an error
-
-						throw new ProxlWebappDataException( "Proxl XML root node is not '" 
-								+ XSD_ElementAttributeNamesConstants.ROOT_ELEMENT_PROXL_INPUT__NAME
-								+ "'.");
-					}
-
-					// this is the Proxl XML Root element, process it
-
-					// read the attributes from this tag for the 
-					// attribute to our object
-					@SuppressWarnings("unchecked")
-					Iterator<Attribute> attributes = startElement.getAttributes();
-
-					while (attributes.hasNext()) {
-
-						Attribute attribute = attributes.next();
-
-						String attrName = attribute.getName().getLocalPart();
-
-						String attrValue = attribute.getValue();
-						
-						if ( XSD_ElementAttributeNamesConstants.ATTR__NAME__ON_ROOT_ELEMENT_PROXL_INPUT__NAME.equals(attrName) ) {
-
-							searchName = attrValue;
-						}
-
-					}
-					
-					break;  //  Exit Loop since processed first element
-				}
-
-			}
-			
-		} finally {
-			
-			if ( xmlEventReader != null ) {
-				
-				xmlEventReader.close();
-			}
-			
-			if ( uploadedFileOnDiskInputStream != null ) {
-				
-				uploadedFileOnDiskInputStream.close();
-			}
-			
-		}
-		
-		return searchName;
-	}
 	
 	
-	//  No longer used
-	
-//	/**
-//	 * @param uploadFileTempSubDirForThisRequestFileObj
-//	 */
-//	private void cleanupOnError( File uploadFileTempSubDirForThisRequestFileObj ) {
-//		
-//		deleteDirectoryAndItsContents( uploadFileTempSubDirForThisRequestFileObj );
-//	}
-//	
-//
-//	
-//	
-//	/**
-//	 * @param dir
-//	 */
-//	private void deleteDirectoryAndItsContents( File dir ) {
-//
-//		if ( dir != null && dir.exists() ) {
-//			
-//			//  first delete the contents of the directory
-//			
-//			for ( File dirEntry : dir.listFiles() ) {
-//			
-//				if ( dirEntry.isFile() ) {
-//					
-//					if ( ! dirEntry.delete() ) {
-//						
-//						
-//					}
-//				} else if ( dirEntry.isDirectory() ) {
-//					
-//					//  Recursively delete that directory
-//					
-//					deleteDirectoryAndItsContents( dirEntry );
-//				}
-//			
-//			}
-//			
-//			if ( ! dir.delete() ) {
-//				
-//			}
-//		}
-//		
-//		
-//	}
-		
-	
-	
-	private class FailResponseSentException extends Exception {
+	private static class FailResponseSentException extends Exception {
 
 		private static final long serialVersionUID = 1L;
 		
@@ -1240,7 +1094,7 @@ public class UploadFileForImportServlet extends HttpServlet {
 	}
 	
 	
-	private class JSON_Servlet_Response_Object {
+	private static class JSON_Servlet_Response_Object {
 		
 
 		private boolean statusSuccess;
