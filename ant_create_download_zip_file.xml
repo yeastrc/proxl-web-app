@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="US-ASCII" ?>
+<project name="Proxl_Create_Zip_Download_File" default="create_zip" basedir=".">
+
+	<!--
+
+	  Ant build to to create the zip file to post to Github Release.
+
+	  Run the default target to create the zip file.
+
+	  If ant is installed and on the PATH,
+	  enter on the command line   "ant -f  ant_create_download_zip_file.xml"
+	  in the base directory to create the zip file to post to Google Code in the downloads section.
+
+	  -->
+
+  <target name="create_zip">
+
+	<delete dir="download_zip_file" />
+	<mkdir dir="download_zip_file" />
+
+	<zip destfile="download_zip_file/proxl_deploy.zip" >
+	    <fileset dir="deploy">
+	    </fileset>
+	    <fileset dir="." includes="database_scripts/install/**">
+	    </fileset>
+	</zip>
+
+  </target>
+
+
+
+</project>

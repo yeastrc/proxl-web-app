@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="US-ASCII" ?>
+<project name="Proxl_Root_Build_All_Proxl" default="createInstallables" basedir=".">
+
+	<!--
+
+	  Ant build to build everything for Proxl.
+
+	  Run the default target to build everything.
+
+	  If ant is installed and on the PATH,
+	  enter on the command line   "ant -f  ant__build_all_proxl.xml"
+	  in the base directory to build everything.
+
+	  -->
+
+
+	<!-- init depends on nothing -->
+	<target name="init">
+		<tstamp />
+
+		<!-- name of jar or whatever that is copied to deploy -->
+
+		<!-- Properties -->
+
+		
+	</target>
+
+	<!--   Not in any 'target'  -->
+		
+		<tstamp prefix="build-info">
+			<format property="current-date" pattern="d-MMMM-yyyy" locale="en" />
+			<format property="current-time" pattern="hh:mm:ss a z" locale="en" />
+			<format property="year-month-day" pattern="yyyy-MM-dd" locale="en" />
+		</tstamp>
+		
+
+	<!-- Clean depends on init -->
+	<target name="clean" depends="init">
+		<delete dir="deploy" />
+		<delete dir="generated_jars" />
+		<delete dir="create_installables_work_dir" />
+
+		<ant dir="proxl_base" antfile="ant_build_jar.xml" target="clean" />
+		
+		<ant dir="proxl_importer" antfile="ant__create_runnable_jar_main_importer.xml" target="clean" />
+		<ant dir="proxl_importer" antfile="ant__create_runnable_jar_run_importer.xml" target="clean" />
+		
+		<ant dir="proxl_submit_import" antfile="ant__create_runnable_jar_submit_import.xml" target="clean" />
+		<ant dir="proxl_web_app" antfile="ant_build_webapp_war.xml" target="clean" />
+
+	</target>
+
+
+
+	<!-- Prepare depends on clean -->
+	<target name="prepare" depends="clean">
+		<mkdir dir="deploy" />
+		<mkdir dir="generated_jars" />
+		<mkdir dir="create_installables_work_dir" />
+	</target>
+
+	<!--
+		compileAllSubmodules depends on prepare
+		executes external builds for each sub project
+	 -->
+	<target name="compileAllSubmodules" depends="prepare">
+
+		<ant dir="proxl_base" antfile="ant_build_jar.xml" />
+		
+		<ant dir="proxl_importer" antfile="ant__create_runnable_jar_main_importer.xml" />
+		<ant dir="proxl_importer" antfile="ant__create_runnable_jar_run_importer.xml" />
+		
+		<ant dir="proxl_submit_import" antfile="ant__create_runnable_jar_submit_import.xml" />
+		<ant dir="proxl_web_app" antfile="ant_build_webapp_war.xml" />
+	</target>
+	
+
+	<!--
+		createInstallables depends on compileAllSubmodules
+	-->
+	<target name="createInstallables" depends="compileAllSubmodules">
+
+		<!-- copy files from subdir 'deploy' to deploy -->
+		<copy file="proxl_web_app/deploy/proxl.war" todir="deploy" />
+		<copy file="proxl_importer/deploy/importProxlXML.jar" todir="deploy" />
+		<copy file="proxl_importer/deploy_run_importer/runImportProxlXML.jar" todir="deploy" />
+		<copy file="proxl_submit_import/deploy/submitProxlXMLImport.jar" todir="deploy" />
+		
+	</target>
+	
+</project>
