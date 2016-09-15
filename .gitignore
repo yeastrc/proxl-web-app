@@ -31,3 +31,13 @@ _build
 /proxl_web_app/.settings
 /proxl_web_app/.classpath
 /proxl_web_app/.project
+/proxl_base/classes
+/proxl_base/bin
+/proxl_base/deploy
+/proxl_importer/jar_this_project_main_importer
+/proxl_importer/bin
+/proxl_importer/classes
+/proxl_importer/classes_run_importer
+/proxl_importer/deploy
+/proxl_importer/deploy_run_importer
+/proxl_importer/jar_this_project_run_importer

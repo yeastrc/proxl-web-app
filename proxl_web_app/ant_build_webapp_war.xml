@@ -36,7 +36,7 @@
 	<property name="aa_Ant_Config__dir_name" value="aa_Ant_Config" />
 
 	
-	<property name="path_to__aa_Ant_Config" value="${aa_Ant_Config__dir_name}" />
+	<property name="path_to__aa_Ant_Config" value="../${aa_Ant_Config__dir_name}" />
 
 	
 	<fail message="ERROR: 'aa_Ant_Config' directory not found, check the path. path: ${path_to__aa_Ant_Config}">
