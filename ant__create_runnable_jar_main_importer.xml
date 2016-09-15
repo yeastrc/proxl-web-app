@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="importProxlXML.jar  Create Runnable Jar for Jar-in-Jar Loader">
+
+	<property name="java_target" value="1.7"/>
+	<property name="java_source" value="1.7"/>
+		
+	<property name="java.source.character.set" value="iso-8859-1"/>
+
+	<property name="jar.main.class" value="org.yeastrc.proxl.import_xml_to_db.program_default.ImporterDefaultMainProgramEntry" />
+
+	<property name="output_runnable_jar" value="importProxlXML.jar"/>
+
+
+	<property name="output_jar_this_project_main_importer" value="proxl_import_XML_main.jar"/>
+
+	<property name="jar_this_project_main_importer_dir" value="jar_this_project_main_importer" />
+
+    <property name="deploy" value="deploy" />
+    <property name="config" value="resources" />
+
+	<property name="src_common" value="src_common" />
+	<property name="src_main_importer" value="src_main_importer" />
+	<property name="classes" value="classes" />	
+
+	<available file=".git" type="dir" property="git.present"/>
+	
+	
+    <target name="create_run_jar"  depends="create_jar_this_project_main_importer">
+    	
+		<path id="build.classpath">
+		  <fileset dir="lib">
+		    <include name="**/*.jar" />
+		  </fileset>
+		</path>
+
+		<!-- convert classpath to a flat list/string for use in manifest task -->
+		<pathconvert property="jars.classpath" pathsep=" ">
+		    <path refid="build.classpath" />
+		    <flattenmapper />
+		</pathconvert>
+
+
+		<path id="lib_proxl_jars_dir">
+		  <fileset dir="lib_proxl_jars">
+		    <include name="**/*.jar" />
+		  </fileset>
+		</path>
+
+		<!-- convert classpath to a flat list/string for use in manifest task -->
+		<pathconvert property="lib_proxl_jars_dir.classpath" pathsep=" ">
+		    <path refid="lib_proxl_jars_dir" />
+		    <flattenmapper />
+		</pathconvert>
+
+    	<property name="final.classpath" value="./ ${output_jar_this_project_main_importer} ${jars.classpath} ${lib_proxl_jars_dir.classpath}"/>
+    	
+    	
+		<echo >Classpath for runnable jar ${final.classpath}</echo>
+    	
+    	
+        <jar destfile="deploy/${output_runnable_jar}">
+
+    	
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" 
+                		value="${jar.main.class}"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="${final.classpath}"/>
+
+            	<attribute name="GIT-last-tag-commit-hash" value="${git.last.tag.and.commit.hash}"/>
+            	<attribute name="GIT-commit-hash" value="${git.last.commit.hash}"/>
+    			
+				<attribute name="Date" value="${build-info.current-date}" />
+				<attribute name="Time" value="${build-info.current-time}" />
+
+            </manifest>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <zipfileset dir="${jar_this_project_main_importer_dir}" />
+        	<zipfileset dir="lib" />
+        	<zipfileset dir="lib_proxl_jars" />
+
+        </jar>
+    </target>
+	
+
+
+    <target name="create_jar_this_project_main_importer"  depends="compile,prepare,git.revision">
+    	
+        <jar destfile="${jar_this_project_main_importer_dir}/${output_jar_this_project_main_importer}">
+
+	        <manifest>
+	            <attribute name="Main-Class" value="${jar.main.class}"/>
+
+	        	<attribute name="GIT-last-tag-commit-hash" value="${git.last.tag.and.commit.hash}"/>
+            	<attribute name="GIT-commit-hash" value="${git.last.commit.hash}"/>
+    			
+				<attribute name="Date" value="${build-info.current-date}" />
+				<attribute name="Time" value="${build-info.current-time}" />
+	        </manifest>
+	
+	        <fileset dir="${classes}"/>
+	        <fileset dir="${config}"/>
+       </jar>
+
+    </target>
+	
+	
+
+    <target name="prepare">
+    	<tstamp prefix="build-info">
+			<format property="current-date" pattern="d-MMMM-yyyy" locale="en" />
+			<format property="current-time" pattern="hh:mm:ss a z" locale="en" />
+			<format property="year-month-day" pattern="yyyy-MM-dd" locale="en" />
+		</tstamp>
+
+    </target>
+	
+	
+	<target name="git.revision" 
+			description="Store git revision in ${git.last.tag.and.commit.hash} and ${git.last.commit.hash}" 
+			if="git.present">
+		
+		<exec executable="git" outputproperty="git.last.tag.and.commit.hash.from.cmd" failifexecutionfails="false" errorproperty="">
+			<arg value="describe"/>
+			<arg value="--tags"/>
+			<arg value="--always"/>
+			<arg value="HEAD"/>
+		</exec>
+		
+		<echo message="git.last.tag.and.commit.hash.from.cmd: ${git.last.tag.and.commit.hash.from.cmd}"/>
+		
+		<condition property="git.last.tag.and.commit.hash" value="${git.last.tag.and.commit.hash.from.cmd}" else="unknown">
+			<and>
+				<isset property="git.last.tag.and.commit.hash.from.cmd"/>
+				<length string="${git.last.tag.and.commit.hash.from.cmd}" trim="yes" length="0" when="greater"/>
+			</and>
+		</condition>
+		
+		<echo message="git.last.tag.and.commit.hash: ${git.last.tag.and.commit.hash}"/>
+
+
+		<exec executable="git" outputproperty="git.last.commit.hash.from.cmd" failifexecutionfails="false" errorproperty="">
+			<arg value="describe"/>
+			<arg value="--always"/>
+			<arg value="HEAD"/>
+		</exec>
+				
+
+		<echo message="git.last.commit.hash.from.cmd: ${git.last.commit.hash.from.cmd}"/>
+		
+		<condition property="git.last.commit.hash" value="${git.last.commit.hash.from.cmd}" else="unknown">
+			<and>
+				<isset property="git.last.commit.hash.from.cmd"/>
+				<length string="${git.last.commit.hash.from.cmd}" trim="yes" length="0" when="greater"/>
+			</and>
+		</condition>
+		
+		<echo message="git.last.commit.hash: ${git.last.commit.hash}"/>
+	
+	</target>
+				
+		
+	
+	
+	<!-- ================================================================================== -->
+	<!-- Clean the build directory -->
+	<!-- ================================================================================== -->
+    <target name="clean" description="Prepare for clean build">
+      <delete dir="${classes}"/>
+      <mkdir  dir="${classes}"/>
+      <delete dir="${deploy}" />
+      <mkdir  dir="${deploy}"/>
+    	<delete dir="${jar_this_project_main_importer_dir}"/>
+    	<mkdir  dir="${jar_this_project_main_importer_dir}"/>
+    </target>
+	
+	<!-- ================================================================================== -->
+	<!-- Normal build of application -->
+	<!-- ================================================================================== -->
+    <target name="compile" depends="clean">
+    	
+    	
+    	<!-- <echo message="${toString:compile.classpath}"/> -->
+        <javac includeantruntime="false"  debug="on" srcdir="src_common" destdir="${classes}" source="${java_source}" target="${java_target}"  encoding="${java.source.character.set}" >
+            <classpath refid="compile.classpath"/>
+        </javac>
+    	
+    	<!-- <echo message="${toString:compile.classpath}"/> -->
+        <javac includeantruntime="false"  debug="on" srcdir="src_main_importer" destdir="${classes}" source="${java_source}" target="${java_target}"  encoding="${java.source.character.set}" >
+            <classpath refid="compile.classpath"/>
+        </javac>
+
+	<!--
+  	<copy  todir="${classes}">
+
+	</copy>
+  	-->
+
+  	  	<copy  todir="${classes}">
+  	  		
+  		    <fileset dir="${src_main_importer}">
+  				<exclude name="**/*.java" />
+  		    </fileset>
+  		</copy>
+  		
+    </target>
+	
+	<!-- classpath  -->
+    <path id="compile.classpath">
+    	<fileset dir="lib">
+        	<include name="**/*.jar"/>
+      	</fileset>
+    	<fileset dir="lib_proxl_jars">
+        	<include name="**/*.jar"/>
+      	</fileset>
+    </path>
+			
+</project>
