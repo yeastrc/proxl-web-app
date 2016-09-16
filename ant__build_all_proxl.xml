@@ -40,8 +40,6 @@
 		<delete dir="generated_jars" />
 		<delete dir="create_installables_work_dir" />
 
-		<ant dir="proxl_base" antfile="ant_build_jar.xml" target="clean" />
-		
 		<ant dir="proxl_importer" antfile="ant__create_runnable_jar_main_importer.xml" target="clean" />
 		<ant dir="proxl_importer" antfile="ant__create_runnable_jar_run_importer.xml" target="clean" />
 		
@@ -55,7 +53,6 @@
 	<!-- Prepare depends on clean -->
 	<target name="prepare" depends="clean">
 		<mkdir dir="deploy" />
-		<mkdir dir="generated_jars" />
 		<mkdir dir="create_installables_work_dir" />
 	</target>
 
@@ -65,8 +62,6 @@
 	 -->
 	<target name="compileAllSubmodules" depends="prepare">
 
-		<ant dir="proxl_base" antfile="ant_build_jar.xml" />
-		
 		<ant dir="proxl_importer" antfile="ant__create_runnable_jar_main_importer.xml" />
 		<ant dir="proxl_importer" antfile="ant__create_runnable_jar_run_importer.xml" />
 		

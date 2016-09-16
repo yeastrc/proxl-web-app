@@ -30,13 +30,15 @@
 	<property name="classes_run_importer" value="classes_run_importer" />
 	
 
-	<available file=".git" type="dir" property="git.present"/>
+	<available file="..${file.separator}.git" type="dir" property="git.present"/>
 	
 	
     <target name="create_run_jar"  
     		depends="create_jar_this_project_run_importer">
     	
-    	
+		<ant dir="..${file.separator}proxl_web_app" antfile="ant_build_shared_code_jar.xml" />
+
+    	<!-- Add the jars in the 'lib' folder to the class path   -->
     	
 		<path id="build.classpath">
 		  <fileset dir="lib">
@@ -50,6 +52,7 @@
 		    <flattenmapper />
 		</pathconvert>
 
+    	<!-- Add the jars in the 'lib_proxl_jars_dir' folder to the class path   -->
 
 		<path id="lib_proxl_jars_dir">
 		  <fileset dir="lib_proxl_jars">
@@ -62,8 +65,22 @@
 		    <path refid="lib_proxl_jars_dir" />
 		    <flattenmapper />
 		</pathconvert>
+    	
+    	<!-- Add the jars in the 'lib_built_proxl_shared_code_jar' folder to the class path   -->
 
-    	<property name="final.classpath" value="./ ${output_jar_this_project_run_importer}  ${jars.classpath} ${lib_proxl_jars_dir.classpath}"/>
+		<path id="lib_built_proxl_shared_code_jar_dir">
+		  <fileset dir="lib_built_proxl_shared_code_jar">
+		    <include name="**/*.jar" />
+		  </fileset>
+		</path>
+
+		<!-- convert classpath to a flat list/string for use in manifest task -->
+		<pathconvert property="lib_built_proxl_shared_code_jar_dir.classpath" pathsep=" ">
+		    <path refid="lib_built_proxl_shared_code_jar_dir" />
+		    <flattenmapper />
+		</pathconvert>    	
+
+    	<property name="final.classpath" value="./ ${output_jar_this_project_run_importer}  ${jars.classpath} ${lib_proxl_jars_dir.classpath} ${lib_built_proxl_shared_code_jar_dir.classpath}"/>
     	
     	
 		<echo >Classpath for runnable jar ${final.classpath}</echo>
@@ -84,12 +101,13 @@
     			
 				<attribute name="Date" value="${build-info.current-date}" />
 				<attribute name="Time" value="${build-info.current-time}" />
-
             </manifest>
+        	
             <zipfileset src="jar-in-jar-loader.zip"/>
             <zipfileset dir="${jar_this_project_run_importer_dir}" />
         	<zipfileset dir="lib" />
         	<zipfileset dir="lib_proxl_jars" />
+        	<zipfileset dir="lib_built_proxl_shared_code_jar" />
 
         </jar>
     </target>
@@ -239,7 +257,9 @@
     	<fileset dir="lib_proxl_jars">
         	<include name="**/*.jar"/>
       	</fileset>
-    	
+    	<fileset dir="lib_built_proxl_shared_code_jar">
+        	<include name="**/*.jar"/>
+      	</fileset>   	
     </path>
 			
 </project>

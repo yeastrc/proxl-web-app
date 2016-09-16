@@ -76,6 +76,8 @@
 		</jar>
 		
 
+		<copy file="deploy/proxl_base.jar" todir="../generated_jars" />
+				
 		
 	</target>
 	

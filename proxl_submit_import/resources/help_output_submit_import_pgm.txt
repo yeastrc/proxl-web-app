@@ -1,7 +1,7 @@
-Usage: java -jar importProxlXML.jar -i import_file.proxl.xml 
+Usage: java -jar submitProxlXMLImport.jar -i import_file.proxl.xml 
                                     [ --no-scan-files ]  
                                     [ -s scan_file.mzML ]
-                                    [ -c db_connection.properties ] 
+                                    [ -c submit_upload.properties ] 
                                     [-p project_id  ]
                                     [ --username-password-file=proxl_username_password_file ]
                                     [ --username=xxx  ]
@@ -10,11 +10,11 @@ Usage: java -jar importProxlXML.jar -i import_file.proxl.xml
 
 Examples:
 
-    To import a Proxl XML file (with no scans):
-    java -jar importProxlXML.jar -p 1 -i proxlInput.xml -n -c /path/to/db.properties
+    To submit for import a Proxl XML file (with no scans):
+    java -jar submitProxlXMLImport.jar -p 1 -i proxlInput.xml --no-scan-files -c /path/to/submit_upload.properties
 
-    To import a Proxl XML file and related scan file:
-    java -jar importProxlXML.jar -p 1 -i proxlInput.xml -s /path/to/file.mzML -c /path/to/db.properties
+    To submit for import a Proxl XML file and related scan file:
+    java -jar submitProxlXMLImport.jar -p 1 -i proxlInput.xml -s /path/to/file.mzML -c /path/to/submit_upload.properties
 	
 	
 Parameters:

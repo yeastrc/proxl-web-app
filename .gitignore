@@ -41,3 +41,10 @@ _build
 /proxl_importer/deploy
 /proxl_importer/deploy_run_importer
 /proxl_importer/jar_this_project_run_importer
+/download_zip_file
+/proxl_importer/.project
+/proxl_importer/lib_built_proxl_shared_code_jar
+/proxl_importer/.classpath
+/proxl_web_app/zz_build_dir
+/proxl_web_app/zz_classes_shared_code
+/proxl_web_app/WebRoot/WEB-INF/classes

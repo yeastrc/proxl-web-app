@@ -9,13 +9,14 @@
   <target name="init">
     <tstamp/>
   	
-	<available file=".git" type="dir" property="git.present"/>
+	<available file="../${file.separator}.git" type="dir" property="git.present"/>
 	
 	  	
 
   	<!-- name of jar or whatever that is copied to deploy -->
     <property name="deployablename" value="proxl.war" />
 
+  	<property name="src_shared_code" value="src_shared_code" />
     <property name="src" value="src" />
     <property name="zz_build_dir" value="zz_build_dir" />
     <property name="build" value="build" />
@@ -152,6 +153,10 @@
 
 	<!--  Build the Java code   -->
 
+  	<javac includeantruntime="false"  srcdir="${src_shared_code}" destdir="${classesweb}" debug="true"  
+  		 source="${java_source}" target="${java_target}"  encoding="${java.source.character.set}" >
+		<classpath refid="classpath"/>
+	</javac>
   	
   	<javac includeantruntime="false"  srcdir="${src}" destdir="${classesweb}" debug="true"  
   		 source="${java_source}" target="${java_target}"  encoding="${java.source.character.set}" >
