@@ -40,8 +40,8 @@ import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.SearchProteinMonolink;
 import org.yeastrc.xlink.www.objects.SearchProteinMonolinkWrapper;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId;
-import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult;
+import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId;
+import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
@@ -369,8 +369,8 @@ public class ProteinsService {
 						
 						searchProteinCrosslinkWrapperList.add(searchProteinCrosslinkWrapper);
 						
-						SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult sortResultGetHeaders =
-								SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId.getInstance()
+						SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt sortResultGetHeaders =
+								SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId.getInstance()
 								.sortOnBestPeptideBestPSMAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId( 
 										searchId, 
 										searchProteinCrosslinkWrapperList, 
@@ -736,8 +736,8 @@ public class ProteinsService {
 						
 						searchProteinLooplinkWrapperList.add(searchProteinLooplinkWrapper);
 						
-						SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult sortResultGetHeaders =
-								SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId.getInstance()
+						SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt sortResultGetHeaders =
+								SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId.getInstance()
 								.sortOnBestPeptideBestPSMAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId( 
 										searchId, 
 										searchProteinLooplinkWrapperList, 
@@ -1091,8 +1091,8 @@ public class ProteinsService {
 						
 						searchProteinMonolinkWrapperList.add(searchProteinMonolinkWrapper);
 						
-						SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult sortResultGetHeaders =
-								SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId.getInstance()
+						SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt sortResultGetHeaders =
+								SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId.getInstance()
 								.sortOnBestPeptideBestPSMAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId( 
 										searchId, 
 										searchProteinMonolinkWrapperList, 

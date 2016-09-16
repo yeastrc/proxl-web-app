@@ -1,4 +1,4 @@
-package org.yeastrc.proxl.import_xml_to_db.spectrum.database_update_with_transaction_services;
+package org.yeastrc.proxl.import_xml_to_db.spectrum.db_update_with_transaction_services;
 
 import java.math.BigDecimal;
 import java.sql.Connection;

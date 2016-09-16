@@ -22,8 +22,8 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchTaxonomySearcher;
-import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId;
-import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult;
+import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId;
+import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
@@ -763,8 +763,8 @@ public class ViewSearchProteinsAction extends Action {
 
 				//      Get Annotation data and Sort by Annotation data
 
-				SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult sortCrosslinksResult =
-						SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId.getInstance()
+				SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt sortCrosslinksResult =
+						SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId.getInstance()
 						.sortOnBestPeptideBestPSMAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId(
 								searchId, 
 								wrappedCrosslinks, 
@@ -846,8 +846,8 @@ public class ViewSearchProteinsAction extends Action {
 				
 				//      Get Annotation data and Sort by Annotation data
 
-				SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult sortLooplinksResult =
-						SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId.getInstance()
+				SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt sortLooplinksResult =
+						SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId.getInstance()
 						.sortOnBestPeptideBestPSMAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId(
 								searchId, 
 								wrappedLooplinks, 

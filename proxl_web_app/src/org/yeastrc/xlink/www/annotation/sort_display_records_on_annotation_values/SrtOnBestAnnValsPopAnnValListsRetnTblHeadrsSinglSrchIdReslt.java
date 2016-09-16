@@ -8,7 +8,7 @@ import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
  * Output from SortOnAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId
  *
  */
-public class SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult {
+public class SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt {
 
 
 	private List<AnnotationDisplayNameDescription> peptideAnnotationDisplayNameDescriptionList;

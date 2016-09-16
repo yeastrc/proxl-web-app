@@ -17,20 +17,20 @@ import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
  * 
  * Only Sort on Best Peptide and Best PSM values
  */
-public class SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId {
+public class SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId {
 
 
-	private static final Logger log = Logger.getLogger(SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId.class);
+	private static final Logger log = Logger.getLogger(SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId.class);
 
-	public static SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId getInstance() {
+	public static SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId getInstance() {
 		
-		return new SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId();
+		return new SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId();
 	}
 			
 
 	
 	//  constructor
-	private SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId() { }
+	private SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId() { }
 	
 	
 	
@@ -45,7 +45,7 @@ public class SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSea
 	 * @throws ProxlWebappDataException
 	 * @throws Exception
 	 */
-	public SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult sortOnBestPeptideBestPSMAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId(
+	public SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt sortOnBestPeptideBestPSMAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId(
 	
 			int searchId,
 			List<? extends SortDisplayRecordsWrapperBase> sortDisplayRecordsWrapperBaseList,
@@ -55,8 +55,8 @@ public class SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSea
 			
 			) throws ProxlWebappDataException, Exception {
 		
-		SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult result =
-				new SortOnBestAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchIdResult();
+		SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt result =
+				new SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt();
 		
 		//  Make local copies of annotation type lists for sorting
 		
