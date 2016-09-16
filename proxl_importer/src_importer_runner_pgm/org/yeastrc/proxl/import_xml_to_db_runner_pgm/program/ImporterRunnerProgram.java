@@ -150,14 +150,23 @@ public class ImporterRunnerProgram {
 				
 			}
 			
+
+			if ( StringUtils.isEmpty( configFileFromCommandLineFileName ) ) {
+
+				System.err.println( "Config file is required." );
+
+				System.err.println( "" );
+				System.err.println( FOR_HELP_STRING );
+				
+
+				System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
+			}
 			
 			File configFileFromCommandLine = null;
 
 			if ( StringUtils.isNotEmpty( configFileFromCommandLineFileName ) ) {
 
 				configFileFromCommandLine = new File( configFileFromCommandLineFileName );
-
-
 
 				if( ! configFileFromCommandLine.exists() ) {
 
@@ -176,6 +185,11 @@ public class ImporterRunnerProgram {
 
 			try {
 
+				if ( log.isDebugEnabled() ) {
+					
+					log.debug( "processing config file from command line: " + configFileFromCommandLine.getAbsolutePath() );
+				}
+				
 				dbConnectionParametersProvider =
 						ProcessImporterRunnerConfigFile.getInstance().processConfigFile( configFileFromCommandLine );
 
@@ -191,13 +205,24 @@ public class ImporterRunnerProgram {
 			} catch ( Exception e ) {
 
 				System.err.println( "Failed processing DB config file." );
+				
+				if ( log.isDebugEnabled() ) {
+
+					e.printStackTrace();
+				}
 
 				System.exit( 1 );
 			}
+			
+			if ( dbConnectionParametersProvider != null ) {
 
-			if ( StringUtils.isNotEmpty( proxlDatabaseName ) ) {
+				if ( StringUtils.isNotEmpty( proxlDatabaseName ) ) {
 
-				dbConnectionParametersProvider.setProxlDbName( proxlDatabaseName );
+					dbConnectionParametersProvider.setProxlDbName( proxlDatabaseName );
+				}
+			} else {
+				
+				System.err.println( "Unable to set proxlDatabaseName since no config file present");
 			}
 
 			ImportDBConnectionFactory importDBConnectionFactory = ImportDBConnectionFactory.getInstance();

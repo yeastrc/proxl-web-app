@@ -251,22 +251,51 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 				String msg = "No provided DB username or DB username is empty string.";
 				log.error( msg );
 				throw new Exception(msg);
+			} else {
+				
+				if ( log.isDebugEnabled() ) {
+					
+					log.debug( "DB Connection:  username: " + username );
+				}
 			}
 
 			if ( StringUtils.isEmpty( password ) ) {
 				String msg = "No provided DB password or DB password is empty string.";
 				log.error( msg );
 				throw new Exception(msg);
+			} else {
+				
+				if ( log.isDebugEnabled() ) {
+					
+					log.debug( "DB Connection:  password: is populated" );
+				}
 			}
 
 			if ( StringUtils.isEmpty( dbURL ) ) {
 				String msg = "No provided DB URL or DB URL is empty string.";
 				log.error( msg );
 				throw new Exception(msg);
+			} else {
+				
+				if ( log.isDebugEnabled() ) {
+					
+					log.debug( "DB Connection:  dbURL: " + dbURL);
+				}
 			}
 
 			if ( StringUtils.isEmpty( dbPort ) ) {
 				dbPort = _DEFAULT_PORT;  // set to default port
+				
+				if ( log.isDebugEnabled() ) {
+					
+					log.debug( "DB Connection:  dbPort set to default: " + dbPort);
+				}
+			} else {
+				
+				if ( log.isDebugEnabled() ) {
+					
+					log.debug( "DB Connection:  dbPort: " + dbPort);
+				}
 			}
 
 
