@@ -39,15 +39,29 @@ public class RetentionTimesFromScanTblSearcher {
 
 			+ " psm_filterable_annotation__generic_lookup" 
 			+ " ON "  
-			+ "psm.id = psm_filterable_annotation__generic_lookup.psm_id " 
-			+ " WHERE psm.search_id = ? "
+			+ "psm.id = psm_filterable_annotation__generic_lookup.psm_id ";
+	
+	private static final String SQL_SUB_SELECT__SCAN_IDS_LINK_TYPE_JOIN_MAIN =
+			
+			" INNER JOIN search_reported_peptide "
+			+ 	" ON psm.search_id = search_reported_peptide.search_id"
+			+ 		" AND psm.reported_peptide_id = search_reported_peptide.reported_peptide_id ";
+	
+	private static final String SQL_SUB_SELECT__SCAN_IDS_WHERE = " WHERE psm.search_id = ? "
 			+ 	" AND psm_filterable_annotation__generic_lookup.annotation_type_id = ? "
 			+ 	" AND psm_filterable_annotation__generic_lookup.value_double ";
 
-	private static final String SQL_SUB_SELECT__SCAN_IDS__START_WHERE_PSM_TYPE_IN = " AND psm.type IN ( "; 
+	private static final String SQL_SUB_SELECT__SCAN_IDS__START_WHERE_LINK_TYPE_IN = 
+			" AND search_reported_peptide.link_type IN ( "; 
 
-	private static final String SQL_SUB_SELECT__SCAN_IDS__END_WHERE_PSM_TYPE_IN = " ) "; 
+	private static final String SQL_SUB_SELECT__SCAN_IDS__END_WHERE_LINK_TYPE_IN = " ) "; 
 	
+	
+//	search_reported_peptide
+//
+//	# search_id, reported_peptide_id, link_type
+//	42, 248, unlinked
+
 
 
 	public List<BigDecimal> getRetentionTimes( 
@@ -106,6 +120,22 @@ public class RetentionTimesFromScanTblSearcher {
 		sqlSB.append( SQL_SUB_SELECT__SCAN_IDS_MAIN );
 		
 
+
+		if ( webLinkTypeCrosslink
+				&& webLinkTypeLooplink
+				&& webLinkTypeUnlinked ) {
+
+
+		} else {
+			
+			sqlSB.append( SQL_SUB_SELECT__SCAN_IDS_LINK_TYPE_JOIN_MAIN );
+		}
+		
+
+		sqlSB.append( SQL_SUB_SELECT__SCAN_IDS_WHERE );
+		
+
+
 		if ( annotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
 			
 			String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + annotationTypeDTO.getId();
@@ -134,7 +164,7 @@ public class RetentionTimesFromScanTblSearcher {
 
 		} else {
 
-			sqlSB.append( SQL_SUB_SELECT__SCAN_IDS__START_WHERE_PSM_TYPE_IN );   //   ...  IN (
+			sqlSB.append( SQL_SUB_SELECT__SCAN_IDS__START_WHERE_LINK_TYPE_IN );   //   ...  IN (
 			
 
 			boolean firstScanForType = true;
@@ -187,7 +217,7 @@ public class RetentionTimesFromScanTblSearcher {
 			}
 			
 			
-			sqlSB.append( SQL_SUB_SELECT__SCAN_IDS__END_WHERE_PSM_TYPE_IN );   //  )
+			sqlSB.append( SQL_SUB_SELECT__SCAN_IDS__END_WHERE_LINK_TYPE_IN );   //  )
 
 		}
 
