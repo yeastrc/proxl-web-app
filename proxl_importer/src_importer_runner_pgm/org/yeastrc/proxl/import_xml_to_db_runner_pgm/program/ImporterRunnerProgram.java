@@ -228,6 +228,8 @@ public class ImporterRunnerProgram {
 			ImportDBConnectionFactory importDBConnectionFactory = ImportDBConnectionFactory.getInstance();
 
 			importDBConnectionFactory.setDbConnectionParametersProvider( dbConnectionParametersProvider );
+			
+			importDBConnectionFactory.setDatabaseConnectionTestOnBorrow(true);
 
 
 			DBConnectionFactory.setDbConnectionFactoryImpl( importDBConnectionFactory );

@@ -313,11 +313,15 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 			dataSource.setMinIdle( 1 );
 			
 			dataSource.setMaxWaitMillis(100);
+			
+			if ( databaseConnectionTestOnBorrow ) {
 
-//			dataSource.setValidationQuery("select 1 from dual");
-//			
-//			dataSource.setTestOnBorrow( databaseConnectionTestOnBorrow );  // databaseConnectionTestOnBorrow is default to false;
-//			dataSource.setTestWhileIdle( true );
+				dataSource.setValidationQuery("select 1 from dual");
+
+				dataSource.setTestOnBorrow( databaseConnectionTestOnBorrow );  // databaseConnectionTestOnBorrow is default to false;
+				dataSource.setTestWhileIdle( true );
+
+			}
 			
 
 //			dataSource.setMinEvictableIdleTimeMillis   ( 21600000 );
