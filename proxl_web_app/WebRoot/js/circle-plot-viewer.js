@@ -53,7 +53,12 @@ circlePlotViewer.prototype.CONSTANTS = {
 		_FEATURE_ANNOTATION_HEIGHT:15,	// height of the feature annotation bar
 		_DISOPRED_COLOR: "#3a3a3a",			// color to use for disopred annotations
 		_PSIPRED_ALPHA_COLOR: "#5d9960",	// color to use for alpha helices in psipred annotations
-		_PSIPRED_BETA_COLOR: "#5d6499"		// color to use for beta sheets in psipred annotations
+		_PSIPRED_BETA_COLOR: "#5d6499",		// color to use for beta sheets in psipred annotations
+			
+			
+			
+		_PROTEIN_BAR_OVERLAY_RECTANGLE_LABEL_CLASS: "protein-bar-class",	// css class for protein bars
+		
 };
 
 /**
@@ -73,7 +78,7 @@ circlePlotViewer.prototype.draw  = function(  ) {
 	
 	this.setViewerDimensions( svgRootSnapSVGObject );
 	
-	this.drawProteinBars( svgRootSnapSVGObject );
+	this.drawProteinBars( svgRootSnapSVGObject, false );
 	
 	
 	if( this.isFeatureAnnotationShown() ) {
@@ -107,6 +112,13 @@ circlePlotViewer.prototype.draw  = function(  ) {
 	if ( $( "input#show-tryptic-cleavage-positions" ).is( ':checked' ) ) {
 		this.drawTrypticPositions( svgRootSnapSVGObject );
 	}
+	
+	
+	// draw the transparent protein bars over the protein bars to capture
+	// mouse events such as mouseover and click
+	this.drawProteinBars( svgRootSnapSVGObject, true );
+
+	
 	
 	if( this.isColorBySearch() ) {
 		this.drawLegend( svgRootSnapSVGObject );
@@ -363,7 +375,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 	var degreesPerResidue = this.getDegreesPerResidue();
 	
 	// determine frequency and factor of tic marks
-	var testFactors = [ 1, 5, 10, 25, 50, 100, 250, 500, 1000, 2000, 5000, 10000 ];
+	var testFactors = [ 1, 2, 4, 10, 20, 40, 60, 80, 100, 200, 400, 600, 1000, 2000, 5000, 10000 ];
 	
 	var factor;				// number of residues per tick mark
 	var degreesPerTick;		// number of degrees between tick marks
@@ -376,7 +388,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 			break;
 		}
 	}
-
+	
 	// loop over all proteins, draw their scale bars
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 
@@ -464,7 +476,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 		// draw interval ticks
 		for( var k = factor; k < _proteinLengths[ proteinId ]; k += factor ) {
 			
-			var angle = startAngle + ( k * degreesPerResidue );
+			var angle = startAngle + ( k * degreesPerResidue ) - degreesPerResidue;
 			
 			startPoint = this.polarToCartesian( center.x, center.y, radius1 , angle)
 			endPoint = this.polarToCartesian( center.x, center.y, radius2 , angle)
@@ -494,7 +506,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 			
 			// create the path on which we are drawing our label
 			
-			angle = startAngle + ( k * degreesPerResidue );
+			var angle = startAngle + ( k * degreesPerResidue ) - degreesPerResidue;
 			
 			var startAdjustment = 0.5;
 			var endAdjustment = 1;
@@ -988,7 +1000,7 @@ circlePlotViewer.prototype.getAngleForProteinPosition = function( proteinIndex, 
  * Draw all the protein bars, and associated items (such as labels, linkable positions, and scale bars)
  * @param svgRootSnapSVGObject
  */
-circlePlotViewer.prototype.drawProteinBars = function( svgRootSnapSVGObject ) {
+circlePlotViewer.prototype.drawProteinBars = function( svgRootSnapSVGObject, isTransparent ) {
 	
 	var selectedProteins = getAllSelectedProteins();
 	var totalGapDegrees = selectedProteins.length * this.CONSTANTS._GAP_BETWEEN_BARS;
@@ -1004,7 +1016,7 @@ circlePlotViewer.prototype.drawProteinBars = function( svgRootSnapSVGObject ) {
 		var totalLengthProportion = _proteinLengths[ selectedProteins[ i ] ] / totalProteinLength;
 		var rotationDegrees = workingDegrees * totalLengthProportion;
 		
-		this.drawProteinBar( svgRootSnapSVGObject, selectedProteins[ i ], i, currentStartDegrees, rotationDegrees );
+		this.drawProteinBar( svgRootSnapSVGObject, isTransparent, selectedProteins[ i ], i, currentStartDegrees, rotationDegrees );
 		
 		currentStartDegrees += this.CONSTANTS._GAP_BETWEEN_BARS + rotationDegrees;
 		
@@ -1021,7 +1033,7 @@ circlePlotViewer.prototype.drawProteinBars = function( svgRootSnapSVGObject ) {
  * @param startDegrees
  * @param rotationDegrees
  */
-circlePlotViewer.prototype.drawProteinBar = function( svgRootSnapSVGObject, proteinId, index, startDegrees, rotationDegrees ) {
+circlePlotViewer.prototype.drawProteinBar = function( svgRootSnapSVGObject, isTransparent, proteinId, index, startDegrees, rotationDegrees ) {
 	
 	var center = this.getCenterCoords();
 	
@@ -1033,12 +1045,25 @@ circlePlotViewer.prototype.drawProteinBar = function( svgRootSnapSVGObject, prot
 	
 	var svgPath = svgRootSnapSVGObject.path( path );
 	
-	svgPath.attr( {
-		fill:this.getColorForIndex( index ),
-	})
+	if( isTransparent ) {
+		
+		svgPath.attr( {
+			"fill-opacity":"0",
+			"protein_id":proteinId,
+		});
+		
+		this.addMouseOverHandlerToProteinBar( svgPath, proteinId, index );
+		
+	} else {
+		svgPath.attr( {
+			fill:this.getColorForIndex( index ),
+		});
+	}
+
+	if( !isTransparent ){
+		this.drawProteinBarLabel( svgRootSnapSVGObject, proteinId, index, startDegrees, rotationDegrees );
+	}
 	
-	//this.drawProteinBarLabel( svgRootSnapSVGObject, svgPath, proteinId );
-	this.drawProteinBarLabel( svgRootSnapSVGObject, proteinId, index, startDegrees, rotationDegrees );
 }
 
 /**
@@ -1074,6 +1099,249 @@ circlePlotViewer.prototype.drawProteinBarLabel = function( svgRootSnapSVGObject,
 		dx:"5px",
 	});
 }
+
+/**
+ * Add mouseover handler (causing a tooltip) to the protein bar
+ * 
+ * @param svgPath
+ * @param proteinId
+ */
+circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgPath, proteinId, index ) {
+	
+	svgPath.addClass( _PROTEIN_BAR_OVERLAY_RECTANGLE_LABEL_CLASS );
+	
+	var proteinBarPlainSVGObject = svgPath.node;
+	var $proteinBarPlainSVGObject = $( proteinBarPlainSVGObject );		// jquery variable
+	var $svgDrawing = $proteinBarPlainSVGObject.parent();				// jquery object for parent svg drawing
+	
+	// coords for the location of the svg drawing so we can convert page
+	// coordiantes into coordinates within the drawing
+	var topLevelSVGCoords = {
+			x:$svgDrawing.offset().left,
+			y:$svgDrawing.offset().top
+	}
+	
+	// a this we can use within the function defined below that refers to this object
+	var _THIS = this;
+	
+
+	// the function called on mouse over
+	var toolTipFunction = function( eventObject, qtipAPI /* qtip "api" variable/property */ ) {
+		
+		var eventpageX = eventObject.pageX;
+		var eventpageY = eventObject.pageY;
+		
+		var svgCoords = { };
+		svgCoords.x = eventpageX - topLevelSVGCoords.x;
+		svgCoords.y = eventpageY - topLevelSVGCoords.y;
+		
+		
+		var proteinPositionOneBased = _THIS.getProteinIndexPosition( index, svgCoords );
+		var proteinPositionZeroBased = proteinPositionOneBased - 1;
+		
+		var proteinName = getProteinName( proteinId );
+		var proteinSequence = _proteinSequences[ proteinId ];
+		var proteinSequenceLength  = proteinSequence.length;
+		
+		var sequenceAtPosition = proteinSequence.charAt( ( proteinPositionZeroBased ) );  
+
+		//  Default sequences left and right to "" since may be at either edge.
+		var sequenceAtPositionLeft1 = "";
+		var sequenceAtPositionLeft2 = "";
+		var sequenceAtPositionLeft3 = "";
+
+		var sequenceAtPositionRight1 = "";
+		var sequenceAtPositionRight2 = "";
+		var sequenceAtPositionRight3 = "";
+		
+		if ( proteinPositionZeroBased > 0 ) { sequenceAtPositionLeft1 = proteinSequence.charAt( ( proteinPositionZeroBased - 1 ) ); }
+		if ( proteinPositionZeroBased > 1 ) { sequenceAtPositionLeft2 = proteinSequence.charAt( ( proteinPositionZeroBased - 2 ) ); }
+		if ( proteinPositionZeroBased > 2 ) { sequenceAtPositionLeft3 = proteinSequence.charAt( ( proteinPositionZeroBased - 3 ) ); }
+		
+		if ( proteinPositionZeroBased < proteinSequenceLength - 1 ) { sequenceAtPositionRight1 = proteinSequence.charAt( ( proteinPositionZeroBased + 1 ) ); }
+		if ( proteinPositionZeroBased < proteinSequenceLength - 2 ) { sequenceAtPositionRight2 = proteinSequence.charAt( ( proteinPositionZeroBased + 2 ) ); }
+		if ( proteinPositionZeroBased < proteinSequenceLength - 3 ) { sequenceAtPositionRight3 = proteinSequence.charAt( ( proteinPositionZeroBased + 3 ) ); }
+		
+
+		// whether or not show linkable positions is selected
+		var linkablePositionsSelected = $( "input#show-linkable-positions" ).is( ':checked' );
+		
+		var proteinNameDisplay = " display:none; ";
+
+		if ( linkablePositionsSelected ) {
+			proteinNameDisplay = " ";	
+		}
+
+	
+		var cutPointBetweenCenterAndFirstLeft = false;
+		var cutPointBetweenFirstLeftAndSecondLeft = false;
+		var cutPointBetweenSecondLeftAndThirdLeft = false;
+		
+		var cutPointBetweenCenterAndFirstRight = false;
+		var cutPointBetweenFirstRightAndSecondRight = false;
+		var cutPointBetweenSecondRightAndThirdRight = false;
+		
+		var proteinSequenceTrypsinCutPoints = _proteinSequenceTrypsinCutPoints[ proteinId ];
+
+		for ( var proteinSequenceTrypsinCutPointsIndex = 0; proteinSequenceTrypsinCutPointsIndex < proteinSequenceTrypsinCutPoints.length; proteinSequenceTrypsinCutPointsIndex++ ) {
+			
+			//  trypsinCutPoint is "1" based 
+			
+			var trypsinCutPoint = proteinSequenceTrypsinCutPoints[ proteinSequenceTrypsinCutPointsIndex ];
+
+			if ( trypsinCutPoint > proteinPositionOneBased - 1 && trypsinCutPoint < proteinPositionOneBased ) {
+				cutPointBetweenCenterAndFirstLeft = true;
+			}
+			if ( trypsinCutPoint > proteinPositionOneBased - 2 && trypsinCutPoint < proteinPositionOneBased - 1 ) {
+				cutPointBetweenFirstLeftAndSecondLeft = true;
+			}
+			if ( trypsinCutPoint > proteinPositionOneBased - 3 && trypsinCutPoint < proteinPositionOneBased - 2 ) {
+				cutPointBetweenSecondLeftAndThirdLeft = true;
+			}
+
+			if ( trypsinCutPoint > proteinPositionOneBased && trypsinCutPoint < proteinPositionOneBased + 1 ) {
+				cutPointBetweenCenterAndFirstRight = true;
+			}
+			if ( trypsinCutPoint > proteinPositionOneBased + 1 && trypsinCutPoint < proteinPositionOneBased + 2 ) {
+				cutPointBetweenFirstRightAndSecondRight = true;
+			}
+			if ( trypsinCutPoint > proteinPositionOneBased + 2 && trypsinCutPoint < proteinPositionOneBased + 3 ) {
+				cutPointBetweenSecondRightAndThirdRight = true;
+			}
+		
+		
+		}
+		
+		
+		
+		//  name of css class in global.css.  Using a css class here since this is tool tip SVG, not main SVG
+		
+		var textClassForLinkablePosition = "proxl-primary-color-bold-svg-text";
+
+		var textClassAtPosition = "";
+
+		var textClassAtPositionLeft1 = "";
+		var textClassAtPositionLeft2 = "";
+		var textClassAtPositionLeft3 = "";
+
+		var textClassAtPositionRight1 = "";
+		var textClassAtPositionRight2 = "";
+		var textClassAtPositionRight3 = "";
+		
+		
+		
+		var linkablePositionsForProtein = _linkablePositions[ proteinId ];
+		
+		
+		for ( var linkablePositionsForProteinIndex = 0; linkablePositionsForProteinIndex < linkablePositionsForProtein.length; linkablePositionsForProteinIndex++ ) {
+		
+			//  linkablePositionsForProtein is "1" based 
+			
+			var linkablePosition = linkablePositionsForProtein[ linkablePositionsForProteinIndex ];
+
+			if ( linkablePosition === proteinPositionOneBased ) {
+				textClassAtPosition = textClassForLinkablePosition;
+			}
+
+			if ( linkablePosition === proteinPositionOneBased - 1 ) {
+				textClassAtPositionLeft1 = textClassForLinkablePosition;
+			}
+			if ( linkablePosition === proteinPositionOneBased - 2 ) {
+				textClassAtPositionLeft2 = textClassForLinkablePosition;
+			}
+			if ( linkablePosition === proteinPositionOneBased - 3 ) {
+				textClassAtPositionLeft3 = textClassForLinkablePosition;
+			}
+
+			if ( linkablePosition === proteinPositionOneBased + 1 ) {
+				textClassAtPositionRight1 = textClassForLinkablePosition;
+			}
+			if ( linkablePosition === proteinPositionOneBased + 2 ) {
+				textClassAtPositionRight2 = textClassForLinkablePosition;
+			}
+			if ( linkablePosition === proteinPositionOneBased + 3 ) {
+				textClassAtPositionRight3 = textClassForLinkablePosition;
+			}
+		
+		
+		}
+		
+		///////////
+		
+		//   New tool tip contents:
+			
+		var tooltipDataObject = {
+				
+				sequencePosition: proteinPositionOneBased,
+				
+				proteinName: proteinName,
+				proteinNameDisplay: proteinNameDisplay,
+				
+				sequenceAtPosition: sequenceAtPosition,
+				sequenceAtPositionLeft1: sequenceAtPositionLeft1,
+				sequenceAtPositionLeft2: sequenceAtPositionLeft2,
+				sequenceAtPositionLeft3: sequenceAtPositionLeft3,
+				sequenceAtPositionRight1: sequenceAtPositionRight1,
+				sequenceAtPositionRight2: sequenceAtPositionRight2,
+				sequenceAtPositionRight3: sequenceAtPositionRight3,
+				
+				cutPointBetweenCenterAndFirstLeft: cutPointBetweenCenterAndFirstLeft,
+				cutPointBetweenFirstLeftAndSecondLeft: cutPointBetweenFirstLeftAndSecondLeft,
+				cutPointBetweenSecondLeftAndThirdLeft: cutPointBetweenSecondLeftAndThirdLeft,
+
+				cutPointBetweenCenterAndFirstRight: cutPointBetweenCenterAndFirstRight,
+				cutPointBetweenFirstRightAndSecondRight: cutPointBetweenFirstRightAndSecondRight,
+				cutPointBetweenSecondRightAndThirdRight: cutPointBetweenSecondRightAndThirdRight,
+				
+				textClassAtPosition: textClassAtPosition,
+				
+				textClassAtPositionLeft1: textClassAtPositionLeft1,
+				textClassAtPositionLeft2: textClassAtPositionLeft2,
+				textClassAtPositionLeft3: textClassAtPositionLeft3,
+				
+				textClassAtPositionRight1: textClassAtPositionRight1,
+				textClassAtPositionRight2: textClassAtPositionRight2,
+				textClassAtPositionRight3: textClassAtPositionRight3
+		
+
+		};
+		
+		//  Use Handlebars libary to convert the template into HTML, performing substitutions using tooltipDataObject
+		var tooltipContentsHTML = _proteinBarToolTip_template_HandlebarsTemplate( tooltipDataObject );
+
+
+		
+		//  Update tool tip contents
+		qtipAPI.set('content.text', tooltipContentsHTML );
+	};
+		
+
+		
+	//  Add the qtip tool tip to the protein bar overlay rectangle
+		
+	$proteinBarPlainSVGObject.qtip({
+		content: {
+			text: toolTipFunction
+		},
+		position: {
+			my: 'top center', //  center the tool tip under the mouse and place the call out arrow in the center top of the tool tip box
+			target: 'mouse'
+				,
+				adjust: { x: 0, y: 10 } // Offset it from under the mouse
+		}
+	});
+		
+		
+	// Grab the first element in the tooltips array and access its qTip API
+	var qtipAPI = $proteinBarPlainSVGObject.qtip('api');
+		
+	
+	
+	svgPath.mousemove( function( eventObject ) {
+		toolTipFunction( eventObject, qtipAPI );
+	} );
+}
+
 
 circlePlotViewer.prototype.inializeSVGObject = function() {
 
