@@ -41,6 +41,10 @@ Parameters:
     -n (--no-scan-files) : [Optional] : Must be set if no Scan files are present, the Proxl XML file
                                         will be imported without any scan files. May not be set if
                                         -s is used.
-                                        
+
+
+	--do-not-use-cutoff-in-input-file : [Optional] : Do not use any cutoff values in <annotation_cutoffs_on_import>
+				in the input file for excluding data from being imported.
+				
 	--output-data-errors-file= : [Optional] : The file data errors are written to.
 						
