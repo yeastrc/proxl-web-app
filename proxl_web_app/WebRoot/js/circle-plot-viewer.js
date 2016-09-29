@@ -1394,11 +1394,22 @@ circlePlotViewer.prototype.drawProteinPositionIndicator = function ( svgRootSnap
  */
 circlePlotViewer.prototype.getPathForProteinSegment = function( index, start, end ) {
 	
+	var minDegrees = 0.2;
+	
 	// getAngleForProteinPosition = function( proteinIndex, position )
 	var degreesPerResidue = this.getDegreesPerResidue();
 	
 	var startDegrees = this.getAngleForProteinPosition( index, start ) - ( degreesPerResidue / 2 );
 	var endDegrees = this.getAngleForProteinPosition( index, end ) + ( degreesPerResidue / 2 );
+	
+	// ensure there is a minimum separation between start and end so that an indicator is visible
+	var diff = endDegrees - startDegrees;
+	if( diff < minDegrees ) {
+
+		startDegrees = this.getAngleForProteinPosition( index, start ) - ( minDegrees / 2 );
+		endDegrees = this.getAngleForProteinPosition( index, end ) + ( minDegrees / 2 );
+		
+	}
 	
 	var path = this.getCurvedBarPath( startDegrees, endDegrees );
 	
