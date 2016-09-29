@@ -208,7 +208,7 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
 	}
 	
 	
-}
+};
 
 /**
  * Get the string to use for the path for a feature annotation segment
@@ -241,7 +241,7 @@ circlePlotViewer.prototype.getPathForSegment = function( proteinIndex, startPosi
          ].join(" ");
 	
 	return d;
-}
+};
 
 
 
@@ -272,7 +272,7 @@ circlePlotViewer.prototype.getFeatureAnnotationRadii = function() {
 		outer:outerRadius
 	};
 	
-}
+};
 
 /**
  * Draw the legend when coloring by search
@@ -361,7 +361,7 @@ circlePlotViewer.prototype.drawLegend = function( svgRootSnapSVGObject ) {
 	
 	
 	
-}
+};
 
 /**
  * Draw scale bar outside of each protein bar
@@ -694,7 +694,7 @@ circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGO
 		fill:"none",
 		"stroke-opacity":opacity,
 	});
-}
+};
 
 
 /**
@@ -794,7 +794,7 @@ circlePlotViewer.prototype.drawCrosslinks = function( svgRootSnapSVGObject ) {
 		}
 	}
 	
-}
+};
 
 
 /**
@@ -902,7 +902,7 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
 	});
     
     return path;
-}
+};
 
 
 
@@ -1037,8 +1037,7 @@ circlePlotViewer.prototype.drawProteinBar = function( svgRootSnapSVGObject, isTr
 	
 	var center = this.getCenterCoords();
 	
-	var path = this.getCurvedBarPath( center.x, 
-									  center.y,
+	var path = this.getCurvedBarPath( 
 									  startDegrees,
 									  startDegrees + rotationDegrees
 									 );
@@ -1052,7 +1051,7 @@ circlePlotViewer.prototype.drawProteinBar = function( svgRootSnapSVGObject, isTr
 			"protein_id":proteinId,
 		});
 		
-		this.addMouseOverHandlerToProteinBar( svgPath, proteinId, index );
+		this.addMouseOverHandlerToProteinBar( svgRootSnapSVGObject, svgPath, proteinId, index );
 		
 	} else {
 		svgPath.attr( {
@@ -1064,7 +1063,7 @@ circlePlotViewer.prototype.drawProteinBar = function( svgRootSnapSVGObject, isTr
 		this.drawProteinBarLabel( svgRootSnapSVGObject, proteinId, index, startDegrees, rotationDegrees );
 	}
 	
-}
+};
 
 /**
  * Draw the label for a given protein bar
@@ -1098,7 +1097,7 @@ circlePlotViewer.prototype.drawProteinBarLabel = function( svgRootSnapSVGObject,
 		dy:"-15px",
 		dx:"5px",
 	});
-}
+};
 
 /**
  * Add mouseover handler (causing a tooltip) to the protein bar
@@ -1106,7 +1105,7 @@ circlePlotViewer.prototype.drawProteinBarLabel = function( svgRootSnapSVGObject,
  * @param svgPath
  * @param proteinId
  */
-circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgPath, proteinId, index ) {
+circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgRootSnapSVGObject, svgPath, proteinId, index ) {
 	
 	svgPath.addClass( _PROTEIN_BAR_OVERLAY_RECTANGLE_LABEL_CLASS );
 	
@@ -1119,7 +1118,7 @@ circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgPath, 
 	var topLevelSVGCoords = {
 			x:$svgDrawing.offset().left,
 			y:$svgDrawing.offset().top
-	}
+	};
 	
 	// a this we can use within the function defined below that refers to this object
 	var _THIS = this;
@@ -1313,6 +1312,9 @@ circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgPath, 
 		
 		//  Update tool tip contents
 		qtipAPI.set('content.text', tooltipContentsHTML );
+		
+		// draw the indicator of this protein position on the SVG document
+		_THIS.drawProteinPositionIndicator( svgRootSnapSVGObject, svgPath, index, proteinPositionOneBased );
 	};
 		
 
@@ -1325,9 +1327,8 @@ circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgPath, 
 		},
 		position: {
 			my: 'top center', //  center the tool tip under the mouse and place the call out arrow in the center top of the tool tip box
-			target: 'mouse'
-				,
-				adjust: { x: 0, y: 10 } // Offset it from under the mouse
+			target: 'mouse',
+			adjust: { x: 0, y: 10 } // Offset it from under the mouse
 		}
 	});
 		
@@ -1340,7 +1341,70 @@ circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgPath, 
 	svgPath.mousemove( function( eventObject ) {
 		toolTipFunction( eventObject, qtipAPI );
 	} );
-}
+	
+	svgPath.mouseout( function( eventObject ) {
+		_THIS.removeProteinPositionIndicator();
+	} );
+	
+};
+
+circlePlotViewer.prototype.removeProteinPositionIndicator = function() {
+	if( !this.proteinPositionIndicator ) { return; }
+	this.proteinPositionIndicator.svgPath.remove();
+	delete this.proteinPositionIndicator;
+};
+
+
+/**
+ * Draw the visual indicator of a specific position on a protein bar when it is moused over
+ */
+circlePlotViewer.prototype.drawProteinPositionIndicator = function ( svgRootSnapSVGObject, parentPath, index, position ) {
+
+	// if we're moused over the same position, do nothing
+	if( this.proteinPositionIndicator &&
+		this.proteinPositionIndicator.index === index &&
+		this.proteinPositionIndicator.position == position ) {
+		return;
+	} else {
+		this.removeProteinPositionIndicator();
+	}
+	
+	var path = this.getPathForProteinSegment( index, position, position );
+	var svgPath = svgRootSnapSVGObject.path( path );
+	
+	svgPath.attr( {
+		fill:"cyan",
+		opacity:"0.45"
+	});
+	
+	parentPath.before( svgPath );
+
+	this.proteinPositionIndicator = {
+		svgPath:svgPath,
+		index:index,
+		position:position
+	};
+	
+	
+	return svgPath;
+};
+
+/**
+ * Get the SVG path string for the given protein index and start and end positions (starting at 1)
+ */
+circlePlotViewer.prototype.getPathForProteinSegment = function( index, start, end ) {
+	
+	// getAngleForProteinPosition = function( proteinIndex, position )
+	var degreesPerResidue = this.getDegreesPerResidue();
+	
+	var startDegrees = this.getAngleForProteinPosition( index, start ) - ( degreesPerResidue / 2 );
+	var endDegrees = this.getAngleForProteinPosition( index, end ) + ( degreesPerResidue / 2 );
+	
+	var path = this.getCurvedBarPath( startDegrees, endDegrees );
+	
+	return path;	
+};
+
 
 
 circlePlotViewer.prototype.inializeSVGObject = function() {
@@ -1475,7 +1539,7 @@ circlePlotViewer.prototype.cartesianToPolar = function( centerCoords, testCoords
 	
 	return degrees;
 	
-}
+};
 
 /**
  * Find the amino acid position (starting at 1) represented by the coordinates in testCoords
@@ -1521,7 +1585,7 @@ circlePlotViewer.prototype.getCurvedPathForLabel = function(centerX, centerY, st
          ].join(" ");
     
     return d + "Z";       
-}
+};
 
 
 /**
@@ -1535,18 +1599,20 @@ circlePlotViewer.prototype.getCurvedPathForLabel = function(centerX, centerY, st
  * @param endAngle The end angle in degrees
  * @returns {String}
  */
-circlePlotViewer.prototype.getCurvedBarPath = function(centerX, centerY, startAngle, endAngle){
+circlePlotViewer.prototype.getCurvedBarPath = function( startAngle, endAngle){
 	
 	var radii = this.getProteinBarRadii();
+	
+	var center = this.getCenterCoords();
 	
 	var outerRadius = radii.outer;
 	var innerRadius = radii.inner;
 	
-    var outerStart = this.polarToCartesian(centerX, centerY, outerRadius, endAngle);
-    var outerEnd = this.polarToCartesian(centerX, centerY, outerRadius, startAngle);
+    var outerStart = this.polarToCartesian( center.x, center.y, outerRadius, endAngle );
+    var outerEnd = this.polarToCartesian( center.x, center.y, outerRadius, startAngle );
 
-    var innerStart = this.polarToCartesian(centerX, centerY, innerRadius, endAngle);
-    var innerEnd = this.polarToCartesian(centerX, centerY, innerRadius, startAngle);
+    var innerStart = this.polarToCartesian( center.x, center.y, innerRadius, endAngle );
+    var innerEnd = this.polarToCartesian( center.x, center.y, innerRadius, startAngle );
     
     var arcSweep = endAngle - startAngle <= 180 ? "0" : "1";
     
@@ -1558,18 +1624,8 @@ circlePlotViewer.prototype.getCurvedBarPath = function(centerX, centerY, startAn
              "L", innerEnd.x, innerEnd.y
          ].join(" ");
     
-    /*
-    var d = [
-        "M", outerStart.x, outerStart.y, 
-        "A", outerRadius, outerRadius, 0, arcSweep, 0, outerEnd.x, outerEnd.y,
-        "L", innerEnd.x, innerEnd.y,
-        "A", innerRadius, innerRadius, 0, arcSweep, 1, innerStart.x, innerStart.y,
-        "L", outerStart.x, outerStart.y
-    ].join(" ");
-	*/
-    
     return d + "Z";       
-}
+};
 
 /**
  * Get the radii to use for protein bars
@@ -1638,7 +1694,7 @@ circlePlotViewer.prototype.getColorForLink = function( index, link ) {
 	// color by "originating" protein is default
 	return this.getColorForIndex( index );
 	
-}
+};
 
 /**
  * Get the color for the given index, given the total number of proteins
