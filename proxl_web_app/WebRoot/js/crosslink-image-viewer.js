@@ -8285,6 +8285,16 @@ function getProteinName( proteinId ) {
 
 ////////////    Click handlers for the links ( Lines that show the links )
 
+function processClickOnLink( clickThis ) {
+	var $clickThis = $(clickThis);
+	
+	if( $clickThis.attr( 'linktype' ) === "monolink" ) { return processClickOnMonoLink( clickThis ); }
+	if( $clickThis.attr( 'linktype' ) === "looplink" ) { return processClickOnLoopLink( clickThis ); }
+	if( $clickThis.attr( 'linktype' ) === "crosslink" ) { return processClickOnCrossLink( clickThis ); }
+	
+	console.log( "Clicked on a link of unknown type:" );
+	console.log( clickThis );
+}
 
 
 //////////////   Process LOOP link

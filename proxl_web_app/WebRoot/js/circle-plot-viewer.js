@@ -688,11 +688,18 @@ circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGO
 	
 	var opacity = getOpacityForIndexAndLink( index, link );
 	
+    var lsearches = _proteinMonolinkPositions[ link.protein1 ][ link.position1 ];
+	
     path.attr( {
 		stroke:this.getColorForIndex( index ),
 		"stroke-dasharray":"4,2",
 		fill:"none",
 		"stroke-opacity":opacity,
+		'from_protein_id':link.protein1,
+		'fromp': _proteinNames[ link.protein1 ],
+		'frompp': link.position1,
+		'searches': lsearches,
+		'linktype' : 'monolink'
 	});
     
     
@@ -701,7 +708,6 @@ circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGO
     
     var text = "";
     
-    var lsearches = _proteinMonolinkPositions[ link.protein1 ][ link.position1 ];
 	text = 'Monolink: ' + _proteinNames[ link.protein1 ] + " (" + link.position1 + ")<br>Searches: " + lsearches;
     
 	var pathSVGObject = path.node;
@@ -717,6 +723,9 @@ circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGO
 	// add mouseover effects
 	path.mouseover( function() { this.attr({ strokeWidth: 3 }); });
 	path.mouseout( function() { this.attr({ strokeWidth: 1 }); });
+	
+	// add click event
+	$pathSVGObject.click( function(  ) { processClickOnLink( this ); });
 };
 
 
@@ -932,9 +941,31 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
     	
 		var lsearches = _proteinLooplinkPositions[ link.protein1 ][ link.protein1 ][ link.position1 ][ link.position2 ];
 		text = 'Looplink: ' + _proteinNames[ link.protein1 ] + " (" + link.position1 + "," + link.position2 + ")<br>Searches: " + lsearches;
+		
+	    path.attr( {
+			'from_protein_id': link.protein1,
+			'fromp': _proteinNames[ link.protein1 ],
+			'frompp': link.position1,
+			'topp': link.position2,
+			'searches': lsearches,
+			'linktype' : 'looplink'
+		});
+		
     } else {
 		var lsearches = _proteinLinkPositions[ link.protein1 ][ link.protein2 ][ link.position1 ][ link.position2 ];
 		text = 'Crosslink: ' + _proteinNames[ link.protein1 ] + " (" + link.position1 + ") - " + _proteinNames[ link.protein2 ] + " (" + link.position2 + ")<br>Searches: " + lsearches;
+		
+	    path.attr( {
+			'from_protein_id':link.protein1,
+			'to_protein_id':link.protein2,
+			'fromp': _proteinNames[ link.protein1 ],
+			'top': _proteinNames[ link.protein2 ],
+			'frompp': link.position1,
+			'topp': link.position2,
+			'searches': lsearches,
+			'linktype' : 'crosslink'
+		});
+	    
     }
     
 	var pathSVGObject = path.node;
@@ -951,6 +982,9 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
 	path.mouseover( function() { this.attr({ strokeWidth: 3 }); });
 	path.mouseout( function() { this.attr({ strokeWidth: 1 }); });
 	
+	// add click effects
+	$pathSVGObject.click( function(  ) { processClickOnLink( this ); });
+
 	
     return path;
 };
