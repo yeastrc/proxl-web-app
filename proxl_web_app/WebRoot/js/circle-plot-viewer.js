@@ -694,6 +694,29 @@ circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGO
 		fill:"none",
 		"stroke-opacity":opacity,
 	});
+    
+    
+    
+    // add a tooltip to this drawn link
+    
+    var text = "";
+    
+    var lsearches = _proteinMonolinkPositions[ link.protein1 ][ link.position1 ];
+	text = 'Monolink: ' + _proteinNames[ link.protein1 ] + " (" + link.position1 + ")<br>Searches: " + lsearches;
+    
+	var pathSVGObject = path.node;
+	var $pathSVGObject = $( pathSVGObject );		// jquery variable
+	
+	
+	$pathSVGObject.qtip({
+		content:  { text: text },
+	    position: { target: 'mouse', adjust: { x: 5, y: 5 } }
+	});
+    
+    
+	// add mouseover effects
+	path.mouseover( function() { this.attr({ strokeWidth: 3 }); });
+	path.mouseout( function() { this.attr({ strokeWidth: 1 }); });
 };
 
 
@@ -737,8 +760,8 @@ circlePlotViewer.prototype.drawLooplinks = function( svgRootSnapSVGObject ) {
 				var link = { };
 				link.type = "looplink",
 				link.protein1 = proteinId;
-				link.position1 = toPosition;
-				link.position2 = fromPosition;
+				link.position1 = fromPosition;
+				link.position2 = toPosition;
 				
 				var looplink = this.drawCrosslink( i, fromPosition, i, toPosition, link, svgRootSnapSVGObject );
 				looplink.attr( { "stroke-dasharray":"4,2" });
@@ -901,6 +924,34 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
 		"stroke-opacity":opacity,
 	});
     
+    // add a tooltip to this drawn link
+    
+    var text = "";
+    
+    if( link.type === "looplink" ) {	
+    	
+		var lsearches = _proteinLooplinkPositions[ link.protein1 ][ link.protein1 ][ link.position1 ][ link.position2 ];
+		text = 'Looplink: ' + _proteinNames[ link.protein1 ] + " (" + link.position1 + "," + link.position2 + ")<br>Searches: " + lsearches;
+    } else {
+		var lsearches = _proteinLinkPositions[ link.protein1 ][ link.protein2 ][ link.position1 ][ link.position2 ];
+		text = 'Crosslink: ' + _proteinNames[ link.protein1 ] + " (" + link.position1 + ") - " + _proteinNames[ link.protein2 ] + " (" + link.position2 + ")<br>Searches: " + lsearches;
+    }
+    
+	var pathSVGObject = path.node;
+	var $pathSVGObject = $( pathSVGObject );		// jquery variable
+	
+	
+	$pathSVGObject.qtip({
+		content:  { text: text },
+	    position: { target: 'mouse', adjust: { x: 5, y: 5 } }
+	});
+    
+    
+	// add mouseover effects
+	path.mouseover( function() { this.attr({ strokeWidth: 3 }); });
+	path.mouseout( function() { this.attr({ strokeWidth: 1 }); });
+	
+	
     return path;
 };
 
