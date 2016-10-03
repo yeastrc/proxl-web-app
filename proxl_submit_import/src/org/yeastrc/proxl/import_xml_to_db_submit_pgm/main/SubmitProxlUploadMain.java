@@ -115,6 +115,7 @@ public class SubmitProxlUploadMain {
 			List<File> scanFiles,
 			
 			String searchName,
+			String searchPath,
 			Boolean noSearchNameCommandLineOptChosen,
 			
 			
@@ -500,6 +501,7 @@ public class SubmitProxlUploadMain {
 
 			uploadSubmitRequest.setProjectId( projectId );
 			uploadSubmitRequest.setSearchName( searchName ); // optional
+			uploadSubmitRequest.setSearchPath( searchPath ); // optional
 			uploadSubmitRequest.setUploadKey( uploadInitResult.getUploadKey() );
 
 			if ( submitterSameMachine ) {

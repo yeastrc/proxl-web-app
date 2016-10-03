@@ -1604,6 +1604,7 @@ CREATE TABLE  proxl_xml_file_import_tracking (
   remote_user_ip_address VARCHAR(45) NOT NULL,
   marked_for_deletion TINYINT UNSIGNED NOT NULL DEFAULT 0,
   search_name VARCHAR(2000) NULL,
+  search_path VARCHAR(2000) NULL,
   insert_request_url VARCHAR(255) NOT NULL,
   record_insert_date_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_updated_date_time TIMESTAMP NULL,

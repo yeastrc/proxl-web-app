@@ -90,6 +90,7 @@ public class ImporterDefaultMainProgramEntry {
 	
 	
 
+	public static final String DO_NOT_USE_CUTOFFS_IN_INPUT_FILE = "do-not-use-cutoff-in-input-file";
 
 	public static final String SKIP_POPULATING_PATH_ON_SEARCH_CMD_LINE_PARAM_STRING = "skip_populating_path_on_search";
 
@@ -226,6 +227,10 @@ public class ImporterDefaultMainProgramEntry {
 		
 		String searchNameOverrideValue = null;
 		
+		//  "search_path" field from "proxl_xml_file_import_tracking" table, if import run from Run Import pgm
+		
+		String importDirectoryOverrideValue = null;
+		
 		
 		//  TODO  Not currently used
 		
@@ -293,6 +298,9 @@ public class ImporterDefaultMainProgramEntry {
 			//  'Z' is arbitrary and won't be suggested to user
 			CmdLineParser.Option dropPeptideCutoffValueOpt = cmdLineParser.addStringOption( 'Z', "drop-peptide-cutoff" );
 			CmdLineParser.Option dropPsmCutoffValueOpt = cmdLineParser.addStringOption( 'Z', "drop-psm-cutoff" );
+			
+		//  'Z' is arbitrary and won't be suggested to user
+			CmdLineParser.Option doNotUseCutoffInInputFileOpt = cmdLineParser.addBooleanOption( 'Z', DO_NOT_USE_CUTOFFS_IN_INPUT_FILE );
 
 
 			//  'Z' is arbitrary and won't be suggested to user
@@ -410,7 +418,9 @@ public class ImporterDefaultMainProgramEntry {
 
 			}
 			
-			
+
+			Boolean doNotUseCutoffInInputFile = (Boolean) cmdLineParser.getOptionValue( doNotUseCutoffInInputFileOpt, Boolean.FALSE);
+
 			Boolean skipPopulatingPathOnSearchLineOptChosen = (Boolean) cmdLineParser.getOptionValue( skipPopulatingPathOnSearchLineOpt, Boolean.FALSE);
 
 			String proxlDatabaseName = (String)cmdLineParser.getOptionValue( proxlDatabaseNameCommandLineOpt );
@@ -680,6 +690,14 @@ public class ImporterDefaultMainProgramEntry {
 				//  Search Name User entered in form, or null if nothing entered
 				searchNameOverrideValue = proxlXMLFileImportTrackingDTO.getSearchName();
 				
+				if ( StringUtils.isNotEmpty( proxlXMLFileImportTrackingDTO.getSearchPath() ) ) {
+					
+					skipPopulatingPathOnSearchLineOptChosen = false;
+
+					importDirectoryOverrideValue = proxlXMLFileImportTrackingDTO.getSearchPath();
+					
+				}
+				
 				
 				///  Get the Proxl XML file and Scan files
 				
@@ -947,8 +965,8 @@ public class ImporterDefaultMainProgramEntry {
 
 				@SuppressWarnings("rawtypes")
 				Vector  dropPsmCutoffValueVector = cmdLineParser.getOptionValues( dropPsmCutoffValueOpt );
-
-
+				
+				
 				if( ( noScanFilesCommandLineOptChosen == null || ( ! noScanFilesCommandLineOptChosen ) )
 						&& ( inputScanFileStringVector == null || ( inputScanFileStringVector.isEmpty() ) ) ) {
 
@@ -1345,6 +1363,7 @@ public class ImporterDefaultMainProgramEntry {
 							projectId, 
 							
 							searchNameOverrideValue,
+							importDirectoryOverrideValue,
 							
 							mainXMLFileToImportContainer.getMainXMLFileToImport(), 
 							
@@ -1354,7 +1373,10 @@ public class ImporterDefaultMainProgramEntry {
 
 							dropPeptidePSMCutoffValues,
 
-							skipPopulatingPathOnSearchLineOptChosen
+							skipPopulatingPathOnSearchLineOptChosen,
+							
+							doNotUseCutoffInInputFile 
+							
 							);
 
 			

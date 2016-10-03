@@ -520,6 +520,16 @@ public class ProxlXMLFileImportUploadSubmitService {
 			searchName = null; // make null if it is the empty string
 		}
 
+		//  use search path in Submit request if populated
+
+		String searchPath = uploadSubmitRequest.getSearchPath();
+
+		if ( StringUtils.isEmpty( searchPath ) ) {
+
+			//  No Search path in upload request
+
+			searchPath= null; // make null if it is the empty string
+		}
 		
 		List<ProxlXMLFileImportTrackingSingleFileDTO> proxlXMLFileImportTrackingSingleFileDTOList = new ArrayList<>( 1 );
 		
@@ -767,6 +777,10 @@ public class ProxlXMLFileImportUploadSubmitService {
 		proxlXMLFileImportTrackingDTO.setAuthUserId( authUserId );
 		
 		proxlXMLFileImportTrackingDTO.setSearchName( searchName );
+		
+		proxlXMLFileImportTrackingDTO.setSearchPath( searchPath );
+		
+		
 		
 		
 		proxlXMLFileImportTrackingDTO.setInsertRequestURL( requestURL );
@@ -1170,6 +1184,8 @@ public class ProxlXMLFileImportUploadSubmitService {
 		
 		String searchName;
 		
+		String searchPath;
+		
 		List<UploadSubmitRequestFileItem> fileItems;
 
 		public Integer getProjectId() {
@@ -1218,6 +1234,14 @@ public class ProxlXMLFileImportUploadSubmitService {
 
 		public void setSubmitterSameMachine(boolean submitterSameMachine) {
 			this.submitterSameMachine = submitterSameMachine;
+		}
+
+		public String getSearchPath() {
+			return searchPath;
+		}
+
+		public void setSearchPath(String searchPath) {
+			this.searchPath = searchPath;
 		}
 		
 		

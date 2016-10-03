@@ -101,19 +101,6 @@ public class ProxlXMLFileImportTracking_ForWebAppDAO {
 
 
 
-//CREATE TABLE IF NOT EXISTS proxl_xml_file_import_tracking (
-//  id INT UNSIGNED NOT NULL,
-//  status_id TINYINT UNSIGNED NOT NULL,
-//  marked_for_deletion TINYINT NOT NULL DEFAULT 0,
-//  project_id INT UNSIGNED NOT NULL,
-//  auth_user_id INT UNSIGNED NOT NULL,
-//  search_name VARCHAR(2000) NULL,
-//  insert_request_url VARCHAR(255) NOT NULL,
-//  inserted_search_id INT UNSIGNED NULL,
-//  upload_date_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-//  last_updated_date_time TIMESTAMP NOT NULL,
-
-
 	/**
 	 * @param item
 	 * @throws Exception
@@ -153,9 +140,9 @@ public class ProxlXMLFileImportTracking_ForWebAppDAO {
 
 		final String sql = "INSERT INTO proxl_xml_file_import_tracking ( "
 				+ " id, project_id, priority, status_id, marked_for_deletion, insert_request_url, "
-				+ " search_name, auth_user_id,  "
+				+ " search_name, search_path, auth_user_id,  "
 				+ " remote_user_ip_address, last_updated_date_time )"
-				+ " VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW() )";
+				+ " VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW() )";
 
 		try {
 			
@@ -189,6 +176,8 @@ public class ProxlXMLFileImportTracking_ForWebAppDAO {
 			pstmt.setString( counter, item.getInsertRequestURL() );
 			counter++;
 			pstmt.setString( counter, item.getSearchName() );
+			counter++;
+			pstmt.setString( counter, item.getSearchPath() );
 			
 			counter++;
 			pstmt.setInt( counter, item.getAuthUserId() );
@@ -298,20 +287,7 @@ public class ProxlXMLFileImportTracking_ForWebAppDAO {
 					+ " WHERE id = ? AND status_id = ?";
 		}
 		
-//		CREATE TABLE `proxl_xml_file_import_tracking` (
-//				  `id` int(10) unsigned NOT NULL,
-//				  `status_id` tinyint(3) unsigned NOT NULL,
-//				  `insert_request_url` varchar(255) COLLATE utf8_bin NOT NULL,
-//				  `project_id` int(10) unsigned NOT NULL,
-//				  `auth_user_id` int(10) unsigned NOT NULL,
-//				  `inserted_search_id` int(10) unsigned DEFAULT NULL,
-//				  `upload_date_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-//				  `last_updated_date_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-//				  `search_name` varchar(2000) COLLATE utf8_bin DEFAULT NULL,
-//				  `marked_for_deletion` tinyint(3) unsigned NOT NULL DEFAULT '0',
-//				  `deleted_by_auth_user_id` int(10) unsigned DEFAULT NULL,
-//				  `deleted_date_time` varchar(45) COLLATE utf8_bin DEFAULT NULL,
-//		
+
 		try {
 			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );

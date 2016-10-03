@@ -67,6 +67,7 @@ public class ImporterCoreEntryPoint {
 	/**
 	 * @param projectId
 	 * @param searchNameOverrideValue
+	 * @param importDirectoryOverrideValue
 	 * @param mainXMLFileToImport
 	 * @param proxlInputForImportParam
 	 * @param scanFileFileContainerList
@@ -81,6 +82,7 @@ public class ImporterCoreEntryPoint {
 			
 			int projectId,
 			String searchNameOverrideValue,
+			String importDirectoryOverrideValue,
 			File mainXMLFileToImport,
 			
 			ProxlInput proxlInputForImportParam,
@@ -90,7 +92,9 @@ public class ImporterCoreEntryPoint {
 			
 			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			
-			Boolean skipPopulatingPathOnSearchLineOptChosen
+			Boolean skipPopulatingPathOnSearchLineOptChosen,
+			
+			Boolean doNotUseCutoffInInputFile 
 			
 			) throws Exception, ProxlImporterProjectNotAllowImportException, ProxlImporterProxlXMLDeserializeFailException {
 
@@ -103,35 +107,40 @@ public class ImporterCoreEntryPoint {
 
 		String importDirectory = null; 
 		
-				
-		try {
+		if ( StringUtils.isNotEmpty( importDirectoryOverrideValue ) ) {
 			
-			File importFileCanonicalFile = mainXMLFileToImport.getCanonicalFile();
-			
-			if ( importFileCanonicalFile != null ) {
+			importDirectory = importDirectoryOverrideValue;
+		
+		} else {
 
-				File importFileParent = importFileCanonicalFile.getParentFile();
+			try {
 
-				if ( importFileParent != null ) {
+				File importFileCanonicalFile = mainXMLFileToImport.getCanonicalFile();
 
-					importDirectory = importFileParent.getCanonicalPath();
+				if ( importFileCanonicalFile != null ) {
 
+					File importFileParent = importFileCanonicalFile.getParentFile();
+
+					if ( importFileParent != null ) {
+
+						importDirectory = importFileParent.getCanonicalPath();
+
+					} else {
+
+						importDirectory = importFileCanonicalFile.getCanonicalPath();
+					}
 				} else {
 
-					importDirectory = importFileCanonicalFile.getCanonicalPath();
+					importDirectory = mainXMLFileToImport.getCanonicalPath();
 				}
-			} else {
-				
-				importDirectory = mainXMLFileToImport.getCanonicalPath();
+
+			} catch ( Exception e ) {
+
+				String msg = "Error mainXMLFileToImport.getCanonicalPath() or importFileCanonicalFile.getParentFile() or importFileParent.getCanonicalPath()";
+				log.error( msg, e );
+				throw e;
 			}
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Error mainXMLFileToImport.getCanonicalPath() or importFileCanonicalFile.getParentFile() or importFileParent.getCanonicalPath()";
-			log.error( msg, e );
-			throw e;
 		}
-		
 		
 		if ( proxlInputForImport == null ) {
 
@@ -179,7 +188,14 @@ public class ImporterCoreEntryPoint {
 		
 		proxlInputForImport = null; //  release this reference
 		
-		int insertedSearchId = doImportPassingDeserializedProxlImportInputXML( projectId, proxlInputObjectContainer, scanFileFileContainerList, importDirectory, dropPeptidePSMCutoffValues, skipPopulatingPathOnSearchLineOptChosen );
+		int insertedSearchId = doImportPassingDeserializedProxlImportInputXML( 
+				projectId, 
+				proxlInputObjectContainer, 
+				scanFileFileContainerList, 
+				importDirectory, 
+				dropPeptidePSMCutoffValues, 
+				skipPopulatingPathOnSearchLineOptChosen,
+				doNotUseCutoffInInputFile );
 		
 		return insertedSearchId;
 		
@@ -313,7 +329,9 @@ public class ImporterCoreEntryPoint {
 			
 			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			
-			Boolean skipPopulatingPathOnSearchLineOptChosen
+			Boolean skipPopulatingPathOnSearchLineOptChosen,
+			
+			Boolean doNotUseCutoffInInputFile
 
 			) throws Exception, ProxlImporterProjectNotAllowImportException {
 		
@@ -376,11 +394,15 @@ public class ImporterCoreEntryPoint {
 			ValidateScanFilenamesInXMLAreOnCommandLine.getInstance().validateScanFilenamesInXMLAreOnCommandLine( proxlInputForImport, scanFileFileContainerList );
 
 			
+			if ( doNotUseCutoffInInputFile ) {
+				
+				dropPeptidePSMCutoffValues = new DropPeptidePSMCutoffValues();
+				
+			} else {
 			
-			
-			//   Throws ProxlImporterDataException if data error found
-			DropPeptidePSMPopulateFromProxlXMLInput.getInstance().populateFromProxlXMLInput( dropPeptidePSMCutoffValues, proxlInputForImport );
-			
+				//   Throws ProxlImporterDataException if data error found
+				DropPeptidePSMPopulateFromProxlXMLInput.getInstance().populateFromProxlXMLInput( dropPeptidePSMCutoffValues, proxlInputForImport );
+			}
 
 			//  Process proxl Input
 
