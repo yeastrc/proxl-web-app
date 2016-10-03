@@ -777,7 +777,7 @@ function loadSequenceCoverageDataForProtein( protein, loadRequest, callout ) {
 			
 			var url = contextPathJSVar + "/services/sequenceCoverage/getDataForProtein";
 			url += buildQueryStringFromHash();
-			url += "&proteinId=" + protein;
+			url += "&proteinSequenceId=" + protein;
 			
 			 $.ajax({
 			        type: "GET",
