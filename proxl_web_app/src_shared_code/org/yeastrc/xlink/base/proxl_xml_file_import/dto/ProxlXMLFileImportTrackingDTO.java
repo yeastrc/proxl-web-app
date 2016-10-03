@@ -21,6 +21,7 @@ public class ProxlXMLFileImportTrackingDTO {
 	private String remoteUserIpAddress;
 	private boolean markedForDeletion;
 	private String searchName;
+	private String searchPath;
 	private String insertRequestURL;
 	
 	private Date recordInsertDateTime;
@@ -38,15 +39,15 @@ public class ProxlXMLFileImportTrackingDTO {
 				+ authUserId + ", status=" + status + ", remoteUserIpAddress="
 				+ remoteUserIpAddress + ", markedForDeletion="
 				+ markedForDeletion + ", searchName=" + searchName
-				+ ", insertRequestURL=" + insertRequestURL
-				+ ", recordInsertDateTime=" + recordInsertDateTime
-				+ ", importStartDateTime=" + importStartDateTime
-				+ ", importEndDateTime=" + importEndDateTime
-				+ ", lastUpdatedDateTime=" + lastUpdatedDateTime
-				+ ", deletedByAuthUserId=" + deletedByAuthUserId
-				+ ", deletedDateTime=" + deletedDateTime + "]";
+				+ ", searchPath=" + searchPath + ", insertRequestURL="
+				+ insertRequestURL + ", recordInsertDateTime="
+				+ recordInsertDateTime + ", importStartDateTime="
+				+ importStartDateTime + ", importEndDateTime="
+				+ importEndDateTime + ", lastUpdatedDateTime="
+				+ lastUpdatedDateTime + ", deletedByAuthUserId="
+				+ deletedByAuthUserId + ", deletedDateTime=" + deletedDateTime
+				+ "]";
 	}
-
 
 	
 	public int getId() {
@@ -148,6 +149,18 @@ public class ProxlXMLFileImportTrackingDTO {
 	}
 	public void setPriority(int priority) {
 		this.priority = priority;
+	}
+
+
+
+	public String getSearchPath() {
+		return searchPath;
+	}
+
+
+
+	public void setSearchPath(String searchPath) {
+		this.searchPath = searchPath;
 	}
 
 }

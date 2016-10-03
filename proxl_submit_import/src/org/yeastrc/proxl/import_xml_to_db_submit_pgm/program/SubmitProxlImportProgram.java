@@ -90,7 +90,10 @@ public class SubmitProxlImportProgram {
 			CmdLineParser.Option searchNameFromCommandLineCommandLineOpt = cmdLineParser.addStringOption( 'Z', "search-description" );
 
 			CmdLineParser.Option noSearchNameCommandLineOpt = cmdLineParser.addBooleanOption( 'Z', "no-search-description" );
+
 			
+			CmdLineParser.Option sendSearchPathCommandLineOpt = cmdLineParser.addBooleanOption( 'Z', "send-search-path" );
+		
 			
 			//  Username and password 
 			CmdLineParser.Option usernameCommandLineOpt = cmdLineParser.addStringOption( 'Z', "username" );
@@ -240,6 +243,8 @@ public class SubmitProxlImportProgram {
 			
 
 			Boolean noSearchNameCommandLineOptChosen = (Boolean) cmdLineParser.getOptionValue( noSearchNameCommandLineOpt, Boolean.FALSE);
+			
+			Boolean sendSearchPathCommandLineOptChosen = (Boolean) cmdLineParser.getOptionValue( sendSearchPathCommandLineOpt, Boolean.FALSE);
 
 			
 			ConfigParams configParams = ConfigParams.getInstance();
@@ -247,6 +252,16 @@ public class SubmitProxlImportProgram {
 			if ( StringUtils.isNotEmpty( configFile ) ) {
 				
 				File configFileCommandLine = new File( configFile );
+				
+				if ( ! configFileCommandLine.exists() ) {
+					
+					System.err.println( "config file specified on command line does not exist: " + configFileCommandLine.getAbsolutePath() );
+					
+					System.err.println( "" );
+					System.err.println( FOR_HELP_STRING );
+
+					System.exit(PROGRAM_EXIT_CODE_INVALID_INPUT);  //  EARLY EXIT
+				}
 				
 				configParams.setConfigFileCommandLine( configFileCommandLine );
 			}
@@ -280,6 +295,27 @@ public class SubmitProxlImportProgram {
 				}
 			}
 			
+			String searchPath = null;
+			
+			if ( sendSearchPathCommandLineOptChosen ) {
+
+				try {
+					searchPath = proxlXMLFile.getCanonicalFile().getParentFile().getCanonicalPath();
+
+
+				} catch ( Exception e ) {
+
+					System.err.println( "System error getting path for Proxl XML file: " + proxlXMLFile.getCanonicalPath() );
+
+					System.err.println( "" );
+					System.err.println( FOR_HELP_STRING );
+
+					System.exit( PROGRAM_EXIT_CODE_PROGRAM_PROBLEM  );  //  EARLY EXIT
+
+				}
+			}
+			
+			
 			System.out.println( "Run with '-h' to view help" );
 
 
@@ -301,6 +337,8 @@ public class SubmitProxlImportProgram {
 							scanFiles,
 
 							searchName,
+							searchPath,
+							
 							noSearchNameCommandLineOptChosen,
 							noScanFilesCommandLineOptChosen);
 			

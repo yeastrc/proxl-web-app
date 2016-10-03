@@ -23,6 +23,8 @@ public class UploadSubmitRequest {
 	String submitterKey;
 	
 	String searchName;
+
+	String searchPath;
 	
 	List<UploadSubmitRequestFileItem> fileItems;
 
@@ -72,5 +74,13 @@ public class UploadSubmitRequest {
 
 	public void setSubmitterSameMachine(boolean submitterSameMachine) {
 		this.submitterSameMachine = submitterSameMachine;
+	}
+
+	public String getSearchPath() {
+		return searchPath;
+	}
+
+	public void setSearchPath(String searchPath) {
+		this.searchPath = searchPath;
 	}
 }

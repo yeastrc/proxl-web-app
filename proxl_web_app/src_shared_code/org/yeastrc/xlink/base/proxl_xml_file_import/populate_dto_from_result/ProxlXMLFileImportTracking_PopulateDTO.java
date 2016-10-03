@@ -58,6 +58,7 @@ public class ProxlXMLFileImportTracking_PopulateDTO {
 		}
 		
 		returnItem.setSearchName( rs.getString( "search_name" ) );
+		returnItem.setSearchPath( rs.getString( "search_path" ) );
 		
 		returnItem.setInsertRequestURL( rs.getString( "insert_request_url" ) );
 		
