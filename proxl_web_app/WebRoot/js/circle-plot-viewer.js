@@ -8,13 +8,12 @@ var circlePlotViewer = function() {
 
 
 circlePlotViewer.prototype.initialize  = function(  ) {
-	
+
 };
 
 circlePlotViewer.prototype.CONSTANTS = { 
 
-		_DEFAULT_VIEWPORT_HEIGHT : 800,
-		_DEFAULT_VIEWPORT_WIDTH : 800,
+		_DEFAULT_DIAMETER : 800,
 		
 		_GAP_BETWEEN_BARS : 2,			// gap between proteins bars in degrees
 		_HEIGHT_OF_PROTEIN_BARS : 40,	// height of protein bars in pixels
@@ -1545,7 +1544,7 @@ circlePlotViewer.prototype.inializeSVGObject = function() {
 		$svg_image_inner_container_div.css( { height : newHeightContainingDivEmpty } );
 		return;
 	} else {
-		$svg_image_inner_container_div.css( { height : this.CONSTANTS._DEFAULT_VIEWPORT_HEIGHT + 4 + "px" } );
+		$svg_image_inner_container_div.css( { height : this.getDiameter() + 4 + "px" } );
 	}
 	
 	return svgRootSnapSVGObject;
@@ -1556,12 +1555,12 @@ circlePlotViewer.prototype.inializeSVGObject = function() {
 
 circlePlotViewer.prototype.setViewerDimensions = function(svgRootSnapSVGObject) {
 	
-	this.centerX = this.CONSTANTS._DEFAULT_VIEWPORT_WIDTH / 2;
+	this.centerX = this.getDiameter() / 2;
 	this.centerY = this.centerX;
 	this.radius = this.centerX;
 	
-	var width = this.CONSTANTS._DEFAULT_VIEWPORT_WIDTH;
-	var height = this.CONSTANTS._DEFAULT_VIEWPORT_HEIGHT;
+	var width = this.getDiameter();
+	var height = this.getDiameter();
 	
 	if( this.isColorBySearch() ) {
 		width += this.CONSTANTS._LEGEND_WIDTH + this.CONSTANTS._LEGEND_GAP;
@@ -1906,5 +1905,39 @@ circlePlotViewer.prototype.getDegreesPerResidue = function() {
 	
 	// number of degrees per protein residue
 	return workingDegrees / totalProteinLength;
+};
+
+/**
+ * Get the diameter to use for the circle plot. Will use the default diameter set
+ * in CONSTANTS, unless automatic sizing is disabled--it will then use the value
+ * set in the slider
+ */
+circlePlotViewer.prototype.getDiameter = function() {
+	
+	if ( $( "input#automatic-sizing" ).is( ':checked' ) ) {
+		return this.CONSTANTS._DEFAULT_DIAMETER;
+	} else {
+		
+		if( this.getUserDiameter() ) {
+			return this.getUserDiameter();
+		} else {
+			return this.CONSTANTS._DEFAULT_DIAMETER;
+		}
+	}
+	
+};
+
+/**
+ * Get the value set by the user to use for the diameter
+ */
+circlePlotViewer.prototype.getUserDiameter = function() {
+	return this.userDiameter;
+};
+
+/**
+ * Set the value set by the user to use for the diameter
+ */
+circlePlotViewer.prototype.setUserDiameter = function( d ) {
+	return this.userDiameter = d;
 };
 

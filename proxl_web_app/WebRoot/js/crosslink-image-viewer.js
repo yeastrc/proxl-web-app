@@ -251,7 +251,9 @@ var HASH_OBJECT_PROPERTIES = {
 
 		"selected-proteins" : "x",
 		
-		"color_by" : "y"
+		"color_by" : "y",
+		
+		"user_circle_diameter" : "ucd",
 };
 
 
@@ -1213,6 +1215,9 @@ function updateURLHash( useSearchForm ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["protein_names_position"], PROTEIN_NAMES_POSITION_LEFT );
 	}
 	
+	if( _circlePlotViewer.getDiameter() ) {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["user_circle_diameter"], _circlePlotViewer.getDiameter() );
+	}
 	
 	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["annotation_type"], $("#annotation_type").val() );
 
@@ -2526,6 +2531,10 @@ function populateViewerCheckBoxes() {
 	
 	
 	handleScaleFactorVisibility( true /* supressRedraw */ );
+	
+	if( json[ 'user_circle_diameter' ] ) {
+		_circlePlotViewer.setUserDiameter( json[ 'user_circle_diameter' ] );
+	}
 	
 	updateContextOptions();
 }
@@ -7977,7 +7986,32 @@ function initializeViewer()  {
 	
 	populateViewerCheckBoxes();
 
+	
+	// set up the slider for custom diameter
+	$("#circle_diameter_value").text( _circlePlotViewer.getDiameter() );
 
+	$("#circle_diameter_slider_div").slider({
+	      value:_circlePlotViewer.getDiameter(),
+	      min: 500,
+	      max: 2000,
+	      step: 100,
+	      slide: function( event, ui ) {
+	    	  $("#circle_diameter_value").text( ui.value );
+	      },
+	      change: function( event, ui ) {
+	  		  
+	  		  _circlePlotViewer.setUserDiameter( ui.value );
+	  		  
+	  		  updateURLHash( false /* useSearchForm */ );
+
+	    	  $("#circle_diameter_value").text( _circlePlotViewer.getDiameter() );
+	    	  drawSvg();
+	      }
+
+	    });
+	
+	
+	
 	
 	$("#vertical_spacing_value").text( _singleProteinBarOverallHeight );
 	

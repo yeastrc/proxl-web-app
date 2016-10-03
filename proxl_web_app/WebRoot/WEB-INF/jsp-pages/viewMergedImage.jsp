@@ -420,6 +420,13 @@
 						<div id="horizontal_scaling_slider_div" style="display: inline-block; width: 100px;"></div>  
 						<span id="horizontal_scaling_value" >100</span>%
 					</div>
+					
+					
+					<div class="circle-only" style="margin:0px;">
+						<span class="tool_tip_attached_jq" data-tooltip="User slider to change circle diameter">Circle diameter:</span>&nbsp;&nbsp;&nbsp;
+						<div id="circle_diameter_slider_div" style="display: inline-block; width: 100px;"></div>  
+						<span id="circle_diameter_value" ></span> pixels
+					</div>
 
 				</div>
 				
