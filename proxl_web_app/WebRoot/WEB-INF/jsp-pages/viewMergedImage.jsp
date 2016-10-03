@@ -308,10 +308,12 @@
 					
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle display of scale bar" style="white-space:nowrap;" ><input type="checkbox" id="show-scalebar" checked>Show scalebar</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle automatic sizing of protein bars. Uncheck to allow manual horizontal sizing and vertical spacing." style="white-space:nowrap;" ><input type="checkbox" id="automatic-sizing" checked>Automatic sizing</span></label>
-					<label><span style="white-space:nowrap;"
+
+					<label class="bar-only"><span style="white-space:nowrap;"
 							class="tool_tip_attached_jq" data-tooltip="Toggle showing protein names to left of protein bars" 
 							><input type="checkbox" id="protein_names_position_left" 
 								>Protein Names On Left</span></label>
+								
 					<label><span style="white-space:nowrap;"
 							class="tool_tip_attached_jq" data-tooltip="Toggle showing image as a circle plot" 
 							><input type="checkbox" id="view-as-circle-plot" 
@@ -369,11 +371,11 @@
 					
 					<span style="white-space:nowrap;" >
 
-						<a class="tool_tip_attached_jq" 
+						<a class="bar-only tool_tip_attached_jq" 
 							data-tooltip="Reset Proteins highlighting, flipping, positioning, and horizontal scaling"  
 							href="javascript:resetProteins()"  style="font-size:10pt;white-space:nowrap;"
 							>[Reset Proteins]</a>
-						<a class="tool_tip_attached_jq" data-tooltip="Orients all proteins with N-terminus on left-hand side" style="font-size:10pt;white-space:nowrap;" 
+						<a class="bar-only tool_tip_attached_jq" data-tooltip="Orients all proteins with N-terminus on left-hand side" style="font-size:10pt;white-space:nowrap;" 
 							href="javascript:resetProteinsReversed()"
 							>[Reset Protein Flipping]</a>							
 
@@ -407,16 +409,17 @@
 					
 				<div id="user-image-sizing-div" style="display:none; margin-top: 5px;">
 					
-					
-					<span class="tool_tip_attached_jq" data-tooltip="Use slider to change spacing between protein bars">Vertical spacing:</span>&nbsp;&nbsp;&nbsp;
-					<div id="vertical_spacing_slider_div" style="display: inline-block; width: 100px;"></div>  
-					<span id="vertical_spacing_value" ></span> pixels
-					
-					&nbsp;&nbsp;&nbsp;
-					
-					<span class="tool_tip_attached_jq" data-tooltip="User slider to change width of protein bars">Horizontal scaling:</span>&nbsp;&nbsp;&nbsp;
-					<div id="horizontal_scaling_slider_div" style="display: inline-block; width: 100px;"></div>  
-					<span id="horizontal_scaling_value" >100</span>%
+					<div class="bar-only" style="margin:0px;">
+						<span class="tool_tip_attached_jq" data-tooltip="Use slider to change spacing between protein bars">Vertical spacing:</span>&nbsp;&nbsp;&nbsp;
+						<div id="vertical_spacing_slider_div" style="display: inline-block; width: 100px;"></div>  
+						<span id="vertical_spacing_value" ></span> pixels
+						
+						&nbsp;&nbsp;&nbsp;
+						
+						<span class="tool_tip_attached_jq" data-tooltip="User slider to change width of protein bars">Horizontal scaling:</span>&nbsp;&nbsp;&nbsp;
+						<div id="horizontal_scaling_slider_div" style="display: inline-block; width: 100px;"></div>  
+						<span id="horizontal_scaling_value" >100</span>%
+					</div>
 
 				</div>
 				

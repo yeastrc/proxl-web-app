@@ -2527,6 +2527,7 @@ function populateViewerCheckBoxes() {
 	
 	handleScaleFactorVisibility( true /* supressRedraw */ );
 	
+	updateContextOptions();
 }
 
 
@@ -8058,8 +8059,7 @@ function initializeViewer()  {
 	});
 	
 	$( "input#view-as-circle-plot" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		loadDataAndDraw( true /* doDraw */ );
+		toggleCircleBarView();
 	});
 
 	$( "#color_by" ).change( function() {
@@ -8139,9 +8139,6 @@ function initializeViewer()  {
 		$("#pgm_failed_annotation_data_overlay_div").hide();
 
 
-//		$("#annotation_type").val("");
-//		updateURLHash( false /* useSearchForm */ );
-
 		loadDataAndDraw( true /* doDraw */ );
 
 	});
@@ -8149,6 +8146,35 @@ function initializeViewer()  {
 
 };
 
+// update the contextual options (e.g. show bar plot-only options when viewing bar plot)
+function updateContextOptions() {
+	
+	if(  $( "input#view-as-circle-plot" ).is( ':checked' )  ) {
+		
+		// turn on circle-plot-only options
+		$( ".circle-only" ).show();
+		
+		
+		// hide bar options
+		$( ".bar-only" ).hide();
+
+	} else {
+		
+		// turn on bar-only options
+		$( ".bar-only" ).show();
+		
+		// hide circle-only options
+		$( ".circle-only" ).hide();
+	}
+	
+}
+
+// function called when toggling between circle and bar plot
+function toggleCircleBarView() {	
+	updateContextOptions();	
+	updateURLHash( false /* useSearchForm */ );
+	loadDataAndDraw( true /* doDraw */ );
+}
 
 function isSizingAutomatic() {
 	if ( $( "input#automatic-sizing" ).is( ':checked' ) ) {
@@ -8163,13 +8189,6 @@ function handleScaleFactorVisibility( supressRedraw ) {
 	if ( isSizingAutomatic() ) {
 		$( "div#user-image-sizing-div" ).hide();
 	} else {
-		
-//		if ( _userScaleFactor == undefined ) {
-//			setUserScaleFactorAndRedraw( ( getMultiplier( true /* ignoreUserScale */ ) ).toFixed( 1 ) );
-//		}
-		
-		
-		
 		$( "div#user-image-sizing-div" ).show();
 	}
 	
@@ -8178,68 +8197,7 @@ function handleScaleFactorVisibility( supressRedraw ) {
 	}
 }
 
-//function setUserScaleFactorAndRedraw( newMultiplier ) {
-//	
-//	if ( _userScaleFactor == undefined || _userScaleFactor != newMultiplier ) {
-//		
-//		_userScaleFactor = newMultiplier;
-//		drawSvg();
-//	}
-//}
-//
-//function submitUserScaleFactor() {
-//	
-//	//  If the user entered scale factor is not a floating point number,
-//	//    put the previous value stored in the variable into the input field
-//	
-//	var $input_scale_factor_input = $( "input#scale-factor-input" );
-//	
-//	var input_scale_factor_input = $input_scale_factor_input.val();
-//	
-//	if ( input_scale_factor_input == undefined || input_scale_factor_input === "" ) {
-//		$input_scale_factor_input.val( _userScaleFactor );
-//		return;
-//	}
-//	
-//	if ( isNaN( input_scale_factor_input ) ) {
-//		$input_scale_factor_input.val( _userScaleFactor );
-//		return;
-//	}
-//	
-//	var value = parseFloat( input_scale_factor_input );
-//	if ( value <= 0 ) {
-//		$input_scale_factor_input.val( _userScaleFactor );
-//		return;
-//	}
-//	
-//	//  The user has entered a number so save the value and redraw
-//	
-//	setUserScaleFactorAndRedraw( value );
-//	updateURLHash( false /* useSearchForm */ );
-//}
 
-
-//// handle redrawing on resize
-//var rtime;
-//var timeout = false;
-//var delta = 200;
-//$(window).resize(function() {
-//	rtime = new Date();
-//	if (timeout === false) {
-//		timeout = true;
-//		setTimeout(resizeend, delta);
-//	}
-//});
-//
-//function resizeend() {
-//	if (new Date() - rtime < delta) {
-//		setTimeout(resizeend, delta);
-//	} else {
-//		timeout = false;
-//		drawSvg();
-//	}
-//}
-//
 
 
 
