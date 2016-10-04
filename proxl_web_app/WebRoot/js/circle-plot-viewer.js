@@ -507,47 +507,27 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 			
 			var angle = startAngle + ( k * degreesPerResidue ) - degreesPerResidue;
 			
-			var startAdjustment = 0.5;
-			var endAdjustment = 1;
-			
-			if( k >= 10 ) {
-				startAdjustment = 1;
-				endAdjustment = 2;
-			}
-			if( k >= 100 ) {
-				var startAdjustment = 1.5;
-				var endAdjustment = 2;
-			}
-			if( k > 1000 ) {
-				var startAdjustment = 2;
-				var endAdjustment = 3;
-			}
-			
-			startPoint = this.polarToCartesian( center.x, center.y, radius , angle - startAdjustment);
-			endPoint = this.polarToCartesian( center.x, center.y, radius , angle + endAdjustment );
+			startPoint = this.polarToCartesian( center.x, center.y, radius , angle - degreesPerResidue * factor );
+			endPoint = this.polarToCartesian( center.x, center.y, radius , angle + degreesPerResidue * factor  );
 			
 			d = [
 	             "M", startPoint.x, startPoint.y, 
 	             "A", radius, radius, 0, 0, 1, endPoint.x, endPoint.y
 	         ].join(" ");
-		
-			var path = svgRootSnapSVGObject.path( d );
-			path.attr({
-				stroke:"none",
-				fill:"none",
-				"startOffset":"50%",
-			});
-		
-			group.add( path );
-			
+					
 			var text = svgRootSnapSVGObject.text( 0, 0, k + "" );
 			
 			text.attr( {
-				"textpath" : path,
+				"textpath" : d,
 				"font-size": this.CONSTANTS._SCALE_BAR_FONT_HEIGHT + "px",
 				stroke:this.getColorForIndex( i ),
 				fill:"none",
 				"stroke-opacity":"0.9",
+				"text-anchor":"middle",
+			});
+			
+			text.textPath.attr( {
+				"startOffset":"50%",
 			});
 			
 			group.add( text );
