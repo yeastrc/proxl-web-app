@@ -167,24 +167,35 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
 		for( var s = 0; s < segments.length; s++ ) {
 			
 			var segment = segments[ s ];
-
+			var toolTipText = '';
+			
 			// get the color to use for this segment
 			var color;
 			if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_DISOPRED3 ) {
 				
 				color = this.CONSTANTS._DISOPRED_COLOR;
+				
+				toolTipText = 'Disordered Region: start: ' + segment.startPosition + ', end: ' + segment.endPosition;
 
 			} else if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_PSIPRED3 ) {
 				
 				if ( segment.type === BETA_SHEET ) {
 					color = this.CONSTANTS._PSIPRED_BETA_COLOR;
+					
+					toolTipText = '&#946; sheet: start: ' + segment.startPosition + ', end: ' + segment.endPosition;
+					
 				} else {
 					color = this.CONSTANTS._PSIPRED_ALPHA_COLOR;
+					
+					toolTipText = '&#945; helix: start: ' + segment.startPosition + ', end: ' + segment.endPosition;
+
 				}
 								
 			} else if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE ) {
 				
 				color = this.getColorForIndex( i );
+				
+				toolTipText = 'Sequence coverage segment: start: ' + segment.start + ', end: ' + segment.end;
 				
 			}
 			
@@ -201,6 +212,23 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
 				fill:color,
 				"fill-opacity":"0.8"
 			});
+			
+			// add tooltip to this segment
+			
+			var toolTipParams = {
+					content: {
+						text: toolTipText
+					},
+					position: {
+						target: 'mouse'
+							,
+							adjust: { x: 5, y: 5 } // Offset it slightly from under the mouse
+					}
+			};
+			
+			var pSVGNativeObject = p.node;
+			var $pSVGNativeObject= $(pSVGNativeObject);
+			$pSVGNativeObject.qtip( toolTipParams );
 			
 		}
 		
