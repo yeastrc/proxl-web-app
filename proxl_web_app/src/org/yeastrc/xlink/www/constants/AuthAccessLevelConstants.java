@@ -20,6 +20,9 @@ public class AuthAccessLevelConstants {
 
 	public static final int ACCESS_LEVEL_PROJECT_OWNER = 30;
 	
+
+	
+	public static final int ACCESS_LEVEL_SEARCH_DELETE = ACCESS_LEVEL_PROJECT_OWNER;
 	
 //	Assistant project owner -  Used for access level label "Researcher"
 //
@@ -30,8 +33,6 @@ public class AuthAccessLevelConstants {
 
 	public static final int ACCESS_LEVEL_ASSISTANT_PROJECT_OWNER_AKA_RESEARCHER = 38;
 	
-	
-	public static final int ACCESS_LEVEL_SEARCH_DELETE = 40;
 	
 	
 	public static final int ACCESS_LEVEL_WRITE = 50;
