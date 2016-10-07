@@ -7,7 +7,13 @@ package org.yeastrc.xlink.www.objects;
 public class CutoffsAppliedOnImportWebDisplay {
 	
 	private String annotationName;
+	private int annotationTypeId;
+	
+	private String annotationFilterDirection;
+
 	private String cutoffValue;
+	private Double cutoffValueDouble;
+
 	private boolean peptideCutoff;
 	
 	
@@ -28,6 +34,24 @@ public class CutoffsAppliedOnImportWebDisplay {
 	}
 	public void setPeptideCutoff(boolean peptideCutoff) {
 		this.peptideCutoff = peptideCutoff;
+	}
+	public int getAnnotationTypeId() {
+		return annotationTypeId;
+	}
+	public void setAnnotationTypeId(int annotationTypeId) {
+		this.annotationTypeId = annotationTypeId;
+	}
+	public Double getCutoffValueDouble() {
+		return cutoffValueDouble;
+	}
+	public void setCutoffValueDouble(Double cutoffValueDouble) {
+		this.cutoffValueDouble = cutoffValueDouble;
+	}
+	public String getAnnotationFilterDirection() {
+		return annotationFilterDirection;
+	}
+	public void setAnnotationFilterDirection(String annotationFilterDirection) {
+		this.annotationFilterDirection = annotationFilterDirection;
 	}
 
 }

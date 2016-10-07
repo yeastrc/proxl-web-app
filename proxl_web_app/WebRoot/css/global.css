@@ -63,6 +63,8 @@ table.tablesorter tbody td {	padding-right: 15px; }
 A.overide-text-color-to-base-color:link, A.overide-text-color-to-base-color:visited , A.overide-text-color-to-base-color:active , A.overide-text-color-to-base-color:hover 
 { color: #545454 }
 
+.error-text { color: #A55353 }
+
 
 input { font-size:14px;  }
 select { font-size:14px;  }
@@ -876,6 +878,8 @@ body.project-page .qc-plot-overlay-link { margin-right: 20px;  }
 body.project-page tr.search_root_jq:hover { background-color:#fff0f0; }
 body.project-page td.search-checkbox-cell { background-color:#ffffff; }
 body.project-page div.search-details-container-div { background-color:#ffffff; }
+
+body.project-page .qc-plot-filter-on-import-notice { color: #A55353; padding-bottom: 5px; }
 
 
 	/* ----------------------  */
@@ -1739,7 +1743,7 @@ div.filter-cutoffs-modal-dialog-overlay-div {
 	display: block;
 	z-index: 1002;
 
-	width: 500px;
+	width: 650px;
 
 
 }

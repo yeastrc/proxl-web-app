@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.form_page_objects;
 
+
 /**
  * Display of cutoff data per annotation
  *
@@ -11,12 +12,20 @@ public class CutoffPageDisplayAnnotationLevel {
 	private String annotationDescription;
 	
 	private String annotationDefaultValue;
+
+	private String annotationCutoffOnImportValue;
+	
+	private String annotationFilterDirection;
+	
+	private boolean annotationFilterDirectionAbove;
 	
 	private Integer sortOrder;
 	private Integer displayOrder;
 	
 	
 	private String searchProgramDisplayName;
+	
+
 	
 //	/**
 //	 * This annotation name is duplicate across search programs
@@ -84,5 +93,26 @@ public class CutoffPageDisplayAnnotationLevel {
 	public void setAnnotationTypeId(int annotationTypeId) {
 		this.annotationTypeId = annotationTypeId;
 	}
+	public String getAnnotationFilterDirection() {
+		return annotationFilterDirection;
+	}
+	public void setAnnotationFilterDirection(String annotationFilterDirection) {
+		this.annotationFilterDirection = annotationFilterDirection;
+	}
+	public String getAnnotationCutoffOnImportValue() {
+		return annotationCutoffOnImportValue;
+	}
+	public void setAnnotationCutoffOnImportValue(
+			String annotationCutoffOnImportValue) {
+		this.annotationCutoffOnImportValue = annotationCutoffOnImportValue;
+	}
+	public boolean isAnnotationFilterDirectionAbove() {
+		return annotationFilterDirectionAbove;
+	}
+	public void setAnnotationFilterDirectionAbove(
+			boolean annotationFilterDirectionAbove) {
+		this.annotationFilterDirectionAbove = annotationFilterDirectionAbove;
+	}
+
 
 }

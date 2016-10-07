@@ -1668,6 +1668,9 @@
 							
 								<tr searchId="<bean:write name="search" property="id" />" class=" search_root_jq ">
 		
+								  <script type="text/text" class=" qc_plots_links_filtered_on_import_message_jq "
+										><c:out value="${ search_wrapper.cutoffsAppliedOnImportAllAsString }"></c:out></script>
+
 									<td style="width:10px;" valign="top" class="search-checkbox-cell">
 										<input id="search-checkbox-<bean:write name="search" property="id" />" onChange="javascript:checkSearchCheckboxes(<bean:write name="search" property="id" />)" class="search-checkbox" type="checkbox" name="searchIds" value="<bean:write name="search" property="id" />"/>
 									</td>
@@ -1830,13 +1833,12 @@
 											</c:if>
 																						
 											
-											<tr>
+											<tr >
 												<td>QC Plots:</td>
 												<td>
 													<c:if test="${ search.hasScanData }" >
 														[<a href="javascript:" data-tooltip="View scan counts as function of retention time" class="tool_tip_attached_jq qc_plot_scan_retention_time_link_jq" >Retention Time</a>]
 													</c:if>
-												
 													[<a href="javascript:" data-tooltip="View PSM counts as function of score" class="tool_tip_attached_jq qc_plot_psm_count_vs_score_link_jq" >PSM Count vs/ Score</a>]
 												</td>
 											</tr>
@@ -2115,6 +2117,7 @@
 									  </div>
 			
 									 </td>
+								</tr>
 							</table>
 			
 							<div class="search-entry-bottom-border"></div>
@@ -2258,6 +2261,18 @@
 								(min: <span id="scan_retention_time_qc_plot_min_value_for_ann_type_id"
 									></span>, max: <span id="scan_retention_time_qc_plot_max_value_for_ann_type_id"></span>)
 							</td>
+						</tr>
+						
+						<tr id="scan_retention_time_qc_plot_score_cutoffs_on_import_row" 
+							style="display: none;">
+							<td id="scan_retention_time_qc_plot_score_cutoffs_on_import_message"
+								class=" qc-plot-filter-on-import-notice "
+								colspan="2" >
+								Note: Filtered on Import:
+								<%-- Block for annotations and values text --%>
+								<span id="scan_retention_time_qc_plot_score_cutoffs_on_import_anns_values" >
+								</span>
+							</td>	
 						</tr>
 
 				
@@ -2450,6 +2465,20 @@
 
 							</td>
 						</tr>
+						
+						<tr id="psm_count_vs_score_qc_plot_score_cutoffs_on_import_row" 
+							style="display: none;">
+							<td id="psm_count_vs_score_qc_plot_score_cutoffs_on_import_message"
+								class=" qc-plot-filter-on-import-notice "
+								colspan="2" >
+								Note: Filtered on Import:
+								<%-- Block for annotations and values text --%>
+								<span id="psm_count_vs_score_qc_plot_score_cutoffs_on_import_anns_values" >
+								</span>
+							</td>	
+						</tr>
+
+						
 						<tr>
 
 							<td>View as:</td>

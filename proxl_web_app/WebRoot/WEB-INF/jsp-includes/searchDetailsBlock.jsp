@@ -8,8 +8,15 @@
 
 --%>
 
+<%@page import="org.yeastrc.xlink.enum_classes.FilterDirectionType"%>
 <%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
+
+
+<%--  For the JS to pick up and compare to values --%>
+<script id="search_details_block_filter_direction_above_value" type="text/text" ><%= FilterDirectionType.ABOVE.value()  %></script>
+<script id="search_details_block_filter_direction_below_value" type="text/text" ><%= FilterDirectionType.BELOW.value()  %></script>
+
 
 
 <c:set var="singleSearch" value="${ true }" />
@@ -22,24 +29,6 @@
 	 <td style="vertical-align: top;" >Search<c:if test="${ not singleSearch }" >es</c:if>:</td>
 	 <td colspan="10">
 	 
-<%-- 	 
-	 
-<c:choose>
-<c:when test="${ singleSearch }" >
-	
-	<tr>
-	 <td style="vertical-align: top;" >Search:</td>
-	 <td colspan="10">
-		
- </c:when>
- <c:otherwise> 
-	<tr>
-	 <td style="vertical-align: top;" >Search<c:if test="${ not singleSearch }" >es</c:if>:</td>
-	 <td colspan="10">
- </c:otherwise>	
-</c:choose>		
-
---%>
 		
   <c:forEach  var="search_details"  items="${ searches_details_list }" varStatus="searchVarStatus">
 			

@@ -14,13 +14,20 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.SearchProgramsPerSearchDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
 import org.yeastrc.xlink.dto.SearchProgramsPerSearchDTO;
+import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDBDataOutOfSyncException;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplayAnnotationLevel;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplayRoot;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplaySearchLevel;
+import org.yeastrc.xlink.www.objects.CutoffsAppliedOnImportWebDisplay;
+import org.yeastrc.xlink.www.web_utils.GetCutoffsAppliedOnImportForSearchList;
+
+
 
 /**
  * 
@@ -153,13 +160,19 @@ public class GetCutoffPageDisplayRoot {
 		for ( Integer searchId : searchIdsList ) {
 
 
+			List<CutoffsAppliedOnImportWebDisplay> cutoffsAppliedOnImportList = 
+					GetCutoffsAppliedOnImportForSearchList.getInstance()
+					.getCutoffsAppliedOnImportList( searchId );
+
 			CutoffPageDisplaySearchLevel cutoffPageDisplaySearchLevel = new CutoffPageDisplaySearchLevel();
 			cutoffPageDisplayRoot.addCutoffPageDisplaySearchLevel( cutoffPageDisplaySearchLevel );
 
 			cutoffPageDisplaySearchLevel.setSearchId( searchId );
 
-			Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_Psm_AnnotationType_DTOMap = srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap.get( searchId );
-			Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap = srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOListPerSearchIdMap.get( searchId );
+			Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_Psm_AnnotationType_DTOMap = 
+					srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap.get( searchId );
+			Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap = 
+					srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOListPerSearchIdMap.get( searchId );
 
 			if ( srchPgm_Filterable_Psm_AnnotationType_DTOMap == null ) {
 				
@@ -180,9 +193,16 @@ public class GetCutoffPageDisplayRoot {
 			}
 			
 			
-			processPSMs( srchPgm_Filterable_Psm_AnnotationType_DTOMap, cutoffPageDisplaySearchLevel, searchProgramsPerSearchDTOMap );
+			processPSMs( srchPgm_Filterable_Psm_AnnotationType_DTOMap, 
+					cutoffPageDisplaySearchLevel, 
+					searchProgramsPerSearchDTOMap,
+					cutoffsAppliedOnImportList );
 
-			processPeptides( srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap, cutoffPageDisplaySearchLevel, searchProgramsPerSearchDTOMap );
+			processPeptides( 
+					srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap, 
+					cutoffPageDisplaySearchLevel, 
+					searchProgramsPerSearchDTOMap,
+					cutoffsAppliedOnImportList );
 		}
 
 
@@ -206,61 +226,24 @@ public class GetCutoffPageDisplayRoot {
 	private void processPeptides(
 			Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap,
 			CutoffPageDisplaySearchLevel cutoffPageDisplaySearchLevel,
-			Map<Integer,SearchProgramsPerSearchDTO> searchProgramsPerSearchDTOMap )
+			Map<Integer,SearchProgramsPerSearchDTO> searchProgramsPerSearchDTOMap,
+			List<CutoffsAppliedOnImportWebDisplay> cutoffsAppliedOnImportList )
 					throws Exception {
 
 		for ( Map.Entry<Integer, AnnotationTypeDTO> entry : srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap.entrySet() ) {
 
 			AnnotationTypeDTO annotationTypeDTO = entry.getValue();
 
-			if ( annotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
-
-				String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + annotationTypeDTO.getId();
-				log.error( msg );
-				throw new Exception(msg);
-			}
-
-			//  Add Display object
-
-			CutoffPageDisplayAnnotationLevel cutoffPageDisplayAnnotationLevel = new CutoffPageDisplayAnnotationLevel();
+			CutoffPageDisplayAnnotationLevel cutoffPageDisplayAnnotationLevel =
+			processAnnotationTypeObject(
+					annotationTypeDTO,
+					searchProgramsPerSearchDTOMap,
+					cutoffsAppliedOnImportList );
 
 			cutoffPageDisplaySearchLevel.addPeptideCutoffPageDisplayAnnotationLevel( cutoffPageDisplayAnnotationLevel );
 
-			cutoffPageDisplayAnnotationLevel.setAnnotationTypeId( annotationTypeDTO.getId() );
-			cutoffPageDisplayAnnotationLevel.setAnnotationName( annotationTypeDTO.getName() );
-			cutoffPageDisplayAnnotationLevel.setAnnotationDescription( annotationTypeDTO.getDescription() );
-
-			if ( annotationTypeDTO.getAnnotationTypeFilterableDTO().isDefaultFilter() ) {
-
-				cutoffPageDisplayAnnotationLevel.setAnnotationDefaultValue( annotationTypeDTO.getAnnotationTypeFilterableDTO().getDefaultFilterValueString() );
-			}
-
-			cutoffPageDisplayAnnotationLevel.setSortOrder( annotationTypeDTO.getAnnotationTypeFilterableDTO().getSortOrder() );
-			cutoffPageDisplayAnnotationLevel.setDisplayOrder( annotationTypeDTO.getDisplayOrder() );
-
-
-			Integer searchProgramsPerSearchId = annotationTypeDTO.getSearchProgramsPerSearchId();
-			
-			SearchProgramsPerSearchDTO searchProgramsPerSearchDTO = searchProgramsPerSearchDTOMap.get( searchProgramsPerSearchId );
-			
-			if ( searchProgramsPerSearchDTO == null ) {
-					
-				String msg = "No searchProgramsPerSearchDTO record found for searchProgramsPerSearchId: " + searchProgramsPerSearchId;
-				log.error( msg );
-
-				throw new ProxlWebappDBDataOutOfSyncException( msg );
-			}
-			
-			cutoffPageDisplayAnnotationLevel.setSearchProgramDisplayName( searchProgramsPerSearchDTO.getDisplayName() );
-
-			//  Determine if this annotation name is duplicate across search programs
-			
-			//  True/False: This annotation name is duplicate across search programs
-//			cutoffPageDisplayAnnotationLevel.setAnnNameDupsAcrossSrchPgms( true );
 		}
 	}
-
-
 
 
 
@@ -273,63 +256,119 @@ public class GetCutoffPageDisplayRoot {
 	public void processPSMs(
 			Map<Integer, AnnotationTypeDTO> srchPgmFilterablePsmAnnotationTypeDTOMap,
 			CutoffPageDisplaySearchLevel cutoffPageDisplaySearchLevel,
-			Map<Integer,SearchProgramsPerSearchDTO> searchProgramsPerSearchDTOMap )
+			Map<Integer,SearchProgramsPerSearchDTO> searchProgramsPerSearchDTOMap,
+			List<CutoffsAppliedOnImportWebDisplay> cutoffsAppliedOnImportList )
 					throws Exception {
 
 
 		for ( Map.Entry<Integer, AnnotationTypeDTO> entry :  srchPgmFilterablePsmAnnotationTypeDTOMap.entrySet() ) {
 
 			AnnotationTypeDTO annotationTypeDTO = entry.getValue();
-
-			if ( annotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
-
-				String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + annotationTypeDTO.getId();
-				log.error( msg );
-				throw new Exception(msg);
-			}
-
-			//  Add Display object
-
-			CutoffPageDisplayAnnotationLevel cutoffPageDisplayAnnotationLevel = new CutoffPageDisplayAnnotationLevel();
+			
+			CutoffPageDisplayAnnotationLevel cutoffPageDisplayAnnotationLevel =
+					processAnnotationTypeObject( 
+							annotationTypeDTO,
+							searchProgramsPerSearchDTOMap, 
+							cutoffsAppliedOnImportList );
+			
 
 			cutoffPageDisplaySearchLevel.addPsmCutoffPageDisplayAnnotationLevel( cutoffPageDisplayAnnotationLevel );
-
-			cutoffPageDisplayAnnotationLevel.setAnnotationTypeId( annotationTypeDTO.getId() );
-			cutoffPageDisplayAnnotationLevel.setAnnotationName( annotationTypeDTO.getName() );
-			cutoffPageDisplayAnnotationLevel.setAnnotationDescription( annotationTypeDTO.getDescription() );
-
-			if ( annotationTypeDTO.getAnnotationTypeFilterableDTO().isDefaultFilter() ) {
-
-				cutoffPageDisplayAnnotationLevel.setAnnotationDefaultValue( annotationTypeDTO.getAnnotationTypeFilterableDTO().getDefaultFilterValueString() );
-			}
-
-			cutoffPageDisplayAnnotationLevel.setSortOrder( annotationTypeDTO.getAnnotationTypeFilterableDTO().getSortOrder() );
-			cutoffPageDisplayAnnotationLevel.setDisplayOrder( annotationTypeDTO.getDisplayOrder() );
-
-
-
-			Integer searchProgramsPerSearchId = annotationTypeDTO.getSearchProgramsPerSearchId();
-			
-			SearchProgramsPerSearchDTO searchProgramsPerSearchDTO = searchProgramsPerSearchDTOMap.get( searchProgramsPerSearchId );
-			
-			if ( searchProgramsPerSearchDTO == null ) {
-					
-				String msg = "No searchProgramsPerSearchDTO record found for searchProgramsPerSearchId: " + searchProgramsPerSearchId;
-				log.error( msg );
-
-				throw new ProxlWebappDBDataOutOfSyncException( msg );
-			}
-			
-
-			cutoffPageDisplayAnnotationLevel.setSearchProgramDisplayName( searchProgramsPerSearchDTO.getDisplayName() );
-
-			//  Determine if this annotation name is duplicate across search programs
-			
-			//  True/False: This annotation name is duplicate across search programs
-//			cutoffPageDisplayAnnotationLevel.setAnnNameDupsAcrossSrchPgms( true );
 		}
 
 	}
+	
+
+	private CutoffPageDisplayAnnotationLevel processAnnotationTypeObject(
+			AnnotationTypeDTO annotationTypeDTO,
+			Map<Integer, SearchProgramsPerSearchDTO> searchProgramsPerSearchDTOMap,
+			List<CutoffsAppliedOnImportWebDisplay> cutoffsAppliedOnImportList ) 
+					throws Exception, ProxlWebappDataException, ProxlWebappDBDataOutOfSyncException {
+		
+		
+		if ( annotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
+
+			String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + annotationTypeDTO.getId();
+			log.error( msg );
+			throw new Exception(msg);
+		}
+
+		//  Add Display object
+
+		CutoffPageDisplayAnnotationLevel cutoffPageDisplayAnnotationLevel = new CutoffPageDisplayAnnotationLevel();
+
+		cutoffPageDisplayAnnotationLevel.setAnnotationTypeId( annotationTypeDTO.getId() );
+		cutoffPageDisplayAnnotationLevel.setAnnotationName( annotationTypeDTO.getName() );
+		cutoffPageDisplayAnnotationLevel.setAnnotationDescription( annotationTypeDTO.getDescription() );
+
+		AnnotationTypeFilterableDTO annotationTypeFilterableDTO = annotationTypeDTO.getAnnotationTypeFilterableDTO();
+				
+		if ( annotationTypeFilterableDTO == null ) {
+
+			String msg = "No annotationTypeFilterableDTO for AnnotationTypeId. "
+					+ "  AnnotationTypeId: " + annotationTypeDTO.getId();
+			
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
+		}
+
+		FilterDirectionType filterDirectionType = annotationTypeFilterableDTO.getFilterDirectionType();
+
+		if ( filterDirectionType == null ) {
+
+			String msg = "No filterDirectionType for AnnotationTypeId. "
+					+ "  AnnotationTypeId: " + annotationTypeDTO.getId();
+			
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
+		}
+		
+		
+		if ( annotationTypeFilterableDTO.isDefaultFilter() ) {
+
+			cutoffPageDisplayAnnotationLevel.setAnnotationDefaultValue( annotationTypeDTO.getAnnotationTypeFilterableDTO().getDefaultFilterValueString() );
+		}
+		
+		cutoffPageDisplayAnnotationLevel.setAnnotationFilterDirection( filterDirectionType.value() );
+		
+		if ( filterDirectionType == FilterDirectionType.ABOVE ) {
+
+			cutoffPageDisplayAnnotationLevel.setAnnotationFilterDirectionAbove(true);
+		}
+
+		cutoffPageDisplayAnnotationLevel.setSortOrder( annotationTypeFilterableDTO.getSortOrder() );
+		cutoffPageDisplayAnnotationLevel.setDisplayOrder( annotationTypeDTO.getDisplayOrder() );
+
+
+		Integer searchProgramsPerSearchId = annotationTypeDTO.getSearchProgramsPerSearchId();
+		
+		SearchProgramsPerSearchDTO searchProgramsPerSearchDTO = searchProgramsPerSearchDTOMap.get( searchProgramsPerSearchId );
+		
+		if ( searchProgramsPerSearchDTO == null ) {
+				
+			String msg = "No searchProgramsPerSearchDTO record found for searchProgramsPerSearchId: " + searchProgramsPerSearchId;
+			log.error( msg );
+
+			throw new ProxlWebappDBDataOutOfSyncException( msg );
+		}
+		
+		cutoffPageDisplayAnnotationLevel.setSearchProgramDisplayName( searchProgramsPerSearchDTO.getDisplayName() );
+
+
+		for ( CutoffsAppliedOnImportWebDisplay item : cutoffsAppliedOnImportList ) {
+			
+			if ( cutoffPageDisplayAnnotationLevel.getAnnotationTypeId() == item.getAnnotationTypeId() ) {
+				
+				cutoffPageDisplayAnnotationLevel.setAnnotationCutoffOnImportValue( item.getCutoffValue() );
+				
+				break;
+			}
+		}
+		
+		return cutoffPageDisplayAnnotationLevel;
+	}
+
+
+
 }
 
 

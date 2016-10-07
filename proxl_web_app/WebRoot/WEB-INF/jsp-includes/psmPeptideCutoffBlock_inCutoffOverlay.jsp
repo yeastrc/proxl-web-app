@@ -108,21 +108,70 @@
 												data-tooltip="<c:out value="${ annotationCutoffDataEntry.annotationDescription }"></c:out>"
 											</c:if>
 --%>
-											value="<%--- <c:out value="${ annotationCutoffDataEntry.annotationValue }"></c:out> --%>" />						
+											onchange="cutoffProcessingCommonCode.inputFieldChanged( { fieldThis: this } )"
+											value="<%--- <c:out value="${ annotationCutoffDataEntry.annotationValue }"></c:out> --%>" />
+											
+				
 									
 										<input type="hidden" class=" annotation_cutoff_default_value_field_jq " 
 											value="<c:out value="${ annotationCutoffDataEntry.annotationDefaultValue }"></c:out>" >
 			
-												<input type="hidden" class=" annotation_display_name_field_jq "
-													value="<c:out value="${ annotationCutoffDataEntry.annotationName }"
-															></c:out> (<c:out value="${ annotationCutoffDataEntry.searchProgramDisplayName }"
-														></c:out>)" > 
+										<input type="hidden" class=" annotation_display_name_field_jq "
+											value="<c:out value="${ annotationCutoffDataEntry.annotationName }"
+													></c:out> (<c:out value="${ annotationCutoffDataEntry.searchProgramDisplayName }"
+												></c:out>)" > 
+										
+										<input type="hidden" class=" annotation_description_field_jq "
+											value="<c:out value="${ annotationCutoffDataEntry.annotationDescription }"></c:out>" >
+											
+										<input type="hidden" class=" annotation_filter_direction_field_jq "
+											value="<c:out value="${ annotationCutoffDataEntry.annotationFilterDirection }"></c:out>" >
+
+										<c:if test="${ not empty annotationCutoffDataEntry.annotationCutoffOnImportValue }">
+										  <%-- 
+										  	This annotation has Cutoff on Import Value.  
+										  --%>
+
+										  <input type="hidden" class=" annotation_cutoff_on_import_value_field_jq "
+											value="<c:out value="${ annotationCutoffDataEntry.annotationCutoffOnImportValue }"></c:out>" >
 												
-												<input type="hidden" class=" annotation_description_field_jq "
-													value="<c:out value="${ annotationCutoffDataEntry.annotationDescription }"></c:out>" > 								
+										</c:if>			
+												 								
 									  </div>
 									  	
 									</td>
+									<td>
+										<c:if test="${ not empty annotationCutoffDataEntry.annotationCutoffOnImportValue }">
+										  <%-- 
+										  	This annotation has Cutoff on Import Value.  
+										  	Add messages for when:
+										  	1) user blanks out the value
+										  	2) user sets the value to beyond the cutoff on import value
+										  --%>
+
+										  <div class=" annotation_cutoff_missing_or_exceeds_cutoff_on_import_message_jq  error-text "
+										  		style="display: none; " >
+										  	value has to be 
+										  	<c:choose>
+										  	 <c:when test="${ annotationCutoffDataEntry. annotationFilterDirectionAbove }">
+										  	   >= 
+										  	 </c:when>
+										  	 <c:otherwise>
+										  	   <=
+										  	 </c:otherwise>
+										  	</c:choose>
+										  	 
+										  	<c:out value="${ annotationCutoffDataEntry.annotationCutoffOnImportValue }"></c:out>
+										  </div>
+										
+										</c:if>		
+										
+										
+										  <div class=" annotation_cutoff_not_number_message_jq  error-text "
+										  		style="display: none; " >
+										  	value has to be a decimal number 
+										  </div>
+									</td>									
 								</tr>
 							
 							</c:forEach>
@@ -140,7 +189,10 @@
 		
 							
 				
-							<input type="button" value="Save" onclick="cutoffProcessingCommonCode.saveUserValues( { clickedThis : this } )" >
+							<input type="button" value="Save" 
+								class=" save_user_cutoff_values_button_jq  "
+								onclick="cutoffProcessingCommonCode.saveUserValues( { clickedThis : this } )"
+								>
 							<input type="button" value="Cancel" onclick="cutoffProcessingCommonCode.cancel_RestoreUserValues( { clickedThis : this } )" >
 							<input type="button" value="Reset to Defaults" onclick="cutoffProcessingCommonCode.setToDefaultValues( { clickedThis : this } )" >
 			

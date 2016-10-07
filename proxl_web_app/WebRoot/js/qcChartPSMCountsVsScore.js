@@ -320,6 +320,8 @@ QCChartPSMCountVsScores.prototype.openPSMCountVsScoreQCPlotOverlay = function(cl
 	
 	
 	
+	this.populateCutoffsOnImportMessage( { $search_root_jq: $search_root_jq } );
+
 	
 	$psm_count_vs_score_qc_plot_current_search_id.val( searchId );
 	
@@ -331,7 +333,31 @@ QCChartPSMCountVsScores.prototype.openPSMCountVsScoreQCPlotOverlay = function(cl
 
 
 
+//////////
 
+///  
+
+QCChartPSMCountVsScores.prototype.populateCutoffsOnImportMessage = function( params ) {
+
+	var $search_root_jq = params.$search_root_jq;
+
+	var $qc_plots_links_filtered_on_import_message_jq = $search_root_jq.find(".qc_plots_links_filtered_on_import_message_jq");
+
+	var qc_plots_links_filtered_on_import_message_jqHTML = $qc_plots_links_filtered_on_import_message_jq.html();
+
+	var $psm_count_vs_score_qc_plot_score_cutoffs_on_import_row = $("#psm_count_vs_score_qc_plot_score_cutoffs_on_import_row");
+	var $psm_count_vs_score_qc_plot_score_cutoffs_on_import_anns_values = $("#psm_count_vs_score_qc_plot_score_cutoffs_on_import_anns_values");
+
+	if ( qc_plots_links_filtered_on_import_message_jqHTML === "" ) {
+
+		$psm_count_vs_score_qc_plot_score_cutoffs_on_import_row.hide();
+		return;
+	}
+
+	$psm_count_vs_score_qc_plot_score_cutoffs_on_import_row.show();
+	$psm_count_vs_score_qc_plot_score_cutoffs_on_import_anns_values.html( qc_plots_links_filtered_on_import_message_jqHTML );
+
+};
 
 ///  
 
