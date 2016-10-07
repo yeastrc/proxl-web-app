@@ -15,6 +15,7 @@ import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPep
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSM_InsertToDB;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ScanFileFileContainer;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.process_scans.Process_MzML_MzXml_File;
@@ -25,6 +26,7 @@ import org.yeastrc.proxl_import.api.xml_dto.Linkers;
 import org.yeastrc.proxl_import.api.xml_dto.MonolinkMass;
 import org.yeastrc.proxl_import.api.xml_dto.MonolinkMasses;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
+import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingSingleFileDTO;
 import org.yeastrc.xlink.dao.LinkerDAO;
 import org.yeastrc.xlink.dao.SearchCommentDAO;
 import org.yeastrc.xlink.dao.SearchLinkerDAO;
@@ -144,11 +146,13 @@ public class ProcessProxlInput {
 			//  TODO  Must load linkers in a Per Search way
 //			proxlInput.getLinkers();
 			
+			
 			//  Scan Numbers to Scan Ids Map per Scan Filename
 			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds = new HashMap<>();
 			
 			if ( scanFileFileContainerList != null && ( ! scanFileFileContainerList.isEmpty() ) ) {
 
+				
 				//  Scan Numbers in the input XML that need to be read from the scan files and inserted into the DB
 				Map<String, Set<Integer>> mapOfScanFilenamesSetsOfScanNumbers = 
 						GetScanFilenamesAndScanNumbersToInsert.getInstance()
@@ -167,6 +171,13 @@ public class ProcessProxlInput {
 					File scanFile = scanFileFileContainer.getScanFile();
 
 					String scanFilenameString = scanFile.getName();
+
+					if ( scanFileFileContainer.getScanFileDBRecord() != null ) {
+						
+						ProxlXMLFileImportTrackingSingleFileDTO scanFileDBRecord = scanFileFileContainer.getScanFileDBRecord();
+						
+						scanFilenameString = scanFileDBRecord.getFilenameInUpload();
+					}
 
 					
 					Set<Integer> scanNumbersToLoadSet = mapOfScanFilenamesSetsOfScanNumbers.entrySet().iterator().next().getValue();
@@ -190,11 +201,21 @@ public class ProcessProxlInput {
 				} else {
 				
 
+					boolean scanNumbersFoundForAnyScanFile = false;
+					
+					
 					for ( ScanFileFileContainer scanFileFileContainer : scanFileFileContainerList ) {
 
 						File scanFile = scanFileFileContainer.getScanFile();
 						
 						String scanFilenameString = scanFile.getName();
+						
+						if ( scanFileFileContainer.getScanFileDBRecord() != null ) {
+							
+							ProxlXMLFileImportTrackingSingleFileDTO scanFileDBRecord = scanFileFileContainer.getScanFileDBRecord();
+							
+							scanFilenameString = scanFileDBRecord.getFilenameInUpload();
+						}
 
 						Set<Integer> scanNumbersToLoadSet = mapOfScanFilenamesSetsOfScanNumbers.get( scanFilenameString );
 
@@ -205,6 +226,8 @@ public class ProcessProxlInput {
 							
 						} else {
 
+							scanNumbersFoundForAnyScanFile = true;
+							
 							int[] scanNumbersToLoadIntArray = new int[ scanNumbersToLoadSet.size() ];
 							
 							int index = 0;
@@ -222,6 +245,14 @@ public class ProcessProxlInput {
 							mapOfScanFilenamesMapsOfScanNumbersToScanIds.put( scanFilenameString, mapOfScanNumbersToScanIds );
 						}
 					}
+					
+					if ( ! scanNumbersFoundForAnyScanFile ) {
+						
+						String msg = "No Scan Numbers found for any scan file.";
+						log.error( msg );
+						throw new ProxlImporterInteralException( msg );
+					}
+					
 				}
 			}
 			
