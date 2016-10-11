@@ -42,9 +42,12 @@ public class CutoffsAppliedOnImportSearcher {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		String sql = "SELECT annotation_type_id, cutoff_value_string FROM cutoffs_applied_on_import"
+		String sql = "SELECT annotation_type_id, cutoff_value_double, cutoff_value_string FROM cutoffs_applied_on_import"
 				+ " WHERE search_id = ? ";
 		
+//		# id, search_id, annotation_type_id, cutoff_value_string, cutoff_value_double
+//		'16', '204', '1996', '0.06', '0.06'
+
 		try {
 			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
@@ -61,6 +64,7 @@ public class CutoffsAppliedOnImportSearcher {
 				CutoffsAppliedOnImportDTO cutoffsAppliedOnImportDTO = new CutoffsAppliedOnImportDTO();
 				
 				cutoffsAppliedOnImportDTO.setAnnotationTypeId( rs.getInt( "annotation_type_id" ) );
+				cutoffsAppliedOnImportDTO.setCutoffValueDouble( rs.getDouble( "cutoff_value_double" ) );
 				cutoffsAppliedOnImportDTO.setCutoffValueString( rs.getString( "cutoff_value_string" ) );
 				
 				results.add(cutoffsAppliedOnImportDTO);

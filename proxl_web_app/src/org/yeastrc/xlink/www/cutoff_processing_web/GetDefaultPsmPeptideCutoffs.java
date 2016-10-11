@@ -1,14 +1,20 @@
 package org.yeastrc.xlink.www.cutoff_processing_web;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
+import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
+import org.yeastrc.xlink.www.dto.CutoffsAppliedOnImportDTO;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.searcher.CutoffsAppliedOnImportSearcher;
 
 /**
  * 
@@ -61,12 +67,36 @@ public class GetDefaultPsmPeptideCutoffs {
 		srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOListPerSearchIdMap =
 				GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIds );
 		
+		//  Get Cutoff on Import records
+		
+		Map<Integer, Map<Integer, CutoffsAppliedOnImportDTO>> cutoffsAppliedOnImportKeyedOnSearchIdAnnTypeId = new HashMap<>();
+				
+		for ( Integer searchId : searchIds ) {
+
+			List<CutoffsAppliedOnImportDTO> cutoffsAppliedOnImportList = 
+					CutoffsAppliedOnImportSearcher.getInstance().getCutoffsAppliedOnImportDTOForSearchId( searchId );
+			
+			Map<Integer, CutoffsAppliedOnImportDTO> cutoffsAppliedOnImportKeyedAnnTypeId = new HashMap<>();
+			cutoffsAppliedOnImportKeyedOnSearchIdAnnTypeId.put(searchId, cutoffsAppliedOnImportKeyedAnnTypeId);
+
+			for ( CutoffsAppliedOnImportDTO cutoffsAppliedOnImport : cutoffsAppliedOnImportList ) {
+
+				cutoffsAppliedOnImportKeyedAnnTypeId.put( cutoffsAppliedOnImport.getAnnotationTypeId(), cutoffsAppliedOnImport );
+			}
+		}
+
 		
 		CutoffValuesRootLevel cutoffValuesRootLevel =  new CutoffValuesRootLevel();
 
-		processPeptides( srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOListPerSearchIdMap, cutoffValuesRootLevel );
+		processPeptides( 
+				srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOListPerSearchIdMap,
+				cutoffsAppliedOnImportKeyedOnSearchIdAnnTypeId,
+				cutoffValuesRootLevel );
 		
-		processPSMs( srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap, cutoffValuesRootLevel );
+		processPSMs( 
+				srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap, 
+				cutoffsAppliedOnImportKeyedOnSearchIdAnnTypeId,
+				cutoffValuesRootLevel );
 		
 		return cutoffValuesRootLevel;
 	}
@@ -81,6 +111,7 @@ public class GetDefaultPsmPeptideCutoffs {
 	private void processPeptides( 
 
 			Map<Integer, Map<Integer, AnnotationTypeDTO>> srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOListPerSearchIdMap,
+			Map<Integer, Map<Integer, CutoffsAppliedOnImportDTO>> cutoffsAppliedOnImportKeyedOnSearchIdAnnTypeId,
 			CutoffValuesRootLevel cutoffValuesRootLevel
 			) throws Exception {
 
@@ -96,7 +127,12 @@ public class GetDefaultPsmPeptideCutoffs {
 
 			Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap = 
 					srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap_Entry.getValue();
+			
+			
+			Map<Integer, CutoffsAppliedOnImportDTO> cutoffsAppliedOnImportKeyedAnnTypeId =
+					cutoffsAppliedOnImportKeyedOnSearchIdAnnTypeId.get( reportedPeptideAnnotationTypesSearchId );
 
+			
 			//  cutoffValuesSearchesMap is map with searchId (as String) as key.
 
 			CutoffValuesSearchLevel cutoffValuesSearchLevelEntry =
@@ -111,30 +147,71 @@ public class GetDefaultPsmPeptideCutoffs {
 				cutoffValuesSearchLevelEntry.setSearchId( reportedPeptideAnnotationTypesSearchId );
 			}
 
-			Map<String,CutoffValuesAnnotationLevel> peptideCutoffValuesMap = cutoffValuesSearchLevelEntry.getPeptideCutoffValues();
+			Map<String,CutoffValuesAnnotationLevel> cutoffValuesMap = cutoffValuesSearchLevelEntry.getPeptideCutoffValues();
 
 			for ( Map.Entry<Integer, AnnotationTypeDTO> entry :  srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap.entrySet() ) {
 
-				AnnotationTypeDTO srchPgmFilterableReportedPeptideAnnotationTypeDTO = entry.getValue();
+				AnnotationTypeDTO annotationTypeDTO = entry.getValue();
+				
+				AnnotationTypeFilterableDTO annotationTypeFilterableDTO = annotationTypeDTO.getAnnotationTypeFilterableDTO();
 
-				if ( srchPgmFilterableReportedPeptideAnnotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
+				if ( annotationTypeFilterableDTO == null ) {
 
-					String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + srchPgmFilterableReportedPeptideAnnotationTypeDTO.getId();
+					String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + annotationTypeDTO.getId();
 					log.error( msg );
 					throw new Exception(msg);
 				}
+				
+				CutoffsAppliedOnImportDTO cutoffsAppliedOnImportDTO = null;
+				
+				if ( cutoffsAppliedOnImportKeyedAnnTypeId != null && ( ! cutoffsAppliedOnImportKeyedAnnTypeId.isEmpty() ) ) {
+					
+					cutoffsAppliedOnImportDTO = cutoffsAppliedOnImportKeyedAnnTypeId.get( annotationTypeDTO.getId() );
+				}
 
-				if ( srchPgmFilterableReportedPeptideAnnotationTypeDTO.getAnnotationTypeFilterableDTO().isDefaultFilter() ) {
+				if ( annotationTypeFilterableDTO.isDefaultFilter() ) {
 
-					int typeId = srchPgmFilterableReportedPeptideAnnotationTypeDTO.getId();
+					int typeId = annotationTypeDTO.getId();
 
 					String typeIdString = Integer.toString( typeId );
 
-					CutoffValuesAnnotationLevel peptideCutoffValuesEntryForTypeId = new CutoffValuesAnnotationLevel();
-					peptideCutoffValuesMap.put( typeIdString, peptideCutoffValuesEntryForTypeId );
+					CutoffValuesAnnotationLevel cutoffValuesEntryForTypeId = new CutoffValuesAnnotationLevel();
+					cutoffValuesMap.put( typeIdString, cutoffValuesEntryForTypeId );
 
-					peptideCutoffValuesEntryForTypeId.setId(typeId);
-					peptideCutoffValuesEntryForTypeId.setValue( srchPgmFilterableReportedPeptideAnnotationTypeDTO.getAnnotationTypeFilterableDTO().getDefaultFilterValueString() );
+					cutoffValuesEntryForTypeId.setId(typeId);
+					cutoffValuesEntryForTypeId.setValue( annotationTypeFilterableDTO.getDefaultFilterValueString() );
+					
+					if ( cutoffsAppliedOnImportDTO != null ) {
+						
+						if ( annotationTypeFilterableDTO.getFilterDirectionType() == FilterDirectionType.ABOVE ) {
+
+							if ( cutoffsAppliedOnImportDTO.getCutoffValueDouble() > annotationTypeFilterableDTO.getDefaultFilterValue() ) {
+								
+								cutoffValuesEntryForTypeId.setValue( cutoffsAppliedOnImportDTO.getCutoffValueString() );
+							}
+						} else {
+
+							if ( cutoffsAppliedOnImportDTO.getCutoffValueDouble() < annotationTypeFilterableDTO.getDefaultFilterValue() ) {
+								
+								cutoffValuesEntryForTypeId.setValue( cutoffsAppliedOnImportDTO.getCutoffValueString() );
+							}
+						}
+					}
+				} else {
+
+					if ( cutoffsAppliedOnImportDTO != null ) {
+
+						int typeId = annotationTypeDTO.getId();
+
+						String typeIdString = Integer.toString( typeId );
+
+						CutoffValuesAnnotationLevel cutoffValuesEntryForTypeId = new CutoffValuesAnnotationLevel();
+						cutoffValuesMap.put( typeIdString, cutoffValuesEntryForTypeId );
+
+						cutoffValuesEntryForTypeId.setId(typeId);
+						cutoffValuesEntryForTypeId.setValue( cutoffsAppliedOnImportDTO.getCutoffValueString() );
+					}
+					
 				}
 
 			}
@@ -150,6 +227,7 @@ public class GetDefaultPsmPeptideCutoffs {
 	private void processPSMs( 
 
 			Map<Integer, Map<Integer, AnnotationTypeDTO>> srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap,
+			Map<Integer, Map<Integer, CutoffsAppliedOnImportDTO>> cutoffsAppliedOnImportKeyedOnSearchIdAnnTypeId,
 			CutoffValuesRootLevel cutoffValuesRootLevel
 			) throws Exception {
 
@@ -167,6 +245,11 @@ public class GetDefaultPsmPeptideCutoffs {
 			Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_Psm_AnnotationType_DTOMap = 
 					srchPgm_Filterable_Psm_AnnotationType_DTOMap_Entry.getValue();
 
+
+			Map<Integer, CutoffsAppliedOnImportDTO> cutoffsAppliedOnImportKeyedAnnTypeId =
+					cutoffsAppliedOnImportKeyedOnSearchIdAnnTypeId.get( psmAnnotationTypesSearchId );
+
+			
 			//  cutoffValuesSearchesMap is map with searchId (as String) as key.
 
 			CutoffValuesSearchLevel cutoffValuesSearchLevelEntry =
@@ -186,27 +269,69 @@ public class GetDefaultPsmPeptideCutoffs {
 
 			for ( Map.Entry<Integer, AnnotationTypeDTO> entry :  srchPgm_Filterable_Psm_AnnotationType_DTOMap.entrySet() ) {
 
-				AnnotationTypeDTO srchPgmFilterablePsmAnnotationTypeDTO = entry.getValue();
+				AnnotationTypeDTO annotationTypeDTO = entry.getValue();
+
+				AnnotationTypeFilterableDTO annotationTypeFilterableDTO = annotationTypeDTO.getAnnotationTypeFilterableDTO();
 
 
-				if ( srchPgmFilterablePsmAnnotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
+				if ( annotationTypeFilterableDTO == null ) {
 
-					String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + srchPgmFilterablePsmAnnotationTypeDTO.getId();
+					String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + annotationTypeDTO.getId();
 					log.error( msg );
 					throw new Exception(msg);
 				}
 
-				if ( srchPgmFilterablePsmAnnotationTypeDTO.getAnnotationTypeFilterableDTO().isDefaultFilter() ) {
+				CutoffsAppliedOnImportDTO cutoffsAppliedOnImportDTO = null;
+				
+				if ( cutoffsAppliedOnImportKeyedAnnTypeId != null && ( ! cutoffsAppliedOnImportKeyedAnnTypeId.isEmpty() ) ) {
+					
+					cutoffsAppliedOnImportDTO = cutoffsAppliedOnImportKeyedAnnTypeId.get( annotationTypeDTO.getId() );
+				}
+				
+				if ( annotationTypeFilterableDTO.isDefaultFilter() ) {
 
-					int typeId = srchPgmFilterablePsmAnnotationTypeDTO.getId();
+					int typeId = annotationTypeDTO.getId();
 
 					String typeIdString = Integer.toString( typeId );
 
-					CutoffValuesAnnotationLevel psmCutoffValuesEntryForTypeId = new CutoffValuesAnnotationLevel();
-					psmCutoffValuesMap.put( typeIdString, psmCutoffValuesEntryForTypeId );
+					CutoffValuesAnnotationLevel cutoffValuesEntryForTypeId = new CutoffValuesAnnotationLevel();
+					psmCutoffValuesMap.put( typeIdString, cutoffValuesEntryForTypeId );
 
-					psmCutoffValuesEntryForTypeId.setId(typeId);
-					psmCutoffValuesEntryForTypeId.setValue( srchPgmFilterablePsmAnnotationTypeDTO.getAnnotationTypeFilterableDTO().getDefaultFilterValueString() );
+					cutoffValuesEntryForTypeId.setId(typeId);
+					cutoffValuesEntryForTypeId.setValue( annotationTypeFilterableDTO.getDefaultFilterValueString() );
+					
+					if ( cutoffsAppliedOnImportDTO != null ) {
+						
+						if ( annotationTypeFilterableDTO.getFilterDirectionType() == FilterDirectionType.ABOVE ) {
+
+							if ( cutoffsAppliedOnImportDTO.getCutoffValueDouble() > annotationTypeFilterableDTO.getDefaultFilterValue() ) {
+								
+								cutoffValuesEntryForTypeId.setValue( cutoffsAppliedOnImportDTO.getCutoffValueString() );
+							}
+						} else {
+
+							if ( cutoffsAppliedOnImportDTO.getCutoffValueDouble() < annotationTypeFilterableDTO.getDefaultFilterValue() ) {
+								
+								cutoffValuesEntryForTypeId.setValue( cutoffsAppliedOnImportDTO.getCutoffValueString() );
+							}
+						}
+					}
+					
+				} else {
+
+					if ( cutoffsAppliedOnImportDTO != null ) {
+
+						int typeId = annotationTypeDTO.getId();
+
+						String typeIdString = Integer.toString( typeId );
+
+						CutoffValuesAnnotationLevel cutoffValuesEntryForTypeId = new CutoffValuesAnnotationLevel();
+						psmCutoffValuesMap.put( typeIdString, cutoffValuesEntryForTypeId );
+
+						cutoffValuesEntryForTypeId.setId(typeId);
+						cutoffValuesEntryForTypeId.setValue( cutoffsAppliedOnImportDTO.getCutoffValueString() );
+					}
+					
 				}
 			}
 		}
