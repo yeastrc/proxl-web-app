@@ -151,7 +151,7 @@ public class ProjectMoveSearchesService {
 
 			AuthAccessLevel authAccessLevel = GetAuthAccessLevelForWebRequest.getInstance().getAuthAccessLevelForWebRequestProjectId( userSessionObject, projectId );
 
-			if ( ! authAccessLevel.isAssistantProjectOwnerAllowed() ) {
+			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 
 				//  No Access Allowed for this project id
 
@@ -164,7 +164,7 @@ public class ProjectMoveSearchesService {
 			
 			AuthAccessLevel authAccessLevelMoveToProject = GetAuthAccessLevelForWebRequest.getInstance().getAuthAccessLevelForWebRequestProjectId( userSessionObject, moveToProjectId );
 
-			if ( ! authAccessLevelMoveToProject.isAssistantProjectOwnerAllowed() ) {
+			if ( ! authAccessLevelMoveToProject.isProjectOwnerAllowed() ) {
 
 				//  No Access Allowed for move to project id
 

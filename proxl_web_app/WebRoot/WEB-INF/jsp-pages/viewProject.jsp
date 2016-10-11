@@ -1377,7 +1377,7 @@
 
 	
 				<%--  If admin section rendered, include the Javascript for it --%>
-				<c:if test="${authAccessLevel.assistantProjectOwnerAllowed and not empty otherProjectList}" >
+				<c:if test="${authAccessLevel.projectOwnerAllowed and not empty otherProjectList}" >
 			
 						<%--  Div behind modal dialog div --%>
 			
@@ -1635,9 +1635,12 @@
 														  									
 									  
 				  	<c:if test="${authAccessLevel.assistantProjectOwnerAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }" >
-						<div style="margin-bottom:10px;">
-							<input class="submit-button" type="button" value="Expand All" onClick="javascript:expandAll()">
-							<input class="submit-button" type="button" value="Collapse All" onClick="javascript:collapseAll()">
+					  
+					  <div style="margin-bottom:10px;">
+						<input class="submit-button" type="button" value="Expand All" onClick="javascript:expandAll()">
+						<input class="submit-button" type="button" value="Collapse All" onClick="javascript:collapseAll()">
+
+				  	    <c:if test="${authAccessLevel.projectOwnerAllowed }" >
 			
 							<c:if test="${not empty otherProjectList}" >
 								
@@ -1652,8 +1655,11 @@
 								</div>
 								
 							</c:if>
+							
+						</c:if>
 				
-						</div>
+					  </div>
+					  
 					</c:if>
 
 					<div>
