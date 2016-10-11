@@ -1487,8 +1487,12 @@
 						
 			
 				</c:if>
+				
+				
+				<%--   Start of overall block under "Explore Data" section --%>
 									
-				<div class="searches-block collapsable_jq">
+			 <div id="explore_data_overall_block"
+				  class="searches-block collapsable_jq">
 															
 				 <c:choose>
 				  <c:when test="${noAccess}">
@@ -1632,6 +1636,10 @@
 					 <!-- END:   Modal dialog for confirming deleting a search Web Link -->
 					 
 					</c:if>
+
+				 		<%--  Main Data Block  Under "Explore Data" section  --%>
+
+			       <div id="explore_data_main_data_block">   <%--   Displayed HTML Under "Explore Data" section  --%>
 														  									
 									  
 				  	<c:if test="${authAccessLevel.assistantProjectOwnerAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }" >
@@ -1654,6 +1662,14 @@
 										data-tooltip="Select one or more searches below and click here to move the selected searches to another project." ></div>
 								</div>
 								
+							</c:if>
+							
+							<c:if test="${authAccessLevel.projectOwnerAllowed }" >
+
+								<input class="submit-button tool_tip_attached_jq " type="button" 
+											id="re_order_search_button"
+											data-tooltip="Click here to change the order of the searches."
+											value="Re-order Searches" >
 							</c:if>
 							
 						</c:if>
@@ -2179,12 +2195,25 @@
 						</div>
 					 </c:otherwise>
 					</c:choose>
-					
-				
+
+				   </div> <%--   Main Data Block Under "Explore Data" section  <div id="explore_data_main_data_block">  --%>
+						
+						
+						
+				   <c:if test="${ authAccessLevel.projectOwnerAllowed }" >
+
+						<%-- Re-order searches Block, only for project owners  --%>
+
+
+						<%@ include file="/WEB-INF/jsp-includes/projectReOrderSearches.jsp" %>
+						
+				   </c:if>
+										
 				  </c:otherwise>
 				 </c:choose>
-				 					
-				</div>
+					 					
+			 </div>   <%--   END of overall block under "Explore Data" section  <div id="explore_data_overall_block"> --%>
+								
 			</div>
 		</form>
 
@@ -2750,6 +2779,13 @@
 
 		</c:if> 
 		
+
+		<%--  If project owner, include the Javascript for Project Search Order admin --%>
+		<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
+			
+			<script type="text/javascript" src="${ contextPath }/js/viewProject_SearchDisplayOrderAdmin.js?x=${cacheBustValue}"></script>
+		
+		</c:if>		
 
 		<%--  If project owner, include the Javascript for Project Lock admin --%>
 		<c:if test="${authAccessLevel.projectOwnerAllowed or authAccessLevel.projectOwnerIfProjectNotLockedAllowed}" >

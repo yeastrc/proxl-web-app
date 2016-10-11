@@ -634,6 +634,13 @@ body.project-page .delete-search-web-link-overlay-containing-outer-div, body.pro
 /* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
 body.project-page .delete-search-web-link-overlay-container {   }
 
+	/* re-arrange re-order searches */
+
+body.project-page   #re_order_searches_main_data_block .sort-handle-and-text { cursor: move;  }
+body.project-page   #re_order_searches_main_data_block .sort-handle-and-text:hover { background-color:  #FFF0F0 }
+body.project-page   #re_order_searches_main_data_block .sort-handle-float { float: left; padding-left: 2px; padding-right: 2px; padding-top: 4px; }
+body.project-page   #re_order_searches_main_data_block .search-name {  margin: 7px; padding: 3px; overflow: hidden; text-overflow: ellipsis; }
+
 
 
 /* -----   upload Proxl XML file modal dialog background ----- */

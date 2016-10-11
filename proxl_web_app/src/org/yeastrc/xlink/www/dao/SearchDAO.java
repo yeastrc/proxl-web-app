@@ -338,6 +338,54 @@ public class SearchDAO {
 	}
 	
 
+	/**
+	 * Update the display_order associated with this search
+	 * @param searchId
+	 * @param newDisplayOrder
+	 * @throws Exception
+	 */
+	public void updateDisplayOrderForSearch( int searchId, int newDisplayOrder, Connection dbConnection ) throws Exception {
+		
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		String sql = "UPDATE search SET display_order = ? WHERE id = ?";
+
+		try {
+			
+			
+			pstmt = dbConnection.prepareStatement( sql );
+			pstmt.setInt( 1, newDisplayOrder );
+			pstmt.setInt( 2, searchId );
+			
+			pstmt.executeUpdate();
+			
+		} catch ( Exception e ) {
+			
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
+			
+			throw e;
+			
+		} finally {
+			
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			
+		}
+		
+		
+	}
+	
+
+
 
 	
 	/**
