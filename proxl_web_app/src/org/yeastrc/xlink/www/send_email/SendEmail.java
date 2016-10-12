@@ -91,7 +91,8 @@ public class SendEmail {
 
 				if ( log.isDebugEnabled() ) {
 
-					log.debug("Send Email: Http Response Status code: " + httpStatusCode );
+					log.debug("Send Email: Http Response Status code: " + httpStatusCode 
+							+ ", email_webservice_url: " + email_webservice_url );
 				}
 
 				rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
@@ -109,7 +110,8 @@ public class SendEmail {
 				
 				if ( httpStatusCode != HttpStatus.SC_OK ) {
 					
-					String msg = "Failed to send Email.  Http Response Status code: " + httpStatusCode ;
+					String msg = "Failed to send Email.  Http Response Status code: " + httpStatusCode 
+							+ ", email_webservice_url: " + email_webservice_url ;
 					
 					log.error( msg );
 					
@@ -120,7 +122,8 @@ public class SendEmail {
 			} catch (Exception e) {
 
 				log.error("Failed to send email request.  from address = |" + sendEmailDTO.getFromEmailAddress() 
-						+ "|, to address = |" + sendEmailDTO.getToEmailAddress() + "|.", e );
+						+ "|, to address = |" + sendEmailDTO.getToEmailAddress() + "|."
+						+ ", email_webservice_url: " + email_webservice_url , e );
 				throw e;
 
 			} finally { 
@@ -134,13 +137,13 @@ public class SendEmail {
 
 		} else {
 
-
+			MimeMessage message = null;
 
 
 			// Generate and send the email to the user.
 			try {
 
-				MimeMessage message = createSMTPMailMessageToSend( sendEmailDTO );
+				message = createSMTPMailMessageToSend( sendEmailDTO );
 
 				// send the message
 				Transport.send(message);
@@ -157,33 +160,27 @@ public class SendEmail {
 			catch (SendFailedException e) {
 				// Invalid email address format
 
-				//				errors.add("email", new ActionMessage("error.resetpassword.sendmail.error.system"));
-
-				log.error( "SendFailedException: to email address: " + sendEmailDTO.getToEmailAddress(), e );
+				log.error( "SendFailedException: to email address: " + sendEmailDTO.getToEmailAddress()
+						+ ", Smtp Server Host: " + GetEmailConfig.getSmtpServerURL(), e );
 
 				throw e; 
 			}
 			catch (MessagingException e) {
 				// Invalid email address format
 
-				//				errors.add("email", new ActionMessage("error.resetpassword.sendmail.error.system"));
-
-				log.error( "MessagingException: to email address: " + sendEmailDTO.getToEmailAddress(), e );
+				log.error( "MessagingException: to email address: " + sendEmailDTO.getToEmailAddress()
+						+ ", Smtp Server Host: " + GetEmailConfig.getSmtpServerURL(), e );
 
 				throw e; 
 			}
 			catch (Exception e) {
 				// Invalid email address format
 
-				//				errors.add("email", new ActionMessage("error.resetpassword.sendmail.error.system"));
-
-				log.error( "Exception: to email address: " + sendEmailDTO.getToEmailAddress(), e );
+				log.error( "Exception: to email address: " + sendEmailDTO.getToEmailAddress()
+						+ ", Smtp Server Host: " + GetEmailConfig.getSmtpServerURL(), e );
 
 				throw e; 
 			}
-
-
-
 
 		}
 

@@ -34,6 +34,8 @@ public class ProcessImporterRunnerConfigFile {
 	
 	private static final String PROPERTY_NAME__IMPORTER_DB_CONFIG_WITH_PATH = "importer.db.config.file.with.path";
 	
+	private static final String PROPERTY_NAME__PROXL_WEB_APP_BASE_URL = "proxl.web.app.base.url";
+	
 	/**
 	 * private constructor
 	 */
@@ -149,11 +151,20 @@ public class ProcessImporterRunnerConfigFile {
 			String javaExecutableWithPath = configProps.getProperty( PROPERTY_NAME__JAVA_EXECUTABLE_WITH_PATH );
 			String importerJarWithPath = configProps.getProperty( PROPERTY_NAME__IMPORTER_JAR_WITH_PATH );
 			String importerDbConfigWithPath = configProps.getProperty( PROPERTY_NAME__IMPORTER_DB_CONFIG_WITH_PATH );
-
+			
+			String proxlWebAppBaseURL = configProps.getProperty( PROPERTY_NAME__PROXL_WEB_APP_BASE_URL );
+			
 
 			if ( StringUtils.isEmpty( importerJarWithPath ) ) {
 
 				String msg = "For config file: parameter '" + PROPERTY_NAME__IMPORTER_JAR_WITH_PATH + "' is not provided or is empty string.";
+				log.error( msg );
+				throw new DBConnectionParametersProviderPropertiesFileErrorException(msg);
+			}
+
+			if ( StringUtils.isEmpty( proxlWebAppBaseURL ) ) {
+
+				String msg = "For config file: parameter '" + PROPERTY_NAME__PROXL_WEB_APP_BASE_URL + "' is not provided or is empty string.";
 				log.error( msg );
 				throw new DBConnectionParametersProviderPropertiesFileErrorException(msg);
 			}
@@ -168,6 +179,9 @@ public class ProcessImporterRunnerConfigFile {
 			if ( StringUtils.isNotEmpty( importerDbConfigWithPath ) ) {
 				ImporterRunnerConfigData.setImporterDbConfigWithPath( importerDbConfigWithPath );
 			}
+			
+			ImporterRunnerConfigData.setProxlWebAppBaseURL( proxlWebAppBaseURL );
+
 			
 			ImporterRunnerConfigData.setConfigured(true);
 			

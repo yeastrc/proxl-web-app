@@ -14,6 +14,8 @@ public class ImporterRunnerConfigData {
 	private static String importerJarWithPath;
 	private static String importerDbConfigWithPath;
 	
+	private static String proxlWebAppBaseURL;
+	
 	private static boolean configured = false;
 	
 	public static String getImporterJarWithPath() {
@@ -31,6 +33,14 @@ public class ImporterRunnerConfigData {
 			throw new IllegalStateException(msg);
 		}
 		return importerDbConfigWithPath;
+	}
+	public static String getProxlWebAppBaseURL() {
+		if ( ! configured ) {
+			String msg = "ImporterRunnerConfigData not configured";
+			log.error( msg );
+			throw new IllegalStateException(msg);
+		}
+		return proxlWebAppBaseURL;
 	}
 	
 	public static void setImporterJarWithPath(String importerJarWithPath) {
@@ -51,6 +61,10 @@ public class ImporterRunnerConfigData {
 	}
 	public static void setJavaExecutableWithPath(String javaExecutableWithPath) {
 		ImporterRunnerConfigData.javaExecutableWithPath = javaExecutableWithPath;
+	}
+	
+	public static void setProxlWebAppBaseURL(String proxlWebAppBaseURL) {
+		ImporterRunnerConfigData.proxlWebAppBaseURL = proxlWebAppBaseURL;
 	}
 
 	

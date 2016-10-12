@@ -20,6 +20,7 @@ import org.yeastrc.proxl.import_xml_to_db.proxl_xml_file_import.run_importer_to_
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.config.ImporterRunnerConfigData;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.constants.RunImporterCommandConstants;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.constants.RunImporterToImporterFilenameConstants;
+import org.yeastrc.proxl.import_xml_to_db_runner_pgm.on_import_finish.OnImprtFnshCllWbSrvc;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.run_system_command.RunSystemCommand;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.run_system_command.RunSystemCommandResponse;
 import org.yeastrc.xlink.base.proxl_xml_file_import.constants.ProxlXMLFileUploadCommonConstants;
@@ -108,6 +109,10 @@ public class ProcessProxlXMLImport {
 					proxlXMLFileImportTrackingDTO.getId(), 
 					proxlXMLFileImportTrackingRunDTO );
 			
+			OnImprtFnshCllWbSrvc.getInstance()
+			.callProxlWebServiceOnSingleImportFinish( 
+					proxlXMLFileImportTrackingDTO.getId(), 
+					proxlXMLFileImportTrackingRunDTO.getId() );
 			
 			throw new ProxlImporterInteralException(msg);
 		}
@@ -143,6 +148,11 @@ public class ProcessProxlXMLImport {
 					ProxlXMLFileImportStatus.FAILED, 
 					proxlXMLFileImportTrackingDTO.getId(), 
 					proxlXMLFileImportTrackingRunDTO );
+
+			OnImprtFnshCllWbSrvc.getInstance()
+			.callProxlWebServiceOnSingleImportFinish( 
+					proxlXMLFileImportTrackingDTO.getId(), 
+					proxlXMLFileImportTrackingRunDTO.getId() );
 			
 			
 			throw new ProxlImporterInteralException(errorMsg);
@@ -357,7 +367,15 @@ public class ProcessProxlXMLImport {
 		} finally {
 			
 			runSystemCommand = null;
+			
+
+			OnImprtFnshCllWbSrvc.getInstance()
+			.callProxlWebServiceOnSingleImportFinish( 
+					proxlXMLFileImportTrackingDTO.getId(), 
+					proxlXMLFileImportTrackingRunDTO.getId() );
 		}
+		
+		
 	}
 	
 	
