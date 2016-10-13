@@ -128,9 +128,7 @@
     <target name="clean" description="Prepare for clean build">
       <delete dir="${classes}"/>
       <mkdir  dir="${classes}"/>
-      <delete dir="${deploy}" />
-      <mkdir  dir="${deploy}"/>
-    	
+
     	<mkdir  dir="${output_jar_dir}"/>  <!-- makes it if it doesn't exist.  no error if it does exist -->
 
     </target>
