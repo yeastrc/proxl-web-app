@@ -14,12 +14,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.database_update_with_transaction_services.UpdateTrackingTrackingRunRecordsDBTransaction;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
+import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTableGetValueCommon;
+import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
+import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsValuesSharedConstants;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dao.ProxlXMLFileImportTracking_Base_DAO;
 import org.yeastrc.proxl.import_xml_to_db.proxl_xml_file_import.run_importer_to_importer_file_data.RunImporterToImporterFileRoot;
 import org.yeastrc.proxl.import_xml_to_db.proxl_xml_file_import.run_importer_to_importer_file_data.RunImporterToImporterParameterNamesConstants;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.config.ImporterRunnerConfigData;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.constants.RunImporterCommandConstants;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.constants.RunImporterToImporterFilenameConstants;
+import org.yeastrc.proxl.import_xml_to_db_runner_pgm.delete_directory_and_contents.DeleteDirectoryAndContents;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.on_import_finish.OnImprtFnshCllWbSrvc;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.run_system_command.RunSystemCommand;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.run_system_command.RunSystemCommandResponse;
@@ -375,6 +379,54 @@ public class ProcessProxlXMLImport {
 					proxlXMLFileImportTrackingRunDTO.getId() );
 		}
 		
+		
+		deleteUploadedFilesIfConfiguredAndStatusSuccess( proxlXMLFileImportTrackingDTO, subdirForThisTrackingId );
+		
+	}
+	
+	
+	/**
+	 * @param proxlXMLFileImportTrackingDTO
+	 * @throws Exception
+	 */
+	private void deleteUploadedFilesIfConfiguredAndStatusSuccess( ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO, File subdirForThisTrackingId ) throws Exception {
+		
+		int trackingId = proxlXMLFileImportTrackingDTO.getId();
+		
+		//  Get current record for ProxlXMLFileImportTrackingDTO since the importer pgm may have updated it.
+		
+		ProxlXMLFileImportTrackingDTO currentTrackingDTO = ProxlXMLFileImportTracking_Base_DAO.getInstance().getItem( trackingId );
+
+		if ( currentTrackingDTO.getStatus() != ProxlXMLFileImportStatus.COMPLETE ) {
+			
+			//  Status is not COMPLETE so NO DELETION
+			
+			return;  //  EARLY EXIT
+		}
+		
+		// Get configuration item
+		
+		try {
+			
+			String deleteFilesConfigValue =
+					ConfigSystemTableGetValueCommon.getInstance()
+					.getConfigValueForConfigKey( ConfigSystemsKeysSharedConstants.IMPORT_DELETE_UPLOADED_FILES );
+			
+			if ( ! ConfigSystemsValuesSharedConstants.TRUE.equals( deleteFilesConfigValue ) ) {
+
+				//  Config value in table is not true string.
+				
+				return;  //  EARLY EXIT
+			}
+			
+		} catch ( IllegalStateException e ) {
+			
+			//  Config key not in table.  Assume don't want files deleted
+			
+			return;  //  EARLY EXIT
+		}
+		
+		DeleteDirectoryAndContents.getInstance().deleteDirectoryAndContents( subdirForThisTrackingId );
 		
 	}
 	

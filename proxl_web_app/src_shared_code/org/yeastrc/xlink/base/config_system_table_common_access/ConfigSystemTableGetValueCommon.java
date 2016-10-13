@@ -3,8 +3,7 @@ package org.yeastrc.xlink.base.config_system_table_common_access;
 import org.apache.log4j.Logger;
 
 /**
- * 
- *
+ * Singleton Instance
  */
 public class ConfigSystemTableGetValueCommon {
 

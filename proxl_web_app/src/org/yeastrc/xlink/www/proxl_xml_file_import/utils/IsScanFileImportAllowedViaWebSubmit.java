@@ -2,8 +2,8 @@ package org.yeastrc.xlink.www.proxl_xml_file_import.utils;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
+import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsValuesSharedConstants;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
-import org.yeastrc.xlink.www.constants.ConfigSystemsValuesConstants;
 
 /**
  * 
@@ -32,7 +32,7 @@ public class IsScanFileImportAllowedViaWebSubmit {
 			String scanFileImportAllowedViaWebSubmitString = ConfigSystemCaching.getInstance()
 					.getConfigValueForConfigKey( ConfigSystemsKeysSharedConstants.SCAN_FILE_IMPORT_ALLOWED_VIA_WEB_SUBMIT_KEY );
 			
-			if ( ConfigSystemsValuesConstants.TRUE.equals( scanFileImportAllowedViaWebSubmitString ) ) {
+			if ( ConfigSystemsValuesSharedConstants.TRUE.equals( scanFileImportAllowedViaWebSubmitString ) ) {
 				
 				return true;
 			}

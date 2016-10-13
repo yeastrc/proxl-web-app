@@ -32,12 +32,16 @@
 
 	<available file="..${file.separator}.git" type="dir" property="git.present"/>
 	
+
+	<target name="build_shared_code_jar" >
+	
+		<!-- build the jar proxl_shared_code.jar which will be put in the folder 'lib_built_proxl_shared_code_jar' -->
+		<ant dir="..${file.separator}proxl_web_app" antfile="ant_build_shared_code_jar.xml" />
+	</target>	    	
 	
     <target name="create_run_jar"  
-    		depends="create_jar_this_project_run_importer">
+    		depends="build_shared_code_jar,create_jar_this_project_run_importer">
     	
-		<ant dir="..${file.separator}proxl_web_app" antfile="ant_build_shared_code_jar.xml" />
-
     	<!-- Add the jars in the 'lib' folder to the class path   -->
     	
 		<path id="build.classpath">

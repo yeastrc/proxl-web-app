@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
+import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsValuesSharedConstants;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
@@ -207,12 +208,32 @@ public class ConfigService {
 				if ( ( ! ConfigSystemsKeysConstants.textConfigKeys.contains( item.getConfigKey() ) )
 						&& ( ! ConfigSystemsKeysSharedConstants.textConfigKeys.contains( item.getConfigKey() ) ) ) {
 					
-					//  Not one of the text config keys so validate the config keys with specific values
+					
 					
 					if ( ConfigSystemsKeysConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY.equals( item.getConfigKey() ) ) {
+					
+						//  Not one of the text config keys so validate the config keys with specific values
 						
 						if ( ( ! UserSignupConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY__TRUE.equals( item.getConfigValue() ) )
 								&& ( ! UserSignupConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY__FALSE.equals( item.getConfigValue() ) ) ) {
+
+							//  Invalid value for config key found
+
+							String msg = "Invalid value for config key: " + item.getConfigKey();
+							log.error( msg );
+
+							throw new WebApplicationException(
+									Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+									.entity( msg )
+									.build()
+									);		
+						}
+						
+					} else if ( ConfigSystemsKeysSharedConstants.IMPORT_DELETE_UPLOADED_FILES.equals( item.getConfigKey() ) ) {
+
+						//  Not one of the text config keys so validate the config keys with specific values
+						if ( ( ! ConfigSystemsValuesSharedConstants.TRUE.equals( item.getConfigValue() ) )
+								&& ( ! ConfigSystemsValuesSharedConstants.FALSE.equals( item.getConfigValue() ) ) ) {
 
 							//  Invalid value for config key found
 

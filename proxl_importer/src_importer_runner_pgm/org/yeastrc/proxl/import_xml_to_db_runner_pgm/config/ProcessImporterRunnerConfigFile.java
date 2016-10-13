@@ -10,7 +10,7 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFile;
-import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderPropertiesFileErrorException;
+import org.yeastrc.proxl.import_xml_to_db_runner_pgm.exceptions.ConfigPropertiesFileErrorException;
 
 
 
@@ -78,7 +78,7 @@ public class ProcessImporterRunnerConfigFile {
 						String msg = "Properties file not found: " + configFileFromCommandLine.getAbsolutePath();
 						//					log.error( msg );
 
-						throw new DBConnectionParametersProviderPropertiesFileErrorException( msg );
+						throw new ConfigPropertiesFileErrorException( msg );
 					}
 
 					try {
@@ -92,7 +92,7 @@ public class ProcessImporterRunnerConfigFile {
 						String msg = "Properties file not found: " + configFileFromCommandLine.getAbsolutePath() + " exception: " + e.toString();
 						//					log.error( msg, e );
 
-						throw new DBConnectionParametersProviderPropertiesFileErrorException( msg );
+						throw new ConfigPropertiesFileErrorException( msg );
 					}
 
 				} else {
@@ -110,7 +110,7 @@ public class ProcessImporterRunnerConfigFile {
 						String msg = "Properties file '" + CONFIG_FILENAME + "' not found in class path.";
 						//					log.error( msg );
 
-						throw new DBConnectionParametersProviderPropertiesFileErrorException( msg );
+						throw new ConfigPropertiesFileErrorException( msg );
 
 					} else {
 
@@ -131,7 +131,7 @@ public class ProcessImporterRunnerConfigFile {
 
 						//					log.error( msg );
 
-						throw new DBConnectionParametersProviderPropertiesFileErrorException( msg );
+						throw new ConfigPropertiesFileErrorException( msg );
 					}
 				}
 
@@ -155,18 +155,17 @@ public class ProcessImporterRunnerConfigFile {
 			String proxlWebAppBaseURL = configProps.getProperty( PROPERTY_NAME__PROXL_WEB_APP_BASE_URL );
 			
 
-			if ( StringUtils.isEmpty( importerJarWithPath ) ) {
-
-				String msg = "For config file: parameter '" + PROPERTY_NAME__IMPORTER_JAR_WITH_PATH + "' is not provided or is empty string.";
-				log.error( msg );
-				throw new DBConnectionParametersProviderPropertiesFileErrorException(msg);
-			}
+//			if ( StringUtils.isEmpty( importerJarWithPath ) ) {
+//
+//				String msg = "For config file: parameter '" + PROPERTY_NAME__IMPORTER_JAR_WITH_PATH + "' is not provided or is empty string.";
+//				log.error( msg );
+//				throw new ConfigPropertiesFileErrorException(msg);
+//			}
 
 			if ( StringUtils.isEmpty( proxlWebAppBaseURL ) ) {
 
 				String msg = "For config file: parameter '" + PROPERTY_NAME__PROXL_WEB_APP_BASE_URL + "' is not provided or is empty string.";
-				log.error( msg );
-				throw new DBConnectionParametersProviderPropertiesFileErrorException(msg);
+				log.warn( msg );
 			}
 
 

@@ -13,7 +13,7 @@ public class ConfigSystemsKeysConstants {
 	//////   Any plain text inputs need to be added to textConfigKeys in the "static {}" at the bottom
 	
 	
-	//   !!  Additional Config contants in ConfigSystemsKeysSharedConstants in proxl_base
+	//   !!  Additional Config contants in ConfigSystemsKeysSharedConstants in src_shared_code
 	
 	
 	////  User sign up procedure key  -  Specific Values allowed

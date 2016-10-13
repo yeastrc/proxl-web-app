@@ -11,6 +11,7 @@ import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTab
 /**
  * DAO for config_system table
  *
+ * For Importer and Run Importer
  */
 public class ConfigSystemDAO implements IConfigSystemTableGetValue {
 	

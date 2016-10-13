@@ -1,4 +1,4 @@
-<%@page import="org.yeastrc.xlink.www.constants.ConfigSystemsValuesConstants"%>
+<%@page import="org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsValuesSharedConstants"%>
 <%@page import="org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants"%>
 <%@page import="org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants"%>
 <%@page import="org.yeastrc.xlink.www.constants.UserSignupConstants"%>
@@ -148,8 +148,16 @@
 				Allow Scan file Upload: 
 				<input type="checkbox" class=" config_checkbox_inputs_jq "  
 					data-config-key="<%= ConfigSystemsKeysSharedConstants.SCAN_FILE_IMPORT_ALLOWED_VIA_WEB_SUBMIT_KEY %>"
-					data-value-checked="<%= ConfigSystemsValuesConstants.TRUE %>" 
-					data-value-not-checked="<%= ConfigSystemsValuesConstants.FALSE %>" > 
+					data-value-checked="<%= ConfigSystemsValuesSharedConstants.TRUE %>" 
+					data-value-not-checked="<%= ConfigSystemsValuesSharedConstants.FALSE %>" > 
+			
+			</div>
+			<div>
+				Delete uploaded files after Successful Import: 
+				<input type="checkbox" class=" config_checkbox_inputs_jq "  
+					data-config-key="<%= ConfigSystemsKeysSharedConstants.IMPORT_DELETE_UPLOADED_FILES %>"
+					data-value-checked="<%= ConfigSystemsValuesSharedConstants.TRUE %>" 
+					data-value-not-checked="<%= ConfigSystemsValuesSharedConstants.FALSE %>" > 
 			
 			</div>
 		</div>

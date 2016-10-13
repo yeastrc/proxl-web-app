@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
@@ -52,6 +53,13 @@ public class OnImprtFnshCllWbSrvc {
 	public void callProxlWebServiceOnSingleImportFinish( int trackingId, int runId ) throws Exception {
 		
 		String baseURL = ImporterRunnerConfigData.getProxlWebAppBaseURL();
+		
+		if ( StringUtils.isEmpty( baseURL) ) {
+			
+			//  No URL to connect to to notify that import is finished
+			
+			return;  //  EARLY EXIT
+		}
 		
 		byte[] request_JSON = null;
 		
