@@ -130,7 +130,7 @@ circlePlotViewer.prototype.draw  = function(  ) {
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGObject ) {
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	var annoType = $("#annotation_type").val();	
 	var radii = this.getFeatureAnnotationRadii();		// the radii to use for drawing the feature annotation curved bars
 	
@@ -398,7 +398,7 @@ circlePlotViewer.prototype.drawLegend = function( svgRootSnapSVGObject ) {
 circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 	
 	var center = this.getCenterCoords();
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	var degreesPerResidue = this.getDegreesPerResidue();
 	
 	// determine frequency and factor of tic marks
@@ -574,7 +574,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawTrypticPositions = function( svgRootSnapSVGObject ) {
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	var radius = this.getProteinBarRadii();
 	var center = this.getCenterCoords();
 	
@@ -611,7 +611,7 @@ circlePlotViewer.prototype.drawTrypticPositions = function( svgRootSnapSVGObject
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawLinkablePositions = function( svgRootSnapSVGObject ) {
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	var radius = this.getProteinBarRadii();
 	var center = this.getCenterCoords();
 	
@@ -646,7 +646,7 @@ circlePlotViewer.prototype.drawLinkablePositions = function( svgRootSnapSVGObjec
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawMonolinks = function( svgRootSnapSVGObject ) {
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId = selectedProteins[ i ];
@@ -741,7 +741,7 @@ circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGO
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawLooplinks = function( svgRootSnapSVGObject ) {
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId = selectedProteins[ i ];
@@ -793,7 +793,7 @@ circlePlotViewer.prototype.drawLooplinks = function( svgRootSnapSVGObject ) {
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawCrosslinks = function( svgRootSnapSVGObject ) {
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId1 = selectedProteins[ i ];
@@ -842,7 +842,7 @@ circlePlotViewer.prototype.drawCrosslinks = function( svgRootSnapSVGObject ) {
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawSelfCrosslinks = function( svgRootSnapSVGObject ) {
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 		
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId = selectedProteins[ i ];
@@ -1007,7 +1007,7 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
  * @returns
  */
 circlePlotViewer.prototype.getCrosslinkTerminus = function( proteinIndex, position ) {
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	
 	var center = this.getCenterCoords();
 	
@@ -1054,7 +1054,7 @@ circlePlotViewer.prototype.getCrosslinkTerminus = function( proteinIndex, positi
  * @returns {Number}
  */
 circlePlotViewer.prototype.getAngleForProteinPosition = function( proteinIndex, position ) {
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	
 	var totalGapDegrees = selectedProteins.length * this.CONSTANTS._GAP_BETWEEN_BARS;
 	var workingDegrees = 360 - totalGapDegrees;
@@ -1094,7 +1094,7 @@ circlePlotViewer.prototype.getAngleForProteinPosition = function( proteinIndex, 
  */
 circlePlotViewer.prototype.drawProteinBars = function( svgRootSnapSVGObject, isTransparent ) {
 	
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	var totalGapDegrees = selectedProteins.length * this.CONSTANTS._GAP_BETWEEN_BARS;
 	var workingDegrees = 360 - totalGapDegrees;
 	
@@ -1531,7 +1531,7 @@ circlePlotViewer.prototype.inializeSVGObject = function() {
 	//  get the <svg> HTML element to pass to Snap
 	var merged_image_svg_element = $merged_image_svg_jq[0];
 	
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	
 	if ( selectedProteins === undefined || selectedProteins.length < 1 ) { 
 		
@@ -1805,7 +1805,7 @@ circlePlotViewer.prototype.getColorForLink = function( index, link ) {
  * @returns
  */
 circlePlotViewer.prototype.getColorForIndex = function( index ) {
-	var number = getAllSelectedProteins().length;
+	var number = _indexManager.getProteinList().length;
 		
 	var hueDivider = 360 / number;
 	var saturation = 0.39;
@@ -1901,7 +1901,7 @@ circlePlotViewer.prototype.isFeatureAnnotationShown  = function() {
  * @returns {Number}
  */
 circlePlotViewer.prototype.getDegreesPerResidue = function() {
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	
 	var totalGapDegrees = selectedProteins.length * this.CONSTANTS._GAP_BETWEEN_BARS;
 	var workingDegrees = 360 - totalGapDegrees;

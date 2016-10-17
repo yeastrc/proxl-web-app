@@ -10,10 +10,12 @@
 		--%>
 		
 		  <div class="outer-float  protein_select_outer_block_jq" 
-		  	data-position_index="{{positionIndex}}"  data-protein_id="{{proteinId}}" >
+		  	data-protein_id="{{proteinId}}"
+		  	data-uid="{{uid}}"
+		  	>
 		  
 		   <div class=" sort-handle-and-text protein_select_protein_item_and_sort_handle_block_jq " 
-		   		data-position_index="{{positionIndex}}"  data-protein_id="{{proteinId}}"
+		   		data-uid="{{uid}}" data-protein_id="{{proteinId}}"
 		   		 >
 			<div class="sort-handle-float">
 				<span class=" sort_handle_jq  tool_tip_attached_jq" 
@@ -28,7 +30,7 @@
 		   
 		   <div class="delete-icon-float">
 			  <input type="image" class="protein_delete_icon_jq tool_tip_attached_jq" data-tooltip="Remove Protein" 
-					 data-protein_id="{{proteinId}}" data-position_index="{{positionIndex}}"  
+					 data-protein_id="{{proteinId}}" data-uid="{{uid}}"  
 					src="${ contextPath }/images/icon-delete-small.png" >
 		   </div> 
 		  </div>

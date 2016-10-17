@@ -9,7 +9,7 @@
 
 <div > <%-- outer div so that template has a single outermost element.  Supports finding .protein_divider_jq div at bottom --%>
 
-  	<div data-item_index="{{itemIndex}}" data-protein_id="{{proteinId}}" data-protein_length="{{proteinLength}}"
+  	<div data-uid="{{uid}}" data-protein_id="{{proteinId}}" data-protein_length="{{proteinLength}}"
   		class= " single_protein_bar_block_jq " style="padding-top: 3px; padding-bottom: 3px;">
 	  	
 	  	<div style="margin-bottom: 5px;">

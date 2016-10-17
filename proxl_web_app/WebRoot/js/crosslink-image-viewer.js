@@ -38,9 +38,13 @@
 
 ///////////////   CONSTANTS  ////////////////////////
 
+/*
+ * The version number to pass along in the JSON for check for compatibility
+ */
+var _JSON_VERSION_NUMBER = 1;
+
 
 //  Default exclude link type "No Links"
-
 var EXCLUDE_LINK_TYPE_DEFAULT = [ 0 ];
 
 
@@ -254,6 +258,10 @@ var HASH_OBJECT_PROPERTIES = {
 		"color_by" : "y",
 		
 		"user_circle_diameter" : "ucd",
+		
+		"index-manager-data" : "imd",
+		
+		"version-number" : "vn",
 };
 
 
@@ -318,8 +326,9 @@ var _imageProteinBarDataManager = ImageProteinBarDataManagerContructor();
 
 var _proteinBarRegionSelectionsOverlayCode = ProteinBarRegionSelectionsOverlayCodeContructor( { imageProteinBarDataManager : _imageProteinBarDataManager });
 
-var _circlePlotViewer = new circlePlotViewer();
+var _indexManager = new indexManager();
 
+var _circlePlotViewer = new circlePlotViewer();
 
 
 //   General
@@ -409,347 +418,6 @@ var _proteinBarsLeftEdge = _PADDING_OVERALL_IMAGE_LEFT_SIDE;
 var _proteinBarToolTip_template_HandlebarsTemplate = null;  ///  Compiled Handlebars template for the protein bar tool tip
 
 
-//////////////////////////////////////////////////////////////////////////////
-
-////////////////     CODE   ///////////////////////////////////
-
-
-
-
-
-//   Convert OLD JSON if necessary
-
-//   Will immediately return after converting JSON or will call initPage() again after converting JSON
-
-//   Unable to return immediately if need to use webservice to get data from server.
-
-function convertOldJSONIfNecessaryReturnTrueIfExit() {
-
-	var json = getRawJsonFromHash();
-
-	if ( convertProteinDataBarDataToProteinSequenceIds( json ) ) {
-
-		return true;  // force main code to wait for async
-	}
-
-
-}
-
-/////
-
-function convertProteinDataBarDataToProteinSequenceIds( json ) {
-
-
-	hashObjectManager.setHashObject( json );
-	
-	var proteinBarData = hashObjectManager.getFromHashObject(HASH_OBJECT_PROPERTIES["protein_bar_data"]);
-		
-
-	if ( proteinBarData !== undefined ) {
-		
-		//  Next load the data into _imageProteinBarDataManager so it can check for and replace NRSEQ Protein Ids
-		
-		_imageProteinBarDataManager.replaceInternalObjectsWithObjectsInHash( { 
-			proteinBarData : proteinBarData,
-			currentProteinIdsArray : undefined
-		} );
-	}
-	
-	//  Convert from before "protein_bar_data"
-	
-	convertProteinHashDataPre_protein_bar_data( json );
-	
-	
-
-	if ( proteinBarData !== undefined ) {
-		
-		//  Next load the data into _imageProteinBarDataManager so it can check for and replace NRSEQ Protein Ids
-		
-		_imageProteinBarDataManager.replaceInternalObjectsWithObjectsInHash( { 
-			proteinBarData : proteinBarData,
-			currentProteinIdsArray : undefined
-		} );
-	}
-	
-
-	if ( ! _imageProteinBarDataManager.contains_OLD_NrseqProteinId() ) {
-		
-		//  No NRSEQ Protein Ids so return false;
-		
-		return false;
-	}
-		
-		
-
-	console.log( "Converting nrseq protein ids to protein sequence ids: " );
-
-
-	var nrseqProteinIds = [];
-
-
-	var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
-
-	//  Iterate through entries in _imageProteinBarDataManager and extract NRSEQ Protein Ids 
-
-	for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
-
-		var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
-
-		var nrseqProteinId = imageProteinBarDataEntry.getOLD_NrseqProteinId();
-
-		nrseqProteinIds.push( nrseqProteinId );
-	}	
-	
-
-	var callback = function( params ) {
-
-		convertProteinDataBarDataToProteinSequenceIdsProcessReponse( params );
-	};
-
-
-
-	var params = {
-
-			nrseqProteinIds : nrseqProteinIds,
-			callback : callback
-	};
-
-	var response = getProteinSequenceIdsForNrseqProteinIds( params );
-
-	if ( response.calledAJAX ) {
-
-		return true;
-	}
-
-	return false;
-}
-
-
-function convertProteinDataBarDataToProteinSequenceIdsProcessReponse( responseParams ) {
-
-	var proteinIdsMapping = responseParams.proteinIdsMapping;
-	var calledAJAX = responseParams.calledAJAX;
-
-
-	var json = getRawJsonFromHash();
-
-	hashObjectManager.setHashObject( json );
-	
-	var proteinBarData = hashObjectManager.getFromHashObject(HASH_OBJECT_PROPERTIES["protein_bar_data"]);
-		
-	if ( proteinBarData !== undefined ) {
-		
-		//  Next load the data into _imageProteinBarDataManager so it can check for and replace NRSEQ Protein Ids
-		
-		_imageProteinBarDataManager.replaceInternalObjectsWithObjectsInHash( { 
-			proteinBarData : proteinBarData,
-			currentProteinIdsArray : undefined
-		} );
-	}
-	
-
-	//  Convert from before "protein_bar_data"
-	
-	convertProteinHashDataPre_protein_bar_data( json );
-	
-
-
-	if ( ! _imageProteinBarDataManager.contains_OLD_NrseqProteinId() ) {
-		
-		//  No NRSEQ Protein Ids so return false;
-		
-		return false;
-	}
-
-
-	var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
-
-	//  Iterate through entries in _imageProteinBarDataManager and lookup NRSEQ Protein Ids to get protein sequence ids
-	
-	for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
-
-		var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
-
-		var nrseqProteinId = imageProteinBarDataEntry.getOLD_NrseqProteinId();
-
-		var matchingProteinSequenceId = proteinIdsMapping[ nrseqProteinId ];
-
-		if ( matchingProteinSequenceId === undefined || matchingProteinSequenceId === null ) {
-
-			throw "Matching protein sequence id not found for nrseq protein id: " + visibleChainNRSEQProteinIdEntry;
-		}
-
-		imageProteinBarDataEntry.setProteinIdNoOtherChanges( { proteinId : matchingProteinSequenceId } );
-	}	
-	
-	
-	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["protein_bar_data"], _imageProteinBarDataManager.getArrayOfObjectsForHash() );
-
-	
-	
-//	Update Hash with updated JSON
-
-	updateURLHashWithJSONObject( json );
-
-
-	if ( calledAJAX ) {
-
-		//   Re call initPage() since on AJAX callback thread;
-
-		initPage();
-	}
-}
-
-
-function convertProteinHashDataPre_protein_bar_data( json ) {
-
-	//  Backwards compatibility Support
-
-
-
-	//   IMPORTANT
-
-	//  If items[ 'protein_bar_data' ] is undefined, it needs to be built from old/previous values 
-	//                to be backwards compatible
-
-	//  Build from other sources
-
-
-	var proteinBarData = json['protein_bar_data'];
-
-	if ( proteinBarData === undefined && _imageProteinBarDataManager.getAllItems().length === 0 ) {
-
-
-		var selectedProteinIds = json[ 'selected-proteins' ];
-
-		if ( selectedProteinIds !== undefined && selectedProteinIds !== null ) {
-
-			for ( var selectedProteinIdsIndex = 0; selectedProteinIdsIndex < selectedProteinIds.length; selectedProteinIdsIndex++ ) {
-
-				var selectedProteinId = selectedProteinIds[ selectedProteinIdsIndex ];
-
-				var newEntry = ImageProteinBarData.constructEmptyImageProteinBarData();
-
-				newEntry.setOLD_NrseqProteinId( { nrseqProteinId : selectedProteinId } );
-
-				_imageProteinBarDataManager.addEntry( { arrayIndexInt : selectedProteinIdsIndex, entry : newEntry } );
-			}
-
-
-		}
-	}
-
-//	More conversion from old data
-	
-
-	var highlightedProteins = json['highlighted-proteins'];  //   Array of the indexes of the highlighted proteins
-
-	if ( highlightedProteins !== undefined && highlightedProteins !== null ) {
-
-		for ( var highlightedProteinsIndex = 0; highlightedProteinsIndex < highlightedProteins.length; highlightedProteinsIndex++ ) {
-
-			var highlightedProteinProteinBarPositionIndex = highlightedProteins[ highlightedProteinsIndex ];
-
-			try {
-
-				//  Try/Catch since the index may not be valid
-
-				var entry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : highlightedProteinProteinBarPositionIndex } );
-
-				entry.setProteinBarHighlightedAll();
-
-			} catch ( e ) {
-
-
-			}
-		}
-	}			
-
-//	Object. Property keys are nrseq protein ids.  The reversed proteins have a value of true
-
-	var proteinsReversedObject = json['proteins-reversed'];  
-
-	if ( proteinsReversedObject !== undefined && proteinsReversedObject !== null ) {
-
-		var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
-
-		var proteinsReversedKeys = Object.keys( proteinsReversedObject );
-
-		for ( var proteinsReversedKeysIndex = 0; proteinsReversedKeysIndex < proteinsReversedKeys.length; proteinsReversedKeysIndex++ ) {
-
-			var reversedProtein_Key = proteinsReversedKeys[ proteinsReversedKeysIndex ];
-
-			var reversedProtein_Value = proteinsReversedObject[ reversedProtein_Key ];
-
-			if ( reversedProtein_Value ) {
-
-				//  value is true so this protein id is reversed
-
-				var reversedProtein_ProteinId = reversedProtein_Key;
-
-				//  Find all entries in _imageProteinBarDataManager with this protein id and set the protein reversed property to true
-
-				for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
-
-					var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
-
-					var imageProteinBarDataEntryProteinId = imageProteinBarDataEntry.getOLD_NrseqProteinId();
-
-					if ( imageProteinBarDataEntryProteinId === reversedProtein_ProteinId ) {
-
-						imageProteinBarDataEntry.setProteinReversed( { proteinReversed : true } );
-					}
-				}
-			}
-		}
-	}
-
-
-
-//	Object. Property keys are nrseq protein ids.  Value are from the left edge
-
-	var proteinsOffsetsObject = json['protein-offsets'];  
-
-	if ( proteinsOffsetsObject !== undefined && proteinsOffsetsObject !== null ) {
-
-		var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
-
-		var proteinsOffsetsKeys = Object.keys( proteinsOffsetsObject );
-
-		for ( var proteinsOffsetsKeysIndex = 0; proteinsOffsetsKeysIndex < proteinsOffsetsKeys.length; proteinsOffsetsKeysIndex++ ) {
-
-			var offsetProtein_Key = proteinsOffsetsKeys[ proteinsOffsetsKeysIndex ];
-
-			var offsetProtein_Value = proteinsOffsetsObject[ offsetProtein_Key ];
-
-			if ( offsetProtein_Value !== undefined && offsetProtein_Value !== null ) {
-
-				//  value is a number so use it
-
-				var offsetProtein_ProteinId = offsetProtein_Key;
-
-				//  Find all entries in _imageProteinBarDataManager with this protein id and set the protein offset property to the value
-
-				for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
-
-					var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
-
-					var imageProteinBarDataEntryProteinId = imageProteinBarDataEntry.getOLD_NrseqProteinId();
-
-					if ( imageProteinBarDataEntryProteinId === offsetProtein_ProteinId ) {
-
-						imageProteinBarDataEntry.setProteinOffset( { proteinOffset : offsetProtein_Value } );
-					}
-				}
-			}
-		}
-	}
-
-
-	
-}
-
-
 
 ////////////////////////////////////////////
 
@@ -788,21 +456,7 @@ var _computedStandardMultiplier = 0;
 function getMultiplier( ignoreUserScale ) {
 
 	if ( ignoreUserScale || isSizingAutomatic() ) {
-		
 		return _computedMultiplier;
-		
-//		var maxProteinLength = 0;
-//		var selectedProteins = getAllSelectedProteins();
-//		
-//		for ( var i = 0; i < selectedProteins.length; i++ ) {
-//			
-//			if ( _proteinLengths[ selectedProteins[ i ] ] > maxProteinLength ) { 
-//			
-//				maxProteinLength = _proteinLengths[ selectedProteins[ i ] ]; 
-//			}
-//		}
-//		
-//		return get_MAX_WIDTH() / ( maxProteinLength + 1 );
 	}
 	
 	return _userScaleFactor;
@@ -829,7 +483,7 @@ function getMultiplier( ignoreUserScale ) {
 // get the right-most edge (in pixels) of the currently selected proteins
 function getCurrentRightmostProteinEdge( ) {
 	
-	var prots = getAllSelectedProteins();
+	var prots = _indexManager.getProteinList();
 	var multiplier = getMultiplier();
 	var rightmostEdge = 0;
 	
@@ -1108,6 +762,9 @@ function updateURLHash( useSearchForm ) {
 
 	hashObjectManager.resetHashObject();
 
+	// add in the version number
+	hashObjectManager.setOnHashObject(  HASH_OBJECT_PROPERTIES[ "version-number" ], _JSON_VERSION_NUMBER );	
+	
 	if ( ! useSearchForm ) {
 
 //		build hash string from previous search, they've just updated the drawing
@@ -1137,6 +794,9 @@ function updateURLHash( useSearchForm ) {
 		getValuesFromForm();
 	}
 
+	
+
+	
 
 //	load in settings from viewer section
 	if ( $( "input#show-self-crosslinks" ).is( ':checked' ) ) {
@@ -1199,6 +859,10 @@ function updateURLHash( useSearchForm ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["view-as-circle-plot"], false );
 	}
 	
+	// save the index manager data
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["index-manager-data"], _indexManager.parr );
+	
+	
 	_colorLinesBy = $("#color_by").val();
 	
 	if ( _colorLinesBy !== "" ) {
@@ -1227,14 +891,7 @@ function updateURLHash( useSearchForm ) {
 
 	
 	//  Add in protein bar data
-	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["protein_bar_data"], _imageProteinBarDataManager.getArrayOfObjectsForHash() );
-	
-	
-	//  Now covered in the 'protein_bar_data'
-//	add in the selected proteins
-//	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["selected-proteins"], getAllSelectedProteins() );
-
-	
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["protein_bar_data"], _imageProteinBarDataManager.getObjectsForHash() );
 	
 	var hashObject = hashObjectManager.getHashObject();
 	
@@ -1243,19 +900,13 @@ function updateURLHash( useSearchForm ) {
 }
 
 
-
 function updateURLHashWithJSONObject( jsonObject ) {
 	
 
-	var newHash = JSON.stringify( jsonObject );
-
-//	var newHashLength = newHash.length;
-	
+	var newHash = JSON.stringify( jsonObject );	
 	var newHashEncodedToEncodedURIComponent = LZString.compressToEncodedURIComponent( newHash );
 	
-
 	try {
-
 		window.location.hash = newHashEncodedToEncodedURIComponent;
 		
 	} catch ( e ) {
@@ -1266,8 +917,6 @@ function updateURLHashWithJSONObject( jsonObject ) {
 		
 		console.log( "Update window.location.hash Failed: e: " + e );
 	}
-
-	
 }
 
 
@@ -1945,7 +1594,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 	
 	// only load sequences for visible proteins
 
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList()
 	
 	var proteinIdsToGetSequence = [];
 	
@@ -2002,7 +1651,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 	
 	// only load annotation data ( other than Sequence Coverage ) for visible proteins
 	
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 
 	var annotationType = $("#annotation_type").val();
 	
@@ -2317,6 +1966,8 @@ function loadDataFromService() {
 	        	populateFromHash_imageProteinBarDataManager();
 	        	
 	        	
+	        	
+	        	
 	        	populateNavigation();
 	        	
 	        	//  Populate from local variables
@@ -2331,42 +1982,7 @@ function loadDataFromService() {
 	        	updateURLHash( false /* useSearchForm */ );
 	        	
 	        	decrementSpinner();
-	        	
-	        	
 
-	        	//  populate _imageProteinBarDataManager from the data loaded from server
-
-	        	populateFromDataLoaded_imageProteinBarDataManager();
-	        	
-	        	
-	        	
-	        	//  Find and show max protein length
-	        	
-//	        	var maxProteinLength = 0;
-//	        	var maxProteinLength_proteinId = 0;
-//	        	
-//	        	var proteinLengthsKeys = Object.keys( _proteinLengths );
-//
-//	        	for ( var i = 0; i < proteinLengthsKeys.length; i++ ) {
-//	        		
-//	        		var id = proteinLengthsKeys[ i ];
-//	        		var proteinLength = _proteinLengths[ id ];
-//	        		
-//	        		if ( proteinLength > maxProteinLength ) {
-//	        			
-//	        			maxProteinLength = proteinLength;
-//	        			maxProteinLength_proteinId = id;
-//	        		}
-//	        	}
-//	        	
-//	        	var proteinNameOfMaxLengthProtein = _proteinNames[ maxProteinLength_proteinId ];
-//	        	
-//	        	alert( "Longest protein:  id: " + maxProteinLength_proteinId + ", length: " + maxProteinLength 
-//	        			+ ", name: " + proteinNameOfMaxLengthProtein );
-	        	
-	        	/////////
-	        	
-	        	
 	        	loadDataAndDraw( true /* doDraw */ );
 	        	
 	        	
@@ -2390,13 +2006,9 @@ function populateFromHash_imageProteinBarDataManager(){
 	var json = getJsonFromHash();
 
 	var proteinBarData = json['protein_bar_data'];
-	
-	if ( proteinBarData !== undefined ) {
 		
-		_imageProteinBarDataManager.replaceInternalObjectsWithObjectsInHash( { 
-			proteinBarData : proteinBarData,
-			currentProteinIdsArray : _proteins
-		} );
+	if ( proteinBarData !== undefined ) {
+		_imageProteinBarDataManager.replaceInternalObjectsWithObjectsInHash( proteinBarData );
 	
 //	} else {
 //
@@ -2405,13 +2017,21 @@ function populateFromHash_imageProteinBarDataManager(){
 	}
 }
 
+/**
+ * Populates the index manager data from the hash.
+ */
+function populateIndexManagerFromHash() {
+	
+	var json = getJsonFromHash();	
+	var data = json[ 'index-manager-data' ];
 
-
-//  populate _imageProteinBarDataManager from the data loaded from server
-
-function populateFromDataLoaded_imageProteinBarDataManager(){
-
-	_imageProteinBarDataManager.updateProteinLengths( { proteinLengths : _proteinLengths } );
+	if( data ) {
+		_indexManager.parr = data;
+	} else {
+		
+		// there is no index manager data (no proteins have been added)
+		
+	}	
 }
 
 
@@ -2561,7 +2181,7 @@ function showSelectedProteins() {
 	
 	
 	
-	var selectedProteinIds = getAllSelectedProteins();
+	var selectedProteinIds = _indexManager.getProteinArray();
 	
 	if ( !selectedProteinIds || selectedProteinIds.length < 1 || _proteins.length < 1 ) {
 
@@ -2598,11 +2218,11 @@ function showSelectedProteins() {
 
 		for ( var i = 0; i < selectedProteinIds.length; i++ ) {
 
-			var proteinId = selectedProteinIds[ i ];
+			var proteinId = selectedProteinIds[ i ].pid;
 			
 			var proteinName = getProteinName( proteinId );
 
-			var selectedProteinEntryValue = { positionIndex : i, proteinId : proteinId , proteinName : proteinName };
+			var selectedProteinEntryValue = { uid : selectedProteinIds[ i ].uid, proteinId : proteinId , proteinName : proteinName };
 			
 			var selectedProteinHTML = selectedProteinEntry_HandlebarsTemplate( selectedProteinEntryValue );
 
@@ -2685,37 +2305,34 @@ function processSortUpdateSelectedProteins( event, ui ) {
 	
 	console.log("processSortUpdateSelectedProteins");
 	
-	//   Update the Selected Proteins with their current index.
+	var $item = ui.item;
+	var uid = $item.attr( "data-uid" );	// the uid of the protein instance we moved
+	
+	// Move the moved protein to the correct index position in the index manager
 	
 	var $selected_proteins_container = $("#selected_proteins_container");
 	
 	var $protein_select_outer_block_jq_Items = $selected_proteins_container.find(".protein_select_outer_block_jq");
-	
-	var elementPrevPositions = [];
-	
+		
 	$protein_select_outer_block_jq_Items.each( function( index, element ) {
 	
 		var $this = $( this );
 		
-		var element_data_position_index = $this.attr("data-position_index");
+		var tuid = $this.attr("data-uid");
 		
-		var element_data_position_index_Int = parseInt( element_data_position_index, 10 );
-		
-		if ( isNaN( element_data_position_index_Int ) ) {
+		if( tuid === uid ) {
 			
-			throw "element_data_position_index is not an integer: " + element_data_position_index;
+			// index is now the position to which we moved the protein
+			
+			_indexManager.moveEntryToIndexPosition( uid, index );
 		}
-		
-		var elementPrevPosition = { prevPosition : element_data_position_index_Int };
-		
-		elementPrevPositions.push( elementPrevPosition );
+
 	} );
 	
-	_imageProteinBarDataManager.updateItemOrder( { elementPrevPositions : elementPrevPositions } );
 	
 	updateURLHash( false /* useSearchForm */ );
 	
-	showSelectedProteins();
+	//showSelectedProteins();
 	
 	drawSvg();
 }
@@ -2729,19 +2346,11 @@ function processClickOnRemoveSelectedProtein( params ) {
 	var $clickedThis = $( clickedThis );
 	
 	$clickedThis.qtip('destroy', true); // Immediately destroy all tooltips belonging to the selected elements
-	
-//	var protein_id = $clickedThis.attr("data-protein_id");
-	
-	var positionIndex = $clickedThis.attr("data-position_index");
-
-	var positionIndexInt = parseInt( positionIndex, 10 );
-	
-	if ( isNaN( positionIndexInt ) ) {
 		
-		throw "positionIndex is not a number.  is: " + positionIndex;
-	}
+	var uid = $clickedThis.attr("data-uid");
 	
-	_imageProteinBarDataManager.removeItemByIndex( { arrayIndexInt : positionIndexInt } );
+	_imageProteinBarDataManager.removeItemByUID( uid );	
+	_indexManager.removeEntryByUID( uid );
 	
 	updateURLHash( false /* useSearchForm */ );
 	
@@ -3000,7 +2609,7 @@ function getProteinOffset( params ) {
 
 	var proteinBarIndex = params.proteinBarIndex;
 	
-	var entry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarIndex } );
+	var entry = _imageProteinBarDataManager.getItemByIndex( proteinBarIndex );
 	
 	var proteinOffset = entry.getProteinOffset();
 
@@ -3024,7 +2633,7 @@ function isProteinReversed( params ) {
 //	var proteinId = params.proteinId;
 	var proteinBarIndex = params.proteinBarIndex;
 	
-	var entry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarIndex } );
+	var entry = _imageProteinBarDataManager.getItemByIndex( proteinBarIndex );
 	
 	var proteinReversed = entry.getProteinReversed();
 
@@ -3211,7 +2820,7 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 		// only do this if they actually moved the protein bar group, or moved bar and tool tips were destroyed
 		if ( ( Math.abs( amountElementMoved ) > 0 ) || tooltipsDestroyed ) {
 		
-			var entry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarIndex } );
+			var entry = _imageProteinBarDataManager.getItemByIndex( proteinBarIndex );
 			
 			var prevOffset = entry.getProteinOffset();
 
@@ -3463,7 +3072,7 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 		var selectionRegion = { start: startX_SequencePositionOneBased, end: endX_SequencePositionOneBased };
 		
 		var imageProteinBarDataEntry = 
-			_imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarIndex } );
+			_imageProteinBarDataManager.getItemByIndex( proteinBarIndex );
 		
 		if ( shiftKeyDown ) {
 			
@@ -3516,7 +3125,7 @@ function removeHighlightedProteinRegion( params ) {
 		sequencePositionOneBased = proteinSequenceLength - sequencePositionOneBased + 1;
 	}
 
-	var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarIndex } );
+	var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex(  proteinBarIndex );
 	
 	imageProteinBarDataEntry.removeProteinBarHighlightedRegion( { position : sequencePositionOneBased } );
 	
@@ -3617,7 +3226,7 @@ function clearHighlightedProteins() {
 // whether or not the supplied selected protein index is currently highlighted
 function isHighlightedProtein( i ) {
 
-	var imageProteinBarData =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : i } );
+	var imageProteinBarData =  _imageProteinBarDataManager.getItemByIndex( i );
 
 	if ( imageProteinBarData.isAllOfProteinBarHighlighted()  ) {
 		
@@ -3634,7 +3243,7 @@ function toggleHighlightedProtein( i, shouldClearFirst ) {
 		
 		clearHighlightedProteins();
 
-		var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : i } );
+		var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByIndex( i );
 		
 		imageProteinBarDataItem.setProteinBarHighlightedAll();
 		
@@ -3642,7 +3251,7 @@ function toggleHighlightedProtein( i, shouldClearFirst ) {
 		
 		if ( isHighlightedProtein( i ) ) {
 			
-			var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : i } );
+			var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByIndex( i );
 			
 			imageProteinBarDataItem.clearProteinBarHighlighted();
 			
@@ -3651,7 +3260,7 @@ function toggleHighlightedProtein( i, shouldClearFirst ) {
 				clearHighlightedProteins(); 
 			}
 
-			var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : i } );
+			var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByIndex( i );
 			
 			imageProteinBarDataItem.setProteinBarHighlightedAll();
 		}
@@ -3664,7 +3273,7 @@ function toggleHighlightedProtein( i, shouldClearFirst ) {
 //Reverse the protein 
 function toggleReversedProtein( i, protein ) {
 
-	var entry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : i } );
+	var entry = _imageProteinBarDataManager.getItemByIndex( i );
 	
 	var proteinReversed = entry.getProteinReversed();
 	
@@ -3689,7 +3298,7 @@ function annotationColorOverrideForUnselected( params ) {
 	var annotationEndPosition = params.annotationEndPosition;
 	
 
-	var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarPositionIndex } );
+	var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex(  proteinBarPositionIndex );
 	
 	if ( imageProteinBarDataEntry.isProteinBarHighlightedAtPosition( { position_1 : annotationStartPosition } )
 			|| imageProteinBarDataEntry.isProteinBarHighlightedAtPosition( { position_1 : annotationEndPosition } ) ) {
@@ -4001,7 +3610,7 @@ function getLineColorSingleProteinBar( params ) {
 		return getColorForProteinBarRowIndexPosition( { proteinBarRowIndex : proteinIndex } ); 
 	}
 
-	var imageProteinBarDataProtein =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinIndex } );
+	var imageProteinBarDataProtein =  _imageProteinBarDataManager.getItemByIndex( proteinIndex );
 
 	if ( toProteinPosition === undefined || toProteinPosition === null ) {
 		
@@ -4059,9 +3668,9 @@ function getCrosslinkLineColor( params ) {
 	}
 
 	
-	var imageProteinBarDataFromProtein =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : fromProteinIndex } );
+	var imageProteinBarDataFromProtein =  _imageProteinBarDataManager.getItemByIndex( fromProteinIndex );
 
-	var imageProteinBarDataToProtein =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : toProteinIndex } );
+	var imageProteinBarDataToProtein =  _imageProteinBarDataManager.getItemByIndex( toProteinIndex );
 	
 	
 	if ( _imageProteinBarDataManager.exactly_One_ProteinBar_Highlighted() ) {
@@ -4204,7 +3813,7 @@ function getLineOpacitySingleProteinBar( params ) {
 	}
 
 
-	var imageProteinBarDataProtein =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinIndex } );
+	var imageProteinBarDataProtein =  _imageProteinBarDataManager.getItemByIndex( proteinIndex );
 
 	if ( toProteinPosition === undefined || toProteinPosition === null ) {
 
@@ -4244,9 +3853,9 @@ function getCrosslinkLineOpacity( params ) {
 	}
 
 	
-	var imageProteinBarDataFromProtein =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : fromProteinIndex } );
+	var imageProteinBarDataFromProtein =  _imageProteinBarDataManager.getItemByIndex( fromProteinIndex );
 
-	var imageProteinBarDataToProtein =  _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : toProteinIndex } );
+	var imageProteinBarDataToProtein =  _imageProteinBarDataManager.getItemByIndex( toProteinIndex );
 	
 	
 	if ( _imageProteinBarDataManager.exactly_One_ProteinBar_Highlighted() ) {
@@ -4405,7 +4014,7 @@ function precomputeMultiplierAndOtherValuesForSVG( svgRootSnapSVGObject, selecte
 	//  Get max protein length
 	
 	var maxProteinLength = 0;
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	
 	for ( var i = 0; i < selectedProteins.length; i++ ) {
 		
@@ -4651,7 +4260,7 @@ function drawSvg() {
 	var bottomOfLowestItemDrawn = 0;
 	var rightMostEdgeOfAllElements = 0;
 	
-	var selectedProteins = getAllSelectedProteins();
+	var selectedProteins = _indexManager.getProteinList();
 	
 //	var maxProteinLength = 0;
 
@@ -4846,7 +4455,7 @@ function drawSequenceCoverage( selectedProteins, svgRootSnapSVGObject ) {
 					
 				if ( isAnyProteinBarsHighlighted ) {
 
-					var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarRowIndex } );
+					var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( proteinBarRowIndex );
 
 					var isProteinBarHighlightedAnywhereBetweenPositionsParams = {
 							position_1 : start,
@@ -5008,7 +4617,7 @@ function drawDisopred_3_AnnotationData( selectedProteins, svgRootSnapSVGObject )
 
 					if ( isAnyProteinBarsHighlighted ) {
 
-						var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarRowIndex } );
+						var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( proteinBarRowIndex );
 
 						var isProteinBarHighlightedAnywhereBetweenPositionsParams = {
 								position_1 : start,
@@ -5153,7 +4762,7 @@ function drawPsipred_3_AnnotationData( selectedProteins, svgRootSnapSVGObject ) 
 
 					if ( isAnyProteinBarsHighlighted ) {
 
-						var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : proteinBarRowIndex } );
+						var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( proteinBarRowIndex );
 
 						var isProteinBarHighlightedAnywhereBetweenPositionsParams = {
 								position_1 : start,
@@ -5307,7 +4916,7 @@ function addSingleProteinBarGroup( i, protein, proteinNamePositionLeftSelected, 
 	
 
 	var imageProteinBarDataEntry = 
-		_imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : i } );
+		_imageProteinBarDataManager.getItemByIndex( i );
 	
 
 
@@ -5375,8 +4984,8 @@ function addSingleProteinBarGroup( i, protein, proteinNamePositionLeftSelected, 
 
 			var proteinRegion = proteinBarHighlightedRegions[ index ];
 
-			var regionStartSequencePosition = proteinRegion.start - 0.5;
-			var regionEndSequencePosition = proteinRegion.end + 0.5;
+			var regionStartSequencePosition = proteinRegion.s - 0.5;
+			var regionEndSequencePosition = proteinRegion.e + 0.5;
 
 
 			var regionRectStartX = translatePositionToXCoordinate( { position : regionStartSequencePosition, proteinId : protein, proteinBarIndex : i } );
@@ -7350,13 +6959,17 @@ function closeAddProteinSelect( params ) {
 }
 
 
-
+/**
+ * Opens the protein selection overlay, and populates it with appropriate data.
+ */
 function openSelectProteinSelect( params ) {
 	
 	if ( ! params ) {
 		
 		throw "params is empty";
 	}
+	
+	var clickedUID, clickedProteinId;
 	
 	var clickedThis = params.clickedThis;
 	
@@ -7389,26 +7002,16 @@ function openSelectProteinSelect( params ) {
 
 	$protein_select_text_container_jq.qtip('toggle', false); // Immediately hide all tooltips belonging to the selected elements
 	
-	var positionIndexSelectedProtein = $clickedThis.attr("data-position_index");
-	var proteinIdSelectedProtein = $clickedThis.attr("data-protein_id");
+	clickedUID = $clickedThis.attr("data-uid");
 	
-	
-	if ( positionIndexSelectedProtein === undefined ) {
-		positionIndexSelectedProtein = null;
+	if ( !clickedUID ) {
+		clickedUID = null;
 	}
-
-	if ( proteinIdSelectedProtein === undefined ) {
-		proteinIdSelectedProtein = null;
-	}
-	
 	
 	
 	if ( addProteinsClicked ) {
 		
 		//  "Add Protein" button clicked
-		
-		positionIndexSelectedProtein = null;
-		proteinIdSelectedProtein = null;
 		
 		$("#select_protein_add_proteins_overlay_header_text").show();
 		$("#select_protein_change_protein_overlay_header_text").hide();
@@ -7446,8 +7049,7 @@ function openSelectProteinSelect( params ) {
 	//  Save off values from clicked Selected Protein.  Will be null for Add Protein
 	
 	$protein_list_container.data( { 
-		positionIndex: positionIndexSelectedProtein, 
-		proteinIdSelectedProtein : proteinIdSelectedProtein,
+		clickedUID : clickedUID,
 		addProteinsClicked : addProteinsClicked } );
 	
 	//  Highlight the currently selected protein
@@ -7462,7 +7064,11 @@ function openSelectProteinSelect( params ) {
 	$protein_select_jq_Items.removeClass( _PROTEIN_OVERLAY_PROTEIN_SELECTED );
 	
 	
-	if ( proteinIdSelectedProtein !== undefined && proteinIdSelectedProtein !== null ) {
+	if( clickedUID ) {
+		clickedProteinId = _indexManager.getProteinIdForUID( clickedUID );
+	}
+	
+	if ( clickedProteinId !== undefined && clickedProteinId !== null ) {
 		
 		$protein_select_jq_Items.each( function( index, element ) {
 			
@@ -7470,7 +7076,7 @@ function openSelectProteinSelect( params ) {
 			
 			var element_protein_id =  $protein_select_jq.attr("data-protein_id");
 			
-			if ( element_protein_id === proteinIdSelectedProtein ) {
+			if ( element_protein_id == clickedProteinId ) {
 				
 				$protein_select_jq.addClass("single-protein-select-item-highlight");
 				
@@ -7499,7 +7105,7 @@ function openSelectProteinSelect( params ) {
 	}
 	
 	
-	markInvalidProteinsInProteinSelector( { positionIndexSelectedProtein : positionIndexSelectedProtein } );
+	markInvalidProteinsInProteinSelector( clickedUID );
 
 	
 	//  Position and Set Size of overlay
@@ -7606,7 +7212,9 @@ function openSelectProteinSelect( params ) {
 }
 
 
-
+/**
+ * Called when a protein listed in the protein selection overlay is clicked on
+ */
 function processClickOnSelectProtein( params ) {
 	
 	var clickedThis = params.clickedThis; //  HTML <div> object for clicked protein name
@@ -7618,15 +7226,19 @@ function processClickOnSelectProtein( params ) {
 	
 	var protein_list_container_Data = $protein_list_container.data();
 	
-	var positionIndex = protein_list_container_Data.positionIndex;
-	var proteinIdSelectedProtein = protein_list_container_Data.proteinIdSelectedProtein;
+	var clickedUID = protein_list_container_Data.clickedUID;
+	var clickedProteinId = null;
 	
-	var addProteinsClicked = protein_list_container_Data.addProteinsClicked;
+	if( clickedUID ) {
+		clickedProteinId = _indexManager.getProteinIdForUID( clickedUID );
+	}
+	
+	var addProteinsClicked = protein_list_container_Data.addProteinsClicked;	
+	
+	var selectedProteinId = Number( $clickedThis.attr("data-protein_id") );
 	
 	
-	var selectedProteinId = $clickedThis.attr("data-protein_id");
-	
-	if ( selectedProteinId === proteinIdSelectedProtein ) {
+	if ( selectedProteinId == clickedProteinId ) {
 		
 		//  No protein id change so just close the overlay
 		
@@ -7647,23 +7259,26 @@ function processClickOnSelectProtein( params ) {
 			 $clickedThis.addClass( _PROTEIN_OVERLAY_PROTEIN_SELECTED );
 		}
 		
-		markInvalidProteinsInProteinSelector( { positionIndexSelectedProtein : positionIndex } );
+		markInvalidProteinsInProteinSelector();
 		
 	} else {
 
 		//  Update an existing entry using the selected protein id
 
-		var positionIndexInt = parseInt( positionIndex, 10 );
-
-		if ( isNaN( positionIndexInt ) ) {
-
-			throw "positionIndex is not an integer,  positionIndex: '" + positionIndex + "'";
+		var position = _indexManager.findIndexPosition( clickedUID );
+		
+		if( position === -1 ) {
+			throw "Could not find position for UID: " + clickedUID;
 		}
+		
+		
+		_indexManager.removeEntryByUID( clickedUID );
 
-		var imageProteinBarDataItem = _imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : positionIndexInt } );
-		
-		imageProteinBarDataItem.setProteinId( { proteinId : selectedProteinId } );
-		
+		var newUID = _indexManager.addProteinId( selectedProteinId );
+		_indexManager.moveEntryToIndexPosition( newUID, position );
+
+		_imageProteinBarDataManager.removeItemByUID( clickedUID );
+		_imageProteinBarDataManager.addEntry( newUID )
 
 		closeAddProteinSelect();
 		
@@ -7676,7 +7291,9 @@ function processClickOnSelectProtein( params ) {
 	
 }
 
-
+/**
+ * Called when the Add button of the protein selection overlay is clicked on.
+ */
 function processClickOnAddProteins( ) {
 	
 
@@ -7692,13 +7309,11 @@ function processClickOnAddProteins( ) {
 		
 		var newImageProteinBarData = ImageProteinBarData.constructEmptyImageProteinBarData();
 		
-		newImageProteinBarData.setProteinId( { proteinId : selectedProteinId } );
+		// add this protein to the index manager
+		var uid = _indexManager.addProteinId( selectedProteinId );
 		
-		var proteinLength = _proteinLengths[ selectedProteinId ];
-		
-		newImageProteinBarData.setProteinLength( { proteinLength : proteinLength } );
-		
-		_imageProteinBarDataManager.addEntry( { entry : newImageProteinBarData } );
+		// add an entry for protein bar information
+		_imageProteinBarDataManager.addEntry( uid, newImageProteinBarData );
 		
 	} );
 	
@@ -7712,74 +7327,18 @@ function processClickOnAddProteins( ) {
 	
 }
 
-
-
-
-// get an array of all the currently-selected proteins, can contain same
-// protein multiple times
-function getAllSelectedProteins() {
-
-	var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
+/**
+ * "Grays out" proteins listed in the protein selection overlay if the respective
+ * protein is not cross-linked to any currently-shown protein (minus the one that
+ * was clicked on to open the window) or any of the other selected proteins in the
+ * selection overlay.
+ */
+function markInvalidProteinsInProteinSelector( uid ) {
 	
-
-	var proteinsLocalVar = [];
-	
-	for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
-
-		var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
-
-		var imageProteinBarDataEntryProteinId = imageProteinBarDataEntry.getProteinId();
-
-		proteinsLocalVar.push( imageProteinBarDataEntryProteinId );
-	}
-	
-	return proteinsLocalVar;
-	
-}
-
-
-
-
-//get an array of all the currently-selected proteins, can contain same
-//protein multiple times
-function getSelectedProteinsExcludingPositionIndex( params ) {
-	
-	var positionIndex = params.positionIndex;
-
-	var imageProteinBarDataItems = _imageProteinBarDataManager.getAllItems();
-	
-
-	var proteinsLocalVar = [];
-	
-	for ( var imageProteinBarDataItemsIndex = 0; imageProteinBarDataItemsIndex < imageProteinBarDataItems.length; imageProteinBarDataItemsIndex ++ ) {
-
-		if ( imageProteinBarDataItemsIndex === positionIndex ) {
-			
-			//   Skip provided positionIndex
-			
-			continue;  //  EARLY continue
-		}
-		
-		var imageProteinBarDataEntry = imageProteinBarDataItems[ imageProteinBarDataItemsIndex ];
-
-		var imageProteinBarDataEntryProteinId = imageProteinBarDataEntry.getProteinId();
-
-		proteinsLocalVar.push( imageProteinBarDataEntryProteinId );
-	}
-	
-	return proteinsLocalVar;
-	
-}
-
-
-function markInvalidProteinsInProteinSelector( params ) {
-	
-	var positionIndexSelectedProtein = params.positionIndexSelectedProtein;
-
 	//  validProteins contains array of protein ids that the selected protein ids link to, 
 	//    excluding the protein id at position positionIndexSelectedProtein ( null or undefined for add )
 	
-	var validProteins = getValidProteins( { positionIndexSelectedProtein : positionIndexSelectedProtein } );
+	var validProteins = getValidProteins( uid );
 
 	var $protein_list_container = $("#protein_list_container");
 	
@@ -7799,14 +7358,12 @@ function markInvalidProteinsInProteinSelector( params ) {
 			$(this).addClass("select-protein-overlay-dimmed-protein-select-text");
 		}
 	});
-}
+};
 
 
 // get an array of "valid" proteins--proteins with crosslinks with
 // any of the currently-selected proteins
-function getValidProteins( params ) {
-	
-	var positionIndexSelectedProtein = params.positionIndexSelectedProtein;
+function getValidProteins( uid ) {
 	
 	///  Producing a list of protein ids that the other selected protein ids link to
 	
@@ -7817,18 +7374,21 @@ function getValidProteins( params ) {
 		return _proteins;
 	}
 	
-	var selectedProteins = null;
 	
-	if ( positionIndexSelectedProtein !== undefined && positionIndexSelectedProtein !== null ) {
+	
+	var pid = null;						// protein ID for the given uid
+	var selectedProteins = null;
 
-		//  Get selected proteins, excluding current selector value
+	if( uid ) {
+		pid = _indexManager.getProteinIdForUID( uid );
+	}
+	
+	
+	selectedProteins = _indexManager.getProteinList();
 
-		selectedProteins = getSelectedProteinsExcludingPositionIndex( { positionIndex : positionIndexSelectedProtein } );
-			
-	} else {
-		
-		//  Get all proteins since no current selector
-		selectedProteins = getAllSelectedProteins();
+	// remove our protein id from this list
+	if( pid !== undefined && pid !== null ) {
+		selectedProteins = selectedProteins.filter( function( e ) { return e !== pid; } );
 	}
 	
 	//  Add in proteins already selected in the protein selection overlay
@@ -8336,6 +7896,21 @@ function processClickOnMonoLink( clickThis  ) {
 	getMonolinkDataForSpecificLinkInGraph( params );
 }
 
+/**
+ * Get the JSON version number from the raw JSON hash
+ */
+function getJSONVersionNumber() {
+	
+	var json = getRawJsonFromHash();
+	
+	var version = json.vn;
+	
+	if( version ) {
+		return version;
+	}
+	
+	return 0;
+}
 
 
 //////////////////////////////////////////////////
@@ -8344,13 +7919,21 @@ function processClickOnMonoLink( clickThis  ) {
 
 function initPage() {
 
-	
-	convertOldJSONIfNecessaryReturnTrueIfExit();
-
 	console.log( "Initializing the page." );
+
+	
+	// convert old JSON
+	console.log( "\tPerforming necessary legacy JSON updates." );
+	var _legacyJSONUpdater = new legacyJSONUpdater();
+	if( _legacyJSONUpdater.convertLegacyJSON() ) {
+		return;
+	}
+
+	console.log( "\tPopulating index manager." );
+	populateIndexManagerFromHash();
+
 	
 	proteinAnnotationStore.init();
-	
 	
 	//  Set up nag overlay for text for Merged Image page
 	

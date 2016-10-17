@@ -43,11 +43,6 @@ ProteinBarRegionSelectionsOverlayCode.prototype.init = function( ) {
 
 		objectThis.closeOverlay();
 	} );
-
-//	$("#view_protein_bar_highlighting_modal_dialog_overlay_background").click( function( eventObject ) {
-//
-//		objectThis.closeOverlay();
-//	} );
 	
 
 	$("#view_protein_bar_highlighting_overlay_protein_bars_cancel_button").click( function( eventObject ) {
@@ -162,18 +157,25 @@ ProteinBarRegionSelectionsOverlayCode.prototype._populate = function( params ) {
 	}
 	
 	
-	var imageProteinBarDataItemsArray = this.imageProteinBarDataManager.getAllItems();
+	for( var i = 0; i < _indexManager.getProteinArray().length; i++ ) {
+		
+		var uid = _indexManager.getProteinArray()[ i ][ 'uid' ];
 
-	for ( var index = 0; index < imageProteinBarDataItemsArray.length; index++ ) {
-
-		var imageProteinBarDataItem = imageProteinBarDataItemsArray[ index ];
-
+		var imageProteinBarDataItem = this.imageProteinBarDataManager.getAllItems()[ uid ];
+		if( !imageProteinBarDataItem ) {
+			console.log( "WARNING: Have no entry in protein bar data manager for uid:" + uid );
+			console.log( "Adding empty entry." );
+			
+			this.imageProteinBarDataManager.addEntry( uid );			
+		}
+		
+		
 		var proteinId = imageProteinBarDataItem.getProteinId();
 
 		var proteinName = _proteinNames[ proteinId ];
 
 		var singleBarContext = {
-				itemIndex : index,
+				uid : uid,
 				proteinId : proteinId,
 				proteinName : proteinName,
 				proteinLength : imageProteinBarDataItem.getProteinLength()
@@ -185,7 +187,7 @@ ProteinBarRegionSelectionsOverlayCode.prototype._populate = function( params ) {
 
 		//  Hide protein divider after last entry
 		
-		if ( index === ( imageProteinBarDataItemsArray.length - 1 ) ) {
+		if ( i === ( _indexManager.getProteinArray().length - 1 ) ) {
 
 			var $protein_divider_jq = $singleBarHtml.find(".protein_divider_jq");
 			
@@ -228,8 +230,8 @@ ProteinBarRegionSelectionsOverlayCode.prototype._populate = function( params ) {
 
 				var singleBarRegionContext = {
 
-						start : proteinBarHighlightedRegionsEntry.start,
-						end : proteinBarHighlightedRegionsEntry.end
+						start : proteinBarHighlightedRegionsEntry.s,
+						end : proteinBarHighlightedRegionsEntry.e
 
 				};
 
@@ -346,8 +348,11 @@ ProteinBarRegionSelectionsOverlayCode.prototype.save = function( params ) {
 		
 		var $single_protein_bar_block_jq = $( this );
 		
-		var itemIndexString = $single_protein_bar_block_jq.attr( "data-item_index" );
-		var itemIndex = parseInt( itemIndexString, 10 );
+		var uid = $single_protein_bar_block_jq.attr( "data-uid" );
+		
+		if( !uid ) {
+			throw "Got no uid.";
+		}
 
 		var proteinIdString = $single_protein_bar_block_jq.attr( "data-protein_id");
 
@@ -355,7 +360,7 @@ ProteinBarRegionSelectionsOverlayCode.prototype.save = function( params ) {
 		var proteinLength = parseInt( proteinLengthString, 10 );
 		
 		var imageProteinBarDataItem =
-			objectThis.imageProteinBarDataManager.getItemByIndex( { arrayIndexInt : itemIndex } );
+			objectThis.imageProteinBarDataManager.getItemByUID( uid );
 		
 		if ( proteinIdString !== imageProteinBarDataItem.getProteinId() ) {
 			

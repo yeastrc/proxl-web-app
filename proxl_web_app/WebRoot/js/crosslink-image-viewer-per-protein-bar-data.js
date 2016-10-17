@@ -32,7 +32,8 @@
 
 var ImageProteinBarDataManager = function() {
 		
-	this.imageProteinBarDataList = [];
+	this.barData = { };
+
 };
 
 var ImageProteinBarDataManagerContructor = function() { 
@@ -41,58 +42,31 @@ var ImageProteinBarDataManagerContructor = function() {
 };
 		
 
-ImageProteinBarDataManager.prototype.addEntry = function( params ) {
-
-	var arrayIndexInt 	= undefined;
-	var entry 			= undefined;
-
-	if ( params ) {
-
-		arrayIndexInt 	= params.arrayIndexInt; // Optional, add next if not set
-		entry 			= params.entry;  		//  Optional
-	}
+ImageProteinBarDataManager.prototype.addEntry = function( uid, entry ) {
 	
-	if ( this.imageProteinBarDataList[ arrayIndexInt ] ) {
-		
-		//  Already exists
-		
-		throw "Entry in imageProteinBarDataList already exists for arrayIndexInt: " + arrayIndexInt;
-	}
-	
-	if ( arrayIndexInt !== undefined && arrayIndexInt !== null ) {
+
 
 		if ( entry ) {
 
-			this.imageProteinBarDataList[ arrayIndexInt ] = entry;
-			
 			entry.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
+
+			entry.uid = uid;
+			entry.pid = _indexManager.getProteinIdForUID( uid );
+			
+			this.barData[ uid ] = entry;
 
 		} else {
 
 			var newEntry = ImageProteinBarData.constructEmptyImageProteinBarData();
 			
 			newEntry.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
-			
-			this.imageProteinBarDataList[ arrayIndexInt ] = newEntry;
-		} 
-		
-	} else {
 
-		if ( entry ) {
+			newEntry.uid = uid;
+			newEntry.pid = _indexManager.getProteinIdForUID( uid );
 
-			entry.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
-			
-			this.imageProteinBarDataList.push( entry );
-
-		} else {
-
-			var newEntry = ImageProteinBarData.constructEmptyImageProteinBarData();
-
-			newEntry.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
-
-			this.imageProteinBarDataList.push( newEntry );
+			this.barData[ uid ] = newEntry;
 		}
-	}
+		
 };
 
 
@@ -100,57 +74,42 @@ ImageProteinBarDataManager.prototype.addEntry = function( params ) {
 
 ImageProteinBarDataManager.prototype.getAllItems = function( ) {
 
-	return this.imageProteinBarDataList;
-},
+	return this.barData;
+};
 
 
-ImageProteinBarDataManager.prototype.getItemByIndex = function( params ) {
-
-	var arrayIndexInt = params.arrayIndexInt;
+ImageProteinBarDataManager.prototype.getItemByUID = function( uid ) {
 	
-	var item = this.imageProteinBarDataList[ arrayIndexInt ];
+	var item = this.barData[ uid ];
 	
 	if ( ! item ) {
-		
-		throw "entry not found in imageProteinBarDataList for index: " + arrayIndexInt;
+		throw "entry not found in barData for uid: " + uid;
 	}
 	
 	return item;
-},
-
-ImageProteinBarDataManager.prototype.removeItemByIndex = function( params ) {
-	
-	var arrayIndexInt = params.arrayIndexInt;
-	
-//	var removedItem = 
-	this.imageProteinBarDataList.splice( arrayIndexInt, 1 );
 };
 
-ImageProteinBarDataManager.prototype.updateItemOrder = function( params ) {
+ImageProteinBarDataManager.prototype.getItemByIndex = function( index ) {
 	
-	var elementPrevPositions = params.elementPrevPositions;
-	
-	var newImageProteinBarDataList = [];
-	
-	
-	for ( var newPosition = 0; newPosition < elementPrevPositions.length; newPosition++ ) {
-		
-		var elementPrevPositionObj = elementPrevPositions[ newPosition ];
-		
-		var elementPrevPositionInt = elementPrevPositionObj.prevPosition;
-		
-		var elementAtPrevPosition = this.imageProteinBarDataList[ elementPrevPositionInt ];
-		
-		newImageProteinBarDataList.push( elementAtPrevPosition );
+	var entry = _indexManager.getProteinArray()[ index ];
+
+	if ( ! entry ) {
+		throw "entry not found in barData for index: " + index;
 	}
 	
-	this.imageProteinBarDataList = newImageProteinBarDataList;
+	return this.getItemByUID( entry.uid );
 };
 
 
-ImageProteinBarDataManager.prototype.clearItems = function( params ) {
+ImageProteinBarDataManager.prototype.removeItemByUID = function( uid ) {
+	delete this.barData[ uid ];
+};
+
+
+
+ImageProteinBarDataManager.prototype.clearItems = function() {
 	
-	this.imageProteinBarDataList = [];
+	this.barData = { };
 };
 
 
@@ -161,103 +120,52 @@ ImageProteinBarDataManager.prototype.clearItems = function( params ) {
 
 //  Get objects for Hash
 
-ImageProteinBarDataManager.prototype.getArrayOfObjectsForHash = function( ) {
+ImageProteinBarDataManager.prototype.getObjectsForHash = function( ) {
 	
-	var imageProteinBarDataListResult = [];
+	var imageProteinBarDataResult = { };
 	
-	for ( var index = 0; index < this.imageProteinBarDataList.length; index++ ) {
-		
-		var imageProteinBarDataEntry = this.imageProteinBarDataList[ index ];
-		
+	
+	var keys = Object.keys( this.getAllItems() );
+	
+	for( var i = 0; i < keys.length; i++ ) {
+		var key = keys[ i ];
+	    
+		var imageProteinBarDataEntry = this.barData[ key ];
 		var imageProteinBarDataForHash = imageProteinBarDataEntry.getHashDataObject();
-
-		imageProteinBarDataListResult.push( imageProteinBarDataForHash );
+		
+		imageProteinBarDataResult[ key ] = imageProteinBarDataForHash;
 	}
 	
-	return imageProteinBarDataListResult;
+	
+	return imageProteinBarDataResult;
 };
 	
 ////
 
 //  Update Internal ProteinBarData objects with objects in the Page Hash
 
-ImageProteinBarDataManager.prototype.replaceInternalObjectsWithObjectsInHash = function( params ) {
+ImageProteinBarDataManager.prototype.replaceInternalObjectsWithObjectsInHash = function( proteinBarData ) {
 	
-	var proteinBarData = params.proteinBarData;
-	var currentProteinIdsArray = params.currentProteinIdsArray;
-	
-	//  Copy current protein ids into an object/map for easier searching
-	
-	var currentProteinIdsObject = {};
-	
-	if ( currentProteinIdsArray ) {
-
-		for ( var currentProteinIdsArrayIndex = 0; currentProteinIdsArrayIndex < currentProteinIdsArray.length; currentProteinIdsArrayIndex++ ) {
-			
-			var currentProteinIdsArrayEntry = currentProteinIdsArray[ currentProteinIdsArrayIndex ];
-			
-			var currentProteinIdsArrayEntryString = currentProteinIdsArrayEntry.toString();
-			
-			currentProteinIdsObject[ currentProteinIdsArrayEntryString ] = true;
-		}
-	}
-	
-	this.imageProteinBarDataList = [];
+	this.clearItems();
 	
 	if ( proteinBarData ) {
 		
-		for ( var index = 0; index < proteinBarData.length; index++ ) {
+		var keys = Object.keys( proteinBarData );
+		
+		for( var i = 0; i < keys.length; i++ ) {
+			var key = keys[ i ];
 			
-			var proteinBarDataHashItem = proteinBarData[ index ];
-			
-			var proteinBarDataItem = 
-				ImageProteinBarData.constructImageProteinBarDataFromHashDataObject( proteinBarDataHashItem ); 
-
-			if ( currentProteinIdsArray ) {
-				
-				//  Only do if currentProteinIdsArray is passed in
-
-				//  If protein id in proteinBarDataItem is not in currentProteinIdsArray
-				//   Drop the proteinBarDataItem
-
-				if ( ! currentProteinIdsObject[ proteinBarDataItem.getProteinId() ] ) {
-
-					continue;  // EARLY continue
-				}
-			}
-
-			
+			var proteinBarDataHashItem = proteinBarData[ key ];
+		
+			var proteinBarDataItem = ImageProteinBarData.constructImageProteinBarDataFromHashDataObject( proteinBarDataHashItem ); 
 			proteinBarDataItem.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
 
-			this.imageProteinBarDataList.push( proteinBarDataItem );
+			this.addEntry( key, proteinBarDataItem );
+			
 		}
+		
 	}
 };
-	
-////////
-
-///  Update objects for data loaded from server
-
-//  Update Protein Lengths
-
-ImageProteinBarDataManager.prototype.updateProteinLengths = function( params ) {
-	
-	var proteinLengths = params.proteinLengths;
-	
-	for ( var index = 0; index < this.imageProteinBarDataList.length; index++ ) {
-		
-		var imageProteinBarDataEntry = this.imageProteinBarDataList[ index ];
-		
-		var proteinLengthForProteinId = proteinLengths[ imageProteinBarDataEntry.getProteinId() ];
-		
-		if ( proteinLengthForProteinId ) {
-
-			imageProteinBarDataEntry.setProteinLength( { proteinLength : proteinLengthForProteinId } );
-		}
-	}
-};
-
-
 
 ////////
 
@@ -268,24 +176,30 @@ ImageProteinBarDataManager.prototype.updateProteinLengths = function( params ) {
 
 ImageProteinBarDataManager.prototype.clearAllProteinBarsReversed = function(  ) {
 	
-	for ( var index = 0; index < this.imageProteinBarDataList.length; index++ ) {
+	var keys = Object.keys( this.getAllItems() );
+	
+	for( var i = 0; i < keys.length; i++ ) {
+		var key = keys[ i ];
+	    
+		var imageProteinBarDataEntry = this.barData[ key ];
 
-		var imageProteinBarDataListEntry = this.imageProteinBarDataList[ index ];
-
-		imageProteinBarDataListEntry.setProteinReversed( { proteinReversed : undefined } );
-	};
+		imageProteinBarDataEntry.setProteinReversed( { proteinReversed : undefined } );
+	}
 };
 
 //  Protein Offsets
 
 ImageProteinBarDataManager.prototype.clearAllProteinBarsOffsets = function(  ) {
 
-	for ( var index = 0; index < this.imageProteinBarDataList.length; index++ ) {
+	var keys = Object.keys( this.getAllItems() );
+	
+	for( var i = 0; i < keys.length; i++ ) {
+		var key = keys[ i ];
+	    
+		var imageProteinBarDataEntry = this.barData[ key ];
 
-		var imageProteinBarDataListEntry = this.imageProteinBarDataList[ index ];
-
-		imageProteinBarDataListEntry.setProteinOffset( { proteinOffset : 0 } );
-	};
+		imageProteinBarDataEntry.setProteinOffset( { proteinOffset : 0 } );
+	}
 };
 
 
@@ -293,12 +207,15 @@ ImageProteinBarDataManager.prototype.addToAllProteinOffsets = function( params )
 
 	var offsetChange = params.offsetChange;
 	
-	for ( var index = 0; index < this.imageProteinBarDataList.length; index++ ) {
+	var keys = Object.keys( this.getAllItems() );
+	
+	for( var i = 0; i < keys.length; i++ ) {
+		var key = keys[ i ];
+	    
+		var imageProteinBarDataEntry = this.barData[ key ];
 
-		var imageProteinBarDataListEntry = this.imageProteinBarDataList[ index ];
-
-		imageProteinBarDataListEntry.addToProteinOffset( { offsetChange : offsetChange } );
-	};
+		imageProteinBarDataEntry.addToProteinOffset( { offsetChange : offsetChange } );
+	}
 };
 
 
@@ -309,15 +226,18 @@ ImageProteinBarDataManager.prototype.addToAllProteinOffsets = function( params )
 ImageProteinBarDataManager.prototype.isAnyProteinBarsHighlighted = function(  ) {
 	
 
-	for ( var index = 0; index < this.imageProteinBarDataList.length; index++ ) {
+	var keys = Object.keys( this.getAllItems() );
+	
+	for( var i = 0; i < keys.length; i++ ) {
+		var key = keys[ i ];
+		
+		var imageProteinBarDataEntry = this.barData[ key ];
 
-		var imageProteinBarDataListEntry = this.imageProteinBarDataList[ index ];
-
-		if ( imageProteinBarDataListEntry.isAnyOfProteinBarHighlighted() ) {
+		if ( imageProteinBarDataEntry.isAnyOfProteinBarHighlighted() ) {
 
 			return true;
 		}
-		;
+		
 	}
 
 	return false;
@@ -328,15 +248,18 @@ ImageProteinBarDataManager.prototype.exactly_One_ProteinBar_Highlighted = functi
 
 	var proteinBarHighlightCount = 0;
 
-	for ( var index = 0; index < this.imageProteinBarDataList.length; index++ ) {
+	var keys = Object.keys( this.getAllItems() );
+	
+	for( var i = 0; i < keys.length; i++ ) {
+		var key = keys[ i ];
+	    
+		var imageProteinBarDataEntry = this.barData[ key ];
 
-		var imageProteinBarDataListEntry = this.imageProteinBarDataList[ index ];
-
-		if ( imageProteinBarDataListEntry.isAnyOfProteinBarHighlighted() ) {
+		if ( imageProteinBarDataEntry.isAnyOfProteinBarHighlighted() ) {
 
 			proteinBarHighlightCount++;
 		}
-		;
+		
 	}
 	
 	if ( proteinBarHighlightCount === 1 ) {
@@ -352,15 +275,17 @@ ImageProteinBarDataManager.prototype.moreThan_One_ProteinBar_Highlighted = funct
 
 	var proteinBarHighlightCount = 0;
 
-	for ( var index = 0; index < this.imageProteinBarDataList.length; index++ ) {
+	var keys = Object.keys( this.getAllItems() );
+	
+	for( var i = 0; i < keys.length; i++ ) {
+		var key = keys[ i ];
+	    
+		var imageProteinBarDataEntry = this.barData[ key ];
 
-		var imageProteinBarDataListEntry = this.imageProteinBarDataList[ index ];
-
-		if ( imageProteinBarDataListEntry.isAnyOfProteinBarHighlighted() ) {
+		if ( imageProteinBarDataEntry.isAnyOfProteinBarHighlighted() ) {
 
 			proteinBarHighlightCount++;
 		}
-		;
 	}
 	
 	if ( proteinBarHighlightCount > 1 ) {
@@ -375,11 +300,14 @@ ImageProteinBarDataManager.prototype.moreThan_One_ProteinBar_Highlighted = funct
 
 ImageProteinBarDataManager.prototype.clearAllProteinBarsHighlighted = function(  ) {
 	
-	for ( var index = 0; index < this.imageProteinBarDataList.length; index++ ) {
+	var keys = Object.keys( this.getAllItems() );
+	
+	for( var i = 0; i < keys.length; i++ ) {
+		var key = keys[ i ];
+	    
+		var imageProteinBarDataEntry = this.barData[ key ];
 
-		var imageProteinBarDataListEntry = this.imageProteinBarDataList[ index ];
-
-		imageProteinBarDataListEntry.clearProteinBarHighlighted();
+		imageProteinBarDataEntry.clearProteinBarHighlighted();
 	}
 };
 
@@ -392,11 +320,14 @@ ImageProteinBarDataManager.prototype.clearAllProteinBarsHighlighted = function( 
 
 ImageProteinBarDataManager.prototype.contains_OLD_NrseqProteinId = function(  ) {
 	
-	for ( var index = 0; index < this.imageProteinBarDataList.length; index++ ) {
+	var keys = Object.keys( this.getAllItems() );
+	
+	for( var i = 0; i < keys.length; i++ ) {
+		var key = keys[ i ];
+	    
+		var imageProteinBarDataEntry = this.barData[ key ];
 
-		var imageProteinBarDataListEntry = this.imageProteinBarDataList[ index ];
-
-		if ( imageProteinBarDataListEntry.getOLD_NrseqProteinId() ) {
+		if ( imageProteinBarDataEntry.getOLD_NrseqProteinId() ) {
 			
 			return true;
 		}
@@ -421,10 +352,7 @@ ImageProteinBarDataManager.prototype.contains_OLD_NrseqProteinId = function(  ) 
 var ImageProteinBarData = function(  ) {
 
 	this.containingImageProteinBarDataManager = undefined;
-	
-	
-	this.proteinId = undefined;
-	
+		
 	this.proteinBarHighlightedRegions = undefined;
 	
 	this.proteinBarHighlightedAll = undefined;
@@ -439,9 +367,7 @@ ImageProteinBarData.prototype.clearPropertiesOnProteinIdChange = function() {
 	this.proteinBarHighlightedRegions = undefined;
 	
 	this.proteinBarHighlightedAll = undefined;
-	
-	this.proteinLength = undefined;
-	
+		
 	this.proteinReversed = undefined;
 	
 	this.proteinOffset = 0;
@@ -459,33 +385,6 @@ ImageProteinBarData.prototype.setContainingImageProteinBarDataManager = function
 	this.containingImageProteinBarDataManager = params.containingImageProteinBarDataManager;
 };
 
-
-//  Protein Id - This is actually now a Protein Sequence Id
-
-ImageProteinBarData.prototype.getProteinId = function( ) {
-	
-	return this.proteinId;
-};
-ImageProteinBarData.prototype.setProteinId = function( params ) {
-	
-	var proteinId = params.proteinId;
-	var proteinLength = params.proteinLength;
-	
-	if ( this.proteinId !== proteinId ) {
-		
-		this.clearPropertiesOnProteinIdChange();
-	}
-	
-	this.proteinId = proteinId;
-	this.proteinLength = proteinLength;
-};
-
-ImageProteinBarData.prototype.setProteinIdNoOtherChanges = function( params ) {
-	
-	var proteinId = params.proteinId;
-	this.proteinId = proteinId;
-};
-
 //////////////////////
 
 //    OLD NRSEQ Protein Id
@@ -498,21 +397,6 @@ ImageProteinBarData.prototype.setOLD_NrseqProteinId = function( params ) {
 	
 	var nrseqProteinId = params.nrseqProteinId;
 	this.nrseqProteinId = nrseqProteinId;
-};
-
-////////////////
-
-//  Protein Length
-
-ImageProteinBarData.prototype.getProteinLength = function( ) {
-
-	return this.proteinLength;
-};
-ImageProteinBarData.prototype.setProteinLength = function( params ) {
-	
-	var proteinLength = params.proteinLength;
-	
-	this.proteinLength = proteinLength;
 };
 
 ////////////////
@@ -718,8 +602,8 @@ ImageProteinBarData.prototype.indexOfProteinBarHighlightedRegionAtSinglePosition
 		
 		var proteinBarHighlightedRegionsEntry = this.proteinBarHighlightedRegions[ index ];
 				
-		if ( proteinBarHighlightedRegionsEntry.start <= position 
-				&& proteinBarHighlightedRegionsEntry.end >= position ) {
+		if ( proteinBarHighlightedRegionsEntry.s <= position 
+				&& proteinBarHighlightedRegionsEntry.e >= position ) {
 			
 			return index;
 		}
@@ -789,12 +673,12 @@ ImageProteinBarData.prototype.indexOfProteinBarHighlightedRegionAnywhereBetweenP
 
 		var proteinBarHighlightedRegionsEntry = this.proteinBarHighlightedRegions[ index ];
 
-		if ( ( proteinBarHighlightedRegionsEntry.start <= position_1 
-				&& proteinBarHighlightedRegionsEntry.end >= position_1 ) //  The select block contains position_1
-				|| ( proteinBarHighlightedRegionsEntry.start <= position_2 
-						&& proteinBarHighlightedRegionsEntry.end >= position_2 ) //  The select block contains position_2
-						|| ( proteinBarHighlightedRegionsEntry.start >= position_1
-								&& proteinBarHighlightedRegionsEntry.end <= position_2 ) //  The select block is within position_1 and position_2
+		if ( ( proteinBarHighlightedRegionsEntry.s <= position_1 
+				&& proteinBarHighlightedRegionsEntry.e >= position_1 ) //  The select block contains position_1
+				|| ( proteinBarHighlightedRegionsEntry.s <= position_2 
+						&& proteinBarHighlightedRegionsEntry.e >= position_2 ) //  The select block contains position_2
+						|| ( proteinBarHighlightedRegionsEntry.s >= position_1
+								&& proteinBarHighlightedRegionsEntry.e <= position_2 ) //  The select block is within position_1 and position_2
 		)
 		{
 
@@ -829,15 +713,22 @@ ImageProteinBarData.prototype.setProteinBarHighlightedAll = function( ) {
 	
 	//  If this is the only bar, unhighlight it.
 	
-	var imageProteinBarDataItems = this.containingImageProteinBarDataManager.getAllItems();
+	var numItems = Object.keys( this.containingImageProteinBarDataManager.getAllItems() ).length;
 	
-	if ( ( ! imageProteinBarDataItems ) 
-			|| imageProteinBarDataItems.length === 0 
-			|| imageProteinBarDataItems.length === 1 ) {
-		
+	if ( ( ! numItems ) || numItems === 0 || numItems === 1 ) {
 		this.proteinBarHighlightedAll = undefined;
 	}
 };
+
+
+ImageProteinBarData.prototype.getProteinId = function() {
+	return this.pid;
+};
+
+ImageProteinBarData.prototype.getProteinLength = function() {
+	return _proteinLengths[ this.getProteinId() ];
+};
+
 
 //  Replace existing highlighted values
 
@@ -848,7 +739,7 @@ ImageProteinBarData.prototype.setProteinBarHighlightedRegion = function( params 
 	var end = params.end;
 	
 
-	if ( start > this.proteinLength ) {
+	if ( start > this.getProteinLength() ) {
 		
 		//  start is not within the protein bar so don't add
 		
@@ -868,12 +759,12 @@ ImageProteinBarData.prototype.setProteinBarHighlightedRegion = function( params 
 		start = 1;
 	}
 	
-	if ( end > this.proteinLength ) {
+	if ( end > this.getProteinLength() ) {
 		
-		end = this.proteinLength;
+		end = this.getProteinLength();
 	}
 	
-	var regionToSet = { start : start, end : end };
+	var regionToSet = { s : start, e : end };
 	
 	var proteinBarHighlightedRegionEntry = regionToSet;
 
@@ -893,7 +784,7 @@ ImageProteinBarData.prototype.addProteinBarHighlightedRegion = function( params 
 	var end = params.end;
 	
 
-	if ( start > this.proteinLength ) {
+	if ( start > this.getProteinLength() ) {
 		
 		//  start is not within the protein bar so don't add
 		
@@ -905,12 +796,12 @@ ImageProteinBarData.prototype.addProteinBarHighlightedRegion = function( params 
 		start = 1;
 	}
 	
-	if ( end > this.proteinLength ) {
+	if ( end > this.getProteinLength() ) {
 		
-		end = this.proteinLength;
+		end = this.getProteinLength();
 	}
 	
-	var regionToAdd = { start : start, end : end };
+	var regionToAdd = { s : start, e : end };
 	
 //	if ( this.proteinBarHighlightedAll ) {
 //		
@@ -949,16 +840,16 @@ ImageProteinBarData.prototype.addProteinBarHighlightedRegion = function( params 
 		
 			new_proteinBarHighlightedRegions.push( region );
 		
-		} else if ( regionToAdd.start < region.start ) {
+		} else if ( regionToAdd.s < region.s ) {
 			
 			new_proteinBarHighlightedRegions.push( regionToAdd );
 			new_proteinBarHighlightedRegions.push( region );
 			
 			newRegionAdded = true;
 		
-		} else if ( regionToAdd.start === region.start ) {
+		} else if ( regionToAdd.s === region.s ) {
 			
-			if ( regionToAdd.end >= region.end ) {
+			if ( regionToAdd.e >= region.e ) {
 
 				new_proteinBarHighlightedRegions.push( regionToAdd );
 				new_proteinBarHighlightedRegions.push( region );
@@ -1007,7 +898,7 @@ ImageProteinBarData.prototype.addProteinBarHighlightedRegion = function( params 
 			
 		} else { 
 			
-			if ( lastAddedRegion.end < region.start ) {
+			if ( lastAddedRegion.e < region.s ) {
 
 				//  No region overlap
 
@@ -1019,11 +910,11 @@ ImageProteinBarData.prototype.addProteinBarHighlightedRegion = function( params 
 				
 				//  Region overlap so copy region.end to lastAddedRegion.end if needed
 			
-				if ( lastAddedRegion.end < region.end ) {
+				if ( lastAddedRegion.e < region.e ) {
 			
 					//  region.end is after lastAddedRegion.end so extend lastAddedRegion and drop region
 					
-					lastAddedRegion.end = region.end;
+					lastAddedRegion.e = region.e;
 				
 				}  // else drop region since fully contained within lastAddedRegion
 			}
@@ -1048,8 +939,8 @@ ImageProteinBarData.prototype._if_WholeBarHighlighted_SwitchTo_proteinBarHighlig
 		
 		var proteinBarHighlightedRegionEntry = this.proteinBarHighlightedRegions[ 0 ];
 		
-		if ( proteinBarHighlightedRegionEntry.start <= 1 
-				&& proteinBarHighlightedRegionEntry.end >= ( this.proteinLength ) ) {
+		if ( proteinBarHighlightedRegionEntry.s <= 1 
+				&& proteinBarHighlightedRegionEntry.e >= ( this.getProteinLength() ) ) {
 			
 			//  Only 1 region that selects the whole protein bar
 
@@ -1086,7 +977,7 @@ ImageProteinBarData.prototype.removeProteinBarHighlightedRegion = function( para
 		
 		var region = this.proteinBarHighlightedRegions[ regionsIndex ];
 		
-		if ( region.start <= position && region.end >= position ) {
+		if ( region.s <= position && region.e >= position ) {
 			
 			if ( this.proteinBarHighlightedRegions.length === 1 ) {
 				
@@ -1127,9 +1018,7 @@ ImageProteinBarData.prototype.clearProteinBarHighlighted = function( ) {
 ImageProteinBarData.prototype.getHashDataObject = function() {
 	
 	var hashDataObject = {};
-	
-	hashDataObject.protSeqId = this.proteinId;
-	
+		
 	hashDataObject.pHlhAll = this.proteinBarHighlightedAll;
 	hashDataObject.pHlghRgns = this.proteinBarHighlightedRegions;
 	hashDataObject.pRvrs = this.proteinReversed;
@@ -1151,8 +1040,6 @@ ImageProteinBarData.constructImageProteinBarDataFromHashDataObject = function( h
 	if ( hashDataObject ) {
 
 //		Copy data from hashDataObject
-
-		imageProteinBarData.proteinId = hashDataObject.protSeqId;
 
 		imageProteinBarData.proteinBarHighlightedAll = hashDataObject.pHlhAll;
 		imageProteinBarData.proteinBarHighlightedRegions = hashDataObject.pHlghRgns;

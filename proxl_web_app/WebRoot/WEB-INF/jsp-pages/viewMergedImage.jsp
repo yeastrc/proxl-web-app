@@ -80,6 +80,8 @@
 
 		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
 
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-legacy-handler.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-index-manager.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-per-protein-bar-data.js?x=${cacheBustValue}"></script> 
