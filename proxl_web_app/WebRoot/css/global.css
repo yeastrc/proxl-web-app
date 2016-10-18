@@ -283,6 +283,16 @@ body.inset-page .error-message-close-x, body.inset-page .success-message-close-x
 
 .terms-of-service-overlay-div .terms-of-service-overlay-body input.terms-of-service-overlay-button { font-size: 14px;  }
 
+
+/*  Terms of Service page  */
+
+
+body.terms-of-service-page .terms-of-service-header { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+
+body.terms-of-service-page .terms-of-service-text { text-align: left; font-size: 14px; padding-left: 25px; padding-right: 25px; }
+
+
+
 /* Invite Landing Page  */
 
 

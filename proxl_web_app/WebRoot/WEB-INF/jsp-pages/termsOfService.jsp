@@ -23,7 +23,7 @@
 	
 </head>
 
-<body class="login-page inset-page"> <%-- "inset-page" is for pages with an 'inset' look --%>
+<body class="terms-of-service-page inset-page"> <%-- "inset-page" is for pages with an 'inset' look --%>
 
  <%@ include file="/WEB-INF/jsp-includes/body_section_start_include_every_page.jsp" %>
 
@@ -40,10 +40,10 @@
   	<div  style="position: relative;" class="page-label">
 	  <c:choose>
 	   <c:when test="${ not empty termsOfServiceText }">
-		  <div style="margin-bottom: 10px;">
+		  <div class=" terms-of-service-header ">
 		  	Terms of Service
 		  </div>
-		  <div >
+		  <div class=" terms-of-service-text ">
 	  	  	<c:out value="${ termsOfServiceText }" escapeXml="false"></c:out>
 	      </div>
 	   </c:when>
