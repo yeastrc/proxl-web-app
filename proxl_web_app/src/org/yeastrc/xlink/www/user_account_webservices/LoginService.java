@@ -17,8 +17,16 @@ import org.apache.log4j.Logger;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.auth.hash_password.HashedPasswordProcessing;
+import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
+import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsValuesSharedConstants;
+import org.yeastrc.xlink.www.dao.TermsOfServiceTextVersionsDAO;
+import org.yeastrc.xlink.www.dao.TermsOfServiceUserAcceptedVersionHistoryDAO;
 import org.yeastrc.xlink.www.dao.XLinkUserDAO;
+import org.yeastrc.xlink.www.dto.TermsOfServiceTextVersionsDTO;
+import org.yeastrc.xlink.www.dto.TermsOfServiceUserAcceptedVersionHistoryDTO;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappConfigException;
+import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.objects.LoginResult;
@@ -32,6 +40,7 @@ public class LoginService {
 	private static final Logger log = Logger.getLogger(LoginService.class);
 	
 	
+	private static final String RETURN_TOS_TRUE = "true";
 
 	
 	
@@ -42,11 +51,13 @@ public class LoginService {
 	public Response loginService(   
 			@FormParam( "username" ) String username,
 			@FormParam( "password" ) String password,
+			@FormParam( "return_tos" ) String returnTOS,
+			@FormParam( "tos_key" ) String tosAcceptedKey,
 			@Context HttpServletRequest request )
 	throws Exception {
 		
 		
-		LoginResult loginResult = loginServiceLocal( username, password, request );
+		LoginResult loginResult = loginServiceLocal( username, password, returnTOS, tosAcceptedKey, request );
 		
 //		.cookie(new NewCookie("name", "Hello, world!"))
 		
@@ -58,6 +69,8 @@ public class LoginService {
 	private LoginResult loginServiceLocal(   
 			String username,
 			String password,
+			String returnTOS,
+			String tosAcceptedKey,
 			HttpServletRequest request ) {
 
 		LoginResult loginResult = new LoginResult();
@@ -144,6 +157,114 @@ public class LoginService {
 //			LastLoginUpdaterQueue.addLastLoginUpdaterObject(lastLoginUpdaterObject);
 			
 			
+			
+
+			//  Is terms of service enabled?
+			String termsOfServiceEnabledString =
+					ConfigSystemCaching.getInstance()
+					.getConfigValueForConfigKey( ConfigSystemsKeysSharedConstants.TERMS_OF_SERVICE_ENABLED );
+			
+			boolean termsOfServiceEnabled = false;
+			
+			if ( ConfigSystemsValuesSharedConstants.TRUE.equals(termsOfServiceEnabledString) ) {
+				
+				termsOfServiceEnabled = true;
+			}
+
+			if ( termsOfServiceEnabled ) {
+				
+				// terms of service is enabled
+				
+				//  Has user accepted latest version
+				
+				Integer tosLatestVersionId = TermsOfServiceTextVersionsDAO.getInstance().getLatestVersionId();
+				
+				if ( tosLatestVersionId == null ) {
+					
+					String msg = "Config/Terms Of Service Error. terms of service is enabled but no terms of service text record ";
+					log.error( msg );
+					throw new ProxlWebappConfigException(msg);
+					
+				} else {
+
+					TermsOfServiceUserAcceptedVersionHistoryDTO tosUserAccepted =
+							TermsOfServiceUserAcceptedVersionHistoryDAO.getInstance()
+							.getForAuthUserIdTermsOfServiceVersionId( userDatabaseRecord.getAuthUser().getId(), tosLatestVersionId );
+					
+					if ( tosUserAccepted == null ) {
+						
+						if ( StringUtils.isEmpty( tosAcceptedKey ) ) {
+
+							//  User has not accepted latest TOS.
+
+							//   User is not logged in.
+
+							loginResult.setTermsOfServiceAcceptanceRequired(true);
+
+							if ( RETURN_TOS_TRUE.equals( returnTOS ) ) {
+
+								TermsOfServiceTextVersionsDTO termsOfServiceTextVersionsDTO = 
+										TermsOfServiceTextVersionsDAO.getInstance().getLatest();
+
+								loginResult.setTermsOfServiceKey( termsOfServiceTextVersionsDTO.getIdString() );
+								loginResult.setTermsOfServiceText( termsOfServiceTextVersionsDTO.getTermsOfServiceText() );
+							}
+
+							return loginResult;  //  Early Exit
+
+						} else {
+
+							TermsOfServiceTextVersionsDTO termsOfServiceTextVersionsDTO =
+									TermsOfServiceTextVersionsDAO.getInstance().getForIdString( tosAcceptedKey );
+							
+							if ( termsOfServiceTextVersionsDTO == null ) {
+								
+								String msg = "No record for tosAcceptedKey: " + tosAcceptedKey;
+								log.warn( msg );
+
+								throw new WebApplicationException(
+										Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+										.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+										.build()
+										);
+							}
+
+							int authUserId = authUserDTO.getId();
+
+							tosUserAccepted = new TermsOfServiceUserAcceptedVersionHistoryDTO();
+
+							tosUserAccepted.setAuthUserId( authUserId );
+							tosUserAccepted.setTermsOfServiceVersionId( termsOfServiceTextVersionsDTO.getVersionId() );
+
+							TermsOfServiceUserAcceptedVersionHistoryDAO.getInstance().save( tosUserAccepted );
+
+							//  Next validate that user accepted the LATEST Terms of Service
+							
+							if ( termsOfServiceTextVersionsDTO.getVersionId() != tosLatestVersionId ) {
+
+								//  User has not accepted latest TOS.
+
+								//   User is not logged in.
+
+								loginResult.setTermsOfServiceAcceptanceRequired(true);
+
+								if ( RETURN_TOS_TRUE.equals( returnTOS ) ) {
+
+									TermsOfServiceTextVersionsDTO termsOfServiceTextVersionsDTONewLatest = 
+											TermsOfServiceTextVersionsDAO.getInstance().getLatest();
+
+									loginResult.setTermsOfServiceKey( termsOfServiceTextVersionsDTONewLatest.getIdString() );
+									loginResult.setTermsOfServiceText( termsOfServiceTextVersionsDTONewLatest.getTermsOfServiceText() );
+								}
+
+								return loginResult;  //  Early Exit
+
+							}
+						}
+					}
+				}
+			}
+			
 
 			UserSessionObject userSessionObject = new UserSessionObject();
 
@@ -151,8 +272,9 @@ public class LoginService {
 
 			session.setAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN, userSessionObject );
 
-			
-	        loginResult.setStatus(true);
+
+			loginResult.setStatus(true);
+
 			
 			return loginResult;
 			

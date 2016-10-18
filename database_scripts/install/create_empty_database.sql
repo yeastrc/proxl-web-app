@@ -1880,6 +1880,55 @@ ENGINE = InnoDB;
 CREATE UNIQUE INDEX unique_search_id_filename ON search_scan_filename (search_id ASC, filename ASC);
 
 
+-- -----------------------------------------------------
+-- Table terms_of_service_text_versions
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS terms_of_service_text_versions ;
+
+CREATE TABLE  terms_of_service_text_versions (
+  version_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  id_string VARCHAR(55) NOT NULL,
+  terms_of_service_text LONGTEXT NOT NULL,
+  created_auth_user_id INT UNSIGNED NOT NULL,
+  created_date_time DATETIME NOT NULL,
+  PRIMARY KEY (version_id),
+  CONSTRAINT terms_of_service_text_versions_auth_user_id
+    FOREIGN KEY (created_auth_user_id)
+    REFERENCES auth_user (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE UNIQUE INDEX id_string_UNIQUE ON terms_of_service_text_versions (id_string ASC);
+
+CREATE INDEX terms_of_service_text_versions_auth_user_id_idx ON terms_of_service_text_versions (created_auth_user_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table terms_of_service_user_accepted_version_history
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS terms_of_service_user_accepted_version_history ;
+
+CREATE TABLE  terms_of_service_user_accepted_version_history (
+  auth_user_id INT UNSIGNED NOT NULL,
+  terms_of_service_version_id INT UNSIGNED NOT NULL,
+  accepted__date_time DATETIME NOT NULL,
+  PRIMARY KEY (auth_user_id, terms_of_service_version_id),
+  CONSTRAINT tos_usr_a_v_hist_auth_user_id_fk
+    FOREIGN KEY (auth_user_id)
+    REFERENCES auth_user (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT tos_usr_a_v_hist_tos_text_v_id_fk
+    FOREIGN KEY (terms_of_service_version_id)
+    REFERENCES terms_of_service_text_versions (version_id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX tos_usr_a_v_hist_tos_text_v_id_fk_idx ON terms_of_service_user_accepted_version_history (terms_of_service_version_id ASC);
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

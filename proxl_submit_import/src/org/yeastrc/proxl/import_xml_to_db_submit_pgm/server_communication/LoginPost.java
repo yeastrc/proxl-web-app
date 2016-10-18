@@ -132,6 +132,11 @@ public class LoginPost {
 				} else if ( loginResponse.disabledUser ) {
 						
 					System.out.println( "Failed to log in:  Username is disabled." );
+					
+				} else if ( loginResponse.termsOfServiceAcceptanceRequired ) {
+					
+					System.out.println( "Failed to log in:  User MUST log in on the web and accept the current Terms of Service." );
+					
 				} else {
 					
 					System.out.println( "Failed to log in for unknown reason." );
@@ -174,7 +179,11 @@ public class LoginPost {
 		
 		private boolean invalidUserOrPassword = false;
 		private boolean disabledUser = false;
-		
+
+		private boolean termsOfServiceAcceptanceRequired = false;
+
+		private String termsOfServiceText;
+		private String termsOfServiceKey;
 		
 		public boolean isStatus() {
 			return status;
@@ -193,6 +202,25 @@ public class LoginPost {
 		}
 		public void setDisabledUser(boolean disabledUser) {
 			this.disabledUser = disabledUser;
+		}
+		public boolean isTermsOfServiceAcceptanceRequired() {
+			return termsOfServiceAcceptanceRequired;
+		}
+		public void setTermsOfServiceAcceptanceRequired(
+				boolean termsOfServiceAcceptanceRequired) {
+			this.termsOfServiceAcceptanceRequired = termsOfServiceAcceptanceRequired;
+		}
+		public String getTermsOfServiceText() {
+			return termsOfServiceText;
+		}
+		public void setTermsOfServiceText(String termsOfServiceText) {
+			this.termsOfServiceText = termsOfServiceText;
+		}
+		public String getTermsOfServiceKey() {
+			return termsOfServiceKey;
+		}
+		public void setTermsOfServiceKey(String termsOfServiceKey) {
+			this.termsOfServiceKey = termsOfServiceKey;
 		}
 		
 		

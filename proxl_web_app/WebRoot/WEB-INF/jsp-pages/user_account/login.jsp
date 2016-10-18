@@ -29,6 +29,63 @@
  <%@ include file="/WEB-INF/jsp-includes/body_section_start_include_every_page.jsp" %>
 
 
+
+
+	<%--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --%>
+	
+	<%--  !!!!!!!!!!    Overlays               !!!!!!!!!! --%>
+
+	<%--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --%>
+	
+	
+	
+  <%--  Terms of Service Overlay --%>
+		
+
+	<%--  Terms of Service Overlay Background --%>
+	
+	
+	<div id="terms_of_service_modal_dialog_overlay_background" class="terms-of-service-modal-dialog-overlay-background" style="display: none;"  >
+	
+	</div>
+	
+	
+	<%--  Terms of Service Overlay Div --%>
+	
+	<div style="text-align: center; position: relative;">
+	  <div style="text-align: center; position: relative;" >
+		<div id="terms_of_service_overlay_div" class=" terms-of-service-overlay-div " style="display: none; "  >
+		
+			<div id="terms_of_service_overlay_header" class="terms-of-service-overlay-header" style="width:100%; " >
+				<h1 id="terms_of_service_overlay_header_text" class="terms-of-service-overlay-header-text" 
+					>Terms of Service</h1>
+			</div>
+			<div id="terms_of_service_overlay_body" class="terms-of-service-overlay-body" >
+			
+		
+				<div style="margin-bottom: 10px;">
+					Terms of Service Acceptance required.
+				</div>
+				
+				<div id="terms_of_service_acceptance_required_text" class=" terms-of-service-overlay-text ">
+				</div>
+				
+				<div style="margin-top: 10px; margin-bottom: 10px;">
+					<input id="terms_of_service_acceptance_yes_button" class="submit-button terms-of-service-overlay-button"
+						type="button" value="Accept Terms of Service">
+		
+					<input id="terms_of_service_acceptance_no_button"  class="submit-button terms-of-service-overlay-button"
+						type="button" value="Reject Terms of Service">
+				</div>
+				
+			</div> <%--  END  <div id="terms_of_service_overlay_body"  --%>
+			
+		</div>  <%--  END  <div id="terms_of_service_overlay_div"  --%>
+	  </div>
+	</div>
+
+
+
 <div class="page-content-outer-container" >	
  <div class="page-content-container" >	
   <div class="page-content" >	
@@ -82,6 +139,8 @@
 		
 	 	<INPUT TYPE="submit" class="submit-button" VALUE="Sign In" id="login_person_button">
 	</form>
+	
+	
 
 
  <%--  	

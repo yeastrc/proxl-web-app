@@ -183,7 +183,102 @@
 	 	</div>	  
 	  </div>
 	</div>
+	
+	<%--  Manage Terms of Service (TOS) --%>
+	
+	<div style="margin-top: 20px;">
+	
+		<div >
+			<span class=" terms-of-service-config-title ">Terms of Service Management:</span>
+		</div>
+		<div >
+			<span id="tos_not_exist" style=";"
+				><input type="button" id="tos_add_button" 
+					value="Add Terms of Service"></span>
+				
+			<span id="tos_enabled" style="display: none;"
+				><input type="button"  id="tos_change_button" 
+					value="Change Terms of Service">
+				<input type="button"  id="tos_disable_button" 
+					value="Disable Terms of Service"></span>	
+				
+			<span id="tos_not_enabled" style="display: none;"
+					><input type="button" id="tos_enable_button" 
+						value="Enable Terms of Service"></span>	
+								
+		</div>
+	</div>
+	
+
+
+	<%--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --%>
+	
+	<%--  !!!!!!!!!!    Overlays               !!!!!!!!!! --%>
+
+	<%--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --%>
+	
+	
+	
+  <%--  Terms of Service Overlay --%>
+		
+
+	<%--  Terms of Service Overlay Background --%>
+	
+	
+	<div id="terms_of_service_modal_dialog_overlay_background" class="terms-of-service-config-modal-dialog-overlay-background" style="display: none;"  >
+	
+	</div>
+	
+	
+	<%--  Terms of Service Overlay Div --%>
+	
+	<div id="terms_of_service_overlay_div" class=" terms-of-service-config-overlay-div " style="display: none; "  >
+	
+		<div id="terms_of_service_overlay_header" class="terms-of-service-config-overlay-header" style="width:100%; " >
+			<h1 id="terms_of_service_overlay_X_for_exit_overlay" class="terms-of-service-config-overlay-X-for-exit-overlay" >X</h1>
+			<h1 id="terms_of_service_overlay_header_text" class="terms-of-service-config-overlay-header-text" 
+				><span  class=" add_tos_parts_jq " >Add Terms of Service</span
+				><span  class=" change_tos_parts_jq " style="display: none;" >Change Terms of Service</span
+				></h1>
+		</div>
+		<div id="terms_of_service_overlay_body" class="terms-of-service-config-overlay-body" >
+		
+		  <div style=" margin-bottom: 10px;" >
+			<div class=" add_tos_parts_jq ">
+				Enter a Terms of Service and click "Add"
+			</div>
+		
+			<div class=" change_tos_parts_jq " style="display: none;">
+				Change the Terms of Service and click "Change"
+			</div>
 			
+			<div >
+				The terms of service can contain HTML
+			</div>
+		  </div>
+		
+			<textarea id="terms_of_service_user_text" 
+				rows="20" cols="" 
+				style="width: 400px;"></textarea>
+		
+			<div class=" add_tos_parts_jq " 
+				style=" margin-top: 10px;" >
+				<input type="button" value="Add"  id="terms_of_service_overlay_add_button" 
+					 class="tool_tip_attached_jq" data-tooltip="Add Terms of Service" />
+			</div> 
+
+			<div class=" change_tos_parts_jq " 
+				style=" margin-top: 10px;" >
+				<input type="button" value="Change"  id="terms_of_service_overlay_change_button" 
+					 class="tool_tip_attached_jq" data-tooltip="Change Terms of Service" />
+			</div> 			
+			
+		</div> <%--  END  <div id="terms_of_service_overlay_body"  --%>
+		
+	</div>  <%--  END  <div id="terms_of_service_overlay_div"  --%>
+
+
+
   </div>  <%--  Close <div class="overall-enclosing-block">  --%>
 
   

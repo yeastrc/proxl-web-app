@@ -19,6 +19,11 @@ var PAGE_CONSTANTS = {
 		
 };
 
+var pageGlobals = {
+		
+	tosKey : ""	
+		
+};
 
 ///////////////////
 
@@ -29,9 +34,22 @@ var loginPersonFormSubmit = function() {
 
 ////////////////////////////
 
-var loginPerson = function(clickThis, eventObject) {
-
+var loginPerson = function( params ) {
+	
+	var tosKeyToServer = "";
+	
+	if ( params ) {
+		
+		if ( params.tosKey ) {
+			
+			tosKeyToServer = params.tosKey;
+		}
+	}
+	
+	
 	hideAllErrorMessages();
+	
+	
 	
 
 	var $username = $("#username");
@@ -71,10 +89,13 @@ var loginPerson = function(clickThis, eventObject) {
 			
 		return;  //  !!!  EARLY EXIT
 	}
+	
 
 	var requestData = {
 			username : username,
-			password : password
+			password : password,
+			return_tos : "true",
+			tos_key : tosKeyToServer
 	};
 
 	var _URL = contextPathJSVar + "/services/user/login";
@@ -118,10 +139,18 @@ var loginComplete = function(requestData, responseData) {
 
 	if ( ! responseData.status ) {
 
-//		private boolean invalidUserOrPassword = false;
-//		private boolean disabledUser = false;
+		//  User not logged in if status not true
+		
+		if ( responseData.termsOfServiceAcceptanceRequired ) {
 
-		if ( responseData.invalidUserOrPassword ) {
+			$("#terms_of_service_modal_dialog_overlay_background").show();
+			$("#terms_of_service_overlay_div").show();
+			
+			pageGlobals.tosKey = responseData.termsOfServiceKey;
+			
+			$("#terms_of_service_acceptance_required_text").html( responseData.termsOfServiceText );
+			
+		} else if ( responseData.invalidUserOrPassword ) {
 			
 			var $element = $("#error_message_username_or_password_invalid");
 			
@@ -257,32 +286,10 @@ var loginComplete = function(requestData, responseData) {
 };
 
 
-//function showErrorMsg( $element ) {
-//	
-//	$element.css( { top: PAGE_CONSTANTS.ERROR_MESSAGE_VERTICAL_MOVEMENT } );
-//	
-//	$element.show();
-//	
-//	$element.animate( { top: 0 }, { duration: 500 } );
-//
-//};
-//
-//
-//
-///////////////
-//
-//function hideAllErrorMessages() {
-//
-//	var $error_message_container_jq = $(".error_message_container_jq");
-//
-//	$error_message_container_jq.hide();
-//}
-
-
 
 //////////////////
 
-function initLogin() {
+function initLoginPage() {
 	
 	
 	$(document).click( function(eventObject) {
@@ -292,16 +299,25 @@ function initLogin() {
 	
 	$("#username").focus();
 
-//	var $login_person_button  = $("#login_person_button");
-//
-//	$login_person_button.click( function(eventObject) {
-//
-//		var clickThis = this;
-//		loginPerson(clickThis, eventObject);	
-//		
-//		return false;  // stop click bubble up.
-//	});
 	
+	$("#terms_of_service_acceptance_yes_button").click( function(eventObject) {
+
+//		var clickThis = this;
+
+		loginPerson( { tosKey : pageGlobals. tosKey } );
+			
+		return false;  // stop click bubble up.
+	});
+	
+	$("#terms_of_service_acceptance_no_button").click( function(eventObject) {
+
+//		var clickThis = this;
+
+		$("#terms_of_service_modal_dialog_overlay_background").hide();
+		$("#terms_of_service_overlay_div").hide();
+			
+		return false;  // stop click bubble up.
+	});
 
 };
 	
@@ -310,6 +326,6 @@ function initLogin() {
 
 $(document).ready(function() {
 
-	initLogin();
+	initLoginPage();
 
 });

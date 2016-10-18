@@ -10,6 +10,11 @@ public class LoginResult {
 	
 	private boolean invalidUserOrPassword = false;
 	private boolean disabledUser = false;
+	
+	private boolean termsOfServiceAcceptanceRequired = false;
+	
+	private String termsOfServiceText;
+	private String termsOfServiceKey;
 
 	public boolean isInvalidUserOrPassword() {
 		return invalidUserOrPassword;
@@ -33,6 +38,31 @@ public class LoginResult {
 
 	public void setStatus(boolean status) {
 		this.status = status;
+	}
+
+	public boolean isTermsOfServiceAcceptanceRequired() {
+		return termsOfServiceAcceptanceRequired;
+	}
+
+	public void setTermsOfServiceAcceptanceRequired(
+			boolean termsOfServiceAcceptanceRequired) {
+		this.termsOfServiceAcceptanceRequired = termsOfServiceAcceptanceRequired;
+	}
+
+	public String getTermsOfServiceText() {
+		return termsOfServiceText;
+	}
+
+	public void setTermsOfServiceText(String termsOfServiceText) {
+		this.termsOfServiceText = termsOfServiceText;
+	}
+
+	public String getTermsOfServiceKey() {
+		return termsOfServiceKey;
+	}
+
+	public void setTermsOfServiceKey(String termsOfServiceKey) {
+		this.termsOfServiceKey = termsOfServiceKey;
 	}
 
 }

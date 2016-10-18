@@ -239,12 +239,303 @@ function saveListConfigurationResponse( params ) {
 }
 
 
+////////////////////////////////
 
+//////   Term of Service
+
+function openTermsOfServiceOverlay() {
+	
+	
+	$("#terms_of_service_modal_dialog_overlay_background").show();
+	$("#terms_of_service_overlay_div").show();
+}
+
+function closeTermsOfServiceOverlay() {
+	
+	$("#terms_of_service_modal_dialog_overlay_background").hide();
+	$("#terms_of_service_overlay_div").hide();
+}
+
+
+
+/////////////////
+
+var getTermsOfServiceData = function() {
+
+	var requestData = {
+
+	};
+
+	var _URL = contextPathJSVar + "/services/config/termsOfServiceData";
+
+//	var request =
+	$.ajax({
+		type : "GET",
+		url : _URL,
+		data : requestData,
+		dataType : "json",
+		success : function(data) {
+
+			getTermsOfServiceDataResponse(requestData, data);
+		},
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+
+			handleAJAXError(jqXHR, textStatus, errorThrown);
+
+//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
+//			textStatus: " + textStatus );
+		}
+	});
+
+};
+
+
+///////
+
+var getTermsOfServiceDataResponse = function(requestData, responseData) {
+
+	var termsOfServiceEnabled = responseData.termsOfServiceEnabled;
+	var termsOfServiceText = responseData.termsOfServiceText;
+	
+	if ( termsOfServiceText === undefined || termsOfServiceText === null || termsOfServiceText === "" ) {
+		
+		$(".change_tos_parts_jq").hide();
+		$(".add_tos_parts_jq").show();
+		
+		$("#tos_not_exist").show();
+		$("#tos_enabled").hide();
+		
+	} else {
+		
+		$(".add_tos_parts_jq").hide();
+		$(".change_tos_parts_jq").show();
+		
+		$("#tos_not_exist").hide();
+		
+		if ( termsOfServiceEnabled ) {
+
+			$("#tos_not_enabled").hide();
+			$("#tos_enabled").show();
+		} else {
+			
+			$("#tos_enabled").hide();
+			$("#tos_not_enabled").show();
+			
+		}
+		
+	}
+
+	$("#terms_of_service_user_text").val( termsOfServiceText );
+};
+
+
+
+function addChangeTermsOfServiceData( params ) {
+	
+	var add = params.add;
+	var change = params.change;
+	
+	var $terms_of_service_user_text = $("#terms_of_service_user_text");
+	
+	var termsOfServiceText = $terms_of_service_user_text.val();
+
+	var requestData = { termsOfServiceText : termsOfServiceText };
+	
+	var _URL = contextPathJSVar + "/services/config/addTermsOfService";
+
+//	var request =
+	$.ajax({
+		type : "POST",
+		url : _URL,
+		data : requestData,
+		dataType : "json",
+		success : function(data) {
+
+			addTermsOfServiceDataResponse( { 
+				requestData : requestData, 
+				responseData : data,
+				add : add,
+				change : change
+			} );
+		},
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+
+			handleAJAXError(jqXHR, textStatus, errorThrown);
+
+//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
+//			textStatus: " + textStatus );
+		}
+	});
+	
+}
+
+
+function addTermsOfServiceDataResponse( params ) {
+
+	var responseData = params.responseData;
+	var add = params.add;
+//	var change = params.change;
+	
+	if ( responseData.status ) {
+
+		if ( add ) {
+
+			$(".add_tos_parts_jq").hide();
+			$(".change_tos_parts_jq").show();
+			
+			$("#tos_not_exist").hide();
+			
+			$("#tos_not_enabled").hide();
+			$("#tos_enabled").show();
+			
+
+			alert( "added" );
+
+		} else {
+
+			alert( "changed" );
+		}
+
+		closeTermsOfServiceOverlay();
+
+		
+	} else {
+
+		if ( add ) {
+
+			alert( "add failed" );
+
+		} else {
+
+			alert( "change failed" );
+		}
+		
+	}
+}
+
+
+
+
+
+
+function disableTermsOfService( ) {
+	
+	var requestData = { };
+	
+	var _URL = contextPathJSVar + "/services/config/disableTermsOfService";
+
+//	var request =
+	$.ajax({
+		type : "POST",
+		url : _URL,
+		data : requestData,
+		dataType : "json",
+		success : function(data) {
+
+			disableTermsOfServiceResponse( { 
+				requestData : requestData, 
+				responseData : data
+			} );
+		},
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+
+			handleAJAXError(jqXHR, textStatus, errorThrown);
+
+//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
+//			textStatus: " + textStatus );
+		}
+	});
+	
+}
+
+
+function disableTermsOfServiceResponse( params ) {
+
+	var responseData = params.responseData;
+	
+	if ( responseData.status ) {
+		
+		$("#tos_enabled").hide();
+		$("#tos_not_enabled").show();
+
+		alert( "disabled" );
+		
+	} else {
+			
+		alert( "failed to disable" );
+	}
+}
+
+
+function enableTermsOfService( ) {
+	
+	var requestData = { };
+	
+	var _URL = contextPathJSVar + "/services/config/enableTermsOfService";
+
+//	var request =
+	$.ajax({
+		type : "POST",
+		url : _URL,
+		data : requestData,
+		dataType : "json",
+		success : function(data) {
+
+			enableTermsOfServiceResponse( { 
+				requestData : requestData, 
+				responseData : data
+			} );
+		},
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+
+			handleAJAXError(jqXHR, textStatus, errorThrown);
+
+//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
+//			textStatus: " + textStatus );
+		}
+	});
+	
+}
+
+
+function enableTermsOfServiceResponse( params ) {
+
+	var responseData = params.responseData;
+	
+	if ( responseData.status ) {
+		
+		$("#tos_not_enabled").hide();
+		$("#tos_enabled").show();
+
+		alert( "enabled" );
+		
+	} else {
+			
+		alert( "failed to enable" );
+	}
+}
+
+
+
+
+
+
+/////////////////////////////////////
 
 function initPage() {
 	
-//	<input type="button" value="Save" id="save_button">
-//	<input type="button" value="Reset" id="reset_button">
 	
 	$("#save_button").click(function(eventObject) {
 
@@ -263,8 +554,74 @@ function initPage() {
 		
 		return false;
 	});
+	
+	$("#terms_of_service_overlay_X_for_exit_overlay").click(function(eventObject) {
+
+//		var clickThis = this;
+
+		closeTermsOfServiceOverlay();
+		
+		return false;
+	});
+	
+	$("#tos_add_button").click(function(eventObject) {
+
+//		var clickThis = this;
+
+		openTermsOfServiceOverlay();
+		
+		return false;
+	});
+
+	$("#tos_change_button").click(function(eventObject) {
+
+//		var clickThis = this;
+
+		openTermsOfServiceOverlay();
+		
+		return false;
+	});
+
+	$("#tos_disable_button").click(function(eventObject) {
+
+//		var clickThis = this;
+
+		disableTermsOfService();
+		
+		return false;
+	});
+
+	$("#tos_enable_button").click(function(eventObject) {
+
+//		var clickThis = this;
+
+		enableTermsOfService();
+		
+		return false;
+	});
+	
+	
+	$("#terms_of_service_overlay_add_button").click(function(eventObject) {
+
+//		var clickThis = this;
+
+		addChangeTermsOfServiceData( { add : true } );
+		
+		return false;
+	});
+
+	$("#terms_of_service_overlay_change_button").click(function(eventObject) {
+
+//		var clickThis = this;
+
+		addChangeTermsOfServiceData( { change : true } );
+		
+		return false;
+	});
+	
 
 	getListConfiguration();
+	getTermsOfServiceData();
 
 };
 

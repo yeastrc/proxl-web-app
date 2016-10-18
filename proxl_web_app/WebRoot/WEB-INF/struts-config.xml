@@ -59,6 +59,14 @@
 		    <forward name="Success" path="/listProjects.do" redirect="true"/>
 		</action>			
 		
+		<action path="/termsOfService"
+				type="org.yeastrc.xlink.www.actions.TermsOfServicePageAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/termsOfService.jsp" redirect="false"/>
+		</action>		
+		
+		
 <!--  		
 		<action path="/home"
 				type="org.yeastrc.xlink.www.actions.HomeAction"

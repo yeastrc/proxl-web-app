@@ -18,6 +18,11 @@ public class ConfigSystemsKeysSharedConstants {
 
 	public static final String IMPORT_DELETE_UPLOADED_FILES = "import_delete_uploaded_files_after_import";
 
+	////              Terms of Service Enabled key  -  Specific Values allowed
+
+	public static final String TERMS_OF_SERVICE_ENABLED = "terms_of_service_enabled";
+
+
 
 
 	//   Lists of config keys for validation on save
