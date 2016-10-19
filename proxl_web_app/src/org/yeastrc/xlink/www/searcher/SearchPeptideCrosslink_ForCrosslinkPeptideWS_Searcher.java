@@ -736,18 +736,6 @@ public class SearchPeptideCrosslink_ForCrosslinkPeptideWS_Searcher {
 				}
 				
 
-				if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
-						|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {
-					
-					if ( queryResultItem.numPsms == null || queryResultItem.numPsms <= 0 ) {
-
-						//  !!!!!!!   Number of PSMs is zero this this isn't really a peptide that meets the cutoffs
-						
-						continue;  //  EARY LOOP ENTRY EXIT
-					}
-				}
-				
-
 				queryResultItem.reported_peptide_id = reportedPeptideId;
 				
 //				queryResultItem.protein_sequence_id_1 = rs.getInt( "protein_sequence_id_1" );
@@ -785,8 +773,10 @@ public class SearchPeptideCrosslink_ForCrosslinkPeptideWS_Searcher {
 				}
 				
 				
+				//  queryResultItemList is per reportedPeptideId
 
-				List<QueryResultItem> queryResultItemList = queryResultItemListMapKeyedOnReportedPeptideId.get(reportedPeptideId);
+				List<QueryResultItem> queryResultItemList = 
+						queryResultItemListMapKeyedOnReportedPeptideId.get( reportedPeptideId );
 
 				if ( queryResultItemList == null ) {
 					
@@ -794,9 +784,12 @@ public class SearchPeptideCrosslink_ForCrosslinkPeptideWS_Searcher {
 					queryResultItemListMapKeyedOnReportedPeptideId.put(reportedPeptideId, queryResultItemList);
 				}
 				
-				queryResultItemList.add(queryResultItem);
+				queryResultItemList.add( queryResultItem );  //  add to list for this reportedPeptideId
 				
-			}
+				
+			}  //   End of processing result set
+			
+			
 			
 			//  Process Map of Lists of query results keyed on Reported Peptide Id
 				
@@ -846,8 +839,31 @@ public class SearchPeptideCrosslink_ForCrosslinkPeptideWS_Searcher {
 				link.setReportedPeptideId( queryResultItem.reported_peptide_id );
 				
 				if ( queryResultItem.numPsms != null ) {
+					
+					//  Number of PSMs retrieve from reported peptide level record 
+					//  since query is on default Peptide and PSM cutoff values
 
 					link.setNumPsms( queryResultItem.numPsms );
+				
+				} else {
+					
+					//  Query is NOT on default Peptide and PSM cutoff values.
+					
+					//  If more than one peptide or PSM cutoff, 
+					//    retrieve number of PSMs for this record.
+					//  If number of PSMs is zero, then this record is not an actual result record.
+
+					if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
+							|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {
+						
+						if ( link.getNumPsms() <= 0 ) {
+
+							//  !!!!!!!   Number of PSMs is zero this this isn't really a peptide that meets the cutoffs
+							
+							continue;  //  EARY LOOP ENTRY EXIT
+						}
+					}
+
 				}
 				
 				PeptideDTO peptide1 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( queryResultItem.peptide_id_1 );
