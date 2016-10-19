@@ -23,7 +23,7 @@ var updateFirstName = function(clickThis, eventObject) {
 
 	if ($firstName.length === 0) {
 
-		throw "Unable to find input field for id 'first-name-change-field' ";
+		throw Error( "Unable to find input field for id 'first-name-change-field' " );
 	}
 
 	var firstName = $firstName.val();
@@ -52,7 +52,12 @@ var updateFirstName = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			updateFirstNameComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			try {
+				updateFirstNameComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure : function(errMsg) {
 			var $element = $("#error_message_system_error");
@@ -127,7 +132,7 @@ var updateLastName = function(clickThis, eventObject) {
 
 	if ($lastName.length === 0) {
 
-		throw "Unable to find input field for id 'last-name-change-field' ";
+		throw Error( "Unable to find input field for id 'last-name-change-field' " );
 	}
 
 	var lastName = $lastName.val();
@@ -158,7 +163,12 @@ var updateLastName = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			updateLastNameComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			try {
+				updateLastNameComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure : function(errMsg) {
 			var $element = $("#error_message_system_error");
@@ -233,7 +243,7 @@ var updateOrganization = function(clickThis, eventObject) {
 
 	if ($organization.length === 0) {
 
-		throw "Unable to find input field for id 'organization-change-field' ";
+		throw Error( "Unable to find input field for id 'organization-change-field' " );
 	}
 
 	var organization = $organization.val();
@@ -263,7 +273,12 @@ var updateOrganization = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			updateOrganizationComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			try {
+				updateOrganizationComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure : function(errMsg) {
 			var $element = $("#error_message_system_error");
@@ -335,7 +350,7 @@ var updateEmail = function(clickThis, eventObject) {
 
 	if ($email.length === 0) {
 
-		throw "Unable to find input field for id 'email-change-field' ";
+		throw Error( "Unable to find input field for id 'email-change-field' " );
 	}
 
 	var email = $email.val();
@@ -365,7 +380,12 @@ var updateEmail = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			updateEmailComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			try {
+				updateEmailComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure : function(errMsg) {
 			var $element = $("#error_message_system_error");
@@ -450,7 +470,7 @@ var updateUsername = function(clickThis, eventObject) {
 
 	if ($username.length === 0) {
 
-		throw "Unable to find input field for id 'username-change-field' ";
+		throw Error( "Unable to find input field for id 'username-change-field' " );
 	}
 
 	var username = $username.val();
@@ -480,7 +500,12 @@ var updateUsername = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			updateUsernameComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			try {
+				updateUsernameComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure : function(errMsg) {
 			var $element = $("#error_message_system_error");
@@ -568,14 +593,14 @@ var updatePassword = function(clickThis, eventObject) {
 
 	if ($password.length === 0) {
 
-		throw "Unable to find input field for id 'password-change-field' ";
+		throw Error( "Unable to find input field for id 'password-change-field' " );
 	}
 
 	var $passwordConfirm = $("#password-confirm-field");
 
 	if ($passwordConfirm.length === 0) {
 
-		throw "Unable to find input field for id 'password-confirm-field' ";
+		throw Error( "Unable to find input field for id 'password-confirm-field' " );
 	}
 
 	var password = $password.val();
@@ -626,7 +651,12 @@ var updatePassword = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			updatePasswordComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			try {
+				updatePasswordComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure : function(errMsg) {
 			var $element = $("#error_message_system_error");
@@ -693,14 +723,14 @@ var updatePasswordComplete = function( params ) {
 
 	if ($password.length === 0) {
 
-		throw "Unable to find input field for id 'password-change-field' ";
+		throw Error( "Unable to find input field for id 'password-change-field' " );
 	}
 
 	var $passwordConfirm = $("#password-confirm-field");
 
 	if ($passwordConfirm.length === 0) {
 
-		throw "Unable to find input field for id 'password-confirm-field' ";
+		throw Error( "Unable to find input field for id 'password-confirm-field' " );
 	}
 	
 	///  Clear the entry fields
@@ -771,120 +801,165 @@ function initPage() {
 //	});
 
 	// set up so clicking the edit icon switches to the text to change
-	
+
 	var $edit_value_jq = $(".edit_value_jq");
-	
+
 	$edit_value_jq.click( function(eventObject) {
 
-		var clickThis = this;
+		try {
+			var clickThis = this;
 
-		hideAllErrorMessages();
+			hideAllErrorMessages();
 
-		editValue( clickThis );
-		
-		return false;  // stop click bubble up.
+			editValue( clickThis );
+
+			return false;  // stop click bubble up.
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	var $cancel_button_jq = $(".cancel_button_jq");
-	
+
 	$cancel_button_jq.click( function(eventObject) {
 
-		var clickThis = this;
+		try {
+			var clickThis = this;
 
-		hideAllErrorMessages();
-		
-		closeEditValue( clickThis );
-		
-		return false;  // stop click bubble up.
+			hideAllErrorMessages();
+
+			closeEditValue( clickThis );
+
+			return false;  // stop click bubble up.
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	var $submit_first_name_change_button = $("#submit-first-name-change-button");
 
 	$submit_first_name_change_button.click( function(eventObject) {
 
-		var clickThis = this;
+		try {
+			var clickThis = this;
 
-		hideAllErrorMessages();
+			hideAllErrorMessages();
 
-		updateFirstName(clickThis, eventObject);	
-		
-		return false;  // stop click bubble up.
+			updateFirstName(clickThis, eventObject);	
+
+			return false;  // stop click bubble up.
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	var $submit_last_name_change_button = $("#submit-last-name-change-button");
 
 	$submit_last_name_change_button.click( function(eventObject) {
 
-		var clickThis = this;
+		try {
+			var clickThis = this;
 
-		hideAllErrorMessages();
+			hideAllErrorMessages();
 
-		updateLastName(clickThis, eventObject);	
-		
-		return false;  // stop click bubble up.
+			updateLastName(clickThis, eventObject);	
+
+			return false;  // stop click bubble up.
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
-	
+
+
+
 	var $submit_organization_change_button = $("#submit-organization-change-button");
 
 	$submit_organization_change_button.click( function(eventObject) {
 
-		var clickThis = this;
+		try {
+			var clickThis = this;
 
-		hideAllErrorMessages();
+			hideAllErrorMessages();
 
-		updateOrganization(clickThis, eventObject);	
-		
-		return false;  // stop click bubble up.
+			updateOrganization(clickThis, eventObject);	
+
+			return false;  // stop click bubble up.
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	var $submit_email_change_button = $("#submit-email-change-button");
 
 	$submit_email_change_button.click( function(eventObject) {
 
-		var clickThis = this;
+		try {
+			var clickThis = this;
 
-		hideAllErrorMessages();
+			hideAllErrorMessages();
 
-		updateEmail(clickThis, eventObject);	
-		
-		return false;  // stop click bubble up.
+			updateEmail(clickThis, eventObject);	
+
+			return false;  // stop click bubble up.
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	var $submit_username_change_button = $("#submit-username-change-button");
 
 	$submit_username_change_button.click( function(eventObject) {
 
-		var clickThis = this;
+		try {
+			var clickThis = this;
 
-		hideAllErrorMessages();
+			hideAllErrorMessages();
 
-		updateUsername(clickThis, eventObject);	
-		
-		return false;  // stop click bubble up.
+			updateUsername(clickThis, eventObject);	
+
+			return false;  // stop click bubble up.
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	var $submit_password_change_button = $("#submit-password-change-button");
 
 	$submit_password_change_button.click( function(eventObject) {
 
-		var clickThis = this;
+		try {
+			var clickThis = this;
 
-		hideAllErrorMessages();
+			hideAllErrorMessages();
 
-		updatePassword(clickThis, eventObject);	
-		
-		return false;  // stop click bubble up.
+			updatePassword(clickThis, eventObject);	
+
+			return false;  // stop click bubble up.
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$(document).click( function(eventObject) {
-		
-		hideAllErrorMessages();
+
+		try {
+			hideAllErrorMessages();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 };
@@ -894,6 +969,11 @@ function initPage() {
 
 $(document).ready(function() {
 
-	initPage();
-
+	try {
+		initPage();
+		
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 });

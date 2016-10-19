@@ -23,7 +23,12 @@ var PAGE_CONSTANTS = {
 
 var resetPasswordFormSubmit = function() {
 
-	resetPassword();
+	try {
+		resetPassword();
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 };
 
 
@@ -38,14 +43,14 @@ var resetPassword = function(clickThis, eventObject) {
 
 	if ($username.length === 0) {
 
-		throw "Unable to find input field for id 'username' ";
+		throw Error( "Unable to find input field for id 'username' " );
 	}
 
 	var $email = $("#email");
 
 	if ($email.length === 0) {
 
-		throw "Unable to find input field for id 'email' ";
+		throw Error( "Unable to find input field for id 'email' " );
 	}
 
 
@@ -89,7 +94,12 @@ var resetPassword = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			resetPasswordComplete(requestData, data);
+			try {
+				resetPasswordComplete(requestData, data);
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure : function(errMsg) {
 			var $element = $("#error_message_system_error");
@@ -171,7 +181,7 @@ var resetPasswordComplete = function(requestData, responseData) {
 //
 //	if ($requestedURL.length === 0) {
 //
-//		throw "Unable to find input field for id 'requestedURL' ";
+//		throw Error( "Unable to find input field for id 'requestedURL' " );
 //	}
 //
 //
@@ -189,7 +199,7 @@ var resetPasswordComplete = function(requestData, responseData) {
 //
 //	if ($defaultURL.length === 0) {
 //
-//		throw "Unable to find input field for id 'defaultURL' ";
+//		throw Error( "Unable to find input field for id 'defaultURL' " );
 //	}
 //
 //
@@ -202,7 +212,7 @@ var resetPasswordComplete = function(requestData, responseData) {
 //		return;
 //	}
 //
-//	throw "requestedURL and defaultURL are both empty";
+//	throw Error( "requestedURL and defaultURL are both empty" );
 
 };
 
@@ -257,6 +267,11 @@ function initResetPassword() {
 
 $(document).ready(function() {
 
-	initResetPassword();
+	try {
+		initResetPassword();
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 
 });

@@ -8,27 +8,49 @@ var _MAX_PDB_FILESIZE = _MAX_PDB_FILESIZE_IN_MB * 1000 * 1000;
 
 // initialize the pdb upload overlay
 $(document).ready(function()  { 
-	attachPDBUploadOverlayClickHandlers();
-	attachPDBFileUploadHandlers();
+	
+	try {
+	
+		attachPDBUploadOverlayClickHandlers();
+		attachPDBFileUploadHandlers();
+		
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 });
 
 // opens the overlay
 var openPDBUploadOverlay = function (  ) {
 
-	$("#pdb-upload-modal-dialog-overlay-background").show();
-	$(".pdb-upload-overlay-div").show();
-	
-	//  scroll the window to the top left
-	var $window = $(window);
-	$window.scrollTop( 0 );
-	$window.scrollLeft( 0 );
+	try {
+
+		$("#pdb-upload-modal-dialog-overlay-background").show();
+		$(".pdb-upload-overlay-div").show();
+
+		//  scroll the window to the top left
+		var $window = $(window);
+		$window.scrollTop( 0 );
+		$window.scrollLeft( 0 );
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 };
 
 // close the overlay
 var closePDBUploadOverlay = function (  ) {
 
-	$("#pdb-upload-modal-dialog-overlay-background").hide();
-	$(".pdb-upload-overlay-div").hide();
+	try {
+
+		$("#pdb-upload-modal-dialog-overlay-background").hide();
+		$(".pdb-upload-overlay-div").hide();
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 
 };
 
@@ -37,7 +59,15 @@ var attachPDBUploadOverlayClickHandlers = function (  ) {
 	var $pdb_upload_overlay_X_for_exit_overlay = $(".pdb-upload-overlay-X-for-exit-overlay");
 	
 	$pdb_upload_overlay_X_for_exit_overlay.click( function( eventObject ) {
-		closePDBUploadOverlay();
+
+		try {
+		
+			closePDBUploadOverlay();
+			
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 	
 };
@@ -53,11 +83,20 @@ function attachPDBFileUploadHandlers() {
 
 	// make upload button clickable!
 	$uploadButton.click( function(eventObject) {
-		uploadPDBFile();		
+
+		try {
+		
+			uploadPDBFile();		
+			
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	// enable upload button if they select a file
 	$fileField.change( function( eventObject ) {
+
 		$uploadButton.prop("disabled", false );
 	});
 	
@@ -102,58 +141,66 @@ function uploadPDBFile() {
 	xhr.open('POST', contextPathJSVar + '/uploadPDBFileService.do', true);
 
     xhr.onload = function() {
-        if (xhr.status === 200) {
 
-        	var xhrResponse = xhr.response;
+    	try {
 
+    		if (xhr.status === 200) {
 
-        	var resp = null;
-
-        	try {
-        		resp = JSON.parse(xhrResponse);
-
-        		if ( resp.statusSuccess ) {
+    			var xhrResponse = xhr.response;
 
 
-        		} else if ( resp.parsePDBFailed ) {
+    			var resp = null;
 
-        			alert( "Unable to parse the uploaded PDB file. Please upload a different file." );
-        			return;
-        			
-        		} else if ( resp.noChains ) {
-        			
-        			alert( "Can not find chains in that file. Please upload a different file." );
-        			return;
-        		
-        		} else {
-        			
-            		alert("File Upload failed. Failed to determine error reason.");
-        			
-        			throw 'Unknown error occurred: [' + xhr.responseText + ']';
-        		}
+    			try {
+    				resp = JSON.parse(xhrResponse);
 
-        	} catch (e) {
-        		
-        		alert("File Upload failed. Failed to get information from server response.");
-        		
-        		throw 'Unknown error occurred: [' + xhr.responseText + ']';
-        	}
+    				if ( resp.statusSuccess ) {
 
 
+    				} else if ( resp.parsePDBFailed ) {
+
+    					alert( "Unable to parse the uploaded PDB file. Please upload a different file." );
+    					return;
+
+    				} else if ( resp.noChains ) {
+
+    					alert( "Can not find chains in that file. Please upload a different file." );
+    					return;
+
+    				} else {
+
+    					alert("File Upload failed. Failed to determine error reason.");
+
+    					throw 'Unknown error occurred: [' + xhr.responseText + ']';
+    				}
+
+    			} catch (e) {
+
+    				alert("File Upload failed. Failed to get information from server response.");
+
+    				throw 'Unknown error occurred: [' + xhr.responseText + ']';
+    			}
 
 
-        	closePDBUploadOverlay();
-        	
-        	var pdbFileId = getSelectedPDBFile().id;
-        	loadPDBFiles( pdbFileId );
-        	
-          } else {
 
-        	  
-        	  handleAJAXError( xhr );
-        	  
-        	  
-          }
+
+    			closePDBUploadOverlay();
+
+    			var pdbFileId = getSelectedPDBFile().id;
+    			loadPDBFiles( pdbFileId );
+
+    		} else {
+
+
+    			handleAJAXError( xhr );
+
+
+    		}
+    		
+    	} catch( e ) {
+    		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+    		throw e;
+    	}
     };
     
     xhr.send(formData);

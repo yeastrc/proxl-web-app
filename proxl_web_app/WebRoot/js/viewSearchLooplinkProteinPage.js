@@ -14,28 +14,43 @@
 
 var ViewSearchLooplinkProteinPageCode = function() {
 
-	//  function called after all HTML above main table is generated
+	//  function called after all HTML above main table is generated, called from inline script on page
 
 	this.createPartsAboveMainTable = function() {
 
-		var params = {
-				listOfObjectsToPassPsmPeptideCutoffsRootTo : [ 
-				                                               viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate,
-				                                               viewPsmsLoadedFromWebServiceTemplate,
-				                                               viewPeptidesRelatedToPSMsByScanId
-				                                               ]
-		};
+		try {
 
-		viewSearchProteinPageCommonCrosslinkLooplinkCoverage.createPartsAboveMainTableSearchProteinPageCommon( params );
+			var params = {
+					listOfObjectsToPassPsmPeptideCutoffsRootTo : [ 
+					                                              viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate,
+					                                              viewPsmsLoadedFromWebServiceTemplate,
+					                                              viewPeptidesRelatedToPSMsByScanId
+					                                              ]
+			};
+
+			viewSearchProteinPageCommonCrosslinkLooplinkCoverage.createPartsAboveMainTableSearchProteinPageCommon( params );
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	};
 	
-		
+
 	///////////////////////
 	
-	this.updatePageForFormParams = function() {
+	//   Called by "onclick" on HTML element
 	
-		
-		viewSearchProteinPageCommonCrosslinkLooplinkCoverage.updatePageForFormParams();
+	this.updatePageForFormParams = function() {
+
+		try {
+
+			viewSearchProteinPageCommonCrosslinkLooplinkCoverage.updatePageForFormParams();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	};
 		
 

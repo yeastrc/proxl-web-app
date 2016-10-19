@@ -31,7 +31,7 @@ var ViewSearchPeptidePageCode = function() {
 		var _query_json_field_String = null;
 
 		
-		//  function called after all HTML above main table is generated
+		//  function called after all HTML above main table is generated, called from inline script on page
 
 		this.createPartsAboveMainTable = function() {
 			
@@ -39,7 +39,14 @@ var ViewSearchPeptidePageCode = function() {
 
 			   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 					  
-				   objectThis.get_query_json_field_ContentsFromHiddenField();
+				   try {
+
+					   objectThis.get_query_json_field_ContentsFromHiddenField();
+
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
 	
 			   },10);
 			  
@@ -62,14 +69,14 @@ var ViewSearchPeptidePageCode = function() {
 		
 		
 		 this.get_query_json_field_ContentsFromHiddenField = function() {
-			
+			 
 			 var query_json_field_outside_form_id = "query_json_field_outside_form";
 			 
 			 var $query_json_field =  $( "#" + query_json_field_outside_form_id );
 			
 			if ( $query_json_field.length === 0 ) {
 				
-				throw "No HTML field with id '" + query_json_field_outside_form_id + "'";
+				throw Error( "No HTML field with id '" + query_json_field_outside_form_id + "'" );
 			}
 			
 			_query_json_field_String = $query_json_field.val();
@@ -79,7 +86,7 @@ var ViewSearchPeptidePageCode = function() {
 				
 			} catch( e ) {
 				
-				throw "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + _query_json_field_String;
+				throw Error( "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + _query_json_field_String );
 				
 			}
 
@@ -201,7 +208,7 @@ var ViewSearchPeptidePageCode = function() {
 			
 			if ( $query_json_field.length === 0 ) {
 				
-				throw "No HTML field with id 'query_json_field'";
+				throw Error( "No HTML field with id 'query_json_field'" );
 			}
 			
 //			var inputCutoffs = _query_json_field_Contents.cutoffs;
@@ -300,7 +307,7 @@ var ViewSearchPeptidePageCode = function() {
 				
 			} catch( e ) {
 				
-				throw "Failed to stringify JSON to HTML field with id 'query_json_field'.";
+				throw Error( "Failed to stringify JSON to HTML field with id 'query_json_field'." );
 				
 			}
 			
@@ -308,22 +315,29 @@ var ViewSearchPeptidePageCode = function() {
 		
 		///////////////////////
 		
+		//   Called by "onclick" on HTML element
+		
 		this.updatePageForFormParams = function() {
 		
-			
-			var put_query_json_field_ContentsToHiddenFieldResult =
-				this.put_query_json_field_ContentsToHiddenField();
-			
-			if ( put_query_json_field_ContentsToHiddenFieldResult 
-					&& put_query_json_field_ContentsToHiddenFieldResult.output_FieldDataFailedValidation ) {
-				
-				//  Only submit if there were no errors in the input data
+			try {
 
-				return;
+				var put_query_json_field_ContentsToHiddenFieldResult =
+					this.put_query_json_field_ContentsToHiddenField();
+
+				if ( put_query_json_field_ContentsToHiddenFieldResult 
+						&& put_query_json_field_ContentsToHiddenFieldResult.output_FieldDataFailedValidation ) {
+
+					//  Only submit if there were no errors in the input data
+
+					return;
+				}
+
+				$('#form_get_for_updated_parameters').submit();
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
 			}
-			
-			$('#form_get_for_updated_parameters').submit();
-			
 		};
 		
 };

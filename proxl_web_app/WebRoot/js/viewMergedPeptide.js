@@ -29,7 +29,7 @@ var ViewMergedPeptidePageCode = function() {
 	var _query_json_field_Contents = null;
 
 
-	//  function called after all HTML above main table is generated
+	//  function called after all HTML above main table is generated, called from inline script on page
 
 	this.createPartsAboveMainTable = function() {
 
@@ -37,9 +37,16 @@ var ViewMergedPeptidePageCode = function() {
 
 		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 
-			objectThis.get_query_json_field_ContentsFromHiddenField();
+			try {
 
-			window.createVennDiagramIfNeeded();
+				objectThis.get_query_json_field_ContentsFromHiddenField();
+
+				window.createVennDiagramIfNeeded();
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 
 		},10);
 
@@ -51,14 +58,19 @@ var ViewMergedPeptidePageCode = function() {
 
 	this.passCutoffsToWebserviceJS = function( psmPeptideCutoffsRootObject ) {
 
+		try {
 
-		viewMergedPeptidePerSearchDataFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+			viewMergedPeptidePerSearchDataFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
 
 
-		viewPsmsLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+			viewPsmsLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
 
-		viewPeptidesRelatedToPSMsByScanId.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+			viewPeptidesRelatedToPSMsByScanId.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
 
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 
 	};
 
@@ -70,7 +82,7 @@ var ViewMergedPeptidePageCode = function() {
 
 		if ( $query_json_field.length === 0 ) {
 
-			throw "No HTML field with id 'query_json_field'";
+			throw Error( "No HTML field with id 'query_json_field'" );
 		}
 
 		var query_json_field_String = $query_json_field.val();
@@ -80,7 +92,7 @@ var ViewMergedPeptidePageCode = function() {
 
 		} catch( e ) {
 
-			throw "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + query_json_field_String;
+			throw Error( "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + query_json_field_String );
 
 		}
 
@@ -214,108 +226,115 @@ var ViewMergedPeptidePageCode = function() {
 
 	this.put_query_json_field_ContentsToHiddenField = function() {
 
-		var $query_json_field = $("#query_json_field");
-
-		if ( $query_json_field.length === 0 ) {
-
-			throw "No HTML field with id 'query_json_field'";
-		}
-
-//		var inputCutoffs = _query_json_field_Contents.cutoffs;
-
-		
-		var getCutoffsFromThePageResult = cutoffProcessingCommonCode.getCutoffsFromThePage(  {  } );
-		
-		var getCutoffsFromThePageResult_FieldDataFailedValidation = getCutoffsFromThePageResult.getCutoffsFromThePageResult_FieldDataFailedValidation;
-		
-		if ( getCutoffsFromThePageResult_FieldDataFailedValidation ) {
-			
-			//  Cutoffs failed validation and error message was displayed
-			
-			//  EARLY EXIT from function
-			
-			return { output_FieldDataFailedValidation : getCutoffsFromThePageResult_FieldDataFailedValidation };
-		}
-		
-		var outputCutoffs = getCutoffsFromThePageResult.cutoffsBySearchId;
-		
-
-
-		//  Create array from check boxes for chosen link types
-
-		var outputLinkTypes = [];
-
-//		var allLinkTypesChosen = true;
-
-		var $link_type_jq = $(".link_type_jq");
-
-		$link_type_jq.each( function( index, element ) {
-
-			var $item = $( this );
-
-			if ( $item.prop('checked') === true ) {
-
-				var linkTypeFieldValue = $item.val();
-
-				outputLinkTypes.push( linkTypeFieldValue );
-
-//				} else {
-
-//				allLinkTypesChosen = false;
-			}
-		});
-
-//		if ( allLinkTypesChosen ) {
-
-//		outputLinkTypes = null;  //  set to null when all chosen
-//		}
-
-
-
-
-
-
-		//  Create array from check boxes for chosen dynamic mod masses
-
-		var outputDynamicModMasses = [];
-
-		var allDynamicModMassesChosen = true;
-
-		var $mod_mass_filter_jq = $(".mod_mass_filter_jq");
-
-		$mod_mass_filter_jq.each( function( index, element ) {
-
-			var $item = $( this );
-
-			if ( $item.prop('checked') === true ) {
-
-				var fieldValue = $item.val();
-
-				outputDynamicModMasses.push( fieldValue );
-
-			} else {
-
-				allDynamicModMassesChosen = false;
-			}
-		});
-
-		if ( allDynamicModMassesChosen ) {
-
-			outputDynamicModMasses = null;  //  set to null when all chosen
-		}
-
-
-		var output_query_json_field_Contents = { cutoffs : outputCutoffs, linkTypes : outputLinkTypes, mods : outputDynamicModMasses };
-
 		try {
-			var output_query_json_field_String = JSON.stringify( output_query_json_field_Contents );
 
-			$query_json_field.val( output_query_json_field_String );
+			var $query_json_field = $("#query_json_field");
+
+			if ( $query_json_field.length === 0 ) {
+
+				throw Error( "No HTML field with id 'query_json_field'" );
+			}
+
+//			var inputCutoffs = _query_json_field_Contents.cutoffs;
+
+
+			var getCutoffsFromThePageResult = cutoffProcessingCommonCode.getCutoffsFromThePage(  {  } );
+
+			var getCutoffsFromThePageResult_FieldDataFailedValidation = getCutoffsFromThePageResult.getCutoffsFromThePageResult_FieldDataFailedValidation;
+
+			if ( getCutoffsFromThePageResult_FieldDataFailedValidation ) {
+
+				//  Cutoffs failed validation and error message was displayed
+
+				//  EARLY EXIT from function
+
+				return { output_FieldDataFailedValidation : getCutoffsFromThePageResult_FieldDataFailedValidation };
+			}
+
+			var outputCutoffs = getCutoffsFromThePageResult.cutoffsBySearchId;
+
+
+
+			//  Create array from check boxes for chosen link types
+
+			var outputLinkTypes = [];
+
+//			var allLinkTypesChosen = true;
+
+			var $link_type_jq = $(".link_type_jq");
+
+			$link_type_jq.each( function( index, element ) {
+
+				var $item = $( this );
+
+				if ( $item.prop('checked') === true ) {
+
+					var linkTypeFieldValue = $item.val();
+
+					outputLinkTypes.push( linkTypeFieldValue );
+
+//					} else {
+
+//					allLinkTypesChosen = false;
+				}
+			});
+
+//			if ( allLinkTypesChosen ) {
+
+//			outputLinkTypes = null;  //  set to null when all chosen
+//			}
+
+
+
+
+
+
+			//  Create array from check boxes for chosen dynamic mod masses
+
+			var outputDynamicModMasses = [];
+
+			var allDynamicModMassesChosen = true;
+
+			var $mod_mass_filter_jq = $(".mod_mass_filter_jq");
+
+			$mod_mass_filter_jq.each( function( index, element ) {
+
+				var $item = $( this );
+
+				if ( $item.prop('checked') === true ) {
+
+					var fieldValue = $item.val();
+
+					outputDynamicModMasses.push( fieldValue );
+
+				} else {
+
+					allDynamicModMassesChosen = false;
+				}
+			});
+
+			if ( allDynamicModMassesChosen ) {
+
+				outputDynamicModMasses = null;  //  set to null when all chosen
+			}
+
+
+			var output_query_json_field_Contents = { cutoffs : outputCutoffs, linkTypes : outputLinkTypes, mods : outputDynamicModMasses };
+
+			try {
+				var output_query_json_field_String = JSON.stringify( output_query_json_field_Contents );
+
+				$query_json_field.val( output_query_json_field_String );
+
+			} catch( e ) {
+
+				throw Error( "Failed to stringify JSON to HTML field with id 'query_json_field'." );
+
+			}
 
 		} catch( e ) {
-
-			throw "Failed to stringify JSON to HTML field with id 'query_json_field'.";
-
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
 		}
 	};
 
@@ -323,21 +342,26 @@ var ViewMergedPeptidePageCode = function() {
 	///////////////////////
 	
 	this.updatePageForFormParams = function() {
-	
-		
-		var put_query_json_field_ContentsToHiddenFieldResult =
-			this.put_query_json_field_ContentsToHiddenField();
-		
-		if ( put_query_json_field_ContentsToHiddenFieldResult 
-				&& put_query_json_field_ContentsToHiddenFieldResult.output_FieldDataFailedValidation ) {
-			
-			//  Only submit if there were no errors in the input data
 
-			return;
+		try {	
+		
+			var put_query_json_field_ContentsToHiddenFieldResult =
+				this.put_query_json_field_ContentsToHiddenField();
+
+			if ( put_query_json_field_ContentsToHiddenFieldResult 
+					&& put_query_json_field_ContentsToHiddenFieldResult.output_FieldDataFailedValidation ) {
+
+				//  Only submit if there were no errors in the input data
+
+				return;
+			}
+
+			$('#form_get_for_updated_parameters').submit();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
 		}
-		
-		$('#form_get_for_updated_parameters').submit();
-		
 	};
 	
 

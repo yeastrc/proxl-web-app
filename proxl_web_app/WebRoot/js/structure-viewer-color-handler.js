@@ -107,7 +107,7 @@ LinkColorHandler.prototype.setUserColorByTypeSingleColor = function( params ) {
 			&& linkTypeLabel !== this._CONSTANTS.typeColorsProperties.MONOLINK
 			&& linkTypeLabel !== this._CONSTANTS.typeColorsProperties.UNKNOWN ) {
 		
-		throw "setUserColorByTypeSingleColor(..): value for 'linkTypeLabel' invalid: " + linkTypeLabel;
+		throw Error( "setUserColorByTypeSingleColor(..): value for 'linkTypeLabel' invalid: " + linkTypeLabel );
 	}
 	
 	if ( ! this.userColorByType ) {
@@ -137,7 +137,7 @@ LinkColorHandler.prototype.getColorByLinkTypeLabel = function( linkTypeLabel ) {
 			&& linkTypeLabel !== this._CONSTANTS.typeColorsProperties.MONOLINK
 			&& linkTypeLabel !== this._CONSTANTS.typeColorsProperties.UNKNOWN ) {
 
-		throw "getColorByLinkTypeLabel(..): value for 'linkTypeLabel' invalid: " + linkTypeLabel;
+		throw Error( "getColorByLinkTypeLabel(..): value for 'linkTypeLabel' invalid: " + linkTypeLabel );
 	}
 	
 	if ( this.userColorByType && this.userColorByType[ linkTypeLabel ] ) {
@@ -165,7 +165,7 @@ LinkColorHandler.prototype.setUserColorByLengthSingleColor = function( params ) 
 			&& linkLengthLabel !== this._CONSTANTS.lengthColorProperties.MEDIUM
 			&& linkLengthLabel !== this._CONSTANTS.lengthColorProperties.LONG ) {
 		
-		throw "setUserColorByLengthSingleColor(..): value for 'linkLengthLabel' invalid: " + linkLengthLabel;
+		throw Error( "setUserColorByLengthSingleColor(..): value for 'linkLengthLabel' invalid: " + linkLengthLabel );
 	}
 	
 	if ( ! this.userColorByLength ) {
@@ -194,7 +194,7 @@ LinkColorHandler.prototype.getColorByLinkLengthLabel = function( linkLengthLabel
 			&& linkLengthLabel !== this._CONSTANTS.lengthColorProperties.MEDIUM
 			&& linkLengthLabel !== this._CONSTANTS.lengthColorProperties.LONG ) {
 
-		throw "getColorByLinkLengthLabel(..): value for 'linkLengthLabel' invalid: " + linkLengthLabel;
+		throw Error( "getColorByLinkLengthLabel(..): value for 'linkLengthLabel' invalid: " + linkLengthLabel );
 	}
 	
 	if ( this.userColorByLength && this.userColorByLength[ linkLengthLabel ] ) {

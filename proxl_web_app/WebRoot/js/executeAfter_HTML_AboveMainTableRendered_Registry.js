@@ -32,10 +32,17 @@ ExecuteAfter_HTML_AboveMainTableRendered_Registry.prototype.addExecuteAfter_HTML
 
 ExecuteAfter_HTML_AboveMainTableRendered_Registry.prototype.createPartsAboveMainTable = function ( params ) {
 
-	$.each( this.executeRegistry, function( index, executeRegistryItem ) {
+	try {
 
-		executeRegistryItem.createPartsAboveMainTable( params );
-	});
+		$.each( this.executeRegistry, function( index, executeRegistryItem ) {
+
+			executeRegistryItem.createPartsAboveMainTable( params );
+		});
+		
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 };
 
 //  Object of the type

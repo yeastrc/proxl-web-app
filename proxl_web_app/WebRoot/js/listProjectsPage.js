@@ -34,7 +34,14 @@ var getProjectList = function() {
 		dataType : "json",
 		success : function(data) {
 
-			getProjectListResponse(requestData, data);
+			try {
+
+				getProjectListResponse(requestData, data);
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
         failure: function(errMsg) {
         	handleAJAXFailure( errMsg );
@@ -70,10 +77,10 @@ var getProjectListResponse = function(requestData, responseData) {
 		var source = $("#project_template tbody").html();
 
 		if ( source === undefined ) {
-			throw ' $("#project_template tbody").html() === undefined';
+			throw Error( ' $("#project_template tbody").html() === undefined' );
 		}
 		if ( source === null ) {
-			throw ' $("#project_template tbody").html() === null';
+			throw Error( ' $("#project_template tbody").html() === null' );
 		}
 		
 		var template = Handlebars.compile(source);
@@ -98,14 +105,19 @@ var getProjectListResponse = function(requestData, responseData) {
 
 				if ($delete_project_link_jq.length === 0) {
 
-					throw "Unable to find '.delete_project_link_jq'";
+					throw Error( "Unable to find '.delete_project_link_jq'" );
 				}
 
 				$delete_project_link_jq.click(function(eventObject) {
 	
-					var clickThis = this;
-	
-					markProjectForDeletion( clickThis, eventObject );
+					try {
+						var clickThis = this;
+
+						markProjectForDeletion( clickThis, eventObject );
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
 				});
 			}
 
@@ -210,12 +222,12 @@ var markProjectForDeletionConfirmed = function(clickThis, eventObject) {
 
 	if ( project_id === undefined || project_id === null ) {
 
-		throw " project_id === undefined || project_id === null ";
+		throw Error( " project_id === undefined || project_id === null " );
 	}
 
 	if ( project_id === "" ) {
 
-		throw ' project_id === "" ';
+		throw Error( ' project_id === "" ' );
 	}
 
 	
@@ -229,7 +241,7 @@ var markProjectForDeletionConfirmed = function(clickThis, eventObject) {
 
 		showErrorMsg( $element );
 		
-		throw 'Page Error:  project_id === undefined || project_id === null || project_id === ""';
+		throw Error( 'Page Error:  project_id === undefined || project_id === null || project_id === ""' );
 
 		return;  //  !!!  EARLY EXIT
 	}
@@ -250,7 +262,14 @@ var markProjectForDeletionConfirmed = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			markProjectForDeletionComplete(requestData, data);
+			try {
+				
+				markProjectForDeletionComplete(requestData, data);
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
         failure: function(errMsg) {
         	handleAJAXFailure( errMsg );
@@ -304,14 +323,14 @@ var addProject = function(clickThis, eventObject) {
 
 	if ($new_project_title.length === 0) {
 
-		throw "Unable to find input field for id 'new_project_title' ";
+		throw Error( "Unable to find input field for id 'new_project_title' " );
 	}
 
 	var $new_project_abstract = $("#new_project_abstract");
 
 	if ($new_project_abstract.length === 0) {
 
-		throw "Unable to find input field for id 'new_project_abstract' ";
+		throw Error( "Unable to find input field for id 'new_project_abstract' " );
 	}
 
 
@@ -357,7 +376,13 @@ var addProject = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			addProjectComplete(requestData, data);
+			try {
+				addProjectComplete(requestData, data);
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
         failure: function(errMsg) {
         	handleAJAXFailure( errMsg );
@@ -447,50 +472,71 @@ function initPage() {
 	var $new_project_expand_jq  = $(".new_project_expand_jq");
 
 	$new_project_expand_jq.click( function(eventObject) {
+		try {
+			$("#new_project_expanded").show();
+			$("#new_project_collapsed").hide(); 
+			$("#new_project_expand_link" ).hide();
+			$("#new_project_cancel_link" ).show();
 
-		$("#new_project_expanded").show();
-		$("#new_project_collapsed").hide(); 
-		$("#new_project_expand_link" ).hide();
-		$("#new_project_cancel_link" ).show();
-
-		$("#new_project_title").focus();
+			$("#new_project_title").focus();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 	var $new_project_cancel_jq  = $(".new_project_cancel_jq");
 
 	$new_project_cancel_jq.click( function(eventObject) {
-
-		closeAndClearAddProject();
+		try {
+			closeAndClearAddProject();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 	var $add_project_button = $("#add_project_button");
 	
 	$add_project_button.click( function(eventObject) {
 
-		var clickThis = this;
-		
-		addProject( clickThis, eventObject );
+		try {
+			var clickThis = this;
 
+			addProject( clickThis, eventObject );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 
 	$("#mark_project_for_deletion_confirm_button").click(function(eventObject) {
+		try {
+			var clickThis = this;
 
-		var clickThis = this;
+			markProjectForDeletionConfirmed( clickThis, eventObject );
 
-		markProjectForDeletionConfirmed( clickThis, eventObject );
-
-		return false;
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 
 	$(".mark_project_for_deletion_overlay_cancel_parts_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
+			var clickThis = this;
 
-		closeConfirmMarkProjectForDeletionOverlay( clickThis, eventObject );
+			closeConfirmMarkProjectForDeletionOverlay( clickThis, eventObject );
 
-		return false;
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 
@@ -501,6 +547,12 @@ function initPage() {
 
 $(document).ready(function() {
 
-	initPage();
+	try {
+		initPage();
+		
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 
 });

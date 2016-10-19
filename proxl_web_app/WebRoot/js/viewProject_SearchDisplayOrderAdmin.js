@@ -16,7 +16,14 @@
 
 $(document).ready(function() {
 
-	searchReorder.init();
+	try {
+
+		searchReorder.init();
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		 e;
+	}
 });
 
 
@@ -32,7 +39,14 @@ var SearchReorder = function() {
 
 		$("#re_order_search_button").click(function(eventObject) {
 
-			objectThis.startSearchReorder();
+			try {
+
+				objectThis.startSearchReorder();
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				 e;
+			}
 		});
 		
 		
@@ -46,16 +60,21 @@ var SearchReorder = function() {
 		$("#re_order_searches_data_block").show();
 		
 		this.loadData();
-
-		$("#re_order_searches_main_data_block").show();  //  TEMP
 	};
 
 	this.doneSearchReorder = function() {
 
-		$("#re_order_searches_data_block").hide();
-		$("#re_order_searches_re_loading_page_message").show();
+		try {
 
-		window.location.reload(true);
+			$("#re_order_searches_data_block").hide();
+			$("#re_order_searches_re_loading_page_message").show();
+
+			window.location.reload(true);
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			 e;
+		}
 	};
 	
 	this.loadData = function() {
@@ -71,7 +90,15 @@ var SearchReorder = function() {
 			dataType : "json",
 
 			success : function(data) {
-				objectThis.loadDataProcessResponse( { requestData : requestData, responseData : data } );
+
+				try {
+
+					objectThis.loadDataProcessResponse( { requestData : requestData, responseData : data } );
+
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					 e;
+				}
 			},
 	        failure: function(errMsg) {
 	        	handleAJAXFailure( errMsg );
@@ -108,10 +135,10 @@ var SearchReorder = function() {
 		var source = $("#re_order_searches_single_search_template").html();
 
 		if ( source === undefined ) {
-			throw '$("#re_order_searches_single_search_template").html() === undefined';
+			throw Error( '$("#re_order_searches_single_search_template").html() === undefined' );
 		}
 		if ( source === null ) {
-			throw '$("#re_order_searches_single_search_template").html() === null';
+			throw Error( '$("#re_order_searches_single_search_template").html() === null' );
 		}
 		
 		var template = Handlebars.compile(source);
@@ -136,55 +163,70 @@ var SearchReorder = function() {
 	    $( "#re_order_searches_search_entries_block" ).disableSelection();		
 	};
 	
+	
+	
 	this.changeSearchesOrderInDB = function() {
 		
-		var searchesInOrder = [];
-		
-		var $search_display_order_item_jq = $( "#re_order_searches_search_entries_block" ).find(".search_display_order_item_jq");
-		
-		$search_display_order_item_jq.each( function() {
-			
-			var $this = $( this );
-			var search_id = $this.attr("data-search_id");
-			
-			searchesInOrder.push( search_id );
-		});
-		
+		try {
 
-		var requestData = {
-				searchesInOrder: searchesInOrder
-		};
-		
-		var requestDataJSON = JSON.stringify( requestData );
+			var searchesInOrder = [];
 
-		var _URL = contextPathJSVar + "/services/project/setSearchesOrder";
+			var $search_display_order_item_jq = $( "#re_order_searches_search_entries_block" ).find(".search_display_order_item_jq");
 
-		// var request =
-		$.ajax({
-			type : "POST",
-			url : _URL,
-		    data: requestDataJSON,
-		    contentType: "application/json; charset=utf-8",
-		    dataType: "json",
-			success : function(data) {
+			$search_display_order_item_jq.each( function() {
 
-				if ( ! data.status ) {
-					
-					window.location.reload(true);
+				var $this = $( this );
+				var search_id = $this.attr("data-search_id");
+
+				searchesInOrder.push( search_id );
+			});
+
+
+			var requestData = {
+					searchesInOrder: searchesInOrder
+			};
+
+			var requestDataJSON = JSON.stringify( requestData );
+
+			var _URL = contextPathJSVar + "/services/project/setSearchesOrder";
+
+			// var request =
+			$.ajax({
+				type : "POST",
+				url : _URL,
+				data: requestDataJSON,
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success : function(data) {
+
+					try {
+
+						if ( ! data.status ) {
+
+							window.location.reload(true);
+						}
+
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				},
+				failure: function(errMsg) {
+					handleAJAXFailure( errMsg );
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+
+					handleAJAXError(jqXHR, textStatus, errorThrown);
+
+					// alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
+					// textStatus: " + textStatus );
 				}
-			},
-	        failure: function(errMsg) {
-	        	handleAJAXFailure( errMsg );
-	        },
-			error : function(jqXHR, textStatus, errorThrown) {
+			});
 
-				handleAJAXError(jqXHR, textStatus, errorThrown);
-
-				// alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
-				// textStatus: " + textStatus );
-			}
-		});
-		
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	};
 	
 };

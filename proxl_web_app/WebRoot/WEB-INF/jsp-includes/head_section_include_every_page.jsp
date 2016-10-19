@@ -12,6 +12,10 @@
     <link rel="icon" href="${ contextPath }/images/favicon.ico" />
  
 	<script type="text/javascript" src="${contextPath}/js/libs/modernizr.v2.7.1__custom.39924_min.js"></script>
+	
+	<script type="text/javascript" src="${ contextPath }/js/reportWebErrorToServer.js?x=${cacheBustValue}"></script>
+	
+	
 	<%--
 	<script type="text/javascript" src="${contextPath}/js/libs/modernizr.v2.7.1__custom.39924.js"></script>
 	--%>

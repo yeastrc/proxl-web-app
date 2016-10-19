@@ -32,7 +32,14 @@ var getListConfiguration = function() {
 		dataType : "json",
 		success : function(data) {
 
-			getListConfigurationResponse(requestData, data);
+			try {
+
+				getListConfigurationResponse(requestData, data);
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -196,11 +203,18 @@ function saveListConfiguration() {
 		dataType : "json",
 		success : function(data) {
 
-			saveListConfigurationResponse( { 
-				requestData : requestData, 
-				responseData : data, 
-				input_footer_center_of_page_html_Val : input_footer_center_of_page_html_Val
-			} );
+			try {
+
+				saveListConfigurationResponse( { 
+					requestData : requestData, 
+					responseData : data, 
+					input_footer_center_of_page_html_Val : input_footer_center_of_page_html_Val
+				} );
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -276,7 +290,14 @@ var getTermsOfServiceData = function() {
 		dataType : "json",
 		success : function(data) {
 
-			getTermsOfServiceDataResponse(requestData, data);
+			try {
+
+				getTermsOfServiceDataResponse(requestData, data);
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -354,12 +375,19 @@ function addChangeTermsOfServiceData( params ) {
 		dataType : "json",
 		success : function(data) {
 
-			addTermsOfServiceDataResponse( { 
-				requestData : requestData, 
-				responseData : data,
-				add : add,
-				change : change
-			} );
+			try {
+
+				addTermsOfServiceDataResponse( { 
+					requestData : requestData, 
+					responseData : data,
+					add : add,
+					change : change
+				} );
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -438,10 +466,16 @@ function disableTermsOfService( ) {
 		dataType : "json",
 		success : function(data) {
 
-			disableTermsOfServiceResponse( { 
-				requestData : requestData, 
-				responseData : data
-			} );
+			try {
+				disableTermsOfServiceResponse( { 
+					requestData : requestData, 
+					responseData : data
+				} );
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -490,10 +524,16 @@ function enableTermsOfService( ) {
 		dataType : "json",
 		success : function(data) {
 
-			enableTermsOfServiceResponse( { 
-				requestData : requestData, 
-				responseData : data
-			} );
+			try {
+				enableTermsOfServiceResponse( { 
+					requestData : requestData, 
+					responseData : data
+				} );
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -535,90 +575,149 @@ function enableTermsOfServiceResponse( params ) {
 /////////////////////////////////////
 
 function initPage() {
-	
-	
+
+
 	$("#save_button").click(function(eventObject) {
+		try {
 
-//		var clickThis = this;
-		
-		saveListConfiguration();
+//			var clickThis = this;
 
-		return false;
+			saveListConfiguration();
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$("#reset_button").click(function(eventObject) {
+		try {
 
-//		var clickThis = this;
+//			var clickThis = this;
 
-		getListConfiguration();
-		
-		return false;
+			getListConfiguration();
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$("#terms_of_service_overlay_X_for_exit_overlay").click(function(eventObject) {
+		try {
 
-//		var clickThis = this;
+//			var clickThis = this;
 
-		closeTermsOfServiceOverlay();
-		
-		return false;
+			closeTermsOfServiceOverlay();
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+
 	});
-	
+
 	$("#tos_add_button").click(function(eventObject) {
+		try {
 
-//		var clickThis = this;
+//			var clickThis = this;
 
-		openTermsOfServiceOverlay();
-		
-		return false;
+			openTermsOfServiceOverlay();
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+
 	});
 
 	$("#tos_change_button").click(function(eventObject) {
+		try {
 
-//		var clickThis = this;
+//			var clickThis = this;
 
-		openTermsOfServiceOverlay();
-		
-		return false;
+			openTermsOfServiceOverlay();
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+
 	});
 
 	$("#tos_disable_button").click(function(eventObject) {
+		try {
 
-//		var clickThis = this;
+//			var clickThis = this;
 
-		disableTermsOfService();
-		
-		return false;
+			disableTermsOfService();
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+
 	});
 
 	$("#tos_enable_button").click(function(eventObject) {
+		try {
 
-//		var clickThis = this;
+//			var clickThis = this;
 
-		enableTermsOfService();
-		
-		return false;
+			enableTermsOfService();
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+
 	});
-	
-	
+
+
 	$("#terms_of_service_overlay_add_button").click(function(eventObject) {
+		try {
 
-//		var clickThis = this;
+//			var clickThis = this;
 
-		addChangeTermsOfServiceData( { add : true } );
-		
-		return false;
+			addChangeTermsOfServiceData( { add : true } );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$("#terms_of_service_overlay_change_button").click(function(eventObject) {
+		try {
 
-//		var clickThis = this;
+//			var clickThis = this;
 
-		addChangeTermsOfServiceData( { change : true } );
-		
-		return false;
+			addChangeTermsOfServiceData( { change : true } );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 
 	getListConfiguration();
 	getTermsOfServiceData();
@@ -630,6 +729,12 @@ function initPage() {
 
 $(document).ready(function() {
 
-	initPage();
+	try {
 
+		initPage();
+		
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 });

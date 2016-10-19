@@ -60,30 +60,37 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 	
 	this.showHideCrosslinkProteins = function( params ) {
 		
-		var clickedElement = params.clickedElement;
-		
-		var $clickedElement = $( clickedElement );
-		
-		var $itemToToggle = $clickedElement.next();
+		try {
+
+			var clickedElement = params.clickedElement;
+
+			var $clickedElement = $( clickedElement );
+
+			var $itemToToggle = $clickedElement.next();
 
 
 
-		if( $itemToToggle.is(":visible" ) ) {
+			if( $itemToToggle.is(":visible" ) ) {
 
-			$itemToToggle.hide(); 
+				$itemToToggle.hide(); 
 
-			$clickedElement.find(".toggle_visibility_expansion_span_jq").show();
-			$clickedElement.find(".toggle_visibility_contraction_span_jq").hide();
-		} else { 
-			$itemToToggle.show();
+				$clickedElement.find(".toggle_visibility_expansion_span_jq").show();
+				$clickedElement.find(".toggle_visibility_contraction_span_jq").hide();
+			} else { 
+				$itemToToggle.show();
 
-			$clickedElement.find(".toggle_visibility_expansion_span_jq").hide();
-			$clickedElement.find(".toggle_visibility_contraction_span_jq").show();
+				$clickedElement.find(".toggle_visibility_expansion_span_jq").hide();
+				$clickedElement.find(".toggle_visibility_contraction_span_jq").show();
 
-			this.loadAndInsertCrosslinkProteinsIfNeeded( { $topTRelement : $itemToToggle, $clickedElement : $clickedElement } );
+				this.loadAndInsertCrosslinkProteinsIfNeeded( { $topTRelement : $itemToToggle, $clickedElement : $clickedElement } );
+			}
+
+			return false;  // does not stop bubbling of click event
+			
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
 		}
-
-		return false;  // does not stop bubbling of click event
 	};
 	
 		
@@ -132,7 +139,7 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 		
 		if ( search_idsCommaDelim === undefined || search_idsCommaDelim === null || search_idsCommaDelim === "" ) {
 			
-			throw "attribute 'search_ids' is missing or empty";
+			throw Error( "attribute 'search_ids' is missing or empty" );
 		}
 		
 		//  Convert search ids comma delim to array
@@ -154,7 +161,7 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 		
 		if ( search_ids.length === 0 ) {
 			
-			throw "No values found in attribute 'search_ids'.";
+			throw Error( "No values found in attribute 'search_ids'." );
 		}
 		
 
@@ -192,7 +199,7 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 			
 			if ( cutoffForSearchId === undefined || cutoffForSearchId === null ) {
 				
-				throw "No Cutoff data found for search id: " + searchIdForLookup;
+				throw Error( "No Cutoff data found for search id: " + searchIdForLookup );
 			}
 			
 			cutoffsPerSearchIds[ searchIdForLookup ] = cutoffForSearchId;
@@ -230,16 +237,23 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 
 			success : function( ajaxResponseData ) {
 				
-				var responseParams = {
-						ajaxResponseData : ajaxResponseData, 
-						ajaxRequestData : ajaxRequestData,
-						$topTRelement : $topTRelement
-				};
+				try {
 
-				objectThis.loadAndInsertCrosslinkProteinsResponse( responseParams );
-				
+					var responseParams = {
+							ajaxResponseData : ajaxResponseData, 
+							ajaxRequestData : ajaxRequestData,
+							$topTRelement : $topTRelement
+					};
 
-				$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+					objectThis.loadAndInsertCrosslinkProteinsResponse( responseParams );
+
+
+					$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+					
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
 				
 			},
 	        failure: function(errMsg) {
@@ -274,7 +288,7 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 		
 		if ( $data_container.length === 0 ) {
 			
-			throw "unable to find HTML element with class 'child_data_container_jq'";
+			throw Error( "unable to find HTML element with class 'child_data_container_jq'" );
 		}
 
 		$data_container.empty();
@@ -284,10 +298,10 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 			var handlebarsSource_crosslink_protein_block_template = $( "#crosslink_protein_block_template" ).html();
 
 			if ( handlebarsSource_crosslink_protein_block_template === undefined ) {
-				throw "handlebarsSource_crosslink_protein_block_template === undefined";
+				throw Error( "handlebarsSource_crosslink_protein_block_template === undefined" );
 			}
 			if ( handlebarsSource_crosslink_protein_block_template === null ) {
-				throw "handlebarsSource_crosslink_protein_block_template === null";
+				throw Error( "handlebarsSource_crosslink_protein_block_template === null" );
 			}
 			
 			_handlebarsTemplate_crosslink_protein_block_template = Handlebars.compile( handlebarsSource_crosslink_protein_block_template );
@@ -298,10 +312,10 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 			var handlebarsSource_crosslink_protein_data_row_entry_template = $( "#crosslink_protein_data_row_entry_template" ).html();
 
 			if ( handlebarsSource_crosslink_protein_data_row_entry_template === undefined ) {
-				throw "handlebarsSource_crosslink_protein_data_row_entry_template === undefined";
+				throw Error( "handlebarsSource_crosslink_protein_data_row_entry_template === undefined" );
 			}
 			if ( handlebarsSource_crosslink_protein_data_row_entry_template === null ) {
-				throw "handlebarsSource_crosslink_protein_data_row_entry_template === null";
+				throw Error( "handlebarsSource_crosslink_protein_data_row_entry_template === null" );
 			}
 			
 			_handlebarsTemplate_crosslink_protein_data_row_entry_template = Handlebars.compile( handlebarsSource_crosslink_protein_data_row_entry_template );
@@ -313,10 +327,10 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 			var handlebarsSource_crosslink_protein_child_row_entry_template = $( "#crosslink_protein_child_row_entry_template" ).html();
 
 			if ( handlebarsSource_crosslink_protein_child_row_entry_template === undefined ) {
-				throw "handlebarsSource_crosslink_protein_child_row_entry_template === undefined";
+				throw Error( "handlebarsSource_crosslink_protein_child_row_entry_template === undefined" );
 			}
 			if ( handlebarsSource_crosslink_protein_child_row_entry_template === null ) {
-				throw "handlebarsSource_crosslink_protein_child_row_entry_template === null";
+				throw Error( "handlebarsSource_crosslink_protein_child_row_entry_template === null" );
 			}
 			
 			_handlebarsTemplate_crosslink_protein_child_row_entry_template = Handlebars.compile( handlebarsSource_crosslink_protein_child_row_entry_template );
@@ -380,10 +394,10 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 				_data_per_search_between_searches_html = $crosslink_protein_block_template.find( ".data_per_search_between_searches_html_jq" ).html();
 				
 				if ( _data_per_search_between_searches_html === undefined ) {
-					throw "data_per_search_between_searches_html_jq === undefined";
+					throw Error( "data_per_search_between_searches_html_jq === undefined" );
 				}
 				if ( _data_per_search_between_searches_html === null ) {
-					throw "data_per_search_between_searches_html_jq === null";
+					throw Error( "data_per_search_between_searches_html_jq === null" );
 				}
 
 			}
@@ -398,7 +412,7 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 
 			if ( $crosslink_protein_table_jq.length === 0 ) {
 
-				throw "unable to find HTML element with class '" + crosslink_protein_table_jq_ClassName + "'";
+				throw Error( "unable to find HTML element with class '" + crosslink_protein_table_jq_ClassName + "'" );
 			}
 
 

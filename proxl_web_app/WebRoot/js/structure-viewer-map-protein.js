@@ -2,7 +2,16 @@
 
 //initialize the pdb upload overlay
 $(document).ready(function()  { 
-	attachPDBMapProteinOverlayClickHandlers();
+	
+	try {
+
+		attachPDBMapProteinOverlayClickHandlers();
+		
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
+
 });
 
 
@@ -56,14 +65,30 @@ var attachPDBMapProteinOverlayClickHandlers = function (  ) {
 	var $pdb_map_protein_overlay_X_for_exit_overlay = $(".pdb-map-protein-overlay-X-for-exit-overlay");
 	
 	$pdb_map_protein_overlay_X_for_exit_overlay.click( function( eventObject ) {
-		closePDBMapProteinOverlay();
+
+		try {
+
+			closePDBMapProteinOverlay();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 	
 	
 	var $pdb_show_alignment_overlay_X_for_exit_overlay = $(".pdb-show-alignment-overlay-X-for-exit-overlay");
 	
 	$pdb_show_alignment_overlay_X_for_exit_overlay.click( function( eventObject ) {
-		closePDBShowAlignmentOverlay();
+
+		try {
+
+			closePDBShowAlignmentOverlay();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 	
 };
@@ -134,15 +159,39 @@ var showProteinSelectInOverlay = function( chainId ) {
 
 	// add handlers	
 	$("#pdb-map-protein-cancel").click( function() {
-		closePDBMapProteinOverlay();
+
+		try {
+
+			closePDBMapProteinOverlay();
+			
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 	$("#pdb-map-protein-overlay-protein-select").change( function() {
-		$("#pdb-map-protein-submit").removeAttr( 'disabled' );
+
+		try {
+
+			$("#pdb-map-protein-submit").removeAttr( 'disabled' );
+			
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$("#pdb-map-protein-submit").click( function() {
-		submitProteinForAlignment( chainId );
+
+		try {
+
+			submitProteinForAlignment( chainId );
+			
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 };
@@ -205,11 +254,21 @@ var showAlignment = function( alignment, showSave ) {
 	$showAlignmentDiv.html( html );
 	
 	$("#saveAlignmentButton").click( function() {
-		saveAlignment( alignment );
+		try {
+			saveAlignment( alignment );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 	$("#editAlignmentButton").click( function() {
-		showEditAlignmentOverlay( alignment );
+		try {
+			showEditAlignmentOverlay( alignment );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 };
@@ -252,7 +311,12 @@ var showEditAlignmentOverlay = function( alignment ) {
 	$overlayDiv.html( html );
 	
 	$("#saveEditedAlignmentButton").click( function() {
-		saveEditedAlignment( alignment );
+		try {
+			saveEditedAlignment( alignment );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 	
@@ -332,10 +396,13 @@ var saveAlignment = function( alignment ) {
 	        	'alignedExperimentalSequence' : alignment.alignedExperimentalSequence },
 	        dataType: "json",
 	        success: function(data)	{
-
-	        	closePDBShowAlignmentOverlay();
-	        	loadPDBFileAlignments( listChains );
-											
+	        	try {
+	        		closePDBShowAlignmentOverlay();
+	        		loadPDBFileAlignments( listChains );
+	        	} catch( e ) {
+	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+	        		throw e;
+	        	}
 			},
 	        failure: function(errMsg) {
 	        	handleAJAXFailure( errMsg );
@@ -363,9 +430,12 @@ var submitProteinForAlignment = function( chainId ) {
 	        url: url,
 	        dataType: "json",
 	        success: function(data)	{
-	        	        	
-	        	showAlignment( data, true );
-	        		
+	        	try {
+	        		showAlignment( data, true );
+	        	} catch( e ) {
+	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+	        		throw e;
+	        	}
 	        },
 	        failure: function(errMsg) {
 	        	handleAJAXFailure( errMsg );

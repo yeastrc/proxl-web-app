@@ -1,130 +1,186 @@
-//    viewProject_ProjectAdminSection.js
+//viewProject_ProjectAdminSection.js
 
-//  Javascript for the project admin section of the page viewProject.jsp
+//Javascript for the project admin section of the page viewProject.jsp
 
-//////////////////////////////////
 
-// JavaScript directive:   all variables have to be declared with "var", maybe other things
+
+//JavaScript directive:   all variables have to be declared with "var", maybe other things
 
 "use strict";
 
-// /////////////////////////////////////////
+///////////////////////////////////////////
 
 var adminGlobals = {
 
-	projectToMoveSearchesToSelected : false,
+		projectToMoveSearchesToSelected : false,
 
-	searchCheckboxesCheckedCount : 0,
+		searchCheckboxesCheckedCount : 0,
 
-	project_id : null,
+		project_id : null,
 
-	logged_in_user_id : null,
-	
-	logged_in_user_access_level_owner_or_better : false
+		logged_in_user_id : null,
+
+		logged_in_user_access_level_owner_or_better : false
 };
 
-// //////////////////////////
+////////////////////////////
 
-// //////////////////////////
+////////////////////////////
 
 var initMaintTitleAndAbstract = function() {
 
 
 	$("#maint_title_init_button").click(function(eventObject) {
 
-		hideAllErrorMessages();
-		
-		// var clickThis = this;
+		try {
 
-		var title = $("#title_span").text();
+			hideAllErrorMessages();
 
-		$("#maint_title_field").val(title);
+			// var clickThis = this;
 
-		$("#maint_title_div").show();
-		$("#title_container_div").hide();
+			var title = $("#title_span").text();
+
+			$("#maint_title_field").val(title);
+
+			$("#maint_title_div").show();
+			$("#title_container_div").hide();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$("#maint_title_reset_button").click(function(eventObject) {
-		
-		hideAllErrorMessages();
 
-		// var clickThis = this;
+		try {
 
-		var title = $("#title_span").text();
+			hideAllErrorMessages();
 
-		$("#maint_title_field").val(title);
+			// var clickThis = this;
+
+			var title = $("#title_span").text();
+
+			$("#maint_title_field").val(title);
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 
 	});
 
 	$("#maint_title_cancel_button").click(function(eventObject) {
-		
-		hideAllErrorMessages();
 
-		// var clickThis = this;
+		try {
 
-		$("#maint_title_div").hide();
-		$("#title_container_div").show();
+			hideAllErrorMessages();
+
+			// var clickThis = this;
+
+			$("#maint_title_div").hide();
+			$("#title_container_div").show();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$("#maint_title_save_button").click(function(eventObject) {
-		
-		hideAllErrorMessages();
 
-		var clickThis = this;
+		try {
 
-		updateProjectTitle(clickThis, eventObject);
+			hideAllErrorMessages();
+
+			var clickThis = this;
+
+			updateProjectTitle(clickThis, eventObject);
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	// ////////// Abstract
 
 	$("#maint_abstract_init_button").click(function(eventObject) {
-		
-		hideAllErrorMessages();
 
-		// var clickThis = this;
+		try {
 
-		var abstractText = $("#abstract_span").text();
+			hideAllErrorMessages();
 
-		$("#maint_abstract_field").val(abstractText);
+			// var clickThis = this;
 
-		$("#maint_abstract_div").show();
-		$("#abstract_container_div").hide();
+			var abstractText = $("#abstract_span").text();
+
+			$("#maint_abstract_field").val(abstractText);
+
+			$("#maint_abstract_div").show();
+			$("#abstract_container_div").hide();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$("#maint_abstract_reset_button").click(function(eventObject) {
-		
-		hideAllErrorMessages();
 
-		// var clickThis = this;
+		try {
 
-		var abstractText = $("#abstract_span").text();
+			hideAllErrorMessages();
 
-		$("#maint_abstract_field").val(abstractText);
+			// var clickThis = this;
+
+			var abstractText = $("#abstract_span").text();
+
+			$("#maint_abstract_field").val(abstractText);
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 
 	});
 
 	$("#maint_abstract_cancel_button").click(function(eventObject) {
-		
-		hideAllErrorMessages();
 
-		// var clickThis = this;
+		try {
 
-		$("#maint_abstract_div").hide();
-		$("#abstract_container_div").show();
+			hideAllErrorMessages();
+
+			// var clickThis = this;
+
+			$("#maint_abstract_div").hide();
+			$("#abstract_container_div").show();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$("#maint_abstract_save_button").click(function(eventObject) {
-		
-		hideAllErrorMessages();
 
-		var clickThis = this;
+		try {
 
-		updateProjectAbstract(clickThis, eventObject);
+			hideAllErrorMessages();
+
+			var clickThis = this;
+
+			updateProjectAbstract(clickThis, eventObject);
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 };
 
-// ///////////
+/////////////
 
 var updateProjectTitle = function(clickThis, eventObject) {
 
@@ -133,23 +189,23 @@ var updateProjectTitle = function(clickThis, eventObject) {
 	if (title === undefined || title === null || title === "") {
 
 //		alert("Title cannot be empty");
-		
-		
+
+
 		var $element = $("#error_message_project_title_required");
-		
+
 		showErrorMsg( $element );
-			
+
 		return;  //  !!!  EARLY EXIT
 	}
 
 	if (adminGlobals.project_id === null) {
 
-		throw "Unable to find input field for id 'project_id' ";
+		throw Error( "Unable to find input field for id 'project_id' " );
 	}
 
 	var requestData = {
-		title : title,
-		projectId : adminGlobals.project_id
+			title : title,
+			projectId : adminGlobals.project_id
 	};
 
 	var _URL = contextPathJSVar + "/services/project/updateTitle";
@@ -162,11 +218,18 @@ var updateProjectTitle = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			updateProjectTitleComplete(requestData, data);
+			try {
+
+				updateProjectTitleComplete(requestData, data);
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -177,7 +240,7 @@ var updateProjectTitle = function(clickThis, eventObject) {
 	});
 };
 
-////
+
 
 var updateProjectTitleComplete = function(requestData, responseData) {
 
@@ -187,61 +250,61 @@ var updateProjectTitleComplete = function(requestData, responseData) {
 
 		$("#maint_title_div").hide();
 		$("#title_container_div").show();
-		
+
 		var $header_project_title = $("#header_project_title");
-		
+
 		if ( $header_project_title.length > 0 ) {
-			
+
 			$header_project_title.text( responseData.titleHeaderDisplay );
-			
+
 			if ( responseData.title !== responseData.titleHeaderDisplay ) {
-			
+
 				//  Update the tool tip
-			
+
 				var $header_project_title_link = $("#header_project_title_link");
-				
+
 				if ( $header_project_title_link.length > 0 ) {
-					
+
 					$header_project_title_link.attr("title", responseData.title );
 				}
 			}
 		}
-		
+
 		var $header_current_project_in_drop_down_list = $("#header_current_project_in_drop_down_list");
-		
+
 		if ( $header_current_project_in_drop_down_list.length > 0 ) {
-			
+
 			$header_current_project_in_drop_down_list.text( responseData.titleHeaderDisplay );
 		}
 	}
 };
 
-// ///////////
+/////////////
 
 var updateProjectAbstract = function(clickThis, eventObject) {
 
 	var abstractText = $("#maint_abstract_field").val();
 
 //	if (abstractText === undefined || abstractText === null
-//			|| abstractText === "") {
-//
-////		alert("Abstract cannot be empty");
-//		
-//		var $element = $("#error_message_project_abstract_required");
-//		
-//		showErrorMsg( $element );
-//			
-//		return;  //  !!!  EARLY EXIT
+//	|| abstractText === "") {
+
+////	alert("Abstract cannot be empty");
+
+//	var $element = $("#error_message_project_abstract_required");
+
+//	showErrorMsg( $element );
+
+//	return;  //  !!!  EARLY EXIT
 //	}
 
 	if (adminGlobals.project_id === null) {
 
-		throw "Unable to find input field for id 'project_id' ";
+		throw Error( "Unable to find input field for id 'project_id' " );
 	}
 
 	var requestData = {
-		abstractText : abstractText,
-		projectId : adminGlobals.project_id
+			abstractText : abstractText,
+			projectId : adminGlobals.project_id
 	};
 
 	var _URL = contextPathJSVar + "/services/project/updateAbstract";
@@ -254,11 +317,18 @@ var updateProjectAbstract = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			updateProjectAbstractComplete(requestData, data);
+			try {
+
+				updateProjectAbstractComplete(requestData, data);
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -281,58 +351,79 @@ var updateProjectAbstractComplete = function(requestData, responseData) {
 };
 
 
-////////////////////////////
+
 
 
 var initMaintProjectNotes = function() {
 
 	//  Note Add
-	
-	
+
+
 	$("#add_note_init_button").click(function(eventObject) {
-		
-		hideAllErrorMessages();
 
-		// var clickThis = this;
+		try {
 
-		$("#add_note_field").val("");
-		
-		$("#add_note_div").show();
-		$("#add_note_button_container_div").hide();
-		
-		$("#add_note_field").focus();
+			hideAllErrorMessages();
+
+			// var clickThis = this;
+
+			$("#add_note_field").val("");
+
+			$("#add_note_div").show();
+			$("#add_note_button_container_div").hide();
+
+			$("#add_note_field").focus();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$("#add_note_cancel_button").click(function(eventObject) {
 
-		hideAllErrorMessages();
-		
-		// var clickThis = this;
+		try {
 
-		$("#add_note_field").val("");
+			hideAllErrorMessages();
 
-		$("#add_note_div").hide();
-		$("#add_note_button_container_div").show();
+			// var clickThis = this;
+
+			$("#add_note_field").val("");
+
+			$("#add_note_div").hide();
+			$("#add_note_button_container_div").show();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$("#add_note_save_button").click(function(eventObject) {
-		
-		hideAllErrorMessages();
 
-		var clickThis = this;
+		try {
 
-		addProjectNote(clickThis, eventObject);
+			hideAllErrorMessages();
+
+			var clickThis = this;
+
+			addProjectNote(clickThis, eventObject);
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 
 	//  only process ".note_root_container_div_jq" under "#notes_list_container_div"
-	
+
 	var $notes_list_container_div = $("#notes_list_container_div");
-	
+
 	$notes_list_container_div.find(".note_root_container_div_jq").each( function( index, element ) {
-		
+
 		var $note_root_container_div_jq = $( this );
-		
+
 		attachProjectNoteMaintOnClick( $note_root_container_div_jq );
 	});
 
@@ -341,7 +432,7 @@ var initMaintProjectNotes = function() {
 
 
 
-// ///////////
+/////////////
 
 var addProjectNote = function(clickThis, eventObject) {
 
@@ -350,17 +441,17 @@ var addProjectNote = function(clickThis, eventObject) {
 	if (note === undefined || note === null || note === "") {
 
 //		alert("Note cannot be empty");
-		
+
 		var $element = $("#error_message_project_note_required");
-		
+
 		showErrorMsg( $element );
-			
+
 		return;  //  !!!  EARLY EXIT
 	}
 
 	if (adminGlobals.project_id === null) {
 
-		throw "Unable to find input field for id 'project_id' ";
+		throw Error( "Unable to find input field for id 'project_id' " );
 	}
 
 	var requestData = {
@@ -378,11 +469,18 @@ var addProjectNote = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			addProjectNoteComplete(requestData, data);
+			try {
+
+				addProjectNoteComplete(requestData, data);
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -393,40 +491,40 @@ var addProjectNote = function(clickThis, eventObject) {
 	});
 };
 
-////
+
 
 var addProjectNoteComplete = function(requestData, responseData) {
 
 	if (responseData.status) {
-		
+
 		var $notes_list_container_div = $("#notes_list_container_div");
 
 		var source = $("#notes_template_div").html();
 
 		if ( source === undefined ) {
-			throw '$("#notes_template_div").html() === undefined';
+			throw Error( '$("#notes_template_div").html() === undefined' );
 		}
 		if ( source === null ) {
-			throw '$("#notes_template_div").html() === null';
+			throw Error( '$("#notes_template_div").html() === null' );
 		}
-		
+
 		var template = Handlebars.compile(source);
 
 		var context = responseData;
-		
+
 		context.noteText = requestData.noteText;
 
 		var html = template(context);
 
 		var note_root_container_div_jq = $(html).appendTo($notes_list_container_div);
-		
+
 		attachProjectNoteMaintOnClick( note_root_container_div_jq );
-				
+
 		$("#add_note_field").val("");
 
 		$("#add_note_div").hide();
 		$("#add_note_button_container_div").show();
-		
+
 		addToolTips( $notes_list_container_div );
 	}
 };
@@ -441,72 +539,107 @@ var attachProjectNoteMaintOnClick = function( $note_root_container_div_jq  ) {
 
 	$note_root_container_div_jq.find(".notes_update_button_jq").click(function(eventObject) {
 
-		hideAllErrorMessages();
-		
-//		var clickThis = this;
-		
-		var $this = $( this );
-		
-		var $note_root_container_div_jq_parent = $this.closest(".note_root_container_div_jq");
+		try {
 
-		var note = $note_root_container_div_jq_parent.find(".notes_text_jq").text();
+			hideAllErrorMessages();
 
-		$note_root_container_div_jq_parent.find(".note_maint_textarea_jq").val(note);
+//			var clickThis = this;
 
-		$note_root_container_div_jq_parent.find(".note_maint_container_div_jq").show();
-		$note_root_container_div_jq_parent.find(".note_display_container_div_jq").hide();
+			var $this = $( this );
+
+			var $note_root_container_div_jq_parent = $this.closest(".note_root_container_div_jq");
+
+			var note = $note_root_container_div_jq_parent.find(".notes_text_jq").text();
+
+			$note_root_container_div_jq_parent.find(".note_maint_textarea_jq").val(note);
+
+			$note_root_container_div_jq_parent.find(".note_maint_container_div_jq").show();
+			$note_root_container_div_jq_parent.find(".note_display_container_div_jq").hide();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$note_root_container_div_jq.find(".note_maint_reset_button_jq").click(function(eventObject) {
 
-		hideAllErrorMessages();
-		
-//		var clickThis = this;
+		try {
 
-		var $this = $( this );
-		
-		var $note_root_container_div_jq_parent = $this.closest(".note_root_container_div_jq");
+			hideAllErrorMessages();
+
+//			var clickThis = this;
+
+			var $this = $( this );
+
+			var $note_root_container_div_jq_parent = $this.closest(".note_root_container_div_jq");
 
 
-		var note = $note_root_container_div_jq_parent.find(".notes_text_jq").text();
+			var note = $note_root_container_div_jq_parent.find(".notes_text_jq").text();
 
-		$note_root_container_div_jq_parent.find(".note_maint_textarea_jq").val(note);
+			$note_root_container_div_jq_parent.find(".note_maint_textarea_jq").val(note);
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$note_root_container_div_jq.find(".note_maint_cancel_button_jq").click(function(eventObject) {
 
-		hideAllErrorMessages();
-		
-//		var clickThis = this;
+		try {
 
-		var $this = $( this );
-		
-		var $note_root_container_div_jq_parent = $this.closest(".note_root_container_div_jq");
+			hideAllErrorMessages();
+
+//			var clickThis = this;
+
+			var $this = $( this );
+
+			var $note_root_container_div_jq_parent = $this.closest(".note_root_container_div_jq");
 
 
-		$note_root_container_div_jq_parent.find(".note_maint_container_div_jq").hide();
-		$note_root_container_div_jq_parent.find(".note_display_container_div_jq").show();
+			$note_root_container_div_jq_parent.find(".note_maint_container_div_jq").hide();
+			$note_root_container_div_jq_parent.find(".note_display_container_div_jq").show();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$note_root_container_div_jq.find(".note_maint_save_button_jq").click(function(eventObject) {
 
-		hideAllErrorMessages();
-		
-		var clickThis = this;
+		try {
 
-		updateProjectNote(clickThis, eventObject);
+			hideAllErrorMessages();
+
+			var clickThis = this;
+
+			updateProjectNote(clickThis, eventObject);
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 
 	$note_root_container_div_jq.find(".notes_remove_button_jq").click(function(eventObject) {
 
-		hideAllErrorMessages();
-		
-		var clickThis = this;
+		try {
 
-		removeProjectNote(clickThis, eventObject);
+			hideAllErrorMessages();
+
+			var clickThis = this;
+
+			removeProjectNote(clickThis, eventObject);
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 };
 
 
@@ -516,9 +649,9 @@ var attachProjectNoteMaintOnClick = function( $note_root_container_div_jq  ) {
 var updateProjectNote = function(clickThis, eventObject) {
 
 
-	
+
 	var $clickThis = $( clickThis );
-	
+
 	var $note_root_container_div_jq_parent = $clickThis.closest(".note_root_container_div_jq");
 
 	var note = $note_root_container_div_jq_parent.find(".note_maint_textarea_jq").val();
@@ -526,19 +659,19 @@ var updateProjectNote = function(clickThis, eventObject) {
 	if ( note === undefined || note === null || note === "" ) {
 
 //		alert("Note cannot be empty");
-		
+
 		var $element = $note_root_container_div_jq_parent.find(".error_message_project_note_required_jq");
-		
+
 		showErrorMsg( $element );
-			
+
 		return;  //  !!!  EARLY EXIT
 	}
-	
+
 	var noteId = $note_root_container_div_jq_parent.attr("note_id");
 
 	if ( noteId === undefined || noteId === null || noteId === "") {
 
-		throw "Unable to find attribute for id 'noteId' ";
+		throw Error( "Unable to find attribute for id 'noteId' " );
 	}
 
 	var requestData = {
@@ -556,12 +689,19 @@ var updateProjectNote = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			var responseParams = { requestData: requestData, responseData: data, clickThis: clickThis };
-			updateProjectNoteComplete( responseParams);
+			try {
+
+				var responseParams = { requestData: requestData, responseData: data, clickThis: clickThis };
+				updateProjectNoteComplete( responseParams);
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -575,18 +715,18 @@ var updateProjectNote = function(clickThis, eventObject) {
 ///
 
 var updateProjectNoteComplete = function( params ) {
-	
+
 	var requestData =  params.requestData;
 	var responseData = params.responseData;
 	var clickThis = params.clickThis;
-	
-	
+
+
 	if (responseData.status) {
-		
+
 		var $clickThis = $( clickThis );
-		
+
 		var $note_root_container_div_jq_parent = $clickThis.closest(".note_root_container_div_jq");
-		
+
 		$note_root_container_div_jq_parent.find(".notes_text_jq").text( requestData.noteText );
 
 		$note_root_container_div_jq_parent.find(".note_maint_textarea_jq").val("");
@@ -601,16 +741,16 @@ var updateProjectNoteComplete = function( params ) {
 /////////////
 
 //var removeProjectNote = function(clickThis, eventObject) {
-//
-//
-//
-//	var $clickThis = $( clickThis );
-//
-//	var $note_root_container_div_jq_parent = $clickThis.closest(".note_root_container_div_jq");
-//
-//	var noteId = $note_root_container_div_jq_parent.attr("note_id");
-//	
-//	
+
+
+
+//var $clickThis = $( clickThis );
+
+//var $note_root_container_div_jq_parent = $clickThis.closest(".note_root_container_div_jq");
+
+//var noteId = $note_root_container_div_jq_parent.attr("note_id");
+
+
 //};
 
 
@@ -638,37 +778,37 @@ var openConfirmRemoveProjectNoteOverlay = function(clickThis, eventObject) {
 
 	var $delete_note_confirm_button = $("#delete_note_confirm_button");
 	$delete_note_confirm_button.data("noteId", noteId);
-	
+
 	// Position dialog over clicked delete icon
-	
+
 	//  get position of div containing the dialog that is inline in the page
 	var $delete_note_overlay_containing_outermost_div_inline_div = $("#delete_note_overlay_containing_outermost_div_inline_div");
-	
+
 	var offset__containing_outermost_div_inline_div = $delete_note_overlay_containing_outermost_div_inline_div.offset();
 	var offsetTop__containing_outermost_div_inline_div = offset__containing_outermost_div_inline_div.top;
-	
+
 	var offset__ClickedDeleteIcon = $clickThis.offset();
 	var offsetTop__ClickedDeleteIcon = offset__ClickedDeleteIcon.top;
-	
+
 	var offsetDifference = offsetTop__ClickedDeleteIcon - offsetTop__containing_outermost_div_inline_div;
-	
+
 	//  adjust vertical position of dialog 
-	
+
 	var $delete_note_overlay_container = $("#delete_note_overlay_container");
-	
+
 	var height__delete_note_overlay_container = $delete_note_overlay_container.outerHeight( true /* [includeMargin ] */ );
-	
+
 	var positionAdjust = offsetDifference - ( height__delete_note_overlay_container / 2 );
-	
+
 	$delete_note_overlay_container.css( "top", positionAdjust );
 
-	
+
 	var $delete_note_overlay_background = $("#delete_note_overlay_background"); 
 	$delete_note_overlay_background.show();
 	$delete_note_overlay_container.show();
 };
 
-//////////	/
+///////////
 
 var closeConfirmRemoveProjectNoteOverlay = function(clickThis, eventObject) {
 
@@ -681,36 +821,36 @@ var closeConfirmRemoveProjectNoteOverlay = function(clickThis, eventObject) {
 
 /////////////////
 
-//	put click handler for this on #delete_note_confirm_button
+//put click handler for this on #delete_note_confirm_button
 
 var deleteProjectNoteConfirmed = function(clickThis, eventObject) {
-	
+
 
 	var $clickThis = $(clickThis);
 
 	var noteId = $clickThis.data("noteId");
-	
+
 	if ( noteId === undefined || noteId === null ) {
-		
-		throw " noteId === undefined || noteId === null ";
+
+		throw Error( " noteId === undefined || noteId === null " );
 	}
 
 	if ( noteId === "" ) {
-		
-		throw ' noteId === "" ';
+
+		throw Error( ' noteId === "" ' );
 	}
 
 	if ( noteId === undefined || noteId === null || noteId === "") {
 
-		throw "Unable to find attribute for id 'noteId' ";
+		throw Error( "Unable to find attribute for id 'noteId' " );
 	}
-	
+
 
 	var requestData = {
 			noteId : noteId
 	};
-	
-	
+
+
 	var _URL = contextPathJSVar + "/services/project/deleteNote";
 
 //	var request =
@@ -721,12 +861,19 @@ var deleteProjectNoteConfirmed = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			var responseParams = { requestData: requestData, responseData: data, noteIdDeleted: noteId, clickThis: clickThis };
-			removeProjectNoteComplete( responseParams);
+			try {
+
+				var responseParams = { requestData: requestData, responseData: data, noteIdDeleted: noteId, clickThis: clickThis };
+				removeProjectNoteComplete( responseParams);
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -741,7 +888,7 @@ var deleteProjectNoteConfirmed = function(clickThis, eventObject) {
 
 var removeProjectNoteComplete = function( params ) {
 
-	
+
 	var responseData = params.responseData;
 
 	if (responseData.status) {
@@ -749,54 +896,54 @@ var removeProjectNoteComplete = function( params ) {
 		closeConfirmRemoveProjectNoteOverlay();
 
 		//  Get the note deleted and remove it from the DOM
-		
+
 		var noteIdDeleted = params.noteIdDeleted;
-		
+
 		var $notes_list_container_div = $("#notes_list_container_div");
-		
+
 		$notes_list_container_div.find(".note_root_container_div_jq").each( function( index, element ) {
-			
+
 			//  The root DOM node for a note
 			var $note_root_container_div_jq = $( this );
-			
+
 			var noteIdOnDOMnode = $note_root_container_div_jq.attr("note_id");
-			
+
 			if ( noteIdDeleted === noteIdOnDOMnode ) {
-				
+
 				//  The noteId on this DOM node matches the noteId that was deleted so remove this DOM node
-				
+
 				$note_root_container_div_jq.remove();
 			}
 		});
-	
+
 	} else {
-		
+
 		//  TODO  Do something when status is false
 	}
 
-	
+
 	//  WAS
-	
+
 //	var responseData = params.responseData;
 //	var clickThis = params.clickThis;
-//
+
 //	if (responseData.status) {
-//
-//		var $clickThis = $( clickThis );
-//		
-//		var $note_root_container_div_jq_parent = $clickThis.closest(".note_root_container_div_jq");
-//
-//		$note_root_container_div_jq_parent.remove( );
+
+//	var $clickThis = $( clickThis );
+
+//	var $note_root_container_div_jq_parent = $clickThis.closest(".note_root_container_div_jq");
+
+//	$note_root_container_div_jq_parent.remove( );
 //	}
 };
 
 
-// //////////////////////////
+////////////////////////////
 
 function updateMoveSearchesButton() {
 
 //	if (adminGlobals.projectToMoveSearchesToSelected
-//			&& adminGlobals.searchCheckboxesCheckedCount > 0) {
+//	&& adminGlobals.searchCheckboxesCheckedCount > 0) {
 
 	if (adminGlobals.searchCheckboxesCheckedCount > 0) {
 
@@ -816,7 +963,7 @@ function updateMoveSearchesButton() {
 
 };
 
-// //////////////////////////
+////////////////////////////
 
 function updateMoveSearchesButtonFromSearchCheckboxes(searchCheckboxesCheckedCount) {
 
@@ -825,7 +972,7 @@ function updateMoveSearchesButtonFromSearchCheckboxes(searchCheckboxesCheckedCou
 	updateMoveSearchesButton();
 };
 
-//////////////////////////////
+
 
 var openMoveSearchesOverlay = function(clickThis, eventObject) {
 
@@ -838,7 +985,7 @@ var openMoveSearchesOverlay = function(clickThis, eventObject) {
 
 
 
-//////////////////////////////
+
 
 var closeMoveSearchesOverlay = function(clickThis, eventObject) {
 
@@ -846,20 +993,20 @@ var closeMoveSearchesOverlay = function(clickThis, eventObject) {
 };
 
 
-////////////////////////////
+
 
 var moveSearchesProjectClicked = function(clickThis, eventObject) {
 
 	var $clickThis = $(clickThis);
-	
+
 	var otherProjectIdValue = $clickThis.attr("otherProjectId");
-	
+
 	$("#move_search_confirm_button").data( {moveToProjectId: otherProjectIdValue } );
 
 	var projectTitle = $clickThis.html();
-	
+
 	$("#move-searches-overlay-project-to-move-title").html( projectTitle );
-	
+
 	$("#move-searches-overlay-select-project-block").hide();
 
 	$("#move-searches-overlay-confirm-project-block").show();
@@ -871,22 +1018,22 @@ var moveSearchesProjectClicked = function(clickThis, eventObject) {
 var executeMoveSearches = function(clickThis, eventObject) {
 
 	var storedData = $("#move_search_confirm_button").data(  );
-	
+
 	var moveToProjectId = storedData.moveToProjectId;
-	
+
 	var searchesToMoveToOtherProject = searchesToMerge; //  searchesToMerge is an array managed as the user clicks each check box
-	
+
 	if (adminGlobals.project_id === null) {
 
-		throw "Unable to find input field for id 'project_id', adminGlobals.project_id not set ";
+		throw Error( "Unable to find input field for id 'project_id', adminGlobals.project_id not set " );
 	}
 
 	var requestData = {
-		moveToProjectId : moveToProjectId,
-		searchesToMoveToOtherProject: searchesToMoveToOtherProject,
-		projectId : adminGlobals.project_id
+			moveToProjectId : moveToProjectId,
+			searchesToMoveToOtherProject: searchesToMoveToOtherProject,
+			projectId : adminGlobals.project_id
 	};
-	
+
 	var requestDataJSON = JSON.stringify( requestData );
 
 	var _URL = contextPathJSVar + "/services/project/moveSearches";
@@ -895,16 +1042,23 @@ var executeMoveSearches = function(clickThis, eventObject) {
 	$.ajax({
 		type : "POST",
 		url : _URL,
-	    data: requestDataJSON,
-	    contentType: "application/json; charset=utf-8",
-	    dataType: "json",
+		data: requestDataJSON,
+		contentType: "application/json; charset=utf-8",
+		dataType: "json",
 		success : function(data) {
 
-			executeMoveSearchesComplete(requestData, data);
+			try {
+
+				executeMoveSearchesComplete(requestData, data);
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -922,21 +1076,21 @@ var executeMoveSearchesComplete = function(requestData, responseData) {
 	if (responseData.status) {
 
 		$("#show-project-searches-moved-to").data( {moveToProjectId: requestData.moveToProjectId } );
-		
+
 		//  Remove the moved searches from the DOM
-		
+
 		var searchIds = requestData.searchesToMoveToOtherProject;
-		
+
 		var $search_row_jq = $(".search_row_jq");
-		
+
 		$search_row_jq.each(function( index, element ){
 
 			var $thisRow = $(this);
-			
+
 			var searchIdString = $thisRow.attr("searchId");
-			
+
 			try {
-				
+
 				var searchId = parseInt( searchIdString, 10 );
 
 				if ( searchId !== undefined && searchId !== null ) {
@@ -947,40 +1101,40 @@ var executeMoveSearchesComplete = function(requestData, responseData) {
 						$thisRow.remove();
 					}
 				}
-			
+
 			} catch ( exception ) {
-				
+
 //				var z = 90;
-				
+
 			}
-		
+
 		});
-		
-		
+
+
 		$("#move-searches-overlay-confirm-project-block").hide();
 		$("#move-searches-overlay-confirmation-project-block").show();
-	
+
 	} else {
-		
+
 		$("#move-searches-overlay-confirm-project-block").hide();
 
 //		private boolean moveToProjectMarkedForDeletion;
 //		private boolean moveToProjectDisabled;
 
 		if ( responseData.moveToProjectMarkedForDeletion ) {
-			
+
 			$("#move-searches-overlay-move-to-project-marked-for-deletion-block").show();
-			
+
 		} else if ( responseData.moveToProjectDisabled ) {
-			
+
 			$("#move-searches-overlay-move-to-project-disabled-block").show();
-			
+
 		} else {
 
 			//  Shouldn't get here, no other reason for status to be false
 
 			$("#move-searches-overlay-move-project-failed-block").show();
-			
+
 		}
 	}
 };
@@ -991,22 +1145,22 @@ var executeMoveSearchesComplete = function(requestData, responseData) {
 var showProjectSearchesMovedTo = function(clickThis, eventObject) {
 
 	var storedData = $("#show-project-searches-moved-to").data(  );
-	
-		
+
+
 	var moveToProjectId = storedData.moveToProjectId;
-	
+
 	if ( moveToProjectId === undefined || moveToProjectId === null ) {
-		throw "executeMoveSearches(...)  moveToProjectId === undefined || moveToProjectId === null";
+		throw Error( "executeMoveSearches(...)  moveToProjectId === undefined || moveToProjectId === null" );
 	}
-	
+
 	document.location.href= contextPathJSVar + "/viewProject.do?project_id=" + moveToProjectId;
-	
+
 };
 
 
 
 
-////////////////////////////////
+
 
 //Give existing user access to the project
 
@@ -1022,12 +1176,12 @@ var initInviteUserLastNameAutoComplete = function() {
 	var $invite_user_last_name = $("#invite_user_last_name");
 
 	if ($invite_user_last_name.length === 0) {
-		
+
 		console.log( "Unable to find input field for id 'invite_user_last_name' to attach autocomplete, probably since project is locked " );
 
 		return;  // Exit since input field is not on the page, probably since project is locked. 
-		
-//		throw "Unable to find input field for id 'invite_user_last_name' ";
+
+//		throw Error( "Unable to find input field for id 'invite_user_last_name' " );
 	}
 
 	$invite_user_last_name.autocomplete({
@@ -1035,14 +1189,14 @@ var initInviteUserLastNameAutoComplete = function() {
 
 			if (adminGlobals.project_id === null) {
 
-				throw "Unable to find input field for id 'project_id' ";
+				throw Error( "Unable to find input field for id 'project_id' " );
 			}
 
 			$.ajax({
 				url : contextPathJSVar + "/services/user/lookupLastNameNotInProjectId",
-		        failure: function(errMsg) {
-		        	handleAJAXFailure( errMsg );
-		        },
+				failure: function(errMsg) {
+					handleAJAXFailure( errMsg );
+				},
 
 				error : function(jqXHR, textStatus, errorThrown) {
 
@@ -1057,16 +1211,23 @@ var initInviteUserLastNameAutoComplete = function() {
 
 				success : function(data) {
 
-					// call "response" passed into the function defined at
-					// "source"
-					response($.map(data.queryResultList, function(item) {
-						return {
+					try {
 
-							label : item.lastName + ", " + item.firstName,
-							value : item.lastName,
-							id : item.authUser.id
-						};
-					}));
+						// call "response" passed into the function defined at
+						// "source"
+						response($.map(data.queryResultList, function(item) {
+							return {
+
+								label : item.lastName + ", " + item.firstName,
+								value : item.lastName,
+								id : item.authUser.id
+							};
+						}));
+
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
 				}
 			});
 		},
@@ -1085,7 +1246,7 @@ var initInviteUserLastNameAutoComplete = function() {
 		// },
 
 		minLength : 0
-	// minLength: 1
+		// minLength: 1
 
 	}).focus(function() {
 		// This searches on focus to search the autocomplete with no data
@@ -1109,8 +1270,8 @@ var initInviteUserEmailAutoComplete = function() {
 		console.log( "Unable to find input field for id 'invite_user_email' to attach autocomplete, probably since project is locked " );
 
 		return;  // Exit since input field is not on the page, probably since project is locked. 
-		
-//		throw "Unable to find input field for id 'invite_user_email' ";
+
+//		throw Error( "Unable to find input field for id 'invite_user_email' " );
 	}
 
 
@@ -1119,14 +1280,14 @@ var initInviteUserEmailAutoComplete = function() {
 
 			if (adminGlobals.project_id === null) {
 
-				throw "Unable to find input field for id 'project_id' ";
+				throw Error( "Unable to find input field for id 'project_id' " );
 			}
 
 			$.ajax({
 				url : contextPathJSVar + "/services/user/lookupEmailNotInProjectId",
-		        failure: function(errMsg) {
-		        	handleAJAXFailure( errMsg );
-		        },
+				failure: function(errMsg) {
+					handleAJAXFailure( errMsg );
+				},
 
 				error : function(jqXHR, textStatus, errorThrown) {
 
@@ -1141,16 +1302,23 @@ var initInviteUserEmailAutoComplete = function() {
 
 				success : function(data) {
 
-					// call "response" passed into the function defined at
-					// "source"
-					response($.map(data.queryResultList, function(item) {
-						return {
+					try {
 
-							label : item.authUser.email + ", " + item.lastName + ", " + item.firstName,
-							value : item.authUser.email,
-							id : item.authUser.id
-						};
-					}));
+						// call "response" passed into the function defined at
+						// "source"
+						response($.map(data.queryResultList, function(item) {
+							return {
+
+								label : item.authUser.email + ", " + item.lastName + ", " + item.firstName,
+								value : item.authUser.email,
+								id : item.authUser.id
+							};
+						}));
+
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
 				}
 			});
 		},
@@ -1169,7 +1337,7 @@ var initInviteUserEmailAutoComplete = function() {
 		// },
 
 		minLength : 0
-	// minLength: 1
+		// minLength: 1
 
 	}).focus(function() {
 		// This searches on focus to search the autocomplete with no data
@@ -1177,7 +1345,7 @@ var initInviteUserEmailAutoComplete = function() {
 	});
 
 };
-////////////////////////////
+
 
 var processChosenUserForAddProjectAccess = function(ui, thisValue) {
 
@@ -1197,54 +1365,82 @@ var processChosenUserForAddProjectAccess = function(ui, thisValue) {
 
 
 
-////////////////////////////
+
 
 var initInviteUser = function() {
 
 	initInviteUserLastNameAutoComplete();
-	
+
 	initInviteUserEmailAutoComplete();
-	
+
 	$("#close_invite_user_auto_complete_display").click(function(eventObject) {
 
-		hideAllErrorMessages();
-		
-		// var clickThis = this;
+		try {
 
-		clearInviteUserFieldsAndAutocompleteDisplay();
-		
-		return false;
+			hideAllErrorMessages();
+
+			// var clickThis = this;
+
+			clearInviteUserFieldsAndAutocompleteDisplay();
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	$("#invite_user_button").click(function(eventObject) {
 
-		hideAllErrorMessages();
-		
-		var clickThis = this;
-		
-		inviteUserToProject( clickThis );
+		try {
 
-		return false;
+			hideAllErrorMessages();
+
+			var clickThis = this;
+
+			inviteUserToProject( clickThis );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$(".invite_user_expand_link_jq").click(function(eventObject) {
-		
-		$("#invite_user_collapsed").hide();
-		$("#invite_user_expanded").show();
 
-		return false;
+		try {
+
+			$("#invite_user_collapsed").hide();
+			$("#invite_user_expanded").show();
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	$(".invite_user_cancel_button_jq").click(function(eventObject) {
 
-		clearInviteUserFieldsAndAutocompleteDisplay();
+		try {
 
-		$("#invite_user_collapsed").show();
-		$("#invite_user_expanded").hide();
-		
-		return false;
+			clearInviteUserFieldsAndAutocompleteDisplay();
+
+			$("#invite_user_collapsed").show();
+			$("#invite_user_expanded").hide();
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 };
@@ -1253,7 +1449,7 @@ var initInviteUser = function() {
 
 
 var clearInviteUserFieldsAndAutocompleteDisplay = function() {
-	
+
 	$("#invite_user_auto_complete_display").hide();
 
 	existingUserIdForAddProjectAccess = "";
@@ -1264,7 +1460,7 @@ var clearInviteUserFieldsAndAutocompleteDisplay = function() {
 };
 
 
-////////////////////////////
+
 
 var inviteUserToProject = function(clickThis) {
 
@@ -1272,22 +1468,22 @@ var inviteUserToProject = function(clickThis) {
 
 	if (adminGlobals.project_id === null) {
 
-		throw "Unable to find input field for id 'project_id' ";
+		throw Error( "Unable to find input field for id 'project_id' " );
 	}
-	
+
 
 	var $invite_person_to_project_access_level_entry_field = $("#invite_person_to_project_access_level_entry_field");
 
 	if ($invite_person_to_project_access_level_entry_field.length === 0) {
 
-		throw "Unable to find input field for id 'invite_person_to_project_access_level_entry_field' ";
+		throw Error( "Unable to find input field for id 'invite_person_to_project_access_level_entry_field' " );
 	}
 
 
 
 
 	var invite_person_to_project_access_level_entry_field = $invite_person_to_project_access_level_entry_field.val();
-	
+
 	var requestData = { 
 			invite_person_to_project_access_level_entry_field : invite_person_to_project_access_level_entry_field, 
 			projectId : adminGlobals.project_id
@@ -1297,26 +1493,26 @@ var inviteUserToProject = function(clickThis) {
 			invitedPersonAccessLevel : invite_person_to_project_access_level_entry_field,
 			projectId : adminGlobals.project_id
 	};
-	
+
 	if ( existingUserIdForAddProjectAccess !== "" ) {
-		
+
 		ajaxParams.invitedPersonUserId = existingUserIdForAddProjectAccess;
 		requestData.existingUserIdForAddProjectAccess = existingUserIdForAddProjectAccess;
-		
+
 	} else {
-		
+
 		var $invite_user_last_name = $("#invite_user_last_name");
 
 		if ($invite_user_last_name.length === 0) {
 
-			throw "Unable to find input field for id 'invite_user_last_name' ";
+			throw Error( "Unable to find input field for id 'invite_user_last_name' " );
 		}
-		
+
 		var $invite_user_email = $("#invite_user_email");
 
 		if ($invite_user_email.length === 0) {
 
-			throw "Unable to find input field for id 'invite_user_email' ";
+			throw Error( "Unable to find input field for id 'invite_user_email' " );
 		}
 
 		var invite_user_last_name = $invite_user_last_name.val();
@@ -1325,32 +1521,32 @@ var inviteUserToProject = function(clickThis) {
 		if ( invite_user_last_name === "" && invite_user_email === "" ) {
 
 //			alert("last name or email must be specified");
-			
+
 			var $element = $("#error_message_invite_name_or_email_required");
-			
+
 			showErrorMsg( $element );
-				
+
 			return false;  //  !!!  EARLY EXIT			
 		}
 
 		if ( invite_user_last_name !== "" && invite_user_email !== "" ) {
 
 //			alert("last name and email cannot both be specified");
-			
+
 			var $element = $("#error_message_invite_name_and_email_have_values");
-			
+
 			showErrorMsg( $element );
-				
+
 			return false;  //  !!!  EARLY EXIT	
 		}
-		
+
 		ajaxParams.invitedPersonLastName = invite_user_last_name;
 		ajaxParams.invitedPersonEmail = invite_user_email;
-		
+
 		requestData.invite_user_last_name = invite_user_last_name;
 		requestData.invite_user_email = invite_user_email;
 	}
-	
+
 	requestData.ajaxParams = ajaxParams;
 
 	var _URL = contextPathJSVar + "/services/user/invite";
@@ -1364,15 +1560,22 @@ var inviteUserToProject = function(clickThis) {
 		dataType : "json",
 		success : function(data) {
 
-			inviteUserToProjectResponse({
-				responseData : data,
-				requestData : requestData,
-				clickThis : clickThis
-			});
+			try {
+
+				inviteUserToProjectResponse({
+					responseData : data,
+					requestData : requestData,
+					clickThis : clickThis
+				});
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -1384,7 +1587,7 @@ var inviteUserToProject = function(clickThis) {
 
 };
 
-////////////////////////////
+
 
 var inviteUserToProjectResponse = function(params) {
 
@@ -1392,35 +1595,35 @@ var inviteUserToProjectResponse = function(params) {
 	var requestData = params.requestData;
 
 	if (responseData.status) {
-		
+
 		clearInviteUserFieldsAndAutocompleteDisplay();
-		
+
 		var addedExistingUser = responseData.addedExistingUser;
 		var existingUserThatWasAdded = responseData.existingUserThatWasAdded;
-		
+
 		var invite_user_email = requestData.invite_user_email;
-		
+
 		if ( addedExistingUser ) {
 
 			if ( existingUserThatWasAdded ) {
-				
+
 //				var firstName = existingUserThatWasAdded.firstName;
 //				var lastName = existingUserThatWasAdded.lastName;
 
 //				alert( "Access to project added for " + firstName + " " + lastName );
 
 			} else {
-			
+
 //				alert( "Access to project added for provided user" );
 			}
 		} else {
-			
+
 //			alert( "email sent to " + invite_user_email  + " inviting them to this project" );
-			
+
 			$("#invite_user_email_that_was_sent").text( invite_user_email );
 
 			var $element = $("#success_message_invite_email_sent");
-			
+
 			showErrorMsg( $element );  //  Used for success messages as well
 
 		}	
@@ -1429,9 +1632,9 @@ var inviteUserToProjectResponse = function(params) {
 
 	} else {
 
-		
+
 //		status: false
-		
+
 //		addedExistingUser: false
 //		duplicateInsertError: false
 //		emailAddressDuplicateError: false
@@ -1441,48 +1644,48 @@ var inviteUserToProjectResponse = function(params) {
 //		lastNameDuplicateError: false
 //		lastNameNotFoundError: true
 //		unableToSendEmailError: false
-		
-		
+
+
 		if (responseData.duplicateInsertError) {
 
 //			alert("User already has access to this project");
-			
+
 			var $element = $("#error_message_invite_already_has_access");
-			
+
 			showErrorMsg( $element );
-			
+
 		} else if (responseData.lastNameNotFoundError ) {
-			
+
 //			alert("Unable to send email, email address is invalid.");
-			
+
 			var $element = $("#error_message_invite_name_not_found");
-			
+
 			showErrorMsg( $element );			
-			
+
 		} else if (responseData.lastNameDuplicateError ) {
-			
+
 			//  More than one user has this last name
-			
+
 //			alert("Unable to send email, email address is invalid.");
-			
+
 			var $element = $("#error_message_invite_name_duplicate");
-			
+
 			showErrorMsg( $element );	
-			
+
 		} else if (responseData.emailAddressInvalidSendError ) {
-			
+
 //			alert("Unable to send email, email address is invalid.");
-			
+
 			var $element = $("#error_message_invite_email_address_invalid");
-			
+
 			showErrorMsg( $element );
-			
+
 		} else if (responseData.unableToSendEmailError ) {
-			
+
 //			alert("Unable to send email, system error.");
 
 			var $element = $("#error_message_invite_email_send_sytem_error");
-			
+
 			showErrorMsg( $element );
 
 		} else {
@@ -1490,7 +1693,7 @@ var inviteUserToProjectResponse = function(params) {
 //			alert("Error adding user to project");
 
 			var $element = $("#error_message_invite_error_adding_user_to_project");
-			
+
 			showErrorMsg( $element );
 		}
 	}
@@ -1499,157 +1702,234 @@ var inviteUserToProjectResponse = function(params) {
 
 
 
-// //////////////////////////
+////////////////////////////
 
 var initAdminPublicAccessCode = function() {
-	
-	
+
+
 	$("#public_access_expand_link_jq").click( function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		showPublicAccessControlDataButtonClicked(clickThis,eventObject);
-		
-		return false;
+			var clickThis = this;
+
+			showPublicAccessControlDataButtonClicked(clickThis,eventObject);
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	$("#public_access_collapse_link_jq").click( function(eventObject) {
 
-		var params = { clickThis : this, eventObject : eventObject };
+		try {
 
-		hidePublicAccessControlData(params);
-		
-		return false;
+			var params = { clickThis : this, eventObject : eventObject };
+
+			hidePublicAccessControlData(params);
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 
 	$("#enable_project_public_access_button").click( function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		enable_project_public_access_button(clickThis,eventObject);
-		
-		return false;
+			var clickThis = this;
+
+			enable_project_public_access_button(clickThis,eventObject);
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$("#disable_project_public_access_button").click( function(eventObject) {
 
-				var clickThis = this;
+		try {
 
-				disable_project_public_access_button(clickThis, eventObject);
-				
-				return false;
-			});
+			var clickThis = this;
+
+			disable_project_public_access_button(clickThis, eventObject);
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	});
 
 	$("#generate_new_public_access_code_button").click( function(eventObject) {
 
-				var clickThis = this;
+		try {
 
-				generate_new_public_access_code_button(clickThis, eventObject);
-				
-				return false;
+			var clickThis = this;
+
+			generate_new_public_access_code_button(clickThis, eventObject);
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$("#generate_new_pub_access_code_confirm_button").click( function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		generate_new_pub_access_code_confirm_button(clickThis, eventObject);
-		
-		return false;
+			var clickThis = this;
+
+			generate_new_pub_access_code_confirm_button(clickThis, eventObject);
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$(".generate_new_pub_access_code_overlay_cancel_parts_jq").click( function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		generate_new_pub_access_code_overlay_cancel(clickThis, eventObject);
-		
-		return false;
+			var clickThis = this;
+
+			generate_new_pub_access_code_overlay_cancel(clickThis, eventObject);
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
 
-	
-	
-	
-	
+
+
+
+
+
 	$("#lock_project_public_access_button").click( function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		lock_project_public_access_button(clickThis, eventObject);
-		
-		return false;
+			var clickThis = this;
+
+			lock_project_public_access_button(clickThis, eventObject);
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$("#unlock_project_public_access_button").click( function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		unlock_project_public_access_button(clickThis, eventObject);
-		
-		return false;
+			var clickThis = this;
+
+			unlock_project_public_access_button(clickThis, eventObject);
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	$("#require_public_access_code_yes_radio_button").change( function(eventObject) {
 
-		var changeThis = this;
+		try {
 
-		require_public_access_code_yes_radio_button(changeThis, eventObject);
-		
-		return false;
+			var changeThis = this;
+
+			require_public_access_code_yes_radio_button(changeThis, eventObject);
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	$("#require_public_access_code_no_radio_button").change( function(eventObject) {
 
-		var changeThis = this;
+		try {
 
-		require_public_access_code_no_radio_button(changeThis, eventObject);
-		
-		return false;
+			var changeThis = this;
+
+			require_public_access_code_no_radio_button(changeThis, eventObject);
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
-	
-	
+
+
+
+
 };
 
 
 
-////////////////////////////
 
 
-////////////////////////////
+
+
 
 
 var showPublicAccessControlDataButtonClicked = function(clickThis, eventObject) {
 
 	var $this = $( clickThis );
-	
+
 	var params = { clickThis : clickThis, eventObject : eventObject };
 
 	var isDataLoaded = $this.data( "isDataLoaded" );
-	
+
 	if ( isDataLoaded ) {
-		
+
 		showPublicAccessControlData( params );
-		
+
 	} else {
-		
+
 		loadPublicAccessControlData( params );
-		
+
 	}
 };
 
 
 var loadPublicAccessControlData = function( clickParams ) {
-	
+
 
 	var requestData = {
-		projectId : adminGlobals.project_id
+			projectId : adminGlobals.project_id
 	};
 
 	var _URL = contextPathJSVar + "/services/project/publicAccessAdmin/getData";
@@ -1662,11 +1942,18 @@ var loadPublicAccessControlData = function( clickParams ) {
 		dataType : "json",
 		success : function(data) {
 
-			loadPublicAccessControlDataResponse( { clickParams : clickParams, requestData : requestData, responseData : data } );
+			try {
+
+				loadPublicAccessControlDataResponse( { clickParams : clickParams, requestData : requestData, responseData : data } );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -1676,53 +1963,53 @@ var loadPublicAccessControlData = function( clickParams ) {
 		}
 	});
 
-	
+
 };
 
 
-////////
+
 
 var loadPublicAccessControlDataResponse = function( params ) {
-	
+
 	var clickParams = params.clickParams; 
 	var requestData = params.requestData; 
 	var responseData = params.responseData;
-	
+
 	var anyPublicAccessEnabled = responseData.anyPublicAccessEnabled;
-	
+
 	var publicAccessCode = responseData.publicAccessCode;
 	var publicAccessCodeEnabled = responseData.publicAccessCodeEnabled;
-	
+
 	var publicAccessEnabled = responseData.publicAccessEnabled;
 	var publicAccessLocked = responseData.publicAccessLocked;
-	
 
-	
+
+
 	if ( publicAccessLocked ) {
-		
+
 		$("#lock_project_public_access_button").hide();
 		$("#unlock_project_public_access_button").show();
-		
+
 	} else {
-		
+
 		//  Enable all buttons and radio buttons except lock and unlock public access buttons. 
 		//  Will disable or hide specific items in the following code. 
-		
+
 		$(".first_enable_when_public_access_not_locked_jq").each( function() {
-			
+
 			var $this = $( this );
-			
+
 			enableIfAllowedPublicAccessElements( $this );
 		});
-		
+
 		$("#lock_project_public_access_button").show();
 		$("#unlock_project_public_access_button").hide();
 	}
-	
-	
-	
+
+
+
 	if ( anyPublicAccessEnabled ) {
-	
+
 		$("#enable_project_public_access_button").hide();
 		$("#disable_project_public_access_button").show();
 		$("#generate_new_public_access_code_button").show();
@@ -1739,7 +2026,7 @@ var loadPublicAccessControlDataResponse = function( params ) {
 
 			// Uncheck
 			$( "#require_public_access_code_yes_radio_button" ).prop( "checked", false );
-			
+
 			$("#generate_new_public_access_code_button").hide();
 
 			//  The URL is simply the current page
@@ -1750,14 +2037,14 @@ var loadPublicAccessControlDataResponse = function( params ) {
 
 			// Check
 			$( "#require_public_access_code_yes_radio_button" ).prop( "checked", true );
-			 
+
 			// Uncheck
 			$( "#require_public_access_code_no_radio_button" ).prop( "checked", false );
 
 			$("#generate_new_public_access_code_button").show();
 
 			// Build the public access code URL and display it
-			
+
 			var project_public_access_code_template = $("#project_public_access_code_template_div").text();
 			var project_public_access_code_div = project_public_access_code_template + publicAccessCode;
 
@@ -1765,15 +2052,15 @@ var loadPublicAccessControlDataResponse = function( params ) {
 
 			$("#project_public_access_code_outer_div").show();
 
-			
+
 		} else {
-			
-			throw "shouldn't get here";
+
+			throw Error( "shouldn't get here" );
 		}
 
-		
+
 	} else {
-		
+
 		$("#enable_project_public_access_button").show();
 		$("#disable_project_public_access_button").hide();
 		$("#generate_new_public_access_code_button").hide();
@@ -1781,16 +2068,16 @@ var loadPublicAccessControlDataResponse = function( params ) {
 
 		$(".show_when_public_access_or_public_access_code_disabled_jq").show();
 		$(".show_when_public_access_or_public_access_code_enabled_jq").hide();
-		
-		
+
+
 	}
-	
+
 	if ( publicAccessLocked ) {
-		
+
 		//  Disable all buttons and radio buttons except lock and unlock public access buttons. 
-		
+
 		$(".first_enable_when_public_access_not_locked_jq").each( function() {
-			
+
 			var $this = $( this );
 			$this.prop('disabled', true);
 		});
@@ -1802,20 +2089,20 @@ var loadPublicAccessControlDataResponse = function( params ) {
 		var $clickThis = $( clickParams.clickThis );
 
 		$clickThis.data( "isDataLoaded", true );
-		
+
 		showPublicAccessControlData( clickParams );
 	}
-		
-	
-		
+
+
+
 };
 
 var enableIfAllowedPublicAccessElements = function( $element ) {
-	
+
 	var allowed_to_enable = $element.attr( "allowed_to_enable" );
 
 	if ( allowed_to_enable === "true" ) {
-		
+
 		$element.prop('disabled', false);
 	}
 };
@@ -1825,29 +2112,29 @@ var enableIfAllowedPublicAccessElements = function( $element ) {
 
 var showPublicAccessControlData = function(params) {
 
-	
+
 	var clickThis = params.clickThis;
 //	var eventObject = params.eventObject;
-	
+
 	var $this = $( clickThis );
 	var $collapsable_container_jq = $this.closest(".collapsable_container_jq");
-	
+
 	var $collapsable_jq = $collapsable_container_jq.children(".collapsable_jq");
-	
+
 	var $public_access_collapse_link_jq = $("#public_access_collapse_link_jq");
-	
-	
+
+
 	$this.hide();
 	$collapsable_jq.show();
 	$public_access_collapse_link_jq.show();
 
 	if ( $public_access_collapse_link_jq.length === 0 ) {
-		
-		throw "Unable to find id=public_access_collapse_link_jq to show";
+
+		throw Error( "Unable to find id=public_access_collapse_link_jq to show" );
 	}
 
 
-	
+
 };
 
 
@@ -1856,35 +2143,35 @@ var hidePublicAccessControlData = function(params) {
 
 	var clickThis = params.clickThis;
 //	var eventObject = params.eventObject;
-	
+
 	var $this = $( clickThis );
 	var $collapsable_container_jq = $this.closest(".collapsable_container_jq");
-	
+
 	var $collapsable_jq = $collapsable_container_jq.children(".collapsable_jq");
-	
+
 	var $public_access_expand_link_jq = $("#public_access_expand_link_jq");
-	
+
 	$this.hide();
 	$collapsable_jq.hide();
 	$public_access_expand_link_jq.show();
 
 
 	if ( $public_access_expand_link_jq.length === 0 ) {
-		
-		throw "Unable to find expand link";
+
+		throw Error( "Unable to find expand link" );
 	}
 };
 
 
-////////////////////////////
+
 
 var require_public_access_code_yes_radio_button = function(changeThis, eventObject) {
-	
+
 	enable_project_public_access_button(changeThis, eventObject);
 };
 
 
-////////////////////////////
+
 
 var require_public_access_code_no_radio_button = function(changeThis, eventObject) {
 
@@ -1893,25 +2180,25 @@ var require_public_access_code_no_radio_button = function(changeThis, eventObjec
 
 
 
-// //////////////////////////
+////////////////////////////
 
 var enable_project_public_access_button = function(clickThis, eventObject) {
-	
+
 	var require_public_access_code = "false";
-	
+
 	var require_public_access_code_yes_radio_button = $( "#require_public_access_code_yes_radio_button:checked" ).val();
-	
+
 	if ( require_public_access_code_yes_radio_button !== undefined
 			&& require_public_access_code_yes_radio_button !== "" ) {
-		
+
 		require_public_access_code = "true";
 	}
-	
-	
+
+
 
 	var requestData = {
-		projectId : adminGlobals.project_id,
-		require_public_access_code : require_public_access_code
+			projectId : adminGlobals.project_id,
+			require_public_access_code : require_public_access_code
 	};
 
 	var _URL = contextPathJSVar + "/services/project/publicAccessAdmin/enable";
@@ -1924,11 +2211,18 @@ var enable_project_public_access_button = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(responseData) {
 
-			loadPublicAccessControlDataResponse( { requestData : requestData, responseData : responseData } );
+			try {
+
+				loadPublicAccessControlDataResponse( { requestData : requestData, responseData : responseData } );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -1941,12 +2235,12 @@ var enable_project_public_access_button = function(clickThis, eventObject) {
 };
 
 
-// ///////////////
+/////////////////
 
 var disable_project_public_access_button = function(clickThis, eventObject) {
 
 	var requestData = {
-		projectId : adminGlobals.project_id
+			projectId : adminGlobals.project_id
 	};
 
 	var _URL = contextPathJSVar + "/services/project/publicAccessAdmin/disable";
@@ -1959,11 +2253,18 @@ var disable_project_public_access_button = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(responseData) {
 
-			loadPublicAccessControlDataResponse( { requestData : requestData, responseData : responseData } );
+			try {
+
+				loadPublicAccessControlDataResponse( { requestData : requestData, responseData : responseData } );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -1987,23 +2288,23 @@ var openConfirmGenerateNewPublicAccessCodeOverlay = function(clickThis, eventObj
 
 ////	get position of div containing the dialog that is inline in the page
 //	var $generate_new_pub_access_code_overlay_containing_outermost_div_inline_div = $("#generate_new_pub_access_code_overlay_containing_outermost_div_inline_div");
-//
+
 //	var offset__containing_outermost_div_inline_div = $generate_new_pub_access_code_overlay_containing_outermost_div_inline_div.offset();
 //	var offsetTop__containing_outermost_div_inline_div = offset__containing_outermost_div_inline_div.top;
-//
+
 //	var offset__ClickedDeleteIcon = $clickThis.offset();
 //	var offsetTop__ClickedDeleteIcon = offset__ClickedDeleteIcon.top;
-//
+
 //	var offsetDifference = offsetTop__ClickedDeleteIcon - offsetTop__containing_outermost_div_inline_div;
-//
+
 ////	adjust vertical position of dialog 
-//
+
 	var $generate_new_pub_access_code_overlay_container = $("#generate_new_pub_access_code_overlay_container");
-//
+
 //	var height__generate_new_pub_access_code_overlay_container = $generate_new_pub_access_code_overlay_container.outerHeight( true /* [includeMargin ] */ );
-//
+
 //	var positionAdjust = offsetDifference - ( height__generate_new_pub_access_code_overlay_container / 2 );
-//
+
 //	$generate_new_pub_access_code_overlay_container.css( "top", positionAdjust );
 
 
@@ -2024,7 +2325,7 @@ var closeConfirmGenerateNewPublicAccessCodeOverlay = function(clickThis, eventOb
 
 var generate_new_public_access_code_button = function(clickThis, eventObject) {
 
-	
+
 	openConfirmGenerateNewPublicAccessCodeOverlay(clickThis, eventObject);
 };
 
@@ -2047,13 +2348,20 @@ var generate_new_pub_access_code_confirm_button = function(clickThis, eventObjec
 		dataType : "json",
 		success : function(responseData) {
 
-			closeConfirmGenerateNewPublicAccessCodeOverlay(clickThis, eventObject);
-			
-			loadPublicAccessControlDataResponse( { requestData : requestData, responseData : responseData } );
+			try {
+
+				closeConfirmGenerateNewPublicAccessCodeOverlay(clickThis, eventObject);
+
+				loadPublicAccessControlDataResponse( { requestData : requestData, responseData : responseData } );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -2071,7 +2379,7 @@ var generate_new_pub_access_code_confirm_button = function(clickThis, eventObjec
 var generate_new_pub_access_code_overlay_cancel = function(clickThis, eventObject) {
 
 	closeConfirmGenerateNewPublicAccessCodeOverlay(clickThis, eventObject);
-	
+
 };
 
 /////////////////
@@ -2092,11 +2400,18 @@ var lock_project_public_access_button = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(responseData) {
 
-			loadPublicAccessControlDataResponse( { requestData : requestData, responseData : responseData } );
+			try {
+
+				loadPublicAccessControlDataResponse( { requestData : requestData, responseData : responseData } );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -2128,11 +2443,18 @@ var unlock_project_public_access_button = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(responseData) {
 
-			loadPublicAccessControlDataResponse( { requestData : requestData, responseData : responseData } );
+			try {
+
+				loadPublicAccessControlDataResponse( { requestData : requestData, responseData : responseData } );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -2168,7 +2490,7 @@ var updateInvitedPeopleCurrentUsersLists = function() {
 var getInvitedPeople = function() {
 
 	var requestData = {
-		projectId : adminGlobals.project_id
+			projectId : adminGlobals.project_id
 	};
 
 	var _URL = contextPathJSVar + "/services/user/listInvitedPeopleForProjectId";
@@ -2181,11 +2503,18 @@ var getInvitedPeople = function() {
 		dataType : "json",
 		success : function(data) {
 
-			getInvitedPeopleResponse(requestData, data);
+			try {
+
+				getInvitedPeopleResponse(requestData, data);
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -2202,92 +2531,92 @@ var getInvitedPeople = function() {
 var getInvitedPeopleResponse = function(requestData, responseData) {
 
 	var $invited_people = $("#invited_people_current_users");
-	
+
 	$invited_people.empty();
 
 	if (responseData && responseData.length > 0) {
 
 		var access_level_id_project_owner_String = $("#access-level-id-project-owner").val();
 		var access_level_id_project_researcher_String = $("#access-level-id-project-researcher").val();
-		
+
 		if ( access_level_id_project_owner_String === undefined || 
 				access_level_id_project_owner_String === null || 
 				access_level_id_project_owner_String === "" ) {
-			
-			throw "No value for hidden field with id 'access-level-id-project-owner'";
+
+			throw Error( "No value for hidden field with id 'access-level-id-project-owner'" );
 		}
-		
-		
+
+
 		if ( access_level_id_project_researcher_String === undefined || 
 				access_level_id_project_researcher_String === null || 
 				access_level_id_project_researcher_String === "" ) {
-			
-			throw "No value for hidden field with id 'access-level-id-project-researcher'";
+
+			throw Error( "No value for hidden field with id 'access-level-id-project-researcher'" );
 		}
-		
+
 		var access_level_id_project_owner = parseInt( access_level_id_project_owner_String, 10 ); 
 		var access_level_id_project_researcher = parseInt( access_level_id_project_researcher_String, 10 ); 
-		
+
 		if ( isNaN( access_level_id_project_owner ) ) {
-			throw "value in hideden field with id 'access-level-id-project-owner' is not a number, it is: " + access_level_id_project_owner_String;
+			throw Error( "value in hideden field with id 'access-level-id-project-owner' is not a number, it is: " + access_level_id_project_owner_String );
 		}
-		
+
 		if ( isNaN( access_level_id_project_researcher ) ) {
-			throw "value in hideden field with id 'access-level-id-project-researcher' is not a number, it is: " + access_level_id_project_researcher_String;
+			throw Error( "value in hideden field with id 'access-level-id-project-researcher' is not a number, it is: " + access_level_id_project_researcher_String );
 		}
-		
-		
+
+
 		//////////////////
 
 		//  verson for '#invited_person_entry_template' is a div:
-		
+
 //		var source = $("#invited_person_entry_template").html();
 
 		//  verson for '#invited_person_entry_template' is a table:
-		
+
 		var $invited_person_entry_template = $("#invited_person_entry_template tbody");
-		
-		
+
+
 		var source = $invited_person_entry_template.html();
 
 
 		if ( source === undefined ) {
-			throw '$("#invited_person_entry_template tbody").html() === undefined';
+			throw Error( '$("#invited_person_entry_template tbody").html() === undefined' );
 		}
 		if ( source === null ) {
-			throw '$("#invited_person_entry_template tbody").html() === null';
+			throw Error( '$("#invited_person_entry_template tbody").html() === null' );
 		}
-		
+
 		var template = Handlebars.compile(source);
-		
-		
+
+
 		for (var index = 0; index < responseData.length; index++) {
 
 			var responseDataItem = responseData[index];
 
 			var context = responseDataItem;
 
-			
+
 			var html = template(context);
 
 			var $invited_person_entry = $(html).appendTo($invited_people);
 			addToolTips( $invited_person_entry );
-			
+
 			$invited_person_entry.data("context", context);
-			
+
 			var access_level_id_project_owner = parseInt( access_level_id_project_owner_String, 10 ); 
 			var access_level_id_project_researcher = parseInt( access_level_id_project_researcher_String, 10 ); 
 
 			var attachClickHandlerToRemoveButton = true;
 
-			
+
 			if ( responseDataItem.invitedUserAccessLevel === access_level_id_project_owner ) {
-				
+
 				var $access_level_owner_jq = $invited_person_entry.find(".access_level_owner_jq");
-				
+
 				$access_level_owner_jq.show();
 
-				
+
 				var $invited_person_entry_access_level_update_button_jq = $access_level_owner_jq.find(".invited_person_entry_access_level_update_button_jq");
 
 				if ( adminGlobals.logged_in_user_access_level_owner_or_better ) {
@@ -2297,31 +2626,38 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 
 					$invited_person_entry_access_level_update_button_jq.click(function(eventObject) {
 
-						var clickThis = this;
+						try {
 
-						updateInvitedPersonAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_project_researcher } );
+							var clickThis = this;
 
-						return false;
+							updateInvitedPersonAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_project_researcher } );
+
+							return false;
+
+						} catch( e ) {
+							reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+							throw e;
+						}
 					});
 
 				} else {
-					
+
 					//  Logged in user is not owner level
-					
+
 					//     hide buttons for "remove user from project" and "change user access level"
 
 					$invited_person_entry_access_level_update_button_jq.hide();
-					
+
 					attachClickHandlerToRemoveButton = false;
-					
+
 				}
-				
+
 			} else if ( responseDataItem.invitedUserAccessLevel === access_level_id_project_researcher ) {
 
 				//  User in list is "Researcher" access level
-				
+
 				var $access_level_researcher_jq = $invited_person_entry.find(".access_level_researcher_jq");
-				
+
 				$access_level_researcher_jq.show();
 
 				var $invited_person_entry_access_level_update_button_jq = $access_level_researcher_jq.find(".invited_person_entry_access_level_update_button_jq");
@@ -2329,47 +2665,61 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 				if ( adminGlobals.logged_in_user_access_level_owner_or_better ) {
 
 					//  Logged in User is project owner or better
-					
+
 					$invited_person_entry_access_level_update_button_jq.click(function(eventObject) {
 
-						var clickThis = this;
+						try {
 
-						updateInvitedPersonAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_project_owner } );
+							var clickThis = this;
 
-						return false;
+							updateInvitedPersonAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_project_owner } );
+
+							return false;
+
+						} catch( e ) {
+							reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+							throw e;
+						}
 					});
 
 				} else {
-					
+
 					//  Logged in user is not owner level, 
-					
+
 					//     hide buttons for "change user access level"
 
 					$invited_person_entry_access_level_update_button_jq.hide();
-					
+
 				}
-			
+
 			} else {
-				
-				
+
+
 			}
-			
-			
+
+
 			var $invited_person_entry_access_level_remove_button_jq = $invited_person_entry.find(".invited_person_entry_access_level_remove_button_jq");
 
-			
+
 			if ( attachClickHandlerToRemoveButton ) {
-				
+
 				$invited_person_entry_access_level_remove_button_jq.click(function(eventObject) {
 
-					var clickThis = this;
+					try {
 
-					revokePersonInvite(clickThis);
+						var clickThis = this;
 
-					return false;
+						revokePersonInvite(clickThis);
+
+						return false;
+
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
 				});
 			} else {
-				
+
 				$invited_person_entry_access_level_remove_button_jq.css({visibility:"hidden"});
 			}
 
@@ -2378,11 +2728,11 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 	} else {
 
 //		var noDataMsg = $("#invited_person_entry_no_data_template_div").html();
-//
+
 //		$invited_persons.html(noDataMsg);
 	}
-	
-	
+
+
 	getCurrentUserAccess();
 
 };
@@ -2392,34 +2742,34 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 /////////////////
 
 var updateInvitedPersonAccessLevel = function(params) {
-	
+
 	var clickThis = params.clickThis;
 	var newAccessLevel = params.newAccessLevel;
-	
+
 	var $clickThis = $(clickThis);
 
 	// get root div for this invited person entry
 	var $invited_person_entry_root_div_jq = $clickThis.closest(".invited_person_entry_root_div_jq");
 
 //	var $invited_person_entry_access_level_entry_field_jq = $invited_person_entry_root_div_jq
-//			.find(".current_user_entry_access_level_entry_field_jq");
-//
+//	.find(".current_user_entry_access_level_entry_field_jq");
+
 //	var invited_person_entry_access_level_entry = $invited_person_entry_access_level_entry_field_jq
-//			.val();
+//	.val();
 
 	var invited_person_entry_user_id = $invited_person_entry_root_div_jq.attr("inviteId");
 
 	if (adminGlobals.project_id === null) {
 
-		throw "Unable to find input field for id 'project_id' ";
+		throw Error( "Unable to find input field for id 'project_id' " );
 	}
 
 	var _URL = contextPathJSVar + "/services/user/updateInviteAccessLevel";
 
 	var ajaxParams = {
-		inviteId : invited_person_entry_user_id,
-		personAccessLevel : newAccessLevel, // invited_person_entry_access_level_entry,
-		projectId : adminGlobals.project_id
+			inviteId : invited_person_entry_user_id,
+			personAccessLevel : newAccessLevel, // invited_person_entry_access_level_entry,
+			projectId : adminGlobals.project_id
 	};
 
 	// var request =
@@ -2430,14 +2780,21 @@ var updateInvitedPersonAccessLevel = function(params) {
 		dataType : "json",
 		success : function(data) {
 
-			updateInvitedPersonAccessLevelResponse({
-				data : data,
-				clickThis : clickThis
-			});
+			try {
+
+				updateInvitedPersonAccessLevelResponse({
+					data : data,
+					clickThis : clickThis
+				});
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -2449,7 +2806,7 @@ var updateInvitedPersonAccessLevel = function(params) {
 
 };
 
-//////
+
 
 var updateInvitedPersonAccessLevelResponse = function(params) {
 
@@ -2507,33 +2864,33 @@ var openRevokePersonInviteOverlay = function(clickThis, eventObject) {
 
 
 	// Position dialog over clicked revoke invite icon
-	
+
 	//  get position of div containing the dialog that is inline in the page
 	var $revoke_invite_to_project_overlay_containing_outermost_div_inline_div = $("#revoke_invite_to_project_overlay_containing_outermost_div_inline_div");
-	
+
 	var offset__containing_outermost_div_inline_div = $revoke_invite_to_project_overlay_containing_outermost_div_inline_div.offset();
 	var offsetTop__containing_outermost_div_inline_div = offset__containing_outermost_div_inline_div.top;
-	
+
 	var offset__ClickedRevokeInviteIcon = $clickThis.offset();
 	var offsetTop__ClickedRevokeInviteIcon = offset__ClickedRevokeInviteIcon.top;
-	
+
 	var offsetDifference = offsetTop__ClickedRevokeInviteIcon - offsetTop__containing_outermost_div_inline_div;
-	
+
 	//  adjust vertical position of dialog 
-	
+
 	var $revoke_invite_to_project_overlay_container = $("#revoke_invite_to_project_overlay_container");
-	
+
 	var height__delete_search_overlay_container = $revoke_invite_to_project_overlay_container.outerHeight( true /* [includeMargin ] */ );
-	
+
 	var positionAdjust = offsetDifference - ( height__delete_search_overlay_container / 2 );
-	
+
 	$revoke_invite_to_project_overlay_container.css( "top", positionAdjust );
 
-	
-	
-	
-	
-	
+
+
+
+
+
 
 	var $revoke_invite_to_project_confirm_button = $("#revoke_invite_to_project_confirm_button");
 	$revoke_invite_to_project_confirm_button.data("inviteId", inviteId);
@@ -2560,37 +2917,37 @@ var closeRevokePersonInviteOverlay = function(clickThis, eventObject) {
 var revokePersonInviteConfirmed = function(clickThis, eventObject) {
 
 //	if (!confirm('Are you sure you want to revoke this invite?')) {
-//
-//		return false;
+
+//	return false;
 //	}
 
 	var $clickThis = $(clickThis);
 
 //	// get root div for this current user entry
 //	var $invited_person_entry_root_div_jq = $clickThis.closest(".invited_person_entry_root_div_jq");
-//
+
 //	var inviteId = $invited_person_entry_root_div_jq.attr("inviteId");
-	
-	
+
+
 
 	var inviteId = $clickThis.data("inviteId");
-	
+
 	if ( inviteId === undefined || inviteId === null ) {
-		
-		throw " inviteId === undefined || inviteId === null ";
+
+		throw Error( " inviteId === undefined || inviteId === null " );
 	}
 
 	if ( inviteId === "" ) {
-		
-		throw ' inviteId === "" ';
+
+		throw Error( ' inviteId === "" ' );
 	}
-	
+
 
 	if (adminGlobals.project_id === null) {
 
-		throw "Unable to find input field for id 'project_id' ";
+		throw Error( "Unable to find input field for id 'project_id' " );
 	}
-	
+
 
 	var ajaxParams = {
 			inviteId : inviteId,
@@ -2608,14 +2965,21 @@ var revokePersonInviteConfirmed = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			revokePersonInviteResponse({
-				data : data,
-				clickThis : clickThis
-			});
+			try {
+
+				revokePersonInviteResponse({
+					data : data,
+					clickThis : clickThis
+				});
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -2627,7 +2991,7 @@ var revokePersonInviteConfirmed = function(clickThis, eventObject) {
 
 };
 
-//////
+
 
 var revokePersonInviteResponse = function(params) {
 
@@ -2636,7 +3000,7 @@ var revokePersonInviteResponse = function(params) {
 	if (data.status) {
 
 		closeRevokePersonInviteOverlay();
-		
+
 //		alert("User access to project removed");
 
 		getInvitedPeople();
@@ -2649,15 +3013,15 @@ var revokePersonInviteResponse = function(params) {
 
 };
 
-// //////
+////////
 
 
-// ///////////////
+/////////////////
 
 var getCurrentUserAccess = function() {
 
 	var requestData = {
-		projectId : adminGlobals.project_id
+			projectId : adminGlobals.project_id
 	};
 
 	var _URL = contextPathJSVar + "/services/user/listForProjectId";
@@ -2670,11 +3034,18 @@ var getCurrentUserAccess = function() {
 		dataType : "json",
 		success : function(data) {
 
-			getCurrentUserAccessResponse(requestData, data);
+			try {
+
+				getCurrentUserAccessResponse(requestData, data);
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -2686,7 +3057,7 @@ var getCurrentUserAccess = function() {
 
 };
 
-//////////
+
 
 var getCurrentUserAccessResponse = function(requestData, responseData) {
 
@@ -2698,58 +3069,58 @@ var getCurrentUserAccessResponse = function(requestData, responseData) {
 
 		var access_level_id_project_owner_String = $("#access-level-id-project-owner").val();
 		var access_level_id_project_researcher_String = $("#access-level-id-project-researcher").val();
-		
+
 		if ( access_level_id_project_owner_String === undefined || 
 				access_level_id_project_owner_String === null || 
 				access_level_id_project_owner_String === "" ) {
-			
-			throw "No value for hidden field with id 'access-level-id-project-owner'";
+
+			throw Error( "No value for hidden field with id 'access-level-id-project-owner'" );
 		}
-		
-		
+
+
 		if ( access_level_id_project_researcher_String === undefined || 
 				access_level_id_project_researcher_String === null || 
 				access_level_id_project_researcher_String === "" ) {
-			
-			throw "No value for hidden field with id 'access-level-id-project-researcher'";
+
+			throw Error( "No value for hidden field with id 'access-level-id-project-researcher'" );
 		}
-		
+
 		var access_level_id_project_owner = parseInt( access_level_id_project_owner_String, 10 ); 
 		var access_level_id_project_researcher = parseInt( access_level_id_project_researcher_String, 10 ); 
-		
+
 		if ( isNaN( access_level_id_project_owner ) ) {
-			throw "value in hidden field with id 'access-level-id-project-owner' is not a number, it is: " + access_level_id_project_owner_String;
+			throw Error( "value in hidden field with id 'access-level-id-project-owner' is not a number, it is: " + access_level_id_project_owner_String );
 		}
-		
+
 		if ( isNaN( access_level_id_project_researcher ) ) {
-			throw "value in hidden field with id 'access-level-id-project-researcher' is not a number, it is: " + access_level_id_project_researcher_String;
+			throw Error( "value in hidden field with id 'access-level-id-project-researcher' is not a number, it is: " + access_level_id_project_researcher_String );
 		}
-		
-		
+
+
 		//////////////////
 
 		//////////////////
 
 		//  verson for '#current_user_entry_template' is a div:
-		
+
 //		var source = $("#current_user_entry_template").html();
 
 		//  verson for '#current_user_entry_template' is a table:
-		
+
 		var $current_user_entry_template = $("#current_user_entry_template tbody");
-				
+
 		var source = $current_user_entry_template.html();
 
 		if ( source === undefined ) {
-			throw '$("#current_user_entry_template tbody").html() === undefined';
+			throw Error( '$("#current_user_entry_template tbody").html() === undefined' );
 		}
 		if ( source === null ) {
-			throw '$("#current_user_entry_template tbody").html() === null';
+			throw Error( '$("#current_user_entry_template tbody").html() === null' );
 		}
-		
+
 		var template = Handlebars.compile(source);
-		
-		
+
+
 		for (var index = 0; index < responseData.length; index++) {
 
 			var responseDataItem = responseData[index];
@@ -2760,160 +3131,181 @@ var getCurrentUserAccessResponse = function(requestData, responseData) {
 			//  Assign to the boolean result of the comparison
 			var thisIsCurrentlyLoggedInUser = adminGlobals.logged_in_user_id === responseDataItem.userId;
 
-			
+
 			var html = template(context);
 
 			var $current_user_entry = $(html).appendTo($current_users);
 			addToolTips( $current_user_entry );
 
 			$current_user_entry.data("context", context);
-			
+
 			var access_level_id_project_owner = parseInt( access_level_id_project_owner_String, 10 ); 
 			var access_level_id_project_researcher = parseInt( access_level_id_project_researcher_String, 10 ); 
 
 			var attachClickHandlerToRemoveButton = true;
 
-			
+
 			if ( responseDataItem.userAccessLevelId === access_level_id_project_owner ) {
-				
+
 				var $access_level_owner_jq = $current_user_entry.find(".access_level_owner_jq");
-				
+
 				$access_level_owner_jq.show();
 
-				
+
 				var $current_user_entry_access_level_update_button_jq = $access_level_owner_jq.find(".current_user_entry_access_level_update_button_jq");
 
 				if ( adminGlobals.logged_in_user_access_level_owner_or_better ) {
 
 					//  Logged in User is project owner or better
-					
+
 					$current_user_entry_access_level_update_button_jq.click(function(eventObject) {
 
-						var clickThis = this;
+						try {
 
-						updateUserAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_project_researcher } );
+							var clickThis = this;
 
-						return false;
+							updateUserAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_project_researcher } );
+
+							return false;
+
+						} catch( e ) {
+							reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+							throw e;
+						}
 					});
 
 
 				} else {
-					
+
 					//  If currently logged in user is not owner level, 
 					//     hide buttons for "remove user from project" and "change user access level"
 
 					$current_user_entry_access_level_update_button_jq.hide();
-					
+
 					attachClickHandlerToRemoveButton = false;
-					
+
 				}
-				
+
 			} else if ( responseDataItem.userAccessLevelId === access_level_id_project_researcher ) {
 
 				//  User in list is "Researcher" access level
-				
+
 				var $access_level_researcher_jq = $current_user_entry.find(".access_level_researcher_jq");
-				
+
 				$access_level_researcher_jq.show();
 
-				
+
 				var $current_user_entry_access_level_update_button_jq = $access_level_researcher_jq.find(".current_user_entry_access_level_update_button_jq");
 
 				if ( adminGlobals.logged_in_user_access_level_owner_or_better ) {
 
 					//  Logged in User is project owner or better
-					
+
 					$current_user_entry_access_level_update_button_jq.click(function(eventObject) {
 
-						var clickThis = this;
+						try {
 
-						updateUserAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_project_owner } );
+							var clickThis = this;
 
-						return false;
+							updateUserAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_project_owner } );
+
+							return false;
+
+						} catch( e ) {
+							reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+							throw e;
+						}
 					});
 
 
 				} else {
-					
+
 					//  If currently logged in user is not owner level, 
 					//     hide button for "change user access level"
 
 					$current_user_entry_access_level_update_button_jq.hide();
-					
+
 				}
 
 
 
-			
+
 			} else {
-				
-				
+
+
 			}
-			
-			
+
+
 			if ( thisIsCurrentlyLoggedInUser ) {
-				
+
 				//  The user in the list being processed is the currently logged in user.  Don't allow them to change their own account
-				
+
 				$current_user_entry_access_level_update_button_jq = $current_user_entry.find(".current_user_entry_access_level_update_button_jq");
-				
+
 				$current_user_entry_access_level_update_button_jq.css({visibility:"hidden"});
-				
+
 				attachClickHandlerToRemoveButton = false;
-				
+
 
 				var $currently_logged_in_user_jq = $current_user_entry.find(".currently_logged_in_user_jq");
 
 				$currently_logged_in_user_jq.show();
 			}
-			
+
 
 			var $current_user_entry_access_level_remove_button_jq = $current_user_entry.find(".current_user_entry_access_level_remove_button_jq");
 
-			
+
 			if ( attachClickHandlerToRemoveButton ) {
-				
+
 				$current_user_entry_access_level_remove_button_jq.click(function(eventObject) {
 
-					var clickThis = this;
+					try {
 
-					removeUserAccess(clickThis, eventObject);
+						var clickThis = this;
 
-					return false;
+						removeUserAccess(clickThis, eventObject);
+
+						return false;
+
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
 				});
 			} else {
-				
+
 				$current_user_entry_access_level_remove_button_jq.css({visibility:"hidden"});
 			}
 
-			
-			
+
+
 			//   Condition to check for currently logged in user 
-			
+
 //			if (thisIsCurrentlyLoggedInUser) {
-//
-//				//   Code to hide the currently logged in user so they cannot remove themselves or lower their access level
-//				
-//				var $update_remove_access_div_jq = $current_user_entry.find(".update_remove_access_div_jq");
-//
-//				$update_remove_access_div_jq.hide();
-//
+
+//			//   Code to hide the currently logged in user so they cannot remove themselves or lower their access level
+
+//			var $update_remove_access_div_jq = $current_user_entry.find(".update_remove_access_div_jq");
+
+//			$update_remove_access_div_jq.hide();
+
 //			} else {
 
-//				var $current_user_entry_access_level_remove_button_jq = $current_user_entry.find(".current_user_entry_access_level_remove_button_jq");
-//
-//				$current_user_entry_access_level_remove_button_jq
-//						.click(function(eventObject) {
-//
-//							var clickThis = this;
-//
-//							removeUserAccess(clickThis);
-//							
-//							return false;
-//						});
+//			var $current_user_entry_access_level_remove_button_jq = $current_user_entry.find(".current_user_entry_access_level_remove_button_jq");
+
+//			$current_user_entry_access_level_remove_button_jq
+//			.click(function(eventObject) {
+
+//			var clickThis = this;
+
+//			removeUserAccess(clickThis);
+
+//			return false;
+//			});
 //			}
 
-				
+
 
 
 		}
@@ -2924,42 +3316,42 @@ var getCurrentUserAccessResponse = function(requestData, responseData) {
 
 		$current_users.html(noDataMsg);
 	}
-	
+
 };
 
-// ///////////////
+/////////////////
 
 var updateUserAccessLevel = function(params) {
-	
+
 	var clickThis = params.clickThis;
 	var newAccessLevel = params.newAccessLevel;
-	
+
 	var $clickThis = $(clickThis);
 
 	// get root div for this current user entry
 	var $current_user_entry_root_div_jq = $clickThis
-			.closest(".current_user_entry_root_div_jq");
+	.closest(".current_user_entry_root_div_jq");
 
 //	var $current_user_entry_access_level_entry_field_jq = $current_user_entry_root_div_jq
-//			.find(".current_user_entry_access_level_entry_field_jq");
-//
+//	.find(".current_user_entry_access_level_entry_field_jq");
+
 //	var current_user_entry_access_level_entry = $current_user_entry_access_level_entry_field_jq
-//			.val();
+//	.val();
 
 	var current_user_entry_user_id = $current_user_entry_root_div_jq
-			.attr("userId");
+	.attr("userId");
 
 	if (adminGlobals.project_id === null) {
 
-		throw "Unable to find input field for id 'project_id' ";
+		throw Error( "Unable to find input field for id 'project_id' " );
 	}
 
 	var _URL = contextPathJSVar + "/services/user/updateAccessToProject";
 
 	var ajaxParams = {
-		personId : current_user_entry_user_id,
-		personAccessLevel : newAccessLevel, // current_user_entry_access_level_entry,
-		projectId : adminGlobals.project_id
+			personId : current_user_entry_user_id,
+			personAccessLevel : newAccessLevel, // current_user_entry_access_level_entry,
+			projectId : adminGlobals.project_id
 	};
 
 	// var request =
@@ -2970,14 +3362,21 @@ var updateUserAccessLevel = function(params) {
 		dataType : "json",
 		success : function(data) {
 
-			updateUserAccessLevelResponse({
-				data : data,
-				clickThis : clickThis
-			});
+			try {
+
+				updateUserAccessLevelResponse({
+					data : data,
+					clickThis : clickThis
+				});
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -2989,7 +3388,7 @@ var updateUserAccessLevel = function(params) {
 
 };
 
-// ////
+//////
 
 var updateUserAccessLevelResponse = function(params) {
 
@@ -3016,15 +3415,15 @@ var updateUserAccessLevelResponse = function(params) {
 
 var removeUserAccess = function(clickThis, eventObject) {
 
-	
+
 	openRemoveUserAccessOverlay(clickThis, eventObject);
-	
+
 	return;
-	
+
 };
 
 
-//////////////////////////////
+
 
 var openRemoveUserAccessOverlay = function(clickThis, eventObject) {
 
@@ -3035,50 +3434,50 @@ var openRemoveUserAccessOverlay = function(clickThis, eventObject) {
 	var $current_user_entry_root_div_jq = $clickThis.closest(".current_user_entry_root_div_jq");
 
 	var current_user_entry_user_id = $current_user_entry_root_div_jq.attr("userId");	
-	
+
 	//  copy the name to the overlay
-	
+
 	var $current_user_entry_name_jq = $current_user_entry_root_div_jq.find(".current_user_entry_name_jq");
-	
+
 	var current_user_entry_name = $current_user_entry_name_jq.text();
-	
+
 	var $remove_user_from_project_overlay_name_of_user = $("#remove_user_from_project_overlay_name_of_user");
 	$remove_user_from_project_overlay_name_of_user.text( current_user_entry_name );
-	
+
 
 	// Position dialog over clicked delete icon
-	
+
 	//  get position of div containing the dialog that is inline in the page
 	var $remove_user_from_project_overlay_containing_outermost_div_inline_div = $("#remove_user_from_project_overlay_containing_outermost_div_inline_div");
-	
+
 	var offset__containing_outermost_div_inline_div = $remove_user_from_project_overlay_containing_outermost_div_inline_div.offset();
 	var offsetTop__containing_outermost_div_inline_div = offset__containing_outermost_div_inline_div.top;
-	
+
 	var offset__ClickedDeleteIcon = $clickThis.offset();
 	var offsetTop__ClickedDeleteIcon = offset__ClickedDeleteIcon.top;
-	
+
 	var offsetDifference = offsetTop__ClickedDeleteIcon - offsetTop__containing_outermost_div_inline_div;
-	
+
 	//  adjust vertical position of dialog 
-	
+
 	var $remove_user_from_project_overlay_container = $("#remove_user_from_project_overlay_container");
-	
+
 	var height__remove_user_from_project_overlay_container = $remove_user_from_project_overlay_container.outerHeight( true /* [includeMargin ] */ );
-	
+
 	var positionAdjust = offsetDifference - ( height__remove_user_from_project_overlay_container / 2 );
-	
+
 	$remove_user_from_project_overlay_container.css( "top", positionAdjust );
-	
-	
-	
-	
+
+
+
+
 	var $remove_user_from_project_confirm_button = $("#remove_user_from_project_confirm_button");
 	$remove_user_from_project_confirm_button.data("userId", current_user_entry_user_id);
-	
+
 	$("#remove_user_from_project_overlay_background").show();
 	$remove_user_from_project_overlay_container.show();
 
-	
+
 };
 
 ///////////
@@ -3092,47 +3491,47 @@ var closeRemoveUserAccessOverlay = function(clickThis, eventObject) {
 };
 
 
-// ///////////////
+/////////////////
 
-//  put click handler for this on #remove_user_from_project_confirm_button
+//put click handler for this on #remove_user_from_project_confirm_button
 
 var removeUserAccessConfirmed = function(clickThis, eventObject) {
 
 //	if (!confirm('Are you sure you want to remove access to this project from this user?')) {
-//
-//		return false;
+
+//	return false;
 //	}
 
 	var $clickThis = $(clickThis);
 
 //	// get root div for this current user entry
 //	var $current_user_entry_root_div_jq = $clickThis.closest(".current_user_entry_root_div_jq");
-//
+
 //	var userId = $current_user_entry_root_div_jq.attr("userId");	
 
 	var userId = $clickThis.data("userId");
-	
+
 	if ( userId === undefined || userId === null ) {
-		
-		throw " userId === undefined || userId === null ";
+
+		throw Error( " userId === undefined || userId === null " );
 	}
 
 	if ( userId === "" ) {
-		
-		throw ' userId === "" ';
+
+		throw Error( ' userId === "" ' );
 	}
 
-	
+
 	if (adminGlobals.project_id === null) {
 
-		throw "Unable to find input field for id 'project_id' ";
+		throw Error( "Unable to find input field for id 'project_id' " );
 	}
 
 	var _URL = contextPathJSVar + "/services/user/removeAccessToProject";
 
 	var ajaxParams = {
-		personId : userId,
-		projectId : adminGlobals.project_id
+			personId : userId,
+			projectId : adminGlobals.project_id
 	};
 
 	// var request =
@@ -3143,14 +3542,21 @@ var removeUserAccessConfirmed = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			removeUserAccessResponse({
-				data : data,
-				clickThis : clickThis
-			});
+			try {
+
+				removeUserAccessResponse({
+					data : data,
+					clickThis : clickThis
+				});
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -3162,14 +3568,14 @@ var removeUserAccessConfirmed = function(clickThis, eventObject) {
 
 };
 
-// ////
+//////
 
 var removeUserAccessResponse = function(params) {
 
 	var data = params.data;
 
 	if (data.status) {
-		
+
 		closeRemoveUserAccessOverlay();
 
 //		alert("User access to project removed");
@@ -3184,7 +3590,7 @@ var removeUserAccessResponse = function(params) {
 
 };
 
-// ////////////////
+//////////////////
 
 function initProjectAdminSection() {
 
@@ -3192,7 +3598,7 @@ function initProjectAdminSection() {
 
 	if ($project_id.length === 0) {
 
-		throw "Unable to find input field for id 'project_id' ";
+		throw Error( "Unable to find input field for id 'project_id' " );
 	}
 
 	adminGlobals.project_id = $project_id.val();
@@ -3201,7 +3607,7 @@ function initProjectAdminSection() {
 
 	if ($view_searches_project_admin_div.length === 0) {
 
-		throw "Unable to find div for id 'view_searches_project_admin_div' ";
+		throw Error( "Unable to find div for id 'view_searches_project_admin_div' " );
 	}
 
 	var logged_in_user_id = $view_searches_project_admin_div.attr("logged_in_user_id");
@@ -3209,172 +3615,263 @@ function initProjectAdminSection() {
 	if (logged_in_user_id === undefined || logged_in_user_id === null
 			|| logged_in_user_id.length === 0) {
 
-		throw "Unable to find attr 'logged_in_user_id' in div with id 'view_searches_project_admin_div' ";
+		throw Error( "Unable to find attr 'logged_in_user_id' in div with id 'view_searches_project_admin_div' " );
 	}
 
 	try {
 		adminGlobals.logged_in_user_id = parseInt(logged_in_user_id, 10);
 	} catch (ex) {
 
-		throw "failed to parse logged_in_user_id: " + logged_in_user_id;
+		throw Error( "failed to parse logged_in_user_id: " + logged_in_user_id );
 	}
-	
+
 	if ( isNaN( adminGlobals.logged_in_user_id ) ) {
-		
-		throw "failed to parse logged_in_user_id (parse to NaN): " + logged_in_user_id;
+
+		throw Error( "failed to parse logged_in_user_id (parse to NaN): " + logged_in_user_id );
 	}
-	
-	
+
+
 	var logged_in_user_access_level_owner_or_better_String = $view_searches_project_admin_div.attr("logged_in_user_access_level_owner_or_better");
-	
+
 	if ( logged_in_user_access_level_owner_or_better_String === "true" ) {
-		
+
 		adminGlobals.logged_in_user_access_level_owner_or_better = true;
 	}
 
-	
-	
+
+
 	$("#delete_note_confirm_button").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		deleteProjectNoteConfirmed( clickThis, eventObject );
+			var clickThis = this;
 
-		return false;
+			deleteProjectNoteConfirmed( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$(".delete_note_overlay_show_hide_parts_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		closeConfirmRemoveProjectNoteOverlay( clickThis, eventObject );
-		
-		return false;
+			var clickThis = this;
+
+			closeConfirmRemoveProjectNoteOverlay( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	$(".move_search_project_choice_jq").click(function(eventObject) {
 
-		// var clickThis = this;
+		try {
 
-		adminGlobals.projectToMoveSearchesToSelected = true;
+			// var clickThis = this;
 
-		updateMoveSearchesButton();
-		
-		return false;
+			adminGlobals.projectToMoveSearchesToSelected = true;
+
+			updateMoveSearchesButton();
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$("#move_search_button").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		openMoveSearchesOverlay( clickThis, eventObject );
-		
-		return false;
+			var clickThis = this;
+
+			openMoveSearchesOverlay( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$(".move_searches_overlay_cancel_parts_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		closeMoveSearchesOverlay( clickThis, eventObject );
-		
-		return false;
+			var clickThis = this;
+
+			closeMoveSearchesOverlay( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
-	
+
+
+
 	$(".move_search_project_choice_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		moveSearchesProjectClicked( clickThis, eventObject );
-		
-		return false;
+			var clickThis = this;
+
+			moveSearchesProjectClicked( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$("#move_search_confirm_button").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		executeMoveSearches( clickThis, eventObject );
-		
-		return false;
+			var clickThis = this;
+
+			executeMoveSearches( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$("#show-project-searches-moved-to").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		showProjectSearchesMovedTo( clickThis, eventObject );
-		
-		return false;
+			var clickThis = this;
+
+			showProjectSearchesMovedTo( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
-	
+
 
 	$("#revoke_invite_to_project_confirm_button").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		revokePersonInviteConfirmed( clickThis, eventObject );
+			var clickThis = this;
 
-		return false;
+			revokePersonInviteConfirmed( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$(".revoke_invite_to_project_overlay_show_hide_parts_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		closeRevokePersonInviteOverlay( clickThis, eventObject );
-		
-		return false;
+			var clickThis = this;
+
+			closeRevokePersonInviteOverlay( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
-	
+
+
+
 	$("#remove_user_from_project_confirm_button").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		removeUserAccessConfirmed( clickThis, eventObject );
+			var clickThis = this;
 
-		return false;
+			removeUserAccessConfirmed( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$(".remove_user_from_project_overlay_show_hide_parts_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		closeRemoveUserAccessOverlay( clickThis, eventObject );
-		
-		return false;
+			var clickThis = this;
+
+			closeRemoveUserAccessOverlay( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 
 	initAdminPublicAccessCode();
-	
+
 	initInviteUser();
 
 	initMaintTitleAndAbstract();
-	
+
 	initMaintProjectNotes();
 
 	updateInvitedPeopleCurrentUsersLists();
 
 };
 
-// /////////////
+///////////////
 
 $(document).ready(function() {
 
-	var $view_searches_project_admin_div = $("#view_searches_project_admin_div");
+	try {
 
-	if ($view_searches_project_admin_div.length !== 0) {
+		var $view_searches_project_admin_div = $("#view_searches_project_admin_div");
 
-		// The admin section is on the page so initialize it
+		if ($view_searches_project_admin_div.length !== 0) {
 
-		initProjectAdminSection();
+			// The admin section is on the page so initialize it
+
+			initProjectAdminSection();
+		}
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
 	}
 
 });

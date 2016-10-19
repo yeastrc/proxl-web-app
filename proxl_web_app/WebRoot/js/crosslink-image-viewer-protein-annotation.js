@@ -214,8 +214,8 @@ ProteinAnnotationStore.prototype._get_DataForProteinId_Common = function( params
 
 	if ( annotationData_For_proteinId === undefined ) {
 
-		throw "_get_DataForProteinId_Common:   annotationData_For_proteinId === undefined, annotationDataTypeKey: " + annotationDataTypeKey 
-				+ ", proteinId: " + proteinId;
+		throw Error( "_get_DataForProteinId_Common:   annotationData_For_proteinId === undefined, annotationDataTypeKey: " + annotationDataTypeKey 
+				+ ", proteinId: " + proteinId );
 	}
 
 	if ( annotationData_For_proteinId.status !== this.CONSTANTS.SERVER_STATUS_VALUES.STATUS_COMPLETE ) {
@@ -225,10 +225,10 @@ ProteinAnnotationStore.prototype._get_DataForProteinId_Common = function( params
 
 	if ( annotationData_For_proteinId.data === undefined || annotationData_For_proteinId.data === null ) {
 
-		throw "_get_DataForProteinId_Common:   annotationData_For_proteinId.data === undefined || annotationData_For_proteinId.data === null"
+		throw Error( "_get_DataForProteinId_Common:   annotationData_For_proteinId.data === undefined || annotationData_For_proteinId.data === null"
 				+ "  AND  annotationData_For_proteinId.status === this.CONSTANTS.SERVER_STATUS_VALUES.STATUS_COMPLETE,"
 				+ "annotationDataTypeKey: " + annotationDataTypeKey 
-				+ ", proteinId: " + proteinId;
+				+ ", proteinId: " + proteinId );
 	}
 	
 	return annotationData_For_proteinId.data;
@@ -500,7 +500,7 @@ ProteinAnnotationStore.prototype._submit_Common_ForProteinId = function( params 
 	
 	if ( proteinSequence === undefined ) {
 		
-		throw "no protein sequence for protein id: " + proteinId;
+		throw Error( "no protein sequence for protein id: " + proteinId );
 	}
 	
 	
@@ -508,7 +508,7 @@ ProteinAnnotationStore.prototype._submit_Common_ForProteinId = function( params 
 	
 	if ( proteinTaxonomyId === undefined ) {
 		
-		throw "no protein Taxonomy Id for protein id: " + proteinId;
+		throw Error( "no protein Taxonomy Id for protein id: " + proteinId );
 	}
 	
 	
@@ -550,37 +550,41 @@ ProteinAnnotationStore.prototype._submit_Common_ForProteinId = function( params 
 		
 		success: function( responseData )	{
 			
-			
-			if ( ajaxTimeoutTimerId ) {
+			try {
 
-				//   Clear Timeout since have response
-				clearTimeout( ajaxTimeoutTimerId );
-				
-				ajaxTimeoutTimerId = null;
+				if ( ajaxTimeoutTimerId ) {
+
+					//   Clear Timeout since have response
+					clearTimeout( ajaxTimeoutTimerId );
+
+					ajaxTimeoutTimerId = null;
+				}
+
+				var process_submit_Common_ForProteinId_Response_Params = {
+
+						initialLoadAnnotationsParams : params.initialLoadAnnotationsParams, //  Pass around the params initially passed in
+
+						responseData : responseData, 
+						proteinId : proteinId, 
+						loadIdentifier : loadIdentifier,
+
+						annotationDataKey : annotationDataKey,
+
+						serviceURLsBase : serviceURLsBase,
+
+						selectedProteins : params.selectedProteins, 
+
+						globalMainData : params.globalMainData,
+
+						submitStatusPerProtein : params.submitStatusPerProtein
+				};
+
+				objectThis._process_submit_Common_ForProteinId_Response( process_submit_Common_ForProteinId_Response_Params );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
 			}
-			
-			var process_submit_Common_ForProteinId_Response_Params = {
-
-					initialLoadAnnotationsParams : params.initialLoadAnnotationsParams, //  Pass around the params initially passed in
-
-					responseData : responseData, 
-					proteinId : proteinId, 
-					loadIdentifier : loadIdentifier,
-					
-					annotationDataKey : annotationDataKey,
-					
-					serviceURLsBase : serviceURLsBase,
-
-					selectedProteins : params.selectedProteins, 
-					
-					globalMainData : params.globalMainData,
-					
-					submitStatusPerProtein : params.submitStatusPerProtein
-			};
-
-			objectThis._process_submit_Common_ForProteinId_Response( process_submit_Common_ForProteinId_Response_Params );
-
-
 
 		},
         failure: function(errMsg) {
@@ -679,7 +683,7 @@ ProteinAnnotationStore.prototype._process_submit_Common_ForProteinId_Response = 
 	
 	if ( proteinTaxonomyId === undefined ) {
 		
-		throw "no protein Taxonomy Id for protein id: " + proteinId;
+		throw Error( "no protein Taxonomy Id for protein id: " + proteinId );
 	}
 	
 	
@@ -793,7 +797,7 @@ ProteinAnnotationStore.prototype._get_AnnotationData_Common_ForProteinId = funct
 	if ( annotationTypeData_For_proteinId === undefined 
 			|| annotationTypeData_For_proteinId.status === objectThis.CONSTANTS.SERVER_STATUS_VALUES.STATUS_NO_RECORD ) {
 		
-		throw "_get_AnnotationData_Common_ForProteinId: Unable to get PAWS proteinSequenceId for protein id: " + proteinId;
+		throw Error( "_get_AnnotationData_Common_ForProteinId: Unable to get PAWS proteinSequenceId for protein id: " + proteinId );
 	}
 	
 	var sequenceId = annotationTypeData_For_proteinId.sequenceId;
@@ -801,15 +805,15 @@ ProteinAnnotationStore.prototype._get_AnnotationData_Common_ForProteinId = funct
 
 	if ( sequenceId === undefined ) {
 		
-		throw "_get_AnnotationData_Common_ForProteinId: sequenceId not populated in annotationTypeData_For_proteinId.sequenceId for"
-			+ " protein id: " + proteinId;
+		throw Error( "_get_AnnotationData_Common_ForProteinId: sequenceId not populated in annotationTypeData_For_proteinId.sequenceId for"
+			+ " protein id: " + proteinId );
 	}
 	
 	var proteinTaxonomyId = proteinTaxonomyIds[ proteinId ];
 	
 	if ( proteinTaxonomyId === undefined ) {
 		
-		throw "no protein Taxonomy Id for protein id: " + proteinId;
+		throw Error( "no protein Taxonomy Id for protein id: " + proteinId );
 	}
 	
 	
@@ -852,36 +856,41 @@ ProteinAnnotationStore.prototype._get_AnnotationData_Common_ForProteinId = funct
 		data: requestData,
 		success: function( responseData )	{
 
-			if ( ajaxTimeoutTimerId ) {
+			try {
 
-				//   Clear Timeout since have response
-				clearTimeout( ajaxTimeoutTimerId );
-				
-				ajaxTimeoutTimerId = null;
+				if ( ajaxTimeoutTimerId ) {
+
+					//   Clear Timeout since have response
+					clearTimeout( ajaxTimeoutTimerId );
+
+					ajaxTimeoutTimerId = null;
+				}
+
+				var _get_AnnotationData_Common_ForProteinId_Response_Params = {
+
+						initialLoadAnnotationsParams : params.initialLoadAnnotationsParams, //  Pass around the params initially passed in
+
+						responseData : responseData,
+
+						proteinId : proteinId, 
+						loadIdentifier : params.loadIdentifier,
+
+						annotationDataKey : params.annotationDataKey,
+
+						serviceURLsBase : params.serviceURLsBase,
+
+						selectedProteins : params.selectedProteins, 
+
+						globalMainData : params.globalMainData,
+
+						submitStatusPerProtein : params.submitStatusPerProtein
+				};
+
+				objectThis._get_AnnotationData_Common_ForProteinId_Response( _get_AnnotationData_Common_ForProteinId_Response_Params );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
 			}
-
-			var _get_AnnotationData_Common_ForProteinId_Response_Params = {
-
-					initialLoadAnnotationsParams : params.initialLoadAnnotationsParams, //  Pass around the params initially passed in
-
-					responseData : responseData,
-					
-					proteinId : proteinId, 
-					loadIdentifier : params.loadIdentifier,
-					
-					annotationDataKey : params.annotationDataKey,
-					
-					serviceURLsBase : params.serviceURLsBase,
-
-					selectedProteins : params.selectedProteins, 
-
-					globalMainData : params.globalMainData,
-
-					submitStatusPerProtein : params.submitStatusPerProtein
-			};
-
-			objectThis._get_AnnotationData_Common_ForProteinId_Response( _get_AnnotationData_Common_ForProteinId_Response_Params );
-
 		},
         failure: function(errMsg) {
         	handleAJAXFailure( errMsg );
@@ -1008,7 +1017,7 @@ ProteinAnnotationStore.prototype._get_AnnotationData_Common_ForProteinId_Respons
 		
 		if ( proteinTaxonomyId === undefined ) {
 			
-			throw "no protein Taxonomy Id for protein id: " + proteinId;
+			throw Error( "no protein Taxonomy Id for protein id: " + proteinId );
 		}
 		
 		

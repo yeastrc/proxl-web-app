@@ -14,7 +14,14 @@
 
 $(document).ready( function() {
 
-	proxlXMLFileImport.initOnDocumentReady();
+	try {
+
+		proxlXMLFileImport.initOnDocumentReady();
+	
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 
 });
 
@@ -31,8 +38,15 @@ $(document).ready( function() {
 //} );
 
 window.addEventListener("beforeunload", function (event) {
+
+	try {
+
+		proxlXMLFileImport.pageUnload( event );
 	
-	proxlXMLFileImport.pageUnload( event );
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 });
 
 
@@ -105,14 +119,14 @@ ProxlXMLFileImportFileData.factory = function( params ) {
 				|| constructorParam.fileTypeString === null
 				|| constructorParam.fileTypeString === "" ) {
 			
-			throw "fileTypeString is undefined, null or empty";
+			throw Error( "fileTypeString is undefined, null or empty" );
 		}
 		
 		constructorParam.fileType = parseInt( constructorParam.fileTypeString, 10 );
 		
 		if ( isNaN( constructorParam.fileType ) ) {
 			
-			throw "fileTypeString failed to parse: " + fileTypeString;
+			throw Error( "fileTypeString failed to parse: " + fileTypeString );
 		}
 	}
 	
@@ -204,7 +218,7 @@ ProxlXMLFileImport.prototype.getFileData  = function( params ) {
 
 	if ( ! this.fileStorage ) {
 		
-		throw "no files in fileStorage";
+		throw Error( "no files in fileStorage" );
 	}
 	
 	var fileData = this.fileStorage[ fileIndex ];
@@ -240,12 +254,12 @@ ProxlXMLFileImport.prototype.removeFileData  = function( params ) {
 	
 	if ( ! this.fileStorage ) {
 		
-		throw "no files in fileStorage";
+		throw Error( "no files in fileStorage" );
 	}
 
 	if ( ! this.fileStorage[ fileIndex ] ) {
 		
-		throw "no file in fileStorage for index: " + fileIndex;
+		throw Error( "no file in fileStorage for index: " + fileIndex );
 	}
 	
 	delete this.fileStorage[ fileIndex ];
@@ -275,18 +289,18 @@ ProxlXMLFileImport.prototype.getFileIndexAsIntFromDOM  = function( params ) {
 
 	if ( fileIndexString === undefined ) {
 
-		throw 'undefined:  $domElement.attr("data-file_index");';
+		throw Error( 'undefined:  $domElement.attr("data-file_index");' );
 	}
 	if ( fileIndexString === "" ) {
 
-		throw 'empty string:  $domElement.attr("data-file_index");';
+		throw Error( 'empty string:  $domElement.attr("data-file_index");' );
 	}
 
 	var fileIndex = parseInt( fileIndexString, 10 );
 
 	if ( isNaN( fileIndex ) ) {
 
-		throw 'Fail parse to int:  $domElement.attr("data-file_index") : fileIndexString: ' + fileIndexString;
+		throw Error( 'Fail parse to int:  $domElement.attr("data-file_index") : fileIndexString: ' + fileIndexString );
 	}
 
 	return fileIndex;
@@ -302,272 +316,359 @@ ProxlXMLFileImport.prototype.getFileIndexAsIntFromDOM  = function( params ) {
 
 ProxlXMLFileImport.prototype.initOnDocumentReady  = function(  ) {
 
-	var objectThis = this;
-	
-	
-	
-	//  Get uploading scan files
-	
-	
-	this.uploadingScanFiles = false;
+	try {
 
-	var $proxl_xml_file_upload_overlay_upload_scan_files = $("#proxl_xml_file_upload_overlay_upload_scan_files");
+		var objectThis = this;
 
-	if ( $proxl_xml_file_upload_overlay_upload_scan_files.length > 0 ) {
-		
-		var proxl_xml_file_upload_overlay_upload_scan_files_text = $proxl_xml_file_upload_overlay_upload_scan_files.val();
-		
-		if ( proxl_xml_file_upload_overlay_upload_scan_files_text !== "" ) {
-			
-			//  Only populated when true
-			
-			this.uploadingScanFiles = true;
-		}
-	}
-	
-	
-	
 
-	//  Get max Proxl XML upload size
 
-	var $proxl_xml_file_max_file_upload_size = $("#proxl_xml_file_max_file_upload_size");
+		//  Get uploading scan files
 
-	if ( $proxl_xml_file_max_file_upload_size.length === 0 ) {
-		
-		throw "#proxl_xml_file_max_file_upload_size input field missing";
-	}
-	
-	var proxl_xml_file_max_file_upload_size_val = $proxl_xml_file_max_file_upload_size.val();
 
-	this.maxProxlXMLFileUploadSize = parseInt( proxl_xml_file_max_file_upload_size_val, 10 );
+		this.uploadingScanFiles = false;
 
-	if ( isNaN( this.maxProxlXMLFileUploadSize ) ) {
+		var $proxl_xml_file_upload_overlay_upload_scan_files = $("#proxl_xml_file_upload_overlay_upload_scan_files");
 
-		throw "Unable to parse #proxl_xml_file_max_file_upload_size: " + proxl_xml_file_max_file_upload_size_val;
-	}
+		if ( $proxl_xml_file_upload_overlay_upload_scan_files.length > 0 ) {
 
-	var $proxl_xml_file_max_file_upload_size_formatted = $("#proxl_xml_file_max_file_upload_size_formatted");
-	
-	if ( $proxl_xml_file_max_file_upload_size_formatted.length === 0 ) {
-		
-		throw "#proxl_xml_file_max_file_upload_size_formatted input field missing";
-	}
+			var proxl_xml_file_upload_overlay_upload_scan_files_text = $proxl_xml_file_upload_overlay_upload_scan_files.val();
 
-	this.maxProxlXMLFileUploadSizeFormatted = $proxl_xml_file_max_file_upload_size_formatted.val();
+			if ( proxl_xml_file_upload_overlay_upload_scan_files_text !== "" ) {
 
-	if ( this.maxProxlXMLFileUploadSizeFormatted === undefined || this.maxProxlXMLFileUploadSizeFormatted === "" ) {
-		
-		throw "#proxl_xml_file_max_file_upload_size_formatted input field empty";
-	}
-	
-	if ( this.uploadingScanFiles ) {  
+				//  Only populated when true
 
-		//  Get max Scan upload size
-
-		var $proxl_import_scan_file_max_file_upload_size = $("#proxl_import_scan_file_max_file_upload_size");
-
-		if ( $proxl_import_scan_file_max_file_upload_size.length === 0 ) {
-
-			throw "#proxl_import_scan_file_max_file_upload_size input field missing";
+				this.uploadingScanFiles = true;
+			}
 		}
 
-		var proxl_import_scan_file_max_file_upload_size_val = $proxl_import_scan_file_max_file_upload_size.val();
 
-		this.maxScanFileUploadSize = parseInt( proxl_import_scan_file_max_file_upload_size_val, 10 );
 
-		if ( isNaN( this.maxScanFileUploadSize ) ) {
 
-			throw "Unable to parse #proxl_import_scan_file_max_file_upload_size: " + proxl_import_scan_file_max_file_upload_size_val;
+		//  Get max Proxl XML upload size
+
+		var $proxl_xml_file_max_file_upload_size = $("#proxl_xml_file_max_file_upload_size");
+
+		if ( $proxl_xml_file_max_file_upload_size.length === 0 ) {
+
+			throw Error( "#proxl_xml_file_max_file_upload_size input field missing" );
 		}
 
-		var $proxl_import_scan_file_max_file_upload_size_formatted = $("#proxl_import_scan_file_max_file_upload_size_formatted");
+		var proxl_xml_file_max_file_upload_size_val = $proxl_xml_file_max_file_upload_size.val();
 
-		if ( $proxl_import_scan_file_max_file_upload_size_formatted.length === 0 ) {
+		this.maxProxlXMLFileUploadSize = parseInt( proxl_xml_file_max_file_upload_size_val, 10 );
 
-			throw "#proxl_import_scan_file_max_file_upload_size_formatted input field missing";
+		if ( isNaN( this.maxProxlXMLFileUploadSize ) ) {
+
+			throw Error( "Unable to parse #proxl_xml_file_max_file_upload_size: " + proxl_xml_file_max_file_upload_size_val );
 		}
 
-		this.maxScanFileUploadSizeFormatted = $proxl_import_scan_file_max_file_upload_size_formatted.val();
+		var $proxl_xml_file_max_file_upload_size_formatted = $("#proxl_xml_file_max_file_upload_size_formatted");
+
+		if ( $proxl_xml_file_max_file_upload_size_formatted.length === 0 ) {
+
+			throw Error( "#proxl_xml_file_max_file_upload_size_formatted input field missing" );
+		}
+
+		this.maxProxlXMLFileUploadSizeFormatted = $proxl_xml_file_max_file_upload_size_formatted.val();
 
 		if ( this.maxProxlXMLFileUploadSizeFormatted === undefined || this.maxProxlXMLFileUploadSizeFormatted === "" ) {
 
-			throw "#proxl_import_scan_file_max_file_upload_size_formatted input field empty";
+			throw Error( "#proxl_xml_file_max_file_upload_size_formatted input field empty" );
 		}
 
-	}	
-	
-	
-	
-	
-	////////////////////
+		if ( this.uploadingScanFiles ) {  
 
-	$(".open_proxl_file_upload_overlay_jq").click(function(eventObject) {
+			//  Get max Scan upload size
 
-		var clickThis = this;
+			var $proxl_import_scan_file_max_file_upload_size = $("#proxl_import_scan_file_max_file_upload_size");
 
-		objectThis.openOverlay( clickThis, eventObject );
+			if ( $proxl_import_scan_file_max_file_upload_size.length === 0 ) {
 
-		eventObject.preventDefault();
-		
-		return false;
-	});	 			
+				throw Error( "#proxl_import_scan_file_max_file_upload_size input field missing" );
+			}
 
+			var proxl_import_scan_file_max_file_upload_size_val = $proxl_import_scan_file_max_file_upload_size.val();
 
-	$(".proxl_xml_file_upload_overlay_close_parts_jq").click(function(eventObject) {
+			this.maxScanFileUploadSize = parseInt( proxl_import_scan_file_max_file_upload_size_val, 10 );
 
-		var clickThis = this;
+			if ( isNaN( this.maxScanFileUploadSize ) ) {
 
-		objectThis.closeClicked( clickThis, eventObject );
+				throw Error( "Unable to parse #proxl_import_scan_file_max_file_upload_size: " + proxl_import_scan_file_max_file_upload_size_val );
+			}
 
-		eventObject.preventDefault();
-		
-		return false;
-	});
-	
-	
-	$("#import_proxl_xml_choose_proxl_xml_file_button").click(function(eventObject) {
+			var $proxl_import_scan_file_max_file_upload_size_formatted = $("#proxl_import_scan_file_max_file_upload_size_formatted");
 
-//		var clickThis = this;
+			if ( $proxl_import_scan_file_max_file_upload_size_formatted.length === 0 ) {
 
-		$("#import_proxl_xml_proxl_xml_file_field").click(); // "click" the file input field
+				throw Error( "#proxl_import_scan_file_max_file_upload_size_formatted input field missing" );
+			}
 
-		eventObject.preventDefault();
-		
-		return false;
-	});
+			this.maxScanFileUploadSizeFormatted = $proxl_import_scan_file_max_file_upload_size_formatted.val();
 
-	$("#import_proxl_xml_proxl_xml_file_field").change(  function(eventObject) {
+			if ( this.maxProxlXMLFileUploadSizeFormatted === undefined || this.maxProxlXMLFileUploadSizeFormatted === "" ) {
 
-		var changeThis = this;
+				throw Error( "#proxl_import_scan_file_max_file_upload_size_formatted input field empty" );
+			}
 
-		objectThis.proxlXMLFileDialogChanged( changeThis, eventObject );
-	});
-
-	//  Remove The Proxl XML file, aborting the upload if in progress
-
-	$("#import_proxl_xml_remove_proxl_xml_file_button").click(function( eventObject ) {
-
-		var clickThis = this;
-
-		objectThis.removeProxlXMLFile( { clickThis : clickThis, doAbortIfNeeded : true, eventObject : eventObject } );
-		
-		eventObject.preventDefault();
-		
-		return false;
-	});
-	
-	
-
-	
-	$("#import_proxl_xml_choose_scan_file_button").click(function(eventObject) {
-
-//		var clickThis = this;
-
-		$("#import_proxl_xml_scan_file_field").click(); // "click" the file input field
-
-		eventObject.preventDefault();
-		
-		return false;
-	});
-
-	$("#import_proxl_xml_scan_file_field").change(  function(eventObject) {
-
-		var changeThis = this;
-
-		objectThis.scanFileDialogChanged( changeThis, eventObject );
-	});
+		}	
 
 
-	$("#import_proxl_xml_file_close_button").click(function(eventObject) {
+		////////////////////
 
-		var clickThis = this;
+		$(".open_proxl_file_upload_overlay_jq").click(function(eventObject) {
 
-		objectThis.closeClicked( clickThis, eventObject );
+			try {
 
-		eventObject.preventDefault();
-		
-		return false;
-	});
+				var clickThis = this;
 
-	
+				objectThis.openOverlay( clickThis, eventObject );
 
-	$("#import_proxl_xml_file_submit_button").click(function(eventObject) {
+				eventObject.preventDefault();
 
-		var clickThis = this;
-
-		objectThis.submitClicked( clickThis, eventObject );
-		
-		eventObject.preventDefault();
-
-		return false;
-	});
-
-	$("#import_proxl_xml_file_submit_import_success_submit_another_import_button").click(function(eventObject) {
-
-//		var clickThis = this;
-
-		objectThis.openOverlay(); // Will call resetOverlay
-
-		eventObject.preventDefault();
-		
-		return false;
-	});
+				return false;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});	 			
 
 
-	
-	////////////////////
-	
-	//   Upload error message overlay
+		$(".proxl_xml_file_upload_overlay_close_parts_jq").click(function(eventObject) {
 
-	$(".import_proxl_xml_file_upload_error_overlay_cancel_parts_jq").click(function(eventObject) {
+			try {
 
-		$(".import_proxl_xml_file_upload_error_overlay_show_hide_parts_jq").hide();
+				var clickThis = this;
 
-		eventObject.preventDefault();
-		
-		return false;
-	});
+				objectThis.closeClicked( clickThis, eventObject );
 
-	////////////////////
-	
-	//   File Choose error message overlay
+				eventObject.preventDefault();
 
-	$(".import_proxl_xml_choose_file_error_overlay_show_hide_parts_jq").click(function(eventObject) {
+				return false;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 
-		$(".import_proxl_xml_choose_file_error_overlay_show_hide_parts_jq").hide();
 
-		eventObject.preventDefault();
-		
-		return false;
-	});
+		$("#import_proxl_xml_choose_proxl_xml_file_button").click(function(eventObject) {
 
-	////////////////////
-	
-	//   Confirm Abandon Upload overlay
+			try {
 
-	$(".import_proxl_xml_file_confirm_abandon_upload_overlay_cancel_parts_jq").click(function(eventObject) {
+//				var clickThis = this;
 
-		$(".import_proxl_xml_file_confirm_abandon_upload_overlay_show_hide_parts_jq").hide();
+				$("#import_proxl_xml_proxl_xml_file_field").click(); // "click" the file input field
 
-		eventObject.preventDefault();
-		
-		return false;
-	});
-	
-	$("#import_proxl_xml_file_confirm_abandon_upload_confirm_button").click(function(eventObject) {
+				eventObject.preventDefault();
 
-		var clickThis = this;
-		
-		$(".import_proxl_xml_file_confirm_abandon_upload_overlay_show_hide_parts_jq").hide();
-		
-		objectThis.closeOverlay( clickThis, eventObject );
-		
-		eventObject.preventDefault();
-		
-		return false;
-	});
-	
-	
+				return false;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+		$("#import_proxl_xml_proxl_xml_file_field").change(  function(eventObject) {
+
+			try {
+
+				var changeThis = this;
+
+				objectThis.proxlXMLFileDialogChanged( changeThis, eventObject );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+		//  Remove The Proxl XML file, aborting the upload if in progress
+
+		$("#import_proxl_xml_remove_proxl_xml_file_button").click(function( eventObject ) {
+
+			try {
+
+				var clickThis = this;
+
+				objectThis.removeProxlXMLFile( { clickThis : clickThis, doAbortIfNeeded : true, eventObject : eventObject } );
+
+				eventObject.preventDefault();
+
+				return false;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+
+
+
+		$("#import_proxl_xml_choose_scan_file_button").click(function(eventObject) {
+
+			try {
+
+//				var clickThis = this;
+
+				$("#import_proxl_xml_scan_file_field").click(); // "click" the file input field
+
+				eventObject.preventDefault();
+
+				return false;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+		$("#import_proxl_xml_scan_file_field").change(  function(eventObject) {
+
+			try {
+
+				var changeThis = this;
+
+				objectThis.scanFileDialogChanged( changeThis, eventObject );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+
+		$("#import_proxl_xml_file_close_button").click(function(eventObject) {
+
+			try {
+
+				var clickThis = this;
+
+				objectThis.closeClicked( clickThis, eventObject );
+
+				eventObject.preventDefault();
+
+				return false;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+
+
+		$("#import_proxl_xml_file_submit_button").click(function(eventObject) {
+
+			try {
+
+				var clickThis = this;
+
+				objectThis.submitClicked( clickThis, eventObject );
+
+				eventObject.preventDefault();
+
+				return false;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+		$("#import_proxl_xml_file_submit_import_success_submit_another_import_button").click(function(eventObject) {
+
+			try {
+
+//				var clickThis = this;
+
+				objectThis.openOverlay(); // Will call resetOverlay
+
+				eventObject.preventDefault();
+
+				return false;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+
+
+		////////////////////
+
+		//   Upload error message overlay
+
+		$(".import_proxl_xml_file_upload_error_overlay_cancel_parts_jq").click(function(eventObject) {
+
+			try {
+
+				$(".import_proxl_xml_file_upload_error_overlay_show_hide_parts_jq").hide();
+
+				eventObject.preventDefault();
+
+				return false;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+		////////////////////
+
+		//   File Choose error message overlay
+
+		$(".import_proxl_xml_choose_file_error_overlay_show_hide_parts_jq").click(function(eventObject) {
+
+			try {
+
+				$(".import_proxl_xml_choose_file_error_overlay_show_hide_parts_jq").hide();
+
+				eventObject.preventDefault();
+
+				return false;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+		////////////////////
+
+		//   Confirm Abandon Upload overlay
+
+		$(".import_proxl_xml_file_confirm_abandon_upload_overlay_cancel_parts_jq").click(function(eventObject) {
+
+			try {
+
+				$(".import_proxl_xml_file_confirm_abandon_upload_overlay_show_hide_parts_jq").hide();
+
+				eventObject.preventDefault();
+
+				return false;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+		$("#import_proxl_xml_file_confirm_abandon_upload_confirm_button").click(function(eventObject) {
+
+			try {
+
+				var clickThis = this;
+
+				$(".import_proxl_xml_file_confirm_abandon_upload_overlay_show_hide_parts_jq").hide();
+
+				objectThis.closeOverlay( clickThis, eventObject );
+
+				eventObject.preventDefault();
+
+				return false;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 	
 };
 
@@ -777,7 +878,7 @@ ProxlXMLFileImport.prototype.proxlXMLFileDialogChanged  = function( changeThis, 
 	
 	if ( fileTypeString === undefined || fileTypeString === null || fileTypeString === "" ) {
 		
-		throw "fileType is not a value";
+		throw Error( "fileType is not a value" );
 	}
 	
 	var $import_proxl_xml_chosen_proxl_xml_file_block = $("#import_proxl_xml_chosen_proxl_xml_file_block");
@@ -832,7 +933,7 @@ ProxlXMLFileImport.prototype.removeProxlXMLFile  = function( params ) {
 	if ( ! $import_proxl_xml_file_scan_file_entry_block_jq ) {
 
 		if ( ! clickThis ) {
-			throw "Either $import_proxl_xml_file_scan_file_entry_block_jq or clickThis must be populated";
+			throw Error( "Either $import_proxl_xml_file_scan_file_entry_block_jq or clickThis must be populated" );
 		}
 		var $clickThis = $( clickThis );
 
@@ -866,7 +967,7 @@ ProxlXMLFileImport.prototype.removeScanFile  = function( params ) {
 	if ( ! $import_proxl_xml_file_scan_file_entry_block_jq ) {
 
 		if ( ! clickThis ) {
-			throw "Either $import_proxl_xml_file_scan_file_entry_block_jq or clickThis must be populated";
+			throw Error( "Either $import_proxl_xml_file_scan_file_entry_block_jq or clickThis must be populated" );
 		}
 		var $clickThis = $( clickThis );
 
@@ -902,7 +1003,7 @@ ProxlXMLFileImport.prototype.abortXMLHttpRequestSend  = function( params ) {
 
 	if ( ! fileIndex && ! proxlXMLFileImportFileData ) {
 
-		throw "fileIndex or proxlXMLFileImportFileData is required"; 
+		throw Error( "fileIndex or proxlXMLFileImportFileData is required" ); 
 	}
 
 	if ( ! proxlXMLFileImportFileData ) {
@@ -940,7 +1041,7 @@ ProxlXMLFileImport.prototype.scanFileDialogChanged  = function( changeThis, even
 	
 	if ( ! this.uploadingScanFiles ) {
 		
-		throw "scanFileDialogChanged(...): Scan files not allowed, should not enter this";
+		throw Error( "scanFileDialogChanged(...): Scan files not allowed, should not enter this" );
 	}
 
 	var objectThis = this;
@@ -1040,7 +1141,7 @@ ProxlXMLFileImport.prototype.scanFileDialogChanged  = function( changeThis, even
 	
 	if ( fileType === undefined || fileType === null || fileType === "" ) {
 		
-		throw "fileType is not a value";
+		throw Error( "fileType is not a value" );
 	}
 	
 	var maxScanFileUploadSize = this.maxScanFileUploadSize;
@@ -1093,16 +1194,16 @@ ProxlXMLFileImport.prototype.scanFileDialogChanged  = function( changeThis, even
 		
 		if ( $import_proxl_xml_file_scan_file_entry_template.length === 0 ) {
 			
-			throw "id 'import_proxl_xml_file_scan_file_entry_template not on page'";
+			throw Error( "id 'import_proxl_xml_file_scan_file_entry_template not on page'" );
 		}
 
 		var source = $("#import_proxl_xml_file_scan_file_entry_template").html();
 
 		if ( source === undefined ) {
-			throw '$("#import_proxl_xml_file_scan_file_entry_template").html() === undefined';
+			throw Error( '$("#import_proxl_xml_file_scan_file_entry_template").html() === undefined' );
 		}
 		if ( source === null ) {
-			throw '$("#import_proxl_xml_file_scan_file_entry_template").html() === null';
+			throw Error( '$("#import_proxl_xml_file_scan_file_entry_template").html() === null' );
 		}
 		
 		this.scanFileHandlebarsTemplate = Handlebars.compile(source);
@@ -1167,7 +1268,13 @@ ProxlXMLFileImport.prototype.openOverlay  = function( clickThis, eventObject ) {
 		dataType : "json",
 		success : function(data) {
 
-			objectThis.openOverlayProcessServerResponse( { requestData : requestData, responseData : data } );
+			try {
+
+				objectThis.openOverlayProcessServerResponse( { requestData : requestData, responseData : data } );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -1210,7 +1317,7 @@ ProxlXMLFileImport.prototype.openOverlayProcessServerResponse  = function( param
 		
 		//  Probably shouldn't get here
 		
-		throw "statusSuccess is false";  ///  TODO  Need to display error
+		throw Error( "statusSuccess is false" );  ///  TODO  Need to display error
 	}
 	
 	//  Save upload key
@@ -1262,18 +1369,18 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 	
 	if ( fileTypeString === undefined ) {
 		
-		throw 'undefined:  $containingBlock.attr("data-file_type");';
+		throw Error( 'undefined:  $containingBlock.attr("data-file_type");' );
 	}
 	if ( fileTypeString === "" ) {
 
-		throw 'empty string:  $containingBlock.attr("data-file_type");';
+		throw Error( 'empty string:  $containingBlock.attr("data-file_type"); ' );
 	}
 	
 	var fileType = parseInt( fileTypeString, 10 );
 	
 	if ( isNaN( fileType ) ) {
 		
-		throw 'Fail parse to int:  $containingBlock.attr("data-file_type");';
+		throw Error( 'Fail parse to int:  $containingBlock.attr("data-file_type"); ' );
 	}
 	
 	var $project_id = $("#project_id");
@@ -1285,7 +1392,7 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 		
 		//  TODO  show error to user?
 		
-		throw "upload key cannot be not set";
+		throw Error( "upload key cannot be not set" );
 	}
 	
 	try {
@@ -1297,7 +1404,7 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 		
 		if ( fileType !== proxlXMLFileImportFileData.getFileType() ) {
 			
-			throw "file type for saved fileData does not match file type in DOM element";
+			throw Error( "file type for saved fileData does not match file type in DOM element" );
 		}
 		
 		var file = proxlXMLFileImportFileData.getFile();
@@ -1327,194 +1434,252 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 
 
 	xmlHttpRequest.onload = function() {
-		
-		var currentXHRinOnLoad = xmlHttpRequest;
-		
-		proxlXMLFileImportFileData.setXMLHttpRequest( undefined ); ///  clear reference to XMLHttpRequest
+
+		try {
+
+			var currentXHRinOnLoad = xmlHttpRequest;
+
+			proxlXMLFileImportFileData.setXMLHttpRequest( undefined ); ///  clear reference to XMLHttpRequest
 
 
-		$("#import_proxl_xml_file_close_button").show();
-		$("#import_proxl_xml_file_cancel_button").hide();
-		
+			$("#import_proxl_xml_file_close_button").show();
+			$("#import_proxl_xml_file_cancel_button").hide();
 
-		var xhrStatus = currentXHRinOnLoad.status;
 
-		
-		var xhrResponse = currentXHRinOnLoad.response;
-		
-		var xhrResponseText = currentXHRinOnLoad.responseText;
-		
-		if (xhrStatus === 200) {
+			var xhrStatus = currentXHRinOnLoad.status;
 
-			var resp = null;
 
-			try {
-				resp = JSON.parse(xhrResponse);
+			var xhrResponse = currentXHRinOnLoad.response;
 
-			} catch (e) {
+			var xhrResponseText = currentXHRinOnLoad.responseText;
+
+			if (xhrStatus === 200) {
+
+				var resp = null;
+
+				try {
+					resp = JSON.parse(xhrResponse);
+
+				} catch (e) {
+//					resp = {
+//					statusSuccess: false,
+//					data: 'Unknown error occurred: [' + xhrResponseText + ']'
+//					};
+
+					var errorMessage = "File Uploaded but failed to get information from server response.";
+
+					objectThis.failedFileUpload( 
+							{ isProxlXMLFile : isProxlXMLFile,
+								errorMessage :  errorMessage,
+								filename : filename,
+								$containingBlock : $containingBlock } );
+				}
+
+
+				if ( resp !== null ) {
+
+					if ( resp.statusSuccess ) {
+
+						objectThis.successfulFileUpload( 
+								{
+									isProxlXMLFile : isProxlXMLFile,
+									fileUploadResponse : resp,
+									proxlXMLFileImportFileData : proxlXMLFileImportFileData,
+									$containingBlock : $containingBlock } );
+
+					} else {
+
+						var errorMessage = "File NOT Uploaded, service returned failed status";
+
+						objectThis.failedFileUpload( 
+								{ isProxlXMLFile : isProxlXMLFile,
+									errorMessage :  errorMessage,
+									filename : filename,
+									$containingBlock : $containingBlock } );
+					}
+				}
+
+
+			} else if (xhrStatus === 400) {
+
+				var resp = null;
+
+				try {
+					resp = JSON.parse(xhrResponse);
+
+
+				} catch (e) {
+
+					var errorMessage = 'Unknown error occurred: [' + xhrResponseText + ']';
+
+					objectThis.failedFileUpload( 
+							{ isProxlXMLFile : isProxlXMLFile,
+								errorMessage :  errorMessage,
+								filename : filename,
+								$containingBlock : $containingBlock } );
+				}
+
+				if ( resp !== null ) {
+
+					if ( resp.fileSizeLimitExceeded ) {
+
+						var errorMessage = "File NOT Uploaded, file too large.  Max file size in bytes: " + resp.maxSizeFormatted;
+
+						objectThis.failedFileUpload( 
+								{ isProxlXMLFile : isProxlXMLFile,
+									errorMessage :  errorMessage,
+									filename : filename,
+									$containingBlock : $containingBlock } );
+
+					} else if ( resp.ProjectLocked ) {
+
+						var errorMessage = "The project is locked so no imports are allowed.  Please reload the web page.";
+
+						objectThis.failedFileUpload( 
+								{ isProxlXMLFile : isProxlXMLFile,
+									errorMessage :  errorMessage,
+									filename : filename,
+									$containingBlock : $containingBlock } );
+
+					} else if ( resp.filenameInFormNotMatchFilenameInQueryString ) {
+
+						var errorMessage = "System Error";
+
+						objectThis.failedFileUpload( 
+								{ isProxlXMLFile : isProxlXMLFile,
+									errorMessage :  errorMessage,
+									filename : filename,
+									$containingBlock : $containingBlock } );
+
+					} else if ( resp.noUploadedFile ) {
+
+						var errorMessage = "System Error";
+
+						objectThis.failedFileUpload( 
+								{ isProxlXMLFile : isProxlXMLFile,
+									errorMessage :  errorMessage,
+									filename : filename,
+									$containingBlock : $containingBlock } );
+
+					} else if ( resp.proxlXMLFileFailsInitialParse ) {
+
+						var errorMessage = "The server failed to parse the Proxl XML file.  Please confirm that it is a valid Proxl XML file.";
+
+						objectThis.failedFileUpload( 
+								{ isProxlXMLFile : isProxlXMLFile,
+									errorMessage :  errorMessage,
+									filename : filename,
+									$containingBlock : $containingBlock } );
+
+					} else if ( resp.proxlXMLFilerootXMLNodeIncorrect ) {
+
+						var errorMessage = "The server failed to parse the Proxl XML file.  Please confirm that it is a valid Proxl XML file.";
+
+						objectThis.failedFileUpload( 
+								{ isProxlXMLFile : isProxlXMLFile,
+									errorMessage :  errorMessage,
+									filename : filename,
+									$containingBlock : $containingBlock } );
+
+
+					} else if ( resp.submittedScanFileNotAllowed ) {
+
+						var errorMessage = "Scan files are no longer allowed.  Please refresh the page.";
+
+						objectThis.failedFileUpload( 
+								{ isProxlXMLFile : isProxlXMLFile,
+									errorMessage :  errorMessage,
+									filename : filename,
+									$containingBlock : $containingBlock } );
+
+					} else {
+
+						var errorMessage = "File NOT Uploaded, input data error, status 400";
+
+						objectThis.failedFileUpload( 
+								{ isProxlXMLFile : isProxlXMLFile,
+									errorMessage :  errorMessage,
+									filename : filename,
+									$containingBlock : $containingBlock } );
+
+					}
+				}
+
+				objectThis.progressBarClear( { $containingBlock : $containingBlock } );
+
+
+			} else if (xhrStatus === 401 || xhrStatus === 403) {
+
+				//  No Session or not Authorized
+
+				var handledResponse = handleRawAJAXError( currentXHRinOnLoad );
+
+				if ( handledResponse ) {
+
+					return;
+				}
+
+				objectThis.progressBarClear( { $containingBlock : $containingBlock } );
+
+				if (xhrStatus === 401 ) {
+
+					var errorMessage = "File NOT Uploaded, server error, status 401";
+
+					objectThis.failedFileUpload( 
+							{ isProxlXMLFile : isProxlXMLFile,
+								errorMessage :  errorMessage,
+								filename : filename,
+								$containingBlock : $containingBlock } );
+
+				} else {
+
+					var errorMessage = "File NOT Uploaded, server error, status 403";
+
+					objectThis.failedFileUpload( 
+							{ isProxlXMLFile : isProxlXMLFile,
+								errorMessage :  errorMessage,
+								filename : filename,
+								$containingBlock : $containingBlock } );
+				}
+
+
+
+			} else if (xhrStatus === 500) {
+
+
+//				var resp = null;
+
+//				try {
+//				resp = JSON.parse(xhrResponse);
+//				} catch (e){
 //				resp = {
-//						statusSuccess: false,
-//						data: 'Unknown error occurred: [' + xhrResponseText + ']'
+//				statusSuccess: false,
+//				data: 'Unknown error occurred: [' + xhrResponseText + ']'
 //				};
-
-				var errorMessage = "File Uploaded but failed to get information from server response.";
-
-				objectThis.failedFileUpload( 
-						{ isProxlXMLFile : isProxlXMLFile,
-							errorMessage :  errorMessage,
-							filename : filename,
-							$containingBlock : $containingBlock } );
-			}
-				
-
-			if ( resp !== null ) {
-				
-				if ( resp.statusSuccess ) {
-					
-					objectThis.successfulFileUpload( 
-							{
-								isProxlXMLFile : isProxlXMLFile,
-								fileUploadResponse : resp,
-								proxlXMLFileImportFileData : proxlXMLFileImportFileData,
-								$containingBlock : $containingBlock } );
-					
-				} else {
-
-					var errorMessage = "File NOT Uploaded, service returned failed status";
-
-					objectThis.failedFileUpload( 
-							{ isProxlXMLFile : isProxlXMLFile,
-								errorMessage :  errorMessage,
-								filename : filename,
-								$containingBlock : $containingBlock } );
-				}
-			}
-
-
-		} else if (xhrStatus === 400) {
-
-			var resp = null;
-
-			try {
-				resp = JSON.parse(xhrResponse);
-
-
-			} catch (e) {
-
-				var errorMessage = 'Unknown error occurred: [' + xhrResponseText + ']';
+//				}
+				var errorMessage = "File NOT Uploaded, server error, status 500";
 
 				objectThis.failedFileUpload( 
 						{ isProxlXMLFile : isProxlXMLFile,
 							errorMessage :  errorMessage,
 							filename : filename,
 							$containingBlock : $containingBlock } );
-			}
-			
-			if ( resp !== null ) {
 
-				if ( resp.fileSizeLimitExceeded ) {
-					
-					var errorMessage = "File NOT Uploaded, file too large.  Max file size in bytes: " + resp.maxSizeFormatted;
-
-					objectThis.failedFileUpload( 
-							{ isProxlXMLFile : isProxlXMLFile,
-								errorMessage :  errorMessage,
-								filename : filename,
-								$containingBlock : $containingBlock } );
-
-				} else if ( resp.ProjectLocked ) {
-					
-					var errorMessage = "The project is locked so no imports are allowed.  Please reload the web page.";
-
-					objectThis.failedFileUpload( 
-							{ isProxlXMLFile : isProxlXMLFile,
-								errorMessage :  errorMessage,
-								filename : filename,
-								$containingBlock : $containingBlock } );
-					
-				} else if ( resp.filenameInFormNotMatchFilenameInQueryString ) {
-
-					var errorMessage = "System Error";
-
-					objectThis.failedFileUpload( 
-							{ isProxlXMLFile : isProxlXMLFile,
-								errorMessage :  errorMessage,
-								filename : filename,
-								$containingBlock : $containingBlock } );
-					
-				} else if ( resp.noUploadedFile ) {
-
-					var errorMessage = "System Error";
-
-					objectThis.failedFileUpload( 
-							{ isProxlXMLFile : isProxlXMLFile,
-								errorMessage :  errorMessage,
-								filename : filename,
-								$containingBlock : $containingBlock } );
-					
-				} else if ( resp.proxlXMLFileFailsInitialParse ) {
-
-					var errorMessage = "The server failed to parse the Proxl XML file.  Please confirm that it is a valid Proxl XML file.";
-
-					objectThis.failedFileUpload( 
-							{ isProxlXMLFile : isProxlXMLFile,
-								errorMessage :  errorMessage,
-								filename : filename,
-								$containingBlock : $containingBlock } );
-					
-				} else if ( resp.proxlXMLFilerootXMLNodeIncorrect ) {
-
-					var errorMessage = "The server failed to parse the Proxl XML file.  Please confirm that it is a valid Proxl XML file.";
-
-					objectThis.failedFileUpload( 
-							{ isProxlXMLFile : isProxlXMLFile,
-								errorMessage :  errorMessage,
-								filename : filename,
-								$containingBlock : $containingBlock } );
-					
-
-				} else if ( resp.submittedScanFileNotAllowed ) {
-
-					var errorMessage = "Scan files are no longer allowed.  Please refresh the page.";
-
-					objectThis.failedFileUpload( 
-							{ isProxlXMLFile : isProxlXMLFile,
-								errorMessage :  errorMessage,
-								filename : filename,
-								$containingBlock : $containingBlock } );
-					
-				} else {
-
-					var errorMessage = "File NOT Uploaded, input data error, status 400";
-
-					objectThis.failedFileUpload( 
-							{ isProxlXMLFile : isProxlXMLFile,
-								errorMessage :  errorMessage,
-								filename : filename,
-								$containingBlock : $containingBlock } );
-
-				}
-			}
-
-			objectThis.progressBarClear( { $containingBlock : $containingBlock } );
+			} else if (xhrStatus === 404) {
 
 
-		} else if (xhrStatus === 401 || xhrStatus === 403) {
+//				var resp = null;
 
-			//  No Session or not Authorized
+//				try {
+//				resp = JSON.parse(xhrResponse);
+//				} catch (e){
+//				resp = {
+//				statusSuccess: false,
+//				data: 'Unknown error occurred: [' + xhrResponseText + ']'
+//				};
+//				}
 
-			var handledResponse = handleRawAJAXError( currentXHRinOnLoad );
-			
-			if ( handledResponse ) {
-				
-				return;
-			}
-
-			objectThis.progressBarClear( { $containingBlock : $containingBlock } );
-
-			if (xhrStatus === 401 ) {
-
-				var errorMessage = "File NOT Uploaded, server error, status 401";
+				var errorMessage = "File NOT Uploaded, Service not found on server. status 404";
 
 				objectThis.failedFileUpload( 
 						{ isProxlXMLFile : isProxlXMLFile,
@@ -1523,76 +1688,27 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 							$containingBlock : $containingBlock } );
 
 			} else {
-				
-				var errorMessage = "File NOT Uploaded, server error, status 403";
+
+				var errorMessage = "File upload failed. xhrStatus: " + xhrStatus;
 
 				objectThis.failedFileUpload( 
 						{ isProxlXMLFile : isProxlXMLFile,
 							errorMessage :  errorMessage,
 							filename : filename,
 							$containingBlock : $containingBlock } );
+
 			}
-
 			
-
-		} else if (xhrStatus === 500) {
-
-
-//			var resp = null;
-//
-//			try {
-//				resp = JSON.parse(xhrResponse);
-//			} catch (e){
-//				resp = {
-//						statusSuccess: false,
-//						data: 'Unknown error occurred: [' + xhrResponseText + ']'
-//				};
-//			}
-			var errorMessage = "File NOT Uploaded, server error, status 500";
-
-			objectThis.failedFileUpload( 
-					{ isProxlXMLFile : isProxlXMLFile,
-						errorMessage :  errorMessage,
-						filename : filename,
-						$containingBlock : $containingBlock } );
-
-		} else if (xhrStatus === 404) {
-
-
-//			var resp = null;
-//
-//			try {
-//				resp = JSON.parse(xhrResponse);
-//			} catch (e){
-//				resp = {
-//						statusSuccess: false,
-//						data: 'Unknown error occurred: [' + xhrResponseText + ']'
-//				};
-//			}
-			
-			var errorMessage = "File NOT Uploaded, Service not found on server. status 404";
-
-			objectThis.failedFileUpload( 
-					{ isProxlXMLFile : isProxlXMLFile,
-						errorMessage :  errorMessage,
-						filename : filename,
-						$containingBlock : $containingBlock } );
-
-		} else {
-			
-			var errorMessage = "File upload failed. xhrStatus: " + xhrStatus;
-
-			objectThis.failedFileUpload( 
-					{ isProxlXMLFile : isProxlXMLFile,
-						errorMessage :  errorMessage,
-						filename : filename,
-						$containingBlock : $containingBlock } );
-
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
 		}
 	};
 
+	 
 	xmlHttpRequest.upload.addEventListener('error', function(event){
 
+		try {
 		
 		proxlXMLFileImportFileData.setXMLHttpRequest( undefined ); ///  clear reference to XMLHttpRequest
 
@@ -1605,6 +1721,10 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 					errorMessage :  errorMessage,
 					filename : filename,
 					$containingBlock : $containingBlock } );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 		
 	}, false);
 
@@ -1625,10 +1745,15 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 
 	xmlHttpRequest.upload.addEventListener('progress', function(event){
 
-		var progressPercent = Math.ceil( ( event.loaded / event.total) * 100 );
+		try {
 
-		objectThis.progressBarUpdate( { progressPercent : progressPercent, $containingBlock : params.$containingBlock }  );
+			var progressPercent = Math.ceil( ( event.loaded / event.total) * 100 );
 
+			objectThis.progressBarUpdate( { progressPercent : progressPercent, $containingBlock : params.$containingBlock }  );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	}, false);
 
 	//  parameters added to the query string are available when the request is first received at the server.
@@ -1774,7 +1899,7 @@ ProxlXMLFileImport.prototype.submitClicked  = function( clickThis, eventObject )
 	
 	if ( ! uploadKey ) {
 		
-		throw "uploadKey must be set";
+		throw Error( "uploadKey must be set" );
 	}
 	
 	
@@ -1805,7 +1930,7 @@ ProxlXMLFileImport.prototype.submitClicked  = function( clickThis, eventObject )
 			if ( isProxlXMLFile ) {
 				if ( foundProxlXMLFile ) {
 					
-					throw "Found more than one Proxl XML file in submit: second filename: " + filename;
+					throw Error( "Found more than one Proxl XML file in submit: second filename: " + filename );
 				}
 				foundProxlXMLFile = true;
 			}
@@ -1825,7 +1950,7 @@ ProxlXMLFileImport.prototype.submitClicked  = function( clickThis, eventObject )
 	
 	if ( ! foundProxlXMLFile ) {
 		
-		throw "No Proxl XML file in submit";
+		throw Error( "No Proxl XML file in submit" );
 	}
 	
 
@@ -1850,8 +1975,13 @@ ProxlXMLFileImport.prototype.submitClicked  = function( clickThis, eventObject )
 		contentType: "application/json; charset=utf-8",
 		dataType : "json",  //  data type returned
 		success : function(data) {
-
-			objectThis.submitClickedProcessServerResponse( { requestObj : requestObj, responseData : data } );
+			
+			try {
+				objectThis.submitClickedProcessServerResponse( { requestObj : requestObj, responseData : data } );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -1908,7 +2038,7 @@ ProxlXMLFileImport.prototype.submitClickedProcessServerResponse  = function( par
 		
 		return;
 		
-		throw "statusSuccess is false";  ///  TODO  Need to display error
+		throw Error( "statusSuccess is false" );  ///  TODO  Need to display error
 	}
 	
 	this.uploadKey = undefined;

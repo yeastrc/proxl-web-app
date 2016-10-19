@@ -72,29 +72,38 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 	
 	//////////
 	
+	//   Called by HTML Element onclick 
+	
 	this.showHidePsms = function( params ) {
 		
-		var clickedElement = params.clickedElement;
-		
-		var $clickedElement = $( clickedElement );
-		
-		var $itemToToggle = $clickedElement.next();
+		try {
+
+			var clickedElement = params.clickedElement;
+
+			var $clickedElement = $( clickedElement );
+
+			var $itemToToggle = $clickedElement.next();
 
 
 
-		if( $itemToToggle.is(":visible" ) ) {
+			if( $itemToToggle.is(":visible" ) ) {
 
-			$itemToToggle.hide(); 
+				$itemToToggle.hide(); 
 
-			$clickedElement.find(".toggle_visibility_expansion_span_jq").show();
-			$clickedElement.find(".toggle_visibility_contraction_span_jq").hide();
-		} else { 
-			$itemToToggle.show();
+				$clickedElement.find(".toggle_visibility_expansion_span_jq").show();
+				$clickedElement.find(".toggle_visibility_contraction_span_jq").hide();
+			} else { 
+				$itemToToggle.show();
 
-			$clickedElement.find(".toggle_visibility_expansion_span_jq").hide();
-			$clickedElement.find(".toggle_visibility_contraction_span_jq").show();
+				$clickedElement.find(".toggle_visibility_expansion_span_jq").hide();
+				$clickedElement.find(".toggle_visibility_contraction_span_jq").show();
 
-			this.loadAndInsertPsmsIfNeeded( { $topTRelement : $itemToToggle, $clickedElement : $clickedElement } );
+				this.loadAndInsertPsmsIfNeeded( { $topTRelement : $itemToToggle, $clickedElement : $clickedElement } );
+			}
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
 		}
 
 		return false;  // does not stop bubbling of click event
@@ -170,7 +179,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			
 			psmPeptideCutoffsForSearchId = {};
 			
-//			throw "Getting data.  Unable to get cutoff data for search id: " + search_id;
+//			throw Error( "Getting data.  Unable to get cutoff data for search id: " + search_id );
 		}
 
 		var psmPeptideCutoffsForSearchId_JSONString = JSON.stringify( psmPeptideCutoffsForSearchId );
@@ -197,17 +206,24 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 
 			success : function( ajaxResponseData ) {
 
-				objectThis.loadAndInsertPsmsResponse( 
-						{ ajaxResponseData : ajaxResponseData, 
-							$topTRelement : $topTRelement, 
-							ajaxRequestData : ajaxRequestData,
-							otherData : 
+				try {
+
+					objectThis.loadAndInsertPsmsResponse( 
+							{ ajaxResponseData : ajaxResponseData, 
+								$topTRelement : $topTRelement, 
+								ajaxRequestData : ajaxRequestData,
+								otherData : 
 								{ show_associated_peptides_link_true : show_associated_peptides_link_true,
 									initial_scan_id : initial_scan_id }
-						} );
-				
+							} );
 
-				$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+
+					$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
 				
 			},
 	        failure: function(errMsg) {
@@ -258,7 +274,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		
 		if ( $psm_data_container.length === 0 ) {
 			
-			throw "unable to find HTML element with class 'child_data_container_jq'";
+			throw Error( "unable to find HTML element with class 'child_data_container_jq'" );
 		}
 
 		$psm_data_container.empty();
@@ -268,10 +284,10 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			var handlebarsSource_psm_block_template = $( "#psm_block_template" ).html();
 
 			if ( handlebarsSource_psm_block_template === undefined ) {
-				throw "handlebarsSource_psm_block_template === undefined";
+				throw Error( "handlebarsSource_psm_block_template === undefined" );
 			}
 			if ( handlebarsSource_psm_block_template === null ) {
-				throw "handlebarsSource_psm_block_template === null";
+				throw Error( "handlebarsSource_psm_block_template === null" );
 			}
 			
 			_handlebarsTemplate_psm_block_template = Handlebars.compile( handlebarsSource_psm_block_template );
@@ -282,10 +298,10 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			var handlebarsSource_psm_data_row_entry_template = $( "#psm_data_row_entry_template" ).html();
 
 			if ( handlebarsSource_psm_data_row_entry_template === undefined ) {
-				throw "handlebarsSource_psm_data_row_entry_template === undefined";
+				throw Error( "handlebarsSource_psm_data_row_entry_template === undefined" );
 			}
 			if ( handlebarsSource_psm_data_row_entry_template === null ) {
-				throw "handlebarsSource_psm_data_row_entry_template === null";
+				throw Error( "handlebarsSource_psm_data_row_entry_template === null" );
 			}
 			
 			_handlebarsTemplate_psm_data_row_entry_template = Handlebars.compile( handlebarsSource_psm_data_row_entry_template );
@@ -364,7 +380,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		
 		if ( $psm_table_jq.length === 0 ) {
 			
-			throw "unable to find HTML element with class 'psm_table_jq'";
+			throw Error( "unable to find HTML element with class 'psm_table_jq'" );
 		}
 		
 	

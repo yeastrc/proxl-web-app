@@ -41,32 +41,56 @@ ProteinBarRegionSelectionsOverlayCode.prototype.init = function( ) {
 
 	$("#view_protein_bar_highlighting_overlay_X_for_exit_overlay").click( function( eventObject ) {
 
-		objectThis.closeOverlay();
+		try {
+			objectThis.closeOverlay();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 	
 
 	$("#view_protein_bar_highlighting_overlay_protein_bars_cancel_button").click( function( eventObject ) {
-
-		objectThis.closeOverlay();
+		try {
+			objectThis.closeOverlay();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 	
 
 	$("#view_protein_bar_highlighting_overlay_protein_bars_reset_button").click( function( eventObject ) {
 
-		objectThis._populate();
+		try {
+			objectThis._populate();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 	
 
 	$("#view_protein_bar_highlighting_overlay_protein_bars_clear_all_button").click( function( eventObject ) {
 
-		objectThis._populate( { clearAll : true } );
+		try {
+			objectThis._populate( { clearAll : true } );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 	
 	
 
 	$("#view_protein_bar_highlighting_overlay_protein_bars_save_button").click( function( eventObject ) {
 
-		objectThis.save();
+		try {	
+			objectThis.save();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 
 	
@@ -75,10 +99,10 @@ ProteinBarRegionSelectionsOverlayCode.prototype.init = function( ) {
 	var singleBarTemplate_handlebarsSource = $( "#view_protein_bar_highlighting_overlay_single_bar_template" ).text();
 
 	if ( singleBarTemplate_handlebarsSource === undefined ) {
-		throw "singleBarTemplate_handlebarsSource === undefined";
+		throw Error( "singleBarTemplate_handlebarsSource === undefined" );
 	}
 	if ( singleBarTemplate_handlebarsSource === null ) {
-		throw "singleBarTemplate_handlebarsSource === null";
+		throw Error( "singleBarTemplate_handlebarsSource === null" );
 	}
 
 	this._singleBarTemplate_HandlebarsTemplate = Handlebars.compile( singleBarTemplate_handlebarsSource );
@@ -88,10 +112,10 @@ ProteinBarRegionSelectionsOverlayCode.prototype.init = function( ) {
 	var singleBarRegionTemplate_handlebarsSource = $( "#view_protein_bar_highlighting_overlay_bar_region_template" ).text();
 
 	if ( singleBarRegionTemplate_handlebarsSource === undefined ) {
-		throw "singleBarRegionTemplate_handlebarsSource === undefined";
+		throw Error( "singleBarRegionTemplate_handlebarsSource === undefined" );
 	}
 	if ( singleBarRegionTemplate_handlebarsSource === null ) {
-		throw "singleBarRegionTemplate_handlebarsSource === null";
+		throw Error( "singleBarRegionTemplate_handlebarsSource === null" );
 	}
 	
 	this._singleBarRegionTemplate_HandlebarsTemplate = Handlebars.compile( singleBarRegionTemplate_handlebarsSource );
@@ -198,7 +222,12 @@ ProteinBarRegionSelectionsOverlayCode.prototype._populate = function( params ) {
 		
 		$add_region_jq.click( function( eventObject ) {
 
-			objectThis.addRegion( { clickedThis : this } );
+			try {
+				objectThis.addRegion( { clickedThis : this } );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		} );
 		
 		
@@ -210,7 +239,12 @@ ProteinBarRegionSelectionsOverlayCode.prototype._populate = function( params ) {
 
 		$whole_protein_bar_selected_checkbox_jq.click( function( eventObject ) {
 
-			objectThis.clickSelectWholeProteinBarProcessor( { clickedThis : this } );
+			try {
+				objectThis.clickSelectWholeProteinBarProcessor( { clickedThis : this } );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		} );
 
 		if ( ( noProteinBarsSelected || clearAll ) || ( ( imageProteinBarDataItem.isAllOfProteinBarHighlighted() ) ) ) {
@@ -259,11 +293,16 @@ ProteinBarRegionSelectionsOverlayCode.prototype._appendProteinBarHighlightedOver
 
 	$view_protein_bar_highlighting_region_remove_button_jq.click( function( eventObject ) {
 
-		var $clickedThis = $( this );
+		try {
+			var $clickedThis = $( this );
 
-		var $bar_region_jq = $clickedThis.closest(".bar_region_jq");
+			var $bar_region_jq = $clickedThis.closest(".bar_region_jq");
 
-		$bar_region_jq.remove();
+			$bar_region_jq.remove();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 
 };
@@ -279,10 +318,10 @@ ProteinBarRegionSelectionsOverlayCode.prototype.addRegion = function( params ) {
 	var singleBarRegionTemplate_handlebarsSource = $( "#view_protein_bar_highlighting_overlay_bar_region_template" ).text();
 
 	if ( singleBarRegionTemplate_handlebarsSource === undefined ) {
-		throw "singleBarRegionTemplate_handlebarsSource === undefined";
+		throw Error( "singleBarRegionTemplate_handlebarsSource === undefined" );
 	}
 	if ( singleBarRegionTemplate_handlebarsSource === null ) {
-		throw "singleBarRegionTemplate_handlebarsSource === null";
+		throw Error( "singleBarRegionTemplate_handlebarsSource === null" );
 	}
 
 	var $regions_block_jq = $clickedThis.closest(".regions_block_jq");
@@ -351,7 +390,7 @@ ProteinBarRegionSelectionsOverlayCode.prototype.save = function( params ) {
 		var uid = $single_protein_bar_block_jq.attr( "data-uid" );
 		
 		if( !uid ) {
-			throw "Got no uid.";
+			throw Error( "Got no uid." );
 		}
 
 		var proteinIdString = $single_protein_bar_block_jq.attr( "data-protein_id");
@@ -364,8 +403,8 @@ ProteinBarRegionSelectionsOverlayCode.prototype.save = function( params ) {
 		
 		if ( proteinIdString !== imageProteinBarDataItem.getProteinId() ) {
 			
-			throw "protein id mismatch.  proteinIdString: '" + proteinIdString + "'.  data item protein id: '" 
-			+ imageProteinBarDataItem.getProteinId() + "'.";
+			throw Error( "protein id mismatch.  proteinIdString: '" + proteinIdString + "'.  data item protein id: '" 
+					+ imageProteinBarDataItem.getProteinId() + "'." );
 		}
 		
 		selectionDataSingleBarUpdate.imageProteinBarDataItem = imageProteinBarDataItem;

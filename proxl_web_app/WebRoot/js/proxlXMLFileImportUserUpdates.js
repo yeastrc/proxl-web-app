@@ -20,7 +20,15 @@ $(document).ready(function() {
 //Constructor
 
 var ProxlXMLFileImportUserUpdates = function() {	
-	this.initialize();
+	
+	try {
+		
+		this.initialize();
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 	
 };
 
@@ -46,94 +54,148 @@ ProxlXMLFileImportUserUpdates.prototype.addClickHandlers  = function(  ) {
 
 	$(".proxl_xml_import_item_cancel_queued_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		objectThis.cancelQueuedItemClicked( { cancelQueued : true, clickThis : clickThis, eventObject : eventObject } );
+			var clickThis = this;
 
-		return false;
+			objectThis.cancelQueuedItemClicked( { cancelQueued : true, clickThis : clickThis, eventObject : eventObject } );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 
 	$(".cancel_queued_item_yes_button_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		objectThis.cancelQueuedItemConfirmedClicked(  { cancelQueued : true, clickThis : clickThis, eventObject : eventObject } );
+			var clickThis = this;
 
-		return false;
+			objectThis.cancelQueuedItemConfirmedClicked(  { cancelQueued : true, clickThis : clickThis, eventObject : eventObject } );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
-	
-	
+
+
 	$(".proxl_xml_import_item_cancel_re_queued_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		objectThis.cancelQueuedItemClicked( { cancelRequeued : true, clickThis : clickThis, eventObject : eventObject } );
+			var clickThis = this;
 
-		return false;
+			objectThis.cancelQueuedItemClicked( { cancelRequeued : true, clickThis : clickThis, eventObject : eventObject } );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 
 	$(".cancel_re_queued_item_yes_button_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		objectThis.cancelQueuedItemConfirmedClicked(  { cancelQueued : true, clickThis : clickThis, eventObject : eventObject } );
+			var clickThis = this;
 
-		return false;
+			objectThis.cancelQueuedItemConfirmedClicked(  { cancelQueued : true, clickThis : clickThis, eventObject : eventObject } );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
-	
+
 
 
 
 	$(".proxl_xml_import_item_remove_failed_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		objectThis.removeFailedItemClicked( clickThis, eventObject );
+			var clickThis = this;
 
-		return false;
+			objectThis.removeFailedItemClicked( clickThis, eventObject );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 
 	$(".remove_failed_item_yes_button_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		objectThis.removeFailedItemConfirmedClicked( clickThis, eventObject );
+			var clickThis = this;
 
-		return false;
+			objectThis.removeFailedItemConfirmedClicked( clickThis, eventObject );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 
 	$(".proxl_xml_import_item_remove_completed_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		objectThis.removeCompletedItemClicked( clickThis, eventObject );
+			var clickThis = this;
 
-		return false;
+			objectThis.removeCompletedItemClicked( clickThis, eventObject );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$(".remove_completed_item_yes_button_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		objectThis.removeCompletedItemConfirmedClicked( clickThis, eventObject );
+			var clickThis = this;
 
-		return false;
+			objectThis.removeCompletedItemConfirmedClicked( clickThis, eventObject );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
-	
+
 	$(".import_proxl_xml_file_confirm_remove_upload_overlay_cancel_parts_jq").click(function(eventObject) {
 
-//		var clickThis = this;
+		try {
 
-		$(".import_proxl_xml_file_confirm_remove_upload_overlay_show_hide_parts_jq").hide();
+//			var clickThis = this;
 
-		return false;
+			$(".import_proxl_xml_file_confirm_remove_upload_overlay_show_hide_parts_jq").hide();
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 };
@@ -235,13 +297,20 @@ ProxlXMLFileImportUserUpdates.prototype.cancelQueuedItemConfirmedClicked  = func
 		dataType: "json",
 		success: function( responseData )	{
 
-			var responseParams = {
-					responseData : responseData,
-					clickThis : clickThis,
-					tracking_id : tracking_id
-			};
+			try {
 
-			objectThis.cancelQueuedItemClickedProcessAjaxResponse( responseParams );
+				var responseParams = {
+						responseData : responseData,
+						clickThis : clickThis,
+						tracking_id : tracking_id
+				};
+
+				objectThis.cancelQueuedItemClickedProcessAjaxResponse( responseParams );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -348,13 +417,20 @@ ProxlXMLFileImportUserUpdates.prototype.removeFailedItemConfirmedClicked  = func
 		dataType: "json",
 		success: function( responseData )	{
 
-			var responseParams = {
-					responseData : responseData,
-					clickThis : clickThis,
-					tracking_id : tracking_id
-			};
+			try {
 
-			objectThis.removeFailedItemClickedProcessAjaxResponse( responseParams );
+				var responseParams = {
+						responseData : responseData,
+						clickThis : clickThis,
+						tracking_id : tracking_id
+				};
+
+				objectThis.removeFailedItemClickedProcessAjaxResponse( responseParams );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -457,13 +533,19 @@ ProxlXMLFileImportUserUpdates.prototype.removeCompletedItemConfirmedClicked  = f
 		dataType: "json",
 		success: function( responseData )	{
 
-			var responseParams = {
-					responseData : responseData,
-					clickThis : clickThis,
-					tracking_id : tracking_id
-			};
+			try {
 
-			objectThis.removeFailedItemClickedProcessAjaxResponse( responseParams );
+				var responseParams = {
+						responseData : responseData,
+						clickThis : clickThis,
+						tracking_id : tracking_id
+				};
+
+				objectThis.removeFailedItemClickedProcessAjaxResponse( responseParams );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );

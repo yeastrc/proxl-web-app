@@ -130,92 +130,133 @@ QCChartPSMCountVsScores.prototype.init = function() {
 	
 
 	$(".qc_plot_psm_count_vs_score_link_jq").click(function(eventObject) {
+		try {
+			var clickThis = this;
 
-		var clickThis = this;
+			objectThis.psmCountVsScoreQCPlotClickHandler( clickThis, eventObject );
 
-		objectThis.psmCountVsScoreQCPlotClickHandler( clickThis, eventObject );
-		
-		return false;
-	});	 	
-	
-	$(".psm_count_vs_score_qc_plot_overlay_close_parts_jq").click(function(eventObject) {
-
-		var clickThis = this;
-		
-		if ( objectThis.reloadPSMCountVsScoreChartTimerId ) {
-			
-			clearTimeout( objectThis.reloadPSMCountVsScoreChartTimerId );
-			
-			objectThis.reloadPSMCountVsScoreChartTimerId = null;
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
 		}
+	});	 	
 
-		objectThis.closePSMCountVsScoreQCPlotOverlay( clickThis, eventObject );
-		
-		return false;
+	$(".psm_count_vs_score_qc_plot_overlay_close_parts_jq").click(function(eventObject) {
+		try {
+
+			var clickThis = this;
+
+			if ( objectThis.reloadPSMCountVsScoreChartTimerId ) {
+
+				clearTimeout( objectThis.reloadPSMCountVsScoreChartTimerId );
+
+				objectThis.reloadPSMCountVsScoreChartTimerId = null;
+			}
+
+			objectThis.closePSMCountVsScoreQCPlotOverlay( clickThis, eventObject );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$("#psm_count_vs_score_qc_plot_score_type_id").change(function(eventObject) {
-		
-		objectThis.scoreTypeChanged( );
-		
-		return false;
+		try {
+
+			objectThis.scoreTypeChanged( );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
 
 
-	
+
+
 	$(".psm_count_vs_score_qc_plot_on_change_jq").change(function(eventObject) {
-		
-		objectThis.createChartFromPageParams( );
-		
-		return false;
+		try {
+
+			objectThis.createChartFromPageParams( );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 
 	$(".psm_count_vs_score_qc_plot_on_change_jq").keyup(function(eventObject) {
-		
-		if ( objectThis.reloadPSMCountVsScoreChartTimerId ) {
-			
-			clearTimeout( objectThis.reloadPSMCountVsScoreChartTimerId );
-			
-			objectThis.reloadPSMCountVsScoreChartTimerId = null;
-		}
+		try {
 
-		
-		objectThis.reloadPSMCountVsScoreChartTimerId = setTimeout( function() {
-				
-			objectThis.createChartFromPageParams( );
-				
-		}, objectThis.RELOAD_PSM_COUNT_VS_SCORE_CHART_TIMER_DELAY );
-		
-		return false;
-	});
-	
+			if ( objectThis.reloadPSMCountVsScoreChartTimerId ) {
+
+				clearTimeout( objectThis.reloadPSMCountVsScoreChartTimerId );
+
+				objectThis.reloadPSMCountVsScoreChartTimerId = null;
+			}
+
+
+			objectThis.reloadPSMCountVsScoreChartTimerId = setTimeout( function() {
+				try {
+
+					objectThis.createChartFromPageParams( );
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+
+				}, objectThis.RELOAD_PSM_COUNT_VS_SCORE_CHART_TIMER_DELAY );
+
+			return false;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
 
 	$("#psm_count_vs_score_qc_plot_max_reset_button").click(function(eventObject) {
 
-		
-		objectThis.resetMaxXMaxY();
+		try {
 
-		objectThis.createChartFromPageParams( );
-		
-		return false;
-	});
-	
-		
+			objectThis.resetMaxXMaxY();
+
+			objectThis.createChartFromPageParams( );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+		});
+
+
 	$( "#psm_count_vs_score_qc_plot_download_svg" ).click( function() {
-		var d = new Date().toISOString().slice(0, 19).replace(/-/g, "");
-		var $svg_image_inner_container_div__svg_merged_image_svg_jq = $( "#psm_count_vs_score_qc_plot_chartDiv svg " );
-		var svgContents = $svg_image_inner_container_div__svg_merged_image_svg_jq.html();
-		var fullSVG_String = "<svg id=\"svg\">" + svgContents +"</svg>";
-		var svgBase64Ecoded = Base64.encode( fullSVG_String );
-		var hrefString = "data:application/svg+xml;base64," + svgBase64Ecoded;
-		var downloadFilename = "psm_count_vs_scores_" + d + ".svg";
-		$(this).attr("href", hrefString ).attr("download", downloadFilename );
+
+		try {
+
+			var d = new Date().toISOString().slice(0, 19).replace(/-/g, "");
+			var $svg_image_inner_container_div__svg_merged_image_svg_jq = $( "#psm_count_vs_score_qc_plot_chartDiv svg " );
+			var svgContents = $svg_image_inner_container_div__svg_merged_image_svg_jq.html();
+			var fullSVG_String = "<svg id=\"svg\">" + svgContents +"</svg>";
+			var svgBase64Ecoded = Base64.encode( fullSVG_String );
+			var hrefString = "data:application/svg+xml;base64," + svgBase64Ecoded;
+			var downloadFilename = "psm_count_vs_scores_" + d + ".svg";
+			$(this).attr("href", hrefString ).attr("download", downloadFilename );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
-};
+
+
+	};
 
 
 

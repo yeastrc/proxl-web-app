@@ -33,41 +33,47 @@ var vennDiagramColors = [
 
 function createMergedSearchesLinkCountsVennDiagram( searchesLinkCountsVennDiagramDataLocal ) {
 	
-	
-	if ( typeof Modernizr === 'undefined' || ! Modernizr.svg ) {
-			
-		console.log( "SVG not supported." );
+	try {
+
+		if ( typeof Modernizr === 'undefined' || ! Modernizr.svg ) {
+
+			console.log( "SVG not supported." );
+
+			return;
+		}
+
+
+
+		var width = 300;
+		var height = 150;
+
+
+
+		var getVennData = function() {
+
+
+			var sets = searchesLinkCountsVennDiagramDataLocal.sets;
+
+			var areas = searchesLinkCountsVennDiagramDataLocal.areas;
+
+			return venn.venn(sets, areas);
+		};
+
+		var parameters = { 
+
+				colorsFcn : function( index ) {
+
+					return vennDiagramColors[ index ];
+				} 
+		};
+
+		var diagram = venn.drawD3Diagram( d3.select("#searches_intersection_venn_diagram"), getVennData(), width, height, parameters );
+
 		
-		return;
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
 	}
-
-				
-			
-	var width = 300;
-	var height = 150;
-	
-
-
-	var getVennData = function() {
-		
-		
-	    var sets = searchesLinkCountsVennDiagramDataLocal.sets;
-	    
-	    var areas = searchesLinkCountsVennDiagramDataLocal.areas;
-
-	    return venn.venn(sets, areas);
-	};
-	
-	var parameters = { 
-	
-			colorsFcn : function( index ) {
-		
-				return vennDiagramColors[ index ];
-			} 
-	};
-	
-	var diagram = venn.drawD3Diagram( d3.select("#searches_intersection_venn_diagram"), getVennData(), width, height, parameters );
-				
 	
 }		
 		

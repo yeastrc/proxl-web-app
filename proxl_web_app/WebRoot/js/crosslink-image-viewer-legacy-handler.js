@@ -196,7 +196,7 @@ legacyJSONUpdater.prototype.convertProteinBarDataToIndexManager = function( json
 		var item = proteinBarData[ i ];
 		var pid = Number( item[ "protSeqId" ] );
 		if( !pid ) {
-			throw "Got a non number for protSeqId. Got: " + item[ "protSeqId" ];
+			throw Error( "Got a non number for protSeqId. Got: " + item[ "protSeqId" ] );
 		}		
 		
 		var uid = "a" + i;
@@ -244,7 +244,7 @@ legacyJSONUpdater.prototype.proteinBarDataContainsNrSeqIds = function( ob ) {
 	}
 	
 	console.log( item );
-	throw "Got aberrant entry for protein bar data object." ;
+	throw Error( "Got aberrant entry for protein bar data object." );
 	
 };
 
@@ -267,7 +267,7 @@ legacyJSONUpdater.prototype.convertSelectedProteinsJSON = function( params ) {
 	var proteinIdsMapping = params[ "proteinIdsMapping" ];
 	
 	if( !proteinIdsMapping || Object.keys( proteinIdsMapping ).length < 1 ) {
-		throw "Got no protein sequence id mapping.";
+		throw Error( "Got no protein sequence id mapping." );
 	}
 	
 	// use this instead of the keys of the proteinIdsMapping to preserve order

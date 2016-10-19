@@ -93,14 +93,21 @@ var _psmPeptideCutoffsRootObjectStorage = {
 	_psmPeptideCutoffsRootObject : null,
 	
 	setPsmPeptideCutoffsRootObject : function( psmPeptideCutoffsRootObject ) {
-		
-		this._psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
-		
-		viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
-		viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
-		viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
-		
-		viewPsmsLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+
+		try {
+
+			this._psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
+
+			viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+			viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+			viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+
+			viewPsmsLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	},
 
 	getPsmPeptideCutoffsRootObject : function( ) {
@@ -232,7 +239,7 @@ function convertVisibleChainsToProteinSequenceIdsProcessReponse( responseParams 
 			
 			if ( matchingProteinSequenceId === undefined || matchingProteinSequenceId === null ) {
 				
-				throw "Matching protein sequence id not found for nrseq protein id: " + visibleChainNRSEQProteinIdEntry;
+				throw Error( "Matching protein sequence id not found for nrseq protein id: " + visibleChainNRSEQProteinIdEntry );
 			}
 			
 			visibleChainNRSEQProteinIdsArray[ visibleChainNRSEQProteinIdsArrayIndex ] = matchingProteinSequenceId;
@@ -349,8 +356,8 @@ function getJsonFromHash() {
 
 	if ( jsonFromHash === null || jsonFromHash === undefined ) {
 
-		throw "Failed to parse window hash string as JSON and decodeURI and then parse as JSON.  windowHashContentsMinusHashChar: " 
-		+ windowHashContentsMinusHashChar;
+		throw Error( "Failed to parse window hash string as JSON and decodeURI and then parse as JSON.  windowHashContentsMinusHashChar: " 
+		+ windowHashContentsMinusHashChar );
 	}
 
 	//   Transform json on hash to expected object for rest of the code
@@ -391,11 +398,11 @@ function getCutoffDefaultsFromPage() {
 		var cutoffValuesRootLevelCutoffDefaults = JSON.parse( cutoffValuesRootLevelCutoffDefaultsString );
 	} catch( e2 ) {
 		
-		throw "Failed to parse cutoffValuesRootLevelCutoffDefaults string as JSON.  " +
+		throw Error( "Failed to parse cutoffValuesRootLevelCutoffDefaults string as JSON.  " +
 				"Error Message: " + e2.message +
 				".  cutoffValuesRootLevelCutoffDefaultsString: |" +
 				cutoffValuesRootLevelCutoffDefaultsString +
-				"|";
+				"|" );
 	}
 
 	return cutoffValuesRootLevelCutoffDefaults;
@@ -465,7 +472,7 @@ function getValuesFromForm() {
 		
 //		return { output_FieldDataFailedValidation : getCutoffsFromThePageResult_FieldDataFailedValidation };
 		
-		throw "Cutoffs are invalid so stop processing";
+		throw Error( "Cutoffs are invalid so stop processing" );
 	}
 	
 	var outputCutoffs = getCutoffsFromThePageResult.cutoffsBySearchId;
@@ -785,18 +792,25 @@ function loadSequenceCoverageDataForProtein( protein, loadRequest, callout ) {
 			        dataType: "json",
 			        success: function(data)	{
 			        
-			        	decrementSpinner();
+			        	try {
 			        	
-			        	if ( _ranges == undefined ) {
-			        		_coverages = data.coverages;
-			        		_ranges = data.ranges;
-			        	} else {
-			        		_coverages[ protein ] = data[ 'coverages' ][ protein ];
-			        		_ranges[ protein ] = data[ 'ranges' ][ protein ];
+			        		decrementSpinner();
+
+			        		if ( _ranges == undefined ) {
+			        			_coverages = data.coverages;
+			        			_ranges = data.ranges;
+			        		} else {
+			        			_coverages[ protein ] = data[ 'coverages' ][ protein ];
+			        			_ranges[ protein ] = data[ 'ranges' ][ protein ];
+			        		}
+
+			        		if( loadRequest ) { loadRequest.statusMap[ protein ] = 1; }
+			        		if( callout ) { callout(); }
+			        		
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
 			        	}
-			              	
-			        	if( loadRequest ) { loadRequest.statusMap[ protein ] = 1; }
-			        	if( callout ) { callout(); }
 			        },
 			        failure: function(errMsg) {
 						decrementSpinner();
@@ -830,14 +844,21 @@ function loadCrosslinkData( doDraw ) {
 			        url: url,
 			        dataType: "json",
 			        success: function(data)	{
+				        
+			        	try {
 			        
-			        	_proteinLinkPositions = data.proteinLinkPositions;
-			        	decrementSpinner();
-			        	
-			        	if( doDraw ) {
-			        		drawMeshesOnStructure( drawCrosslinks);
+			        		_proteinLinkPositions = data.proteinLinkPositions;
+			        		decrementSpinner();
+
+			        		if( doDraw ) {
+			        			drawMeshesOnStructure( drawCrosslinks);
+			        		}
+			        		
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
 			        	}
-			        	
+ 	
 			        },
 			        failure: function(errMsg) {
 						decrementSpinner();
@@ -865,14 +886,21 @@ function loadCrosslinkPSMCounts( doDraw ) {
 			        url: url,
 			        dataType: "json",
 			        success: function(data)	{
+				        
+			        	try {
 			        
-			        	_linkPSMCounts.crosslink = data.crosslinkPSMCounts;
-			        	decrementSpinner();
-			        	
-			        	if( doDraw ) {
-			        		drawMeshesOnStructure( drawCrosslinks);
+			        		_linkPSMCounts.crosslink = data.crosslinkPSMCounts;
+			        		decrementSpinner();
+
+			        		if( doDraw ) {
+			        			drawMeshesOnStructure( drawCrosslinks);
+			        		}
+			        		
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
 			        	}
-			        	
+ 	
 			        },
 			        failure: function(errMsg) {
 						decrementSpinner();
@@ -902,15 +930,22 @@ function loadLooplinkData( doDraw ) {
 			        url: url,
 			        dataType: "json",
 			        success: function(data)	{
-			        
-			        	// handle protein monolink positions
-			        	_proteinLooplinkPositions = data.proteinLoopLinkPositions;			        	
-			        	decrementSpinner();
-			        	
-			        	if( doDraw ) {
-			        		drawMeshesOnStructure( drawLooplinks);
+				        
+			        	try {
+
+			        		// handle protein monolink positions
+			        		_proteinLooplinkPositions = data.proteinLoopLinkPositions;			        	
+			        		decrementSpinner();
+
+			        		if( doDraw ) {
+			        			drawMeshesOnStructure( drawLooplinks);
+			        		}
+			        		
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
 			        	}
-			        	
+ 	
 			        },
 			        failure: function(errMsg) {
 						decrementSpinner();
@@ -937,14 +972,21 @@ function loadLooplinkPSMCounts( doDraw ) {
 			        url: url,
 			        dataType: "json",
 			        success: function(data)	{
+				        
+			        	try {
 			        
-			        	_linkPSMCounts.looplink = data.looplinkPSMCounts;			        	
-			        	decrementSpinner();
-			        	
-			        	if( doDraw ) {
-			        		drawMeshesOnStructure( drawLooplinks);
+			        		_linkPSMCounts.looplink = data.looplinkPSMCounts;			        	
+			        		decrementSpinner();
+
+			        		if( doDraw ) {
+			        			drawMeshesOnStructure( drawLooplinks);
+			        		}
+			        		
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
 			        	}
-			        	
+ 	
 			        },
 			        failure: function(errMsg) {
 						decrementSpinner();
@@ -974,15 +1016,22 @@ function loadMonolinkData( doDraw ) {
 			        url: url,
 			        dataType: "json",
 			        success: function(data)	{
+				        
+			        	try {
 			        
-			        	// handle protein monolink positions
-			        	_proteinMonolinkPositions = data.proteinMonoLinkPositions;			        	
-			        	decrementSpinner();
-			        	
-			        	if( doDraw ) {
-			        		drawMeshesOnStructure( drawMonolinks);
+			        		// handle protein monolink positions
+			        		_proteinMonolinkPositions = data.proteinMonoLinkPositions;			        	
+			        		decrementSpinner();
+
+			        		if( doDraw ) {
+			        			drawMeshesOnStructure( drawMonolinks);
+			        		}
+			        		
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
 			        	}
-			        	
+ 	
 			        },
 			        failure: function(errMsg) {
 						decrementSpinner();
@@ -1009,14 +1058,21 @@ function loadMonolinkPSMCounts( doDraw ) {
 			        url: url,
 			        dataType: "json",
 			        success: function(data)	{
+				        
+			        	try {
 			        
-			        	_linkPSMCounts.monolink = data.monolinkPSMCounts;			        	
-			        	decrementSpinner();
-			        	
-			        	if( doDraw ) {
-			        		drawMeshesOnStructure( drawMonolinks);
+			        		_linkPSMCounts.monolink = data.monolinkPSMCounts;			        	
+			        		decrementSpinner();
+
+			        		if( doDraw ) {
+			        			drawMeshesOnStructure( drawMonolinks);
+			        		}
+			        		
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
 			        	}
-			        	
+ 	
 			        },
 			        failure: function(errMsg) {
 						decrementSpinner();
@@ -1043,7 +1099,7 @@ function loadProteinSequencesForProteins( proteinIdsToGetSequence, doDrawReport 
 	if ( project_id === undefined || project_id === null 
 			|| project_id === "" ) {
 		
-		throw '$("#project_id").val() returned no value';
+		throw Error( '$("#project_id").val() returned no value' );
 	}
 	
 
@@ -1063,27 +1119,34 @@ function loadProteinSequencesForProteins( proteinIdsToGetSequence, doDrawReport 
 			//   So proteinIdsToGetSequence array is passed as "proteinIdsToGetSequence=<value>" which is what Jersey expects
 
 	        success: function(data)	{
+		        
+	        	try {
 	        
-	        	var returnedProteinIdsAndSequences = data;  //  The property names are the protein ids and the property values are the sequences
-	        	
-	        	// copy the returned sequences into the global object
-	        	
-	    		var returnedProteinIdsAndSequences_Keys = Object.keys( returnedProteinIdsAndSequences );
-	    		
-	    		for ( var keysIndex = 0; keysIndex < returnedProteinIdsAndSequences_Keys.length; keysIndex++ ) {
-	    			
-	    			var proteinId = returnedProteinIdsAndSequences_Keys[ keysIndex ];
-	    			
-	    			_proteinSequences[ proteinId ] = returnedProteinIdsAndSequences[ proteinId ];
-	    		}
-	    		
-	        	
-	        	decrementSpinner();
+	        		var returnedProteinIdsAndSequences = data;  //  The property names are the protein ids and the property values are the sequences
 
-	        	if( doDrawReport ) {
-	        		redrawDistanceReport();
+	        		// copy the returned sequences into the global object
+
+	        		var returnedProteinIdsAndSequences_Keys = Object.keys( returnedProteinIdsAndSequences );
+
+	        		for ( var keysIndex = 0; keysIndex < returnedProteinIdsAndSequences_Keys.length; keysIndex++ ) {
+
+	        			var proteinId = returnedProteinIdsAndSequences_Keys[ keysIndex ];
+
+	        			_proteinSequences[ proteinId ] = returnedProteinIdsAndSequences[ proteinId ];
+	        		}
+
+
+	        		decrementSpinner();
+
+	        		if( doDrawReport ) {
+	        			redrawDistanceReport();
+	        		}
+	        		
+	        	} catch( e ) {
+	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+	        		throw e;
 	        	}
-	        	
+
 	        },
 	        failure: function(errMsg) {
 	        	decrementSpinner();
@@ -1112,51 +1175,58 @@ function loadDataFromService() {
 	        url: url,
 	        dataType: "json",
 	        success: function(data)	{
+		        
+	        	try {
 	        
-	        	// handle searches
-	        	_searches = data.searches;
-	        	
-	        	// handle proteins
-	        	_proteins = data.proteins;
+	        		// handle searches
+	        		_searches = data.searches;
 
-	        	// handle protein names
-	        	_proteinNames = data.proteinNames;
-	        	
-	        	// handle other search parameters
+	        		// handle proteins
+	        		_proteins = data.proteins;
 
-	        	_psmPeptideCutoffsRootObjectStorage.setPsmPeptideCutoffsRootObject( data.cutoffs );
-	        	
-	        	_excludeTaxonomy = data.excludeTaxonomy;
-	        	_excludeType = data.excludeType;
-	        	_filterNonUniquePeptides = data.filterNonUniquePeptides;
-	        	_filterOnlyOnePSM = data.filterOnlyOnePSM;
-	        	_filterOnlyOnePeptide = data.filterOnlyOnePeptide;
-	        	_taxonomies = data.taxonomies;
-	        	
-	        	_linkablePositions = data.linkablePositions;
-	        	
-	        	//console.log( _linkablePositions );
+	        		// handle protein names
+	        		_proteinNames = data.proteinNames;
 
-	        	// clear all other data that depends on which peptides are loaded
-	        	_proteinLinkPositions = undefined;
-	        	_proteinMonolinkPositions = undefined;
-	        	_proteinLooplinkPositions = undefined;
-	        	_ranges = undefined;
-	        	_coverages = undefined;
-	        	_linkPSMCounts = { };
-	        	_distanceReportData = { };
-	        				
+	        		// handle other search parameters
 
-	        	populateNavigation();
-		        	
-				populateSearchForm();
-				populatePDBFormArea();
-	        	
+	        		_psmPeptideCutoffsRootObjectStorage.setPsmPeptideCutoffsRootObject( data.cutoffs );
 
-//	        	Cannot put this call here, it does not work right:    updateURLHash( false /* useSearchForm */ );
-	        	
-	        	decrementSpinner();
-	        	
+	        		_excludeTaxonomy = data.excludeTaxonomy;
+	        		_excludeType = data.excludeType;
+	        		_filterNonUniquePeptides = data.filterNonUniquePeptides;
+	        		_filterOnlyOnePSM = data.filterOnlyOnePSM;
+	        		_filterOnlyOnePeptide = data.filterOnlyOnePeptide;
+	        		_taxonomies = data.taxonomies;
+
+	        		_linkablePositions = data.linkablePositions;
+
+	        		//console.log( _linkablePositions );
+
+	        		// clear all other data that depends on which peptides are loaded
+	        		_proteinLinkPositions = undefined;
+	        		_proteinMonolinkPositions = undefined;
+	        		_proteinLooplinkPositions = undefined;
+	        		_ranges = undefined;
+	        		_coverages = undefined;
+	        		_linkPSMCounts = { };
+	        		_distanceReportData = { };
+
+
+	        		populateNavigation();
+
+	        		populateSearchForm();
+	        		populatePDBFormArea();
+
+
+//	        		Cannot put this call here, it does not work right:    updateURLHash( false /* useSearchForm */ );
+
+	        		decrementSpinner();
+	        		
+	        	} catch( e ) {
+	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+	        		throw e;
+	        	}
+
 	        },
 	        failure: function(errMsg) {
 				decrementSpinner();
@@ -1549,12 +1619,20 @@ function loadPDBFiles( defaultId, doDraw ) {
 	        url: url,
 	        dataType: "json",
 	        success: function(data)	{
+		        
+	        	try {
 	        
-	        	console.log( "PDB files:" );
-	        	console.log( data );
-	        	
-	        	createPDBFileSelect( data, defaultId, doDraw );
-	        	decrementSpinner();
+	        		console.log( "PDB files:" );
+	        		console.log( data );
+
+	        		createPDBFileSelect( data, defaultId, doDraw );
+	        		decrementSpinner();
+	        		
+	        	} catch( e ) {
+	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+	        		throw e;
+	        	}
+
 	        },
 	        failure: function(errMsg) {
 				decrementSpinner();
@@ -1671,13 +1749,20 @@ function loadPDBFileContent() {
 	        url: url,
 	        dataType: "json",
 	        success: function(data)	{
-	        	        	
-	        	_PDB_FILE_CONTENT = data[ 'content' ];
-	        	_VIEWER = undefined;
-	        	_STRUCTURE = undefined;
-	        	
-	        	initViewer();
-	        	decrementSpinner();
+		        
+	        	try {
+
+	        		_PDB_FILE_CONTENT = data[ 'content' ];
+	        		_VIEWER = undefined;
+	        		_STRUCTURE = undefined;
+
+	        		initViewer();
+	        		decrementSpinner();
+	        		
+	        	} catch( e ) {
+	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+	        		throw e;
+	        	}
 	        		
 	        },
 	        failure: function(errMsg) {
@@ -1825,13 +1910,20 @@ function loadPDBFileAlignments( callback, doDraw ) {
 	        url: url,
 	        dataType: "json",
 	        success: function(data)	{
+		        
+	        	try {
 	        	
-	        	_ALIGNMENTS = data;
-	        	//console.log( _ALIGNMENTS );
-	        	decrementSpinner();
-	        	
-	        	callback( doDraw );
+	        		_ALIGNMENTS = data;
+	        		//console.log( _ALIGNMENTS );
+	        		decrementSpinner();
+
+	        		callback( doDraw );
 	        		
+	        	} catch( e ) {
+	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+	        		throw e;
+	        	}
+
 	        },
 	        failure: function(errMsg) {
 				decrementSpinner();
@@ -2288,8 +2380,17 @@ var doLinkablePositionsLookup = function( proteins, onlyShortest ) {
 	        data : requestData,
 	        dataType: "json",
 	        success: function(data)	{
-	        	decrementSpinner();
-	        	answerLinkablePositionsLookup( data, onlyShortest );
+	        	
+	        	try {
+
+	        		decrementSpinner();
+	        		answerLinkablePositionsLookup( data, onlyShortest );
+	        		
+	        	} catch( e ) {
+	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+	        		throw e;
+	        	}
+
 	        },
 	        failure: function(errMsg) {
 				decrementSpinner();
@@ -2625,16 +2726,23 @@ var updateShownLinks = function () {
 	var $reported_crosslink_jq = $( '.reported_crosslink_jq' );
 	
 	$reported_crosslink_jq.click( function( e ) {
-		
-		var params = { 
-				psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
-		};
-		
-		var index = $(e.currentTarget ).attr( 'data-crosslink-index' );
-		var link = _renderedLinks[ 'crosslinks' ][ index ];
-		if( !link ) { return; }
-		
-		getCrosslinkDataForSpecificLinkInGraph( params, link.link );
+
+		try {
+
+			var params = { 
+					psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
+			};
+
+			var index = $(e.currentTarget ).attr( 'data-crosslink-index' );
+			var link = _renderedLinks[ 'crosslinks' ][ index ];
+			if( !link ) { return; }
+
+			getCrosslinkDataForSpecificLinkInGraph( params, link.link );
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 	addToolTips( $shownCrosslinksDiv );
@@ -2675,17 +2783,24 @@ var updateShownLinks = function () {
 	$shownLooplinksDiv.html( html );
 	
 	$( '.reported_looplink_jq' ).click( function( e ) {
-		
-		var params = { 
-				psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
-		};
-		
-		
-		var index = $(e.currentTarget ).attr( 'data-looplink-index' );
-		var link = _renderedLinks[ 'looplinks' ][ index ];
-		if( !link ) { return; }
-		
-		getLooplinkDataForSpecificLinkInGraph( params, link.link );
+
+		try {
+
+			var params = { 
+					psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
+			};
+
+
+			var index = $(e.currentTarget ).attr( 'data-looplink-index' );
+			var link = _renderedLinks[ 'looplinks' ][ index ];
+			if( !link ) { return; }
+
+			getLooplinkDataForSpecificLinkInGraph( params, link.link );
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 
@@ -4987,13 +5102,19 @@ var deleteAlignmentConfirmed = function(clickThis, eventObject) {
 		dataType: "text",
 		success: function(data)	{
 
+        	try {
 
-			closeConfirmDeleteAlignmentOverlay( clickThis, eventObject );
+        		closeConfirmDeleteAlignmentOverlay( clickThis, eventObject );
 
 
-        	loadPDBFileAlignments( listChains );
+        		loadPDBFileAlignments( listChains );
 
-			decrementSpinner();
+        		decrementSpinner();
+        		
+        	} catch( e ) {
+        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+        		throw e;
+        	}
 
 		},
         failure: function(errMsg) {
@@ -5112,17 +5233,23 @@ var deletePDBFileConfirmed = function(clickThis, eventObject) {
 		        dataType: "json",
 		        success: function(data)	{
 		        	
+		        	try {
 
-		    		closeConfirmDeletePDBFileOverlay( clickThis, eventObject );
-		    		
-		        	loadPDBFiles();
-		        	$("#glmol-div").empty();
-		        	_VIEWER = undefined;
-		        	_STRUCTURE = undefined;
-		        	$( "#chain-list-div" ).empty();
-		        	
-		        	decrementSpinner();
+		        		closeConfirmDeletePDBFileOverlay( clickThis, eventObject );
+
+		        		loadPDBFiles();
+		        		$("#glmol-div").empty();
+		        		_VIEWER = undefined;
+		        		_STRUCTURE = undefined;
+		        		$( "#chain-list-div" ).empty();
+
+		        		decrementSpinner();
 		        		
+		        	} catch( e ) {
+		        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		        		throw e;
+		        	}
+
 		        },
 		        failure: function(errMsg) {
 					decrementSpinner();
@@ -5201,7 +5328,7 @@ function initPage() {
 	if ( json === null ) {
 
 		$("#invalid_url_no_data_after_hash_div").show();
-		throw "Invalid URL, no data after the hash '#'";
+		throw Error( "Invalid URL, no data after the hash '#'" );
 	}
 
 	
@@ -5227,7 +5354,7 @@ function initPage() {
 
 	if ( Modernizr && ! Modernizr.svg ) {  //  Modernizr.svg is false if SVG not supported
 		console.log( "SVG not supported." );
-		throw "SVG not supported";
+		throw Error( "SVG not supported" );
 	}
 	
 
@@ -5238,7 +5365,7 @@ function initPage() {
 	
 	if ( $search_id_jq.length === 0 ) {
 		
-		throw "Must be at least one search id in hidden field with class 'search_id_jq'";
+		throw Error( "Must be at least one search id in hidden field with class 'search_id_jq'" );
 	}
 	
 	$search_id_jq.each( function( index, element ) {
@@ -5248,7 +5375,7 @@ function initPage() {
 		var searchId = parseInt( searchIdString, 10 );
 		
 		if ( isNaN( searchId ) ) {
-			throw "Search Id is not a number: " + searchIdString;
+			throw Error( "Search Id is not a number: " + searchIdString );
 		}
 		
 		_searchIds.push( searchId );
@@ -5262,113 +5389,241 @@ function initPage() {
 	}
 
 	//  Attach click handlers for confirm delete overlays
-	
-	
+
 	$("#delete_pdb_file_confirm_button").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		deletePDBFileConfirmed( clickThis, eventObject );
+			var clickThis = this;
 
-		return false;
+			deletePDBFileConfirmed( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$(".delete_pdb_file_overlay_show_hide_parts_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		closeConfirmDeletePDBFileOverlay( clickThis, eventObject );
-		
-		return false;
+			var clickThis = this;
+
+			closeConfirmDeletePDBFileOverlay( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
 
-	
+
+
 	$("#delete_alignment_confirm_button").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		deleteAlignmentConfirmed( clickThis, eventObject );
+			var clickThis = this;
 
-		return false;
+			deleteAlignmentConfirmed( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$(".delete_alignment_overlay_show_hide_parts_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
 
-		closeConfirmDeleteAlignmentOverlay( clickThis, eventObject );
-		
-		return false;
+			var clickThis = this;
+
+			closeConfirmDeleteAlignmentOverlay( clickThis, eventObject );
+
+			return false;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 
 	attachViewLinkInfoOverlayClickHandlers();
-	
-	
-	
-	
+
+
+
+
 	$( "input#filterNonUniquePeptides" ).change(function() {
-		
-		defaultPageView.searchFormChanged_ForDefaultPageView();
+
+		try {
+
+			defaultPageView.searchFormChanged_ForDefaultPageView();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	$( "input#filterOnlyOnePSM" ).change(function() {
-		
-		defaultPageView.searchFormChanged_ForDefaultPageView();
+
+		try {
+
+			defaultPageView.searchFormChanged_ForDefaultPageView();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	$( "input#filterOnlyOnePeptide" ).change(function() {
-		
-		defaultPageView.searchFormChanged_ForDefaultPageView();
+
+		try {
+
+			defaultPageView.searchFormChanged_ForDefaultPageView();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});		
 
 	$("#exclude_protein_types_block").find("input").change(function() {
-		
-		defaultPageView.searchFormChanged_ForDefaultPageView();
+
+		try {
+
+			defaultPageView.searchFormChanged_ForDefaultPageView();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	$( "input#show-crosslinks" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		toggleShowCrosslinks();
+
+		try {
+
+			updateURLHash( false /* useSearchForm */ );
+			toggleShowCrosslinks();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	$( "input#show-looplinks" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		toggleShowLooplinks();
+
+		try {
+
+			updateURLHash( false /* useSearchForm */ );
+			toggleShowLooplinks();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	$( "input#show-monolinks" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		toggleShowMonolinks();
+
+		try {
+
+			updateURLHash( false /* useSearchForm */ );
+			toggleShowMonolinks();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	$( "input#show-linkable-positions" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		toggleShowLinkablePositions();
+
+		try {
+
+			updateURLHash( false /* useSearchForm */ );
+			toggleShowLinkablePositions();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	$( "input#show-coverage" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		toggleShowCoverage();
+
+		try {
+
+			updateURLHash( false /* useSearchForm */ );
+			toggleShowCoverage();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$( "#select-render-mode" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		changeRenderMode();
+
+		try {
+
+			updateURLHash( false /* 
+		useSearchForm */ );
+			changeRenderMode();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$( "#select-link-color-mode" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		changeLinkColorMode();
+
+		try {
+
+			updateURLHash( false /* useSearchForm */ );
+			changeLinkColorMode();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$( "#show-unique-udrs" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		toggleShowUniqueUDRs();
+
+		try {
+
+			updateURLHash( false /* useSearchForm */ );
+			toggleShowUniqueUDRs();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$( "#shade-by-counts" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		toggleShadeByCounts();
+
+		try {
+
+			updateURLHash( false /* useSearchForm */ );
+			toggleShadeByCounts();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 
 	///////
 	
@@ -5451,24 +5706,39 @@ function initPage() {
 	$('.color_picker_by_search_jq').ColorPicker({
 		onSubmit: function(hsbColor, hexColor, rgbColor, htmlElement ) {
 			
-			// update block on page with selected color 
-			
-			var $htmlElement = $( htmlElement );
-			
-			$htmlElement.css('backgroundColor', '#' + hexColor); // set HTML block color on page
-			
-			$htmlElement.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, '#' + hexColor ); // store color in .data
+			try {
 
-			$htmlElement.ColorPickerHide();
-			
+				// update block on page with selected color 
 
-			saveChangedColorLinkBySearch();
+				var $htmlElement = $( htmlElement );
+
+				$htmlElement.css('backgroundColor', '#' + hexColor); // set HTML block color on page
+
+				$htmlElement.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, '#' + hexColor ); // store color in .data
+
+				$htmlElement.ColorPickerHide();
+
+
+				saveChangedColorLinkBySearch();
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 			
 		},
 		onBeforeShow: function () {
-			var $this = $(this);
-			var thisColor = $this.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR );
-			$this.ColorPickerSetColor( thisColor );
+			
+			try {
+
+				var $this = $(this);
+				var thisColor = $this.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR );
+				$this.ColorPickerSetColor( thisColor );
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		onHide: function() {
 			//  called when hidden
@@ -5485,7 +5755,15 @@ function initPage() {
 
 
 $(document).ready(function()  { 
-	initPage();
+	
+	try {
+
+		initPage();
+		
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 });
 
 $(window).unload(function()  { 
@@ -5495,23 +5773,27 @@ $(window).unload(function()  {
 });
 
 
+
+
+// TODO   This function is probably not called
+
 //This will only be called when there is one search
 
 function mergedImageSaveOrUpdateDefaultPageView__( clickedThis ) {
 	
 	if ( _searches === undefined || _searches === null ) {
 		
-		throw "_searches is undefined or null which is invalid";
+		throw Error( "_searches is undefined or null which is invalid " );
 	}
 	
 	if ( _searches.length === 0 ) {
 		
-		throw "_searches.length === 0 which is invalid";
+		throw Error( "_searches.length === 0 which is invalid " );
 	}
 	
 	if ( _searches.length > 1 ) {
 		
-		throw "_searches.length > 1 which is invalid";
+		throw Error( "_searches.length > 1 which is invalid " );
 	}
 	
 	var search = _searches[ 0 ];
@@ -5528,7 +5810,7 @@ function mergedImageSaveOrUpdateDefaultPageView__( clickedThis ) {
 
 ///////////
 
-//Object for passing to other objects
+//  Object for passing to other objects
 
 var structureViewerPageObject = {
 

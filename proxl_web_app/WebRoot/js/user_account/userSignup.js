@@ -43,168 +43,180 @@ var createAccountFormSubmit = function() {
 
 var createAccount = function(clickThis, eventObject) {
 
-	hideAllErrorMessages();
-	
-	
-	var $firstName = $("#firstName");
+	try {
 
-	if ($firstName.length === 0) {
-
-		throw "Unable to find input field for id 'firstName' ";
-	}
-
-	var firstName = $firstName.val();
+		hideAllErrorMessages();
 
 
-	var $lastName = $("#lastName");
+		var $firstName = $("#firstName");
 
-	if ($lastName.length === 0) {
+		if ($firstName.length === 0) {
 
-		throw "Unable to find input field for id 'lastName' ";
-	}
+			throw Error( "Unable to find input field for id 'firstName' " );
+		}
 
-	var lastName = $lastName.val();
+		var firstName = $firstName.val();
 
 
-	var $organization = $("#organization");
+		var $lastName = $("#lastName");
 
-	if ($organization.length === 0) {
+		if ($lastName.length === 0) {
 
-		throw "Unable to find input field for id 'organization' ";
-	}
+			throw Error( "Unable to find input field for id 'lastName' " );
+		}
 
-	var organization = $organization.val();
+		var lastName = $lastName.val();
 
-	//
-	
 
-	var $email = $("#email");
+		var $organization = $("#organization");
 
-	if ($email.length === 0) {
+		if ($organization.length === 0) {
 
-		throw "Unable to find input field for id 'email' ";
-	}
+			throw Error( "Unable to find input field for id 'organization' " );
+		}
 
-	var email = $email.val();
+		var organization = $organization.val();
 
-	var $username = $("#username");
+		//
 
-	if ($username.length === 0) {
 
-		throw "Unable to find input field for id 'username' ";
-	}
+		var $email = $("#email");
 
-	var username = $username.val();
+		if ($email.length === 0) {
 
-	var $password = $("#password");
+			throw Error( "Unable to find input field for id 'email' " );
+		}
 
-	if ($password.length === 0) {
+		var email = $email.val();
 
-		throw "Unable to find input field for id 'password' ";
-	}
+		var $username = $("#username");
 
-	var password = $password.val();
+		if ($username.length === 0) {
 
-	var $passwordConfirm = $("#passwordConfirm");
+			throw Error( "Unable to find input field for id 'username' " );
+		}
 
-	if ($passwordConfirm.length === 0) {
+		var username = $username.val();
 
-		throw "Unable to find input field for id 'passwordConfirm' ";
-	}
+		var $password = $("#password");
 
-	var passwordConfirm = $passwordConfirm.val();
+		if ($password.length === 0) {
 
-	
-	if ( firstName === "" ||
-			lastName === "" ||
-			organization === "" ||
-			email === "" ||
-			username === "" ||
-			password === "" ||
-			passwordConfirm === "" ) {
+			throw Error( "Unable to find input field for id 'password' " );
+		}
 
-		var $element = $("#error_message_all_fields_required");
+		var password = $password.val();
 
-		showErrorMsg( $element );
+		var $passwordConfirm = $("#passwordConfirm");
 
-		return;  //  !!!  EARLY EXIT
+		if ($passwordConfirm.length === 0) {
 
-	} 
-	
-	if ( password !== passwordConfirm ) {
+			throw Error( "Unable to find input field for id 'passwordConfirm' " );
+		}
 
-		var $element = $("#error_message_password_confirm_password_not_match");
+		var passwordConfirm = $passwordConfirm.val();
 
-		showErrorMsg( $element );
 
-		return;  //  !!!  EARLY EXIT
+		if ( firstName === "" ||
+				lastName === "" ||
+				organization === "" ||
+				email === "" ||
+				username === "" ||
+				password === "" ||
+				passwordConfirm === "" ) {
 
-	} 
-	
-	var recaptchaValue = "";
+			var $element = $("#error_message_all_fields_required");
 
-	var $proxl_google_recaptcha_container_div = $("#proxl_google_recaptcha_container_div");
-	
-	if ( $proxl_google_recaptcha_container_div.length > 0 ) {
-		
-		//  Google Recaptcha included so get the user's response
-		
-		recaptchaValue = grecaptcha.getResponse();
-		
-		if ( recaptchaValue === "" || recaptchaValue === null || recaptchaValue === undefined ) {
-			
-	
-			var $element = $("#error_message_recaptcha_required");
-	
 			showErrorMsg( $element );
-	
+
 			return;  //  !!!  EARLY EXIT
+
+		} 
+
+		if ( password !== passwordConfirm ) {
+
+			var $element = $("#error_message_password_confirm_password_not_match");
+
+			showErrorMsg( $element );
+
+			return;  //  !!!  EARLY EXIT
+
+		} 
+
+		var recaptchaValue = "";
+
+		var $proxl_google_recaptcha_container_div = $("#proxl_google_recaptcha_container_div");
+
+		if ( $proxl_google_recaptcha_container_div.length > 0 ) {
+
+			//  Google Recaptcha included so get the user's response
+
+			recaptchaValue = grecaptcha.getResponse();
+
+			if ( recaptchaValue === "" || recaptchaValue === null || recaptchaValue === undefined ) {
+
+
+				var $element = $("#error_message_recaptcha_required");
+
+				showErrorMsg( $element );
+
+				return;  //  !!!  EARLY EXIT
+			}
 		}
+
+		var requestData = {
+				firstName : firstName,
+				lastName :  lastName,
+				organization :  organization,
+				email :  email,
+				username :  username,
+				password :  password,
+				recaptchaValue : recaptchaValue
+		};
+
+		var _URL = contextPathJSVar + "/services/user/createAccountNoInvite";
+
+//		var request =
+		$.ajax({
+			type : "POST",
+			url : _URL,
+			data : requestData,
+			dataType : "json",
+			success : function(data) {
+
+				try {
+					createAccountComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			},
+			failure : function(errMsg) {
+				var $element = $("#error_message_system_error");
+
+				showErrorMsg( $element );
+
+//				alert(errMsg);
+
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+
+
+				var $element = $("#error_message_system_error");
+
+				showErrorMsg( $element );
+
+//				handleAJAXError(jqXHR, textStatus, errorThrown);
+
+//				alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
+//				textStatus: " + textStatus );
+			}
+		});
+		
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
 	}
-	
-	var requestData = {
-			firstName : firstName,
-			lastName :  lastName,
-			organization :  organization,
-			email :  email,
-			username :  username,
-			password :  password,
-			recaptchaValue : recaptchaValue
-	};
-
-	var _URL = contextPathJSVar + "/services/user/createAccountNoInvite";
-
-//	var request =
-	$.ajax({
-		type : "POST",
-		url : _URL,
-		data : requestData,
-		dataType : "json",
-		success : function(data) {
-
-			createAccountComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
-		},
-		failure : function(errMsg) {
-			var $element = $("#error_message_system_error");
-
-			showErrorMsg( $element );
-
-//			alert(errMsg);
-
-		},
-		error : function(jqXHR, textStatus, errorThrown) {
-
-
-			var $element = $("#error_message_system_error");
-
-			showErrorMsg( $element );
-
-//			handleAJAXError(jqXHR, textStatus, errorThrown);
-
-//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
-//			textStatus: " + textStatus );
-		}
-	});
 };
 
 
@@ -330,7 +342,12 @@ function initPage() {
 	
 	$(document).click( function(eventObject) {
 	
-		hideAllErrorMessages();
+		try {
+			hideAllErrorMessages();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 };
@@ -341,6 +358,11 @@ function initPage() {
 
 $(document).ready(function() {
 
-	initPage();
+	try {
+		initPage();
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 
 });

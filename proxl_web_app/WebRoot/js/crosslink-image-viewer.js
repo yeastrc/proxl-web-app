@@ -280,7 +280,7 @@ var hashObjectManager = {
 
 			if ( property === undefined || property === null ) {
 				
-				throw "property not found in 'HASH_OBJECT_PROPERTIES' ";
+				throw Error( "property not found in 'HASH_OBJECT_PROPERTIES' " );
 			}
 
 			this.hashObject[ property ] = value;
@@ -290,7 +290,7 @@ var hashObjectManager = {
 
 			if ( property === undefined || property === null ) {
 				
-				throw "property not found in 'HASH_OBJECT_PROPERTIES' ";
+				throw Error( "property not found in 'HASH_OBJECT_PROPERTIES' " );
 			}
 			
 			return this.hashObject[ property ];
@@ -591,8 +591,8 @@ function getRawJsonFromHash() {
 
 	if ( jsonFromHash === null || jsonFromHash === undefined ) {
 
-		throw "Failed to parse window hash string as JSON and decodeURI and then parse as JSON.  windowHashContentsMinusHashChar: " 
-		+ windowHashContentsMinusHashChar;
+		throw Error( "Failed to parse window hash string as JSON and decodeURI and then parse as JSON.  windowHashContentsMinusHashChar: " 
+				+ windowHashContentsMinusHashChar );
 	}
 	
 	//   Transform json on hash to expected object for rest of the code
@@ -665,11 +665,11 @@ function getCutoffDefaultsFromPage() {
 		var cutoffValuesRootLevelCutoffDefaults = JSON.parse( cutoffValuesRootLevelCutoffDefaultsString );
 	} catch( e2 ) {
 		
-		throw "Failed to parse cutoffValuesRootLevelCutoffDefaults string as JSON.  " +
+		throw Error( "Failed to parse cutoffValuesRootLevelCutoffDefaults string as JSON.  " +
 				"Error Message: " + e2.message +
 				".  cutoffValuesRootLevelCutoffDefaultsString: |" +
 				cutoffValuesRootLevelCutoffDefaultsString +
-				"|";
+				"|" );
 	}
 
 	return cutoffValuesRootLevelCutoffDefaults;
@@ -699,7 +699,7 @@ function getValuesFromForm() {
 		
 //		return { output_FieldDataFailedValidation : getCutoffsFromThePageResult_FieldDataFailedValidation };
 		
-		throw "Cutoffs are invalid so stop processing";
+		throw Error( "Cutoffs are invalid so stop processing" );
 	}
 	
 	var outputCutoffs = getCutoffsFromThePageResult.cutoffsBySearchId;
@@ -1035,21 +1035,26 @@ function loadSequenceCoverageDataForProtein( selProteinsForSeqCov, doDraw ) {
 
 		success: function(data)	{
 
-			if ( _ranges == undefined ) {
-				_coverages = data.coverages;
-				_ranges = data.ranges;
-			} else {
+			try {
+				if ( _ranges == undefined ) {
+					_coverages = data.coverages;
+					_ranges = data.ranges;
+				} else {
 
-				for ( var index = 0; index < selProteinsForSeqCov.length; index++ ) {
+					for ( var index = 0; index < selProteinsForSeqCov.length; index++ ) {
 
-					var protein = selProteinsForSeqCov[ index ];
-					_coverages[ protein ] = data[ 'coverages' ][ protein ];
-					_ranges[ protein ] = data[ 'ranges' ][ protein ];
+						var protein = selProteinsForSeqCov[ index ];
+						_coverages[ protein ] = data[ 'coverages' ][ protein ];
+						_ranges[ protein ] = data[ 'ranges' ][ protein ];
+					}
 				}
-			}
 
-			decrementSpinner();
-			loadDataAndDraw( doDraw );
+				decrementSpinner();
+				loadDataAndDraw( doDraw );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			decrementSpinner();
@@ -1079,7 +1084,7 @@ function loadProteinSequenceDataForProtein( proteinIdsToGetSequence, doDraw ) {
 	if ( project_id === undefined || project_id === null 
 			|| project_id === "" ) {
 		
-		throw '$("#project_id").val() returned no value';
+		throw Error( '$("#project_id").val() returned no value' );
 	}
 	
 
@@ -1099,23 +1104,26 @@ function loadProteinSequenceDataForProtein( proteinIdsToGetSequence, doDraw ) {
 			//   So proteinIdsToGetSequence array is passed as "proteinIdsToGetSequence=<value>" which is what Jersey expects
 
 	        success: function(data)	{
-	        
-	        	var returnedProteinIdsAndSequences = data;  //  The property names are the protein ids and the property values are the sequences
-	        	
-	        	// copy the returned sequences into the global object
-	        	
-	    		var returnedProteinIdsAndSequences_Keys = Object.keys( returnedProteinIdsAndSequences );
-	    		
-	    		for ( var keysIndex = 0; keysIndex < returnedProteinIdsAndSequences_Keys.length; keysIndex++ ) {
-	    			
-	    			var proteinId = returnedProteinIdsAndSequences_Keys[ keysIndex ];
-	    			
-	    			_proteinSequences[ proteinId ] = returnedProteinIdsAndSequences[ proteinId ];
-	    		}
-	    		
-	        	
-	        	decrementSpinner();
-	        	loadDataAndDraw( doDraw );
+	        	try {
+	        		var returnedProteinIdsAndSequences = data;  //  The property names are the protein ids and the property values are the sequences
+
+	        		// copy the returned sequences into the global object
+
+	        		var returnedProteinIdsAndSequences_Keys = Object.keys( returnedProteinIdsAndSequences );
+
+	        		for ( var keysIndex = 0; keysIndex < returnedProteinIdsAndSequences_Keys.length; keysIndex++ ) {
+
+	        			var proteinId = returnedProteinIdsAndSequences_Keys[ keysIndex ];
+
+	        			_proteinSequences[ proteinId ] = returnedProteinIdsAndSequences[ proteinId ];
+	        		}
+
+	        		decrementSpinner();
+	        		loadDataAndDraw( doDraw );
+	        	} catch( e ) {
+	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+	        		throw e;
+	        	}
 	        },
 	        failure: function(errMsg) {
 				decrementSpinner();
@@ -1160,28 +1168,33 @@ function loadProteinTaxonomyIdDataForProtein( proteinIds, doDraw ) {
 
 	        success: function(data)	{
 	        
-	        	var returnedProteinIdsAndTaxonomyIds = data;  //  The property names are the protein ids and the property values are the taxonomy ids
-	        	
-        	
-	        	// copy the returned taxonomy ids into the global object
-	        	
-	    		var returnedProteinIdsAndTaxonomyIds_Keys = Object.keys( returnedProteinIdsAndTaxonomyIds );
-	    		
-	    		if ( returnedProteinIdsAndTaxonomyIds_Keys.length === 0 ) {
-	    			
-	    			throw "No taxonomy ids returned. proteinIds: " + proteinIds;
-	    		}
-	    		
-	    		for ( var keysIndex = 0; keysIndex < returnedProteinIdsAndTaxonomyIds_Keys.length; keysIndex++ ) {
-	    			
-	    			var proteinId = returnedProteinIdsAndTaxonomyIds_Keys[ keysIndex ];
-	    			
-	    			_proteinTaxonomyIds[ proteinId ] = returnedProteinIdsAndTaxonomyIds[ proteinId ];
-	    		}
-	    		
-	        	
-	        	decrementSpinner();
-	        	loadDataAndDraw( doDraw );
+	        	try {
+	        		var returnedProteinIdsAndTaxonomyIds = data;  //  The property names are the protein ids and the property values are the taxonomy ids
+
+
+	        		// copy the returned taxonomy ids into the global object
+
+	        		var returnedProteinIdsAndTaxonomyIds_Keys = Object.keys( returnedProteinIdsAndTaxonomyIds );
+
+	        		if ( returnedProteinIdsAndTaxonomyIds_Keys.length === 0 ) {
+
+	        			throw Error( "No taxonomy ids returned. proteinIds: " + proteinIds );
+	        		}
+
+	        		for ( var keysIndex = 0; keysIndex < returnedProteinIdsAndTaxonomyIds_Keys.length; keysIndex++ ) {
+
+	        			var proteinId = returnedProteinIdsAndTaxonomyIds_Keys[ keysIndex ];
+
+	        			_proteinTaxonomyIds[ proteinId ] = returnedProteinIdsAndTaxonomyIds[ proteinId ];
+	        		}
+
+
+	        		decrementSpinner();
+	        		loadDataAndDraw( doDraw );
+	        	} catch( e ) {
+	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+	        		throw e;
+	        	}
 	        },
 	        failure: function(errMsg) {
 				decrementSpinner();
@@ -1221,11 +1234,16 @@ function loadMonolinkData( doDraw ) {
 			        dataType: "json",
 			        success: function(data)	{
 			        
-			        	_proteinMonolinkPositions = data.proteinMonoLinkPositions;
+			        	try {
+			        		_proteinMonolinkPositions = data.proteinMonoLinkPositions;
 
-			        	decrementSpinner();
-			        	
-			        	reportLinkDataLoadComplete( 'monolinks', doDraw );
+			        		decrementSpinner();
+
+			        		reportLinkDataLoadComplete( 'monolinks', doDraw );
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
+			        	}
 
 			        },
 			        failure: function(errMsg) {
@@ -1265,13 +1283,16 @@ function loadMonolinkPSMCounts( doDraw ) {
 			        url: url,
 			        dataType: "json",
 			        success: function(data)	{
-			        
-			        	_linkPSMCounts.monolink = data.monolinkPSMCounts;
-			        	
-			        	decrementSpinner();
-			        	
-						reportLinkDataLoadComplete( 'monolinkPSMs', doDraw );
+			        	try {
+			        		_linkPSMCounts.monolink = data.monolinkPSMCounts;
 
+			        		decrementSpinner();
+
+			        		reportLinkDataLoadComplete( 'monolinkPSMs', doDraw );
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
+			        	}
 			        },
 			        failure: function(errMsg) {
 						decrementSpinner();
@@ -1313,13 +1334,16 @@ function loadLooplinkData( doDraw ) {
 			        url: url,
 			        dataType: "json",
 			        success: function(data)	{
-			        
-			        	_proteinLooplinkPositions = data.proteinLoopLinkPositions;
-			        	
-			        	decrementSpinner();
-			        	
-			        	reportLinkDataLoadComplete( 'looplinks', doDraw );
+			        	try {
+			        		_proteinLooplinkPositions = data.proteinLoopLinkPositions;
 
+			        		decrementSpinner();
+
+			        		reportLinkDataLoadComplete( 'looplinks', doDraw );
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
+			        	}
 			        },
 			        failure: function(errMsg) {
 						decrementSpinner();
@@ -1357,13 +1381,16 @@ function loadLooplinkPSMCounts( doDraw ) {
 			        url: url,
 			        dataType: "json",
 			        success: function(data)	{
-			        
-			        	_linkPSMCounts.looplink = data.looplinkPSMCounts;
-			        	
-			        	decrementSpinner();
-			        	
-						reportLinkDataLoadComplete( 'looplinkPSMs', doDraw );
+			        	try {
+			        		_linkPSMCounts.looplink = data.looplinkPSMCounts;
 
+			        		decrementSpinner();
+
+			        		reportLinkDataLoadComplete( 'looplinkPSMs', doDraw );
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
+			        	}
 			        },
 			        failure: function(errMsg) {
 						decrementSpinner();
@@ -1403,13 +1430,16 @@ function loadCrosslinkData( doDraw ) {
 			        url: url,
 			        dataType: "json",
 			        success: function(data)	{
-			        
-			        	_proteinLinkPositions = data.proteinLinkPositions;
-			        	
-			        	decrementSpinner();
-			        	
-			        	reportLinkDataLoadComplete( 'crosslinks', doDraw );
-			        	
+			        	try {
+			        		_proteinLinkPositions = data.proteinLinkPositions;
+
+			        		decrementSpinner();
+
+			        		reportLinkDataLoadComplete( 'crosslinks', doDraw );
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
+			        	}
 			        },
 			        failure: function(errMsg) {
 						decrementSpinner();
@@ -1448,13 +1478,16 @@ function loadCrosslinkPSMCounts( doDraw ) {
 			        url: url,
 			        dataType: "json",
 			        success: function(data)	{
-			        
-			        	_linkPSMCounts.crosslink = data.crosslinkPSMCounts;
-			        	
-			        	decrementSpinner();
-			        	
-						reportLinkDataLoadComplete( 'crosslinkPSMs', doDraw );
+			        	try {
+			        		_linkPSMCounts.crosslink = data.crosslinkPSMCounts;
 
+			        		decrementSpinner();
+
+			        		reportLinkDataLoadComplete( 'crosslinkPSMs', doDraw );
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
+			        	}
 			        },
 			        failure: function(errMsg) {
 						decrementSpinner();
@@ -1887,7 +1920,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 				
 		} else {
 			
-			throw "unknown annotationType: " + annotationType;
+			throw Error( "unknown annotationType: " + annotationType );
 		}
 		
 		
@@ -1934,57 +1967,62 @@ function loadDataFromService() {
 	        url: url,
 	        dataType: "json",
 	        success: function(data)	{
-	        
-	        	// handle searches
-	        	_searches = data.searches;
-	        	
-	        	// handle proteins
-	        	_proteins = data.proteins;
-	        	
-	        	// handle protein lengths
-	        	_proteinLengths = data.proteinLengths;
-	        	
-	        	// handle protein names
-	        	_proteinNames = data.proteinNames;
-	        	
-	        	// positions of all linkable-positions
-	        	_linkablePositions = data.linkablePositions;
-	        	
-	        	// handle other search parameters
+	       
+	        	try {
 
-	        	_psmPeptideCutoffsRootObjectStorage.setPsmPeptideCutoffsRootObject( data.cutoffs );
-	        	
-	        	_excludeTaxonomy = data.excludeTaxonomy;
-	        	_excludeType = data.excludeType;
-	        	_filterNonUniquePeptides = data.filterNonUniquePeptides;
-	        	_filterOnlyOnePSM = data.filterOnlyOnePSM;
-	        	_filterOnlyOnePeptide = data.filterOnlyOnePeptide;
-	        	_taxonomies = data.taxonomies;
-	        	
-	        	//  Populate these from the Hash
-	        	
-	        	populateFromHash_imageProteinBarDataManager();
-	        	
-	        	
-	        	
-	        	
-	        	populateNavigation();
-	        	
-	        	//  Populate from local variables
-	        	populateSearchForm();
-	        	
-	        	
+	        		// handle searches
+	        		_searches = data.searches;
 
-	        	populateSelectProteinSelect();
-	        	
-	        	initializeViewer();
-	        	
-	        	updateURLHash( false /* useSearchForm */ );
-	        	
-	        	decrementSpinner();
+	        		// handle proteins
+	        		_proteins = data.proteins;
 
-	        	loadDataAndDraw( true /* doDraw */ );
-	        	
+	        		// handle protein lengths
+	        		_proteinLengths = data.proteinLengths;
+
+	        		// handle protein names
+	        		_proteinNames = data.proteinNames;
+
+	        		// positions of all linkable-positions
+	        		_linkablePositions = data.linkablePositions;
+
+	        		// handle other search parameters
+
+	        		_psmPeptideCutoffsRootObjectStorage.setPsmPeptideCutoffsRootObject( data.cutoffs );
+
+	        		_excludeTaxonomy = data.excludeTaxonomy;
+	        		_excludeType = data.excludeType;
+	        		_filterNonUniquePeptides = data.filterNonUniquePeptides;
+	        		_filterOnlyOnePSM = data.filterOnlyOnePSM;
+	        		_filterOnlyOnePeptide = data.filterOnlyOnePeptide;
+	        		_taxonomies = data.taxonomies;
+
+	        		//  Populate these from the Hash
+
+	        		populateFromHash_imageProteinBarDataManager();
+
+
+
+
+	        		populateNavigation();
+
+	        		//  Populate from local variables
+	        		populateSearchForm();
+
+
+
+	        		populateSelectProteinSelect();
+
+	        		initializeViewer();
+
+	        		updateURLHash( false /* useSearchForm */ );
+
+	        		decrementSpinner();
+
+	        		loadDataAndDraw( true /* doDraw */ );
+	        	} catch( e ) {
+	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+	        		throw e;
+	        	}
 	        	
 	        },
 	        failure: function(errMsg) {
@@ -2012,7 +2050,7 @@ function populateFromHash_imageProteinBarDataManager(){
 	
 //	} else {
 //
-//		throw "json['protein_bar_data'] missing";
+//		throw Error( "json['protein_bar_data'] missing" );
 		
 	}
 }
@@ -2061,8 +2099,13 @@ function populateSearchForm() {
 	$taxonomy_checkboxes.html( html );
 	
 	$taxonomy_checkboxes.find("input").change(function() {
-		
-		defaultPageView.searchFormChanged_ForDefaultPageView();;
+		try {
+			defaultPageView.searchFormChanged_ForDefaultPageView();;
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 	
@@ -2205,10 +2248,10 @@ function showSelectedProteins() {
 	var selectedProteinEntry_template_handlebarsSource = $selected_protein_entry_template.text();
 
 	if ( selectedProteinEntry_template_handlebarsSource === undefined ) {
-		throw "selectedProteinEntry_template_handlebarsSource === undefined";
+		throw Error( "selectedProteinEntry_template_handlebarsSource === undefined" );
 	}
 	if ( selectedProteinEntry_template_handlebarsSource === null ) {
-		throw "selectedProteinEntry_template_handlebarsSource === null";
+		throw Error( "selectedProteinEntry_template_handlebarsSource === null" );
 	}
 
 	
@@ -2253,7 +2296,14 @@ function showSelectedProteins() {
 
 	$protein_select_protein_item_and_sort_handle_block_jq_Items.click( function( eventObject ) {
 		
-		openSelectProteinSelect( { clickedThis : this } );
+		try {
+
+			openSelectProteinSelect( { clickedThis : this } );
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 	
 	
@@ -2267,7 +2317,13 @@ function showSelectedProteins() {
 	
 	$protein_delete_icon_jq_Items.click( function( eventObject ) {
 		
-		processClickOnRemoveSelectedProtein( { clickedThis : this } );
+		try {
+			processClickOnRemoveSelectedProtein( { clickedThis : this } );
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 	
 	// Add General tool tips to everything in the container.  (including on Delete icon)
@@ -2341,22 +2397,29 @@ function processSortUpdateSelectedProteins( event, ui ) {
 
 function processClickOnRemoveSelectedProtein( params ) {
 	
-	var clickedThis = params.clickedThis;
-	
-	var $clickedThis = $( clickedThis );
-	
-	$clickedThis.qtip('destroy', true); // Immediately destroy all tooltips belonging to the selected elements
-		
-	var uid = $clickedThis.attr("data-uid");
-	
-	_imageProteinBarDataManager.removeItemByUID( uid );	
-	_indexManager.removeEntryByUID( uid );
-	
-	updateURLHash( false /* useSearchForm */ );
-	
-	showSelectedProteins();
-	
-	drawSvg();
+	try {
+
+		var clickedThis = params.clickedThis;
+
+		var $clickedThis = $( clickedThis );
+
+		$clickedThis.qtip('destroy', true); // Immediately destroy all tooltips belonging to the selected elements
+
+		var uid = $clickedThis.attr("data-uid");
+
+		_imageProteinBarDataManager.removeItemByUID( uid );	
+		_indexManager.removeEntryByUID( uid );
+
+		updateURLHash( false /* useSearchForm */ );
+
+		showSelectedProteins();
+
+		drawSvg();
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 }
 
 
@@ -2935,7 +2998,7 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 
 		if ( ! selectProteinBarPart ) {
 			
-			throw "In select Protein Bar Part Mouse Move but Select Protein Bar Part not started, 'startDragFunc(...) not called";
+			throw Error( "In select Protein Bar Part Mouse Move but Select Protein Bar Part not started, 'startDragFunc(...) not called" );
 		}
 
 		if ( firstDrag ) {
@@ -3008,7 +3071,7 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 	
 		if ( ! selectProteinBarPart ) {
 			
-			throw "In select Protein Bar Part End but Select Protein Bar Part not started, 'startDragFunc(...) not called";
+			throw Error( "In select Protein Bar Part End but Select Protein Bar Part not started, 'startDragFunc(...) not called" );
 		}
 		
 		if ( endX_NewRectanglePosition === undefined || endX_NewRectanglePosition === null ) {
@@ -3342,7 +3405,7 @@ function getColorForProteinBarRowIndexPosition( params ) {
 				return getColorForIndex( lineColorIndex );
 			}
 			
-			throw "getColorForProteinBarRowIndexPosition: singlePosition: lineColorIndex === -1";
+			throw Error( "getColorForProteinBarRowIndexPosition: singlePosition: lineColorIndex === -1" );
 			
 //			return _NOT_HIGHLIGHTED_LINE_COLOR;
 		}
@@ -3366,7 +3429,7 @@ function getColorForProteinBarRowIndexPosition( params ) {
 				return getColorForIndex( lineColorIndexPosition_2 );
 			}
 			
-			throw "getColorForProteinBarRowIndexPosition: singlePosition: lineColorIndex === -1";
+			throw Error( "getColorForProteinBarRowIndexPosition: singlePosition: lineColorIndex === -1" );
 			
 //			return _NOT_HIGHLIGHTED_LINE_COLOR;
 		}
@@ -3391,7 +3454,7 @@ function getColorIndexForProteinBarRowIndexPosition__SinglePosition( params ) {
 	
 	if ( proteinBarRowIndex >= imageProteinBarDataEntryArray.length ) {
 		
-		throw "ERROR: in getColorForProteinBarRowIndexPosition__SinglePosition(...): proteinBarRowIndex >= imageProteinBarDataEntryArray.length ";
+		throw Error( "ERROR: in getColorForProteinBarRowIndexPosition__SinglePosition(...): proteinBarRowIndex >= imageProteinBarDataEntryArray.length " );
 	}
 	
 	for ( var imageProteinBarDataEntryArrayIndex = 0; imageProteinBarDataEntryArrayIndex < imageProteinBarDataEntryArray.length; imageProteinBarDataEntryArrayIndex++ ) {
@@ -3463,7 +3526,7 @@ function getColorForProteinBarRowIndexBlockPositions( params ) {
 			
 			if ( proteinBarRowIndex >= imageProteinBarDataEntryArray.length ) {
 				
-				throw "ERROR: in getColorForProteinBarRowIndexBlockPositions(...): proteinBarRowIndex >= imageProteinBarDataEntryArray.length ";
+				throw Error( "ERROR: in getColorForProteinBarRowIndexBlockPositions(...): proteinBarRowIndex >= imageProteinBarDataEntryArray.length " );
 			}
 			
 			for ( var imageProteinBarDataEntryArrayIndex = 0; imageProteinBarDataEntryArrayIndex < imageProteinBarDataEntryArray.length; imageProteinBarDataEntryArrayIndex++ ) {
@@ -3521,7 +3584,7 @@ function getColorForProteinBarRowIndexBlockPositions( params ) {
 			
 			if ( ! foundProteinBarsSelectedRegion ) {
 	
-				throw "ERROR: in getColorForProteinBarRowIndexBlockPositions(...): ! foundProteinBarsSelectedRegion ";
+				throw Error( "ERROR: in getColorForProteinBarRowIndexBlockPositions(...): ! foundProteinBarsSelectedRegion " );
 			}
 
 
@@ -3558,7 +3621,7 @@ function getColorForSearchesForIndexAndSearchList( i, searchList ) {
 		
 //			if ( colorForSearches === undefined ) {
 //				
-//				throw "In getColorForSearches: color for searches is undefined for colorIndex: '" + colorIndex + "'  _SEARCH_COLORS_TWO_SEARCHES[ colorIndex ]";
+//				throw Error( "In getColorForSearches: color for searches is undefined for colorIndex: '" + colorIndex + "'  _SEARCH_COLORS_TWO_SEARCHES[ colorIndex ]" );
 //			}
 		
 		return colorForSearches;
@@ -3567,7 +3630,7 @@ function getColorForSearchesForIndexAndSearchList( i, searchList ) {
 		
 //			if ( colorForSearches === undefined ) {
 //				
-//				throw "In getColorForSearches: color for searches is undefined for colorIndex: '" + colorIndex + "'  _SEARCH_COLORS[ colorIndex ]";
+//				throw Error( "In getColorForSearches: color for searches is undefined for colorIndex: '" + colorIndex + "'  _SEARCH_COLORS[ colorIndex ]" );
 //			}
 		
 		return colorForSearches;
@@ -4540,7 +4603,7 @@ function drawAnnotationData( selectedProteins, svgRootSnapSVGObject ) {
 			
 		} else {
 			
-			throw "unknown annotationType: " + annotationType;
+			throw Error( "unknown annotationType: " + annotationType );
 		}
 		
 
@@ -5901,7 +5964,7 @@ function drawInterProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject 
 
 						}
 
-						throw "lineColor returned from getCrosslinkLineColorForSearches(...) is undefined for selectedProteinsIndex: " + fromSelectedProteinsIndex + ", k: " + toSelectedProteinsIndex + searchesListPart;
+						throw Error( "lineColor returned from getCrosslinkLineColorForSearches(...) is undefined for selectedProteinsIndex: " + fromSelectedProteinsIndex + ", k: " + toSelectedProteinsIndex + searchesListPart );
 					}
 
 
@@ -5989,7 +6052,14 @@ function addClickHandler__InterProteinCrosslinkLines( $SVGNativeObject ) {
 
 	$SVGNativeObject.click( function(  ) {
 
-		processClickOnCrossLink( this );
+		try {
+
+			processClickOnCrossLink( this );
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 
 	});
 }
@@ -6173,7 +6243,14 @@ function addClickHandler__SelfProteinCrosslinkLines( $SVGNativeObject ) {
 
 	$SVGNativeObject.click( function(  ) {
 
-		processClickOnCrossLink( this );
+		try {
+
+			processClickOnCrossLink( this );
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 
 	});
 	
@@ -6326,8 +6403,14 @@ function addClickHandler__ProteinLooplinkLines( $SVGNativeObject ) {
 
 	$SVGNativeObject.click( function(  ) {
 
-		processClickOnLoopLink( this );
+		try {
 
+			processClickOnLoopLink( this );
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 }
 
@@ -6483,7 +6566,14 @@ function addClickHandler__ProteinMonolinkLines( $SVGNativeObject ) {
 
 	$SVGNativeObject.click( function(  ) {
 
-		processClickOnMonoLink( this );
+		try {
+
+			processClickOnMonoLink( this );
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 
 	});
 }
@@ -6633,11 +6723,11 @@ function drawColorBySearchLegend(  selectedProteins, bottomOfLowestItemDrawn, sv
 
 			var search = _searches[ i ];
 			if ( search === undefined ) {
-				throw "search not found in _searches for index: " + i;
+				throw Error( "search not found in _searches for index: " + i );
 			}
 			var searchId = search[ 'id' ];
 			if ( searchId === undefined ) {
-				throw "searchId not found in _searches for index: " + i;
+				throw Error( "searchId not found in _searches for index: " + i );
 			}
 
 			if ( ! onlyMeasureWidth && i !== 0 ) {
@@ -6667,22 +6757,22 @@ function drawColorBySearchLegend(  selectedProteins, bottomOfLowestItemDrawn, sv
 
 				var search_1 = _searches[ i ];
 				if ( search_1 === undefined ) {
-					throw "search not found in _searches for index: " + i;
+					throw Error( "search not found in _searches for index: " + i );
 				}
 				var searchId_1 = search_1[ 'id' ];
 				if ( searchId_1 === undefined ) {
-					throw "searchId not found in _searches for index: " + i;
+					throw Error( "searchId not found in _searches for index: " + i );
 				}
 
 				for ( var k = i + 1; k < _searches.length; k++ ) {
 
 					var search_2 = _searches[ k ];
 					if ( search_2 === undefined ) {
-						throw "search not found in _searches for index: " + k;
+						throw Error( "search not found in _searches for index: " + k );
 					}
 					var searchId_2 = search_2[ 'id' ];
 					if ( searchId_2 === undefined ) {
-						throw "searchId not found in _searches for index: " + k;
+						throw Error( "searchId not found in _searches for index: " + k );
 					}
 
 					if ( ! onlyMeasureWidth ) {
@@ -6813,7 +6903,7 @@ function translateAnnotationRectanglePositionToXCoordinate( protein, proteinBarR
 	
 	} else {
 		
-		throw "translateAnnotationRectanglePositionToXCoordinate: unknown value for side: |" + side + "|"; 
+		throw Error( "translateAnnotationRectanglePositionToXCoordinate: unknown value for side: |" + side + "|" ); 
 	}
 }
 
@@ -6897,10 +6987,10 @@ function populateSelectProteinSelect( ) {
 	var proteinEntry_template_handlebarsSource = $select_protein_overlay_protein_entry_template.text();
 
 	if ( proteinEntry_template_handlebarsSource === undefined ) {
-		throw "proteinEntry_template_handlebarsSource === undefined";
+		throw Error( "proteinEntry_template_handlebarsSource === undefined" );
 	}
 	if ( proteinEntry_template_handlebarsSource === null ) {
-		throw "proteinEntry_template_handlebarsSource === null";
+		throw Error( "proteinEntry_template_handlebarsSource === null" );
 	}
 	
 	var proteinEntry_HandlebarsTemplate = Handlebars.compile( proteinEntry_template_handlebarsSource );
@@ -6924,7 +7014,14 @@ function populateSelectProteinSelect( ) {
 		
 		$newEntry.click( function( eventObject ) {
 			
-			processClickOnSelectProtein( { clickedThis : this } );
+			try {
+
+				processClickOnSelectProtein( { clickedThis : this } );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		} );
 		
 		//  Add Protein Name Tool Tip
@@ -6966,7 +7063,7 @@ function openSelectProteinSelect( params ) {
 	
 	if ( ! params ) {
 		
-		throw "params is empty";
+		throw Error( "params is empty" );
 	}
 	
 	var clickedUID, clickedProteinId;
@@ -6977,7 +7074,7 @@ function openSelectProteinSelect( params ) {
 	
 	if ( ! clickedThis ) {
 		
-		throw "clickedThis is empty";
+		throw Error( "clickedThis is empty" );
 	}
 	
 	if ( addProteinsClicked === undefined ) {
@@ -7268,7 +7365,7 @@ function processClickOnSelectProtein( params ) {
 		var position = _indexManager.findIndexPosition( clickedUID );
 		
 		if( position === -1 ) {
-			throw "Could not find position for UID: " + clickedUID;
+			throw Error( "Could not find position for UID: " + clickedUID );
 		}
 		
 		
@@ -7476,7 +7573,7 @@ function makeArcPath( direction, startx, starty, endx, endy ) {
 	
 	} else {
 		
-		throw "direction passed to makeArcPath(...) is invalid.  direction: '" + direction + "'.";
+		throw Error( "direction passed to makeArcPath(...) is invalid.  direction: '" + direction + "'." );
 	}
 
 	var path = "M" + startx + " " + starty;
@@ -7493,12 +7590,19 @@ function makeArcPath( direction, startx, starty, endx, endy ) {
 
 function downloadSvg( type ) {
 	
-	var getSVGContentsAsStringResult = getSVGContentsAsString();
-	var svgString = getSVGContentsAsStringResult.fullSVG_String;
+	try {
 
-	convertAndDownloadSVG( svgString, type );
-	
-	updateURLHash( false /* useSearchForm */ );
+		var getSVGContentsAsStringResult = getSVGContentsAsString();
+		var svgString = getSVGContentsAsStringResult.fullSVG_String;
+
+		convertAndDownloadSVG( svgString, type );
+
+		updateURLHash( false /* useSearchForm */ );
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 }
 
 
@@ -7616,87 +7720,164 @@ function initializeViewer()  {
 	    	  drawSvg();
 	      }
 	    });
-	
+
 	$( "input#show-crosslinks" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		loadDataAndDraw( true /* doDraw */ );
+		try {
+			updateURLHash( false /* useSearchForm */ );
+			loadDataAndDraw( true /* doDraw */ );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$( "input#show-self-crosslinks" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		loadDataAndDraw( true /* doDraw */ );
+		try {
+			updateURLHash( false /* useSearchForm */ );
+			loadDataAndDraw( true /* doDraw */ );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$( "input#show-looplinks" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		loadDataAndDraw( true /* doDraw */ );
+		try {
+			updateURLHash( false /* useSearchForm */ );
+			loadDataAndDraw( true /* doDraw */ );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$( "input#show-monolinks" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		loadDataAndDraw( true /* doDraw */ );
+		try {
+			updateURLHash( false /* useSearchForm */ );
+			loadDataAndDraw( true /* doDraw */ );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$( "input#show-linkable-positions" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		drawSvg();
+		try {
+			updateURLHash( false /* useSearchForm */ );
+			drawSvg();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$( "input#show-tryptic-cleavage-positions" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		drawSvg();
+		try {
+			updateURLHash( false /* useSearchForm */ );
+			drawSvg();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$( "input#show-scalebar" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		drawSvg();
+		try {
+			updateURLHash( false /* useSearchForm */ );
+			drawSvg();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$( "input#view-as-circle-plot" ).change( function() {
-		toggleCircleBarView();
+		try {
+			toggleCircleBarView();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$( "#color_by" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		drawSvg();
+		try {
+			updateURLHash( false /* useSearchForm */ );
+			drawSvg();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 
 	$( "input#shade-by-counts" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		loadDataAndDraw( true /* doDraw */ );
+		try {
+			updateURLHash( false /* useSearchForm */ );
+			loadDataAndDraw( true /* doDraw */ );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
-	
+
 	$( "#annotation_type" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		loadDataAndDraw( true /* doDraw */ );
+		try {
+			updateURLHash( false /* useSearchForm */ );
+			loadDataAndDraw( true /* doDraw */ );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
-	$( "input#automatic-sizing" ).change( function() {
-		
-		var horizontal_scaling_slider_Value = $("#horizontal_scaling_slider_div").slider( "value" );
-		
-		_userScaleFactor = _computedStandardMultiplier * ( horizontal_scaling_slider_Value / 100 );
 
-		handleScaleFactorVisibility();
-		updateURLHash( false /* useSearchForm */ );
+
+	$( "input#automatic-sizing" ).change( function() {
+
+		try {
+
+			var horizontal_scaling_slider_Value = $("#horizontal_scaling_slider_div").slider( "value" );
+
+			_userScaleFactor = _computedStandardMultiplier * ( horizontal_scaling_slider_Value / 100 );
+
+			handleScaleFactorVisibility();
+			updateURLHash( false /* useSearchForm */ );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$( "input#scale-factor-button" ).click( function() {
-		submitUserScaleFactor();
+		try {
+			submitUserScaleFactor();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	$( "input#protein_names_position_left" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		drawSvg();
+		try {
+			updateURLHash( false /* useSearchForm */ );
+			drawSvg();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$( "input#show-protein-termini" ).change( function() {
-		updateURLHash( false /* useSearchForm */ );
-		drawSvg();
+		try {
+			updateURLHash( false /* useSearchForm */ );
+			drawSvg();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 	$( "#svg-download-jpeg" ).click( function() { downloadSvg( 'jpeg' ); });
@@ -7707,20 +7888,26 @@ function initializeViewer()  {
 	
 	$("#run_pgm_annotation_data_overlay_cancel_button").click( function() { 
 
-		
-		proteinAnnotationStore.cancelCheckForComplete();
+		try {
 
-		decrementSpinner();
+			proteinAnnotationStore.cancelCheckForComplete();
 
-		$("#run_pgm_annotation_data_modal_dialog_overlay_background").hide();
-		
-		$("#run_pgm_annotation_data_overlay_div").hide();
-		
-		$("#annotation_type").val("");
-		updateURLHash( false /* useSearchForm */ );
+			decrementSpinner();
+
+			$("#run_pgm_annotation_data_modal_dialog_overlay_background").hide();
+
+			$("#run_pgm_annotation_data_overlay_div").hide();
+
+			$("#annotation_type").val("");
+			updateURLHash( false /* useSearchForm */ );
 
 
-		loadDataAndDraw( true /* doDraw */ );
+			loadDataAndDraw( true /* doDraw */ );
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 	
@@ -7728,13 +7915,19 @@ function initializeViewer()  {
 	
 	$("#pgm_failed_annotation_data_overlay_annotation_type_button").click( function() { 
 
-		$("#pgm_failed_annotation_data_modal_dialog_overlay_background").hide();
+		try {
 
-		$("#pgm_failed_annotation_data_overlay_div").hide();
+			$("#pgm_failed_annotation_data_modal_dialog_overlay_background").hide();
+
+			$("#pgm_failed_annotation_data_overlay_div").hide();
 
 
-		loadDataAndDraw( true /* doDraw */ );
+			loadDataAndDraw( true /* doDraw */ );
 
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 
@@ -7947,7 +8140,7 @@ function initPage() {
 		console.log( "SVG not supported." );
 		
 
-		throw "SVG not supported";
+		throw Error( "SVG not supported" );
 	}
 
 	
@@ -7957,7 +8150,7 @@ function initPage() {
 	
 	if ( $search_id_jq.length === 0 ) {
 		
-		throw "Must be at least one search id in hidden field with class 'search_id_jq'";
+		throw Error( "Must be at least one search id in hidden field with class 'search_id_jq'" );
 	}
 	
 	$search_id_jq.each( function( index, element ) {
@@ -7970,7 +8163,7 @@ function initPage() {
 		
 		if ( isNaN( searchId ) ) {
 			
-			throw "Search Id is not a number: " + searchIdString;
+			throw Error( "Search Id is not a number: " + searchIdString );
 		}
 		
 		
@@ -7985,7 +8178,7 @@ function initPage() {
 		$("#invalid_url_no_data_after_hash_div").show();
 
 
-		throw "Invalid URL, no data after the hash '#'";
+		throw Error( "Invalid URL, no data after the hash '#'" );
 	}
 
 	
@@ -8000,42 +8193,70 @@ function initPage() {
 	var proteinBarToolTip_template_handlebarsSource = $( "#protein_bar_tool_tip_template" ).text();
 
 	if ( proteinBarToolTip_template_handlebarsSource === undefined ) {
-		throw "proteinBarToolTip_template_handlebarsSource === undefined";
+		throw Error( "proteinBarToolTip_template_handlebarsSource === undefined" );
 	}
 	if ( proteinBarToolTip_template_handlebarsSource === null ) {
-		throw "proteinBarToolTip_template_handlebarsSource === null";
+		throw Error( "proteinBarToolTip_template_handlebarsSource === null" );
 	}
 	
 	_proteinBarToolTip_template_HandlebarsTemplate = Handlebars.compile( proteinBarToolTip_template_handlebarsSource );
 
-	
+
 	$( "input#filterNonUniquePeptides" ).change(function() {
-		
-		defaultPageView.searchFormChanged_ForDefaultPageView();
+		try {
+			defaultPageView.searchFormChanged_ForDefaultPageView();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	$( "input#filterOnlyOnePSM" ).change(function() {
-		
-		defaultPageView.searchFormChanged_ForDefaultPageView();
+		try {
+			defaultPageView.searchFormChanged_ForDefaultPageView();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	$( "input#filterOnlyOnePeptide" ).change(function() {
-		
-		defaultPageView.searchFormChanged_ForDefaultPageView();
+		try {
+			defaultPageView.searchFormChanged_ForDefaultPageView();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});		
 
 	$("#exclude_protein_types_block").find("input").change(function() {
-		
-		defaultPageView.searchFormChanged_ForDefaultPageView();
+		try {
+			defaultPageView.searchFormChanged_ForDefaultPageView();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	//  select_protein_modal_dialog_overlay_background
 	
 	$("#select_protein_overlay_X_for_exit_overlay").click( function( eventObject ) {
-		closeAddProteinSelect();
+		try {
+			closeAddProteinSelect();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 	
 	
 	$("#select_protein_add_proteins_overlay_add_button").click( function( eventObject ) {
-		processClickOnAddProteins();
+		try {
+			processClickOnAddProteins();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 	
 	
@@ -8049,7 +8270,14 @@ function initPage() {
 
 
 $(document).ready(function()  { 
-	initPage();
+	
+	try {
+		initPage();
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 });
 
 ///////////

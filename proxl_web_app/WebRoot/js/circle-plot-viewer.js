@@ -732,7 +732,14 @@ circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGO
 	path.mouseout( function() { this.attr({ strokeWidth: 1 }); });
 	
 	// add click event
-	$pathSVGObject.click( function(  ) { processClickOnLink( this ); });
+	$pathSVGObject.click( function(  ) { 
+		try {
+			processClickOnLink( this ); 
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}		
+	});
 };
 
 
@@ -990,7 +997,14 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
 	path.mouseout( function() { this.attr({ strokeWidth: 1 }); });
 	
 	// add click effects
-	$pathSVGObject.click( function(  ) { processClickOnLink( this ); });
+	$pathSVGObject.click( function(  ) { 
+		try {
+			processClickOnLink( this ); 
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}	
+	});
 
 	
     return path;

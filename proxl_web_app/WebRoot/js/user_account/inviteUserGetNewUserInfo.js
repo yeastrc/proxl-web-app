@@ -27,7 +27,13 @@ var PAGE_CONSTANTS = {
 
 var createAccountFormSubmit = function() {
 
-	createAccount();
+	try {
+		createAccount();
+		
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 };
 
 
@@ -41,7 +47,7 @@ var createAccount = function(clickThis, eventObject) {
 
 	if ($inviteCode.length === 0) {
 
-		throw "Unable to find input field for id 'code' ";
+		throw Error( "Unable to find input field for id 'code' " );
 	}
 
 	var inviteCode = $inviteCode.val();
@@ -52,7 +58,7 @@ var createAccount = function(clickThis, eventObject) {
 
 		showErrorMsg( $element );
 		
-		throw 'inviteCode === undefined || inviteCode === null ';
+		throw Error( 'inviteCode === undefined || inviteCode === null ' );
 	}
 
 	if ( inviteCode === "" ) {
@@ -61,7 +67,7 @@ var createAccount = function(clickThis, eventObject) {
 
 		showErrorMsg( $element );
 		
-		throw 'inviteCode === "" ';
+		throw Error( 'inviteCode === "" ' );
 	}
 
 	
@@ -71,7 +77,7 @@ var createAccount = function(clickThis, eventObject) {
 
 	if ($firstName.length === 0) {
 
-		throw "Unable to find input field for id 'firstName' ";
+		throw Error( "Unable to find input field for id 'firstName' " );
 	}
 
 	var firstName = $firstName.val();
@@ -81,7 +87,7 @@ var createAccount = function(clickThis, eventObject) {
 
 	if ($lastName.length === 0) {
 
-		throw "Unable to find input field for id 'lastName' ";
+		throw Error( "Unable to find input field for id 'lastName' " );
 	}
 
 	var lastName = $lastName.val();
@@ -91,7 +97,7 @@ var createAccount = function(clickThis, eventObject) {
 
 	if ($organization.length === 0) {
 
-		throw "Unable to find input field for id 'organization' ";
+		throw Error( "Unable to find input field for id 'organization' " );
 	}
 
 	var organization = $organization.val();
@@ -103,7 +109,7 @@ var createAccount = function(clickThis, eventObject) {
 
 	if ($email.length === 0) {
 
-		throw "Unable to find input field for id 'email' ";
+		throw Error( "Unable to find input field for id 'email' " );
 	}
 
 	var email = $email.val();
@@ -112,7 +118,7 @@ var createAccount = function(clickThis, eventObject) {
 
 	if ($username.length === 0) {
 
-		throw "Unable to find input field for id 'username' ";
+		throw Error( "Unable to find input field for id 'username' " );
 	}
 
 	var username = $username.val();
@@ -121,7 +127,7 @@ var createAccount = function(clickThis, eventObject) {
 
 	if ($password.length === 0) {
 
-		throw "Unable to find input field for id 'password' ";
+		throw Error( "Unable to find input field for id 'password' " );
 	}
 
 	var password = $password.val();
@@ -130,7 +136,7 @@ var createAccount = function(clickThis, eventObject) {
 
 	if ($passwordConfirm.length === 0) {
 
-		throw "Unable to find input field for id 'passwordConfirm' ";
+		throw Error( "Unable to find input field for id 'passwordConfirm' " );
 	}
 
 	var passwordConfirm = $passwordConfirm.val();
@@ -183,7 +189,12 @@ var createAccount = function(clickThis, eventObject) {
 		dataType : "json",
 		success : function(data) {
 
-			createAccountComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			try {
+				createAccountComplete( { requestData: requestData, responseData: data, clickThis: clickThis } );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure : function(errMsg) {
 			var $element = $("#error_message_system_error");
@@ -314,7 +325,13 @@ function initPage() {
 	
 	$(document).click( function(eventObject) {
 	
-		hideAllErrorMessages();
+		try {
+
+			hideAllErrorMessages();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 };

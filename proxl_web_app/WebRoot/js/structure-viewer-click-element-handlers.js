@@ -77,22 +77,22 @@ function getCrosslinkDataForSpecificLinkInGraph( params, link ) {
 	
 	var from_protein_id_int = parseInt( from_protein_id, 10 );
 	if ( isNaN( from_protein_id_int ) ) {
-		throw "from_protein_id is not an Integer, is: " + from_protein_id;
+		throw Error( "from_protein_id is not an Integer, is: " + from_protein_id );
 	}
 	
 	var to_protein_id_int = parseInt( to_protein_id, 10 );
 	if ( isNaN( to_protein_id_int ) ) {
-		throw "to_protein_id is not an Integer, is: " + to_protein_id;
+		throw Error( "to_protein_id is not an Integer, is: " + to_protein_id );
 	}
 	
 	var from_protein_position_int = parseInt( from_protein_position, 10 );
 	if ( isNaN( from_protein_position_int ) ) {
-		throw "from_protein_position is not an Integer, is: " + from_protein_position;
+		throw Error( "from_protein_position is not an Integer, is: " + from_protein_position );
 	}
 	
 	var to_protein_position_int = parseInt( to_protein_position, 10 );
 	if ( isNaN( to_protein_position_int ) ) {
-		throw "to_protein_position is not an Integer, is: " + to_protein_position;
+		throw Error( "to_protein_position is not an Integer, is: " + to_protein_position );
 	}
 	
 	var context = {

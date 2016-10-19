@@ -47,13 +47,18 @@ $(document).ready(function()  {
 
 function initLorikeetViewer() {
 
-	attachLorikeetOverlayClickHandlers();
+	try {
 
-	var $openLorkeetLinks = $(".view_spectrum_open_spectrum_link_jq");
-	
-	addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
+		attachLorikeetOverlayClickHandlers();
 
-	
+		var $openLorkeetLinks = $(".view_spectrum_open_spectrum_link_jq");
+
+		addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 }
 
 
@@ -102,9 +107,15 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 
 					success :  function( data ) {
 
-//						testStatusOnReturnedJSON( data );
+						try {
+//							testStatusOnReturnedJSON( data );
 
-						openViewLorikeetOverlayProcessData( data );
+							openViewLorikeetOverlayProcessData( data );
+							
+						} catch( e ) {
+							reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+							throw e;
+						}
 					},
 			        failure: function(errMsg) {
 			        	handleAJAXFailure( errMsg );
@@ -948,7 +959,7 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 		
 		} else {
 			
-			throw "direction passed to makeArcPath(...) is invalid.  direction: '" + direction + "'.";
+			throw Error( "direction passed to makeArcPath(...) is invalid.  direction: '" + direction + "'." );
 		}
 
 		var path = "M" + startx + " " + starty;
@@ -999,13 +1010,23 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 		var $view_spectra_overlay_X_for_exit_overlay = $(".view-spectra-overlay-X-for-exit-overlay");
 		
 		$view_spectra_overlay_X_for_exit_overlay.click( function( eventObject ) {
-
-			closeLorikeetOverlay();
+			try {
+				closeLorikeetOverlay();
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		} );
 
 		$("#lorikeet-modal-dialog-overlay-background").click( function( eventObject ) {
-
-			closeLorikeetOverlay();
+			try {
+				closeLorikeetOverlay();
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		} );
 
 //		$(".view-spectra-overlay-div").click( function( eventObject ) {
@@ -1014,8 +1035,13 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 //		} );
 
 		$(".error-message-ok-button").click( function( eventObject ) {
-
-			closeLorikeetOverlay();
+			try {
+				closeLorikeetOverlay();
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		} );
 
 		

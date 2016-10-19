@@ -32,84 +32,91 @@ var _data_per_search_between_searches_html = null;
 /////////////////////
 
 function getLooplinkDataCommon( params ) {
-	
 
-	var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
-	
+	try {
 
-	var requestContext = params.context;
-	
-
-	var search_ids = requestContext.searchesArray;
-	
-	//  Extract psm peptide cutoffs for search ids provided
-	
-	var psmPeptideCutoffsRootObjectForQuery = { searches : {} };
-	
-	var searches = psmPeptideCutoffsRootObject.searches;
-	
-	var querySearches = psmPeptideCutoffsRootObjectForQuery.searches;
-	
-	
-	for ( var search_idsIndex = 0; search_idsIndex < search_ids.length; search_idsIndex++ ) {
-		
-		var searchId = search_ids[ search_idsIndex ];
-		
-		var searchIdString = searchId.toString();
-		
-		var cutoffForSearchId = searches[ searchIdString ];
-		
-		querySearches[ searchIdString ] = cutoffForSearchId;
-	} 
-	
-	
-
-	///   Serialize cutoffs to JSON
-
-	var psmPeptideCutoffsRootObjectForQueryObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObjectForQuery );
-
-	var ajaxRequestData = {
-
-			search_ids : search_ids,
-			psmPeptideCutoffsForSearchIds : psmPeptideCutoffsRootObjectForQueryObject_JSONString,
-			
-			protein_id : requestContext.from_protein_id,
-			protein_position_1 : requestContext.protein_position_1,
-			protein_position_2 : requestContext.protein_position_2
-	};
-	
+		var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
 
 
-	var _URL = contextPathJSVar + "/services/data/getLooplinkProteinsPerSearchIdsProteinIdsPositions";
-
-	$.ajax({
-		type: "GET",
-		url: _URL,
-		dataType: "json",
-		data: ajaxRequestData,  //  The data sent as params on the URL
-
-		traditional: true,  //  Force traditional serialization of the data sent
-							//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-							//   So searchIds array is passed as "searchIds=<value>" which is what Jersey expects
-		
-		success: function(data)	{
+		var requestContext = params.context;
 
 
-			decrementSpinner();
+		var search_ids = requestContext.searchesArray;
 
-			getLooplinkDataCommonProcessResponse( { ajaxResponseData: data, ajaxRequestData: ajaxRequestData, requestContext : requestContext });
+		//  Extract psm peptide cutoffs for search ids provided
 
-		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
-        error: function(jqXHR, textStatus, errorThrown) {	
+		var psmPeptideCutoffsRootObjectForQuery = { searches : {} };
 
-			handleAJAXError( jqXHR, textStatus, errorThrown );
-		}
-	});
-	
-	
+		var searches = psmPeptideCutoffsRootObject.searches;
+
+		var querySearches = psmPeptideCutoffsRootObjectForQuery.searches;
+
+
+		for ( var search_idsIndex = 0; search_idsIndex < search_ids.length; search_idsIndex++ ) {
+
+			var searchId = search_ids[ search_idsIndex ];
+
+			var searchIdString = searchId.toString();
+
+			var cutoffForSearchId = searches[ searchIdString ];
+
+			querySearches[ searchIdString ] = cutoffForSearchId;
+		} 
+
+
+
+		///   Serialize cutoffs to JSON
+
+		var psmPeptideCutoffsRootObjectForQueryObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObjectForQuery );
+
+		var ajaxRequestData = {
+
+				search_ids : search_ids,
+				psmPeptideCutoffsForSearchIds : psmPeptideCutoffsRootObjectForQueryObject_JSONString,
+
+				protein_id : requestContext.from_protein_id,
+				protein_position_1 : requestContext.protein_position_1,
+				protein_position_2 : requestContext.protein_position_2
+		};
+
+
+
+		var _URL = contextPathJSVar + "/services/data/getLooplinkProteinsPerSearchIdsProteinIdsPositions";
+
+		$.ajax({
+			type: "GET",
+			url: _URL,
+			dataType: "json",
+			data: ajaxRequestData,  //  The data sent as params on the URL
+
+			traditional: true,  //  Force traditional serialization of the data sent
+			//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+			//   So searchIds array is passed as "searchIds=<value>" which is what Jersey expects
+
+			success: function(data)	{
+				try {
+					decrementSpinner();
+
+					getLooplinkDataCommonProcessResponse( { ajaxResponseData: data, ajaxRequestData: ajaxRequestData, requestContext : requestContext });
+					
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			},
+			failure: function(errMsg) {
+				handleAJAXFailure( errMsg );
+			},
+			error: function(jqXHR, textStatus, errorThrown) {	
+
+				handleAJAXError( jqXHR, textStatus, errorThrown );
+			}
+		});
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 	
 }
 
@@ -167,10 +174,10 @@ function getLooplinkDataCommonProcessResponse( params ) {
 	var handlebarsSource_protein_data_per_search_block_template = $( "#protein_data_per_search_block_template" ).html(); 
 
 	if ( handlebarsSource_protein_data_per_search_block_template === undefined ) {
-		throw "handlebarsSource_protein_data_per_search_block_template === undefined";
+		throw Error( "handlebarsSource_protein_data_per_search_block_template === undefined" );
 	}
 	if ( handlebarsSource_protein_data_per_search_block_template === null ) {
-		throw "handlebarsSource_protein_data_per_search_block_template === null";
+		throw Error( "handlebarsSource_protein_data_per_search_block_template === null" );
 	}
 
 	var handlebarsTemplate_protein_data_per_search_block_template = Handlebars.compile( handlebarsSource_protein_data_per_search_block_template );
@@ -179,10 +186,10 @@ function getLooplinkDataCommonProcessResponse( params ) {
 	var handlebarsSource_protein_data_per_search_data_row_entry_template = $( "#protein_data_per_search_data_row_entry_template" ).html(); 
 
 	if ( handlebarsSource_protein_data_per_search_data_row_entry_template === undefined ) {
-		throw "handlebarsSource_protein_data_per_search_data_row_entry_template === undefined";
+		throw Error( "handlebarsSource_protein_data_per_search_data_row_entry_template === undefined" );
 	}
 	if ( handlebarsSource_protein_data_per_search_data_row_entry_template === null ) {
-		throw "handlebarsSource_protein_data_per_search_data_row_entry_template === null";
+		throw Error( "handlebarsSource_protein_data_per_search_data_row_entry_template === null" );
 	}
 
 	var handlebarsTemplate_protein_data_per_search_data_row_entry_template = Handlebars.compile( handlebarsSource_protein_data_per_search_data_row_entry_template );
@@ -191,10 +198,10 @@ function getLooplinkDataCommonProcessResponse( params ) {
 	var handlebarsSource_protein_data_per_search_child_row_entry_template = $( "#protein_data_per_search_child_row_entry_template" ).html(); 
 
 	if ( handlebarsSource_protein_data_per_search_child_row_entry_template === undefined ) {
-		throw "handlebarsSource_protein_data_per_search_child_row_entry_template === undefined";
+		throw Error( "handlebarsSource_protein_data_per_search_child_row_entry_template === undefined" );
 	}
 	if ( handlebarsSource_protein_data_per_search_child_row_entry_template === null ) {
-		throw "handlebarsSource_protein_data_per_search_child_row_entry_template === null";
+		throw Error( "handlebarsSource_protein_data_per_search_child_row_entry_template === null" );
 	}
 
 	var handlebarsTemplate_protein_data_per_search_child_row_entry_template = Handlebars.compile( handlebarsSource_protein_data_per_search_child_row_entry_template );
@@ -267,10 +274,10 @@ function getLooplinkDataCommonProcessResponse( params ) {
 			_data_per_search_between_searches_html = $protein_data_per_search_block.find( ".data_per_search_between_searches_html_jq" ).html();
 
 			if ( _data_per_search_between_searches_html === undefined ) {
-				throw "data_per_search_between_searches_html_jq === undefined";
+				throw Error( "data_per_search_between_searches_html_jq === undefined" );
 			}
 			if ( _data_per_search_between_searches_html === null ) {
-				throw "data_per_search_between_searches_html_jq === null";
+				throw Error( "data_per_search_between_searches_html_jq === null" );
 			}
 
 		}
@@ -287,7 +294,7 @@ function getLooplinkDataCommonProcessResponse( params ) {
 
 		if ( $link_info_table_jq.length === 0 ) {
 
-			throw "unable to find HTML element with class '" + link_info_table_jq_ClassName + "'";
+			throw Error( "unable to find HTML element with class '" + link_info_table_jq_ClassName + "'" );
 		}
 
 
@@ -426,19 +433,23 @@ function getCrosslinkDataCommon( params ) {
 		//   So searchIds array is passed as "searchIds=<value>" which is what Jersey expects
 
 		success: function(data)	{
+			try {
+			
+				decrementSpinner();
 
+				var getCrosslinkDataCommonProcessResponseParams = 
+				{ 
+						ajaxResponseData: data, 
+						ajaxRequestData: ajaxRequestData,
+						requestContext: requestContext
+				};
 
-			decrementSpinner();
-
-			var getCrosslinkDataCommonProcessResponseParams = 
-			{ 
-					ajaxResponseData: data, 
-					ajaxRequestData: ajaxRequestData,
-					requestContext: requestContext
-			};
-
-			getCrosslinkDataCommonProcessResponse( getCrosslinkDataCommonProcessResponseParams );
-
+				getCrosslinkDataCommonProcessResponse( getCrosslinkDataCommonProcessResponseParams );
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -506,10 +517,10 @@ function getCrosslinkDataCommonProcessResponse( params ) {
 	var handlebarsSource_protein_data_per_search_block_template = $( "#protein_data_per_search_block_template" ).html(); 
 
 	if ( handlebarsSource_protein_data_per_search_block_template === undefined ) {
-		throw "handlebarsSource_protein_data_per_search_block_template === undefined";
+		throw Error( "handlebarsSource_protein_data_per_search_block_template === undefined" );
 	}
 	if ( handlebarsSource_protein_data_per_search_block_template === null ) {
-		throw "handlebarsSource_protein_data_per_search_block_template === null";
+		throw Error( "handlebarsSource_protein_data_per_search_block_template === null" );
 	}
 
 	var handlebarsTemplate_protein_data_per_search_block_template = Handlebars.compile( handlebarsSource_protein_data_per_search_block_template );
@@ -518,10 +529,10 @@ function getCrosslinkDataCommonProcessResponse( params ) {
 	var handlebarsSource_protein_data_per_search_data_row_entry_template = $( "#protein_data_per_search_data_row_entry_template" ).html(); 
 
 	if ( handlebarsSource_protein_data_per_search_data_row_entry_template === undefined ) {
-		throw "handlebarsSource_protein_data_per_search_data_row_entry_template === undefined";
+		throw Error( "handlebarsSource_protein_data_per_search_data_row_entry_template === undefined" );
 	}
 	if ( handlebarsSource_protein_data_per_search_data_row_entry_template === null ) {
-		throw "handlebarsSource_protein_data_per_search_data_row_entry_template === null";
+		throw Error( "handlebarsSource_protein_data_per_search_data_row_entry_template === null" );
 	}
 
 	var handlebarsTemplate_protein_data_per_search_data_row_entry_template = Handlebars.compile( handlebarsSource_protein_data_per_search_data_row_entry_template );
@@ -530,10 +541,10 @@ function getCrosslinkDataCommonProcessResponse( params ) {
 	var handlebarsSource_protein_data_per_search_child_row_entry_template = $( "#protein_data_per_search_child_row_entry_template" ).html(); 
 
 	if ( handlebarsSource_protein_data_per_search_child_row_entry_template === undefined ) {
-		throw "handlebarsSource_protein_data_per_search_child_row_entry_template === undefined";
+		throw Error( "handlebarsSource_protein_data_per_search_child_row_entry_template === undefined" );
 	}
 	if ( handlebarsSource_protein_data_per_search_child_row_entry_template === null ) {
-		throw "handlebarsSource_protein_data_per_search_child_row_entry_template === null";
+		throw Error( "handlebarsSource_protein_data_per_search_child_row_entry_template === null" );
 	}
 
 	var handlebarsTemplate_protein_data_per_search_child_row_entry_template = Handlebars.compile( handlebarsSource_protein_data_per_search_child_row_entry_template );
@@ -607,10 +618,10 @@ function getCrosslinkDataCommonProcessResponse( params ) {
 			_data_per_search_between_searches_html = $protein_data_per_search_block.find( ".data_per_search_between_searches_html_jq" ).html();
 
 			if ( _data_per_search_between_searches_html === undefined ) {
-				throw "data_per_search_between_searches_html_jq === undefined";
+				throw Error( "data_per_search_between_searches_html_jq === undefined" );
 			}
 			if ( _data_per_search_between_searches_html === null ) {
-				throw "data_per_search_between_searches_html_jq === null";
+				throw Error( "data_per_search_between_searches_html_jq === null" );
 			}
 
 		}
@@ -627,7 +638,7 @@ function getCrosslinkDataCommonProcessResponse( params ) {
 
 		if ( $link_info_table_jq.length === 0 ) {
 
-			throw "unable to find HTML element with class '" + link_info_table_jq_ClassName + "'";
+			throw Error( "unable to find HTML element with class '" + link_info_table_jq_ClassName + "'" );
 		}
 
 
@@ -761,12 +772,16 @@ function getMonolinkDataCommon( params ) {
 		//   So searchIds array is passed as "searchIds=<value>" which is what Jersey expects
 
 		success: function(data)	{
+			try {
 
+				decrementSpinner();
 
-			decrementSpinner();
-
-			getMonolinkDataCommonProcessResponse( { ajaxResponseData: data, ajaxRequestData: ajaxRequestData, requestContext : requestContext });
-
+				getMonolinkDataCommonProcessResponse( { ajaxResponseData: data, ajaxRequestData: ajaxRequestData, requestContext : requestContext });
+			
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -837,10 +852,10 @@ function getMonolinkDataCommonProcessResponse( params ) {
 	var handlebarsSource_protein_data_per_search_block_template = $( "#protein_data_per_search_block_template" ).html(); 
 
 	if ( handlebarsSource_protein_data_per_search_block_template === undefined ) {
-		throw "handlebarsSource_protein_data_per_search_block_template === undefined";
+		throw Error( "handlebarsSource_protein_data_per_search_block_template === undefined" );
 	}
 	if ( handlebarsSource_protein_data_per_search_block_template === null ) {
-		throw "handlebarsSource_protein_data_per_search_block_template === null";
+		throw Error( "handlebarsSource_protein_data_per_search_block_template === null" );
 	}
 	
 	var handlebarsTemplate_protein_data_per_search_block_template = Handlebars.compile( handlebarsSource_protein_data_per_search_block_template );
@@ -849,10 +864,10 @@ function getMonolinkDataCommonProcessResponse( params ) {
 	var handlebarsSource_protein_data_per_search_data_row_entry_template = $( "#protein_data_per_search_data_row_entry_template" ).html(); 
 
 	if ( handlebarsSource_protein_data_per_search_data_row_entry_template === undefined ) {
-		throw "handlebarsSource_protein_data_per_search_data_row_entry_template === undefined";
+		throw Error( "handlebarsSource_protein_data_per_search_data_row_entry_template === undefined" );
 	}
 	if ( handlebarsSource_protein_data_per_search_data_row_entry_template === null ) {
-		throw "handlebarsSource_protein_data_per_search_data_row_entry_template === null";
+		throw Error( "handlebarsSource_protein_data_per_search_data_row_entry_template === null" );
 	}
 	
 	var handlebarsTemplate_protein_data_per_search_data_row_entry_template = Handlebars.compile( handlebarsSource_protein_data_per_search_data_row_entry_template );
@@ -861,10 +876,10 @@ function getMonolinkDataCommonProcessResponse( params ) {
 	var handlebarsSource_protein_data_per_search_child_row_entry_template = $( "#protein_data_per_search_child_row_entry_template" ).html(); 
 
 	if ( handlebarsSource_protein_data_per_search_child_row_entry_template === undefined ) {
-		throw "handlebarsSource_protein_data_per_search_child_row_entry_template === undefined";
+		throw Error( "handlebarsSource_protein_data_per_search_child_row_entry_template === undefined" );
 	}
 	if ( handlebarsSource_protein_data_per_search_child_row_entry_template === null ) {
-		throw "handlebarsSource_protein_data_per_search_child_row_entry_template === null";
+		throw Error( "handlebarsSource_protein_data_per_search_child_row_entry_template === null" );
 	}
 	
 	var handlebarsTemplate_protein_data_per_search_child_row_entry_template = Handlebars.compile( handlebarsSource_protein_data_per_search_child_row_entry_template );
@@ -937,10 +952,10 @@ function getMonolinkDataCommonProcessResponse( params ) {
 			_data_per_search_between_searches_html = $protein_data_per_search_block.find( ".data_per_search_between_searches_html_jq" ).html();
 			
 			if ( _data_per_search_between_searches_html === undefined ) {
-				throw "data_per_search_between_searches_html_jq === undefined";
+				throw Error( "data_per_search_between_searches_html_jq === undefined" );
 			}
 			if ( _data_per_search_between_searches_html === null ) {
-				throw "data_per_search_between_searches_html_jq === null";
+				throw Error( "data_per_search_between_searches_html_jq === null" );
 			}
 
 		}
@@ -957,7 +972,7 @@ function getMonolinkDataCommonProcessResponse( params ) {
 
 		if ( $link_info_table_jq.length === 0 ) {
 
-			throw "unable to find HTML element with class '" + link_info_table_jq_ClassName + "'";
+			throw Error( "unable to find HTML element with class '" + link_info_table_jq_ClassName + "'" );
 		}
 
 
@@ -1081,18 +1096,30 @@ var closeViewLinkInfoOverlay = function (  ) {
 var attachViewLinkInfoOverlayClickHandlers = function (  ) {
 
 	$(".view-link-info-overlay-X-for-exit-overlay").click( function( eventObject ) {
-
-		closeViewLinkInfoOverlay();
+		try {
+			closeViewLinkInfoOverlay();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 
 	$("#view_link_info_modal_dialog_overlay_background").click( function( eventObject ) {
-
-		closeViewLinkInfoOverlay();
+		try {
+			closeViewLinkInfoOverlay();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 
 	$(".error-message-ok-button").click( function( eventObject ) {
-
-		closeViewLinkInfoOverlay();
+		try {
+			closeViewLinkInfoOverlay();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	} );
 
 

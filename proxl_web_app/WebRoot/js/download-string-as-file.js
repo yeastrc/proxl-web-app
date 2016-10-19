@@ -8,41 +8,46 @@
  */
 var downloadStringAsFile = function( filename, mimetype, content ) {
 	
-	
-	
-	console.log( "downloadStringAsFile called." );
-	
-	var form = document.createElement( "form" );
-	
-	$( form ).hide();
-	
-    form.setAttribute( "method", "post" );
-    form.setAttribute( "action", contextPathJSVar + "/downloadStringAsFile.do" );
-    form.setAttribute( "target", "_blank" );
+	try {
 
-    var filenameField = document.createElement( "input" );
-    filenameField.setAttribute("name", "filename");
-    filenameField.setAttribute("value", filename);
+		console.log( "downloadStringAsFile called." );
 
-    var mimetypeField = document.createElement( "input" );
-    mimetypeField.setAttribute("name", "mimetype");
-    mimetypeField.setAttribute("value", mimetype);
+		var form = document.createElement( "form" );
 
-    var contentField = document.createElement( "textarea" );
-    contentField.setAttribute("name", "content");
-    
-    $( contentField ).text( content );
+		$( form ).hide();
 
-    form.appendChild( filenameField );
-    form.appendChild( mimetypeField );
-    form.appendChild( contentField );
-    
-    document.body.appendChild(form);    // Not entirely sure if this is necessary			
+		form.setAttribute( "method", "post" );
+		form.setAttribute( "action", contextPathJSVar + "/downloadStringAsFile.do" );
+		form.setAttribute( "target", "_blank" );
 
-    form.submit();
-	
-    document.body.removeChild( form );
+		var filenameField = document.createElement( "input" );
+		filenameField.setAttribute("name", "filename");
+		filenameField.setAttribute("value", filename);
 
-	
-	//window.open("data:" + mimetype + ";charset=utf-8," + encodeURIComponent(content));
+		var mimetypeField = document.createElement( "input" );
+		mimetypeField.setAttribute("name", "mimetype");
+		mimetypeField.setAttribute("value", mimetype);
+
+		var contentField = document.createElement( "textarea" );
+		contentField.setAttribute("name", "content");
+
+		$( contentField ).text( content );
+
+		form.appendChild( filenameField );
+		form.appendChild( mimetypeField );
+		form.appendChild( contentField );
+
+		document.body.appendChild(form);    // Not entirely sure if this is necessary			
+
+		form.submit();
+
+		document.body.removeChild( form );
+
+		
+		//window.open("data:" + mimetype + ";charset=utf-8," + encodeURIComponent(content));
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 };

@@ -19,17 +19,23 @@ var ViewMergedCrosslinkProteinPageCode = function() {
 
 		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 
-			var params = {
-					listOfObjectsToPassPsmPeptideCutoffsRootTo : [ 
-					                                              viewCrosslinkProteinsLoadedFromWebServiceTemplate,
-					                                              viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate,
-					                                              viewPsmsLoadedFromWebServiceTemplate,
-					                                              viewPeptidesRelatedToPSMsByScanId
-					                                              ]
-			};
+			try {
 
-			viewSearchProteinPageCommonCrosslinkLooplinkCoverage.createPartsAboveMainTableSearchProteinPageCommon( params );
+				var params = {
+						listOfObjectsToPassPsmPeptideCutoffsRootTo : [ 
+						                                              viewCrosslinkProteinsLoadedFromWebServiceTemplate,
+						                                              viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate,
+						                                              viewPsmsLoadedFromWebServiceTemplate,
+						                                              viewPeptidesRelatedToPSMsByScanId
+						                                              ]
+				};
 
+				viewSearchProteinPageCommonCrosslinkLooplinkCoverage.createPartsAboveMainTableSearchProteinPageCommon( params );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},10);
 		
 
@@ -39,7 +45,14 @@ var ViewMergedCrosslinkProteinPageCode = function() {
 
 			if ( window.createMergedSearchesLinkCountsVennDiagram_PageFunction ) {
 
-				window.createMergedSearchesLinkCountsVennDiagram_PageFunction();
+				try {
+
+					window.createMergedSearchesLinkCountsVennDiagram_PageFunction();
+
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
 			}
 		},10);
 	};
@@ -50,8 +63,14 @@ var ViewMergedCrosslinkProteinPageCode = function() {
 	
 	this.updatePageForFormParams = function() {
 	
+		try {
 		
-		viewSearchProteinPageCommonCrosslinkLooplinkCoverage.updatePageForFormParams();
+			viewSearchProteinPageCommonCrosslinkLooplinkCoverage.updatePageForFormParams();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	};
 		
 	

@@ -16,72 +16,87 @@
 
 $(document).ready(function() {
 
+	try {
 
-	$(".collapsable_collapse_link_jq").click( function(eventObject) {
-	
-		var $this = $( this );
-		var $collapsable_container_jq = $this.closest(".collapsable_container_jq");
-		
-		var $collapsable_jq = $collapsable_container_jq.children(".collapsable_jq");
-		
-		var $collapsable_expand_link_jq = $collapsable_container_jq.children(".collapsable_expand_link_jq");
-		
-		if ( $collapsable_expand_link_jq.length === 0 ) {
-			
-			var $collapsable_link_container_jq = $collapsable_container_jq.children(".collapsable_link_container_jq");
-			$collapsable_expand_link_jq = $collapsable_link_container_jq.children(".collapsable_expand_link_jq");
-			
-		}
-		
-		$this.hide();
-		$collapsable_jq.hide();
-		$collapsable_expand_link_jq.show();
+		$(".collapsable_collapse_link_jq").click( function(eventObject) {
 
-		if ( $collapsable_expand_link_jq.length === 0 ) {
-			
-			throw "Unable to find class=\"collapsable_jq\" to hide";
-		}
+			try {
 
-		if ( $collapsable_expand_link_jq.length === 0 ) {
-			
-			throw "Unable to find expand link";
-		}
+				var $this = $( this );
+				var $collapsable_container_jq = $this.closest(".collapsable_container_jq");
 
-	});
-	
-	
+				var $collapsable_jq = $collapsable_container_jq.children(".collapsable_jq");
 
-	$(".collapsable_expand_link_jq").click( function(eventObject) {
-	
-		var $this = $( this );
-		var $collapsable_container_jq = $this.closest(".collapsable_container_jq");
-		
-		var $collapsable_jq = $collapsable_container_jq.children(".collapsable_jq");
-		
-		var $collapsable_collapse_link_jq = $collapsable_container_jq.children(".collapsable_collapse_link_jq");
-		
-		if ( $collapsable_collapse_link_jq.length === 0 ) {
-			
-			var $collapsable_link_container_jq = $collapsable_container_jq.children(".collapsable_link_container_jq");
-			$collapsable_collapse_link_jq = $collapsable_link_container_jq.children(".collapsable_collapse_link_jq");
-			
-		}
-		
-		$this.hide();
-		$collapsable_jq.show();
-		$collapsable_collapse_link_jq.show();
+				var $collapsable_expand_link_jq = $collapsable_container_jq.children(".collapsable_expand_link_jq");
 
-		if ( $collapsable_collapse_link_jq.length === 0 ) {
-			
-			throw "Unable to find class=\"collapsable_jq\" to show";
-		}
+				if ( $collapsable_expand_link_jq.length === 0 ) {
 
-		if ( $collapsable_collapse_link_jq.length === 0 ) {
-			
-			throw "Unable to find collapse link";
-		}
+					var $collapsable_link_container_jq = $collapsable_container_jq.children(".collapsable_link_container_jq");
+					$collapsable_expand_link_jq = $collapsable_link_container_jq.children(".collapsable_expand_link_jq");
 
-	});
-	
+				}
+
+				$this.hide();
+				$collapsable_jq.hide();
+				$collapsable_expand_link_jq.show();
+
+				if ( $collapsable_expand_link_jq.length === 0 ) {
+
+					throw Error( "Unable to find class=\"collapsable_jq\" to hide" );
+				}
+
+				if ( $collapsable_expand_link_jq.length === 0 ) {
+
+					throw Error( "Unable to find expand link" );
+				}
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+
+
+		$(".collapsable_expand_link_jq").click( function(eventObject) {
+
+			try {
+
+				var $this = $( this );
+				var $collapsable_container_jq = $this.closest(".collapsable_container_jq");
+
+				var $collapsable_jq = $collapsable_container_jq.children(".collapsable_jq");
+
+				var $collapsable_collapse_link_jq = $collapsable_container_jq.children(".collapsable_collapse_link_jq");
+
+				if ( $collapsable_collapse_link_jq.length === 0 ) {
+
+					var $collapsable_link_container_jq = $collapsable_container_jq.children(".collapsable_link_container_jq");
+					$collapsable_collapse_link_jq = $collapsable_link_container_jq.children(".collapsable_collapse_link_jq");
+
+				}
+
+				$this.hide();
+				$collapsable_jq.show();
+				$collapsable_collapse_link_jq.show();
+
+				if ( $collapsable_collapse_link_jq.length === 0 ) {
+
+					throw Error( "Unable to find class=\"collapsable_jq\" to show" );
+				}
+
+				if ( $collapsable_collapse_link_jq.length === 0 ) {
+
+					throw Error( "Unable to find collapse link" );
+				}
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+
+		});
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 
 });

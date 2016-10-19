@@ -3,7 +3,14 @@
 
 	$(document).ready(function() {
 		
-		addToolTips();
+		try {
+
+			addToolTips();
+			
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 
 	});
 	

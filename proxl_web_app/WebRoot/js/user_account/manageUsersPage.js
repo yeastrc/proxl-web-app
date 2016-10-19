@@ -27,8 +27,13 @@ var adminGlobals = {
 
 var updateInvitedPeopleCurrentUsersLists = function() {
 
-	getInvitedPeople();
-//	getCurrentUserAccess();
+	try {
+		getInvitedPeople();
+//		getCurrentUserAccess();
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 };
 
 
@@ -52,7 +57,12 @@ var getInvitedPeople = function() {
 		dataType : "json",
 		success : function(data) {
 
-			getInvitedPeopleResponse(requestData, data);
+			try {
+				getInvitedPeopleResponse(requestData, data);
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
         failure: function(errMsg) {
         	handleAJAXFailure( errMsg );
@@ -85,20 +95,20 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 				access_level_id_administrator_String === null || 
 				access_level_id_administrator_String === "" ) {
 			
-			throw "No value for hidden field with id 'access_level_id_administrator'";
+			throw Error( "No value for hidden field with id 'access_level_id_administrator'" );
 		}
 		
 		
 		if ( access_level_id_user_String === undefined || 
 				access_level_id_user_String === null ) {
 			
-			throw "Hidden field with id 'access_level_id_user' value is undefined or null or the field is not found";
+			throw Error( "Hidden field with id 'access_level_id_user' value is undefined or null or the field is not found" );
 		}
 		
 		var access_level_id_administrator = parseInt( access_level_id_administrator_String, 10 ); 
 
 		if ( isNaN( access_level_id_administrator ) ) {
-			throw "value in hidden field with id 'access_level_id_administrator' is not a number, it is: " + access_level_id_administrator_String;
+			throw Error( "value in hidden field with id 'access_level_id_administrator' is not a number, it is: " + access_level_id_administrator_String );
 		}
 		
 		var access_level_id_user = null;  //  default to null if field === ""
@@ -108,7 +118,7 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 			access_level_id_user = parseInt( access_level_id_user_String, 10 ); 
 		
 			if ( isNaN( access_level_id_user ) ) {
-				throw "value in hidden field with id 'access_level_id_user' is not a number, it is: " + access_level_id_user_String;
+				throw Error( "value in hidden field with id 'access_level_id_user' is not a number, it is: " + access_level_id_user_String );
 			}
 		}
 		
@@ -121,7 +131,7 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 				access_level_id_project_owner_String === null || 
 				access_level_id_project_owner_String === "" ) {
 			
-			throw "No value for hidden field with id 'access-level-id-project-owner'";
+			throw Error( "No value for hidden field with id 'access-level-id-project-owner'" );
 		}
 		
 		
@@ -129,18 +139,18 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 				access_level_id_project_researcher_String === null || 
 				access_level_id_project_researcher_String === "" ) {
 			
-			throw "No value for hidden field with id 'access-level-id-project-researcher'";
+			throw Error( "No value for hidden field with id 'access-level-id-project-researcher'" );
 		}
 		
 		var access_level_id_project_owner = parseInt( access_level_id_project_owner_String, 10 ); 
 		var access_level_id_project_researcher = parseInt( access_level_id_project_researcher_String, 10 ); 
 		
 		if ( isNaN( access_level_id_project_owner ) ) {
-			throw "value in hidden field with id 'access-level-id-project-owner' is not a number, it is: " + access_level_id_project_owner_String;
+			throw Error( "value in hidden field with id 'access-level-id-project-owner' is not a number, it is: " + access_level_id_project_owner_String );
 		}
 		
 		if ( isNaN( access_level_id_project_researcher ) ) {
-			throw "value in hidden field with id 'access-level-id-project-researcher' is not a number, it is: " + access_level_id_project_researcher_String;
+			throw Error( "value in hidden field with id 'access-level-id-project-researcher' is not a number, it is: " + access_level_id_project_researcher_String );
 		}
 				
 				
@@ -159,10 +169,10 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 
 
 		if ( source === undefined ) {
-			throw "$invited_person_entry_template.html() === undefined";
+			throw Error( "$invited_person_entry_template.html() === undefined" );
 		}
 		if ( source === null ) {
-			throw "$invited_person_entry_template.html() === null";
+			throw Error( "$invited_person_entry_template.html() === null" );
 		}
 		
 		var template = Handlebars.compile(source);
@@ -203,11 +213,16 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 
 				$invited_person_entry_access_level_update_button_jq.click(function(eventObject) {
 
-					var clickThis = this;
+					try {
+						var clickThis = this;
 
-					updateInvitedPersonAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_user } );
+						updateInvitedPersonAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_user } );
 
-					return false;
+						return false;
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
 				});
 					
 //				} else {
@@ -281,11 +296,16 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 
 				$invited_person_entry_access_level_update_button_jq.click(function(eventObject) {
 
-					var clickThis = this;
+					try {
+						var clickThis = this;
 
-					updateInvitedPersonAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_administrator } );
+						updateInvitedPersonAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_administrator } );
 
-					return false;
+						return false;
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
 				});
 
 //				} else {
@@ -309,11 +329,16 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 
 				$invited_person_entry_access_level_remove_button_jq.click(function(eventObject) {
 
-					var clickThis = this;
+					try {
+						var clickThis = this;
 
-					revokePersonInvite(clickThis);
+						revokePersonInvite(clickThis);
 
-					return false;
+						return false;
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
 				});
 			} else {
 
@@ -625,10 +650,10 @@ var getCurrentUserAccessResponse = function(requestData, responseData) {
 			var template = Handlebars.compile(source);
 
 			if ( template === undefined ) {
-				throw '$("#current_account_template").html() === undefined';
+				throw Error( '$("#current_account_template").html() === undefined' );
 			}
 			if ( template === null ) {
-				throw '$("#current_account_template").html() === null';
+				throw Error( '$("#current_account_template").html() === null' );
 			}
 			
 			var context = currentUser;
@@ -653,20 +678,20 @@ var getCurrentUserAccessResponse = function(requestData, responseData) {
 				access_level_id_administrator_String === null || 
 				access_level_id_administrator_String === "" ) {
 			
-			throw "No value for hidden field with id 'access_level_id_administrator'";
+			throw Error( "No value for hidden field with id 'access_level_id_administrator'" );
 		}
 		
 		
 		if ( access_level_id_user_String === undefined || 
 				access_level_id_user_String === null ) {
 			
-			throw "Hidden field with id 'access_level_id_user' value is undefined or null or the field is not found";
+			throw Error( "Hidden field with id 'access_level_id_user' value is undefined or null or the field is not found" );
 		}
 		
 		var access_level_id_administrator = parseInt( access_level_id_administrator_String, 10 ); 
 
 		if ( isNaN( access_level_id_administrator ) ) {
-			throw "value in hideden field with id 'access_level_id_administrator' is not a number, it is: " + access_level_id_administrator_String;
+			throw Error( "value in hidden field with id 'access_level_id_administrator' is not a number, it is: " + access_level_id_administrator_String );
 		}
 		
 		var access_level_id_user = null;  //  default to null if field === ""
@@ -676,7 +701,7 @@ var getCurrentUserAccessResponse = function(requestData, responseData) {
 			access_level_id_user = parseInt( access_level_id_user_String, 10 ); 
 		
 			if ( isNaN( access_level_id_user ) ) {
-				throw "value in hidden field with id 'access_level_id_user' is not a number, it is: " + access_level_id_user_String;
+				throw Error( "value in hidden field with id 'access_level_id_user' is not a number, it is: " + access_level_id_user_String );
 			}
 		}
 				
@@ -684,10 +709,10 @@ var getCurrentUserAccessResponse = function(requestData, responseData) {
 		var source = $("#user_entry_template tbody").html();
 
 		if ( source === undefined ) {
-			throw '$("#user_entry_template tbody").html() === undefined';
+			throw Error( '$("#user_entry_template tbody").html() === undefined' );
 		}
 		if ( source === null ) {
-			throw '$("#user_entry_template tbody").html() === null';
+			throw Error( '$("#user_entry_template tbody").html() === null' );
 		}
 		
 		var template = Handlebars.compile(source);
@@ -757,8 +782,13 @@ var getCurrentUserAccessResponse = function(requestData, responseData) {
 
 					$user_disable_button_jq.click( function(eventObject) {
 
-						var clickThis = this;
-						disableUser( clickThis );
+						try {
+							var clickThis = this;
+							disableUser( clickThis );
+						} catch( e ) {
+							reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+							throw e;
+						}
 					});
 
 					var $user_entry_access_level_update_button_jq = $user_entry.find(".user_entry_access_level_update_button_jq");
@@ -767,13 +797,18 @@ var getCurrentUserAccessResponse = function(requestData, responseData) {
 
 						$user_entry_access_level_update_button_jq.click(function(eventObject) {
 
-							var clickThis = this;
+							try {
+								var clickThis = this;
 
-							//  access_level_id_user  requires special handling if it is null
+								//  access_level_id_user  requires special handling if it is null
 
-							updateUserAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_user } );
+								updateUserAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_user } );
 
-							return false;
+								return false;
+							} catch( e ) {
+								reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+								throw e;
+							}
 						});					
 
 						var $access_level_administrator_jq = $user_entry.find(".access_level_administrator_jq");
@@ -785,11 +820,16 @@ var getCurrentUserAccessResponse = function(requestData, responseData) {
 
 						$user_entry_access_level_update_button_jq.click(function(eventObject) {
 
-							var clickThis = this;
+							try {
+								var clickThis = this;
 
-							updateUserAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_administrator } );
+								updateUserAccessLevel( { clickThis: clickThis, newAccessLevel: access_level_id_administrator } );
 
-							return false;
+								return false;
+							} catch( e ) {
+								reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+								throw e;
+							}
 						});					
 
 						var $access_level_administrator_jq = $user_entry.find(".access_level_user_jq");
@@ -814,8 +854,13 @@ var getCurrentUserAccessResponse = function(requestData, responseData) {
 
 					$user_enable_button_jq.click( function(eventObject) {
 
-						var clickThis = this;
-						enableUser( clickThis );
+						try {
+							var clickThis = this;
+							enableUser( clickThis );
+						} catch( e ) {
+							reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+							throw e;
+						}
 					});
 
 					var $name_of_user_jq = $user_entry.find(".name_of_user_jq");
@@ -1003,7 +1048,7 @@ var invitePerson = function(clickThis, eventObject) {
 
 	if ($invite_user_email.length === 0) {
 
-		throw "Unable to find input field for id 'invite_user_email' ";
+		throw Error( "Unable to find input field for id 'invite_user_email' " );
 	}
 
 	var $invite_person_access_level_entry_field = $("#invite_person_access_level_entry_field");
@@ -1018,7 +1063,7 @@ var invitePerson = function(clickThis, eventObject) {
 
 	if ( invitedPersonEmail === undefined || invitedPersonEmail === null ) {
 
-		throw "ERROR: invitedPersonEmail === undefined || invitedPersonEmail === null";
+		throw Error( "ERROR: invitedPersonEmail === undefined || invitedPersonEmail === null" );
 	}
 	
 
@@ -1121,7 +1166,7 @@ function initAdmin() {
 
 	if ( $logged_in_user_id.length === 0 ) {
 
-		throw "Unable to find hidden field '#logged_in_user_id'";
+		throw Error( "Unable to find hidden field '#logged_in_user_id'" );
 	}
 
 	var logged_in_user_id = $("#logged_in_user_id").val();
@@ -1129,68 +1174,93 @@ function initAdmin() {
 	if (logged_in_user_id === undefined || logged_in_user_id === null
 			|| logged_in_user_id.length === 0) {
 
-		throw "No value in hidden field '#logged_in_user_id' ";
+		throw Error( "No value in hidden field '#logged_in_user_id' " );
 	}
 
 	try {
 		adminGlobals.logged_in_user_id = parseInt(logged_in_user_id, 10);
 	} catch (ex) {
 
-		throw "failed to parse logged_in_user_id: " + logged_in_user_id;
+		throw Error( "failed to parse logged_in_user_id: " + logged_in_user_id );
 	}
 	
 	if ( isNaN( adminGlobals.logged_in_user_id ) ) {
 		
-		throw "failed to parse logged_in_user_id (parse to NaN): " + logged_in_user_id;
+		throw Error( "failed to parse logged_in_user_id (parse to NaN): " + logged_in_user_id );
 	}
 
 
 	$("#invite_user_button").click(function(eventObject) {
 
-		var clickThis = this;
-		
-		invitePerson( clickThis );
+		try {
+			var clickThis = this;
 
-		return false;
+			invitePerson( clickThis );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 	$(".invite_user_expand_link_jq").click(function(eventObject) {
-		
-		$("#invite_user_collapsed").hide();
-		$("#invite_user_expanded").show();
 
-		return false;
+		try {
+			$("#invite_user_collapsed").hide();
+			$("#invite_user_expanded").show();
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	$(".invite_user_cancel_button_jq").click(function(eventObject) {
 
-		clearInviteUserField();
+		try {
+			clearInviteUserField();
 
-		$("#invite_user_collapsed").show();
-		$("#invite_user_expanded").hide();
-		
-		return false;
+			$("#invite_user_collapsed").show();
+			$("#invite_user_expanded").hide();
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 
 
 	$("#revoke_invite_to_project_confirm_button").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
+			var clickThis = this;
 
-		revokePersonInviteConfirmed( clickThis, eventObject );
+			revokePersonInviteConfirmed( clickThis, eventObject );
 
-		return false;
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$(".revoke_invite_to_project_overlay_show_hide_parts_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
+			var clickThis = this;
 
-		closeRevokePersonInviteOverlay( clickThis, eventObject );
-		
-		return false;
+			closeRevokePersonInviteOverlay( clickThis, eventObject );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 		
 
@@ -1203,6 +1273,12 @@ function initAdmin() {
 
 $(document).ready(function() {
 
-	initAdmin();
+	try {
+		initAdmin();
+		
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 
 });

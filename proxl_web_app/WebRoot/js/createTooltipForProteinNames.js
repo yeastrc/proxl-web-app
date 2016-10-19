@@ -29,7 +29,13 @@ $(document).ready(function() {
 
 	setTimeout( function() { // put in setTimeout so it doesn't run on the main page init thread
 
-		createTooltipForProteinNames();
+		try {
+
+			createTooltipForProteinNames();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	},10);
 
 	
@@ -61,22 +67,25 @@ var createTooltipForProteinNames = function() {
 
 	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 
+		try {
+
+			$('.proteinName').each(function() {
+
+				var $elementToAddToolTipTo =  $(this);
 
 
-		$('.proteinName').each(function() {
+				var htmlIdString = $elementToAddToolTipTo.attr( "id" );
 
-			var $elementToAddToolTipTo =  $(this);
-
-
-			var htmlIdString = $elementToAddToolTipTo.attr( "id" );
-
-			var proteinIdString = htmlIdString.replace( "protein-id-", "" );
+				var proteinIdString = htmlIdString.replace( "protein-id-", "" );
 
 
 
-			addSingleTooltipForProteinNameOnTopRight( {$elementToAddToolTipTo: $elementToAddToolTipTo, proteinIdString: proteinIdString } );
-		});
-
+				addSingleTooltipForProteinNameOnTopRight( {$elementToAddToolTipTo: $elementToAddToolTipTo, proteinIdString: proteinIdString } );
+			});
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 
 	},50);
 
@@ -221,51 +230,58 @@ var addSingleTooltipForProteinName = function( params ) {
                 			  })
                 			  .done( function( data ) {
                 				  
-                				  //  first set to html for "not found" 
-                				  
-                				  var mainProteinDataFormattedHTML =
-                					  "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
-                					  + "<span class='is-tooltip-label'>From YRC PDR:</span> " 
-                					  + "</div>"
-                					  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
-                					  + "<span class='is-tooltip-label'>Not Found</span>"
-                					  + "</div>";
+                				  try {
+
+                					  //  first set to html for "not found" 
+
+                					  var mainProteinDataFormattedHTML =
+                						  "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
+                						  + "<span class='is-tooltip-label'>From YRC PDR:</span> " 
+                						  + "</div>"
+                						  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
+                						  + "<span class='is-tooltip-label'>Not Found</span>"
+                						  + "</div>";
 
 
-                				  if ( data.dataFound ) {
+                					  if ( data.dataFound ) {
 
-                					  mainProteinDataFormattedHTML = 
-                    					  "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
-                    					  + "<span class='is-tooltip-label'>From YRC PDR:</span> " 
-                    					  + "</div>"
-                    					  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
-                    					  + "<span class='is-tooltip-label'>Source:</span> " + data.source + "</div>" 
-                    					  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
-                    					  + "<span class='is-tooltip-label'>Name:</span> " + data.name + "</div>";
+                						  mainProteinDataFormattedHTML = 
+                							  "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
+                							  + "<span class='is-tooltip-label'>From YRC PDR:</span> " 
+                							  + "</div>"
+                							  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
+                							  + "<span class='is-tooltip-label'>Source:</span> " + data.source + "</div>" 
+                							  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
+                							  + "<span class='is-tooltip-label'>Name:</span> " + data.name + "</div>";
 
-                					  if ( data.description !== undefined && data.description !== null ) {
-                						  output += "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
-                							  + "<span class='is-tooltip-label'>Description:</span> " + data.description + "</div>";
+                						  if ( data.description !== undefined && data.description !== null ) {
+                							  output += "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
+                								  + "<span class='is-tooltip-label'>Description:</span> " + data.description + "</div>";
+                						  }
                 					  }
-                				  }
-                				  
-                				  __proteinDataForToolTipFormattedHTMLCache[ proteinIdString ] = mainProteinDataFormattedHTML;
-                				  
 
-                				  var output = mainProteinDataFormattedHTML;
+                					  __proteinDataForToolTipFormattedHTMLCache[ proteinIdString ] = mainProteinDataFormattedHTML;
 
-                				  if ( proteinDisplayName ) {
 
-                					  var HTML_Addition_DisplayedProteinName =
-                						  _addSingleTooltipForProteinName_HTML_Addition_DisplayedProteinName( { displayedProteinName : proteinDisplayName } );
-                							
-                					  output = 
-                						  HTML_Addition_DisplayedProteinName + mainProteinDataFormattedHTML;
+                					  var output = mainProteinDataFormattedHTML;
+
+                					  if ( proteinDisplayName ) {
+
+                						  var HTML_Addition_DisplayedProteinName =
+                							  _addSingleTooltipForProteinName_HTML_Addition_DisplayedProteinName( { displayedProteinName : proteinDisplayName } );
+
+                						  output = 
+                							  HTML_Addition_DisplayedProteinName + mainProteinDataFormattedHTML;
+
+                					  }
+
+
+                					  api.set('content.text', output);
                 					  
-                				  }
-                				  
-
-                				  api.set('content.text', output);
+                					} catch( e ) {
+                						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+                						throw e;
+                					}
                 			  } );
 
                 			  return 'Loading listing information...'; // Set some initial text

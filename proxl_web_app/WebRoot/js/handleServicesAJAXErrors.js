@@ -189,37 +189,43 @@ function showAjaxErrorMsg( params ) {
 
 function showAjaxErrorMsgFromMsg( params ) {
 	
-	var errorMsg = params.errorMsg;
-	
-	if ( ! errorMsg || errorMsg === "" )  {
-		
-		throw "No value passed in params.errorMsg to function showAjaxErrorMsgFromMsg( params )";
-	}
-	
-//	alert( errorMsg );
-	
-	var html = '<div style="position: absolute; background-color: white; z-index: 10000; top:40px; left:40px; width:500px; padding: 10px; border-width: 5px; border-color: red; border-style: solid;" >'
-	
-	+ '<h1 style="color: red;">Error accessing server</h1>'
-	
-	+ '<h3>Please reload the page and try again.</h3>'
-	+ '<h3>If this error continues to occur, please contact the person at the bottom of the page.</h3>'
-	
-	+ '<br><br>'
-	
-	+ 'Error Message:<br>'
-	
-	+ errorMsg
-	
-	+ '<br><br>'
-	
-	+ '</div>';
-		
-		
-	$("body").append( html );
-	
-	window.scroll(0, 0);  // scroll to top left, assuming message is in that corner
+	try {
 
+		var errorMsg = params.errorMsg;
+
+		if ( ! errorMsg || errorMsg === "" )  {
+
+			throw Error( "No value passed in params.errorMsg to function showAjaxErrorMsgFromMsg( params )" );
+		}
+
+//		alert( errorMsg );
+
+		var html = '<div style="position: absolute; background-color: white; z-index: 10000; top:40px; left:40px; width:500px; padding: 10px; border-width: 5px; border-color: red; border-style: solid;" >'
+
+			+ '<h1 style="color: red;">Error accessing server</h1>'
+
+			+ '<h3>Please reload the page and try again.</h3>'
+			+ '<h3>If this error continues to occur, please contact the person at the bottom of the page.</h3>'
+
+			+ '<br><br>'
+
+			+ 'Error Message:<br>'
+
+			+ errorMsg
+
+			+ '<br><br>'
+
+			+ '</div>';
+
+
+		$("body").append( html );
+
+		window.scroll(0, 0);  // scroll to top left, assuming message is in that corner
+		
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 }
 	
 			

@@ -64,7 +64,14 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 
-			objectThis.updateUserInputFieldsWithDataIn_query_json_field_ContentsInHiddenField( params );
+			try {
+
+				objectThis.updateUserInputFieldsWithDataIn_query_json_field_ContentsInHiddenField( params );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 
 		},10);
 
@@ -92,7 +99,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 		if ( $query_json_field.length === 0 ) {
 
-			throw "No HTML field with id 'query_json_field'";
+			throw Error( "No HTML field with id 'query_json_field'" );
 		}
 
 		_query_json_field_String = $query_json_field.val();
@@ -102,7 +109,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 		} catch( e ) {
 
-			throw "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + _query_json_field_String;
+			throw Error( "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + _query_json_field_String );
 
 		}
 
@@ -221,7 +228,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 		if ( $query_json_field.length === 0 ) {
 
-			throw "No HTML field with id 'query_json_field'";
+			throw Error( "No HTML field with id 'query_json_field'" );
 		}
 
 //		var inputCutoffs = _query_json_field_Contents.cutoffs;
@@ -284,7 +291,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 				if ( isNaN( excludeTaxonomyFieldValueInt ) ) {
 
-					throw "excludeTaxonomy cannot be parsed to int.  value: " + excludeTaxonomyFieldValue;
+					throw Error( "excludeTaxonomy cannot be parsed to int.  value: " + excludeTaxonomyFieldValue );
 				}
 
 				outputExcludeTaxonomy.push( excludeTaxonomyFieldValueInt );
@@ -323,7 +330,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 		} catch( e ) {
 
-			throw "Failed to stringify JSON to HTML field with id 'query_json_field'.";
+			throw Error( "Failed to stringify JSON to HTML field with id 'query_json_field'." );
 
 		}
 		
@@ -357,7 +364,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 				if ( isNaN( outputExcludeProteinInt ) ) {
 
-					throw "outputExcludeProtein cannot be parsed to int.  value: " + outputExcludeProteinString;
+					throw Error( "outputExcludeProtein cannot be parsed to int.  value: " + outputExcludeProteinString );
 				}
 
 				outputExcludeProteinsAsInts.push( outputExcludeProteinInt );
@@ -406,6 +413,8 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 	};
 	
 	///////////////////////
+	
+	//   Called from Crosslink and Looplink code
 
 	this.updatePageForFormParams = function() {
 
@@ -427,7 +436,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 
 };
 
-//Instance of class
+//  Instance of class
 
 var viewSearchProteinPageCommonCrosslinkLooplinkCoverage = new ViewSearchProteinPageCommonCrosslinkLooplinkCoverage();
 

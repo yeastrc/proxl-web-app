@@ -15,35 +15,49 @@
 
 var unlockProject = function(clickThis) {
 
-	var requestData = {
-			projectId : getProjectIdForProjectLockUnlockChange()
-	};
+	try {
 
-	var _URL = contextPathJSVar + "/services/project/projectLockedAdmin/unlock";
+		var requestData = {
+				projectId : getProjectIdForProjectLockUnlockChange()
+		};
 
-//	var request =
-	$.ajax({
-		type : "POST",
-		url : _URL,
-		data : requestData,
-		dataType : "json",
-		success : function(responseData) {
+		var _URL = contextPathJSVar + "/services/project/projectLockedAdmin/unlock";
 
-			$("#project_just_unlocked_message").show();
+//		var request =
+		$.ajax({
+			type : "POST",
+			url : _URL,
+			data : requestData,
+			dataType : "json",
+			success : function(responseData) {
 
-			reloadPageForProjectLockUnlockChange( clickThis );
-		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
-		error : function(jqXHR, textStatus, errorThrown) {
+				try {
 
-			handleAJAXError(jqXHR, textStatus, errorThrown);
+					$("#project_just_unlocked_message").show();
 
-//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
-//			textStatus: " + textStatus );
-		}
-	});
+					reloadPageForProjectLockUnlockChange( clickThis );
+
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			},
+			failure: function(errMsg) {
+				handleAJAXFailure( errMsg );
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+
+				handleAJAXError(jqXHR, textStatus, errorThrown);
+
+//				alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
+//				textStatus: " + textStatus );
+			}
+		});
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 
 };
 
@@ -54,35 +68,50 @@ var unlockProject = function(clickThis) {
 
 var lockProject = function(clickThis) {
 
-	var requestData = {
-			projectId : getProjectIdForProjectLockUnlockChange()
-	};
+	try {
 
-	var _URL = contextPathJSVar + "/services/project/projectLockedAdmin/lock";
+		var requestData = {
+				projectId : getProjectIdForProjectLockUnlockChange()
+		};
 
-//	var request =
-	$.ajax({
-		type : "POST",
-		url : _URL,
-		data : requestData,
-		dataType : "json",
-		success : function(responseData) {
+		var _URL = contextPathJSVar + "/services/project/projectLockedAdmin/lock";
 
-			$("#project_just_locked_message").show();
+//		var request =
+		$.ajax({
+			type : "POST",
+			url : _URL,
+			data : requestData,
+			dataType : "json",
+			success : function(responseData) {
 
-			reloadPageForProjectLockUnlockChange( clickThis );
-		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
-		error : function(jqXHR, textStatus, errorThrown) {
+				try {
 
-			handleAJAXError(jqXHR, textStatus, errorThrown);
+					$("#project_just_locked_message").show();
 
-//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
-//			textStatus: " + textStatus );
-		}
-	});
+					reloadPageForProjectLockUnlockChange( clickThis );
+
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			},
+			failure: function(errMsg) {
+				handleAJAXFailure( errMsg );
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+
+				handleAJAXError(jqXHR, textStatus, errorThrown);
+
+//				alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
+//				textStatus: " + textStatus );
+			}
+
+		});
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 
 };
 
@@ -93,7 +122,7 @@ var getProjectIdForProjectLockUnlockChange = function() {
 
 	if ($project_id.length === 0) {
 
-		throw "Unable to find input field for id 'project_id' ";
+		throw Error( "Unable to find input field for id 'project_id' " );
 	}
 
 	var project_id = $project_id.val();
@@ -101,7 +130,7 @@ var getProjectIdForProjectLockUnlockChange = function() {
 
 	if ( project_id === undefined || project_id === null || project_id === "" ) {
 
-		throw "No value in input field for id 'project_id' ";
+		throw Error( "No value in input field for id 'project_id' " );
 	}
 
 	return project_id;
@@ -112,10 +141,17 @@ var getProjectIdForProjectLockUnlockChange = function() {
 
 var reloadPageForProjectLockUnlockChange = function(clickThis) {
 
-	setTimeout( function() { 
-		
-		window.location.reload(true);
+	try {
 
-	}, 1000 ); //  time in milliseconds
+		setTimeout( function() { 
+
+			window.location.reload(true);
+
+		}, 1000 ); //  time in milliseconds
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 };
 

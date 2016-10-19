@@ -61,30 +61,37 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 	
 	this.showHideLooplinkReportedPeptides = function( params ) {
 		
-		var clickedElement = params.clickedElement;
-		
-		var $clickedElement = $( clickedElement );
-		
-		var $itemToToggle = $clickedElement.next();
+		try {
+
+			var clickedElement = params.clickedElement;
+
+			var $clickedElement = $( clickedElement );
+
+			var $itemToToggle = $clickedElement.next();
 
 
 
-		if( $itemToToggle.is(":visible" ) ) {
+			if( $itemToToggle.is(":visible" ) ) {
 
-			$itemToToggle.hide(); 
+				$itemToToggle.hide(); 
 
-			$clickedElement.find(".toggle_visibility_expansion_span_jq").show();
-			$clickedElement.find(".toggle_visibility_contraction_span_jq").hide();
-		} else { 
-			$itemToToggle.show();
+				$clickedElement.find(".toggle_visibility_expansion_span_jq").show();
+				$clickedElement.find(".toggle_visibility_contraction_span_jq").hide();
+			} else { 
+				$itemToToggle.show();
 
-			$clickedElement.find(".toggle_visibility_expansion_span_jq").hide();
-			$clickedElement.find(".toggle_visibility_contraction_span_jq").show();
+				$clickedElement.find(".toggle_visibility_expansion_span_jq").hide();
+				$clickedElement.find(".toggle_visibility_contraction_span_jq").show();
 
-			this.loadAndInsertLooplinkReportedPeptidesIfNeeded( { $topTRelement : $itemToToggle, $clickedElement : $clickedElement } );
+				this.loadAndInsertLooplinkReportedPeptidesIfNeeded( { $topTRelement : $itemToToggle, $clickedElement : $clickedElement } );
+			}
+
+			return false;  // does not stop bubbling of click event
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
 		}
-
-		return false;  // does not stop bubbling of click event
 	};
 	
 		
@@ -153,7 +160,7 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		
 		if ( _psmPeptideCutoffsRootObject === null || _psmPeptideCutoffsRootObject === undefined ) {
 			
-			throw "_psmPeptideCutoffsRootObject not initialized";
+			throw Error( "_psmPeptideCutoffsRootObject not initialized" );
 		} 
 		
 		var psmPeptideCutoffsForSearchId = _psmPeptideCutoffsRootObject.searches[ search_id ];
@@ -162,7 +169,7 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			
 			psmPeptideCutoffsForSearchId = {};
 			
-//			throw "Getting data.  Unable to get cutoff data for search id: " + search_id;
+//			throw Error( "Getting data.  Unable to get cutoff data for search id: " + search_id );
 		}
 		
 		var psmPeptideCutoffsForSearchId_JSONString = JSON.stringify( psmPeptideCutoffsForSearchId );
@@ -191,17 +198,24 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 
 			success : function( ajaxResponseData ) {
 				
-				var responseParams = {
-						ajaxResponseData : ajaxResponseData, 
-						ajaxRequestData : ajaxRequestData,
-						$topTRelement : $topTRelement,
-						$clickedElement : $clickedElement
-				};
+				try {
 
-				objectThis.loadAndInsertLooplinkReportedPeptidesResponse( responseParams );
-				
+					var responseParams = {
+							ajaxResponseData : ajaxResponseData, 
+							ajaxRequestData : ajaxRequestData,
+							$topTRelement : $topTRelement,
+							$clickedElement : $clickedElement
+					};
 
-				$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+					objectThis.loadAndInsertLooplinkReportedPeptidesResponse( responseParams );
+
+
+					$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
 				
 			},
 	        failure: function(errMsg) {
@@ -245,7 +259,7 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		
 		if ( $looplink_peptide_data_container.length === 0 ) {
 			
-			throw "unable to find HTML element with class 'child_data_container_jq'";
+			throw Error( "unable to find HTML element with class 'child_data_container_jq'" );
 		}
 
 		$looplink_peptide_data_container.empty();
@@ -255,10 +269,10 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			var handlebarsSource_looplink_peptide_block_template = $( "#looplink_peptide_block_template" ).html();
 			
 			if ( handlebarsSource_looplink_peptide_block_template === undefined ) {
-				throw "handlebarsSource_looplink_peptide_block_template === undefined";
+				throw Error( "handlebarsSource_looplink_peptide_block_template === undefined" );
 			}
 			if ( handlebarsSource_looplink_peptide_block_template === null ) {
-				throw "handlebarsSource_looplink_peptide_block_template === null";
+				throw Error( "handlebarsSource_looplink_peptide_block_template === null" );
 			}
 			
 			_handlebarsTemplate_looplink_peptide_block_template = Handlebars.compile( handlebarsSource_looplink_peptide_block_template );
@@ -269,10 +283,10 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			var handlebarsSource_looplink_peptide_data_row_entry_template = $( "#looplink_peptide_data_row_entry_template" ).html();
 			
 			if ( handlebarsSource_looplink_peptide_data_row_entry_template === undefined ) {
-				throw "handlebarsSource_looplink_peptide_data_row_entry_template === undefined";
+				throw Error( "handlebarsSource_looplink_peptide_data_row_entry_template === undefined" );
 			}
 			if ( handlebarsSource_looplink_peptide_data_row_entry_template === null ) {
-				throw "handlebarsSource_looplink_peptide_data_row_entry_template === null";
+				throw Error( "handlebarsSource_looplink_peptide_data_row_entry_template === null" );
 			}
 			
 			_handlebarsTemplate_looplink_peptide_data_row_entry_template = Handlebars.compile( handlebarsSource_looplink_peptide_data_row_entry_template );
@@ -286,10 +300,10 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 				var handlebarsSource_looplink_peptide_child_row_entry_template = $( "#looplink_peptide_child_row_entry_template" ).html();
 
 				if ( handlebarsSource_looplink_peptide_child_row_entry_template === undefined ) {
-					throw "handlebarsSource_looplink_peptide_child_row_entry_template === undefined";
+					throw Error( "handlebarsSource_looplink_peptide_child_row_entry_template === undefined" );
 				}
 				if ( handlebarsSource_looplink_peptide_child_row_entry_template === null ) {
-					throw "handlebarsSource_looplink_peptide_child_row_entry_template === null";
+					throw Error( "handlebarsSource_looplink_peptide_child_row_entry_template === null" );
 				}
 				
 				_handlebarsTemplate_looplink_peptide_child_row_entry_template = Handlebars.compile( handlebarsSource_looplink_peptide_child_row_entry_template );
@@ -331,7 +345,7 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 	
 		if ( $looplink_peptide_table_jq.length === 0 ) {
 			
-			throw "unable to find HTML element with class '" + looplink_peptide_table_jq_ClassName + "'";
+			throw Error( "unable to find HTML element with class '" + looplink_peptide_table_jq_ClassName + "'" );
 		}
 		
 		

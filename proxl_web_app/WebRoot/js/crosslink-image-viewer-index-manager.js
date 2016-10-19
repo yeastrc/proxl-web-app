@@ -92,7 +92,7 @@ indexManager.prototype.addProteinId = function( proteinId ) {
 	
 	var pid = Number( proteinId );
 	if( !pid ) {
-		throw "Got a non number for a proteinId. Got: " + proteinId;
+		throw Error( "Got a non number for a proteinId. Got: " + proteinId );
 	}
 	
 	

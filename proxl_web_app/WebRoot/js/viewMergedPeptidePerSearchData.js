@@ -57,33 +57,42 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 	
 	
 	//////////////
+
+	//   Called by "onclick" on HTML element
 	
 	this.showHideReportedPeptidesPerSearch = function( params ) {
-		
-		var clickedElement = params.clickedElement;
-		
-		var $clickedElement = $( clickedElement );
-		
-		var $itemToToggle = $clickedElement.next();
+
+		try {
+
+			var clickedElement = params.clickedElement;
+
+			var $clickedElement = $( clickedElement );
+
+			var $itemToToggle = $clickedElement.next();
 
 
 
-		if( $itemToToggle.is(":visible" ) ) {
+			if( $itemToToggle.is(":visible" ) ) {
 
-			$itemToToggle.hide(); 
+				$itemToToggle.hide(); 
 
-			$clickedElement.find(".toggle_visibility_expansion_span_jq").show();
-			$clickedElement.find(".toggle_visibility_contraction_span_jq").hide();
-		} else { 
-			$itemToToggle.show();
+				$clickedElement.find(".toggle_visibility_expansion_span_jq").show();
+				$clickedElement.find(".toggle_visibility_contraction_span_jq").hide();
+			} else { 
+				$itemToToggle.show();
 
-			$clickedElement.find(".toggle_visibility_expansion_span_jq").hide();
-			$clickedElement.find(".toggle_visibility_contraction_span_jq").show();
+				$clickedElement.find(".toggle_visibility_expansion_span_jq").hide();
+				$clickedElement.find(".toggle_visibility_contraction_span_jq").show();
 
-			this.loadAndInsertReportedPeptidesPerSearchIfNeeded( { $topTRelement : $itemToToggle, $clickedElement : $clickedElement } );
+				this.loadAndInsertReportedPeptidesPerSearchIfNeeded( { $topTRelement : $itemToToggle, $clickedElement : $clickedElement } );
+			}
+
+			return false;  // does not stop bubbling of click event
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
 		}
-
-		return false;  // does not stop bubbling of click event
 	};
 	
 		
@@ -191,16 +200,23 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 
 			success : function( ajaxResponseData ) {
 				
-				var responseParams = {
-						ajaxResponseData : ajaxResponseData, 
-						ajaxRequestData : ajaxRequestData,
-						$topTRelement : $topTRelement
-				};
+				try {
 
-				objectThis.loadAndInsertReportedPeptidesPerSearchResponse( responseParams );
-				
+					var responseParams = {
+							ajaxResponseData : ajaxResponseData, 
+							ajaxRequestData : ajaxRequestData,
+							$topTRelement : $topTRelement
+					};
 
-				$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+					objectThis.loadAndInsertReportedPeptidesPerSearchResponse( responseParams );
+
+
+					$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
 				
 			},
 	        failure: function(errMsg) {

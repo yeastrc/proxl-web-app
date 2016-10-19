@@ -21,16 +21,23 @@ var ViewMergedLooplinkProteinPageCode = function() {
 
 		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 
-			var params = {
-					listOfObjectsToPassPsmPeptideCutoffsRootTo : [ 
-					                                              viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate,
-					                                              viewLooplinkProteinsLoadedFromWebServiceTemplate,
-					                                              viewPsmsLoadedFromWebServiceTemplate,
-					                                              viewPeptidesRelatedToPSMsByScanId
-					                                              ]
-			};
+			try {
 
-			viewSearchProteinPageCommonCrosslinkLooplinkCoverage.createPartsAboveMainTableSearchProteinPageCommon( params );
+				var params = {
+						listOfObjectsToPassPsmPeptideCutoffsRootTo : [ 
+						                                              viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate,
+						                                              viewLooplinkProteinsLoadedFromWebServiceTemplate,
+						                                              viewPsmsLoadedFromWebServiceTemplate,
+						                                              viewPeptidesRelatedToPSMsByScanId
+						                                              ]
+				};
+
+				viewSearchProteinPageCommonCrosslinkLooplinkCoverage.createPartsAboveMainTableSearchProteinPageCommon( params );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 
 		},10);
 		
@@ -41,7 +48,14 @@ var ViewMergedLooplinkProteinPageCode = function() {
 
 			if ( window.createMergedSearchesLinkCountsVennDiagram_PageFunction ) {
 
-				window.createMergedSearchesLinkCountsVennDiagram_PageFunction();
+				try {
+
+					window.createMergedSearchesLinkCountsVennDiagram_PageFunction();
+
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
 			}
 		},10);
 	};
@@ -50,9 +64,15 @@ var ViewMergedLooplinkProteinPageCode = function() {
 	///////////////////////
 	
 	this.updatePageForFormParams = function() {
-	
-		
-		viewSearchProteinPageCommonCrosslinkLooplinkCoverage.updatePageForFormParams();
+
+		try {		
+
+			viewSearchProteinPageCommonCrosslinkLooplinkCoverage.updatePageForFormParams();
+			
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	};
 		
 	

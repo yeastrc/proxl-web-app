@@ -35,35 +35,35 @@ var loginPersonFormSubmit = function() {
 ////////////////////////////
 
 var loginPerson = function( params ) {
-	
+
 	var tosKeyToServer = "";
-	
+
 	if ( params ) {
-		
+
 		if ( params.tosKey ) {
-			
+
 			tosKeyToServer = params.tosKey;
 		}
 	}
-	
-	
+
+
 	hideAllErrorMessages();
-	
-	
-	
+
+
+
 
 	var $username = $("#username");
 
 	if ($username.length === 0) {
 
-		throw "Unable to find input field for id 'username' ";
+		throw Error("Unable to find input field for id 'username' ");
 	}
 
 	var $password = $("#password");
 
 	if ($password.length === 0) {
 
-		throw "Unable to find input field for id 'password' ";
+		throw Error("Unable to find input field for id 'password' ");
 	}
 
 
@@ -71,25 +71,25 @@ var loginPerson = function( params ) {
 	var username = $username.val();
 
 	var password = $password.val();
-	
+
 
 	if ( username === "" ) {
-		
+
 		var $element = $("#error_message_username_required");
-		
+
 		showErrorMsg( $element );
-		
+
 		return;  //  !!!  EARLY EXIT
 
 	} else if ( password === "" ) {
-			
+
 		var $element = $("#error_message_password_required");
-		
+
 		showErrorMsg( $element );
-			
+
 		return;  //  !!!  EARLY EXIT
 	}
-	
+
 
 	var requestData = {
 			username : username,
@@ -108,29 +108,38 @@ var loginPerson = function( params ) {
 		dataType : "json",
 		success : function(data) {
 
-			loginComplete(requestData, data);
+			try {
+
+				loginComplete(requestData, data);
+				
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure : function(errMsg) {
 			var $element = $("#error_message_system_error");
-			
+
 			showErrorMsg( $element );
-			
+
 //			alert(errMsg);
-			
+
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
 
-			
+
 			var $element = $("#error_message_system_error");
-			
+
 			showErrorMsg( $element );
-			
+
 //			handleAJAXError(jqXHR, textStatus, errorThrown);
 
 			// alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
 			// textStatus: " + textStatus );
 		}
 	});
+
+	
 };
 
 //////////
@@ -180,7 +189,7 @@ var loginComplete = function(requestData, responseData) {
 
 	if ($useDefaultURL.length === 0) {
 
-		throw "Unable to find input field for id 'useDefaultURL' ";
+		throw Error("Unable to find input field for id 'useDefaultURL' ");
 	}
 	
 	var useDefaultURL = $useDefaultURL.val();
@@ -190,7 +199,7 @@ var loginComplete = function(requestData, responseData) {
 
 	if ($defaultURL.length === 0) {
 
-		throw "Unable to find input field for id 'defaultURL' ";
+		throw Error("Unable to find input field for id 'defaultURL' ");
 	}
 
 
@@ -203,7 +212,7 @@ var loginComplete = function(requestData, responseData) {
 		
 		if (  defaultURL === undefined ||  defaultURL === null || defaultURL === "" ) {
 			
-			throw "input field for id 'defaultURL' is empty";
+			throw Error("input field for id 'defaultURL' is empty");
 		}
 			
 		window.location.href = defaultURL;
@@ -217,7 +226,7 @@ var loginComplete = function(requestData, responseData) {
 
 		if ($requestedURL.length === 0) {
 
-			throw "Unable to find input field for id 'requestedURL' ";
+			throw Error("Unable to find input field for id 'requestedURL' ");
 		}
 
 
@@ -268,7 +277,7 @@ var loginComplete = function(requestData, responseData) {
 //
 //	if ($defaultURL.length === 0) {
 //
-//		throw "Unable to find input field for id 'defaultURL' ";
+//		throw Error("Unable to find input field for id 'defaultURL' ");
 //	}
 //
 //
@@ -281,7 +290,7 @@ var loginComplete = function(requestData, responseData) {
 //		return;
 //	}
 //
-//	throw "requestedURL and defaultURL are both empty";
+//	throw Error("requestedURL and defaultURL are both empty");
 
 };
 
@@ -294,7 +303,14 @@ function initLoginPage() {
 	
 	$(document).click( function(eventObject) {
 	
-		hideAllErrorMessages();
+		try {
+
+			hideAllErrorMessages();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 	$("#username").focus();
@@ -303,8 +319,15 @@ function initLoginPage() {
 	$("#terms_of_service_acceptance_yes_button").click( function(eventObject) {
 
 //		var clickThis = this;
+		
+		try {
 
-		loginPerson( { tosKey : pageGlobals. tosKey } );
+			loginPerson( { tosKey : pageGlobals. tosKey } );
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 			
 		return false;  // stop click bubble up.
 	});
@@ -313,8 +336,15 @@ function initLoginPage() {
 
 //		var clickThis = this;
 
-		$("#terms_of_service_modal_dialog_overlay_background").hide();
-		$("#terms_of_service_overlay_div").hide();
+		try {
+
+			$("#terms_of_service_modal_dialog_overlay_background").hide();
+			$("#terms_of_service_overlay_div").hide();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 			
 		return false;  // stop click bubble up.
 	});
@@ -326,6 +356,13 @@ function initLoginPage() {
 
 $(document).ready(function() {
 
-	initLoginPage();
+	try {
+
+		initLoginPage();
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 
 });

@@ -71,127 +71,195 @@ ProxlXMLFileImportStatusDisplay.prototype.initialize  = function(  ) {
 ProxlXMLFileImportStatusDisplay.prototype.initOnDocumentReady  = function(  ) {
 
 	var objectThis = this;
-	
-	$("#upload_data_expand_show_data").click(function(eventObject) {
 
-		var clickThis = this;
-		
-		$( this ).hide();
-		$("#upload_data_collapse_hide_data").show();
-		$("#upload_data_main_collapsable_jq").show();
-		
-		$("#upload_data_top_level_container").data( objectThis.CONSTANTS.DATA_ATTR_FOR_UPLOAD_DATA_SHOWING, true );
+	try {
 
-		objectThis.showUploadDataClicked( clickThis, eventObject );
+		$("#upload_data_expand_show_data").click(function(eventObject) {
 
-		return false;
-	});
+			try {
 
-	$("#upload_data_collapse_hide_data").click(function(eventObject) {
+				var clickThis = this;
 
-//		var clickThis = this;
+				$( this ).hide();
+				$("#upload_data_collapse_hide_data").show();
+				$("#upload_data_main_collapsable_jq").show();
 
-		$( this ).hide();
-		$("#upload_data_expand_show_data").show();
-		$("#upload_data_main_collapsable_jq").hide();
-		
-		$("#upload_data_top_level_container").data( objectThis.CONSTANTS.DATA_ATTR_FOR_UPLOAD_DATA_SHOWING, false );
+				$("#upload_data_top_level_container").data( objectThis.CONSTANTS.DATA_ATTR_FOR_UPLOAD_DATA_SHOWING, true );
 
-		return false;
-	});
-	
+				objectThis.showUploadDataClicked( clickThis, eventObject );
 
-	$("#upload_data_refresh_data").click(function(eventObject) {
+				return false;
 
-		var clickThis = this;
-		
-		objectThis.refreshDataClicked( clickThis, eventObject );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 
-		return false;
-	});
-	
-	
+		$("#upload_data_collapse_hide_data").click(function(eventObject) {
 
-	$(".proxl_xml_file_upload_complete_successfully_overlay_cancel_parts_jq").click(function(eventObject) {
+			try {
 
-		var clickThis = this;
+//				var clickThis = this;
 
-		objectThis.cancelClicked( clickThis, eventObject );
+				$( this ).hide();
+				$("#upload_data_expand_show_data").show();
+				$("#upload_data_main_collapsable_jq").hide();
 
-		return false;
-	});
+				$("#upload_data_top_level_container").data( objectThis.CONSTANTS.DATA_ATTR_FOR_UPLOAD_DATA_SHOWING, false );
+
+				return false;
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 
 
-	$("#proxl_xml_file_upload_complete_successfully_refresh_page_button").click(function(eventObject) {
+		$("#upload_data_refresh_data").click(function(eventObject) {
 
-		var clickThis = this;
+			try {
 
-		objectThis.refreshPageClicked( clickThis, eventObject );
+				var clickThis = this;
 
-		return false;
-	});
-	
-	this.statusIdQueued = $("#proxl_xml_file_upload_complete_successfully_status_id_queued").val();
-	this.statusIdRequeued = $("#proxl_xml_file_upload_complete_successfully_status_id_re_queued").val();
-	this.statusIdStarted = $("#proxl_xml_file_upload_complete_successfully_status_id_started").val();
-	this.statusIdComplete = $("#proxl_xml_file_upload_complete_successfully_status_id_complete").val();
-	this.statusIdFailed = $("#proxl_xml_file_upload_complete_successfully_status_id_failed").val();
-									
+				objectThis.refreshDataClicked( clickThis, eventObject );
 
-	$("#upload_data_pending_items_show_link").click(function(eventObject) {
+				return false;
 
-		$( this ).hide();
-		$("#upload_data_pending_items_container").show();
-		$("#upload_data_pending_items_hide_link").show();
-
-		return false;
-	});
-
-	$("#upload_data_pending_items_hide_link").click(function(eventObject) {
-
-		$( this ).hide();
-		$("#upload_data_pending_items_container").hide();
-		$("#upload_data_pending_items_show_link").show();
-
-		return false;
-	});
-	
-
-	$("#upload_data_history_items_show_link").click(function(eventObject) {
-
-		$( this ).hide();
-		$("#upload_data_history_items_container").show();
-		$("#upload_data_history_items_hide_link").show();
-
-		$("#upload_data_history_items_block").data( objectThis.CONSTANTS.DATA_ATTR_FOR_UPLOAD_DATA_SHOWING, true );
-		
-		return false;
-	});
-
-	$("#upload_data_history_items_hide_link").click(function(eventObject) {
-
-		$( this ).hide();
-		$("#upload_data_history_items_container").hide();
-		$("#upload_data_history_items_show_link").show();
-
-		$("#upload_data_history_items_block").data( objectThis.CONSTANTS.DATA_ATTR_FOR_UPLOAD_DATA_SHOWING, false );
-		
-		return false;
-	});
-	
-	
-
-//	this.populatePendingCount();  do initial population in the Struts Action instead 
-	
-
-//  TODO  Turned off
-	
-	
-	//  Do initial status change check to get initial status values
-	
-//	this.checkForStatusChange();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 
 
+
+		$(".proxl_xml_file_upload_complete_successfully_overlay_cancel_parts_jq").click(function(eventObject) {
+
+			try {
+
+				var clickThis = this;
+
+				objectThis.cancelClicked( clickThis, eventObject );
+
+				return false;
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+
+		$("#proxl_xml_file_upload_complete_successfully_refresh_page_button").click(function(eventObject) {
+
+			try {
+
+				var clickThis = this;
+
+				objectThis.refreshPageClicked( clickThis, eventObject );
+
+				return false;
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+		this.statusIdQueued = $("#proxl_xml_file_upload_complete_successfully_status_id_queued").val();
+		this.statusIdRequeued = $("#proxl_xml_file_upload_complete_successfully_status_id_re_queued").val();
+		this.statusIdStarted = $("#proxl_xml_file_upload_complete_successfully_status_id_started").val();
+		this.statusIdComplete = $("#proxl_xml_file_upload_complete_successfully_status_id_complete").val();
+		this.statusIdFailed = $("#proxl_xml_file_upload_complete_successfully_status_id_failed").val();
+
+
+		$("#upload_data_pending_items_show_link").click(function(eventObject) {
+
+			try {
+
+				$( this ).hide();
+				$("#upload_data_pending_items_container").show();
+				$("#upload_data_pending_items_hide_link").show();
+
+				return false;
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+		$("#upload_data_pending_items_hide_link").click(function(eventObject) {
+
+			try {
+
+				$( this ).hide();
+				$("#upload_data_pending_items_container").hide();
+				$("#upload_data_pending_items_show_link").show();
+
+				return false;
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+
+		$("#upload_data_history_items_show_link").click(function(eventObject) {
+
+			try {
+
+				$( this ).hide();
+				$("#upload_data_history_items_container").show();
+				$("#upload_data_history_items_hide_link").show();
+
+				$("#upload_data_history_items_block").data( objectThis.CONSTANTS.DATA_ATTR_FOR_UPLOAD_DATA_SHOWING, true );
+
+				return false;
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+		$("#upload_data_history_items_hide_link").click(function(eventObject) {
+
+			try {
+
+				$( this ).hide();
+				$("#upload_data_history_items_container").hide();
+				$("#upload_data_history_items_show_link").show();
+
+				$("#upload_data_history_items_block").data( objectThis.CONSTANTS.DATA_ATTR_FOR_UPLOAD_DATA_SHOWING, false );
+
+				return false;
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+
+
+//		this.populatePendingCount();  do initial population in the Struts Action instead 
+
+
+//		TODO  Turned off
+
+
+		//  Do initial status change check to get initial status values
+
+//		this.checkForStatusChange();
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 };
 
 
@@ -252,8 +320,13 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCount = fun
 		dataType : "json",
 		success : function(data) {
 
-			objectThis.populateDataBlockAndPendingCountProcessResponse( { responseData : data, requestData : requestData } );
-			
+			try {
+
+				objectThis.populateDataBlockAndPendingCountProcessResponse( { responseData : data, requestData : requestData } );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			
@@ -281,10 +354,10 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCount = fun
 		var handlebarsSource_proxl_xml_import_item_template = $( "#proxl_xml_import_item_template" ).html();
 
 		if ( handlebarsSource_proxl_xml_import_item_template === undefined ) {
-			throw "handlebarsSource_proxl_xml_import_item_template === undefined";
+			throw Error( "handlebarsSource_proxl_xml_import_item_template === undefined" );
 		}
 		if ( handlebarsSource_proxl_xml_import_item_template === null ) {
-			throw "handlebarsSource_proxl_xml_import_item_template === null";
+			throw Error( "handlebarsSource_proxl_xml_import_item_template === null" );
 		}
 
 		this.handlebarsTemplate_proxl_xml_import_item_template = Handlebars.compile( handlebarsSource_proxl_xml_import_item_template );
@@ -296,10 +369,10 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCount = fun
 		var handlebarsSource_proxl_xml_import_item_tooltip_template = $( "#proxl_xml_import_item_tooltip_template" ).html();
 
 		if ( handlebarsSource_proxl_xml_import_item_tooltip_template === undefined ) {
-			throw "handlebarsSource_proxl_xml_import_item_tooltip_template === undefined";
+			throw Error( "handlebarsSource_proxl_xml_import_item_tooltip_template === undefined" );
 		}
 		if ( handlebarsSource_proxl_xml_import_item_tooltip_template === null ) {
-			throw "handlebarsSource_proxl_xml_import_item_tooltip_template === null";
+			throw Error( "handlebarsSource_proxl_xml_import_item_tooltip_template === null" );
 		}
 
 		this.handlebarsTemplate_proxl_xml_import_item_tooltip_template = Handlebars.compile( handlebarsSource_proxl_xml_import_item_tooltip_template );
@@ -698,211 +771,6 @@ ProxlXMLFileImportStatusDisplay.prototype.refreshPageClicked  = function( clickT
 	
 	window.location.reload(true);
 };
-
-
-
-
-//   Possibly not used
-
-//ProxlXMLFileImportStatusDisplay.prototype.checkForStatusChange  = function( ) {
-//
-//	var objectThis = this;
-//	
-//	
-//	var $project_id = $("#project_id");
-//	var projectId = $project_id.val();
-//	
-//
-//	
-//	//  Check if status has changed
-//	
-//
-//	var _URL = contextPathJSVar + "/services/proxl_xml_file_import/trackingIdStatusIdList";
-//
-//	var requestData = { project_id : projectId };
-//
-//	// var request =
-//	$.ajax({
-//		type : "GET",
-//		url : _URL,
-//		data : requestData,
-//		
-//		traditional: true,  //  Force traditional serialization of the data sent
-//		//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-//		//   So searchIds array is passed as "searchIds=<value>" which is what Jersey expects
-//
-//		dataType : "json",
-//		success : function(data) {
-//
-//			objectThis.checkForStatusChangeProcessResponse( { responseData : data, requestData : requestData } );
-//			
-//			//  check again after the delay
-//			
-//			setTimeout( function() {
-//					objectThis.checkForStatusChange();
-//				}, objectThis.CONSTANTS.CHECK_FOR_CHANGE_STATUS_DELAY );
-//			
-//		},
-//		failure: function(errMsg) {
-//			
-//			// silently let fail
-//			
-////			handleAJAXFailure( errMsg );
-//		},
-//		error : function(jqXHR, textStatus, errorThrown) {
-//
-//			// silently let fail
-//			
-////			handleAJAXError(jqXHR, textStatus, errorThrown);
-//
-//			// alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
-//			// textStatus: " + textStatus );
-//		}
-//	});
-//};
-//
-//
-//ProxlXMLFileImportStatusDisplay.prototype.checkForStatusChangeProcessResponse  = function( params ) {
-//
-////	var requestData = params.requestData;
-//	var responseDataArray = params.responseData;
-//	
-//	//  Sort response on trackingId
-//	
-//	responseDataArray.sort( function(a, b) {
-//		  return a.trackingId - b.trackingId;
-//		} );
-//	
-//	
-//	if ( this.prevStatusDataArray === undefined ) {
-//		
-//		//  initial data retrieved
-//		
-//		this.prevStatusDataArray = responseDataArray;
-//		
-//		return;  //  EARLY EXIT
-//	}
-//	
-//	// Compare prev data to response
-//	
-//	if ( this.prevStatusDataArray.length !== responseDataArray.length ) {
-//		
-//		this.openOverlay();
-//		
-//		this.prevStatusDataArray = responseDataArray;
-//		
-//		return;  //  EARLY EXIT
-//	}
-//	
-//	// compare the array contents, item by item
-//	
-//	for ( var index = 0; index < responseDataArray.length; index++ ) {
-//		
-//		var responseDataItem = responseDataArray[ index ];
-//		var prevStatusDataItem = this.prevStatusDataArray[ index ];
-//		
-//		if ( responseDataItem.trackingId !== prevStatusDataItem.trackingId
-//				|| responseDataItem.statusId !== prevStatusDataItem.statusId ) {
-//			
-//			//  Found difference so prompt user to refresh page
-//
-//			this.openOverlay();
-//			
-//			this.prevStatusDataArray = responseDataArray;
-//			
-//			return;  //  EARLY EXIT
-//		}
-//	}
-//	
-//
-//	this.prevStatusDataArray = responseDataArray;
-//};
-
-
-
-
-//  Possibly not used
-
-//  Populate pending count         
-//
-//ProxlXMLFileImportStatusDisplay.prototype.populatePendingCount = function( ) {
-//
-////	Anything that isn't failed or finished
-//
-//	var objectThis = this;
-//
-//
-//	var $project_id = $("#project_id");
-//	var projectId = $project_id.val();
-//
-//
-//
-////	Check if status has changed
-//
-//
-//	var _URL = contextPathJSVar + "/services/proxl_xml_file_import/pendingCount";
-//
-//	var requestData = { project_id : projectId };
-//
-////	var request =
-//	$.ajax({
-//		type : "GET",
-//		url : _URL,
-//		data : requestData,
-//
-//		traditional: true,  //  Force traditional serialization of the data sent
-//		//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-//		//   So searchIds array is passed as "searchIds=<value>" which is what Jersey expects
-//
-//		dataType : "json",
-//		success : function(data) {
-//
-//			objectThis.populatePendingCountProcessResponse( { responseData : data, requestData : requestData } );
-//
-//			//  check again after the delay
-//
-////			setTimeout( function() {
-////			objectThis.populatePendingCount();
-////			}, objectThis.CONSTANTS.UPDATE_PENDING_COUNT_DELAY );
-//
-//		},
-//		failure: function(errMsg) {
-//
-//			// silently let fail
-//
-////			handleAJAXFailure( errMsg );
-//		},
-//		error : function(jqXHR, textStatus, errorThrown) {
-//
-//			// silently let fail
-//
-////			handleAJAXError(jqXHR, textStatus, errorThrown);
-//
-//			// alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
-//			// textStatus: " + textStatus );
-//		}
-//	});
-//};
-//
-//ProxlXMLFileImportStatusDisplay.prototype.populatePendingCountProcessResponse  = function( params ) {
-//
-////	var requestData = params.requestData;
-//	var responseData = params.responseData;
-//
-//	var pendingCount = responseData.pendingCount;
-//
-//	if ( pendingCount > 0 ) {
-//
-//
-//	} else {
-//
-//
-//	}
-//
-//	$("#upload_data_pending_number").text( pendingCount );
-//	$("#upload_data_pending_block").show();
-//
-//};
 
 
 

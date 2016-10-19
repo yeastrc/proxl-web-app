@@ -125,87 +125,128 @@ QCChartRetentionTime.prototype.init = function() {
 
 	$(".qc_plot_scan_retention_time_link_jq").click(function(eventObject) {
 
-		var clickThis = this;
+		try {
+			var clickThis = this;
 
-		objectThis.scanRetentionTimeQCPlotClickHandler( clickThis, eventObject );
-		
-		return false;
+			objectThis.scanRetentionTimeQCPlotClickHandler( clickThis, eventObject );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});	 	
-	
+
 	$(".scan_retention_time_qc_plot_overlay_close_parts_jq").click(function(eventObject) {
 
-		var clickThis = this;
-		
-		if ( objectThis.reloadRetentionTimeCountChartTimerId ) {
-			
-			clearTimeout( objectThis.reloadRetentionTimeCountChartTimerId );
-			
-			objectThis.reloadRetentionTimeCountChartTimerId = null;
-		}
+		try {
+			var clickThis = this;
 
-		objectThis.closeScanRetentionTimeQCPlotOverlay( clickThis, eventObject );
-		
-		return false;
+			if ( objectThis.reloadRetentionTimeCountChartTimerId ) {
+
+				clearTimeout( objectThis.reloadRetentionTimeCountChartTimerId );
+
+				objectThis.reloadRetentionTimeCountChartTimerId = null;
+			}
+
+			objectThis.closeScanRetentionTimeQCPlotOverlay( clickThis, eventObject );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 
 	$("#scan_retention_time_qc_plot_score_type_id").change(function(eventObject) {
-		
-		objectThis.scoreTypeChanged( );
-		
-		return false;
+
+		try {
+			objectThis.scoreTypeChanged( );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	$(".scan_retention_time_qc_plot_on_change_jq").change(function(eventObject) {
-		
-		objectThis.createRetentionTimeCountChartFromPageParams( );
-		
-		return false;
+
+		try {
+			objectThis.createRetentionTimeCountChartFromPageParams( );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
+
 
 	$(".scan_retention_time_qc_plot_on_change_jq").keyup(function(eventObject) {
-		
-		if ( objectThis.reloadRetentionTimeCountChartTimerId ) {
-			
-			clearTimeout( objectThis.reloadRetentionTimeCountChartTimerId );
-			
-			objectThis.reloadRetentionTimeCountChartTimerId = null;
-		}
 
-		
-		objectThis.reloadRetentionTimeCountChartTimerId = setTimeout( function() {
-				
-			objectThis.createRetentionTimeCountChartFromPageParams( );
-				
-		}, objectThis.RELOAD_RETENTION_COUNT_CHART_TIMER_DELAY );
-		
-		return false;
+		try {
+			if ( objectThis.reloadRetentionTimeCountChartTimerId ) {
+
+				clearTimeout( objectThis.reloadRetentionTimeCountChartTimerId );
+
+				objectThis.reloadRetentionTimeCountChartTimerId = null;
+			}
+
+
+			objectThis.reloadRetentionTimeCountChartTimerId = setTimeout( function() {
+				try {
+
+					objectThis.createRetentionTimeCountChartFromPageParams( );
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+
+			}, objectThis.RELOAD_RETENTION_COUNT_CHART_TIMER_DELAY );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-		
-	
+
+
+
 	$("#scan_retention_time_qc_plot_max_reset_button").click(function(eventObject) {
 
-//		var clickThis = this;
-		
-		objectThis.resetRetentionTimeCountChartMaxXMaxY();
+		try {
+//			var clickThis = this;
 
-		objectThis.createRetentionTimeCountChartFromPageParams( );
-		
-		return false;
+			objectThis.resetRetentionTimeCountChartMaxXMaxY();
+
+			objectThis.createRetentionTimeCountChartFromPageParams( );
+
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
-	
-	
+
+
 	$( "#scan_retention_time_qc_plot_download_svg" ).click( function() {
-		var d = new Date().toISOString().slice(0, 19).replace(/-/g, "");
-		var $svg_image_inner_container_div__svg_merged_image_svg_jq = $( "#scan_retention_time_qc_plot_chartDiv svg " );
-		var svgContents = $svg_image_inner_container_div__svg_merged_image_svg_jq.html();
-		var fullSVG_String = "<svg id=\"svg\">" + svgContents +"</svg>";
-		var svgBase64Ecoded = Base64.encode( fullSVG_String );
-		var hrefString = "data:application/svg+xml;base64," + svgBase64Ecoded;
-		var downloadFilename = "scan_retention_time_" + d + ".svg";
-		$(this).attr("href", hrefString ).attr("download", downloadFilename );
+
+		try {
+			var d = new Date().toISOString().slice(0, 19).replace(/-/g, "");
+			var $svg_image_inner_container_div__svg_merged_image_svg_jq = $( "#scan_retention_time_qc_plot_chartDiv svg " );
+			var svgContents = $svg_image_inner_container_div__svg_merged_image_svg_jq.html();
+			var fullSVG_String = "<svg id=\"svg\">" + svgContents +"</svg>";
+			var svgBase64Ecoded = Base64.encode( fullSVG_String );
+			var hrefString = "data:application/svg+xml;base64," + svgBase64Ecoded;
+			var downloadFilename = "scan_retention_time_" + d + ".svg";
+			$(this).attr("href", hrefString ).attr("download", downloadFilename );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	});
 	
 	
@@ -414,8 +455,12 @@ QCChartRetentionTime.prototype.getPSMFilterableAnnTypesForSearchId = function( p
 		dataType : "json",
 		success : function(data) {
 
-
-			objectThis.getPSMFilterableAnnTypesForSearchIdResponse(requestData, data, params);
+			try {
+				objectThis.getPSMFilterableAnnTypesForSearchIdResponse(requestData, data, params);
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
         failure: function(errMsg) {
         	handleAJAXFailure( errMsg );
@@ -529,8 +574,12 @@ QCChartRetentionTime.prototype.getPSMFilterableMaxMinValuesAnnTypes = function( 
 		
 		dataType : "json",
 		success : function(data) {
-
-			objectThis.getPSMFilterableMaxMinValuesAnnTypesResponse(requestData, data, params);
+			try {
+				objectThis.getPSMFilterableMaxMinValuesAnnTypesResponse(requestData, data, params);
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -638,9 +687,12 @@ QCChartRetentionTime.prototype.getScanFileIdsForSearchId = function( params ) {
 		data : requestData,
 		dataType : "json",
 		success : function(data) {
-
-
-			objectThis.getScanFileIdsForSearchIdResponse(requestData, data, params);
+			try {
+				objectThis.getScanFileIdsForSearchIdResponse(requestData, data, params);
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
         failure: function(errMsg) {
         	handleAJAXFailure( errMsg );
@@ -1000,8 +1052,12 @@ QCChartRetentionTime.prototype.createRetentionTimeCountChart = function( params 
 		
 		dataType : "json",
 		success : function(data) {
-
-			objectThis.createRetentionTimeCountChartResponse(requestData, data, params);
+			try {
+				objectThis.createRetentionTimeCountChartResponse(requestData, data, params);
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		},
         failure: function(errMsg) {
         	handleAJAXFailure( errMsg );

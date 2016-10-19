@@ -69,14 +69,28 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 		
 		$view_data_related_to_psm_data_overlay_X_for_exit_overlay.click( function( eventObject ) {
 
-			objectThis.closeOverlay();
+			try {
+
+				objectThis.closeOverlay();
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		} );
 
 		var $view_data_related_to_psm_data_modal_dialog_overlay_background = $("#view_data_related_to_psm_data_modal_dialog_overlay_background");
 		
 		$view_data_related_to_psm_data_modal_dialog_overlay_background.click( function( eventObject ) {
 
-			objectThis.closeOverlay();
+			try {
+
+				objectThis.closeOverlay();
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		} );
 
 		
@@ -97,50 +111,59 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 	};
 
 	// /////////
+
+	//   Called by "onclick" on HTML element
 	
 	this.openOverlayForPeptidesRelatedToPSMsByScanId = function( params ) {
 
-		var clickedElement = params.clickedElement;
+		try {
 
-		var $clickedElement = $( clickedElement );
-		
-		var $view_data_related_to_psm_data_modal_dialog_overlay_background = $("#view_data_related_to_psm_data_modal_dialog_overlay_background");
-		
-		$view_data_related_to_psm_data_modal_dialog_overlay_background.show();
-		
-		var $view_data_related_to_psm_data_overlay_div = $("#view_data_related_to_psm_data_overlay_div");
-		
-		$view_data_related_to_psm_data_overlay_div.show();
-		
+			var clickedElement = params.clickedElement;
 
-		// Close any open Lorikeet Overlay
-		closeLorikeetOverlay();
+			var $clickedElement = $( clickedElement );
+
+			var $view_data_related_to_psm_data_modal_dialog_overlay_background = $("#view_data_related_to_psm_data_modal_dialog_overlay_background");
+
+			$view_data_related_to_psm_data_modal_dialog_overlay_background.show();
+
+			var $view_data_related_to_psm_data_overlay_div = $("#view_data_related_to_psm_data_overlay_div");
+
+			$view_data_related_to_psm_data_overlay_div.show();
 
 
-		// Adjust the overlay positon to be within the viewport
+			// Close any open Lorikeet Overlay
+			closeLorikeetOverlay();
 
-		var scrollTopWindow = $(window).scrollTop();
 
-		if ( scrollTopWindow > 0 ) {
+			// Adjust the overlay positon to be within the viewport
 
-			// User has scrolled down
+			var scrollTopWindow = $(window).scrollTop();
 
-			var overlayTop = scrollTopWindow + 10;
+			if ( scrollTopWindow > 0 ) {
 
-			$view_data_related_to_psm_data_overlay_div.css( { top: overlayTop + "px" } );
+				// User has scrolled down
 
-		} else {
+				var overlayTop = scrollTopWindow + 10;
 
-			$view_data_related_to_psm_data_overlay_div.css( { top: "10px" } );
+				$view_data_related_to_psm_data_overlay_div.css( { top: overlayTop + "px" } );
+
+			} else {
+
+				$view_data_related_to_psm_data_overlay_div.css( { top: "10px" } );
+			}
+
+
+
+
+
+			this.loadAndInsertPeptides( { $clickedElement : $clickedElement } );
+
+			return false;  // does not stop bubbling of click event
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
 		}
-		
-		
-		
-		
-
-		this.loadAndInsertPeptides( { $clickedElement : $clickedElement } );
-
-		return false;  // does not stop bubbling of click event
 	};
 
 
@@ -230,13 +253,20 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 
 			success : function( ajaxResponseData ) {
 
-				var responseParams = {
-						ajaxResponseData : ajaxResponseData, 
-						ajaxRequestData : ajaxRequestData,
-						$clickedElement : $clickedElement
-				};
+				try {
 
-				objectThis.loadAndInsertPeptidesResponse( responseParams );
+					var responseParams = {
+							ajaxResponseData : ajaxResponseData, 
+							ajaxRequestData : ajaxRequestData,
+							$clickedElement : $clickedElement
+					};
+
+					objectThis.loadAndInsertPeptidesResponse( responseParams );
+
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
 			},
 			failure: function(errMsg) {
 				handleAJAXFailure( errMsg );
@@ -439,7 +469,7 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 // Adjust width of link info overlay to be 40 pixels wider than the link info
 // table
 
-		var view_data_related_to_psm_data_overlay_div__Width = view_data_related_to_psm_data_overlay_div__Width + 40;
+		view_data_related_to_psm_data_overlay_div__Width += 40;
 
 		$("#view_data_related_to_psm_data_overlay_div").css( {"width": view_data_related_to_psm_data_overlay_div__Width } );
 	};
@@ -458,6 +488,13 @@ var viewPeptidesRelatedToPSMsByScanId = new ViewPeptidesRelatedToPSMsByScanId();
 
 $(document).ready(function()  { 
 
-	viewPeptidesRelatedToPSMsByScanId.init();
+	try {
+
+		viewPeptidesRelatedToPSMsByScanId.init();
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
 
 });

@@ -52,106 +52,117 @@ var DefaultPageView = function() {
 
 	this.saveOrUpdateDefaultPageView = function( params ) {
 
-		var objectThis = this;
-		
-		if ( ! params ) {
-
-			console.log( "params cannot be empty" );
-			throw "saveOrUpdateDefaultPageView(params): params cannot be empty"; 
-		}
-
-		var clickedThis = params.clickedThis;
-
-		if ( ! clickedThis ) {
-
-			console.log( "clickedThis cannot be empty" );
-			throw "saveOrUpdateDefaultPageView(params): clickedThis cannot be empty"; 
-		}
-
-		var $clickedThis = $( clickedThis );
-
-
-		var page_JS_Object = params.page_JS_Object;
-
-		if ( ! page_JS_Object ) {
-
-			console.log( "page_JS_Object cannot be empty" );
-			throw "saveOrUpdateDefaultPageView(params): page_JS_Object cannot be empty"; 
-		}
-
-
-		if ( ! page_JS_Object.getQueryJSONString ) {
-
-			console.log( "page_JS_Object.getQueryJSONString must exist and must be a function" );
-			throw "saveOrUpdateDefaultPageView(params): page_JS_Object.getQueryJSONString must exist and must be a function"; 
-		}
-
-		var searchId = params.searchId;
-
-		if ( ! searchId ) {
-
-			searchId = $clickedThis.attr("data-search_id");
-		}
-
-		if ( ! searchId ) {
-
-			console.log( "searchId cannot be empty" );
-			throw "saveOrUpdateDefaultPageView(params): searchId must be a parameter or 'data-search_id' must be an attribute on the button "; 
-		}
-		
-		
-		var pageQueryJSONString = null;
-
 		try {
-			
-			pageQueryJSONString = page_JS_Object.getQueryJSONString();
-			
-		} catch( e ) {
-			console.log( "calling page_JS_Object.getQueryJSON() throw an exception" );
-			throw "saveOrUpdateDefaultPageView(params): calling page_JS_Object.getQueryJSON() throw an exception"; 
-		}
-		
 
-		var successCallback = params.successCallback;
+			var objectThis = this;
 
+			if ( ! params ) {
 
-		var pageUrl = this.getDefaultPageViewURL(); 
-
-		var requestData = { searchId: searchId, pageUrl: pageUrl, pageQueryJSON : pageQueryJSONString };
-
-
-		var _URL = contextPathJSVar + "/services/defaultPageView/saveOrUpdateDefaultPageView";
-
-		$.ajax({
-			type: "POST",
-			url: _URL,
-			data: requestData,
-			dataType: "json",
-			success: function( responseData )	{
-
-				var saveOrUpdateDefaultPageViewProcessAjaxResponseParams = {
-
-						responseData : responseData,
-
-						pageUrl : pageUrl,
-						clickedThis : clickedThis,
-						successCallback : successCallback
-
-
-				};
-
-				objectThis.saveOrUpdateDefaultPageViewProcessAjaxResponse( saveOrUpdateDefaultPageViewProcessAjaxResponseParams );
-
-			},
-			failure: function(errMsg) {
-				handleAJAXFailure( errMsg );
-			},
-			error: function(jqXHR, textStatus, errorThrown) {	
-
-				handleAJAXError( jqXHR, textStatus, errorThrown );
+				console.log( "params cannot be empty" );
+				throw Error( "saveOrUpdateDefaultPageView(params): params cannot be empty" ); 
 			}
-		});
 
+			var clickedThis = params.clickedThis;
+
+			if ( ! clickedThis ) {
+
+				console.log( "clickedThis cannot be empty" );
+				throw Error( "saveOrUpdateDefaultPageView(params): clickedThis cannot be empty" ); 
+			}
+
+			var $clickedThis = $( clickedThis );
+
+
+			var page_JS_Object = params.page_JS_Object;
+
+			if ( ! page_JS_Object ) {
+
+				console.log( "page_JS_Object cannot be empty" );
+				throw Error( "saveOrUpdateDefaultPageView(params): page_JS_Object cannot be empty" ); 
+			}
+
+
+			if ( ! page_JS_Object.getQueryJSONString ) {
+
+				console.log( "page_JS_Object.getQueryJSONString must exist and must be a function" );
+				throw Error( "saveOrUpdateDefaultPageView(params): page_JS_Object.getQueryJSONString must exist and must be a function" ); 
+			}
+
+			var searchId = params.searchId;
+
+			if ( ! searchId ) {
+
+				searchId = $clickedThis.attr("data-search_id");
+			}
+
+			if ( ! searchId ) {
+
+				console.log( "searchId cannot be empty" );
+				throw Error( "saveOrUpdateDefaultPageView(params): searchId must be a parameter or 'data-search_id' must be an attribute on the button " ); 
+			}
+
+
+			var pageQueryJSONString = null;
+
+			try {
+
+				pageQueryJSONString = page_JS_Object.getQueryJSONString();
+
+			} catch( e ) {
+				console.log( "calling page_JS_Object.getQueryJSON() throw an exception" );
+				throw Error( "saveOrUpdateDefaultPageView(params): calling page_JS_Object.getQueryJSON() throw an exception" ); 
+			}
+
+
+			var successCallback = params.successCallback;
+
+
+			var pageUrl = this.getDefaultPageViewURL(); 
+
+			var requestData = { searchId: searchId, pageUrl: pageUrl, pageQueryJSON : pageQueryJSONString };
+
+
+			var _URL = contextPathJSVar + "/services/defaultPageView/saveOrUpdateDefaultPageView";
+
+			$.ajax({
+				type: "POST",
+				url: _URL,
+				data: requestData,
+				dataType: "json",
+				success: function( responseData )	{
+
+					try {
+						var saveOrUpdateDefaultPageViewProcessAjaxResponseParams = {
+
+								responseData : responseData,
+
+								pageUrl : pageUrl,
+								clickedThis : clickedThis,
+								successCallback : successCallback
+
+
+						};
+
+						objectThis.saveOrUpdateDefaultPageViewProcessAjaxResponse( saveOrUpdateDefaultPageViewProcessAjaxResponseParams );
+
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				},
+				failure: function(errMsg) {
+					handleAJAXFailure( errMsg );
+				},
+				error: function(jqXHR, textStatus, errorThrown) {	
+
+					handleAJAXError( jqXHR, textStatus, errorThrown );
+				}
+			});
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	};
 
 
@@ -259,9 +270,15 @@ var DefaultPageView = function() {
 
 		//		var $clickedThis = $( clickedThis );
 
-		var $current_url_saved_as_default_page_view_success = $("#current_url_saved_as_default_page_view_success");
+		try {
+			var $current_url_saved_as_default_page_view_success = $("#current_url_saved_as_default_page_view_success");
 
-		this.clearSaveOrUpdateDefaultPageViewMsg( $current_url_saved_as_default_page_view_success, false /* fadeErrorMsg */ );
+			this.clearSaveOrUpdateDefaultPageViewMsg( $current_url_saved_as_default_page_view_success, false /* fadeErrorMsg */ );
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
 	};
 
 

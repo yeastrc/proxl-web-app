@@ -83,7 +83,7 @@ ImageProteinBarDataManager.prototype.getItemByUID = function( uid ) {
 	var item = this.barData[ uid ];
 	
 	if ( ! item ) {
-		throw "entry not found in barData for uid: " + uid;
+		throw Error( "entry not found in barData for uid: " + uid );
 	}
 	
 	return item;
@@ -94,7 +94,7 @@ ImageProteinBarDataManager.prototype.getItemByIndex = function( index ) {
 	var entry = _indexManager.getProteinArray()[ index ];
 
 	if ( ! entry ) {
-		throw "entry not found in barData for index: " + index;
+		throw Error( "entry not found in barData for index: " + index );
 	}
 	
 	return this.getItemByUID( entry.uid );
