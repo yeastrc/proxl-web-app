@@ -455,7 +455,7 @@
 				
 			<div id="no_proteins_add_protein_outer_container" style="display: none;">
 			
-				<div class="no-proteins-add-protein-block"
+				<div class=" no-proteins-add-protein-block clickable "
 					onclick="openSelectProteinSelect( { clickedThis : this, addProteinsClicked : true } )" >
 
 						Click to Add Protein
