@@ -17,12 +17,14 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.JPEGTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
+import org.apache.commons.lang.StringUtils;
 import org.apache.fop.svg.PDFTranscoder;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.forms.ConvertAndDownloadSVGForm;
 
 /**
@@ -79,11 +81,35 @@ public class ConvertAndDownloadSVGAction extends Action {
 
 			
 			ConvertAndDownloadSVGForm downloadForm = (ConvertAndDownloadSVGForm)form;
+			
+
+			if ( StringUtils.isEmpty( downloadForm.getSvgString() ) ) {
+				
+				String msg = "downloadForm.getSvgString() is empty.";
+				log.error( msg );
+				throw new ProxlWebappDataException(msg);
+			}
+
+			if ( StringUtils.isEmpty( downloadForm.getFileType() ) ) {
+				
+				String msg = "downloadForm.getFileType() is empty.";
+				log.error( msg );
+				throw new ProxlWebappDataException(msg);
+			}
+			
 
 			byte[] fileBytes = this.getBytes( downloadForm.getSvgString(), downloadForm.getFileType() );
 			String fileName = this.getFilename( downloadForm.getFileType() );
+
+			String contentTypeString = mimeTypes.get( downloadForm.getFileType() ); 
 			
-			response.setContentType( mimeTypes.get( downloadForm.getFileType() ) );
+			if ( contentTypeString == null ) {
+				log.error( "downloadForm.getFileType() not == any supported mime types, is: '" + downloadForm.getFileType() 
+						+ "'.  Exiting and not returning anything to browser" );
+				return null;
+			}
+			
+			response.setContentType( contentTypeString );
 			response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
 			response.setContentLength( fileBytes.length );
 
@@ -157,6 +183,21 @@ public class ConvertAndDownloadSVGAction extends Action {
 	 */
 	private byte[] getBytes( String svgString, String type ) throws Exception {
 		
+		if ( StringUtils.isEmpty( svgString ) ) {
+			
+			String msg = "incoming svgString is empty.";
+			log.error( msg );
+			throw new ProxlWebappDataException(msg);
+		}
+
+		if ( StringUtils.isEmpty( type ) ) {
+			
+			String msg = "incoming type is empty.";
+			log.error( msg );
+			throw new ProxlWebappDataException(msg);
+		}
+		
+		
 		// it's already svg, don't do much
 		if( type.equals( "svg" ) ) {
 			return svgString.getBytes();
@@ -203,7 +244,7 @@ public class ConvertAndDownloadSVGAction extends Action {
 	        t.transcode(input, output);			
 		} else {
 
-			throw new Exception( "Unsupported type: " + type );
+			throw new ProxlWebappDataException( "Unsupported type: " + type );
 		}
 		
 		return ostream.toByteArray();
