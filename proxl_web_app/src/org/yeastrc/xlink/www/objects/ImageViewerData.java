@@ -9,11 +9,11 @@ import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 
 public class ImageViewerData {
 
-	public Set<Integer> getProteins() {
+	public Collection<Integer> getProteins() {
 		return proteins;
 	}
 
-	public void setProteins(Set<Integer> proteins) {
+	public void setProteins(Collection<Integer> proteins) {
 		this.proteins = proteins;
 	}
 
@@ -185,7 +185,7 @@ public class ImageViewerData {
 
 	private Collection<Integer> excludeTaxonomy;
 	private Collection<Integer> excludeType;
-	private Set<Integer> proteins;
+	private Collection<Integer> proteins;
 	private Collection<SearchDTO> searches;
 	private Map<Integer, Integer> proteinLengths;
 	private Map<Integer, String> proteinNames;

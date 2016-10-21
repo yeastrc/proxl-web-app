@@ -62,10 +62,6 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Functions;
-import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.Ordering;
-
 
 
 @Path("/imageViewer")
@@ -657,14 +653,34 @@ public class ViewerProteinDataService {
 				proteinNames.put( mp.getProteinSequenceObject().getProteinSequenceId(), mp.getName() );
 			}
 
-			// sort the proteinNames map by value
-			Ordering<Integer> valueComparator = Ordering.from(new SortIgnoreCase() ).onResultOf(Functions.forMap(proteinNames));
-			Map<Integer,String> sortedProteinNames = ImmutableSortedMap.copyOf(proteinNames, valueComparator);
+			//   Create a list of protein sequence ids ordered by protein name, protein sequence id
+			
+			List<ProteinSequenceIdProteinName> proteinSequenceIdProteinNameList = new ArrayList<>( proteinNames.size() );
+			for ( Map.Entry<Integer, String> proteinNamesEntry : proteinNames.entrySet() ) {
+				ProteinSequenceIdProteinName proteinSequenceIdProteinName = new ProteinSequenceIdProteinName();
+				proteinSequenceIdProteinName.proteinName = proteinNamesEntry.getValue();
+				proteinSequenceIdProteinName.proteinSequenceId = proteinNamesEntry.getKey();
+				proteinSequenceIdProteinNameList.add( proteinSequenceIdProteinName );
+			}
 
-
+			Collections.sort( proteinSequenceIdProteinNameList, new  Comparator<ProteinSequenceIdProteinName>() {
+		        public int compare(ProteinSequenceIdProteinName o1, ProteinSequenceIdProteinName o2) {
+		        	if ( o1.proteinName.equals( o2.proteinName ) ) {
+		        		return o1.proteinSequenceId - o2.proteinSequenceId;
+		        	}
+		        	return o1.proteinName.compareTo( o2.proteinName );
+		        }
+			} );
+			
+			//  Output list of protein sequence ids ordered by protein name, protein sequence id 
+			List<Integer> proteinSequenceIdsSortedOnProteinNameList = new ArrayList<>( proteinSequenceIdProteinNameList.size() );
+			for ( ProteinSequenceIdProteinName proteinSequenceIdProteinName : proteinSequenceIdProteinNameList ) {
+				proteinSequenceIdsSortedOnProteinNameList.add( proteinSequenceIdProteinName.proteinSequenceId );
+			}
+			
 			ivd.setProteinLengths( proteinLengths );
 			ivd.setProteinNames( proteinNames );
-			ivd.setProteins( sortedProteinNames.keySet() );
+			ivd.setProteins( proteinSequenceIdsSortedOnProteinNameList );
 
 			ivd.setCutoffs( cutoffValuesRootLevel );
 
@@ -675,35 +691,25 @@ public class ViewerProteinDataService {
 			ivd.setFilterOnlyOnePSM( filterOnlyOnePSM );
 			ivd.setFilterOnlyOnePeptide( filterOnlyOnePeptide );
 
-
-
 			return ivd;
-			
-			
+
 		} catch ( WebApplicationException e ) {
-
 			throw e;
-			
-
+		
 		} catch ( ProxlWebappDataException e ) {
 
 			String msg = "Exception processing request data, msg: " + e.toString();
-			
 			log.error( msg, e );
-
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-		    	        .entity( msg )
+		    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT )
 		    	        .build()
 		    	        );			
 			
 		} catch ( Exception e ) {
 			
 			String msg = "Exception caught: " + e.toString();
-			
 			log.error( msg, e );
-			
-
 			throw new WebApplicationException(
 					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
 					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
@@ -713,11 +719,10 @@ public class ViewerProteinDataService {
 
 	}
 	
-    public class SortIgnoreCase implements Comparator<Object> {
-        public int compare(Object o1, Object o2) {
-            String s1 = (String) o1;
-            String s2 = (String) o2;
-            return s1.toLowerCase().compareTo(s2.toLowerCase());
-        }
-    }
+	private static class ProteinSequenceIdProteinName {
+		
+		private Integer proteinSequenceId;
+		private String proteinName;
+	}
+	
 }
