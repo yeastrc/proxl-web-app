@@ -1996,10 +1996,16 @@ function loadDataFromService() {
 	        		_filterOnlyOnePeptide = data.filterOnlyOnePeptide;
 	        		_taxonomies = data.taxonomies;
 
-	        		//  Populate these from the Hash
-
+	        		// remove any now-invalid proteins from the index manager
+	        		if( _indexManager ) {
+	        			_indexManager.removeInvalidProteins( _proteins );
+	        		}
+	        		
+	        		//  Populate these from the Hash	        		
 	        		populateFromHash_imageProteinBarDataManager();
 
+	        		// remove any now-valid entries from the protein bar data manager
+	        		_imageProteinBarDataManager.removeInvalidEntries();
 
 
 
@@ -2013,6 +2019,9 @@ function loadDataFromService() {
 	        		populateSelectProteinSelect();
 
 	        		initializeViewer();
+	        		
+	        		
+	        		
 
 	        		updateURLHash( false /* useSearchForm */ );
 

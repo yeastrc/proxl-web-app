@@ -46,6 +46,58 @@ indexManager.prototype.getProteinArray = function() {
 };
 
 /**
+ * Using the supplied proteins list as the list of valid proteins, remove
+ * all entries from the index manager that contain proteins not in this list.
+ * 
+ * @param validProteinList The list of valid proteins
+ * @return A list of the removed entries
+ */
+indexManager.prototype.removeInvalidProteins = function( validProteinList ) {
+	
+	var removedEntries = [ ];
+	var UIDsToRemove = [ ];
+	
+	for( var i = 0; i < this.parr.length; i++ ) {
+		var element = this.parr[ i ];
+		
+		if( !this.listContainsElement( validProteinList, element.pid ) ) {			
+			UIDsToRemove.push( element.uid );
+		}
+	}
+	
+	for( var i = 0; i < UIDsToRemove.length; i++ ) {
+
+		var removedElement = this.removeEntryByUID( UIDsToRemove[ i ] );
+		
+		console.log( "Removed invalid element from index manager: " );
+		console.log( removedElement );
+		console.log( "\n" );
+		
+		removedEntries.push( removedElement );
+	}	
+	
+	return removedEntries;
+};
+
+/**
+ * Test if the given list contains the given element
+ * 
+ * @param list The list that may or may not contain the element
+ * @param element The element that may or may not be contained in the list
+ * @return true if in the list, false if not
+ */
+indexManager.prototype.listContainsElement = function( list, element ) {	
+	var l = list.length;
+	
+    for (var i = 0; i < l; i++) {
+        if( list[ i ] === element ) {
+            return true;
+        }
+    }
+    return false;	
+};
+
+/**
  * Get a new unique id. This is guaranteed to be unique in the current
  * list of proteins in the index. It may, however, have the same id as
  * a previously-deleted entry.
@@ -80,6 +132,22 @@ indexManager.prototype.getProteinIdForUID = function( uniqueId) {
 	return null;
 };
 
+/**
+ * Check whether the given UID is defined in this index manager
+ * 
+ * @param uniqueId the UID to check
+ * @return true if that UID is in this index manager, false if not
+ */
+indexManager.prototype.containsUID = function( uniqueId ) {
+	
+	for( var i = 0; i < this.parr.length; i++ ) {
+		if( this.parr[ i ].uid === uniqueId ) {
+			return true;
+		}
+	}
+	
+	return false;	
+};
 
 /**
  * Add the given proteinId to the index manager.

@@ -89,6 +89,31 @@ ImageProteinBarDataManager.prototype.getItemByUID = function( uid ) {
 	return item;
 };
 
+/**
+ * Remove all invalid UIDs--that is, UIDs not found in the _indexManager
+ */
+ImageProteinBarDataManager.prototype.removeInvalidEntries = function() {
+		
+	var keys = Object.keys( this.getAllItems() );
+	var kl = keys.length;	
+	var UIDsToRemove = [ ];
+	
+	for( var i = 0; i < kl; i++ ) {
+		if( !(_indexManager.containsUID( keys[ i ] )) ) {
+			UIDsToRemove.push( keys[ i ] );
+		}
+	}
+
+	for( var i = 0; i < UIDsToRemove.length; i++ ) {
+		
+		console.log( "Removing invalid entry from protein bar manager: " + UIDsToRemove[ i ] );
+		
+		this.removeItemByUID( UIDsToRemove[ i ] );
+	}
+	
+	
+};
+
 ImageProteinBarDataManager.prototype.getItemByIndex = function( index ) {
 	
 	var entry = _indexManager.getProteinArray()[ index ];
