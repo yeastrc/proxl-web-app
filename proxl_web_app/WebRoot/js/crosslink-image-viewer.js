@@ -2347,12 +2347,15 @@ function showSelectedProteins() {
 		
 		//  This event is triggered when the user stopped sorting and the DOM position has changed.
 		//        (User released the item they were dragging and items are now in "after sort" order)
-        update : processSortUpdateSelectedProteins		
+        update : processSortUpdateSelectedProteins	,
+        
+        // Added to ensure click event doesn't fire in Firefox
+        helper:'clone'
 	} );
 }
 
 function processSortStartSelectedProteins( event, ui ) {
-		
+	
 	var $item = ui.item;
 	
 	//  ui.item is  <div class="outer-float  protein_select_outer_block_jq" style="" >
@@ -2367,8 +2370,6 @@ function processSortStartSelectedProteins( event, ui ) {
 }
 
 function processSortUpdateSelectedProteins( event, ui ) {
-	
-	console.log("processSortUpdateSelectedProteins");
 	
 	var $item = ui.item;
 	var uid = $item.attr( "data-uid" );	// the uid of the protein instance we moved
