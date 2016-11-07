@@ -330,6 +330,8 @@ var _indexManager = new indexManager();
 
 var _circlePlotViewer = new circlePlotViewer();
 
+var _colorManager = new ColorManager();
+
 
 //   General
 

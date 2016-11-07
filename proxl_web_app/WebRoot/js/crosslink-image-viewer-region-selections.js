@@ -401,7 +401,7 @@ ProteinBarRegionSelectionsOverlayCode.prototype.save = function( params ) {
 		var imageProteinBarDataItem =
 			objectThis.imageProteinBarDataManager.getItemByUID( uid );
 		
-		if ( proteinIdString !== imageProteinBarDataItem.getProteinId() ) {
+		if ( proteinIdString !== imageProteinBarDataItem.getProteinId().toString() ) {
 			
 			throw Error( "protein id mismatch.  proteinIdString: '" + proteinIdString + "'.  data item protein id: '" 
 					+ imageProteinBarDataItem.getProteinId() + "'." );

@@ -133,6 +133,34 @@ indexManager.prototype.getProteinIdForUID = function( uniqueId) {
 };
 
 /**
+ * Get the index (starting at 0) for the given UID Returns -1 if not found
+ * 
+ * @param uniqueId the UID to check
+ * @return the index (starting at 0) for the given UID Returns -1 if not found
+ */
+indexManager.prototype.getIndexForUID = function( uniqueId ) {
+	
+	for( var i = 0; i < this.parr.length; i++ ) {
+		if( this.parr[ i ].uid === uniqueId ) {
+			return i;
+		}
+	}
+	
+	return -1;	
+};
+
+/**
+ * Get the UID of the given index
+ * 
+ * @param index the index to check
+ * @return the uid of the index
+ */
+indexManager.prototype.getUIDForIndex = function( index ) {
+	
+	return this.parr[ index ].uid;	
+};
+
+/**
  * Check whether the given UID is defined in this index manager
  * 
  * @param uniqueId the UID to check

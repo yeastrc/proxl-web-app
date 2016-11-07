@@ -623,6 +623,15 @@ ImageProteinBarData.prototype._isProteinBarHighlightedAtSinglePosition = functio
 
 ImageProteinBarData.prototype.indexOfProteinBarHighlightedRegionAtSinglePosition = function( position ) {
 	
+	if ( this.proteinBarHighlightedRegions === undefined
+			|| this.proteinBarHighlightedRegions === null
+			|| this.proteinBarHighlightedRegions.length === 0 ) {
+		
+		//  There are no highlighted regions so return false
+		
+		return -1;
+	}
+	
 	for ( var index = 0; index < this.proteinBarHighlightedRegions.length; index++ ) {
 		
 		var proteinBarHighlightedRegionsEntry = this.proteinBarHighlightedRegions[ index ];

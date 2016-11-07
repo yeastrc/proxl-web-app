@@ -36,24 +36,12 @@ circlePlotViewer.prototype.CONSTANTS = {
 		_LEGEND_INDENT:5,			// indentation for legend items under header
 		_LEGEND_RADIUS:7,			// pixels of radius of legend indicator (circle)
 		
-		// colors to use when coloring by search
-		_SEARCH_COLORS: {
-			"1" : "#995d5d",	// redish
-			"2" : "#5d6499",	// blueish
-			"3" : "#b5af00",	// yellowish
-			
-			"12" : "#cd83c7",	// purpleish
-			"13" : "#35bec0",	// orangeish
-			"23" : "#5d9960",	// greenish
-			
-			"123" : "#3a3a3a",	// grey
-		},
-		
 		_FEATURE_ANNOTATION_HEIGHT:15,	// height of the feature annotation bar
 		_DISOPRED_COLOR: "#3a3a3a",			// color to use for disopred annotations
 		_PSIPRED_ALPHA_COLOR: "#5d9960",	// color to use for alpha helices in psipred annotations
 		_PSIPRED_BETA_COLOR: "#5d6499",		// color to use for beta sheets in psipred annotations
-			
+		
+		_NON_HIGHLIGHTED_COLOR: "#868686",			// the color of non-highlighted bars and lines
 			
 			
 		_PROTEIN_BAR_OVERLAY_RECTANGLE_LABEL_CLASS: "protein-bar-class",	// css class for protein bars
@@ -130,24 +118,27 @@ circlePlotViewer.prototype.draw  = function(  ) {
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGObject ) {
-	var selectedProteins = _indexManager.getProteinList();
+	var selectedProteins = _indexManager.getProteinArray();
 	var annoType = $("#annotation_type").val();	
 	var radii = this.getFeatureAnnotationRadii();		// the radii to use for drawing the feature annotation curved bars
 	
 	for( var i = 0; i < selectedProteins.length; i++ ) {
+
+		var pid = selectedProteins[ i ].pid;
+		var uid = selectedProteins[ i ].uid;
 		
 		var segments;
 		if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_DISOPRED3 ) {
 		
-			segments = getDisorderedRegionsDisopred_3( selectedProteins[ i ] );
+			segments = getDisorderedRegionsDisopred_3( pid );
 
 		} else if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_PSIPRED3 ) {
 			
-			segments = getSecondaryStructureRegions( selectedProteins[ i ] );
+			segments = getSecondaryStructureRegions( pid );
 			
 		} else if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE ) {
 			
-			segments = _ranges[ selectedProteins[ i ] ];
+			segments = _ranges[ pid ];
 			
 		} else {
 			console.log( "Error, unknown feature annotation type selected." );
@@ -157,7 +148,7 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
 		if( segments == undefined ) {
 			console.log( "Error, got undefined for segments." );
 			
-			console.log( "protein: " + selectedProteins[ i ] );
+			console.log( "protein: " + pid );
 			console.log( "annoType: " + annoType );
 			
 			return;
@@ -193,7 +184,7 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
 								
 			} else if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE ) {
 				
-				color = this.getColorForIndex( i );
+				color = _colorManager.getColorForUIDAnnotation( uid ).hex;
 				
 				toolTipText = 'Sequence coverage segment: start: ' + segment.start + ', end: ' + segment.end;
 				
@@ -202,9 +193,9 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
 			// draw this segment
 			var pathText;
 			if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE ) {
-				pathText = this.getPathForSegment( i, segment.start, segment.end );			
+				pathText = this.getPathForFeatureAnnotationSegment( i, segment.start, segment.end );			
 			} else {
-				pathText = this.getPathForSegment( i, segment.startPosition, segment.endPosition )
+				pathText = this.getPathForFeatureAnnotationSegment( i, segment.startPosition, segment.endPosition )
 			}
 			
 			var p = svgRootSnapSVGObject.path( pathText );
@@ -243,7 +234,7 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
  * @param proteinIndex
  * @param segment
  */
-circlePlotViewer.prototype.getPathForSegment = function( proteinIndex, startPosition, endPosition ) {
+circlePlotViewer.prototype.getPathForFeatureAnnotationSegment = function( proteinIndex, startPosition, endPosition ) {
 	
 	var startAngle = this.getAngleForProteinPosition( proteinIndex, startPosition );
 	var endAngle = this.getAngleForProteinPosition( proteinIndex, endPosition );
@@ -344,7 +335,7 @@ circlePlotViewer.prototype.drawLegend = function( svgRootSnapSVGObject ) {
 	// draw each legend item
 	for( var i = 0; i < searchArrays.length; i++ ) {
 		
-		var color = this.getColorForSearches( searchArrays[ i ] );
+		var color = _colorManager.getColorForSearches( searchArrays[ i ] ).hex;
 		
 		var y = this.CONSTANTS._LEGEND_HEADER_HEIGHT + this.CONSTANTS._LEGEND_GAP;
 		y += i * ( this.CONSTANTS._LEGEND_FONT_HEIGHT + this.CONSTANTS._LEGEND_GAP );
@@ -398,7 +389,7 @@ circlePlotViewer.prototype.drawLegend = function( svgRootSnapSVGObject ) {
 circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 	
 	var center = this.getCenterCoords();
-	var selectedProteins = _indexManager.getProteinList();
+	var selectedProteins = _indexManager.getProteinArray();
 	var degreesPerResidue = this.getDegreesPerResidue();
 	
 	// determine frequency and factor of tic marks
@@ -419,7 +410,8 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 	// loop over all proteins, draw their scale bars
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 
-		var proteinId = selectedProteins[ i ];
+		var proteinId = selectedProteins[ i ].pid;
+		var uid = selectedProteins[ i ].uid;
 		
 		// group to hold the scale bar
 		var group = svgRootSnapSVGObject.g();
@@ -428,7 +420,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 		var startAngle = this.getAngleForProteinPosition( i, 1 );
 		var endAngle = this.getAngleForProteinPosition( i, _proteinLengths[ proteinId ] );
 		
-		
+		var color = _colorManager.getColorForUIDAnnotation( uid );
 		
 		
 		// draw base line of scale bar
@@ -450,7 +442,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 		
 		var path = svgRootSnapSVGObject.path( d );
 		path.attr({
-			stroke:this.getColorForIndex( i ),
+			stroke:color.hex,
 			fill:"none"
 		});
 		
@@ -475,7 +467,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 		
 		path = svgRootSnapSVGObject.path( d );
 		path.attr({
-			stroke:this.getColorForIndex( i ),
+			stroke:color.hex,
 			fill:"none"
 		});
 		group.add( path );
@@ -493,7 +485,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 		
 		path = svgRootSnapSVGObject.path( d );
 		path.attr({
-			stroke:this.getColorForIndex( i ),
+			stroke:color.hex,
 			fill:"none"
 		});
 		group.add( path );
@@ -515,7 +507,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 			
 			path = svgRootSnapSVGObject.path( d );
 			path.attr({
-				stroke:this.getColorForIndex( i ),
+				stroke:color.hex,
 				fill:"none"
 			});
 			group.add( path );
@@ -548,7 +540,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 			text.attr( {
 				"textpath" : d,
 				"font-size": this.CONSTANTS._SCALE_BAR_FONT_HEIGHT + "px",
-				stroke:this.getColorForIndex( i ),
+				stroke:color.hex,
 				fill:"none",
 				"stroke-opacity":"0.9",
 				"text-anchor":"middle",
@@ -662,7 +654,8 @@ circlePlotViewer.prototype.drawMonolinks = function( svgRootSnapSVGObject ) {
 			var link = { };
 			link.type = "monolink";
 			link.protein1 = proteinId;
-			link.position1 = position;
+			link.position1 = parseInt( position );				// looks like monolink positions are strings?
+			link.uid1 = _indexManager.getUIDForIndex( i );
 			
 			
 			this.drawMonolink( i, link, svgRootSnapSVGObject );
@@ -692,16 +685,16 @@ circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGO
 	pathString += "L" + point2.x + "," + point2.y;
 	
 	var path = svgRootSnapSVGObject.path( pathString );
-	
-	var opacity = getOpacityForIndexAndLink( index, link );
-	
+		
     var lsearches = _proteinMonolinkPositions[ link.protein1 ][ link.position1 ];
 	
+    var color = _colorManager.getColorForLink( link );
+    
     path.attr( {
-		stroke:this.getColorForIndex( index ),
+		stroke:color.hex,
+		"stroke-opacity":color.opacity,
 		"stroke-dasharray":"4,2",
 		fill:"none",
-		"stroke-opacity":opacity,
 		'from_protein_id':link.protein1,
 		'fromp': _proteinNames[ link.protein1 ],
 		'frompp': link.position1,
@@ -785,6 +778,7 @@ circlePlotViewer.prototype.drawLooplinks = function( svgRootSnapSVGObject ) {
 				link.protein1 = proteinId;
 				link.position1 = fromPosition;
 				link.position2 = toPosition;
+				link.uid1 = _indexManager.getUIDForIndex( i );
 				
 				var looplink = this.drawCrosslink( i, fromPosition, i, toPosition, link, svgRootSnapSVGObject );
 				looplink.attr( { "stroke-dasharray":"4,2" });
@@ -830,6 +824,8 @@ circlePlotViewer.prototype.drawCrosslinks = function( svgRootSnapSVGObject ) {
 					link.position1 = fromPosition;
 					link.protein2 = proteinId2;
 					link.position2 = toPosition;
+					link.uid1 = _indexManager.getUIDForIndex( i );
+					link.uid2 = _indexManager.getUIDForIndex( j );
 					
 					this.drawCrosslink( i, fromPosition, j, toPosition, link, svgRootSnapSVGObject );				
 				}
@@ -888,6 +884,8 @@ circlePlotViewer.prototype.drawSelfCrosslinks = function( svgRootSnapSVGObject )
 				link.protein2 = proteinId;
 				link.position1 = fromPosition;
 				link.position2 = toPosition;
+				link.uid1 = _indexManager.getUIDForIndex( i );
+				link.uid2 = link.uid1;
 				
 				this.drawCrosslink( i, fromPosition, i, toPosition, link, svgRootSnapSVGObject );				
 			}
@@ -933,18 +931,18 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
 	radius -= radius * ratio;
 		
 	var loopPeakCoordinates = this.polarToCartesian( center.x, center.y, radius, midAngle );
-	
-	var opacity = getOpacityForIndexAndLink( fromIndex, link );
-	
+		
     var pathString = "M" + fromCoords.x + "," + fromCoords.y;
     pathString += "Q" + loopPeakCoordinates.x + "," + loopPeakCoordinates.y;
     pathString += " " + toCoords.x + "," + toCoords.y;
-        
+    
+    var color = _colorManager.getColorForLink( link );
+    
     var path = svgRootSnapSVGObject.path( pathString );
     path.attr( {
-		stroke:this.getColorForLink( fromIndex, link ),
+		stroke:color.hex,
+		"stroke-opacity":color.opacity,
 		fill:"none",
-		"stroke-opacity":opacity,
 	});
     
     // add a tooltip to this drawn link
@@ -1108,27 +1106,68 @@ circlePlotViewer.prototype.getAngleForProteinPosition = function( proteinIndex, 
  */
 circlePlotViewer.prototype.drawProteinBars = function( svgRootSnapSVGObject, isTransparent ) {
 	
-	var selectedProteins = _indexManager.getProteinList();
+	var selectedProteins = _indexManager.getProteinArray();
 	var totalGapDegrees = selectedProteins.length * this.CONSTANTS._GAP_BETWEEN_BARS;
 	var workingDegrees = 360 - totalGapDegrees;
 	
 	var totalProteinLength = 0;
 	for( var i = 0; i < selectedProteins.length; i++ ) {
-		totalProteinLength += _proteinLengths[ selectedProteins[ i ] ];
+		totalProteinLength += _proteinLengths[ selectedProteins[ i ].pid ];
 	}
 	
 	var currentStartDegrees = 0;
 	for( var i = 0; i < selectedProteins.length; i++ ) {
-		var totalLengthProportion = _proteinLengths[ selectedProteins[ i ] ] / totalProteinLength;
-		var rotationDegrees = workingDegrees * totalLengthProportion;
+		var pid = selectedProteins[ i ].pid;		// protein sequence id
+		var uid = selectedProteins[ i ].uid;		// unique id
 		
-		this.drawProteinBar( svgRootSnapSVGObject, isTransparent, selectedProteins[ i ], i, currentStartDegrees, rotationDegrees );
+		var totalLengthProportion = _proteinLengths[ pid ] / totalProteinLength;
+		var rotationDegrees = workingDegrees * totalLengthProportion;
+		var barEntry = _imageProteinBarDataManager.getItemByUID( uid );
+		
+		this.drawProteinBar( svgRootSnapSVGObject, isTransparent, pid, i, currentStartDegrees, rotationDegrees );
+		
+		// draw protein regions if necessary
+		if( !isTransparent && _imageProteinBarDataManager.isAnyProteinBarsHighlighted() && !barEntry.isAllOfProteinBarHighlighted() && barEntry.isAnyOfProteinBarHighlighted() ) {
+			
+			var regions = barEntry.getProteinBarHighlightedRegionsArray();
+			
+			for( var r = 0; r < regions.length; r++ ) {
+				
+				var region = { };
+				
+				region.uid = uid;
+				region.start = regions[ r ].s;
+				region.end = regions[ r ].e;
+				
+				this.drawRegion( svgRootSnapSVGObject, region );
+			}
+			
+		}
+		
+		if( !isTransparent ){
+			this.drawProteinBarLabel( svgRootSnapSVGObject, pid, i, currentStartDegrees, rotationDegrees );
+		}
 		
 		currentStartDegrees += this.CONSTANTS._GAP_BETWEEN_BARS + rotationDegrees;
 		
 	}
 	
 };
+
+
+circlePlotViewer.prototype.drawRegion = function( svgRootSnapSVGObject, region ) {
+	
+	var index = _indexManager.getIndexForUID( region.uid );
+	var path = this.getPathForProteinSegment( index, region.start, region.end );
+	var color = _colorManager.getColorForRegion( region );
+	
+	var svgPath = svgRootSnapSVGObject.path( path );
+	
+	svgPath.attr( {
+		fill:color.hex,
+	});
+	
+}
 
 
 
@@ -1158,17 +1197,13 @@ circlePlotViewer.prototype.drawProteinBar = function( svgRootSnapSVGObject, isTr
 		});
 		
 		this.addMouseOverHandlerToProteinBar( svgRootSnapSVGObject, svgPath, proteinId, index );
+		this.addClickHandlerToProteinBar( svgRootSnapSVGObject, svgPath, proteinId, index );
 		
 	} else {
 		svgPath.attr( {
-			fill:this.getColorForIndex( index ),
+			fill:_colorManager.getColorForIndex( index ).hex,
 		});
-	}
-
-	if( !isTransparent ){
-		this.drawProteinBarLabel( svgRootSnapSVGObject, proteinId, index, startDegrees, rotationDegrees );
-	}
-	
+	}	
 };
 
 /**
@@ -1204,6 +1239,41 @@ circlePlotViewer.prototype.drawProteinBarLabel = function( svgRootSnapSVGObject,
 		dx:"5px",
 	});
 };
+
+/**
+ * Add a mouse click handler (toggling whole-protein highlighting) to a protein bar
+ */
+circlePlotViewer.prototype.addClickHandlerToProteinBar = function( svgRootSnapSVGObject, svgPath, proteinId, index ) {
+
+	var pathSVGObject = svgPath.node;
+	var $pathSVGObject = $( pathSVGObject );		// jquery variable
+
+	var objectThis = this;
+	
+	// add click event
+	$pathSVGObject.click( function( e ) { 
+		objectThis.processClickOnProteinBar( e, svgRootSnapSVGObject, svgPath, proteinId, index ); 
+	});
+	
+};
+
+/**
+ * Process a click on a protein bar
+ */
+circlePlotViewer.prototype.processClickOnProteinBar = function( e, svgRootSnapSVGObject, svgPath, proteinId, index ) {
+
+	this.removeProteinPositionIndicator();
+	
+	if( e.shiftKey ) { 		// shift + click				
+		toggleHighlightedProtein( index, false );
+		updateURLHash( false );
+
+	} else {				// normal click
+		toggleHighlightedProtein( index, true );
+		updateURLHash( false );
+	}
+	
+}
 
 /**
  * Add mouseover handler (causing a tooltip) to the protein bar
@@ -1535,6 +1605,11 @@ circlePlotViewer.prototype.inializeSVGObject = function() {
 	var svg_image_template_div__html = $svg_image_template_div.html();
 	var $svg_image_inner_container_div = $("#svg_image_inner_container_div");
 	
+
+	$(".qtip").qtip('destroy', true); // Immediately destroy all tooltips belonging to the selected elements
+	
+	
+	
 	//  select the <svg> element	
 	$svg_image_inner_container_div.empty();  //  remove the <svg> element.  jQuery will also properly remove all the handlers attached to those elements
 	$svg_image_inner_container_div.html( svg_image_template_div__html );  // insert new <svg> as copied from the template
@@ -1544,6 +1619,10 @@ circlePlotViewer.prototype.inializeSVGObject = function() {
 	
 	//  get the <svg> HTML element to pass to Snap
 	var merged_image_svg_element = $merged_image_svg_jq[0];
+	
+	
+	
+	
 	
 	var selectedProteins = _indexManager.getProteinList();
 	
@@ -1783,74 +1862,6 @@ circlePlotViewer.prototype.getCenterCoords = function() {
 	center.y = this.centerY;
 	
 	return center;
-};
-
-/**
- * Get the color to use for the given link and originating index
- * @param index
- * @param link
- */
-circlePlotViewer.prototype.getColorForLink = function( index, link ) {
-	
-	var searches;
-	
-	// are we coloring by search?
-	if( this.isColorBySearch() ) {
-		if( link.type === "crosslink" ) { searches = findSearchesForCrosslink( link.protein1, link.protein2, link.position1, link.position2 ); }
-		else if( link.type === "looplink" ) { searches = findSearchesForLooplink( link.protein1, link.position1, link.position2 ); }
-		else if( link.type === "monolink" ) { searches = findSearchesForMonolink( link.protein1, link.position1 ); }
-		else {
-			console.log( "ERROR in getColorForLink, can't type type of link to find searches:" );
-			console.log( link );
-			return "#000000";
-		}
-				
-		return this.getColorForSearches( searches );
-	}
-
-	// color by "originating" protein is default
-	return this.getColorForIndex( index );
-	
-};
-
-/**
- * Get the color for the given index, given the total number of proteins
- * @param index
- * @returns
- */
-circlePlotViewer.prototype.getColorForIndex = function( index ) {
-	var number = _indexManager.getProteinList().length;
-		
-	var hueDivider = 360 / number;
-	var saturation = 0.39;
-	var brightness = 0.60;
-
-	var hue =  (360 - (hueDivider * index ) - 1) / 360;
-		
-	var color = Snap.hsb2rgb( hue, saturation, brightness );
-	return color.hex;
-};
-
-/**
- * Get the color to use for an array of searches when coloring by search
- * @param searches
- * @returns
- */
-circlePlotViewer.prototype.getColorForSearches = function( searches ) {
-
-	var colorIndex = "";
-	
-	for ( var i = 0; i < _searches.length; i++ ) {
-		for ( var k = 0; k < searches.length; k++ ) {
-			if ( _searches[i]['id'] === searches[ k ] ) {
-				colorIndex += ( i + 1 );
-				break;
-			}
-		}
-	}
-	
-	return this.CONSTANTS._SEARCH_COLORS[ colorIndex ];
-	
 };
 
 /**
