@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.ProteinSequenceAnnotationDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -26,7 +27,7 @@ public class ProteinSequenceAnnotationSearcher {
 	public static ProteinSequenceAnnotationSearcher getInstance() { return _INSTANCE; }
 	
 	
-	public Collection<ProteinSequenceAnnotationDTO> getProteinSequenceAnnotationsForSearchAndProtein( int searchId, int proteinSequenceId ) throws Exception {
+	public Collection<ProteinSequenceAnnotationDTO> getProteinSequenceAnnotationsForSearchAndProtein( Collection<Integer> searchIds, int proteinSequenceId ) throws Exception {
 
 		Collection<ProteinSequenceAnnotationDTO> annotations = new ArrayList<>();
 		
@@ -34,7 +35,9 @@ public class ProteinSequenceAnnotationSearcher {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		String sql = "SELECT annotation_id FROM search_protein_sequence_annotation WHERE search_id = ? AND protein_sequence_id = ? ORDER BY annotation_id";
+		String sql = "SELECT DISTINCT annotation_id FROM search_protein_sequence_annotation WHERE search_id IN (#SEARCHES#) AND protein_sequence_id = ? ORDER BY annotation_id";
+
+		sql = sql.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
 		
 		try {
 			
@@ -43,8 +46,7 @@ public class ProteinSequenceAnnotationSearcher {
 			
 			pstmt = conn.prepareStatement( sql );
 			
-			pstmt.setInt( 1, searchId );
-			pstmt.setInt( 2, proteinSequenceId );
+			pstmt.setInt( 1, proteinSequenceId );
 			
 			rs = pstmt.executeQuery();
 

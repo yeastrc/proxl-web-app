@@ -231,33 +231,70 @@ var addSingleTooltipForProteinName = function( params ) {
                 			  .done( function( data ) {
                 				  
                 				  try {
+                					  
+                					  //  first, show any "local" descriptions for this protein
 
-                					  //  first set to html for "not found" 
-
-                					  var mainProteinDataFormattedHTML =
-                						  "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
-                						  + "<span class='is-tooltip-label'>From YRC PDR:</span> " 
-                						  + "</div>"
-                						  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
-                						  + "<span class='is-tooltip-label'>Not Found</span>"
-                						  + "</div>";
+                					  var descriptionCount = 0;
+                					  if( data.annotations && data.annotations.length > 0 ) {
+                						  for( var i = 0; i < data.annotations.length; i++ ) {
+                							  
+                							  var annotation = data.annotations[ i ];
+                							  if( annotation.description != null && annotation.description.length > 0 ) {
+                								  descriptionCount++;
+                							  }         							  
+                						  }
+                					  }
+                					  
+                					  var mainProteinDataFormattedHTML =  "";
+                					  
+                					  
+                					  if( descriptionCount === 0 ) {
+                						  mainProteinDataFormattedHTML += "<div style=\"margin-bottom:10px;\" class=\"isTooltip\"><span class='is-tooltip-label'>No description uploaded to Proxl.</span></div>";
+                					  } else {
+                						  mainProteinDataFormattedHTML += "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">";
+                						  
+                    					  if( data.annotations && data.annotations.length > 0 ) {
+                    						  
+                    						  mainProteinDataFormattedHTML += "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">";
+                    						  mainProteinDataFormattedHTML += "<span class='is-tooltip-label'>Description(s) uploaded to ProXL:</span> ";
+                    						  mainProteinDataFormattedHTML += "</div>";
+                    						  
+                    						  for( var i = 0; i < data.annotations.length; i++ ) {
+                    							  
+                    							  var annotation = data.annotations[ i ];
+                    							  
+                        						  mainProteinDataFormattedHTML += "<div style=\"margin-bottom:10px;margin-left:10px;\" class=\"isTooltip\">";
+                        						  mainProteinDataFormattedHTML += "<span>" + annotation.description + "</span> ";
+                        						  mainProteinDataFormattedHTML += "</div>";
+                    							  
+                    							  
+                    						  }
+                    						  
+                    					  }
+                						  
+                						  
+                						  mainProteinDataFormattedHTML += "</div>";
+                					  }
 
 
                 					  if ( data.dataFound ) {
 
-                						  mainProteinDataFormattedHTML = 
+                						  mainProteinDataFormattedHTML += 
                 							  "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">"
                 							  + "<span class='is-tooltip-label'>From YRC PDR:</span> " 
                 							  + "</div>"
-                							  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
-                							  + "<span class='is-tooltip-label'>Source:</span> " + data.source + "</div>" 
-                							  + "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
-                							  + "<span class='is-tooltip-label'>Name:</span> " + data.name + "</div>";
+                							  + "<div style=\"margin-bottom:5px;margin-left:10px;\" class=\"isTooltip\"><span>Source:</span> " + data.source + "</div>" 
+                							  + "<div style=\"margin-bottom:5px;margin-left:10px;\" class=\"isTooltip\"><span>Name:</span> " + data.name + "</div>";
 
                 						  if ( data.description !== undefined && data.description !== null ) {
-                							  output += "<div style=\"margin-bottom:10px;\" class=\"isTooltip\">" 
-                								  + "<span class='is-tooltip-label'>Description:</span> " + data.description + "</div>";
+                							  mainProteinDataFormattedHTML += "<div style=\"margin-bottom:5px;margin-left:10px;\" class=\"isTooltip\"><span>Description:</span> " + data.description + "</div>";
+                						  } else {
+                							  mainProteinDataFormattedHTML += "<div style=\"margin-bottom:5px;margin-left:10px;\" class=\"isTooltip\"><span>Description:</span> Not found.</div>"
                 						  }
+                					  } else {
+                						  
+                						  mainProteinDataFormattedHTML += "<div style=\"margin-bottom:10px;\" class=\"isTooltip\"><span class='is-tooltip-label'>No data found in YRC PDR.</span></div>";
+
                 					  }
 
                 					  __proteinDataForToolTipFormattedHTMLCache[ proteinIdString ] = mainProteinDataFormattedHTML;

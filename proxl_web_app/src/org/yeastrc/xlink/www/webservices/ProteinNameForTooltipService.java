@@ -3,6 +3,7 @@ package org.yeastrc.xlink.www.webservices;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,15 +32,17 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.dto.ProteinSequenceAnnotationDTO;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.constants.WebServiceURLConstants;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
+import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.ProteinSequenceAnnotationSearcher;
 import org.yeastrc.xlink.www.searcher.TaxonomyIdsForProtSeqIdSearchIdSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -394,6 +397,11 @@ public class ProteinNameForTooltipService {
 			
 			}
 			
+			// add in local annotations for this protein sequence
+			Collection<ProteinSequenceAnnotationDTO> annotations = ProteinSequenceAnnotationSearcher.getInstance().getProteinSequenceAnnotationsForSearchAndProtein( searchIdsSet, proteinSequenceId );
+			proteinNameForTooltipServiceWebserviceResponse.setAnnotations( annotations );
+			
+			
 			return proteinNameForTooltipServiceWebserviceResponse;
 			
 		} catch ( WebApplicationException e ) {
@@ -461,8 +469,14 @@ public class ProteinNameForTooltipService {
 		private String name = "Not Found";
 		private String description = "Not Found";
 		private String source = "Not Found";
-
+		private Collection<ProteinSequenceAnnotationDTO> annotations = new ArrayList<>();
 		
+		public Collection<ProteinSequenceAnnotationDTO> getAnnotations() {
+			return annotations;
+		}
+		public void setAnnotations(Collection<ProteinSequenceAnnotationDTO> annotations) {
+			this.annotations = annotations;
+		}
 		public boolean isDataFound() {
 			return dataFound;
 		}
