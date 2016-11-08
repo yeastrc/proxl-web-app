@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.proxl_xml_file_import.constants;
 public class ProxlXMLFileUploadMaxFileSizeConstants {
 
 
-	public static final long MAX_PROXL_XML_FILE_UPLOAD_SIZE = ( 150 * ( (long) ( 1000 * 1000 ) ) ); // 150MB max
+	public static final long MAX_PROXL_XML_FILE_UPLOAD_SIZE = ( 250 * ( (long) ( 1000 * 1000 ) ) ); // 250MB max
 
 
 	// Must cast some part to long. 
@@ -15,7 +15,7 @@ public class ProxlXMLFileUploadMaxFileSizeConstants {
 
 	//  !!!!   Must keep these in sync with the numbers above
 	
-	public static final String MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED = "150MB";
+	public static final String MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED = "250MB";
 
 	
 	public static final String MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED = "10GB";
