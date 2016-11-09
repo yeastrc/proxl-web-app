@@ -42,7 +42,8 @@ public class LogBrowserJavascriptErrorService {
 		
 		log.error( "Error encountered on browser: message: " + logBrowserJavascriptErrorsRequest.errorMsg
 				+ "\n stack: " + logBrowserJavascriptErrorsRequest.stackString
-				+ "\n userAgent: " + logBrowserJavascriptErrorsRequest.userAgent );
+				+ "\n userAgent: " + logBrowserJavascriptErrorsRequest.userAgent
+				+ "\n browserURL: " + logBrowserJavascriptErrorsRequest.browserURL );
 		
 		LogBrowserJavascriptErrorResult logBrowserJavascriptErrorResult = new LogBrowserJavascriptErrorResult();
 		logBrowserJavascriptErrorResult.status = true;
@@ -54,6 +55,7 @@ public class LogBrowserJavascriptErrorService {
 		private String errorMsg;
 		private String stackString;
 		private String userAgent;
+		private String browserURL;
 		private boolean fdajklweRWOIUOPOP;
 		
 		
@@ -80,6 +82,12 @@ public class LogBrowserJavascriptErrorService {
 		}
 		public void setUserAgent(String userAgent) {
 			this.userAgent = userAgent;
+		}
+		public String getBrowserURL() {
+			return browserURL;
+		}
+		public void setBrowserURL(String browserURL) {
+			this.browserURL = browserURL;
 		}
 	}
 

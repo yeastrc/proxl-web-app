@@ -34,11 +34,14 @@ var ReportWebErrorToServer = function() {
 					userAgent = window.navigator.userAgent
 				}
 			}
+			
+			var browserURL = window.location.href;
 
 			var requestObj = { fdajklweRWOIUOPOP : true,
 					errorMsg : errorException.message,
 					stackString : errorException.stack,
-					userAgent : userAgent };
+					userAgent : userAgent,
+					browserURL : browserURL };
 			
 			var requestData = JSON.stringify( requestObj );
 
