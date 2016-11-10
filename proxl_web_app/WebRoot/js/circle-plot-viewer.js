@@ -640,6 +640,9 @@ circlePlotViewer.prototype.drawLinkablePositions = function( svgRootSnapSVGObjec
 circlePlotViewer.prototype.drawMonolinks = function( svgRootSnapSVGObject ) {
 	var selectedProteins = _indexManager.getProteinList();
 	
+	// this shouldn't happen, but does...
+	if( !_proteinMonolinkPositions ) { return; }
+	
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId = selectedProteins[ i ];
 		
