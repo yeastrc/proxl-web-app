@@ -156,6 +156,69 @@ public class TermsOfServiceTextVersionsDAO {
 	}
 	
 
+	/**
+	 * @param idString
+	 * @return null if not found
+	 * @throws Exception
+	 */
+	public Integer getVersionIdForIdString( String idString ) throws Exception {
+
+		Integer returnItem = null;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		final String sql = "SELECT version_id FROM terms_of_service_text_versions WHERE id_string = ?";
+
+		
+		try {
+			
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			
+			pstmt = conn.prepareStatement( sql );
+			pstmt.setString( 1, idString );
+			
+			rs = pstmt.executeQuery();
+			
+			if( rs.next() ) {
+
+				returnItem = rs.getInt( "version_id" );
+			}
+			
+		} catch ( Exception e ) {
+			
+			String msg = "Failed to select TermsOfServiceTextVersionsDTO, id_string: " + idString + ", sql: " + sql;
+			
+			log.error( msg, e );
+			
+			throw e;
+			
+
+		} finally {
+			
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			
+			if( conn != null ) {
+				try { conn.close(); } catch( Throwable t ) { ; }
+				conn = null;
+			}
+			
+		}
+		
+		return returnItem;
+	}
+	
+
 	
 	/**
 	 * Get record with largest version_id

@@ -10,7 +10,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
+import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsValuesSharedConstants;
+import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.dao.TermsOfServiceTextVersionsDAO;
+import org.yeastrc.xlink.www.dto.TermsOfServiceTextVersionsDTO;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserInviteTrackingCode;
 
 public class UserInviteCreateNewUserInitPageAction extends Action {
@@ -40,9 +45,17 @@ public class UserInviteCreateNewUserInitPageAction extends Action {
 				return mapping.findForward("Failure");
 			}
 			
+			//  Is terms of service enabled?
+			String termsOfServiceEnabledString =
+					ConfigSystemCaching.getInstance()
+					.getConfigValueForConfigKey( ConfigSystemsKeysSharedConstants.TERMS_OF_SERVICE_ENABLED );
+			if ( ConfigSystemsValuesSharedConstants.TRUE.equals( termsOfServiceEnabledString ) ) {
+				// Terms of service Is enabled, put on page
+				TermsOfServiceTextVersionsDTO termsOfServiceTextVersionsDTO = 
+						TermsOfServiceTextVersionsDAO.getInstance().getLatest();
+				request.setAttribute( "termsOfServiceTextVersion", termsOfServiceTextVersionsDTO );
+			}
 			
-//			AuthUserInviteTrackingDTO authUserInviteTrackingDTO =  validateUserInviteTrackingCode.getAuthUserInviteTrackingDTO();
-
 			return mapping.findForward("Success");
 			
 		} catch ( Exception e ) {
