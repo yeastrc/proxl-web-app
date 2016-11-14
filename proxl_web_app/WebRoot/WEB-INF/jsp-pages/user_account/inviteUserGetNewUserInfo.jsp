@@ -38,6 +38,63 @@
  <%@ include file="/WEB-INF/jsp-includes/body_section_start_include_every_page.jsp" %>
 
 
+
+	<%--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --%>
+	
+	<%--  !!!!!!!!!!    Overlays               !!!!!!!!!! --%>
+
+	<%--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --%>
+	
+	
+ <c:if test="${ not empty termsOfServiceTextVersion }">	
+ 
+  <%--  Terms of Service Overlay --%>
+		
+
+	<%--  Terms of Service Overlay Background --%>
+	
+	
+	<div id="terms_of_service_modal_dialog_overlay_background" class="terms-of-service-modal-dialog-overlay-background" style="display: none;"  >
+	</div>
+	
+	<%--  Terms of Service Overlay Div --%>
+	
+	<div style="text-align: center; position: relative;">
+	  <div style="text-align: center; position: relative;" >
+		<div id="terms_of_service_overlay_div" class=" terms-of-service-overlay-div " style="display: none; "  >
+		
+			<div id="terms_of_service_overlay_header" class="terms-of-service-overlay-header" style="width:100%; " >
+				<h1 id="terms_of_service_overlay_header_text" class="terms-of-service-overlay-header-text" 
+					>Terms of Service</h1>
+			</div>
+			<div id="terms_of_service_overlay_body" class="terms-of-service-overlay-body" >
+				<div style="margin-bottom: 10px;">
+					Terms of Service Acceptance required.
+				</div>
+				
+				<div id="terms_of_service_acceptance_required_text" class=" terms-of-service-overlay-text ">
+					<c:out value="${ termsOfServiceTextVersion.termsOfServiceText }" escapeXml="false"></c:out>
+					<input type="hidden" value="${ termsOfServiceTextVersion.idString }" id="terms_of_service_id_string">
+				</div>
+				
+				<div style="margin-top: 10px; margin-bottom: 10px;">
+					<input id="terms_of_service_acceptance_yes_button" class="submit-button terms-of-service-overlay-button"
+						type="button" value="Accept Terms of Service">
+		
+					<input id="terms_of_service_acceptance_no_button"  class="submit-button terms-of-service-overlay-button"
+						type="button" value="Reject Terms of Service">
+				</div>
+				
+			</div> <%--  END  <div id="terms_of_service_overlay_body"  --%>
+			
+		</div>  <%--  END  <div id="terms_of_service_overlay_div"  --%>
+	  </div>
+	</div>
+	
+  </c:if>
+  
+  	
+
 <div class="page-content-outer-container" >	
  <div class="page-content-container" >	
   <div class="page-content" >	
@@ -46,7 +103,6 @@
 		<img src="${ contextPath }/images/logo-large.png" />
 	</div>
 
-  	
   	<div  style="position: relative;" class="page-label">
   		<div class="error-message-container error_message_container_jq" id="error_message_all_fields_required">
   			<div class="error-message-inner-container" >
