@@ -1,8 +1,9 @@
 package org.yeastrc.xlink.www.webservices;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -14,52 +15,34 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.qc_plots.psm_count_for_score.CreatePsmCountsVsScoreQCPlotData;
-import org.yeastrc.xlink.www.qc_plots.psm_count_for_score.PsmCountsVsScoreQCPlotDataJSONRoot;
+import org.yeastrc.xlink.www.objects.ProteinSequenceIdProteinAnnotationName;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.ProteinSequenceIdAnnotationNameSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
 
-@Path("/qcplot")
-public class QCPlotPsmCountsVsScoreService {
+@Path("/proteinNames")
+public class ProteinNameListForSearchIdService {
 
-	private static final Logger log = Logger.getLogger(QCPlotPsmCountsVsScoreService.class);
+	private static final Logger log = Logger.getLogger(ProteinNameListForSearchIdService.class);
 	
 	/**
-	 * @param selectedLinkTypes
 	 * @param searchId
-	 * @param annotationTypeId
-	 * @param psmScoreCutoff
-	 * @param proteinSequenceIdsToIncludeList
 	 * @param request
 	 * @return
 	 * @throws Exception
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/getPsmCountsVsScore") 
-	public PsmCountsVsScoreQCPlotDataJSONRoot getViewerData( 
-			@QueryParam( "selectedLinkTypes" ) Set<String> selectedLinkTypes,			
+	@Path("/getProteinNameListForSearchId") 
+	public ProteinNameListForSearchIdServiceResult getPSMFilterableAnnTypesForSearchId( 
 			@QueryParam( "searchId" ) int searchId,
-			@QueryParam( "annotationTypeId" ) int annotationTypeId,
-			@QueryParam( "psmScoreCutoff" ) Double psmScoreCutoff,
-			@QueryParam( "protein_sequence_id" ) List<Integer> proteinSequenceIdsToIncludeList,
 			@Context HttpServletRequest request )
 	throws Exception {
-
 		if ( searchId == 0 ) {
-			String msg = ": Provided searchId is zero or wasn't provided";
-			log.error( msg );
-		    throw new WebApplicationException(
-		    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
-		    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
-		    	        .build()
-		    	        );
-		}
-		if ( selectedLinkTypes == null || selectedLinkTypes.isEmpty() ) {
-			String msg = ": selectedLinkTypes is empty";
+			String msg = ": Provided searchId is zero";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
@@ -107,7 +90,7 @@ public class QCPlotPsmCountsVsScoreService {
 			//  Test access to the project id
 			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
-				//  No Access Allowed for this search id
+				//  No Access Allowed for this project id
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
 						.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
@@ -115,13 +98,24 @@ public class QCPlotPsmCountsVsScoreService {
 						);
 			}
 			
+			////////   Auth complete
+			//////////////////////////////////////////
 			
+			//  Get  ProteinSequenceId and AnnotationName for search
 			
-			PsmCountsVsScoreQCPlotDataJSONRoot psmCountsVsScoreQCPlotDataJSONRoot = 
-					CreatePsmCountsVsScoreQCPlotData.getInstance()
-					.create( selectedLinkTypes, searchId, annotationTypeId, psmScoreCutoff, proteinSequenceIdsToIncludeList );
-			
-			return psmCountsVsScoreQCPlotDataJSONRoot;
+			List<ProteinSequenceIdProteinAnnotationName> proteinSequenceIdProteinAnnotationNameList = 
+					ProteinSequenceIdAnnotationNameSearcher.getInstance()
+					.getProteinSequenceIdAnnotationNameForSearch( searchId );
+
+			Collections.sort( proteinSequenceIdProteinAnnotationNameList, new Comparator<ProteinSequenceIdProteinAnnotationName>() {
+				@Override
+				public int compare(ProteinSequenceIdProteinAnnotationName o1, ProteinSequenceIdProteinAnnotationName o2) {
+					return o1.getAnnotationName().compareToIgnoreCase( o2.getAnnotationName() );
+				}
+			});
+			ProteinNameListForSearchIdServiceResult result = new ProteinNameListForSearchIdServiceResult();
+			result.proteinSequenceIdProteinAnnotationNameList = proteinSequenceIdProteinAnnotationNameList;
+			return result;
 			
 		} catch ( WebApplicationException e ) {
 			throw e;
@@ -134,5 +128,21 @@ public class QCPlotPsmCountsVsScoreService {
 					.build()
 					);
 		}
+	}
+	
+	
+	public static final class ProteinNameListForSearchIdServiceResult {
+		
+		List<ProteinSequenceIdProteinAnnotationName> proteinSequenceIdProteinAnnotationNameList;
+
+		public List<ProteinSequenceIdProteinAnnotationName> getProteinSequenceIdProteinAnnotationNameList() {
+			return proteinSequenceIdProteinAnnotationNameList;
+		}
+
+		public void setProteinSequenceIdProteinAnnotationNameList(
+				List<ProteinSequenceIdProteinAnnotationName> proteinSequenceIdProteinAnnotationNameList) {
+			this.proteinSequenceIdProteinAnnotationNameList = proteinSequenceIdProteinAnnotationNameList;
+		}
+		
 	}
 }
