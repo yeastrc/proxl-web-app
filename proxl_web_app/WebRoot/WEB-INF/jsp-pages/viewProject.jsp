@@ -2505,9 +2505,6 @@
 								<select id="psm_count_vs_score_qc_plot_protein_seq_id_select" multiple="multiple" 
 									class=" psm_count_vs_score_qc_plot_on_change_jq " >
 								</select>					
-								<script type="text/text"  id="psm_count_vs_score_qc_plot_protein_seq_id_sel_def_all" >
-									<option value="">All</option>
-								</script>		
 							</td>
 						</tr>
 						
