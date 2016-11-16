@@ -33,6 +33,7 @@ import org.yeastrc.xlink.www.objects.AnnotationTypeDTOListForSearchId;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult;
+import org.yeastrc.xlink.www.objects.WebMergedProteinPosition;
 import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmAnnotationDataSearcher;
@@ -266,7 +267,7 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 
 				//  Write header line
 				
-				writer.write( "SEARCH ID\tSCAN NUMBER\tPEPTIDE 1\tPOSITION 1\tMODS\tPEPTIDE 1\tPOSITION 2\tMODS\tLink Type" );
+				writer.write( "SEARCH ID\tSCAN NUMBER\tPEPTIDE 1\tPOSITION 1\tMODS\tPROTEINS\tPEPTIDE 2\tPOSITION 2\tMODS\tPROTEINS\tLink Type" );
 				writer.write( "\tOBSERVED M/Z\tCHARGE\tRETENTION TIME (MINUTES)\tSCAN FILENAME" );
 
 
@@ -362,188 +363,214 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 							
 
 							for ( PsmWebDisplayWebServiceResult psmWebDisplay : psms ) {
-					
-							//  Process each PSM
-							
-//								SEARCH ID
-//								SCAN NUMBER
-//								PEPTIDE 1
-//								POSITION 1
-//								MODS
-//								PEPTIDE 1
-//								POSITION 2
-//								MODS
-//								Link Type
-//								OBSERVED M/Z
-//								CHARGE
-//								RETENTION TIME (MINUTES)
-//								SCAN FILENAME (THE MZML FILE)
-
-					
-
-							writer.write( Integer.toString( eachSearchIdToProcess ) );
-
-							writer.write( "\t" );
-							if ( psmWebDisplay.getScanNumber() != null ) {
-								writer.write( Integer.toString( psmWebDisplay.getScanNumber() ) );
-							}
-							
-							//  Peptide 1 data
-							
-							writer.write( "\t" );
-							writer.write( link.getPeptide1().getSequence() );
-							writer.write( "\t" );
-							writer.write( link.getPeptide1Position() );
-							writer.write( "\t" );
-							writer.write( link.getModsStringPeptide1() );  // MODS
-
-							//  Peptide 2 data
-
-							writer.write( "\t" );
-							if ( link.getPeptide2() != null ) {
-								writer.write( link.getPeptide2().getSequence() );
-							}
-							writer.write( "\t" );
-							writer.write( link.getPeptide2Position() );
-							
-							writer.write( "\t" );
-							writer.write( link.getModsStringPeptide2() );  // MODS
-							
-							
-							
-							writer.write( "\t" );
-							writer.write( link.getLinkType() );
-							
-							//  Scan data
-							
-							writer.write( "\t" );
-							if ( StringUtils.isNotEmpty( psmWebDisplay.getPreMZRounded() ) ) {
-
-								writer.write( psmWebDisplay.getPreMZRounded() ); // OBSERVED M/Z
-							}
-							writer.write( "\t" );
-							if ( psmWebDisplay.getCharge() != null ) {
-								writer.write( Integer.toString( psmWebDisplay.getCharge() ) ); // CHARGE
-							}
-							writer.write( "\t" );
-							if ( StringUtils.isNotEmpty( psmWebDisplay.getRetentionTimeMinutesRoundedString() ) ) {
-								writer.write( psmWebDisplay.getRetentionTimeMinutesRoundedString() ); // RETENTION TIME (MINUTES)
-							}
-							writer.write( "\t" );
-							if ( psmWebDisplay.getScanFilename() != null ) {
-								writer.write( psmWebDisplay.getScanFilename() );   /// SCAN FILENAME
-							}
-							
-							
-
-							///  Fill in empty cells for other search ids before search id being processed
-
-							for ( Integer searchIdOtherThanSearchIdBeingProcessed : searchIdsListDeduppedSorted ) {
-								
-								if ( searchIdOtherThanSearchIdBeingProcessed >= eachSearchIdToProcess ) {
-									
-									//  Exit loop at eachSearchIdToProcess,  >= comparison since search ids in sorted order
-									
-									break;  // EARLY EXIT of loop
+	
+								writer.write( Integer.toString( eachSearchIdToProcess ) );
+	
+								writer.write( "\t" );
+								if ( psmWebDisplay.getScanNumber() != null ) {
+									writer.write( Integer.toString( psmWebDisplay.getScanNumber() ) );
 								}
-
-								//  Fill in cells for search id searchIdOtherThanSearchIdBeingProcessed
 								
-								AnnotationTypeDTOListForSearchId annotationTypeDTOListFor_OTHER_SearchId = 
-										psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( searchIdOtherThanSearchIdBeingProcessed );
-
-								if ( annotationTypeDTOListFor_OTHER_SearchId == null ) {
-									
-									String msg = "annotationTypeDTOListFor_OTHER_SearchId not found for search id " + searchIdOtherThanSearchIdBeingProcessed;
-									log.error( msg );
-									throw new ProxlWebappDataException( msg );
-								}
-
-								for ( int counter = 0; counter < annotationTypeDTOListFor_OTHER_SearchId.getAnnotationTypeDTOList().size(); counter++ ) {
-									
-									writer.write( "\t" );
-								}
-							}
-							
-
-							AnnotationTypeDTOListForSearchId annotationTypeDTOListForSearchId = 
-									psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( eachSearchIdToProcess );
-
-							if ( annotationTypeDTOListForSearchId == null ) {
-								
-								String msg = "annotationTypeDTOListForSearchId not found for search id " + eachSearchIdToProcess;
-								log.error( msg );
-								throw new ProxlWebappDataException( msg );
-							}
-							
-
-							//  Get set of annotation type ids for getting annotation data
-							
-							Set<Integer> annotationTypeIdsForGettingAnnotationData = new HashSet<>();
-
-							for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDTOListForSearchId.getAnnotationTypeDTOList() ) {
-								
-								annotationTypeIdsForGettingAnnotationData.add( annotationTypeDTO.getId() );
-							}
-							
-							Map<Integer, PsmAnnotationDTO> psmAnnotationDTOMapOnTypeId = new HashMap<>();
-							
-							List<PsmAnnotationDTO> psmAnnotationDataList = 
-									PsmAnnotationDataSearcher.getInstance()
-									.getPsmAnnotationDTOList( psmWebDisplay.getPsmDTO().getId(), annotationTypeIdsForGettingAnnotationData );
-
-							for ( PsmAnnotationDTO psmAnnotationDataItem : psmAnnotationDataList ) {
-
-								psmAnnotationDTOMapOnTypeId.put( psmAnnotationDataItem.getAnnotationTypeId(), psmAnnotationDataItem );
-							}
-
-							for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDTOListForSearchId.getAnnotationTypeDTOList() ) {
-								
-								PsmAnnotationDTO psmAnnotationDTO = psmAnnotationDTOMapOnTypeId.get( annotationTypeDTO.getId() );
-
-								if ( psmAnnotationDTO == null ) {
-									
-									String msg = "psmAnnotationDTO not foudn for annotation type id " +  annotationTypeDTO.getId();
-									log.error( msg );
-									throw new ProxlWebappDataException( msg );
-								}
+								//  Peptide 1 data
 								
 								writer.write( "\t" );
-								writer.write( psmAnnotationDTO.getValueString() );
-							}
-							
-							
-							///  Fill in empty cells for other search ids After search id being processed
+								writer.write( link.getPeptide1().getSequence() );
+								writer.write( "\t" );
+								writer.write( link.getPeptide1Position() );
+								writer.write( "\t" );
+								writer.write( link.getModsStringPeptide1() );  // MODS
+								writer.write( "\t" );
 
-							for ( Integer searchIdOtherThanSearchIdBeingProcessed : searchIdsListDeduppedSorted ) {
-								
-								if ( searchIdOtherThanSearchIdBeingProcessed <= eachSearchIdToProcess ) {
+								{
+									List<WebMergedProteinPosition> peptideProteinPositions = link.getPeptide1ProteinPositions();
+									List<String> reportedProteinStrings = new ArrayList<>();
+									for( WebMergedProteinPosition peptideProteinPosition : peptideProteinPositions ) {
+										
+										String output = peptideProteinPosition.getProtein().getName();
+										
+										if( link.getLinkType().equals( "LOOPLINK" ) ) {
+											output += "(" + peptideProteinPosition.getPosition1() + "," + peptideProteinPosition.getPosition2() + ")";
+										} else if( link.getLinkType().equals( "CROSSLINK" ) ) {
+											output += "(" + peptideProteinPosition.getPosition1() + ")";
+										}
+										
+										reportedProteinStrings.add( output );
+									}
 									
-									//  skip to next entry at eachSearchIdToProcess,  <= comparison since search ids in sorted order
-									
-									continue;  // EARLY CONTINUE of loop, Skip to next entry
+									writer.write( StringUtils.join( reportedProteinStrings, "," ) );
+									writer.write( "\t" );
 								}
-
-								//  Fill in cells for search id searchIdOtherThanSearchIdBeingProcessed
 								
-								AnnotationTypeDTOListForSearchId annotationTypeDTOListFor_OTHER_SearchId = 
-										psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( searchIdOtherThanSearchIdBeingProcessed );
-
-								if ( annotationTypeDTOListFor_OTHER_SearchId == null ) {
-									
-									String msg = "annotationTypeDTOListFor_OTHER_SearchId not found for search id " + searchIdOtherThanSearchIdBeingProcessed;
-									log.error( msg );
-									throw new ProxlWebappDataException( msg );
+								
+								//  Peptide 2 data
+	
+								if ( link.getPeptide2() != null ) {
+									writer.write( link.getPeptide2().getSequence() );
 								}
+								writer.write( "\t" );
+								writer.write( link.getPeptide2Position() );
+								
+								writer.write( "\t" );
+								writer.write( link.getModsStringPeptide2() );  // MODS
+								writer.write( "\t" );
+								
 
-								for ( int counter = 0; counter < annotationTypeDTOListFor_OTHER_SearchId.getAnnotationTypeDTOList().size(); counter++ ) {
+								{
+									List<WebMergedProteinPosition> peptideProteinPositions = link.getPeptide2ProteinPositions();
+									
+									if( peptideProteinPositions != null && peptideProteinPositions.size() > 0 ) {
+									
+										List<String> reportedProteinStrings = new ArrayList<>();
+										for( WebMergedProteinPosition peptideProteinPosition : peptideProteinPositions ) {
+											
+											if( link.getLinkType().equals( "CROSSLINK" ) ) {
+												String output = peptideProteinPosition.getProtein().getName();
+												output += "(" + peptideProteinPosition.getPosition1() + ")";
+												
+												reportedProteinStrings.add( output );
+											}
+											
+										}
+										
+										writer.write( StringUtils.join( reportedProteinStrings, "," ) );
+									}
 									
 									writer.write( "\t" );
 								}
-							}
-							
-							
-							writer.write( "\n" );
+								
+								
+								writer.write( link.getLinkType() );
+								
+								//  Scan data
+								
+								writer.write( "\t" );
+								if ( StringUtils.isNotEmpty( psmWebDisplay.getPreMZRounded() ) ) {
+	
+									writer.write( psmWebDisplay.getPreMZRounded() ); // OBSERVED M/Z
+								}
+								writer.write( "\t" );
+								if ( psmWebDisplay.getCharge() != null ) {
+									writer.write( Integer.toString( psmWebDisplay.getCharge() ) ); // CHARGE
+								}
+								writer.write( "\t" );
+								if ( StringUtils.isNotEmpty( psmWebDisplay.getRetentionTimeMinutesRoundedString() ) ) {
+									writer.write( psmWebDisplay.getRetentionTimeMinutesRoundedString() ); // RETENTION TIME (MINUTES)
+								}
+								writer.write( "\t" );
+								if ( psmWebDisplay.getScanFilename() != null ) {
+									writer.write( psmWebDisplay.getScanFilename() );   /// SCAN FILENAME
+								}
+								
+								
+	
+								///  Fill in empty cells for other search ids before search id being processed
+	
+								for ( Integer searchIdOtherThanSearchIdBeingProcessed : searchIdsListDeduppedSorted ) {
+									
+									if ( searchIdOtherThanSearchIdBeingProcessed >= eachSearchIdToProcess ) {
+										
+										//  Exit loop at eachSearchIdToProcess,  >= comparison since search ids in sorted order
+										
+										break;  // EARLY EXIT of loop
+									}
+	
+									//  Fill in cells for search id searchIdOtherThanSearchIdBeingProcessed
+									
+									AnnotationTypeDTOListForSearchId annotationTypeDTOListFor_OTHER_SearchId = 
+											psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( searchIdOtherThanSearchIdBeingProcessed );
+	
+									if ( annotationTypeDTOListFor_OTHER_SearchId == null ) {
+										
+										String msg = "annotationTypeDTOListFor_OTHER_SearchId not found for search id " + searchIdOtherThanSearchIdBeingProcessed;
+										log.error( msg );
+										throw new ProxlWebappDataException( msg );
+									}
+	
+									for ( int counter = 0; counter < annotationTypeDTOListFor_OTHER_SearchId.getAnnotationTypeDTOList().size(); counter++ ) {
+										
+										writer.write( "\t" );
+									}
+								}
+								
+	
+								AnnotationTypeDTOListForSearchId annotationTypeDTOListForSearchId = 
+										psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( eachSearchIdToProcess );
+	
+								if ( annotationTypeDTOListForSearchId == null ) {
+									
+									String msg = "annotationTypeDTOListForSearchId not found for search id " + eachSearchIdToProcess;
+									log.error( msg );
+									throw new ProxlWebappDataException( msg );
+								}
+								
+	
+								//  Get set of annotation type ids for getting annotation data
+								
+								Set<Integer> annotationTypeIdsForGettingAnnotationData = new HashSet<>();
+	
+								for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDTOListForSearchId.getAnnotationTypeDTOList() ) {
+									
+									annotationTypeIdsForGettingAnnotationData.add( annotationTypeDTO.getId() );
+								}
+								
+								Map<Integer, PsmAnnotationDTO> psmAnnotationDTOMapOnTypeId = new HashMap<>();
+								
+								List<PsmAnnotationDTO> psmAnnotationDataList = 
+										PsmAnnotationDataSearcher.getInstance()
+										.getPsmAnnotationDTOList( psmWebDisplay.getPsmDTO().getId(), annotationTypeIdsForGettingAnnotationData );
+	
+								for ( PsmAnnotationDTO psmAnnotationDataItem : psmAnnotationDataList ) {
+	
+									psmAnnotationDTOMapOnTypeId.put( psmAnnotationDataItem.getAnnotationTypeId(), psmAnnotationDataItem );
+								}
+	
+								for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDTOListForSearchId.getAnnotationTypeDTOList() ) {
+									
+									PsmAnnotationDTO psmAnnotationDTO = psmAnnotationDTOMapOnTypeId.get( annotationTypeDTO.getId() );
+	
+									if ( psmAnnotationDTO == null ) {
+										
+										String msg = "psmAnnotationDTO not foudn for annotation type id " +  annotationTypeDTO.getId();
+										log.error( msg );
+										throw new ProxlWebappDataException( msg );
+									}
+									
+									writer.write( "\t" );
+									writer.write( psmAnnotationDTO.getValueString() );
+								}
+								
+								
+								///  Fill in empty cells for other search ids After search id being processed
+	
+								for ( Integer searchIdOtherThanSearchIdBeingProcessed : searchIdsListDeduppedSorted ) {
+									
+									if ( searchIdOtherThanSearchIdBeingProcessed <= eachSearchIdToProcess ) {
+										
+										//  skip to next entry at eachSearchIdToProcess,  <= comparison since search ids in sorted order
+										
+										continue;  // EARLY CONTINUE of loop, Skip to next entry
+									}
+	
+									//  Fill in cells for search id searchIdOtherThanSearchIdBeingProcessed
+									
+									AnnotationTypeDTOListForSearchId annotationTypeDTOListFor_OTHER_SearchId = 
+											psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( searchIdOtherThanSearchIdBeingProcessed );
+	
+									if ( annotationTypeDTOListFor_OTHER_SearchId == null ) {
+										
+										String msg = "annotationTypeDTOListFor_OTHER_SearchId not found for search id " + searchIdOtherThanSearchIdBeingProcessed;
+										log.error( msg );
+										throw new ProxlWebappDataException( msg );
+									}
+	
+									for ( int counter = 0; counter < annotationTypeDTOListFor_OTHER_SearchId.getAnnotationTypeDTOList().size(); counter++ ) {
+										
+										writer.write( "\t" );
+									}
+								}
+								
+								
+								writer.write( "\n" );
 
 							
 							}
