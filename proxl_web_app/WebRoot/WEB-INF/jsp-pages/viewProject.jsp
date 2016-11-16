@@ -2390,8 +2390,20 @@
 						</div>
 							
 						
-						<a style="font-size:10pt;white-space:nowrap;" href="javascript:" id="scan_retention_time_qc_plot_download_svg"
-								title="Download a SVG file of the image">[Download SVG]</a>
+						<span id="svg-download">
+							<a id="download_as_link"
+									data-tooltip="Download current image as file." style="font-size:10pt;white-space:nowrap;" 
+									href="#" class="tool_tip_attached_jq download-svg">[Download Image]</a>
+								
+							<span id="svg-download-options">
+								Choose file format:
+								<a data-tooltip="Download as a JPEG image file." id="rt-svg-download-jpeg" class="svg-download-option tool_tip_attached_jq" href="javascript:" style="margin-top:5px;">JPEG</a>
+								<a data-tooltip="Download as PDF file suitable for use in Adobe Illustrator or printing." id="rt-svg-download-pdf" class="svg-download-option tool_tip_attached_jq" href="javascript:">PDF</a>
+								<a data-tooltip="Download as PNG image file." id="rt-svg-download-png" class="svg-download-option tool_tip_attached_jq" href="javascript:">PNG</a>
+								<a data-tooltip="Download as scalable vector graphics file suitable for use in Inkscape or other compatible software." id="rt-svg-download-svg" class="svg-download-option tool_tip_attached_jq" href="javascript:">SVG</a>
+							</span>
+						</span>
+						
 					</div>						
 					
 					<div style="clear: both; " >
@@ -2609,11 +2621,19 @@
 														
 					</table>
 
-					
-					
-					<a style="font-size:10pt;white-space:nowrap;" href="javascript:" id="psm_count_vs_score_qc_plot_download_svg"
-							title="Download a SVG file of the image">[Download SVG]</a>
-					
+						<span id="svg-download">
+							<a id="download_as_link"
+									data-tooltip="Download current image as file." style="font-size:10pt;white-space:nowrap;" 
+									href="#" class="tool_tip_attached_jq download-svg">[Download Image]</a>
+								
+							<span id="svg-download-options">
+								Choose file format:
+								<a data-tooltip="Download as a JPEG image file." id="psm_count-svg-download-jpeg" class="svg-download-option tool_tip_attached_jq" href="javascript:" style="margin-top:5px;">JPEG</a>
+								<a data-tooltip="Download as PDF file suitable for use in Adobe Illustrator or printing." id="psm_count-svg-download-pdf" class="svg-download-option tool_tip_attached_jq" href="javascript:">PDF</a>
+								<a data-tooltip="Download as PNG image file." id="psm_count-svg-download-png" class="svg-download-option tool_tip_attached_jq" href="javascript:">PNG</a>
+								<a data-tooltip="Download as scalable vector graphics file suitable for use in Inkscape or other compatible software." id="psm_count-svg-download-svg" class="svg-download-option tool_tip_attached_jq" href="javascript:">SVG</a>
+							</span>
+						</span>			
 					
 					<div style="clear: both; " >
 					

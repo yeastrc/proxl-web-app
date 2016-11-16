@@ -122,7 +122,7 @@ input[type="button"]:disabled, input[type="submit"]:disabled, .disabled-checkbox
 #svg-download { position: relative; display: inline-block; }
 #svg-download:hover #svg-download-options { display: block; }
 #download_as_link { }
-#svg-download-options { padding-top:7px; display: none; position: absolute; background-color: #f9f9f9; min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); }
+#svg-download-options { z-index:10; padding-top:7px; display: none; position: absolute; background-color: #f9f9f9; min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); }
 .svg-download-option { display:block; margin-left:5px; }
 
 

@@ -232,23 +232,10 @@ QCChartRetentionTime.prototype.init = function() {
 	});
 
 
-	$( "#scan_retention_time_qc_plot_download_svg" ).click( function() {
-
-		try {
-			var d = new Date().toISOString().slice(0, 19).replace(/-/g, "");
-			var $svg_image_inner_container_div__svg_merged_image_svg_jq = $( "#scan_retention_time_qc_plot_chartDiv svg " );
-			var svgContents = $svg_image_inner_container_div__svg_merged_image_svg_jq.html();
-			var fullSVG_String = "<svg id=\"svg\">" + svgContents +"</svg>";
-			var svgBase64Ecoded = Base64.encode( fullSVG_String );
-			var hrefString = "data:application/svg+xml;base64," + svgBase64Ecoded;
-			var downloadFilename = "scan_retention_time_" + d + ".svg";
-			$(this).attr("href", hrefString ).attr("download", downloadFilename );
-		} catch( e ) {
-			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-			throw e;
-		}
-	});
-	
+	$( "#rt-svg-download-jpeg" ).click( function() { objectThis.downloadSvg( 'jpeg' ); });
+	$( "#rt-svg-download-png" ).click( function() { objectThis.downloadSvg( 'png' ); });
+	$( "#rt-svg-download-pdf" ).click( function() { objectThis.downloadSvg( 'pdf' ); });
+	$( "#rt-svg-download-svg" ).click( function() { objectThis.downloadSvg( 'svg' ); });
 	
 };
 
@@ -263,6 +250,56 @@ QCChartRetentionTime.prototype.init = function() {
 //var scanRetentionTimeQCPlot
 
 
+QCChartRetentionTime.prototype.downloadSvg = function( type ) {
+	
+	try {
+		
+		var form = document.createElement( "form" );
+		
+		$( form ).hide();
+		
+	    form.setAttribute( "method", "post" );
+	    form.setAttribute( "action", contextPathJSVar + "/convertAndDownloadSVG.do" );
+
+		var $svg_image_inner_container_div__svg_merged_image_svg_jq = $( "#scan_retention_time_qc_plot_chartDiv svg " );
+		var svgContents = $svg_image_inner_container_div__svg_merged_image_svg_jq.html();
+		
+		
+		
+		var fullSVG_String = "<?xml version=\"1.0\" standalone=\"no\"?><!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
+		fullSVG_String += "<svg id=\"svg\" ";
+		
+		fullSVG_String += "width=\"" + $svg_image_inner_container_div__svg_merged_image_svg_jq.attr( "width" ) + "\" ";
+		fullSVG_String += "height=\"" + $svg_image_inner_container_div__svg_merged_image_svg_jq.attr( "height" ) + "\" ";
+		
+		fullSVG_String += "xmlns=\"http://www.w3.org/2000/svg\">" + svgContents + "</svg>";
+	    
+		// fix the URL that google charts is putting into the SVG. Breaks parsing.
+		fullSVG_String = fullSVG_String.replace( /url\(.+\#_ABSTRACT_RENDERER_ID_(\d+)\)/g, "url(#_ABSTRACT_RENDERER_ID_$1)" );		
+		
+	    var svgStringField = document.createElement( "input" );
+	    svgStringField.setAttribute("name", "svgString");
+	    svgStringField.setAttribute("value", fullSVG_String );
+	    
+	    var fileTypeField = document.createElement( "input" );
+	    fileTypeField.setAttribute("name", "fileType");
+	    fileTypeField.setAttribute("value", type);
+
+	    form.appendChild( svgStringField );
+	    form.appendChild( fileTypeField );
+	    
+	    document.body.appendChild(form);    // Not entirely sure if this is necessary			
+
+	    form.submit();
+		
+	    document.body.removeChild( form );
+		
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
+	
+};
 
 
 /////////////////
