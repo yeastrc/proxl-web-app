@@ -89,30 +89,19 @@
 
 		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/lorikeet.css">
 		
-	<script>
-
-
-
-		<c:if test="${ not empty vennDiagramDataToJSON }">
- 				
-			//  function called to put Venn diagram of proteins onto the page
-		
-			function createMergedSearchesLinkCountsVennDiagram_PageFunction() {
-
-				//  This data is used in the script mergedSearchesVennDiagramCreator.js
-				var searchesLinkCountsVennDiagramData = <c:out value="${ vennDiagramDataToJSON }" escapeXml="false"></c:out>;
+	<c:if test="${ not empty vennDiagramDataToJSON }">
+		<script type="text/text" id="venn_diagram_data_JSON"
+			><c:out value="${ vennDiagramDataToJSON }" escapeXml="false"></c:out></script>
+	</c:if>
 	
-		 		
-		 		createMergedSearchesLinkCountsVennDiagram( searchesLinkCountsVennDiagramData );
-			}
-		 	
+	<script>
+	function createMergedSearchesLinkCountsVennDiagram_PageFunction() {
+	
+		<c:if test="${ not empty vennDiagramDataToJSON }">
+	 		createMergedSearchesLinkCountsVennDiagram( );
 	 	</c:if>
-	 	
-		
-		
-
+	}
 	</script>
-
 
 </c:set>
 

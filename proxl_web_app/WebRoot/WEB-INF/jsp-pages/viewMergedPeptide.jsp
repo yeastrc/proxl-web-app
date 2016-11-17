@@ -93,24 +93,20 @@
 
 		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/lorikeet.css">
 
+
+	<c:if test="${ not empty vennDiagramDataToJSON }">
+		<script type="text/text" id="venn_diagram_data_JSON"
+			><c:out value="${ vennDiagramDataToJSON }" escapeXml="false"></c:out></script>
+	</c:if>
+	
 	<script>
-
-
 	function createVennDiagramIfNeeded() {
 	
 		<c:if test="${ not empty vennDiagramDataToJSON }">
-	
-			//  This data is used in the script mergedSearchesVennDiagramCreator.js
-			var searchesLinkCountsVennDiagramData = <c:out value="${ vennDiagramDataToJSON }" escapeXml="false"></c:out>;
-	
-	 		
-	 		createMergedSearchesLinkCountsVennDiagram( searchesLinkCountsVennDiagramData );
-	 		
+	 		createMergedSearchesLinkCountsVennDiagram( );
 	 	</c:if>
 	}
-
 	</script>
-
 
 
 </c:set>
