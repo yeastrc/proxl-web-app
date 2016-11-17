@@ -69,11 +69,13 @@
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		
-			
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js?x=${cacheBustValue}"></script>
-		
+
+		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
+				
 		
 		<script type="text/javascript" src="${ contextPath }/js/viewSearchLooplinkProteinPage.js?x=${cacheBustValue}"></script>
 		
@@ -285,13 +287,30 @@
 				[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="mergedQueryString" />">Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
 			</div>
 
+			<%--  Block for user choosing which annotation types to display  --%>
+			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
+
+
 			<%--  Create via javascript the parts that will be above the main table --%>
 			<script type="text/javascript">
-			
-				viewSearchLooplinkProteinPageCode.createPartsAboveMainTable();
 				
+				//  If object exists, call function on it now, otherwise call the function on document ready
+				if ( window.viewSearchLooplinkProteinPageCode ) {
+					window.viewSearchLooplinkProteinPageCode.createPartsAboveMainTable();
+				} else {
+	
+					$(document).ready(function() 
+					    { 
+						   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+							  
+							   window.viewSearchLooplinkProteinPageCode.createPartsAboveMainTable();
+						   },10);
+					    } 
+					); // end $(document).ready(function() 
+				}
 			</script>
-			
+				
+									
 			
 				<table style="" id="main_page_data_table" class="tablesorter  top_data_table_jq ">
 				

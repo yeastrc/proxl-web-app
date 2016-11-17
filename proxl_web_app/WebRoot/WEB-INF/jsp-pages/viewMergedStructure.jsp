@@ -74,6 +74,8 @@
 		 
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 		
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
+		
 		<script type="text/javascript" src="${ contextPath }/js/nrseqProteinIdToProteinSequenceIdLookup.js?x=${cacheBustValue}"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
@@ -96,6 +98,8 @@
 		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+
+		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
 				
 		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-pdb-upload.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-map-protein.js?x=${cacheBustValue}"></script>
@@ -777,6 +781,12 @@
 					</div>		
 					
 				  </div>			
+
+
+				  <c:set var="imageOrStructurePageForAnnDispMgmt" value="${ true }" />
+												
+					<%--  Block for user choosing which annotation types to display  --%>
+				  <%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
 
 
 				  <div id="link_data_table_place_holder">

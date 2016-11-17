@@ -52,6 +52,7 @@ import org.yeastrc.xlink.www.forms.SearchViewProteinsForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
+import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
@@ -315,7 +316,11 @@ public class ViewSearchProteinsAction extends Action {
 			//  Populate request objects for Standard Search Display
 			
 			GetSearchDetailsData.getInstance().getSearchDetailsData( search, request );
-
+			
+			//  Populate request objects for User Selection of Annotation Data Display
+			
+			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( search, request );
+			
 
 			String searchIdAsString = Integer.toString( searchId );
 			

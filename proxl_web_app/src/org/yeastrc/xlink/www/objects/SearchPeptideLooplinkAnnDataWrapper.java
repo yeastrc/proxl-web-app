@@ -11,7 +11,7 @@ import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_value
  * Supports sorting and populating annotation display values
  * 
  */
-public class SearchPeptideLooplinkAnnDataWrapper extends SortDisplayRecordsWrapperBase {
+public class SearchPeptideLooplinkAnnDataWrapper extends SortDisplayRecordsWrapperBase implements SearchPeptideCommonLinkAnnDataWrapperIF {
 
 	
 	/**
@@ -20,6 +20,16 @@ public class SearchPeptideLooplinkAnnDataWrapper extends SortDisplayRecordsWrapp
 	private SearchPeptideLooplink searchPeptideLooplink;
 
 
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	public int getReportedPeptideId() {
+		
+		return searchPeptideLooplink.getReportedPeptideId();
+	}
+	
 
 	@Override
 	public int getFinalSortOrderKey() {

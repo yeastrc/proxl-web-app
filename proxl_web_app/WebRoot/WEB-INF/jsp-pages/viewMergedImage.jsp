@@ -75,6 +75,8 @@
 
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
+		
 
 		<script type="text/javascript" src="${ contextPath }/js/nrseqProteinIdToProteinSequenceIdLookup.js?x=${cacheBustValue}"></script>
 
@@ -109,6 +111,8 @@
 		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
 		
 		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
@@ -785,6 +789,11 @@
 					
 				  </div>			
 				  
+				  <c:set var="imageOrStructurePageForAnnDispMgmt" value="${ true }" />
+						
+					<%--  Block for user choosing which annotation types to display  --%>
+				  <%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
+
 				  <div id="link_data_table_place_holder">
 				  
 				  

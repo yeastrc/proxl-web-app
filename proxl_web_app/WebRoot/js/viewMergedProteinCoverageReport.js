@@ -339,4 +339,9 @@ var viewProteinCoverageReportPageCode = new ViewProteinCoverageReportPageCode();
 
 
 
+//  Copy to standard page level JS Code Object
+
+var standardFullPageCode = viewProteinCoverageReportPageCode;
+
+
 

@@ -73,7 +73,11 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/viewMergedPeptidePerSearchData.js?x=${cacheBustValue}"></script>
 
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
+		
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/mergedSearchesVennDiagramCreator.js?x=${cacheBustValue}"></script>
 
@@ -254,7 +258,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td valign="top" >Modification Filter:</td>
+					<td valign="top" style="white-space: nowrap;">Modification Filter:</td>
 					<td colspan="2">
 					  <label >
 						<input type="checkbox" class=" mod_mass_filter_jq " 
@@ -366,6 +370,12 @@
 			 </c:otherwise>
 			</c:choose>
  			
+
+						
+			<%--  Block for user choosing which annotation types to display  --%>
+			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
+
+
 
 
 			<%--  Create via javascript the parts that will be above the main table --%>

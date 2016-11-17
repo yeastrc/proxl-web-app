@@ -16,6 +16,7 @@ import java.util.List;
 
 
 
+
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
@@ -31,7 +32,7 @@ import org.yeastrc.xlink.www.searcher.PsmCountForUniquePSM_SearchIdReportedPepti
  * Class for data for row in Peptide page
  *
  */
-public class WebReportedPeptide {
+public class WebReportedPeptide implements SearchPeptideCommonLinkWebserviceResultIF{
 
 	private static final Logger log = Logger.getLogger(WebReportedPeptide.class);
 

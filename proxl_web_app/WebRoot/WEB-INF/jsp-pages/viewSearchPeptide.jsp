@@ -16,13 +16,8 @@
 
 		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 		
-		
-		<script type="text/javascript" src="${ contextPath }/js/executeAfter_HTML_AboveMainTableRendered_Registry.js?x=${cacheBustValue}"></script> 
-
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter.min.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
-		
-		
 		
 <%--  Start of Lorikeet Core Parts --%>		
 
@@ -72,7 +67,11 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 		
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
+		
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/viewSearchPeptide.js?x=${cacheBustValue}"></script>
 		
@@ -210,7 +209,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td valign="top" >Modification Filter:</td>
+					<td valign="top" style="white-space: nowrap;">Modification Filter:</td>
 					<td colspan="2">
 					  <label >
 						<input type="checkbox" class=" mod_mass_filter_jq " 
@@ -269,10 +268,29 @@
 					>Download PSM Data</a>]
 			</div>
 
+						
+			<%--  Block for user choosing which annotation types to display  --%>
+			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
+
+
+
 			<%--  Create via javascript the parts that will be above the main table --%>
 			<script type="text/javascript">
 			
-			executeAfter_HTML_AboveMainTableRendered_Registry.createPartsAboveMainTable();
+			//  If object exists, call function on it now, otherwise call the function on document ready
+			if ( window.viewSearchPeptidePageCode ) {
+				window.viewSearchPeptidePageCode.createPartsAboveMainTable();
+			} else {
+
+				$(document).ready(function() 
+				    { 
+					   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+						  
+						   window.viewSearchPeptidePageCode.createPartsAboveMainTable();
+					   },10);
+				    } 
+				); // end $(document).ready(function() 
+			}
 				
 			</script>
 			

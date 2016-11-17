@@ -12,7 +12,8 @@
 containing div id:  protein_data_per_search_data_row_entry_template
 --%>
 			
-<tr  style="cursor: pointer; " 
+<tr class=" main_data_row_jq " 
+	style="cursor: pointer; " 
 	show_children_if_one_row="true"
 	search_id="{{ searchId }}"
 
@@ -21,6 +22,7 @@ containing div id:  protein_data_per_search_data_row_entry_template
 	protein_id="{{ from_protein_id }}"
 	protein_position_1="{{ from_protein_position }}"
 	protein_position_2="{{ to_protein_position }}"
+	children_mgmt_object="viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate"
   {{/if}}
 
   {{#if isCrosslink }}
@@ -29,6 +31,7 @@ containing div id:  protein_data_per_search_data_row_entry_template
 	protein_2_id="{{ to_protein_id }}"
 	protein_1_position="{{ from_protein_position }}"
 	protein_2_position="{{ to_protein_position }}"
+	children_mgmt_object="viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate"
   {{/if}}  
   
   
@@ -36,6 +39,7 @@ containing div id:  protein_data_per_search_data_row_entry_template
 	onclick="viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.showHideMonolinkReportedPeptides( { clickedElement : this })" 
 	protein_id="{{ from_protein_id }}"
 	protein_position="{{ from_protein_position }}"
+	children_mgmt_object="viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate"
   {{/if}}
   
 	>

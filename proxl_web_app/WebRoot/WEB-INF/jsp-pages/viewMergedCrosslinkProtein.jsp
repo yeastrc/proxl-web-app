@@ -69,9 +69,12 @@
 		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js?x=${cacheBustValue}"></script>
 		
+		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
+				
 		<script type="text/javascript" src="${ contextPath }/js/viewMergedCrosslinkProteinPage.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/mergedSearchesVennDiagramCreator.js?x=${cacheBustValue}"></script>
@@ -386,11 +389,27 @@
  			
 			<div style="clear:both;"></div>
 
+			<%--  Block for user choosing which annotation types to display  --%>
+			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
+
 			<%--  Create via javascript the parts that will be above the main table --%>
 			<script type="text/javascript">
 			
-			viewMergedCrosslinkProteinPageCode.createPartsAboveMainTable();
-				
+			//  If object exists, call function on it now, otherwise call the function on document ready
+			if ( window.viewMergedCrosslinkProteinPageCode ) {
+				window.viewMergedCrosslinkProteinPageCode.createPartsAboveMainTable();
+			} else {
+
+				$(document).ready(function() 
+				    { 
+					   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+						  
+						   window.viewMergedCrosslinkProteinPageCode.createPartsAboveMainTable();
+					   },10);
+				    } 
+				); // end $(document).ready(function() 
+			}
+								
 			</script>
 
 				<table style="" id="main_page_data_table" class="tablesorter top_data_table_jq ">

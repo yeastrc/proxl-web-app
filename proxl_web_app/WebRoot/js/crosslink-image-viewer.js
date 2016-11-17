@@ -257,6 +257,8 @@ var HASH_OBJECT_PROPERTIES = {
 		
 		"color_by" : "y",
 		
+		"annTypeIdDisplay" : "z",
+		
 		"user_circle_diameter" : "ucd",
 		
 		"index-manager-data" : "imd",
@@ -378,18 +380,12 @@ var _psmPeptideCutoffsRootObjectStorage = {
 		_psmPeptideCutoffsRootObject : null,
 		
 		setPsmPeptideCutoffsRootObject : function( psmPeptideCutoffsRootObject ) {
-			
 			this._psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
-			
-			viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
-			viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
-			viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
-			
-			viewPsmsLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+			//  Distribute the updated value to the JS code that loads and displays Peptide and PSM data
+			webserviceDataParamsDistributionCommonCode.paramsForDistribution( { psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject } );
 		},
 
 		getPsmPeptideCutoffsRootObject : function( ) {
-
 			return this._psmPeptideCutoffsRootObject;
 		}
 };
@@ -706,7 +702,6 @@ function getValuesFromForm() {
 	
 	var outputCutoffs = getCutoffsFromThePageResult.cutoffsBySearchId;
 	
-
 	
 	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.cutoffs, outputCutoffs );
 
@@ -796,9 +791,14 @@ function updateURLHash( useSearchForm ) {
 		getValuesFromForm();
 	}
 
-	
 
-	
+
+	//  Output the selected Annotation data for display
+	var getAnnotationTypeDisplayFromThePageResult = annotationDataDisplayProcessingCommonCode.getAnnotationTypeDisplayFromThePage( {} );
+	var annTypeIdDisplay = getAnnotationTypeDisplayFromThePageResult.annTypeIdDisplayBySearchId;
+
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.annTypeIdDisplay, annTypeIdDisplay );
+
 
 //	load in settings from viewer section
 	if ( $( "input#show-self-crosslinks" ).is( ':checked' ) ) {
@@ -2086,9 +2086,12 @@ function populateIndexManagerFromHash() {
 
 function populateSearchForm() {
 	
-	cutoffProcessingCommonCode.putCutoffsOnThePage(  { cutoffs : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject() } );
+	var psmPeptideCutoffsRootObject = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
 
+	webserviceDataParamsDistributionCommonCode.paramsForDistribution( { cutoffs : psmPeptideCutoffsRootObject } );
 	
+	cutoffProcessingCommonCode.putCutoffsOnThePage(  { cutoffs : psmPeptideCutoffsRootObject } );
+
 	$( "input#filterNonUniquePeptides" ).prop('checked', _filterNonUniquePeptides);
 	$( "input#filterOnlyOnePSM" ).prop('checked', _filterOnlyOnePSM);
 	$( "input#filterOnlyOnePeptide" ).prop('checked', _filterOnlyOnePeptide);
@@ -2444,9 +2447,11 @@ function getNavigationJSON_Not_for_Image_Or_Structure() {
 	
 	var cutoffs = json.cutoffs;
 	
+	var annTypeIdDisplay = json.annTypeIdDisplay;
+	
 	//  Layout of baseJSONObject  matches Java class A_QueryBase_JSONRoot
 	
-	var baseJSONObject = { cutoffs : cutoffs };
+	var baseJSONObject = { cutoffs : cutoffs, annTypeIdDisplay : annTypeIdDisplay };
 	
 	
 	//  Add to baseJSONObject
@@ -2612,7 +2617,10 @@ function populateNavigation() {
 
 			//  Add Filter cutoffs
 			structureJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
-
+			
+			//  Add Ann Type Display
+			var annTypeIdDisplay = baseJSONObject.annTypeIdDisplay;
+			structureJSON[ 'annTypeIdDisplay' ] = annTypeIdDisplay;
 
 //			add filter out non unique peptides
 			structureJSON[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
@@ -8101,6 +8109,8 @@ function processClickOnMonoLink( clickThis  ) {
 	getMonolinkDataForSpecificLinkInGraph( params );
 }
 
+/////////////////////////////////////
+
 /**
  * Get the JSON version number from the raw JSON hash
  */
@@ -8115,6 +8125,33 @@ function getJSONVersionNumber() {
 	}
 	
 	return 0;
+}
+
+
+
+/**
+ * Populates the annotationDataDisplayProcessingCommonCode data from the hash.
+ */
+function populateAnnotationDataDisplayProcessingCommonCodeFromHash() {
+	
+	var json = getJsonFromHash();	
+	var data = json[ 'annTypeIdDisplay' ];
+
+	if( data ) {
+		annotationDataDisplayProcessingCommonCode.putAnnTypeIdDisplayOnThePage( { annTypeIdDisplay : data } );
+	} else {
+		annotationDataDisplayProcessingCommonCode.putAnnTypeIdDisplayOnThePage( { annTypeIdDisplay : undefined } );
+	}	
+	
+	//  Get from annotationDataDisplayProcessingCommonCode to reflect defaults if no data
+	var annTypeIdDisplay = annotationDataDisplayProcessingCommonCode.getAnnotationTypeDisplayFromThePage({});
+	
+	var annTypeIdDisplayBySearchId = annTypeIdDisplay.annTypeIdDisplayBySearchId;
+
+	webserviceDataParamsDistributionCommonCode.paramsForDistribution( { 
+		annTypeIdDisplay : annTypeIdDisplayBySearchId
+	} );
+	
 }
 
 
@@ -8137,6 +8174,7 @@ function initPage() {
 	console.log( "\tPopulating index manager." );
 	populateIndexManagerFromHash();
 
+	populateAnnotationDataDisplayProcessingCommonCodeFromHash();
 	
 	proteinAnnotationStore.init();
 	

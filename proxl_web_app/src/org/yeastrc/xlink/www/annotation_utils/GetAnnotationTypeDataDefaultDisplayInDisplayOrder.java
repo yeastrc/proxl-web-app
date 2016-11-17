@@ -58,7 +58,7 @@ public class GetAnnotationTypeDataDefaultDisplayInDisplayOrder {
 	 * @return map keyed on search id
 	 * @throws Exception
 	 */
-	public Map<Integer, AnnotationTypeDTOListForSearchId>  getPeptide_AnnotationTypeDataDefaultDisplayInDisplayOrder( Collection<Integer> searchIdsCollection ) throws Exception {
+	public Map<Integer, AnnotationTypeDTOListForSearchId>  getPeptideAnnotationTypeDataDefaultDisplayInDisplayOrder( Collection<Integer> searchIdsCollection ) throws Exception {
 
 		return _getAnnotationTypeDataInDefaultDisplayInDisplayOrder( searchIdsCollection, PsmPeptideAnnotationType.PEPTIDE );
 	}

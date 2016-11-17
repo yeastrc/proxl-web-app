@@ -729,8 +729,7 @@ var _project_id = null;
 
 								var html = template(context);
 
-//								var comment_root_container_div_jq = 
-								$inserted = $( html ).insertBefore( "span#add-comment-link-span-" + searchId );
+								var $inserted = $( html ).insertBefore( "span#add-comment-link-span-" + searchId );
 								addToolTips( $inserted );
 
 								$( "div#comment-" + id ).show( 200 );

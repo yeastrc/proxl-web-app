@@ -12,7 +12,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.SearchProgramsPerSearchDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
 import org.yeastrc.xlink.dto.SearchProgramsPerSearchDTO;
@@ -25,6 +24,7 @@ import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplayAnnotationLevel;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplayRoot;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplaySearchLevel;
 import org.yeastrc.xlink.www.objects.CutoffsAppliedOnImportWebDisplay;
+import org.yeastrc.xlink.www.search_programs_per_search_utils.GetSearchProgramsPerSearchData;
 import org.yeastrc.xlink.www.web_utils.GetCutoffsAppliedOnImportForSearchList;
 
 
@@ -120,40 +120,6 @@ public class GetCutoffPageDisplayRoot {
 		
 		
 		
-		//  Get search program DTO records
-		
-		Map<Integer,SearchProgramsPerSearchDTO> searchProgramsPerSearchDTOMap = new HashMap<>();
-		
-		for ( Map.Entry<Integer, Map<Integer, AnnotationTypeDTO>> perSearchEntry : srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap.entrySet() ) {
-			
-			for ( Map.Entry<Integer, AnnotationTypeDTO> perAnnTypeEntry : perSearchEntry.getValue().entrySet() ) {
-				
-				Integer searchProgramsPerSearchId = perAnnTypeEntry.getValue().getSearchProgramsPerSearchId();
-				
-				SearchProgramsPerSearchDTO searchProgramsPerSearchDTO = searchProgramsPerSearchDTOMap.get( searchProgramsPerSearchId );
-				
-				if ( searchProgramsPerSearchDTO == null ) {
-					
-					searchProgramsPerSearchDTO = SearchProgramsPerSearchDAO.getInstance().getSearchProgramDTOForId( searchProgramsPerSearchId ) ;
-					
-					if ( searchProgramsPerSearchDTO == null ) {
-						
-						String msg = "No searchProgramsPerSearchDTO record found for searchProgramsPerSearchId: " + searchProgramsPerSearchId;
-						log.error( msg );
-						
-						throw new ProxlWebappDBDataOutOfSyncException( msg );
-					}
-					
-					searchProgramsPerSearchDTOMap.put( searchProgramsPerSearchId, searchProgramsPerSearchDTO );
-				}
-			}
-		}
-		
-		
-		
-		
-		
-		
 		// Process Per SearchId
 
 
@@ -195,13 +161,11 @@ public class GetCutoffPageDisplayRoot {
 			
 			processPSMs( srchPgm_Filterable_Psm_AnnotationType_DTOMap, 
 					cutoffPageDisplaySearchLevel, 
-					searchProgramsPerSearchDTOMap,
 					cutoffsAppliedOnImportList );
 
 			processPeptides( 
 					srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap, 
 					cutoffPageDisplaySearchLevel, 
-					searchProgramsPerSearchDTOMap,
 					cutoffsAppliedOnImportList );
 		}
 
@@ -226,7 +190,6 @@ public class GetCutoffPageDisplayRoot {
 	private void processPeptides(
 			Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOMap,
 			CutoffPageDisplaySearchLevel cutoffPageDisplaySearchLevel,
-			Map<Integer,SearchProgramsPerSearchDTO> searchProgramsPerSearchDTOMap,
 			List<CutoffsAppliedOnImportWebDisplay> cutoffsAppliedOnImportList )
 					throws Exception {
 
@@ -237,7 +200,6 @@ public class GetCutoffPageDisplayRoot {
 			CutoffPageDisplayAnnotationLevel cutoffPageDisplayAnnotationLevel =
 			processAnnotationTypeObject(
 					annotationTypeDTO,
-					searchProgramsPerSearchDTOMap,
 					cutoffsAppliedOnImportList );
 
 			cutoffPageDisplaySearchLevel.addPeptideCutoffPageDisplayAnnotationLevel( cutoffPageDisplayAnnotationLevel );
@@ -256,7 +218,6 @@ public class GetCutoffPageDisplayRoot {
 	public void processPSMs(
 			Map<Integer, AnnotationTypeDTO> srchPgmFilterablePsmAnnotationTypeDTOMap,
 			CutoffPageDisplaySearchLevel cutoffPageDisplaySearchLevel,
-			Map<Integer,SearchProgramsPerSearchDTO> searchProgramsPerSearchDTOMap,
 			List<CutoffsAppliedOnImportWebDisplay> cutoffsAppliedOnImportList )
 					throws Exception {
 
@@ -268,7 +229,6 @@ public class GetCutoffPageDisplayRoot {
 			CutoffPageDisplayAnnotationLevel cutoffPageDisplayAnnotationLevel =
 					processAnnotationTypeObject( 
 							annotationTypeDTO,
-							searchProgramsPerSearchDTOMap, 
 							cutoffsAppliedOnImportList );
 			
 
@@ -280,7 +240,6 @@ public class GetCutoffPageDisplayRoot {
 
 	private CutoffPageDisplayAnnotationLevel processAnnotationTypeObject(
 			AnnotationTypeDTO annotationTypeDTO,
-			Map<Integer, SearchProgramsPerSearchDTO> searchProgramsPerSearchDTOMap,
 			List<CutoffsAppliedOnImportWebDisplay> cutoffsAppliedOnImportList ) 
 					throws Exception, ProxlWebappDataException, ProxlWebappDBDataOutOfSyncException {
 		
@@ -341,7 +300,8 @@ public class GetCutoffPageDisplayRoot {
 
 		Integer searchProgramsPerSearchId = annotationTypeDTO.getSearchProgramsPerSearchId();
 		
-		SearchProgramsPerSearchDTO searchProgramsPerSearchDTO = searchProgramsPerSearchDTOMap.get( searchProgramsPerSearchId );
+		SearchProgramsPerSearchDTO searchProgramsPerSearchDTO =
+				GetSearchProgramsPerSearchData.getInstance().getSearchProgramsPerSearchDTO( searchProgramsPerSearchId );
 		
 		if ( searchProgramsPerSearchDTO == null ) {
 				

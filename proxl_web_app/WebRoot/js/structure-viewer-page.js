@@ -93,17 +93,10 @@ var _psmPeptideCutoffsRootObjectStorage = {
 	_psmPeptideCutoffsRootObject : null,
 	
 	setPsmPeptideCutoffsRootObject : function( psmPeptideCutoffsRootObject ) {
-
 		try {
-
 			this._psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
-
-			viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
-			viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
-			viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
-
-			viewPsmsLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
-
+			//  Distribute the updated value to the JS code that loads and displays Peptide and PSM data
+			webserviceDataParamsDistributionCommonCode.paramsForDistribution( { cutoffs : psmPeptideCutoffsRootObject } );
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -111,7 +104,6 @@ var _psmPeptideCutoffsRootObjectStorage = {
 	},
 
 	getPsmPeptideCutoffsRootObject : function( ) {
-
 		return this._psmPeptideCutoffsRootObject;
 	}
 };
@@ -576,7 +568,12 @@ function updateURLHash( useSearchForm) {
 		items = formValues;
 
 	}
+	
+	//  Output the selected Annotation data for display
+	var getAnnotationTypeDisplayFromThePageResult = annotationDataDisplayProcessingCommonCode.getAnnotationTypeDisplayFromThePage( {} );
+	var annTypeIdDisplay = getAnnotationTypeDisplayFromThePageResult.annTypeIdDisplayBySearchId;
 
+	items[ 'annTypeIdDisplay' ] = annTypeIdDisplay;
 
 	if ( $( "input#show-crosslinks" ).is( ':checked' ) ) {
 		items[ 'show-crosslinks' ] = true;
@@ -1271,9 +1268,11 @@ function getNavigationJSON_Not_for_Image_Or_Structure() {
 	
 	var cutoffs = json.cutoffs;
 	
+	var annTypeIdDisplay = json[ 'annTypeIdDisplay' ];
+	
 	//  Layout of baseJSONObject  matches Java class A_QueryBase_JSONRoot
 	
-	var baseJSONObject = { cutoffs : cutoffs };
+	var baseJSONObject = { cutoffs : cutoffs, annTypeIdDisplay : annTypeIdDisplay };
 	
 	
 	//  Add to baseJSONObject
@@ -1439,6 +1438,10 @@ function populateNavigation() {
 
 		//  Add Filter cutoffs
 		imageJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
+
+		//  Add Ann Type Display
+		var annTypeIdDisplay = baseJSONObject.annTypeIdDisplay;
+		imageJSON[ 'annTypeIdDisplay' ] = annTypeIdDisplay;
 
 
 //		add filter out non unique peptides
@@ -5317,7 +5320,34 @@ function mouseoutChain( chainId ) {
 }
 
 
-//Initialize the page and load the data
+/**
+ * Populates the annotationDataDisplayProcessingCommonCode data from the hash.
+ */
+function populateAnnotationDataDisplayProcessingCommonCodeFromHash() {
+	
+	var json = getJsonFromHash();	
+	var data = json[ 'annTypeIdDisplay' ];
+
+	if( data ) {
+		annotationDataDisplayProcessingCommonCode.putAnnTypeIdDisplayOnThePage( { annTypeIdDisplay : data } );
+	} else {
+		annotationDataDisplayProcessingCommonCode.putAnnTypeIdDisplayOnThePage( { annTypeIdDisplay : undefined } );
+	}	
+	
+	//  Get from annotationDataDisplayProcessingCommonCode to reflect defaults if no data
+	var annTypeIdDisplay = annotationDataDisplayProcessingCommonCode.getAnnotationTypeDisplayFromThePage({});
+	
+	var annTypeIdDisplayBySearchId = annTypeIdDisplay.annTypeIdDisplayBySearchId;
+
+	webserviceDataParamsDistributionCommonCode.paramsForDistribution( { 
+		annTypeIdDisplay : annTypeIdDisplayBySearchId
+	} );
+	
+}
+
+
+
+//  Initialize the page and load the data
 
 function initPage() {
 
@@ -5340,6 +5370,9 @@ function initPage() {
 		return;
 	}
 
+
+	populateAnnotationDataDisplayProcessingCommonCodeFromHash();
+	
 	
 	
 	console.log( "Initializing the page." );

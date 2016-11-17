@@ -11,7 +11,7 @@ import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_value
  * Supports sorting and populating annotation display values
  * 
  */
-public class SearchPeptideMonolinkAnnDataWrapper extends SortDisplayRecordsWrapperBase {
+public class SearchPeptideMonolinkAnnDataWrapper extends SortDisplayRecordsWrapperBase implements SearchPeptideCommonLinkAnnDataWrapperIF {
 
 	
 	/**
@@ -19,6 +19,18 @@ public class SearchPeptideMonolinkAnnDataWrapper extends SortDisplayRecordsWrapp
 	 */
 	private SearchPeptideMonolink searchPeptideMonolink;
 
+
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	public int getReportedPeptideId() {
+		
+		return searchPeptideMonolink.getReportedPeptideId();
+	}
+	
+	
 	/**
 	 * Used for sorting when all the values match so that every time the data is displayed, it is in the same order
 	 * @return
@@ -70,8 +82,6 @@ public class SearchPeptideMonolinkAnnDataWrapper extends SortDisplayRecordsWrapp
 	public void setSearchPeptideMonolink(SearchPeptideMonolink searchPeptideMonolink) {
 		this.searchPeptideMonolink = searchPeptideMonolink;
 	}
-
-
 	
 	
 }

@@ -10,7 +10,7 @@ import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_value
  * Supports sorting and populating annotation display values
  *
  */
-public class WebReportedPeptideWrapper extends SortDisplayRecordsWrapperBase {
+public class WebReportedPeptideWrapper extends SortDisplayRecordsWrapperBase implements SearchPeptideCommonLinkAnnDataWrapperIF {
 
 
 	/**
@@ -57,7 +57,13 @@ public class WebReportedPeptideWrapper extends SortDisplayRecordsWrapperBase {
 		webReportedPeptide.setPeptideAnnotationValueList( peptideAnnotationValueList );
 	}
 
-	
+
+	@Override
+	public int getReportedPeptideId() throws Exception {
+
+		return webReportedPeptide.getReportedPeptide().getId();
+	}
+
 
 	
 

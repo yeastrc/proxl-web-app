@@ -89,6 +89,9 @@ public class WebConstants {
 	
 	public static final String PARAMETER_CUTOFF_PAGE_DISPLAY_ROOT_REQUEST_ENTRY = "cutoffPageDisplayRootRequestEntry";
 
+
+	public static final String PARAMETER_ANNOTATION_DISPLAY_DATA_USER_SELECTION_REQUEST_KEY = "annDisplayDataUserSelctn";
+	
 	
 	/////////    Redirect URLs
 	

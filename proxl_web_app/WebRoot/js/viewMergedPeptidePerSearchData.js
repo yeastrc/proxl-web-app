@@ -25,8 +25,10 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 	var _handlebarsTemplate_peptide_data_per_search_data_row_template = null;
 	var _handlebarsTemplate_peptide_data_per_search_child_row_template = null;
 	
-
+	var _psmPeptideAnnTypeIdDisplay = null;
+	
 	var _psmPeptideCutoffsRootObject = null;
+	
 	
 	//   Currently expect _psmPeptideCriteria = 
 //					searches: Object
@@ -47,6 +49,7 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 	
 //			peptideCutoffValues.id and psmCutoffValues.id - annotation type id
 	
+	
 
 	//////////////
 	
@@ -54,6 +57,15 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 		
 		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
 	};
+	
+
+	//////////////
+	
+	this.setPsmPeptideAnnTypeIdDisplay = function( psmPeptideAnnTypeIdDisplay ) {
+		
+		_psmPeptideAnnTypeIdDisplay = psmPeptideAnnTypeIdDisplay;
+	};
+	
 	
 	
 	//////////////
@@ -63,42 +75,29 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 	this.showHideReportedPeptidesPerSearch = function( params ) {
 
 		try {
-
 			var clickedElement = params.clickedElement;
-
 			var $clickedElement = $( clickedElement );
-
 			var $itemToToggle = $clickedElement.next();
 
-
-
 			if( $itemToToggle.is(":visible" ) ) {
-
 				$itemToToggle.hide(); 
-
 				$clickedElement.find(".toggle_visibility_expansion_span_jq").show();
 				$clickedElement.find(".toggle_visibility_contraction_span_jq").hide();
 			} else { 
 				$itemToToggle.show();
-
 				$clickedElement.find(".toggle_visibility_expansion_span_jq").hide();
 				$clickedElement.find(".toggle_visibility_contraction_span_jq").show();
 
 				this.loadAndInsertReportedPeptidesPerSearchIfNeeded( { $topTRelement : $itemToToggle, $clickedElement : $clickedElement } );
 			}
-
 			return false;  // does not stop bubbling of click event
-
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
 		}
 	};
 	
-		
-	
 	////////////////////////
-	
 	this.loadAndInsertReportedPeptidesPerSearchIfNeeded = function( params ) {
 
 		var objectThis = this;
@@ -106,7 +105,6 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 		var $topTRelement = params.$topTRelement;
 		var $clickedElement = params.$clickedElement;
 		
-
 		var dataLoaded = $topTRelement.data( _DATA_LOADED_DATA_KEY );
 		
 		if ( dataLoaded ) {
@@ -177,16 +175,19 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 
 		var psmPeptideCutoffsForSearchIds_JSONString = JSON.stringify( _psmPeptideCutoffsRootObject );
 
+		
+		var annTypeDisplay_JSONString = null;
+		
+		if ( _psmPeptideAnnTypeIdDisplay ) {
+			annTypeDisplay_JSONString = JSON.stringify( _psmPeptideAnnTypeIdDisplay );
+		}
 				
-		
-		
 		var ajaxRequestData = {
-
 				search_ids : search_ids,
 				unified_reported_peptide_id : unified_reported_peptide_id,
-				psmPeptideCutoffsForSearchIds : psmPeptideCutoffsForSearchIds_JSONString
+				psmPeptideCutoffsForSearchIds : psmPeptideCutoffsForSearchIds_JSONString,
+				annTypeDisplay : annTypeDisplay_JSONString
 		};
-		
 		
 		$.ajax({
 			url : contextPathJSVar + "/services/data/getReportedPeptidesForUnifiedPeptId",

@@ -10,7 +10,7 @@ import org.yeastrc.xlink.dto.ReportedPeptideDTO;
  * Result returned from web service
  *
  */
-public class SearchPeptideCrosslinkWebserviceResult {
+public class SearchPeptideCrosslinkWebserviceResult implements SearchPeptideCommonLinkWebserviceResultIF {
 
 	private static final Logger log = Logger.getLogger(SearchPeptideCrosslinkWebserviceResult.class);
 	

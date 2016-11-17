@@ -67,12 +67,14 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-
 			
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js?x=${cacheBustValue}"></script>
-		
+
+		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
+				
 		<script type="text/javascript" src="${ contextPath }/js/viewSearchCrosslinkProteinPage.js?x=${cacheBustValue}"></script>
 
 	
@@ -291,12 +293,28 @@
 					>Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
 			</div>
 			
+			<%--  Block for user choosing which annotation types to display  --%>
+			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
+
 
 			<%--  Create via javascript the parts that will be above the main table --%>
 			<script type="text/javascript">
-			
-				viewSearchCrosslinkProteinPageCode.createPartsAboveMainTable();
 				
+				//  If object exists, call function on it now, otherwise call the function on document ready
+				if ( window.viewSearchCrosslinkProteinPageCode ) {
+					window.viewSearchCrosslinkProteinPageCode.createPartsAboveMainTable();
+				} else {
+	
+					$(document).ready(function() 
+					    { 
+						   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+							  
+							   window.viewSearchCrosslinkProteinPageCode.createPartsAboveMainTable();
+						   },10);
+					    } 
+					); // end $(document).ready(function() 
+				}
+							
 			</script>
 			
 

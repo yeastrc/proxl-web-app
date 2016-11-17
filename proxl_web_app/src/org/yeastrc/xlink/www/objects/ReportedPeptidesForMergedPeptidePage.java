@@ -8,7 +8,7 @@ import org.yeastrc.xlink.dto.ReportedPeptideDTO;
  * 
  *
  */
-public class ReportedPeptidesForMergedPeptidePage {
+public class ReportedPeptidesForMergedPeptidePage implements SearchPeptideCommonLinkWebserviceResultIF {
 
 	private ReportedPeptideDTO reportedPeptide;
 	
@@ -24,7 +24,22 @@ public class ReportedPeptidesForMergedPeptidePage {
 	private List<String> psmAnnotationValues;
 	
 
-	
+	@Override
+	public List<String> getPsmAnnotationValueList() {
+		return psmAnnotationValues;
+	}
+	@Override
+	public void setPsmAnnotationValueList(List<String> psmAnnotationValueList) {
+		this.psmAnnotationValues = psmAnnotationValueList;
+	}
+	@Override
+	public List<String> getPeptideAnnotationValueList() {
+		return peptideAnnotationValues;
+	}
+	@Override
+	public void setPeptideAnnotationValueList(List<String> peptideAnnotationValueList) {
+		this.peptideAnnotationValues = peptideAnnotationValueList;
+	}
 	
 	public List<String> getPeptideAnnotationValues() {
 		return peptideAnnotationValues;
@@ -63,6 +78,7 @@ public class ReportedPeptidesForMergedPeptidePage {
 	public void setNumPSMs(int numPSMs) {
 		this.numPSMs = numPSMs;
 	}
+
 	
 	
 }

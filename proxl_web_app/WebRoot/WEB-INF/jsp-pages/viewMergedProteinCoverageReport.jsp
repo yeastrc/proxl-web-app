@@ -37,7 +37,10 @@
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
-		
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
+				
+		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
+			
 		<script type="text/javascript" src="${ contextPath }/js/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/viewProteinCoverageReport.js?x=${cacheBustValue}"></script>
@@ -261,12 +264,29 @@
 				[<a class="tool_tip_attached_jq" data-tooltip="Download as tab-delimited text" href="${ contextPath }/downloadProteinCoverageReport.do?<bean:write name="mergedQueryString" />">Download Coverage Report</a>]
 			</div>
 
+			<c:set var="coveragePageForAnnDispMgmt" value="${ true }"/>
+			
+			<%--  Block for user choosing which annotation types to display  --%>
+			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
 
 			<%--  Create via javascript the parts that will be above the main table --%>
 			<script type="text/javascript">
-			
-				viewProteinCoverageReportPageCode.createPartsAboveMainTable();
-				
+
+			//  If object exists, call function on it now, otherwise call the function on document ready
+			if ( window.viewProteinCoverageReportPageCode ) {
+				window.viewProteinCoverageReportPageCode.createPartsAboveMainTable();
+			} else {
+
+				$(document).ready(function() 
+				    { 
+					   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+						  
+						   window.viewProteinCoverageReportPageCode.createPartsAboveMainTable();
+					   },10);
+				    } 
+				); // end $(document).ready(function() 
+			}
+									
 			</script>
 			
 			

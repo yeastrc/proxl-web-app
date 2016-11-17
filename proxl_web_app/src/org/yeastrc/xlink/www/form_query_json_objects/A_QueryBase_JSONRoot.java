@@ -1,5 +1,7 @@
 package org.yeastrc.xlink.www.form_query_json_objects;
 
+import org.yeastrc.xlink.www.annotation_display.AnnTypeIdDisplayJSONRoot;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
@@ -17,6 +19,8 @@ public class A_QueryBase_JSONRoot {
 
 	private CutoffValuesRootLevel cutoffs;
 	
+	private AnnTypeIdDisplayJSONRoot annTypeIdDisplay;
+	
 
 	////////
 	
@@ -28,6 +32,7 @@ public class A_QueryBase_JSONRoot {
 	public A_QueryBase_JSONRoot( A_QueryBase_JSONRoot a_QueryBase_JSONRoot ) {
 		
 		this.cutoffs = a_QueryBase_JSONRoot.cutoffs;
+		this.annTypeIdDisplay = a_QueryBase_JSONRoot.annTypeIdDisplay;
 	}
 		
 
@@ -46,6 +51,16 @@ public class A_QueryBase_JSONRoot {
 	}
 	public void setCutoffs(CutoffValuesRootLevel cutoffs) {
 		this.cutoffs = cutoffs;
+	}
+
+
+	public AnnTypeIdDisplayJSONRoot getAnnTypeIdDisplay() {
+		return annTypeIdDisplay;
+	}
+
+
+	public void setAnnTypeIdDisplay(AnnTypeIdDisplayJSONRoot annTypeIdDisplay) {
+		this.annTypeIdDisplay = annTypeIdDisplay;
 	}
 	
 }

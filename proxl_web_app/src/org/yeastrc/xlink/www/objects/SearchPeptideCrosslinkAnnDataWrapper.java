@@ -11,12 +11,25 @@ import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_value
  * Supports sorting 
  * 
  */
-public class SearchPeptideCrosslinkAnnDataWrapper extends SortDisplayRecordsWrapperBase {
+public class SearchPeptideCrosslinkAnnDataWrapper extends SortDisplayRecordsWrapperBase implements SearchPeptideCommonLinkAnnDataWrapperIF {
 
 	/**
 	 * Wrapped display data
 	 */
 	private SearchPeptideCrosslink searchPeptideCrosslink;
+
+	
+
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	public int getReportedPeptideId() {
+		
+		return searchPeptideCrosslink.getReportedPeptideId();
+	}
+	
 
 	
 	/**
