@@ -129,7 +129,7 @@
 						<td><bean:write name="search" property="formattedLoadTime" /></td>
 					</tr>
 					<tr>
-						<td>FASTA&nbsp;file:</td>
+						<td style="white-space: nowrap;">FASTA file:</td>
 						<td><bean:write name="search" property="fastaFilename" /></td>
 					</tr>
 					

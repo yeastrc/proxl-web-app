@@ -1814,6 +1814,10 @@
 												<td>Upload:</td>
 												<td><bean:write name="search" property="formattedLoadTime" /></td>
 											</tr>
+											<tr>
+												<td style="white-space: nowrap;">FASTA file:</td>
+												<td><bean:write name="search" property="fastaFilename" /></td>
+											</tr>
 											
 											<%--  Copy  'search_wrapper' to 'search_details' to use here --%>
 											
