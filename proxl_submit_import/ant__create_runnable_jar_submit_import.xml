@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="create_run_jar" name="submitProxlXMLImport.jar  Create Runnable Jar for Jar-in-Jar Loader">
 
-	<property name="java_target" value="1.7"/>
-	<property name="java_source" value="1.7"/>
-		
-	<property name="java.source.character.set" value="iso-8859-1"/>
-
 	<property name="jar.main.class" value="org.yeastrc.proxl.import_xml_to_db_submit_pgm.program.SubmitProxlImportProgram" />
 
 	<property name="output_runnable_jar" value="submitProxlXMLImport.jar"/>
@@ -22,6 +17,42 @@
 	<property name="classes" value="classes" />	
 
 	<available file="..${file.separator}.git" type="dir" property="git.present"/>
+
+	
+	<property name="aa_Ant_Config__dir_name" value="aa_Ant_Config" />
+
+	
+	<property name="path_to__aa_Ant_Config" value="../${aa_Ant_Config__dir_name}" />
+
+	
+	<fail message="ERROR: 'aa_Ant_Config' directory not found, check the path. path: ${path_to__aa_Ant_Config}">
+	    <condition>
+	        <not>
+	        	<available file="${path_to__aa_Ant_Config}" />
+	        </not>
+	    </condition>
+	</fail>
+	
+		
+	<!-- ================================================================================== -->
+	<!--  repository wide overall Ant properties in overall_build_config.properties -->
+	<!-- ================================================================================== -->
+	
+	
+	<property name="overall_build_config.properties__file_with_path" 
+		value="${path_to__aa_Ant_Config}${file.separator}overall_build_config.properties"/>
+		
+	<fail message="ERROR: 'overall_build_config.properties' file not found, check the path. filename with path: ${overall_build_config.properties__file_with_path}">
+	<condition>
+	    <not>
+	    	<available file="${overall_build_config.properties__file_with_path}" />
+	    </not>
+	</condition>
+	</fail>
+	
+	<!-- This does not fail if the file is not found -->
+	<property file="${overall_build_config.properties__file_with_path}" />
+	
 	
 	
     <target name="create_run_jar"  depends="create_jar_this_project">
@@ -166,7 +197,9 @@
 	<!-- Normal build of application -->
 	<!-- ================================================================================== -->
     <target name="compile" depends="clean">
-    	
+
+      	<echo message="Compiling Java:  java_source: ${java_source}, java_target: ${java_target} "/>  	
+
     	<!-- <echo message="${toString:compile.classpath}"/> -->
         <javac includeantruntime="false"  debug="on" srcdir="src" destdir="${classes}" source="${java_source}" target="${java_target}"  encoding="${java.source.character.set}" >
             <classpath refid="compile.classpath"/>

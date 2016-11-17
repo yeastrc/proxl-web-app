@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="US-ASCII" ?>
 <project name="ProXL build web app war" default="package_war" basedir="." >
 	
-	
-	<property name="java_target" value="1.7"/>
-	<property name="java_source" value="1.7"/>
-		
-	
   <target name="init">
     <tstamp/>
   	
@@ -50,7 +45,7 @@
 	
 		
 	<!-- ================================================================================== -->
-	<!--  SVN repository wide overall Ant properties in overall_build_config.properties -->
+	<!--  repository wide overall Ant properties in overall_build_config.properties -->
 	<!-- ================================================================================== -->
 	
 	
@@ -152,6 +147,8 @@
 
 
 	<!--  Build the Java code   -->
+  	
+  	<echo message="Compiling Java:  java_source: ${java_source}, java_target: ${java_target} "/>  	
 
   	<javac includeantruntime="false"  srcdir="${src_shared_code}" destdir="${classesweb}" debug="true"  
   		 source="${java_source}" target="${java_target}"  encoding="${java.source.character.set}" >
