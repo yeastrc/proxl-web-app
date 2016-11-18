@@ -1292,19 +1292,18 @@ circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgRootSn
 	var $proteinBarPlainSVGObject = $( proteinBarPlainSVGObject );		// jquery variable
 	var $svgDrawing = $proteinBarPlainSVGObject.parent();				// jquery object for parent svg drawing
 	
-	// coords for the location of the svg drawing so we can convert page
-	// coordiantes into coordinates within the drawing
-	var topLevelSVGCoords = {
-			x:$svgDrawing.offset().left,
-			y:$svgDrawing.offset().top
-	};
-	
 	// a this we can use within the function defined below that refers to this object
 	var _THIS = this;
-	
 
 	// the function called on mouse over
 	var toolTipFunction = function( eventObject, qtipAPI /* qtip "api" variable/property */ ) {
+
+		// coords for the location of the svg drawing so we can convert page
+		// coordiantes into coordinates within the drawing
+		var topLevelSVGCoords = {
+				x:$svgDrawing.offset().left,
+				y:$svgDrawing.offset().top
+		};
 		
 		var eventpageX = eventObject.pageX;
 		var eventpageY = eventObject.pageY;
@@ -1312,7 +1311,6 @@ circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgRootSn
 		var svgCoords = { };
 		svgCoords.x = eventpageX - topLevelSVGCoords.x;
 		svgCoords.y = eventpageY - topLevelSVGCoords.y;
-		
 		
 		var proteinPositionOneBased = _THIS.getProteinIndexPosition( index, svgCoords );
 		var proteinPositionZeroBased = proteinPositionOneBased - 1;
