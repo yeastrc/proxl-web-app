@@ -2,7 +2,14 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
+-- -----------------------------------------------------
+-- Schema proxl
+-- -----------------------------------------------------
 DROP SCHEMA IF EXISTS proxl ;
+
+-- -----------------------------------------------------
+-- Schema proxl
+-- -----------------------------------------------------
 CREATE SCHEMA  proxl DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
 USE proxl ;
 
@@ -152,8 +159,7 @@ CREATE TABLE  pdb_file (
     REFERENCES project (id)
     ON DELETE CASCADE)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_general_ci;
+DEFAULT CHARACTER SET = utf8;
 
 CREATE INDEX uploaded_by ON pdb_file (uploaded_by ASC);
 
@@ -304,8 +310,7 @@ CREATE TABLE  search_reported_peptide (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_swedish_ci;
+DEFAULT CHARACTER SET = latin1;
 
 CREATE INDEX reported_peptide_id ON search_reported_peptide (reported_peptide_id ASC);
 
@@ -801,7 +806,7 @@ CREATE TABLE  unified_rep_pep_dynamic_mod_lookup (
   position INT(10) UNSIGNED NOT NULL,
   mass DOUBLE NOT NULL,
   mass_rounded DOUBLE NOT NULL,
-  mass_rounded_string VARCHAR(200) NOT NULL,
+  mass_rounded_string VARCHAR(200) COLLATE 'latin1_general_ci' NOT NULL,
   mass_rounding_places SMALLINT NOT NULL,
   mod_order SMALLINT NOT NULL,
   PRIMARY KEY (id),
@@ -992,8 +997,7 @@ CREATE TABLE  srch__rep_pept__annotation (
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 AUTO_INCREMENT = 27
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_general_ci;
+DEFAULT CHARACTER SET = utf8;
 
 CREATE INDEX srch__rep_pept__ann__rep_pept_id_fk_idx ON srch__rep_pept__annotation (reported_peptide_id ASC);
 
@@ -1929,6 +1933,45 @@ ENGINE = InnoDB;
 CREATE INDEX tos_usr_a_v_hist_tos_text_v_id_fk_idx ON terms_of_service_user_accepted_version_history (terms_of_service_version_id ASC);
 
 
+-- -----------------------------------------------------
+-- Table url_shortener
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS url_shortener ;
+
+CREATE TABLE  url_shortener (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  shortened_url_key VARCHAR(12) NOT NULL,
+  auth_user_id INT UNSIGNED NULL,
+  date_record_created DATETIME NOT NULL,
+  url VARCHAR(6000) NOT NULL,
+  PRIMARY KEY (id, shortened_url_key))
+ENGINE = InnoDB;
+
+CREATE UNIQUE INDEX shortened_url_key_unique ON url_shortener (shortened_url_key ASC);
+
+CREATE INDEX url ON url_shortener (url(500) ASC);
+
+
+-- -----------------------------------------------------
+-- Table url_shortener_associated_search_id
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS url_shortener_associated_search_id ;
+
+CREATE TABLE  url_shortener_associated_search_id (
+  url_shortener_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  search_id INT UNSIGNED NOT NULL,
+  PRIMARY KEY (url_shortener_id, search_id),
+  CONSTRAINT url_shortener_associated_search_id_main_id
+    FOREIGN KEY (url_shortener_id)
+    REFERENCES url_shortener (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX default_page_view_search_id_fk_idx ON url_shortener_associated_search_id (url_shortener_id ASC);
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+

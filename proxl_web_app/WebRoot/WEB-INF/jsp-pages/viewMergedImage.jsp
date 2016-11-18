@@ -103,6 +103,7 @@
 		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 		
 		
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
@@ -240,13 +241,6 @@
 				<tr>
 					<td>Exclude proteins with:</td>
 					<td id="exclude_protein_types_block">
-
-						<%--
-						<label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-4">Crosslinks</span></label>
-						<label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-2">Looplinks</span></label>
-						<label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-1">Monolinks</span></label>
-						--%>
-						<%-- <label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-3">Dimers</span></label> --%>
 						<label><span style="white-space:nowrap;" ><input type="checkbox" id="exclude-type-0">No links</span></label>
 					</td>
 				</tr>
@@ -255,27 +249,25 @@
 					<td>Exclude organisms:</td>
 					<td><div id="taxonomy-checkboxes"></div>
 					</td>
-					
 				</tr>
-				
 				
 				<tr>
 					<td>&nbsp;</td>
 					<td>
-
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerOverlayFragment.jsp" %>
+					
 						<c:set var="UpdateButtonText" value="Update From Database"/>
 						
 						<input type="button" value="${ UpdateButtonText }"  onclick="refreshData()" >
 
 						<c:if test="${ not empty onlySingleSearchId }">
-
 							<c:set var="searchId" value="${ onlySingleSearchId }"/>	
-								
 							<c:set var="page_JS_Object" value="imageViewerPageObject"/>
 							
 							<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
 						</c:if>
-											
+
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 					</td>
 				</tr>
 			
@@ -293,15 +285,9 @@
 		
 				<%--  Protein Item to put in Overlay --%>		
 				<script id="selected_protein_entry_template"  type="text/x-handlebars-template">
-
 					<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedImage.jsp_page_templates/viewMergedImageSelectedProteinItemTemplate.jsp" %>
-
 				</script>
 				
-								
-
-
-
 				<div style="margin-top: 5px; clear: both; ">
 					
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle showing inter-protein crosslinks" style="white-space:nowrap;" ><input type="checkbox" id="show-crosslinks" checked>Show crosslinks</span></label>

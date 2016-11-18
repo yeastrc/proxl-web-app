@@ -62,6 +62,7 @@
 		
 		
 		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
@@ -163,14 +164,6 @@
 						
 			--%>
 			
-<%--
-		Moved JS call to the "Update" button
-		 			
-			<form action="javascript:viewSearchPeptidePageCode.updatePageForFormParams()" method="get" 
-
-				--%>	 <%-- id="form_get_for_updated_parameters" --%>
-		
-			
 			<table style="border-width:0px;">
 
 					
@@ -236,6 +229,8 @@
 					<td>&nbsp;</td>
 					<td colspan="5">
 					
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerOverlayFragment.jsp" %>
+					
 						<c:set var="UpdateButtonText" value="Update"/>
 						
 						<input type="button" value="${ UpdateButtonText }"  onclick="viewSearchPeptidePageCode.updatePageForFormParams()" >
@@ -245,16 +240,14 @@
 						<c:set var="page_JS_Object" value="viewSearchPeptidePageCode"/>
 						
 						<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 
 					</td>
 				</tr>
 			
 			</table>
 			
-<%-- 			
-			</form>
---%>
-			
+			<div style="height: 10px;">&nbsp;</div>
 	
 			<h3 style="display:inline;">Peptides (<c:out value="${ viewSearchPeptidesPageDataRoot.peptideListSize }"></c:out>):</h3>
 			

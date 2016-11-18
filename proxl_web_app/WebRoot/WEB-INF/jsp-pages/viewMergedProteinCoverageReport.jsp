@@ -33,6 +33,7 @@
 		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
@@ -137,29 +138,6 @@
 			 </c:otherwise>
 			</c:choose>
 			
-			
-						
-			
-						
-			<%-- WAS		
-			
-
-			<html:form action="viewProteinCoverageReport" method="get" styleId="form_get_for_updated_parameters">
-							
-				<html:hidden property="searchId"/>
-			
-								
-			--%>
-			
-			
-			<%--
-		Moved JS call to the "Update" button
-		 			
-			<form action="javascript:viewProteinCoverageReportPageCode.updatePageForFormParams()" method="get" > 
-			
-				--%>	 <%-- id="form_get_for_updated_parameters" --%>
-			
-			
 			<table style="border-width:0px;">
 					
 				<%--  Set to false to not show color block before search for key --%>
@@ -190,15 +168,6 @@
 					<td>Exclude organisms:</td>
 					<td>
 						<logic:iterate id="taxonomy" name="taxonomies">
-						
-<%-- 						
-						 <label style="white-space: nowrap" >
-						  <html:multibox property="excludeTaxonomy" styleClass="excludeTaxonomy_jq" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >
-						   <bean:write name="taxonomy" property="key"/> 
-						  </html:multibox> 
-						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
-						 </label> 
---%>						 
 						 <label style="white-space: nowrap" >
 						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq " onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >  
 						  
@@ -235,28 +204,25 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td>
-
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerOverlayFragment.jsp" %>
+					
 						<c:set var="UpdateButtonText" value="Update"/>
 						
 						<input type="button" value="${ UpdateButtonText }"  onclick="viewProteinCoverageReportPageCode.updatePageForFormParams()" >
 
 						<c:if test="${ not mergedPage }"> 	
-							
 							<c:set var="searchId" value="${ search.id }"/>	
-	
 							<c:set var="page_JS_Object" value="viewSearchProteinPageCommonCrosslinkLooplinkCoverage"/>
 						
 							<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
-						
 						</c:if>						
+
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 					</td>
 				</tr>
-			
 			</table>
 			
-<%-- 			
-			</form>
---%>
+			<div style="height: 10px;">&nbsp;</div>			
 	
 			<h3 style="display:inline;">Protein Coverage Report:</h3>
 

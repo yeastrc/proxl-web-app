@@ -86,6 +86,13 @@
 		    <forward name="Success" path="/WEB-INF/jsp-pages/manageConfiguration.jsp" redirect="false"/>
 		</action>			
 				
+
+		<action path="/shortcutNotFound"
+				type="org.yeastrc.xlink.www.actions.ShortcutNotFoundPageInitAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/shortcutNotFound.jsp" redirect="false"/>
+		</action>			
 				
 		<action
 		   path="/user_noSession"

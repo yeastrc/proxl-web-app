@@ -91,6 +91,7 @@
 		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
@@ -272,7 +273,8 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td>
-
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerOverlayFragment.jsp" %>
+					
 						<c:set var="UpdateButtonText" value="Update From Database"/>
 						
 						<input type="button" value="${ UpdateButtonText }"  onclick="refreshData()" >
@@ -285,7 +287,8 @@
 							
 							<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
 						</c:if>
-															
+
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 					</td>
 				</tr>
 			

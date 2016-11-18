@@ -475,6 +475,20 @@ body.crosslinks-page-main .top-level-label-bottom-border {
 
 
 
+	/* showing user the shortened URL modal dialog */
+
+.shortened-url-display-overlay-containing-outermost-div { width: 100%; height: 0px;   }
+.shortened-url-display-overlay-containing-outer-div { position: relative; display: inline-block; }
+
+/* These 2 divs MUST have the same width so set width for both together */
+.shortened-url-display-overlay-containing-outer-div, body.project-page .shortened-url-display-overlay-container { width: 600px;  }
+
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+.shortened-url-display-overlay-container {   }
+
+
+
+
 /*  Projects List Page  */
 
 

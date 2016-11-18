@@ -204,6 +204,9 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	  <c:when test="${ not empty headerProject }">
 	   <a href="${ contextPath }/viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ headerProject.projectDTO.id }" ></c:out>">
 	  </c:when>
+	  <c:otherwise>
+	  	
+	  </c:otherwise>
 	 </c:choose>
 		<img src="${ contextPath }/images/logo-small.png" >
 	 <c:choose>
@@ -211,6 +214,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	   </a>
 	  </c:when>
 	  <c:when test="${ not empty headerProject }">
+	   </a>
 	  </c:when>
 	 </c:choose>
 	</div>

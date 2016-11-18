@@ -63,6 +63,7 @@
 		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 	
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
 				
@@ -251,31 +252,22 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td>
-	
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerOverlayFragment.jsp" %>
+					
 						<c:set var="UpdateButtonText" value="Update"/>
-						
 						<input type="button" value="${ UpdateButtonText }"  onclick="viewSearchLooplinkProteinPageCode.updatePageForFormParams()" >
 						
 						<c:set var="searchId" value="${ search.id }"/>	
-
 						<c:set var="page_JS_Object" value="viewSearchProteinPageCommonCrosslinkLooplinkCoverage"/>
 												
 						<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
-												
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 					</td>
 				</tr>
-			
 			</table>
 			
-			
-<%-- 			
-			</form>
---%>
-			
-			
-			
-			
-	
+			<div style="height: 10px;">&nbsp;</div>
+				
 			<h3 style="display:inline;">Looplinks (<bean:write name="numLooplinks" />):</h3>
 			<div style="display:inline;">
 

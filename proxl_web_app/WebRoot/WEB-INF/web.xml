@@ -37,7 +37,7 @@
             
             <!-- specifies the packages to scan for Classes that have Jersey annotations for webservices -->
             <!-- Adding "jackson.jaxrs" changes the JSON and JAXB XML provider to Jackson -->
-            <param-value>com.fasterxml.jackson.jaxrs;org.yeastrc.xlink.www.webservices;org.yeastrc.xlink.www.proxl_xml_file_import.webservices;org.yeastrc.xlink.www.user_account_webservices</param-value>
+            <param-value>com.fasterxml.jackson.jaxrs;org.yeastrc.xlink.www.webservices;org.yeastrc.xlink.www.proxl_xml_file_import.webservices;org.yeastrc.xlink.www.user_account_webservices;org.yeastrc.xlink.www.url_shortner_share_page.webservices</param-value>
         </init-param>  
         
         <load-on-startup>1</load-on-startup>
@@ -61,6 +61,18 @@
     <url-pattern>/uploadFileForImport</url-pattern>
   </servlet-mapping>
 
+	<!--  Servlet for handling shortened URLs, redirects to full URL  -->
+
+  <servlet>
+    <servlet-name>Shortened_URL_Servlet</servlet-name>
+    <servlet-class>org.yeastrc.xlink.www.url_shortner_share_page.url_handler_servlet.SharePageURLHandlerServlet</servlet-class>
+    <load-on-startup>3</load-on-startup>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>Shortened_URL_Servlet</servlet-name>
+    <url-pattern>/go</url-pattern>
+  </servlet-mapping>
 
   <!-- Filters - run on each request -->
    

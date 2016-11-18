@@ -65,6 +65,8 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
 			
+		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
+
 		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkProteinsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
@@ -211,13 +213,6 @@
 
 			</html:form>
 			
-
-<%--
-		Moved JS call to the "Update" button
-		 			
-			<form action="javascript:viewMergedLooplinkProteinPageCode.updatePageForFormParams()" method="get" >
---%>
-
 			<table style="border-width:0px;">
 
 				<%--  Set to true to show color block before search for key --%>
@@ -295,32 +290,25 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td>
-
-<%--   WAS 						
-						<input type="submit" value="Update" >
---%>						
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerOverlayFragment.jsp" %>
+					
 						<input type="button" value="Update"  onclick="viewMergedLooplinkProteinPageCode.updatePageForFormParams()" >
 											
-					
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 					</td>
 				</tr>
 			
 			</table>
 			
-			
-<%-- 			
-			</form>
---%>
+			<div style="height: 10px;">&nbsp;</div>
 			
 			<div >
-	
 				<h3 style="display:inline;">Merged Looplinks: <bean:write name="numLooplinks" />
 				</h3>			
 				<div style="display:inline;">
 					[<a class="tool_tip_attached_jq" data-tooltip="View crosslinks (instead of looplinks)" href="${ contextPath }/mergedCrosslinkProtein.do?<bean:write name="queryString" />">View Crosslinks (<bean:write name="numCrosslinks" />)</a>]
 					[<a class="tool_tip_attached_jq" data-tooltip="Download all looplinks as tab-delimited text" href="${ contextPath }/downloadMergedProteins.do?<bean:write name="queryString" />">Download Data (<bean:write name="numLinks" />)</a>]
 					[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="queryString" />">Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
-					
 				</div>
 			</div>
 			

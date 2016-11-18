@@ -62,6 +62,7 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
 					
+		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 					
 		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkProteinsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 					
@@ -202,13 +203,7 @@
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
 			</html:form>
-			
-<%--
-		Moved JS call to the "Update" button
-		 	
-			<form action="javascript:viewMergedCrosslinkProteinPageCode.updatePageForFormParams()" method="get" >
---%>					
-												
+				
 			<table style="border-width:0px;">
 
 				<%--  Set to true to show color block before search for key --%>
@@ -293,22 +288,17 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td>
-
-<%--   WAS 						
-						<input type="submit" value="Update" >
---%>						
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerOverlayFragment.jsp" %>
+					
 						<input type="button" value="Update"  onclick="viewMergedCrosslinkProteinPageCode.updatePageForFormParams()" >
-											
+
+						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 					</td>
 				</tr>
-			
 			</table>
-			
-<%-- 			
-			</form>
---%>
-			
-			
+					
+			<div style="height: 10px;">&nbsp;</div>
+						
 		<div>
 			<h3 style="display:inline;">Merged Crosslinks: <bean:write name="numCrosslinks" />
 			</h3>
