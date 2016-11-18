@@ -40,17 +40,8 @@ var AnnotationDataDisplayProcessingCommonCode = function() {
 				return;  // EARLY EXIT
 			}
 			
-			//  If On Coverage page, no initialization needed.
-			var $annotation_mgmt_coverage_page_script_tag = $("#annotation_mgmt_coverage_page_script_tag");
-			if ( $annotation_mgmt_coverage_page_script_tag.length > 0 ) {
-				// #annotation_mgmt_coverage_page_script_tag present so on coverage page
-				initializeCalled = true;
-				return;  // EARLY EXIT
-			}
-			
 			//  Get default display ann type ids
 			
-
 			var $annotation_displays_defaults_json_jq = $("#annotation_displays_defaults_json_jq");
 			if ( $annotation_displays_defaults_json_jq.length === 0 ) {
 				throw Error( "Failed to find element with id: 'annotation_displays_defaults_json_jq'" );
@@ -65,7 +56,14 @@ var AnnotationDataDisplayProcessingCommonCode = function() {
 			
 			_annTypeIdDisplayDefaultValues = JSON.parse( annotation_displays_defaults_json );
 
-
+			//  If On Coverage page, no initialization needed.
+			var $annotation_mgmt_coverage_page_script_tag = $("#annotation_mgmt_coverage_page_script_tag");
+			if ( $annotation_mgmt_coverage_page_script_tag.length > 0 ) {
+				// #annotation_mgmt_coverage_page_script_tag present so on coverage page
+				initializeCalled = true;
+				return;  // EARLY EXIT
+			}
+			
 			// Add .sortable to Annotation Display Overlay Data Block
 			
 			var $annotation_displays_container_jq = $(".annotation_displays_container_jq");
