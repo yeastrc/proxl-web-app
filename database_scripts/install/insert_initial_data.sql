@@ -41,7 +41,7 @@ INSERT INTO search_record_status_lookup (id, display_text) VALUES ( 2, 'import c
 INSERT INTO search_record_status_lookup (id, display_text) VALUES ( 3, 'import fail' );
 INSERT INTO search_record_status_lookup (id, display_text) VALUES ( 4, 'import canceled/incomplete' );
 INSERT INTO search_record_status_lookup (id, display_text) VALUES ( 5, 'marked for deletion' );
-
+INSERT INTO search_record_status_lookup (id, display_text) VALUES ( 6, 'deletion in progress' );
 
 --  Import via web app lookup values	
 
