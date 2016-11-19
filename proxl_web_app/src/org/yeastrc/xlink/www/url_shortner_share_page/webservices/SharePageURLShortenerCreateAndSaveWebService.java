@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.url_shortner_share_page.webservices;
 
 
-import java.util.List;
+import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -16,10 +16,13 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.auth.dto.AuthUserDTO;
+import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.dao.URLShortenerDAO;
+import org.yeastrc.xlink.www.dao.URLShortenerDAO.LogDuplicateSQLException;
 import org.yeastrc.xlink.www.dto.URLShortenerDTO;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.servlet_context.CurrentContext;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 
@@ -32,6 +35,8 @@ import com.google.common.primitives.Longs;
 public class SharePageURLShortenerCreateAndSaveWebService {
 
 	private static final Logger log = Logger.getLogger(SharePageURLShortenerCreateAndSaveWebService.class);
+	
+	private static final int RETRY_COUNT_MAX_ON_DUPLICATE_SHORT_KEY = 10;
 	
 	/**
 	 * Webservice result
@@ -67,7 +72,7 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/createAndSaveShortenedURL")
-	public SharePageURLShortenerCreateAndSaveWebServiceResult saveOrUpdateDefaultPageView( 
+	public SharePageURLShortenerCreateAndSaveWebServiceResult createAndSaveSharePageURLShortenerWebService( 
 //			@FormParam("searchId") List<Integer> searchId, 
 			@FormParam("pageUrl") String pageUrl, 
 			@Context HttpServletRequest httpServletRequest ) throws Exception {
@@ -125,22 +130,38 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 				
 				while ( ( ! saveSuccessful ) ) {
 
+					saveAttemptCounter++;
+					String shortenedUrlKey = null;
 					try {
 						//  Do retries since may create shortenedUrlKey that collides with existing records
 						
-						String shortenedUrlKey = getShortenedKey();
-
+						shortenedUrlKey = getShortenedKey();
+						
 						urlShortenerDTO.setShortenedUrlKey(shortenedUrlKey);
+						
+						LogDuplicateSQLException logDuplicateSQLException = LogDuplicateSQLException.FALSE;
 
-						URLShortenerDAO.getInstance().save(urlShortenerDTO);
+						if ( saveAttemptCounter >=  RETRY_COUNT_MAX_ON_DUPLICATE_SHORT_KEY ) {
+							logDuplicateSQLException = LogDuplicateSQLException.TRUE;
+						}
+						//  Only log insert Duplicate errors if last try
+						URLShortenerDAO.getInstance().save( urlShortenerDTO, logDuplicateSQLException );
 
 						saveSuccessful = true;
+
+					} catch ( SQLException sqlException ) {
 						
-					} catch ( Exception e ) {
+						String exceptionMessage = sqlException.getMessage();
 						
-						if ( saveAttemptCounter >  8 ) {
-							
-							throw e;
+						if ( exceptionMessage != null && exceptionMessage.startsWith( "Duplicate entry" ) ) {
+
+							if ( saveAttemptCounter >=  RETRY_COUNT_MAX_ON_DUPLICATE_SHORT_KEY ) {
+								String msg = "Exceeded max number of attempts to insert and get Duplicate Key error."
+										+ "  Max # = " + RETRY_COUNT_MAX_ON_DUPLICATE_SHORT_KEY
+										+ ", current shortenedUrlKey: " + shortenedUrlKey;
+								log.error( msg, sqlException );
+								throw new ProxlWebappInternalErrorException(msg);
+							}
 						}
 					}
 				}

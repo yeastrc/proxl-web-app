@@ -3,6 +3,7 @@ package org.yeastrc.xlink.www.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.log4j.Logger;
@@ -16,6 +17,8 @@ import org.yeastrc.xlink.www.dto.URLShortenerDTO;
 public class URLShortenerDAO {
 	
 	private static final Logger log = Logger.getLogger(URLShortenerDAO.class);
+	
+	public static enum LogDuplicateSQLException{ TRUE, FALSE }
 
 	//  private constructor
 	private URLShortenerDAO() { }
@@ -159,7 +162,7 @@ public class URLShortenerDAO {
 	 * @param item
 	 * @throws Exception
 	 */
-	public void save( URLShortenerDTO item ) throws Exception {
+	public void save( URLShortenerDTO item, LogDuplicateSQLException logDuplicateSQLException ) throws Exception {
 		
 		
 		Connection dbConnection = null;
@@ -168,7 +171,7 @@ public class URLShortenerDAO {
 			
 			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
-			save( item, dbConnection );
+			save( item, logDuplicateSQLException, dbConnection );
 
 		} finally {
 			
@@ -190,7 +193,7 @@ public class URLShortenerDAO {
 	 * @param item
 	 * @throws Exception
 	 */
-	public void save( URLShortenerDTO item, Connection dbConnection ) throws Exception {
+	public void save( URLShortenerDTO item, LogDuplicateSQLException logDuplicateSQLException, Connection dbConnection ) throws Exception {
 		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -221,23 +224,30 @@ public class URLShortenerDAO {
 			if( rs.next() ) {
 				item.setId( rs.getInt( 1 ) );
 			} else {
-				
 				String msg = "Failed to insert URLShortenerDTO, generated key not found.";
-				
 				log.error( msg );
-				
 				throw new Exception( msg );
 			}
+		} catch ( SQLException sqlException ) {
+
+			String exceptionMessage = sqlException.getMessage();
 			
+			if ( exceptionMessage != null && exceptionMessage.startsWith( "Duplicate entry" ) ) {
+
+				if ( logDuplicateSQLException == LogDuplicateSQLException.TRUE ) {
+					String msg = "Failed to insert URLShortenerDTO, sql: " + sql;
+					log.error( msg, sqlException );
+				}
+			} else {
+				String msg = "Failed to insert URLShortenerDTO, sql: " + sql;
+				log.error( msg, sqlException );
+			}			
+			throw sqlException;
 			
 		} catch ( Exception e ) {
-			
 			String msg = "Failed to insert URLShortenerDTO, sql: " + sql;
-			
 			log.error( msg, e );
-			
 			throw e;
-			
 		} finally {
 			
 			// be sure database handles are closed
