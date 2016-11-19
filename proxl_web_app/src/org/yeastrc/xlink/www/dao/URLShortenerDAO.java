@@ -206,7 +206,11 @@ public class URLShortenerDAO {
 			counter++;
 			pstmt.setString( counter, item.getShortenedUrlKey() );
 			counter++;
-			pstmt.setInt( counter, item.getAuthUserId() );
+			if ( item.getAuthUserId() != null ) {
+				pstmt.setInt( counter, item.getAuthUserId() );
+			} else {
+				pstmt.setNull( counter, java.sql.Types.INTEGER );
+			}
 			counter++;
 			pstmt.setString( counter, item.getUrl() );
 
