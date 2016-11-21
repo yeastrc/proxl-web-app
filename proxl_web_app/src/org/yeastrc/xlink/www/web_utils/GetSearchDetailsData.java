@@ -51,11 +51,18 @@ public class GetSearchDetailsData {
 
 		List<SearchDTODetailsDisplayWrapper> searchDTODetailsList = new ArrayList<>( searches.size() );
 		
+		StringBuilder searchIdListCommaDelimSB = new StringBuilder( 1000 );
+		
 		GetCutoffPageDisplayRoot getCutoffPageDisplayRoot = GetCutoffPageDisplayRoot.getInstance();
 		
 		for ( SearchDTO search : searches ) {
 		
 			Integer searchId = search.getId();
+			
+			if ( searchIdListCommaDelimSB.length() != 0 ) {
+				searchIdListCommaDelimSB.append(",");
+			}
+			searchIdListCommaDelimSB.append( searchId.toString() );
 			
 			SearchDTODetailsDisplayWrapper searchDTODetailsDisplayWrapper = new SearchDTODetailsDisplayWrapper();
 			
@@ -83,7 +90,8 @@ public class GetSearchDetailsData {
 		}
 		
 		
-
+		String searchIdListCommaDelim = searchIdListCommaDelimSB.toString();
+		request.setAttribute( WebConstants.PARAMETER_SEARCH_ID_COMMA_DELIM_LIST_REQUEST_KEY, searchIdListCommaDelim );
 		
 		request.setAttribute( WebConstants.PARAMETER_SEARCHES_DETAILS_LIST_REQUEST_KEY, searchDTODetailsList );
 

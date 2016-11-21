@@ -85,6 +85,8 @@ public class WebConstants {
 	public static final String PARAMETER_REDIRECT_AFTER_PROCESS_PROJECT_READ_CODE_TRUE = "true";
 	
 
+	public static final String PARAMETER_SEARCH_ID_COMMA_DELIM_LIST_REQUEST_KEY = "search_id_comma_delim_list";
+	
 	public static final String PARAMETER_SEARCHES_DETAILS_LIST_REQUEST_KEY = "searches_details_list";
 	
 	public static final String PARAMETER_CUTOFF_PAGE_DISPLAY_ROOT_REQUEST_ENTRY = "cutoffPageDisplayRootRequestEntry";

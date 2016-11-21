@@ -18,8 +18,6 @@
 
 var SharePageURLShortener = function() {
 
-
-
 	//  Called from 'Share Page' button
 
 	this.sharePage = function( params ) {
@@ -42,14 +40,33 @@ var SharePageURLShortener = function() {
 
 			var pageUrl = window.location.href;
 
-			var requestData = { pageUrl: pageUrl };
+			var requestObj = { pageUrl: pageUrl };
+			
+			//  Get search ids from attr on button
+			
+			var search_id_comma_delim_list = $clickedThis.attr("data-search_id_comma_delim_list");
+			if ( search_id_comma_delim_list !== undefined && search_id_comma_delim_list !== "" ) {
 
+				var searchIdStringList = search_id_comma_delim_list.split(",");
+				var searchIdIntList = [];
+				for ( var index = 0; index < searchIdStringList.length; index++ ) {
+					var searchIdString = searchIdStringList[ index ];
+					var searchIdInt = parseInt( searchIdString, 10 );
+					searchIdIntList.push( searchIdInt );
+				}
+				
+				requestObj.searchIdList = searchIdIntList;
+			}
+		
+			var requestData = JSON.stringify( requestObj );
+			
 			var _URL = contextPathJSVar + "/services/sharePageShortenURL/createAndSaveShortenedURL";
 
 			$.ajax({
 				type: "POST",
 				url: _URL,
-				data: requestData,
+				data : requestData,
+				contentType: "application/json; charset=utf-8",
 				dataType: "json",
 				success: function( responseData )	{
 					try {

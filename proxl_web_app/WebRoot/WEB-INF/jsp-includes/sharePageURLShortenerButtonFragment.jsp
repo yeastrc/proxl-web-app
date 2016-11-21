@@ -4,6 +4,8 @@
 		This contains the "Share Page" Button
 
 	  This is used by the Javascript code in sharePageURLShortener.js
+	  
+	  Page variable "search_id_comma_delim_list" is set in Java class GetSearchDetailsData
 --%>
 
 
@@ -18,8 +20,8 @@
 		<input type="button" value="Share Page"
 			id="sharePageButton"
 			class=" tool_tip_attached_jq  "
-			data-tooltip="create a shortened link for accessing this page" 
-			data-search_id="${ searchId }"
+			data-tooltip="Create and share a link to this view of the data." 
+			data-search_id_comma_delim_list="${ search_id_comma_delim_list }"
 			onclick="sharePageURLShortener.sharePage( { clickedThis : this } )" />
 			
 	  </div>
