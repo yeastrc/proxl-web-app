@@ -12,7 +12,7 @@
 	<div class="footer-outer-container">
 	
 		<div class="footer-left-container">
-			<span class="ProXL-DB-text" >ProXL DB</span> - Protein Crosslinking Database
+			<span><img src="${ contextPath }/images/proxl-logo-footer-21px.png" ></span>
 		</div>
 		<div class="footer-right-container">
 			© 2016 University of Washington

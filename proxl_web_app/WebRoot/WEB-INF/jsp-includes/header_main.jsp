@@ -208,7 +208,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	  	
 	  </c:otherwise>
 	 </c:choose>
-		<img src="${ contextPath }/images/logo-small.png" >
+		<img src="${ contextPath }/images/proxl-logo-23px.png" >
 	 <c:choose>
 	  <c:when test="${ not empty headerUser }">
 	   </a>
