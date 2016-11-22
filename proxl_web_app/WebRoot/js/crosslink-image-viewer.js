@@ -3459,7 +3459,7 @@ function getColorForProteinBarRowIndexPosition( params ) {
 }
 
 /////////////////////////
-
+//  Must return an index or -1 to indicate no index
 function getColorIndexForProteinBarRowIndexPosition__SinglePosition( params ) {
 
 	var proteinBarRowIndex = params.proteinBarRowIndex;
@@ -3470,16 +3470,10 @@ function getColorIndexForProteinBarRowIndexPosition__SinglePosition( params ) {
 
 	var proteinBarsSelectedRegionsCounter = 0;
 	
-	var imageProteinBarDataEntryArray = _imageProteinBarDataManager.getAllItems();
-	
-	if ( proteinBarRowIndex >= imageProteinBarDataEntryArray.length ) {
+	//  Loop through the protein bars up to index proteinBarRowIndex, counting regions to get the color for that region
+	for ( var imageProteinBarDataEntryArrayIndex = 0; imageProteinBarDataEntryArrayIndex <= proteinBarRowIndex; imageProteinBarDataEntryArrayIndex++ ) {
 		
-		throw Error( "ERROR: in getColorForProteinBarRowIndexPosition__SinglePosition(...): proteinBarRowIndex >= imageProteinBarDataEntryArray.length " );
-	}
-	
-	for ( var imageProteinBarDataEntryArrayIndex = 0; imageProteinBarDataEntryArrayIndex < imageProteinBarDataEntryArray.length; imageProteinBarDataEntryArrayIndex++ ) {
-		
-		var imageProteinBarDataEntry = imageProteinBarDataEntryArray[ imageProteinBarDataEntryArrayIndex ];
+		var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( imageProteinBarDataEntryArrayIndex );
 		
 		if ( proteinBarRowIndex === imageProteinBarDataEntryArrayIndex ) {
 			
@@ -3520,6 +3514,10 @@ function getColorIndexForProteinBarRowIndexPosition__SinglePosition( params ) {
 			proteinBarsSelectedRegionsCounter += proteinBarHighlightedRegionCount;
 		}
 	}
+	
+	throw Error( "ERROR: in getColorForProteinBarRowIndexPosition__SinglePosition(...): at bottom of function without returning a value. " +
+			" proteinBarRowIndex: " + proteinBarRowIndex + ", singlePosition: " + singlePosition );
+
 }
 
 ////////////
@@ -3542,16 +3540,10 @@ function getColorForProteinBarRowIndexBlockPositions( params ) {
 			
 			var proteinBarsSelectedRegionsCounter = 0;
 			
-			var imageProteinBarDataEntryArray = _imageProteinBarDataManager.getAllItems();
-			
-			if ( proteinBarRowIndex >= imageProteinBarDataEntryArray.length ) {
-				
-				throw Error( "ERROR: in getColorForProteinBarRowIndexBlockPositions(...): proteinBarRowIndex >= imageProteinBarDataEntryArray.length " );
-			}
-			
-			for ( var imageProteinBarDataEntryArrayIndex = 0; imageProteinBarDataEntryArrayIndex < imageProteinBarDataEntryArray.length; imageProteinBarDataEntryArrayIndex++ ) {
-				
-				var imageProteinBarDataEntry = imageProteinBarDataEntryArray[ imageProteinBarDataEntryArrayIndex ];
+			//  Loop through the protein bars up to index proteinBarRowIndex, counting regions to get the color for that region
+			for ( var imageProteinBarDataEntryArrayIndex = 0; imageProteinBarDataEntryArrayIndex <= proteinBarRowIndex; imageProteinBarDataEntryArrayIndex++ ) {
+
+				var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( imageProteinBarDataEntryArrayIndex );
 				
 				if ( proteinBarRowIndex === imageProteinBarDataEntryArrayIndex ) {
 					
