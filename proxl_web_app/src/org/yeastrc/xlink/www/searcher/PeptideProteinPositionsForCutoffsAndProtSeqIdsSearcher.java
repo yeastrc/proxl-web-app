@@ -17,6 +17,8 @@ import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.protein_coverage.PeptideProteinPositionsForCutoffsAndProtSeqIdsResultItem;
+import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData;
+import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult;
 import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
@@ -85,7 +87,9 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 
 		List<PeptideProteinPositionsForCutoffsAndProtSeqIdsResultItem> resultList = new ArrayList<>();
 		
-		
+
+		int searchId = search.getId();
+
 		
 
 		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
@@ -123,59 +127,14 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 			psmCutoffsAnnotationTypeDTOList.add( searcherCutoffValuesAnnotationLevel.getAnnotationTypeDTO() );
 		}
 
+		//  Determine if can use PSM count at Default Cutoff
+		DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult defaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult =
+				DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.getInstance()
+				.defaultCutoffsExactlyMatchAnnTypeDataToSearchData( searchId, searcherCutoffValuesSearchLevel );
 		
-		
-		////////////
-		
-		//  All cutoffs are default?
-		
-		boolean onlyDefaultPeptideCutoffs = false;
-		
-		boolean onlyDefaultPsmCutoffs = false;
-		
-		
-		if ( ! peptideCutoffValuesList.isEmpty()  ) {
-
-			//   Check if any Peptide Cutoffs are default filters
+		boolean defaultCutoffsExactlyMatchAnnTypeDataToSearchData =
+				defaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult.isDefaultCutoffsExactlyMatchAnnTypeDataToSearchData();
 			
-			onlyDefaultPeptideCutoffs = true;
-
-
-			for ( SearcherCutoffValuesAnnotationLevel item : peptideCutoffValuesList ) {
-
-				if ( item.getAnnotationTypeDTO().getAnnotationTypeFilterableDTO() == null ) {
-
-					String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + item.getAnnotationTypeDTO().getId();
-					log.error( msg );
-					throw new Exception(msg);
-				}
-
-				if ( ! item.annotationValueMatchesDefault() ) {
-
-					//  Non-default filter value found so set to false
-
-					onlyDefaultPeptideCutoffs = false;
-					break;
-				}
-			}
-		}
-
-
-		if ( ! psmCutoffValuesList.isEmpty()  ) {
-
-			//   Check if all Psm Cutoffs are default values
-			
-			onlyDefaultPsmCutoffs = true;
-
-			for ( SearcherCutoffValuesAnnotationLevel item : psmCutoffValuesList ) {
-
-				if ( ! item.annotationValueMatchesDefault() ) {
-
-					onlyDefaultPsmCutoffs = false;
-					break;
-				}
-			}
-		}		
 		
 		//////////////////////////////////
 		
@@ -187,8 +146,6 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 		ResultSet rs = null;
 		
 		
-		int searchId = search.getId();
-
 		
 		//////////////////////
 		
@@ -212,7 +169,7 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 		
 		{
 			
-			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) ) ) {
+			if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) ) ) {
 
 
 				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
@@ -252,7 +209,7 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 		
 		{
 			
-			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) ) ) {
+			if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) ) ) {
 
 
 				//  Non-Default PSM cutoffs so have to query on the cutoffs
@@ -322,7 +279,7 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 
 		{
 			
-			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) ) ) {
+			if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) ) ) {
 
 
 				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
@@ -389,7 +346,7 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 
 		{
 
-			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) ) ) {
+			if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) ) ) {
 
 				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
 
@@ -475,7 +432,7 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 
 
 			{
-				if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) ) ) {
+				if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) ) ) {
 
 					
 					//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
@@ -506,7 +463,7 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 
 			{
 
-				if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) ) ) {
+				if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) ) ) {
 
 					
 					//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
@@ -542,7 +499,7 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 				int reportedPeptideId = rs.getInt( "reported_peptide_id" );
 				
 				if ( psmCutoffsAnnotationTypeDTOList.size() > 1 
-						&& ( ! onlyDefaultPsmCutoffs ) ) {
+						&& ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) ) {
 
 					Boolean foundAtLeastOnePSMForSearchReportedPeptideId = 
 							foundAtLeastOnePSMForSearchReportedPeptideIdMap.get( reportedPeptideId );

@@ -63,43 +63,6 @@ public class PsmWebDisplaySearcher {
 		List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesList = 
 				searcherCutoffValuesSearchLevel.getPsmPerAnnotationCutoffsList();
 
-
-
-		////////////
-		
-		//  All cutoffs are default?
-		
-//		boolean onlyDefaultPeptideCutoffs = true;
-		
-//		boolean onlyDefaultPsmCutoffs = true;
-		
-		
-		
-		//   Check if all Peptide Cutoffs are default values
-		
-//		for ( SearcherCutoffValuesAnnotationLevel item : peptideCutoffValuesList ) {
-//			
-//			if ( ! item.annotationValueMatchesDefault() ) {
-//				
-//				onlyDefaultPeptideCutoffs = false;
-//				break;
-//			}
-//		}
-
-		//   Check if all Psm Cutoffs are default values
-		
-//		for ( SearcherCutoffValuesAnnotationLevel item : psmCutoffValuesList ) {
-//			
-//			if ( ! item.annotationValueMatchesDefault() ) {
-//				
-//				onlyDefaultPsmCutoffs = false;
-//				break;
-//			}
-//		}
-		
-		
-		
-
 		StringBuilder sqlSB = new StringBuilder( 1000 );
 		
 
@@ -115,12 +78,6 @@ public class PsmWebDisplaySearcher {
 
 		{
 			
-//			if ( ! onlyDefaultPsmCutoffs ) { //  Can only use this if psm table or a lookup has a flag for "met default cutoffs"
-				
-				
-				// NOT CURRENTLY APPLY SINCE "if" just above commented out:     Non-Default PSM cutoffs so have to query on the cutoffs
-
-
 				//  Add inner join for each PSM cutoff
 
 				for ( int counter = 1; counter <= psmCutoffValuesList.size(); counter++ ) {
@@ -143,7 +100,6 @@ public class PsmWebDisplaySearcher {
 
 				}
 
-//			}
 		
 		}
 		
@@ -157,23 +113,6 @@ public class PsmWebDisplaySearcher {
 		// Process PSM Cutoffs for WHERE
 
 		{
-
-			
-//			if ( onlyDefaultPsmCutoffs ) {
-//				
-//				//   Only Default PSM Cutoffs chosen so criteria simply the Peptides where the PSM count for the default cutoffs is > zero
-//				
-//
-//				sqlSB.append( " AND " );
-//
-//
-//				sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff > 0 " );
-//
-//				
-//			} else {
-
-				
-				//  Non-Default PSM cutoffs so have to query on the cutoffs
 
 				int counter = 0; 
 
@@ -217,7 +156,7 @@ public class PsmWebDisplaySearcher {
 
 					sqlSB.append( " ) " );
 				}
-//			}
+
 		}
 		
 

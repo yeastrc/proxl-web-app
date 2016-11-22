@@ -80,42 +80,6 @@ public class PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher {
 				searcherCutoffValuesSearchLevel.getPsmPerAnnotationCutoffsList();
 
 
-		
-//
-//		////////////
-//		
-//		//  All cutoffs are default?
-//		
-////		boolean onlyDefaultPeptideCutoffs = true;
-//		
-//		boolean onlyDefaultPsmCutoffs = true;
-//		
-//		
-//		
-//		//   Check if all Peptide Cutoffs are default values
-//		
-////		for ( SearcherCutoffValuesAnnotationLevel item : peptideCutoffValuesList ) {
-////			
-////			if ( ! item.annotationValueMatchesDefault() ) {
-////				
-////				onlyDefaultPeptideCutoffs = false;
-////				break;
-////			}
-////		}
-//
-//		//   Check if all Psm Cutoffs are default values
-//		
-//		for ( SearcherCutoffValuesAnnotationLevel item : psmCutoffValuesList ) {
-//			
-//			if ( ! item.annotationValueMatchesDefault() ) {
-//				
-//				onlyDefaultPsmCutoffs = false;
-//				break;
-//			}
-//		}
-		
-		
-
 		//////////////////////
 		
 		/////   Start building the SQL

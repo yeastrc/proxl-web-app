@@ -21,6 +21,8 @@ import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
+import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData;
+import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePage;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePageWrapper;
 
@@ -99,45 +101,22 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 		for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesAnnotationLevel : psmCutoffValuesList ) {
 			psmCutoffsAnnotationTypeDTOList.add( searcherCutoffValuesAnnotationLevel.getAnnotationTypeDTO() );
 		}
-		
-		////////////
-		//  All cutoffs are default?
-		boolean onlyDefaultPeptideCutoffs = false;
-		boolean onlyDefaultPsmCutoffs = false;
-		if ( ! peptideCutoffValuesList.isEmpty()  ) {
-			//   Check if any Peptide Cutoffs are default filters
-			onlyDefaultPeptideCutoffs = true;
-			for ( SearcherCutoffValuesAnnotationLevel item : peptideCutoffValuesList ) {
-				if ( item.getAnnotationTypeDTO().getAnnotationTypeFilterableDTO() == null ) {
-					String msg = "ERROR: Annotation type data must contain Filterable DTO data.  Annotation type id: " + item.getAnnotationTypeDTO().getId();
-					log.error( msg );
-					throw new Exception(msg);
-				}
-				if ( ! item.annotationValueMatchesDefault() ) {
-					//  Non-default filter value found so set to false
-					onlyDefaultPeptideCutoffs = false;
-					break;
-				}
-			}
-		}
-		if ( ! psmCutoffValuesList.isEmpty()  ) {
-			//   Check if all Psm Cutoffs are default values
-			onlyDefaultPsmCutoffs = true;
-			for ( SearcherCutoffValuesAnnotationLevel item : psmCutoffValuesList ) {
-				if ( ! item.annotationValueMatchesDefault() ) {
-					onlyDefaultPsmCutoffs = false;
-					break;
-				}
-			}
-		}		
 
+		//  Determine if can use PSM count at Default Cutoff
+		DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult defaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult =
+				DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.getInstance()
+				.defaultCutoffsExactlyMatchAnnTypeDataToSearchData( searchId, searcherCutoffValuesSearchLevel );
+		
+		boolean defaultCutoffsExactlyMatchAnnTypeDataToSearchData =
+				defaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult.isDefaultCutoffsExactlyMatchAnnTypeDataToSearchData();
+		
 		//////////////////////
 		/////   Start building the SQL
 		StringBuilder sqlSB = new StringBuilder( 1000 );
 		sqlSB.append( SQL_FIRST_PART );
 		///////   Add fields to result from best PSM annotation values
 		{
-			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
+			if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) )
 					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
 				//  Add Field retrieval for each PSM cutoff
@@ -163,7 +142,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 		}
 		sqlSB.append( SQL_FROM_PART );
 		{
-			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
+			if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) )
 					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
 				//  Add inner join for each PSM cutoff
@@ -185,7 +164,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 			}
 		}
 		{
-			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
+			if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) )
 					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
 				//  Add inner join for each Peptide cutoff
@@ -211,7 +190,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 		//////////
 		// Process PSM Cutoffs for WHERE
 		{
-			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
+			if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) )
 					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
 				int counter = 0; 
@@ -249,7 +228,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 		}
 		//  Process Peptide Cutoffs for WHERE
 		{
-			if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
+			if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) )
 					|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
 				int counter = 0; 
@@ -304,7 +283,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 			pstmt.setInt( paramCounter, reportedPeptideId );
 			// Process PSM Cutoffs for WHERE
 			{
-				if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
+				if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) )
 						|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 					//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
 					for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesPsmAnnotationLevel : psmCutoffValuesList ) {
@@ -320,7 +299,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 			}
 			// Process Peptide Cutoffs for WHERE
 			{
-				if ( ( ( ! onlyDefaultPsmCutoffs ) || ( ! onlyDefaultPeptideCutoffs ) )
+				if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) )
 						|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 					//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
 					for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesReportedPeptideAnnotationLevel : peptideCutoffValuesList ) {
@@ -354,7 +333,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 //				int reportedPeptideId = rs.getInt( "reported_peptide_id" );
 				reportedPeptideData.setReportedPeptide ( ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( reportedPeptideId ) );
 				//  These counts are only valid for PSM and Peptide at default cutoffs
-				if ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs ) {
+				if ( defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) {
 					//  associated PSM data
 					int numPsmsForDefaultCutoffs = rs.getInt( "psm_num_at_default_cutoff" );
 					if ( ! rs.wasNull() ) {
@@ -373,7 +352,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 						continue;  //  EARY LOOP ENTRY EXIT
 					}
 				}
-				if ( ( onlyDefaultPsmCutoffs && onlyDefaultPeptideCutoffs )
+				if ( ( defaultCutoffsExactlyMatchAnnTypeDataToSearchData )
 					&& ( USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 				} else {
 					//  Get PSM best values from DB query, since psm best value table was joined
