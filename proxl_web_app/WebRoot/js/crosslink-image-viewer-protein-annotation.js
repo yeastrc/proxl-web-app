@@ -366,7 +366,6 @@ ProteinAnnotationStore.prototype._loadProteinAnnotationData__Common = function( 
 //	proteinSequences : _proteinSequences,
 //	proteinTaxonomyIds : _proteinTaxonomyIds,
 //	proteinNames : _proteinNames,
-//	proteinLengths : _proteinLengths
 //},
 	
 	
@@ -491,7 +490,6 @@ ProteinAnnotationStore.prototype._submit_Common_ForProteinId = function( params 
 //	proteinSequences : _proteinSequences,
 //	proteinTaxonomyIds : _proteinTaxonomyIds,
 //	proteinNames : _proteinNames,
-//	proteinLengths : _proteinLengths
 //},
 	
 	
@@ -635,7 +633,6 @@ ProteinAnnotationStore.prototype._process_submit_Common_ForProteinId_Response = 
 //	proteinSequences : _proteinSequences,
 //	proteinTaxonomyIds : _proteinTaxonomyIds,
 //	proteinNames : _proteinNames,
-//	proteinLengths : _proteinLengths
 //},
 	
 	
@@ -771,8 +768,7 @@ ProteinAnnotationStore.prototype._get_AnnotationData_Common_ForProteinId = funct
 //	
 //	proteinSequences : _proteinSequences,
 //	proteinTaxonomyIds : _proteinTaxonomyIds,
-//	proteinNames : _proteinNames,
-//	proteinLengths : _proteinLengths
+//	proteinNames : _proteinNames
 //},
 	
 	
@@ -947,7 +943,6 @@ ProteinAnnotationStore.prototype._get_AnnotationData_Common_ForProteinId_Respons
 //	proteinSequences : _proteinSequences,
 //	proteinTaxonomyIds : _proteinTaxonomyIds,
 //	proteinNames : _proteinNames,
-//	proteinLengths : _proteinLengths
 //},
 
 	var annotationTypeData = this.getAnnotationDataForKey( annotationDataKey );

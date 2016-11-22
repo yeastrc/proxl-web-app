@@ -16,15 +16,6 @@ public class ImageViewerData {
 	public void setProteins(Collection<Integer> proteins) {
 		this.proteins = proteins;
 	}
-
-	public Map<Integer, Integer> getProteinLengths() {
-		return proteinLengths;
-	}
-
-	public void setProteinLengths(Map<Integer, Integer> proteinLengths) {
-		this.proteinLengths = proteinLengths;
-	}
-
 	public Map<Integer, String> getProteinNames() {
 		return proteinNames;
 	}
@@ -187,7 +178,6 @@ public class ImageViewerData {
 	private Collection<Integer> excludeType;
 	private Collection<Integer> proteins;
 	private Collection<SearchDTO> searches;
-	private Map<Integer, Integer> proteinLengths;
 	private Map<Integer, String> proteinNames;
 	private Map<Integer, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>> proteinLinkPositions;
 	private Map<Integer, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>> proteinLoopLinkPositions;

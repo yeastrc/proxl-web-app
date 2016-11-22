@@ -645,11 +645,9 @@ public class ViewerProteinDataService {
 			ivd.setLinkablePositions( proteinIdslinkablePositionsMap ); 
 
 			// guild maps of protein lengths and protein names for the found proteins
-			Map<Integer, Integer> proteinLengths = new HashMap<Integer, Integer>();
 			Map<Integer, String> proteinNames = new HashMap<Integer, String>();
 
 			for( MergedSearchProtein mp : proteins ) {
-				proteinLengths.put( mp.getProteinSequenceObject().getProteinSequenceId(), mp.getProteinSequenceObject().getSequence().length() );
 				proteinNames.put( mp.getProteinSequenceObject().getProteinSequenceId(), mp.getName() );
 			}
 
@@ -678,7 +676,6 @@ public class ViewerProteinDataService {
 				proteinSequenceIdsSortedOnProteinNameList.add( proteinSequenceIdProteinName.proteinSequenceId );
 			}
 			
-			ivd.setProteinLengths( proteinLengths );
 			ivd.setProteinNames( proteinNames );
 			ivd.setProteins( proteinSequenceIdsSortedOnProteinNameList );
 

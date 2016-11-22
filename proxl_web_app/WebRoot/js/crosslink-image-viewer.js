@@ -358,6 +358,23 @@ var _proteinSequenceTrypsinCutPoints = {};
 
 var _proteinTaxonomyIds = {};
 var _proteinLengths;
+
+var _proteinLengths = {
+		
+		_proteinLengthsInternal : {},
+		
+		getProteinLength : function( proteinSequenceIdString ) {
+			var proteinLength = this._proteinLengthsInternal[ proteinSequenceIdString ];
+			if ( proteinLength === undefined ) {
+				throw Error( "proteinLength not found in _proteinLengths._proteinLengthsInternal for proteinSequenceIdString: " + proteinSequenceIdString );
+			}
+			return proteinLength;
+		},
+		setProteinLength : function( proteinSequenceIdString, proteinLength ) {
+			this._proteinLengthsInternal[ proteinSequenceIdString ] = proteinLength;
+		}
+}
+
 var _proteinNames;
 var _proteinLinkPositions;
 var _proteinLooplinkPositions;
@@ -490,7 +507,7 @@ function getCurrentRightmostProteinEdge( ) {
 		var protein = prots[ i ];
 		
 		var proteinOffsetFromLeftEdge = getProteinOffset( { proteinBarIndex : i } ) + _proteinBarsLeftEdge;
-		var lengthOfProteinSequence = _proteinLengths[ protein ];
+		var lengthOfProteinSequence = _proteinLengths.getProteinLength( protein );
 		var widthOfProtein = lengthOfProteinSequence * multiplier; 
 		var rightEdgeOfProtein = proteinOffsetFromLeftEdge + widthOfProtein;
 		
@@ -1118,6 +1135,7 @@ function loadProteinSequenceDataForProtein( proteinIdsToGetSequence, doDraw ) {
 	        			var proteinId = returnedProteinIdsAndSequences_Keys[ keysIndex ];
 
 	        			_proteinSequences[ proteinId ] = returnedProteinIdsAndSequences[ proteinId ];
+	        			_proteinLengths.setProteinLength( proteinId, returnedProteinIdsAndSequences[ proteinId ].length )
 	        		}
 
 	        		decrementSpinner();
@@ -1894,8 +1912,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 				
 				proteinSequences : _proteinSequences,
 				proteinTaxonomyIds : _proteinTaxonomyIds,
-				proteinNames : _proteinNames,
-				proteinLengths : _proteinLengths
+				proteinNames : _proteinNames
 			},
 
 			functionCallbacks : functionCallbacks,
@@ -1977,9 +1994,6 @@ function loadDataFromService() {
 
 	        		// handle proteins
 	        		_proteins = data.proteins;
-
-	        		// handle protein lengths
-	        		_proteinLengths = data.proteinLengths;
 
 	        		// handle protein names
 	        		_proteinNames = data.proteinNames;
@@ -4093,7 +4107,8 @@ function precomputeMultiplierAndOtherValuesForSVG( svgRootSnapSVGObject, selecte
 	
 	for ( var i = 0; i < selectedProteins.length; i++ ) {
 		
-		var proteinLength = _proteinLengths[ selectedProteins[ i ] ];
+		var proteinSequenceId = selectedProteins[ i ];
+		var proteinLength = _proteinLengths.getProteinLength( proteinSequenceId );
 		
 		if ( proteinLength > maxProteinLength ) { 
 		
@@ -4644,7 +4659,7 @@ function drawDisopred_3_AnnotationData( selectedProteins, svgRootSnapSVGObject )
 			
 			//  Disopred likely Failed so display failed 
 			
-			var proteinLength = _proteinLengths[ protein ];
+			var proteinLength = _proteinLengths.getProteinLength( protein );
 			
 			var drawAnnotationRectangle_Params = {
 
@@ -4776,7 +4791,7 @@ function drawPsipred_3_AnnotationData( selectedProteins, svgRootSnapSVGObject ) 
 			
 			//  Secondary Structure likely Failed so display failed 
 			
-			var proteinLength = _proteinLengths[ protein ];
+			var proteinLength = _proteinLengths.getProteinLength( protein );
 			
 			var drawAnnotationRectangle_Params = {
 
@@ -6925,7 +6940,7 @@ function translateAnnotationRectanglePositionToXCoordinate( protein, proteinBarR
 function translateProteinWidthToPixelWidth( protein ) {
 	
 	var m = getMultiplier();
-	var l = _proteinLengths[ protein ];
+	var l = _proteinLengths.getProteinLength( protein );
 	
 	return m * l;
 }
