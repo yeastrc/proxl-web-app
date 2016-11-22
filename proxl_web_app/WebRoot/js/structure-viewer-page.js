@@ -64,7 +64,6 @@ var _linkColorHandler = new LinkColorHandler();
 
 var _proteins;
 var _proteinSequences = { };
-var _proteinLengths;
 var _proteinNames;
 var _proteinLinkPositions;
 var _proteinLooplinkPositions;
