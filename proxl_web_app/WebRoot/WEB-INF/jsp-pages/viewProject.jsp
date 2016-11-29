@@ -2624,7 +2624,8 @@
 						</tr>	
 														
 					</table>
-
+					
+					<div style="margin-bottom: 15px;">
 						<span id="svg-download">
 							<a id="download_as_link"
 									data-tooltip="Download current image as file." style="font-size:10pt;white-space:nowrap;" 
@@ -2638,13 +2639,15 @@
 								<a data-tooltip="Download as scalable vector graphics file suitable for use in Inkscape or other compatible software." id="psm_count-svg-download-svg" class="svg-download-option tool_tip_attached_jq" href="javascript:">SVG</a>
 							</span>
 						</span>			
-					
-					<div style="clear: both; " >
-					
-					
-					
+						
+						<a href="javascript:" id="psm_count-svg-download-data"
+							data-tooltip="Download current data as tab limited text." style="font-size:10pt;white-space:nowrap;" 
+							href="#" class="tool_tip_attached_jq download-svg">[Download Data]</a>
+						
 					</div>
-					
+
+					<div style="clear: both; " >
+					</div>
 					
 					<h1 class="psm_count_vs_score_qc_plot_no_data_jq" 
 						style="display: none;  ">
@@ -2858,7 +2861,7 @@
   google.setOnLoadCallback(googleOnLoadCallbackFunction);
 </script>		
 
-	
+			<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
 			<script type="text/javascript" src="${ contextPath }/js/qcChartsViewProjectPage.js?x=${cacheBustValue}"></script>
 			<script type="text/javascript" src="${ contextPath }/js/qcChartPSMCountsVsScore.js?x=${cacheBustValue}"></script>
 	
