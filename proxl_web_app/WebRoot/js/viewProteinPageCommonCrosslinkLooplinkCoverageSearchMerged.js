@@ -61,11 +61,39 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 			throw Error( "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + _query_json_field_String );
 		}
 		
-		cutoffProcessingCommonCode.putCutoffsOnThePage( { cutoffs : _query_json_field_Contents.cutoffs } );
+		if ( window.cutoffProcessingCommonCode ) {
+			cutoffProcessingCommonCode.putCutoffsOnThePage( { cutoffs : _query_json_field_Contents.cutoffs } );
+		} else {
+			//  webserviceDataParamsDistributionCommonCode not on page yet so delay the call
+			$(document).ready(function() { 
+				setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+					try {
+						cutoffProcessingCommonCode.putCutoffsOnThePage( { cutoffs : _query_json_field_Contents.cutoffs } );
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				},10);
+			}); // end $(document).ready(function()
+		}
 		
 		//  Pass cutoffs and ann type display to all JS that call web services to get data (IE PSMs)
-		webserviceDataParamsDistributionCommonCode.paramsForDistribution( _query_json_field_Contents  )
-
+		if ( window.webserviceDataParamsDistributionCommonCode ) {
+			webserviceDataParamsDistributionCommonCode.paramsForDistribution( _query_json_field_Contents  );
+		} else {
+			//  webserviceDataParamsDistributionCommonCode not on page yet so delay the call
+			$(document).ready(function() { 
+				setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+					try {
+						webserviceDataParamsDistributionCommonCode.paramsForDistribution( _query_json_field_Contents  );
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				},10);
+			}); // end $(document).ready(function()
+		}
+		
 		//  Mark check boxes for chosen links to exclude:  "no unique peptides", "only one PSM", "only one peptide"
 		if ( _query_json_field_Contents.filterNonUniquePeptides ) {
 			$("#filterNonUniquePeptides").prop('checked', true);
