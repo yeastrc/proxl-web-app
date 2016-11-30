@@ -418,7 +418,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 
 		
 		var startAngle = this.getAngleForProteinPosition( i, 1 );
-		var endAngle = this.getAngleForProteinPosition( i, _proteinLengths[ proteinId ] );
+		var endAngle = this.getAngleForProteinPosition( i, _proteinLengths.getProteinLength( proteinId ) );
 		
 		var color = _colorManager.getColorForUIDAnnotation( uid );
 		
@@ -491,9 +491,11 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 		group.add( path );
 		
 		
+		var proteinLengthForProteinId = _proteinLengths.getProteinLength( proteinId );
 
+		
 		// draw interval ticks
-		for( var k = factor; k < _proteinLengths[ proteinId ]; k += factor ) {
+		for( var k = factor; k < proteinLengthForProteinId; k += factor ) {
 			
 			var angle = startAngle + ( k * degreesPerResidue ) - degreesPerResidue;
 			
@@ -521,7 +523,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 		radius = this.radius;
 		radius -= this.CONSTANTS._SCALE_BAR_FONT_HEIGHT;
 		
-		for( var k = factor; k < _proteinLengths[ proteinId ]; k += factor * 2 ) {
+		for( var k = factor; k < proteinLengthForProteinId; k += factor * 2 ) {
 			
 			// create the path on which we are drawing our label
 			
@@ -1031,7 +1033,7 @@ circlePlotViewer.prototype.getCrosslinkTerminus = function( proteinIndex, positi
 	
 	var totalProteinLength = 0;
 	for( var i = 0; i < selectedProteins.length; i++ ) {
-		totalProteinLength += _proteinLengths[ selectedProteins[ i ] ];
+		totalProteinLength += _proteinLengths.getProteinLength( selectedProteins[ i ] );
 	}
 	
 	// number of degrees per protein residue
@@ -1053,7 +1055,7 @@ circlePlotViewer.prototype.getCrosslinkTerminus = function( proteinIndex, positi
 			 
 
 		} else {
-			var totalLengthProportion = _proteinLengths[ selectedProteins[ i ] ] / totalProteinLength;
+			var totalLengthProportion = _proteinLengths.getProteinLength( selectedProteins[ i ] ) / totalProteinLength;
 			var rotationDegrees = workingDegrees * totalLengthProportion;
 			currentStartDegrees += this.CONSTANTS._GAP_BETWEEN_BARS + rotationDegrees;
 		}
@@ -1076,7 +1078,7 @@ circlePlotViewer.prototype.getAngleForProteinPosition = function( proteinIndex, 
 	
 	var totalProteinLength = 0;
 	for( var i = 0; i < selectedProteins.length; i++ ) {
-		totalProteinLength += _proteinLengths[ selectedProteins[ i ] ];
+		totalProteinLength += _proteinLengths.getProteinLength( selectedProteins[ i ] );
 	}
 	
 	// number of degrees per protein residue
@@ -1093,7 +1095,7 @@ circlePlotViewer.prototype.getAngleForProteinPosition = function( proteinIndex, 
 			return degrees;
 
 		} else {
-			var totalLengthProportion = _proteinLengths[ selectedProteins[ i ] ] / totalProteinLength;
+			var totalLengthProportion = _proteinLengths.getProteinLength( selectedProteins[ i ] ) / totalProteinLength;
 			var rotationDegrees = workingDegrees * totalLengthProportion;
 			currentStartDegrees += this.CONSTANTS._GAP_BETWEEN_BARS + rotationDegrees;
 		}
@@ -1115,7 +1117,7 @@ circlePlotViewer.prototype.drawProteinBars = function( svgRootSnapSVGObject, isT
 	
 	var totalProteinLength = 0;
 	for( var i = 0; i < selectedProteins.length; i++ ) {
-		totalProteinLength += _proteinLengths[ selectedProteins[ i ].pid ];
+		totalProteinLength += _proteinLengths.getProteinLength( selectedProteins[ i ].pid );
 	}
 	
 	var currentStartDegrees = 0;
@@ -1123,7 +1125,7 @@ circlePlotViewer.prototype.drawProteinBars = function( svgRootSnapSVGObject, isT
 		var pid = selectedProteins[ i ].pid;		// protein sequence id
 		var uid = selectedProteins[ i ].uid;		// unique id
 		
-		var totalLengthProportion = _proteinLengths[ pid ] / totalProteinLength;
+		var totalLengthProportion = _proteinLengths.getProteinLength( pid ) / totalProteinLength;
 		var rotationDegrees = workingDegrees * totalLengthProportion;
 		var barEntry = _imageProteinBarDataManager.getItemByUID( uid );
 		
@@ -1934,7 +1936,7 @@ circlePlotViewer.prototype.getDegreesPerResidue = function() {
 	
 	var totalProteinLength = 0;
 	for( var i = 0; i < selectedProteins.length; i++ ) {
-		totalProteinLength += _proteinLengths[ selectedProteins[ i ] ];
+		totalProteinLength += _proteinLengths.getProteinLength( selectedProteins[ i ] );
 	}
 	
 	// number of degrees per protein residue

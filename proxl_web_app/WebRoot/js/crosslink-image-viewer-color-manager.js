@@ -384,7 +384,7 @@ ColorManager.PrettyTheme.prototype.getColorForUID = function( uid ) {
 				
 				region.uid = uid;
 				region.start = 1;
-				region.end = _proteinLengths[ _indexManager.getProteinIdForUID( uid ) ];
+				region.end = _proteinLengths.getProteinLength( _indexManager.getProteinIdForUID( uid ) );
 				
 				return this.getColorForRegion( region );				
 				
@@ -662,7 +662,7 @@ ColorManager.getRegionForUIDAndPosition = function( uid, position ) {
 		
 		region.uid = uid;
 		region.start = 1;
-		region.end = _proteinLengths[ _indexManager.getProteinIdForUID( uid ) ];
+		region.end = _proteinLengths.getProteinLength( _indexManager.getProteinIdForUID( uid ) );
 			
 		return region;
 	}
@@ -679,7 +679,7 @@ ColorManager.getRegionForUIDAndPosition = function( uid, position ) {
 			
 		region.uid = uid;
 		region.start = 1;
-		region.end = _proteinLengths[ _indexManager.getProteinIdForUID( uid ) ];
+		region.end = _proteinLengths.getProteinLength( _indexManager.getProteinIdForUID( uid ) );
 			
 		return region;
 	}
@@ -764,7 +764,7 @@ ColorManager.getAllRegions = function() {
 			
 			region.uid = uid;
 			region.start = 1;
-			region.end = _proteinLengths[ pid ];
+			region.end = _proteinLengths.getProteinLength( pid );
 			
 			if( !region.end ) {
 				throw Error( "Unable to find protein length for protein: " + pid );
@@ -791,7 +791,7 @@ ColorManager.getAllRegions = function() {
 				
 				region.uid = uid;
 				region.start = 1;
-				region.end = _proteinLengths[ pid ];
+				region.end = _proteinLengths.getProteinLength( pid );
 				
 				if( !region.end ) {
 					throw Error( "Unable to find protein length for protein: " + pid );
@@ -961,24 +961,17 @@ ColorManager.validateLink = function( link ) {
 		if( typeof link.position1 !== "number" ) {
 			throw Error( "position1 must be a number" );
 		} else {
-			if( link.position1 < 1 || link.position1 > _proteinLengths[ _indexManager.getProteinIdForUID( link.uid1 ) ] ) {
-				throw Error( "position 1 is not in the valid range for uid (1-" + _proteinLengths[ _indexManager.getProteinIdForUID( link.uid1 ) ] + ")" );
+			var uidForPosition1 = link.uid1;
+			var proteinIdForPosition1 = _indexManager.getProteinIdForUID( uidForPosition1 );
+			var proteinLengthForPosition1 = _proteinLengths.getProteinLength( proteinIdForPosition1 );
+			if( link.position1 < 1 || link.position1 > proteinLengthForPosition1 ) {
+				throw Error( "position 1 is not in the valid range for uid (1-" + 
+						proteinLengthForPosition1 + "), uid: " + uidForPosition1 );
 			}
 		}
 	}
 	
 	if( link.type === "crosslink" || link.type ==="looplink" ) {
-		if( !link.hasOwnProperty( "position2" ) ) {
-			throw Error( "position2 does not exist." );
-		} else {
-			if( typeof link.position2 !== "number" ) {
-				throw Error( "position2 must be a number" );
-			} else {
-				if( link.position2 < 1 || link.position2 > _proteinLengths[ _indexManager.getProteinIdForUID( link.uid2 ) ] ) {
-					throw Error( "position 2 is not in the valid range for uid (1-" + _proteinLengths[ _indexManager.getProteinIdForUID( link.uid2 ) ] + ")" );
-				}
-			}
-		}
 		
 		if( link.type === "crosslink" && !link.hasOwnProperty( "uid2" ) ) {
 			throw Error( "uid2 does not exist." );
@@ -986,12 +979,30 @@ ColorManager.validateLink = function( link ) {
 			if( !_indexManager.containsUID( link.uid2 ) ) {
 				throw Error( "invalid uid2 sent: " + link.uid2 );
 			}
-			
 			if( !_imageProteinBarDataManager.getItemByUID( link.uid2 ) ) {
 				throw Error( "no protein bar data for uid2: " + link.uid2 );
 			}
-			
 		}
+		
+		if( !link.hasOwnProperty( "position2" ) ) {
+			throw Error( "position2 does not exist." );
+		} else {
+			if( typeof link.position2 !== "number" ) {
+				throw Error( "position2 must be a number" );
+			} else {
+				var uidForPosition2 = link.uid2; //  uid for position 2 for crosslink
+				if ( link.type ==="looplink" && uidForPosition2 === undefined ) {
+					uidForPosition2 = link.uid1; //  uid for position 2 for looplink
+				}
+				var proteinIdForPosition2 = _indexManager.getProteinIdForUID( uidForPosition2 );
+				var proteinLengthForPosition2 = _proteinLengths.getProteinLength( proteinIdForPosition2 );
+				if( link.position2 < 1 || link.position2 > proteinLengthForPosition2 ) {
+					throw Error( "position 2 is not in the valid range for uid (1-" + 
+							proteinLengthForPosition2 + "), uid: " + uidForPosition2 );
+				}
+			}
+		}
+
 	}
 }
 

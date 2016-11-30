@@ -760,7 +760,7 @@ ImageProteinBarData.prototype.getProteinId = function() {
 };
 
 ImageProteinBarData.prototype.getProteinLength = function() {
-	return _proteinLengths[ this.getProteinId() ];
+	return _proteinLengths.getProteinLength( this.getProteinId() );
 };
 
 
