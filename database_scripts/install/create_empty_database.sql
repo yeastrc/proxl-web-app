@@ -1,3 +1,5 @@
+-- MySQL Workbench Forward Engineering
+
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
@@ -587,6 +589,8 @@ ENGINE = InnoDB;
 CREATE UNIQUE INDEX start_scan_number ON scan (start_scan_number ASC, scan_file_id ASC);
 
 CREATE INDEX fk_scan_scan_file_id_idx ON scan (scan_file_id ASC);
+
+CREATE INDEX precursor_scan_id_idx ON scan (precursor_scan_id ASC);
 
 
 -- -----------------------------------------------------
@@ -1974,4 +1978,3 @@ CREATE INDEX default_page_view_search_id_fk_idx ON url_shortener_associated_sear
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
