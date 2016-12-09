@@ -868,6 +868,168 @@ function loadCrosslinkData( doDraw ) {
 
 }
 
+function collateAndDownloadDetailedUDRReport( data ) {
+
+	var reportText = "";
+	
+	/*
+	 * Create the header of the report
+	 */
+	reportText = "link type\tprotein 1\tposition 1\tprotein 2\tposition 2\tdistance\tnum PSMs\tnumPeptides\tunique peptides\t";
+	
+	for( var i = 0; i < data[ "bestPSMValuesNames" ].length; i++ ) {
+		if( i != 0 ) { reportText += "\t"; }
+		
+		reportText += "best PSM " + data[ "bestPSMValuesNames" ][ i ];
+	}
+
+	if( data[ "bestPeptideValuesNames" ] ) {
+		for( var i = 0; i < data[ "bestPeptideValuesNames" ].length; i++ ) {			
+			reportText += "\tbest peptide " + data[ "bestPeptideValuesNames" ][ i ];
+		}
+	}
+	
+	reportText += "\n";
+	
+	/*
+	 * Create the report itself, by iterating over all UDRs and only printing those that are currently
+	 * visible on the structure.
+	 */
+	var udrLength = data[ 'udrItemList' ].length;
+	console.log( udrLength );
+	for( var i = 0; i < udrLength; i++ ) {
+		var udrItem = data[ 'udrItemList' ][ i ];
+				
+		var link = getRenderedLink( udrItem.linkType, udrItem.proteinSeqId_1, udrItem.proteinPos_1, udrItem.proteinSeqId_2, udrItem.proteinPos_2 );
+		
+		// not a rendered link, skip it.
+		if( !link ) { continue; }
+		
+		reportText += udrItem.linkType + "\t";
+		reportText += _proteinNames[ link[ 'protein1' ]  ] + "\t";
+		reportText += link[ 'position1' ] + "\t";
+		
+		if( udrItem.linkType === "crosslink" ) {
+			reportText += _proteinNames[ link[ 'protein2' ]  ] + "\t";
+		} else {
+			reportText += "\t";
+		}
+		reportText += link[ 'position2' ] + "\t";
+		reportText += link.length + "\t";
+		reportText += udrItem.numPSMs + "\t";
+		reportText += udrItem.numPeptides + "\t";
+		reportText += udrItem.numUniquePeptides + "\t";
+
+		for( var k = 0; k < udrItem[ 'bestPSMValues' ].length; k++ ) {
+			if( k != 0 ) { reportText += "\t"; }
+
+			reportText += udrItem[ 'bestPSMValues' ][ k ] + "\t";
+		}
+		
+		if( udrItem[ 'bestPeptideValues' ] ) {
+			for( var k = 0; k < udrItem[ 'bestPeptideValues' ].length; k++ ) {
+				reportText += "\t" + udrItem[ 'bestPeptideValues' ][ k ];
+			}
+		}
+		
+		reportText += "\n";		
+	}
+	
+	downloadStringAsFile( "detailed-udr-report.txt", "text/plain", reportText );
+
+}
+
+function getRenderedLink( type, protein1, position1, protein2, position2 ) {
+		
+	if( type === "crosslink" ) {
+		if (!_renderedLinks[ 'crosslinks' ] || _renderedLinks[ 'crosslinks' ].length === 0 ) { return null; }
+		
+		for( var i = 0; i < _renderedLinks[ 'crosslinks' ].length; i++ ) {
+			var link = _renderedLinks[ 'crosslinks' ][ i ][ 'link' ];
+
+			if( link.protein1 == protein1 && link.protein2 == protein2 &&
+				link.position1 == position1 && link.position2 == position2 ) {
+				
+				return link;
+			}
+
+			if( link.protein1 == protein2 && link.protein2 == protein1 &&
+					link.position1 == position2 && link.position2 == position1 ) {
+					
+					return link;
+			}
+		
+		}
+	}
+	
+	
+	if( type === "looplink" ) {
+		if (!_renderedLinks[ 'looplinks' ] || _renderedLinks[ 'looplinks' ].length === 0 ) { return null; }
+		
+		for( var i = 0; i < _renderedLinks[ 'looplinks' ].length; i++ ) {
+			var link = _renderedLinks[ 'looplinks' ][ i ][ 'link' ];
+
+			if( link.protein1 == protein1 &&
+				link.position1 == position1 && link.position2 == position2 ) {
+				
+				return link;
+			}
+
+		
+			if( link.protein1 == protein1 &&
+					link.position1 == position2 && link.position2 == position2 ) {
+					
+					return link;
+			}
+		}
+	}
+	
+	// nothing was found
+	return null;	
+}
+
+function loadDetailedUDRData() {
+	
+	console.log( "Loading detailed UDR data." );
+	
+			incrementSpinner();				// create spinner
+			
+			var url = contextPathJSVar + "/services/imageViewer/getUDRData";
+			url += buildQueryStringFromHash();
+			
+			 $.ajax({
+			        type: "GET",
+			        url: url,
+			        dataType: "json",
+			        success: function(data)	{
+				        
+			        	try {
+			        
+			        		_linkPSMCounts.crosslink = data.crosslinkPSMCounts;
+			        		decrementSpinner();
+
+			        		console.log( data );
+			        		
+			        		collateAndDownloadDetailedUDRReport( data );
+			        		
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
+			        	}
+ 	
+			        },
+			        failure: function(errMsg) {
+						decrementSpinner();
+			        	handleAJAXFailure( errMsg );
+			        },
+					error: function(jqXHR, textStatus, errorThrown) {	
+							decrementSpinner();
+							handleAJAXError( jqXHR, textStatus, errorThrown );
+					}
+			  });
+
+}
+
 function loadCrosslinkPSMCounts( doDraw ) {
 	
 	console.log( "Loading crosslink PSM counts." );
@@ -2673,7 +2835,13 @@ var redrawDistanceReport = function( ) {
 	html += "</div>";
 	
 	html += "<div style=\"font-size:14pt;margin-top:15px;\">Download reports:</div>";
-	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadShownUDRLinks()\">All shown UDRs</a></div>";
+	
+	if( _searchIds.length === 1 ) {
+		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:loadDetailedUDRData()\">All shown UDRs</a></div>";
+	} else {
+		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadShownUDRLinks()\">All shown UDRs</a></div>";
+	}
+	
 	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadAllLinkablePositions(0)\">All possible UDRs (all possible points on structure)</a></div>";
 	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadAllLinkablePositions(1)\">All possible UDRs (shortest-only)</a></div>";
 	
