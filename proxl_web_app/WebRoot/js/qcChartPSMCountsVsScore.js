@@ -231,7 +231,7 @@ QCChartPSMCountVsScores.prototype.downloadData = function( ) {
 			processForType( { dataForType: crosslinkChartData, linkTypeLabel: "crosslink" }  );
 		}
 		if ( looplinkChartData ) {
-			processForType( { dataForType: looplinkChartData, linkTypeLabel: "loooplink" }  );
+			processForType( { dataForType: looplinkChartData, linkTypeLabel: "looplink" }  );
 		}
 		if ( unlinkedChartData ) {
 			processForType( { dataForType: unlinkedChartData, linkTypeLabel: "unlinked" }  );
@@ -868,7 +868,7 @@ QCChartPSMCountVsScores.prototype.createChartResponse = function(requestData, re
 		var chartDataEntry = [];
 		processBucketForType( { dataForType: alllinkChartData, linkTypeLabel: "all" } );
 		processBucketForType( { dataForType: crosslinkChartData, linkTypeLabel: "crosslink" }  );
-		processBucketForType( { dataForType: looplinkChartData, linkTypeLabel: "loooplink" }  );
+		processBucketForType( { dataForType: looplinkChartData, linkTypeLabel: "looplink" }  );
 		processBucketForType( { dataForType: unlinkedChartData, linkTypeLabel: "unlinked" }  );
 		if ( chartDataEntry && chartDataEntry.length > 0 ) {
 			chartData.push( chartDataEntry );
