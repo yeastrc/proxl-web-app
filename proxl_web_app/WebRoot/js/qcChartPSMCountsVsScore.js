@@ -335,16 +335,6 @@ QCChartPSMCountVsScores.prototype.openPSMCountVsScoreQCPlotOverlay = function(cl
 	var $psm_count_vs_score_qc_plot_current_search_name_and_id = $("#psm_count_vs_score_qc_plot_current_search_name_and_id");
 	$psm_count_vs_score_qc_plot_current_search_name_and_id.val( searchNameAndNumberInParens );
 	
-	//  Empty Include Protein Name option Select before get list of protein names
-	var $psm_count_vs_score_qc_plot_protein_seq_id_include_select = $("#psm_count_vs_score_qc_plot_protein_seq_id_include_select");
-	$psm_count_vs_score_qc_plot_protein_seq_id_include_select.empty();
-	$psm_count_vs_score_qc_plot_protein_seq_id_include_select.val("");
-	
-	//  Empty Exclude Protein Name option Select before get list of protein names
-	var $psm_count_vs_score_qc_plot_protein_seq_id_exclude_select = $("#psm_count_vs_score_qc_plot_protein_seq_id_exclude_select");
-	$psm_count_vs_score_qc_plot_protein_seq_id_exclude_select.empty();
-	$psm_count_vs_score_qc_plot_protein_seq_id_exclude_select.val("");
-	
 	// Position dialog over clicked link
 	//  get position of div containing the dialog that is inline in the page
 	var $psm_count_vs_score_qc_plot_overlay_containing_outermost_div_inline_div = $("#psm_count_vs_score_qc_plot_overlay_containing_outermost_div_inline_div");
@@ -373,6 +363,16 @@ QCChartPSMCountVsScores.prototype.openPSMCountVsScoreQCPlotOverlay = function(cl
 	this.populateCutoffsOnImportMessage( { $search_root_jq: $search_root_jq } );
 	$psm_count_vs_score_qc_plot_current_search_id.val( searchId );
 	
+	//  Empty Include Protein Name option Select before get list of protein names
+	var $psm_count_vs_score_qc_plot_protein_seq_id_include_select = $("#psm_count_vs_score_qc_plot_protein_seq_id_include_select");
+	$psm_count_vs_score_qc_plot_protein_seq_id_include_select.empty();
+	$psm_count_vs_score_qc_plot_protein_seq_id_include_select.val("");
+	
+	//  Empty Exclude Protein Name option Select before get list of protein names
+	var $psm_count_vs_score_qc_plot_protein_seq_id_exclude_select = $("#psm_count_vs_score_qc_plot_protein_seq_id_exclude_select");
+	$psm_count_vs_score_qc_plot_protein_seq_id_exclude_select.empty();
+	$psm_count_vs_score_qc_plot_protein_seq_id_exclude_select.val("");
+
 	this.getPSMFilterableAnnTypesForSearchId( { 
 		searchId: searchId
 	} );
