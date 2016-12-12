@@ -45,7 +45,8 @@ public class QCPlotPsmCountsVsScoreService {
 			@QueryParam( "searchId" ) int searchId,
 			@QueryParam( "annotationTypeId" ) int annotationTypeId,
 			@QueryParam( "psmScoreCutoff" ) Double psmScoreCutoff,
-			@QueryParam( "protein_sequence_id" ) List<Integer> proteinSequenceIdsToIncludeList,
+			@QueryParam( "iP" ) List<Integer> proteinSequenceIdsToIncludeList,
+			@QueryParam( "eP" ) List<Integer> proteinSequenceIdsToExcludeList,
 			@Context HttpServletRequest request )
 	throws Exception {
 
@@ -119,7 +120,13 @@ public class QCPlotPsmCountsVsScoreService {
 			
 			PsmCountsVsScoreQCPlotDataJSONRoot psmCountsVsScoreQCPlotDataJSONRoot = 
 					CreatePsmCountsVsScoreQCPlotData.getInstance()
-					.create( selectedLinkTypes, searchId, annotationTypeId, psmScoreCutoff, proteinSequenceIdsToIncludeList );
+					.create( 
+							selectedLinkTypes, 
+							searchId, 
+							annotationTypeId, 
+							psmScoreCutoff, 
+							proteinSequenceIdsToIncludeList,
+							proteinSequenceIdsToExcludeList );
 			
 			return psmCountsVsScoreQCPlotDataJSONRoot;
 			

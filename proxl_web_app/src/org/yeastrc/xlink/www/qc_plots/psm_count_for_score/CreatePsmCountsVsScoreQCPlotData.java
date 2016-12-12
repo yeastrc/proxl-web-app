@@ -40,6 +40,7 @@ public class CreatePsmCountsVsScoreQCPlotData {
 	 * @param annotationTypeId
 	 * @param psmScoreCutoff
 	 * @param proteinSequenceIdsToIncludeList
+	 * @param proteinSequenceIdsToExcludeList
 	 * @return
 	 * @throws Exception
 	 */
@@ -48,7 +49,8 @@ public class CreatePsmCountsVsScoreQCPlotData {
 			int searchId, 
 			int annotationTypeId, 
 			Double psmScoreCutoff,
-			List<Integer> proteinSequenceIdsToIncludeList ) throws Exception {
+			List<Integer> proteinSequenceIdsToIncludeList,
+			List<Integer> proteinSequenceIdsToExcludeList ) throws Exception {
 	
 		if ( selectedLinkTypes == null || selectedLinkTypes.isEmpty() ) {
 			String msg = "selectedLinkTypes cannot be empty.";
@@ -102,7 +104,13 @@ public class CreatePsmCountsVsScoreQCPlotData {
 			
 			//  Get data from DB for Link Type
 			List<Double> scoreValuesForPSMsthatMeetCriteriaList = 
-				ScoreCountFromPsmTblSearcher.getInstance().getScoreValues( linkType, searchId, annotationTypeId, psmScoreCutoff, proteinSequenceIdsToIncludeList );
+				ScoreCountFromPsmTblSearcher.getInstance().getScoreValues( 
+						linkType, 
+						searchId, 
+						annotationTypeId, 
+						psmScoreCutoff, 
+						proteinSequenceIdsToIncludeList,
+						proteinSequenceIdsToExcludeList );
 			
 			scoreValuesForSelectedTypesMap.put( selectedLinkType, scoreValuesForPSMsthatMeetCriteriaList );
 		}

@@ -2516,9 +2516,18 @@
 						</tr>
 						
 						<tr>
-							<td valign="top">Protein filter:</td>
+							<td valign="top" style="white-space: nowrap;">Include Protein filter:</td>
 							<td>
-								<select id="psm_count_vs_score_qc_plot_protein_seq_id_select" multiple="multiple" 
+								<select id="psm_count_vs_score_qc_plot_protein_seq_id_include_select" multiple="multiple" 
+									class=" psm_count_vs_score_qc_plot_on_change_jq " >
+								</select>					
+							</td>
+						</tr>
+						
+						<tr>
+							<td valign="top" style="white-space: nowrap;">Exclude Protein filter:</td>
+							<td>
+								<select id="psm_count_vs_score_qc_plot_protein_seq_id_exclude_select" multiple="multiple" 
 									class=" psm_count_vs_score_qc_plot_on_change_jq " >
 								</select>					
 							</td>
