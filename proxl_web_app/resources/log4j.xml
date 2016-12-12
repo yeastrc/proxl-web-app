@@ -149,6 +149,7 @@
         
         <!-- Debugging loggers -->
 
+
         <!-- Uncomment to enable debug on specific code only -->
         <!--
         <logger name="org.yeastrc.xlink.www.actions.ViewSearchPeptidesAction" additivity="false">
@@ -157,7 +158,13 @@
                 <appender-ref ref="ROLL_ERROR" />
         </logger>
         -->
-
+		<!--  
+        <logger name="org.yeastrc.xlink.www.searcher.ScoreCountFromPsmTblSearcher" additivity="false">
+                <level value="debug"/>
+                <appender-ref ref="ROLL" />
+                <appender-ref ref="ROLL_ERROR" />
+        </logger>
+        -->
 
 		<!--    Uncomment debug for the following to get Timing info written to the log file  -->
         <!--
