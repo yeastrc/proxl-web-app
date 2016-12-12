@@ -154,12 +154,16 @@ public class CreatePsmCountsVsScoreQCPlotData {
 		//  Process for each Selected Link Type
 		for ( String selectedLinkType : selectedLinkTypes ) {
 
+			//  Scores for selected link type being processed
 			List<Double> scoreValuesForPSMsthatMeetCriteriaList = scoreValuesForSelectedTypesMap.get( selectedLinkType );
 			
 			int totalCountForType = scoreValuesForPSMsthatMeetCriteriaList.size();
 			
 			if ( psmScoreCutoff != null ) {
 
+				//  Have score cutoff so need to get a total count for the type 
+				//    without applying the cutoff but applying all other selections
+				
 				//  Get data from DB, total score count for selectedLinkType, search id, annotation type id
 				LinkType linkType = null;
 				if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__ALL_PSM.equals( selectedLinkType ) ) {
@@ -171,7 +175,13 @@ public class CreatePsmCountsVsScoreQCPlotData {
 				} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__UNLINKED_PSM.equals( selectedLinkType ) ) {
 					linkType = LinkType.UNLINKED;
 				}
-				totalCountForType = ScoreCountFromPsmTblSearcher.getInstance().getScoreCount( linkType, searchId, annotationTypeId );
+				totalCountForType = ScoreCountFromPsmTblSearcher.getInstance()
+						.getScoreCount( 
+								linkType, 
+								searchId, 
+								annotationTypeId, 
+								proteinSequenceIdsToIncludeList,
+								proteinSequenceIdsToExcludeList );
 			}
 			PsmCountsVsScoreQCPlotDataJSONPerType linkData = null;
 			if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__ALL_PSM.equals( selectedLinkType ) ) {

@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -22,17 +24,24 @@ public class ScoreCountFromPsmTblSearcher {
 	
 	public static enum LinkType { CROSSLINK, LOOPLINK, UNLINKED, ALL }
 	
+
 	/**
+	 * Get count of records, never applying psmScoreCutoff
+	 * 
 	 * @param linkType
 	 * @param searchId
 	 * @param annotationTypeId
+	 * @param proteinSequenceIdsToIncludeList
+	 * @param proteinSequenceIdsToExcludeList
 	 * @return
 	 * @throws Exception
 	 */
 	public int getScoreCount( 
 			LinkType linkType, 
 			int searchId,
-			int annotationTypeId
+			int annotationTypeId,
+			List<Integer> proteinSequenceIdsToIncludeList,
+			List<Integer> proteinSequenceIdsToExcludeList
 			) throws Exception {
 		
 		int scoreCount = 0;
@@ -44,42 +53,19 @@ public class ScoreCountFromPsmTblSearcher {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		StringBuilder sqlSB = new StringBuilder( 10000 );
-		
-		sqlSB.append( "SELECT COUNT(*) AS count FROM psm_filterable_annotation__generic_lookup AS pfagl \n" );
-		sqlSB.append( " WHERE pfagl.search_id = ? AND annotation_type_id = ? " );
 
-		if ( linkType != LinkType.ALL ) {
-			sqlSB.append( " AND pfagl.psm_type IN ( " ); 
-			if ( linkType == LinkType.CROSSLINK ) {
-				sqlSB.append( " '" );
-				sqlSB.append( XLinkUtils.CROSS_TYPE_STRING );
-				sqlSB.append( "' " );
-			} else if ( linkType == LinkType.LOOPLINK ) {
-				sqlSB.append( " '" );
-				sqlSB.append( XLinkUtils.LOOP_TYPE_STRING );
-				sqlSB.append( "' " );
-			} else {
-				sqlSB.append( " '" );
-				sqlSB.append( XLinkUtils.DIMER_TYPE_STRING );
-				sqlSB.append( "' " );
-				sqlSB.append( " , " );
-				sqlSB.append( " '" );
-				sqlSB.append( XLinkUtils.UNLINKED_TYPE_STRING );
-				sqlSB.append( "' " );
-			}
-			sqlSB.append( " ) " );
-		}
-		
-		String sql = sqlSB.toString();
+		String sql = createSelectSQL( 
+				"COUNT(*) AS count", 
+				linkType, 
+				searchId, 
+				annotationTypeId, 
+				null /* psmScoreCutoff */, 
+				proteinSequenceIdsToIncludeList, 
+				proteinSequenceIdsToExcludeList );
+				
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
-			int paramCounter = 0;
-			paramCounter++;
-			pstmt.setInt( paramCounter, searchId );
-			paramCounter++;
-			pstmt.setInt( paramCounter, annotationTypeId );
 			rs = pstmt.executeQuery();
 			if( rs.next() ) {
 				scoreCount = rs.getInt( "count" );
@@ -124,6 +110,7 @@ public class ScoreCountFromPsmTblSearcher {
 			List<Integer> proteinSequenceIdsToIncludeList,
 			List<Integer> proteinSequenceIdsToExcludeList
 			) throws Exception {
+		
 
 		List<Double> scoreValueList = new ArrayList<Double>();
 		
@@ -131,20 +118,102 @@ public class ScoreCountFromPsmTblSearcher {
 			throw new IllegalArgumentException("linkType cannot == null");
 		}
 		
-//		if ( linkType != LinkType.CROSSLINK && linkType != LinkType.LOOPLINK ) {  //  TODO  TEMP
-//			
-//			return scoreValueList;
-//		}
 		
-		String searchIdString = Integer.toString( searchId );
-		
+		String sql = createSelectSQL( 
+				"value_double", 
+				linkType, 
+				searchId, 
+				annotationTypeId, 
+				psmScoreCutoff, 
+				proteinSequenceIdsToIncludeList, 
+				proteinSequenceIdsToExcludeList );
+				
+
+
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
+		try {
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			pstmt = conn.prepareStatement( sql );
+			int paramCounter = 0;
+
+			if ( psmScoreCutoff != null ) {
+				paramCounter++;
+				pstmt.setDouble( paramCounter, psmScoreCutoff );
+			}
+			rs = pstmt.executeQuery();
+			while( rs.next() ) {
+				scoreValueList.add( rs.getDouble( "value_double" ) );
+			}
+		} catch ( Exception e ) {
+			String msg = "getScoreValues(), sql: " + sql;
+			log.error( msg, e );
+			throw e;
+		} finally {
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			if( conn != null ) {
+				try { conn.close(); } catch( Throwable t ) { ; }
+				conn = null;
+			}
+		}
+		
+		return scoreValueList;
+	}
+	
+	
+	/**
+	 * Create SQL
+	 * 
+	 * @param selectResult - What the select should return 
+	 * @param linkType
+	 * @param searchId
+	 * @param annotationTypeId
+	 * @param psmScoreCutoff - Not NULL if set
+	 * @param proteinSequenceIdsToIncludeList
+	 * @param proteinSequenceIdsToExcludeList
+	 * @return
+	 * @throws Exception
+	 */
+	private String createSelectSQL( 
+			String selectResult,
+			LinkType linkType,  
+			int searchId,
+			int annotationTypeId,
+			Double psmScoreCutoff,
+			List<Integer> proteinSequenceIdsToIncludeList,
+			List<Integer> proteinSequenceIdsToExcludeList
+			) throws Exception {
+
+		
+		String searchIdString = Integer.toString( searchId );
+		
+		//  Convert include and exclude protein sequence id lists to comma delim strings 
+		String includeProteinSequenceIdsCommaDelim = null;
+		String excludeProteinSequenceIdsCommaDelim = null;
+		
+		if ( proteinSequenceIdsToIncludeList != null && ( ! proteinSequenceIdsToIncludeList.isEmpty() ) ) {
+			includeProteinSequenceIdsCommaDelim = StringUtils.join(proteinSequenceIdsToIncludeList, ',');
+		}
+		if ( proteinSequenceIdsToExcludeList != null && ( ! proteinSequenceIdsToExcludeList.isEmpty() ) ) {
+			excludeProteinSequenceIdsCommaDelim = StringUtils.join(proteinSequenceIdsToExcludeList, ',');
+		}
+		
 		StringBuilder sqlSB = new StringBuilder( 10000 );
 		
-		sqlSB.append( "SELECT value_double FROM psm_filterable_annotation__generic_lookup AS pfagl \n" );
+		
+		sqlSB.append( "SELECT " );
+		sqlSB.append( selectResult );
+		sqlSB.append( " FROM psm_filterable_annotation__generic_lookup AS pfagl \n" );
 		
 		if ( ( proteinSequenceIdsToIncludeList != null && ( ! proteinSequenceIdsToIncludeList.isEmpty() ) )
 				|| ( proteinSequenceIdsToExcludeList != null && ( ! proteinSequenceIdsToExcludeList.isEmpty() ) ) ) {
@@ -152,20 +221,38 @@ public class ScoreCountFromPsmTblSearcher {
 			sqlSB.append( " INNER JOIN ( \n" );
 			
 			if ( linkType == LinkType.ALL ) {
-				getScoreValuesSQLSingleLinkType( 
-						LinkType.CROSSLINK, searchIdString, proteinSequenceIdsToIncludeList, proteinSequenceIdsToExcludeList, sqlSB);
+
+				// If "ALL", Get Reported Peptide Ids for each link type and use "UNION DISTINCT" to combine them
+				
+				String singleLinkTypeSQL = null;
+				
+				singleLinkTypeSQL = 
+						getScoreValuesSQLSingleLinkType( 
+								LinkType.CROSSLINK, searchIdString, includeProteinSequenceIdsCommaDelim, excludeProteinSequenceIdsCommaDelim);
+				sqlSB.append( singleLinkTypeSQL );
+
 				sqlSB.append( "UNION DISTINCT \n" );
-				getScoreValuesSQLSingleLinkType( 
-						LinkType.LOOPLINK, searchIdString, proteinSequenceIdsToIncludeList, proteinSequenceIdsToExcludeList, sqlSB);
+
+				singleLinkTypeSQL = 
+						getScoreValuesSQLSingleLinkType( 
+								LinkType.LOOPLINK, searchIdString, includeProteinSequenceIdsCommaDelim, excludeProteinSequenceIdsCommaDelim);
+				sqlSB.append( singleLinkTypeSQL );
+
 				sqlSB.append( "UNION DISTINCT \n" );
-				getScoreValuesSQLSingleLinkType( 
-						LinkType.UNLINKED, searchIdString, proteinSequenceIdsToIncludeList, proteinSequenceIdsToExcludeList, sqlSB);
+
+				singleLinkTypeSQL = 
+						getScoreValuesSQLSingleLinkType( 
+								LinkType.UNLINKED, searchIdString, includeProteinSequenceIdsCommaDelim, excludeProteinSequenceIdsCommaDelim);
+				sqlSB.append( singleLinkTypeSQL );
+				
 			} else {
-				getScoreValuesSQLSingleLinkType(
-						linkType, searchIdString, proteinSequenceIdsToIncludeList, proteinSequenceIdsToExcludeList, sqlSB);
+				String singleLinkTypeSQL = 
+					getScoreValuesSQLSingleLinkType(
+							linkType, searchIdString, includeProteinSequenceIdsCommaDelim, excludeProteinSequenceIdsCommaDelim);
+				sqlSB.append( singleLinkTypeSQL );
 			}
 			
-			sqlSB.append( " ) AS rep_pept_ids ON pfagl.reported_peptide_id = rep_pept_ids.reported_peptide_id " ); //  Close the subselect and specify join
+			sqlSB.append( "\n ) AS rep_pept_ids ON pfagl.reported_peptide_id = rep_pept_ids.reported_peptide_id " ); //  Close the subselect and specify join
 		}
 		 
 		sqlSB.append( "\n WHERE pfagl.search_id = " );
@@ -210,94 +297,54 @@ public class ScoreCountFromPsmTblSearcher {
 			sqlSB.append( " ? \n" );
 		}
 		String sql = sqlSB.toString();
-		try {
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			pstmt = conn.prepareStatement( sql );
-			int paramCounter = 0;
-
-			if ( psmScoreCutoff != null ) {
-				paramCounter++;
-				pstmt.setDouble( paramCounter, psmScoreCutoff );
-			}
-			rs = pstmt.executeQuery();
-			while( rs.next() ) {
-				scoreValueList.add( rs.getDouble( "value_double" ) );
-			}
-		} catch ( Exception e ) {
-			String msg = "getScoreValues(), sql: " + sql;
-			log.error( msg, e );
-			throw e;
-		} finally {
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
+		if ( log.isDebugEnabled() ) {
+			String msg = "\nlinkType: " + linkType.toString() 
+			+ "\nInclude Prot Seq Ids: " + includeProteinSequenceIdsCommaDelim
+			+ "\nExclude Prot Seq Ids: " + excludeProteinSequenceIdsCommaDelim
+			+ "\nSQL: " + sql;
+			log.debug( msg );
 		}
-		return scoreValueList;
+		
+		return sql;
 	}
 
-	public void getScoreValuesSQLSingleLinkType(
+	/**
+	 * @param linkType
+	 * @param searchIdString
+	 * @param includeProteinSequenceIdsCommaDelim
+	 * @param excludeProteinSequenceIdsCommaDelim
+	 * @return
+	 */
+	private String getScoreValuesSQLSingleLinkType(
 			LinkType linkType, 
 			String searchIdString,
-			List<Integer> proteinSequenceIdsToIncludeList, 
-			List<Integer> proteinSequenceIdsToExcludeList, 
-			StringBuilder sqlSB) {
+			String includeProteinSequenceIdsCommaDelim, 
+			String excludeProteinSequenceIdsCommaDelim) {
 
-		//  Include
-		
 		boolean haveIncludeProteins = false;
 		boolean haveExcludeProteins = false;
 		
-		if ( ( proteinSequenceIdsToIncludeList != null && ( ! proteinSequenceIdsToIncludeList.isEmpty() ) ) ) {
+		if ( includeProteinSequenceIdsCommaDelim != null ) {
 			haveIncludeProteins = true;
 		}
-		if ( ( proteinSequenceIdsToExcludeList != null && ( ! proteinSequenceIdsToExcludeList.isEmpty() ) ) ) {
+		if ( excludeProteinSequenceIdsCommaDelim != null ) {
 			haveExcludeProteins = true;
 		}
+		
+		StringBuilder sqlSB = new StringBuilder( 1000 );
 
 
 		//  If have Both Include and Exclude, Add surrounding SELECT and INNER JOIN Between Them 
 		if ( haveIncludeProteins && haveExcludeProteins ) {
 			sqlSB.append( "  SELECT DISTINCT included_rep_pept.reported_peptide_id FROM ( \n" );
 		}
-		
+
+		//  Include proteins
 		if ( haveIncludeProteins ) {
-				
-			sqlSB.append( "  SELECT DISTINCT reported_peptide_id FROM " );
-			if ( linkType == LinkType.CROSSLINK ) {
-				sqlSB.append( " srch_rep_pept__prot_seq_id_pos_crosslink " );
-			} else if ( linkType == LinkType.LOOPLINK ) {
-				sqlSB.append( " srch_rep_pept__prot_seq_id_pos_looplink " );
-			} else {
-				sqlSB.append( " srch_rep_pept__prot_seq_id_unlinked_dimer " );
-			}
-			
-			sqlSB.append( "\n WHERE search_id = " );
-			sqlSB.append( searchIdString );
-			sqlSB.append( "\n AND protein_sequence_id IN ( " );
-			boolean firstProteinSeqId = true;
-			for ( Integer proteinSequenceId : proteinSequenceIdsToIncludeList ) {
-				if ( firstProteinSeqId ) {
-					firstProteinSeqId = false;
-				} else {
-					sqlSB.append( "," );		
-				}
-				sqlSB.append( proteinSequenceId.toString() );
-			}
-			sqlSB.append( " ) \n" ); //  Close the IN (
-		
-		
+			String includeSQL = getScoreValuesSQLSingleLinkTypeInclude( linkType, searchIdString, includeProteinSequenceIdsCommaDelim );
+			sqlSB.append( includeSQL );
 		}
-		
+
 		//  If have Both Include and Exclude, Add surrounding SELECT and INNER JOIN Between Them 
 		if ( haveIncludeProteins && haveExcludeProteins ) {
 			sqlSB.append( " ) AS included_rep_pept \n" ); 
@@ -306,181 +353,9 @@ public class ScoreCountFromPsmTblSearcher {
 		}
 			
 		//  Exclude proteins
-		
 		if ( haveExcludeProteins ) {
-		
-			//  Specific SQL for each link type
-			
-			if ( linkType == LinkType.CROSSLINK ) {
-
-				sqlSB.append( " SELECT DISTINCT link1.reported_peptide_id  \n" );
-				sqlSB.append(  " FROM  srch_rep_pept__prot_seq_id_pos_crosslink AS link1  \n" );
-				sqlSB.append(  " INNER JOIN  srch_rep_pept__prot_seq_id_pos_crosslink AS link2 \n" );
-				sqlSB.append(   " ON link1.search_id = link2.search_id\n" );
-				sqlSB.append(   " AND link1.reported_peptide_id = link2.reported_peptide_id \n" );
-				sqlSB.append(   " WHERE link1.search_reported_peptide_peptide_id \n" );
-				sqlSB.append(   " != link2.search_reported_peptide_peptide_id \n" );
-						sqlSB.append( " AND link1.search_id = " );
-				sqlSB.append( searchIdString );
-				sqlSB.append(   "\n AND link1.protein_sequence_id NOT IN ( " ); 
-				{
-					boolean firstProteinSeqId = true;
-					for ( Integer proteinSequenceId : proteinSequenceIdsToExcludeList ) {
-						if ( firstProteinSeqId ) {
-							firstProteinSeqId = false;
-						} else {
-							sqlSB.append( "," );		
-						}
-						sqlSB.append( proteinSequenceId.toString() );
-					}
-					sqlSB.append( " ) \n" ); //  Close the NOT IN (
-				}
-				sqlSB.append(   " AND link2.protein_sequence_id NOT IN ( " );
-				{
-					boolean firstProteinSeqId = true;
-					for ( Integer proteinSequenceId : proteinSequenceIdsToExcludeList ) {
-						if ( firstProteinSeqId ) {
-							firstProteinSeqId = false;
-						} else {
-							sqlSB.append( "," );		
-						}
-						sqlSB.append( proteinSequenceId.toString() );
-					}
-					sqlSB.append( " ) \n" ); //  Close the NOT IN (
-				}
-				
-			} else if ( linkType == LinkType.LOOPLINK ) {
-				
-//				sqlSB.append( " srch_rep_pept__prot_seq_id_pos_looplink " );
-				
-
-				sqlSB.append( " SELECT DISTINCT reported_peptide_id  \n" );
-				sqlSB.append(  " FROM  srch_rep_pept__prot_seq_id_pos_looplink \n" );
-				sqlSB.append(   " WHERE search_id = " );
-				sqlSB.append( searchIdString );
-				sqlSB.append(   "\n AND protein_sequence_id NOT IN ( " ); 
-				boolean firstProteinSeqId = true;
-				for ( Integer proteinSequenceId : proteinSequenceIdsToExcludeList ) {
-					if ( firstProteinSeqId ) {
-						firstProteinSeqId = false;
-					} else {
-						sqlSB.append( "," );		
-					}
-					sqlSB.append( proteinSequenceId.toString() );
-				}
-				sqlSB.append( " ) \n" ); //  Close the NOT IN (
-				
-			} else {
-				
-				//  "Unlinked"    Unlinked and Dimer
-				
-				//   For both, inner join to search_reported_peptide to get link type
-				
-//				sqlSB.append( " srch_rep_pept__prot_seq_id_unlinked_dimer " );
-				
-				sqlSB.append( " SELECT DISTINCT combined.reported_peptide_id FROM  \n" );
-
-				sqlSB.append( " ( \n" );
-
-				//  Dimer - 
-				
-				sqlSB.append( " SELECT DISTINCT pept_prot_1.reported_peptide_id  \n" );
-				sqlSB.append(  " FROM \n" );
-				sqlSB.append( " ( \n" );
-
-				sqlSB.append(   " SELECT pept_prot.* \n" );
-				sqlSB.append(   " FROM srch_rep_pept__prot_seq_id_unlinked_dimer AS pept_prot \n" );
-				sqlSB.append(   " INNER JOIN search_reported_peptide as srp \n" );
-				sqlSB.append(   "  ON pept_prot.search_id = srp.search_id \n" );
-				sqlSB.append(   	"  AND pept_prot.reported_peptide_id = srp.reported_peptide_id \n" );
-				sqlSB.append(   "  WHERE srp.link_type = '" );
-				sqlSB.append(   XLinkUtils.DIMER_TYPE_STRING );
-				sqlSB.append(   "' " );
-				sqlSB.append(   " AND pept_prot.search_id = " );
-				sqlSB.append( searchIdString );
-				sqlSB.append( ") AS pept_prot_1  \n" );
-				
-				sqlSB.append(   " INNER JOIN \n " );
-				
-				sqlSB.append( " ( \n" );
-				sqlSB.append(   " SELECT pept_prot.* \n" );
-				sqlSB.append(   " FROM srch_rep_pept__prot_seq_id_unlinked_dimer AS pept_prot \n" );
-				sqlSB.append(   " INNER JOIN search_reported_peptide as srp \n" );
-				sqlSB.append(   "  ON pept_prot.search_id = srp.search_id \n" );
-				sqlSB.append(   	"  AND pept_prot.reported_peptide_id = srp.reported_peptide_id \n" );
-				sqlSB.append(   "  WHERE srp.link_type = '" );
-				sqlSB.append(   XLinkUtils.DIMER_TYPE_STRING );
-				sqlSB.append(   "' " );
-				sqlSB.append(   " AND pept_prot.search_id = " );
-				sqlSB.append( searchIdString );
-				sqlSB.append( ") AS pept_prot_2  \n" );						
-				sqlSB.append(   " ON pept_prot_1.search_id = pept_prot_2.search_id\n" );
-				sqlSB.append(   " AND pept_prot_1.reported_peptide_id = pept_prot_2.reported_peptide_id \n" );
-				sqlSB.append(   " WHERE pept_prot_1.search_reported_peptide_peptide_id \n" );
-				sqlSB.append(   " != pept_prot_2.search_reported_peptide_peptide_id \n" );
-						sqlSB.append( " AND pept_prot_1.search_id = " );
-				sqlSB.append( searchIdString );
-				sqlSB.append(   "\n AND pept_prot_1.protein_sequence_id NOT IN ( " ); 
-				{
-					boolean firstProteinSeqId = true;
-					for ( Integer proteinSequenceId : proteinSequenceIdsToExcludeList ) {
-						if ( firstProteinSeqId ) {
-							firstProteinSeqId = false;
-						} else {
-							sqlSB.append( "," );		
-						}
-						sqlSB.append( proteinSequenceId.toString() );
-					}
-					sqlSB.append( " ) \n" ); //  Close the NOT IN (
-				}
-				sqlSB.append(   " AND pept_prot_2.protein_sequence_id NOT IN ( " );
-				{
-					boolean firstProteinSeqId = true;
-					for ( Integer proteinSequenceId : proteinSequenceIdsToExcludeList ) {
-						if ( firstProteinSeqId ) {
-							firstProteinSeqId = false;
-						} else {
-							sqlSB.append( "," );		
-						}
-						sqlSB.append( proteinSequenceId.toString() );
-					}
-					sqlSB.append( " ) \n" ); //  Close the NOT IN (
-				}
-				
-//				sqlSB.append( " ) AS dimer_rept_pept_ids \n" ); //  Close select dimer data
-				
-				sqlSB.append( " UNION DISTINCT \n" ); //  UNION dimer data and unlinked data
-				
-				//  Unlinked
-				
-				sqlSB.append(   " SELECT pept_prot.reported_peptide_id \n" );
-				sqlSB.append(   " FROM srch_rep_pept__prot_seq_id_unlinked_dimer AS pept_prot \n" );
-				sqlSB.append(   " INNER JOIN search_reported_peptide as srp \n" );
-				sqlSB.append(   "  ON pept_prot.search_id = srp.search_id \n" );
-				sqlSB.append(   	"  AND pept_prot.reported_peptide_id = srp.reported_peptide_id \n" );
-				sqlSB.append(   "  WHERE srp.link_type = '" );
-				sqlSB.append(   XLinkUtils.UNLINKED_TYPE_STRING );
-				sqlSB.append(   "' " );
-				sqlSB.append(   " AND pept_prot.search_id = " );
-				sqlSB.append( searchIdString );
-				sqlSB.append(   "\n AND pept_prot.protein_sequence_id NOT IN ( " ); 
-				boolean firstProteinSeqId = true;
-				for ( Integer proteinSequenceId : proteinSequenceIdsToExcludeList ) {
-					if ( firstProteinSeqId ) {
-						firstProteinSeqId = false;
-					} else {
-						sqlSB.append( "," );		
-					}
-					sqlSB.append( proteinSequenceId.toString() );
-				}
-				sqlSB.append( " ) \n" ); //  Close the NOT IN (			}
-
-//				sqlSB.append( " ) AS unlinked_rept_pept_ids \n" ); //  Close select unlinked data
-				
-
-				sqlSB.append( " ) AS combined \n" ); //  Close select combined data
-				
-			}
+			String excludeSQL = getScoreValuesSQLSingleLinkTypeExclude( linkType, searchIdString, excludeProteinSequenceIdsCommaDelim );
+			sqlSB.append( excludeSQL );
 		}
 
 		//  If have Both Include and Exclude, Add surrounding SELECT and INNER JOIN Between Them 
@@ -489,5 +364,158 @@ public class ScoreCountFromPsmTblSearcher {
 			sqlSB.append( " ON included_rep_pept.reported_peptide_id = not_excluded_rep_pept.reported_peptide_id " );
 		}
 			
+		String sql = sqlSB.toString();
+		
+		return sql;
+	}
+	
+	/**
+	 * SQL for Included Protein Sequence Ids 
+	 * @param linkType
+	 * @param searchIdString
+	 * @param includeProteinSequenceIdsCommaDelim
+	 * @return
+	 */
+	private String getScoreValuesSQLSingleLinkTypeInclude(
+			LinkType linkType, 
+			String searchIdString,
+			String includeProteinSequenceIdsCommaDelim ) {
+
+		String tableName = null;
+		if ( linkType == LinkType.CROSSLINK ) {
+			tableName = "srch_rep_pept__prot_seq_id_pos_crosslink";
+		} else if ( linkType == LinkType.LOOPLINK ) {
+			tableName = "srch_rep_pept__prot_seq_id_pos_looplink ";
+		} else {
+			tableName = "srch_rep_pept__prot_seq_id_unlinked_dimer";
+		}
+
+		String sql = " SELECT DISTINCT reported_peptide_id FROM "
+				+ tableName
+				+ "\n WHERE search_id = " + searchIdString
+				+ "\n AND protein_sequence_id IN ( " + includeProteinSequenceIdsCommaDelim + " ) \n";
+
+		return sql;
+	}
+	
+
+	/**
+	 * SQL for Excluded Protein Sequence Ids 
+	 * @param linkType
+	 * @param searchIdString
+	 * @param excludeProteinSequenceIdsCommaDelim
+	 * @return
+	 */
+	private String getScoreValuesSQLSingleLinkTypeExclude(
+			LinkType linkType, 
+			String searchIdString,
+			String excludeProteinSequenceIdsCommaDelim ) {
+
+		String sql = null;
+
+		//  Specific SQL for each link type
+
+		if ( linkType == LinkType.CROSSLINK ) {
+
+			//  For Crosslink, the table srch_rep_pept__prot_seq_id_pos_crosslink is joined to itself
+			//   Only reported peptide ids that are in both halves after excluding protein sequence ids 
+			//   are in the result
+			
+			sql = " SELECT DISTINCT link1.reported_peptide_id  \n" 
+					+  " FROM  srch_rep_pept__prot_seq_id_pos_crosslink AS link1  \n" 
+					+  " INNER JOIN  srch_rep_pept__prot_seq_id_pos_crosslink AS link2 \n" 
+					+   " ON link1.search_id = link2.search_id\n" 
+					+   " AND link1.reported_peptide_id = link2.reported_peptide_id \n" 
+					+   " WHERE link1.search_reported_peptide_peptide_id \n" 
+					+   " != link2.search_reported_peptide_peptide_id \n" 
+					+ " AND link1.search_id = " + searchIdString 
+					+   "\n AND link1.protein_sequence_id NOT IN ( "  
+					+                 excludeProteinSequenceIdsCommaDelim + " ) \n"
+					+   " AND link2.protein_sequence_id NOT IN ( " 
+					+                 excludeProteinSequenceIdsCommaDelim + " ) \n";
+
+		} else if ( linkType == LinkType.LOOPLINK ) {
+
+			//  For Looplink, it is a simple query excluding the protein sequence ids
+			
+			sql = " SELECT DISTINCT reported_peptide_id  \n" 
+					+  " FROM  srch_rep_pept__prot_seq_id_pos_looplink \n" 
+					+   " WHERE search_id = " + searchIdString 
+					+   "\n AND protein_sequence_id NOT IN ( "  
+					+                 excludeProteinSequenceIdsCommaDelim + " ) \n";
+
+		} else {
+
+			//  "Unlinked"    Unlinked and Dimer
+
+			//   For both, inner join to search_reported_peptide to get link type
+
+			//  Dimer - Similar to Crosslink but each half of the dimer is a sub select with 
+			//          srch_rep_pept__prot_seq_id_unlinked_dimer joined to search_reported_peptide 
+			//          to only retrieve dimer reported peptide ids
+			
+			//          These sub selects are then INNER JOIN to get reported peptide ids for Dimer
+			//          since a reported peptide id has to be in both query results to be included in the result
+
+			sql = " SELECT DISTINCT pept_prot_1.reported_peptide_id  \n" 
+			+  " FROM \n" 
+
+			// Sub select to get only dimer records from srch_rep_pept__prot_seq_id_unlinked_dimer
+			+ " ( \n" 
+			+   " SELECT pept_prot.* \n" 
+			+   " FROM srch_rep_pept__prot_seq_id_unlinked_dimer AS pept_prot \n" 
+			+   " INNER JOIN search_reported_peptide as srp \n" 
+			+   "  ON pept_prot.search_id = srp.search_id \n" 
+			+   	"  AND pept_prot.reported_peptide_id = srp.reported_peptide_id \n" 
+			+   "  WHERE srp.link_type = '" +   XLinkUtils.DIMER_TYPE_STRING +   "' " 
+			+   	" AND pept_prot.search_id = " + searchIdString 
+			+ "\n ) AS pept_prot_1  \n" 
+
+			+   " INNER JOIN \n " 
+
+			// Sub select to get only dimer records from srch_rep_pept__prot_seq_id_unlinked_dimer
+			+ " ( \n" 
+			+   " SELECT pept_prot.* \n" 
+			+   " FROM srch_rep_pept__prot_seq_id_unlinked_dimer AS pept_prot \n" 
+			+   " INNER JOIN search_reported_peptide as srp \n" 
+			+   "  ON pept_prot.search_id = srp.search_id \n" 
+			+   	"  AND pept_prot.reported_peptide_id = srp.reported_peptide_id \n" 
+			+   "  WHERE srp.link_type = '" 
+			+   XLinkUtils.DIMER_TYPE_STRING 
+			+   "' " 
+			+   " AND pept_prot.search_id = " + searchIdString 
+			+ "\n ) AS pept_prot_2  \n" 	
+
+			+   " ON pept_prot_1.search_id = pept_prot_2.search_id\n" 
+			+   " AND pept_prot_1.reported_peptide_id = pept_prot_2.reported_peptide_id \n" 
+			+   " WHERE pept_prot_1.search_reported_peptide_peptide_id \n" 
+			+   " != pept_prot_2.search_reported_peptide_peptide_id \n" 
+			+ " AND pept_prot_1.search_id = " + searchIdString 
+			+   "\n AND pept_prot_1.protein_sequence_id NOT IN ( "  
+			+                 excludeProteinSequenceIdsCommaDelim + " ) \n"
+			+   " AND pept_prot_2.protein_sequence_id NOT IN ( " 
+			+                 excludeProteinSequenceIdsCommaDelim + " ) \n"
+			
+			//  UNION dimer reported peptide ids and unlinked reported peptide ids
+
+			+ " UNION DISTINCT \n"  
+
+			//  Unlinked - Similar to Looplink but with 
+			//          srch_rep_pept__prot_seq_id_unlinked_dimer joined to search_reported_peptide 
+			//          to only retrieve unlinked reported peptide ids
+
+			+   " SELECT pept_prot.reported_peptide_id \n" 
+			+   " FROM srch_rep_pept__prot_seq_id_unlinked_dimer AS pept_prot \n" 
+			+   " INNER JOIN search_reported_peptide as srp \n" 
+			+   "  ON pept_prot.search_id = srp.search_id \n" 
+			+   	"  AND pept_prot.reported_peptide_id = srp.reported_peptide_id \n" 
+			+   "  WHERE srp.link_type = '" +   XLinkUtils.UNLINKED_TYPE_STRING	+   "' " 
+			+   " AND pept_prot.search_id = " + searchIdString 
+			+   "\n AND pept_prot.protein_sequence_id NOT IN ( "  
+			+                 excludeProteinSequenceIdsCommaDelim + " ) \n";
+
+		}
+	
+		return sql;
 	}
 }
