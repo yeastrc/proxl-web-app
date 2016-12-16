@@ -868,12 +868,212 @@ function loadCrosslinkData( doDraw ) {
 
 }
 
-function collateAndDownloadShownPSMS( data ) {
+function downloadPSMsForAllShownUDRLinks() {
 	
+	var requestObject = { };
+	requestObject.searchIds = _searchIds;
+	
+	if( !_renderedLinks ) { return; }
+	
+	if( _renderedLinks['crosslinks'] && _renderedLinks['crosslinks'].length > 0 ) {
+		
+		requestObject.crosslinkUdrRequestList = [  ];
+		
+		for( var i = 0; i < _renderedLinks[ 'crosslinks' ].length; i++ ) {
+			var link = _renderedLinks[ 'crosslinks' ][ i ][ 'link' ];
+	
+			var dataObj = { };
+			dataObj.protId1 = link.protein1;
+			dataObj.protId2 = link.protein2;
+			dataObj.pos1 = link.position1;
+			dataObj.pos2 = link.position2;
+			
+			requestObject.crosslinkUdrRequestList.push( dataObj );
+		}
+	}
 
+	if( _renderedLinks['looplinks'] && _renderedLinks['looplinks'].length > 0 ) {
+		
+		requestObject.looplinkUdrRequestList = [  ];
+		
+		for( var i = 0; i < _renderedLinks[ 'looplinks' ].length; i++ ) {
+			var link = _renderedLinks[ 'looplinks' ][ i ][ 'link' ];
 	
+			var dataObj = { };
+			dataObj.protId1 = link.protein1;
+			dataObj.pos1 = link.position1;
+			dataObj.pos2 = link.position2;
+			
+			requestObject.looplinkUdrRequestList.push( dataObj );
+		}
+	}
+	
+	loadPSMUDRData( requestObject );
 	
 }
+
+function loadPSMUDRData( requestObject ) {
+	
+	console.log( "Loading PSM UDR data." );
+	
+			incrementSpinner();				// create spinner
+			
+			var url = contextPathJSVar + "/services/imageViewer/getMultPsmUDRData";
+			//url += buildQueryStringFromHash();
+			
+			var requestData = JSON.stringify( requestObject );
+			
+		       $.ajax({
+	               type : "POST",
+	               url : url,
+	               data : requestData,
+	               contentType: "application/json; charset=utf-8",
+	               dataType : "json",
+	               success : function(data) {
+				        
+			        	try {
+			        
+			        		decrementSpinner();
+			        		collateAndDownloadPSMUDRData( data );
+			        		
+			        	} catch( e ) {
+			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			        		throw e;
+			        	}
+ 	
+			        },
+			        failure: function(errMsg) {
+						decrementSpinner();
+			        	handleAJAXFailure( errMsg );
+			        },
+					error: function(jqXHR, textStatus, errorThrown) {	
+							decrementSpinner();
+							handleAJAXError( jqXHR, textStatus, errorThrown );
+					}
+			  });
+
+}
+
+function collateAndDownloadPSMUDRData( data ) {
+	
+	var reportText = "";
+	
+	if( !data || !data.dataForSearches ) {
+		reportWebErrorToServer.reportErrorObjectToServer( Error( "Did not get data." ));
+		throw e;
+	}
+
+	for( var i = 0; i < _searchIds.length; i++ ) {
+		
+		if( !data.dataForSearches[ _searchIds[ i ] ] ) {
+			console.log( "WARNING: GOT NO PSM UDR DATA FOR SEARCH: " + _searchIds[ i ] );
+			continue;
+		}
+		
+		var searchId = _searchIds[ i ];
+		var searchData = data.dataForSearches[ searchId ];
+		
+		// pad each searches section with some white space
+		if( i != 0 ) {
+			reportText += "\n\n";
+		}
+		
+		reportText += "search id\tlink type\tprotein 1\tposition 1\tprotein 2\tposition 2\tdistance";
+		
+		for( var k = 0; k < searchData.psmValuesNames.length; k++ ) {
+			reportText += "\t";
+			reportText += searchData.psmValuesNames[ k ];
+		}
+		
+		reportText += "\n";
+		
+		if( searchData.crosslinkUdrItemList && searchData.crosslinkUdrItemList.length > 0 ) {
+			
+			for( var k = 0; k < searchData.crosslinkUdrItemList.length; k++ ) {
+				
+				var udrItem = searchData.crosslinkUdrItemList[ k ];
+				
+				var protein1 = udrItem.protId1;
+				var protein2 = udrItem.protId2;
+				var position1 = udrItem.pos1;
+				var position2 = udrItem.pos2;
+				
+				var link = getRenderedLink( "crosslink", protein1, position1, protein2, position2 );
+				if( !link ) {
+					reportWebErrorToServer.reportErrorObjectToServer( Error( "Did not get rendered link for UDR..." ));
+					throw e;
+				}
+				
+				var distance = link.length;
+				
+				for( var j = 0; j < udrItem.psmItemList.length; j++ ) {
+					var psmItem = udrItem.psmItemList[ j ];
+					
+					reportText += searchId + "\t";
+					reportText += "crosslink\t";
+					reportText += _proteinNames[ protein1 ] + "\t";
+					reportText += position1 + "\t";
+					reportText += _proteinNames[ protein2 ] + "\t";
+					reportText += position2 + "\t";
+					reportText += distance + "\t";
+					
+					for( var m = 0; m < psmItem.psmValues.length; m++ ) {
+						if( m != 0 ) { reportText += "\t"; }
+						
+						reportText += psmItem.psmValues[ m ];
+					}
+					
+					reportText += "\n";										
+				}
+			}
+		}
+		
+		
+		if( searchData.looplinkUdrItemList && searchData.looplinkUdrItemList.length > 0 ) {
+			
+			for( var k = 0; k < searchData.looplinkUdrItemList.length; k++ ) {
+				
+				var udrItem = searchData.looplinkUdrItemList[ k ];
+				
+				var protein1 = udrItem.protId1;
+				var position1 = udrItem.pos1;
+				var position2 = udrItem.pos2;
+				
+				var link = getRenderedLink( "looplink", protein1, position1, protein1, position2 );
+				if( !link ) {
+					reportWebErrorToServer.reportErrorObjectToServer( Error( "Did not get rendered link for UDR..." ));
+					throw e;
+				}
+				
+				var distance = link.length;
+				
+				for( var j = 0; j < udrItem.psmItemList.length; j++ ) {
+					var psmItem = udrItem.psmItemList[ j ];
+					
+					reportText += searchId + "\t";
+					reportText += "looplink\t";
+					reportText += _proteinNames[ protein1 ] + "\t";
+					reportText += position1 + "\t";
+					reportText += _proteinNames[ protein1 ] + "\t";
+					reportText += position2 + "\t";
+					reportText += distance + "\t";
+					
+					for( var m = 0; m < psmItem.psmValues.length; m++ ) {
+						if( m != 0 ) { reportText += "\t"; }
+						
+						reportText += psmItem.psmValues[ m ];
+					}
+					
+					reportText += "\n";										
+				}
+			}
+		}
+	}
+	
+	downloadStringAsFile( "psm-udr-report.txt", "text/plain", reportText );
+
+}
+
 
 function collateAndDownloadDetailedUDRReport( data ) {
 
@@ -1044,12 +1244,6 @@ function downloadDetailedUDRReport() {
 	loadDetailedUDRData( collateAndDownloadDetailedUDRReport );
 }
 
-/**
- * Download a report of all PSMs for the shown UDRs
- */
-function downloadPSMsForAllShownUDRLinks() {
-	loadDetailedUDRData( collateAndDownloadShownPSMS );
-}
 
 function loadCrosslinkPSMCounts( doDraw ) {
 	
