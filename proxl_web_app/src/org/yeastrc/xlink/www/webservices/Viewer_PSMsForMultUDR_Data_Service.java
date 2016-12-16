@@ -389,23 +389,31 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 				
 				single_Search_Result.setPsmValuesNames( psmValuesNames );
 				
-				single_Search_Result.crosslinkUdrItemList = 
-						processCrosslinkOrLooplink(
-								searchId, 
-								LinkType.Crosslink, 
-								webserviceRequest.crosslinkUdrRequestList,
-								searcherCutoffValuesSearchLevel, 
-								annotationTypesOrderByNameList,
-								annotationTypeIdsForGettingAnnotationData );
+				if ( webserviceRequest.crosslinkUdrRequestList != null 
+						&& ( ! webserviceRequest.crosslinkUdrRequestList.isEmpty() ) ) {
+				
+					single_Search_Result.crosslinkUdrItemList = 
+							processCrosslinkOrLooplink(
+									searchId, 
+									LinkType.Crosslink, 
+									webserviceRequest.crosslinkUdrRequestList,
+									searcherCutoffValuesSearchLevel, 
+									annotationTypesOrderByNameList,
+									annotationTypeIdsForGettingAnnotationData );
+				}
 
-				single_Search_Result.looplinkUdrItemList = 
-						processCrosslinkOrLooplink(
-								searchId, 
-								LinkType.Looplink, 
-								webserviceRequest.looplinkUdrRequestList,
-								searcherCutoffValuesSearchLevel, 
-								annotationTypesOrderByNameList,
-								annotationTypeIdsForGettingAnnotationData );
+				if ( webserviceRequest.looplinkUdrRequestList != null 
+						&& ( ! webserviceRequest.looplinkUdrRequestList.isEmpty() ) ) {
+
+					single_Search_Result.looplinkUdrItemList = 
+							processCrosslinkOrLooplink(
+									searchId, 
+									LinkType.Looplink, 
+									webserviceRequest.looplinkUdrRequestList,
+									searcherCutoffValuesSearchLevel, 
+									annotationTypesOrderByNameList,
+									annotationTypeIdsForGettingAnnotationData );
+				}
 			}
 
 			return viewer_UDR_Data_Service_Result;
