@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 //import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -65,19 +66,26 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 	public static class Viewer_UDR_Data_Service_Request {
 
 		private List<Integer> searchIds;
-		private List<Viewer_UDR_Data_Service_Single_UDR_Request> udrRequestList;
+		private List<Viewer_UDR_Data_Service_Single_UDR_Request> crosslinkUdrRequestList;
+		private List<Viewer_UDR_Data_Service_Single_UDR_Request> looplinkUdrRequestList;
 
-		public List<Viewer_UDR_Data_Service_Single_UDR_Request> getUdrRequestList() {
-			return udrRequestList;
-		}
-		public void setUdrRequestList(List<Viewer_UDR_Data_Service_Single_UDR_Request> udrRequestList) {
-			this.udrRequestList = udrRequestList;
-		}
 		public List<Integer> getSearchIds() {
 			return searchIds;
 		}
 		public void setSearchIds(List<Integer> searchIds) {
 			this.searchIds = searchIds;
+		}
+		public List<Viewer_UDR_Data_Service_Single_UDR_Request> getCrosslinkUdrRequestList() {
+			return crosslinkUdrRequestList;
+		}
+		public void setCrosslinkUdrRequestList(List<Viewer_UDR_Data_Service_Single_UDR_Request> crosslinkUdrRequestList) {
+			this.crosslinkUdrRequestList = crosslinkUdrRequestList;
+		}
+		public List<Viewer_UDR_Data_Service_Single_UDR_Request> getLooplinkUdrRequestList() {
+			return looplinkUdrRequestList;
+		}
+		public void setLooplinkUdrRequestList(List<Viewer_UDR_Data_Service_Single_UDR_Request> looplinkUdrRequestList) {
+			this.looplinkUdrRequestList = looplinkUdrRequestList;
 		}
 	}
 
@@ -132,22 +140,30 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 
 	public static class Viewer_UDR_Data_Service_Single_Search_Result {
 		
-		private List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> udrItemList;
+		private List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> crosslinkUdrItemList;
+		private List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> looplinkUdrItemList;
 		
 		private List<String> psmValuesNames;
 
-		public List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> getUdrItemList() {
-			return udrItemList;
-		}
-		public void setUdrItemList(List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> udrItemList) {
-			this.udrItemList = udrItemList;
-		}
 		public List<String> getPsmValuesNames() {
 			return psmValuesNames;
 		}
 		public void setPsmValuesNames(List<String> psmValuesNames) {
 			this.psmValuesNames = psmValuesNames;
 		}
+		public List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> getCrosslinkUdrItemList() {
+			return crosslinkUdrItemList;
+		}
+		public void setCrosslinkUdrItemList(List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> crosslinkUdrItemList) {
+			this.crosslinkUdrItemList = crosslinkUdrItemList;
+		}
+		public List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> getLooplinkUdrItemList() {
+			return looplinkUdrItemList;
+		}
+		public void setLooplinkUdrItemList(List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> looplinkUdrItemList) {
+			this.looplinkUdrItemList = looplinkUdrItemList;
+		}
+
 	}
 
 	/**
@@ -215,25 +231,16 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/getMultPsmUDRDataCrosslink") 
+	@Path("/getMultPsmUDRData") 
 	public Viewer_UDR_Data_Service_Result getViewerDataCrosslink(
 			@QueryParam( "query" ) String queryJSONString,
 			@Context HttpServletRequest request )
 	throws Exception {
-		return getViewerDataMultUDRInternalFromJSON( queryJSONString, LinkType.Crosslink, request );
-	}
-
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/getMultPsmUDRDataLooplink") 
-	public Viewer_UDR_Data_Service_Result getViewerDataLooplink(
-			@QueryParam( "query" ) String queryJSONString,
-			@Context HttpServletRequest request )
-	throws Exception {
-		return getViewerDataMultUDRInternalFromJSON( queryJSONString, LinkType.Looplink, request );
+		return getViewerDataMultUDRInternalFromJSON( queryJSONString, request );
 	}
 	
-	@Path("/getMultPsmUDRDataCrosslink") 
+	@POST
+	@Path("/getMultPsmUDRData") 
 	@Consumes( MediaType.APPLICATION_JSON )
 	@Produces(MediaType.APPLICATION_JSON)
 	public Viewer_UDR_Data_Service_Result getViewerDataMultUDRCrosslinkPost(
@@ -241,19 +248,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 			@Context HttpServletRequest request )
 					throws Exception {
 		
-		return getViewerDataMultUDRInternal( webserviceRequest, LinkType.Crosslink, request );
-	}
-	
-
-	@Path("/getMultPsmUDRDataLooplink") 
-	@Consumes( MediaType.APPLICATION_JSON )
-	@Produces(MediaType.APPLICATION_JSON)
-	public Viewer_UDR_Data_Service_Result getViewerDataMultUDRLooplinkPost(
-			Viewer_UDR_Data_Service_Request webserviceRequest,
-			@Context HttpServletRequest request )
-					throws Exception {
-		
-		return getViewerDataMultUDRInternal( webserviceRequest, LinkType.Looplink, request );
+		return getViewerDataMultUDRInternal( webserviceRequest, request );
 	}
 	
 	/**
@@ -264,7 +259,6 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 	 */
 	private Viewer_UDR_Data_Service_Result getViewerDataMultUDRInternalFromJSON(
 			String queryJSONString,
-			LinkType linkType,
 			HttpServletRequest request )
 	throws Exception {
 
@@ -318,7 +312,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 					);
 		}
 
-		return getViewerDataMultUDRInternal( webserviceRequest, linkType, request );
+		return getViewerDataMultUDRInternal( webserviceRequest, request );
 	}
 
 
@@ -331,7 +325,6 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 	 */
 	private Viewer_UDR_Data_Service_Result getViewerDataMultUDRInternal(
 			Viewer_UDR_Data_Service_Request webserviceRequest,
-			LinkType linkType,
 			HttpServletRequest request )
 					throws Exception {
 
@@ -399,153 +392,25 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 				Viewer_UDR_Data_Service_Single_Search_Result single_Search_Result = new Viewer_UDR_Data_Service_Single_Search_Result();
 				dataForSearches.put( searchId, single_Search_Result );
 				
-				
-				
-				
-				List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> udrItemList = new ArrayList<>();
-				single_Search_Result.setUdrItemList( udrItemList );
 				single_Search_Result.setPsmValuesNames( psmValuesNames );
 				
-				for ( Viewer_UDR_Data_Service_Single_UDR_Request singleUDRRequest : webserviceRequest.udrRequestList  ) {
+				single_Search_Result.crosslinkUdrItemList = 
+						processCrosslinkOrLooplink(
+								searchId, 
+								LinkType.Crosslink, 
+								webserviceRequest.crosslinkUdrRequestList,
+								searcherCutoffValuesSearchLevel, 
+								annotationTypesOrderByNameList,
+								annotationTypeIdsForGettingAnnotationData );
 
-					Viewer_PSM_UDR_Data_Service_Result_UDR_Item udrItem = new Viewer_PSM_UDR_Data_Service_Result_UDR_Item(); 
-					udrItemList.add( udrItem );
-					
-					udrItem.protId1 = singleUDRRequest.protId1;
-					udrItem.protId2 = singleUDRRequest.protId2;
-					udrItem.pos1 = singleUDRRequest.pos1;
-					udrItem.pos2 = singleUDRRequest.pos2;
-					
-					List<Viewer_PSM_UDR_Data_Service_Result_PSM_Item> udrPsmItemList = new ArrayList<>();
-					udrItem.psmItemList = udrPsmItemList;
-
-
-					List<? extends SearchPeptideCommonLinkAnnDataWrapperIF> reportedPeptideList = null;
-
-					if ( linkType == LinkType.Crosslink ) {
-						//  Get peptides for these parameters for Crosslinks
-
-						if ( singleUDRRequest.protId1 == null ) {
-							String msg = "Provided protId1 is null or missing";
-							log.error( msg );
-							throw new WebApplicationException(
-									Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-									.entity( msg ).build() );
-						}
-
-						if ( singleUDRRequest.pos1 == null ) {
-							String msg = "Provided pos1 is null or missing";
-							log.error( msg );
-							throw new WebApplicationException(
-									Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-									.entity( msg ).build() );
-						}
-						if ( singleUDRRequest.protId2 == null ) {
-							String msg = "Provided protId2 is null or missing";
-							log.error( msg );
-							throw new WebApplicationException(
-									Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-									.entity( msg ).build() );
-						}
-						if ( singleUDRRequest.pos2 == null ) {
-							String msg = "Provided pos2 is null or missing";
-							log.error( msg );
-							throw new WebApplicationException(
-									Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-									.entity( msg ).build() );
-						}
-						reportedPeptideList = 
-								SearchPeptideCrosslink_LinkedPosition_Searcher.getInstance()
-								.searchOnSearchProteinCrosslink( 
-										searchId, 
-										searcherCutoffValuesSearchLevel, // empty so retrieving everything 
-										singleUDRRequest.protId1, 
-										singleUDRRequest.protId2, 
-										singleUDRRequest.pos1, 
-										singleUDRRequest.pos2 );
-
-					} else {
-						//  Get peptides for these parameters for Looplinks
-
-						if ( singleUDRRequest.protId1 == null ) {
-							String msg = "Provided protId1 is null or missing";
-							log.error( msg );
-							throw new WebApplicationException(
-									Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-									.entity( msg ).build() );
-						}
-
-						if ( singleUDRRequest.pos1 == null ) {
-							String msg = "Provided pos1 is null or missing";
-							log.error( msg );
-							throw new WebApplicationException(
-									Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-									.entity( msg ).build() );
-						}
-						if ( singleUDRRequest.pos2 == null ) {
-							String msg = "Provided pos2 is null or missing";
-							log.error( msg );
-							throw new WebApplicationException(
-									Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-									.entity( msg ).build() );
-						}
-						reportedPeptideList = 
-								SearchPeptideLooplink_LinkedPosition_Searcher.getInstance()
-								.searchOnSearchProteinLooplink( 
-										searchId, 
-										searcherCutoffValuesSearchLevel, 
-										singleUDRRequest.protId1, 
-										singleUDRRequest.pos1, 
-										singleUDRRequest.pos2 );
-					}
-
-
-					for ( SearchPeptideCommonLinkAnnDataWrapperIF reportedPeptideEntry : reportedPeptideList ) {
-
-						//  Get PSM data for each reported peptide
-						List<PsmWebDisplayWebServiceResult> psmWebDisplayList = 
-								PsmWebDisplaySearcher.getInstance()
-								.getPsmsWebDisplay( searchId, 
-										reportedPeptideEntry.getReportedPeptideId(), 
-										searcherCutoffValuesSearchLevel // empty so retrieving everything  
-										);
-						// Process PSMs
-						for ( PsmWebDisplayWebServiceResult psmWebDisplayEntry :psmWebDisplayList ) {
-
-							Viewer_PSM_UDR_Data_Service_Result_PSM_Item udrPsmItem = new Viewer_PSM_UDR_Data_Service_Result_PSM_Item();
-							udrPsmItemList.add(udrPsmItem);
-							
-							List<String> psmValues = new ArrayList<>();
-							udrPsmItem.setPsmValues( psmValues );
-							udrPsmItem.setPsmId( psmWebDisplayEntry.getPsmDTO().getId() );
-
-							// For each PSM, get the annotation data for it
-							List<PsmAnnotationDTO> psmAnnotationDataList = 
-									PsmAnnotationDataSearcher.getInstance()
-									.getPsmAnnotationDTOList( 
-											psmWebDisplayEntry.getPsmDTO().getId(), 
-											annotationTypeIdsForGettingAnnotationData );
-							// Transfer to map for lookup by ann type id
-							Map<Integer,PsmAnnotationDTO> psmAnnotationDataMap = new HashMap<>();
-							for ( PsmAnnotationDTO item : psmAnnotationDataList ) {
-								psmAnnotationDataMap.put( item.getAnnotationTypeId(), item );
-							}
-							//  Copy to output by ann type id
-							for ( AnnotationTypeDTO annotationType : annotationTypesOrderByNameList ) {
-								PsmAnnotationDTO psmAnnotationDTO = psmAnnotationDataMap.get( annotationType.getId() );
-								if ( psmAnnotationDTO == null ) {
-									String msg = "No data for ann type id: " + annotationType.getId() 
-									+ ", for PSM id: " + psmWebDisplayEntry.getPsmDTO().getId();
-									log.error( msg );
-									throw new ProxlWebappDataException( msg );
-								}
-								psmValues.add( psmAnnotationDTO.getValueString() );
-							}
-						}
-
-					}
-
-				}
+				single_Search_Result.looplinkUdrItemList = 
+						processCrosslinkOrLooplink(
+								searchId, 
+								LinkType.Looplink, 
+								webserviceRequest.looplinkUdrRequestList,
+								searcherCutoffValuesSearchLevel, 
+								annotationTypesOrderByNameList,
+								annotationTypeIdsForGettingAnnotationData );
 			}
 
 			return viewer_UDR_Data_Service_Result;
@@ -569,6 +434,175 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		}
 
 
+	}
+
+
+	/**
+	 * @param searchId
+	 * @param linkType
+	 * @param udrRequestList
+	 * @param searcherCutoffValuesSearchLevel
+	 * @param annotationTypesOrderByNameList
+	 * @param annotationTypeIdsForGettingAnnotationData
+	 * @return
+	 * @throws Exception
+	 * @throws ProxlWebappDataException
+	 */
+	public List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> processCrosslinkOrLooplink(
+			int searchId,
+			LinkType linkType,
+			List<Viewer_UDR_Data_Service_Single_UDR_Request> udrRequestList,
+			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel, 
+			List<AnnotationTypeDTO> annotationTypesOrderByNameList,
+			Set<Integer> annotationTypeIdsForGettingAnnotationData 
+			)
+					throws Exception, ProxlWebappDataException {
+
+		
+		List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> udrItemList = new ArrayList<>();
+		
+		for ( Viewer_UDR_Data_Service_Single_UDR_Request singleUDRRequest : udrRequestList ) {
+
+			Viewer_PSM_UDR_Data_Service_Result_UDR_Item udrItem = new Viewer_PSM_UDR_Data_Service_Result_UDR_Item(); 
+			udrItemList.add( udrItem );
+			
+			udrItem.protId1 = singleUDRRequest.protId1;
+			udrItem.protId2 = singleUDRRequest.protId2;
+			udrItem.pos1 = singleUDRRequest.pos1;
+			udrItem.pos2 = singleUDRRequest.pos2;
+			
+			List<Viewer_PSM_UDR_Data_Service_Result_PSM_Item> udrPsmItemList = new ArrayList<>();
+			udrItem.psmItemList = udrPsmItemList;
+
+
+			List<? extends SearchPeptideCommonLinkAnnDataWrapperIF> reportedPeptideList = null;
+
+			if ( linkType == LinkType.Crosslink ) {
+				//  Get peptides for these parameters for Crosslinks
+
+				if ( singleUDRRequest.protId1 == null ) {
+					String msg = "Provided protId1 is null or missing";
+					log.error( msg );
+					throw new WebApplicationException(
+							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+							.entity( msg ).build() );
+				}
+
+				if ( singleUDRRequest.pos1 == null ) {
+					String msg = "Provided pos1 is null or missing";
+					log.error( msg );
+					throw new WebApplicationException(
+							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+							.entity( msg ).build() );
+				}
+				if ( singleUDRRequest.protId2 == null ) {
+					String msg = "Provided protId2 is null or missing";
+					log.error( msg );
+					throw new WebApplicationException(
+							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+							.entity( msg ).build() );
+				}
+				if ( singleUDRRequest.pos2 == null ) {
+					String msg = "Provided pos2 is null or missing";
+					log.error( msg );
+					throw new WebApplicationException(
+							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+							.entity( msg ).build() );
+				}
+				reportedPeptideList = 
+						SearchPeptideCrosslink_LinkedPosition_Searcher.getInstance()
+						.searchOnSearchProteinCrosslink( 
+								searchId, 
+								searcherCutoffValuesSearchLevel, // empty so retrieving everything 
+								singleUDRRequest.protId1, 
+								singleUDRRequest.protId2, 
+								singleUDRRequest.pos1, 
+								singleUDRRequest.pos2 );
+
+			} else {
+				//  Get peptides for these parameters for Looplinks
+
+				if ( singleUDRRequest.protId1 == null ) {
+					String msg = "Provided protId1 is null or missing";
+					log.error( msg );
+					throw new WebApplicationException(
+							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+							.entity( msg ).build() );
+				}
+
+				if ( singleUDRRequest.pos1 == null ) {
+					String msg = "Provided pos1 is null or missing";
+					log.error( msg );
+					throw new WebApplicationException(
+							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+							.entity( msg ).build() );
+				}
+				if ( singleUDRRequest.pos2 == null ) {
+					String msg = "Provided pos2 is null or missing";
+					log.error( msg );
+					throw new WebApplicationException(
+							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+							.entity( msg ).build() );
+				}
+				reportedPeptideList = 
+						SearchPeptideLooplink_LinkedPosition_Searcher.getInstance()
+						.searchOnSearchProteinLooplink( 
+								searchId, 
+								searcherCutoffValuesSearchLevel, 
+								singleUDRRequest.protId1, 
+								singleUDRRequest.pos1, 
+								singleUDRRequest.pos2 );
+			}
+
+
+			for ( SearchPeptideCommonLinkAnnDataWrapperIF reportedPeptideEntry : reportedPeptideList ) {
+
+				//  Get PSM data for each reported peptide
+				List<PsmWebDisplayWebServiceResult> psmWebDisplayList = 
+						PsmWebDisplaySearcher.getInstance()
+						.getPsmsWebDisplay( searchId, 
+								reportedPeptideEntry.getReportedPeptideId(), 
+								searcherCutoffValuesSearchLevel // empty so retrieving everything  
+								);
+				// Process PSMs
+				for ( PsmWebDisplayWebServiceResult psmWebDisplayEntry :psmWebDisplayList ) {
+
+					Viewer_PSM_UDR_Data_Service_Result_PSM_Item udrPsmItem = new Viewer_PSM_UDR_Data_Service_Result_PSM_Item();
+					udrPsmItemList.add(udrPsmItem);
+					
+					List<String> psmValues = new ArrayList<>();
+					udrPsmItem.setPsmValues( psmValues );
+					udrPsmItem.setPsmId( psmWebDisplayEntry.getPsmDTO().getId() );
+
+					// For each PSM, get the annotation data for it
+					List<PsmAnnotationDTO> psmAnnotationDataList = 
+							PsmAnnotationDataSearcher.getInstance()
+							.getPsmAnnotationDTOList( 
+									psmWebDisplayEntry.getPsmDTO().getId(), 
+									annotationTypeIdsForGettingAnnotationData );
+					// Transfer to map for lookup by ann type id
+					Map<Integer,PsmAnnotationDTO> psmAnnotationDataMap = new HashMap<>();
+					for ( PsmAnnotationDTO item : psmAnnotationDataList ) {
+						psmAnnotationDataMap.put( item.getAnnotationTypeId(), item );
+					}
+					//  Copy to output by ann type id
+					for ( AnnotationTypeDTO annotationType : annotationTypesOrderByNameList ) {
+						PsmAnnotationDTO psmAnnotationDTO = psmAnnotationDataMap.get( annotationType.getId() );
+						if ( psmAnnotationDTO == null ) {
+							String msg = "No data for ann type id: " + annotationType.getId() 
+							+ ", for PSM id: " + psmWebDisplayEntry.getPsmDTO().getId();
+							log.error( msg );
+							throw new ProxlWebappDataException( msg );
+						}
+						psmValues.add( psmAnnotationDTO.getValueString() );
+					}
+				}
+
+			}
+
+			
+		}
+		return udrItemList;
 	}
 
 
