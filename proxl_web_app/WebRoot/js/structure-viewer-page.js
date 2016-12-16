@@ -868,6 +868,13 @@ function loadCrosslinkData( doDraw ) {
 
 }
 
+function collateAndDownloadShownPSMS( data ) {
+	
+
+	
+	
+}
+
 function collateAndDownloadDetailedUDRReport( data ) {
 
 	var reportText = "";
@@ -988,7 +995,7 @@ function getRenderedLink( type, protein1, position1, protein2, position2 ) {
 	return null;	
 }
 
-function loadDetailedUDRData() {
+function loadDetailedUDRData( callback ) {
 	
 	console.log( "Loading detailed UDR data." );
 	
@@ -1010,7 +1017,7 @@ function loadDetailedUDRData() {
 
 			        		console.log( data );
 			        		
-			        		collateAndDownloadDetailedUDRReport( data );
+			        		callback( data );
 			        		
 			        	} catch( e ) {
 			        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -1028,6 +1035,20 @@ function loadDetailedUDRData() {
 					}
 			  });
 
+}
+
+/**
+ * Download a detailed UDR report
+ */
+function downloadDetailedUDRReport() {
+	loadDetailedUDRData( collateAndDownloadDetailedUDRReport );
+}
+
+/**
+ * Download a report of all PSMs for the shown UDRs
+ */
+function downloadPSMsForAllShownUDRLinks() {
+	loadDetailedUDRData( collateAndDownloadShownPSMS );
 }
 
 function loadCrosslinkPSMCounts( doDraw ) {
@@ -2837,10 +2858,13 @@ var redrawDistanceReport = function( ) {
 	html += "<div style=\"font-size:14pt;margin-top:15px;\">Download reports:</div>";
 	
 	if( _searchIds.length === 1 ) {
-		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:loadDetailedUDRData()\">All shown UDRs</a></div>";
+		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadDetailedUDRReport()\">All shown UDRs</a></div>";
 	} else {
 		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadShownUDRLinks()\">All shown UDRs</a></div>";
 	}
+	
+	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadPSMsForAllShownUDRLinks()\">PSMs for all shown UDRs</a></div>";
+
 	
 	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadAllLinkablePositions(0)\">All possible UDRs (all possible points on structure)</a></div>";
 	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadAllLinkablePositions(1)\">All possible UDRs (shortest-only)</a></div>";
