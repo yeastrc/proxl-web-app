@@ -27,16 +27,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
-import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
-import org.yeastrc.xlink.www.objects.SearchPeptideCommonLinkAnnDataWrapperIF;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.PsmAnnotationDataSearcher;
-import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
-import org.yeastrc.xlink.www.searcher.SearchPeptideCrosslink_LinkedPosition_Searcher;
-import org.yeastrc.xlink.www.searcher.SearchPeptideLooplink_LinkedPosition_Searcher;
+import org.yeastrc.xlink.www.searcher.PsmAnnFromCrosslinkProteinSearcher;
+import org.yeastrc.xlink.www.searcher.PsmAnnFromLooplinkProteinSearcher;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -474,11 +469,11 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 			List<Viewer_PSM_UDR_Data_Service_Result_PSM_Item> udrPsmItemList = new ArrayList<>();
 			udrItem.psmItemList = udrPsmItemList;
 
-
-			List<? extends SearchPeptideCommonLinkAnnDataWrapperIF> reportedPeptideList = null;
-
+			//  Map<PSM_ID,Map<AnnTypeId,Value>
+			Map<Integer,Map<Integer,Double>> psmAnnValues = null; 
+					
 			if ( linkType == LinkType.Crosslink ) {
-				//  Get peptides for these parameters for Crosslinks
+				//  Get psm data for these parameters for Crosslinks
 
 				if ( singleUDRRequest.protId1 == null ) {
 					String msg = "Provided protId1 is null or missing";
@@ -509,11 +504,11 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 							.entity( msg ).build() );
 				}
-				reportedPeptideList = 
-						SearchPeptideCrosslink_LinkedPosition_Searcher.getInstance()
+			
+				psmAnnValues = 
+						PsmAnnFromCrosslinkProteinSearcher.getInstance()
 						.searchOnSearchProteinCrosslink( 
 								searchId, 
-								searcherCutoffValuesSearchLevel, // empty so retrieving everything 
 								singleUDRRequest.protId1, 
 								singleUDRRequest.protId2, 
 								singleUDRRequest.pos1, 
@@ -544,63 +539,37 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 							.entity( msg ).build() );
 				}
-				reportedPeptideList = 
-						SearchPeptideLooplink_LinkedPosition_Searcher.getInstance()
-						.searchOnSearchProteinLooplink( 
-								searchId, 
-								searcherCutoffValuesSearchLevel, 
-								singleUDRRequest.protId1, 
-								singleUDRRequest.pos1, 
-								singleUDRRequest.pos2 );
+				
+				psmAnnValues =
+						PsmAnnFromLooplinkProteinSearcher.getInstance().searchOnSearchProteinLooplink( 
+								searchId, singleUDRRequest.protId1, singleUDRRequest.pos1, singleUDRRequest.pos2 );
 			}
 
 
-			for ( SearchPeptideCommonLinkAnnDataWrapperIF reportedPeptideEntry : reportedPeptideList ) {
+			for ( Map.Entry<Integer,Map<Integer,Double>> psmAnnValuesEntry : psmAnnValues.entrySet() ) {
 
-				//  Get PSM data for each reported peptide
-				List<PsmWebDisplayWebServiceResult> psmWebDisplayList = 
-						PsmWebDisplaySearcher.getInstance()
-						.getPsmsWebDisplay( searchId, 
-								reportedPeptideEntry.getReportedPeptideId(), 
-								searcherCutoffValuesSearchLevel // empty so retrieving everything  
-								);
-				// Process PSMs
-				for ( PsmWebDisplayWebServiceResult psmWebDisplayEntry :psmWebDisplayList ) {
+				Integer psmId = psmAnnValuesEntry.getKey();
+				Map<Integer,Double> psmAnnotationDataMap = psmAnnValuesEntry.getValue();
 
-					Viewer_PSM_UDR_Data_Service_Result_PSM_Item udrPsmItem = new Viewer_PSM_UDR_Data_Service_Result_PSM_Item();
-					udrPsmItemList.add(udrPsmItem);
-					
-					List<String> psmValues = new ArrayList<>();
-					udrPsmItem.setPsmValues( psmValues );
-					udrPsmItem.setPsmId( psmWebDisplayEntry.getPsmDTO().getId() );
+				Viewer_PSM_UDR_Data_Service_Result_PSM_Item udrPsmItem = new Viewer_PSM_UDR_Data_Service_Result_PSM_Item();
+				udrPsmItemList.add(udrPsmItem);
 
-					// For each PSM, get the annotation data for it
-					List<PsmAnnotationDTO> psmAnnotationDataList = 
-							PsmAnnotationDataSearcher.getInstance()
-							.getPsmAnnotationDTOList( 
-									psmWebDisplayEntry.getPsmDTO().getId(), 
-									annotationTypeIdsForGettingAnnotationData );
-					// Transfer to map for lookup by ann type id
-					Map<Integer,PsmAnnotationDTO> psmAnnotationDataMap = new HashMap<>();
-					for ( PsmAnnotationDTO item : psmAnnotationDataList ) {
-						psmAnnotationDataMap.put( item.getAnnotationTypeId(), item );
+				List<String> psmValues = new ArrayList<>();
+				udrPsmItem.setPsmValues( psmValues );
+				udrPsmItem.setPsmId( psmId );
+
+				//  Copy to output by ann type id
+				for ( AnnotationTypeDTO annotationType : annotationTypesOrderByNameList ) {
+					Double psmAnnValue = psmAnnotationDataMap.get( annotationType.getId() );
+					if ( psmAnnValue == null ) {
+						String msg = "No data for ann type id: " + annotationType.getId() 
+						+ ", for PSM id: " + psmId;
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
 					}
-					//  Copy to output by ann type id
-					for ( AnnotationTypeDTO annotationType : annotationTypesOrderByNameList ) {
-						PsmAnnotationDTO psmAnnotationDTO = psmAnnotationDataMap.get( annotationType.getId() );
-						if ( psmAnnotationDTO == null ) {
-							String msg = "No data for ann type id: " + annotationType.getId() 
-							+ ", for PSM id: " + psmWebDisplayEntry.getPsmDTO().getId();
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-						psmValues.add( psmAnnotationDTO.getValueString() );
-					}
+					psmValues.add( Double.toString( psmAnnValue ) );
 				}
-
 			}
-
-			
 		}
 		return udrItemList;
 	}
