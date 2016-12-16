@@ -25,10 +25,13 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDBDataOutOfSyncException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.dto.SearchProgramsPerSearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.search_programs_per_search_utils.GetSearchProgramsPerSearchData;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmAnnFromCrosslinkProteinSearcher;
 import org.yeastrc.xlink.www.searcher.PsmAnnFromLooplinkProteinSearcher;
@@ -377,9 +380,30 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 					}
 				});
 				
+				Map<Integer,SearchProgramsPerSearchDTO> searchProgramsPerSearchDTO_MappedOnId = new HashMap<>();
+				
 				List<String> psmValuesNames = new ArrayList<>();
 				for ( AnnotationTypeDTO annotationTypeDTO : annotationTypesOrderByNameList ) {
-					psmValuesNames.add( annotationTypeDTO.getName() );
+
+					Integer searchProgramsPerSearchId = annotationTypeDTO.getSearchProgramsPerSearchId();
+					
+					SearchProgramsPerSearchDTO searchProgramsPerSearchDTO = searchProgramsPerSearchDTO_MappedOnId.get( searchProgramsPerSearchId );
+
+					if ( searchProgramsPerSearchDTO == null ) {
+						searchProgramsPerSearchDTO =
+							GetSearchProgramsPerSearchData.getInstance().getSearchProgramsPerSearchDTO( searchProgramsPerSearchId );
+					}
+					
+					if ( searchProgramsPerSearchDTO == null ) {
+						String msg = "No searchProgramsPerSearchDTO record found for searchProgramsPerSearchId: " + searchProgramsPerSearchId;
+						log.error( msg );
+						throw new ProxlWebappDBDataOutOfSyncException( msg );
+					}
+					
+					String annTypeNameDesc = annotationTypeDTO.getName() + "("
+							+ searchProgramsPerSearchDTO.getDisplayName() + ")";
+					
+					psmValuesNames.add( annTypeNameDesc );
 				}
 				
 				
