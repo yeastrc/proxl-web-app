@@ -1865,7 +1865,10 @@
 													<c:if test="${ search.hasScanData }" >
 														[<a href="javascript:" data-tooltip="View scan counts as function of retention time" class="tool_tip_attached_jq qc_plot_scan_retention_time_link_jq" >Retention Time</a>]
 													</c:if>
-													[<a href="javascript:" data-tooltip="View PSM counts as function of score" class="tool_tip_attached_jq qc_plot_psm_count_vs_score_link_jq" >PSM Count vs/ Score</a>]
+													[<a href="javascript:" data-tooltip="View PSM counts as function of score" class="tool_tip_attached_jq qc_plot_psm_count_vs_score_link_jq" 
+														>PSM Count vs/ Score</a>]
+													[<a href="javascript:" data-tooltip="View 2 PSM scores plotted together" class="tool_tip_attached_jq qc_plot_psm_score_vs_score_link_jq" 
+														>Score vs/ Score</a>]
 												</td>
 											</tr>
 											
@@ -2707,7 +2710,201 @@
 		
 		<!-- END:   Modal dialog for displaying the PSM Q Value Counts QC plot -->
 								
+
+		<!--  Modal dialog for displaying the PSM Score VS Score QC plot -->
+
+
+			<%--   Overlay Background --%>
+			
+		<div id="psm_score_vs_score_qc_plot_overlay_background" 
+			class=" qc-plot-overlay-background   psm_score_vs_score_qc_plot_overlay_show_hide_parts_jq psm_score_vs_score_qc_plot_overlay_close_parts_jq  overlay_show_hide_parts_jq"  
+			style="display: none;"  >
 		
+		</div>
+			
+			<%--  PSM Score VS Score QC plot Overlay Div --%>
+			
+				<!--  Inline div for positioning modal dialog on page -->
+		<div class="qc-plot-overlay-containing-outermost-div " id="psm_score_vs_score_qc_plot_overlay_containing_outermost_div_inline_div" >
+
+		  <div class="qc-plot-overlay-containing-outer-div " style="position: relative;" >
+			
+			
+			
+			<div id="psm_score_vs_score_qc_plot_overlay_container" 
+				class=" qc-plot-overlay-div overlay-outer-div   psm_score_vs_score_qc_plot_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
+				style="display: none; "  >
+			
+				<div id="psm_score_vs_score_qc_plot_overlay_header" class="qc-plot-overlay-header" style="width:100%; " >
+				
+					<h1 id="psm_score_vs_score_qc_plot_overlay_X_for_exit_overlay" 
+						class="qc-plot-overlay-X-for-exit-overlay  psm_score_vs_score_qc_plot_overlay_close_parts_jq" 
+						>X</h1>
+						
+					<h1 id="psm_score_vs_score_qc_plot_overlay_header_text" class="qc-plot-overlay-header-text" 
+						>QC Plot: PSM Score Vs Score</h1>
+				</div>
+				<div id="psm_score_vs_score_qc_plot_overlay_body" class="qc-plot-overlay-body" >
+			
+			
+				<div >
+				
+					<input type="hidden" id="psm_score_vs_score_qc_plot_current_search_id" >
+					
+					<input type="hidden" id="psm_score_vs_score_qc_plot_current_search_name_and_id" >
+		
+					
+					<table style="border-width:0px;">
+						
+						
+						<tr>
+							<td>X-Axis Score:</td>
+							<td>
+								<select id="psm_score_vs_score_qc_plot_score_type_id_1" >
+									
+								</select>							
+							</td>
+						</tr>
+						
+						<tr>
+							<td>Y-Axis Score:</td>
+							<td>
+								<select id="psm_score_vs_score_qc_plot_score_type_id_2" >
+									
+								</select>							
+							</td>
+						</tr>
+
+						<tr id="psm_score_vs_score_qc_plot_score_cutoffs_on_import_row" 
+							style="display: none;">
+							<td id="psm_score_vs_score_qc_plot_score_cutoffs_on_import_message"
+								class=" qc-plot-filter-on-import-notice "
+								colspan="2" >
+								Note: Filtered on Import:
+								<%-- Block for annotations and values text --%>
+								<span id="psm_score_vs_score_qc_plot_score_cutoffs_on_import_anns_values" >
+								</span>
+							</td>	
+						</tr>
+						
+						<tr>
+							<td>PSMs with:</td>
+							<td>
+							  <label >
+								<input type="checkbox" class="psm_score_vs_score_qc_plot_link_type_include_jq psm_score_vs_score_qc_plot_on_change_jq"
+									checked="checked"
+									value="<%=QCPlotConstants.PSM_SCORE_VS_SCORE_PLOT__CROSSLINK_PSM%>" >
+								crosslinks
+							  </label>
+							  <label >
+								<input type="checkbox" class="psm_score_vs_score_qc_plot_link_type_include_jq psm_score_vs_score_qc_plot_on_change_jq"
+									checked="checked"
+									value="<%=QCPlotConstants.PSM_SCORE_VS_SCORE_PLOT__LOOPLINK_PSM%>" >
+								looplinks
+							  </label> 
+							  
+							  <label >
+								<input type="checkbox" class="psm_score_vs_score_qc_plot_link_type_include_jq psm_score_vs_score_qc_plot_on_change_jq"
+									checked="checked"
+									value="<%=QCPlotConstants.PSM_SCORE_VS_SCORE_PLOT__UNLINKED_PSM%>" >
+								unlinked
+							  </label>
+
+							</td>
+						</tr>
+			
+												
+						<tr>
+							<td>Max: </td>
+							<td>
+								X:
+								<input type="text" id="psm_score_vs_score_qc_plot_max_x" 
+									class="psm_score_vs_score_qc_plot_on_change_jq" 
+									size="8"> 
+								Y:
+								<input type="text" id="psm_score_vs_score_qc_plot_max_y" 
+									class="psm_score_vs_score_qc_plot_on_change_jq"
+									size="8">
+				
+								<input type="button" id="psm_score_vs_score_qc_plot_max_reset_button" value="Reset">
+							</td>
+						</tr>	
+														
+					</table>
+					
+					<div style="margin-bottom: 15px;">
+						<span id="svg-download">
+							<a id="download_as_link"
+									data-tooltip="Download current image as file." style="font-size:10pt;white-space:nowrap;" 
+									href="#" class="tool_tip_attached_jq download-svg">[Download Image]</a>
+								
+							<span id="svg-download-options">
+								Choose file format:
+								<a data-tooltip="Download as a JPEG image file." id="psm_score-svg-download-jpeg" class="svg-download-option tool_tip_attached_jq" href="javascript:" style="margin-top:5px;">JPEG</a>
+								<a data-tooltip="Download as PDF file suitable for use in Adobe Illustrator or printing." id="psm_score-svg-download-pdf" class="svg-download-option tool_tip_attached_jq" href="javascript:">PDF</a>
+								<a data-tooltip="Download as PNG image file." id="psm_score-svg-download-png" class="svg-download-option tool_tip_attached_jq" href="javascript:">PNG</a>
+								<a data-tooltip="Download as scalable vector graphics file suitable for use in Inkscape or other compatible software." id="psm_score-svg-download-svg" class="svg-download-option tool_tip_attached_jq" href="javascript:">SVG</a>
+							</span>
+						</span>			
+						
+						<a href="javascript:" id="psm_score-svg-download-data"
+							data-tooltip="Download current data as tab limited text." style="font-size:10pt;white-space:nowrap;" 
+							href="#" class="tool_tip_attached_jq download-svg">[Download Data]</a>
+						
+					</div>
+
+					<div style="clear: both; " >
+					</div>
+					
+					<h1 class="psm_score_vs_score_qc_plot_no_data_jq" 
+						style="display: none;  ">
+					
+						No Data
+					</h1>
+					
+					
+					<h1 class="psm_score_vs_score_qc_plot_param_not_a_number_jq" 
+						style="display: none;  ">
+					
+						Max X or Max Y is not empty and is not a number
+					</h1>
+					
+					
+					<%-- overflow: hidden; and left: -50px; to clip off padding from left side of chart --%>
+					
+<%-- 				commented out since on redraw shifts further left and hides vertical axis label
+ 	
+					<div style="position: relative; width: 920px; height: 650px; overflow: hidden;" >
+						<div style="position: absolute; top: 0px; left: -50px;">
+--%>						
+					<div class=" psm_score_vs_score_qc_plot_have_data_jq ">
+					
+							<div id="psm_score_vs_score_qc_plot_chartDiv"
+								style="width: 920px; height: 650px;"  
+									<%-- style="width: 1050px; height: 800px;"   
+										Keep this width and height in sync with the chart create config in the 
+													JS as RETENTION_TIME_COUNT_CHART_WIDTH and RETENTION_TIME_COUNT_CHART_HEIGHT  --%>
+								></div>
+												
+					</div>
+<%-- 					
+						</div>
+					</div>
+--%>
+					
+									
+				</div>
+				
+			</div>
+		   
+		   </div>
+	
+		  </div>
+		</div>
+		
+		
+		<!-- END:   Modal dialog for displaying the PSM Score VS Score QC plot -->
+										
 		
 		<!--  END:    Overlays for displaying QC Quality Control Plots/Charts   -->
 	
@@ -2862,6 +3059,8 @@
 			  initQCCharts();
 			  
 			  initQCChartPSMCountVsScore();
+
+			  initQCChartPSMScoreVsScore();
 	   },10);
 	  
   };
@@ -2873,6 +3072,7 @@
 			<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
 			<script type="text/javascript" src="${ contextPath }/js/qcChartsViewProjectPage.js?x=${cacheBustValue}"></script>
 			<script type="text/javascript" src="${ contextPath }/js/qcChartPSMCountsVsScore.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="${ contextPath }/js/qcChartPSMScoreVsScore.js?x=${cacheBustValue}"></script>
 	
 
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>

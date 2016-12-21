@@ -227,6 +227,8 @@ var _project_id = null;
 	 					initQCPlotsClickHandlers();
 
 	 					initQCPlotPSMCountVsScoreClickHandlers();
+	 					
+	 					initQCPlotPSMScoreVsScoreClickHandlers();
 
 	 				} catch( e ) {
 	 					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );

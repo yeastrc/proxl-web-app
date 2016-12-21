@@ -1,3 +1,4 @@
+
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -1039,6 +1040,8 @@ CREATE INDEX psm_filtrble_ann__generic_lkup__srch_rep_pep_anntpid_value ON psm_f
 
 CREATE INDEX psm_filtrble_ann__generic_lkup__psm_id_idx ON psm_filterable_annotation__generic_lookup (psm_id ASC);
 
+CREATE INDEX search_id_ann_type_id_link_type ON psm_filterable_annotation__generic_lookup (search_id ASC, annotation_type_id ASC, psm_type ASC);
+
 
 -- -----------------------------------------------------
 -- Table default_page_view_generic
@@ -1408,7 +1411,8 @@ CREATE TABLE  srch_rep_pept__prot_seq_id_pos_monolink (
     REFERENCES srch_rep_pept__peptide (id)
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
-ENGINE = InnoDB;
+ENGINE = InnoDB
+COMMENT = 'Each entry is a mapping of a peptide entry in the table srch_rep_pept__peptide\nto a protein.\nIt also contains the position of the monolink in the peptide.';
 
 CREATE INDEX search_rep_pept_idx ON srch_rep_pept__prot_seq_id_pos_monolink (search_id ASC, reported_peptide_id ASC);
 
@@ -1433,7 +1437,8 @@ CREATE TABLE  srch_rep_pept__prot_seq_id_pos_crosslink (
     REFERENCES srch_rep_pept__peptide (id)
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
-ENGINE = InnoDB;
+ENGINE = InnoDB
+COMMENT = 'Each entry is a mapping of a peptide entry in the table srch_rep_pept__peptide\nto a protein.\n\nLike in srch_rep_pept__peptide, each entry in this table is for one half of the crosslink.';
 
 CREATE INDEX search_rep_pept_idx ON srch_rep_pept__prot_seq_id_pos_crosslink (search_id ASC, reported_peptide_id ASC);
 
@@ -1459,7 +1464,8 @@ CREATE TABLE  srch_rep_pept__prot_seq_id_pos_looplink (
     REFERENCES srch_rep_pept__peptide (id)
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
-ENGINE = InnoDB;
+ENGINE = InnoDB
+COMMENT = 'Each entry is a mapping of a peptide entry in the table srch_rep_pept__peptide\nto a protein.\n\n';
 
 CREATE INDEX search_rep_pept_idx ON srch_rep_pept__prot_seq_id_pos_looplink (search_id ASC, reported_peptide_id ASC);
 
@@ -1483,7 +1489,8 @@ CREATE TABLE  srch_rep_pept__prot_seq_id_unlinked_dimer (
     REFERENCES srch_rep_pept__peptide (id)
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
-ENGINE = InnoDB;
+ENGINE = InnoDB
+COMMENT = 'Each entry is a mapping of a peptide entry in the table srch_rep_pept__peptide\nto a protein.\n\nLike in srch_rep_pept__peptide, for Dimer, each entry in this table is for one half of the Dimer.';
 
 CREATE INDEX search_rep_pept_idx ON srch_rep_pept__prot_seq_id_unlinked_dimer (search_id ASC, reported_peptide_id ASC);
 

@@ -97,6 +97,11 @@ public class ConvertAndDownloadSVGAction extends Action {
 				throw new ProxlWebappDataException(msg);
 			}
 			
+//			String svgString = downloadForm.getSvgString();
+//			
+//			int svgStringLength = svgString.length();
+//			
+//			String svgStringLast100Chars = svgString.substring( svgString.length() - 100 );
 
 			byte[] fileBytes = this.getBytes( downloadForm.getSvgString(), downloadForm.getFileType() );
 			String fileName = this.getFilename( downloadForm.getFileType() );

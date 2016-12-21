@@ -17,4 +17,9 @@ public class QCPlotConstants {
 	
 	public static final String PSM_COUNT_VS_SCORE_PLOT__ALL_PSM = "ALL";
 	
+
+	public static final String PSM_SCORE_VS_SCORE_PLOT__CROSSLINK_PSM = "CROSSLINK";
+	public static final String PSM_SCORE_VS_SCORE_PLOT__LOOPLINK_PSM = "LOOPLINK";
+	public static final String PSM_SCORE_VS_SCORE_PLOT__UNLINKED_PSM = "UNLINKED";
+	
 }
