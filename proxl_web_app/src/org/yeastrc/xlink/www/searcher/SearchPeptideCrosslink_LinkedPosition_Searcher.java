@@ -73,6 +73,16 @@ public class SearchPeptideCrosslink_LinkedPosition_Searcher {
 	
 
 
+	//  The data returned from THIS SEARCHER IS CORRECT 
+	//  since Duplicate reported_peptide_id values 
+	//  are checked for in the Java code and dropped.
+	//  (See use of retrieved_reported_peptide_id_values_Set)
+	//  The following WARNING only applies if using this SQL elsewhere.
+	
+	//  WARNING:  This SQL returns duplicate records 
+	//				when Prot_Seq_Id_1 = Prot_Seq_Id_2  AND Prot_Pos_1 = Prot_Pos_2
+	
+
 	private final String SQL_FIRST_PART = 
 			
 			"SELECT unified_rp__search__rep_pept__generic_lookup.reported_peptide_id, "

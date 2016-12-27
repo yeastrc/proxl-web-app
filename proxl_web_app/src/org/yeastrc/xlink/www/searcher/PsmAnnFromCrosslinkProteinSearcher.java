@@ -21,6 +21,13 @@ public class PsmAnnFromCrosslinkProteinSearcher {
 	private static final PsmAnnFromCrosslinkProteinSearcher _INSTANCE = new PsmAnnFromCrosslinkProteinSearcher();
 	public static PsmAnnFromCrosslinkProteinSearcher getInstance() { return _INSTANCE; }
 
+
+	//  The data returned from THIS SEARCHER IS CORRECT since the data is placed in MAPs.
+	//  The following WARNING only applies if using this SQL elsewhere.
+	
+	//  WARNING:  This SQL returns duplicate records 
+	//				when Prot_Seq_Id_1 = Prot_Seq_Id_2  AND Prot_Pos_1 = Prot_Pos_2
+	
 	
 	private final String SQL = 
 			"SELECT psm_fltrbl_tbl.psm_id, psm_fltrbl_tbl.annotation_type_id, psm_fltrbl_tbl.value_double "

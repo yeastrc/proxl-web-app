@@ -77,9 +77,17 @@ public class SearchPeptideCrosslink_ForCrosslinkPeptideWS_Searcher {
 	private final String PEPTIDE_FILTER_TABLE_ALIAS = "pept_value_tbl_";
 	
 	
+
+	//  The data returned from THIS SEARCHER IS CORRECT 
+	//  since Duplicate reported_peptide_id values 
+	//  are automatically droppped in the Java code since the result set is stored
+	//  in a Map keyed on reported_peptide_id.
+	//  (See use of queryResultItemListMapKeyedOnReportedPeptideId)
+	//  The following WARNING only applies if using this SQL elsewhere.
+   
+	//  WARNING:  This SQL returns duplicate records 
+	//				when Prot_Seq_Id_1 = Prot_Seq_Id_2  AND Prot_Pos_1 = Prot_Pos_2
 	
-
-
 	private final String SQL_FIRST_PART = 
 			
 			"SELECT unified_rp__search__rep_pept__generic_lookup.reported_peptide_id, "
