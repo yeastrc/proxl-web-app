@@ -954,6 +954,71 @@ function loadPSMUDRData( requestObject ) {
 
 }
 
+/**
+ * Assemble and download a report of the PDB mapping of the currently shown chains and proteins
+ */
+function downloadProteinToPDBMap() {
+	
+	var reportText = "";
+	
+	reportText += "protein\tposition\tresidue\tPDB chain\tPDB chain position\tPDB residue\n";
+	
+	var visibleProteinsMap = getVisibleProteins();
+		
+	if( !visibleProteinsMap || visibleProteinsMap == undefined || visibleProteinsMap.length < 1 ) { return; }
+	var visibleProteins = Object.keys( visibleProteinsMap );
+	
+	for( var i = 0; i < visibleProteins.length; i++ ) {
+		var proteinId = visibleProteins[ i ];
+		var chains = visibleProteinsMap[ proteinId ];
+		
+		for( var k = 0; k < chains.length; k++ ) {
+			
+			var chain = chains[ k ];
+
+			var alignment = getAlignmentByChainAndProtein( chain, proteinId );
+			
+			var expPosition = 0;
+			var pdbPosition = 0;
+			
+			for( var h = 0; h < alignment.alignedExperimentalSequence.length; h++ ) {
+
+				if( alignment.alignedExperimentalSequence[ h ] != '-' ) { expPosition++; }
+				if( alignment.alignedPDBSequence[ h ] != '-' ) { pdbPosition++; }
+				
+				if( alignment.alignedExperimentalSequence[ h ] !== '-' ) {
+					
+					reportText += _proteinNames[ proteinId ] + "\t";
+					reportText += expPosition + "\t";
+					reportText += alignment.alignedExperimentalSequence[ h ] + "\t";
+					
+					var atoms = findCAAtoms( proteinId, expPosition, [ chain ] );
+					
+					if( !atoms || atoms.length < 1 ) {
+						reportText += "\t\t\n";
+					} else {
+					
+						var atom = atoms[ 0 ];					
+						var residue = atom.residue();
+						var num = residue.num();		// pdb number for this residue in this chain
+					
+						var chain = residue.chain().name();
+					
+						reportText += chain + "\t";
+						reportText += num + "\t";
+						reportText += alignment.alignedPDBSequence[ h ] + "\n";
+					}
+				}
+				
+				
+			}
+
+		}
+	}
+	
+	downloadStringAsFile( "protein-to-pdb-map.txt", "text/plain", reportText );
+}
+
 function collateAndDownloadPSMUDRData( data ) {
 	
 	var reportText = "";
@@ -3051,6 +3116,8 @@ var redrawDistanceReport = function( ) {
 	
 	html += "<div style=\"font-size:14pt;margin-top:15px;\">Download reports:</div>";
 	
+	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadProteinToPDBMap()\">Protein Position to PDB Mapping</a></div>";
+
 	if( _searchIds.length === 1 ) {
 		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadDetailedUDRReport()\">All shown UDRs</a></div>";
 	} else {
