@@ -99,7 +99,7 @@ public class AreScanFileUploadsAllowedGet {
 			
 			
 			//  Throws ProxlSubImportServerReponseException if  httpStatusCode != HttpStatus.SC_OK (200)
-			A_ProcessHTTP_StatusCode.getInstance().processHTTP_StatusCode( httpStatusCode );
+			A_ProcessHTTP_StatusCode.getInstance().processHTTP_StatusCode( httpStatusCode, url );
 			
 			
 

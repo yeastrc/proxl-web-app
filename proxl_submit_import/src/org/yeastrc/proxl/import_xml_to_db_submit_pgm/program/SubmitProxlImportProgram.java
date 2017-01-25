@@ -34,12 +34,8 @@ public class SubmitProxlImportProgram {
 
 	private static final int PROGRAM_EXIT_CODE_INVALID_INPUT = 2;
 	
-	private static final int PROGRAM_EXIT_CODE_NO_PROJECTS_FOR_USER = 3;
+	private static final int PROGRAM_EXIT_CODE_ERROR_WITH_SERVER = 10;
 
-	private static final int PROGRAM_EXIT_CODE_UPLOAD_SUBMIT_FAILED = 4;
-
-	private static final int PROGRAM_EXIT_CODE_UPLOAD_SEND_FILE_FAILED = 5;
-	
 	private static final int PROGRAM_EXIT_CODE_PROGRAM_PROBLEM = 99;
 
 	private static final int PROGRAM_EXIT_CODE_HELP = 1;
@@ -350,26 +346,40 @@ public class SubmitProxlImportProgram {
 
 			// Already reported so do not report
 			
-			throw e;
+			System.out.println( "Program Failed.  See Syserr for more info.");
+			System.exit( PROGRAM_EXIT_CODE_ERROR_WITH_SERVER );
 			
 		} catch ( ProxlSubImportReportedErrorException e ) {
 
 			// Already reported so do not report
+			
+			System.out.println( "Program Failed.  See Syserr for more info.");
+			System.exit( PROGRAM_EXIT_CODE_ERROR_WITH_SERVER );
 						
 		} catch ( ProxlSubImportUserDataException e ) {
 			
 			// Already reported so do nothing
+			
+			System.out.println( "Program Failed.  See Syserr for more info.");
+			System.exit( PROGRAM_EXIT_CODE_ERROR_WITH_SERVER );
 
 		} catch ( ProxlSubImportConfigException e ) {
 			
 			// Already reported so do nothing
+			
+			System.out.println( "Program Failed.  See Syserr for more info.");
+			System.exit( PROGRAM_EXIT_CODE_ERROR_WITH_SERVER );
 
 		} catch ( ProxlSubImportServerReponseException e ) {
 			
 			// Already reported so do nothing
 			
+			System.out.println( "Program Failed.  See Syserr for more info.");
+			System.exit( PROGRAM_EXIT_CODE_ERROR_WITH_SERVER );
+			
 		} catch (Exception e) {
 
+			System.out.println( "Program Failed.  See Syserr for more info.");
 			log.error("Failed.", e );
 			throw e;
 

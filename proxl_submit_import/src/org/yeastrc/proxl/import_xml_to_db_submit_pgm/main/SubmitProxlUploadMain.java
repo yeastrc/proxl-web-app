@@ -74,7 +74,7 @@ public class SubmitProxlUploadMain {
 
 	private static final int PROGRAM_EXIT_CODE_UPLOAD_SEND_FILE_FAILED = 5;
 	
-	private static final int PROGRAM_EXIT_CODE_PROGRAM_PROBLEM = 99;
+//	private static final int PROGRAM_EXIT_CODE_PROGRAM_PROBLEM = 99;
 
 
 	private static final String FOR_HELP_STRING = "For help, run without any parameters, -h, or --help";

@@ -29,7 +29,7 @@ public class A_ProcessHTTP_StatusCode {
 	 * @param httpStatusCode
 	 * @throws ProxlSubImportServerReponseException - thrown if httpStatusCode != HttpStatus.SC_OK
 	 */
-	public void processHTTP_StatusCode( int httpStatusCode ) throws ProxlSubImportServerReponseException {
+	public void processHTTP_StatusCode( int httpStatusCode, String webserviceURL ) throws ProxlSubImportServerReponseException {
 		
 
 		if ( httpStatusCode == HttpStatus.SC_OK ) {
@@ -44,6 +44,7 @@ public class A_ProcessHTTP_StatusCode {
 			
 			System.err.println( "Request to server contains incorrect parameters (400 code)." );
 			System.err.println( "Confirm that this is the correct version of the program" );
+			System.err.println( "Server webservice URL: " + webserviceURL );
 
 			System.err.println( "If this error continues, contact the administrator of your Proxl Instance." );
 			
@@ -58,6 +59,7 @@ public class A_ProcessHTTP_StatusCode {
 			
 			System.err.println( "The login session to the server has expired (401 code)." );
 			System.err.println( "Please try again." );
+			System.err.println( "Server webservice URL: " + webserviceURL );
 
 			System.err.println( "If this error continues, contact the administrator of your Proxl Instance." );
 			
@@ -71,6 +73,7 @@ public class A_ProcessHTTP_StatusCode {
 			
 			System.err.println( "Request to server is forbidden (403 code)." );
 			System.err.println( "Confirm that you are allowed access to the server." );
+			System.err.println( "Server webservice URL: " + webserviceURL );
 
 			System.err.println( "If this error continues, contact the administrator of your Proxl Instance." );
 			
@@ -83,7 +86,8 @@ public class A_ProcessHTTP_StatusCode {
 			// 404 error
 			
 			System.err.println( "Server is not found at this URL (404 code)." );
-			System.err.println( "Server URL: " + ConfigParams.getInstance().getProxlWebAppUrl() );
+			System.err.println( "Server webservice URL: " + webserviceURL );
+			System.err.println( "Server URL from configuration: " + ConfigParams.getInstance().getProxlWebAppUrl() );
 			
 			System.err.println( "Confirm that this URL is correct or contact the administrator of your Proxl Instance." );
 			
@@ -97,6 +101,7 @@ public class A_ProcessHTTP_StatusCode {
 			
 			System.err.println( "Server had an error (500 code)." );
 			System.err.println( "Please try again." );
+			System.err.println( "Server webservice URL: " + webserviceURL );
 
 			System.err.println( "If this error continues, contact the administrator of your Proxl Instance." );
 			
@@ -104,6 +109,7 @@ public class A_ProcessHTTP_StatusCode {
 		}
 
 		System.err.println( "Server returned an unexpected status code: " + httpStatusCode + "." );
+		System.err.println( "Server webservice URL: " + webserviceURL );
 		System.err.println( "Please contact the administrator of your Proxl Instance." );
 
 		throw new ProxlSubImportServerReponseException();

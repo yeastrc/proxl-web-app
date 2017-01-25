@@ -113,7 +113,7 @@ public class LoginPost {
 
 			
 			//  Throws ProxlSubImportServerReponseException if  httpStatusCode != HttpStatus.SC_OK (200)
-			A_ProcessHTTP_StatusCode.getInstance().processHTTP_StatusCode( httpStatusCode );
+			A_ProcessHTTP_StatusCode.getInstance().processHTTP_StatusCode( httpStatusCode, url );
 			
 			
 
@@ -179,6 +179,11 @@ public class LoginPost {
 		
 		private boolean invalidUserOrPassword = false;
 		private boolean disabledUser = false;
+		/**
+		 * No Proxl account and not auto create account since invite required
+		 */
+		private boolean noProxlAccount = false;
+		private boolean invalidInviteTrackingCode = false;
 
 		private boolean termsOfServiceAcceptanceRequired = false;
 
@@ -221,6 +226,18 @@ public class LoginPost {
 		}
 		public void setTermsOfServiceKey(String termsOfServiceKey) {
 			this.termsOfServiceKey = termsOfServiceKey;
+		}
+		public boolean isNoProxlAccount() {
+			return noProxlAccount;
+		}
+		public void setNoProxlAccount(boolean noProxlAccount) {
+			this.noProxlAccount = noProxlAccount;
+		}
+		public boolean isInvalidInviteTrackingCode() {
+			return invalidInviteTrackingCode;
+		}
+		public void setInvalidInviteTrackingCode(boolean invalidInviteTrackingCode) {
+			this.invalidInviteTrackingCode = invalidInviteTrackingCode;
 		}
 		
 		
