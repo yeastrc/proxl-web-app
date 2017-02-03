@@ -19,6 +19,7 @@ import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.www.dto.PeptideDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
@@ -163,7 +164,7 @@ public class SearchPeptideCrosslink_ForCrosslinkPeptideWS_Searcher {
 	/**
 	 * Get all crosslink peptides corresponding to the given Criteria
 	 * 
-	 * @param searchId
+	 * @param projectSearchId
 	 * @param searcherCutoffValuesSearchLevel
 	 * @param protein1Id
 	 * @param protein2Id
@@ -173,7 +174,7 @@ public class SearchPeptideCrosslink_ForCrosslinkPeptideWS_Searcher {
 	 * @throws Exception
 	 */
 	public List<SearchPeptideCrosslinkAnnDataWrapper> searchOnSearchProteinCrosslink( 
-			int searchId,
+			int projectSearchId,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
 			int protein1Id,
 			int protein2Id,
@@ -186,6 +187,16 @@ public class SearchPeptideCrosslink_ForCrosslinkPeptideWS_Searcher {
 		List<SearchPeptideCrosslinkAnnDataWrapper> wrappedLinks = new ArrayList<>();
 
 
+		SearchDTO searchDTO = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
+		if ( searchDTO == null ) {
+			String msg = "search record not found for projectSearchId: " + projectSearchId;
+			log.error( msg );
+			throw new ProxlWebappDataException(msg);
+		}
+		
+		int searchId = searchDTO.getSearchId();
+
+		
 		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
 				searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
 		
@@ -676,10 +687,6 @@ public class SearchPeptideCrosslink_ForCrosslinkPeptideWS_Searcher {
 			
 			rs = pstmt.executeQuery();
 			
-			SearchDTO searchDTO = null;
-			
-			searchDTO = SearchDAO.getInstance().getSearch( searchId );
-
 			//  Build a Map of Lists of query results keyed on Reported Peptide Id
 
 			Map<Integer, List<QueryResultItem>> queryResultItemListMapKeyedOnReportedPeptideId = new HashMap<>();

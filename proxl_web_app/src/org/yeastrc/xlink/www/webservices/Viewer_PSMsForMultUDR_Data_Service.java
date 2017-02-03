@@ -31,8 +31,9 @@ import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.SearchProgramsPerSearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.search_programs_per_search_utils.GetSearchProgramsPerSearchData;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmAnnFromCrosslinkProteinSearcher;
 import org.yeastrc.xlink.www.searcher.PsmAnnFromLooplinkProteinSearcher;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
@@ -46,9 +47,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Get the PSMs for Multiple UDR
- * 
- * One method for crosslink and one method for looplink
- *
  */
 @Path("/imageViewer")
 public class Viewer_PSMsForMultUDR_Data_Service {
@@ -63,7 +61,11 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 	 */
 	public static class Viewer_UDR_Data_Service_Request {
 
+		/**
+		 * Actually projectSearchIdList
+		 */
 		private List<Integer> searchIds;
+		
 		private List<Viewer_UDR_Data_Service_Single_UDR_Request> crosslinkUdrRequestList;
 		private List<Viewer_UDR_Data_Service_Single_UDR_Request> looplinkUdrRequestList;
 
@@ -271,16 +273,12 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		}
 
 		//  Jackson JSON Mapper object for JSON deserialization and serialization
-
 		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-
+		
 		Viewer_UDR_Data_Service_Request webserviceRequest = null;
-
 		try {
 			webserviceRequest = jacksonJSON_Mapper.readValue( queryJSONString, Viewer_UDR_Data_Service_Request.class );
-
 		} catch ( JsonParseException e ) {
-
 			String msg = "Failed to parse 'queryJSONString', JsonParseException.  queryJSONString: " + queryJSONString;
 			log.error( msg, e );
 			throw new WebApplicationException(
@@ -288,9 +286,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 					.entity( msg )
 					.build()
 					);
-
 		} catch ( JsonMappingException e ) {
-
 			String msg = "Failed to parse 'queryJSONString', JsonMappingException.  queryJSONString: " + queryJSONString;
 			log.error( msg, e );
 			throw new WebApplicationException(
@@ -298,9 +294,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 					.entity( msg )
 					.build()
 					);
-
 		} catch ( IOException e ) {
-
 			String msg = "Failed to parse 'queryJSONString', IOException.  queryJSONString: " + queryJSONString;
 			log.error( msg, e );
 			throw new WebApplicationException(
@@ -325,37 +319,109 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 			Viewer_UDR_Data_Service_Request webserviceRequest,
 			HttpServletRequest request )
 					throws Exception {
-
 		try {
+			List<Integer> projectSearchIdList = webserviceRequest.searchIds;
+			 
+			if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
+				String msg = "Provided searchIds is null or empty, searchIds = " + projectSearchIdList;
+				log.warn(msg);
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
 
-			//  Check Auth
-			authCheck(webserviceRequest.getSearchIds(), request);
+			//   Get the project id for this search
+			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
+			projectSearchIdsSet.addAll( projectSearchIdList );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
+			if ( projectIdsFromSearchIds.isEmpty() ) {
+				// should never happen
+				String msg = "No project ids for search ids: ";
+				for ( int projectSearchId : projectSearchIdList ) {
+					msg += projectSearchId + ", ";
+				}				
+				log.error( msg );
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+			if ( projectIdsFromSearchIds.size() > 1 ) {
+				//  Invalid request, searches across projects
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+			int projectId = projectIdsFromSearchIds.get( 0 );
+			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
+					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			if ( accessAndSetupWebSessionResult.isNoSession() ) {
+				//  No User session 
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+			//  Test access to the project id
+			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			//  Test access to the project id
+			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
+				//  No Access Allowed for this project id
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
 
-			/////////////////////////////////////////////////////////////////////////////
-			/////////////////////////////////////////////////////////////////////////////
-			
-			////////   Generic Param processing
+			////////   Auth complete
+			//////////////////////////////////////////
 			
 			Viewer_UDR_Data_Service_Result viewer_UDR_Data_Service_Result = new Viewer_UDR_Data_Service_Result();
 			Map<Integer,Viewer_UDR_Data_Service_Single_Search_Result> dataForSearches = new HashMap<>();
 			viewer_UDR_Data_Service_Result.dataForSearches = dataForSearches;
 			
+			Set<Integer> projectSearchIdSet = new HashSet<>( projectSearchIdList );
+			List<Integer> projectSearchIdListDeduppedSorted = new ArrayList<Integer>( projectSearchIdSet );
+			Collections.sort( projectSearchIdListDeduppedSorted );
 			
-			//  Get Annotation Type records for PSM and Peptide
+			Set<Integer> searchIds = new HashSet<>();
+			Map<Integer,Integer> projectSearchIdToSearchIdMap = new HashMap<>();
 			
+			for ( Integer projectSearchId : projectSearchIdListDeduppedSorted ) {
+				Integer searchId = MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
+				if ( searchId == null ) {
+					String msg = "searchId not found for projectSearchId = " + projectSearchId;
+					log.error( msg );
+					throw new WebApplicationException(
+							Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+							.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+							.build() );
+				}
+				searchIds.add( searchId );
+				projectSearchIdToSearchIdMap.put( projectSearchId, searchId );
+			}			
 			
+			//             Get Annotation Type records for PSM and Peptide
 			//  Get  Annotation Type records for PSM
-			
 			Map<Integer, Map<Integer, AnnotationTypeDTO>> 
 			srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap =
-					GetAnnotationTypeData.getInstance().getAll_Psm_Filterable_ForSearchIds( webserviceRequest.searchIds );
-			
+					GetAnnotationTypeData.getInstance().getAll_Psm_Filterable_ForSearchIds( searchIds );
+		
 			//  Create empty searcherCutoffValuesSearchLevel so returns everything
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
 			
 			
 
-			for ( int searchId : webserviceRequest.searchIds ) {
+			for ( Integer projectSearchId : projectSearchIdListDeduppedSorted ) {
+				Integer searchId = projectSearchIdToSearchIdMap.get( projectSearchId );
 				
 				Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_Psm_AnnotationType_DTOMap = 
 						srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap.get( searchId );
@@ -384,28 +450,20 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 				
 				List<String> psmValuesNames = new ArrayList<>();
 				for ( AnnotationTypeDTO annotationTypeDTO : annotationTypesOrderByNameList ) {
-
 					Integer searchProgramsPerSearchId = annotationTypeDTO.getSearchProgramsPerSearchId();
-					
 					SearchProgramsPerSearchDTO searchProgramsPerSearchDTO = searchProgramsPerSearchDTO_MappedOnId.get( searchProgramsPerSearchId );
-
 					if ( searchProgramsPerSearchDTO == null ) {
 						searchProgramsPerSearchDTO =
 							GetSearchProgramsPerSearchData.getInstance().getSearchProgramsPerSearchDTO( searchProgramsPerSearchId );
 					}
-					
 					if ( searchProgramsPerSearchDTO == null ) {
 						String msg = "No searchProgramsPerSearchDTO record found for searchProgramsPerSearchId: " + searchProgramsPerSearchId;
 						log.error( msg );
 						throw new ProxlWebappDBDataOutOfSyncException( msg );
 					}
-					
-					String annTypeNameDesc = annotationTypeDTO.getName() + "("
-							+ searchProgramsPerSearchDTO.getDisplayName() + ")";
-					
+					String annTypeNameDesc = annotationTypeDTO.getName() + "(" + searchProgramsPerSearchDTO.getDisplayName() + ")";
 					psmValuesNames.add( annTypeNameDesc );
 				}
-				
 				
 				//  Output Result Data
 				Viewer_UDR_Data_Service_Single_Search_Result single_Search_Result = new Viewer_UDR_Data_Service_Single_Search_Result();
@@ -475,7 +533,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 	 * @throws Exception
 	 * @throws ProxlWebappDataException
 	 */
-	public List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> processCrosslinkOrLooplink(
+	private List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> processCrosslinkOrLooplink(
 			int searchId,
 			LinkType linkType,
 			List<Viewer_UDR_Data_Service_Single_UDR_Request> udrRequestList,
@@ -605,105 +663,6 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		}
 		return udrItemList;
 	}
-
-
-
-	/**
-	 * @param searchIds
-	 * @param request
-	 * @throws Exception
-	 */
-	public void authCheck(List<Integer> searchIds, HttpServletRequest request) throws Exception {
-		if ( searchIds.isEmpty() ) {
-
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
-					.build()
-					);
-		}
-
-
-		//   Get the project id for this search
-
-		Set<Integer> searchIdsSet = new HashSet<Integer>( );
-
-		searchIdsSet.addAll( searchIds );
-
-		for ( int searchId : searchIds ) {
-
-			searchIdsSet.add( searchId );
-		}
-
-
-		List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsSet );
-
-		if ( projectIdsFromSearchIds.isEmpty() ) {
-
-			// should never happen
-			String msg = "No project ids for search ids: ";
-			for ( int searchId : searchIds ) {
-
-				msg += searchId + ", ";
-			}				
-			log.error( msg );
-
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_TEXT ) // This string will be passed to the client
-					.build()
-					);
-		}
-
-		if ( projectIdsFromSearchIds.size() > 1 ) {
-
-			//  Invalid request, searches across projects
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_TEXT ) // This string will be passed to the client
-					.build()
-					);
-		}
-
-
-		int projectId = projectIdsFromSearchIds.get( 0 );
-
-
-		AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-				GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-
-		//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-
-		if ( accessAndSetupWebSessionResult.isNoSession() ) {
-
-			//  No User session 
-
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-					.build()
-					);
-		}
-
-		//  Test access to the project id
-
-		AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
-
-		//  Test access to the project id
-
-		if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
-
-			//  No Access Allowed for this project id
-
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
-					.build()
-					);
-
-		}
-	}
-
 
 
 }

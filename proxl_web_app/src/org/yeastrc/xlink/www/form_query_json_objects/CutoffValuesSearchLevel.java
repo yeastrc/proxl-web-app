@@ -9,6 +9,9 @@ import java.util.Map;
  */
 public class CutoffValuesSearchLevel {
 
+	/**
+	 * Actually projectSearchId, not changed since is set by deserializing JSON from URL
+	 */
 	private int searchId;
 
 	private Map<String,CutoffValuesAnnotationLevel> psmCutoffValues;
@@ -43,9 +46,15 @@ public class CutoffValuesSearchLevel {
 		this.peptideCutoffValues = peptideCutoffValues;
 	}
 	
+	/**
+	 * Actually projectSearchId
+	 */
 	public int getSearchId() {
 		return searchId;
 	}
+	/**
+	 * Actually projectSearchId
+	 */
 	public void setSearchId(int searchId) {
 		this.searchId = searchId;
 	}

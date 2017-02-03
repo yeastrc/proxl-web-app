@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.ReportedPeptideDAO;
-import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
@@ -103,28 +102,17 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem> reportedPeptideRecordsForAssociatedScanId( int psmId, int scanId, int searchId, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
+	public List<ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem> reportedPeptideRecordsForAssociatedScanId( 
+			int psmId, 
+			int scanId, 
+			SearchDTO search,
+			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
 		
 		
 		List<ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem> results = new ArrayList<>();
 		
-		SearchDTO search = null;
-		
-		try {
-			
-			search = SearchDAO.getInstance().getSearch( searchId );
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Failed to get searchDTO";
-			
-			log.error( msg, e );
-			
-			throw e;
-			
-		}
-		
-		
+		int searchId = search.getSearchId();
+
 
 		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
 				searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();

@@ -29,7 +29,8 @@ import org.yeastrc.xlink.www.objects.AnnotationTypeDTOListForSearchId;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.PsmsServiceResult;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmAnnotationDataSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.annotation_display.AddAddAnnTypeIdToAnnotationTypeIdSet;
@@ -62,14 +63,14 @@ public class PsmsService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getPsms") 
-	public PsmsServiceResult getViewerData( @QueryParam( "search_id" ) Integer searchId,
+	public PsmsServiceResult getViewerData( @QueryParam( "search_id" ) Integer projectSearchId,
 										  @QueryParam( "reported_peptide_id" ) Integer reportedPeptideId,
 										  @QueryParam( "psmPeptideCutoffsForSearchId" ) String psmPeptideCutoffsForSearchId_JSONString,
 										  @QueryParam( "psmAnnTypeDisplayIncludeExclude" ) String psmAnnTypeDisplayIncludeExclude_JSONString,
 										  @Context HttpServletRequest request )
 	throws Exception {
 	
-		if ( searchId == null ) {
+		if ( projectSearchId == null ) {
 			String msg = "Provided search_id is null or search_id is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
@@ -99,21 +100,14 @@ public class PsmsService {
 		try {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
-//			if ( searchIds.isEmpty() ) {
-//				
-//				throw new WebApplicationException(
-//						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-//						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
-//						.build()
-//						);
-//			}
 			//   Get the project id for this search
-			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
-			searchIdsCollection.add( searchId );
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
+			projectSearchIdsCollection.add( projectSearchId );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsCollection );
+			
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search id: " + searchId;
+				String msg = "No project ids for search id: " + projectSearchId;
 				log.error( msg );
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
@@ -155,6 +149,22 @@ public class PsmsService {
 			
 			////////   Auth complete
 			//////////////////////////////////////////
+
+			Integer searchId =
+					MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
+			
+			if ( searchId == null ) {
+				String msg = ": No searchId found for projectSearchId: " + projectSearchId;
+				log.warn( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+			    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+			    	        .build()
+			    	        );
+			}
+			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
+
+			searchIdsCollection.add( searchId );
 			
 			//   Get PSM and Peptide Cutoff data from JSON
 			CutoffValuesSearchLevel cutoffValuesSearchLevel = 

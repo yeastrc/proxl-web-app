@@ -1,4 +1,3 @@
-
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -230,41 +229,73 @@ DROP TABLE IF EXISTS search ;
 
 CREATE TABLE  search (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  project_id INT UNSIGNED NOT NULL,
   status_id TINYINT UNSIGNED NOT NULL DEFAULT 1,
   path VARCHAR(2000) NULL,
   fasta_filename VARCHAR(2000) NOT NULL,
   load_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   import_end_timestamp TIMESTAMP NULL,
-  name VARCHAR(2000) NULL,
   directory_name VARCHAR(255) NULL,
-  display_order INT NOT NULL DEFAULT 0,
   has_scan_data TINYINT UNSIGNED NOT NULL DEFAULT 1,
-  marked_for_deletion_auth_user_id INT UNSIGNED NULL,
-  marked_for_deletion_timestamp DATETIME NULL,
   PRIMARY KEY (id),
-  CONSTRAINT fk_project_id
-    FOREIGN KEY (project_id)
-    REFERENCES project (id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
   CONSTRAINT search_status_id_fk
     FOREIGN KEY (status_id)
     REFERENCES search_record_status_lookup (id)
     ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX search_status_id_fk_idx ON search (status_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table project_search
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS project_search ;
+
+CREATE TABLE  project_search (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT UNSIGNED NOT NULL,
+  search_id INT UNSIGNED NOT NULL,
+  status_id TINYINT UNSIGNED NOT NULL DEFAULT 1,
+  search_name VARCHAR(2000) NULL,
+  search_display_order INT NOT NULL DEFAULT 0,
+  active_project_id_search_id_unique_record TINYINT NULL DEFAULT 1 COMMENT 'Set to NULL to remove record from UNIQUE index project_id_search_id_active_p_id_s_id_u_r_unique_idx',
+  marked_for_deletion_auth_user_id INT UNSIGNED NULL,
+  marked_for_deletion_timestamp DATETIME NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_project_search__project_id
+    FOREIGN KEY (project_id)
+    REFERENCES project (id)
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT search__marked_for_deletion_auth_user_id
+  CONSTRAINT fk_project_search__search_id
+    FOREIGN KEY (search_id)
+    REFERENCES search (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_project_search__status_id
+    FOREIGN KEY (status_id)
+    REFERENCES search_record_status_lookup (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_project_search__del_auth_user_id
     FOREIGN KEY (marked_for_deletion_auth_user_id)
     REFERENCES auth_user (id)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-CREATE INDEX fk_project_id_idx ON search (project_id ASC);
+CREATE INDEX fk_project_search_project_id_idx ON project_search (project_id ASC);
 
-CREATE INDEX search_status_id_fk_idx ON search (status_id ASC);
+CREATE INDEX fk_project_search__search_id_idx ON project_search (search_id ASC);
 
-CREATE INDEX search__marked_for_deletion_auth_user_id_idx ON search (marked_for_deletion_auth_user_id ASC);
+CREATE INDEX fk_project_search__status_id_idx ON project_search (status_id ASC);
+
+CREATE INDEX fk_project_search__del_auth_user_id_idx ON project_search (marked_for_deletion_auth_user_id ASC);
+
+CREATE INDEX id_search_id_idx ON project_search (id ASC, search_id ASC);
+
+CREATE UNIQUE INDEX project_id_search_id_active_p_id_s_id_u_r_unique_idx ON project_search (project_id ASC, search_id ASC, active_project_id_search_id_unique_record ASC);
 
 
 -- -----------------------------------------------------
@@ -283,8 +314,9 @@ CREATE TABLE  search_comment (
   PRIMARY KEY (id),
   CONSTRAINT perc_run_comment_ibfk_1
     FOREIGN KEY (search_id)
-    REFERENCES search (id)
-    ON DELETE CASCADE,
+    REFERENCES project_search (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
   CONSTRAINT search_comment_user_fk
     FOREIGN KEY (auth_user_id)
     REFERENCES auth_user (id)
@@ -743,7 +775,7 @@ CREATE TABLE  search_web_links (
     ON UPDATE RESTRICT,
   CONSTRAINT search_links_search_id_fk
     FOREIGN KEY (search_id)
-    REFERENCES search (id)
+    REFERENCES project_search (id)
     ON DELETE CASCADE)
 ENGINE = InnoDB;
 
@@ -1064,8 +1096,8 @@ CREATE TABLE  default_page_view_generic (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
   CONSTRAINT default_page_view_generic_search_id_fk
-    FOREIGN KEY (search_id)
-    REFERENCES search (id)
+    FOREIGN KEY ()
+    REFERENCES project_search ()
     ON DELETE CASCADE
     ON UPDATE RESTRICT,
   CONSTRAINT default_page_view_generic_auth_lst_upd
@@ -1980,6 +2012,47 @@ CREATE TABLE  url_shortener_associated_search_id (
 ENGINE = InnoDB;
 
 CREATE INDEX default_page_view_search_id_fk_idx ON url_shortener_associated_search_id (url_shortener_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table search_file__project_search
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS search_file__project_search ;
+
+CREATE TABLE  search_file__project_search (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  search_file_id INT UNSIGNED NOT NULL,
+  project_search_id INT UNSIGNED NOT NULL,
+  display_filename VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT search_file__project_search_srch_fl_id
+    FOREIGN KEY (search_file_id)
+    REFERENCES search_file (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT search_file__project_search_proj_srch_id
+    FOREIGN KEY (project_search_id)
+    REFERENCES project_search (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX search_file__project_search_srch_fl_id_idx ON search_file__project_search (search_file_id ASC);
+
+CREATE INDEX search_file__project_search_proj_srch_id_idx ON search_file__project_search (project_search_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table aa_updates_applied
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS aa_updates_applied ;
+
+CREATE TABLE  aa_updates_applied (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  label VARCHAR(255) NOT NULL,
+  date_applied TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id))
+ENGINE = InnoDB;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

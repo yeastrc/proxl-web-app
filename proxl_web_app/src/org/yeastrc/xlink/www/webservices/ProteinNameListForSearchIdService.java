@@ -16,7 +16,8 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.ProteinSequenceIdProteinAnnotationName;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProteinSequenceIdAnnotationNameSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -29,7 +30,7 @@ public class ProteinNameListForSearchIdService {
 	private static final Logger log = Logger.getLogger(ProteinNameListForSearchIdService.class);
 	
 	/**
-	 * @param searchId
+	 * @param projectSearchId
 	 * @param request
 	 * @return
 	 * @throws Exception
@@ -38,10 +39,10 @@ public class ProteinNameListForSearchIdService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getProteinNameListForSearchId") 
 	public ProteinNameListForSearchIdServiceResult getPSMFilterableAnnTypesForSearchId( 
-			@QueryParam( "searchId" ) int searchId,
+			@QueryParam( "searchId" ) int projectSearchId,
 			@Context HttpServletRequest request )
 	throws Exception {
-		if ( searchId == 0 ) {
+		if ( projectSearchId == 0 ) {
 			String msg = ": Provided searchId is zero";
 			log.error( msg );
 		    throw new WebApplicationException(
@@ -54,12 +55,12 @@ public class ProteinNameListForSearchIdService {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			//   Get the project id for this search
-			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
-			searchIdsCollection.add( searchId );
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
+			projectSearchIdsCollection.add( projectSearchId );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsCollection );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search id: " + searchId;
+				String msg = "No project ids for search id: " + projectSearchId;
 				log.error( msg );
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
@@ -100,6 +101,20 @@ public class ProteinNameListForSearchIdService {
 			
 			////////   Auth complete
 			//////////////////////////////////////////
+			
+
+			Integer searchId =
+					MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
+			
+			if ( searchId == null ) {
+				String msg = ": No searchId found for projectSearchId: " + projectSearchId;
+				log.warn( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+			    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+			    	        .build()
+			    	        );
+			}
 			
 			//  Get  ProteinSequenceId and AnnotationName for search
 			

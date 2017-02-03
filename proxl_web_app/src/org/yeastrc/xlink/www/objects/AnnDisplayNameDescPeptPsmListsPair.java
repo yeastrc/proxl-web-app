@@ -9,6 +9,7 @@ import java.util.List;
  */
 public class AnnDisplayNameDescPeptPsmListsPair {
 	
+	private int projectSearchId;
 	private int searchId;
 
 	private List<AnnotationDisplayNameDescription> psmAnnotationNameDescriptionList;
@@ -35,6 +36,12 @@ public class AnnDisplayNameDescPeptPsmListsPair {
 	public void setPeptideAnnotationNameDescriptionList(
 			List<AnnotationDisplayNameDescription> peptideAnnotationNameDescriptionList) {
 		this.peptideAnnotationNameDescriptionList = peptideAnnotationNameDescriptionList;
+	}
+	public int getProjectSearchId() {
+		return projectSearchId;
+	}
+	public void setProjectSearchId(int projectSearchId) {
+		this.projectSearchId = projectSearchId;
 	}
 	
 }

@@ -12,6 +12,7 @@ import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.constants.QCPlotConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDBDataOutOfSyncException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ScoreCountFromPsmTblSearcher;
 import org.yeastrc.xlink.www.searcher.ScoreCountFromPsmTblSearcher.LinkType;
 
@@ -36,7 +37,7 @@ public class CreatePsmCountsVsScoreQCPlotData {
 	
 	/**
 	 * @param selectedLinkTypes
-	 * @param searchId
+	 * @param projectSearchId
 	 * @param annotationTypeId
 	 * @param psmScoreCutoff
 	 * @param proteinSequenceIdsToIncludeList
@@ -46,7 +47,7 @@ public class CreatePsmCountsVsScoreQCPlotData {
 	 */
 	public PsmCountsVsScoreQCPlotDataJSONRoot create( 
 			Set<String> selectedLinkTypes, 
-			int searchId, 
+			int projectSearchId, 
 			int annotationTypeId, 
 			Double psmScoreCutoff,
 			List<Integer> proteinSequenceIdsToIncludeList,
@@ -57,6 +58,16 @@ public class CreatePsmCountsVsScoreQCPlotData {
 			log.error( msg );
 			throw new IllegalArgumentException( msg );
 		}
+
+		Integer searchId =
+				MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
+		
+		if ( searchId == null ) {
+			String msg = ": No searchId found for projectSearchId: " + projectSearchId;
+			log.warn( msg );
+		    throw new ProxlWebappDataException( msg );
+		}
+		
 		List<Integer> searchIdsList = new ArrayList<>( 1 );
 		searchIdsList.add( searchId );
 		Map<Integer, Map<Integer, AnnotationTypeDTO>> annotationTypeDataAllSearchIds = 

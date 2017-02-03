@@ -12,6 +12,7 @@ public class ViewSearchPeptidesPageDataRoot {
 
 	//  projectId  not included
 	
+	private int projectSearchId;
 	private int searchId;
 	
 	private  List<String> modMassFilterList;
@@ -85,6 +86,12 @@ public class ViewSearchPeptidesPageDataRoot {
 	}
 	public void setModMassFilterList(List<String> modMassFilterList) {
 		this.modMassFilterList = modMassFilterList;
+	}
+	public int getProjectSearchId() {
+		return projectSearchId;
+	}
+	public void setProjectSearchId(int projectSearchId) {
+		this.projectSearchId = projectSearchId;
 	}
 	
 

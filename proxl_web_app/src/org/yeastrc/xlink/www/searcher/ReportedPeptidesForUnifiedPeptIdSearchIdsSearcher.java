@@ -14,6 +14,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
@@ -77,6 +78,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 	 * @throws Exception
 	 */
 	public List<ReportedPeptidesForMergedPeptidePageWrapper> getReportedPeptidesWebDisplay( 
+			SearchDTO search,
 			int searchId, 
 			int reportedPeptideId, 
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel
@@ -314,21 +316,20 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 				}
 			}
 			rs = pstmt.executeQuery();
-			//  Search temp cache 
-			Map<Integer, SearchDTO> searches = new HashMap<Integer, SearchDTO>();
 			while( rs.next() ) {
 				ReportedPeptidesForMergedPeptidePageWrapper wrappedReportedPeptideData = new ReportedPeptidesForMergedPeptidePageWrapper();
 				ReportedPeptidesForMergedPeptidePage reportedPeptideData = new ReportedPeptidesForMergedPeptidePage();
 				wrappedReportedPeptideData.setReportedPeptidesForMergedPeptidePage( reportedPeptideData );
-//				reportedPeptideData.setSearchId( rs.getInt( "search_id" ) );
-				//  Get searchDTOs for the search ids
-//				Integer searchId = reportedPeptideData.getSearchId();
-				reportedPeptideData.setSearchId( searchId );
-				SearchDTO search = searches.get( searchId );
+				
 				if ( search == null ) {
-					search = SearchDAO.getInstance().getSearch( searchId );
-					searches.put( searchId, search );
+					search = SearchDAO.getInstance().getSearchFromProjectSearchId( searchId );
+					if ( search == null ) {
+						String msg = "Failed to get search for searchId: " + searchId;
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
+					}
 				}
+				reportedPeptideData.setSearchId( search.getProjectSearchId() );
 				reportedPeptideData.setSearchName( search.getName() );
 //				int reportedPeptideId = rs.getInt( "reported_peptide_id" );
 				reportedPeptideData.setReportedPeptide ( ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( reportedPeptideId ) );

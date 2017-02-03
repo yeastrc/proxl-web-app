@@ -43,53 +43,6 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 			if ( searchProteinCrosslinks == null ) {
 				
 				throw new Exception( "searchProteinCrosslinks == null, no longer looking up the data" );
-
-//				searchProteinCrosslinks = new TreeMap<SearchDTO, SearchProteinCrosslink>();
-//
-//
-//				for ( SearchDTO search : searches ) {
-//					
-//					int searchId = search.getId();
-//					
-//					SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
-//
-//					if ( searcherCutoffValuesSearchLevel == null ) {
-//
-//						String msg = "No searcherCutoffValuesSearchLevel found in searcherCutoffValuesRootLevel for search id: " + searchId;
-//						log.error( msg );
-//						throw new Exception(msg);
-//					}
-//
-////					SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper =
-////							SearchProteinCrosslinkSearcher.getInstance().search(
-////									search, 
-////									searcherCutoffValuesSearchLevel, 
-////									this.getProtein1().getProteinSequenceObject(),
-////									this.getProtein2().getProteinSequenceObject(),
-////									this.getProtein1Position(),
-////									this.getProtein2Position()
-////									);
-//					
-//					SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper =
-//							CrosslinkLinkedPositions.getInstance()
-//							.getSearchProteinCrosslinkWrapperForSearchCutoffsProtIdsPositions(
-//									search, 
-//									searcherCutoffValuesSearchLevel, 
-//									this.getProtein1().getProteinSequenceObject(),
-//									this.getProtein2().getProteinSequenceObject(),
-//									this.getProtein1Position(),
-//									this.getProtein2Position()
-//									);
-//
-//					if( searchProteinCrosslinkWrapper != null ) {
-//
-//						SearchProteinCrosslink tlink = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
-//
-//						if( tlink != null ) {
-//							searchProteinCrosslinks.put( search, tlink );
-//						}
-//					}
-//				}
 			}
 
 			return searchProteinCrosslinks;

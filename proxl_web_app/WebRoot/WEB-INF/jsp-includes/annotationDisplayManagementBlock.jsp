@@ -84,7 +84,7 @@
 			  <c:forEach  var="annDisplayPerSearchItem"  
 			  	items="${ annDisplayDataUserSelctn.annotationDisplayUserSelectionDetailsPerSearchList }" varStatus="annDisplItemVarStatus">
 				<c:set var="search" value="${ annDisplayPerSearchItem.searchDTO }"></c:set>
-				<option value="${ search.id }"><c:out value="${ search.name }"></c:out></option>
+				<option value="${ search.projectSearchId }"><c:out value="${ search.name }"></c:out></option>
 			  </c:forEach>
 			</select>
 		</div>
@@ -96,10 +96,10 @@
 		
 		<%-- Data for one search --%>
 		
-		<div id="annotation_displays_modal_dialog_overlay_div_search_id_${ search.id }"
+		<div id="annotation_displays_modal_dialog_overlay_div_search_id_${ search.projectSearchId }"
 			style="${ initialHidePerSearch }"
 			class=" per_search_container_jq "
-			data-search_id="${ search.id }">
+			data-search_id="${ search.projectSearchId }">
 <%-- 		
 		  <c:if test="${ moreThanOneSearch }">
 			<div >

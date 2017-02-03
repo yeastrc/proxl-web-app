@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.XMLConstants;
@@ -16,10 +15,12 @@ import javax.xml.validation.SchemaFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant;
+import org.yeastrc.proxl.import_xml_to_db.dao.ProjectSearchDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMPopulateFromProxlXMLInput;
+import org.yeastrc.proxl.import_xml_to_db.dto.ProjectSearchDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
 import org.yeastrc.proxl.import_xml_to_db.exception.ProxlImporterProjectNotAllowImportException;
 import org.yeastrc.proxl.import_xml_to_db.exception.ProxlImporterProxlXMLDeserializeFailException;
@@ -408,27 +409,19 @@ public class ImporterCoreEntryPoint {
 
 			processProxlInput = ProcessProxlInput.getInstance();
 
-			SearchDTO searchDTOInserted =
 
-					processProxlInput.processProxlInput( 
-							projectId, 
-							proxlInputForImport, 
-							scanFileFileContainerList,
-							importDirectory, 
-							dropPeptidePSMCutoffValues,
-							skipPopulatingPathOnSearchLineOptChosen
-							 );
 
-			
-			if ( log.isInfoEnabled() ) {
+			processProxlInput.processProxlInput( 
+					projectId, 
+					proxlInputForImport, 
+					scanFileFileContainerList,
+					importDirectory, 
+					dropPeptidePSMCutoffValues,
+					skipPopulatingPathOnSearchLineOptChosen
+					);
 
-				System.out.println( "!!!!");
-
-				System.out.println( "Insert done for core tables for search ID " + searchDTOInserted.getId() + ".");
-				System.out.println( "Now: " + new Date() );
-
-				System.out.println( "!!!!");
-			}
+			SearchDTO searchDTOInserted = processProxlInput.getSearchDTOInserted();
+			ProjectSearchDTO projectSearchDTOInserted = processProxlInput.getProjectSearchDTOInserted();
 
 			//  Set proxlInputForImport to null to release memory needed later, but right now no other code to run
 			
@@ -439,13 +432,22 @@ public class ImporterCoreEntryPoint {
 			ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
 
 			try {
-				
 				SearchDAO.getInstance().updateStatus( searchDTOInserted.getId(), SearchRecordStatus.IMPORT_COMPLETE_VIEW );
 			}  catch ( Exception e ) {
-		    	
-
 				String msg = "Failed to mark the Search as ImportComplete, search id: " + searchDTOInserted.getId() ;
-				
+				log.error( msg );
+
+				System.err.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				System.err.println( msg );
+				System.err.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+				throw e;
+		    }
+
+			try {
+				ProjectSearchDAO.getInstance().updateStatus( projectSearchDTOInserted.getId(),  SearchRecordStatus.IMPORT_COMPLETE_VIEW );
+			}  catch ( Exception e ) {
+				String msg = "Failed to mark the project_search as ImportComplete, search id: " + searchDTOInserted.getId() ;
 				log.error( msg );
 
 				System.err.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");

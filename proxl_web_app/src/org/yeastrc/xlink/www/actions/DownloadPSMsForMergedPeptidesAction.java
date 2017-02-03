@@ -9,11 +9,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -32,10 +30,9 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.www.objects.AnnotationTypeDTOListForSearchId;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
-import org.yeastrc.xlink.www.objects.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult;
 import org.yeastrc.xlink.www.objects.WebMergedProteinPosition;
 import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmAnnotationDataSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher;
@@ -52,251 +49,146 @@ import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
-
-
+/**
+ * 
+ *
+ */
 public class DownloadPSMsForMergedPeptidesAction extends Action {
-	
-	private static final Logger log = Logger.getLogger(DownloadPSMsForMergedPeptidesAction.class);
 
+	private static final Logger log = Logger.getLogger(DownloadPSMsForMergedPeptidesAction.class);
+	
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
-		
-		
 		try {
-
 			// our form
 			MergedSearchViewPeptidesForm form = (MergedSearchViewPeptidesForm)actionForm;
 			request.setAttribute( "mergedSearchViewCrosslinkPeptideForm", form );
-
-
 			// Get the session first.  
 //			HttpSession session = request.getSession();
-
-
-			int[] searchIds = form.getSearchIds();
-			
-			
-			if ( searchIds.length == 0 ) {
-				
+			int[] projectSearchIds = form.getSearchIds();
+			if ( projectSearchIds.length == 0 ) {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
-
-
 			//   Get the project id for these searches
-
-			Set<Integer> searchIdsSet = new HashSet<Integer>( );
-
-			for ( int searchId : searchIds ) {
-
-				searchIdsSet.add( searchId );
+			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
+			for ( int projectSearchId : projectSearchIds ) {
+				projectSearchIdsSet.add( projectSearchId );
 			}
-
-
-			List<Integer> searchIdsListDeduppedSorted = new ArrayList<>( searchIdsSet );
-
-			Collections.sort( searchIdsListDeduppedSorted );
-
-			
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsSet );
-			
+			List<Integer> projectSearchIdsListDeduppedSorted = new ArrayList<>( projectSearchIdsSet );
+			Collections.sort( projectSearchIdsListDeduppedSorted );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
-				
 				// should never happen
-				
 				String msg = "No project ids for search ids: ";
-				for ( int searchId : searchIds ) {
-
-					msg += searchId + ", ";
+				for ( int projectSearchId : projectSearchIds ) {
+					msg += projectSearchId + ", ";
 				}
-				
 				log.error( msg );
-
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
-			
 			if ( projectIdsFromSearchIds.size() > 1 ) {
-				
 				//  Invalid request, searches across projects
-
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_SEARCHES_ACROSS_PROJECTS );
 			}
-			
-
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			
 			request.setAttribute( "projectId", projectId ); 
-			
 
 			///////////////////////
-			
-			
-
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
-
 				//  No User session 
-
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
-			
 			//  Test access to the project id
-			
 			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
-
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
-
 				//  No Access Allowed for this project id
-
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
 			}
-			
-
-
 			request.setAttribute( WebConstants.REQUEST_AUTH_ACCESS_LEVEL, authAccessLevel );
-
-
-
-			///    Done Processing Auth Check and Auth Level
-
-
-			//////////////////////////////
-
-
-
 			
-
-
+			///    Done Processing Auth Check and Auth Level
+			//////////////////////////////
+			
+			request.setAttribute( "searchIds", projectSearchIdsListDeduppedSorted );
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
-
-			Map<Integer, SearchDTO> searchesMapOnId = new HashMap<>();
-
-			for( int searchId : form.getSearchIds() ) {
-				
-				SearchDTO search = SearchDAO.getInstance().getSearch( searchId );
-				
+			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
+			Set<Integer> searchIdsSet = new HashSet<>();
+			for( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
+				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 				if ( search == null ) {
-					
-					String msg = "Percolator search id '" + searchId + "' not found in the database. User taken to home page.";
-					
+					String msg = "projectSearchId '" + projectSearchId + "' not found in the database. User taken to home page.";
 					log.warn( msg );
-					
 					//  Search not found, the data on the page they are requesting does not exist.
 					//  The data on the user's previous page no longer reflects what is in the database.
 					//  Take the user to the home page
-					
 					return mapping.findForward( StrutsGlobalForwardNames.HOME );  //  EARLY EXIT from Method
 				}
-				
 				searches.add( search );
-				
-				searchesMapOnId.put( searchId, search );
+				searchesMapOnSearchId.put( search.getSearchId(), search );
+				searchIdsSet.add( search.getSearchId() );
 			}
 
-
-			
-
-
 			OutputStreamWriter writer = null;
-			
 			try {
-
 				Map<Integer, AnnotationTypeDTOListForSearchId> psmAnnotationTypeDataDefaultDisplayInDisplayOrder =
 						GetAnnotationTypeDataDefaultDisplayInDisplayOrder.getInstance()
 						.getPsmAnnotationTypeDataDefaultDisplayInDisplayOrder( searchIdsSet );
-				
 				////////     Get Merged Peptides
-
-
 				PeptidesMergedCommonPageDownloadResult peptidesMergedCommonPageDownloadResult =
 						PeptidesMergedCommonPageDownload.getInstance()
 						.getWebMergedPeptideRecords(
 								form,
-								searchIdsListDeduppedSorted,
+								projectSearchIdsListDeduppedSorted,
 								searches,
-								searchesMapOnId,
-								searchIdsSet );
-
-
+								searchesMapOnSearchId );
 				////////////
-
 				/////   Searcher cutoffs for all searches
-
 				CutoffValuesRootLevel cutoffValuesRootLevel = peptidesMergedCommonPageDownloadResult.getMergedPeptideQueryJSONRoot().getCutoffs();
-
 				Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 						Z_CutoffValuesObjectsToOtherObjectsFactory
-						.createSearcherCutoffValuesRootLevel( searchIdsListDeduppedSorted, cutoffValuesRootLevel );
-				
+						.createSearcherCutoffValuesRootLevel( searchIdsSet, cutoffValuesRootLevel );
 				SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel =
 						cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
-
-				
-				
-
 				// generate file name
 				String filename = "xlinks-psms-search-";
 				filename += StringUtils.join( form.getSearchIds(), '-' );
-
 				DateTime dt = new DateTime();
 				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
 				filename += "-" + fmt.print( dt );
-
 				filename += ".txt";
-
 				response.setContentType("application/x-download");
 				response.setHeader("Content-Disposition", "attachment; filename=" + filename);
-
-				
-				
-
 				ServletOutputStream out = response.getOutputStream();
-
 				BufferedOutputStream bos = new BufferedOutputStream(out);
-
 				writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
-
-
-
-
 //				writer.write( "SEARCH ID(S)\tTYPE\tPEPTIDE 1\tPOSITION\tMODS\tPEPTIDE 2\tPOSITION\tMODS\tPROTEIN 1\tPROTEIN 2\tBEST PSM Q-VALUE\tNUM PSMS\n" );
-
 				//  Write header line
-				
 				writer.write( "SEARCH ID\tSCAN NUMBER\tPEPTIDE 1\tPOSITION 1\tMODS\tPROTEINS\tPEPTIDE 2\tPOSITION 2\tMODS\tPROTEINS\tLink Type" );
 				writer.write( "\tOBSERVED M/Z\tCHARGE\tRETENTION TIME (MINUTES)\tSCAN FILENAME" );
-
-
 				//  Process for each search id:
-
-				for ( Integer eachSearchIdToProcess : searchIdsListDeduppedSorted ) {
-					
+				for ( SearchDTO search : searches ) {
+					int projectSearchId = search.getProjectSearchId();
+					Integer eachSearchIdToProcess = search.getSearchId();
 					AnnotationTypeDTOListForSearchId annotationTypeDTOListForSearchId = psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( eachSearchIdToProcess );
-
 					if ( annotationTypeDTOListForSearchId == null ) {
-						
-						String msg = "annotationTypeDTOListForSearchId not foudn for search id " + eachSearchIdToProcess;
+						String msg = "annotationTypeDTOListForSearchId not found for search id " + eachSearchIdToProcess;
 						log.error( msg );
 						throw new ProxlWebappDataException( msg );
 					}
-					
 					for ( AnnotationTypeDTO psmAnnotationTypeDTO : annotationTypeDTOListForSearchId.getAnnotationTypeDTOList() ) {
-					
 						writer.write( "\t" );
 						writer.write( psmAnnotationTypeDTO.getName() );
 						writer.write( "(SEARCH ID: " );
-						writer.write( Integer.toString( eachSearchIdToProcess ) );
+						writer.write( Integer.toString( projectSearchId ) );
 						writer.write( ")" );
 					}
 				}
-				
 				writer.write( "\n" );
-
-
 //		SEARCH ID
 //		SCAN NUMBER
 //		PEPTIDE 1
@@ -310,69 +202,40 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 //		CHARGE
 //		RETENTION TIME (MINUTES)
 //		SCAN FILENAME (THE MZML FILE)
-				
-				
-				
 				for( WebMergedReportedPeptide link : peptidesMergedCommonPageDownloadResult.getWebMergedReportedPeptideList() ) {
-
 					//  Process links
-					
-					
 					int unifiedReportedPeptideId = link.getUnifiedReportedPeptideId();
-
-
 					//  Process for each search id:
-
-					for ( Integer eachSearchIdToProcess : searchIdsListDeduppedSorted ) {
-						
-						
-						
+					for ( SearchDTO search : searches ) {
+						int eachProjectSearchIdToProcess = search.getProjectSearchId();
+						Integer eachSearchIdToProcess = search.getSearchId();
 						SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = 
-								searcherCutoffValuesRootLevel.getPerSearchCutoffs( eachSearchIdToProcess );
-
-
+								searcherCutoffValuesRootLevel.getPerSearchCutoffs( eachProjectSearchIdToProcess );
+						if ( searcherCutoffValuesSearchLevel == null ) {
+							String msg = "searcherCutoffValuesRootLevel.getPerSearchCutoffs(projectSearchId) returned null for:  " + eachProjectSearchIdToProcess;
+							log.error( msg );
+							throw new ProxlWebappDataException( msg );
+						}
 						//  First get list of reported peptide ids for unifiedReportedPeptideId and search id
-
-						List<Integer> singleSearchIdList = new ArrayList<>( 1 );
-
-						singleSearchIdList.add( eachSearchIdToProcess );
-
-						List<ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult>  resultList = 
+						List<Integer> reportedPeptideIdList = 
 								ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher.getInstance()
-								.getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( singleSearchIdList, unifiedReportedPeptideId );
-
-
+								.getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( eachProjectSearchIdToProcess, unifiedReportedPeptideId );
 						//  Process each search id, reported peptide id pair
-
-						for ( ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult item : resultList ) {
-
-							int reportedPeptideId = item.getReportedPeptideId();
-
-
+						for ( int reportedPeptideId : reportedPeptideIdList ) {
 							//  Process Each search id/reported peptide id for the link
-
-
 							//  Get the PSMs for a Peptide/Search combination and output the records
-
 							List<PsmWebDisplayWebServiceResult> psms = 
 									PsmWebDisplaySearcher.getInstance().getPsmsWebDisplay( 
 											eachSearchIdToProcess, 
 											reportedPeptideId, 
 											searcherCutoffValuesSearchLevel);
-							
-							
-
 							for ( PsmWebDisplayWebServiceResult psmWebDisplay : psms ) {
-	
-								writer.write( Integer.toString( eachSearchIdToProcess ) );
-	
+								writer.write( Integer.toString( eachProjectSearchIdToProcess ) );
 								writer.write( "\t" );
 								if ( psmWebDisplay.getScanNumber() != null ) {
 									writer.write( Integer.toString( psmWebDisplay.getScanNumber() ) );
 								}
-								
 								//  Peptide 1 data
-								
 								writer.write( "\t" );
 								writer.write( link.getPeptide1().getSequence() );
 								writer.write( "\t" );
@@ -380,72 +243,49 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 								writer.write( "\t" );
 								writer.write( link.getModsStringPeptide1() );  // MODS
 								writer.write( "\t" );
-
 								{
 									List<WebMergedProteinPosition> peptideProteinPositions = link.getPeptide1ProteinPositions();
 									List<String> reportedProteinStrings = new ArrayList<>();
 									for( WebMergedProteinPosition peptideProteinPosition : peptideProteinPositions ) {
-										
 										String output = peptideProteinPosition.getProtein().getName();
-										
 										if( link.getLinkType().equals( "LOOPLINK" ) ) {
 											output += "(" + peptideProteinPosition.getPosition1() + "," + peptideProteinPosition.getPosition2() + ")";
 										} else if( link.getLinkType().equals( "CROSSLINK" ) ) {
 											output += "(" + peptideProteinPosition.getPosition1() + ")";
 										}
-										
 										reportedProteinStrings.add( output );
 									}
-									
 									writer.write( StringUtils.join( reportedProteinStrings, "," ) );
 									writer.write( "\t" );
 								}
-								
-								
 								//  Peptide 2 data
-	
 								if ( link.getPeptide2() != null ) {
 									writer.write( link.getPeptide2().getSequence() );
 								}
 								writer.write( "\t" );
 								writer.write( link.getPeptide2Position() );
-								
 								writer.write( "\t" );
 								writer.write( link.getModsStringPeptide2() );  // MODS
 								writer.write( "\t" );
-								
-
 								{
 									List<WebMergedProteinPosition> peptideProteinPositions = link.getPeptide2ProteinPositions();
-									
 									if( peptideProteinPositions != null && peptideProteinPositions.size() > 0 ) {
-									
 										List<String> reportedProteinStrings = new ArrayList<>();
 										for( WebMergedProteinPosition peptideProteinPosition : peptideProteinPositions ) {
-											
 											if( link.getLinkType().equals( "CROSSLINK" ) ) {
 												String output = peptideProteinPosition.getProtein().getName();
 												output += "(" + peptideProteinPosition.getPosition1() + ")";
-												
 												reportedProteinStrings.add( output );
 											}
-											
 										}
-										
 										writer.write( StringUtils.join( reportedProteinStrings, "," ) );
 									}
-									
 									writer.write( "\t" );
 								}
-								
-								
 								writer.write( link.getLinkType() );
-								
 								//  Scan data
-								
 								writer.write( "\t" );
 								if ( StringUtils.isNotEmpty( psmWebDisplay.getPreMZRounded() ) ) {
-	
 									writer.write( psmWebDisplay.getPreMZRounded() ); // OBSERVED M/Z
 								}
 								writer.write( "\t" );
@@ -460,165 +300,101 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 								if ( psmWebDisplay.getScanFilename() != null ) {
 									writer.write( psmWebDisplay.getScanFilename() );   /// SCAN FILENAME
 								}
-								
-								
-	
 								///  Fill in empty cells for other search ids before search id being processed
-	
-								for ( Integer searchIdOtherThanSearchIdBeingProcessed : searchIdsListDeduppedSorted ) {
+								for ( SearchDTO searchOtherThanSearchIdBeingProcessed : searches ) {
+									int projectSearchIdOtherThanSearchIdBeingProcessed = searchOtherThanSearchIdBeingProcessed.getProjectSearchId();
+									Integer searchIdOtherThanSearchIdBeingProcessed = searchOtherThanSearchIdBeingProcessed.getSearchId();
 									
-									if ( searchIdOtherThanSearchIdBeingProcessed >= eachSearchIdToProcess ) {
-										
+									if ( projectSearchIdOtherThanSearchIdBeingProcessed >= eachProjectSearchIdToProcess ) {
 										//  Exit loop at eachSearchIdToProcess,  >= comparison since search ids in sorted order
-										
 										break;  // EARLY EXIT of loop
 									}
-	
 									//  Fill in cells for search id searchIdOtherThanSearchIdBeingProcessed
-									
 									AnnotationTypeDTOListForSearchId annotationTypeDTOListFor_OTHER_SearchId = 
 											psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( searchIdOtherThanSearchIdBeingProcessed );
-	
 									if ( annotationTypeDTOListFor_OTHER_SearchId == null ) {
-										
 										String msg = "annotationTypeDTOListFor_OTHER_SearchId not found for search id " + searchIdOtherThanSearchIdBeingProcessed;
 										log.error( msg );
 										throw new ProxlWebappDataException( msg );
 									}
-	
 									for ( int counter = 0; counter < annotationTypeDTOListFor_OTHER_SearchId.getAnnotationTypeDTOList().size(); counter++ ) {
-										
 										writer.write( "\t" );
 									}
 								}
-								
-	
 								AnnotationTypeDTOListForSearchId annotationTypeDTOListForSearchId = 
 										psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( eachSearchIdToProcess );
-	
 								if ( annotationTypeDTOListForSearchId == null ) {
-									
 									String msg = "annotationTypeDTOListForSearchId not found for search id " + eachSearchIdToProcess;
 									log.error( msg );
 									throw new ProxlWebappDataException( msg );
 								}
-								
-	
 								//  Get set of annotation type ids for getting annotation data
-								
 								Set<Integer> annotationTypeIdsForGettingAnnotationData = new HashSet<>();
-	
 								for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDTOListForSearchId.getAnnotationTypeDTOList() ) {
-									
 									annotationTypeIdsForGettingAnnotationData.add( annotationTypeDTO.getId() );
 								}
-								
 								Map<Integer, PsmAnnotationDTO> psmAnnotationDTOMapOnTypeId = new HashMap<>();
-								
 								List<PsmAnnotationDTO> psmAnnotationDataList = 
 										PsmAnnotationDataSearcher.getInstance()
 										.getPsmAnnotationDTOList( psmWebDisplay.getPsmDTO().getId(), annotationTypeIdsForGettingAnnotationData );
-	
 								for ( PsmAnnotationDTO psmAnnotationDataItem : psmAnnotationDataList ) {
-	
 									psmAnnotationDTOMapOnTypeId.put( psmAnnotationDataItem.getAnnotationTypeId(), psmAnnotationDataItem );
 								}
-	
 								for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDTOListForSearchId.getAnnotationTypeDTOList() ) {
-									
 									PsmAnnotationDTO psmAnnotationDTO = psmAnnotationDTOMapOnTypeId.get( annotationTypeDTO.getId() );
-	
 									if ( psmAnnotationDTO == null ) {
-										
 										String msg = "psmAnnotationDTO not foudn for annotation type id " +  annotationTypeDTO.getId();
 										log.error( msg );
 										throw new ProxlWebappDataException( msg );
 									}
-									
 									writer.write( "\t" );
 									writer.write( psmAnnotationDTO.getValueString() );
 								}
-								
-								
 								///  Fill in empty cells for other search ids After search id being processed
-	
-								for ( Integer searchIdOtherThanSearchIdBeingProcessed : searchIdsListDeduppedSorted ) {
-									
-									if ( searchIdOtherThanSearchIdBeingProcessed <= eachSearchIdToProcess ) {
-										
+								for ( SearchDTO searchOtherThanSearchIdBeingProcessed : searches ) {
+									int projectSearchIdOtherThanSearchIdBeingProcessed = searchOtherThanSearchIdBeingProcessed.getProjectSearchId();
+									Integer searchIdOtherThanSearchIdBeingProcessed = searchOtherThanSearchIdBeingProcessed.getSearchId();
+									if ( projectSearchIdOtherThanSearchIdBeingProcessed <= eachProjectSearchIdToProcess ) {
 										//  skip to next entry at eachSearchIdToProcess,  <= comparison since search ids in sorted order
-										
 										continue;  // EARLY CONTINUE of loop, Skip to next entry
 									}
-	
 									//  Fill in cells for search id searchIdOtherThanSearchIdBeingProcessed
-									
 									AnnotationTypeDTOListForSearchId annotationTypeDTOListFor_OTHER_SearchId = 
 											psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( searchIdOtherThanSearchIdBeingProcessed );
-	
 									if ( annotationTypeDTOListFor_OTHER_SearchId == null ) {
-										
 										String msg = "annotationTypeDTOListFor_OTHER_SearchId not found for search id " + searchIdOtherThanSearchIdBeingProcessed;
 										log.error( msg );
 										throw new ProxlWebappDataException( msg );
 									}
-	
 									for ( int counter = 0; counter < annotationTypeDTOListFor_OTHER_SearchId.getAnnotationTypeDTOList().size(); counter++ ) {
-										
 										writer.write( "\t" );
 									}
 								}
-								
-								
 								writer.write( "\n" );
-
-							
 							}
 						}
 					}
-
 				}
-				
-
 			} finally {
-				
-
 				try {
 					if ( writer != null ) {
 						writer.close();
 					}
-
 				} catch ( Exception ex ) {
-
 					log.error( "writer.close():Exception " + ex.toString(), ex );
 				}
-
-
 				try {
 					response.flushBuffer();
 				} catch ( Exception ex ) {
-
 					log.error( "response.flushBuffer():Exception " + ex.toString(), ex );
 				}
-
 			}
-
 			return null;
-			
-			
 		} catch ( Exception e ) {
-			
 			String msg = "Exception:  RemoteAddr: " + request.getRemoteAddr()  
 					+ ", Exception caught: " + e.toString();
-			
 			log.error( msg, e );
-			
 			throw e;
 		}
 	}
-	
-	
-	
-	
-	
 }

@@ -14,9 +14,9 @@
 
 <%--  block container div --%>
 
-<div id="${ filterTypeHTML_Id }_annotation_displays_container__search_id_${ search.id }" 
+<div id="${ filterTypeHTML_Id }_annotation_displays_container__search_id_${ search.projectSearchId }" 
 	class=" annotation_displays_container_jq  ${ filterTypeHTML_Id }_annotation_displays_container_jq "
-	data-search_id="${ search.id }"
+	data-search_id="${ search.projectSearchId }"
 	data-psm_peptide_type="${ filterTypeHTML_Id }"
 	style="">
 
@@ -49,7 +49,7 @@
 	 <%--  This div encloses the selection items and the buttons and marks what is part of this overlay --%>
 	 <div 
 		class=" annotation_display_overlay_enclosing_block_jq "  <%--  filterTypeHTML_Id == 'psm' or 'peptide' --%>
-		data-associated_ann_data_display_block_id="${ filterTypeHTML_Id }_annotation_displays_search_id_${ search.id }"
+		data-associated_ann_data_display_block_id="${ filterTypeHTML_Id }_annotation_displays_search_id_${ search.projectSearchId }"
 		>
 				 
 		<%-- Data Display Selection Items.  Each is Click to Select --%>
@@ -99,7 +99,7 @@
 		<%--  This div encloses the selection items and the buttons and marks what is part of this overlay --%>
 		<div 
 			class=" annotation_display_overlay_enclosing_block_jq "  <%--  filterTypeHTML_Id == 'psm' or 'peptide' --%>
-			data-associated_ann_data_display_block_id="${ filterTypeHTML_Id }_annotation_displays_search_id_${ search.id }"
+			data-associated_ann_data_display_block_id="${ filterTypeHTML_Id }_annotation_displays_search_id_${ search.projectSearchId }"
 			>
 					 
 			<%-- Data Display Sort Items.  Each is Drag to re-order --%>

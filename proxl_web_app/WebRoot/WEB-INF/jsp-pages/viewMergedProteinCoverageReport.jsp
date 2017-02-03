@@ -109,7 +109,7 @@
 				<form action="mergedProteinCoverageReport.do" method="get" id="form_get_for_updated_parameters">
 
 					<logic:iterate name="searches" id="search">
-						<input type="hidden" name="searchIds" value="<bean:write name="search" property="id" />">
+						<input type="hidden" name="searchIds" value="<bean:write name="search" property="projectSearchId" />">
 					</logic:iterate>
 
 					<input type="hidden" name="queryJSON" id="query_json_field" />
@@ -125,7 +125,7 @@
 				<form action="proteinCoverageReport.do" method="get" id="form_get_for_updated_parameters">
 										
 					<logic:iterate name="searches" id="search">
-						<input type="hidden" name="searchId" value="<bean:write name="search" property="id" />">
+						<input type="hidden" name="searchId" value="<bean:write name="search" property="projectSearchId" />">
 					</logic:iterate>
 				
 					<input type="hidden" name="queryJSON" id="query_json_field" />
@@ -211,7 +211,7 @@
 						<input type="button" value="${ UpdateButtonText }"  onclick="viewProteinCoverageReportPageCode.updatePageForFormParams()" >
 
 						<c:if test="${ not mergedPage }"> 	
-							<c:set var="searchId" value="${ search.id }"/>	
+							<c:set var="searchId" value="${ search.projectSearchId }"/>	
 							<c:set var="page_JS_Object" value="viewSearchProteinPageCommonCrosslinkLooplinkCoverage"/>
 						
 							<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>

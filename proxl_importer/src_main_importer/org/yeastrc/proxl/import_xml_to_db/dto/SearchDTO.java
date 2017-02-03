@@ -69,25 +69,6 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	}
 	
 	
-	
-//	public String getName() {
-//		return name;
-//	}
-	
-	public String getName() {
-		if( this.name != null )
-			return name;
-		else
-			return "Search: " + this.id;
-	}
-
-	
-	public String getName_AsActuallyInObject() {
-		return name;
-	}
-
-	
-	
 	//  Setters and Getters
 	
 	public int getId() {
@@ -108,15 +89,6 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	public void setFastaFilename(String fastaFilename) {
 		this.fastaFilename = fastaFilename;
 	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public int getProjectId() {
-		return projectId;
-	}
-	public void setProjectId(int projectId) {
-		this.projectId = projectId;
-	}
 	public String getPath() {
 		return path;
 	}
@@ -128,12 +100,6 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	}
 	public void setDirectoryName(String directoryName) {
 		this.directoryName = directoryName;
-	}
-	public int getDisplayOrder() {
-		return displayOrder;
-	}
-	public void setDisplayOrder(int displayOrder) {
-		this.displayOrder = displayOrder;
 	}
 	public boolean isHasScanData() {
 		return hasScanData;
@@ -149,10 +115,7 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	private String path;
 	private DateTime load_time;
 	private String fastaFilename;
-	private String name;
-	private int projectId;
 	private String directoryName;
-	private int displayOrder;
 	private boolean hasScanData;
 
 

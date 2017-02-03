@@ -27,7 +27,8 @@ import org.yeastrc.xlink.www.objects.AnnotationMinMaxFilterableValues;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdServiceResult;
 import org.yeastrc.xlink.www.objects.AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdServiceResult.AnnotationTypesMinMaxValuesEntry;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmMinMaxForSearchIdAnnotationTypeIdSearcher;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -55,7 +56,7 @@ public class AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getMinMaxValuesForPsmFilterableAnnTypeIdsSearchId") 
 	public AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdServiceResult getPSMFilterableAnnTypesForSearchId( 
-			@QueryParam( "search_id" ) int searchId,
+			@QueryParam( "search_id" ) int projectSearchId,
 			@QueryParam( "ann_type_id" ) List<Integer> annotationTypeIds,
 			@Context HttpServletRequest request )
 	throws Exception {
@@ -64,7 +65,7 @@ public class AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdService {
 		
 		
 		
-		if ( searchId == 0 ) {
+		if ( projectSearchId == 0 ) {
 
 			String msg = ": search_id is zero or not provided";
 
@@ -101,18 +102,18 @@ public class AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdService {
 
 			//   Get the project id for this search
 			
-			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
+			Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
 
-			searchIdsCollection.add( searchId );
+			projectSearchIdsCollection.add( projectSearchId );
 			
 			
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsCollection );
 			
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				
 				// should never happen
 				
-				String msg = "No project ids for search id: " + searchId;
+				String msg = "No project ids for search id: " + projectSearchId;
 				
 				log.error( msg );
 
@@ -173,6 +174,21 @@ public class AnnotationTypesMinMaxValuesForAnnTypeIdsSearchIdService {
 			//////////////////////////////////////////
 
 
+			Integer searchId =
+					MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
+			
+			if ( searchId == null ) {
+				String msg = ": No searchId found for projectSearchId: " + projectSearchId;
+				log.warn( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+			    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+			    	        .build()
+			    	        );
+			}
+			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
+
+			searchIdsCollection.add( searchId );
 			
 			//  Get  Annotation Type records for PSM
 			

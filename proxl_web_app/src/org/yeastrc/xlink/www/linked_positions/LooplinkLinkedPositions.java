@@ -63,7 +63,7 @@ public class LooplinkLinkedPositions {
 	 */
 	public List<SearchProteinLooplinkWrapper> getSearchProteinLooplinkWrapperList( SearchDTO search, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
 	
-		int searchId = search.getId();
+		int searchId = search.getSearchId();
 		
 		String[] linkTypesLooplink = { PeptideViewLinkTypesConstants.LOOPLINK_PSM };
 
@@ -251,7 +251,7 @@ public class LooplinkLinkedPositions {
 		List<SearchPeptideLooplinkAnnDataWrapper> searchPeptideLooplinkAnnDataWrapper_List = 
 				SearchPeptideLooplink_LinkedPosition_Searcher.getInstance()
 				.searchOnSearchProteinLooplink( 
-						search.getId(), 
+						search, 
 						searcherCutoffValuesSearchLevel, 
 						protein.getProteinSequenceId(), 
 						position1, 
@@ -264,7 +264,7 @@ public class LooplinkLinkedPositions {
 			WebReportedPeptide webReportedPeptide = new WebReportedPeptide();
 			
 			webReportedPeptide.setSearch( search );
-			webReportedPeptide.setSearchId( search.getId() );
+			webReportedPeptide.setSearchId( search.getSearchId() );
 			webReportedPeptide.setReportedPeptideId( searchPeptideLooplink.getReportedPeptideId() );
 			
 			webReportedPeptide.setNumPsms( searchPeptideLooplink.getNumPsms() );
@@ -343,7 +343,7 @@ public class LooplinkLinkedPositions {
 			
 			boolean areRelatedPeptidesUnique =
 					Get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Searcher.getInstance()
-					.get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId( search.getId(), reportedPeptideId );
+					.get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId( search.getSearchId(), reportedPeptideId );
 			
 			if ( areRelatedPeptidesUnique ) {
 

@@ -41,7 +41,7 @@ public class CutoffPageDisplayRoot {
 
 					//  Sort on Sort Order
 
-					return o1.getSearchId() - o2.getSearchId();
+					return o1.getProjectSearchId() - o2.getProjectSearchId();
 				}
 			});
 

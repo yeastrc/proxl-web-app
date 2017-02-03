@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_plots.psm_count_for_score.CreatePsmCountsVsScoreQCPlotData;
 import org.yeastrc.xlink.www.qc_plots.psm_count_for_score.PsmCountsVsScoreQCPlotDataJSONRoot;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -42,7 +42,7 @@ public class QCPlotPsmCountsVsScoreService {
 	@Path("/getPsmCountsVsScore") 
 	public PsmCountsVsScoreQCPlotDataJSONRoot getViewerData( 
 			@QueryParam( "selectedLinkTypes" ) Set<String> selectedLinkTypes,			
-			@QueryParam( "searchId" ) int searchId,
+			@QueryParam( "searchId" ) int projectSearchId,
 			@QueryParam( "annotationTypeId" ) int annotationTypeId,
 			@QueryParam( "psmScoreCutoff" ) Double psmScoreCutoff,
 			@QueryParam( "iP" ) List<Integer> proteinSequenceIdsToIncludeList,
@@ -50,7 +50,7 @@ public class QCPlotPsmCountsVsScoreService {
 			@Context HttpServletRequest request )
 	throws Exception {
 
-		if ( searchId == 0 ) {
+		if ( projectSearchId == 0 ) {
 			String msg = ": Provided searchId is zero or wasn't provided";
 			log.error( msg );
 		    throw new WebApplicationException(
@@ -72,12 +72,12 @@ public class QCPlotPsmCountsVsScoreService {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			//   Get the project id for this search
-			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
-			searchIdsCollection.add( searchId );
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
+			projectSearchIdsCollection.add( projectSearchId );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsCollection );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search id: " + searchId;
+				String msg = "No project ids for search id: " + projectSearchId;
 				log.error( msg );
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
@@ -122,7 +122,7 @@ public class QCPlotPsmCountsVsScoreService {
 					CreatePsmCountsVsScoreQCPlotData.getInstance()
 					.create( 
 							selectedLinkTypes, 
-							searchId, 
+							projectSearchId, 
 							annotationTypeId, 
 							psmScoreCutoff, 
 							proteinSequenceIdsToIncludeList,

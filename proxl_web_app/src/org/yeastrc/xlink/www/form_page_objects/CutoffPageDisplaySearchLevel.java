@@ -16,7 +16,7 @@ public class CutoffPageDisplaySearchLevel {
 //	private static final Logger log = Logger.getLogger( CutoffPageDisplaySearchLevel.class );
 
 
-	private int searchId;
+	private int projectSearchId;
 	
 	private List<CutoffPageDisplayAnnotationLevel> psmAnnotationCutoffData = new ArrayList<>();
 	private List<CutoffPageDisplayAnnotationLevel> peptideAnnotationCutoffData = new ArrayList<>();
@@ -42,13 +42,6 @@ public class CutoffPageDisplaySearchLevel {
 
 	
 	
-	
-	public int getSearchId() {
-		return searchId;
-	}
-	public void setSearchId(int searchId) {
-		this.searchId = searchId;
-	}
 	
 	public List<CutoffPageDisplayAnnotationLevel> getPsmAnnotationCutoffData() {
 		
@@ -113,5 +106,13 @@ public class CutoffPageDisplaySearchLevel {
 	public void setPeptideAnnotationCutoffData(
 			List<CutoffPageDisplayAnnotationLevel> peptideAnnotationCutoffData) {
 		this.peptideAnnotationCutoffData = peptideAnnotationCutoffData;
+	}
+
+	public int getProjectSearchId() {
+		return projectSearchId;
+	}
+
+	public void setProjectSearchId(int projectSearchId) {
+		this.projectSearchId = projectSearchId;
 	}
 }

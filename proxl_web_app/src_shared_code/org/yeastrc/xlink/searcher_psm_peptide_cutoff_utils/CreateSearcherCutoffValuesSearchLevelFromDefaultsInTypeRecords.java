@@ -47,7 +47,7 @@ public class CreateSearcherCutoffValuesSearchLevelFromDefaultsInTypeRecords {
 
 		SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
 		
-		searcherCutoffValuesSearchLevel.setSearchId( searchId );
+		searcherCutoffValuesSearchLevel.setProjectSearchId( searchId );
 		
 		
 		for ( AnnotationTypeDTO item : srchPgm_Filterable_Psm_AnnotationType_DTOList ) {

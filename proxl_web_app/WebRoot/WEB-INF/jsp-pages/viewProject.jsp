@@ -1376,105 +1376,163 @@
 				<div class="top-level-label-bottom-border" ></div>
 
 	
-				<%--  If admin section rendered, include the Javascript for it --%>
-				<c:if test="${authAccessLevel.projectOwnerAllowed and not empty otherProjectList}" >
+				<c:if test="${authAccessLevel.projectOwnerAllowed and otherProjectsExistForUser}" >
+			
+					<%--  Modal Dialog block for copying searches to another project --%>
 			
 						<%--  Div behind modal dialog div --%>
 			
-					<div class="modal-dialog-overlay-background   move_searches_overlay_show_hide_parts_jq move_searches_overlay_cancel_parts_jq  overlay_show_hide_parts_jq" 
-						id="move-searches-overlay-background" ></div>
+					<div class="modal-dialog-overlay-background   copy_searches_overlay_show_hide_parts_jq copy_searches_overlay_cancel_parts_jq  overlay_show_hide_parts_jq" 
+						id="copy-searches-overlay-background" ></div>
 			
 						<%--  Inline div for positioning modal dialog on page --%>
-					<div class="move-searches-overlay-containing-full-width-div " >
+					<div class="copy-searches-overlay-containing-full-width-div " >
 					
 							<%--  Inline div for positioning modal dialog on page --%>
-					  <div class="move-searches-overlay-containing-relative-div " >
+					  <div class="copy-searches-overlay-containing-relative-div " >
 					
 							<%--  Div overlay for moving searches --%>
 					
-						<div class="modal-dialog-overlay-container move-searches-overlay-container   move_searches_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
-							 id="move-searches-overlay-container" style="top: -30px;">
+						<div class="modal-dialog-overlay-container copy-searches-overlay-container   copy_searches_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
+							 id="copy-searches-overlay-container" style="top: -30px;">
 
-							<div class="top-level-label" style="margin-left: 0px;">Move Search Data</div>
+							<div class="top-level-label" style="margin-left: 0px;">Copy Search Data</div>
 			
 							<div class="top-level-label-bottom-border" ></div>
 							
-							<div id="move-searches-overlay-select-project-block">
+							<div id="copy-searches-overlay-select-project-block">
 							
-								<div >Click the title of the project to which you would like to move the selected searches.</div>
+								<div >Click the title of the project to which you would like to copy the selected searches to.</div>
 								
-								<div class="move-searches-overlay-project-list-block">
+								<div >
+								  <label>
+									<input type="checkbox" id="copy_searches_remove_from_current_project_checkbox">
+									Move the searches to the new project
+								  </label>
+								</div>
+								
+								<div class="copy-searches-overlay-project-list-block">
 	
-								<div class="top-level-label-bottom-border" ></div>
+									<div class="top-level-label-bottom-border" ></div>
 									
-									<c:forEach var="otherProject" items="${otherProjectList}">
-									
-									  <div >
-										<a href="javascript:"  otherProjectId="${otherProject.id}"
-											class="move_search_project_choice_jq" 
-											><c:out value="${otherProject.title}"></c:out></a> 
-								
-										<div class="top-level-label-bottom-border" ></div>
-									  </div>
-									</c:forEach>
-									
+									<div id="copy_searches_other_project_list_loading_msg">
+										Loading Projects
+									</div>
+									<div id="copy_searches_other_project_list_no_projects_msg">
+										No other projects to copy to for selected searches.
+										All searches are in all other projects.
+									</div>
+									<div id="copy_searches_other_project_list">
+										<%-- The other projects to copy to will be inserted here --%>
+									</div>
+										
 									<div style="float: right;">
-										<input type="button" value="Cancel" class="move_searches_overlay_cancel_parts_jq" >
+										<input type="button" value="Cancel" class="copy_searches_overlay_cancel_parts_jq" >
 									</div>
 									
 								</div>	
 							</div>
 							
-							<div id="move-searches-overlay-confirm-project-block"  class="move_searches_overlay_confirmation_steps_jq" style="display: none;">
+							<%-- Other project Handlebars template --%>
+							<div id="copy_searches_other_project_template" style="display: none;">
+							  <div >
+							  	<div >
+									<a href="javascript:"  data-other_project_id="{{ projectId }}"
+										class="copy_search_project_choice_jq" 
+										>{{ projectTitle }}</a> 
+								</div>
+								<div class="top-level-label-bottom-border" ></div>
+							  </div>
+							</div>
 							
-								<div style="margin-bottom: 10px;">Move selected searches to "<span id="move-searches-overlay-project-to-move-title"></span>"?</div>
+							<div id="copy-searches-overlay-confirm-project-block"  class="copy_searches_overlay_confirmation_steps_jq" style="display: none;">
+							
+								<div style="margin-bottom: 10px;">
+									<span class=" copy_searches_copy_text_jq ">Copy</span
+									><span class=" copy_searches_move_text_jq " style="display: none;">Move</span>
+										selected searches to "<span id="copy-searches-overlay-project-to-move-title"></span>"?
+									
+								</div>
 								<div >
-									<input type="button" value="Yes" id="move_search_confirm_button" >
-									<input type="button" value="Cancel" class="move_searches_overlay_cancel_parts_jq" >
-								</div>								
+									<input type="button" value="Yes" id="copy_search_confirm_button" >
+									
+									<%--
+									<input type="button" value="Copy All Searches" id="copy_search_copy_all_search_confirm_button" style="display: none;">
+									--%>
+									<input type="button" value="Copy" 
+										id="copy_search_copy_searches_not_in_new_project_confirm_button" style="display: none;">
+									
+									<%--	
+									<input type="button" value="Move All Searches" id="copy_search_move_all_search_confirm_button" style="display: none;">
+									--%>
+									<input type="button" value="Move" 
+										id="copy_search_move_searches_not_in_new_project_confirm_button" style="display: none;">
+										
+									<input type="button" value="Cancel" class="copy_searches_overlay_cancel_parts_jq" >
+								</div>							
+								
+								<div id="copy_searches_searches_in_new_project_outer_block" 
+									style="display: none; margin-top: 10px;">
+									<div style="margin-bottom: 10px;">
+										The following searches are already in the destination project and will not be 
+										<span class=" copy_searches_copy_text_jq ">copied</span
+										><span class=" copy_searches_move_text_jq " style="display: none;">moved</span>:
+									</div>
+									<div id="copy_searches_searches_in_new_project_list_block" style="margin-left: 10px; ">
+									</div>
+								</div>
+								<%-- Handlebars template --%>	
+								<div id="copy_searches_searches_in_new_project_entry_template" style="display: none;">
+									<div >
+									  	<div >
+											{{ searchNameDisplay }} 
+										</div>
+										<div class="top-level-label-bottom-border" ></div>
+									</div>
+								</div>
 									
 							</div>
 							
-							<div id="move-searches-overlay-confirmation-project-block" class="move_searches_overlay_confirmation_steps_jq" style="display: none;">
+							<div id="copy-searches-overlay-confirmation-project-block" class="copy_searches_overlay_confirmation_steps_jq" style="display: none;">
 
 								<div >
-									Searches moved successfully
+									Searches copied successfully
 								</div>
 														
-								<input type="button" value="Go to project the searches were moved to" id="show-project-searches-moved-to" >
+								<input type="button" value="Go to project the searches were copied to" id="show-project-searches-copied-to" >
 
-								<input type="button" value="Return to Project" class="move_searches_overlay_cancel_parts_jq" >
+								<input type="button" value="Return to Project" id="copy_searches_return_to_project" >
 
 							</div>
 
-							<div id="move-searches-overlay-move-to-project-marked-for-deletion-block"  class="move_searches_overlay_confirmation_steps_jq" style="display: none;">
+							<div id="copy-searches-overlay-move-to-project-marked-for-deletion-block"  class="copy_searches_overlay_confirmation_steps_jq" style="display: none;">
 							
 								<div  style="margin-bottom: 10px;">
-									Move Searches Failed.  Project moving to is marked for deletion.  Please reload the page to get a current list of valid projects to move to.
+									Copy Searches Failed.  Project copying to is marked for deletion.  Please reload the page to get a current list of valid projects to copy to.
 								</div>
 								<div >
-									<input type="button" value="Cancel" class="move_searches_overlay_cancel_parts_jq" >
+									<input type="button" value="Cancel" class="copy_searches_overlay_cancel_parts_jq" >
 								</div>
 							</div>
 							
-							<div id="move-searches-overlay-move-to-project-disabled-block"  class="move_searches_overlay_confirmation_steps_jq" style="display: none;">
+							<div id="copy-searches-overlay-move-to-project-disabled-block"  class="copy_searches_overlay_confirmation_steps_jq" style="display: none;">
 							
 								<div  style="margin-bottom: 10px;">
-									Move Searches Failed.  Project moving to is disabled.  Please reload the page to get a current list of valid projects to move to.
+									Copy Searches Failed.  Project copying to is disabled.  Please reload the page to get a current list of valid projects to copy to.
 								</div>
 								<div >
-									<input type="button" value="Cancel" class="move_searches_overlay_cancel_parts_jq" >
+									<input type="button" value="Cancel" class="copy_searches_overlay_cancel_parts_jq" >
 								</div>
 							</div>
 							
-							<div id="move-searches-overlay-move-project-failed-block"  class="move_searches_overlay_confirmation_steps_jq" style="display: none;">
+							<div id="copy-searches-overlay-move-project-failed-block"  class="copy_searches_overlay_confirmation_steps_jq" style="display: none;">
 							
 								<div  style="margin-bottom: 10px;">
-									Move Searches Failed.  Please reload the page to get a current list of valid projects to move to.  
+									Copy Searches Failed.  Please reload the page to get a current list of valid projects to copy to.  
 									If you continue to get this error message, contact the administrator.
 								</div>
 								<div >
-									<input type="button" value="Cancel" class="move_searches_overlay_cancel_parts_jq" >
+									<input type="button" value="Cancel" class="copy_searches_overlay_cancel_parts_jq" >
 								</div>
 							</div>
 							
@@ -1650,16 +1708,16 @@
 
 				  	    <c:if test="${authAccessLevel.projectOwnerAllowed }" >
 			
-							<c:if test="${not empty otherProjectList}" >
+							<c:if test="${otherProjectsExistForUser}" >
 								
 								<div style="display:inline-block;position:relative;"> <%-- outer div to support overlay div when button disabled --%>
-									<input class="submit-button tool_tip_attached_jq " type="button" id="move_search_button"
-											 data-tooltip="Click here to move the selected searches to another project."
-											value="Move Searches" disabled>
+									<input class="submit-button tool_tip_attached_jq " type="button" id="copy_search_button"
+											 data-tooltip="Click here to copy the selected searches to another project."
+											value="Copy Searches" disabled>
 										<%-- overlay div to provide tooltip for button --%>
-									<div class=" tool_tip_attached_jq   " id="move_search_button_cover_when_disabled" 
+									<div class=" tool_tip_attached_jq   " id="copy_search_button_cover_when_disabled" 
 										style="position:absolute;left:0;right:0;top:0;bottom:0;" 
-										data-tooltip="Select one or more searches below and click here to move the selected searches to another project." ></div>
+										data-tooltip="Select one or more searches below and click here to copy the selected searches to another project." ></div>
 								</div>
 								
 							</c:if>
@@ -1684,17 +1742,17 @@
 						
 							<c:set var="search" value="${ search_wrapper.searchDTO }" />
 						
-						  <div searchId="<bean:write name="search" property="id" />" class=" search_row_jq" >
+						  <div searchId="<bean:write name="search" property="projectSearchId" />" class=" search_row_jq" >
 
 							<table style="padding:0px;margin-top:0px;margin-bottom:0px;width:100%;">
 							
-								<tr searchId="<bean:write name="search" property="id" />" class=" search_root_jq ">
+								<tr searchId="<bean:write name="search" property="projectSearchId" />" class=" search_root_jq ">
 		
 								  <script type="text/text" class=" qc_plots_links_filtered_on_import_message_jq "
 										><c:out value="${ search_wrapper.cutoffsAppliedOnImportAllAsString }"></c:out></script>
 
 									<td style="width:10px;" valign="top" class="search-checkbox-cell">
-										<input id="search-checkbox-<bean:write name="search" property="id" />" onChange="javascript:checkSearchCheckboxes(<bean:write name="search" property="id" />)" class="search-checkbox" type="checkbox" name="searchIds" value="<bean:write name="search" property="id" />"/>
+										<input id="search-checkbox-<bean:write name="search" property="projectSearchId" />" onChange="javascript:checkSearchCheckboxes(<bean:write name="search" property="projectSearchId" />)" class="search-checkbox" type="checkbox" name="searchIds" value="<bean:write name="search" property="projectSearchId" />"/>
 									</td>
 									<td>
 						
@@ -1702,15 +1760,15 @@
 									  <div style="float: right;" >
 										
 										[<a data-tooltip="View peptides found in search" class="tool_tip_attached_jq" 
-											href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" searchId="${ search.id }">peptide.do?searchId=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
+											href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" searchId="${ search.projectSearchId }">peptide.do?searchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 												>Peptides</a>]
 										
 										[<a data-tooltip="View proteins found in search" class="tool_tip_attached_jq" 
-											href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" searchId="${ search.id }">crosslinkProtein.do?searchId=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
+											href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" searchId="${ search.projectSearchId }">crosslinkProtein.do?searchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 												>Proteins</a>]
 
 										[<a data-tooltip="Graphical view of links between proteins" class="tool_tip_attached_jq" 
-											href="${ contextPath }/<proxl:defaultPageUrl pageName="/image" searchId="${ search.id }">image.do?searchIds=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
+											href="${ contextPath }/<proxl:defaultPageUrl pageName="/image" searchId="${ search.projectSearchId }">image.do?searchIds=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 												>Image</a>]
 
 										<c:choose>
@@ -1718,7 +1776,7 @@
 										
 
 											[<a data-tooltip="View data on 3D structures" class="tool_tip_attached_jq" 
-												href="${ contextPath }/<proxl:defaultPageUrl pageName="/structure" searchId="${ search.id }">structure.do?searchIds=<bean:write name="search" property="id" /></proxl:defaultPageUrl>"
+												href="${ contextPath }/<proxl:defaultPageUrl pageName="/structure" searchId="${ search.projectSearchId }">structure.do?searchIds=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 													>Structure</a>]
 																							
 										 </c:when>
@@ -1733,7 +1791,7 @@
 			
 										<c:if test="${authAccessLevel.searchDeleteAllowed}" >
 											<a href="javascript:" data-tooltip="Delete search" class="tool_tip_attached_jq delete_search_link_jq"
-											 		<%-- WAS  href="javascript:confirmDelete(<bean:write name="search" property="id" />)"  --%>
+											 		<%-- WAS  href="javascript:confirmDelete(<bean:write name="search" property="projectSearchId" />)"  --%>
 												><img src="${ contextPath }/images/icon-delete-small.png" ></a>
 										</c:if>
 										
@@ -1741,25 +1799,37 @@
 		
 									  <div>
 		
-										<a class="tool_tip_attached_jq expand-link" data-tooltip="Show or hide more details" id="search-details-link-<bean:write name="search" property="id" />" style="font-size:80%;color:#4900d4;text-decoration:none;" href="javascript:showSearchDetails(<bean:write name="search" property="id" />)"
+										<a class="tool_tip_attached_jq expand-link" data-tooltip="Show or hide more details" 
+											id="search-details-link-<bean:write name="search" property="projectSearchId" />" 
+											style="font-size:80%;color:#4900d4;text-decoration:none;" 
+											href="javascript:showSearchDetails(<bean:write name="search" property="projectSearchId" />)"
 											><img src="${ contextPath }/images/icon-expand-small.png" <%-- This image src is changed in the Javascript --%>
 											></a>
 										
-										<span id="search-name-normal-<bean:write name="search" property="id" />"
-											><span class="search-name-display  search_name_display_jq" id="search-name-display-<bean:write name="search" property="id" />"
+										<span id="search-name-normal-<bean:write name="search" property="projectSearchId" />"
+											><span class="search-name-display  search_name_display_jq" 
+												id="search-name-display-<bean:write name="search" property="projectSearchId" />"
 												><bean:write name="search" property="name" /></span
-											 ><c:if test="${authAccessLevel.writeAllowed}" 
-											 		> <span class="search-name-display search_number_in_parens_display_jq ">(<bean:write name="search" property="id" />)</span></c:if><c:if test="${authAccessLevel.writeAllowed}" 
-											 		><a class="tool_tip_attached_jq" data-tooltip="Edit name of search" href="javascript:showSearchNameForm(<bean:write name="search" property="id" />)"
-												><img class="edit-icon" src="${ contextPath }/images/icon-edit-small.png" 
-													></a></c:if></span>
+											 > <span class="search-name-display search_number_in_parens_display_jq "
+											 			>(<bean:write name="search" property="searchId" />)</span
+											 			><c:if test="${authAccessLevel.writeAllowed}" 
+											 				><a class="tool_tip_attached_jq" data-tooltip="Edit name of search" 
+											 					href="javascript:showSearchNameForm(<bean:write name="search" property="projectSearchId" />)"
+																><img class="edit-icon" src="${ contextPath }/images/icon-edit-small.png" 
+																	></a></c:if></span>
 													
-										<span style="display:none;" id="search-name-edit-<bean:write name="search" property="id" />"><input id="search-name-value-<bean:write name="search" property="id" />" type="text" style="width:200px;" value="<bean:write name="search" property="name" />"><input class="submit-button" type="button" value="Save" onClick="saveName(<bean:write name="search" property="id" />)"><input class="submit-button" type="button" value="Cancel" onClick="cancelNameEdit(<bean:write name="search" property="id" />)"></span>
+										<span style="display:none;" id="search-name-edit-<bean:write name="search" property="projectSearchId" />"
+											><input id="search-name-value-<bean:write name="search" property="projectSearchId" />" 
+												type="text" style="width:200px;" value="<bean:write name="search" property="name" />"
+												><input class="submit-button" type="button" value="Save" 
+													onClick="saveName(<bean:write name="search" property="projectSearchId" />)"
+													><input class="submit-button" type="button" value="Cancel" 
+														onClick="cancelNameEdit(<bean:write name="search" property="projectSearchId" />)"></span>
 										
 									  </div>
 									  <div style="clear: right;"  class="search-details-container-div">
 																	
-										<table class="search-details" id="search-details-<bean:write name="search" property="id" />" style="display:none;margin-left:15px;">
+										<table class="search-details" id="search-details-<bean:write name="search" property="projectSearchId" />" style="display:none;margin-left:15px;">
 
 										  <c:if test="${ authAccessLevel.writeAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }" >
 										   <c:if test="${ not empty search.path }" >
@@ -1878,11 +1948,11 @@
 													<%--  Hide this block if no Web Links and user unable to add Web Links --%>
 											<tr>
 												<td valign="top">Raw MS data files:</td>
-												<td id="search-web-links-<bean:write name="search" property="id" />">
+												<td id="search-web-links-<bean:write name="search" property="projectSearchId" />">
 													
 													<div style="position: relative;">			 
 												  		<div class="error-message-container error_message_container_jq" 
-												  				id="error_message_web_link_url_invalid_<bean:write name="search" property="id" />"
+												  				id="error_message_web_link_url_invalid_<bean:write name="search" property="projectSearchId" />"
 												  				style="width: 600px;">
 												  			<div class="error-message-inner-container" >
 												  				<div class="error-message-close-x error_message_close_x_jq">X</div>
@@ -1915,23 +1985,23 @@
 		
 													<c:if test="${authAccessLevel.writeAllowed}" >
 													 <div >
-														<div id="add-web-links-link-span-<bean:write name="search" property="id" />"
-															>[<a id="add-web-link-link-<bean:write name="search" property="id" />" 
+														<div id="add-web-links-link-span-<bean:write name="search" property="projectSearchId" />"
+															>[<a id="add-web-link-link-<bean:write name="search" property="projectSearchId" />" 
 																style="font-size:80%;text-decoration:none;" 
-																href="javascript:showAddWebLink(<bean:write name="search" property="id" />)"
+																href="javascript:showAddWebLink(<bean:write name="search" property="projectSearchId" />)"
 																class="tool_tip_attached_jq" data-tooltip="Add URL for a RAW file">+Link to Raw file</a>]</div>
-														<div style="display:none;" id="add-web-links-form-span-<bean:write name="search" property="id" />" >
+														<div style="display:none;" id="add-web-links-form-span-<bean:write name="search" property="projectSearchId" />" >
 														 <div>
 														  URL:
-														  <input id="web-links-url-input-<bean:write name="search" property="id" />" 
+														  <input id="web-links-url-input-<bean:write name="search" property="projectSearchId" />" 
 																type="text" style="font-size:80%;width:200px;">
 														  Label:
-														  <input id="web-links-label-input-<bean:write name="search" property="id" />" 
+														  <input id="web-links-label-input-<bean:write name="search" property="projectSearchId" />" 
 																type="text" style="font-size:80%;width:200px;">
 														  <input style="font-size:80%;" class="submit-button" type="button" value="Add Web Link" 
-																	onClick="addWebLink(<bean:write name="search" property="id" />)">
+																	onClick="addWebLink(<bean:write name="search" property="projectSearchId" />)">
 														  <input style="font-size:80%;" class="submit-button" type="button" value="Cancel" 
-																 	onClick="cancelWebLink(<bean:write name="search" property="id" />)" >
+																 	onClick="cancelWebLink(<bean:write name="search" property="projectSearchId" />)" >
 														  </div>
 														  <div style="font-size: 80%;">
 														  	The URL must start with "http://", "https://", "ftp://" or some other transport protocal
@@ -1971,29 +2041,24 @@
 												<td >
 												  <logic:iterate name="search" property="files" id="searchFile" >
 													
-													<div class=" display_search_filename_outer_container_jq " search_file_id="${ searchFile.id }" search_id="${ search.id }"> 
+													<div class=" display_search_filename_outer_container_jq " search_file_id="${ searchFile.id }" search_id="${ search.projectSearchId }"> 
 													
 													 <div class="display_search_filename_container_jq">
 													 
 													  <%--  Normal display of link with filename --%>
 
-													  <a href="downloadSearchFile.do?project_id=<c:out value="${project_id}" />&fileId=<bean:write name="searchFile" property="id" />" 
+													  <a href="downloadSearchFile.do?fileId=<bean:write name="searchFile" property="id" />" 
 													  	class="tool_tip_attached_jq search_file_link_for_tooltip_jq" data-tooltip="Download file">
 													  		
 													  	<span class="search_filename_jq">
 															<bean:write name="searchFile" property="displayFilename" />
 														</span>
-														<c:if test="${authAccessLevel.projectOwnerAllowed}"> 
+													  </a>
+													  <c:if test="${authAccessLevel.projectOwnerAllowed}"> 
 															<a class="tool_tip_attached_jq" data-tooltip="Edit name" href="javascript:" onclick="showSearchFilenameForm( this )"
 																><img class="edit-icon" src="${ contextPath }/images/icon-edit-small.png" 
 																	></a>
-														</c:if>
-																	
-															<c:if test="${authAccessLevel.assistantProjectOwnerAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }">
-																<span class="search_file_link_tooltip_jq"  style="display: none;"
-																	><bean:write name="searchFile" property="description" /></span>
-															</c:if>
-													  </a>
+													  </c:if>
 													 </div>
 												
 												  	<c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" >
@@ -2023,7 +2088,7 @@
 													<%--  Hide this block if no comments and user unable to add comments --%>
 											  <tr>
 												<td valign="top">Comments:</td>
-												<td id="search-comments-<bean:write name="search" property="id" />">
+												<td id="search-comments-<bean:write name="search" property="projectSearchId" />">
 		
 													<logic:iterate name="search" property="comments" id="comment" >
 
@@ -2125,13 +2190,13 @@
 															</div>
 														</div>													
 													
-														<span id="add-comment-link-span-<bean:write name="search" property="id" />"
-															>[<a class="tool_tip_attached_jq" data-tooltip="Add a comment" id="add-comment-link-<bean:write name="search" property="id" />" style="font-size:80%;text-decoration:none;" href="javascript:showAddComment(<bean:write name="search" property="id" />)"
+														<span id="add-comment-link-span-<bean:write name="search" property="projectSearchId" />"
+															>[<a class="tool_tip_attached_jq" data-tooltip="Add a comment" id="add-comment-link-<bean:write name="search" property="projectSearchId" />" style="font-size:80%;text-decoration:none;" href="javascript:showAddComment(<bean:write name="search" property="projectSearchId" />)"
 																>+Comment</a>]</span>
-														<span style="display:none;" id="add-comment-form-span-<bean:write name="search" property="id" />"
-															><input id="comment-input-<bean:write name="search" property="id" />" type="text" style="font-size:80%;width:200px;"
-															><input style="font-size:80%;" class="submit-button" type="button" value="Add Comment" onClick="addComment(<bean:write name="search" property="id" />)"
-															><input style="font-size:80%;" class="submit-button" type="button" value="Cancel" onClick="cancelComment(<bean:write name="search" property="id" />)"
+														<span style="display:none;" id="add-comment-form-span-<bean:write name="search" property="projectSearchId" />"
+															><input id="comment-input-<bean:write name="search" property="projectSearchId" />" type="text" style="font-size:80%;width:200px;"
+															><input style="font-size:80%;" class="submit-button" type="button" value="Add Comment" onClick="addComment(<bean:write name="search" property="projectSearchId" />)"
+															><input style="font-size:80%;" class="submit-button" type="button" value="Cancel" onClick="cancelComment(<bean:write name="search" property="projectSearchId" />)"
 															></span>
 													</c:if>
 													
@@ -3011,6 +3076,11 @@
 		
 		
 	
+		<%--  If Not locked and user allowed to change search data, include the Javascript for it --%>
+		<c:if test="${authAccessLevel.assistantProjectOwnerAllowed }" >
+		
+			<script type="text/javascript" src="${ contextPath }/js/viewProject_SearchMaint.js?x=${cacheBustValue}"></script>
+		</c:if> 
 	
 		<%--  If admin section rendered, include the Javascript for it --%>
 		<c:if test="${authAccessLevel.assistantProjectOwnerAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed}" >

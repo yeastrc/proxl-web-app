@@ -87,7 +87,7 @@ public class GetAnnotationDisplayUserSelectionDetailsData {
 
 		for ( SearchDTO search : searches ) {
 		
-			searchIdsSet.add( search.getId() );
+			searchIdsSet.add( search.getSearchId() );
 		}
 
 		Map<Integer, AnnotationTypeDTOListForSearchId> psmAnnotationTypeDTO_DefaultDisplay_DisplayOrder_MainMap = 
@@ -107,7 +107,8 @@ public class GetAnnotationDisplayUserSelectionDetailsData {
 		
 		for ( SearchDTO search : searches ) {
 		
-			Integer searchId = search.getId();
+			Integer projectSearchId = search.getProjectSearchId();
+			Integer searchId = search.getSearchId();
 			
 			//  Populate Default Display Data
 			
@@ -124,7 +125,7 @@ public class GetAnnotationDisplayUserSelectionDetailsData {
 			defaultAnnTypesPerSearch.setPsmDefaultAnnotationTypeIdList( psmDefaultAnnotationTypeIdList );
 			defaultAnnTypesPerSearch.setPeptideDefaultAnnotationTypeIdList( peptideDefaultAnnotationTypeIdList );
 			
-			defaultAnnTypesPerSearchKeySearchIdMap.put( searchId, defaultAnnTypesPerSearch );
+			defaultAnnTypesPerSearchKeySearchIdMap.put( projectSearchId, defaultAnnTypesPerSearch );
 			
 			////////////////
 			

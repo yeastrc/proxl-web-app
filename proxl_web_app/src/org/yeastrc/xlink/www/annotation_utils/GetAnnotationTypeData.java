@@ -30,7 +30,7 @@ public class GetAnnotationTypeData {
 	
 	private static final int CACHE_MAX_SIZE = 60;
 
-	private static final int CACHE_TIMEOUT = 200; // in seconds
+	private static final int CACHE_TIMEOUT = 200; // in hours
 
 
 	/**
@@ -38,7 +38,7 @@ public class GetAnnotationTypeData {
 	 * 
 	 * currently 60 minutes
 	 */
-	private static final int CACHE__FORCED_TIMEOUT = 60 * 60 * 1000; // in milliseconds
+//	private static final int CACHE__FORCED_TIMEOUT = 60 * 60 * 1000; // in milliseconds
 	
 	
 	/**
@@ -128,14 +128,14 @@ public class GetAnnotationTypeData {
 
 		//  value is in cache or was just loaded
 
-		if ( localCacheValue.lastAccessTime < ( System.currentTimeMillis() - CACHE__FORCED_TIMEOUT ) ) {
-
-			//   Compare time when item was put in cache and if time exceeded, reload item from db
-			
-			localCacheValue =  loadFromDB( localCacheKey );
-
-			annotationTypeDataCache.put( localCacheKey, localCacheValue );
-		}
+//		if ( localCacheValue.lastAccessTime < ( System.currentTimeMillis() - CACHE__FORCED_TIMEOUT ) ) {
+//
+//			//   Compare time when item was put in cache and if time exceeded, reload item from db
+//			
+//			localCacheValue =  loadFromDB( localCacheKey );
+//
+//			annotationTypeDataCache.put( localCacheKey, localCacheValue );
+//		}
 
 		Map<Integer, Map<Integer, AnnotationTypeDTO>> annotationTypeData = localCacheValue.annotationTypeData;
 
@@ -158,7 +158,7 @@ public class GetAnnotationTypeData {
 		
 		annotationTypeDataCache = CacheBuilder.newBuilder()
 				
-				.expireAfterAccess( CACHE_TIMEOUT, TimeUnit.SECONDS )
+				.expireAfterAccess( CACHE_TIMEOUT, TimeUnit.HOURS )
 			    .maximumSize( CACHE_MAX_SIZE )
 			    .build(
 			    		new CacheLoader<LocalCacheKey, LocalCacheValue>() {

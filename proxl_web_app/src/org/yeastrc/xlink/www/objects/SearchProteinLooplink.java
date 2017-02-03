@@ -47,7 +47,7 @@ public class SearchProteinLooplink implements IProteinLooplink {
 			
 			return -1;
 		}
-		return search.getId();
+		return search.getSearchId();
 	}
 	
 	

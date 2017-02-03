@@ -15,6 +15,7 @@ import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.ScanRetentionTimeDTO;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.RetentionTimesFromScanTblSearcher;
 import org.yeastrc.xlink.www.web_utils.RetentionTimeScalingAndRounding;
 
@@ -52,7 +53,7 @@ public class CreateScanRetentionTimeQCPlotData {
 
 	/**
 	 * @param scansForSelectedLinkTypes
-	 * @param searchId
+	 * @param projectSearchId
 	 * @param scanFileId
 	 * @param annotationTypeId
 	 * @param psmScoreCutoff
@@ -63,7 +64,7 @@ public class CreateScanRetentionTimeQCPlotData {
 	public ScanRetentionTimeJSONRoot create( 
 			
 			List<String> scansForSelectedLinkTypes,	
-			int searchId, 
+			int projectSearchId, 
 			int scanFileId, 
 			int annotationTypeId,
 			double psmScoreCutoff, 
@@ -74,10 +75,20 @@ public class CreateScanRetentionTimeQCPlotData {
 		if ( ! scansForSelectedLinkTypes.isEmpty() ) {
 
 			//  Process retention times for psms that meet criteria
+
+			Integer searchId =
+					MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
+			
+			if ( searchId == null ) {
+				String msg = ": No searchId found for projectSearchId: " + projectSearchId;
+				log.warn( msg );
+			    throw new ProxlWebappDataException( msg );
+			}
 			
 			List<Integer> searchIds = new ArrayList<>( 1 );
-			
+
 			searchIds.add( searchId );
+			
 			
 			Map<Integer, Map<Integer, AnnotationTypeDTO>> annotationTypeDataMappedOnSearchIdAnnTypeId =
 					GetAnnotationTypeData.getInstance().getAll_Psm_Filterable_ForSearchIds( searchIds );

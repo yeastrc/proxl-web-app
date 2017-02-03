@@ -88,7 +88,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 	 */
 	public UnlinkedDimerPeptideProteinMappingResult getSearchProteinUnlinkedAndDimerWrapperLists( SearchDTO search, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
 	
-		int searchId = search.getId();
+		int searchId = search.getSearchId();
 		
 		String[] linkTypesDimer = { PeptideViewLinkTypesConstants.UNLINKED_PSM }; // Get Unlinked and Dimer records
 

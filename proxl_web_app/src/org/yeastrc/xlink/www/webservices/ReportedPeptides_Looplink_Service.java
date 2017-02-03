@@ -1,4 +1,5 @@
 package org.yeastrc.xlink.www.webservices;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,11 +21,13 @@ import org.yeastrc.xlink.www.objects.GetLooplinkReportedPeptidesServiceResult;
 import org.yeastrc.xlink.www.objects.SearchPeptideLooplink;
 import org.yeastrc.xlink.www.objects.SearchPeptideLooplinkAnnDataWrapper;
 import org.yeastrc.xlink.www.objects.SearchPeptideLooplinkWebserviceResult;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchPeptideLooplink_LinkedPosition_Searcher;
 import org.yeastrc.xlink.www.annotation_display.AnnTypeIdDisplayJSON_PerSearch;
 import org.yeastrc.xlink.www.annotation_display.DeserializeAnnTypeIdDisplayJSON_PerSearch;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
+import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
@@ -60,7 +63,7 @@ public class ReportedPeptides_Looplink_Service {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getLooplinkReportedPeptides") 
 	public GetLooplinkReportedPeptidesServiceResult getLooplinkReportedPeptides( 
-			@QueryParam( "search_id" ) Integer searchId,
+			@QueryParam( "search_id" ) Integer projectSearchId,
 			@QueryParam( "psmPeptideCutoffsForSearchId" ) String psmPeptideCutoffsForSearchId_JSONString,
 			@QueryParam( "peptideAnnTypeDisplayPerSearch" ) String annTypeIdDisplayJSON_PerSearch_JSONString,
 			@QueryParam( "protein_id" ) Integer proteinId,
@@ -68,7 +71,7 @@ public class ReportedPeptides_Looplink_Service {
 			@QueryParam( "protein_position_2" ) Integer proteinPosition2,
 			@Context HttpServletRequest request )
 	throws WebApplicationException {
-		if ( searchId == null ) {
+		if ( projectSearchId == null ) {
 			String msg = "Provided search_id is null or search_id is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
@@ -117,21 +120,13 @@ public class ReportedPeptides_Looplink_Service {
 		try {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
-//			if ( searchIds.isEmpty() ) {
-//				
-//				throw new WebApplicationException(
-//						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-//						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
-//						.build()
-//						);
-//			}
 			//   Get the project id for this search
-			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
-			searchIdsCollection.add( searchId );
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
+			projectSearchIdsCollection.add( projectSearchId );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsCollection );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search id: " + searchId;
+				String msg = "No project ids for search id: " + projectSearchId;
 				log.error( msg );
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
@@ -173,6 +168,22 @@ public class ReportedPeptides_Looplink_Service {
 			
 			////////   Auth complete
 			//////////////////////////////////////////
+
+			SearchDTO searchDTO = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
+			
+			if ( searchDTO == null ) {
+				String msg = ": No search found for projectSearchId: " + projectSearchId;
+				log.warn( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+			    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+			    	        .build()
+			    	        );
+			}
+		
+			Integer searchId = searchDTO.getSearchId();
+			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
+			searchIdsCollection.add( searchId );
 			
 			//   Get PSM and Peptide Cutoff data from JSON
 			CutoffValuesSearchLevel cutoffValuesSearchLevel = 
@@ -196,8 +207,11 @@ public class ReportedPeptides_Looplink_Service {
 			List<SearchPeptideLooplinkAnnDataWrapper> searchPeptideLooplinkList = 
 					SearchPeptideLooplink_LinkedPosition_Searcher.getInstance()
 					.searchOnSearchProteinLooplink( 
-							searchId, searcherCutoffValuesSearchLevel, 
-							proteinId, proteinPosition1, proteinPosition2 );
+							searchDTO, 
+							searcherCutoffValuesSearchLevel, 
+							proteinId, 
+							proteinPosition1, 
+							proteinPosition2 );
 			
 			GetLooplinkReportedPeptidesServiceResult getLooplinkReportedPeptidesServiceResult =
 					getAnnotationDataAndSort(

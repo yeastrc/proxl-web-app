@@ -55,7 +55,7 @@ public class SearchProteinSearcher {
 			int counter = 0;
 
 			counter++;
-			pstmt.setInt( counter, search.getId() );
+			pstmt.setInt( counter, search.getSearchId() );
 			counter++;
 			pstmt.setInt( counter, reportedPeptideId );
 			counter++;
@@ -139,7 +139,7 @@ public class SearchProteinSearcher {
 			int counter = 0;
 			
 			counter++;
-			pstmt.setInt( counter, search.getId() );
+			pstmt.setInt( counter, search.getSearchId() );
 			counter++;
 			pstmt.setInt( counter, reportedPeptideId );
 			counter++;
@@ -220,7 +220,7 @@ public class SearchProteinSearcher {
 			int counter = 0;
 			
 			counter++;
-			pstmt.setInt( counter, search.getId() );
+			pstmt.setInt( counter, search.getSearchId() );
 			counter++;
 			pstmt.setInt( counter, reportedPeptideId );
 			counter++;
@@ -324,7 +324,7 @@ public class SearchProteinSearcher {
 			int counter = 0;
 			
 			counter++;
-			pstmt.setInt( counter, search.getId() );
+			pstmt.setInt( counter, search.getSearchId() );
 			counter++;
 			pstmt.setInt( counter, reportedPeptideId );
 			counter++;

@@ -14,7 +14,10 @@ import java.util.Map;
  */
 public class SearcherCutoffValuesSearchLevel {
 
-	private int searchId;
+	/**
+	 * 
+	 */
+	private int projectSearchId;
 
 	/**
 	 * Key is annotation id
@@ -30,11 +33,19 @@ public class SearcherCutoffValuesSearchLevel {
 	private List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesPerAnnotationIdList;
 	
 	
-	public int getSearchId() {
-		return searchId;
+	/**
+	 * 
+	 * @return
+	 */
+	public int getProjectSearchId() {
+		return projectSearchId;
 	}
-	public void setSearchId(int searchId) {
-		this.searchId = searchId;
+	/**
+	 * 
+	 * @param projectSearchId
+	 */
+	public void setProjectSearchId(int projectSearchId) {
+		this.projectSearchId = projectSearchId;
 	}
 
 	///////////////////////

@@ -289,8 +289,8 @@ var CutoffProcessingCommonCode = function() {
 		var $search_details_block_filter_direction_above_value = $("#search_details_block_filter_direction_above_value");
 //		var $search_details_block_filter_direction_below_value = $("#search_details_block_filter_direction_below_value");
 		
-		var filter_direction_above_value = $search_details_block_filter_direction_above_value.val();
-//		var filter_direction_below_value = $search_details_block_filter_direction_below_value.val();
+		var filter_direction_above_value = $search_details_block_filter_direction_above_value.text();
+//		var filter_direction_below_value = $search_details_block_filter_direction_below_value.text();
 		
 		// Compare current value to cutoff on import and set to cutoff on import if required.
 		

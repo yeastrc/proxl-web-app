@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -143,7 +142,7 @@ public class SearchPeptideCrosslink_LinkedPosition_Searcher {
 	 * @throws Exception
 	 */
 	public List<SearchPeptideCrosslinkAnnDataWrapper> searchOnSearchProteinCrosslink( 
-			int searchId,
+			SearchDTO searchDTO,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
 			int protein1Id,
 			int protein2Id,
@@ -154,6 +153,9 @@ public class SearchPeptideCrosslink_LinkedPosition_Searcher {
 	
 		
 		List<SearchPeptideCrosslinkAnnDataWrapper> wrappedLinks = new ArrayList<>();
+
+		int searchId = searchDTO.getSearchId();
+		
 
 
 		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
@@ -637,11 +639,6 @@ public class SearchPeptideCrosslink_LinkedPosition_Searcher {
 			
 			rs = pstmt.executeQuery();
 			
-			SearchDTO searchDTO = null;
-			
-			searchDTO = SearchDAO.getInstance().getSearch( searchId );
-			
-
 			Set<Integer> retrieved_reported_peptide_id_values_Set = new HashSet<>();
 			
 

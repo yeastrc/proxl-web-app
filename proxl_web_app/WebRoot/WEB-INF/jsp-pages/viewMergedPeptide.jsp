@@ -203,7 +203,7 @@
 			
 			
 				<logic:iterate name="searches" id="search">
-					<input type="hidden" name="searchIds" value="<bean:write name="search" property="id" />">
+					<input type="hidden" name="searchIds" value="<bean:write name="search" property="projectSearchId" />">
 				</logic:iterate>
 				
 				
@@ -378,13 +378,13 @@
 
 						<c:forEach items="${ searches }" var="search"  varStatus="searchVarStatus">
 		
-							<th id="search_header_<bean:write name="search" property="id" />" style="text-align:left;font-weight:bold;width:25px;"
-								><bean:write name="search" property="id" /></th>
+							<th id="search_header_<bean:write name="search" property="searchId" />" style="text-align:left;font-weight:bold;width:25px;"
+								><bean:write name="search" property="searchId" /></th>
 								
 							<script >
-								$("#search_header_<bean:write name="search" property="id" />").qtip( {
+								$("#search_header_<bean:write name="search" property="searchId" />").qtip( {
 							        content: {
-							            text: '<bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="id" />)'
+							            text: '<bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="searchId" />)'
 							        },
 							        position: {
 							            my: 'bottom left',

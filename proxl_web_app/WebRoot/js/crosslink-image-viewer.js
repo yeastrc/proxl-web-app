@@ -384,6 +384,8 @@ var _linkPSMCounts = { };
 
 var _searches;
 
+var _projectSearchIdToSearchIdMapping;
+
 var _taxonomies;
 var _linkablePositions;
 var _coverages;
@@ -438,6 +440,31 @@ var _proteinBarToolTip_template_HandlebarsTemplate = null;  ///  Compiled Handle
 
 //////////////   MAIN CODE
 
+function populateProjectSearchIdToSearchIdMapping() {
+	_projectSearchIdToSearchIdMapping = {};
+	for ( var index = 0; index < _searches.length; index++ ) {
+		var search = _searches[ index ];
+		_projectSearchIdToSearchIdMapping[ search.id ] = search.searchId;
+	}
+}
+
+function convertProjectSearchIdArrayToSearchIdArray( projectSearchIdArray ) {
+	if ( ! Array.isArray( projectSearchIdArray ) ) {
+		throw Error( "projectSearchIdArray is not an array" );
+	}
+	var searchIdArray = [];
+	for ( var index = 0; index < projectSearchIdArray.length; index++ ) {
+		var projectSearchId = projectSearchIdArray[ index ];
+		var searchId = _projectSearchIdToSearchIdMapping[ projectSearchId ];
+		if ( searchId === undefined ) {
+			throw Error( "Failed to find searchId mapping for projectSearchId: " + projectSearchId );
+		}
+		searchIdArray.push( searchId );
+	}
+	return searchIdArray;
+}
+
+////////////////
 
 function get_MAX_WIDTH() {
 	
@@ -1991,6 +2018,8 @@ function loadDataFromService() {
 
 	        		// handle searches
 	        		_searches = data.searches;
+	        		
+	        		populateProjectSearchIdToSearchIdMapping();
 
 	        		// handle proteins
 	        		_proteins = data.proteins;
@@ -5961,6 +5990,9 @@ function drawInterProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject 
 					var toPp = toProteinPositionInt;
 					var lsearches = _proteinLinkPositions[ fromProteinId ][ toProteinId ][ fromProteinPosition ][ toProteinPosition ];
 
+					// for display to user
+					var searchIdArray = convertProjectSearchIdArrayToSearchIdArray( lsearches );
+					
 					var getCrosslinkLineColorParams = { 
 							fromProteinIndex : fromSelectedProteinsIndex,
 							fromProteinPosition : fromPp, 
@@ -6049,7 +6081,7 @@ function drawInterProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject 
 
 						$lineSVGNativeObject.qtip({
 							content: {
-								text: 'Crosslink: ' + fromP + "(" + fromPp + ") - " + toP + "(" + toPp + ")<br>Searches: " + lsearches
+								text: 'Crosslink: ' + fromP + "(" + fromPp + ") - " + toP + "(" + toPp + ")<br>Searches: " + searchIdArray
 							},
 							position: {
 								target: 'mouse'
@@ -6173,6 +6205,8 @@ function drawSelfProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject )
 				var toPp = toProteinPositionInt;
 				var lsearches = _proteinLinkPositions[ proteinBarProteinId ][ proteinBarProteinId ][ fromProteinPosition ][ toProteinPosition ];
 
+				// for display to user
+				var searchIdArray = convertProjectSearchIdArrayToSearchIdArray( lsearches );
 
 				var link = { 
 						type : 'crosslink',
@@ -6245,7 +6279,7 @@ function drawSelfProteinCrosslinkLines( selectedProteins, svgRootSnapSVGObject )
 
 					$arcSVGNativeObject.qtip({
 						content: {
-							text: 'Crosslink: ' + fromP + "(" + fromPp + ") - " + toP + "(" + toPp + ")<br>Searches: " + lsearches
+							text: 'Crosslink: ' + fromP + "(" + fromPp + ") - " + toP + "(" + toPp + ")<br>Searches: " + searchIdArray
 						},
 						position: {
 							target: 'mouse'
@@ -6331,6 +6365,8 @@ function drawProteinLooplinkLines( selectedProteins, svgRootSnapSVGObject ) {
 				var toPp = toProteinPositionInt;
 				var lsearches = _proteinLooplinkPositions[ proteinBarProteinId ][ proteinBarProteinId ][ fromProteinPosition ][ toProteinPosition ];
 
+				// for display to user
+				var searchIdArray = convertProjectSearchIdArrayToSearchIdArray( lsearches );
 
 				var link = {
 						type : 'looplink',
@@ -6403,7 +6439,7 @@ function drawProteinLooplinkLines( selectedProteins, svgRootSnapSVGObject ) {
 //						tip: false // suppress arrow from tool tip, corner of tool tip box then at mouse position
 //						},
 						content: {
-							text: 'Looplink: ' + fromP + "(" + fromPp + "," + toPp + ")<br>Searches: " + lsearches
+							text: 'Looplink: ' + fromP + "(" + fromPp + "," + toPp + ")<br>Searches: " + searchIdArray
 						}
 					,
 					position: {
@@ -6481,7 +6517,8 @@ function drawProteinMonolinkLines( selectedProteins, svgRootSnapSVGObject ) {
 			var fromPp = proteinPositionInt;
 			var lsearches = _proteinMonolinkPositions[ proteinBarProteinId ][ proteinPosition ];
 
-			
+			var searchIdArray = convertProjectSearchIdArrayToSearchIdArray( lsearches );
+
 			var link = {
 					type : 'monolink',
 					protein1 : proteinBarProteinId,
@@ -6555,7 +6592,7 @@ function drawProteinMonolinkLines( selectedProteins, svgRootSnapSVGObject ) {
 				
 //				add tooltips to mono links
 				
-				var toolTipText = 'Monolink: ' + fromP + "(" + fromPp + ")<br>Searches: " + lsearches;
+				var toolTipText = 'Monolink: ' + fromP + "(" + fromPp + ")<br>Searches: " + searchIdArray;
 
 				var toolTipParams = {
 						content: {
@@ -6715,7 +6752,9 @@ function drawColorBySearchLegend(  selectedProteins, bottomOfLowestItemDrawn, sv
 			searchLabel = "Searches";
 		}
 		
-		var searchIdsAsCommaDelimText = searchesArray.join();
+		var searchIdArray = convertProjectSearchIdArrayToSearchIdArray( searchesArray );
+
+		var searchIdsAsCommaDelimText = searchIdArray.join();
 			
 
 		var groupSnapSVGForSearchLegendGroup = svgRootSnapSVGObject.g();

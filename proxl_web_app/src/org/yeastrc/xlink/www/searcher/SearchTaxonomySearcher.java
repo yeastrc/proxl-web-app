@@ -111,16 +111,16 @@ public class SearchTaxonomySearcher {
 			int paramCounter = 0;
 			
 			paramCounter++;
-			pstmt.setInt( paramCounter, search.getId() );
+			pstmt.setInt( paramCounter, search.getSearchId() );
 
 			paramCounter++;
-			pstmt.setInt( paramCounter, search.getId() );
+			pstmt.setInt( paramCounter, search.getSearchId() );
 			
 			paramCounter++;
-			pstmt.setInt( paramCounter, search.getId() );
+			pstmt.setInt( paramCounter, search.getSearchId() );
 			
 			paramCounter++;
-			pstmt.setInt( paramCounter, search.getId() );
+			pstmt.setInt( paramCounter, search.getSearchId() );
 			
 			
 			rs = pstmt.executeQuery();
@@ -216,7 +216,7 @@ public class SearchTaxonomySearcher {
 
 		Collection<Integer> searchIds = new HashSet<Integer>();
 		for( SearchDTO search : searches ) {
-			searchIds.add( search.getId() );
+			searchIds.add( search.getSearchId() );
 		}
 		String sql = MULTIPLE_SEARCHES_SQL.replaceAll( "#SEARCHES#", StringUtils.join( searchIds, "," ) );
 

@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_plots.scan_retention_time.CreateScanRetentionTimeQCPlotData;
 import org.yeastrc.xlink.www.qc_plots.scan_retention_time.ScanRetentionTimeJSONRoot;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -41,7 +41,7 @@ public class QCPlotScanRetentionTimeService {
 	@Path("/getScanRetentionTime") 
 	public ScanRetentionTimeJSONRoot getScanRetentionTime( 
 			@QueryParam( "scansForSelectedLinkTypes" ) List<String> scansForSelectedLinkTypes,			
-			@QueryParam( "searchId" ) int searchId,
+			@QueryParam( "searchId" ) int projectSearchId,
 			@QueryParam( "scanFileId" ) int scanFileId,
 			@QueryParam( "annotationTypeId" ) int annotationTypeId,
 			@QueryParam( "psmScoreCutoff" ) Double psmScoreCutoff,
@@ -50,7 +50,7 @@ public class QCPlotScanRetentionTimeService {
 	throws Exception {
 		
 
-		if ( searchId == 0 ) {
+		if ( projectSearchId == 0 ) {
 
 			String msg = ": Provided searchId is zero";
 
@@ -113,19 +113,19 @@ public class QCPlotScanRetentionTimeService {
 
 
 			//   Get the project id for this search
-			
-			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
 
-			searchIdsCollection.add( searchId );
+			Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
+
+			projectSearchIdsCollection.add( projectSearchId );
 			
 			
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsCollection );
 			
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				
 				// should never happen
 				
-				String msg = "No project ids for search id: " + searchId;
+				String msg = "No project ids for search id: " + projectSearchId;
 				
 				log.error( msg );
 
@@ -194,7 +194,7 @@ public class QCPlotScanRetentionTimeService {
 			
 			ScanRetentionTimeJSONRoot scanRetentionTimeJSONRoot = 
 					CreateScanRetentionTimeQCPlotData.getInstance()
-					.create( scansForSelectedLinkTypes, searchId, scanFileId, annotationTypeId, psmScoreCutoff, retentionTimeInSecondsCutoff );
+					.create( scansForSelectedLinkTypes, projectSearchId, scanFileId, annotationTypeId, psmScoreCutoff, retentionTimeInSecondsCutoff );
 			
 			return scanRetentionTimeJSONRoot;
 			

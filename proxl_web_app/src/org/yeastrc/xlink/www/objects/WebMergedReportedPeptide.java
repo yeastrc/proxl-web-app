@@ -2,12 +2,15 @@ package org.yeastrc.xlink.www.objects;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dto.PeptideDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
@@ -77,30 +80,30 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 
 			int totalNumPsms = 0;
 
-			List<ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult>  reppeptideIdSearchIdList = 
-					ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher.getInstance()
-					.getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( searchIds, unifiedReportedPeptideId );
-			
-			for ( ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult item : reppeptideIdSearchIdList ) {
-				
-				int searchId = item.getSearchId();
+			for ( SearchDTO searchDTO : searches ) {
+				int projectSearchId = searchDTO.getProjectSearchId();
+				int searchId = searchDTO.getSearchId();
 
 				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = 
-						searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
-				
+						searcherCutoffValuesRootLevel.getPerSearchCutoffs( projectSearchId );
 				if ( searcherCutoffValuesSearchLevel == null ) {
-					
-					searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
-					
-//					String msg = "Unable to get cutoffs for search id: " + searchId;
-//					log.error( msg );
-//					throw new Exception(msg);
+					String msg = "searcherCutoffValuesRootLevel.getPerSearchCutoffs(projectSearchId) returned null for:  " + projectSearchId;
+					log.error( msg );
+					throw new ProxlWebappDataException( msg );
 				}
 
-				int numPsms = PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
-						.getPsmCountForSearchIdReportedPeptideId( item.getReportedPeptideId(), item.getSearchId(), searcherCutoffValuesSearchLevel );
+				Collection<Integer>  reportedPeptideIdCollection = 
+						ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher.getInstance()
+						.getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( searchId, unifiedReportedPeptideId );
+				
+				Set<Integer> reportedPeptideIdSet = new HashSet<>( reportedPeptideIdCollection ); // remove any dups
+			
+				for ( Integer reportedPeptideId : reportedPeptideIdSet ) {
+					int numPsms = PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
+							.getPsmCountForSearchIdReportedPeptideId( reportedPeptideId, searchId, searcherCutoffValuesSearchLevel );
 
-				totalNumPsms += numPsms;
+					totalNumPsms += numPsms;
+				}
 			}
 
 
@@ -265,33 +268,6 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 		return "";	
 	}
 
-
-	
-	
-	public Collection<SearchDTO> getSearches() {
-		if ( mergedSearchPeptideCrosslink != null ) {
-			
-			return mergedSearchPeptideCrosslink.getSearches();
-		}
-		
-		if ( mergedSearchPeptideLooplink != null ) {
-			
-			return mergedSearchPeptideLooplink.getSearches();
-		}
-		
-		
-		if ( mergedSearchPeptideUnlinked != null ) {
-			
-			return mergedSearchPeptideUnlinked.getSearches();
-		}
-		
-		if ( mergedSearchPeptideDimer != null ) {
-			
-			return mergedSearchPeptideDimer.getSearches();
-		}
-
-		return null;	
-	}
 
 	
 
@@ -512,6 +488,15 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 
 
 
+	public Collection<SearchDTO> getSearches() {
+		return searches;
+	}
+	public void setSearches(Collection<SearchDTO> searches) {
+		this.searches = searches;
+	}
+
+
+
 
 	private MergedSearchPeptideCrosslink mergedSearchPeptideCrosslink;
 	private MergedSearchPeptideLooplink mergedSearchPeptideLooplink;
@@ -526,8 +511,7 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 
 	private int unifiedReportedPeptideId;
 	private Collection<Integer> searchIds;
-
-
+	private Collection<SearchDTO> searches;
 
 	private int numSearches;
 
@@ -545,21 +529,10 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 	private SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel;
 
 
-
-
-
-
 	/**
 	 * Used for display on web page
 	 */
 	private List<AnnValuePeptPsmListsPair> peptidePsmAnnotationValueListsForEachSearch;
-
-
-
-
-
-
-
 
 
 

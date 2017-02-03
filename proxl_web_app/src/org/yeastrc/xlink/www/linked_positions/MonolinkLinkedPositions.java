@@ -62,7 +62,7 @@ public class MonolinkLinkedPositions {
 	 */
 	public List<SearchProteinMonolinkWrapper> getSearchProteinMonolinkWrapperList( SearchDTO search, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
 	
-		int searchId = search.getId();
+		int searchId = search.getSearchId();
 		
 		String[] linkTypesAll = null; //  Get All Link Types
 
@@ -223,7 +223,7 @@ public class MonolinkLinkedPositions {
 		List<SearchPeptideMonolinkAnnDataWrapper> searchPeptideMonolinkAnnDataWrapper_List = 
 				SearchPeptideMonolink_LinkedPosition_Searcher.getInstance()
 				.searchOnSearchProteinMonolink( 
-						search.getId(), 
+						search, 
 						searcherCutoffValuesSearchLevel, 
 						protein.getProteinSequenceId(), 
 						position );
@@ -235,7 +235,7 @@ public class MonolinkLinkedPositions {
 			WebReportedPeptide webReportedPeptide = new WebReportedPeptide();
 			
 			webReportedPeptide.setSearch( search );
-			webReportedPeptide.setSearchId( search.getId() );
+			webReportedPeptide.setSearchId( search.getSearchId() );
 			webReportedPeptide.setReportedPeptideId( searchPeptideMonolink.getReportedPeptideId() );
 			
 			webReportedPeptide.setNumPsms( searchPeptideMonolink.getNumPsms() );
@@ -311,7 +311,7 @@ public class MonolinkLinkedPositions {
 			
 			boolean areRelatedPeptidesUnique =
 					Get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Searcher.getInstance()
-					.get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId( search.getId(), reportedPeptideId );
+					.get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId( search.getSearchId(), reportedPeptideId );
 			
 			if ( areRelatedPeptidesUnique ) {
 

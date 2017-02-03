@@ -683,16 +683,16 @@ body.project-page .no-searches-in-project-text { margin-left: 20px; }
 
 	/* move searches modal dialog */
 
-body.project-page .move-searches-overlay-containing-full-width-div { width: 100%; height: 0px; text-align: center; }
-body.project-page .move-searches-overlay-containing-relative-div { position: relative; display: inline-block; }
+body.project-page .copy-searches-overlay-containing-full-width-div { width: 100%; height: 0px; text-align: center; }
+body.project-page .copy-searches-overlay-containing-relative-div { position: relative; display: inline-block; }
 
 /* These 2 divs MUST have the same width so set width for both together */
-body.project-page .move-searches-overlay-containing-relative-div, body.project-page .move-searches-overlay-container { width: 600px;  }
+body.project-page .copy-searches-overlay-containing-relative-div, body.project-page .copy-searches-overlay-container { width: 600px;  }
 
 /* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
-body.project-page .move-searches-overlay-container {   }
+body.project-page .copy-searches-overlay-container {   }
 
-body.project-page .move-searches-overlay-project-list-block { margin-left: 20px;  }
+body.project-page .copy-searches-overlay-project-list-block { margin-left: 20px;  }
 
 
 

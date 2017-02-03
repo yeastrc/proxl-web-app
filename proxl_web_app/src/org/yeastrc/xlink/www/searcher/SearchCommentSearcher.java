@@ -29,7 +29,7 @@ public class SearchCommentSearcher {
 			String sql = "SELECT id FROM search_comment WHERE search_id = ? ORDER BY commentTimestamp";
 			
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, search.getId() );
+			pstmt.setInt( 1, search.getProjectSearchId() );
 			
 			rs = pstmt.executeQuery();
 			while( rs.next() ) {

@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.objects;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -39,12 +40,12 @@ public class SearchPeptideLooplink {
 		try {
 			List<SrchRepPeptPeptideDTO> results = 
 					SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
-					.getForSearchIdReportedPeptideId( this.getSearch().getId(), this.getReportedPeptideId() );
+					.getForSearchIdReportedPeptideId( this.getSearch().getSearchId(), this.getReportedPeptideId() );
 
 			if ( results.size() != 1 ) {
 
 
-				String msg = "List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " +this.getSearch().getId()
+				String msg = "List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " +this.getSearch().getSearchId()
 						+ ", ReportedPeptideId: " + this.getReportedPeptideId() ;
 
 				log.error( msg );
@@ -85,6 +86,9 @@ public class SearchPeptideLooplink {
 		return search;
 	}
 	public void setSearch(SearchDTO search) {
+		if ( search == null ) {
+			throw new InvalidParameterException( "search cannot be assigned to null");
+		}
 		this.search = search;
 	}
 	
@@ -239,7 +243,7 @@ public class SearchPeptideLooplink {
 
 			numUniquePsms = 
 					PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher.getInstance()
-					.getPsmCountForUniquePSM_SearchIdReportedPeptideId( this.getReportedPeptideId(), this.search.getId(), searcherCutoffValuesSearchLevel );
+					.getPsmCountForUniquePSM_SearchIdReportedPeptideId( this.getReportedPeptideId(), this.search.getSearchId(), searcherCutoffValuesSearchLevel );
 
 			numUniquePsmsSet = true;
 
@@ -265,7 +269,7 @@ public class SearchPeptideLooplink {
 
 		numPsms = 
 				PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
-				.getPsmCountForSearchIdReportedPeptideId( reportedPeptideId, search.getId(), searcherCutoffValuesSearchLevel );
+				.getPsmCountForSearchIdReportedPeptideId( reportedPeptideId, search.getSearchId(), searcherCutoffValuesSearchLevel );
 
 		numPsmsSet = true;
 
@@ -288,7 +292,7 @@ public class SearchPeptideLooplink {
 
 		try {
 			
-			Integer psmId = SearchPsmSearcher.getInstance().getSinglePsmId( this.getSearch().getId(), this.getReportedPeptideId() );
+			Integer psmId = SearchPsmSearcher.getInstance().getSinglePsmId( this.getSearch().getSearchId(), this.getReportedPeptideId() );
 
 			return psmId;
 

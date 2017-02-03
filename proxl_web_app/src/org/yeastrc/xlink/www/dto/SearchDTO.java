@@ -1,45 +1,23 @@
 package org.yeastrc.xlink.www.dto;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
-import org.yeastrc.xlink.dao.SearchFileDAO;
+import org.yeastrc.xlink.dao.SearchFileProjectSearchDAO;
 import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.SearchCommentDTO;
-import org.yeastrc.xlink.dto.SearchFileDTO;
+import org.yeastrc.xlink.dto.SearchFileProjectSearchDTO;
 import org.yeastrc.xlink.www.searcher.SearchCommentSearcher;
 import org.yeastrc.xlink.www.searcher.SearchLinkerSearcher;
 import org.yeastrc.xlink.www.searcher.SearchWebLinksSearcher;
-
-
 /**
  * Table search
  *
  */
 public class SearchDTO implements Comparable<SearchDTO> {
-	
 	private static final Logger log = Logger.getLogger(SearchDTO.class);
-
-	
 	/* 
 	 * Default order by Search Id field
 	 * (non-Javadoc)
@@ -47,131 +25,95 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	 */
 	@Override
 	public int compareTo(SearchDTO o) {
-		
-		return this.getId() - o.getId();
+		return this.getSearchId() - o.getSearchId();
 	}
-
 	
 	/**
 	 * @return
 	 * @throws Exception
 	 */
-	public List<SearchFileDTO> getFiles() throws Exception {
-
-		List<SearchFileDTO>  fileList = 
-				SearchFileDAO.getInstance().getSearchFileDTOForSearchId( id );
-
+	public List<SearchFileProjectSearchDTO> getFiles() throws Exception {
+		List<SearchFileProjectSearchDTO> fileList =
+				SearchFileProjectSearchDAO.getInstance().getSearchFileProjectSearchDTOForProjectSearchId( projectSearchId );
 		return fileList;
 	}
 	
-	
 	public String getFormattedLoadTime() {
-
 		try {
 			return this.load_time.toString( DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss") );
-			
 		} catch ( RuntimeException e ) {
-			
 			String msg = "Exception caught in getFormattedLoadTime(): " + e.toString();
-			
 			log.error( msg, e );
-			
 			throw e;
 		}
 	}
 	
 	public List<SearchCommentDTO> getComments() throws Exception {
-		
 		try {
 			return SearchCommentSearcher.getInstance().getCommentsForSearch( this );
-			
 		} catch ( Exception e ) {
-			
 			String msg = "Exception caught in getComments(): " + e.toString();
-			
 			log.error( msg, e );
-			
 			throw e;
 		}
 	}
-
 	
 	public List<SearchWebLinksDTO> getWebLinks() throws Exception {
-
 		try {
 			return SearchWebLinksSearcher.getInstance().getWebLinksForSearch(this);
-
 		} catch ( Exception e ) {
-
 			String msg = "Exception caught in getWebLinks(): " + e.toString();
-
 			log.error( msg, e );
-
 			throw e;
 		}
 	}
 	
-	
 	public List<LinkerDTO> getLinkersSorted() throws Exception {
-
 		List<LinkerDTO> linkers = getLinkers();
-		
 		//  sort on the names
-		
 		Collections.sort( linkers, new Comparator<LinkerDTO>() { 
-
 			@Override
 			public int compare(LinkerDTO o1, LinkerDTO o2) {
-
 				return o1.getName().compareTo( o2.getName() );
-		
 			}
 		} );
-		
 		return linkers;
 	}
 	
 	public List<LinkerDTO> getLinkers() throws Exception {
-
 		try {
 			return SearchLinkerSearcher.getInstance().getLinkersForSearch(this);
-
 		} catch ( Exception e ) {
-
 			String msg = "Exception caught in getLinkers(): " + e.toString();
-
 			log.error( msg, e );
-
 			throw e;
 		}
 	}	
-
 	
 //	public String getName() {
 //		return name;
 //	}
-	
 	public String getName() {
 		if( this.name != null )
 			return name;
 		else
-			return "Search: " + this.id;
+			return "Search: " + this.searchId;
 	}
-
-	
 	public String getName_AsActuallyInObject() {
 		return name;
 	}
-
-	
-	
 	//  Setters and Getters
-	
-	public int getId() {
-		return id;
+	public int getProjectSearchId() {
+		return projectSearchId;
 	}
-	public void setId(int id) {
-		this.id = id;
+	public void setProjectSearchId(int projectSearchId) {
+		this.projectSearchId = projectSearchId;
+	}
+	public int getSearchId() {
+		return searchId;
+	}
+	public void setSearchId(int id) {
+		this.searchId = id;
 	}
 	public DateTime getLoad_time() {
 		return load_time;
@@ -218,11 +160,9 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	public void setHasScanData(boolean hasScanData) {
 		this.hasScanData = hasScanData;
 	}
-
-
-
-
-	private int id;
+	
+	private int projectSearchId;
+	private int searchId;
 	private String path;
 	private DateTime load_time;
 	private String fastaFilename;
@@ -231,10 +171,4 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	private String directoryName;
 	private int displayOrder;
 	private boolean hasScanData;
-
-
-
-
-
-	
 }

@@ -88,7 +88,7 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 		List<PeptideProteinPositionsForCutoffsAndProtSeqIdsResultItem> resultList = new ArrayList<>();
 		
 
-		int searchId = search.getId();
+		int searchId = search.getSearchId();
 
 		
 

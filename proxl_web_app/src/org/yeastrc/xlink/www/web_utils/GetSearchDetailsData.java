@@ -57,12 +57,13 @@ public class GetSearchDetailsData {
 		
 		for ( SearchDTO search : searches ) {
 		
-			Integer searchId = search.getId();
+			int projectSearchId = search.getProjectSearchId();
+			Integer searchId = search.getSearchId();
 			
 			if ( searchIdListCommaDelimSB.length() != 0 ) {
 				searchIdListCommaDelimSB.append(",");
 			}
-			searchIdListCommaDelimSB.append( searchId.toString() );
+			searchIdListCommaDelimSB.append( Integer.toString( projectSearchId ) );
 			
 			SearchDTODetailsDisplayWrapper searchDTODetailsDisplayWrapper = new SearchDTODetailsDisplayWrapper();
 			
@@ -72,7 +73,7 @@ public class GetSearchDetailsData {
 			CutoffPageDisplaySearchLevel cutoffPageDisplaySearchLevel = null;
 			
 			CutoffPageDisplayRoot cutoffPageDisplayRoot =
-					getCutoffPageDisplayRoot.getCutoffPageDisplayRootSingleSearchId( searchId, request );
+					getCutoffPageDisplayRoot.getCutoffPageDisplayRootSingleSearchId( projectSearchId, searchId, request );
 			
 			List<CutoffPageDisplaySearchLevel> cutoffsPerSearchDataList = cutoffPageDisplayRoot.getPerSearchDataList();
 			

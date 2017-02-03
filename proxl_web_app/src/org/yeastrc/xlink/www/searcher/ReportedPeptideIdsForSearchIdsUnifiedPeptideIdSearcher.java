@@ -4,12 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.www.objects.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult;
 
 public class ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher {
 	
@@ -18,41 +16,27 @@ public class ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher {
 	private ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher() { }
 	public static ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher getInstance() { return new ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher(); }
 
+
+	private static final String getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideIdSQL = 
+			" SELECT reported_peptide_id FROM unified_rp__search__rep_pept__generic_lookup "
+			 + " WHERE unified_reported_peptide_id = ? AND search_id = ?";
+	
 	/**
-	 * Get a list of reported peptide id, search id pairs for the collection of search ids and unified reported peptide id
-	 * @param searchIds
+	 * Get a list of reported peptide id for the search id and unified reported peptide id
+	 * @param searchId
 	 * @param unifiedReportedPeptideId
-	 * @return
+	 * @return - list of reported peptide id
 	 * @throws Exception
 	 */
-	public List<ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult> getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( Collection<Integer> searchIds, int unifiedReportedPeptideId ) throws Exception {
+	public List<Integer> getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( int searchId, int unifiedReportedPeptideId ) throws Exception {
 
-		List<ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult>  resultList = new ArrayList<>();
+		List<Integer>  resultList = new ArrayList<>();
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		
-		final String sqlMain = " SELECT reported_peptide_id, search_id FROM unified_rp__search__rep_pept__generic_lookup "
-				 + " WHERE unified_reported_peptide_id = ? AND search_id IN (";
-		
-		final String sqlEnd = ")  ";
-		
-		String sqlSearchIdsString = null;
-		
-		for ( Integer searchId : searchIds ) {
-			
-			if ( sqlSearchIdsString == null ) {
-				
-				sqlSearchIdsString = searchId.toString();
-			} else {
-				
-				sqlSearchIdsString += "," + searchId.toString();
-			}
-		}
-		
-		final String sql = sqlMain + sqlSearchIdsString + sqlEnd;
+		final String sql = getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideIdSQL;
 		
 		try {
 						
@@ -61,18 +45,12 @@ public class ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher {
 			pstmt = conn.prepareStatement( sql );
 			
 			pstmt.setInt( 1, unifiedReportedPeptideId );
+			pstmt.setInt( 2, searchId );
 			
 			rs = pstmt.executeQuery();
 			
 			while ( rs.next() ) {
-				
-				ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult result = new ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult();
-				
-				result.setSearchId( rs.getInt( "search_id" ) );
-				result.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
-				
-				resultList.add( result );
-				
+				resultList.add( rs.getInt( "reported_peptide_id" ) );
 			}
 
 		} catch ( Exception e ) {

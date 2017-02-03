@@ -25,7 +25,7 @@ import org.yeastrc.xlink.dto.SearchCommentDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchCommentSearcher;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -91,7 +91,7 @@ public class SearchCommentService {
 			searchIdsCollection.add( searchId );
 			
 			
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( searchIdsCollection );
 			
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				
@@ -215,7 +215,7 @@ public class SearchCommentService {
 			searchIdsCollection.add( searchId );
 			
 			
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( searchIdsCollection );
 			
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				
@@ -364,7 +364,7 @@ public class SearchCommentService {
 			searchIdsCollection.add( searchId );
 			
 			
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( searchIdsCollection );
 			
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				
@@ -500,7 +500,7 @@ public class SearchCommentService {
 			searchIdsCollection.add( searchId );
 			
 			
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( searchIdsCollection );
 			
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				
@@ -569,7 +569,7 @@ public class SearchCommentService {
 			}
 			
 			
-			SearchDTO search = SearchDAO.getInstance().getSearch( searchId );
+			SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( searchId );
 			
 			if ( search == null ) {
 				

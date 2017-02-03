@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.objects;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -78,6 +79,9 @@ public class SearchPeptideMonolink {
 		return search;
 	}
 	public void setSearch(SearchDTO search) {
+		if ( search == null ) {
+			throw new InvalidParameterException( "search cannot be assigned to null");
+		}
 		this.search = search;
 	}
 	
@@ -142,7 +146,7 @@ public class SearchPeptideMonolink {
 
 			if ( peptidePosition == -1 ) {
 				
-				String msg = "Peptide Position Not Set.  Search Id: " + search.getId()
+				String msg = "Peptide Position Not Set.  Search Id: " + search.getSearchId()
 						+ ", reported peptide id: " + reportedPeptideId;
 				log.error( msg );
 				throw new ProxlWebappDataException(msg);
@@ -204,7 +208,7 @@ public class SearchPeptideMonolink {
 
 			numUniquePsms = 
 					PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher.getInstance()
-					.getPsmCountForUniquePSM_SearchIdReportedPeptideId( this.getReportedPeptide().getId(), this.search.getId(), searcherCutoffValuesSearchLevel );
+					.getPsmCountForUniquePSM_SearchIdReportedPeptideId( this.getReportedPeptide().getId(), this.search.getSearchId(), searcherCutoffValuesSearchLevel );
 
 			numUniquePsmsSet = true;
 
@@ -230,7 +234,7 @@ public class SearchPeptideMonolink {
 
 		numPsms = 
 				PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
-				.getPsmCountForSearchIdReportedPeptideId( reportedPeptideId, search.getId(), searcherCutoffValuesSearchLevel );
+				.getPsmCountForSearchIdReportedPeptideId( reportedPeptideId, search.getSearchId(), searcherCutoffValuesSearchLevel );
 
 		numPsmsSet = true;
 
@@ -253,7 +257,7 @@ public class SearchPeptideMonolink {
 
 		try {
 			
-			Integer psmId = SearchPsmSearcher.getInstance().getSinglePsmId( this.getSearch().getId(), this.getReportedPeptide().getId() );
+			Integer psmId = SearchPsmSearcher.getInstance().getSinglePsmId( this.getSearch().getSearchId(), this.getReportedPeptide().getId() );
 
 			return psmId;
 

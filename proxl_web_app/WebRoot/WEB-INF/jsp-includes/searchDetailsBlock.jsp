@@ -52,7 +52,7 @@
 			  		><a href="javascript:"
 					onclick="toggleVisibility(this)"
 					 class="tool_tip_attached_jq" data-tooltip="Show or hide search details"
-					toggle_visibility_associated_element_id="search_details_<bean:write name="search" property="id" />"
+					toggle_visibility_associated_element_id="search_details_<bean:write name="search" property="projectSearchId" />"
 			  		><span class="toggle_visibility_expansion_span_jq" 
 							><img src="${contextPath}/images/icon-expand-small.png" 
 								class=" <%--  icon-expand-contract-in-data-table --%> "
@@ -67,9 +67,9 @@
 		 <table class="table-no-border-no-cell-spacing-no-cell-padding" style="border-width:0px;" >
 		  <tr>
 		   <td style="<c:if test="${ not singleSearch }" > padding-bottom: 2px;</c:if>">
-			<div><bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="id" />)</div>
+			<div><bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="searchId" />)</div>
 
-			<div id="search_details_<bean:write name="search" property="id" />"
+			<div id="search_details_<bean:write name="search" property="projectSearchId" />"
 					 
 			  	>						
 			</div>

@@ -1,13 +1,9 @@
 package org.yeastrc.xlink.www.webservices;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -19,32 +15,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
-import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
-import org.yeastrc.xlink.dto.AnnotationTypeDTO;
-import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
-import org.yeastrc.xlink.www.objects.AnnotationTypeDTOListForSearchId;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesRelatedToPSMServiceResult;
-import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWebserviceWrapper;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
+import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_PerSearchResult;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher;
-import org.yeastrc.xlink.www.searcher.SearchReportedPeptideAnnotationDataSearcher;
-import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortAnnotationDTORecords;
 import org.yeastrc.xlink.www.annotation_display.AnnTypeIdDisplayJSON_PerSearch;
 import org.yeastrc.xlink.www.annotation_display.DeserializeAnnTypeIdDisplayJSON_PerSearch;
-import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
-import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataDefaultDisplayInDisplayOrder;
-import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataInSortOrder;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.DeserializeCutoffForWebservices;
@@ -56,7 +42,7 @@ import org.yeastrc.xlink.www.web_utils.SearchPeptideWebserviceCommonCode.SearchP
  *
  */
 /**
- * @author danj
+ * 
  *
  */
 @Path("/reportedPeptidesRelatedToPSMService")
@@ -77,7 +63,7 @@ public class ReportedPeptidesRelatedToPSMService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/get") 
-	public ReportedPeptidesRelatedToPSMServiceResult get( @QueryParam( "search_id" ) Integer searchId,
+	public ReportedPeptidesRelatedToPSMServiceResult get( @QueryParam( "search_id" ) Integer projectSearchId,
 										  @QueryParam( "psmPeptideCutoffsForSearchId" ) String psmPeptideCutoffsForSearchId_JSONString,
 										  @QueryParam( "peptideAnnTypeDisplayPerSearch" ) String annTypeIdDisplayJSON_PerSearch_JSONString,
 										  @QueryParam( "psm_id" ) Integer psmId,
@@ -85,7 +71,7 @@ public class ReportedPeptidesRelatedToPSMService {
 										  @Context HttpServletRequest request )
 	throws Exception {
 
-		if ( searchId == null ) {
+		if ( projectSearchId == null ) {
 			String msg = "Provided search_id is null or search_id is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
@@ -134,20 +120,20 @@ public class ReportedPeptidesRelatedToPSMService {
 //						);
 //			}
 			//   Get the project id for this search
-			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
-			searchIdsCollection.add( searchId );
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
+			projectSearchIdsCollection.add( projectSearchId );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsCollection );
+			
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search id: " + searchId;
+				String msg = "No project ids for search id: " + projectSearchId;
 				log.error( msg );
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
 						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_TEXT ) // This string will be passed to the client
 						.build()
 						);
-			}
-			if ( projectIdsFromSearchIds.size() > 1 ) {
+			}			if ( projectIdsFromSearchIds.size() > 1 ) {
 				//  Invalid request, searches across projects
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_STATUS_CODE )  //  Send HTTP code
@@ -181,6 +167,21 @@ public class ReportedPeptidesRelatedToPSMService {
 			
 			////////   Auth complete
 			//////////////////////////////////////////
+			SearchDTO searchDTO = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
+			
+			if ( searchDTO == null ) {
+				String msg = ": No search found for projectSearchId: " + projectSearchId;
+				log.warn( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+			    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+			    	        .build()
+			    	        );
+			}
+		
+			Integer searchId = searchDTO.getSearchId();
+			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
+			searchIdsCollection.add( searchId );
 			
 			//   Get PSM and Peptide Cutoff data from JSON
 			CutoffValuesSearchLevel cutoffValuesSearchLevel = 
@@ -196,7 +197,13 @@ public class ReportedPeptidesRelatedToPSMService {
 			
 			//  Get Result
 			ReportedPeptidesRelatedToPSMServiceResult reportedPeptidesRelatedToPSMServiceResult = 
-					getReportedPeptidesRelatedToPSMData( cutoffValuesSearchLevel, annTypeIdDisplayJSON_PerSearch, searchId, psmId, scanId , searchIdsCollection );
+					getReportedPeptidesRelatedToPSMData( 
+							cutoffValuesSearchLevel, 
+							annTypeIdDisplayJSON_PerSearch, 
+							searchDTO, 
+							psmId, 
+							scanId , 
+							searchIdsCollection );
 			
 			return reportedPeptidesRelatedToPSMServiceResult;
 			
@@ -234,11 +241,13 @@ public class ReportedPeptidesRelatedToPSMService {
 	private ReportedPeptidesRelatedToPSMServiceResult getReportedPeptidesRelatedToPSMData( 
 			CutoffValuesSearchLevel cutoffValuesSearchLevel,
 			AnnTypeIdDisplayJSON_PerSearch annTypeIdDisplayJSON_PerSearch,
-			Integer searchId,
+			SearchDTO searchDTO,
 			int psmId,
 			int scanId,
 			Collection<Integer> searchIdsCollection ) throws Exception {
 
+		int searchId = searchDTO.getSearchId();
+		
 		List<Integer> peptideDisplayAnnTypeIdList = null;
 		if ( annTypeIdDisplayJSON_PerSearch != null ) {
 			peptideDisplayAnnTypeIdList = annTypeIdDisplayJSON_PerSearch.getPeptide();
@@ -253,7 +262,7 @@ public class ReportedPeptidesRelatedToPSMService {
 		//  Get Reported Peptides From DB:
 		List<ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem> reportedPeptideDBList = 
 				ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher.getInstance()
-				.reportedPeptideRecordsForAssociatedScanId( psmId, scanId, searchId, searcherCutoffValuesSearchLevel ); 
+				.reportedPeptideRecordsForAssociatedScanId( psmId, scanId, searchDTO, searcherCutoffValuesSearchLevel ); 
 		
 		//  Get Annotation Data for links and Sort Links
 		SearchPeptideWebserviceCommonCodeGetDataResult searchPeptideWebserviceCommonCodeGetDataResult =

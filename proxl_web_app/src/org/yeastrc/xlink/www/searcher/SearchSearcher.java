@@ -14,7 +14,7 @@ import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 
 /**
- * Return a list of all searches in the database, ordered by upload date
+ * Return a list of all searches for the project, ordered by upload date
  * @author Mike
  *
  */
@@ -30,10 +30,18 @@ public class SearchSearcher {
 	
 	
 	
+	private final static String SEARCH_SQL =
+			"SELECT project_search.id FROM project_search"
 
-	
+			+ " INNER JOIN project ON project_search.project_id = project.id   "
+
+			+ " WHERE project.id = ? AND project_search.status_id = " + SearchRecordStatus.IMPORT_COMPLETE_VIEW.value()
+			+   " AND active_project_id_search_id_unique_record IS NOT NULL "
+
+			+ " ORDER BY project_search.search_display_order , project_search.search_id DESC";
 
 	/**
+	 * Return a list of all searches for the project, ordered by upload date
 	 * @param projectId
 	 * @return
 	 * @throws Exception
@@ -47,13 +55,7 @@ public class SearchSearcher {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		final String sql = "SELECT search.id FROM search"
-
-			+ " INNER JOIN project ON search.project_id = project.id   "
-
-			+ " WHERE project.id = ? AND status_id = " + SearchRecordStatus.IMPORT_COMPLETE_VIEW.value()
-
-			+ " ORDER BY search.display_order , search.id DESC";
+		final String sql = SEARCH_SQL;
 
 		try {
 			
@@ -66,8 +68,9 @@ public class SearchSearcher {
 			
 			rs = pstmt.executeQuery();
 
-			while( rs.next() )
-				searches.add( SearchDAO.getInstance().getSearch( rs.getInt( 1 ) ) );
+			while( rs.next() ) {
+				searches.add( SearchDAO.getInstance().getSearchFromProjectSearchId( rs.getInt( 1 ) ) );
+			}
 			
 		} catch ( Exception e ) {
 			
@@ -105,57 +108,57 @@ public class SearchSearcher {
 	
 	
 	
+	//   Commented out since not maintained
 	
-	
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	public List<SearchDTO> getAllSearchs() throws Exception {
-		
-		
-		List<SearchDTO> searches = new ArrayList<SearchDTO>();
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		try {
-			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			String sql = "SELECT id FROM search" +
-					" ORDER BY id DESC";
-			
-			pstmt = conn.prepareStatement( sql );
-			
-			rs = pstmt.executeQuery();
-
-			while( rs.next() )
-				searches.add( SearchDAO.getInstance().getSearch( rs.getInt( 1 ) ) );
-
-			
-		} finally {
-			
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-			
-		}
-		
-		
-		
-		return searches;
-	}
+//	/**
+//	 * @return
+//	 * @throws Exception
+//	 */
+//	public List<SearchDTO> getAllSearchs() throws Exception {
+//		
+//		
+//		List<SearchDTO> searches = new ArrayList<SearchDTO>();
+//		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		ResultSet rs = null;
+//		try {
+//			
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+//			String sql = "SELECT id FROM project_search" +
+//					" ORDER BY id DESC";
+//			
+//			pstmt = conn.prepareStatement( sql );
+//			
+//			rs = pstmt.executeQuery();
+//
+//			while( rs.next() )
+//				searches.add( SearchDAO.getInstance().getSearchFromProjectSearchId( rs.getInt( 1 ) ) );
+//
+//			
+//		} finally {
+//			
+//			// be sure database handles are closed
+//			if( rs != null ) {
+//				try { rs.close(); } catch( Throwable t ) { ; }
+//				rs = null;
+//			}
+//			
+//			if( pstmt != null ) {
+//				try { pstmt.close(); } catch( Throwable t ) { ; }
+//				pstmt = null;
+//			}
+//			
+//			if( conn != null ) {
+//				try { conn.close(); } catch( Throwable t ) { ; }
+//				conn = null;
+//			}
+//			
+//		}
+//		
+//		
+//		
+//		return searches;
+//	}
 	
 }

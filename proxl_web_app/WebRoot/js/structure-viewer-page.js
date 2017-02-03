@@ -79,6 +79,8 @@ var _renderedLinks = { };
 
 var _searches;
 
+var _projectSearchIdToSearchIdMapping;
+
 var _taxonomies;
 var _lysineLocations;
 var _coverages;
@@ -257,6 +259,32 @@ function convertVisibleChainsToProteinSequenceIdsProcessReponse( responseParams 
 }
 
 
+
+////////////////////////////////////////////
+
+function populateProjectSearchIdToSearchIdMapping() {
+	_projectSearchIdToSearchIdMapping = {};
+	for ( var index = 0; index < _searches.length; index++ ) {
+		var search = _searches[ index ];
+		_projectSearchIdToSearchIdMapping[ search.id ] = search.searchId;
+	}
+}
+
+function convertProjectSearchIdArrayToSearchIdArray( projectSearchIdArray ) {
+	if ( ! Array.isArray( projectSearchIdArray ) ) {
+		throw Error( "projectSearchIdArray is not an array" );
+	}
+	var searchIdArray = [];
+	for ( var index = 0; index < projectSearchIdArray.length; index++ ) {
+		var projectSearchId = projectSearchIdArray[ index ];
+		var searchId = _projectSearchIdToSearchIdMapping[ projectSearchId ];
+		if ( searchId === undefined ) {
+			throw Error( "Failed to find searchId mapping for projectSearchId: " + projectSearchId );
+		}
+		searchIdArray.push( searchId );
+	}
+	return searchIdArray;
+}
 
 
 ////////////////////////////////////////
@@ -1024,19 +1052,22 @@ function collateAndDownloadPSMUDRData( data ) {
 	var reportText = "";
 	
 	if( !data || !data.dataForSearches ) {
-		reportWebErrorToServer.reportErrorObjectToServer( Error( "Did not get data." ));
-		throw e;
+		throw Error( "Did not get data." );
 	}
 
 	for( var i = 0; i < _searchIds.length; i++ ) {
 		
-		if( !data.dataForSearches[ _searchIds[ i ] ] ) {
-			console.log( "WARNING: GOT NO PSM UDR DATA FOR SEARCH: " + _searchIds[ i ] );
+		var projectSearchId = _searchIds[ i ];
+		var searchId = _projectSearchIdToSearchIdMapping[ projectSearchId ];
+		if ( searchId === undefined ) {
+			throw Error( "collateAndDownloadPSMUDRData( data ): Failed to find searchId mapping for projectSearchId: " + projectSearchId );
+		}
+
+		var searchData = data.dataForSearches[ searchId ];
+		if( ! searchData ) {
+			console.log( "WARNING: GOT NO PSM UDR DATA FOR SEARCH: " + searchId );
 			continue;
 		}
-		
-		var searchId = _searchIds[ i ];
-		var searchData = data.dataForSearches[ searchId ];
 		
 		// pad each searches section with some white space
 		if( i != 0 ) {
@@ -1618,6 +1649,8 @@ function loadDataFromService() {
 	        
 	        		// handle searches
 	        		_searches = data.searches;
+
+	        		populateProjectSearchIdToSearchIdMapping();
 
 	        		// handle proteins
 	        		_proteins = data.proteins;
@@ -4606,11 +4639,15 @@ var drawLegend = function() {
 		
 		for ( var i = 0; i < _searches.length; i++ ) {
 			
-			var searchId = _searches[ i ].id;
+			var projectSearchId = _searches[ i ].id;
 			
-			var searchIds = [ searchId ];
+			var projectSearchIds = [ projectSearchId ];
 			
-			var colorForBlock = _linkColorHandler.getColorForSearches( searchIds ); 
+			var searchIds = convertProjectSearchIdArrayToSearchIdArray( projectSearchIds );
+			
+			var searchId = searchIds[ 0 ];
+
+			var colorForBlock = _linkColorHandler.getColorForSearches( projectSearchIds ); 
 				
 			var searchPositionNumber = ( i + 1 );
 			
@@ -4636,12 +4673,14 @@ var drawLegend = function() {
 					continue; 
 				}
 
-				var searchId_A = _searches[ i ].id;
-				var searchId_B = _searches[ k ].id;
+				var projectSearchId_A = _searches[ i ].id;
+				var projectSearchId_B = _searches[ k ].id;
 				
-				var searchIds = [ searchId_A, searchId_B ];
-				
-				var colorForBlock = _linkColorHandler.getColorForSearches( searchIds ); 
+				var projectSearchIds = [ projectSearchId_A, projectSearchId_B ];
+
+				var searchIds = convertProjectSearchIdArrayToSearchIdArray( projectSearchIds );
+
+				var colorForBlock = _linkColorHandler.getColorForSearches( projectSearchIds ); 
 
 				var searchPositionNumber_A = ( i + 1 );
 				var searchPositionNumber_B = ( k + 1 );
@@ -4661,9 +4700,11 @@ var drawLegend = function() {
 
 		if( _searches.length === 3 ) {
 			
-			var searchIds = [ _searches[ 0 ].id, _searches[ 1 ].id, _searches[ 2 ].id ];
-			
-			var colorForBlock = _linkColorHandler.getColorForSearches( searchIds ); 
+			var projectSearchIds = [ _searches[ 0 ].id, _searches[ 1 ].id, _searches[ 2 ].id ];
+
+			var searchIds = convertProjectSearchIdArrayToSearchIdArray( projectSearchIds );
+
+			var colorForBlock = _linkColorHandler.getColorForSearches( projectSearchIds ); 
 			
 			var $legend_by_search_container_for_search_1_2_3 = $("#legend_by_search_container_for_search_1_2_3");
 			var $legend_by_search_color_block_for_search_1_2_3 = $("#legend_by_search_color_block_for_search_1_2_3");

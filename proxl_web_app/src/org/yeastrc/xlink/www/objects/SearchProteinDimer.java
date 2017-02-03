@@ -54,7 +54,7 @@ public class SearchProteinDimer  {
 			
 			return -1;
 		}
-		return search.getId();
+		return search.getSearchId();
 	}
 	
 

@@ -26,7 +26,8 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.dto.ScanFileDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ScanFileIdsForSearchSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
@@ -39,11 +40,17 @@ public class ScanFilesForSearchIdService {
 
 	private static final Logger log = Logger.getLogger(ScanFilesForSearchIdService.class);
 	
+	/**
+	 * @param projectSearchId
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getScanFilesForSearchId") 
 	public List<ScanFileDTO> getViewerData( 
-			@QueryParam( "searchId" ) int searchId,
+			@QueryParam( "searchId" ) int projectSearchId,
 			@Context HttpServletRequest request )
 	throws Exception {
 		
@@ -51,11 +58,11 @@ public class ScanFilesForSearchIdService {
 		
 		
 		
-		if ( searchId == 0 ) {
+		if ( projectSearchId == 0 ) {
 
 			String msg = ": Provided searchId is zero";
 
-			log.error( msg );
+			log.warn( msg );
 
 		    throw new WebApplicationException(
 		    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
@@ -75,16 +82,16 @@ public class ScanFilesForSearchIdService {
 			
 			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
 
-			searchIdsCollection.add( searchId );
+			searchIdsCollection.add( projectSearchId );
 			
 			
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( searchIdsCollection );
 			
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				
 				// should never happen
 				
-				String msg = "No project ids for search id: " + searchId;
+				String msg = "No project ids for search id: " + projectSearchId;
 				
 				log.error( msg );
 
@@ -140,6 +147,18 @@ public class ScanFilesForSearchIdService {
 						);
 			}
 			
+			Integer searchId =
+					MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
+			
+			if ( searchId == null ) {
+				String msg = ": No searchId found for projectSearchId: " + projectSearchId;
+				log.warn( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+			    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+			    	        .build()
+			    	        );
+			}
 
 			List<Integer> scanFileIdsForSearchId = ScanFileIdsForSearchSearcher.getInstance().getScanFileIdsForSearchId( searchId );
 

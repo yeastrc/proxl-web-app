@@ -113,14 +113,14 @@
 	
 			<div style="margin-bottom:20px;">
 				[<a class="tool_tip_attached_jq" data-tooltip="View proteins" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" searchId="${ viewSearchPeptidesPageDataRoot.searchId }"
+					href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" searchId="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
 							>crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 					>Protein View</a>]
 					
 					
 					
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/proteinCoverageReport" searchId="${ viewSearchPeptidesPageDataRoot.searchId }"
+					href="${ contextPath }/<proxl:defaultPageUrl pageName="/proteinCoverageReport" searchId="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
 							>proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 													
 					>Coverage Report</a>]
@@ -235,7 +235,7 @@
 						
 						<input type="button" value="${ UpdateButtonText }"  onclick="viewSearchPeptidePageCode.updatePageForFormParams()" >
 						
-						<c:set var="searchId" value="${ viewSearchPeptidesPageDataRoot.searchId }"/>	
+						<c:set var="searchId" value="${ viewSearchPeptidesPageDataRoot.projectSearchId }"/>	
 
 						<c:set var="page_JS_Object" value="viewSearchPeptidePageCode"/>
 						
@@ -338,7 +338,7 @@
 								style="cursor: pointer; "
 								onclick="viewPsmsLoadedFromWebServiceTemplate.showHidePsms( { clickedElement : this } )"
 								reported_peptide_id="${ peptideEntry.reportedPeptide.id }"
-								search_id="${ viewSearchPeptidesPageDataRoot.searchId }"
+								search_id="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
 								project_id="${ projectId }"
 								>
 								

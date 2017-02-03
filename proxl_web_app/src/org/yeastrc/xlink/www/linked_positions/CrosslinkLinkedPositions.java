@@ -66,7 +66,7 @@ public class CrosslinkLinkedPositions {
 	 */
 	public List<SearchProteinCrosslinkWrapper> getSearchProteinCrosslinkWrapperList( SearchDTO search, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
 	
-		int searchId = search.getId();
+		int searchId = search.getSearchId();
 		
 
 		List<WebReportedPeptideWrapper> wrappedPeptidelinks =
@@ -324,7 +324,7 @@ public class CrosslinkLinkedPositions {
 		List<SearchPeptideCrosslinkAnnDataWrapper> searchPeptideCrosslinkAnnDataWrapper_List = 
 				SearchPeptideCrosslink_LinkedPosition_Searcher.getInstance()
 				.searchOnSearchProteinCrosslink( 
-						search.getId(), 
+						search, 
 						searcherCutoffValuesSearchLevel, 
 						protein1.getProteinSequenceId(), 
 						protein2.getProteinSequenceId(), 
@@ -338,7 +338,7 @@ public class CrosslinkLinkedPositions {
 			WebReportedPeptide webReportedPeptide = new WebReportedPeptide();
 			
 			webReportedPeptide.setSearch( search );
-			webReportedPeptide.setSearchId( search.getId() );
+			webReportedPeptide.setSearchId( search.getSearchId() );
 			webReportedPeptide.setReportedPeptideId( searchPeptideCrosslink.getReportedPeptideId() );
 			
 			webReportedPeptide.setNumPsms( searchPeptideCrosslink.getNumPsms() );
@@ -420,7 +420,7 @@ public class CrosslinkLinkedPositions {
 			
 			boolean areRelatedPeptidesUnique =
 					Get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Searcher.getInstance()
-					.get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId( search.getId(), reportedPeptideId );
+					.get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId( search.getSearchId(), reportedPeptideId );
 			
 			if ( areRelatedPeptidesUnique ) {
 

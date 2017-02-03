@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.objects;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -32,12 +33,12 @@ public class SearchPeptideDimer {
 		try {
 			List<SrchRepPeptPeptideDTO> results = 
 					SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
-					.getForSearchIdReportedPeptideId( this.getSearch().getId(), this.getReportedPeptideId() );
+					.getForSearchIdReportedPeptideId( this.getSearch().getSearchId(), this.getReportedPeptideId() );
 
 			if ( results.size() != 2 ) {
 
 
-				String msg = "List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + this.getSearch().getId()
+				String msg = "List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + this.getSearch().getSearchId()
 						+ ", ReportedPeptideId: " + this.getReportedPeptideId() ;
 
 				log.error( msg );
@@ -91,6 +92,9 @@ public class SearchPeptideDimer {
 		return search;
 	}
 	public void setSearch(SearchDTO search) {
+		if ( search == null ) {
+			throw new InvalidParameterException( "search cannot be assigned to null");
+		}
 		this.search = search;
 	}
 	
@@ -202,7 +206,7 @@ public class SearchPeptideDimer {
 	 */
 	public Integer getSinglePsmId() throws Exception {
 
-		Integer psmId = SearchPsmSearcher.getInstance().getSinglePsmId( this.getSearch().getId(), this.getReportedPeptide().getId() );
+		Integer psmId = SearchPsmSearcher.getInstance().getSinglePsmId( this.getSearch().getSearchId(), this.getReportedPeptide().getId() );
 		
 		return psmId;
 	}

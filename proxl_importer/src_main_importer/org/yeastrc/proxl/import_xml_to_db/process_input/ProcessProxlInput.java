@@ -8,11 +8,13 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.dao.ProjectSearchDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCrosslinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchMonolinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSM_InsertToDB;
+import org.yeastrc.proxl.import_xml_to_db.dto.ProjectSearchDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
@@ -53,15 +55,17 @@ public class ProcessProxlInput {
 	private ProcessProxlInput(){}
 	
 	public static ProcessProxlInput getInstance() {
-		
 		return new ProcessProxlInput();
 	}
 	
 	private SearchDTO searchDTOInserted;
-	
+	private ProjectSearchDTO projectSearchDTOInserted;
 	
 	public SearchDTO getSearchDTOInserted() {
 		return searchDTOInserted;
+	}
+	public ProjectSearchDTO getProjectSearchDTOInserted() {
+		return projectSearchDTOInserted;
 	}
 
 	/**
@@ -71,7 +75,7 @@ public class ProcessProxlInput {
 	 * @return
 	 * @throws Exception
 	 */
-	public SearchDTO processProxlInput( 
+	public void processProxlInput( 
 			
 			int projectId,
 			ProxlInput proxlInput,
@@ -90,6 +94,7 @@ public class ProcessProxlInput {
 		
 		
 		searchDTOInserted = null;
+		projectSearchDTOInserted = null;
 
 
 		try {
@@ -97,7 +102,6 @@ public class ProcessProxlInput {
 			SearchDTO searchDTO = new SearchDTO();
 			
 			searchDTO.setFastaFilename( proxlInput.getFastaFilename() );
-			searchDTO.setProjectId( projectId );
 			
 			if ( ( skipPopulatingPathOnSearchLineOptChosen == null ) 
 					|| ( ! skipPopulatingPathOnSearchLineOptChosen ) ) {
@@ -105,10 +109,6 @@ public class ProcessProxlInput {
 				searchDTO.setPath( importDirectory );
 			}
 			
-			if ( StringUtils.isNotEmpty( proxlInput.getName() ) ) {
-			
-				searchDTO.setName( proxlInput.getName() );
-			}
 			
 			if ( scanFileFileContainerList == null || scanFileFileContainerList.isEmpty() ) {
 				searchDTO.setHasScanData( false );
@@ -119,6 +119,17 @@ public class ProcessProxlInput {
 			SearchDAO.getInstance().saveToDatabase( searchDTO );
 			
 			searchDTOInserted = searchDTO;
+			
+			
+			ProjectSearchDTO projectSearchDTO = new ProjectSearchDTO();
+			projectSearchDTO.setProjectId( projectId );
+			projectSearchDTO.setSearchId( searchDTO.getId() );
+			if ( StringUtils.isNotEmpty( proxlInput.getName() ) ) {
+				projectSearchDTO.setSearchName( proxlInput.getName() );
+			}
+			ProjectSearchDAO.getInstance().saveToDatabase( projectSearchDTO );
+			
+			projectSearchDTOInserted = projectSearchDTO;
 
 			if ( StringUtils.isNotEmpty( proxlInput.getComment() ) ) {
 
@@ -283,7 +294,6 @@ public class ProcessProxlInput {
 			throw e;
 		}
 		
-		return searchDTOInserted;
 	}
 
 	

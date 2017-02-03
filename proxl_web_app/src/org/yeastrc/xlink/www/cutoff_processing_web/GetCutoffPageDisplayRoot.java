@@ -52,27 +52,31 @@ public class GetCutoffPageDisplayRoot {
 	/**
 	 * Get Cutoff Display data and put in request scope
 	 * 
+	 * @param projectSearchId
 	 * @param searchId
 	 * @return
 	 * @throws Exception
 	 */
 	public CutoffPageDisplayRoot getCutoffPageDisplayRootSingleSearchId(
 
+			int projectSearchId,
 			int searchId,
 			HttpServletRequest request
 			
 			) throws Exception {
 
-
+		Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();
+		mapProjectSearchIdToSearchId.put( projectSearchId, searchId );
+		
 		Collection<Integer> searchIdsCollection = new HashSet<>();
-
 		searchIdsCollection.add( searchId );
 
-		return getCutoffPageDisplayRoot( searchIdsCollection, request );
+		return getCutoffPageDisplayRoot( mapProjectSearchIdToSearchId, searchIdsCollection, request );
 	}
 
 
 	/**
+	 * @param mapProjectSearchIdToSearchId
 	 * @param searchIdsCollection
 	 * @param request
 	 * @return
@@ -80,7 +84,9 @@ public class GetCutoffPageDisplayRoot {
 	 */
 	public CutoffPageDisplayRoot getCutoffPageDisplayRoot(
 
+			Map<Integer,Integer> mapProjectSearchIdToSearchId,
 			Collection<Integer> searchIdsCollection,
+
 			HttpServletRequest request
 
 			) throws Exception {
@@ -123,8 +129,9 @@ public class GetCutoffPageDisplayRoot {
 		// Process Per SearchId
 
 
-		for ( Integer searchId : searchIdsList ) {
-
+		for ( Map.Entry<Integer,Integer> entry : mapProjectSearchIdToSearchId.entrySet() ) {
+			Integer projectSearchId = entry.getKey();
+			Integer searchId = entry.getValue(); 
 
 			List<CutoffsAppliedOnImportWebDisplay> cutoffsAppliedOnImportList = 
 					GetCutoffsAppliedOnImportForSearchList.getInstance()
@@ -133,7 +140,7 @@ public class GetCutoffPageDisplayRoot {
 			CutoffPageDisplaySearchLevel cutoffPageDisplaySearchLevel = new CutoffPageDisplaySearchLevel();
 			cutoffPageDisplayRoot.addCutoffPageDisplaySearchLevel( cutoffPageDisplaySearchLevel );
 
-			cutoffPageDisplaySearchLevel.setSearchId( searchId );
+			cutoffPageDisplaySearchLevel.setProjectSearchId( projectSearchId );
 
 			Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_Psm_AnnotationType_DTOMap = 
 					srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap.get( searchId );

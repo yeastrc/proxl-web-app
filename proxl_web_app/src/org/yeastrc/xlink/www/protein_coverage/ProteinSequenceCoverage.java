@@ -2,19 +2,22 @@ package org.yeastrc.xlink.www.protein_coverage;
 
 import java.util.Set;
 
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 
+/**
+ * 
+ *
+ */
 public class ProteinSequenceCoverage {
 
 	public ProteinSequenceCoverage( ProteinSequenceObject protein ) {
 		this.protein = protein;
 	}
-	
-	
 	
 	/**
 	 * Add the supplied start and end coordinates as a sequence coverage range
@@ -29,7 +32,6 @@ public class ProteinSequenceCoverage {
 		
 		Range<Integer> r = Range.closed( start, end );
 		this.ranges.add( r );
-		
 	}
 	
 	/**
@@ -43,16 +45,14 @@ public class ProteinSequenceCoverage {
 			this.ranges = TreeRangeSet.create();
 		
 		if( this.getProtein().getProteinSequenceId() != coverageToAdd.getProtein().getProteinSequenceId() )
-			throw new Exception( "Attempted to add two coverage objects that do not describe the same protein." );
+			throw new ProxlWebappInternalErrorException( "Attempted to add two coverage objects that do not describe the same protein." );
 		
 		if( coverageToAdd.getRanges() == null )
 			return;
 		
-		
 		for( Range<Integer> r : coverageToAdd.getRanges() ) {
 			this.ranges.add( r );
 		}
-		
 	}
 	
 	/**

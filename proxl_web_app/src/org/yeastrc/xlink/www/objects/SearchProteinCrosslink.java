@@ -176,7 +176,7 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 			
 			return -1;
 		}
-		return search.getId();
+		return search.getSearchId();
 	}
 	
 

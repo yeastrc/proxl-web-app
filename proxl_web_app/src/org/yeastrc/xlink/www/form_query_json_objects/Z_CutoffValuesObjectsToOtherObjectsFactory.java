@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -11,7 +14,9 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
+import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 
 /**
  * Create SearcherCutoffValues... Objects from objects in package org.yeastrc.xlink.www.form_query_json_objects
@@ -65,19 +70,32 @@ public class Z_CutoffValuesObjectsToOtherObjectsFactory {
 
 		for ( Map.Entry<String,CutoffValuesSearchLevel> entry : inputSearches.entrySet() ) {
 			
-			String searchIdString = entry.getKey();
+			String projectSearchIdString = entry.getKey();
 			CutoffValuesSearchLevel cutoffValuesSearchLevel = entry.getValue();
 			
-			Integer searchId = null;
+			Integer projectSearchId = null;
 			
 			try {
-				searchId = Integer.valueOf( searchIdString );
+				projectSearchId = Integer.valueOf( projectSearchIdString );
 				
 			} catch ( Exception e ) {
 				
-				String msg = "Failed to parse Search Id: " + searchIdString;
+				String msg = "Failed to parse Project Search Id: " + projectSearchIdString;
 				log.error( msg );
 				throw new ProxlWebappDataException(msg);
+			}
+
+			Integer searchId =
+					MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
+			
+			if ( searchId == null ) {
+				String msg = ": No searchId found for projectSearchId: " + projectSearchId;
+				log.warn( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+			    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+			    	        .build()
+			    	        );
 			}
 			
 			Map<Integer, AnnotationTypeDTO> srchPgmFilterablePsmAnnotationTypeDTOMap =
@@ -90,7 +108,8 @@ public class Z_CutoffValuesObjectsToOtherObjectsFactory {
 
 				srchPgmFilterablePsmAnnotationTypeDTOMap = new HashMap<>();
 				
-				String msg = "Failed to get Filterable PSM annotionation type records for Search Id: " + searchIdString;
+				String msg = "Failed to get Filterable PSM annotionation type records for Search Id: " + searchId
+						+ ", projectSearchId: " + projectSearchId;
 				log.error( msg );
 				throw new ProxlWebappDataException(msg);
 			}
@@ -141,8 +160,16 @@ public class Z_CutoffValuesObjectsToOtherObjectsFactory {
 		
 		
 		
-		Integer searchId = inputItem.getSearchId();
+		Integer projectSearchId = inputItem.getSearchId();
 
+		Integer searchId =
+				MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
+		
+		if ( searchId == null ) {
+			String msg = ": No searchId found for projectSearchId: " + projectSearchId;
+			log.warn( msg );
+		    throw new ProxlWebappDataException( msg );
+		}
 
 		//  Get Annotation Type records for PSM and Peptide
 		
@@ -198,20 +225,17 @@ public class Z_CutoffValuesObjectsToOtherObjectsFactory {
 	
 			) throws Exception {
 		
-		
-		
-
 		// inputs
 		
-		int searchId = inputItem.getSearchId();
+		int projectSearchId = inputItem.getSearchId();  //  Actually returns projectSearchId
+		
 		Map<String,CutoffValuesAnnotationLevel> psmCutoffValues = inputItem.getPsmCutoffValues();
 		Map<String,CutoffValuesAnnotationLevel> peptideCutoffValues = inputItem.getPeptideCutoffValues();
 
 		//  outputs
 
 		SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
-		
-		searcherCutoffValuesSearchLevel.setSearchId( searchId );
+		searcherCutoffValuesSearchLevel.setProjectSearchId( projectSearchId );
 
 
 		//////////////////////

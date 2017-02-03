@@ -26,7 +26,7 @@ import org.yeastrc.xlink.www.default_page_view.DefaultPageViewSaveOrUpdate;
 import org.yeastrc.xlink.www.default_page_view.GetDefaultURLFromPageURL;
 import org.yeastrc.xlink.www.dto.DefaultPageViewGenericDTO;
 import org.yeastrc.xlink.www.objects.GenericWebserviceResult;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProteinSequenceIdForNrseqProteinIdSearcher;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;

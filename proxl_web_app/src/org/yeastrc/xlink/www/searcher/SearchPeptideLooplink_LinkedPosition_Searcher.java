@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -117,7 +116,7 @@ public class SearchPeptideLooplink_LinkedPosition_Searcher {
 	/**
 	 * Get all looplink peptides corresponding to the given Criteria
 	 * 
-	 * @param searchId
+	 * @param projectSearchId
 	 * @param searcherCutoffValuesSearchLevel
 	 * @param proteinId
 	 * @param proteinPosition1
@@ -126,7 +125,7 @@ public class SearchPeptideLooplink_LinkedPosition_Searcher {
 	 * @throws Exception
 	 */
 	public List<SearchPeptideLooplinkAnnDataWrapper> searchOnSearchProteinLooplink( 
-			int searchId,
+			SearchDTO searchDTO,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
 			int proteinId,
 			int proteinPosition1,
@@ -137,7 +136,9 @@ public class SearchPeptideLooplink_LinkedPosition_Searcher {
 		
 		List<SearchPeptideLooplinkAnnDataWrapper> wrappedLinks = new ArrayList<>();
 
+		int searchId = searchDTO.getSearchId();
 
+		
 		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
 				searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
 		
@@ -613,10 +614,6 @@ public class SearchPeptideLooplink_LinkedPosition_Searcher {
 			
 			
 			rs = pstmt.executeQuery();
-			
-			SearchDTO searchDTO = null;
-			
-			searchDTO = SearchDAO.getInstance().getSearch( searchId );
 			
 
 			Set<Integer> retrieved_reported_peptide_id_values_Set = new HashSet<>();

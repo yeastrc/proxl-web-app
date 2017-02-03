@@ -42,7 +42,7 @@ public class SearchUtils {
 		
 		try {
 			
-			int searchId = prprotein.getSearch().getId();
+			int searchId = prprotein.getSearch().getSearchId();
 			int proteinSequenceId = prprotein.getProteinSequenceObject().getProteinSequenceId();
 			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
@@ -130,7 +130,7 @@ public class SearchUtils {
 		
 		try {
 			
-			int searchId = prprotein.getSearch().getId();
+			int searchId = prprotein.getSearch().getSearchId();
 			int proteinSequenceId = prprotein.getProteinSequenceObject().getProteinSequenceId();
 			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );

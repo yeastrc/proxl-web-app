@@ -194,7 +194,7 @@
 			
 						
 						<logic:iterate name="searches" id="search">
-							<input type="hidden" name="searchIds" value="<bean:write name="search" property="id" />">
+							<input type="hidden" name="searchIds" value="<bean:write name="search" property="projectSearchId" />">
 						</logic:iterate>
 
 				<input type="hidden" name="queryJSON" id="query_json_field" />
@@ -398,13 +398,13 @@
 
 						<c:forEach items="${ searches }" var="search"  varStatus="searchVarStatus">
 		
-							<th id="search_header_<bean:write name="search" property="id" />" style="text-align:left;font-weight:bold;width:25px;"
-								><bean:write name="search" property="id" /></th>
+							<th id="search_header_<bean:write name="search" property="searchId" />" style="text-align:left;font-weight:bold;width:25px;"
+								><bean:write name="search" property="searchId" /></th>
 								
 							<script >
-								$("#search_header_<bean:write name="search" property="id" />").qtip( {
+								$("#search_header_<bean:write name="search" property="searchId" />").qtip( {
 							        content: {
-							            text: '<bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="id" />)'
+							            text: '<bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="searchId" />)'
 							        },
 							        position: {
 							            my: 'bottom left',
@@ -499,7 +499,7 @@
 								
 								onclick="viewCrosslinkProteinsLoadedFromWebServiceTemplate.showHideCrosslinkProteins( { clickedElement : this })"
 								project_id="${ projectId }"
-								search_ids="<c:forEach var="searchEntryForThisRow" items="${ proteinEntry.searches }">,${ searchEntryForThisRow.id }</c:forEach>"
+								search_ids="<c:forEach var="searchEntryForThisRow" items="${ proteinEntry.searches }">,${ searchEntryForThisRow.projectSearchId }</c:forEach>"
 								protein_1_id="<bean:write name="proteinEntry" property="protein1.proteinSequenceObject.proteinSequenceId" />"
 								protein_2_id="<bean:write name="proteinEntry" property="protein2.proteinSequenceObject.proteinSequenceId" />"
 								protein_1_position="<bean:write name="proteinEntry" property="protein1Position" />"

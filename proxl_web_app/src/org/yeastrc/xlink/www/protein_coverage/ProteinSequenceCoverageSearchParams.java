@@ -30,7 +30,7 @@ public class ProteinSequenceCoverageSearchParams {
 		
 		ProteinSequenceCoverageSearchParams params = new ProteinSequenceCoverageSearchParams();
 		
-		params.setSearchId( scvslParams.getSearchId() );
+		params.setProjectSearchId( scvslParams.getProjectSearchId() );
 		params.setProteinId( proteinId );
 		
 		Map<Integer, Double> filters = new HashMap<>();
@@ -53,7 +53,7 @@ public class ProteinSequenceCoverageSearchParams {
 	@Override
 	public String toString() {
 		
-		String theString = this.getSearchId() + "-";
+		String theString = this.getProjectSearchId() + "-";
 		theString += this.getProteinId() + "-";
 		
 		List<Integer> annoIds = new ArrayList<>( this.getAnnotationFilters().keySet() );
@@ -79,7 +79,7 @@ public class ProteinSequenceCoverageSearchParams {
 		
 		ProteinSequenceCoverageSearchParams pscp = (ProteinSequenceCoverageSearchParams)o;
 		
-		if( this.getSearchId() != pscp.getSearchId() ) return false;
+		if( this.getProjectSearchId() != pscp.getProjectSearchId() ) return false;
 		if( this.getProteinId() != pscp.getProteinId() ) return false;
 		
 		if( this.getAnnotationFilters() == null && pscp.getAnnotationFilters() == null ) return true;
@@ -88,11 +88,11 @@ public class ProteinSequenceCoverageSearchParams {
 	}
 	
 	
-	public int getSearchId() {
-		return searchId;
+	public int getProjectSearchId() {
+		return projectSearchId;
 	}
-	public void setSearchId(int searchId) {
-		this.searchId = searchId;
+	public void setProjectSearchId(int projectSearchId) {
+		this.projectSearchId = projectSearchId;
 	}
 	public int getProteinId() {
 		return proteinId;
@@ -107,7 +107,7 @@ public class ProteinSequenceCoverageSearchParams {
 		this.annotationFilters = annotationFilters;
 	}
 	
-	private int searchId;
+	private int projectSearchId;
 	private int proteinId;
 	private Map<Integer, Double> annotationFilters;
 	

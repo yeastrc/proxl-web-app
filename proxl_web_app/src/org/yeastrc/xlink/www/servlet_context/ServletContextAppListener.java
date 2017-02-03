@@ -16,6 +16,7 @@ import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.db_web.DBConnectionFactoryWeb;
 import org.yeastrc.xlink.www.db_web.DBSet_JNDI_Name_FromConfigFile;
+import org.yeastrc.xlink.www.no_data_validation.ThrowExceptionOnNoDataConfig;
 import org.yeastrc.xlink.www.web_utils.GetJsCssCacheBustString;
 
 
@@ -48,6 +49,13 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		{
 			isDevEnv = true;
 		}
+		
+		try {
+			ThrowExceptionOnNoDataConfig.getInstance().init();
+		} catch (Exception e) {
+			//  already logged
+			throw new RuntimeException( e );
+		} 
 		
 
 		try {

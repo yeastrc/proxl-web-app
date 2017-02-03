@@ -24,18 +24,19 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePage;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePageWrapper;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesPerSearchForMergedPeptidePageResult;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesPerSearchForMergedPeptidePageResultEntry;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher;
 import org.yeastrc.xlink.www.annotation_display.AnnTypeIdDisplayJSONRoot;
 import org.yeastrc.xlink.www.annotation_display.AnnTypeIdDisplayJSON_PerSearch;
 import org.yeastrc.xlink.www.annotation_display.DeserializeAnnTypeIdDisplayJSONRoot;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
+import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
@@ -58,13 +59,13 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getReportedPeptidesForUnifiedPeptId") 
 	public ReportedPeptidesPerSearchForMergedPeptidePageResult getViewerData( 
-			@QueryParam( "search_ids" ) List<Integer> searchIdList,
+			@QueryParam( "search_ids" ) List<Integer> projectSearchIdList,
 			@QueryParam( "unified_reported_peptide_id" ) Integer unifiedReportedPeptideId,
 			@QueryParam( "psmPeptideCutoffsForSearchIds" ) String psmPeptideCutoffsForSearchIds_JSONString,
 			@QueryParam( "annTypeDisplay" ) String annTypeDisplay_JSONString,
 			@Context HttpServletRequest request )
 					throws Exception {
-		if ( searchIdList == null || searchIdList.isEmpty() ) {
+		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
 			String msg = "Provided searchIds is null or searchIds is missing or searchIds list is empty";
 			log.error( msg );
 			throw new WebApplicationException(
@@ -94,23 +95,15 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 		try {
 			// Get the session first.  
 			//			HttpSession session = request.getSession();
-			//			if ( searchIds.isEmpty() ) {
-			//				
-			//				throw new WebApplicationException(
-			//						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-			//						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
-			//						.build()
-			//						);
-			//			}
 			//   Get the project id for this search
-			Set<Integer> searchIdsCollection = new HashSet<Integer>( );
-			searchIdsCollection.addAll( searchIdList );
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForSearchIdsSearcher.getInstance().getProjectIdsForSearchIds( searchIdsCollection );
+			Set<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
+			projectSearchIdsCollection.addAll( projectSearchIdList );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsCollection );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
 				String msg = "No project ids for search ids: ";
-				for ( int searchId : searchIdList ) {
-					msg += searchId + ", ";
+				for ( int projectSearchId : projectSearchIdList ) {
+					msg += projectSearchId + ", ";
 				}				
 				log.error( msg );
 				throw new WebApplicationException(
@@ -182,7 +175,7 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 			}
 			
 			ReportedPeptidesPerSearchForMergedPeptidePageResult results =
-					getPeptideData( cutoffValuesRootLevel, annTypeIdDisplayRoot, searchIdsCollection, unifiedReportedPeptideId );
+					getPeptideData( cutoffValuesRootLevel, annTypeIdDisplayRoot, projectSearchIdsCollection, unifiedReportedPeptideId );
 			return results;
 		} catch ( WebApplicationException e ) {
 			throw e;
@@ -214,34 +207,65 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 	private ReportedPeptidesPerSearchForMergedPeptidePageResult getPeptideData( 
 			CutoffValuesRootLevel cutoffValuesRootLevel,
 			AnnTypeIdDisplayJSONRoot annTypeIdDisplayRoot,
-			Set<Integer> searchIdsSet,
+			Set<Integer> projectSearchIdsSet,
 			int unifiedReportedPeptideId ) throws Exception {
+
+		Set<Integer> searchIdsSet = new HashSet<>( projectSearchIdsSet.size() );
+		List<SearchDTO> searchList = new ArrayList<>( projectSearchIdsSet.size() );
 		
+		for ( Integer projectSearchId : projectSearchIdsSet ) {
+			SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
+			if ( search == null ) {
+				String msg = ": No search found for projectSearchId: " + projectSearchId;
+				log.warn( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+			    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+			    	        .build()
+			    	        );
+			}
+			Integer searchId = search.getSearchId();
+			searchIdsSet.add( searchId );
+			searchList.add( search );
+		}
+		
+		Collections.sort( searchList, new Comparator<SearchDTO>() {
+			@Override
+			public int compare(SearchDTO o1, SearchDTO o2) {
+				return o1.getSearchId() - o2.getSearchId();
+			}
+		});
+
 		//  Main part of returned result
 		Map<Integer, ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> reportedPeptidesPerSearchIdMap = new HashMap<>();
-
-		//  Put search ids in list and sort them
-		List<Integer> searchIdsList = new ArrayList<>( searchIdsSet );
-		Collections.sort( searchIdsList );
 		
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory
-				.createSearcherCutoffValuesRootLevel( searchIdsList, cutoffValuesRootLevel );
+				.createSearcherCutoffValuesRootLevel( searchIdsSet, cutoffValuesRootLevel );
 		
 		SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel =
 				cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
 		
 		//  Process for each search id:
-		for ( Integer eachSearchIdToProcess : searchIdsList ) {
+		for ( SearchDTO search : searchList ) {
 			
-			String searchIdAsString = eachSearchIdToProcess.toString();
+			int eachProjectSearchIdToProcess = search.getProjectSearchId();
+			int eachSearchIdToProcess = search.getSearchId();
+			
+			String searchIdAsString = Integer.toString( eachSearchIdToProcess );
 			
 			List<ReportedPeptidesForMergedPeptidePage> reportedPepidesListOutput = new ArrayList<>();
 
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
-					searcherCutoffValuesRootLevel.getPerSearchCutoffs( eachSearchIdToProcess );
+					searcherCutoffValuesRootLevel.getPerSearchCutoffs( eachProjectSearchIdToProcess );
 			if ( searcherCutoffValuesSearchLevel == null ) {
-				searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
+				String msg = "searcherCutoffValuesRootLevel.getPerSearchCutoffs(projectSearchId) returned null for:  " + eachProjectSearchIdToProcess;
+				log.error( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+			    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+			    	        .build()
+			    	        );
 			}
 
 			////////////////////
@@ -256,29 +280,19 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 			}
 			
 			//  First get list of reported peptide ids for unifiedReportedPeptideId and search id
-			
-			List<Integer> singleSearchIdList = new ArrayList<>( 1 );
-			singleSearchIdList.add( eachSearchIdToProcess );
-			List<ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult>  resultList = 
+			List<Integer>  reportedPeptideIdList = 
 					ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher.getInstance()
-					.getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( singleSearchIdList, unifiedReportedPeptideId );
+					.getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( eachSearchIdToProcess, unifiedReportedPeptideId );
 			
 			//  Sort on reported peptide id
-			Collections.sort( resultList, new Comparator<ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult>() {
-				@Override
-				public int compare(ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult o1, ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult o2) {
-					return o1.getReportedPeptideId() - o2.getReportedPeptideId();
-				}
-			});		
+			Collections.sort( reportedPeptideIdList );
 			SearchPeptideWebserviceCommonCodeGetDataResult searchPeptideWebserviceCommonCodeGetDataResult = null;
 			
 			//  Process each search id, reported peptide id pair
-			for ( ReportedPeptideIdsForSearchIdsUnifiedPeptideIdResult item : resultList ) {
-				int reportedPeptideId = item.getReportedPeptideId();
-				
+			for ( int reportedPeptideId : reportedPeptideIdList ) {
 				//  Get Peptide data
 				List<ReportedPeptidesForMergedPeptidePageWrapper> peptideWebDisplayList = 
-						ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher.getInstance().getReportedPeptidesWebDisplay( eachSearchIdToProcess, reportedPeptideId, searcherCutoffValuesSearchLevel );
+						ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher.getInstance().getReportedPeptidesWebDisplay( search, eachSearchIdToProcess, reportedPeptideId, searcherCutoffValuesSearchLevel );
 
 				//  Get Annotation Data for links and Sort Links
 				searchPeptideWebserviceCommonCodeGetDataResult =
@@ -315,7 +329,7 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 				serviceResultEntry.setPeptideAnnotationDisplayNameDescriptionList( searchPeptideWebserviceCommonCodeGetDataResult.getPeptideAnnotationDisplayNameDescriptionList() );
 				serviceResultEntry.setPsmAnnotationDisplayNameDescriptionList( searchPeptideWebserviceCommonCodeGetDataResult.getPsmAnnotationDisplayNameDescriptionList() );
 				serviceResultEntry.setReportedPepides( reportedPepidesListOutput );
-				reportedPeptidesPerSearchIdMap.put( eachSearchIdToProcess, serviceResultEntry );
+				reportedPeptidesPerSearchIdMap.put( eachProjectSearchIdToProcess, serviceResultEntry );
 			}
 		}  //  END:  for each search id
 		

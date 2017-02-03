@@ -14,7 +14,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
+import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
@@ -387,10 +389,22 @@ public class SearchPeptideWebserviceCommonCode {
 
 				//  Process the Peptide annotation types (sorted on sort order), comparing the values
 
-				for ( AnnotationTypeDTO srchPgmFilterableReportedPeptideAnnotationTypeDTO : reportedPeptide_AnnotationTypeDTO_SortOrder_List ) {
+				for ( AnnotationTypeDTO annotationTypeDTO : reportedPeptide_AnnotationTypeDTO_SortOrder_List ) {
 
-					Integer typeId = srchPgmFilterableReportedPeptideAnnotationTypeDTO.getId();
-
+					Integer typeId = annotationTypeDTO.getId();
+					AnnotationTypeFilterableDTO annotationTypeFilterableDTO = annotationTypeDTO.getAnnotationTypeFilterableDTO();
+					if ( annotationTypeFilterableDTO == null ) {
+						String msg = "Peptide AnnotationTypeFilterableDTO == null for type id: " + typeId;
+						log.error( msg );
+						throw new RuntimeException(msg);
+					}
+					FilterDirectionType annTypeFilterDirectionType = annotationTypeFilterableDTO.getFilterDirectionType();
+					if ( annTypeFilterDirectionType == null ) {
+						String msg = "Peptide FilterDirectionType == null for type id: " + typeId;
+						log.error( msg );
+						throw new RuntimeException(msg);
+					}
+					
 					AnnotationDataBaseDTO o1_SearchReportedPeptideAnnotationDTO = o1.getPeptideAnnotationDTOMap().get( typeId );
 					if ( o1_SearchReportedPeptideAnnotationDTO == null ) {
 
@@ -410,22 +424,39 @@ public class SearchPeptideWebserviceCommonCode {
 					double o2Value = o2_SearchReportedPeptideAnnotationDTO.getValueDouble();
 					
 					if ( o1Value != o2Value ) {
-
-						if ( o1Value < o2Value ) {
-
-							return -1;
+						if ( annTypeFilterDirectionType == FilterDirectionType.ABOVE ) {
+							if ( o1Value > o2Value ) {
+								return -1;
+							} else {
+								return 1;
+							}
 						} else {
-							return 1;
+							if ( o1Value < o2Value ) {
+								return -1;
+							} else {
+								return 1;
+							}
 						}
 					}
 				}
 				
 				//  If everything matches, process the PSM annotation types (sorted on some order), comparing the values
 
-				for ( AnnotationTypeDTO psmAnnotationTypeDTO : psmCutoffsAnnotationTypeDTOList ) {
+				for ( AnnotationTypeDTO annotationTypeDTO : psmCutoffsAnnotationTypeDTOList ) {
 
-					Integer typeId = psmAnnotationTypeDTO.getId();
-
+					Integer typeId = annotationTypeDTO.getId();
+					AnnotationTypeFilterableDTO annotationTypeFilterableDTO = annotationTypeDTO.getAnnotationTypeFilterableDTO();
+					if ( annotationTypeFilterableDTO == null ) {
+						String msg = "Peptide AnnotationTypeFilterableDTO == null for type id: " + typeId;
+						log.error( msg );
+						throw new RuntimeException(msg);
+					}
+					FilterDirectionType annTypeFilterDirectionType = annotationTypeFilterableDTO.getFilterDirectionType();
+					if ( annTypeFilterDirectionType == null ) {
+						String msg = "Peptide FilterDirectionType == null for type id: " + typeId;
+						log.error( msg );
+						throw new RuntimeException(msg);
+					}
 					AnnotationDataBaseDTO o1_PsmPeptideAnnotationDTO = o1.getPsmAnnotationDTOMap().get( typeId );
 					if ( o1_PsmPeptideAnnotationDTO == null ) {
 
@@ -443,12 +474,19 @@ public class SearchPeptideWebserviceCommonCode {
 						throw new RuntimeException(msg);
 					}
 					double o2Value = o2_PsmPeptideAnnotationDTO.getValueDouble();
-
 					if ( o1Value != o2Value ) {
-						if ( o1Value < o2Value ) {
-							return -1;
+						if ( annTypeFilterDirectionType == FilterDirectionType.ABOVE ) {
+							if ( o1Value > o2Value ) {
+								return -1;
+							} else {
+								return 1;
+							}
 						} else {
-							return 1;
+							if ( o1Value < o2Value ) {
+								return -1;
+							} else {
+								return 1;
+							}
 						}
 					}
 				}

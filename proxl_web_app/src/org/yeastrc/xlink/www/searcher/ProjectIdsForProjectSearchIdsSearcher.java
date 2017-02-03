@@ -10,20 +10,20 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
-public class ProjectIdsForSearchIdsSearcher {
+public class ProjectIdsForProjectSearchIdsSearcher {
 	
-	private static final Logger log = Logger.getLogger(ProjectIdsForSearchIdsSearcher.class);
+	private static final Logger log = Logger.getLogger(ProjectIdsForProjectSearchIdsSearcher.class);
 
-	private ProjectIdsForSearchIdsSearcher() { }
-	public static ProjectIdsForSearchIdsSearcher getInstance() { return new ProjectIdsForSearchIdsSearcher(); }
+	private ProjectIdsForProjectSearchIdsSearcher() { }
+	public static ProjectIdsForProjectSearchIdsSearcher getInstance() { return new ProjectIdsForProjectSearchIdsSearcher(); }
 
 	/**
-	 * Get a list of project ids for the collection of search ids
-	 * @param searchIds
+	 * Get a list of project ids for the collection of project_search ids
+	 * @param projectSearchIds
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Integer> getProjectIdsForSearchIds( Collection<Integer> searchIds ) throws Exception {
+	public List<Integer> getProjectIdsForProjectSearchIds( Collection<Integer> projectSearchIds ) throws Exception {
 
 		List<Integer>  resultList = new ArrayList<>();
 		
@@ -32,14 +32,14 @@ public class ProjectIdsForSearchIdsSearcher {
 		ResultSet rs = null;
 		
 		final String sqlMain = " SELECT project_id FROM ( SELECT DISTINCT project_id AS project_id "
-				 + " FROM search "
+				 + " FROM project_search "
 				 + " WHERE id IN (";
 		
 		final String sqlEnd = ") ) AS project_ids INNER JOIN project ON project_ids.project_id = project.id WHERE project.enabled = 1 AND project.marked_for_deletion = 0  ";
 		
 		String sqlSearchIdsString = null;
 		
-		for ( Integer searchId : searchIds ) {
+		for ( Integer searchId : projectSearchIds ) {
 			
 			if ( sqlSearchIdsString == null ) {
 				

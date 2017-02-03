@@ -93,7 +93,7 @@ public class SearchDTODetailsDisplayWrapper {
 			return searchProgramDisplayList;
 		}
 		
-		int searchId = getSearchDTO().getId();
+		int searchId = getSearchDTO().getSearchId();
 		
 		searchProgramDisplayList = SearchProgramDisplaySearcher.getInstance().getSearchProgramDisplay( searchId );
 		
@@ -115,7 +115,7 @@ public class SearchDTODetailsDisplayWrapper {
 			throw new IllegalStateException( "searchDTO == null");
 		}
 		
-		cutoffsAppliedOnImportList = GetCutoffsAppliedOnImportForSearchList.getInstance().getCutoffsAppliedOnImportList( searchDTO.getId() );
+		cutoffsAppliedOnImportList = GetCutoffsAppliedOnImportForSearchList.getInstance().getCutoffsAppliedOnImportList( searchDTO.getSearchId() );
 		
 		return cutoffsAppliedOnImportList;
 	}

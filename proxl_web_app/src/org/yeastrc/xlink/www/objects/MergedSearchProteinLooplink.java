@@ -35,44 +35,6 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 			if ( searchProteinLooplinks == null ) {
 
 				throw new Exception( "searchProteinCrosslinks == null, no longer looking up the data" );
-
-				// add search-level info for the protein looplinks:
-//
-//				searchProteinLooplinks = new TreeMap<SearchDTO, SearchProteinLooplink>();
-//
-//
-//				for ( SearchDTO search : searches ) {
-//
-//					int searchId = search.getId(); 
-//
-//					SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = searcherCutoffValuesRootLevel.getPerSearchCutoffs( searchId );
-//
-//					if ( searcherCutoffValuesSearchLevel == null ) {
-//
-//						String msg = "No searcherCutoffValuesSearchLevel found in searcherCutoffValuesRootLevel for search id: " + searchId;
-//						log.error( msg );
-//						throw new Exception(msg);
-//					}
-//
-//					SearchProteinLooplinkWrapper searchProteinLooplinkWrapper = 
-//							SearchProteinLooplinkSearcher.getInstance().search(
-//									search, 
-//									searcherCutoffValuesSearchLevel, 
-//									this.getProtein().getProteinSequenceObject(),
-//									this.getProteinPosition1(),
-//									this.getProteinPosition2()
-//									);
-//
-//					if ( searchProteinLooplinkWrapper != null ) {
-//
-//						SearchProteinLooplink tlink = searchProteinLooplinkWrapper.getSearchProteinLooplink(); 
-//
-//						if( tlink != null ) {
-//							searchProteinLooplinks.put( search, tlink );
-//						}
-//					}
-//				}
-
 			}
 
 			return searchProteinLooplinks;

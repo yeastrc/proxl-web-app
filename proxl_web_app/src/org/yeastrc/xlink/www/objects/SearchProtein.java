@@ -16,7 +16,7 @@ public class SearchProtein implements IProtein {
 	}
 	
 	public int hashCode() {
-		return ("" + this.getProteinSequenceObject().getProteinSequenceId() + "-" + this.getSearch().getId() ).hashCode();
+		return ("" + this.getProteinSequenceObject().getProteinSequenceId() + "-" + this.getSearch().getSearchId() ).hashCode();
 	}
 	
 	public boolean equals( Object o ) {
@@ -25,7 +25,7 @@ public class SearchProtein implements IProtein {
 		if( ((SearchProtein)o).getProteinSequenceObject().getProteinSequenceId() != this.getProteinSequenceObject().getProteinSequenceId() )
 			return false;
 		
-		if( ((SearchProtein)o).getSearch().getId() != this.getSearch().getId() )
+		if( ((SearchProtein)o).getSearch().getSearchId() != this.getSearch().getSearchId() )
 			return false;
 		
 		return true;

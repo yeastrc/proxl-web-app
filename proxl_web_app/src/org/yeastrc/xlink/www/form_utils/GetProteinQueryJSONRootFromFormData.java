@@ -2,6 +2,7 @@ package org.yeastrc.xlink.www.form_utils;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -49,7 +50,9 @@ public class GetProteinQueryJSONRootFromFormData {
 	public ProteinQueryJSONRoot getProteinQueryJSONRootFromFormData( 
 			
 			ProteinCommonForm proteinCommonForm,
-			Collection<Integer> searchIds
+			Collection<Integer> projectSearchIds,
+			Collection<Integer> searchIds,
+			Map<Integer,Integer> mapProjectSearchIdToSearchId
 			) throws ProxlWebappDataException, Exception {
 
 
@@ -97,7 +100,8 @@ public class GetProteinQueryJSONRootFromFormData {
 			
 			
 			CutoffValuesRootLevel cutoffValuesRootLevel =
-					GetDefaultPsmPeptideCutoffs.getInstance().getDefaultPsmPeptideCutoffs( searchIds );
+					GetDefaultPsmPeptideCutoffs.getInstance()
+					.getDefaultPsmPeptideCutoffs( projectSearchIds,searchIds, mapProjectSearchIdToSearchId );
 			
 			proteinQueryJSONRoot.setCutoffs( cutoffValuesRootLevel );
 			

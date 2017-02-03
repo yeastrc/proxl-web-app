@@ -118,14 +118,14 @@
 			<div style="margin-bottom:20px;"> 
 				
 				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" searchId="${ search.id }"
-						>peptide.do?searchId=<bean:write name="search" property="id" 
+					href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" searchId="${ search.projectSearchId }"
+						>peptide.do?searchId=<bean:write name="search" property="projectSearchId" 
 						/>&queryJSON=<c:out value="${ peptidePageQueryJSON }" escapeXml="false" 
 						></c:out></proxl:defaultPageUrl>"
 						>Peptide View</a>]
 						 									
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
-						href="${ contextPath }/<proxl:defaultPageUrl pageName="/proteinCoverageReport" searchId="${ search.id }">proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+						href="${ contextPath }/<proxl:defaultPageUrl pageName="/proteinCoverageReport" searchId="${ search.projectSearchId }">proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 						>Coverage Report</a>]
 				
 				<%-- Navigation links to Merged Image and Merged Structure --%>
@@ -257,7 +257,7 @@
 						<c:set var="UpdateButtonText" value="Update"/>
 						<input type="button" value="${ UpdateButtonText }"  onclick="viewSearchLooplinkProteinPageCode.updatePageForFormParams()" >
 						
-						<c:set var="searchId" value="${ search.id }"/>	
+						<c:set var="searchId" value="${ search.projectSearchId }"/>	
 						<c:set var="page_JS_Object" value="viewSearchProteinPageCommonCrosslinkLooplinkCoverage"/>
 												
 						<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
@@ -272,7 +272,7 @@
 			<div style="display:inline;">
 
 				[<a class="tool_tip_attached_jq" data-tooltip="View crosslinks (instead of looplinks)" 
-						href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" searchId="${ search.id }">crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+						href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" searchId="${ search.projectSearchId }">crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 						>View Crosslinks (<bean:write name="numCrosslinks" />)</a>]
 
 				[<a class="tool_tip_attached_jq" data-tooltip="Download all looplinks as tab-delimited text" href="${ contextPath }/downloadMergedProteins.do?<bean:write name="mergedQueryString" />">Download Data (<bean:write name="numLinks" />)</a>]
@@ -347,7 +347,7 @@
 								
 								
 								onclick="viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.showHideLooplinkReportedPeptides( { clickedElement : this })"
-								search_id="${ search.id }"
+								search_id="${ search.projectSearchId }"
 								project_id="${ projectId }"
 								protein_id="<bean:write name="looplink" property="protein.proteinSequenceObject.proteinSequenceId" />"
 								protein_position_1="<bean:write name="looplink" property="proteinPosition1" />"

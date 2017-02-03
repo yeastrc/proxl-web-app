@@ -4,9 +4,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 
+/**
+ * 
+ *
+ */
 public class ImageViewerData {
 
 	public Collection<Integer> getProteins() {
@@ -48,11 +51,11 @@ public class ImageViewerData {
 		this.proteinLoopLinkPositions = proteinLoopLinkPositions;
 	}
 
-	public Collection<SearchDTO> getSearches() {
+	public Collection<SearchDTO_PartsForImageStructureWebservices> getSearches() {
 		return searches;
 	}
 
-	public void setSearches(Collection<SearchDTO> searches) {
+	public void setSearches(Collection<SearchDTO_PartsForImageStructureWebservices> searches) {
 		this.searches = searches;
 	}
 	
@@ -177,7 +180,7 @@ public class ImageViewerData {
 	private Collection<Integer> excludeTaxonomy;
 	private Collection<Integer> excludeType;
 	private Collection<Integer> proteins;
-	private Collection<SearchDTO> searches;
+	private Collection<SearchDTO_PartsForImageStructureWebservices> searches;
 	private Map<Integer, String> proteinNames;
 	private Map<Integer, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>> proteinLinkPositions;
 	private Map<Integer, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>> proteinLoopLinkPositions;

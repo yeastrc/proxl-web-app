@@ -176,12 +176,12 @@ public class MergedSearchPeptideUnlinked implements IMergedSearchLink {
 			for ( SearchDTO search : searches ) {
 
 				Integer reportedPeptideIdForSearchId =
-						reportedPeptideIds_KeyedOnSearchId_Map.get( search.getId() );
+						reportedPeptideIds_KeyedOnSearchId_Map.get( search.getSearchId() );
 
 				if ( reportedPeptideIdForSearchId == null ) {
 
 					String msg = "reportedPeptideIdForSearchId == null for getCrosslinkPeptideProteinPositions()."
-							+ ", search.getId(): " + search.getId();
+							+ ", search.getId(): " + search.getSearchId();
 					log.error( msg );
 					throw new ProxlWebappDataException(msg);
 				}
@@ -217,7 +217,7 @@ public class MergedSearchPeptideUnlinked implements IMergedSearchLink {
 					
 					for ( SearchDTO searchInSearches : searches ) {
 						
-						if ( search.getId() == searchInSearches.getId() ) {
+						if ( search.getSearchId() == searchInSearches.getSearchId() ) {
 							
 							searchFound = true;
 							break;

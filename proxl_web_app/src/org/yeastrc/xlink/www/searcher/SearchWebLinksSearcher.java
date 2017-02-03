@@ -29,7 +29,7 @@ public class SearchWebLinksSearcher {
 			String sql = "SELECT id FROM search_web_links WHERE search_id = ? ORDER BY link_label";
 			
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, search.getId() );
+			pstmt.setInt( 1, search.getProjectSearchId() );
 			
 			rs = pstmt.executeQuery();
 			while( rs.next() ) {
@@ -37,23 +37,19 @@ public class SearchWebLinksSearcher {
 			}
 			
 		} finally {
-			
 			// be sure database handles are closed
 			if( rs != null ) {
 				try { rs.close(); } catch( Throwable t ) { ; }
 				rs = null;
 			}
-			
 			if( pstmt != null ) {
 				try { pstmt.close(); } catch( Throwable t ) { ; }
 				pstmt = null;
 			}
-			
 			if( conn != null ) {
 				try { conn.close(); } catch( Throwable t ) { ; }
 				conn = null;
 			}
-			
 		}
 		
 		return comments;

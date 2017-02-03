@@ -22,15 +22,15 @@ public class ProteinListingTooltipConfigUtil {
 	/**
 	 * 
 	 * 
-	 * @param searchIds
+	 * @param projectSearchIdsSet
 	 * @param request
 	 * @throws Exception 
 	 */
-	public void putProteinListingTooltipConfigForPage( Collection<Integer> searchIds, HttpServletRequest request ) throws Exception {
+	public void putProteinListingTooltipConfigForPage( Collection<Integer> projectSearchIdsSet, HttpServletRequest request ) throws Exception {
 		
 		try {
 
-			request.setAttribute( "searchIdsForProteinListing", searchIds );
+			request.setAttribute( "searchIdsForProteinListing", projectSearchIdsSet );
 
 			String protein_listing_webservice_base_url = 
 					ConfigSystemCaching.getInstance().getConfigValueForConfigKey( ConfigSystemsKeysConstants.PROTEIN_LISTING_FROM_SEQUENCE_TAXONOMY_WEBSERVICE_URL_KEY );

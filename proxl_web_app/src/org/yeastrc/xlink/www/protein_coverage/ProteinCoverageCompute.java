@@ -115,21 +115,20 @@ public class ProteinCoverageCompute {
 		
 		{
 			for ( SearchDTO search : searches ) {
-
+				Integer projectSearchId = search.getProjectSearchId();
 				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
-						searcherCutoffValuesRootLevel.getPerSearchCutoffs( search.getId() );
-				
+						searcherCutoffValuesRootLevel.getPerSearchCutoffs( projectSearchId );
 				if ( searcherCutoffValuesSearchLevel == null ) {
-					
-					searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
+					String msg = "searcherCutoffValuesRootLevel.getPerSearchCutoffs(projectSearchId) returned null for:  " + projectSearchId;
+					log.error( msg );
+					throw new ProxlWebappDataException( msg );
 				}
-
 				{
 					List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
 							CrosslinkLinkedPositions.getInstance()
 							.getSearchProteinCrosslinkWrapperList( search, searcherCutoffValuesSearchLevel );
 					
-					wrappedCrosslinks_MappedOnSearchId.put( search.getId(), wrappedCrosslinks );
+					wrappedCrosslinks_MappedOnSearchId.put( search.getSearchId(), wrappedCrosslinks );
 
 					for ( SearchProteinCrosslinkWrapper wrappedCrosslink : wrappedCrosslinks ) {
 
@@ -146,7 +145,7 @@ public class ProteinCoverageCompute {
 							LooplinkLinkedPositions.getInstance()
 							.getSearchProteinLooplinkWrapperList( search, searcherCutoffValuesSearchLevel );
 
-					wrappedLooplinks_MappedOnSearchId.put( search.getId(), wrappedLooplinks );
+					wrappedLooplinks_MappedOnSearchId.put( search.getSearchId(), wrappedLooplinks );
 					
 					for ( SearchProteinLooplinkWrapper wrappedLooplink : wrappedLooplinks ) {
 
@@ -162,7 +161,7 @@ public class ProteinCoverageCompute {
 							MonolinkLinkedPositions.getInstance()
 							.getSearchProteinMonolinkWrapperList( search, searcherCutoffValuesSearchLevel );
 
-					wrappedMonolinks_MappedOnSearchId.put( search.getId(), wrappedMonolinks );
+					wrappedMonolinks_MappedOnSearchId.put( search.getSearchId(), wrappedMonolinks );
 					
 					for ( SearchProteinMonolinkWrapper wrappedMonolink : wrappedMonolinks ) {
 
@@ -557,7 +556,7 @@ public class ProteinCoverageCompute {
 		
 		Set<Integer> searchIds = new HashSet<>();
 		for ( SearchDTO search : searches ) {
-			int searchId = search.getId();
+			int searchId = search.getSearchId();
 			searchIds.add( searchId );
 		}
 
@@ -605,7 +604,7 @@ public class ProteinCoverageCompute {
 			
 			for ( SearchDTO search : protein.getSearchs() ) {
 				
-				searchIdsSet.add( search.getId() );
+				searchIdsSet.add( search.getSearchId() );
 			}
 			
 			List<MergedSearchProtein> mergedSearchProteinList = mergedSearchProtein_KeyedOnSearchIds_Map.get( searchIdsSet );
@@ -662,7 +661,7 @@ public class ProteinCoverageCompute {
 					//  Get all taxonomy ids for protein sequence id and search id
 
 					Set<Integer> taxonomyIds = 
-							TaxonomyIdsForProtSeqIdSearchIdSearcher.getInstance().getTaxonomyIdsSingleSearch( protein.getProteinSequenceObject(), searchDTO.getId() );
+							TaxonomyIdsForProtSeqIdSearchIdSearcher.getInstance().getTaxonomyIdsSingleSearch( protein.getProteinSequenceObject(), searchDTO.getSearchId() );
 
 					for ( Integer taxonomyId : taxonomyIds ) {
 

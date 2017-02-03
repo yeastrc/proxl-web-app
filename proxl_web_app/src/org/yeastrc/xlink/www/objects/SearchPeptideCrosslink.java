@@ -1,6 +1,7 @@
 package org.yeastrc.xlink.www.objects;
 
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -117,13 +118,16 @@ public class SearchPeptideCrosslink {
 //		return search;
 //	}
 	public void setSearch(SearchDTO search) {
+		if ( search == null ) {
+			throw new InvalidParameterException( "search cannot be assigned to null");
+		}
 		this.search = search;
 	}
 	
 
 	public int getSearchId() {
 		
-		return search.getId();
+		return search.getSearchId();
 	}
 
 	
@@ -369,7 +373,7 @@ public class SearchPeptideCrosslink {
 
 			numUniquePsms = 
 					PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher.getInstance()
-					.getPsmCountForUniquePSM_SearchIdReportedPeptideId( this.getReportedPeptideId(), this.search.getId(), searcherCutoffValuesSearchLevel );
+					.getPsmCountForUniquePSM_SearchIdReportedPeptideId( this.getReportedPeptideId(), this.search.getSearchId(), searcherCutoffValuesSearchLevel );
 			
 			
 			
@@ -398,7 +402,7 @@ public class SearchPeptideCrosslink {
 
 		numPsms = 
 				PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
-				.getPsmCountForSearchIdReportedPeptideId( this.reportedPeptideId, search.getId(), searcherCutoffValuesSearchLevel );
+				.getPsmCountForSearchIdReportedPeptideId( this.reportedPeptideId, search.getSearchId(), searcherCutoffValuesSearchLevel );
 
 		numPsmsSet = true;
 

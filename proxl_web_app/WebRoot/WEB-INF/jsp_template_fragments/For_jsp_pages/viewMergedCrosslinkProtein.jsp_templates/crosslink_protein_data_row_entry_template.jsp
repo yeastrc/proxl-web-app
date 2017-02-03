@@ -6,7 +6,9 @@
 	
 	<%--  Protein Data Per Search Template --%>
 
-
+<%-- 
+	Include in <script id="crosslink_protein_data_row_entry_template"  type="text/x-handlebars-template">
+--%>
 
 <tr id=""
 	style="cursor: pointer; "
@@ -17,6 +19,7 @@
 	protein_2_id="{{ protein_2_id }}"
 	protein_1_position="{{ protein_1_position }}"
 	protein_2_position="{{ protein_2_position }}"
+	ssssssssss="sssssssssee"
 >
 
 	<td>{{ data.searchName }}</td>
