@@ -305,15 +305,15 @@ DROP TABLE IF EXISTS search_comment ;
 
 CREATE TABLE  search_comment (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  search_id INT(10) UNSIGNED NOT NULL,
+  project_search_id INT(10) UNSIGNED NOT NULL,
   comment VARCHAR(2000) NOT NULL,
   commentTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   auth_user_id INT UNSIGNED NULL,
   commentCreatedTimestamp TIMESTAMP NULL,
   created_auth_user_id INT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT perc_run_comment_ibfk_1
-    FOREIGN KEY (search_id)
+  CONSTRAINT search_comment_project_search_fk
+    FOREIGN KEY (project_search_id)
     REFERENCES project_search (id)
     ON DELETE CASCADE
     ON UPDATE RESTRICT,
@@ -324,7 +324,7 @@ CREATE TABLE  search_comment (
     ON UPDATE RESTRICT)
 ENGINE = InnoDB;
 
-CREATE INDEX search_id ON search_comment (search_id ASC, commentTimestamp ASC);
+CREATE INDEX search_id ON search_comment (project_search_id ASC, commentTimestamp ASC);
 
 CREATE INDEX search_comment_user_fk_idx ON search_comment (auth_user_id ASC);
 
@@ -762,7 +762,7 @@ DROP TABLE IF EXISTS search_web_links ;
 
 CREATE TABLE  search_web_links (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  search_id INT UNSIGNED NOT NULL,
+  project_search_id INT UNSIGNED NOT NULL,
   auth_user_id INT UNSIGNED NULL,
   link_url VARCHAR(600) NOT NULL,
   link_label VARCHAR(400) NOT NULL,
@@ -773,13 +773,13 @@ CREATE TABLE  search_web_links (
     REFERENCES auth_user (id)
     ON DELETE SET NULL
     ON UPDATE RESTRICT,
-  CONSTRAINT search_links_search_id_fk
-    FOREIGN KEY (search_id)
+  CONSTRAINT search_links_project_search_id_fk
+    FOREIGN KEY (project_search_id)
     REFERENCES project_search (id)
     ON DELETE CASCADE)
 ENGINE = InnoDB;
 
-CREATE INDEX search_links_search_id_fk_idx ON search_web_links (search_id ASC);
+CREATE INDEX search_links_search_id_fk_idx ON search_web_links (project_search_id ASC);
 
 CREATE INDEX search_links_auth_user_id_fk_idx ON search_web_links (auth_user_id ASC);
 
@@ -843,7 +843,7 @@ CREATE TABLE  unified_rep_pep_dynamic_mod_lookup (
   position INT(10) UNSIGNED NOT NULL,
   mass DOUBLE NOT NULL,
   mass_rounded DOUBLE NOT NULL,
-  mass_rounded_string VARCHAR(200) COLLATE 'latin1_general_ci' NOT NULL,
+  mass_rounded_string VARCHAR(200) NOT NULL,
   mass_rounding_places SMALLINT NOT NULL,
   mod_order SMALLINT NOT NULL,
   PRIMARY KEY (id),
@@ -1081,7 +1081,7 @@ CREATE INDEX search_id_ann_type_id_link_type ON psm_filterable_annotation__gener
 DROP TABLE IF EXISTS default_page_view_generic ;
 
 CREATE TABLE  default_page_view_generic (
-  search_id INT UNSIGNED NOT NULL,
+  project_search_id INT UNSIGNED NOT NULL,
   page_name VARCHAR(80) NOT NULL,
   auth_user_id_created_record INT UNSIGNED NOT NULL,
   auth_user_id_last_updated_record INT UNSIGNED NOT NULL,
@@ -1089,15 +1089,15 @@ CREATE TABLE  default_page_view_generic (
   date_record_last_updated DATETIME NULL,
   url VARCHAR(6000) NOT NULL,
   query_json VARCHAR(6000) NOT NULL,
-  PRIMARY KEY (search_id, page_name),
+  PRIMARY KEY (project_search_id, page_name),
   CONSTRAINT default_page_view_generic_auth_user_id_fk
     FOREIGN KEY (auth_user_id_created_record)
     REFERENCES auth_user (id)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT default_page_view_generic_search_id_fk
-    FOREIGN KEY ()
-    REFERENCES project_search ()
+  CONSTRAINT default_page_view_generic_project_search_id_fk
+    FOREIGN KEY (project_search_id)
+    REFERENCES project_search (id)
     ON DELETE CASCADE
     ON UPDATE RESTRICT,
   CONSTRAINT default_page_view_generic_auth_lst_upd
@@ -1107,7 +1107,7 @@ CREATE TABLE  default_page_view_generic (
     ON UPDATE RESTRICT)
 ENGINE = InnoDB;
 
-CREATE INDEX default_page_view_search_id_fk_idx ON default_page_view_generic (search_id ASC);
+CREATE INDEX default_page_view_search_id_fk_idx ON default_page_view_generic (project_search_id ASC);
 
 CREATE INDEX default_page_view_auth_user_id_fk_idx ON default_page_view_generic (auth_user_id_created_record ASC);
 

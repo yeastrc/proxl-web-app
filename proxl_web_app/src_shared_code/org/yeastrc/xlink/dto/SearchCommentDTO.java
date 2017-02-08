@@ -9,8 +9,8 @@ import org.joda.time.format.DateTimeFormat;
 public class SearchCommentDTO {
 	
 	
-	public SearchCommentDTO( int searchId, String comment, int authUserId ) {
-		this.searchid = searchId;
+	public SearchCommentDTO( int projectSearchid, String comment, int authUserId ) {
+		this.projectSearchid = projectSearchid;
 		this.comment = comment;
 		this.authUserId = authUserId;
 	}
@@ -39,12 +39,12 @@ public class SearchCommentDTO {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getSearchid() {
-		return searchid;
+	public int getProjectSearchid() {
+		return projectSearchid;
 	}
 
-	public void setSearchid(int searchid) {
-		this.searchid = searchid;
+	public void setProjectSearchid(int projectSearchid) {
+		this.projectSearchid = projectSearchid;
 	}
 
 	@XmlTransient //  Does not stop JACKSON from serializing to JSON
@@ -70,7 +70,7 @@ public class SearchCommentDTO {
 
 	private String comment;
 	private DateTime dateTime;	
-	private int searchid;
+	private int projectSearchid;
 	private Integer authUserId;
 
 	private int id;

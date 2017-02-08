@@ -29,26 +29,13 @@ public class DefaultPageViewGenericDAO {
 		return new DefaultPageViewGenericDAO(); 
 	}
 	
-//	CREATE TABLE default_page_view_generic (
-//			  search_id INT UNSIGNED NOT NULL,
-//			  page_name VARCHAR(80) NOT NULL,
-//			  auth_user_id INT UNSIGNED NOT NULL,
-//			  url VARCHAR(6000) NOT NULL,
-//			  query_json VARCHAR(6000) NOT NULL,
-
-
-	
-	
-
-
 	/**
-	 * @param searchId
+	 * @param projectSearchId
 	 * @param pageName
 	 * @return null if not found
 	 * @throws Exception
 	 */
-	public DefaultPageViewGenericDTO getForSearchIdPageName( int searchId, String pageName ) throws Exception {
-
+	public DefaultPageViewGenericDTO getForProjectSearchIdPageName( int projectSearchId, String pageName ) throws Exception {
 
 		DefaultPageViewGenericDTO returnItem = null;
 		
@@ -56,7 +43,7 @@ public class DefaultPageViewGenericDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		final String sql = "SELECT * FROM default_page_view_generic WHERE search_id = ? AND page_name = ?";
+		final String sql = "SELECT * FROM default_page_view_generic WHERE project_search_id = ? AND page_name = ?";
 
 		
 		try {
@@ -64,7 +51,7 @@ public class DefaultPageViewGenericDAO {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, searchId );
+			pstmt.setInt( 1, projectSearchId );
 			pstmt.setString( 2, pageName );
 			
 			rs = pstmt.executeQuery();
@@ -77,7 +64,7 @@ public class DefaultPageViewGenericDAO {
 			
 		} catch ( Exception e ) {
 			
-			String msg = "Failed to select DefaultPageViewDTO, id: " + searchId + ", sql: " + sql;
+			String msg = "Failed to select DefaultPageViewDTO, projectSearchId: " + projectSearchId + ", sql: " + sql;
 			
 			log.error( msg, e );
 			
@@ -108,13 +95,14 @@ public class DefaultPageViewGenericDAO {
 	}
 	
 	
-
+	//  Not currently used
+	
 	/**
-	 * @param searchId
+	 * @param projectSearchId
 	 * @return 
 	 * @throws Exception
 	 */
-	public List<DefaultPageViewGenericDTO> getForSearchId( int searchId ) throws Exception {
+	public List<DefaultPageViewGenericDTO> getForProjectSearchId( int projectSearchId ) throws Exception {
 
 
 		 List<DefaultPageViewGenericDTO> results = new ArrayList<>();
@@ -123,7 +111,7 @@ public class DefaultPageViewGenericDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		final String sql = "SELECT * FROM project WHERE search_id = ? ";
+		final String sql = "SELECT * FROM project WHERE project_search_id = ? ";
 
 		
 		try {
@@ -131,7 +119,7 @@ public class DefaultPageViewGenericDAO {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, searchId );
+			pstmt.setInt( 1, projectSearchId );
 			
 			rs = pstmt.executeQuery();
 			
@@ -143,7 +131,7 @@ public class DefaultPageViewGenericDAO {
 			
 		} catch ( Exception e ) {
 			
-			String msg = "Failed to select DefaultPageViewDTO, id: " + searchId + ", sql: " + sql;
+			String msg = "Failed to select DefaultPageViewDTO, projectSearchId: " + projectSearchId + ", sql: " + sql;
 			
 			log.error( msg, e );
 			
@@ -185,7 +173,7 @@ public class DefaultPageViewGenericDAO {
 		
 		DefaultPageViewGenericDTO returnItem = new DefaultPageViewGenericDTO();
 
-		returnItem.setSearchId( rs.getInt( "search_id" ) );
+		returnItem.setProjectSearchId( rs.getInt( "project_search_id" ) );
 		returnItem.setPageName( rs.getString( "page_name" ) );
 		returnItem.setAuthUserIdCreated( rs.getInt( "auth_user_id_created_record" ) );
 		returnItem.setAuthUserIdLastUpdated( rs.getInt( "auth_user_id_last_updated_record" ) );
@@ -226,7 +214,7 @@ public class DefaultPageViewGenericDAO {
 
 
 	private final String INSERT_SQL = "INSERT INTO default_page_view_generic "
-			+ " (search_id, page_name, "
+			+ " (project_search_id, page_name, "
 			+ 	" auth_user_id_created_record, auth_user_id_last_updated_record, "
 			+ 	" date_record_created, date_record_last_updated, "
 			+ 	" url, query_json ) " 
@@ -257,7 +245,7 @@ public class DefaultPageViewGenericDAO {
 			int counter = 0;
 			
 			counter++;
-			pstmt.setInt( counter, item.getSearchId() );
+			pstmt.setInt( counter, item.getProjectSearchId() );
 			counter++;
 			pstmt.setString( counter, item.getPageName() );
 			counter++;
@@ -337,7 +325,7 @@ public class DefaultPageViewGenericDAO {
 //		PreparedStatement pstmt = null;
 //		ResultSet rs = null;
 //
-//		final String sql = "UPDATE default_page_view SET url = ?, query_json = ?, auth_user_id = ? WHERE search_id = ? AND page_name = ?";
+//		final String sql = "UPDATE default_page_view SET url = ?, query_json = ?, auth_user_id = ? WHERE project_search_id = ? AND page_name = ?";
 //
 //		
 //		try {

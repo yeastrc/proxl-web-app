@@ -28,7 +28,7 @@ public class SearchCommentDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		final String sql = "INSERT INTO search_comment ( search_id, comment, auth_user_id, created_auth_user_id, commentCreatedTimestamp ) VALUES (?,?,?,?, NOW() )";
+		final String sql = "INSERT INTO search_comment ( project_search_id, comment, auth_user_id, created_auth_user_id, commentCreatedTimestamp ) VALUES (?,?,?,?, NOW() )";
 
 		try {
 			
@@ -36,7 +36,7 @@ public class SearchCommentDAO {
 			
 			pstmt = conn.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );
 			
-			pstmt.setInt( 1, comment.getSearchid() );
+			pstmt.setInt( 1, comment.getProjectSearchid() );
 			pstmt.setString( 2, comment.getComment() );
 			
 			if ( comment.getAuthUserId() != null ) {
@@ -153,7 +153,7 @@ public class SearchCommentDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		String sql = "SELECT search_id, comment, commentTimestamp FROM search_comment WHERE id = ?";
+		String sql = "SELECT project_search_id, comment, commentTimestamp FROM search_comment WHERE id = ?";
 
 		try {
 			
@@ -168,8 +168,7 @@ public class SearchCommentDAO {
 				comment = new SearchCommentDTO();
 				
 				comment.setId( id );
-//				comment.setSearch( SearchDAO.getInstance().getSearch( rs.getInt( 1 ) ) );
-				comment.setSearchid( rs.getInt( 1 ) );
+				comment.setProjectSearchid( rs.getInt( 1 ) );
 				comment.setComment( rs.getString( 2 ) );
 				comment.setDateTime( new DateTime( rs.getTimestamp( 3 ) ) );				
 			}

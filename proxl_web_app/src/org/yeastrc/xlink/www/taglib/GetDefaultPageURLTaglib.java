@@ -84,7 +84,7 @@ public class GetDefaultPageURLTaglib extends TagSupport {
     		throw new JspException( e );
     	} 
         try { 
-        	DefaultPageViewGenericDTO defaultPageViewDTO = DefaultPageViewGenericDAO.getInstance().getForSearchIdPageName( projectSearchIdInt, pageName );
+        	DefaultPageViewGenericDTO defaultPageViewDTO = DefaultPageViewGenericDAO.getInstance().getForProjectSearchIdPageName( projectSearchIdInt, pageName );
         	if ( defaultPageViewDTO != null ) {
         		returnValue = SKIP_BODY; // Do NOT print the contents of the body of the tag since print data here
         		// Get our writer for the JSP page using this tag

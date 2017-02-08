@@ -80,7 +80,7 @@ public class SearchCommentService {
 			    	        );
 			}
 				
-			int searchId = comment.getSearchid();
+			int searchId = comment.getProjectSearchid();
 			
 			
 
@@ -353,7 +353,7 @@ public class SearchCommentService {
 			    	        );
 			}
 				
-			int searchId = searchCommentDTOToGetSearchId.getSearchid();
+			int searchId = searchCommentDTOToGetSearchId.getProjectSearchid();
 			
 			
 
@@ -466,148 +466,150 @@ public class SearchCommentService {
 
 	}
 	
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/getForSearch")
-	public List<SearchCommentDTO> getForSearch( @QueryParam("searchId") int searchId, @Context HttpServletRequest request ) throws Exception {
-
-
-		if ( searchId == 0 ) {
-
-			String msg = "Provided searchId is zero, searchId = " + searchId;
-
-			log.error( msg );
-
-		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-		    	        .entity( msg )
-		    	        .build()
-		    	        );
-		}
-		
-		
-		try {
-
-			// Get the session first.  
-			HttpSession session = request.getSession();
-
-
-
-			//   Get the project id for this search
-			
-			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
-
-			searchIdsCollection.add( searchId );
-			
-			
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( searchIdsCollection );
-			
-			if ( projectIdsFromSearchIds.isEmpty() ) {
-				
-				// should never happen
-				
-				String msg = "No project ids for search id: " + searchId;
-				
-				log.error( msg );
-
-				throw new WebApplicationException(
-						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
-						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_TEXT ) // This string will be passed to the client
-						.build()
-						);
-			}
-			
-			if ( projectIdsFromSearchIds.size() > 1 ) {
-				
-				//  Invalid request, searches across projects
-				throw new WebApplicationException(
-						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_STATUS_CODE )  //  Send HTTP code
-						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_TEXT ) // This string will be passed to the client
-						.build()
-						);
-			}
-			
-
-			int projectId = projectIdsFromSearchIds.get( 0 );
-			
-
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-			
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-
-			if ( accessAndSetupWebSessionResult.isNoSession() ) {
-
-				//  No User session 
-
-				throw new WebApplicationException(
-						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-						.build()
-						);
-			}
-			
-			//  Test access to the project id
-			
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
-
-			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
-
-				//  No Access Allowed for this search id
-
-				throw new WebApplicationException(
-						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
-						.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
-						.build()
-						);
-			}
-
-
-			if ( log.isDebugEnabled() ) {
-				
-				log.debug( "getForSearch(): SearchId: " + searchId );
-			}
-			
-			
-			SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( searchId );
-			
-			if ( search == null ) {
-				
-				String msg = "Search not found in DB for searchId: " + searchId;
-				
-				log.error( msg );
-
-				throw new WebApplicationException(
-						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
-						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_TEXT ) // This string will be passed to the client
-						.build()
-						);
-			}
-			
-			return SearchCommentSearcher.getInstance().getCommentsForSearch( search );
-
-
-			
-		} catch ( WebApplicationException e ) {
-
-			throw e;
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Exception caught: " + e.toString();
-			
-			log.error( msg, e );
-			
-			
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
-					.build()
-					);
-		}
-
-			
-	}
+	//   Not Current,  Should use projectSearchId instead of searchId
+//	
+//	@GET
+//	@Produces(MediaType.APPLICATION_JSON)
+//	@Path("/getForSearch")
+//	public List<SearchCommentDTO> getForSearch( @QueryParam("searchId") int searchId, @Context HttpServletRequest request ) throws Exception {
+//
+//
+//		if ( searchId == 0 ) {
+//
+//			String msg = "Provided searchId is zero, searchId = " + searchId;
+//
+//			log.error( msg );
+//
+//		    throw new WebApplicationException(
+//		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity( msg )
+//		    	        .build()
+//		    	        );
+//		}
+//		
+//		
+//		try {
+//
+//			// Get the session first.  
+//			HttpSession session = request.getSession();
+//
+//
+//
+//			//   Get the project id for this search
+//			
+//			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
+//
+//			searchIdsCollection.add( searchId );
+//			
+//			
+//			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( searchIdsCollection );
+//			
+//			if ( projectIdsFromSearchIds.isEmpty() ) {
+//				
+//				// should never happen
+//				
+//				String msg = "No project ids for search id: " + searchId;
+//				
+//				log.error( msg );
+//
+//				throw new WebApplicationException(
+//						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
+//						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_TEXT ) // This string will be passed to the client
+//						.build()
+//						);
+//			}
+//			
+//			if ( projectIdsFromSearchIds.size() > 1 ) {
+//				
+//				//  Invalid request, searches across projects
+//				throw new WebApplicationException(
+//						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_STATUS_CODE )  //  Send HTTP code
+//						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_TEXT ) // This string will be passed to the client
+//						.build()
+//						);
+//			}
+//			
+//
+//			int projectId = projectIdsFromSearchIds.get( 0 );
+//			
+//
+//			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
+//					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+//			
+//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+//
+//			if ( accessAndSetupWebSessionResult.isNoSession() ) {
+//
+//				//  No User session 
+//
+//				throw new WebApplicationException(
+//						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+//						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+//						.build()
+//						);
+//			}
+//			
+//			//  Test access to the project id
+//			
+//			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+//
+//			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
+//
+//				//  No Access Allowed for this search id
+//
+//				throw new WebApplicationException(
+//						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
+//						.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
+//						.build()
+//						);
+//			}
+//
+//
+//			if ( log.isDebugEnabled() ) {
+//				
+//				log.debug( "getForSearch(): SearchId: " + searchId );
+//			}
+//			
+//			
+//			SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( searchId );
+//			
+//			if ( search == null ) {
+//				
+//				String msg = "Search not found in DB for searchId: " + searchId;
+//				
+//				log.error( msg );
+//
+//				throw new WebApplicationException(
+//						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
+//						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_TEXT ) // This string will be passed to the client
+//						.build()
+//						);
+//			}
+//			
+//			return SearchCommentSearcher.getInstance().getCommentsForSearch( search );
+//
+//
+//			
+//		} catch ( WebApplicationException e ) {
+//
+//			throw e;
+//			
+//		} catch ( Exception e ) {
+//			
+//			String msg = "Exception caught: " + e.toString();
+//			
+//			log.error( msg, e );
+//			
+//			
+//			throw new WebApplicationException(
+//					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
+//					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
+//					.build()
+//					);
+//		}
+//
+//			
+//	}
 
 	
 }

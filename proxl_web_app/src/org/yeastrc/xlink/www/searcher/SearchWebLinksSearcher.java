@@ -26,7 +26,7 @@ public class SearchWebLinksSearcher {
 		try {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			String sql = "SELECT id FROM search_web_links WHERE search_id = ? ORDER BY link_label";
+			String sql = "SELECT id FROM search_web_links WHERE project_search_id = ? ORDER BY link_label";
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, search.getProjectSearchId() );

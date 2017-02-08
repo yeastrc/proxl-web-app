@@ -1,9 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
-
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -18,20 +15,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.default_page_view.DefaultPageViewSaveOrUpdate;
-import org.yeastrc.xlink.www.default_page_view.GetDefaultURLFromPageURL;
-import org.yeastrc.xlink.www.dto.DefaultPageViewGenericDTO;
-import org.yeastrc.xlink.www.objects.GenericWebserviceResult;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProteinSequenceIdForNrseqProteinIdSearcher;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-
 
 
 @Path("/nrseqDataMapping")

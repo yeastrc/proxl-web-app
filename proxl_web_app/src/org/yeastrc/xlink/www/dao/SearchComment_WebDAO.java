@@ -35,7 +35,7 @@ public class SearchComment_WebDAO {
 
 		String sql = 
 				" INSERT INTO search_comment " 
-				+ "( search_id, comment, commentTimestamp, auth_user_id, commentCreatedTimestamp, created_auth_user_id ) " 
+				+ "( project_search_id, comment, commentTimestamp, auth_user_id, commentCreatedTimestamp, created_auth_user_id ) " 
 				+ " SELECT " 
 				 + newProjectSearchId + ", comment, commentTimestamp, auth_user_id, commentCreatedTimestamp, created_auth_user_id"
 				+ " FROM search_comment "

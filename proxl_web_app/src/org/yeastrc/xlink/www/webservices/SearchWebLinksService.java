@@ -79,7 +79,7 @@ public class SearchWebLinksService {
 			    	        );
 			}
 				
-			int searchId = webLink.getSearchid();
+			int searchId = webLink.getProjectSearchid();
 			
 
 
@@ -308,7 +308,7 @@ public class SearchWebLinksService {
 			
 			SearchWebLinksDTO webLinksDTO  = new SearchWebLinksDTO();
 			
-			webLinksDTO.setSearchid( searchId );
+			webLinksDTO.setProjectSearchid( searchId );
 			webLinksDTO.setAuthUserId( authUserId );
 			
 			webLinksDTO.setLinkUrl( linkUrl );

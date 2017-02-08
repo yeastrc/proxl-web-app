@@ -29,11 +29,11 @@ public class SearchWebLinksDAO {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String sql = "INSERT INTO search_web_links ( search_id, auth_user_id, link_url, link_label ) VALUES (?,?,?,?)";
+		String sql = "INSERT INTO search_web_links ( project_search_id, auth_user_id, link_url, link_label ) VALUES (?,?,?,?)";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );
-			pstmt.setInt( 1, webLinks.getSearchid() );
+			pstmt.setInt( 1, webLinks.getProjectSearchid() );
 			pstmt.setInt( 2, webLinks.getAuthUserId() );
 			pstmt.setString( 3, webLinks.getLinkUrl() );
 			pstmt.setString( 4, webLinks.getLinkLabel() );
@@ -114,7 +114,7 @@ public class SearchWebLinksDAO {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT search_id, link_url, link_label, link_timestamp FROM search_web_links  WHERE id = ?";
+		String sql = "SELECT project_search_id, link_url, link_label, link_timestamp FROM search_web_links  WHERE id = ?";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
@@ -123,7 +123,7 @@ public class SearchWebLinksDAO {
 			if( rs.next() ) {
 				webLinks = new SearchWebLinksDTO();
 				webLinks.setId( id );
-				webLinks.setSearchid( rs.getInt( "search_id" ) );
+				webLinks.setProjectSearchid( rs.getInt( "project_search_id" ) );
 				webLinks.setLinkUrl( rs.getString( "link_url" ) );
 				webLinks.setLinkLabel( rs.getString( "link_label" ) );
 				webLinks.setDateTime( new DateTime( rs.getTimestamp( "link_timestamp" ) ) );				
@@ -167,11 +167,11 @@ public class SearchWebLinksDAO {
 		ResultSet rs = null;
 		String sql = 
 				" INSERT INTO search_web_links " 
-				+ "( search_id, auth_user_id, link_url, link_label, link_timestamp ) " 
+				+ "( project_search_id, auth_user_id, link_url, link_label, link_timestamp ) " 
 				+ " SELECT " 
 				 + newProjectSearchId + ", auth_user_id, link_url, link_label, link_timestamp"
 				+ " FROM search_web_links "
-				+ " WHERE search_web_links.search_id = " + oldProjectSearchId;
+				+ " WHERE search_web_links.project_search_id = " + oldProjectSearchId;
 				;
 		try {
 //			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );

@@ -99,31 +99,6 @@ public class CopyProjectSearchIdToNewProjectUsingDBTransactionService {
 		SearchFileProjectSearch_WebDAO.getInstance()
 		.duplicateRecordsForProjectSearchIdWithNewProjectSearchId( projectSearchId, insertedProjectsearchId, dbConnection );
 		
-		//  Copy records associated with projectSearchId
-		
-//		CREATE TABLE  search_comment (
-//				  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-//				  search_id INT(10) UNSIGNED NOT NULL,
-//				  comment VARCHAR(2000) NOT NULL,
-//				  commentTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-//				  auth_user_id INT UNSIGNED NULL,
-//				  commentCreatedTimestamp TIMESTAMP NULL,
-//				  created_auth_user_id INT NULL,
-//
-//		  CREATE TABLE  search_web_links (
-//				  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//				  search_id INT UNSIGNED NOT NULL,
-//				  auth_user_id INT UNSIGNED NULL,
-//				  link_url VARCHAR(600) NOT NULL,
-//				  link_label VARCHAR(400) NOT NULL,
-//				  link_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-//  
-//		  CREATE TABLE  search_file__project_search (
-//				  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//				  search_file_id INT UNSIGNED NOT NULL,
-//				  project_search_id INT UNSIGNED NOT NULL,
-//				  display_filename VARCHAR(255) NOT NULL,
-//		
 		return insertedProjectsearchId;
 	}
 	

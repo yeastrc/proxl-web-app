@@ -137,7 +137,7 @@ public class DefaultPageViewService {
 			defaultPageViewDTO.setPageName( pageName );
 			defaultPageViewDTO.setUrl( defaultURLFromPageURLString );
 			defaultPageViewDTO.setQueryJSON( pageQueryJSON );
-			defaultPageViewDTO.setSearchId( projectSearchId );
+			defaultPageViewDTO.setProjectSearchId( projectSearchId );
 			defaultPageViewDTO.setAuthUserIdCreated( userSessionObject.getUserDBObject().getAuthUser().getId() );
 			defaultPageViewDTO.setAuthUserIdLastUpdated( userSessionObject.getUserDBObject().getAuthUser().getId() );
 			DefaultPageViewSaveOrUpdate.getInstance().defaultPageViewSaveOrUpdate( defaultPageViewDTO );

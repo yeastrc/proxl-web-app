@@ -26,7 +26,7 @@ public class SearchCommentSearcher {
 		try {
 						
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			String sql = "SELECT id FROM search_comment WHERE search_id = ? ORDER BY commentTimestamp";
+			String sql = "SELECT id FROM search_comment WHERE project_search_id = ? ORDER BY commentTimestamp";
 			
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, search.getProjectSearchId() );

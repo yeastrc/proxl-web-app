@@ -14,7 +14,7 @@ public class SearchWebLinksDTO {
 	private String linkUrl;
 	private String linkLabel;
 	private DateTime dateTime;	
-	private int searchid;
+	private int projectSearchid;
 	private int authUserId;
 
 	private int id;
@@ -49,11 +49,11 @@ public class SearchWebLinksDTO {
 	public void setLinkLabel(String linkLabel) {
 		this.linkLabel = linkLabel;
 	}
-	public int getSearchid() {
-		return searchid;
+	public int getProjectSearchid() {
+		return projectSearchid;
 	}
-	public void setSearchid(int searchid) {
-		this.searchid = searchid;
+	public void setProjectSearchid(int projectSearchid) {
+		this.projectSearchid = projectSearchid;
 	}
 	public int getAuthUserId() {
 		return authUserId;
@@ -69,12 +69,4 @@ public class SearchWebLinksDTO {
 	}
 	
 }
-
-//CREATE TABLE search_web_links (
-//id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//search_id INT UNSIGNED NOT NULL,
-//auth_user_id INT UNSIGNED NULL,
-//link_url VARCHAR(600) NOT NULL,
-//link_label VARCHAR(400) NOT NULL,
-//link_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 

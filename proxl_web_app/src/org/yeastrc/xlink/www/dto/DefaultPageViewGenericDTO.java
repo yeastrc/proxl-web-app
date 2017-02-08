@@ -8,7 +8,7 @@ import java.util.Date;
  */
 public class DefaultPageViewGenericDTO {
 
-	private int searchId;
+	private int projectSearchId;
 	private String pageName;
 	
 	private int authUserIdCreated;
@@ -32,11 +32,11 @@ public class DefaultPageViewGenericDTO {
 
 	
 
-	public int getSearchId() {
-		return searchId;
+	public int getProjectSearchId() {
+		return projectSearchId;
 	}
-	public void setSearchId(int searchId) {
-		this.searchId = searchId;
+	public void setProjectSearchId(int projectSearchId) {
+		this.projectSearchId = projectSearchId;
 	}
 	public String getPageName() {
 		return pageName;
