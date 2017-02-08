@@ -21,7 +21,10 @@ public class SearchDAO {
 	public static SearchDAO getInstance() { return new SearchDAO(); }
 	
 	private static final String GET_FROM_PROJECT_SEARCH_ID_SQL =
-			"SELECT search_id, path, directory_name, load_time, fasta_filename, search_name, project_id, search_display_order, has_scan_data "
+			"SELECT project_search.search_id, "
+			+ " search.path, search.directory_name, "
+			+ " search.load_time, search.fasta_filename, search.has_scan_data, "
+			+ " project_search.search_name, project_search.project_id, project_search.search_display_order "
 			+ " FROM project_search INNER JOIN search ON project_search.search_id = search.id "
 			+ " WHERE project_search.id = ?";
 	
