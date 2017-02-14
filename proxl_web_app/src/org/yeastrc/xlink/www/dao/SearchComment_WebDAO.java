@@ -39,7 +39,7 @@ public class SearchComment_WebDAO {
 				+ " SELECT " 
 				 + newProjectSearchId + ", comment, commentTimestamp, auth_user_id, commentCreatedTimestamp, created_auth_user_id"
 				+ " FROM search_comment "
-				+ " WHERE search_comment.search_id = " + oldProjectSearchId;
+				+ " WHERE search_comment.project_search_id = " + oldProjectSearchId;
 				;
 		try {
 //			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
