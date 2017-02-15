@@ -44,18 +44,18 @@ var SharePageURLShortener = function() {
 			
 			//  Get search ids from attr on button
 			
-			var search_id_comma_delim_list = $clickedThis.attr("data-search_id_comma_delim_list");
-			if ( search_id_comma_delim_list !== undefined && search_id_comma_delim_list !== "" ) {
+			var project_search_id_comma_delim_list = $clickedThis.attr("data-project_search_id_comma_delim_list");
+			if ( project_search_id_comma_delim_list !== undefined && project_search_id_comma_delim_list !== "" ) {
 
-				var searchIdStringList = search_id_comma_delim_list.split(",");
-				var searchIdIntList = [];
-				for ( var index = 0; index < searchIdStringList.length; index++ ) {
-					var searchIdString = searchIdStringList[ index ];
-					var searchIdInt = parseInt( searchIdString, 10 );
-					searchIdIntList.push( searchIdInt );
+				var projectSearchIdStringList = project_search_id_comma_delim_list.split(",");
+				var projectSearchIdIntList = [];
+				for ( var index = 0; index < projectSearchIdStringList.length; index++ ) {
+					var projectSearchIdString = projectSearchIdStringList[ index ];
+					var projectSearchIdInt = parseInt( projectSearchIdString, 10 );
+					projectSearchIdIntList.push( projectSearchIdInt );
 				}
 				
-				requestObj.searchIdList = searchIdIntList;
+				requestObj.projectSearchIdList = projectSearchIdIntList;
 			}
 		
 			var requestData = JSON.stringify( requestObj );

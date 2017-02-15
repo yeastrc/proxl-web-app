@@ -154,22 +154,22 @@
 
 	<input type="hidden" id="project_id" value="<c:out value="${ project_id }"></c:out>"> 
 	
-	<c:forEach var="searchId" items="${ searchIds }">
+	<c:forEach var="projectSearchId" items="${ projectSearchIds }">
 	
-		<%--  Put Search Ids on the page for the JS code --%>
-		<input type="hidden" class=" search_id_jq " value="<c:out value="${ searchId }"></c:out>">
+		<%--  Put Project_Search_Ids on the page for the JS code --%>
+		<input type="hidden" class=" project_search_id_jq " value="<c:out value="${ projectSearchId }"></c:out>">
 	</c:forEach>
 	
-	<c:if test="${ not empty onlySingleSearchId }">
+	<c:if test="${ not empty onlySingleProjectSearchId }">
 	
 		<input type="hidden" id="viewSearchPeptideDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="/peptide" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ onlySingleProjectSearchId }"></proxl:defaultPageUrl>">
 		<input type="hidden" id="viewSearchCrosslinkProteinDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="/crosslinkProtein" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ onlySingleProjectSearchId }"></proxl:defaultPageUrl>">
 		<input type="hidden" id="viewProteinCoverageReportDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="/proteinCoverageReport" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="/proteinCoverageReport" projectSearchId="${ onlySingleProjectSearchId }"></proxl:defaultPageUrl>">
 		<input type="hidden" id="viewMergedStructureDefaultPageUrl" 
-			value="<proxl:defaultPageUrl pageName="/structure" searchId="${ onlySingleSearchId }"></proxl:defaultPageUrl>">
+			value="<proxl:defaultPageUrl pageName="/structure" projectSearchId="${ onlySingleProjectSearchId }"></proxl:defaultPageUrl>">
 	</c:if>
 					
 	
@@ -260,8 +260,8 @@
 						
 						<input type="button" value="${ UpdateButtonText }"  onclick="refreshData()" >
 
-						<c:if test="${ not empty onlySingleSearchId }">
-							<c:set var="searchId" value="${ onlySingleSearchId }"/>	
+						<c:if test="${ not empty onlySingleProjectSearchId }">
+							<c:set var="projectSearchId" value="${ onlySingleProjectSearchId }"/>	
 							<c:set var="page_JS_Object" value="imageViewerPageObject"/>
 							
 							<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
@@ -329,7 +329,7 @@
 							<option value="region">Region</option>
 							
 							<c:choose>
-							  <c:when test="${ fn:length( searchIds ) <= 3 }">
+							  <c:when test="${ fn:length( projectSearchIds ) <= 3 }">
 							
 								<%-- Only shown when the number of searches is <= the number supported by 'Color by search' --%>
 								<option value="search">Search</option>

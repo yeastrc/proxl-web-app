@@ -21,7 +21,7 @@
 			id="sharePageButton"
 			class=" tool_tip_attached_jq  "
 			data-tooltip="Create and share a link to this view of the data." 
-			data-search_id_comma_delim_list="${ search_id_comma_delim_list }"
+			data-project_search_id_comma_delim_list="${ search_id_comma_delim_list }"
 			onclick="sharePageURLShortener.sharePage( { clickedThis : this } )" />
 			
 	  </div>

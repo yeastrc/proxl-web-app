@@ -96,10 +96,10 @@
 		
 		<%-- Data for one search --%>
 		
-		<div id="annotation_displays_modal_dialog_overlay_div_search_id_${ search.projectSearchId }"
+		<div id="annotation_displays_modal_dialog_overlay_div_project_search_id_${ search.projectSearchId }"
 			style="${ initialHidePerSearch }"
 			class=" per_search_container_jq "
-			data-search_id="${ search.projectSearchId }">
+			data-project_search_id="${ search.projectSearchId }">
 <%-- 		
 		  <c:if test="${ moreThanOneSearch }">
 			<div >

@@ -63,12 +63,12 @@ var searchesToMerge = new Array();
 
 //////////
 //   Called by "onclick" on HTML element
-function checkSearchCheckboxes( searchId) {
+function checkSearchCheckboxes( projectSearchId) {
 	try {
-		if( $( "input#search-checkbox-" + searchId ).is( ":checked" ) ) {
-			if( searchesToMerge.indexOf( searchId ) == -1 ) { searchesToMerge.push( searchId ); }
+		if( $( "input#search-checkbox-" + projectSearchId ).is( ":checked" ) ) {
+			if( searchesToMerge.indexOf( projectSearchId ) == -1 ) { searchesToMerge.push( projectSearchId ); }
 		} else {
-			var index = searchesToMerge.indexOf( searchId );
+			var index = searchesToMerge.indexOf( projectSearchId );
 			if( index != -1 ) {
 				searchesToMerge.splice( index, 1 );
 			}

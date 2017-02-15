@@ -78,10 +78,10 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		if ( dataLoaded ) {
 			return;  //  EARLY EXIT  since data already loaded. 
 		}
-		var initial_scan_id = $clickedElement.attr( "initial_scan_id" );
-		var reported_peptide_id = $clickedElement.attr( "reported_peptide_id" );
-		var search_id = $clickedElement.attr( "search_id" );
-		var skip_associated_peptides_link = $clickedElement.attr( "skip_associated_peptides_link" );
+		var initial_scan_id = $clickedElement.attr( "data-initial_scan_id" );
+		var reported_peptide_id = $clickedElement.attr( "data-reported_peptide_id" );
+		var project_search_id = $clickedElement.attr( "data-project_search_id" );
+		var skip_associated_peptides_link = $clickedElement.attr( "data-skip_associated_peptides_link" );
 		var show_associated_peptides_link_true = true; // default to true
 		if ( skip_associated_peptides_link === "true" ) {
 			show_associated_peptides_link_true = false;
@@ -90,38 +90,38 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		if ( ! reported_peptide_id ) {
 			reported_peptide_id = "";
 		}
-		if ( ! search_id ) {
-			search_id = "";
+		if ( ! project_search_id ) {
+			project_search_id = "";
 		}
 		//   Currently expect _psmPeptideCriteria = 
 //	           The key to:
 //					searches - searchId
 //					peptideCutoffValues and psmCutoffValues - annotation type id
 //				peptideCutoffValues.id and psmCutoffValues.id - annotation type id
-		var psmPeptideCutoffsForSearchId = _psmPeptideCutoffsRootObject.searches[ search_id ];
-		if ( psmPeptideCutoffsForSearchId === undefined || psmPeptideCutoffsForSearchId === null ) {
-			psmPeptideCutoffsForSearchId = {};
-//			throw Error( "Getting data.  Unable to get cutoff data for search id: " + search_id );
+		var psmPeptideCutoffsForProjectSearchId = _psmPeptideCutoffsRootObject.searches[ project_search_id ];
+		if ( psmPeptideCutoffsForProjectSearchId === undefined || psmPeptideCutoffsForProjectSearchId === null ) {
+			psmPeptideCutoffsForProjectSearchId = {};
+//			throw Error( "Getting data.  Unable to get cutoff data for project_search_id: " + project_search_id );
 		}
-		var psmPeptideCutoffsForSearchId_JSONString = JSON.stringify( psmPeptideCutoffsForSearchId );
+		var psmPeptideCutoffsForProjectSearchId_JSONString = JSON.stringify( psmPeptideCutoffsForProjectSearchId );
 		var psmAnnTypeDisplayIncludeExclude_JSONString = null;
 		if ( _psmPeptideAnnTypeIdDisplay ) {
-			var psmPeptideAnnTypeIdDisplayForSearchId = _psmPeptideAnnTypeIdDisplay.searches[ search_id ];
+			var psmPeptideAnnTypeIdDisplayForSearchId = _psmPeptideAnnTypeIdDisplay.searches[ project_search_id ];
 			if ( psmPeptideAnnTypeIdDisplayForSearchId === undefined || psmPeptideAnnTypeIdDisplayForSearchId === null ) {
 //				psmPeptideAnnTypeIdDisplayForSearchId = {};
-				throw Error( "Getting data.  Unable to get ann type display data for search id: " + search_id );
+				throw Error( "Getting data.  Unable to get ann type display data for project_search_id: " + project_search_id );
 			}
 			var psmAnnTypeIdDisplayForSearchId = psmPeptideAnnTypeIdDisplayForSearchId.psm;
 			if ( psmAnnTypeIdDisplayForSearchId === undefined || psmAnnTypeIdDisplayForSearchId === null ) {
-				throw Error( "Getting data.  Unable to get ann type display data for search id: " + search_id + " and .psm" );
+				throw Error( "Getting data.  Unable to get ann type display data for project_search_id: " + project_search_id + " and .psm" );
 			}
 			var psmAnnTypeDisplayIncludeExclude = { inclAnnTypeId : psmAnnTypeIdDisplayForSearchId };
 			psmAnnTypeDisplayIncludeExclude_JSONString = JSON.stringify( psmAnnTypeDisplayIncludeExclude );
 		}
 		var ajaxRequestData = {
 				reported_peptide_id : reported_peptide_id,
-				search_id : search_id,
-				psmPeptideCutoffsForSearchId : psmPeptideCutoffsForSearchId_JSONString,
+				project_search_id : project_search_id,
+				psmPeptideCutoffsForProjectSearchId : psmPeptideCutoffsForProjectSearchId_JSONString,
 				psmAnnTypeDisplayIncludeExclude : psmAnnTypeDisplayIncludeExclude_JSONString
 		};
 		$.ajax({
@@ -267,7 +267,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 					context.scanIdMatchesInitialScanId = true;
 				}
 				context.project_id = ajaxRequestData.project_id;
-				context.search_id = ajaxRequestData.search_id;
+				context.project_search_id = ajaxRequestData.project_search_id;
 				context.reported_peptide_id = ajaxRequestData.reported_peptide_id;
 				context.show_associated_peptides_link_true = show_associated_peptides_link_true;
 				html = _handlebarsTemplate_psm_data_row_entry_template(context);

@@ -168,8 +168,8 @@ QCChartPSMScoreVsScores.prototype.downloadData = function( ) {
 		var looplinkChartData = this.globals.chartDataFromServer.looplinkChartData;
 		var unlinkedChartData = this.globals.chartDataFromServer.unlinkedChartData;
 
-		var $psm_score_vs_score_qc_plot_current_search_id = $("#psm_score_vs_score_qc_plot_current_search_id");
-		var searchId = $psm_score_vs_score_qc_plot_current_search_id.val( );
+		var $psm_score_vs_score_qc_plot_current_project_search_id = $("#psm_score_vs_score_qc_plot_current_project_search_id");
+		var projectSearchId = $psm_score_vs_score_qc_plot_current_project_search_id.val( );
 		
 		//  Selected Annotation Text
 		var selectedAnnotationTypeText_1 = $("#psm_score_vs_score_qc_plot_score_type_id_1 option:selected").text();
@@ -196,7 +196,7 @@ QCChartPSMScoreVsScores.prototype.downloadData = function( ) {
 				var outputScore_2_Value = dataForTypeEntry.score_2.toFixed( PSM_SCORE_VS_SCORE_CHART_BIN_START_OR_END_TO_FIXED_VALUE );
 				
 				var outputLine = 
-					searchId + 
+					projectSearchId + 
 					"\t" + dataForTypeEntry.psmId + 
 					"\t" + outputType + 
 					"\t" + outputScore_1_Value + 
@@ -306,7 +306,7 @@ QCChartPSMScoreVsScores.prototype.openPSMScoreVsScoreQCPlotOverlay = function(cl
 	var $clickThis = $(clickThis);
 	//	get root div for this search
 	var $search_root_jq = $clickThis.closest(".search_root_jq");
-	var searchId = $search_root_jq.attr("searchId");	
+	var projectSearchId = $search_root_jq.attr("data-project_search_id");	
 	// copy the search name to the overlay
 	var $search_name_display_jq = $search_root_jq.find(".search_name_display_jq");
 	var search_name_display_jq = $search_name_display_jq.text();
@@ -330,10 +330,10 @@ QCChartPSMScoreVsScores.prototype.openPSMScoreVsScoreQCPlotOverlay = function(cl
 	$psm_score_vs_score_qc_plot_overlay_background.show();
 	$psm_score_vs_score_qc_plot_overlay_container.show();
 	////////////////
-	var $psm_score_vs_score_qc_plot_current_search_id = $("#psm_score_vs_score_qc_plot_current_search_id");
-	var prevSearchId = $psm_score_vs_score_qc_plot_current_search_id.val( );
-	if ( prevSearchId === searchId ) {
-		////  Same Search Id as when last opened so just show it
+	var $psm_score_vs_score_qc_plot_current_project_search_id = $("#psm_score_vs_score_qc_plot_current_project_search_id");
+	var prevProjectSearchId = $psm_score_vs_score_qc_plot_current_project_search_id.val( );
+	if ( prevProjectSearchId === projectSearchId ) {
+		////  Same ProjectSearchId as when last opened so just show it
 		var $psm_score_vs_score_qc_plot_overlay_background = $("#psm_score_vs_score_qc_plot_overlay_background"); 
 		$psm_score_vs_score_qc_plot_overlay_background.show();
 		$psm_score_vs_score_qc_plot_overlay_container.show();
@@ -342,10 +342,10 @@ QCChartPSMScoreVsScores.prototype.openPSMScoreVsScoreQCPlotOverlay = function(cl
 
 	this.globals.currentSearchData = undefined;   ///  Reset "currentSearchData" for new search
 	this.populateCutoffsOnImportMessage( { $search_root_jq: $search_root_jq } );
-	$psm_score_vs_score_qc_plot_current_search_id.val( searchId );
+	$psm_score_vs_score_qc_plot_current_project_search_id.val( projectSearchId );
 	
-	this.getPSMFilterableAnnTypesForSearchId( { 
-		searchId: searchId
+	this.getPSMFilterableAnnTypesForProjectSearchId( { 
+		projectSearchId: projectSearchId
 	} );
 };
 
@@ -365,15 +365,15 @@ QCChartPSMScoreVsScores.prototype.populateCutoffsOnImportMessage = function( par
 };
 
 ///  
-QCChartPSMScoreVsScores.prototype.getPSMFilterableAnnTypesForSearchId = function( params ) {
+QCChartPSMScoreVsScores.prototype.getPSMFilterableAnnTypesForProjectSearchId = function( params ) {
 	var objectThis = this;
-	var searchId = params.searchId;
+	var projectSearchId = params.projectSearchId;
 	if ( ! qcChartsInitialized ) {
 		throw "qcChartsInitialized is false"; 
 	}
-	var _URL = contextPathJSVar + "/services/annotationTypes/getAnnotationTypesPsmFilterableForSearchId";
+	var _URL = contextPathJSVar + "/services/annotationTypes/getAnnotationTypesPsmFilterableForProjectSearchId";
 	var requestData = {
-			searchId : searchId
+			projectSearchId : projectSearchId
 	};
 //	var request =
 	$.ajax({
@@ -382,7 +382,7 @@ QCChartPSMScoreVsScores.prototype.getPSMFilterableAnnTypesForSearchId = function
 		data : requestData,
 		dataType : "json",
 		success : function(data) {
-			objectThis.getPSMFilterableAnnTypesForSearchIdResponse(requestData, data, params);
+			objectThis.getPSMFilterableAnnTypesForProjectSearchIdResponse(requestData, data, params);
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -394,7 +394,7 @@ QCChartPSMScoreVsScores.prototype.getPSMFilterableAnnTypesForSearchId = function
 };
 
 ///
-QCChartPSMScoreVsScores.prototype.getPSMFilterableAnnTypesForSearchIdResponse = function(requestData, responseData, originalParams) {
+QCChartPSMScoreVsScores.prototype.getPSMFilterableAnnTypesForProjectSearchIdResponse = function(requestData, responseData, originalParams) {
 	var annTypesSearchProgramsPerSearch = responseData.annotationTypeList;
 	if (  annTypesSearchProgramsPerSearch.length === 0 ) {
 		throw "annTypesSearchProgramsPerSearch.length === 0";
@@ -439,9 +439,7 @@ QCChartPSMScoreVsScores.prototype.getPSMFilterableAnnTypesForSearchIdResponse = 
 //			$psm_score_vs_score_qc_plot_score_type_id_2.val( annType.id );
 		}
 	}
-	this.createChartFromPageParams( { 
-		searchId: originalParams.searchId
-	} );
+	this.createChartFromPageParams();
 };
 
 
@@ -537,8 +535,8 @@ QCChartPSMScoreVsScores.prototype.createChartFromPageParams = function( ) {
 			}
 		}
 	}	
-	var $psm_score_vs_score_qc_plot_current_search_id = $("#psm_score_vs_score_qc_plot_current_search_id");
-	var searchId = $psm_score_vs_score_qc_plot_current_search_id.val( );
+	var $psm_score_vs_score_qc_plot_current_project_search_id = $("#psm_score_vs_score_qc_plot_current_project_search_id");
+	var projectSearchId = $psm_score_vs_score_qc_plot_current_project_search_id.val( );
 	var $psm_score_vs_score_qc_plot_score_type_id_1 = $("#psm_score_vs_score_qc_plot_score_type_id_1");
 	var annotationTypeId_1 = $psm_score_vs_score_qc_plot_score_type_id_1.val();
 	var selectedAnnotationType_1_Text = $("#psm_score_vs_score_qc_plot_score_type_id_1 option:selected").text();
@@ -555,7 +553,7 @@ QCChartPSMScoreVsScores.prototype.createChartFromPageParams = function( ) {
 	}
 	
 	var createChartParams =  {  
-			searchId : searchId,
+			projectSearchId : projectSearchId,
 			annotationTypeId_1 : annotationTypeId_1,
 			selectedAnnotationType_1_Text : selectedAnnotationType_1_Text,
 			annotationTypeId_2 : annotationTypeId_2,
@@ -585,7 +583,7 @@ QCChartPSMScoreVsScores.prototype._getLinkTypesChecked = function(  ) {
 ///  
 QCChartPSMScoreVsScores.prototype.createChart = function( params ) {
 	var objectThis = this;
-	var searchId = params.searchId;
+	var projectSearchId = params.projectSearchId;
 	var selectedLinkTypes = params.selectedLinkTypes;
 	var annotationTypeId_1 = params.annotationTypeId_1;
 	var annotationTypeId_2 = params.annotationTypeId_2;
@@ -600,7 +598,7 @@ QCChartPSMScoreVsScores.prototype.createChart = function( params ) {
 	var _URL = contextPathJSVar + "/services/qcplot/getPsmScoreVsScore";
 	var requestData = {
 			selectedLinkTypes : selectedLinkTypes,
-			searchId : searchId,
+			projectSearchId : projectSearchId,
 			annotationTypeId_1 : annotationTypeId_1,
 			annotationTypeId_2 : annotationTypeId_2
 	};

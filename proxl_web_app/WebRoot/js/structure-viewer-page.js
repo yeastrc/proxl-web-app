@@ -1,6 +1,11 @@
 "use strict";
 
 
+//	!!!! Warning !!!!:  
+//		the objects in _searches have property ['id'] which is the projectSearchId
+//		search.id and _searches[i]['id']  reference the projectSearchId 
+//		Some uses of searchId are actually projectSearchId
+
 //   All references to proteinId or protein_id are actually referencing the protein sequence id
 
 
@@ -55,7 +60,7 @@ var COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS = "SEARCH_IDS";
 //  From Page
 
 
-var _searchIds = {};
+var _projectSearchIds;
 
 // object to handle all link color determination duties
 var _linkColorHandler = new LinkColorHandler();
@@ -494,15 +499,9 @@ function getValuesFromForm() {
 		throw Error( "Cutoffs are invalid so stop processing" );
 	}
 	
-	var outputCutoffs = getCutoffsFromThePageResult.cutoffsBySearchId;
-	
-
-	
+	var outputCutoffs = getCutoffsFromThePageResult.cutoffsByProjectSearchId;
 	
 	items[ 'cutoffs' ] = outputCutoffs;
-	
-	
-	
 
 	if ( $( "input#filterNonUniquePeptides" ).is( ':checked' ) )
 		items[ 'filterNonUniquePeptides' ] = true;
@@ -551,10 +550,8 @@ function updateURLHash( useSearchForm) {
 
 	var items = { };
 
-
 //	DO NOT put anything in "items" before this "if" statement.
 //	The "else" of this "if" replaces the contents of "items"
-
 
 	if ( ! useSearchForm ) {
 
@@ -598,7 +595,7 @@ function updateURLHash( useSearchForm) {
 	
 	//  Output the selected Annotation data for display
 	var getAnnotationTypeDisplayFromThePageResult = annotationDataDisplayProcessingCommonCode.getAnnotationTypeDisplayFromThePage( {} );
-	var annTypeIdDisplay = getAnnotationTypeDisplayFromThePageResult.annTypeIdDisplayBySearchId;
+	var annTypeIdDisplay = getAnnotationTypeDisplayFromThePageResult.annTypeIdDisplayByProjectSearchId;
 
 	items[ 'annTypeIdDisplay' ] = annTypeIdDisplay;
 
@@ -713,20 +710,16 @@ function updateURLHashWithJSONObject( jsonObject ) {
 
 
 function buildQueryStringFromHash() {
-	
-	
+		
 	var queryString = "?";
 	var items = new Array();
 	
-	
 	var json = getJsonFromHash();
-	
-	//  searchIds from the page
-	for ( var i = 0; i < _searchIds.length; i++ ) {
-		items.push( "searchIds=" + _searchIds[ i ] );
-	}
-	
 
+	//  _projectSearchIds from the page
+	for ( var i = 0; i < _projectSearchIds.length; i++ ) {
+		items.push( "projectSearchId=" + _projectSearchIds[ i ] );
+	}
 	
 	if ( json.excludeTaxonomy != undefined && json.excludeTaxonomy.length > 0 ) {
 		for ( var i = 0; i < json.excludeTaxonomy.length; i++ ) {
@@ -750,18 +743,12 @@ function buildQueryStringFromHash() {
 	if ( json.filterOnlyOnePeptide != undefined && json.filterOnlyOnePeptide ) {
 		items.push( "filterOnlyOnePeptide=on" );
 	}
-	
 
-	
-	
 	///   Serialize cutoffs to JSON
-	
 	var cutoffs = json.cutoffs;
-	
-	var psmPeptideCutoffsForSearchIds_JSONString = JSON.stringify( cutoffs );
-
-	items.push( "psmPeptideCutoffsForSearchIds=" + psmPeptideCutoffsForSearchIds_JSONString );
-
+	var psmPeptideCutoffsForProjectSearchIds_JSONString = JSON.stringify( cutoffs );
+	var psmPeptideCutoffsForProjectSearchIds_JSONStringEncoded = encodeURIComponent( psmPeptideCutoffsForProjectSearchIds_JSONString );
+	items.push( "psmPeptideCutoffsForProjectSearchIds=" + psmPeptideCutoffsForProjectSearchIds_JSONStringEncoded );
 	
 	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
 		items.push( "filterNonUniquePeptides=on" );
@@ -772,7 +759,6 @@ function buildQueryStringFromHash() {
 	if ( json.filterOnlyOnePeptide != undefined && json.filterOnlyOnePeptide ) {
 		items.push( "filterOnlyOnePeptide=on" );
 	}
-	
 	
 	queryString += items.join( "&" );
 	
@@ -899,7 +885,7 @@ function loadCrosslinkData( doDraw ) {
 function downloadPSMsForAllShownUDRLinks() {
 	
 	var requestObject = { };
-	requestObject.searchIds = _searchIds;
+	requestObject.projectSearchIds = _projectSearchIds;
 	
 	if( !_renderedLinks ) { return; }
 	
@@ -1055,9 +1041,9 @@ function collateAndDownloadPSMUDRData( data ) {
 		throw Error( "Did not get data." );
 	}
 
-	for( var i = 0; i < _searchIds.length; i++ ) {
+	for( var i = 0; i < _projectSearchIds.length; i++ ) {
 		
-		var projectSearchId = _searchIds[ i ];
+		var projectSearchId = _projectSearchIds[ i ];
 		var searchId = _projectSearchIdToSearchIdMapping[ projectSearchId ];
 		if ( searchId === undefined ) {
 			throw Error( "collateAndDownloadPSMUDRData( data ): Failed to find searchId mapping for projectSearchId: " + projectSearchId );
@@ -1775,27 +1761,15 @@ function populateNavigation() {
 	
 	var queryString = "?";
 	var items = new Array();
-	
-	
-	if ( _searches.length > 1 ) {
-		for ( var i = 0; i < _searchIds.length; i++ ) {
-			items.push( "searchIds=" + _searchIds[ i ] );
-		}
-	} else {
-		items.push( "searchId=" + _searchIds[ 0 ] );		
+	for ( var i = 0; i < _projectSearchIds.length; i++ ) {
+		items.push( "projectSearchId=" + _projectSearchIds[ i ] );
 	}
-
-
+	
 	var baseJSONObject = getNavigationJSON_Not_for_Image_Or_Structure();
-	
-	var psmPeptideCutoffsForSearchIds_JSONString = JSON.stringify( baseJSONObject );
-	
-	var psmPeptideCutoffsForSearchIds_JSONStringEncodedURIComponent = encodeURIComponent( psmPeptideCutoffsForSearchIds_JSONString ); 
-
+	var psmPeptideCutoffsForProjectSearchIds_JSONString = JSON.stringify( baseJSONObject );
+	var psmPeptideCutoffsForProjectSearchIds_JSONStringEncodedURIComponent = encodeURIComponent( psmPeptideCutoffsForProjectSearchIds_JSONString ); 
 	//  Parameter name matches standard form parameter name for JSON
-	
-	items.push( "queryJSON=" + psmPeptideCutoffsForSearchIds_JSONStringEncodedURIComponent );
-
+	items.push( "queryJSON=" + psmPeptideCutoffsForProjectSearchIds_JSONStringEncodedURIComponent );
 	
 	queryString += items.join( "&" );
 
@@ -1807,133 +1781,75 @@ function populateNavigation() {
 		
 		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
 	} else {
-		
 
 		//  Add Peptide Link
-		
 		html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" href='" + contextPathJSVar + "/";
-        
 		var viewSearchPeptideDefaultPageUrl = $("#viewSearchPeptideDefaultPageUrl").val();
-		
 		if ( viewSearchPeptideDefaultPageUrl === undefined || viewSearchPeptideDefaultPageUrl === "" ) {
-			      
 			html += "peptide.do" + queryString;
-
 		} else {
-			
 			html += viewSearchPeptideDefaultPageUrl;
-			
 		}
 		html += "'>Peptide View</a>]";
-				
-
 		//  Add Protein View Link
-		
 		html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" href='" + contextPathJSVar + "/";
-        
 		var viewSearchCrosslinkProteinDefaultPageUrl = $("#viewSearchCrosslinkProteinDefaultPageUrl").val();
-		
 		if ( viewSearchCrosslinkProteinDefaultPageUrl === undefined || viewSearchCrosslinkProteinDefaultPageUrl === "" ) {
-			      
 			html += "crosslinkProtein.do" + queryString;
-
 		} else {
-			
 			html += viewSearchCrosslinkProteinDefaultPageUrl;
-			
 		}
 		html += "'>Protein View</a>]";
-				
-
 		//  Add Coverage Report Link
-		
 		html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" href='" + contextPathJSVar + "/";
-        
 		var viewProteinCoverageReportDefaultPageUrl = $("#viewProteinCoverageReportDefaultPageUrl").val();
-		
 		if ( viewProteinCoverageReportDefaultPageUrl === undefined || viewProteinCoverageReportDefaultPageUrl === "" ) {
-			      
 			html += "proteinCoverageReport.do" + queryString;
-
 		} else {
-			
 			html += viewProteinCoverageReportDefaultPageUrl;
-			
 		}
 		html += "'>Coverage Report</a>]";
-		
 	}
 
 	var $navigation_links_except_image = $("#navigation_links_except_image"); 
-	
 	
 	$navigation_links_except_image.empty();
 	$navigation_links_except_image.html( html );
 	addToolTips( $navigation_links_except_image );
 	
-	
-	
-
 	//  Add Merged Image Link
-	
-
-
 	var imageNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"Graphical view of links between proteins\" " + 
 		"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/";
-		
 
 	var $viewMergedImageDefaultPageUrl = $("#viewMergedImageDefaultPageUrl");
-	
 	var viewMergedImageDefaultPageUrl = $viewMergedImageDefaultPageUrl.val();
-	
-	
 	if ( viewMergedImageDefaultPageUrl === undefined || viewMergedImageDefaultPageUrl === "" ) {
-		      
-
 		var imageQueryString = "?";
-
-		for ( var j = 0; j < _searchIds.length; j++ ) {
-
+		for ( var j = 0; j < _projectSearchIds.length; j++ ) {
 			if ( j > 0 ) {
-
 				imageQueryString += "&";
 			}
-
-			imageQueryString += "searchIds=" + _searchIds[ j ];
+			imageQueryString += "projectSearchId=" + _projectSearchIds[ j ];
 		}
-
 		var imageJSON = { };
-
 //		add taxonomy exclusions
 		imageJSON[ 'excludeTaxonomy' ] = _excludeTaxonomy;
-
 //		add type exclusions
 		imageJSON[ 'excludeType' ] = _excludeType;
-
 		//  Add Filter cutoffs
 		imageJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
-
 		//  Add Ann Type Display
 		var annTypeIdDisplay = baseJSONObject.annTypeIdDisplay;
 		imageJSON[ 'annTypeIdDisplay' ] = annTypeIdDisplay;
-
-
 //		add filter out non unique peptides
 		imageJSON[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
-
 		imageJSON[ 'filterOnlyOnePSM' ] = _filterOnlyOnePSM;
 		imageJSON[ 'filterOnlyOnePeptide' ] = _filterOnlyOnePeptide;
-
 		var imageJSONString = encodeURI( JSON.stringify( imageJSON ) );
-
 		imageNavHTML += "image.do" 
 		+ imageQueryString + "#" + imageJSONString;
-
-
 	} else {
-
 		imageNavHTML += viewMergedImageDefaultPageUrl;
-
 	}
 	
 	imageNavHTML += "\">Image View</a>]</span>";
@@ -1943,10 +1859,7 @@ function populateNavigation() {
 	$image_viewer_link_span.empty();
 	$image_viewer_link_span.html( imageNavHTML );
 	addToolTips( $image_viewer_link_span );
-	
 }
-
-
 
 //
 ////ensure the necessary data are collected before viewer is drawn
@@ -2088,8 +2001,9 @@ function loadPDBFiles( defaultId, doDraw ) {
 	
 	incrementSpinner();
 	
-	var url = contextPathJSVar + "/services/pdb/listPDBFiles";
-	url += "?projectId=" + $("#project_id" ).val();
+	var projectId = $("#project_id" ).val();
+	
+	var url = contextPathJSVar + "/services/pdb/listPDBFiles?projectId=" + projectId;
 	
 	 $.ajax({
 	        type: "GET",
@@ -3151,7 +3065,7 @@ var redrawDistanceReport = function( ) {
 	
 	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadProteinToPDBMap()\">Protein Position to PDB Mapping</a></div>";
 
-	if( _searchIds.length === 1 ) {
+	if( _projectSearchIds.length === 1 ) {
 		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadDetailedUDRReport()\">All shown UDRs</a></div>";
 	} else {
 		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadShownUDRLinks()\">All shown UDRs</a></div>";
@@ -5830,10 +5744,10 @@ function populateAnnotationDataDisplayProcessingCommonCodeFromHash() {
 	//  Get from annotationDataDisplayProcessingCommonCode to reflect defaults if no data
 	var annTypeIdDisplay = annotationDataDisplayProcessingCommonCode.getAnnotationTypeDisplayFromThePage({});
 	
-	var annTypeIdDisplayBySearchId = annTypeIdDisplay.annTypeIdDisplayBySearchId;
+	var annTypeIdDisplayByProjectSearchId = annTypeIdDisplay.annTypeIdDisplayByProjectSearchId;
 
 	webserviceDataParamsDistributionCommonCode.paramsForDistribution( { 
-		annTypeIdDisplay : annTypeIdDisplayBySearchId
+		annTypeIdDisplay : annTypeIdDisplayByProjectSearchId
 	} );
 	
 }
@@ -5885,29 +5799,21 @@ function initPage() {
 	
 
 	
-	_searchIds = [];
+	_projectSearchIds = [];
 	
-	var $search_id_jq = $(".search_id_jq");
-	
-	if ( $search_id_jq.length === 0 ) {
-		
-		throw Error( "Must be at least one search id in hidden field with class 'search_id_jq'" );
+	var $project_search_id_jq = $(".project_search_id_jq");
+	if ( $project_search_id_jq.length === 0 ) {
+		throw Error( "Must be at least one search id in hidden field with class 'project_search_id_jq'" );
 	}
-	
-	$search_id_jq.each( function( index, element ) {
-		
-		var $search_id_jq_single = $( this );
-		var searchIdString = $search_id_jq_single.val();
-		var searchId = parseInt( searchIdString, 10 );
-		
-		if ( isNaN( searchId ) ) {
-			throw Error( "Search Id is not a number: " + searchIdString );
+	$project_search_id_jq.each( function( index, element ) {
+		var $project_search_id_jq_single = $( this );
+		var projectSearchIdString = $project_search_id_jq_single.val();
+		var projectSearchId = parseInt( projectSearchIdString, 10 );
+		if ( isNaN( projectSearchId ) ) {
+			throw Error( "Project Search Id is not a number: " + projectSearchIdString );
 		}
-		
-		_searchIds.push( searchId );
+		_projectSearchIds.push( projectSearchId );
 	});
-	
-	
 	
 	if ( json.searches && json.searches.length > 1 ) {
 		

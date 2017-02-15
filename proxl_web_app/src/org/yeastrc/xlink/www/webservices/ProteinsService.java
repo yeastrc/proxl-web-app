@@ -70,8 +70,8 @@ public class ProteinsService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getCrosslinkProteinsPerSearchIdsProteinIdsPositions") 
 	public ProteinCommonForPerSearchIdsProteinIdsPositionsWebserviceResult getCrosslinkProteins( 
-			@QueryParam( "search_ids" ) List<Integer> projectSearchIdList,
-			@QueryParam( "psmPeptideCutoffsForSearchIds" ) String psmPeptideCutoffsForSearchIds_JSONString,
+			@QueryParam( "project_search_ids" ) List<Integer> projectSearchIdList,
+			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
 			@QueryParam( "protein_1_id" ) Integer protein1Id,
 			@QueryParam( "protein_2_id" ) Integer protein2Id,
 			@QueryParam( "protein_1_position" ) Integer protein1Position,
@@ -81,7 +81,7 @@ public class ProteinsService {
 		
 		ProteinCommonForPerSearchIdsProteinIdsPositionsWebserviceResult webserviceResult = new ProteinCommonForPerSearchIdsProteinIdsPositionsWebserviceResult();
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
-			String msg = "Provided search_ids is null or search_ids is missing";
+			String msg = "Provided project_search_ids is null or project_search_ids is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -89,8 +89,8 @@ public class ProteinsService {
 		    	        .build()
 		    	        );
 		}
-		if ( StringUtils.isEmpty( psmPeptideCutoffsForSearchIds_JSONString ) ) {
-			String msg = "Provided psmPeptideCutoffsForSearchIds is null or psmPeptideCutoffsForSearchIds is missing";
+		if ( StringUtils.isEmpty( psmPeptideCutoffsForProjectSearchIds_JSONString ) ) {
+			String msg = "Provided psmPeptideCutoffsForProjectSearchIds is null or psmPeptideCutoffsForProjectSearchIds is missing";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -144,7 +144,7 @@ public class ProteinsService {
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search ids: ";
+				String msg = "No project ids for projectSearchIds: ";
 				for ( int projectSearchId : projectSearchIdList ) {
 					msg += projectSearchId + ", ";
 				}				
@@ -216,7 +216,7 @@ public class ProteinsService {
 				}
 			});
 			
-			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = getSearcherCutoffValuesRootLevel( psmPeptideCutoffsForSearchIds_JSONString, searchIdsSet );
+			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = getSearcherCutoffValuesRootLevel( psmPeptideCutoffsForProjectSearchIds_JSONString, searchIdsSet );
 
 			for ( SearchDTO search : searchList ) {
 				int projectSearchId = search.getProjectSearchId();
@@ -286,14 +286,14 @@ public class ProteinsService {
 						entry.setProteins( proteins );
 						ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult item = new ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult();
 						proteins.add( item );
-						item.setSearchId( projectSearchId );
+						item.setProjectSearchId( projectSearchId );
 						item.setSearchName( search.getName() );
 						item.setNumPeptides( searchProteinCrosslink.getNumLinkedPeptides() );
 						item.setNumUniquePeptides( searchProteinCrosslink.getNumUniqueLinkedPeptides() );
 						item.setNumPsms( searchProteinCrosslink.getNumPsms() );
 						item.setPsmAnnotationValueList( searchProteinCrosslinkWrapper.getPsmAnnotationValueList() );
 						item.setPeptideAnnotationValueList( searchProteinCrosslinkWrapper.getPeptideAnnotationValueList() );
-						webserviceResult.addEntryToProteinsPerSearchIdMap( projectSearchId, entry );
+						webserviceResult.addEntryToProteinsPerProjectSearchIdMap( projectSearchId, entry );
 					}
 				}
 			}
@@ -314,7 +314,7 @@ public class ProteinsService {
 	/////////////////////////////////////////////////////
 	/**
 	 * @param projectSearchIdList
-	 * @param psmPeptideCutoffsForSearchIds_JSONString
+	 * @param psmPeptideCutoffsForProjectSearchIds_JSONString
 	 * @param proteinId
 	 * @param proteinPosition1
 	 * @param proteinPosition2
@@ -326,8 +326,8 @@ public class ProteinsService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getLooplinkProteinsPerSearchIdsProteinIdsPositions") 
 	public ProteinCommonForPerSearchIdsProteinIdsPositionsWebserviceResult getLooplinkProteins( 
-			@QueryParam( "search_ids" ) List<Integer> projectSearchIdList,
-			@QueryParam( "psmPeptideCutoffsForSearchIds" ) String psmPeptideCutoffsForSearchIds_JSONString,
+			@QueryParam( "project_search_ids" ) List<Integer> projectSearchIdList,
+			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
 			@QueryParam( "protein_id" ) Integer proteinId,
 			@QueryParam( "protein_position_1" ) Integer proteinPosition1,
 			@QueryParam( "protein_position_2" ) Integer proteinPosition2,
@@ -335,7 +335,7 @@ public class ProteinsService {
 	throws Exception {
 		ProteinCommonForPerSearchIdsProteinIdsPositionsWebserviceResult webserviceResult = new ProteinCommonForPerSearchIdsProteinIdsPositionsWebserviceResult();
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
-			String msg = "Provided search_ids is null or search_ids is missing";
+			String msg = "Provided project_search_ids is null or project_search_ids is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -343,8 +343,8 @@ public class ProteinsService {
 		    	        .build()
 		    	        );
 		}
-		if ( StringUtils.isEmpty( psmPeptideCutoffsForSearchIds_JSONString ) ) {
-			String msg = "Provided psmPeptideCutoffsForSearchIds is null or psmPeptideCutoffsForSearchIds is missing";
+		if ( StringUtils.isEmpty( psmPeptideCutoffsForProjectSearchIds_JSONString ) ) {
+			String msg = "Provided psmPeptideCutoffsForProjectSearchIds is null or psmPeptideCutoffsForProjectSearchIds is missing";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -461,7 +461,7 @@ public class ProteinsService {
 				}
 			});
 			
-			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = getSearcherCutoffValuesRootLevel( psmPeptideCutoffsForSearchIds_JSONString, searchIdsSet );
+			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = getSearcherCutoffValuesRootLevel( psmPeptideCutoffsForProjectSearchIds_JSONString, searchIdsSet );
 
 			for ( SearchDTO search : searchList ) {
 				int projectSearchId = search.getProjectSearchId();
@@ -528,14 +528,14 @@ public class ProteinsService {
 						entry.setProteins( proteins );
 						ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult item = new ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult();
 						proteins.add( item );
-						item.setSearchId( projectSearchId );
+						item.setProjectSearchId( projectSearchId );
 						item.setSearchName( search.getName() );
 						item.setNumPeptides( searchProteinLooplink.getNumPeptides() );
 						item.setNumUniquePeptides( searchProteinLooplink.getNumUniquePeptides() );
 						item.setNumPsms( searchProteinLooplink.getNumPsms() );
 						item.setPsmAnnotationValueList( searchProteinLooplinkWrapper.getPsmAnnotationValueList() );
 						item.setPeptideAnnotationValueList( searchProteinLooplinkWrapper.getPeptideAnnotationValueList() );
-						webserviceResult.addEntryToProteinsPerSearchIdMap( projectSearchId, entry );
+						webserviceResult.addEntryToProteinsPerProjectSearchIdMap( projectSearchId, entry );
 					}
 				}
 			}
@@ -575,8 +575,8 @@ public class ProteinsService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getMonolinkProteinsPerSearchIdsProteinIdsPositions") 
 	public ProteinCommonForPerSearchIdsProteinIdsPositionsWebserviceResult getMonolinkProteins( 
-			@QueryParam( "search_ids" ) List<Integer> projectSearchIdList,
-			@QueryParam( "psmPeptideCutoffsForSearchIds" ) String psmPeptideCutoffsForSearchIds_JSONString,
+			@QueryParam( "project_search_ids" ) List<Integer> projectSearchIdList,
+			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
 			@QueryParam( "protein_id" ) Integer proteinId,
 			@QueryParam( "protein_position" ) Integer proteinPosition,
 			@Context HttpServletRequest request )
@@ -584,7 +584,7 @@ public class ProteinsService {
 		
 		ProteinCommonForPerSearchIdsProteinIdsPositionsWebserviceResult webserviceResult = new ProteinCommonForPerSearchIdsProteinIdsPositionsWebserviceResult();
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
-			String msg = "Provided search_ids is null or search_ids is missing";
+			String msg = "Provided project_search_ids is null or project_search_ids is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -592,8 +592,8 @@ public class ProteinsService {
 		    	        .build()
 		    	        );
 		}
-		if ( StringUtils.isEmpty( psmPeptideCutoffsForSearchIds_JSONString ) ) {
-			String msg = "Provided psmPeptideCutoffsForSearchIds is null or psmPeptideCutoffsForSearchIds is missing";
+		if ( StringUtils.isEmpty( psmPeptideCutoffsForProjectSearchIds_JSONString ) ) {
+			String msg = "Provided psmPeptideCutoffsForProjectSearchIds is null or psmPeptideCutoffsForProjectSearchIds is missing";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -709,7 +709,7 @@ public class ProteinsService {
 				}
 			});
 			
-			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = getSearcherCutoffValuesRootLevel( psmPeptideCutoffsForSearchIds_JSONString, searchIdsSet );
+			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = getSearcherCutoffValuesRootLevel( psmPeptideCutoffsForProjectSearchIds_JSONString, searchIdsSet );
 			
 			for ( SearchDTO search : searchList ) {
 				int projectSearchId = search.getProjectSearchId();
@@ -775,14 +775,14 @@ public class ProteinsService {
 						entry.setProteins( proteins );
 						ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult item = new ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult();
 						proteins.add( item );
-						item.setSearchId( projectSearchId );
+						item.setProjectSearchId( projectSearchId );
 						item.setSearchName( search.getName() );
 						item.setNumPeptides( searchProteinMonolink.getNumPeptides() );
 						item.setNumUniquePeptides( searchProteinMonolink.getNumUniquePeptides() );
 						item.setNumPsms( searchProteinMonolink.getNumPsms() );
 						item.setPsmAnnotationValueList( searchProteinMonolinkWrapper.getPsmAnnotationValueList() );
 						item.setPeptideAnnotationValueList( searchProteinMonolinkWrapper.getPeptideAnnotationValueList() );
-						webserviceResult.addEntryToProteinsPerSearchIdMap( projectSearchId, entry );
+						webserviceResult.addEntryToProteinsPerProjectSearchIdMap( projectSearchId, entry );
 					}
 				}
 			}
@@ -802,14 +802,14 @@ public class ProteinsService {
 	
 	///////////////////////////////////////////////////////
 	/**
-	 * @param psmPeptideCutoffsForSearchIds_JSONString
+	 * @param psmPeptideCutoffsForProjectSearchIds_JSONString
 	 * @param searchIdsSet
 	 * @return
 	 * @throws Exception
 	 */
-	private SearcherCutoffValuesRootLevel getSearcherCutoffValuesRootLevel( String psmPeptideCutoffsForSearchIds_JSONString, Set<Integer> searchIdsSet ) throws Exception {
+	private SearcherCutoffValuesRootLevel getSearcherCutoffValuesRootLevel( String psmPeptideCutoffsForProjectSearchIds_JSONString, Set<Integer> searchIdsSet ) throws Exception {
 		CutoffValuesRootLevel cutoffValuesRootLevel = 
-				DeserializeCutoffForWebservices.getInstance().deserialize_JSON_ToCutoffRoot( psmPeptideCutoffsForSearchIds_JSONString );
+				DeserializeCutoffForWebservices.getInstance().deserialize_JSON_ToCutoffRoot( psmPeptideCutoffsForProjectSearchIds_JSONString );
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory.createSearcherCutoffValuesRootLevel( 
 						searchIdsSet, 

@@ -123,10 +123,10 @@ var ViewSearchPeptidePageCode = function() {
 			//  Cutoffs failed validation and error message was displayed
 			return { output_FieldDataFailedValidation : getCutoffsFromThePageResult_FieldDataFailedValidation };  //  EARLY EXIT from function
 		}
-		var outputCutoffs = getCutoffsFromThePageResult.cutoffsBySearchId;
+		var outputCutoffs = getCutoffsFromThePageResult.cutoffsByProjectSearchId;
 		//  Output the selected Annotation data for display
 		var getAnnotationTypeDisplayFromThePageResult = annotationDataDisplayProcessingCommonCode.getAnnotationTypeDisplayFromThePage( {} );
-		var annotationTypeDisplayBySearchId = getAnnotationTypeDisplayFromThePageResult.annTypeIdDisplayBySearchId;
+		var annotationTypeDisplayByProjectSearchId = getAnnotationTypeDisplayFromThePageResult.annTypeIdDisplayByProjectSearchId;
 		//  Create array from check boxes for chosen link types
 		var outputLinkTypes = [];
 		var $link_type_jq = $(".link_type_jq");
@@ -157,7 +157,7 @@ var ViewSearchPeptidePageCode = function() {
 		}
 		var output_query_json_field_Contents = { 
 				cutoffs : outputCutoffs, 
-				annTypeIdDisplay : annotationTypeDisplayBySearchId,
+				annTypeIdDisplay : annotationTypeDisplayByProjectSearchId,
 				linkTypes : outputLinkTypes, 
 				mods : outputDynamicModMasses 
 		};

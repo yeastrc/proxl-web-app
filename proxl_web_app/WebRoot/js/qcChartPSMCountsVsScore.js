@@ -325,7 +325,7 @@ QCChartPSMCountVsScores.prototype.openPSMCountVsScoreQCPlotOverlay = function(cl
 	var $clickThis = $(clickThis);
 	//	get root div for this search
 	var $search_root_jq = $clickThis.closest(".search_root_jq");
-	var searchId = $search_root_jq.attr("searchId");	
+	var projectSearchId = $search_root_jq.attr("data-project_search_id");	
 	// copy the search name to the overlay
 	var $search_name_display_jq = $search_root_jq.find(".search_name_display_jq");
 	var search_name_display_jq = $search_name_display_jq.text();
@@ -349,10 +349,10 @@ QCChartPSMCountVsScores.prototype.openPSMCountVsScoreQCPlotOverlay = function(cl
 	$psm_count_vs_score_qc_plot_overlay_background.show();
 	$psm_count_vs_score_qc_plot_overlay_container.show();
 	////////////////
-	var $psm_count_vs_score_qc_plot_current_search_id = $("#psm_count_vs_score_qc_plot_current_search_id");
-	var prevSearchId = $psm_count_vs_score_qc_plot_current_search_id.val( );
-	if ( prevSearchId === searchId ) {
-		////  Same Search Id as when last opened so just show it
+	var $psm_count_vs_score_qc_plot_current_project_search_id = $("#psm_count_vs_score_qc_plot_current_project_search_id");
+	var prevProjectSearchId = $psm_count_vs_score_qc_plot_current_project_search_id.val( );
+	if ( prevProjectSearchId === projectSearchId ) {
+		////  Same ProjectSearchId as when last opened so just show it
 		var $psm_count_vs_score_qc_plot_overlay_background = $("#psm_count_vs_score_qc_plot_overlay_background"); 
 		$psm_count_vs_score_qc_plot_overlay_background.show();
 		$psm_count_vs_score_qc_plot_overlay_container.show();
@@ -361,7 +361,7 @@ QCChartPSMCountVsScores.prototype.openPSMCountVsScoreQCPlotOverlay = function(cl
 
 	this.globals.currentSearchData = undefined;   ///  Reset "currentSearchData" for new search
 	this.populateCutoffsOnImportMessage( { $search_root_jq: $search_root_jq } );
-	$psm_count_vs_score_qc_plot_current_search_id.val( searchId );
+	$psm_count_vs_score_qc_plot_current_project_search_id.val( projectSearchId );
 	
 	//  Empty Include Protein Name option Select before get list of protein names
 	var $psm_count_vs_score_qc_plot_protein_seq_id_include_select = $("#psm_count_vs_score_qc_plot_protein_seq_id_include_select");
@@ -373,11 +373,11 @@ QCChartPSMCountVsScores.prototype.openPSMCountVsScoreQCPlotOverlay = function(cl
 	$psm_count_vs_score_qc_plot_protein_seq_id_exclude_select.empty();
 	$psm_count_vs_score_qc_plot_protein_seq_id_exclude_select.val("");
 
-	this.getPSMFilterableAnnTypesForSearchId( { 
-		searchId: searchId
+	this.getPSMFilterableAnnTypesForProjectSearchId( { 
+		projectSearchId: projectSearchId
 	} );
-	this.getProteinSeqIdsProteinAnnNamesForSearchId( { 
-		searchId: searchId
+	this.getProteinSeqIdsProteinAnnNamesForProjectSearchId( { 
+		projectSearchId: projectSearchId
 	} );
 };
 
@@ -397,15 +397,15 @@ QCChartPSMCountVsScores.prototype.populateCutoffsOnImportMessage = function( par
 };
 
 ///  
-QCChartPSMCountVsScores.prototype.getPSMFilterableAnnTypesForSearchId = function( params ) {
+QCChartPSMCountVsScores.prototype.getPSMFilterableAnnTypesForProjectSearchId = function( params ) {
 	var objectThis = this;
-	var searchId = params.searchId;
+	var projectSearchId = params.projectSearchId;
 	if ( ! qcChartsInitialized ) {
 		throw "qcChartsInitialized is false"; 
 	}
-	var _URL = contextPathJSVar + "/services/annotationTypes/getAnnotationTypesPsmFilterableForSearchId";
+	var _URL = contextPathJSVar + "/services/annotationTypes/getAnnotationTypesPsmFilterableForProjectSearchId";
 	var requestData = {
-			searchId : searchId
+			projectSearchId : projectSearchId
 	};
 //	var request =
 	$.ajax({
@@ -414,7 +414,7 @@ QCChartPSMCountVsScores.prototype.getPSMFilterableAnnTypesForSearchId = function
 		data : requestData,
 		dataType : "json",
 		success : function(data) {
-			objectThis.getPSMFilterableAnnTypesForSearchIdResponse(requestData, data, params);
+			objectThis.getPSMFilterableAnnTypesForProjectSearchIdResponse(requestData, data, params);
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -426,7 +426,7 @@ QCChartPSMCountVsScores.prototype.getPSMFilterableAnnTypesForSearchId = function
 };
 
 ///
-QCChartPSMCountVsScores.prototype.getPSMFilterableAnnTypesForSearchIdResponse = function(requestData, responseData, originalParams) {
+QCChartPSMCountVsScores.prototype.getPSMFilterableAnnTypesForProjectSearchIdResponse = function(requestData, responseData, originalParams) {
 	var annTypesSearchProgramsPerSearch = responseData.annotationTypeList;
 	if (  annTypesSearchProgramsPerSearch.length === 0 ) {
 		throw "annTypesSearchProgramsPerSearch.length === 0";
@@ -467,22 +467,20 @@ QCChartPSMCountVsScores.prototype.getPSMFilterableAnnTypesForSearchIdResponse = 
 			$psm_count_vs_score_qc_plot_score_type_id.val( annType.id );
 		}
 	}
-	this.createChartFromPageParams( { 
-		searchId: originalParams.searchId
-	} );
+	this.createChartFromPageParams();
 };
 
 
 ///  
-QCChartPSMCountVsScores.prototype.getProteinSeqIdsProteinAnnNamesForSearchId = function( params ) {
+QCChartPSMCountVsScores.prototype.getProteinSeqIdsProteinAnnNamesForProjectSearchId = function( params ) {
 	var objectThis = this;
-	var searchId = params.searchId;
+	var projectSearchId = params.projectSearchId;
 	if ( ! qcChartsInitialized ) {
 		throw "qcChartsInitialized is false"; 
 	}
-	var _URL = contextPathJSVar + "/services/proteinNames/getProteinNameListForSearchId";
+	var _URL = contextPathJSVar + "/services/proteinNames/getProteinNameListForProjectSearchId";
 	var requestData = {
-			searchId : searchId
+			projectSearchId : projectSearchId
 	};
 //	var request =
 	$.ajax({
@@ -491,7 +489,7 @@ QCChartPSMCountVsScores.prototype.getProteinSeqIdsProteinAnnNamesForSearchId = f
 		data : requestData,
 		dataType : "json",
 		success : function(data) {
-			objectThis.getProteinSeqIdsProteinAnnNamesForSearchIdResponse(requestData, data, params);
+			objectThis.getProteinSeqIdsProteinAnnNamesForProjectSearchIdResponse(requestData, data, params);
 		},
 		failure: function(errMsg) {
 			handleAJAXFailure( errMsg );
@@ -503,7 +501,7 @@ QCChartPSMCountVsScores.prototype.getProteinSeqIdsProteinAnnNamesForSearchId = f
 };
 
 ///
-QCChartPSMCountVsScores.prototype.getProteinSeqIdsProteinAnnNamesForSearchIdResponse = function(requestData, responseData, originalParams) {
+QCChartPSMCountVsScores.prototype.getProteinSeqIdsProteinAnnNamesForProjectSearchIdResponse = function(requestData, responseData, originalParams) {
 	
 	var proteinSequenceIdProteinAnnotationNameList = responseData.proteinSequenceIdProteinAnnotationNameList;
 	
@@ -622,8 +620,8 @@ QCChartPSMCountVsScores.prototype.createChartFromPageParams = function( ) {
 			}
 		}
 	}	
-	var $psm_count_vs_score_qc_plot_current_search_id = $("#psm_count_vs_score_qc_plot_current_search_id");
-	var searchId = $psm_count_vs_score_qc_plot_current_search_id.val( );
+	var $psm_count_vs_score_qc_plot_current_project_search_id = $("#psm_count_vs_score_qc_plot_current_project_search_id");
+	var projectSearchId = $psm_count_vs_score_qc_plot_current_project_search_id.val( );
 	var $psm_count_vs_score_qc_plot_score_type_id = $("#psm_count_vs_score_qc_plot_score_type_id");
 	var annotationTypeId = $psm_count_vs_score_qc_plot_score_type_id.val();
 	var selectedAnnotationTypeText = $("#psm_count_vs_score_qc_plot_score_type_id option:selected").text();
@@ -636,7 +634,7 @@ QCChartPSMCountVsScores.prototype.createChartFromPageParams = function( ) {
 	}
 	
 	var createChartParams =  {  
-			searchId : searchId,
+			projectSearchId : projectSearchId,
 			annotationTypeId : annotationTypeId,
 			selectedAnnotationTypeText : selectedAnnotationTypeText,
 			selectedLinkTypes : selectedLinkTypes,
@@ -683,7 +681,7 @@ QCChartPSMCountVsScores.prototype._getLinkTypesChecked = function(  ) {
 ///  
 QCChartPSMCountVsScores.prototype.createChart = function( params ) {
 	var objectThis = this;
-	var searchId = params.searchId;
+	var projectSearchId = params.projectSearchId;
 	var selectedLinkTypes = params.selectedLinkTypes;
 	var includeProteinSequenceIds = params.includeProteinSequenceIds;
 	var excludeProteinSequenceIds = params.excludeProteinSequenceIds;
@@ -699,7 +697,7 @@ QCChartPSMCountVsScores.prototype.createChart = function( params ) {
 			selectedLinkTypes : selectedLinkTypes,
 			iP : includeProteinSequenceIds,
 			eP : excludeProteinSequenceIds,
-			searchId : searchId,
+			projectSearchId : projectSearchId,
 			annotationTypeId : annotationTypeId
 	};
 	if ( userInputMaxXString !== "" ) {

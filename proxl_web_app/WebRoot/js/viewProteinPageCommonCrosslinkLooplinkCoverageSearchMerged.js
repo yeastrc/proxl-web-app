@@ -148,11 +148,11 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 			//  EARLY EXIT from function
 			return { output_FieldDataFailedValidation : getCutoffsFromThePageResult_FieldDataFailedValidation };
 		}
-		var outputCutoffs = getCutoffsFromThePageResult.cutoffsBySearchId;
+		var outputCutoffs = getCutoffsFromThePageResult.cutoffsByProjectSearchId;
 
 		//  Output the selected Annotation data for display
 		var getAnnotationTypeDisplayFromThePageResult = annotationDataDisplayProcessingCommonCode.getAnnotationTypeDisplayFromThePage( {} );
-		var annotationTypeDisplayBySearchId = getAnnotationTypeDisplayFromThePageResult.annTypeIdDisplayBySearchId;
+		var annotationTypeDisplayByProjectSearchId = getAnnotationTypeDisplayFromThePageResult.annTypeIdDisplayByProjectSearchId;
 
 		//  Mark check boxes for chosen links to exclude:  "no unique peptides", "only one PSM", "only one peptide"
 		var filterNonUniquePeptides = false;
@@ -186,7 +186,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 		var getEncodedExcludeProteinsResult = this.getEncodedExcludeProteins( outputExcludeProteinsAsStrings );
 		var output_query_json_field_Contents = { 
 				cutoffs : outputCutoffs, 
-				annTypeIdDisplay : annotationTypeDisplayBySearchId,
+				annTypeIdDisplay : annotationTypeDisplayByProjectSearchId,
 				filterNonUniquePeptides : filterNonUniquePeptides,
 				filterOnlyOnePSM : filterOnlyOnePSM,
 				filterOnlyOnePeptide : filterOnlyOnePeptide,

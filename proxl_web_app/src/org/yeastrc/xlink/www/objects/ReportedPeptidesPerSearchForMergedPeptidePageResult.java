@@ -9,25 +9,25 @@ import java.util.Map;
 public class ReportedPeptidesPerSearchForMergedPeptidePageResult {
 
 	/**
-	 * Key is search id
+	 * Key is project search id
 	 */
-	private Map<Integer, ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> reportedPeptidesPerSearchIdMap;
+	private Map<Integer, ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> reportedPeptidesPerProjectSearchIdMap;
 
 	/**
-	 * Key is search id
+	 * Key is project search id
 	 * @return
 	 */
-	public Map<Integer, ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> getReportedPeptidesPerSearchIdMap() {
-		return reportedPeptidesPerSearchIdMap;
+	public Map<Integer, ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> getReportedPeptidesPerProjectSearchIdMap() {
+		return reportedPeptidesPerProjectSearchIdMap;
 	}
 
 	/**
-	 * Key is search id
-	 * @param reportedPeptidesPerSearchIdMap
+	 * Key is Project search id
+	 * @param reportedPeptidesPerProjectSearchIdMap
 	 */
-	public void setReportedPeptidesPerSearchIdMap(
-			Map<Integer, ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> reportedPeptidesPerSearchIdMap) {
-		this.reportedPeptidesPerSearchIdMap = reportedPeptidesPerSearchIdMap;
+	public void setReportedPeptidesPerProjectSearchIdMap(
+			Map<Integer, ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> reportedPeptidesPerProjectSearchIdMap) {
+		this.reportedPeptidesPerProjectSearchIdMap = reportedPeptidesPerProjectSearchIdMap;
 	}
 
 }

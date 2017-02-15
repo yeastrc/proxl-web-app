@@ -30,7 +30,7 @@
 			id="setDefaultPageViewButton"
 			class=" tool_tip_attached_jq  "
 			data-tooltip="set the current data as the default view" 
-			data-search_id="${ searchId }"
+			data-project_search_id="${ projectSearchId }"
 			onclick="defaultPageView.saveOrUpdateDefaultPageView( { clickedThis : this, page_JS_Object : ${ page_JS_Object } } )">
 			
 		<div class=" tool_tip_attached_jq  "

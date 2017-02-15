@@ -191,11 +191,10 @@
 				
 	
 			<html:form action="mergedCrosslinkProtein" method="get" styleId="form_get_for_updated_parameters" >
-			
 						
-						<logic:iterate name="searches" id="search">
-							<input type="hidden" name="searchIds" value="<bean:write name="search" property="projectSearchId" />">
-						</logic:iterate>
+				<logic:iterate name="searches" id="search">
+					<input type="hidden" name="projectSearchId" value="<bean:write name="search" property="projectSearchId" />">
+				</logic:iterate>
 
 				<input type="hidden" name="queryJSON" id="query_json_field" />
 				
@@ -398,11 +397,11 @@
 
 						<c:forEach items="${ searches }" var="search"  varStatus="searchVarStatus">
 		
-							<th id="search_header_<bean:write name="search" property="searchId" />" style="text-align:left;font-weight:bold;width:25px;"
+							<th id="search_header_<bean:write name="search" property="projectSearchId" />" style="text-align:left;font-weight:bold;width:25px;"
 								><bean:write name="search" property="searchId" /></th>
 								
 							<script >
-								$("#search_header_<bean:write name="search" property="searchId" />").qtip( {
+								$("#search_header_<bean:write name="search" property="projectSearchId" />").qtip( {
 							        content: {
 							            text: '<bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="searchId" />)'
 							        },
@@ -498,12 +497,11 @@
 								style="cursor: pointer; "
 								
 								onclick="viewCrosslinkProteinsLoadedFromWebServiceTemplate.showHideCrosslinkProteins( { clickedElement : this })"
-								project_id="${ projectId }"
-								search_ids="<c:forEach var="searchEntryForThisRow" items="${ proteinEntry.searches }">,${ searchEntryForThisRow.projectSearchId }</c:forEach>"
-								protein_1_id="<bean:write name="proteinEntry" property="protein1.proteinSequenceObject.proteinSequenceId" />"
-								protein_2_id="<bean:write name="proteinEntry" property="protein2.proteinSequenceObject.proteinSequenceId" />"
-								protein_1_position="<bean:write name="proteinEntry" property="protein1Position" />"
-								protein_2_position="<bean:write name="proteinEntry" property="protein2Position" />"
+								data-project_search_ids="<c:forEach var="searchEntryForThisRow" items="${ proteinEntry.searches }">,${ searchEntryForThisRow.projectSearchId }</c:forEach>"
+								data-protein_1_id="<bean:write name="proteinEntry" property="protein1.proteinSequenceObject.proteinSequenceId" />"
+								data-protein_2_id="<bean:write name="proteinEntry" property="protein2.proteinSequenceObject.proteinSequenceId" />"
+								data-protein_1_position="<bean:write name="proteinEntry" property="protein1Position" />"
+								data-protein_2_position="<bean:write name="proteinEntry" property="protein2Position" />"
 							>
 										
 

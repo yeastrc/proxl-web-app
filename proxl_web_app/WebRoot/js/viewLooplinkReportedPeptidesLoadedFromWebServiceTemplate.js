@@ -103,13 +103,13 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			}
 		}
 		
-		var search_id = $clickedElement.attr( "search_id" );
-		var protein_id = $clickedElement.attr( "protein_id" );
-		var protein_position_1 = $clickedElement.attr( "protein_position_1" );
-		var protein_position_2 = $clickedElement.attr( "protein_position_2" );
+		var project_search_id = $clickedElement.attr( "data-project_search_id" );
+		var protein_id = $clickedElement.attr( "data-protein_id" );
+		var protein_position_1 = $clickedElement.attr( "data-protein_position_1" );
+		var protein_position_2 = $clickedElement.attr( "data-protein_position_2" );
 		//  Convert all attributes to empty string if null or undefined
-		if ( ! search_id ) {
-			search_id = "";
+		if ( ! project_search_id ) {
+			project_search_id = "";
 		}
 		if ( ! protein_id ) {
 			protein_id = "";
@@ -139,30 +139,30 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		if ( _psmPeptideCutoffsRootObject === null || _psmPeptideCutoffsRootObject === undefined ) {
 			throw Error( "_psmPeptideCutoffsRootObject not initialized" );
 		} 
-		var psmPeptideCutoffsForSearchId = _psmPeptideCutoffsRootObject.searches[ search_id ];
-		if ( psmPeptideCutoffsForSearchId === undefined || psmPeptideCutoffsForSearchId === null ) {
-			psmPeptideCutoffsForSearchId = {};
-//			throw Error( "Getting data.  Unable to get cutoff data for search id: " + search_id );
+		var psmPeptideCutoffsForProjectSearchId = _psmPeptideCutoffsRootObject.searches[ project_search_id ];
+		if ( psmPeptideCutoffsForProjectSearchId === undefined || psmPeptideCutoffsForProjectSearchId === null ) {
+			psmPeptideCutoffsForProjectSearchId = {};
+//			throw Error( "Getting data.  Unable to get cutoff data for project_search_id: " + project_search_id );
 		}
-		var psmPeptideCutoffsForSearchId_JSONString = JSON.stringify( psmPeptideCutoffsForSearchId );
+		var psmPeptideCutoffsForProjectSearchId_JSONString = JSON.stringify( psmPeptideCutoffsForProjectSearchId );
 		
-		var psmPeptideAnnTypeDisplayPerSearchId_JSONString = null;
+		var psmPeptideAnnTypeDisplayPerProjectSearchId_JSONString = null;
 		if ( _psmPeptideAnnTypeIdDisplay ) {
-			var psmPeptideAnnTypeIdDisplayForSearchId = _psmPeptideAnnTypeIdDisplay.searches[ search_id ];
-			if ( psmPeptideAnnTypeIdDisplayForSearchId === undefined || psmPeptideAnnTypeIdDisplayForSearchId === null ) {
+			var psmPeptideAnnTypeIdDisplayForProjectSearchId = _psmPeptideAnnTypeIdDisplay.searches[ project_search_id ];
+			if ( psmPeptideAnnTypeIdDisplayForProjectSearchId === undefined || psmPeptideAnnTypeIdDisplayForProjectSearchId === null ) {
 //				psmPeptideAnnTypeIdDisplayForSearchId = {};
-				throw Error( "Getting data.  Unable to get ann type display data for search id: " + search_id );
+				throw Error( "Getting data.  Unable to get ann type display data for project_search_id: " + project_search_id );
 			}
-			psmPeptideAnnTypeDisplayPerSearchId_JSONString = JSON.stringify( psmPeptideAnnTypeIdDisplayForSearchId );
+			psmPeptideAnnTypeDisplayPerProjectSearchId_JSONString = JSON.stringify( psmPeptideAnnTypeIdDisplayForProjectSearchId );
 		}
 
 		var ajaxRequestData = {
-				search_id : search_id,
+				project_search_id : project_search_id,
 				protein_id : protein_id,
 				protein_position_1 : protein_position_1,
 				protein_position_2 : protein_position_2,
-				psmPeptideCutoffsForSearchId : psmPeptideCutoffsForSearchId_JSONString,
-				peptideAnnTypeDisplayPerSearch : psmPeptideAnnTypeDisplayPerSearchId_JSONString
+				psmPeptideCutoffsForProjectSearchId : psmPeptideCutoffsForProjectSearchId_JSONString,
+				peptideAnnTypeDisplayPerSearch : psmPeptideAnnTypeDisplayPerProjectSearchId_JSONString
 		};
 		$.ajax({
 			url : contextPathJSVar + "/services/data/getLooplinkReportedPeptides",
@@ -270,7 +270,7 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			var context = { 
 					showNumberUniquePSMs : showNumberUniquePSMs,
 					data : looplink_peptide, 
-					searchId : ajaxRequestData.search_id
+					projectSearchId : ajaxRequestData.project_search_id
 					};
 			var html = _handlebarsTemplate_looplink_peptide_data_row_entry_template(context);
 			var $looplink_peptide_entry = 

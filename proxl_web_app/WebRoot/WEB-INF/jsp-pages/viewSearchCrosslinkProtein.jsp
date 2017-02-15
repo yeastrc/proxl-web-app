@@ -117,14 +117,14 @@
 			<div style="margin-bottom:20px;"> 
 				
 				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" searchId="${ search.projectSearchId }"
-						>peptide.do?searchId=<bean:write name="search" property="projectSearchId" 
+					href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ search.projectSearchId }"
+						>peptide.do?projectSearchId=<bean:write name="search" property="projectSearchId" 
 						/>&queryJSON=<c:out value="${ peptidePageQueryJSON }" escapeXml="false" 
 						></c:out></proxl:defaultPageUrl>"
 						>Peptide View</a>]
 						 
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/proteinCoverageReport" searchId="${ search.projectSearchId }">proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+					href="${ contextPath }/<proxl:defaultPageUrl pageName="/proteinCoverageReport" projectSearchId="${ search.projectSearchId }">proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 						>Coverage Report</a>]
 						
 						
@@ -146,7 +146,8 @@
 	
 			<html:form action="crosslinkProtein" method="get" styleId="form_get_for_updated_parameters">
 				
-				<html:hidden property="searchId"/>
+				<input type="hidden" name="projectSearchId" value="${ search.projectSearchId }">
+				<%-- cannot use <html:hidden property="projectSearchId" /> since projectSearchId is an array --%>
 				
 				<html:hidden property="queryJSON" styleId="query_json_field" />
 
@@ -265,7 +266,7 @@
 						
 						<input type="button" value="${ UpdateButtonText }"  onclick="viewSearchCrosslinkProteinPageCode.updatePageForFormParams()" >
 						
-						<c:set var="searchId" value="${ search.projectSearchId }"/>	
+						<c:set var="projectSearchId" value="${ search.projectSearchId }"/>	
 
 						<c:set var="page_JS_Object" value="viewSearchProteinPageCommonCrosslinkLooplinkCoverage"/>
 						
@@ -281,13 +282,13 @@
 			<h3 style="display:inline;">Crosslinks (<bean:write name="numCrosslinks" />):</h3>
 			<div style="display:inline;">
 				[<a class="tool_tip_attached_jq" data-tooltip="View looplinks (instead of crosslinks)" 
-						href="${ contextPath }/<proxl:defaultPageUrl pageName="/looplinkProtein" searchId="${ search.projectSearchId }">looplinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+						href="${ contextPath }/<proxl:defaultPageUrl pageName="/looplinkProtein" projectSearchId="${ search.projectSearchId }">looplinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 						>View Looplinks (<bean:write name="numLooplinks" />)</a>]
 				[<a class="tool_tip_attached_jq" data-tooltip="Download all crosslinks as tab-delimited text" 
-					href="${ contextPath }/downloadMergedProteins.do?<bean:write name="mergedQueryString" />"
+					href="${ contextPath }/downloadMergedProteins.do?<bean:write name="queryString" />"
 					>Download Data (<bean:write name="numLinks" />)</a>]
 				[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" 
-					href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="mergedQueryString" />"
+					href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="queryString" />"
 					>Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
 			</div>
 			
@@ -360,14 +361,11 @@
 								style="cursor: pointer; "
 								
 								onclick="viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.showHideCrosslinkReportedPeptides( { clickedElement : this })"
-								search_id="${ search.projectSearchId }"
-								project_id="${ projectId }"
-								protein_1_id="<bean:write name="crosslink" property="protein1.proteinSequenceObject.proteinSequenceId" />"
-								protein_2_id="<bean:write name="crosslink" property="protein2.proteinSequenceObject.proteinSequenceId" />"
-								protein_1_position="<bean:write name="crosslink" property="protein1Position" />"
-								protein_2_position="<bean:write name="crosslink" property="protein2Position" />"
-								
-
+								data-project_search_id="${ search.projectSearchId }"
+								data-protein_1_id="<bean:write name="crosslink" property="protein1.proteinSequenceObject.proteinSequenceId" />"
+								data-protein_2_id="<bean:write name="crosslink" property="protein2.proteinSequenceObject.proteinSequenceId" />"
+								data-protein_1_position="<bean:write name="crosslink" property="protein1Position" />"
+								data-protein_2_position="<bean:write name="crosslink" property="protein2Position" />"
 							>
 								<td><span class="proteinName" id="protein-id-<bean:write name="crosslink" property="protein1.proteinSequenceObject.proteinSequenceId" />"><bean:write name="crosslink" property="protein1.name" /></span></td>
 								<td class="integer-number-column"><bean:write name="crosslink" property="protein1Position" /></td>

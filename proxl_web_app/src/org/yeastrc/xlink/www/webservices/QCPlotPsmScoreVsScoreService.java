@@ -42,9 +42,9 @@ public class QCPlotPsmScoreVsScoreService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getPsmScoreVsScore") 
-	public QCPlotPsmScoreVsScoreServiceResult getViewerData( 
+	public QCPlotPsmScoreVsScoreServiceResult getPsmScoreVsScore( 
 			@QueryParam( "selectedLinkTypes" ) Set<String> selectedLinkTypes,			
-			@QueryParam( "searchId" ) int projectSearchId,
+			@QueryParam( "projectSearchId" ) int projectSearchId,
 			@QueryParam( "annotationTypeId_1" ) int annotationTypeId_1,
 			@QueryParam( "annotationTypeId_2" ) int annotationTypeId_2,
 			@QueryParam( "psmScoreCutoff_1" ) Double psmScoreCutoff_1,
@@ -53,7 +53,7 @@ public class QCPlotPsmScoreVsScoreService {
 	throws Exception {
 
 		if ( projectSearchId == 0 ) {
-			String msg = ": Provided searchId is zero or wasn't provided";
+			String msg = ": Provided projectSearchId is zero or wasn't provided";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
@@ -79,7 +79,7 @@ public class QCPlotPsmScoreVsScoreService {
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsCollection );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search id: " + projectSearchId;
+				String msg = "No project ids for projectSearchId: " + projectSearchId;
 				log.error( msg );
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code

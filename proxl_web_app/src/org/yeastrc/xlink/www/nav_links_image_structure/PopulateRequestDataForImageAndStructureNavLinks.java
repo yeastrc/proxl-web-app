@@ -22,9 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class PopulateRequestDataForImageAndStructureNavLinks {
 
-
 	private static final Logger log = Logger.getLogger(PopulateRequestDataForImageAndStructureNavLinks.class);
-
 
 	/**
 	 * Static get instance
@@ -37,7 +35,14 @@ public class PopulateRequestDataForImageAndStructureNavLinks {
 	//  constructor
 	private PopulateRequestDataForImageAndStructureNavLinks() { }
 	
-
+	/**
+	 * @param peptideQueryJSONRoot
+	 * @param projectId
+	 * @param authAccessLevel
+	 * @param form
+	 * @param request
+	 * @throws ProxlWebappDataException
+	 */
 	public void populateRequestDataForImageAndStructureNavLinksForPeptide(
 
 			PeptideQueryJSONRoot peptideQueryJSONRoot,
@@ -51,6 +56,14 @@ public class PopulateRequestDataForImageAndStructureNavLinks {
 		populateRequestDataForImageAndStructureNavLinksCommon( imageStructureQueryJSONRoot, form, projectId, authAccessLevel, request );
 	}
 	
+	/**
+	 * @param proteinQueryJSONRoot
+	 * @param projectId
+	 * @param authAccessLevel
+	 * @param form
+	 * @param request
+	 * @throws ProxlWebappDataException
+	 */
 	public void populateRequestDataForImageAndStructureNavLinksForProtein(
 			
 			ProteinQueryJSONRoot proteinQueryJSONRoot,
@@ -65,6 +78,14 @@ public class PopulateRequestDataForImageAndStructureNavLinks {
 	}
 	
 
+	/**
+	 * @param imageStructureQueryJSONRoot
+	 * @param form
+	 * @param projectId
+	 * @param authAccessLevel
+	 * @param request
+	 * @throws ProxlWebappDataException
+	 */
 	private void populateRequestDataForImageAndStructureNavLinksCommon(
 			
 			ImageStructureQueryJSONRoot imageStructureQueryJSONRoot,
@@ -75,47 +96,32 @@ public class PopulateRequestDataForImageAndStructureNavLinks {
 		
 		request.setAttribute( "formDataForImageStructure", form );
 		
-		if ( form.getSearchIds() != null && form.getSearchIds().length == 1 ) {
-		
-			request.setAttribute( "ImageAndStructureSingleSearchId", form.getSearchIds()[0] );
+		if ( form.getProjectSearchId() != null && form.getProjectSearchId().length == 1 ) {
+			request.setAttribute( "ImageAndStructureSingleProjectSearchId", form.getProjectSearchId()[0] );
 		}
 		
-		
 		try {
-
 			//  Jackson JSON Mapper object for JSON deserialization and serialization
 
 			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
 
 			String imageStructureQueryJSONRootToPage = jacksonJSON_Mapper.writeValueAsString( imageStructureQueryJSONRoot );
 
-
 			//  Create URI Encoded JSON for passing to Image and Structure pages in hash 
-
 			String imageAndStructureQueryJSONRootToPageURIEncoded = URLEncodeDecodeAURL.urlEncodeAURL( imageStructureQueryJSONRootToPage );
-
 			request.setAttribute( "imageAndStructureQueryJSON", imageAndStructureQueryJSONRootToPageURIEncoded );
-
-			
 
 			boolean showStructureLink = true;
 			
 			if ( authAccessLevel.isAssistantProjectOwnerAllowed()
 					|| authAccessLevel.isAssistantProjectOwnerIfProjectNotLockedAllowed() ) {
 				
-				
 			} else {
-				
 				//  Public access user:
-				
 				showStructureLink = AnyPDBFilesForProjectId.getInstance().anyPDBFilesForProjectId( projectId );
 			}
 			
 			request.setAttribute( WebConstants.REQUEST_SHOW_STRUCTURE_LINK, showStructureLink );
-			
-
-			
-
 		
 		} catch ( JsonProcessingException e ) {
 			

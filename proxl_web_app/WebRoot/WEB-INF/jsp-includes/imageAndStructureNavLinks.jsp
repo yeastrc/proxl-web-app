@@ -9,8 +9,8 @@
 													
 	<c:url value="" var="imageAndStructureQueryParams">
 			
-		<c:forEach var="searchId" items="${ formDataForImageStructure.searchIds }" >
-			<c:param name="searchIds"   value="${searchId}" />
+		<c:forEach var="projectSearchId" items="${ formDataForImageStructure.projectSearchId }" >
+			<c:param name="projectSearchId"   value="${projectSearchId}" />
 		</c:forEach>
 	</c:url>
 	
@@ -28,13 +28,13 @@
 	<c:set var="structurePageURLFinal" value="${ structurePageURL }" />
 	
 	<c:choose>
-		<c:when test="${ not empty ImageAndStructureSingleSearchId }">
+		<c:when test="${ not empty ImageAndStructureSingleProjectSearchId }">
 	
 			<%--  Single searches so look up default Page URL --%>
-		
-			<c:set var="imagePageURLFinal"><proxl:defaultPageUrl pageName="/image" searchId="${ ImageAndStructureSingleSearchId }">${ imagePageURL }</proxl:defaultPageUrl></c:set>
+ 		
+			<c:set var="imagePageURLFinal"><proxl:defaultPageUrl pageName="/image" projectSearchId="${ ImageAndStructureSingleProjectSearchId }">${ imagePageURL }</proxl:defaultPageUrl></c:set>
 
-			<c:set var="structurePageURLFinal"><proxl:defaultPageUrl pageName="/structure" searchId="${ ImageAndStructureSingleSearchId }">${ structurePageURL }</proxl:defaultPageUrl></c:set>
+			<c:set var="structurePageURLFinal"><proxl:defaultPageUrl pageName="/structure" projectSearchId="${ ImageAndStructureSingleProjectSearchId }">${ structurePageURL }</proxl:defaultPageUrl></c:set>
 		
 		</c:when>
 	</c:choose>

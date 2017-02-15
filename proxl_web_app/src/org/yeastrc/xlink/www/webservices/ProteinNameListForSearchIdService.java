@@ -37,13 +37,13 @@ public class ProteinNameListForSearchIdService {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/getProteinNameListForSearchId") 
-	public ProteinNameListForSearchIdServiceResult getPSMFilterableAnnTypesForSearchId( 
-			@QueryParam( "searchId" ) int projectSearchId,
+	@Path("/getProteinNameListForProjectSearchId") 
+	public ProteinNameListForSearchIdServiceResult getProteinNameListForProjectSearchId( 
+			@QueryParam( "projectSearchId" ) int projectSearchId,
 			@Context HttpServletRequest request )
 	throws Exception {
 		if ( projectSearchId == 0 ) {
-			String msg = ": Provided searchId is zero";
+			String msg = ": Provided projectSearchId is zero";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
@@ -60,7 +60,7 @@ public class ProteinNameListForSearchIdService {
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsCollection );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search id: " + projectSearchId;
+				String msg = "No project ids for projectSearchId: " + projectSearchId;
 				log.error( msg );
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code

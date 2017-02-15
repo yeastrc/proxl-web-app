@@ -118,14 +118,14 @@
 			<div style="margin-bottom:20px;"> 
 				
 				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" searchId="${ search.projectSearchId }"
-						>peptide.do?searchId=<bean:write name="search" property="projectSearchId" 
+					href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ search.projectSearchId }"
+						>peptide.do?projectSearchId=<bean:write name="search" property="projectSearchId" 
 						/>&queryJSON=<c:out value="${ peptidePageQueryJSON }" escapeXml="false" 
 						></c:out></proxl:defaultPageUrl>"
 						>Peptide View</a>]
 						 									
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
-						href="${ contextPath }/<proxl:defaultPageUrl pageName="/proteinCoverageReport" searchId="${ search.projectSearchId }">proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+						href="${ contextPath }/<proxl:defaultPageUrl pageName="/proteinCoverageReport" projectSearchId="${ search.projectSearchId }">proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 						>Coverage Report</a>]
 				
 				<%-- Navigation links to Merged Image and Merged Structure --%>
@@ -145,7 +145,8 @@
 	
 			<html:form action="looplinkProtein" method="get" styleId="form_get_for_updated_parameters">
 				
-				<html:hidden property="searchId"/>
+				<input type="hidden" name="projectSearchId" value="${ search.projectSearchId }">
+				<%-- cannot use <html:hidden property="projectSearchId" /> since projectSearchId is an array --%>
 				
 				<html:hidden property="queryJSON" styleId="query_json_field" />
 			
@@ -153,20 +154,6 @@
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
 			</html:form>
-			
-						
-			<%-- WAS		
-			
-			
-			<html:form action="viewSearchCrosslinkProtein" method="get" styleId="form_get_for_updated_parameters">
-			
-				<html:hidden property="project_id"/>
-				
-				<html:hidden property="searchId"/>
-			
-			
-			--%>
-			
 			
 <%--
 		Moved JS call to the "Update" button
@@ -257,7 +244,7 @@
 						<c:set var="UpdateButtonText" value="Update"/>
 						<input type="button" value="${ UpdateButtonText }"  onclick="viewSearchLooplinkProteinPageCode.updatePageForFormParams()" >
 						
-						<c:set var="searchId" value="${ search.projectSearchId }"/>	
+						<c:set var="projectSearchId" value="${ search.projectSearchId }"/>	
 						<c:set var="page_JS_Object" value="viewSearchProteinPageCommonCrosslinkLooplinkCoverage"/>
 												
 						<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
@@ -272,11 +259,15 @@
 			<div style="display:inline;">
 
 				[<a class="tool_tip_attached_jq" data-tooltip="View crosslinks (instead of looplinks)" 
-						href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" searchId="${ search.projectSearchId }">crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+						href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ search.projectSearchId }">crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 						>View Crosslinks (<bean:write name="numCrosslinks" />)</a>]
 
-				[<a class="tool_tip_attached_jq" data-tooltip="Download all looplinks as tab-delimited text" href="${ contextPath }/downloadMergedProteins.do?<bean:write name="mergedQueryString" />">Download Data (<bean:write name="numLinks" />)</a>]
-				[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="mergedQueryString" />">Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
+				[<a class="tool_tip_attached_jq" data-tooltip="Download all looplinks as tab-delimited text" 
+					href="${ contextPath }/downloadMergedProteins.do?<bean:write name="queryString" />"
+					>Download Data (<bean:write name="numLinks" />)</a>]
+				[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" 
+					href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="queryString" />"
+					>Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
 			</div>
 
 			<%--  Block for user choosing which annotation types to display  --%>
@@ -347,11 +338,10 @@
 								
 								
 								onclick="viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.showHideLooplinkReportedPeptides( { clickedElement : this })"
-								search_id="${ search.projectSearchId }"
-								project_id="${ projectId }"
-								protein_id="<bean:write name="looplink" property="protein.proteinSequenceObject.proteinSequenceId" />"
-								protein_position_1="<bean:write name="looplink" property="proteinPosition1" />"
-								protein_position_2="<bean:write name="looplink" property="proteinPosition2" />"
+								data-project_search_id="${ search.projectSearchId }"
+								data-protein_id="<bean:write name="looplink" property="protein.proteinSequenceObject.proteinSequenceId" />"
+								data-protein_position_1="<bean:write name="looplink" property="proteinPosition1" />"
+								data-protein_position_2="<bean:write name="looplink" property="proteinPosition2" />"
 							>
 								<td><span class="proteinName" id="protein-id-<bean:write name="looplink" property="protein.proteinSequenceObject.proteinSequenceId" />"><bean:write name="looplink" property="protein.name" /></span></td>
 								<td class="integer-number-column"><bean:write name="looplink" property="proteinPosition1" /></td>

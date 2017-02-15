@@ -66,6 +66,8 @@ public class PeptidesMergedCommonPageDownload {
 		private List<WebMergedReportedPeptide> webMergedReportedPeptideList;
 		private MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot;
 		private List<AnnDisplayNameDescPeptPsmListsPair> peptidePsmAnnotationNameDescListsForEachSearch;
+		SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel;
+		
 		public List<AnnDisplayNameDescPeptPsmListsPair> getPeptidePsmAnnotationNameDescListsForEachSearch() {
 			return peptidePsmAnnotationNameDescListsForEachSearch;
 		}
@@ -86,6 +88,12 @@ public class PeptidesMergedCommonPageDownload {
 		public void setWebMergedReportedPeptideList(
 				List<WebMergedReportedPeptide> webMergedReportedPeptideList) {
 			this.webMergedReportedPeptideList = webMergedReportedPeptideList;
+		}
+		public SearcherCutoffValuesRootLevel getSearcherCutoffValuesRootLevel() {
+			return searcherCutoffValuesRootLevel;
+		}
+		public void setSearcherCutoffValuesRootLevel(SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel) {
+			this.searcherCutoffValuesRootLevel = searcherCutoffValuesRootLevel;
 		}
 	}
 	
@@ -166,6 +174,7 @@ public class PeptidesMergedCommonPageDownload {
 				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
 		SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel =
 				cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
+		
 		/////////////////////////////////////
 		//////    Get data from database per search and put in Map by UnifiedPeptideId then SearchId
 		Map<Integer, Map<Integer, WebReportedPeptideWrapper>> webReportedPeptideWrapperMapOnUnifiedPeptideIdSearchId = new HashMap<>();
@@ -419,9 +428,11 @@ public class PeptidesMergedCommonPageDownload {
 			}
 		}
 		PeptidesMergedCommonPageDownloadResult peptidesMergedCommonPageDownloadResult = new PeptidesMergedCommonPageDownloadResult();
-		peptidesMergedCommonPageDownloadResult.setPeptidePsmAnnotationNameDescListsForEachSearch( peptidePsmAnnotationNameDescListsForEachSearch );
-		peptidesMergedCommonPageDownloadResult.setMergedPeptideQueryJSONRoot( mergedPeptideQueryJSONRoot );
-		peptidesMergedCommonPageDownloadResult.setWebMergedReportedPeptideList( webMergedReportedPeptideList );
+		peptidesMergedCommonPageDownloadResult.peptidePsmAnnotationNameDescListsForEachSearch = peptidePsmAnnotationNameDescListsForEachSearch;
+		peptidesMergedCommonPageDownloadResult.mergedPeptideQueryJSONRoot = mergedPeptideQueryJSONRoot;
+		peptidesMergedCommonPageDownloadResult.webMergedReportedPeptideList = webMergedReportedPeptideList;
+		peptidesMergedCommonPageDownloadResult.searcherCutoffValuesRootLevel = searcherCutoffValuesRootLevel;
+		
 		return peptidesMergedCommonPageDownloadResult;
 	}
 	////////////////////////////////////////

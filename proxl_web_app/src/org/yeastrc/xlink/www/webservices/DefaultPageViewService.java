@@ -37,7 +37,7 @@ public class DefaultPageViewService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/saveOrUpdateDefaultPageView")
 	public GenericWebserviceResult saveOrUpdateDefaultPageView( 
-			@FormParam("searchId") int projectSearchId, 
+			@FormParam("projectSearchId") int projectSearchId, 
 			@FormParam("pageName") String pageName, 
 			@FormParam("pageUrl") String pageUrl, 
 			@FormParam("pageQueryJSON") String pageQueryJSON, 
@@ -45,7 +45,7 @@ public class DefaultPageViewService {
 		GenericWebserviceResult genericWebserviceResult = new GenericWebserviceResult();
 		try {
 			if ( projectSearchId == 0 ) {
-				String msg = "Provided searchId is zero, is = " + projectSearchId;
+				String msg = "Provided projectSearchId is zero or not provided";
 				log.error( msg );
 			    throw new WebApplicationException(
 			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -91,7 +91,7 @@ public class DefaultPageViewService {
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( searchIdsCollection );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search id: " + projectSearchId;
+				String msg = "No project ids for projectSearchId: " + projectSearchId;
 				log.error( msg );
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code

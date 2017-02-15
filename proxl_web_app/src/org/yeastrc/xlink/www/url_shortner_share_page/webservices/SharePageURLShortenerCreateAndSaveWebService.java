@@ -194,11 +194,11 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 					}
 				}
 
-				if ( webServiceRequest.searchIdList != null ) {
-					for ( int searchId : webServiceRequest.searchIdList ) {
+				if ( webServiceRequest.projectSearchIdList != null ) {
+					for ( int projectSearchId : webServiceRequest.projectSearchIdList ) {
 						URLShortenerAssociatedSearchIdDTO urlShortenerAssociatedSearchIdDTO = new URLShortenerAssociatedSearchIdDTO();
 						urlShortenerAssociatedSearchIdDTO.setUrlShortenerId( urlShortenerDTO.getId() );
-						urlShortenerAssociatedSearchIdDTO.setSearchId( searchId );
+						urlShortenerAssociatedSearchIdDTO.setSearchId( projectSearchId );
 						URLShortenerAssociatedSearchIdDAO.getInstance().save( urlShortenerAssociatedSearchIdDTO );
 					}
 				}
@@ -265,7 +265,7 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 	 */
 	public static class WebServiceRequest {
 		private String pageUrl;
-		private List<Integer> searchIdList; 
+		private List<Integer> projectSearchIdList; 
 		
 		public String getPageUrl() {
 			return pageUrl;
@@ -273,12 +273,13 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 		public void setPageUrl(String pageUrl) {
 			this.pageUrl = pageUrl;
 		}
-		public List<Integer> getSearchIdList() {
-			return searchIdList;
+		public List<Integer> getProjectSearchIdList() {
+			return projectSearchIdList;
 		}
-		public void setSearchIdList(List<Integer> searchIdList) {
-			this.searchIdList = searchIdList;
-		} 
+		public void setProjectSearchIdList(List<Integer> projectSearchIdList) {
+			this.projectSearchIdList = projectSearchIdList;
+		}
+
 	}
 	
 	/**

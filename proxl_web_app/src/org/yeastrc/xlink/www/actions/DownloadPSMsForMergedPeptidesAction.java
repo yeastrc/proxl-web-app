@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
+import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.objects.AnnotationTypeDTOListForSearchId;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
@@ -42,9 +44,6 @@ import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
-import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
-import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -68,7 +67,7 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 			request.setAttribute( "mergedSearchViewCrosslinkPeptideForm", form );
 			// Get the session first.  
 //			HttpSession session = request.getSession();
-			int[] projectSearchIds = form.getSearchIds();
+			int[] projectSearchIds = form.getProjectSearchId();
 			if ( projectSearchIds.length == 0 ) {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
@@ -82,7 +81,7 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search ids: ";
+				String msg = "No project ids for projectSearchIds: ";
 				for ( int projectSearchId : projectSearchIds ) {
 					msg += projectSearchId + ", ";
 				}
@@ -114,10 +113,11 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
 			
-			request.setAttribute( "searchIds", projectSearchIdsListDeduppedSorted );
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
 			Set<Integer> searchIdsSet = new HashSet<>();
+			List<Integer> searchIdsForFilename = new ArrayList<>( projectSearchIdsListDeduppedSorted.size() );
+			
 			for( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
 				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 				if ( search == null ) {
@@ -131,13 +131,23 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 				searches.add( search );
 				searchesMapOnSearchId.put( search.getSearchId(), search );
 				searchIdsSet.add( search.getSearchId() );
+				searchIdsForFilename.add( search.getSearchId() );
 			}
+			// Sort searches list
+			Collections.sort( searches, new Comparator<SearchDTO>() {
+				@Override
+				public int compare(SearchDTO o1, SearchDTO o2) {
+					return o1.getProjectSearchId() - o2.getProjectSearchId();
+				}
+			});
+			Collections.sort( searchIdsForFilename );
 
 			OutputStreamWriter writer = null;
 			try {
 				Map<Integer, AnnotationTypeDTOListForSearchId> psmAnnotationTypeDataDefaultDisplayInDisplayOrder =
 						GetAnnotationTypeDataDefaultDisplayInDisplayOrder.getInstance()
 						.getPsmAnnotationTypeDataDefaultDisplayInDisplayOrder( searchIdsSet );
+				
 				////////     Get Merged Peptides
 				PeptidesMergedCommonPageDownloadResult peptidesMergedCommonPageDownloadResult =
 						PeptidesMergedCommonPageDownload.getInstance()
@@ -148,19 +158,18 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 								searchesMapOnSearchId );
 				////////////
 				/////   Searcher cutoffs for all searches
-				CutoffValuesRootLevel cutoffValuesRootLevel = peptidesMergedCommonPageDownloadResult.getMergedPeptideQueryJSONRoot().getCutoffs();
-				Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
-						Z_CutoffValuesObjectsToOtherObjectsFactory
-						.createSearcherCutoffValuesRootLevel( searchIdsSet, cutoffValuesRootLevel );
 				SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel =
-						cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
+						peptidesMergedCommonPageDownloadResult.searcherCutoffValuesRootLevel;
+				
 				// generate file name
-				String filename = "xlinks-psms-search-";
-				filename += StringUtils.join( form.getSearchIds(), '-' );
 				DateTime dt = new DateTime();
 				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
-				filename += "-" + fmt.print( dt );
-				filename += ".txt";
+				
+				String filename = "xlinks-psms-search-" 
+						+ StringUtils.join( searchIdsForFilename, '-' )
+						+ "-" + fmt.print( dt )
+						+ ".txt";
+
 				response.setContentType("application/x-download");
 				response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 				ServletOutputStream out = response.getOutputStream();
@@ -172,7 +181,7 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 				writer.write( "\tOBSERVED M/Z\tCHARGE\tRETENTION TIME (MINUTES)\tSCAN FILENAME" );
 				//  Process for each search id:
 				for ( SearchDTO search : searches ) {
-					int projectSearchId = search.getProjectSearchId();
+//					int projectSearchId = search.getProjectSearchId();
 					Integer eachSearchIdToProcess = search.getSearchId();
 					AnnotationTypeDTOListForSearchId annotationTypeDTOListForSearchId = psmAnnotationTypeDataDefaultDisplayInDisplayOrder.get( eachSearchIdToProcess );
 					if ( annotationTypeDTOListForSearchId == null ) {
@@ -184,7 +193,7 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 						writer.write( "\t" );
 						writer.write( psmAnnotationTypeDTO.getName() );
 						writer.write( "(SEARCH ID: " );
-						writer.write( Integer.toString( projectSearchId ) );
+						writer.write( Integer.toString( eachSearchIdToProcess ) );
 						writer.write( ")" );
 					}
 				}
@@ -202,13 +211,18 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 //		CHARGE
 //		RETENTION TIME (MINUTES)
 //		SCAN FILENAME (THE MZML FILE)
+				
 				for( WebMergedReportedPeptide link : peptidesMergedCommonPageDownloadResult.getWebMergedReportedPeptideList() ) {
+					
 					//  Process links
 					int unifiedReportedPeptideId = link.getUnifiedReportedPeptideId();
+					
 					//  Process for each search id:
 					for ( SearchDTO search : searches ) {
+						
 						int eachProjectSearchIdToProcess = search.getProjectSearchId();
 						Integer eachSearchIdToProcess = search.getSearchId();
+						
 						SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = 
 								searcherCutoffValuesRootLevel.getPerSearchCutoffs( eachProjectSearchIdToProcess );
 						if ( searcherCutoffValuesSearchLevel == null ) {
@@ -216,10 +230,11 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 							log.error( msg );
 							throw new ProxlWebappDataException( msg );
 						}
+						
 						//  First get list of reported peptide ids for unifiedReportedPeptideId and search id
 						List<Integer> reportedPeptideIdList = 
 								ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher.getInstance()
-								.getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( eachProjectSearchIdToProcess, unifiedReportedPeptideId );
+								.getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( eachSearchIdToProcess, unifiedReportedPeptideId );
 						//  Process each search id, reported peptide id pair
 						for ( int reportedPeptideId : reportedPeptideIdList ) {
 							//  Process Each search id/reported peptide id for the link
@@ -230,7 +245,7 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 											reportedPeptideId, 
 											searcherCutoffValuesSearchLevel);
 							for ( PsmWebDisplayWebServiceResult psmWebDisplay : psms ) {
-								writer.write( Integer.toString( eachProjectSearchIdToProcess ) );
+								writer.write( Integer.toString( eachSearchIdToProcess ) );
 								writer.write( "\t" );
 								if ( psmWebDisplay.getScanNumber() != null ) {
 									writer.write( Integer.toString( psmWebDisplay.getScanNumber() ) );
@@ -248,9 +263,9 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 									List<String> reportedProteinStrings = new ArrayList<>();
 									for( WebMergedProteinPosition peptideProteinPosition : peptideProteinPositions ) {
 										String output = peptideProteinPosition.getProtein().getName();
-										if( link.getLinkType().equals( "LOOPLINK" ) ) {
+										if(  XLinkUtils.LOOP_TYPE_STRING_UPPERCASE.equals( link.getLinkType() ) ) {
 											output += "(" + peptideProteinPosition.getPosition1() + "," + peptideProteinPosition.getPosition2() + ")";
-										} else if( link.getLinkType().equals( "CROSSLINK" ) ) {
+										} else if( XLinkUtils.CROSS_TYPE_STRING_UPPERCASE.equals( link.getLinkType() ) ) {
 											output += "(" + peptideProteinPosition.getPosition1() + ")";
 										}
 										reportedProteinStrings.add( output );
@@ -272,7 +287,7 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 									if( peptideProteinPositions != null && peptideProteinPositions.size() > 0 ) {
 										List<String> reportedProteinStrings = new ArrayList<>();
 										for( WebMergedProteinPosition peptideProteinPosition : peptideProteinPositions ) {
-											if( link.getLinkType().equals( "CROSSLINK" ) ) {
+											if( XLinkUtils.CROSS_TYPE_STRING_UPPERCASE.equals( link.getLinkType() ) ) {
 												String output = peptideProteinPosition.getProtein().getName();
 												output += "(" + peptideProteinPosition.getPosition1() + ")";
 												reportedProteinStrings.add( output );

@@ -60,7 +60,7 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 			request.setAttribute( "mergedSearchViewCrosslinkPeptideForm", form );
 			// Get the session first.  
 //			HttpSession session = request.getSession();
-			int[] projectSearchIds = form.getSearchIds();
+			int[] projectSearchIds = form.getProjectSearchId();
 			if ( projectSearchIds.length == 0 ) {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
@@ -105,9 +105,10 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
 			
-			request.setAttribute( "searchIds", projectSearchIdsListDeduppedSorted );
-			List<SearchDTO> searches = new ArrayList<SearchDTO>();
+			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIdsListDeduppedSorted.size() );
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
+			List<Integer> searchIds = new ArrayList<>( projectSearchIdsListDeduppedSorted.size() );
+			
 			for( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
 				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 				if ( search == null ) {
@@ -120,14 +121,16 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 				}
 				searches.add( search );
 				searchesMapOnSearchId.put( search.getSearchId(), search );
+				searchIds.add( search.getSearchId() );
 			}
 			Collections.sort( searches, new Comparator<SearchDTO>() {
-
 				@Override
 				public int compare(SearchDTO o1, SearchDTO o2) {
 					return o1.getSearchId() - o2.getSearchId();
 				}
 			});
+			Collections.sort( searchIds );
+			
 			OutputStreamWriter writer = null;
 			try {
 				////////     Get Merged Peptides
@@ -141,7 +144,7 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 
 				// generate file name
 				String filename = "xlinks-peptides-search-";
-				filename += StringUtils.join( form.getSearchIds(), '-' );
+				filename += StringUtils.join( searchIds, '-' );
 				DateTime dt = new DateTime();
 				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
 				filename += "-" + fmt.print( dt );
@@ -151,6 +154,7 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 				ServletOutputStream out = response.getOutputStream();
 				BufferedOutputStream bos = new BufferedOutputStream(out);
 				writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
+				//  Write header line
 				writer.write( "SEARCH ID(S)\tTYPE\tPEPTIDE 1\tPOSITION\tMODS\tPEPTIDE 2\tPOSITION\tMODS\tPROTEIN 1\tPROTEIN 2\tNUM PSMS" );
 				for ( AnnDisplayNameDescPeptPsmListsPair annDisplayNameDescPeptPsmListsPair : peptidesMergedCommonPageDownloadResult.getPeptidePsmAnnotationNameDescListsForEachSearch() ) {
 					for ( AnnotationDisplayNameDescription peptideAnnotationDisplayNameDescription : annDisplayNameDescPeptPsmListsPair.getPeptideAnnotationNameDescriptionList() ) {
@@ -160,7 +164,7 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 						writer.write( Integer.toString( annDisplayNameDescPeptPsmListsPair.getSearchId() ) );
 						writer.write( ")" );
 					}
-					for ( AnnotationDisplayNameDescription psmAnnotationDisplayNameDescription : annDisplayNameDescPeptPsmListsPair.getPeptideAnnotationNameDescriptionList() ) {
+					for ( AnnotationDisplayNameDescription psmAnnotationDisplayNameDescription : annDisplayNameDescPeptPsmListsPair.getPsmAnnotationNameDescriptionList() ) {
 						writer.write( "\tBest PSM Value:" );
 						writer.write( psmAnnotationDisplayNameDescription.getDisplayName() );
 						writer.write( "(SEARCH ID: " );
@@ -169,6 +173,7 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 					}
 				}
 				writer.write( "\n" );
+				
 				for( WebMergedReportedPeptide link : peptidesMergedCommonPageDownloadResult.getWebMergedReportedPeptideList() ) {
 					List<WebMergedProteinPosition> peptide1ProteinPositions = link.getPeptide1ProteinPositions();
 					List<WebMergedProteinPosition> peptide2ProteinPositions = link.getPeptide2ProteinPositions();

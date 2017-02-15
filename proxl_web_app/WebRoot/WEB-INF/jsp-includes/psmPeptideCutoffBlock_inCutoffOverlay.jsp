@@ -102,7 +102,7 @@
 											id="annotation_cutoff_input_field_ann_id_${ annotationCutoffDataEntry.annotationTypeId }"
 											class=" ${ filterTypeHTML_Id }_annotation_cutoff_input_field_jq  annotation_cutoff_input_field_jq <%--  ${ class_string_tool_tip_attached_jq } --%> " 
 											data-type_id="${ annotationCutoffDataEntry.annotationTypeId }"
-											data-search_id="${ cutoffPageDisplayRootPerSearchDataListEntry.projectSearchId }"
+											data-project_search_id="${ cutoffPageDisplayRootPerSearchDataListEntry.projectSearchId }"
 <%-- 											
 											<c:if test="${ not empty annotationCutoffDataEntry.annotationDescription }">
 												data-tooltip="<c:out value="${ annotationCutoffDataEntry.annotationDescription }"></c:out>"

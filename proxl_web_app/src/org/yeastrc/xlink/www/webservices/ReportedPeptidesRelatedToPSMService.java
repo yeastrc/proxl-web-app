@@ -52,7 +52,7 @@ public class ReportedPeptidesRelatedToPSMService {
 	
 	/**
 	 * @param searchId
-	 * @param psmPeptideCutoffsForSearchId_JSONString
+	 * @param psmPeptideCutoffsForProjectSearchId_JSONString
 	 * @param annTypeIdDisplayJSON_PerSearch_JSONString
 	 * @param psmId
 	 * @param scanId
@@ -63,8 +63,8 @@ public class ReportedPeptidesRelatedToPSMService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/get") 
-	public ReportedPeptidesRelatedToPSMServiceResult get( @QueryParam( "search_id" ) Integer projectSearchId,
-										  @QueryParam( "psmPeptideCutoffsForSearchId" ) String psmPeptideCutoffsForSearchId_JSONString,
+	public ReportedPeptidesRelatedToPSMServiceResult get( @QueryParam( "project_search_id" ) Integer projectSearchId,
+										  @QueryParam( "psmPeptideCutoffsForProjectSearchId" ) String psmPeptideCutoffsForProjectSearchId_JSONString,
 										  @QueryParam( "peptideAnnTypeDisplayPerSearch" ) String annTypeIdDisplayJSON_PerSearch_JSONString,
 										  @QueryParam( "psm_id" ) Integer psmId,
 										  @QueryParam( "scan_id" ) Integer scanId,
@@ -72,7 +72,7 @@ public class ReportedPeptidesRelatedToPSMService {
 	throws Exception {
 
 		if ( projectSearchId == null ) {
-			String msg = "Provided search_id is null or search_id is missing";
+			String msg = "Provided project_search_id is null or project_search_id is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -80,8 +80,8 @@ public class ReportedPeptidesRelatedToPSMService {
 		    	        .build()
 		    	        );
 		}
-		if ( StringUtils.isEmpty( psmPeptideCutoffsForSearchId_JSONString ) ) {
-			String msg = "Provided psmPeptideCutoffsForSearchId is null or psmPeptideCutoffsForSearchId is missing";
+		if ( StringUtils.isEmpty( psmPeptideCutoffsForProjectSearchId_JSONString ) ) {
+			String msg = "Provided psmPeptideCutoffsForProjectSearchId is null or psmPeptideCutoffsForProjectSearchId is missing";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -185,7 +185,7 @@ public class ReportedPeptidesRelatedToPSMService {
 			
 			//   Get PSM and Peptide Cutoff data from JSON
 			CutoffValuesSearchLevel cutoffValuesSearchLevel = 
-					DeserializeCutoffForWebservices.getInstance().deserialize_JSON_ToCutoffSearchLevel( psmPeptideCutoffsForSearchId_JSONString );
+					DeserializeCutoffForWebservices.getInstance().deserialize_JSON_ToCutoffSearchLevel( psmPeptideCutoffsForProjectSearchId_JSONString );
 
 			//    Get Peptide annotation type ids to include for display
 			AnnTypeIdDisplayJSON_PerSearch annTypeIdDisplayJSON_PerSearch = null;

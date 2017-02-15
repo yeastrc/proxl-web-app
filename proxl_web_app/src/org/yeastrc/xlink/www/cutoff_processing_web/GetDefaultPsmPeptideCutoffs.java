@@ -66,7 +66,7 @@ public class GetDefaultPsmPeptideCutoffs {
 					|| psm_AnnotationType_DTOMap != null ) {
 				CutoffValuesSearchLevel cutoffValuesSearchLevelEntry = new CutoffValuesSearchLevel();
 				cutoffValuesSearchesMap.put( projectSearchId.toString(), cutoffValuesSearchLevelEntry );
-				cutoffValuesSearchLevelEntry.setSearchId( projectSearchId );
+				cutoffValuesSearchLevelEntry.setProjectSearchId( projectSearchId );
 				//  Get Cutoff on Import records
 				List<CutoffsAppliedOnImportDTO> cutoffsAppliedOnImportList = 
 						CutoffsAppliedOnImportSearcher.getInstance().getCutoffsAppliedOnImportDTOForSearchId( searchId );

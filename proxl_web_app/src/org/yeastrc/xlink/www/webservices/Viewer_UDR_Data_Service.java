@@ -162,7 +162,7 @@ public class Viewer_UDR_Data_Service {
 	/**
 	 * 
 	 * @param projectSearchIdList
-	 * @param psmPeptideCutoffsForSearchIds_JSONString
+	 * @param psmPeptideCutoffsForProjectSearchIds_JSONString
 	 * @param filterNonUniquePeptidesString
 	 * @param filterOnlyOnePSMString
 	 * @param filterOnlyOnePeptideString
@@ -175,8 +175,8 @@ public class Viewer_UDR_Data_Service {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getUDRData") 
 	public Viewer_UDR_Data_Service_Result getViewerData(
-			@QueryParam( "searchIds" ) List<Integer> projectSearchIdList,
-			@QueryParam( "psmPeptideCutoffsForSearchIds" ) String psmPeptideCutoffsForSearchIds_JSONString,
+			@QueryParam( "projectSearchId" ) List<Integer> projectSearchIdList,
+			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
 			@QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
 			@QueryParam( "filterOnlyOnePeptide" ) String filterOnlyOnePeptideString,
@@ -184,7 +184,7 @@ public class Viewer_UDR_Data_Service {
 			@Context HttpServletRequest request )
 	throws Exception {
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
-			String msg = "Provided searchIds is null or empty, searchIds = " + projectSearchIdList;
+			String msg = "Provided projectSearchId is null or empty, projectSearchId = " + projectSearchIdList;
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -193,7 +193,7 @@ public class Viewer_UDR_Data_Service {
 		    	        );
 		}
 		if ( projectSearchIdList.size() != 1 ) {
-			String msg = "Provided searchIds is more than one search id, searchIds = " + projectSearchIdList;
+			String msg = "Provided projectSearchId is more than one search id, projectSearchId = " + projectSearchIdList;
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -201,8 +201,8 @@ public class Viewer_UDR_Data_Service {
 		    	        .build()
 		    	        );
 		}
-		if ( StringUtils.isEmpty( psmPeptideCutoffsForSearchIds_JSONString ) ) {
-			String msg = "Provided psmPeptideCutoffsForSearchIds is null or psmPeptideCutoffsForSearchIds is missing";
+		if ( StringUtils.isEmpty( psmPeptideCutoffsForProjectSearchIds_JSONString ) ) {
+			String msg = "Provided psmPeptideCutoffsForProjectSearchIds is null or psmPeptideCutoffsForProjectSearchIds is missing";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -230,7 +230,7 @@ public class Viewer_UDR_Data_Service {
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search ids: ";
+				String msg = "No project ids for projectSearchIdList: ";
 				for ( int projectSearchId : projectSearchIdList ) {
 					msg += projectSearchId + ", ";
 				}				
@@ -306,17 +306,17 @@ public class Viewer_UDR_Data_Service {
 			
 			CutoffValuesRootLevel cutoffValuesRootLevel = null;
 			try {
-				cutoffValuesRootLevel = jacksonJSON_Mapper.readValue( psmPeptideCutoffsForSearchIds_JSONString, CutoffValuesRootLevel.class );
+				cutoffValuesRootLevel = jacksonJSON_Mapper.readValue( psmPeptideCutoffsForProjectSearchIds_JSONString, CutoffValuesRootLevel.class );
 			} catch ( JsonParseException e ) {
-				String msg = "Failed to parse 'psmPeptideCutoffsForSearchIds_JSONString', JsonParseException.  psmPeptideCutoffsForSearchIds_JSONString: " + psmPeptideCutoffsForSearchIds_JSONString;
+				String msg = "Failed to parse 'psmPeptideCutoffsForProjectSearchIds_JSONString', JsonParseException.  psmPeptideCutoffsForProjectSearchIds_JSONString: " + psmPeptideCutoffsForProjectSearchIds_JSONString;
 				log.error( msg, e );
 				throw e;
 			} catch ( JsonMappingException e ) {
-				String msg = "Failed to parse 'psmPeptideCutoffsForSearchIds_JSONString', JsonMappingException.  psmPeptideCutoffsForSearchIds_JSONString: " + psmPeptideCutoffsForSearchIds_JSONString;
+				String msg = "Failed to parse 'psmPeptideCutoffsForProjectSearchIds_JSONString', JsonMappingException.  psmPeptideCutoffsForProjectSearchIds_JSONString: " + psmPeptideCutoffsForProjectSearchIds_JSONString;
 				log.error( msg, e );
 				throw e;
 			} catch ( IOException e ) {
-				String msg = "Failed to parse 'psmPeptideCutoffsForSearchIds_JSONString', IOException.  psmPeptideCutoffsForSearchIds_JSONString: " + psmPeptideCutoffsForSearchIds_JSONString;
+				String msg = "Failed to parse 'psmPeptideCutoffsForProjectSearchIds_JSONString', IOException.  psmPeptideCutoffsForProjectSearchIds_JSONString: " + psmPeptideCutoffsForProjectSearchIds_JSONString;
 				log.error( msg, e );
 				throw e;
 			}

@@ -55,7 +55,7 @@ public class DownloadMergedSearchUDRsAction extends Action {
 			MergedSearchViewProteinsForm form = (MergedSearchViewProteinsForm)actionForm;
 			// Get the session first.  
 //			HttpSession session = request.getSession();
-			int[] projectSearchIds = form.getSearchIds();
+			int[] projectSearchIds = form.getProjectSearchId();
 			if ( projectSearchIds.length == 0 ) {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
@@ -100,10 +100,12 @@ public class DownloadMergedSearchUDRsAction extends Action {
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
 
-			List<SearchDTO> searches = new ArrayList<SearchDTO>();
+			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIdsListDeduppedSorted.size() );
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
 			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
 			int searchIdsArrayIndex = 0;
+			List<Integer> searchIds = new ArrayList<>( projectSearchIdsListDeduppedSorted.size() );
+			
 			for( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
 				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 				if ( search == null ) {
@@ -118,6 +120,7 @@ public class DownloadMergedSearchUDRsAction extends Action {
 				searchesMapOnSearchId.put( search.getSearchId(), search );
 				searchIdsArray[ searchIdsArrayIndex ] = search.getSearchId();
 				searchIdsArrayIndex++;
+				searchIds.add( search.getSearchId() );
 			}
 			// Sort searches list
 			Collections.sort( searches, new Comparator<SearchDTO>() {
@@ -126,6 +129,7 @@ public class DownloadMergedSearchUDRsAction extends Action {
 					return o1.getSearchId() - o2.getSearchId();
 				}
 			});
+			Collections.sort( searchIds );
 			
 			OutputStreamWriter writer = null;
 			try {
@@ -141,7 +145,7 @@ public class DownloadMergedSearchUDRsAction extends Action {
 				List<MergedSearchProteinLooplink> looplinks = proteinsMergedCommonPageDownloadResult.getLooplinks();
 				// generate file name
 				String filename = "udr-list-search-";
-				filename += StringUtils.join( form.getSearchIds(), '-' );
+				filename += StringUtils.join( searchIds, '-' );
 				DateTime dt = new DateTime();
 				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
 				filename += "-" + fmt.print( dt );

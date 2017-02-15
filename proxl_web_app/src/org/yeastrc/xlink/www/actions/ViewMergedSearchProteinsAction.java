@@ -81,7 +81,7 @@ public class ViewMergedSearchProteinsAction extends Action {
 			request.setAttribute( "strutsActionForm", form );
 			// Get the session first.  
 			//			HttpSession session = request.getSession();
-			int[] projectSearchIds = form.getSearchIds();
+			int[] projectSearchIds = form.getProjectSearchId();
 			if ( projectSearchIds.length == 0 ) {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
@@ -95,7 +95,7 @@ public class ViewMergedSearchProteinsAction extends Action {
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search ids: ";
+				String msg = "No project ids for projectSearchIds: ";
 				for ( int projectSearchId : projectSearchIds ) {
 					msg += projectSearchId + ", ";
 				}
@@ -132,8 +132,6 @@ public class ViewMergedSearchProteinsAction extends Action {
 			//  Jackson JSON Mapper object for JSON deserialization and serialization
 			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
 			
-			request.setAttribute( "searchIds", projectSearchIdsListDeduppedSorted );
-			
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
 			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
@@ -141,7 +139,7 @@ public class ViewMergedSearchProteinsAction extends Action {
 			for( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
 				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 				if ( search == null ) {
-					String msg = "search id '" + projectSearchId + "' not found in the database. User taken to home page.";
+					String msg = "projectSearchId '" + projectSearchId + "' not found in the database. User taken to home page.";
 					log.warn( msg );
 					//  Search not found, the data on the page they are requesting does not exist.
 					//  The data on the user's previous page no longer reflects what is in the database.

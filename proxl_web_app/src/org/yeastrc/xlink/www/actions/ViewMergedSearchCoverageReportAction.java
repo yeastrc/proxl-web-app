@@ -91,13 +91,12 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			request.setAttribute( "mergedSearchViewCrosslinkProteinForm", form );
 			request.setAttribute( "strutsActionForm", form );
 			request.setAttribute( "queryString",  request.getQueryString() );
-			request.setAttribute( "mergedQueryString", request.getQueryString() );
 			if ( Struts_Config_Parameter_Values_Constants.STRUTS__PARAMETER__MERGED_PROTEIN_COVERAGE_PAGE.equals( strutsActionMappingParameter ) ) {
 				request.setAttribute( "mergedPage", true );
 			}
 			// Get the session first.  
 //			HttpSession session = request.getSession();
-			int[] projectSearchIds = form.getSearchIds();
+			int[] projectSearchIds = form.getProjectSearchId();
 			if ( projectSearchIds == null || projectSearchIds.length == 0 ) {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
@@ -111,7 +110,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search ids: ";
+				String msg = "No project ids for projectSearchIds: ";
 				for ( int projectSearchId : projectSearchIds ) {
 					msg += projectSearchId + ", ";
 				}

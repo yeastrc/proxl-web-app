@@ -194,7 +194,7 @@ var ViewProteinCoverageReportPageCode = function() {
 				return { output_FieldDataFailedValidation : getCutoffsFromThePageResult_FieldDataFailedValidation };
 			}
 
-			var outputCutoffs = getCutoffsFromThePageResult.cutoffsBySearchId;
+			var outputCutoffs = getCutoffsFromThePageResult.cutoffsByProjectSearchId;
 
 
 

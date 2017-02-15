@@ -12,10 +12,10 @@
 	style="cursor: pointer; "
 	
 	onclick="viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.showHideLooplinkReportedPeptides( { clickedElement : this })"
-	search_id="{{ data.searchId }}"
-	protein_id="{{ protein_id }}"
-	protein_position_1="{{ protein_position_1 }}"
-	protein_position_2="{{ protein_position_2 }}"
+	data-project_search_id="{{ data.projectSearchId }}"
+	data-protein_id="{{ protein_id }}"
+	data-protein_position_1="{{ protein_position_1 }}"
+	data-protein_position_2="{{ protein_position_2 }}"
 >
 
 	<td>{{ data.searchName }}</td>

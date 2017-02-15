@@ -8,10 +8,9 @@
 <tr 
 	style="cursor: pointer; "
 	onclick="viewPsmsLoadedFromWebServiceTemplate.showHidePsms( { clickedElement : this } )"
-	reported_peptide_id="{{ data.reportedPeptide.id }}"
-	search_id="{{ searchId }}"
-	project_id="${ projectId }"  <%-- JSP EL value --%>
->
+	data-reported_peptide_id="{{ data.reportedPeptide.id }}"
+	data-project_search_id="{{ projectSearchId }}"
+	>
 	 
 	<td>{{ data.reportedPeptide.sequence }}</td>
 	<td>{{ data.peptide.sequence }}</td>

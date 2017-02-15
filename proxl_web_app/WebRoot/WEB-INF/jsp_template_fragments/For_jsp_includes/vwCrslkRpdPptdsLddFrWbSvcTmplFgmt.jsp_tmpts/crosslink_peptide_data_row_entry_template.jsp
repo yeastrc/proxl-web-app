@@ -9,10 +9,10 @@
 	onclick="viewPsmsLoadedFromWebServiceTemplate.showHidePsms( { clickedElement : this } )"
 	
 	<%--  Values to pass to get PSMs for this reported peptide --%>
-	reported_peptide_id="{{ data.reportedPeptide.id }}"
-	search_id="{{ searchId }}"
-	project_id="${ projectId }"  <%-- JSP EL value --%>
->
+	
+	data-reported_peptide_id="{{ data.reportedPeptide.id }}"
+	data-project_search_id="{{ projectSearchId }}"
+	>
 	 
 	<td>{{ data.reportedPeptide.sequence }}</td>
 	<td style="text-align:left;" >{{ data.peptide1.sequence }}</td>

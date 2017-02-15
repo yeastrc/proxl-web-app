@@ -85,7 +85,7 @@ public class ViewSearchPeptidesAction extends Action {
 			// our form
 			SearchViewPeptidesForm form = (SearchViewPeptidesForm)actionForm;
 			request.setAttribute( "strutsActionForm", form );
-			int projectSearchId = form.getSearchId();
+			int projectSearchId = form.getProjectSearchIdSingle();
 			viewSearchPeptidesPageDataRoot.setProjectSearchId( projectSearchId );
 			// Get the session first.  
 //			HttpSession session = request.getSession();
@@ -95,7 +95,7 @@ public class ViewSearchPeptidesAction extends Action {
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search id: " + projectSearchId;
+				String msg = "No project ids for projectSearchId: " + projectSearchId;
 				log.error( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
@@ -287,7 +287,6 @@ public class ViewSearchPeptidesAction extends Action {
 				viewSearchPeptidesPageDataRoot.setShowNumberUniquePSMs( true );
 			}
 			request.setAttribute( "queryString",  request.getQueryString() );
-			request.setAttribute( "mergedQueryString", request.getQueryString().replaceAll( "searchId=", "searchIds=" ) );
 			/////////////////////
 			//  clear out form so value doesn't go back on the page in the form
 			form.setQueryJSON( "" );

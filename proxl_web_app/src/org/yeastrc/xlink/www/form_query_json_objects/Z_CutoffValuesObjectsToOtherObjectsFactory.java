@@ -160,7 +160,7 @@ public class Z_CutoffValuesObjectsToOtherObjectsFactory {
 		
 		
 		
-		Integer projectSearchId = inputItem.getSearchId();
+		Integer projectSearchId = inputItem.getProjectSearchId();
 
 		Integer searchId =
 				MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
@@ -227,7 +227,7 @@ public class Z_CutoffValuesObjectsToOtherObjectsFactory {
 		
 		// inputs
 		
-		int projectSearchId = inputItem.getSearchId();  //  Actually returns projectSearchId
+		int projectSearchId = inputItem.getProjectSearchId();  //  Actually returns projectSearchId
 		
 		Map<String,CutoffValuesAnnotationLevel> psmCutoffValues = inputItem.getPsmCutoffValues();
 		Map<String,CutoffValuesAnnotationLevel> peptideCutoffValues = inputItem.getPeptideCutoffValues();

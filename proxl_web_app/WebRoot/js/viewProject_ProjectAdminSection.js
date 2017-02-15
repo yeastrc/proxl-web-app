@@ -929,22 +929,26 @@ var executeCopySearchesComplete = function(requestData, responseData) {
 	if (responseData.status) {
 		$("#show-project-searches-copied-to").data( {copyToProjectId: requestData.copyToProjectId } );
 		if ( ! requestData.copyToOtherProject ) {
+			//  Not Copy so Moving searches to Other Project Id
 			//  Remove the moved searches from the DOM
-			var searchIds = requestData.searchesToCopyToOtherProject;
+			var projectSearchIds = requestData.searchesToCopyToOtherProject;
 			var $search_row_jq = $(".search_row_jq");
 			$search_row_jq.each(function( index, element ){
 				var $thisRow = $(this);
-				var searchIdString = $thisRow.attr("searchId");
+				var projectSearchIdString = $thisRow.attr("data-project_search_id");
 				try {
-					var searchId = parseInt( searchIdString, 10 );
-					if ( searchId !== undefined && searchId !== null ) {
-						var index = searchIds.indexOf( searchId );
+					var projectSearchId = parseInt( projectSearchIdString, 10 );
+					if ( isNaN( projectSearchId) ) {
+						throw Error( "Value in attr 'data-project_search_id' is not integer: " + projectSearchIdString );
+					}
+					if ( projectSearchId !== undefined && projectSearchId !== null ) {
+						var index = projectSearchIds.indexOf( projectSearchId );
 						if( index != -1 ) {
 							$thisRow.remove();
 						}
 					}
 				} catch ( exception ) {
-//					var z = 90;
+//					var z = 1;
 				}
 			});
 		}
@@ -952,11 +956,9 @@ var executeCopySearchesComplete = function(requestData, responseData) {
 		$("#copy-searches-overlay-confirmation-project-block").show();
 	} else {
 		$("#copy-searches-overlay-confirm-project-block").hide();
-//		private boolean moveToProjectMarkedForDeletion;
-//		private boolean moveToProjectDisabled;
-		if ( responseData.moveToProjectMarkedForDeletion ) {
+		if ( responseData.copyToProjectMarkedForDeletion ) {
 			$("#copy-searches-overlay-move-to-project-marked-for-deletion-block").show();
-		} else if ( responseData.moveToProjectDisabled ) {
+		} else if ( responseData.copyToProjectDisabled ) {
 			$("#copy-searches-overlay-move-to-project-disabled-block").show();
 		} else {
 			//  Shouldn't get here, no other reason for status to be false

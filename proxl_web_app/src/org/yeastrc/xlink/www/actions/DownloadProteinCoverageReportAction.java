@@ -72,7 +72,7 @@ public class DownloadProteinCoverageReportAction extends Action {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			//   Get the project id for this search
-			int[] projectSearchIds = form.getSearchIds();
+			int[] projectSearchIds = form.getProjectSearchId();
 			if ( projectSearchIds.length == 0 ) {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
@@ -126,6 +126,8 @@ public class DownloadProteinCoverageReportAction extends Action {
 			List<Integer> searchIdsList = new ArrayList<>( projectSearchIdsListDeduppedSorted.size() );
 			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
 			int searchIdsArrayIndex = 0;
+			List<Integer> searchIdsForFilename = new ArrayList<>( projectSearchIdsListDeduppedSorted.size() );
+			
 			for( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
 				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 				if ( search == null ) {
@@ -144,6 +146,7 @@ public class DownloadProteinCoverageReportAction extends Action {
 				mapProjectSearchIdToSearchId.put( search.getProjectSearchId(), searchId );
 				searchIdsArray[ searchIdsArrayIndex ] = searchId;
 				searchIdsArrayIndex++;
+				searchIdsForFilename.add( search.getSearchId() );
 			}
 			// Sort searches list
 			Collections.sort( searches, new Comparator<SearchDTO>() {
@@ -152,16 +155,18 @@ public class DownloadProteinCoverageReportAction extends Action {
 					return o1.getProjectSearchId() - o2.getProjectSearchId();
 				}
 			});
+			Collections.sort( searchIdsForFilename );
 			
 			// generate file name
 			String filename = "protein-coverage-report-";
-			filename += StringUtils.join( form.getSearchIds(), '-' );
+			filename += StringUtils.join( searchIdsForFilename, '-' );
 			DateTime dt = new DateTime();
 			DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
 			filename += "-" + fmt.print( dt );
 			filename += ".txt";
 			response.setContentType("application/x-download");
 			response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+			
 			OutputStreamWriter writer = null;
 			try {
 				ServletOutputStream out = response.getOutputStream();
@@ -237,7 +242,6 @@ public class DownloadProteinCoverageReportAction extends Action {
 				List<ProteinCoverageData> pcdlist = pcs.getProteinCoverageData();
 				writer.write( "# Protein Coverage Report For:\n");
 				writer.write( "# Search(s): " + StringUtils.join( searchIdsList, ", " ) + "\n" );
-//				So, like, "psm_q-Value(search:1)" for search 1?
 				
 				//   Output cutoffs used
 				//   Map keyed on search id as string

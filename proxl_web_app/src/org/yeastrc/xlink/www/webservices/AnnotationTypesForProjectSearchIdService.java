@@ -22,8 +22,6 @@ import org.yeastrc.xlink.dao.SearchProgramsPerSearchDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.SearchProgramsPerSearchDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.PSMAnnotationFilterableTypesForSearchIdServiceResult;
-import org.yeastrc.xlink.www.objects.PSMAnnotationFilterableTypesForSearchIdServiceResult.PSMAnnotationFilterableTypesForSearchIdServiceResultEntry;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
@@ -37,15 +35,15 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
  *
  */
 @Path("/annotationTypes")
-public class AnnotationTypesForSearchIdService {
+public class AnnotationTypesForProjectSearchIdService {
 	
-	private static final Logger log = Logger.getLogger(AnnotationTypesForSearchIdService.class);
+	private static final Logger log = Logger.getLogger(AnnotationTypesForProjectSearchIdService.class);
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/getAnnotationTypesPsmFilterableForSearchId") 
-	public PSMAnnotationFilterableTypesForSearchIdServiceResult getPSMFilterableAnnTypesForSearchId( 
-			@QueryParam( "searchId" ) int projectSearchId,
+	@Path("/getAnnotationTypesPsmFilterableForProjectSearchId") 
+	public WebserviceResult getPSMFilterableAnnTypesForProjectSearchId( 
+			@QueryParam( "projectSearchId" ) int projectSearchId,
 			@Context HttpServletRequest request )
 	throws Exception {
 		
@@ -134,11 +132,11 @@ public class AnnotationTypesForSearchIdService {
 			}
 			
 			Map<Integer,SearchProgramsPerSearchDTO> searchProgramsPerSearchDTOMap = new HashMap<>();
-			List<PSMAnnotationFilterableTypesForSearchIdServiceResultEntry> annotationTypeList = new ArrayList<>( srchPgmFilterablePsmAnnotationTypeDTOMap.size() );
+			List<WebserviceResultEntry> annotationTypeList = new ArrayList<>( srchPgmFilterablePsmAnnotationTypeDTOMap.size() );
 			for ( Map.Entry<Integer, AnnotationTypeDTO> entry : srchPgmFilterablePsmAnnotationTypeDTOMap.entrySet() ) {
 				AnnotationTypeDTO annotationTypeDTO = entry.getValue();
 				Integer searchProgramsPerSearchId = annotationTypeDTO.getSearchProgramsPerSearchId();
-				PSMAnnotationFilterableTypesForSearchIdServiceResultEntry psmAnnotationFilterableTypesForSearchIdServiceResultEntry = new PSMAnnotationFilterableTypesForSearchIdServiceResultEntry();
+				WebserviceResultEntry psmAnnotationFilterableTypesForSearchIdServiceResultEntry = new WebserviceResultEntry();
 				psmAnnotationFilterableTypesForSearchIdServiceResultEntry.setAnnotationTypeDTO( annotationTypeDTO );
 				SearchProgramsPerSearchDTO searchProgramsPerSearchDTO = searchProgramsPerSearchDTOMap.get( searchProgramsPerSearchId );
 				if ( searchProgramsPerSearchDTO == null ) {
@@ -153,14 +151,14 @@ public class AnnotationTypesForSearchIdService {
 				psmAnnotationFilterableTypesForSearchIdServiceResultEntry.setSearchProgramsPerSearchDTO( searchProgramsPerSearchDTO );
 				annotationTypeList.add( psmAnnotationFilterableTypesForSearchIdServiceResultEntry );
 			}
-			Collections.sort( annotationTypeList, new Comparator<PSMAnnotationFilterableTypesForSearchIdServiceResultEntry>() {
+			Collections.sort( annotationTypeList, new Comparator<WebserviceResultEntry>() {
 				@Override
-				public int compare(PSMAnnotationFilterableTypesForSearchIdServiceResultEntry o1, PSMAnnotationFilterableTypesForSearchIdServiceResultEntry o2) {
+				public int compare(WebserviceResultEntry o1, WebserviceResultEntry o2) {
 					return o1.getAnnotationTypeDTO().getName().compareToIgnoreCase( o2.getAnnotationTypeDTO().getName() );
 				}
 			});
 			
-			PSMAnnotationFilterableTypesForSearchIdServiceResult result = new PSMAnnotationFilterableTypesForSearchIdServiceResult();
+			WebserviceResult result = new WebserviceResult();
 			result.setAnnotationTypeList( annotationTypeList );;
 			return result;
 			
@@ -175,5 +173,47 @@ public class AnnotationTypesForSearchIdService {
 					.build()
 					);
 		}
+	}
+	
+
+	/**
+	 * result from Webservice
+	 *
+	 */
+	public static class WebserviceResult {
+
+		private List<WebserviceResultEntry> annotationTypeList;
+		public List<WebserviceResultEntry> getAnnotationTypeList() {
+			return annotationTypeList;
+		}
+		public void setAnnotationTypeList(
+				List<WebserviceResultEntry> annotationTypeList) {
+			this.annotationTypeList = annotationTypeList;
+		}
+	}
+
+	/**
+	 * Entry in WebserviceResult
+	 *
+	 */
+	public static class WebserviceResultEntry {
+
+		private AnnotationTypeDTO annotationTypeDTO;
+		private SearchProgramsPerSearchDTO searchProgramsPerSearchDTO;
+
+		public AnnotationTypeDTO getAnnotationTypeDTO() {
+			return annotationTypeDTO;
+		}
+		public void setAnnotationTypeDTO(AnnotationTypeDTO annotationTypeDTO) {
+			this.annotationTypeDTO = annotationTypeDTO;
+		}
+		public SearchProgramsPerSearchDTO getSearchProgramsPerSearchDTO() {
+			return searchProgramsPerSearchDTO;
+		}
+		public void setSearchProgramsPerSearchDTO(
+				SearchProgramsPerSearchDTO searchProgramsPerSearchDTO) {
+			this.searchProgramsPerSearchDTO = searchProgramsPerSearchDTO;
+		}
+
 	}
 }

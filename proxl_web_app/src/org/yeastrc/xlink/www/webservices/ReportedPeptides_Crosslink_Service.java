@@ -50,8 +50,8 @@ public class ReportedPeptides_Crosslink_Service {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getCrosslinkReportedPeptides") 
 	public GetCrosslinkReportedPeptidesServiceResult getCrosslinkReportedPeptides( 
-			@QueryParam( "search_id" ) Integer projectSearchId,
-			@QueryParam( "psmPeptideCutoffsForSearchId" ) String psmPeptideCutoffsForSearchId_JSONString,
+			@QueryParam( "project_search_id" ) Integer projectSearchId,
+			@QueryParam( "psmPeptideCutoffsForProjectSearchId" ) String psmPeptideCutoffsForProjectSearchId_JSONString,
 			@QueryParam( "peptideAnnTypeDisplayPerSearch" ) String annTypeIdDisplayJSON_PerSearch_JSONString,
 			@QueryParam( "protein_1_id" ) Integer protein1Id,
 			@QueryParam( "protein_2_id" ) Integer protein2Id,
@@ -69,8 +69,8 @@ public class ReportedPeptides_Crosslink_Service {
 		    	        .build()
 		    	        );
 		}
-		if ( StringUtils.isEmpty( psmPeptideCutoffsForSearchId_JSONString ) ) {
-			String msg = "Provided psmPeptideCutoffsForSearchId is null or psmPeptideCutoffsForSearchId is missing";
+		if ( StringUtils.isEmpty( psmPeptideCutoffsForProjectSearchId_JSONString ) ) {
+			String msg = "Provided psmPeptideCutoffsForProjectSearchId is null or psmPeptideCutoffsForProjectSearchId is missing";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -184,7 +184,7 @@ public class ReportedPeptides_Crosslink_Service {
 			
 			//   Get PSM and Peptide Cutoff data from JSON
 			CutoffValuesSearchLevel cutoffValuesSearchLevel = 
-					DeserializeCutoffForWebservices.getInstance().deserialize_JSON_ToCutoffSearchLevel( psmPeptideCutoffsForSearchId_JSONString );
+					DeserializeCutoffForWebservices.getInstance().deserialize_JSON_ToCutoffSearchLevel( psmPeptideCutoffsForProjectSearchId_JSONString );
 			
 			//  Copy cutoff data to searcher cutoff data
 			Z_CutoffValuesObjectsToOtherObjects_PerSearchResult z_CutoffValuesObjectsToOtherObjects_PerSearchResult = 

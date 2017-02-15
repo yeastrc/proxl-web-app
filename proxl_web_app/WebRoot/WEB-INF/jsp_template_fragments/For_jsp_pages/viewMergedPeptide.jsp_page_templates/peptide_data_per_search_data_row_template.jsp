@@ -1,27 +1,16 @@
 
-
-
 		<%-- !!!   Handlebars template   !!!!!!!!!   --%>
-		
-		
-	
+
 	<%--  Peptide Data Per Search Template --%>
-
-
-
-			
-
 
 <tr class="" 
 	id=""
 	style="cursor: pointer; "
 	onclick="viewPsmsLoadedFromWebServiceTemplate.showHidePsms( { clickedElement : this } )"
-	reported_peptide_id="{{ data.reportedPeptide.id }}"
-	search_id="{{  data.searchId }}"
-	project_id="{{  project_id }}"
->
+	data-reported_peptide_id="{{ data.reportedPeptide.id }}"
+	data-project_search_id="{{  data.searchId }}"
+	>
 	<td>{{ data.searchName }}</td>
-
 	<td>
 		{{ data.reportedPeptide.sequence }}
 	</td>

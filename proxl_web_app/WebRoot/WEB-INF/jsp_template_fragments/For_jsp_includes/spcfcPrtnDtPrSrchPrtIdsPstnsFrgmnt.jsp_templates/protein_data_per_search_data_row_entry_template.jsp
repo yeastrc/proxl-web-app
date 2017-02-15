@@ -1,13 +1,7 @@
 
-
 		<%-- !!!   Handlebars template   !!!!!!!!!   --%>
-		
-		
 	
 	<%--  Protein Data Per Search Template --%>
-
-
-
 <%-- 
 containing div id:  protein_data_per_search_data_row_entry_template
 --%>
@@ -15,31 +9,31 @@ containing div id:  protein_data_per_search_data_row_entry_template
 <tr class=" main_data_row_jq " 
 	style="cursor: pointer; " 
 	show_children_if_one_row="true"
-	search_id="{{ searchId }}"
+	data-project_search_id="{{ projectSearchId }}"
 
   {{#if isLooplink }}
 	onclick="viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.showHideLooplinkReportedPeptides( { clickedElement : this })" 
-	protein_id="{{ from_protein_id }}"
-	protein_position_1="{{ from_protein_position }}"
-	protein_position_2="{{ to_protein_position }}"
-	children_mgmt_object="viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate"
+	data-protein_id="{{ from_protein_id }}"
+	data-protein_position_1="{{ from_protein_position }}"
+	data-protein_position_2="{{ to_protein_position }}"
+	data-children_mgmt_object="viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate"
   {{/if}}
 
   {{#if isCrosslink }}
 	onclick="viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.showHideCrosslinkReportedPeptides( { clickedElement : this })" 
-	protein_1_id="{{ from_protein_id }}"
-	protein_2_id="{{ to_protein_id }}"
-	protein_1_position="{{ from_protein_position }}"
-	protein_2_position="{{ to_protein_position }}"
-	children_mgmt_object="viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate"
+	data-protein_1_id="{{ from_protein_id }}"
+	data-protein_2_id="{{ to_protein_id }}"
+	data-protein_1_position="{{ from_protein_position }}"
+	data-protein_2_position="{{ to_protein_position }}"
+	data-children_mgmt_object="viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate"
   {{/if}}  
   
   
   {{#if isMonolink }}
 	onclick="viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.showHideMonolinkReportedPeptides( { clickedElement : this })" 
-	protein_id="{{ from_protein_id }}"
-	protein_position="{{ from_protein_position }}"
-	children_mgmt_object="viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate"
+	data-protein_id="{{ from_protein_id }}"
+	data-protein_position="{{ from_protein_position }}"
+	data-children_mgmt_object="viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate"
   {{/if}}
   
 	>

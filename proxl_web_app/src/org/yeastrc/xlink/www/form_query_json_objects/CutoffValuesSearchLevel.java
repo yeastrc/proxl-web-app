@@ -9,32 +9,46 @@ import java.util.Map;
  */
 public class CutoffValuesSearchLevel {
 
-	/**
-	 * Actually projectSearchId, not changed since is set by deserializing JSON from URL
-	 */
-	private int searchId;
+	private int projectSearchId;
 
 	private Map<String,CutoffValuesAnnotationLevel> psmCutoffValues;
 	private Map<String,CutoffValuesAnnotationLevel> peptideCutoffValues;
 	
-	
 	public Map<String, CutoffValuesAnnotationLevel> getPsmCutoffValues() {
-		
 		if ( psmCutoffValues == null ) {
-			
 			psmCutoffValues = new HashMap<>();
 		}
 		return psmCutoffValues;
 	}
 	public Map<String, CutoffValuesAnnotationLevel> getPeptideCutoffValues() {
-		
 		if ( peptideCutoffValues == null ) {
-			
 			peptideCutoffValues = new HashMap<>();
 		}
 		return peptideCutoffValues;
 	}
 
+	// added for backwards compatibility  public void setSearchId(int searchId) {
+	/**
+	 * This method supports old URLs with 'searchId=###'
+	 * Actually projectSearchId
+	 * @param searchId
+	 */
+	public void setSearchId(int searchId) {
+		this.projectSearchId = searchId;
+	}
+
+	//  Not needed
+//	public int getSearchId() {
+//		return projectSearchId;
+//	}
+	
+	
+	public int getProjectSearchId() {
+		return projectSearchId;
+	}
+	public void setProjectSearchId(int projectSearchId) {
+		this.projectSearchId = projectSearchId;
+	}
 	
 	
 	public void setPsmCutoffValues(
@@ -46,17 +60,5 @@ public class CutoffValuesSearchLevel {
 		this.peptideCutoffValues = peptideCutoffValues;
 	}
 	
-	/**
-	 * Actually projectSearchId
-	 */
-	public int getSearchId() {
-		return searchId;
-	}
-	/**
-	 * Actually projectSearchId
-	 */
-	public void setSearchId(int searchId) {
-		this.searchId = searchId;
-	}
 
 }

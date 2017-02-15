@@ -102,12 +102,12 @@ var ViewMonolinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			}
 		}
 		
-		var search_id = $clickedElement.attr( "search_id" );
-		var protein_id = $clickedElement.attr( "protein_id" );
-		var protein_position = $clickedElement.attr( "protein_position" );
+		var project_search_id = $clickedElement.attr( "data-project_search_id" );
+		var protein_id = $clickedElement.attr( "data-protein_id" );
+		var protein_position = $clickedElement.attr( "data-protein_position" );
 		//  Convert all attributes to empty string if null or undefined
-		if ( ! search_id ) {
-			search_id = "";
+		if ( ! project_search_id ) {
+			project_search_id = "";
 		}
 		if ( ! protein_id ) {
 			protein_id = "";
@@ -123,28 +123,28 @@ var ViewMonolinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		if ( _psmPeptideCutoffsRootObject === null || _psmPeptideCutoffsRootObject === undefined ) {
 			throw "_psmPeptideCutoffsRootObject not initialized";
 		} 
-		var psmPeptideCutoffsForSearchId = _psmPeptideCutoffsRootObject.searches[ search_id ];
-		if ( psmPeptideCutoffsForSearchId === undefined || psmPeptideCutoffsForSearchId === null ) {
-			psmPeptideCutoffsForSearchId = {};
-//			throw "Getting data.  Unable to get cutoff data for search id: " + search_id;
+		var psmPeptideCutoffsForProjectSearchId = _psmPeptideCutoffsRootObject.searches[ project_search_id ];
+		if ( psmPeptideCutoffsForProjectSearchId === undefined || psmPeptideCutoffsForProjectSearchId === null ) {
+			psmPeptideCutoffsForProjectSearchId = {};
+//			throw "Getting data.  Unable to get cutoff data for project_search_id: " + project_search_id;
 		}
-		var psmPeptideCutoffsForSearchId_JSONString = JSON.stringify( psmPeptideCutoffsForSearchId );
+		var psmPeptideCutoffsForProjectSearchId_JSONString = JSON.stringify( psmPeptideCutoffsForProjectSearchId );
 
 		var psmPeptideAnnTypeDisplayPerSearchId_JSONString = null;
 		if ( _psmPeptideAnnTypeIdDisplay ) {
-			var psmPeptideAnnTypeIdDisplayForSearchId = _psmPeptideAnnTypeIdDisplay.searches[ search_id ];
+			var psmPeptideAnnTypeIdDisplayForSearchId = _psmPeptideAnnTypeIdDisplay.searches[ project_search_id ];
 			if ( psmPeptideAnnTypeIdDisplayForSearchId === undefined || psmPeptideAnnTypeIdDisplayForSearchId === null ) {
 //				psmPeptideAnnTypeIdDisplayForSearchId = {};
-				throw Error( "Getting data.  Unable to get ann type display data for search id: " + search_id );
+				throw Error( "Getting data.  Unable to get ann type display data for project_search_id: " + project_search_id );
 			}
 			psmPeptideAnnTypeDisplayPerSearchId_JSONString = JSON.stringify( psmPeptideAnnTypeIdDisplayForSearchId );
 		}
 
 		var ajaxRequestData = {
-				search_id : search_id,
+				project_search_id : project_search_id,
 				protein_id : protein_id,
 				protein_position : protein_position,
-				psmPeptideCutoffsForSearchId : psmPeptideCutoffsForSearchId_JSONString,
+				psmPeptideCutoffsForProjectSearchId : psmPeptideCutoffsForProjectSearchId_JSONString,
 				peptideAnnTypeDisplayPerSearch : psmPeptideAnnTypeDisplayPerSearchId_JSONString
 		};
 		$.ajax({
@@ -254,7 +254,7 @@ var ViewMonolinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			var context = { 
 					showNumberUniquePSMs : showNumberUniquePSMs,
 					data : monolink_peptide, 
-					searchId : ajaxRequestData.search_id
+					projectSearchId : ajaxRequestData.project_search_id
 					};
 			var html = _handlebarsTemplate_monolink_peptide_data_row_entry_template(context);
 			var $monolink_peptide_entry = 

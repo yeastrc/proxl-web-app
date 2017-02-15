@@ -5,7 +5,7 @@
 
 
 <div class="outer-item-container  search_display_order_item_jq" 
-		  	 data-search_id="{{id}}">
+		  	 data-project_search_id="{{id}}">
 
   <div class=" sort-handle-and-text protein_select_protein_item_and_sort_handle_block_jq " 
    		data-position_index="{{positionIndex}}"  data-protein_id="{{proteinId}}"

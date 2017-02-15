@@ -19,10 +19,7 @@ public class GetDefaultPageURLTaglib extends TagSupport {
 	
 	private String pageName;
 	
-	/**
-	 * actually projectSearchId
-	 */
-	private String searchId;
+	private String projectSearchId;
 	
 	public String getPageName() {
 		return pageName;
@@ -30,12 +27,13 @@ public class GetDefaultPageURLTaglib extends TagSupport {
 	public void setPageName(String pageName) {
 		this.pageName = pageName;
 	}
-	public String getSearchId() {
-		return searchId;
+	public String getProjectSearchId() {
+		return projectSearchId;
 	}
-	public void setSearchId(String searchId) {
-		this.searchId = searchId;
-	}
+	public void setProjectSearchId(String projectSearchId) {
+		this.projectSearchId = projectSearchId;
+	} 
+
 	/**
 	 * 
 	 */
@@ -51,8 +49,8 @@ public class GetDefaultPageURLTaglib extends TagSupport {
         	log.error( msg );
             throw new JspException( msg );
     	}
-    	if ( StringUtils.isEmpty(searchId)) {
-        	String msg = "Exception:  searchId is empty";
+    	if ( StringUtils.isEmpty(projectSearchId)) {
+        	String msg = "Exception:  projectSearchId is empty";
         	log.error( msg );
             throw new JspException( msg );
     	}
@@ -63,9 +61,9 @@ public class GetDefaultPageURLTaglib extends TagSupport {
     	}
     	int projectSearchIdInt = 0;
     	try {
-    		projectSearchIdInt = Integer.parseInt(searchId); //  searchId is actually projectSearchId
+    		projectSearchIdInt = Integer.parseInt(projectSearchId); //  searchId is actually projectSearchId
     	} catch (Exception e) { 
-    		String msg = "Exception:  Search Id is not a number: " + searchId + ", pageName: " + pageName;
+    		String msg = "Exception:  projectSearchId is not a number: " + projectSearchId + ", pageName: " + pageName;
     		log.error( msg, e );
     		throw new JspException( e );
     	} 
@@ -97,5 +95,6 @@ public class GetDefaultPageURLTaglib extends TagSupport {
             throw new JspException( e );
         } 
         return returnValue;
-    } 
+    }
+
 }

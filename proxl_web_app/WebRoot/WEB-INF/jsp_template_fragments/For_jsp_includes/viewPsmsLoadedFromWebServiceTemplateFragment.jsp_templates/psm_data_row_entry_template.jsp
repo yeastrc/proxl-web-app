@@ -33,9 +33,11 @@
 			<%-- 
 				{{#if  show_associated_peptides_link_true }}
 				 {{#if  psm.psmDTO.scanId }}
-				  <a href="javascript:" psm_id="{{  psm.psmDTO.id }}" scan_id="{{  psm.psmDTO.scanId }}" 
-				  	initial_reported_peptide_id="{{  reported_peptide_id }}"
-					project_id="{{  project_id }}" search_id="{{  search_id }}"
+				  <a href="javascript:" 
+				  	data-psm_id="{{  psm.psmDTO.id }}" 
+				  	data-scan_id="{{  psm.psmDTO.scanId }}" 
+				  	data-initial_reported_peptide_id="{{  reported_peptide_id }}"
+					data-project_search_id="{{  project_search_id }}"
 				 	onclick="viewPeptidesRelatedToPSMsByScanId.openOverlayForPeptidesRelatedToPSMsByScanId( { clickedElement : this } )"
 				 	>{{/if}}{{/if}}TEMP_N{{#if  show_associated_peptides_link_true }}{{#if  psm.psmDTO.scanId }}</a>{{/if}}{{/if}}
 			--%>
@@ -44,9 +46,11 @@
 				Y
 			{{else}}
 				{{#if  show_associated_peptides_link_true }}
-				  <a href="javascript:" psm_id="{{  psm.psmDTO.id }}" scan_id="{{  psm.psmDTO.scanId }}" 
-				  	initial_reported_peptide_id="{{  reported_peptide_id }}"
-					project_id="{{  project_id }}" search_id="{{  search_id }}"
+				  <a href="javascript:" 
+				    data-psm_id="{{  psm.psmDTO.id }}" 
+				    data-scan_id="{{  psm.psmDTO.scanId }}" 
+				  	data-initial_reported_peptide_id="{{  reported_peptide_id }}"
+					data-project_search_id="{{  project_search_id }}"
 				 	onclick="viewPeptidesRelatedToPSMsByScanId.openOverlayForPeptidesRelatedToPSMsByScanId( { clickedElement : this } )"
 				 	>{{/if}}N{{#if  show_associated_peptides_link_true }}</a>{{/if}}
 			{{/if}}

@@ -13,10 +13,11 @@
 	<tr 
 		style="cursor: pointer; "
 		onclick="viewPsmsLoadedFromWebServiceTemplate.showHidePsms( { clickedElement : this } )"
-		initial_scan_id="{{ initial_scan_id }}"  <%-- For the Related Peptides Overlay, this is the initial scan id clicked on  --%>
-		reported_peptide_id="{{ data.reportedPeptide_Id }}"
-		search_id="{{ searchId }}"
-		skip_associated_peptides_link="true"
+
+		data-initial_scan_id="{{ initial_scan_id }}"  <%-- For the Related Peptides Overlay, this is the initial scan id clicked on  --%>
+		data-reported_peptide_id="{{ data.reportedPeptide_Id }}"
+		data-project_search_id="{{ projectSearchId }}"
+		data-skip_associated_peptides_link="true"
 		>
 		
 		<td class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " >

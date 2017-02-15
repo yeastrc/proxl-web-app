@@ -113,14 +113,14 @@
 	
 			<div style="margin-bottom:20px;">
 				[<a class="tool_tip_attached_jq" data-tooltip="View proteins" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" searchId="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
+					href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
 							>crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 					>Protein View</a>]
 					
 					
 					
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/proteinCoverageReport" searchId="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
+					href="${ contextPath }/<proxl:defaultPageUrl pageName="/proteinCoverageReport" projectSearchId="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
 							>proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 													
 					>Coverage Report</a>]
@@ -144,9 +144,9 @@
 
 			<html:form action="peptide" method="get" styleId="form_get_for_updated_parameters"> <%-- id="form_get_for_updated_parameters" --%>
 		
-						
-				<html:hidden property="searchId"/>
-				
+				<input type="hidden" name="projectSearchId" value="${ viewSearchPeptidesPageDataRoot.projectSearchId }">
+				<%-- cannot use <html:hidden property="projectSearchId" /> since projectSearchId is an array --%>
+				 
 				<html:hidden property="queryJSON" styleId="query_json_field" />
 			
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
@@ -154,16 +154,6 @@
 			
 			</html:form>
 
-			<%-- WAS			
-			<html:form action="viewSearchPeptide" method="get" styleId="form_get_for_updated_parameters">
-			
-
-				<html:hidden property="project_id"/>
-						
-				<html:hidden property="searchId"/>
-						
-			--%>
-			
 			<table style="border-width:0px;">
 
 					
@@ -235,7 +225,7 @@
 						
 						<input type="button" value="${ UpdateButtonText }"  onclick="viewSearchPeptidePageCode.updatePageForFormParams()" >
 						
-						<c:set var="searchId" value="${ viewSearchPeptidesPageDataRoot.projectSearchId }"/>	
+						<c:set var="projectSearchId" value="${ viewSearchPeptidesPageDataRoot.projectSearchId }"/>	
 
 						<c:set var="page_JS_Object" value="viewSearchPeptidePageCode"/>
 						
@@ -253,11 +243,11 @@
 			
 			<div style="display:inline;">
 				[<a class="tool_tip_attached_jq" data-tooltip="Download data as tab-delimited text" 
-						href="${ contextPath }/downloadMergedPeptides.do?<bean:write name="mergedQueryString" />"
+						href="${ contextPath }/downloadMergedPeptides.do?<bean:write name="queryString" />"
 					>Download Data</a>]
 					
 				[<a class="tool_tip_attached_jq" data-tooltip="Download PSM data as tab-delimited text" 
-						href="${ contextPath }/downloadMergedPSMsForPeptides.do?<bean:write name="mergedQueryString" />"
+						href="${ contextPath }/downloadMergedPSMsForPeptides.do?<bean:write name="queryString" />"
 					>Download PSM Data</a>]
 			</div>
 
@@ -337,9 +327,8 @@
 							<tr id="reported-peptide-<bean:write name="peptideEntry" property="reportedPeptide.id"/>"
 								style="cursor: pointer; "
 								onclick="viewPsmsLoadedFromWebServiceTemplate.showHidePsms( { clickedElement : this } )"
-								reported_peptide_id="${ peptideEntry.reportedPeptide.id }"
-								search_id="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
-								project_id="${ projectId }"
+								data-reported_peptide_id="${ peptideEntry.reportedPeptide.id }"
+								data-project_search_id="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
 								>
 								
 								<td>

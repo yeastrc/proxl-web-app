@@ -16,7 +16,7 @@
 
 <div id="${ filterTypeHTML_Id }_annotation_displays_container__search_id_${ search.projectSearchId }" 
 	class=" annotation_displays_container_jq  ${ filterTypeHTML_Id }_annotation_displays_container_jq "
-	data-search_id="${ search.projectSearchId }"
+	data-project_search_id="${ search.projectSearchId }"
 	data-psm_peptide_type="${ filterTypeHTML_Id }"
 	style="">
 

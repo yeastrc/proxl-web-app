@@ -60,7 +60,7 @@ public class ViewMergedStructureAction extends Action {
 			 */
 			// Get the session first.  
 //			HttpSession session = request.getSession();
-			int[] projectSearchIds = form.getSearchIds();
+			int[] projectSearchIds = form.getProjectSearchId();
 			if ( projectSearchIds.length == 0 ) {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
@@ -74,7 +74,7 @@ public class ViewMergedStructureAction extends Action {
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search ids: ";
+				String msg = "No project ids for projectSearchIds: ";
 				for ( int projectSearchId : projectSearchIds ) {
 					msg += projectSearchId + ", ";
 				}
@@ -106,11 +106,11 @@ public class ViewMergedStructureAction extends Action {
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
 
-			request.setAttribute( "searchIds", projectSearchIdsListDeduppedSorted );
+			request.setAttribute( "projectSearchIds", projectSearchIdsListDeduppedSorted );
 			
 			if ( projectSearchIdsListDeduppedSorted.size() == 1 ) {
-				int onlySingleSearchId = projectSearchIdsListDeduppedSorted.get( 0 );
-				request.setAttribute( "onlySingleSearchId", onlySingleSearchId );	
+				int onlySingleProjectSearchId = projectSearchIdsListDeduppedSorted.get( 0 );
+				request.setAttribute( "onlySingleProjectSearchId", onlySingleProjectSearchId );	
 			}
 			
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
@@ -120,7 +120,7 @@ public class ViewMergedStructureAction extends Action {
 			for( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
 				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 				if ( search == null ) {
-					String msg = "search id '" + projectSearchId + "' not found in the database. User taken to home page.";
+					String msg = "projectSearchId '" + projectSearchId + "' not found in the database. User taken to home page.";
 					log.warn( msg );
 					//  Search not found, the data on the page they are requesting does not exist.
 					//  The data on the user's previous page no longer reflects what is in the database.

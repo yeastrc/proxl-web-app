@@ -1742,17 +1742,21 @@
 						
 							<c:set var="search" value="${ search_wrapper.searchDTO }" />
 						
-						  <div searchId="<bean:write name="search" property="projectSearchId" />" class=" search_row_jq" >
+						  <div data-project_search_id="<bean:write name="search" property="projectSearchId" />" class=" search_row_jq " >
 
 							<table style="padding:0px;margin-top:0px;margin-bottom:0px;width:100%;">
 							
-								<tr searchId="<bean:write name="search" property="projectSearchId" />" class=" search_root_jq ">
+								<tr data-project_search_id="<bean:write name="search" property="projectSearchId" />" class=" search_root_jq ">
 		
 								  <script type="text/text" class=" qc_plots_links_filtered_on_import_message_jq "
 										><c:out value="${ search_wrapper.cutoffsAppliedOnImportAllAsString }"></c:out></script>
 
 									<td style="width:10px;" valign="top" class="search-checkbox-cell">
-										<input id="search-checkbox-<bean:write name="search" property="projectSearchId" />" onChange="javascript:checkSearchCheckboxes(<bean:write name="search" property="projectSearchId" />)" class="search-checkbox" type="checkbox" name="searchIds" value="<bean:write name="search" property="projectSearchId" />"/>
+										<input id="search-checkbox-<bean:write name="search" property="projectSearchId" />" 
+											onChange="javascript:checkSearchCheckboxes(<bean:write name="search" property="projectSearchId" />)" 
+											class="search-checkbox" type="checkbox" 
+											name="projectSearchId" 
+											value="<bean:write name="search" property="projectSearchId" />"/>
 									</td>
 									<td>
 						
@@ -1760,34 +1764,27 @@
 									  <div style="float: right;" >
 										
 										[<a data-tooltip="View peptides found in search" class="tool_tip_attached_jq" 
-											href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" searchId="${ search.projectSearchId }">peptide.do?searchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+											href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ search.projectSearchId }">peptide.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 												>Peptides</a>]
 										
 										[<a data-tooltip="View proteins found in search" class="tool_tip_attached_jq" 
-											href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" searchId="${ search.projectSearchId }">crosslinkProtein.do?searchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+											href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ search.projectSearchId }">crosslinkProtein.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 												>Proteins</a>]
 
 										[<a data-tooltip="Graphical view of links between proteins" class="tool_tip_attached_jq" 
-											href="${ contextPath }/<proxl:defaultPageUrl pageName="/image" searchId="${ search.projectSearchId }">image.do?searchIds=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+											href="${ contextPath }/<proxl:defaultPageUrl pageName="/image" projectSearchId="${ search.projectSearchId }">image.do?searchIds=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 												>Image</a>]
 
 										<c:choose>
 										 <c:when test="${ showStructureLink }">
-										
-
 											[<a data-tooltip="View data on 3D structures" class="tool_tip_attached_jq" 
-												href="${ contextPath }/<proxl:defaultPageUrl pageName="/structure" searchId="${ search.projectSearchId }">structure.do?searchIds=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+												href="${ contextPath }/<proxl:defaultPageUrl pageName="/structure" projectSearchId="${ search.projectSearchId }">structure.do?searchIds=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 													>Structure</a>]
-																							
 										 </c:when>
 										 <c:otherwise>
-										 	
 											<%@ include file="/WEB-INF/jsp-includes/structure_link_non_link.jsp" %>
-										 	
 										 </c:otherwise>
 										</c:choose>
-		
-			
 			
 										<c:if test="${authAccessLevel.searchDeleteAllowed}" >
 											<a href="javascript:" data-tooltip="Delete search" class="tool_tip_attached_jq delete_search_link_jq"
@@ -1933,11 +1930,15 @@
 												<td>QC Plots:</td>
 												<td>
 													<c:if test="${ search.hasScanData }" >
-														[<a href="javascript:" data-tooltip="View scan counts as function of retention time" class="tool_tip_attached_jq qc_plot_scan_retention_time_link_jq" >Retention Time</a>]
+														[<a href="javascript:" data-tooltip="View scan counts as function of retention time" 
+															class="tool_tip_attached_jq qc_plot_scan_retention_time_link_jq" 
+															>Retention Time</a>]
 													</c:if>
-													[<a href="javascript:" data-tooltip="View PSM counts as function of score" class="tool_tip_attached_jq qc_plot_psm_count_vs_score_link_jq" 
+													[<a href="javascript:" data-tooltip="View PSM counts as function of score" 
+														class="tool_tip_attached_jq qc_plot_psm_count_vs_score_link_jq" 
 														>PSM Count vs/ Score</a>]
-													[<a href="javascript:" data-tooltip="View 2 PSM scores plotted together" class="tool_tip_attached_jq qc_plot_psm_score_vs_score_link_jq" 
+													[<a href="javascript:" data-tooltip="View 2 PSM scores plotted together" 
+														class="tool_tip_attached_jq qc_plot_psm_score_vs_score_link_jq" 
 														>Score vs/ Score</a>]
 												</td>
 											</tr>
@@ -2334,37 +2335,25 @@
 					<h1 id="scan_retention_time_qc_plot_overlay_header_text" class="qc-plot-overlay-header-text" >QC Plot: Retention Time</h1>
 				</div>
 				<div id="scan_retention_time_qc_plot_overlay_body" class="qc-plot-overlay-body" >
-			
-			
-				<div >
-				
-					<input type="hidden" id="scan_retention_time_qc_plot_current_search_id" >
-		
+				  <div >
+					<input type="hidden" id="scan_retention_time_qc_plot_current_project_search_id" >
 					
 					<table style="border-width:0px;">
-						
 						<tr>
 							<td>Scan File:</td>
 							<td>
 								<select id="scan_retention_time_qc_plot_scan_file_id"  class="scan_retention_time_qc_plot_on_change_jq">
-								
 								</select>
 							</td>
-							
-
 						</tr>
-								
 						<tr>
 							<td>Filter PSMs by:</td>
 							<td>
 								<select id="scan_retention_time_qc_plot_score_type_id" >
-									
 								</select>							
-							
 								<input type="text" id="scan_retention_time_qc_plot_psm_score_cutoff"  
 									class="scan_retention_time_qc_plot_on_change_jq"
 									size="4">
-									
 								(min: <span id="scan_retention_time_qc_plot_min_value_for_ann_type_id"
 									></span>, max: <span id="scan_retention_time_qc_plot_max_value_for_ann_type_id"></span>)
 							</td>
@@ -2566,7 +2555,7 @@
 			
 				<div >
 				
-					<input type="hidden" id="psm_count_vs_score_qc_plot_current_search_id" >
+					<input type="hidden" id="psm_count_vs_score_qc_plot_current_project_search_id" >
 					
 					<input type="hidden" id="psm_count_vs_score_qc_plot_current_search_name_and_id" >
 		
@@ -2814,7 +2803,7 @@
 			
 				<div >
 				
-					<input type="hidden" id="psm_score_vs_score_qc_plot_current_search_id" >
+					<input type="hidden" id="psm_score_vs_score_qc_plot_current_project_search_id" >
 					
 					<input type="hidden" id="psm_score_vs_score_qc_plot_current_search_name_and_id" >
 		

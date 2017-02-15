@@ -55,18 +55,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 
 	private static final Logger log = Logger.getLogger(ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService.class);
+	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getReportedPeptidesForUnifiedPeptId") 
-	public ReportedPeptidesPerSearchForMergedPeptidePageResult getViewerData( 
-			@QueryParam( "search_ids" ) List<Integer> projectSearchIdList,
+	public ReportedPeptidesPerSearchForMergedPeptidePageResult getReportedPeptidesForUnifiedPeptId( 
+			@QueryParam( "project_search_ids" ) List<Integer> projectSearchIdList,
 			@QueryParam( "unified_reported_peptide_id" ) Integer unifiedReportedPeptideId,
-			@QueryParam( "psmPeptideCutoffsForSearchIds" ) String psmPeptideCutoffsForSearchIds_JSONString,
+			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
 			@QueryParam( "annTypeDisplay" ) String annTypeDisplay_JSONString,
 			@Context HttpServletRequest request )
 					throws Exception {
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
-			String msg = "Provided searchIds is null or searchIds is missing or searchIds list is empty";
+			String msg = "Provided project_search_ids is null or project_search_ids is missing or searchIds list is empty";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -83,8 +84,8 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 					.build()
 					);
 		}
-		if ( StringUtils.isEmpty( psmPeptideCutoffsForSearchIds_JSONString ) ) {
-			String msg = "Provided psmPeptideCutoffsForSearchIds is null or psmPeptideCutoffsForSearchIds is missing";
+		if ( StringUtils.isEmpty( psmPeptideCutoffsForProjectSearchIds_JSONString ) ) {
+			String msg = "Provided psmPeptideCutoffsForProjectSearchIds is null or psmPeptideCutoffsForProjectSearchIds is missing";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -101,7 +102,7 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsCollection );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search ids: ";
+				String msg = "No project ids for project_search_ids: ";
 				for ( int projectSearchId : projectSearchIdList ) {
 					msg += projectSearchId + ", ";
 				}				
@@ -151,17 +152,17 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON Mapper object for JSON deserialization
 			CutoffValuesRootLevel cutoffValuesRootLevel = null;
 			try {
-				cutoffValuesRootLevel = jacksonJSON_Mapper.readValue( psmPeptideCutoffsForSearchIds_JSONString, CutoffValuesRootLevel.class );
+				cutoffValuesRootLevel = jacksonJSON_Mapper.readValue( psmPeptideCutoffsForProjectSearchIds_JSONString, CutoffValuesRootLevel.class );
 			} catch ( JsonParseException e ) {
-				String msg = "Failed to parse 'psmPeptideCutoffsForSearchIds_JSONString', JsonParseException.  psmPeptideCutoffsForSearchIds_JSONString: " + psmPeptideCutoffsForSearchIds_JSONString;
+				String msg = "Failed to parse 'psmPeptideCutoffsForProjectSearchIds_JSONString', JsonParseException.  psmPeptideCutoffsForProjectSearchIds_JSONString: " + psmPeptideCutoffsForProjectSearchIds_JSONString;
 				log.error( msg, e );
 				throw e;
 			} catch ( JsonMappingException e ) {
-				String msg = "Failed to parse 'psmPeptideCutoffsForSearchIds_JSONString', JsonMappingException.  psmPeptideCutoffsForSearchIds_JSONString: " + psmPeptideCutoffsForSearchIds_JSONString;
+				String msg = "Failed to parse 'psmPeptideCutoffsForProjectSearchIds_JSONString', JsonMappingException.  psmPeptideCutoffsForProjectSearchIds_JSONString: " + psmPeptideCutoffsForProjectSearchIds_JSONString;
 				log.error( msg, e );
 				throw e;
 			} catch ( IOException e ) {
-				String msg = "Failed to parse 'psmPeptideCutoffsForSearchIds_JSONString', IOException.  psmPeptideCutoffsForSearchIds_JSONString: " + psmPeptideCutoffsForSearchIds_JSONString;
+				String msg = "Failed to parse 'psmPeptideCutoffsForProjectSearchIds_JSONString', IOException.  psmPeptideCutoffsForProjectSearchIds_JSONString: " + psmPeptideCutoffsForProjectSearchIds_JSONString;
 				log.error( msg, e );
 				throw e;
 			}
@@ -197,6 +198,7 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 					);
 		}
 	}
+	
 	/**
 	 * @param cutoffValuesRootLevel
 	 * @param searchIdsCollection
@@ -237,7 +239,7 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 		});
 
 		//  Main part of returned result
-		Map<Integer, ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> reportedPeptidesPerSearchIdMap = new HashMap<>();
+		Map<Integer, ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> reportedPeptidesPerProjectSearchIdMap = new HashMap<>();
 		
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory
@@ -329,14 +331,14 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 				serviceResultEntry.setPeptideAnnotationDisplayNameDescriptionList( searchPeptideWebserviceCommonCodeGetDataResult.getPeptideAnnotationDisplayNameDescriptionList() );
 				serviceResultEntry.setPsmAnnotationDisplayNameDescriptionList( searchPeptideWebserviceCommonCodeGetDataResult.getPsmAnnotationDisplayNameDescriptionList() );
 				serviceResultEntry.setReportedPepides( reportedPepidesListOutput );
-				reportedPeptidesPerSearchIdMap.put( eachProjectSearchIdToProcess, serviceResultEntry );
+				reportedPeptidesPerProjectSearchIdMap.put( eachProjectSearchIdToProcess, serviceResultEntry );
 			}
 		}  //  END:  for each search id
 		
 		///////////
 		
 		ReportedPeptidesPerSearchForMergedPeptidePageResult serviceResult = new ReportedPeptidesPerSearchForMergedPeptidePageResult();
-		serviceResult.setReportedPeptidesPerSearchIdMap( reportedPeptidesPerSearchIdMap );
+		serviceResult.setReportedPeptidesPerProjectSearchIdMap( reportedPeptidesPerProjectSearchIdMap );
 		return serviceResult;
 	}
 	

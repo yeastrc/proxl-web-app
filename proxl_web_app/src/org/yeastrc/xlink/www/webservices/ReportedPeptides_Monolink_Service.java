@@ -48,7 +48,7 @@ public class ReportedPeptides_Monolink_Service {
 	
 	/**
 	 * @param searchId
-	 * @param psmPeptideCutoffsForSearchId_JSONString
+	 * @param psmPeptideCutoffsForProjectSearchId_JSONString
 	 * @param annTypeIdDisplayJSON_PerSearch_JSONString
 	 * @param proteinId
 	 * @param proteinPosition
@@ -60,8 +60,8 @@ public class ReportedPeptides_Monolink_Service {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getMonolinkReportedPeptides") 
 	public GetMonolinkReportedPeptidesServiceResult getMonolinkReportedPeptides( 
-			@QueryParam( "search_id" ) Integer projectSearchId,
-			@QueryParam( "psmPeptideCutoffsForSearchId" ) String psmPeptideCutoffsForSearchId_JSONString,
+			@QueryParam( "project_search_id" ) Integer projectSearchId,
+			@QueryParam( "psmPeptideCutoffsForProjectSearchId" ) String psmPeptideCutoffsForProjectSearchId_JSONString,
 			@QueryParam( "peptideAnnTypeDisplayPerSearch" ) String annTypeIdDisplayJSON_PerSearch_JSONString,
 			@QueryParam( "protein_id" ) Integer proteinId,
 			@QueryParam( "protein_position" ) Integer proteinPosition,
@@ -69,7 +69,7 @@ public class ReportedPeptides_Monolink_Service {
 	throws WebApplicationException {
 
 		if ( projectSearchId == null ) {
-			String msg = "Provided search_id is null or search_id is missing";
+			String msg = "Provided project_search_id is null or project_search_id is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -77,8 +77,8 @@ public class ReportedPeptides_Monolink_Service {
 		    	        .build()
 		    	        );
 		}
-		if ( StringUtils.isEmpty( psmPeptideCutoffsForSearchId_JSONString ) ) {
-			String msg = "Provided psmPeptideCutoffsForSearchId is null or psmPeptideCutoffsForSearchId is missing";
+		if ( StringUtils.isEmpty( psmPeptideCutoffsForProjectSearchId_JSONString ) ) {
+			String msg = "Provided psmPeptideCutoffsForProjectSearchId is null or psmPeptideCutoffsForProjectSearchId is missing";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -175,7 +175,7 @@ public class ReportedPeptides_Monolink_Service {
 			
 			//   Get PSM and Peptide Cutoff data from JSON
 			CutoffValuesSearchLevel cutoffValuesSearchLevel = 
-					DeserializeCutoffForWebservices.getInstance().deserialize_JSON_ToCutoffSearchLevel( psmPeptideCutoffsForSearchId_JSONString );
+					DeserializeCutoffForWebservices.getInstance().deserialize_JSON_ToCutoffSearchLevel( psmPeptideCutoffsForProjectSearchId_JSONString );
 			//////////////
 			//  Copy cutoff data to searcher cutoff data
 			Z_CutoffValuesObjectsToOtherObjects_PerSearchResult z_CutoffValuesObjectsToOtherObjects_PerSearchResult = 

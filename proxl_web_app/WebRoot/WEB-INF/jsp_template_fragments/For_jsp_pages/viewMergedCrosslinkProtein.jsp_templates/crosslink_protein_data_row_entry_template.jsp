@@ -14,13 +14,12 @@
 	style="cursor: pointer; "
 	
 	onclick="viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.showHideCrosslinkReportedPeptides( { clickedElement : this })"
-	search_id="{{ data.searchId }}"
-	protein_1_id="{{ protein_1_id }}"
-	protein_2_id="{{ protein_2_id }}"
-	protein_1_position="{{ protein_1_position }}"
-	protein_2_position="{{ protein_2_position }}"
-	ssssssssss="sssssssssee"
->
+	data-project_search_id="{{ data.projectSearchId }}"
+	data-protein_1_id="{{ protein_1_id }}"
+	data-protein_2_id="{{ protein_2_id }}"
+	data-protein_1_position="{{ protein_1_position }}"
+	data-protein_2_position="{{ protein_2_position }}"
+	>
 
 	<td>{{ data.searchName }}</td>
 

@@ -87,7 +87,7 @@ public class ViewSearchProteinsAction extends Action {
 			// our form
 			SearchViewProteinsForm form = (SearchViewProteinsForm)actionForm;
 			request.setAttribute( "searchViewCrosslinkProteinForm", form );
-			int projectSearchId = form.getSearchId();
+			int projectSearchId = form.getProjectSearchIdSingle();
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			//   Get the project id for this search
@@ -134,7 +134,6 @@ public class ViewSearchProteinsAction extends Action {
 			//  Populate request objects for Protein Name Tooltip JS
 			ProteinListingTooltipConfigUtil.getInstance().putProteinListingTooltipConfigForPage( projectSearchIdsSet, request );
 			request.setAttribute( "queryString",  request.getQueryString() );
-			request.setAttribute( "mergedQueryString", request.getQueryString().replaceAll( "searchId=", "searchIds=" ) );
 			
 			SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 			if ( search == null ) {

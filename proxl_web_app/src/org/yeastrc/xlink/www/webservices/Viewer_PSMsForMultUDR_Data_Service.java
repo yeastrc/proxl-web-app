@@ -61,20 +61,11 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 	 */
 	public static class Viewer_UDR_Data_Service_Request {
 
-		/**
-		 * Actually projectSearchIdList
-		 */
-		private List<Integer> searchIds;
+		private List<Integer> projectSearchIds;
 		
 		private List<Viewer_UDR_Data_Service_Single_UDR_Request> crosslinkUdrRequestList;
 		private List<Viewer_UDR_Data_Service_Single_UDR_Request> looplinkUdrRequestList;
 
-		public List<Integer> getSearchIds() {
-			return searchIds;
-		}
-		public void setSearchIds(List<Integer> searchIds) {
-			this.searchIds = searchIds;
-		}
 		public List<Viewer_UDR_Data_Service_Single_UDR_Request> getCrosslinkUdrRequestList() {
 			return crosslinkUdrRequestList;
 		}
@@ -87,6 +78,13 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		public void setLooplinkUdrRequestList(List<Viewer_UDR_Data_Service_Single_UDR_Request> looplinkUdrRequestList) {
 			this.looplinkUdrRequestList = looplinkUdrRequestList;
 		}
+		public List<Integer> getProjectSearchIds() {
+			return projectSearchIds;
+		}
+		public void setProjectSearchIds(List<Integer> projectSearchIds) {
+			this.projectSearchIds = projectSearchIds;
+		}
+
 	}
 
 	public static class Viewer_UDR_Data_Service_Single_UDR_Request {
@@ -320,7 +318,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 			HttpServletRequest request )
 					throws Exception {
 		try {
-			List<Integer> projectSearchIdList = webserviceRequest.searchIds;
+			List<Integer> projectSearchIdList = webserviceRequest.projectSearchIds;
 			 
 			if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
 				String msg = "Provided searchIds is null or empty, searchIds = " + projectSearchIdList;

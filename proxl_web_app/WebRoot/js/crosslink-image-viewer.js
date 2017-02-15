@@ -3,15 +3,12 @@
 
 //  Javascript for the viewMergedImage.jsp page
 
-//////////////////////////////////
-
-// JavaScript directive:   all variables have to be declared with "var", maybe other things
-
-"use strict";
-
+//  !!!! Warning !!!!:  
+//		the objects in _searches have property ['id'] which is the projectSearchId
+//		search.id and _searches[i]['id']  reference the projectSearchId 
+//		Some uses of searchId are actually projectSearchId
 
 //   All references to proteinId are actually referencing the protein sequence id
-
 
 //   A plain "protein" variable is the protein sequence id
 
@@ -34,6 +31,12 @@
 //	<tspan id="SvgjsTspan1583" dy=".35em" x="18" style="font-size:12px;font-family:Helvetica, Arial, sans-serif">Coiled-coil</tspan>
 //  </text>
 
+
+//////////////////////////////////
+
+// JavaScript directive:   all variables have to be declared with "var", maybe other things
+
+"use strict";
 
 
 ///////////////   CONSTANTS  ////////////////////////
@@ -269,58 +272,38 @@ var HASH_OBJECT_PROPERTIES = {
 
 
 var hashObjectManager = {
-
 		hashObject : {},
 
 		resetHashObject : function() {
-
 			this.hashObject = {};
-
 		},
 
 		setOnHashObject : function( property, value ) {
-
 			if ( property === undefined || property === null ) {
-				
 				throw Error( "property not found in 'HASH_OBJECT_PROPERTIES' " );
 			}
-
 			this.hashObject[ property ] = value;
 		},
 		
 		getFromHashObject : function( property ) {
-
 			if ( property === undefined || property === null ) {
-				
 				throw Error( "property not found in 'HASH_OBJECT_PROPERTIES' " );
 			}
-			
 			return this.hashObject[ property ];
-
 		},
 		
 		getHashObject : function() {
-			
 			return this.hashObject;
 		},
 
 		setHashObject : function( hashObject ) {
-			
 			this.hashObject = hashObject;
 		},
-		
-		
-
 };
-
-
-
 
 /////////////////////////////////////////////////////////////////////////
 
 ///////////////    GLOBAL VARIABLES  ////////////////////////////////////
-
-
 
 //   Objects of classes that have their own code
 
@@ -346,7 +329,7 @@ var _testThatCanGetSVGasString = true;
 //  From Page
 
 
-var _searchIds = {};
+var _projectSearchIds;
 
 
 
@@ -744,7 +727,7 @@ function getValuesFromForm() {
 		throw Error( "Cutoffs are invalid so stop processing" );
 	}
 	
-	var outputCutoffs = getCutoffsFromThePageResult.cutoffsBySearchId;
+	var outputCutoffs = getCutoffsFromThePageResult.cutoffsByProjectSearchId;
 	
 	
 	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.cutoffs, outputCutoffs );
@@ -839,7 +822,7 @@ function updateURLHash( useSearchForm ) {
 
 	//  Output the selected Annotation data for display
 	var getAnnotationTypeDisplayFromThePageResult = annotationDataDisplayProcessingCommonCode.getAnnotationTypeDisplayFromThePage( {} );
-	var annTypeIdDisplay = getAnnotationTypeDisplayFromThePageResult.annTypeIdDisplayBySearchId;
+	var annTypeIdDisplay = getAnnotationTypeDisplayFromThePageResult.annTypeIdDisplayByProjectSearchId;
 
 	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.annTypeIdDisplay, annTypeIdDisplay );
 
@@ -970,19 +953,15 @@ function updateURLHashWithJSONObject( jsonObject ) {
 
 function buildQueryStringFromHash() {
 	
-	
 	var queryString = "?";
 	var items = new Array();
-	
-	
+		
 	var json = getJsonFromHash();
 	
-	//  searchIds from the page
-	for ( var i = 0; i < _searchIds.length; i++ ) {
-		items.push( "searchIds=" + _searchIds[ i ] );
+	//  _projectSearchIds from the page
+	for ( var i = 0; i < _projectSearchIds.length; i++ ) {
+		items.push( "projectSearchId=" + _projectSearchIds[ i ] );
 	}
-	
-
 	
 	if ( json.excludeTaxonomy != undefined && json.excludeTaxonomy.length > 0 ) {
 		for ( var i = 0; i < json.excludeTaxonomy.length; i++ ) {
@@ -996,18 +975,11 @@ function buildQueryStringFromHash() {
 		}
 	}
 	
-	
-	
 	///   Serialize cutoffs to JSON
-	
 	var cutoffs = json.cutoffs;
-	
-	var psmPeptideCutoffsForSearchIds_JSONString = JSON.stringify( cutoffs );
-
-	var psmPeptideCutoffsForSearchIds_JSONStringEncoded = encodeURIComponent( psmPeptideCutoffsForSearchIds_JSONString );
-
-	items.push( "psmPeptideCutoffsForSearchIds=" + psmPeptideCutoffsForSearchIds_JSONStringEncoded );
-
+	var psmPeptideCutoffsForProjectSearchIds_JSONString = JSON.stringify( cutoffs );
+	var psmPeptideCutoffsForProjectSearchIds_JSONStringEncoded = encodeURIComponent( psmPeptideCutoffsForProjectSearchIds_JSONString );
+	items.push( "psmPeptideCutoffsForProjectSearchIds=" + psmPeptideCutoffsForProjectSearchIds_JSONStringEncoded );
 
 	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
 		items.push( "filterNonUniquePeptides=on" );
@@ -1036,8 +1008,6 @@ function refreshData() {
 	
 	defaultPageView.searchFormUpdateButtonPressed_ForDefaultPageView();
 	
-
-
 	_coverages = undefined;
 	_ranges = undefined;
 	
@@ -1064,7 +1034,6 @@ function loadSequenceCoverageDataForProtein( selProteinsForSeqCov, doDraw ) {
 	var urlAdditionProteinSequenceIds = "";
 
 	for ( var index = 0; index < selProteinsForSeqCov.length; index++ ) {
-
 		var protein = selProteinsForSeqCov[ index ];
 		urlAdditionProteinSequenceIds += "&proteinSequenceId=" + protein;
 	}
@@ -1072,7 +1041,6 @@ function loadSequenceCoverageDataForProtein( selProteinsForSeqCov, doDraw ) {
 	url += urlAdditionProteinSequenceIds;
 
 	console.log( "Loading sequence coverage data for selProteinsForSeqCov: " + urlAdditionProteinSequenceIds );
-
 
 	$.ajax({
 		type: "GET",
@@ -1198,7 +1166,7 @@ function loadProteinTaxonomyIdDataForProtein( proteinIds, doDraw ) {
 	var url = contextPathJSVar + "/services/proteinTaxonomyId/getDataForProtein";
 
 	var ajaxRequestData = {
-			searchIds : _searchIds,
+			projectSearchIds : _projectSearchIds,
 			proteinIds: proteinIds
 	};
 
@@ -2525,29 +2493,15 @@ function populateNavigation() {
 	var queryString = "?";
 	var items = new Array();
 	
-	
-	if ( _searches.length > 1 ) {
-		for ( var i = 0; i < _searchIds.length; i++ ) {
-			items.push( "searchIds=" + _searchIds[ i ] );
-		}
-	} else {
-		items.push( "searchId=" + _searchIds[ 0 ] );		
+	for ( var i = 0; i < _projectSearchIds.length; i++ ) {
+		items.push( "projectSearchId=" + _projectSearchIds[ i ] );
 	}
-
 	
 	var baseJSONObject = getNavigationJSON_Not_for_Image_Or_Structure();
-	
-	
-	
-	var psmPeptideCutoffsForSearchIds_JSONString = JSON.stringify( baseJSONObject );
-	
-	
-	var psmPeptideCutoffsForSearchIds_JSONStringEncodedURIComponent = encodeURIComponent( psmPeptideCutoffsForSearchIds_JSONString ); 
-
+	var psmPeptideCutoffsForProjectSearchIds_JSONString = JSON.stringify( baseJSONObject );
+	var psmPeptideCutoffsForProjectSearchIds_JSONStringEncodedURIComponent = encodeURIComponent( psmPeptideCutoffsForProjectSearchIds_JSONString ); 
 	//  Parameter name matches standard form parameter name for JSON
-	
-	items.push( "queryJSON=" + psmPeptideCutoffsForSearchIds_JSONStringEncodedURIComponent );
-
+	items.push( "queryJSON=" + psmPeptideCutoffsForProjectSearchIds_JSONStringEncodedURIComponent );
 	
 	queryString += items.join( "&" );
 
@@ -2558,129 +2512,72 @@ function populateNavigation() {
 		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
 		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
 	} else {
-		
-
 		//  Add Peptide Link
-		
 		html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" href='" + contextPathJSVar + "/";
-        
 		var viewSearchPeptideDefaultPageUrl = $("#viewSearchPeptideDefaultPageUrl").val();
-		
 		if ( viewSearchPeptideDefaultPageUrl === undefined || viewSearchPeptideDefaultPageUrl === "" ) {
-			      
 			html += "peptide.do" + queryString;
-
 		} else {
-			
 			html += viewSearchPeptideDefaultPageUrl;
-			
 		}
 		html += "'>Peptide View</a>]";
-				
-
 		//  Add Protein View Link
-		
 		html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" href='" + contextPathJSVar + "/";
-        
 		var viewSearchCrosslinkProteinDefaultPageUrl = $("#viewSearchCrosslinkProteinDefaultPageUrl").val();
-		
 		if ( viewSearchCrosslinkProteinDefaultPageUrl === undefined || viewSearchCrosslinkProteinDefaultPageUrl === "" ) {
-			      
 			html += "crosslinkProtein.do" + queryString;
-
 		} else {
-			
 			html += viewSearchCrosslinkProteinDefaultPageUrl;
-			
 		}
 		html += "'>Protein View</a>]";
-				
-
 		//  Add Coverage Report Link
-		
 		html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" href='" + contextPathJSVar + "/";
-        
 		var viewProteinCoverageReportDefaultPageUrl = $("#viewProteinCoverageReportDefaultPageUrl").val();
-		
 		if ( viewProteinCoverageReportDefaultPageUrl === undefined || viewProteinCoverageReportDefaultPageUrl === "" ) {
-			      
 			html += "proteinCoverageReport.do" + queryString;
-
 		} else {
-			
 			html += viewProteinCoverageReportDefaultPageUrl;
-			
 		}
 		html += "'>Coverage Report</a>]";
-		
 	}
 
-
 	var $navigation_links_except_structure = $("#navigation_links_except_structure"); 
-	
 	
 	$navigation_links_except_structure.empty();
 	$navigation_links_except_structure.html( html );
 	addToolTips( $navigation_links_except_structure );
 	
-	
 	var $structure_viewer_link_span = $("#structure_viewer_link_span");
-	
 	if ( $structure_viewer_link_span.length > 0 ) {
-
-
 		var structureNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View data on 3D structures\" " +
 			"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/";
-			
-			
 		var viewMergedStructureDefaultPageUrl = $("#viewMergedStructureDefaultPageUrl").val();
-		
-		
 		if ( viewMergedStructureDefaultPageUrl === undefined || viewMergedStructureDefaultPageUrl === "" ) {
-			      
 			var structureQueryString = "?";
-
-			for ( var j = 0; j < _searchIds.length; j++ ) {
-
+			for ( var j = 0; j < _projectSearchIds.length; j++ ) {
 				if ( j > 0 ) {
-
 					structureQueryString += "&";
 				}
-
-				structureQueryString += "searchIds=" + _searchIds[ j ];
+				structureQueryString += "projectSearchId=" + _projectSearchIds[ j ];
 			}
-
 			var structureJSON = { };
-
 //			add taxonomy exclusions
 			structureJSON[ 'excludeTaxonomy' ] = _excludeTaxonomy;
-
 //			add type exclusions
 			structureJSON[ 'excludeType' ] = _excludeType;
-
 			//  Add Filter cutoffs
 			structureJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
-			
 			//  Add Ann Type Display
 			var annTypeIdDisplay = baseJSONObject.annTypeIdDisplay;
 			structureJSON[ 'annTypeIdDisplay' ] = annTypeIdDisplay;
-
 //			add filter out non unique peptides
 			structureJSON[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
-
 			structureJSON[ 'filterOnlyOnePSM' ] = _filterOnlyOnePSM;
 			structureJSON[ 'filterOnlyOnePeptide' ] = _filterOnlyOnePeptide;
-
 			var structureJSONString = encodeURIComponent( JSON.stringify( structureJSON ) );
-
-			
 			structureNavHTML += "structure.do" + structureQueryString + "#" + structureJSONString;
-
-
 		} else {
-			
 			structureNavHTML += viewMergedStructureDefaultPageUrl;
-			
 		}
 		
 		structureNavHTML += "\">Structure View</a>]</span>";
@@ -2688,11 +2585,9 @@ function populateNavigation() {
 		$structure_viewer_link_span.empty();
 		$structure_viewer_link_span.html( structureNavHTML );
 		addToolTips( $structure_viewer_link_span );
-
 	}
 	
 }
-
 
 //  Reset Proteins highlighting, flipping, positioning, and horizontal scaling and redraw
 
@@ -8192,10 +8087,10 @@ function populateAnnotationDataDisplayProcessingCommonCodeFromHash() {
 	//  Get from annotationDataDisplayProcessingCommonCode to reflect defaults if no data
 	var annTypeIdDisplay = annotationDataDisplayProcessingCommonCode.getAnnotationTypeDisplayFromThePage({});
 	
-	var annTypeIdDisplayBySearchId = annTypeIdDisplay.annTypeIdDisplayBySearchId;
+	var annTypeIdDisplayByProjectSearchId = annTypeIdDisplay.annTypeIdDisplayByProjectSearchId;
 
 	webserviceDataParamsDistributionCommonCode.paramsForDistribution( { 
-		annTypeIdDisplay : annTypeIdDisplayBySearchId
+		annTypeIdDisplay : annTypeIdDisplayByProjectSearchId
 	} );
 	
 }
@@ -8240,30 +8135,20 @@ function initPage() {
 	}
 
 	
-	_searchIds = [];
+	_projectSearchIds = [];
 	
-	var $search_id_jq = $(".search_id_jq");
-	
-	if ( $search_id_jq.length === 0 ) {
-		
-		throw Error( "Must be at least one search id in hidden field with class 'search_id_jq'" );
+	var $project_search_id_jq = $(".project_search_id_jq");
+	if ( $project_search_id_jq.length === 0 ) {
+		throw Error( "Must be at least one search id in hidden field with class 'project_search_id_jq'" );
 	}
-	
-	$search_id_jq.each( function( index, element ) {
-		
-		var $search_id_jq_single = $( this );
-		
-		var searchIdString = $search_id_jq_single.val();
-		
-		var searchId = parseInt( searchIdString, 10 );
-		
-		if ( isNaN( searchId ) ) {
-			
-			throw Error( "Search Id is not a number: " + searchIdString );
+	$project_search_id_jq.each( function( index, element ) {
+		var $project_search_id_jq_single = $( this );
+		var projectSearchIdString = $project_search_id_jq_single.val();
+		var projectSearchId = parseInt( projectSearchIdString, 10 );
+		if ( isNaN( projectSearchId ) ) {
+			throw Error( "Project Search Id is not a number: " + projectSearchIdString );
 		}
-		
-		
-		_searchIds.push( searchId );
+		_projectSearchIds.push( projectSearchId );
 	});
 	
 
@@ -8278,7 +8163,7 @@ function initPage() {
 	}
 
 	
-	if ( _searchIds && _searchIds.length > 1 ) {
+	if ( _projectSearchIds && _projectSearchIds.length > 1 ) {
 		
 		$("#merged_label_text_header").show();  //  Update text at top to show this is for "merged" since more than one search
 	}

@@ -165,8 +165,8 @@
 		
 		<input type="hidden" id="project_id_for_js" value="${ projectId }" >
 		
-		<c:forEach var="searchId" items="${ searchIds }">
-			<input type="hidden" class=" search_id_input_field_jq " value="<c:out value="${ searchId }"></c:out>" >
+		<c:forEach var="projectSearchId" items="${ projectSearchIds }">
+			<input type="hidden" class=" project_search_id_input_field_jq " value="<c:out value="${ projectSearchId }"></c:out>" >
 		</c:forEach>		
 
 		
@@ -203,7 +203,7 @@
 			
 			
 				<logic:iterate name="searches" id="search">
-					<input type="hidden" name="searchIds" value="<bean:write name="search" property="projectSearchId" />">
+					<input type="hidden" name="projectSearchId" value="<bean:write name="search" property="projectSearchId" />">
 				</logic:iterate>
 				
 				

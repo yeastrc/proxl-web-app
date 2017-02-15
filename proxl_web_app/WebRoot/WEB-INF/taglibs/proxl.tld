@@ -31,7 +31,7 @@
 	</attribute>
 	
 	<attribute>
-	<name>searchId</name>
+	<name>projectSearchId</name>
 	<required>true</required>
 	<rtexprvalue>true</rtexprvalue>
 	</attribute>

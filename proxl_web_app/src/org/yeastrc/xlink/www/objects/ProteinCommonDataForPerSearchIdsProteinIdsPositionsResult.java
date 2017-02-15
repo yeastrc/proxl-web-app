@@ -3,31 +3,22 @@ package org.yeastrc.xlink.www.objects;
 import java.util.List;
 
 public class ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult {
-
-	  
 	
-	private int searchId;
+	private int projectSearchId;
 	private String searchName;
 	
 	private int numPeptides;
 	private int numUniquePeptides;
 	private int numPsms;
-	
-	
 
 	/**
 	 * Used for display on web page
 	 */
 	private List<String> psmAnnotationValueList;
-	
-
 	/**
 	 * Used for display on web page
 	 */
 	private List<String> peptideAnnotationValueList;
-
-
-
 
 	//  Getters and setters
 	
@@ -44,12 +35,7 @@ public class ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult {
 			List<String> peptideAnnotationValueList) {
 		this.peptideAnnotationValueList = peptideAnnotationValueList;
 	}
-	public int getSearchId() {
-		return searchId;
-	}
-	public void setSearchId(int searchId) {
-		this.searchId = searchId;
-	}
+
 	public String getSearchName() {
 		return searchName;
 	}
@@ -74,6 +60,12 @@ public class ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult {
 	}
 	public void setNumPsms(int numPsms) {
 		this.numPsms = numPsms;
+	}
+	public int getProjectSearchId() {
+		return projectSearchId;
+	}
+	public void setProjectSearchId(int projectSearchId) {
+		this.projectSearchId = projectSearchId;
 	}
 
 }

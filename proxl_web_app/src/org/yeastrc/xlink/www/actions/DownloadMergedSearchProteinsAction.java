@@ -58,7 +58,7 @@ public class DownloadMergedSearchProteinsAction extends Action {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			//   Get the project id for these searches
-			int[] projectSearchIds = form.getSearchIds();
+			int[] projectSearchIds = form.getProjectSearchId();
 			if ( projectSearchIds.length == 0 ) {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
@@ -103,10 +103,12 @@ public class DownloadMergedSearchProteinsAction extends Action {
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
 
-			List<SearchDTO> searches = new ArrayList<SearchDTO>();
+			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIdsListDeduppedSorted.size() );
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
 			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
 			int searchIdsArrayIndex = 0;
+			List<Integer> searchIds = new ArrayList<>( projectSearchIdsListDeduppedSorted.size() );
+			
 			for( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
 				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 				if ( search == null ) {
@@ -121,6 +123,7 @@ public class DownloadMergedSearchProteinsAction extends Action {
 				searchesMapOnSearchId.put( search.getSearchId(), search );
 				searchIdsArray[ searchIdsArrayIndex ] = search.getSearchId();
 				searchIdsArrayIndex++;
+				searchIds.add( search.getSearchId() );
 			}
 			// Sort searches list
 			Collections.sort( searches, new Comparator<SearchDTO>() {
@@ -129,6 +132,7 @@ public class DownloadMergedSearchProteinsAction extends Action {
 					return o1.getSearchId() - o2.getSearchId();
 				}
 			});
+			Collections.sort( searchIds );
 			
 			OutputStreamWriter writer = null;
 			try {
@@ -144,7 +148,7 @@ public class DownloadMergedSearchProteinsAction extends Action {
 				List<MergedSearchProteinLooplink> looplinks = proteinsMergedCommonPageDownloadResult.getLooplinks();
 				// generate file name
 				String filename = "xlinks-proteins-search-";
-				filename += StringUtils.join( form.getSearchIds(), '-' );
+				filename += StringUtils.join( searchIdsArray, '-' );
 				DateTime dt = new DateTime();
 				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
 				filename += "-" + fmt.print( dt );
@@ -173,12 +177,12 @@ public class DownloadMergedSearchProteinsAction extends Action {
 				}
 				writer.write( "\n" );
 				for( MergedSearchProteinCrosslink link : crosslinks ) {
-					List<Integer> searchIds = new ArrayList<Integer>( link.getSearches().size() );
+					List<Integer> searchIdsForLink = new ArrayList<Integer>( link.getSearches().size() );
 					for( SearchDTO r : link.getSearches() ) { 
-						searchIds.add( r.getSearchId() ); 
+						searchIdsForLink.add( r.getSearchId() ); 
 					}
-					Collections.sort( searchIds );
-					writer.write( StringUtils.join( searchIds, "," ) );
+					Collections.sort( searchIdsForLink );
+					writer.write( StringUtils.join( searchIdsForLink, "," ) );
 					writer.write( "\t" );
 					writer.write( "CROSSLINK\t" );
 					writer.write( link.getProtein1().getName() );
@@ -207,12 +211,12 @@ public class DownloadMergedSearchProteinsAction extends Action {
 					writer.write( "\n" );
 				}
 				for( MergedSearchProteinLooplink link : looplinks ) {
-					List<Integer> searchIds = new ArrayList<Integer>( link.getSearches().size() );
+					List<Integer> searchIdsForLink = new ArrayList<Integer>( link.getSearches().size() );
 					for( SearchDTO r : link.getSearches() ) { 
-						searchIds.add( r.getProjectSearchId() ); 
+						searchIdsForLink.add( r.getProjectSearchId() ); 
 					}
-					Collections.sort( searchIds );
-					writer.write( StringUtils.join( searchIds, "," ) );
+					Collections.sort( searchIdsForLink );
+					writer.write( StringUtils.join( searchIdsForLink, "," ) );
 					writer.write( "\t" );
 					writer.write( "LOOPLINK" );
 					writer.write( "\t" );

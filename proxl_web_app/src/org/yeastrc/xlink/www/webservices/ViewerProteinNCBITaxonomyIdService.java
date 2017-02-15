@@ -35,12 +35,12 @@ public class ViewerProteinNCBITaxonomyIdService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getDataForProtein") 
 	public Map<Integer, Integer> getTaxonomyIdsDataForProteinIds( 
-			@QueryParam( "searchIds" ) List<Integer> projectSearchIdList,
+			@QueryParam( "projectSearchIds" ) List<Integer> projectSearchIdList,
 			@QueryParam( "proteinIds" ) List<Integer>  proteinSequenceIds,  // "proteinIds" to remain compatible with JS code
 			@Context HttpServletRequest request )
 	throws Exception {
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
-			String msg = "Provided searchIds is null or empty, searchIds = " + projectSearchIdList;
+			String msg = "Provided projectSearchIds is null or empty, projectSearchIds = " + projectSearchIdList;
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -65,7 +65,7 @@ public class ViewerProteinNCBITaxonomyIdService {
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search ids: ";
+				String msg = "No project ids for projectSearchIdList: ";
 				for ( int projectSearchId : projectSearchIdList ) {
 					msg += projectSearchId + ", ";
 				}				

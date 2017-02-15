@@ -135,7 +135,7 @@ public class ProcessProxlInput {
 
 				SearchCommentDTO searchCommentDTO = new SearchCommentDTO();
 				
-				searchCommentDTO.setSearchid( searchDTO.getId() );
+				searchCommentDTO.setProjectSearchid( projectSearchDTOInserted.getId() );
 				searchCommentDTO.setComment( proxlInput.getComment() );
 
 				searchCommentDTO.setAuthUserId(null);
