@@ -24,7 +24,7 @@ import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
 /**
- * 
+ *  Marks record in project_search as deleted
  *
  */
 public class DeleteSearchAction extends Action {
@@ -37,24 +37,24 @@ public class DeleteSearchAction extends Action {
 			  HttpServletResponse response )
 					  throws Exception {
 		try {
-			int projectSearchId = Integer.parseInt( request.getParameter( "searchId" ) );
+			int projectSearchId = Integer.parseInt( request.getParameter( "projectSearchId" ) );
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			//   Get the project id for this search
 			Collection<Integer> projectSearchIdsSet = new HashSet<>();
 			projectSearchIdsSet.add( projectSearchId );
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
-			if ( projectIdsFromSearchIds.isEmpty() ) {
+			List<Integer> projectIdsFromProjectSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
+			if ( projectIdsFromProjectSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for search id: " + projectSearchId;
+				String msg = "No project ids for projectSearchId: " + projectSearchId;
 				log.error( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
-			if ( projectIdsFromSearchIds.size() > 1 ) {
+			if ( projectIdsFromProjectSearchIds.size() > 1 ) {
 				//  Invalid request, searches across projects
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_SEARCHES_ACROSS_PROJECTS );
 			}
-			int projectId = projectIdsFromSearchIds.get( 0 );
+			int projectId = projectIdsFromProjectSearchIds.get( 0 );
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
 			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
@@ -69,6 +69,9 @@ public class DeleteSearchAction extends Action {
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
 			}
 			request.setAttribute( WebConstants.REQUEST_AUTH_ACCESS_LEVEL, authAccessLevel );
+			
+			//  Auth complete
+			
 //			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 			AuthUserDTO authUserDTO = userSessionObject.getUserDBObject().getAuthUser();
 			SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
@@ -76,7 +79,7 @@ public class DeleteSearchAction extends Action {
 			ProjectSearchDAO.getInstance().markAsDeleted( projectSearchId, authUserDTO.getId() );
 			
 			try {
-				String msg = "Search id " + projectSearchId 
+				String msg = "Project Search id " + projectSearchId 
 						+ " successfully deleted by user (username: " +  authUserDTO.getUsername() 
 						+ ", user id: " + authUserDTO.getId() 
 						+ "), IP of request: " + request.getRemoteAddr()

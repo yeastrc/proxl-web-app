@@ -496,14 +496,17 @@ var openConfirmDeleteSearchOverlay = function(clickThis, eventObject) {
 	var $clickThis = $(clickThis);
 //	get root div for this search
 	var $search_root_jq = $clickThis.closest(".search_root_jq");
-	var searchId = $search_root_jq.attr("searchId");	
+	var projectSearchId = $search_root_jq.attr("data-project_search_id");	
+	if ( projectSearchId === undefined ) {
+		throw Error( "Error: attribute 'data-project_search_id' not found on element with class 'search_root_jq'" );
+	}
 //	copy the search name to the overlay
 	var $search_name_display_jq = $search_root_jq.find(".search_name_display_jq");
 	var search_name_display_jq = $search_name_display_jq.text();
 	var $delete_search_overlay_search_name = $("#delete_search_overlay_search_name");
 	$delete_search_overlay_search_name.text( search_name_display_jq );
 	var $delete_search_confirm_button = $("#delete_search_confirm_button");
-	$delete_search_confirm_button.data("searchId", searchId);
+	$delete_search_confirm_button.data("projectSearchId", projectSearchId);
 //	Position dialog over clicked delete icon
 //	get position of div containing the dialog that is inline in the page
 	var $delete_search_overlay_containing_outermost_div_inline_div = $("#delete_search_overlay_containing_outermost_div_inline_div");
@@ -525,7 +528,7 @@ var openConfirmDeleteSearchOverlay = function(clickThis, eventObject) {
 ///////////
 var closeConfirmDeleteSearchOverlay = function(clickThis, eventObject) {
 	var $delete_search_confirm_button = $("#delete_search_confirm_button");
-	$delete_search_confirm_button.data("searchId", null);
+	$delete_search_confirm_button.data("projectSearchId", null);
 	$(".delete_search_overlay_show_hide_parts_jq").hide();
 };
 
@@ -533,21 +536,21 @@ var closeConfirmDeleteSearchOverlay = function(clickThis, eventObject) {
 //put click handler for this on #delete_search_confirm_button
 var deleteSearchConfirmed = function(clickThis, eventObject) {
 	var $clickThis = $(clickThis);
-	var searchId = $clickThis.data("searchId");
-	if ( searchId === undefined || searchId === null ) {
-		throw Error( " searchId === undefined || searchId === null " );
+	var projectSearchId = $clickThis.data("projectSearchId");
+	if ( projectSearchId === undefined || projectSearchId === null ) {
+		throw Error( " projectSearchId === undefined || projectSearchId === null " );
 	}
-	if ( searchId === "" ) {
-		throw Error( ' searchId === "" ' );
+	if ( projectSearchId === "" ) {
+		throw Error( ' projectSearchId === "" ' );
 	}
-	document.location.href= contextPathJSVar + "/deleteSearch.do?searchId=" + searchId;
+	document.location.href= contextPathJSVar + "/deleteSearch.do?projectSearchId=" + projectSearchId;
 	closeConfirmDeleteSearchOverlay();
 };
 
-//END   Delete Search processing
+//  END   Delete Search processing
 
 
-//Delete Search Comment processing
+//  Delete Search Comment processing
 
 /////////////////
 var deleteSearchCommentClickHandler = function(clickThis) {
