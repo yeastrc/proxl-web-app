@@ -1759,9 +1759,11 @@
 						
 							<div  class="collapsable-link-container folder-collapsable-link-container collapsable_link_container_jq" style="">
 							
-								<a href="javascript:" class=" collapsable_collapse_link_jq" style="display: none;"
+								<a href="javascript:" class=" collapsable_collapse_link_jq tool_tip_attached_jq " style="display: none;"
+									data-tooltip="Close folder"
 									><img  src="${ contextPath }/images/icon-folder-click-to-close.png"></a>
-								<a href="javascript:" class=" collapsable_expand_link_jq"
+								<a href="javascript:" class=" collapsable_expand_link_jq tool_tip_attached_jq "
+									data-tooltip="Open folder"
 									><img  src="${ contextPath }/images/icon-folder-click-to-open.png"></a>
 	
 							</div>
