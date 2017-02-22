@@ -357,6 +357,55 @@ CREATE INDEX reported_peptide_id ON search_reported_peptide (reported_peptide_id
 
 
 -- -----------------------------------------------------
+-- Table scan_file
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS scan_file ;
+
+CREATE TABLE  scan_file (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  filename VARCHAR(255) NOT NULL,
+  path VARCHAR(2000) NULL,
+  sha1sum VARCHAR(255) NULL,
+  PRIMARY KEY (id))
+ENGINE = InnoDB;
+
+CREATE UNIQUE INDEX filename ON scan_file (filename ASC, sha1sum ASC);
+
+
+-- -----------------------------------------------------
+-- Table scan
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS scan ;
+
+CREATE TABLE  scan (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  scan_file_id INT UNSIGNED NOT NULL,
+  start_scan_number INT UNSIGNED NOT NULL,
+  end_scan_number INT UNSIGNED NULL,
+  level SMALLINT UNSIGNED NOT NULL,
+  preMZ DECIMAL(18,9) NULL,
+  precursor_scan_number INT NOT NULL,
+  precursor_scan_id INT UNSIGNED NULL,
+  retention_time DECIMAL(18,9) NULL,
+  peak_count INT NOT NULL,
+  fragmentation_type VARCHAR(45) NULL,
+  is_centroid CHAR(1) NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_scan_scan_file_id
+    FOREIGN KEY (scan_file_id)
+    REFERENCES scan_file (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE UNIQUE INDEX start_scan_number ON scan (start_scan_number ASC, scan_file_id ASC);
+
+CREATE INDEX fk_scan_scan_file_id_idx ON scan (scan_file_id ASC);
+
+CREATE INDEX precursor_scan_id_idx ON scan (precursor_scan_id ASC);
+
+
+-- -----------------------------------------------------
 -- Table psm
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS psm ;
@@ -374,12 +423,18 @@ CREATE TABLE  psm (
   CONSTRAINT psm_ibfk_1
     FOREIGN KEY (search_id)
     REFERENCES search (id)
-    ON DELETE CASCADE,
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
   CONSTRAINT psm_ibfk_2
     FOREIGN KEY (reported_peptide_id)
     REFERENCES reported_peptide (id)
     ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
+    ON UPDATE RESTRICT,
+  CONSTRAINT psm_scan_id_fk
+    FOREIGN KEY (scan_id)
+    REFERENCES scan (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
 COLLATE = latin1_bin;
@@ -563,22 +618,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table scan_file
--- -----------------------------------------------------
-DROP TABLE IF EXISTS scan_file ;
-
-CREATE TABLE  scan_file (
-  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  filename VARCHAR(255) NOT NULL,
-  path VARCHAR(2000) NULL,
-  sha1sum VARCHAR(255) NULL,
-  PRIMARY KEY (id))
-ENGINE = InnoDB;
-
-CREATE UNIQUE INDEX filename ON scan_file (filename ASC, sha1sum ASC);
-
-
--- -----------------------------------------------------
 -- Table scan_file_header
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS scan_file_header ;
@@ -597,39 +636,6 @@ CREATE TABLE  scan_file_header (
 ENGINE = InnoDB;
 
 CREATE INDEX fk_scan_file_header_scan_file_id_idx ON scan_file_header (scan_file_id ASC);
-
-
--- -----------------------------------------------------
--- Table scan
--- -----------------------------------------------------
-DROP TABLE IF EXISTS scan ;
-
-CREATE TABLE  scan (
-  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  scan_file_id INT UNSIGNED NOT NULL,
-  start_scan_number INT UNSIGNED NOT NULL,
-  end_scan_number INT UNSIGNED NULL,
-  level SMALLINT UNSIGNED NOT NULL,
-  preMZ DECIMAL(18,9) NULL,
-  precursor_scan_number INT NOT NULL,
-  precursor_scan_id INT UNSIGNED NULL,
-  retention_time DECIMAL(18,9) NULL,
-  peak_count INT NOT NULL,
-  fragmentation_type VARCHAR(45) NULL,
-  is_centroid CHAR(1) NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT fk_scan_scan_file_id
-    FOREIGN KEY (scan_file_id)
-    REFERENCES scan_file (id)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE UNIQUE INDEX start_scan_number ON scan (start_scan_number ASC, scan_file_id ASC);
-
-CREATE INDEX fk_scan_scan_file_id_idx ON scan (scan_file_id ASC);
-
-CREATE INDEX precursor_scan_id_idx ON scan (precursor_scan_id ASC);
 
 
 -- -----------------------------------------------------
@@ -2002,14 +2008,14 @@ CREATE INDEX url ON url_shortener (url(500) ASC);
 
 
 -- -----------------------------------------------------
--- Table url_shortener_associated_search_id
+-- Table url_shortener_associated_project_search_id
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS url_shortener_associated_search_id ;
+DROP TABLE IF EXISTS url_shortener_associated_project_search_id ;
 
-CREATE TABLE  url_shortener_associated_search_id (
-  url_shortener_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  search_id INT UNSIGNED NOT NULL,
-  PRIMARY KEY (url_shortener_id, search_id),
+CREATE TABLE  url_shortener_associated_project_search_id (
+  url_shortener_id INT UNSIGNED NOT NULL,
+  project_search_id INT UNSIGNED NOT NULL,
+  PRIMARY KEY (url_shortener_id, project_search_id),
   CONSTRAINT url_shortener_associated_search_id_main_id
     FOREIGN KEY (url_shortener_id)
     REFERENCES url_shortener (id)
@@ -2017,7 +2023,7 @@ CREATE TABLE  url_shortener_associated_search_id (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-CREATE INDEX default_page_view_search_id_fk_idx ON url_shortener_associated_search_id (url_shortener_id ASC);
+CREATE INDEX default_page_view_search_id_fk_idx ON url_shortener_associated_project_search_id (url_shortener_id ASC);
 
 
 -- -----------------------------------------------------

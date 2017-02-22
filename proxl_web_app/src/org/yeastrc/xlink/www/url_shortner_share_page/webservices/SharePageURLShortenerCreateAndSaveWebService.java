@@ -21,10 +21,10 @@ import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.constants.URLShortenerWhiteListConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.dao.URLShortenerAssociatedSearchIdDAO;
+import org.yeastrc.xlink.www.dao.URLShortenerAssociatedProjectSearchIdDAO;
 import org.yeastrc.xlink.www.dao.URLShortenerDAO;
 import org.yeastrc.xlink.www.dao.URLShortenerDAO.LogDuplicateSQLException;
-import org.yeastrc.xlink.www.dto.URLShortenerAssociatedSearchIdDTO;
+import org.yeastrc.xlink.www.dto.URLShortenerAssociatedProjectSearchIdDTO;
 import org.yeastrc.xlink.www.dto.URLShortenerDTO;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
@@ -196,10 +196,10 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 
 				if ( webServiceRequest.projectSearchIdList != null ) {
 					for ( int projectSearchId : webServiceRequest.projectSearchIdList ) {
-						URLShortenerAssociatedSearchIdDTO urlShortenerAssociatedSearchIdDTO = new URLShortenerAssociatedSearchIdDTO();
-						urlShortenerAssociatedSearchIdDTO.setUrlShortenerId( urlShortenerDTO.getId() );
-						urlShortenerAssociatedSearchIdDTO.setSearchId( projectSearchId );
-						URLShortenerAssociatedSearchIdDAO.getInstance().save( urlShortenerAssociatedSearchIdDTO );
+						URLShortenerAssociatedProjectSearchIdDTO urlShortenerAssociatedProjectSearchIdDTO = new URLShortenerAssociatedProjectSearchIdDTO();
+						urlShortenerAssociatedProjectSearchIdDTO.setUrlShortenerId( urlShortenerDTO.getId() );
+						urlShortenerAssociatedProjectSearchIdDTO.setProjectSearchId( projectSearchId );
+						URLShortenerAssociatedProjectSearchIdDAO.getInstance().save( urlShortenerAssociatedProjectSearchIdDTO );
 					}
 				}
 			}

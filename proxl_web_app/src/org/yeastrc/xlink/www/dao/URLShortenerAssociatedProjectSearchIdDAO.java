@@ -8,31 +8,31 @@ import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.www.dto.URLShortenerAssociatedSearchIdDTO;
+import org.yeastrc.xlink.www.dto.URLShortenerAssociatedProjectSearchIdDTO;
 
 /**
- * DAO for url_shortener_associated_search_id table
+ * DAO for url_shortener_associated_project_search_id table
  *
  */
-public class URLShortenerAssociatedSearchIdDAO {
+public class URLShortenerAssociatedProjectSearchIdDAO {
 	
-	private static final Logger log = Logger.getLogger(URLShortenerAssociatedSearchIdDAO.class);
+	private static final Logger log = Logger.getLogger(URLShortenerAssociatedProjectSearchIdDAO.class);
 	
 	//  private constructor
-	private URLShortenerAssociatedSearchIdDAO() { }
+	private URLShortenerAssociatedProjectSearchIdDAO() { }
 	
 	/**
 	 * @return newly created instance
 	 */
-	public static URLShortenerAssociatedSearchIdDAO getInstance() { 
-		return new URLShortenerAssociatedSearchIdDAO(); 
+	public static URLShortenerAssociatedProjectSearchIdDAO getInstance() { 
+		return new URLShortenerAssociatedProjectSearchIdDAO(); 
 	}
 	
 	/**
 	 * @param item
 	 * @throws Exception
 	 */
-	public void save( URLShortenerAssociatedSearchIdDTO item ) throws Exception {
+	public void save( URLShortenerAssociatedProjectSearchIdDTO item ) throws Exception {
 		
 		
 		Connection dbConnection = null;
@@ -55,15 +55,15 @@ public class URLShortenerAssociatedSearchIdDAO {
 	}
 
 
-	private final String INSERT_SQL = "INSERT IGNORE INTO url_shortener_associated_search_id "
-			+ " (url_shortener_id, search_id ) "
+	private final String INSERT_SQL = "INSERT IGNORE INTO url_shortener_associated_project_search_id "
+			+ " (url_shortener_id, project_search_id ) "
 			+ " VALUES ( ?, ? ) ";
 	
 	/**
 	 * @param item
 	 * @throws Exception
 	 */
-	public void save( URLShortenerAssociatedSearchIdDTO item, Connection dbConnection ) throws Exception {
+	public void save( URLShortenerAssociatedProjectSearchIdDTO item, Connection dbConnection ) throws Exception {
 		
 		PreparedStatement pstmt = null;
 //		ResultSet rs = null;
@@ -80,7 +80,7 @@ public class URLShortenerAssociatedSearchIdDAO {
 			counter++;
 			pstmt.setInt( counter, item.getUrlShortenerId() );
 			counter++;
-			pstmt.setInt( counter, item.getSearchId() );
+			pstmt.setInt( counter, item.getProjectSearchId() );
 
 			pstmt.executeUpdate();
 			
