@@ -78,28 +78,28 @@ public class GetAuthLevelFromXLinkData {
 	}
 	
 	
-	
-	/**
-	 * @param xLinkUserDBObject
-	 * @param searchId
-	 * @return
-	 * @throws Exception
-	 */
-	public AuthAccessLevel  getAuthLevelForAuthUserIdSearchId( XLinkUserDTO xLinkUserDBObject, int searchId ) throws Exception {
-		
-		Integer projectId = SearchDAO.getInstance().getSearchProjectId( searchId );
-		
-		if ( projectId == null ) {
-			
-			String msg = "Failed to get project id for search id: " + searchId;
-			
-			log.error( msg );
-			
-			throw new Exception( msg );
-		}
-		
-		return getAuthLevelForAuthUserIdProjectId( xLinkUserDBObject, projectId );
-	}
+	//  Removed since this method no longer exists:  SearchDAO.getInstance().getSearchProjectId( searchId );
+//	/**
+//	 * @param xLinkUserDBObject
+//	 * @param searchId
+//	 * @return
+//	 * @throws Exception
+//	 */
+//	public AuthAccessLevel  getAuthLevelForAuthUserIdSearchId( XLinkUserDTO xLinkUserDBObject, int searchId ) throws Exception {
+//		
+//		Integer projectId = SearchDAO.getInstance().getSearchProjectId( searchId );
+//		
+//		if ( projectId == null ) {
+//			
+//			String msg = "Failed to get project id for search id: " + searchId;
+//			
+//			log.error( msg );
+//			
+//			throw new Exception( msg );
+//		}
+//		
+//		return getAuthLevelForAuthUserIdProjectId( xLinkUserDBObject, projectId );
+//	}
 		
 	
 }

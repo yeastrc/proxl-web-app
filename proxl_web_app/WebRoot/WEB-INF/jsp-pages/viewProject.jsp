@@ -190,7 +190,9 @@
 						<span id="title_span" style="<c:out value="${title_style_addition}" ></c:out>" ><c:out value="${project.title}" ></c:out></span>
 						
 						<c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" >
-							<input class="tool_tip_attached_jq" data-tooltip="Edit project title" id="maint_title_init_button" type="image" src="${ contextPath }/images/icon-edit-small.png"  value="Update">
+							<input class="tool_tip_attached_jq" data-tooltip="Edit project title" 
+								id="maint_title_init_button" type="image" src="${ contextPath }/images/icon-edit-small.png"  
+								value="Update">
 						</c:if>
 					</div>
 					<div  id="maint_title_div"  class="second-level-text project-info-text"  style="display: none; position: relative;">
@@ -1558,7 +1560,7 @@
 				    	No access is allowed to any data on this website.
 				    
 				  </c:when>
-				  <c:when test="${empty SearchDTODetailsDisplayWrapperList}">
+				  <c:when test="${ projectPageFoldersSearches.noSearchesFound }">
 				    
 				    	<div  class="no-searches-in-project-text">
 				    		No searches in this project.
@@ -1568,129 +1570,137 @@
 				  <c:otherwise>		
 				  
 				  	<c:if test="${authAccessLevel.assistantProjectOwnerAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }" >
-		
-					 <!--  Modal dialog for confirming deleting a search -->
+
+					 <!--  Modal dialog for Rename a Folder -->
 			
 						<!--  Div behind modal dialog div -->
 			
-					 <div class="modal-dialog-overlay-background   delete_search_overlay_show_hide_parts_jq delete_search_overlay_cancel_parts_jq  overlay_show_hide_parts_jq" 
-						id="delete_search_overlay_background" ></div>
+					 <div class="modal-dialog-overlay-background   rename_folder_overlay_show_hide_parts_jq rename_folder_overlay_cancel_parts_jq  overlay_show_hide_parts_jq" 
+						id="rename_folder_overlay_background" ></div>
 					
 							<!--  Inline div for positioning modal dialog on page -->
-					 <div class="delete-search-overlay-containing-outermost-div " id="delete_search_overlay_containing_outermost_div_inline_div"  >
-		
-					  <div class="delete-search-overlay-containing-outer-div " >
-					
+					 <div class="rename-folder-overlay-containing-outermost-div " id="rename_folder_overlay_containing_outermost_div_inline_div"  >
+					  <div class="rename-folder-overlay-containing-outer-div " >
+							<!--  Div overlay for confirming removing a folder -->
+						<div class="modal-dialog-overlay-container rename-folder-overlay-container   rename_folder_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
+							 id="rename_folder_overlay_container" >
+							<div class="top-level-label" style="margin-left: 0px;">Edit Name of Folder</div>
+							<div class="top-level-label-bottom-border" ></div>
+							<div >
+								<div >Enter new name for the folder</div>
+								<div style="margin-top: 5px;"
+								  ><input type="text" id="rename_folder_overlay_folder_name"
+								    maxlength="400"
+									class="rename-folder-overlay-folder-name-input-field"></div>
+								<div style="margin-top: 10px">
+									<input type="button" value="Save" id="rename_folder_save_button" >
+									<input type="button" value="Cancel" class="rename_folder_overlay_cancel_parts_jq" >
+								</div>
+							</div>
+						</div>
+					  </div>
+					 </div>
+					 <!-- END:   Modal dialog for confirming deleting a folder -->
+							 
+					 <!--  Modal dialog for confirming deleting a Folder -->
 			
+						<!--  Div behind modal dialog div -->
+			
+					 <div class="modal-dialog-overlay-background   delete_folder_overlay_show_hide_parts_jq delete_folder_overlay_cancel_parts_jq  overlay_show_hide_parts_jq" 
+						id="delete_folder_overlay_background" ></div>
+					
+							<!--  Inline div for positioning modal dialog on page -->
+					 <div class="delete-folder-overlay-containing-outermost-div " id="delete_folder_overlay_containing_outermost_div_inline_div"  >
+					  <div class="delete-folder-overlay-containing-outer-div " >
+							<!--  Div overlay for confirming removing a folder -->
+						<div class="modal-dialog-overlay-container delete-folder-overlay-container   delete_folder_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
+							 id="delete_folder_overlay_container" >
+							<div class="top-level-label" style="margin-left: 0px;">Delete Folder</div>
+							<div class="top-level-label-bottom-border" ></div>
+							<div >
+								<div >Delete the folder <span style="font-weight: bold;" id="delete_folder_overlay_folder_name"></span>?</div>
+								<div style="margin-top: 10px">
+									<input type="button" value="Yes" id="delete_folder_confirm_button" >
+									<input type="button" value="Cancel" class="delete_folder_overlay_cancel_parts_jq" >
+								</div>
+							</div>
+						</div>
+					  </div>
+					 </div>
+					 <!-- END:   Modal dialog for confirming deleting a folder -->
+		
+					 <!--  Modal dialog for confirming deleting a search -->
+						<!--  Div behind modal dialog div -->
+					 <div class="modal-dialog-overlay-background   delete_search_overlay_show_hide_parts_jq delete_search_overlay_cancel_parts_jq  overlay_show_hide_parts_jq" 
+						id="delete_search_overlay_background" ></div>
+							<!--  Inline div for positioning modal dialog on page -->
+					 <div class="delete-search-overlay-containing-outermost-div " id="delete_search_overlay_containing_outermost_div_inline_div"  >
+					  <div class="delete-search-overlay-containing-outer-div " >
 							<!--  Div overlay for confirming removing a search -->
 						<div class="modal-dialog-overlay-container delete-search-overlay-container   delete_search_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
 							 id="delete_search_overlay_container" >
-		
 							<div class="top-level-label" style="margin-left: 0px;">Delete Search</div>
-			
 							<div class="top-level-label-bottom-border" ></div>
-							
 							<div >
-							
 								<div >Delete the search <span style="font-weight: bold;" id="delete_search_overlay_search_name"></span>?</div>
-								
 								<div style="margin-top: 10px">
 									<input type="button" value="Yes" id="delete_search_confirm_button" >
 									<input type="button" value="Cancel" class="delete_search_overlay_cancel_parts_jq" >
 								</div>
-									
 							</div>
-							
 						</div>
-					
 					  </div>
 					 </div>
-					
-					
 					 <!-- END:   Modal dialog for confirming deleting a search -->
-					
-									
 
 					 <!--  Modal dialog for confirming deleting a search comment -->
 			
 						<!--  Div behind modal dialog div -->
-			
 					 <div class="modal-dialog-overlay-background   delete_search_comment_overlay_show_hide_parts_jq delete_search_comment_overlay_cancel_parts_jq  overlay_show_hide_parts_jq" 
 						id="delete_search_comment_overlay_background" ></div>
-					
 							<!--  Inline div for positioning modal dialog on page -->
 					 <div class="delete-search-comment-overlay-containing-outermost-div " id="delete_search_comment_overlay_containing_outermost_div_inline_div"  >
-		
 					  <div class="delete-search-comment-overlay-containing-outer-div " >
-					
-			
 							<!--  Div overlay for confirming removing a search comment -->
 						<div class="modal-dialog-overlay-container delete-search-comment-overlay-container   delete_search_comment_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
 							 id="delete_search_comment_overlay_container" >
-		
 							<div class="top-level-label" style="margin-left: 0px;">Delete Search Comment</div>
-			
 							<div class="top-level-label-bottom-border" ></div>
-							
 							<div >
-							
 								<div >Delete the comment?</div>
-								
 								<div style="margin-top: 10px">
 									<input type="button" value="Yes" id="delete_search_comment_confirm_button" >
 									<input type="button" value="Cancel" class="delete_search_comment_overlay_cancel_parts_jq" >
 								</div>
-									
 							</div>
-							
 						</div>
-					
 					  </div>
 					 </div>
-					
-					
 					 <!-- END:   Modal dialog for confirming deleting a search comment -->
-					
-
 
 					 <!--  Modal dialog for confirming deleting a search Web Link -->
 			
 						<!--  Div behind modal dialog div -->
-			
 					 <div class="modal-dialog-overlay-background   delete_search_web_link_overlay_show_hide_parts_jq delete_search_web_link_overlay_cancel_parts_jq  overlay_show_hide_parts_jq" 
 						id="delete_search_web_link_overlay_background" ></div>
-					
 							<!--  Inline div for positioning modal dialog on page -->
 					 <div class="delete-search-web-link-overlay-containing-outermost-div " id="delete_search_web_link_overlay_containing_outermost_div_inline_div"  >
-		
 					  <div class="delete-search-web-link-overlay-containing-outer-div " >
-					
-			
 							<!--  Div overlay for confirming removing a search Web Link -->
 						<div class="modal-dialog-overlay-container delete-search-web-link-overlay-container   delete_search_web_link_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
 							 id="delete_search_web_link_overlay_container" >
-		
 							<div class="top-level-label" style="margin-left: 0px;">Delete Search Web Link</div>
-			
 							<div class="top-level-label-bottom-border" ></div>
-							
 							<div >
-							
 								<div >Delete the Web Link?</div>
-								
 								<div style="margin-top: 10px">
 									<input type="button" value="Yes" id="delete_search_web_link_confirm_button" >
 									<input type="button" value="Cancel" class="delete_search_web_link_overlay_cancel_parts_jq" >
 								</div>
-									
 							</div>
-							
 						</div>
-					
 					  </div>
 					 </div>
-					
-					
 					 <!-- END:   Modal dialog for confirming deleting a search Web Link -->
 					 
 					</c:if>
@@ -1725,9 +1735,9 @@
 							<c:if test="${authAccessLevel.projectOwnerAllowed }" >
 
 								<input class="submit-button tool_tip_attached_jq " type="button" 
-											id="re_order_search_button"
-											data-tooltip="Click here to change the order of the searches."
-											value="Re-order Searches" >
+											id="organize_searches_button"
+											data-tooltip="Click here to organize the searches. Put in folders and change the order."
+											value="Organize Searches" >
 							</c:if>
 							
 						</c:if>
@@ -1736,491 +1746,77 @@
 					  
 					</c:if>
 
+							<%-- Display the searches --%>
 					<div>
-					    
-						<logic:iterate id="search_wrapper" name="SearchDTODetailsDisplayWrapperList">
-						
-							<c:set var="search" value="${ search_wrapper.searchDTO }" />
-						
-						  <div data-project_search_id="<bean:write name="search" property="projectSearchId" />" class=" search_row_jq " >
+					  <c:if test="${ not projectPageFoldersSearches.noSearchesFound }">
 
-							<table style="padding:0px;margin-top:0px;margin-bottom:0px;width:100%;">
+					    <%-- Searches in Folders --%>
+						<c:forEach var="folder" items="${ projectPageFoldersSearches.folders }">
+			
+						  <div class=" folder-container folder_root_jq collapsable_container_jq"
+						  	data-folder_id="${ folder.id }"
+						   >
+						
+							<div  class="collapsable-link-container folder-collapsable-link-container collapsable_link_container_jq" style="">
 							
-								<tr data-project_search_id="<bean:write name="search" property="projectSearchId" />" class=" search_root_jq ">
-		
-								  <script type="text/text" class=" qc_plots_links_filtered_on_import_message_jq "
-										><c:out value="${ search_wrapper.cutoffsAppliedOnImportAllAsString }"></c:out></script>
+								<a href="javascript:" class=" collapsable_collapse_link_jq" style="display: none;"
+									><img  src="${ contextPath }/images/icon-folder-click-to-close.png"></a>
+								<a href="javascript:" class=" collapsable_expand_link_jq"
+									><img  src="${ contextPath }/images/icon-folder-click-to-open.png"></a>
+	
+							</div>
+				
+							<div >
+								<span class=" folder-name-display folder_name_jq "
+									><c:out value="${ folder.folderName }"></c:out></span>
+								<a href="javascript:" class="folder_rename_button_jq tool_tip_attached_jq" 
+									data-tooltip="Edit name of folder"
+									><img  src="${ contextPath }/images/icon-edit-small.png"></a>
+								<a href="javascript:" class="folder_delete_button_jq tool_tip_attached_jq" 
+									data-tooltip="Delete folder.  Searches in it become 'Unfiled'."
+									><img  src="${ contextPath }/images/icon-delete-small.png"></a>
+							</div>
 
-									<td style="width:10px;" valign="top" class="search-checkbox-cell">
-										<input id="search-checkbox-<bean:write name="search" property="projectSearchId" />" 
-											onChange="javascript:checkSearchCheckboxes(<bean:write name="search" property="projectSearchId" />)" 
-											class="search-checkbox" type="checkbox" 
-											name="projectSearchId" 
-											value="<bean:write name="search" property="projectSearchId" />"/>
-									</td>
-									<td>
-						
-		
-									  <div style="float: right;" >
-										
-										[<a data-tooltip="View peptides found in search" class="tool_tip_attached_jq" 
-											href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ search.projectSearchId }">peptide.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
-												>Peptides</a>]
-										
-										[<a data-tooltip="View proteins found in search" class="tool_tip_attached_jq" 
-											href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ search.projectSearchId }">crosslinkProtein.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
-												>Proteins</a>]
-
-										[<a data-tooltip="Graphical view of links between proteins" class="tool_tip_attached_jq" 
-											href="${ contextPath }/<proxl:defaultPageUrl pageName="/image" projectSearchId="${ search.projectSearchId }">image.do?searchIds=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
-												>Image</a>]
-
-										<c:choose>
-										 <c:when test="${ showStructureLink }">
-											[<a data-tooltip="View data on 3D structures" class="tool_tip_attached_jq" 
-												href="${ contextPath }/<proxl:defaultPageUrl pageName="/structure" projectSearchId="${ search.projectSearchId }">structure.do?searchIds=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
-													>Structure</a>]
-										 </c:when>
-										 <c:otherwise>
-											<%@ include file="/WEB-INF/jsp-includes/structure_link_non_link.jsp" %>
-										 </c:otherwise>
-										</c:choose>
-			
-										<c:if test="${authAccessLevel.searchDeleteAllowed}" >
-											<a href="javascript:" data-tooltip="Delete search" class="tool_tip_attached_jq delete_search_link_jq"
-											 		<%-- WAS  href="javascript:confirmDelete(<bean:write name="search" property="projectSearchId" />)"  --%>
-												><img src="${ contextPath }/images/icon-delete-small.png" ></a>
-										</c:if>
-										
-									  </div>
-		
-									  <div>
-		
-										<a class="tool_tip_attached_jq expand-link" data-tooltip="Show or hide more details" 
-											id="search-details-link-<bean:write name="search" property="projectSearchId" />" 
-											style="font-size:80%;color:#4900d4;text-decoration:none;" 
-											href="javascript:showSearchDetails(<bean:write name="search" property="projectSearchId" />)"
-											><img src="${ contextPath }/images/icon-expand-small.png" <%-- This image src is changed in the Javascript --%>
-											></a>
-										
-										<span id="search-name-normal-<bean:write name="search" property="projectSearchId" />"
-											><span class="search-name-display  search_name_display_jq" 
-												id="search-name-display-<bean:write name="search" property="projectSearchId" />"
-												><bean:write name="search" property="name" /></span
-											 > <span class="search-name-display search_number_in_parens_display_jq "
-											 			>(<bean:write name="search" property="searchId" />)</span
-											 			><c:if test="${authAccessLevel.writeAllowed}" 
-											 				><a class="tool_tip_attached_jq" data-tooltip="Edit name of search" 
-											 					href="javascript:showSearchNameForm(<bean:write name="search" property="projectSearchId" />)"
-																><img class="edit-icon" src="${ contextPath }/images/icon-edit-small.png" 
-																	></a></c:if></span>
-													
-										<span style="display:none;" id="search-name-edit-<bean:write name="search" property="projectSearchId" />"
-											><input id="search-name-value-<bean:write name="search" property="projectSearchId" />" 
-												type="text" style="width:200px;" value="<bean:write name="search" property="name" />"
-												><input class="submit-button" type="button" value="Save" 
-													onClick="saveName(<bean:write name="search" property="projectSearchId" />)"
-													><input class="submit-button" type="button" value="Cancel" 
-														onClick="cancelNameEdit(<bean:write name="search" property="projectSearchId" />)"></span>
-										
-									  </div>
-									  <div style="clear: right;"  class="search-details-container-div">
-																	
-										<table class="search-details" id="search-details-<bean:write name="search" property="projectSearchId" />" style="display:none;margin-left:15px;">
-
-										  <c:if test="${ authAccessLevel.writeAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }" >
-										   <c:if test="${ not empty search.path }" >
-											<tr>
-												<td>Path:</td>
-												<td><bean:write name="search" property="path" /></td>
-											</tr>
-										   </c:if>
-										  </c:if>
-											
-											
-											<tr>
-												<td>Linker:</td>
-												<td><c:out value="${ search_wrapper.linkersDisplayString }"></c:out></td>
-											</tr>								  
-
-											<tr>
-												<td valign="top"  >
-													Search Program<c:if test="${ fn:length( search_wrapper.searchPrograms ) > 1 }" >s</c:if>:
-												</td>
-												
-												 <c:choose>
-												  <c:when test="${ empty search_wrapper.searchPrograms }">
-													<td  style="padding-top: 2px;">
-													  	Not Found
-													</td>
-												  </c:when>
-												  <c:otherwise>
-												    <td style="border-width:0px; padding: 0px;">
-
-													<table  style="border-width:0px; border-spacing: 0px; ">
-
-												   <c:forEach var="searchProgram" items="${ search_wrapper.searchPrograms }">
-												     <tr>
-												      <td style="padding-right: 5px;">
-												     	<c:out value="${ searchProgram.displayName }"></c:out>
-												      </td>
-												      <td >
-												     	<c:out value="${ searchProgram.version }"></c:out>
-												      </td>
-												     </tr>
-												   </c:forEach>
-
-												    </table>
-												  
-													</td>
-												  </c:otherwise> 
-												 </c:choose>
-											</tr>								  
-											
-											<tr>
-												<td>Upload:</td>
-												<td><bean:write name="search" property="formattedLoadTime" /></td>
-											</tr>
-											<tr>
-												<td style="white-space: nowrap;">FASTA file:</td>
-												<td><bean:write name="search" property="fastaFilename" /></td>
-											</tr>
-											
-											<%--  Copy  'search_wrapper' to 'search_details' to use here --%>
-											
-											<c:set var="search_details" value="${ search_wrapper }"/>
-						
-											<c:if test="${ not empty search_details.cutoffsAppliedOnImportList }">
-											  <tr>
-													<td style="vertical-align: top; padding-top: 3px; padding-right: 5px; " >Cutoffs Applied On Import:</td>
-													
-												    <td style="border-width:0px; padding: 0px; padding-top: 3px;">
-								
-													<table  style="border-width:0px; border-spacing: 0px; ">
 									
-													   <c:forEach var="cutoffsAppliedOnImport" items="${ search_details.cutoffsAppliedOnImportList }">
-													     <tr>
-													      <td style="padding-right: 5px; ">
-													       <c:choose>
-													        <c:when test="${ cutoffsAppliedOnImport.peptideCutoff }">
-													        	<span style="white-space: nowrap;" >Peptide Cutoff:</span>
-													        </c:when>
-													        <c:otherwise>
-													        	<span style="white-space: nowrap;" >PSM Cutoff:</span>
-													        </c:otherwise>
-													       </c:choose>
-													      </td>
-													      <td style="padding-right: 5px;">
-													     	<c:out value="${ cutoffsAppliedOnImport.annotationName }"></c:out>
-													      </td>
-													      <td >
-													     	<c:out value="${ cutoffsAppliedOnImport.cutoffValue }"></c:out>
-													      </td>
-													     </tr>
-													   </c:forEach>
-								
-												    </table>
-												  
-													</td>						
-											  </tr>
-											</c:if>
-																						
-											
-											<tr >
-												<td>QC Plots:</td>
-												<td>
-													<c:if test="${ search.hasScanData }" >
-														[<a href="javascript:" data-tooltip="View scan counts as function of retention time" 
-															class="tool_tip_attached_jq qc_plot_scan_retention_time_link_jq" 
-															>Retention Time</a>]
-													</c:if>
-													[<a href="javascript:" data-tooltip="View PSM counts as function of score" 
-														class="tool_tip_attached_jq qc_plot_psm_count_vs_score_link_jq" 
-														>PSM Count vs/ Score</a>]
-													[<a href="javascript:" data-tooltip="View 2 PSM scores plotted together" 
-														class="tool_tip_attached_jq qc_plot_psm_score_vs_score_link_jq" 
-														>Score vs/ Score</a>]
-												</td>
-											</tr>
-											
-
-											<c:if test="${ not ( not authAccessLevel.writeAllowed and empty search.webLinks ) }" >
-											 
-													<%--  Hide this block if no Web Links and user unable to add Web Links --%>
-											<tr>
-												<td valign="top">Raw MS data files:</td>
-												<td id="search-web-links-<bean:write name="search" property="projectSearchId" />">
-													
-													<div style="position: relative;">			 
-												  		<div class="error-message-container error_message_container_jq" 
-												  				id="error_message_web_link_url_invalid_<bean:write name="search" property="projectSearchId" />"
-												  				style="width: 600px;">
-												  			<div class="error-message-inner-container" >
-												  				<div class="error-message-close-x error_message_close_x_jq">X</div>
-													  			<div class="error-message-text" >Web Link URL is invalid</div>
-												  			</div>
-													  	</div>	
-													  </div>
-	  	
-	  	
-													<logic:iterate name="search" property="webLinks" id="webLink" >
-													
-														<%--  Keep this block in sync with the Template just below --%>
-														
-														<div id="web-links-<bean:write name="webLink" property="id" />"
-															class="search_web_link_root_jq"
-															searchwebLinkId="<bean:write name="webLink" property="id" />" 
-															style="margin-bottom:5px; margin-top:0px;">
-															<c:if test="${authAccessLevel.writeAllowed}" >
-																<a id="web-links-delete-<bean:write name="webLink" property="id" />" 
-																	style="color:#d40000;font-size:80%;" 
-																	class="tool_tip_attached_jq delete_search_webLink_link_jq"
-																	data-tooltip="Delete link to RAW file"
-																	href="javascript:"
-																		><img src="${ contextPath }/images/icon-delete-small.png"></a>
-															</c:if>
-															<a  target="_blank" href="<bean:write name="webLink" property="linkUrl" />" 
-																><bean:write name="webLink" property="linkLabel" /></a>
-														</div>
-													</logic:iterate>
-		
-													<c:if test="${authAccessLevel.writeAllowed}" >
-													 <div >
-														<div id="add-web-links-link-span-<bean:write name="search" property="projectSearchId" />"
-															>[<a id="add-web-link-link-<bean:write name="search" property="projectSearchId" />" 
-																style="font-size:80%;text-decoration:none;" 
-																href="javascript:showAddWebLink(<bean:write name="search" property="projectSearchId" />)"
-																class="tool_tip_attached_jq" data-tooltip="Add URL for a RAW file">+Link to Raw file</a>]</div>
-														<div style="display:none;" id="add-web-links-form-span-<bean:write name="search" property="projectSearchId" />" >
-														 <div>
-														  URL:
-														  <input id="web-links-url-input-<bean:write name="search" property="projectSearchId" />" 
-																type="text" style="font-size:80%;width:200px;">
-														  Label:
-														  <input id="web-links-label-input-<bean:write name="search" property="projectSearchId" />" 
-																type="text" style="font-size:80%;width:200px;">
-														  <input style="font-size:80%;" class="submit-button" type="button" value="Add Web Link" 
-																	onClick="addWebLink(<bean:write name="search" property="projectSearchId" />)">
-														  <input style="font-size:80%;" class="submit-button" type="button" value="Cancel" 
-																 	onClick="cancelWebLink(<bean:write name="search" property="projectSearchId" />)" >
-														  </div>
-														  <div style="font-size: 80%;">
-														  	The URL must start with "http://", "https://", "ftp://" or some other transport protocal
-														  </div>
-														</div>
-													 </div>
-													</c:if>
-													
-													
-													<%--  Template for links added by Javascript --%>
-													<div id="web_link_template" style="display: none;">
-														<div id="web-links-{{id}}"
-															class="search_web_link_root_jq"
-															searchwebLinkId="{{id}}" 
-															style="margin-bottom:5px; margin-top:0px;">
-															<c:if test="${authAccessLevel.writeAllowed}" >
-																<a  id="web-links-delete-{{id}}" 
-																	style="color:#d40000;font-size:80%;" 
-																	class="tool_tip_attached_jq delete_search_webLink_link_jq"
-																	data-tooltip="Delete link to RAW file"
-																	href="javascript:"
-																		><img src="${ contextPath }/images/icon-delete-small.png"></a>
-															</c:if>
-															<a  target="_blank" href="{{linkUrl}}" >{{linkLabel}}</a>
-														</div>
-													</div>
-													
-												</td>
-											</tr>
-
-											</c:if>
-																						
-											
-											<c:if test="${ not empty search.files }">
-											  <tr>
-												<td valign="top">Additional files:</td>
-												<td >
-												  <logic:iterate name="search" property="files" id="searchFile" >
-													
-													<div class=" display_search_filename_outer_container_jq " search_file_id="${ searchFile.id }" search_id="${ search.projectSearchId }"> 
-													
-													 <div class="display_search_filename_container_jq">
-													 
-													  <%--  Normal display of link with filename --%>
-
-													  <a href="downloadSearchFile.do?fileId=<bean:write name="searchFile" property="id" />" 
-													  	class="tool_tip_attached_jq search_file_link_for_tooltip_jq" data-tooltip="Download file">
-													  		
-													  	<span class="search_filename_jq">
-															<bean:write name="searchFile" property="displayFilename" />
-														</span>
-													  </a>
-													  <c:if test="${authAccessLevel.projectOwnerAllowed}"> 
-															<a class="tool_tip_attached_jq" data-tooltip="Edit name" href="javascript:" onclick="showSearchFilenameForm( this )"
-																><img class="edit-icon" src="${ contextPath }/images/icon-edit-small.png" 
-																	></a>
-													  </c:if>
-													 </div>
-												
-												  	<c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" >
-			 
-													 <div class=" edit_search_filename_container_jq " style="display: none;">
-
-													  <%--  Edit filename --%>
-
-														<input type="text" style="width:200px;" value="<bean:write name="searchFile" property="displayFilename" />"
-															class=" edit_search_filename_input_field_jq "
-															><input class="submit-button" type="button" value="Save" onClick="saveSearchFilename( this )"
-															><input class="submit-button" type="button" value="Cancel" onClick="cancelSearchFilenameEdit( this )">													 
-													 
-													 </div>
-													
-													</c:if>  <%--  END <c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" > --%>
-													  
-													</div>
-												  </logic:iterate>
-		
-												</td>
-											  </tr>
-											</c:if>
-											
-											<c:if test="${ not ( not authAccessLevel.writeAllowed and empty search.comments ) }" >
-											 
-													<%--  Hide this block if no comments and user unable to add comments --%>
-											  <tr>
-												<td valign="top">Comments:</td>
-												<td id="search-comments-<bean:write name="search" property="projectSearchId" />">
-		
-													<logic:iterate name="search" property="comments" id="comment" >
-
-														<%--  Keep this block in sync with the Template just below --%>
-																											
-														<div id="comment-<bean:write name="comment" property="id" />"
-															class="search_comment_root_jq"
-															searchCommentId="<bean:write name="comment" property="id" />" 
-															style="margin-bottom:5px; margin-top:0px;">
-															
-														  <div class=" search_comment_display_jq ">
-															<c:if test="${authAccessLevel.writeAllowed}" >
-																<a class="tool_tip_attached_jq" data-tooltip="Delete comment" style="color:#d40000;font-size:80%;" 
-																	onclick="deleteSearchCommentClickHandler(this);return false;" 
-																	href="javascript:"
-																		><img src="${ contextPath }/images/icon-delete-small.png"></a>
-															</c:if>
-															<span class=" search_comment_string_jq "
-																><bean:write name="comment" property="comment" 
-															/></span>
-															
-															<c:if test="${authAccessLevel.writeAllowed}" >
-															  <a class="tool_tip_attached_jq" data-tooltip="Edit comment"  onclick="showSearchCommentEditForm( this ); return false;" href="javascript:" >
-																<img class="edit-icon" src="${ contextPath }/images/icon-edit-small.png">
-															  </a> 
-															</c:if>
-															
-															(<span class=" search_comment_date_jq "
-																><bean:write name="comment" property="dateTimeString" /></span>)
-														  </div>
-														  
-														  <c:if test="${authAccessLevel.writeAllowed}" >
-														  
-														  	<%--  For editing the comment value --%>
-														  	<div class=" search_comment_edit_jq " style="display: none;">
-														  
-														  		<input type="text" class="search_comment_input_field_jq" style="width:200px;" >
-														  		<input class="submit-button" type="button" value="Save" 
-														  			onclick="updateSearchComment( this ); return false;" >
-														  		<input class="submit-button" type="button" value="Cancel" 
-														  			onclick="cancelSearchCommentEditForm( this ); return false;" >
-
-
-														  	</div>
-														  </c:if>
-														  
-														  
-														</div>
-													</logic:iterate>
-		
-													<c:if test="${authAccessLevel.writeAllowed}" >
-													
-														<%--  Template for search comments added by Javascript --%>
-														<div id="search_comment_template" style="display: none;">
-															<div id="comment-{{id}}"
-																class="search_comment_root_jq"
-																searchCommentId="{{id}}" 
-																style="margin-bottom:5px; margin-top:0px;">
-																
-														  	  <div class=" search_comment_display_jq ">
-																
-																<c:if test="${authAccessLevel.writeAllowed}" >
-																	<a class="tool_tip_attached_jq" data-tooltip="Delete comment" style="color:#d40000;font-size:80%;" 
-																		onclick="deleteSearchCommentClickHandler(this);return false;" 
-																		href="javascript:"
-																			><img src="${ contextPath }/images/icon-delete-small.png"></a>
-																</c:if>
-																<span class=" search_comment_string_jq "
-																	>{{comment}}</span>
-																
-																<c:if test="${authAccessLevel.writeAllowed}" >
-																  <a class="tool_tip_attached_jq" data-tooltip="Edit comment" onclick="showSearchCommentEditForm( this ); return false;" href="javascript:" >
-																	<img class="edit-icon" src="${ contextPath }/images/icon-edit-small.png">
-																  </a> 
-																</c:if>
-																																
-																(<span class=" search_comment_date_jq "
-																	>{{dateTimeString}}</span>)
-
-														  	  </div>
-														  	  
-															  
-															  <c:if test="${authAccessLevel.writeAllowed}" >
-															  
-															  	<%--  For editing the comment value --%>
-															  	<div class=" search_comment_edit_jq " style="display: none;">
-															  
-															  		<input type="text" class="search_comment_input_field_jq" style="width:200px;" >
-															  		<input class="submit-button" type="button" value="Save" 
-															  			onclick="updateSearchComment( this ); return false;" >
-															  		<input class="submit-button" type="button" value="Cancel" 
-															  			onclick="cancelSearchCommentEditForm( this ); return false;" >
-	
-	
-															  	</div>
-															  </c:if>
-															  	  
-																	
-															</div>
-														</div>													
-													
-														<span id="add-comment-link-span-<bean:write name="search" property="projectSearchId" />"
-															>[<a class="tool_tip_attached_jq" data-tooltip="Add a comment" id="add-comment-link-<bean:write name="search" property="projectSearchId" />" style="font-size:80%;text-decoration:none;" href="javascript:showAddComment(<bean:write name="search" property="projectSearchId" />)"
-																>+Comment</a>]</span>
-														<span style="display:none;" id="add-comment-form-span-<bean:write name="search" property="projectSearchId" />"
-															><input id="comment-input-<bean:write name="search" property="projectSearchId" />" type="text" style="font-size:80%;width:200px;"
-															><input style="font-size:80%;" class="submit-button" type="button" value="Add Comment" onClick="addComment(<bean:write name="search" property="projectSearchId" />)"
-															><input style="font-size:80%;" class="submit-button" type="button" value="Cancel" onClick="cancelComment(<bean:write name="search" property="projectSearchId" />)"
-															></span>
-													</c:if>
-													
-												</td>
-											  </tr>
-
-											</c:if>
-											
-											
-							 											
-										</table>
-									  </div>
-			
-									 </td>
-								</tr>
-							</table>
-			
+							<div class=" searches-under-folder-block collapsable_jq" style="display: none;" >
+							
+								<c:forEach var="search_wrapper" items="${ folder.searches }" varStatus="search_wrapper_varStatus">
+								  <c:choose>
+									<c:when test="${ search_wrapper_varStatus.last }">
+										<c:set var="SingleSearch_SkipBottomSeperator" value="${ true }" />
+									</c:when>
+									<c:otherwise>
+										<c:set var="SingleSearch_SkipBottomSeperator" value="${ false }" />
+									</c:otherwise>
+								  </c:choose>
+									
+									<%-- Include for a displaying a single search --%>
+									<%@ include file="/WEB-INF/jsp-includes/viewProject_SingleSearch.jsp" %>
+									
+								</c:forEach>
+							</div>
+							
 							<div class="search-entry-bottom-border"></div>
-			
+							
 						  </div>
-						  
-						</logic:iterate>
-		
+						</c:forEach>
+						
+						<%--  Clear value after last folder loop --%>
+						<c:set var="SingleSearch_SkipBottomSeperator" value="${ false }" />
+
+<%-- 					    
+					    <div >
+					    	Searches Not in Any Folder
+					    </div>
+--%>					    
+					    <%-- Searches Not in Any Folder --%>
+						<c:forEach var="search_wrapper" items="${ projectPageFoldersSearches.searchesNotInFolders }">
+						
+							<%-- Include for a displaying a single search --%>
+							<%@ include file="/WEB-INF/jsp-includes/viewProject_SingleSearch.jsp" %>
+							
+						</c:forEach>
+					  </c:if>
 					</div>
 					
 					<div style="display:inline-block;position:relative;"> <%-- outer div to support overlay div when button disabled --%>
@@ -2271,15 +1867,10 @@
 
 				   </div> <%--   Main Data Block Under "Explore Data" section  <div id="explore_data_main_data_block">  --%>
 						
-						
-						
 				   <c:if test="${ authAccessLevel.projectOwnerAllowed }" >
 
-						<%-- Re-order searches Block, only for project owners  --%>
-
-
-						<%@ include file="/WEB-INF/jsp-includes/projectReOrderSearches.jsp" %>
-						
+						<%-- Organize searches Block, only for project owners  --%>
+						<%@ include file="/WEB-INF/jsp-includes/projectOrganizeSearches.jsp" %>
 				   </c:if>
 										
 				  </c:otherwise>
@@ -3017,7 +2608,6 @@
 			 <div class="proxl-xml-file-upload-complete-successfully-overlay-containing-outermost-div " id="proxl_xml_file_upload_complete_successfully_overlay_containing_outermost_div_inline_div"  >
 	
 			  <div class="proxl-xml-file-upload-complete-successfully-overlay-containing-outer-div " >
-			
 	
 					<!--  Div overlay for confirming removing a search -->
 				<div class="modal-dialog-overlay-container proxl-xml-file-upload-complete-successfully-overlay-container   proxl_xml_file_upload_complete_successfully_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
@@ -3048,15 +2638,10 @@
 			
 			<script type="text/javascript" src="${ contextPath }/js/proxlXMLFileImportStatusDisplay.js?x=${cacheBustValue}"></script>
 		
-	
-		
 			<%--  Proxl XML File Import Entry Template --%>
-					
 			<script id="proxl_xml_import_item_template"  type="text/x-handlebars-template">
-
 				<%--  include the template text  --%>
 				<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/proxlXMLFileImportItem.jsp" %>
-
 			</script>	
 									
 		  </c:if> <%--  END test="${ authAccessLevel.assistantProjectOwnerAllowed }"  --%>
@@ -3067,42 +2652,23 @@
 	
 		<%--  If Not locked and user allowed to change search data, include the Javascript for it --%>
 		<c:if test="${authAccessLevel.assistantProjectOwnerAllowed }" >
-		
 			<script type="text/javascript" src="${ contextPath }/js/viewProject_SearchMaint.js?x=${cacheBustValue}"></script>
 		</c:if> 
-	
 		<%--  If admin section rendered, include the Javascript for it --%>
 		<c:if test="${authAccessLevel.assistantProjectOwnerAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed}" >
-		
 			<script type="text/javascript" src="${ contextPath }/js/viewProject_ProjectAdminSection.js?x=${cacheBustValue}"></script>
-
 		</c:if> 
-		
-
 		<%--  If project owner, include the Javascript for Project Search Order admin --%>
 		<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
-			
-			<script type="text/javascript" src="${ contextPath }/js/viewProject_SearchDisplayOrderAdmin.js?x=${cacheBustValue}"></script>
-		
+			<script type="text/javascript" src="${ contextPath }/js/viewProject_OrganizeSearchesAndFoldersAdmin.js?x=${cacheBustValue}"></script>
 		</c:if>		
-
 		<%--  If project owner, include the Javascript for Project Lock admin --%>
 		<c:if test="${authAccessLevel.projectOwnerAllowed or authAccessLevel.projectOwnerIfProjectNotLockedAllowed}" >
-			
 			<script type="text/javascript" src="${ contextPath }/js/viewProject_ProjectLockAdmin.js?x=${cacheBustValue}"></script>
-		
 		</c:if>
-
-
-
 	
 	</div>
-	
-	
-	
-	
-	
-	
+
 
 <%-- Google Chart API import --%>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -3110,18 +2676,11 @@
   google.load("visualization", "1", {packages:["corechart"]});
   
   var googleOnLoadCallbackFunction = function() {
-	  
-
-		
 	   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-		  
 			  initQCCharts();
-			  
 			  initQCChartPSMCountVsScore();
-
 			  initQCChartPSMScoreVsScore();
 	   },10);
-	  
   };
   
   //  Do NOT call a method on an object here.  The "this" gets set to the window.

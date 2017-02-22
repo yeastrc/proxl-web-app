@@ -1,15 +1,20 @@
 
 		<%-- !!!   Handlebars template   !!!!!!!!!   --%>
 		
-<%--  srchDsplyOrderAdminTmpl.jsp  --%>
+<%--  srchDsplyOrdrSrchAdminTmpl.jsp 
+
+  Display order of folders and searches
+
+  Single Search entry
+
+Containing element: <script id="organize_searches_single_search_template"  type="text/x-handlebars-template">
+ --%>
 
 
 <div class="outer-item-container  search_display_order_item_jq" 
 		  	 data-project_search_id="{{id}}">
 
-  <div class=" sort-handle-and-text protein_select_protein_item_and_sort_handle_block_jq " 
-   		data-position_index="{{positionIndex}}"  data-protein_id="{{proteinId}}"
-   		 >
+  <div class=" sort-handle-and-text " > 
 	 <div class="sort-handle-float">
 		<span class=" sort_handle_jq  tool_tip_attached_jq" 
 			data-tooltip='<div>Drag to re-order</div>'
@@ -17,9 +22,9 @@
 		  ><img src="${ contextPath }/images/icon-draggable-small.png" 
 		  ></span>
 	 </div >
-     <div class="search-name" >
-	  {{name}}
-     </div>
+     <div class="item-display-name search_display_name_jq tool_tip_attached_jq" 
+     	data-tooltip="Drag Search to a folder to move to that folder"
+	  	>{{name}}</div>
      <div style="clear: both;"></div>
   </div>
   <div class="search-entry-bottom-border"></div>

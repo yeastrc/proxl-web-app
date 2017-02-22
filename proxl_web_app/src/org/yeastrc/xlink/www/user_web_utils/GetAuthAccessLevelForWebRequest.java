@@ -483,37 +483,36 @@ public class GetAuthAccessLevelForWebRequest {
 		
 	}
 	
-
-
-	/**
-	 * Auth access level for specific related project, unless the user level is ADMIN or NONE
-	 * 
-	 * @param userSessionObject
-	 * @param searchId
-	 * @return
-	 * @throws Exception
-	 */
-	public AuthAccessLevel getAuthAccessLevelForWebRequestSearchId( UserSessionObject userSessionObject, int searchId ) throws Exception {
-		
-		
-		Integer projectId = SearchDAO.getInstance().getSearchProjectId( searchId );
-		
-		if ( projectId == null ) {
-			
-			String msg = "Failed to get project id for search id: " + searchId;
-			
-			log.error( msg );
-			
-			throw new Exception( msg );
-		}
-		
-		AuthAccessLevel authAccessLevel = getAuthAccessLevelForWebRequestProjectId( userSessionObject, projectId );
-
-		
-		return authAccessLevel;
-	
-		
-	}
+	//  Removed since this method no longer exists:  SearchDAO.getInstance().getSearchProjectId( searchId );
+//	/**
+//	 * Auth access level for specific related project, unless the user level is ADMIN or NONE
+//	 * 
+//	 * @param userSessionObject
+//	 * @param searchId
+//	 * @return
+//	 * @throws Exception
+//	 */
+//	public AuthAccessLevel getAuthAccessLevelForWebRequestSearchId( UserSessionObject userSessionObject, int searchId ) throws Exception {
+//		
+//		
+//		Integer projectId = SearchDAO.getInstance().getSearchProjectId( searchId );
+//		
+//		if ( projectId == null ) {
+//			
+//			String msg = "Failed to get project id for search id: " + searchId;
+//			
+//			log.error( msg );
+//			
+//			throw new Exception( msg );
+//		}
+//		
+//		AuthAccessLevel authAccessLevel = getAuthAccessLevelForWebRequestProjectId( userSessionObject, projectId );
+//
+//		
+//		return authAccessLevel;
+//	
+//		
+//	}
 	
 	
 }

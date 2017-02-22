@@ -1,8 +1,13 @@
 package org.yeastrc.xlink.www.webservices;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -11,32 +16,40 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.dao.SearchDAO;
-import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.dao.FolderProjectSearchDAO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
-import org.yeastrc.xlink.www.database_update_with_transaction_services.UpdateSearchDisplayOrderUsingDBTransactionService;
+import org.yeastrc.xlink.www.dto.FolderProjectSearchDTO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.GetAuthAccessLevelForWebRequest;
 
+/**
+ * 
+ *
+ */
 @Path("/project")
-public class ProjectSetSearchesDisplayOrderService {
+public class ProjectOrganizeSearchesSetSearchFolderService {
 	
-	private static final Logger log = Logger.getLogger(ProjectSetSearchesDisplayOrderService.class);
+	private static final Logger log = Logger.getLogger(ProjectOrganizeSearchesSetSearchFolderService.class);
+	
+	private static final String TRUE = "true";
 	
 	@POST
-	@Consumes( MediaType.APPLICATION_JSON )
+	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/setSearchesOrder")
-	public ProjectSetSearchesDisplayOrderResult setSearchesOrder( ProjectSetSearchesDisplayOrderRequest projectSetSearchesOrderRequest,
+	@Path("/organizeSearchesSetSearchFolder")
+	public WebserviceResult setSearchesOrder( 
+			@FormParam("projectSearchId") Integer projectSearchId, 
+			@FormParam("folderId") Integer folderId,
+			@FormParam("searches_not_in_any_folder") String searches_not_in_any_folderString,
 			@Context HttpServletRequest request ) throws Exception {
 		try {
-			int[] projectSearchesIdsInOrder = projectSetSearchesOrderRequest.searchesInOrder;
-			if ( projectSearchesIdsInOrder == null ) {
-				String msg = "Provided searchesInOrder is null";
+			if ( projectSearchId == null ) {
+				String msg = "'projectSearchId' is missing";
 				log.error( msg );
 			    throw new WebApplicationException(
 			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -44,8 +57,12 @@ public class ProjectSetSearchesDisplayOrderService {
 			    	        .build()
 			    	        );
 			}
-			if ( projectSearchesIdsInOrder.length == 0 ) {
-				String msg = "Provided searchesInOrder is empty";
+			boolean searches_not_in_any_folder = false;
+			if ( TRUE.equals( searches_not_in_any_folderString ) ) {
+				searches_not_in_any_folder = true;
+			}
+			if ( folderId == null && ( ! searches_not_in_any_folder ) ) {
+				String msg = "'folderId' is null and searches_not_in_any_folder is false";
 				log.error( msg );
 			    throw new WebApplicationException(
 			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -65,33 +82,28 @@ public class ProjectSetSearchesDisplayOrderService {
 						.build()
 						);
 			}
-			Integer projectId = null;
-			for( int projectSearchId : projectSearchesIdsInOrder ) {
-				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
-				if ( search == null ) {
-					String msg = "Search not found in DB for projectSearchId: " + projectSearchId;
-					log.error( msg );
-					throw new WebApplicationException(
-							Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
-							.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_TEXT ) // This string will be passed to the client
-							.build()
-							);
-				}
-				if ( projectId == null ) {
-					projectId = search.getProjectId();
-				} else {
-					if ( projectId != search.getProjectId() ) {
-						//  Invalid request, searches not in from or to project
-						String msg = "Searches don't all have the same project id, search_id: " + search.getSearchId();
-						log.error( msg );
-						throw new WebApplicationException(
-								Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-								.entity( msg )
-								.build()
-								);
-					}
-				}
+			Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
+			projectSearchIdsCollection.add( projectSearchId );
+			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsCollection );
+			if ( projectIdsFromSearchIds.isEmpty() ) {
+				// should never happen
+				String msg = "No project ids for projectSearchId: " + projectSearchId;
+				log.error( msg );
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_TEXT ) // This string will be passed to the client
+						.build()
+						);
 			}
+			if ( projectIdsFromSearchIds.size() > 1 ) {
+				//  Invalid request, searches across projects
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+			int projectId = projectIdsFromSearchIds.get( 0 );
 			AuthAccessLevel authAccessLevel = 
 					GetAuthAccessLevelForWebRequest.getInstance()
 					.getAuthAccessLevelForWebRequestProjectId( userSessionObject, projectId );
@@ -103,6 +115,10 @@ public class ProjectSetSearchesDisplayOrderService {
 						.build()
 						);
 			}
+			//  END Auth Check
+			
+			WebserviceResult webserviceResult = new WebserviceResult();
+			
 			ProjectDAO projectDAO = ProjectDAO.getInstance();
 			ProjectDTO projectDTO = projectDAO.getProjectDTOForProjectId( projectId );
 			if ( projectDTO == null ) {
@@ -113,7 +129,7 @@ public class ProjectSetSearchesDisplayOrderService {
 						.build()
 						);
 			}
-			ProjectSetSearchesDisplayOrderResult webserviceResult = new ProjectSetSearchesDisplayOrderResult();
+
 			if ( projectDTO.isProjectLocked() ) {
 				webserviceResult.setProjectLocked(true);
 				webserviceResult.setStatus(false);
@@ -129,8 +145,18 @@ public class ProjectSetSearchesDisplayOrderService {
 				webserviceResult.setStatus(false);
 				return webserviceResult;  //  EARLY Return
 			}
-			UpdateSearchDisplayOrderUsingDBTransactionService.getInstance()
-			.updateSearchDisplayOrder( projectSearchesIdsInOrder );
+			
+			if ( searches_not_in_any_folder ) {
+				//  Remove project_search_id from folder
+				FolderProjectSearchDAO.getInstance().delete( projectSearchId );
+			} else {
+				//  Add or move project_search_id to folder
+				FolderProjectSearchDTO folderProjectSearchDTO = new FolderProjectSearchDTO();
+				folderProjectSearchDTO.setProjectSearchId( projectSearchId );
+				folderProjectSearchDTO.setFolderId( folderId );
+				FolderProjectSearchDAO.getInstance().saveOrUpdate( folderProjectSearchDTO );
+			}
+			
 			webserviceResult.setStatus(true);
 			return webserviceResult;
 		} catch ( WebApplicationException e ) {
@@ -148,42 +174,40 @@ public class ProjectSetSearchesDisplayOrderService {
 	
 	//////////////////////
 	//  Classes for web service request and response
-	public static class ProjectSetSearchesDisplayOrderRequest {
-		private int[] searchesInOrder;
-		public int[] getSearchesInOrder() {
-			return searchesInOrder;
-		}
-		public void setSearchesInOrder(int[] searchesInOrder) {
-			this.searchesInOrder = searchesInOrder;
-		}
-	}
-	
-	public static class ProjectSetSearchesDisplayOrderResult {
+	public static class WebserviceResult {
 		private boolean status;
 		private boolean projectMarkedForDeletion;
 		private boolean projectDisabled;
 		private boolean projectLocked;
+
 		public boolean isStatus() {
 			return status;
 		}
+
 		public void setStatus(boolean status) {
 			this.status = status;
 		}
+
 		public boolean isProjectMarkedForDeletion() {
 			return projectMarkedForDeletion;
 		}
+
 		public void setProjectMarkedForDeletion(boolean projectMarkedForDeletion) {
 			this.projectMarkedForDeletion = projectMarkedForDeletion;
 		}
+
 		public boolean isProjectDisabled() {
 			return projectDisabled;
 		}
+
 		public void setProjectDisabled(boolean projectDisabled) {
 			this.projectDisabled = projectDisabled;
 		}
+
 		public boolean isProjectLocked() {
 			return projectLocked;
 		}
+
 		public void setProjectLocked(boolean projectLocked) {
 			this.projectLocked = projectLocked;
 		}

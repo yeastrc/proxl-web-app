@@ -139,7 +139,7 @@ var DefaultPageView = function() {
 			if ( clearMsg === undefined ) { //  If no value passed, default to true;
 				clearMsg = true;
 			}
-			this.clearSaveOrUpdateDefaultPageViewMsg( $element );
+			this.clearSaveOrUpdateDefaultPageViewMsg( $element, false /* fadeErrorMsg */ );
 			$element.show();
 			var animateNewTop = offsetTop__SaveAsDefaultButton - height__current_url_saved_as_default_page_view_success_div - 10;
 			$element.animate( { top: animateNewTop }, { duration: 750 } );

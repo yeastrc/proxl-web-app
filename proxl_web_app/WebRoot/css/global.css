@@ -542,30 +542,35 @@ body.projects-list-page .mark-project-for-deletion-overlay-container {   }
 body.project-page .collapsable-link-container { float:left; }
 
 body.project-page .top-level-container { margin-top: 20px; clear: left; } 
-
 body.project-page .top-level-collapsable-link-container { padding-top: 5px; }
-
 body.project-page .top-level-collapsable-link {  }
-
 body.project-page .top-level-label { margin-left: 30px; }
-
 
 body.project-page .second-level-label { font-weight: bold; }
 
-
 body.project-page .project-info-block { margin-left: 40px; }
-
 body.project-page .project-info-single-block { margin-bottom: 10px; clear: both; }
-
 body.project-page .project-info-label { float: left;  }
-
 body.project-page .project-info-text { margin-left: 120px; }
-
 body.project-page .project-info-end-block-clear-float { clear: both;  }
-
 
 body.project-page .note-display-div { margin-bottom: 10px; }
 
+/* Folder Data */
+
+body.project-page .folder-container { padding-left: 8px; padding-top: 3px; padding-bottom: 3px; clear: left; } 
+body.project-page .folder-collapsable-link-container { padding-top: 0px; padding-right: 3px; }
+body.project-page .folder-collapsable-link {  }
+
+body.project-page .folder-name-display { font-size: 18px; font-weight: bold; }
+
+body.project-page .searches-under-folder-block { margin-left: 20px; margin-top: 6px; }
+
+
+/* Search Data */
+body.project-page tr.search_root_jq:hover { background-color:#fff0f0; }
+body.project-page td.search-checkbox-cell { background-color:#ffffff; padding-top: 0px; }
+body.project-page div.search-details-container-div { background-color:#ffffff; }
 
 
 	/* delete note modal dialog */
@@ -694,6 +699,22 @@ body.project-page .copy-searches-overlay-container {   }
 
 body.project-page .copy-searches-overlay-project-list-block { margin-left: 20px;  }
 
+	/* rename folder modal dialog */
+body.project-page .rename-folder-overlay-containing-outermost-div { width: 100%; height: 0px;  text-align: left;  }
+body.project-page .rename-folder-overlay-containing-outer-div { position: relative; display: inline-block; padding-right: 50px; }
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .rename-folder-overlay-containing-outer-div, body.project-page .rename-folder-overlay-container { width: 600px;  }
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .rename-folder-overlay-container {   }
+body.project-page .rename-folder-overlay-folder-name-input-field { width: 90%; }
+
+	/* delete folder modal dialog */
+body.project-page .delete-folder-overlay-containing-outermost-div { width: 100%; height: 0px;  text-align: left;  }
+body.project-page .delete-folder-overlay-containing-outer-div { position: relative; display: inline-block; padding-right: 50px; }
+/* These 2 divs MUST have the same width so set width for both together */
+body.project-page .delete-folder-overlay-containing-outer-div, body.project-page .delete-folder-overlay-container { width: 600px;  }
+/* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
+body.project-page .delete-folder-overlay-container {   }
 
 
 	/* delete search modal dialog */
@@ -733,14 +754,42 @@ body.project-page .delete-search-web-link-overlay-containing-outer-div, body.pro
 /* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
 body.project-page .delete-search-web-link-overlay-container {   }
 
-	/* re-arrange re-order searches */
-
-body.project-page   #re_order_searches_main_data_block .sort-handle-and-text { cursor: move;  }
-body.project-page   #re_order_searches_main_data_block .sort-handle-and-text:hover { background-color:  #FFF0F0 }
-body.project-page   #re_order_searches_main_data_block .sort-handle-float { float: left; padding-left: 2px; padding-right: 2px; padding-top: 4px; }
-body.project-page   #re_order_searches_main_data_block .search-name {  margin: 7px; padding: 3px; overflow: hidden; text-overflow: ellipsis; }
 
 
+
+	/* Organize Searches - Put Searches in Folders and Order Searches and Folders */
+	
+body.project-page  #organize_searches_folder_searches_table { min-width: 1000px; width: 100%; table-layout: fixed; border-collapse: collapse; }
+body.project-page  #organize_searches_folder_searches_table,
+body.project-page  #organize_searches_folder_searches_table tr,
+body.project-page  #organize_searches_folder_searches_table td { border: 1px solid #A55353;  }
+body.project-page  #organize_searches_folder_searches_table td { padding: 10px; width: 50%; max-width: 50%; min-width: 50%; vertical-align: top;  }
+	
+	/* Folder cell */
+/*
+body.project-page  #organize_searches_folder_total_block_container { min-width: 400px; max-width: 400px; padding-right: 60px; vertical-align: top; }
+*/
+body.project-page  #organize_searches_folder_total_block_container { vertical-align: top; }
+/* If change min-width, max-width, or padding: Update max-width on: body.project-page   #organize_searches_main_data_block .item-display-name */
+
+/* Draggable item (folder or search) */
+body.project-page   #organize_searches_main_data_block .sort-handle-and-text {  white-space: nowrap;  cursor: move; }
+body.project-page   #organize_searches_main_data_block .sort-handle-and-text:hover { color: #545454; background-color:  #FFF0F0 }
+body.project-page   #organize_searches_main_data_block .sort-handle-float { float: left; padding-left: 2px; padding-right: 2px; padding-top: 4px; }
+/* max-width: value 330px = <td> width 400 - padding-right 60 - 10 */
+body.project-page   #organize_searches_main_data_block .item-display-name { max-width: 90%; float: left; padding: 3px; overflow: hidden; text-overflow: ellipsis; }
+body.project-page   #organize_searches_main_data_block .edit-delete-icons {padding-top: 3px; padding-right: 3px; } 
+body.project-page   #organize_searches_main_data_block .outer-item-container { position: relative; }
+body.project-page   #organize_searches_main_data_block .outer-item-container .selected-item { color: #FFFFFF; background-color: #A55353; } 
+body.project-page   #organize_searches_main_data_block .outer-item-container .selected-item:hover { color: #FFFFFF; background-color: #A55353; }
+body.project-page   #organize_searches_main_data_block .outer-item-container .selected-item  .folder-row-icon { background-color: #FFFFFF; }
+body.project-page   #organize_searches_main_data_block .highlighted-item { color: #545454; background-color: #FFF0F0; } 
+
+body.project-page #organize_searches_folder_searches_not_in_any_folder:hover {  background-color: #FFF0F0; }
+
+/*
+body.view-merged-image-page   .selected-proteins-container .text-float {float: left; margin-right: 3px; max-width: 200px;overflow: hidden; text-overflow: ellipsis; }
+*/
 
 /* -----   upload Proxl XML file modal dialog background ----- */
 
@@ -980,10 +1029,6 @@ body.project-page .qc-plot-overlay-header-text { color: black; padding: 3px; mar
 body.project-page .qc-plot-overlay-body {  padding: 20px; }
 
 body.project-page .qc-plot-overlay-link { margin-right: 20px;  }
-
-body.project-page tr.search_root_jq:hover { background-color:#fff0f0; }
-body.project-page td.search-checkbox-cell { background-color:#ffffff; }
-body.project-page div.search-details-container-div { background-color:#ffffff; }
 
 body.project-page .qc-plot-filter-on-import-notice { color: #A55353; padding-bottom: 5px; }
 

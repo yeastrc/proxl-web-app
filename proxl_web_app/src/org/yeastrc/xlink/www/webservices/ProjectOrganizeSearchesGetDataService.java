@@ -17,21 +17,24 @@ import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.objects.ProjectPageFoldersSearches;
+import org.yeastrc.xlink.www.objects.ProjectPageSingleFolder;
+import org.yeastrc.xlink.www.objects.SearchDTODetailsDisplayWrapper;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.searcher.SearchSearcher;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.GetAuthAccessLevelForWebRequest;
+import org.yeastrc.xlink.www.web_utils.ViewProjectSearchesInFolders;
 
 @Path("/project")
-public class ProjectGetSearchesReorderDataService {
+public class ProjectOrganizeSearchesGetDataService {
 	
-	private static final Logger log = Logger.getLogger(ProjectGetSearchesReorderDataService.class);
+	private static final Logger log = Logger.getLogger(ProjectOrganizeSearchesGetDataService.class);
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/getSearchesReorderData")
-	public ProjectGetSearchesReorderDataResult getSearchesReorderData( 
+	@Path("/organizeSearchesGetData")
+	public WebserviceResult projectOrganizeSearchesGetData( 
 			@QueryParam( "project_id" ) Integer projectId,
 			@Context HttpServletRequest request ) throws Exception {
 		try {
@@ -84,7 +87,7 @@ public class ProjectGetSearchesReorderDataService {
 						.build()
 						);
 			}
-			ProjectGetSearchesReorderDataResult webserviceResult = new ProjectGetSearchesReorderDataResult();
+			WebserviceResult webserviceResult = new WebserviceResult();
 			if ( projectDTO.isProjectLocked() ) {
 				webserviceResult.setProjectLocked(true);
 				webserviceResult.setStatus(false);
@@ -100,16 +103,39 @@ public class ProjectGetSearchesReorderDataService {
 				webserviceResult.setStatus(false);
 				return webserviceResult;  //  EARLY Return
 			}
-			List<SearchDTO> searchDTOList = SearchSearcher.getInstance().getSearchsForProjectId( projectId );
-			List<ProjectGetSearchesReorderDataResultSearchItem> searchDataList = new ArrayList<>( searchDTOList.size() );
-			for ( SearchDTO searchDTO : searchDTOList ) {
-				ProjectGetSearchesReorderDataResultSearchItem searchItem = new ProjectGetSearchesReorderDataResultSearchItem();
-				searchItem.id = searchDTO.getProjectSearchId();
-				searchItem.name = searchDTO.getName();
-				searchDataList.add( searchItem );
+			//  Get data to return
+
+			//  Get the searches and put them in folders
+			ProjectPageFoldersSearches projectPageFoldersSearches = 
+					ViewProjectSearchesInFolders.getInstance()
+					.getProjectPageFoldersSearches( projectId );
+			
+			if ( projectPageFoldersSearches.isNoSearchesFound() ) {
+				webserviceResult.status = true;
+				webserviceResult.noSearchesFound = true;
+				return webserviceResult;  //  EARLY Return
 			}
-			webserviceResult.status = true;
-			webserviceResult.searchDataList = searchDataList;
+			
+			//  Convert the projectPageFoldersSearches to the webservice result
+			
+			List<WebserviceResultSearchItem> searchesNotInFoldersList = 
+					convertSearchWrapperToWebserviceResultSearchItem( projectPageFoldersSearches.getSearchesNotInFolders() );
+
+			List<WebserviceResultFolderItem> folderDataList = new ArrayList<>( projectPageFoldersSearches.getFolders().size() );
+			for ( ProjectPageSingleFolder projectPageSingleFolder : projectPageFoldersSearches.getFolders() ) {
+				List<WebserviceResultSearchItem> searchesInFolderList = 
+						convertSearchWrapperToWebserviceResultSearchItem( projectPageSingleFolder.getSearches() );
+				WebserviceResultFolderItem folderItem = new WebserviceResultFolderItem();
+				folderItem.setSearchesForFolder( searchesInFolderList );
+				folderItem.setName( projectPageSingleFolder.getFolderName() );
+				folderItem.setId( projectPageSingleFolder.getId() );
+				folderDataList.add( folderItem );
+			}
+			
+			// populate webserviceResult
+			webserviceResult.setStatus( true );
+			webserviceResult.setSearchesNotInFoldersList( searchesNotInFoldersList );
+			webserviceResult.setFolderDataList( folderDataList );
 			return webserviceResult;
 		} catch ( WebApplicationException e ) {
 			throw e;
@@ -124,25 +150,39 @@ public class ProjectGetSearchesReorderDataService {
 		}
 	}
 	
+	/**
+	 * Convert search wrapper to webservice result objects
+	 * @param searches
+	 * @return
+	 */
+	private List<WebserviceResultSearchItem> convertSearchWrapperToWebserviceResultSearchItem( List<SearchDTODetailsDisplayWrapper> searches ) {
+		List<WebserviceResultSearchItem> webserviceResultSearchItemList = new ArrayList<>( searches.size() );
+		for ( SearchDTODetailsDisplayWrapper searchWrapperItem : searches ) {
+			SearchDTO searchDTO = searchWrapperItem.getSearchDTO();
+			WebserviceResultSearchItem searchItem = new WebserviceResultSearchItem();
+			searchItem.id = searchDTO.getProjectSearchId();
+			searchItem.name = searchDTO.getName();
+			webserviceResultSearchItemList.add( searchItem );
+		}
+		return webserviceResultSearchItemList;
+	}
+	
 	//////////////////////
 	//  Classes for web service request and response
 	
-	public static class ProjectGetSearchesReorderDataRequest {
-		private Integer projectId;
-		public Integer getProjectId() {
-			return projectId;
-		}
-		public void setProjectId(Integer projectId) {
-			this.projectId = projectId;
-		}
-	}
-	
-	public static class ProjectGetSearchesReorderDataResult {
+	/**
+	 * Webservice Result Class
+	 *
+	 */
+	public static class WebserviceResult {
 		private boolean status;
 		private boolean projectMarkedForDeletion;
 		private boolean projectDisabled;
 		private boolean projectLocked;
-		private List<ProjectGetSearchesReorderDataResultSearchItem> searchDataList;
+		private boolean noSearchesFound;
+		private List<WebserviceResultSearchItem> searchesNotInFoldersList;
+		private List<WebserviceResultFolderItem> folderDataList;
+		
 		public boolean isStatus() {
 			return status;
 		}
@@ -167,16 +207,60 @@ public class ProjectGetSearchesReorderDataService {
 		public void setProjectLocked(boolean projectLocked) {
 			this.projectLocked = projectLocked;
 		}
-		public List<ProjectGetSearchesReorderDataResultSearchItem> getSearchDataList() {
-			return searchDataList;
+		public boolean isNoSearchesFound() {
+			return noSearchesFound;
 		}
-		public void setSearchDataList(
-				List<ProjectGetSearchesReorderDataResultSearchItem> searchDataList) {
-			this.searchDataList = searchDataList;
+		public void setNoSearchesFound(boolean noSearchesFound) {
+			this.noSearchesFound = noSearchesFound;
+		}
+		public List<WebserviceResultSearchItem> getSearchesNotInFoldersList() {
+			return searchesNotInFoldersList;
+		}
+		public void setSearchesNotInFoldersList(List<WebserviceResultSearchItem> searchesNotInFoldersList) {
+			this.searchesNotInFoldersList = searchesNotInFoldersList;
+		}
+		public List<WebserviceResultFolderItem> getFolderDataList() {
+			return folderDataList;
+		}
+		public void setFolderDataList(List<WebserviceResultFolderItem> folderDataList) {
+			this.folderDataList = folderDataList;
 		}
 	}		
 	
-	public static class ProjectGetSearchesReorderDataResultSearchItem {
+	/**
+	 * 
+	 *
+	 */
+	public static class WebserviceResultFolderItem {
+		private int id;
+		private String name;
+		private List<WebserviceResultSearchItem> searchesForFolder;
+		
+		public int getId() {
+			return id;
+		}
+		public void setId(int id) {
+			this.id = id;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public List<WebserviceResultSearchItem> getSearchesForFolder() {
+			return searchesForFolder;
+		}
+		public void setSearchesForFolder(List<WebserviceResultSearchItem> searchesForFolder) {
+			this.searchesForFolder = searchesForFolder;
+		}
+	}
+	
+	/**
+	 * 
+	 *
+	 */
+	public static class WebserviceResultSearchItem {
 		private int id;
 		private String name;
 		public int getId() {

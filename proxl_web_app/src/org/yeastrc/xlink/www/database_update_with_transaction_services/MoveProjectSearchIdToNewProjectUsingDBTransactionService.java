@@ -4,6 +4,7 @@ import java.sql.Connection;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
+import org.yeastrc.xlink.www.dao.FolderProjectSearchDAO;
 import org.yeastrc.xlink.www.dao.ProjectSearchDAO;
 import org.yeastrc.xlink.www.searcher.ProjectSearchIdAssocSearchIdInProjectIdSearcher;
 
@@ -44,6 +45,8 @@ public class MoveProjectSearchIdToNewProjectUsingDBTransactionService {
 				}
 				if ( moveSearch ) {
 					ProjectSearchDAO.getInstance().updateProjectIdForProjectSearch( projectSearchId, newProjectId, dbConnection );
+					//  Remove folder mapping record related to old project, if it exists
+					FolderProjectSearchDAO.getInstance().delete( projectSearchId );
 				}
 			}
 			dbConnection.commit();

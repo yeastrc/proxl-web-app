@@ -85,7 +85,7 @@ public class SearchDAO {
 		}
 		return search;
 	}
-	
+
 	/**
 	 * Get the project id for the search id from the database
 	 * 
@@ -93,13 +93,13 @@ public class SearchDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public Integer getSearchProjectId( int id ) throws Exception {
+	public Integer getProjectIdFromProjectSearchId( int id ) throws Exception {
 		
 		Integer result = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT project_id FROM search WHERE id = ?";
+		String sql = "SELECT project_id FROM project_search WHERE id = ?";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
@@ -129,4 +129,50 @@ public class SearchDAO {
 		return result;
 	}
 	
+	
+	///  Removed since field 'project_id' no longer on 'search' table
+//	/**
+//	 * Get the project id for the search id from the database
+//	 * 
+//	 * @param id
+//	 * @return
+//	 * @throws Exception
+//	 */
+//	public Integer getSearchProjectId( int id ) throws Exception {
+//		
+//		Integer result = null;
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		ResultSet rs = null;
+//		String sql = "SELECT project_id FROM search WHERE id = ?";
+//		try {
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+//			pstmt = conn.prepareStatement( sql );
+//			pstmt.setInt( 1, id );
+//			rs = pstmt.executeQuery();
+//			if( rs.next() ) {
+//				result = rs.getInt( "project_id" );
+//			}
+//		} catch ( Exception e ) {
+//			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
+//			throw e;
+//		} finally {
+//			// be sure database handles are closed
+//			if( rs != null ) {
+//				try { rs.close(); } catch( Throwable t ) { ; }
+//				rs = null;
+//			}
+//			if( pstmt != null ) {
+//				try { pstmt.close(); } catch( Throwable t ) { ; }
+//				pstmt = null;
+//			}
+//			if( conn != null ) {
+//				try { conn.close(); } catch( Throwable t ) { ; }
+//				conn = null;
+//			}
+//		}
+//		return result;
+//	}
+	
+
 }

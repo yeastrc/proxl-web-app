@@ -612,6 +612,7 @@ var deleteSearchCommentConfirmed = function(clickThis, eventObject) {
 		success: function(data)	{
 			try {
 				$( "div#comment-" + searchCommentId ).hide(200, function() { $( "div#comment-" + searchCommentId ).remove(); });
+				closeConfirmDeleteSearchCommentOverlay();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
@@ -625,7 +626,6 @@ var deleteSearchCommentConfirmed = function(clickThis, eventObject) {
 //			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ", textStatus: " + textStatus );
 		}
 	});
-	closeConfirmDeleteSearchCommentOverlay();
 };
 
 //END   Delete Search Comment processing

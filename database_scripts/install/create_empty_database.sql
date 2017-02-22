@@ -236,6 +236,8 @@ CREATE TABLE  search (
   import_end_timestamp TIMESTAMP NULL,
   directory_name VARCHAR(255) NULL,
   has_scan_data TINYINT UNSIGNED NOT NULL DEFAULT 1,
+  created_by_user_id INT UNSIGNED NULL,
+  created_date_time DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   CONSTRAINT search_status_id_fk
     FOREIGN KEY (status_id)
@@ -262,6 +264,10 @@ CREATE TABLE  project_search (
   active_project_id_search_id_unique_record TINYINT NULL DEFAULT 1 COMMENT 'Set to NULL to remove record from UNIQUE index project_id_search_id_active_p_id_s_id_u_r_unique_idx',
   marked_for_deletion_auth_user_id INT UNSIGNED NULL,
   marked_for_deletion_timestamp DATETIME NULL,
+  created_by_user_id INT UNSIGNED NULL,
+  created_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_by_user_id INT NULL,
+  updated_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   CONSTRAINT fk_project_search__project_id
     FOREIGN KEY (project_id)
@@ -2053,6 +2059,55 @@ CREATE TABLE  aa_updates_applied (
   date_applied TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id))
 ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table folder_for_project
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS folder_for_project ;
+
+CREATE TABLE  folder_for_project (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT UNSIGNED NOT NULL,
+  display_order INT NOT NULL DEFAULT 0,
+  name VARCHAR(600) NOT NULL,
+  created_by_user_id INT(10) UNSIGNED NULL,
+  created_date_time DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_by_user_id INT(10) UNSIGNED NULL,
+  updated_date_time DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT folder_for_project_proj_id_fk
+    FOREIGN KEY (project_id)
+    REFERENCES project (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX folder_for_project_proj_id_fk_idx ON folder_for_project (project_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table folder_project_search
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS folder_project_search ;
+
+CREATE TABLE  folder_project_search (
+  project_search_id INT UNSIGNED NOT NULL,
+  folder_id INT UNSIGNED NOT NULL,
+  PRIMARY KEY (project_search_id),
+  CONSTRAINT folder_project_search_folder_id
+    FOREIGN KEY (folder_id)
+    REFERENCES folder_for_project (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT folder_project_search_proj_srch_id
+    FOREIGN KEY (project_search_id)
+    REFERENCES project_search (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX folder_project_search_folder_id_idx ON folder_project_search (folder_id ASC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
