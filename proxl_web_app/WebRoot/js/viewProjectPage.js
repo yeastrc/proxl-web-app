@@ -172,6 +172,13 @@ function showSearchDetails( id ) {
 //   Called by "onclick" on HTML element
 function expandAll() {
 	try {
+		var $folder_contents_block_jq = $(".folder_contents_block_jq");
+		$folder_contents_block_jq.show();
+		var $folder_hide_contents_link_jq = $(".folder_hide_contents_link_jq");
+		$folder_hide_contents_link_jq.show();
+		var $folder_show_contents_link_jq = $(".folder_show_contents_link_jq");
+		$folder_show_contents_link_jq.hide();
+		
 		$( "table.search-details" ).show();
 		$( "a.expand-link" ).html( '<img src="' + contextPathJSVar + '/images/icon-collapse-small.png">' );
 	} catch( e ) {
@@ -183,6 +190,13 @@ function expandAll() {
 //   Called by "onclick" on HTML element
 function collapseAll() {
 	try {
+		var $folder_contents_block_jq = $(".folder_contents_block_jq");
+		$folder_contents_block_jq.hide();
+		var $folder_hide_contents_link_jq = $(".folder_hide_contents_link_jq");
+		$folder_hide_contents_link_jq.hide();
+		var $folder_show_contents_link_jq = $(".folder_show_contents_link_jq");
+		$folder_show_contents_link_jq.show();
+
 		$( "table.search-details" ).hide();
 		$( "a.expand-link" ).html( '<img src="' + contextPathJSVar + '/images/icon-expand-small.png">' );
 	} catch( e ) {

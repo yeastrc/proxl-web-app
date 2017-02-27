@@ -1759,10 +1759,13 @@
 						
 							<div  class="collapsable-link-container folder-collapsable-link-container collapsable_link_container_jq" style="">
 							
-								<a href="javascript:" class=" collapsable_collapse_link_jq tool_tip_attached_jq " style="display: none;"
+								<a href="javascript:" 
+									class=" folder_hide_contents_link_jq collapsable_collapse_link_jq tool_tip_attached_jq " 
+									style="display: none;"
 									data-tooltip="Close folder"
 									><img  src="${ contextPath }/images/icon-folder-click-to-close.png"></a>
-								<a href="javascript:" class=" collapsable_expand_link_jq tool_tip_attached_jq "
+								<a href="javascript:" 
+									class=" folder_show_contents_link_jq collapsable_expand_link_jq tool_tip_attached_jq "
 									data-tooltip="Open folder"
 									><img  src="${ contextPath }/images/icon-folder-click-to-open.png"></a>
 	
@@ -1780,7 +1783,8 @@
 							</div>
 
 									
-							<div class=" searches-under-folder-block collapsable_jq" style="display: none;" >
+							<div class=" searches-under-folder-block collapsable_jq folder_contents_block_jq " 
+									style="display: none;" >
 							
 								<c:forEach var="search_wrapper" items="${ folder.searches }" varStatus="search_wrapper_varStatus">
 								  <c:choose>
