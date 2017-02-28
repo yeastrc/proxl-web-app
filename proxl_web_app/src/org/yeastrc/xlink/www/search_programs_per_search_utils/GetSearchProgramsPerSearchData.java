@@ -4,6 +4,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.yeastrc.xlink.dao.SearchProgramsPerSearchDAO;
 import org.yeastrc.xlink.dto.SearchProgramsPerSearchDTO;
+import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
+import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -16,7 +18,7 @@ import com.google.common.cache.LoadingCache;
  * 
  * Singleton instance
  */
-public class GetSearchProgramsPerSearchData {
+public class GetSearchProgramsPerSearchData implements CachedDataCommonIF {
 
 	
 	private static final int CACHE_MAX_SIZE = 60;
@@ -31,7 +33,6 @@ public class GetSearchProgramsPerSearchData {
 	 */
 	private static final int CACHE__FORCED_TIMEOUT = 60 * 60 * 1000; // in milliseconds
 	
-	
 	/**
 	 * Static get singleton instance
 	 * @return
@@ -39,6 +40,17 @@ public class GetSearchProgramsPerSearchData {
 	public static GetSearchProgramsPerSearchData getInstance() {
 		return _instance; 
 	}
+
+	/* (non-Javadoc)
+	 * @see org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF#clearCacheData()
+	 * 
+	 * Clear all entries from the cache
+	 */
+	@Override
+	public void clearCacheData() throws Exception {
+		searchProgramsPerSearchDataCache.invalidateAll();
+	}
+
 	
 	/**
 	 * @param searchProgramsPerSearchId
@@ -51,7 +63,7 @@ public class GetSearchProgramsPerSearchData {
 		
 		localCacheKey.searchProgramsPerSearchId = searchProgramsPerSearchId;
 		
-		LocalCacheValue localCacheValue = annotationTypeDataCache.get( localCacheKey );
+		LocalCacheValue localCacheValue = searchProgramsPerSearchDataCache.get( localCacheKey );
 		
 		if ( localCacheValue == null ) {
 			
@@ -66,7 +78,7 @@ public class GetSearchProgramsPerSearchData {
 			
 			localCacheValue =  loadFromDB( localCacheKey );
 
-			annotationTypeDataCache.put( localCacheKey, localCacheValue );
+			searchProgramsPerSearchDataCache.put( localCacheKey, localCacheValue );
 		}
 
 		SearchProgramsPerSearchDTO searchProgramsPerSearchDTO = localCacheValue.searchProgramsPerSearchDTO;
@@ -88,7 +100,7 @@ public class GetSearchProgramsPerSearchData {
 	 */
 	private GetSearchProgramsPerSearchData() {
 		
-		annotationTypeDataCache = CacheBuilder.newBuilder()
+		searchProgramsPerSearchDataCache = CacheBuilder.newBuilder()
 				
 				.expireAfterAccess( CACHE_TIMEOUT, TimeUnit.SECONDS )
 			    .maximumSize( CACHE_MAX_SIZE )
@@ -106,6 +118,10 @@ public class GetSearchProgramsPerSearchData {
 			    		});
 			    
 //			    .build(); // no CacheLoader
+		
+		//  Register this class with the centralized Cached Data Registry, to support centralized cache clearing
+		CachedDataCentralRegistry.getInstance().register( this );
+
 	}
 	
 	
@@ -176,7 +192,7 @@ public class GetSearchProgramsPerSearchData {
 	/**
 	 * cached annotation type data
 	 */
-	private LoadingCache<LocalCacheKey, LocalCacheValue> annotationTypeDataCache = null;
+	private LoadingCache<LocalCacheKey, LocalCacheValue> searchProgramsPerSearchDataCache = null;
 	
 	
 	

@@ -116,6 +116,18 @@
 -->
         <!-- Loggers to filter out various class paths -->
 
+        <logger name="org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry" additivity="false">
+        
+                <level value="INFO"/>
+                
+                <appender-ref ref="ROLL" />
+
+                <appender-ref ref="ROLL_ERROR" />
+
+
+
+        </logger>
+
 <!--
 
         <logger name="org.yeastrc.xlink" additivity="false">

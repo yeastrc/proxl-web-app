@@ -16,10 +16,10 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.TestIsUserSignedIn;
 
-public class ManageConfigurationPageInitAction extends Action {
+public class ConfigureProxlForAdminPageInitAction extends Action {
 
 
-	private static final Logger log = Logger.getLogger(ManageConfigurationPageInitAction.class);
+	private static final Logger log = Logger.getLogger(ConfigureProxlForAdminPageInitAction.class);
 	
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,

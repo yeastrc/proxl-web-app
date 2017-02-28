@@ -813,7 +813,7 @@ function initPage() {
 
 			editValue( clickThis );
 
-			return false;  // stop click bubble up.
+			eventObject.preventDefault();  // stop click bubble up.
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -831,7 +831,7 @@ function initPage() {
 
 			closeEditValue( clickThis );
 
-			return false;  // stop click bubble up.
+			eventObject.preventDefault();  // stop click bubble up.
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -850,7 +850,7 @@ function initPage() {
 
 			updateFirstName(clickThis, eventObject);	
 
-			return false;  // stop click bubble up.
+			eventObject.preventDefault();  // stop click bubble up.
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -869,7 +869,7 @@ function initPage() {
 
 			updateLastName(clickThis, eventObject);	
 
-			return false;  // stop click bubble up.
+			eventObject.preventDefault();  // stop click bubble up.
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -889,7 +889,7 @@ function initPage() {
 
 			updateOrganization(clickThis, eventObject);	
 
-			return false;  // stop click bubble up.
+			eventObject.preventDefault();  // stop click bubble up.
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -907,7 +907,7 @@ function initPage() {
 
 			updateEmail(clickThis, eventObject);	
 
-			return false;  // stop click bubble up.
+			eventObject.preventDefault();  // stop click bubble up.
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -926,7 +926,7 @@ function initPage() {
 
 			updateUsername(clickThis, eventObject);	
 
-			return false;  // stop click bubble up.
+			eventObject.preventDefault();  // stop click bubble up.
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -945,7 +945,7 @@ function initPage() {
 
 			updatePassword(clickThis, eventObject);	
 
-			return false;  // stop click bubble up.
+			eventObject.preventDefault();  // stop click bubble up.
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;

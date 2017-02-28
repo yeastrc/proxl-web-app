@@ -52,6 +52,20 @@
   
     <action-mappings>
 		
+		<action path="/clearAllCacheDFUIEWORU"
+				type="org.yeastrc.xlink.www.actions.ClearAllCacheAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/clearAllConfigCacheSuccess.jsp" redirect="false"/>
+		</action>			
+		
+		<action path="/clearAllConfigCacheDFUIEWORU"
+				type="org.yeastrc.xlink.www.actions.ClearAllConfigCacheAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/clearAllConfigCacheSuccess.jsp" redirect="false"/>
+		</action>			
+		
 		<action path="/home"
 				type="org.yeastrc.xlink.www.actions.HomeAction"
 				scope="request"
@@ -80,10 +94,10 @@
 		<!--  Manage Configuration  -->
 		
 		<action path="/manageConfiguration"
-				type="org.yeastrc.xlink.www.actions.ManageConfigurationPageInitAction"
+				type="org.yeastrc.xlink.www.actions.ConfigureProxlForAdminPageInitAction"
 				scope="request"
 				validate="false">
-		    <forward name="Success" path="/WEB-INF/jsp-pages/manageConfiguration.jsp" redirect="false"/>
+		    <forward name="Success" path="/WEB-INF/jsp-pages/configureProxlForAdmin.jsp" redirect="false"/>
 		</action>			
 				
 

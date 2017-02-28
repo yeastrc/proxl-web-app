@@ -4,6 +4,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTableGetValue;
+import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
+import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 
 import com.google.common.cache.CacheBuilder;
@@ -17,25 +19,17 @@ import com.google.common.cache.LoadingCache;
  * 
  * Singleton instance
  */
-public class ConfigSystemCaching implements IConfigSystemTableGetValue {
-
+public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDataCommonIF {
 
 	private static final Logger log = Logger.getLogger(ConfigSystemCaching.class);
-
-
-
 	
 	private static final int CACHE_MAX_SIZE = 20;
-
 	private static final int CACHE_TIMEOUT = 200000000; // in seconds
-
 	
 	/**
 	 * Static singleton instance
 	 */
 	private static final ConfigSystemCaching _instance = new ConfigSystemCaching();
-	
-	
 	
 	
 	/**
@@ -45,13 +39,21 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue {
 	public static ConfigSystemCaching getInstance() {
 		return _instance; 
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF#clearCacheData()
+	 * 
+	 * Clear all entries from the cache
+	 */
+	@Override
+	public void clearCacheData() throws Exception {
+		clearCache();
+	}
 	
 	/**
 	 * Clear all entries from the cache
 	 */
 	public void clearCache() {
-		
 		configSystemDataCache.invalidateAll();
 	}
 
@@ -82,8 +84,6 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue {
 			throw e;
 		}
 	}
-	
-	
 
 	/**
 	 * constructor
@@ -96,21 +96,18 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue {
 			    .maximumSize( CACHE_MAX_SIZE )
 			    .build(
 			    		new CacheLoader<LocalCacheKey, LocalCacheValue>() {
-
 			    			public LocalCacheValue load(LocalCacheKey localCacheKey) throws Exception {
-
 			    				//  value is NOT in cache so get it and return it
-
 			    				return loadFromDB(localCacheKey);
-
 			    			}
-
 			    		});
 			    
 //			    .build(); // no CacheLoader
+
+		//  Register this class with the centralized Cached Data Registry, to support centralized cache clearing
+		CachedDataCentralRegistry.getInstance().register( this );
+
 	}
-	
-	
 
 	/**
 	 * classes for holding data in the cache
@@ -130,7 +127,6 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue {
 					+ ((configKey == null) ? 0 : configKey.hashCode());
 			return result;
 		}
-
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj)
@@ -147,61 +143,37 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue {
 				return false;
 			return true;
 		}
-
 	}
 	
-	
-
 	/**
 	 * classes for holding data in the cache
 	 * 
 	 * value in the cache
-	 *
 	 */
 	private static class LocalCacheValue {
 		
 		String configValue;
 	}
 	
-	
-	
-	
-	
 	/**
 	 * cached data from config_system table
 	 */
 	private LoadingCache<LocalCacheKey, LocalCacheValue> configSystemDataCache = null;
 	
-	
-	
-	
 	/**
-	 * @param searchIds
-	 * @param filterableDescriptiveAnnotationType
-	 * @param psmPeptideAnnotationType
 	 * @param localCacheKey
 	 * @return
 	 * @throws Exception
 	 */
-	private LocalCacheValue loadFromDB(   
-
-			LocalCacheKey localCacheKey
-
-			) throws Exception {
-		
-
+	private LocalCacheValue loadFromDB( LocalCacheKey localCacheKey ) throws Exception {
 		//  value is NOT in cache so get it and return it
-		
 		String configValue =
 				ConfigSystemDAO.getInstance().getConfigValueForConfigKey(  localCacheKey.configKey );
-		
 		LocalCacheValue localCacheValue = new LocalCacheValue();
-
 		localCacheValue.configValue = configValue;
-		
 		return localCacheValue;
-		
 	}
+
 
 	
 }

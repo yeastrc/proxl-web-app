@@ -7,7 +7,7 @@
 <%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
-<%--  manageConfiguration.jsp --%>
+<%--  configureProxlForAdmin.jsp --%>
 
 
  <c:set var="pageTitle">Manage Configuration</c:set>
@@ -29,7 +29,7 @@
 			
 	<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 
-	<script type="text/javascript" src="${ contextPath }/js/manageConfigurationPage.js?x=${cacheBustValue}"></script> 
+	<script type="text/javascript" src="${ contextPath }/js/configureProxlForAdminPage.js?x=${cacheBustValue}"></script> 
 
  </c:set>
 
@@ -210,6 +210,34 @@
 	</div>
 	
 
+	<div class="top-level-container collapsable_container_jq" >
+	
+		<div  class="collapsable-link-container top-level-collapsable-link-container collapsable_link_container_jq" style="">
+			<a href="javascript:" class="top-level-collapsable-link collapsable_collapse_link_jq" style="display: none;"
+				><img  src="${ contextPath }/images/icon-collapse.png"></a>
+			<a href="javascript:" class="top-level-collapsable-link collapsable_expand_link_jq"
+				><img  src="${ contextPath }/images/icon-expand.png"></a>
+		
+		</div>
+	
+		<div class="top-level-label">
+		  Advanced Proxl Configuration
+		</div>
+	
+		  <div class="advanced-body collapsable_jq " style="display: none;">
+		  	<div >
+		  		Click this when change the "config_system" table in the database directly: 
+				<input type="button" id="clear_cached_config_data_button" 
+									value="Clear Cached Config Data">
+			</div>
+		  	<div >
+		  		Click this when change any data in the database directly:
+				<input type="button" id="clear_all_cached_data_button" 
+									value="Clear All Cached Data">
+			</div>
+		  </div>
+	  </div>
+	</div>
 
 	<%--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --%>
 	

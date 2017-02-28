@@ -8,6 +8,8 @@ import java.util.concurrent.TimeUnit;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 import org.yeastrc.xlink.enum_classes.PsmPeptideAnnotationType;
+import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
+import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
 import org.yeastrc.xlink.www.searcher.AnnotationTypeForSearchIdsSearcher;
 
 import com.google.common.cache.CacheBuilder;
@@ -21,7 +23,7 @@ import com.google.common.cache.LoadingCache;
  * Singleton instance
  *
  */
-public class GetAnnotationTypeData {
+public class GetAnnotationTypeData implements CachedDataCommonIF {
 
 
 //	private static final Logger log = Logger.getLogger(GetAnnotationTypeData.class);
@@ -48,6 +50,18 @@ public class GetAnnotationTypeData {
 	public static GetAnnotationTypeData getInstance() {
 		return _instance; 
 	}
+	
+
+	/* (non-Javadoc)
+	 * @see org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF#clearCacheData()
+	 * 
+	 * Clear all entries from the cache
+	 */
+	@Override
+	public void clearCacheData() throws Exception {
+		annotationTypeDataCache.invalidateAll();
+	}
+
 	
 
 	/**
@@ -174,6 +188,9 @@ public class GetAnnotationTypeData {
 			    		});
 			    
 //			    .build(); // no CacheLoader
+		
+		//  Register this class with the centralized Cached Data Registry, to support centralized cache clearing
+		CachedDataCentralRegistry.getInstance().register( this );
 	}
 	
 	
@@ -293,6 +310,7 @@ public class GetAnnotationTypeData {
 		return localCacheValue;
 		
 	}
+
 
 	
 	

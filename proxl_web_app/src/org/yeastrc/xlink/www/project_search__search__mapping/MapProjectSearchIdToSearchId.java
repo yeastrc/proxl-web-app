@@ -3,6 +3,8 @@ package org.yeastrc.xlink.www.project_search__search__mapping;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
+import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
 import org.yeastrc.xlink.www.searcher.SearchIdForProjectSearchIdSearcher;
 
 import com.google.common.cache.CacheBuilder;
@@ -14,7 +16,7 @@ import com.google.common.cache.LoadingCache;
  * 
  * Singleton Class
  */
-public class MapProjectSearchIdToSearchId {
+public class MapProjectSearchIdToSearchId implements CachedDataCommonIF {
 
 	private static final Logger log = Logger.getLogger(MapProjectSearchIdToSearchId.class);
 	
@@ -31,7 +33,17 @@ public class MapProjectSearchIdToSearchId {
 	 * @return
 	 */
 	public static MapProjectSearchIdToSearchId getInstance() { return _INSTANCE; }
-	
+
+	/* (non-Javadoc)
+	 * @see org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF#clearCacheData()
+	 * 
+	 * Clear all entries from the cache
+	 */
+	@Override
+	public void clearCacheData() throws Exception {
+		projectSearchIdToSearchIdMappingCache.invalidateAll();
+	}
+
 	/**
 	 * @param projectSearchId
 	 * @return - Null if search id not found
@@ -72,6 +84,9 @@ public class MapProjectSearchIdToSearchId {
 			    			}
 			    		});
 //			    .build(); // no CacheLoader
+		
+		//  Register this class with the centralized Cached Data Registry, to support centralized cache clearing
+		CachedDataCentralRegistry.getInstance().register( this );
 	}
 		
 	/**

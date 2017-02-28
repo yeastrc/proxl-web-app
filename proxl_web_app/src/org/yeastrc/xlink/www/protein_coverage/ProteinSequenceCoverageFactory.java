@@ -59,17 +59,17 @@ public class ProteinSequenceCoverageFactory {
 			Map<Integer, ProteinSequenceObject> proteinSequenceObjectsToComputeCoverageFor_KeyedOnProtSeqId = new HashMap<>();
 			for ( ProteinSequenceObject protein : proteinList ) {
 				Integer proteinSequenceId = protein.getProteinSequenceId();
-				ProteinSequenceCoverage coverageInCache = null;
+//				ProteinSequenceCoverage coverageInCache = null;
 				//  First check if in cache and use that
-				coverageInCache = 
-						ProteinSequenceCoverageCacheManager.getInstance()
-						.getProteinSequenceCoverageFromCache( proteinSequenceId, searcherCutoffValuesSearchLevel );
-				if( coverageInCache != null ) {
-					proteinSequenceCoverages_KeyedOnProtId_Map.put( proteinSequenceId, coverageInCache );
-				} else {
+//				coverageInCache = 
+//						ProteinSequenceCoverageCacheManager.getInstance()
+//						.getProteinSequenceCoverageFromCache( proteinSequenceId, searcherCutoffValuesSearchLevel );
+//				if( coverageInCache != null ) {
+//					proteinSequenceCoverages_KeyedOnProtId_Map.put( proteinSequenceId, coverageInCache );
+//				} else {
 					//  Not in cache, add to collection of proteins to compute coverage
 					proteinSequenceObjectsToComputeCoverageFor_KeyedOnProtSeqId.put( proteinSequenceId, protein );
-				}
+//				}
 			}
 			if ( ! proteinSequenceObjectsToComputeCoverageFor_KeyedOnProtSeqId.isEmpty() ) {
 				Map<Integer, ProteinSequenceCoverage> proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages = 
@@ -145,15 +145,15 @@ public class ProteinSequenceCoverageFactory {
 			coverage.addStartEndBoundary( peptideProteinPositionsItem.getProteinStartPosition(), peptideProteinPositionsItem.getProteinEndPosition() );
 		}
 		//  Add computed coverages to cache
-		for ( Map.Entry<Integer, ProteinSequenceCoverage> entry : proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages.entrySet() ) {
-			Integer proteinSequenceId = entry.getKey();
-			ProteinSequenceCoverage coverage = entry.getValue(); 
-			/*
-			 * add coverage object to the cache
-			 */
-			ProteinSequenceCoverageCacheManager.getInstance()
-			.addProteinSequenceCoverageToCache( proteinSequenceId, searcherCutoffValuesSearchLevel, coverage);
-		}
+//		for ( Map.Entry<Integer, ProteinSequenceCoverage> entry : proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages.entrySet() ) {
+//			Integer proteinSequenceId = entry.getKey();
+//			ProteinSequenceCoverage coverage = entry.getValue(); 
+//			/*
+//			 * add coverage object to the cache
+//			 */
+//			ProteinSequenceCoverageCacheManager.getInstance()
+//			.addProteinSequenceCoverageToCache( proteinSequenceId, searcherCutoffValuesSearchLevel, coverage);
+//		}
 		return proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages;
 	}
 }

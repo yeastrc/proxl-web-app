@@ -1099,7 +1099,15 @@ body.manage-configuration-page .manage-config-title { margin-top: 20px; margin-b
 
 body.manage-configuration-page .terms-of-service-config-title { font-weight: bold; font-size: 18px; }
 
+/* "Advanced ..." */
+body.manage-configuration-page .collapsable-link-container { float:left; }
 
+body.manage-configuration-page .top-level-container { margin-top: 20px; clear: left; } 
+body.manage-configuration-page .top-level-collapsable-link-container { padding-top: 5px; }
+body.manage-configuration-page .top-level-collapsable-link {  }
+body.manage-configuration-page .top-level-label { margin-left: 30px; }
+
+body.manage-configuration-page .advanced-body { margin-left: 30px; }
 
 /* -----   Terms of Service  Overlay Div on Manage COnfiguration Page  modal dialog background ----- */
 
