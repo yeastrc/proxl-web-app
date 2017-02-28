@@ -7,25 +7,25 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
-import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosUnlinkedDimerDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosDimerDTO;
 
 
 /**
- * Unlinked or Dimer (Half of a Dimer)
+ * Dimer (Half of a Dimer)
  * 
- * table srch_rep_pept__prot_seq_id_unlinked_dimer
+ * table srch_rep_pept__prot_seq_id_dimer
  *
  */
-public class DB_Insert_SrchRepPeptProtSeqIdPosUnlinkedDimerDAO {
+public class DB_Insert_SrchRepPeptProtSeqIdPosDimerDAO {
 
 
-	private static final Logger log = Logger.getLogger(DB_Insert_SrchRepPeptProtSeqIdPosUnlinkedDimerDAO.class);
+	private static final Logger log = Logger.getLogger(DB_Insert_SrchRepPeptProtSeqIdPosDimerDAO.class);
 
-	private DB_Insert_SrchRepPeptProtSeqIdPosUnlinkedDimerDAO() { }
-	public static DB_Insert_SrchRepPeptProtSeqIdPosUnlinkedDimerDAO getInstance() { return new DB_Insert_SrchRepPeptProtSeqIdPosUnlinkedDimerDAO(); }
+	private DB_Insert_SrchRepPeptProtSeqIdPosDimerDAO() { }
+	public static DB_Insert_SrchRepPeptProtSeqIdPosDimerDAO getInstance() { return new DB_Insert_SrchRepPeptProtSeqIdPosDimerDAO(); }
 
 
-	private static final String INSERT_SQL = "INSERT INTO srch_rep_pept__prot_seq_id_unlinked_dimer "
+	private static final String INSERT_SQL = "INSERT INTO srch_rep_pept__prot_seq_id_dimer "
 
 			+ " ( search_id, reported_peptide_id, search_reported_peptide_peptide_id, "
 			+   " protein_sequence_id )"
@@ -37,7 +37,7 @@ public class DB_Insert_SrchRepPeptProtSeqIdPosUnlinkedDimerDAO {
 	 * @param item
 	 * @throws Exception
 	 */
-	public void save( SrchRepPeptProtSeqIdPosUnlinkedDimerDTO item ) throws Exception {
+	public void save( SrchRepPeptProtSeqIdPosDimerDTO item ) throws Exception {
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;

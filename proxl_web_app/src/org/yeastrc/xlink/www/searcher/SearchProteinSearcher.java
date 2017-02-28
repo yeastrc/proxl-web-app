@@ -38,9 +38,9 @@ public class SearchProteinSearcher {
 		final String sql = 
 				"SELECT DISTINCT protein_sequence_id " 
 						+ " FROM srch_rep_pept__peptide "
-						+ "  INNER JOIN srch_rep_pept__prot_seq_id_unlinked_dimer "
+						+ "  INNER JOIN srch_rep_pept__prot_seq_id_unlinked "
 						+ 	" ON srch_rep_pept__peptide.id = "
-						+ 		" srch_rep_pept__prot_seq_id_unlinked_dimer.search_reported_peptide_peptide_id" 
+						+ 		" srch_rep_pept__prot_seq_id_unlinked.search_reported_peptide_peptide_id" 
 						+ " WHERE srch_rep_pept__peptide.search_id = ? "
 						+ 	" AND srch_rep_pept__peptide.reported_peptide_id = ? "
 						+ 	" AND srch_rep_pept__peptide.peptide_id = ? ";
@@ -109,6 +109,13 @@ public class SearchProteinSearcher {
 	
 	
 
+	/**
+	 * @param search
+	 * @param reportedPeptideId
+	 * @param peptideId
+	 * @return
+	 * @throws Exception
+	 */
 	public List<SearchProteinPosition> getProteinForDimer( SearchDTO search, int reportedPeptideId, int peptideId ) throws Exception {
 		
 		List<SearchProteinPosition> proteinPositions = new ArrayList<SearchProteinPosition>();
@@ -122,9 +129,9 @@ public class SearchProteinSearcher {
 		final String sql = 
 					"SELECT DISTINCT protein_sequence_id " 
 					+ " FROM srch_rep_pept__peptide "
-					+ "  INNER JOIN srch_rep_pept__prot_seq_id_unlinked_dimer "
+					+ "  INNER JOIN srch_rep_pept__prot_seq_id_dimer "
 					+ 	" ON srch_rep_pept__peptide.id = "
-					+ 		" srch_rep_pept__prot_seq_id_unlinked_dimer.search_reported_peptide_peptide_id" 
+					+ 		" srch_rep_pept__prot_seq_id_dimer.search_reported_peptide_peptide_id" 
 					+ " WHERE srch_rep_pept__peptide.search_id = ? "
 					+ 	" AND srch_rep_pept__peptide.reported_peptide_id = ? "
 					+ 	" AND srch_rep_pept__peptide.peptide_id = ? ";

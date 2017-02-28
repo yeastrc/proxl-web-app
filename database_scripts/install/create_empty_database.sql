@@ -1517,31 +1517,6 @@ CREATE INDEX srch_rppp_prt_sq_d_ps_lplnk_srch_rppptpptd ON srch_rep_pept__prot_s
 
 
 -- -----------------------------------------------------
--- Table srch_rep_pept__prot_seq_id_unlinked_dimer
--- -----------------------------------------------------
-DROP TABLE IF EXISTS srch_rep_pept__prot_seq_id_unlinked_dimer ;
-
-CREATE TABLE  srch_rep_pept__prot_seq_id_unlinked_dimer (
-  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  search_id INT UNSIGNED NOT NULL,
-  reported_peptide_id INT UNSIGNED NOT NULL,
-  search_reported_peptide_peptide_id INT UNSIGNED NOT NULL,
-  protein_sequence_id INT UNSIGNED NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT srch_rppp_prt_sq_d_ps_unlnkd_srch_rppptpptd
-    FOREIGN KEY (search_reported_peptide_peptide_id)
-    REFERENCES srch_rep_pept__peptide (id)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB
-COMMENT = 'Each entry is a mapping of a peptide entry in the table srch_rep_pept__peptide\nto a protein.\n\nLike in srch_rep_pept__peptide, for Dimer, each entry in this table is for one half of the Dimer.';
-
-CREATE INDEX search_rep_pept_idx ON srch_rep_pept__prot_seq_id_unlinked_dimer (search_id ASC, reported_peptide_id ASC);
-
-CREATE INDEX srch_rppp_prt_sq_d_ps_unlnkd_srch_rppptpptd ON srch_rep_pept__prot_seq_id_unlinked_dimer (search_reported_peptide_peptide_id ASC);
-
-
--- -----------------------------------------------------
 -- Table protein_sequence
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS protein_sequence ;
@@ -2114,6 +2089,56 @@ CREATE TABLE  folder_project_search (
 ENGINE = InnoDB;
 
 CREATE INDEX folder_project_search_folder_id_idx ON folder_project_search (folder_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table srch_rep_pept__prot_seq_id_unlinked
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS srch_rep_pept__prot_seq_id_unlinked ;
+
+CREATE TABLE  srch_rep_pept__prot_seq_id_unlinked (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  search_id INT UNSIGNED NOT NULL,
+  reported_peptide_id INT UNSIGNED NOT NULL,
+  search_reported_peptide_peptide_id INT UNSIGNED NOT NULL,
+  protein_sequence_id INT UNSIGNED NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT srch_rppp_prt_sq_d_ps_unlnkd_srch_rppptpptd0
+    FOREIGN KEY (search_reported_peptide_peptide_id)
+    REFERENCES srch_rep_pept__peptide (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+COMMENT = 'Each entry is a mapping of a peptide entry in the table srch_rep_pept__peptide\nto a protein.\n';
+
+CREATE INDEX search_rep_pept_idx ON srch_rep_pept__prot_seq_id_unlinked (search_id ASC, reported_peptide_id ASC);
+
+CREATE INDEX srch_rppp_prt_sq_d_ps_unlnkd_srch_rppptpptd ON srch_rep_pept__prot_seq_id_unlinked (search_reported_peptide_peptide_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table srch_rep_pept__prot_seq_id_dimer
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS srch_rep_pept__prot_seq_id_dimer ;
+
+CREATE TABLE  srch_rep_pept__prot_seq_id_dimer (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  search_id INT UNSIGNED NOT NULL,
+  reported_peptide_id INT UNSIGNED NOT NULL,
+  search_reported_peptide_peptide_id INT UNSIGNED NOT NULL,
+  protein_sequence_id INT UNSIGNED NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT srch_rppp_prt_sq_d_ps_unlnkd_srch_rppptpptd1
+    FOREIGN KEY (search_reported_peptide_peptide_id)
+    REFERENCES srch_rep_pept__peptide (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+COMMENT = 'Each entry is a mapping of a peptide entry in the table srch_rep_pept__peptide\nto a protein.\n\nLike in srch_rep_pept__peptide, for Dimer, each entry in this table is for one half of the Dimer.';
+
+CREATE INDEX search_rep_pept_idx ON srch_rep_pept__prot_seq_id_dimer (search_id ASC, reported_peptide_id ASC);
+
+CREATE INDEX srch_rppp_prt_sq_d_ps_unlnkd_srch_rppptpptd ON srch_rep_pept__prot_seq_id_dimer (search_reported_peptide_peptide_id ASC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

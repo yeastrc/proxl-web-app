@@ -1,13 +1,13 @@
-package org.yeastrc.xlink.www.dto;
+package org.yeastrc.proxl.import_xml_to_db.dto;
 
 
 /**
- * Unlinked or Dimer (Half of a Dimer)
+ * Dimer (Half of a Dimer)
  * 
- * table srch_rep_pept__prot_seq_id_unlinked_dimer
+ * table srch_rep_pept__prot_seq_id_dimer
  *
  */
-public class SrchRepPeptProtSeqIdPosUnlinkedDimerDTO {
+public class SrchRepPeptProtSeqIdPosDimerDTO {
 
 	private int id;
 	private int searchId;
@@ -17,10 +17,11 @@ public class SrchRepPeptProtSeqIdPosUnlinkedDimerDTO {
 	
 	@Override
 	public String toString() {
-		return "SrchRepPeptProtSeqIdPosUnlinkedDimerDTO [id=" + id + ", searchId="
-				+ searchId + ", reportedPeptideId=" + reportedPeptideId
-				+ ", searchReportedPeptidepeptideId="
-				+ searchReportedPeptidepeptideId + ", proteinSequenceId=" + proteinSequenceId + "]";
+		return "SrchRepPeptProteinSequenceIdPosDimerDTO [id=" + id
+				+ ", searchId=" + searchId + ", reportedPeptideId="
+				+ reportedPeptideId + ", searchReportedPeptidepeptideId="
+				+ searchReportedPeptidepeptideId + ", proteinSequenceId=" + proteinSequenceId
+				+ "]";
 	}
 	
 	
@@ -54,6 +55,7 @@ public class SrchRepPeptProtSeqIdPosUnlinkedDimerDTO {
 	public void setProteinSequenceId(int proteinSequenceId) {
 		this.proteinSequenceId = proteinSequenceId;
 	}
+
 
 		
 }

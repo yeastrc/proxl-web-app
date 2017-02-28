@@ -10,12 +10,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProteinImporterContainerDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReportedPeptideDynamicModLookupDAO;
-import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptProtSeqIdPosUnlinkedDimerDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptProtSeqIdPosUnlinkedDAO;
 import org.yeastrc.proxl.import_xml_to_db.dto.PeptideProteinPositionDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDynamicModLookupDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosMonolinkDTO;
-import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosUnlinkedDimerDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosUnlinkedDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
@@ -85,7 +85,7 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 		
 		ProteinImporterContainer proteinImporterContainer;
 		
-		SrchRepPeptProtSeqIdPosUnlinkedDimerDTO srchRepPeptProtSeqIdPosUnlinkedDimer;
+		SrchRepPeptProtSeqIdPosUnlinkedDTO srchRepPeptProtSeqIdPosUnlinkedDimer;
 
 		Collection<Integer> peptidePositionsInProteinCollection;
 	}
@@ -221,7 +221,7 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 			Collection<Integer> peptidePositionsInProteinCollection = proteinMapEntry.getValue();
 			
 			// a single unlinked entry
-			SrchRepPeptProtSeqIdPosUnlinkedDimerDTO srchRepPeptProtSeqIdPosUnlinkedDimerDTO = new SrchRepPeptProtSeqIdPosUnlinkedDimerDTO();
+			SrchRepPeptProtSeqIdPosUnlinkedDTO srchRepPeptProtSeqIdPosUnlinkedDimerDTO = new SrchRepPeptProtSeqIdPosUnlinkedDTO();
 
 			SrchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair = new SrchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair(); 
 			
@@ -336,7 +336,7 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 
 			ProteinSequenceDTO proteinSequenceDTO = proteinImporterContainer.getProteinSequenceDTO();
 			
-			SrchRepPeptProtSeqIdPosUnlinkedDimerDTO srchRepPeptProtSeqIdPosUnlinkedDimerDTO = srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair.srchRepPeptProtSeqIdPosUnlinkedDimer;
+			SrchRepPeptProtSeqIdPosUnlinkedDTO srchRepPeptProtSeqIdPosUnlinkedDimerDTO = srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair.srchRepPeptProtSeqIdPosUnlinkedDimer;
 			
 			srchRepPeptProtSeqIdPosUnlinkedDimerDTO.setProteinSequenceId( proteinSequenceDTO.getId() );
 			
@@ -344,7 +344,7 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 			srchRepPeptProtSeqIdPosUnlinkedDimerDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
 			srchRepPeptProtSeqIdPosUnlinkedDimerDTO.setSearchReportedPeptidepeptideId( searchReportedPeptidepeptideId );
 			
-			DB_Insert_SrchRepPeptProtSeqIdPosUnlinkedDimerDAO.getInstance().save( srchRepPeptProtSeqIdPosUnlinkedDimerDTO );
+			DB_Insert_SrchRepPeptProtSeqIdPosUnlinkedDAO.getInstance().save( srchRepPeptProtSeqIdPosUnlinkedDimerDTO );
 			
 
 			//  Insert PeptideProteinPositionDTO record for protein coverage
@@ -416,7 +416,7 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 			SrchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair firstSrchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair =
 					srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_PairList_Peptide.get( 0 );
 
-			SrchRepPeptProtSeqIdPosUnlinkedDimerDTO firstSrchRepPeptProtSeqIdPosUnlinkedDimerDTO = firstSrchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair.srchRepPeptProtSeqIdPosUnlinkedDimer;
+			SrchRepPeptProtSeqIdPosUnlinkedDTO firstSrchRepPeptProtSeqIdPosUnlinkedDimerDTO = firstSrchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair.srchRepPeptProtSeqIdPosUnlinkedDimer;
 
 			int firstProteinSequenceId = firstSrchRepPeptProtSeqIdPosUnlinkedDimerDTO.getProteinSequenceId();
 			

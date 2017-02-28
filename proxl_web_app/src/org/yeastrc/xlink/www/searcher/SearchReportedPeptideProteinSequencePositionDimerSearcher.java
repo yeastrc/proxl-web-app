@@ -8,30 +8,34 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosUnlinkedDimerDTO;
+import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosDimerDTO;
 
-public class SearchReportedPeptideProteinSequencePositionUnlinkedDimerSearcher {
+/**
+ * table srch_rep_pept__prot_seq_id_dimer
+ * WHERE search_id = ? AND reported_peptide_id = ?
+ */
+public class SearchReportedPeptideProteinSequencePositionDimerSearcher {
 
-	private static final Logger log = Logger.getLogger( SearchReportedPeptideProteinSequencePositionUnlinkedDimerSearcher.class );
+	private static final Logger log = Logger.getLogger( SearchReportedPeptideProteinSequencePositionDimerSearcher.class );
 	
-	private SearchReportedPeptideProteinSequencePositionUnlinkedDimerSearcher() { }
-	private static final SearchReportedPeptideProteinSequencePositionUnlinkedDimerSearcher _INSTANCE = new SearchReportedPeptideProteinSequencePositionUnlinkedDimerSearcher();
-	public static SearchReportedPeptideProteinSequencePositionUnlinkedDimerSearcher getInstance() { return _INSTANCE; }
+	private SearchReportedPeptideProteinSequencePositionDimerSearcher() { }
+	private static final SearchReportedPeptideProteinSequencePositionDimerSearcher _INSTANCE = new SearchReportedPeptideProteinSequencePositionDimerSearcher();
+	public static SearchReportedPeptideProteinSequencePositionDimerSearcher getInstance() { return _INSTANCE; }
 	
 	
-	private static final String getSrchRepPeptProtSeqIdPosUnlinkedDimerDTOList_SQL = 
-			"SELECT * FROM srch_rep_pept__prot_seq_id_unlinked_dimer WHERE search_id = ? AND reported_peptide_id = ?";
+	private static final String getSrchRepPeptProtSeqIdPosDimerDTOList_SQL = 
+			"SELECT * FROM srch_rep_pept__prot_seq_id_dimer WHERE search_id = ? AND reported_peptide_id = ?";
 
-	public List<SrchRepPeptProtSeqIdPosUnlinkedDimerDTO> getSrchRepPeptProtSeqIdPosUnlinkedDimerDTOList( int searchId, int reportedPeptideId ) throws Exception {
+	public List<SrchRepPeptProtSeqIdPosDimerDTO> getSrchRepPeptProtSeqIdPosDimerDTOList( int searchId, int reportedPeptideId ) throws Exception {
 		
-		List<SrchRepPeptProtSeqIdPosUnlinkedDimerDTO> results = new ArrayList<>();
+		List<SrchRepPeptProtSeqIdPosDimerDTO> results = new ArrayList<>();
 
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		final String sql = getSrchRepPeptProtSeqIdPosUnlinkedDimerDTOList_SQL;
+		final String sql = getSrchRepPeptProtSeqIdPosDimerDTOList_SQL;
 
 		
 		try {
@@ -52,7 +56,7 @@ public class SearchReportedPeptideProteinSequencePositionUnlinkedDimerSearcher {
 
 			while( rs.next() ) {
 		
-				SrchRepPeptProtSeqIdPosUnlinkedDimerDTO item = new SrchRepPeptProtSeqIdPosUnlinkedDimerDTO();
+				SrchRepPeptProtSeqIdPosDimerDTO item = new SrchRepPeptProtSeqIdPosDimerDTO();
 		
 				item.setId( rs.getInt( "id" ) );
 				item.setSearchId( rs.getInt( "search_id" ) );

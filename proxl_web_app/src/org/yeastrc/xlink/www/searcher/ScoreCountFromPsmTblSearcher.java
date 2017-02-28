@@ -381,21 +381,38 @@ public class ScoreCountFromPsmTblSearcher {
 			String searchIdString,
 			String includeProteinSequenceIdsCommaDelim ) {
 
-		String tableName = null;
-		if ( linkType == LinkType.CROSSLINK ) {
-			tableName = "srch_rep_pept__prot_seq_id_pos_crosslink";
-		} else if ( linkType == LinkType.LOOPLINK ) {
-			tableName = "srch_rep_pept__prot_seq_id_pos_looplink ";
+		if ( linkType == LinkType.UNLINKED ) {
+			
+			String sql = 
+					" SELECT reported_peptide_id FROM "
+					+ "srch_rep_pept__prot_seq_id_unlinked"
+					+ "\n WHERE search_id = " + searchIdString
+					+ "\n AND protein_sequence_id IN ( " + includeProteinSequenceIdsCommaDelim + " ) \n"
+					+ "UNION DISTINCT \n" 
+					+ " SELECT reported_peptide_id FROM "
+					+ "srch_rep_pept__prot_seq_id_dimer"
+					+ "\n WHERE search_id = " + searchIdString
+					+ "\n AND protein_sequence_id IN ( " + includeProteinSequenceIdsCommaDelim + " ) \n";
+
+			return sql;
+
 		} else {
-			tableName = "srch_rep_pept__prot_seq_id_unlinked_dimer";
+
+			String tableName = null;
+			
+			if ( linkType == LinkType.CROSSLINK ) {
+				tableName = "srch_rep_pept__prot_seq_id_pos_crosslink";
+			} else if ( linkType == LinkType.LOOPLINK ) {
+				tableName = "srch_rep_pept__prot_seq_id_pos_looplink ";
+			}
+
+			String sql = " SELECT DISTINCT reported_peptide_id FROM "
+					+ tableName
+					+ "\n WHERE search_id = " + searchIdString
+					+ "\n AND protein_sequence_id IN ( " + includeProteinSequenceIdsCommaDelim + " ) \n";
+
+			return sql;
 		}
-
-		String sql = " SELECT DISTINCT reported_peptide_id FROM "
-				+ tableName
-				+ "\n WHERE search_id = " + searchIdString
-				+ "\n AND protein_sequence_id IN ( " + includeProteinSequenceIdsCommaDelim + " ) \n";
-
-		return sql;
 	}
 	
 
@@ -448,72 +465,36 @@ public class ScoreCountFromPsmTblSearcher {
 
 			//  "Unlinked"    Unlinked and Dimer
 
-			//   For both, inner join to search_reported_peptide to get link type
 
-			//  Dimer - Similar to Crosslink but each half of the dimer is a sub select with 
-			//          srch_rep_pept__prot_seq_id_unlinked_dimer joined to search_reported_peptide 
-			//          to only retrieve dimer reported peptide ids
+			//  For Dimer, the table srch_rep_pept__prot_seq_id_dimer is joined to itself
+			//   Only reported peptide ids that are in both halves after excluding protein sequence ids 
+			//   are in the result
 			
-			//          These sub selects are then INNER JOIN to get reported peptide ids for Dimer
-			//          since a reported peptide id has to be in both query results to be included in the result
+			sql = " SELECT DISTINCT dimer_half_1.reported_peptide_id  \n" 
+					+  " FROM  srch_rep_pept__prot_seq_id_dimer AS dimer_half_1  \n" 
+					+  " INNER JOIN  srch_rep_pept__prot_seq_id_dimer AS dimer_half_2 \n" 
+					+   " ON dimer_half_1.search_id = dimer_half_2.search_id\n" 
+					+   " AND dimer_half_1.reported_peptide_id = dimer_half_2.reported_peptide_id \n" 
+					+   " WHERE dimer_half_1.search_reported_peptide_peptide_id \n" 
+					+   " != dimer_half_2.search_reported_peptide_peptide_id \n" 
+					+ " AND dimer_half_1.search_id = " + searchIdString 
+					+   "\n AND dimer_half_1.protein_sequence_id NOT IN ( "  
+					+                 excludeProteinSequenceIdsCommaDelim + " ) \n"
+					+   " AND dimer_half_2.protein_sequence_id NOT IN ( " 
+					+                 excludeProteinSequenceIdsCommaDelim + " ) \n"
 
-			sql = " SELECT DISTINCT pept_prot_1.reported_peptide_id  \n" 
-			+  " FROM \n" 
-
-			// Sub select to get only dimer records from srch_rep_pept__prot_seq_id_unlinked_dimer
-			+ " ( \n" 
-			+   " SELECT pept_prot.* \n" 
-			+   " FROM srch_rep_pept__prot_seq_id_unlinked_dimer AS pept_prot \n" 
-			+   " INNER JOIN search_reported_peptide as srp \n" 
-			+   "  ON pept_prot.search_id = srp.search_id \n" 
-			+   	"  AND pept_prot.reported_peptide_id = srp.reported_peptide_id \n" 
-			+   "  WHERE srp.link_type = '" +   XLinkUtils.DIMER_TYPE_STRING +   "' " 
-			+   	" AND pept_prot.search_id = " + searchIdString 
-			+ "\n ) AS pept_prot_1  \n" 
-
-			+   " INNER JOIN \n " 
-
-			// Sub select to get only dimer records from srch_rep_pept__prot_seq_id_unlinked_dimer
-			+ " ( \n" 
-			+   " SELECT pept_prot.* \n" 
-			+   " FROM srch_rep_pept__prot_seq_id_unlinked_dimer AS pept_prot \n" 
-			+   " INNER JOIN search_reported_peptide as srp \n" 
-			+   "  ON pept_prot.search_id = srp.search_id \n" 
-			+   	"  AND pept_prot.reported_peptide_id = srp.reported_peptide_id \n" 
-			+   "  WHERE srp.link_type = '" 
-			+   XLinkUtils.DIMER_TYPE_STRING 
-			+   "' " 
-			+   " AND pept_prot.search_id = " + searchIdString 
-			+ "\n ) AS pept_prot_2  \n" 	
-
-			+   " ON pept_prot_1.search_id = pept_prot_2.search_id\n" 
-			+   " AND pept_prot_1.reported_peptide_id = pept_prot_2.reported_peptide_id \n" 
-			+   " WHERE pept_prot_1.search_reported_peptide_peptide_id \n" 
-			+   " != pept_prot_2.search_reported_peptide_peptide_id \n" 
-			+ " AND pept_prot_1.search_id = " + searchIdString 
-			+   "\n AND pept_prot_1.protein_sequence_id NOT IN ( "  
-			+                 excludeProteinSequenceIdsCommaDelim + " ) \n"
-			+   " AND pept_prot_2.protein_sequence_id NOT IN ( " 
-			+                 excludeProteinSequenceIdsCommaDelim + " ) \n"
-			
-			//  UNION dimer reported peptide ids and unlinked reported peptide ids
+//			//  UNION dimer reported peptide ids and unlinked reported peptide ids
 
 			+ " UNION DISTINCT \n"  
 
-			//  Unlinked - Similar to Looplink but with 
-			//          srch_rep_pept__prot_seq_id_unlinked_dimer joined to search_reported_peptide 
-			//          to only retrieve unlinked reported peptide ids
-
-			+   " SELECT pept_prot.reported_peptide_id \n" 
-			+   " FROM srch_rep_pept__prot_seq_id_unlinked_dimer AS pept_prot \n" 
-			+   " INNER JOIN search_reported_peptide as srp \n" 
-			+   "  ON pept_prot.search_id = srp.search_id \n" 
-			+   	"  AND pept_prot.reported_peptide_id = srp.reported_peptide_id \n" 
-			+   "  WHERE srp.link_type = '" +   XLinkUtils.UNLINKED_TYPE_STRING	+   "' " 
-			+   " AND pept_prot.search_id = " + searchIdString 
-			+   "\n AND pept_prot.protein_sequence_id NOT IN ( "  
-			+                 excludeProteinSequenceIdsCommaDelim + " ) \n";
-
+			//  For Unlinked, it is a simple query excluding the protein sequence ids
+			
+			+ " SELECT DISTINCT reported_peptide_id  \n" 
+					+  " FROM  srch_rep_pept__prot_seq_id_unlinked \n" 
+					+   " WHERE search_id = " + searchIdString 
+					+   "\n AND protein_sequence_id NOT IN ( "  
+					+                 excludeProteinSequenceIdsCommaDelim + " ) \n";
+			
 		}
 	
 		return sql;
