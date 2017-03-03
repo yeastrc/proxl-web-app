@@ -52,15 +52,21 @@
   
     <action-mappings>
 		
-		<action path="/clearAllCacheDFUIEWORU"
-				type="org.yeastrc.xlink.www.actions.ClearAllCacheAction"
+		<action path="/cacheDataAllLogCurrentCacheSizesDFUIEWORU"
+				type="org.yeastrc.xlink.www.actions.CacheDataAllLogCurrentCacheSizesAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/clearAllConfigCacheSuccess.jsp" redirect="false"/>
+		</action>			
+		<action path="/cacheDataClearAllDFUIEWORU"
+				type="org.yeastrc.xlink.www.actions.CacheDataClearAllAction"
 				scope="request"
 				validate="false">
 		    <forward name="Success" path="/WEB-INF/jsp-pages/clearAllConfigCacheSuccess.jsp" redirect="false"/>
 		</action>			
 		
-		<action path="/clearAllConfigCacheDFUIEWORU"
-				type="org.yeastrc.xlink.www.actions.ClearAllConfigCacheAction"
+		<action path="/cacheDataClearConfigDataDFUIEWORU"
+				type="org.yeastrc.xlink.www.actions.CacheDataClearConfigDataAction"
 				scope="request"
 				validate="false">
 		    <forward name="Success" path="/WEB-INF/jsp-pages/clearAllConfigCacheSuccess.jsp" redirect="false"/>

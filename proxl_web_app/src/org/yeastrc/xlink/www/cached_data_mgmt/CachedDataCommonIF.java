@@ -8,4 +8,6 @@ package org.yeastrc.xlink.www.cached_data_mgmt;
 public interface CachedDataCommonIF {
 
 	public void clearCacheData() throws Exception;
+	
+	public CacheCurrentSizeMaxSizeResult getCurrentCacheSizeAndMax() throws Exception;
 }

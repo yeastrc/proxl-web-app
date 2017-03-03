@@ -1,3 +1,4 @@
+<%@page import="org.yeastrc.xlink.www.constants.CacheSizeConfigStringsConstants"%>
 <%@page import="org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsValuesSharedConstants"%>
 <%@page import="org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants"%>
 <%@page import="org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants"%>
@@ -235,9 +236,16 @@
 				<input type="button" id="clear_all_cached_data_button" 
 									value="Clear All Cached Data">
 			</div>
+		  	<div >
+		  		Click this to have current sizes of data caches to the log file:
+				<input type="button" id="write_all_data_cache_sizes_to_log_button" 
+									value="Write Cached Data Sizes to log">
+			</div>			
+			
 		  </div>
 	  </div>
-	</div>
+
+  </div>  <%--  Close <div class="overall-enclosing-block">  --%>
 
 	<%--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --%>
 	
@@ -307,8 +315,15 @@
 
 
 
-  </div>  <%--  Close <div class="overall-enclosing-block">  --%>
-
-  
+<script type="text/text">
+<!--
+	Values for key "cache_size_config_label":
+  "<%= CacheSizeConfigStringsConstants.CACHE_SIZE_VALUE_FULL %>"
+  "<%= CacheSizeConfigStringsConstants.CACHE_SIZE_VALUE_HALF %>"
+  "<%= CacheSizeConfigStringsConstants.CACHE_SIZE_VALUE_SMALL %>"
+  "<%= CacheSizeConfigStringsConstants.CACHE_SIZE_VALUE_FEW %>"
+	
+//-->
+</script>
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>
 

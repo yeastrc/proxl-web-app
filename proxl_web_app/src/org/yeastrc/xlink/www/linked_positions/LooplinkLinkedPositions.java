@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -27,11 +26,14 @@ import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
 import org.yeastrc.xlink.www.objects.SearchProteinLooplinkWrapper;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
-import org.yeastrc.xlink.www.searcher.Get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Searcher;
-import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher;
-import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher.ReturnOnlyReportedPeptidesWithMonolinks;
+import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request;
+import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_ReqParams;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Result;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_Result;
 import org.yeastrc.xlink.www.searcher.SearchPeptideLooplink_LinkedPosition_Searcher;
-import org.yeastrc.xlink.www.searcher.SearchReportedPeptideProteinSequencePositionLooplinkSearcher;
 
 /**
  *  Build lists of various objects for looplink data from linked positions tables
@@ -42,18 +44,18 @@ import org.yeastrc.xlink.www.searcher.SearchReportedPeptideProteinSequencePositi
 public class LooplinkLinkedPositions {
 	
 	private static final Logger log = Logger.getLogger(LooplinkLinkedPositions.class);
-
+	
 	private LooplinkLinkedPositions() { }
+	
 	private static final LooplinkLinkedPositions _INSTANCE = new LooplinkLinkedPositions();
+	
 	public static LooplinkLinkedPositions getInstance() { return _INSTANCE; }
 	
 	private static class RepPept_Stage_1_Wrapper {
-		
 		List<WebReportedPeptideWrapper> webReportedPeptideWrapperList = new ArrayList<>();;
 	}
 	
 	private static enum PeptidePsm { PEPTIDE, PSM }
-	
 	
 	/**
 	 * @param search
@@ -62,142 +64,91 @@ public class LooplinkLinkedPositions {
 	 * @throws Exception
 	 */
 	public List<SearchProteinLooplinkWrapper> getSearchProteinLooplinkWrapperList( SearchDTO search, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
-	
+		
 		int searchId = search.getSearchId();
-		
 		String[] linkTypesLooplink = { PeptideViewLinkTypesConstants.LOOPLINK_PSM };
-
 		List<WebReportedPeptideWrapper> wrappedPeptidelinks =
-				PeptideWebPageSearcher.getInstance()
-				.searchOnSearchIdPsmCutoffPeptideCutoff( search, searcherCutoffValuesSearchLevel, linkTypesLooplink, null /* modMassSelections */, ReturnOnlyReportedPeptidesWithMonolinks.NO );
-	
-		
+				PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
+						search, searcherCutoffValuesSearchLevel, linkTypesLooplink, null /* modMassSelections */, 
+						PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
 		//  Build a structure of SrchRepPeptProtSeqIdPosDTO
 		//  Mapped on Reported Peptide Id, searchReportedPeptidepeptideId (PK table srch_rep_pept__peptide)
-		
-		SearchReportedPeptideProteinSequencePositionLooplinkSearcher searchReportedPeptideProteinSequencePositionLooplinkSearcher =
-				SearchReportedPeptideProteinSequencePositionLooplinkSearcher.getInstance();
-		
+		Cached_SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId cached_SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId =
+				Cached_SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId.getInstance();
 		//  Process into Map of protein, position 1, position 2 objects
-		
 		//     The innermost Map contains a RepPept_Stage_1_Wrapper object 
 		//              which currently contains List<WebReportedPeptideWrapper> webReportedPeptideWrapperList
 		//
-		
 		Map<Integer,Map<Integer,Map<Integer,RepPept_Stage_1_Wrapper>>> repPept_Stage_1_Wrapper_MappedProtPos1Pos2 = new HashMap<>();
-		
-		
 		for ( WebReportedPeptideWrapper wrappedPeptidelink : wrappedPeptidelinks ) {
-			
 			WebReportedPeptide webReportedPeptide = wrappedPeptidelink.getWebReportedPeptide();
-			
 			Integer reportedPeptideId = webReportedPeptide.getReportedPeptideId();
-			
-			List<SrchRepPeptProtSeqIdPosLooplinkDTO> srchRepPeptProtSeqIdPosLooplinkDTOList = searchReportedPeptideProteinSequencePositionLooplinkSearcher.getSrchRepPeptProtSeqIdPosLooplinkDTOList( searchId, reportedPeptideId );
-			
+			SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_ReqParams reqParams = new SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_ReqParams();
+			reqParams.setSearchId( searchId );
+			reqParams.setReportedPeptideId( reportedPeptideId );
+			SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_Result result =
+					cached_SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId.getSrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_Result( reqParams );
+			List<SrchRepPeptProtSeqIdPosLooplinkDTO> srchRepPeptProtSeqIdPosLooplinkDTOList =
+					result.getSrchRepPeptProtSeqIdPosLooplinkDTOList();
 			for ( SrchRepPeptProtSeqIdPosLooplinkDTO srchRepPeptProtSeqIdPosLooplinkDTO : srchRepPeptProtSeqIdPosLooplinkDTOList ) {
-			
-
 				//  Process into Map of protein, position 1, position 2 objects
-
 				// Map<Integer,Map<Integer,Map<Integer,RepPept_Stage_1_Wrapper>>> repPept_Stage_1_Wrapper_MappedProtPos1Pos2 = new HashMap<>();
-				
-
 				Map<Integer,Map<Integer,RepPept_Stage_1_Wrapper>> repPept_Stage_1_Wrapper_MappedPos1Pos2 =
 						repPept_Stage_1_Wrapper_MappedProtPos1Pos2.get( srchRepPeptProtSeqIdPosLooplinkDTO.getProteinSequenceId() );
-
 				if ( repPept_Stage_1_Wrapper_MappedPos1Pos2 == null ) {
-
 					repPept_Stage_1_Wrapper_MappedPos1Pos2 = new HashMap<>();
 					repPept_Stage_1_Wrapper_MappedProtPos1Pos2.put( srchRepPeptProtSeqIdPosLooplinkDTO.getProteinSequenceId(), repPept_Stage_1_Wrapper_MappedPos1Pos2 );
 				}
-
-				
-				
 				Map<Integer,RepPept_Stage_1_Wrapper> repPept_Stage_1_Wrapper_MappedPos2 =
 						repPept_Stage_1_Wrapper_MappedPos1Pos2.get( srchRepPeptProtSeqIdPosLooplinkDTO.getProteinSequencePosition_1() );
-
 				if ( repPept_Stage_1_Wrapper_MappedPos2 == null ) {
-
 					repPept_Stage_1_Wrapper_MappedPos2 = new HashMap<>();
 					repPept_Stage_1_Wrapper_MappedPos1Pos2.put( srchRepPeptProtSeqIdPosLooplinkDTO.getProteinSequencePosition_1(), repPept_Stage_1_Wrapper_MappedPos2 );
 				}
-
-
 				RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper = repPept_Stage_1_Wrapper_MappedPos2.get( srchRepPeptProtSeqIdPosLooplinkDTO.getProteinSequencePosition_2() );
-
 				if ( repPept_Stage_1_Wrapper == null ) {
-
 					repPept_Stage_1_Wrapper = new RepPept_Stage_1_Wrapper();
 					repPept_Stage_1_Wrapper_MappedPos2.put( srchRepPeptProtSeqIdPosLooplinkDTO.getProteinSequencePosition_2(), repPept_Stage_1_Wrapper );
 				}
-
 				boolean reportedPeptideIdAlreadyInList = false;
-
 				for ( WebReportedPeptideWrapper itemInList : repPept_Stage_1_Wrapper.webReportedPeptideWrapperList ) {
-
 					if ( itemInList.getWebReportedPeptide().getReportedPeptideId() == reportedPeptideId.intValue() ) {
-
 						reportedPeptideIdAlreadyInList = true;
 					}
 				}
-
 				if ( reportedPeptideIdAlreadyInList ) {
-
 					continue;  //  EARLY CONTINUE    skip since this reported peptide is already in this list
 				}
-
 				repPept_Stage_1_Wrapper.webReportedPeptideWrapperList.add( wrappedPeptidelink );
-				
 			}
 		}
 		
-		
 		////////////////////////////
-		
 		Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map = new HashMap<>();
-		
-
-
 		List<SearchProteinLooplinkWrapper> wrappedLinks = new ArrayList<>();
-
-		
 		
 		//  Process Map of protein, position 1, position 2 objects
-
 		//     The innermost Map contains a RepPept_Stage_1_Wrapper object 
 		//              which currently contains List<WebReportedPeptideWrapper> webReportedPeptideWrapperList
 		//
-
 		// Map<Integer,Map<Integer,Map<Integer,RepPept_Stage_1_Wrapper>>> repPept_Stage_1_Wrapper_MappedProtPos1Pos2 = new HashMap<>();
-		
 		for ( Map.Entry<Integer,Map<Integer,Map<Integer,RepPept_Stage_1_Wrapper>>> repPept_Stage_1_Wrapper_MappedProtPos1Pos2_Entry :
-			repPept_Stage_1_Wrapper_MappedProtPos1Pos2.entrySet() ) {
-		
-			Integer proteinId = repPept_Stage_1_Wrapper_MappedProtPos1Pos2_Entry.getKey();
 			
+			repPept_Stage_1_Wrapper_MappedProtPos1Pos2.entrySet() ) {
+			Integer proteinId = repPept_Stage_1_Wrapper_MappedProtPos1Pos2_Entry.getKey();
 			Map<Integer,Map<Integer,RepPept_Stage_1_Wrapper>> repPept_Stage_1_Wrapper_MappedPos1Pos2 =
 					repPept_Stage_1_Wrapper_MappedProtPos1Pos2_Entry.getValue();
-
 			for ( Map.Entry<Integer,Map<Integer,RepPept_Stage_1_Wrapper>> repPept_Stage_1_Wrapper_MappedPos1Pos2_Entry :
 				repPept_Stage_1_Wrapper_MappedPos1Pos2.entrySet() ) {
-
 				Integer proteinPosition_1 = repPept_Stage_1_Wrapper_MappedPos1Pos2_Entry.getKey();
-
 				Map<Integer,RepPept_Stage_1_Wrapper> repPept_Stage_1_Wrapper_MappedPos2 =
 						repPept_Stage_1_Wrapper_MappedPos1Pos2_Entry.getValue();
-
 				for ( Map.Entry<Integer,RepPept_Stage_1_Wrapper> repPept_Stage_1_Wrapper_MappedPos2_Entry :
 					repPept_Stage_1_Wrapper_MappedPos2.entrySet() ) {
-
 					Integer proteinPosition_2 = repPept_Stage_1_Wrapper_MappedPos2_Entry.getKey();
-
 					RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper =
 							repPept_Stage_1_Wrapper_MappedPos2_Entry.getValue();
-
-
 					SearchProteinLooplinkWrapper searchProteinLooplinkWrapper =
-
 							populateSearchProteinLooplinkWrapper(
 									search, 
 									searcherCutoffValuesSearchLevel,
@@ -206,25 +157,16 @@ public class LooplinkLinkedPositions {
 									proteinPosition_2, 
 									searchProtein_KeyOn_PROT_SEQ_ID_Map,
 									repPept_Stage_1_Wrapper );
-
-
 					if ( searchProteinLooplinkWrapper == null ) {
-
 						//  !!!!!!!   This isn't really a Protein that meets the cutoffs
-
 						continue;  //  EARY LOOP ENTRY EXIT
 					}
-
 					wrappedLinks.add( searchProteinLooplinkWrapper );
-					
 				}
 			}
 		}
-		
-
 		return wrappedLinks;
 	}
-	
 	
 	/**
 	 * @param search
@@ -243,11 +185,8 @@ public class LooplinkLinkedPositions {
 			int position1, 
 			int position2 ) throws Exception {
 		
-
 		Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map = new HashMap<>();
-		
 		RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper = new RepPept_Stage_1_Wrapper();
-		
 		List<SearchPeptideLooplinkAnnDataWrapper> searchPeptideLooplinkAnnDataWrapper_List = 
 				SearchPeptideLooplink_LinkedPosition_Searcher.getInstance()
 				.searchOnSearchProteinLooplink( 
@@ -256,33 +195,20 @@ public class LooplinkLinkedPositions {
 						protein.getProteinSequenceId(), 
 						position1, 
 						position2 );
-
 		for ( SearchPeptideLooplinkAnnDataWrapper searchPeptideLooplinkAnnDataWrapper : searchPeptideLooplinkAnnDataWrapper_List ) {
-		
 			SearchPeptideLooplink searchPeptideLooplink = searchPeptideLooplinkAnnDataWrapper.getSearchPeptideLooplink();
-			
 			WebReportedPeptide webReportedPeptide = new WebReportedPeptide();
-			
 			webReportedPeptide.setSearch( search );
 			webReportedPeptide.setSearchId( search.getSearchId() );
 			webReportedPeptide.setReportedPeptideId( searchPeptideLooplink.getReportedPeptideId() );
-			
 			webReportedPeptide.setNumPsms( searchPeptideLooplink.getNumPsms() );
-			
 			webReportedPeptide.setSearchPeptideLooplink( searchPeptideLooplink );
-			
-			
 			WebReportedPeptideWrapper wrappedPeptidelink = new WebReportedPeptideWrapper();
-			
 			wrappedPeptidelink.setWebReportedPeptide( webReportedPeptide );
-			
 			wrappedPeptidelink.setPeptideAnnotationDTOMap( searchPeptideLooplinkAnnDataWrapper.getPeptideAnnotationDTOMap() );
 			wrappedPeptidelink.setPsmAnnotationDTOMap( searchPeptideLooplinkAnnDataWrapper.getPsmAnnotationDTOMap() );
-
 			repPept_Stage_1_Wrapper.webReportedPeptideWrapperList.add( wrappedPeptidelink );
-
 		}
-		
 		SearchProteinLooplinkWrapper searchProteinLooplinkWrapper = 
 				populateSearchProteinLooplinkWrapper(
 						search, 
@@ -292,11 +218,9 @@ public class LooplinkLinkedPositions {
 						position2, 
 						searchProtein_KeyOn_PROT_SEQ_ID_Map, 
 						repPept_Stage_1_Wrapper );
-		
 		return searchProteinLooplinkWrapper;
 	}
-
-
+	
 	/**
 	 * @param search
 	 * @param searcherCutoffValuesSearchLevel
@@ -318,182 +242,125 @@ public class LooplinkLinkedPositions {
 			Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map,
 			RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper) throws Exception {
 		
-		
 		List<WebReportedPeptideWrapper> webReportedPeptideWrapperList = repPept_Stage_1_Wrapper.webReportedPeptideWrapperList;
-
 		Map<Integer, AnnotationDataBaseDTO> bestPsmAnnotationDTOMap = new HashMap<>();
 		Map<Integer, AnnotationDataBaseDTO> bestPeptideAnnotationDTOMap = new HashMap<>();
-		
 		int numPsms = 0;
 		int numLinkedPeptides = 0;
 		int numUniqueLinkedPeptides = 0;
-		
 		Set<Integer> reportedPeptideIds = new HashSet<>();
 		Set<Integer> reportedPeptideIdsRelatedPeptidesUnique = new HashSet<>();
-		
 		for ( WebReportedPeptideWrapper webReportedPeptideWrapper : webReportedPeptideWrapperList ) {
-			
 			WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
-
 			Integer reportedPeptideId = webReportedPeptide.getReportedPeptideId();
-			
 			numLinkedPeptides++;
-			
 			reportedPeptideIds.add( reportedPeptideId );
-			
-			boolean areRelatedPeptidesUnique =
-					Get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Searcher.getInstance()
-					.get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId( search.getSearchId(), reportedPeptideId );
-			
+			Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request =
+					new Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request();
+			related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request.setSearchId( search.getSearchId() );
+			related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request.setReportedPeptideId( reportedPeptideId );
+			Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Result relatedResult =
+					Cached_Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId.getInstance()
+					.getRelated_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Result( related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request );
+			boolean areRelatedPeptidesUnique = relatedResult.isRelated_peptides_unique();			
 			if ( areRelatedPeptidesUnique ) {
-
 				numUniqueLinkedPeptides++;
-				
 				reportedPeptideIdsRelatedPeptidesUnique.add( reportedPeptideId );
 			}
-			
 			numPsms += webReportedPeptide.getNumPsms();
-
 			updateBestAnnotationValues( 
 					bestPsmAnnotationDTOMap, 
 					webReportedPeptideWrapper.getPsmAnnotationDTOMap(), 
 					PeptidePsm.PSM,
 					searcherCutoffValuesSearchLevel );
-
 			updateBestAnnotationValues( 
 					bestPeptideAnnotationDTOMap, 
 					webReportedPeptideWrapper.getPeptideAnnotationDTOMap(),
 					PeptidePsm.PEPTIDE,
 					searcherCutoffValuesSearchLevel );
 		}
-		
-		
-
 		SearchProteinLooplinkWrapper searchProteinLooplinkWrapper = new SearchProteinLooplinkWrapper();
-
 		SearchProteinLooplink searchProteinLooplink = new SearchProteinLooplink();
 		searchProteinLooplinkWrapper.setSearchProteinLooplink( searchProteinLooplink );
-
 		searchProteinLooplinkWrapper.setPsmAnnotationDTOMap( bestPsmAnnotationDTOMap );
 		searchProteinLooplinkWrapper.setPeptideAnnotationDTOMap( bestPeptideAnnotationDTOMap );
-
-		
-		
 		searchProteinLooplink.setSearch( search );
 		searchProteinLooplink.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
-
-
 		SearchProtein searchProtein = searchProtein_KeyOn_PROT_SEQ_ID_Map.get( proteinId );
-
-
 		if ( searchProtein == null ) {
-
 			searchProtein = new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId ) );
-
 			searchProtein_KeyOn_PROT_SEQ_ID_Map.put( proteinId, searchProtein );
 		}
-
 		searchProteinLooplink.setProtein( searchProtein );
-
-
 		searchProteinLooplink.setProteinPosition1( proteinPosition_1 );
 		searchProteinLooplink.setProteinPosition2( proteinPosition_2 );
-
-
 		searchProteinLooplink.setNumPsms( numPsms );
 		searchProteinLooplink.setNumPeptides( numLinkedPeptides );
 		searchProteinLooplink.setNumUniquePeptides( numUniqueLinkedPeptides );
-		
 		searchProteinLooplink.setAssociatedReportedPeptideIds( reportedPeptideIds );
 		searchProteinLooplink.setAssociatedReportedPeptideIdsRelatedPeptidesUnique( reportedPeptideIdsRelatedPeptidesUnique );
-
-
 		if ( searchProteinLooplink.getNumPsms() <= 0 ) {
-
 			//  !!!!!!!   Number of PSMs is zero this this isn't really a Protein that meets the cutoffs
-
 			return null;  //  EARY EXIT
 		}
-
-		
 		return searchProteinLooplinkWrapper;
 	}
 	
-
+	/**
+	 * @param bestAnnotationDTOMap
+	 * @param entryAnnotationDTOMap
+	 * @param peptidePsm
+	 * @param searcherCutoffValuesSearchLevel
+	 * @throws ProxlWebappDataException
+	 */
 	private void updateBestAnnotationValues( 
 			Map<Integer, AnnotationDataBaseDTO> bestAnnotationDTOMap, 
 			Map<Integer, AnnotationDataBaseDTO> entryAnnotationDTOMap, 
 			PeptidePsm peptidePsm,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws ProxlWebappDataException {
-
 		
 		for ( Map.Entry<Integer, AnnotationDataBaseDTO> entryAnnotationDTOMap_Entry : entryAnnotationDTOMap.entrySet() ) {
-		
 			Integer annotationTypeId = entryAnnotationDTOMap_Entry.getKey();
 			AnnotationDataBaseDTO entryAnnotationDTO = entryAnnotationDTOMap_Entry.getValue();
-			
-			
 			//  Reformat value string to look like what went into best fields in DB
-			
 			entryAnnotationDTO.setValueString( Double.toString( entryAnnotationDTO.getValueDouble() ) );
-			
-			
 			AnnotationDataBaseDTO bestAnnotationDTO = bestAnnotationDTOMap.get( annotationTypeId );
-			
 			if ( bestAnnotationDTO == null ) {
-				
 				bestAnnotationDTOMap.put( annotationTypeId, entryAnnotationDTO );
-				
 			} else {
-			
 				SearcherCutoffValuesAnnotationLevel searcherCutoffValuesAnnotationLevel = null;
-				
 				if ( peptidePsm == PeptidePsm.PEPTIDE ) {
 					searcherCutoffValuesAnnotationLevel = searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffs( annotationTypeId );
 				} else {
 					searcherCutoffValuesAnnotationLevel = searcherCutoffValuesSearchLevel.getPsmPerAnnotationCutoffs( annotationTypeId );
 				}
-
 				if ( searcherCutoffValuesAnnotationLevel == null ) {
-					
 					String msg = "searcherCutoffValuesAnnotationLevel == null for annotationTypeId: " + annotationTypeId
 							+ ", peptidePsm: " + peptidePsm;
 					log.error(msg);
 					throw new ProxlWebappDataException(msg);
 				}
-				
 				AnnotationTypeDTO annotationTypeDTO = searcherCutoffValuesAnnotationLevel.getAnnotationTypeDTO();
 				AnnotationTypeFilterableDTO annotationTypeFilterableDTO = annotationTypeDTO.getAnnotationTypeFilterableDTO();
-
 				if ( annotationTypeFilterableDTO == null ) {
-					
 					String msg = "annotationTypeFilterableDTO == null for annotationTypeId: " + annotationTypeId;
 					log.error(msg);
 					throw new ProxlWebappDataException(msg);
 				}
-				
 				FilterDirectionType filterDirectionType = annotationTypeFilterableDTO.getFilterDirectionType();
-
 				if ( filterDirectionType == FilterDirectionType.ABOVE ) {
-					
 					if ( entryAnnotationDTO.getValueDouble() > bestAnnotationDTO.getValueDouble() ) {
-						
 						//  entry has a better value than best so replace best with entry
-
 						bestAnnotationDTOMap.put( annotationTypeId, entryAnnotationDTO );
 					}
 				} else {
-
 					if ( entryAnnotationDTO.getValueDouble() < bestAnnotationDTO.getValueDouble() ) {
-						
 						//  entry has a better value than best so replace best with entry
-
 						bestAnnotationDTOMap.put( annotationTypeId, entryAnnotationDTO );
 					}
 				}
 			}
 		}
-					
 	}
 	
 }

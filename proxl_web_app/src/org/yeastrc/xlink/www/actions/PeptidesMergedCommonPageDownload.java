@@ -39,8 +39,7 @@ import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebMergedReportedPeptideWrapper;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
-import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher;
-import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher.ReturnOnlyReportedPeptidesWithMonolinks;
+import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -230,9 +229,10 @@ public class PeptidesMergedCommonPageDownload {
 			///////////////////////////////////////////////
 			//  Get peptides for this search from the DATABASE
 			List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
-					PeptideWebPageSearcher.getInstance()
-					.searchOnSearchIdPsmCutoffPeptideCutoff( 
-							searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, ReturnOnlyReportedPeptidesWithMonolinks.NO );
+					PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
+							searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
+							PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
+			
 			///   Add the WebReportedPeptideWrapper to the map on unified peptide id and search id
 			for ( WebReportedPeptideWrapper item : wrappedLinksPerForSearch ) {
 				Integer unifiedReportedPeptideId = item.getWebReportedPeptide().getUnifiedReportedPeptideId();

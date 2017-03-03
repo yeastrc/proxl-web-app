@@ -18,6 +18,44 @@ import org.yeastrc.xlink.www.searcher.SearchWebLinksSearcher;
  */
 public class SearchDTO implements Comparable<SearchDTO> {
 	private static final Logger log = Logger.getLogger(SearchDTO.class);
+
+	//  equals(...) on projectSearchId and searchId 
+	private int projectSearchId;
+	private int searchId;
+	private String path;
+	private DateTime load_time;
+	private String fastaFilename;
+	private String name;
+	private int projectId;
+	private String directoryName;
+	private int displayOrder;
+	private boolean hasScanData;
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SearchDTO other = (SearchDTO) obj;
+		if (projectSearchId != other.projectSearchId)
+			return false;
+		if (searchId != other.searchId)
+			return false;
+		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + projectSearchId;
+		result = prime * result + searchId;
+		return result;
+	}
+
 	/* 
 	 * Default order by Search Id field
 	 * (non-Javadoc)
@@ -68,17 +106,17 @@ public class SearchDTO implements Comparable<SearchDTO> {
 		}
 	}
 	
-	public List<LinkerDTO> getLinkersSorted() throws Exception {
-		List<LinkerDTO> linkers = getLinkers();
-		//  sort on the names
-		Collections.sort( linkers, new Comparator<LinkerDTO>() { 
-			@Override
-			public int compare(LinkerDTO o1, LinkerDTO o2) {
-				return o1.getName().compareTo( o2.getName() );
-			}
-		} );
-		return linkers;
-	}
+//	public List<LinkerDTO> getLinkersSorted() throws Exception {
+//		List<LinkerDTO> linkers = getLinkers();
+//		//  sort on the names
+//		Collections.sort( linkers, new Comparator<LinkerDTO>() { 
+//			@Override
+//			public int compare(LinkerDTO o1, LinkerDTO o2) {
+//				return o1.getName().compareTo( o2.getName() );
+//			}
+//		} );
+//		return linkers;
+//	}
 	
 	public List<LinkerDTO> getLinkers() throws Exception {
 		try {
@@ -161,14 +199,4 @@ public class SearchDTO implements Comparable<SearchDTO> {
 		this.hasScanData = hasScanData;
 	}
 	
-	private int projectSearchId;
-	private int searchId;
-	private String path;
-	private DateTime load_time;
-	private String fastaFilename;
-	private String name;
-	private int projectId;
-	private String directoryName;
-	private int displayOrder;
-	private boolean hasScanData;
 }

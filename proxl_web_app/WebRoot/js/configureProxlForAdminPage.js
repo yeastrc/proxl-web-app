@@ -383,7 +383,7 @@ function enableTermsOfServiceResponse( params ) {
 function clearCachedConfigData() {
 
 	var requestData = { };
-	var _URL = contextPathJSVar + "/clearAllConfigCacheDFUIEWORU.do";
+	var _URL = contextPathJSVar + "/cacheDataClearConfigDataDFUIEWORU.do";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -421,7 +421,7 @@ function clearCachedConfigData() {
 function clearAllCachedData() {
 
 	var requestData = { };
-	var _URL = contextPathJSVar + "/clearAllCacheDFUIEWORU.do";
+	var _URL = contextPathJSVar + "/cacheDataClearAllDFUIEWORU.do";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -445,6 +445,44 @@ function clearAllCachedData() {
 					status === AJAX_RESPONSE_NOT_AUTHORIZED_STATUS_CODE ) {
 				// Check status here since error text won't match what handleAJAXError expects
 				//  reload current URL
+				window.location.reload(true);
+			} else {
+				handleAJAXError(jqXHR, textStatus, errorThrown);
+			}
+//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
+//			textStatus: " + textStatus );
+		}
+	});
+}
+
+/////////////////////////////////////
+function cacheDataAllLogCurrentCacheSizes() {
+
+	var requestData = { };
+	var _URL = contextPathJSVar + "/cacheDataAllLogCurrentCacheSizesDFUIEWORU.do";
+//	var request =
+	$.ajax({
+		type : "POST",
+		url : _URL,
+		data : requestData,
+		dataType : "text",
+		success : function(data) {
+			try {
+				alert("All Data Cache sized written to log file");
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		},
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+			var status = jqXHR.status;
+			if ( status === AJAX_RESPONSE_NO_SESSION_STATUS_CODE ||
+					status === AJAX_RESPONSE_NOT_AUTHORIZED_STATUS_CODE ) {
+//				Check status here since error text won't match what handleAJAXError expects
+//				reload current URL
 				window.location.reload(true);
 			} else {
 				handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -574,6 +612,18 @@ function initPage() {
 		try {
 //			var clickThis = this;
 			clearAllCachedData();
+			eventObject.preventDefault();  // stop following value in 'url='.
+			eventObject.stopPropagation();  // stop click bubble up.
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	});
+	
+	$("#write_all_data_cache_sizes_to_log_button").click(function(eventObject) {
+		try {
+//			var clickThis = this;
+			cacheDataAllLogCurrentCacheSizes();
 			eventObject.preventDefault();  // stop following value in 'url='.
 			eventObject.stopPropagation();  // stop click bubble up.
 		} catch( e ) {

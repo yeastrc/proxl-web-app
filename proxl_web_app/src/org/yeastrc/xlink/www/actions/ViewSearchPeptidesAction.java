@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.actions;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,10 +19,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchModMassDistinctSearcher;
-import org.yeastrc.xlink.www.searcher.PeptideWebPageSearcher.ReturnOnlyReportedPeptidesWithMonolinks;
+import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureNavLinks;
 import org.yeastrc.xlink.www.no_data_validation.ThrowExceptionOnNoDataConfig;
@@ -244,8 +244,9 @@ public class ViewSearchPeptidesAction extends Action {
 			//////////////////////////////////////////////////////////////
 			//  Get Peptides from DATABASE
 			List<WebReportedPeptideWrapper> wrappedlinks =
-					PeptideWebPageSearcher.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff( 
-							search, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, ReturnOnlyReportedPeptidesWithMonolinks.NO );
+					PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
+							search, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
+							PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
 			
 			//  If configured, throw exception if no peptides found
 			if ( ThrowExceptionOnNoDataConfig.getInstance().isThrowExceptionNoData() ) {

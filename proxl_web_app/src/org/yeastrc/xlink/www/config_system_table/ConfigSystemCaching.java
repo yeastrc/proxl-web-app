@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTableGetValue;
+import org.yeastrc.xlink.www.cached_data_mgmt.CacheCurrentSizeMaxSizeResult;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
@@ -23,8 +24,8 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 
 	private static final Logger log = Logger.getLogger(ConfigSystemCaching.class);
 	
-	private static final int CACHE_MAX_SIZE = 20;
-	private static final int CACHE_TIMEOUT = 200000000; // in seconds
+	private static final int CACHE_MAX_SIZE = 60;
+//	private static final int CACHE_TIMEOUT = 200000000; // in seconds
 	
 	/**
 	 * Static singleton instance
@@ -40,6 +41,15 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 		return _instance; 
 	}
 
+	@Override
+	public CacheCurrentSizeMaxSizeResult getCurrentCacheSizeAndMax() throws Exception {
+		CacheCurrentSizeMaxSizeResult result = new CacheCurrentSizeMaxSizeResult();
+		result.setCurrentSize( configSystemDataCache.size() );
+		result.setMaxSize( CACHE_MAX_SIZE );
+		return result;
+	}
+
+	
 	/* (non-Javadoc)
 	 * @see org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF#clearCacheData()
 	 * 
@@ -52,9 +62,11 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 	
 	/**
 	 * Clear all entries from the cache
+	 * @throws Exception 
 	 */
-	public void clearCache() {
+	public void clearCache() throws Exception {
 		configSystemDataCache.invalidateAll();
+		ConfigSystemChangesRegistry.getInstance().allConfigKeysChanged();
 	}
 
 
@@ -92,7 +104,7 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 		
 		configSystemDataCache = CacheBuilder.newBuilder()
 				
-				.expireAfterAccess( CACHE_TIMEOUT, TimeUnit.SECONDS )
+//				.expireAfterAccess( CACHE_TIMEOUT, TimeUnit.SECONDS )
 			    .maximumSize( CACHE_MAX_SIZE )
 			    .build(
 			    		new CacheLoader<LocalCacheKey, LocalCacheValue>() {

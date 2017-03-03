@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 import org.yeastrc.xlink.enum_classes.PsmPeptideAnnotationType;
+import org.yeastrc.xlink.www.cached_data_mgmt.CacheCurrentSizeMaxSizeResult;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
 import org.yeastrc.xlink.www.searcher.AnnotationTypeForSearchIdsSearcher;
@@ -30,9 +31,9 @@ public class GetAnnotationTypeData implements CachedDataCommonIF {
 
 
 	
-	private static final int CACHE_MAX_SIZE = 60;
+	private static final int CACHE_MAX_SIZE = 500;
 
-	private static final int CACHE_TIMEOUT = 200; // in hours
+	private static final int CACHE_TIMEOUT = 20; // in days
 
 
 	/**
@@ -60,6 +61,14 @@ public class GetAnnotationTypeData implements CachedDataCommonIF {
 	@Override
 	public void clearCacheData() throws Exception {
 		annotationTypeDataCache.invalidateAll();
+	}
+
+	@Override
+	public CacheCurrentSizeMaxSizeResult getCurrentCacheSizeAndMax() throws Exception {
+		CacheCurrentSizeMaxSizeResult result = new CacheCurrentSizeMaxSizeResult();
+		result.setCurrentSize( annotationTypeDataCache.size() );
+		result.setMaxSize( CACHE_MAX_SIZE );
+		return result;
 	}
 
 	
@@ -172,7 +181,7 @@ public class GetAnnotationTypeData implements CachedDataCommonIF {
 		
 		annotationTypeDataCache = CacheBuilder.newBuilder()
 				
-				.expireAfterAccess( CACHE_TIMEOUT, TimeUnit.HOURS )
+				.expireAfterAccess( CACHE_TIMEOUT, TimeUnit.DAYS )
 			    .maximumSize( CACHE_MAX_SIZE )
 			    .build(
 			    		new CacheLoader<LocalCacheKey, LocalCacheValue>() {

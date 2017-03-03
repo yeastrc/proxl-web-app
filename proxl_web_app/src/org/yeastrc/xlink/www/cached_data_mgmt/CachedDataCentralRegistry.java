@@ -1,7 +1,13 @@
 package org.yeastrc.xlink.www.cached_data_mgmt;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
@@ -17,7 +23,7 @@ public class CachedDataCentralRegistry {
 
 	private static final CachedDataCentralRegistry instance = new CachedDataCentralRegistry();
 
-	private List<CachedDataCommonIF> cachedDataCommonItemList = new ArrayList<>();
+	private final Map<String,CachedDataCommonIF> cachedDataCommonItemMap = new ConcurrentHashMap<>();
 	
 	//  private constructor
 	private CachedDataCentralRegistry() { }
@@ -33,7 +39,8 @@ public class CachedDataCentralRegistry {
 	 * @param cachedConfigDataCommonItem
 	 */
 	public void register( CachedDataCommonIF cachedConfigDataCommonItem ) {
-		cachedDataCommonItemList.add(cachedConfigDataCommonItem);
+		String className = cachedConfigDataCommonItem.getClass().getName();
+		cachedDataCommonItemMap.put( className, cachedConfigDataCommonItem );
 //		if ( log.isInfoEnabled() ) {
 //			Exception e = new Exception();
 //			log.info( "Adding cachedConfigDataCommonItem: " + cachedConfigDataCommonItem, e );
@@ -51,7 +58,8 @@ public class CachedDataCentralRegistry {
 //		log.warn( "INFO: clearAllCacheData() called" );
 		
 		try {
-			for ( CachedDataCommonIF item : cachedDataCommonItemList ) {
+			for ( Map.Entry<String,CachedDataCommonIF> entry : cachedDataCommonItemMap.entrySet() ) {
+				CachedDataCommonIF item = entry.getValue();
 				item.clearCacheData();
 			}
 		} catch (Exception e) {
@@ -59,5 +67,38 @@ public class CachedDataCentralRegistry {
 			log.error( msg, e );
 			throw e;
 		}
+	}
+	
+	public void writeToLogAllCacheSizes() throws Exception {
+
+		List<Map.Entry<String,CachedDataCommonIF>> cachedDataCommonItemList = new ArrayList<>( cachedDataCommonItemMap.size() );
+		for ( Map.Entry<String,CachedDataCommonIF> entry : cachedDataCommonItemMap.entrySet() ) {
+			cachedDataCommonItemList.add( entry );
+		}
+		//  Sort by class Name
+		Collections.sort( cachedDataCommonItemList, new Comparator<Map.Entry<String,CachedDataCommonIF>>() {
+			@Override
+			public int compare(Entry<String, CachedDataCommonIF> o1, Entry<String, CachedDataCommonIF> o2) {
+				return o1.getKey().compareTo( o2.getKey() );
+			} } );
+		
+		NumberFormat numberFormatStandard = NumberFormat.getInstance();
+		StringBuilder cacheSizesSB = new StringBuilder( 10000 );
+		cacheSizesSB.append( "List of current Data Cache info " );
+		try {
+			for ( Map.Entry<String,CachedDataCommonIF> entry : cachedDataCommonItemList ) {
+				CachedDataCommonIF cachedDataCommonIF = entry.getValue();
+				CacheCurrentSizeMaxSizeResult cacheCurrentSizeMaxSizeResult = cachedDataCommonIF.getCurrentCacheSizeAndMax();
+				cacheSizesSB.append( "\n class: " + entry.getKey()
+						+ ", current cache size: " + numberFormatStandard.format( cacheCurrentSizeMaxSizeResult.getCurrentSize() ) 
+						+ ", max cache size: " + numberFormatStandard.format( cacheCurrentSizeMaxSizeResult.getMaxSize() ) );
+			}
+		} catch (Exception e) {
+			String msg = "Error writeToLogAllCacheSizes(): ";
+			log.error( msg, e );
+			throw e;
+		}
+		String cacheSizes = cacheSizesSB.toString();
+		log.warn( cacheSizes );
 	}
 }

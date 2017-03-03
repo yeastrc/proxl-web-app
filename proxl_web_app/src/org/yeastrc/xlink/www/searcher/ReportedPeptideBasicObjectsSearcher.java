@@ -1,4 +1,5 @@
 package org.yeastrc.xlink.www.searcher;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,43 +10,44 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.dbcp.DelegatingPreparedStatement;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
-import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
+import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
-import org.yeastrc.xlink.www.constants.DynamicModificationsSelectionConstants;
-import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
-import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.www.objects.SearchPeptideCrosslink;
-import org.yeastrc.xlink.www.objects.SearchPeptideDimer;
-import org.yeastrc.xlink.www.objects.SearchPeptideLooplink;
-import org.yeastrc.xlink.www.objects.SearchPeptideUnlink;
-import org.yeastrc.xlink.www.objects.WebReportedPeptide;
-import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
-import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData;
-import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult;
 import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.XLinkUtils;
+import org.yeastrc.xlink.www.constants.DynamicModificationsSelectionConstants;
+import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
+import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData;
+import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult;
+import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.ReportedPeptideBasicObjectsSearcherRequestParameters;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.ReportedPeptideBasicObjectsSearcherResult;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.ReportedPeptideBasicObjectsSearcherResultEntry;
+
 /**
- * 
+ * Return basic objects for Reported Peptide Search
  *
  */
-public class PeptideWebPageSearcher {
-	private static final Logger log = Logger.getLogger(PeptideWebPageSearcher.class);
-	private PeptideWebPageSearcher() { }
-	private static final PeptideWebPageSearcher _INSTANCE = new PeptideWebPageSearcher();
-	public static PeptideWebPageSearcher getInstance() { return _INSTANCE; }
+public class ReportedPeptideBasicObjectsSearcher {
+	
+	private static final Logger log = Logger.getLogger(ReportedPeptideBasicObjectsSearcher.class);
+	private ReportedPeptideBasicObjectsSearcher() { }
+	private static final ReportedPeptideBasicObjectsSearcher _INSTANCE = new ReportedPeptideBasicObjectsSearcher();
+	public static ReportedPeptideBasicObjectsSearcher getInstance() { return _INSTANCE; }
+
 	public static enum ReturnOnlyReportedPeptidesWithMonolinks {
 		YES, NO
 	}
+	
 	/**
 	 * Should it use the optimization of Peptide and PSM defaults to skip joining the tables with the annotation values?
 	 */
@@ -132,9 +134,13 @@ public class PeptideWebPageSearcher {
 			" ) AS srch_id_rep_pep_id_for_mod_masses "
 			+ " ON unified_rp__search__rep_pept__generic_lookup.search_id = srch_id_rep_pep_id_for_mod_masses.search_id "
 			+ "    AND unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = srch_id_rep_pep_id_for_mod_masses.reported_peptide_id";
+	
+	
+	
+	
 	/**
 	 * Get the peptides corresponding to the given parameters
-	 * @param search The search we're searching
+	 * @param searchId The search we're searching
 	 * @param searcherCutoffValuesSearchLevel - PSM and Peptide cutoffs for a search id
 	 * @param linkTypes Which link types to include in the results
 	 * @param modMassSelections Which modified masses to include.  Null if include all. element "" means no modifications
@@ -142,14 +148,21 @@ public class PeptideWebPageSearcher {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<WebReportedPeptideWrapper> searchOnSearchIdPsmCutoffPeptideCutoff( 
-			SearchDTO search, 
-			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel, 
-			String[] linkTypes, 
-			String[] modMassSelections, 
-			ReturnOnlyReportedPeptidesWithMonolinks returnOnlyReportedPeptidesWithMonolinks ) throws Exception {
-		List<WebReportedPeptideWrapper> wrappedLinks = new ArrayList<>();
-		int searchId = search.getSearchId();
+	public ReportedPeptideBasicObjectsSearcherResult searchOnSearchIdPsmCutoffPeptideCutoff( 
+			ReportedPeptideBasicObjectsSearcherRequestParameters reportedPeptideBasicObjectsSearcherRequestParameters
+			) throws Exception {
+		
+		
+		int searchId = reportedPeptideBasicObjectsSearcherRequestParameters.getSearchId(); 
+		SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
+				reportedPeptideBasicObjectsSearcherRequestParameters.getSearcherCutoffValuesSearchLevel();
+		String[] linkTypes = reportedPeptideBasicObjectsSearcherRequestParameters.getLinkTypes();
+		String[] modMassSelections = reportedPeptideBasicObjectsSearcherRequestParameters.getModMassSelections();
+		ReturnOnlyReportedPeptidesWithMonolinks returnOnlyReportedPeptidesWithMonolinks =
+				reportedPeptideBasicObjectsSearcherRequestParameters.getReturnOnlyReportedPeptidesWithMonolinks();
+		
+		List<ReportedPeptideBasicObjectsSearcherResultEntry> entryList = new ArrayList<>();
+
 		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
 				searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
 		List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesList = 
@@ -530,22 +543,27 @@ public class PeptideWebPageSearcher {
 					}
 				}
 			}
+//			if ( log.isDebugEnabled() ) {
+//
+//				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
+//			}
 			if ( log.isDebugEnabled() ) {
 				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
 			}
 			rs = pstmt.executeQuery();
 			Set<Integer> retrieved_reported_peptide_id_values_Set = new HashSet<>();
 			while( rs.next() ) {
-				WebReportedPeptideWrapper item = populateFromResultSet( 
-						rs, 
-						search, 
-						searcherCutoffValuesSearchLevel, 
-						peptideCutoffsAnnotationTypeDTOList,
-						psmCutoffsAnnotationTypeDTOList,
-						defaultCutoffsExactlyMatchAnnTypeDataToSearchData,
-						sql );
+				ReportedPeptideBasicObjectsSearcherResultEntry item = 
+						populateFromResultSet( 
+								rs, 
+								searchId,
+								searcherCutoffValuesSearchLevel, 
+								peptideCutoffsAnnotationTypeDTOList,
+								psmCutoffsAnnotationTypeDTOList,
+								defaultCutoffsExactlyMatchAnnTypeDataToSearchData,
+								sql );
 				if ( item != null ) {
-					int itemReportedPeptideId = item.getWebReportedPeptide().getReportedPeptideId();
+					int itemReportedPeptideId = item.getReportedPeptideId();
 					if ( ! retrieved_reported_peptide_id_values_Set.add( itemReportedPeptideId ) ) {
 //						String msg = "Already processed result entry for itemReportedPeptideId: " + itemReportedPeptideId;
 //
@@ -553,7 +571,7 @@ public class PeptideWebPageSearcher {
 //						log.error( msg );
 //						throw new ProxlWebappDataException(msg);
 					} else {
-						wrappedLinks.add( item );
+						entryList.add( item );
 					}
 				}
 			}
@@ -576,11 +594,17 @@ public class PeptideWebPageSearcher {
 				conn = null;
 			}
 		}
-		return wrappedLinks;
+
+		ReportedPeptideBasicObjectsSearcherResult result = new ReportedPeptideBasicObjectsSearcherResult();
+		result.setEntryList( entryList );
+		result.setSearchId( searchId );
+		
+		return result;
 	}
+	
 	/**
 	 * @param rs
-	 * @param search
+	 * @param searchDTO
 	 * @param searcherCutoffValuesSearchLevel
 	 * @param defaultCutoffsExactlyMatchAnnTypeDataToSearchData
 	 * @param sql
@@ -588,26 +612,27 @@ public class PeptideWebPageSearcher {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	private WebReportedPeptideWrapper populateFromResultSet(
+	private ReportedPeptideBasicObjectsSearcherResultEntry populateFromResultSet(
 			ResultSet rs,
-			SearchDTO search,
+			int searchId,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel, 
 			List<AnnotationTypeDTO> peptideCutoffsAnnotationTypeDTOList,
 			List<AnnotationTypeDTO> psmCutoffsAnnotationTypeDTOList,
 			boolean defaultCutoffsExactlyMatchAnnTypeDataToSearchData,
 			String sql
 			) throws SQLException, Exception {
-		WebReportedPeptide item = new WebReportedPeptide();
-		WebReportedPeptideWrapper wrappedItem = new WebReportedPeptideWrapper();
-		wrappedItem.setWebReportedPeptide( item );
-		item.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
+		
+		ReportedPeptideBasicObjectsSearcherResultEntry item = new ReportedPeptideBasicObjectsSearcherResultEntry();
+		
 		String linkType = rs.getString( "link_type" );
 		int reportedPeptideId = rs.getInt( "reported_peptide_id" );
 		int unifiedReportedPeptideId = rs.getInt( "unified_reported_peptide_id" );
-		item.setSearchId( search.getSearchId() );
-		item.setReportedPeptideId( reportedPeptideId );
+		
+		int linkTypeNumber = XLinkUtils.getTypeNumber( linkType );
+		item.setLinkType( linkTypeNumber );
+		item.setReportedPeptideId(reportedPeptideId);
 		item.setUnifiedReportedPeptideId( unifiedReportedPeptideId );
-		item.setSearch( search );
+
 		if ( defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) {
 			int numPsmsForDefaultCutoffs = rs.getInt( "psm_num_at_default_cutoff" );
 			if ( ! rs.wasNull() ) {
@@ -620,9 +645,16 @@ public class PeptideWebPageSearcher {
 		}
 		if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
 				|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {
-			if ( item.getNumPsms() <= 0 ) {
+
+			int numPsms = 
+					PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
+					.getPsmCountForSearchIdReportedPeptideId( reportedPeptideId, searchId, searcherCutoffValuesSearchLevel );
+
+			if ( numPsms <= 0 ) {
 				//  !!!!!!!   Number of PSMs is zero this this isn't really a peptide that meets the cutoffs
 				return null;  //  EARY EXIT
+			} else {
+				item.setNumPsms( numPsms );
 			}
 		}
 		//  Get Peptide and PSM annotations
@@ -631,7 +663,7 @@ public class PeptideWebPageSearcher {
 		if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) )
 			|| ( ! USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES ) ) {
 			Map<Integer, AnnotationDataBaseDTO> searchedForPeptideAnnotationDTOFromQueryMap = getPeptideValuesFromDBQuery( rs, peptideCutoffsAnnotationTypeDTOList );
-			wrappedItem.setPeptideAnnotationDTOMap( searchedForPeptideAnnotationDTOFromQueryMap );
+			item.setPeptideAnnotationDTOMap( searchedForPeptideAnnotationDTOFromQueryMap );
 		} else {
 			//  Get Peptide values in separate DB query, since peptide value table was not joined
 //			List<Integer> peptideCutoffsAnnotationTypeIdList = new ArrayList<>( peptideCutoffsAnnotationTypeDTOList.size() );
@@ -653,7 +685,7 @@ public class PeptideWebPageSearcher {
 			//  Get PSM best values from DB query, since psm best value table was joined
 			Map<Integer, AnnotationDataBaseDTO> bestPsmAnnotationDTOFromQueryMap =
 					getPSMBestValuesFromDBQuery( rs, psmCutoffsAnnotationTypeDTOList );
-			wrappedItem.setPsmAnnotationDTOMap( bestPsmAnnotationDTOFromQueryMap );
+			item.setPsmAnnotationDTOMap( bestPsmAnnotationDTOFromQueryMap );
 		} else {
 			//  Get PSM best values in separate DB query, since psm best value table was not joined
 //			List<PsmAnnotationDTO> bestPsmAnnotationDTOList = 
@@ -663,32 +695,8 @@ public class PeptideWebPageSearcher {
 //			item.setBestPsmAnnotationDTOList( bestPsmAnnotationDTOList );
 			int z = 0;
 		}
-		if ( XLinkUtils.CROSS_TYPE_STRING.equals(linkType) ) {
-			SearchPeptideCrosslink link = new SearchPeptideCrosslink();
-			link.setSearch( search );
-			link.setReportedPeptideId( reportedPeptideId );
-			item.setSearchPeptideCrosslink(link);
-		} else if ( XLinkUtils.LOOP_TYPE_STRING.equals(linkType) ) {
-			SearchPeptideLooplink link = new SearchPeptideLooplink();
-			link.setSearch( search );
-			link.setReportedPeptideId ( reportedPeptideId );
-			item.setSearchPeptideLooplink(link);
-		} else if ( XLinkUtils.UNLINKED_TYPE_STRING.equals(linkType) ) {
-			SearchPeptideUnlink link = new SearchPeptideUnlink();
-			link.setSearch( search );
-			link.setReportedPeptideId ( reportedPeptideId );
-			item.setSearchPeptideUnlinked(link);
-		} else if ( XLinkUtils.DIMER_TYPE_STRING.equals(linkType) ) {
-			SearchPeptideDimer link = new SearchPeptideDimer();
-			link.setSearch( search );
-			link.setReportedPeptideId ( reportedPeptideId );
-			item.setSearchPeptideDimer(link);
-		} else {
-			String msg = "Unknown link type in populateFromResultSet( ... ), linkType: " + linkType + ", sql: " + sql;
-			log.error( msg );
-			return null;  //  EARLY RETURN:    skip over other types for now
-		}
-		return wrappedItem;
+
+		return item;
 	}
 	//  Get PSM best values from DB query, since psm best value table was joined
 	/**
@@ -740,4 +748,6 @@ public class PeptideWebPageSearcher {
 		}
 		return searchedForPeptideAnnotationDTOFromQueryMap;
 	}
+		
+
 }

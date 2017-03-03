@@ -47,10 +47,12 @@ public class ConfigSystemsKeysConstants {
 	///   Page Content Config
 	
 	public static final String FOOTER_CENTER_OF_PAGE_HTML_KEY = "footer_center_of_page_html";
-	
 	public static final String GOOGLE_ANALYTICS_TRACKING_CODE_KEY = "google_analytics_tracking_code";
 	
+	//    Size of Caches for DB data config, see class CacheSizeConfigStringsConstants
 	
+	public static final String CACHE_SIZE_CONFIG_LABEL_KEY = "cache_size_config_label";
+
 	//   Lists of config keys for validation on save
 	
 	public static final Set<String> textConfigKeys = new HashSet<>();
@@ -72,6 +74,7 @@ public class ConfigSystemsKeysConstants {
 		textConfigKeys.add( FOOTER_CENTER_OF_PAGE_HTML_KEY );
 		textConfigKeys.add( GOOGLE_ANALYTICS_TRACKING_CODE_KEY );
 	
+		textConfigKeys.add( CACHE_SIZE_CONFIG_LABEL_KEY );
 	}
 	
 }

@@ -8,7 +8,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
+import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
@@ -20,16 +20,16 @@ import org.yeastrc.xlink.www.web_utils.TestIsUserSignedIn;
  * 
  *
  */
-public class ClearAllCacheAction extends Action {
+public class CacheDataClearConfigDataAction extends Action {
 
-	private static Logger log = Logger.getLogger( ClearAllCacheAction.class );
+	private static Logger log = Logger.getLogger( CacheDataClearConfigDataAction.class );
 	
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
-
+				
 		AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 				GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request, response );
 
@@ -51,9 +51,11 @@ public class ClearAllCacheAction extends Action {
 		}
 		
 		try {
-			CachedDataCentralRegistry.getInstance().clearAllCacheData();
-			return mapping.findForward( "Success" );
+			log.warn("ClearAllConfigCacheAction execute called");
+			ConfigSystemCaching.getInstance().clearCacheData();
 			
+			return mapping.findForward( "Success" );
+
 		} catch ( Exception e ) {
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );

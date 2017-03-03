@@ -22,7 +22,9 @@ import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.TaxonomyIdsForProtSeqIdSearchIdSearcher;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsForProtSeqIdSearchId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Request;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Result;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -139,8 +141,15 @@ public class ViewerProteinNCBITaxonomyIdService {
 					int taxonomyIdSmallestNonZero = taxonomyIdSmallestNonZeroInitialValue;
 					//  Get all taxonomy ids for protein sequence id and search id
 					for ( Integer searchId : searchIdsSet ) {
-						Set<Integer> taxonomyIds = TaxonomyIdsForProtSeqIdSearchIdSearcher.getInstance()
-								.getTaxonomyIdsSingleSearch( proteinSequenceObject, searchId );
+						TaxonomyIdsForProtSeqIdSearchId_Request taxonomyIdsForProtSeqIdSearchId_Request =
+								new TaxonomyIdsForProtSeqIdSearchId_Request();
+						taxonomyIdsForProtSeqIdSearchId_Request.setSearchId( searchId );
+						taxonomyIdsForProtSeqIdSearchId_Request.setProteinSequenceId( proteinSequenceObject.getProteinSequenceId() );
+						TaxonomyIdsForProtSeqIdSearchId_Result taxonomyIdsForProtSeqIdSearchId_Result =
+								Cached_TaxonomyIdsForProtSeqIdSearchId.getInstance()
+								.getTaxonomyIdsForProtSeqIdSearchId_Result( taxonomyIdsForProtSeqIdSearchId_Request );
+						Set<Integer> taxonomyIds = taxonomyIdsForProtSeqIdSearchId_Result.getTaxonomyIds();
+
 						if ( taxonomyIds.isEmpty() ) {
 							//  did not find any taxonomy id so skip to next search id
 							continue;  //  EARLY CONTINUE
