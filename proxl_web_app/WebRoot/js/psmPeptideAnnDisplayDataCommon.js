@@ -143,6 +143,39 @@ var AnnotationDataDisplayProcessingCommonCode = function() {
 				annTypeIdDisplay = jQuery.extend( true /* [deep ] */, {}, _annTypeIdDisplayDefaultValues );
 			}
 			_annTypeIdDisplayInitialValues = annTypeIdDisplay;
+			
+			//  START: Special update to allow projectSearchId values to be added or removed from URL
+			
+			//  Update _annTypeIdDisplayInitialValues with values from _annTypeIdDisplayDefaultValues
+			//      for any searches in _annTypeIdDisplayDefaultValues but not in _annTypeIdDisplayInitialValues
+			
+			var annTypeIdDisplayInitialValues_Searches = _annTypeIdDisplayInitialValues.searches;
+			var annTypeIdDisplayDefaultValues_Searches = _annTypeIdDisplayDefaultValues.searches;
+			var annTypeIdDisplayDefaultValues_Searches_KeysArray = Object.keys( annTypeIdDisplayDefaultValues_Searches );
+			for ( var index = 0; index < annTypeIdDisplayDefaultValues_Searches_KeysArray.length; index++ ) {
+				var searchIdInDefaultValues = annTypeIdDisplayDefaultValues_Searches_KeysArray[ index ];
+				var initialValuesForSearch = annTypeIdDisplayInitialValues_Searches[ searchIdInDefaultValues ];
+				if ( initialValuesForSearch === undefined || initialValuesForSearch === null ) {
+					// Not in Initial values so copy from default
+					var annTypeIdDisplayDefaultValues_ForSearch = annTypeIdDisplayDefaultValues_Searches[ searchIdInDefaultValues ];
+					var cloneOfDefaultValuesForSearch = jQuery.extend( true /* [deep ] */, {}, annTypeIdDisplayDefaultValues_ForSearch );
+					annTypeIdDisplayInitialValues_Searches[ searchIdInDefaultValues ] = cloneOfDefaultValuesForSearch;
+				}
+			}
+			//  Remove _annTypeIdDisplayInitialValues entries for searches not in _annTypeIdDisplayDefaultValues
+			var projectSearchIdIdArry = Object.keys( annTypeIdDisplayInitialValues_Searches );
+			for ( var index = 0; index < projectSearchIdIdArry.length; index++ ) {
+				var projectSearchId = projectSearchIdIdArry[ index ];
+				var annTypeIdDisplayDefaultValues_ForSrchId = annTypeIdDisplayDefaultValues_Searches[ projectSearchId ];
+				if ( annTypeIdDisplayDefaultValues_ForSrchId === undefined || annTypeIdDisplayDefaultValues_ForSrchId === null ) {
+					// Not in default values so remove from input
+					delete annTypeIdDisplayInitialValues_Searches[ projectSearchId ];
+				}
+			}
+			
+			//  END: Special update to allow projectSearchId values to be added or removed from URL
+			
+			
 			//  Values when user clicks "Save"
 			//  Deep copy of _annTypeIdDisplayInitialValues to _annTypeIdDisplaySavedValues
 			_annTypeIdDisplaySavedValues = jQuery.extend( true /* [deep ] */, {}, _annTypeIdDisplayInitialValues );

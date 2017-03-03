@@ -396,6 +396,42 @@ function getJsonFromHash() {
 		json.cutoffs = getCutoffDefaultsFromPage();
 	}
 	
+
+	//  START: Special update to allow projectSearchId values to be added or removed from URL
+
+	//  Update cutoffs to add defaults for search ids in defaults but not in cutoffs
+	//  Update cutoffs to remove search ids not in defaults but in cutoffs
+	
+	var cutoffs_Searches = json.cutoffs.searches;
+	var cutoffDefaultsFromPage = getCutoffDefaultsFromPage();
+	var cutoffDefaultsFromPage_Searches = cutoffDefaultsFromPage.searches;
+	//  Update cutoffs_Searches with values from cutoffDefaultsFromPage
+	//      for any searches in cutoffDefaultsFromPage but not in cutoffs_Searches
+	var cutoffDefaultsFromPageSrchIdArry = Object.keys( cutoffDefaultsFromPage_Searches );
+	for ( var index = 0; index < cutoffDefaultsFromPageSrchIdArry.length; index++ ) {
+		var cutoffDefaultsFromPageSrchId = cutoffDefaultsFromPageSrchIdArry[ index ];
+		var cutoffs_SearchesEntryForDefProcessing = cutoffs_Searches[ cutoffDefaultsFromPageSrchId ];
+		if ( cutoffs_SearchesEntryForDefProcessing === undefined || cutoffs_SearchesEntryForDefProcessing === null ) {
+			// Not in cutoff values so copy from default
+			var cutoffDefaultValues_ForSearch = cutoffDefaultsFromPage_Searches[ cutoffDefaultsFromPageSrchId ];
+			var cloneOfDefaultValuesForSearch = jQuery.extend( true /* [deep ] */, {}, cutoffDefaultValues_ForSearch );
+			cutoffs_Searches[ cutoffDefaultsFromPageSrchId ] = cloneOfDefaultValuesForSearch;
+		}
+	}
+	//  Remove cutoffs in cutoffs_Searches for searches not in cutoffDefaultsFromPage
+	var cutoffs_SearchesSrchIdArry = Object.keys( cutoffs_Searches );
+	for ( var index = 0; index < cutoffs_SearchesSrchIdArry.length; index++ ) {
+		var cutoffs_SearchesSrchId = cutoffs_SearchesSrchIdArry[ index ];
+		var cutoffDefaultsFromPageForSrchId = cutoffDefaultsFromPage_Searches[ cutoffs_SearchesSrchId ];
+		if ( cutoffDefaultsFromPageForSrchId === undefined || cutoffDefaultsFromPageForSrchId === null ) {
+			// Not in default values so remove from input
+			delete cutoffs_Searches[ cutoffs_SearchesSrchId ];
+		}
+	}
+	
+	//  END: Special update to allow projectSearchId values to be added or removed from URL
+
+	
 	//  Set default for exclude link type
 	
 	if ( json[ 'excludeType' ] === undefined ) {

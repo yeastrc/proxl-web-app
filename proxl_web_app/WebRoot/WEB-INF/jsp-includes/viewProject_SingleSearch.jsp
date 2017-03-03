@@ -31,12 +31,12 @@
 					href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ search.projectSearchId }">crosslinkProtein.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 						>Proteins</a>]
 				[<a data-tooltip="Graphical view of links between proteins" class="tool_tip_attached_jq" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/image" projectSearchId="${ search.projectSearchId }">image.do?searchIds=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+					href="${ contextPath }/<proxl:defaultPageUrl pageName="/image" projectSearchId="${ search.projectSearchId }">image.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 						>Image</a>]
 				<c:choose>
 				 <c:when test="${ showStructureLink }">
 					[<a data-tooltip="View data on 3D structures" class="tool_tip_attached_jq" 
-						href="${ contextPath }/<proxl:defaultPageUrl pageName="/structure" projectSearchId="${ search.projectSearchId }">structure.do?searchIds=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+						href="${ contextPath }/<proxl:defaultPageUrl pageName="/structure" projectSearchId="${ search.projectSearchId }">structure.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 							>Structure</a>]
 				 </c:when>
 				 <c:otherwise>
