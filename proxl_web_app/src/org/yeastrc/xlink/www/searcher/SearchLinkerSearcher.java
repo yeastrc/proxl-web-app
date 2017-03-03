@@ -8,7 +8,6 @@ import java.util.List;
 import org.yeastrc.xlink.dao.LinkerDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.LinkerDTO;
-import org.yeastrc.xlink.www.dto.SearchDTO;
 
 public class SearchLinkerSearcher {
 	
@@ -21,7 +20,7 @@ public class SearchLinkerSearcher {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<LinkerDTO> getLinkersForSearch( SearchDTO search ) throws Exception {
+	public List<LinkerDTO> getLinkersForSearch( int searchId ) throws Exception {
 		
 		List<LinkerDTO> comments = new ArrayList<LinkerDTO>();
 		Connection conn = null;
@@ -31,7 +30,7 @@ public class SearchLinkerSearcher {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			String sql = "SELECT linker_id FROM search_linker WHERE search_id = ?";
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, search.getSearchId() );
+			pstmt.setInt( 1, searchId );
 			rs = pstmt.executeQuery();
 			while( rs.next() ) {
 				comments.add( LinkerDAO.getInstance().getLinkerDTOForId( rs.getInt( 1 ) ) );

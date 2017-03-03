@@ -187,6 +187,10 @@ public class Cached_TaxonomyIdsForProtSeqIdSearchId implements CachedDataCommonI
 						.build(
 								new CacheLoader<TaxonomyIdsForProtSeqIdSearchId_Request, TaxonomyIdsForProtSeqIdSearchId_Result>() {
 									public TaxonomyIdsForProtSeqIdSearchId_Result load(TaxonomyIdsForProtSeqIdSearchId_Request taxonomyIdsForProtSeqIdSearchId_Request) throws Exception {
+										
+										//   WARNING  cannot return null.  
+										//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+										
 										//  value is NOT in cache so get it and return it
 										return loadFromDB(taxonomyIdsForProtSeqIdSearchId_Request);
 									}
@@ -209,6 +213,10 @@ public class Cached_TaxonomyIdsForProtSeqIdSearchId implements CachedDataCommonI
 		 * @throws Exception
 		 */
 		private TaxonomyIdsForProtSeqIdSearchId_Result loadFromDB( TaxonomyIdsForProtSeqIdSearchId_Request taxonomyIdsForProtSeqIdSearchId_Request ) throws Exception {
+			
+			//   WARNING  cannot return null.  
+			//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+			
 			//  value is NOT in cache so get it and return it
 			if ( debugLogLevelEnabled ) {
 				cacheDBRetrievalCount.incrementAndGet();

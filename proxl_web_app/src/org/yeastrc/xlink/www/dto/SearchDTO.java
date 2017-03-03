@@ -120,7 +120,7 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	
 	public List<LinkerDTO> getLinkers() throws Exception {
 		try {
-			return SearchLinkerSearcher.getInstance().getLinkersForSearch(this);
+			return SearchLinkerSearcher.getInstance().getLinkersForSearch(this.searchId);
 		} catch ( Exception e ) {
 			String msg = "Exception caught in getLinkers(): " + e.toString();
 			log.error( msg, e );

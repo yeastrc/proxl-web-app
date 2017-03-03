@@ -186,6 +186,10 @@ public class Cached_Related_peptides_unique_for_search_For_SearchId_ReportedPept
 						.build(
 								new CacheLoader<Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request, Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Result>() {
 									public Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Result load(Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request) throws Exception {
+										
+										//   WARNING  cannot return null.  
+										//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+										
 										//  value is NOT in cache so get it and return it
 										return loadFromDB(related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request);
 									}
@@ -208,6 +212,10 @@ public class Cached_Related_peptides_unique_for_search_For_SearchId_ReportedPept
 		 * @throws Exception
 		 */
 		private Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Result loadFromDB( Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request ) throws Exception {
+			
+			//   WARNING  cannot return null.  
+			//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+			
 			//  value is NOT in cache so get it and return it
 			if ( debugLogLevelEnabled ) {
 				cacheDBRetrievalCount.incrementAndGet();

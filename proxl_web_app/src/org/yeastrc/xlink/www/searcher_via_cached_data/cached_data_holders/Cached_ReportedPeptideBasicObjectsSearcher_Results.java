@@ -186,6 +186,10 @@ public class Cached_ReportedPeptideBasicObjectsSearcher_Results implements Cache
 						.build(
 								new CacheLoader<ReportedPeptideBasicObjectsSearcherRequestParameters, ReportedPeptideBasicObjectsSearcherResult>() {
 									public ReportedPeptideBasicObjectsSearcherResult load(ReportedPeptideBasicObjectsSearcherRequestParameters reportedPeptideBasicObjectsSearcherRequestParameters) throws Exception {
+										
+										//   WARNING  cannot return null.  
+										//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+										
 										//  value is NOT in cache so get it and return it
 										return loadFromDB(reportedPeptideBasicObjectsSearcherRequestParameters);
 									}
@@ -208,6 +212,10 @@ public class Cached_ReportedPeptideBasicObjectsSearcher_Results implements Cache
 		 * @throws Exception
 		 */
 		private ReportedPeptideBasicObjectsSearcherResult loadFromDB( ReportedPeptideBasicObjectsSearcherRequestParameters reportedPeptideBasicObjectsSearcherRequestParameters ) throws Exception {
+			
+			//   WARNING  cannot return null.  
+			//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+			
 			//  value is NOT in cache so get it and return it
 			if ( debugLogLevelEnabled ) {
 				cacheDBRetrievalCount.incrementAndGet();

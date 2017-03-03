@@ -186,6 +186,10 @@ public class Cached_ProteinNameFor_SearchProtein implements CachedDataCommonIF {
 						.build(
 								new CacheLoader<ProteinNameFor_SearchProtein_Request, ProteinNameFor_SearchProtein_Result>() {
 									public ProteinNameFor_SearchProtein_Result load(ProteinNameFor_SearchProtein_Request proteinNameFor_SearchProtein_Request) throws Exception {
+										
+										//   WARNING  cannot return null.  
+										//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+										
 										//  value is NOT in cache so get it and return it
 										return loadFromDB(proteinNameFor_SearchProtein_Request);
 									}
@@ -208,6 +212,10 @@ public class Cached_ProteinNameFor_SearchProtein implements CachedDataCommonIF {
 		 * @throws Exception
 		 */
 		private ProteinNameFor_SearchProtein_Result loadFromDB( ProteinNameFor_SearchProtein_Request proteinNameFor_SearchProtein_Request ) throws Exception {
+			
+			//   WARNING  cannot return null.  
+			//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+			
 			//  value is NOT in cache so get it and return it
 			if ( debugLogLevelEnabled ) {
 				cacheDBRetrievalCount.incrementAndGet();

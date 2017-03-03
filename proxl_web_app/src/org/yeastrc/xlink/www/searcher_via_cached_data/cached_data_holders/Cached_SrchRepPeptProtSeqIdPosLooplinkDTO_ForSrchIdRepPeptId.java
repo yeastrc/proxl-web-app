@@ -189,6 +189,10 @@ public class Cached_SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId implem
 						.build(
 								new CacheLoader<SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_ReqParams, SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_Result>() {
 									public SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_Result load(SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_ReqParams) throws Exception {
+										
+										//   WARNING  cannot return null.  
+										//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+										
 										//  value is NOT in cache so get it and return it
 										return loadFromDB(srchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_ReqParams);
 									}
@@ -212,6 +216,10 @@ public class Cached_SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId implem
 		 * @throws Exception
 		 */
 		private SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_Result loadFromDB( SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_ReqParams ) throws Exception {
+			
+			//   WARNING  cannot return null.  
+			//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+			
 			//  value is NOT in cache so get it and return it
 			if ( debugLogLevelEnabled ) {
 				cacheDBRetrievalCount.incrementAndGet();

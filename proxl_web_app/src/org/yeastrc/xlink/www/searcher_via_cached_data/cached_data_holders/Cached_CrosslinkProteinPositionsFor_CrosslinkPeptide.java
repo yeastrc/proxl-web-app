@@ -188,6 +188,10 @@ public class Cached_CrosslinkProteinPositionsFor_CrosslinkPeptide implements Cac
 						.build(
 								new CacheLoader<CrosslinkProteinPositionsFor_CrosslinkPeptide_Request, CrosslinkProteinPositionsFor_CrosslinkPeptide_Result>() {
 									public CrosslinkProteinPositionsFor_CrosslinkPeptide_Result load(CrosslinkProteinPositionsFor_CrosslinkPeptide_Request crosslinkProteinPositionsFor_CrosslinkPeptide_Request) throws Exception {
+										
+										//   WARNING  cannot return null.  
+										//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+										
 										//  value is NOT in cache so get it and return it
 										return loadFromDB(crosslinkProteinPositionsFor_CrosslinkPeptide_Request);
 									}
@@ -210,6 +214,10 @@ public class Cached_CrosslinkProteinPositionsFor_CrosslinkPeptide implements Cac
 		 * @throws Exception
 		 */
 		private CrosslinkProteinPositionsFor_CrosslinkPeptide_Result loadFromDB( CrosslinkProteinPositionsFor_CrosslinkPeptide_Request crosslinkProteinPositionsFor_CrosslinkPeptide_Request ) throws Exception {
+			
+			//   WARNING  cannot return null.  
+			//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+			
 			//  value is NOT in cache so get it and return it
 			if ( debugLogLevelEnabled ) {
 				cacheDBRetrievalCount.incrementAndGet();

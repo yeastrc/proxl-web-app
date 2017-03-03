@@ -109,6 +109,10 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 			    .build(
 			    		new CacheLoader<LocalCacheKey, LocalCacheValue>() {
 			    			public LocalCacheValue load(LocalCacheKey localCacheKey) throws Exception {
+			    				
+			    				//   WARNING  cannot return null.  
+			    				//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+			    				
 			    				//  value is NOT in cache so get it and return it
 			    				return loadFromDB(localCacheKey);
 			    			}
@@ -178,6 +182,10 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 	 * @throws Exception
 	 */
 	private LocalCacheValue loadFromDB( LocalCacheKey localCacheKey ) throws Exception {
+		
+		//   WARNING  cannot return null.  
+		//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+		
 		//  value is NOT in cache so get it and return it
 		String configValue =
 				ConfigSystemDAO.getInstance().getConfigValueForConfigKey(  localCacheKey.configKey );

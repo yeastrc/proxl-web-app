@@ -187,6 +187,10 @@ public class Cached_ProteinDescriptionFor_SearchProtein implements CachedDataCom
 						.build(
 								new CacheLoader<ProteinDescriptionFor_SearchProtein_Request, ProteinDescriptionFor_SearchProtein_Result>() {
 									public ProteinDescriptionFor_SearchProtein_Result load(ProteinDescriptionFor_SearchProtein_Request proteinDescriptionFor_SearchProtein_Request) throws Exception {
+										
+										//   WARNING  cannot return null.  
+										//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+										
 										//  value is NOT in cache so get it and return it
 										return loadFromDB(proteinDescriptionFor_SearchProtein_Request);
 									}
@@ -209,6 +213,10 @@ public class Cached_ProteinDescriptionFor_SearchProtein implements CachedDataCom
 		 * @throws Exception
 		 */
 		private ProteinDescriptionFor_SearchProtein_Result loadFromDB( ProteinDescriptionFor_SearchProtein_Request proteinDescriptionFor_SearchProtein_Request ) throws Exception {
+			
+			//   WARNING  cannot return null.  
+			//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+			
 			//  value is NOT in cache so get it and return it
 			if ( debugLogLevelEnabled ) {
 				cacheDBRetrievalCount.incrementAndGet();

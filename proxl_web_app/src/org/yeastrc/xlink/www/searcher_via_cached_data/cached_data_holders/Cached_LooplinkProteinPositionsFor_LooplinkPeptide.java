@@ -189,6 +189,10 @@ public class Cached_LooplinkProteinPositionsFor_LooplinkPeptide implements Cache
 						.build(
 								new CacheLoader<LooplinkProteinPositionsFor_LooplinkPeptide_Request, LooplinkProteinPositionsFor_LooplinkPeptide_Result>() {
 									public LooplinkProteinPositionsFor_LooplinkPeptide_Result load(LooplinkProteinPositionsFor_LooplinkPeptide_Request looplinkProteinPositionsFor_LooplinkPeptide_Request) throws Exception {
+										
+										//   WARNING  cannot return null.  
+										//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+										
 										//  value is NOT in cache so get it and return it
 										return loadFromDB(looplinkProteinPositionsFor_LooplinkPeptide_Request);
 									}
@@ -211,6 +215,10 @@ public class Cached_LooplinkProteinPositionsFor_LooplinkPeptide implements Cache
 		 * @throws Exception
 		 */
 		private LooplinkProteinPositionsFor_LooplinkPeptide_Result loadFromDB( LooplinkProteinPositionsFor_LooplinkPeptide_Request looplinkProteinPositionsFor_LooplinkPeptide_Request ) throws Exception {
+			
+			//   WARNING  cannot return null.  
+			//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+			
 			//  value is NOT in cache so get it and return it
 			if ( debugLogLevelEnabled ) {
 				cacheDBRetrievalCount.incrementAndGet();
