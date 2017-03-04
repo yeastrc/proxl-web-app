@@ -202,7 +202,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	   <a href="listProjects.do" >
 	  </c:when>
 	  <c:when test="${ not empty headerProject }">
-	   <a href="${ contextPath }/viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ headerProject.projectDTO.id }" ></c:out>">
+	   <a href="${ contextPath }/viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ headerProject.projectTblData.id }" ></c:out>">
 	  </c:when>
 	  <c:otherwise>
 	  	
@@ -248,7 +248,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 				<c:set var="header_current_project_in_drop_down_list"></c:set>  <%-- default to empty --%>
 				
 				<c:if test="${ not empty headerProject  }">
-				  <c:if test="${ projectItem.projectDTO.id == headerProject.projectDTO.id }">
+				  <c:if test="${ projectItem.projectTblData.id == headerProject.projectTblData.id }">
 				  
 				  	<%--  Set to the value for the "id" in the span expected by the Javascript for the header --%>
 					<c:set var="header_current_project_in_drop_down_list">header_current_project_in_drop_down_list</c:set>
@@ -256,7 +256,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 				</c:if>
 			
 				<div  class="project-text-div" >
-					<a href="${ contextPath }/viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ projectItem.projectDTO.id }" ></c:out>"
+					<a href="${ contextPath }/viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ projectItem.projectTblData.id }" ></c:out>"
 						class="project-text-link" 
 						><span id="${ header_current_project_in_drop_down_list }"  <%-- << use EL ${  } to drop in the value set just above --%>
 							><c:out value="${ projectItem.titleHeaderDisplay }" ></c:out
@@ -282,17 +282,17 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	  <div class="header-current-project-label-div">
 	  
 	  
-		<a href="${ contextPath }/viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ headerProject.projectDTO.id }" ></c:out>"  
+		<a href="${ contextPath }/viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ headerProject.projectTblData.id }" ></c:out>"  
 				class="header-project-title"  id="header_project_title_link" 
-				<c:if test="${ headerProject.projectDTO.title ne  headerProject.titleHeaderDisplay }">
+				<c:if test="${ headerProject.projectTblData.title ne  headerProject.titleHeaderDisplay }">
 				
-					title="<c:out value="${ headerProject.projectDTO.title }"></c:out>"
+					title="<c:out value="${ headerProject.projectTblData.title }"></c:out>"
 				</c:if>
 				
 				>
 				
 				<c:set var="header_project_locked_display_none">display:none;</c:set> <%-- initialize to hide the lock symbol for non-locked projects --%>
-				<c:if test="${ not headerProject.projectDTO.projectLocked }">
+				<c:if test="${ not headerProject.projectTblData.projectLocked }">
 					<c:set var="header_project_locked_display_none"></c:set> <%-- for locked projects, clear the "display:none;" so the lock is shown --%>
 				</c:if>
 				
@@ -300,7 +300,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 				
 				<c:if test="${ not empty headerUser }">
 					<img src="${ contextPath }/images/icon-locked-small.png" 
-							style="<c:if test="${ not headerProject.projectDTO.projectLocked }">display:none;</c:if>" 
+							style="<c:if test="${ not headerProject.projectTblData.projectLocked }">display:none;</c:if>" 
 							id="header_project_locked_icon">
 				</c:if>
 				

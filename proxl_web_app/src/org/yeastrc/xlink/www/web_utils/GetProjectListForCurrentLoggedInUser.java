@@ -9,7 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
-import org.yeastrc.xlink.www.dto.ProjectDTO;
+import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.searcher.ProjectSearcher;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
@@ -32,7 +32,7 @@ public class GetProjectListForCurrentLoggedInUser {
 	 * @param request
 	 * @throws Exception 
 	 */
-	public List<ProjectDTO> getProjectListForCurrentLoggedInUser( HttpServletRequest request ) throws Exception {
+	public List<ProjectTblSubPartsForProjectLists> getProjectListForCurrentLoggedInUser( HttpServletRequest request ) throws Exception {
 		
 		
 		// Get their session first.  
@@ -43,14 +43,11 @@ public class GetProjectListForCurrentLoggedInUser {
 		= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
 
 		if ( userSessionObject == null || userSessionObject.getUserDBObject() == null || userSessionObject.getUserDBObject().getAuthUser() == null ) {
-
 			//  No User session 
-
-			return new ArrayList<ProjectDTO>();
+			return new ArrayList<>();
 		}
-		
 
-		List<ProjectDTO> projects = null;
+		List<ProjectTblSubPartsForProjectLists> projects = null;
 
 
 		AuthUserDTO authUser = userSessionObject.getUserDBObject().getAuthUser();

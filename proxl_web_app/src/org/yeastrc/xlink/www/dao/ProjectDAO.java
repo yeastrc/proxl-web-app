@@ -8,6 +8,7 @@ import java.sql.Statement;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
+import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
 
 /**
  * DAO for project table
@@ -48,6 +49,53 @@ public class ProjectDAO {
 			}
 		} catch ( Exception e ) {
 			String msg = "Failed to select ProjectDTO, projectId: " + projectId + ", sql: " + sql;
+			log.error( msg, e );
+			throw e;
+		} finally {
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			if( conn != null ) {
+				try { conn.close(); } catch( Throwable t ) { ; }
+				conn = null;
+			}
+		}
+		return returnItem;
+	}
+	
+	
+
+	/**
+	 * @param projectId
+	 * @return null if not found
+	 * @throws Exception
+	 */
+	public ProjectTblSubPartsForProjectLists getProjectTblSubPartsForProjectListsForProjectId( int projectId ) throws Exception {
+		
+		ProjectTblSubPartsForProjectLists returnItem = null;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		final String sql = "SELECT title, project_locked FROM project WHERE id = ?";
+		try {
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			pstmt = conn.prepareStatement( sql );
+			pstmt.setInt( 1, projectId );
+			rs = pstmt.executeQuery();
+			if( rs.next() ) {
+				returnItem = new ProjectTblSubPartsForProjectLists();
+				returnItem.setId( projectId );
+				returnItem.setTitle( rs.getString( "title" ) );
+				returnItem.setProjectLocked( rs.getBoolean( "project_locked" ) );
+			}
+		} catch ( Exception e ) {
+			String msg = "Failed to select ProjectTblSubPartsForProjectLists, projectId: " + projectId + ", sql: " + sql;
 			log.error( msg, e );
 			throw e;
 		} finally {

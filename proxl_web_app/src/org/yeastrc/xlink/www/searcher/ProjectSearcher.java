@@ -8,9 +8,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
-import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.www.dto.ProjectDTO;
+import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ProjectTblSubPartsForProjectLists;
 
 /**
  * Return a list of projects in the database this session can access, ordered by project title
@@ -34,30 +34,9 @@ public class ProjectSearcher {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<ProjectDTO> getProjectsForAuthUserId( int authUserId ) throws Exception {
+	public List<ProjectTblSubPartsForProjectLists> getProjectsForAuthUserId( int authUserId ) throws Exception {
 		
-
-		//CREATE TABLE project (
-//		  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//		  auth_shareable_object_id INT UNSIGNED NOT NULL,
-//		  title VARCHAR(255) NULL,
-//		  abstract TEXT NULL,
-//		  enabled TINYINT UNSIGNED NOT NULL DEFAULT 1,
-//		  marked_for_deletion TINYINT UNSIGNED NOT NULL DEFAULT 0,
-
-		
-//		CREATE TABLE IF NOT EXISTS crosslinks.auth_shared_object (
-//				  shared_object_id INT UNSIGNED NOT NULL,
-//				  public_access_code_enabled TINYINT(1) NOT NULL DEFAULT false,
-//				  public_access_code VARCHAR(255) NULL,
-
-//		CREATE TABLE IF NOT EXISTS auth_shared_object_users (
-//				  shared_object_id INT UNSIGNED NOT NULL,
-//				  user_id INT UNSIGNED NOT NULL,
-//				  access_level SMALLINT UNSIGNED NOT NULL,
-			
-		
-		List<ProjectDTO> projects = new ArrayList<ProjectDTO>();
+		List<ProjectTblSubPartsForProjectLists> projects = new ArrayList<>();
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -86,8 +65,9 @@ public class ProjectSearcher {
 			
 			rs = pstmt.executeQuery();
 
-			while( rs.next() )
-				projects.add( ProjectDAO.getInstance().getProjectDTOForProjectId( rs.getInt( 1 ) ) );
+			while( rs.next() ) { 
+				projects.add( Cached_ProjectTblSubPartsForProjectLists.getInstance().getProjectTblSubPartsForProjectLists( rs.getInt( 1 ) ) );
+			}
 			
 		} catch ( Exception e ) {
 			
@@ -109,15 +89,11 @@ public class ProjectSearcher {
 				try { pstmt.close(); } catch( Throwable t ) { ; }
 				pstmt = null;
 			}
-			
 			if( conn != null ) {
 				try { conn.close(); } catch( Throwable t ) { ; }
 				conn = null;
 			}
-			
 		}
-		
-		
 		
 		return projects;
 	}
@@ -272,10 +248,10 @@ public class ProjectSearcher {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<ProjectDTO> getAllProjects() throws Exception {
+	public List<ProjectTblSubPartsForProjectLists> getAllProjects() throws Exception {
 		
 		
-		List<ProjectDTO> projects = new ArrayList<ProjectDTO>();
+		List<ProjectTblSubPartsForProjectLists> projects = new ArrayList<>();
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -294,9 +270,9 @@ public class ProjectSearcher {
 			
 			rs = pstmt.executeQuery();
 
-			while( rs.next() )
-				projects.add( ProjectDAO.getInstance().getProjectDTOForProjectId( rs.getInt( 1 ) ) );
-
+			while( rs.next() ) {
+				projects.add( Cached_ProjectTblSubPartsForProjectLists.getInstance().getProjectTblSubPartsForProjectLists( rs.getInt( 1 ) ) );
+			}
 			
 		} catch ( Exception e ) {
 			

@@ -8,11 +8,11 @@ import javax.servlet.http.HttpSession;
 
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
-import org.yeastrc.xlink.www.dao.ProjectDAO;
-import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.objects.ProjectTitleAbstractHeaderDisplay;
+import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
+import org.yeastrc.xlink.www.objects.ProjectTitleHeaderDisplay;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ProjectTblSubPartsForProjectLists;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.TruncateProjectTitleForDisplay;
 
@@ -108,15 +108,15 @@ public class GetPageHeaderData {
 
 			request.setAttribute( "headerUser", userSessionObject.getUserDBObject() );
 			
-			List<ProjectDTO> projectsFromDB = GetProjectListForCurrentLoggedInUser.getInstance().getProjectListForCurrentLoggedInUser( request );
+			List<ProjectTblSubPartsForProjectLists> projectsFromDB = GetProjectListForCurrentLoggedInUser.getInstance().getProjectListForCurrentLoggedInUser( request );
 			
-			List<ProjectTitleAbstractHeaderDisplay> projects = new ArrayList<ProjectTitleAbstractHeaderDisplay>( projectsFromDB.size() );
+			List<ProjectTitleHeaderDisplay> projects = new ArrayList<ProjectTitleHeaderDisplay>( projectsFromDB.size() );
 			
-			for ( ProjectDTO projectFromDB : projectsFromDB ) {
+			for ( ProjectTblSubPartsForProjectLists projectFromDB : projectsFromDB ) {
 				
-				ProjectTitleAbstractHeaderDisplay project = new ProjectTitleAbstractHeaderDisplay();
+				ProjectTitleHeaderDisplay project = new ProjectTitleHeaderDisplay();
 				
-				project.setProjectDTO(projectFromDB);
+				project.setProjectTblData( projectFromDB );
 				
 				String titleHeaderDisplay = TruncateProjectTitleForDisplay.truncateProjectTitleForHeader( projectFromDB.getTitle() );
 				
@@ -135,18 +135,18 @@ public class GetPageHeaderData {
 		
 		if ( projectId != null ) {
 			
-			ProjectDTO projectFromDB = ProjectDAO.getInstance().getProjectDTOForProjectId( projectId );
+			ProjectTblSubPartsForProjectLists projectTblData = Cached_ProjectTblSubPartsForProjectLists.getInstance().getProjectTblSubPartsForProjectLists( projectId );
 			
-			ProjectTitleAbstractHeaderDisplay project = new ProjectTitleAbstractHeaderDisplay();
+			ProjectTitleHeaderDisplay project = new ProjectTitleHeaderDisplay();
 			
-			project.setProjectDTO(projectFromDB);
+			project.setProjectTblData( projectTblData );;
 
-			String titleHeaderDisplay = TruncateProjectTitleForDisplay.truncateProjectTitleForHeader( projectFromDB.getTitle() );
+			String titleHeaderDisplay = TruncateProjectTitleForDisplay.truncateProjectTitleForHeader( projectTblData.getTitle() );
 			
 			project.setTitleHeaderDisplay( titleHeaderDisplay );
 			
 
-			String titleHeaderDisplayNonUser = TruncateProjectTitleForDisplay.truncateProjectTitleForHeaderNonUser( projectFromDB.getTitle() );
+			String titleHeaderDisplayNonUser = TruncateProjectTitleForDisplay.truncateProjectTitleForHeaderNonUser( projectTblData.getTitle() );
 
 			project.setTitleHeaderDisplayNonUser( titleHeaderDisplayNonUser );
 			

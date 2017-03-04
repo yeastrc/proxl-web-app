@@ -20,6 +20,7 @@ import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.objects.ProjectTitleAbstractAdminResult;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ProjectTblSubPartsForProjectLists;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -124,7 +125,7 @@ public class ProjectTitleAbstractAdminService {
 
 			
 			projectDAO.updateTitle(projectId, title);
-			
+			Cached_ProjectTblSubPartsForProjectLists.getInstance().invalidateProjectId( projectId );
 
 			projectDTO = projectDAO.getProjectDTOForProjectId( projectId );
 			
@@ -259,7 +260,7 @@ public class ProjectTitleAbstractAdminService {
 
 			
 			projectDAO.updateAbstract(projectId, abstractText);
-			
+			Cached_ProjectTblSubPartsForProjectLists.getInstance().invalidateProjectId( projectId );
 
 			projectDTO = projectDAO.getProjectDTOForProjectId( projectId );
 			

@@ -18,6 +18,7 @@ import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.GenericWebserviceResult;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ProjectTblSubPartsForProjectLists;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -35,7 +36,7 @@ public class ProjectMarkForDeletionService {
 	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/markForDeletion")
-	public GenericWebserviceResult addNote( 
+	public GenericWebserviceResult markForDeletion( 
 			@FormParam("projectId") int projectId,
 			@Context HttpServletRequest request ) throws Exception {
 
@@ -113,7 +114,8 @@ public class ProjectMarkForDeletionService {
 			int authUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
 			
 			projectDAO.updateSetEnabledZeroAndMarkToDeleteOne( projectId, authUserId ); 
-
+			Cached_ProjectTblSubPartsForProjectLists.getInstance().invalidateProjectId( projectId );
+			
 			genericWebserviceResult.setStatus(true);
 
 			return genericWebserviceResult;

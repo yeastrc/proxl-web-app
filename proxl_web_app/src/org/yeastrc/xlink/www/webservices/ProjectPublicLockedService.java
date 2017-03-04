@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.GenericWebserviceResult;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ProjectTblSubPartsForProjectLists;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -36,7 +37,7 @@ public class ProjectPublicLockedService {
 	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/lock")
-	public GenericWebserviceResult enable( 
+	public GenericWebserviceResult lock( 
 			@FormParam("projectId") int projectId, 
 			@Context HttpServletRequest request ) throws Exception {
 
@@ -106,7 +107,7 @@ public class ProjectPublicLockedService {
 
 			
 			ProjectDAO.getInstance().updateProjectLocked( projectId, true /* projectLocked */ );
-			
+			Cached_ProjectTblSubPartsForProjectLists.getInstance().invalidateProjectId( projectId );
 			
 			GenericWebserviceResult genericWebserviceResult = new GenericWebserviceResult();
 			
@@ -206,7 +207,7 @@ public class ProjectPublicLockedService {
 
 			
 			ProjectDAO.getInstance().updateProjectLocked( projectId, false /* projectLocked */ );
-			
+			Cached_ProjectTblSubPartsForProjectLists.getInstance().invalidateProjectId( projectId );
 			
 			GenericWebserviceResult genericWebserviceResult = new GenericWebserviceResult();
 			

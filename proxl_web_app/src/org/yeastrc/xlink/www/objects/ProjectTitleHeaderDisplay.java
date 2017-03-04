@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.objects;
 
-import org.yeastrc.xlink.www.dto.ProjectDTO;
 
 /**
  * display a project in the header
@@ -8,9 +7,9 @@ import org.yeastrc.xlink.www.dto.ProjectDTO;
  * Placed in request scope by GetPageHeaderData
  *
  */
-public class ProjectTitleAbstractHeaderDisplay {
+public class ProjectTitleHeaderDisplay {
 
-	private ProjectDTO projectDTO;
+	private ProjectTblSubPartsForProjectLists projectTblData;
 	
 	/**
 	 * Truncated as needed
@@ -29,17 +28,17 @@ public class ProjectTitleAbstractHeaderDisplay {
 	public void setTitleHeaderDisplayNonUser(String titleHeaderDisplayNonUser) {
 		this.titleHeaderDisplayNonUser = titleHeaderDisplayNonUser;
 	}
-	public ProjectDTO getProjectDTO() {
-		return projectDTO;
-	}
-	public void setProjectDTO(ProjectDTO projectDTO) {
-		this.projectDTO = projectDTO;
-	}
 	public String getTitleHeaderDisplay() {
 		return titleHeaderDisplay;
 	}
 	public void setTitleHeaderDisplay(String titleHeaderDisplay) {
 		this.titleHeaderDisplay = titleHeaderDisplay;
+	}
+	public ProjectTblSubPartsForProjectLists getProjectTblData() {
+		return projectTblData;
+	}
+	public void setProjectTblData(ProjectTblSubPartsForProjectLists projectTblData) {
+		this.projectTblData = projectTblData;
 	}
 
 }

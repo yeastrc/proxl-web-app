@@ -17,8 +17,8 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
-import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -41,7 +41,7 @@ public class ProjectListForCurrentUserService {
 		try {
 
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 
 
 
@@ -73,7 +73,7 @@ public class ProjectListForCurrentUserService {
 						);
 			}
 
-			List<ProjectDTO> projects = GetProjectListForCurrentLoggedInUser.getInstance().getProjectListForCurrentLoggedInUser( request );
+			List<ProjectTblSubPartsForProjectLists> projects = GetProjectListForCurrentLoggedInUser.getInstance().getProjectListForCurrentLoggedInUser( request );
 
 
 			AuthUserDTO authUser = userSessionObject.getUserDBObject().getAuthUser();
@@ -95,7 +95,7 @@ public class ProjectListForCurrentUserService {
 			
 			List<ProjectWithUserAccessLevel> projectList = new ArrayList<ProjectWithUserAccessLevel>( projects.size() );
 			
-			for ( ProjectDTO project : projects ) {
+			for ( ProjectTblSubPartsForProjectLists project : projects ) {
 				
 				ProjectWithUserAccessLevel projectWithUserAccessLevel = new ProjectWithUserAccessLevel();
 				projectList.add( projectWithUserAccessLevel );
@@ -159,15 +159,15 @@ public class ProjectListForCurrentUserService {
 
 	public static class ProjectWithUserAccessLevel {
 
-		private ProjectDTO project;
+		private ProjectTblSubPartsForProjectLists project;
 		private boolean canDelete;
 		private boolean canUpload;
 
 
-		public ProjectDTO getProject() {
+		public ProjectTblSubPartsForProjectLists getProject() {
 			return project;
 		}
-		public void setProject(ProjectDTO project) {
+		public void setProject(ProjectTblSubPartsForProjectLists project) {
 			this.project = project;
 		}
 		public boolean isCanDelete() {
