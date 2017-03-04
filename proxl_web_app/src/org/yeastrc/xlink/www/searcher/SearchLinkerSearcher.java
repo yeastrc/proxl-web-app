@@ -5,9 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.yeastrc.xlink.dao.LinkerDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.dto.LinkerDTO;
 
 public class SearchLinkerSearcher {
 	
@@ -20,9 +18,9 @@ public class SearchLinkerSearcher {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<LinkerDTO> getLinkersForSearch( int searchId ) throws Exception {
+	public List<Integer> getLinkerIdsForSearch( int searchId ) throws Exception {
 		
-		List<LinkerDTO> comments = new ArrayList<LinkerDTO>();
+		List<Integer> resultList = new ArrayList<Integer>();
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -33,7 +31,7 @@ public class SearchLinkerSearcher {
 			pstmt.setInt( 1, searchId );
 			rs = pstmt.executeQuery();
 			while( rs.next() ) {
-				comments.add( LinkerDAO.getInstance().getLinkerDTOForId( rs.getInt( 1 ) ) );
+				resultList.add(  rs.getInt( 1 ) );
 			}
 		} finally {
 			// be sure database handles are closed
@@ -51,6 +49,6 @@ public class SearchLinkerSearcher {
 			}
 		}
 		
-		return comments;
+		return resultList;
 	}
 }

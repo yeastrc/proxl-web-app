@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.dto;
-import java.util.Collections;
-import java.util.Comparator;
+
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -10,8 +9,9 @@ import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.SearchCommentDTO;
 import org.yeastrc.xlink.dto.SearchFileProjectSearchDTO;
 import org.yeastrc.xlink.www.searcher.SearchCommentSearcher;
-import org.yeastrc.xlink.www.searcher.SearchLinkerSearcher;
 import org.yeastrc.xlink.www.searcher.SearchWebLinksSearcher;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Linkers_ForSearchId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.Linkers_ForSearchId_Response;
 /**
  * Table search
  *
@@ -30,6 +30,28 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	private String directoryName;
 	private int displayOrder;
 	private boolean hasScanData;
+	
+	///////  Constructors
+	
+	public SearchDTO() {
+		
+	}
+	
+	public SearchDTO( Search_Core_DTO search_Core_DTO ) {
+		this.projectSearchId = search_Core_DTO.getProjectSearchId();
+		this.searchId = search_Core_DTO.getSearchId();
+		this.path = search_Core_DTO.getPath();
+		this.load_time = search_Core_DTO.getLoad_time();
+		this.fastaFilename = search_Core_DTO.getFastaFilename();
+		this.name = search_Core_DTO.getName();
+		this.projectId = search_Core_DTO.getProjectId();
+		this.directoryName = search_Core_DTO.getDirectoryName();
+		this.displayOrder = search_Core_DTO.getDisplayOrder();
+		this.hasScanData = search_Core_DTO.isHasScanData();
+	}
+	
+	
+	
 
 	@Override
 	public boolean equals(Object obj) {
@@ -120,7 +142,10 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	
 	public List<LinkerDTO> getLinkers() throws Exception {
 		try {
-			return SearchLinkerSearcher.getInstance().getLinkersForSearch(this.searchId);
+			Linkers_ForSearchId_Response linkers_ForSearchId_Response =
+					Cached_Linkers_ForSearchId.getInstance()
+					.getLinkers_ForSearchId_Response( this.searchId );
+			return linkers_ForSearchId_Response.getLinkersForSearchIdList();
 		} catch ( Exception e ) {
 			String msg = "Exception caught in getLinkers(): " + e.toString();
 			log.error( msg, e );

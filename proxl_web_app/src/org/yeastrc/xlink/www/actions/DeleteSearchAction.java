@@ -18,6 +18,7 @@ import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Search_Core_DTO;
 import org.yeastrc.xlink.www.servlet_context.CurrentContext;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -77,7 +78,8 @@ public class DeleteSearchAction extends Action {
 			SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 //			SearchDAO.getInstance().deleteSearch( searchId );
 			ProjectSearchDAO.getInstance().markAsDeleted( projectSearchId, authUserDTO.getId() );
-			
+			Cached_Search_Core_DTO.getInstance().invalidateProjectSearchId( projectSearchId );
+
 			try {
 				String msg = "Project Search id " + projectSearchId 
 						+ " successfully deleted by user (username: " +  authUserDTO.getUsername() 

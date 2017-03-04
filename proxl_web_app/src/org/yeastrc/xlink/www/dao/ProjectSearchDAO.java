@@ -10,6 +10,7 @@ import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
 /**
  * Table project_search
  *
+ * !!! SearchDAO also has queries against project_search table
  */
 public class ProjectSearchDAO {
 	

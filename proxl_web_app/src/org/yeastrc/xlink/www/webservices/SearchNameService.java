@@ -20,6 +20,7 @@ import org.yeastrc.xlink.www.dao.ProjectSearchDAO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Search_Core_DTO;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -34,13 +35,12 @@ public class SearchNameService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/save")
 	public SearchNameServiceResult saveSearchName( 
-			@FormParam("searchId") 
-			Integer projectSearchId, 
+			@FormParam("projectSearchId") Integer projectSearchId, 
 			@FormParam("name") String name, 
 			@Context HttpServletRequest request ) throws Exception {
 		
 		if ( projectSearchId == null ) {
-			String msg = "Provided searchId is null or searchId is missing";
+			String msg = "Provided projectSearchId is null or projectSearchId is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -110,6 +110,7 @@ public class SearchNameService {
 
 			if( name != null && name != "" ) {
 				ProjectSearchDAO.getInstance().updateName( projectSearchId, name );
+				Cached_Search_Core_DTO.getInstance().invalidateProjectSearchId( projectSearchId );
 			}
 			
 			SearchNameServiceResult result = new SearchNameServiceResult();

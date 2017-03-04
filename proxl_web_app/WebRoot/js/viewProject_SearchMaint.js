@@ -737,22 +737,22 @@ function cancelNameEdit( id ) {
 
 
 //Called by "onclick" on HTML element
-function saveName( searchId ) {
+function saveName( projectSearchId ) {
 	try {
 		var _URL = contextPathJSVar + "/services/searchName/save";
-		var name = $( "input#search-name-value-" + searchId ).val();
+		var name = $( "input#search-name-value-" + projectSearchId ).val();
 		if( name == undefined || name == "" ) { return; }
 //		var request = 
 		$.ajax({
 			type: "POST",
 			url: _URL,
-			data: { 'searchId' : searchId, 'name' : name },
+			data: { 'projectSearchId' : projectSearchId, 'name' : name },
 			dataType: "json",
 			success: function(data)	{
 				try {
-					$( "span#search-name-display-" + searchId ).html( name );
-					$( "span#search-name-edit-" + searchId ).hide();
-					$( "span#search-name-normal-" + searchId ).show();
+					$( "span#search-name-display-" + projectSearchId ).html( name );
+					$( "span#search-name-edit-" + projectSearchId ).hide();
+					$( "span#search-name-normal-" + projectSearchId ).show();
 				} catch( e ) {
 					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 					throw e;

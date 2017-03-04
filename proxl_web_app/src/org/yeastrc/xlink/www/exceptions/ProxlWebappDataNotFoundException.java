@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.exceptions;
 
 /**
- * Data not found.  
+ * Data not found from DB query.  
  * 
  * Required for Guava LoadingCache since not valid to return null to Guava Cache
  *
