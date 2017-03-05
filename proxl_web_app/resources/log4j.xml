@@ -160,12 +160,13 @@
         
         
         <!-- Debugging loggers -->
+        <!-- 
         <logger name="org.yeastrc.xlink.www.db_web.DBConnectionFactoryWeb" additivity="false">
                 <level value="DEBUG"/>
                 <appender-ref ref="ROLL" />
                 <appender-ref ref="ROLL_ERROR" />
         </logger>
-        
+         -->
 
         <!-- Uncomment to enable debug on specific code only -->
         <!--
