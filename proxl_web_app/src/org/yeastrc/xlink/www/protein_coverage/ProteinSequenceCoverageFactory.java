@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.protein_coverage;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -145,18 +146,42 @@ public class ProteinSequenceCoverageFactory {
 			coverage.addStartEndBoundary( peptideProteinPositionsItem.getProteinStartPosition(), peptideProteinPositionsItem.getProteinEndPosition() );
 		}
 		//  Add computed coverages to cache
-//		ProteinSequenceCoverageCachedData proteinSequenceCoverageCachedData = ProteinSequenceCoverageCachedData.getInstance();
-//		for ( Map.Entry<Integer, ProteinSequenceCoverage> entry : proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages.entrySet() ) {
-//			Integer proteinSequenceId = entry.getKey();
-//			ProteinSequenceCoverage coverage = entry.getValue(); 
-//			/*
-//			 * add coverage object to the cache
-//			 */
-//			ProteinSequenceCoverage coverageCopy = coverage.copy();
-//			proteinSequenceCoverageCachedData
-//			.addProteinSequenceCoverage( proteinSequenceId, searcherCutoffValuesSearchLevel, coverageCopy );
-//		}
+		// First make copy of data inside synchronized to ensure written to main memory before add to cache
+		List<ProteinSequenceCoverageCacheAddEntry> proteinSequenceCoverageCacheAddEntryList = new ArrayList<>( proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages.size() );
+		synchronized ( this ) {
+			for ( Map.Entry<Integer, ProteinSequenceCoverage> entry : proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages.entrySet() ) {
+				Integer proteinSequenceId = entry.getKey();
+				ProteinSequenceCoverage coverage = entry.getValue(); 
+				ProteinSequenceCoverage coverageCopy = coverage.copy();
+				ProteinSequenceCoverageCacheAddEntry psccae = new ProteinSequenceCoverageCacheAddEntry();
+				psccae.proteinSequenceId = proteinSequenceId;
+				psccae.searcherCutoffValuesSearchLevel = searcherCutoffValuesSearchLevel;
+				psccae.coverage = coverageCopy;
+				proteinSequenceCoverageCacheAddEntryList.add( psccae );
+			}
+		}
+		ProteinSequenceCoverageCachedData proteinSequenceCoverageCachedData = ProteinSequenceCoverageCachedData.getInstance();
+		for ( ProteinSequenceCoverageCacheAddEntry entry : proteinSequenceCoverageCacheAddEntryList ) {
+			/*
+			 * add coverage object to the cache
+			 */
+			proteinSequenceCoverageCachedData
+			.addProteinSequenceCoverage( entry.proteinSequenceId, entry.searcherCutoffValuesSearchLevel, entry.coverage );
+		}
+
 
 		return proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages;
+	}
+	
+
+	/**
+	 * 
+	 * Cache Entry to add
+	 */
+	private class ProteinSequenceCoverageCacheAddEntry {
+		
+		int proteinSequenceId;
+		SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel;
+		ProteinSequenceCoverage coverage;
 	}
 }
