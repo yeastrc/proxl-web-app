@@ -393,14 +393,15 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 				
 			} else {
 				
-
-				//   Only Default Peptide Cutoffs chosen so criteria simply the Peptides where the defaultPeptideCutoffs is yes
-
+				//   Only Default Peptide Cutoffs chosen so criteria simply the Peptides where the defaultPeptideCutoffs is yes or NA
 				sqlSB.append( " AND " );
-
-
 				sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.peptide_meets_default_cutoffs = '" );
-				sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.YES.value() );
+
+				if ( peptideCutoffValuesList.isEmpty() ) {
+					sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.NOT_APPLICABLE.value() );
+				} else {
+					sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.YES.value() );
+				}
 				sqlSB.append( "' " );
 
 			}

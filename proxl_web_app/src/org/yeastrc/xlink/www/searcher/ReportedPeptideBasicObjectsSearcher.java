@@ -491,9 +491,18 @@ public class ReportedPeptideBasicObjectsSearcher {
 				}
 			} else {
 				//   Only Default Peptide Cutoffs chosen so criteria simply the Peptides where the defaultPeptideCutoffs is yes
+				
+				//  WARNING   This is very like WRONG.  
+				//  For certain inputs, the right value to search for is: Yes_No__NOT_APPLICABLE_Enum.NOT_APPLICABLE
+				
 				sqlSB.append( " AND " );
 				sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.peptide_meets_default_cutoffs = '" );
-				sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.YES.value() );
+
+				if ( peptideCutoffValuesList.isEmpty() ) {
+					sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.NOT_APPLICABLE.value() );
+				} else {
+					sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.YES.value() );
+				}
 				sqlSB.append( "' " );
 			}
 		}		

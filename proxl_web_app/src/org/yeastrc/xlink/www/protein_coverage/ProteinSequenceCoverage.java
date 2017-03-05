@@ -3,6 +3,7 @@ package org.yeastrc.xlink.www.protein_coverage;
 import java.util.Set;
 
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
+import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
 import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
 
 import com.google.common.collect.Range;
@@ -20,12 +21,24 @@ public class ProteinSequenceCoverage {
 	}
 	
 	/**
+	 * @return a copy of this object
+	 */
+	public ProteinSequenceCoverage copy() {
+		ProteinSequenceObject ps = ProteinSequenceObjectFactory.getProteinSequenceObject( this.protein.getProteinSequenceId() );
+		ProteinSequenceCoverage returnedProteinCoverage = new ProteinSequenceCoverage( ps );
+		for( Range<Integer> range : this.getRanges() ) {
+			returnedProteinCoverage.addStartEndBoundary( range.lowerEndpoint(), range.upperEndpoint() );
+		}
+		return returnedProteinCoverage;
+	}
+	
+	
+	/**
 	 * Add the supplied start and end coordinates as a sequence coverage range
 	 * @param start
 	 * @param end
-	 * @throws Exception
 	 */
-	public void addStartEndBoundary( int start, int end ) throws Exception {
+	public void addStartEndBoundary( int start, int end ) {
 
 		if( this.ranges == null )
 			this.ranges = TreeRangeSet.create();
