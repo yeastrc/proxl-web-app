@@ -263,11 +263,22 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 				}
 			} else {
 				//   Only Default Peptide Cutoffs chosen so criteria simply the Peptides where the defaultPeptideCutoffs is yes
+				
+				//  WARNING:  This code is currently not run for set value of USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES
+				
+				//  WARNING   This is possibly still WRONG and needs testing before using.
+				
+				//  For certain inputs, the right value to search for is: Yes_No__NOT_APPLICABLE_Enum.NOT_APPLICABLE
+				
 				sqlSB.append( " AND " );
 				sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.peptide_meets_default_cutoffs = '" );
-				sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.YES.value() );
-				sqlSB.append( "' " );
-			}
+
+				if ( peptideCutoffValuesList.isEmpty() ) {
+					sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.NOT_APPLICABLE.value() );
+				} else {
+					sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.YES.value() );
+				}
+				sqlSB.append( "' " );			}
 		}		
 		sqlSB.append( SQL_LAST_PART );
 		final String sql = sqlSB.toString();

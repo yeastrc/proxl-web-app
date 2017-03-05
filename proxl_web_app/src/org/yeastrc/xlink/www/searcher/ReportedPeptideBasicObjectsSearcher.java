@@ -492,7 +492,10 @@ public class ReportedPeptideBasicObjectsSearcher {
 			} else {
 				//   Only Default Peptide Cutoffs chosen so criteria simply the Peptides where the defaultPeptideCutoffs is yes
 				
-				//  WARNING   This is very like WRONG.  
+				//  WARNING:  This code is currently not run for set value of USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES
+				
+				//  WARNING   This is possibly still WRONG and needs testing before using.
+				
 				//  For certain inputs, the right value to search for is: Yes_No__NOT_APPLICABLE_Enum.NOT_APPLICABLE
 				
 				sqlSB.append( " AND " );
