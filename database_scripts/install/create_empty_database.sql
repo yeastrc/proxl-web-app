@@ -1843,31 +1843,6 @@ CREATE INDEX prxl_xml_fl_imprt_trkng_sngl_fl_type_id_idx ON proxl_xml_file_impor
 
 CREATE INDEX prxl_xml_fl_imprt_trkng_sngl_fl_up_st_id_idx ON proxl_xml_file_import_tracking_sngl_fl_del_web_user (file_upload_status_id ASC);
 
-
--- -----------------------------------------------------
--- Table sequence_coverage_cache
--- -----------------------------------------------------
-DROP TABLE IF EXISTS sequence_coverage_cache ;
-
-CREATE TABLE  sequence_coverage_cache (
-  search_param_hash_code INT(11) NOT NULL,
-  search_param_hash_idx INT(11) NOT NULL,
-  search_id INT(11) UNSIGNED NOT NULL,
-  search_param_json TEXT NOT NULL,
-  sequence_coverage_json TEXT NOT NULL,
-  PRIMARY KEY (search_param_hash_code, search_param_hash_idx),
-  CONSTRAINT fk_sequence_coverage_srch_id
-    FOREIGN KEY (search_id)
-    REFERENCES search (id)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_bin;
-
-CREATE INDEX fk_sequence_coverage_srch_id_idx ON sequence_coverage_cache (search_id ASC);
-
-
 -- -----------------------------------------------------
 -- Table peptide_protein_position
 -- -----------------------------------------------------
