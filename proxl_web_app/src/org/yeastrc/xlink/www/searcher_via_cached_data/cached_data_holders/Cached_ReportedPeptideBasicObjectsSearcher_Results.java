@@ -77,8 +77,16 @@ public class Cached_ReportedPeptideBasicObjectsSearcher_Results implements Cache
 		if ( debugLogLevelEnabled ) {
 			cacheGetCount.incrementAndGet();
 		}
+		int searchId = reportedPeptideBasicObjectsSearcherRequestParameters.getSearchId();
+		SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = reportedPeptideBasicObjectsSearcherRequestParameters.getSearcherCutoffValuesSearchLevel();
+		//  Determine count at Default Cutoff
+		DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult defaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult =
+				DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.getInstance()
+				.defaultCutoffsExactlyMatchAnnTypeDataToSearchData( searchId, searcherCutoffValuesSearchLevel );
+		boolean defaultCutoffsExactlyMatchAnnTypeDataToSearchData =
+				defaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult.isDefaultCutoffsExactlyMatchAnnTypeDataToSearchData();
 		LoadingCache<ReportedPeptideBasicObjectsSearcherRequestParameters, ReportedPeptideBasicObjectsSearcherResult> cache = 
-				cacheHolderInternal.getCache( reportedPeptideBasicObjectsSearcherRequestParameters );
+				cacheHolderInternal.getCache( defaultCutoffsExactlyMatchAnnTypeDataToSearchData );
 		if ( cache != null ) {
 			ReportedPeptideBasicObjectsSearcherResult reportedPeptideBasicObjectsSearcherResult = cache.get( reportedPeptideBasicObjectsSearcherRequestParameters );
 			return reportedPeptideBasicObjectsSearcherResult; // EARLY return
@@ -174,7 +182,7 @@ public class Cached_ReportedPeptideBasicObjectsSearcher_Results implements Cache
 		 */
 		@SuppressWarnings("static-access")
 		private synchronized LoadingCache<ReportedPeptideBasicObjectsSearcherRequestParameters, ReportedPeptideBasicObjectsSearcherResult> 
-		getCache( ReportedPeptideBasicObjectsSearcherRequestParameters reportedPeptideBasicObjectsSearcherRequestParameters ) throws Exception {
+		getCache( boolean defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) throws Exception {
 			if ( ! cacheDataInitialized ) { 
 				//  No caches so create caches
 				CachedDataSizeOptions cachedDataSizeOptions = 
@@ -242,14 +250,6 @@ public class Cached_ReportedPeptideBasicObjectsSearcher_Results implements Cache
 				}
 				cacheDataInitialized = true;
 			}
-			int searchId = reportedPeptideBasicObjectsSearcherRequestParameters.getSearchId();
-			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = reportedPeptideBasicObjectsSearcherRequestParameters.getSearcherCutoffValuesSearchLevel();
-			//  Determine count at Default Cutoff
-			DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult defaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult =
-					DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.getInstance()
-					.defaultCutoffsExactlyMatchAnnTypeDataToSearchData( searchId, searcherCutoffValuesSearchLevel );
-			boolean defaultCutoffsExactlyMatchAnnTypeDataToSearchData =
-					defaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult.isDefaultCutoffsExactlyMatchAnnTypeDataToSearchData();
 			if ( defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) {
 				return dbRecordsDataCacheDefaultCutoffs;
 			} else {
