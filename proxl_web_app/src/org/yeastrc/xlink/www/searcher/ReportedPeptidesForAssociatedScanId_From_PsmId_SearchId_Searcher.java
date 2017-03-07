@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
@@ -30,6 +29,7 @@ import org.yeastrc.xlink.www.objects.SearchPeptideUnlink;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData;
 import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ReportedPeptideDTO;
 
 /**
  * Is only this PSM associated with it's scan ids 
@@ -553,7 +553,7 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 
 				
 				ReportedPeptideDTO reportedPeptideDTO = 
-						ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( reportedPeptideId );
+						Cached_ReportedPeptideDTO.getInstance().getReportedPeptideDTO( reportedPeptideId );
 
 
 				if ( defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) {

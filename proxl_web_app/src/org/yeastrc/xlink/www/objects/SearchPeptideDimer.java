@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
-import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.www.dto.PeptideDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
@@ -14,6 +13,7 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.searcher.SearchProteinSearcher;
 import org.yeastrc.xlink.www.searcher.SearchPsmSearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ReportedPeptideDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -114,7 +114,7 @@ public class SearchPeptideDimer {
 			if ( reportedPeptide == null ) {
 
 				reportedPeptide = 
-						ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( reportedPeptideId );
+						Cached_ReportedPeptideDTO.getInstance().getReportedPeptideDTO( reportedPeptideId );
 			}
 
 			return reportedPeptide;

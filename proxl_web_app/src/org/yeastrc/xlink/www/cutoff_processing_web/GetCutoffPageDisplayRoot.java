@@ -25,7 +25,8 @@ import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplayRoot;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplaySearchLevel;
 import org.yeastrc.xlink.www.objects.CutoffsAppliedOnImportWebDisplay;
 import org.yeastrc.xlink.www.search_programs_per_search_utils.GetSearchProgramsPerSearchData;
-import org.yeastrc.xlink.www.web_utils.GetCutoffsAppliedOnImportForSearchList;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_CutoffsAppliedOnImportWebDisplay;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.Cached_CutoffsAppliedOnImportWebDisplay_Result;
 
 
 
@@ -133,9 +134,11 @@ public class GetCutoffPageDisplayRoot {
 			Integer projectSearchId = entry.getKey();
 			Integer searchId = entry.getValue(); 
 
+			Cached_CutoffsAppliedOnImportWebDisplay_Result cached_CutoffsAppliedOnImportWebDisplay_Result =
+			Cached_CutoffsAppliedOnImportWebDisplay.getInstance()
+			.getCached_CutoffsAppliedOnImportWebDisplay_Result( searchId );
 			List<CutoffsAppliedOnImportWebDisplay> cutoffsAppliedOnImportList = 
-					GetCutoffsAppliedOnImportForSearchList.getInstance()
-					.getCutoffsAppliedOnImportList( searchId );
+					cached_CutoffsAppliedOnImportWebDisplay_Result.getCutoffsAppliedOnImportList();
 
 			CutoffPageDisplaySearchLevel cutoffPageDisplaySearchLevel = new CutoffPageDisplaySearchLevel();
 			cutoffPageDisplayRoot.addCutoffPageDisplaySearchLevel( cutoffPageDisplaySearchLevel );

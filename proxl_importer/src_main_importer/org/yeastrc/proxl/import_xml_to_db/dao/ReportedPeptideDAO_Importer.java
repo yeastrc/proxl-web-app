@@ -1,4 +1,4 @@
-package org.yeastrc.xlink.dao;
+package org.yeastrc.proxl.import_xml_to_db.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,68 +9,12 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 
-public class ReportedPeptideDAO {
+public class ReportedPeptideDAO_Importer {
 	
-	private static final Logger log = Logger.getLogger(ReportedPeptideDAO.class);
+	private static final Logger log = Logger.getLogger(ReportedPeptideDAO_Importer.class);
 
-	private ReportedPeptideDAO() { }
-	public static ReportedPeptideDAO getInstance() { return new ReportedPeptideDAO(); }
-	
-	public ReportedPeptideDTO getReportedPeptideFromDatabase( int id ) throws Exception {
-		
-		ReportedPeptideDTO peptide = null;
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		String sql = "SELECT sequence FROM reported_peptide WHERE id = ?";
-
-		try {
-			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			
-			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, id );
-			
-			rs = pstmt.executeQuery();
-			
-			if( !rs.next() )
-				throw new Exception( "Could not find reported_peptide for " + id );
-			
-			peptide = new ReportedPeptideDTO();
-			peptide.setSequence( rs.getString( 1 ) );
-			peptide.setId( id );
-			
-			
-		} catch ( Exception e ) {
-			
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
-			
-			throw e;
-			
-		} finally {
-			
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-			
-		}
-		
-		return peptide;
-	}
+	private ReportedPeptideDAO_Importer() { }
+	public static ReportedPeptideDAO_Importer getInstance() { return new ReportedPeptideDAO_Importer(); }
 	
 	
 	/**
@@ -83,7 +27,7 @@ public class ReportedPeptideDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public ReportedPeptideDTO getReportedPeptideDTO( String sequence ) throws Exception {
+	public ReportedPeptideDTO getReportedPeptideDTO_OrSave( String sequence ) throws Exception {
 		
 		ReportedPeptideDTO plpeptide = new ReportedPeptideDTO();
 		plpeptide.setSequence( sequence );
@@ -97,7 +41,7 @@ public class ReportedPeptideDAO {
 	}
 	
 	/**
-	 * Get the id for the supplied peptide sequence (as it appears in percolator
+	 * Get the id for the supplied reported peptide sequence (as it appears in analysis program
 	 * output) from the database. Returns 0 if not found.
 	 * @param sequence
 	 * @return

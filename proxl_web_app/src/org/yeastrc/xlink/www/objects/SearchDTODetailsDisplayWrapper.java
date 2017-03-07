@@ -8,7 +8,9 @@ import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplaySearchLevel;
 import org.yeastrc.xlink.www.searcher.SearchProgramDisplaySearcher;
-import org.yeastrc.xlink.www.web_utils.GetCutoffsAppliedOnImportForSearchList;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_CutoffsAppliedOnImportWebDisplay;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.Cached_CutoffsAppliedOnImportWebDisplay_Result;
+
 
 /**
  * Used for the searchDetailsBlock.jsp and viewProject.jsp
@@ -78,7 +80,11 @@ public class SearchDTODetailsDisplayWrapper {
 		if ( searchDTO == null ) {
 			throw new IllegalStateException( "searchDTO == null");
 		}
-		cutoffsAppliedOnImportList = GetCutoffsAppliedOnImportForSearchList.getInstance().getCutoffsAppliedOnImportList( searchDTO.getSearchId() );
+		Cached_CutoffsAppliedOnImportWebDisplay_Result cached_CutoffsAppliedOnImportWebDisplay_Result =
+				Cached_CutoffsAppliedOnImportWebDisplay.getInstance()
+				.getCached_CutoffsAppliedOnImportWebDisplay_Result( searchDTO.getSearchId() );
+		cutoffsAppliedOnImportList = cached_CutoffsAppliedOnImportWebDisplay_Result.getCutoffsAppliedOnImportList();
+
 		return cutoffsAppliedOnImportList;
 	}
 	

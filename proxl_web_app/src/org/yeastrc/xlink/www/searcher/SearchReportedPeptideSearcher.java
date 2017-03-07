@@ -6,9 +6,9 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ReportedPeptideDTO;
 
 /**
  * 
@@ -50,7 +50,7 @@ public class SearchReportedPeptideSearcher {
 			while( rs.next() ) {
 				
 				int reported_peptide_id = rs.getInt( 1 );
-				results.add( ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( reported_peptide_id ) );
+				results.add( Cached_ReportedPeptideDTO.getInstance().getReportedPeptideDTO( reported_peptide_id ) );
 			}
 			
 		} finally {

@@ -32,6 +32,8 @@ public class GetCutoffsAppliedOnImportForSearchList {
 
 
 	/**
+	 * This is cached in class 
+	 * 
 	 * @param searchId
 	 * @return
 	 * @throws Exception

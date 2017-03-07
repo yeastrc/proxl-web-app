@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.dao.ReportedPeptideDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_PsmFilterableAnnotationGenericLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchDynamicModMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReportedPeptideDAO;
@@ -40,7 +41,6 @@ import org.yeastrc.proxl_import.api.xml_dto.Psm;
 import org.yeastrc.proxl_import.api.xml_dto.Psms;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptides;
-import org.yeastrc.xlink.dao.ReportedPeptideDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
@@ -380,7 +380,7 @@ public class ProcessReportedPeptidesAndPSMs {
 
 		//  Retrieves reported_peptide record or inserts it if not in the database.
 		ReportedPeptideDTO reportedPeptideDTO =
-				ReportedPeptideDAO.getInstance().getReportedPeptideDTO( reportedPeptideString );
+				ReportedPeptideDAO_Importer.getInstance().getReportedPeptideDTO_OrSave( reportedPeptideString );
 
 		int reportedPeptideId = reportedPeptideDTO.getId();
 

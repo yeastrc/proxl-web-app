@@ -1,4 +1,5 @@
 package org.yeastrc.xlink.www.searcher;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,13 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.ReportedPeptideDAO;
-import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.ReportedPeptideDAO_Web;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
+import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
@@ -327,23 +327,19 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 				}
 			}
 			rs = pstmt.executeQuery();
+			ReportedPeptideDTO reportedPeptideDTO = null;
 			while( rs.next() ) {
 				ReportedPeptidesForMergedPeptidePageWrapper wrappedReportedPeptideData = new ReportedPeptidesForMergedPeptidePageWrapper();
 				ReportedPeptidesForMergedPeptidePage reportedPeptideData = new ReportedPeptidesForMergedPeptidePage();
 				wrappedReportedPeptideData.setReportedPeptidesForMergedPeptidePage( reportedPeptideData );
 				
-				if ( search == null ) {
-					search = SearchDAO.getInstance().getSearchFromProjectSearchId( searchId );
-					if ( search == null ) {
-						String msg = "Failed to get search for searchId: " + searchId;
-						log.error( msg );
-						throw new ProxlWebappDataException( msg );
-					}
-				}
 				reportedPeptideData.setSearchId( search.getProjectSearchId() );
 				reportedPeptideData.setSearchName( search.getName() );
 //				int reportedPeptideId = rs.getInt( "reported_peptide_id" );
-				reportedPeptideData.setReportedPeptide ( ReportedPeptideDAO.getInstance().getReportedPeptideFromDatabase( reportedPeptideId ) );
+				if ( reportedPeptideDTO == null ) {
+					reportedPeptideDTO = ReportedPeptideDAO_Web.getInstance().getReportedPeptideDTO( reportedPeptideId );
+				}
+				reportedPeptideData.setReportedPeptide ( reportedPeptideDTO );
 				//  These counts are only valid for PSM and Peptide at default cutoffs
 				if ( defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) {
 					//  associated PSM data
