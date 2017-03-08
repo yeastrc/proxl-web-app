@@ -14,6 +14,7 @@ import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -34,27 +35,28 @@ public class HomeAction extends Action {
 			  HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
-				
 		try {
-
 			// Get the session first.  
 			HttpSession session = request.getSession();
 			
-
-
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request, response );
 
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
-
 				//  No User session 
-
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
 			
 			//  Test access to application no project id
 			
 			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			
+			if ( authAccessLevel == null ) {
+				//  No Access Level provided
+				String msg = "No Access Level provided (authAccessLevel == null), throwing exception";
+				log.warn( msg );
+				throw new ProxlWebappInternalErrorException(msg);
+			}
 
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 

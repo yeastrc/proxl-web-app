@@ -6,13 +6,13 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
-import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
-import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.internal_services.UpdateAuthUserUserAccessLevelEnabled;
 import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
 import org.yeastrc.xlink.www.objects.ProjectTitleHeaderDisplay;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ProjectTblSubPartsForProjectLists;
+import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
+import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.TruncateProjectTitleForDisplay;
 
@@ -89,8 +89,7 @@ public class GetPageHeaderData {
 				authUser = userSessionObject.getUserDBObject().getAuthUser();
 				
 				///  Refresh with latest
-				
-				authUser = AuthUserDAO.getInstance().getAuthUserDTOForId( authUser.getId() );
+				UpdateAuthUserUserAccessLevelEnabled.getInstance().updateAuthUserUserAccessLevelEnabled( authUser );
 				
 				userSessionObject.getUserDBObject().setAuthUser( authUser );
 				
@@ -117,7 +116,7 @@ public class GetPageHeaderData {
 				ProjectTitleHeaderDisplay project = new ProjectTitleHeaderDisplay();
 				
 				project.setProjectTblData( projectFromDB );
-				
+							
 				String titleHeaderDisplay = TruncateProjectTitleForDisplay.truncateProjectTitleForHeader( projectFromDB.getTitle() );
 				
 				project.setTitleHeaderDisplay( titleHeaderDisplay );
@@ -153,7 +152,6 @@ public class GetPageHeaderData {
 			request.setAttribute( "headerProject", project ); 
 			 
 		}
-		
 		
 		
 		

@@ -11,10 +11,10 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
+import org.yeastrc.xlink.www.internal_services.UpdateAuthUserUserAccessLevelEnabled;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
@@ -64,14 +64,10 @@ public class AccountPageInitAction extends Action {
 
 			
 			XLinkUserDTO userDBObject = userSessionObject.getUserDBObject();
-
 			AuthUserDTO authUser = userDBObject.getAuthUser();
 
 			///  Refresh with latest
-
-			authUser = AuthUserDAO.getInstance().getAuthUserDTOForId( authUser.getId() );
-
-			userDBObject.setAuthUser( authUser );
+			UpdateAuthUserUserAccessLevelEnabled.getInstance().updateAuthUserUserAccessLevelEnabled( authUser );
 
 			request.setAttribute( "loggedInUser", userDBObject );
 

@@ -6,10 +6,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
+import org.yeastrc.xlink.www.internal_services.UpdateAuthUserUserAccessLevelEnabled;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.searcher.ProjectSearcher;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
@@ -53,11 +53,7 @@ public class GetProjectListForCurrentLoggedInUser {
 		AuthUserDTO authUser = userSessionObject.getUserDBObject().getAuthUser();
 
 		///  Refresh with latest
-
-		authUser = AuthUserDAO.getInstance().getAuthUserDTOForId( authUser.getId() );
-
-		userSessionObject.getUserDBObject().setAuthUser( authUser );
-
+		UpdateAuthUserUserAccessLevelEnabled.getInstance().updateAuthUserUserAccessLevelEnabled( authUser );
 
 		if ( authUser != null 
 				&& authUser.getUserAccessLevel() != null

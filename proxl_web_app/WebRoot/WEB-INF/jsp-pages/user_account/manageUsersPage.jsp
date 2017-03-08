@@ -304,7 +304,8 @@
 		 	<!-- One of these spans will be shown  -->
 			<span class="role-of-user access_level_administrator_jq" style="display: none;">Administrator</span>		
 			<span class="role-of-user access_level_user_jq" style="display: none;">User</span>
-			<span class="role-of-user user_disabled_jq" style="display: none;">Disabled</span>
+			<span class="role-of-user user_disabled_jq" style="display: none;">Disabled For This App</span>
+			<span class="role-of-user user_disabled_global_jq" style="display: none;">Disabled For All Apps</span>
 		 </td>
 		 
 		 <td></td>

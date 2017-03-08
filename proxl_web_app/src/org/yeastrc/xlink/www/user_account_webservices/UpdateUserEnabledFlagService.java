@@ -16,7 +16,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.auth.dao.AuthUserDAO;
-import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.objects.UpdateUserAccessToProjectResult;
@@ -111,7 +110,7 @@ public class UpdateUserEnabledFlagService {
 		try {
 
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 
 
 
@@ -164,12 +163,10 @@ public class UpdateUserEnabledFlagService {
 
 			AuthUserDAO authUserDAO = AuthUserDAO.getInstance();
 			
-			AuthUserDTO authUserDTO = authUserDAO.getAuthUserDTOForId(personId);
+			Integer authUserIdFromDB = authUserDAO.getIdForId(personId);
 			
-			if ( authUserDTO == null ) {
-				
+			if ( authUserIdFromDB == null ) {
 				log.warn( "UpdateUserEnabledFlagService:  personId is not in database: " + personId );
-
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
 						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
@@ -177,7 +174,7 @@ public class UpdateUserEnabledFlagService {
 						);
 			}
 			
-			AuthUserDAO.getInstance().updateEnabledFlag( personId, personEnabledFlag );
+			AuthUserDAO.getInstance().updateEnabledAppSpecific( personId, personEnabledFlag );
 
 			UpdateUserAccessToProjectResult updateUserAccessToProjectResult = new UpdateUserAccessToProjectResult();
 			

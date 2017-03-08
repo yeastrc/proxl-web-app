@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dao.ProxlXMLFileImportTrackingSingleFileDAO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dao.ProxlXMLFileImportTracking_Base_DAO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingDTO;
@@ -29,8 +30,6 @@ import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTracki
 import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportFileType;
 import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportStatus;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.dao.XLinkUserDAO;
-import org.yeastrc.xlink.www.dto.XLinkUserDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -41,6 +40,9 @@ import org.yeastrc.xlink.www.proxl_xml_file_import.searchers.ProxlXMLFileImportT
 import org.yeastrc.xlink.www.proxl_xml_file_import.searchers.ProxlXMLFileImportTracking_PendingCount_Searcher;
 import org.yeastrc.xlink.www.proxl_xml_file_import.searchers.ProxlXMLFileImportTracking_PendingTrackingIdsAllProjects_Searcher;
 import org.yeastrc.xlink.www.proxl_xml_file_import.utils.IsProxlXMLFileImportFullyConfigured;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataRequest;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataResponse;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -145,7 +147,7 @@ public class ProxlXMLFileImportTrackingDataService {
 			    	        .build()
 			    	        );
 			}
-
+			
 			ListImportsAndGetPendingCountResponse listImportsAndGetPendingCountResponse = 
 					getProxlXMLFileImportingDataForPage( projectId );
 			
@@ -459,20 +461,45 @@ public class ProxlXMLFileImportTrackingDataService {
 				
 				int authUserId = trackingItem.getAuthUserId();
 				
-				XLinkUserDTO xlinkUserDTO =
-						XLinkUserDAO.getInstance().getXLinkUserDTOForAuthUserId( authUserId );
 
-				if ( xlinkUserDTO == null ) {
+				//  Get full user data
 
-					String msg = "xlinkUserDTO not found for authUserId: " + authUserId 
-							+ " ,tracking id: " 
-							+ trackingItem.getId()
-							+ ", number of files returned: " + fileDataList.size();
+				//  Get User Mgmt User Id for authUserId
+				Integer userMgmtUserId = AuthUserDAO.getInstance().getUserMgmtUserIdForId( authUserId );
+				if ( userMgmtUserId == null ) {
+					String msg = "Failed to get userMgmtUserId for Proxl auth user id: " + authUserId;
+					log.warn( msg );
+			        return null;  //  Early Exit
+				}
+				
+				UserMgmtGetUserDataRequest userMgmtGetUserDataRequest = new UserMgmtGetUserDataRequest();
+//				userMgmtGetUserDataRequest.setSessionKey( userMgmtLoginResponse.getSessionKey() );
+				userMgmtGetUserDataRequest.setUserId( userMgmtUserId );
+				
+				UserMgmtGetUserDataResponse userMgmtGetUserDataResponse = 
+						UserMgmtCentralWebappWebserviceAccess.getInstance().getUserData( userMgmtGetUserDataRequest );
+				
+				if ( ! userMgmtGetUserDataResponse.isSuccess() ) {
+					String msg = "Failed to get Full user data from User Mgmt Webapp for user id: " + authUserId
+							+ ", userMgmtUserId: " + userMgmtUserId;
 					log.error( msg );
 					throw new ProxlWebappInternalErrorException( msg );
 				}
+
+//				XLinkUserDTO xlinkUserDTO =
+//						XLinkUserDAO.getInstance().getXLinkUserDTOForAuthUserId( authUserId );
+//
+//				if ( xlinkUserDTO == null ) {
+//
+//					String msg = "xlinkUserDTO not found for authUserId: " + authUserId 
+//							+ " ,tracking id: " 
+//							+ trackingItem.getId()
+//							+ ", number of files returned: " + fileDataList.size();
+//					log.error( msg );
+//					throw new ProxlWebappInternalErrorException( msg );
+//				}
 				
-				String nameOfUploadUser = xlinkUserDTO.getFirstName() + " " + xlinkUserDTO.getLastName();
+				String nameOfUploadUser = userMgmtGetUserDataResponse.getFirstName() + " " + userMgmtGetUserDataResponse.getLastName();
 				
 				displayItem.setNameOfUploadUser( nameOfUploadUser );
 

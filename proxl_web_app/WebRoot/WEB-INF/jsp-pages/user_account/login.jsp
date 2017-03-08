@@ -119,6 +119,12 @@
 	  			<div class="error-message-text" >User disabled</div>
   			</div>
 	  	</div>
+  		<div class="error-message-container error_message_container_jq" id="error_message_no_proxl_account">
+  			<div class="error-message-inner-container" >
+  				<div class="error-message-close-x error_message_close_x_jq">X</div>
+	  			<div class="error-message-text" >No account on Proxl</div>
+  			</div>
+	  	</div>
   		<div class="error-message-container error_message_container_jq" id="error_message_system_error">
   			<div class="error-message-inner-container" >
   				<div class="error-message-close-x error_message_close_x_jq">X</div>
@@ -133,6 +139,7 @@
 		<input type="hidden" id="requestedURL" value="<c:out value="${ param.requestedURL }" />"/>
 		<input type="hidden" id="useDefaultURL"  value="<c:out value="${ param.useDefaultURL }" />"/>
 	    <input type="hidden" id="defaultURL" value="home.do"/>
+	    <input type="hidden" id="inviteTrackingCode" value="<c:out value="${ param.inviteTrackingCode }" ></c:out>">
 
 		<input type="text" id="username" placeholder="Username" class="input-field input_field_jq" maxlength="40"/><br> <!--  size="20" size controlled by CSS -->
 		<input type="password" id="password" placeholder="Password" class="input-field input_field_jq" maxlength="40" /><br> <!--  size="20" size controlled by CSS -->

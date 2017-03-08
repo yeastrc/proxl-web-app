@@ -88,7 +88,7 @@ public class ListProjectsAction extends Action {
 			
 			AuthUserDTO authUser = userSessionObject.getUserDBObject().getAuthUser();
 			
-			if ( ! authUser.isEnabled() ) {
+			if ( ! authUser.isEnabledAppSpecific() ) {
 				
 				//  No Access Allowed since user is disabled
 

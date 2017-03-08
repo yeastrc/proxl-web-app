@@ -11,9 +11,8 @@
  <c:set var="pageBodyClass" >manage-account-page</c:set>
 
  <c:set var="headerAdditions">
-	
+	<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script>
 	<script type="text/javascript" src="${ contextPath }/js/user_account/accountManagementPage.js?x=${cacheBustValue}"></script>
-
  </c:set>
 
 
@@ -140,9 +139,16 @@
 		
 		<div  class="value-container value_container_jq">
 			<div class="value-label value_label_jq" style="position: relative;" >
+	  	
+		  		<div class="error-message-container error_message_container_jq" id="error_message_old_password_invalid">
+		  			<div class="error-message-inner-container"  style="width:500px;" >
+			  			<span class="error-message-text" >Old Password is Invalid
+				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+				  	</div>
+			  	</div>
 		
 		  		<div class="error-message-container error_message_container_jq" id="error_message_password_confirm_not_match">
-		  			<div class="error-message-inner-container" >
+		  			<div class="error-message-inner-container" style="width:500px;" >
 			  			<span class="error-message-text" >The new password and confirm password do not match
 				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
 				  	</div>
@@ -155,11 +161,15 @@
 			</div>
 			<div  class="edit-value-container edit_value_container_jq">
 			  <div >
-				<input type="password" value="" placeholder="New Pasword" title="New Pasword"  
+				<input type="password" value="" placeholder="Old Password" title="Old Password"  
+						class="edit-value-input-field  " id="password-change-old-password-field"  maxlength="40">
+			  </div>
+			  <div style="margin-top: 5px;">
+				<input type="password" value="" placeholder="New Password" title="New Password"  
 						class="edit-value-input-field  " id="password-change-field"  maxlength="40">
 			  </div>
 			  <div style="margin-top: 5px; margin-bottom: 6px;">
-				<input type="password" value="" placeholder="Confirm New Pasword" title="Confirm New Pasword"  
+				<input type="password" value="" placeholder="Confirm New Password" title="Confirm New Password"  
 						class="edit-value-input-field  " id="password-confirm-field"  maxlength="40"><br>
 			  </div>
 			  <div >

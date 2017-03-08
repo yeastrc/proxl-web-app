@@ -32,9 +32,3 @@ public class XLUserAccessLevelLabelDescriptionDTO {
 	}
 	
 }
-
-
-//CREATE TABLE xl_user_access_level_label_description (
-//		  xl_user_access_level_numeric_value INT UNSIGNED NOT NULL,
-//		  label VARCHAR(255) NOT NULL,
-//		  description VARCHAR(255) NULL,

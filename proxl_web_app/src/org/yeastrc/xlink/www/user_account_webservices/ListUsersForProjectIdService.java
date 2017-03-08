@@ -96,11 +96,13 @@ public class ListUsersForProjectIdService {
 						);
 			}
 
+			///  Auth check complete
+			
+			///////////
 			
 			Integer projectSharedObjectId = ProjectDAO.getInstance().getAuthShareableObjectIdForProjectId( projectId );
 			
 			if ( projectSharedObjectId == null ) {
-
 
 				log.warn( "ListUsersForProjectIdService:  projectId is not in database: " + projectId );
 

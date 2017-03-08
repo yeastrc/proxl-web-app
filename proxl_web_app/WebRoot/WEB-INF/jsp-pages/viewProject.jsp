@@ -451,12 +451,12 @@
 			  <div id="view_searches_project_admin_div" logged_in_user_id="${ loggedInUserId }" 
 			  		logged_in_user_access_level_owner_or_better="<c:if test="${authAccessLevel.projectOwnerAllowed}" >true</c:if>" >
 
-			  <div class="top-level-container collapsable_container_jq" >
+			  <div class="top-level-container " >
 			
-				<div  class="collapsable-link-container top-level-collapsable-link-container collapsable_link_container_jq" style="">
-					<a href="javascript:" class="top-level-collapsable-link collapsable_collapse_link_jq" style="display: none;"
+				<div  class="collapsable-link-container top-level-collapsable-link-container " style="">
+					<a href="javascript:" id="researchers_in_project_block_hide" class="top-level-collapsable-link " style="display: none;"
 						><img  src="${ contextPath }/images/icon-collapse.png"></a>
-					<a href="javascript:" class="top-level-collapsable-link collapsable_expand_link_jq" 
+					<a href="javascript:"  id="researchers_in_project_block_show" class="top-level-collapsable-link " 
 						><img  src="${ contextPath }/images/icon-expand.png"></a>
 				
 				</div>
@@ -466,7 +466,7 @@
 				<div class="top-level-label-bottom-border" ></div>
 					
 									
-				<div class="researchers-block collapsable_jq" style="display: none;" > <%--  style="display: none;" TODO  TEMP --%>
+				<div  id="researchers_in_project_block" class="researchers-block " style="display: none;" > 
 
 
 				<%--  Only allow Invite if not locked --%>

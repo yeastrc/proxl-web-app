@@ -15,8 +15,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
+import org.yeastrc.xlink.www.internal_services.UpdateAuthUserUserAccessLevelEnabled;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -79,17 +79,12 @@ public class ProjectListForCurrentUserService {
 			AuthUserDTO authUser = userSessionObject.getUserDBObject().getAuthUser();
 
 			///  Refresh with latest
-
-			authUser = AuthUserDAO.getInstance().getAuthUserDTOForId( authUser.getId() );
-
-			userSessionObject.getUserDBObject().setAuthUser( authUser );
-
+			UpdateAuthUserUserAccessLevelEnabled.getInstance().updateAuthUserUserAccessLevelEnabled( authUser );
 
 			if ( authUser != null ) {
 				
 				//  Add projects user invited to
 				
-				//  Mike has a mockup but invites are associated with emails, not accounts
 				
 			}
 			

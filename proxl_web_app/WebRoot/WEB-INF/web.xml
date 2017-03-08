@@ -98,7 +98,21 @@
     </filter-mapping>
 
 
-	<!-- This filter will be the Second called for a request and does initial setup -->
+
+	<!-- This filter will be the Second called for a request and keeps the  -->
+    <filter>
+	  <filter-name>SSOSessionKeepAliveServletFilter</filter-name>
+	  <filter-class>org.yeastrc.xlink.www.servlet_filter.SSOSessionKeepAliveServletFilter</filter-class>
+    </filter>
+
+	<filter-mapping>
+	  <filter-name>SSOSessionKeepAliveServletFilter</filter-name>
+	  <url-pattern>/*</url-pattern> 
+	</filter-mapping>	
+
+ 
+
+	<!-- This filter will be the Third called for a request and does initial setup -->
     <filter>
 	  <filter-name>InitialServletFilter</filter-name>
 	  <filter-class>org.yeastrc.xlink.www.servlet_filter.InitialServletFilter</filter-class>

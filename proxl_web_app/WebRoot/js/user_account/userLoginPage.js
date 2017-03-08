@@ -38,6 +38,11 @@ var loginPerson = function( params ) {
 	if ($password.length === 0) {
 		throw Error("Unable to find input field for id 'password' ");
 	}
+	var $inviteTrackingCode = $("#inviteTrackingCode");
+	if ($inviteTrackingCode.length === 0) {
+		throw Error("Unable to find input field for id 'inviteTrackingCode' ");
+	}
+
 	var username = $username.val();
 	var password = $password.val();
 	if ( username === "" ) {
@@ -49,11 +54,15 @@ var loginPerson = function( params ) {
 		showErrorMsg( $element );
 		return;  //  !!!  EARLY EXIT
 	}
+	// inviteTrackingCode Only when came to Sign in page from Clicking "Sign in" on Invite landing page
+	var inviteTrackingCode = $inviteTrackingCode.val();
+	
 	var requestData = {
 			username : username,
 			password : password,
 			return_tos : "true",
-			tos_key : tosKeyToServer
+			tos_key : tosKeyToServer,
+			inviteTrackingCode : inviteTrackingCode
 	};
 	var _URL = contextPathJSVar + "/services/user/login";
 	// var request =
@@ -100,6 +109,20 @@ var loginComplete = function(requestData, responseData) {
 		} else if ( responseData.disabledUser ) {
 			var $element = $("#error_message_user_disabled");
 			showErrorMsg( $element );
+		} else if ( responseData.noProxlAccount ) {
+			var $element = $("#error_message_no_proxl_account");
+			showErrorMsg( $element );
+		} else if ( responseData. invalidInviteTrackingCode ) {
+			//  Invalid Invite tracking code so redirect to requestedURL to process tracking code and show error msg
+			var $requestedURL = $("#requestedURL");
+			if ($requestedURL.length === 0) {
+				throw Error("Unable to find input field for id 'requestedURL' ");
+			}
+			var requestedURL = $requestedURL.val();
+			if ( requestedURL !== "" ) {
+				window.location.href = requestedURL;
+				return;
+			}
 		} else {
 			var $element = $("#error_message_system_error");
 			showErrorMsg( $element );

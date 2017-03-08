@@ -1,204 +1,93 @@
 package org.yeastrc.xlink.www.internal_services;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.yeastrc.auth.exceptions.AuthSharedObjectRecordNotFoundException;
-import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
-import org.yeastrc.xlink.www.dao.XLinkUserDAO;
+import org.yeastrc.auth.dao.AuthUserDAO;
+import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
 import org.yeastrc.xlink.www.searcher.UserSearcherAll;
-import org.yeastrc.xlink.www.searcher.UserSearcherForAccessLevel;
-import org.yeastrc.xlink.www.searcher.UserSearcherForEnabledFlag;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataRequest;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataResponse;
+
 
 /**
  * 
  *
  */
 public class GetXLinkUserDTOListForUsers {
-	
-	private static final Logger log = Logger.getLogger(GetXLinkUserDTOListForUsers.class);
-	
-	
-	private UserSearcherForAccessLevel userSearcherForAccessLevel = UserSearcherForAccessLevel.getInstance();
-	
 
+	private static final Logger log = Logger.getLogger(GetXLinkUserDTOListForUsers.class);
 	//  private constructor
 	private GetXLinkUserDTOListForUsers() { }
-	
 	/**
 	 * @return newly created instance
 	 */
 	public static GetXLinkUserDTOListForUsers getInstance() { 
 		return new GetXLinkUserDTOListForUsers();
 	}
-		
-	/**
-	 * @return
-	 * @throws AuthSharedObjectRecordNotFoundException
-	 * @throws Exception
-	 */
-	public List<XLinkUserDTO> getXLinkUserDTOListForAdminUsers(  ) throws AuthSharedObjectRecordNotFoundException, Exception {
-		
-		int authAccessLevel = AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN;
-		
-		return getXLinkUserDTOListForUsers( authAccessLevel );
-	}
-	
-	/**
-	 * @return
-	 * @throws AuthSharedObjectRecordNotFoundException
-	 * @throws Exception
-	 */
-	public List<XLinkUserDTO> getXLinkUserDTOListForGlobalNoAccessUsers(  ) throws AuthSharedObjectRecordNotFoundException, Exception {
-		
-		int authAccessLevel = AuthAccessLevelConstants.ACCESS_LEVEL_NONE;
-		
-		return getXLinkUserDTOListForUsers( authAccessLevel );
-	}
-	
-	
-	
-	
-	
-	/**
-	 * @param authAccessLevel
-	 * @return
-	 * @throws AuthSharedObjectRecordNotFoundException
-	 * @throws Exception
-	 */
-	private List<XLinkUserDTO> getXLinkUserDTOListForUsers( int authAccessLevel ) throws AuthSharedObjectRecordNotFoundException, Exception {
-		
-		List<Integer> userIds = userSearcherForAccessLevel.getAuthUserIdsForAuthAccessLevel( authAccessLevel );
-
-		
-		List<XLinkUserDTO> returnList = new ArrayList<XLinkUserDTO>( userIds.size() );
-
-		XLinkUserDAO xLinkUserDAO = XLinkUserDAO.getInstance();
-		
-		
-		for ( int authUserId : userIds ) {
-			
-			XLinkUserDTO xLinkUserDTO = xLinkUserDAO.getXLinkUserDTOForAuthUserId( authUserId );
-
-			if ( xLinkUserDTO == null ) {
-
-				String msg = "Unexpected null for user id: " + authUserId;
-
-				log.error( msg );
-
-			} else {
-				returnList.add( xLinkUserDTO );
-			}
-		}
-		
-
-		return returnList;
-	}
-	
-	
-	
-	/**
-	 * @return
-	 * @throws AuthSharedObjectRecordNotFoundException
-	 * @throws Exception
-	 */
-	public List<XLinkUserDTO> getXLinkUserDTOListForEnabledUsers(  ) throws AuthSharedObjectRecordNotFoundException, Exception {
-		
-		boolean enabledFlag = true;
-		
-		return getXLinkUserDTOListForUsersFromEnabledFlag( enabledFlag );
-	}
-	
-	/**
-	 * @return
-	 * @throws AuthSharedObjectRecordNotFoundException
-	 * @throws Exception
-	 */
-	public List<XLinkUserDTO> getXLinkUserDTOListForDisabledUsers(  ) throws AuthSharedObjectRecordNotFoundException, Exception {
-		
-		boolean enabledFlag = false;
-
-		return getXLinkUserDTOListForUsersFromEnabledFlag( enabledFlag );
-	}
-	
-	
-	
-	
-	
-	/**
-	 * @param enabledFlag
-	 * @return
-	 * @throws AuthSharedObjectRecordNotFoundException
-	 * @throws Exception
-	 */
-	private List<XLinkUserDTO> getXLinkUserDTOListForUsersFromEnabledFlag( boolean enabledFlag ) throws AuthSharedObjectRecordNotFoundException, Exception {
-		
-		List<Integer> userIds = UserSearcherForEnabledFlag.getInstance().getAuthUserIdsForEnabledFlag( enabledFlag );
-
-		
-		List<XLinkUserDTO> returnList = new ArrayList<XLinkUserDTO>( userIds.size() );
-
-		XLinkUserDAO xLinkUserDAO = XLinkUserDAO.getInstance();
-		
-		
-		for ( int authUserId : userIds ) {
-			
-			XLinkUserDTO xLinkUserDTO = xLinkUserDAO.getXLinkUserDTOForAuthUserId( authUserId );
-
-			if ( xLinkUserDTO == null ) {
-
-				String msg = "Unexpected null for user id: " + authUserId;
-
-				log.error( msg );
-
-			} else {
-				returnList.add( xLinkUserDTO );
-			}
-		}
-		
-
-		return returnList;
-	}
-	
-	
-	
-	
-	
 	
 	/**
 	 * @return
 	 * @throws Exception
 	 */
 	public List<XLinkUserDTO> getXLinkUserDTOListForAllUsers( ) throws Exception {
-		
 		List<Integer> userIds = UserSearcherAll.getInstance().getAllAuthUserIds();
-
-		
 		List<XLinkUserDTO> returnList = new ArrayList<XLinkUserDTO>( userIds.size() );
-
-		XLinkUserDAO xLinkUserDAO = XLinkUserDAO.getInstance();
-		
-		
 		for ( int authUserId : userIds ) {
-			
-			XLinkUserDTO xLinkUserDTO = xLinkUserDAO.getXLinkUserDTOForAuthUserId( authUserId );
 
-			if ( xLinkUserDTO == null ) {
-
-				String msg = "Unexpected null for user id: " + authUserId;
-
-				log.error( msg );
-
-			} else {
-				returnList.add( xLinkUserDTO );
+			//  Get User Mgmt User Id for authUserId
+			Integer userMgmtUserId = AuthUserDAO.getInstance().getUserMgmtUserIdForId( authUserId );
+			if ( userMgmtUserId == null ) {
+				String msg = "Failed to get userMgmtUserId for Proxl auth user id: " + authUserId;
+				log.warn( msg );
+		        return null;  //  Early Exit
 			}
+			
+			//  Get full user data
+			UserMgmtGetUserDataRequest userMgmtGetUserDataRequest = new UserMgmtGetUserDataRequest();
+//			userMgmtGetUserDataRequest.setSessionKey( userMgmtLoginResponse.getSessionKey() );
+			userMgmtGetUserDataRequest.setUserId( userMgmtUserId );
+			UserMgmtGetUserDataResponse userMgmtGetUserDataResponse = 
+					UserMgmtCentralWebappWebserviceAccess.getInstance().getUserData( userMgmtGetUserDataRequest );
+			if ( ! userMgmtGetUserDataResponse.isSuccess() ) {
+				String msg = "Failed to get Full user data from User Mgmt Webapp for authUserId: " + authUserId
+						+ ", userMgmtUserId: " + userMgmtUserId;
+				log.error( msg );
+				continue;  //  EARLY CONTINUE to next entry
+			}
+			
+			Boolean enabledAppSpecific =
+					AuthUserDAO.getInstance().getUserEnabledAppSpecific( authUserId );
+			if ( enabledAppSpecific == null ) {
+				String msg = "Failed to get enabledAppSpecific from proxl auth_user table for user id: " + authUserId;
+				log.error( msg );
+				continue;  //  EARLY CONTINUE to next entry
+			}
+			
+			//  Get user Access level at account level from proxl db
+			Integer userAccessLevel = AuthUserDAO.getInstance().getUserAccessLevel( authUserId );
+			if ( userAccessLevel == null ) {
+				String msg = "Failed to get userAccessLevel from proxl auth_user table for user id: " + authUserId;
+				log.error( msg );
+				continue;  //  EARLY CONTINUE to next entry
+			}
+			XLinkUserDTO xLinkUserDTO = new XLinkUserDTO();
+			AuthUserDTO authUserDTO = new AuthUserDTO();
+			xLinkUserDTO.setAuthUser(authUserDTO);
+			authUserDTO.setId( authUserId );
+			authUserDTO.setUserMgmtUserId( userMgmtUserId );
+			authUserDTO.setUsername( userMgmtGetUserDataResponse.getUsername() );
+			authUserDTO.setEmail( userMgmtGetUserDataResponse.getEmail() );
+			authUserDTO.setUserAccessLevel( userAccessLevel );
+			authUserDTO.setEnabledAppSpecific( enabledAppSpecific );
+			authUserDTO.setEnabledUserMgmtGlobalLevel( userMgmtGetUserDataResponse.isEnabled() );
+			
+			xLinkUserDTO.setFirstName( userMgmtGetUserDataResponse.getFirstName() );
+			xLinkUserDTO.setLastName( userMgmtGetUserDataResponse.getLastName() );
+			xLinkUserDTO.setOrganization( userMgmtGetUserDataResponse.getOrganization() );
+			returnList.add( xLinkUserDTO );
 		}
-		
-
 		return returnList;
 	}
-	
-	
 }

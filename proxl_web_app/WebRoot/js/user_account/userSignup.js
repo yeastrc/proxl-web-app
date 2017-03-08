@@ -179,19 +179,26 @@ var createAccount = function() {
 var createAccountComplete = function( params ) {
 	var requestData = params.requestData;
 	var responseData = params.responseData;
+	
+	$("#terms_of_service_modal_dialog_overlay_background").hide();
+	$("#terms_of_service_overlay_div").hide();
+	
 	if ( ! responseData.status ) {
 		if ( responseData.duplicateUsername && responseData.duplicateEmail ) {
 			var $element = $("#error_message_username_email_taken");
 			showErrorMsg( $element );
-			$("#email").focus();
+			var $emailInput = $("#email");
+			$emailInput.focus();
 		} else if ( responseData.duplicateUsername ) {
 			var $element = $("#error_message_username_taken");
 			showErrorMsg( $element );
-			$("#username").focus();
+			var $usernameInput = $("#username");
+			$usernameInput.focus();
 		} else if ( responseData.duplicateEmail ) {
 			var $element = $("#error_message_email_taken");
 			showErrorMsg( $element );
-			$("#email").focus();
+			var $emailInput = $("#email");
+			$emailInput.focus();
 		} else if ( responseData.errorMessage ) {
 			$("#error_message_from_server_text").text( responseData.errorMessage );
 			var $element = $("#error_message_from_server");

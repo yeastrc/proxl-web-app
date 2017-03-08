@@ -1,4 +1,5 @@
 package org.yeastrc.xlink.www.user_account_webservices;
+
 import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -13,14 +14,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthSharedObjectUsersDTO;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.auth.dto.AuthUserInviteTrackingDTO;
-import org.yeastrc.auth.hash_password.HashedPasswordProcessing;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.AddNewUserUsingDBTransactionService;
 import org.yeastrc.xlink.www.dto.TermsOfServiceUserAcceptedVersionHistoryDTO;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
+import org.yeastrc.xlink.www.dto.ZzUserDataMirrorDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsValuesSharedConstants;
 import org.yeastrc.xlink.www.captcha_google_api.CaptchaGoogleValidateUserResponseToken;
@@ -36,6 +37,11 @@ import org.yeastrc.xlink.www.dao.TermsOfServiceTextVersionsDAO;
 import org.yeastrc.xlink.www.dao.TermsOfServiceUserAcceptedVersionHistoryDAO;
 import org.yeastrc.xlink.www.objects.CreateAccountResult;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCreateAccountRequest;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCreateAccountResponse;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginRequest;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginResponse;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserInviteTrackingCode;
 import org.yeastrc.xlink.www.web_utils.GetMessageTextFromKeyFrom_web_app_application_properties;
 
@@ -255,19 +261,19 @@ public class UserCreateAccountService {
 		}
 		//  Pre-check for username and email already exist
 		{
-			AuthUserDAO authUserDAO = AuthUserDAO.getInstance();
-			AuthUserDTO authUserDTOFromEmail = authUserDAO.getAuthUserDTOForEmail( email );
-			if ( authUserDTOFromEmail != null ) {
-				createAccountResult.setStatus(false);
-				createAccountResult.setDuplicateEmail(true);
-				return createAccountResult;  //  !!!!!  EARLY EXIT
-			}
-			AuthUserDTO authUserDTOFromUsername = authUserDAO.getAuthUserDTOForUsername( username );
-			if ( authUserDTOFromUsername != null ) {
-				createAccountResult.setStatus(false);
-				createAccountResult.setDuplicateUsername(true);
-				return createAccountResult;  //  !!!!!  EARLY EXIT
-			}
+//			AuthUserDAO authUserDAO = AuthUserDAO.getInstance();
+//			AuthUserDTO authUserDTOFromEmail = authUserDAO.getAuthUserDTOForEmail( email );
+//			if ( authUserDTOFromEmail != null ) {
+//				createAccountResult.setStatus(false);
+//				createAccountResult.setDuplicateEmail(true);
+//				return createAccountResult;  //  !!!!!  EARLY EXIT
+//			}
+//			AuthUserDTO authUserDTOFromUsername = authUserDAO.getAuthUserDTOForUsername( username );
+//			if ( authUserDTOFromUsername != null ) {
+//				createAccountResult.setStatus(false);
+//				createAccountResult.setDuplicateUsername(true);
+//				return createAccountResult;  //  !!!!!  EARLY EXIT
+//			}
 		}
 		if( StringUtils.isNotEmpty( recaptchaValue ) ) {
 			createAccountResult.setUserTestValidated( true );
@@ -278,6 +284,8 @@ public class UserCreateAccountService {
 				return createAccountResult;  //  !!!!!  EARLY EXIT
 			}
 		}
+		
+
 		try {
 			AuthUserInviteTrackingDTO authUserInviteTrackingDTO = null;
 			if ( StringUtils.isNotEmpty( inviteCode ) ) {
@@ -317,14 +325,44 @@ public class UserCreateAccountService {
 							.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
 							.build() );  //  Early Exit with Data Exception
 				}
+			}
 
+			//  New User Mgmt
+			
+			UserMgmtCreateAccountRequest userMgmtCreateAccountRequest = new UserMgmtCreateAccountRequest();
+			
+			userMgmtCreateAccountRequest.setUsername( username );
+			userMgmtCreateAccountRequest.setEmail( email );
+			userMgmtCreateAccountRequest.setPassword( password );
+			userMgmtCreateAccountRequest.setFirstName( firstName );
+			userMgmtCreateAccountRequest.setLastName( lastName );
+			userMgmtCreateAccountRequest.setOrganization( organization );
+			userMgmtCreateAccountRequest.setUserRemoteIP( request.getRemoteAddr() );
+			
+			UserMgmtCreateAccountResponse userMgmtCreateAccountResponse =
+					UserMgmtCentralWebappWebserviceAccess.getInstance().createUser( userMgmtCreateAccountRequest );
+			
+			if ( ! userMgmtCreateAccountResponse.isSuccess() ) {
 				
+				if ( userMgmtCreateAccountResponse.isDuplicateEmail() ) {
+					createAccountResult.setDuplicateEmail(true);
+					createAccountResult.setStatus(false);
+					return createAccountResult;   //  EARLY EXIT
+				}
+				if ( userMgmtCreateAccountResponse.isDuplicateUsername() ) {
+					createAccountResult.setDuplicateUsername(true);
+					createAccountResult.setStatus(false);
+					return createAccountResult;   //  EARLY EXIT
+				}
 			}
 			
-			String hashedPassword = HashedPasswordProcessing.getInstance().createNewHashedPasswordHex( password );
+			int createdUserMgmtUserId = userMgmtCreateAccountResponse.getCreatedUserId();
+			
 			AuthUserDTO authUserDTO = new AuthUserDTO();
-			//		authUserDTO.setPasswordHashedHex( hashedPassword );
-			authUserDTO.setEmail( email );
+			
+			// pass in created user id from User Mgmt Webapp
+			authUserDTO.setUserMgmtUserId( createdUserMgmtUserId );
+			
 			if ( authUserInviteTrackingDTO != null && authUserInviteTrackingDTO.getInvitedSharedObjectId() == null ) {
 				//  Invite not tied to a project so the access level in the invite is used as the user level
 				authUserDTO.setUserAccessLevel( authUserInviteTrackingDTO.getInvitedUserAccessLevel() );
@@ -332,51 +370,52 @@ public class UserCreateAccountService {
 				//  The InvitedUserAccessLevel is tied to the project so at the user level this default is used.
 				authUserDTO.setUserAccessLevel( AuthAccessLevelConstants.ACCESS_LEVEL_DEFAULT_USER_CREATED_VIA_PROJECT_INVITE  );
 			}
-			authUserDTO.setUsername( username );
-			//		  AuthUserDAO.getInstance().save( authUserDTO );  //  Done in XLinkUserDAO.getInstance().save(item)
-			XLinkUserDTO xLinkUserDTO = new XLinkUserDTO();
-			xLinkUserDTO.setAuthUser(authUserDTO);
-			xLinkUserDTO.setFirstName( firstName );
-			xLinkUserDTO.setLastName( lastName );
-			xLinkUserDTO.setOrganization( organization );
+			
+			//  After user added to User Mgmt, add to proxl DB
+			
+			XLinkUserDTO userDatabaseRecord = null;
+			
+			ZzUserDataMirrorDTO zzUserDataMirrorDTO = new ZzUserDataMirrorDTO();
+			// zzUserDataMirrorDTO.setAuthUserId( XXX );  AuthUserId set later
+			zzUserDataMirrorDTO.setUsername( username );
+			zzUserDataMirrorDTO.setEmail( email );
+			zzUserDataMirrorDTO.setFirstName( firstName );
+			zzUserDataMirrorDTO.setLastName( lastName );
+			zzUserDataMirrorDTO.setOrganization( organization );
+
 			try {
 				if ( authUserInviteTrackingDTO != null ) {
 					if ( authUserInviteTrackingDTO.getInvitedSharedObjectId() == null ) {
 						//  user is not linked to a project so just add the user
-						AddNewUserUsingDBTransactionService.getInstance().addNewUserForUserInvite( xLinkUserDTO, hashedPassword, authUserInviteTrackingDTO );
+						AddNewUserUsingDBTransactionService.getInstance()
+						.addNewUserForUserInvite( authUserDTO, zzUserDataMirrorDTO, authUserInviteTrackingDTO );
 					} else {
 						//  A shared object id is associated so create and save records for that as well
 						AuthSharedObjectUsersDTO authSharedObjectUsersDTO = new AuthSharedObjectUsersDTO();
 						authSharedObjectUsersDTO.setSharedObjectId( authUserInviteTrackingDTO.getInvitedSharedObjectId() );
 						authSharedObjectUsersDTO.setAccessLevel( authUserInviteTrackingDTO.getInvitedUserAccessLevel() );
-						AddNewUserUsingDBTransactionService.getInstance().addNewUserAddAuthSharedObjectUsersDTOForUserInvite( xLinkUserDTO, hashedPassword, authSharedObjectUsersDTO, authUserInviteTrackingDTO );
+						AddNewUserUsingDBTransactionService.getInstance()
+						.addNewUserAddAuthSharedObjectUsersDTOForUserInvite( 
+								authUserDTO, zzUserDataMirrorDTO, authSharedObjectUsersDTO, authUserInviteTrackingDTO );
 					}
 				} else {
 					//  user is not linked to a project so just add the user
-					AddNewUserUsingDBTransactionService.getInstance().addNewUserForUserInvite( xLinkUserDTO, hashedPassword, null /* authUserInviteTrackingDTO */ );
+					AddNewUserUsingDBTransactionService.getInstance().addNewUserForUserInvite( authUserDTO, zzUserDataMirrorDTO, null /* authUserInviteTrackingDTO */ );
 				}
-				UserSessionObject userSessionObject = new UserSessionObject();
-				userSessionObject.setUserDBObject( xLinkUserDTO );
-				// Get their session   
-				HttpSession session = request.getSession();
-				session.setAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN, userSessionObject );
+				
+				userDatabaseRecord = new XLinkUserDTO();
+				userDatabaseRecord.setAuthUser(authUserDTO);
+				
+				authUserDTO.setUsername( username );
+				authUserDTO.setEmail( email );
+				
+				userDatabaseRecord.setFirstName( firstName );
+				userDatabaseRecord.setLastName( lastName );
+				userDatabaseRecord.setOrganization( organization );
+				
 			} catch ( SQLException sqlException ) {
-				String exceptionMessage = sqlException.getMessage();
-				if ( exceptionMessage != null && exceptionMessage.startsWith( "Duplicate entry" ) ) {
-					AuthUserDAO authUserDAO = AuthUserDAO.getInstance();
-					AuthUserDTO authUserDTOFromEmail = authUserDAO.getAuthUserDTOForEmail( email );
-					if ( authUserDTOFromEmail != null ) {
-						createAccountResult.setDuplicateEmail(true);
-					}
-					AuthUserDTO authUserDTOFromUsername = authUserDAO.getAuthUserDTOForUsername( username );
-					if ( authUserDTOFromUsername != null ) {
-						createAccountResult.setDuplicateUsername(true);
-					}
-					createAccountResult.setStatus(false);
-					return createAccountResult;   //  EARLY EXIT
-				} else {
-					throw sqlException;
-				}
+				
+				throw sqlException;
 			}
 
 			if ( termsOfServiceEnabled ) {
@@ -387,6 +426,33 @@ public class UserCreateAccountService {
 				tosUserAccepted.setTermsOfServiceVersionId( termsOfServiceVersionIdForIdString );
 				TermsOfServiceUserAcceptedVersionHistoryDAO.getInstance().save( tosUserAccepted );
 			}
+
+			UserMgmtLoginRequest userMgmtLoginRequest = new UserMgmtLoginRequest();
+			userMgmtLoginRequest.setUsername( username );
+			userMgmtLoginRequest.setPassword( password );
+			userMgmtLoginRequest.setRemoteIP(  request.getRemoteAddr() );
+			
+			UserMgmtLoginResponse userMgmtLoginResponse = 
+					UserMgmtCentralWebappWebserviceAccess.getInstance().userLogin( userMgmtLoginRequest );
+			
+			if ( ! userMgmtLoginResponse.isSuccess() ) {
+				String msg = null;
+				if ( userMgmtLoginResponse.isUsernameNotFound() || userMgmtLoginResponse.isPasswordInvalid() ) {
+					msg = "Fail to log into account just created for username not found or password is invalid.  username: " + username;
+				} else if ( userMgmtLoginResponse.isUserDisabled() ) {
+					msg = "Fail to log into account just created for user is disabled.  username: " + username;
+				}
+				msg = "Fail to log into account just created.  username: " + username;
+				log.error( msg );
+				throw new ProxlWebappInternalErrorException( msg );
+			}
+
+			UserSessionObject userSessionObject = new UserSessionObject();
+			userSessionObject.setUserDBObject( userDatabaseRecord );
+			userSessionObject.setUserLoginSessionKey( userMgmtLoginResponse.getSessionKey() );
+			// Get their session   
+			HttpSession session = request.getSession();
+			session.setAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN, userSessionObject );
 			
 			createAccountResult.setStatus(true);
 			return createAccountResult;
@@ -396,7 +462,11 @@ public class UserCreateAccountService {
 		} catch ( Exception e ) {
 			String msg = "createAccountCommonInternal(...) Exception caught: " + e.toString();
 			log.error( msg, e );
-			throw e;
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
+					.build()
+					);
 		}
 	}
 }

@@ -8,17 +8,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.cookie_mgmt.main.ProxlDataCookieManagement;
 import org.yeastrc.xlink.www.cookie_mgmt.main.PublicAccessCodeSessionManagement;
-import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
 import org.yeastrc.xlink.www.internal_services.GetAuthLevelFromXLinkData;
+import org.yeastrc.xlink.www.internal_services.UpdateAuthUserUserAccessLevelEnabled;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.web_utils.RefreshAllowedReadAccessProjectIds;
@@ -85,15 +84,12 @@ public class GetAuthAccessLevelForWebRequest {
 				//  This is a signed in user so use their access.
 
 				///  Refresh with latest
-
-				AuthUserDTO authUser = AuthUserDAO.getInstance().getAuthUserDTOForId( xLinkUserDBObject.getAuthUser().getId() );
-
-				xLinkUserDBObject.setAuthUser( authUser );
-
+				AuthUserDTO authUser = xLinkUserDBObject.getAuthUser();
+				UpdateAuthUserUserAccessLevelEnabled.getInstance().updateAuthUserUserAccessLevelEnabled( authUser );
 
 				//  If user is not enabled, return access level none
 
-				if ( ! authUser.isEnabled() ) {
+				if ( ! authUser.isEnabledAppSpecific() ) {
 
 					authAccessLevel = new AuthAccessLevel( AuthAccessLevelConstants.ACCESS_LEVEL_NONE );
 
@@ -293,15 +289,12 @@ public class GetAuthAccessLevelForWebRequest {
 		}
 		
 		///  Refresh with latest
-		
-		AuthUserDTO authUser = AuthUserDAO.getInstance().getAuthUserDTOForId( xLinkUserDBObject.getAuthUser().getId() );
-		
-		xLinkUserDBObject.setAuthUser( authUser );
-		
+		AuthUserDTO authUser = xLinkUserDBObject.getAuthUser();
+		UpdateAuthUserUserAccessLevelEnabled.getInstance().updateAuthUserUserAccessLevelEnabled( authUser );
 		
 		//  If user is not enabled, return access level none
 		
-		if ( ! authUser.isEnabled() ) {
+		if ( ! authUser.isEnabledAppSpecific() ) {
 		
 			AuthAccessLevel authAccessLevel = new AuthAccessLevel( AuthAccessLevelConstants.ACCESS_LEVEL_NONE );
 
@@ -367,15 +360,12 @@ public class GetAuthAccessLevelForWebRequest {
 			//  This is a signed in user so use their access.
 			
 			///  Refresh with latest
-			
-			AuthUserDTO authUser = AuthUserDAO.getInstance().getAuthUserDTOForId( xLinkUserDBObject.getAuthUser().getId() );
-			
-			xLinkUserDBObject.setAuthUser( authUser );
-
+			AuthUserDTO authUser = xLinkUserDBObject.getAuthUser();
+			UpdateAuthUserUserAccessLevelEnabled.getInstance().updateAuthUserUserAccessLevelEnabled( authUser );
 			
 			//  If user is not enabled, return access level none
 			
-			if ( ! authUser.isEnabled() ) {
+			if ( ! authUser.isEnabledAppSpecific() ) {
 			
 				authAccessLevel = new AuthAccessLevel( AuthAccessLevelConstants.ACCESS_LEVEL_NONE );
 				

@@ -432,7 +432,7 @@
 				validate="false">
 		    <forward name="ProjectInviteLandingPage" path="/user_inviteLandingPage.do" redirect="false"/>
 		    <forward name="AddNewUser" path="/user_inviteCreateNewUserPage.do" redirect="false"/>
-		    <forward name="GoToProjectList" path="/listProjects.do" redirect="false"/>
+		    <forward name="GoToProjectList" path="/listProjects.do" redirect="true"/>
 		    <forward name="Failure" path="/WEB-INF/jsp-pages/user_account/inviteUserProcessCodeFail.jsp" redirect="false"/>
 		</action>	
 		  		

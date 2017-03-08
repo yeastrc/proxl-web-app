@@ -22,21 +22,16 @@ DROP TABLE IF EXISTS auth_user ;
 
 CREATE TABLE  auth_user (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  username VARCHAR(255) NOT NULL,
-  password_hashed VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL,
+  user_mgmt_user_id INT UNSIGNED NOT NULL,
   user_access_level SMALLINT NULL,
+  enabled_app_specific TINYINT NOT NULL DEFAULT 1,
   last_login DATETIME NULL,
   last_login_ip VARCHAR(255) NULL,
-  last_password_change DATETIME NULL,
-  enabled TINYINT NOT NULL DEFAULT 1,
   PRIMARY KEY (id))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-CREATE UNIQUE INDEX auth_username_UNIQUE ON auth_user (username ASC);
-
-CREATE UNIQUE INDEX email_UNIQUE ON auth_user (email ASC);
+CREATE UNIQUE INDEX user_mgmt_user_id_UNIQUE ON auth_user (user_mgmt_user_id ASC);
 
 
 -- -----------------------------------------------------
@@ -54,25 +49,6 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_bin;
 
 CREATE UNIQUE INDEX public_access_code_UNIQUE ON auth_shared_object (public_access_code ASC);
-
-
--- -----------------------------------------------------
--- Table xl_user
--- -----------------------------------------------------
-DROP TABLE IF EXISTS xl_user ;
-
-CREATE TABLE  xl_user (
-  auth_user_id INT UNSIGNED NOT NULL,
-  first_name VARCHAR(255) NOT NULL,
-  last_name VARCHAR(255) NOT NULL,
-  organization VARCHAR(2000) NULL,
-  PRIMARY KEY (auth_user_id),
-  CONSTRAINT fk_auth_user_id
-    FOREIGN KEY (auth_user_id)
-    REFERENCES auth_user (id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -1843,6 +1819,7 @@ CREATE INDEX prxl_xml_fl_imprt_trkng_sngl_fl_type_id_idx ON proxl_xml_file_impor
 
 CREATE INDEX prxl_xml_fl_imprt_trkng_sngl_fl_up_st_id_idx ON proxl_xml_file_import_tracking_sngl_fl_del_web_user (file_upload_status_id ASC);
 
+
 -- -----------------------------------------------------
 -- Table peptide_protein_position
 -- -----------------------------------------------------
@@ -2064,6 +2041,27 @@ CREATE TABLE  folder_project_search (
 ENGINE = InnoDB;
 
 CREATE INDEX folder_project_search_folder_id_idx ON folder_project_search (folder_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table zz_user_data_mirror
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS zz_user_data_mirror ;
+
+CREATE TABLE  zz_user_data_mirror (
+  auth_user_id INT UNSIGNED NOT NULL,
+  username VARCHAR(255) NULL,
+  email VARCHAR(255) NULL,
+  first_name VARCHAR(255) NULL,
+  last_name VARCHAR(255) NULL,
+  organization VARCHAR(2000) NULL,
+  PRIMARY KEY (auth_user_id),
+  CONSTRAINT zz_user_data_mirror__auth_user_id_fk
+    FOREIGN KEY (auth_user_id)
+    REFERENCES auth_user (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------

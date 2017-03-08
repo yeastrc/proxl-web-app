@@ -2,7 +2,6 @@ package org.yeastrc.xlink.www.user_account_webservices;
 
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -16,7 +15,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.auth.dao.AuthUserDAO;
-import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.objects.UpdateUserAccessToProjectResult;
@@ -113,7 +111,7 @@ public class UpdateUserGlobalAccessService {
 		try {
 
 			// Get the session first.  
-			HttpSession session = request.getSession();
+//			HttpSession session = request.getSession();
 
 
 
@@ -167,9 +165,9 @@ public class UpdateUserGlobalAccessService {
 
 			AuthUserDAO authUserDAO = AuthUserDAO.getInstance();
 			
-			AuthUserDTO authUserDTO = authUserDAO.getAuthUserDTOForId(personId);
+			Integer idFromDB = authUserDAO.getIdForId(personId);
 			
-			if ( authUserDTO == null ) {
+			if ( idFromDB == null ) {
 				
 				log.warn( "UpdateUserGlobalAccessService:  personId is not in database: " + personId );
 

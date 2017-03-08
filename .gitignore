@@ -48,3 +48,4 @@ _build
 /proxl_web_app/zz_build_dir
 /proxl_web_app/zz_classes_shared_code
 /proxl_web_app/WebRoot/WEB-INF/classes
+/proxl_web_app/resources__Local_Config_Only

@@ -1792,6 +1792,27 @@ var unlock_project_public_access_button = function(clickThis, eventObject) {
 		}
 	});
 };
+/////////////////
+var showResearchersInProjectBlock = function( clickThis, eventObject ) {
+	$("#researchers_in_project_block_hide").show();
+	var $researchers_in_project_block = $("#researchers_in_project_block");
+	$researchers_in_project_block.show();
+	$("#researchers_in_project_block_show").hide();
+	//  Code to load data from webservices for first expand of block
+	var initialDataLoadDone = $researchers_in_project_block.data("initialDataLoadDone");
+	if ( initialDataLoadDone ) {
+		return;
+	}
+	updateInvitedPeopleCurrentUsersLists();
+	$researchers_in_project_block.data("initialDataLoadDone", true);
+};
+
+/////////////////
+var hideResearchersInProjectBlock = function( clickThis, eventObject ) {
+	$("#researchers_in_project_block_show").show();
+	$("#researchers_in_project_block").hide();
+	$("#researchers_in_project_block_hide").hide();
+};
 
 /////////////////
 var updateInvitedPeopleCurrentUsersLists = function() {
@@ -2480,6 +2501,26 @@ function initProjectAdminSection() {
 	if ( logged_in_user_access_level_owner_or_better_String === "true" ) {
 		adminGlobals.logged_in_user_access_level_owner_or_better = true;
 	}
+	$("#researchers_in_project_block_show").click(function(eventObject) {
+		try {
+			var clickThis = this;
+			showResearchersInProjectBlock( clickThis, eventObject );
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	});
+	$("#researchers_in_project_block_hide").click(function(eventObject) {
+		try {
+			var clickThis = this;
+			hideResearchersInProjectBlock( clickThis, eventObject );
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	});
 	$("#delete_note_confirm_button").click(function(eventObject) {
 		try {
 			var clickThis = this;

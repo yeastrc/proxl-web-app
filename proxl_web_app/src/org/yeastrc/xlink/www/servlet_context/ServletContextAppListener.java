@@ -11,11 +11,13 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTableGetValueCommon;
 import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTableGetValue;
 import org.yeastrc.xlink.www.auth_db.AuthLibraryDBConnectionFactoryForWeb;
+import org.yeastrc.xlink.www.config_properties_file.ProxlConfigFileReader;
 import org.yeastrc.xlink.www.config_system_table.AppContextConfigSystemValuesRetrieval;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.db_web.DBConnectionFactoryWeb;
 import org.yeastrc.xlink.www.db_web.DBSet_JNDI_Name_FromConfigFile;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
 import org.yeastrc.xlink.www.no_data_validation.ThrowExceptionOnNoDataConfig;
 import org.yeastrc.xlink.www.web_utils.GetJsCssCacheBustString;
 
@@ -49,6 +51,13 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		{
 			isDevEnv = true;
 		}
+
+		try {
+			ProxlConfigFileReader.getInstance().populateProxlConfigFileValuesFromConfigFiles();
+		} catch (Exception e) {
+			//  already logged
+			throw new RuntimeException( e );
+		} 
 		
 		try {
 			ThrowExceptionOnNoDataConfig.getInstance().init();
@@ -57,7 +66,6 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 			throw new RuntimeException( e );
 		} 
 		
-
 		try {
 			DBSet_JNDI_Name_FromConfigFile.getInstance().dbSet_JNDI_Name_FromConfigFile();
 		} catch (Exception e) {
@@ -118,6 +126,8 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 			//  already logged
 			throw new RuntimeException( e );
 		} 
+
+		UserMgmtCentralWebappWebserviceAccess.getInstance().init();
 
 		AppContextConfigSystemValuesRetrieval appContextConfigSystemValuesRetrieval = 
 				new AppContextConfigSystemValuesRetrieval();

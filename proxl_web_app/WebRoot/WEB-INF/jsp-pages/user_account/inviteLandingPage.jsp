@@ -67,7 +67,7 @@
   	
 	<form action="${ contextPath }/user_loginPage.do" >
 		<input type="hidden" name="requestedURL" value="${ intialIncomingURL }"> 
-	
+		<input type="hidden" name="inviteTrackingCode" value="<c:out value="${ inviteCode }" ></c:out>">
 	 	<INPUT TYPE="submit" class="submit-button" VALUE="Sign In" >
 	</form>
 	

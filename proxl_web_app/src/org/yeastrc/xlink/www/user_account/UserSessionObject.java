@@ -11,7 +11,12 @@ import org.yeastrc.xlink.www.dto.XLinkUserDTO;
  */
 public class UserSessionObject {
 
+	/**
+	 * Populated if a user is logged in
+	 */
+	private String userLoginSessionKey;
 	private XLinkUserDTO userDBObject;
+	private volatile long lastPingToSSOServer;
 	
 	private Set<Integer> allowedReadAccessProjectIds;
 
@@ -116,4 +121,21 @@ public class UserSessionObject {
 			Set<String> allowedReadAccessProjectPublicAccessCodes) {
 		this.allowedReadAccessProjectPublicAccessCodes = allowedReadAccessProjectPublicAccessCodes;
 	}
+
+	public String getUserLoginSessionKey() {
+		return userLoginSessionKey;
+	}
+
+	public void setUserLoginSessionKey(String userLoginSessionKey) {
+		this.userLoginSessionKey = userLoginSessionKey;
+	}
+
+	public long getLastPingToSSOServer() {
+		return lastPingToSSOServer;
+	}
+
+	public void setLastPingToSSOServer(long lastPingToSSOServer) {
+		this.lastPingToSSOServer = lastPingToSSOServer;
+	}
+
 }

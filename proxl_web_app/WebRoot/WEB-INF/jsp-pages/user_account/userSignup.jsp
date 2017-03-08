@@ -181,16 +181,16 @@
 	
 		<%--  size of input fields controlled by CSS, was size="20"  --%>
 
-		<input type="text" id="firstName" placeholder="First name" class="input-field input_field_jq" maxlength="40"/><br>
-		<input type="text" id="lastName" placeholder="Last name" class="input-field input_field_jq" maxlength="60" /><br>
-		<input type="text" id="organization" placeholder="Organization" class="input-field input_field_jq" maxlength="2000" /><br>
+		<input type="text" id="firstName" placeholder="First name" title="First name" class="input-field input_field_jq" maxlength="40"/><br>
+		<input type="text" id="lastName" placeholder="Last name" title="Last name" class="input-field input_field_jq" maxlength="60" /><br>
+		<input type="text" id="organization" placeholder="Organization" title="Organization" class="input-field input_field_jq" maxlength="2000" /><br>
 		
-		<input type="text" id="email" placeholder="Email address" class="input-field input_field_jq" maxlength="255" /><br>
+		<input type="text" id="email" placeholder="Email address" title="Email address" class="input-field input_field_jq" maxlength="255" /><br>
 
-		<input type="text" id="username" placeholder="Username" class="input-field input_field_jq" maxlength="40" /><br>
+		<input type="text" id="username" placeholder="Username" title="Username" class="input-field input_field_jq" maxlength="40" /><br>
 
-		<input type="password" id="password" placeholder="Password" class="input-field input_field_jq" maxlength="40" /><br>
-		<input type="password" id="passwordConfirm" placeholder="Confirm Password" class="input-field input_field_jq" maxlength="40" /><br>
+		<input type="password" id="password" placeholder="Password" title="Password" class="input-field input_field_jq" maxlength="40" /><br>
+		<input type="password" id="passwordConfirm" placeholder="Confirm Password" title="Confirm Password" class="input-field input_field_jq" maxlength="40" /><br>
 		
 		
 		<c:if test="${ configSystemValues.googleRecaptchaConfigured }">

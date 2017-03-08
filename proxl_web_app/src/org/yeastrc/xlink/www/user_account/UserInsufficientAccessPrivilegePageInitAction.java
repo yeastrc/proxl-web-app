@@ -41,7 +41,8 @@ public class UserInsufficientAccessPrivilegePageInitAction extends Action {
 					&& userSessionObject.getUserDBObject() != null 
 					&& userSessionObject.getUserDBObject().getAuthUser() != null ) {
 				
-				if ( ! userSessionObject.getUserDBObject().getAuthUser().isEnabled() ) {
+				if ( ( ! userSessionObject.getUserDBObject().getAuthUser().isEnabledAppSpecific() )
+						|| ( ! ! userSessionObject.getUserDBObject().getAuthUser().isEnabledUserMgmtGlobalLevel() ) ) {
 				
 					//  User is Disabled 
 
