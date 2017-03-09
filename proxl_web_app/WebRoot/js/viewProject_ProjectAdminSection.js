@@ -2677,7 +2677,6 @@ function initProjectAdminSection() {
 	initInviteUser();
 	initMaintTitleAndAbstract();
 	initMaintProjectNotes();
-	updateInvitedPeopleCurrentUsersLists();
 };
 
 ///////////////
