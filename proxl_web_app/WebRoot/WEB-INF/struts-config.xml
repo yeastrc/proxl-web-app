@@ -162,16 +162,7 @@
 			<forward name="Success" path="/WEB-INF/jsp-pages/listProjects.jsp" redirect="false" />
 			<forward name="Failure" path="/WEB-INF/jsp-pages/listProjects.jsp" redirect="false" />
 		</action>		
-	    
-  		<action path="/deleteSearch"
-				type="org.yeastrc.xlink.www.actions.DeleteSearchAction"
-				scope="request"
-				validate="false">
-			<!-- This forward is used as a template, the project id will be appended to it  -->
-			<forward name="Success" path="/viewProject.do" redirect="true" />
-		</action>
-		
-  
+	      
 		<action path="/viewProject"
 				type="org.yeastrc.xlink.www.actions.ViewProjectAction"
 				scope="request"

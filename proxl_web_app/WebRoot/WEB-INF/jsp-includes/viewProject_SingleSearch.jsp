@@ -10,7 +10,8 @@
 
    <c:set var="search" value="${ search_wrapper.searchDTO }" />
 							
-  <div data-project_search_id="<bean:write name="search" property="projectSearchId" />" class=" search_row_jq " >
+  <div id="single_search_entry__project_search_id_<bean:write name="search" property="projectSearchId" />"
+  	data-project_search_id="<bean:write name="search" property="projectSearchId" />" class=" search_row_jq " >
 	<table style="padding:0px;margin-top:0px;margin-bottom:0px;width:100%;">
 		<tr data-project_search_id="<bean:write name="search" property="projectSearchId" />" class=" search_root_jq ">
 		  <script type="text/text" class=" qc_plots_links_filtered_on_import_message_jq "

@@ -533,7 +533,7 @@ var closeConfirmDeleteSearchOverlay = function(clickThis, eventObject) {
 };
 
 /////////////////
-//put click handler for this on #delete_search_confirm_button
+//  user confirms search delete
 var deleteSearchConfirmed = function(clickThis, eventObject) {
 	var $clickThis = $(clickThis);
 	var projectSearchId = $clickThis.data("projectSearchId");
@@ -543,7 +543,47 @@ var deleteSearchConfirmed = function(clickThis, eventObject) {
 	if ( projectSearchId === "" ) {
 		throw Error( ' projectSearchId === "" ' );
 	}
-	document.location.href= contextPathJSVar + "/deleteSearch.do?projectSearchId=" + projectSearchId;
+	var requestData = {	projectSearchId : projectSearchId };
+	var _URL = contextPathJSVar + "/services/search/delete";
+//	var request =
+	$.ajax({
+		type : "POST",
+		url : _URL,
+		data : requestData,
+		dataType : "json",
+		success : function(responseData) {
+			try {
+				deleteSearchConfirmedResponse( { responseData : responseData, projectSearchId: projectSearchId } );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		},
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+			closeConfirmDeleteSearchOverlay();
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+			handleAJAXError(jqXHR, textStatus, errorThrown);
+			closeConfirmDeleteSearchOverlay();
+//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
+//			textStatus: " + textStatus );
+		}
+	});
+};
+///
+var deleteSearchConfirmedResponse = function( params ) {
+	var projectSearchId = params.projectSearchId;
+	// assume successful if get here
+	//  Remove search from page
+	var single_search_entry__project_search_id__HTML_ElementID = "single_search_entry__project_search_id_" + projectSearchId;
+	var $single_search_entry__project_search_id_ID = $( "#" + single_search_entry__project_search_id__HTML_ElementID );
+	if ( $single_search_entry__project_search_id_ID.length === 0 ) {
+		console.log("No HTML element found for id: " + single_search_entry__project_search_id__HTML_ElementID );
+		//  Maybe reload page here
+	} else {
+		$single_search_entry__project_search_id_ID.remove();
+	}
 	closeConfirmDeleteSearchOverlay();
 };
 
