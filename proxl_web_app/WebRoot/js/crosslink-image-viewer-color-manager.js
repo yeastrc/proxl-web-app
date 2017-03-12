@@ -23,11 +23,8 @@ var ColorManager = function() {
  * 
  */
 ColorManager.prototype.getColorForUIDAnnotation = function( uid ) {
-	
 	try {
-		
 		return this.theme.getColorForUIDAnnotation( uid );
-		
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 		throw e;
@@ -43,11 +40,8 @@ ColorManager.prototype.getColorForUIDAnnotation = function( uid ) {
  * 
  */
 ColorManager.prototype.getColorForUID = function( uid ) {
-	
 	try {
-		
 		return this.theme.getColorForUID( uid );
-		
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 		throw e;
@@ -63,11 +57,8 @@ ColorManager.prototype.getColorForUID = function( uid ) {
  * 
  */
 ColorManager.prototype.getColorForRegion = function( region ) {
-	
 	try {
-		
 		return this.theme.getColorForRegion( region );
-		
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 		throw e;
@@ -84,7 +75,6 @@ ColorManager.prototype.getColorForRegion = function( region ) {
  */
 ColorManager.prototype.getColorForIndex = function( index ) {
 	var uid = _indexManager.getUIDForIndex( index );
-		
 	return this.getColorForUID( uid );
 }
 
@@ -105,16 +95,12 @@ ColorManager.prototype.getColorForIndex = function( index ) {
  * 
  */
 ColorManager.prototype.getColorForLink = function( link ) {
-	
 	try {
-		
 		return this.theme.getColorForLink( link );
-	
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 		throw e;
 	}
-	
 };
 
 /**
@@ -126,20 +112,13 @@ ColorManager.prototype.getColorForLink = function( link ) {
  * 
  */
 ColorManager.prototype.getColorForSearches = function( searches ) {
-	
 	try {
-		
 		return this.theme.getColorForSearches( searches );
-		
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 		throw e;
 	}
 };
-
-
-
-
 
 /*
 
@@ -172,14 +151,10 @@ ColorManager.prototype.getColorForSearches = function( searches ) {
  *
 */
 
-
-
-
 /*
  * Pretty Theme - uses a "pretty" coloring algorithm that automagically determines the colors to use
  * based on how many items there are in the index.
  */
-
 
 /**
  * Construct a PrettyTheme object
@@ -205,7 +180,6 @@ ColorManager.PrettyTheme.CONSTANTS = {
 		},
 };
 
-
 /**
  * Get the hex code to use for coloring a link.
  * 
@@ -226,12 +200,10 @@ ColorManager.PrettyTheme.prototype.getColorForLink = function( link ) {
 	// Ensure we have the data we need and that it has expected values
 	ColorManager.validateLink( link );
 	
-	
 	// if no highlighting is going on, just return the normal color
 	if( !_imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) {	
 		return this.getColorForHighlightedLink( link );		
 	}
-	
 	
 	var barEntry1 = _imageProteinBarDataManager.getItemByUID( link.uid1 );
 	var barEntry2 = undefined;			//undefined if monolink or looplink
@@ -249,7 +221,6 @@ ColorManager.PrettyTheme.prototype.getColorForLink = function( link ) {
 			return this.getColorForNonHighlightedItem();
 		}
 	}
-
 	
 	// if exactly one region is highlighted, any link that has either end
 	// on that region should be highlighted
@@ -324,9 +295,7 @@ ColorManager.PrettyTheme.prototype.getColorForLink = function( link ) {
 		} else {		
 			return this.getColorForNonHighlightedItem();
 		}
-		
 	}
-	
 };
 
 /**
@@ -354,9 +323,7 @@ ColorManager.PrettyTheme.prototype.getColorForUIDAnnotation = function( uid ) {
 	}
 	
 	return this.getColorForUID( uid );
-	
 }
-
 
 /**
  * Get the hex code to use for coloring the protein bar with the given uid.
@@ -391,18 +358,13 @@ ColorManager.PrettyTheme.prototype.getColorForUID = function( uid ) {
 			} else {
 				return this.getColorForHighlightedUID( uid );	// there is highlighting going on and this protein bar is highlighted
 			}
-
 		} else {
 			return this.getColorForNonHighlightedItem();	// there is highlighting going on and this protein bar is NOT highlighted
 		}
-		
 	} else {
-		
 		return this.getColorForHighlightedUID( uid );		// no highlighting going on, so everything is highlighted
 	}
-	
 };
-
 
 /**
  * Get the color to use for a link if it's highlighted, or if there are
@@ -424,20 +386,15 @@ ColorManager.PrettyTheme.prototype.getColorForHighlightedLink = function( link )
 	} else if( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_REGION ) {
 
 		color =  this.getColorForLinkUsingRegions( link );
-		
 	} else {
-		
 		color =  this.getColorForLinkUsingUID( link );
-		
 	}
-	
 	
 	// if shading by counts, set the transparency of this color appropriately	
 	color.opacity = ColorManager.getOpacityForHighlightedLink( link );
 	
 	return color;
 };
-
 
 /**
  * Get the color to use for a link based on its UID
@@ -458,12 +415,9 @@ ColorManager.PrettyTheme.prototype.getColorForLinkUsingUID = function ( link ) {
 	} else if( ColorManager.isLinkedPositionHighlighted( link.uid2, link.position2 ) ) {
 		
 		return this.getColorForHighlightedUID( link.uid2 );
-	
 	} else {		
 		throw Error( "Was told to highlight link by protein (uid), but neither end of it is highlighted?" );
-	
 	}
-	
 };
 
 

@@ -6,12 +6,6 @@ var legacyJSONUpdater = function() {
 
 };
 
-
-
-
-
-
-
 /**
  * Convert the JSON hash to the current spec for the JSON hash
  * and support backwards compatibility with previously-saved URLs
@@ -30,7 +24,6 @@ legacyJSONUpdater.prototype.convertLegacyJSON = function() {
 		return false;
 	}
 	
-	
 	/*
 	 * Convert JSON to version 1
 	 */
@@ -48,7 +41,6 @@ legacyJSONUpdater.prototype.convertLegacyJSON = function() {
 		updateURLHashWithJSONObject( json );
 		
 		if( json[ "selected-proteins" ] ) {
-			
 			/*
 			 * Convert pre-protein bar data. We know it uses the old nrseq ids and
 			 * protein seq ids must be looked up via ajax calls
@@ -66,7 +58,6 @@ legacyJSONUpdater.prototype.convertLegacyJSON = function() {
 			getProteinSequenceIdsForNrseqProteinIds( params );
 			
 			return true;
-			
 			
 		} else if( proteinBarData ) {
 			
@@ -99,26 +90,17 @@ legacyJSONUpdater.prototype.convertLegacyJSON = function() {
 
 				this.convertProteinBarDataToIndexManager( json, proteinBarData, false );
 			}
-			
-			
 		}
-
 	} //end conversion to version 1
-	
-	
-	
 	
 	/*
 	// convert pre-protein data bar manager and pre-protein sequence id usage
 	if(	convertOldJSONIfNecessaryReturnTrueIfExit() ){ 
 		return true;
 	}
-	
-
 	*/
 		
 	return false;
-	
 };
 
 /**
