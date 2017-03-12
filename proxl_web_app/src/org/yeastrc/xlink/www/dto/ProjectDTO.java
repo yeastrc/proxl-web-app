@@ -24,9 +24,6 @@ public class ProjectDTO {
 	private Integer publicAccessLevel;
 	private boolean publicAccessLocked;
 	
-	
-
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -122,14 +119,3 @@ public class ProjectDTO {
 	}
 	
 }
-
-//CREATE TABLE project (
-//		  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//		  auth_shareable_object_id INT UNSIGNED NOT NULL,
-//		  title VARCHAR(255) NULL,
-//		  abstract TEXT NULL,
-//		  enabled TINYINT UNSIGNED NOT NULL DEFAULT 1,
-//		  marked_for_deletion TINYINT UNSIGNED NOT NULL DEFAULT 0,
-//		  project_locked TINYINT NOT NULL DEFAULT 0,
-//		  public_access_level SMALLINT NULL,
-//		  public_access_locked TINYINT NULL DEFAULT 0,

@@ -2,7 +2,6 @@ package org.yeastrc.xlink.www.actions;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -17,8 +16,7 @@ import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.TestIsUserSignedIn;
 
 public class ConfigureProxlForAdminPageInitAction extends Action {
-
-
+	
 	private static final Logger log = Logger.getLogger(ConfigureProxlForAdminPageInitAction.class);
 	
 	public ActionForward execute( ActionMapping mapping,
@@ -26,55 +24,30 @@ public class ConfigureProxlForAdminPageInitAction extends Action {
 			  HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
-		
 		try {
-
-
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-
-
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request, response );
-
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
-
 				//  No User session 
-
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
-			
 			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-
 			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSessionObject ) ) {
-				
 				//  No User session 
-
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
-			
-
 			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
-
 			if ( authAccessLevel == null || ( ! authAccessLevel.isAdminAllowed() ) ) {
-
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
 			}
 			
-
 			GetPageHeaderData.getInstance().getPageHeaderDataWithoutProjectId( request );
-
-			
 			return mapping.findForward( "Success" );
-
+			
 		} catch ( Exception e ) {
-			
 			String msg = "Exception caught: " + e.toString();
-			
 			log.error( msg, e );
-			
 			throw e;
 		}
 	}
-
 }

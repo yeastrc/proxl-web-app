@@ -59,8 +59,7 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
-			  HttpServletResponse response )
-					  throws Exception {
+			  HttpServletResponse response ) throws Exception {
 		try {
 			// our form
 			MergedSearchViewPeptidesForm form = (MergedSearchViewPeptidesForm)actionForm;
@@ -198,28 +197,12 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 					}
 				}
 				writer.write( "\n" );
-//		SEARCH ID
-//		SCAN NUMBER
-//		PEPTIDE 1
-//		POSITION 1
-//		MODS
-//		PEPTIDE 1
-//		POSITION 2
-//		MODS
-//		Link Type
-//		OBSERVED M/Z
-//		CHARGE
-//		RETENTION TIME (MINUTES)
-//		SCAN FILENAME (THE MZML FILE)
-				
+
 				for( WebMergedReportedPeptide link : peptidesMergedCommonPageDownloadResult.getWebMergedReportedPeptideList() ) {
-					
 					//  Process links
 					int unifiedReportedPeptideId = link.getUnifiedReportedPeptideId();
-					
 					//  Process for each search id:
 					for ( SearchDTO search : searches ) {
-						
 						int eachProjectSearchIdToProcess = search.getProjectSearchId();
 						Integer eachSearchIdToProcess = search.getSearchId();
 						

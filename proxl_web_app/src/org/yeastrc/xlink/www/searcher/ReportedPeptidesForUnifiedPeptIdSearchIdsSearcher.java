@@ -41,6 +41,7 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 	 * Should it use the optimization of Peptide and PSM defaults to skip joining the tables with the annotation values?
 	 */
 	private final boolean USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES = false;  // UNTESTED for a value of "true"
+	
 	/**
 	 * UNTESTED for a value of "true"
 	 * 
@@ -49,8 +50,8 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 	 * Also, test web page and/or webservice 
 	 */
 //	private final boolean USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES = true;  //  UNTESTED for a value of "true"
-	///  These are not used everywhere, most places the string values are hard coded in the SQL
 	
+	///  This is not used everywhere, most places the string values are hard coded in the SQL
 	private final String PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS = "psm_fltrbl_tbl_";
 	
 	private final String SQL_FIRST_PART = 

@@ -40,7 +40,6 @@ import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginResponse;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserInviteTrackingCode;
 
-
 @Path("/user")
 public class LoginService {
 
@@ -70,12 +69,10 @@ public class LoginService {
 			@FormParam( "inviteTrackingCode" ) String inviteTrackingCode,
 			@Context HttpServletRequest request )
 	throws Exception {
-
 		LoginResult loginResult = loginServiceLocal( username, password, returnTOS, tosAcceptedKey, inviteTrackingCode,request );
 //		.cookie(new NewCookie("name", "Hello, world!"))
 		return Response.ok(loginResult).build();
 	}
-	
 	/**
 	 * @param username
 	 * @param password
@@ -91,7 +88,6 @@ public class LoginService {
 			String tosAcceptedKey,
 			String inviteTrackingCode,
 			HttpServletRequest request ) {
-	
 		LoginResult loginResult = new LoginResult();
 		if ( StringUtils.isEmpty( username ) ) {
 			log.warn( "LoginService:  username empty: " + username );
@@ -114,17 +110,13 @@ public class LoginService {
 		try {
 			// Get their session first.  
 			HttpSession session = request.getSession();
-			
 			UserMgmtLoginRequest userMgmtLoginRequest = new UserMgmtLoginRequest();
 			userMgmtLoginRequest.setUsername( username );
 			userMgmtLoginRequest.setPassword( password );
 			userMgmtLoginRequest.setRemoteIP(  request.getRemoteAddr() );
-			
 			UserMgmtLoginResponse userMgmtLoginResponse = 
 					UserMgmtCentralWebappWebserviceAccess.getInstance().userLogin( userMgmtLoginRequest );
-			
 			if ( ! userMgmtLoginResponse.isSuccess() ) {
-				
 				if ( userMgmtLoginResponse.isUsernameNotFound() || userMgmtLoginResponse.isPasswordInvalid() ) {
 			        loginResult.setInvalidUserOrPassword(true);
 					return loginResult;  //  Early Exit
@@ -134,27 +126,20 @@ public class LoginService {
 					return loginResult;  //  Early Exit
 				}
 			}
-
 			//  Marked as logged in in User Mgmt Web app even if don't accept TOS
-			
 			int userMgmtUserId = userMgmtLoginResponse.getUserId();
-			
 			//  Get full user data
-			
 			UserMgmtGetUserDataRequest userMgmtGetUserDataRequest = new UserMgmtGetUserDataRequest();
 			userMgmtGetUserDataRequest.setSessionKey( userMgmtLoginResponse.getSessionKey() );
 			userMgmtGetUserDataRequest.setUserId( userMgmtUserId );
-			
 			UserMgmtGetUserDataResponse userMgmtGetUserDataResponse = 
 					UserMgmtCentralWebappWebserviceAccess.getInstance().getUserData( userMgmtGetUserDataRequest );
-			
 			if ( ! userMgmtGetUserDataResponse.isSuccess() ) {
 				String msg = "Failed to get Full user data from User Mgmt Webapp for user id: " + userMgmtUserId;
 				log.error( msg );
 		        loginResult.setInvalidUserOrPassword(true); //  TODO Set different error
 				return loginResult;  //  Early Exit
 			}
-
 			Integer proxlAuthUserId = AuthUserDAO.getInstance().getIdForUserMgmtUserId( userMgmtUserId );
 			if ( proxlAuthUserId == null ) {
 				// No account in proxl for this user id.  
@@ -166,10 +151,8 @@ public class LoginService {
 					authUserDTO.setUserAccessLevel( AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN );
 				} else {
 					//  User is not Global Admin User 
-					
 					//  Only create account if user signup without invite is allowed
 					//  or has valid invite code
-					
 					//  Check config for if invite is required
 					String userSignupAllowWithoutInviteConfigValue =
 							ConfigSystemCaching.getInstance()
@@ -205,10 +188,8 @@ public class LoginService {
 					log.error( msg, e );
 					throw e;
 				}
-				
 				proxlAuthUserId = authUserDTO.getId();
 			}
-
 			//  Get user Access level at account level from proxl db
 			Boolean userEnabledAppSpecific = AuthUserDAO.getInstance().getUserEnabledAppSpecific( proxlAuthUserId );
 			if ( userEnabledAppSpecific == null ) {
@@ -222,7 +203,6 @@ public class LoginService {
 		        loginResult.setDisabledUser(true);
 				return loginResult;  //  Early Exit
 			}
-			
 			//  Get user Access level at account level from proxl db
 			Integer userAccessLevel = AuthUserDAO.getInstance().getUserAccessLevel( proxlAuthUserId );
 			if ( userAccessLevel == null ) {
@@ -231,7 +211,6 @@ public class LoginService {
 		        loginResult.setInvalidUserOrPassword(true); //  TODO Set different error
 				return loginResult;  //  Early Exit
 			}
-			
 			//  Is terms of service enabled?
 			String termsOfServiceEnabledString =
 					ConfigSystemCaching.getInstance()
@@ -240,7 +219,6 @@ public class LoginService {
 			if ( ConfigSystemsValuesSharedConstants.TRUE.equals(termsOfServiceEnabledString) ) {
 				termsOfServiceEnabled = true;
 			}
-			
 			if ( termsOfServiceEnabled ) {
 				// terms of service is enabled
 				//  Has user accepted latest version
@@ -297,13 +275,10 @@ public class LoginService {
 					}
 				}
 			}
-			
 			AuthUserDAO.getInstance().updateLastLogin( proxlAuthUserId, request.getRemoteAddr() );
-			
 			XLinkUserDTO userDatabaseRecord = new XLinkUserDTO();
 			AuthUserDTO authUserDTO = new AuthUserDTO();
 			userDatabaseRecord.setAuthUser(authUserDTO);
-			
 			authUserDTO.setId( proxlAuthUserId );
 			authUserDTO.setUserMgmtUserId( userMgmtUserId );
 			authUserDTO.setUsername( userMgmtGetUserDataResponse.getUsername() );
@@ -311,22 +286,17 @@ public class LoginService {
 			authUserDTO.setUserAccessLevel( userAccessLevel );
 			authUserDTO.setEnabledAppSpecific(true);
 			authUserDTO.setEnabledUserMgmtGlobalLevel(true);
-			
 			userDatabaseRecord.setFirstName( userMgmtGetUserDataResponse.getFirstName() );
 			userDatabaseRecord.setLastName( userMgmtGetUserDataResponse.getLastName() );
 			userDatabaseRecord.setOrganization( userMgmtGetUserDataResponse.getOrganization() );
-			
 			long currentTime = System.currentTimeMillis();
-			
 			UserSessionObject userSessionObject = new UserSessionObject();
 			userSessionObject.setLastPingToSSOServer( currentTime );
 			userSessionObject.setUserLoginSessionKey( userMgmtLoginResponse.getSessionKey() );
 			userSessionObject.setUserDBObject( userDatabaseRecord );
 			session.setAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN, userSessionObject );
 			loginResult.setStatus(true);
-			
 			return loginResult;
-			
 		} catch ( WebApplicationException e ) {
 			throw e; //  Data exception so just rethrow
 		} catch ( Exception e ) {
@@ -340,15 +310,12 @@ public class LoginService {
 		}
 	}
 	
-
 	/**
 	 * This is returned from the web service LoginService
 	 *
 	 */
 	public static class LoginResult {
-
 		private boolean status = false;
-
 		private boolean invalidUserOrPassword = false;
 		private boolean disabledUser = false;
 		/**
@@ -356,74 +323,57 @@ public class LoginService {
 		 */
 		private boolean noProxlAccount = false;
 		private boolean invalidInviteTrackingCode = false;
-
 		private boolean termsOfServiceAcceptanceRequired = false;
-
 		private String termsOfServiceText;
 		private String termsOfServiceKey;
-
 		public boolean isInvalidUserOrPassword() {
 			return invalidUserOrPassword;
 		}
-
 		public void setInvalidUserOrPassword(boolean invalidUserOrPassword) {
 			this.invalidUserOrPassword = invalidUserOrPassword;
 		}
-
 		public boolean isDisabledUser() {
 			return disabledUser;
 		}
-
 		public void setDisabledUser(boolean disabledUser) {
 			this.disabledUser = disabledUser;
 		}
-
 		public boolean isStatus() {
 			return status;
 		}
-
 		public void setStatus(boolean status) {
 			this.status = status;
 		}
-
 		public boolean isTermsOfServiceAcceptanceRequired() {
 			return termsOfServiceAcceptanceRequired;
 		}
-
 		public void setTermsOfServiceAcceptanceRequired(
 				boolean termsOfServiceAcceptanceRequired) {
 			this.termsOfServiceAcceptanceRequired = termsOfServiceAcceptanceRequired;
 		}
-
 		public String getTermsOfServiceText() {
 			return termsOfServiceText;
 		}
-
 		public void setTermsOfServiceText(String termsOfServiceText) {
 			this.termsOfServiceText = termsOfServiceText;
 		}
-
 		public String getTermsOfServiceKey() {
 			return termsOfServiceKey;
 		}
-
 		public void setTermsOfServiceKey(String termsOfServiceKey) {
 			this.termsOfServiceKey = termsOfServiceKey;
 		}
 		public boolean isInvalidInviteTrackingCode() {
 			return invalidInviteTrackingCode;
 		}
-
 		public void setInvalidInviteTrackingCode(boolean invalidInviteTrackingCode) {
 			this.invalidInviteTrackingCode = invalidInviteTrackingCode;
 		}
 		public boolean isNoProxlAccount() {
 			return noProxlAccount;
 		}
-
 		public void setNoProxlAccount(boolean noProxlAccount) {
 			this.noProxlAccount = noProxlAccount;
 		}
 	}
-
 }

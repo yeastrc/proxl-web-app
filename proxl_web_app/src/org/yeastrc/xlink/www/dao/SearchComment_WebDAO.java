@@ -11,9 +11,8 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  *
  */
 public class SearchComment_WebDAO {
-	
+
 	private static final Logger log = Logger.getLogger(SearchComment_WebDAO.class);
-	
 	private SearchComment_WebDAO() { }
 	public static SearchComment_WebDAO getInstance() { return new SearchComment_WebDAO(); }
 	
@@ -28,11 +27,9 @@ public class SearchComment_WebDAO {
 			int newProjectSearchId,
 			Connection dbConnection
 			) throws Exception {
-		
 //		Connection dbConnection = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-
 		String sql = 
 				" INSERT INTO search_comment " 
 				+ "( project_search_id, comment, commentTimestamp, auth_user_id, commentCreatedTimestamp, created_auth_user_id ) " 
@@ -64,5 +61,4 @@ public class SearchComment_WebDAO {
 //			}
 		}
 	}
-	
 }

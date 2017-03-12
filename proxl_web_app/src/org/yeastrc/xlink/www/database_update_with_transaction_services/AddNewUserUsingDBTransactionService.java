@@ -35,7 +35,6 @@ public class AddNewUserUsingDBTransactionService {
 			ZzUserDataMirrorDTO zzUserDataMirrorDTO,
 			AuthSharedObjectUsersDTO authSharedObjectUsersDTO,
 			AuthUserInviteTrackingDTO authUserInviteTrackingDTO ) throws Exception {
-		
 		Connection dbConnection = null;
 		try {
 			dbConnection = getConnectionWithAutocommitTurnedOff();
@@ -86,7 +85,6 @@ public class AddNewUserUsingDBTransactionService {
 			}
 			zzUserDataMirrorDTO.setAuthUserId( authUserDTO.getId() );
 			ZzUserDataMirrorDAO.getInstance().save( zzUserDataMirrorDTO, dbConnection );
-
 			dbConnection.commit();
 		} catch ( Exception e ) {
 			String msg = "Failed addNewUserForUserInvite(...)";
@@ -102,7 +100,7 @@ public class AddNewUserUsingDBTransactionService {
 			}
 		}
 	}
-
+	
 	/**
 	 * @param authUserDTO
 	 * @throws Exception
@@ -136,48 +134,7 @@ public class AddNewUserUsingDBTransactionService {
 			}
 		}
 	}
-	
 
-	//  Unused, Untested.  May need updates before it can be used
-	//
-//	/**
-//	 * @param authUserDTO
-//	 * @param zzUserDataMirrorDTO
-//	 * @param authSharedObjectUsersDTO
-//	 * @throws Exception
-//	 */
-//	public void addNewUserAddAuthSharedObjectUsersDTO( 
-//			AuthUserDTO authUserDTO, 			
-//			ZzUserDataMirrorDTO zzUserDataMirrorDTO,
-//			AuthSharedObjectUsersDTO authSharedObjectUsersDTO ) throws Exception {
-//		Connection dbConnection = null;
-//		try {
-//			dbConnection = getConnectionWithAutocommitTurnedOff();
-//			AuthUserDAO.getInstance().save( authUserDTO, dbConnection );
-//			//  set user id here since was just set when called addNewUserInternal(...)
-//			authSharedObjectUsersDTO.setUserId( authUserDTO.getId() );
-//			AuthSharedObjectUsersDAO.getInstance().save( authSharedObjectUsersDTO, dbConnection );
-//			
-//			zzUserDataMirrorDTO.setAuthUserId( authUserDTO.getId() );
-//			ZzUserDataMirrorDAO.getInstance().save( zzUserDataMirrorDTO, dbConnection );
-//
-//			dbConnection.commit();
-//		} catch ( Exception e ) {
-//			String msg = "Failed addNewUserAddProjectAccessRecord(...)";
-//			log.error( msg, e );
-//			if ( dbConnection != null ) {
-//				dbConnection.rollback();
-//			}
-//			throw e;
-//		} finally {
-//			if( dbConnection != null ) {
-//				try { dbConnection.close(); } catch( Throwable t ) { ; }
-//				dbConnection = null;
-//			}
-//		}
-//	}
-
-	
 	/**
 	 * @return
 	 * @throws Exception

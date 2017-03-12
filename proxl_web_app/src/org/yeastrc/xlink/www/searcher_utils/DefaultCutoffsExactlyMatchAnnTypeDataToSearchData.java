@@ -5,14 +5,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
-
 /**
  * 
  * 
@@ -24,58 +22,47 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
  * and the cutoffs passed in match the default cutoffs for the annotation types
  */
 public class DefaultCutoffsExactlyMatchAnnTypeDataToSearchData {
-
+	
 	private static final Logger log = Logger.getLogger(DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.class);
-
 	private DefaultCutoffsExactlyMatchAnnTypeDataToSearchData() { }
 	private static final DefaultCutoffsExactlyMatchAnnTypeDataToSearchData _INSTANCE = new DefaultCutoffsExactlyMatchAnnTypeDataToSearchData();
 	public static DefaultCutoffsExactlyMatchAnnTypeDataToSearchData getInstance() { return _INSTANCE; }
 	
-	
+	/**
+	 * @param searchId
+	 * @param searcherCutoffValuesSearchLevel
+	 * @return
+	 * @throws Exception
+	 */
 	public DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult defaultCutoffsExactlyMatchAnnTypeDataToSearchData( 
 			int searchId, 
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
-		
 		DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult result = new DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult();
-		
 		boolean defaultCutoffsExactlyMatchAnnTypeDataToSearchData = true;
-		
 		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
 				searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
-		
 		List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesList = 
 				searcherCutoffValuesSearchLevel.getPsmPerAnnotationCutoffsList();
-		
-
 		//  Get Filterable Annotation Type records for Reported Peptides and PSMs
-
 		Collection<Integer> searchIdsCollection = new ArrayList<>( 1 );
 		searchIdsCollection.add( searchId );
-		
 		Map<Integer, Map<Integer, AnnotationTypeDTO>> peptideFilterableAnnotationTypesForSearchIds =
 				GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIdsCollection );
-
 		Map<Integer, AnnotationTypeDTO> peptideFilterableAnnotationTypesForSearchId =
 				peptideFilterableAnnotationTypesForSearchIds.get( searchId );
-
 		Map<Integer, Map<Integer, AnnotationTypeDTO>> psmFilterableAnnotationTypesForSearchIds =
 				GetAnnotationTypeData.getInstance().getAll_Psm_Filterable_ForSearchIds( searchIdsCollection );
-
 		Map<Integer, AnnotationTypeDTO> psmFilterableAnnotationTypesForSearchId =
 				psmFilterableAnnotationTypesForSearchIds.get( searchId );
-
 		//  Test Peptide Cutoffs
 		if ( ! processPeptideOrPSM( peptideCutoffValuesList,  peptideFilterableAnnotationTypesForSearchId ) ) {
 			defaultCutoffsExactlyMatchAnnTypeDataToSearchData = false;
 		}
-
 		//  Test PSM Cutoffs
 		if ( ! processPeptideOrPSM( psmCutoffValuesList,  psmFilterableAnnotationTypesForSearchId ) ) {
 			defaultCutoffsExactlyMatchAnnTypeDataToSearchData = false;
 		}
-		
 		result.defaultCutoffsExactlyMatchAnnTypeDataToSearchData = defaultCutoffsExactlyMatchAnnTypeDataToSearchData;
-		
 		return result;
 	}
 	
@@ -88,12 +75,9 @@ public class DefaultCutoffsExactlyMatchAnnTypeDataToSearchData {
 	private boolean processPeptideOrPSM( 
 			List<SearcherCutoffValuesAnnotationLevel> cutoffValuesList, 
 			Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesForSearchId ) throws ProxlWebappInternalErrorException {
-	
 		Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesWithDefaultValues = getFilterableAnnTypesWithDefaultValues( filterableAnnotationTypesForSearchId );
-		
 		if ( cutoffValuesList == null || cutoffValuesList.isEmpty() ) {
 			//  No cutoffs so must not be any default cutoffs in annotation types
-			
 			if ( filterableAnnotationTypesWithDefaultValues == null ) {
 				//  Also no annotation type records with defaults so return true
 				return true; //  EARLY EXIT
@@ -101,9 +85,7 @@ public class DefaultCutoffsExactlyMatchAnnTypeDataToSearchData {
 			//  Found at least one default filter but no cutoff provided for it so return false;
 			return false; //  EARLY EXIT
 		}
-		
 		//  Process the cutoffs, ensure that ALL are default and all default in Annotation types is in the cutoffs
-		
 		for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesAnnotationLevel : cutoffValuesList ) {
 			//  Safe to do .remove(...) since this is a copy Map
 			AnnotationTypeDTO annotationTypeDTOWithDefaultValue = filterableAnnotationTypesWithDefaultValues.remove( searcherCutoffValuesAnnotationLevel.getAnnotationTypeId() );
@@ -119,7 +101,6 @@ public class DefaultCutoffsExactlyMatchAnnTypeDataToSearchData {
 			//  There is at least one default filter and no cutoff provided for it so return false;
 			return false; //  EARLY EXIT
 		}
-		
 		return true;
 	}
 	
@@ -129,13 +110,10 @@ public class DefaultCutoffsExactlyMatchAnnTypeDataToSearchData {
 	 * @throws ProxlWebappInternalErrorException
 	 */
 	private Map<Integer, AnnotationTypeDTO> getFilterableAnnTypesWithDefaultValues( Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesForSearchId ) throws ProxlWebappInternalErrorException {
-
 		if ( filterableAnnotationTypesForSearchId == null || filterableAnnotationTypesForSearchId.isEmpty() ) {
 			return null;
 		}
-		
 		Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesWithDefaultValues = new HashMap<>();
-		
 		for ( Map.Entry<Integer, AnnotationTypeDTO> entry : filterableAnnotationTypesForSearchId.entrySet() ) {
 			AnnotationTypeDTO annotationTypeDTO = entry.getValue();
 			if ( annotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
@@ -151,23 +129,18 @@ public class DefaultCutoffsExactlyMatchAnnTypeDataToSearchData {
 		}
 		return filterableAnnotationTypesWithDefaultValues;
 	}
-
-
+	
 	/**
 	 * Result object
 	 *
 	 */
 	public static class DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult {
-		
 		private boolean defaultCutoffsExactlyMatchAnnTypeDataToSearchData;
-
 		public boolean isDefaultCutoffsExactlyMatchAnnTypeDataToSearchData() {
 			return defaultCutoffsExactlyMatchAnnTypeDataToSearchData;
 		}
 		public void setDefaultCutoffsExactlyMatchAnnTypeDataToSearchData(boolean defaultCutoffsExactlyMatchAnnTypeDataToSearchData) {
 			this.defaultCutoffsExactlyMatchAnnTypeDataToSearchData = defaultCutoffsExactlyMatchAnnTypeDataToSearchData;
 		}
-
 	}
-	
 }

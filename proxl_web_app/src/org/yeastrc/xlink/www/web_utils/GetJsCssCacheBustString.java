@@ -8,7 +8,6 @@ package org.yeastrc.xlink.www.web_utils;
  */
 public class GetJsCssCacheBustString {
 
-
 //	private static final Logger log = Logger.getLogger(GetJsCssCacheBustString.class);
 
 	private GetJsCssCacheBustString() { }

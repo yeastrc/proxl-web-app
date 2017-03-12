@@ -30,21 +30,8 @@ public class UploadPDBFileForm extends ActionForm {
 		this.projectId = projectId;
 	}
 	
-	
-//	public String getVisibility() {
-//		return visibility;
-//	}
-//	public void setVisibility(String visibility) {
-//		this.visibility = visibility;
-//	}
-
-
-
 	private FormFile file;
 	private String description;
 	private int projectId;
 	
-	//  Not used
-//	private String visibility;
-
 }

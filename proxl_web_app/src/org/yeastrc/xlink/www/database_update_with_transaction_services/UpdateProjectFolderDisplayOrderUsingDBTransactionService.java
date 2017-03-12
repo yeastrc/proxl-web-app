@@ -12,7 +12,6 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
 public class UpdateProjectFolderDisplayOrderUsingDBTransactionService {
 
 	private static final Logger log = Logger.getLogger(UpdateProjectFolderDisplayOrderUsingDBTransactionService.class);
-	
 	UpdateProjectFolderDisplayOrderUsingDBTransactionService() { }
 	private static UpdateProjectFolderDisplayOrderUsingDBTransactionService _INSTANCE = new UpdateProjectFolderDisplayOrderUsingDBTransactionService();
 	public static UpdateProjectFolderDisplayOrderUsingDBTransactionService getInstance() { return _INSTANCE; }
@@ -24,7 +23,6 @@ public class UpdateProjectFolderDisplayOrderUsingDBTransactionService {
 	 * @throws Exception
 	 */
 	public void updateProjectFolderDisplayOrder( int[] folderIdList ) throws Exception {
-		
 		Connection dbConnection = null;
 		try {
 			dbConnection = getConnectionWithAutocommitTurnedOff();

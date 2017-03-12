@@ -9,31 +9,23 @@ public class AuthUserDTO {
 
 	private int id;
 	private int userMgmtUserId;
-
 	/**
 	 * Null if not set
 	 */
 	private Integer userAccessLevel;
-
 	/**
 	 * Default to true unless set to false
 	 */
 	private boolean enabledAppSpecific = true;
 	
-	
-	
 	//  These used to be in the auth_user table but now come from the User Mgmt Webapp
-	
 	private String username;
 	private String email;
-
 	/**
 	 * Default to true unless set to false
 	 */
 	private boolean enabledUserMgmtGlobalLevel = true;
 	
-	
-
 	public boolean isEnabledUserMgmtGlobalLevel() {
 		return enabledUserMgmtGlobalLevel;
 	}
@@ -52,7 +44,6 @@ public class AuthUserDTO {
 	public void setEnabledAppSpecific(boolean enabledAppSpecific) {
 		this.enabledAppSpecific = enabledAppSpecific;
 	}
-
 	public int getId() {
 		return id;
 	}

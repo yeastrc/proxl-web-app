@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.commons.dbcp.DelegatingPreparedStatement;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
@@ -32,7 +31,6 @@ import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDat
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.ReportedPeptideBasicObjectsSearcherRequestParameters;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.ReportedPeptideBasicObjectsSearcherResult;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.ReportedPeptideBasicObjectsSearcherResultEntry;
-
 /**
  * Return basic objects for Reported Peptide Search
  *
@@ -43,15 +41,14 @@ public class ReportedPeptideBasicObjectsSearcher {
 	private ReportedPeptideBasicObjectsSearcher() { }
 	private static final ReportedPeptideBasicObjectsSearcher _INSTANCE = new ReportedPeptideBasicObjectsSearcher();
 	public static ReportedPeptideBasicObjectsSearcher getInstance() { return _INSTANCE; }
-
-	public static enum ReturnOnlyReportedPeptidesWithMonolinks {
-		YES, NO
-	}
+	
+	public static enum ReturnOnlyReportedPeptidesWithMonolinks { YES, NO }
 	
 	/**
 	 * Should it use the optimization of Peptide and PSM defaults to skip joining the tables with the annotation values?
 	 */
 	private final boolean USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES = false;  // UNTESTED for a value of "true"
+	
 	/**
 	 * UNTESTED for a value of "true"
 	 * 
@@ -60,36 +57,42 @@ public class ReportedPeptideBasicObjectsSearcher {
 	 * Also, test web page and/or webservice 
 	 */
 //	private final boolean USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES = true;  //  UNTESTED for a value of "true"
+	
 	private final String PSM_BEST_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS = "psm_fltrbl_tbl_";
 	private final String PEPTIDE_VALUE_FILTER_TABLE_ALIAS = "srch__rep_pept_fltrbl_tbl_";
+	
 	private final String SQL_FIRST_PART = 
 			"SELECT unified_rp__search__rep_pept__generic_lookup.reported_peptide_id, "
 			+ " unified_rp__search__rep_pept__generic_lookup.unified_reported_peptide_id, "
 			+ " unified_rp__search__rep_pept__generic_lookup.link_type, "
 			+ " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff, "
 			+ " unified_rp__search__rep_pept__generic_lookup.num_unique_psm_at_default_cutoff ";
-	private final String SQL_MAIN_FROM_START = 			
-			" FROM "
-			+ " unified_rp__search__rep_pept__generic_lookup ";
-	private final String SQL_LAST_PART = 
-			"";
+	
+	private final String SQL_MAIN_FROM_START = " FROM unified_rp__search__rep_pept__generic_lookup ";
+	
+	private final String SQL_LAST_PART = "";
+	
 	// Removed since not needed.  
 	// A WARN log message will be written if duplicate reported_peptide_id are found in the result set
 //			" GROUP BY unified_rp__search__rep_pept__generic_lookup.reported_peptide_id ";
+	
 	/**
 	 *   If Dynamic Mods are selected, this gets added after the Join to the Dynamic Mods subselect
 	 */
 	private final String SQL_MAIN_WHERE_START = 
 			" WHERE unified_rp__search__rep_pept__generic_lookup.search_id = ? ";
+
 	//  If Dynamic Mods are selected, one of these three gets added after the main where clause 
 	//  No Mods Only
 	private static final String SQL_NO_MODS_ONLY__MAIN_WHERE_CLAUSE = 
 			" AND  unified_rp__search__rep_pept__generic_lookup.has_dynamic_modifictions  = " 
 					+ Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE + " ";
+	
 	//  Yes Mods Only
 	private static final String SQL_YES_MODS_ONLY_MAIN_WHERE_CLAUSE = 
 			" AND  unified_rp__search__rep_pept__generic_lookup.has_dynamic_modifictions  = " 
 					+	 Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE + " ";
+	
 	private static final String SQL_NO_AND_YES_MODS__MAIN_WHERE_CLAUSE = 
 			" AND ( "
 			// 		 No Mods
@@ -105,14 +108,17 @@ public class ReportedPeptideBasicObjectsSearcher {
 			+ 				" srch_id_rep_pep_id_for_mod_masses.search_id IS NOT NULL "
 			+     		 " ) " 
 			+ " ) ";
+	
 	//  Yes Monolinks Only
 	private static final String SQL_YES_MOONOLINKS_ONLY_MAIN_WHERE_CLAUSE = 
 			" AND  unified_rp__search__rep_pept__generic_lookup.has_monolinks  = " 
 					+	 Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE + " ";
+	
 	///////////////////
 	//  Additional SQL parts
 	private static final String SQL_LINK_TYPE_START = "  unified_rp__search__rep_pept__generic_lookup.link_type IN ( ";
 	private static final String SQL_LINK_TYPE_END = " ) ";
+	
 	//  Dynamic Mod processing
 	private static final String SQL_DYNAMIC_MOD_JOIN_START = 
 			" INNER JOIN (";
@@ -135,9 +141,6 @@ public class ReportedPeptideBasicObjectsSearcher {
 			+ " ON unified_rp__search__rep_pept__generic_lookup.search_id = srch_id_rep_pep_id_for_mod_masses.search_id "
 			+ "    AND unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = srch_id_rep_pep_id_for_mod_masses.reported_peptide_id";
 	
-	
-	
-	
 	/**
 	 * Get the peptides corresponding to the given parameters
 	 * @param searchId The search we're searching
@@ -151,8 +154,6 @@ public class ReportedPeptideBasicObjectsSearcher {
 	public ReportedPeptideBasicObjectsSearcherResult searchOnSearchIdPsmCutoffPeptideCutoff( 
 			ReportedPeptideBasicObjectsSearcherRequestParameters reportedPeptideBasicObjectsSearcherRequestParameters
 			) throws Exception {
-		
-		
 		int searchId = reportedPeptideBasicObjectsSearcherRequestParameters.getSearchId(); 
 		SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
 				reportedPeptideBasicObjectsSearcherRequestParameters.getSearcherCutoffValuesSearchLevel();
@@ -160,9 +161,7 @@ public class ReportedPeptideBasicObjectsSearcher {
 		String[] modMassSelections = reportedPeptideBasicObjectsSearcherRequestParameters.getModMassSelections();
 		ReturnOnlyReportedPeptidesWithMonolinks returnOnlyReportedPeptidesWithMonolinks =
 				reportedPeptideBasicObjectsSearcherRequestParameters.getReturnOnlyReportedPeptidesWithMonolinks();
-		
 		List<ReportedPeptideBasicObjectsSearcherResultEntry> entryList = new ArrayList<>();
-
 		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
 				searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
 		List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesList = 
@@ -491,16 +490,11 @@ public class ReportedPeptideBasicObjectsSearcher {
 				}
 			} else {
 				//   Only Default Peptide Cutoffs chosen so criteria simply the Peptides where the defaultPeptideCutoffs is yes
-				
 				//  WARNING:  This code is currently not run for set value of USE_PEPTIDE_PSM_DEFAULTS_TO_SKIP_JOIN_ANNOTATION_DATA_VALUES_TABLES
-				
 				//  WARNING   This is possibly still WRONG and needs testing before using.
-				
 				//  For certain inputs, the right value to search for is: Yes_No__NOT_APPLICABLE_Enum.NOT_APPLICABLE
-				
 				sqlSB.append( " AND " );
 				sqlSB.append( " unified_rp__search__rep_pept__generic_lookup.peptide_meets_default_cutoffs = '" );
-
 				if ( peptideCutoffValuesList.isEmpty() ) {
 					sqlSB.append( Yes_No__NOT_APPLICABLE_Enum.NOT_APPLICABLE.value() );
 				} else {
@@ -556,7 +550,6 @@ public class ReportedPeptideBasicObjectsSearcher {
 				}
 			}
 //			if ( log.isDebugEnabled() ) {
-//
 //				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
 //			}
 			if ( log.isDebugEnabled() ) {
@@ -578,7 +571,6 @@ public class ReportedPeptideBasicObjectsSearcher {
 					int itemReportedPeptideId = item.getReportedPeptideId();
 					if ( ! retrieved_reported_peptide_id_values_Set.add( itemReportedPeptideId ) ) {
 //						String msg = "Already processed result entry for itemReportedPeptideId: " + itemReportedPeptideId;
-//
 //						log.warn( msg );
 //						log.error( msg );
 //						throw new ProxlWebappDataException(msg);
@@ -606,11 +598,9 @@ public class ReportedPeptideBasicObjectsSearcher {
 				conn = null;
 			}
 		}
-
 		ReportedPeptideBasicObjectsSearcherResult result = new ReportedPeptideBasicObjectsSearcherResult();
 		result.setEntryList( entryList );
 		result.setSearchId( searchId );
-		
 		return result;
 	}
 	
@@ -633,18 +623,14 @@ public class ReportedPeptideBasicObjectsSearcher {
 			boolean defaultCutoffsExactlyMatchAnnTypeDataToSearchData,
 			String sql
 			) throws SQLException, Exception {
-		
 		ReportedPeptideBasicObjectsSearcherResultEntry item = new ReportedPeptideBasicObjectsSearcherResultEntry();
-		
 		String linkType = rs.getString( "link_type" );
 		int reportedPeptideId = rs.getInt( "reported_peptide_id" );
 		int unifiedReportedPeptideId = rs.getInt( "unified_reported_peptide_id" );
-		
 		int linkTypeNumber = XLinkUtils.getTypeNumber( linkType );
 		item.setLinkType( linkTypeNumber );
 		item.setReportedPeptideId(reportedPeptideId);
 		item.setUnifiedReportedPeptideId( unifiedReportedPeptideId );
-
 		if ( defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) {
 			int numPsmsForDefaultCutoffs = rs.getInt( "psm_num_at_default_cutoff" );
 			if ( ! rs.wasNull() ) {
@@ -657,11 +643,9 @@ public class ReportedPeptideBasicObjectsSearcher {
 		}
 		if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
 				|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {
-
 			int numPsms = 
 					PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
 					.getPsmCountForSearchIdReportedPeptideId( reportedPeptideId, searchId, searcherCutoffValuesSearchLevel );
-
 			if ( numPsms <= 0 ) {
 				//  !!!!!!!   Number of PSMs is zero this this isn't really a peptide that meets the cutoffs
 				return null;  //  EARY EXIT
@@ -679,17 +663,12 @@ public class ReportedPeptideBasicObjectsSearcher {
 		} else {
 			//  Get Peptide values in separate DB query, since peptide value table was not joined
 //			List<Integer> peptideCutoffsAnnotationTypeIdList = new ArrayList<>( peptideCutoffsAnnotationTypeDTOList.size() );
-//			
 //			for ( AnnotationTypeDTO peptideAnnotationTypeDTO : peptideCutoffsAnnotationTypeDTOList ) {
-//				
 //				peptideCutoffsAnnotationTypeIdList.add( peptideAnnotationTypeDTO.getId() );
 //			}
-//			
-//
 //			List<SearchReportedPeptideAnnotationDTO> searchedForPeptideAnnotationDTOList =
 //					SearchReportedPeptideAnnotationDataSearcher.getInstance().
 //					getSearchReportedPeptideAnnotationDTOList( search.getId(), reportedPeptideId, peptideCutoffsAnnotationTypeIdList );
-//			
 //			item.setSearchedForPeptideAnnotationDTOList( searchedForPeptideAnnotationDTOList );
 		}
 		if ( ( ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) )
@@ -703,15 +682,14 @@ public class ReportedPeptideBasicObjectsSearcher {
 //			List<PsmAnnotationDTO> bestPsmAnnotationDTOList = 
 //					PsmAnnotationDataBestValueForPeptideSearcher.getInstance()
 //					.getPsmAnnotationDataBestValueForPeptideList( search.getId(), reportedPeptideId, psmCutoffsAnnotationTypeDTOList );
-//
 //			item.setBestPsmAnnotationDTOList( bestPsmAnnotationDTOList );
 			int z = 0;
 		}
-
 		return item;
 	}
-	//  Get PSM best values from DB query, since psm best value table was joined
+
 	/**
+	 * Get PSM best values from DB query, since psm best value table was joined
 	 * @param rs
 	 * @param psmCutoffsAnnotationTypeDTOList
 	 * @return
@@ -735,8 +713,9 @@ public class ReportedPeptideBasicObjectsSearcher {
 		}
 		return bestPsmAnnotationDTOFromQueryMap;
 	}
-	//  Get Peptide values from DB query, since peptide value table was joined
+	  
 	/**
+	 * Get Peptide values from DB query, since peptide value table was joined
 	 * @param rs
 	 * @param peptideCutoffsAnnotationTypeDTOList
 	 * @return
@@ -760,6 +739,4 @@ public class ReportedPeptideBasicObjectsSearcher {
 		}
 		return searchedForPeptideAnnotationDTOFromQueryMap;
 	}
-		
-
 }

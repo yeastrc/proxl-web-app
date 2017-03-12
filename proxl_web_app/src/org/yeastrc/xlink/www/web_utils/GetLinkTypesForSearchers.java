@@ -1,9 +1,7 @@
 package org.yeastrc.xlink.www.web_utils;
 
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
-
 /**
  * 
  * Get Link types for searchers.  
@@ -13,10 +11,8 @@ import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 public class GetLinkTypesForSearchers {
 
 	private static final Logger log = Logger.getLogger(GetLinkTypesForSearchers.class);
-
 	private GetLinkTypesForSearchers() { }
 	public static GetLinkTypesForSearchers getInstance() { return new GetLinkTypesForSearchers(); }
-	
 	
 	/**
 	 * @param linkTypes
@@ -24,54 +20,28 @@ public class GetLinkTypesForSearchers {
 	 * @throws Exception 
 	 */
 	public String[] getLinkTypesForSearchers ( String[] linkTypes ) throws Exception {
-
 		String[] resultLinkTypes = linkTypes;
-		
-		
-//		boolean allWebLinkTypesSelected = false;
-		
 		boolean webLinkTypeSelected_CROSSLINK = false;
 		boolean webLinkTypeSelected_LOOPLINK = false;
 		boolean webLinkTypeSelected_UNLINKED = false;
-		
-		
 		for ( String linkType : linkTypes ) {
-
-		
 			if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkType ) ) {
-
 				webLinkTypeSelected_CROSSLINK = true;
-
 			} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkType ) ) {
-
 				webLinkTypeSelected_LOOPLINK = true;
-
 			} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkType ) ) {
-
 				webLinkTypeSelected_UNLINKED = true;
-
 			} else {
-
 				String msg = "linkType is invalid, linkType: " + linkType;
-
 				log.error( linkType );
-
 				throw new Exception( msg );
 			}
 		}
-		
-		
-
-		
 		if ( webLinkTypeSelected_CROSSLINK 
 				&& webLinkTypeSelected_LOOPLINK 
 				&& webLinkTypeSelected_UNLINKED ) {
-			
-//			allWebLinkTypesSelected = true;
-			
 			resultLinkTypes = null;
 		}
-		
 		return resultLinkTypes;
 	}
 }

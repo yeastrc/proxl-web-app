@@ -1,15 +1,11 @@
 package org.yeastrc.auth.dto;
 
 import java.util.Date;
-
-
-
 /**
  * auth_forgot_password_tracking table
  *
  */
 public class AuthForgotPasswordTrackingDTO {
-
 	private int id;
 	private int userId;
 	private Date createDate;
@@ -18,7 +14,6 @@ public class AuthForgotPasswordTrackingDTO {
 	private String submitIP;
 	private String useIP;
 	private boolean codeReplacedByNewer;
-	
 	
 	public boolean isCodeReplacedByNewer() {
 		return codeReplacedByNewer;
@@ -68,17 +63,4 @@ public class AuthForgotPasswordTrackingDTO {
 	public void setForgotPasswordTrackingCode(String forgotPasswordTrackingCode) {
 		this.forgotPasswordTrackingCode = forgotPasswordTrackingCode;
 	}
-	
-	
 }
-
-
-//CREATE TABLE IF NOT EXISTS auth_forgot_password_tracking (
-//		  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//		  auth_user_id INT UNSIGNED NOT NULL,
-//		  create_date DATETIME NOT NULL,
-//		  used_date DATETIME NULL,
-//		  forgot_password_tracking_code VARCHAR(255) NOT NULL,
-//		  submit_ip VARCHAR(255) NOT NULL,
-//		  use_ip VARCHAR(255) NULL,
-//		  code_replaced_by_newer TINYINT(1) NULL,

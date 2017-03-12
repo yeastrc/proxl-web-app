@@ -16,9 +16,9 @@ import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdT
 public class GetDefaultPageURLTaglib extends TagSupport {
 	
 	private static final Logger log = Logger.getLogger(GetDefaultPageURLTaglib.class);
-	
+
+	// Properties
 	private String pageName;
-	
 	private String projectSearchId;
 	
 	public String getPageName() {

@@ -7,37 +7,31 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.FolderForProjectDTO;
-
 /**
  * DAO for folder_for_project table
  *
  */
 public class FolderForProjectDAO {
-
-	private static final Logger log = Logger.getLogger(FolderForProjectDAO.class);
 	
+	private static final Logger log = Logger.getLogger(FolderForProjectDAO.class);
 	//  private constructor
 	private FolderForProjectDAO() { }
-	
 	/**
 	 * @return newly created instance
 	 */
 	public static FolderForProjectDAO getInstance() { 
 		return new FolderForProjectDAO(); 
 	}
-
-
+	
 	/**
 	 * @param id
 	 * @return project_id, null if not found
 	 * @throws Exception
 	 */
 	public Integer getProjectId_ForId( int id ) throws Exception {
-		
 		Integer returnItem = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -72,7 +66,6 @@ public class FolderForProjectDAO {
 		}
 		return returnItem;
 	}
-
 	
 	/**
 	 * @param id
@@ -80,7 +73,6 @@ public class FolderForProjectDAO {
 	 * @throws Exception
 	 */
 	public FolderForProjectDTO getFolderForProjectDTO_ForId( int id ) throws Exception {
-		
 		FolderForProjectDTO returnItem = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -115,14 +107,13 @@ public class FolderForProjectDAO {
 		}
 		return returnItem;
 	}
-
+	
 	/**
 	 * @param projectId
 	 * @return 
 	 * @throws Exception
 	 */
 	public List<FolderForProjectDTO> getFolderForProjectDTO_ForProjectId( int projectId ) throws Exception {
-		
 		List<FolderForProjectDTO> returnList = new ArrayList<>();
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -159,7 +150,6 @@ public class FolderForProjectDAO {
 		return returnList;
 	}
 	
-
 	/**
 	 * @param rs
 	 * @return
@@ -174,7 +164,6 @@ public class FolderForProjectDAO {
 		return returnItem;
 	}
 	
-
 	/**
 	 * @param item
 	 * @throws Exception
@@ -191,7 +180,7 @@ public class FolderForProjectDAO {
 			}
 		}
 	}
-
+	
 	/**
 	 * @param item
 	 * @throws Exception
@@ -213,9 +202,7 @@ public class FolderForProjectDAO {
 			pstmt.setInt( counter, createUserId );
 			counter++;
 			pstmt.setInt( counter, createUserId );
-			
 			pstmt.executeUpdate();
-			
 			rs = pstmt.getGeneratedKeys();
 			if( rs.next() ) {
 				item.setId( rs.getInt( 1 ) );
@@ -240,7 +227,7 @@ public class FolderForProjectDAO {
 			}
 		}
 	}
-
+	
 	/**
 	 * @param folderId
 	 * @throws Exception
@@ -261,7 +248,6 @@ public class FolderForProjectDAO {
 	// primary key project_search_id
 	private static final String DELETE_SQL =
 			"DELETE FROM folder_for_project WHERE id = ?";
-
 	/**
 	 * @param folderId
 	 * @throws Exception
@@ -275,9 +261,7 @@ public class FolderForProjectDAO {
 			int counter = 0;
 			counter++;
 			pstmt.setInt( counter, folderId );
-			
 			pstmt.executeUpdate();
-			
 		} catch ( Exception e ) {
 			String msg = "Failed to delete folderId, sql: " + sql;
 			log.error( msg, e );
@@ -302,7 +286,6 @@ public class FolderForProjectDAO {
 	 * @throws Exception
 	 */
 	public void updateName( int id, String name, int updateUserId ) throws Exception {
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -338,7 +321,7 @@ public class FolderForProjectDAO {
 			}
 		}
 	}
-
+	
 	/**
 	 * Update the display_order associated with this search
 	 * @param folderId
@@ -346,7 +329,6 @@ public class FolderForProjectDAO {
 	 * @throws Exception
 	 */
 	public void updateDisplayOrder( int folderId, int newDisplayOrder, Connection dbConnection ) throws Exception {
-		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		String sql = "UPDATE folder_for_project SET display_order = ? WHERE id = ?";
@@ -370,5 +352,4 @@ public class FolderForProjectDAO {
 			}
 		}
 	}
-		
 }

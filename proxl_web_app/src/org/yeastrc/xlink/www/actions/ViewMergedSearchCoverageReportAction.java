@@ -79,8 +79,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
-			  HttpServletResponse response )
-					  throws Exception {
+			  HttpServletResponse response ) throws Exception {
 		
 		//  Detect which Struts action mapping was called by examining the value of the "parameter" attribute
 		//     accessed by calling mapping.getParameter()
@@ -179,7 +178,6 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 					return o1.getSearchId() - o2.getSearchId();
 				}
 			});
-			
 			
 			//  Populate request objects for Standard Header Display
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );

@@ -146,8 +146,6 @@ public class AuthForgotPasswordTrackingDAO {
 			pstmt.setInt( counter, id );
 			pstmt.executeUpdate();
 //			int rowsUpdated = pstmt.executeUpdate();
-//			
-//			int z = 0;
 		} catch ( Exception e ) {
 			String msg = "Failed to update used_date, sql: " + sql;
 			log.error( msg, e );

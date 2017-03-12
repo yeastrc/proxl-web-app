@@ -6,32 +6,23 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.constants.QCPlotConstants;
 import org.yeastrc.xlink.www.objects.PsmScoreVsScoreEntry;
 import org.yeastrc.xlink.www.objects.PsmScoreVsScoreSearcherResults;
-
-
-
 /**
  * Get 2 PSM annotation values for search criteria
  * in support of PSM Score VS Score QC Plot on Project Page
  *
  */
 public class PsmAnnotationScoreScoreSearcher {
-
-	private static final Logger log = Logger.getLogger(PsmAnnotationScoreScoreSearcher.class);
 	
+	private static final Logger log = Logger.getLogger(PsmAnnotationScoreScoreSearcher.class);
 	private PsmAnnotationScoreScoreSearcher() { }
 	private static final PsmAnnotationScoreScoreSearcher _INSTANCE = new PsmAnnotationScoreScoreSearcher();
 	public static PsmAnnotationScoreScoreSearcher getInstance() { return _INSTANCE; }
-	
-	
-	
-
 	/**
 	 * @param searchId
 	 * @param selectedLinkTypes
@@ -49,24 +40,18 @@ public class PsmAnnotationScoreScoreSearcher {
 			Double psmScoreCutoff_1,
 			int annotationTypeId_Score_2,
 			Double psmScoreCutoff_2 ) throws Exception {
-
 		List<PsmScoreVsScoreEntry> crosslinkEntries = new ArrayList<>();
 		List<PsmScoreVsScoreEntry> looplinkEntries = new ArrayList<>();
 		List<PsmScoreVsScoreEntry> unlinkedEntries = new ArrayList<>();
-		
-		
 		//////////////////////
-		
 		String sqlScore_1_Max = "";
 		if ( psmScoreCutoff_1 != null ) {
 			sqlScore_1_Max = " AND pfagl_1.value_double <= " + psmScoreCutoff_1;
 		}
-
 		String sqlScore_2_Max = "";
 		if ( psmScoreCutoff_2 != null ) {
 			sqlScore_2_Max = " AND pfagl_2.value_double <= " + psmScoreCutoff_2;
 		}
-		
 		String sqlLinkType = "";
 		if ( selectedLinkTypes != null && ( ! selectedLinkTypes.isEmpty() ) ) {
 			StringBuilder sqlSB = new StringBuilder( 1000 );
@@ -88,14 +73,12 @@ public class PsmAnnotationScoreScoreSearcher {
 					sqlSB.append("','");
 					sqlSB.append( XLinkUtils.UNLINKED_TYPE_STRING);
 				} else {
-					
 				}
 				sqlSB.append("'");
 			}
 			sqlSB.append(")");
 			sqlLinkType = sqlSB.toString();
 		}
-		
 		String sql = "SELECT  pfagl_1.psm_id, pfagl_1.psm_type, pfagl_1.value_double AS score_1,  pfagl_2.value_double AS score_2 "
 				+ " FROM psm_filterable_annotation__generic_lookup AS pfagl_1 "
 				+ " INNER JOIN psm_filterable_annotation__generic_lookup AS pfagl_2 "
@@ -108,36 +91,19 @@ public class PsmAnnotationScoreScoreSearcher {
 				+         sqlScore_2_Max
 				+      " ) "
 				+ sqlLinkType;
-		
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
-			
-//			int paramCounter = 0;
-//			
-//			paramCounter++;
-//			pstmt.setInt( paramCounter, searchId );
-//
-//			paramCounter++;
-//			pstmt.setInt( paramCounter, annotationTypeId_Score_1 );
-//			paramCounter++;
-//			pstmt.setInt( paramCounter, annotationTypeId_Score_2 );
-			
 			rs = pstmt.executeQuery();
-			
 			while( rs.next() ) {
 				PsmScoreVsScoreEntry entry = new PsmScoreVsScoreEntry();
 				entry.setPsmId( rs.getInt( "psm_id" ) );
 				entry.setScore_1( rs.getDouble( "score_1" ) );
 				entry.setScore_2( rs.getDouble( "score_2" ) );
-				
 				String psmLinkType = rs.getString( "psm_type" );
-				
 				if ( XLinkUtils.CROSS_TYPE_STRING.equals( psmLinkType ) ) {
 					crosslinkEntries.add( entry );
 				} else if ( XLinkUtils.LOOP_TYPE_STRING.equals( psmLinkType ) ) {
@@ -146,51 +112,36 @@ public class PsmAnnotationScoreScoreSearcher {
 					unlinkedEntries.add( entry );
 				}
 			}
-			
 		} catch ( Exception e ) {
-			
 			String msg = "Exception in getPsmScoreVsScoreList( ... ): sql: " + sql;
-			
 			log.error( msg, e );
-			
 			throw e;
-			
 		} finally {
-			
 			// be sure database handles are closed
 			if( rs != null ) {
 				try { rs.close(); } catch( Throwable t ) { ; }
 				rs = null;
 			}
-			
 			if( pstmt != null ) {
 				try { pstmt.close(); } catch( Throwable t ) { ; }
 				pstmt = null;
 			}
-			
 			if( conn != null ) {
 				try { conn.close(); } catch( Throwable t ) { ; }
 				conn = null;
 			}
-			
 		}
 		// transfer results to output object
-		
 		PsmScoreVsScoreSearcherResults results = new PsmScoreVsScoreSearcherResults();
-		
 		if ( ! crosslinkEntries.isEmpty() ) {
 			results.setCrosslinkEntries( crosslinkEntries );
 		}
-
 		if ( ! looplinkEntries.isEmpty() ) {
 			results.setLooplinkEntries( looplinkEntries );
 		}
-
 		if ( ! unlinkedEntries.isEmpty() ) {
 			results.setUnlinkedEntries( unlinkedEntries );
 		}
 		return results;
 	}
-	
-	
 }

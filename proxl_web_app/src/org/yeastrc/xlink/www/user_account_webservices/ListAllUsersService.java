@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,7 +12,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
 import org.yeastrc.xlink.www.internal_services.GetXLinkUserDTOListForUsers;
@@ -24,12 +22,10 @@ import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
-
 @Path("/user")
 public class ListAllUsersService {
 
 	private static final Logger log = Logger.getLogger(ListAllUsersService.class);
-	
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -42,7 +38,6 @@ public class ListAllUsersService {
 //			HttpSession session = request.getSession();
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
-
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -51,9 +46,7 @@ public class ListAllUsersService {
 						.build()
 						);
 			}
-			
 			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-			
 			//  Test access at global level
 			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
 			if ( ! authAccessLevel.isAdminAllowed() ) {
@@ -64,11 +57,8 @@ public class ListAllUsersService {
 						.build()
 						);
 			}
-
 			int currentlyLoggedInAccountId = userSessionObject.getUserDBObject().getAuthUser().getId();
-			
 			List<XLinkUserDTO> userAccountDBList = GetXLinkUserDTOListForUsers.getInstance().getXLinkUserDTOListForAllUsers();
-			
 			//  Sort on last name then first name
 			Collections.sort( userAccountDBList, new Comparator<XLinkUserDTO>() {
 				@Override
@@ -80,20 +70,14 @@ public class ListAllUsersService {
 					return o1.getFirstName().compareTo( o2.getFirstName() );
 				}
 			});
-			
 			List<XLinkUserDTO> users = new ArrayList<XLinkUserDTO>( userAccountDBList.size() );
-
 			ListAllUsersResponse listAllUsersResponse = new ListAllUsersResponse();
 			listAllUsersResponse.setUsers( users );
-			
 			for ( XLinkUserDTO xLinkUserDTO : userAccountDBList ) {
 				users.add( xLinkUserDTO );
 			}
-			
 			listAllUsersResponse.setStatus(true);
-
 			return listAllUsersResponse;
-			
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
@@ -102,5 +86,4 @@ public class ListAllUsersService {
 			throw e;
 		}
 	}
-
 }

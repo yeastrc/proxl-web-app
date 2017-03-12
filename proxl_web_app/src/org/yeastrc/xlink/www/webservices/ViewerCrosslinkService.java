@@ -247,11 +247,6 @@ public class ViewerCrosslinkService {
 											link.getProtein2().getProteinSequenceObject(), 
 											searchId );
 							if ( excludeOnProtein_1 || excludeOnProtein_2 ) {
-//							int taxonomyId_1 = link.getProtein1().getProteinSequenceObject().getTaxonomyId();
-//							int taxonomyId_2 = link.getProtein2().getProteinSequenceObject().getTaxonomyId();
-//
-//							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_1 ) 
-//									|| excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_2 ) ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
 							}
@@ -554,11 +549,6 @@ public class ViewerCrosslinkService {
 											link.getProtein2().getProteinSequenceObject(), 
 											searchId );
 							if ( excludeOnProtein_1 || excludeOnProtein_2 ) {
-//							int taxonomyId_1 = link.getProtein1().getProteinSequenceObject().getTaxonomyId();
-//							int taxonomyId_2 = link.getProtein2().getProteinSequenceObject().getTaxonomyId();
-//
-//							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_1 ) 
-//									|| excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_2 ) ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
 							}

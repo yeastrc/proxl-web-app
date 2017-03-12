@@ -20,29 +20,19 @@ import org.yeastrc.xlink.db.IDBConnectionFactory;
  */
 public class DBConnectionFactoryWeb implements IDBConnectionFactory {
 
-
 	private static final Logger log = Logger.getLogger( DBConnectionFactoryWeb.class );
 
-
 	private static final String JNDI_NAME_PREFIX = "java:comp/env/jdbc/";
-
 	private static final String JNDI_NAME_SUFFIX_proxl = "proxl";
-
-
 	private static final String JNDI_NAME_proxl = JNDI_NAME_PREFIX + JNDI_NAME_SUFFIX_proxl;
 
-
-
 	private static String proxlJNDIName = JNDI_NAME_proxl;
-
 
 	private static final AtomicLong dbConnectionRetrievalCount = new AtomicLong();
 
 	private static volatile int prevDayOfYear = -1;
 
 	private boolean debugLogLevelEnabled = false;
-
-
 
 	/**
 	 * Constructor
@@ -54,21 +44,13 @@ public class DBConnectionFactoryWeb implements IDBConnectionFactory {
 		}
 	}
 
-
-
-
 	/**
 	 * Change Proxl JNDI name 
 	 */
 	public static void setProxlJNDIName( String newProxlJNDINameSuffix ) {
-
 		proxlJNDIName = JNDI_NAME_PREFIX + newProxlJNDINameSuffix;
-
 		log.warn("INFO:  setProxlJNDIName() called. proxlJNDIName now: " + proxlJNDIName);
 	}
-
-
-
 
 	/* 
 	 * Get DataSource from JNDI as setup in Application Server and get database
@@ -91,9 +73,7 @@ public class DBConnectionFactoryWeb implements IDBConnectionFactory {
 			Connection conn;
 
 			if (db.equals(DBConnectionFactory.PROXL)) {
-
 				ds = (DataSource) ctx.lookup( proxlJNDIName );
-
 			} else {
 				throw new SQLException( "Invalid database name passed into DBConnectionManager.  db: " + db );
 			}
@@ -101,40 +81,25 @@ public class DBConnectionFactoryWeb implements IDBConnectionFactory {
 			if (ds != null) {
 				conn = ds.getConnection();
 				if (conn != null) {
-
 					//					boolean connectionAutoCommit = conn.getAutoCommit();
-
 					return conn;
 				} else {
 					throw new SQLException("Got a null connection...");
 				}
 			}
-
-
 			throw new SQLException("Got a null DataSource...");
 		} catch (NamingException ne) {
-
 			log.error( "ERROR: getting database connection: db: " + db, ne );
-
 			throw new SQLException("Naming exception: " + ne.getMessage(), ne);
-
-
 		} catch ( Exception e ) {
-
 			log.error( "ERROR: getting database connection: db: " + db, e );
-
 			throw e;
 		}
-
 	}
-
-
 
 	@Override
 	public void closeAllConnections() throws Exception {
-
 		//  Not applicable for Web	
-
 		printGetConnectionCounts( true /* forcePrintNow */ );
 	}
 
@@ -142,13 +107,9 @@ public class DBConnectionFactoryWeb implements IDBConnectionFactory {
 	 * 
 	 */
 	private void printGetConnectionCounts( boolean forcePrintNow ) {
-
 		Calendar now = Calendar.getInstance();
-
 		int nowDayOfYear = now.get( Calendar.DAY_OF_YEAR );
-
 		if ( prevDayOfYear != nowDayOfYear || forcePrintNow ) {
-
 			if ( prevDayOfYear != -1 ) {
 				if ( debugLogLevelEnabled ) {
 					log.debug( "DB Connection Retrieval Count for previous day: " 
@@ -161,14 +122,11 @@ public class DBConnectionFactoryWeb implements IDBConnectionFactory {
 							+ dbConnectionRetrievalCount.intValue() );
 				}
 			}
-
 			prevDayOfYear = nowDayOfYear;
 			//  Reset counter
 			dbConnectionRetrievalCount.set(0);
 		}
-
 	}
-
 
 	/**
 	 * 

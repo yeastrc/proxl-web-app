@@ -15,9 +15,8 @@ import org.yeastrc.xlink.dto.ProjectSearch_Shared_DTO;
  *
  */
 public class CopyProjectSearchIdToNewProjectUsingDBTransactionService {
-	
+
 	private static final Logger log = Logger.getLogger(CopyProjectSearchIdToNewProjectUsingDBTransactionService.class);
-	
 	CopyProjectSearchIdToNewProjectUsingDBTransactionService() { }
 	private static CopyProjectSearchIdToNewProjectUsingDBTransactionService _INSTANCE = new CopyProjectSearchIdToNewProjectUsingDBTransactionService();
 	public static CopyProjectSearchIdToNewProjectUsingDBTransactionService getInstance() { return _INSTANCE; }
@@ -30,7 +29,6 @@ public class CopyProjectSearchIdToNewProjectUsingDBTransactionService {
 	 * @throws Exception
 	 */
 	public void copyProjectSearchIdToNewProjectId( int[] projectSearchIdList, int newProjectId, boolean copyAllSearches ) throws Exception {
-		
 		Connection dbConnection = null;
 		try {
 			dbConnection = getConnectionWithAutocommitTurnedOff();
@@ -46,8 +44,8 @@ public class CopyProjectSearchIdToNewProjectUsingDBTransactionService {
 					}
 				}
 				if ( copySearch ) {
-					int insertedProjectsearchId = 
-							copyProjectSearchIdToProjectId( projectSearchId, newProjectId, dbConnection );
+//					int insertedProjectsearchId = 
+					copyProjectSearchIdToProjectId( projectSearchId, newProjectId, dbConnection );
 				}
 			}
 			dbConnection.commit();
@@ -73,7 +71,6 @@ public class CopyProjectSearchIdToNewProjectUsingDBTransactionService {
 		}
 	}
 	
-
 	/**
 	 * @param projectSearchId
 	 * @param newProjectId
@@ -82,23 +79,16 @@ public class CopyProjectSearchIdToNewProjectUsingDBTransactionService {
 	 * @throws Exception 
 	 */
 	private int copyProjectSearchIdToProjectId( int projectSearchId, int newProjectId, Connection dbConnection ) throws Exception {
-		
 		ProjectSearch_Shared_DTO projectSearch_Shared_DTO = ProjectSearch_Shared_DAO.getInstance().getFromId( projectSearchId );
 		projectSearch_Shared_DTO.setProjectId(newProjectId);
-		
 		ProjectSearch_Shared_DAO.getInstance().saveToDatabase( projectSearch_Shared_DTO, dbConnection); 
-		
 		int insertedProjectsearchId = projectSearch_Shared_DTO.getId();
-		
 		SearchComment_WebDAO.getInstance()
 		.duplicateRecordsForProjectSearchIdWithNewProjectSearchId( projectSearchId, insertedProjectsearchId, dbConnection );
-		
 		SearchWebLinksDAO.getInstance()
 		.duplicateRecordsForProjectSearchIdWithNewProjectSearchId( projectSearchId, insertedProjectsearchId, dbConnection );
-		
 		SearchFileProjectSearch_WebDAO.getInstance()
 		.duplicateRecordsForProjectSearchIdWithNewProjectSearchId( projectSearchId, insertedProjectsearchId, dbConnection );
-		
 		return insertedProjectsearchId;
 	}
 	

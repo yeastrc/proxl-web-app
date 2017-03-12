@@ -63,8 +63,7 @@ public class ViewMergedSearchProteinsAction extends Action {
 	public ActionForward execute( ActionMapping mapping,
 			ActionForm actionForm,
 			HttpServletRequest request,
-			HttpServletResponse response )
-					throws Exception {
+			HttpServletResponse response )	throws Exception {
 		
 		//  Detect which Struts action mapping was called by examining the value of the "parameter" attribute
 		//     accessed by calling mapping.getParameter()

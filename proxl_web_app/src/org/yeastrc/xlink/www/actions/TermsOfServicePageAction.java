@@ -1,9 +1,7 @@
 package org.yeastrc.xlink.www.actions;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -14,51 +12,35 @@ import org.yeastrc.xlink.www.dao.TermsOfServiceTextVersionsDAO;
 import org.yeastrc.xlink.www.dto.TermsOfServiceTextVersionsDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappConfigException;
 import org.yeastrc.xlink.www.web_utils.IsTermsOfServiceEnabled;
-
 /**
  * Terms of Service page action
  *
  */
 public class TermsOfServicePageAction extends Action {
-
+	
 	private static final Logger log = Logger.getLogger(TermsOfServicePageAction.class);
 	
-
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
-			  HttpServletResponse response )
-					  throws Exception {
-				
+			  HttpServletResponse response ) throws Exception {
 		try {
-
 			boolean termsOfServiceEnabled = IsTermsOfServiceEnabled.getInstance().isTermsOfServiceEnabled();
-
 			if ( termsOfServiceEnabled ) {
-
 				TermsOfServiceTextVersionsDTO termsOfServiceTextVersionsDTO =
 						TermsOfServiceTextVersionsDAO.getInstance().getLatest();
-					
 				if ( termsOfServiceTextVersionsDTO == null ) {
-					
 					String msg = "Terms of service is enabled but there is no 'Latest' terms of service record.";
 					log.error( msg );
 					throw new ProxlWebappConfigException(msg);
-					
 				} else {
-
 					request.setAttribute( "termsOfServiceText", termsOfServiceTextVersionsDTO.getTermsOfServiceText() );
 				}
 			}
-			
 			return mapping.findForward( "Success" );
-			
 		} catch ( Exception e ) {
-			
 			String msg = "Exception caught: " + e.toString();
-			
 			log.error( msg, e );
-			
 			return mapping.findForward( StrutsGlobalForwardNames.GENERAL_ERROR );
 		}
 	}

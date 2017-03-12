@@ -45,7 +45,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 /**
  * 
  *
@@ -435,6 +434,7 @@ public class PeptidesMergedCommonPageDownload {
 		
 		return peptidesMergedCommonPageDownloadResult;
 	}
+	
 	////////////////////////////////////////
 	////////   Sorter Class to Sort Peptides
 	/**
@@ -494,7 +494,6 @@ public class PeptidesMergedCommonPageDownload {
 					}
 				}
 				
-
 				//  All peptide data matches or no peptide Ann Data exists so sort on PSM Ann Data
 
 				List<AnnotationTypeDTO> psmCutoffsAnnotationTypeDTOListAnnotationSortOrderSorted =

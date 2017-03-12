@@ -1,4 +1,5 @@
 package org.yeastrc.xlink.www.qc_plots.psm_count_for_score;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,22 +53,18 @@ public class CreatePsmCountsVsScoreQCPlotData {
 			Double psmScoreCutoff,
 			List<Integer> proteinSequenceIdsToIncludeList,
 			List<Integer> proteinSequenceIdsToExcludeList ) throws Exception {
-	
 		if ( selectedLinkTypes == null || selectedLinkTypes.isEmpty() ) {
 			String msg = "selectedLinkTypes cannot be empty.";
 			log.error( msg );
 			throw new IllegalArgumentException( msg );
 		}
-
 		Integer searchId =
 				MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
-		
 		if ( searchId == null ) {
 			String msg = ": No searchId found for projectSearchId: " + projectSearchId;
 			log.warn( msg );
 		    throw new ProxlWebappDataException( msg );
 		}
-		
 		List<Integer> searchIdsList = new ArrayList<>( 1 );
 		searchIdsList.add( searchId );
 		Map<Integer, Map<Integer, AnnotationTypeDTO>> annotationTypeDataAllSearchIds = 
@@ -97,10 +94,8 @@ public class CreatePsmCountsVsScoreQCPlotData {
 			log.error(msg);
 			throw new ProxlWebappDBDataOutOfSyncException( msg );
 		}		
-		
 		//  Keyed on Selected Link Type
 		Map<String, List<Double>> scoreValuesForSelectedTypesMap = new HashMap<>();
-		
 		for ( String selectedLinkType : selectedLinkTypes ) {
 			LinkType linkType = null;
 			if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__ALL_PSM.equals( selectedLinkType ) ) {
@@ -112,7 +107,6 @@ public class CreatePsmCountsVsScoreQCPlotData {
 			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__UNLINKED_PSM.equals( selectedLinkType ) ) {
 				linkType = LinkType.UNLINKED;
 			}
-			
 			//  Get data from DB for Link Type
 			List<Double> scoreValuesForPSMsthatMeetCriteriaList = 
 				ScoreCountFromPsmTblSearcher.getInstance().getScoreValues( 
@@ -122,10 +116,8 @@ public class CreatePsmCountsVsScoreQCPlotData {
 						psmScoreCutoff, 
 						proteinSequenceIdsToIncludeList,
 						proteinSequenceIdsToExcludeList );
-			
 			scoreValuesForSelectedTypesMap.put( selectedLinkType, scoreValuesForPSMsthatMeetCriteriaList );
 		}
-		
 		double maxScore = 0;
 		double minScore = 0;
 		boolean firstEntry = true;
@@ -146,12 +138,10 @@ public class CreatePsmCountsVsScoreQCPlotData {
 				}
 			}
 		}
-		
 		double scoreMaxForPuttingInBins = maxScore;
 		if ( psmScoreCutoff != null ) {
 			scoreMaxForPuttingInBins = psmScoreCutoff;
 		}
-		
 		double scoreMinForPuttingInBins = minScore;
 		//  Process data into bins
 		double binSizeAsDouble = ( scoreMaxForPuttingInBins - scoreMinForPuttingInBins ) / BIN_COUNT;
@@ -159,22 +149,15 @@ public class CreatePsmCountsVsScoreQCPlotData {
 		PsmCountsVsScoreQCPlotDataJSONPerType looplinkData = null;
 		PsmCountsVsScoreQCPlotDataJSONPerType unlinkedData = null;
 		PsmCountsVsScoreQCPlotDataJSONPerType alllinkData = null;
-
 		int dataArraySize = 0;
-		
 		//  Process for each Selected Link Type
 		for ( String selectedLinkType : selectedLinkTypes ) {
-
 			//  Scores for selected link type being processed
 			List<Double> scoreValuesForPSMsthatMeetCriteriaList = scoreValuesForSelectedTypesMap.get( selectedLinkType );
-			
 			int totalCountForType = scoreValuesForPSMsthatMeetCriteriaList.size();
-			
 			if ( psmScoreCutoff != null ) {
-
 				//  Have score cutoff so need to get a total count for the type 
 				//    without applying the cutoff but applying all other selections
-				
 				//  Get data from DB, total score count for selectedLinkType, search id, annotation type id
 				LinkType linkType = null;
 				if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__ALL_PSM.equals( selectedLinkType ) ) {
@@ -265,7 +248,6 @@ public class CreatePsmCountsVsScoreQCPlotData {
 			dataArraySize = chartBuckets.size();
 			linkData.setTotalCountForType( totalCountForType );
 		}
-		
 		//  Populate objects to generate JSON
 		PsmCountsVsScoreQCPlotDataJSONRoot psmCountsVsScoreQCPlotDataJSONRoot = new PsmCountsVsScoreQCPlotDataJSONRoot();
 		psmCountsVsScoreQCPlotDataJSONRoot.setDataArraySize( dataArraySize );
@@ -278,7 +260,6 @@ public class CreatePsmCountsVsScoreQCPlotData {
 		} else if ( filterDirectionType == FilterDirectionType.BELOW ) {
 			psmCountsVsScoreQCPlotDataJSONRoot.setSortDirectionBelow(true);
 		}
-		
 		return psmCountsVsScoreQCPlotDataJSONRoot;
 	}
 }

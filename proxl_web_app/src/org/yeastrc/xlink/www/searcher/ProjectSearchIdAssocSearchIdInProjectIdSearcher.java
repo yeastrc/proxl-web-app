@@ -14,7 +14,6 @@ import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
 public class ProjectSearchIdAssocSearchIdInProjectIdSearcher {
 
 	private static final Logger log = Logger.getLogger(ProjectSearchIdAssocSearchIdInProjectIdSearcher.class);
-	
 	ProjectSearchIdAssocSearchIdInProjectIdSearcher() { }
 	private static ProjectSearchIdAssocSearchIdInProjectIdSearcher _INSTANCE = new ProjectSearchIdAssocSearchIdInProjectIdSearcher();
 	public static ProjectSearchIdAssocSearchIdInProjectIdSearcher getInstance() { return _INSTANCE; }
@@ -26,8 +25,6 @@ public class ProjectSearchIdAssocSearchIdInProjectIdSearcher {
 			+    " ON from_project_search.search_id = to_project_search.search_id "
 			+ " WHERE from_project_search.id = ? AND to_project_search.project_id = ? "
 			+ " AND to_project_search.status_id = " + SearchRecordStatus.IMPORT_COMPLETE_VIEW.value();
-	
-	
 	/**
 	 * Is the SearchId associated with a ProjectSearchId in the ProjectId where project_search is not marked for deletion
 	 * 
@@ -37,7 +34,6 @@ public class ProjectSearchIdAssocSearchIdInProjectIdSearcher {
 	 * @throws Exception 
 	 */
 	public boolean isSearchIdAssocWithProjectSearchIdInProjectId( int projectSearchId, int projectId ) throws Exception {
-		
 		boolean result = false;;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -70,7 +66,6 @@ public class ProjectSearchIdAssocSearchIdInProjectIdSearcher {
 				conn = null;
 			}
 		}
-		
 		return result;
 	}
 }

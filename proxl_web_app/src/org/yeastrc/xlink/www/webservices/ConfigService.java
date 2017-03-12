@@ -254,6 +254,12 @@ public class ConfigService {
 			this.status = status;
 		}
 	}
+	
+	/**
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/termsOfServiceData") 
@@ -342,6 +348,13 @@ public class ConfigService {
 			this.termsOfServiceText = termsOfServiceText;
 		}
 	}
+	
+	/**
+	 * @param termsOfServiceText
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@POST
 	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
 	@Produces(MediaType.APPLICATION_JSON)
@@ -453,6 +466,12 @@ public class ConfigService {
 			this.status = status;
 		}
 	}
+	
+	/**
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@POST
 	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
 	@Produces(MediaType.APPLICATION_JSON)
@@ -520,6 +539,12 @@ public class ConfigService {
 			this.status = status;
 		}
 	}
+	
+	/**
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@POST
 	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
 	@Produces(MediaType.APPLICATION_JSON)

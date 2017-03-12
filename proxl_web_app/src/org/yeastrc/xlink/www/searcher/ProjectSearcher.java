@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -20,13 +19,17 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached
 public class ProjectSearcher {
 
 	private static final Logger log = Logger.getLogger(ProjectSearcher.class);
-	
 	private ProjectSearcher() { }
 	private static final ProjectSearcher _INSTANCE = new ProjectSearcher();
 	public static ProjectSearcher getInstance() { return _INSTANCE; }
 	
-	
-	
+	private static final String SQL = "SELECT project.id FROM project"
+			+ " INNER JOIN auth_shared_object ON project.auth_shareable_object_id = auth_shared_object.shared_object_id "
+			+ " INNER JOIN auth_shared_object_users ON auth_shared_object.shared_object_id = auth_shared_object_users.shared_object_id "
+			+ " WHERE  ( auth_shared_object_users.user_id = ? AND auth_shared_object_users.access_level <= " 
+			+              AuthAccessLevelConstants.ACCESS_LEVEL__PUBLIC_ACCESS_CODE_READ_ONLY__PUBLIC_PROJECT_READ_ONLY +   " ) "
+			+           " AND project.enabled = 1 AND project.marked_for_deletion = 0 "
+			+ " ORDER BY project.id DESC";
 
 	
 	/**
@@ -35,56 +38,29 @@ public class ProjectSearcher {
 	 * @throws Exception
 	 */
 	public List<ProjectTblSubPartsForProjectLists> getProjectsForAuthUserId( int authUserId ) throws Exception {
-		
 		List<ProjectTblSubPartsForProjectLists> projects = new ArrayList<>();
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		
-		String sql = "SELECT project.id FROM project"
-				+ " INNER JOIN auth_shared_object ON project.auth_shareable_object_id = auth_shared_object.shared_object_id "
-				+ " INNER JOIN auth_shared_object_users ON auth_shared_object.shared_object_id = auth_shared_object_users.shared_object_id "
-				+ " WHERE  ( auth_shared_object_users.user_id = ? AND auth_shared_object_users.access_level <= " 
-				+              AuthAccessLevelConstants.ACCESS_LEVEL__PUBLIC_ACCESS_CODE_READ_ONLY__PUBLIC_PROJECT_READ_ONLY +   " ) "
-				+           " AND project.enabled = 1 AND project.marked_for_deletion = 0 ";
-		
-				
-				
-				
-		sql += " ORDER BY project.id DESC";
-		
+		final String sql = SQL;
 		try {
-			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-
-			
 			pstmt = conn.prepareStatement( sql );
-			
 			pstmt.setInt( 1, authUserId );
-			
 			rs = pstmt.executeQuery();
-
 			while( rs.next() ) { 
 				projects.add( Cached_ProjectTblSubPartsForProjectLists.getInstance().getProjectTblSubPartsForProjectLists( rs.getInt( 1 ) ) );
 			}
-			
 		} catch ( Exception e ) {
-			
 			String msg = "getProjectsForAuthUserId(), sql: " + sql;
-			
 			log.error( msg, e );
-			
 			throw e;
-			
 		} finally {
-			
 			// be sure database handles are closed
 			if( rs != null ) {
 				try { rs.close(); } catch( Throwable t ) { ; }
 				rs = null;
 			}
-			
 			if( pstmt != null ) {
 				try { pstmt.close(); } catch( Throwable t ) { ; }
 				pstmt = null;
@@ -94,16 +70,8 @@ public class ProjectSearcher {
 				conn = null;
 			}
 		}
-		
 		return projects;
 	}
-	
-	
-
-	
-	
-
-	
 //	/**
 //	 * @param authUserId
 //	 * @param allowedProjectIds
@@ -238,73 +206,44 @@ public class ProjectSearcher {
 //		
 //		return projects;
 //	}
-	
-	
-	
-	
-	
-	
 	/**
 	 * @return
 	 * @throws Exception
 	 */
 	public List<ProjectTblSubPartsForProjectLists> getAllProjects() throws Exception {
-		
-		
 		List<ProjectTblSubPartsForProjectLists> projects = new ArrayList<>();
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		
 		String sql = "SELECT id FROM project" 
 				+ " WHERE project.enabled = 1 AND project.marked_for_deletion = 0 "
 				+ " ORDER BY project.title";
-		
 		try {
-
-	
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-
 			pstmt = conn.prepareStatement( sql );
-			
 			rs = pstmt.executeQuery();
-
 			while( rs.next() ) {
 				projects.add( Cached_ProjectTblSubPartsForProjectLists.getInstance().getProjectTblSubPartsForProjectLists( rs.getInt( 1 ) ) );
 			}
-			
 		} catch ( Exception e ) {
-			
 			String msg = "ERROR: getAllProjects(), sql: " + sql;
-			
 			log.error( msg, e );
-			
 			throw e;
-			
 		} finally {
-			
 			// be sure database handles are closed
 			if( rs != null ) {
 				try { rs.close(); } catch( Throwable t ) { ; }
 				rs = null;
 			}
-			
 			if( pstmt != null ) {
 				try { pstmt.close(); } catch( Throwable t ) { ; }
 				pstmt = null;
 			}
-			
 			if( conn != null ) {
 				try { conn.close(); } catch( Throwable t ) { ; }
 				conn = null;
 			}
-			
 		}
-		
-		
-		
 		return projects;
 	}
-	
 }

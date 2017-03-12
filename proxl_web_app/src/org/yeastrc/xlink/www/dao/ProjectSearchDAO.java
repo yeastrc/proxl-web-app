@@ -13,9 +13,8 @@ import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
  * !!! SearchDAO also has queries against project_search table
  */
 public class ProjectSearchDAO {
-	
+
 	private static final Logger log = Logger.getLogger(ProjectSearchDAO.class);
-	
 	private ProjectSearchDAO() { }
 	public static ProjectSearchDAO getInstance() { return new ProjectSearchDAO(); }
 	
@@ -26,7 +25,6 @@ public class ProjectSearchDAO {
 	 * @throws Exception
 	 */
 	public void updateName( int projectSearchId, String name ) throws Exception {
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -64,7 +62,6 @@ public class ProjectSearchDAO {
 	 * @throws Exception
 	 */
 	public void updateProjectIdForProjectSearch( int projectSearchId, int newProjectId ) throws Exception {
-		
 		Connection dbConnection = null;
 		try {
 			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
@@ -84,7 +81,6 @@ public class ProjectSearchDAO {
 	 * @throws Exception
 	 */
 	public void updateProjectIdForProjectSearch( int projectSearchId, int newProjectId, Connection dbConnection ) throws Exception {
-		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		String sql = "UPDATE project_search SET project_id = ? WHERE id = ?";
@@ -116,7 +112,6 @@ public class ProjectSearchDAO {
 	 * @throws Exception
 	 */
 	public void updateDisplayOrderForSearch( int searchId, int newDisplayOrder, Connection dbConnection ) throws Exception {
-		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		String sql = "UPDATE project_search SET search_display_order = ? WHERE id = ?";
@@ -148,17 +143,14 @@ public class ProjectSearchDAO {
 	 * @throws Exception
 	 */
 	public void markAsDeleted( int searchId, int deletionAuthUserId ) throws Exception {
-		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		Connection dbConnection = null;
-		
 		//  active_project_id_search_id_unique_record = NULL  to remove this record from UNIQUE index on project_id, search_id, active_project_id_search_id_unique_record
 		String sql = "UPDATE project_search SET status_id = " + SearchRecordStatus.MARKED_FOR_DELETION.value()
 				+ ", active_project_id_search_id_unique_record = NULL "
 				+ ", marked_for_deletion_auth_user_id = ?, marked_for_deletion_timestamp = NOW() "
 				+ " WHERE id = ?";
-		
 		try {
 			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = dbConnection.prepareStatement( sql );

@@ -5,11 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-
 /**
  * Return a list of users in the database for a shared object id
  *
@@ -17,13 +15,11 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  *
  */
 public class UsersForSharedObjectIdSearcher {
-
-	private static final Logger log = Logger.getLogger(UsersForSharedObjectIdSearcher.class);
 	
+	private static final Logger log = Logger.getLogger(UsersForSharedObjectIdSearcher.class);
 	private UsersForSharedObjectIdSearcher() { }
 	private static final UsersForSharedObjectIdSearcher _INSTANCE = new UsersForSharedObjectIdSearcher();
 	public static UsersForSharedObjectIdSearcher getInstance() { return _INSTANCE; }
-	
 	
 	private final String SQL = "SELECT auth_shared_object_users.user_id FROM "
 			+ " auth_shared_object  "
@@ -35,20 +31,16 @@ public class UsersForSharedObjectIdSearcher {
 			+      " WHERE "
 			+      "     auth_user.user_access_level = " + AuthAccessLevelConstants.ACCESS_LEVEL_NONE
 			+     " ) ";
-	
 	/**
 	 * @param sharedObjectId
 	 * @return
 	 * @throws Exception
 	 */
 	public List<Integer> getAuthUserIdsExcludeGlobalNoAccessAccountsForSharedObjectId( int sharedObjectId ) throws Exception {
-		
 		List<Integer> userIds = new ArrayList<Integer>();
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		
 		final String sql = SQL;
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );

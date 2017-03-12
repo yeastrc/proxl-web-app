@@ -48,8 +48,7 @@ public class ViewMergedSearchImageAction extends Action {
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
-			  HttpServletResponse response )
-					  throws Exception {
+			  HttpServletResponse response ) throws Exception {
 		try {
 			MergedSearchViewProteinsForm form = (MergedSearchViewProteinsForm) actionForm;
 			// Get the session first.  

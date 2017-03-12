@@ -62,13 +62,8 @@ public class ConvertAndDownloadSVGAction extends Action {
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
-			  HttpServletResponse response )
-					  throws Exception {
-
-
+			  HttpServletResponse response ) throws Exception {
 		try {
-			
-			
 			// ensure referrer was on the same server as this Action to prevent abuse
 			URL referrerURL = new URL( request.getHeader("referer") );
 			URL thisURL = new URL( request.getRequestURL().toString() );
@@ -78,29 +73,20 @@ public class ConvertAndDownloadSVGAction extends Action {
 				return null;
 			}
 			
-
-			
 			ConvertAndDownloadSVGForm downloadForm = (ConvertAndDownloadSVGForm)form;
-			
-
 			if ( StringUtils.isEmpty( downloadForm.getSvgString() ) ) {
-				
 				String msg = "downloadForm.getSvgString() is empty.";
 				log.error( msg );
 				throw new ProxlWebappDataException(msg);
 			}
-
 			if ( StringUtils.isEmpty( downloadForm.getFileType() ) ) {
-				
 				String msg = "downloadForm.getFileType() is empty.";
 				log.error( msg );
 				throw new ProxlWebappDataException(msg);
 			}
 			
 //			String svgString = downloadForm.getSvgString();
-//			
 //			int svgStringLength = svgString.length();
-//			
 //			String svgStringLast100Chars = svgString.substring( svgString.length() - 100 );
 
 			byte[] fileBytes = this.getBytes( downloadForm.getSvgString(), downloadForm.getFileType() );
@@ -121,44 +107,30 @@ public class ConvertAndDownloadSVGAction extends Action {
 			BufferedOutputStream bos = null;
 			
 			try {
-
-
 				ServletOutputStream out = response.getOutputStream();
-
 				bos = new BufferedOutputStream(out);
-
 				out.write( fileBytes );
-
 			} finally {
-				
 				try {
 					if ( bos != null ) {
 						bos.close();
 					}
-
 				} catch ( Exception ex ) {
-
 					log.error( "bos.close():Exception " + ex.toString(), ex );
 				}
-
 				try {
 					response.flushBuffer();
 				} catch ( Exception ex ) {
 
 					log.error( "response.flushBuffer():Exception " + ex.toString(), ex );
 				}
-
 			}
-			
 			return null;
 			
 		} catch ( Exception e ) {
-
 			String msg = "Exception:  RemoteAddr: " + request.getRemoteAddr()  
 					+ ", Exception caught: " + e.toString();
-
 			log.error( msg, e );
-
 			throw e;
 		}
 	}
@@ -189,25 +161,20 @@ public class ConvertAndDownloadSVGAction extends Action {
 	private byte[] getBytes( String svgString, String type ) throws Exception {
 		
 		if ( StringUtils.isEmpty( svgString ) ) {
-			
 			String msg = "incoming svgString is empty.";
 			log.error( msg );
 			throw new ProxlWebappDataException(msg);
 		}
-
 		if ( StringUtils.isEmpty( type ) ) {
-			
 			String msg = "incoming type is empty.";
 			log.error( msg );
 			throw new ProxlWebappDataException(msg);
 		}
 		
-		
 		// it's already svg, don't do much
 		if( type.equals( "svg" ) ) {
 			return svgString.getBytes();
 		}
-
 		
         // Create the transcoder input.
         InputStream istream = new ByteArrayInputStream( svgString.getBytes() );
@@ -218,37 +185,27 @@ public class ConvertAndDownloadSVGAction extends Action {
         TranscoderOutput output = new TranscoderOutput(ostream);
 		
 		if( type.equals( "pdf" ) ) {
-			
 	        // Create a PDF transcoder
     		PDFTranscoder t = new PDFTranscoder();
-    		
 	        // Save the image.
 	        t.transcode(input, output);			
 
 		} else if( type.equals( "png" ) ) {
-			
 	        // Create a PNG transcoder
     		PNGTranscoder t = new PNGTranscoder();
     		t.addTranscodingHint( PNGTranscoder.KEY_BACKGROUND_COLOR, Color.white );
-    		
 	        // Save the image.
 	        t.transcode(input, output);			
 
 		} else if( type.equals( "jpeg" ) ) {
-			
 	        // Create a JPEG transcoder
 	        JPEGTranscoder t = new JPEGTranscoder();
-		        
 	        // Set the transcoding hints.
-	        t.addTranscodingHint(JPEGTranscoder.KEY_QUALITY,
-	                   new Float(.8));
-	
+	        t.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, new Float(.8));
     		t.addTranscodingHint( JPEGTranscoder.KEY_BACKGROUND_COLOR, Color.white );
-    		
 	        // Save the image.
 	        t.transcode(input, output);			
 		} else {
-
 			throw new ProxlWebappDataException( "Unsupported type: " + type );
 		}
 		

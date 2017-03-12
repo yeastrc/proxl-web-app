@@ -48,7 +48,6 @@ import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-
 /**
  * 
  *
@@ -70,7 +69,6 @@ public class LorikeetSpectrumService {
 	public LorikeetGetSpectrumServiceResult getViewerData( @QueryParam( "psmId" ) int psmId,
 										  @Context HttpServletRequest request )
 	throws Exception {
-		
 		LorikeetRootData lorikeetRootData = new LorikeetRootData();
 		LorikeetGetSpectrumServiceResult lorikeetGetSpectrumServiceResult = new LorikeetGetSpectrumServiceResult();
 		lorikeetGetSpectrumServiceResult.setData( lorikeetRootData );
@@ -107,23 +105,17 @@ public class LorikeetSpectrumService {
 			    	        );
         	}
         	int searchId = psmDTO.getSearchId();
-
         	//  Validate Auth access to this search id
-        	
         	//  Need access to at least one projectSearchId associated with this searchId
-        	
         	boolean allAuthHaveNoSession = true;
         	boolean accessAllowed = false;
-        	
         	List<Integer> projectSearchIdList = 
         			ProjectSearchIdsForSearchIdSearcher.getInstance().getProjectSearchIdsForSearchId( searchId );
-        	
         	for ( Integer projectSearchId : projectSearchIdList ) { 
     			//   Get the project id for this search
         		Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
         		projectSearchIdsCollection.add( projectSearchId );
         		List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsCollection );
-
         		if ( projectIdsFromSearchIds.isEmpty() ) {
         			// should never happen
         			String msg = "No project ids for projectSearchId: " + projectSearchId;
@@ -147,27 +139,6 @@ public class LorikeetSpectrumService {
         		AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
         				GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
         		//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-        		
-        		//  Old Auth check
-//        		if ( accessAndSetupWebSessionResult.isNoSession() ) {
-//        			//  No User session 
-//        			throw new WebApplicationException(
-//        					Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-//        					.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-//        					.build()
-//        					);
-//        		}
-//        		//  Test access to the project id
-//        		AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
-//        		if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
-//        			//  No Access Allowed for this project id
-//        			throw new WebApplicationException(
-//        					Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
-//        					.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
-//        					.build()
-//        					);
-//        		}
-        		
         		if ( accessAndSetupWebSessionResult.isNoSession() ) {
         			//  No user session so not allowed
         			continue;
@@ -196,10 +167,8 @@ public class LorikeetSpectrumService {
     					.build()
     					);
         	}
-
 			////////   Auth complete
 			//////////////////////////////////////////
-			
 			ScanDTO scanDTO = null;
 			int scanId = psmDTO.getScanId();
 			try {
@@ -231,21 +200,14 @@ public class LorikeetSpectrumService {
 			}
 			//  Ignore if not found
 //        	if ( scanDTO_Ms1 == null )  {
-//
-//        		
 //				String msg = "scan not found for scanId_Ms1: " + scanId_Ms1;
-//				
 //				log.error( msg);
-//				
-//
 //				//  TODO  Return something else instead
-//				
 //			    throw new WebApplicationException(
 //			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
 //			    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
 //			    	        .build()
 //			    	        );
-//				
 //        	}
         	///////////////////////
         	ScanFileDTO scanFileDTO = null;
@@ -333,6 +295,7 @@ public class LorikeetSpectrumService {
 					);
 		}
 	}
+	
 	/**
 	 * @param psmDTO
 	 * @return
@@ -360,6 +323,7 @@ public class LorikeetSpectrumService {
 		lorikeetCrossLinkData.setPeptideData2( peptideData2 );
 		return lorikeetCrossLinkData;
 	}
+	
 	/**
 	 * @param psmDTO
 	 * @return
@@ -384,6 +348,7 @@ public class LorikeetSpectrumService {
 		lorikeetDimerData.setPeptideData2( peptideData2 );
 		return lorikeetDimerData;
 	}
+	
 	/**
 	 * @param psmDTO
 	 * @return
@@ -408,6 +373,7 @@ public class LorikeetSpectrumService {
 		lorikeetLoopLinkData.setPeptideData( peptideData );
 		return lorikeetLoopLinkData;
 	}
+	
 	/**
 	 * @param psmDTO
 	 * @return
@@ -427,6 +393,7 @@ public class LorikeetSpectrumService {
 		LorikeetPerPeptideData peptideData = getLorikeetPerPeptideData( srchRepPeptPeptideDTO );
 		return peptideData;
 	}
+	
 	/**
 	 * @param matchedPeptideDTO
 	 * @return

@@ -6,8 +6,12 @@ import java.sql.ResultSet;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
+/**
+ * 
+ *
+ */
 public class SearchUtils {
-
+	
 	private static final Logger log = Logger.getLogger(SearchUtils.class);
 	
 	private static final String NAME_SQL =
@@ -16,7 +20,6 @@ public class SearchUtils {
 					+ " INNER JOIN search_protein_sequence_annotation AS spsa "
 					+ " ON annotation.id = spsa.annotation_id "
 			+ " WHERE spsa.search_id = ? AND spsa.protein_sequence_id = ? ";
-	
 	/**
 	 * Get the name for this protein in the context of its search 
 	 * @param searchId
@@ -25,7 +28,6 @@ public class SearchUtils {
 	 * @throws Exception
 	 */
 	public static String getProteinNameForSearchIdProteinSequenceId( int searchId, int proteinSequenceId ) throws Exception {
-		
 		String result = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -74,7 +76,6 @@ public class SearchUtils {
 					+ " INNER JOIN search_protein_sequence_annotation AS spsa "
 					+ " ON annotation.id = spsa.annotation_id "
 			+ " WHERE spsa.search_id = ? AND spsa.protein_sequence_id = ? ";
-	
 	/**
 	 * Get the description for this protein in the context of its search (based on
 	 * the FASTA file used to do the search.
@@ -84,7 +85,6 @@ public class SearchUtils {
 	 * @throws Exception
 	 */
 	public static String getProteinDescriptionForSearchIdProteinSequenceId( int searchId, int proteinSequenceId ) throws Exception {
-		
 		String result = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;

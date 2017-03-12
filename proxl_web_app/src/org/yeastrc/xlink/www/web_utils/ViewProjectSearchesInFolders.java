@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dao.FolderForProjectDAO;
 import org.yeastrc.xlink.www.dao.FolderProjectSearchDAO;
@@ -18,48 +17,39 @@ import org.yeastrc.xlink.www.objects.ProjectPageFoldersSearches;
 import org.yeastrc.xlink.www.objects.ProjectPageSingleFolder;
 import org.yeastrc.xlink.www.objects.SearchDTODetailsDisplayWrapper;
 import org.yeastrc.xlink.www.searcher.SearchSearcher;
-
 /**
  * For the project page, retrieve searches and put in folders
  *
  */
 public class ViewProjectSearchesInFolders {
-
+	
 	private static final Logger log = Logger.getLogger( ViewProjectSearchesInFolders.class );
-			
 	// private constructor
 	private ViewProjectSearchesInFolders() { }
-	
 	public static ViewProjectSearchesInFolders getInstance() {
 		return new ViewProjectSearchesInFolders();
 	}
-
+	
 	/**
 	 * @param projectId
 	 * @return
 	 * @throws Exception
 	 */
 	public ProjectPageFoldersSearches getProjectPageFoldersSearches( int projectId ) throws Exception {
-
 		ProjectPageFoldersSearches projectPageFoldersSearches = new ProjectPageFoldersSearches();
-
 		List<SearchDTO> searches = SearchSearcher.getInstance().getSearchsForProjectId( projectId );
 		if ( searches.isEmpty() ) {
 			projectPageFoldersSearches.setNoSearchesFound( true );
 			return projectPageFoldersSearches; //  EARLY EXIT
 		}
-		
 		projectPageFoldersSearches.setNoSearchesFound( false );
-		
 		List<SearchDTODetailsDisplayWrapper> searchDTODetailsDisplayWrapperList = new ArrayList<>( searches.size() );
 		for ( SearchDTO search : searches ) {
 			SearchDTODetailsDisplayWrapper searchDTODetailsDisplayWrapper = new SearchDTODetailsDisplayWrapper();
 			searchDTODetailsDisplayWrapper.setSearchDTO(search);
 			searchDTODetailsDisplayWrapperList.add(searchDTODetailsDisplayWrapper);
 		}
-
 		//  Get data for Put searches into folders
-		
 		List<FolderForProjectDTO> folderForProjectList = FolderForProjectDAO.getInstance().getFolderForProjectDTO_ForProjectId( projectId );
 		List<FolderProjectSearchDTO> folderProjectSearchList = FolderProjectSearchDAO.getInstance().getFolderProjectSearchDTO_ForProjectId( projectId );
 		//  Sort folders
@@ -83,12 +73,9 @@ public class ViewProjectSearchesInFolders {
 		for ( FolderProjectSearchDTO folderProjectSearchItem : folderProjectSearchList ) {
 			folderProjectSearchDTO_KeyedProjectSearchId_Map.put( folderProjectSearchItem.getProjectSearchId(), folderProjectSearchItem );
 		}
-		
 		//  Put searches into folders
-
 		//  The searches that are not in any folders
 		List<SearchDTODetailsDisplayWrapper> searchesNotInAnyFolders = new ArrayList<>( searches.size() );
-
 		for ( SearchDTODetailsDisplayWrapper searchWrapperItem : searchDTODetailsDisplayWrapperList ) {
 			SearchDTO search = searchWrapperItem.getSearchDTO();
 			FolderProjectSearchDTO folderProjectSearchDTO = folderProjectSearchDTO_KeyedProjectSearchId_Map.get( search.getProjectSearchId() );
@@ -108,7 +95,6 @@ public class ViewProjectSearchesInFolders {
 			}
 			projectPageSingleFolder.addSearchWrapper( searchWrapperItem );
 		}
-
 		//  Generate list of folders
 		List<ProjectPageSingleFolder> projectPageSingleFolderList = new ArrayList<>( folderForProjectList.size() );
 		for ( FolderForProjectDTO folderForProjectItem : folderForProjectList ) {
@@ -122,10 +108,8 @@ public class ViewProjectSearchesInFolders {
 			projectPageSingleFolderList.add( projectPageSingleFolder );
 		}
 		sortSearchesOnDisplayOrder( searchesNotInAnyFolders );
-
 		projectPageFoldersSearches.setSearchesNotInFolders( searchesNotInAnyFolders );
 		projectPageFoldersSearches.setFolders( projectPageSingleFolderList );
-		
 		return projectPageFoldersSearches;
 	}
 	
@@ -139,6 +123,5 @@ public class ViewProjectSearchesInFolders {
 				return o1.getSearchDTO().getDisplayOrder() - o2.getSearchDTO().getDisplayOrder();
 			}
 		});
-		
 	}
 }

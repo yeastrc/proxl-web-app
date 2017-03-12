@@ -1,7 +1,4 @@
 package org.yeastrc.auth.dto;
-
-
-
 /**
  * auth_shared_object_users table
  *

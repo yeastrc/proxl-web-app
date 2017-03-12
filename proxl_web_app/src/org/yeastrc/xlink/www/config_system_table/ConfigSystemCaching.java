@@ -1,14 +1,11 @@
 package org.yeastrc.xlink.www.config_system_table;
 
-import java.util.concurrent.TimeUnit;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTableGetValue;
 import org.yeastrc.xlink.www.cached_data_mgmt.CacheCurrentSizeMaxSizeResult;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -23,16 +20,11 @@ import com.google.common.cache.LoadingCache;
 public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDataCommonIF {
 
 	private static final Logger log = Logger.getLogger(ConfigSystemCaching.class);
-	
 	private static final int CACHE_MAX_SIZE = 60;
-//	private static final int CACHE_TIMEOUT = 200000000; // in seconds
-	
 	/**
 	 * Static singleton instance
 	 */
 	private static final ConfigSystemCaching _instance = new ConfigSystemCaching();
-	
-	
 	/**
 	 * Static get singleton instance
 	 * @return
@@ -40,7 +32,7 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 	public static ConfigSystemCaching getInstance() {
 		return _instance; 
 	}
-
+	
 	@Override
 	public CacheCurrentSizeMaxSizeResult getCurrentCacheSizeAndMax() throws Exception {
 		CacheCurrentSizeMaxSizeResult result = new CacheCurrentSizeMaxSizeResult();
@@ -48,7 +40,6 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 		result.setMaxSize( CACHE_MAX_SIZE );
 		return result;
 	}
-
 	
 	/* (non-Javadoc)
 	 * @see org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF#clearCacheData()
@@ -68,63 +59,46 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 		configSystemDataCache.invalidateAll();
 		ConfigSystemChangesRegistry.getInstance().allConfigKeysChanged();
 	}
-
-
+	
 	/**
 	 * @param configKey
 	 * @return null if not found
 	 * @throws Exception
 	 */
 	public String getConfigValueForConfigKey( String configKey ) throws Exception {
-
 		try {
-
 			LocalCacheKey localCacheKey = new LocalCacheKey();
-
 			localCacheKey.configKey = configKey;
-
 			LocalCacheValue localCacheValue = configSystemDataCache.get( localCacheKey );
-
 			String configValue = localCacheValue.configValue;
-
 			return configValue;
-			
 		} catch ( Exception e ) {
-			
 			String msg = "Exception getting configSystem value for configKey: '" + configKey + "'.";
 			log.error( msg, e );
 			throw e;
 		}
 	}
-
+	
 	/**
 	 * constructor
 	 */
 	private ConfigSystemCaching() {
-		
 		configSystemDataCache = CacheBuilder.newBuilder()
-				
-//				.expireAfterAccess( CACHE_TIMEOUT, TimeUnit.SECONDS )
 			    .maximumSize( CACHE_MAX_SIZE )
 			    .build(
 			    		new CacheLoader<LocalCacheKey, LocalCacheValue>() {
 			    			public LocalCacheValue load(LocalCacheKey localCacheKey) throws Exception {
-			    				
 			    				//   WARNING  cannot return null.  
 			    				//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
-			    				
 			    				//  value is NOT in cache so get it and return it
 			    				return loadFromDB(localCacheKey);
 			    			}
 			    		});
-			    
 //			    .build(); // no CacheLoader
-
 		//  Register this class with the centralized Cached Data Registry, to support centralized cache clearing
 		CachedDataCentralRegistry.getInstance().register( this );
-
 	}
-
+	
 	/**
 	 * classes for holding data in the cache
 	 * 
@@ -132,9 +106,7 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 	 *
 	 */
 	private static class LocalCacheKey {
-		
 		String configKey;
-
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -167,7 +139,6 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 	 * value in the cache
 	 */
 	private static class LocalCacheValue {
-		
 		String configValue;
 	}
 	
@@ -182,10 +153,8 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 	 * @throws Exception
 	 */
 	private LocalCacheValue loadFromDB( LocalCacheKey localCacheKey ) throws Exception {
-		
 		//   WARNING  cannot return null.  
 		//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
-		
 		//  value is NOT in cache so get it and return it
 		String configValue =
 				ConfigSystemDAO.getInstance().getConfigValueForConfigKey(  localCacheKey.configKey );
@@ -193,7 +162,4 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 		localCacheValue.configValue = configValue;
 		return localCacheValue;
 	}
-
-
-	
 }

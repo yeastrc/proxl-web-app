@@ -41,8 +41,6 @@ public class ZzUserDataMirrorDAO {
 					
 			+ " ON DUPLICATE KEY UPDATE "
 			+ " username = ?, email = ?, first_name = ?, last_name = ?, organization = ?";
-
-	
 	/**
 	 * @param item
 	 * @throws Exception
@@ -106,7 +104,6 @@ public class ZzUserDataMirrorDAO {
 			}
 		}
 	}
-	
 
 	/**
 	 * Update the non-null item values associated with this auth_user_id
@@ -114,7 +111,6 @@ public class ZzUserDataMirrorDAO {
 	 * @throws Exception
 	 */
 	public void updateRecord( ZzUserDataMirrorDTO item ) throws Exception {
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;

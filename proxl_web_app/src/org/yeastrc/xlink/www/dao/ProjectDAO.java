@@ -15,9 +15,8 @@ import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
  *
  */
 public class ProjectDAO {
-	
+
 	private static final Logger log = Logger.getLogger(ProjectDAO.class);
-	
 	//  private constructor
 	private ProjectDAO() { }
 	/**
@@ -26,14 +25,13 @@ public class ProjectDAO {
 	public static ProjectDAO getInstance() { 
 		return new ProjectDAO(); 
 	}
-
+	
 	/**
 	 * @param projectId
 	 * @return null if not found
 	 * @throws Exception
 	 */
 	public ProjectDTO getProjectDTOForProjectId( int projectId ) throws Exception {
-		
 		ProjectDTO returnItem = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -69,15 +67,12 @@ public class ProjectDAO {
 		return returnItem;
 	}
 	
-	
-
 	/**
 	 * @param projectId
 	 * @return null if not found
 	 * @throws Exception
 	 */
 	public ProjectTblSubPartsForProjectLists getProjectTblSubPartsForProjectListsForProjectId( int projectId ) throws Exception {
-		
 		ProjectTblSubPartsForProjectLists returnItem = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -122,7 +117,6 @@ public class ProjectDAO {
 	 * @throws Exception
 	 */
 	public ProjectDTO getProjectDTOForAuthShareableObjectId( int authShareableObjectId ) throws Exception {
-		
 		ProjectDTO returnItem = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -164,7 +158,6 @@ public class ProjectDAO {
 	 * @throws SQLException
 	 */
 	private ProjectDTO populateResultObject(ResultSet rs) throws SQLException {
-		
 		ProjectDTO returnItem = new ProjectDTO();
 		returnItem.setId( rs.getInt( "id" ) );
 		returnItem.setAuthShareableObjectId( rs.getInt( "auth_shareable_object_id" ) );
@@ -196,7 +189,6 @@ public class ProjectDAO {
 	 * @throws Exception
 	 */
 	public Integer getAuthShareableObjectIdForProjectId( int projectId ) throws Exception {
-		
 		Integer authShareableObjectId = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -240,7 +232,6 @@ public class ProjectDAO {
 	 * @throws Exception
 	 */
 	public ProjectDTO getProjectLockedPublicAccessLevelPublicAccessLockedForProjectId( int projectId ) throws Exception {
-		
 		ProjectDTO returnItem = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -355,7 +346,6 @@ public class ProjectDAO {
 	 * @throws Exception
 	 */
 	public void updateTitle( int id, String title ) throws Exception {
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -397,7 +387,6 @@ public class ProjectDAO {
 	 * @throws Exception
 	 */
 	public void updateAbstract( int id, String abstractText ) throws Exception {
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -438,7 +427,6 @@ public class ProjectDAO {
 	 * @throws Exception
 	 */
 	public void updateSetEnabledZeroAndMarkToDeleteOne( int id, int authUserId ) throws Exception {
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -480,7 +468,6 @@ public class ProjectDAO {
 	 * @throws Exception
 	 */
 	public void updatePublicAccessLevel( int id, Integer publicAccessLevel ) throws Exception {
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -526,7 +513,6 @@ public class ProjectDAO {
 	 * @throws Exception
 	 */
 	public void updatePublicAccessLocked( int id, boolean publicAccessLocked ) throws Exception {
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -568,7 +554,6 @@ public class ProjectDAO {
 	 * @throws Exception
 	 */
 	public void updateProjectLocked( int id, boolean projectLocked ) throws Exception {
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;

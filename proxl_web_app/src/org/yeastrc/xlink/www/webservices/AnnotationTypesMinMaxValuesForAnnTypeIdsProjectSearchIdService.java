@@ -31,7 +31,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
 @Path("/annotationTypes")
 public class AnnotationTypesMinMaxValuesForAnnTypeIdsProjectSearchIdService {
-	
+
 	private static final Logger log = Logger.getLogger(AnnotationTypesMinMaxValuesForAnnTypeIdsProjectSearchIdService.class);
 	
 	/**
@@ -53,7 +53,6 @@ public class AnnotationTypesMinMaxValuesForAnnTypeIdsProjectSearchIdService {
 			@QueryParam( "ann_type_id" ) List<Integer> annotationTypeIds,
 			@Context HttpServletRequest request )
 	throws Exception {
-		
 		if ( projectSearchId == 0 ) {
 			String msg = ": projectSearchId is zero or not provided";
 			log.error( msg );
@@ -121,7 +120,6 @@ public class AnnotationTypesMinMaxValuesForAnnTypeIdsProjectSearchIdService {
 			}
 			////////   Auth complete
 			//////////////////////////////////////////
-			
 			Integer searchId =
 					MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
 			if ( searchId == null ) {

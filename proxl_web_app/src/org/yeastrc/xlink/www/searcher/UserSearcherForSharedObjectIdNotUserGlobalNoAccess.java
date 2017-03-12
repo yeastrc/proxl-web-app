@@ -5,11 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-
 /**
  * Return a list of users in the database for 
  * 	a query and not in the project id and not Global No access allowed and Not User Disabled
@@ -17,20 +15,17 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  *
  */
 public class UserSearcherForSharedObjectIdNotUserGlobalNoAccess {
-
-	private static final Logger log = Logger.getLogger(UserSearcherForSharedObjectIdNotUserGlobalNoAccess.class);
 	
+	private static final Logger log = Logger.getLogger(UserSearcherForSharedObjectIdNotUserGlobalNoAccess.class);
 	private UserSearcherForSharedObjectIdNotUserGlobalNoAccess() { }
 	private static final UserSearcherForSharedObjectIdNotUserGlobalNoAccess _INSTANCE = new UserSearcherForSharedObjectIdNotUserGlobalNoAccess();
 	public static UserSearcherForSharedObjectIdNotUserGlobalNoAccess getInstance() { return _INSTANCE; }
-
-
+	
 	private static final String SQL = " SELECT auth_user.user_mgmt_user_id FROM auth_user"
 			+ " INNER JOIN auth_shared_object_users ON auth_user.id = auth_shared_object_users.user_id "
 			+ " WHERE "
 			+  " auth_shared_object_users.shared_object_id = ?  "
 			+  " OR auth_user.user_access_level = " + AuthAccessLevelConstants.ACCESS_LEVEL_NONE;
-	
 	/**
 	 * Return a list of auth_user.id in the database for 
 	 * in the project id and not Global No access allowed
@@ -40,9 +35,7 @@ public class UserSearcherForSharedObjectIdNotUserGlobalNoAccess {
 	 * @throws Exception
 	 */
 	public Set<Integer> getUserMgmtUserIdListForSharedObjectId( int sharedObjectId ) throws Exception {
-		
 		Set<Integer> userIds = new HashSet<>();
-		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;

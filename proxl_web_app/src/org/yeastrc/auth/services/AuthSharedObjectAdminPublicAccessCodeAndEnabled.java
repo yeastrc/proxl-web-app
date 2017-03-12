@@ -51,13 +51,9 @@ public class AuthSharedObjectAdminPublicAccessCodeAndEnabled {
 	public void deactivatePublicAccessCode( int authShareableObjectId ) throws IllegalArgumentException, Exception {
 		AuthSharedObjectDAO authSharedObjectDAO = AuthSharedObjectDAO.getInstance();
 //		AuthSharedObjectDTO authSharedObjectDTO = authSharedObjectDAO.getAuthSharedObjectDTOForSharedObjectId( authShareableObjectId );
-//		
 //		if ( authSharedObjectDTO == null ) {
-//			
 //			String msg = "authSharedObjectDTO not found for authShareableObjectId: " + authShareableObjectId;
-//			
 //			log.warn(msg);
-//			
 //			throw new IllegalArgumentException(msg);
 //		}
 		authSharedObjectDAO.updatePublicAccessCodeEnabled(authShareableObjectId, false /* publicAccessCodeEnabled */);
@@ -71,13 +67,9 @@ public class AuthSharedObjectAdminPublicAccessCodeAndEnabled {
 	public String regeneratePublicAccessCode( int authShareableObjectId ) throws IllegalArgumentException, Exception {
 		AuthSharedObjectDAO authSharedObjectDAO = AuthSharedObjectDAO.getInstance();
 //		AuthSharedObjectDTO authSharedObjectDTO = authSharedObjectDAO.getAuthSharedObjectDTOForSharedObjectId( authShareableObjectId );
-//		
 //		if ( authSharedObjectDTO == null ) {
-//			
 //			String msg = "authSharedObjectDTO not found for authShareableObjectId: " + authShareableObjectId;
-//			
 //			log.warn(msg);
-//			
 //			throw new IllegalArgumentException(msg);
 //		}
 		String publicAccessCode = GenerateRandomStringForCode.getInstance().generateRandomStringForCode();

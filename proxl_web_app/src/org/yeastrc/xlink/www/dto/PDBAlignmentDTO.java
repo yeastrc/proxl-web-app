@@ -8,11 +8,7 @@ public class PDBAlignmentDTO {
 	private String chainId;
 	private int proteinSequenceId;
 	private String alignedPDBSequence;
-	
 	private String alignedExperimentalSequence;
-	
-	
-	
 	
 	public int getPdbFileId() {
 		return pdbFileId;

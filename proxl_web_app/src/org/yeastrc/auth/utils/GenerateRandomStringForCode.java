@@ -9,7 +9,6 @@ package org.yeastrc.auth.utils;
 public class GenerateRandomStringForCode {
 
 //	private static final Logger log = Logger.getLogger(GenerateRandomStringForCode.class);
-	
 	private GenerateRandomStringForCode() { }
 	private static final GenerateRandomStringForCode _INSTANCE = new GenerateRandomStringForCode();
 	public static GenerateRandomStringForCode getInstance() { return _INSTANCE; }
@@ -17,7 +16,6 @@ public class GenerateRandomStringForCode {
 	private static final int minKeyLength = 62;
 	private static final int maxKeyLength = 65;
 	private static final int minMaxKeyLengthDiff = maxKeyLength - minKeyLength;
-	
 
 	/**
 	 * Generate random string in length between minKeyLength and maxKeyLength

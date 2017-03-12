@@ -29,7 +29,6 @@ import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDBDataOutOfSyncException;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-
 /**
  * 
  *
@@ -46,7 +45,6 @@ public class AnnotationTypesForProjectSearchIdService {
 			@QueryParam( "projectSearchId" ) int projectSearchId,
 			@Context HttpServletRequest request )
 	throws Exception {
-		
 		if ( projectSearchId == 0 ) {
 			String msg = ": Provided searchId is zero";
 			log.error( msg );
@@ -105,7 +103,6 @@ public class AnnotationTypesForProjectSearchIdService {
 			}
 			////////   Auth complete
 			//////////////////////////////////////////
-			
 			Integer searchId =
 					MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
 			if ( searchId == null ) {
@@ -119,7 +116,6 @@ public class AnnotationTypesForProjectSearchIdService {
 			}
 			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
 			searchIdsCollection.add( searchId );
-			
 			//  Get  Annotation Type records for PSM
 			//    Filterable annotations
 			Map<Integer, Map<Integer, AnnotationTypeDTO>> srchPgmFilterablePsmAnnotationTypeDTOListPerSearchIdMap =
@@ -130,7 +126,6 @@ public class AnnotationTypesForProjectSearchIdService {
 				//  No records were found, probably an error   TODO
 				srchPgmFilterablePsmAnnotationTypeDTOMap = new HashMap<>();
 			}
-			
 			Map<Integer,SearchProgramsPerSearchDTO> searchProgramsPerSearchDTOMap = new HashMap<>();
 			List<WebserviceResultEntry> annotationTypeList = new ArrayList<>( srchPgmFilterablePsmAnnotationTypeDTOMap.size() );
 			for ( Map.Entry<Integer, AnnotationTypeDTO> entry : srchPgmFilterablePsmAnnotationTypeDTOMap.entrySet() ) {
@@ -157,11 +152,9 @@ public class AnnotationTypesForProjectSearchIdService {
 					return o1.getAnnotationTypeDTO().getName().compareToIgnoreCase( o2.getAnnotationTypeDTO().getName() );
 				}
 			});
-			
 			WebserviceResult result = new WebserviceResult();
 			result.setAnnotationTypeList( annotationTypeList );;
 			return result;
-			
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
@@ -175,13 +168,11 @@ public class AnnotationTypesForProjectSearchIdService {
 		}
 	}
 	
-
 	/**
 	 * result from Webservice
 	 *
 	 */
 	public static class WebserviceResult {
-
 		private List<WebserviceResultEntry> annotationTypeList;
 		public List<WebserviceResultEntry> getAnnotationTypeList() {
 			return annotationTypeList;
@@ -191,16 +182,14 @@ public class AnnotationTypesForProjectSearchIdService {
 			this.annotationTypeList = annotationTypeList;
 		}
 	}
-
+	
 	/**
 	 * Entry in WebserviceResult
 	 *
 	 */
 	public static class WebserviceResultEntry {
-
 		private AnnotationTypeDTO annotationTypeDTO;
 		private SearchProgramsPerSearchDTO searchProgramsPerSearchDTO;
-
 		public AnnotationTypeDTO getAnnotationTypeDTO() {
 			return annotationTypeDTO;
 		}
@@ -214,6 +203,5 @@ public class AnnotationTypesForProjectSearchIdService {
 				SearchProgramsPerSearchDTO searchProgramsPerSearchDTO) {
 			this.searchProgramsPerSearchDTO = searchProgramsPerSearchDTO;
 		}
-
 	}
 }

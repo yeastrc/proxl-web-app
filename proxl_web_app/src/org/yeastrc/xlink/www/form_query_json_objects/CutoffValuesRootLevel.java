@@ -8,27 +8,21 @@ import java.util.Map;
  *
  */
 public class CutoffValuesRootLevel {
-
 	/**
 	 * Key is Search Id
 	 */
 	private Map<String,CutoffValuesSearchLevel> searches;
-
 	/**
 	 * Key is Search Id
 	 * 
 	 * @return
 	 */
 	public Map<String, CutoffValuesSearchLevel> getSearches() {
-		
 		if ( searches == null ) {
-			
 			searches = new HashMap<>();
 		}
-		
 		return searches;
 	}
-
 	/**
 	 * Key is Search Id
 	 * 
@@ -37,5 +31,4 @@ public class CutoffValuesRootLevel {
 	public void setSearches(Map<String, CutoffValuesSearchLevel> searches) {
 		this.searches = searches;
 	}
-
 }

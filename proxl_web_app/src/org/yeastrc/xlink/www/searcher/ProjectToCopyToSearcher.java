@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.objects.ProjectToCopyToResultItem;
@@ -19,11 +18,9 @@ import org.yeastrc.xlink.www.objects.ProjectToCopyToResultItem;
 public class ProjectToCopyToSearcher {
 
 	private static final Logger log = Logger.getLogger(ProjectToCopyToSearcher.class);
-	
 	private ProjectToCopyToSearcher() { }
 	private static final ProjectToCopyToSearcher _INSTANCE = new ProjectToCopyToSearcher();
 	public static ProjectToCopyToSearcher getInstance() { return _INSTANCE; }
-	
 	
 	private static final String anyProjectsExistExcludingProjectId_SQL =
 			"SELECT id FROM project "
@@ -35,7 +32,6 @@ public class ProjectToCopyToSearcher {
 	 * @throws Exception
 	 */
 	public boolean anyProjectsExistExcludingProjectId( int projectId ) throws Exception {
-		
 		boolean result = false;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -82,7 +78,6 @@ public class ProjectToCopyToSearcher {
 	 * @throws Exception
 	 */
 	public List<ProjectToCopyToResultItem> getAllExcludingProjectId( int projectId ) throws Exception {
-		
 		List<ProjectToCopyToResultItem>  returnList = new ArrayList<>();
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -119,15 +114,12 @@ public class ProjectToCopyToSearcher {
 		return returnList;
 	}
 	
-
-	
 	private static final String anyProjectsExistForAuthUserExcludingProjectId_SQL = "SELECT project.id FROM project " 
 			+ " INNER JOIN auth_shared_object_users ON project.auth_shareable_object_id = auth_shared_object_users.shared_object_id"
 			+ " WHERE auth_shared_object_users.user_id = ? AND auth_shared_object_users.access_level <= ?"
 			+ " AND project.id != ? "
 			+ " AND project.enabled = 1 AND project.marked_for_deletion = 0 AND project_locked = 0 "
 			+ " LIMIT 1";
-
 	/**
 	 * @param authUserId
 	 * @param maxAuthLevel
@@ -136,7 +128,6 @@ public class ProjectToCopyToSearcher {
 	 * @throws Exception
 	 */
 	public boolean anyProjectsExistForAuthUserExcludingProjectId( int authUserId, int maxAuthLevel, int projectId ) throws Exception {
-		
 		boolean result = false;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -175,14 +166,12 @@ public class ProjectToCopyToSearcher {
 	}
 	
 	///////////
-	
 	private static final String getForAuthUserExcludingProjectId_SQL = "SELECT project.id, project.title FROM project " 
 			+ " INNER JOIN auth_shared_object_users ON project.auth_shareable_object_id = auth_shared_object_users.shared_object_id"
 			+ " WHERE auth_shared_object_users.user_id = ? AND auth_shared_object_users.access_level <= ?"
 			+ " AND project.id != ? "
 			+ " AND project.enabled = 1 AND project.marked_for_deletion = 0 AND project_locked = 0"
 			+ " ORDER BY project.title";
-
 	/**
 	 * @param authUserId
 	 * @param maxAuthLevel
@@ -191,7 +180,6 @@ public class ProjectToCopyToSearcher {
 	 * @throws Exception
 	 */
 	public List<ProjectToCopyToResultItem> getForAuthUserExcludingProjectId( int authUserId, int maxAuthLevel, int projectId ) throws Exception {
-		
 		List<ProjectToCopyToResultItem>  returnList = new ArrayList<>();
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -230,18 +218,15 @@ public class ProjectToCopyToSearcher {
 		return returnList;
 	}
 	
-	
 	/**
 	 * @param rs
 	 * @return
 	 * @throws SQLException 
 	 */
 	private ProjectToCopyToResultItem populateProjectToCopyToResultItemFromResultObject( ResultSet rs ) throws SQLException {
-		
 		ProjectToCopyToResultItem item = new ProjectToCopyToResultItem();
 		item.setProjectId( rs.getInt( "id" ) );
 		item.setProjectTitle( rs.getString( "title" ) );
 		return item;
 	}
-		
 }

@@ -30,7 +30,6 @@ public class GenerateInviteCodeSaveInviteRecordService {
 			AuthUserInviteTrackingDAO authUserInviteTrackingDAO = AuthUserInviteTrackingDAO.getInstance();
 			authUserInviteTrackingDAO.save( authUserInviteTrackingDTO );
 			authUserInviteTrackingDAO.updateCodeReplacedByNewerToTrueForPrevInvites( authUserInviteTrackingDTO );
-			
 		} catch ( Exception e ) {
 			String msg = "Exception  SubmittingAuthUserId: " + authUserInviteTrackingDTO.getSubmittingAuthUserId()
 					+ ", submitIP: " +  authUserInviteTrackingDTO.getSubmitIP() 

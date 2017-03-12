@@ -62,8 +62,11 @@ public class ConfigSystemChangesRegistry {
 		}
 	}
 	
+	/**
+	 * @param configKey
+	 * @throws Exception
+	 */
 	public void specificConfigKeyChanged( String configKey ) throws Exception {
-
 		try {
 			for ( Map.Entry<String,ConfigSystemChangesRegistryItemIF> entry : configSystemChangesItemMap.entrySet() ) {
 				ConfigSystemChangesRegistryItemIF item = entry.getValue();

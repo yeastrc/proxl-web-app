@@ -116,8 +116,6 @@ public class QCPlotPsmCountsVsScoreService {
 						);
 			}
 			
-			
-			
 			PsmCountsVsScoreQCPlotDataJSONRoot psmCountsVsScoreQCPlotDataJSONRoot = 
 					CreatePsmCountsVsScoreQCPlotData.getInstance()
 					.create( 

@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 //import javax.servlet.http.HttpSession;
@@ -22,7 +21,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDBDataOutOfSyncException;
@@ -40,7 +38,6 @@ import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,7 +49,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Viewer_PSMsForMultUDR_Data_Service {
 
 	private static final Logger log = Logger.getLogger(Viewer_PSMsForMultUDR_Data_Service.class);
-
+	
 	private static enum LinkType { Crosslink, Looplink }
 	
 	/**
@@ -60,12 +57,9 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 	 *
 	 */
 	public static class Viewer_UDR_Data_Service_Request {
-
 		private List<Integer> projectSearchIds;
-		
 		private List<Viewer_UDR_Data_Service_Single_UDR_Request> crosslinkUdrRequestList;
 		private List<Viewer_UDR_Data_Service_Single_UDR_Request> looplinkUdrRequestList;
-
 		public List<Viewer_UDR_Data_Service_Single_UDR_Request> getCrosslinkUdrRequestList() {
 			return crosslinkUdrRequestList;
 		}
@@ -84,9 +78,11 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		public void setProjectSearchIds(List<Integer> projectSearchIds) {
 			this.projectSearchIds = projectSearchIds;
 		}
-
 	}
-
+	/**
+	 * 
+	 *
+	 */
 	public static class Viewer_UDR_Data_Service_Single_UDR_Request {
 		private Integer protId1;
 		private Integer pos1;
@@ -116,7 +112,6 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		public void setPos2(Integer pos2) {
 			this.pos2 = pos2;
 		}
-
 	}
 	
 	/**
@@ -124,9 +119,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 	 *
 	 */
 	public static class Viewer_UDR_Data_Service_Result {
-
 		private Map<Integer,Viewer_UDR_Data_Service_Single_Search_Result> dataForSearches;
-
 		public Map<Integer, Viewer_UDR_Data_Service_Single_Search_Result> getDataForSearches() {
 			return dataForSearches;
 		}
@@ -134,15 +127,10 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 			this.dataForSearches = dataForSearches;
 		}
 	}
-	
-
 	public static class Viewer_UDR_Data_Service_Single_Search_Result {
-		
 		private List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> crosslinkUdrItemList;
 		private List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> looplinkUdrItemList;
-		
 		private List<String> psmValuesNames;
-
 		public List<String> getPsmValuesNames() {
 			return psmValuesNames;
 		}
@@ -161,9 +149,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		public void setLooplinkUdrItemList(List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> looplinkUdrItemList) {
 			this.looplinkUdrItemList = looplinkUdrItemList;
 		}
-
 	}
-
 	/**
 	 * Result for 1 UDR within a search
 	 *
@@ -174,7 +160,6 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		private Integer protId2;
 		private Integer pos2;
 		private List<Viewer_PSM_UDR_Data_Service_Result_PSM_Item> psmItemList;
-		
 		public Integer getProtId1() {
 			return protId1;
 		}
@@ -205,11 +190,8 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		public void setPsmItemList(List<Viewer_PSM_UDR_Data_Service_Result_PSM_Item> psmItemList) {
 			this.psmItemList = psmItemList;
 		}
-
 	}
-
 	public static class Viewer_PSM_UDR_Data_Service_Result_PSM_Item {
-		
 		private int psmId;
 		private List<String> psmValues;
 		public int getPsmId() {
@@ -226,7 +208,12 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		}
 	}
 	
-	
+	/**
+	 * @param queryJSONString
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getMultPsmUDRData") 
@@ -237,6 +224,12 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		return getViewerDataMultUDRInternalFromJSON( queryJSONString, request );
 	}
 	
+	/**
+	 * @param webserviceRequest
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@POST
 	@Path("/getMultPsmUDRData") 
 	@Consumes( MediaType.APPLICATION_JSON )
@@ -245,7 +238,6 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 			Viewer_UDR_Data_Service_Request webserviceRequest,
 			@Context HttpServletRequest request )
 					throws Exception {
-		
 		return getViewerDataMultUDRInternal( webserviceRequest, request );
 	}
 	
@@ -259,7 +251,6 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 			String queryJSONString,
 			HttpServletRequest request )
 	throws Exception {
-
 		if ( StringUtils.isEmpty( queryJSONString ) ) {
 			String msg = "Provided 'query' is null or empty";
 			log.error( msg );
@@ -269,10 +260,8 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 					.build()
 					);
 		}
-
 		//  Jackson JSON Mapper object for JSON deserialization and serialization
 		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		
 		Viewer_UDR_Data_Service_Request webserviceRequest = null;
 		try {
 			webserviceRequest = jacksonJSON_Mapper.readValue( queryJSONString, Viewer_UDR_Data_Service_Request.class );
@@ -301,11 +290,9 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 					.build()
 					);
 		}
-
 		return getViewerDataMultUDRInternal( webserviceRequest, request );
 	}
-
-
+	
 	/**
 	 * @param webserviceRequest
 	 * @param linkType
@@ -319,7 +306,6 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 					throws Exception {
 		try {
 			List<Integer> projectSearchIdList = webserviceRequest.projectSearchIds;
-			 
 			if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
 				String msg = "Provided searchIds is null or empty, searchIds = " + projectSearchIdList;
 				log.warn(msg);
@@ -329,7 +315,6 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 						.build()
 						);
 			}
-
 			//   Get the project id for this search
 			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
 			projectSearchIdsSet.addAll( projectSearchIdList );
@@ -378,21 +363,17 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 						.build()
 						);
 			}
-
 			////////   Auth complete
 			//////////////////////////////////////////
 			
 			Viewer_UDR_Data_Service_Result viewer_UDR_Data_Service_Result = new Viewer_UDR_Data_Service_Result();
 			Map<Integer,Viewer_UDR_Data_Service_Single_Search_Result> dataForSearches = new HashMap<>();
 			viewer_UDR_Data_Service_Result.dataForSearches = dataForSearches;
-			
 			Set<Integer> projectSearchIdSet = new HashSet<>( projectSearchIdList );
 			List<Integer> projectSearchIdListDeduppedSorted = new ArrayList<Integer>( projectSearchIdSet );
 			Collections.sort( projectSearchIdListDeduppedSorted );
-			
 			Set<Integer> searchIds = new HashSet<>();
 			Map<Integer,Integer> projectSearchIdToSearchIdMap = new HashMap<>();
-			
 			for ( Integer projectSearchId : projectSearchIdListDeduppedSorted ) {
 				Integer searchId = MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
 				if ( searchId == null ) {
@@ -406,46 +387,34 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 				searchIds.add( searchId );
 				projectSearchIdToSearchIdMap.put( projectSearchId, searchId );
 			}			
-			
 			//             Get Annotation Type records for PSM and Peptide
 			//  Get  Annotation Type records for PSM
 			Map<Integer, Map<Integer, AnnotationTypeDTO>> 
 			srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap =
 					GetAnnotationTypeData.getInstance().getAll_Psm_Filterable_ForSearchIds( searchIds );
-		
 			//  Create empty searcherCutoffValuesSearchLevel so returns everything
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
-			
-			
-
 			for ( Integer projectSearchId : projectSearchIdListDeduppedSorted ) {
 				Integer searchId = projectSearchIdToSearchIdMap.get( projectSearchId );
-				
 				Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_Psm_AnnotationType_DTOMap = 
 						srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap.get( searchId );
-
 				if ( srchPgm_Filterable_Psm_AnnotationType_DTOMap == null ) {
 					//  No records were found, probably an error   TODO
 					srchPgm_Filterable_Psm_AnnotationType_DTOMap = new HashMap<>();
 				}
-				
 				List<AnnotationTypeDTO> annotationTypesOrderByNameList = new ArrayList<>( srchPgm_Filterable_Psm_AnnotationType_DTOMap.size() );
 				Set<Integer> annotationTypeIdsForGettingAnnotationData = new HashSet<>();
-				
 				for ( Map.Entry<Integer, AnnotationTypeDTO> entry : srchPgm_Filterable_Psm_AnnotationType_DTOMap.entrySet() ) {
 					annotationTypesOrderByNameList.add( entry.getValue() );
 					annotationTypeIdsForGettingAnnotationData.add( entry.getKey() );
 				}
-				
 				Collections.sort( annotationTypesOrderByNameList, new Comparator<AnnotationTypeDTO>() {
 					@Override
 					public int compare(AnnotationTypeDTO o1, AnnotationTypeDTO o2) {
 						return o1.getName().compareToIgnoreCase( o2.getName() );
 					}
 				});
-				
 				Map<Integer,SearchProgramsPerSearchDTO> searchProgramsPerSearchDTO_MappedOnId = new HashMap<>();
-				
 				List<String> psmValuesNames = new ArrayList<>();
 				for ( AnnotationTypeDTO annotationTypeDTO : annotationTypesOrderByNameList ) {
 					Integer searchProgramsPerSearchId = annotationTypeDTO.getSearchProgramsPerSearchId();
@@ -462,16 +431,12 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 					String annTypeNameDesc = annotationTypeDTO.getName() + "(" + searchProgramsPerSearchDTO.getDisplayName() + ")";
 					psmValuesNames.add( annTypeNameDesc );
 				}
-				
 				//  Output Result Data
 				Viewer_UDR_Data_Service_Single_Search_Result single_Search_Result = new Viewer_UDR_Data_Service_Single_Search_Result();
 				dataForSearches.put( searchId, single_Search_Result );
-				
 				single_Search_Result.setPsmValuesNames( psmValuesNames );
-				
 				if ( webserviceRequest.crosslinkUdrRequestList != null 
 						&& ( ! webserviceRequest.crosslinkUdrRequestList.isEmpty() ) ) {
-				
 					single_Search_Result.crosslinkUdrItemList = 
 							processCrosslinkOrLooplink(
 									searchId, 
@@ -481,10 +446,8 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 									annotationTypesOrderByNameList,
 									annotationTypeIdsForGettingAnnotationData );
 				}
-
 				if ( webserviceRequest.looplinkUdrRequestList != null 
 						&& ( ! webserviceRequest.looplinkUdrRequestList.isEmpty() ) ) {
-
 					single_Search_Result.looplinkUdrItemList = 
 							processCrosslinkOrLooplink(
 									searchId, 
@@ -495,31 +458,20 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 									annotationTypeIdsForGettingAnnotationData );
 				}
 			}
-
 			return viewer_UDR_Data_Service_Result;
-
 		} catch ( WebApplicationException e ) {
-
 			throw e;
-
 		} catch ( Exception e ) {
-
 			String msg = "Exception caught: " + e.toString();
-
 			log.error( msg, e );
-
 			    throw new WebApplicationException(
 			    	      Response.status(WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE)  //  return 500 error
 			    	        .entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT )
 			    	        .build()
 			    	        );
-			
 		}
-
-
 	}
-
-
+	
 	/**
 	 * @param searchId
 	 * @param linkType
@@ -540,29 +492,20 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 			Set<Integer> annotationTypeIdsForGettingAnnotationData 
 			)
 					throws Exception, ProxlWebappDataException {
-
-		
 		List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> udrItemList = new ArrayList<>();
-		
 		for ( Viewer_UDR_Data_Service_Single_UDR_Request singleUDRRequest : udrRequestList ) {
-
 			Viewer_PSM_UDR_Data_Service_Result_UDR_Item udrItem = new Viewer_PSM_UDR_Data_Service_Result_UDR_Item(); 
 			udrItemList.add( udrItem );
-			
 			udrItem.protId1 = singleUDRRequest.protId1;
 			udrItem.protId2 = singleUDRRequest.protId2;
 			udrItem.pos1 = singleUDRRequest.pos1;
 			udrItem.pos2 = singleUDRRequest.pos2;
-			
 			List<Viewer_PSM_UDR_Data_Service_Result_PSM_Item> udrPsmItemList = new ArrayList<>();
 			udrItem.psmItemList = udrPsmItemList;
-
 			//  Map<PSM_ID,Map<AnnTypeId,Value>
 			Map<Integer,Map<Integer,Double>> psmAnnValues = null; 
-					
 			if ( linkType == LinkType.Crosslink ) {
 				//  Get psm data for these parameters for Crosslinks
-
 				if ( singleUDRRequest.protId1 == null ) {
 					String msg = "Provided protId1 is null or missing";
 					log.error( msg );
@@ -570,7 +513,6 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 							.entity( msg ).build() );
 				}
-
 				if ( singleUDRRequest.pos1 == null ) {
 					String msg = "Provided pos1 is null or missing";
 					log.error( msg );
@@ -592,7 +534,6 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 							.entity( msg ).build() );
 				}
-			
 				psmAnnValues = 
 						PsmAnnFromCrosslinkProteinSearcher.getInstance()
 						.searchOnSearchProteinCrosslink( 
@@ -601,10 +542,8 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 								singleUDRRequest.protId2, 
 								singleUDRRequest.pos1, 
 								singleUDRRequest.pos2 );
-
 			} else {
 				//  Get peptides for these parameters for Looplinks
-
 				if ( singleUDRRequest.protId1 == null ) {
 					String msg = "Provided protId1 is null or missing";
 					log.error( msg );
@@ -612,7 +551,6 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 							.entity( msg ).build() );
 				}
-
 				if ( singleUDRRequest.pos1 == null ) {
 					String msg = "Provided pos1 is null or missing";
 					log.error( msg );
@@ -627,25 +565,18 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 							.entity( msg ).build() );
 				}
-				
 				psmAnnValues =
 						PsmAnnFromLooplinkProteinSearcher.getInstance().searchOnSearchProteinLooplink( 
 								searchId, singleUDRRequest.protId1, singleUDRRequest.pos1, singleUDRRequest.pos2 );
 			}
-
-
 			for ( Map.Entry<Integer,Map<Integer,Double>> psmAnnValuesEntry : psmAnnValues.entrySet() ) {
-
 				Integer psmId = psmAnnValuesEntry.getKey();
 				Map<Integer,Double> psmAnnotationDataMap = psmAnnValuesEntry.getValue();
-
 				Viewer_PSM_UDR_Data_Service_Result_PSM_Item udrPsmItem = new Viewer_PSM_UDR_Data_Service_Result_PSM_Item();
 				udrPsmItemList.add(udrPsmItem);
-
 				List<String> psmValues = new ArrayList<>();
 				udrPsmItem.setPsmValues( psmValues );
 				udrPsmItem.setPsmId( psmId );
-
 				//  Copy to output by ann type id
 				for ( AnnotationTypeDTO annotationType : annotationTypesOrderByNameList ) {
 					Double psmAnnValue = psmAnnotationDataMap.get( annotationType.getId() );
@@ -661,6 +592,4 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		}
 		return udrItemList;
 	}
-
-
 }

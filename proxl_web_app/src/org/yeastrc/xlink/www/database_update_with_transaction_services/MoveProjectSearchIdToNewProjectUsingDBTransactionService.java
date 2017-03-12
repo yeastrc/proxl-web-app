@@ -1,13 +1,11 @@
 package org.yeastrc.xlink.www.database_update_with_transaction_services;
 
 import java.sql.Connection;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dao.FolderProjectSearchDAO;
 import org.yeastrc.xlink.www.dao.ProjectSearchDAO;
 import org.yeastrc.xlink.www.searcher.ProjectSearchIdAssocSearchIdInProjectIdSearcher;
-
 /**
  * 
  *
@@ -15,7 +13,6 @@ import org.yeastrc.xlink.www.searcher.ProjectSearchIdAssocSearchIdInProjectIdSea
 public class MoveProjectSearchIdToNewProjectUsingDBTransactionService {
 
 	private static final Logger log = Logger.getLogger(MoveProjectSearchIdToNewProjectUsingDBTransactionService.class);
-	
 	MoveProjectSearchIdToNewProjectUsingDBTransactionService() { }
 	private static MoveProjectSearchIdToNewProjectUsingDBTransactionService _INSTANCE = new MoveProjectSearchIdToNewProjectUsingDBTransactionService();
 	public static MoveProjectSearchIdToNewProjectUsingDBTransactionService getInstance() { return _INSTANCE; }
@@ -28,7 +25,6 @@ public class MoveProjectSearchIdToNewProjectUsingDBTransactionService {
 	 * @throws Exception
 	 */
 	public void moveProjectSearchIdToNewProjectId( int[] projectSearchIdList, int newProjectId, boolean moveAllSearches ) throws Exception {
-		
 		Connection dbConnection = null;
 		try {
 			dbConnection = getConnectionWithAutocommitTurnedOff();

@@ -2,7 +2,6 @@ package org.yeastrc.xlink.www.actions;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -18,24 +17,21 @@ import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.TestIsUserSignedIn;
-
 /**
  * 
  *
  */
 public class CacheDataAllLogCurrentCacheSizesAction extends Action {
-
+	
 	private static Logger log = Logger.getLogger( CacheDataAllLogCurrentCacheSizesAction.class );
 	
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
-			  HttpServletResponse response )
-					  throws Exception {
-
+			  HttpServletResponse response ) throws Exception {
+		
 		AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 				GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request, response );
-
 		if ( accessAndSetupWebSessionResult.isNoSession() ) {
 			//  No User session 
 			response.setStatus( 401 );
@@ -62,13 +58,11 @@ public class CacheDataAllLogCurrentCacheSizesAction extends Action {
 				dbConnectionFactoryWeb.printCurrentGetConnectionCounts();
 			}
 			return mapping.findForward( "Success" );
-			
 		} catch ( Exception e ) {
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );
 			response.setStatus( 500 );
 			return mapping.findForward( StrutsGlobalForwardNames.GENERAL_ERROR );
 		}
-		
 	}
 }

@@ -34,7 +34,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.user_web_utils.GetAuthAccessLevelForWebRequest;
 
 /**
- * @author danj
+ * 
  *
  */
 @Path("/project")

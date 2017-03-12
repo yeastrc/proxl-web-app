@@ -18,13 +18,11 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached
  *
  */
 public class SearchDAO {
-	
+
 	private static final Logger log = Logger.getLogger(SearchDAO.class);
-	
 	private SearchDAO() { }
 	public static SearchDAO getInstance() { return new SearchDAO(); }
 	
-
 	/**
 	 * Get the given Search from the database
 	 * 
@@ -35,15 +33,12 @@ public class SearchDAO {
 	 * @throws Exception
 	 */
 	public SearchDTO getSearchFromProjectSearchId( int id ) throws Exception {
-		
 		Search_Core_DTO search_Core_DTO = 
 				Cached_Search_Core_DTO.getInstance().getSearch_Core_DTO( id );
 		if ( search_Core_DTO == null ) {
 			return null;  // EARLY EXIT
 		}
-		
 		SearchDTO searchDTO = new SearchDTO( search_Core_DTO );
-		
 		//  Update projectId to ensure it is the latest.  Could invalidate cache on move but too important
 		Integer projectId = getProjectIdFromProjectSearchId( id );
 		if ( projectId == null ) {
@@ -53,10 +48,8 @@ public class SearchDAO {
 			throw new ProxlWebappInternalErrorException(msg);
 		}
 		searchDTO.setProjectId( projectId );
-		
 		return searchDTO;
 	}
-	
 	
 	private static final String GET_FROM_PROJECT_SEARCH_ID_SQL =
 			"SELECT project_search.search_id, "
@@ -66,7 +59,6 @@ public class SearchDAO {
 			+ " FROM project_search INNER JOIN search ON project_search.search_id = search.id "
 			+ " WHERE project_search.id = ? "
 			+    " AND project_search.status_id = " + SearchRecordStatus.IMPORT_COMPLETE_VIEW.value();
-	
 	/**
 	 * Get the given Search from the database
 	 * 
@@ -77,7 +69,6 @@ public class SearchDAO {
 	 * @throws Exception
 	 */
 	public Search_Core_DTO getSearch_Core_DTO_FromProjectSearchId( int id ) throws Exception {
-		
 		Search_Core_DTO search = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -126,7 +117,7 @@ public class SearchDAO {
 		}
 		return search;
 	}
-
+	
 	/**
 	 * Get the project id for the project_search.id from the database
 	 * 
@@ -137,7 +128,6 @@ public class SearchDAO {
 	 * @throws Exception
 	 */
 	public Integer getProjectIdFromProjectSearchId( int id ) throws Exception {
-		
 		Integer result = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -171,51 +161,5 @@ public class SearchDAO {
 		}
 		return result;
 	}
-	
-	
-	///  Removed since field 'project_id' no longer on 'search' table
-//	/**
-//	 * Get the project id for the search id from the database
-//	 * 
-//	 * @param id
-//	 * @return
-//	 * @throws Exception
-//	 */
-//	public Integer getSearchProjectId( int id ) throws Exception {
-//		
-//		Integer result = null;
-//		Connection conn = null;
-//		PreparedStatement pstmt = null;
-//		ResultSet rs = null;
-//		String sql = "SELECT project_id FROM search WHERE id = ?";
-//		try {
-//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-//			pstmt = conn.prepareStatement( sql );
-//			pstmt.setInt( 1, id );
-//			rs = pstmt.executeQuery();
-//			if( rs.next() ) {
-//				result = rs.getInt( "project_id" );
-//			}
-//		} catch ( Exception e ) {
-//			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
-//			throw e;
-//		} finally {
-//			// be sure database handles are closed
-//			if( rs != null ) {
-//				try { rs.close(); } catch( Throwable t ) { ; }
-//				rs = null;
-//			}
-//			if( pstmt != null ) {
-//				try { pstmt.close(); } catch( Throwable t ) { ; }
-//				pstmt = null;
-//			}
-//			if( conn != null ) {
-//				try { conn.close(); } catch( Throwable t ) { ; }
-//				conn = null;
-//			}
-//		}
-//		return result;
-//	}
-	
 
 }

@@ -1,9 +1,6 @@
 package org.yeastrc.auth.dto;
 
 import java.util.Date;
-
-
-
 /**
  * auth_user_invite_tracking table
  *
@@ -125,21 +122,3 @@ public class AuthUserInviteTrackingDTO {
 	}
 
 }
-
-
-//CREATE TABLE IF NOT EXISTS auth_user_invite_tracking (
-//		  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//		  submitting_auth_user_id INT UNSIGNED NOT NULL,
-//		  invited_user_email VARCHAR(255) NOT NULL,
-//		  invited_user_access_level SMALLINT NOT NULL,
-//		  invited_shared_object_id INT UNSIGNED NULL,
-//		  invite_create_date DATETIME NOT NULL,
-//		  invite_used_date DATETIME NULL,
-//		  invite_tracking_code VARCHAR(255) NOT NULL,
-//		  submit_ip VARCHAR(255) NOT NULL,
-//		  use_ip VARCHAR(255) NULL,
-//		  code_replaced_by_newer TINYINT(1) NULL,
-//		  invite_revoked TINYINT(1) NULL,
-//		  revoking_auth_user_id INT UNSIGNED NULL,
-//		  revoked_date DATETIME NULL,
-		

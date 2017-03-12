@@ -12,12 +12,10 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
  * Table auth_user
- *
  */
 public class AuthUserDAO {
 
 	private static final Logger log = Logger.getLogger(AuthUserDAO.class);
-	
 	private AuthUserDAO() { }
 	public static AuthUserDAO getInstance() { return new AuthUserDAO(); }
 	
@@ -366,13 +364,11 @@ public class AuthUserDAO {
 		}
 	}
 	
-
 	/**
 	 * @param authUserId
 	 * @throws Exception
 	 */
 	public void updateLastLogin( int authUserId, String lastLoginIP ) throws Exception {
-		
 		Connection dbConnection = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -405,5 +401,4 @@ public class AuthUserDAO {
 			}
 		}
 	}
-	
 }

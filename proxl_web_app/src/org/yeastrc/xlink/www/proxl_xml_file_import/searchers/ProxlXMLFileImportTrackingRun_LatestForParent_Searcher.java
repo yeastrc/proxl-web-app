@@ -3,13 +3,10 @@ package org.yeastrc.xlink.www.proxl_xml_file_import.searchers;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingRunDTO;
 import org.yeastrc.xlink.base.proxl_xml_file_import.populate_dto_from_result.ProxlXMLFileImportTrackingRun_PopulateDTO;
-
-
 
 /**
  * 
@@ -17,13 +14,9 @@ import org.yeastrc.xlink.base.proxl_xml_file_import.populate_dto_from_result.Pro
  */
 public class ProxlXMLFileImportTrackingRun_LatestForParent_Searcher {
 
-
 	private static final Logger log = Logger.getLogger(ProxlXMLFileImportTrackingRun_LatestForParent_Searcher.class);
-	
-
 	//  private constructor
 	private ProxlXMLFileImportTrackingRun_LatestForParent_Searcher() { }
-	
 	/**
 	 * @return newly created instance
 	 */
@@ -31,72 +24,49 @@ public class ProxlXMLFileImportTrackingRun_LatestForParent_Searcher {
 		return new ProxlXMLFileImportTrackingRun_LatestForParent_Searcher(); 
 	}
 	
-	
+	/**
+	 * @param proxlXMLFileImportTrackingId
+	 * @return
+	 * @throws Exception
+	 */
 	public ProxlXMLFileImportTrackingRunDTO getLatestRunForProxlXMLFileImportTrackingDTO( int proxlXMLFileImportTrackingId ) throws Exception {
-		
 		ProxlXMLFileImportTrackingRunDTO result = null;
-		
-
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		
 		final String sql =  "SELECT * FROM proxl_xml_file_import_tracking_run"
 				+ " WHERE id = "
 				+ 		"( SELECT MAX(id) from proxl_xml_file_import_tracking_run "
 				+ 		" WHERE proxl_xml_file_import_tracking_id = ? )";
-
 		try {
-			
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			
 			pstmt = conn.prepareStatement( sql );
-			
 			int paramCounter = 0;
-			
 			paramCounter++;
 			pstmt.setInt( paramCounter, proxlXMLFileImportTrackingId );
-				
-			
 			rs = pstmt.executeQuery();
-			
 			if( rs.next() ) {
-				
 				result = ProxlXMLFileImportTrackingRun_PopulateDTO.getInstance().populateResultObject( rs );
 			}
-			
 		} catch ( Exception e ) {
-			
 			String msg = "Failed getLatestRunForProxlXMLFileImportTrackingDTO(...), sql: " + sql;
-			
 			log.error( msg, e );
-			
 			throw e;
-			
-
 		} finally {
-			
 			// be sure database handles are closed
 			if( rs != null ) {
 				try { rs.close(); } catch( Throwable t ) { ; }
 				rs = null;
 			}
-			
 			if( pstmt != null ) {
 				try { pstmt.close(); } catch( Throwable t ) { ; }
 				pstmt = null;
 			}
-			
 			if( conn != null ) {
 				try { conn.close(); } catch( Throwable t ) { ; }
 				conn = null;
 			}
-			
 		}
-		
 		return result;
-		
 	}
-	
-
 }

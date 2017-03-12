@@ -120,7 +120,7 @@ public class SearchDTO implements Comparable<SearchDTO> {
 	
 	public List<SearchWebLinksDTO> getWebLinks() throws Exception {
 		try {
-			return SearchWebLinksSearcher.getInstance().getWebLinksForSearch(this);
+			return SearchWebLinksSearcher.getInstance().getWebLinksForSearch( this.projectSearchId );
 		} catch ( Exception e ) {
 			String msg = "Exception caught in getWebLinks(): " + e.toString();
 			log.error( msg, e );

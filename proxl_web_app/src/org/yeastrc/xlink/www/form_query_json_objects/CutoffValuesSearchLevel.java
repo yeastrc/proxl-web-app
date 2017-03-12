@@ -37,20 +37,12 @@ public class CutoffValuesSearchLevel {
 		this.projectSearchId = searchId;
 	}
 
-	//  Not needed
-//	public int getSearchId() {
-//		return projectSearchId;
-//	}
-	
-	
 	public int getProjectSearchId() {
 		return projectSearchId;
 	}
 	public void setProjectSearchId(int projectSearchId) {
 		this.projectSearchId = projectSearchId;
 	}
-	
-	
 	public void setPsmCutoffValues(
 			Map<String, CutoffValuesAnnotationLevel> psmCutoffValues) {
 		this.psmCutoffValues = psmCutoffValues;
@@ -59,6 +51,4 @@ public class CutoffValuesSearchLevel {
 			Map<String, CutoffValuesAnnotationLevel> peptideCutoffValues) {
 		this.peptideCutoffValues = peptideCutoffValues;
 	}
-	
-
 }

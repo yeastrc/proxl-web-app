@@ -36,7 +36,6 @@ public class ProxlConfigFileReader {
 	public static ProxlConfigFileReader getInstance() {
 		return new ProxlConfigFileReader();
 	}
-	
 	/**
 	 * private constructor
 	 */
@@ -84,9 +83,6 @@ public class ProxlConfigFileReader {
 			log.warn( "INFO: '" + PROPERTY_NAME__PROXL_WEBAPP_ENCRYPTION_KEY_FOR_USER_ACCOUNT_WEB_APP 
 					+ "' is not populated in config or is empty string." ); 
 		}
-		
-		
-		
 	}
 	
 	/**
@@ -143,8 +139,6 @@ public class ProxlConfigFileReader {
 			if ( StringUtils.isNotEmpty( propertyValue ) ) {
 				proxlConfigFileValues.setRequestingEncryptionKey( propertyValue );
 			}
-			
-
 		} catch ( RuntimeException e ) {
 			log.error( "Error processing Properties file '" + propertiesFilename + "', exception: " + e.toString(), e );
 			throw e;

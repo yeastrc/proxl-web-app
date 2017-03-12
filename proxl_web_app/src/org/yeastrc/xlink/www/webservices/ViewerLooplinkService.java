@@ -240,9 +240,6 @@ public class ViewerLooplinkService {
 											excludeTaxonomy_Ids_Set_UserInput, 
 											link.getProtein().getProteinSequenceObject(), 
 											searchId ) ) {
-//							int taxonomyId = link.getProtein().getProteinSequenceObject().getTaxonomyId();
-//
-//							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
 							}
@@ -549,9 +546,6 @@ public class ViewerLooplinkService {
 											excludeTaxonomy_Ids_Set_UserInput, 
 											link.getProtein().getProteinSequenceObject(), 
 											searchId ) ) {
-//							int taxonomyId = link.getProtein().getProteinSequenceObject().getTaxonomyId();
-//
-//							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
 							}
