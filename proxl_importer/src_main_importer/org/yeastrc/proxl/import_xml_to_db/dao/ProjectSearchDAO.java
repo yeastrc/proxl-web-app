@@ -14,7 +14,7 @@ import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
  *
  */
 public class ProjectSearchDAO {
-	
+
 	private static final Logger log = Logger.getLogger(ProjectSearchDAO.class);
 	
 	private ProjectSearchDAO() { }
@@ -44,7 +44,6 @@ public class ProjectSearchDAO {
 			+ " (project_id, search_id, search_name, status_id ) "
 			+ " VALUES (?, ?, ?, " +  SearchRecordStatus.IMPORTING.value()
 			+ " )";
-	
 	/**
 	 * This will INSERT the given ProjectSearchDTO into the database... even if an id is already set.
 	 * This will result in a new id being set in the object.
@@ -67,9 +66,7 @@ public class ProjectSearchDAO {
 			pstmt.setInt( counter, item.getSearchId() );
 			counter++;
 			pstmt.setString( counter, item.getSearchName() );
-
 			pstmt.executeUpdate();
-			
 			rs = pstmt.getGeneratedKeys();
 			if( rs.next() ) {
 				item.setId( rs.getInt( 1 ) );
@@ -121,10 +118,8 @@ public class ProjectSearchDAO {
 	 * @throws Exception
 	 */
 	public void updateStatus( int projectSearchId, SearchRecordStatus status, Connection dbConnection ) throws Exception {
-		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		
 		String sql = "UPDATE project_search SET status_id = ? WHERE id = ?";
 		try {
 			pstmt = dbConnection.prepareStatement( sql );

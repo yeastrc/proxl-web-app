@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
@@ -22,17 +21,12 @@ import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
  */
 public class GetLinkableProteinsAndPositions {
 
-	
 	private static final Logger log = Logger.getLogger(GetLinkableProteinsAndPositions.class);
-	
 	//  private constructor
 	private GetLinkableProteinsAndPositions() {  }
-	
 	private static final GetLinkableProteinsAndPositions _INSTANCE = new GetLinkableProteinsAndPositions(); 
-	
 	public static GetLinkableProteinsAndPositions getInstance() { return _INSTANCE; }
 	
-
 	/**
 	 * For Crosslinks:
 	 * 
@@ -50,48 +44,29 @@ public class GetLinkableProteinsAndPositions {
 	 * @throws Exception
 	 */
 	public  Map<ProteinImporterContainer, Collection<Integer>> getCrosslinkLinkableProteinsAndPositions( 
-			
 			ReportedPeptide reportedPeptide,
 			Peptide peptide, 
 			String peptideSequence, 
 			int peptideCrossLinkPosition, 
 			Set<Integer> peptideMonolinkPositions,
-			
 			List<ILinker> linkerList, 
 			Collection<ProteinImporterContainer> proteinImporterContainerCollection ) throws Exception {
-		
 		Map<ProteinImporterContainer, Collection<Integer>> results = new HashMap<>();
-		
 		for( ProteinImporterContainer proteinImporterContainer : proteinImporterContainerCollection ) {
-			
 			String proteinSequence = proteinImporterContainer.getProteinSequenceDTO().getSequence();
-			
-			
 			List<Integer> proteinCrosslinkedPositions = ProteinPositionUtils.getProteinPosition( proteinSequence, peptideSequence, peptideCrossLinkPosition );
-			
 			//  Get linkable positions for all the linkers
-			
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
-			
 			for ( ILinker linker : linkerList ) {
-			
 				Collection<Integer> proteinLinkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
-				
 				proteinLinkablePositionsCollection.addAll( proteinLinkablePositionsCollectionForLinker );
 			}
-						
 			List<Integer> proteinPositionList = null;
-			
 			for( Integer proteinCrosslinkedPosition : proteinCrosslinkedPositions ) {
-
 				boolean crosslinkAndMonolinksPositionsFoundInLinkablePositions = true; 
-				
 				if( ! ( proteinLinkablePositionsCollection.contains( proteinCrosslinkedPosition ) ) ) {
-					
 					crosslinkAndMonolinksPositionsFoundInLinkablePositions = false;
-
 					if ( log.isInfoEnabled() ) {
-
 						String msg = " Skipping link for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence() 
 								+ " for peptide " + peptideSequence 
 								+ " at position " + peptideCrossLinkPosition 
@@ -102,22 +77,14 @@ public class GetLinkableProteinsAndPositions {
 						log.info( msg );
 					}
 				}
-				
 				if ( crosslinkAndMonolinksPositionsFoundInLinkablePositions
 						&& peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
-					
 					for ( Integer peptideMonolinkPosition : peptideMonolinkPositions ) {
-						
 						//  Convert peptide monolink position to protein position
-						
 						int proteinMonolinkPosition = proteinCrosslinkedPosition - peptideCrossLinkPosition + peptideMonolinkPosition; 
-						
 						//  Check if monolink protein position is a linkable position
-
 						if( ! ( proteinLinkablePositionsCollection.contains( proteinMonolinkPosition ) ) ) {
-
 							if ( log.isInfoEnabled() ) {
-
 								String msg = " Skipping link for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence() 
 										+ " for peptide " + peptideSequence 
 										+ " because the monolink at peptide position " + peptideMonolinkPosition 
@@ -131,48 +98,32 @@ public class GetLinkableProteinsAndPositions {
 										+ ".";
 								log.info( msg );
 							}
-							
 							crosslinkAndMonolinksPositionsFoundInLinkablePositions = false;
 							break;
 						}
 					}
 				}
-				
-				
 				if ( crosslinkAndMonolinksPositionsFoundInLinkablePositions ) {
-					
 					if ( proteinPositionList == null ) {
-						
 						//  First position found, create list and put in map
-						
 						proteinPositionList = new ArrayList<>();
-						
 						Object proteinPositionListPrev =
 								results.put( proteinImporterContainer, proteinPositionList );
-						
 						if ( proteinPositionListPrev != null ) {
-							
 							String msg = "proteinImporterContainer already in map. protein sequence: "
 									+ proteinImporterContainer.getProteinSequenceDTO().getSequence();
 							log.error( msg );
 							throw new ProxlImporterInteralException(msg);
 						}
 					}
-					
 					proteinPositionList.add( proteinCrosslinkedPosition );
-					
 				} else {
-					
 				}
 			}
 		}
-		
 		return results;
 	}
 	
-
-	
-
 	/**
 	 * For Looplinks:
 	 * 
@@ -191,54 +142,35 @@ public class GetLinkableProteinsAndPositions {
 	 * @throws Exception
 	 */
 	public  Map<ProteinImporterContainer, Collection<List<Integer>>> getLooplinkLinkableProteinsAndPositionsForLooplink( 
-			
 			ReportedPeptide reportedPeptide,
 			Peptide peptide, 
 			String peptideSequence, 
 			int peptideLooplinkPosition_1, 
 			int peptideLooplinkPosition_2, 
 			Set<Integer> peptideMonolinkPositions,
-
 			List<ILinker> linkerList, 
 			Collection<ProteinImporterContainer> proteinImporterContainerCollection ) throws Exception {
-
-		Map<ProteinImporterContainer, Collection<List<Integer>>> results = new HashMap<>();
 		
+		Map<ProteinImporterContainer, Collection<List<Integer>>> results = new HashMap<>();
 		for( ProteinImporterContainer proteinImporterContainer : proteinImporterContainerCollection ) {
-			
 			String proteinSequence = proteinImporterContainer.getProteinSequenceDTO().getSequence();
-						
 			List<List<Integer>> proteinPositions = 
 					ProteinPositionUtils.getLooplinkProteinPosition( proteinSequence, peptideSequence, peptideLooplinkPosition_1, peptideLooplinkPosition_2 );
-			
 			//  Get linkable positions for all the linkers
-			
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
-			
 			for ( ILinker linker : linkerList ) {
-			
 				Collection<Integer> linkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
-				
 				proteinLinkablePositionsCollection.addAll( linkablePositionsCollectionForLinker );
 			}
-			
-
 			List<List<Integer>> proteinPosition_1_2_List = null;
-			
 			for( List<Integer> linkedPositions_1_2 : proteinPositions ) {
-
 				boolean looplinkAndMonolinksFoundInLinkablePositions = true; 
-				
 				int looplinkProteinPosition_1 = linkedPositions_1_2.get( 0 );
 				int looplinkProteinPosition_2 = linkedPositions_1_2.get( 1 );
-				
 				if( ! ( proteinLinkablePositionsCollection.contains( looplinkProteinPosition_1 )
 						&& proteinLinkablePositionsCollection.contains( looplinkProteinPosition_2 ) ) ) {
-					
 					looplinkAndMonolinksFoundInLinkablePositions = false;
-					
 					if ( log.isInfoEnabled() ) {
-
 						String msg = "Skipping looplink for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence()
 								+ " for peptide " + peptideSequence 
 								+ " at positions " + peptideLooplinkPosition_1 + " and " + peptideLooplinkPosition_2 
@@ -247,23 +179,14 @@ public class GetLinkableProteinsAndPositions {
 						log.info( msg );
 					}
 				}
-				
-
 				if ( looplinkAndMonolinksFoundInLinkablePositions
 						&& peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
-					
 					for ( Integer peptideMonolinkPosition : peptideMonolinkPositions ) {
-						
 						//  Convert peptide monolink position to protein position
-						
 						int proteinMonolinkPosition = looplinkProteinPosition_1 - peptideLooplinkPosition_1 + peptideMonolinkPosition; 
-						
 						//  Check if monolink protein position is a linkable position
-
 						if( ! ( proteinLinkablePositionsCollection.contains( proteinMonolinkPosition ) ) ) {
-
 							if ( log.isInfoEnabled() ) {
-
 								String msg = " Skipping link for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence() 
 										+ " for peptide " + peptideSequence 
 										+ " because the monolink at peptide position " + peptideMonolinkPosition 
@@ -276,52 +199,35 @@ public class GetLinkableProteinsAndPositions {
 										+ looplinkProteinPosition_1 + " and " + looplinkProteinPosition_2 
 										+ " for reported peptide: " + reportedPeptide.getReportedPeptideString()
 										+ ".";
-
 								log.info( msg );
 							}
-							
 							looplinkAndMonolinksFoundInLinkablePositions = false;
 							break;
 						}
 					}
 				}
-				
-				
 				if ( looplinkAndMonolinksFoundInLinkablePositions ) {
-
 					if ( proteinPosition_1_2_List == null ) {
-						
 						//  First position found, create list and put in map
-						
 						proteinPosition_1_2_List = new ArrayList<>();
-						
 						Object proteinPositionListPrev =
 								results.put(proteinImporterContainer, proteinPosition_1_2_List);
-						
 						if ( proteinPositionListPrev != null ) {
-							
 							String msg = "proteinImporterContainer already in map. protein sequence: "
 									+ proteinImporterContainer.getProteinSequenceDTO().getSequence();
 							log.error( msg );
 							throw new ProxlImporterInteralException(msg);
 						}
 					}
-					
 					List<Integer> proteinPositions_1_2_list = new ArrayList<Integer>( 2 );
 					proteinPositions_1_2_list.add( looplinkProteinPosition_1 );
 					proteinPositions_1_2_list.add( looplinkProteinPosition_2 );
-					
 					proteinPosition_1_2_List.add( proteinPositions_1_2_list );
-					
 				}
 			}
 		}
-		
 		return results;
 	}
-	
-	
-
 	
 	/**
 	 * For Unlinked and Dimer
@@ -333,61 +239,36 @@ public class GetLinkableProteinsAndPositions {
 	 * @throws Exception
 	 */
 	public Map<ProteinImporterContainer, Collection<Integer>> get_Unlinked_Dimer_PeptidePositionsInProteins(
-
 			ReportedPeptide reportedPeptide,
 			Peptide peptide, 
 			String peptideSequence, 
 			Set<Integer> peptideMonolinkPositions,
-
 			List<ILinker> linkerList, 
 			Collection<ProteinImporterContainer> proteinImporterContainerCollection ) throws Exception {
-
-		Map<ProteinImporterContainer, Collection<Integer>> results = new HashMap<>();
 		
+		Map<ProteinImporterContainer, Collection<Integer>> results = new HashMap<>();
 		for( ProteinImporterContainer proteinImporterContainer : proteinImporterContainerCollection ) {
-			
 			String proteinSequence = proteinImporterContainer.getProteinSequenceDTO().getSequence();
-
 			//  Get linkable positions for all the linkers
-			
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
-			
 			for ( ILinker linker : linkerList ) {
-			
 				Collection<Integer> linkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
-				
 				proteinLinkablePositionsCollection.addAll( linkablePositionsCollectionForLinker );
 			}
-			
-
 			List<Integer> peptidePositionInProteinList = null;
-			
-			
 			int fromIndex = 0;
-			
 			int peptideIndex = 0;
-					
 			while ( ( peptideIndex = proteinSequence.indexOf( peptideSequence, fromIndex ) ) >= 0 ) {
-			
 				int proteinStartPosition = peptideIndex + 1;  //  Positions are 1 based
 //				int proteinEndPosition = proteinStartPosition + peptideSequence.length() - 1;
-
 				boolean monolinksFoundInLinkablePositions = true;
-				
 				if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
-					
 					for ( Integer peptideMonolinkPosition : peptideMonolinkPositions ) {
-						
 						//  Convert peptide monolink position to protein position
-						
 						int proteinMonolinkPosition = peptideIndex + peptideMonolinkPosition; 
-						
 						//  Check if monolink protein position is a linkable position
-
 						if( ! ( proteinLinkablePositionsCollection.contains( proteinMonolinkPosition ) ) ) {
-
 							if ( log.isInfoEnabled() ) {
-
 								String msg = " Skipping link for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence() 
 										+ " for peptide " + peptideSequence 
 										+ " because the monolink at peptide position " + peptideMonolinkPosition 
@@ -398,49 +279,31 @@ public class GetLinkableProteinsAndPositions {
 										+ proteinStartPosition
 										+ ", for reported peptide: " + reportedPeptide.getReportedPeptideString()
 										+ ".";
-
 								log.info( msg );
 							}
-							
 							monolinksFoundInLinkablePositions = false;
 							break;
 						}
 					}
 				}
-				
-				
 				if ( monolinksFoundInLinkablePositions ) {
-
 					if ( peptidePositionInProteinList == null ) {
-						
 						//  First position found, create list and put in map
-						
 						peptidePositionInProteinList = new ArrayList<>();
-						
 						Object proteinPositionListPrev =
 								results.put(proteinImporterContainer, peptidePositionInProteinList);
-						
 						if ( proteinPositionListPrev != null ) {
-							
 							String msg = "proteinImporterContainer already in map. protein sequence: "
 									+ proteinImporterContainer.getProteinSequenceDTO().getSequence();
 							log.error( msg );
 							throw new ProxlImporterInteralException(msg);
 						}
 					}
-					
-					
 					peptidePositionInProteinList.add( proteinStartPosition );
-					
 				}
-				
 				fromIndex = peptideIndex + 1;
 			}
 		}
-		
 		return results;
 	}
-	
-	
-	
 }

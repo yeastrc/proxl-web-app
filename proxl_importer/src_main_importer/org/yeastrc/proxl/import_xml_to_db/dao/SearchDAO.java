@@ -15,9 +15,8 @@ import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
  *
  */
 public class SearchDAO {
-	
+
 	private static final Logger log = Logger.getLogger(SearchDAO.class);
-	
 	private SearchDAO() { }
 	public static SearchDAO getInstance() { return new SearchDAO(); }
 	
@@ -45,7 +44,6 @@ public class SearchDAO {
 			+ " (path, directory_name, fasta_filename, has_scan_data, status_id ) "
 			+ " VALUES (?, ?, ?, ?, " +  SearchRecordStatus.IMPORTING.value()
 			+ " )";
-	
 	/**
 	 * This will INSERT the given SearchDTO into the database... even if an id is already set.
 	 * This will result in a new id being set in the object.
@@ -73,7 +71,6 @@ public class SearchDAO {
 			} else {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
 			}
-			
 			pstmt.executeUpdate();
 			rs = pstmt.getGeneratedKeys();
 			if( rs.next() ) {
@@ -99,6 +96,7 @@ public class SearchDAO {
 //			}
 		}
 	}
+	
 	/**
 	 * Update the status_id associated with this search
 	 * @param searchId
@@ -117,6 +115,7 @@ public class SearchDAO {
 			}
 		}
 	}
+	
 	/**
 	 * Update the status_id associated with this search
 	 * @param searchId
@@ -124,10 +123,8 @@ public class SearchDAO {
 	 * @throws Exception
 	 */
 	public void updateStatus( int searchId, SearchRecordStatus status, Connection dbConnection ) throws Exception {
-		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		
 		String sql = "UPDATE search SET status_id = ?, import_end_timestamp = NOW() WHERE id = ?";
 		try {
 			pstmt = dbConnection.prepareStatement( sql );

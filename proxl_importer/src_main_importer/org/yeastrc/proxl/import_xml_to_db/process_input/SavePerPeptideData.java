@@ -1,8 +1,6 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
-
 // import org.apache.log4j.Logger;
-
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptProtSeqIdPosMonolinkDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptPeptDynamicModDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptPeptideDAO;
@@ -20,17 +18,12 @@ import org.yeastrc.xlink.dto.ReportedPeptideDTO;
  */
 public class SavePerPeptideData {
 
-
 //	private static final Logger log = Logger.getLogger( SavePerPeptideData.class );
-	
 	/**
 	 * private constructor
 	 */
 	private SavePerPeptideData(){}
-	
 	public static SavePerPeptideData getInstance() { return new SavePerPeptideData(); }
-
-
 	
 	/**
 	 * Save SrchRepPeptPeptideDTO, SrchRepPeptPeptDynamicModDTO, SrchRepPeptProtSeqIdPosMonolinkDTO
@@ -43,12 +36,9 @@ public class SavePerPeptideData {
 	public void savePerPeptideData( 
 			
 			PerPeptideData perPeptideData,
-			
 			int searchId,
 			ReportedPeptideDTO reportedPeptideDTO
-			
 			) throws Exception {
-
 		
 		//  Save SrchRepPeptPeptideDTO
 		
@@ -61,7 +51,6 @@ public class SavePerPeptideData {
 		
 		int searchReportedPeptidepeptideId = srchRepPeptPeptideDTO.getId();
 		
-		
 		//  Save SrchRepPeptPeptDynamicModDTO
 		
 		for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide() ) {
@@ -72,9 +61,7 @@ public class SavePerPeptideData {
 		}
 		
 		//  Save SrchRepPeptProtSeqIdPosMonolinkDTO
-		
 		for ( MonolinkContainer monolinkContainer : perPeptideData.getMonolinkContainerList() ) {
-			
 			SrchRepPeptProtSeqIdPosMonolinkDTO srchRepPeptProtSeqIdPosMonolinkDTO = monolinkContainer.getSrchRepPeptProtSeqIdPosMonolinkDTO();
 			ProteinImporterContainer proteinImporterContainer = monolinkContainer.getProteinImporterContainer();
 			

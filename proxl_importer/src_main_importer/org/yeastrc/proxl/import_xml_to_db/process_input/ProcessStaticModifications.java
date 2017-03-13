@@ -21,18 +21,13 @@ import org.yeastrc.xlink.dto.StaticModDTO;
 public class ProcessStaticModifications {
 	
 //	private static final Logger log = Logger.getLogger( ProcessStaticModifications.class );
-	
 	/**
 	 * private constructor
 	 */
 	private ProcessStaticModifications(){}
-	
 	public static ProcessStaticModifications getInstance() {
-		
 		return new ProcessStaticModifications();
 	}
-
-	
 	
 	/**
 	 * @param proxlInput
