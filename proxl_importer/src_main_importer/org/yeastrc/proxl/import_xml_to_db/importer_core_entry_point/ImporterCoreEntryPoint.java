@@ -528,6 +528,7 @@ public class ImporterCoreEntryPoint {
 						try {
 							
 							SearchDAO.getInstance().updateStatus( search.getId(), SearchRecordStatus.IMPORT_FAIL );
+							
 						}  catch ( Exception eUpd ) {
 					    	
 
@@ -541,6 +542,20 @@ public class ImporterCoreEntryPoint {
 
 					    }
 						
+						ProjectSearchDTO projectSearchDTOInserted = processProxlInput.getProjectSearchDTOInserted();
+
+						try {
+							ProjectSearchDAO.getInstance().updateStatus( projectSearchDTOInserted.getId(),  SearchRecordStatus.IMPORT_FAIL );
+						}  catch ( Exception e2 ) {
+							String msg_failUpd = "Failed to mark the project_search as IMPORT_FAIL, search id: " + search.getId() ;
+							log.error( msg_failUpd, e2 );
+
+							System.err.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+							System.err.println( msg );
+							System.err.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+							throw e;
+					    }						
 					}
 
 				}
