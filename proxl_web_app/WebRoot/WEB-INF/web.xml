@@ -37,7 +37,7 @@
             
             <!-- specifies the packages to scan for Classes that have Jersey annotations for webservices -->
             <!-- Adding "jackson.jaxrs" changes the JSON and JAXB XML provider to Jackson -->
-            <param-value>com.fasterxml.jackson.jaxrs;org.yeastrc.xlink.www.webservices;org.yeastrc.xlink.www.proxl_xml_file_import.webservices;org.yeastrc.xlink.www.user_account_webservices;org.yeastrc.xlink.www.url_shortner_share_page.webservices</param-value>
+            <param-value>com.fasterxml.jackson.jaxrs;org.yeastrc.xlink.www.webservices;org.yeastrc.xlink.www.file_import_proxl_xml_scans.webservices;org.yeastrc.xlink.www.user_account_webservices;org.yeastrc.xlink.www.url_shortner_share_page.webservices</param-value>
         </init-param>  
         
         <load-on-startup>1</load-on-startup>
@@ -52,7 +52,7 @@
 	<!-- This Servlet should be considered a webservice as it returns JSON -->
   <servlet>
     <servlet-name>File_Upload_For_Import_Servlet</servlet-name>
-    <servlet-class>org.yeastrc.xlink.www.proxl_xml_file_import.servlets_as_webservices.UploadFileForImportServlet</servlet-class>
+    <servlet-class>org.yeastrc.xlink.www.file_import_proxl_xml_scans.servlets_as_webservices.UploadFileForImportServlet</servlet-class>
     <load-on-startup>3</load-on-startup>
   </servlet>
   
