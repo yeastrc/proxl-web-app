@@ -43,20 +43,20 @@ import org.yeastrc.proxl.import_xml_to_db.importer_core_entry_point.ImporterCore
 import org.yeastrc.proxl.import_xml_to_db.objects.ImportResults;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProxlXMLFileFileContainer;
 import org.yeastrc.proxl.import_xml_to_db.objects.ScanFileFileContainer;
-import org.yeastrc.proxl.import_xml_to_db.proxl_xml_file_import.dao.ProxlXMLFileImportTrackingSingleFile_Importer_DAO;
-import org.yeastrc.proxl.import_xml_to_db.proxl_xml_file_import.run_importer_to_importer_file_data.RunImporterToImporterFileRoot;
-import org.yeastrc.proxl.import_xml_to_db.proxl_xml_file_import.run_importer_to_importer_file_data.RunImporterToImporterParameterNamesConstants;
+import org.yeastrc.proxl.import_xml_to_db.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTrackingSingleFile_Importer_DAO;
+import org.yeastrc.proxl.import_xml_to_db.file_import_proxl_xml_scans.run_importer_to_importer_file_data.RunImporterToImporterFileRoot;
+import org.yeastrc.proxl.import_xml_to_db.file_import_proxl_xml_scans.run_importer_to_importer_file_data.RunImporterToImporterParameterNamesConstants;
 import org.yeastrc.proxl.import_xml_to_db.utils.SHA1SumCalculator;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
-import org.yeastrc.xlink.base.proxl_xml_file_import.dao.ProxlXMLFileImportTrackingRun_Base_DAO;
-import org.yeastrc.xlink.base.proxl_xml_file_import.dao.ProxlXMLFileImportTrackingSingleFileDAO;
-import org.yeastrc.xlink.base.proxl_xml_file_import.dao.ProxlXMLFileImportTracking_Base_DAO;
-import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingDTO;
-import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingRunDTO;
-import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingSingleFileDTO;
-import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportFileType;
-import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportRunSubStatus;
-import org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportStatus;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTrackingRun_Base_DAO;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTrackingSingleFileDAO;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTracking_Base_DAO;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingDTO;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingRunDTO;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportFileType;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportRunSubStatus;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportStatus;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
 
@@ -171,13 +171,13 @@ public class ImporterDefaultMainProgramEntry {
 		
 		//  Search Name from proxlXMLFileImportTrackingDTO or command Line
 		String searchNameOverrideValue = null;
-		//  "search_path" field from "proxl_xml_file_import_tracking" table, if import run from Run Import pgm
+		//  "search_path" field from "file_import_proxl_xml_scans_tracking" table, if import run from Run Import pgm
 		String importDirectoryOverrideValue = null;
 		
 		//  TODO  Not currently used
 //		String outputImportResultFileName = null;
 		
-		Integer userIdInsertingSearch = null;  //  Populated from proxl_xml_file_import_tracking.auth_user_id
+		Integer userIdInsertingSearch = null;  //  Populated from file_import_proxl_xml_scans_tracking.auth_user_id
 		
 		String outputDataErrorsFileName = null;
 		ImportProgramShutdownThread importProgramShutdownThread = null;

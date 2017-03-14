@@ -2,7 +2,7 @@ package org.yeastrc.proxl.import_xml_to_db.objects;
 
 import java.io.File;
 
-import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingSingleFileDTO;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
 
 public class ScanFileFileContainer {
 

@@ -13,7 +13,7 @@ import org.yeastrc.proxl_import.api.xml_dto.Psm;
 import org.yeastrc.proxl_import.api.xml_dto.Psms;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptides;
-import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingSingleFileDTO;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
 
 /**
  * 

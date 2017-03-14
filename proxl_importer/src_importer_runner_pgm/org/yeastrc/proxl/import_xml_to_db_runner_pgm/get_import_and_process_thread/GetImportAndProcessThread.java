@@ -3,7 +3,7 @@ package org.yeastrc.proxl.import_xml_to_db_runner_pgm.get_import_and_process_thr
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.database_update_with_transaction_services.GetNextTrackingToProcessDBTransaction;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.process_import.ProcessProxlXMLImport;
-import org.yeastrc.xlink.base.proxl_xml_file_import.objects.TrackingDTOTrackingRunDTOPair;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.objects.TrackingDTOTrackingRunDTOPair;
 
 /**
  * Get the next import and process it thread

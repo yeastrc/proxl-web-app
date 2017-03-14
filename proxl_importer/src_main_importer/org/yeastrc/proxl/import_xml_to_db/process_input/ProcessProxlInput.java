@@ -27,7 +27,7 @@ import org.yeastrc.proxl_import.api.xml_dto.Linkers;
 import org.yeastrc.proxl_import.api.xml_dto.MonolinkMass;
 import org.yeastrc.proxl_import.api.xml_dto.MonolinkMasses;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
-import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingSingleFileDTO;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
 import org.yeastrc.xlink.dao.LinkerDAO;
 import org.yeastrc.xlink.dao.SearchCommentDAO;
 import org.yeastrc.xlink.dao.SearchLinkerDAO;

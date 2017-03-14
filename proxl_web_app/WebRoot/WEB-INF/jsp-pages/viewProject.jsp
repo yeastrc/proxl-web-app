@@ -1,4 +1,4 @@
-<%@page import="org.yeastrc.xlink.base.proxl_xml_file_import.enum_classes.ProxlXMLFileImportStatus"%>
+<%@page import="org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportStatus"%>
 <%@page import="org.yeastrc.xlink.www.constants.QCPlotConstants"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 <%@page import="org.yeastrc.xlink.www.constants.StrutsActionPathsConstants"%>

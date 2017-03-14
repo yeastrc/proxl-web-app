@@ -8,11 +8,11 @@ import java.sql.Statement;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
-import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingRunDTO;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingRunDTO;
 
 /**
  * 
- * table proxl_xml_file_import_tracking_run
+ * table file_import_proxl_xml_scans_tracking_run
  */
 public class ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO {
 
@@ -59,8 +59,8 @@ public class ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO {
 //	}
 
 	
-	private static final String SAVE_SQL = "INSERT INTO proxl_xml_file_import_tracking_run ( "
-			+ "proxl_xml_file_import_tracking_id, status_id,"
+	private static final String SAVE_SQL = "INSERT INTO file_import_proxl_xml_scans_tracking_run ( "
+			+ "file_import_proxl_xml_scans_tracking_id, status_id,"
 			+ " current_run, "
 			+ " last_updated_date_time )"
 			+ " VALUES ( ?, ?, "
@@ -146,9 +146,9 @@ public class ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		final String sql = "UPDATE proxl_xml_file_import_tracking_run "
+		final String sql = "UPDATE file_import_proxl_xml_scans_tracking_run "
 				+ "SET current_run = " + Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE
-				+ " WHERE proxl_xml_file_import_tracking_id = ?";
+				+ " WHERE file_import_proxl_xml_scans_tracking_id = ?";
 
 		
 		try {
@@ -229,7 +229,7 @@ public class ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		final String sql = "UPDATE proxl_xml_file_import_tracking_run "
+		final String sql = "UPDATE file_import_proxl_xml_scans_tracking_run "
 				+ "SET status_id = ?, importer_sub_status_id = ?, import_result_text = ?, data_error_text = ?, "
 				+ " last_updated_date_time = NOW() WHERE id = ?";
 
@@ -331,7 +331,7 @@ public class ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		final String sql = "UPDATE proxl_xml_file_import_tracking_run "
+		final String sql = "UPDATE file_import_proxl_xml_scans_tracking_run "
 				+ "SET inserted_search_id  = ? WHERE id = ?";
 
 		

@@ -303,7 +303,7 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCount = fun
 	var $project_id = $("#project_id");
 	var projectId = $project_id.val();
 	
-	var _URL = contextPathJSVar + "/services/proxl_xml_file_import/trackingDataList";
+	var _URL = contextPathJSVar + "/services/file_import_proxl_xml_scans/trackingDataList";
 
 	var requestData = { project_id : projectId };
 

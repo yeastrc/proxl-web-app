@@ -142,7 +142,7 @@
 			<div style="margin-bottom: 3px;">
 				Run Importer Workspace: 
 				<input type="text" class=" config_text_inputs_jq " style="width: 650px;"
-					data-config-key="<%= ConfigSystemsKeysSharedConstants.PROXL_XML_FILE_IMPORT_TEMP_DIR_KEY %>"
+					data-config-key="<%= ConfigSystemsKeysSharedConstants.file_import_proxl_xml_scans_TEMP_DIR_KEY %>"
 					>
 			</div>
 			<div>

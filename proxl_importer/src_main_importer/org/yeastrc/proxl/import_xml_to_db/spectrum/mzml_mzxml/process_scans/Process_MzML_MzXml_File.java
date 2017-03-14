@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.base.proxl_xml_file_import.dto.ProxlXMLFileImportTrackingSingleFileDTO;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
 import org.yeastrc.xlink.dao.ScanRetentionTimeDAO;
 import org.yeastrc.xlink.dto.ScanFileDTO;
 import org.yeastrc.xlink.dto.ScanFileHeaderDTO;
@@ -18,7 +18,7 @@ import org.yeastrc.xlink.dto.ScanRetentionTimeDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ScanFileFileContainer;
-import org.yeastrc.proxl.import_xml_to_db.proxl_xml_file_import.dao.ProxlXMLFileImportTrackingSingleFile_Importer_DAO;
+import org.yeastrc.proxl.import_xml_to_db.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTrackingSingleFile_Importer_DAO;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.db_update_with_transaction_services.AddNewScanFileAndHeadersIfNeededDBTransactionService;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.db_update_with_transaction_services.InsertNewScanAndPrescanIfNeededDBTransactionService;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.dto.MzML_MzXmlHeader;
