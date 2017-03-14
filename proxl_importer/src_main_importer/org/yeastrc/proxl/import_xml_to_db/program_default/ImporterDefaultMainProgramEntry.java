@@ -177,6 +177,8 @@ public class ImporterDefaultMainProgramEntry {
 		//  TODO  Not currently used
 //		String outputImportResultFileName = null;
 		
+		Integer userIdInsertingSearch = null;  //  Populated from proxl_xml_file_import_tracking.auth_user_id
+		
 		String outputDataErrorsFileName = null;
 		ImportProgramShutdownThread importProgramShutdownThread = null;
 		try {
@@ -337,12 +339,16 @@ public class ImporterDefaultMainProgramEntry {
 				DBConnectionFactory.setDbConnectionFactoryImpl( importDBConnectionFactory );
 				//				databaseConnectionFactoryCreated = true;
 			}
+			
 			///  runImporterParamsFilename is the file that the Run Importer Program creates
 			///                            to pass parameter values to the Importer 
 			///                            instead of passing them as command line parameters 
 			String runImporterParamsFilename = (String)cmdLineParser.getOptionValue( runImporterParamsFileCommandLineOpt );
+			
 			if ( StringUtils.isNotEmpty( runImporterParamsFilename ) ) {
+				
 				//  Have a file from the run importer to parse and update the parameter variables with
+				
 				File runImporterParamsFile = new File( runImporterParamsFilename );
 				if( ! runImporterParamsFile.exists() ) {
 					System.err.println( "Could not find runImporterParamsFilename File: " + runImporterParamsFile.getAbsolutePath() );
@@ -380,6 +386,7 @@ public class ImporterDefaultMainProgramEntry {
 				if ( runImporterToImporterFileRoot.isSkipPopulatingPathOnSearch() ) {
 					skipPopulatingPathOnSearchLineOptChosen = true;
 				}
+				
 //				if ( runImporterToImporterFileRoot.getSystemInStringForShutdown() != null ) {
 //					//  Create a thread that will read the system in until the SystemInStringForShutdown String
 //					//  is passed and then it will shut down the importer.
@@ -405,6 +412,8 @@ public class ImporterDefaultMainProgramEntry {
 					log.error( msg );
 					throw new ProxlImporterInteralException( msg );  //  TODO  Change exception class
 				}
+				
+				userIdInsertingSearch = proxlXMLFileImportTrackingDTO.getAuthUserId();
 				
 				//  Search Name User entered in form, or null if nothing entered
 				searchNameOverrideValue = proxlXMLFileImportTrackingDTO.getSearchName();
@@ -775,6 +784,7 @@ public class ImporterDefaultMainProgramEntry {
 			int insertedSearchId = 
 					importerCoreEntryPoint.doImport( 
 							projectId, 
+							userIdInsertingSearch,
 							searchNameOverrideValue,
 							importDirectoryOverrideValue,
 							mainXMLFileToImportContainer.getMainXMLFileToImport(), 

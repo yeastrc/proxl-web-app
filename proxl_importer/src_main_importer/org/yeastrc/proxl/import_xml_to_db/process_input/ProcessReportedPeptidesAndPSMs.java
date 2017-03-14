@@ -18,7 +18,7 @@ import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPep_
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptideAndOrPSMForCutoffs;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DroppedPeptideCount;
-import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchScanFilenameDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic_Lookup__DTO;
@@ -80,7 +80,7 @@ public class ProcessReportedPeptidesAndPSMs {
 	 */
 	public void processReportedPeptides( 
 			ProxlInput proxlInput, 
-			SearchDTO search,
+			SearchDTO_Importer search,
 			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
 			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds ) throws Exception {

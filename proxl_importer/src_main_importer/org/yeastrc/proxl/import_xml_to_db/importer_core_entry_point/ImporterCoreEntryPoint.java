@@ -13,13 +13,13 @@ import javax.xml.validation.SchemaFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant;
-import org.yeastrc.proxl.import_xml_to_db.dao.ProjectSearchDAO;
-import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao.ProjectSearchDAO_Importer;
+import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMPopulateFromProxlXMLInput;
-import org.yeastrc.proxl.import_xml_to_db.dto.ProjectSearchDTO;
-import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.ProjectSearchDTO_Importer;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.exception.ProxlImporterProjectNotAllowImportException;
 import org.yeastrc.proxl.import_xml_to_db.exception.ProxlImporterProxlXMLDeserializeFailException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
@@ -69,6 +69,7 @@ public class ImporterCoreEntryPoint {
 	 */
 	public int doImport( 
 			int projectId,
+			Integer userIdInsertingSearch,
 			String searchNameOverrideValue,
 			String importDirectoryOverrideValue,
 			File mainXMLFileToImport,
@@ -132,6 +133,7 @@ public class ImporterCoreEntryPoint {
 		proxlInputForImport = null; //  release this reference
 		int insertedSearchId = doImportPassingDeserializedProxlImportInputXML( 
 				projectId, 
+				userIdInsertingSearch,
 				proxlInputObjectContainer, 
 				scanFileFileContainerList, 
 				importDirectory, 
@@ -217,6 +219,7 @@ public class ImporterCoreEntryPoint {
 	 */
 	public int doImportPassingDeserializedProxlImportInputXML( 
 			int projectId,
+			Integer userIdInsertingSearch,
 			ProxlInputObjectContainer proxlInputObjectContainer,
 			List<ScanFileFileContainer> scanFileFileContainerList,
 			String importDirectory,
@@ -265,20 +268,21 @@ public class ImporterCoreEntryPoint {
 			processProxlInput = ProcessProxlInput.getInstance();
 			processProxlInput.processProxlInput( 
 					projectId, 
+					userIdInsertingSearch,
 					proxlInputForImport, 
 					scanFileFileContainerList,
 					importDirectory, 
 					dropPeptidePSMCutoffValues,
 					skipPopulatingPathOnSearchLineOptChosen
 					);
-			SearchDTO searchDTOInserted = processProxlInput.getSearchDTOInserted();
-			ProjectSearchDTO projectSearchDTOInserted = processProxlInput.getProjectSearchDTOInserted();
+			SearchDTO_Importer searchDTOInserted = processProxlInput.getSearchDTOInserted();
+			ProjectSearchDTO_Importer projectSearchDTOInserted = processProxlInput.getProjectSearchDTOInserted();
 			//  Set proxlInputForImport to null to release memory needed later, but right now no other code to run
 			proxlInputForImport = null;
 			proxlInputObjectContainer.setProxlInput( null );
 			ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
 			try {
-				SearchDAO.getInstance().updateStatus( searchDTOInserted.getId(), SearchRecordStatus.IMPORT_COMPLETE_VIEW );
+				SearchDAO_Importer.getInstance().updateStatus( searchDTOInserted.getId(), SearchRecordStatus.IMPORT_COMPLETE_VIEW );
 			}  catch ( Exception e ) {
 				String msg = "Failed to mark the Search as ImportComplete, search id: " + searchDTOInserted.getId() ;
 				log.error( msg );
@@ -288,7 +292,7 @@ public class ImporterCoreEntryPoint {
 				throw e;
 		    }
 			try {
-				ProjectSearchDAO.getInstance().updateStatus( projectSearchDTOInserted.getId(),  SearchRecordStatus.IMPORT_COMPLETE_VIEW );
+				ProjectSearchDAO_Importer.getInstance().updateStatus( projectSearchDTOInserted.getId(),  SearchRecordStatus.IMPORT_COMPLETE_VIEW );
 			}  catch ( Exception e ) {
 				String msg = "Failed to mark the project_search as ImportComplete, search id: " + searchDTOInserted.getId() ;
 				log.error( msg );
@@ -317,7 +321,7 @@ public class ImporterCoreEntryPoint {
 				e.printStackTrace( System.err );
 				if ( processProxlInput != null ) {
 					//  processProxlInput was instantiated to process the input so get data from it
-					SearchDTO search = processProxlInput.getSearchDTOInserted();
+					SearchDTO_Importer search = processProxlInput.getSearchDTOInserted();
 					if ( search != null ) {
 						String msg = "search record inserted, but import not complete, search.id: " + search.getId()
 								+ ", search.path: " + search.getPath();
@@ -339,7 +343,7 @@ public class ImporterCoreEntryPoint {
 							//  Just ignore any exception
 					    }
 						try {
-							SearchDAO.getInstance().updateStatus( search.getId(), SearchRecordStatus.IMPORT_FAIL );
+							SearchDAO_Importer.getInstance().updateStatus( search.getId(), SearchRecordStatus.IMPORT_FAIL );
 						}  catch ( Exception eUpd ) {
 							String msgeUpd = "Failed to mark the Search as ImportFail, search id: " + search.getId() ;
 							log.error( msgeUpd, eUpd );
@@ -347,9 +351,9 @@ public class ImporterCoreEntryPoint {
 							System.err.println( msgeUpd );
 							System.err.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 					    }
-						ProjectSearchDTO projectSearchDTOInserted = processProxlInput.getProjectSearchDTOInserted();
+						ProjectSearchDTO_Importer projectSearchDTOInserted = processProxlInput.getProjectSearchDTOInserted();
 						try {
-							ProjectSearchDAO.getInstance().updateStatus( projectSearchDTOInserted.getId(),  SearchRecordStatus.IMPORT_FAIL );
+							ProjectSearchDAO_Importer.getInstance().updateStatus( projectSearchDTOInserted.getId(),  SearchRecordStatus.IMPORT_FAIL );
 						}  catch ( Exception e2 ) {
 							String msg_failUpd = "Failed to mark the project_search as IMPORT_FAIL, search id: " + search.getId() ;
 							log.error( msg_failUpd, e2 );

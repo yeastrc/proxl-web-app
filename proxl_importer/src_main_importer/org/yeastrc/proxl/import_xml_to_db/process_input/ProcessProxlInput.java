@@ -7,14 +7,14 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.proxl.import_xml_to_db.dao.ProjectSearchDAO;
-import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao.ProjectSearchDAO_Importer;
+import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCrosslinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchMonolinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSM_InsertToDB;
-import org.yeastrc.proxl.import_xml_to_db.dto.ProjectSearchDTO;
-import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.ProjectSearchDTO_Importer;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ScanFileFileContainer;
@@ -52,12 +52,12 @@ public class ProcessProxlInput {
 	public static ProcessProxlInput getInstance() {
 		return new ProcessProxlInput();
 	}
-	private SearchDTO searchDTOInserted;
-	private ProjectSearchDTO projectSearchDTOInserted;
-	public SearchDTO getSearchDTOInserted() {
+	private SearchDTO_Importer searchDTOInserted;
+	private ProjectSearchDTO_Importer projectSearchDTOInserted;
+	public SearchDTO_Importer getSearchDTOInserted() {
 		return searchDTOInserted;
 	}
-	public ProjectSearchDTO getProjectSearchDTOInserted() {
+	public ProjectSearchDTO_Importer getProjectSearchDTOInserted() {
 		return projectSearchDTOInserted;
 	}
 	
@@ -70,6 +70,7 @@ public class ProcessProxlInput {
 	 */
 	public void processProxlInput( 
 			int projectId,
+			Integer userIdInsertingSearch,
 			ProxlInput proxlInput,
 			List<ScanFileFileContainer> scanFileFileContainerList,
 			String importDirectory,
@@ -79,7 +80,8 @@ public class ProcessProxlInput {
 		searchDTOInserted = null;
 		projectSearchDTOInserted = null;
 		try {
-			SearchDTO searchDTO = new SearchDTO();
+			SearchDTO_Importer searchDTO = new SearchDTO_Importer();
+			searchDTO.setCreatedByUserId( userIdInsertingSearch );
 			searchDTO.setFastaFilename( proxlInput.getFastaFilename() );
 			if ( ( skipPopulatingPathOnSearchLineOptChosen == null ) 
 					|| ( ! skipPopulatingPathOnSearchLineOptChosen ) ) {
@@ -90,15 +92,16 @@ public class ProcessProxlInput {
 			} else {
 				searchDTO.setHasScanData( true );
 			}
-			SearchDAO.getInstance().saveToDatabase( searchDTO );
+			SearchDAO_Importer.getInstance().saveToDatabase( searchDTO );
 			searchDTOInserted = searchDTO;
-			ProjectSearchDTO projectSearchDTO = new ProjectSearchDTO();
+			ProjectSearchDTO_Importer projectSearchDTO = new ProjectSearchDTO_Importer();
 			projectSearchDTO.setProjectId( projectId );
 			projectSearchDTO.setSearchId( searchDTO.getId() );
+			projectSearchDTO.setCreatedByUserId( userIdInsertingSearch );
 			if ( StringUtils.isNotEmpty( proxlInput.getName() ) ) {
 				projectSearchDTO.setSearchName( proxlInput.getName() );
 			}
-			ProjectSearchDAO.getInstance().saveToDatabase( projectSearchDTO );
+			ProjectSearchDAO_Importer.getInstance().saveToDatabase( projectSearchDTO );
 			projectSearchDTOInserted = projectSearchDTO;
 			if ( StringUtils.isNotEmpty( proxlInput.getComment() ) ) {
 				SearchCommentDTO searchCommentDTO = new SearchCommentDTO();
@@ -198,7 +201,7 @@ public class ProcessProxlInput {
 	 * @throws ProxlImporterDataException
 	 * @throws Exception
 	 */
-	private void processLinkersValidateAndSave( ProxlInput proxlInput, SearchDTO searchDTO ) throws ProxlImporterDataException, Exception {
+	private void processLinkersValidateAndSave( ProxlInput proxlInput, SearchDTO_Importer searchDTO ) throws ProxlImporterDataException, Exception {
 		
 		// Save Linker mapping for search
 		Linkers proxlInputLinkers = proxlInput.getLinkers();
@@ -236,7 +239,7 @@ public class ProcessProxlInput {
 	 * @param searchDTO
 	 * @throws Exception
 	 */
-	private void saveMonolinkMasses( Linker proxlInputLinkerItem, LinkerDTO linkerDTO, SearchDTO searchDTO ) throws Exception {
+	private void saveMonolinkMasses( Linker proxlInputLinkerItem, LinkerDTO linkerDTO, SearchDTO_Importer searchDTO ) throws Exception {
 		
 		MonolinkMasses monolinkMasses = proxlInputLinkerItem.getMonolinkMasses();
 		if ( monolinkMasses == null ) {
@@ -262,7 +265,7 @@ public class ProcessProxlInput {
 	 * @param searchDTO
 	 * @throws Exception
 	 */
-	private void saveCrosslinkMasses( Linker proxlInputLinkerItem, LinkerDTO linkerDTO, SearchDTO searchDTO ) throws Exception {
+	private void saveCrosslinkMasses( Linker proxlInputLinkerItem, LinkerDTO linkerDTO, SearchDTO_Importer searchDTO ) throws Exception {
 		
 		CrosslinkMasses crosslinkMasses = proxlInputLinkerItem.getCrosslinkMasses();
 		if ( crosslinkMasses == null ) {

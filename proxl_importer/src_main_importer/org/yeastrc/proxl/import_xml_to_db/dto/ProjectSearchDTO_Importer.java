@@ -5,12 +5,13 @@ package org.yeastrc.proxl.import_xml_to_db.dto;
  * 
  * Not all fields
  */
-public class ProjectSearchDTO {
+public class ProjectSearchDTO_Importer {
 
 	private int id;
 	private int projectId;
 	private int searchId;
 	private String searchName;
+	private Integer createdByUserId;
 	
 	public int getProjectId() {
 		return projectId;
@@ -35,6 +36,12 @@ public class ProjectSearchDTO {
 	}
 	public void setId(int id) {
 		this.id = id;
+	}
+	public Integer getCreatedByUserId() {
+		return createdByUserId;
+	}
+	public void setCreatedByUserId(Integer createdByUserId) {
+		this.createdByUserId = createdByUserId;
 	}
 	
 }

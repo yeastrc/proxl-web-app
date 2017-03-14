@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import org.apache.log4j.Logger;
-import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
@@ -14,11 +14,11 @@ import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
  * table search
  *
  */
-public class SearchDAO {
+public class SearchDAO_Importer {
 
-	private static final Logger log = Logger.getLogger(SearchDAO.class);
-	private SearchDAO() { }
-	public static SearchDAO getInstance() { return new SearchDAO(); }
+	private static final Logger log = Logger.getLogger(SearchDAO_Importer.class);
+	private SearchDAO_Importer() { }
+	public static SearchDAO_Importer getInstance() { return new SearchDAO_Importer(); }
 	
 	/**
 	 * This will INSERT the given SearchDTO into the database... even if an id is already set.
@@ -26,7 +26,7 @@ public class SearchDAO {
 	 * @param item
 	 * @throws Exception
 	 */
-	public void saveToDatabase( SearchDTO item ) throws Exception {
+	public void saveToDatabase( SearchDTO_Importer item ) throws Exception {
 		Connection dbConnection = null;
 		try {
 			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
@@ -41,8 +41,8 @@ public class SearchDAO {
 	
 	private static final String INSERT_SQL =
 			"INSERT INTO search "
-			+ " (path, directory_name, fasta_filename, has_scan_data, status_id ) "
-			+ " VALUES (?, ?, ?, ?, " +  SearchRecordStatus.IMPORTING.value()
+			+ " (path, directory_name, fasta_filename, has_scan_data, status_id, created_by_user_id ) "
+			+ " VALUES (?, ?, ?, ?, " +  SearchRecordStatus.IMPORTING.value() + ", ? "
 			+ " )";
 	/**
 	 * This will INSERT the given SearchDTO into the database... even if an id is already set.
@@ -50,7 +50,7 @@ public class SearchDAO {
 	 * @param item
 	 * @throws Exception
 	 */
-	public void saveToDatabase( SearchDTO item, Connection conn ) throws Exception {
+	public void saveToDatabase( SearchDTO_Importer item, Connection conn ) throws Exception {
 //		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -71,6 +71,13 @@ public class SearchDAO {
 			} else {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
 			}
+			counter++;
+			if ( item.getCreatedByUserId() != null ) {
+				pstmt.setInt( counter, item.getCreatedByUserId() );
+			} else {
+				pstmt.setNull(counter, java.sql.Types.INTEGER );
+			}
+			
 			pstmt.executeUpdate();
 			rs = pstmt.getGeneratedKeys();
 			if( rs.next() ) {
