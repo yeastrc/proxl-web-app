@@ -17,10 +17,12 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dao.ProjectSearchDAO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Search_Core_DTO;
+import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -85,7 +87,7 @@ public class SearchNameService {
 			int projectId = projectIdsFromSearchIds.get( 0 );
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -108,8 +110,17 @@ public class SearchNameService {
 			////////   Auth complete
 			//////////////////////////////////////////
 
+			int authUserId = 0;
+			try {
+				authUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+			} catch ( Exception e ) {
+				String msg = "Error getting authUserId from userSessionObject";
+				log.error( msg, e );
+				throw new ProxlWebappInternalErrorException(msg, e);
+			}
+			
 			if( name != null && name != "" ) {
-				ProjectSearchDAO.getInstance().updateName( projectSearchId, name );
+				ProjectSearchDAO.getInstance().updateName( projectSearchId, name, authUserId );
 				Cached_Search_Core_DTO.getInstance().invalidateProjectSearchId( projectSearchId );
 			}
 			

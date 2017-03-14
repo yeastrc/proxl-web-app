@@ -24,16 +24,17 @@ public class ProjectSearchDAO {
 	 * @param name
 	 * @throws Exception
 	 */
-	public void updateName( int projectSearchId, String name ) throws Exception {
+	public void updateName( int projectSearchId, String name, int authUserId ) throws Exception {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String sql = "UPDATE project_search SET search_name = ? WHERE id = ?";
+		String sql = "UPDATE project_search SET search_name = ?, updated_by_user_id = ? WHERE id = ?";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setString( 1, name );
-			pstmt.setInt( 2, projectSearchId );
+			pstmt.setInt( 2, authUserId );
+			pstmt.setInt( 3, projectSearchId );
 			pstmt.executeUpdate();
 		} catch ( Exception e ) {
 			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
