@@ -1761,7 +1761,7 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 
 	var filenameURIEncoded = encodeURIComponent( filename );
 
-	var postURL = contextPathJSVar + "/uploadFileForImport?"
+	var postURL = contextPathJSVar + "/uploadProxlXmlOrScanFileForImport.do?"
 	+ "upload_key=" +  uploadKey
 	+ "&project_id=" + projectId
 	+ "&file_index=" + fileIndex

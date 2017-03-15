@@ -26,21 +26,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class UploadFilePost {
 	
-
 	private static final Logger log = Logger.getLogger(UploadFilePost.class);
 
-
 	private static final UploadFilePost instance = new UploadFilePost();
-
 	private UploadFilePost() { }
 	public static UploadFilePost getInstance() { return instance; }
 
-	public static final String SUB_URL = "/uploadFileForImport?";
+	public static final String SUB_URL = "/uploadProxlXmlOrScanFileForImport.do?";
 
-	
-	
-	
-	
+	/**
+	 * @param uploadFile
+	 * @param fileIndex
+	 * @param fileType
+	 * @param projectIdString
+	 * @param uploadKey
+	 * @param baseURL
+	 * @param httpclient
+	 * @return
+	 * @throws Exception
+	 */
 	public UploadFileResult uploadFilePost(
 			
 			File uploadFile,

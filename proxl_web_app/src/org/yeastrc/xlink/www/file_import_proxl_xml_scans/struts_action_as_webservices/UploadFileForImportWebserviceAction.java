@@ -1,12 +1,9 @@
-package org.yeastrc.xlink.www.file_import_proxl_xml_scans.servlets_as_webservices;
+package org.yeastrc.xlink.www.file_import_proxl_xml_scans.struts_action_as_webservices;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBContext;
@@ -18,6 +15,10 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportFileType;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.utils.Proxl_XML_ImporterWrkDirAndSbDrsCmmn;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -38,23 +39,19 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
+ * Upload 
  * 
- *  This Servlet should be considered a webservice as it returns JSON
+ * This Struts Action should be considered a webservice as it returns JSON
  */
-public class UploadFileForImportServlet extends HttpServlet {
+public class UploadFileForImportWebserviceAction extends Action {
+
+	private static Logger log = Logger.getLogger( UploadFileForImportWebserviceAction.class );
 	
-	private static final Logger log = Logger.getLogger( UploadFileForImportServlet.class );
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	/* (non-Javadoc)
-	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-	 */
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public ActionForward execute( ActionMapping mapping,
+			  ActionForm form,
+			  HttpServletRequest request,
+			  HttpServletResponse response ) throws Exception {
+
 		//  For multipart forms (which is what is passed to this servlet), 
 		//  	request.getParameter(...) only comes from the query string
 //		String uploadType = request.getParameter( "uploadTypeQueryString" ); 
@@ -573,20 +570,8 @@ public class UploadFileForImportServlet extends HttpServlet {
 			//  No longer delete dir
 //			cleanupOnError( uploadFileTempSubDirForThisRequestFileObj );
 		}
-		//  Example for forwarding to a JSP
-//        
-//        //File uploaded successfully
-//        request.setAttribute("message", "File Uploaded Successfully");
-//     } catch (Exception ex) {
-//        request.setAttribute("message", "File Upload Failed due to " + ex);
-//     }          
-//  
-// }else{
-//     request.setAttribute("message",
-//                          "Sorry this Servlet only handles file upload request");
-// }
-//
-// request.getRequestDispatcher("/result.jsp").forward(request, response);
+
+		return null;
 	}
 	
 	/**

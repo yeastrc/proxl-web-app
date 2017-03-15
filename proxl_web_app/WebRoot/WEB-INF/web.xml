@@ -50,6 +50,7 @@
 
 
 	<!-- This Servlet should be considered a webservice as it returns JSON -->
+<!--  
   <servlet>
     <servlet-name>File_Upload_For_Import_Servlet</servlet-name>
     <servlet-class>org.yeastrc.xlink.www.file_import_proxl_xml_scans.servlets_as_webservices.UploadFileForImportServlet</servlet-class>
@@ -60,6 +61,7 @@
     <servlet-name>File_Upload_For_Import_Servlet</servlet-name>
     <url-pattern>/uploadFileForImport</url-pattern>
   </servlet-mapping>
+-->
 
 	<!--  Servlet for handling shortened URLs, redirects to full URL  -->
 

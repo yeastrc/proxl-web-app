@@ -361,7 +361,12 @@
                   forward="/WEB-INF/jsp-pages/proxl-external-viewer.jsp">
         </action>
         
-        
+
+		<action path="/uploadProxlXmlOrScanFileForImport"
+				type="org.yeastrc.xlink.www.file_import_proxl_xml_scans.struts_action_as_webservices.UploadFileForImportWebserviceAction"
+				scope="request"
+				validate="false">
+		</action>        
         
         
         <!--  ==========================================================================================  -->
