@@ -1,16 +1,23 @@
 package org.yeastrc.xlink.www.annotation_utils;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-//import org.apache.log4j.Logger;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 import org.yeastrc.xlink.enum_classes.PsmPeptideAnnotationType;
 import org.yeastrc.xlink.www.cached_data_mgmt.CacheCurrentSizeMaxSizeResult;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.searcher.AnnotationTypeForSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher_via_cached_data.config_size_etc_central_code.CachedDataCentralConfigStorageAndProcessing;
+import org.yeastrc.xlink.www.searcher_via_cached_data.config_size_etc_central_code.CachedDataSizeOptions;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -19,38 +26,84 @@ import com.google.common.cache.LoadingCache;
  * Central place to get Annotation Type data
  * 
  * Singleton instance
+ * 
+ * Cache Key:  
+ * Cache Value: 
  */
 public class GetAnnotationTypeData implements CachedDataCommonIF {
 	
-//	private static final Logger log = Logger.getLogger(GetAnnotationTypeData.class);
-	private static final int CACHE_MAX_SIZE = 500;
-	private static final int CACHE_TIMEOUT = 20; // in days
+	private static final Logger log = Logger.getLogger(GetAnnotationTypeData.class);
+	
+	private static final int CACHE_MAX_SIZE_FULL_SIZE = 8000;
+	private static final int CACHE_MAX_SIZE_SMALL_FEW = 500;
+
+	private static final int CACHE_TIMEOUT_FULL_SIZE = 20; // in days
+	private static final int CACHE_TIMEOUT_SMALL = 20; // in days
+
+
+	private static final AtomicLong cacheGetCount = new AtomicLong();
+	private static final AtomicLong cacheDBRetrievalCount = new AtomicLong();
+	
+	private static volatile int prevDayOfYear = -1;
+
+	private static boolean debugLogLevelEnabled = false;
+	
+	/**
+	 * Static singleton instance
+	 */
+	private static GetAnnotationTypeData _instance = null; //  Delay creating until first getInstance() call
+
 	/**
 	 * Static get singleton instance
 	 * @return
+	 * @throws Exception 
 	 */
-	public static GetAnnotationTypeData getInstance() {
+	public static synchronized GetAnnotationTypeData getInstance() throws Exception {
+		if ( _instance == null ) {
+			_instance = new GetAnnotationTypeData();
+		}
 		return _instance; 
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF#clearCacheData()
-	 * 
-	 * Clear all entries from the cache
+	/**
+	 * constructor
 	 */
-	@Override
-	public void clearCacheData() throws Exception {
-		annotationTypeDataCache.invalidateAll();
+	private GetAnnotationTypeData() {
+		if ( log.isDebugEnabled() ) {
+			debugLogLevelEnabled = true;
+			log.debug( "debug log level enabled" );
+		}
+
+		cacheHolderInternal = new CacheHolderInternal( this );
+
+		//  Register this class with the centralized Cached Data Registry, to support centralized cache clearing
+		CachedDataCentralRegistry.getInstance().register( this );
 	}
+	
+	private CacheHolderInternal cacheHolderInternal;
+
 	
 	@Override
 	public CacheCurrentSizeMaxSizeResult getCurrentCacheSizeAndMax() throws Exception {
-		CacheCurrentSizeMaxSizeResult result = new CacheCurrentSizeMaxSizeResult();
-		result.setCurrentSize( annotationTypeDataCache.size() );
-		result.setMaxSize( CACHE_MAX_SIZE );
-		return result;
+		return cacheHolderInternal.getCurrentCacheSizeAndMax();
 	}
 	
+
+	@Override
+	public void clearCacheData() throws Exception {
+		clearCache();
+	}
+
+	/**
+	 * Recreate the cache using current config values, if they exist, or else defaults
+	 * @throws Exception 
+	 */
+	public void clearCache() throws Exception {
+		printPrevCacheHitCounts( true /* forcePrintNow */ );
+		cacheHolderInternal.invalidate();
+	}
+
+
 	/**
 	 * @param searchIds
 	 * @return
@@ -99,38 +152,17 @@ public class GetAnnotationTypeData implements CachedDataCommonIF {
 		localCacheKey.searchIds = searchIds;
 		localCacheKey.filterableDescriptiveAnnotationType = filterableDescriptiveAnnotationType;
 		localCacheKey.psmPeptideAnnotationType = psmPeptideAnnotationType;
-		LocalCacheValue localCacheValue = annotationTypeDataCache.get( localCacheKey );
+
+		LoadingCache<LocalCacheKey, LocalCacheValue> cache = cacheHolderInternal.getCache();
+		
+		LocalCacheValue localCacheValue = cache.get( localCacheKey );
 		if ( localCacheValue == null ) {
-			throw new Exception("Should be getting annotation data via cache internal load");
+			throw new ProxlWebappInternalErrorException("Should be getting annotation data via cache internal load");
 		}
 		Map<Integer, Map<Integer, AnnotationTypeDTO>> annotationTypeData = localCacheValue.annotationTypeData;
 		return annotationTypeData;
 	}
-	/**
-	 * Static singleton instance
-	 */
-	private static final GetAnnotationTypeData _instance = new GetAnnotationTypeData();
 	
-	/**
-	 * constructor
-	 */
-	private GetAnnotationTypeData() {
-		annotationTypeDataCache = CacheBuilder.newBuilder()
-				.expireAfterAccess( CACHE_TIMEOUT, TimeUnit.DAYS )
-			    .maximumSize( CACHE_MAX_SIZE )
-			    .build(
-			    		new CacheLoader<LocalCacheKey, LocalCacheValue>() {
-			    			public LocalCacheValue load(LocalCacheKey localCacheKey) throws Exception {
-			    				//   WARNING  cannot return null.  
-			    				//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
-			    				//  value is NOT in cache so get it and return it
-			    				return loadFromDB(localCacheKey);
-			    			}
-			    		});
-//			    .build(); // no CacheLoader
-		//  Register this class with the centralized Cached Data Registry, to support centralized cache clearing
-		CachedDataCentralRegistry.getInstance().register( this );
-	}
 	/**
 	 * classes for holding data in the cache
 	 * 
@@ -185,40 +217,151 @@ public class GetAnnotationTypeData implements CachedDataCommonIF {
 	 * value in the cache
 	 */
 	private static class LocalCacheValue {
-		LocalCacheKey localCacheKey;
 		Map<Integer, Map<Integer, AnnotationTypeDTO>> annotationTypeData;
-		long lastAccessTime;
+	}
+
+	/**
+	 * Class to hold and create the cache object
+	 *
+	 */
+	private static class CacheHolderInternal {
+
+		private GetAnnotationTypeData parentObject;
+		
+		private CacheHolderInternal( GetAnnotationTypeData parentObject ) {
+			this.parentObject = parentObject;
+		}
+		
+		private boolean cacheDataInitialized;
+		
+		/**
+		 * cached data, left null if no caching
+		 */
+		private LoadingCache<LocalCacheKey, LocalCacheValue> dbRecordsDataCache = null;
+		
+		private int cacheMaxSize;
+
+		/**
+		 * @return
+		 * @throws Exception
+		 */
+		public synchronized CacheCurrentSizeMaxSizeResult getCurrentCacheSizeAndMax() throws Exception {
+			CacheCurrentSizeMaxSizeResult result = new CacheCurrentSizeMaxSizeResult();
+			if ( dbRecordsDataCache != null ) {
+				result.setCurrentSize( dbRecordsDataCache.size() );
+				result.setMaxSize( cacheMaxSize );
+			}
+			return result;
+		}
+		
+		/**
+		 * @throws Exception
+		 */
+		@SuppressWarnings("static-access")
+		private synchronized LoadingCache<LocalCacheKey, LocalCacheValue> getCache(  ) throws Exception {
+			if ( ! cacheDataInitialized ) { 
+				CachedDataSizeOptions cachedDataSizeOptions = 
+						CachedDataCentralConfigStorageAndProcessing.getInstance().getCurrentSizeConfigValue();
+				
+				//  Not applicable for this cache.  Always create a cache
+//				if ( cachedDataSizeOptions == CachedDataSizeOptions.FEW ) {
+//					//  No Cache, just mark initialized, dbRecordsDataCache already set to null;
+//					cacheDataInitialized = true;
+//					return dbRecordsDataCache;  //  EARLY RETURN
+//				}
+				
+				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
+				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
+					cacheMaxSize = cacheMaxSize / 2;
+				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL
+						|| cachedDataSizeOptions == CachedDataSizeOptions.FEW ) {
+					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL_FEW;
+					cacheTimeout = CACHE_TIMEOUT_SMALL;
+				}
+				
+				dbRecordsDataCache = CacheBuilder.newBuilder()
+						.expireAfterAccess( cacheTimeout, TimeUnit.DAYS )
+						.maximumSize( cacheMaxSize )
+						.build(
+								new CacheLoader<LocalCacheKey, LocalCacheValue>() {
+									public LocalCacheValue load( LocalCacheKey LocalCacheKey ) throws Exception {
+										
+										//   WARNING  cannot return null.  
+										//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+										
+										//  value is NOT in cache so get it and return it
+										return loadFromDB( LocalCacheKey );
+									}
+								});
+			//			    .build(); // no CacheLoader
+				cacheDataInitialized = true;
+			}
+			return dbRecordsDataCache;
+		}
+
+		private synchronized void invalidate() {
+			dbRecordsDataCache = null;
+			cacheDataInitialized = false;
+		}
+
+		/**
+		 * @param searchIds
+		 * @param filterableDescriptiveAnnotationType
+		 * @param psmPeptideAnnotationType
+		 * @param localCacheKey
+		 * @return
+		 * @throws Exception
+		 */
+		private LocalCacheValue loadFromDB(   
+				LocalCacheKey localCacheKey
+				) throws Exception {
+			//   WARNING  cannot return null.  
+			//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
+			//  value is NOT in cache so get it and return it
+			Map<Integer, Map<Integer, AnnotationTypeDTO>> annotationTypeData =
+					AnnotationTypeForSearchIdsSearcher.getInstance()
+					.getAllForSearchIds_FilterableDescriptive_PsmPeptide(
+							localCacheKey.searchIds, 
+							localCacheKey.filterableDescriptiveAnnotationType, 
+							localCacheKey.psmPeptideAnnotationType );
+			LocalCacheValue localCacheValue = new LocalCacheValue();
+			localCacheValue.annotationTypeData = annotationTypeData;
+			return localCacheValue;
+		}
+
+ 	}
+
+	/**
+	 * 
+	 */
+	private void printPrevCacheHitCounts( boolean forcePrintNow ) {
+		
+		Calendar now = Calendar.getInstance();
+		
+		int nowDayOfYear = now.get( Calendar.DAY_OF_YEAR );
+		
+		if ( prevDayOfYear != nowDayOfYear || forcePrintNow ) {
+
+			if ( prevDayOfYear != -1 ) {
+				if ( debugLogLevelEnabled ) {
+					log.debug( "Cache total gets and db loads(misses) for previous day (or since last cache recreate): 'total gets': " + cacheGetCount.intValue() 
+					+ ", misses: " + cacheDBRetrievalCount.intValue() );
+				}
+			}
+			if ( forcePrintNow ) {
+				if ( debugLogLevelEnabled ) {
+					log.debug( "Cache total gets and db loads(misses) since last print: 'total gets': " + cacheGetCount.intValue() 
+					+ ", misses: " + cacheDBRetrievalCount.intValue() );
+				}
+			}
+			
+			prevDayOfYear = nowDayOfYear;
+			//  Reset cache hit and miss counters
+			cacheGetCount.set(0);
+			cacheDBRetrievalCount.set(0);
+		}
+		
 	}
 	
-	/**
-	 * cached annotation type data
-	 */
-	private LoadingCache<LocalCacheKey, LocalCacheValue> annotationTypeDataCache = null;
-	
-	/**
-	 * @param searchIds
-	 * @param filterableDescriptiveAnnotationType
-	 * @param psmPeptideAnnotationType
-	 * @param localCacheKey
-	 * @return
-	 * @throws Exception
-	 */
-	private LocalCacheValue loadFromDB(   
-			LocalCacheKey localCacheKey
-			) throws Exception {
-		//   WARNING  cannot return null.  
-		//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
-		//  value is NOT in cache so get it and return it
-		Map<Integer, Map<Integer, AnnotationTypeDTO>> annotationTypeData =
-				AnnotationTypeForSearchIdsSearcher.getInstance()
-				.getAllForSearchIds_FilterableDescriptive_PsmPeptide(
-						localCacheKey.searchIds, 
-						localCacheKey.filterableDescriptiveAnnotationType, 
-						localCacheKey.psmPeptideAnnotationType );
-		LocalCacheValue localCacheValue = new LocalCacheValue();
-		localCacheValue.localCacheKey = localCacheKey;
-		localCacheValue.annotationTypeData = annotationTypeData;
-		localCacheValue.lastAccessTime = System.currentTimeMillis();
-		return localCacheValue;
-	}
 }
