@@ -24,7 +24,7 @@ public class ProxlXMLFileImportTracking_PendingCount_Searcher {
 		return new ProxlXMLFileImportTracking_PendingCount_Searcher(); 
 	}
 	private static final String SQL = 
-			"SELECT COUNT(*) AS count FROM file_import_proxl_xml_scans_tracking"
+			"SELECT COUNT(*) AS count FROM proxl_xml_file_import_tracking"
 					+ " WHERE "
 			+ "  marked_for_deletion != " + Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE
 			+ " AND status_id IN ( " 

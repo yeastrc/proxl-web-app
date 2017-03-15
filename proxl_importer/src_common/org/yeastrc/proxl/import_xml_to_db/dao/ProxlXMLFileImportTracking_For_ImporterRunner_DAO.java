@@ -13,7 +13,7 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.populate_dto_from_resu
 
 /**
  * 
- * table file_import_proxl_xml_scans_tracking
+ * table proxl_xml_file_import_tracking
  */
 public class ProxlXMLFileImportTracking_For_ImporterRunner_DAO {
 
@@ -34,7 +34,7 @@ public class ProxlXMLFileImportTracking_For_ImporterRunner_DAO {
 	
 	private static final String GET_NEXT_QUEUED_SQL = 
 			
-			"SELECT * FROM file_import_proxl_xml_scans_tracking "
+			"SELECT * FROM proxl_xml_file_import_tracking "
 			+ " WHERE status_id IN ( " 
 			+ 		ProxlXMLFileImportStatus.QUEUED.value()
 			+	  "," + ProxlXMLFileImportStatus.RE_QUEUED.value()
@@ -107,7 +107,7 @@ public class ProxlXMLFileImportTracking_For_ImporterRunner_DAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		final String sql = "UPDATE file_import_proxl_xml_scans_tracking SET status_id = "
+		final String sql = "UPDATE proxl_xml_file_import_tracking SET status_id = "
 				+ ProxlXMLFileImportStatus.STARTED.value() 
 				+ ", import_start_date_time = NOW(), last_updated_date_time = NOW() WHERE id = ?";
 
@@ -191,7 +191,7 @@ public class ProxlXMLFileImportTracking_For_ImporterRunner_DAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		final String sql = "UPDATE file_import_proxl_xml_scans_tracking SET status_id = ?"
+		final String sql = "UPDATE proxl_xml_file_import_tracking SET status_id = ?"
 				+ ", import_end_date_time = NOW(), last_updated_date_time = NOW() WHERE id = ?";
 
 		

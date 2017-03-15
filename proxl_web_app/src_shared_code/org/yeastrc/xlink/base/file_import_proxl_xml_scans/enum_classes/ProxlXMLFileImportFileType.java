@@ -5,7 +5,7 @@ package org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes;
  * Enum for this Proxl XML File Import Single File record for the file type 
  * 
  * Keep these values in sync with the values in the table 
- * 'file_import_proxl_xml_scans_tracking_single_file_type_lookup'
+ * 'proxl_xml_file_import_tracking_single_file_type_lookup'
  * 
  */
 public enum ProxlXMLFileImportFileType {

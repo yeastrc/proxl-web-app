@@ -42,11 +42,11 @@ public class ProxlXMLFIleImportTrackingFileIdCreatorDAO {
 		
 		PreparedStatement pstmtDelete = null;
 
-		final String sql = "INSERT INTO file_import_proxl_xml_scans_tracking_id_creator () VALUES ( )";
+		final String sql = "INSERT INTO proxl_xml_file_import_tracking_id_creator () VALUES ( )";
 
 
 				
-//		CREATE TABLE file_import_proxl_xml_scans_tracking_id_creator (
+//		CREATE TABLE proxl_xml_file_import_tracking_id_creator (
 //				  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 				  
 		try {
@@ -67,7 +67,7 @@ public class ProxlXMLFIleImportTrackingFileIdCreatorDAO {
 					
 				} else {
 					
-					String msg = "Failed to insert file_import_proxl_xml_scans_tracking_id_creator, generated key not found.";
+					String msg = "Failed to insert proxl_xml_file_import_tracking_id_creator, generated key not found.";
 					
 					log.error( msg );
 					
@@ -77,7 +77,7 @@ public class ProxlXMLFIleImportTrackingFileIdCreatorDAO {
 				
 			} catch ( Exception e ) {
 				
-				String msg = "Failed to insert file_import_proxl_xml_scans_tracking_id_creator, sql: " + sql;
+				String msg = "Failed to insert proxl_xml_file_import_tracking_id_creator, sql: " + sql;
 				
 				log.error( msg, e );
 				
@@ -101,7 +101,7 @@ public class ProxlXMLFIleImportTrackingFileIdCreatorDAO {
 			
 
 			
-			final String deleteSQL = "DELETE FROM file_import_proxl_xml_scans_tracking_id_creator WHERE id < ?";
+			final String deleteSQL = "DELETE FROM proxl_xml_file_import_tracking_id_creator WHERE id < ?";
 			
 			try {
 				
@@ -114,7 +114,7 @@ public class ProxlXMLFIleImportTrackingFileIdCreatorDAO {
 				
 			} catch ( Exception e ) {
 				
-				String msg = "Failed to delete from file_import_proxl_xml_scans_tracking_id_creator, sql: " + deleteSQL;
+				String msg = "Failed to delete from proxl_xml_file_import_tracking_id_creator, sql: " + deleteSQL;
 				
 				log.error( msg, e );
 				

@@ -13,7 +13,7 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImport
 
 /**
  * 
- * table file_import_proxl_xml_scans_tracking_status_values_lookup
+ * table proxl_xml_file_import_tracking_status_values_lookup
  */
 public class ProxlXMLFileImportTrackingStatusValuesLookupDAO {
 
@@ -48,7 +48,7 @@ public class ProxlXMLFileImportTrackingStatusValuesLookupDAO {
 		ResultSet rs = null;
 		
 		
-		final String sql =  "SELECT * FROM file_import_proxl_xml_scans_tracking_status_values_lookup ";
+		final String sql =  "SELECT * FROM proxl_xml_file_import_tracking_status_values_lookup ";
 		
 		try {
 			
@@ -115,7 +115,7 @@ public class ProxlXMLFileImportTrackingStatusValuesLookupDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		final String sql = "SELECT * FROM file_import_proxl_xml_scans_tracking WHERE id = ?";
+		final String sql = "SELECT * FROM proxl_xml_file_import_tracking WHERE id = ?";
 		
 		try {
 			

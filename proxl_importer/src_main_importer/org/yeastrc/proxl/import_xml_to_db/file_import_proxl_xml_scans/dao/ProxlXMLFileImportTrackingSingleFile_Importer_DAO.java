@@ -8,7 +8,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
  * 
- * table file_import_proxl_xml_scans_tracking_single_file
+ * table proxl_xml_file_import_tracking_single_file
  */
 public class ProxlXMLFileImportTrackingSingleFile_Importer_DAO {
 	
@@ -51,7 +51,7 @@ public class ProxlXMLFileImportTrackingSingleFile_Importer_DAO {
 	public void updateFileSizeSHA1Sum( long fileSize, String sha1Sum, int id, Connection dbConnection ) throws Exception {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		final String sql = "UPDATE file_import_proxl_xml_scans_tracking_single_file SET file_size = ?, sha1_sum = ? WHERE id = ?";
+		final String sql = "UPDATE proxl_xml_file_import_tracking_single_file SET file_size = ?, sha1_sum = ? WHERE id = ?";
 		try {
 			pstmt = dbConnection.prepareStatement( sql );
 			int counter = 0;

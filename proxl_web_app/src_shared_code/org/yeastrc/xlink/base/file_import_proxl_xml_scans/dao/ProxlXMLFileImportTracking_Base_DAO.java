@@ -11,7 +11,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
  * 
- * table file_import_proxl_xml_scans_tracking
+ * table proxl_xml_file_import_tracking
  */
 public class ProxlXMLFileImportTracking_Base_DAO {
 
@@ -27,7 +27,7 @@ public class ProxlXMLFileImportTracking_Base_DAO {
 	}
 
 	/**
-	 * Get the given file_import_proxl_xml_scans_tracking from the database
+	 * Get the given proxl_xml_file_import_tracking from the database
 	 * 
 	 * @param id
 	 * @return
@@ -38,7 +38,7 @@ public class ProxlXMLFileImportTracking_Base_DAO {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT * FROM file_import_proxl_xml_scans_tracking WHERE id = ?";
+		String sql = "SELECT * FROM proxl_xml_file_import_tracking WHERE id = ?";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );

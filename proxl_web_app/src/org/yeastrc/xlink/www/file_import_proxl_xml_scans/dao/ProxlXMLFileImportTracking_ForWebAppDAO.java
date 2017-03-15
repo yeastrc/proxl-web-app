@@ -13,7 +13,7 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLF
 
 /**
  * 
- * table file_import_proxl_xml_scans_tracking
+ * table proxl_xml_file_import_tracking
  */
 public class ProxlXMLFileImportTracking_ForWebAppDAO {
 
@@ -48,7 +48,7 @@ public class ProxlXMLFileImportTracking_ForWebAppDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		final String sql = "SELECT status_id FROM file_import_proxl_xml_scans_tracking WHERE id = ?";
+		final String sql = "SELECT status_id FROM proxl_xml_file_import_tracking WHERE id = ?";
 		
 		try {
 			
@@ -138,7 +138,7 @@ public class ProxlXMLFileImportTracking_ForWebAppDAO {
 		
 		//  Insert field "id" since not autoincrement
 
-		final String sql = "INSERT INTO file_import_proxl_xml_scans_tracking ( "
+		final String sql = "INSERT INTO proxl_xml_file_import_tracking ( "
 				+ " id, project_id, priority, status_id, marked_for_deletion, insert_request_url, "
 				+ " search_name, search_path, auth_user_id,  "
 				+ " remote_user_ip_address, last_updated_date_time )"
@@ -273,14 +273,14 @@ public class ProxlXMLFileImportTracking_ForWebAppDAO {
 		
 		if ( markedForDeletion ) {
 
-			sql = "UPDATE file_import_proxl_xml_scans_tracking "
+			sql = "UPDATE proxl_xml_file_import_tracking "
 					+ " SET marked_for_deletion = " + Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE
 					+ " , last_updated_date_time = NOW(),"
 					+ " deleted_by_auth_user_id = ?, deleted_date_time = NOW() "
 					+ " WHERE id = ? AND status_id = ?";
 		} else {
 			
-			sql = "UPDATE file_import_proxl_xml_scans_tracking "
+			sql = "UPDATE proxl_xml_file_import_tracking "
 					+ " SET marked_for_deletion = " + Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE
 					+ " , last_updated_date_time = NOW(),"
 					+ " deleted_by_auth_user_id = NULL, deleted_date_time = NULL "

@@ -11,7 +11,7 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImport
 
 /**
  * 
- * table file_import_proxl_xml_scans_tracking_single_file
+ * table proxl_xml_file_import_tracking_single_file
  */
 public class ProxlXMLFileImportTrackingSingleFile_ForWebAppDAO {
 
@@ -67,8 +67,8 @@ public class ProxlXMLFileImportTrackingSingleFile_ForWebAppDAO {
 		ResultSet rs = null;
 		
 
-		final String sql = "INSERT INTO file_import_proxl_xml_scans_tracking_single_file "
-				+ "( file_import_proxl_xml_scans_tracking_id, file_type_id, file_upload_status_id, "
+		final String sql = "INSERT INTO proxl_xml_file_import_tracking_single_file "
+				+ "( proxl_xml_file_import_tracking_id, file_type_id, file_upload_status_id, "
 				+ " filename_in_upload, filename_on_disk, filename_on_disk_with_path_sub_same_machine, "
 				+ " file_size )"
 				+ " VALUES ( ?, ?, ?, ?, ?, ?, ? )";

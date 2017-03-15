@@ -10,7 +10,7 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.populate_dto_from_resu
 import org.yeastrc.xlink.db.DBConnectionFactory;
 /**
  * 
- * table file_import_proxl_xml_scans_tracking_run
+ * table proxl_xml_file_import_tracking_run
  */
 public class ProxlXMLFileImportTrackingRun_Base_DAO {
 	
@@ -25,7 +25,7 @@ public class ProxlXMLFileImportTrackingRun_Base_DAO {
 	}
 	
 	/**
-	 * Get the given file_import_proxl_xml_scans_tracking_run from the database
+	 * Get the given proxl_xml_file_import_tracking_run from the database
 	 * 
 	 * @param id
 	 * @return
@@ -36,7 +36,7 @@ public class ProxlXMLFileImportTrackingRun_Base_DAO {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT * FROM file_import_proxl_xml_scans_tracking_run WHERE id = ?";
+		String sql = "SELECT * FROM proxl_xml_file_import_tracking_run WHERE id = ?";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
@@ -91,7 +91,7 @@ public class ProxlXMLFileImportTrackingRun_Base_DAO {
 	public void updateStatus( ProxlXMLFileImportStatus status, int id, Connection dbConnection ) throws Exception {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		final String sql = "UPDATE file_import_proxl_xml_scans_tracking_run SET status = ?, last_updated_date_time = NOW() WHERE id = ?";
+		final String sql = "UPDATE proxl_xml_file_import_tracking_run SET status = ?, last_updated_date_time = NOW() WHERE id = ?";
 		try {
 			pstmt = dbConnection.prepareStatement( sql );
 			int counter = 0;

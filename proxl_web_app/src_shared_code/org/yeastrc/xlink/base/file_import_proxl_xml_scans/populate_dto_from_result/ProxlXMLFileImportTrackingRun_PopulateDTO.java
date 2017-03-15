@@ -11,7 +11,7 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImport
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportStatus;
 
 /**
- * table file_import_proxl_xml_scans_tracking_run
+ * table proxl_xml_file_import_tracking_run
  *
  */
 public class ProxlXMLFileImportTrackingRun_PopulateDTO {
@@ -49,7 +49,7 @@ public class ProxlXMLFileImportTrackingRun_PopulateDTO {
 			returnItem.setCurrentRun( false );
 		}
 		
-		returnItem.setProxlXmlFileImportTrackingId( rs.getInt( "file_import_proxl_xml_scans_tracking_id" ) );
+		returnItem.setProxlXmlFileImportTrackingId( rs.getInt( "proxl_xml_file_import_tracking_id" ) );
 		
 		returnItem.setRunStatus( ProxlXMLFileImportStatus.fromValue( rs.getInt( "status_id" ) ) );
 		

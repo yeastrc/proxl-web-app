@@ -171,13 +171,13 @@ public class ImporterDefaultMainProgramEntry {
 		
 		//  Search Name from proxlXMLFileImportTrackingDTO or command Line
 		String searchNameOverrideValue = null;
-		//  "search_path" field from "file_import_proxl_xml_scans_tracking" table, if import run from Run Import pgm
+		//  "search_path" field from "proxl_xml_file_import_tracking" table, if import run from Run Import pgm
 		String importDirectoryOverrideValue = null;
 		
 		//  TODO  Not currently used
 //		String outputImportResultFileName = null;
 		
-		Integer userIdInsertingSearch = null;  //  Populated from file_import_proxl_xml_scans_tracking.auth_user_id
+		Integer userIdInsertingSearch = null;  //  Populated from proxl_xml_file_import_tracking.auth_user_id
 		
 		String outputDataErrorsFileName = null;
 		ImportProgramShutdownThread importProgramShutdownThread = null;

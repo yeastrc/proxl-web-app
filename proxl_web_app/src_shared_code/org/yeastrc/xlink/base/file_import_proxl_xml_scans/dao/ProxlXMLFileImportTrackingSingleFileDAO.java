@@ -12,7 +12,7 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLF
 import org.yeastrc.xlink.db.DBConnectionFactory;
 /**
  * 
- * table file_import_proxl_xml_scans_tracking_single_file
+ * table proxl_xml_file_import_tracking_single_file
  */
 public class ProxlXMLFileImportTrackingSingleFileDAO {
 
@@ -36,7 +36,7 @@ public class ProxlXMLFileImportTrackingSingleFileDAO {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		final String sql = "SELECT * FROM file_import_proxl_xml_scans_tracking_single_file WHERE id = ?";
+		final String sql = "SELECT * FROM proxl_xml_file_import_tracking_single_file WHERE id = ?";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
@@ -77,7 +77,7 @@ public class ProxlXMLFileImportTrackingSingleFileDAO {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		final String sql = "SELECT * FROM file_import_proxl_xml_scans_tracking_single_file WHERE file_import_proxl_xml_scans_tracking_id = ?";
+		final String sql = "SELECT * FROM proxl_xml_file_import_tracking_single_file WHERE proxl_xml_file_import_tracking_id = ?";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
@@ -117,7 +117,7 @@ public class ProxlXMLFileImportTrackingSingleFileDAO {
 	public ProxlXMLFileImportTrackingSingleFileDTO populateResultObject(ResultSet rs) throws SQLException {
 		ProxlXMLFileImportTrackingSingleFileDTO returnItem = new ProxlXMLFileImportTrackingSingleFileDTO();
 		returnItem.setId( rs.getInt( "id" ) );
-		returnItem.setProxlXmlFileImportTrackingId( rs.getInt( "file_import_proxl_xml_scans_tracking_id" ) );
+		returnItem.setProxlXmlFileImportTrackingId( rs.getInt( "proxl_xml_file_import_tracking_id" ) );
 		returnItem.setFileType( ProxlXMLFileImportFileType.fromValue( rs.getInt( "file_type_id" ) ) );
 		returnItem.setFilenameInUpload( rs.getString( "filename_in_upload" ) );
 		returnItem.setFilenameOnDisk( rs.getString( "filename_on_disk" ) );

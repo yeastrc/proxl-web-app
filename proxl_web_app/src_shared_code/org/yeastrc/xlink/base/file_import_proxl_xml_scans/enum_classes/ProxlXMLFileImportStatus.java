@@ -5,7 +5,7 @@ package org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes;
  * Enum for is this Proxl XML File Import record for the status 
  * 
  * Keep these values in sync with the values in the table 
- * 'file_import_proxl_xml_scans_tracking_status_values_lookup'
+ * 'proxl_xml_file_import_tracking_status_values_lookup'
  * 
  */
 public enum ProxlXMLFileImportStatus {

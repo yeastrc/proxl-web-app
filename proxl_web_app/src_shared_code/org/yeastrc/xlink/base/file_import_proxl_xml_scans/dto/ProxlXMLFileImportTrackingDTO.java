@@ -6,7 +6,7 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLF
 
 /**
  * 
- * table file_import_proxl_xml_scans_tracking
+ * table proxl_xml_file_import_tracking
  * 
  */
 public class ProxlXMLFileImportTrackingDTO {

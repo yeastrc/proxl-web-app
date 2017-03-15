@@ -34,7 +34,7 @@ public class ProxlXMLFileImportTracking_PendingTrackingIdsAllProjects_Searcher {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		final String sql =  "SELECT id FROM file_import_proxl_xml_scans_tracking"
+		final String sql =  "SELECT id FROM proxl_xml_file_import_tracking"
 				+ " WHERE "
 				 + "  status_id IN ( " 
 					+ ProxlXMLFileImportStatus.QUEUED.value()

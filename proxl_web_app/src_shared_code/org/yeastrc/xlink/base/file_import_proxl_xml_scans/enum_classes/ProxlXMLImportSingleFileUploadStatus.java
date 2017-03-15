@@ -3,10 +3,10 @@ package org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes;
 
 /**
  * Enum for is this Proxl XML File Import 
- * DB field file_import_proxl_xml_scans_tracking_single_file.file_upload_status_id
+ * DB field proxl_xml_file_import_tracking_single_file.file_upload_status_id
  * 
  * Keep these values in sync with the values in the table 
- * 'file_import_proxl_xml_scans_tracking_single_file_upload_status_lookup'
+ * 'proxl_xml_file_import_tracking_single_file_upload_status_lookup'
  * 
  */
 public enum ProxlXMLImportSingleFileUploadStatus {

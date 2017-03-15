@@ -34,10 +34,10 @@ public class ProxlXMLFileImportTrackingRun_LatestForParent_Searcher {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		final String sql =  "SELECT * FROM file_import_proxl_xml_scans_tracking_run"
+		final String sql =  "SELECT * FROM proxl_xml_file_import_tracking_run"
 				+ " WHERE id = "
-				+ 		"( SELECT MAX(id) from file_import_proxl_xml_scans_tracking_run "
-				+ 		" WHERE file_import_proxl_xml_scans_tracking_id = ? )";
+				+ 		"( SELECT MAX(id) from proxl_xml_file_import_tracking_run "
+				+ 		" WHERE proxl_xml_file_import_tracking_id = ? )";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );

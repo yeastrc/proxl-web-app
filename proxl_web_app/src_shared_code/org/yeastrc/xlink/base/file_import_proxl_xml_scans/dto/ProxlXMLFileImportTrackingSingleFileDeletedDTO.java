@@ -4,7 +4,7 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLF
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLImportSingleFileUploadStatus;
 
 /**
- * table  file_import_proxl_xml_scans_tracking_single_file
+ * table  proxl_xml_file_import_tracking_single_file
  *
  */
 public class ProxlXMLFileImportTrackingSingleFileDeletedDTO {

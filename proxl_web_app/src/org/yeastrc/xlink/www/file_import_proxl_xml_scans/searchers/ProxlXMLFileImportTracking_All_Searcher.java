@@ -54,7 +54,7 @@ public class ProxlXMLFileImportTracking_All_Searcher {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		final String sql =  "SELECT * FROM file_import_proxl_xml_scans_tracking"
+		final String sql =  "SELECT * FROM proxl_xml_file_import_tracking"
 				+ " WHERE "
 				+ SELECT_WHERE_CLAUSE;
 		try {
@@ -102,7 +102,7 @@ public class ProxlXMLFileImportTracking_All_Searcher {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		final String sql =  "SELECT id, status_id FROM file_import_proxl_xml_scans_tracking"
+		final String sql =  "SELECT id, status_id FROM proxl_xml_file_import_tracking"
 				+ " WHERE "
 				+ SELECT_WHERE_CLAUSE;
 				;

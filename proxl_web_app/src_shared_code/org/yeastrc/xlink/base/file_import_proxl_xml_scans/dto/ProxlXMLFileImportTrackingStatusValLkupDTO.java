@@ -3,7 +3,7 @@ package org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto;
 
 /**
  * 
- * table file_import_proxl_xml_scans_tracking_status_values_lookup
+ * table proxl_xml_file_import_tracking_status_values_lookup
  * 
  */
 public class ProxlXMLFileImportTrackingStatusValLkupDTO {

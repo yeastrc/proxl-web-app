@@ -37,8 +37,8 @@ public class ProxlXMLFileImportTrackingHistoryDAO {
 			}
 		}
 	}
-	private static final String SAVE_SQL = "INSERT INTO file_import_proxl_xml_scans_tracking_status_history "
-			+ "( file_import_proxl_xml_scans_tracking_id, status_id )"
+	private static final String SAVE_SQL = "INSERT INTO proxl_xml_file_import_tracking_status_history "
+			+ "( proxl_xml_file_import_tracking_id, status_id )"
 			+ " VALUES ( ?, ? )";
 
 	/**
@@ -69,7 +69,7 @@ public class ProxlXMLFileImportTrackingHistoryDAO {
 //				throw new Exception( msg );
 //			}
 		} catch ( Exception e ) {
-			String msg = "Failed to insert file_import_proxl_xml_scans_tracking_status_history, sql: " + sql;
+			String msg = "Failed to insert proxl_xml_file_import_tracking_status_history, sql: " + sql;
 			log.error( msg, e );
 			throw e;
 		} finally {
