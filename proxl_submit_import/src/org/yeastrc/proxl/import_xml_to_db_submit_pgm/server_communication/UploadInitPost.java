@@ -32,7 +32,7 @@ public class UploadInitPost {
 	private UploadInitPost() { }
 	public static UploadInitPost getInstance() { return instance; }
 
-	public static final String SUB_URL = "/proxl_xml_file_import/uploadInit";
+	public static final String SUB_URL = "/file_import_proxl_xml_scans/uploadInit";
 	
 	public static final String PROJECT_ID_FORM_FIELD = "project_id";
 	public static final String SUBMITTER_SAME_MACHINE_FORM_FIELD = "submitter_same_machine";

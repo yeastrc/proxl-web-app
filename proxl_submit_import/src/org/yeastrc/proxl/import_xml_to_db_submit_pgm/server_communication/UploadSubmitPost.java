@@ -29,7 +29,7 @@ public class UploadSubmitPost {
 	private UploadSubmitPost() { }
 	public static UploadSubmitPost getInstance() { return instance; }
 
-	public static final String SUB_URL = "/proxl_xml_file_import/uploadSubmit";
+	public static final String SUB_URL = "/file_import_proxl_xml_scans/uploadSubmit";
 
 	
 	public UploadSubmitResult uploadSubmitPost( 

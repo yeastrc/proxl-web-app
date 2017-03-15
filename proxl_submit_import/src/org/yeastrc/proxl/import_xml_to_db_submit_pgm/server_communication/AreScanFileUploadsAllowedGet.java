@@ -30,7 +30,7 @@ public class AreScanFileUploadsAllowedGet {
 	private AreScanFileUploadsAllowedGet() { }
 	public static AreScanFileUploadsAllowedGet getInstance() { return instance; }
 
-	public static final String SUB_URL = "/proxl_xml_file_import/scanFilesAllowed";
+	public static final String SUB_URL = "/file_import_proxl_xml_scans/scanFilesAllowed";
 	
 
 	
