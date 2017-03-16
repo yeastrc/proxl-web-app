@@ -28,9 +28,10 @@
  <%@ include file="/WEB-INF/jsp-includes/body_section_start_include_every_page.jsp" %>
 
 
+<div class="inset-page-main-outermost-div"> <%--  Closed in footer_main.jsp --%>
 
 <div class="page-content-outer-container" >	
- <div class="page-content-container" >	
+ <div class=" page-terms-of-service-container page-content-container" >	
   <div class="page-content" >	
 
 	<div class="logo-large-container" >

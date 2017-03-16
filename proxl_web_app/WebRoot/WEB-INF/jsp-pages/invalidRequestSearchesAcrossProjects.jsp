@@ -28,6 +28,8 @@
 
 
 
+<div class="inset-page-main-outermost-div"> <%--  Closed in footer_main.jsp --%>
+
 <div class="page-content-outer-container" >	
  <div class="page-content-container" >	
   <div class="page-content" >	

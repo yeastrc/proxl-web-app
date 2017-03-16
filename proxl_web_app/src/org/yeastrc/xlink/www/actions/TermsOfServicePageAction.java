@@ -8,10 +8,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
-import org.yeastrc.xlink.www.dao.TermsOfServiceTextVersionsDAO;
 import org.yeastrc.xlink.www.dto.TermsOfServiceTextVersionsDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappConfigException;
+import org.yeastrc.xlink.www.terms_of_service.GetTermsOfServiceTextForDisplay;
 import org.yeastrc.xlink.www.web_utils.IsTermsOfServiceEnabled;
+
 /**
  * Terms of Service page action
  *
@@ -28,7 +29,7 @@ public class TermsOfServicePageAction extends Action {
 			boolean termsOfServiceEnabled = IsTermsOfServiceEnabled.getInstance().isTermsOfServiceEnabled();
 			if ( termsOfServiceEnabled ) {
 				TermsOfServiceTextVersionsDTO termsOfServiceTextVersionsDTO =
-						TermsOfServiceTextVersionsDAO.getInstance().getLatest();
+						GetTermsOfServiceTextForDisplay.getInstance().getLatestTermsOfServiceTextForDisplay();
 				if ( termsOfServiceTextVersionsDTO == null ) {
 					String msg = "Terms of service is enabled but there is no 'Latest' terms of service record.";
 					log.error( msg );

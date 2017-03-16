@@ -234,6 +234,10 @@ function addChangeTermsOfServiceData( params ) {
 	var change = params.change;
 	var $terms_of_service_user_text = $("#terms_of_service_user_text");
 	var termsOfServiceText = $terms_of_service_user_text.val();
+
+	//		Javascript to convert all line endings to '\n'
+	termsOfServiceText = termsOfServiceText.replace(/(\r\n|\r|\n)/g, '\n');
+
 	var requestData = { termsOfServiceText : termsOfServiceText };
 	var _URL = contextPathJSVar + "/services/config/addTermsOfService";
 //	var request =

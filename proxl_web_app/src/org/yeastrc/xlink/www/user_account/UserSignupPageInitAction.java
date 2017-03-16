@@ -14,8 +14,8 @@ import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsVal
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.UserSignupConstants;
-import org.yeastrc.xlink.www.dao.TermsOfServiceTextVersionsDAO;
 import org.yeastrc.xlink.www.dto.TermsOfServiceTextVersionsDTO;
+import org.yeastrc.xlink.www.terms_of_service.GetTermsOfServiceTextForDisplay;
 
 /**
  * 
@@ -62,7 +62,7 @@ public class UserSignupPageInitAction  extends Action {
 			if ( termsOfServiceEnabled ) {
 
 				TermsOfServiceTextVersionsDTO termsOfServiceTextVersionsDTO = 
-						TermsOfServiceTextVersionsDAO.getInstance().getLatest();
+						GetTermsOfServiceTextForDisplay.getInstance().getLatestTermsOfServiceTextForDisplay();
 			
 				request.setAttribute( "termsOfServiceTextVersion", termsOfServiceTextVersionsDTO );
 			}

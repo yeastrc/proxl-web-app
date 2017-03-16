@@ -14,10 +14,14 @@ import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKey
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsValuesSharedConstants;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.dao.TermsOfServiceTextVersionsDAO;
 import org.yeastrc.xlink.www.dto.TermsOfServiceTextVersionsDTO;
+import org.yeastrc.xlink.www.terms_of_service.GetTermsOfServiceTextForDisplay;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserInviteTrackingCode;
 
+/**
+ * 
+ *
+ */
 public class UserInviteCreateNewUserInitPageAction extends Action {
 
 	private static final Logger log = Logger.getLogger(UserInviteCreateNewUserInitPageAction.class);
@@ -52,7 +56,7 @@ public class UserInviteCreateNewUserInitPageAction extends Action {
 			if ( ConfigSystemsValuesSharedConstants.TRUE.equals( termsOfServiceEnabledString ) ) {
 				// Terms of service Is enabled, put on page
 				TermsOfServiceTextVersionsDTO termsOfServiceTextVersionsDTO = 
-						TermsOfServiceTextVersionsDAO.getInstance().getLatest();
+						GetTermsOfServiceTextForDisplay.getInstance().getLatestTermsOfServiceTextForDisplay();
 				request.setAttribute( "termsOfServiceTextVersion", termsOfServiceTextVersionsDTO );
 			}
 			

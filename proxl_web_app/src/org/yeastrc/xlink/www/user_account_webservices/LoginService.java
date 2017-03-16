@@ -26,6 +26,7 @@ import org.yeastrc.xlink.www.dto.XLinkUserDTO;
 import org.yeastrc.xlink.www.dto.ZzUserDataMirrorDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappConfigException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
+import org.yeastrc.xlink.www.terms_of_service.GetTermsOfServiceTextForDisplay;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
@@ -238,7 +239,7 @@ public class LoginService {
 							loginResult.setTermsOfServiceAcceptanceRequired(true);
 							if ( RETURN_TOS_TRUE.equals( returnTOS ) ) {
 								TermsOfServiceTextVersionsDTO termsOfServiceTextVersionsDTO = 
-										TermsOfServiceTextVersionsDAO.getInstance().getLatest();
+										GetTermsOfServiceTextForDisplay.getInstance().getLatestTermsOfServiceTextForDisplay();
 								loginResult.setTermsOfServiceKey( termsOfServiceTextVersionsDTO.getIdString() );
 								loginResult.setTermsOfServiceText( termsOfServiceTextVersionsDTO.getTermsOfServiceText() );
 							}
@@ -265,7 +266,7 @@ public class LoginService {
 								loginResult.setTermsOfServiceAcceptanceRequired(true);
 								if ( RETURN_TOS_TRUE.equals( returnTOS ) ) {
 									TermsOfServiceTextVersionsDTO termsOfServiceTextVersionsDTONewLatest = 
-											TermsOfServiceTextVersionsDAO.getInstance().getLatest();
+											GetTermsOfServiceTextForDisplay.getInstance().getLatestTermsOfServiceTextForDisplay();
 									loginResult.setTermsOfServiceKey( termsOfServiceTextVersionsDTONewLatest.getIdString() );
 									loginResult.setTermsOfServiceText( termsOfServiceTextVersionsDTONewLatest.getTermsOfServiceText() );
 								}

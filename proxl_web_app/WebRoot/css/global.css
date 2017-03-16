@@ -161,12 +161,15 @@ img.edit-icon { max-width:12px;margin-left:2px;margin-right:5px;opacity:0.8;filt
 
 span.search-name-display { font-weight:bold; }
 
+	/*  Whole Page level  */
 
 /* 'body.inset-page'  is for pages with an 'inset' look, login.jsp, forgotPassword.jsp, ... */
 
 body.inset-page {  }
 
-body.inset-page div.page-content-outer-container { width: 100%; text-align: center;  }
+body.inset-page .inset-page-main-outermost-div { /*  lock the footer to the bottom of the page */	min-height:100%; position:relative; }
+
+body.inset-page div.page-content-outer-container { width: 100%; text-align: center;     padding-bottom: 40px;  }
 
 body.inset-page div.page-content-container { width: 466px; margin-top: 140px; display: inline-block;  }
 
@@ -206,6 +209,10 @@ body.inset-page span.error-message-text, body.inset-page span.success-message-te
 	
 body.inset-page .error-message-close-x, body.inset-page .success-message-close-x { cursor: pointer; float: right; margin-left: 10px; }
 
+
+	/*   Terms of service Page  */
+	
+body.inset-page div.page-terms-of-service-container { width: 80% }
 
 	/*   Login Page  */
 	

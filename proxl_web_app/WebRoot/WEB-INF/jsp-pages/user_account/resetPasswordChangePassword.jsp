@@ -37,6 +37,9 @@
 
 <input type="hidden" id="resetPasswordTrackingCode" value="<c:out value="${ resetPasswordTrackingCode }"></c:out>"> 
 
+
+<div class="inset-page-main-outermost-div"> <%--  Closed in footer_main.jsp --%>
+
 <div class="page-content-outer-container" >	
  <div class="page-content-container" >	
   <div class="page-content" >	
