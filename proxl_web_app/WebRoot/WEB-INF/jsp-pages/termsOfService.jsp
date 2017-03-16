@@ -41,15 +41,30 @@
   	<div  style="position: relative;" class="page-label">
 	  <c:choose>
 	   <c:when test="${ not empty termsOfServiceText }">
+	   
 		  <div class=" terms-of-service-header ">
 		  	Terms of Service
 		  </div>
+		  
+	   	  <div class=" terms-of-service-close-button ">
+	   	  	<input type="button" value="Close" onclick="window.close();">
+	   	  </div>
+	   	 
 		  <div class=" terms-of-service-text ">
 	  	  	<c:out value="${ termsOfServiceText }" escapeXml="false"></c:out>
 	      </div>
+	      
+	   	  <div class=" terms-of-service-close-button ">
+	   	  	<input type="button" value="Close" onclick="window.close();">
+	   	  </div>	      
 	   </c:when>
 	   <c:otherwise>
+		  <div class=" terms-of-service-text ">
 	   		No Terms of Service
+	   	  </div>
+	   	  <div class=" terms-of-service-close-button ">
+	   	  	<input type="button" value="Close" onclick="window.close();">
+	   	  </div>	      
 	   </c:otherwise>
 	  </c:choose>
   	</div>

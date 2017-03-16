@@ -293,11 +293,11 @@ body.inset-page div.page-terms-of-service-container { width: 80% }
 
 /*  Terms of Service page  */
 
-
 body.terms-of-service-page .terms-of-service-header { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
 
-body.terms-of-service-page .terms-of-service-text { text-align: left; font-size: 14px; padding-left: 25px; padding-right: 25px; }
+body.terms-of-service-page .terms-of-service-text { text-align: left; font-size: 14px; padding-left: 25px; padding-right: 25px; padding-bottom: 25px; padding-top: 25px; }
 
+body.terms-of-service-page .terms-of-service-close-button { text-align: left; padding-left: 25px; }
 
 
 /* Invite Landing Page  */
