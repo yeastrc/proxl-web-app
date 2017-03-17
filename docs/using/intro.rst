@@ -1,36 +1,40 @@
-Getting started using ProXL DB
+Getting Started
 ===========================================
 
-ProXL is a database and web application for viewing, analyzing, and sharing bottom-up
+Proxl is a database and web application for viewing, analyzing, and sharing bottom-up
 proteomics data resulting from chemical crosslinking and mass spectrometry
 analysis. It includes tools for viewing, downloading, and visualizing data; including tools
 for comparing data between different searches and pipelines.
 
-Projects and Access Control
-----------------------------------
-Projects in ProXL are the core means of organizing data and controlling access to those
-data. While projects serve to logically organize data by theme or aim,
-they also serve to organize the data by who you would like to have access
-to those data. All data are associated with projects and, by default, only the researchers
-associated with a project may view data associated with that project. (These permissions
-can be changed, see :ref:`public-access-label`.)
-
 
 Gaining Access
 ---------------------------------
-The only way to gain access to a ProXL installation is to be invited to a project by an
-existing user. Only users associated with a project may invite users to that project.
-(To learn how to invite a user to a project, see :ref:`invite-researchers-label`.)
-Invitations will appear in your email with a link to register as a user of ProXL.
-**Important**: Be sure to check your SPAM folder for ProXL invitations if they do not appear.
 
-Unless you are already logged into ProXL, following the link in the invitation email
+Public Installation
+^^^^^^^^^^^^^^^^^^^^^^^^^
+A publicly-available version of proxl is available at `https://www.yeastrc.org/proxl_public/ <https://www.yeastrc.org/proxl_public/>`_.
+To create an account, click the "Signup" tab on the signin screen:
+
+.. image:: /images/signup-link.png
+
+Private Installations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If downloaded and installed privately, the site administrator may choose to allow public registration (see above)
+or restrict access to only those who are invited to projects.
+
+If restricted to invites-only, the only way to gain access to a proxl installation is to be invited to a project by an
+existing user. Only users associated with a project may invite users to the project.
+(To learn how to invite a user to a project, see :ref:`invite-researchers-label`.)
+Invitations will appear in your email with a link to register as a user of proxl.
+**Important**: Be sure to check your SPAM folder for proxl invitations if they do not appear.
+
+Unless you are already logged into proxl, following the link in the invitation email
 brings you to the following screen. (If you are already logged in, you will be taken to a list of
 you projects, which now includes the one to which you were invited.)
 
 .. image:: /images/register-screen1.png
 
-Choosing "Sign In" will sign you into ProXL, and the new project will be listed in your
+Choosing "Sign In" will sign you into proxl, and the new project will be listed in your
 project list. Choosing "Create Account" will present you with the following registration form:
 
 .. image:: /images/register-screen2.png
@@ -40,7 +44,7 @@ to which you were invited in your project list.
 
 Sign In
 ------------------------------------
-Accessing the URL for any non-public data or the URL for the home page of ProXL will
+Accessing the URL for any non-public data or the URL for the home page of proxl will
 produce the password prompt below. Provide your username and password to proceed.
 
 .. image:: /images/signin.png
@@ -51,6 +55,18 @@ If you are unable to remember your password, click the "Reset Password" button a
 bottom-right of the sign-in form. Entering either your username or email address on file
 for your account will send a link to your email address that may be used to reset
 your password. For security reasons, this link is only valid for 24 hours.
+
+
+
+
+Projects and Access Control
+----------------------------------
+Projects in proxl are the core means of organizing data and controlling access to those
+data. While projects serve to logically organize data by theme or aim,
+they also serve to organize the data by who you would like to have access
+to those data. All data are associated with projects and, by default, only the researchers
+associated with a project may view data associated with that project. (These permissions
+can be changed, see :ref:`public-access-label`.)
 
 Accessing Projects and Data
 ------------------------------------
@@ -70,7 +86,7 @@ project's page and data:
 Return to Project List
 ------------------------------------
 To return to the project list (required for adding or deleting projects), click the
-"ProXL DB" icon or the "Projects" text at the top-left of any page in ProXL
+proxl icon or the "Projects" text at the top-left of any page in proxl.
 
 Adding New Projects
 ------------------------------------
@@ -89,7 +105,7 @@ the project and all associated data will be removed.
 
 Get Help
 ---------------------------------
-To view documentation for ProXL, click the (?) icon on the top-right nagivation
+To view documentation for proxl, click the (?) icon on the top-right nagivation
 bar present on all pages.
 
 .. image:: /images/get-help.png
@@ -115,3 +131,10 @@ If you are an administrator, you may manage or invite users by clicking the mana
 user icon at the top-right of the page:
 
 .. image:: /images/manage-users.png
+
+System Configuration (Admin Only)
+---------------------------------
+If you are an administrator, you may configure proxl by clicking this link. See :doc:`/install/config`.
+
+.. image:: /images/manage-users.png
+

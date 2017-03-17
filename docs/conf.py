@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# ProXL DB documentation build configuration file, created by
+# proxl documentation build configuration file, created by
 # sphinx-quickstart on Mon Oct  5 13:36:19 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -47,8 +47,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'ProXL DB'
-copyright = u'2016, Michael Riffle'
+project = u'proxl'
+copyright = u'2017, Michael Riffle'
 author = u'Michael Riffle'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -223,7 +223,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'ProXLDB.tex', u'ProXL DB Documentation',
+  (master_doc, 'proxl.tex', u'proxl Documentation',
    u'Michael Riffle', 'manual'),
 ]
 
@@ -253,7 +253,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'proxldb', u'ProXL DB Documentation',
+    (master_doc, 'proxl', u'proxl Documentation',
      [author], 1)
 ]
 
@@ -267,8 +267,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'ProXLDB', u'ProXL DB Documentation',
-   author, 'ProXLDB', 'One line description of project.',
+  (master_doc, 'proxl', u'proxl Documentation',
+   author, 'proxl', 'One line description of project.',
    'Miscellaneous'),
 ]
 

@@ -153,15 +153,18 @@ without first clicking "Unlock Public Access." This is meant to prevent accident
 public access or generation of new public access codes, which would revoke previously-granted
 access to the public, colleagues or reviewers.
 
+Upload Data
+=========================
+We have set up a separate page describing uploading data. Please see :doc:`/using/upload_data`.
+
 Explore Data
 =========================
 
 .. image:: /images/project-overview-explore-data.png
 
-This section lists each of the searches associated with this project. A "search" in this context
-is a run of Kojak, XQuest or some other peptide-spectrum match software pipeline run against spectral
-data. Project researchers may change the name of these searches by clicking the pencil icon to the
-right of the current search name. To the right of the search name the search ID number is listed
+This section lists each of the searches associated with this project. A "search" in this context are all the data resulting from
+running a software pipeline (e.g., Kojak or xQuest) against spectra data (e.g., a mzML file). Project researchers may change the
+name of these searches by clicking the pencil icon to the right of the current search name. To the right of the search name the search ID number is listed
 in parentheses as a standard way to refer to specific searches.
 
 View Search Information
@@ -238,24 +241,68 @@ Use the links to the right of the search names (in red box above) to view the da
 
 View Merged Data
 --------------------------------
-To compare and contrast data between different searches
+Proxl allows for comparing and contrasting multiple searches, even if those searches were analyzed with different software pipelines. Proxl refers
+to this as merging data. To merge data from multiple searches, click the check boxes to the left of the searches of interest and click either
+"View Merged Peptides", "View Merged Proteins", "View Merged Image", or "View Merged Structure."
+
+For more information please see: :doc:`/using/merged-peptide`, :doc:`/using/merged-protein`, :doc:`/using/image`, and :doc:`/using/structure`.
 
 
-Move Data
+Copy Searches
 --------------------------------
-Project owners may move searches to a different project (where they must also be an owner). To move data,
-check the checkbox to the left of the search name(s) you wish to move and click the "Move Searches"
+Project owners may copy searches to a different project (where they must also be an owner). To copy data,
+check the checkbox to the left of the search name(s) you wish to copy and click the "Copy Searches"
 button above the search list to see the following dialogue:
 
-.. image:: /images/project-overview-move-search.png
+.. image:: /images/copy-searches.png
 
-Projects to which you have permission to move data are listed. Selecting one will move the selected
-searches to that project. The searches will no longer be visible for the previous project. Selecting
-"Cancel" will cancel the move with no changes.
+Projects to which you have permission to copy data are listed. Click on the project name to which the searches should be copied.
+Copied searches are treated independently with regards to the search name, comments, and other search metadata. For example, adding
+a comment or changing the name of the search in the new project will not affect the original search's name or comments.
 
-Delete Data
+The "Move the searches to the new project" option will remove the search(es) from this project when copying to the new project.
+
+Organize Searches
+--------------------------------
+The "Organize Searches" button opens an interface for rearranging the search list and creating and placing searches inside of "folders" for improved
+organization when the project contains many searches.
+
+Clicking the "Organize Searches" button opens the following dialog:
+
+.. image:: /images/organize-searches-1.png
+
+The right-hand panel is labeled "Search List". This lists the searches contained in the currently-selected folder. To re-arrange the order in which searches
+are listed, click and drag the search to the desired order in the list. To see and re-arrange searches in another folder, click on the name of the folder in the left-hand panel.
+
+
+The left panel is labeled "Folder List". This is a list of the folders that have been created for organizing searches. Note: Searches not in any folder are listed here under a special folder named "Unfiled Searches". Any searches in "Unfiled Searches" will not be
+placed into a folder when shown to users in the web application.
+
+To create a new folder, click the "New Folder" button, type in the name of the new folder, and click "Add Folder." In the following example, two folders have been created,
+"Control" and "Treatment."
+
+.. image:: /images/organize-searches-2.png
+
+Folders may be deleted by clicking the small red "X" icon next to the folder name. Folder names may be edited by clicking the pencil icon. And folders may
+be re-arranged by clicking and dragging them to the desired position.
+
+To place a search in a folder, first click on the folder name that currently contains the search (remember, searches not in folders are under "Unfiled Searches").
+Then click the name of the search in the right-hand panel and drag it onto the row containing the folder in the left-hand panel and release the mouse button. This
+will "drop" that search into that folder.
+
+When done, click the "Done Organizing Searches" button above the folder list to return to the normal interface.
+
+In the following example, the StavroX and xQuest demo searches were added to the "Treatment" folder. The Crux demo search was left unfiled. And the user has clicked
+on the "Treatment" folder to view the searches listed under it.
+
+.. image:: /images/organize-searches-3.png
+
+
+
+Delete Searches
 --------------------------------
 Project owners may delete searches by clicking the red (X) icon to the right of the view data
 links. This will remove all data associated with that search from the database--use with care.
+Note that if this search was copied to another project, that copy search will not be deleted.
 
 

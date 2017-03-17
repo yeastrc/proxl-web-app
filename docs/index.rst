@@ -1,25 +1,28 @@
-.. ProXL documentation master file, created by
+.. proxl documentation master file, created by
    sphinx-quickstart on Mon Oct  5 13:36:19 2015.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ProXL's documentation!
+Welcome to proxl's documentation!
 ====================================
 
 .. image:: /images/intro-image.png
 
-ProXL (short for Protein Crosslinking) is a web application and database for
-storing, viewing, analyzing, and sharing protein crosslinking mass spectrometry data.
+Proxl is a web application and database for storing, viewing,
+analyzing, and sharing protein cross-linking mass spectrometry data.
 
-Here you will find documentation for both using and installing ProXL.
+Proxl is available to use free-of-charge at `https://www.yeastrc.org/proxl_public/ <https://www.yeastrc.org/proxl_public/>`_ 
+
+Here you will find documentation for both using and installing proxl locally.
 
 
 .. toctree::
    :maxdepth: 2
-   :caption: Using ProXL
+   :caption: Using proxl
    
    using/intro
    using/project
+   using/upload_data
    using/image
    using/structure
    using/peptide
