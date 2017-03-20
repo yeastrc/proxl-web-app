@@ -38,7 +38,6 @@ Here you will find documentation for both using and installing proxl locally.
    
    install/intro
    install/config
-   install/import
    install/converter_guide
    install/paws
    

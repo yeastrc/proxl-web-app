@@ -226,6 +226,22 @@ The "PSMs with:" options toggle the visibility of the lines corresponding to the
 
 The "Max:" options allow for a user-supplied maximum for the X- and Y-axes. "Reset" clears the user-supplied maximum values.
 
+PSM Score Vs Score QC Plot
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Clicking the "[Score vs/ Score]" link next to "QC Plots:" produces a plot of any PSM-level score vs/ any PSM-level score:
+
+.. image:: /images/project-overview-qc-score-vs-score.png
+
+This is a scatter plot showing how PSM-level scores correlate with other PSM-level scores. For example, the above image shows calculated
+false discover rates (FDR) for PSMs vs/ the underling Xcorr score calculated by Crux. This can be used to discover unexpected relationships
+between scores, or to understand the effects of post processing statistical tools.
+
+The chart options are:
+	* X-Axis Score - The score to use for the x-axis.
+	* Y-Axis Score - The score to use for the y-axis.
+	* PSMs with - Select the type of PSMs to plot (cross-links, loop-links, and/or unlinked).
+	* Max - Values entered here will be the maximum value on the X or Y axis--used for rescaling the chart.
+
 
 View Data
 --------------------------------
