@@ -123,7 +123,11 @@
 	</div>
 	
   </div>
+
   <div class="bottom-tab">
+		<a href="http://www.yeastrc.org/proxl_docs/" >Get Help</a>  		
+  </div>
+  <div class="bottom-tab" style="border-right-width: 0px;">
   		<%-- specify where to go after logging in. --%>
 		<a href="listProjects.do" >Sign In</a>  		
   </div>

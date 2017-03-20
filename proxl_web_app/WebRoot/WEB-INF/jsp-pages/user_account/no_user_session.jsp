@@ -65,8 +65,11 @@
    
   </div>
   <div class="bottom-tab">
+		<a href="http://www.yeastrc.org/proxl_docs/" >Get Help</a>  		
+  </div>
+  <div class="bottom-tab" style="border-right-width: 0px;">
 		<a id="ajax_error_no_session_login_link" href="javascript:" onclick="$('#ajax_error_no_session_form').submit()" 
-				>sign in</a>
+				>Sign in</a>
   </div>
   
  </div>
