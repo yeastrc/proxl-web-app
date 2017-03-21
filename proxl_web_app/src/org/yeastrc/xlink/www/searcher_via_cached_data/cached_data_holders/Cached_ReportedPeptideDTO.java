@@ -28,7 +28,7 @@ public class Cached_ReportedPeptideDTO implements CachedDataCommonIF {
 
 	private static final Logger log = Logger.getLogger( Cached_ReportedPeptideDTO.class );
 
-	private static final int CACHE_MAX_SIZE_FULL_SIZE = 2000;
+	private static final int CACHE_MAX_SIZE_FULL_SIZE = 5000;
 	private static final int CACHE_MAX_SIZE_SMALL = 10;
 
 	private static final int CACHE_TIMEOUT_FULL_SIZE = 20; // in days
