@@ -1,6 +1,21 @@
+/**
+ * circle-plot-viewer.js
+ * 
+ * Javascript for the viewMergedImage.jsp page
+ * 
+ * uses many variables and functions from  crosslink-image-viewer.js
+ *   including: convertProjectSearchIdArrayToSearchIdArray( searchesArray );
+ *
+ * 
+ */
+
+//////////////////////////////////
+// JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
 ///////////////////////////////////////////
+
+
 
 var circlePlotViewer = function() {	
 	this.initialize();
@@ -356,8 +371,8 @@ circlePlotViewer.prototype.drawLegend = function( svgRootSnapSVGObject ) {
 		// the left edge of the associated text
 		var textX = x + (this.CONSTANTS._LEGEND_RADIUS * 2 ) + this.CONSTANTS._LEGEND_INDENT;
 		
-		
-		var text = searchArrays[ i ].join( ", " );
+		var searchArraysSearchIds = convertProjectSearchIdArrayToSearchIdArray( searchArrays[ i ] );
+		var text = searchArraysSearchIds.join( ", " );
 		if( searchArrays[ i ].length < 2 ) {
 			text = "Search " + text;
 		} else {
@@ -708,12 +723,13 @@ circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGO
 	});
     
     
+    var searchIdsForLink = convertProjectSearchIdArrayToSearchIdArray( lsearches );
     
     // add a tooltip to this drawn link
     
     var text = "";
     
-	text = 'Monolink: ' + _proteinNames[ link.protein1 ] + " (" + link.position1 + ")<br>Searches: " + lsearches;
+	text = 'Monolink: ' + _proteinNames[ link.protein1 ] + " (" + link.position1 + ")<br>Searches: " + searchIdsForLink;
     
 	var pathSVGObject = path.node;
 	var $pathSVGObject = $( pathSVGObject );		// jquery variable
@@ -957,7 +973,10 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
     if( link.type === "looplink" ) {	
     	
 		var lsearches = _proteinLooplinkPositions[ link.protein1 ][ link.protein1 ][ link.position1 ][ link.position2 ];
-		text = 'Looplink: ' + _proteinNames[ link.protein1 ] + " (" + link.position1 + "," + link.position2 + ")<br>Searches: " + lsearches;
+	    
+	    var searchIdsForLink = convertProjectSearchIdArrayToSearchIdArray( lsearches );
+	    
+		text = 'Looplink: ' + _proteinNames[ link.protein1 ] + " (" + link.position1 + "," + link.position2 + ")<br>Searches: " + searchIdsForLink;
 		
 	    path.attr( {
 			'from_protein_id': link.protein1,
@@ -970,7 +989,10 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
 		
     } else {
 		var lsearches = _proteinLinkPositions[ link.protein1 ][ link.protein2 ][ link.position1 ][ link.position2 ];
-		text = 'Crosslink: ' + _proteinNames[ link.protein1 ] + " (" + link.position1 + ") - " + _proteinNames[ link.protein2 ] + " (" + link.position2 + ")<br>Searches: " + lsearches;
+		
+	    var searchIdsForLink = convertProjectSearchIdArrayToSearchIdArray( lsearches );
+	    
+		text = 'Crosslink: ' + _proteinNames[ link.protein1 ] + " (" + link.position1 + ") - " + _proteinNames[ link.protein2 ] + " (" + link.position2 + ")<br>Searches: " + searchIdsForLink;
 		
 	    path.attr( {
 			'from_protein_id':link.protein1,
