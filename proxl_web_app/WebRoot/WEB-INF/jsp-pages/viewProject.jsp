@@ -1398,20 +1398,18 @@
 						<div class="modal-dialog-overlay-container copy-searches-overlay-container   copy_searches_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
 							 id="copy-searches-overlay-container" style="top: -30px;">
 
-							<div class="top-level-label" style="margin-left: 0px;">Copy Search Data</div>
+							<div class="top-level-label" style="margin-left: 0px;"
+								><span class=" copy_searches_display_copy_part_jq " >Copy</span
+								><span class=" copy_searches_display_move_part_jq " >Move</span> Search Data</div>
 			
 							<div class="top-level-label-bottom-border" ></div>
 							
 							<div id="copy-searches-overlay-select-project-block">
 							
-								<div >Click the title of the project to which you would like to copy the selected searches to.</div>
-								
-								<div >
-								  <label>
-									<input type="checkbox" id="copy_searches_remove_from_current_project_checkbox">
-									Move the searches to the new project
-								  </label>
-								</div>
+								<div >Click the title of the project to which you would like to 
+									<span class=" copy_searches_display_copy_part_jq " >copy</span
+									><span class=" copy_searches_display_move_part_jq " >move</span> 
+									 the selected searches to.</div>
 								
 								<div class="copy-searches-overlay-project-list-block">
 	
@@ -1421,7 +1419,10 @@
 										Loading Projects
 									</div>
 									<div id="copy_searches_other_project_list_no_projects_msg">
-										No other projects to copy to for selected searches.
+										No other projects to 
+										<span class=" copy_searches_display_copy_part_jq " >copy</span
+										><span class=" copy_searches_display_move_part_jq " >move</span> 
+										 to for selected searches.
 										All searches are in all other projects.
 									</div>
 									<div id="copy_searches_other_project_list">
@@ -1450,24 +1451,20 @@
 							<div id="copy-searches-overlay-confirm-project-block"  class="copy_searches_overlay_confirmation_steps_jq" style="display: none;">
 							
 								<div style="margin-bottom: 10px;">
-									<span class=" copy_searches_copy_text_jq ">Copy</span
-									><span class=" copy_searches_move_text_jq " style="display: none;">Move</span>
+									<span class=" copy_searches_display_copy_part_jq ">Copy</span
+									><span class=" copy_searches_display_move_part_jq " style="display: none;">Move</span>
 										selected searches to "<span id="copy-searches-overlay-project-to-move-title"></span>"?
 									
 								</div>
 								<div >
 									<input type="button" value="Yes" id="copy_search_confirm_button" >
 									
-									<%--
-									<input type="button" value="Copy All Searches" id="copy_search_copy_all_search_confirm_button" style="display: none;">
-									--%>
 									<input type="button" value="Copy" 
+										class=" copy_searches_display_copy_part_jq "
 										id="copy_search_copy_searches_not_in_new_project_confirm_button" style="display: none;">
 									
-									<%--	
-									<input type="button" value="Move All Searches" id="copy_search_move_all_search_confirm_button" style="display: none;">
-									--%>
 									<input type="button" value="Move" 
+										class=" copy_searches_display_move_part_jq "
 										id="copy_search_move_searches_not_in_new_project_confirm_button" style="display: none;">
 										
 									<input type="button" value="Cancel" class="copy_searches_overlay_cancel_parts_jq" >
@@ -1477,8 +1474,8 @@
 									style="display: none; margin-top: 10px;">
 									<div style="margin-bottom: 10px;">
 										The following searches are already in the destination project and will not be 
-										<span class=" copy_searches_copy_text_jq ">copied</span
-										><span class=" copy_searches_move_text_jq " style="display: none;">moved</span>:
+										<span class=" copy_searches_display_copy_part_jq ">copied</span
+										><span class=" copy_searches_display_move_part_jq " style="display: none;">moved</span>:
 									</div>
 									<div id="copy_searches_searches_in_new_project_list_block" style="margin-left: 10px; ">
 									</div>
@@ -1728,6 +1725,16 @@
 									<div class=" tool_tip_attached_jq   " id="copy_search_button_cover_when_disabled" 
 										style="position:absolute;left:0;right:0;top:0;bottom:0;" 
 										data-tooltip="Select one or more searches below and click here to copy the selected searches to another project." ></div>
+								</div>
+								
+								<div style="display:inline-block;position:relative;"> <%-- outer div to support overlay div when button disabled --%>
+									<input class="submit-button tool_tip_attached_jq " type="button" id="move_search_button"
+											 data-tooltip="Click here to move the selected searches to another project."
+											value="Move Searches" disabled>
+										<%-- overlay div to provide tooltip for button --%>
+									<div class=" tool_tip_attached_jq   " id="move_search_button_cover_when_disabled" 
+										style="position:absolute;left:0;right:0;top:0;bottom:0;" 
+										data-tooltip="Select one or more searches below and click here to move the selected searches to another project." ></div>
 								</div>
 								
 							</c:if>

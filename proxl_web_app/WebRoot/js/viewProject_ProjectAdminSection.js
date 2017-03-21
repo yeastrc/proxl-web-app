@@ -591,15 +591,27 @@ function updateCopySearchesButton() {
 //	if (adminGlobals.projectToCopySearchesToSelected
 //	&& adminGlobals.searchCheckboxesCheckedCount > 0) {
 	if (adminGlobals.searchCheckboxesCheckedCount > 0) {
+		//  Copy Searches button
 		// enable button
 		$("#copy_search_button").removeAttr("disabled");
 		//  hide covering div
 		$("#copy_search_button_cover_when_disabled").hide();
+		//  Move Searches button
+		// enable button
+		$("#move_search_button").removeAttr("disabled");
+		//  hide covering div
+		$("#move_search_button_cover_when_disabled").hide();
 	} else {
+		//  Copy Searches button
 		// disable button
 		$("#copy_search_button").attr("disabled", "disabled");
 		//  show covering div
 		$("#copy_search_button_cover_when_disabled").show();
+		//  Move Searches button
+		// disable button
+		$("#move_search_button").attr("disabled", "disabled");
+		//  show covering div
+		$("#move_search_button_cover_when_disabled").show();
 	}
 };
 
@@ -610,12 +622,30 @@ function updateCopySearchesButtonFromSearchCheckboxes(searchCheckboxesCheckedCou
 };
 
 var openCopySearchesOverlay = function(clickThis, eventObject) {
-
-	populateOtherProjectsForCopySearchesOverlay(clickThis, eventObject);
-};
+	$(".copy_searches_display_copy_part_jq").show();
+	$(".copy_searches_display_move_part_jq").hide();
 	
-var populateOtherProjectsForCopySearchesOverlay = function(clickThis, eventObject) {
+	$("#copy-searches-overlay-confirm-project-block").data( "copyToOtherProject", true );
+	$("#copy-searches-overlay-confirm-project-block").data( "moveToOtherProject", false );
+	
+	populateOtherProjectsForCopySearchesOverlay( { doCopy : true } );
+};
 
+var openMoveSearchesOverlay = function(clickThis, eventObject) {
+	$(".copy_searches_display_move_part_jq").show();
+	$(".copy_searches_display_copy_part_jq").hide();
+
+	$("#copy-searches-overlay-confirm-project-block").data( "moveToOtherProject", true );
+	$("#copy-searches-overlay-confirm-project-block").data( "copyToOtherProject", false );
+
+	populateOtherProjectsForCopySearchesOverlay( { doMove : true } );
+};
+
+var populateOtherProjectsForCopySearchesOverlay = function( params ) {
+
+	var doCopy = params.doCopy;
+	var doMove = params.doMove;
+	
 	var searchesToCopyToOtherProject = searchesToMerge; //  searchesToMerge is an array managed as the user clicks each check box
 
 	var requestData = {
@@ -636,7 +666,12 @@ var populateOtherProjectsForCopySearchesOverlay = function(clickThis, eventObjec
 
 		success : function(data) {
 			try {
-				populateOtherProjectsForCopySearchesOverlayResponse(requestData, data);
+				populateOtherProjectsForCopySearchesOverlayResponse( { 
+					requestData : requestData,
+					responseData : data,
+					doCopy : doCopy,
+					doMove : doMove
+				});
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
@@ -653,11 +688,13 @@ var populateOtherProjectsForCopySearchesOverlay = function(clickThis, eventObjec
 	});
 };
 
-
-
-
 ///////
-var populateOtherProjectsForCopySearchesOverlayResponse = function(requestData, responseData) {
+var populateOtherProjectsForCopySearchesOverlayResponse = function( params ) {
+
+	var requestData = params.requestData;
+	var responseData = params.responseData;
+	var doCopy = params.doCopy;
+	var doMove = params.doMove;
 
 	var otherProjects = responseData.otherProjects;
 	
@@ -726,15 +763,10 @@ var closeCopySearchesOverlay = function(clickThis, eventObject) {
 var copySearchesProjectClicked = function(clickThis, eventObject) {
 	var $clickThis = $(clickThis);
 	var otherProjectIdValue = $clickThis.attr("data-other_project_id");
-	var $copy_searches_remove_from_current_project_checkbox = $("#copy_searches_remove_from_current_project_checkbox");
-	var copyToOtherProject = true;
-	if ( $copy_searches_remove_from_current_project_checkbox.prop( "checked" ) ) {
-		copyToOtherProject = false;
-	}
 	
 	var projectTitle = $clickThis.html();
 
-	$("#copy-searches-overlay-confirm-project-block").data( { copyToProjectId: otherProjectIdValue, copyToOtherProject : copyToOtherProject } );
+	$("#copy-searches-overlay-confirm-project-block").data( "copyToProjectId", otherProjectIdValue );
 	$("#copy-searches-overlay-project-to-move-title").html( projectTitle );
 	
 	copySearchesCheckForSearchIdsInOtherProject(  );
@@ -746,7 +778,7 @@ var copySearchesCheckForSearchIdsInOtherProject = function() {
 
 	var storedData = $("#copy-searches-overlay-confirm-project-block").data(  );
 	var copyToProjectId = storedData.copyToProjectId;
-	var copyToOtherProject = storedData.copyToOtherProject;
+
 	var searchesToCopyToOtherProject = searchesToMerge; //  searchesToMerge is an array managed as the user clicks each check box
 	if (adminGlobals.project_id === null) {
 		throw Error( "Unable to find input field for id 'project_id', adminGlobals.project_id not set " );
@@ -794,31 +826,21 @@ var copySearchesCheckForSearchIdsInOtherProjectProcessResponse = function(reques
 		//  At least one projectSearchId is already in the new project
 		//  (queried using the searchId for the projectSearchId, searching for the searchId in the new projectId)
 		
+		$("#copy_search_confirm_button").hide();
+
 		var storedData = $("#copy-searches-overlay-confirm-project-block").data(  );
 		var copyToProjectId = storedData.copyToProjectId;
 		var copyToOtherProject = storedData.copyToOtherProject;
 
-		if ( copyToOtherProject ) {
-			// Copying the searches
-			$("#copy_search_confirm_button").hide();
-//			$("#copy_search_move_all_search_confirm_button").hide();  // Not currently used
-			$("#copy_search_move_searches_not_in_new_project_confirm_button").hide();
-//			$("#copy_search_copy_all_search_confirm_button").show();  // Not currently used
-			$("#copy_search_copy_searches_not_in_new_project_confirm_button").show();
-			
-			$(".copy_searches_copy_text_jq").show();
-			$(".copy_searches_move_text_jq").hide();
-		} else {
-			// Moving the searches
-			$("#copy_search_confirm_button").hide();
-//			$("#copy_search_copy_all_search_confirm_button").hide();  // Not currently used
-			$("#copy_search_copy_searches_not_in_new_project_confirm_button").hide();
-//			$("#copy_search_move_all_search_confirm_button").show();  // Not currently used
-			$("#copy_search_move_searches_not_in_new_project_confirm_button").show();
-			
-			$(".copy_searches_copy_text_jq").hide();
-			$(".copy_searches_move_text_jq").show();
-		}
+//		if ( copyToOtherProject ) {
+//			// Copying the searches
+//			$(".copy_searches_display_copy_part_jq").show();
+//			$(".copy_searches_display_move_part_jq").hide();
+//		} else {
+//			// Moving the searches
+//			$(".copy_searches_display_copy_part_jq").hide();
+//			$(".copy_searches_display_move_part_jq").show();
+//		}
 		
 		//  List the searches already in the new project
 		
@@ -2545,6 +2567,16 @@ function initProjectAdminSection() {
 		try {
 			var clickThis = this;
 			openCopySearchesOverlay( clickThis, eventObject );
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	});
+	$("#move_search_button").click(function(eventObject) {
+		try {
+			var clickThis = this;
+			openMoveSearchesOverlay( clickThis, eventObject );
 			return false;
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
