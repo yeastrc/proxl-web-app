@@ -95,7 +95,8 @@ public class ViewMergedSearchPeptidesAction extends Action {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_SEARCHES_ACROSS_PROJECTS );
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			request.setAttribute( "projectId", projectId ); 
+			request.setAttribute( "projectId", projectId );
+			request.setAttribute( "project_id", projectId );
 			///////////////////////
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
@@ -116,7 +117,7 @@ public class ViewMergedSearchPeptidesAction extends Action {
 			
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
-			
+
 			request.setAttribute( "projectSearchIds", projectSearchIdsListDeduppedSorted );
 
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();

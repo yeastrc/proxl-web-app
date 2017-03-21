@@ -107,6 +107,7 @@ public class ViewMergedSearchProteinsAction extends Action {
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
 			request.setAttribute( "projectId", projectId ); 
+			request.setAttribute( "project_id", projectId );
 			///////////////////////
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
@@ -127,7 +128,10 @@ public class ViewMergedSearchProteinsAction extends Action {
 			
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
+
+			request.setAttribute( "projectSearchIds", projectSearchIdsListDeduppedSorted );
 			
+
 			//  Jackson JSON Mapper object for JSON deserialization and serialization
 			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
 			

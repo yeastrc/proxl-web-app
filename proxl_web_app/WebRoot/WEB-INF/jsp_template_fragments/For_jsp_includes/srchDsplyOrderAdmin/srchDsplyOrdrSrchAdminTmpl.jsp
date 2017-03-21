@@ -24,7 +24,7 @@ Containing element: <script id="organize_searches_single_search_template"  type=
 	 </div >
      <div class="item-display-name search_display_name_jq tool_tip_attached_jq" 
      	data-tooltip="Drag Search to a folder to move to that folder"
-	  	>{{name}}</div>
+	  	>{{name}} ({{ searchId }})</div>
      <div style="clear: both;"></div>
   </div>
   <div class="search-entry-bottom-border"></div>

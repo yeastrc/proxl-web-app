@@ -47,6 +47,7 @@ public class Z_CutoffValuesObjectsToOtherObjectsFactory {
 		Map<Integer, Map<Integer, AnnotationTypeDTO>> 
 		srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOListPerSearchIdMap =
 				GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIds );
+		
 		for ( Map.Entry<String,CutoffValuesSearchLevel> entry : inputSearches.entrySet() ) {
 			String projectSearchIdString = entry.getKey();
 			CutoffValuesSearchLevel cutoffValuesSearchLevel = entry.getValue();

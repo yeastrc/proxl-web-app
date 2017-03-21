@@ -42,6 +42,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.PeptideQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_PerSearchResult;
+import org.yeastrc.xlink.www.form_utils.Update__A_QueryBase_JSONRoot__ForCurrentSearchIds;
 import org.yeastrc.xlink.www.forms.SearchViewPeptidesForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -104,7 +105,8 @@ public class ViewSearchPeptidesAction extends Action {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_SEARCHES_ACROSS_PROJECTS );
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			request.setAttribute( "projectId", projectId ); 
+			request.setAttribute( "projectId", projectId );
+			request.setAttribute( "project_id", projectId );
 			///////////////////////
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
@@ -124,6 +126,8 @@ public class ViewSearchPeptidesAction extends Action {
 			}
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
+
+			request.setAttribute( "projectSearchId", projectSearchId );
 			
 			//  Jackson JSON Mapper object for JSON deserialization and serialization
 			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
@@ -183,6 +187,11 @@ public class ViewSearchPeptidesAction extends Action {
 					log.error( msg, e );
 					throw new ProxlWebappDataException( msg, e );
 				}
+
+				//  Update peptideQueryJSONRoot for current search ids and project search ids
+				Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.getInstance()
+				.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( peptideQueryJSONRoot, mapProjectSearchIdToSearchId );
+				
 			} else {
 				//  Query JSON in the form is empty so create an empty object that will be populated.
 				peptideQueryJSONRoot = new PeptideQueryJSONRoot();

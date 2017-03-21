@@ -197,7 +197,7 @@ var ViewMergedPeptidePageCode = function() {
 				//  Only submit if there were no errors in the input data
 				return;
 			}
-			$('#form_get_for_updated_parameters').submit();
+			$('#form_get_for_updated_parameters_multiple_searches').submit();
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;

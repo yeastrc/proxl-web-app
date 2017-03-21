@@ -106,6 +106,7 @@ public class ViewSearchProteinsAction extends Action {
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
 			request.setAttribute( "projectId", projectId ); 
+			request.setAttribute( "project_id", projectId );
 			///////////////////////
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
@@ -125,6 +126,8 @@ public class ViewSearchProteinsAction extends Action {
 			}
 			
 			///    Done Processing Auth Check and Auth Level
+
+			request.setAttribute( "projectSearchId", projectSearchId );
 			
 			//////////////////////////////
 			//  Jackson JSON Mapper object for JSON deserialization and serialization

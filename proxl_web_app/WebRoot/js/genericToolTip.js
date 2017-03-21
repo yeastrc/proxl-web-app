@@ -32,19 +32,26 @@
 	
 			//console.log( "Adding handler to:" );
 			//console.log( $this );
-			
-			var tooltipText = $this.attr("data-tooltip");			
-			
-			$this.qtip( {
-		        content: {
-		            text: tooltipText
-		        },
-				position: {
-					target: 'mouse',
-					adjust: { x: 5, y: 5 }, // Offset it slightly from under the mouse
-		            viewport: $(window)
-		         }
-		    });				
+		
+			addSingleGenericProxlToolTip( $this );
 
 		});
+	};
+	
+
+	var addSingleGenericProxlToolTip = function ( $element ) {
+		
+		var tooltipText = $element.attr("data-tooltip");			
+		
+		$element.qtip( {
+	        content: {
+	            text: tooltipText
+	        },
+			position: {
+				target: 'mouse',
+				adjust: { x: 5, y: 5 }, // Offset it slightly from under the mouse
+	            viewport: $(window)
+	         }
+	    });		
+		
 	};

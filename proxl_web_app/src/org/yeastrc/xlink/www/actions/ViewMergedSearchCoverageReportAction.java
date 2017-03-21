@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.actions;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +12,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 //import javax.servlet.http.HttpSession;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -45,12 +43,12 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.Struts_Config_Parameter_Values_Constants;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
+import org.yeastrc.xlink.www.form_utils.GetProteinQueryJSONRootFromFormData;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.objects.ProteinCoverageData;
 import org.yeastrc.xlink.www.protein_coverage.ProteinCoverageCompute;
@@ -63,9 +61,7 @@ import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import org.yeastrc.xlink.www.web_utils.URLEncodeDecodeAURL;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -122,6 +118,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
 			request.setAttribute( "projectId", projectId ); 
+			request.setAttribute( "project_id", projectId );
 			///////////////////////
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
@@ -139,6 +136,8 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
+
+			request.setAttribute( "projectSearchIds", projectSearchIdsListDeduppedSorted );
 			
 			//  Jackson JSON Mapper object for JSON deserialization and serialization
 			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
@@ -201,33 +200,14 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			request.setAttribute( "searches", searches );
 
 			//   Get Query JSON from the form and if not empty, deserialize it
-			String queryJSONFromForm = form.getQueryJSON();
-			ProteinQueryJSONRoot proteinQueryJSONRoot = null;
-			if ( StringUtils.isNotEmpty( queryJSONFromForm ) ) {
-				try {
-					proteinQueryJSONRoot = jacksonJSON_Mapper.readValue( queryJSONFromForm, ProteinQueryJSONRoot.class );
-				} catch ( JsonParseException e ) {
-					String msg = "Failed to parse 'queryJSONFromForm', JsonParseException.  queryJSONFromForm: " + queryJSONFromForm;
-					log.error( msg, e );
-					throw e;
-				} catch ( JsonMappingException e ) {
-					String msg = "Failed to parse 'queryJSONFromForm', JsonMappingException.  queryJSONFromForm: " + queryJSONFromForm;
-					log.error( msg, e );
-					throw e;
-				} catch ( IOException e ) {
-					String msg = "Failed to parse 'queryJSONFromForm', IOException.  queryJSONFromForm: " + queryJSONFromForm;
-					log.error( msg, e );
-					throw e;
-				}
-			} else {
-				//  Query JSON in the form is empty so create an empty object that will be populated.
-				proteinQueryJSONRoot = new ProteinQueryJSONRoot();
-				//  TODO  only do this if not generic
-				CutoffValuesRootLevel cutoffValuesRootLevel =
-						GetDefaultPsmPeptideCutoffs.getInstance()
-						.getDefaultPsmPeptideCutoffs( projectSearchIdsSet, searchIds, mapProjectSearchIdToSearchId );
-				proteinQueryJSONRoot.setCutoffs( cutoffValuesRootLevel );
-			}
+			ProteinQueryJSONRoot proteinQueryJSONRoot = 
+					GetProteinQueryJSONRootFromFormData.getInstance()
+					.getProteinQueryJSONRootFromFormData( 
+							form, 
+							projectSearchIdsListDeduppedSorted,
+							searchIds,
+							mapProjectSearchIdToSearchId );
+
 			/////////////////////////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////
 			////////   Generic Param processing
@@ -440,11 +420,11 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 					String queryJSONToFormURIEncoded = URLEncodeDecodeAURL.urlEncodeAURL( queryJSONToForm );
 					request.setAttribute( "queryJSONToFormURIEncoded", queryJSONToFormURIEncoded );
 				} catch ( JsonProcessingException e ) {
-					String msg = "Failed to write as JSON 'queryJSONToForm', JsonProcessingException.  queryJSONFromForm: " + queryJSONFromForm;
+					String msg = "Failed to write as JSON 'proteinQueryJSONRoot', JsonProcessingException.";
 					log.error( msg, e );
 					throw e;
 				} catch ( Exception e ) {
-					String msg = "Failed to write as JSON 'queryJSONToForm', Exception.  queryJSONFromForm: " + queryJSONFromForm;
+					String msg = "Failed to write as JSON 'proteinQueryJSONRoot', Exception. ";
 					log.error( msg, e );
 					throw e;
 				}
