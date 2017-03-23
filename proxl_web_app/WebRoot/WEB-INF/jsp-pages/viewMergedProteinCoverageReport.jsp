@@ -58,6 +58,14 @@
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
 
+	<input type="hidden" id="project_id" value="<c:out value="${ project_id }"></c:out>"> 
+
+	<c:forEach var="projectSearchId" items="${ projectSearchIds }">
+	
+		<%--  Put Project_Search_Ids on the page for the JS code --%>
+		<input type="hidden" class=" project_search_id_jq " value="<c:out value="${ projectSearchId }"></c:out>">
+	</c:forEach>	
+		
 	<%--  used by createTooltipForProteinNames.js --%>
 	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
 
@@ -84,7 +92,7 @@
 				 </c:otherwise>
 				</c:choose> 
 
-			<div style="margin-bottom:20px;">
+			<div  class=" navigation-links-block ">
 				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" href="${ contextPath }/${ peptideNav }.do?<bean:write name="queryString" />">Peptide View</a>]
 		
 				[<a class="tool_tip_attached_jq" data-tooltip="View proteins" href="${ contextPath }/${ proteinNav }.do?<bean:write name="queryString" />">Protein View</a>]
@@ -102,41 +110,47 @@
 			<%--  A block outside any form for PSM Peptide cutoff JS code --%>
 			<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_outsideAnyForm.jsp" %>
 
-
+			<%-- Coding to handle both merged an unmerged with 1 JSP --%>
 			<c:choose>
 			 <c:when test="${ mergedPage }"> 	
-
-				<form action="mergedProteinCoverageReport.do" method="get" id="form_get_for_updated_parameters">
-
-					<logic:iterate name="searches" id="search">
-						<input type="hidden" name="proteinSearchId" value="<bean:write name="search" property="projectSearchId" />">
-					</logic:iterate>
-
-					<input type="hidden" name="queryJSON" id="query_json_field" />
-								
-					<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
-					<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
-	
-				</form>
-		
-
+				<script type="text/text" id="form_get_for_updated_parameters__id_to_use">form_get_for_updated_parameters_multiple_searches</script>
 			 </c:when>
 			 <c:otherwise>
-				<form action="proteinCoverageReport.do" method="get" id="form_get_for_updated_parameters">
-										
-					<logic:iterate name="searches" id="search">
-						<input type="hidden" name="proteinSearchId" value="<bean:write name="search" property="projectSearchId" />">
-					</logic:iterate>
-				
-					<input type="hidden" name="queryJSON" id="query_json_field" />
-				
-					<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
-					<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
-	
-				</form>
-			 
+				<script type="text/text" id="form_get_for_updated_parameters__id_to_use">form_get_for_updated_parameters_single_search</script>
 			 </c:otherwise>
 			</c:choose>
+		 
+			<form action="mergedProteinCoverageReport.do" method="get" id="form_get_for_updated_parameters_multiple_searches">
+
+				<logic:iterate name="searches" id="search">
+					<input type="hidden" name="projectSearchId"
+						class=" project_search_id_in_update_form_jq "
+						value="<bean:write name="search" property="projectSearchId" />">
+				</logic:iterate>
+
+				<input type="hidden" name="queryJSON" id="query_json_field"  value="<c:out value="${ queryJSONToForm }" ></c:out>" />
+							
+				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
+				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
+
+			</form>
+	
+
+			<form action="proteinCoverageReport.do" method="get" id="form_get_for_updated_parameters_single_search">
+									
+				<logic:iterate name="searches" id="search">
+					<input type="hidden" name="projectSearchId"
+						class=" project_search_id_in_update_form_jq "
+						value="<bean:write name="search" property="projectSearchId" />">
+				</logic:iterate>
+			
+				<input type="hidden" name="queryJSON" id="query_json_field"  value="<c:out value="${ queryJSONToForm }" ></c:out>" />
+			
+				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
+				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %> <%--  Currently empty --%>
+
+			</form>
+		 
 			
 			<table style="border-width:0px;">
 					

@@ -1,7 +1,6 @@
 package org.yeastrc.xlink.www.actions;
 
 import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +32,6 @@ import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetCutoffPageDisplayRoot;
-import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplayAnnotationLevel;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplayRoot;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplaySearchLevel;
@@ -43,15 +41,13 @@ import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
+import org.yeastrc.xlink.www.form_utils.GetProteinQueryJSONRootFromFormData;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.objects.ProteinCoverageData;
 import org.yeastrc.xlink.www.protein_coverage.ProteinCoverageCompute;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 
@@ -178,35 +174,16 @@ public class DownloadProteinCoverageReportAction extends Action {
 						return r1.getSearchId() - r2.getSearchId();
 					}
 				});
-				//  Jackson JSON Mapper object for JSON deserialization and serialization
-				ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
+				
 				//   Get Query JSON from the form and if not empty, deserialize it
-				String queryJSONFromForm = form.getQueryJSON();
-				ProteinQueryJSONRoot proteinQueryJSONRoot = null;
-				if ( StringUtils.isNotEmpty( queryJSONFromForm ) ) {
-					try {
-						proteinQueryJSONRoot = jacksonJSON_Mapper.readValue( queryJSONFromForm, ProteinQueryJSONRoot.class );
-					} catch ( JsonParseException e ) {
-						String msg = "Failed to parse 'queryJSONFromForm', JsonParseException.  queryJSONFromForm: " + queryJSONFromForm;
-						log.error( msg, e );
-						throw e;
-					} catch ( JsonMappingException e ) {
-						String msg = "Failed to parse 'queryJSONFromForm', JsonMappingException.  queryJSONFromForm: " + queryJSONFromForm;
-						log.error( msg, e );
-						throw e;
-					} catch ( IOException e ) {
-						String msg = "Failed to parse 'queryJSONFromForm', IOException.  queryJSONFromForm: " + queryJSONFromForm;
-						log.error( msg, e );
-						throw e;
-					}
-				} else {
-					//  Query JSON in the form is empty so create an empty object that will be populated.
-					proteinQueryJSONRoot = new ProteinQueryJSONRoot();
-					CutoffValuesRootLevel cutoffValuesRootLevel =
-							GetDefaultPsmPeptideCutoffs.getInstance()
-							.getDefaultPsmPeptideCutoffs( projectSearchIdsSet, searchIds, mapProjectSearchIdToSearchId );
-					proteinQueryJSONRoot.setCutoffs( cutoffValuesRootLevel );
-				}
+				ProteinQueryJSONRoot proteinQueryJSONRoot = 
+						GetProteinQueryJSONRootFromFormData.getInstance()
+						.getProteinQueryJSONRootFromFormData( 
+								form, 
+								projectSearchIdsListDeduppedSorted,
+								searchIds,
+								mapProjectSearchIdToSearchId );
+
 				////////////
 				//  Copy Exclude Taxonomy and Exclude Protein Sets for lookup
 				Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();

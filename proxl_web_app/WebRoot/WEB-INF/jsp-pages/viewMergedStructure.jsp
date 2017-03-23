@@ -123,35 +123,16 @@
 
 		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/lorikeet.css">
 		
-
-
 	<%-- includ javascript library for glmol structure viewer --%>
 	<script type="text/javascript" src="${ contextPath }/js/libs/bio-pv.min.js"></script>
 
-
 </c:set>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
-
 
 	<%--  used by createTooltipForProteinNames.js --%>
 	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
 
-	
 	<%@ include file="/WEB-INF/jsp-includes/defaultPageViewFragment.jsp" %>
 		
 	<%@ include file="/WEB-INF/jsp-includes/viewPsmsLoadedFromWebServiceTemplateFragment.jsp" %>
@@ -202,7 +183,7 @@
 	
 			<h2 style="margin-bottom:5px;">View <span id="merged_label_text_header" style="display: none;" >merged </span>search results:</h2>
 	
-			<div id="navigation-links">
+			<div id="navigation-links"  class=" navigation-links-block ">
 				<span id="navigation_links_except_image"></span>
 					
 				<span id="image_viewer_link_span"></span>

@@ -180,7 +180,7 @@ var ViewSearchPeptidePageCode = function() {
 				//  Only submit if there were no errors in the input data
 				return;
 			}
-			$('#form_get_for_updated_parameters').submit();
+			$('#form_get_for_updated_parameters_single_search').submit();
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;

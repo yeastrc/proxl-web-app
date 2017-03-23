@@ -1,7 +1,7 @@
 
-//viewMergedProteinCoverageReport.js
+//  viewMergedProteinCoverageReport.js
 
-//Javascript for the viewMergedProteinCoverageReport.jsp page
+//  Javascript for the viewMergedProteinCoverageReport.jsp page
 
 
 
@@ -322,7 +322,12 @@ var ViewProteinCoverageReportPageCode = function() {
 				return;
 			}
 
-			$('#form_get_for_updated_parameters').submit();
+			var $form_get_for_updated_parameters__id_to_use = $("#form_get_for_updated_parameters__id_to_use");
+			var form_get_for_updated_parameters__id_to_use = $form_get_for_updated_parameters__id_to_use.text();
+			var formToSubmitSelector = "#" + form_get_for_updated_parameters__id_to_use;
+			var $formToSubmit = $( formToSubmitSelector )
+			
+			$formToSubmit.submit();
 
 
 		} catch( e ) {

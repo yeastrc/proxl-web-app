@@ -26,8 +26,19 @@
 </c:if>
 
 	<tr>
-	 <td style="vertical-align: top;" >Search<c:if test="${ not singleSearch }" >es</c:if>:</td>
-	 <td colspan="10">
+	 <td style="vertical-align: top;" >
+		<div >
+	 		Search<c:if test="${ not singleSearch }" >es</c:if>:
+	 	</div>
+ 		<div id="searches_for_page_chooser_button_container" style="display: none;">
+			<a href="javascript:" id="searches_for_page_chooser_open_overlay" style="font-size: 12px;"
+				class="tool_tip_attached_jq"  
+				data-tooltip="Change searches from which data are displayed"
+				>Change searches</a>
+		</div>
+	 
+	 </td>
+	 <td colspan="10"  style="vertical-align: top;" >
 	 
 		
   <c:forEach  var="search_details"  items="${ searches_details_list }" varStatus="searchVarStatus">
@@ -280,6 +291,8 @@
 						  			</div>
 							  	</div>
 							</div>
+
+			<%@ include file="/WEB-INF/jsp-includes/searchesForPageChooser.jsp" %>
 						
 	 </td>
 	</tr>

@@ -96,10 +96,15 @@
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
 		
+
+	<input type="hidden" id="project_id" value="<c:out value="${ project_id }"></c:out>"> 
+	
+	<%--  Put Project_Search_Id on the page for the JS code --%>
+	<input type="hidden" class=" project_search_id_jq " value="<c:out value="${ projectSearchId }"></c:out>">
+		
+		
 	<%--  used by createTooltipForProteinNames.js --%>
 	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
-
-	
 	
 		<%@ include file="/WEB-INF/jsp-includes/defaultPageViewFragment.jsp" %>
 		
@@ -114,7 +119,7 @@
 	
 			<h2 style="margin-bottom:5px;">List search proteins:</h2>
 	
-			<div style="margin-bottom:20px;"> 
+			<div  class=" navigation-links-block "> 
 				
 				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" 
 					href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ search.projectSearchId }"
@@ -143,36 +148,31 @@
 			<%--  A block outside any form for PSM Peptide cutoff JS code --%>
 			<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_outsideAnyForm.jsp" %>
 
-	
-			<html:form action="crosslinkProtein" method="get" styleId="form_get_for_updated_parameters">
-				
-				<input type="hidden" name="projectSearchId" value="${ search.projectSearchId }">
+			<script type="text/text" id="form_get_for_updated_parameters__id_to_use">form_get_for_updated_parameters_single_search</script>
+
+			<%--  Single search version, used by add/remove searches JS code --%>
+			<html:form action="crosslinkProtein" method="get" styleId="form_get_for_updated_parameters_single_search" >
+						
+				<input type="hidden" name="projectSearchId" class=" project_search_id_in_update_form_jq " 
+					value="${ search.projectSearchId }">
 				<%-- cannot use <html:hidden property="projectSearchId" /> since projectSearchId is an array --%>
 				
-				<html:hidden property="queryJSON" styleId="query_json_field" />
+				<input type="hidden" name="queryJSON" id="query_json_field" value="<c:out value="${ queryJSONToForm }" ></c:out>"  />
+				
+				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%> <%--  Currently empty --%>
+				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
-				<%--  A block in the submitted form for Protein Common JS code --%>
-				<%@ include file="/WEB-INF/jsp-includes/proteinPageCommonSubmittedForm.jsp" %>
-			
+			</html:form>			
+				
+			<html:form action="mergedCrosslinkProtein" method="get" styleId="form_get_for_updated_parameters_multiple_searches" >
+						
+				<input type="hidden" name="queryJSON" value="<c:out value="${ queryJSONToForm }" ></c:out>"  />
+				
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
-
-
 			</html:form>
-			
-						
-			<%-- WAS		
-			
-			
-			<html:form action="viewSearchCrosslinkProtein" method="get" styleId="form_get_for_updated_parameters">
-			
-				<html:hidden property="project_id"/>
 				
-				<html:hidden property="searchId"/>
-			
-			
-			--%>
 			
 			
 <%--

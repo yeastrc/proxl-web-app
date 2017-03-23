@@ -27,6 +27,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
+import org.yeastrc.xlink.www.form_utils.Update__A_QueryBase_JSONRoot__ForCurrentSearchIds;
 import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
 import org.yeastrc.xlink.www.objects.AnnDisplayNameDescPeptPsmListsPair;
 import org.yeastrc.xlink.www.objects.AnnValuePeptPsmListsPair;
@@ -143,6 +144,11 @@ public class PeptidesMergedCommonPageDownload {
 				log.error( msg, e );
 				throw e;
 			}
+
+			//  Update mergedPeptideQueryJSONRoot for current search ids and project search ids
+			Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.getInstance()
+			.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( mergedPeptideQueryJSONRoot, mapProjectSearchIdToSearchId );
+			
 		} else {
 			//  Query JSON in the form is empty so create an empty object that will be populated.
 			mergedPeptideQueryJSONRoot = new MergedPeptideQueryJSONRoot();

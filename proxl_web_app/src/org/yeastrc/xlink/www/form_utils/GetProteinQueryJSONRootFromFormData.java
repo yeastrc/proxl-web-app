@@ -65,6 +65,11 @@ public class GetProteinQueryJSONRootFromFormData {
 				log.error( msg, e );
 				throw new ProxlWebappDataException( msg, e );
 			}
+
+			//  Update proteinQueryJSONRoot for current search ids and project search ids
+			Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.getInstance()
+			.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( proteinQueryJSONRoot, mapProjectSearchIdToSearchId );
+			
 		} else {
 			//  Query JSON in the form is empty so create an empty object that will be populated.
 			proteinQueryJSONRoot = new ProteinQueryJSONRoot();

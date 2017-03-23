@@ -9,11 +9,11 @@ import java.util.Map;
  */
 public class CutoffValuesRootLevel {
 	/**
-	 * Key is Search Id
+	 * Key is Project Search Id
 	 */
 	private Map<String,CutoffValuesSearchLevel> searches;
 	/**
-	 * Key is Search Id
+	 * Key is Project Search Id
 	 * 
 	 * @return
 	 */
@@ -24,7 +24,7 @@ public class CutoffValuesRootLevel {
 		return searches;
 	}
 	/**
-	 * Key is Search Id
+	 * Key is Project Search Id
 	 * 
 	 * @param searches
 	 */

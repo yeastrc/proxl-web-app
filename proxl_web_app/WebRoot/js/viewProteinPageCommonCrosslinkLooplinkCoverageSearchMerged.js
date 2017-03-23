@@ -258,7 +258,18 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 			//  Only submit if there were no errors in the input data
 			return;
 		}
-		$('#form_get_for_updated_parameters').submit();
+
+		var form_get_for_updated_parameters__id_to_use = "form_get_for_updated_parameters_multiple_searches";
+		
+		var $form_get_for_updated_parameters__id_to_use = $("#form_get_for_updated_parameters__id_to_use");
+		if ( $form_get_for_updated_parameters__id_to_use.length > 0 ) {
+			form_get_for_updated_parameters__id_to_use = $form_get_for_updated_parameters__id_to_use.text();
+		}
+		var formToSubmitSelector = "#" + form_get_for_updated_parameters__id_to_use;
+		var $formToSubmit = $( formToSubmitSelector )
+		
+		$formToSubmit.submit();
+		
 	};
 };
 

@@ -177,10 +177,9 @@
 	
 			<h2 style="margin-bottom:5px;">View <span id="merged_label_text_header" style="display: none;" >merged </span>search results:</h2>
 	
-			<div id="navigation-links">
+			<div id="navigation-links"  class=" navigation-links-block ">
 			
 				<span id="navigation_links_except_structure"></span>
-				
 
 				<c:choose>
 				 <c:when test="${ showStructureLink }">
@@ -189,10 +188,7 @@
 	
 				 </c:when>
 				 <c:otherwise>
-				 	
-										 	
 					<%@ include file="/WEB-INF/jsp-includes/structure_link_non_link.jsp" %>
-										 	
 				 </c:otherwise>
 				</c:choose>
 								

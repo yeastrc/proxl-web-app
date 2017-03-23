@@ -12,4 +12,8 @@ public class StrutsActionPathsConstants {
 	
 	//  The Public Access Code Struts Action
 	public static final String PROJECT_READ_PROCESS_CODE = "/projectReadProcessCode.do";
+	
+	
+	public static final String IMAGE_PAGE_ACTION = "/image.do";
+	public static final String STRUCTURE_PAGE_ACTION = "/structure.do";
 }

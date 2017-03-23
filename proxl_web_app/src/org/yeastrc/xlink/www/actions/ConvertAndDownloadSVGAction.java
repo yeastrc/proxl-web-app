@@ -65,11 +65,32 @@ public class ConvertAndDownloadSVGAction extends Action {
 			  HttpServletResponse response ) throws Exception {
 		try {
 			// ensure referrer was on the same server as this Action to prevent abuse
-			URL referrerURL = new URL( request.getHeader("referer") );
-			URL thisURL = new URL( request.getRequestURL().toString() );
+			String referrerURLString = request.getHeader("referer");
+			if( StringUtils.isEmpty( referrerURLString ) ) {
+				log.error( "referrer host is empty string or null.  Exiting and not returning anything to browser" );
+				return null;
+			}
+			URL referrerURL = null;
+			URL thisURL = null;
+			try {
+				referrerURL = new URL( referrerURLString );
+			} catch (Exception e ) {
+				log.error( "Exception converting referrerURLString to URL object.  Exiting and not returning anything to browser."
+						+ "  referrerURLString: " + referrerURLString, e );
+				return null;
+			}
+			String thisURLString = request.getRequestURL().toString();
+			try {
+				thisURL = new URL( thisURLString );
+			} catch (Exception e ) {
+				log.error( "Exception converting thisURLString to URL object.  Exiting and not returning anything to browser."
+						+ "  thisURLString: " + thisURLString, e );
+				return null;
+			}
 			
 			if( !referrerURL.getHost().equals( thisURL.getHost() ) ) {
-				log.error( "This host and referrer host do not match.  Exiting and not returning anything to browser" );
+				log.error( "This host and referrer host do not match.  Exiting and not returning anything to browser."
+						+ "  referrer: " + referrerURLString + ", thisURL: " + thisURLString );
 				return null;
 			}
 			
@@ -143,9 +164,7 @@ public class ConvertAndDownloadSVGAction extends Action {
 	 */
 	private String getFilename( String type ) {
 		
-		String base = "proxl-image";
-		base += extensions.get( type );
-		
+		String base = "proxl-image" + extensions.get( type );		
 		return base;
 	}
 	
