@@ -1,8 +1,14 @@
 -- MySQL Workbench Forward Engineering
 
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+--  WARNING:  When regenerate this content, remove 'proxl' around 'TRIGGER'
+
+--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+-- SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+-- SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+-- SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 -- -----------------------------------------------------
 -- Schema proxl
@@ -2114,6 +2120,59 @@ CREATE INDEX search_rep_pept_idx ON srch_rep_pept__prot_seq_id_dimer (search_id 
 CREATE INDEX srch_rppp_prt_sq_d_ps_unlnkd_srch_rppptpptd ON srch_rep_pept__prot_seq_id_dimer (search_reported_peptide_peptide_id ASC);
 
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+-- -----------------------------------------------------
+-- Table default_page_view_generic_prev
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS default_page_view_generic_prev ;
+
+CREATE TABLE  default_page_view_generic_prev (
+  id_prev_record INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  page_name VARCHAR(80) NOT NULL,
+  project_search_id INT UNSIGNED NOT NULL,
+  auth_user_id_created_record INT UNSIGNED NOT NULL,
+  auth_user_id_last_updated_record INT UNSIGNED NOT NULL,
+  date_record_created DATETIME NULL,
+  date_record_last_updated DATETIME NULL,
+  url VARCHAR(6000) NOT NULL,
+  query_json VARCHAR(6000) NOT NULL,
+  PRIMARY KEY (id_prev_record),
+  CONSTRAINT default_page_view_generic_prev_project_search_id_fk
+    FOREIGN KEY (project_search_id)
+    REFERENCES project_search (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE INDEX default_page_view_prev_search_id_fk_idx ON default_page_view_generic_prev (project_search_id ASC);
+
+
+-- SET SQL_MODE=@OLD_SQL_MODE;
+-- SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+-- SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
+-- Remove all references to 'proxl' in TRIGGER 
+
+--  Remove all 'USE proxl$$' 
+--  Remove 'proxl.' on line starting with 'CREATE DEFINER ='
+
+-- USE proxl;
+
+DELIMITER $$
+
+
+DROP TRIGGER IF EXISTS default_page_view_generic_BEFORE_UPDATE $$
+
+CREATE DEFINER = CURRENT_USER TRIGGER default_page_view_generic_BEFORE_UPDATE BEFORE UPDATE ON default_page_view_generic FOR EACH ROW
+BEGIN
+	INSERT INTO default_page_view_generic_prev
+	(project_search_id,page_name,auth_user_id_created_record,auth_user_id_last_updated_record,date_record_created,
+	 date_record_last_updated,url,query_json)
+	SELECT project_search_id,page_name,auth_user_id_created_record,auth_user_id_last_updated_record,date_record_created,
+	 date_record_last_updated,url,query_json
+	 FROM default_page_view_generic 
+     WHERE project_search_id = OLD.project_search_id AND page_name = OLD.page_name;
+END$$
+
+
+DELIMITER ;
