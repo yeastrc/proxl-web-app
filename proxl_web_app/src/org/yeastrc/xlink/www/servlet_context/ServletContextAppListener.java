@@ -9,6 +9,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTableGetValueCommon;
 import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTableGetValue;
 import org.yeastrc.xlink.www.auth_db.AuthLibraryDBConnectionFactoryForWeb;
+import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
 import org.yeastrc.xlink.www.config_properties_file.ProxlConfigFileReader;
 import org.yeastrc.xlink.www.config_system_table.AppContextConfigSystemValuesRetrieval;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
@@ -99,7 +100,17 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
 	 */
 	public void contextDestroyed(ServletContextEvent event) {
-		//ServletContext context = event.getServletContext();
+		
+//		ServletContext context = event.getServletContext();
+		
+		log.warn("INFO:  !!!!!!!!  Web app Undeploying   !!!!!!!!");
+		
+		try {
+			CachedDataCentralRegistry.getInstance().writeToLogAllCacheSizes();
+		} catch (Exception e) {
+			log.error( "CachedDataCentralRegistry.getInstance().writeToLogAllCacheSizes() threw exception while app undeploying.", e);
+		}
+		
 //		LastLoginUpdaterQueue.endProcessing();
 //		
 //		try {
