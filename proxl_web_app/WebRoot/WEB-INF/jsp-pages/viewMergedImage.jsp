@@ -558,7 +558,9 @@
 					</div>
 				  </div>
 				
-					<div id="protein_list_container" class=" protein-list-container">
+					<div id="protein_list_outer_container" class=" protein-list-outer-container">
+						<div id="protein_list_container" class=" protein-list-container">
+						</div>
 					</div>
 					
 					<div id="select_protein_add_proteins_overlay_add_button_container"
