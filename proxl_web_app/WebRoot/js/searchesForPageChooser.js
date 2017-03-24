@@ -237,15 +237,17 @@ SearchesForPageChooser.prototype.loadSearchDataProcessResponse = function( param
 
 	$(".searches_for_page_chooser_modal_dialog_overlay_display_parts_jq").show()
 	
-
 	var OVERLAY_MINIMUM_HEIGTH = 150;
 	
 	var $window = $( window );
 	var windowScrollTop = $window.scrollTop();
 	var viewportHeight = $window.height();
 
+	var $searches_for_page_chooser_list_outer_container = $("#searches_for_page_chooser_list_outer_container");
 	var $searches_for_page_chooser_overlay_div = $("#searches_for_page_chooser_overlay_div");
 
+	var listMaximumHeight = $searches_for_page_chooser_list_container.height() + 5;
+	
 	//   Set overlay height to viewport - 40px or at minimum height
 	var overlayHeight = viewportHeight - 40;
 	var current_select_searches_overlay_div_Heigth = $searches_for_page_chooser_overlay_div.height();
@@ -255,11 +257,15 @@ SearchesForPageChooser.prototype.loadSearchDataProcessResponse = function( param
 	if ( new_current_searches_list_container_Height < OVERLAY_MINIMUM_HEIGTH ) {
 		new_current_searches_list_container_Height = OVERLAY_MINIMUM_HEIGTH ;
 	}
+	if ( new_current_searches_list_container_Height > listMaximumHeight ) {
+		new_current_searches_list_container_Height = listMaximumHeight ;
+	}
+	
 	//  Position Overlay Vertically
 	var overlayNewTop = windowScrollTop + 10;
 	//  Apply position to overlay
 	$searches_for_page_chooser_overlay_div.css( { top : overlayNewTop + "px" } );
-	$searches_for_page_chooser_list_container.css( { height : new_current_searches_list_container_Height + "px" } ); 
+	$searches_for_page_chooser_list_outer_container.css( { height : new_current_searches_list_container_Height + "px" } ); 
 
 	//  Does not always work, if the mouse moves right after the click
 //	console.log("Before: Scroll to first selected search" );

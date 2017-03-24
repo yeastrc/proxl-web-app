@@ -39,9 +39,11 @@
 		</div>
 	  </div>
 	
+	  <div id="searches_for_page_chooser_list_outer_container" class="searches-list-outer-container">
 		<div id="searches_for_page_chooser_list_container" class=" searches-list-container">
 		</div>
-		
+	  </div>
+	  	
 		<div id="searches_for_page_chooser_overlay_change_button_container"
 			style=" margin-top: 10px;" >
 			<div style="display:inline-block;position:relative;"> <%-- outer div to support overlay div when button disabled --%>
