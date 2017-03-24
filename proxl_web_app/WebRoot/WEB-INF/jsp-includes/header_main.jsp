@@ -237,8 +237,8 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 			<img src="${ contextPath }/images/pointer-down.png">
 		</a>
 		
-		<div class="header-projects-list" id="header_projects_list">
-		
+		<div class="header-projects-list-container" id="header_projects_list_container">
+		  <div class="header-projects-list" id="header_projects_list">
 			<c:forEach var="projectItem" items="${ headerProjectList }" varStatus="headerProjectListVarStatus" >
 			
 				<c:if test="${ headerProjectListVarStatus.count > 1 }"> <%-- All but first item, "count" starts at 1 --%>
@@ -263,6 +263,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 					</a>
 				</div>
 			</c:forEach>
+		  </div>
 		</div>
 		
 	  </div>

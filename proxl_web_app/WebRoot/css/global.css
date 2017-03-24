@@ -424,10 +424,15 @@ body.crosslinks-page-main .header-outer-container .header-projects-label { color
 body.crosslinks-page-main .header-outer-container .header-project-title { color: #000000; font-size: 14px; font-weight: bold; opacity:0.9;filter:alpha(opacity=90); text-decoration: none; }
 
 	/* drop down project list */
-body.crosslinks-page-main .header-outer-container .header-projects-list { 
+		/* outer container scrollable div */
+body.crosslinks-page-main .header-outer-container .header-projects-list-container {
 	/* offset-x | offset-y | blur-radius | spread-radius | color */
 	box-shadow: 10px 10px 22px 15px rgba(0, 0, 0, 0.2);
 	top: 24px; width: 330px; display: none; position: absolute; overflow-y: auto; background-color: white; padding: 15px; white-space:nowrap; padding: 15px; ; z-index: 2
+}
+		/* inner container div */
+body.crosslinks-page-main .header-outer-container .header-projects-list { 
+
 }
 
 body.crosslinks-page-main .header-outer-container .header-icon-tool-tips { 

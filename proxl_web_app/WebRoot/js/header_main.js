@@ -36,8 +36,7 @@ var headerMainGlobals = {
 var initHeaderMain = function() {
 
 	
-	// Put on both items
-	$("#header_projects_link,#header_projects_list").mouseenter( function( eventObject  ) {
+	$("#header_projects_link,#header_projects_list_container").mouseenter( function( eventObject  ) {
 		
 		if ( headerMainGlobals.divCloseTimerId !== null ) {
 			
@@ -45,22 +44,29 @@ var initHeaderMain = function() {
 			clearTimeout( headerMainGlobals.divCloseTimerId );
 		}
 
-		var $header_projects_list = $("#header_projects_list");
-
-		$header_projects_list.show();
-		
-		var LIST_MINIMUM_HEIGHT = 150;
-		
 		var $window = $( window );
 		var viewportHeight = $window.height();
+		
+		var $header_projects_list_container = $("#header_projects_list_container");
+		var $header_projects_list = $("#header_projects_list");
+
+		$header_projects_list_container.show();
+		
+		var listMaximumHeight = $header_projects_list.height() + 5; // + 40;
+
+		var LIST_MINIMUM_HEIGHT = 150;
 
 		//   Set list height to viewport * .8 (80%) or at minimum height
 		var header_projects_listHeight = viewportHeight * .8;
 		if ( header_projects_listHeight < LIST_MINIMUM_HEIGHT ) {
 			header_projects_listHeight = LIST_MINIMUM_HEIGHT ;
 		}
+		if ( header_projects_listHeight > listMaximumHeight ) {
+			header_projects_listHeight = listMaximumHeight;
+		}
+		
 		//  Apply height to list container
-		$header_projects_list.css( { height : header_projects_listHeight + "px" } ); 
+		$header_projects_list_container.css( { height : header_projects_listHeight + "px" } ); 
 		//  Reposition at top of list
 		$header_projects_list.scrollTop( 0 );
 		
@@ -74,7 +80,7 @@ var initHeaderMain = function() {
 		}
 		// Create timer to close projects list div
 		headerMainGlobals.divCloseTimerId = setTimeout( function() {
-			$("#header_projects_list").hide();	
+			$("#header_projects_list_container").hide();	
 		}, HEADER_MAIN_CONSTANTS.DIV_CLOSE_TIMEOUT );
 	} );
 	
