@@ -242,6 +242,18 @@ public class UserLookupNotInProjectIdService {
 //				throw new ProxlWebappInternalErrorException(msg);
 			}
 			
+			Boolean userEnabledAppSpecific = AuthUserDAO.getInstance().getUserEnabledAppSpecific( authUserId );
+			if ( userEnabledAppSpecific == null ) {
+				String msg = "Failed to get getUserEnabledAppSpecific from proxl auth_user table for authUserId: " + authUserId;
+				log.error( msg );
+				throw new ProxlWebappInternalErrorException(msg);
+			}			
+			
+			if ( ! userEnabledAppSpecific ) {
+				//  User disabled in Proxl so exclude
+				continue;  //  EARLY Continue
+			}
+			
 			//  Get full user data
 			UserMgmtGetUserDataRequest userMgmtGetUserDataRequest = new UserMgmtGetUserDataRequest();
 //				userMgmtGetUserDataRequest.setSessionKey( userMgmtLoginResponse.getSessionKey() );
