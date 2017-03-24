@@ -1343,14 +1343,13 @@ div.searches-for-page-chooser-overlay-div {
 .searches-for-page-chooser-overlay-body {  padding: 20px; }
 
 
-.searches-for-page-chooser-overlay-div .searches-list-container {
+.searches-for-page-chooser-overlay-div .searches-list-outer-container {
 	
 	position: relative;
 	padding: 6px;
 	border-width: 1px;
 	border-style: solid;
 	border-color: #D3D3D3 ;
-	height: 300px;
 	overflow-y: auto; 
 }
 
