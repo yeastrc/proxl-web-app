@@ -44,28 +44,38 @@ var initHeaderMain = function() {
 			// Cancel existing timer
 			clearTimeout( headerMainGlobals.divCloseTimerId );
 		}
+
+		var $header_projects_list = $("#header_projects_list");
+
+		$header_projects_list.show();
 		
-		$("#header_projects_list").show();
+		var LIST_MINIMUM_HEIGHT = 150;
+		
+		var $window = $( window );
+		var viewportHeight = $window.height();
+
+		//   Set list height to viewport * .8 (80%) or at minimum height
+		var header_projects_listHeight = viewportHeight * .8;
+		if ( header_projects_listHeight < LIST_MINIMUM_HEIGHT ) {
+			header_projects_listHeight = LIST_MINIMUM_HEIGHT ;
+		}
+		//  Apply height to list container
+		$header_projects_list.css( { height : header_projects_listHeight + "px" } ); 
+		//  Reposition at top of list
+		$header_projects_list.scrollTop( 0 );
 		
 		///////////
 		
 	} ).mouseleave( function( eventObject  ) {
 		
-		
 		if ( headerMainGlobals.divCloseTimerId !== null ) {
-			
 			// Cancel existing timer
 			clearTimeout( headerMainGlobals.divCloseTimerId );
 		}
-		
 		// Create timer to close projects list div
-		
 		headerMainGlobals.divCloseTimerId = setTimeout( function() {
-				
 			$("#header_projects_list").hide();	
-			
 		}, HEADER_MAIN_CONSTANTS.DIV_CLOSE_TIMEOUT );
-		
 	} );
 	
 

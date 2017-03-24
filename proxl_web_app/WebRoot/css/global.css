@@ -425,9 +425,10 @@ body.crosslinks-page-main .header-outer-container .header-project-title { color:
 
 	/* drop down project list */
 body.crosslinks-page-main .header-outer-container .header-projects-list { 
-	display: none; position: absolute; background-color: white; top: 24px; width: 330px; padding: 15px; border-style: solid; border-width: 1px; border-color: #D3D3D3; z-index: 1; 
+	/* offset-x | offset-y | blur-radius | spread-radius | color */
+	box-shadow: 10px 10px 22px 15px rgba(0, 0, 0, 0.2);
+	top: 24px; width: 330px; display: none; position: absolute; overflow-y: auto; background-color: white; padding: 15px; white-space:nowrap; padding: 15px; ; z-index: 2
 }
-
 
 body.crosslinks-page-main .header-outer-container .header-icon-tool-tips { 
 	display: none; position: absolute; background-color: #FFF0F0; top: 24px; right: 0px; padding: 3px; white-space:nowrap; border-style: solid; border-width: 1px; border-color: #D3D3D3; z-index: 1; 

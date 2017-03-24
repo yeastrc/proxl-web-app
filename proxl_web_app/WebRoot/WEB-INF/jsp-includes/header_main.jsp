@@ -249,12 +249,11 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 				
 				<c:if test="${ not empty headerProject  }">
 				  <c:if test="${ projectItem.projectTblData.id == headerProject.projectTblData.id }">
-				  
 				  	<%--  Set to the value for the "id" in the span expected by the Javascript for the header --%>
 					<c:set var="header_current_project_in_drop_down_list">header_current_project_in_drop_down_list</c:set>
 				  </c:if>
 				</c:if>
-			
+
 				<div  class="project-text-div" >
 					<a href="${ contextPath }/viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ projectItem.projectTblData.id }" ></c:out>"
 						class="project-text-link" 
@@ -263,10 +262,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 						></span>
 					</a>
 				</div>
-						
 			</c:forEach>
-		
-		
 		</div>
 		
 	  </div>
