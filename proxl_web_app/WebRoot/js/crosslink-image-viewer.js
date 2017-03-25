@@ -4706,6 +4706,8 @@ function openSelectProteinSelect( params ) {
 	var current_select_protein_overlay_div_Height = $select_protein_overlay_div.outerHeight();
 	var overlayHeightDiff = overlayHeight - current_select_protein_overlay_div_Height;
 
+	var protein_list_container_HeightSetToListMaxHeight = false;
+	
 	var current_protein_list_container_Height = $protein_list_container.height();
 	var new_protein_list_container_Height = overlayHeightDiff;
 	if ( new_protein_list_container_Height < OVERLAY_MINIMUM_HEIGHT ) {
@@ -4713,15 +4715,30 @@ function openSelectProteinSelect( params ) {
 	}
 	if ( new_protein_list_container_Height > listMaximumHeight ) {
 		new_protein_list_container_Height = listMaximumHeight ;
+		protein_list_container_HeightSetToListMaxHeight = true;
 	}
+
+	$protein_list_outer_container.css( { height : new_protein_list_container_Height + "px" } );
+	
 	//  Position Overlay Vertically
 	var overlayNewTop = windowScrollTop + 10;
+	if ( protein_list_container_HeightSetToListMaxHeight ) {
+		//  overlay height less than full viewport so position top as close to proteins, keeping full overlay within viewport
+		var select_protein_overlay_divHeight = $select_protein_overlay_div.outerHeight();
+		var selected_proteins_outer_containerTop = $("#selected_proteins_outer_container").position().top;
+		var containerTopInViewport = selected_proteins_outer_containerTop - windowScrollTop - 10;
+		overlayNewTop = containerTopInViewport;
+		if ( overlayNewTop + select_protein_overlay_divHeight > viewportHeight - 40 ) {
+			overlayNewTop = windowScrollTop + viewportHeight - select_protein_overlay_divHeight - 20;
+		}
+		
+	}
+
 	//  Apply position to overlay
 	$select_protein_overlay_div.css( { 
 		left : overlayNewOffsetLeft + "px", 
 		top : overlayNewTop + "px",
 		width : overlayNewWidth + "px" } );
-	$protein_list_outer_container.css( { height : new_protein_list_container_Height + "px" } ); 
 }
 
 /**
