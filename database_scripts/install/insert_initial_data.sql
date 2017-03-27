@@ -84,4 +84,8 @@ INSERT INTO linker(abbr,name)VALUES( 'bs3','bis[sulfosuccinimidyl] suberate' );
 INSERT INTO linker(abbr,name)VALUES( 'bs2','bis(sulfosuccinimidyl) glutarate' );
 INSERT INTO linker(abbr,name)VALUES( 'edc','1-ethyl-3-(3-dimethylaminopropyl)carbodiimide hydrochloride' );
 INSERT INTO linker(abbr,name)VALUES( 'dfdnb','1,5-difluoro-2,4-dinitrobenzene' );
+INSERT INTO linker(abbr,name)VALUES( 
+	'dss.sty','disuccinimidyl suberate that includes sty links on one half of the link' );
+INSERT INTO linker(abbr,name)VALUES( 
+	'bs3.sty','bis[sulfosuccinimidyl] suberate that includes sty links on one half of the link' );
 
