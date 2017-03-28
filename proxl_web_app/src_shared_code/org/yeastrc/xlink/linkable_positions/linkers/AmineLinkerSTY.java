@@ -53,6 +53,7 @@ public abstract class AmineLinkerSTY implements ILinker {
 			linkablePositions.addAll( ProteinSequenceUtils.getPositionsOfResidueForProteinSequence( querySequence, "T" ) );
 			linkablePositions.addAll( ProteinSequenceUtils.getPositionsOfResidueForProteinSequence( querySequence, "Y" ) );
 			linkablePositions.add( 1 );
+			linkablePositions.add( 2 );
 
 		} else if( subjectResidue.equals( "S" ) || subjectResidue.equals( "T" ) || subjectResidue.equals( "Y" ) ) {
 			

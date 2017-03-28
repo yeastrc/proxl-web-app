@@ -9,8 +9,10 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 import org.yeastrc.xlink.linkable_positions.linkers.BS2;
 import org.yeastrc.xlink.linkable_positions.linkers.BS3;
+import org.yeastrc.xlink.linkable_positions.linkers.BS3_STY;
 import org.yeastrc.xlink.linkable_positions.linkers.DSG;
 import org.yeastrc.xlink.linkable_positions.linkers.DSS;
+import org.yeastrc.xlink.linkable_positions.linkers.DSS_STY;
 import org.yeastrc.xlink.linkable_positions.linkers.EDC;
 import org.yeastrc.xlink.linkable_positions.linkers.DFDNB;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
@@ -25,6 +27,11 @@ public class GetLinkerFactory {
 	public static final String BUILT_IN_LINKER_DSS = "dss";
 	public static final String BUILT_IN_LINKER_EDC = "edc";
 	public static final String BUILT_IN_LINKER_DFDNB = "dfdnb";
+	
+	public static final String BUILT_IN_LINKER_BS3_STY = "bs3.sty";
+	public static final String BUILT_IN_LINKER_DSS_STY = "dss.sty";
+
+	
 
 	private static ILinker LINKER_BS2 = new BS2();
 	private static ILinker LINKER_BS3 = new BS3();
@@ -32,6 +39,10 @@ public class GetLinkerFactory {
 	private static ILinker LINKER_DSS = new DSS();
 	private static ILinker LINKER_EDC = new EDC();
 	private static ILinker LINKER_DFDNB = new DFDNB();
+	
+	private static ILinker LINKER_DSS_STY = new DSS_STY();
+	private static ILinker LINKER_BS3_STY = new BS3_STY();
+
 	
 	private static Map<String,ILinker> linkers = new HashMap<String, ILinker>();
 	
@@ -43,6 +54,9 @@ public class GetLinkerFactory {
 		linkers.put( BUILT_IN_LINKER_DSS, LINKER_DSS );
 		linkers.put( BUILT_IN_LINKER_EDC, LINKER_EDC );
 		linkers.put( BUILT_IN_LINKER_DFDNB, LINKER_DFDNB );
+		
+		linkers.put( BUILT_IN_LINKER_BS3_STY, LINKER_BS3_STY );
+		linkers.put( BUILT_IN_LINKER_DSS_STY, LINKER_DSS_STY );
 	}
 	
 	/**
