@@ -1917,7 +1917,7 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 	var ctrlKeyDown = false;
 	//   Function called when Dragging is Started
 	var startDragFunc = function( clickX, ClickY, mouseEvent ) {
-		ctrlKeyDown = mouseEvent.ctrlKey;
+		ctrlKeyDown = mouseEvent.ctrlKey || mouseEvent.metaKey;
 		//  "this" is the Snap object holding the <g> for the protein group ( the rectangle and the label (protein name) )
 		if ( ctrlKeyDown ) {
 			startSelectProteinBarPartMouseHandler( this, clickX, ClickY, mouseEvent );
@@ -2211,7 +2211,7 @@ function addClickDoubleClickTo( g, protein, i  ) {
 				if ( clicks === 1 ) {
 					if ( e.shiftKey ) { 
 						shiftClickFunction.call( this, e );
-					} else if ( e.ctrlKey ) { 
+					} else if ( e.ctrlKey || e.metaKey ) { 
 						controlClickFunction.call( this, e ); 
 					} else { 
 						singleClickFunction.call( this, e ); 
