@@ -21,7 +21,7 @@ public class MapProjectSearchIdToSearchId implements CachedDataCommonIF {
 
 	private static final Logger log = Logger.getLogger(MapProjectSearchIdToSearchId.class);
 	
-	private static final int CACHE_MAX_SIZE = 500;
+	private static final int CACHE_MAX_SIZE = 2000;
 	private static final int CACHE_TIMEOUT = 50; // in days
 
 	/**
