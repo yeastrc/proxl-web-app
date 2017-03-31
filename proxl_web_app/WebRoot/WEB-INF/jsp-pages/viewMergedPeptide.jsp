@@ -387,11 +387,11 @@
 
 						<c:forEach items="${ searches }" var="search"  varStatus="searchVarStatus">
 		
-							<th id="search_header_<bean:write name="search" property="searchId" />" style="text-align:left;font-weight:bold;width:25px;"
+							<th id="search_header_${ search.projectSearchId }" style="text-align:left;font-weight:bold;width:25px;"
 								><bean:write name="search" property="searchId" /></th>
 								
 							<script >
-								$("#search_header_<bean:write name="search" property="searchId" />").qtip( {
+								$("#search_header_${ search.projectSearchId }").qtip( {
 							        content: {
 							            text: '<bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="searchId" />)'
 							        },
