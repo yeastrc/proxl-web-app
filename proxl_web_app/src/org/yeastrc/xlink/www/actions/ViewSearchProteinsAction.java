@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
@@ -19,7 +20,6 @@ import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.SearchTaxonomySearcher;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
@@ -56,6 +56,7 @@ import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsD
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
+import org.yeastrc.xlink.www.web_utils.TaxonomiesForSearchOrSearches;
 import org.yeastrc.xlink.www.web_utils.URLEncodeDecodeAURL;
 import org.yeastrc.xlink.www.web_utils.XLinkWebAppUtils;
 import org.yeastrc.xlink.www.webapp_timing.WebappTiming;
@@ -152,10 +153,13 @@ public class ViewSearchProteinsAction extends Action {
 			mapProjectSearchIdToSearchId.put( projectSearchId, searchId );
 			
 			// build list of taxonomies to show in exclusion list
-			request.setAttribute("taxonomies", SearchTaxonomySearcher.getInstance().getTaxonomies( search ) );
+			Map<Integer, String> taxonomies = 
+					TaxonomiesForSearchOrSearches.getInstance().getTaxonomiesForSearchId( search.getSearchId() );
+			request.setAttribute("taxonomies", taxonomies );
 			if ( webappTiming != null ) {
 				webappTiming.markPoint( "After Taxonomy Searcher:  SearchTaxonomySearcher.getInstance().getTaxonomies( search )" );
 			}
+			
 			//   Get Query JSON from the form and if not empty, deserialize it
 			ProteinQueryJSONRoot proteinQueryJSONRoot = 
 					GetProteinQueryJSONRootFromFormData.getInstance()

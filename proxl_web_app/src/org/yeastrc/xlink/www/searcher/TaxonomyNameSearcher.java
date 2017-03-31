@@ -1,4 +1,4 @@
-package org.yeastrc.xlink.www.web_utils;
+package org.yeastrc.xlink.www.searcher;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,9 +10,9 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  * 
  *
  */
-public class TaxonomyUtils {
+public class TaxonomyNameSearcher {
 	
-	private static final Logger log = Logger.getLogger(TaxonomyUtils.class);
+	private static final Logger log = Logger.getLogger(TaxonomyNameSearcher.class);
 	
 	/**
 	 * Get the name associated with the given NCBI taxonomy ID

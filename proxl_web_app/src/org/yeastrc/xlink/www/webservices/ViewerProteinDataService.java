@@ -45,11 +45,12 @@ import org.yeastrc.xlink.www.objects.SearchProteinUnlinkedWrapper;
 import org.yeastrc.xlink.www.searcher.LinkersForSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsForProtSeqIdSearchId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyNameStringForTaxonomyId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Request;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Result;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyNameStringForTaxonomyId_Result;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.www.web_utils.TaxonomyUtils;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -362,7 +363,15 @@ public class ViewerProteinDataService {
 						if( taxonomies.containsKey( taxonomyId ) ) { 
 							continue;
 						}
-						taxonomies.put( taxonomyId, TaxonomyUtils.getTaxonomyName( taxonomyId ) );
+						TaxonomyNameStringForTaxonomyId_Result taxonomyNameStringForTaxonomyId_Result =
+								Cached_TaxonomyNameStringForTaxonomyId.getInstance().getTaxonomyNameStringForTaxonomyId_Result( taxonomyId );
+						String taxonomyName = taxonomyNameStringForTaxonomyId_Result.getTaxonomyName();
+						if ( taxonomyName == null ) {
+							String msg = "No taxonomyName found for taxonomyId: " + taxonomyId;
+							log.error( msg );
+							throw new ProxlWebappDataException(msg);
+						}
+						taxonomies.put( taxonomyId, taxonomyName );
 					}
 				}
 			}

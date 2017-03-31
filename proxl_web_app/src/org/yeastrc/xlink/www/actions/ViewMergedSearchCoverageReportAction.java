@@ -37,7 +37,6 @@ import org.yeastrc.xlink.www.objects.SearchProteinLooplinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinked;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinkedWrapper;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.SearchTaxonomySearcher;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
@@ -60,6 +59,7 @@ import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsD
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
+import org.yeastrc.xlink.www.web_utils.TaxonomiesForSearchOrSearches;
 import org.yeastrc.xlink.www.web_utils.URLEncodeDecodeAURL;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -404,7 +404,10 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 				request.setAttribute( "proteins", allProteinsUnfilteredList );
 			}
 			// build list of taxonomies to show in exclusion list
-			request.setAttribute("taxonomies", SearchTaxonomySearcher.getInstance().getTaxonomies( searches ) );
+			//    puts Map<Integer, String> into request attribute where key is taxonomy id, value is taxonomy name
+			Map<Integer, String> taxonomies = 
+					TaxonomiesForSearchOrSearches.getInstance().getTaxonomiesForSearchIds( searchIds );
+			request.setAttribute("taxonomies", taxonomies );
 			//////////////////////////////////////////////
 			/////////////////////
 			//  clear out form so value doesn't go back on the page in the form

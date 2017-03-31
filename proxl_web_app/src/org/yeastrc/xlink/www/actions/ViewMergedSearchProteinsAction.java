@@ -1,6 +1,7 @@
 package org.yeastrc.xlink.www.actions;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -27,7 +28,6 @@ import org.yeastrc.xlink.www.objects.MergedSearchProtein;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinLooplink;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.SearchTaxonomySearcher;
 import org.yeastrc.xlink.www.actions.ProteinsMergedCommonPageDownload.ProteinsMergedCommonPageDownloadResult;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.Struts_Config_Parameter_Values_Constants;
@@ -44,6 +44,7 @@ import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsD
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
+import org.yeastrc.xlink.www.web_utils.TaxonomiesForSearchOrSearches;
 import org.yeastrc.xlink.www.web_utils.XLinkWebAppUtils;
 import org.yeastrc.xlink.www.webapp_timing.WebappTiming;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -137,6 +138,7 @@ public class ViewMergedSearchProteinsAction extends Action {
 			
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
+			Collection<Integer> searchIds = new HashSet<>();
 			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
 			int searchIdsArrayIndex = 0;
 			for( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
@@ -151,6 +153,7 @@ public class ViewMergedSearchProteinsAction extends Action {
 				}
 				searches.add( search );
 				searchesMapOnSearchId.put( search.getSearchId(), search );
+				searchIds.add( search.getSearchId() );
 				searchIdsArray[ searchIdsArrayIndex ] = search.getSearchId();
 				searchIdsArrayIndex++;
 			}
@@ -173,7 +176,10 @@ public class ViewMergedSearchProteinsAction extends Action {
 			
 			///////////////
 			// build list of taxonomies to show in exclusion list
-			request.setAttribute("taxonomies", SearchTaxonomySearcher.getInstance().getTaxonomies( searches ) );
+			//    puts Map<Integer, String> into request attribute where key is taxonomy id, value is taxonomy name
+			Map<Integer, String> taxonomies = 
+					TaxonomiesForSearchOrSearches.getInstance().getTaxonomiesForSearchIds( searchIds );
+			request.setAttribute("taxonomies", taxonomies );
 			if ( webappTiming != null ) {
 				webappTiming.markPoint( "After Taxonomy Searcher:  SearchTaxonomySearcher.getInstance().getTaxonomies( search )" );
 			}
