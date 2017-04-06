@@ -78,6 +78,7 @@ INSERT INTO proxl_xml_file_import_tracking_run_sub_status_values_lookup (id, dis
 	
 --  INSERT SUPPORTED CROSS-LINKERS
 
+INSERT INTO linker(abbr,name)VALUES( 'bmoe','bismaleimidoethane' );
 INSERT INTO linker(abbr,name)VALUES( 'dss','disuccinimidyl suberate' );
 INSERT INTO linker(abbr,name)VALUES( 'dsg','disuccinimidyl glutarate' );
 INSERT INTO linker(abbr,name)VALUES( 'bs3','bis[sulfosuccinimidyl] suberate' );

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
+import org.yeastrc.xlink.linkable_positions.linkers.BMOE;
 import org.yeastrc.xlink.linkable_positions.linkers.BS2;
 import org.yeastrc.xlink.linkable_positions.linkers.BS3;
 import org.yeastrc.xlink.linkable_positions.linkers.BS3_STY;
@@ -21,6 +22,7 @@ public class GetLinkerFactory {
 	
 	private static final Logger log = Logger.getLogger(GetLinkerFactory.class);
 	
+	public static final String BUILT_IN_LINKER_BMOE = "bmoe";
 	public static final String BUILT_IN_LINKER_BS2 = "bs2";
 	public static final String BUILT_IN_LINKER_BS3 = "bs3";
 	public static final String BUILT_IN_LINKER_DSG = "dsg";
@@ -33,6 +35,7 @@ public class GetLinkerFactory {
 
 	
 
+	private static ILinker LINKER_BMOE = new BMOE();
 	private static ILinker LINKER_BS2 = new BS2();
 	private static ILinker LINKER_BS3 = new BS3();
 	private static ILinker LINKER_DSG = new DSG();
@@ -48,6 +51,7 @@ public class GetLinkerFactory {
 	
 	static {
 		
+		linkers.put( BUILT_IN_LINKER_BMOE, LINKER_BMOE );
 		linkers.put( BUILT_IN_LINKER_BS2, LINKER_BS2 );
 		linkers.put( BUILT_IN_LINKER_BS3, LINKER_BS3 );
 		linkers.put( BUILT_IN_LINKER_DSG, LINKER_DSG );
@@ -65,33 +69,26 @@ public class GetLinkerFactory {
 	 * @throws Exception 
 	 */
 	public static ILinker getLinkerForAbbr( String linkerAbbr ) throws Exception {
-		
 		ILinker linker = linkers.get( linkerAbbr );
-
 		if ( linker == null ) {
-
 			String msg = "linker abbreviation '" + linkerAbbr + "' does not match to any supported linker.";
-			
 			log.error( msg );
-			
 			throw new Exception( msg );
 		}
-		
 		return linker;
-		
 	}
 	
+	/**
+	 * @param linkerAbbr
+	 * @param linker
+	 * @throws Exception
+	 */
 	public static void registerLinker( String linkerAbbr, ILinker linker ) throws Exception {
-		
 		if ( linkers.containsKey(linkerAbbr)) {
-
 			String msg = "registerLinker: linker abbreviation '" + linkerAbbr + "' already registered.";
-			
 			log.error( msg );
-			
 			throw new Exception( msg );
 		}
-		
 		linkers.put( linkerAbbr, linker );
 	}
 	
@@ -99,14 +96,10 @@ public class GetLinkerFactory {
 	 * @return
 	 */
 	public static List<String> getLinkerAbbrList() {
-		
 		List<String> linkerAbbrList = new ArrayList<>();
-		
 		for ( Map.Entry<String,ILinker> entry : linkers.entrySet() ) {
-			
 			linkerAbbrList.add( entry.getKey() );
 		}
-		
 		return linkerAbbrList;
 	}
 	
