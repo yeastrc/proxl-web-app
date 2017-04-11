@@ -137,6 +137,44 @@ public class ProjectSearchDAO {
 		}
 	}
 	
+	private static final String resetDisplayOrderForFolderId_SQL =
+			
+			"UPDATE project_search INNER JOIN folder_project_search " 
+			+ 		" ON project_search.id = folder_project_search.project_search_id "
+			+ "SET project_search.search_display_order = 0 "
+			+ "WHERE folder_project_search.folder_id = ?";
+
+	/**
+	 * Update the display_order associated with this search
+	 * @param folderId
+	 * @param newDisplayOrder
+	 * @throws Exception
+	 */
+	public void resetDisplayOrderForFolderId( int folderId, Connection dbConnection ) throws Exception {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		final String sql = resetDisplayOrderForFolderId_SQL;
+		try {
+			pstmt = dbConnection.prepareStatement( sql );
+			pstmt.setInt( 1, folderId );
+			pstmt.executeUpdate();
+		} catch ( Exception e ) {
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
+			throw e;
+		} finally {
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+		}
+	}
+	
+	
 	/**
 	 * Mark search as deleted
 	 * @param searchId

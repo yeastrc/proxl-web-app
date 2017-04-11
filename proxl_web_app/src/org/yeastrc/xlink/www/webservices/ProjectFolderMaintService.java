@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dao.FolderForProjectDAO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
+import org.yeastrc.xlink.www.database_update_with_transaction_services.DeleteFolderResetSearchDisplayOrderUsingDBTransactionService;
 import org.yeastrc.xlink.www.dto.FolderForProjectDTO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
@@ -256,7 +257,9 @@ public class ProjectFolderMaintService {
 			}
 			
 			FolderForProjectDTO folderForProjectDTO = FolderForProjectDAO.getInstance().getFolderForProjectDTO_ForId( folderId );
-			FolderForProjectDAO.getInstance().delete( folderId );
+			
+			DeleteFolderResetSearchDisplayOrderUsingDBTransactionService.getInstance()
+			.deleteFolderResetSearchDisplayOrder( folderId );
 			
 			log.warn( "INFO: Folder for project deleted by user. username: " + authUserDTO.getUsername() + ", userId: " + authUserDTO.getId()
 					+ ", projectId: " + projectId 
