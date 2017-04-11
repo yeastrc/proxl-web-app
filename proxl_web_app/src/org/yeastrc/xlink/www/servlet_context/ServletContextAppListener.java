@@ -5,6 +5,8 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import org.apache.log4j.Logger;
 import org.yeastrc.auth.db.AuthLibraryDBConnectionFactory;
+import org.yeastrc.session_mgmt.main.YRCSessionMgmtMain;
+import org.yeastrc.user_mgmt_central.main_code.db.UserMgmtCentralMainDBConnectionFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTableGetValueCommon;
 import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTableGetValue;
@@ -18,6 +20,7 @@ import org.yeastrc.xlink.www.db_web.DBConnectionFactoryWeb;
 import org.yeastrc.xlink.www.db_web.DBSet_JNDI_Name_FromConfigFile;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
 import org.yeastrc.xlink.www.no_data_validation.ThrowExceptionOnNoDataConfig;
+import org.yeastrc.xlink.www.user_mgmt_db.UserMgmtCentralMainDBConnectionFactory_For_Proxl;
 import org.yeastrc.xlink.www.web_utils.GetJsCssCacheBustString;
 /**
  * This class is loaded and the method "contextInitialized" is called when the web application is first loaded by the container
@@ -69,8 +72,21 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 			jsCssCacheBustString = "devEnv";
 		}
 		context.setAttribute( WebConstants.APP_CONTEXT_JS_CSS_CACHE_BUST, jsCssCacheBustString );
+
+		try {
+			YRCSessionMgmtMain.getInstance().init();
+		} catch (Exception e) {
+			//  
+			log.error( "Exception in YRCSessionMgmtMain.init():", e  );
+			throw new RuntimeException( e );
+		} 
+		
 		AuthLibraryDBConnectionFactoryForWeb dbConnectFactory = new AuthLibraryDBConnectionFactoryForWeb();
 		AuthLibraryDBConnectionFactory.setDbConnectionFactoryImpl(dbConnectFactory);
+		
+		UserMgmtCentralMainDBConnectionFactory_For_Proxl userMgmtCentralMainDBConnectionFactory_For_Proxl = new UserMgmtCentralMainDBConnectionFactory_For_Proxl();
+		UserMgmtCentralMainDBConnectionFactory.setDbConnectionFactoryImpl( userMgmtCentralMainDBConnectionFactory_For_Proxl );
+		
 		//  Remove validation so web app will start up with no configuration records
 //		try {
 //			GetEmailConfig.validateEmailConfig(); // throws Exception if error
@@ -87,10 +103,13 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 			//  already logged
 			throw new RuntimeException( e );
 		} 
+		
 		UserMgmtCentralWebappWebserviceAccess.getInstance().init();
+		
 		AppContextConfigSystemValuesRetrieval appContextConfigSystemValuesRetrieval = 
 				new AppContextConfigSystemValuesRetrieval();
 		context.setAttribute( WebConstants.CONFIG_SYSTEM_VALUES_HTML_KEY, appContextConfigSystemValuesRetrieval );
+		
 		log.warn( "INFO:  !!!!!!!!!!!!!!!   Start up of web app  'Proxl' complete  !!!!!!!!!!!!!!!!!!!! " );
 		log.warn( "INFO: Application context values set.  Key = " + WebConstants.APP_CONTEXT_CONTEXT_PATH + ": value = " + contextPath
 				+ "" );

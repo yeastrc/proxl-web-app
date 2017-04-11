@@ -35,6 +35,7 @@ import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.TermsOfServiceTextVersionsDAO;
 import org.yeastrc.xlink.www.dao.TermsOfServiceUserAcceptedVersionHistoryDAO;
+import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.CreateAccountResult;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
@@ -42,6 +43,8 @@ import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCreateAccountReques
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCreateAccountResponse;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginResponse;
+import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
+import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserInviteTrackingCode;
 import org.yeastrc.xlink.www.web_utils.GetMessageTextFromKeyFrom_web_app_application_properties;
 
@@ -61,6 +64,90 @@ import org.yeastrc.xlink.www.web_utils.GetMessageTextFromKeyFrom_web_app_applica
 public class UserCreateAccountService {
 
 	private static final Logger log = Logger.getLogger(UserCreateAccountService.class);
+	
+	private static enum CreateAccountUsingAdminUserAccount { YES, NO }
+
+	///////////////////////////////////////////
+	//    Create Account from Page NOT using Invite Code
+	@POST
+	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/createAccountUsingAdminUserAccount") 
+	public CreateAccountResult createAccountUsingAdminUserAccount(
+			@FormParam( "firstName" ) String firstName,
+			@FormParam( "lastName" ) String lastName,
+			@FormParam( "organization" ) String organization,
+			@FormParam( "email" ) String email,
+			@FormParam( "username" ) String username,
+			@FormParam( "password" ) String password,
+			@FormParam( "accessLevel" ) String accessLevelString,
+			@Context HttpServletRequest request )
+	throws Exception {
+		
+		if ( StringUtils.isEmpty( accessLevelString ) ) {
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+					.build()
+					);
+		}
+		
+		Integer accessLevel = null;
+		try {
+			accessLevel = Integer.valueOf( accessLevelString );
+		} catch ( Exception e ) {
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+					.build()
+					);
+		}
+		
+		if ( ! ( AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN == accessLevel
+				|| AuthAccessLevelConstants.ACCESS_LEVEL_DEFAULT_USER_CREATED_VIA_PROJECT_INVITE == accessLevel ) ) {
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+					.build()
+					);
+		}
+		
+		//  Restricted to users with ACCESS_LEVEL_ADMIN or better
+		// Get the session first.  
+//		HttpSession session = request.getSession();
+		AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
+				GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+		if ( accessAndSetupWebSessionResult.isNoSession() ) {
+			//  No User session 
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+					.build()
+					);
+		}
+//		UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+		//  Test access at global level
+		AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+		if ( ! authAccessLevel.isAdminAllowed() ) {
+			//  No Access Allowed 
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
+					.build()
+					);
+		}
+		////////   Auth complete
+		//////////////////////////////////////////
+		
+		return createAccountCommonInternal( 
+				null /* inviteCode */, 
+				null /* tosAcceptedKey */, 
+				firstName, lastName, organization, email, username, password, 
+				accessLevel, 
+				null /* recaptchaValue */, 
+				CreateAccountUsingAdminUserAccount.YES, 
+				request );
+	}
 	
 	///////////////////////////////////////////
 	//    Create Account from Page NOT using Invite Code
@@ -100,7 +187,13 @@ public class UserCreateAccountService {
 						);
 			}
 		}
-		return createAccountCommonInternal( null /* inviteCode */, tosAcceptedKey, firstName, lastName, organization, email, username, password, recaptchaValue, request );
+		return createAccountCommonInternal( 
+				null /* inviteCode */, tosAcceptedKey, 
+				firstName, lastName, organization, email, username, password, 
+				null /* accessLevel */, 
+				recaptchaValue, 
+				CreateAccountUsingAdminUserAccount.NO,
+				request );
 	}
 	
 	///////////////////////////////////////////
@@ -131,7 +224,13 @@ public class UserCreateAccountService {
 					.build()
 					);
 		}
-		return createAccountCommonInternal( inviteCode, tosAcceptedKey, firstName, lastName, organization, email, username, password, null /* recaptchaValue */, request );
+		return createAccountCommonInternal( 
+				inviteCode, tosAcceptedKey, 
+				firstName, lastName, organization, email, username, password, 
+				null /* accessLevel */, 
+				null /* recaptchaValue */, 
+				CreateAccountUsingAdminUserAccount.NO,
+				request );
 	}
 	
 	/**
@@ -157,7 +256,9 @@ public class UserCreateAccountService {
 			String email,
 			String username,
 			String password,
+			Integer accessLevel,
 			String recaptchaValue,  //  Only for without invite code
+			CreateAccountUsingAdminUserAccount createAccountUsingAdminUserAccount,
 			@Context HttpServletRequest request )
 	throws Exception {
 
@@ -287,20 +388,9 @@ public class UserCreateAccountService {
 		
 
 		try {
+
 			AuthUserInviteTrackingDTO authUserInviteTrackingDTO = null;
-			if ( StringUtils.isNotEmpty( inviteCode ) ) {
-				//  Only process if have invite code
-				ValidateUserInviteTrackingCode validateUserInviteTrackingCode = ValidateUserInviteTrackingCode.getInstance( inviteCode );
-				if ( ! validateUserInviteTrackingCode.validateInviteTrackingCode() ) {
-					String errorMsgKey = validateUserInviteTrackingCode.getErrorMsgKey();
-					String errorMessage = GetMessageTextFromKeyFrom_web_app_application_properties.getInstance().getMessageForKey( errorMsgKey );
-					createAccountResult.setStatus(false);
-					createAccountResult.setErrorMessage( errorMessage );
-					return createAccountResult;  //  !!!!!  EARLY EXIT
-				}
-				authUserInviteTrackingDTO = validateUserInviteTrackingCode.getAuthUserInviteTrackingDTO();
-			}
-			
+
 			Integer termsOfServiceVersionIdForIdString = null;
 
 			//  Is terms of service enabled?
@@ -311,19 +401,35 @@ public class UserCreateAccountService {
 			if ( ConfigSystemsValuesSharedConstants.TRUE.equals(termsOfServiceEnabledString) ) {
 				termsOfServiceEnabled = true;
 			}
-			
-			if ( termsOfServiceEnabled ) {
-				// terms of service is enabled
-				//  Version of TOS user accepted
-				termsOfServiceVersionIdForIdString =
-						TermsOfServiceTextVersionsDAO.getInstance().getVersionIdForIdString( tosAcceptedKey );
-				if ( termsOfServiceVersionIdForIdString == null ) {
-					String msg = "No record for tosAcceptedKey: " + tosAcceptedKey;
-					log.warn( msg );
-					throw new WebApplicationException(
-							Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-							.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
-							.build() );  //  Early Exit with Data Exception
+
+			if ( createAccountUsingAdminUserAccount == CreateAccountUsingAdminUserAccount.NO ) {
+
+				if ( StringUtils.isNotEmpty( inviteCode ) ) {
+					//  Only process if have invite code
+					ValidateUserInviteTrackingCode validateUserInviteTrackingCode = ValidateUserInviteTrackingCode.getInstance( inviteCode );
+					if ( ! validateUserInviteTrackingCode.validateInviteTrackingCode() ) {
+						String errorMsgKey = validateUserInviteTrackingCode.getErrorMsgKey();
+						String errorMessage = GetMessageTextFromKeyFrom_web_app_application_properties.getInstance().getMessageForKey( errorMsgKey );
+						createAccountResult.setStatus(false);
+						createAccountResult.setErrorMessage( errorMessage );
+						return createAccountResult;  //  !!!!!  EARLY EXIT
+					}
+					authUserInviteTrackingDTO = validateUserInviteTrackingCode.getAuthUserInviteTrackingDTO();
+				}
+
+				if ( termsOfServiceEnabled ) {
+					// terms of service is enabled
+					//  Version of TOS user accepted
+					termsOfServiceVersionIdForIdString =
+							TermsOfServiceTextVersionsDAO.getInstance().getVersionIdForIdString( tosAcceptedKey );
+					if ( termsOfServiceVersionIdForIdString == null ) {
+						String msg = "No record for tosAcceptedKey: " + tosAcceptedKey;
+						log.warn( msg );
+						throw new WebApplicationException(
+								Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+								.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+								.build() );  //  Early Exit with Data Exception
+					}
 				}
 			}
 
@@ -362,13 +468,20 @@ public class UserCreateAccountService {
 			
 			// pass in created user id from User Mgmt Webapp
 			authUserDTO.setUserMgmtUserId( createdUserMgmtUserId );
-			
-			if ( authUserInviteTrackingDTO != null && authUserInviteTrackingDTO.getInvitedSharedObjectId() == null ) {
-				//  Invite not tied to a project so the access level in the invite is used as the user level
-				authUserDTO.setUserAccessLevel( authUserInviteTrackingDTO.getInvitedUserAccessLevel() );
+
+			if ( createAccountUsingAdminUserAccount == CreateAccountUsingAdminUserAccount.NO ) {
+
+				if ( authUserInviteTrackingDTO != null && authUserInviteTrackingDTO.getInvitedSharedObjectId() == null ) {
+					//  Invite not tied to a project so the access level in the invite is used as the user level
+					authUserDTO.setUserAccessLevel( authUserInviteTrackingDTO.getInvitedUserAccessLevel() );
+				} else {
+					//  The InvitedUserAccessLevel is tied to the project so at the user level this default is used.
+					authUserDTO.setUserAccessLevel( AuthAccessLevelConstants.ACCESS_LEVEL_DEFAULT_USER_CREATED_VIA_PROJECT_INVITE  );
+				}
+				
 			} else {
-				//  The InvitedUserAccessLevel is tied to the project so at the user level this default is used.
-				authUserDTO.setUserAccessLevel( AuthAccessLevelConstants.ACCESS_LEVEL_DEFAULT_USER_CREATED_VIA_PROJECT_INVITE  );
+				//  Set Level provided by user for CreateAccountUsingAdminUserAccount.YES
+				authUserDTO.setUserAccessLevel( accessLevel );
 			}
 			
 			//  After user added to User Mgmt, add to proxl DB
@@ -418,42 +531,46 @@ public class UserCreateAccountService {
 				throw sqlException;
 			}
 
-			if ( termsOfServiceEnabled ) {
-				// terms of service is enabled, save user acceptance
-				int authUserId = authUserDTO.getId();
-				TermsOfServiceUserAcceptedVersionHistoryDTO tosUserAccepted = new TermsOfServiceUserAcceptedVersionHistoryDTO();
-				tosUserAccepted.setAuthUserId( authUserId );
-				tosUserAccepted.setTermsOfServiceVersionId( termsOfServiceVersionIdForIdString );
-				TermsOfServiceUserAcceptedVersionHistoryDAO.getInstance().save( tosUserAccepted );
-			}
+			if ( createAccountUsingAdminUserAccount == CreateAccountUsingAdminUserAccount.NO ) {
 
-			UserMgmtLoginRequest userMgmtLoginRequest = new UserMgmtLoginRequest();
-			userMgmtLoginRequest.setUsername( username );
-			userMgmtLoginRequest.setPassword( password );
-			userMgmtLoginRequest.setRemoteIP(  request.getRemoteAddr() );
-			
-			UserMgmtLoginResponse userMgmtLoginResponse = 
-					UserMgmtCentralWebappWebserviceAccess.getInstance().userLogin( userMgmtLoginRequest );
-			
-			if ( ! userMgmtLoginResponse.isSuccess() ) {
-				String msg = null;
-				if ( userMgmtLoginResponse.isUsernameNotFound() || userMgmtLoginResponse.isPasswordInvalid() ) {
-					msg = "Fail to log into account just created for username not found or password is invalid.  username: " + username;
-				} else if ( userMgmtLoginResponse.isUserDisabled() ) {
-					msg = "Fail to log into account just created for user is disabled.  username: " + username;
+				if ( termsOfServiceEnabled ) {
+					// terms of service is enabled, save user acceptance
+					int authUserId = authUserDTO.getId();
+					TermsOfServiceUserAcceptedVersionHistoryDTO tosUserAccepted = new TermsOfServiceUserAcceptedVersionHistoryDTO();
+					tosUserAccepted.setAuthUserId( authUserId );
+					tosUserAccepted.setTermsOfServiceVersionId( termsOfServiceVersionIdForIdString );
+					TermsOfServiceUserAcceptedVersionHistoryDAO.getInstance().save( tosUserAccepted );
 				}
-				msg = "Fail to log into account just created.  username: " + username;
-				log.error( msg );
-				throw new ProxlWebappInternalErrorException( msg );
+
+				UserMgmtLoginRequest userMgmtLoginRequest = new UserMgmtLoginRequest();
+				userMgmtLoginRequest.setUsername( username );
+				userMgmtLoginRequest.setPassword( password );
+				userMgmtLoginRequest.setRemoteIP(  request.getRemoteAddr() );
+
+				UserMgmtLoginResponse userMgmtLoginResponse = 
+						UserMgmtCentralWebappWebserviceAccess.getInstance().userLogin( userMgmtLoginRequest );
+
+				if ( ! userMgmtLoginResponse.isSuccess() ) {
+					String msg = null;
+					if ( userMgmtLoginResponse.isUsernameNotFound() || userMgmtLoginResponse.isPasswordInvalid() ) {
+						msg = "Fail to log into account just created for username not found or password is invalid.  username: " + username;
+					} else if ( userMgmtLoginResponse.isUserDisabled() ) {
+						msg = "Fail to log into account just created for user is disabled.  username: " + username;
+					}
+					msg = "Fail to log into account just created.  username: " + username;
+					log.error( msg );
+					throw new ProxlWebappInternalErrorException( msg );
+				}
+
+				UserSessionObject userSessionObject = new UserSessionObject();
+				userSessionObject.setUserDBObject( userDatabaseRecord );
+				userSessionObject.setUserLoginSessionKey( userMgmtLoginResponse.getSessionKey() );
+				// Get their session   
+				HttpSession session = request.getSession();
+				session.setAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN, userSessionObject );
+
 			}
 
-			UserSessionObject userSessionObject = new UserSessionObject();
-			userSessionObject.setUserDBObject( userDatabaseRecord );
-			userSessionObject.setUserLoginSessionKey( userMgmtLoginResponse.getSessionKey() );
-			// Get their session   
-			HttpSession session = request.getSession();
-			session.setAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN, userSessionObject );
-			
 			createAccountResult.setStatus(true);
 			return createAccountResult;
 			

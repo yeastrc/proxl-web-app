@@ -657,6 +657,7 @@ var enableDisableUserResponse = function(params) {
 		alert("Error Updating user");
 	}
 };
+
 ////////////////////////////
 var invitePerson = function(clickThis, eventObject) {
 	var $invite_user_email = $("#invite_user_email");
@@ -723,6 +724,161 @@ var clearInviteUserField = function( ) {
 	var $invite_user_email = $("#invite_user_email");
 	$invite_user_email.val("");
 };
+
+/////////////
+
+//  Create User
+
+
+///////////////////
+var createAccountGetFormDataAndValidate = function() {
+
+	try {
+		hideAllErrorMessages();
+		var $create_person_access_level_entry_field = $("#create_person_access_level_entry_field");
+		if ($create_person_access_level_entry_field.length === 0) {
+			throw Error( "Unable to find input field for id 'create_person_access_level_entry_field' " );
+		}
+		var accessLevel = $create_person_access_level_entry_field.val();
+		
+		var $firstName = $("#firstName");
+		if ($firstName.length === 0) {
+			throw Error( "Unable to find input field for id 'firstName' " );
+		}
+		var firstName = $firstName.val();
+		var $lastName = $("#lastName");
+		if ($lastName.length === 0) {
+			throw Error( "Unable to find input field for id 'lastName' " );
+		}
+		var lastName = $lastName.val();
+		var $organization = $("#organization");
+		if ($organization.length === 0) {
+			throw Error( "Unable to find input field for id 'organization' " );
+		}
+		var organization = $organization.val();
+
+		var $email = $("#email");
+		if ($email.length === 0) {
+			throw Error( "Unable to find input field for id 'email' " );
+		}
+		var email = $email.val();
+		var $username = $("#username");
+		if ($username.length === 0) {
+			throw Error( "Unable to find input field for id 'username' " );
+		}
+		var username = $username.val();
+		var $password = $("#password");
+		if ($password.length === 0) {
+			throw Error( "Unable to find input field for id 'password' " );
+		}
+		var password = $password.val();
+		var $passwordConfirm = $("#passwordConfirm");
+		if ($passwordConfirm.length === 0) {
+			throw Error( "Unable to find input field for id 'passwordConfirm' " );
+		}
+		var passwordConfirm = $passwordConfirm.val();
+		if ( firstName === "" ||
+				lastName === "" ||
+				organization === "" ||
+				email === "" ||
+				username === "" ||
+				password === "" ||
+				passwordConfirm === "" ) {
+			var $element = $("#error_message_all_fields_required");
+			showErrorMsg( $element );
+			return null;  //  !!!  EARLY EXIT
+		} 
+		if ( password !== passwordConfirm ) {
+			var $element = $("#error_message_password_confirm_password_not_match");
+			showErrorMsg( $element );
+			return null;  //  !!!  EARLY EXIT
+		} 
+
+		var formPageData = {
+				accessLevel : accessLevel,
+				firstName : firstName,
+				lastName :  lastName,
+				organization :  organization,
+				email :  email,
+				username :  username,
+				password :  password
+		};
+
+		return formPageData;
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
+};
+
+
+
+var createAccountFormSubmit = function() {
+
+	var requestData = createAccountGetFormDataAndValidate();
+	if ( requestData === null ) {  //  Error in form data so exit
+		return;  //  EARLY EXIT
+	}
+
+	var _URL = contextPathJSVar + "/services/user/createAccountUsingAdminUserAccount";
+//	var request =
+	$.ajax({
+		type : "POST",
+		url : _URL,
+		data : requestData,
+		dataType : "json",
+		success : function(data) {
+			createAccountComplete( { requestData: requestData, responseData: data } );
+		},
+		failure : function(errMsg) {
+			var $element = $("#error_message_system_error");
+			showErrorMsg( $element );
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+			handleAJAXError(jqXHR, textStatus, errorThrown);
+//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
+//			textStatus: " + textStatus );
+		}
+	});
+};
+
+var createAccountComplete = function( params ) {
+	var requestData = params.requestData;
+	var responseData = params.responseData;
+	
+	if ( ! responseData.status ) {
+		if ( responseData.duplicateUsername && responseData.duplicateEmail ) {
+			var $element = $("#error_message_username_email_taken");
+			showErrorMsg( $element );
+			var $emailInput = $("#email");
+			$emailInput.focus();
+		} else if ( responseData.duplicateUsername ) {
+			var $element = $("#error_message_username_taken");
+			showErrorMsg( $element );
+			var $usernameInput = $("#username");
+			$usernameInput.focus();
+		} else if ( responseData.duplicateEmail ) {
+			var $element = $("#error_message_email_taken");
+			showErrorMsg( $element );
+			var $emailInput = $("#email");
+			$emailInput.focus();
+		} else if ( responseData.errorMessage ) {
+			$("#error_message_from_server_text").text( responseData.errorMessage );
+			var $element = $("#error_message_from_server");
+			showErrorMsg( $element );
+		} else {
+			var $element = $("#error_message_system_error");
+			showErrorMsg( $element );
+		}
+		return;
+	} 
+	
+	updateInvitedPeopleCurrentUsersLists();
+};
+
+
+
 //////////////////
 function initAdmin() {
 	var $logged_in_user_id = $("#logged_in_user_id");
@@ -787,6 +943,28 @@ function initAdmin() {
 		try {
 			var clickThis = this;
 			closeRevokePersonInviteOverlay( clickThis, eventObject );
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	});
+	
+	$(".create_user_expand_link_jq").click(function(eventObject) {
+		try {
+			$("#create_user_collapsed").hide();
+			$("#create_user_expanded").show();
+			return false;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	});
+	$(".create_user_cancel_button_jq").click(function(eventObject) {
+		try {
+			clearInviteUserField();
+			$("#create_user_collapsed").show();
+			$("#create_user_expanded").hide();
 			return false;
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );

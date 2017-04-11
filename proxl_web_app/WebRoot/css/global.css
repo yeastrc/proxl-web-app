@@ -1240,6 +1240,8 @@ body.manage-users-page .invited-person-invite-date-block { padding-left: 20px; }
 
 body.manage-users-page .invite-user-text-link { font-size: 14px; text-decoration: none; color: black; font-weight: bold; opacity:0.6;filter:alpha(opacity=60);  }
 
+body.manage-users-page .create-user-text-link { font-size: 14px; text-decoration: none; color: black; font-weight: bold; opacity:0.6;filter:alpha(opacity=60);  }
+
 body.manage-users-page .account-info-block { margin-left: 40px; }
 
 

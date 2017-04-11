@@ -123,6 +123,166 @@
 		<div class="top-level-label-bottom-border" style="width: 100%" ></div>
 	</div>
    
+
+	<div id="create_user_block" >
+
+		<div  id="create_user_collapsed" >
+
+			<div style="float: left; padding-left: 3px; padding-right: 10px;">
+			  <a href="javascript:" class="create_user_expand_link_jq">
+				<img src="${ contextPath }/images/icon-add-user.png">
+			  </a>
+			</div>
+			<div style="padding-top: 2px; ">
+			  <a href="javascript:" class="create-user-text-link create_user_expand_link_jq">
+				Create User
+			  </a>
+			</div>
+
+		</div>		
+	
+	
+		<div  id="create_user_expanded" style="display: none;"  > <%-- style="display: none;"  --%>
+	
+		  <div style="position: relative; width: 500px;" >
+		  		
+	  		<div class="error-message-container error_message_container_jq" id="error_message_field_empty">
+	  			<div class="error-message-inner-container" >
+		  			<span class="error-message-text" >A value is required
+			  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+			  	</div>
+		  	</div>
+		  	
+	  		<div class="error-message-container error_message_container_jq" id="error_message_email_already_exists">
+	  			<div class="error-message-inner-container" >
+		  			<span class="error-message-text" >A user with that email already exists.
+			  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+			  	</div>
+		  	</div>		  	
+		  	
+	
+	  		<div class="error-message-container error_message_container_jq" id="error_message_system_error">
+	  			<div class="error-message-inner-container" >
+		  			<span class="error-message-text" >System Error
+			  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+			  	</div>
+		  	</div>
+	
+		  </div>
+		
+	  	<div  style="position: relative;" class="page-label">
+	  		<div class="error-message-container error_message_container_jq" id="error_message_recaptcha_required">
+	  			<div class="error-message-inner-container" >
+		  			<span class="error-message-text" >Recaptcha must be completed
+			  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+			  	</div>
+		  	</div>
+	  		<div class="error-message-container error_message_container_jq" id="error_message_all_fields_required">
+	  			<div class="error-message-inner-container" >
+		  			<span class="error-message-text" >All fields are required
+			  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+			  	</div>
+		  	</div>
+	  		<div class="error-message-container error_message_container_jq" id="error_message_password_confirm_password_not_match">
+	  			<div class="error-message-inner-container" >
+		  			<span class="error-message-text" >Password and Confirm Password must match
+			  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+			  	</div>
+		  	</div>
+	
+	  		<div class="error-message-container error_message_container_jq" id="error_message_username_taken">
+	  			<div class="error-message-inner-container" >
+		  			<span class="error-message-text" >Username already taken
+			  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+		  		</div>
+		  	</div>
+	  		<div class="error-message-container error_message_container_jq" id="error_message_email_taken">
+	  			<div class="error-message-inner-container" >
+		  			<span class="error-message-text" >Email address already taken
+			  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+		  		</div>
+		  	</div>
+	  		<div class="error-message-container error_message_container_jq" id="error_message_username_email_taken">
+	  			<div class="error-message-inner-container" >
+		  			<span class="error-message-text" >Username already taken.  Email address already taken.
+			  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+		  		</div>
+		  	</div>
+	
+	  		<div class="error-message-container error_message_container_jq" id="error_message_from_server">
+	  			<div class="error-message-inner-container" >
+	  				<div class="error-message-close-x error_message_close_x_jq">X</div>
+		  			<div class="error-message-text" id="error_message_from_server_text"></div>
+		  		</div>
+		  	</div>
+		  	
+	  		<div class="error-message-container error_message_container_jq" id="error_message_system_error">
+	  			<div class="error-message-inner-container" >
+		  			<span class="error-message-text" >System Error
+			  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+			  	</div>
+		  	</div>
+		  	
+	<%-- 	  	
+		  	UNUSED  
+	--%>	  		  	
+		  	
+	  		<div class="success-message-container error_message_container_jq" id="success_message_system_success">
+	  			<div class="success-message-inner-container" >
+	  				<div class="success-message-close-x error_message_close_x_jq">X</div>
+		  			<div class="success-message-text" >Account Created</div>
+			  	</div>
+		  	</div>
+		  		  
+	  	</div>
+	  	
+	  	<div class="page-text">
+			Fill out the form below to create an account.
+		</div>
+	  	
+	  	
+		<form action="javascript:createAccountFormSubmit()" >
+	
+			<select id="create_person_access_level_entry_field">
+						<option value="<%= AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN %>" >Administrator</option>
+						<option value="<%= AuthAccessLevelConstants.ACCESS_LEVEL_CREATE_NEW_PROJECT_AKA_USER %>" >User</option>
+			</select><br>
+				
+			<input type="text" id="firstName" placeholder="First name" title="First name" class="input-field input_field_jq" maxlength="40"/><br>
+			<input type="text" id="lastName" placeholder="Last name" title="Last name" class="input-field input_field_jq" maxlength="60" /><br>
+			<input type="text" id="organization" placeholder="Organization" title="Organization" class="input-field input_field_jq" maxlength="2000" /><br>
+			
+			<input type="text" id="email" placeholder="Email address" title="Email address" class="input-field input_field_jq" maxlength="255" /><br>
+	
+			<input type="text" id="username" placeholder="Username" title="Username" class="input-field input_field_jq" maxlength="40" /><br>
+	
+			<input type="password" id="password" placeholder="Password" title="Password" class="input-field input_field_jq" maxlength="40" /><br>
+			<input type="password" id="passwordConfirm" placeholder="Confirm Password" title="Confirm Password" class="input-field input_field_jq" maxlength="40" /><br>
+			
+			
+			<c:if test="${ configSystemValues.googleRecaptchaConfigured }">
+	
+			  <div style="text-align: center;" id="proxl_google_recaptcha_container_div"> <%--  div "id" is used in JS code --%>
+			   <div class="page-text">
+				 <div class="g-recaptcha"  
+				 	data-sitekey="<c:out value="${ configSystemValues.googleRecaptchaSiteCode }"></c:out>"></div>
+			   </div>
+			  </div>
+	
+			</c:if>
+			
+			
+		 	<INPUT TYPE="submit" class="submit-button" VALUE="Create Account" id="create_account_button">
+		 	<input type="button" value="Cancel" class="create_user_cancel_button_jq">
+		 	
+		</form>
+
+					   	
+		</div>
+	
+		<div class="top-level-label-bottom-border" style="width: 100%" ></div>
+	</div>
+      
    
 	<div id="no_users" style="display: none;" >
 	

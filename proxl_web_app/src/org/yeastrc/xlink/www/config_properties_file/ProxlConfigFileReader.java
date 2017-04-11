@@ -52,12 +52,12 @@ public class ProxlConfigFileReader {
 		processPropertiesFilename( CONFIG_DEFAULTS_FILENAME, AllowNoPropertiesFile.NO, proxlConfigFileValues );
 		processPropertiesFilename( CONFIG_OVERRIDES_FILENAME, AllowNoPropertiesFile.YES, proxlConfigFileValues );
 		
-		if ( StringUtils.isEmpty( proxlConfigFileValues.getUserAccountServerURLandAppContext() ) ) {
-			String msg = "Property  '" + PROPERTY_NAME__USER_ACCOUNT_WEB_APP_URL + "' must have a value in "
-					+ "properties file: '" + CONFIG_DEFAULTS_FILENAME + "'.";
-			log.error( msg );
-			throw new ProxlWebappConfigException( msg );
-		}
+//		if ( StringUtils.isEmpty( proxlConfigFileValues.getUserAccountServerURLandAppContext() ) ) {
+//			String msg = "Property  '" + PROPERTY_NAME__USER_ACCOUNT_WEB_APP_URL + "' must have a value in "
+//					+ "properties file: '" + CONFIG_DEFAULTS_FILENAME + "'.";
+//			log.error( msg );
+//			throw new ProxlWebappConfigException( msg );
+//		}
 
 		if ( StringUtils.isEmpty( proxlConfigFileValues.getRequestingWebappIdentifier() ) ) {
 			String msg = "Property  '" + PROPERTY_NAME__PROXL_WEBAPP_IDENTIFIER_FOR_USER_ACCOUNT_WEB_APP + "' must have a value in "

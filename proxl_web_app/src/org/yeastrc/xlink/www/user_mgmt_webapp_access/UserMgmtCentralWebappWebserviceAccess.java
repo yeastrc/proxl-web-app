@@ -1,8 +1,10 @@
 package org.yeastrc.xlink.www.user_mgmt_webapp_access;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.user_mgmt_central.webservice_connect.main.CallUserAccountMgmtWebservice;
 import org.yeastrc.user_mgmt_central.webservice_connect.main.CallUserAccountMgmtWebserviceInitParameters;
+import org.yeastrc.user_mgmt_central.main_code.user_mgmt_embedded_facade.UserMgmtCentral_Embedded_Facade;
 import org.yeastrc.user_mgmt_central.shared_server_client.webservice_request_response.CreateAccountWebserviceRequest;
 import org.yeastrc.user_mgmt_central.shared_server_client.webservice_request_response.CreateAccountWebserviceResponse;
 import org.yeastrc.user_mgmt_central.shared_server_client.webservice_request_response.GetAccountEnabledForIdAccountWebserviceRequest;
@@ -47,6 +49,7 @@ public class UserMgmtCentralWebappWebserviceAccess {
 	private UserMgmtCentralWebappWebserviceAccess() {}
 	
 	private CallUserAccountMgmtWebservice callUserAccountMgmtWebservice;
+	private UserMgmtCentral_Embedded_Facade userMgmtCentral_Embedded_Facade;
 	
 	private boolean instanceInitialized;
 	
@@ -57,17 +60,26 @@ public class UserMgmtCentralWebappWebserviceAccess {
 	public void init() {
 		try {
 			String userAccountServerBaseURL = ProxlConfigFileValues.getInstance().getUserAccountServerURLandAppContext();
-			String requestingWebappIdentifier = ProxlConfigFileValues.getInstance().getRequestingWebappIdentifier();
-			String requestingWebappKey = ProxlConfigFileValues.getInstance().getRequestingWebappKey();
-			String requestingEncryptionKey = ProxlConfigFileValues.getInstance().getRequestingEncryptionKey();
+			
+			if ( StringUtils.isEmpty( userAccountServerBaseURL ) ) {
+				//  Use User Account tables in local database
+				
+				userMgmtCentral_Embedded_Facade = UserMgmtCentral_Embedded_Facade.getInstance();
+				
+			} else {
+				String requestingWebappIdentifier = ProxlConfigFileValues.getInstance().getRequestingWebappIdentifier();
+				String requestingWebappKey = ProxlConfigFileValues.getInstance().getRequestingWebappKey();
+				String requestingEncryptionKey = ProxlConfigFileValues.getInstance().getRequestingEncryptionKey();
 
-			CallUserAccountMgmtWebserviceInitParameters initParams = new CallUserAccountMgmtWebserviceInitParameters();
-			initParams.setUserAccountServerBaseURL( userAccountServerBaseURL );
-			initParams.setRequestingWebappIdentifier( requestingWebappIdentifier );
-			initParams.setRequestingWebappKey( requestingWebappKey );
-			initParams.setRequestingEncryptionKey( requestingEncryptionKey );
-			callUserAccountMgmtWebservice = CallUserAccountMgmtWebservice.getInstance();
-			callUserAccountMgmtWebservice.init( initParams );
+				CallUserAccountMgmtWebserviceInitParameters initParams = new CallUserAccountMgmtWebserviceInitParameters();
+				initParams.setUserAccountServerBaseURL( userAccountServerBaseURL );
+				initParams.setRequestingWebappIdentifier( requestingWebappIdentifier );
+				initParams.setRequestingWebappKey( requestingWebappKey );
+				initParams.setRequestingEncryptionKey( requestingEncryptionKey );
+				callUserAccountMgmtWebservice = CallUserAccountMgmtWebservice.getInstance();
+				callUserAccountMgmtWebservice.init( initParams );
+			}
+			
 		} catch (Exception e) {
 			String msg = "Failed to initialize the code to access the User Mgmt Webapp";
 			log.error(msg, e);
@@ -84,19 +96,25 @@ public class UserMgmtCentralWebappWebserviceAccess {
 	 */
 	public UserMgmtSessionKeyAliveWebserviceResponse sessionKeyAlive( UserMgmtSessionKeyAliveWebserviceRequest userMgmtSessionKeyAliveWebserviceRequest ) throws Exception {
 		
-		SessionKeyAliveWebserviceRequest webserviceRequest = new SessionKeyAliveWebserviceRequest();
-		
-		webserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtSessionKeyAliveWebserviceRequest.getSessionKey() );
-		
-		SessionKeyAliveWebserviceResponse sessionKeyAliveWebserviceResponse =
-				callUserAccountMgmtWebservice.callSessionKeyAliveWebservice( webserviceRequest );
-		
-		UserMgmtSessionKeyAliveWebserviceResponse userMgmtSessionKeyAliveWebserviceResponse = new UserMgmtSessionKeyAliveWebserviceResponse();
-		userMgmtSessionKeyAliveWebserviceResponse.setSuccess( sessionKeyAliveWebserviceResponse.isSuccess() );
-		userMgmtSessionKeyAliveWebserviceResponse.setSessionKeyNotValid( sessionKeyAliveWebserviceResponse.isSessionKeyNotValid() );
-		userMgmtSessionKeyAliveWebserviceResponse.setErrorMessage( sessionKeyAliveWebserviceResponse.getErrorMessage() );
-		
-		return userMgmtSessionKeyAliveWebserviceResponse;
+		if ( callUserAccountMgmtWebservice != null ) {
+
+			SessionKeyAliveWebserviceRequest webserviceRequest = new SessionKeyAliveWebserviceRequest();
+			webserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtSessionKeyAliveWebserviceRequest.getSessionKey() );
+			SessionKeyAliveWebserviceResponse sessionKeyAliveWebserviceResponse =
+					callUserAccountMgmtWebservice.callSessionKeyAliveWebservice( webserviceRequest );
+
+			UserMgmtSessionKeyAliveWebserviceResponse userMgmtSessionKeyAliveWebserviceResponse = new UserMgmtSessionKeyAliveWebserviceResponse();
+			userMgmtSessionKeyAliveWebserviceResponse.setSuccess( sessionKeyAliveWebserviceResponse.isSuccess() );
+			userMgmtSessionKeyAliveWebserviceResponse.setSessionKeyNotValid( sessionKeyAliveWebserviceResponse.isSessionKeyNotValid() );
+			userMgmtSessionKeyAliveWebserviceResponse.setErrorMessage( sessionKeyAliveWebserviceResponse.getErrorMessage() );
+
+			return userMgmtSessionKeyAliveWebserviceResponse;
+		} else {
+			//  Fake since not connecting to User Mgmt Central web app
+			UserMgmtSessionKeyAliveWebserviceResponse userMgmtSessionKeyAliveWebserviceResponse = new UserMgmtSessionKeyAliveWebserviceResponse();
+			userMgmtSessionKeyAliveWebserviceResponse.setSuccess( true );
+			return userMgmtSessionKeyAliveWebserviceResponse;
+		}
 	}
 	
 	/**
@@ -116,15 +134,19 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		webserviceRequest.setPassword( userMgmtCreateAccountRequest.getPassword() );
 		webserviceRequest.setUserRemoteIP( userMgmtCreateAccountRequest.getUserRemoteIP() );
 		
-		CreateAccountWebserviceResponse createAccountWebserviceResponse =
-				callUserAccountMgmtWebservice.callCreateAccountWebservice( webserviceRequest );
+		CreateAccountWebserviceResponse webserviceResponse = null;
+		if ( userMgmtCentral_Embedded_Facade != null ) {
+			webserviceResponse = userMgmtCentral_Embedded_Facade.callCreateAccountWebservice( webserviceRequest );
+		} else {
+			webserviceResponse = callUserAccountMgmtWebservice.callCreateAccountWebservice( webserviceRequest );
+		}
 		
 		UserMgmtCreateAccountResponse userMgmtCreateAccountResponse = new UserMgmtCreateAccountResponse();
-		userMgmtCreateAccountResponse.setSuccess( createAccountWebserviceResponse.isSuccess() );
-		userMgmtCreateAccountResponse.setCreatedUserId( createAccountWebserviceResponse.getCreatedUserId() );
-		userMgmtCreateAccountResponse.setDuplicateEmail( createAccountWebserviceResponse.isDuplicateEmail() );
-		userMgmtCreateAccountResponse.setDuplicateUsername( createAccountWebserviceResponse.isDuplicateUsername() );
-		userMgmtCreateAccountResponse.setErrorMessage( createAccountWebserviceResponse.getErrorMessage() );
+		userMgmtCreateAccountResponse.setSuccess( webserviceResponse.isSuccess() );
+		userMgmtCreateAccountResponse.setCreatedUserId( webserviceResponse.getCreatedUserId() );
+		userMgmtCreateAccountResponse.setDuplicateEmail( webserviceResponse.isDuplicateEmail() );
+		userMgmtCreateAccountResponse.setDuplicateUsername( webserviceResponse.isDuplicateUsername() );
+		userMgmtCreateAccountResponse.setErrorMessage( webserviceResponse.getErrorMessage() );
 		
 		return userMgmtCreateAccountResponse;
 	}
@@ -139,22 +161,26 @@ public class UserMgmtCentralWebappWebserviceAccess {
 			throw new IllegalStateException( "Not initialized" );
 		}
 		
-		LoginAccountWebserviceRequest loginAccountWebserviceRequest = new LoginAccountWebserviceRequest();
-		loginAccountWebserviceRequest.setUsername( userMgmtLoginRequest.getUsername() );
-		loginAccountWebserviceRequest.setPasswordUserMgmtQQW( userMgmtLoginRequest.getPassword() );
-		loginAccountWebserviceRequest.setRemoteIP( userMgmtLoginRequest.getRemoteIP() );
+		LoginAccountWebserviceRequest webserviceRequest = new LoginAccountWebserviceRequest();
+		webserviceRequest.setUsername( userMgmtLoginRequest.getUsername() );
+		webserviceRequest.setPasswordUserMgmtQQW( userMgmtLoginRequest.getPassword() );
+		webserviceRequest.setRemoteIP( userMgmtLoginRequest.getRemoteIP() );
 		
-		LoginAccountWebserviceResponse loginAccountWebserviceResponse =
-				callUserAccountMgmtWebservice.callLoginAccountWebservice( loginAccountWebserviceRequest );
+		LoginAccountWebserviceResponse webserviceResponse = null;
+		if ( userMgmtCentral_Embedded_Facade != null ) {
+			webserviceResponse = userMgmtCentral_Embedded_Facade.callLoginAccountWebservice( webserviceRequest );
+		} else {
+			webserviceResponse = callUserAccountMgmtWebservice.callLoginAccountWebservice( webserviceRequest );
+		}
 		
 		UserMgmtLoginResponse userMgmtLoginResponse = new UserMgmtLoginResponse();
-		userMgmtLoginResponse.setSuccess( loginAccountWebserviceResponse.isSuccess() );
-		userMgmtLoginResponse.setSessionKey( loginAccountWebserviceResponse.getSessionKey() );
-		userMgmtLoginResponse.setUsernameNotFound( loginAccountWebserviceResponse.isUsernameNotFound() );
-		userMgmtLoginResponse.setPasswordInvalid( loginAccountWebserviceResponse.isPasswordInvalid() );
-		userMgmtLoginResponse.setUserDisabled( loginAccountWebserviceResponse.isUserDisabled() );
-		userMgmtLoginResponse.setErrorMessage( loginAccountWebserviceResponse.getErrorMessage() );
-		userMgmtLoginResponse.setUserId( loginAccountWebserviceResponse.getUserId() );
+		userMgmtLoginResponse.setSuccess( webserviceResponse.isSuccess() );
+		userMgmtLoginResponse.setSessionKey( webserviceResponse.getSessionKey() );
+		userMgmtLoginResponse.setUsernameNotFound( webserviceResponse.isUsernameNotFound() );
+		userMgmtLoginResponse.setPasswordInvalid( webserviceResponse.isPasswordInvalid() );
+		userMgmtLoginResponse.setUserDisabled( webserviceResponse.isUserDisabled() );
+		userMgmtLoginResponse.setErrorMessage( webserviceResponse.getErrorMessage() );
+		userMgmtLoginResponse.setUserId( webserviceResponse.getUserId() );
 		
 		return userMgmtLoginResponse;
 	}
@@ -171,20 +197,24 @@ public class UserMgmtCentralWebappWebserviceAccess {
 			throw new IllegalStateException( "Not initialized" );
 		}
 		
-		PasswordChangeAccountWebserviceRequest passwordChangeAccountWebserviceRequest = new PasswordChangeAccountWebserviceRequest();
-		passwordChangeAccountWebserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtChangePasswordRequest.getSessionKey());
-		passwordChangeAccountWebserviceRequest.setOldPasswordFDSJKLIEOW( userMgmtChangePasswordRequest.getOldPassword() );
-		passwordChangeAccountWebserviceRequest.setNewPasswordVCMVLSJ( userMgmtChangePasswordRequest.getNewPassword() );
-		passwordChangeAccountWebserviceRequest.setUserRemoteIP( userMgmtChangePasswordRequest.getUserRemoteIP() );
+		PasswordChangeAccountWebserviceRequest webserviceRequest = new PasswordChangeAccountWebserviceRequest();
+		webserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtChangePasswordRequest.getSessionKey());
+		webserviceRequest.setOldPasswordFDSJKLIEOW( userMgmtChangePasswordRequest.getOldPassword() );
+		webserviceRequest.setNewPasswordVCMVLSJ( userMgmtChangePasswordRequest.getNewPassword() );
+		webserviceRequest.setUserRemoteIP( userMgmtChangePasswordRequest.getUserRemoteIP() );
 		
-		PasswordChangeAccountWebserviceResponse passwordChangeAccountWebserviceResponse =
-				callUserAccountMgmtWebservice.callPasswordChangeAccountWebservice( passwordChangeAccountWebserviceRequest );
+		PasswordChangeAccountWebserviceResponse webserviceResponse = null;
+		if ( userMgmtCentral_Embedded_Facade != null ) {
+			webserviceResponse = userMgmtCentral_Embedded_Facade.callPasswordChangeAccountWebservice( webserviceRequest );
+		} else {
+			webserviceResponse = callUserAccountMgmtWebservice.callPasswordChangeAccountWebservice( webserviceRequest );
+		}
 		
 		UserMgmtChangePasswordResponse userMgmtChangePasswordResponse = new UserMgmtChangePasswordResponse();
-		userMgmtChangePasswordResponse.setSuccess( passwordChangeAccountWebserviceResponse.isSuccess() );
-		userMgmtChangePasswordResponse.setSessionKeyNotValid( passwordChangeAccountWebserviceResponse.isSessionKeyNotValid() );
-		userMgmtChangePasswordResponse.setOldPasswordNotValid( passwordChangeAccountWebserviceResponse.isOldPasswordNotValid() );
-		userMgmtChangePasswordResponse.setErrorMessage( passwordChangeAccountWebserviceResponse.getErrorMessage() );
+		userMgmtChangePasswordResponse.setSuccess( webserviceResponse.isSuccess() );
+		userMgmtChangePasswordResponse.setSessionKeyNotValid( webserviceResponse.isSessionKeyNotValid() );
+		userMgmtChangePasswordResponse.setOldPasswordNotValid( webserviceResponse.isOldPasswordNotValid() );
+		userMgmtChangePasswordResponse.setErrorMessage( webserviceResponse.getErrorMessage() );
 
 		return userMgmtChangePasswordResponse;
 	}
@@ -200,18 +230,22 @@ public class UserMgmtCentralWebappWebserviceAccess {
 			throw new IllegalStateException( "Not initialized" );
 		}
 		
-		PasswordResetAccountWebserviceRequest passwordResetAccountWebserviceRequest = new PasswordResetAccountWebserviceRequest();
-		passwordResetAccountWebserviceRequest.setUserMgmtUserIdWUERxcvmEWURIO( userMgmtResetPasswordRequest.getUserMgmtUserId() );
-		passwordResetAccountWebserviceRequest.setNewPasswordVCMVLSJ( userMgmtResetPasswordRequest.getNewPassword() );
-		passwordResetAccountWebserviceRequest.setUserRemoteIP( userMgmtResetPasswordRequest.getUserRemoteIP() );
+		PasswordResetAccountWebserviceRequest webserviceRequest = new PasswordResetAccountWebserviceRequest();
+		webserviceRequest.setUserMgmtUserIdWUERxcvmEWURIO( userMgmtResetPasswordRequest.getUserMgmtUserId() );
+		webserviceRequest.setNewPasswordVCMVLSJ( userMgmtResetPasswordRequest.getNewPassword() );
+		webserviceRequest.setUserRemoteIP( userMgmtResetPasswordRequest.getUserRemoteIP() );
 
-		PasswordResetAccountWebserviceResponse passwordResetAccountWebserviceResponse =
-				callUserAccountMgmtWebservice.callPasswordResetAccountWebservice( passwordResetAccountWebserviceRequest );
+		PasswordResetAccountWebserviceResponse webserviceResponse = null;
+		if ( userMgmtCentral_Embedded_Facade != null ) {
+			webserviceResponse = userMgmtCentral_Embedded_Facade.callPasswordResetAccountWebservice( webserviceRequest );
+		} else {
+			webserviceResponse = callUserAccountMgmtWebservice.callPasswordResetAccountWebservice( webserviceRequest );
+		}
 		
 		UserMgmtResetPasswordResponse userMgmtResetPasswordResponse = new UserMgmtResetPasswordResponse();
-		userMgmtResetPasswordResponse.setSuccess( passwordResetAccountWebserviceResponse.isSuccess() );
-		userMgmtResetPasswordResponse.setUserIdNotValid( passwordResetAccountWebserviceResponse.isUserIdNotValid() );
-		userMgmtResetPasswordResponse.setErrorMessage( passwordResetAccountWebserviceResponse.getErrorMessage() );
+		userMgmtResetPasswordResponse.setSuccess( webserviceResponse.isSuccess() );
+		userMgmtResetPasswordResponse.setUserIdNotValid( webserviceResponse.isUserIdNotValid() );
+		userMgmtResetPasswordResponse.setErrorMessage( webserviceResponse.getErrorMessage() );
 
 		return userMgmtResetPasswordResponse;
 	}
@@ -225,25 +259,29 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		if ( ! instanceInitialized ) {
 			throw new IllegalStateException( "Not initialized" );
 		}
-		GetUserDataForIdAccountWebserviceRequest getUserDataForIdAccountWebserviceRequest = new GetUserDataForIdAccountWebserviceRequest();
-		getUserDataForIdAccountWebserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtGetUserDataRequest.getSessionKey() );
-		getUserDataForIdAccountWebserviceRequest.setUserId( userMgmtGetUserDataRequest.getUserId() );
+		GetUserDataForIdAccountWebserviceRequest webserviceRequest = new GetUserDataForIdAccountWebserviceRequest();
+		webserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtGetUserDataRequest.getSessionKey() );
+		webserviceRequest.setUserId( userMgmtGetUserDataRequest.getUserId() );
 		
-		GetUserDataForIdAccountWebserviceResponse getUserDataForIdAccountWebserviceResponse =
-				callUserAccountMgmtWebservice.callGetUserDataForIdAccountWebservice( getUserDataForIdAccountWebserviceRequest );
+		GetUserDataForIdAccountWebserviceResponse webserviceResponse = null;
+		if ( userMgmtCentral_Embedded_Facade != null ) {
+			webserviceResponse = userMgmtCentral_Embedded_Facade.callGetUserDataForIdAccountWebservice( webserviceRequest );
+		} else {
+			webserviceResponse = callUserAccountMgmtWebservice.callGetUserDataForIdAccountWebservice( webserviceRequest );
+		}
 				
 		UserMgmtGetUserDataResponse userMgmtGetUserDataResponse = new UserMgmtGetUserDataResponse();
-		userMgmtGetUserDataResponse.setSuccess( getUserDataForIdAccountWebserviceResponse.isSuccess() );
-		userMgmtGetUserDataResponse.setSessionKeyNotValid( getUserDataForIdAccountWebserviceResponse.isSessionKeyNotValid() );
-		userMgmtGetUserDataResponse.setUserIdNotFound( getUserDataForIdAccountWebserviceResponse.isUserIdNotFound() );
-		userMgmtGetUserDataResponse.setUsername( getUserDataForIdAccountWebserviceResponse.getUsername() );
-		userMgmtGetUserDataResponse.setEmail( getUserDataForIdAccountWebserviceResponse.getEmail() );
-		userMgmtGetUserDataResponse.setFirstName( getUserDataForIdAccountWebserviceResponse.getFirstName() );
-		userMgmtGetUserDataResponse.setLastName( getUserDataForIdAccountWebserviceResponse.getLastName() );
-		userMgmtGetUserDataResponse.setOrganization( getUserDataForIdAccountWebserviceResponse.getOrganization() );
-		userMgmtGetUserDataResponse.setEnabled( getUserDataForIdAccountWebserviceResponse.isEnabled() );
-		userMgmtGetUserDataResponse.setGlobalAdminUser( getUserDataForIdAccountWebserviceResponse.isGlobalAdminUser() );
-		userMgmtGetUserDataResponse.setErrorMessage( getUserDataForIdAccountWebserviceResponse.getErrorMessage() );
+		userMgmtGetUserDataResponse.setSuccess( webserviceResponse.isSuccess() );
+		userMgmtGetUserDataResponse.setSessionKeyNotValid( webserviceResponse.isSessionKeyNotValid() );
+		userMgmtGetUserDataResponse.setUserIdNotFound( webserviceResponse.isUserIdNotFound() );
+		userMgmtGetUserDataResponse.setUsername( webserviceResponse.getUsername() );
+		userMgmtGetUserDataResponse.setEmail( webserviceResponse.getEmail() );
+		userMgmtGetUserDataResponse.setFirstName( webserviceResponse.getFirstName() );
+		userMgmtGetUserDataResponse.setLastName( webserviceResponse.getLastName() );
+		userMgmtGetUserDataResponse.setOrganization( webserviceResponse.getOrganization() );
+		userMgmtGetUserDataResponse.setEnabled( webserviceResponse.isEnabled() );
+		userMgmtGetUserDataResponse.setGlobalAdminUser( webserviceResponse.isGlobalAdminUser() );
+		userMgmtGetUserDataResponse.setErrorMessage( webserviceResponse.getErrorMessage() );
 		
 		return userMgmtGetUserDataResponse;
 	}
@@ -257,19 +295,23 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		if ( ! instanceInitialized ) {
 			throw new IllegalStateException( "Not initialized" );
 		}
-		GetAccountEnabledForIdAccountWebserviceRequest getAccountEnabledForIdAccountWebserviceRequest = new GetAccountEnabledForIdAccountWebserviceRequest();
-		getAccountEnabledForIdAccountWebserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtGetAccountEnabledRequest.getSessionKey() );
-		getAccountEnabledForIdAccountWebserviceRequest.setUserId( userMgmtGetAccountEnabledRequest.getUserId() );
+		GetAccountEnabledForIdAccountWebserviceRequest webserviceRequest = new GetAccountEnabledForIdAccountWebserviceRequest();
+		webserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtGetAccountEnabledRequest.getSessionKey() );
+		webserviceRequest.setUserId( userMgmtGetAccountEnabledRequest.getUserId() );
 		
-		GetAccountEnabledForIdAccountWebserviceResponse getAccountEnabledForIdAccountWebserviceResponse =
-				callUserAccountMgmtWebservice.callGetAccountEnabledForIdAccountWebservice( getAccountEnabledForIdAccountWebserviceRequest );
+		GetAccountEnabledForIdAccountWebserviceResponse webserviceResponse = null;
+		if ( userMgmtCentral_Embedded_Facade != null ) {
+			webserviceResponse = userMgmtCentral_Embedded_Facade.callGetAccountEnabledForIdAccountWebservice( webserviceRequest );
+		} else {
+			webserviceResponse = callUserAccountMgmtWebservice.callGetAccountEnabledForIdAccountWebservice( webserviceRequest );
+		}
 				
 		UserMgmtGetAccountEnabledResponse userMgmtGetAccountEnabledResponse = new UserMgmtGetAccountEnabledResponse();
-		userMgmtGetAccountEnabledResponse.setSuccess( getAccountEnabledForIdAccountWebserviceResponse.isSuccess() );
-		userMgmtGetAccountEnabledResponse.setSessionKeyNotValid( getAccountEnabledForIdAccountWebserviceResponse.isSessionKeyNotValid() );
-		userMgmtGetAccountEnabledResponse.setUserIdNotFound( getAccountEnabledForIdAccountWebserviceResponse.isUserIdNotFound() );
-		userMgmtGetAccountEnabledResponse.setEnabled( getAccountEnabledForIdAccountWebserviceResponse.isEnabled() );
-		userMgmtGetAccountEnabledResponse.setErrorMessage( getAccountEnabledForIdAccountWebserviceResponse.getErrorMessage() );
+		userMgmtGetAccountEnabledResponse.setSuccess( webserviceResponse.isSuccess() );
+		userMgmtGetAccountEnabledResponse.setSessionKeyNotValid( webserviceResponse.isSessionKeyNotValid() );
+		userMgmtGetAccountEnabledResponse.setUserIdNotFound( webserviceResponse.isUserIdNotFound() );
+		userMgmtGetAccountEnabledResponse.setEnabled( webserviceResponse.isEnabled() );
+		userMgmtGetAccountEnabledResponse.setErrorMessage( webserviceResponse.getErrorMessage() );
 		
 		return userMgmtGetAccountEnabledResponse;
 	}
@@ -285,24 +327,28 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		if ( ! instanceInitialized ) {
 			throw new IllegalStateException( "Not initialized" );
 		}
-		ManageAccountWebserviceRequest manageAccountWebserviceRequest = new ManageAccountWebserviceRequest();
-		manageAccountWebserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtManageAccountRequest.getSessionKey() );
-		manageAccountWebserviceRequest.setEmail( userMgmtManageAccountRequest.getEmail() );
-		manageAccountWebserviceRequest.setUsername( userMgmtManageAccountRequest.getUsername() );
-		manageAccountWebserviceRequest.setFirstName( userMgmtManageAccountRequest.getFirstName() );
-		manageAccountWebserviceRequest.setLastName( userMgmtManageAccountRequest.getLastName() );
-		manageAccountWebserviceRequest.setOrganization( userMgmtManageAccountRequest.getOrganization() );
-		manageAccountWebserviceRequest.setAssignOrganizationNull( userMgmtManageAccountRequest.isAssignOrganizationNull() );
+		ManageAccountWebserviceRequest webserviceRequest = new ManageAccountWebserviceRequest();
+		webserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtManageAccountRequest.getSessionKey() );
+		webserviceRequest.setEmail( userMgmtManageAccountRequest.getEmail() );
+		webserviceRequest.setUsername( userMgmtManageAccountRequest.getUsername() );
+		webserviceRequest.setFirstName( userMgmtManageAccountRequest.getFirstName() );
+		webserviceRequest.setLastName( userMgmtManageAccountRequest.getLastName() );
+		webserviceRequest.setOrganization( userMgmtManageAccountRequest.getOrganization() );
+		webserviceRequest.setAssignOrganizationNull( userMgmtManageAccountRequest.isAssignOrganizationNull() );
 		
-		ManageAccountWebserviceResponse manageAccountWebserviceResponse =
-				callUserAccountMgmtWebservice.callManageAccountWebservice( manageAccountWebserviceRequest );
+		ManageAccountWebserviceResponse webserviceResponse = null;
+		if ( userMgmtCentral_Embedded_Facade != null ) {
+			webserviceResponse = userMgmtCentral_Embedded_Facade.callManageAccountWebservice( webserviceRequest );
+		} else {
+			webserviceResponse = callUserAccountMgmtWebservice.callManageAccountWebservice( webserviceRequest );
+		}
 				
 		UserMgmtManageAccountResponse userMgmtManageAccountResponse = new UserMgmtManageAccountResponse();
-		userMgmtManageAccountResponse.setSuccess( manageAccountWebserviceResponse.isSuccess() );
-		userMgmtManageAccountResponse.setSessionKeyNotValid( manageAccountWebserviceResponse.isSessionKeyNotValid() );
-		userMgmtManageAccountResponse.setDuplicateEmail( manageAccountWebserviceResponse.isDuplicateEmail() );
-		userMgmtManageAccountResponse.setDuplicateUsername( manageAccountWebserviceResponse.isDuplicateUsername() );
-		userMgmtManageAccountResponse.setErrorMessage( manageAccountWebserviceResponse.getErrorMessage() );
+		userMgmtManageAccountResponse.setSuccess( webserviceResponse.isSuccess() );
+		userMgmtManageAccountResponse.setSessionKeyNotValid( webserviceResponse.isSessionKeyNotValid() );
+		userMgmtManageAccountResponse.setDuplicateEmail( webserviceResponse.isDuplicateEmail() );
+		userMgmtManageAccountResponse.setDuplicateUsername( webserviceResponse.isDuplicateUsername() );
+		userMgmtManageAccountResponse.setErrorMessage( webserviceResponse.getErrorMessage() );
 		
 		return userMgmtManageAccountResponse;
 	}
@@ -317,19 +363,23 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		if ( ! instanceInitialized ) {
 			throw new IllegalStateException( "Not initialized" );
 		}
-		SearchUserDataAccountWebserviceRequest searchUserDataAccountWebserviceRequest = new SearchUserDataAccountWebserviceRequest();
-		searchUserDataAccountWebserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtSearchUserDataRequest.getSessionKey() );
-		searchUserDataAccountWebserviceRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
-		searchUserDataAccountWebserviceRequest.setSearchStringExactMatch( userMgmtSearchUserDataRequest.isSearchStringExactMatch() );
+		SearchUserDataAccountWebserviceRequest webserviceRequest = new SearchUserDataAccountWebserviceRequest();
+		webserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtSearchUserDataRequest.getSessionKey() );
+		webserviceRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
+		webserviceRequest.setSearchStringExactMatch( userMgmtSearchUserDataRequest.isSearchStringExactMatch() );
 
-		SearchUserDataAccountWebserviceResponse searchUserDataAccountWebserviceResponse = 
-				callUserAccountMgmtWebservice.callSearchUserDataByLastNameAccountWebservice( searchUserDataAccountWebserviceRequest );
+		SearchUserDataAccountWebserviceResponse webserviceResponse = null;
+		if ( userMgmtCentral_Embedded_Facade != null ) {
+			webserviceResponse = userMgmtCentral_Embedded_Facade.callSearchUserDataByLastNameAccountWebservice( webserviceRequest );
+		} else {
+			webserviceResponse = callUserAccountMgmtWebservice.callSearchUserDataByLastNameAccountWebservice( webserviceRequest );
+		}
 		
 		UserMgmtSearchUserDataResponse userMgmtSearchUserDataResponse = new UserMgmtSearchUserDataResponse();
-		userMgmtSearchUserDataResponse.setSuccess( searchUserDataAccountWebserviceResponse.isSuccess() );
-		userMgmtSearchUserDataResponse.setSessionKeyNotValid( searchUserDataAccountWebserviceResponse.isSessionKeyNotValid() );
-		userMgmtSearchUserDataResponse.setErrorMessage( searchUserDataAccountWebserviceResponse.getErrorMessage() );
-		userMgmtSearchUserDataResponse.setUserIdList( searchUserDataAccountWebserviceResponse.getUserIdList() );
+		userMgmtSearchUserDataResponse.setSuccess( webserviceResponse.isSuccess() );
+		userMgmtSearchUserDataResponse.setSessionKeyNotValid( webserviceResponse.isSessionKeyNotValid() );
+		userMgmtSearchUserDataResponse.setErrorMessage( webserviceResponse.getErrorMessage() );
+		userMgmtSearchUserDataResponse.setUserIdList( webserviceResponse.getUserIdList() );
 		return userMgmtSearchUserDataResponse;
 	}
 	
@@ -343,19 +393,23 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		if ( ! instanceInitialized ) {
 			throw new IllegalStateException( "Not initialized" );
 		}
-		SearchUserDataAccountWebserviceRequest searchUserDataAccountWebserviceRequest = new SearchUserDataAccountWebserviceRequest();
-		searchUserDataAccountWebserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtSearchUserDataRequest.getSessionKey() );
-		searchUserDataAccountWebserviceRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
-		searchUserDataAccountWebserviceRequest.setSearchStringExactMatch( userMgmtSearchUserDataRequest.isSearchStringExactMatch() );
+		SearchUserDataAccountWebserviceRequest webserviceRequest = new SearchUserDataAccountWebserviceRequest();
+		webserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtSearchUserDataRequest.getSessionKey() );
+		webserviceRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
+		webserviceRequest.setSearchStringExactMatch( userMgmtSearchUserDataRequest.isSearchStringExactMatch() );
 
-		SearchUserDataAccountWebserviceResponse searchUserDataAccountWebserviceResponse = 
-				callUserAccountMgmtWebservice.callSearchUserDataByEmailAccountWebservice( searchUserDataAccountWebserviceRequest );
+		SearchUserDataAccountWebserviceResponse webserviceResponse = null;
+		if ( userMgmtCentral_Embedded_Facade != null ) {
+			webserviceResponse = userMgmtCentral_Embedded_Facade.callSearchUserDataByEmailAccountWebservice( webserviceRequest );
+		} else {
+			webserviceResponse = callUserAccountMgmtWebservice.callSearchUserDataByEmailAccountWebservice( webserviceRequest );
+		}
 		
 		UserMgmtSearchUserDataResponse userMgmtSearchUserDataResponse = new UserMgmtSearchUserDataResponse();
-		userMgmtSearchUserDataResponse.setSuccess( searchUserDataAccountWebserviceResponse.isSuccess() );
-		userMgmtSearchUserDataResponse.setSessionKeyNotValid( searchUserDataAccountWebserviceResponse.isSessionKeyNotValid() );
-		userMgmtSearchUserDataResponse.setErrorMessage( searchUserDataAccountWebserviceResponse.getErrorMessage() );
-		userMgmtSearchUserDataResponse.setUserIdList( searchUserDataAccountWebserviceResponse.getUserIdList() );
+		userMgmtSearchUserDataResponse.setSuccess( webserviceResponse.isSuccess() );
+		userMgmtSearchUserDataResponse.setSessionKeyNotValid( webserviceResponse.isSessionKeyNotValid() );
+		userMgmtSearchUserDataResponse.setErrorMessage( webserviceResponse.getErrorMessage() );
+		userMgmtSearchUserDataResponse.setUserIdList( webserviceResponse.getUserIdList() );
 		return userMgmtSearchUserDataResponse;
 	}
 
@@ -369,19 +423,23 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		if ( ! instanceInitialized ) {
 			throw new IllegalStateException( "Not initialized" );
 		}
-		SearchUserDataAccountWebserviceRequest searchUserDataAccountWebserviceRequest = new SearchUserDataAccountWebserviceRequest();
-		searchUserDataAccountWebserviceRequest.setNoSessionKeyWURIPOWmvcxuozm(true);
-		searchUserDataAccountWebserviceRequest.setSearchStringExactMatch(true);
-		searchUserDataAccountWebserviceRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
+		SearchUserDataAccountWebserviceRequest webserviceRequest = new SearchUserDataAccountWebserviceRequest();
+		webserviceRequest.setNoSessionKeyWURIPOWmvcxuozm(true);
+		webserviceRequest.setSearchStringExactMatch(true);
+		webserviceRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
 		
-		SearchUserDataAccountWebserviceResponse searchUserDataAccountWebserviceResponse = 
-				callUserAccountMgmtWebservice.callSearchUserDataByEmailAccountWebservice( searchUserDataAccountWebserviceRequest );
+		SearchUserDataAccountWebserviceResponse webserviceResponse = null;
+		if ( userMgmtCentral_Embedded_Facade != null ) {
+			webserviceResponse = userMgmtCentral_Embedded_Facade.callSearchUserDataByEmailAccountWebservice( webserviceRequest );
+		} else {
+			webserviceResponse = callUserAccountMgmtWebservice.callSearchUserDataByEmailAccountWebservice( webserviceRequest );
+		}
 		
 		UserMgmtSearchUserDataResponse userMgmtSearchUserDataResponse = new UserMgmtSearchUserDataResponse();
-		userMgmtSearchUserDataResponse.setSuccess( searchUserDataAccountWebserviceResponse.isSuccess() );
-		userMgmtSearchUserDataResponse.setSessionKeyNotValid( searchUserDataAccountWebserviceResponse.isSessionKeyNotValid() );
-		userMgmtSearchUserDataResponse.setErrorMessage( searchUserDataAccountWebserviceResponse.getErrorMessage() );
-		userMgmtSearchUserDataResponse.setUserIdList( searchUserDataAccountWebserviceResponse.getUserIdList() );
+		userMgmtSearchUserDataResponse.setSuccess( webserviceResponse.isSuccess() );
+		userMgmtSearchUserDataResponse.setSessionKeyNotValid( webserviceResponse.isSessionKeyNotValid() );
+		userMgmtSearchUserDataResponse.setErrorMessage( webserviceResponse.getErrorMessage() );
+		userMgmtSearchUserDataResponse.setUserIdList( webserviceResponse.getUserIdList() );
 		return userMgmtSearchUserDataResponse;
 	}
 
@@ -395,19 +453,23 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		if ( ! instanceInitialized ) {
 			throw new IllegalStateException( "Not initialized" );
 		}
-		SearchUserDataAccountWebserviceRequest searchUserDataAccountWebserviceRequest = new SearchUserDataAccountWebserviceRequest();
-		searchUserDataAccountWebserviceRequest.setNoSessionKeyWURIPOWmvcxuozm(true);
-		searchUserDataAccountWebserviceRequest.setSearchStringExactMatch(true);
-		searchUserDataAccountWebserviceRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
+		SearchUserDataAccountWebserviceRequest webserviceRequest = new SearchUserDataAccountWebserviceRequest();
+		webserviceRequest.setNoSessionKeyWURIPOWmvcxuozm(true);
+		webserviceRequest.setSearchStringExactMatch(true);
+		webserviceRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
 		
-		SearchUserDataAccountWebserviceResponse searchUserDataAccountWebserviceResponse = 
-				callUserAccountMgmtWebservice.callSearchUserDataByUsernameAccountWebservice( searchUserDataAccountWebserviceRequest );
+		SearchUserDataAccountWebserviceResponse webserviceResponse = null;
+		if ( userMgmtCentral_Embedded_Facade != null ) {
+			webserviceResponse = userMgmtCentral_Embedded_Facade.callSearchUserDataByUsernameAccountWebservice( webserviceRequest );
+		} else {
+			webserviceResponse = callUserAccountMgmtWebservice.callSearchUserDataByUsernameAccountWebservice( webserviceRequest );
+		}
 		
 		UserMgmtSearchUserDataResponse userMgmtSearchUserDataResponse = new UserMgmtSearchUserDataResponse();
-		userMgmtSearchUserDataResponse.setSuccess( searchUserDataAccountWebserviceResponse.isSuccess() );
-		userMgmtSearchUserDataResponse.setSessionKeyNotValid( searchUserDataAccountWebserviceResponse.isSessionKeyNotValid() );
-		userMgmtSearchUserDataResponse.setErrorMessage( searchUserDataAccountWebserviceResponse.getErrorMessage() );
-		userMgmtSearchUserDataResponse.setUserIdList( searchUserDataAccountWebserviceResponse.getUserIdList() );
+		userMgmtSearchUserDataResponse.setSuccess( webserviceResponse.isSuccess() );
+		userMgmtSearchUserDataResponse.setSessionKeyNotValid( webserviceResponse.isSessionKeyNotValid() );
+		userMgmtSearchUserDataResponse.setErrorMessage( webserviceResponse.getErrorMessage() );
+		userMgmtSearchUserDataResponse.setUserIdList( webserviceResponse.getUserIdList() );
 		return userMgmtSearchUserDataResponse;
 	}
 
