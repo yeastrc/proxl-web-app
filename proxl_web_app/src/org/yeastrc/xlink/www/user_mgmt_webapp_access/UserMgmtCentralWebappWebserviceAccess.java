@@ -96,25 +96,20 @@ public class UserMgmtCentralWebappWebserviceAccess {
 	 */
 	public UserMgmtSessionKeyAliveWebserviceResponse sessionKeyAlive( UserMgmtSessionKeyAliveWebserviceRequest userMgmtSessionKeyAliveWebserviceRequest ) throws Exception {
 		
-		if ( callUserAccountMgmtWebservice != null ) {
-
-			SessionKeyAliveWebserviceRequest webserviceRequest = new SessionKeyAliveWebserviceRequest();
-			webserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtSessionKeyAliveWebserviceRequest.getSessionKey() );
-			SessionKeyAliveWebserviceResponse sessionKeyAliveWebserviceResponse =
-					callUserAccountMgmtWebservice.callSessionKeyAliveWebservice( webserviceRequest );
-
-			UserMgmtSessionKeyAliveWebserviceResponse userMgmtSessionKeyAliveWebserviceResponse = new UserMgmtSessionKeyAliveWebserviceResponse();
-			userMgmtSessionKeyAliveWebserviceResponse.setSuccess( sessionKeyAliveWebserviceResponse.isSuccess() );
-			userMgmtSessionKeyAliveWebserviceResponse.setSessionKeyNotValid( sessionKeyAliveWebserviceResponse.isSessionKeyNotValid() );
-			userMgmtSessionKeyAliveWebserviceResponse.setErrorMessage( sessionKeyAliveWebserviceResponse.getErrorMessage() );
-
-			return userMgmtSessionKeyAliveWebserviceResponse;
-		} else {
-			//  Fake since not connecting to User Mgmt Central web app
-			UserMgmtSessionKeyAliveWebserviceResponse userMgmtSessionKeyAliveWebserviceResponse = new UserMgmtSessionKeyAliveWebserviceResponse();
-			userMgmtSessionKeyAliveWebserviceResponse.setSuccess( true );
-			return userMgmtSessionKeyAliveWebserviceResponse;
+		SessionKeyAliveWebserviceRequest webserviceRequest = new SessionKeyAliveWebserviceRequest();
+		webserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtSessionKeyAliveWebserviceRequest.getSessionKey() );
+		SessionKeyAliveWebserviceResponse sessionKeyAliveWebserviceResponse = null;
+		if ( userMgmtCentral_Embedded_Facade != null ) {
+			sessionKeyAliveWebserviceResponse = userMgmtCentral_Embedded_Facade.callSessionKeyAliveWebservice( webserviceRequest );
+		} else { 
+			sessionKeyAliveWebserviceResponse = callUserAccountMgmtWebservice.callSessionKeyAliveWebservice( webserviceRequest );
 		}
+		UserMgmtSessionKeyAliveWebserviceResponse userMgmtSessionKeyAliveWebserviceResponse = new UserMgmtSessionKeyAliveWebserviceResponse();
+		userMgmtSessionKeyAliveWebserviceResponse.setSuccess( sessionKeyAliveWebserviceResponse.isSuccess() );
+		userMgmtSessionKeyAliveWebserviceResponse.setSessionKeyNotValid( sessionKeyAliveWebserviceResponse.isSessionKeyNotValid() );
+		userMgmtSessionKeyAliveWebserviceResponse.setErrorMessage( sessionKeyAliveWebserviceResponse.getErrorMessage() );
+
+		return userMgmtSessionKeyAliveWebserviceResponse;
 	}
 	
 	/**

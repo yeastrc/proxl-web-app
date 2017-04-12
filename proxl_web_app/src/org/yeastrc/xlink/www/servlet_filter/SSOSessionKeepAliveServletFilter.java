@@ -29,8 +29,8 @@ public class SSOSessionKeepAliveServletFilter implements Filter {
 	private static final Logger log = Logger.getLogger( SSOSessionKeepAliveServletFilter.class );
 	
 	private static final long HOUR_IN_MILLISECONDS = 1 * 60 * 60 * 1000;
-	//  TODO  TEMP 5 seconds
-//	private static final long HOUR_IN_MILLISECONDS = 5 * 1000;
+	//  TODO  TEMP 1 second
+//	private static final long HOUR_IN_MILLISECONDS = 1 * 1000;
 	
 	@Override
 	public void destroy() {
