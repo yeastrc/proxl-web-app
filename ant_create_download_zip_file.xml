@@ -23,6 +23,12 @@
 	    </fileset>
 	    <fileset dir="." includes="database_scripts/install/**">
 	    </fileset>
+	    <fileset dir="." includes="proxl_importer/config_sample_files_proxl_xml_importer/**">
+	    </fileset>
+	    <fileset dir="." includes="proxl_importer/config_sample_files_RUN_proxl_xml_importer_PGM/**">
+	    </fileset>
+		<fileset dir="." includes="proxl_submit_import/submit_import__config_sample_files/**">
+	    </fileset>
 	</zip>
 
   </target>
