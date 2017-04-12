@@ -1,6 +1,7 @@
 package org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders;
 
 import java.util.Calendar;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -130,6 +131,15 @@ public class Cached_ReportedPeptideDTO implements CachedDataCommonIF {
 
 			ReportedPeptideDTO reportedPeptideDTO = cacheHolderInternal.loadFromDB( reportedPeptideId );
 			return reportedPeptideDTO;
+			
+		} catch ( ExecutionException e ) {
+			//  caught from LoadingCache when loadFromDB throws ProxlWebappDataNotFoundException
+			if ( e.getCause() instanceof ProxlWebappDataNotFoundException ) {
+				//  DB query returned null so return null here
+				return null;
+			}
+			throw e;
+			
 		} catch ( ProxlWebappDataNotFoundException e ) {
 			//  DB query returned null so return null here
 			return null;

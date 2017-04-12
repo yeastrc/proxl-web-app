@@ -3,6 +3,7 @@ package org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -232,6 +233,15 @@ public class Cached_Linkers_ForSearchId implements CachedDataCommonIF {
 				LinkerDTO linkerDTO = null;
 				try {
 					linkerDTO = Cached_Linker.getInstance().getLinkerDTO( linkerId );
+					
+				} catch ( ExecutionException e ) {
+					//  caught from LoadingCache when loadFromDB throws ProxlWebappDataNotFoundException
+					if ( e.getCause() instanceof ProxlWebappDataNotFoundException ) {
+						//  DB query returned null so return null here
+					} else {
+						throw e;
+					}
+					
 				} catch ( ProxlWebappDataNotFoundException e ) {
 					// thrown when not in DB
 				}
