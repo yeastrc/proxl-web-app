@@ -28,17 +28,17 @@
 		<h1 id="searches_for_page_chooser_overlay_X_for_exit_overlay" 
 			class="searches-for-page-chooser-overlay-X-for-exit-overlay searches_for_page_chooser_modal_dialog_overlay_hide_parts_jq" >X</h1>
 		<h1 id="searches_for_page_chooser_overlay_header_text" class="searches-for-page-chooser-overlay-header-text" 
-			>Change searches merged</h1>
+			>Choose the searches to display</h1>
 	</div>
 	<div id="searches_for_page_chooser_overlay_body" class="searches-for-page-chooser-overlay-body" >
-	
+<%-- 	
 	  <div style=" margin-bottom: 10px;" >
 	
 		<div id="">
 			Choose the searches to display
 		</div>
 	  </div>
-	
+--%>	
 	  <div id="searches_for_page_chooser_list_outer_container" class="searches-list-outer-container">
 		<div id="searches_for_page_chooser_list_container" class=" searches-list-container">
 		</div>
