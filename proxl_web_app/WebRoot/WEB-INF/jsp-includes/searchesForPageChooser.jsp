@@ -31,14 +31,7 @@
 			>Choose the searches to display</h1>
 	</div>
 	<div id="searches_for_page_chooser_overlay_body" class="searches-for-page-chooser-overlay-body" >
-<%-- 	
-	  <div style=" margin-bottom: 10px;" >
-	
-		<div id="">
-			Choose the searches to display
-		</div>
-	  </div>
---%>	
+
 	  <div id="searches_for_page_chooser_list_outer_container" class="searches-list-outer-container">
 		<div id="searches_for_page_chooser_list_container" class=" searches-list-container">
 		</div>
