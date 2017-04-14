@@ -17,12 +17,13 @@ Here you will find documentation for both using and installing proxl locally.
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Using proxl
    
    using/intro
    using/project
    using/upload_data
+   using/image-circle
    using/image-bar
    using/structure
    using/peptide
@@ -33,7 +34,7 @@ Here you will find documentation for both using and installing proxl locally.
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Proxl Administration
    
    install/intro

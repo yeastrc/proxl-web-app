@@ -1,20 +1,19 @@
 =======================================
-Image View Page (Protein Bar View)
+Image View Page (Circle Plot View)
 =======================================
 
-.. image:: /images/image-viewer-page.png
+.. image:: /images/image-view-circle-plot.png
 
-The image viewer displays a SVG rendering of select proteins as bars, the lengths of which
-are proportional to protein sequence length. The bars are annotated with positions of
-monolinks, looplinks, crosslinks, and other biological sequence annotations. The viewer is
+The circle plot image viewer displays a SVG rendering of select proteins as curved bars around the perimeter of a circle.
+The bars are annotated with positions of monolinks, looplinks, crosslinks, and other biological sequence annotations. The viewer is
 highly interactive and contains many options for customization (see below).
 
 Viewer Basics
 ==================
 
-Switch to "Circle Plot" View
+Switch to "Protein Bar" View
 -------------------------------
-To switch to the "Circle Plot" view, click the checkbox next to "View as Circle Plot" in the viewer options. See :doc:`/using/image-circle` for more information.
+To switch to the "Protein Bar" view, click the checkbox next to "View as Circle Plot" in the viewer options. See :doc:`/using/image-bar` for more information.
 
 .. image:: /images/toggle-circle-plot-view.png
 
@@ -73,35 +72,24 @@ URL does not grant access to the page to any user that would not otherwise have 
 
 Viewer Display
 --------------------
-Below is a labeled example of a protein bar in the viewer, with most options disabled. Self-crosslinks,
-that is crosslinks where both linked peptides map to the same protein, appear as arcs on the top
-of the protein bar. These are contrasted with looplinks, where a single peptide contains two
-linked residues, which appear as arcs on the bottom of the protein bar. Monolinks appear as inverted
-lollipops (a line segment with a ball on the end) on the bottom of protein bars.
+Below is a labeled example of the circle plot viewer. Inter-protein cross-links appear as arcs between proteins.
+Self cross-links (cross-links within the same protein) appear as solid-colored loops on the interior of the circle.
+Loop-links appear as dashed loops on the interior of the circle. And mono-links appear as short dashed lines sticking
+into the interior of the circle.
 
-.. image:: /images/viewer-display1.png
-
-When a second protein is added to the viewer, crosslinks between the two proteins will appear as line segments
-connecting the two proteins, with the end points of the segments are the respective link positions in the
-proteins:
-
-.. image:: /images/viewer-display2.png
-
-And a third protein:
-
-.. image:: /images/viewer-display3.png
+.. image:: /images/circle-plot-viewer-display.png
 
 Coloring
 ---------------------
-By default, the coloring of the links corresponds to the "originating" protein in the viewer. For example, the
-first protein is colored red. All of its self-crosslinks, looplinks, and monolinks will be red. And all inter-protein crosslinks
-originating from this protein will be red. The originating protein of a crosslink will be the protein which
-appears first in the viewer (from top-down). Similarly, the second protein is colored green. All of its links and
-originating inter-protein crosslinks will be colored green. This coloring scheme is intended to ease confusion about which
-links originated at which proteins, farther down the list of proteins.
+By default, the coloring of the links corresponds to the "originating" protein in the viewer. For example, if the
+first protein is colored red, all of its self-crosslinks, looplinks, and monolinks will be red. And all inter-protein cross-links
+containing this protein will be red. The originating protein of a crosslink will be the protein which
+appears first in the viewer (from top-down). Similarly, if the second protein is colored green, all of its links and
+originating inter-protein cross-links will be colored green (except for those involving the first protein, which are red). This coloring scheme is intended to ease confusion about which
+links involve which proteins, farther down the list of proteins.
 
-This coloring scheme can be changed to show in which search(es) the link appears (See :ref:`image-color-by-search-label`). And, specific
-proteins in the viewer can be highlighted to only color links involving those proteins (See :ref:`image-highlight-proteins-label`).
+This coloring scheme can be changed to show in which search(es) the link appears (See :ref:`circle-image-color-by-search-label`). And, specific
+proteins in the viewer can be highlighted to only color links involving those proteins (See :ref:`circle-image-highlight-proteins-label`).
 
 
 Viewer Interaction
@@ -109,31 +97,38 @@ Viewer Interaction
 
 Add a Protein
 ---------------------
-To add a protein to the viewer, select a protein in the pull-down menu above the viewer options labeled "Select a protein." All proteins in the experiment
-that meet the filtering criteria at the top of the page will be present.
+To add a protein to an empty viewer (no proteins visible), click either the "Add Protein" button or the "Click to Add Protein" text in the viewer area:
 
-.. image:: /images/viewer-select-protein1.png
+.. image:: /images/circle-plot-add-protein1.png
 
-To add subsequent proteins to the viewer, click the +Protein link next to this protein pull-down menu. This will create a new pull-down
-menu where you may select another protein to be added to the viewer:
+This will open the "Add Protein(s)" overlay, where one or more proteins may be selected:
 
-.. image:: /images/viewer-select-protein2.png
+.. image:: /images/add-protein-overlay.png
 
-.. image:: /images/viewer-select-protein3.png
+Cick "Add" to add the selected proteins to the viewer. Click anywhere outside the overlay, or on the "X" in the top-right corner, to close the overlay.
 
-This can be repeated many times to add many proteins to the viewer.
+To add more proteins to the viewer, click the "Add Protein" button above the viewer.
+
 
 Remove a Protein
 ---------------------
-To remove a protein from the viewer, choose the "Select a protein" option in the pull-down menu representing that protein in the viewer. This will
-remove that protein from the viewer and shift all proteins bars below it up.
+To remove a protein from the viewer, click the small red (X) next to the name of the protein above the image area:
+
+.. image:: /images/delete-protein.png
+
+Rearrange Proteins
+---------------------
+To rearrange proteins, simply drag and drop the protein in the protein list above the circle to the desired position in the order. The viewer will update automatically.
+
+.. image:: /images/rearrange-proteins.png
+
 
 View Link Summary
 ---------------------
 To view summary information about a link, hover your mouse arrow over that link in the viewer. (Or tap, on touch devices.) This may be done for any link type.
 This will display the link type, protein(s), and position(s).
 
-.. image:: /images/viewer-hover.png
+.. image:: /images/circle-plot-hover.png
 
 View Peptides, PSMs, and Spectra
 -------------------------------------
@@ -149,15 +144,7 @@ PSM includes a "View Spectrum" link for viewing an annotated spectrum associated
 spectrum viewer, see the :doc:`/using/spectrum-viewer` page. Click the "X" in the top-right corner of the overlay (or
 click on the page anywhere outside of the overlay) to close the overlay window.
 
-Move Protein Bars
-------------------
-The protein bars may be moved to the left or right by clicking and dragging the bars in the desired direction.
-
-Flip Protein Bars
-------------------
-By default, the protein bars are laid out left-to-right from N-to-C terminus. This orientation may be flipped by double-clicking on the protein bar.
-
-.. _image-highlight-proteins-label:
+.. _circle-image-highlight-proteins-label:
 
 Highlight Proteins
 ------------------
@@ -165,43 +152,68 @@ Proteins may be highlighted by clicking on any of the protein bars. This will ch
 only links involving the highlighted protein(s) will be colored, all other links for all other proteins are shaded
 light gray:
 
-.. image:: /images/viewer-highlight-protein.png
+.. image:: /images/circle-plot-highlight-protein.png
 
 Multiple proteins may be highlighted by holding shift and clicking protein bars:
 
-.. image:: /images/viewer-highlight-protein2.png
+.. image:: /images/circle-plot-highlight-protein2.png
+
+When multiple proteins are highlighted, all links within and between those proteins will be colored. Everything else will be greyed-out.
 
 Remove Highlighting
 ^^^^^^^^^^^^^^^^^^^^^
 If a single protein is highlighted, click it to unhighlight it. If multiple proteins are highlighted, hold shift and click a
 highlighted protein to unhighlight it. If shift is not used, the viewer will highlight only the protein clicked.
 
+
+Highlight Proteins Regions
+----------------------------
+Instead of highlighting entire proteins, it is possible highly only segments of proteins (protein regions). This is done by clicking
+the "[Manage Protein Selections]" link above the image:
+
+.. image:: /images/circle-plot-manage-protein-selections.png
+
+This opens an overlay with an interface for managing which regions of which proteins are highlighted:
+
+.. image:: /images/manage-protein-selections-overlay1.png
+
+This overlay lists all proteins visible in the viewer and which regions are currently highlighted for each one. By default,
+all proteins are visible in their entirety, so the "Select whole protein bar" option is checked for all of them. When this
+checkbox is checked, that protein is highlighted in its entirety and no sub-regions may be selected.
+
+To select sub-regions in a protein to highlight, uncheck the "Select whole protein bar" option:
+
+.. image:: /images/manage-protein-selections-overlay2.png
+
+Click "+Add Region" to define the start and end positions for a region to highlight in that protein. This option may be
+used multiple times per protein to define multiple regions. Click the red "x" next to a region to remove it. Unchecking
+"Select whole protein bar" and not defining regions unhighlights that entire protein:
+
+.. image:: /images/manage-protein-selections-overlay3.png
+
+Click "Save" to save these settings and view the image with these defined regions. Click "Cancel" to make no changes and close overlay, "Reset" to reset
+regions to those visible in the image (without closing overlay), and "Clear All" to set to defaults (all proteins visible).
+
+Clicking "Save" gives us:
+
+.. image:: /images/circle-plot-manage-protein-selections2.png
+
+Only links within and between the defined regions are colored. The reset are greyed-out.
+
 Local Sequence Information
 ---------------------------
 Local sequence information in the protein bars may be viewed by hovering the mouse cursor over the protein bar. A tooltip will appear
 that shows the amino acid position number, the amino acid at that position, and neighboring amino acids. Amino acids that linkable
-with the crosslinker(s) used in the experiment(s) will be bolded and red. Vertical bars indicate sites that are cleavable by
+with the cross-linker(s) used in the experiment(s) will be bolded and red. Vertical bars indicate sites that are cleavable by
 trypsin. This tooltip will slide and dynamically update along with the mouse cursor as it is moved along the protein bar.
 
-.. image:: /images/viewer-local-sequence-info.png
+.. image:: /images/circle-plot-local-sequence-info.png
 
-Reset Proteins
+Download Image
 ---------------------------
-Reset the positioning of all protein bars so that left edges are aligned to left of viewer.
+Mouse over the "[Download Image]" link to see image download options. Click on the format of choice to initiate a download of the image.
 
-.. image:: /images/viewer-reset-proteins.png
-
-Reset Protein Flipping
----------------------------
-Sets the left side of all protein bars to be the N-termini.
-
-.. image:: /images/viewer-reset-protein-flipping.png
-
-Download SVG
----------------------------
-Download a scalable vector graphics (SVG) file of the current view. Suitable for import into Adobe Illustrator or other software that supports SVG files.
-
-.. image:: /images/viewer-download-svg.png
+.. image:: /images/circle-plot-download-svg.png
 
 Viewer Options
 ==================
@@ -224,27 +236,13 @@ Toggle the showing of monolinks.
 
 Show linkable positions
 -------------------------------------
-Toggle the showing of which positions in the protein are linkable by the crosslinker(s) used in the experiment. The linkable
+Toggle the showing of which positions in the protein are linkable by the cross-linker(s) used in the experiment. The linkable
 positions are noted by white lines in the protein bar.
-
-.. image:: /images/viewer-linkable-positions.png
 
 Show show tryptic positions
 -------------------------------------
 Toggle the showing of which positions in the protein are cleavable by trypsin, an enzyme commonly used to digest proteins
-in bottom-up proteomics experiments. The cleavable positions are noted by yellow lines in the protein bar.
-
-.. image:: /images/viewer-tryptic-positions.png
-
-If both linkable and tryptic positions are being displayed, each type is displayed by a half-height line to remove ambiguity
-caused by overlapping linkable and tryptic positions. Linkable sites are shown in white on the top-half of the protein bar,
-and tryptic positions in yellow on the bottom half.
-
-.. image:: /images/viewer-linkable-tryptic-positions.png
-
-Show protein termini
--------------------------------------
-Toggles the labelling of the N and C termini to the lower left and right of the protein bars.
+in bottom-up proteomics experiments. The cleavable positions are noted by dashed white lines in the protein bar.
 
 Shade by counts
 -------------------------------------
@@ -252,17 +250,15 @@ If enabled, the opacity (transparency) of links reflects the number of PSMs foun
 1 PSM (minimum opacity, most transparent) to 10 PSMs (maximum opacity). Any link having 10 or more PSMs will have the
 maximum opacity.
 
-.. image:: /images/viewer-shade-by-counts.png
-
-.. _image-color-by-search-label:
+.. _circle-image-color-by-search-label:
 
 Color by search
 -----------------
 When merging multiple searches, this option changes the coloring scheme so that all links are colored by which search (or searches) they were found in at the given cutoffs. Each search is assigned
 a color, and each combination of searches are assigned other, distinct colors. It is possible to ascertain from the color in which search, or combination of searches,
-the individual link was found. A legend is provided beaneath the graphic. This functionality is limited to a maximum of three searches.
+the individual link was found. A legend is provided with the graphic. This functionality is limited to a maximum of three searches.
 
-.. image:: /images/viewer-color-by-search.png
+.. image:: /images/circle-plot-color-by-search.png
 
 Show scalebar
 -------------------------------------
@@ -270,39 +266,21 @@ Toggle the display of the scale bar on and off.
 
 Automatic sizing
 -------------------------------------
-The viewer automatically determines a single horizontal scale for pixels/residue for all protein bars based on the length of the longest protein and the width of the
-browser window--such that the longest protein stretches the entire width of the window. This scaling is dynamically recalculated and redrawn as the width of the browser window is changed or
-as longer proteins are added to the viewer. Additionally, the viewer employs a default vertical distance between the protein bars.
+The viewer automatically sizes the circle plot with a diameter of 800 pixels. To change this, uncheck the "Automatic sizing" checkbox and use the
+slider to change the radius of the circle plot.
 
-These defaults may be disabled and manually altered by disabling this option. Disabling this option presents the two sliders below:
-
-.. image:: /images/viewer-size-options.png
-
-Vertical spacing
-^^^^^^^^^^^^^^^^^^^^^^
-This slider adjusts the distance between the vertical bars, slide right to increase the distance.
-
-Horizontal scaling
-^^^^^^^^^^^^^^^^^^^^^^
-This slider adjusts the the number of pixels per residue, as a percentage of the default. 50% means the bars are scaled to be one-half as wide as they are by default. 400% means
-the bars are 4 times as wide. Slide left to decrease the width, slide right to increase the width.
-
-Protein Names On Left
--------------------------------------
-By default, protein names are placed within the protein bar, on the left side. This option will place the protein names outside and to the left of the protein bars.
-
-.. image:: /images/viewer-names-on-left.png
+.. image:: /images/circle-plot-size-options.png
 
 Show Feature Annotations
 -------------------------------------
 This option allows for the display of protein sequence feature annotations of various on the protein bars. To select a type of feature annotation, click
 the pull-down menu next to "Show Feature Annotations" and select a type:
 
-.. image:: /images/viewer-feature-annotation1.png
+.. image:: /images/circle-plot-feature-annotation1.png
 
-This will retrieve the necessary data from the server and display the respective annotation as a shaded region on the protein bars:
+This will retrieve the necessary data from the server and display the respective annotation as bars aligned outside of the protein bars on the circle:
 
-.. image:: /images/viewer-feature-annotation2.png
+.. image:: /images/circle-plot-feature-annotation2.png
 
 The types of feature annotations currently supported are:
 
@@ -318,18 +296,21 @@ Predicted Disordered Regions
 Selecting this option annotates the protein bars to show predicted
 disordered regions according to the DISOPRED3 algorithm. The regions may be
 moused over to view exact start and stop residues. This feature requires that
-PAWS be available, see: :ref:`viewer-paws-label`.
+PAWS be available, see: :ref:`circle-viewer-paws-label`.
 
-.. image:: /images/viewer-disordered-regions.png
+.. image:: /images/circle-plot-disordered-regions.png
 
 Predicted Secondary Structure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Selecting this option annotates the protein bars to show predictions
 for secondary structure according to the PSIPRED 3 algorithm. The regions may be
 moused over to view exact start and stop residues. This feature requires that
-PAWS be available, see: :ref:`viewer-paws-label`.
+PAWS be available, see: :ref:`circle-viewer-paws-label`.
 
-.. _viewer-paws-label:
+.. image:: /images/circle-plot-ss.png
+
+
+.. _circle-viewer-paws-label:
 
 Feature Annotations and PAWS
 -------------------------------------
