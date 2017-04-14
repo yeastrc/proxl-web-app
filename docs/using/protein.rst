@@ -18,6 +18,47 @@ protein database is redundant in terms of homologous proteins or proteoforms or 
 peptides are mapping to many proteins. The filtering options described below are meant to
 help eliminate this redundancy in reported proteins.
 
+General Options
+============================
+
+Change Searches
+---------------------
+.. image:: /images/protein-page-change-searches-link.png
+
+The "Change searches" link allows the user to change which searches are currently being displayed. Clicking the link causes the following overlay to be displayed:
+
+.. image:: /images/change-searches-overlay.png
+
+Select or de-select searches by clicking on them in the list. Once done, click "Change" to update the page with the new data or "Cancel" to close the overlay.
+
+
+Update From Database
+---------------------
+.. image:: /images/filter-update-from-database-protein.png
+
+If the user changes any filter parameters--such as PSM/peptide score cutoffs--this button must be clicked to reflect the new filter choices.
+
+Save as Default
+--------------------
+.. image:: /images/protein-page-button-save-as-default.png
+
+Project owners may click "Save as Default" to save the current URL as the default
+view of the "Protein View" for this search. This default view will be populated with the same
+options as when the button is clicked. This is a convenient
+way to share data with collaborators or the public that does not require that they
+manipulate the image viewer to see the data.
+
+Share Page
+--------------------
+.. image:: /images/protein-page-button-share-page.png
+
+Clicking the "Share Page" button will generate a shortcut URL for viewing the current page. The shortened URL will appear in an overlay as:
+
+.. image:: /images/share-page-overlay.png
+
+Copying and sharing the highlighted URL will direct users to the view of the page when the URL was generated. Note that this
+URL does not grant access to the page to any user that would not otherwise have access.
+
 View Looplinks
 =========================
 By default, the table shows crosslinks. To switch to looplinks, click the [View Looplinks]
@@ -37,7 +78,7 @@ the number of rows in the table.
 Download UDRs
 =========================
 UDR stands for "unique distance restraint", which takes its name from 3D modelling
-terminology. A UDR, in ProXL, is any specific position in a protein linked to a
+terminology. A UDR, in proxl, is any specific position in a protein linked to a
 specific position in another protein, whether it is a crosslink or a looplink. The
 [Download UDRs (#)] link downloads a non-redundant tab-delimited text table of these UDRs consolidated
 from the crosslinks and looplinks. The # is the number of UDRs.
@@ -62,51 +103,52 @@ critiera will be listed.
 
 To change the PSM-level filters, first click the pencil icon next to "PSM Filters":
 
-.. image:: /images/filter-change-psm-filter1.png
+.. image:: /images/filter-change-psm-filter1-protein.png
 
 This opens an overlay with the containing the possible score types to use as PSM filters for this search. To change
-the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+the cutoff values to be used for any of these score types, enter the value next to the score type. proxl will correctly
 handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
 
 .. image:: /images/filter-change-psm-filter2.png
 
 To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
 
-The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the proxl XML file uploaded
 to the database. This typically represents the suggested cutoffs by the author of the respective search program.
 
 *Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
-the "Save" button, you must click the "Update From Database" button on the page to apply any new PSM- or peptide-level
+the "Save" button, you must click the "Update" button on the page to apply any new PSM- or peptide-level
 filters.
 
-.. image:: /images/filter-update-from-database.png
+.. image:: /images/filter-update-from-database-protein.png
 
 
 Peptide Filters
 -----------------------
-The filters to apply at the peptide level. Only results which have at least one peptide that meets all of the selected
+Some search algorithms, such as Percolator, provide statistics at the peptide level that may be used for filtering.
+If applicable, peptide-level filtering options may be set here. Only results which have at least one peptide that meets all of the selected
 critiera will be listed.
 
 To change the peptide-level filters, first click the pencil icon next to "Peptide Filters":
 
-.. image:: /images/filter-change-peptide-filter1.png
+.. image:: /images/filter-change-peptide-filter1-protein.png
 
 This opens an overlay with the containing the possible score types to use as peptide-level filters for this search. To change
-the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+the cutoff values to be used for any of these score types, enter the value next to the score type. proxl will correctly
 handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
 
 .. image:: /images/filter-change-peptide-filter2.png
 
 To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
 
-The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the proxl XML file uploaded
 to the database. This typically represents the suggested cutoffs by the author of the respective search program.
 
 *Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
-the "Save" button, you must click the "Update From Database" button on the page to apply any new PSM- or peptide-level
+the "Save" button, you must click the "Update" button on the page to apply any new PSM- or peptide-level
 filters.
 
-.. image:: /images/filter-update-from-database.png
+.. image:: /images/filter-update-from-database-protein.png
 
 
 Exclude links with
@@ -132,7 +174,7 @@ out individual contaminant proteins.
 Update
 -------------------------
 In order to apply new filter parameters to the shown data, the "Update" button must be clicked. This will
-fetch filtered data from the ProXL server and display the data on the web page.
+fetch filtered data from the proxl server and display the data on the web page.
 
 Save As Default
 --------------------------

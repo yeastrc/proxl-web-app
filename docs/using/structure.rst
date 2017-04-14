@@ -50,7 +50,7 @@ Save as Default
 .. image:: /images/button-save-as-default.png
 
 Project owners may click "Save as Default" to save the current URL (see above) as the default
-view of the "Structure View" for this project. This default view will be populated with the same
+view of the "Structure View" for this search. This default view will be populated with the same
 proteins, positions, and viewer options as when the button is clicked. This is a convenient
 way to share data with collaborators or the public that does not require that they
 manipulate the image viewer to see the data.

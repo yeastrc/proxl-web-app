@@ -51,7 +51,7 @@ Save as Default
 .. image:: /images/peptide-page-button-save-as-default.png
 
 Project owners may click "Save as Default" to save the current URL as the default
-view of the "Peptide View" for this project. This default view will be populated with the same
+view of the "Peptide View" for this search. This default view will be populated with the same
 options as when the button is clicked. This is a convenient
 way to share data with collaborators or the public that does not require that they
 manipulate the image viewer to see the data.
