@@ -26,7 +26,7 @@ Search Details
 The "Path" is the location on disk from which the data were imported. The "Linker" is the
 name of the crossinker used in the experiment. "Search Program(s)" is the name and
 version number of the PSM search software used. "Upload date" is the date the data were
-uploaded into ProXL. "FASTA file" is the name of the FASTA file used to perform the
+uploaded into proxl. "FASTA file" is the name of the FASTA file used to perform the
 PSM search.
 
 Search Filter
@@ -45,14 +45,14 @@ To change the PSM-level filters, first click the pencil icon next to "PSM Filter
 .. image:: /images/filter-change-psm-filter-merged.png
 
 This opens an overlay with the containing the possible score types to use as PSM filters for this search. To change
-the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+the cutoff values to be used for any of these score types, enter the value next to the score type. proxl will correctly
 handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
 
 .. image:: /images/filter-change-psm-filter2.png
 
 To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
 
-The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the proxl XML file uploaded
 to the database. This typically represents the suggested cutoffs by the author of the respective search program.
 
 *Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
@@ -72,14 +72,14 @@ To change the peptide-level filters, first click the pencil icon next to "Peptid
 .. image:: /images/filter-change-peptide-filter-merged.png
 
 This opens an overlay with the containing the possible score types to use as peptide-level filters for this search. To change
-the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+the cutoff values to be used for any of these score types, enter the value next to the score type. proxl will correctly
 handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
 
 .. image:: /images/filter-change-peptide-filter2.png
 
 To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
 
-The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the proxl XML file uploaded
 to the database. This typically represents the suggested cutoffs by the author of the respective search program.
 
 *Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
@@ -140,7 +140,7 @@ crosslinks or looplinks. Only checking 'crosslinks' will only return crosslinked
 Modification filter
 -------------------------
 Only peptides with at least one of the checked modifications will be included. Note that monolinks
-are considered modifications of residues in ProXL, so the mass of the crosslinker when found
+are considered modifications of residues in proxl, so the mass of the crosslinker when found
 on monolinks is included here.
 
 Update

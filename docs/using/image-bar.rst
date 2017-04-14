@@ -330,13 +330,13 @@ Feature Annotations and PAWS
 Disordered regions and secondary structure require a separate, optional web application be
 installed by the site administrator that we have called PAWS, or Protein Annotation Web Services.
 Requests for these types of sequence annotations make a request to the PAWS service for information
-about the respective sequence. If available, that information is sent by PAWS to ProXL and that
+about the respective sequence. If available, that information is sent by PAWS to proxl and that
 information is shown. If not available, PAWS will initiate the running of DISOPRED3 or PSIPRED3
-on the sequence, store the results in a database (for future use), and respond to ProXL with
+on the sequence, store the results in a database (for future use), and respond to proxl with
 the data.
 
 As a consequence, if the sequence annotations for the requested sequence has not
-yet been run, there may be a delay before the data are shown in ProXL. The user as the option
+yet been run, there may be a delay before the data are shown in proxl. The user as the option
 of waiting for the data to be returned, or canceling and performing other actions. (Note: if
 canceled, the data are still processed and will be available on a subsequent request.)
 
@@ -361,14 +361,14 @@ To change the PSM-level filters, first click the pencil icon next to "PSM Filter
 .. image:: /images/filter-change-psm-filter1.png
 
 This opens an overlay with the containing the possible score types to use as PSM filters for this search. To change
-the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+the cutoff values to be used for any of these score types, enter the value next to the score type. proxl will correctly
 handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
 
 .. image:: /images/filter-change-psm-filter2.png
 
 To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
 
-The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the proxl XML file uploaded
 to the database. This typically represents the suggested cutoffs by the author of the respective search program.
 
 *Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
@@ -388,14 +388,14 @@ To change the peptide-level filters, first click the pencil icon next to "Peptid
 .. image:: /images/filter-change-peptide-filter1.png
 
 This opens an overlay with the containing the possible score types to use as peptide-level filters for this search. To change
-the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+the cutoff values to be used for any of these score types, enter the value next to the score type. proxl will correctly
 handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
 
 .. image:: /images/filter-change-peptide-filter2.png
 
 To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
 
-The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the proxl XML file uploaded
 to the database. This typically represents the suggested cutoffs by the author of the respective search program.
 
 *Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking

@@ -2,7 +2,7 @@
 Spectrum Viewer
 ==================
 
-ProXL uses a version of the `Lorikeet spectrum viewer <https://github.com/UWPR/Lorikeet>`_ that has been modified to support crosslinked
+Proxl uses a version of the `Lorikeet spectrum viewer <https://github.com/UWPR/Lorikeet>`_ that has been modified to support crosslinked
 and looplinked spectra. Lorikeet is a pure-HTML and Javascript viewer that requires no 3rd party plugins to use.  (Source code of the customized
 version of Lorikeet may be found `here <https://github.com/yeastrc/proxl-web-app/tree/master/proxl_web_app/WebRoot/js/lorikeet>`_.)
 Some knowledge of interpreting tandem mass spectra is assumed in this document.
@@ -139,7 +139,7 @@ during the search. The position of the variable modification in the peptide sequ
 
 Monolink Spectrum
 ========================================
-Monolinks in ProXL are treated as modifications on residues in the same way as other post-translational modifications. There may be multiple
+Monolinks in proxl are treated as modifications on residues in the same way as other post-translational modifications. There may be multiple
 monolinks present in the sequence, and monolinks may appear in unlinked, crosslinked or looplinked peptides. In the example
 below, the modification on the lysine at position 7 has a mass of 156.08, the mass of the crosslinker used in this experiment when it has bound
 to an amino acid on one end (but not the other). This residue is highlighted in the "PSM Details" area and in the sequence presented in
@@ -155,14 +155,14 @@ and "square" peptide are given. Note that the opposite peptide is present as a m
 
 .. image:: /images/lorikeet-crosslink-ion-series.png
 
-ProXL displays the ion series for each of the linked peptides separately. The sequences and positions of the crosslink are presented graphically at the top of
+Proxl displays the ion series for each of the linked peptides separately. The sequences and positions of the crosslink are presented graphically at the top of
 the window. In the sequence presented in the "Fragment Ion Series" panel for each peptide, the linked residue is highlighted green.
 
 .. image:: /images/lorikeet-example-crosslink.png
 
 Looplink Spectrum
 ========================================
-Looplink peptides contain a crosslinker that has linked two residues in the single peptide. When calculating ion series, ProXL treats the sub-sequence
+Looplink peptides contain a crosslinker that has linked two residues in the single peptide. When calculating ion series, proxl treats the sub-sequence
 between the linked residues (inclusive) as a single unit, as cleavages between the linked residues would result in crosslinked peptides--not a looplinked
 peptide. As a result, a hypothetical b- and y-ion series for a looplinked peptide would look be as follows:
 

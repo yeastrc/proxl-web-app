@@ -114,7 +114,7 @@ the positions do not map to the PDB, they are never drawn or measured.
 
 .. image:: /images/structure-alignment-figure.png
 
-In ProXL, links that map to the
+In proxl, links that map to the
 structure on both ends are said to be "mappable". The distance report displays the number of mappable links
 from the experiment out of the total number of observed links. See :ref:`structure-distance-report-label` for
 more information.
@@ -127,10 +127,10 @@ Uploading PDB Files and Mapping Proteins
 
 Upload PDB File
 --------------------------------------
-A PDB file in ProXL is any file adhering to the `PDB file format <http://www.wwpdb.org/documentation/file-format>`_. These
+A PDB file in proxl is any file adhering to the `PDB file format <http://www.wwpdb.org/documentation/file-format>`_. These
 include public PDB files downloaded from the PDB database, or structures you have generated yourself using any number of programs--
 as long as they adhere to the PDB file format. The PDB file may contain structures for multiple proteins (such as for a protein complex).
-PDB files you upload to ProXL are only visible to members of the project with
+PDB files you upload to proxl are only visible to members of the project with
 which the data are associated. (If you enable public access on the project, the PDB file will be visible to public access users as well.)
 
 To upload a PDB file, click the "+Upload PDB File" link next to the PDB file pull-down menu above the viewer:
@@ -148,7 +148,7 @@ Enter a brief description for your PDB file and click "Upload PDB File." The PDB
 Map PDB Chains to Proteins
 ----------------------------------------
 In order to calculate distances or view crosslinking data on a 3D structure, it is necessary to first map proteins from the experiment to sequences present in a PDB file.
-(To learn more about how ProXL uses this mapping to find 3D positions, see :ref:`structure-mapping-residue-position-to-3D-label`.) The sequences in the PDB file do not need
+(To learn more about how proxl uses this mapping to find 3D positions, see :ref:`structure-mapping-residue-position-to-3D-label`.) The sequences in the PDB file do not need
 to be 100% matches to the protein sequences in your experiment, and may contain insertions or deletions. However, the quality of the reported distances and visualized
 links depends on the matches being close. It is also not necessary to map proteins to all chains in the PDB file.
 
@@ -365,7 +365,7 @@ four possibilities for where to draw the crosslink (each corresponding to a diff
 
 .. image:: /images/structure-oligomer-example1.png
 
-By default, ProXL will pick the shortest possibility and only draw that one:
+By default, proxl will pick the shortest possibility and only draw that one:
 
 .. image:: /images/structure-oligomer-example2.png
 
@@ -413,10 +413,10 @@ experimental protein. To learn more about this mapping, see :ref:`structure-mapp
 
 Total UDRs
 -------------------------
-UDR stands for "unique distance restraint." In ProXL, this is the name for a distinct position in a
+UDR stands for "unique distance restraint." In proxl, this is the name for a distinct position in a
 protein linked to a distinct position in the same or another protein. This section of the distance
 report reports the total number of such UDRs present in the data, and how many of those are mappable
-to the structure. To learn more about what "mappable" means or about how ProXL maps protein
+to the structure. To learn more about what "mappable" means or about how proxl maps protein
 positions to PDB structure, see :ref:`structure-mapping-residue-position-to-3D-label`.
 
 Shown links
@@ -435,6 +435,22 @@ drawn crosslinks and/or looplinks will be listed in the table.
 
 Each row may be clicked on (or tapped on touch devices) to view the underlying peptides, PSMs, and
 spectra. See :ref:`structure-click-on-links-label` for more information.
+
+
+Download Reports
+-----------------------------
+At the bottom of the "Distance Report" panel is "Download reports". Click on the name of the report to initiate a download.
+
+.. image:: /images/download-reports.png
+
+Available reports are:
+
+    * Protein Position to PDB Mapping - A tab-delimited file showing the pair-wise mapping of the protein sequences in the experiment to the PDB file.
+    * All shown UDRs - A tab-delimited report of all currently-displayed UDRs, showing protein positions, distances, and PSM/peptide scoring statistics.
+    * PSMs for all shown UDRs - A tab-delimited report of all PSMs for all currently-displayed UDRs, including scoring statistics for those PSMs.
+    * All possible UDRs (all possible points on structure) - A tab-delimited report of all theoretically possible cross-links on the structure, given the cross-linker that was used.
+    * All possible UDRs (shortest-only) - A tab-delimited report of all possible cross-links on the structure, given the cross-linker that was used. Only the shortest cross-link for each unique protein pair and position is reported. This is useful when proteins appear more than once in the structure.
+
 
 Viewer Options
 ============================
@@ -541,14 +557,14 @@ To change the PSM-level filters, first click the pencil icon next to "PSM Filter
 .. image:: /images/filter-change-psm-filter1.png
 
 This opens an overlay with the containing the possible score types to use as PSM filters for this search. To change
-the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+the cutoff values to be used for any of these score types, enter the value next to the score type. proxl will correctly
 handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
 
 .. image:: /images/filter-change-psm-filter2.png
 
 To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
 
-The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the proxl XML file uploaded
 to the database. This typically represents the suggested cutoffs by the author of the respective search program.
 
 *Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
@@ -568,14 +584,14 @@ To change the peptide-level filters, first click the pencil icon next to "Peptid
 .. image:: /images/filter-change-peptide-filter1.png
 
 This opens an overlay with the containing the possible score types to use as peptide-level filters for this search. To change
-the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+the cutoff values to be used for any of these score types, enter the value next to the score type. proxl will correctly
 handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
 
 .. image:: /images/filter-change-peptide-filter2.png
 
 To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
 
-The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the proxl XML file uploaded
 to the database. This typically represents the suggested cutoffs by the author of the respective search program.
 
 *Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking

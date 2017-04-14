@@ -79,9 +79,9 @@ Alternatively, click "Cancel" to cancel the process.
 
 For New Users
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-To invite a new user to ProXL and provide them access to this project, type in their
+To invite a new user to proxl and provide them access to this project, type in their
 email address and click "Invite User". They will receive an email with a link for
-creating an account in ProXL and this project will appear in their project list. New
+creating an account in proxl and this project will appear in their project list. New
 users invited to the project will appear as:
 
 .. image:: /images/project-overview-invite-user4.png
@@ -95,7 +95,7 @@ Click the red (X) icon to the left of a listed user to remove that user from thi
 project. That user will immediately lose access to the project and its associated
 data. This will not remove existing users, only revoke their access to this project.
 For invited email addresses, this will invalidate the access code included in the
-invitation email and they will not be able to use it to create a ProXL account.
+invitation email and they will not be able to use it to create a proxl account.
 
 Promote or Demote User
 --------------------------
@@ -124,7 +124,7 @@ Some important notes about the public access section:
 Enable or Disable Public Access
 --------------------------------
 Enabling public access allows access to the data without requiring that users
-have ProXL accounts. Clicking "Enable Public Access" enables public access and changes
+have proxl accounts. Clicking "Enable Public Access" enables public access and changes
 the display of this section to indicate that public access is enabled.
 
 .. image:: /images/project-overview-public-access2.png
@@ -177,9 +177,9 @@ to see all information about all searches.)
 
 Search information includes the following information for each search:
 
-	* Path - The path the data were in when imported into ProXL.
+	* Path - The path the data were in when imported into proxl.
 	* Linker - the crosslinker(s) used in this experiment
-	* Upload - the date the data were uploaded to ProXL
+	* Upload - the date the data were uploaded to proxl
 	* QC Plots - links to a retention time QC plot. See below.
 	* Raw MS data files - Links to RAW files that contain the raw machine output for this experiment. Project owners may add URL links to RAW files by clicking [+Link to Raw file]. 
 	* Additional files - Links to additional files associated with this search, such as the configuration or parameters files for the respective search program.

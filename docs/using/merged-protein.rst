@@ -27,6 +27,37 @@ protein database is redundant in terms of homologous proteins or proteoforms or 
 peptides are mapping to many proteins. The filtering options described below are meant to
 help eliminate this redundancy in reported proteins.
 
+General Options
+============================
+
+Change Searches
+---------------------
+.. image:: /images/merged-protein-page-change-searches-link.png
+
+The "Change searches" link allows the user to change which searches are currently being displayed. Clicking the link causes the following overlay to be displayed:
+
+.. image:: /images/change-searches-overlay.png
+
+Select or de-select searches by clicking on them in the list. Once done, click "Change" to update the page with the new data or "Cancel" to close the overlay.
+
+
+Update From Database
+---------------------
+.. image:: /images/filter-update-from-database-merged-protein.png
+
+If the user changes any filter parameters--such as PSM/peptide score cutoffs--this button must be clicked to reflect the new filter choices.
+
+Share Page
+--------------------
+.. image:: /images/merged-protein-page-button-share-page.png
+
+Clicking the "Share Page" button will generate a shortcut URL for viewing the current page. The shortened URL will appear in an overlay as:
+
+.. image:: /images/share-page-overlay.png
+
+Copying and sharing the highlighted URL will direct users to the view of the page when the URL was generated. Note that this
+URL does not grant access to the page to any user that would not otherwise have access.
+
 Search List
 =========================
 The list of merged searches is presented below the top navigation. Each search
@@ -39,7 +70,7 @@ Search Details
 The "Path" is the location on disk from which the data were imported. The "Linker" is the
 name of the crossinker used in the experiment. "Search Program(s)" is the name and
 version number of the PSM search software used. "Upload date" is the date the data were
-uploaded into ProXL. "FASTA file" is the name of the FASTA file used to perform the
+uploaded into proxl. "FASTA file" is the name of the FASTA file used to perform the
 PSM search.
 
 Search Filter
@@ -53,31 +84,32 @@ The filters to apply at the PSM level. Only results which have at least one PSM 
 critiera will be listed. When listing PSMs associated with peptides, only PSMs that meet all of the selected
 critiera will be listed.
 
-To change the PSM-level filters, first click the pencil icon next to "PSM Filters":
+To change the PSM-level filters, first click the pencil icon next to "PSM Filters" or the filter tag:
 
 .. image:: /images/filter-change-psm-filter-merged.png
 
 This opens an overlay with the containing the possible score types to use as PSM filters for this search. To change
-the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+the cutoff values to be used for any of these score types, enter the value next to the score type. proxl will correctly
 handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
 
 .. image:: /images/filter-change-psm-filter2.png
 
 To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
 
-The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the proxl XML file uploaded
 to the database. This typically represents the suggested cutoffs by the author of the respective search program.
 
 *Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
 the "Save" button, you must click the "Update" button on the page to apply any new PSM- or peptide-level
 filters.
 
-.. image:: /images/filter-update-from-database-merged.png
+.. image:: /images/filter-update-from-database-merged-protein.png
 
 
 Peptide Filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The filters to apply at the peptide level. Only results which have at least one peptide that meets all of the selected
+Some search algorithms, such as Percolator, provide statistics at the peptide level that may be used for filtering.
+If applicable, peptide-level filtering options may be set here. Only results which have at least one peptide that meets all of the selected
 critiera will be listed.
 
 To change the peptide-level filters, first click the pencil icon next to "Peptide Filters":
@@ -85,21 +117,21 @@ To change the peptide-level filters, first click the pencil icon next to "Peptid
 .. image:: /images/filter-change-peptide-filter-merged.png
 
 This opens an overlay with the containing the possible score types to use as peptide-level filters for this search. To change
-the cutoff values to be used for any of these score types, enter the value next to the score type. ProXL will correctly
+the cutoff values to be used for any of these score types, enter the value next to the score type. proxl will correctly
 handle scores for which larger values are more significant or scores for which smaller values are more signiciant.
 
 .. image:: /images/filter-change-peptide-filter2.png
 
 To save the new values to the page, click the "Save" button. To cancel, click "Cancel".
 
-The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the ProXL XML file uploaded
+The "Reset to Defaults" button will reset the cutoff values to the defaults specified by the proxl XML file uploaded
 to the database. This typically represents the suggested cutoffs by the author of the respective search program.
 
 *Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
 the "Save" button, you must click the "Update" button on the page to apply any new PSM- or peptide-level
 filters.
 
-.. image:: /images/filter-update-from-database-merged.png
+.. image:: /images/filter-update-from-database-merged-protein.png
 
 Filter Data
 =========================
@@ -162,7 +194,7 @@ the number of rows in the table.
 Download UDRs
 =========================
 UDR stands for "unique distance restraint", which takes its name from 3D modelling
-terminology. A UDR, in ProXL, is any specific position in a protein linked to a
+terminology. A UDR, in proxl, is any specific position in a protein linked to a
 specific position in another protein, whether it is a crosslink or a looplink. The
 [Download UDRs (#)] link downloads a non-redundant tab-delimited text table of these UDRs consolidated
 from the crosslinks and looplinks. The # is the number of UDRs.
