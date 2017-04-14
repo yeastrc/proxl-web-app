@@ -251,7 +251,7 @@ Use the links to the right of the search names (in red box above) to view the da
 
 	* **Peptides** - Provides a table view of the identified peptides and associated data. See :doc:`peptide` for more details.
 	* **Proteins** - Provides a table view of the crosslinks and looplinks at the protein level. See :doc:`protein` for more details.
-	* **Image** - Provides a graphical view of the data where proteins are represented as proportionately-sized bars that are annotated with link locations within and between proteins in the context of sequence annotation data. See :doc:`image` for more details.
+	* **Image** - Provides a graphical view of the data where proteins are represented as proportionately-sized bars that are annotated with link locations within and between proteins in the context of sequence annotation data. See :doc:`image-bar` for more details.
 	* **Structure** - Provides a view of crosslinking data on 3D protein structures, including an interface for uploading PDB files and mapping sequences from the FASTA file onto those PDB files using pairwise sequence alignment. See :doc:`structure` for more details. 
 
 
@@ -261,7 +261,7 @@ Proxl allows for comparing and contrasting multiple searches, even if those sear
 to this as merging data. To merge data from multiple searches, click the check boxes to the left of the searches of interest and click either
 "View Merged Peptides", "View Merged Proteins", "View Merged Image", or "View Merged Structure."
 
-For more information please see: :doc:`/using/merged-peptide`, :doc:`/using/merged-protein`, :doc:`/using/image`, and :doc:`/using/structure`.
+For more information please see: :doc:`/using/merged-peptide`, :doc:`/using/merged-protein`, :doc:`/using/image-bar`, and :doc:`/using/structure`.
 
 
 Copy Searches
@@ -276,7 +276,18 @@ Projects to which you have permission to copy data are listed. Click on the proj
 Copied searches are treated independently with regards to the search name, comments, and other search metadata. For example, adding
 a comment or changing the name of the search in the new project will not affect the original search's name or comments.
 
-The "Move the searches to the new project" option will remove the search(es) from this project when copying to the new project.
+
+Move Searches
+--------------------------------
+Project owners may move searches to a different project (where they must also be an owner). To move data,
+check the checkbox to the left of the search name(s) you wish to copy and click the "Move Searches"
+button above the search list to see the following dialogue:
+
+.. image:: /images/move-searches.png
+
+Projects to which you have permission to copy data are listed. Click on the project name to which the searches should be copied.
+Moving a search will remove it from the current project and place it in the new project.
+
 
 Organize Searches
 --------------------------------

@@ -88,6 +88,40 @@ filters.
 
 .. image:: /images/filter-update-from-database-merged.png
 
+
+General Options
+============================
+
+Change Searches
+---------------------
+.. image:: /images/merged-peptide-page-change-searches-link.png
+
+The "Change searches" link allows the user to change which searches are currently being displayed. Clicking the link causes the following overlay to be displayed:
+
+.. image:: /images/change-searches-overlay.png
+
+Select or de-select searches by clicking on them in the list. Once done, click "Change" to update the page with the new data or "Cancel" to close the overlay.
+
+
+Update From Database
+---------------------
+.. image:: /images/filter-update-from-database-merged.png
+
+If the user changes any filter parameters--such as PSM/peptide score cutoffs--this button must be clicked to reflect the new filter choices.
+
+
+Share Page
+--------------------
+.. image:: /images/merged-peptide-page-button-share-page.png
+
+Clicking the "Share Page" button will generate a shortcut URL for viewing the current page. The shortened URL will appear in an overlay as:
+
+.. image:: /images/share-page-overlay.png
+
+Copying and sharing the highlighted URL will direct users to the view of the page when the URL was generated. Note that this
+URL does not grant access to the page to any user that would not otherwise have access.
+
+
 Filter Data
 =========================
 

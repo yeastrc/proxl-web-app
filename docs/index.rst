@@ -23,7 +23,7 @@ Here you will find documentation for both using and installing proxl locally.
    using/intro
    using/project
    using/upload_data
-   using/image
+   using/image-bar
    using/structure
    using/peptide
    using/merged-peptide

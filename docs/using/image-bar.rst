@@ -12,8 +12,8 @@ highly interactive and contains many options for customization (see below).
 Viewer Basics
 ==================
 
-URL Captures State
---------------------
+URL Captures State of Page
+-------------------------------
 The URL of the page is dynamically updated at all times to reflect the complete state of
 the viewer--including filter parameters, protein bar positions, and all viewer options.
 As such, the URL may be bookmarked or shared to link to a viewer with the same content
@@ -22,13 +22,48 @@ For complicated visualizations, this is a convenient
 way to save and share you work. (Note, this link only works for other users who are listed
 on this project unless public access is enabled.)
 
+Change Searches
+---------------------
+.. image:: /images/change-searches-link.png
+
+The "Change searches" link allows the user to change which searches are currently being displayed. None of the other options
+on the page (such as viewer settings) will be changed, only the searches from which data are displayed. Clicking the link causes the following overlay to be displayed:
+
+.. image:: /images/change-searches-overlay.png
+
+Select or de-select searches by clicking on them in the list. Once done, click "Change" to update the page with the new data or "Cancel" to close the overlay.
+
+
+Update From Database
+---------------------
+.. image:: /images/button-update-from-database.png
+
+If the user changes any filter parameters--such as PSM/peptide score cutoffs, link type exclusions, protein exclusions, or taxonomic
+exclusions--this button must be clicked to reflect the new filter choices.
+
 Save as Default
 --------------------
+.. image:: /images/button-save-as-default.png
+
 Project owners may click "Save as Default" to save the current URL (see above) as the default
 view of the "Image View" for this project. This default view will be populated with the same
 proteins, positions, and viewer options as when the button is clicked. This is a convenient
 way to share data with collaborators or the public that does not require that they
 manipulate the image viewer to see the data.
+
+
+Share Page
+--------------------
+.. image:: /images/button-share-page.png
+
+Clicking the "Share Page" button will generate a shortcut URL for viewing the current page, including all viewer settings, filter options,
+and so forth. The shortened URL will appear in an overlay as:
+
+.. image:: /images/share-page-overlay.png
+
+Copying and sharing the highlighted URL will direct users to the view of the page when the URL was generated. Note that this
+URL does not grant access to the page to any user that would not otherwise have access.
+
 
 Viewer Display
 --------------------

@@ -26,6 +26,48 @@ version number of the PSM search software used. "Upload date" is the date the da
 uploaded into ProXL. "FASTA file" is the name of the FASTA file used to perform the
 PSM search.
 
+General Options
+============================
+
+Change Searches
+---------------------
+.. image:: /images/peptide-page-change-searches-link.png
+
+The "Change searches" link allows the user to change which searches are currently being displayed. Clicking the link causes the following overlay to be displayed:
+
+.. image:: /images/change-searches-overlay.png
+
+Select or de-select searches by clicking on them in the list. Once done, click "Change" to update the page with the new data or "Cancel" to close the overlay.
+
+
+Update From Database
+---------------------
+.. image:: /images/peptide-page-button-update.png
+
+If the user changes any filter parameters--such as PSM/peptide score cutoffs--this button must be clicked to reflect the new filter choices.
+
+Save as Default
+--------------------
+.. image:: /images/peptide-page-button-save-as-default.png
+
+Project owners may click "Save as Default" to save the current URL as the default
+view of the "Peptide View" for this project. This default view will be populated with the same
+options as when the button is clicked. This is a convenient
+way to share data with collaborators or the public that does not require that they
+manipulate the image viewer to see the data.
+
+
+Share Page
+--------------------
+.. image:: /images/peptide-page-button-share-page.png
+
+Clicking the "Share Page" button will generate a shortcut URL for viewing the current page. The shortened URL will appear in an overlay as:
+
+.. image:: /images/share-page-overlay.png
+
+Copying and sharing the highlighted URL will direct users to the view of the page when the URL was generated. Note that this
+URL does not grant access to the page to any user that would not otherwise have access.
+
 Filter Data
 =========================
 The data presented may be filtered according to the following criteria. Note: Only peptides
@@ -53,7 +95,7 @@ The "Reset to Defaults" button will reset the cutoff values to the defaults spec
 to the database. This typically represents the suggested cutoffs by the author of the respective search program.
 
 *Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
-the "Save" button, you must click the "Update From Database" button on the page to apply any new PSM- or peptide-level
+the "Save" button, you must click the "Update" button on the page to apply any new PSM- or peptide-level
 filters.
 
 .. image:: /images/filter-update-from-database.png
@@ -80,7 +122,7 @@ The "Reset to Defaults" button will reset the cutoff values to the defaults spec
 to the database. This typically represents the suggested cutoffs by the author of the respective search program.
 
 *Important*: It is necessary to update the data on the page after changing filter cutoff values. After clicking
-the "Save" button, you must click the "Update From Database" button on the page to apply any new PSM- or peptide-level
+the "Save" button, you must click the "Update" button on the page to apply any new PSM- or peptide-level
 filters.
 
 .. image:: /images/filter-update-from-database.png
@@ -92,14 +134,11 @@ Only peptides of the checked type(s) will be returned. Proxl defines the types a
 
 	* crosslink - A pair of peptides linked by a crosslinker.
 	* looplink - A single peptide with two residues linked by a crosslinker.
-	* monolink - A peptide containing at least one linked residue, where the other end of the linker is unlinked.
 	* unlinked - The peptide without a crosslinker on any residue.
 
 Checking multiple boxes will include any peptide that has at least one of the checked types.
 I.e., checking 'crosslinks' and 'looplinks' will only include peptides that are either
 crosslinks or looplinks. Only checking 'crosslinks' will only return crosslinked peptides.
-The 'monolinks' type will include any peptides that contain a monolink.
-
 
 Modification filter
 -------------------------
