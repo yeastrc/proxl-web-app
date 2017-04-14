@@ -183,9 +183,12 @@ var HASH_OBJECT_PROPERTIES = {
 		"selected-proteins" : "x",
 		"color_by" : "y",
 		"annTypeIdDisplay" : "z",
+		
+		//  For future additions, please continue the single character approach instead of using mnemonic or acronym
+		
 		"user_circle_diameter" : "ucd",
 		"index-manager-data" : "imd",
-		"version-number" : "vn",
+		"version-number" : "vn"
 };
 
 /**
@@ -222,11 +225,15 @@ var hashObjectManager = {
 
 //   Objects of classes that have their own code
 
-var _imageProteinBarDataManager = ImageProteinBarDataManagerContructor();
-var _proteinBarRegionSelectionsOverlayCode = ProteinBarRegionSelectionsOverlayCodeContructor( { imageProteinBarDataManager : _imageProteinBarDataManager });
 var _indexManager = new indexManager();
 var _circlePlotViewer = new circlePlotViewer();
 var _colorManager = new ColorManager();
+var _imageProteinBarDataManager = ImageProteinBarDataManagerContructor();
+
+var _proteinBarRegionSelectionsOverlayCode = ProteinBarRegionSelectionsOverlayCodeContructor( { 
+	imageProteinBarDataManager : _imageProteinBarDataManager,
+	indexManager : _indexManager 
+} );
 
 //   General
 var _testThatCanGetSVGasString = true;
@@ -239,7 +246,6 @@ var _proteins;
 var _proteinSequences = {};
 var _proteinSequenceTrypsinCutPoints = {};
 var _proteinTaxonomyIds = {};
-var _proteinLengths;
 
 var _proteinLengths = {
 		_proteinLengthsInternal : {},
@@ -5329,7 +5335,7 @@ function initPage() {
 	console.log( "Initializing the page." );
 	// convert old JSON
 	console.log( "\tPerforming necessary legacy JSON updates." );
-	var _legacyJSONUpdater = new legacyJSONUpdater();
+	var _legacyJSONUpdater = new LegacyJSONUpdater();
 	if( _legacyJSONUpdater.convertLegacyJSON() ) {
 		return;
 	}
@@ -5337,9 +5343,7 @@ function initPage() {
 	populateIndexManagerFromHash();
 	populateAnnotationDataDisplayProcessingCommonCodeFromHash();
 	proteinAnnotationStore.init();
-	//  Set up nag overlay for text for Merged Image page
-	$("#nag_update_button_other_pages").hide();
-	$("#nag_update_button_merged_image_page").show();
+
 	if ( Modernizr && ! Modernizr.svg ) {  //  Modernizr.svg is false if SVG not supported
 		console.log( "SVG not supported." );
 		throw Error( "SVG not supported" );
@@ -5358,6 +5362,7 @@ function initPage() {
 		}
 		_projectSearchIds.push( projectSearchId );
 	});
+	
 	var json = getJsonFromHash();
 	if ( json === null ) {
 		$("#invalid_url_no_data_after_hash_div").show();

@@ -438,6 +438,10 @@ public class ProjectCopySearchesService {
 						.build()
 						);
 			}
+
+			////////   Auth complete
+			//////////////////////////////////////////
+
 			for( int projectSearchId : searchesToCopyToOtherProject ) {
 				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 				if ( search == null ) {

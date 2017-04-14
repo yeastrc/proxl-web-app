@@ -2,7 +2,7 @@
  * Encapsulate code used to update legacy JSON to current standards
  */
 
-var legacyJSONUpdater = function() {
+var LegacyJSONUpdater = function() {
 
 };
 
@@ -12,7 +12,7 @@ var legacyJSONUpdater = function() {
  * 
  * @return true if an async web services call has been made and initPage() should not proceed until finished
  */
-legacyJSONUpdater.prototype.convertLegacyJSON = function() {
+LegacyJSONUpdater.prototype.convertLegacyJSON = function() {
 
 	var json = getRawJsonFromHash();
 	var version = getJSONVersionNumber();
@@ -37,7 +37,7 @@ legacyJSONUpdater.prototype.convertLegacyJSON = function() {
 	
 	if( !version || version <= 1 ) {
 	
-		json.vn = 1;
+		json[ HASH_OBJECT_PROPERTIES["version-number"] ] /* json.vn */ = 1;
 		updateURLHashWithJSONObject( json );
 		
 		if( json[ "selected-proteins" ] ) {
@@ -110,7 +110,7 @@ legacyJSONUpdater.prototype.convertLegacyJSON = function() {
  * 
  * @param params The params sent from the ajax call
  */
-legacyJSONUpdater.prototype.convertProteinBarDataCallback = function( params ) {
+LegacyJSONUpdater.prototype.convertProteinBarDataCallback = function( params ) {
 	
 	var json = getRawJsonFromHash();
 	var proteinIdsMapping = params[ "proteinIdsMapping" ];
@@ -144,7 +144,7 @@ legacyJSONUpdater.prototype.convertProteinBarDataCallback = function( params ) {
  * @param proteinBarData the protein bar data object containing nrseq ids
  * @return An array of nrseq protein ids
  */
-legacyJSONUpdater.prototype.getNrseqProteinArrayFromProteinBarData = function( proteinBarData ) {
+LegacyJSONUpdater.prototype.getNrseqProteinArrayFromProteinBarData = function( proteinBarData ) {
 	
 	var nrseqIds = [ ];
 	
@@ -168,7 +168,7 @@ legacyJSONUpdater.prototype.getNrseqProteinArrayFromProteinBarData = function( p
  * @param proteinBarData The object containing the old-style protein data bar data
  * @param ajaxResults The results of the ajax call to do the nrseq -> protein sequence id lookup (if it was necessary)
  */
-legacyJSONUpdater.prototype.convertProteinBarDataToIndexManager = function( json, proteinBarData, ajaxResults ) {
+LegacyJSONUpdater.prototype.convertProteinBarDataToIndexManager = function( json, proteinBarData, ajaxResults ) {
 		
 	var imdata = [ ];		// the index manager data
 	var pbdata = { };
@@ -194,7 +194,6 @@ legacyJSONUpdater.prototype.convertProteinBarDataToIndexManager = function( json
 		pbdata[ uid ] = item;
 	}
 	
-	
 	json[ HASH_OBJECT_PROPERTIES["protein_bar_data"] ] = pbdata;
 	json[ HASH_OBJECT_PROPERTIES["index-manager-data"] ] = imdata;
 	
@@ -204,15 +203,12 @@ legacyJSONUpdater.prototype.convertProteinBarDataToIndexManager = function( json
 	if( ajaxResults ) {
 		initPage();
 	}
-	
 };
-
-
 
 /**
  * Return true if the protein bar data json contains nrseq ids
  */
-legacyJSONUpdater.prototype.proteinBarDataContainsNrSeqIds = function( ob ) {
+LegacyJSONUpdater.prototype.proteinBarDataContainsNrSeqIds = function( ob ) {
 	
 	if( ob.length < 1 ) { return false; }
 	
@@ -227,8 +223,7 @@ legacyJSONUpdater.prototype.proteinBarDataContainsNrSeqIds = function( ob ) {
 	
 	console.log( item );
 	throw Error( "Got aberrant entry for protein bar data object." );
-	
-};
+	};
 
 
 
@@ -243,7 +238,7 @@ legacyJSONUpdater.prototype.proteinBarDataContainsNrSeqIds = function( ob ) {
  * properties that are nrseq protein ids and values that are new protein
  * sequence ids.
  */
-legacyJSONUpdater.prototype.convertSelectedProteinsJSON = function( params ) {
+LegacyJSONUpdater.prototype.convertSelectedProteinsJSON = function( params ) {
 	
 	var json = getRawJsonFromHash();
 	var proteinIdsMapping = params[ "proteinIdsMapping" ];
@@ -256,20 +251,15 @@ legacyJSONUpdater.prototype.convertSelectedProteinsJSON = function( params ) {
 	var nrseqIds = json[ 'selected-proteins' ];
 
 	for( var i = 0; i < nrseqIds.length; i++ ) {
-		
 		var nrseqId = nrseqIds[ i ];
 		var pid = proteinIdsMapping[ nrseqId ];
 		var uid = _indexManager.addProteinId( pid );
-		
-		
 		// populate the protein bar data manager
 		this.convertProteinHashDataPre_protein_bar_data( json, uid, nrseqId );
-		
 	}
 	
-	
-	json[ 'imd' ] = _indexManager.getProteinArray();
-	json[ 'w' ] = _imageProteinBarDataManager.getObjectsForHash();
+	json[ HASH_OBJECT_PROPERTIES[ "index-manager-data" ] /* 'imd' */ ] = _indexManager.getProteinArray();
+	json[ HASH_OBJECT_PROPERTIES[ "protein_bar_data" ] /* 'w' */ ] = _imageProteinBarDataManager.getObjectsForHash();
 	
 	delete json[ 'selected-proteins' ];
 	delete json[ 'protein-offsets' ];
@@ -290,32 +280,23 @@ legacyJSONUpdater.prototype.convertSelectedProteinsJSON = function( params ) {
  * @param uid The unique id from the index manager
  * @param The old nrseq id that corresponds to this uid
  */
-legacyJSONUpdater.prototype.convertProteinHashDataPre_protein_bar_data = function( json, uid, nrseqId ) {
+LegacyJSONUpdater.prototype.convertProteinHashDataPre_protein_bar_data = function( json, uid, nrseqId ) {
 
 	//  Backwards compatibility Support	
 		
 	var newEntry = ImageProteinBarData.constructEmptyImageProteinBarData();
 	_imageProteinBarDataManager.addEntry( uid, newEntry );
 
-
 	var highlightedProteins = json['highlighted-proteins'];  //   Array of the indexes of the highlighted proteins
 
 	if ( highlightedProteins ) {
 		for ( var highlightedProteinsIndex = 0; highlightedProteinsIndex < highlightedProteins.length; highlightedProteinsIndex++ ) {
-
 			var highlightedProteinProteinBarPositionIndex = highlightedProteins[ highlightedProteinsIndex ];
-
 			try {
-
 				//  Try/Catch since the index may not be valid
-
 				var entry = _imageProteinBarDataManager.getItemByIndex( highlightedProteinProteinBarPositionIndex );
-
 				entry.setProteinBarHighlightedAll();
-
 			} catch ( e ) {
-
-
 			}
 		}
 	}			
@@ -325,59 +306,39 @@ legacyJSONUpdater.prototype.convertProteinHashDataPre_protein_bar_data = functio
 	var proteinsReversedObject = json['proteins-reversed'];  
 
 	if ( proteinsReversedObject !== undefined && proteinsReversedObject !== null ) {
-
 		var proteinsReversedKeys = Object.keys( proteinsReversedObject );
-
 		for ( var proteinsReversedKeysIndex = 0; proteinsReversedKeysIndex < proteinsReversedKeys.length; proteinsReversedKeysIndex++ ) {
-
 			var reversedProtein_Key = proteinsReversedKeys[ proteinsReversedKeysIndex ];
-
 			var reversedProtein_Value = proteinsReversedObject[ reversedProtein_Key ];
-
 			if ( reversedProtein_Value ) {
-
 				//  value is true so this protein id is reversed
-
 				var reversedProtein_ProteinId = reversedProtein_Key;
-
 				if( reversedProtein_ProteinId == nrseqId ) {
 					var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByUID( uid );
 					imageProteinBarDataEntry.setProteinReversed( { proteinReversed : true } );
 				}
-				
 			}
 		}
 	}
-
-
 
 //	Object. Property keys are nrseq protein ids.  Value are from the left edge
 
 	var proteinsOffsetsObject = json['protein-offsets'];  
 
 	if ( proteinsOffsetsObject !== undefined && proteinsOffsetsObject !== null ) {
-
 		var proteinsOffsetsKeys = Object.keys( proteinsOffsetsObject );
-
 		for ( var proteinsOffsetsKeysIndex = 0; proteinsOffsetsKeysIndex < proteinsOffsetsKeys.length; proteinsOffsetsKeysIndex++ ) {
-
 			var offsetProtein_Key = proteinsOffsetsKeys[ proteinsOffsetsKeysIndex ];
 			var offsetProtein_Value = proteinsOffsetsObject[ offsetProtein_Key ];
 
 			if ( offsetProtein_Value !== undefined && offsetProtein_Value !== null ) {
-
 				//  value is a number so use it
-
 				var offsetProtein_ProteinId = offsetProtein_Key;
-
 				if( offsetProtein_ProteinId == nrseqId ) {
 					var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByUID( uid );
 					imageProteinBarDataEntry.setProteinOffset( { proteinOffset : offsetProtein_Value } );
 				}
-				
 			}
 		}
 	}
-
-	
 };

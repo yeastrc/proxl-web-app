@@ -108,18 +108,18 @@ public class ProjectSearchDAO {
 	
 	/**
 	 * Update the display_order associated with this search
-	 * @param searchId
+	 * @param projectSearchId
 	 * @param newDisplayOrder
 	 * @throws Exception
 	 */
-	public void updateDisplayOrderForSearch( int searchId, int newDisplayOrder, Connection dbConnection ) throws Exception {
+	public void updateDisplayOrderForProjectSearch( int projectSearchId, int newDisplayOrder, Connection dbConnection ) throws Exception {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		String sql = "UPDATE project_search SET search_display_order = ? WHERE id = ?";
 		try {
 			pstmt = dbConnection.prepareStatement( sql );
 			pstmt.setInt( 1, newDisplayOrder );
-			pstmt.setInt( 2, searchId );
+			pstmt.setInt( 2, projectSearchId );
 			pstmt.executeUpdate();
 		} catch ( Exception e ) {
 			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );

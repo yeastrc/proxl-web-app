@@ -17,8 +17,11 @@ public class MoveProjectSearchIdToNewProjectUsingDBTransactionService {
 	private static MoveProjectSearchIdToNewProjectUsingDBTransactionService _INSTANCE = new MoveProjectSearchIdToNewProjectUsingDBTransactionService();
 	public static MoveProjectSearchIdToNewProjectUsingDBTransactionService getInstance() { return _INSTANCE; }
 	
+	private static final int DISPLAY_ORDER_NO_ORDER = 0;
+	
 	/**
 	 * For each entry in projectSearchIdList, if it isn't in the new project, move it to the new project
+	 * Set search_display_order to 0 to reset it.
 	 * @param projectSearchIdList
 	 * @param newProjectId
 	 * @param moveAllSearches - if true, move those already in new project
@@ -41,6 +44,8 @@ public class MoveProjectSearchIdToNewProjectUsingDBTransactionService {
 				}
 				if ( moveSearch ) {
 					ProjectSearchDAO.getInstance().updateProjectIdForProjectSearch( projectSearchId, newProjectId, dbConnection );
+					// Clear display order so moved searches (project_search records) appear at the top or according to project_search.id order
+					ProjectSearchDAO.getInstance().updateDisplayOrderForProjectSearch( projectSearchId, DISPLAY_ORDER_NO_ORDER, dbConnection);
 					//  Remove folder mapping record related to old project, if it exists
 					FolderProjectSearchDAO.getInstance().delete( projectSearchId );
 				}
