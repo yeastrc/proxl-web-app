@@ -30,7 +30,7 @@ public class UpdateSearchDisplayOrderUsingDBTransactionService {
 			int newDisplayOrder = 0;
 			for ( int searchId : searchIdList ) {
 				newDisplayOrder++;  //  increment for each search id
-				projectSearchDAO.updateDisplayOrderForSearch( searchId, newDisplayOrder, dbConnection );
+				projectSearchDAO.updateDisplayOrderForProjectSearch( searchId, newDisplayOrder, dbConnection );
 			}
 			dbConnection.commit();
 		} catch ( Exception e ) {
