@@ -5816,24 +5816,12 @@ function initPage() {
 
 	populateAnnotationDataDisplayProcessingCommonCodeFromHash();
 	
-	
-	
 	console.log( "Initializing the page." );
 	
-	
-	
-	//  Set up nag overlay for text for Merged Image page
-	
-	$("#nag_update_button_other_pages").hide();
-	$("#nag_update_button_merged_image_page").show();
-		
-
 	if ( Modernizr && ! Modernizr.svg ) {  //  Modernizr.svg is false if SVG not supported
 		console.log( "SVG not supported." );
 		throw Error( "SVG not supported" );
 	}
-	
-
 	
 	_projectSearchIds = [];
 	

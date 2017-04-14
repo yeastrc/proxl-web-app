@@ -1,33 +1,45 @@
+/**
+ * crosslink-image-viewer-per-protein-bar-data.js
+ * 
+ * Javascript for the viewMergedImage.jsp page
+ * 
+ * This file holds javascript for per protein bar data.  
+ * 
+ * This file also handles protein bar highlighting/selecting and de-selecting
+ *  
+ * !!! The following global variables from "crosslink-image-viewer.js" are used in this file:
+ * 
+ * 	  _indexManager
+ *    _proteinLengths
+ */
 
-//  crosslink-image-viewer-per-protein-bar-data.js
-
-//  Javascript for the viewMergedImage.jsp page
-
-
-//   This file holds javascript for per protein bar data.   
-
-//   This is a work in progress so it doesn't hold all the data yet 
-
-//   This file also handles protein bar highlighting/selecting and de-selecting
-//////////////////////////////////
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
+
 ////////////////////////////
 //   All references to proteinId or protein_id are actually referencing the protein sequence id
 ////////////////////////////
 
 /////     Protein Bar Data Manager
 
-//   Constructor
+/**
+ * Constructor
+ */
 var ImageProteinBarDataManager = function() {
 	this.barData = { };
 };
 
+/**
+ * Function that returns a new object using Constructor ImageProteinBarDataManager()
+ */
 var ImageProteinBarDataManagerContructor = function() { 
 	
 	return new ImageProteinBarDataManager();
 };
-		
+
+/**
+ * 
+ */
 ImageProteinBarDataManager.prototype.addEntry = function( uid, entry ) {
 	
 		if ( entry ) {
@@ -184,8 +196,10 @@ ImageProteinBarDataManager.prototype.addToAllProteinOffsets = function( params )
 	}
 };
 
+//    Highlighted Protein bars
+
 /**
- * Highlighted Protein bars
+ * Is Any Protein bars Highlighted
  */
 ImageProteinBarDataManager.prototype.isAnyProteinBarsHighlighted = function(  ) {
 	var keys = Object.keys( this.getAllItems() );
@@ -587,13 +601,19 @@ ImageProteinBarData.prototype.setProteinBarHighlightedRegion = function( params 
 };
 
 /**
- * Add to existing highlighted values.   No optimization yet to set this.proteinBarHighlightedAll if whole sequence is selected
+ * Add to existing highlighted values.
+ * 
+ * Calls this._if_WholeBarHighlighted_SwitchTo_proteinBarHighlightedAll() at end of this function
  */
 ImageProteinBarData.prototype.addProteinBarHighlightedRegion = function( params ) {
 	var start = params.start;
 	var end = params.end;
-	if ( start > this.getProteinLength() ) {
+	var proteinLength = this.getProteinLength();
+	if ( start > proteinLength ) {
 		//  start is not within the protein bar so don't add
+		console.log("addProteinBarHighlightedRegion(...): region start > proteinLength so ignoring protein region. "
+				+ "region start: " + start 
+				+ ", protein length: " + proteinLength );
 		return;  //   EARLY EXIT
 	}
 	if ( start < 1 ) {
@@ -672,6 +692,7 @@ ImageProteinBarData.prototype.addProteinBarHighlightedRegion = function( params 
 	}
 
 	this.proteinBarHighlightedRegions = new_proteinBarHighlightedRegions;
+	
 	this._if_WholeBarHighlighted_SwitchTo_proteinBarHighlightedAll();
 };
 

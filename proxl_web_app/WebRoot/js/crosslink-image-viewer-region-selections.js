@@ -7,7 +7,7 @@
  *  
  * !!! The following global variables from "crosslink-image-viewer.js" are used in this file:
  * 
- *    _proteinNames
+ *    _proteinNames - used since the variable is replaced every time "Update from Database" is clicked.
  */
 
 //  JavaScript directive:   all variables have to be declared with "var", maybe other things
@@ -17,7 +17,9 @@
  * Constructor
  */
 var ProteinBarRegionSelectionsOverlayCode = function( params ) {
+	var indexManager = params.indexManager;
 	var imageProteinBarDataManager = params.imageProteinBarDataManager;
+	this.indexManager = indexManager;
 	this.imageProteinBarDataManager = imageProteinBarDataManager;
 };
 
@@ -130,26 +132,31 @@ ProteinBarRegionSelectionsOverlayCode.prototype._populate = function( params ) {
 	if ( isAnyProteinBarsHighlighted ) {
 		noProteinBarsSelected = false;
 	}
-	for( var i = 0; i < _indexManager.getProteinArray().length; i++ ) {
-		var uid = _indexManager.getProteinArray()[ i ][ 'uid' ];
-		var imageProteinBarDataItem = this.imageProteinBarDataManager.getAllItems()[ uid ];
+	var proteinsChosenForDisplayArray = this.indexManager.getProteinArray();
+	var proteinsChosenForDisplayArrayLength = proteinsChosenForDisplayArray.length;
+	var proteinsChosenForDisplayArrayLastItemIndex = proteinsChosenForDisplayArray.length - 1;
+	for( var i = 0; i < proteinsChosenForDisplayArrayLength; i++ ) {
+		var uid = proteinsChosenForDisplayArray[ i ][ 'uid' ];
+		var imageProteinBarDataItem = this.imageProteinBarDataManager.getItemByUID( uid );
 		if( !imageProteinBarDataItem ) {
 			console.log( "WARNING: Have no entry in protein bar data manager for uid:" + uid );
 			console.log( "Adding empty entry." );
 			this.imageProteinBarDataManager.addEntry( uid );			
 		}
 		var proteinId = imageProteinBarDataItem.getProteinId();
+		var proteinLength = imageProteinBarDataItem.getProteinLength();
 		var proteinName = _proteinNames[ proteinId ];
+		//  singleBarContext is for Handlebars template to put info for this bar on the overlay on the page
 		var singleBarContext = {
 				uid : uid,
 				proteinId : proteinId,
 				proteinName : proteinName,
-				proteinLength : imageProteinBarDataItem.getProteinLength()
+				proteinLength : proteinLength
 		};
 		var singleBarHtml = this._singleBarTemplate_HandlebarsTemplate( singleBarContext );
 		var $singleBarHtml = $( singleBarHtml ).appendTo( $view_protein_bar_highlighting_overlay_protein_bars_data_div );
 		//  Hide protein divider after last entry
-		if ( i === ( _indexManager.getProteinArray().length - 1 ) ) {
+		if ( i === ( proteinsChosenForDisplayArrayLastItemIndex ) ) {
 			var $protein_divider_jq = $singleBarHtml.find(".protein_divider_jq");
 			$protein_divider_jq.hide();
 		}
@@ -162,7 +169,6 @@ ProteinBarRegionSelectionsOverlayCode.prototype._populate = function( params ) {
 				throw e;
 			}
 		} );
-		var proteinBarHighlightedRegionsArray = imageProteinBarDataItem.getProteinBarHighlightedRegionsArray();
 		var $whole_protein_bar_selected_checkbox_jq = $singleBarHtml.find(".whole_protein_bar_selected_checkbox_jq");
 		$whole_protein_bar_selected_checkbox_jq.click( function( eventObject ) {
 			try {
@@ -176,6 +182,7 @@ ProteinBarRegionSelectionsOverlayCode.prototype._populate = function( params ) {
 			$whole_protein_bar_selected_checkbox_jq.prop( "checked", true );
 			objectThis.clickSelectWholeProteinBarProcessor( { $this : $whole_protein_bar_selected_checkbox_jq } );
 		}
+		var proteinBarHighlightedRegionsArray = imageProteinBarDataItem.getProteinBarHighlightedRegionsArray();
 		if ( ( ! clearAll ) && (proteinBarHighlightedRegionsArray && proteinBarHighlightedRegionsArray.length > 0 ) ) {
 			var $regions_items_block_jq = $singleBarHtml.find(".regions_items_block_jq");
 			for ( var proteinBarHighlightedRegionsArrayIndex = 0; proteinBarHighlightedRegionsArrayIndex < proteinBarHighlightedRegionsArray.length; proteinBarHighlightedRegionsArrayIndex++ ) {
