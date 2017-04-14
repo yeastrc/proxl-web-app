@@ -109,24 +109,30 @@ Viewer Interaction
 
 Add a Protein
 ---------------------
-To add a protein to the viewer, select a protein in the pull-down menu above the viewer options labeled "Select a protein." All proteins in the experiment
-that meet the filtering criteria at the top of the page will be present.
+To add a protein to an empty viewer (no proteins visible), click either the "Add Protein" button or the "Click to Add Protein" text in the viewer area:
 
-.. image:: /images/viewer-select-protein1.png
+.. image:: /images/circle-plot-add-protein1.png
 
-To add subsequent proteins to the viewer, click the +Protein link next to this protein pull-down menu. This will create a new pull-down
-menu where you may select another protein to be added to the viewer:
+This will open the "Add Protein(s)" overlay, where one or more proteins may be selected:
 
-.. image:: /images/viewer-select-protein2.png
+.. image:: /images/add-protein-overlay.png
 
-.. image:: /images/viewer-select-protein3.png
+Cick "Add" to add the selected proteins to the viewer. Click anywhere outside the overlay, or on the "X" in the top-right corner, to close the overlay.
 
-This can be repeated many times to add many proteins to the viewer.
+To add more proteins to the viewer, click the "Add Protein" button above the viewer.
+
 
 Remove a Protein
 ---------------------
-To remove a protein from the viewer, choose the "Select a protein" option in the pull-down menu representing that protein in the viewer. This will
-remove that protein from the viewer and shift all proteins bars below it up.
+To remove a protein from the viewer, click the small red (X) next to the name of the protein above the image area:
+
+.. image:: /images/delete-protein.png
+
+Rearrange Proteins
+---------------------
+To rearrange proteins, simply drag and drop the protein in the protein list above the circle to the desired position in the order. The viewer will update automatically.
+
+.. image:: /images/rearrange-proteins.png
 
 View Link Summary
 ---------------------
@@ -176,6 +182,41 @@ Remove Highlighting
 If a single protein is highlighted, click it to unhighlight it. If multiple proteins are highlighted, hold shift and click a
 highlighted protein to unhighlight it. If shift is not used, the viewer will highlight only the protein clicked.
 
+Highlight Proteins Regions
+----------------------------
+Instead of highlighting entire proteins, it is possible highly only segments of proteins (protein regions). This is done by clicking
+the "[Manage Protein Selections]" link above the image:
+
+.. image:: /images/viewer-manage-protein-selections.png
+
+This opens an overlay with an interface for managing which regions of which proteins are highlighted:
+
+.. image:: /images/manage-protein-selections-overlay1.png
+
+This overlay lists all proteins visible in the viewer and which regions are currently highlighted for each one. By default,
+all proteins are visible in their entirety, so the "Select whole protein bar" option is checked for all of them. When this
+checkbox is checked, that protein is highlighted in its entirety and no sub-regions may be selected.
+
+To select sub-regions in a protein to highlight, uncheck the "Select whole protein bar" option:
+
+.. image:: /images/manage-protein-selections-overlay2.png
+
+Click "+Add Region" to define the start and end positions for a region to highlight in that protein. This option may be
+used multiple times per protein to define multiple regions. Click the red "x" next to a region to remove it. Unchecking
+"Select whole protein bar" and not defining regions unhighlights that entire protein:
+
+.. image:: /images/manage-protein-selections-overlay3.png
+
+Click "Save" to save these settings and view the image with these defined regions. Click "Cancel" to make no changes and close overlay, "Reset" to reset
+regions to those visible in the image (without closing overlay), and "Clear All" to set to defaults (all proteins visible).
+
+Clicking "Save" gives us:
+
+.. image:: /images/viewer-manage-protein-selections2.png
+
+Only links within and between the defined regions are colored. The reset are greyed-out.
+
+
 Local Sequence Information
 ---------------------------
 Local sequence information in the protein bars may be viewed by hovering the mouse cursor over the protein bar. A tooltip will appear
@@ -197,9 +238,9 @@ Sets the left side of all protein bars to be the N-termini.
 
 .. image:: /images/viewer-reset-protein-flipping.png
 
-Download SVG
+Download Image
 ---------------------------
-Download a scalable vector graphics (SVG) file of the current view. Suitable for import into Adobe Illustrator or other software that supports SVG files.
+Mouse over the "[Download Image]" link to see image download options. Click on the format of choice to initiate a download of the image.
 
 .. image:: /images/viewer-download-svg.png
 
