@@ -131,14 +131,11 @@ Only peptides of the checked type(s) will be returned. Proxl defines the types a
 
 	* crosslink - A pair of peptides linked by a crosslinker.
 	* looplink - A single peptide with two residues linked by a crosslinker.
-	* monolink - A peptide containing at least one linked residue, where the other end of the linker is unlinked.
 	* unlinked - The peptide without a crosslinker on any residue.
 
 Checking multiple boxes will include any peptide that has at least one of the checked types.
 I.e., checking 'crosslinks' and 'looplinks' will only include peptides that are either
 crosslinks or looplinks. Only checking 'crosslinks' will only return crosslinked peptides.
-The 'monolinks' type will include any peptides that contain a monolink.
-
 
 Modification filter
 -------------------------
