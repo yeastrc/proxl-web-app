@@ -9,29 +9,29 @@ Usage: java -jar importProxlXML.jar -p project_id  \
 Examples:
 
     To import a Proxl XML file (with no scans):
-    java -jar importProxlXML.jar -p 1 -i proxlInput.xml -n -c /path/to/db.properties
+    java -jar importProxlXML.jar -p 1 -i proxlInput.xml -n -c /path/to/db_config_file.properties
 
     To import a Proxl XML file and related scan file:
-    java -jar importProxlXML.jar -p 1 -i proxlInput.xml -s /path/to/file.mzML -c /path/to/db.properties
+    java -jar importProxlXML.jar -p 1 -i proxlInput.xml -s /path/to/file.mzML -c /path/to/db_config_file.properties
 	
 	
 Parameters:
 
-    -p  : [Required] : The id for the ProXL project into which the data are being loaded.
+    -p (--project=) : [Required] : The id for the ProXL project into which the data are being loaded.
 
     -i (--import-file=) : [Required] : The Proxl XML file to import, with it's relative or absolute path.
 	
     -c (--config=) : [Required] : The Database configuration file, with it's relative or absolute path.
     
-                                  File must contain the following key/value pairs:
-                                  
-                                  username=your_db_username
-                                  password=your_db_password
-                                  dbHost=your_host (e.g., localhost)
-                                  dbPort=3306 (default port for MySQL)
-                                  
-                                  For more information, see the importer documentation at
-                                  https://github.com/yeastrc/proxl-import-xml-to-db
+		    An example file is in the release zip file at:
+			proxl_importer/config_sample_files_proxl_xml_importer/run_importer_config_file.properties
+			(the path may change but the filename will not change)
+			
+			Releases are at:   https://github.com/yeastrc/proxl-web-app/releases
+			
+			The file db_config_file.properties is also in the Github repository, currently at:
+			https://github.com/yeastrc/proxl-web-app/blob/master/proxl_importer/config_sample_files_proxl_xml_importer/db_config_file.properties
+			
 
 	
     -s (--scan-file=) : [Optional] : The scan file ( mzML or mzXML ), with it's relative or absolute path.
