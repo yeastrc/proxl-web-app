@@ -1,27 +1,27 @@
 ===========================================
-ProXL Installation Guide
+Proxl Installation Guide
 ===========================================
 
-This is a guide for downloading and installing your own copy of ProXL, running on
-you own server. ProXL is relatively simple to install and set up, but does require
+This is a guide for downloading and installing your own copy of proxl, running on
+you own server. proxl is relatively simple to install and set up, but does require
 some working proficiency with the command line and some knowledge of databases
 (preferably MySQL).
 
-ProXL comprises a database component and a web application component. Downloading,
+Proxl comprises a database component and a web application component. Downloading,
 installing, and configuring these components are described below.
 
 1. Install MySQL, Java, and Apache Tomcat (if necessary)
 ==========================================================
 
-This documentation assumes that `Java <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`_ (JDK version, 1.7 or later) and the
-`Apache Tomcat <http://tomcat.apache.org/>`_ (7 or later) servlet container are installed on the same
-computer on which you are installing ProXL.
+This documentation assumes that `Java <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`_ (JDK version, 1.8 or later) and the
+`Apache Tomcat <http://tomcat.apache.org/>`_ (8 or later) servlet container are installed on the same
+computer on which you are installing proxl.
 
 This documentation also assumes that `MySQL <http://www.mysql.com/>`_ (5.6 or later) has been
 installed and is accessible by the installation of Apache Tomcat. This does not need to be on the
 same machine as Apache Tomcat.
 
-ProXL should work equally well on any operating system for which
+proxl should work equally well on any operating system for which
 MySQL and Java are available (MS Windows, Apple OS X, or Linux). Other servlet containers and database
 server software may work as well, though these have not been tested.
 
@@ -116,13 +116,13 @@ MySQL server.
 
 Install proxl.war
 ------------------------------
-To install the ProXL web application, first download latest release of the ``proxl.war`` file
+To install the proxl web application, first download latest release of the ``proxl.war`` file
 from `<https://github.com/yeastrc/proxl-web-app/releases>`_. Then copy this file into the
 ``webapps`` directory of your Tomcat installation. It should automatically deploy (you should
 see a ``proxl`` directory created in the webapps directory. If it does not automatically deploy,
 restart Tomcat to force it to deploy.
 
-4. Start using ProXL
+4. Start using proxl
 ==========================================================
 Your web application should now be available at http://your.host:8080/proxl/.
 If you have a firewall running, may need to allow access through this port.
@@ -131,4 +131,4 @@ password: ``FJS483792nzmv,xc4#&@(!VMKSDL``  You should change this information a
 convenience by logging in and clicking the "Manage Account" icon at the top-right of any page
 (person-shaped icon). You may add initial users by creating projects and inviting users to those projects.
 
-For information about uploading data and using ProXL, please see the documentation at `<http://proxl-web-app.readthedocs.org/en/latest/>`_.
+For information about uploading data and using proxl, please see the documentation at `<http://proxl-web-app.readthedocs.org/en/latest/>`_.
