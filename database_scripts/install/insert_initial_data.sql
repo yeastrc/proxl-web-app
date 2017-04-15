@@ -90,3 +90,8 @@ INSERT INTO linker(abbr,name)VALUES(
 INSERT INTO linker(abbr,name)VALUES( 
 	'bs3.sty','bis[sulfosuccinimidyl] suberate that includes sty links on one half of the link' );
 
+
+--  INSERT to config_system to connect to YRC services for protein listing and protein annotation (paws)
+
+INSERT INTO config_system (config_key, config_value) VALUES ('protein_annotation_webservice_url', 'http://yeastrc.org/paws/services/');
+INSERT INTO config_system (config_key, config_value) VALUES ('protein_listing_from_sequence_taxonomy_webservice_url', 'http://yeastrc.org/pdr/services/');
