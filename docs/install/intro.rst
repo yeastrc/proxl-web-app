@@ -21,7 +21,7 @@ This documentation also assumes that `MySQL <http://www.mysql.com/>`_ (5.6 or la
 installed and is accessible by the installation of Apache Tomcat. This does not need to be on the
 same machine as Apache Tomcat.
 
-proxl should work equally well on any operating system for which
+Proxl should work equally well on any operating system for which
 MySQL and Java are available (MS Windows, Apple OS X, or Linux). Other servlet containers and database
 server software may work as well, though these have not been tested.
 
@@ -30,38 +30,34 @@ After Apache Tomcat is installed, you will need to download and install the MySQ
 the downloaded jar file into lib directory of Apache Tomcat  (e.g. /usr/local/apache-tomcat-7.0.65/lib)
 and restart Tomcat.
 
-2. Set up the proxl database
+2. Download the latest release of proxl
 ==========================================================
+Download the latest release at `<https://github.com/yeastrc/proxl-web-app/releases>`_. Unzip
+the contents of the zip file to the directory of your choice.
 
-Create the ``proxl`` database.
------------------------------------
-To set up this database, first download :download:`create_empty_database.sql <../../database_scripts/install/create_empty_database.sql>`.
+3. Set up the proxl database
+==========================================================
+All database creation and population scripts are in the ``database_scripts/install`` directory of the zip file.
 
-To run this SQL script, do one of the following:
+Execute the following sql scripts in this order.
+
+    * ``create_empty_database.sql``
+    * ``create_empty_database_add_tables.sql``
+    * ``insert_initial_data.sql``
+    * ``insert_initial_user.sql``
+    
+
+To run these SQL scripts, do one of the following:
     * Log into your MySQL server and paste in the file contents.
-    * Source the file by logging into MySQL and typing the following at the MySQL prompt: ``source /location/to/create_empty_database.sql``. (Be sure MYSQL has read access to the file).
-    * At the command line (on macos or linux): ``cat /location/to/create_empty_database.sql | mysql -u your_username -p``
-
-Populate the ``proxl`` database with needed data.
--------------------------------------------------------
-Download :download:`insert_initial_data.sql <../../database_scripts/install/insert_initial_data.sql>`.
-
-To run this SQL script, do one of the following:
-    * Log into your MySQL server and paste in the file contents.
-    * Source the file by logging into MySQL and typing the following at the MySQL prompt: ``source /location/to/insert_initial_data.sql``. (Be sure MYSQL has read access to the file).
-    * At the command line: ``cat /location/to/insert_initial_data.sql | mysql -u your_username -p``
+    * Source the file by logging into MySQL and typing the following at the MySQL prompt: ``source /location/to/script_name.sql``. (Be sure MYSQL has read access to the file).
+    * At the command line (on macos or linux): ``cat /location/to/script_name.sql | mysql -u your_username -p``
 
 (Optional) Populate the ``taxonomy`` table.
 -------------------------------------------------------
 In order to provide functionality based on taxonomy (such as filtering searches based on taxonomy of hit proteins), the
-``taxonomy`` table must be populated. To populate this table, download :download:`create_taxonomy_table.sql <../../database_scripts/install/create_taxonomy_table.sql>` and
-execute the SQL script doing one of the following (note, file is too big to paste in the contents from a text editor):
+``taxonomy`` table must be populated. To populate this table, execute the ``create_taxonomy_table.sql`` SQL script.
 
-    * Source the file by logging into MySQL and typing the following at the MySQL prompt: ``source /location/to/create_taxonomy_table.sql``. (Be sure MYSQL has read access to the file).
-    * At the command line (on macos or linux): ``cat /location/to/create_taxonomy_table.sql | mysql -u your_username -p``
-
-
-3. Install and configure the web application
+4. Install and configure the web application
 ==========================================================
 
 Add MySQL user for Tomcat access
@@ -116,13 +112,12 @@ MySQL server.
 
 Install proxl.war
 ------------------------------
-To install the proxl web application, first download latest release of the ``proxl.war`` file
-from `<https://github.com/yeastrc/proxl-web-app/releases>`_. Then copy this file into the
+Copy ``proxl.war`` in the top directory of the zip file into the
 ``webapps`` directory of your Tomcat installation. It should automatically deploy (you should
 see a ``proxl`` directory created in the webapps directory. If it does not automatically deploy,
 restart Tomcat to force it to deploy.
 
-4. Start using proxl
+5. Start using proxl
 ==========================================================
 Your web application should now be available at http://your.host:8080/proxl/.
 If you have a firewall running, may need to allow access through this port.
