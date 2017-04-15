@@ -790,6 +790,8 @@ ImageProteinBarData.constructImageProteinBarDataFromHashDataObject = function( h
 		if ( hashDataObject.proteinOffset !== undefined ) {
 			imageProteinBarData.proteinOffset  = hashDataObject.proteinOffset;
 		}
+		//  END: Backwards compatible
+		
 		if ( imageProteinBarData.proteinOffset === undefined ) {
 			imageProteinBarData.proteinOffset = 0;
 		}
