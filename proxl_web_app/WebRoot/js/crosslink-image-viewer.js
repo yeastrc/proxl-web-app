@@ -236,7 +236,22 @@ var _proteinBarRegionSelectionsOverlayCode = ProteinBarRegionSelectionsOverlayCo
 } );
 
 //   General
+
+/**
+ *  set to true when viewer is initialized
+ */
+var viewerInitialized = false;
+
 var _testThatCanGetSVGasString = true;
+
+var _computedMultiplier = 0;
+var _computedStandardMultiplier = 0;
+
+/**
+ * 
+ */
+var _dataLoadManager = { };
+
 
 //  From Page
 var _projectSearchIds;
@@ -351,9 +366,6 @@ function get_MAX_WIDTH() {
 		( _BORDER_OVERALL_IMAGE_ON_ONE_SIDE * 2 ) - _MAX_WIDTH_EXTRA_SUBTRACT_VALUE;  
 	return maxWidth;
 }
-
-var _computedMultiplier = 0;
-var _computedStandardMultiplier = 0;
 
 /*
  * Get the multiplier, which is the translation of residue position to pixel position relative to the
@@ -1164,10 +1176,6 @@ function loadCrosslinkPSMCounts( doDraw ) {
 	}
 }
 
-/**
- * 
- */
-var _dataLoadManager = { };
 
 /**
  * 
@@ -1913,37 +1921,51 @@ function isProteinReversed( params ) {
 	var proteinReversed = entry.getProteinReversed();
 	return proteinReversed;
 }
+
 /**
- * responsible for adding the draggable events to a protein group ( the rectangle and the label (protein name) )
+ * responsible for adding and handling the draggable events to a protein group ( the rectangle and the label (protein name) )
+ * 
+ * This function serves as a closure to contain all the variables shared 
+ * between the functions "startDragFunc", "moveFunc", and "stopDragFunc"
+ * The detection of the 'control' key (or 'command' key) being down changes the behavior of what is done during the drag.
+ * 
+ * There are numerous functions defined inside this function
  */
 function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
-	//  This function serves as a closure to contain all the variables shared 
-	//  between the functions "startDragFunc", "moveFunc", and "stopDragFunc"
-	//  The detection of the 'control' key being down changes the behavior of what is done during the drag.
-	var ctrlKeyDown = false;
-	//   Function called when Dragging is Started
+	
+	var ctrlKey_or_metaKey_Down = false;
+	
+	/**
+	 * Function called when Dragging is Started
+	 */
 	var startDragFunc = function( clickX, ClickY, mouseEvent ) {
-		ctrlKeyDown = mouseEvent.ctrlKey || mouseEvent.metaKey;
+		ctrlKey_or_metaKey_Down = mouseEvent.ctrlKey || mouseEvent.metaKey;
 		//  "this" is the Snap object holding the <g> for the protein group ( the rectangle and the label (protein name) )
-		if ( ctrlKeyDown ) {
+		if ( ctrlKey_or_metaKey_Down ) {
 			startSelectProteinBarPartMouseHandler( this, clickX, ClickY, mouseEvent );
 		} else {
 			startDragProteinBarMouseHandler( this, clickX, ClickY, mouseEvent );
 		}
 	};
-	//   Function called while Dragging is In Progress, as the mouse is moved while dragging
+
+	/**
+	 * Function called while Dragging is In Progress, as the mouse is moved while dragging
+	 */
 	var moveFunc = function (dx, dy, posx, posy) {
 		//  "this" is the Snap object holding the <g> for the protein group ( the rectangle and the label (protein name) )
-		if ( ctrlKeyDown ) {
+		if ( ctrlKey_or_metaKey_Down ) {
 			mouseMoveSelectProteinBarPart_Handler( this, dx, dy, posx, posy );
 		} else {
 			mouseMoveDragProteinBarHandler( this, dx, dy, posx, posy );
 		}
 	};
-	//   Function called when Dragging is Stopped/Ended
+   
+	/**
+	 * Function called when Dragging is Stopped/Ended
+	 */
 	var stopDragFunc = function (mouseEvent) {
 		//  "this" is the Snap object holding the <g> for the protein group ( the rectangle and the label (protein name) )
-		if ( ctrlKeyDown ) {
+		if ( ctrlKey_or_metaKey_Down ) {
 			endSelectSelectProteinBarPart_Handler( this, mouseEvent );
 		} else {
 			endDragProteinBarMouseHandler( this, mouseEvent );
@@ -1952,6 +1974,7 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 		resetSelectSelectProteinBarPart_Handler();
 		resetDragProteinBarMouseHandler();
 	};
+	
 	//  actually add the drag listener to the SVG group - protein group ( the rectangle and the label (protein name) )
 	g.drag( moveFunc, startDragFunc, stopDragFunc  );
 	////////////////////
@@ -1966,6 +1989,10 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 		tooltipsDestroyed = false;
 		dragStarted = true;
 	};
+	
+	/**
+	 * 
+	 */
 	var mouseMoveDragProteinBarHandler = function ( draggedGroupSnapObject, dx, dy, posx, posy) {
 		if ( ! dragStarted ) {
 			console.log( "In Drag Move but Drag not started, 'startDragFunc(...) not called" );
@@ -1989,6 +2016,10 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 			}
 		}
 	};
+	
+	/**
+	 * 
+	 */
 	var endDragProteinBarMouseHandler = function ( draggedGroupSnapObject, mouseEvent ) {
 		if ( ! dragStarted ) {
 			console.log( "In Drag End but Drag not started, 'startDragFunc(...) not called" );
@@ -2017,14 +2048,23 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 			drawSvg();
 		}
 	};
+	
+	/**
+	 * 
+	 */
 	var resetDragProteinBarMouseHandler = function() {
 		startX_ProteinBarPosition = null; //  reset.   updated on "start drag"
 		tooltipsDestroyed = false;
 	};
+	
 	////////////////////
 	////   For Selecting part of the Protein Bar by holding down the ctrl key while dragging the mouse
 	var selectProteinBarPart = false;
 	var firstDrag = false;
+	
+	/**
+	 * 
+	 */
 	var startSelectProteinBarPartMouseHandler = function ( draggedGroupSnapObject, clickX, ClickY, mouseEvent ) {
 		selectProteinBarPart = true;
 		if ( mouseEvent.shiftKey ) {
@@ -2048,6 +2088,7 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 			proteinBarOverlayRectangleSnapObject_BBox_X + proteinBarOverlayRectangleSnapObject_BBox_Width - startX_NewRectanglePosition + 3; 
 		firstDrag = true;
 	};
+	
 	//  The detection of the 'shift' key being down changes the behavior of what is done during the drag.
 	var shiftKeyDown = false;
 	var proteinBarOverlayRectangleSnapObject_BBox_X = null;
@@ -2057,6 +2098,10 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 	var startX_NewRectanglePosition = null;
 	var endX_NewRectanglePosition = null;
 	var newRectangleMaxWidthToRight = null;
+	
+	/**
+	 * 
+	 */
 	var mouseMoveSelectProteinBarPart_Handler = function ( draggedGroupSnapObject, dx, dy, posx, posy) {
 		//  draggedGroupSnapObject is the Snap object holding the <g> for the protein group ( the rectangle and the label (protein name) )
 		if ( ! selectProteinBarPart ) {
@@ -2094,6 +2139,10 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 			endX_NewRectanglePosition = newRectX;
 		}
 	};
+
+	/**
+	 * 
+	 */
 	var endSelectSelectProteinBarPart_Handler = function ( draggedGroupSnapObject, mouseEvent ) {
 		if ( ! selectProteinBarPart ) {
 			throw Error( "In select Protein Bar Part End but Select Protein Bar Part not started, 'startDragFunc(...) not called" );
@@ -2145,6 +2194,10 @@ function addDragTo( g, protein, proteinBarIndex, svgRootSnapSVGObject ) {
 		updateURLHash( false /* useSearchForm */ );	  					// save the new selection to the URL hash
 		drawSvg();
 	};
+	
+	/**
+	 * 
+	 */
 	var resetSelectSelectProteinBarPart_Handler = function () {
 		selectProteinBarPart = false;
 		startX_NewRectanglePosition = null;
@@ -2185,27 +2238,51 @@ function addClickDoubleClickTo( g, protein, i  ) {
 	var rectangleOffset = $proteinBarOverlayRectanglePlainSVGObject.offset(); // returns an object containing the properties top and left.
 	var rectangleOffsetLeft = rectangleOffset.left;
 	//		var rectangleOffsetTop = rectangleOffset.top; // not using the "Y" axis value
+	
+	/**
+	 * 
+	 */
 	var singleClickFunction = function( e ) {
 		toggleHighlightedProtein( i, true /* shouldClearFirst */ );
 		updateURLHash( false /* useSearchForm */ );
 	};
+	
+	/**
+	 * 
+	 */
 	var doubleClickFunction = function( e ) {
 		toggleReversedProtein( i, protein );
 		updateURLHash( false /* useSearchForm */ );
 		//console.log( "got double click on " + _proteinNames[ protein ] + "(" + i + ")" );
 	};
+	
+	/**
+	 * 
+	 */
 	var shiftClickFunction = function( e ) {
 		toggleHighlightedProtein( i, false /* shouldClearFirst */ );
 		updateURLHash( false /* useSearchForm */ );
 	};
+	
+	/**
+	 * 
+	 */
 	var controlClickFunction = function( e ) {
 		removeHighlightedProteinRegion( { proteinBarIndex : i, proteinId : protein, mousePositionX : e.clientX, rectangleOffsetLeft : rectangleOffsetLeft } );
 //		toggleHighlightedProtein( i, false /* shouldClearFirst */ );
 		updateURLHash( false /* useSearchForm */ );
 	};
+	
+	/**
+	 * 
+	 */
 	var mouseDownFunction = function( e ) {
 		startx = e.clientX;
 	};
+	
+	/**
+	 * 
+	 */
 	var mouseUpFunction = function( e ) {
 		if ( Math.abs( e.clientX - startx ) < 1 ) {
 			clicks++;
@@ -2229,6 +2306,7 @@ function addClickDoubleClickTo( g, protein, i  ) {
 			}, 300 );
 		}
 	};
+	
 	g.mousedown( mouseDownFunction );
 	g.mouseup( mouseUpFunction );
 }
@@ -2321,12 +2399,14 @@ function getColorForProteinBarRowIndexPosition( params ) {
 	//  Used for: Links within same protein bar (Self Crosslink or Looplink)
 	var position_1 = params.position_1;
 	var position_2 = params.position_2;
-	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_REGION
-			&& ( _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) {
+	
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_REGION && ( _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) {
+		
 		if ( singlePosition !== undefined ) {
 			var lineColorIndex = 
 				getColorIndexForProteinBarRowIndexPosition__SinglePosition( { proteinBarRowIndex : proteinBarRowIndex, singlePosition : singlePosition } );
 			if ( lineColorIndex !== -1 ) {
+				
 				return getColorForIndex( lineColorIndex );
 			}
 			throw Error( "getColorForProteinBarRowIndexPosition: singlePosition: lineColorIndex === -1" );
@@ -2336,11 +2416,13 @@ function getColorForProteinBarRowIndexPosition( params ) {
 			var lineColorIndexPosition_1 = 
 				getColorIndexForProteinBarRowIndexPosition__SinglePosition( { proteinBarRowIndex : proteinBarRowIndex, singlePosition : position_1 } );
 			if ( lineColorIndexPosition_1 !== -1 ) {
+				
 				return getColorForIndex( lineColorIndexPosition_1 );
 			}
 			var lineColorIndexPosition_2 = 
 				getColorIndexForProteinBarRowIndexPosition__SinglePosition( { proteinBarRowIndex : proteinBarRowIndex, singlePosition : position_2 } );
 			if ( lineColorIndexPosition_2 !== -1 ) {
+				
 				return getColorForIndex( lineColorIndexPosition_2 );
 			}
 			throw Error( "getColorForProteinBarRowIndexPosition: singlePosition: lineColorIndex === -1" );
@@ -2367,11 +2449,13 @@ function getColorIndexForProteinBarRowIndexPosition__SinglePosition( params ) {
 			//  position is in this index so find this position in a region and exit.
 			if ( imageProteinBarDataEntry.isAllOfProteinBarHighlighted() ) {
 				//  Whole protein bar highlighted so a single region
+				
 				return proteinBarsSelectedRegionsCounter;
 			}
 			var regionIndexContainingPosition = 
 				imageProteinBarDataEntry.indexOfProteinBarHighlightedRegionAtSinglePosition( singlePosition );
 			if ( regionIndexContainingPosition === -1 ) {
+				
 				return -1;
 			}
 			proteinBarsSelectedRegionsCounter += ( regionIndexContainingPosition );
@@ -2397,8 +2481,9 @@ function getColorForProteinBarRowIndexBlockPositions( params ) {
 	var proteinBarRowIndex = params.proteinBarRowIndex;
 	var block_position_1 = params.block_position_1;
 	var block_position_2 = params.block_position_2;
-	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_REGION
-			&& ( _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) {
+	
+	if ( _colorLinesBy === SELECT_ELEMENT_COLOR_BY_REGION && ( _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) {
+		
 		if ( block_position_1 !== undefined && block_position_2 !== undefined ) {
 			//  Loop through protein bars selected regions incrementing a counter to get an index into the colors array
 			var foundProteinBarsSelectedRegion = false;
@@ -2438,6 +2523,7 @@ function getColorForProteinBarRowIndexBlockPositions( params ) {
 			if ( ! foundProteinBarsSelectedRegion ) {
 				throw Error( "ERROR: in getColorForProteinBarRowIndexBlockPositions(...): ! foundProteinBarsSelectedRegion " );
 			}
+			
 			return getColorForIndex( proteinBarsSelectedRegionsCounter );
 		}
 	} 
@@ -2459,16 +2545,20 @@ function getColorForSearchesForIndexAndSearchList( i, searchList ) {
 		}
 	}
 	if ( _searches.length === 2 ) {
+		
 		var colorForSearches = _SEARCH_COLORS_TWO_SEARCHES[ colorIndex ];
 //			if ( colorForSearches === undefined ) {
 //				throw Error( "In getColorForSearches: color for searches is undefined for colorIndex: '" + colorIndex + "'  _SEARCH_COLORS_TWO_SEARCHES[ colorIndex ]" );
 //			}
+		
 		return colorForSearches;
+		
 	} else {
 		var colorForSearches = _SEARCH_COLORS[ colorIndex ];
 //			if ( colorForSearches === undefined ) {
 //				throw Error( "In getColorForSearches: color for searches is undefined for colorIndex: '" + colorIndex + "'  _SEARCH_COLORS[ colorIndex ]" );
 //			}
+		
 		return colorForSearches;
 	}
 }
@@ -2481,6 +2571,8 @@ function getColorForSearchesForIndexAndSearchList( i, searchList ) {
 function getColorForSearchesForLegend( searchList ) {
 	var i = -1;  // hard coded for Legend
 	return getColorForSearchesForIndexAndSearchList( i, searchList );
+	
+	//  Never called.  Consider removing   TODO
 	return _NOT_HIGHLIGHTED_LINE_COLOR;
 }
 
@@ -4951,11 +5043,6 @@ function getSVGContentsAsString() {
 		return { error : true };
 	}
 }
-
-/**
- * 
- */
-var viewerInitialized = false;
 
 /**
  * 

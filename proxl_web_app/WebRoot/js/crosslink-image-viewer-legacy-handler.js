@@ -1,5 +1,9 @@
 /**
+ * crosslink-image-viewer-legacy-handler.js
+ * 
  * Encapsulate code used to update legacy JSON to current standards
+ * 
+ * This code uses a number of variables and functions from crosslink-image-viewer.js and possibly other JS files
  */
 
 var LegacyJSONUpdater = function() {
