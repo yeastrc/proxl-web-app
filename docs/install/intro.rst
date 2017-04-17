@@ -117,7 +117,18 @@ Copy ``proxl.war`` in the top directory of the zip file into the
 see a ``proxl`` directory created in the webapps directory. If it does not automatically deploy,
 restart Tomcat to force it to deploy.
 
-5. Install and configure the import manager
+5. Start using proxl
+==========================================================
+Your web application should now be available at http://your.host:8080/proxl/.
+If you have a firewall running, may need to allow access through this port.
+You should be able to log in with username: ``initial_proxl_user`` and
+password: ``FJS483792nzmv,xc4#&@(!VMKSDL``  You should change this information at your soonest
+convenience by logging in and clicking the "Manage Account" icon at the top-right of any page
+(person-shaped icon). You may add initial users by creating projects and inviting users to those projects.
+
+For information about uploading data and using proxl, please see the documentation at `<http://proxl-web-app.readthedocs.org/en/latest/>`_.
+
+6. Install and configure the import manager
 ==========================================================
 The import manager is software that runs on the same computer as the proxl web application. It is responsible for processing data uploaded
 through proxl and saving it to the database. Follow these steps to set up and run the import manager:
@@ -131,7 +142,7 @@ Log into the proxl web application, click on the gear icon at the top-right for 
 
 Set up run directory
 -------------------------
-Create a directory where the upload manager runs and creates files. For example ``/var/lib/proxl/run` or ``C:\\proxl\\run``. We will call this ``RUN_DIRECTORY`` here.
+Create a directory where the upload manager runs and creates files. For example ``/var/lib/proxl/run`` or ``C:\\proxl\\run``. We will call this ``RUN_DIRECTORY`` here.
 
 In this directory place the following files from the release zip file:
 
@@ -156,13 +167,3 @@ with a command similar to:
 Where the user ``tomcat`` has the necessary permissions.
 
 
-6. Start using proxl
-==========================================================
-Your web application should now be available at http://your.host:8080/proxl/.
-If you have a firewall running, may need to allow access through this port.
-You should be able to log in with username: ``initial_proxl_user`` and
-password: ``FJS483792nzmv,xc4#&@(!VMKSDL``  You should change this information at your soonest
-convenience by logging in and clicking the "Manage Account" icon at the top-right of any page
-(person-shaped icon). You may add initial users by creating projects and inviting users to those projects.
-
-For information about uploading data and using proxl, please see the documentation at `<http://proxl-web-app.readthedocs.org/en/latest/>`_.
