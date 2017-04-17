@@ -90,3 +90,13 @@ If checked, users will be able to upload scan data with their data. This may gre
 Delete uploaded files after Successful Import
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 If checked, data on disk will be deleted after being successfully imported into proxl.
+
+Terms of Service Management
+--------------------------------------
+If enabled, Terms of Service (ToS) is a text document that users must view and accept before they may use an installation of proxl. To enable
+the ToS requirement, click "Change Terms of Service" to edit the document, then "Enable Terms of Service". To disable the ToS requirement, click
+"Disable Terms of Service".
+
+Note that if ToS is enabled, and if the text document is changed in any way, all users will have to view and agree to the new ToS before continuing
+to use this installation of proxl.
+
