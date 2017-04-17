@@ -117,7 +117,46 @@ Copy ``proxl.war`` in the top directory of the zip file into the
 see a ``proxl`` directory created in the webapps directory. If it does not automatically deploy,
 restart Tomcat to force it to deploy.
 
-5. Start using proxl
+5. Install and configure the import manager
+==========================================================
+The import manager is software that runs on the same computer as the proxl web application. It is responsible for processing data uploaded
+through proxl and saving it to the database. Follow these steps to set up and run the import manager:
+
+Set up upload directory
+-------------------------
+Create a directory for storing uploaded files. For example ``/var/lib/proxl/upload`` or ``C:\proxl\upload``. Ensure the user running the Tomcat process above
+has write access to this directory. We will call this ``UPLOAD_DIRECTORY`` here.
+
+Log into the proxl web application, click on the gear icon at the top-right for system configuration. Enter the full path for ``UPLOAD_DIRECTORY`` for the ``Run Importer Workspace`` field and click "Save".
+
+Set up run directory
+-------------------------
+Create a directory where the upload manager runs and creates files. For example ``/var/lib/proxl/run` or ``C:\\proxl\\run``. We will call this ``RUN_DIRECTORY`` here.
+
+In this directory place the following files from the release zip file:
+
+    * ``runImportProxlXML.jar``
+    * ``run_importer_config_file.properties`` (in the ``proxl_importer/config_sample_files_RUN_proxl_xml_importer_PGM`` directory)
+    * ``importProxlXML.jar``
+    * ``db_config_file.properties`` (in the ``proxl_importer/config_sample_files_proxl_xml_importer`` directory)
+
+Update run_importer_config_file.properties and db_config_file.properties with setting for your server.
+
+Run the import manager process
+--------------------------------
+This program must be running to import data via the proxl web application. To start it:
+
+``java -jar ``RUN_DIRECTORY/runImportProxlXML.jar --config=run_importer_config_file.properties``
+
+Note, the user running this process must have read access to ``UPLOAD_DIRECTORY`` and write access to ``RUN_DIRECTORY``.  On linux this can be accomplished
+with a command similar to:
+
+``su -c "java -jar ``RUN_DIRECTORY/runImportProxlXML.jar --config=run_importer_config_file.properties" -s /bin/bash tomcat``
+
+Where the user ``tomcat`` has the necessary permissions.
+
+
+6. Start using proxl
 ==========================================================
 Your web application should now be available at http://your.host:8080/proxl/.
 If you have a firewall running, may need to allow access through this port.
