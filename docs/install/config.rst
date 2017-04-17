@@ -1,5 +1,5 @@
 ===========================================
-proxl Configuration
+Proxl Configuration
 ===========================================
 
 If you are an administrator running your own instance of proxl, you can manage the proxl
@@ -81,7 +81,7 @@ how to set up the helper application to handle user uploads.
 Run Importer Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 This is the directory on the local machine (same machine running the proxl web application) where the processing of user uploads will take place. The
-user running Tomcat must have read/write permissioni to this directory.
+user running Tomcat must have read/write permission to this directory.
 
 Allow Scan file Upload
 ^^^^^^^^^^^^^^^^^^^^^^^^
