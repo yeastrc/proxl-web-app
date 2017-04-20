@@ -39,7 +39,15 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.utils.Proxl_XML_Import
 public class ProcessProxlXMLImport {
 	
 	private static final String ERROR_MSG_SYSTEM_ERROR = "System Error";
+	
+	private static final int RETRY_DELAY_INITIAL = 1;
+	private static final int RETRY_DELAY_EXTENDED_1 = 20;
+	private static final int RETRY_DELAY_EXTENDED_2 = 90;
+	private static final int RETRY_COUNT_SWITCH_TO_EXTENDED_1 = 5;
+	private static final int RETRY_COUNT_SWITCH_TO_EXTENDED_2 = 10;
+	
 	private static final Logger log = Logger.getLogger(ProcessProxlXMLImport.class);
+	
 	//  private constructor
 	private ProcessProxlXMLImport() { }
 	/**
@@ -51,6 +59,35 @@ public class ProcessProxlXMLImport {
 	
 	private volatile boolean shutdownRequested = false;
 	private volatile RunSystemCommand runSystemCommand;
+	
+	/**
+	 * awaken thread to allow shutdown
+	 */
+	public void awaken() {
+		log.error( "awaken() called.");
+		synchronized (this) {
+			notify();
+		}
+	}
+	
+
+	/**
+	 * Called on a separate thread when a shutdown request comes from the operating system.
+	 * If this is not heeded, the process may be killed by the operating system after some time has passed ( controlled by the operating system )
+	 */
+	public void shutdown() {
+		log.error( "shutdown() called. Calling runSystemCommand.shutdown() then calling awaken()");
+		shutdownRequested = true;
+		try {
+			if ( runSystemCommand != null ) {
+				runSystemCommand.shutdown();
+			}
+		} catch ( NullPointerException e ) {
+			//  Eat the NullPointerException since that meant that nothing had to be done.
+		}
+		log.error( "shutdown() called. Called runSystemCommand.shutdown() Now calling awaken()");
+		awaken();
+	}
 	
 	/**
 	 * @param trackingDTOTrackingRunDTOPair
@@ -72,19 +109,9 @@ public class ProcessProxlXMLImport {
 		if ( ! subdirForThisTrackingId.exists() ) {
 			String msg = "subdirForThisTrackingId does not exist: " + subdirForThisTrackingId.getCanonicalPath();
 			log.error( msg );
-			proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
-			proxlXMLFileImportTrackingRunDTO.setRunSubStatus( ProxlXMLFileImportRunSubStatus.SYSTEM_ERROR );
-			proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
-			proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
-			UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
-			.updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
-					ProxlXMLFileImportStatus.FAILED, 
-					proxlXMLFileImportTrackingDTO.getId(), 
-					proxlXMLFileImportTrackingRunDTO );
-			OnImprtFnshCllWbSrvc.getInstance()
-			.callProxlWebServiceOnSingleImportFinish( 
-					proxlXMLFileImportTrackingDTO.getId(), 
-					proxlXMLFileImportTrackingRunDTO.getId() );
+			
+			markImportTrackingAsFailed( proxlXMLFileImportTrackingDTO, proxlXMLFileImportTrackingRunDTO, ProxlXMLFileImportRunSubStatus.SYSTEM_ERROR );
+			
 			throw new ProxlImporterInteralException(msg);
 		}
 		final String importJarWithPath = ImporterRunnerConfigData.getImporterJarWithPath();
@@ -98,19 +125,9 @@ public class ProcessProxlXMLImport {
 					+ " Import Jar with Path in config file: "
 					+ importJarWithPath;
 			log.error( errorMsg ) ;
-			proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
-			proxlXMLFileImportTrackingRunDTO.setRunSubStatus( ProxlXMLFileImportRunSubStatus.SYSTEM_ERROR );
-			proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
-			proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
-			UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
-			.updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
-					ProxlXMLFileImportStatus.FAILED, 
-					proxlXMLFileImportTrackingDTO.getId(), 
-					proxlXMLFileImportTrackingRunDTO );
-			OnImprtFnshCllWbSrvc.getInstance()
-			.callProxlWebServiceOnSingleImportFinish( 
-					proxlXMLFileImportTrackingDTO.getId(), 
-					proxlXMLFileImportTrackingRunDTO.getId() );
+			
+			markImportTrackingAsFailed( proxlXMLFileImportTrackingDTO, proxlXMLFileImportTrackingRunDTO, ProxlXMLFileImportRunSubStatus.SYSTEM_ERROR);
+			
 			throw new ProxlImporterInteralException(errorMsg);
 		}
 		//   Create a params file that is passed to the importer
@@ -212,21 +229,17 @@ public class ProcessProxlXMLImport {
 							+ ", command: "
 							+ commandAndItsArgumentsAsList
 							+ ", subdirForThisTrackingId:  " + subdirForThisTrackingId.getCanonicalPath() );
-					 proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
-					 proxlXMLFileImportTrackingRunDTO.setRunSubStatus( ProxlXMLFileImportRunSubStatus.SYSTEM_ERROR );
-					 proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
-					 proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
-					 UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
-					 .updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
-							 ProxlXMLFileImportStatus.FAILED, 
-							 proxlXMLFileImportTrackingDTO.getId(), 
-							 proxlXMLFileImportTrackingRunDTO );
+					
+					markImportTrackingAsFailed( proxlXMLFileImportTrackingDTO_AfterImporterRun, proxlXMLFileImportTrackingRunDTO, ProxlXMLFileImportRunSubStatus.SYSTEM_ERROR );
 				}				
 			}
 		} catch (Throwable e) {
 			log.error( "command failed: " + commandAndItsArgumentsAsList
 					+ ", subdirForThisTrackingId:  " + subdirForThisTrackingId.getCanonicalPath() );
-			 proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
+
+			markImportTrackingAsFailed( proxlXMLFileImportTrackingDTO, proxlXMLFileImportTrackingRunDTO, ProxlXMLFileImportRunSubStatus.SYSTEM_ERROR );
+
+			proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
 			 proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
 			 proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
 			 UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
@@ -243,6 +256,135 @@ public class ProcessProxlXMLImport {
 					proxlXMLFileImportTrackingRunDTO.getId() );
 		}
 		deleteUploadedFilesIfConfiguredAndStatusSuccess( proxlXMLFileImportTrackingDTO, subdirForThisTrackingId );
+	}
+	
+	/**
+	 * @param proxlXMLFileImportTrackingDTO
+	 * @param proxlXMLFileImportTrackingRunDTO
+	 * @throws Exception
+	 */
+	public void markImportTrackingAsFailed(
+			ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO,
+			ProxlXMLFileImportTrackingRunDTO proxlXMLFileImportTrackingRunDTO,
+			ProxlXMLFileImportRunSubStatus proxlXMLFileImportRunSubStatus ) throws Exception {
+		
+		proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
+		proxlXMLFileImportTrackingRunDTO.setRunSubStatus( proxlXMLFileImportRunSubStatus );
+		proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
+		proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
+		
+		boolean updatedDBCompleted = false;
+		int retryCount = 0;
+		int nextTryInMinutes = 0;
+		
+		while ( ! updatedDBCompleted && ! shutdownRequested ) {
+		
+			try {
+				UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
+				.updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
+						ProxlXMLFileImportStatus.FAILED, 
+						proxlXMLFileImportTrackingDTO.getId(), 
+						proxlXMLFileImportTrackingRunDTO );
+				updatedDBCompleted = true;
+				
+			} catch ( Exception e ) {
+				
+				retryCount++;
+
+				if ( retryCount > RETRY_COUNT_SWITCH_TO_EXTENDED_2 ) {
+					nextTryInMinutes +=  RETRY_DELAY_EXTENDED_2;
+				} else if ( retryCount > RETRY_COUNT_SWITCH_TO_EXTENDED_1 ) {
+					nextTryInMinutes +=  RETRY_DELAY_EXTENDED_1;
+				} else {
+					nextTryInMinutes +=  RETRY_DELAY_INITIAL;
+				}
+				
+				String msg = "Failed to update Import Tracking status to Failed for tracking id: " + proxlXMLFileImportTrackingDTO.getId()
+					+ ", run id: " + proxlXMLFileImportTrackingRunDTO.getId()
+					+ ".  Will retry to update again in " + nextTryInMinutes + " minute(s).";
+				log.error( msg );
+				
+				int waitTimeInSeconds = nextTryInMinutes * 60;
+				synchronized (this) {
+					try {
+						wait( ( (long) waitTimeInSeconds ) * 1000 ); //  wait for notify() call or timeout, in milliseconds
+					} catch (InterruptedException ie) {
+						log.info("waitForSleepTime():  wait() interrupted with InterruptedException");
+					}
+				}
+
+			}
+		}
+		
+
+		if ( ! updatedDBCompleted && shutdownRequested ) {
+			
+			String msg = "Shutdown requested.  Update DB For Fail of import was not completed. tracking id: " + proxlXMLFileImportTrackingDTO.getId()
+					+ ", run id: " + proxlXMLFileImportTrackingRunDTO.getId()
+					+ ". ";
+			log.error( msg );
+			throw new ProxlImporterInteralException(msg);
+		}
+		
+
+		boolean callServerCompleted = false;
+		retryCount = 0;
+		nextTryInMinutes = 0;
+
+		while ( ! callServerCompleted && ! shutdownRequested ) {
+		
+			try {
+				OnImprtFnshCllWbSrvc.getInstance()
+				.callProxlWebServiceOnSingleImportFinish( 
+						proxlXMLFileImportTrackingDTO.getId(), 
+						proxlXMLFileImportTrackingRunDTO.getId() );
+				callServerCompleted = true;
+
+			} catch ( Exception e ) {
+				
+				retryCount++;
+
+				if ( retryCount > RETRY_COUNT_SWITCH_TO_EXTENDED_2 ) {
+					
+					String msg = "Failed to call Proxl Web app for Failed status for tracking id: " + proxlXMLFileImportTrackingDTO.getId()
+					+ ", run id: " + proxlXMLFileImportTrackingRunDTO.getId()
+					+ ".  Retry count exceeded so no more retries will be attempted.";
+					log.error( msg );
+					throw new ProxlImporterInteralException(msg);
+					
+				} else if ( retryCount > RETRY_COUNT_SWITCH_TO_EXTENDED_1 ) {
+					nextTryInMinutes +=  RETRY_DELAY_EXTENDED_1;
+				} else {
+					nextTryInMinutes +=  RETRY_DELAY_INITIAL;
+				}
+				
+				String msg = "Failed to call Proxl Web app for Failed status for tracking id: " + proxlXMLFileImportTrackingDTO.getId()
+					+ ", run id: " + proxlXMLFileImportTrackingRunDTO.getId()
+					+ ".  Will retry to update again in " + nextTryInMinutes + " minute(s).";
+				log.error( msg );
+				
+				int waitTimeInSeconds = nextTryInMinutes * 60;
+				synchronized (this) {
+					try {
+						wait( ( (long) waitTimeInSeconds ) * 1000 ); //  wait for notify() call or timeout, in milliseconds
+					} catch (InterruptedException ie) {
+						log.info("waitForSleepTime():  wait() interrupted with InterruptedException");
+					}
+				}
+
+			}
+		}
+		
+
+		if ( ! callServerCompleted && shutdownRequested ) {
+			
+			String msg = "Shutdown requested.  Call to Proxl Web app For Fail of import was not completed. tracking id: " + proxlXMLFileImportTrackingDTO.getId()
+					+ ", run id: " + proxlXMLFileImportTrackingRunDTO.getId()
+					+ ". ";
+			log.error( msg );
+			throw new ProxlImporterInteralException(msg);
+		}
+		
 	}
 	
 	/**
@@ -274,18 +416,4 @@ public class ProcessProxlXMLImport {
 		DeleteDirectoryAndContents.getInstance().deleteDirectoryAndContents( subdirForThisTrackingId );
 	}
 	
-	/**
-	 * Called on a separate thread when a shutdown request comes from the operating system.
-	 * If this is not heeded, the process may be killed by the operating system after some time has passed ( controlled by the operating system )
-	 */
-	public void shutdown() {
-		shutdownRequested = true;
-		try {
-			if ( runSystemCommand != null ) {
-				runSystemCommand.shutdown();
-			}
-		} catch ( NullPointerException e ) {
-			//  Eat the NullPointerException since that meant that nothing had to be done.
-		}
-	}
 }
