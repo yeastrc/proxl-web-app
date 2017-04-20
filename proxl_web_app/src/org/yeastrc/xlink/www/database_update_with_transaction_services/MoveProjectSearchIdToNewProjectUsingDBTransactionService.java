@@ -6,6 +6,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dao.FolderProjectSearchDAO;
 import org.yeastrc.xlink.www.dao.ProjectSearchDAO;
 import org.yeastrc.xlink.www.searcher.ProjectSearchIdAssocSearchIdInProjectIdSearcher;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Search_Core_DTO;
 /**
  * 
  *
@@ -49,6 +50,8 @@ public class MoveProjectSearchIdToNewProjectUsingDBTransactionService {
 					//  Remove folder mapping record related to old project, if it exists
 					FolderProjectSearchDAO.getInstance().delete( projectSearchId );
 				}
+
+				Cached_Search_Core_DTO.getInstance().invalidateProjectSearchId( projectSearchId );
 			}
 			dbConnection.commit();
 		} catch ( Exception e ) {

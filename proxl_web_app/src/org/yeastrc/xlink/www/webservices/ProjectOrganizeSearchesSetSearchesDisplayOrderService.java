@@ -16,6 +16,7 @@ import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.UpdateSearchDisplayOrderUsingDBTransactionService;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Search_Core_DTO;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
@@ -130,6 +131,11 @@ public class ProjectOrganizeSearchesSetSearchesDisplayOrderService {
 			}
 			UpdateSearchDisplayOrderUsingDBTransactionService.getInstance()
 			.updateSearchDisplayOrder( projectSearchesIdsInOrder );
+
+			for( int projectSearchId : projectSearchesIdsInOrder ) {
+				Cached_Search_Core_DTO.getInstance().invalidateProjectSearchId( projectSearchId );
+			}
+
 			webserviceResult.setStatus(true);
 			return webserviceResult;
 		} catch ( WebApplicationException e ) {
