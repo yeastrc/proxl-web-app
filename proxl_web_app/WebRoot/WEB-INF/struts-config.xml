@@ -295,8 +295,15 @@
 				validate="false">
 		</action>
   
-    	<action path="/downloadMergedPeptides"
+      	<action path="/downloadMergedPeptides"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedSearchPeptidesAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+  
+    	<action path="/downloadMergedPeptidesForSkylinePRM"
+				type="org.yeastrc.xlink.www.actions.DownloadMergedPeptidesForSkylinePRMAction"
 				scope="request"
 				name="mergedSearchViewPeptideForm"
 				validate="false">

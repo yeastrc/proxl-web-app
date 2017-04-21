@@ -264,6 +264,7 @@
 								Choose file format:
 								<a data-tooltip="Download peptide results as tab-delimited text." id="download-peptide-tld" class="download-option tool_tip_attached_jq" href="${ contextPath }/downloadMergedPeptides.do?<bean:write name="queryString" />" style="margin-top:5px;">Tab-delimited peptide data</a>
 								<a data-tooltip="Download all PSMs and associated statistics." id="download-peptide-psm" class="download-option tool_tip_attached_jq" href="${ contextPath }/downloadMergedPSMsForPeptides.do?<bean:write name="queryString" />">Tab-delimited PSM data</a>
+								<a data-tooltip="Download peptide list for Skyline PRM import." id="download-peptide-skyline" class="download-option tool_tip_attached_jq" href="${ contextPath }/downloadMergedPeptidesForSkylinePRM.do?<bean:write name="queryString" />">Peptides for Skyline PRM input</a>
 							</span>
 						</span>
 			</div>
