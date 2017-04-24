@@ -35,4 +35,13 @@ public interface ILinker {
 	 * @return
 	 */
 	public double getLinkerLength();
+	
+	/**
+	 * Get the formula of the cross-linker after it has linked. Essentially the formula of the spacer arm
+	 * after the cross-link reaction.
+	 * 
+	 * @return
+	 */
+	public Collection<String> getCrosslinkFormula() throws Exception;
+	
 }

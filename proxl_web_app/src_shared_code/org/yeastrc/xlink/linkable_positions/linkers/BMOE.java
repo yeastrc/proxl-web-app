@@ -60,4 +60,8 @@ public class BMOE implements ILinker {
 		return 8;
 	}
 
+	@Override
+	public Collection<String> getCrosslinkFormula() throws Exception {
+		throw new Exception( "Undefined for this cross-linker." );
+	}
 }

@@ -90,5 +90,14 @@ public class EDC implements ILinker {
 	public double getLinkerLength() {
 		return 0;
 	}
+	
+	@Override
+	public Collection<String> getCrosslinkFormula() {
+		
+		Collection<String> formulas = new HashSet<>();
+		formulas.add( "-H2O" );
+		
+		return formulas;
+	}
 
 }
