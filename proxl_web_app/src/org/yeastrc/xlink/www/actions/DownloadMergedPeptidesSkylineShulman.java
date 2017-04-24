@@ -44,6 +44,7 @@ import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.WebMergedProteinPosition;
 import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
 import org.yeastrc.xlink.www.searcher.LinkerForPSMMatcher;
+import org.yeastrc.xlink.www.searcher.LinkersForSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher;
@@ -158,18 +159,7 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 				SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel =
 						peptidesMergedCommonPageDownloadResult.searcherCutoffValuesRootLevel;
 
-				// generate file name
-				String filename = "proxl-peptides-skyline-shulman-";
-				filename += StringUtils.join( searchIds, '-' );
-				DateTime dt = new DateTime();
-				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
-				filename += "-" + fmt.print( dt );
-				filename += ".txt";
-				response.setContentType("application/x-download");
-				response.setHeader("Content-Disposition", "attachment; filename=" + filename);
-				ServletOutputStream out = response.getOutputStream();
-				BufferedOutputStream bos = new BufferedOutputStream(out);
-				writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
+
 
 
 				Collection<String> lines = new HashSet<>();
@@ -182,7 +172,7 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 					if( !link.getLinkType().equals( XLinkUtils.CROSS_TYPE_STRING_UPPERCASE ) ) {
 						continue;
 					}
-					
+										
 					String line = link.getPeptide1().getSequence() + "\t";
 					line += link.getPeptide1Position() + "\t";
 					line += link.getPeptide2().getSequence() + "\t";
@@ -199,9 +189,20 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 					
 					line += link.getPeptide1().getSequence() + "--" + link.getPeptide2().getSequence() + "\t";
 					
-					
-					// TODO: This could be optimized for cases with only one linker that has only one molecular formula (most cases)
-					// by just using that formula w/o checking masses for all PSMs
+					// if there is only one possible formula, just use it no matter what
+					{
+						
+						Collection<LinkerDTO> linkerDTOs = LinkersForSearchIdsSearcher.getInstance().getLinkersForSearchIds( searchIds );
+						
+						if( linkerDTOs.size() == 1 ) {
+							ILinker linker = GetLinkerFactory.getLinkerForAbbr( searches.get( 0 ).getLinkers().get( 0 ).getAbbr() );
+							if( linker.getCrosslinkFormulas().size() == 1 ) {
+								
+								lines.add( line + linker.getCrosslinkFormula( 0.0 ) );
+								continue;// go to next reported peptide
+							}
+						}
+					}
 					
 					// iterate over PSMs for this reported peptide, get linker masses to find linker formula
 					int unifiedReportedPeptideId = link.getUnifiedReportedPeptideId();
@@ -209,7 +210,7 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 					for ( SearchDTO search : searches ) {
 						int eachProjectSearchIdToProcess = search.getProjectSearchId();
 						Integer eachSearchIdToProcess = search.getSearchId();
-												
+																		
 						SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = 
 								searcherCutoffValuesRootLevel.getPerSearchCutoffs( eachProjectSearchIdToProcess );
 						if ( searcherCutoffValuesSearchLevel == null ) {
@@ -231,19 +232,42 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 											eachSearchIdToProcess, 
 											reportedPeptideId, 
 											searcherCutoffValuesSearchLevel);
+														
 							for ( PsmWebDisplayWebServiceResult psm : psms ) {
+																
+								LinkerDTO linkerdto = null;
 								
-								LinkerDTO linkerdto = LinkerForPSMMatcher.getInstance().getLinkerForPSM( psm.getPsmDTO() );
+								try {
+									linkerdto = LinkerForPSMMatcher.getInstance().getLinkerForPSM( psm.getPsmDTO() );
+								} catch (Exception e ) {
+									e.printStackTrace();
+								}
+								
+								
 								ILinker linker = GetLinkerFactory.getLinkerForAbbr( linkerdto.getAbbr() );
 								
 								String formula = linker.getCrosslinkFormula( psm.getPsmDTO().getLinkerMass().doubleValue() );
-								
+
 								lines.add( line + formula );
+								
 							}
 						}
 					}
 				}//end iterating over reported peptides
 				
+				
+				// generate file name
+				String filename = "proxl-peptides-skyline-shulman-";
+				filename += StringUtils.join( searchIds, '-' );
+				DateTime dt = new DateTime();
+				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
+				filename += "-" + fmt.print( dt );
+				filename += ".txt";
+				response.setContentType("application/x-download");
+				response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+				ServletOutputStream out = response.getOutputStream();
+				BufferedOutputStream bos = new BufferedOutputStream(out);
+				writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
 				
 				for( String line : lines ) {
 					writer.write( line + "\n" );

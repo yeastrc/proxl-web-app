@@ -1,5 +1,7 @@
 package org.yeastrc.xlink.www.searcher;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,24 +23,30 @@ public class LinkerForPSMMatcher {
 	
 	public LinkerDTO getLinkerForPSM( PsmDTO psm ) throws Exception {
 		
+		BigDecimal psmLinkerMass = psm.getLinkerMass();
+		psmLinkerMass = psmLinkerMass.setScale( 3, RoundingMode.HALF_UP );
+		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		final String sql = "SELECT linker_id FROM linker_per_search_crosslink_mass WHERE search_id = ? AND crosslink_mass_double = ?";
+		final String sql = "SELECT linker_id, crosslink_mass_double FROM linker_per_search_crosslink_mass WHERE search_id = ?";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
 			pstmt = conn.prepareStatement( sql );
 			
 			pstmt.setInt( 1, psm.getSearchId() );
-			pstmt.setDouble( 2, psm.getLinkerMass().doubleValue() );
 			
 			rs = pstmt.executeQuery();
 
-			if( rs.next() ) {
-				return LinkerDAO.getInstance().getLinkerDTOForId( rs.getInt( 1 ) );
-			} else {
-				throw new Exception( "Could not find a linker for psm: " + psm.getId() );
+			while( rs.next() ) {
+				
+				BigDecimal linkerMass = new BigDecimal( rs.getDouble( 2 ) );
+				linkerMass = linkerMass.setScale( 3, RoundingMode.HALF_UP );
+								
+				if( psmLinkerMass.toString().equals( linkerMass.toString() ) ) {
+					return LinkerDAO.getInstance().getLinkerDTOForId( rs.getInt( 1 ) );
+				}				
 			}
 
 			
@@ -61,6 +69,8 @@ public class LinkerForPSMMatcher {
 				conn = null;
 			}
 		}
+		
+		throw new Exception( "Could not find linker for psm: " + psm.getId() );
 		
 	}
 	
