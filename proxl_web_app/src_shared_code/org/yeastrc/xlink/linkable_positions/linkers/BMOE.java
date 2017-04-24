@@ -61,7 +61,29 @@ public class BMOE implements ILinker {
 	}
 
 	@Override
-	public Collection<String> getCrosslinkFormula() throws Exception {
-		throw new Exception( "Undefined for this cross-linker." );
+	public Collection<String> getCrosslinkFormulas() {
+		
+		Collection<String> formulas = new HashSet<>();
+		formulas.add( "C10H8N2O4" );
+		formulas.add( "C10H10N2O5" );
+		formulas.add( "C10H12N2O6" );
+		
+		return formulas;
+	}
+	
+	public String getCrosslinkFormula( double mass ) throws Exception {
+		
+		int roundedMass = (int)mass;
+
+		if( roundedMass == 220)
+			return "C10H8N2O4";
+		
+		if( roundedMass == 238 )
+			return "C10H10N2O5";
+		
+		if( roundedMass == 256 )
+			return "C10H12N2O6";
+		
+		throw new Exception( "Did not get a valid mass for a BMOE cross-linker." );
 	}
 }

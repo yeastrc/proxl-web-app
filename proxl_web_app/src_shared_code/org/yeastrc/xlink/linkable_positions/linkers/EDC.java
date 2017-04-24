@@ -92,12 +92,17 @@ public class EDC implements ILinker {
 	}
 	
 	@Override
-	public Collection<String> getCrosslinkFormula() {
+	public Collection<String> getCrosslinkFormulas() {
 		
 		Collection<String> formulas = new HashSet<>();
 		formulas.add( "-H2O" );
 		
 		return formulas;
+	}
+	
+	@Override
+	public String getCrosslinkFormula(double mass) throws Exception {
+		return "-H2O";
 	}
 
 }

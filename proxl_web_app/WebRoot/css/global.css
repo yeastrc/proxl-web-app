@@ -130,7 +130,7 @@ input[type="button"]:disabled, input[type="submit"]:disabled, .disabled-checkbox
 
 #data-download { position: relative; display: inline-block; }
 #data-download:hover #data-download-options { display: block; }
-#data-download-options { z-index:10; padding-top:7px; display: none; position: absolute; background-color: #f9f9f9; min-width: 300px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); }
+#data-download-options { z-index:10; padding-top:7px; display: none; position: absolute; background-color: #f9f9f9; min-width: 350px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); }
 .download-option { display:block; margin-left:5px; }
 
 

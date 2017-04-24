@@ -42,6 +42,19 @@ public interface ILinker {
 	 * 
 	 * @return
 	 */
-	public Collection<String> getCrosslinkFormula() throws Exception;
+	public Collection<String> getCrosslinkFormulas();
+	
+	/**
+	 * Attempt to get the cross link formula for the given mass. For linkers with
+	 * multiple cross-link masses, an attempt is made to find the correct formula
+	 * for the supplied mass. If none is found, an exception is thrown.
+	 * 
+	 * For linkers with only one formula, that formula is always returned.
+	 * 
+	 * @param mass
+	 * @return
+	 * @throws Exception
+	 */
+	public String getCrosslinkFormula( double mass ) throws Exception;
 	
 }

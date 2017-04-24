@@ -316,6 +316,13 @@
 				name="mergedSearchViewPeptideForm"
 				validate="false">
 		</action>
+		
+		<action path="/downloadMergedPeptidesForSkylineShulman"
+				type="org.yeastrc.xlink.www.actions.DownloadMergedPeptidesSkylineShulman"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
   
   		<action path="/downloadMergedProteins"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedSearchProteinsAction"

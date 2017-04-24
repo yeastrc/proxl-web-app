@@ -1,6 +1,7 @@
 package org.yeastrc.xlink.linkable_positions.linkers;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.yeastrc.xlink.linkable_positions.linkers.AmineLinker;
 
@@ -12,7 +13,16 @@ public class DFDNB extends AmineLinker {
 	}
 	
 	@Override
-	public Collection<String> getCrosslinkFormula() throws Exception {
-		throw new Exception( "Undefined for this cross-linker." );
+	public Collection<String> getCrosslinkFormulas() {
+		
+		Collection<String> formulas = new HashSet<>();
+		formulas.add( "C6N2O4" );
+		
+		return formulas;
+	}
+	
+	@Override
+	public String getCrosslinkFormula(double mass) throws Exception {
+		return "C6N2O4";
 	}
 }

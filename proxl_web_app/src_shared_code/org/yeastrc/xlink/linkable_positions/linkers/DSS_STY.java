@@ -11,11 +11,16 @@ public class DSS_STY extends AmineLinkerSTY {
 	}
 	
 	@Override
-	public Collection<String> getCrosslinkFormula() {
+	public Collection<String> getCrosslinkFormulas() {
 		
 		Collection<String> formulas = new HashSet<>();
 		formulas.add( "C8H10O2" );
 		
 		return formulas;
+	}
+	
+	@Override
+	public String getCrosslinkFormula(double mass) throws Exception {
+		return "C8H10O2";
 	}
 }
