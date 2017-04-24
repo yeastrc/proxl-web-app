@@ -13,6 +13,7 @@ public class DefaultPageViewConstants {
 		
 		"/crosslinkProtein",
 		"/looplinkProtein",
+		"/allProtein",
 		
 		"/proteinCoverageReport",
 		

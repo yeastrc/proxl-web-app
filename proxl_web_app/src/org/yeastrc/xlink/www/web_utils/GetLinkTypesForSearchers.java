@@ -24,23 +24,25 @@ public class GetLinkTypesForSearchers {
 		boolean webLinkTypeSelected_CROSSLINK = false;
 		boolean webLinkTypeSelected_LOOPLINK = false;
 		boolean webLinkTypeSelected_UNLINKED = false;
-		for ( String linkType : linkTypes ) {
-			if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkType ) ) {
-				webLinkTypeSelected_CROSSLINK = true;
-			} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkType ) ) {
-				webLinkTypeSelected_LOOPLINK = true;
-			} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkType ) ) {
-				webLinkTypeSelected_UNLINKED = true;
-			} else {
-				String msg = "linkType is invalid, linkType: " + linkType;
-				log.error( linkType );
-				throw new Exception( msg );
+		if ( linkTypes != null ) {
+			for ( String linkType : linkTypes ) {
+				if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkType ) ) {
+					webLinkTypeSelected_CROSSLINK = true;
+				} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkType ) ) {
+					webLinkTypeSelected_LOOPLINK = true;
+				} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkType ) ) {
+					webLinkTypeSelected_UNLINKED = true;
+				} else {
+					String msg = "linkType is invalid, linkType: " + linkType;
+					log.error( linkType );
+					throw new Exception( msg );
+				}
 			}
-		}
-		if ( webLinkTypeSelected_CROSSLINK 
-				&& webLinkTypeSelected_LOOPLINK 
-				&& webLinkTypeSelected_UNLINKED ) {
-			resultLinkTypes = null;
+			if ( webLinkTypeSelected_CROSSLINK 
+					&& webLinkTypeSelected_LOOPLINK 
+					&& webLinkTypeSelected_UNLINKED ) {
+				resultLinkTypes = null;
+			}
 		}
 		return resultLinkTypes;
 	}

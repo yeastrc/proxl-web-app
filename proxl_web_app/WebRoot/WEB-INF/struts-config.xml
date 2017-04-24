@@ -219,6 +219,15 @@
 				validate="false">
 			<forward name="Success" path="/WEB-INF/jsp-pages/viewSearchLooplinkProtein.jsp" redirect="false" />
 		</action>
+		
+  		<action path="/allProtein"
+				type="org.yeastrc.xlink.www.actions.ViewSearchProteinsAllAction"
+				scope="request"
+				name="searchViewProteinForm"
+				validate="false">
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewSearchProteinAll.jsp" redirect="false" />
+		</action>
+		
 
   		<action path="/peptide"
 				type="org.yeastrc.xlink.www.actions.ViewSearchPeptidesAction"
@@ -259,17 +268,16 @@
 			<forward name="Success" path="/WEB-INF/jsp-pages/viewMergedLooplinkProtein.jsp" redirect="false" />
 		</action>
 		
-		<!-- WAS -->
-		<!--  
-  		<action path="/viewMergedLooplinkProtein"
-				type="org.yeastrc.xlink.www.actions.ViewMergedSearchLooplinkProteinsAction"
+
+  		<action path="/mergedAllProtein"
+				type="org.yeastrc.xlink.www.actions.ViewMergedSearchProteinsAllAction"
 				scope="request"
 				name="mergedSearchViewProteinForm"
 				validate="false">
-			<forward name="Success" path="/WEB-INF/jsp-pages/viewMergedLooplinkProtein.jsp" redirect="false" />
-		</action>
-		-->		
-  
+			<forward name="Success" path="/WEB-INF/jsp-pages/viewMergedProteinAll.jsp" redirect="false" />
+		</action>		
+		
+		
     	<action path="/image"
 				type="org.yeastrc.xlink.www.actions.ViewMergedSearchImageAction"
 				name="mergedSearchViewProteinForm"
@@ -316,14 +324,20 @@
 				validate="false">
 		</action>
 		
-
   		<action path="/downloadMergedProteinUDRs"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedSearchUDRsAction"
 				scope="request"
 				name="mergedSearchViewProteinForm"
 				validate="false">
 		</action>
-  
+		
+  		<action path="/downloadMergedProteinsAll"
+				type="org.yeastrc.xlink.www.actions.DownloadMergedSearchProteinsAllAction"
+				scope="request"
+				name="mergedSearchViewProteinForm"
+				validate="false">
+		</action>
+		
     	<action path="/downloadProteinCoverageReport"
 				type="org.yeastrc.xlink.www.actions.DownloadProteinCoverageReportAction"
 				scope="request"

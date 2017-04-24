@@ -1,4 +1,4 @@
-<%@page import="org.yeastrc.xlink.www.webapp_timing.WebappTiming"%>
+<%@page import="org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 
 <%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
@@ -67,7 +67,7 @@
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 			
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
@@ -76,7 +76,7 @@
 
 		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
 				
-		<script type="text/javascript" src="${ contextPath }/js/viewSearchCrosslinkProteinPage.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewSearchProteinAllPage.js?x=${cacheBustValue}"></script>
 
 	
 		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
@@ -110,7 +110,7 @@
 		
 		<%@ include file="/WEB-INF/jsp-includes/viewPsmsLoadedFromWebServiceTemplateFragment.jsp" %>
 		
-		<%@ include file="/WEB-INF/jsp-includes/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
+		<%@ include file="/WEB-INF/jsp-includes/viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplateFragment.jsp" %>
 		
 		
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
@@ -151,7 +151,7 @@
 			<script type="text/text" id="form_get_for_updated_parameters__id_to_use">form_get_for_updated_parameters_single_search</script>
 
 			<%--  Single search version, used by add/remove searches JS code --%>
-			<html:form action="crosslinkProtein" method="get" styleId="form_get_for_updated_parameters_single_search" >
+			<html:form action="allProtein" method="get" styleId="form_get_for_updated_parameters_single_search" >
 						
 				<input type="hidden" name="projectSearchId" class=" project_search_id_in_update_form_jq " 
 					value="${ search.projectSearchId }">
@@ -164,7 +164,7 @@
 
 			</html:form>			
 				
-			<html:form action="mergedCrosslinkProtein" method="get" styleId="form_get_for_updated_parameters_multiple_searches" >
+			<html:form action="mergedAllProtein" method="get" styleId="form_get_for_updated_parameters_multiple_searches" >
 						
 				<input type="hidden" name="queryJSON" value="<c:out value="${ queryJSONToForm }" ></c:out>"  />
 				
@@ -178,7 +178,7 @@
 <%--
 		Moved JS call to the "Update" button
 		 						
-			<form action="javascript:viewSearchCrosslinkProteinPageCode.updatePageForFormParams()" method="get" > 
+			<form action="javascript:viewSearchProteinAllPageCode.updatePageForFormParams()" method="get" > 
 			
 				--%>	 <%-- id="form_get_for_updated_parameters" --%>
 			
@@ -192,7 +192,32 @@
 				<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
 				<%@ include file="/WEB-INF/jsp-includes/searchDetailsBlock.jsp" %>
 
+				<tr>
+					<td>Type Filter:</td>
+					<td colspan="2">
+						<%--  Update TestAllWebLinkTypesSelected if add another option --%>
 
+					  <label >
+						<input type="checkbox" class=" link_type_jq " 
+							onchange="defaultPageView.searchFormChanged_ForDefaultPageView();"
+							value="<%= PeptideViewLinkTypesConstants.CROSSLINK_PSM %>"   >
+						crosslinks
+					  </label>
+					  <label >
+						<input type="checkbox" class=" link_type_jq " 
+							onchange="defaultPageView.searchFormChanged_ForDefaultPageView();"
+							value="<%= PeptideViewLinkTypesConstants.LOOPLINK_PSM %>" >
+						looplinks
+					  </label> 
+					  <label >
+						<input type="checkbox" class=" link_type_jq " 
+							onchange="defaultPageView.searchFormChanged_ForDefaultPageView();"
+							value="<%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>" >
+						 unlinked
+					  </label>
+
+					</td>
+				</tr>
 				<tr>
 					<td>Exclude links with:</td>
 					<td>
@@ -264,7 +289,7 @@
 					
 						<c:set var="UpdateButtonText" value="Update"/>
 						
-						<input type="button" value="${ UpdateButtonText }"  onclick="viewSearchCrosslinkProteinPageCode.updatePageForFormParams()" >
+						<input type="button" value="${ UpdateButtonText }"  onclick="viewSearchProteinAllPageCode.updatePageForFormParams()" >
 						
 						<c:set var="projectSearchId" value="${ search.projectSearchId }"/>	
 
@@ -279,20 +304,17 @@
 			
 			<div style="height: 10px;">&nbsp;</div>
 						
-			<h3 style="display:inline;">Crosslinks (<bean:write name="numCrosslinks" />):</h3>
+			<h3 style="display:inline;">Proteins (<bean:write name="numProteins" />):</h3>
 			<div style="display:inline;">
-				[<a class="tool_tip_attached_jq" data-tooltip="View looplinks (instead of crosslinks)" 
+				[<a class="tool_tip_attached_jq" data-tooltip="View crosslinks" 
+						href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ search.projectSearchId }">crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+						>View Crosslinks</a>]
+				[<a class="tool_tip_attached_jq" data-tooltip="View looplinks" 
 						href="${ contextPath }/<proxl:defaultPageUrl pageName="/looplinkProtein" projectSearchId="${ search.projectSearchId }">looplinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
-						>View Looplinks (<bean:write name="numLooplinks" />)</a>]
-				[<a class="tool_tip_attached_jq" data-tooltip="Download all crosslinks as tab-delimited text" 
-					href="${ contextPath }/downloadMergedProteins.do?<bean:write name="queryString" />"
-					>Download Data (<bean:write name="numLinks" />)</a>]
-				[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" 
-					href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="queryString" />"
-					>Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
-				[<a class="tool_tip_attached_jq" data-tooltip="View Protein List" 
-						href="${ contextPath }/<proxl:defaultPageUrl pageName="/allProtein" projectSearchId="${ search.projectSearchId }">allProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
-						>Protein List</a>]
+						>View Looplinks</a>]
+				[<a class="tool_tip_attached_jq" data-tooltip="Download all proteins as tab-delimited text" 
+					href="${ contextPath }/downloadMergedProteinsAll.do?<bean:write name="queryString" />"
+					>Download Data (<bean:write name="numProteins" />)</a>]
 			</div>
 			
 			<%--  Block for user choosing which annotation types to display  --%>
@@ -303,15 +325,15 @@
 			<script type="text/javascript">
 				
 				//  If object exists, call function on it now, otherwise call the function on document ready
-				if ( window.viewSearchCrosslinkProteinPageCode ) {
-					window.viewSearchCrosslinkProteinPageCode.createPartsAboveMainTable();
+				if ( window.viewSearchProteinAllPageCode ) {
+					window.viewSearchProteinAllPageCode.createPartsAboveMainTable();
 				} else {
 	
 					$(document).ready(function() 
 					    { 
 						   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 							  
-							   window.viewSearchCrosslinkProteinPageCode.createPartsAboveMainTable();
+							   window.viewSearchProteinAllPageCode.createPartsAboveMainTable();
 						   },10);
 					    } 
 					); // end $(document).ready(function() 
@@ -325,10 +347,7 @@
 				
 					<thead>
 					<tr>
-						<th data-tooltip="Name of first protein" class="tool_tip_attached_jq" style="text-align:left;width:10%;font-weight:bold;">Protein 1</th>
-						<th data-tooltip="Linked position in first protein" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">Position</th>
-						<th data-tooltip="Name of second protein" class="tool_tip_attached_jq" style="width:10%;font-weight:bold;">Protein 2</th>
-						<th data-tooltip="Linked position in second protein" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">Position</th>
+						<th data-tooltip="Name of protein" class="tool_tip_attached_jq" style="text-align:left;width:10%;font-weight:bold;">Protein</th>
 						<th data-tooltip="Number of peptide spectrum matches showing this link" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">PSMs</th>
 						<th data-tooltip="Number of distinct pairs of peptides showing link" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Peptides</th>
 						<th data-tooltip="Number of found peptide pairs that uniquely map to these two proteins from the FASTA file" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Unique Peptides</th>
@@ -359,26 +378,22 @@
 					</tr>
 					</thead>
 						
-					<logic:iterate id="crosslink" name="crosslinks">
-							<tr id="<bean:write name="crosslink" property="protein1.proteinSequenceObject.proteinSequenceId" />-<bean:write name="crosslink" property="protein1Position" />-<bean:write name="crosslink" property="protein2.proteinSequenceObject.proteinSequenceId" />-<bean:write name="crosslink" property="protein2Position" />"
+					<logic:iterate id="proteinMain" name="proteinsMainList">
+							<tr id="${ proteinMain.proteinSequenceId }"
 								style="cursor: pointer; "
 								
-								onclick="viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.showHideCrosslinkReportedPeptides( { clickedElement : this })"
+								onclick="viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate.showHideReportedPeptides( { clickedElement : this })"
 								data-project_search_id="${ search.projectSearchId }"
-								data-protein_1_id="<bean:write name="crosslink" property="protein1.proteinSequenceObject.proteinSequenceId" />"
-								data-protein_2_id="<bean:write name="crosslink" property="protein2.proteinSequenceObject.proteinSequenceId" />"
-								data-protein_1_position="<bean:write name="crosslink" property="protein1Position" />"
-								data-protein_2_position="<bean:write name="crosslink" property="protein2Position" />"
+								data-protein_id="${ proteinMain.proteinSequenceId }"
 							>
-								<td><span class="proteinName" id="protein-id-<bean:write name="crosslink" property="protein1.proteinSequenceObject.proteinSequenceId" />"><bean:write name="crosslink" property="protein1.name" /></span></td>
-								<td class="integer-number-column"><bean:write name="crosslink" property="protein1Position" /></td>
-								<td><span class="proteinName" id="protein-id-<bean:write name="crosslink" property="protein2.proteinSequenceObject.proteinSequenceId" />"><bean:write name="crosslink" property="protein2.name" /></span></td>
-								<td class="integer-number-column"><bean:write name="crosslink" property="protein2Position" /></td>
-								<td class="integer-number-column"><bean:write name="crosslink" property="numPsms" /></td>
+								<td><span class="proteinName" id="protein-id-<bean:write name="proteinMain" property="searchProtein.proteinSequenceObject.proteinSequenceId" />"
+									><bean:write name="proteinMain" property="searchProtein.name" /></span></td>
+
+								<td class="integer-number-column"><bean:write name="proteinMain" property="numPsms" /></td>
 								
 								<td class="integer-number-column"><a class="show-child-data-link   " 
 										href="javascript:"
-										><bean:write name="crosslink" property="numLinkedPeptides" 
+										><bean:write name="proteinMain" property="numPeptides" 
 											/><span class="toggle_visibility_expansion_span_jq" 
 												><img src="${contextPath}/images/icon-expand-small.png" 
 													class=" icon-expand-contract-in-data-table "
@@ -390,16 +405,15 @@
 									</a>
 								</td>								
 								
-								<td class="integer-number-column"><bean:write name="crosslink" property="numUniqueLinkedPeptides" /></td>
+								<td class="integer-number-column"><bean:write name="proteinMain" property="numUniquePeptides" /></td>
 								
 						
-
-								<c:forEach var="annotationValue" items="${ crosslink.peptideAnnotationValueList }">
+								<c:forEach var="annotationValue" items="${ proteinMain.peptideAnnotationValueList }">
 			
 									<td style="white-space: nowrap"><c:out  value="${ annotationValue }" /></td>
 								</c:forEach>	
 
-								<c:forEach var="annotationValue" items="${ crosslink.psmAnnotationValueList }">
+								<c:forEach var="annotationValue" items="${ proteinMain.psmAnnotationValueList }">
 			
 									<td><c:out  value="${ annotationValue }" /></td>
 								</c:forEach>															
@@ -413,7 +427,7 @@
 									
 								<%--  Add to value for length of Peptide and PSM value lists --%>
 								<c:set var="columnsAddedForAnnotationData" 
-									value="${ fn:length( crosslink.peptideAnnotationValueList ) + fn:length( crosslink.psmAnnotationValueList ) }" />
+									value="${ fn:length( proteinMain.peptideAnnotationValueList ) + fn:length( proteinMain.psmAnnotationValueList ) }" />
 																								
 															
 								<td colspan="${ 8 + columnsAddedForAnnotationData }" align="center" class=" child_data_container_jq ">
@@ -432,19 +446,3 @@
 	
 
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>
-
-
-<%
-
-WebappTiming webappTiming = (WebappTiming)request.getAttribute( "webappTiming" );
-
-if ( webappTiming != null ) {
-		
-	webappTiming.markPoint( "At end of JSP" );
-	
-	webappTiming.logTiming();
-}
-
-
-
-%>

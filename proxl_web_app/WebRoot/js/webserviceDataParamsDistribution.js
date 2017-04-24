@@ -70,6 +70,14 @@ var WebserviceDataParamsDistributionCommonCode = function() {
 				window.viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.setPsmPeptideAnnTypeIdDisplay( annTypeIdDisplay );
 			}
 		}
+		if ( window.viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate ) {
+			if ( psmPeptideCutoffsRootObject !== undefined ) {
+				window.viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+			}
+			if ( annTypeIdDisplay !== undefined ) {
+				window.viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate.setPsmPeptideAnnTypeIdDisplay( annTypeIdDisplay );
+			}
+		}
 
 		//  Merged JS
 		if ( window.viewMergedPeptidePerSearchDataFromWebServiceTemplate ) {
@@ -98,6 +106,16 @@ var WebserviceDataParamsDistributionCommonCode = function() {
 				window.viewLooplinkProteinsLoadedFromWebServiceTemplate.setPsmPeptideAnnTypeIdDisplay( annTypeIdDisplay );
 			}
 		}
+		if ( window.viewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate ) {
+			if ( psmPeptideCutoffsRootObject !== undefined ) {
+				window.viewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate.setPsmPeptideCriteria( psmPeptideCutoffsRootObject );
+			}
+			if ( annTypeIdDisplay !== undefined && window.viewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate.setPsmPeptideAnnTypeIdDisplay ) {
+				//  Not currently exist: window.viewLooplinkProteinsLoadedFromWebServiceTemplate.setPsmPeptideAnnTypeIdDisplay
+				window.viewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate.setPsmPeptideAnnTypeIdDisplay( annTypeIdDisplay );
+			}
+		}
+		
 
 	};
 };

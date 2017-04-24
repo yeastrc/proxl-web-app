@@ -1,8 +1,11 @@
 <%@page import="org.yeastrc.xlink.www.webapp_timing.WebappTiming"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
+<%@page import="org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants"%>
 
 <%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
+
+<%--  viewMergedProteinAll.jsp  --%>
 
  <c:set var="pageTitle">View Search</c:set>
 
@@ -12,9 +15,10 @@
 
  <c:set var="headerAdditions">
  
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script>
  
  		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter.min.js"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/libs/d3.min.js"></script>
 		<script type="text/javascript" src="${ contextPath }/js/libs/venn.js"></script>
@@ -30,15 +34,13 @@
 		<script src="${contextPath}/js/lorikeet/jquery.flot.js"></script>
 		<script src="${contextPath}/js/lorikeet/jquery.flot.selection.js"></script>
 		
-		<script src="${contextPath}/js/lorikeet/specview.js"></script>
-		<script src="${contextPath}/js/lorikeet/peptide.js"></script>
-		<script src="${contextPath}/js/lorikeet/aminoacid.js"></script>
-		<script src="${contextPath}/js/lorikeet/ion.js"></script>		
+		<script src="${contextPath}/js/lorikeet/specview.js?x=${cacheBustValue}"></script>
+		<script src="${contextPath}/js/lorikeet/peptide.js?x=${cacheBustValue}"></script>
+		<script src="${contextPath}/js/lorikeet/aminoacid.js?x=${cacheBustValue}"></script>
+		<script src="${contextPath}/js/lorikeet/ion.js?x=${cacheBustValue}"></script>		
 		
 <%--  End of Lorikeet Core Parts --%>		
-			
-			
-						
+		
 		<!-- Handlebars templating library   -->
 		
 		<%--  
@@ -48,11 +50,13 @@
 		<!-- use minimized version  -->
 		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
 
-				
+		
+
 		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
 		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
-				
+		
+		
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:
@@ -61,25 +65,25 @@
 		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
-					
+			
 		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
-					
-		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkProteinsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-					
-		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 
+		<script type="text/javascript" src="${ contextPath }/js/viewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+	
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
-		
+				
 		<script type="text/javascript" src="${ contextPath }/js/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js?x=${cacheBustValue}"></script>
 		
+		<script type="text/javascript" src="${ contextPath }/js/viewMergedProteinAllPage.js?x=${cacheBustValue}"></script>
+	
 		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
 				
-		<script type="text/javascript" src="${ contextPath }/js/viewMergedCrosslinkProteinPage.js?x=${cacheBustValue}"></script>
-		
 		<script type="text/javascript" src="${ contextPath }/js/mergedSearchesVennDiagramCreator.js?x=${cacheBustValue}"></script>
 
+		
 		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
 
@@ -89,13 +93,13 @@
 		--%>
 
 		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/lorikeet.css">
-		
+	
 	<c:if test="${ not empty vennDiagramDataToJSON }">
 		<script type="text/text" id="venn_diagram_data_JSON"
 			><c:out value="${ vennDiagramDataToJSON }" escapeXml="false"></c:out></script>
 	</c:if>
 	
-	<script>
+	<script type="text/javascript">
 	function createMergedSearchesLinkCountsVennDiagram_PageFunction() {
 	
 		<c:if test="${ not empty vennDiagramDataToJSON }">
@@ -112,51 +116,47 @@
 
 	<%--  used by createTooltipForProteinNames.js --%>
 	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
-	
 
+		
 		<%@ include file="/WEB-INF/jsp-includes/viewPsmsLoadedFromWebServiceTemplateFragment.jsp" %>
-		<%@ include file="/WEB-INF/jsp-includes/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp" %>
-		
-
+	
+		<%@ include file="/WEB-INF/jsp-includes/viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplateFragment.jsp" %>
+	
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
-		
-		
 	
-	<%--  Crosslink Protein Template --%>
-
-
+	<%--  Protein Template --%>
 		
-		<script id="crosslink_protein_block_template"  type="text/x-handlebars-template">
+		<script id="all_protein_block_template"  type="text/x-handlebars-template">
 
 			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedCrosslinkProtein.jsp_templates/crosslink_protein_block_template.jsp" %>
+			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedProteinAll.jsp_templates/all_protein_block_template.jsp" %>
 
 		</script>
 	
 
-	<%--  Crosslink Protein Entry Template --%>
+	<%--  Protein Entry Template --%>
 
 
 
-		<%-- !!!   Handlebars template:  Crosslink Protein Entry Template  !!!!!!!!!   --%>
+		<%-- !!!   Handlebars template:  Looplink Protein Entry Template  !!!!!!!!!   --%>
 		
 		
-		<script id="crosslink_protein_data_row_entry_template"  type="text/x-handlebars-template">
+		<script id="all_protein_data_row_entry_template"  type="text/x-handlebars-template">
 
 			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedCrosslinkProtein.jsp_templates/crosslink_protein_data_row_entry_template.jsp" %>
+			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedProteinAll.jsp_templates/all_protein_data_row_entry_template.jsp" %>
 
 		</script>
 
 
 
-	<%--  Crosslink Protein Child row Entry Template --%>
+	<%--  Protein Child row Entry Template --%>
 
 		
-		<script id="crosslink_protein_child_row_entry_template"  type="text/x-handlebars-template">
+		<script id="all_protein_child_row_entry_template"  type="text/x-handlebars-template">
 
 			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedCrosslinkProtein.jsp_templates/crosslink_protein_child_row_entry_template.jsp" %>
+			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedProteinAll.jsp_templates/all_protein_child_row_entry_template.jsp" %>
 
 		</script>
 
@@ -167,61 +167,56 @@
 	
 		<%--  Put Project_Search_Ids on the page for the JS code --%>
 		<input type="hidden" class=" project_search_id_jq " value="<c:out value="${ projectSearchId }"></c:out>">
-	</c:forEach>	
+	</c:forEach>			
 		
 		<div class="overall-enclosing-block">
-	
+			
 			<h2 style="margin-bottom:5px;">List merged search proteins:</h2>
 	
-			<div class=" navigation-links-block ">
-			
+			<div  class=" navigation-links-block ">
+
 				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" 
 						href="${ contextPath }/mergedPeptide.do?<bean:write name="queryString" />">Peptide View</a>]
-			
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
 						href="${ contextPath }/mergedProteinCoverageReport.do?<bean:write name="queryString" />">Coverage Report</a>]
-
-
 				<%-- Navigation links to Merged Image and Merged Structure --%>
-				
 				<%@ include file="/WEB-INF/jsp-includes/imageAndStructureNavLinks.jsp" %>
-
-		
 			</div>
-	
+
 			<%-- query JSON in field outside of form for input to Javascript --%>
 				
 			<input type="hidden" id="query_json_field_outside_form" value="<c:out value="${ queryJSONToForm }" ></c:out>" > 
-
-				<%--  A block outside any form for PSM Peptide cutoff JS code --%>
-				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_outsideAnyForm.jsp" %>
 				
+			<%--  A block outside any form for PSM Peptide cutoff JS code --%>
+			<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_outsideAnyForm.jsp" %>
+
 	
-			<html:form action="mergedCrosslinkProtein" method="get" styleId="form_get_for_updated_parameters_multiple_searches" >
-						
+			<html:form action="mergedAllProtein" method="get" styleId="form_get_for_updated_parameters_multiple_searches" >
+			
 				<logic:iterate name="searches" id="search">
 					<input type="hidden" name="projectSearchId"
 						class=" project_search_id_in_update_form_jq "
 						value="<bean:write name="search" property="projectSearchId" />">
 				</logic:iterate>
 
-				<input type="hidden" name="queryJSON" id="query_json_field" value="<c:out value="${ queryJSONToForm }" ></c:out>"  />
+				<input type="hidden" name="queryJSON" id="query_json_field"  value="<c:out value="${ queryJSONToForm }" ></c:out>" />
 				
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
 			</html:form>
-			
+
 			<%--  Single search version, used by add/remove searches JS code --%>
-			<html:form action="crosslinkProtein" method="get" styleId="form_get_for_updated_parameters_single_search" >
+			<html:form action="allProtein" method="get" styleId="form_get_for_updated_parameters_single_search" >
 						
-				<input type="hidden" name="queryJSON" value="<c:out value="${ queryJSONToForm }" ></c:out>"  />
+				<input type="hidden" name="queryJSON"  value="<c:out value="${ queryJSONToForm }" ></c:out>" />
 				
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%> <%--  Currently empty --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
 			</html:form>			
-				
+							
+			
 			<table style="border-width:0px;">
 
 				<%--  Set to true to show color block before search for key --%>
@@ -230,20 +225,20 @@
 				<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
 				<%@ include file="/WEB-INF/jsp-includes/searchDetailsBlock.jsp" %>
 
-				
+
 				<tr>
 					<td>Exclude links with:</td>
 					<td>
 						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterNonUniquePeptides" > 					
+							<input type="checkbox" id="filterNonUniquePeptides"  > 					
 						 	 no unique peptides
 						 </span></label>
 						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterOnlyOnePSM" > 					
+							<input type="checkbox" id="filterOnlyOnePSM"   > 					
 						 	 only one PSM
 						 </span></label>
 						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterOnlyOnePeptide" > 					
+							<input type="checkbox" id="filterOnlyOnePeptide"   > 					
 						 	 only one peptide
 						 </span></label>
 					</td>
@@ -263,8 +258,7 @@
 						 </label> 
 --%>						 
 						 <label style="white-space: nowrap" >
-						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" 
-						  		class=" excludeTaxonomy_jq "  >  
+						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq "  >  
 						  
 						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
 						 </label> 						 
@@ -277,7 +271,7 @@
 					<td>
 						<%--  shortened property from "excludeProtein" to "excP" to shorten the URL  --%>
 						<%-- TODO   TEMP
-						<html:select property="excP" multiple="true" styleId="excludeProtein" >
+						<html:select property="excP" multiple="true" styleId="excludeProtein"  >
 							<html:options collection="proteins" property="proteinSequenceObject.proteinSequenceId" labelProperty="name" />
 						</html:select>
 						--%>
@@ -287,19 +281,13 @@
 						
 						All <option> values must be parsable as integers:
 						--%>
-						<select name="excludedProteins" multiple="multiple" id="excludeProtein" >  
+						<select name="excludedProteins" multiple="multiple" id="excludeProtein"  >  
 						  
 	  						<logic:iterate id="protein" name="allProteinsForCrosslinksAndLooplinksUnfilteredList">
 	  						  <option value="<c:out value="${ protein.proteinSequenceObject.proteinSequenceId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
 	  						</logic:iterate>
 	  					</select>
 									
-						<%--  TEMP for testing
-						<select name="excludedProteins" multiple="multiple" id="excludeProtein"> 
-							<option value="1" >TEMP_1</option>
-							<option value="2" >TEMP_2</option>
-						</select>
-						--%>
 					</td>
 				</tr>
 				
@@ -308,27 +296,29 @@
 					<td>
 						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerOverlayFragment.jsp" %>
 					
-						<input type="button" value="Update"  onclick="viewMergedCrosslinkProteinPageCode.updatePageForFormParams()" >
-
+						<input type="button" value="Update"  onclick="viewMergedProteinAllPageCode.updatePageForFormParams()" >
+											
 						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 					</td>
 				</tr>
+			
 			</table>
-					
+			
 			<div style="height: 10px;">&nbsp;</div>
-						
-		<div>
-			<h3 style="display:inline;">Merged Crosslinks: <bean:write name="numCrosslinks" />
-			</h3>
-
-			<div style="display:inline;">
-				[<a class="tool_tip_attached_jq" data-tooltip="View looplinks (instead of crosslinks)" href="${ contextPath }/mergedLooplinkProtein.do?<bean:write name="queryString" />">View Looplinks (<bean:write name="numLooplinks" />)</a>]
-				[<a class="tool_tip_attached_jq" data-tooltip="Download all crosslinks as tab-delimited text" href="${ contextPath }/downloadMergedProteins.do?<bean:write name="queryString" />">Download Data (<bean:write name="numLinks" />)</a>]
-				[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="queryString" />">Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
-
-				[<a class="tool_tip_attached_jq" data-tooltip="View Protein List" href="${ contextPath }/mergedAllProtein.do?<bean:write name="queryString" />">Protein List</a>]
+			
+			<div >
+				<h3 style="display:inline;">Merged Proteins: <bean:write name="numProteins" />
+				</h3>			
+				<div style="display:inline;">
+					[<a class="tool_tip_attached_jq" data-tooltip="View crosslinks" href="${ contextPath }/mergedCrosslinkProtein.do?<bean:write name="queryString" />">View Crosslinks</a>]
+					[<a class="tool_tip_attached_jq" data-tooltip="View looplinks" href="${ contextPath }/mergedLooplinkProtein.do?<bean:write name="queryString" />">View Looplinks</a>]
+					[<a class="tool_tip_attached_jq" data-tooltip="Download all proteins as tab-delimited text" 
+						href="${ contextPath }/downloadMergedProteinsAll.do?<bean:write name="queryString" />"
+						>Download Data (<bean:write name="numProteins" />)</a>]
+				</div>
 			</div>
-		</div>
+			
+			
 			
 			<c:choose>
 	 		 <c:when test="${ not empty vennDiagramDataToJSON }">
@@ -385,7 +375,9 @@
 			 </c:otherwise>
 			</c:choose>
  			
+			
 			<div style="clear:both;"></div>
+			
 
 			<%--  Block for user choosing which annotation types to display  --%>
 			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
@@ -394,25 +386,26 @@
 			<script type="text/javascript">
 			
 			//  If object exists, call function on it now, otherwise call the function on document ready
-			if ( window.viewMergedCrosslinkProteinPageCode ) {
-				window.viewMergedCrosslinkProteinPageCode.createPartsAboveMainTable();
+			if ( window.viewMergedProteinAllPageCode ) {
+				window.viewMergedProteinAllPageCode.createPartsAboveMainTable();
 			} else {
 
 				$(document).ready(function() 
 				    { 
 					   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 						  
-						   window.viewMergedCrosslinkProteinPageCode.createPartsAboveMainTable();
+						   window.viewMergedProteinAllPageCode.createPartsAboveMainTable();
 					   },10);
 				    } 
 				); // end $(document).ready(function() 
 			}
 								
 			</script>
-
+			
+			
 				<table style="" id="main_page_data_table" class="tablesorter top_data_table_jq ">
 				
-					<thead>
+				  <thead>
 					<tr>
 
 						<c:forEach items="${ searches }" var="search"  varStatus="searchVarStatus">
@@ -436,14 +429,11 @@
 								
 						</c:forEach>
 
-						<th data-tooltip="Number of selected searches containing link" class="tool_tip_attached_jq integer-number-column-header" style="left;width:45px;font-weight:bold;">Searches</th>
-						<th data-tooltip="Name of first protein" class="tool_tip_attached_jq" style="text-align:left;font-weight:bold;">Protein 1</th>
-						<th data-tooltip="Linked position in first protein" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">Position</th>
-						<th data-tooltip="Name of second protein" class="tool_tip_attached_jq" style="text-align:left;font-weight:bold;">Protein 2</th>
-						<th data-tooltip="Linked position in second protein" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">Position</th>
+						<th data-tooltip="Number of selected searches containing link" class="tool_tip_attached_jq integer-number-column-header" style="width:45px;font-weight:bold;">Searches</th>
+						<th data-tooltip="Name of the protein" class="tool_tip_attached_jq" style="text-align:left;font-weight:bold;">Protein</th>
 						<th data-tooltip="Number of peptide spectrum matches showing this link" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">PSMs</th>
-						<th data-tooltip="Number of distinct pairs of peptides showing link" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Peptides</th>
-						<th data-tooltip="Number of found peptide pairs that uniquely map to these two proteins from the FASTA file" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Unique Peptides</th>
+						<th data-tooltip="Number of distinct peptides showing link" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Peptides</th>
+						<th data-tooltip="Number of found peptides that uniquely map to this protein from the FASTA file" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Unique Peptides</th>
 
 
 						<c:set var="showSearchColorBlock" value="${ true }" />
@@ -502,30 +492,22 @@
 														
 						</c:forEach>
 
-
-
 					</tr>
-					</thead>
+				  </thead>
 						
-					<logic:iterate id="crosslink" name="crosslinks">
+					<logic:iterate id="protein" name="proteins">
 
-						<%--  crosslink is a wrapped mergedSearchProteinCrosslink --%>
-						
-						<c:set var="proteinEntry" value="${ crosslink.mergedSearchProteinCrosslink }" />
+						<c:set var="proteinEntry" value="${ protein }" />
 
 							<tr 
 								style="cursor: pointer; "
 								
-								onclick="viewCrosslinkProteinsLoadedFromWebServiceTemplate.showHideCrosslinkProteins( { clickedElement : this })"
+								onclick="viewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate.showHideProteinAlls( { clickedElement : this })"
 								data-project_search_ids="<c:forEach var="searchEntryForThisRow" items="${ proteinEntry.searches }">,${ searchEntryForThisRow.projectSearchId }</c:forEach>"
-								data-protein_1_id="<bean:write name="proteinEntry" property="protein1.proteinSequenceObject.proteinSequenceId" />"
-								data-protein_2_id="<bean:write name="proteinEntry" property="protein2.proteinSequenceObject.proteinSequenceId" />"
-								data-protein_1_position="<bean:write name="proteinEntry" property="protein1Position" />"
-								data-protein_2_position="<bean:write name="proteinEntry" property="protein2Position" />"
+								data-protein_id="<bean:write name="proteinEntry" property="protein.proteinSequenceObject.proteinSequenceId" />"
 							>
-										
-
-								<c:forEach items="${ crosslink.searchContainsCrosslink }" var="isMarked"  varStatus="searchVarStatus">
+									
+								<c:forEach items="${ protein.searchContainsProtein }" var="isMarked"  varStatus="searchVarStatus">
 								
 									<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
 									<%@ include file="/WEB-INF/jsp-includes/mergedSearch_SearchIndexToSearchColorCSSClassName.jsp" %>
@@ -539,8 +521,8 @@
 										</c:otherwise>
 									</c:choose>
 
-								</c:forEach>
-
+								</c:forEach>								
+			
 								<td class="integer-number-column"><a class="show-child-data-link   " 
 										href="javascript:"
 										><bean:write name="proteinEntry" property="numSearches" 
@@ -553,16 +535,12 @@
 															class=" icon-expand-contract-in-data-table "
 															></span>
 									</a>
-								</td>								
-								
-								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein1.proteinSequenceObject.proteinSequenceId" />"><bean:write name="proteinEntry" property="protein1.name" /></span></td>
-								<td class="integer-number-column"><bean:write name="proteinEntry" property="protein1Position" /></td>
-								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein2.proteinSequenceObject.proteinSequenceId" />"><bean:write name="proteinEntry" property="protein2.name" /></span></td>
-								<td class="integer-number-column"><bean:write name="proteinEntry" property="protein2Position" /></td>
+								</td>
+																				
+								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein.proteinSequenceObject.proteinSequenceId" />"><bean:write name="proteinEntry" property="protein.name" /></span></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="numPsms" /></td>
-								<td class="integer-number-column"><bean:write name="proteinEntry" property="numLinkedPeptides" /></td>
-								<td class="integer-number-column"><bean:write name="proteinEntry" property="numUniqueLinkedPeptides" /></td>
-						
+								<td class="integer-number-column"><bean:write name="proteinEntry" property="numPeptides" /></td>
+								<td class="integer-number-column"><bean:write name="proteinEntry" property="numUniquePeptides" /></td>
 
 
 								
@@ -640,20 +618,16 @@ private List<String> peptideAnnotationValueList;
 								
 	
 	
-							</c:forEach>			
+							</c:forEach>	
+							
 							</tr>
 
 							<tr class="expand-child" style="display:none;">
 
+							
 								<%--  colspan set to the number of searches plus the number of other columns --%>
-								<td colspan="<c:out value="${ fn:length( searches ) + 9 + columnsAddedForAnnotationData }"
-									></c:out>" align="center"
-									class=" child_data_container_jq ">
+								<td colspan="<c:out value="${ fn:length( searches ) + 8 + columnsAddedForAnnotationData }"></c:out>" align="center" class=" child_data_container_jq ">
 								
-									<div style="color: green; font-size: 16px; padding-top: 10px; padding-bottom: 10px;" >
-										Loading...
-									</div>
-	
 								</td>
 							</tr>
 
@@ -662,6 +636,7 @@ private List<String> peptideAnnotationValueList;
 				</table>
 
 
+	
 		</div>
 	
 	

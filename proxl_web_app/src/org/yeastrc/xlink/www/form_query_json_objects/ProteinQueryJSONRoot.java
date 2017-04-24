@@ -7,6 +7,11 @@ package org.yeastrc.xlink.www.form_query_json_objects;
 public class ProteinQueryJSONRoot extends A_QueryBase_JSONRoot {
 	//  A_QueryBase_JSONRoot contains the PSM and Peptide cutoffs
 
+	/**
+	 * Only for ViewSearchProteinsAllAction
+	 */
+	private String[] linkTypes;
+	
 	private int[] excludeTaxonomy;
 	private boolean filterNonUniquePeptides;
 	private boolean filterOnlyOnePSM;
@@ -33,8 +38,6 @@ public class ProteinQueryJSONRoot extends A_QueryBase_JSONRoot {
 	 */
 	private int[] excludeProtein;
 	
-	//  Consider populating this instead as an optimization when many proteins are excluded
-//	private int[] includeProtein;
 	/**
 	 * OLD  Nrseq Protein Ids
 	 * 
@@ -51,7 +54,20 @@ public class ProteinQueryJSONRoot extends A_QueryBase_JSONRoot {
 	public void setExcludeProtein(int[] excludeProtein) {
 		this.excludeProtein = excludeProtein;
 	}
-	
+	/**
+	 * Only for ViewSearchProteinsAllAction
+	 * @return
+	 */
+	public String[] getLinkTypes() {
+		return linkTypes;
+	}
+	/**
+	 * Only for ViewSearchProteinsAllAction
+	 * @param linkTypes
+	 */
+	public void setLinkTypes(String[] linkTypes) {
+		this.linkTypes = linkTypes;
+	}
 	
 	public int[] getExcludeTaxonomy() {
 		return excludeTaxonomy;
@@ -104,4 +120,5 @@ public class ProteinQueryJSONRoot extends A_QueryBase_JSONRoot {
 	public void setExcludeProteinSequenceIds(int[] excludeProteinSequenceIds) {
 		this.excludeProteinSequenceIds = excludeProteinSequenceIds;
 	}
+
 }

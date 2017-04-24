@@ -54,6 +54,11 @@ public class MoveProjectSearchIdToNewProjectUsingDBTransactionService {
 				Cached_Search_Core_DTO.getInstance().invalidateProjectSearchId( projectSearchId );
 			}
 			dbConnection.commit();
+			///  Invalidate again after DB Commit
+			for ( int projectSearchId : projectSearchIdList ) {
+				Cached_Search_Core_DTO.getInstance().invalidateProjectSearchId( projectSearchId );
+			}
+			
 		} catch ( Exception e ) {
 			String msg = "Failed moveProjectSearchIdToNewProjectId(...)";
 			log.error( msg, e );

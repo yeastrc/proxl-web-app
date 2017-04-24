@@ -318,6 +318,8 @@
 					[<a class="tool_tip_attached_jq" data-tooltip="View crosslinks (instead of looplinks)" href="${ contextPath }/mergedCrosslinkProtein.do?<bean:write name="queryString" />">View Crosslinks (<bean:write name="numCrosslinks" />)</a>]
 					[<a class="tool_tip_attached_jq" data-tooltip="Download all looplinks as tab-delimited text" href="${ contextPath }/downloadMergedProteins.do?<bean:write name="queryString" />">Download Data (<bean:write name="numLinks" />)</a>]
 					[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="queryString" />">Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
+
+					[<a class="tool_tip_attached_jq" data-tooltip="View Protein List" href="${ contextPath }/mergedAllProtein.do?<bean:write name="queryString" />">Protein List</a>]
 				</div>
 			</div>
 			

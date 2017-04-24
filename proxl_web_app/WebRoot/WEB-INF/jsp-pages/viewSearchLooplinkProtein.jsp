@@ -284,6 +284,9 @@
 				[<a class="tool_tip_attached_jq" data-tooltip="Download all distinct UDRs (crosslinks and looplinks) as tab-delimited text" 
 					href="${ contextPath }/downloadMergedProteinUDRs.do?<bean:write name="queryString" />"
 					>Download UDRs (<bean:write name="numDistinctLinks" />)</a>]
+				[<a class="tool_tip_attached_jq" data-tooltip="View Protein List" 
+						href="${ contextPath }/<proxl:defaultPageUrl pageName="/allProtein" projectSearchId="${ search.projectSearchId }">allProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+						>Protein List</a>]
 			</div>
 
 			<%--  Block for user choosing which annotation types to display  --%>

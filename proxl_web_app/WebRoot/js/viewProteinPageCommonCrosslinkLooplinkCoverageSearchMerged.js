@@ -93,6 +93,44 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 				},10);
 			}); // end $(document).ready(function()
 		}
+
+		//  Process chosen link types
+		var linkTypes = _query_json_field_Contents.linkTypes;
+		
+		//  Pass chosen link types to viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate if on the page
+		if ( window.viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate ) {
+			viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate.setChosenLinkTypes( linkTypes );
+		}
+		
+		if ( window.viewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate ) {
+			viewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate.setChosenLinkTypes( linkTypes );
+		}
+		
+		//  Mark check boxes for chosen link types
+		if ( linkTypes !== undefined && linkTypes !== null ) {
+			//  linkTypes not null so process it, empty array means nothing chosen
+			if ( linkTypes.length > 0 ) {
+				var $link_type_jq = $(".link_type_jq");
+				$link_type_jq.each( function( index, element ) {
+					var $item = $( this );
+					var linkTypeFieldValue = $item.val();
+					//  if linkTypeFieldValue found in linkTypes array, set it to checked
+					for ( var linkTypesIndex = 0; linkTypesIndex < linkTypes.length; linkTypesIndex++ ) {
+						var linkTypesEntry = linkTypes[ linkTypesIndex ];
+						if ( linkTypesEntry === linkTypeFieldValue ) {
+							$item.prop('checked', true);
+						}
+					}
+				});
+			}
+		} else {
+			//  linkTypes null means all are chosen, since don't know which one was wanted
+			var $link_type_jq = $(".link_type_jq");
+			$link_type_jq.each( function( index, element ) {
+				var $item = $( this );
+				$item.prop('checked', true);
+			});
+		}		
 		
 		//  Mark check boxes for chosen links to exclude:  "no unique peptides", "only one PSM", "only one peptide"
 		if ( _query_json_field_Contents.filterNonUniquePeptides ) {
@@ -154,6 +192,19 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 		var getAnnotationTypeDisplayFromThePageResult = annotationDataDisplayProcessingCommonCode.getAnnotationTypeDisplayFromThePage( {} );
 		var annotationTypeDisplayByProjectSearchId = getAnnotationTypeDisplayFromThePageResult.annTypeIdDisplayByProjectSearchId;
 
+		//  Create array from check boxes for chosen link types
+		var outputLinkTypes = [];
+		var $link_type_jq = $(".link_type_jq");
+		$link_type_jq.each( function( index, element ) {
+			var $item = $( this );
+			if ( $item.prop('checked') === true ) {
+				var linkTypeFieldValue = $item.val();
+				outputLinkTypes.push( linkTypeFieldValue );
+//				} else {
+//				allLinkTypesChosen = false;
+			}
+		});
+
 		//  Mark check boxes for chosen links to exclude:  "no unique peptides", "only one PSM", "only one peptide"
 		var filterNonUniquePeptides = false;
 		var filterOnlyOnePSM = false;
@@ -187,6 +238,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 		var output_query_json_field_Contents = { 
 				cutoffs : outputCutoffs, 
 				annTypeIdDisplay : annotationTypeDisplayByProjectSearchId,
+				linkTypes : outputLinkTypes, 
 				filterNonUniquePeptides : filterNonUniquePeptides,
 				filterOnlyOnePSM : filterOnlyOnePSM,
 				filterOnlyOnePeptide : filterOnlyOnePeptide,

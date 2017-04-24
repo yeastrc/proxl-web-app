@@ -7,7 +7,7 @@ package org.yeastrc.xlink.www.dto;
  * table srch_rep_pept__prot_seq_id_pos_looplink
  *
  */
-public class SrchRepPeptProtSeqIdPosLooplinkDTO {
+public class SrchRepPeptProtSeqIdPosLooplinkDTO implements SrchRepPeptProtSeqIdPosCommonIF {
 
 	private int id;
 	private int searchId;

@@ -160,6 +160,14 @@
         
         
         <!-- Debugging loggers -->
+        
+        <!--         
+        <logger name="org.yeastrc.xlink.www.searcher.SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher" additivity="false">
+                <level value="DEBUG"/>
+                <appender-ref ref="ROLL" />
+                <appender-ref ref="ROLL_ERROR" />
+        </logger>
+        -->  
         <!-- 
         <logger name="org.yeastrc.xlink.www.db_web.DBConnectionFactoryWeb" additivity="false">
                 <level value="DEBUG"/>
