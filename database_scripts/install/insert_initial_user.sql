@@ -3,7 +3,7 @@
 USE proxl ;
 
 --  This will create an initial user in the "proxl" database
---  The initial user will have user id "initial_user_mgmt_central_user"
+--  The initial user will have user id "initial_proxl_user"
 --  The initial user will have password "FJS483792nzmv,xc4#&@(!VMKSDL"
 
 --  This is required to have an 'id' of 1.  There is hard coding in the app for this id of 1.
