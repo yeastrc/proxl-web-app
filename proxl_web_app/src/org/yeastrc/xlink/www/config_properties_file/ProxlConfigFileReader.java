@@ -58,13 +58,13 @@ public class ProxlConfigFileReader {
 //			log.error( msg );
 //			throw new ProxlWebappConfigException( msg );
 //		}
-
-		if ( StringUtils.isEmpty( proxlConfigFileValues.getRequestingWebappIdentifier() ) ) {
-			String msg = "Property  '" + PROPERTY_NAME__PROXL_WEBAPP_IDENTIFIER_FOR_USER_ACCOUNT_WEB_APP + "' must have a value in "
-					+ "properties file: '" + CONFIG_DEFAULTS_FILENAME + "'.";
-			log.error( msg );
-			throw new ProxlWebappConfigException( msg );
-		}
+//
+//		if ( StringUtils.isEmpty( proxlConfigFileValues.getRequestingWebappIdentifier() ) ) {
+//			String msg = "Property  '" + PROPERTY_NAME__PROXL_WEBAPP_IDENTIFIER_FOR_USER_ACCOUNT_WEB_APP + "' must have a value in "
+//					+ "properties file: '" + CONFIG_DEFAULTS_FILENAME + "'.";
+//			log.error( msg );
+//			throw new ProxlWebappConfigException( msg );
+//		}
 		
 		log.warn( "INFO: '" + PROPERTY_NAME__USER_ACCOUNT_WEB_APP_URL + "' has value: " 
 				+ proxlConfigFileValues.getUserAccountServerURLandAppContext() );
