@@ -200,7 +200,8 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 					line += link.getPeptide1().getSequence() + "--" + link.getPeptide2().getSequence() + "\t";
 					
 					
-					
+					// TODO: This could be optimized for cases with only one linker that has only one molecular formula (most cases)
+					// by just using that formula w/o checking masses for all PSMs
 					
 					// iterate over PSMs for this reported peptide, get linker masses to find linker formula
 					int unifiedReportedPeptideId = link.getUnifiedReportedPeptideId();
