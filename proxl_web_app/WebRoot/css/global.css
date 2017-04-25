@@ -582,7 +582,7 @@ body.project-page .note-display-div { margin-bottom: 10px; }
 /* Folder Data */
 
 body.project-page .folder-container { padding-left: 8px; padding-top: 3px; padding-bottom: 3px; clear: left; } 
-body.project-page .folder-collapsable-link-container { padding-top: 0px; padding-right: 3px; }
+body.project-page .folder-collapsable-link-container { float: left; padding-top: 0px; padding-right: 3px; }
 body.project-page .folder-collapsable-link {  }
 
 body.project-page .folder-name-display { font-size: 18px; font-weight: bold; }

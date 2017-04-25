@@ -16,9 +16,26 @@
 
 $(document).ready(function() {
 
+	addCollapsableEventHandlers();  // Run with no parameter
+});
+
+var addCollapsableEventHandlers = function( $searchRoot ) {
+	
 	try {
 
-		$(".collapsable_collapse_link_jq").click( function(eventObject) {
+		var $collapsable_collapse_link_jq = null;
+		var $collapsable_expand_link_jq = null;
+		
+		if ( $searchRoot ) {
+			
+			$collapsable_collapse_link_jq = $searchRoot.find(".collapsable_collapse_link_jq");
+			$collapsable_expand_link_jq = $searchRoot.find(".collapsable_expand_link_jq")
+		} else {
+			$collapsable_collapse_link_jq = $(".collapsable_collapse_link_jq");
+			$collapsable_expand_link_jq = $(".collapsable_expand_link_jq")
+		}
+		
+		$collapsable_collapse_link_jq.click( function(eventObject) {
 
 			try {
 
@@ -55,9 +72,7 @@ $(document).ready(function() {
 			}
 		});
 
-
-
-		$(".collapsable_expand_link_jq").click( function(eventObject) {
+		$collapsable_expand_link_jq.click( function(eventObject) {
 
 			try {
 
@@ -99,4 +114,4 @@ $(document).ready(function() {
 		throw e;
 	}
 
-});
+};

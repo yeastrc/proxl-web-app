@@ -21,6 +21,7 @@
  * Constructor
  */
 var SearchesForPageChooser = function( params ) {
+	this._folderTemplate_HandlebarsTemplate = undefined;
 	this._singleSearchTemplate_HandlebarsTemplate = undefined;
 	this.minimumNumberOfSearches = 1;
 };
@@ -107,6 +108,15 @@ SearchesForPageChooser.prototype.init = function( params ) {
 			throw Error( "singleSearchTemplate_handlebarsSource === null" );
 		}
 		this._singleSearchTemplate_HandlebarsTemplate = Handlebars.compile( singleSearchTemplate_handlebarsSource );
+
+		var folderTemplate_handlebarsSource = $( "#searches_for_page_chooser_overlay_folder_entry_template" ).text();
+		if ( folderTemplate_handlebarsSource === undefined ) {
+			throw Error( "folderTemplate_handlebarsSource === undefined" );
+		}
+		if ( folderTemplate_handlebarsSource === null ) {
+			throw Error( "folderTemplate_handlebarsSource === null" );
+		}
+		this._folderTemplate_HandlebarsTemplate = Handlebars.compile( folderTemplate_handlebarsSource );
 		
 		//  Plain text template using "#" for project search id 
 		var $searches_for_page_chooser_overlay_project_search_id_input_template = $("#searches_for_page_chooser_overlay_project_search_id_input_template");
@@ -163,7 +173,7 @@ SearchesForPageChooser.prototype.loadSearchData = function( params ) {
 	if ( $project_id.length === 0 ) {
 		throw Error( 'Missing from page: <input type="hidden" id="project_id" value="{ project id }">' );
 	}
-	var project_id = $project_id.val()
+	var project_id = $project_id.val();
 
 	var requestData = { project_id : project_id };
 	$.ajax({
@@ -204,7 +214,8 @@ SearchesForPageChooser.prototype.loadSearchDataProcessResponse = function( param
 		return;
 	}
 	
-	var searchesToDisplay = responseData.searchesList;
+	var folderList = responseData.folderList;
+	var searchesNotInFoldersList = responseData.searchesNotInFoldersList;
 
 	var projectSearchIdsForCurrentPage = this.getProjectSearchIdsForCurrentPage();
 	var projectSearchIdsForCurrentPageAsObject = projectSearchIdsForCurrentPage.asObject;
@@ -213,60 +224,42 @@ SearchesForPageChooser.prototype.loadSearchDataProcessResponse = function( param
 	var $searches_for_page_chooser_list_container = $("#searches_for_page_chooser_list_container");
 	$searches_for_page_chooser_list_container.empty();
 	
-	var searchesOnCurrentPage = [];
-	var searchesNOTOnCurrentPage = [];
+	//  Add folders and their contained searches to the selection list
+	this.addFoldersToPage( {
+		folderList : folderList,
+		$containerToAppendTo : $searches_for_page_chooser_list_container,
+		projectSearchIdsForCurrentPageAsObject : projectSearchIdsForCurrentPageAsObject
+	});
 	
-	//  First separate out the searches currently on the page into a separate array which will be displayed at the top of the list of searches
-	for ( var searchDataListIndex = 0; searchDataListIndex < searchesToDisplay.length; searchDataListIndex++ ) {
-		var searchDataEntry = searchesToDisplay[ searchDataListIndex ];
-		if ( projectSearchIdsForCurrentPageAsObject[ searchDataEntry.id ] ) {
-			searchesOnCurrentPage.push( searchDataEntry );
-		} else {
-			searchesNOTOnCurrentPage.push( searchDataEntry );
-		}
-	}
+	//  Add searches not in any folders
+	this.addSearchesToPage( { 
+		searchesToAddToPage : searchesNotInFoldersList,
+		projectSearchIdsExclude : projectSearchIdsForCurrentPageAsObject, 
+		$containerToAppendTo : $searches_for_page_chooser_list_container,
+		projectSearchIdsForCurrentPageAsObject : projectSearchIdsForCurrentPageAsObject 
+	} );
 	
-	this.addSearchArrayToPage( { 
-		searchesToAddToPage: searchesOnCurrentPage, 
-		$searches_for_page_chooser_list_container : $searches_for_page_chooser_list_container,
-		addCssClassSelected: true } );
-	this.addSearchArrayToPage( { 
-		searchesToAddToPage: searchesNOTOnCurrentPage, 
-		$searches_for_page_chooser_list_container : $searches_for_page_chooser_list_container,
-		addCssClassSelected: false } );
 
 	$(".searches_for_page_chooser_modal_dialog_overlay_display_parts_jq").show()
 	
-	var OVERLAY_MINIMUM_HEIGTH = 150;
-	
 	var $window = $( window );
 	var windowScrollTop = $window.scrollTop();
-	var viewportHeight = $window.height();
 
-	var $searches_for_page_chooser_list_outer_container = $("#searches_for_page_chooser_list_outer_container");
-	var $searches_for_page_chooser_overlay_div = $("#searches_for_page_chooser_overlay_div");
-
-	var listMaximumHeight = $searches_for_page_chooser_list_container.height() + 5;
-	
-	//   Set overlay height to viewport - 40px or at minimum height
-	var overlayHeight = viewportHeight - 40;
-	var current_select_searches_overlay_div_Heigth = $searches_for_page_chooser_overlay_div.height();
-	var overlayHeightDiff = overlayHeight - current_select_searches_overlay_div_Heigth;
-	var current_searches_list_container_Height = $searches_for_page_chooser_list_container.height();
-	var new_current_searches_list_container_Height = current_searches_list_container_Height + overlayHeightDiff;
-	if ( new_current_searches_list_container_Height < OVERLAY_MINIMUM_HEIGTH ) {
-		new_current_searches_list_container_Height = OVERLAY_MINIMUM_HEIGTH ;
-	}
-	if ( new_current_searches_list_container_Height > listMaximumHeight ) {
-		new_current_searches_list_container_Height = listMaximumHeight ;
-	}
-	
 	//  Position Overlay Vertically
 	var overlayNewTop = windowScrollTop + 10;
 	//  Apply position to overlay
+	var $searches_for_page_chooser_overlay_div = $("#searches_for_page_chooser_overlay_div");
 	$searches_for_page_chooser_overlay_div.css( { top : overlayNewTop + "px" } );
-	$searches_for_page_chooser_list_outer_container.css( { height : new_current_searches_list_container_Height + "px" } ); 
 
+	var $searches_for_page_chooser_list_outer_container = $("#searches_for_page_chooser_list_outer_container")
+	$searches_for_page_chooser_list_outer_container.css( { height : "0px" } );
+
+	// Get overlay height when search list is empty
+	this.select_searches_overlay_div_HeightWithSearchListZeroHeight = $searches_for_page_chooser_overlay_div.height();
+	
+	//  forceAdjustHeight : true - for when first loading searches and folders
+	this.setOverlayHeight( { forceAdjustHeight : true } );
+	
 	//  Does not always work, if the mouse moves right after the click
 //	console.log("Before: Scroll to first selected search" );
 //	//  Scroll to first selected search 
@@ -293,17 +286,128 @@ SearchesForPageChooser.prototype.loadSearchDataProcessResponse = function( param
 /**
  * 
  */
-SearchesForPageChooser.prototype.addSearchArrayToPage = function( params ) {
+SearchesForPageChooser.prototype.addFoldersToPage = function( params ) {
+	var objectThis = this;
+	var folderList = params.folderList;
+	var $containerToAppendTo = params.$containerToAppendTo;
+	var projectSearchIdsForCurrentPageAsObject = params.projectSearchIdsForCurrentPageAsObject;
+
+	for ( var folderListIndex = 0; folderListIndex < folderList.length; folderListIndex++ ) {
+		var folder = folderList[ folderListIndex ];
+		//  Add folder to page
+		var folderEntryContext = {
+				folderName : folder.folderName
+		};
+		var html = objectThis._folderTemplate_HandlebarsTemplate( folderEntryContext );
+		var $addedItem = $( html ).appendTo( $containerToAppendTo );
+
+		this.addFolderExpandCollapseClickHandlers( { $addedItem : $addedItem } );
+		
+		var $folder_contents_block_jq = $addedItem.find(".folder_contents_block_jq");
+		//  Create Array of searches for folder that are not already displayed because they are on the current page
+		var searchesList = folder.searchesList;
+		//  Add searches for this folder to the page
+		var anySearchesOnCurrentPage = 
+			this.addSearchesToPage({
+				searchesToAddToPage : searchesList,
+				$containerToAppendTo : $folder_contents_block_jq,
+				projectSearchIdsForCurrentPageAsObject : projectSearchIdsForCurrentPageAsObject
+			});
+		
+		if ( anySearchesOnCurrentPage ) {
+			// Auto expand the folder to show the selected search on the page
+			this.expandFolder( { $folder_root_jq : $addedItem } );
+		}
+	}
+}
+
+
+/**
+ *  
+ */
+SearchesForPageChooser.prototype.addFolderExpandCollapseClickHandlers = function( params ) {
+	var objectThis = this;
+	var $addedItem = params.$addedItem; // assumed to be folder_root_jq
+	var $folder_show_contents_link_jq = $addedItem.find(".folder_show_contents_link_jq");
+	$folder_show_contents_link_jq.click( function( eventObject ) {
+		try {
+			objectThis.expandFolderResizeOverlay( { clickThis : this } );
+			eventObject.preventDefault();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	} );
+	var $folder_hide_contents_link_jq = $addedItem.find(".folder_hide_contents_link_jq");
+	$folder_hide_contents_link_jq.click( function( eventObject ) {
+		try {
+			objectThis.collapseFolder( { clickThis : this } );
+			eventObject.preventDefault();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	} );
+};
+
+
+/**
+ *  
+ */
+SearchesForPageChooser.prototype.expandFolderResizeOverlay = function( params ) {
+	var clickThis = params.clickThis;
+	var $clickThis = $( clickThis );
+	var $folder_root_jq = $clickThis.closest(".folder_root_jq");
+	this.expandFolder( { $folder_root_jq : $folder_root_jq } );
+	this.setOverlayHeight();
+};
+
+/**
+ *  
+ */
+SearchesForPageChooser.prototype.expandFolder = function( params ) {
+	var $folder_root_jq = params.$folder_root_jq;
+	var $folder_contents_block_jq = $folder_root_jq.find(".folder_contents_block_jq");
+	$folder_contents_block_jq.show();
+	var $folder_hide_contents_link_jq = $folder_root_jq.find(".folder_hide_contents_link_jq");
+	$folder_hide_contents_link_jq.show();
+	var $folder_show_contents_link_jq = $folder_root_jq.find(".folder_show_contents_link_jq");
+	$folder_show_contents_link_jq.hide();
+};
+
+/**
+ *  
+ */
+SearchesForPageChooser.prototype.collapseFolder = function( params ) {
+	var clickThis = params.clickThis;
+	var $clickThis = $( clickThis );
+	var $folder_root_jq = $clickThis.closest(".folder_root_jq");
+	var $folder_contents_block_jq = $folder_root_jq.find(".folder_contents_block_jq");
+	$folder_contents_block_jq.hide();
+	var $folder_hide_contents_link_jq = $folder_root_jq.find(".folder_hide_contents_link_jq");
+	$folder_hide_contents_link_jq.hide();
+	var $folder_show_contents_link_jq = $folder_root_jq.find(".folder_show_contents_link_jq");
+	$folder_show_contents_link_jq.show();
+};
+
+/**
+ * return true if any added are on the current page 
+ */
+SearchesForPageChooser.prototype.addSearchesToPage = function( params ) {
 	var objectThis = this;
 	var searchesToAddToPage = params.searchesToAddToPage;
-	var $searches_for_page_chooser_list_container = params.$searches_for_page_chooser_list_container;
-	var addCssClassSelected = params.addCssClassSelected;
+	var $containerToAppendTo = params.$containerToAppendTo;
+	var projectSearchIdsForCurrentPageAsObject = params.projectSearchIdsForCurrentPageAsObject;
+	
+	var anySearchesOnCurrentPage = false;
+	
 	for ( var searchDataListIndex = 0; searchDataListIndex < searchesToAddToPage.length; searchDataListIndex++ ) {
 		var searchDataEntry = searchesToAddToPage[ searchDataListIndex ];
-		var html = objectThis._singleSearchTemplate_HandlebarsTemplate(searchDataEntry);
-		var $addedItem = 
-			$( html ).appendTo( $searches_for_page_chooser_list_container );
-		if ( addCssClassSelected ) {
+		var html = objectThis._singleSearchTemplate_HandlebarsTemplate( searchDataEntry );
+		var $addedItem = $( html ).appendTo( $containerToAppendTo );
+		var projectSearchId = searchDataEntry.projectSearchId;
+		if ( projectSearchIdsForCurrentPageAsObject[ projectSearchId ] ) {
+			anySearchesOnCurrentPage = true;
 			$addedItem.addClass( objectThis.CONSTANTS.USER_CHOSE_SEARCH_CSS_CLASS );
 		}
 		$addedItem.click( function( eventObject ) {
@@ -315,7 +419,55 @@ SearchesForPageChooser.prototype.addSearchArrayToPage = function( params ) {
 			}
 		} );
 	}
+	return anySearchesOnCurrentPage;
 };
+
+
+/**
+ * 
+ */
+SearchesForPageChooser.prototype.setOverlayHeight = function( params ) {
+	var forceAdjustHeight = undefined;
+	if ( params ) {
+		forceAdjustHeight = params.forceAdjustHeight;
+	}
+	
+//	var OVERLAY_MINIMUM_HEIGHT = 150;
+	var OVERLAY_MINIMUM_HEIGHT = 50;
+
+	var $window = $( window );
+	var viewportHeight = $window.height();
+
+	var $searches_for_page_chooser_list_outer_container = $("#searches_for_page_chooser_list_outer_container");
+	var $searches_for_page_chooser_list_container = $("#searches_for_page_chooser_list_container");
+	var $searches_for_page_chooser_overlay_div = $("#searches_for_page_chooser_overlay_div");
+
+	var current_searches_list_container_Height = $searches_for_page_chooser_list_container.height();
+	var listMaximumHeight = current_searches_list_container_Height + 5;
+
+	// overlay height when search list is empty
+	//  this.select_searches_overlay_div_HeightWithEmptySearchList
+
+//	Set overlay height to viewport - 40px or at minimum height
+	var overlayHeight = viewportHeight - 40;
+	var overlayHeightDiff = overlayHeight - this.select_searches_overlay_div_HeightWithSearchListZeroHeight;
+	
+	var new_current_searches_list_container_Height = overlayHeightDiff;
+	
+	if ( new_current_searches_list_container_Height < OVERLAY_MINIMUM_HEIGHT ) {
+		new_current_searches_list_container_Height = OVERLAY_MINIMUM_HEIGHT ;
+	}
+	if ( new_current_searches_list_container_Height > listMaximumHeight ) {
+		new_current_searches_list_container_Height = listMaximumHeight ;
+	}
+	
+	var current_searches_for_page_chooser_list_outer_container = $searches_for_page_chooser_list_outer_container.height();
+	
+	if ( forceAdjustHeight || new_current_searches_list_container_Height > current_searches_for_page_chooser_list_outer_container ) {
+		$searches_for_page_chooser_list_outer_container.css( { height : new_current_searches_list_container_Height + "px" } );
+	}
+};
+
 
 /**
  * 
