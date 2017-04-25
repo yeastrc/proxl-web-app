@@ -9,6 +9,7 @@
   		<form-bean name="searchViewPeptideForm" type="org.yeastrc.xlink.www.forms.SearchViewPeptidesForm" />
   		<form-bean name="mergedSearchViewPeptideForm" type="org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm" />
   		<form-bean name="mergedSearchViewProteinForm" type="org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm" />
+  		<form-bean name="downloadProteinCLMSForm" type="org.yeastrc.xlink.www.forms.DownloadProteinCLMSForm" />
   		
   		<form-bean name="QCPlotRetentionTimeForm" type="org.yeastrc.xlink.www.forms.QCPlotRetentionTimeForm" />
   		<form-bean name="uploadPDBFileForm" type="org.yeastrc.xlink.www.forms.UploadPDBFileForm" />
@@ -328,6 +329,13 @@
 				type="org.yeastrc.xlink.www.actions.DownloadMergedProteinsFASTAAction"
 				scope="request"
 				name="mergedSearchViewProteinForm"
+				validate="false">
+		</action>
+		
+		<action path="/downloadMergedProteinsCLMS_CSV"
+				type="org.yeastrc.xlink.www.actions.DownloadMergedProteinsCLMS_CSVAction"
+				scope="request"
+				name="downloadProteinCLMSForm"
 				validate="false">
 		</action>
   
