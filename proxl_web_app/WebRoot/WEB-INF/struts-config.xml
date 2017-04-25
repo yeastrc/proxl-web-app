@@ -324,6 +324,13 @@
 				validate="false">
 		</action>
   
+        <action path="/downloadMergedProteinsFASTA"
+				type="org.yeastrc.xlink.www.actions.DownloadMergedProteinsFASTAAction"
+				scope="request"
+				name="mergedSearchViewProteinForm"
+				validate="false">
+		</action>
+  
   		<action path="/downloadMergedProteins"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedSearchProteinsAction"
 				scope="request"

@@ -3,6 +3,7 @@ package org.yeastrc.xlink.www.actions;
 import java.io.BufferedOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -146,106 +147,55 @@ public class DownloadMergedProteinsFASTAAction extends Action {
 								searchesMapOnSearchId  );
 				List<MergedSearchProteinCrosslink> crosslinks = proteinsMergedCommonPageDownloadResult.getCrosslinks();
 				List<MergedSearchProteinLooplink> looplinks = proteinsMergedCommonPageDownloadResult.getLooplinks();
+				
 				// generate file name
-				String filename = "xlinks-proteins-search-";
+				String filename = "proxl-fasta-search-";
 				filename += StringUtils.join( searchIdsArray, '-' );
 				DateTime dt = new DateTime();
 				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
 				filename += "-" + fmt.print( dt );
-				filename += ".txt";
+				filename += ".fa";
 				response.setContentType("application/x-download");
 				response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 				ServletOutputStream out = response.getOutputStream();
 				BufferedOutputStream bos = new BufferedOutputStream(out);
 				writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
-				writer.write( "SEARCH ID(S)\tTYPE\tPROTEIN 1\tPOSITION\tPROTEIN 2\tPOSITION\tNUM PSMS\tNUM PEPTIDES\tNUM UNIQUE PEPTIDES" );
-				for ( AnnDisplayNameDescPeptPsmListsPair annDisplayNameDescPeptPsmListsPair : proteinsMergedCommonPageDownloadResult.getPeptidePsmAnnotationNameDescListsForEachSearch() ) {
-					for ( AnnotationDisplayNameDescription peptideAnnotationDisplayNameDescription : annDisplayNameDescPeptPsmListsPair.getPeptideAnnotationNameDescriptionList() ) {
-						writer.write( "\tPeptide Value:" );
-						writer.write( peptideAnnotationDisplayNameDescription.getDisplayName() );
-						writer.write( "(SEARCH ID: " );
-						writer.write( Integer.toString( annDisplayNameDescPeptPsmListsPair.getSearchId() ) );
-						writer.write( ")" );
-					}
-					for ( AnnotationDisplayNameDescription psmAnnotationDisplayNameDescription : annDisplayNameDescPeptPsmListsPair.getPsmAnnotationNameDescriptionList() ) {
-						writer.write( "\tBest PSM Value:" );
-						writer.write( psmAnnotationDisplayNameDescription.getDisplayName() );
-						writer.write( "(SEARCH ID: " );
-						writer.write( Integer.toString( annDisplayNameDescPeptPsmListsPair.getSearchId() ) );
-						writer.write( ")" );
-					}
-				}
-				writer.write( "\n" );
+
+
+				Collection<Integer> outputProteinIds = new HashSet<>();
+				
+				
 				for( MergedSearchProteinCrosslink link : crosslinks ) {
-					List<Integer> searchIdsForLink = new ArrayList<Integer>( link.getSearches().size() );
-					for( SearchDTO r : link.getSearches() ) { 
-						searchIdsForLink.add( r.getSearchId() ); 
+
+					if( !outputProteinIds.contains( link.getProtein1().getProteinSequenceObject().getProteinSequenceId() ) ) {
+						
+						writer.write( ">" + link.getProtein1().getName() + "\n" );
+						writer.write( link.getProtein1().getProteinSequenceObject().getSequence() + "\n" );
+						
+						outputProteinIds.add( link.getProtein1().getProteinSequenceObject().getProteinSequenceId() );
 					}
-					Collections.sort( searchIdsForLink );
-					writer.write( StringUtils.join( searchIdsForLink, "," ) );
-					writer.write( "\t" );
-					writer.write( "CROSSLINK\t" );
-					writer.write( link.getProtein1().getName() );					
-					writer.write( "\t" );
-					writer.write( Integer.toString( link.getProtein1Position() ) );
-					writer.write( "\t" );
-					writer.write( link.getProtein2().getName() );
-					writer.write( "\t" );
-					writer.write( Integer.toString( link.getProtein2Position() ) );
-					writer.write( "\t" );
-					writer.write( Integer.toString( link.getNumPsms() ) );
-					writer.write( "\t" );
-					writer.write( Integer.toString( link.getNumLinkedPeptides() ) );
-					writer.write( "\t" );
-					writer.write( Integer.toString( link.getNumUniqueLinkedPeptides() ) );
-					for ( AnnValuePeptPsmListsPair annValuePeptPsmListsPair : link.getPeptidePsmAnnotationValueListsForEachSearch() ) {
-						for ( String peptideAnnotationValue : annValuePeptPsmListsPair.getPeptideAnnotationValueList() ) {
-							writer.write( "\t" );
-							writer.write( peptideAnnotationValue );
-						}
-						for ( String psmAnnotationValue : annValuePeptPsmListsPair.getPsmAnnotationValueList() ) {
-							writer.write( "\t" );
-							writer.write( psmAnnotationValue );
-						}
+					
+					if( !outputProteinIds.contains( link.getProtein2().getProteinSequenceObject().getProteinSequenceId() ) ) {
+						
+						writer.write( ">" + link.getProtein2().getName() + "\n" );
+						writer.write( link.getProtein2().getProteinSequenceObject().getSequence() + "\n" );
+						
+						outputProteinIds.add( link.getProtein2().getProteinSequenceObject().getProteinSequenceId() );
 					}
-					writer.write( "\n" );
+					
 				}
+				
 				for( MergedSearchProteinLooplink link : looplinks ) {
-					List<Integer> searchIdsForLink = new ArrayList<Integer>( link.getSearches().size() );
-					for( SearchDTO r : link.getSearches() ) { 
-						searchIdsForLink.add( r.getProjectSearchId() ); 
+
+					if( !outputProteinIds.contains( link.getProtein().getProteinSequenceObject().getProteinSequenceId() ) ) {
+						
+						writer.write( ">" + link.getProtein().getName() + "\n" );
+						writer.write( link.getProtein().getProteinSequenceObject().getSequence() + "\n" );
+						
+						outputProteinIds.add( link.getProtein().getProteinSequenceObject().getProteinSequenceId() );
 					}
-					Collections.sort( searchIdsForLink );
-					writer.write( StringUtils.join( searchIdsForLink, "," ) );
-					writer.write( "\t" );
-					writer.write( "LOOPLINK" );
-					writer.write( "\t" );
-					writer.write( link.getProtein().getName() );
-					writer.write( "\t" );
-					writer.write( Integer.toString( link.getProteinPosition1() ) );
-					writer.write( "\t" );
-					writer.write( link.getProtein().getName() );
-					writer.write( "\t" );
-					writer.write( Integer.toString( link.getProteinPosition2() ) );
-					writer.write( "\t" );
-					writer.write( Integer.toString( link.getNumPsms() ) );
-					writer.write( "\t" );
-					writer.write( Integer.toString( link.getNumPeptides() ) );
-					writer.write( "\t" );
-					writer.write( Integer.toString( link.getNumUniquePeptides() ) );
-					writer.write( "\t" );
-					for ( AnnValuePeptPsmListsPair annValuePeptPsmListsPair : link.getPeptidePsmAnnotationValueListsForEachSearch() ) {
-						for ( String peptideAnnotationValue : annValuePeptPsmListsPair.getPeptideAnnotationValueList() ) {
-							writer.write( "\t" );
-							writer.write( peptideAnnotationValue );
-						}
-						for ( String psmAnnotationValue : annValuePeptPsmListsPair.getPsmAnnotationValueList() ) {
-							writer.write( "\t" );
-							writer.write( psmAnnotationValue );
-						}
-					}
-					writer.write( "\n" );
 				}
+				
 			} finally {
 				try {
 					if ( writer != null ) {
