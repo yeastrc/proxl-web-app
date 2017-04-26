@@ -46,6 +46,15 @@ indexManager.prototype.getProteinArray = function() {
 };
 
 /**
+ * Set all the protein index data.
+ * 
+ * Used for populating from URL Hash
+ */
+indexManager.prototype.setProteinArray = function( parrParam ) {
+	this.parr = parrParam;
+};
+
+/**
  * Using the supplied proteins list as the list of valid proteins, remove
  * all entries from the index manager that contain proteins not in this list.
  * 

@@ -682,7 +682,7 @@ function updateURLHash( useSearchForm ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["view-as-circle-plot"], false );
 	}
 	// save the index manager data
-	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["index-manager-data"], _indexManager.parr );
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["index-manager-data"], _indexManager.getProteinArray() );
 	_colorLinesBy = $("#color_by").val();
 	if ( _colorLinesBy !== "" ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["color_by"], _colorLinesBy );
@@ -1510,7 +1510,7 @@ function populateIndexManagerFromHash() {
 	var json = getJsonFromHash();	
 	var data = json[ 'index-manager-data' ];
 	if( data ) {
-		_indexManager.parr = data;
+		_indexManager.setProteinArray( data );
 	} else {
 		// there is no index manager data (no proteins have been added)
 	}	
