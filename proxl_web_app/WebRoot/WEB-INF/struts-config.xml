@@ -339,6 +339,13 @@
 				validate="false">
 		</action>
 		
+		<action path="/downloadMergedProteinsPeptidesSkylineShulman"
+				type="org.yeastrc.xlink.www.actions.DownloadMergedProteinsPeptidesSkylineShulmanAction"
+				scope="request"
+				name="downloadProteinCLMSForm"
+				validate="false">
+		</action>
+		
 		<action path="/downloadMergedProteinsXvis"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedProteinsXvisAction"
 				scope="request"
