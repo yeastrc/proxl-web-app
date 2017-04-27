@@ -148,12 +148,12 @@ public class DownloadMergedProteinsXvisLengthsAction extends Action {
 				List<MergedSearchProteinLooplink> looplinks = proteinsMergedCommonPageDownloadResult.getLooplinks();
 				
 				// generate file name
-				String filename = "proxl-fasta-search-";
+				String filename = "proxl-protein-lengths-";
 				filename += StringUtils.join( searchIdsArray, '-' );
 				DateTime dt = new DateTime();
 				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
 				filename += "-" + fmt.print( dt );
-				filename += ".fa";
+				filename += ".csv";
 				response.setContentType("application/x-download");
 				response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 				ServletOutputStream out = response.getOutputStream();
@@ -170,19 +170,18 @@ public class DownloadMergedProteinsXvisLengthsAction extends Action {
 
 					if( !outputProteinIds.contains( link.getProtein1().getProteinSequenceObject().getProteinSequenceId() ) ) {
 						
-						String name = fixFormattingForName( link.getProtein1().getName() );
-						
-						
-						writer.write( ">" + link.getProtein1().getName() + "\n" );
-						writer.write( link.getProtein1().getProteinSequenceObject().getSequence() + "\n" );
+						String name = fixFormattingForName( link.getProtein1().getName() );					
+
+						writer.write( name + "," + link.getProtein1().getProteinSequenceObject().getSequence().length() + "\n" );
 						
 						outputProteinIds.add( link.getProtein1().getProteinSequenceObject().getProteinSequenceId() );
 					}
 					
 					if( !outputProteinIds.contains( link.getProtein2().getProteinSequenceObject().getProteinSequenceId() ) ) {
 						
-						writer.write( ">" + link.getProtein2().getName() + "\n" );
-						writer.write( link.getProtein2().getProteinSequenceObject().getSequence() + "\n" );
+						String name = fixFormattingForName( link.getProtein2().getName() );					
+
+						writer.write( name + "," + link.getProtein2().getProteinSequenceObject().getSequence().length() + "\n" );
 						
 						outputProteinIds.add( link.getProtein2().getProteinSequenceObject().getProteinSequenceId() );
 					}
@@ -193,8 +192,9 @@ public class DownloadMergedProteinsXvisLengthsAction extends Action {
 
 					if( !outputProteinIds.contains( link.getProtein().getProteinSequenceObject().getProteinSequenceId() ) ) {
 						
-						writer.write( ">" + link.getProtein().getName() + "\n" );
-						writer.write( link.getProtein().getProteinSequenceObject().getSequence() + "\n" );
+						String name = fixFormattingForName( link.getProtein().getName() );					
+
+						writer.write( name + "," + link.getProtein().getProteinSequenceObject().getSequence().length() + "\n" );
 						
 						outputProteinIds.add( link.getProtein().getProteinSequenceObject().getProteinSequenceId() );
 					}
@@ -222,14 +222,14 @@ public class DownloadMergedProteinsXvisLengthsAction extends Action {
 			throw e;
 		}
 	}
-		
+	
+	// remove characters not allowed in Xvis protein identifiers
 	private String fixFormattingForName( String name ) {
 	
-		String invalidRegex = "^[A-Za-z0-9 \\-\\[\\]_]";
+		String invalidRegex = "[^A-Za-z0-9 \\-\\[\\]_]";
+		name = name.replaceAll( invalidRegex, "_" );
 		
-		
-		
-		return null;
+		return name;
 	}
 	
 }

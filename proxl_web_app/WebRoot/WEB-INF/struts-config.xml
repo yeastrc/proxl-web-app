@@ -338,6 +338,20 @@
 				name="downloadProteinCLMSForm"
 				validate="false">
 		</action>
+		
+		<action path="/downloadMergedProteinsXvis"
+				type="org.yeastrc.xlink.www.actions.DownloadMergedProteinsXvisAction"
+				scope="request"
+				name="downloadProteinCLMSForm"
+				validate="false">
+		</action>
+		
+		<action path="/downloadMergedProteinsLengths"
+				type="org.yeastrc.xlink.www.actions.DownloadMergedProteinsXvisLengthsAction"
+				scope="request"
+				name="downloadProteinCLMSForm"
+				validate="false">
+		</action>
   
   		<action path="/downloadMergedProteins"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedSearchProteinsAction"
