@@ -13,9 +13,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -25,19 +27,6 @@ import org.apache.struts.action.ActionMapping;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.yeastrc.xlink.www.dao.SearchDAO;
-import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.objects.AnnDisplayNameDescPeptPsmListsPair;
-import org.yeastrc.xlink.www.objects.AnnValuePeptPsmListsPair;
-import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
-import org.yeastrc.xlink.www.objects.WebMergedProteinPosition;
-import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
-import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
-import org.yeastrc.xlink.www.searcher.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher;
 import org.yeastrc.proteomics.mass.MassUtils;
 import org.yeastrc.proteomics.peptide.peptide.Peptide;
 import org.yeastrc.xlink.dao.StaticModDAO;
@@ -50,10 +39,18 @@ import org.yeastrc.xlink.www.actions.PeptidesMergedCommonPageDownload.PeptidesMe
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
+import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
+import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
+import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
+import org.yeastrc.xlink.www.searcher.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import org.yeastrc.xlink.www.web_utils.XLinkWebAppUtils;
 /**
  * 
  *
@@ -207,13 +204,14 @@ public class DownloadMergedPeptidesForSkylinePRMAction extends Action {
 				
 				
 				writer.write( "0.0\n" );
-				
+								
 				for( WebMergedReportedPeptide link : peptidesMergedCommonPageDownloadResult.getWebMergedReportedPeptideList() ) {
 					
 					// should only return cross-linked peptides
 					if( !link.getLinkType().equals( XLinkUtils.CROSS_TYPE_STRING_UPPERCASE ) ) {
 						continue;
 					}
+
 					
 					/*
 					 * Construct a set of all distinct lines to print for this reported peptide.
@@ -249,12 +247,15 @@ public class DownloadMergedPeptidesForSkylinePRMAction extends Action {
 							throw new ProxlWebappDataException( msg );
 						}
 						
+						
 						//  First get list of reported peptide ids for unifiedReportedPeptideId and search id
 						List<Integer> reportedPeptideIdList = 
 								ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher.getInstance()
 								.getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( eachSearchIdToProcess, unifiedReportedPeptideId );
 						//  Process each search id, reported peptide id pair
-						for ( int reportedPeptideId : reportedPeptideIdList ) {
+						for ( int reportedPeptideId : reportedPeptideIdList ) {	
+							
+							
 							//  Process Each search id/reported peptide id for the link
 							//  Get the PSMs for a Peptide/Search combination and output the records
 							List<PsmWebDisplayWebServiceResult> psms = 
@@ -263,7 +264,7 @@ public class DownloadMergedPeptidesForSkylinePRMAction extends Action {
 											reportedPeptideId, 
 											searcherCutoffValuesSearchLevel);
 							for ( PsmWebDisplayWebServiceResult psm : psms ) {
-
+								
 								// now iterating over the PSMs for this reported peptide in a given search
 								
 								
@@ -274,9 +275,7 @@ public class DownloadMergedPeptidesForSkylinePRMAction extends Action {
 								
 								List<String> peptide1Mods = new ArrayList<>();
 								List<String> peptide2Mods = new ArrayList<>();
-																
-								// TODO: check for static mods on cysteines?
-								
+																								
 								
 								// create a mod to add to peptide1, for the cross-linked residue
 								{

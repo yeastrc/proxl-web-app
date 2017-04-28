@@ -12,6 +12,7 @@ import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
 import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.objects.ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosCrosslinkDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
@@ -51,7 +52,13 @@ public class CrosslinkLinkedPositions {
 	public static CrosslinkLinkedPositions getInstance() { return _INSTANCE; }
 	
 	private static class RepPept_Stage_1_Wrapper {
-		List<WebReportedPeptideWrapper> webReportedPeptideWrapperList = new ArrayList<>();;
+		List<WebReportedPeptideWrapper_And_Assoc_Container> webReportedPeptideWrapper_And_Assoc_ContainerList = new ArrayList<>();;
+	}
+	
+	private static class WebReportedPeptideWrapper_And_Assoc_Container {
+		WebReportedPeptideWrapper webReportedPeptideWrapper;
+		Integer searchReportedPeptidepeptideId_Item_1 = null;  // Not populated for all requests
+		Integer searchReportedPeptidepeptideId_Item_2 = null;  // Not populated for all requests
 	}
 	
 	private static enum PeptidePsm { PEPTIDE, PSM }
@@ -109,16 +116,21 @@ public class CrosslinkLinkedPositions {
 				//  Did not find entries in srch_rep_pept__prot_seq_id_pos_crosslink related to both entries in srch_rep_pept__peptide so skip
 				continue;  //  EARLY CONTINUE
 			}
+			
 			Iterator<Map.Entry<Integer,List<SrchRepPeptProtSeqIdPosCrosslinkDTO>>> protIdPosMap_On_SrchRepPeptPeptId_Iterator =
 					protIdPosMap_On_SrchRepPeptPeptId.entrySet().iterator();
 			Map.Entry<Integer,List<SrchRepPeptProtSeqIdPosCrosslinkDTO>> protIdPosMap_On_SrchRepPeptPeptId_Entry_A =
 					protIdPosMap_On_SrchRepPeptPeptId_Iterator.next();
 			Map.Entry<Integer,List<SrchRepPeptProtSeqIdPosCrosslinkDTO>> protIdPosMap_On_SrchRepPeptPeptId_Entry_B =
 					protIdPosMap_On_SrchRepPeptPeptId_Iterator.next();
-//			Integer searchReportedPeptidepeptideId_Entry_A = protIdPosMap_On_SrchRepPeptPeptId_Entry_A.getKey();
-//			Integer searchReportedPeptidepeptideId_Entry_B = protIdPosMap_On_SrchRepPeptPeptId_Entry_B.getKey();
+			
+			int searchReportedPeptidepeptideId_Entry_A = protIdPosMap_On_SrchRepPeptPeptId_Entry_A.getKey();
+			int searchReportedPeptidepeptideId_Entry_B = protIdPosMap_On_SrchRepPeptPeptId_Entry_B.getKey();
+			
 			for ( SrchRepPeptProtSeqIdPosCrosslinkDTO srchRepPeptProtSeqIdPosCrosslinkDTO_Entry_A_Item : protIdPosMap_On_SrchRepPeptPeptId_Entry_A.getValue() ) {
 				for ( SrchRepPeptProtSeqIdPosCrosslinkDTO srchRepPeptProtSeqIdPosCrosslinkDTO_Entry_B_Item : protIdPosMap_On_SrchRepPeptPeptId_Entry_B.getValue() ) {
+					int searchReportedPeptidepeptideId_Item_1 = searchReportedPeptidepeptideId_Entry_A;
+					int searchReportedPeptidepeptideId_Item_2 = searchReportedPeptidepeptideId_Entry_B;
 					SrchRepPeptProtSeqIdPosCrosslinkDTO srchRepPeptProtSeqIdPosCrosslinkDTO_Item_1 = srchRepPeptProtSeqIdPosCrosslinkDTO_Entry_A_Item;
 					SrchRepPeptProtSeqIdPosCrosslinkDTO srchRepPeptProtSeqIdPosCrosslinkDTO_Item_2 = srchRepPeptProtSeqIdPosCrosslinkDTO_Entry_B_Item;
 					//  Order so:  ( id1 < id2 ) or ( id1 == id2 and pos1 <= pos2 )
@@ -128,6 +140,9 @@ public class CrosslinkLinkedPositions {
 						//  Swap order for consistency of displayed data and to match order the crosslink records were inserted in
 						srchRepPeptProtSeqIdPosCrosslinkDTO_Item_1 = srchRepPeptProtSeqIdPosCrosslinkDTO_Entry_B_Item;
 						srchRepPeptProtSeqIdPosCrosslinkDTO_Item_2 = srchRepPeptProtSeqIdPosCrosslinkDTO_Entry_A_Item;
+						
+						searchReportedPeptidepeptideId_Item_1 = searchReportedPeptidepeptideId_Entry_B;
+						searchReportedPeptidepeptideId_Item_2 = searchReportedPeptidepeptideId_Entry_A;
 					}
 					//  Process into Map of protein 1, position 1, protein 2, position 2 objects
 					// Map<Integer,Map<Integer,Map<Integer,Map<Integer,RepPept_Stage_1_Wrapper>>>> repPept_Stage_1_Wrapper_MappedProt1Pos1Prot2Pos2 = new HashMap<>();
@@ -159,8 +174,9 @@ public class CrosslinkLinkedPositions {
 					}
 					
 					boolean reportedPeptideIdAlreadyInList = false;
-					for ( WebReportedPeptideWrapper itemInList : repPept_Stage_1_Wrapper.webReportedPeptideWrapperList ) {
-						if ( itemInList.getWebReportedPeptide().getReportedPeptideId() == reportedPeptideId.intValue() ) {
+					for ( WebReportedPeptideWrapper_And_Assoc_Container itemInList : repPept_Stage_1_Wrapper.webReportedPeptideWrapper_And_Assoc_ContainerList ) {
+						WebReportedPeptideWrapper webReportedPeptideWrapper = itemInList.webReportedPeptideWrapper;
+						if ( webReportedPeptideWrapper.getWebReportedPeptide().getReportedPeptideId() == reportedPeptideId.intValue() ) {
 							reportedPeptideIdAlreadyInList = true;
 						}
 					}
@@ -169,7 +185,15 @@ public class CrosslinkLinkedPositions {
 						continue;  //  EARLY CONTINUE    skip since this reported peptide is already in this list
 					}
 					
-					repPept_Stage_1_Wrapper.webReportedPeptideWrapperList.add( wrappedPeptidelink );
+					WebReportedPeptideWrapper_And_Assoc_Container webReportedPeptideWrapper_And_Assoc_Container = new WebReportedPeptideWrapper_And_Assoc_Container();
+					webReportedPeptideWrapper_And_Assoc_Container.webReportedPeptideWrapper = wrappedPeptidelink;
+					webReportedPeptideWrapper_And_Assoc_Container.searchReportedPeptidepeptideId_Item_1 = 
+							searchReportedPeptidepeptideId_Item_1;
+					webReportedPeptideWrapper_And_Assoc_Container.searchReportedPeptidepeptideId_Item_2 = 
+							searchReportedPeptidepeptideId_Item_2;
+					
+					repPept_Stage_1_Wrapper.webReportedPeptideWrapper_And_Assoc_ContainerList.add( webReportedPeptideWrapper_And_Assoc_Container );
+					
 				}
 			}
 		}
@@ -228,6 +252,9 @@ public class CrosslinkLinkedPositions {
 	}
 	
 	/**
+	 * Warning:  searchReportedPeptidepeptideId_1 and searchReportedPeptidepeptideId_1 
+	 * 			 are not set in returned SearchProteinCrosslink objects 
+	 * 
 	 * @param search
 	 * @param searcherCutoffValuesSearchLevel
 	 * @param protein1
@@ -246,7 +273,9 @@ public class CrosslinkLinkedPositions {
 			int position2 ) throws Exception {
 		
 		Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map = new HashMap<>();
+		
 		RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper = new RepPept_Stage_1_Wrapper();
+		
 		List<SearchPeptideCrosslinkAnnDataWrapper> searchPeptideCrosslinkAnnDataWrapper_List = 
 				SearchPeptideCrosslink_LinkedPosition_Searcher.getInstance()
 				.searchOnSearchProteinCrosslink( 
@@ -256,6 +285,7 @@ public class CrosslinkLinkedPositions {
 						protein2.getProteinSequenceId(), 
 						position1, 
 						position2 );
+		
 		for ( SearchPeptideCrosslinkAnnDataWrapper searchPeptideCrosslinkAnnDataWrapper : searchPeptideCrosslinkAnnDataWrapper_List ) {
 			SearchPeptideCrosslink searchPeptideCrosslink = searchPeptideCrosslinkAnnDataWrapper.getSearchPeptideCrosslink();
 			WebReportedPeptide webReportedPeptide = new WebReportedPeptide();
@@ -268,8 +298,12 @@ public class CrosslinkLinkedPositions {
 			wrappedPeptidelink.setWebReportedPeptide( webReportedPeptide );
 			wrappedPeptidelink.setPeptideAnnotationDTOMap( searchPeptideCrosslinkAnnDataWrapper.getPeptideAnnotationDTOMap() );
 			wrappedPeptidelink.setPsmAnnotationDTOMap( searchPeptideCrosslinkAnnDataWrapper.getPsmAnnotationDTOMap() );
-			repPept_Stage_1_Wrapper.webReportedPeptideWrapperList.add( wrappedPeptidelink );
+			WebReportedPeptideWrapper_And_Assoc_Container webReportedPeptideWrapper_And_Assoc_Container =
+					new WebReportedPeptideWrapper_And_Assoc_Container();
+			webReportedPeptideWrapper_And_Assoc_Container.webReportedPeptideWrapper = wrappedPeptidelink;
+			repPept_Stage_1_Wrapper.webReportedPeptideWrapper_And_Assoc_ContainerList.add( webReportedPeptideWrapper_And_Assoc_Container );
 		}
+		
 		SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper = 
 				populateSearchProteinCrosslinkWrapper(
 						search, 
@@ -280,6 +314,7 @@ public class CrosslinkLinkedPositions {
 						position2, 
 						searchProtein_KeyOn_PROT_SEQ_ID_Map, 
 						repPept_Stage_1_Wrapper );
+		
 		return searchProteinCrosslinkWrapper;
 	}
 	/**
@@ -305,7 +340,8 @@ public class CrosslinkLinkedPositions {
 			Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map,
 			RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper) throws Exception {
 		
-		List<WebReportedPeptideWrapper> webReportedPeptideWrapperList = repPept_Stage_1_Wrapper.webReportedPeptideWrapperList;
+		List<WebReportedPeptideWrapper_And_Assoc_Container> webReportedPeptideWrapper_And_Assoc_ContainerList = 
+				repPept_Stage_1_Wrapper.webReportedPeptideWrapper_And_Assoc_ContainerList;
 		Map<Integer, AnnotationDataBaseDTO> bestPsmAnnotationDTOMap = new HashMap<>();
 		Map<Integer, AnnotationDataBaseDTO> bestPeptideAnnotationDTOMap = new HashMap<>();
 		int numPsms = 0;
@@ -313,10 +349,33 @@ public class CrosslinkLinkedPositions {
 		int numUniqueLinkedPeptides = 0;
 		Set<Integer> reportedPeptideIds = new HashSet<>();
 		Set<Integer> reportedPeptideIdsRelatedPeptidesUnique = new HashSet<>();
+		List<ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink> reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList = null;
 		
-		for ( WebReportedPeptideWrapper webReportedPeptideWrapper : webReportedPeptideWrapperList ) {
+		for ( WebReportedPeptideWrapper_And_Assoc_Container webReportedPeptideWrapper_And_Assoc_Container : webReportedPeptideWrapper_And_Assoc_ContainerList ) {
+			WebReportedPeptideWrapper webReportedPeptideWrapper = webReportedPeptideWrapper_And_Assoc_Container.webReportedPeptideWrapper;
 			WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
 			Integer reportedPeptideId = webReportedPeptide.getReportedPeptideId();
+
+			  // Not populated for all requests
+			Integer searchReportedPeptidepeptideId_Item_1 = webReportedPeptideWrapper_And_Assoc_Container.searchReportedPeptidepeptideId_Item_1;
+			  // Not populated for all requests
+			Integer searchReportedPeptidepeptideId_Item_2 = webReportedPeptideWrapper_And_Assoc_Container.searchReportedPeptidepeptideId_Item_2;
+
+			if ( searchReportedPeptidepeptideId_Item_1 != null && searchReportedPeptidepeptideId_Item_2 != null ) {
+				ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink reportedPeptide_SearchReportedPeptidepeptideId_Crosslink = new ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink();
+				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setReportedPeptideId( reportedPeptideId );
+				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setSearchReportedPeptidepeptideId_1( searchReportedPeptidepeptideId_Item_1 );
+				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setSearchReportedPeptidepeptideId_2( searchReportedPeptidepeptideId_Item_2 );
+				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setProteinSequenceId_1( proteinSeqId_1 );
+				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setProteinSequenceId_2( proteinSeqId_2 );
+				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setProteinPosition_1( proteinPosition_1 );
+				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setProteinPosition_2( proteinPosition_2 );
+				if ( reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList == null ) {
+					reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList = new ArrayList<>();
+				}
+				reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList.add( reportedPeptide_SearchReportedPeptidepeptideId_Crosslink );
+			}
+			
 			numLinkedPeptides++;
 			reportedPeptideIds.add( reportedPeptideId );
 			Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request =
@@ -342,6 +401,7 @@ public class CrosslinkLinkedPositions {
 					webReportedPeptideWrapper.getPeptideAnnotationDTOMap(),
 					PeptidePsm.PEPTIDE,
 					searcherCutoffValuesSearchLevel );
+			
 		}
 		SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper = new SearchProteinCrosslinkWrapper();
 		SearchProteinCrosslink searchProteinCrosslink = new SearchProteinCrosslink();
@@ -369,6 +429,9 @@ public class CrosslinkLinkedPositions {
 		searchProteinCrosslink.setProtein2( searchProtein_2 );
 		searchProteinCrosslink.setProtein1Position( proteinPosition_1 );
 		searchProteinCrosslink.setProtein2Position( proteinPosition_2 );
+		if ( reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList != null ) {
+			searchProteinCrosslink.setReportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList( reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList );
+		}
 		searchProteinCrosslink.setNumPsms( numPsms );
 		searchProteinCrosslink.setNumLinkedPeptides( numLinkedPeptides );
 		searchProteinCrosslink.setNumUniqueLinkedPeptides( numUniqueLinkedPeptides );
@@ -380,6 +443,15 @@ public class CrosslinkLinkedPositions {
 		}
 		return searchProteinCrosslinkWrapper;
 	}
+	
+	
+	/**
+	 * @param bestAnnotationDTOMap
+	 * @param entryAnnotationDTOMap
+	 * @param peptidePsm
+	 * @param searcherCutoffValuesSearchLevel
+	 * @throws ProxlWebappDataException
+	 */
 	private void updateBestAnnotationValues( 
 			Map<Integer, AnnotationDataBaseDTO> bestAnnotationDTOMap, 
 			Map<Integer, AnnotationDataBaseDTO> entryAnnotationDTOMap, 

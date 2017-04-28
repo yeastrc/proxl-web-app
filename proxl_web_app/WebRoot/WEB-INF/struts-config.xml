@@ -345,6 +345,13 @@
 				name="downloadProteinCLMSForm"
 				validate="false">
 		</action>
+
+		<action path="/downloadMergedProteinsPeptidesSkylineEng"
+				type="org.yeastrc.xlink.www.actions.DownloadMergedProteinsPeptidesSkylineEngAction"
+				scope="request"
+				name="downloadProteinCLMSForm"
+				validate="false">
+		</action>
 		
 		<action path="/downloadMergedProteinsXvis"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedProteinsXvisAction"

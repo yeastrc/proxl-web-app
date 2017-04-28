@@ -2,6 +2,8 @@ package org.yeastrc.xlink.www.actions;
 
 import java.io.BufferedOutputStream;
 import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,9 +27,10 @@ import org.apache.struts.action.ActionMapping;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.yeastrc.xlink.dto.LinkerDTO;
-import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
-import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
+import org.yeastrc.proteomics.mass.MassUtils;
+import org.yeastrc.proteomics.peptide.peptide.Peptide;
+import org.yeastrc.xlink.dao.StaticModDAO;
+import org.yeastrc.xlink.dto.StaticModDTO;
 import org.yeastrc.xlink.www.actions.ProteinsMergedCommonPageDownload.ProteinsMergedCommonPageDownloadResult;
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
@@ -37,6 +40,7 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dao.SrchRepPeptPeptideDAO;
 import org.yeastrc.xlink.www.dto.PeptideDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -44,17 +48,16 @@ import org.yeastrc.xlink.www.objects.MergedSearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
-import org.yeastrc.xlink.www.searcher.LinkerForPSMMatcher;
-import org.yeastrc.xlink.www.searcher.LinkersForSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
+import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 /**
  * 
  *
  */
-public class DownloadMergedProteinsPeptidesSkylineShulmanAction extends Action {
+public class DownloadMergedProteinsPeptidesSkylineEngAction extends Action {
 
 	private static final Logger log = Logger.getLogger(DownloadMergedSearchProteinsAction.class);
 
@@ -158,7 +161,7 @@ public class DownloadMergedProteinsPeptidesSkylineShulmanAction extends Action {
 				List<MergedSearchProteinCrosslink> crosslinks = proteinsMergedCommonPageDownloadResult.getCrosslinks();
 
 				// generate file name
-				String filename = "proxl-peptides-skyline-shulman-";
+				String filename = "proxl-skyline-PRM-import-";
 				filename += StringUtils.join( searchIdsArray, '-' );
 				DateTime dt = new DateTime();
 				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
@@ -170,85 +173,202 @@ public class DownloadMergedProteinsPeptidesSkylineShulmanAction extends Action {
 				BufferedOutputStream bos = new BufferedOutputStream(out);
 				writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
 
+				/*
+
+				From Jimmy Eng:
+
+				Here's what I would expect the exported file to look like (ideally with more accurate mass numbers):
+
+				0.0
+				DFNKVPNFSIR IVQKSSGLNMENLANHEHLLSPVR 2823.472@4 1473.764@4 6
+
+				The value of 2823.472 corresponds to the mass of peptide IVQKSSGLNMENLANHEHLLSPVR (2685.402068) plus mass of crosslinker 138.07.  And the mass 1473.764 is the mass of peptide DFNKVPNFSIR (1335.693535) plus mass of crosslinker 138.07.  It would be great to have at least 4 digits of precision in the encoded mass modification strings.
+
+				If there are any other modifications on the peptide, encode them in the same way.  For example, presume the methionine on the peptide IVQKSSGLNMENLANHEHLLSPVR  is modified with oxidation (15.994915).  The second modification string would change from
+				   1473.764@4
+				to
+				   1473.764@4,15.9959@10
+
+				 */
+
+
+				writer.write( "0.0\n" );
+
+
 				Collection<String> lines = new HashSet<>();
-				
-				Collection<LinkerDTO> linkerDTOs = LinkersForSearchIdsSearcher.getInstance().getLinkersForSearchIds( searchIds );
 
 
 				// iterate over the crosslinks
-				for( MergedSearchProteinCrosslink link : crosslinks ) {
-
-					Map<SearchDTO, SearchProteinCrosslink> searchProteinCrosslinks = link.getSearchProteinCrosslinks();					
+				for( MergedSearchProteinCrosslink crosslink : crosslinks ) {
 					
-					// iterate over searches that contain this crosslink
+					Map<SearchDTO, SearchProteinCrosslink> searchProteinCrosslinks = crosslink.getSearchProteinCrosslinks();					
+					// iterate over searches
 					for( SearchDTO search : searchProteinCrosslinks.keySet() ) {
 
+						// static mods for this search
+						List<StaticModDTO> staticMods = StaticModDAO.getInstance().getStaticModDTOForSearchId( search.getSearchId() );
+						
 						SearchProteinCrosslink searchProteinCrosslink = searchProteinCrosslinks.get( search );
-
 						
 						List<ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink> crosslinkReportedPeptidePeptides = searchProteinCrosslink.getReportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList();
 
+
 						for( ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink crosslinkReportedPeptidePeptide : crosslinkReportedPeptidePeptides ) {
 
+							
 							List<PsmWebDisplayWebServiceResult> PSMs = PsmWebDisplaySearcher.getInstance().getPsmsWebDisplay( search.getSearchId(), crosslinkReportedPeptidePeptide.getReportedPeptideId(), searchProteinCrosslinks.get( search ).getSearcherCutoffValuesSearchLevel() );
 
 							SrchRepPeptPeptideDTO searchReportedPeptidePeptide1 = SrchRepPeptPeptideDAO.getInstance().getForId( crosslinkReportedPeptidePeptide.getSearchReportedPeptidepeptideId_1() );
 							SrchRepPeptPeptideDTO searchReportedPeptidePeptide2 = SrchRepPeptPeptideDAO.getInstance().getForId( crosslinkReportedPeptidePeptide.getSearchReportedPeptidepeptideId_2() );
 
-							PeptideDTO peptide1 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( searchReportedPeptidePeptide1.getPeptideId() );
-							PeptideDTO peptide2 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( searchReportedPeptidePeptide2.getPeptideId() );
-							
-
-							String line = peptide1.getSequence() + "\t";
-							line += searchReportedPeptidePeptide1.getPeptidePosition_1() + "\t";
-							line += peptide2.getSequence() + "\t";
-							line += searchReportedPeptidePeptide2.getPeptidePosition_1() + "\t";
-
-							line += link.getProtein1().getName() + "(" + link.getProtein1Position() + ")";
-							line += "--";
-							line += link.getProtein2().getName() + "(" + link.getProtein2Position() + ")";
-
-							line += ":";
-
-							line += peptide1.getSequence() + "--" + peptide2.getSequence() + "\t";
-
-							
-							// if there is only one possible formula, just use it no matter what
-							{
-
-								if( linkerDTOs.size() == 1 ) {
-									ILinker linker = GetLinkerFactory.getLinkerForAbbr( searches.get( 0 ).getLinkers().get( 0 ).getAbbr() );
-									if( linker.getCrosslinkFormulas().size() == 1 ) {
-										
-										lines.add( line + linker.getCrosslinkFormula( 0.0 ) );
-										continue;// go to next reported peptide
-									}
-								}
+							// ensure these are ordered the same every time
+							if( searchReportedPeptidePeptide1.getId() > searchReportedPeptidePeptide2.getId() ) {
+								SrchRepPeptPeptideDTO tmp = searchReportedPeptidePeptide1;
+								searchReportedPeptidePeptide1 = searchReportedPeptidePeptide2;
+								searchReportedPeptidePeptide2 = tmp;
 							}
 							
 							
+							PeptideDTO peptide1 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( searchReportedPeptidePeptide1.getPeptideId() );
+							PeptideDTO peptide2 = PeptideDAO.getInstance().getPeptideDTOFromDatabase( searchReportedPeptidePeptide2.getPeptideId() );
+							
+							List<SrchRepPeptPeptDynamicModDTO> dynamidMods1 = SrchRepPeptPeptDynamicModSearcher.getInstance().getSrchRepPeptPeptDynamicModForSrchRepPeptPeptideId( searchReportedPeptidePeptide1.getId() );
+							List<SrchRepPeptPeptDynamicModDTO> dynamidMods2 = SrchRepPeptPeptDynamicModSearcher.getInstance().getSrchRepPeptPeptDynamicModForSrchRepPeptPeptideId( searchReportedPeptidePeptide2.getId() );
+							
+							
 							for( PsmWebDisplayWebServiceResult psm : PSMs ) {
+								
+								
+								// TODO: a lot of this doesn't need to be done at the PSM level--only the charge and linker mass need to be at the PSM level
+								
+								
+								String line = "";
+								
+								line += peptide1.getSequence() + " ";
+								line += peptide2.getSequence() + " ";
+								
+								List<String> peptide1Mods = new ArrayList<>();
+								List<String> peptide2Mods = new ArrayList<>();
+								
+								
 
-								LinkerDTO linkerdto = null;
 
-								try {
-									linkerdto = LinkerForPSMMatcher.getInstance().getLinkerForPSM( psm.getPsmDTO() );
-								} catch (Exception e ) {
-									e.printStackTrace();
+								// create a mod to add to peptide1, for the cross-linked residue
+								{
+									Peptide otherPeptide = new Peptide( peptide2.getSequence() );
+
+
+									// get mods of other peptide									
+
+									double modsSum = 0;
+
+									// handle the dynamic mods
+									if( dynamidMods2 != null && dynamidMods2.size() > 0 ) {
+
+										for( SrchRepPeptPeptDynamicModDTO mod : dynamidMods2 ) {
+											modsSum += mod.getMass();											
+										}
+									}
+
+									// handle the static mods
+									if( staticMods != null && staticMods.size() > 0 ) {
+										for( StaticModDTO staticMod : staticMods ) {
+											BigDecimal mass = staticMod.getMass();
+											int count = getNumberOfTimesResidueOccurs( staticMod.getResidue(), otherPeptide.getSequence() );
+
+											modsSum += mass.doubleValue() * (double)count;
+										}
+									}
+
+									BigDecimal modMass = psm.getPsmDTO().getLinkerMass();
+
+									modMass = modMass.add( new BigDecimal( otherPeptide.getMass( MassUtils.MASS_TYPE_MONOISOTOPIC ) ) );
+									modMass = modMass.add( new BigDecimal( modsSum ) );
+
+									modMass = modMass.setScale( 5, RoundingMode.CEILING );		// set to 5 decimal places
+
+
+									peptide1Mods.add( modMass.toString() + "@" + searchReportedPeptidePeptide1.getPeptidePosition_1() );
 								}
 
 
-								ILinker linker = GetLinkerFactory.getLinkerForAbbr( linkerdto.getAbbr() );
 
-								String formula = linker.getCrosslinkFormula( psm.getPsmDTO().getLinkerMass().doubleValue() );
+								// create a mod to add to peptide2, for the cross-linked residue
+								{
+									Peptide otherPeptide = new Peptide( peptide1.getSequence() );
 
-								lines.add( line + formula );
+
+									// get mods of other peptide									
+
+									double modsSum = 0;
+
+									// handle the dynamic mods
+									if( dynamidMods1 != null && dynamidMods1.size() > 0 ) {
+
+										for( SrchRepPeptPeptDynamicModDTO mod : dynamidMods1 ) {
+											modsSum += mod.getMass();											
+										}
+									}
+
+									// handle the static mods
+									if( staticMods != null && staticMods.size() > 0 ) {
+										for( StaticModDTO staticMod : staticMods ) {
+											BigDecimal mass = staticMod.getMass();
+											int count = getNumberOfTimesResidueOccurs( staticMod.getResidue(), otherPeptide.getSequence() );
+
+											modsSum += mass.doubleValue() * (double)count;
+										}
+									}
+
+									BigDecimal modMass = psm.getPsmDTO().getLinkerMass();
+
+									modMass = modMass.add( new BigDecimal( otherPeptide.getMass( MassUtils.MASS_TYPE_MONOISOTOPIC ) ) );
+									modMass = modMass.add( new BigDecimal( modsSum ) );
+
+									modMass = modMass.setScale( 5, RoundingMode.CEILING );		// set to 5 decimal places
+
+
+									peptide2Mods.add( modMass.toString() + "@" + searchReportedPeptidePeptide2.getPeptidePosition_1() );
+								}
+
+
+
+								// now add in other mods on the peptide
+
+								// peptide 1
+								{
+
+									if( dynamidMods1 != null && dynamidMods1.size() > 0 ) {
+
+										for( SrchRepPeptPeptDynamicModDTO mod : dynamidMods1 ) {
+											peptide1Mods.add( mod.getMass() + "@" + mod.getPosition() );
+										}
+									}
+								}
+
+
+								// peptide 2
+								{
+
+									if( dynamidMods2 != null && dynamidMods2.size() > 0 ) {
+
+										for( SrchRepPeptPeptDynamicModDTO mod : dynamidMods2 ) {
+											peptide2Mods.add( mod.getMass() + "@" + mod.getPosition() );
+										}
+									}
+								}
+
+								line += StringUtils.join( peptide1Mods, "," ) + " ";
+								line += StringUtils.join( peptide2Mods, "," ) + " ";
+
+								line += psm.getPsmDTO().getCharge() + "\n";
+
+								lines.add( line );
 
 
 
 							}//end iterating over psms
-
-						}// end iteration over crosslinkReportedPeptidePeptides
+						}// end iteration over crosslink peptides
 
 
 					}// end iteration over searches
@@ -257,7 +377,7 @@ public class DownloadMergedProteinsPeptidesSkylineShulmanAction extends Action {
 
 
 				for( String line : lines ) {
-					writer.write( line + "\n" );
+					writer.write( line );
 				}
 
 			} finally {
@@ -281,6 +401,11 @@ public class DownloadMergedProteinsPeptidesSkylineShulmanAction extends Action {
 			log.error( msg, e );
 			throw e;
 		}
+	}
+	
+	private int getNumberOfTimesResidueOccurs( String residue, String sequence ) {
+		
+		return StringUtils.countMatches( sequence,  residue );
 	}
 
 }

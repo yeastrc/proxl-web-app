@@ -219,6 +219,18 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 		this.searcherCutoffValuesSearchLevel = searcherCutoffValuesSearchLevel;
 	}
 
+	/**
+	 * @return null if not populated
+	 */
+	public List<ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink> getReportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList() {
+		return reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList;
+	}
+	public void setReportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList(
+			List<ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink> reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList) {
+		this.reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList = reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList;
+	}
+
+
 
 	////////////////////////////////////////////////
 	
@@ -262,16 +274,22 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 
 
 
+	private SearchDTO search;
 
 	private SearchProtein protein1;
 	private SearchProtein protein2;
-	private SearchDTO search;
+
 	private int protein1Position;
 	private int protein2Position;
 	
+	private List<ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink> reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList = null;
+
 
 //	private List<SearchPeptideCrosslink> peptides;
 	
+
+
+
 	private Integer numPsms;
 
 	private int numLinkedPeptides = -1;
@@ -297,6 +315,5 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 	 * Used for display on web page
 	 */
 	private List<String> peptideAnnotationValueList;
-
 
 }
