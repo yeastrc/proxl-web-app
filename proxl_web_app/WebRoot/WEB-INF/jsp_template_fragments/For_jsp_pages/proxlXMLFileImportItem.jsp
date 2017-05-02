@@ -50,7 +50,11 @@
 
    <td style="width: 100%;" class=" filename_status_cell_jq ">
    	<div >
-	  	{{ uploadedFilename }} 
+	  	{{#if searchName }}
+	  		{{ searchName }} 
+	  	{{else}}
+	  		{{ uploadedFilename }} 
+	  	{{/if}}
   		{{#if statusQueuedOrRequeued }}(Position in queue: {{queuePosition}}){{/if}}
   		{{#if statusStarted }}(Running){{/if}}
   		{{#if statusComplete }}(Success){{/if}}
