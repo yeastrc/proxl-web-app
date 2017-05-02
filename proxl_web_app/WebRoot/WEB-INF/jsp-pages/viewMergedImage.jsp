@@ -88,8 +88,11 @@
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-per-protein-bar-data.js?x=${cacheBustValue}"></script> 
-
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-region-selections.js?x=${cacheBustValue}"></script> 
+
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-link-exclusion-manager.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-link-exclusion-selections.js?x=${cacheBustValue}"></script>
+		
 
 		<script type="text/javascript" src="${ contextPath }/js/circle-plot-viewer.js?x=${cacheBustValue}"></script> 
 		
@@ -366,13 +369,39 @@
 							>[Reset Proteins]</a>
 						<a class="bar-only tool_tip_attached_jq" data-tooltip="Orients all proteins with N-terminus on left-hand side" style="font-size:10pt;white-space:nowrap;" 
 							href="javascript:resetProteinsReversed()"
-							>[Reset Protein Flipping]</a>							
+							>[Reset Protein Flipping]</a>
+					
+					</span>
 
-						<a class="tool_tip_attached_jq" data-tooltip="Protein Selection Regions Management" style="font-size:10pt;white-space:nowrap;" 
+					<%--  Keep these next two items together on the same line --%>
+					
+					<span style="white-space:nowrap;" >
+		
+					  <span id="manage_regios_exclusions_links_block"  style="display: none;">
+					  
+						<a class="tool_tip_attached_jq" data-tooltip="Protein Selection Regions Management" 
+							style="font-size:10pt;white-space:nowrap;" 
 							href="javascript:" onclick="_proteinBarRegionSelectionsOverlayCode.openOverlay()"
 							>[Manage Protein Selections]</a>							
 							
+						<a class="tool_tip_attached_jq" data-tooltip="Choose which links are always un-highlighted (greyed out)." 
+							style="font-size:10pt;white-space:nowrap;" 
+							href="javascript:" onclick="_linkExclusionSelectionsOverlayCode.openOverlay()"
+							>[Manage Link Exclusions]</a>							
+					  </span>
 
+					  	<%--  Display when no proteins shown  --%>
+					  <span id="manage_regios_exclusions_links_disabled_block" >
+						<span class=" non-link" style="font-size:10pt;white-space:nowrap;" 
+								>[Manage Protein Selections]</span>
+						<span class=" non-link" style="font-size:10pt;white-space:nowrap;" 
+								>[Manage Link Exclusions]</span>
+					  </span>
+					</span>
+
+					<%--  Keep these next two items together on the same line --%>
+					
+					<span style="white-space:nowrap;" >
 						<span id="svg-download">
 							<a id="download_as_link"
 									data-tooltip="Download current image as file." style="font-size:10pt;white-space:nowrap;" 
@@ -814,14 +843,17 @@
 			
 				<div id="view_protein_bar_highlighting_overlay_header" class="view-protein-bar-highlighting-overlay-header" style="width:100%; " >
 					<h1 id="view_protein_bar_highlighting_overlay_X_for_exit_overlay" class="view-protein-bar-highlighting-overlay-X-for-exit-overlay" >X</h1>
-					<h1 id="view_protein_bar_highlighting_overlay_header_text" class="view-protein-bar-highlighting-overlay-header-text" >Proten Bar Region Selections</h1>
+					<div style="float: right; padding-right: 5px; padding-top: 10px;">
+				  		<a href="http://proxl-web-app.readthedocs.io/en/latest/using/image-bar.html"  target="_help_window" id="view_link_exclusions_overlay_X_for_exit_overlay_help_link"
+				  			><img src="${ contextPath }/images/icon-help.png" 
+				  		></a>
+					</div>
+					<h1 id="view_protein_bar_highlighting_overlay_header_text" class="view-protein-bar-highlighting-overlay-header-text" 
+						>Protein Bar Region Selections</h1>
 				</div>
 				<div id="view_protein_bar_highlighting_overlay_body" class="view-protein-bar-highlighting-overlay-body" >
 				
-				
-				
 				  <div style="margin-bottom: 5px; font-weight: bold;" >
-				  
 				  	
 				  	<div id="view_protein_bar_highlighting_overlay_protein_bars_data_div">
 				  	
@@ -859,7 +891,11 @@
 
 		<script id="view_protein_bar_highlighting_overlay_bar_region_template"  type="text/x-handlebars-template">
 	
-			<div class=" bar_region_jq " style="padding-top: 2px; position: relative;" > <%--  position: relative; to support positioning error messages --%>
+			<div class=" bar_region_jq " style="padding-top: 2px; position: relative;" 
+				data-region_unique_id="{{regionUniqueId}}"
+				data-start_prev_value="{{start}}"
+				data-end_prev_value="{{end}}"
+				> <%--  position: relative; to support positioning error messages --%>
 
 				start: <input type="text" style="width: 30px;" value="{{start}}" class=" start_jq ">  
 				End: <input type="text" style="width: 30px;" value="{{end}}" class=" end_jq ">  
@@ -887,6 +923,135 @@
 		</script>
 		
 		<%-- !!!   END   Handlebars template Manage Protein Bar Regions  !!!!!!!!!   --%>
+
+
+
+		<%--  --------------------------------------------------------------------  --%>
+	
+
+			<%--  View Link Exclusions Overlay Div,  this overlay div is for choosing which links to exclude by choosing proteins bars and regions --%>
+
+			
+				<%--  View Link Exclusions Overlay Background --%>
+			
+			
+			<div id="view_link_exclusions_modal_dialog_overlay_background" class="view-link-exclusions-modal-dialog-overlay-background" style="display: none;"  >
+			
+			</div>
+			
+				<%--  View Link Exclusions Overlay Div --%>
+			
+			<div id="view_link_exclusions_overlay_div" class=" view-link-exclusions-overlay-div " style="display: none; "  >
+			
+				<div id="view_link_exclusions_overlay_header" class="view-link-exclusions-overlay-header" style="width:100%; " >
+					<h1 id="view_link_exclusions_overlay_X_for_exit_overlay" class="view-link-exclusions-overlay-X-for-exit-overlay" >X</h1>
+					<div style="float: right; padding-right: 5px; padding-top: 10px;">
+				  		<a href="http://proxl-web-app.readthedocs.io/en/latest/using/image-bar.html#highlight-proteins-regions"  target="_help_window" id="view_link_exclusions_overlay_X_for_exit_overlay_help_link"
+				  			><img src="${ contextPath }/images/icon-help.png" 
+				  		></a>
+					</div>
+					<h1 id="view_link_exclusions_overlay_header_text" class="view-link-exclusions-overlay-header-text" 
+						>Link Exclusion</h1>
+				</div>
+				<div id="view_link_exclusions_overlay_body" class="view-link-exclusions-overlay-body" >
+				  <div style="margin-bottom: 5px; font-weight: bold;" >
+					Select pairs of proteins or regions between which links will always be greyed-out.
+				  </div>
+				  <%--  current exclusions --%>
+				  <div style="margin-bottom: 5px; font-weight: bold;" >
+				  		<span id="view_link_exclusions_overlay_no_exclusions_text">No </span>Current Exclusions
+				  </div>
+				  <div id="view_link_exclusions_overlay_excluded_items_outer_block"
+				  		class=" excluded-list-outer-block " >
+				  			<%-- List of current exclusions is inserted into this div --%>
+				  	  <div id="view_link_exclusions_overlay_excluded_items_data_div" class= " excluded-list-block " >
+				  	  </div>
+				  </div>
+				  		
+				  <%--  Lists of proteins and regions for choosing new exclusion --%>
+				  		  	
+				 <div  style="clear: both; margin-top: 5px;">
+					 <div style="margin-top: 15px; margin-bottom: 5px; font-weight: bold;">
+					  		Add Exclusion: choose one entry from each list and click "Exclude".
+					 </div>
+					  
+					  		<%-- Right block - float right --%>
+					 <div class=" exclude-choices-outer-block  exclude-choices-outer-block-2 ">
+					  		<%--  Lists of proteins and regions inserted into this div.  Same as in Left Block --%>
+						<div id="view_link_exclusions_overlay_exclude_choices_2"
+						  		class=" exclude-choices-block exclude_choices_block_jq ">
+						</div>
+					 </div>
+							<%-- Left block --%>  			
+					 <div class=" exclude-choices-outer-block exclude-choices-outer-block-1 ">
+					  		<%--  Lists of proteins and regions inserted into this div.  Same as in Right Block --%>
+					 	<div id="view_link_exclusions_overlay_exclude_choices_1"
+						  		class=" exclude-choices-block exclude_choices_block_jq ">
+					  	</div>
+					</div>
+					 
+					 <div  style="clear: both; margin-top: 5px;">
+					  	  <div style="display:inline-block;position:relative; "> <%-- outer div to support overlay div when button disabled --%>
+						  	 <input type="button" value="Exclude" id="view_link_exclusions_overlay_add_exclusion_button"
+						  		 class="tool_tip_attached_jq" data-tooltip="Add Exclusion." disabled="disabled">
+								<%-- overlay div to provide tooltip for button --%>
+							<div id="view_link_exclusions_overlay_add_exclusion_button_disabled_cover_div" 
+								class=" tool_tip_attached_jq " 
+								style="position:absolute;left:0;right:0;top:0;bottom:0;" 
+								data-tooltip="Click on an entry from each list above and click here to exclude that combination." ></div>
+						  </div>
+	
+					   <div style="padding-top: 3px; display:inline-block;position:relative; ">
+						 <span id="view_link_exclusions_overlay_new_excluded_item_pre_show">
+						 </span>
+					   </div>
+					 </div>
+
+				  	<div style="margin-top: 5px; margin-bottom: 5px;">
+					  	<input type="button" value="Close" id="view_link_exclusions_overlay_protein_bars_close_button"
+					  		 class="tool_tip_attached_jq" data-tooltip="Close.">
+					</div>
+				</div>			  	
+			</div>  <%--  END  <div id="view-link-exclusions-overlay-body" class="view-link-exclusions-overlay-body" > --%>
+
+		</div>  <%--  END  <div id="view_link_exclusions_overlay_div" class=" view-link-exclusions-overlay-div " style="display: none; "  > --%>
+
+		<%-- !!!   Handlebars template Manage Exclusions  !!!!!!!!!   --%>
+		
+		<script id="view_link_exclusions_overlay_single_existing_exclusion_template"  type="text/x-handlebars-template">
+	
+			<div class=" exclusion_entry_jq " style="padding-top: 2px; position: relative;" 
+				data-protein_uid_1="{{ proteinUID_1 }}"
+				data-region_uid_1="{{ regionUID_1 }}"
+				data-protein_uid_2="{{ proteinUID_2 }}"
+				data-region_uid_2="{{ regionUID_2 }}"
+				>
+				<input type="image" src="${ contextPath }/images/icon-delete-small.png"  
+					class=" view_link_exclusions_overlay_exclusion_remove_button_jq tool_tip_attached_jq" 
+					data-tooltip="Remove Exclusion" > 
+				{{ proteinName_1 }}{{ regionRange_1 }}&mdash;{{ proteinName_2 }}{{ regionRange_2 }}
+			</div>  
+		</script>	<%-- &8212; is long dash.  &mdash; is another option for long dash --%>
+		
+			<%--  <div id="view_link_exclusions_overlay_new_excluded_item_pre_show"> --%>
+		<script id="view_link_exclusions_overlay_exclusion_choice_pre_show_template"  type="text/x-handlebars-template">
+			<div>
+				{{ proteinName_1 }}{{ regionRange_1 }}&mdash;{{ proteinName_2 }}{{ regionRange_2 }}
+			</div>
+		</script>  <%-- &8212; is long dash.  &mdash; is another option for long dash --%>	
+		
+		<%--  Click handler will be added to root element of template --%>
+		<script id="view_link_exclusions_overlay_single_exclusion_choice_template"  type="text/x-handlebars-template">
+	
+			<div class=" exclusion-choice-option exclusion_choice_entry_jq " style="padding-top: 2px; cursor: pointer;" 
+				data-protein_uid="{{ proteinUID }}"
+				data-region_uid="{{ regionUID }}"
+				>
+				{{ proteinName }}{{ regionRange }}
+
+			</div>
+
+		</script>	
 								
 
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	

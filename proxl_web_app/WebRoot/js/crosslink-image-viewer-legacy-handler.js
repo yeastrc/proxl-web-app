@@ -174,8 +174,10 @@ LegacyJSONUpdater.prototype.getNrseqProteinArrayFromProteinBarData = function( p
  */
 LegacyJSONUpdater.prototype.convertProteinBarDataToIndexManager = function( json, proteinBarData, ajaxResults ) {
 		
-	var imdata = [ ];		// the index manager data
-	var pbdata = { };
+	var UID_PREFIX = "a"; //  Prefix for UID for converted from prev Protein Bar Manager
+	
+	var imdata = [ ];		// the Index Manager data
+	var pbdata = { };       //  Protein Bar Manager Data
 	
 	for( var i = 0; i < proteinBarData.length; i++ ) {
 		
@@ -185,7 +187,7 @@ LegacyJSONUpdater.prototype.convertProteinBarDataToIndexManager = function( json
 			throw Error( "Got a non number for protSeqId. Got: " + item[ "protSeqId" ] );
 		}		
 		
-		var uid = "a" + i;
+		var uid = UID_PREFIX + i;  //  uid: Unique ID assigned in conversion before Index Manager existed
 		
 		imdata.push( {
 			pid:pid,
@@ -197,10 +199,14 @@ LegacyJSONUpdater.prototype.convertProteinBarDataToIndexManager = function( json
 		delete item.protSeqId;
 		pbdata[ uid ] = item;
 	}
+
 	
-	json[ HASH_OBJECT_PROPERTIES["protein_bar_data"] ] = pbdata;
-	json[ HASH_OBJECT_PROPERTIES["index-manager-data"] ] = imdata;
-	
+	var jsonKey_indexManagerData = hashObjectPropertyValueFromPropertyNameLookup( "index-manager-data-current" );
+	json[ jsonKey_indexManagerData ] = imdata;
+
+	var jsonKey_protein_bar_data_current = hashObjectPropertyValueFromPropertyNameLookup( "protein_bar_data_current" );
+	json[ jsonKey_protein_bar_data_current ] = pbdata;
+
 	updateURLHashWithJSONObject( json );
 
 	// if ajaxResults is true, then we need to re-call initPage()
@@ -262,8 +268,11 @@ LegacyJSONUpdater.prototype.convertSelectedProteinsJSON = function( params ) {
 		this.convertProteinHashDataPre_protein_bar_data( json, uid, nrseqId );
 	}
 	
-	json[ HASH_OBJECT_PROPERTIES[ "index-manager-data" ] /* 'imd' */ ] = _indexManager.getProteinArray();
-	json[ HASH_OBJECT_PROPERTIES[ "protein_bar_data" ] /* 'w' */ ] = _imageProteinBarDataManager.getObjectsForHash();
+	var jsonKey_indexManagerData = hashObjectPropertyValueFromPropertyNameLookup( "index-manager-data" );
+	var jsonKey_protein_bar_data_current = hashObjectPropertyValueFromPropertyNameLookup( "protein_bar_data" );
+
+	json[ jsonKey_indexManagerData ] = _indexManager.getDataForHash();
+	json[ jsonKey_protein_bar_data_current ] = _imageProteinBarDataManager.getDataForHash();
 	
 	delete json[ 'selected-proteins' ];
 	delete json[ 'protein-offsets' ];

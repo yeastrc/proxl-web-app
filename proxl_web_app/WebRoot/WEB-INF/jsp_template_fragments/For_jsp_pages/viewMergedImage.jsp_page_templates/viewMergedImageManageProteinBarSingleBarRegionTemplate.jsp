@@ -4,8 +4,7 @@
 
 		<%-- !!!   Handlebars template Protein Bar Tool Tip  !!!!!!!!!   --%>
 
-<%--  Enclosed in:  <script id="view_protein_bar_highlighting_overlay_bar_region_template"  type="text/x-handlebars-template">  --%>
-
+<%--  Enclosed in:  <script id="view_protein_bar_highlighting_overlay_single_bar_template"  type="text/x-handlebars-template">  --%>
 
 <div > <%-- outer div so that template has a single outermost element.  Supports finding .protein_divider_jq div at bottom --%>
 

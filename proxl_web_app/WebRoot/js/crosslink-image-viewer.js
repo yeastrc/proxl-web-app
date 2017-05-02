@@ -171,7 +171,6 @@ var HASH_OBJECT_PROPERTIES = {
 		"show-linkable-positions" : "m",
 		"show-tryptic-cleavage-positions" : "n",
 		"show-scalebar" : "o",
-		"view-as-circle-plot" : "cir",
 		"shade-by-counts" : "p",
 		"color-by-search" : "q",  //  Not used, only for backwards compatibility
 		"automatic-sizing" : "r",
@@ -183,12 +182,29 @@ var HASH_OBJECT_PROPERTIES = {
 		"selected-proteins" : "x",
 		"color_by" : "y",
 		"annTypeIdDisplay" : "z",
+		"link_exclusion_data_current" : "A",
 		
 		//  For future additions, please continue the single character approach instead of using mnemonic or acronym
+		//    1)  It will keep the overall JSON string shorter
+		//    2)  It will be easier to see what is available to use
 		
+		//  For future additions, please do not use "-" in the property name
+		
+		"view-as-circle-plot" : "cir",
 		"user_circle_diameter" : "ucd",
 		"index-manager-data" : "imd",
 		"version-number" : "vn"
+};
+
+/**
+ * Take a property name for HASH_OBJECT_PROPERTIES and return it's value.  Throw an exception if the property name is not found
+ */
+var hashObjectPropertyValueFromPropertyNameLookup = function( hashObjectPropertyLabel ) {
+	var propertyValue = HASH_OBJECT_PROPERTIES[ hashObjectPropertyLabel ];
+	if ( propertyValue === undefined || propertyValue === null ) {
+		throw Error( "property name/label not found in 'HASH_OBJECT_PROPERTIES' : " + hashObjectPropertyLabel );
+	}
+	return propertyValue;
 };
 
 /**
@@ -223,17 +239,30 @@ var hashObjectManager = {
 
 ///////////////    GLOBAL VARIABLES  ////////////////////////////////////
 
-//   Objects of classes that have their own code
+//   Objects of classes that have their own code, somewhat ordered by the order of the global variable dependencies
 
-var _indexManager = new indexManager();
-var _circlePlotViewer = new circlePlotViewer();
-var _colorManager = new ColorManager();
 var _imageProteinBarDataManager = ImageProteinBarDataManagerContructor();
+var _indexManager = new indexManager();
+
+var _linkExclusionDataManager = LinkExclusionDataManagerContructor( { 
+	imageProteinBarDataManager : _imageProteinBarDataManager,
+	indexManager : _indexManager 
+} );
 
 var _proteinBarRegionSelectionsOverlayCode = ProteinBarRegionSelectionsOverlayCodeContructor( { 
 	imageProteinBarDataManager : _imageProteinBarDataManager,
 	indexManager : _indexManager 
 } );
+
+var _linkExclusionSelectionsOverlayCode = LinkExclusionSelectionsOverlayCodeContructor( {
+	linkExclusionDataManager : _linkExclusionDataManager,
+	imageProteinBarDataManager : _imageProteinBarDataManager,
+	indexManager : _indexManager 
+} );
+
+var _colorManager = new ColorManager();
+var _circlePlotViewer = new circlePlotViewer();
+
 
 //   General
 
@@ -682,7 +711,7 @@ function updateURLHash( useSearchForm ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["view-as-circle-plot"], false );
 	}
 	// save the index manager data
-	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["index-manager-data"], _indexManager.getProteinArray() );
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["index-manager-data"], _indexManager.getDataForHash() );
 	_colorLinesBy = $("#color_by").val();
 	if ( _colorLinesBy !== "" ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["color_by"], _colorLinesBy );
@@ -700,7 +729,10 @@ function updateURLHash( useSearchForm ) {
 	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["vertical-bar-spacing"], _singleProteinBarOverallHeight );
 	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["horizontal-bar-scaling"], _horizontalScalingPercent );
 	//  Add in protein bar data
-	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["protein_bar_data"], _imageProteinBarDataManager.getObjectsForHash() );
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["protein_bar_data"], _imageProteinBarDataManager.getDataForHash() );
+	//  Add in link exclusion data
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["link_exclusion_data_current"], _linkExclusionDataManager.getDataForHash() );
+	
 	var hashObject = hashObjectManager.getHashObject();
 	updateURLHashWithJSONObject( hashObject );
 }
@@ -1267,6 +1299,17 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 	if( !loadComplete ) { return loadRequiredLinkData( doDraw ); }
 	// only load sequences for visible proteins
 	var selectedProteins = _indexManager.getProteinList()
+	
+	
+	if ( selectedProteins && selectedProteins.length > 0 ) {
+		$("#manage_regios_exclusions_links_block").show();
+		$("#manage_regios_exclusions_links_disabled_block").hide();
+	} else {
+		$("#manage_regios_exclusions_links_block").hide();
+		$("#manage_regios_exclusions_links_disabled_block").show();
+	}
+	
+	
 	var proteinIdsToGetSequence = [];
 	for ( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId = selectedProteins[ i ];
@@ -1424,6 +1467,7 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 			decrementSpinner();
 		}
 	}
+	
 	if ( doDraw ) {
 		drawSvg();
 	}
@@ -1466,6 +1510,9 @@ function loadDataFromService() {
 	        		}
 	        		//  Populate these from the Hash	        		
 	        		populateFromHash_imageProteinBarDataManager();
+	        		//  Populate these from the Hash	        		
+	        		populateFromHash_linkExclusionDataManager();
+
 	        		// remove any now-valid entries from the protein bar data manager
 	        		_imageProteinBarDataManager.removeInvalidEntries();
 	        		populateNavigation();
@@ -1497,23 +1544,37 @@ function loadDataFromService() {
  */
 function populateFromHash_imageProteinBarDataManager(){
 	var json = getJsonFromHash();
+		
 	var proteinBarData = json['protein_bar_data'];
 	if ( proteinBarData !== undefined ) {
-		_imageProteinBarDataManager.replaceInternalObjectsWithObjectsInHash( proteinBarData );
+		_imageProteinBarDataManager.replaceInternalDataWithDataInHash( proteinBarData );
 	}
 }
+
+/**
+ * populate _linkExclusionDataManager from the hash
+ */
+function populateFromHash_linkExclusionDataManager(){
+	var json = getJsonFromHash();
+	
+	var linkExclusionData = json['link_exclusion_data_current'];
+	if ( linkExclusionData !== undefined ) {
+		_linkExclusionDataManager.replaceInternalDataWithDataInHash( linkExclusionData );
+	}
+}
+
 
 /**
  * Populates the index manager data from the hash.
  */
 function populateIndexManagerFromHash() {
 	var json = getJsonFromHash();	
+	
 	var data = json[ 'index-manager-data' ];
-	if( data ) {
-		_indexManager.setProteinArray( data );
-	} else {
-		// there is no index manager data (no proteins have been added)
-	}	
+	if ( data ) {
+		_indexManager.replaceInternalDataWithDataInHash( data );
+		return;
+	}
 }
 
 /**
@@ -1624,10 +1685,14 @@ function showSelectedProteins() {
 	if ( !selectedProteinIds || selectedProteinIds.length < 1 || _proteins.length < 1 ) {
 		$("#no_proteins_add_protein_outer_container").show();
 		$("#svg_image_outer_container_div").hide();
+		$("#manage_regios_exclusions_links_block").hide();
+		$("#manage_regios_exclusions_links_disabled_block").show();
 		return;
 	} else {
 		$("#svg_image_outer_container_div").show();
 		$("#no_proteins_add_protein_outer_container").hide();
+		$("#manage_regios_exclusions_links_block").show();
+		$("#manage_regios_exclusions_links_disabled_block").hide();
 	}
 	var $selected_protein_entry_template = $("#selected_protein_entry_template");
 	var selectedProteinEntry_template_handlebarsSource = $selected_protein_entry_template.text();
@@ -2584,6 +2649,17 @@ function getLineColorSingleProteinBar( params ) {
 	var proteinIndex = params.proteinIndex;
 	var fromProteinPosition = params.fromProteinPosition;  
 	var toProteinPosition  = params.toProteinPosition;   //  Optional
+	
+	if ( toProteinPosition ) {
+		var proteinUID = _indexManager.getUIDForIndex( proteinIndex );
+
+		if ( _linkExclusionDataManager.isLinkExcludedForProteinUIDProteinPosition( {
+			proteinUID_1 : proteinUID, proteinPosition_1 : fromProteinPosition,
+			proteinUID_2 : proteinUID, proteinPosition_2 : toProteinPosition } ) ) {
+			return _NOT_HIGHLIGHTED_LINE_COLOR;
+		}		
+	}
+
 	if ( ( ! _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) { 
 		if ( searchList ) {
 			return getColorForSearchesForIndexAndSearchList( proteinIndex, searchList );
@@ -2620,6 +2696,17 @@ function getCrosslinkLineColor( params ) {
 	var fromProteinPosition = params.fromProteinPosition;  
 	var toProteinIndex = params.toProteinIndex;
 	var toProteinPosition  = params.toProteinPosition;
+	
+	var fromProteinUID = _indexManager.getUIDForIndex( fromProteinIndex );
+	var toProteinUID = _indexManager.getUIDForIndex( toProteinIndex );
+	
+	if ( _linkExclusionDataManager.isLinkExcludedForProteinUIDProteinPosition( {
+		proteinUID_1 : fromProteinUID, proteinPosition_1 : fromProteinPosition,
+		proteinUID_2 : toProteinUID, proteinPosition_2 : toProteinPosition } ) ) {
+		return _NOT_HIGHLIGHTED_LINE_COLOR;
+	}		
+
+	
 	if ( ( ! _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) { 
 		if ( searchList ) {
 			return getColorForSearchesForIndexAndSearchList( fromProteinIndex, searchList );
@@ -2714,6 +2801,20 @@ function getLineOpacitySingleProteinBar( params ) {
 	var proteinIndex = params.proteinIndex;
 	var fromProteinPosition = params.fromProteinPosition;  
 	var toProteinPosition  = params.toProteinPosition;   //  Optional
+	
+	var proteinUID = _indexManager.getUIDForIndex( proteinIndex );
+
+	var isLinkExcludedForProteinUIDProteinPositionParams = {
+			proteinUID_1 : proteinUID, proteinPosition_1 : fromProteinPosition,
+			proteinUID_2 : proteinUID, proteinPosition_2 : toProteinPosition
+	};
+	if ( toProteinPosition === undefined ) {
+		isLinkExcludedForProteinUIDProteinPositionParams.proteinPosition_2 = fromProteinPosition;
+	}
+	if ( _linkExclusionDataManager.isLinkExcludedForProteinUIDProteinPosition( isLinkExcludedForProteinUIDProteinPositionParams ) ) {
+		return 0.25;
+	}		
+	
 	if ( ( ! _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) { 
 		return getOpacityForIndexAndLink( proteinIndex, link );
 	}
@@ -2739,6 +2840,19 @@ function getCrosslinkLineOpacity( params ) {
 	var fromProteinPosition = params.fromProteinPosition;  
 	var toProteinIndex = params.toProteinIndex;
 	var toProteinPosition  = params.toProteinPosition;
+
+	var fromPproteinUID = _indexManager.getUIDForIndex( fromProteinIndex );
+	var toPproteinUID = _indexManager.getUIDForIndex( toProteinIndex );
+
+	var isLinkExcludedForProteinUIDProteinPositionParams = {
+			proteinUID_1 : fromPproteinUID, proteinPosition_1 : fromProteinPosition,
+			proteinUID_2 : toPproteinUID, proteinPosition_2 : toProteinPosition
+	};
+	if ( _linkExclusionDataManager.isLinkExcludedForProteinUIDProteinPosition( isLinkExcludedForProteinUIDProteinPositionParams ) ) {
+		return 0.25;
+	}		
+	
+	
 	if ( ( ! _imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) ) { 
 		return getOpacityForIndexAndLink( fromProteinIndex, link );
 	}
@@ -3369,9 +3483,9 @@ function addAllProteinBarGroups( selectedProteins, svgRootSnapSVGObject, $merged
  * Add a single Protein Bar Group ( rectangle and protein name label and cover transparent rectangle )
  */
 function addSingleProteinBarGroup( i, protein, proteinNamePositionLeftSelected, showProteinTerminiSelected, svgRootSnapSVGObject, $merged_image_svg_jq ) {
+	
 	var rightMostEdgeOfAllElementsThisFunction = 0;
-	var imageProteinBarDataEntry = 
-		_imageProteinBarDataManager.getItemByIndex( i );
+	var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( i );
 	var groupSnapSVGForProteinBar = svgRootSnapSVGObject.g();  //  Create group for all elements for this protein bar
 	var proteinOffset = getProteinOffset( { proteinBarIndex : i } );
 	var proteinOffsetFromImageLeftEdge = proteinOffset + _proteinBarsLeftEdge;
@@ -3392,6 +3506,7 @@ function addSingleProteinBarGroup( i, protein, proteinNamePositionLeftSelected, 
 	proteinBarRectangleSnapSVGObject.attr({
 		fill: proteinBarColor
 	});
+	
 	proteinBarRectangleSnapSVGObject.addClass( _PROTEIN_BAR_MAIN_RECTANGLE_LABEL_CLASS );
 	groupSnapSVGForProteinBar.add( proteinBarRectangleSnapSVGObject );
 	//   Add Group SVG object here so can add more objects at this layer in the SVG later
@@ -3400,8 +3515,7 @@ function addSingleProteinBarGroup( i, protein, proteinNamePositionLeftSelected, 
 	groupSnapSVGForDataItemsAboveMainProteinBar.addClass( _PROTEIN_BAR_GROUP_ON_TOP_OF_MAIN_RECTANGLE_LABEL_CLASS );
 	groupSnapSVGForProteinBar.add( groupSnapSVGForDataItemsAboveMainProteinBar );
 	//  Add in existing protein selection regions
-	var proteinBarHighlightedRegions =
-		imageProteinBarDataEntry.getProteinBarHighlightedRegionsArray();
+	var proteinBarHighlightedRegions = imageProteinBarDataEntry.getProteinBarHighlightedRegionsArray();
 	if ( proteinBarHighlightedRegions && proteinBarHighlightedRegions.length > 0 ) {
 		for ( var index = 0; index < proteinBarHighlightedRegions.length; index++ ) {
 			var proteinRegion = proteinBarHighlightedRegions[ index ];
@@ -3813,6 +3927,8 @@ function addSingleProteinBarGroup( i, protein, proteinNamePositionLeftSelected, 
 //		var eventpageY = eventObject.pageY;
 		//	hide line.
 		mousePositionLineSnapSVGObject.attr( { strokeWidth: 0 } );
+
+		var $rectangle = $( this ); 
 	});
 	//  END  Add mouse handlers to overlay transparent rectangle for managing "groupMouseOverInfoBlock" content and position
 	///////
@@ -5517,6 +5633,7 @@ function initPage() {
 		}
 	} );
 	_proteinBarRegionSelectionsOverlayCode.init();
+	_linkExclusionSelectionsOverlayCode.init();
 	loadDataFromService();
 };
 

@@ -27,6 +27,10 @@
  */
 var ImageProteinBarDataManager = function() {
 	this.barData = { };
+	this.maxRegionIdNumber = 0; //  Current max region id that was allocated, init to zero
+
+	this.UNIQUE_ID_PREFIX = "z";
+	this.UNIQUE_ID_TO_STRING_RADIX = 32;  // max 36
 };
 
 /**
@@ -34,7 +38,30 @@ var ImageProteinBarDataManager = function() {
  */
 var ImageProteinBarDataManagerContructor = function() { 
 	
-	return new ImageProteinBarDataManager();
+	var imageProteinBarDataManager =  new ImageProteinBarDataManager();
+	ProteinBarHighlightedRegion.imageProteinBarDataManager = imageProteinBarDataManager;
+	return imageProteinBarDataManager;
+};
+
+/**
+ * Get a new unique id. This is guaranteed to be unique.
+ */
+ImageProteinBarDataManager.prototype.getNextRegionUniqueId = function() {
+	if ( this.maxRegionIdNumber === undefined ) {
+		throw Error( "this.maxRegionIdNumber === undefined" );
+	}
+	if ( this.maxRegionIdNumber === null ) {
+		throw Error( "this.maxRegionIdNumber === null" );
+	}
+	this.maxRegionIdNumber++;
+	
+	var maxRegionIdNumberLocal = this.maxRegionIdNumber;
+	//  make regionUniqueId from maxRegionIdNumberLocal using this.UNIQUE_ID_TO_STRING_RADIX as radix
+	var regionUniqueId = this.UNIQUE_ID_PREFIX + maxRegionIdNumberLocal.toString( this.UNIQUE_ID_TO_STRING_RADIX );
+	
+	//  TODO  Pass new this.maxRegionIdNumber to server for tracking
+	
+	return regionUniqueId;
 };
 
 /**
@@ -124,10 +151,14 @@ ImageProteinBarDataManager.prototype.clearItems = function() {
 ////    URL Hash Specific Processing
 
 /**
- * Get objects for Hash
+ * Get data for Hash
  */
-ImageProteinBarDataManager.prototype.getObjectsForHash = function( ) {
+ImageProteinBarDataManager.prototype.getDataForHash = function( ) {
 	
+	var imageProteinBarDataManagerDataResult = {};
+
+	imageProteinBarDataManagerDataResult.a = this.maxRegionIdNumber;
+
 	var imageProteinBarDataResult = { };
 	var keys = Object.keys( this.getAllItems() );
 	for( var i = 0; i < keys.length; i++ ) {
@@ -136,23 +167,45 @@ ImageProteinBarDataManager.prototype.getObjectsForHash = function( ) {
 		var imageProteinBarDataForHash = imageProteinBarDataEntry.getHashDataObject();
 		imageProteinBarDataResult[ key ] = imageProteinBarDataForHash;
 	}
-	return imageProteinBarDataResult;
+	imageProteinBarDataManagerDataResult.b = imageProteinBarDataResult;
+	
+	return imageProteinBarDataManagerDataResult;
 };
 
 /**
- * Update Internal ProteinBarData objects with objects in the Page Hash
+ * Update Internal ImageProteinBarDataManager data with data in the Page Hash
  */
-ImageProteinBarDataManager.prototype.replaceInternalObjectsWithObjectsInHash = function( proteinBarData ) {
-	
+ImageProteinBarDataManager.prototype.replaceInternalDataWithDataInHash = function( imageProteinBarDataManagerData ) {
+
 	this.clearItems();
-	if ( proteinBarData ) {
-		var keys = Object.keys( proteinBarData );
-		for( var i = 0; i < keys.length; i++ ) {
-			var key = keys[ i ];
-			var proteinBarDataHashItem = proteinBarData[ key ];
-			var proteinBarDataItem = ImageProteinBarData.constructImageProteinBarDataFromHashDataObject( proteinBarDataHashItem ); 
-			proteinBarDataItem.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
-			this.addEntry( key, proteinBarDataItem );
+	if ( imageProteinBarDataManagerData ) {
+		var maxRegionIdNumber = imageProteinBarDataManagerData.a;
+		var proteinBarDataObjects = imageProteinBarDataManagerData.b;
+		if ( maxRegionIdNumber !== undefined && proteinBarDataObjects !== undefined ) {
+			//  Current version so process
+			this.maxRegionIdNumber = maxRegionIdNumber;
+			if ( proteinBarDataObjects ) {
+				var keys = Object.keys( proteinBarDataObjects );
+				for( var i = 0; i < keys.length; i++ ) {
+					var key = keys[ i ];
+					var proteinBarDataHashItem = proteinBarDataObjects[ key ];
+					var proteinBarDataItem = ImageProteinBarData.constructImageProteinBarDataFromHashDataObject( proteinBarDataHashItem ); 
+					proteinBarDataItem.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
+					this.addEntry( key, proteinBarDataItem );
+				}
+			}
+		} else {
+			// Previous version (proteinBarDataObjects is at the root level of imageProteinBarDataManagerData
+			if ( proteinBarDataObjects ) {
+				var keys = Object.keys( proteinBarDataObjects );
+				for( var i = 0; i < keys.length; i++ ) {
+					var key = keys[ i ];
+					var proteinBarDataHashItem = proteinBarDataObjects[ key ];
+					var proteinBarDataItem = ImageProteinBarData.constructImageProteinBarDataFromHashDataObject( proteinBarDataHashItem ); 
+					proteinBarDataItem.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
+					this.addEntry( key, proteinBarDataItem );
+				}
+			}
 		}
 	}
 };
@@ -291,6 +344,10 @@ var ImageProteinBarData = function(  ) {
 	this.containingImageProteinBarDataManager = undefined;
 	this.proteinBarHighlightedRegions = undefined;
 	this.proteinBarHighlightedAll = undefined;
+	
+	this.uid = undefined;
+	this.pid = undefined;
+
 };
 
 /**
@@ -301,6 +358,14 @@ ImageProteinBarData.prototype.clearPropertiesOnProteinIdChange = function() {
 	this.proteinBarHighlightedAll = undefined;
 	this.proteinReversed = undefined;
 	this.proteinOffset = 0;
+};
+
+ImageProteinBarData.prototype.getProteinBarUniqueId = function() {
+	return this.uid;
+};
+
+ImageProteinBarData.prototype.getProteinBarProtienId = function() {
+	return this.pid;
 };
 
 /**
@@ -559,6 +624,55 @@ ImageProteinBarData.prototype.setProteinBarHighlightedAll = function( ) {
 	}
 };
 
+
+
+/**
+ * Get Region Object of the protein bar highlighted region for this single position
+ * 
+ * @param {number} position in the protein bar
+ * @returns {object} Class ProteinBarHighlightedRegion, or undefined if no region at the position
+ */
+ImageProteinBarData.prototype.getProteinBarHighlightedRegionObjectAtSinglePosition = function( position ) {
+	if ( this.proteinBarHighlightedRegions === undefined
+			|| this.proteinBarHighlightedRegions === null
+			|| this.proteinBarHighlightedRegions.length === 0 ) {
+		//  There are no highlighted regions so return undefined
+		return undefined;
+	}
+	for ( var index = 0; index < this.proteinBarHighlightedRegions.length; index++ ) {
+		var proteinBarHighlightedRegionsEntry = this.proteinBarHighlightedRegions[ index ];
+		if ( proteinBarHighlightedRegionsEntry.getStart() <= position 
+				&& proteinBarHighlightedRegionsEntry.getEnd() >= position ) {
+			return proteinBarHighlightedRegionsEntry;
+		}
+	}
+	return undefined;
+};
+
+/**
+ * Get Region Object of the protein bar highlighted region for this region unique id
+ * 
+ * @param {string} regionUniqueId
+ * @returns {object} Class ProteinBarHighlightedRegion, or undefined if no region with that regionUniqueId
+ */
+ImageProteinBarData.prototype.getProteinBarHighlightedRegionObjectForRegionUniqueId = function( regionUniqueId ) {
+	if ( this.proteinBarHighlightedRegions === undefined
+			|| this.proteinBarHighlightedRegions === null
+			|| this.proteinBarHighlightedRegions.length === 0 ) {
+		//  There are no highlighted regions so return undefined
+		return undefined;
+	}
+	for ( var index = 0; index < this.proteinBarHighlightedRegions.length; index++ ) {
+		var proteinBarHighlightedRegionsEntry = this.proteinBarHighlightedRegions[ index ];
+		if ( proteinBarHighlightedRegionsEntry.getRegionUniqueId() === regionUniqueId ) {
+			return proteinBarHighlightedRegionsEntry;
+		}
+	}
+	return undefined;
+};
+
+
+
 /**
  * 
  */
@@ -593,7 +707,12 @@ ImageProteinBarData.prototype.setProteinBarHighlightedRegion = function( params 
 	if ( end > this.getProteinLength() ) {
 		end = this.getProteinLength();
 	}
-	var regionToSet = { s : start, e : end };
+	
+	var regionToSet = ProteinBarHighlightedRegion.constructEmptyProteinBarHighlightedRegion();
+	regionToSet.setStart( start );  // property 's'
+	regionToSet.setEnd( end );  // property 'e'
+	regionToSet.setRegionUniqueId( ProteinBarHighlightedRegion.imageProteinBarDataManager.getNextRegionUniqueId() );
+
 	var proteinBarHighlightedRegionEntry = regionToSet;
 	this.proteinBarHighlightedRegions = [ proteinBarHighlightedRegionEntry ];
 	this.proteinBarHighlightedAll = undefined;
@@ -616,13 +735,7 @@ ImageProteinBarData.prototype.addProteinBarHighlightedRegion = function( params 
 				+ ", protein length: " + proteinLength );
 		return;  //   EARLY EXIT
 	}
-	if ( start < 1 ) {
-		start = 1;
-	}
-	if ( end > this.getProteinLength() ) {
-		end = this.getProteinLength();
-	}
-	var regionToAdd = { s : start, e : end };
+
 //	if ( this.proteinBarHighlightedAll ) {
 //		//  Exit since whole Protein Bar already highlighted
 //		return;  //  EARLY EXIT
@@ -632,43 +745,36 @@ ImageProteinBarData.prototype.addProteinBarHighlightedRegion = function( params 
 		this.setProteinBarHighlightedRegion( params );
 		return;  // EARLY EXIT
 	}
+	
+	if ( start < 1 ) {
+		start = 1;
+	}
+	if ( end > this.getProteinLength() ) {
+		end = this.getProteinLength();
+	}
+	var regionToAdd = ProteinBarHighlightedRegion.constructEmptyProteinBarHighlightedRegion();
+	regionToAdd.setStart( start );  // property 's'
+	regionToAdd.setEnd( end );  // property 'e'
+	
 	//  Add to existing highlighted array, address overlapping regions
 	//  Keep highlighted array in sorted order
 
-	//  First add new region into the array in sorted order, ascending start, descending end
-	var newRegionAdded = false;
-	var new_proteinBarHighlightedRegions = [];  //  Done by building a new highlighted array.
-	for ( var regionsIndex = 0; regionsIndex < this.proteinBarHighlightedRegions.length; regionsIndex++ ) {
-		var region = this.proteinBarHighlightedRegions[ regionsIndex ];
-		if ( newRegionAdded ) {
-			//  New region added already so now just copy the existing regions
-			new_proteinBarHighlightedRegions.push( region );
-		} else if ( regionToAdd.s < region.s ) {
-			new_proteinBarHighlightedRegions.push( regionToAdd );
-			new_proteinBarHighlightedRegions.push( region );
-			newRegionAdded = true;
-		} else if ( regionToAdd.s === region.s ) {
-			if ( regionToAdd.e >= region.e ) {
-				new_proteinBarHighlightedRegions.push( regionToAdd );
-				new_proteinBarHighlightedRegions.push( region );
-				newRegionAdded = true;
-			} else {
-				new_proteinBarHighlightedRegions.push( region );
-				new_proteinBarHighlightedRegions.push( regionToAdd );
-				newRegionAdded = true;
-			}
-		} else {
-			new_proteinBarHighlightedRegions.push( region );
-		}
+	if ( ! this.proteinBarHighlightedRegions ) {
+		this.proteinBarHighlightedRegions = [];
 	}
-	if ( ! newRegionAdded ) {
-		//  New Region not added yet since it sorts after the existing regions. Add it here
-		new_proteinBarHighlightedRegions.push( regionToAdd );
-	}
-	this.proteinBarHighlightedRegions = new_proteinBarHighlightedRegions;
+	this.proteinBarHighlightedRegions.push( regionToAdd );
 
-	//////  Second Combine overlapping regions
+	//  Sort to keep highlighted array in sorted order
+	this.proteinBarHighlightedRegions.sort(function( item1, item2 ) {
+		if ( item1.getStart() !== item2.getStart() ) {
+			return item1.getStart() - item2.getStart();
+		}
+		return item1.getEnd() - item2.getEnd();
+	})
 	
+	// Combine overlapping regions.  If combine, assign new region unique id
+	
+	var regionCombined = null;
 	var new_proteinBarHighlightedRegions = [];
 	var lastAddedRegion = null;
 	for ( var regionsIndex = 0; regionsIndex < this.proteinBarHighlightedRegions.length; regionsIndex++ ) {
@@ -686,9 +792,18 @@ ImageProteinBarData.prototype.addProteinBarHighlightedRegion = function( params 
 				if ( lastAddedRegion.e < region.e ) {
 					//  region.end is after lastAddedRegion.end so extend lastAddedRegion and drop region
 					lastAddedRegion.e = region.e;
+					regionCombined = lastAddedRegion;
 				}  // else drop region since fully contained within lastAddedRegion
 			}
 		}
+	}
+	
+	if ( regionCombined ) {
+		//  Change region unique id since the region start or end changed
+		regionCombined.setRegionUniqueId( ProteinBarHighlightedRegion.imageProteinBarDataManager.getNextRegionUniqueId() );
+	} else {
+		// New region was not combined with any other so set it's regionUniqueId
+		regionToAdd.setRegionUniqueId( ProteinBarHighlightedRegion.imageProteinBarDataManager.getNextRegionUniqueId() );
 	}
 
 	this.proteinBarHighlightedRegions = new_proteinBarHighlightedRegions;
@@ -709,6 +824,26 @@ ImageProteinBarData.prototype._if_WholeBarHighlighted_SwitchTo_proteinBarHighlig
 			this.setProteinBarHighlightedAll();
 		}
 	}
+};
+
+/**
+ * Get region from regionUID
+ * 
+ * return null if not found
+ */
+ImageProteinBarData.prototype.getRegionFromRegionUID = function( params ) {
+	var regionUID = params.regionUID;
+	if ( ! this.proteinBarHighlightedRegions ) {
+		return null;
+	}
+	//  Find region containing this position and return it;
+	for ( var regionsIndex = 0; regionsIndex < this.proteinBarHighlightedRegions.length ; regionsIndex++ ) {
+		var region = this.proteinBarHighlightedRegions[ regionsIndex ];
+		if ( region.getRegionUniqueId() === regionUID ) {
+			return region;
+		}
+	}
+	return null;
 };
 
 /**
@@ -750,16 +885,71 @@ ImageProteinBarData.prototype.clearProteinBarHighlighted = function( ) {
 	this.proteinBarHighlightedRegions = undefined;
 };
 
+
+/**
+ * Clear existing highlighted values
+
+ */
+ImageProteinBarData.prototype.syncProteinBarHighlightedRegioToProvidedList = function( params ) {
+	var syncRegionList = params.syncRegionList;
+	if ( this.proteinBarHighlightedRegions ) {
+		//  First remove regions in this.proteinBarHighlightedRegions that are not in syncRegionList by matching regionUniqueId
+		var newListRemovedMissingRegionsproteinBarHighlightedRegions = [];
+		for ( var existingEntriesIndex = 0; existingEntriesIndex < this.proteinBarHighlightedRegions.length; existingEntriesIndex++ ) {
+			var existingEntry = this.proteinBarHighlightedRegions[ existingEntriesIndex ];
+			for ( var syncEntriesIndex = 0; syncEntriesIndex < syncRegionList.length; syncEntriesIndex++ ) {
+				var syncRegion = syncRegionList[ syncEntriesIndex ];
+				if ( existingEntry.getRegionUniqueId() === syncRegion.getRegionUniqueId()  ) {
+					newListRemovedMissingRegionsproteinBarHighlightedRegions.push( existingEntry );
+					break;
+				}
+			}
+		}
+		this.proteinBarHighlightedRegions = newListRemovedMissingRegionsproteinBarHighlightedRegions;
+	}
+	// Add the regions in syncRegionList that don't have a region unique id
+	
+	for ( var syncEntriesIndex = 0; syncEntriesIndex < syncRegionList.length; syncEntriesIndex++ ) {
+		var syncRegion = syncRegionList[ syncEntriesIndex ];
+		if ( syncRegion.getRegionUniqueId() === undefined ) {
+			var region = { start : syncRegion.getStart() , end : syncRegion.getEnd() };
+			this.addProteinBarHighlightedRegion( region );
+		}
+	}
+};
+
+
+//////////////
+
 /**
  * Get the data object to put on the Hash
  */
 ImageProteinBarData.prototype.getHashDataObject = function() {
+	
+	var regionsForHashObject = this.getRegionsForHashObject();
+	
 	var hashDataObject = {};
+	hashDataObject.a = regionsForHashObject;
 	hashDataObject.pHlhAll = this.proteinBarHighlightedAll;
-	hashDataObject.pHlghRgns = this.proteinBarHighlightedRegions;
 	hashDataObject.pRvrs = this.proteinReversed;
 	hashDataObject.pOffst = this.proteinOffset;
 	return hashDataObject;
+};
+
+/**
+ * Get the Regions data array to put on the Hash
+ */
+ImageProteinBarData.prototype.getRegionsForHashObject = function() {
+	if ( ! this.proteinBarHighlightedRegions ) {
+		return undefined;
+	}
+	var regionsForHashObject = [];
+	for ( var index = 0; index < this.proteinBarHighlightedRegions.length; index++ ) {
+		var region = this.proteinBarHighlightedRegions[ index ];
+		var regionForHashObject = region.getHashDataObject();
+		regionsForHashObject.push( regionForHashObject );
+	}
+	return regionsForHashObject;
 };
 
 /**
@@ -770,8 +960,10 @@ ImageProteinBarData.constructImageProteinBarDataFromHashDataObject = function( h
 	var imageProteinBarData = new ImageProteinBarData();
 	if ( hashDataObject ) {
 //		Copy data from hashDataObject
+		if ( hashDataObject.a ) {
+			imageProteinBarData.proteinBarHighlightedRegions = this.getRegionsFromHashObject( hashDataObject.a );
+		}
 		imageProteinBarData.proteinBarHighlightedAll = hashDataObject.pHlhAll;
-		imageProteinBarData.proteinBarHighlightedRegions = hashDataObject.pHlghRgns;
 		imageProteinBarData.proteinReversed = hashDataObject.pRvrs;
 		imageProteinBarData.proteinOffset  = hashDataObject.pOffst;
 		//  Backwards compatible:
@@ -781,7 +973,7 @@ ImageProteinBarData.constructImageProteinBarDataFromHashDataObject = function( h
 		if ( hashDataObject.proteinBarHighlightedAll ) {
 			imageProteinBarData.proteinBarHighlightedAll = hashDataObject.proteinBarHighlightedAll;
 		}
-		if ( hashDataObject.proteinBarHighlightedAll ) {
+		if ( hashDataObject.proteinBarHighlightedRegions ) {
 			imageProteinBarData.proteinBarHighlightedRegions = hashDataObject.proteinBarHighlightedRegions;
 		}
 		if ( hashDataObject.proteinReversed ) {
@@ -789,6 +981,9 @@ ImageProteinBarData.constructImageProteinBarDataFromHashDataObject = function( h
 		}
 		if ( hashDataObject.proteinOffset !== undefined ) {
 			imageProteinBarData.proteinOffset  = hashDataObject.proteinOffset;
+		}
+		if ( hashDataObject.pHlghRgns ) {
+			imageProteinBarData.proteinBarHighlightedRegions = this.getRegionsFromHashObject( hashDataObject.pHlghRgns );
 		}
 		//  END: Backwards compatible
 		
@@ -800,6 +995,19 @@ ImageProteinBarData.constructImageProteinBarDataFromHashDataObject = function( h
 };
 
 /**
+ * Construct regions from Hash object 
+ */
+ImageProteinBarData.getRegionsFromHashObject = function( hashDataObject ) {
+	var regionsFromHashObject = [];
+	for ( var index = 0; index < hashDataObject.length; index++ ) {
+		var hashDataObjectRegionItem = hashDataObject[ index ];
+		var regionFromHashObject = ProteinBarHighlightedRegion.constructProteinBarHighlightedRegionFromHashDataObject( hashDataObjectRegionItem );
+		regionsFromHashObject.push( regionFromHashObject );
+	}
+	return regionsFromHashObject;
+};
+
+/**
  * Construct empty object of type ImageProteinBarData
  */
 ImageProteinBarData.constructEmptyImageProteinBarData = function(  ) {
@@ -807,4 +1015,82 @@ ImageProteinBarData.constructEmptyImageProteinBarData = function(  ) {
 	var imageProteinBarData = new ImageProteinBarData();
 	imageProteinBarData.proteinOffset = 0;
 	return imageProteinBarData;
+};
+
+/////////////////////////////////////////////////
+
+///    Protein Bar Highlighted Region Class
+
+var ProteinBarHighlightedRegion = function() {
+
+	/*
+	 * Holds a single selected user region.
+	 * 
+	 * properties   's' and 'e' are used throughout so kept as is
+	 * s : 		region start.
+	 * e : 		region end.
+	 * regionUniqueId  : 	unique id for region to serve for identifying this instance
+	 * 						
+	 */
+	this.s = undefined; //  region start
+	this.e = undefined; //  region end
+	this.regionUniqueId = undefined; 
+};
+
+ProteinBarHighlightedRegion.prototype.getStart = function() {
+	return this.s;
+};
+ProteinBarHighlightedRegion.prototype.setStart = function( regionsStart ) {
+	this.s = regionsStart;
+};
+ProteinBarHighlightedRegion.prototype.getEnd = function() {
+	return this.e;
+};
+ProteinBarHighlightedRegion.prototype.setEnd = function( regionEndParam ) {
+	this.e = regionEndParam;
+};
+ProteinBarHighlightedRegion.prototype.getRegionUniqueId = function() {
+	return this.regionUniqueId;
+};
+ProteinBarHighlightedRegion.prototype.setRegionUniqueId = function( regionUniqueIdParam ) {
+	this.regionUniqueId = regionUniqueIdParam;
+};
+
+
+
+/**
+ * Get the data object to put on the Hash
+ */
+ProteinBarHighlightedRegion.prototype.getHashDataObject = function() {
+	var hashDataObject = {};
+	hashDataObject.s = this.s;
+	hashDataObject.e = this.e;
+	hashDataObject.a = this.regionUniqueId;
+	return hashDataObject;
+};
+
+/**
+ * Construct object of type ImageProteinBarData from hashDataObject.  The parameter hashDataObject comes from the Hash
+ */
+ProteinBarHighlightedRegion.constructProteinBarHighlightedRegionFromHashDataObject = function( hashDataObject ) {
+	var item = new ProteinBarHighlightedRegion();
+	if ( hashDataObject ) {
+		item.s = hashDataObject.s ;
+		item.e = hashDataObject.e;
+		item.regionUniqueId = hashDataObject.a;
+		if ( ! item.regionUniqueId ) { //  assign regionUniqueId if not assigned
+			item.regionUniqueId = ProteinBarHighlightedRegion.imageProteinBarDataManager.getNextRegionUniqueId();
+		}
+	}
+	return item;
+};
+
+
+/**
+ * Construct empty object of type ProteinBarHighlightedRegion
+ */
+ProteinBarHighlightedRegion.constructEmptyProteinBarHighlightedRegion = function(  ) {
+	//	Create an instance from the constructor
+	var proteinBarHighlightedRegion = new ProteinBarHighlightedRegion();
+	return proteinBarHighlightedRegion;
 };

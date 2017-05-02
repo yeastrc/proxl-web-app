@@ -34,6 +34,10 @@ indexManager.prototype.initialize  = function(  ) {
 	 * 		}
 	 */
 	this.parr = [ ];
+	this.maxUIDnumber = 0; // Max uid number assigned
+	
+	this.UNIQUE_ID_TO_STRING_RADIX = 32;
+	this.uniqueIdPrefix = "q"; //  Changed from "p" to not have collisions with existing UID since using different radix in this.UNIQUE_ID_TO_STRING_RADIX
 
 };
 
@@ -47,8 +51,6 @@ indexManager.prototype.getProteinArray = function() {
 
 /**
  * Set all the protein index data.
- * 
- * Used for populating from URL Hash
  */
 indexManager.prototype.setProteinArray = function( parrParam ) {
 	this.parr = parrParam;
@@ -107,19 +109,12 @@ indexManager.prototype.listContainsElement = function( list, element ) {
 };
 
 /**
- * Get a new unique id. This is guaranteed to be unique in the current
- * list of proteins in the index. It may, however, have the same id as
- * a previously-deleted entry.
+ * Get a new unique id. This is guaranteed to be unique.
  */
 indexManager.prototype.getNewUniqueId = function() {
-	
-	var i = 1;
-	var uid = "p" + i;
-	
-	while( this.findIndexPosition( uid ) !== -1 ) {
-		i++;
-		uid = "p" + i;
-	}
+	this.maxUIDnumber++;
+	var uid = this.uniqueIdPrefix + this.maxUIDnumber.toString( this.UNIQUE_ID_TO_STRING_RADIX );
+	//  TODO  Pass new this.maxUIDnumber to server for tracking
 	
 	return uid;
 };
@@ -307,4 +302,49 @@ indexManager.prototype.getProteinList = function() {
 	
 	return prots;
 };
+
+/**
+ * Clear this manager of data
+ */
+indexManager.prototype.resetManager = function( ) {
+
+	this.maxUIDnumber = 0;
+	this.parr = [];
+};
+
+////   URL Hash Specific Processing
+
+/**
+ * Get Data for Hash
+ */
+indexManager.prototype.getDataForHash = function( ) {
+
+	var dataResult = { };
+	dataResult.a = this.maxUIDnumber;
+	dataResult.b = this.parr;
+	return dataResult;
+};
+
+/**
+ * Update Internal Index Manager data with data in the Page Hash
+ */
+indexManager.prototype.replaceInternalDataWithDataInHash = function( indexManagerData ) {
+	
+	this.resetManager();
+	if ( indexManagerData ) {
+		var maxUIDnumber = indexManagerData.a;
+		var parr = indexManagerData.b;
+		if ( maxUIDnumber !== undefined && parr !== undefined && Array.isArray( parr )  ) {
+			//  The current version so set and return
+			this.maxUIDnumber = maxUIDnumber;
+			this.parr = parr;
+			return;  //  EARLY EXIT
+		}
+		//  Handle previous data where indexManagerData is the array for this.parr
+		this.parr = parr;
+		// Store Max Protein UID value in this.maxUIDnumber
+		this.maxUIDnumber = 0;
+	}
+};
+
 

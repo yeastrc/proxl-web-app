@@ -7,6 +7,12 @@
  * @constructor
  * @author Michael Riffle <mriffle@uw.edu>
  * 
+ * !!! The following global variables from "crosslink-image-viewer.js" are used in this file:
+ * 
+ * _indexManager
+ * _imageProteinBarDataManager
+ * _linkExclusionDataManager
+ * 
  */
 var ColorManager = function() {	
 	
@@ -204,6 +210,23 @@ ColorManager.PrettyTheme.prototype.getColorForLink = function( link ) {
 	if( !_imageProteinBarDataManager.isAnyProteinBarsHighlighted() ) {	
 		return this.getColorForHighlightedLink( link );		
 	}
+	
+	//  Check exclusions
+	if( link.type === "crosslink" ) {
+		if ( _linkExclusionDataManager.isLinkExcludedForProteinUIDProteinPosition( {
+				proteinUID_1 : link.uid1, proteinPosition_1 : link.position1,
+				proteinUID_2 : link.uid2, proteinPosition_2 : link.position2 } ) ) {
+			return this.getColorForNonHighlightedItem();
+		}		
+	}
+	if( link.type === "looplink" ) {
+		if ( _linkExclusionDataManager.isLinkExcludedForProteinUIDProteinPosition( {
+			proteinUID_1 : link.uid1, proteinPosition_1 : link.position1,
+			proteinUID_2 : link.uid1, proteinPosition_2 : link.position2 } ) ) {
+			return this.getColorForNonHighlightedItem();
+		}		
+	}
+
 	
 	var barEntry1 = _imageProteinBarDataManager.getItemByUID( link.uid1 );
 	var barEntry2 = undefined;			//undefined if monolink or looplink

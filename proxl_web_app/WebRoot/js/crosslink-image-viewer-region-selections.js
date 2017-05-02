@@ -187,9 +187,11 @@ ProteinBarRegionSelectionsOverlayCode.prototype._populate = function( params ) {
 			var $regions_items_block_jq = $singleBarHtml.find(".regions_items_block_jq");
 			for ( var proteinBarHighlightedRegionsArrayIndex = 0; proteinBarHighlightedRegionsArrayIndex < proteinBarHighlightedRegionsArray.length; proteinBarHighlightedRegionsArrayIndex++ ) {
 				var proteinBarHighlightedRegionsEntry = proteinBarHighlightedRegionsArray[ proteinBarHighlightedRegionsArrayIndex ];
+				var regionUniqueId = proteinBarHighlightedRegionsEntry.getRegionUniqueId();
 				var singleBarRegionContext = {
 						start : proteinBarHighlightedRegionsEntry.s,
-						end : proteinBarHighlightedRegionsEntry.e
+						end : proteinBarHighlightedRegionsEntry.e,
+						regionUniqueId : regionUniqueId
 				};
 				this._appendProteinBarHighlightedOverlayRegion( { $regions_items_block_jq : $regions_items_block_jq, singleBarRegionContext : singleBarRegionContext } );
 			}
@@ -224,13 +226,6 @@ ProteinBarRegionSelectionsOverlayCode.prototype._appendProteinBarHighlightedOver
 ProteinBarRegionSelectionsOverlayCode.prototype.addRegion = function( params ) {
 	var clickedThis = params.clickedThis;
 	var $clickedThis = $( clickedThis );
-	var singleBarRegionTemplate_handlebarsSource = $( "#view_protein_bar_highlighting_overlay_bar_region_template" ).text();
-	if ( singleBarRegionTemplate_handlebarsSource === undefined ) {
-		throw Error( "singleBarRegionTemplate_handlebarsSource === undefined" );
-	}
-	if ( singleBarRegionTemplate_handlebarsSource === null ) {
-		throw Error( "singleBarRegionTemplate_handlebarsSource === null" );
-	}
 	var $regions_block_jq = $clickedThis.closest(".regions_block_jq");
 	var $regions_items_block_jq =  $regions_block_jq.find(".regions_items_block_jq");
 	this._appendProteinBarHighlightedOverlayRegion( { $regions_items_block_jq : $regions_items_block_jq, singleBarRegionContext : {} } );
@@ -324,7 +319,33 @@ ProteinBarRegionSelectionsOverlayCode.prototype.save = function( params ) {
 					dataValidationError = true;
 					return false;  //  EARLY EXIT .each()
 				}
-				selectionRegions.push( { regionStart : regionStart , regionEnd : regionEnd } );
+				var regionUniqueId = $bar_region_jq.attr( "data-region_unique_id" ); // empty for added regions
+				if ( regionUniqueId === "" || regionUniqueId === null || regionUniqueId === undefined ) {
+					regionUniqueId = undefined;
+				} else {
+					var prevRegionStartString = $bar_region_jq.attr( "data-start_prev_value" ); // prev start value
+					var prevRegionEndString = $bar_region_jq.attr( "data-end_prev_value" ); // prev end value
+					if ( prevRegionStartString === "" 
+						|| prevRegionStartString === null
+						|| prevRegionStartString === undefined
+						|| prevRegionEndString === ""
+						|| prevRegionEndString === null
+						| prevRegionEndString === undefined ) {
+						throw Error( '"data-start_prev_value" or "data-end_prev_value" does not have a value when "data-region_unique_id" is populated' ); 
+					}
+					var prevRegionStartInt = Number( prevRegionStartString );
+					var prevRegionEndInt = Number( prevRegionEndString );
+					if ( isNaN( prevRegionStartInt ) ) {
+						throw Error( '"data-start_prev_value" does not contain a number: ' + prevRegionStartString );
+					}
+					if ( isNaN( prevRegionEndInt ) ) {
+						throw Error( '"data-end_prev_value" does not contain a number: ' + prevRegionEndString );
+					}
+					if ( regionStart != prevRegionStartInt || regionEnd != prevRegionEndInt ) {
+						regionUniqueId = undefined; // clear since the start or end changed
+					}
+				}
+				selectionRegions.push( { regionStart : regionStart , regionEnd : regionEnd, regionUniqueId : regionUniqueId } );
 			});
 		}
 		if ( dataValidationError ) {
@@ -347,13 +368,18 @@ ProteinBarRegionSelectionsOverlayCode.prototype.save = function( params ) {
 			if ( selectionDataSingleBarUpdate.setProteinBarHighlightedAll ) {
 				imageProteinBarDataItem.setProteinBarHighlightedAll();
 			} else {
-				imageProteinBarDataItem.clearProteinBarHighlighted();
+				// Match up to existing regions and replace and add.
+				var syncRegionList = [];
 				var selectionRegions = selectionDataSingleBarUpdate.selectionRegions;
 				for ( var selectionRegionsIndex = 0; selectionRegionsIndex < selectionRegions.length; selectionRegionsIndex++ ) {
 					var selectionRegionEntry = selectionRegions[ selectionRegionsIndex ];
-					var addRegionParams = { start : selectionRegionEntry.regionStart  , end: selectionRegionEntry.regionEnd };
-					imageProteinBarDataItem.addProteinBarHighlightedRegion( addRegionParams );
+					var regionFromPageData = ProteinBarHighlightedRegion.constructEmptyProteinBarHighlightedRegion();
+					regionFromPageData.setStart( selectionRegionEntry.regionStart );
+					regionFromPageData.setEnd( selectionRegionEntry.regionEnd );
+					regionFromPageData.setRegionUniqueId( selectionRegionEntry.regionUniqueId );
+					syncRegionList.push( regionFromPageData );
 				}
+				imageProteinBarDataItem.syncProteinBarHighlightedRegioToProvidedList( { syncRegionList : syncRegionList } );
 			}
 		}
 	}
