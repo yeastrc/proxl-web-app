@@ -8,6 +8,7 @@
 
 --%>
 
+<%@page import="org.yeastrc.xlink.www.forms.PeptideProteinCommonForm"%>
 <%@page import="org.yeastrc.xlink.enum_classes.FilterDirectionType"%>
 <%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
@@ -38,15 +39,23 @@
 		</div>
 	 
 	 </td>
-	 <td colspan="10"  style="vertical-align: top;" >
+	 <td id="searches_details_list_container" class=" searches_sort_list_container_jq "
+	 		colspan="10"  style="vertical-align: top;" >
 	 
-		
+		<%-- !!  Plain html template --%>
+		<script id="query_param_do_not_sort_yes_input_template"  type="text/text">
+			<input type="hidden" name="ds" value="<%= PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES %>" class=" query_param_do_not_sort_in_update_form_jq " />
+		</script>	 	
+				
   <c:forEach  var="search_details"  items="${ searches_details_list }" varStatus="searchVarStatus">
 			
 	<c:set var="search" value="${ search_details.searchDTO }"></c:set>
-	
-				
-	 <table class="table-no-border-no-cell-spacing-no-cell-padding" style="border-width:0px;" >
+ 
+ 	 <%--  On Merged Peptide, Protein pages, this is draggable for re-ording --%>
+	 <table class="table-no-border-no-cell-spacing-no-cell-padding  searches_sort_list_item_jq  " 
+	 	data-project_search_id="${ search.projectSearchId }"
+	 	data-search_order_index="${ searchVarStatus.index }"
+	 	style="border-width:0px;" >
 	  <tr>
 		<td style="vertical-align: top; padding-right: 3px;" >
 		
@@ -58,7 +67,12 @@
 			</c:if> 
 					<%--  Display Color block before the search if 'showSearchColorBlock' is true --%>
 			<c:if test="${ showSearchColorBlock }" 
-			  	><span style="margin-right:10px;padding-left:10px;padding-right:10px;" class="${ backgroundColorClassName }"></span
+			  	><span 
+					<%--  This color block is now the drag handle for changing the order of the searches --%>
+			  		style="margin-right:10px;padding-left:10px;padding-right:10px; " <%--  cursor: pointer; --%>
+			  		class="${ backgroundColorClassName } search_sort_handle_jq  " <%-- tool_tip_attached_jq --%>
+			  		 <%-- data-tooltip="Drag to re-order searches" --%>
+			  		></span
 			  	></c:if
 			  		><a href="javascript:"
 					onclick="toggleVisibility(this)"

@@ -569,6 +569,10 @@ SearchesForPageChooser.prototype.changePageUrlFor_NOT_ImageOrStructurePage = fun
 		var $project_search_id_in_update_form_jq_All = $form_get_for_updated_parameters_single_search.find(".project_search_id_in_update_form_jq");
 		$project_search_id_in_update_form_jq_All.remove(); // Removes all existing input fields
 
+		//   Remove 'ds' query param
+		var $query_param_do_not_sort_in_update_form_jq = $form_get_for_updated_parameters_multiple_searches.find(".query_param_do_not_sort_in_update_form_jq");
+		$query_param_do_not_sort_in_update_form_jq.remove(); // Removes existing do not search input field
+
 		var queryStringProjectSearchIds = [];
 		for ( var index = 0; index < chosenProjectSearchIds.length; index++ ) {
 			var projectSearchId = chosenProjectSearchIds[ index ];
@@ -587,6 +591,10 @@ SearchesForPageChooser.prototype.changePageUrlFor_NOT_ImageOrStructurePage = fun
 	
 	var $project_search_id_in_update_form_jq_All = $form_get_for_updated_parameters_multiple_searches.find(".project_search_id_in_update_form_jq");
 	$project_search_id_in_update_form_jq_All.remove(); // Removes all existing input fields
+
+	//   Remove 'ds' query param
+	var $query_param_do_not_sort_in_update_form_jq = $form_get_for_updated_parameters_multiple_searches.find(".query_param_do_not_sort_in_update_form_jq");
+	$query_param_do_not_sort_in_update_form_jq.remove(); // Removes existing do not search input field
 
 	for ( var index = 0; index < chosenProjectSearchIds.length; index++ ) {
 		var projectSearchId = chosenProjectSearchIds[ index ];

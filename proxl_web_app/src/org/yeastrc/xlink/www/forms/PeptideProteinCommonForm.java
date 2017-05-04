@@ -9,13 +9,42 @@ import org.apache.struts.action.ActionForm;
 public class PeptideProteinCommonForm  extends ActionForm {
 
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * value for ds form field
+	 */
+	public static final String DO_NOT_SORT_PROJECT_SEARCH_IDS_YES = "y";
 
 	private int[] projectSearchId = { };
+	
+	/**
+	 * ds for do not sort searches
+	 * Do not sort projectSearchId values
+	 */
+	private String ds;
 	
 	/**
 	 * JSON with the rest of the parameters
 	 */
 	private String queryJSON;
+	
+	
+	
+	
+	/**
+	 * ds for do not sort searches
+	 * Do not sort projectSearchId values
+	 */
+	public String getDs() {
+		return ds;
+	}
+	/**
+	 * ds for do not sort searches
+	 * Do not sort projectSearchId values
+	 */
+	public void setDs(String ds) {
+		this.ds = ds;
+	}
 	
 	/**
 	 * Assumes there is only one element in projectSearchId array
@@ -65,5 +94,5 @@ public class PeptideProteinCommonForm  extends ActionForm {
 	public void setProjectSearchId(int[] projectSearchId) {
 		this.projectSearchId = projectSearchId;
 	}
-	
+
 }

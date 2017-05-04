@@ -31,6 +31,7 @@ import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
+import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
 import org.yeastrc.xlink.www.objects.SearchCount;
 import org.yeastrc.xlink.www.objects.VennDiagramDataToJSON;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -70,13 +71,13 @@ public class ViewMergedSearchProteinsAllAction extends Action {
 			request.setAttribute( "strutsActionForm", form );
 			// Get the session first.  
 			//			HttpSession session = request.getSession();
-			int[] projectSearchIds = form.getProjectSearchId();
-			if ( projectSearchIds.length == 0 ) {
+			int[] projectSearchIdsFromForm = form.getProjectSearchId();
+			if ( projectSearchIdsFromForm.length == 0 ) {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
 			//   Get the project id for these searches
 			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
-			for ( int projectSearchId : projectSearchIds ) {
+			for ( int projectSearchId : projectSearchIdsFromForm ) {
 				projectSearchIdsSet.add( projectSearchId );
 			}
 			List<Integer> projectSearchIdsListDeduppedSorted = new ArrayList<>( projectSearchIdsSet );
@@ -85,7 +86,7 @@ public class ViewMergedSearchProteinsAllAction extends Action {
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
 				String msg = "No project ids for projectSearchIds: ";
-				for ( int projectSearchId : projectSearchIds ) {
+				for ( int projectSearchId : projectSearchIdsFromForm ) {
 					msg += projectSearchId + ", ";
 				}
 				log.error( msg );
@@ -122,34 +123,43 @@ public class ViewMergedSearchProteinsAllAction extends Action {
 			//  Jackson JSON Mapper object for JSON deserialization and serialization
 			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
 			
+			Set<Integer> projectSearchIdsProcessedFromForm = new HashSet<>(); // add each projectSearchId as process in loop next
+
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
 			Collection<Integer> searchIds = new HashSet<>();
 			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
 			int searchIdsArrayIndex = 0;
-			for( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
-				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
-				if ( search == null ) {
-					String msg = "projectSearchId '" + projectSearchId + "' not found in the database. User taken to home page.";
-					log.warn( msg );
-					//  Search not found, the data on the page they are requesting does not exist.
-					//  The data on the user's previous page no longer reflects what is in the database.
-					//  Take the user to the home page
-					return mapping.findForward( StrutsGlobalForwardNames.HOME );  //  EARLY EXIT from Method
+			for ( int projectSearchId : projectSearchIdsFromForm ) {
+				if ( projectSearchIdsProcessedFromForm.add( projectSearchId ) ) {
+					//  Haven't processed this projectSearchId yet in this loop so process it now
+					SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
+					if ( search == null ) {
+						String msg = "projectSearchId '" + projectSearchId + "' not found in the database. User taken to home page.";
+						log.warn( msg );
+						//  Search not found, the data on the page they are requesting does not exist.
+						//  The data on the user's previous page no longer reflects what is in the database.
+						//  Take the user to the home page
+						return mapping.findForward( StrutsGlobalForwardNames.HOME );  //  EARLY EXIT from Method
+					}
+					searches.add( search );
+					searchesMapOnSearchId.put( search.getSearchId(), search );
+					searchIds.add( search.getSearchId() );
+					searchIdsArray[ searchIdsArrayIndex ] = search.getSearchId();
+					searchIdsArrayIndex++;
 				}
-				searches.add( search );
-				searchesMapOnSearchId.put( search.getSearchId(), search );
-				searchIds.add( search.getSearchId() );
-				searchIdsArray[ searchIdsArrayIndex ] = search.getSearchId();
-				searchIdsArrayIndex++;
 			}
-			// Sort searches list
-			Collections.sort( searches, new Comparator<SearchDTO>() {
-				@Override
-				public int compare(SearchDTO o1, SearchDTO o2) {
-					return o1.getSearchId() - o2.getSearchId();
-				}
-			});
+
+			if ( ! PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
+
+				// Sort searches list
+				Collections.sort( searches, new Comparator<SearchDTO>() {
+					@Override
+					public int compare(SearchDTO o1, SearchDTO o2) {
+						return o1.getSearchId() - o2.getSearchId();
+					}
+				});
+			}
 			
 			//  Populate request objects for Standard Header Display
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
@@ -267,6 +277,7 @@ public class ViewMergedSearchProteinsAllAction extends Action {
 				SearchCount searchCount = new SearchCount();
 				SearchCountList.add(searchCount);
 				searchCount.setSearchId( searchId );
+				searchCount.setProjectSearchId( search.getProjectSearchId() );
 				if ( searchCountMapValue != null ) {
 					searchCount.setCount( searchCountMapValue.intValue() );
 				} else {

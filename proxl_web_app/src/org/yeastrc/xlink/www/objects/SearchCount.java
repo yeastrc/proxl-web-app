@@ -6,6 +6,7 @@ package org.yeastrc.xlink.www.objects;
  */
 public class SearchCount {
 
+	private int projectSearchId;
 	private int searchId;
 	private int count;
 	
@@ -21,5 +22,11 @@ public class SearchCount {
 	}
 	public void setCount(int count) {
 		this.count = count;
+	}
+	public int getProjectSearchId() {
+		return projectSearchId;
+	}
+	public void setProjectSearchId(int projectSearchId) {
+		this.projectSearchId = projectSearchId;
 	}
 }

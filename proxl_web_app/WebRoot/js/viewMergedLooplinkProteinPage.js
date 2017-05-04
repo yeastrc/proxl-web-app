@@ -38,6 +38,12 @@ var ViewMergedLooplinkProteinPageCode = function() {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
 			}
+			
+			setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+				if ( window.mergedPeptideProteinSearchesListVennDiagramSection ) {
+					window.mergedPeptideProteinSearchesListVennDiagramSection.init();
+				}
+			},10);
 
 		},10);
 		
