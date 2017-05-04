@@ -47,17 +47,21 @@
 
 	<%-- No Venn Diagram, list legend in horizontal list list --%>
  
-  <div style="margin-top: 5px;">	
+  <div  class=" searches_sort_list_container_jq "  style="margin-top: 5px;">	
 
 	 <c:forEach items="${ searchCounts }" var="searchCount"  varStatus="searchVarStatus">
 	 
-	  <span style="white-space: nowrap;  padding-right: 20px;">
+	  <span class=" searches_sort_list_item_jq " style="white-space: nowrap;  padding-right: 20px;"
+	  	data-project_search_id="${ searchCount.projectSearchId }">
 
 		<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
 		<%@ include file="/WEB-INF/jsp-includes/mergedSearch_SearchIndexToSearchColorCSSClassName.jsp" %>
 					
 			
-			<span style="margin-right: 10px; padding-left: 10px; padding-right: 10px;" class="${ backgroundColorClassName }"></span>
+			<span style="margin-right: 10px; padding-left: 10px; padding-right: 10px; cursor: pointer;" 
+				class="${ backgroundColorClassName } search_sort_handle_jq tool_tip_attached_jq "
+				data-tooltip="Drag to re-order searches"
+				></span>
 		  (Search <bean:write name="searchCount" property="searchId" />: <bean:write name="searchCount" property="count" />)
 		  
 	  </span>
