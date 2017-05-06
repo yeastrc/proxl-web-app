@@ -151,6 +151,9 @@ public class ConvertAndDownloadSVGAction extends Action {
 		} catch ( Exception e ) {
 			String msg = "Exception:  RemoteAddr: " + request.getRemoteAddr()  
 					+ ", Exception caught: " + e.toString();
+			
+			msg += "\nInput SVG:" + ((ConvertAndDownloadSVGForm)form).getSvgString();
+			
 			log.error( msg, e );
 			throw e;
 		}
