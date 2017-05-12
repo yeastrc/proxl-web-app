@@ -67,9 +67,8 @@ public class DB_Insert_UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO
 			"INSERT INTO unified_rp__search__rep_pept__generic_lookup "
 			+ 	"( unified_reported_peptide_id, reported_peptide_id, search_id, link_type, "
 			+  		" has_dynamic_modifictions, has_monolinks, psm_num_at_default_cutoff, "
-			+ 		" peptide_meets_default_cutoffs, related_peptides_unique_for_search,"
-			+ 		" num_unique_psm_at_default_cutoff ) "
-			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
+			+ 		" peptide_meets_default_cutoffs, related_peptides_unique_for_search ) "
+			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
 
 	/**
@@ -156,31 +155,19 @@ public class DB_Insert_UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO
 			} else {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
 			}
-
-			counter++;
-			pstmt.setInt( counter, item.getNumUniquePsmAtDefaultCutoff() );
-					
+			
 			pstmt.executeUpdate();
 			
-			
 		} catch ( Exception e ) {
-			
 			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql
 					+ " :::   Item to insert: " + item, e );
-			
 			throw e;
-			
 		} finally {
-			
 			if( pstmt != null ) {
 				try { pstmt.close(); } catch( Throwable t ) { ; }
 				pstmt = null;
 			}
-			
 		}
-		
-		
 	}
-	
 
 }

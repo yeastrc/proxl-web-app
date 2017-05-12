@@ -33,9 +33,9 @@ public class PeptideWebPageSearcherCacheOptimized {
 		YES, NO
 	}
 	
-	public static class PretendExcForStacktrace extends Exception {
-		
-	}
+//	public static class PretendExcForStacktrace extends Exception {
+//		
+//	}
 
 	/**
 	 * Get the peptides corresponding to the given parameters
@@ -124,9 +124,6 @@ public class PeptideWebPageSearcherCacheOptimized {
 			
 			if ( reportedPeptideData.getNumPsms() != null ) {
 				item.setNumPsms( reportedPeptideData.getNumPsms() );
-			}
-			if ( reportedPeptideData.getNumUniquePsms() != null ) {
-				item.setNumUniquePsms( reportedPeptideData.getNumUniquePsms() );
 			}
 			if ( reportedPeptideData.getPeptideAnnotationDTOMap() != null ) {
 				wrappedItem.setPeptideAnnotationDTOMap( reportedPeptideData.getPeptideAnnotationDTOMap() );

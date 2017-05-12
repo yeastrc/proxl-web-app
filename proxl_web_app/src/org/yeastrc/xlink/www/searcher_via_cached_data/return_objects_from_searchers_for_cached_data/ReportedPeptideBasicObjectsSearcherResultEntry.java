@@ -14,9 +14,8 @@ public class ReportedPeptideBasicObjectsSearcherResultEntry {
 	private int reportedPeptideId;
 	private int unifiedReportedPeptideId;
 
-	//  These are null if not computed
+	//  This is null if not computed
 	private Integer numPsms;
-	private Integer numUniquePsms;
 	
 //  These are null if not retrieved
 	private Map<Integer, AnnotationDataBaseDTO> psmAnnotationDTOMap;
@@ -46,12 +45,6 @@ public class ReportedPeptideBasicObjectsSearcherResultEntry {
 	}
 	public void setNumPsms(Integer numPsms) {
 		this.numPsms = numPsms;
-	}
-	public Integer getNumUniquePsms() {
-		return numUniquePsms;
-	}
-	public void setNumUniquePsms(Integer numUniquePsms) {
-		this.numUniquePsms = numUniquePsms;
 	}
 	public Map<Integer, AnnotationDataBaseDTO> getPsmAnnotationDTOMap() {
 		return psmAnnotationDTOMap;

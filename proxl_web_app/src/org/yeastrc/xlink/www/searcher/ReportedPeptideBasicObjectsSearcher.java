@@ -65,8 +65,7 @@ public class ReportedPeptideBasicObjectsSearcher {
 			"SELECT unified_rp__search__rep_pept__generic_lookup.reported_peptide_id, "
 			+ " unified_rp__search__rep_pept__generic_lookup.unified_reported_peptide_id, "
 			+ " unified_rp__search__rep_pept__generic_lookup.link_type, "
-			+ " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff, "
-			+ " unified_rp__search__rep_pept__generic_lookup.num_unique_psm_at_default_cutoff ";
+			+ " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff";
 	
 	private final String SQL_MAIN_FROM_START = " FROM unified_rp__search__rep_pept__generic_lookup ";
 	
@@ -636,11 +635,6 @@ public class ReportedPeptideBasicObjectsSearcher {
 			if ( ! rs.wasNull() ) {
 				item.setNumPsms( numPsmsForDefaultCutoffs );
 			}
-			//  Comment out since field num_unique_psm_at_default_cutoff is not being populated correctly
-//			int numUniquePsmsForDefaultCutoffs = rs.getInt( "num_unique_psm_at_default_cutoff" );
-//			if ( ! rs.wasNull() ) {
-//				item.setNumUniquePsms( numUniquePsmsForDefaultCutoffs );
-//			}
 		}
 		if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
 				|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {

@@ -20,7 +20,6 @@ public class UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO {
 	private boolean allRelatedPeptidesUniqueForSearch;
 
 	private int psmNumAtDefaultCutoff;
-	private int numUniquePsmAtDefaultCutoff;
 
 	/**
 	 * Not applicable if there are no Peptide filterable annotations
@@ -93,19 +92,9 @@ public class UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO {
 	public void setPsmNumAtDefaultCutoff(int psmNumAtDefaultCutoff) {
 		this.psmNumAtDefaultCutoff = psmNumAtDefaultCutoff;
 	}
-
-	public int getNumUniquePsmAtDefaultCutoff() {
-		return numUniquePsmAtDefaultCutoff;
-	}
-
-	public void setNumUniquePsmAtDefaultCutoff(int numUniquePsmAtDefaultCutoff) {
-		this.numUniquePsmAtDefaultCutoff = numUniquePsmAtDefaultCutoff;
-	}
-
 	public Yes_No__NOT_APPLICABLE_Enum getPeptideMeetsDefaultCutoffs() {
 		return peptideMeetsDefaultCutoffs;
 	}
-
 	public void setPeptideMeetsDefaultCutoffs(
 			Yes_No__NOT_APPLICABLE_Enum peptideMeetsDefaultCutoffs) {
 		this.peptideMeetsDefaultCutoffs = peptideMeetsDefaultCutoffs;

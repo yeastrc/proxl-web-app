@@ -1307,7 +1307,6 @@ CREATE TABLE  unified_rp__search__rep_pept__generic_lookup (
   psm_num_at_default_cutoff INT(10) UNSIGNED NOT NULL,
   peptide_meets_default_cutoffs ENUM('yes','no','not_applicable') NOT NULL,
   related_peptides_unique_for_search TINYINT(1) NOT NULL DEFAULT 0,
-  num_unique_psm_at_default_cutoff INT(10) UNSIGNED NOT NULL,
   PRIMARY KEY (search_id, reported_peptide_id),
   CONSTRAINT unified_rp__search__rep_pept__gnrc_lkp_reported_peptide_id_fk
     FOREIGN KEY (reported_peptide_id)

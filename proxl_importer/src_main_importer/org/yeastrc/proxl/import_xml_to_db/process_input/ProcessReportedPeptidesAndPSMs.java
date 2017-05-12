@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ReportedPeptideDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_PsmFilterableAnnotationGenericLookupDAO;
@@ -427,7 +426,6 @@ public class ProcessReportedPeptidesAndPSMs {
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setHasMonolinks( hasMonolinks );
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setLinkType( linkTypeNumber );
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setPsmNumAtDefaultCutoff( psmStatisticsAndBestValues.psmCountPassDefaultCutoffs );
-		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setNumUniquePsmAtDefaultCutoff( psmStatisticsAndBestValues.uniquePsmCountAtDefaultCutoffs );
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setPeptideMeetsDefaultCutoffs( peptideMeetsDefaultCutoffs );
 		DB_Insert_UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO.getInstance().saveToDatabase( unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO );
 		for ( SearchReportedPeptideAnnotationDTO searchReportedPeptideAnnotationDTO : searchReportedPeptideFilterableAnnotationDTOList ) {
@@ -555,7 +553,6 @@ public class ProcessReportedPeptidesAndPSMs {
 		SavePsmAnnotations savePsmAnnotations = SavePsmAnnotations.getInstance( searchProgramEntryMap, filterablePsmAnnotationTypesOnId );
 		BestPsmAnnotationProcessing bestPsmAnnotationProcessing =
 				BestPsmAnnotationProcessing.getInstance( filterablePsmAnnotationTypesOnId );
-		Map<Integer, MutableInt> psmCount_KeyedOnScanId_ForUniquePsmCountAtDefaultCutoffs_Map = new HashMap<>();
 		int psmCountPassDefaultCutoffs = 0;
 		boolean saveAnyPSMs = false;
 		for ( Psm psm : psmList ) {
@@ -593,13 +590,6 @@ public class ProcessReportedPeptidesAndPSMs {
 							filterablePsmAnnotationTypesOnId );
 			if ( doesPsmPassDefaultCutoffs ) {
 				psmCountPassDefaultCutoffs++;
-				Integer scanIdOnPsmDTO = psmDTO.getScanId();
-				MutableInt psmCountForScanId = psmCount_KeyedOnScanId_ForUniquePsmCountAtDefaultCutoffs_Map.get( scanIdOnPsmDTO );
-				if ( psmCountForScanId == null ) {
-					psmCountForScanId = new MutableInt( 0 );
-					psmCount_KeyedOnScanId_ForUniquePsmCountAtDefaultCutoffs_Map.put( scanIdOnPsmDTO, psmCountForScanId );
-				}
-				psmCountForScanId.increment();
 			}
 			bestPsmAnnotationProcessing.updateForCurrentPsmAnnotationData( currentPsm_psmAnnotationDTO_Filterable_List );
 			saveAnyPSMs = true;
@@ -610,16 +600,8 @@ public class ProcessReportedPeptidesAndPSMs {
 			log.error( msg );
 			throw new ProxlImporterInteralException(msg);
 		}
-		int uniquePsmCountAtDefaultCutoffs = 0;
-		for ( Map.Entry<Integer, MutableInt> entry : psmCount_KeyedOnScanId_ForUniquePsmCountAtDefaultCutoffs_Map.entrySet() ) {
-			MutableInt psmCountForScanId = entry.getValue();
-			if ( psmCountForScanId.intValue() == 1 ) {
-				uniquePsmCountAtDefaultCutoffs++;
-			}
-		}
 		PsmStatisticsAndBestValues psmStatisticsAndBestValues = new PsmStatisticsAndBestValues();
 		psmStatisticsAndBestValues.psmCountPassDefaultCutoffs = psmCountPassDefaultCutoffs;
-		psmStatisticsAndBestValues.uniquePsmCountAtDefaultCutoffs = uniquePsmCountAtDefaultCutoffs;
 		psmStatisticsAndBestValues.bestPsmAnnotationProcessing = bestPsmAnnotationProcessing;
 		return psmStatisticsAndBestValues;
 	}
@@ -630,7 +612,6 @@ public class ProcessReportedPeptidesAndPSMs {
 	 */
 	private static class PsmStatisticsAndBestValues {
 		int psmCountPassDefaultCutoffs = 0;
-		int uniquePsmCountAtDefaultCutoffs;
 		BestPsmAnnotationProcessing bestPsmAnnotationProcessing;
 	}
 	
