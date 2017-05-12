@@ -636,10 +636,11 @@ public class ReportedPeptideBasicObjectsSearcher {
 			if ( ! rs.wasNull() ) {
 				item.setNumPsms( numPsmsForDefaultCutoffs );
 			}
-			int numUniquePsmsForDefaultCutoffs = rs.getInt( "num_unique_psm_at_default_cutoff" );
-			if ( ! rs.wasNull() ) {
-				item.setNumUniquePsms( numUniquePsmsForDefaultCutoffs );
-			}
+			//  Comment out since field num_unique_psm_at_default_cutoff is not being populated correctly
+//			int numUniquePsmsForDefaultCutoffs = rs.getInt( "num_unique_psm_at_default_cutoff" );
+//			if ( ! rs.wasNull() ) {
+//				item.setNumUniquePsms( numUniquePsmsForDefaultCutoffs );
+//			}
 		}
 		if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
 				|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {
