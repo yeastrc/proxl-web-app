@@ -66,13 +66,16 @@ var ViewSearchPeptidePageCode = function() {
 				$link_type_jq.each( function( index, element ) {
 					var $item = $( this );
 					var linkTypeFieldValue = $item.val();
-					//  if linkTypeFieldValue found in linkTypes array, set it to checked
+					//  if linkTypeFieldValue found in linkTypes array, set it to checked, else set it to not checked
+					var checkedPropertyValue = false;
 					for ( var linkTypesIndex = 0; linkTypesIndex < linkTypes.length; linkTypesIndex++ ) {
 						var linkTypesEntry = linkTypes[ linkTypesIndex ];
 						if ( linkTypesEntry === linkTypeFieldValue ) {
-							$item.prop('checked', true);
+							checkedPropertyValue = true;
+							break;
 						}
 					}
+					$item.prop('checked', checkedPropertyValue);
 				});
 			}
 		} else {
@@ -92,13 +95,16 @@ var ViewSearchPeptidePageCode = function() {
 				$mod_mass_filter_jq.each( function( index, element ) {
 					var $item = $( this );
 					var linkTypeFieldValue = $item.val();
-					//  if linkTypeFieldValue found in dynamicModMasses array, set it to checked
+					//  if linkTypeFieldValue found in dynamicModMasses array, set it to checked, else set it to not checked
+					var checkedPropertyValue = false;
 					for ( var dynamicModMassesIndex = 0; dynamicModMassesIndex < dynamicModMasses.length; dynamicModMassesIndex++ ) {
 						var dynamicModMassesEntry = dynamicModMasses[ dynamicModMassesIndex ];
 						if ( dynamicModMassesEntry === linkTypeFieldValue ) {
-							$item.prop('checked', true);
+							checkedPropertyValue = true;
+							break;
 						}
 					}
+					$item.prop('checked', checkedPropertyValue);
 				});
 			}
 		} else {

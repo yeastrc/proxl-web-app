@@ -114,13 +114,15 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 				$link_type_jq.each( function( index, element ) {
 					var $item = $( this );
 					var linkTypeFieldValue = $item.val();
-					//  if linkTypeFieldValue found in linkTypes array, set it to checked
+					//  if linkTypeFieldValue found in linkTypes array, set it to checked, else set it to not checked
+					var linkFieldCheckedPropertyValue = false;
 					for ( var linkTypesIndex = 0; linkTypesIndex < linkTypes.length; linkTypesIndex++ ) {
 						var linkTypesEntry = linkTypes[ linkTypesIndex ];
 						if ( linkTypesEntry === linkTypeFieldValue ) {
-							$item.prop('checked', true);
+							linkFieldCheckedPropertyValue = true;
 						}
 					}
+					$item.prop('checked', linkFieldCheckedPropertyValue);
 				});
 			}
 		} else {
@@ -135,12 +137,18 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 		//  Mark check boxes for chosen links to exclude:  "no unique peptides", "only one PSM", "only one peptide"
 		if ( _query_json_field_Contents.filterNonUniquePeptides ) {
 			$("#filterNonUniquePeptides").prop('checked', true);
+		} else {
+			$("#filterNonUniquePeptides").prop('checked', false);
 		}
 		if ( _query_json_field_Contents.filterOnlyOnePSM ) {
 			$("#filterOnlyOnePSM").prop('checked', true);
+		} else {
+			$("#filterOnlyOnePSM").prop('checked', false);
 		}
 		if ( _query_json_field_Contents.filterOnlyOnePeptide ) {
 			$("#filterOnlyOnePeptide").prop('checked', true);
+		} else {
+			$("#filterOnlyOnePeptide").prop('checked', false);
 		}
 		
 		//  Mark check boxes for chosen taxonomy to exclude
@@ -152,15 +160,17 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 				$excludeTaxonomy_jq.each( function( index, element ) {
 					var $item = $( this );
 					var excludeTaxonomyFieldValue = $item.val();
-					//  if excludeTaxonomyFieldValue found in excludeTaxonomy array, set it to checked
+					//  if excludeTaxonomyFieldValue found in excludeTaxonomy array, set it to checked, else set it to not checked
+					var checkedPropertyValue = false;
 					for ( var excludeTaxonomyIndex = 0; excludeTaxonomyIndex < excludeTaxonomy.length; excludeTaxonomyIndex++ ) {
 						var excludeTaxonomyEntry = excludeTaxonomy[ excludeTaxonomyIndex ];
 						var excludeTaxonomyEntryString = excludeTaxonomyEntry.toString();
 						//  Compare as string since that is what will be retrieved from HTML element
 						if ( excludeTaxonomyEntryString === excludeTaxonomyFieldValue ) {
-							$item.prop('checked', true);
+							checkedPropertyValue = true;
 						}
 					}
+					$item.prop('checked', checkedPropertyValue);
 				});
 			}
 		}
