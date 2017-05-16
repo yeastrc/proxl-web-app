@@ -25,7 +25,7 @@ permalink: pretty
 social:
   - icon: external-link
     text: Use Proxl
-    url: http://www.yeastrc.org/proxl_public/
+    url: https://www.yeastrc.org/proxl_public/
   - icon: question-circle
     text: Documentation
     url: http://www.yeastrc.org/proxl_docs/
