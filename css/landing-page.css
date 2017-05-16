@@ -30,7 +30,7 @@ h6 {
     padding-top: 50px; /* If you're making other pages, make sure there is 50px of padding to make sure the navbar doesn't overlap content! */
     padding-bottom: 50px;
     text-align: center;
-    color: #f8f8f8;
+    color: #A55353;
     background: url(../img/proxl-banner.png) no-repeat center center;
     background-size: cover;
 }
@@ -43,8 +43,8 @@ h6 {
 
 .intro-message > h1 {
     margin: 0;
-    text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
-    font-size: 5em;
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.8);
+    font-size: 6em;
 }
 
 .intro-divider {
@@ -54,7 +54,7 @@ h6 {
 }
 
 .intro-message > h3 {
-    text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.8);
 }
 
 @media(max-width:767px) {
