@@ -23,9 +23,12 @@ permalink: pretty
 # ----------------------- #
 
 social:
-  - title: question-circle
+  - icon: external-link
+    text: Use Proxl
+    url: http://www.yeastrc.org/proxl_public/
+  - icon: question-circle
+    text: Documentation
     url: http://www.yeastrc.org/proxl_docs/
-  - title: github
-    url: https://github.com/IronSummitMedia/startbootstrap
-  - title: linkedin
-    url: 
+  - icon: github
+    text: Source Code
+    url: https://github.com/yeastrc/proxl-web-app
