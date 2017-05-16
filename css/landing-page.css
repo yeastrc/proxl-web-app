@@ -37,9 +37,8 @@ h6 {
 
 .intro-message {
     position: relative;
-    padding-top: 20%;
-    padding-bottom: 20%;
-    background-color:black;
+    padding-top: 80%;
+    padding-bottom: 80%;
 }
 
 .intro-message > h1 {
@@ -167,5 +166,5 @@ p.copyright {
 }
 
 .transparent{    
-    background-color: rgba(0,0,0,0.15);
+    background-color: rgba(165,83,83,0.45);
 }
