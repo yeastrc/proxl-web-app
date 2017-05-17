@@ -247,17 +247,17 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			_handlebarsTemplate_crosslink_peptide_child_row_entry_template = Handlebars.compile( handlebarsSource_crosslink_peptide_child_row_entry_template );
 		}
 		//  Search for NumberUniquePSMs being set in any row
-		var showNumberUniquePSMs = false;
+		var showNumberNonUniquePSMs = false;
 		for ( var crosslink_peptideIndex = 0; crosslink_peptideIndex < crosslink_peptides.length ; crosslink_peptideIndex++ ) {
 			var crosslink_peptide = crosslink_peptides[ crosslink_peptideIndex ];
-			if ( crosslink_peptide.numUniquePsms !== undefined && crosslink_peptide.numUniquePsms !== null ) {
-				showNumberUniquePSMs = true;
+			if ( crosslink_peptide.numNonUniquePsms !== undefined && crosslink_peptide.numNonUniquePsms !== null ) {
+				showNumberNonUniquePSMs = true;
 				break;
 			}
 		}
 		//  create context for header row
 		var context = { 
-				showNumberUniquePSMs : showNumberUniquePSMs,
+				showNumberNonUniquePSMs : showNumberNonUniquePSMs,
 				peptideAnnotationDisplayNameDescriptionList : peptideAnnotationDisplayNameDescriptionList,
 				psmAnnotationDisplayNameDescriptionList : psmAnnotationDisplayNameDescriptionList
 		};
@@ -273,7 +273,7 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			var crosslink_peptide = crosslink_peptides[ crosslink_peptideIndex ];
 			//  wrap data in an object to allow adding more fields
 			var context = { 
-					showNumberUniquePSMs : showNumberUniquePSMs,
+					showNumberNonUniquePSMs : showNumberNonUniquePSMs,
 					data : crosslink_peptide, 
 					projectSearchId : ajaxRequestData.project_search_id
 					};

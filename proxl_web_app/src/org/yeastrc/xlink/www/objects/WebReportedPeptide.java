@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.base_searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
+import org.yeastrc.xlink.base_searcher.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.www.dto.PeptideDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.www.searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
-import org.yeastrc.xlink.www.searcher.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ReportedPeptideDTO;
 
 
@@ -60,6 +61,18 @@ public class WebReportedPeptide implements SearchPeptideCommonLinkWebserviceResu
 	}
 
 
+	public int getNumNonUniquePsms() throws Exception {
+		try {
+			int numPsms = this.getNumPsms();
+			int numUniquePsms = this.getNumUniquePsms();
+			int nonUniquePSMs = numPsms - numUniquePsms;
+			return nonUniquePSMs;
+			
+		} catch ( Exception e ) {
+			log.error( "getNumNonUniquePsms() Exception: " + e.toString(), e );
+			throw e;
+		}
+	}
 
 	public void setNumUniquePsms(int numUniquePsms) {
 		this.numUniquePsms = numUniquePsms;
@@ -67,22 +80,18 @@ public class WebReportedPeptide implements SearchPeptideCommonLinkWebserviceResu
 	}
 
 	public int getNumUniquePsms() throws Exception {
-
 		try {
-
 			if ( numUniquePsmsSet ) {
-
 				return numUniquePsms;
 			}
-
-			numUniquePsms = 
-					PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher.getInstance()
+			
+			this.numUniquePsms = PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher.getInstance()
 					.getPsmCountForUniquePSM_SearchIdReportedPeptideId( reportedPeptideId, searchId, searcherCutoffValuesSearchLevel );
-
+			
 			numUniquePsmsSet = true;
-
+			
 			return numUniquePsms;
-
+			
 		} catch ( Exception e ) {
 
 			log.error( "getNumUniquePsms() Exception: " + e.toString(), e );
@@ -567,6 +576,7 @@ public class WebReportedPeptide implements SearchPeptideCommonLinkWebserviceResu
 	 * true when SetNumUniquePsms has been called
 	 */
 	private boolean numUniquePsmsSet;
+	private boolean numUniquePsmsCheckedAfterSet;
 
 
 

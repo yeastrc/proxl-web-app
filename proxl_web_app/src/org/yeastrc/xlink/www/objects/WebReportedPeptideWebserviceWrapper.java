@@ -98,6 +98,10 @@ public class WebReportedPeptideWebserviceWrapper implements SearchPeptideCommonL
 		return webReportedPeptide.getNumUniquePsms();
 	}
 	
+	public int getNumNonUniquePsms() throws Exception {
+		return webReportedPeptide.getNumNonUniquePsms();
+	}
+	
 	/**
 	 * Wrapper for WebProteinPosition
 	 *

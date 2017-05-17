@@ -1,4 +1,4 @@
-package org.yeastrc.xlink.www.searcher;
+package org.yeastrc.xlink.base_searcher;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

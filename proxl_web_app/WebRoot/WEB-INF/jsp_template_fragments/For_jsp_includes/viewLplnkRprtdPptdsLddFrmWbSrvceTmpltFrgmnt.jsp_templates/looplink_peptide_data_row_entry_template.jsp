@@ -39,9 +39,9 @@
 	</td>												
 
 
-	{{#if showNumberUniquePSMs}} <%-- Only show column if any values are not null --%>
-		<td class="integer-number-column" 
-			>{{ data.numUniquePsms }}
+	{{#if showNumberNonUniquePSMs}} <%-- Only show column if any values are not null --%>
+		<td class="integer-number-column {{#if data.numNonUniquePsms }} highlight-cell {{/if}}" 
+			>{{ data.numNonUniquePsms }}
 		</td>
 	{{/if}}	
 	

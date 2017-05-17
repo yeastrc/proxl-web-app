@@ -26,8 +26,8 @@
 	{{/if}}
 	
 	{{#if scanDataAnyRows}}
+	  {{#if  uniquePSM }}
 		<td style="text-align: right; white-space: nowrap; "  class="integer-number-column {{#if  psm.scanIdMatchesInitialScanId }}   highlight-row  {{/if}}">
-			{{#if  uniquePSM }}
 			
 			<%--  TEMP --%>
 			<%-- 
@@ -44,7 +44,9 @@
 			<%-- 
 			--%>
 				Y
-			{{else}}
+		</td>
+	  {{else}}
+		<td style="text-align: right; white-space: nowrap; "  class="integer-number-column highlight-cell {{#if  psm.scanIdMatchesInitialScanId }}   highlight-row  {{/if}}">
 				{{#if  show_associated_peptides_link_true }}
 				  <a href="javascript:" 
 				    data-psm_id="{{  psm.psmDTO.id }}" 
@@ -53,8 +55,8 @@
 					data-project_search_id="{{  project_search_id }}"
 				 	onclick="viewPeptidesRelatedToPSMsByScanId.openOverlayForPeptidesRelatedToPSMsByScanId( { clickedElement : this } )"
 				 	>{{/if}}N{{#if  show_associated_peptides_link_true }}</a>{{/if}}
-			{{/if}}
 		</td>
+	  {{/if}}
 	{{/if}}
 	
 	{{#if scanDataAnyRows}}

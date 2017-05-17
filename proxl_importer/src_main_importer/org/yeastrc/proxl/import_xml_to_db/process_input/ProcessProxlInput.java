@@ -11,6 +11,7 @@ import org.yeastrc.proxl.import_xml_to_db.dao.ProjectSearchDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCrosslinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchMonolinkMassDAO;
+import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSM_InsertToDB;
 import org.yeastrc.proxl.import_xml_to_db.dto.ProjectSearchDTO_Importer;
@@ -19,6 +20,7 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ScanFileFileContainer;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
+import org.yeastrc.proxl.import_xml_to_db.post_insert_search_processing.PerformPostInsertSearchProcessing;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.process_scans.Process_MzML_MzXml_File;
 import org.yeastrc.proxl_import.api.xml_dto.CrosslinkMass;
 import org.yeastrc.proxl_import.api.xml_dto.CrosslinkMasses;
@@ -31,11 +33,13 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImport
 import org.yeastrc.xlink.dao.LinkerDAO;
 import org.yeastrc.xlink.dao.SearchCommentDAO;
 import org.yeastrc.xlink.dao.SearchLinkerDAO;
+import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchMonolinkMassDTO;
 import org.yeastrc.xlink.dto.SearchCommentDTO;
 import org.yeastrc.xlink.dto.SearchLinkerDTO;
+import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 
 /**
@@ -181,16 +185,121 @@ public class ProcessProxlInput {
 			Map<String, SearchProgramEntry> searchProgramEntryMap =
 					ProcessSearchProgramEntries.getInstance()
 					.processSearchProgramEntries( proxlInput, searchDTO.getId() );
+			
 			DropPeptidePSM_InsertToDB.getInstance().insertDBEntries( dropPeptidePSMCutoffValues, searchProgramEntryMap );
+			
+			ReportedPeptideAndPsmFilterableAnnotationTypesOnId reportedPeptideAndPsmFilterableAnnotationTypesOnId = new ReportedPeptideAndPsmFilterableAnnotationTypesOnId();
+			reportedPeptideAndPsmFilterableAnnotationTypesOnId.filterableReportedPeptideAnnotationTypesOnId = 
+					createReportedPeptideFilterableAnnotationTypesOnId( searchProgramEntryMap );
+			reportedPeptideAndPsmFilterableAnnotationTypesOnId.filterablePsmAnnotationTypesOnId = 
+					createPsmFilterableAnnotationTypesOnId( searchProgramEntryMap );
+			
+			if ( reportedPeptideAndPsmFilterableAnnotationTypesOnId.filterablePsmAnnotationTypesOnId == null ) {
+				String msg = "filterablePsmAnnotationTypesOnId == null";
+				log.error( msg );
+				throw new ProxlImporterInteralException(msg);
+			}
+			if ( reportedPeptideAndPsmFilterableAnnotationTypesOnId.filterablePsmAnnotationTypesOnId.isEmpty() ) {
+				String msg = "filterablePsmAnnotationTypesOnId.isEmpty() ";
+				log.error( msg );
+				throw new ProxlImporterInteralException(msg);
+			}
+
 			ProcessReportedPeptidesAndPSMs.getInstance().processReportedPeptides( 
 					proxlInput, 
 					searchDTO, 
 					dropPeptidePSMCutoffValues,
 					searchProgramEntryMap,
+					reportedPeptideAndPsmFilterableAnnotationTypesOnId,
 					mapOfScanFilenamesMapsOfScanNumbersToScanIds );
+			
+
+			//  Commit all inserts executed to this point
+			ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+			
+			if ( log.isInfoEnabled() ) {
+				log.info( "Primary insert of search complete.  Now performing Updates to the search" );
+			}
+			
+			//  After primary insert search processing, perform other required updates to search
+			PerformPostInsertSearchProcessing.getInstance()
+			.performPostInsertSearchProcessing( searchDTOInserted, reportedPeptideAndPsmFilterableAnnotationTypesOnId );
+
+			
 		} catch ( Exception e ) {
 			throw e;
 		}
+	}
+
+	/**
+	 * 
+	 *
+	 */
+	public static class ReportedPeptideAndPsmFilterableAnnotationTypesOnId {
+		
+		private Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnId;
+		private Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId;
+		
+		public Map<Integer, AnnotationTypeDTO> getFilterableReportedPeptideAnnotationTypesOnId() {
+			return filterableReportedPeptideAnnotationTypesOnId;
+		}
+		public void setFilterableReportedPeptideAnnotationTypesOnId(
+				Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnId) {
+			this.filterableReportedPeptideAnnotationTypesOnId = filterableReportedPeptideAnnotationTypesOnId;
+		}
+		public Map<Integer, AnnotationTypeDTO> getFilterablePsmAnnotationTypesOnId() {
+			return filterablePsmAnnotationTypesOnId;
+		}
+		public void setFilterablePsmAnnotationTypesOnId(Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId) {
+			this.filterablePsmAnnotationTypesOnId = filterablePsmAnnotationTypesOnId;
+		}
+	}
+	
+
+	/**
+	 * @param searchProgramEntryMap
+	 * @return
+	 */
+	private Map<Integer, AnnotationTypeDTO> createReportedPeptideFilterableAnnotationTypesOnId( Map<String, SearchProgramEntry> searchProgramEntryMap ) {
+	
+		///  Build list of Filterable annotation type ids
+		Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesOnId = new HashMap<>();
+		for ( Map.Entry<String, SearchProgramEntry> searchProgramEntryMapEntry : searchProgramEntryMap.entrySet() ) {
+			SearchProgramEntry searchProgramEntry = searchProgramEntryMapEntry.getValue();
+			Map<String, AnnotationTypeDTO> reportedPeptideAnnotationTypeDTOMap =
+					searchProgramEntry.getReportedPeptideAnnotationTypeDTOMap();
+			for ( Map.Entry<String, AnnotationTypeDTO> reportedPeptideAnnotationTypeDTOMapEntry : reportedPeptideAnnotationTypeDTOMap.entrySet() ) {
+				AnnotationTypeDTO reportedPeptideAnnotationTypeDTO = reportedPeptideAnnotationTypeDTOMapEntry.getValue();
+				 if ( reportedPeptideAnnotationTypeDTO.getFilterableDescriptiveAnnotationType()
+						 == FilterableDescriptiveAnnotationType.FILTERABLE ) {
+					 filterableAnnotationTypesOnId.put( reportedPeptideAnnotationTypeDTO.getId(), reportedPeptideAnnotationTypeDTO );
+				 }
+			}
+		}
+		return filterableAnnotationTypesOnId;
+	}
+	
+	/**
+	 * @param searchProgramEntryMap
+	 * @return
+	 */
+	private Map<Integer, AnnotationTypeDTO> createPsmFilterableAnnotationTypesOnId( Map<String, SearchProgramEntry> searchProgramEntryMap ) {
+		
+		///  Build list of Filterable annotation type ids
+		Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesOnId = new HashMap<>();
+		for ( Map.Entry<String, SearchProgramEntry> searchProgramEntryMapEntry : searchProgramEntryMap.entrySet() ) {
+			SearchProgramEntry searchProgramEntry = searchProgramEntryMapEntry.getValue();
+			Map<String, AnnotationTypeDTO> psmAnnotationTypeDTOMap =
+					searchProgramEntry.getPsmAnnotationTypeDTOMap();
+			for ( Map.Entry<String, AnnotationTypeDTO> psmAnnotationTypeDTOMapEntry : psmAnnotationTypeDTOMap.entrySet() ) {
+				AnnotationTypeDTO psmAnnotationTypeDTO = psmAnnotationTypeDTOMapEntry.getValue();
+				if ( psmAnnotationTypeDTO.getFilterableDescriptiveAnnotationType()
+						== FilterableDescriptiveAnnotationType.FILTERABLE ) {
+					filterableAnnotationTypesOnId.put( psmAnnotationTypeDTO.getId(), psmAnnotationTypeDTO );
+				}
+			}
+		}
+		return filterableAnnotationTypesOnId;
 	}
 	
 	/**

@@ -326,7 +326,7 @@
 						<th data-tooltip="Number of PSMs matched to this peptide (or linked pair)" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># PSMs</th>
 						
 						<c:if test="${ viewSearchPeptidesPageDataRoot.showNumberUniquePSMs }">
-							<th data-tooltip="Number of scans that uniquely matched to this reported peptide" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># Unique</th>
+							<th data-tooltip="Number of scans that do not uniquely match to this reported peptide" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># Non-unique</th>
 						</c:if>
 						
 						<c:forEach var="psmAnnotationDisplayNameDescription" items="${ viewSearchPeptidesPageDataRoot.psmAnnotationDisplayNameDescriptionList }">
@@ -423,9 +423,12 @@
 								</td>
 
 								<c:if test="${ viewSearchPeptidesPageDataRoot.showNumberUniquePSMs }">
-								
-									<td class="integer-number-column" 
-										><bean:write name="peptideEntry" property="numUniquePsms" />
+									<c:set var="highlightCellClass" value="" />
+									<c:if test="${ peptideEntry.numNonUniquePsms ne 0 }">
+										<c:set var="highlightCellClass" value=" highlight-cell " />
+									</c:if>
+									<td class="integer-number-column ${ highlightCellClass }" 
+										><bean:write name="peptideEntry" property="numNonUniquePsms" />
 									</td>
 								</c:if>					
 			

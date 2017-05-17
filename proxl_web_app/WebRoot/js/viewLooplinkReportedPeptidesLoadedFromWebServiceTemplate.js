@@ -242,17 +242,17 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			}
 		}
 		//  Search for NumberUniquePSMs being set in any row
-		var showNumberUniquePSMs = false;
+		var showNumberNonUniquePSMs = false;
 		for ( var looplink_peptideIndex = 0; looplink_peptideIndex < looplink_peptides.length ; looplink_peptideIndex++ ) {
 			var looplink_peptide = looplink_peptides[ looplink_peptideIndex ];
-			if ( looplink_peptide.numUniquePsms !== undefined && looplink_peptide.numUniquePsms !== null ) {
-				showNumberUniquePSMs = true;
+			if ( looplink_peptide.numNonUniquePsms !== undefined && looplink_peptide.numNonUniquePsms !== null ) {
+				showNumberNonUniquePSMs = true;
 				break;
 			}
 		}
 		//  create context for header row
 		var context = { 
-				showNumberUniquePSMs : showNumberUniquePSMs,
+				showNumberNonUniquePSMs : showNumberNonUniquePSMs,
 				peptideAnnotationDisplayNameDescriptionList : peptideAnnotationDisplayNameDescriptionList,
 				psmAnnotationDisplayNameDescriptionList : psmAnnotationDisplayNameDescriptionList
 		};
@@ -268,7 +268,7 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			var looplink_peptide = looplink_peptides[ looplink_peptideIndex ];
 			//  wrap data in an object to allow adding more fields
 			var context = { 
-					showNumberUniquePSMs : showNumberUniquePSMs,
+					showNumberNonUniquePSMs : showNumberNonUniquePSMs,
 					data : looplink_peptide, 
 					projectSearchId : ajaxRequestData.project_search_id
 					};

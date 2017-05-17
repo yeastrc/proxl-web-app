@@ -125,6 +125,9 @@ public class PeptideWebPageSearcherCacheOptimized {
 			if ( reportedPeptideData.getNumPsms() != null ) {
 				item.setNumPsms( reportedPeptideData.getNumPsms() );
 			}
+			if ( reportedPeptideData.getNumUniquePsms() != null ) {
+				item.setNumUniquePsms( reportedPeptideData.getNumUniquePsms() );
+			}
 			if ( reportedPeptideData.getPeptideAnnotationDTOMap() != null ) {
 				wrappedItem.setPeptideAnnotationDTOMap( reportedPeptideData.getPeptideAnnotationDTOMap() );
 			}

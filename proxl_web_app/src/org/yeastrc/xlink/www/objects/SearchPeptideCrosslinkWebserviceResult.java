@@ -31,6 +31,10 @@ public class SearchPeptideCrosslinkWebserviceResult implements SearchPeptideComm
 			this.numPsms = searchPeptideCrosslink.getNumPsms();
 			this.numUniquePsms = searchPeptideCrosslink.getNumUniquePsms();
 			
+			if ( this.numUniquePsms != null ) {
+				this.numNonUniquePsms = this.numPsms - this.numUniquePsms;
+			}
+			
 		} catch ( Exception e ) {
 			
 			String msg = "Failed to populate SearchPeptideCrosslinkWebserviceResult from SearchPeptideCrosslink";
@@ -47,98 +51,65 @@ public class SearchPeptideCrosslinkWebserviceResult implements SearchPeptideComm
 	
 	
 	private int numPsms;
-
-
 	private Integer numUniquePsms;
+	private Integer numNonUniquePsms;
 
 	/**
 	 * Used for display on web page
 	 */
 	private List<String> psmAnnotationValueList;
 	
-	
-
 	/**
 	 * Used for display on web page
 	 */
 	private List<String> peptideAnnotationValueList;
 	
-	
-	
+
+	//  In SearchPeptideCommonLinkWebserviceResultIF
+	@Override
+	public List<String> getPsmAnnotationValueList() {
+		return psmAnnotationValueList;
+	}
+	@Override
+	public void setPsmAnnotationValueList(List<String> psmAnnotationValueList) {
+		this.psmAnnotationValueList = psmAnnotationValueList;
+	}
+	@Override
+	public List<String> getPeptideAnnotationValueList() {
+		return peptideAnnotationValueList;
+	}
+	@Override
+	public void setPeptideAnnotationValueList(
+			List<String> peptideAnnotationValueList) {
+		this.peptideAnnotationValueList = peptideAnnotationValueList;
+	}
+
 	
 	
 
 	public ReportedPeptideDTO getReportedPeptide() {
 		return reportedPeptide;
 	}
-
-	public void setReportedPeptide(ReportedPeptideDTO reportedPeptide) {
-		this.reportedPeptide = reportedPeptide;
-	}
-
 	public PeptideDTO getPeptide1() {
 		return peptide1;
 	}
-
-	public void setPeptide1(PeptideDTO peptide1) {
-		this.peptide1 = peptide1;
-	}
-
 	public PeptideDTO getPeptide2() {
 		return peptide2;
 	}
-
-	public void setPeptide2(PeptideDTO peptide2) {
-		this.peptide2 = peptide2;
-	}
-
 	public int getPeptide1Position() {
 		return peptide1Position;
 	}
-
-	public void setPeptide1Position(int peptide1Position) {
-		this.peptide1Position = peptide1Position;
-	}
-
 	public int getPeptide2Position() {
 		return peptide2Position;
 	}
-
-	public void setPeptide2Position(int peptide2Position) {
-		this.peptide2Position = peptide2Position;
-	}
-
 	public int getNumPsms() {
 		return numPsms;
 	}
-
-	public void setNumPsms(int numPsms) {
-		this.numPsms = numPsms;
-	}
-
 	public Integer getNumUniquePsms() {
 		return numUniquePsms;
 	}
-
-	public void setNumUniquePsms(Integer numUniquePsms) {
-		this.numUniquePsms = numUniquePsms;
-	}
-
-	public List<String> getPsmAnnotationValueList() {
-		return psmAnnotationValueList;
-	}
-
-	public void setPsmAnnotationValueList(List<String> psmAnnotationValueList) {
-		this.psmAnnotationValueList = psmAnnotationValueList;
-	}
-
-	public List<String> getPeptideAnnotationValueList() {
-		return peptideAnnotationValueList;
-	}
-
-	public void setPeptideAnnotationValueList(
-			List<String> peptideAnnotationValueList) {
-		this.peptideAnnotationValueList = peptideAnnotationValueList;
+	public Integer getNumNonUniquePsms() {
+		return numNonUniquePsms;
 	}
 
 

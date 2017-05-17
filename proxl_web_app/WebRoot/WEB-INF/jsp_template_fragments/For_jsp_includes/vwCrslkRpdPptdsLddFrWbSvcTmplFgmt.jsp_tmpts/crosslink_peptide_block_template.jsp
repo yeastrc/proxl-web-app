@@ -25,8 +25,8 @@
 
 				
 					<%-- Only show column if any values are not null --%>
-				{{#if showNumberUniquePSMs}} 
-					<th class=" integer-number-column-right-most-column-no-ts-header " style="font-weight:bold; white-space: nowrap;"># Unique</th>
+				{{#if showNumberNonUniquePSMs}} 
+					<th class=" integer-number-column-right-most-column-no-ts-header " style="font-weight:bold; white-space: nowrap;"># Non-unique</th>
 				{{/if}}
 
 				{{#each psmAnnotationDisplayNameDescriptionList}}

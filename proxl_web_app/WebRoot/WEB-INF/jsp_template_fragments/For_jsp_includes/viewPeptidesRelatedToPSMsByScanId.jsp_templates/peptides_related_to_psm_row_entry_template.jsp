@@ -83,8 +83,8 @@
 			</a>
 		</td>
 		
-		<td class="integer-number-column {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" 
-			>{{ data.numUniquePsms }} 
+		<td class="integer-number-column highlight-cell {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" 
+			>{{ data.numNonUniquePsms }} 
 		</td>
 			
 		<%-- 

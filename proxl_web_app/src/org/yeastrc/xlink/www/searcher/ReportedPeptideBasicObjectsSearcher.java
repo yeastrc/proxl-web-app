@@ -13,6 +13,7 @@ import java.util.Set;
 import org.apache.commons.dbcp.DelegatingPreparedStatement;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
+import org.yeastrc.xlink.base_searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -65,7 +66,8 @@ public class ReportedPeptideBasicObjectsSearcher {
 			"SELECT unified_rp__search__rep_pept__generic_lookup.reported_peptide_id, "
 			+ " unified_rp__search__rep_pept__generic_lookup.unified_reported_peptide_id, "
 			+ " unified_rp__search__rep_pept__generic_lookup.link_type, "
-			+ " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff";
+			+ " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff, "
+			+ " unified_rp__search__rep_pept__generic_lookup.num_unique_psm_at_default_cutoff ";
 	
 	private final String SQL_MAIN_FROM_START = " FROM unified_rp__search__rep_pept__generic_lookup ";
 	
@@ -634,6 +636,10 @@ public class ReportedPeptideBasicObjectsSearcher {
 			int numPsmsForDefaultCutoffs = rs.getInt( "psm_num_at_default_cutoff" );
 			if ( ! rs.wasNull() ) {
 				item.setNumPsms( numPsmsForDefaultCutoffs );
+			}
+			int numUniquePsmsForDefaultCutoffs = rs.getInt( "num_unique_psm_at_default_cutoff" );
+			if ( ! rs.wasNull() ) {
+				item.setNumUniquePsms( numUniquePsmsForDefaultCutoffs );
 			}
 		}
 		if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 

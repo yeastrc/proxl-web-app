@@ -280,7 +280,10 @@ public class ImporterCoreEntryPoint {
 			//  Set proxlInputForImport to null to release memory needed later, but right now no other code to run
 			proxlInputForImport = null;
 			proxlInputObjectContainer.setProxlInput( null );
+			
+			//  Commit all inserts executed to this point
 			ImportDBConnectionFactory.getInstance().commitInsertControlCommitConnection();
+			
 			try {
 				SearchDAO_Importer.getInstance().updateStatus( searchDTOInserted.getId(), SearchRecordStatus.IMPORT_COMPLETE_VIEW );
 			}  catch ( Exception e ) {

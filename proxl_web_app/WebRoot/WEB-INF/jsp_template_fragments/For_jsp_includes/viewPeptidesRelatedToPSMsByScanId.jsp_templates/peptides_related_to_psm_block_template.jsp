@@ -46,7 +46,7 @@
 				
 			
 			<th data-tooltip="Number of PSMs matched to this peptide (or linked pair)" class=" <%-- tool_tip_attached_jq --%>  integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># PSMs</th>
-			<th data-tooltip="Number of scans that uniquely matched to this reported peptide" class=" <%-- tool_tip_attached_jq --%>  integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># Unique</th>
+			<th data-tooltip="Number of scans that do not uniquely match to this reported peptide" class=" <%-- tool_tip_attached_jq --%>  integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># Non-unique</th>
 			
 				{{#each psmAnnotationDisplayNameDescriptionList}}
 				 	<th style="text-align:left;font-weight:bold;"

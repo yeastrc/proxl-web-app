@@ -27,6 +27,7 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
+import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput.ReportedPeptideAndPsmFilterableAnnotationTypesOnId;
 import org.yeastrc.proxl.import_xml_to_db.unified_reported_peptide.main.InsertIfNotInDBUnifiedReportedPeptideAndChildren;
 import org.yeastrc.proxl_import.api.xml_dto.LinkType;
 import org.yeastrc.proxl_import.api.xml_dto.Linker;
@@ -48,7 +49,6 @@ import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
-import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
@@ -82,6 +82,7 @@ public class ProcessReportedPeptidesAndPSMs {
 			SearchDTO_Importer search,
 			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
+			ReportedPeptideAndPsmFilterableAnnotationTypesOnId reportedPeptideAndPsmFilterableAnnotationTypesOnId,
 			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds ) throws Exception {
 		
 		int searchId = search.getId();
@@ -108,18 +109,12 @@ public class ProcessReportedPeptidesAndPSMs {
 				linkerListStringForErrorMsgs += ", " + proxlInputLinkerName;
 			}
 		}
-		Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnId = createReportedPeptideFilterableAnnotationTypesOnId( searchProgramEntryMap );
-		Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId = createPsmFilterableAnnotationTypesOnId( searchProgramEntryMap );
-		if ( filterablePsmAnnotationTypesOnId == null ) {
-			String msg = "filterablePsmAnnotationTypesOnId == null";
-			log.error( msg );
-			throw new ProxlImporterInteralException(msg);
-		}
-		if ( filterablePsmAnnotationTypesOnId.isEmpty() ) {
-			String msg = "filterablePsmAnnotationTypesOnId.isEmpty() ";
-			log.error( msg );
-			throw new ProxlImporterInteralException(msg);
-		}
+		
+		Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnId = 
+				reportedPeptideAndPsmFilterableAnnotationTypesOnId.getFilterableReportedPeptideAnnotationTypesOnId();
+		Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId = 
+				reportedPeptideAndPsmFilterableAnnotationTypesOnId.getFilterablePsmAnnotationTypesOnId();
+
 		Map<String, SearchScanFilenameDTO> scanFilenamesOnPSMsKeyedOnScanFilename = new HashMap<>();
 		//////////////
 		ReportedPeptides reportedPeptides = proxlInput.getReportedPeptides();
@@ -678,49 +673,4 @@ public class ProcessReportedPeptidesAndPSMs {
 		return doesPsmPassDefaultCutoffs;
 	}
 	
-	/**
-	 * @param searchProgramEntryMap
-	 * @return
-	 */
-	private Map<Integer, AnnotationTypeDTO> createReportedPeptideFilterableAnnotationTypesOnId( Map<String, SearchProgramEntry> searchProgramEntryMap ) {
-	
-		///  Build list of Filterable annotation type ids
-		Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesOnId = new HashMap<>();
-		for ( Map.Entry<String, SearchProgramEntry> searchProgramEntryMapEntry : searchProgramEntryMap.entrySet() ) {
-			SearchProgramEntry searchProgramEntry = searchProgramEntryMapEntry.getValue();
-			Map<String, AnnotationTypeDTO> reportedPeptideAnnotationTypeDTOMap =
-					searchProgramEntry.getReportedPeptideAnnotationTypeDTOMap();
-			for ( Map.Entry<String, AnnotationTypeDTO> reportedPeptideAnnotationTypeDTOMapEntry : reportedPeptideAnnotationTypeDTOMap.entrySet() ) {
-				AnnotationTypeDTO reportedPeptideAnnotationTypeDTO = reportedPeptideAnnotationTypeDTOMapEntry.getValue();
-				 if ( reportedPeptideAnnotationTypeDTO.getFilterableDescriptiveAnnotationType()
-						 == FilterableDescriptiveAnnotationType.FILTERABLE ) {
-					 filterableAnnotationTypesOnId.put( reportedPeptideAnnotationTypeDTO.getId(), reportedPeptideAnnotationTypeDTO );
-				 }
-			}
-		}
-		return filterableAnnotationTypesOnId;
-	}
-	
-	/**
-	 * @param searchProgramEntryMap
-	 * @return
-	 */
-	private Map<Integer, AnnotationTypeDTO> createPsmFilterableAnnotationTypesOnId( Map<String, SearchProgramEntry> searchProgramEntryMap ) {
-		
-		///  Build list of Filterable annotation type ids
-		Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesOnId = new HashMap<>();
-		for ( Map.Entry<String, SearchProgramEntry> searchProgramEntryMapEntry : searchProgramEntryMap.entrySet() ) {
-			SearchProgramEntry searchProgramEntry = searchProgramEntryMapEntry.getValue();
-			Map<String, AnnotationTypeDTO> psmAnnotationTypeDTOMap =
-					searchProgramEntry.getPsmAnnotationTypeDTOMap();
-			for ( Map.Entry<String, AnnotationTypeDTO> psmAnnotationTypeDTOMapEntry : psmAnnotationTypeDTOMap.entrySet() ) {
-				AnnotationTypeDTO psmAnnotationTypeDTO = psmAnnotationTypeDTOMapEntry.getValue();
-				if ( psmAnnotationTypeDTO.getFilterableDescriptiveAnnotationType()
-						== FilterableDescriptiveAnnotationType.FILTERABLE ) {
-					filterableAnnotationTypesOnId.put( psmAnnotationTypeDTO.getId(), psmAnnotationTypeDTO );
-				}
-			}
-		}
-		return filterableAnnotationTypesOnId;
-	}
 }

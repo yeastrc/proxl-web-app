@@ -226,17 +226,17 @@ var ViewMonolinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			}
 		}
 		//  Search for NumberUniquePSMs being set in any row
-		var showNumberUniquePSMs = false;
+		var showNumberNonUniquePSMs = false;
 		for ( var monolink_peptideIndex = 0; monolink_peptideIndex < monolink_peptides.length ; monolink_peptideIndex++ ) {
 			var monolink_peptide = monolink_peptides[ monolink_peptideIndex ];
-			if ( monolink_peptide.numUniquePsms !== undefined && monolink_peptide.numUniquePsms !== null ) {
-				showNumberUniquePSMs = true;
+			if ( monolink_peptide.numNonUniquePsms !== undefined && monolink_peptide.numNonUniquePsms !== null ) {
+				showNumberNonUniquePSMs = true;
 				break;
 			}
 		}
 		//  create context for header row
 		var context = { 
-				showNumberUniquePSMs : showNumberUniquePSMs,
+				showNumberNonUniquePSMs : showNumberNonUniquePSMs,
 				peptideAnnotationDisplayNameDescriptionList : peptideAnnotationDisplayNameDescriptionList,
 				psmAnnotationDisplayNameDescriptionList : psmAnnotationDisplayNameDescriptionList
 		};
@@ -252,7 +252,7 @@ var ViewMonolinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			var monolink_peptide = monolink_peptides[ monolink_peptideIndex ];
 			//  wrap data in an object to allow adding more fields
 			var context = { 
-					showNumberUniquePSMs : showNumberUniquePSMs,
+					showNumberNonUniquePSMs : showNumberNonUniquePSMs,
 					data : monolink_peptide, 
 					projectSearchId : ajaxRequestData.project_search_id
 					};

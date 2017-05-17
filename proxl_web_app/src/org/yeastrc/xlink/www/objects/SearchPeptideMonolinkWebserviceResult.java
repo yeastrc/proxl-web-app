@@ -28,6 +28,10 @@ public class SearchPeptideMonolinkWebserviceResult implements SearchPeptideCommo
 						
 			this.numPsms = searchPeptideMonolink.getNumPsms();
 			this.numUniquePsms = searchPeptideMonolink.getNumUniquePsms();
+
+			if ( this.numUniquePsms != null ) {
+				this.numNonUniquePsms = this.numPsms - this.numUniquePsms;
+			}
 			
 		} catch ( Exception e ) {
 			
@@ -43,81 +47,59 @@ public class SearchPeptideMonolinkWebserviceResult implements SearchPeptideCommo
 	
 	
 	private int numPsms;
-
-
 	private Integer numUniquePsms;
-
+	private Integer numNonUniquePsms;
+	
 	/**
 	 * Used for display on web page
 	 */
 	private List<String> psmAnnotationValueList;
 	
-	
-
 	/**
 	 * Used for display on web page
 	 */
 	private List<String> peptideAnnotationValueList;
 
-	public ReportedPeptideDTO getReportedPeptide() {
-		return reportedPeptide;
-	}
 
-	public void setReportedPeptide(ReportedPeptideDTO reportedPeptide) {
-		this.reportedPeptide = reportedPeptide;
-	}
-
-	public PeptideDTO getPeptide() {
-		return peptide;
-	}
-
-	public void setPeptide(PeptideDTO peptide) {
-		this.peptide = peptide;
-	}
-
-
-	public int getNumPsms() {
-		return numPsms;
-	}
-
-	public void setNumPsms(int numPsms) {
-		this.numPsms = numPsms;
-	}
-
-	public Integer getNumUniquePsms() {
-		return numUniquePsms;
-	}
-
-	public void setNumUniquePsms(Integer numUniquePsms) {
-		this.numUniquePsms = numUniquePsms;
-	}
-
+	//  In SearchPeptideCommonLinkWebserviceResultIF
+	@Override
 	public List<String> getPsmAnnotationValueList() {
 		return psmAnnotationValueList;
 	}
-
+	@Override
 	public void setPsmAnnotationValueList(List<String> psmAnnotationValueList) {
 		this.psmAnnotationValueList = psmAnnotationValueList;
 	}
-
+	@Override
 	public List<String> getPeptideAnnotationValueList() {
 		return peptideAnnotationValueList;
 	}
-
+	@Override
 	public void setPeptideAnnotationValueList(
 			List<String> peptideAnnotationValueList) {
 		this.peptideAnnotationValueList = peptideAnnotationValueList;
 	}
 
+	
+	
+	
+	public ReportedPeptideDTO getReportedPeptide() {
+		return reportedPeptide;
+	}
+	public PeptideDTO getPeptide() {
+		return peptide;
+	}
+	public int getNumPsms() {
+		return numPsms;
+	}
+	public Integer getNumUniquePsms() {
+		return numUniquePsms;
+	}
 	public int getPeptidePosition() {
 		return peptidePosition;
 	}
-
-	public void setPeptidePosition(int peptidePosition) {
-		this.peptidePosition = peptidePosition;
+	public Integer getNumNonUniquePsms() {
+		return numNonUniquePsms;
 	}
-	
-	
-	
 	
 }

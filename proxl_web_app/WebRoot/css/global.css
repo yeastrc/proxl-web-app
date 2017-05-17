@@ -60,6 +60,8 @@ table.tablesorter tbody td {	padding-right: 15px; }
 .highlight-row { background-color: #FFF0F0 }
 */
 
+td.highlight-cell { background-color: #FFF0F0 }
+
 A.overide-text-color-to-base-color:link, A.overide-text-color-to-base-color:visited , A.overide-text-color-to-base-color:active , A.overide-text-color-to-base-color:hover 
 { color: #545454 }
 
