@@ -1,10 +1,11 @@
 ---
 layout: default
-img: dog.png
-category: Services
-title: Feature 1
+img: search-programs.png
+category: Features
+title: Upload Data From Any Software Pipeline
 description: |
 ---
-  Turn your 2D designs into high quality, 3D
-  product shots in seconds using free Photoshop actions by [PSDCovers](http://www.psdcovers.com/)! Visit
-  their website to download some of their awesome, free photoshop actions!
+ Whether you're using Kojak, pLink, xQuest, Trans-Proteomic Pipeline (TPP), Crux, StavroX, or any other software pipeline, proxl supports
+ data from any software pipeline using that pipeline's native scoring. To learn more, see
+ proxl's [upload documentation](http://proxl-web-app.readthedocs.io/en/latest/using/upload_data.html){:target="_blank"}. To
+ see it in action, see [the proxl demo](http://yeastrc.org/proxl_public/go?H0DHw08DUM){:target="_blank"}.
