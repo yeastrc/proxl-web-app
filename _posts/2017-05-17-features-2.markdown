@@ -5,5 +5,5 @@ category: Features
 title: All Underlying Proteomics Data Are Available
 description: |
 ---
-  All PSM- and peptide-level statistics are available, including the ability to view underlying spectra. Data may be filtered
+  All PSM- and peptide-level statistics are available on every page, including the ability to view underlying spectra. Data may be filtered
   using any of the native scores of whichever search program generated the data.

@@ -26,9 +26,9 @@ social:
   - icon: external-link
     text: Use Proxl
     url: https://www.yeastrc.org/proxl_public/
+  - icon: external-link
+    text: Try Demo
+    url: https://www.yeastrc.org/proxl_demo/
   - icon: question-circle
     text: Documentation
     url: http://www.yeastrc.org/proxl_docs/
-  - icon: github
-    text: Source Code
-    url: https://github.com/yeastrc/proxl-web-app

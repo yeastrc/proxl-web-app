@@ -1,8 +1,11 @@
 ---
 layout: default
-img: phones.png
-category: Services
-title: Feature 3
+img: merged-search-example-2.png
+category: Features
+title: Merge, Compare, and Contrast Data Sets
 description: |
 ---
-This template features the 'Lato' font, part of the [Google Web Font library](http://www.google.com/fonts), as well as [icons from Font Awesome](http://fontawesome.io).
+ Proxl allows you to combine, compare, and contrast data from different searches--even if those
+ searches used different search programs (such as Kojak and pLink) or different versions (or settings) of
+ the same program. Each combined data set displays and is filtered on native scores from the
+ respective search programs.

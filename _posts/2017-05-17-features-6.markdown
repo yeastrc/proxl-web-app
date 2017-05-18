@@ -1,0 +1,8 @@
+---
+layout: default
+img: qc-plots.png
+category: Features
+title: Quality Control (QC) Tools
+description: |
+---
+ Proxl contains quality control (QC) tools to help diagnose problems and aid in cross-linking method refinement.

@@ -1,0 +1,9 @@
+---
+layout: default
+img: access-control.png
+category: Features
+title: Access Control and Advanced Sharing Tools
+description: |
+---
+ Proxl includes sharing tools that make it ideal for collaboration or publication. Access to data is simply and securely controlled by project owners,
+ who can share data by inviting specific users to their project, sharing secure links, or by enabling public access.
