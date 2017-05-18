@@ -17,15 +17,15 @@
 
  
 .btn-default {
-    color: #fff0f0;
-    background-color: #a55353;
-    border-color: #a55353;
+    color: #fff0f0 !important;
+    background-color: #a55353 !important;
+    border-color: #a55353 !important;
 }
 
 .btn-default:hover {
-    color: #a55353;
-    background-color: #fff0f0;
-    border-color: #a55353;
+    color: #a55353 !important;
+    background-color: #fff0f0 !important;
+    border-color: #a55353 !important;
 }
 
 .content-section-a {
@@ -39,7 +39,7 @@
 }
 
 .lead a {
-    color: #a55353 !important;
+    color: #a55353;
 }
 
 .jumbotron {
@@ -50,6 +50,16 @@
     border-left-style:none;
     border-right-style:none;
     border-bottom-style:none;
+}
+
+footer {
+	padding: 10px 0;
+	background-color:#a55353;
+	color:#fff0f0;	
+}
+
+footer a {
+	color: #fff0f0 !important;
 }
 
  /* 
