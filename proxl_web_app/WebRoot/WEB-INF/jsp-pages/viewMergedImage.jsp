@@ -3,7 +3,7 @@
 <%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
- <c:set var="pageTitle">View Search</c:set>
+ <c:set var="pageTitle">View Search - <c:out value="${ headerProject.projectTblData.title }"></c:out></c:set>
 
  <c:set var="pageBodyClass" >project-page view-merged-image-page</c:set>
  

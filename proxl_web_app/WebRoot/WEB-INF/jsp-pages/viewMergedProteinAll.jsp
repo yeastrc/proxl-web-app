@@ -7,7 +7,7 @@
 
 <%--  viewMergedProteinAll.jsp  --%>
 
- <c:set var="pageTitle">View Search</c:set>
+ <c:set var="pageTitle">Proteins - <c:out value="${ headerProject.projectTblData.title }"></c:out></c:set>
 
  <c:set var="pageBodyClass" >project-page</c:set>
  

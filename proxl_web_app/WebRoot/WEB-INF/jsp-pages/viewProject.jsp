@@ -16,7 +16,7 @@
  --%>
 
 
- <c:set var="pageTitle">Project Page - <c:out value="${ project.title }" ></c:out></c:set>
+ <c:set var="pageTitle">project - <c:out value="${ project.title }" ></c:out></c:set>
 
  <c:set var="pageBodyClass" >project-page</c:set>
 
