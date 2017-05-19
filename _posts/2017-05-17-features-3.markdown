@@ -6,6 +6,6 @@ title: Merge, Compare, and Contrast Data Sets
 description: |
 ---
  Proxl allows you to combine, compare, and contrast data from different searches--even if those
- searches used different search programs (such as Kojak and pLink) or different versions (or settings) of
+ searches used different search programs (such as <a href="http://www.kojak-ms.org/">Kojak</a> and <a href="http://pfind.ict.ac.cn/software/pLink/">pLink</a>) or different versions (or settings) of
  the same program. Each combined data set displays and is filtered on native scores from the
  respective search programs. [Give it a try.](https://yeastrc.org/proxl_public/go?H0DHw08DUM){:target="_blank"}
