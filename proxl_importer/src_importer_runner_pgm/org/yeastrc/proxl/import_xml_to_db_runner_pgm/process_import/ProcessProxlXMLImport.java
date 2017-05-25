@@ -14,6 +14,7 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralExcepti
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTableGetValueCommon;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsValuesSharedConstants;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTrackingRun_Base_DAO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTracking_Base_DAO;
 import org.yeastrc.proxl.import_xml_to_db.file_import_proxl_xml_scans.run_importer_to_importer_file_data.RunImporterToImporterFileRoot;
 import org.yeastrc.proxl.import_xml_to_db.file_import_proxl_xml_scans.run_importer_to_importer_file_data.RunImporterToImporterParameterNamesConstants;
@@ -240,13 +241,13 @@ public class ProcessProxlXMLImport {
 			markImportTrackingAsFailed( proxlXMLFileImportTrackingDTO, proxlXMLFileImportTrackingRunDTO, ProxlXMLFileImportRunSubStatus.SYSTEM_ERROR );
 
 			proxlXMLFileImportTrackingRunDTO.setRunStatus( ProxlXMLFileImportStatus.FAILED );
-			 proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
-			 proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
-			 UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
-			 .updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
-					 ProxlXMLFileImportStatus.FAILED, 
-					 proxlXMLFileImportTrackingDTO.getId(), 
-					 proxlXMLFileImportTrackingRunDTO );
+			proxlXMLFileImportTrackingRunDTO.setDataErrorText( ERROR_MSG_SYSTEM_ERROR );
+			proxlXMLFileImportTrackingRunDTO.setImportResultText( ERROR_MSG_SYSTEM_ERROR );
+			UpdateTrackingTrackingRunRecordsDBTransaction.getInstance()
+			.updateTrackingStatusAtImportEndupdateTrackingRunStatusResultTexts(
+					ProxlXMLFileImportStatus.FAILED, 
+					proxlXMLFileImportTrackingDTO.getId(), 
+					proxlXMLFileImportTrackingRunDTO );
 			throw new Exception( e );
 		} finally {
 			runSystemCommand = null;
@@ -255,6 +256,63 @@ public class ProcessProxlXMLImport {
 					proxlXMLFileImportTrackingDTO.getId(), 
 					proxlXMLFileImportTrackingRunDTO.getId() );
 		}
+		
+		final String commandToRunOnSuccessfulImport = ImporterRunnerConfigData.getCommandToRunOnSuccessfulImport();
+		if ( StringUtils.isNotEmpty( commandToRunOnSuccessfulImport ) ) {
+			// Run command on successful import is configured, so run it
+
+			//  Get TrackingRunDTO After Importer Run to get inserted search id
+			ProxlXMLFileImportTrackingRunDTO proxlXMLFileImportTrackingRunDTO_AfterImporterRun = 
+					ProxlXMLFileImportTrackingRun_Base_DAO.getInstance()
+					.getItem( proxlXMLFileImportTrackingRunDTO.getId() );
+			
+			if ( ProxlXMLFileImportStatus.COMPLETE.equals( proxlXMLFileImportTrackingRunDTO_AfterImporterRun.getRunStatus() ) ) {
+
+				if ( proxlXMLFileImportTrackingRunDTO_AfterImporterRun.getInsertedSearchId() == null ) {
+					String msg = "proxlXMLFileImportTrackingRunDTO_AfterImporterRun.getInsertedSearchId() == null "
+							+ " for proxlXMLFileImportTrackingRunDTO_AfterImporterRun.getId(): " 
+							+ proxlXMLFileImportTrackingRunDTO_AfterImporterRun.getId();
+					log.error( msg );
+					throw new Exception(msg);
+				}
+				File dirToWriteSysoutSyserrTo = subdirForThisTrackingId;
+				String commandToRunOnSuccessfulImportSyoutSyserrDirString = ImporterRunnerConfigData.getCommandToRunOnSuccessfulImportSyoutSyserrDir();
+				if ( StringUtils.isNotEmpty( commandToRunOnSuccessfulImportSyoutSyserrDirString ) ) {
+					File commandToRunOnSuccessfulImportSyoutSyserrDir = new File( commandToRunOnSuccessfulImportSyoutSyserrDirString );
+					if ( commandToRunOnSuccessfulImportSyoutSyserrDir.exists() ) {
+						dirToWriteSysoutSyserrTo = commandToRunOnSuccessfulImportSyoutSyserrDir;
+					}
+				}
+
+				List<String> commandAndItsArgumentsAsListRunOnSuccess = new ArrayList<>( 20 );
+				commandAndItsArgumentsAsListRunOnSuccess.add( commandToRunOnSuccessfulImport );
+				commandAndItsArgumentsAsListRunOnSuccess.add( 
+						Integer.toString( proxlXMLFileImportTrackingRunDTO_AfterImporterRun.getInsertedSearchId() ) );
+
+				File fileToWriteSysoutToRunOnSuccess = new File( dirToWriteSysoutSyserrTo, "commandRunOnSuccessSysout.txt" );
+				File fileToWriteSyserrToRunOnSuccess = new File( dirToWriteSysoutSyserrTo, "commandRunOnSuccessSyserr.txt" );
+
+				RunSystemCommand runSystemCommand = RunSystemCommand.getInstance();
+				try {
+					RunSystemCommandResponse runSystemCommandResponse = 
+							runSystemCommand.runCmd( 
+									commandAndItsArgumentsAsListRunOnSuccess, 
+									subdirForThisTrackingId /* dirToRunCommandIn*/, 
+									fileToWriteSysoutToRunOnSuccess /* fileToWriteSysoutTo*/,
+									fileToWriteSyserrToRunOnSuccess /* fileToWriteSyserrTo*/,
+									false /* throwExceptionOnCommandFailure */ );
+
+				} catch ( Throwable e ) {
+
+					log.error( "Failed running commandToRunOnSuccessfulImport: " + commandToRunOnSuccessfulImport
+							+ ", subdirForThisTrackingId: " + subdirForThisTrackingId, e );
+
+				} finally {
+
+				}
+			}			
+		}
+		
 		deleteUploadedFilesIfConfiguredAndStatusSuccess( proxlXMLFileImportTrackingDTO, subdirForThisTrackingId );
 	}
 	

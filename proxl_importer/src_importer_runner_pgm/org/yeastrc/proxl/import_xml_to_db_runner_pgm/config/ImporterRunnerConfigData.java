@@ -16,6 +16,9 @@ public class ImporterRunnerConfigData {
 	
 	private static String proxlWebAppBaseURL;
 	
+	private static String commandToRunOnSuccessfulImport;
+	private static String commandToRunOnSuccessfulImportSyoutSyserrDir;
+	
 	private static boolean configured = false;
 	
 	public static String getImporterJarWithPath() {
@@ -42,6 +45,23 @@ public class ImporterRunnerConfigData {
 		}
 		return proxlWebAppBaseURL;
 	}
+	public static String getCommandToRunOnSuccessfulImport() {
+		if ( ! configured ) {
+			String msg = "ImporterRunnerConfigData not configured";
+			log.error( msg );
+			throw new IllegalStateException(msg);
+		}
+		return commandToRunOnSuccessfulImport;
+	}
+	public static String getCommandToRunOnSuccessfulImportSyoutSyserrDir() {
+		if ( ! configured ) {
+			String msg = "ImporterRunnerConfigData not configured";
+			log.error( msg );
+			throw new IllegalStateException(msg);
+		}
+		return commandToRunOnSuccessfulImportSyoutSyserrDir;
+	}
+
 	
 	public static void setImporterJarWithPath(String importerJarWithPath) {
 		ImporterRunnerConfigData.importerJarWithPath = importerJarWithPath;
@@ -65,6 +85,14 @@ public class ImporterRunnerConfigData {
 	
 	public static void setProxlWebAppBaseURL(String proxlWebAppBaseURL) {
 		ImporterRunnerConfigData.proxlWebAppBaseURL = proxlWebAppBaseURL;
+	}
+
+	public static void setCommandToRunOnSuccessfulImport(String commandToRunOnSuccessfulImport) {
+		ImporterRunnerConfigData.commandToRunOnSuccessfulImport = commandToRunOnSuccessfulImport;
+	}
+	public static void setCommandToRunOnSuccessfulImportSyoutSyserrDir(
+			String commandToRunOnSuccessfulImportSyoutSyserrDir) {
+		ImporterRunnerConfigData.commandToRunOnSuccessfulImportSyoutSyserrDir = commandToRunOnSuccessfulImportSyoutSyserrDir;
 	}
 
 	

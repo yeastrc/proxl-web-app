@@ -36,6 +36,9 @@ public class ProcessImporterRunnerConfigFile {
 	
 	private static final String PROPERTY_NAME__PROXL_WEB_APP_BASE_URL = "proxl.web.app.base.url";
 	
+	private static final String PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT = "command.run.successful.import";
+	private static final String PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT_SYSOUT_SYSERR_DIR = "command.run.successful.import.sysout.syserr.dir";
+	
 	/**
 	 * private constructor
 	 */
@@ -154,6 +157,8 @@ public class ProcessImporterRunnerConfigFile {
 			
 			String proxlWebAppBaseURL = configProps.getProperty( PROPERTY_NAME__PROXL_WEB_APP_BASE_URL );
 			
+			String commandToRunOnSuccessfulImport = configProps.getProperty( PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT );
+			String commandToRunOnSuccessfulImportSyoutSyserrDir = configProps.getProperty( PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT_SYSOUT_SYSERR_DIR );
 
 //			if ( StringUtils.isEmpty( importerJarWithPath ) ) {
 //
@@ -170,7 +175,7 @@ public class ProcessImporterRunnerConfigFile {
 
 
 			if ( StringUtils.isNotEmpty( javaExecutableWithPath ) ) {
-				ImporterRunnerConfigData.setJavaExecutableWithPath( javaExecutableWithPath );;
+				ImporterRunnerConfigData.setJavaExecutableWithPath( javaExecutableWithPath );
 			}
 			
 			ImporterRunnerConfigData.setImporterJarWithPath( importerJarWithPath );
@@ -181,6 +186,14 @@ public class ProcessImporterRunnerConfigFile {
 			
 			ImporterRunnerConfigData.setProxlWebAppBaseURL( proxlWebAppBaseURL );
 
+			if ( StringUtils.isNotEmpty( commandToRunOnSuccessfulImport ) ) {
+				ImporterRunnerConfigData.setCommandToRunOnSuccessfulImport( commandToRunOnSuccessfulImport );
+			}
+			if ( StringUtils.isNotEmpty( commandToRunOnSuccessfulImportSyoutSyserrDir ) ) {
+				ImporterRunnerConfigData.setCommandToRunOnSuccessfulImportSyoutSyserrDir( commandToRunOnSuccessfulImportSyoutSyserrDir );
+			}
+			
+			
 			
 			ImporterRunnerConfigData.setConfigured(true);
 			

@@ -53,6 +53,11 @@ public class ProxlXMLFileImportTrackingRun_PopulateDTO {
 		
 		returnItem.setRunStatus( ProxlXMLFileImportStatus.fromValue( rs.getInt( "status_id" ) ) );
 		
+		int insertedSearchId = rs.getInt( "inserted_search_id" );
+		if ( ! rs.wasNull() ) {
+			returnItem.setInsertedSearchId( insertedSearchId );
+		}
+		
 		//  importer_sub_status_id
 		
 		returnItem.setImportResultText( rs.getString( "import_result_text" ) );
