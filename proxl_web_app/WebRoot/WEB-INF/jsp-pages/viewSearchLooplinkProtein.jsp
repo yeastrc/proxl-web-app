@@ -295,7 +295,7 @@
 								
 								<br><span style="font-size:15px;">Skyline export</span><br>
 								<a data-tooltip="Export peptides for listed proteins for import into Skyline quant. tool. (Shulman et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="${ contextPath }/downloadMergedProteinsPeptidesSkylineShulman.do?<bean:write name="queryString" />">Export peptides for Skyline quant (Shulman et al)</a>
-								<a data-tooltip="Export peptides for listed proteins for Skyline PRM analysis. (Eng et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="${ contextPath }/downloadMergedProteinsPeptidesSkylineEng.do?<bean:write name="queryString" />">Export peptides for Skyline PRM (Eng et al)</a>
+								<a data-tooltip="Export peptides for listed proteins for Skyline PRM analysis. (Chavez et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="${ contextPath }/downloadMergedProteinsPeptidesSkylineEng.do?<bean:write name="queryString" />">Export peptides for Skyline PRM (Chavez et al)</a>
 								
 								<br><span style="font-size:15px;">xiNET export</span><br>
 								<a data-tooltip="Download FASTA file for proteins found in cross-links or loop-links." id="download-protein-udrs" class="download-option tool_tip_attached_jq" href="${ contextPath }/downloadMergedProteinsFASTA.do?<bean:write name="queryString" />">Download FASTA file</a>
