@@ -405,7 +405,7 @@
 						<span id="svg-download">
 							<a id="download_as_link"
 									data-tooltip="Download current image as file." style="font-size:10pt;white-space:nowrap;" 
-									href="#" class="tool_tip_attached_jq download-svg">[Download Image]</a>
+									href="javascript:" class="tool_tip_attached_jq download-svg">[Download Image]</a>
 								
 							<span id="svg-download-options">
 								Choose file format:

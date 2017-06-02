@@ -2058,7 +2058,7 @@
 						<span id="svg-download">
 							<a id="download_as_link"
 									data-tooltip="Download current image as file." style="font-size:10pt;white-space:nowrap;" 
-									href="#" class="tool_tip_attached_jq download-svg">[Download Image]</a>
+									href="javascript:" class="tool_tip_attached_jq download-svg">[Download Image]</a>
 								
 							<span id="svg-download-options">
 								Choose file format:
@@ -2299,7 +2299,7 @@
 						<span id="svg-download">
 							<a id="download_as_link"
 									data-tooltip="Download current image as file." style="font-size:10pt;white-space:nowrap;" 
-									href="#" class="tool_tip_attached_jq download-svg">[Download Image]</a>
+									href="javascript:" class="tool_tip_attached_jq download-svg">[Download Image]</a>
 								
 							<span id="svg-download-options">
 								Choose file format:
@@ -2494,7 +2494,7 @@
 						<span id="svg-download">
 							<a id="download_as_link"
 									data-tooltip="Download current image as file." style="font-size:10pt;white-space:nowrap;" 
-									href="#" class="tool_tip_attached_jq download-svg">[Download Image]</a>
+									href="javascript:" class="tool_tip_attached_jq download-svg">[Download Image]</a>
 								
 							<span id="svg-download-options">
 								Choose file format:
@@ -2507,7 +2507,7 @@
 						
 						<a href="javascript:" id="psm_score-svg-download-data"
 							data-tooltip="Download current data as tab limited text." style="font-size:10pt;white-space:nowrap;" 
-							href="#" class="tool_tip_attached_jq download-svg">[Download Data]</a>
+							href="javascript:" class="tool_tip_attached_jq download-svg">[Download Data]</a>
 						
 					</div>
 
