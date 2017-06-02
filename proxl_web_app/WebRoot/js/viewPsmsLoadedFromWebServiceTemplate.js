@@ -275,6 +275,12 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 	//		var $psm_entry = 
 			$(html).appendTo($psm_table_jq);
 		}
+		
+		//  Add tablesorter to the populated table of psm data
+		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+			$psm_table_jq.tablesorter(); // gets exception if there are no data rows
+		},10);
+		
 		var $openLorkeetLinks = $psm_table_jq.find(".view_spectrum_open_spectrum_link_jq");
 		addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
 		addToolTips( $psm_block_template );
