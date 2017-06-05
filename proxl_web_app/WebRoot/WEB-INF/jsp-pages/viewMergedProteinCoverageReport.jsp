@@ -22,7 +22,7 @@
 		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
 
 		
-		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter.min.js"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter_Modified.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
 
 				<%-- 

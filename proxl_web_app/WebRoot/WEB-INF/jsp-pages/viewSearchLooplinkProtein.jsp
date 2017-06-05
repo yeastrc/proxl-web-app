@@ -15,7 +15,7 @@
  
 		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
  
- 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter.min.js"></script> 
+ 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter_Modified.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
 		
 		

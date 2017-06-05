@@ -289,6 +289,11 @@ var ViewLooplinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 				$looplink_peptide_entry.click();
 			}
 		}
+
+		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+			$looplink_peptide_table_jq.tablesorter(); // gets exception if there are no data rows
+		},10);
+		
 		//  If the function window.linkInfoOverlayWidthResizer() exists, call it to resize the overlay
 		if ( window.linkInfoOverlayWidthResizer ) {
 			window.linkInfoOverlayWidthResizer();
