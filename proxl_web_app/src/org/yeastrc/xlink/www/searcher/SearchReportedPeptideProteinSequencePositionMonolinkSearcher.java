@@ -48,6 +48,7 @@ public class SearchReportedPeptideProteinSequencePositionMonolinkSearcher {
 				item.setSearchId( rs.getInt( "search_id" ) );
 				item.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
 				item.setSearchReportedPeptidepeptideId( rs.getInt( "search_reported_peptide_peptide_id" ) );
+				item.setPeptidePosition( rs.getInt( "peptide_position" ) );
 				item.setProteinSequenceId( rs.getInt( "protein_sequence_id" ) );
 				item.setProteinSequencePosition( rs.getInt( "protein_sequence_position" ) );
 				results.add( item );

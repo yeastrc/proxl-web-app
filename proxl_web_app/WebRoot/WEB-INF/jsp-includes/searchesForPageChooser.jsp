@@ -9,6 +9,7 @@
 			
 		<script type="text/text" id="searches_for_page_chooser_modal_dialog_overlay_image_uri_path"><%= StrutsActionPathsConstants.IMAGE_PAGE_ACTION %></script> 		
 		<script type="text/text" id="searches_for_page_chooser_modal_dialog_overlay_structure_uri_path"><%= StrutsActionPathsConstants.STRUCTURE_PAGE_ACTION %></script> 		
+		<script type="text/text" id="searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path"><%= StrutsActionPathsConstants.QC_DATA_PAGE_ACTION %></script> 		
 		
 <%--   Searches For Page Chooser Overlay Background --%>
 

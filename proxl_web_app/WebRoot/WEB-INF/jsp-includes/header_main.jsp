@@ -85,6 +85,33 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	<link rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" type="text/css" media="print, projection, screen" />
 	<link rel="stylesheet" href="${ contextPath }/css/global.css?x=${cacheBustValue}" type="text/css" media="print, projection, screen" />
 
+	
+	<%-- Google Chart API import --%>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script type="text/javascript">
+	  google.load("visualization", "1", {packages:["corechart"]});
+	  
+	  var googleOnLoadCallbackFunction = function() {
+		   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+				if ( window.initQCCharts ) {
+				   initQCCharts();
+				}
+				if ( window.initQCChartPSMCountVsScore ) {
+				  initQCChartPSMCountVsScore();
+				}
+				if ( window.initQCChartPSMScoreVsScore ) {
+				  initQCChartPSMScoreVsScore();
+				}
+				if ( window.viewPsmsLoadedFromWebServiceTemplate && window.viewPsmsLoadedFromWebServiceTemplate.googleChartAPIloaded ) {
+					viewPsmsLoadedFromWebServiceTemplate.googleChartAPIloaded();
+				}
+		   },10);
+	  };
+	  
+	  //  Do NOT call a method on an object here.  The "this" gets set to the window.
+	  google.setOnLoadCallback(googleOnLoadCallbackFunction);
+	</script>		
+
 
 </head>
  

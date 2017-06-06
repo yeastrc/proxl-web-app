@@ -751,9 +751,9 @@ QCChartRetentionTime.prototype.createRetentionTimeCountChartResponse = function(
 			},  
 			//  Y axis label left of chart
 			vAxis: { title: 'Count', titleTextStyle: {color: 'black'}
-						,baseline: 0                    // always start at zero
-						,ticks: vAxisTicks, format:'#,###'
-						,maxValue : maxDataY
+//						,baseline: 0                    // always start at zero
+//						,ticks: vAxisTicks, format:'#,###'
+//						,maxValue : maxDataY
 			},
 			legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
 			width : objectThis.RETENTION_TIME_COUNT_CHART_WIDTH, 

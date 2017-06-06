@@ -16,4 +16,5 @@ public class StrutsActionPathsConstants {
 	
 	public static final String IMAGE_PAGE_ACTION = "/image.do";
 	public static final String STRUCTURE_PAGE_ACTION = "/structure.do";
+	public static final String QC_DATA_PAGE_ACTION = "/qc.do";
 }

@@ -2682,24 +2682,6 @@
 	
 	</div>
 
-
-<%-- Google Chart API import --%>
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script type="text/javascript">
-  google.load("visualization", "1", {packages:["corechart"]});
-  
-  var googleOnLoadCallbackFunction = function() {
-	   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-			  initQCCharts();
-			  initQCChartPSMCountVsScore();
-			  initQCChartPSMScoreVsScore();
-	   },10);
-  };
-  
-  //  Do NOT call a method on an object here.  The "this" gets set to the window.
-  google.setOnLoadCallback(googleOnLoadCallbackFunction);
-</script>		
-
 			<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
 			<script type="text/javascript" src="${ contextPath }/js/qcChartsViewProjectPage.js?x=${cacheBustValue}"></script>
 			<script type="text/javascript" src="${ contextPath }/js/qcChartPSMCountsVsScore.js?x=${cacheBustValue}"></script>

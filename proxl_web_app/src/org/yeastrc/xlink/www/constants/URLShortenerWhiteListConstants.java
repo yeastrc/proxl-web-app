@@ -16,7 +16,8 @@ public class URLShortenerWhiteListConstants {
 			"mergedPeptide.do",
 			"mergedCrosslinkProtein.do",
 			"mergedLooplinkProtein.do",
-			"mergedProteinCoverageReport.do" 
+			"mergedProteinCoverageReport.do" ,
+			"qc.do"
 	};
 	
 }

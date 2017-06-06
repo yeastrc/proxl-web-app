@@ -9,7 +9,6 @@ import org.yeastrc.xlink.base_searcher.PsmCountForUniquePSM_SearchIdReportedPept
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.www.dto.PeptideDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ReportedPeptideDTO;
 
@@ -576,7 +575,6 @@ public class WebReportedPeptide implements SearchPeptideCommonLinkWebserviceResu
 	 * true when SetNumUniquePsms has been called
 	 */
 	private boolean numUniquePsmsSet;
-	private boolean numUniquePsmsCheckedAfterSet;
 
 
 

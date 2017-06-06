@@ -135,8 +135,15 @@ SearchesForPageChooser.prototype.init = function( params ) {
 		if ( $searches_for_page_chooser_modal_dialog_overlay_structure_uri_path.length === 0 ) {
 			throw Error( "value with id 'searches_for_page_chooser_modal_dialog_overlay_structure_uri_path' not on page" );
 		}
+		var $searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path = $("#searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path");
+		if ( $searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path.length === 0 ) {
+			throw Error( "value with id 'searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path' not on page" );
+		}
 		this._image_uri_path = $searches_for_page_chooser_modal_dialog_overlay_image_uri_path.text();
 		this._structure_uri_path = $searches_for_page_chooser_modal_dialog_overlay_structure_uri_path.text();
+		this._qc_data_uri_path = $searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path.text();
+		
+		var urlPathname = window.location.pathname;
 		
 		//  Everything on the page so show the button
 		$("#searches_for_page_chooser_button_container").show();
@@ -544,9 +551,10 @@ SearchesForPageChooser.prototype.changeButtonClicked = function() {
 	var urlPathname = window.location.pathname;
 	
 	if ( urlPathname.indexOf( this._image_uri_path ) != -1
-			|| urlPathname.indexOf( this._structure_uri_path ) != -1 ) {
+			|| urlPathname.indexOf( this._structure_uri_path ) != -1
+			|| urlPathname.indexOf( this._qc_data_uri_path ) != -1 ) {
 		
-		this.changePageUrlForImageOrStructurePage( { chosenProjectSearchIds : chosenProjectSearchIds } );
+		this.changePageUrlForImageOrStructureOrQCDataPage( { chosenProjectSearchIds : chosenProjectSearchIds } );
 	}
 
 	this.changePageUrlFor_NOT_ImageOrStructurePage( { chosenProjectSearchIds : chosenProjectSearchIds } );
@@ -608,10 +616,10 @@ SearchesForPageChooser.prototype.changePageUrlFor_NOT_ImageOrStructurePage = fun
 };
 
 /**
- * For Image or Structure page
+ * For Image or Structure or QC Data page
  * Create new URL with new project search id(s) and change browser URL to it
  */
-SearchesForPageChooser.prototype.changePageUrlForImageOrStructurePage = function( params ) {
+SearchesForPageChooser.prototype.changePageUrlForImageOrStructureOrQCDataPage = function( params ) {
 	
 	var chosenProjectSearchIds = params.chosenProjectSearchIds;
 	

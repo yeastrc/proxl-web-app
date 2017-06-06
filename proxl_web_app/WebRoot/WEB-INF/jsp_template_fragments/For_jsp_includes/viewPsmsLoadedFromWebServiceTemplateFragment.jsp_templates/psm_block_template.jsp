@@ -8,6 +8,92 @@
 
 <div > <%--  top level div in the template --%>
 
+	<div class=" psm-qc-charts-container psm_qc_charts_container_jq " style="">
+	 <table class="table-no-border-no-cell-spacing-no-cell-padding" style=""> <%--  no width: 100% --%>
+	  <tr style="">
+	   <td style="border: 0px; padding: 4px;">
+			<div class=" psm_qc_charge_chart_outer_container_jq psm_qc_either_chart_outer_container_jq " 
+				style="position: relative; display: none; border-width: 1px; border-style: solid; border-color: #CDCDCD;"
+				data-chart_type="charge" >
+				<!-- Container for Charge Count Chart -->
+				<div style=" width: 300px; height: 240px; " class=" psm_qc_charge_chart_container_jq psm_qc_either_chart_container_jq " >
+				</div>
+				<div class="" style="position: absolute; top: 4px; right: 4px;">
+				  <div class="svg-download-block">
+					<a href="javascript:" class=" tool_tip_attached_jq  " data-tooltip="Download graphic as file." 
+						><img src="images/icon-download-small.png" /></a>
+						
+					<!-- Overlay that goes under main overlay: display on hover of download icon -->
+					<div class="svg-download-options-backing-block">
+					</div>
+					<!-- Overlay: display on hover of download icon -->
+					<div class="svg-download-options-block">
+						Choose download file format:
+						<a data-tooltip="Download as a JPEG image file." 
+							data-download_type="jpeg"
+							class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px;"
+							>JPEG</a>
+						<a data-tooltip="Download as PDF file suitable for use in Adobe Illustrator or printing." 
+							data-download_type="pdf"
+							class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px;"
+							>PDF</a>
+						<a data-tooltip="Download as PNG image file." 
+							data-download_type="png"
+							class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px;"
+							>PNG</a>
+						<a data-tooltip="Download as scalable vector graphics file suitable for use in Inkscape or other compatible software." 
+							data-download_type="svg"
+							class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px;"
+							>SVG</a>
+					</div>
+			
+				  </div>
+				</div>			
+			</div>
+	   </td>
+	   <td style="border: 0px; padding: 4px;">
+			<div class=" psm_qc_retention_time_chart_outer_container_jq psm_qc_either_chart_outer_container_jq "  
+				style="position: relative; display: none; border-width: 1px; border-style: solid; border-color: #CDCDCD;"
+				data-chart_type="charge">
+				<!-- Container for Retention Time Count Chart -->
+				<div style="width: 300px; height: 240px; " class=" psm_qc_retention_time_chart_container_jq psm_qc_either_chart_container_jq " >
+				</div>
+				<div class="" style="position: absolute; top: 4px; right: 4px;">
+				  <div class="svg-download-block">
+					<a href="javascript:" class=" tool_tip_attached_jq  " data-tooltip="Download graphic as file." 
+						><img src="images/icon-download-small.png" /></a>
+
+					<!-- Overlay that goes under main overlay: display on hover of download icon -->
+					<div class="svg-download-options-backing-block">
+					</div>
+					<!-- Overlay: display on hover of download icon -->
+					<span class="svg-download-options-block">
+						Choose download file format:
+						<a data-tooltip="Download as a JPEG image file." 
+							data-download_type="jpeg"
+							class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px;"
+							>JPEG</a>
+						<a data-tooltip="Download as PDF file suitable for use in Adobe Illustrator or printing." 
+							data-download_type="pdf"
+							class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px;"
+							>PDF</a>
+						<a data-tooltip="Download as PNG image file." 
+							data-download_type="png"
+							class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px;"
+							>PNG</a>
+						<a data-tooltip="Download as scalable vector graphics file suitable for use in Inkscape or other compatible software." 
+							data-download_type="svg"
+							class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px;"
+							>SVG</a>
+					</span>
+				  </div>
+				</div>			
+			</div>
+	   </td>
+	  </tr>
+	 </table>
+	</div>
+
 	<table  class=" tablesorter psm_table_jq" style="width:60%"  >
 		<thead>
 		<tr>

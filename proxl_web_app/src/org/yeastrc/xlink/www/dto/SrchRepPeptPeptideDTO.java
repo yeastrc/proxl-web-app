@@ -7,6 +7,8 @@ package org.yeastrc.xlink.www.dto;
  */
 public class SrchRepPeptPeptideDTO {
 
+	public static final int PEPTIDE_POSITION_NOT_SET = -1;
+	
 	private int id;
 	private int searchId;
 	private int reportedPeptideId;
