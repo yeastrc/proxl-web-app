@@ -59,6 +59,17 @@ function createMergedSearchesLinkCountsVennDiagram(  ) {
 				} 
 		};
 		var diagram = venn.drawD3Diagram( d3.select("#searches_intersection_venn_diagram"), getVennData(), width, height, parameters );
+		
+		// 		 Add a border to the circles in the venn diagram
+		//  Get the venn diagram
+		var $searches_intersection_venn_diagram = $("#searches_intersection_venn_diagram");
+		//  Get all the circles in the venn diagram
+		var $circle_All = $searches_intersection_venn_diagram.find("circle");
+		//  Apply a stroke color
+		$circle_All.attr("stroke","#000000");
+		//  Apply a stroke width
+		$circle_All.attr("stroke-width","1");
+		
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 		throw e;
