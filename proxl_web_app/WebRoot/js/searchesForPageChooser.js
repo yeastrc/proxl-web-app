@@ -129,21 +129,24 @@ SearchesForPageChooser.prototype.init = function( params ) {
 		
 		var $searches_for_page_chooser_modal_dialog_overlay_image_uri_path = $("#searches_for_page_chooser_modal_dialog_overlay_image_uri_path");
 		if ( $searches_for_page_chooser_modal_dialog_overlay_image_uri_path.length === 0 ) {
-			throw Error( "value with id 'searches_for_page_chooser_modal_dialog_overlay_image_uri_path' not on page" );
+			return;
+//			throw Error( "value with id 'searches_for_page_chooser_modal_dialog_overlay_image_uri_path' not on page" );
 		}
 		var $searches_for_page_chooser_modal_dialog_overlay_structure_uri_path = $("#searches_for_page_chooser_modal_dialog_overlay_structure_uri_path");
 		if ( $searches_for_page_chooser_modal_dialog_overlay_structure_uri_path.length === 0 ) {
-			throw Error( "value with id 'searches_for_page_chooser_modal_dialog_overlay_structure_uri_path' not on page" );
+			return;
+//			throw Error( "value with id 'searches_for_page_chooser_modal_dialog_overlay_structure_uri_path' not on page" );
 		}
 		var $searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path = $("#searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path");
 		if ( $searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path.length === 0 ) {
-			throw Error( "value with id 'searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path' not on page" );
+			return;
+//			throw Error( "value with id 'searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path' not on page" );
 		}
 		this._image_uri_path = $searches_for_page_chooser_modal_dialog_overlay_image_uri_path.text();
 		this._structure_uri_path = $searches_for_page_chooser_modal_dialog_overlay_structure_uri_path.text();
 		this._qc_data_uri_path = $searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path.text();
 		
-		var urlPathname = window.location.pathname;
+//		var urlPathname = window.location.pathname;
 		
 		//  Everything on the page so show the button
 		$("#searches_for_page_chooser_button_container").show();
@@ -514,6 +517,12 @@ SearchesForPageChooser.prototype.enableDisableChangeButton = function() {
  */
 SearchesForPageChooser.prototype.changeButtonClicked = function() {
 	var objectThis = this;
+	
+	if ( this._image_uri_path === undefined
+			|| this._structure_uri_path === undefined
+			|| this._qc_data_uri_path === undefined ) {
+		throw Error( "this._image_uri_path or this._structure_uri_path or this._qc_data_uri_path is undefined" );
+	}
 
 	var projectSearchIdsForCurrentPage = this.getProjectSearchIdsForCurrentPage();
 	var projectSearchIdsForCurrentPageAsArray = projectSearchIdsForCurrentPage.asArray;
