@@ -44,9 +44,15 @@ function initViewProjectPage() {
 	/////////////////////////
 	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 		try {
-			initQCPlotsClickHandlers();
-			initQCPlotPSMCountVsScoreClickHandlers();
-			initQCPlotPSMScoreVsScoreClickHandlers();
+			if ( window.initQCPlotsClickHandlers ) {
+				initQCPlotsClickHandlers();
+			}
+			if ( window.initQCPlotPSMCountVsScoreClickHandlers ) {
+				initQCPlotPSMCountVsScoreClickHandlers();
+			}
+			if ( window.initQCPlotPSMScoreVsScoreClickHandlers ) {
+				initQCPlotPSMScoreVsScoreClickHandlers();
+			}
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
