@@ -331,7 +331,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		for ( var psmIndex = 0; psmIndex < psmWebDisplayList.length ; psmIndex++ ) {
 			var psm = psmWebDisplayList[ psmIndex ];
 			if ( psm.retentionTime === undefined || psm.retentionTime === null ) {
-				hasRetentionTimeDataAllRows = true;
+				hasRetentionTimeDataAllRows = false;
 			}
 			if ( psm.charge === undefined || psm.charge === null ) {
 				hasChargeDataAllRows = false;
