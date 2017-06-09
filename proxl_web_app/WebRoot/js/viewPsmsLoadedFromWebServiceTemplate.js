@@ -16,6 +16,9 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 	var _handlebarsTemplate_psm_data_row_entry_template = null;
 	var _psm_data_row_entry_no_annotation_data_no_scan_data_row_HTML = null;
 
+	//  Queue of params for this._addChartsParams() before Google Chart API is loaded 
+	var _addChartsParamsQueue = [];
+	
 	var _googleChartAPIloaded = false;
 
 	var _psmPeptideAnnTypeIdDisplay = null;
@@ -39,6 +42,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 
 	this.googleChartAPIloaded = function() {
 		_googleChartAPIloaded = true;
+		this._addChartsFromParamsQueue();
 	};
 
 	//////////////
@@ -302,18 +306,39 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 //		}
 //		}
 
-		if ( ! _googleChartAPIloaded ) {
-			throw Error( "this._addCharts called but this._googleChartAPIloaded is not true;" );
-		}
+//		if ( ! _googleChartAPIloaded ) {
+//			throw Error( "this._addCharts called but this._googleChartAPIloaded is not true;" );
+//		}
+		
+		var addChartsParams = { psmWebDisplayList : psmWebDisplayList, $psm_data_container : $psm_data_container };
 
 		if ( _googleChartAPIloaded ) {
-			this._addCharts( { psmWebDisplayList : psmWebDisplayList, $psm_data_container : $psm_data_container } );
+			this._addCharts( addChartsParams );
+		} else {
+			//  Store params until Google Chart API is loaded, then add charts to page
+			_addChartsParamsQueue.push( addChartsParams );
 		}
 
 		if ( window.linkInfoOverlayWidthResizer ) {
 			window.linkInfoOverlayWidthResizer();
 		}
 	};
+	
+	
+	this._addChartsFromParamsQueue = function() {
+		
+		if ( _addChartsParamsQueue && _addChartsParamsQueue.length > 0  ) {
+			//  process the entries
+			for ( var index = 0; index < _addChartsParamsQueue.length; index++ ) {
+				var paramsEntry = _addChartsParamsQueue[ index ];
+				this._addCharts( paramsEntry )
+			}
+			//  Clear the queue
+			_addChartsParamsQueue = [];
+		}
+		
+	}
+	
 
 	///
 	this._addCharts = function( params ) {
@@ -351,86 +376,11 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			event.preventDefault();
 		});
 
-	};
-	
-	/**
-	 * 
-	 */
-	this._downloadChart = function( params ) {
-		try {
-			var clickedThis = params.clickedThis;
-
-			var $clickedThis = $( clickedThis );
-			var download_type = $clickedThis.attr("data-download_type");
-			var $psm_qc_either_chart_outer_container_jq = $clickedThis.closest(".psm_qc_either_chart_outer_container_jq");
-			var chart_type = $psm_qc_either_chart_outer_container_jq.attr("data-chart_type");
-
-			var getSVGContentsAsStringResult = this._getSVGContentsAsString( $psm_qc_either_chart_outer_container_jq );
-			
-			if ( getSVGContentsAsStringResult.errorException ) {
-				throw errorException;
-			}
-			
-			var fullSVG_String = getSVGContentsAsStringResult.fullSVG_String;
-			
-			var form = document.createElement( "form" );
-			$( form ).hide();
-			form.setAttribute( "method", "post" );
-			form.setAttribute( "action", contextPathJSVar + "/convertAndDownloadSVG.do" );
-
-			var svgStringField = document.createElement( "input" );
-			svgStringField.setAttribute("name", "svgString");
-			svgStringField.setAttribute("value", fullSVG_String );
-			var fileTypeField = document.createElement( "input" );
-			fileTypeField.setAttribute("name", "fileType");
-			fileTypeField.setAttribute("value", download_type);
-			form.appendChild( svgStringField );
-			form.appendChild( fileTypeField );
-			document.body.appendChild(form);    // Not entirely sure if this is necessary			
-			form.submit();
-			document.body.removeChild( form );
-
-			var getSVGContentsAsStringResult = getSVGContentsAsString( $psm_qc_either_chart_outer_container_jq );
-			var svgString = getSVGContentsAsStringResult.fullSVG_String;
-		} catch( e ) {
-			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-			throw e;
-		}
-		
-	};
-	
-
-	/**
-	 * 
-	 */
-	this._getSVGContentsAsString = function ( $psm_qc_either_chart_outer_container_jq ) {
-		try {
-			var $psm_qc_either_chart_container_jq = $psm_qc_either_chart_outer_container_jq.find(".psm_qc_either_chart_container_jq");
-			if ( $psm_qc_either_chart_container_jq.length === 0 ) {
-				// No element found with class psm_qc_either_chart_container_jq
-				return { noPageElement : true };
-			}
-			var $svgRoot = $psm_qc_either_chart_container_jq.find("svg");
-			if ( $svgRoot.length === 0 ) {
-				// No <svg> element found
-				return { noPageElement : true };
-			}
-
-			var svgContents = $svgRoot.html();
-			var fullSVG_String = "<?xml version=\"1.0\" standalone=\"no\"?><!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
-			fullSVG_String += "<svg id=\"svg\" ";
-			fullSVG_String += "width=\"" + $svgRoot.attr( "width" ) + "\" ";
-			fullSVG_String += "height=\"" + $svgRoot.attr( "height" ) + "\" ";
-			fullSVG_String += "xmlns=\"http://www.w3.org/2000/svg\">" + svgContents + "</svg>";
-			// fix the URL that google charts is putting into the SVG. Breaks parsing.
-			fullSVG_String = fullSVG_String.replace( /url\(.+\#_ABSTRACT_RENDERER_ID_(\d+)\)/g, "url(#_ABSTRACT_RENDERER_ID_$1)" );	
-
-			return { fullSVG_String : fullSVG_String};
-		} catch( e ) {
-			//  Not all browsers have svgElement.innerHTML which .html() tries to use, causing an exception
-			return { errorException : e };
+		if ( window.linkInfoOverlayWidthResizer ) {
+			window.linkInfoOverlayWidthResizer();
 		}
 	};
+	
 
 	//  Overridden for Specific elements like Chart Title and X and Y Axis labels
 	var _CHART_DEFAULT_FONT_SIZE = 12;  //  Default font size - using to set font size for tick marks.
@@ -753,6 +703,84 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 	};
 	
 
+	/**
+	 * 
+	 */
+	this._downloadChart = function( params ) {
+		try {
+			var clickedThis = params.clickedThis;
+
+			var $clickedThis = $( clickedThis );
+			var download_type = $clickedThis.attr("data-download_type");
+			var $psm_qc_either_chart_outer_container_jq = $clickedThis.closest(".psm_qc_either_chart_outer_container_jq");
+			var chart_type = $psm_qc_either_chart_outer_container_jq.attr("data-chart_type");
+
+			var getSVGContentsAsStringResult = this._getSVGContentsAsString( $psm_qc_either_chart_outer_container_jq );
+			
+			if ( getSVGContentsAsStringResult.errorException ) {
+				throw errorException;
+			}
+			
+			var fullSVG_String = getSVGContentsAsStringResult.fullSVG_String;
+			
+			var form = document.createElement( "form" );
+			$( form ).hide();
+			form.setAttribute( "method", "post" );
+			form.setAttribute( "action", contextPathJSVar + "/convertAndDownloadSVG.do" );
+
+			var svgStringField = document.createElement( "input" );
+			svgStringField.setAttribute("name", "svgString");
+			svgStringField.setAttribute("value", fullSVG_String );
+			var fileTypeField = document.createElement( "input" );
+			fileTypeField.setAttribute("name", "fileType");
+			fileTypeField.setAttribute("value", download_type);
+			form.appendChild( svgStringField );
+			form.appendChild( fileTypeField );
+			document.body.appendChild(form);    // Not entirely sure if this is necessary			
+			form.submit();
+			document.body.removeChild( form );
+
+			var getSVGContentsAsStringResult = getSVGContentsAsString( $psm_qc_either_chart_outer_container_jq );
+			var svgString = getSVGContentsAsStringResult.fullSVG_String;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+		
+	};
+	
+
+	/**
+	 * 
+	 */
+	this._getSVGContentsAsString = function ( $psm_qc_either_chart_outer_container_jq ) {
+		try {
+			var $psm_qc_either_chart_container_jq = $psm_qc_either_chart_outer_container_jq.find(".psm_qc_either_chart_container_jq");
+			if ( $psm_qc_either_chart_container_jq.length === 0 ) {
+				// No element found with class psm_qc_either_chart_container_jq
+				return { noPageElement : true };
+			}
+			var $svgRoot = $psm_qc_either_chart_container_jq.find("svg");
+			if ( $svgRoot.length === 0 ) {
+				// No <svg> element found
+				return { noPageElement : true };
+			}
+
+			var svgContents = $svgRoot.html();
+			var fullSVG_String = "<?xml version=\"1.0\" standalone=\"no\"?><!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
+			fullSVG_String += "<svg id=\"svg\" ";
+			fullSVG_String += "width=\"" + $svgRoot.attr( "width" ) + "\" ";
+			fullSVG_String += "height=\"" + $svgRoot.attr( "height" ) + "\" ";
+			fullSVG_String += "xmlns=\"http://www.w3.org/2000/svg\">" + svgContents + "</svg>";
+			// fix the URL that google charts is putting into the SVG. Breaks parsing.
+			fullSVG_String = fullSVG_String.replace( /url\(.+\#_ABSTRACT_RENDERER_ID_(\d+)\)/g, "url(#_ABSTRACT_RENDERER_ID_$1)" );	
+
+			return { fullSVG_String : fullSVG_String};
+		} catch( e ) {
+			//  Not all browsers have svgElement.innerHTML which .html() tries to use, causing an exception
+			return { errorException : e };
+		}
+	};
 };
 
 //	Static Singleton Instance of Class

@@ -89,23 +89,51 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	<%-- Google Chart API import --%>
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 	<script type="text/javascript">
+	
+	  var googleChartAPIloaded_GLOBAL_VARIABLE = false;
+	  
+	  
 	  google.load("visualization", "1", {packages:["corechart"]});
 	  
 	  var googleOnLoadCallbackFunction = function() {
-		   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-				if ( window.initQCCharts ) {
-				   initQCCharts();
-				}
-				if ( window.initQCChartPSMCountVsScore ) {
-				  initQCChartPSMCountVsScore();
-				}
-				if ( window.initQCChartPSMScoreVsScore ) {
-				  initQCChartPSMScoreVsScore();
-				}
-				if ( window.viewPsmsLoadedFromWebServiceTemplate && window.viewPsmsLoadedFromWebServiceTemplate.googleChartAPIloaded ) {
-					viewPsmsLoadedFromWebServiceTemplate.googleChartAPIloaded();
-				}
-		   },10);
+		try {	  
+				googleChartAPIloaded_GLOBAL_VARIABLE = true;
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			// throw e;  //  No rethrow e, only for reporting to server
+		}
+		try {	  
+			if ( window.viewPsmsLoadedFromWebServiceTemplate && window.viewPsmsLoadedFromWebServiceTemplate.googleChartAPIloaded ) {
+				viewPsmsLoadedFromWebServiceTemplate.googleChartAPIloaded();
+			}
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			// throw e;  //  No rethrow e, only for reporting to server
+		}
+		try {	  
+			if ( window.initQCCharts ) {
+			   initQCCharts();
+			}
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			// throw e;  //  No rethrow e, only for reporting to server
+		}
+		try {	  
+			if ( window.initQCChartPSMCountVsScore ) {
+			  initQCChartPSMCountVsScore();
+			}
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			// throw e;  //  No rethrow e, only for reporting to server
+		}
+		try {	  
+			if ( window.initQCChartPSMScoreVsScore ) {
+			  initQCChartPSMScoreVsScore();
+			}
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			// throw e;  //  No rethrow e, only for reporting to server
+		}
 	  };
 	  
 	  //  Do NOT call a method on an object here.  The "this" gets set to the window.
