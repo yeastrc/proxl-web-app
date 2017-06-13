@@ -36,11 +36,11 @@ td.table-no-border-no-cell-spacing-no-cell-padding { padding-top: 0px; padding-b
 
 
 tr.table-no-border-no-cell-spacing-no-cell-padding, .table-no-border-no-cell-spacing-no-cell-padding , .table-no-border-no-cell-spacing-no-cell-padding td {
-	
 	padding-top: 0px; padding-bottom: 0px;
 	border-spacing : 0px;
-	
 }
+
+.chart-standard-container-div { border-width: 1px; border-style: solid; border-color: #CDCDCD; position: relative; }
 
 /*  TABLE SORTER CSS Override  */
 

@@ -631,16 +631,18 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			    },
 			    //  X axis label below chart
 				hAxis: { title: 'Retention Time (minutes)', titleTextStyle: { color: 'black', fontSize: _AXIS_LABEL_FONT_SIZE }
-					,ticks: hAxisTicks, format:'#,###.##'
-					,maxValue : maxDataX,
-					 gridlines: {
-			                color: 'none'
-			            }
+					,ticks: hAxisTicks
+					, format:'#,###.##'
+					,maxValue : maxDataX
+					,gridlines: {  
+		                color: 'none'  //  No vertical grid lines on the horzontal axis
+		            }
 				},  
 				//  Y axis label left of chart
 				vAxis: { title: 'Count', titleTextStyle: { color: 'black', fontSize: _AXIS_LABEL_FONT_SIZE }
 					,baseline: 0                    // always start at zero
-					,ticks: vAxisTicks, format:'#,###'
+					,ticks: vAxisTicks
+					, format:'#,###'
 					,maxValue : maxDataY
 				},
 				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
@@ -661,16 +663,16 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		var data = google.visualization.arrayToDataTable( chartData );
 		var chartFullsize = new google.visualization.ColumnChart( $psm_qc_retention_time_chart_container_jq[0] );
 		chartFullsize.draw(data, optionsFullsize);
-		google.visualization.events.addListener(chartFullsize, 'select', function(event) {
-
-			var tableSelection = chartFullsize.getSelection();
-			var tableSelection0 = tableSelection[ 0 ];
-			var column = tableSelection0.column;
-			var row = tableSelection0.row;
-			var chartDataForRow = chartData[ row ];
-			  
-			  var z = 0;
-		});
+//		google.visualization.events.addListener(chartFullsize, 'select', function(event) {
+//
+//			var tableSelection = chartFullsize.getSelection();
+//			var tableSelection0 = tableSelection[ 0 ];
+//			var column = tableSelection0.column;
+//			var row = tableSelection0.row;
+//			var chartDataForRow = chartData[ row ];
+//			  
+//			  var z = 0;
+//		});
 	};
 
 

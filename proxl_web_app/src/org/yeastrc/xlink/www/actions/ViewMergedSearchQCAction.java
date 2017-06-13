@@ -107,6 +107,8 @@ public class ViewMergedSearchQCAction extends Action {
 				request.setAttribute( "onlySingleProjectSearchId", onlySingleProjectSearchId );	
 			}
 			
+			boolean anySearchesHaveScanData = true;
+			
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
 			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
@@ -125,6 +127,9 @@ public class ViewMergedSearchQCAction extends Action {
 				searchesMapOnSearchId.put( search.getSearchId(), search );
 				searchIdsArray[ searchIdsArrayIndex ] = search.getSearchId();
 				searchIdsArrayIndex++;
+				if ( ! search.isHasScanData() ) {
+					anySearchesHaveScanData = false;
+				}
 			}
 			// Sort searches list
 			Collections.sort( searches, new Comparator<SearchDTO>() {
@@ -133,6 +138,8 @@ public class ViewMergedSearchQCAction extends Action {
 					return o1.getSearchId() - o2.getSearchId();
 				}
 			});
+			
+			request.setAttribute( "anySearchesHaveScanData", anySearchesHaveScanData );
 			
 			//  Jackson JSON Mapper object for JSON deserialization and serialization
 			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object

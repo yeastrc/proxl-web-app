@@ -1,6 +1,8 @@
 
 
 <%--
+	searchDetailsBlock.jsp
+
 	Display Details for a list of searches.
 	
 	Used on the Search Peptide, Search Protein, Merged Peptide, Merged Protein, 
@@ -31,12 +33,15 @@
 		<div >
 	 		Search<c:if test="${ not singleSearch }" >es</c:if>:
 	 	</div>
- 		<div id="searches_for_page_chooser_button_container" style="display: none;">
+	 	<%--  if page variable "doNotDisplayChangeSearchesLink" is true, do not display this link "Change searches" --%>
+	 	<c:if test="${ not doNotDisplayChangeSearchesLink }">
+ 		  <div id="searches_for_page_chooser_button_container" style="display: none;">
 			<a href="javascript:" id="searches_for_page_chooser_open_overlay" style="font-size: 12px;"
 				class="tool_tip_attached_jq"  
 				data-tooltip="Change searches from which data are displayed"
 				>Change searches</a>
-		</div>
+		  </div>
+		</c:if>
 	 
 	 </td>
 	 <td id="searches_details_list_container" class=" searches_sort_list_container_jq "

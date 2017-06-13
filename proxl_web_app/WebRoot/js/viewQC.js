@@ -5,12 +5,20 @@
  * 
  * page variable viewQCPageCode
  * 
+ * 		!!!!  Currently only works for single search.  
+ * 
+ * 		The page is designed to work with multiple merged searches 
+ * 		but the code and SQL need to be reviewed to determine that the results returned are what the user expects,
+ * 		especially for reported peptide level results. 
+ * 
  */
 
 //  JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
-///////
+/**
+ * 
+ */
 $(document).ready(function() { 
 	viewQCPageCode.init();
 
@@ -21,6 +29,28 @@ $(document).ready(function() {
  * Constructor 
  */
 var ViewQCPageCode = function() {
+	
+	var _OVERALL_GLOBALS = { 
+			 //  Color of bars
+			BAR_COLOR_CROSSLINK : '#A55353', // Crosslink: Proxl shades of red
+			BAR_COLOR_LOOPLINK : '#53a553',  // Looplink: green: #53a553
+			BAR_COLOR_UNLINKED : '#5353a5'   //	Unlinked: blue: #5353a5
+	};
+	
+	_OVERALL_GLOBALS.BAR_STYLE_CROSSLINK = 
+		"color: " + _OVERALL_GLOBALS.BAR_COLOR_CROSSLINK +
+		"; stroke-color: " + _OVERALL_GLOBALS.BAR_COLOR_CROSSLINK + 
+		"; stroke-width: 1; fill-color: " + _OVERALL_GLOBALS.BAR_COLOR_CROSSLINK + "";
+	
+	_OVERALL_GLOBALS.BAR_STYLE_LOOPLINK = 
+		"color: " + _OVERALL_GLOBALS.BAR_COLOR_LOOPLINK +
+		"; stroke-color: " + _OVERALL_GLOBALS.BAR_COLOR_LOOPLINK + 
+		"; stroke-width: 1; fill-color: " + _OVERALL_GLOBALS.BAR_COLOR_LOOPLINK + "";
+	
+	_OVERALL_GLOBALS.BAR_STYLE_UNLINKED = 
+		"color: " + _OVERALL_GLOBALS.BAR_COLOR_UNLINKED +
+		"; stroke-color: " + _OVERALL_GLOBALS.BAR_COLOR_UNLINKED + 
+		"; stroke-width: 1; fill-color: " + _OVERALL_GLOBALS.BAR_COLOR_UNLINKED + "";
 
 	var _hash_json_Contents = null;
 
@@ -28,6 +58,26 @@ var ViewQCPageCode = function() {
 	var _link_type_looplink_constant = null;
 	var _link_type_unlinked_constant = null;
 	var _link_type_default_selected = null;
+
+	var _link_type_crosslink_LOWER_CASE_constant = null;
+	var _link_type_looplink_LOWER_CASE_constant = null;
+	var _link_type_unlinked_LOWER_CASE_constant = null;
+	
+	var _IS_LOADED_YES = "YES";
+	var _IS_LOADED_NO = "NO";
+	var _IS_LOADED_LOADING = "LOADING";
+
+	//  Block of "isLoaded" variables.  
+	//        These all need to be set to NO in ... when the user clicks "Update from Database" button
+	var _digestion_Statistics_isLoaded = _IS_LOADED_NO;
+	var _chargeCount_Statistics_isLoaded = _IS_LOADED_NO;
+	var _M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_NO;
+	var _peptideLengthsHistogram_isLoaded = _IS_LOADED_NO;
+	
+	//  Block of "sectionDisplayed" variables.  Lists which sections are currently displayed
+	var _digestion_Statistics_sectionDisplayed = false;
+	var _psm_Statistics_sectionDisplayed = false;
+	var _peptide_Statistics_sectionDisplayed = false;
 	
 	/**
 	 * Init page on load 
@@ -39,13 +89,245 @@ var ViewQCPageCode = function() {
 		
 		this.updatePageFiltersFromURLHash();
 		
-		//  TODO  TEMP since don't have default for Type Filter working
-//		this.updatePageFromFiltersToURLHashJSVarsAndPageData();
+		var $update_from_database_button = $("#update_from_database_button");
+		$update_from_database_button.click( function( event ) { 
+			objectThis._update_from_database_button_Clicked( { clickedThis : this } ); 
+			event.preventDefault();
+		});
 		
-		//  TODO  TEMP since don't have load on expand section working
-		this.loadDigestionStatistics();
+		var $digestion_expand_link = $("#digestion_expand_link");
+		$digestion_expand_link.click( function( event ) { 
+			objectThis._digestion_expand_link_Clicked( { clickedThis : this } ); 
+			event.preventDefault();
+		});
+
+		var $digestion_collapse_link = $("#digestion_collapse_link");
+		$digestion_collapse_link.click( function( event ) { 
+			objectThis._digestion_collapse_link_Clicked( { clickedThis : this } ); 
+			event.preventDefault();
+		});
+
+		var $psm_level_expand_link = $("#psm_level_expand_link");
+		$psm_level_expand_link.click( function( event ) { 
+			objectThis._psm_level_expand_link_Clicked( { clickedThis : this } ); 
+			event.preventDefault();
+		});
+
+		var $psm_level_collapse_link = $("#psm_level_collapse_link");
+		$psm_level_collapse_link.click( function( event ) { 
+			objectThis._psm_level_collapse_link_Clicked( { clickedThis : this } ); 
+			event.preventDefault();
+		});
+
+		var $peptide_level_expand_link = $("#peptide_level_expand_link");
+		$peptide_level_expand_link.click( function( event ) { 
+			objectThis._peptide_level_expand_link_Clicked( { clickedThis : this } ); 
+			event.preventDefault();
+		});
+
+		var $peptide_level_collapse_link = $("#peptide_level_collapse_link");
+		$peptide_level_collapse_link.click( function( event ) { 
+			objectThis._peptide_level_collapse_link_Clicked( { clickedThis : this } ); 
+			event.preventDefault();
+		});
+		
+		//  Default display on page load
+		this.showDigestionStatistics();
+
+	};
+	
+	/**
+	 * 
+	 */
+	this._update_from_database_button_Clicked = function( params ) {
+		this.updatePageForFilterCriteria();
+	};
+	
+	/**
+	 * 
+	 */
+	this._digestion_expand_link_Clicked = function( params ) {
+		this.showDigestionStatistics();
+	};
+	
+	/**
+	 *  
+	 */
+	this._digestion_collapse_link_Clicked = function( params ) {
+		this.hideDigestionStatistics();
+	};
+	
+	/**
+	 *  
+	 */
+	this.showDigestionStatistics = function( params ) {
+		
+		_digestion_Statistics_sectionDisplayed = true;
+		
+		var $digestion_display_block = $("#digestion_display_block");
+		$digestion_display_block.show();
+		var $digestion_expand_link = $("#digestion_expand_link");
+		$digestion_expand_link.hide();
+		var $digestion_collapse_link = $("#digestion_collapse_link");
+		$digestion_collapse_link.show();
+		
+		this.loadDigestionStatisticsIfNeeded();
+	};
+	
+	/**
+	 *  
+	 */
+	this.hideDigestionStatistics = function( params ) {
+		
+		var $digestion_display_block = $("#digestion_display_block");
+		$digestion_display_block.hide();
+		var $digestion_expand_link = $("#digestion_expand_link");
+		$digestion_expand_link.show();
+		var $digestion_collapse_link = $("#digestion_collapse_link");
+		$digestion_collapse_link.hide();
+		
+		_digestion_Statistics_sectionDisplayed = false;
+	};
+	
+
+	/**
+	 * 
+	 */
+	this._psm_level_expand_link_Clicked = function( params ) {
+		this.showPSMLevelstatistics();
+	};
+	
+	/**
+	 *  
+	 */
+	this._psm_level_collapse_link_Clicked = function( params ) {
+		this.hidePSMLevelStatistics();
+	};
+
+	/**
+	 *  
+	 */
+	this.showPSMLevelstatistics = function( params ) {
+
+		_psm_Statistics_sectionDisplayed = true;
+
+		var $psm_level_display_block = $("#psm_level_display_block");
+		$psm_level_display_block.show();
+		var $psm_level_expand_link = $("#psm_level_expand_link");
+		$psm_level_expand_link.hide();
+		var $psm_level_collapse_link = $("#psm_level_collapse_link");
+		$psm_level_collapse_link.show();
+		
+		this.load_PSM_Level_StatisticsIfNeeded();
+	};
+	
+	/**
+	 *  
+	 */
+	this.hidePSMLevelStatistics = function( params ) {
+		
+		var $psm_level_display_block = $("#psm_level_display_block");
+		$psm_level_display_block.hide();
+		var $psm_level_expand_link = $("#psm_level_expand_link");
+		$psm_level_expand_link.show();
+		var $psm_level_collapse_link = $("#psm_level_collapse_link");
+		$psm_level_collapse_link.hide();
+		
+		_psm_Statistics_sectionDisplayed = false;
+	};
+
+	/**
+	 * 
+	 */
+	this._peptide_level_expand_link_Clicked = function( params ) {
+		this.showPeptideLevelstatistics();
+	};
+	
+	/**
+	 *  
+	 */
+	this._peptide_level_collapse_link_Clicked = function( params ) {
+		this.hidePeptideLevelStatistics();
+	};
+	
+
+	/**
+	 *  
+	 */
+	this.showPeptideLevelstatistics = function( params ) {
+
+		_peptide_Statistics_sectionDisplayed = true;
+
+		var $peptide_level_display_block = $("#peptide_level_display_block");
+		$peptide_level_display_block.show();
+		var $peptide_level_expand_link = $("#peptide_level_expand_link");
+		$peptide_level_expand_link.hide();
+		var $peptide_level_collapse_link = $("#peptide_level_collapse_link");
+		$peptide_level_collapse_link.show();
+		
+		this.load_Peptide_Level_StatisticsIfNeeded();
+	};
+	
+	/**
+	 *  
+	 */
+	this.hidePeptideLevelStatistics = function( params ) {
+		
+		var $peptide_level_display_block = $("#peptide_level_display_block");
+		$peptide_level_display_block.hide();
+		var $peptide_level_expand_link = $("#peptide_level_expand_link");
+		$peptide_level_expand_link.show();
+		var $peptide_level_collapse_link = $("#peptide_level_collapse_link");
+		$peptide_level_collapse_link.hide();
+		
+		_peptide_Statistics_sectionDisplayed = false;
+	};
+	
+	//////////////////
+	
+	/**
+	 *  
+	 */
+	this.updatePageForFilterCriteria = function() {
+		
+		this.updatePageFromFiltersToURLHashJSVarsAndPageData();
+
+		this.clearAllDisplayedDataAndCharts();
+		
+		this.loadDataForDisplayedDataAndCharts();
 		
 	};
+	
+	/**
+	 *  
+	 */
+	this.clearAllDisplayedDataAndCharts = function() {
+		
+		this.clearDigestionStatistics();
+		this.clearPSM_Level_Statistics();
+		this.clear_Peptide_Level_Statistics();
+	};
+	
+
+	/**
+	 *  
+	 */
+	this.loadDataForDisplayedDataAndCharts = function() {
+		if ( _digestion_Statistics_sectionDisplayed ) {
+			this.loadDigestionStatisticsIfNeeded();
+		}
+		if ( _psm_Statistics_sectionDisplayed ) {
+			this.load_PSM_Level_StatisticsIfNeeded();
+		}
+		if ( _peptide_Statistics_sectionDisplayed ) {
+			this.load_Peptide_Level_StatisticsIfNeeded();
+		}
+	};
+	
+	
+	///////////////////////////////////////////////////
+	
+	
 	
 	/**
 	 * Read strings from page from Java constants and store in Javascript variables used as constants 
@@ -58,16 +340,28 @@ var ViewQCPageCode = function() {
 		var $link_type_unlinked_constant = $("#link_type_unlinked_constant");
 		_link_type_unlinked_constant = $link_type_unlinked_constant.text();
 		
-		_link_type_default_selected = [ _link_type_crosslink_constant ] //  , _link_type_looplink_constant, _link_type_unlinked_constant ]
+		_link_type_crosslink_LOWER_CASE_constant = _link_type_crosslink_constant.toLowerCase();
+		_link_type_looplink_LOWER_CASE_constant = _link_type_looplink_constant.toLowerCase();
+		_link_type_unlinked_LOWER_CASE_constant = _link_type_unlinked_constant.toLowerCase();
+
+		_link_type_default_selected = [ _link_type_crosslink_constant, _link_type_looplink_constant, _link_type_unlinked_constant ]
 	};
 
 	/**
-	 * "Update from Database" clicked.
-	 * Update JS variables with filter values from page 
+	 * return bar color for link type
 	 */
-	this.refreshData = function() {
-		this.updatePageFromFiltersToURLHashJSVarsAndPageData();
+	this.getColorAndBarColorFromLinkType = function( linkType ) {
+		if ( linkType === _link_type_crosslink_LOWER_CASE_constant ) {
+			return { color : _OVERALL_GLOBALS.BAR_COLOR_CROSSLINK, barColor : _OVERALL_GLOBALS.BAR_STYLE_CROSSLINK };
+		} else if ( linkType === _link_type_looplink_LOWER_CASE_constant ) {
+			return { color : _OVERALL_GLOBALS.BAR_COLOR_LOOPLINK, barColor : _OVERALL_GLOBALS.BAR_STYLE_LOOPLINK };
+		} else if ( linkType === _link_type_unlinked_LOWER_CASE_constant ) {
+			return { color : _OVERALL_GLOBALS.BAR_COLOR_UNLINKED, barColor : _OVERALL_GLOBALS.BAR_STYLE_UNLINKED };
+		} else {
+			throw Error( "getColorAndBarColorFromLinkType(...), unknown link type: " + linkType );
+		}
 	};
+	
 	
 	/**
 	 *  
@@ -117,6 +411,9 @@ var ViewQCPageCode = function() {
 		}
 	};
 	
+	/**
+	 * 
+	 */
 	this.markCheckBoxesForLinkTypes = function( linkTypes ) {
 		if ( linkTypes !== undefined && linkTypes !== null ) {
 			//  linkTypes not null so process it, empty array means nothing chosen
@@ -147,8 +444,19 @@ var ViewQCPageCode = function() {
 		}
 	};
 
-	///////////////////////
-	//   Called by "onclick" on HTML element
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * 
+	 */
 	this.updatePageFromFiltersToURLHashJSVarsAndPageData = function() {
 		try {
 			var dataFromFiltersResult =
@@ -163,11 +471,6 @@ var ViewQCPageCode = function() {
 			
 			this.updateURLHashWithJSONObject( dataFromFiltersResult );
 
-			//  TODO Update the page
-
-			this.loadDigestionStatistics();
-			
-			
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -190,7 +493,9 @@ var ViewQCPageCode = function() {
 	}
 
 
-	/////////////
+	/**
+	 * 
+	 */
 	this.getDataFromFilters = function() {
 		
 		var getCutoffsFromThePageResult = cutoffProcessingCommonCode.getCutoffsFromThePage(  {  } );
@@ -211,8 +516,6 @@ var ViewQCPageCode = function() {
 			if ( $item.prop('checked') === true ) {
 				var linkTypeFieldValue = $item.val();
 				outputLinkTypes.push( linkTypeFieldValue );
-//				} else {
-//				allLinkTypesChosen = false;
 			}
 		});
 		//  If no link types are selected, change crosslink to selected
@@ -375,18 +678,51 @@ var ViewQCPageCode = function() {
 	/**
 	 * Load the data for the Digestion Statistics section
 	 */
-	this.loadDigestionStatistics = function() {
+	this.loadDigestionStatisticsIfNeeded = function() {
 		
-		this.loadMissingCleavageReportedPeptidesCount();
+		this.loadMissingCleavageReportedPeptidesCountIfNeeded();
+	};
+	
+	/**
+	 * Clear the data for the Digestion Statistics section
+	 */
+	this.clearDigestionStatistics = function() {
+		
+		this.clearMissingCleavageReportedPeptidesCount();
+	};
+	
+	/**
+	 * Clear data for MissingCleavageReportedPeptidesCount
+	 */
+	this.clearMissingCleavageReportedPeptidesCount = function() {
+		
+		_digestion_Statistics_isLoaded = _IS_LOADED_NO;
+
+		var $missingCleavageReportedPeptidesCountLoadingBlock = $("#missingCleavageReportedPeptidesCountLoadingBlock");
+		var $missingCleavageReportedPeptidesCountBlock = $("#missingCleavageReportedPeptidesCountBlock");
+		$missingCleavageReportedPeptidesCountLoadingBlock.show();
+		$missingCleavageReportedPeptidesCountBlock.hide();
+		$missingCleavageReportedPeptidesCountBlock.empty();
 	};
 	
 
+	/**
+	 * If not currently loaded, call loadMissingCleavageReportedPeptidesCount()
+	 */
+	this.loadMissingCleavageReportedPeptidesCountIfNeeded = function() {
+		
+		if ( _digestion_Statistics_isLoaded === _IS_LOADED_NO ) {
+			this.loadMissingCleavageReportedPeptidesCount();
+		}
+	};
 
 	/**
 	 * Load the data for MissingCleavageReportedPeptidesCount
 	 */
 	this.loadMissingCleavageReportedPeptidesCount = function() {
 		var objectThis = this;
+		
+		_digestion_Statistics_isLoaded = _IS_LOADED_LOADING;
 		
 		var $missingCleavageReportedPeptidesCountLoadingBlock = $("#missingCleavageReportedPeptidesCountLoadingBlock");
 		var $missingCleavageReportedPeptidesCountBlock = $("#missingCleavageReportedPeptidesCountBlock");
@@ -478,60 +814,1152 @@ var ViewQCPageCode = function() {
 		
 		var $missingCleavageReportedPeptidesCountLoadingBlock = $("#missingCleavageReportedPeptidesCountLoadingBlock");
 		var $missingCleavageReportedPeptidesCountBlock = $("#missingCleavageReportedPeptidesCountBlock");
+
+		var $PeptideCleavageEntryTemplate = $("#PeptideCleavageEntryTemplate");
+		if ( $PeptideCleavageEntryTemplate.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PeptideCleavageEntryTemplate'" );
+		}
+		var PeptideCleavageEntryTemplate = $PeptideCleavageEntryTemplate.html();
+
+		$missingCleavageReportedPeptidesCountBlock.empty();
+		
 		$missingCleavageReportedPeptidesCountLoadingBlock.hide();
 		$missingCleavageReportedPeptidesCountBlock.show();
+		
 
-		var $missingCleavageReportedPeptidesCountTable_tbody = $("#missingCleavageReportedPeptidesCountTable tbody");
-		$missingCleavageReportedPeptidesCountTable_tbody.empty();
+		//  Build data for charts
+		var peptidesWithMissedCleavagePerType = [];
+		var missedCleavagesPerType = [];
+		var missedCleavagePSMCountPerType = [];
 		
 		for ( var index = 0; index < missingCleavageReportedPeptidesCountForLinkTypeList.length; index++ ) {
 			var entry = missingCleavageReportedPeptidesCountForLinkTypeList[ index ];
 			
-			var numberInit = (0).toFixed( 2 );
-			
-			//  TODO  Maybe init to something else besides zero
-			var missedCleavageReportedPeptideCount_Div_totalReportedPeptideCount_Display = numberInit;
-			var missedCleavageCount_Div_totalReportedPeptideCount_Display = numberInit;
-			var missedCleavagePSMCount_Div_totalPSMCount_Display = numberInit;
-			
-			if ( entry.totalReportedPeptideCount !== 0 ) {
-				missedCleavageReportedPeptideCount_Div_totalReportedPeptideCount_Display =
-					( entry.missedCleavageReportedPeptideCount / entry.totalReportedPeptideCount ).toFixed( 2 );
-			}
-			if ( entry.totalReportedPeptideCount !== 0 ) {
-				missedCleavageCount_Div_totalReportedPeptideCount_Display =
-					( entry.missedCleavageCount / entry.totalReportedPeptideCount ).toFixed( 2 );
-			}
-			if ( entry.totalPSMCount !== 0 ) {
-				missedCleavagePSMCount_Div_totalPSMCount_Display =
-					( entry.missedCleavagePSMCount / entry.totalPSMCount ).toFixed( 2 );
+			if ( entry.totalReportedPeptideCount === 0 || entry.totalPSMCount === 0 ) {
+				//  No data for this entry so skip it
+				continue;
 			}
 			
-			var html = "<tr><td>" + entry.linkType + 
-			'</td><td  class=" count-display ">' + 
-			entry.missedCleavageReportedPeptideCount +
-			" (" + 
-			missedCleavageReportedPeptideCount_Div_totalReportedPeptideCount_Display +
-			")" +
-			'</td><td  class=" count-display ">' + 
-			entry.missedCleavageCount + 
-			" (" + 
-			missedCleavageCount_Div_totalReportedPeptideCount_Display +
-			")" +
-			'</td><td  class=" count-display ">' + 
-			entry.totalReportedPeptideCount + 
-			'</td><td  class=" count-display ">' + 
-			entry.missedCleavagePSMCount + 
-			" (" + 
-			missedCleavagePSMCount_Div_totalPSMCount_Display +
-			")" +
-			"</td></tr>";
-			$( html ).appendTo( $missingCleavageReportedPeptidesCountTable_tbody );
+			var peptidesWithMissedCleavageTooltip = 
+				entry.missedCleavageReportedPeptideCount + 
+				" Peptides w/ Missed Cleavage / " + 
+				entry.totalReportedPeptideCount + " Total Peptides"; 
+
+			var peptidesWithMissedCleavageSingleType = { 
+					linkType : entry.linkType,
+					count : entry.missedCleavageReportedPeptideCount,
+					totalCount : entry.totalReportedPeptideCount,
+					tooltip: peptidesWithMissedCleavageTooltip 
+			};
+
+			var missedCleavageTooltip = 
+				entry.missedCleavageCount + 
+				" Missed Cleavages / " + 
+				entry.totalReportedPeptideCount + " Total Peptides"; 
+
+			var missedCleavageSingleType = { 
+					linkType : entry.linkType,
+					count : entry.missedCleavageCount,
+					totalCount : entry.totalReportedPeptideCount,
+					tooltip: missedCleavageTooltip
+			};
+
+			var missedCleavagePSMCountTooltip = 
+				entry.missedCleavageCount + 
+				" Missed Cleavage PSM Count / " + 
+				entry.totalPSMCount + " Total PSMs"; 
+			
+			var missedCleavagePSMCountSingleType = { 
+					linkType : entry.linkType,
+					count : entry.missedCleavagePSMCount,
+					totalCount : entry.totalPSMCount,
+					tooltip: missedCleavagePSMCountTooltip
+			};
+			
+			peptidesWithMissedCleavagePerType.push( peptidesWithMissedCleavageSingleType );
+			missedCleavagesPerType.push( missedCleavageSingleType );
+			missedCleavagePSMCountPerType.push( missedCleavagePSMCountSingleType );
 		}
+		
+		var $chartOuterContainer =
+			$( PeptideCleavageEntryTemplate ).appendTo( $missingCleavageReportedPeptidesCountBlock );
+		
+		var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
+		
+		this._addMissedCleavageChart( { 
+			chartTitle : 'Fraction Peptides w/ Missed Cleavages',
+			dataWithOneElementPerType: peptidesWithMissedCleavagePerType, 
+			$chartContainer : $chartContainer } );
+		
+		$chartOuterContainer =
+			$( PeptideCleavageEntryTemplate ).appendTo( $missingCleavageReportedPeptidesCountBlock );
+		
+		$chartContainer = $chartOuterContainer.find(".chart_container_jq");
+		
+		this._addMissedCleavageChart( { 
+			chartTitle : 'Missed Cleavages Per Peptide',
+			dataWithOneElementPerType: missedCleavagesPerType, 
+			$chartContainer : $chartContainer } );
+		
+		$chartOuterContainer =
+			$( PeptideCleavageEntryTemplate ).appendTo( $missingCleavageReportedPeptidesCountBlock );
+		
+		$chartContainer = $chartOuterContainer.find(".chart_container_jq");
+		
+		this._addMissedCleavageChart( { 
+			chartTitle : 'Fraction PSMs w/ Missed Cleavages',
+			dataWithOneElementPerType: missedCleavagePSMCountPerType, 
+			$chartContainer : $chartContainer } );
+	};
+	
+	/**
+	 * Overridden for Specific elements like Chart Title and X and Y Axis labels
+	 */
+	var _MISSED_CLEAVAGE_CHART_GLOBALS = {
+			_CHART_DEFAULT_FONT_SIZE : 12,  //  Default font size - using to set font size for tick marks.
+			_TITLE_FONT_SIZE : 15, // In PX
+			_AXIS_LABEL_FONT_SIZE : 14, // In PX
+			_TICK_MARK_TEXT_FONT_SIZE : 14 // In PX
+	}
+
+	/**
+	 * 
+	 */
+	this._addMissedCleavageChart = function( params ) {
+
+		var dataWithOneElementPerType = params.dataWithOneElementPerType;
+		var chartTitle = params.chartTitle;
+		var $chartContainer = params.$chartContainer;
+
+		//  chart data for Google charts
+		var chartData = [];
+		
+		var barColors = [  ]; // must be an array
+
+		var chartDataHeaderEntry = [ 'Link Type', "Percentage", 
+			{ role: 'style' },  // Style of the bar 
+			{role: "tooltip", 'p': {'html': true} }
+			, {type: 'string', role: 'annotation'}
+		]; 
+		chartData.push( chartDataHeaderEntry );
+
+		var maxYvalue = 0;
+
+		for ( var index = 0; index < dataWithOneElementPerType.length; index++ ) {
+			var dataForOneLinkType = dataWithOneElementPerType[ index ];
+			
+			var linkType = dataForOneLinkType.linkType;
+			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
+			
+			var chartY = dataForOneLinkType.count / dataForOneLinkType.totalCount;
+			
+			if ( chartY === undefined ) {
+				chartY = 0;
+			}
+			
+			var tooltipText = "<div  style='padding: 4px;'>" + dataForOneLinkType.tooltip + "</div>";
+			var entryAnnotationText = chartY.toFixed( 2 );;
+			
+			var chartEntry = [ 
+				linkType,
+				chartY, 
+				//  Style of bar
+				colorAndbarColor.barColor,
+				//  Tool Tip
+				tooltipText
+				,entryAnnotationText
+				 ];
+			chartData.push( chartEntry );
+			if ( chartY > maxYvalue ) {
+				maxYvalue = chartY;
+			}
+			
+			barColors.push( colorAndbarColor.color );
+
+		}
+		
+//		var vAxisTicks = this._get___________TickMarks( { maxValue : maxYvalue } );
+
+		var optionsFullsize = {
+			//  Overridden for Specific elements like Chart Title and X and Y Axis labels
+				fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
+							
+				title: chartTitle, // Title above chart
+			    titleTextStyle: {
+//			        color: <string>,    // any HTML string color ('red', '#cc00cc')
+//			        fontName: <string>, // i.e. 'Times New Roman'
+			        fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
+//			        bold: <boolean>,    // true or false
+//			        italic: <boolean>   // true of false
+			    },
+				//  X axis label below chart
+				hAxis: { title: 'Link Type', titleTextStyle: { color: 'black', fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+				},  
+				//  Y axis label left of chart
+				vAxis: { title: 'Fraction', titleTextStyle: { color: 'black', fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+					,baseline: 0     // always start at zero
+//					,ticks: vAxisTicks
+//					,maxValue : maxChargeCount
+				},
+				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
+				width : 500, 
+				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+//				colors: barColors,  //  Assigned to each bar
+				tooltip: {isHtml: true}
+//				,chartArea : { left : 140, top: 60, 
+//				width: objectThis.RETENTION_TIME_COUNT_CHART_WIDTH - 200 ,  //  was 720 as measured in Chrome
+//				height : objectThis.RETENTION_TIME_COUNT_CHART_HEIGHT - 120 }  //  was 530 as measured in Chrome
+		};        
+		// create the chart
+		var data = google.visualization.arrayToDataTable( chartData );
+		var chartFullsize = new google.visualization.ColumnChart( $chartContainer[0] );
+		chartFullsize.draw(data, optionsFullsize);
+		
+		//  Temp code to find <rect> that are the actual data columns
+		//     Changing them to green to allow show that they are only the data columns and not other <rect> in the <svg>
+		
+//		var $rectanglesInChart_All = $chartContainer.find("rect");
+//		
+//		$rectanglesInChart_All.each( function() {
+//			var $rectangleInChart = $( this );
+//			var rectangleFillColor = $rectangleInChart.attr("fill");
+//			if ( rectangleFillColor !== undefined ) {
+//				if ( rectangleFillColor.toLowerCase() === barColor.toLowerCase() ) {
+//					$rectangleInChart.attr("fill","green");
+//					var z = 0;
+//				}
+//			}
+//		});
+		
+	};
+
+	/**
+	 * 
+	 */
+	this._getChargeCountTickMarks = function( params ) {
+		var maxValue = params.maxValue;
+		if ( maxValue < 5 ) {
+			var tickMarks = [ 0 ];
+			for ( var counter = 1; counter <= maxValue; counter++ ) {
+				tickMarks.push( counter );
+			}
+			return tickMarks;
+		}
+		return undefined; //  Use defaults
+	};
+
+	///////////////////////////////////////////////////////
+	
+	///////    PSM Statistics  ////////////////////
+	
+
+	/**
+	 * Clear the data for the PSM section
+	 */
+	this.clearPSM_Level_Statistics = function() {
+		
+		this.clearChargeCount();
+		this.clear_M_Over_Z_For_PSMs_Histogram();
+
+	};
+	
+	
+	/**
+	 * Load the data for PSM section
+	 */
+	this.load_PSM_Level_StatisticsIfNeeded = function() {
+		this.loadChargeCountIfNeeded();
+		this.load_M_Over_Z_For_PSMs_HistogramIfNeeded();
+	};
+	
+	//////////////////////////////
+	
+	////  PSM  Charge Count
+
+	/**
+	 * Clear data for ChargeCount
+	 */
+	this.clearChargeCount = function() {
+		
+		_chargeCount_Statistics_isLoaded = _IS_LOADED_NO;
+
+		var $PSMChargeStatesCountsLoadingBlock = $("#PSMChargeStatesCountsLoadingBlock");
+		var $PSMChargeStatesCountsBlock = $("#PSMChargeStatesCountsBlock");
+		$PSMChargeStatesCountsLoadingBlock.show();
+		$PSMChargeStatesCountsBlock.hide();
+		$PSMChargeStatesCountsBlock.empty();
+	};
+	
+	/**
+	 * If not loaded, call this.loadChargeCount();
+	 */
+	this.loadChargeCountIfNeeded = function() {
+		if ( _chargeCount_Statistics_isLoaded === _IS_LOADED_NO ) {
+			this.loadChargeCount();
+		}
+	};
+	
+	/**
+	 * Load the data for ChargeCount
+	 */
+	this.loadChargeCount = function() {
+		var objectThis = this;
+		
+		_chargeCount_Statistics_isLoaded = _IS_LOADED_LOADING;
+		
+		var $PSMChargeStatesCountsLoadingBlock = $("#PSMChargeStatesCountsLoadingBlock");
+		var $PSMChargeStatesCountsBlock = $("#PSMChargeStatesCountsBlock");
+		$PSMChargeStatesCountsLoadingBlock.show();
+		$PSMChargeStatesCountsBlock.hide();
+		
+		var project_search_ids = [];
+		var $project_search_id_jq_List = $(".project_search_id_jq");
+		if ( $project_search_id_jq_List.length === 0 ) {
+			throw "input fields with class 'project_search_id_jq' containing project search ids is missing from the page";
+		}
+		$project_search_id_jq_List.each( function( index, element ) {
+			var project_search_id = $( this ).val();
+			//  Convert all attributes to empty string if null or undefined
+			if ( ! project_search_id ) {
+				project_search_id = "";
+			}
+			project_search_ids.push( project_search_id );
+		} );
+
+		var hash_json_field_Contents_JSONString = JSON.stringify( _hash_json_Contents );
+		var ajaxRequestData = {
+				project_search_id : project_search_ids,
+				filterCriteria : hash_json_field_Contents_JSONString
+		};
+		$.ajax({
+			url : contextPathJSVar + "/services/qc/dataPage/chargeCounts",
+			traditional: true,  //  Force traditional serialization of the data sent
+								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+								//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+			data : ajaxRequestData,  // The data sent as params on the URL
+			dataType : "json",
+			success : function( ajaxResponseData ) {
+				try {
+					var responseParams = {
+							ajaxResponseData : ajaxResponseData, 
+							ajaxRequestData : ajaxRequestData
+//							,
+//							topTRelement : topTRelement
+					};
+					objectThis.loadChargeCountResponse( responseParams );
+//					$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			},
+	        failure: function(errMsg) {
+	        	handleAJAXFailure( errMsg );
+	        },
+			error : function(jqXHR, textStatus, errorThrown) {
+				handleAJAXError(jqXHR, textStatus, errorThrown);
+			}
+		});
+	};
+	
+
+	
+	/**
+	 * Load the data for Charge Counts
+	 */
+	this.loadChargeCountResponse = function( params ) {
+		var ajaxResponseData = params.ajaxResponseData;
+		var ajaxRequestData = params.ajaxRequestData;
+		
+		var chargeStateCountsResults = ajaxResponseData.chargeStateCountsResults;
+		var resultsPerLinkTypeList = chargeStateCountsResults.resultsPerLinkTypeList;
+		
+		var $PSMChargeStatesCountsEntryTemplate = $("#PSMChargeStatesCountsEntryTemplate");
+		if ( $PSMChargeStatesCountsEntryTemplate.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PSMChargeStatesCountsEntryTemplate'" );
+		}
+		var PSMChargeStatesCountsEntryTemplate = $PSMChargeStatesCountsEntryTemplate.html();
+
+		var $PSMChargeStatesCountsLoadingBlock = $("#PSMChargeStatesCountsLoadingBlock");
+		if ( $PSMChargeStatesCountsLoadingBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PSMChargeStatesCountsLoadingBlock'" );
+		}
+		var $PSMChargeStatesCountsBlock = $("#PSMChargeStatesCountsBlock");
+		if ( $PSMChargeStatesCountsBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PSMChargeStatesCountsBlock'" );
+		}
+
+		$PSMChargeStatesCountsBlock.empty();
+
+		$PSMChargeStatesCountsLoadingBlock.hide();
+		$PSMChargeStatesCountsBlock.show();
+		
+		for ( var indexForLinkType = 0; indexForLinkType < resultsPerLinkTypeList.length; indexForLinkType++ ) {
+			var entryForLinkType = resultsPerLinkTypeList[ indexForLinkType ];
+			var linkType = entryForLinkType.linkType;
+			var resultsPerChargeValueList = entryForLinkType.resultsPerChargeValueList;
+			
+			if ( resultsPerChargeValueList.length === 0 ) {
+
+			} else {
+				var $chartOuterContainer =
+					$( PSMChargeStatesCountsEntryTemplate ).appendTo( $PSMChargeStatesCountsBlock );
+				
+				var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
+				
+				var linkType = entryForLinkType.linkType;
+				var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
+				
+				this._addChargeChart( { entryForLinkType: entryForLinkType, colorAndbarColor : colorAndbarColor, $chartContainer : $chartContainer } );
+				
+				chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
+				// Add tooltips for download links
+				addToolTips( $chartOuterContainer );
+			}
+		}
+		
+
+		_chargeCount_Statistics_isLoaded = _IS_LOADED_YES;
+		
 		
 	};
 	
+	/**
+	 * Overridden for Specific elements like Chart Title and X and Y Axis labels
+	 */
+	var _CHARGE_CHART_GLOBALS = {
+			_CHART_DEFAULT_FONT_SIZE : 12,  //  Default font size - using to set font size for tick marks.
+			_TITLE_FONT_SIZE : 15, // In PX
+			_AXIS_LABEL_FONT_SIZE : 14, // In PX
+			_TICK_MARK_TEXT_FONT_SIZE : 14 // In PX
+	}
+
+	/**
+	 * 
+	 */
+	this._addChargeChart = function( params ) {
+		var entryForLinkType = params.entryForLinkType;
+		var colorAndbarColor = params.colorAndbarColor;
+		var $chartContainer = params.$chartContainer;
+
+		var linkType = entryForLinkType.linkType;
+		var resultsPerChargeValueList = entryForLinkType.resultsPerChargeValueList;
+
+		//  chart data for Google charts
+		var chartData = [];
+
+		var chartDataHeaderEntry = [ 'AAAAAAAAA', "MMM", {role: "tooltip", 'p': {'html': true} }, {type: 'string', role: 'annotation'} ]; 
+		chartData.push( chartDataHeaderEntry );
+
+		var maxChargeCount = 0;
+
+		for ( var indexForChargeValue = 0; indexForChargeValue < resultsPerChargeValueList.length; indexForChargeValue++ ) {
+			var entryForChargeValue = resultsPerChargeValueList[ indexForChargeValue ];
+			
+			var tooltipText = "<div  style='padding: 4px;'>Charge: +" + entryForChargeValue.chargeValue + 
+				"<br>Count: " + entryForChargeValue.chargeCount + "</div>";
+//			var entryAnnotationText = "+" + entryForChargeValue.chargeValue + ":" + entryForChargeValue.chargeCount;
+			var entryAnnotationText = entryForChargeValue.chargeCount;
+			
+			var chartEntry = [ 
+				"+" + entryForChargeValue.chargeValue, 
+				entryForChargeValue.chargeCount, 
+				//  Tool Tip
+				tooltipText,
+				entryAnnotationText
+				 ];
+			chartData.push( chartEntry );
+			if ( entryForChargeValue.chargeCount > maxChargeCount ) {
+				maxChargeCount = entryForChargeValue.chargeCount;
+			}
+
+		}
+		
+		var vAxisTicks = this._getChargeCountTickMarks( { maxValue : maxChargeCount } );
+		
+		var barColors = [ colorAndbarColor.color ]; // must be an array
+
+		var chartTitle = 'Number PSMs with Charge (' + linkType + ")";
+		var optionsFullsize = {
+			//  Overridden for Specific elements like Chart Title and X and Y Axis labels
+							fontSize: _CHARGE_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
+							
+				title: chartTitle, // Title above chart
+			    titleTextStyle: {
+//			        color: <string>,    // any HTML string color ('red', '#cc00cc')
+//			        fontName: <string>, // i.e. 'Times New Roman'
+			        fontSize: _CHARGE_CHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
+//			        bold: <boolean>,    // true or false
+//			        italic: <boolean>   // true of false
+			    },
+				//  X axis label below chart
+				hAxis: { title: 'Charge', titleTextStyle: { color: 'black', fontSize: _CHARGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+				},  
+				//  Y axis label left of chart
+				vAxis: { title: 'Count', titleTextStyle: { color: 'black', fontSize: _CHARGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+					,baseline: 0     // always start at zero
+					,ticks: vAxisTicks
+					,maxValue : maxChargeCount
+				},
+				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
+				width : 500, 
+				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+				colors: barColors,
+				tooltip: {isHtml: true}
+//				,chartArea : { left : 140, top: 60, 
+//				width: objectThis.RETENTION_TIME_COUNT_CHART_WIDTH - 200 ,  //  was 720 as measured in Chrome
+//				height : objectThis.RETENTION_TIME_COUNT_CHART_HEIGHT - 120 }  //  was 530 as measured in Chrome
+		};        
+		// create the chart
+		var data = google.visualization.arrayToDataTable( chartData );
+		var chartFullsize = new google.visualization.ColumnChart( $chartContainer[0] );
+		chartFullsize.draw(data, optionsFullsize);
+		
+		//  Temp code to find <rect> that are the actual data columns
+		//     Changing them to green to allow show that they are only the data columns and not other <rect> in the <svg>
+		
+//		var $rectanglesInChart_All = $chartContainer.find("rect");
+//		
+//		$rectanglesInChart_All.each( function() {
+//			var $rectangleInChart = $( this );
+//			var rectangleFillColor = $rectangleInChart.attr("fill");
+//			if ( rectangleFillColor !== undefined ) {
+//				if ( rectangleFillColor.toLowerCase() === barColor.toLowerCase() ) {
+//					$rectangleInChart.attr("fill","green");
+//					var z = 0;
+//				}
+//			}
+//		});
+		
+	};
+
+	/**
+	 * 
+	 */
+	this._getChargeCountTickMarks = function( params ) {
+		var maxValue = params.maxValue;
+		if ( maxValue < 5 ) {
+			var tickMarks = [ 0 ];
+			for ( var counter = 1; counter <= maxValue; counter++ ) {
+				tickMarks.push( counter );
+			}
+			return tickMarks;
+		}
+		return undefined; //  Use defaults
+	};
+	
+	//////////////////////////////////////////////////////////////////
+
+	//     M/Z for PSMs Histogram
+	
+
+	/**
+	 * Clear data for  M/Z for PSMs Histogram
+	 */
+	this.clear_M_Over_Z_For_PSMs_Histogram = function() {
+		
+		_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_NO;
+
+		var $NO_PSM_M_Over_Z_CountsBlock = $("#NO_PSM_M_Over_Z_CountsBlock");
+		if ( $NO_PSM_M_Over_Z_CountsBlock.length > 0 ) {
+			//  The element with id 'NO_PSM_M_Over_Z_CountsBlock' exists so there are no scans in the searches
+			_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
+			return;  //  EARLY EXIT
+		}
+		
+		var $PSM_M_Over_Z_CountsLoadingBlock = $("#PSM_M_Over_Z_CountsLoadingBlock");
+		var $PSM_M_Over_Z_CountsBlock = $("#PSM_M_Over_Z_CountsBlock");
+		$PSM_M_Over_Z_CountsLoadingBlock.show();
+		$PSM_M_Over_Z_CountsBlock.hide();
+		$PSM_M_Over_Z_CountsBlock.empty();
+	};
+
+	/**
+	 * If not loaded, call this.load_M_Over_Z_For_PSMs_Histogram()
+	 */
+	this.load_M_Over_Z_For_PSMs_HistogramIfNeeded = function() {
+		if ( _M_Over_Z_For_PSMs_Statistics_isLoaded === _IS_LOADED_NO ) {
+			this.load_M_Over_Z_For_PSMs_Histogram();
+		}
+	};
+	
+	/**
+	 * Load the data for  M/Z for PSMs Histogram
+	 */
+	this.load_M_Over_Z_For_PSMs_Histogram = function() {
+		var objectThis = this;
+
+		_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_LOADING;
+		
+		var $NO_PSM_M_Over_Z_CountsBlock = $("#NO_PSM_M_Over_Z_CountsBlock");
+		if ( $NO_PSM_M_Over_Z_CountsBlock.length > 0 ) {
+			//  The element with id 'NO_PSM_M_Over_Z_CountsBlock' exists so there are no scans in the searches
+			_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
+			return;  //  EARLY EXIT
+		}
+
+		var $PSM_M_Over_Z_CountsLoadingBlock = $("#PSM_M_Over_Z_CountsLoadingBlock");
+		var $PSM_M_Over_Z_CountsBlock = $("#PSM_M_Over_Z_CountsBlock");
+		$PSM_M_Over_Z_CountsLoadingBlock.show();
+		$PSM_M_Over_Z_CountsBlock.hide();
+		
+		var project_search_ids = [];
+		var $project_search_id_jq_List = $(".project_search_id_jq");
+		if ( $project_search_id_jq_List.length === 0 ) {
+			throw "input fields with class 'project_search_id_jq' containing project search ids is missing from the page";
+		}
+		$project_search_id_jq_List.each( function( index, element ) {
+			var project_search_id = $( this ).val();
+			//  Convert all attributes to empty string if null or undefined
+			if ( ! project_search_id ) {
+				project_search_id = "";
+			}
+			project_search_ids.push( project_search_id );
+		} );
+
+		var hash_json_field_Contents_JSONString = JSON.stringify( _hash_json_Contents );
+		var ajaxRequestData = {
+				project_search_id : project_search_ids,
+				filterCriteria : hash_json_field_Contents_JSONString
+		};
+		$.ajax({
+			url : contextPathJSVar + "/services/qc/dataPage/mzForPSMsHistogramCounts",
+			traditional: true,  //  Force traditional serialization of the data sent
+								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+								//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+			data : ajaxRequestData,  // The data sent as params on the URL
+			dataType : "json",
+			success : function( ajaxResponseData ) {
+				try {
+					var responseParams = {
+							ajaxResponseData : ajaxResponseData, 
+							ajaxRequestData : ajaxRequestData
+//							,
+//							topTRelement : topTRelement
+					};
+					objectThis.load_M_Over_Z_For_PSMs_HistogramResponse( responseParams );
+//					$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			},
+	        failure: function(errMsg) {
+	        	handleAJAXFailure( errMsg );
+	        },
+			error : function(jqXHR, textStatus, errorThrown) {
+				handleAJAXError(jqXHR, textStatus, errorThrown);
+			}
+		});
+	};
+
+	/**
+	 * Load the data for Charge Counts
+	 */
+	this.load_M_Over_Z_For_PSMs_HistogramResponse = function( params ) {
+		var ajaxResponseData = params.ajaxResponseData;
+		var ajaxRequestData = params.ajaxRequestData;
+		
+		var preMZ_Histogram_For_PSMPeptideCutoffsResults = ajaxResponseData.preMZ_Histogram_For_PSMPeptideCutoffsResults;
+		var dataForChartPerLinkTypeList = preMZ_Histogram_For_PSMPeptideCutoffsResults.dataForChartPerLinkTypeList;
+		
+		var $PSM_M_Over_Z_CountsEntryTemplate = $("#PSM_M_Over_Z_CountsEntryTemplate");
+		if ( $PSM_M_Over_Z_CountsEntryTemplate.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PSM_M_Over_Z_CountsEntryTemplate'" );
+		}
+		var PSM_M_Over_Z_CountsEntryTemplate = $PSM_M_Over_Z_CountsEntryTemplate.html();
+
+		var $PSM_M_Over_Z_CountsLoadingBlock = $("#PSM_M_Over_Z_CountsLoadingBlock");
+		if ( $PSM_M_Over_Z_CountsLoadingBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PSM_M_Over_Z_CountsLoadingBlock'" );
+		}
+		var $PSM_M_Over_Z_CountsBlock = $("#PSM_M_Over_Z_CountsBlock");
+		if ( $PSM_M_Over_Z_CountsBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PSM_M_Over_Z_CountsBlock'" );
+		}
+
+		$PSM_M_Over_Z_CountsBlock.empty();
+
+		$PSM_M_Over_Z_CountsLoadingBlock.hide();
+		$PSM_M_Over_Z_CountsBlock.show();
+		
+		for ( var indexForLinkType = 0; indexForLinkType < dataForChartPerLinkTypeList.length; indexForLinkType++ ) {
+			var entryForLinkType = dataForChartPerLinkTypeList[ indexForLinkType ];
+			var linkType = entryForLinkType.linkType;
+			var chartBuckets = entryForLinkType.chartBuckets;
+			
+			if ( chartBuckets === null ) {
+				//  No data for this link type
+				continue;  //  EARLY CONTINUE
+			}
+			
+			if ( chartBuckets.length === 0 ) {
+
+			} else {
+				var $chartOuterContainer =
+					$( PSM_M_Over_Z_CountsEntryTemplate ).appendTo( $PSM_M_Over_Z_CountsBlock );
+				
+				var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
+
+				var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
+				
+				this._add_M_Over_Z_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chartContainer } );
+				
+				chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
+				// Add tooltips for download links
+				addToolTips( $chartOuterContainer );
+			}
+		}
+		
+		_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
+	};
+	
+	//  Overridden for Specific elements like Chart Title and X and Y Axis labels
+	var _M_Over_Z_For_PSMs_CHART_GLOBALS = {
+			_CHART_DEFAULT_FONT_SIZE : 12,  //  Default font size - using to set font size for tick marks.
+			_TITLE_FONT_SIZE : 15, // In PX
+			_AXIS_LABEL_FONT_SIZE : 14, // In PX
+			_TICK_MARK_TEXT_FONT_SIZE : 14, // In PX
+	}
+
+	/**
+	 * 
+	 */
+	this._add_M_Over_Z_For_PSMs_Histogram_Chart = function( params ) {
+		var entryForLinkType = params.entryForLinkType;
+		var colorAndbarColor = params.colorAndbarColor;
+		var $chartContainer = params.$chartContainer;
+		
+		var linkType = entryForLinkType.linkType;
+		var chartBuckets = entryForLinkType.chartBuckets;
+
+		//  chart data for Google charts
+		var chartData = [];
+
+		var chartDataHeaderEntry = [ 'preMZ', "Count", { role: 'style' }, {role: "tooltip", 'p': {'html': true} }
+//			, {type: 'string', role: 'annotation'}
+			]; 
+		chartData.push( chartDataHeaderEntry );
+		
+		var maxCount = 0;
+
+		for ( var index = 0; index < chartBuckets.length; index++ ) {
+			var bucket = chartBuckets[ index ];
+			
+			var tooltipText = "<div style='padding: 4px;'>Count: " + bucket.count +
+			"<br>m/z approximately " + bucket.binStart + " to " + bucket.binEnd + "</div>";
+			
+			var entryAnnotationText = bucket.count;
+			
+			var chartEntry = [ 
+				bucket.binCenter,  
+				bucket.count, 
+				//  Style of bar
+				colorAndbarColor.barColor,
+				//  Tool Tip
+				tooltipText
+//				,
+//				entryAnnotationText
+				 ];
+			chartData.push( chartEntry );
+			if ( bucket.count > maxCount ) {
+				maxCount = bucket.count;
+			}
+
+		}
+		
+		var vAxisTicks = this._get_M_Over_Z_For_PSMs_Histogram_ChartTickMarks( { maxValue : maxCount } );
+		
+		var barColors = [ colorAndbarColor.color ]; // must be an array
+
+		//  Chart title and layout also in viewQC_MZ_Data_NoDataAvailable.jsp for empty chart when no M/Z data
+		
+		var chartTitle = 'PSM Count vs/ m/z (' + linkType + ")";
+		var optionsFullsize = {
+			//  Overridden for Specific elements like Chart Title and X and Y Axis labels
+				fontSize: _M_Over_Z_For_PSMs_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
+							
+				title: chartTitle, // Title above chart
+			    titleTextStyle: {
+//			        color: <string>,    // any HTML string color ('red', '#cc00cc')
+//			        fontName: <string>, // i.e. 'Times New Roman'
+			        fontSize: _M_Over_Z_For_PSMs_CHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
+//			        bold: <boolean>,    // true or false
+//			        italic: <boolean>   // true of false
+			    },
+				//  X axis label below chart
+				hAxis: { title: 'M/Z', titleTextStyle: { color: 'black', fontSize: _M_Over_Z_For_PSMs_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+					,gridlines: {  
+		                color: 'none'  //  No vertical grid lines on the horzontal axis
+		            }
+				},  
+				//  Y axis label left of chart
+				vAxis: { title: 'Count', titleTextStyle: { color: 'black', fontSize: _M_Over_Z_For_PSMs_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+//					,baseline: 0     // always start at zero
+					,ticks: vAxisTicks
+					,maxValue : maxCount
+				},
+				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
+				width : 500, 
+				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+				bar: { groupWidth: '100%' },  // set bar width large to eliminate space between bars
+				colors: barColors,
+				tooltip: {isHtml: true}
+//				,chartArea : { left : 140, top: 60, 
+//				width: objectThis.RETENTION_TIME_COUNT_CHART_WIDTH - 200 ,  //  was 720 as measured in Chrome
+//				height : objectThis.RETENTION_TIME_COUNT_CHART_HEIGHT - 120 }  //  was 530 as measured in Chrome
+		};        
+		// create the chart
+		var data = google.visualization.arrayToDataTable( chartData );
+		var chartFullsize = new google.visualization.ColumnChart( $chartContainer[0] );
+		chartFullsize.draw(data, optionsFullsize);
+		
+		//  Temp code to find <rect> that are the actual data columns
+		//     Changing them to green to allow show that they are only the data columns and not other <rect> in the <svg>
+		
+//		var $rectanglesInChart_All = $chartContainer.find("rect");
+//		
+//		$rectanglesInChart_All.each( function() {
+//			var $rectangleInChart = $( this );
+//			var rectangleFillColor = $rectangleInChart.attr("fill");
+//			if ( rectangleFillColor !== undefined ) {
+//				if ( rectangleFillColor.toLowerCase() === _OVERALL_GLOBALS.BAR_COLOR_CROSSLINK.toLowerCase() ) {
+//					$rectangleInChart.attr("fill","green");
+//					var z = 0;
+//				}
+//			}
+//		});
+		
+	};
+
+	/**
+	 * 
+	 */
+	this._get_M_Over_Z_For_PSMs_Histogram_ChartTickMarks = function( params ) {
+		var maxValue = params.maxValue;
+		if ( maxValue < 5 ) {
+			var tickMarks = [ 0 ];
+			for ( var counter = 1; counter <= maxValue; counter++ ) {
+				tickMarks.push( counter );
+			}
+			return tickMarks;
+		}
+		return undefined; //  Use defaults
+	};
+	
+	//////////////////////////////////////////////////////////////////////
+
+	//     Peptide Statistics
+
+	/**
+	 * Clear the data for Peptide 
+	 */
+	this.clear_Peptide_Level_Statistics = function() {
+	
+		this.clearPeptideLengthsHistogram();
+	};
+	
+	/**
+	 * Load the data for Peptide 
+	 */
+	this.load_Peptide_Level_StatisticsIfNeeded = function() {
+	
+		this.loadPeptideLengthsHistogramIfNeeded();
+	};
+
+	//////////////////////////////////////////////////////////////////////
+
+	//     Peptide Lengths Histogram
+
+
+
+	/**
+	 * Clear data for Peptide Lengths Histogram
+	 */
+	this.clearPeptideLengthsHistogram = function() {
+		
+		_peptideLengthsHistogram_isLoaded = _IS_LOADED_NO;
+
+		var $PeptideLengthsCountsLoadingBlock = $("#PeptideLengthsCountsLoadingBlock");
+		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
+		$PeptideLengthsCountsLoadingBlock.show();
+		$PeptideLengthsCountsBlock.hide();
+		$PeptideLengthsCountsBlock.empty();
+	};
+
+	/**
+	 * If not loaded, call this.load_M_Over_Z_For_PSMs_Histogram()
+	 */
+	this.loadPeptideLengthsHistogramIfNeeded = function() {
+		if ( _peptideLengthsHistogram_isLoaded === _IS_LOADED_NO ) {
+			this.loadPeptideLengthsHistogram();
+		}
+	};
+	
+	/**
+	 * Load the data for  Peptide Lengths Histogram
+	 */
+	this.loadPeptideLengthsHistogram = function() {
+		var objectThis = this;
+		
+		_peptideLengthsHistogram_isLoaded = _IS_LOADED_LOADING;
+		
+		var $PeptideLengthsCountsLoadingBlock = $("#PeptideLengthsCountsLoadingBlock");
+		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
+		$PeptideLengthsCountsLoadingBlock.show();
+		$PeptideLengthsCountsBlock.hide();
+		
+		var project_search_ids = [];
+		var $project_search_id_jq_List = $(".project_search_id_jq");
+		if ( $project_search_id_jq_List.length === 0 ) {
+			throw "input fields with class 'project_search_id_jq' containing project search ids is missing from the page";
+		}
+		$project_search_id_jq_List.each( function( index, element ) {
+			var project_search_id = $( this ).val();
+			//  Convert all attributes to empty string if null or undefined
+			if ( ! project_search_id ) {
+				project_search_id = "";
+			}
+			project_search_ids.push( project_search_id );
+		} );
+
+		var hash_json_field_Contents_JSONString = JSON.stringify( _hash_json_Contents );
+		var ajaxRequestData = {
+				project_search_id : project_search_ids,
+				filterCriteria : hash_json_field_Contents_JSONString
+		};
+		$.ajax({
+			url : contextPathJSVar + "/services/qc/dataPage/peptideLengthsHistogram",
+			traditional: true,  //  Force traditional serialization of the data sent
+								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+								//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+			data : ajaxRequestData,  // The data sent as params on the URL
+			dataType : "json",
+			success : function( ajaxResponseData ) {
+				try {
+					var responseParams = {
+							ajaxResponseData : ajaxResponseData, 
+							ajaxRequestData : ajaxRequestData
+//							,
+//							topTRelement : topTRelement
+					};
+					objectThis.loadPeptideLengthsHistogramResponse( responseParams );
+//					$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			},
+	        failure: function(errMsg) {
+	        	handleAJAXFailure( errMsg );
+	        },
+			error : function(jqXHR, textStatus, errorThrown) {
+				handleAJAXError(jqXHR, textStatus, errorThrown);
+			}
+		});
+	};
+	
+	/**
+	 * Process the AJAX response for Peptide Lengths Counts
+	 */
+	this.loadPeptideLengthsHistogramResponse = function( params ) {
+		var ajaxResponseData = params.ajaxResponseData;
+		var ajaxRequestData = params.ajaxRequestData;
+		
+		var peptideLength_Histogram_For_PSMPeptideCutoffsResults = ajaxResponseData.peptideLength_Histogram_For_PSMPeptideCutoffsResults;
+		var dataForChartPerLinkTypeList = peptideLength_Histogram_For_PSMPeptideCutoffsResults.dataForChartPerLinkTypeList;
+		
+		var $PeptideLengthsCountsEntryTemplate = $("#PeptideLengthsCountsEntryTemplate");
+		if ( $PeptideLengthsCountsEntryTemplate.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsEntryTemplate'" );
+		}
+		var PeptideLengthsCountsEntryTemplate = $PeptideLengthsCountsEntryTemplate.html();
+
+		var $PeptideLengthsCountsLoadingBlock = $("#PeptideLengthsCountsLoadingBlock");
+		if ( $PeptideLengthsCountsLoadingBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsLoadingBlock'" );
+		}
+		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
+		if ( $PeptideLengthsCountsBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsBlock'" );
+		}
+
+		$PeptideLengthsCountsBlock.empty();
+
+		$PeptideLengthsCountsLoadingBlock.hide();
+		$PeptideLengthsCountsBlock.show();
+		
+		for ( var indexForLinkType = 0; indexForLinkType < dataForChartPerLinkTypeList.length; indexForLinkType++ ) {
+			var entryForLinkType = dataForChartPerLinkTypeList[ indexForLinkType ];
+			var linkType = entryForLinkType.linkType;
+			var chartBuckets = entryForLinkType.chartBuckets;
+			
+			if ( chartBuckets === null ) {
+				//  No data for this link type
+				continue;  //  EARLY CONTINUE
+			}
+			
+			if ( chartBuckets.length === 0 ) {
+
+			} else {
+				var $chartOuterContainer =
+					$( PeptideLengthsCountsEntryTemplate ).appendTo( $PeptideLengthsCountsBlock );
+				
+				var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
+				
+				var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
+				
+				this._addPeptideLengthsHistogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor : colorAndbarColor, $chartContainer : $chartContainer } );
+				
+				chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
+				// Add tooltips for download links
+				addToolTips( $chartOuterContainer );
+			}
+		}
+		
+		_peptideLengthsHistogram_isLoaded = _IS_LOADED_YES;
+	};
+	
+	/**
+	 * Overridden for Specific elements like Chart Title and X and Y Axis labels
+	 */
+	var PeptideLengthsCHART_GLOBALS = {
+			_CHART_DEFAULT_FONT_SIZE : 12,  //  Default font size - using to set font size for tick marks.
+			_TITLE_FONT_SIZE : 15, // In PX
+			_AXIS_LABEL_FONT_SIZE : 14, // In PX
+			_TICK_MARK_TEXT_FONT_SIZE : 14 // In PX
+	}
+
+	/**
+	 * 
+	 */
+	this._addPeptideLengthsHistogram_Chart = function( params ) {
+		var entryForLinkType = params.entryForLinkType;
+		var colorAndbarColor = params.colorAndbarColor;
+		var $chartContainer = params.$chartContainer;
+		
+		var linkType = entryForLinkType.linkType;
+		var chartBuckets = entryForLinkType.chartBuckets;
+
+		//  chart data for Google charts
+		var chartData = [];
+
+		var chartDataHeaderEntry = [ 'peptideLength', "Count", { role: 'style' }, {role: "tooltip", 'p': {'html': true} }
+//			, {type: 'string', role: 'annotation'}
+			]; 
+		chartData.push( chartDataHeaderEntry );
+		
+		var minpeptideLength = null;
+		var maxpeptideLength = null;
+		
+		var maxCount = 0;
+
+		for ( var index = 0; index < chartBuckets.length; index++ ) {
+			var bucket = chartBuckets[ index ];
+			
+			var tooltipText = "<div style='padding: 4px;'>Count: " + bucket.count +
+			"<br>peptide length: " + bucket.binStart + " to " + bucket.binEnd + "</div>";
+			
+			var entryAnnotationText = bucket.count;
+			
+			var chartEntry = [ 
+				bucket.binCenter,  
+				bucket.count, 
+				//  Style of the bar
+				colorAndbarColor.barColor,
+				//  Tool Tip
+				tooltipText
+//				,
+//				entryAnnotationText
+				 ];
+			chartData.push( chartEntry );
+			if ( bucket.count > maxCount ) {
+				maxCount = bucket.count;
+			}
+		}
+		
+		var vAxisTicks = this._getPeptideLengthsHistogram_ChartTickMarks( { maxValue : maxCount } );
+		
+		var barColors = [ colorAndbarColor.color ]; // must be an array
+
+		var chartTitle = 'Peptide Count vs/ Length (' + linkType + ")";
+		var optionsFullsize = {
+			//  Overridden for Specific elements like Chart Title and X and Y Axis labels
+				fontSize: PeptideLengthsCHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
+							
+				title: chartTitle, // Title above chart
+			    titleTextStyle: {
+//			        color: <string>,    // any HTML string color ('red', '#cc00cc')
+//			        fontName: <string>, // i.e. 'Times New Roman'
+			        fontSize: PeptideLengthsCHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
+//			        bold: <boolean>,    // true or false
+//			        italic: <boolean>   // true of false
+			    },
+				//  X axis label below chart
+				hAxis: { title: 'Peptide Length', titleTextStyle: { color: 'black', fontSize: PeptideLengthsCHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+			    	,minValue : entryForLinkType.peptideLengthMin
+			    	,maxValue : entryForLinkType.peptideLengthMax
+					,gridlines: {  
+		                color: 'none'  //  No vertical grid lines on the horzontal axis
+		            }
+				},  
+				//  Y axis label left of chart
+				vAxis: { title: 'Count', titleTextStyle: { color: 'black', fontSize: PeptideLengthsCHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+//					,baseline: 0     // always start at zero
+					,ticks: vAxisTicks
+					,maxValue : maxCount
+				},
+				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
+				width : 500, 
+				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+				bar: { groupWidth: '100%' },  // set bar width large to eliminate space between bars
+				colors: barColors,
+				tooltip: {isHtml: true}
+//				,chartArea : { left : 140, top: 60, 
+//				width: objectThis.RETENTION_TIME_COUNT_CHART_WIDTH - 200 ,  //  was 720 as measured in Chrome
+//				height : objectThis.RETENTION_TIME_COUNT_CHART_HEIGHT - 120 }  //  was 530 as measured in Chrome
+		};        
+		// create the chart
+		var data = google.visualization.arrayToDataTable( chartData );
+		var chartFullsize = new google.visualization.ColumnChart( $chartContainer[0] );
+		chartFullsize.draw(data, optionsFullsize);
+		
+		//  Temp code to find <rect> that are the actual data columns
+		//     Changing them to green to allow show that they are only the data columns and not other <rect> in the <svg>
+		
+//		var $rectanglesInChart_All = $chartContainer.find("rect");
+//		
+//		$rectanglesInChart_All.each( function() {
+//			var $rectangleInChart = $( this );
+//			var rectangleFillColor = $rectangleInChart.attr("fill");
+//			if ( rectangleFillColor !== undefined ) {
+//				if ( rectangleFillColor.toLowerCase() === _OVERALL_GLOBALS.BAR_COLOR_CROSSLINK.toLowerCase() ) {
+//					$rectangleInChart.attr("fill","green");
+//					var z = 0;
+//				}
+//			}
+//		});
+		
+	};
+
+	/**
+	 * 
+	 */
+	this._getPeptideLengthsHistogram_ChartTickMarks = function( params ) {
+		var maxValue = params.maxValue;
+		if ( maxValue < 5 ) {
+			var tickMarks = [ 0 ];
+			for ( var counter = 1; counter <= maxValue; counter++ ) {
+				tickMarks.push( counter );
+			}
+			return tickMarks;
+		}
+		return undefined; //  Use defaults
+	};
+
 };
+
+
 
 var viewQCPageCode = new ViewQCPageCode();
 

@@ -6,6 +6,19 @@
 
 <%-- viewQC.jsp --%>
 
+<%--   
+
+		!!!!  Currently only works for single search.  
+
+		The page is designed to work with multiple merged searches 
+		but the code and SQL need to be reviewed to determine that the results returned are what the user expects,
+		especially for reported peptide level results. 
+
+ --%>
+
+<%--  In searchDetailsBlock.jsp, suppress display of link "Change searches"  --%>
+<c:set var="doNotDisplayChangeSearchesLink" value="${ true }"/>
+
  <c:set var="pageTitle">View QC - <c:out value="${ headerProject.projectTblData.title }"></c:out></c:set>
 
  <c:set var="pageBodyClass" >project-page view-qc-page</c:set>
@@ -172,7 +185,9 @@
 					
 						<c:set var="UpdateButtonText" value="Update From Database"/>
 						
-						<input type="button" value="${ UpdateButtonText }"  onclick="viewQCPageCode.refreshData()" >
+						<input id="update_from_database_button"
+							type="button" value="${ UpdateButtonText }" > 
+						<%--  onclick="viewQCPageCode.refreshData()" > --%>
 
 						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 					</td>
@@ -184,18 +199,18 @@
 	
 		<hr>
 		
+		<%--  Digestion Statistics --%>
+		
 		<div >
 
-		  <div class="top-level-container collapsable_container_jq" >
+		  <div class="top-level-container qc_top_level_container_jq" >
 			
-			<div  class="collapsable-link-container top-level-collapsable-link-container collapsable_link_container_jq" > 
-				<a href="javascript:" class="top-level-collapsable-link collapsable_collapse_link_jq" 
-						<%-- style="display: none;" --%>
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
-				<a href="javascript:" class="top-level-collapsable-link collapsable_expand_link_jq" 
+			<div  class="collapsable-link-container top-level-collapsable-link-container " > 
+				<a id="digestion_collapse_link" href="javascript:" class="top-level-collapsable-link" 
 						style="display: none;"
+					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+				<a id="digestion_expand_link" href="javascript:" class="top-level-collapsable-link " 
 					><img  src="${ contextPath }/images/icon-expand.png"></a>
-			
 			</div>
 			<div class="top-level-label">
 			  Digestion Statistics
@@ -203,33 +218,172 @@
 
 			<div class="top-level-label-bottom-border" ></div>
 								
-			<div class="project-info-block  collapsable_jq" > <%-- style="display: none;" --%>
+			<div id="digestion_display_block" class="project-info-block" style="display: none;" >
 			
 			  <div >
 			  </div>
 			  <div id="missingCleavageReportedPeptidesCountLoadingBlock">
 			  	Loading
 			  </div>
-			  <div id="missingCleavageReportedPeptidesCountBlock" style="display: none;">
-			  	<table  id="missingCleavageReportedPeptidesCountTable" >
-			  	 <thead>
-			  	  <tr>
-			  	   <th>Link Type</th>
-			  	   <th class=" count-display " >Peptides w/ Missed Cleavage</th>
-			  	   <th class=" count-display " >Missed Cleavages</th>
-			  	   <th class=" count-display " >Total Peptides</th>
-			  	   <th class=" count-display " >Missed Cleavage PSM Count</th>
-			  	  </tr>
-			  	 </thead>
-			  	 <tbody>
-			  	 </tbody>
-			  	</table>
-			  </div>
+ 		      <table  id="missingCleavageReportedPeptidesCountBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+			  </table>
 			</div>
 		  </div>
 
-		</div>
+		</div>  <%--  END:  Digestion Statistics --%>
 
-	</div>
+		<%--  PSM level Statistics --%>
+	
+		<div >
 
+		  <div class="top-level-container qc_top_level_container_jq" >
+			
+			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
+				<a id="psm_level_collapse_link" href="javascript:" class="top-level-collapsable-link" 
+						style="display: none;"
+					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+				<a id="psm_level_expand_link" href="javascript:" class="top-level-collapsable-link" 
+					><img  src="${ contextPath }/images/icon-expand.png"></a>
+			</div>
+			<div class="top-level-label">
+			  PSM Level Statistics
+			</div>
+
+			<div class="top-level-label-bottom-border" ></div>
+								
+			<div id="psm_level_display_block" class="project-info-block" style="display: none;"  >
+			
+			   <h2>Charge State Statistics</h2>
+			   
+			  <div id="PSMChargeStatesCountsLoadingBlock">
+			  	Loading
+			  </div>
+			  
+	 		  <table  id="PSMChargeStatesCountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+			  </table>
+			  
+			  <%--   --%>
+			<c:choose>
+			 <c:when test="${ anySearchesHaveScanData }">
+			  
+			  <h2>M/Z Statistics</h2>
+			  
+			  <div id="PSM_M_Over_Z_CountsLoadingBlock">
+			  	Loading
+			  </div>
+			  
+	 		  <table  id="PSM_M_Over_Z_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+			  </table>			  
+			 
+			 </c:when>
+			 <c:otherwise>
+			 	<%-- 
+			   		No Scans so not showing "M/Z for PSMs Per Link Type"
+			   	--%>
+			   	
+			   	<h2>M/Z Statistics</h2>
+			   	
+			   <script id="NO_PSM_M_Over_Z_CountsBlock" type="text/text">__ContentsNotRead__</script>
+				
+				<%-- No Data Found Charts --%>
+				<%-- --%>  
+				 <table class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+				  <tr>
+				  	<c:set var="noDataLinkType" value="crosslink" />
+				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
+				  	<c:set var="noDataLinkType" value="looplink" />
+				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
+				  	<c:set var="noDataLinkType" value="unlinked" />
+				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
+				   </tr>
+				  </table>			   
+
+			 </c:otherwise>
+			</c:choose>
+			  
+			</div> <%-- close <div class="project-info-block  collapsable_jq" > --%>
+		  </div> <%-- close <div class="top-level-container collapsable_container_jq" > --%>
+
+		</div>   <%-- END: PSM level Statistics --%>
+
+		<%--  Peptide level Statistics --%>
+	
+		<div >
+
+		  <div class="top-level-container qc_top_level_container_jq" >
+			
+			<div  class="collapsable-link-container top-level-collapsable-link-container " > 
+				<a id="peptide_level_collapse_link" href="javascript:" class="top-level-collapsable-link " 
+						style="display: none;"
+					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+				<a id="peptide_level_expand_link" href="javascript:" class="top-level-collapsable-link " 
+					><img  src="${ contextPath }/images/icon-expand.png"></a>
+			
+			</div>
+			<div class="top-level-label">
+			  Peptide Level Statistics
+			</div>
+
+			<div class="top-level-label-bottom-border" ></div>
+								
+			<div id="peptide_level_display_block" class="project-info-block " style="display: none;"  >
+			  <%-- 
+			  <div >
+			  	Peptide lengths Per Link Type
+			  </div>
+			  --%>
+			  <div id="PeptideLengthsCountsLoadingBlock">
+			  	Loading
+			  </div>
+			  
+	 		  <table  id="PeptideLengthsCountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+			  </table>			  
+			  
+			</div> <%-- close <div class="project-info-block  collapsable_jq" > --%>
+		  </div> <%-- close <div class="top-level-container collapsable_container_jq" > --%>
+
+		</div>   <%-- END: Peptide level Statistics --%>
+
+	</div>  <%--  Close   <div class="overall-enclosing-block">  --%>
+	
+<script id="PeptideCleavageEntryTemplate" type="text/text">
+	<td style="padding: 4px;">
+	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
+	  <div class="chart_container_jq chart_container_for_download_jq">
+	  </div>
+	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+	 </div>
+	</td>
+</script>	
+	
+<script id="PSMChargeStatesCountsEntryTemplate" type="text/text">
+	<td style="padding: 4px;">
+	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
+	  <div class="chart_container_jq chart_container_for_download_jq">
+	  </div>
+	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+	 </div>
+	</td>
+</script>
+
+<script id="PSM_M_Over_Z_CountsEntryTemplate" type="text/text">
+	<td style="padding: 4px;">
+	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
+	  <div class="chart_container_jq chart_container_for_download_jq">
+	  </div>
+	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+	 </div>
+	</td>
+</script>
+
+<script id="PeptideLengthsCountsEntryTemplate" type="text/text">
+	<td style="padding: 4px;">
+	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
+	  <div class="chart_container_jq chart_container_for_download_jq">
+	  </div>
+	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+	 </div>
+	</td>
+</script>
+							
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>
