@@ -82,71 +82,84 @@ public class UserCreateAccountService {
 			@FormParam( "password" ) String password,
 			@FormParam( "accessLevel" ) String accessLevelString,
 			@Context HttpServletRequest request )
-	throws Exception {
-		
-		if ( StringUtils.isEmpty( accessLevelString ) ) {
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
-					.build()
-					);
-		}
-		
-		Integer accessLevel = null;
+//	throws Exception //  Remove so only WebApplicationException is thrown
+	{
 		try {
-			accessLevel = Integer.valueOf( accessLevelString );
+			if ( StringUtils.isEmpty( accessLevelString ) ) {
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+
+			Integer accessLevel = null;
+			try {
+				accessLevel = Integer.valueOf( accessLevelString );
+			} catch ( Exception e ) {
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+
+			if ( ! ( AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN == accessLevel
+					|| AuthAccessLevelConstants.ACCESS_LEVEL_DEFAULT_USER_CREATED_VIA_PROJECT_INVITE == accessLevel ) ) {
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+
+			//  Restricted to users with ACCESS_LEVEL_ADMIN or better
+			// Get the session first.  
+			//		HttpSession session = request.getSession();
+			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
+					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			if ( accessAndSetupWebSessionResult.isNoSession() ) {
+				//  No User session 
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+			//		UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			//  Test access at global level
+			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			if ( ! authAccessLevel.isAdminAllowed() ) {
+				//  No Access Allowed 
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+			////////   Auth complete
+			//////////////////////////////////////////
+
+			return createAccountCommonInternal( 
+					null /* inviteCode */, 
+					null /* tosAcceptedKey */, 
+					firstName, lastName, organization, email, username, password, 
+					accessLevel, 
+					null /* recaptchaValue */, 
+					CreateAccountUsingAdminUserAccount.YES, 
+					request );
+			
+		} catch ( WebApplicationException e ) {
+			throw e;
 		} catch ( Exception e ) {
+			String msg = "createAccountUsingAdminUserAccount(...) Exception caught: " + e.toString();
+			log.error( msg, e );
 			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
 					.build()
 					);
 		}
-		
-		if ( ! ( AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN == accessLevel
-				|| AuthAccessLevelConstants.ACCESS_LEVEL_DEFAULT_USER_CREATED_VIA_PROJECT_INVITE == accessLevel ) ) {
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
-					.build()
-					);
-		}
-		
-		//  Restricted to users with ACCESS_LEVEL_ADMIN or better
-		// Get the session first.  
-//		HttpSession session = request.getSession();
-		AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-				GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
-		if ( accessAndSetupWebSessionResult.isNoSession() ) {
-			//  No User session 
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-					.build()
-					);
-		}
-//		UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-		//  Test access at global level
-		AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
-		if ( ! authAccessLevel.isAdminAllowed() ) {
-			//  No Access Allowed 
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
-					.build()
-					);
-		}
-		////////   Auth complete
-		//////////////////////////////////////////
-		
-		return createAccountCommonInternal( 
-				null /* inviteCode */, 
-				null /* tosAcceptedKey */, 
-				firstName, lastName, organization, email, username, password, 
-				accessLevel, 
-				null /* recaptchaValue */, 
-				CreateAccountUsingAdminUserAccount.YES, 
-				request );
 	}
 	
 	///////////////////////////////////////////
@@ -165,35 +178,49 @@ public class UserCreateAccountService {
 			@FormParam( "tos_key" ) String tosAcceptedKey,
 			@FormParam( "recaptchaValue" ) String recaptchaValue,
 			@Context HttpServletRequest request )
-	throws Exception {
+//	throws Exception 
+	{
 
-		String userSignupAllowWithoutInviteConfigValue =
-				ConfigSystemCaching.getInstance()
-				.getConfigValueForConfigKey( ConfigSystemsKeysConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY );
-		if ( ! UserSignupConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY__TRUE.equals( userSignupAllowWithoutInviteConfigValue ) ) {
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
-					.build()
-					);
-		}
-		if ( IsGoogleRecaptchaConfigured.getInstance().isGoogleRecaptchaConfigured() ) {
-			if ( StringUtils.isEmpty( recaptchaValue ) ) {
-				log.warn( "AccountMaintService:  recaptchaValue empty" );
+		try {
+			String userSignupAllowWithoutInviteConfigValue =
+					ConfigSystemCaching.getInstance()
+					.getConfigValueForConfigKey( ConfigSystemsKeysConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY );
+			if ( ! UserSignupConstants.USER_SIGNUP_ALLOW_WITHOUT_INVITE_KEY__TRUE.equals( userSignupAllowWithoutInviteConfigValue ) ) {
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
 						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
 						.build()
 						);
 			}
+			if ( IsGoogleRecaptchaConfigured.getInstance().isGoogleRecaptchaConfigured() ) {
+				if ( StringUtils.isEmpty( recaptchaValue ) ) {
+					log.warn( "AccountMaintService:  recaptchaValue empty" );
+					throw new WebApplicationException(
+							Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+							.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+							.build()
+							);
+				}
+			}
+			return createAccountCommonInternal( 
+					null /* inviteCode */, tosAcceptedKey, 
+					firstName, lastName, organization, email, username, password, 
+					null /* accessLevel */, 
+					recaptchaValue, 
+					CreateAccountUsingAdminUserAccount.NO,
+					request );
+			
+		} catch ( WebApplicationException e ) {
+			throw e;
+		} catch ( Exception e ) {
+			String msg = "createAccountWithoutInviteService(...) Exception caught: " + e.toString();
+			log.error( msg, e );
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
+					.build()
+					);
 		}
-		return createAccountCommonInternal( 
-				null /* inviteCode */, tosAcceptedKey, 
-				firstName, lastName, organization, email, username, password, 
-				null /* accessLevel */, 
-				recaptchaValue, 
-				CreateAccountUsingAdminUserAccount.NO,
-				request );
 	}
 	
 	///////////////////////////////////////////
@@ -214,7 +241,8 @@ public class UserCreateAccountService {
 			@FormParam( "username" ) String username,
 			@FormParam( "password" ) String password,
 			@Context HttpServletRequest request )
-	throws Exception {
+//	throws Exception 
+	{
 
 		if ( StringUtils.isEmpty( inviteCode ) ) {
 			log.warn( "AccountMaintService:  inviteCode empty" );
@@ -260,7 +288,8 @@ public class UserCreateAccountService {
 			String recaptchaValue,  //  Only for without invite code
 			CreateAccountUsingAdminUserAccount createAccountUsingAdminUserAccount,
 			@Context HttpServletRequest request )
-	throws Exception {
+//	throws Exception 
+	{
 
 		CreateAccountResult createAccountResult = new CreateAccountResult();
 		if ( StringUtils.isEmpty( firstName ) ) {
@@ -376,16 +405,30 @@ public class UserCreateAccountService {
 //				return createAccountResult;  //  !!!!!  EARLY EXIT
 //			}
 		}
-		if( StringUtils.isNotEmpty( recaptchaValue ) ) {
-			createAccountResult.setUserTestValidated( true );
-			if ( ! CaptchaGoogleValidateUserResponseToken.getInstance().isCaptchaUserResponseTokenValid( recaptchaValue, request.getRemoteHost() ) ) {
-				String errorMessage = "captcha validation failed";
-				createAccountResult.setStatus(false);
-				createAccountResult.setErrorMessage( errorMessage );
-				return createAccountResult;  //  !!!!!  EARLY EXIT
+
+
+		try {
+			if( StringUtils.isNotEmpty( recaptchaValue ) ) {
+				createAccountResult.setUserTestValidated( true );
+				if ( ! CaptchaGoogleValidateUserResponseToken.getInstance().isCaptchaUserResponseTokenValid( recaptchaValue, request.getRemoteHost() ) ) {
+					String errorMessage = "captcha validation failed";
+					createAccountResult.setStatus(false);
+					createAccountResult.setErrorMessage( errorMessage );
+					return createAccountResult;  //  !!!!!  EARLY EXIT
+				}
 			}
+
+		} catch ( WebApplicationException e ) {
+			throw e;
+		} catch ( Exception e ) {
+			String msg = "createAccountCommonInternal(...) Exception caught: " + e.toString();
+			log.error( msg, e );
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
+					.build()
+					);
 		}
-		
 
 		try {
 

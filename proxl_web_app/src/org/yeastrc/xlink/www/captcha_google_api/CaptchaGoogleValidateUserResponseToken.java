@@ -87,19 +87,23 @@ public class CaptchaGoogleValidateUserResponseToken {
 				responseBytesOffset += bytesRead;
 				responseBytesLength -= bytesRead;
 			}
-			byte[] responseBytesJustData = Arrays.copyOf(responseBytes, totalBytesRead);
-			String responseAsString = new String(responseBytesJustData, JSONStringCharsetConstants.JSON_STRING_CHARSET_UTF_8 );
-			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-//			validationResponse = jacksonJSON_Mapper.readValue( responseInputStream, ValidationResponse.class );
-			validationResponse = jacksonJSON_Mapper.readValue( responseBytesJustData, ValidationResponse.class );
 			if ( httpStatusCode != HttpStatus.SC_OK ) {
 				String msg = "Failed to validate.  Http Response Status code: " + httpStatusCode ;
 				log.error( msg );
-				throw new Exception(msg);
+				throw new ProxlWebappInternalErrorException(msg);
 			}
+			
+			byte[] responseBytesJustData = Arrays.copyOf(responseBytes, totalBytesRead);
+			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
+//			validationResponse = jacksonJSON_Mapper.readValue( responseInputStream, ValidationResponse.class );
+			validationResponse = jacksonJSON_Mapper.readValue( responseBytesJustData, ValidationResponse.class );
 			if ( validationResponse.errorCodes != null && validationResponse.errorCodes.length > 0 ) {
+				//  errorCodes indicates 
 				StringBuilder allErrorCodesSB = new StringBuilder( 1000 );
-				allErrorCodesSB.append( "Error codes returned from Google Captcha: " );
+				allErrorCodesSB.append( "Google Captcha Response: " );
+				allErrorCodesSB.append( "validationResponse.success: " );
+				allErrorCodesSB.append( Boolean.toString( validationResponse.success ) );
+				allErrorCodesSB.append( ", Error codes returned: " );
 				boolean firstErrorCode = true;
 				for (  String errorCode : validationResponse.errorCodes ) {
 					if ( firstErrorCode ) {
@@ -112,10 +116,14 @@ public class CaptchaGoogleValidateUserResponseToken {
 					allErrorCodesSB.append( "\"" );
 				}
 				String allErrorCodes = allErrorCodesSB.toString();
+				String responseAsString = new String(responseBytesJustData, JSONStringCharsetConstants.JSON_STRING_CHARSET_UTF_8 );
 				String msg = "Google Captcha returned error codes (all listed, comma delimited): " + allErrorCodes 
 						+ "    Full response string: " + responseAsString;
-				log.error( msg );
-				throw new ProxlWebappInternalErrorException(msg);
+				log.warn( msg );
+				
+				return false;
+				
+//				throw new ProxlWebappInternalErrorException(msg);
 			}
 		} catch (Exception e) {
 			log.error("Failed to validate.", e );
