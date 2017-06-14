@@ -120,10 +120,13 @@ public class CaptchaGoogleValidateUserResponseToken {
 				String msg = "Google Captcha returned error codes (all listed, comma delimited): " + allErrorCodes 
 						+ "    Full response string: " + responseAsString;
 				log.warn( msg );
+				if ( validationResponse.success ) {
+					String msg2 = "ERROR: validationResponse.success is true but validationResponse.errorCodes has entries: " + allErrorCodes ;
+					log.error( msg2 );
+					throw new ProxlWebappInternalErrorException( msg2 );
+				}
+				return false; // return false since validationResponse.success == false
 				
-				return false;
-				
-//				throw new ProxlWebappInternalErrorException(msg);
 			}
 		} catch (Exception e) {
 			log.error("Failed to validate.", e );
