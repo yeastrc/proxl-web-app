@@ -100,9 +100,11 @@ public class CaptchaGoogleValidateUserResponseToken {
 			if ( validationResponse.errorCodes != null && validationResponse.errorCodes.length > 0 ) {
 				//  errorCodes indicates 
 				StringBuilder allErrorCodesSB = new StringBuilder( 1000 );
-				allErrorCodesSB.append( "Google Captcha Response: " );
+				allErrorCodesSB.append( "Google Captcha Response contains errorCodes: " );
 				allErrorCodesSB.append( "validationResponse.success: " );
 				allErrorCodesSB.append( Boolean.toString( validationResponse.success ) );
+				allErrorCodesSB.append( ", userRemoteIP: " ); 
+				allErrorCodesSB.append( userRemoteIP );
 				allErrorCodesSB.append( ", Error codes returned: " );
 				boolean firstErrorCode = true;
 				for (  String errorCode : validationResponse.errorCodes ) {
