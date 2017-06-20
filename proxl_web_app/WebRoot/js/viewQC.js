@@ -865,7 +865,7 @@ var ViewQCPageCode = function() {
 			};
 
 			var missedCleavagePSMCountTooltip = 
-				entry.missedCleavageCount + 
+				entry.missedCleavagePSMCount + 
 				" Missed Cleavage PSM Count / " + 
 				entry.totalPSMCount + " Total PSMs"; 
 			
