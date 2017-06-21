@@ -25,8 +25,8 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.ChargeStateCountsResults;
 import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.ChargeStateCountsResults.ChargeStateCountsResultsPerChargeValue;
 import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.ChargeStateCountsResults.ChargeStateCountsResultsPerLinkType;
-import org.yeastrc.xlink.www.searcher.PSM_DistinctChargeStates;
-import org.yeastrc.xlink.www.searcher.PSM_DistinctChargeStates.PSM_DistinctChargeStatesResult;
+import org.yeastrc.xlink.www.searcher.PSM_DistinctChargeStatesSearcher;
+import org.yeastrc.xlink.www.searcher.PSM_DistinctChargeStatesSearcher.PSM_DistinctChargeStatesResult;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -151,7 +151,7 @@ public class ChargeStateCounts {
 			}
 			
 			PSM_DistinctChargeStatesResult psm_DistinctChargeStatesResult = 
-					PSM_DistinctChargeStates.getInstance()
+					PSM_DistinctChargeStatesSearcher.getInstance()
 					.getPSM_DistinctChargeStates( searchId, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery );
 			
 			/**

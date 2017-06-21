@@ -24,8 +24,8 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.PreMZ_Histogram_For_PSMPeptideCutoffsResults;
 import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.PreMZ_Histogram_For_PSMPeptideCutoffsResults.PreMZ_Histogram_For_PSMPeptideCutoffsResultsChartBucket;
 import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.PreMZ_Histogram_For_PSMPeptideCutoffsResults.PreMZ_Histogram_For_PSMPeptideCutoffsResultsForLinkType;
-import org.yeastrc.xlink.www.searcher.PreMZ_For_PSMPeptideCutoffs;
-import org.yeastrc.xlink.www.searcher.PreMZ_For_PSMPeptideCutoffs.PreMZ_For_PSMPeptideCutoffsResult;
+import org.yeastrc.xlink.www.searcher.PreMZ_For_PSMPeptideCutoffsSearcher;
+import org.yeastrc.xlink.www.searcher.PreMZ_For_PSMPeptideCutoffsSearcher.PreMZ_For_PSMPeptideCutoffsResult;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -316,7 +316,7 @@ public class PreMZ_Histogram_For_PSMPeptideCutoffs {
 			}
 			
 			PreMZ_For_PSMPeptideCutoffsResult preMZ_For_PSMPeptideCutoffsResult = 
-					PreMZ_For_PSMPeptideCutoffs.getInstance()
+					PreMZ_For_PSMPeptideCutoffsSearcher.getInstance()
 					.getPreMZ_For_PSMPeptideCutoffs( searchId, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery );
 			
 			/**
