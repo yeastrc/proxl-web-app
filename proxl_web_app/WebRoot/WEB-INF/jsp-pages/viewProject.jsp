@@ -1170,7 +1170,13 @@
 							class="  tool_tip_attached_jq "
 							data-tooltip="Refresh this list" >
 					</div>
-					
+
+
+					<div style="margin-top:10px;margin-bottom:15px;">
+						Data must be converted to proxl XML before upload.
+						Please <a href="https://proxl-web-app.readthedocs.io/en/latest/using/upload_data.html" target="_docs">visit our upload help page</a>
+						to find a converter for your data and to learn more.
+					</div>					
 					
 
 				  </c:if>
