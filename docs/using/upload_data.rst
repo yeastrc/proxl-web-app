@@ -7,16 +7,6 @@ into proxl XML then uploaded via the proxl web site.
 
 Convert output to proxl XML
 -------------------------------
-To simplify support for as many software pipelines as possible, we have developed a
-XML specification dubbed proxl XML for describing the cross-linking proteomics results
-from any software pipeline. In addition to the scores, themselves,
-the specification allows the creator of the document to specifiy which programs were used
-(e.g., Kojak or pLink), what types of scores those programs generate (e.g. p-values or XCorrs), and
-how to treat those scores (e.g., smaller is better, default cutoffs, sort order, descriptions).
-Because a description of the scores and how they are treated are
-part of the specification, itself, nearly any conceivable software pipeline can have its results
-represented as proxl XML.
-
 Converters have been developed for several cross-linking proteomics pipelines. Click on the name of the
 software, below, to download and learn more about the respective converter.
 
