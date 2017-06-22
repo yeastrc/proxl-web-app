@@ -300,6 +300,24 @@
 
 			 </c:otherwise>
 			</c:choose>
+			
+			  <h2>Summary Statistics</h2>
+			  
+			  <div id="PSM_Summary_CountsLoadingBlock">
+			  	Loading
+			  </div>
+			  
+	 		  <table  id="PSM_Summary_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="display: none;">
+	 		   <tr>
+				<td style="padding: 4px;">
+				 <div class=" chart-standard-container-div chart_outer_container_jq chart_outer_container_for_download_jq " > 
+				  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
+				  </div>
+				  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+				 </div>
+				</td>
+			   </tr>
+			  </table>			
 			  
 			</div> <%-- close <div class="project-info-block  collapsable_jq" > --%>
 		  </div> <%-- close <div class="top-level-container collapsable_container_jq" > --%>

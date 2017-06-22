@@ -34,7 +34,8 @@ var ViewQCPageCode = function() {
 			 //  Color of bars
 			BAR_COLOR_CROSSLINK : '#A55353', // Crosslink: Proxl shades of red
 			BAR_COLOR_LOOPLINK : '#53a553',  // Looplink: green: #53a553
-			BAR_COLOR_UNLINKED : '#5353a5'   //	Unlinked: blue: #5353a5
+			BAR_COLOR_UNLINKED : '#5353a5',   //	Unlinked: blue: #5353a5
+			BAR_COLOR_ALL_COMBINED: '#A5A5A5'   //  All Combined  Grey  #A5A5A5
 	};
 	
 	_OVERALL_GLOBALS.BAR_STYLE_CROSSLINK = 
@@ -51,6 +52,12 @@ var ViewQCPageCode = function() {
 		"color: " + _OVERALL_GLOBALS.BAR_COLOR_UNLINKED +
 		"; stroke-color: " + _OVERALL_GLOBALS.BAR_COLOR_UNLINKED + 
 		"; stroke-width: 1; fill-color: " + _OVERALL_GLOBALS.BAR_COLOR_UNLINKED + "";
+	
+	_OVERALL_GLOBALS.BAR_STYLE_ALL_COMBINED = 
+		"color: " + _OVERALL_GLOBALS.BAR_COLOR_ALL_COMBINED +
+		"; stroke-color: " + _OVERALL_GLOBALS.BAR_COLOR_ALL_COMBINED + 
+		"; stroke-width: 1; fill-color: " + _OVERALL_GLOBALS.BAR_COLOR_ALL_COMBINED + "";
+	
 
 	var _hash_json_Contents = null;
 
@@ -62,7 +69,9 @@ var ViewQCPageCode = function() {
 	var _link_type_crosslink_LOWER_CASE_constant = null;
 	var _link_type_looplink_LOWER_CASE_constant = null;
 	var _link_type_unlinked_LOWER_CASE_constant = null;
-	
+
+	var _link_type_combined_LOWER_CASE_constant = "combined";
+
 	var _IS_LOADED_YES = "YES";
 	var _IS_LOADED_NO = "NO";
 	var _IS_LOADED_LOADING = "LOADING";
@@ -357,6 +366,9 @@ var ViewQCPageCode = function() {
 			return { color : _OVERALL_GLOBALS.BAR_COLOR_LOOPLINK, barColor : _OVERALL_GLOBALS.BAR_STYLE_LOOPLINK };
 		} else if ( linkType === _link_type_unlinked_LOWER_CASE_constant ) {
 			return { color : _OVERALL_GLOBALS.BAR_COLOR_UNLINKED, barColor : _OVERALL_GLOBALS.BAR_STYLE_UNLINKED };
+
+		} else if ( linkType === _link_type_combined_LOWER_CASE_constant ) {
+			return { color : _OVERALL_GLOBALS.BAR_COLOR_ALL_COMBINED, barColor : _OVERALL_GLOBALS.BAR_STYLE_ALL_COMBINED };
 		} else {
 			throw Error( "getColorAndBarColorFromLinkType(...), unknown link type: " + linkType );
 		}
@@ -1074,10 +1086,10 @@ var ViewQCPageCode = function() {
 	
 	//////////////////////////////
 	
-	////  PSM  Charge Count
+	////  PSM  Charge Count and PSM Summary (Summary created from ChargeCount Data)
 
 	/**
-	 * Clear data for ChargeCount
+	 * Clear data for ChargeCount and Summary (Summary created from ChargeCount Data)
 	 */
 	this.clearChargeCount = function() {
 		
@@ -1088,6 +1100,14 @@ var ViewQCPageCode = function() {
 		$PSMChargeStatesCountsLoadingBlock.show();
 		$PSMChargeStatesCountsBlock.hide();
 		$PSMChargeStatesCountsBlock.empty();
+		
+		//  PSM Summary Summary 
+		var $PSM_Summary_CountsLoadingBlock = $("#PSM_Summary_CountsLoadingBlock");
+		var $PSM_Summary_CountsBlock = $("#PSM_Summary_CountsBlock");
+		var $PSM_Summary_CountsBlock_chart_container_jq = $("#PSM_Summary_CountsBlock .chart_container_jq"); 
+		$PSM_Summary_CountsLoadingBlock.show();
+		$PSM_Summary_CountsBlock.hide();
+		$PSM_Summary_CountsBlock_chart_container_jq.empty();
 	};
 	
 	/**
@@ -1100,7 +1120,7 @@ var ViewQCPageCode = function() {
 	};
 	
 	/**
-	 * Load the data for ChargeCount
+	 * Load the data for ChargeCount  and Summary (Summary created from ChargeCount Data)
 	 */
 	this.loadChargeCount = function() {
 		var objectThis = this;
@@ -1165,7 +1185,7 @@ var ViewQCPageCode = function() {
 
 	
 	/**
-	 * Load the data for Charge Counts
+	 * Load the data for Charge Counts  and Summary (Summary created from ChargeCount Data)
 	 */
 	this.loadChargeCountResponse = function( params ) {
 		var ajaxResponseData = params.ajaxResponseData;
@@ -1210,13 +1230,15 @@ var ViewQCPageCode = function() {
 				var linkType = entryForLinkType.linkType;
 				var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
 				
-				this._addChargeChart( { entryForLinkType: entryForLinkType, colorAndbarColor : colorAndbarColor, $chartContainer : $chartContainer } );
+				this._addSinglePSMChargeChart( { entryForLinkType: entryForLinkType, colorAndbarColor : colorAndbarColor, $chartContainer : $chartContainer } );
 				
 				chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
 				// Add tooltips for download links
 				addToolTips( $chartOuterContainer );
 			}
 		}
+		
+		this._addPSMSummaryChart( { resultsPerLinkTypeList : resultsPerLinkTypeList } );
 		
 
 		_chargeCount_Statistics_isLoaded = _IS_LOADED_YES;
@@ -1232,12 +1254,155 @@ var ViewQCPageCode = function() {
 			_TITLE_FONT_SIZE : 15, // In PX
 			_AXIS_LABEL_FONT_SIZE : 14, // In PX
 			_TICK_MARK_TEXT_FONT_SIZE : 14 // In PX
-	}
+	};
+	
 
 	/**
-	 * 
+	 * Add PSM Summary Chart
 	 */
-	this._addChargeChart = function( params ) {
+	this._addPSMSummaryChart = function( params ) {
+		var resultsPerLinkTypeList = params.resultsPerLinkTypeList;
+		
+		//  PSM Summary Summary 
+		var $PSM_Summary_CountsLoadingBlock = $("#PSM_Summary_CountsLoadingBlock");
+		var $PSM_Summary_CountsBlock = $("#PSM_Summary_CountsBlock");
+		var $chartOuterContainer
+		var $PSM_Summary_CountsBlock_chart_container_jq = $("#PSM_Summary_CountsBlock .chart_container_jq");
+		var $PSM_Summary_CountsBlock_chart_outer_container_jq = $("#PSM_Summary_CountsBlock .chart_outer_container_jq");
+		$PSM_Summary_CountsLoadingBlock.hide();
+		$PSM_Summary_CountsBlock.show();
+		
+		var $chartContainer = $PSM_Summary_CountsBlock_chart_container_jq;
+		var $chartOuterContainer = $PSM_Summary_CountsBlock_chart_outer_container_jq;
+
+		var psmTotalsPerLinkType = [];
+		
+		var combinedCount = 0;
+
+		for ( var indexForLinkType = 0; indexForLinkType < resultsPerLinkTypeList.length; indexForLinkType++ ) {
+			var entryForLinkType = resultsPerLinkTypeList[ indexForLinkType ];
+			var linkType = entryForLinkType.linkType;
+			var resultsPerChargeValueList = entryForLinkType.resultsPerChargeValueList;
+			if ( resultsPerChargeValueList.length !== 0 ) {
+				var linkType = entryForLinkType.linkType;
+				var countPerLinkType = 0;
+				var resultsPerChargeValueList = entryForLinkType.resultsPerChargeValueList;
+				for ( var indexForChargeValue = 0; indexForChargeValue < resultsPerChargeValueList.length; indexForChargeValue++ ) {
+					var entryForChargeValue = resultsPerChargeValueList[ indexForChargeValue ];
+					countPerLinkType += entryForChargeValue.chargeCount;
+				}
+				psmTotalForLinkType = { linkType : linkType, countPerLinkType : countPerLinkType };
+				psmTotalsPerLinkType.push( psmTotalForLinkType )
+				combinedCount += countPerLinkType;
+			}
+		}
+		
+
+		var psmTotalForCombined = { 
+				linkType : _link_type_combined_LOWER_CASE_constant, 
+				countPerLinkType : combinedCount };
+		
+		psmTotalsPerLinkType.push( psmTotalForCombined );
+
+		var chartTitle = "PSM Count";
+
+//		chart data for Google charts
+		var chartData = [];
+
+		var barColors = [  ]; // must be an array
+
+		var chartDataHeaderEntry = [ 'Link Type', "Count", 
+			{ role: 'style' },  // Style of the bar 
+			{role: "tooltip", 'p': {'html': true} }
+			, {type: 'string', role: 'annotation'}
+			]; 
+		chartData.push( chartDataHeaderEntry );
+
+		var maxYvalue = 0;
+
+		for ( var index = 0; index < psmTotalsPerLinkType.length; index++ ) {
+			var psmTotalForLinkType = psmTotalsPerLinkType[ index ];
+
+			var linkType = psmTotalForLinkType.linkType;
+			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
+
+			var chartY = psmTotalForLinkType.countPerLinkType;
+
+			if ( chartY === undefined ) {
+				chartY = 0;
+			}
+
+			var tooltipText = "<div  style='padding: 4px;'>Count: " + psmTotalForLinkType.countPerLinkType + "</div>";
+			var entryAnnotationText = chartY;
+
+			var chartEntry = [ 
+				linkType,
+				chartY, 
+				//  Style of bar
+				colorAndbarColor.barColor,
+				//  Tool Tip
+				tooltipText
+				,entryAnnotationText
+				];
+			chartData.push( chartEntry );
+			if ( chartY > maxYvalue ) {
+				maxYvalue = chartY;
+			}
+
+			barColors.push( colorAndbarColor.color );
+
+		}
+
+//		var vAxisTicks = this._get___________TickMarks( { maxValue : maxYvalue } );
+
+		var optionsFullsize = {
+				//  Overridden for Specific elements like Chart Title and X and Y Axis labels
+				fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
+
+				title: chartTitle, // Title above chart
+				titleTextStyle: {
+//					color: <string>,    // any HTML string color ('red', '#cc00cc')
+//					fontName: <string>, // i.e. 'Times New Roman'
+					fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
+//					bold: <boolean>,    // true or false
+//					italic: <boolean>   // true of false
+				},
+				//  X axis label below chart
+				hAxis: { title: 'Link Type', titleTextStyle: { color: 'black', fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+				},  
+				//  Y axis label left of chart
+				vAxis: { title: 'Count', titleTextStyle: { color: 'black', fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+				,baseline: 0     // always start at zero
+//				,ticks: vAxisTicks
+//				,maxValue : maxChargeCount
+				},
+				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
+				width : 500, 
+				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+//				colors: barColors,  //  Assigned to each bar
+				tooltip: {isHtml: true}
+//				,chartArea : { left : 140, top: 60, 
+//				width: objectThis.RETENTION_TIME_COUNT_CHART_WIDTH - 200 ,  //  was 720 as measured in Chrome
+//				height : objectThis.RETENTION_TIME_COUNT_CHART_HEIGHT - 120 }  //  was 530 as measured in Chrome
+		};        
+//		create the chart
+		var data = google.visualization.arrayToDataTable( chartData );
+		var chartFullsize = new google.visualization.ColumnChart( $chartContainer[0] );
+		chartFullsize.draw(data, optionsFullsize);
+
+
+		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
+		// Add tooltips for download links
+		addToolTips( $chartOuterContainer );
+		
+		
+	};
+	
+
+	/**
+	 * Add single Charge Chart
+	 */
+	this._addSinglePSMChargeChart = function( params ) {
 		var entryForLinkType = params.entryForLinkType;
 		var colorAndbarColor = params.colorAndbarColor;
 		var $chartContainer = params.$chartContainer;
