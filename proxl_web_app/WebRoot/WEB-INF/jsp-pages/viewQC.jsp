@@ -280,7 +280,7 @@
 	 		  <table  id="PSMChargeStatesCountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
 			  </table>
 			  
-			  <%--   --%>
+			  <%-- M/Z Statistics  --%>
 			<c:choose>
 			 <c:when test="${ anySearchesHaveScanData }">
 			  
@@ -318,6 +318,51 @@
 
 			 </c:otherwise>
 			</c:choose>
+			
+
+			  <%--  PPM Error --%>
+			<c:choose>
+			 <c:when test="${ anySearchesHaveScanData }">
+			  
+			  <h2>PPM Error</h2>
+			  
+			  <div id="PSM_PPM_Error_CountsLoadingBlock">
+			  	Loading
+			  </div>
+			  
+	 		  <table  id="PSM_PPM_Error_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+			  </table>			  
+			 
+			 </c:when>
+			 <c:otherwise>
+			 	<%-- 
+			   		No Scans so not showing "M/Z for PSMs Per Link Type"
+			   	--%>
+			   	
+			   	<h2>PPM Error</h2>
+			   	
+			   <script id="NO_PSM_PPM_Error_CountsBlock" type="text/text">__ContentsNotRead__</script>
+				
+				No Scans so not showing "PPM Error for PSMs Per Link Type"
+				
+				<%-- No Data Found Charts --%>
+				<%-- --%>  
+				<%-- 
+				 <table class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+				  <tr>
+				  	<c:set var="noDataLinkType" value="crosslink" />
+				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
+				  	<c:set var="noDataLinkType" value="looplink" />
+				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
+				  	<c:set var="noDataLinkType" value="unlinked" />
+				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
+				   </tr>
+				  </table>
+				--%>			   
+		
+			 </c:otherwise>
+			</c:choose>
+						
 			
 			</div> <%-- close <div class="project-info-block  collapsable_jq" > --%>
 		  </div> <%-- close <div class="top-level-container collapsable_container_jq" > --%>
@@ -385,6 +430,17 @@
 </script>
 
 <script id="PSM_M_Over_Z_CountsEntryTemplate" type="text/text">
+	<td style="padding: 4px;">
+	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
+	  <div class="chart_container_jq chart_container_for_download_jq">
+	  </div>
+	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+	 </div>
+	</td>
+</script>
+
+
+<script id="PSM_PPM_Error_CountsEntryTemplate" type="text/text">
 	<td style="padding: 4px;">
 	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
 	  <div class="chart_container_jq chart_container_for_download_jq">

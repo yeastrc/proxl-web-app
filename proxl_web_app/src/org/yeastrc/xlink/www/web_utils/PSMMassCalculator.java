@@ -1,4 +1,4 @@
-package org.yeastrc.xlink.utils;
+package org.yeastrc.xlink.www.web_utils;
 
 import java.util.List;
 
@@ -8,6 +8,7 @@ import org.yeastrc.proteomics.peptide.atom.AtomUtils;
 import org.yeastrc.proteomics.peptide.peptide.Peptide;
 import org.yeastrc.xlink.dao.StaticModDAO;
 import org.yeastrc.xlink.dto.StaticModDTO;
+import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.www.dto.PeptideDTO;
 import org.yeastrc.xlink.www.dto.PsmDTO;

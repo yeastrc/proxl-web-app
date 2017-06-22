@@ -172,10 +172,10 @@
 								class="tool_tip_attached_jq qc_plot_psm_score_vs_score_link_jq" 
 								>Score vs/ Score</a>]
 <%--								
+--%>								
 							[<a data-tooltip="View QC data" class="tool_tip_attached_jq" 
 								href="${ contextPath }/qc.do?projectSearchId=<bean:write name="search" property="projectSearchId" />"
 									>QC data</a>]
---%>								
 						</td>
 					</tr>
 					<c:if test="${ not ( not authAccessLevel.writeAllowed and empty search.webLinks ) }" >

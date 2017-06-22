@@ -476,7 +476,7 @@ public class PreMZ_For_PSMPeptideCutoffsSearcher {
 			if ( log.isDebugEnabled() ) {
 				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
 			}
-			log.warn( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
+//			log.warn( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
 
 			rs = pstmt.executeQuery();
 			
