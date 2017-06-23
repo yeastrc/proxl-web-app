@@ -20,6 +20,73 @@ import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptideOnSearchIdRepPeptIdSearc
 
 public class PSMMassCalculator {
 
+	
+	private static double getMZ( double mass, int charge ) throws Exception {
+		
+		// add in the mass of the protons (charge == number of proteins)
+		mass += charge * AtomUtils.getAtom( 'p' ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
+
+		// divide by the charge
+		mass /= charge;
+
+		return mass;	
+		
+	}
+	
+	private static double getPPMError( double preMZ, double calcMZ ) {
+		return ( preMZ - calcMZ ) / calcMZ * 1000000;
+	}
+	
+	
+	public static double calculatePPMEstimateForPSM(
+			Double preMZ,
+			PeptideDTO peptide1,
+			PeptideDTO peptide2,
+			List<StaticModDTO> staticMods,
+			List<SrchRepPeptPeptDynamicModDTO> dynamicMods1,
+			List<SrchRepPeptPeptDynamicModDTO> dynamicMods2,
+			Integer charge,
+			Double linkerMass ) throws Exception {
+		
+
+		if( charge == null )
+			throw new Exception( "charge cannot be null." );
+		
+		if( preMZ == null )
+			throw new Exception( "preMZ cannot be null." );
+			
+		if( peptide1 == null )
+			throw new Exception( "peptide1 cannot be null." );
+		
+		
+		double mass = calculateNeutralMassForPSM( peptide1, peptide2, staticMods, dynamicMods1, dynamicMods2, linkerMass );
+		double mz = getMZ( mass, charge );
+		
+		double neutronMass = AtomUtils.getAtom( 'n' ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
+		
+		for( int i = 1; i < 21; i++ ) {
+			double tmass;
+			
+			if( mz > preMZ )
+				tmass = mass - i * neutronMass;
+			else
+				tmass = mass + i * neutronMass;
+
+			double tmz = getMZ( tmass, charge );
+				
+			if( Math.abs( preMZ - tmz ) < Math.abs( preMZ - mz ) ) {
+				mz = tmz;
+			}
+		}
+
+		
+		
+
+		return getPPMError( preMZ, mz );	
+	}
+	
+	
+	
 	public static double calculateMZForPSM( PeptideDTO peptide1,
 			PeptideDTO peptide2,
 			List<StaticModDTO> staticMods,
