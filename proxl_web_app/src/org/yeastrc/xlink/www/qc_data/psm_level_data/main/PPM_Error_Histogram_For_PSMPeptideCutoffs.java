@@ -586,16 +586,32 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 						
 						//  Calculate M/Z from sequence(s), ...
 						
-						double mzCalculated =
-								PSMMassCalculator.calculateMZForPSM( 
-										peptide_1, 
-										peptide_2, 
-										staticModDTOList, 
-										srchRepPeptPeptDynamicModDTOList_1, 
-										srchRepPeptPeptDynamicModDTOList_2, 
-										charge, 
-										linkerMassAsDouble );
-
+						double mzCalculated = 0;
+						
+						try {
+							mzCalculated = 
+									PSMMassCalculator.calculateMZForPSM( 
+											peptide_1, 
+											peptide_2, 
+											staticModDTOList, 
+											srchRepPeptPeptDynamicModDTOList_1, 
+											srchRepPeptPeptDynamicModDTOList_2, 
+											charge, 
+											linkerMassAsDouble );
+						} catch ( Exception e ) {
+							String msg = "PSMMassCalculator.calculateMZForPSM(...) threw exception:"
+									+ "\n linkType: " + linkType
+									+ "\n scanPreMZasDouble: " + scanPreMZasDouble 
+									+ "\n peptide_1: " + peptide_1 
+									+ "\n peptide_2: " + peptide_2
+									+ "\n srchRepPeptPeptDynamicModDTOList_1: " + srchRepPeptPeptDynamicModDTOList_1
+									+ "\n srchRepPeptPeptDynamicModDTOList_2: " + srchRepPeptPeptDynamicModDTOList_2
+									+ "\n charge: " + charge
+									+ "\n linkerMassAsDouble: " + linkerMassAsDouble
+									+ "\n staticModDTOList: " + staticModDTOList;
+							log.error( msg, e );
+							throw e;
+						}
 						//  Only for testing.  Ran and did not throw exception
 //						double mzCalculatedFromPsmDTO =
 //								PSMMassCalculator.calculateMZForPSM( psmDTO );
