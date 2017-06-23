@@ -48,7 +48,6 @@ public class PSMMassCalculator {
 			Integer charge,
 			Double linkerMass ) throws Exception {
 		
-
 		if( charge == null )
 			throw new Exception( "charge cannot be null." );
 		
@@ -60,31 +59,49 @@ public class PSMMassCalculator {
 		
 		
 		double mass = calculateNeutralMassForPSM( peptide1, peptide2, staticMods, dynamicMods1, dynamicMods2, linkerMass );
-		double mz = getMZ( mass, charge );
+		double calcMZ = getMZ( mass, charge );
 		
 		double neutronMass = AtomUtils.getAtom( 'n' ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
 		
-		for( int i = 1; i < 21; i++ ) {
-			double tmass;
-			
-			if( mz > preMZ )
-				tmass = mass - i * neutronMass;
-			else
-				tmass = mass + i * neutronMass;
-
-			double tmz = getMZ( tmass, charge );
-				
-			if( Math.abs( preMZ - tmz ) < Math.abs( preMZ - mz ) ) {
-				mz = tmz;
-			} else {
-				break;
+		if( calcMZ > preMZ ) {
+			for( int i = 1; i < 21; i++ ) {
+				double tmass = mass - i * neutronMass;
+				double tmz = getMZ( tmass, charge );
+					
+				if( Math.abs( preMZ - tmz ) < Math.abs( preMZ - calcMZ ) ) {
+					
+					/*
+					System.out.println( "Found better calcMZ:" );
+					System.out.println( "\tOld: pre: " + preMZ + ", calcMZ: " + calcMZ );
+					System.out.println( "\tNew: pre: " + preMZ + ", calcMZ: " + tmz );
+					*/
+					
+					calcMZ = tmz;
+				} else {					
+					break;
+				}
+			}
+		} else {
+			for( int i = 1; i < 21; i++ ) {
+				double tmass = mass + i * neutronMass;
+				double tmz = getMZ( tmass, charge );
+					
+				if( Math.abs( preMZ - tmz ) < Math.abs( preMZ - calcMZ ) ) {
+					
+					/*
+					System.out.println( "Found better calcMZ:" );
+					System.out.println( "\tOld: pre: " + preMZ + ", calcMZ: " + calcMZ );
+					System.out.println( "\tNew: pre: " + preMZ + ", calcMZ: " + tmz );
+					*/
+					
+					calcMZ = tmz;
+				} else {					
+					break;
+				}
 			}
 		}
 
-		
-		
-
-		return getPPMError( preMZ, mz );	
+		return getPPMError( preMZ, calcMZ );	
 	}
 	
 	

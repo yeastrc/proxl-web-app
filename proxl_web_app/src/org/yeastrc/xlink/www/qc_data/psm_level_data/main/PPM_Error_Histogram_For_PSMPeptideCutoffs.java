@@ -692,6 +692,27 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 											charge, 
 											linkerMassAsDouble);
 
+							/*
+							if( Math.abs( ppmError ) > 400 ) {
+								String msg = "Got ppm error over 400:"
+										+ "\n linkType: " + linkType
+										+ "\n scanPreMZasDouble: " + scanPreMZasDouble
+										+ "\n ppmError: " + ppmError
+										+ "\n search id: " + searchId
+										+ "\n reported peptide id: " + reportedPeptideId
+										+ "\n reported peptide: " + webReportedPeptide.getReportedPeptide().getSequence()
+										+ "\n peptide_1: " + peptide_1 
+										+ "\n peptide_2: " + peptide_2
+										+ "\n srchRepPeptPeptDynamicModDTOList_1: " + srchRepPeptPeptDynamicModDTOList_1
+										+ "\n srchRepPeptPeptDynamicModDTOList_2: " + srchRepPeptPeptDynamicModDTOList_2
+										+ "\n charge: " + charge
+										+ "\n linkerMassAsDouble: " + linkerMassAsDouble
+										+ "\n staticModDTOList: " + staticModDTOList;
+								
+								System.out.println( msg );
+							}
+							*/
+							
 							ppmErrorListForLinkType.add( ppmError );
 						} catch ( Exception e ) {
 							String msg = "PSMMassCalculator.calculatePPMEstimateForPSM(...) threw exception:"
