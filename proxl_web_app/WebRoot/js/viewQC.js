@@ -2014,6 +2014,8 @@ var ViewQCPageCode = function() {
 		
 		var maxCount = 0;
 		
+		var totalCount = 0;
+		
 		var maxPPMError = null;
 		var minPPMError = null;
 
@@ -2039,6 +2041,8 @@ var ViewQCPageCode = function() {
 //				entryAnnotationText
 				 ];
 			chartData.push( chartEntry );
+			
+			totalCount += bucket.count;
 			if ( bucket.count > maxCount ) {
 				maxCount = bucket.count;
 			}
@@ -2055,6 +2059,8 @@ var ViewQCPageCode = function() {
 			}
 
 		}
+		
+//		alert( "link type: " + linkType + ", totalCount: " + totalCount );
 		
 		var vAxisTicks = this._get_PPM_Error_For_PSMs_Histogram_ChartTickMarks( { maxValue : maxCount } );
 		

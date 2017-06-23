@@ -176,6 +176,7 @@
 								href="${ contextPath }/qc.do?projectSearchId=<bean:write name="search" property="projectSearchId" />"
 									>QC data</a>]
 --%>								
+
 						</td>
 					</tr>
 					<c:if test="${ not ( not authAccessLevel.writeAllowed and empty search.webLinks ) }" >
