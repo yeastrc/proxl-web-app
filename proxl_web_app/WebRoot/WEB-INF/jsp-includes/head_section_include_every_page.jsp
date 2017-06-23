@@ -37,6 +37,13 @@
 	<script type="text/javascript" >
 	  var contextPathJSVar = "${contextPath}";
 	  
+	  var _PROXL_DEFAULT_FONT_COLOR = "#545454";
+	  
+	  var _PROXL_COLOR_LINK_TYPE_CROSSLINK = "#A55353";
+	  var _PROXL_COLOR_LINK_TYPE_LOOPLINK = "#53A553";
+	  var _PROXL_COLOR_LINK_TYPE_UNLINKED = "#5353A5";
+	  var _PROXL_COLOR_LINK_TYPE_ALL_COMBINED = "#A5A5A5";
+	  
 	  <%--
 	  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
 	  

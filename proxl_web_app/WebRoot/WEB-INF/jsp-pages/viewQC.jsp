@@ -331,6 +331,57 @@
 			  </div>
 			  
 	 		  <table  id="PSM_PPM_Error_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+	 		   <tr>
+	 		   
+				<td class=" per_link_type_row_jq <%= PeptideViewLinkTypesConstants.CROSSLINK_PSM %>_row_jq " 
+					style="padding: 4px;">
+				  <div class=" qc-data-block chart-standard-container-div" style="position: relative;">
+					 <div class=" loading_block_jq "
+					 	style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
+					 	Loading Crosslink
+					 </div>
+					 <div class="  chart_outer_container_for_download_jq " 
+					 	style="display: none;"> <!-- init to not displayed  -->
+					  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
+					  </div>
+					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+					 </div>
+				  </div>
+				</td>	 	
+					   
+				<td class=" per_link_type_row_jq <%= PeptideViewLinkTypesConstants.LOOPLINK_PSM %>_row_jq " 
+					style="padding: 4px;">
+				  <div class=" qc-data-block chart-standard-container-div" style="position: relative;">
+					 <div class=" loading_block_jq "
+					 	style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
+					 	Loading Looplink
+					 </div>
+					 <div class="  chart_outer_container_for_download_jq " 
+					 	style="display: none;"> <!-- init to not displayed -->
+					  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
+					  </div>
+					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+					 </div>
+				  </div>
+				</td>	 
+						   
+				<td class=" per_link_type_row_jq <%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>_row_jq " 
+					style="padding: 4px;">
+				  <div class=" qc-data-block chart-standard-container-div" style="position: relative;">
+					 <div class=" loading_block_jq "
+					 	style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
+					 	Loading Unlinked
+					 </div>
+					 <div class="  chart_outer_container_for_download_jq " 
+					 	style="display: none;"> <!-- init to not displayed -->
+					  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
+					  </div>
+					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+					 </div>
+				  </div>
+				</td>	 	
+					   
+	 		   </tr>
 			  </table>			  
 			 
 			 </c:when>
@@ -412,7 +463,7 @@
 <script id="PeptideCleavageEntryTemplate" type="text/text">
 	<td style="padding: 4px;">
 	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
-	  <div class="chart_container_jq chart_container_for_download_jq">
+	  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
 	  </div>
 	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
 	 </div>
@@ -422,7 +473,7 @@
 <script id="PSMChargeStatesCountsEntryTemplate" type="text/text">
 	<td style="padding: 4px;">
 	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
-	  <div class="chart_container_jq chart_container_for_download_jq">
+	  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
 	  </div>
 	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
 	 </div>
@@ -432,7 +483,7 @@
 <script id="PSM_M_Over_Z_CountsEntryTemplate" type="text/text">
 	<td style="padding: 4px;">
 	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
-	  <div class="chart_container_jq chart_container_for_download_jq">
+	  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
 	  </div>
 	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
 	 </div>
@@ -443,7 +494,7 @@
 <script id="PSM_PPM_Error_CountsEntryTemplate" type="text/text">
 	<td style="padding: 4px;">
 	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
-	  <div class="chart_container_jq chart_container_for_download_jq">
+	  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
 	  </div>
 	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
 	 </div>
@@ -453,7 +504,7 @@
 <script id="PeptideLengthsCountsEntryTemplate" type="text/text">
 	<td style="padding: 4px;">
 	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
-	  <div class="chart_container_jq chart_container_for_download_jq">
+	  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
 	  </div>
 	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
 	 </div>

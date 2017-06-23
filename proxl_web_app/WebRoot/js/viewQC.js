@@ -29,13 +29,13 @@ $(document).ready(function() {
  * Constructor 
  */
 var ViewQCPageCode = function() {
-	
+
 	var _OVERALL_GLOBALS = { 
-			 //  Color of bars
-			BAR_COLOR_CROSSLINK : '#A55353', // Crosslink: Proxl shades of red
-			BAR_COLOR_LOOPLINK : '#53a553',  // Looplink: green: #53a553
-			BAR_COLOR_UNLINKED : '#5353a5',   //	Unlinked: blue: #5353a5
-			BAR_COLOR_ALL_COMBINED: '#A5A5A5'   //  All Combined  Grey  #A5A5A5
+			 //  Color of bars:  from head_section_include_every_page.jsp
+			BAR_COLOR_CROSSLINK : _PROXL_COLOR_LINK_TYPE_CROSSLINK, // '#A55353', // Crosslink: Proxl shades of red
+			BAR_COLOR_LOOPLINK : _PROXL_COLOR_LINK_TYPE_LOOPLINK, // '#53a553',  // Looplink: green: #53a553
+			BAR_COLOR_UNLINKED : _PROXL_COLOR_LINK_TYPE_UNLINKED, // '#5353a5'   //	Unlinked: blue: #5353a5
+			BAR_COLOR_ALL_COMBINED : _PROXL_COLOR_LINK_TYPE_ALL_COMBINED   //  All Combined  Grey  #A5A5A5
 	};
 	
 	_OVERALL_GLOBALS.BAR_STYLE_CROSSLINK = 
@@ -52,11 +52,13 @@ var ViewQCPageCode = function() {
 		"color: " + _OVERALL_GLOBALS.BAR_COLOR_UNLINKED +
 		"; stroke-color: " + _OVERALL_GLOBALS.BAR_COLOR_UNLINKED + 
 		"; stroke-width: 1; fill-color: " + _OVERALL_GLOBALS.BAR_COLOR_UNLINKED + "";
-	
+
 	_OVERALL_GLOBALS.BAR_STYLE_ALL_COMBINED = 
 		"color: " + _OVERALL_GLOBALS.BAR_COLOR_ALL_COMBINED +
 		"; stroke-color: " + _OVERALL_GLOBALS.BAR_COLOR_ALL_COMBINED + 
 		"; stroke-width: 1; fill-color: " + _OVERALL_GLOBALS.BAR_COLOR_ALL_COMBINED + "";
+
+	var _project_search_ids = null;
 	
 
 	var _hash_json_Contents = null;
@@ -98,6 +100,45 @@ var ViewQCPageCode = function() {
 		this.populateConstantsFromPage();
 		
 		this.updatePageFiltersFromURLHash();
+
+		//  Get Project Search Ids from Page
+
+		_project_search_ids = [];
+		var $project_search_id_jq_List = $(".project_search_id_jq");
+		if ( $project_search_id_jq_List.length === 0 ) {
+			throw "input fields with class 'project_search_id_jq' containing project search ids is missing from the page";
+		}
+		$project_search_id_jq_List.each( function( index, element ) {
+			var project_search_id = $( this ).val();
+			//  Convert all attributes to empty string if null or undefined
+			if ( ! project_search_id ) {
+				project_search_id = "";
+			}
+			_project_search_ids.push( project_search_id );
+		} );
+		
+		
+		this.addClickAndOnChangeHandlers();
+		
+
+		//  Default display on page load
+		
+		//  TODO  TEMP comment out
+		this.showDigestionStatistics();
+		
+		//  TODO  TEMP Add
+		
+//		this.showScanLevelstatistics();
+
+		
+	};
+	
+
+	/**
+	 * Add Click and onChange handlers 
+	 */
+	this.addClickAndOnChangeHandlers = function() {
+		var objectThis = this;
 		
 		var $update_from_database_button = $("#update_from_database_button");
 		$update_from_database_button.click( function( event ) { 
@@ -742,46 +783,10 @@ var ViewQCPageCode = function() {
 		$missingCleavageReportedPeptidesCountLoadingBlock.show();
 		$missingCleavageReportedPeptidesCountBlock.hide();
 		
-		var project_search_ids = [];
-		var $project_search_id_jq_List = $(".project_search_id_jq");
-		if ( $project_search_id_jq_List.length === 0 ) {
-			throw "input fields with class 'project_search_id_jq' containing project search ids is missing from the page";
-		}
-		$project_search_id_jq_List.each( function( index, element ) {
-			var project_search_id = $( this ).val();
-			//  Convert all attributes to empty string if null or undefined
-			if ( ! project_search_id ) {
-				project_search_id = "";
-			}
-			project_search_ids.push( project_search_id );
-		} );
-		//   Currently expect _psmPeptideCriteria = 
-//						searches: Object
-//							128: Object			
-//								peptideCutoffValues: Object
-//									238: Object
-//										id: 238
-//										value: "0.01"
-//								psmCutoffValues: Object
-//									384: Object
-//										id: 384
-//										value: "0.01"
-//								searchId: 128
-//	           The key to:
-//					searches - searchId
-//					peptideCutoffValues and psmCutoffValues - annotation type id
-//				peptideCutoffValues.id and psmCutoffValues.id - annotation type id
-		
 		var hash_json_field_Contents_JSONString = JSON.stringify( _hash_json_Contents );
-//		var annTypeDisplay_JSONString = null;
-//		if ( _psmPeptideAnnTypeIdDisplay ) {
-//			annTypeDisplay_JSONString = JSON.stringify( _psmPeptideAnnTypeIdDisplay );
-//		}
 		var ajaxRequestData = {
-				project_search_id : project_search_ids,
+				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
-//				,
-//				annTypeDisplay : annTypeDisplay_JSONString
 		};
 		$.ajax({
 			url : contextPathJSVar + "/services/qc/dataPage/missing",
@@ -999,6 +1004,7 @@ var ViewQCPageCode = function() {
 							
 				title: chartTitle, // Title above chart
 			    titleTextStyle: {
+			    	color : _PROXL_DEFAULT_FONT_COLOR, //  Set default font color
 //			        color: <string>,    // any HTML string color ('red', '#cc00cc')
 //			        fontName: <string>, // i.e. 'Times New Roman'
 			        fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
@@ -1015,8 +1021,8 @@ var ViewQCPageCode = function() {
 //					,maxValue : maxChargeCount
 				},
 				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
-				width : 500, 
-				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+//				width : 500, 
+//				height : 300,   // width and height of chart, otherwise controlled by enclosing div
 //				colors: barColors,  //  Assigned to each bar
 				tooltip: {isHtml: true}
 //				,chartArea : { left : 140, top: 60, 
@@ -1135,23 +1141,9 @@ var ViewQCPageCode = function() {
 		$PSMChargeStatesCountsLoadingBlock.show();
 		$PSMChargeStatesCountsBlock.hide();
 		
-		var project_search_ids = [];
-		var $project_search_id_jq_List = $(".project_search_id_jq");
-		if ( $project_search_id_jq_List.length === 0 ) {
-			throw "input fields with class 'project_search_id_jq' containing project search ids is missing from the page";
-		}
-		$project_search_id_jq_List.each( function( index, element ) {
-			var project_search_id = $( this ).val();
-			//  Convert all attributes to empty string if null or undefined
-			if ( ! project_search_id ) {
-				project_search_id = "";
-			}
-			project_search_ids.push( project_search_id );
-		} );
-
 		var hash_json_field_Contents_JSONString = JSON.stringify( _hash_json_Contents );
 		var ajaxRequestData = {
-				project_search_id : project_search_ids,
+				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
 		$.ajax({
@@ -1364,6 +1356,7 @@ var ViewQCPageCode = function() {
 
 				title: chartTitle, // Title above chart
 				titleTextStyle: {
+			    	color : _PROXL_DEFAULT_FONT_COLOR, //  Set default font color
 //					color: <string>,    // any HTML string color ('red', '#cc00cc')
 //					fontName: <string>, // i.e. 'Times New Roman'
 					fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
@@ -1380,8 +1373,8 @@ var ViewQCPageCode = function() {
 //				,maxValue : maxChargeCount
 				},
 				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
-				width : 500, 
-				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+//				width : 500, 
+//				height : 300,   // width and height of chart, otherwise controlled by enclosing div
 //				colors: barColors,  //  Assigned to each bar
 				tooltip: {isHtml: true}
 //				,chartArea : { left : 140, top: 60, 
@@ -1454,6 +1447,7 @@ var ViewQCPageCode = function() {
 							
 				title: chartTitle, // Title above chart
 			    titleTextStyle: {
+			    	color : _PROXL_DEFAULT_FONT_COLOR, //  Set default font color
 //			        color: <string>,    // any HTML string color ('red', '#cc00cc')
 //			        fontName: <string>, // i.e. 'Times New Roman'
 			        fontSize: _CHARGE_CHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
@@ -1470,8 +1464,8 @@ var ViewQCPageCode = function() {
 					,maxValue : maxChargeCount
 				},
 				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
-				width : 500, 
-				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+//				width : 500, 
+//				height : 300,   // width and height of chart, otherwise controlled by enclosing div
 				colors: barColors,
 				tooltip: {isHtml: true}
 //				,chartArea : { left : 140, top: 60, 
@@ -1571,23 +1565,9 @@ var ViewQCPageCode = function() {
 		$PSM_M_Over_Z_CountsLoadingBlock.show();
 		$PSM_M_Over_Z_CountsBlock.hide();
 		
-		var project_search_ids = [];
-		var $project_search_id_jq_List = $(".project_search_id_jq");
-		if ( $project_search_id_jq_List.length === 0 ) {
-			throw "input fields with class 'project_search_id_jq' containing project search ids is missing from the page";
-		}
-		$project_search_id_jq_List.each( function( index, element ) {
-			var project_search_id = $( this ).val();
-			//  Convert all attributes to empty string if null or undefined
-			if ( ! project_search_id ) {
-				project_search_id = "";
-			}
-			project_search_ids.push( project_search_id );
-		} );
-
 		var hash_json_field_Contents_JSONString = JSON.stringify( _hash_json_Contents );
 		var ajaxRequestData = {
-				project_search_id : project_search_ids,
+				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
 		$.ajax({
@@ -1749,6 +1729,7 @@ var ViewQCPageCode = function() {
 							
 				title: chartTitle, // Title above chart
 			    titleTextStyle: {
+			    	color : _PROXL_DEFAULT_FONT_COLOR, //  Set default font color
 //			        color: <string>,    // any HTML string color ('red', '#cc00cc')
 //			        fontName: <string>, // i.e. 'Times New Roman'
 			        fontSize: _M_Over_Z_For_PSMs_CHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
@@ -1768,8 +1749,8 @@ var ViewQCPageCode = function() {
 					,maxValue : maxCount
 				},
 				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
-				width : 500, 
-				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+//				width : 500, 
+//				height : 300,   // width and height of chart, otherwise controlled by enclosing div
 				bar: { groupWidth: '100%' },  // set bar width large to eliminate space between bars
 				colors: barColors,
 				tooltip: {isHtml: true}
@@ -1840,7 +1821,8 @@ var ViewQCPageCode = function() {
 		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
 		$PSM_PPM_Error_CountsLoadingBlock.show();
 		$PSM_PPM_Error_CountsBlock.hide();
-		$PSM_PPM_Error_CountsBlock.empty();
+//		$PSM_PPM_Error_CountsBlock.empty();
+		
 	};
 
 	/**
@@ -1853,7 +1835,7 @@ var ViewQCPageCode = function() {
 	};
 	
 	/**
-	 * Load the data for  M/Z for PSMs Histogram
+	 * Load the data for  PPM Error for PSMs Histogram
 	 */
 	this.load_PPM_Error_For_PSMs_Histogram = function() {
 		var objectThis = this;
@@ -1867,28 +1849,67 @@ var ViewQCPageCode = function() {
 			return;  //  EARLY EXIT
 		}
 
+		var selectedLinkTypes = _hash_json_Contents.linkTypes;
+		
+		//  For selected types, display those cells and display "Loading"
+
 		var $PSM_PPM_Error_CountsLoadingBlock = $("#PSM_PPM_Error_CountsLoadingBlock");
 		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
-		$PSM_PPM_Error_CountsLoadingBlock.show();
-		$PSM_PPM_Error_CountsBlock.hide();
+		$PSM_PPM_Error_CountsLoadingBlock.hide();  //  Hide generic loading section
+		$PSM_PPM_Error_CountsBlock.show();
 		
-		var project_search_ids = [];
-		var $project_search_id_jq_List = $(".project_search_id_jq");
-		if ( $project_search_id_jq_List.length === 0 ) {
-			throw "input fields with class 'project_search_id_jq' containing project search ids is missing from the page";
+		//  Get all cells for per link type charts and reset them
+		var $PSM_PPM_Error_CountsBlock__per_link_type_row_jq_All = $PSM_PPM_Error_CountsBlock.find(".per_link_type_row_jq");
+		$PSM_PPM_Error_CountsBlock__per_link_type_row_jq_All.hide();
+		var $PSM_PPM_Error_CountsBlock__chart_loading_block_jq = $PSM_PPM_Error_CountsBlock.find(".loading_block_jq");
+		$PSM_PPM_Error_CountsBlock__chart_loading_block_jq.show();
+		var $PSM_PPM_Error_CountsBlock__chart_outer_container_for_download_jq = $PSM_PPM_Error_CountsBlock.find(".chart_outer_container_for_download_jq")
+		$PSM_PPM_Error_CountsBlock__chart_outer_container_for_download_jq.hide();
+		var $PSM_PPM_Error_CountsBlock__chart_container_for_download_jq = $PSM_PPM_Error_CountsBlock.find(".chart_container_for_download_jq");
+		$PSM_PPM_Error_CountsBlock__chart_container_for_download_jq.empty();
+		
+		// Show cells for selected link types
+		for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
+			var selectedLinkType = selectedLinkTypes[ index ];
+			var cellClassSelector = selectedLinkType + "_row_jq";
+			var $cellForSelectedLinkType = $PSM_PPM_Error_CountsBlock.find("." + cellClassSelector );
+			$cellForSelectedLinkType.show();
 		}
-		$project_search_id_jq_List.each( function( index, element ) {
-			var project_search_id = $( this ).val();
-			//  Convert all attributes to empty string if null or undefined
-			if ( ! project_search_id ) {
-				project_search_id = "";
-			}
-			project_search_ids.push( project_search_id );
-		} );
+		
+		//  Make a copy of _hash_json_Contents
+		var hash_json_Contents_COPY = $.extend( true /*deep*/, _hash_json_Contents, {} );
+		
+		for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
+			
+			//  For each selected link type, 
+			//    set it as selected link type in hash_json_Contents_COPY,
+			//      and create a chart for that
+			
+			var selectedLinkType = selectedLinkTypes[ index ];
+			
+			hash_json_Contents_COPY.linkTypes = [ selectedLinkType ];
+			
+			this.load_PPM_Error_For_PSMs_HistogramForLinkType( {  
+					selectedLinkType : selectedLinkType,
+					hash_json_Contents_COPY : hash_json_Contents_COPY
+			});
+		}
+		
+	};
 
-		var hash_json_field_Contents_JSONString = JSON.stringify( _hash_json_Contents );
+	/**
+	 * Load the data for  PPM Error for PSMs Histogram Specific Link Type
+	 */
+	this.load_PPM_Error_For_PSMs_HistogramForLinkType = function( params ) {
+		var objectThis = this;
+
+		var selectedLinkType = params.selectedLinkType;
+		var hash_json_Contents_COPY = params.hash_json_Contents_COPY;
+		var project_search_ids = params.project_search_ids; 
+			
+		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents_COPY );
 		var ajaxRequestData = {
-				project_search_id : project_search_ids,
+				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
 		$.ajax({
@@ -1902,7 +1923,8 @@ var ViewQCPageCode = function() {
 				try {
 					var responseParams = {
 							ajaxResponseData : ajaxResponseData, 
-							ajaxRequestData : ajaxRequestData
+							ajaxRequestData : ajaxRequestData,
+							selectedLinkType : selectedLinkType
 //							,
 //							topTRelement : topTRelement
 					};
@@ -1926,61 +1948,104 @@ var ViewQCPageCode = function() {
 	 * Load the data for Charge Counts
 	 */
 	this.load_PPM_Error_For_PSMs_HistogramResponse = function( params ) {
+		var objectThis = this;
+
 		var ajaxResponseData = params.ajaxResponseData;
 		var ajaxRequestData = params.ajaxRequestData;
+		var selectedLinkType = params.selectedLinkType;
 		
 		var ppmErrorHistogramResult = ajaxResponseData.ppmErrorHistogramResult;
 		var dataForChartPerLinkTypeList = ppmErrorHistogramResult.dataForChartPerLinkTypeList;
 		
-		var $PSM_PPM_Error_CountsEntryTemplate = $("#PSM_PPM_Error_CountsEntryTemplate");
-		if ( $PSM_PPM_Error_CountsEntryTemplate.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_CountsEntryTemplate'" );
+		if ( dataForChartPerLinkTypeList.length !== 1 ) {
+			throw Error( "dataForChartPerLinkTypeList.length !== 1, is = " + dataForChartPerLinkTypeList.length );
 		}
-		var PSM_PPM_Error_CountsEntryTemplate = $PSM_PPM_Error_CountsEntryTemplate.html();
+		
+//		var $PSM_PPM_Error_CountsEntryTemplate = $("#PSM_PPM_Error_CountsEntryTemplate");
+//		if ( $PSM_PPM_Error_CountsEntryTemplate.length === 0 ) {
+//			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_CountsEntryTemplate'" );
+//		}
+//		var PSM_PPM_Error_CountsEntryTemplate = $PSM_PPM_Error_CountsEntryTemplate.html();
+//
+//		var $PSM_PPM_Error_CountsLoadingBlock = $("#PSM_PPM_Error_CountsLoadingBlock");
+//		if ( $PSM_PPM_Error_CountsLoadingBlock.length === 0 ) {
+//			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_CountsLoadingBlock'" );
+//		}
+//		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
+//		if ( $PSM_PPM_Error_CountsBlock.length === 0 ) {
+//			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_CountsBlock'" );
+//		}
+//
+//		$PSM_PPM_Error_CountsLoadingBlock.hide();
+//		$PSM_PPM_Error_CountsBlock.show();
 
-		var $PSM_PPM_Error_CountsLoadingBlock = $("#PSM_PPM_Error_CountsLoadingBlock");
-		if ( $PSM_PPM_Error_CountsLoadingBlock.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_CountsLoadingBlock'" );
-		}
+		//  Get all cells for per link type charts and reset them
+//		var $PSM_PPM_Error_CountsBlock__per_link_type_row_jq_All = $PSM_PPM_Error_CountsBlock.find(".per_link_type_row_jq");
+//		$PSM_PPM_Error_CountsBlock__per_link_type_row_jq_All.hide();
+//		var $PSM_PPM_Error_CountsBlock__chart_loading_block_jq = $PSM_PPM_Error_CountsBlock.find(".loading_block_jq");
+//		$PSM_PPM_Error_CountsBlock__chart_loading_block_jq.show();
+//		var $PSM_PPM_Error_CountsBlock__chart_outer_container_for_download_jq = $PSM_PPM_Error_CountsBlock.find(".chart_outer_container_for_download_jq")
+//		$PSM_PPM_Error_CountsBlock__chart_outer_container_for_download_jq.hide();
+//		var $PSM_PPM_Error_CountsBlock__chart_container_for_download_jq = $PSM_PPM_Error_CountsBlock.find(".chart_container_for_download_jq");
+//		$PSM_PPM_Error_CountsBlock__chart_container_for_download_jq.empty();
+
 		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
 		if ( $PSM_PPM_Error_CountsBlock.length === 0 ) {
 			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_CountsBlock'" );
 		}
 
-		$PSM_PPM_Error_CountsBlock.empty();
-
-		$PSM_PPM_Error_CountsLoadingBlock.hide();
-		$PSM_PPM_Error_CountsBlock.show();
+		var entryForLinkType = dataForChartPerLinkTypeList[ 0 ];
 		
-		for ( var indexForLinkType = 0; indexForLinkType < dataForChartPerLinkTypeList.length; indexForLinkType++ ) {
-			var entryForLinkType = dataForChartPerLinkTypeList[ indexForLinkType ];
-			var linkType = entryForLinkType.linkType;
-			var chartBuckets = entryForLinkType.chartBuckets;
-			
-			if ( chartBuckets === null ) {
-				//  No data for this link type
-				continue;  //  EARLY CONTINUE
-			}
-			
-			if ( chartBuckets.length === 0 ) {
+		var linkType = entryForLinkType.linkType;
+		var chartBuckets = entryForLinkType.chartBuckets;
 
-			} else {
-				var $chartOuterContainer =
-					$( PSM_PPM_Error_CountsEntryTemplate ).appendTo( $PSM_PPM_Error_CountsBlock );
-				
-				var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
+		if ( chartBuckets === null ) {
+			//  No data for this link type
+			return;  //  EARLY RETURN
+		}
 
-				var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
+		if ( chartBuckets.length === 0 ) {
+
+		} else {
+
+
+			//  Get cell for selectedLinkType
+			var cellClassSelector = selectedLinkType + "_row_jq";
+			var $cellForSelectedLinkType = $PSM_PPM_Error_CountsBlock.find("." + cellClassSelector );
+			
+			var $loading_block_jq = $cellForSelectedLinkType.find(".loading_block_jq");
+			$loading_block_jq.hide();
+			
+			var $chartOuterContainer =
+				$cellForSelectedLinkType.find(".chart_outer_container_for_download_jq");
+			$chartOuterContainer.show();
+			
+			var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
+			
+			var width = $chartContainer.width();
+			var height = $chartContainer.height();
+
+			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
+			
+			setTimeout(function() {
+
+				var width = $chartContainer.width();
+				var height = $chartContainer.height();
 				
-				this._add_PPM_Error_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chartContainer } );
-				
+				objectThis._add_PPM_Error_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chartContainer } );
+
 				chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
 				// Add tooltips for download links
 				addToolTips( $chartOuterContainer );
-			}
+			
+			}, 200);
+
+
 		}
+	
+		//  TODO  FIX THIS
 		
-		_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
+//		_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
 	};
 	
 	//  Overridden for Specific elements like Chart Title and X and Y Axis labels
@@ -2075,6 +2140,7 @@ var ViewQCPageCode = function() {
 							
 				title: chartTitle, // Title above chart
 			    titleTextStyle: {
+			    	color : _PROXL_DEFAULT_FONT_COLOR, //  Set default font color
 //			        color: <string>,    // any HTML string color ('red', '#cc00cc')
 //			        fontName: <string>, // i.e. 'Times New Roman'
 			        fontSize: _PPM_Error_For_PSMs_CHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
@@ -2096,8 +2162,8 @@ var ViewQCPageCode = function() {
 					,maxValue : maxCount
 				},
 				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
-				width : 500, 
-				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+//				width : 500, 
+//				height : 300,   // width and height of chart, otherwise controlled by enclosing div
 				bar: { groupWidth: '100%' },  // set bar width large to eliminate space between bars
 				colors: barColors,
 				tooltip: {isHtml: true}
@@ -2206,23 +2272,9 @@ var ViewQCPageCode = function() {
 		$PeptideLengthsCountsLoadingBlock.show();
 		$PeptideLengthsCountsBlock.hide();
 		
-		var project_search_ids = [];
-		var $project_search_id_jq_List = $(".project_search_id_jq");
-		if ( $project_search_id_jq_List.length === 0 ) {
-			throw "input fields with class 'project_search_id_jq' containing project search ids is missing from the page";
-		}
-		$project_search_id_jq_List.each( function( index, element ) {
-			var project_search_id = $( this ).val();
-			//  Convert all attributes to empty string if null or undefined
-			if ( ! project_search_id ) {
-				project_search_id = "";
-			}
-			project_search_ids.push( project_search_id );
-		} );
-
 		var hash_json_field_Contents_JSONString = JSON.stringify( _hash_json_Contents );
 		var ajaxRequestData = {
-				project_search_id : project_search_ids,
+				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
 		$.ajax({
@@ -2386,6 +2438,7 @@ var ViewQCPageCode = function() {
 							
 				title: chartTitle, // Title above chart
 			    titleTextStyle: {
+			    	color : _PROXL_DEFAULT_FONT_COLOR, //  Set default font color
 //			        color: <string>,    // any HTML string color ('red', '#cc00cc')
 //			        fontName: <string>, // i.e. 'Times New Roman'
 			        fontSize: PeptideLengthsCHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
@@ -2407,8 +2460,8 @@ var ViewQCPageCode = function() {
 					,maxValue : maxCount
 				},
 				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
-				width : 500, 
-				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+//				width : 500, 
+//				height : 300,   // width and height of chart, otherwise controlled by enclosing div
 				bar: { groupWidth: '100%' },  // set bar width large to eliminate space between bars
 				colors: barColors,
 				tooltip: {isHtml: true}

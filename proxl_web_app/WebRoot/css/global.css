@@ -21,9 +21,16 @@ html, body {
 	height:100%;
 }
 
+/*  overall font color also placed in head_section_include_every_page.jsp as JS var _PROXL_DEFAULT_FONT_COLOR = "#545454"; */
 
 BODY { color: #545454; background-color: #FFFFFF; font-size:14px; font-family: arial, sans-serif; font-style:normal; font-weight:500; }
 
+/*  Colors per link type.  Used in Charts and other places.  Also placed in head_section_include_every_page.jsp as JS variables _PROXL_COLOR_LINK_TYPE_... */
+
+.font-color-link-type-crosslink { color: #A55353 }
+.font-color-link-type-looplink  { color: #53A553 }
+.font-color-link-type-unlinked  { color: #5353A5 }
+.font-color-link-type-all-combined { color: #A5A5A5 }
 
 .table-no-border-no-cell-spacing-no-cell-padding { border-width:0px; padding: 0px; border-spacing : 0px; }
 
@@ -2595,3 +2602,9 @@ body.project-page .delete-alignment-overlay-container { left: -200px;  }
 
 
 
+/* ************************************ */
+
+/*    QC Page  */
+
+  /* charts and other data blocks */
+body.view-qc-page .qc-data-block { width: 500px; height: 300px; }
