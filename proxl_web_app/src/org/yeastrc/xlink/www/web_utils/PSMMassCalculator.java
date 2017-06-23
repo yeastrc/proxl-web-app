@@ -76,6 +76,8 @@ public class PSMMassCalculator {
 				
 			if( Math.abs( preMZ - tmz ) < Math.abs( preMZ - mz ) ) {
 				mz = tmz;
+			} else {
+				break;
 			}
 		}
 
