@@ -694,7 +694,7 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 
 							ppmErrorListForLinkType.add( ppmError );
 						} catch ( Exception e ) {
-							String msg = "PSMMassCalculator.calculateMZForPSM(...) threw exception:"
+							String msg = "PSMMassCalculator.calculatePPMEstimateForPSM(...) threw exception:"
 									+ "\n linkType: " + linkType
 									+ "\n scanPreMZasDouble: " + scanPreMZasDouble
 									+ "\n search id: " + searchId
