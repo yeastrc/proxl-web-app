@@ -238,6 +238,11 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 			Collection<Integer> searchIds)
 			throws JsonParseException, JsonMappingException, IOException, Exception, ProxlWebappDataException {
 		
+		//  Reported Peptide Ids Skipped For Error Calculating MZ
+		List<Integer> reportedPeptideIdsSkippedForErrorCalculatingMZ = new ArrayList<>( 100 );
+		
+		//  Internal use for tracking data used to compute PPM Error for entries with highest PPM Error
+//		List<PPM_Error_ComputeEntry> ppm_Error_ComputeEntryList = new ArrayList<>( 10 );
 		
 		//  Jackson JSON Mapper object for JSON deserialization and serialization
 		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
@@ -523,9 +528,52 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 					
 //					staticModDTOList
 					
-					List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList = 
+					List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_Original = 
 							SrchRepPeptPeptDynamicModSearcher.getInstance()
 							.getSrchRepPeptPeptDynamicModForSrchRepPeptPeptideId( srchRepPeptPeptideDTO.getId() );
+					
+					//  Remove duplicate dynamic mods for same position and both compared are monolink flag true
+					//     logging error if mass is different
+					
+					List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList = new ArrayList<>( srchRepPeptPeptDynamicModDTOList_Original.size() );
+
+					for ( SrchRepPeptPeptDynamicModDTO item_OriginalList : srchRepPeptPeptDynamicModDTOList_Original ) {
+						
+						//  Check if already in list 
+						boolean alreadyInList = false;
+						for ( SrchRepPeptPeptDynamicModDTO item_OutputList : srchRepPeptPeptDynamicModDTOList ) {
+							
+							if ( item_OriginalList.getPosition() == item_OutputList.getPosition()
+									&& item_OriginalList.isMonolink() 
+									&& item_OutputList.isMonolink() ) {
+								
+								alreadyInList = true;
+								
+								if ( item_OriginalList.getMass() != item_OutputList.getMass() ) {
+									log.error( "Two SrchRepPeptPeptDynamicModDTO for same searchReportedPeptidepeptideId"
+											+ " found with same position and both are monolink and have different massses."
+											+ "  Entry 1: " + item_OriginalList
+											+ ", Entry 2: " + item_OutputList
+											+ ". searchId: " + searchId + ", reportedPeptideId: " + reportedPeptideId
+											);
+								}
+								break;
+							}
+						}
+						if ( ! alreadyInList ) {
+							srchRepPeptPeptDynamicModDTOList.add( item_OriginalList );
+						}
+					}
+						
+					
+					//  Specific debugging
+					
+//					if ( searchId == 188 && reportedPeptideId == 1408748 ) {
+//						log.warn( "searchId == 188 && reportedPeptideId == 1408748:  srchRepPeptPeptDynamicModDTOList: " 
+//								+ srchRepPeptPeptDynamicModDTOList );
+//					}
+						
+						
 
 					if ( peptide_1 == null ) {
 						peptide_1 = peptide;
@@ -558,6 +606,52 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 				}
 				
 
+				
+				//  To confirm that peptide sequences do not contain invalid amino acid characters
+				
+				//  Calculate M/Z from sequence(s), ... 
+				
+				
+				try {
+//					double mzCalculated = 
+							PSMMassCalculator.calculateMZForPSM( 
+									peptide_1, 
+									peptide_2, 
+									staticModDTOList, 
+									srchRepPeptPeptDynamicModDTOList_1, 
+									srchRepPeptPeptDynamicModDTOList_2, 
+									1, // artificial charge, 
+									null  // artificial linkerMassAsDouble
+									);
+				} catch ( Exception e ) {
+					
+					reportedPeptideIdsSkippedForErrorCalculatingMZ.add( reportedPeptideId );
+					
+//					String msg = "'Precalc' of mass at reported peptide level failed, SKIPPING processing scans for this Reported Peptide.  "
+//							+ "PSMMassCalculator.calculateMZForPSM(...) threw exception."
+//							+ "\n linkType: " + linkType
+//							+ "\n search id: " + searchId
+//							+ "\n reported peptide id: " + reportedPeptideId
+//							+ "\n reported peptide: " + webReportedPeptide.getReportedPeptide().getSequence()
+//							+ "\n peptide_1: " + peptide_1 
+//							+ "\n peptide_2: " + peptide_2
+//							+ "\n srchRepPeptPeptDynamicModDTOList_1: " + srchRepPeptPeptDynamicModDTOList_1
+//							+ "\n srchRepPeptPeptDynamicModDTOList_2: " + srchRepPeptPeptDynamicModDTOList_2
+//							+ "\n charge: Fake charge of '1' passed in"
+//							+ "\n linkerMassAsDouble: Fake charge of null passed in"
+//							+ "\n staticModDTOList: " + staticModDTOList
+//							+ "\n Exception message from PSMMassCalculator.calculateMZForPSM(...): " + e.toString()
+//							+ "\n Exception class from PSMMassCalculator.calculateMZForPSM(...): " + e.getClass().getCanonicalName();
+//					log.warn( msg );
+					
+					//  SKIP to next Reported Peptide
+					
+					continue;  // EARLY CONTINUE
+				}
+
+				
+				
+
 				// process PSMs for this Reported Peptide
 
 				List<PsmWebDisplayWebServiceResult> psmWebDisplayList = 
@@ -583,25 +677,29 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 					if ( charge != null && scanPreMZ != null ) {
 
 						//  Compute PPM Error
-						
-						//  Calculate M/Z from sequence(s), ...
-						
-						double mzCalculated = 0;
+
+						double ppmError = 0;
 						
 						try {
-							mzCalculated = 
-									PSMMassCalculator.calculateMZForPSM( 
+							ppmError = 
+									PSMMassCalculator.calculatePPMEstimateForPSM(
+											scanPreMZasDouble, 
 											peptide_1, 
 											peptide_2, 
 											staticModDTOList, 
 											srchRepPeptPeptDynamicModDTOList_1, 
 											srchRepPeptPeptDynamicModDTOList_2, 
 											charge, 
-											linkerMassAsDouble );
+											linkerMassAsDouble);
+
+							ppmErrorListForLinkType.add( ppmError );
 						} catch ( Exception e ) {
 							String msg = "PSMMassCalculator.calculateMZForPSM(...) threw exception:"
 									+ "\n linkType: " + linkType
-									+ "\n scanPreMZasDouble: " + scanPreMZasDouble 
+									+ "\n scanPreMZasDouble: " + scanPreMZasDouble
+									+ "\n search id: " + searchId
+									+ "\n reported peptide id: " + reportedPeptideId
+									+ "\n reported peptide: " + webReportedPeptide.getReportedPeptide().getSequence()
 									+ "\n peptide_1: " + peptide_1 
 									+ "\n peptide_2: " + peptide_2
 									+ "\n srchRepPeptPeptDynamicModDTOList_1: " + srchRepPeptPeptDynamicModDTOList_1
@@ -612,26 +710,24 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 							log.error( msg, e );
 							throw e;
 						}
-						//  Only for testing.  Ran and did not throw exception
-//						double mzCalculatedFromPsmDTO =
-//								PSMMassCalculator.calculateMZForPSM( psmDTO );
+						
+						
+//						//  Calculate M/Z from sequence(s), ...
 //						
-//						if ( mzCalculated != mzCalculatedFromPsmDTO ) {
-//							String msg = "mzCalculated != mzCalculatedFromPsmDTO.  "
-//									+ "mzCalculated: " + mzCalculated
-//									+ ", mzCalculatedFromPsmDTO: " + mzCalculatedFromPsmDTO;
-//							log.error( msg );
-//							throw new ProxlWebappInternalErrorException(msg);
-//						}
-						
-						//  Compare preMZ to computed mass, applying charge, linkerMass(if not null)
-						
-						double ppmError = ( scanPreMZasDouble - mzCalculated ) / mzCalculated * 1000000;
-						
-//						if ( ppmError > 600 && linkType.equals( XLinkUtils.UNLINKED_TYPE_STRING ) ) {
-//							
-//							log.error( "ppmError > 600. ppmError: " + ppmError
-//									+ "\n mzCalculated: " + mzCalculated
+//						double mzCalculated = 0;
+//						
+//						try {
+//							mzCalculated = 
+//									PSMMassCalculator.calculateMZForPSM( 
+//											peptide_1, 
+//											peptide_2, 
+//											staticModDTOList, 
+//											srchRepPeptPeptDynamicModDTOList_1, 
+//											srchRepPeptPeptDynamicModDTOList_2, 
+//											charge, 
+//											linkerMassAsDouble );
+//						} catch ( Exception e ) {
+//							String msg = "PSMMassCalculator.calculateMZForPSM(...) threw exception:"
 //									+ "\n linkType: " + linkType
 //									+ "\n scanPreMZasDouble: " + scanPreMZasDouble 
 //									+ "\n peptide_1: " + peptide_1 
@@ -640,14 +736,76 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 //									+ "\n srchRepPeptPeptDynamicModDTOList_2: " + srchRepPeptPeptDynamicModDTOList_2
 //									+ "\n charge: " + charge
 //									+ "\n linkerMassAsDouble: " + linkerMassAsDouble
-//									+ "\n staticModDTOList: " + staticModDTOList
-//									
-//									);
-//							throw new Exception( "FORCE EXCEPTION");
+//									+ "\n staticModDTOList: " + staticModDTOList;
+//							log.error( msg, e );
+//							throw e;
 //						}
+//
+//						
+//						//  Compare preMZ to computed mass, applying charge, linkerMass(if not null)
+//						
+//						double ppmError = ( scanPreMZasDouble - mzCalculated ) / mzCalculated * 1000000;
+//						
+//						ppmErrorListForLinkType.add( ppmError );
 						
 						
-						ppmErrorListForLinkType.add( ppmError );
+//						//  ONLY FOR DEBUGGING
+//						
+//						//  Tracking entries with largest PPM Error for Unlinked
+//						
+//						if ( linkType.equals( XLinkUtils.UNLINKED_TYPE_STRING ) ) {
+////						if ( linkType.equals( XLinkUtils.CROSS_TYPE_STRING ) ) {
+//
+//							PPM_Error_ComputeEntry ppm_Error_ComputeEntry = new PPM_Error_ComputeEntry();
+//
+//							ppm_Error_ComputeEntry.ppmError = ppmError;
+//							ppm_Error_ComputeEntry.linkType = linkType;
+//							
+//							ppm_Error_ComputeEntry.scanPreM = scanPreMZasDouble;
+////							ppm_Error_ComputeEntry.computedMZ = mzCalculated;
+//							
+//							ppm_Error_ComputeEntry.searchId = searchId;
+//							ppm_Error_ComputeEntry.reportedPeptideId = reportedPeptideId;
+//							
+//							ppm_Error_ComputeEntry.reportedPeptideString = webReportedPeptide.getReportedPeptide().getSequence();
+//							
+//							ppm_Error_ComputeEntry.peptide1 = peptide_1;
+//							ppm_Error_ComputeEntry.peptide2 = peptide_2;
+//							ppm_Error_ComputeEntry.staticMods = staticModDTOList;
+//							ppm_Error_ComputeEntry.dynamicMods1 = srchRepPeptPeptDynamicModDTOList_1;
+//							ppm_Error_ComputeEntry.dynamicMods2 = srchRepPeptPeptDynamicModDTOList_2;
+//							ppm_Error_ComputeEntry.charge = charge;
+//							ppm_Error_ComputeEntry.linkerMass = linkerMassAsDouble;
+//
+//							ppm_Error_ComputeEntryList.add( ppm_Error_ComputeEntry );
+//
+//							//  Sort in descending ABS( ppmError ) order
+//							Collections.sort( ppm_Error_ComputeEntryList, new Comparator<PPM_Error_ComputeEntry>() {
+//
+//								@Override
+//								public int compare(PPM_Error_ComputeEntry o1, PPM_Error_ComputeEntry o2) {
+//									double o1_ppmError = o1.ppmError;
+//									double o2_ppmError = o2.ppmError;
+//									double difference = Math.abs( o1_ppmError ) - Math.abs( o2_ppmError );
+//									//  Sort in descending ppmError order
+//									if ( difference > 0 ) {
+//										return -1;
+//									}
+//									if ( difference < 0 ) {
+//										return 1;
+//									}
+//									return 0;
+//								}
+//							});
+//
+//							int MAX_ENTRIES = 10;
+//
+//							if ( ppm_Error_ComputeEntryList.size() > MAX_ENTRIES ) {
+//								for ( int index = MAX_ENTRIES; index < ppm_Error_ComputeEntryList.size(); index++ ) {
+//									ppm_Error_ComputeEntryList.remove( index );
+//								}
+//							}
+//						} // END  //  Tracking entries with largest PPM Error for Unlinked
 						
 					}
 
@@ -656,50 +814,76 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 				
 			}
 		}
+		
+		
+	//  ONLY FOR DEBUGGING
+		
+		//  Output List  ppm_Error_ComputeEntryList
+		
+//		System.out.println( "!!!!!!!!!!!!!!!!!!!!" );
+//		System.out.println( "ppm_Error_ComputeEntryList Values:" );
+//		
+//		for ( PPM_Error_ComputeEntry entry : ppm_Error_ComputeEntryList ) {
+//		
+//			System.out.println( "!!!!!!!" );
+//			System.out.println( entry.toString() );
+//		}
+		
+		if ( ! reportedPeptideIdsSkippedForErrorCalculatingMZ.isEmpty() ) {
+			
+			log.warn( "Number of Reported Peptides Skipped For Error Calculating MZ: " + reportedPeptideIdsSkippedForErrorCalculatingMZ.size()
+					+ ", List of Reported Peptide Ids: " + reportedPeptideIdsSkippedForErrorCalculatingMZ );
+		}
+		
+		
 		return ppmErrorListForLinkType_ByLinkType;
 	}
 	
+//  ONLY FOR DEBUGGING
 	
+//	private static class PPM_Error_ComputeEntry {
+//		
+//		double scanPreM;
+//		
+////		double computedMZ;  // not set
+//		
+//		double ppmError;
+//		
+//		String linkType;
+//		
+//		int searchId;
+//		int reportedPeptideId;
+//		
+//		String reportedPeptideString;
+//		
+//		PeptideDTO peptide1;
+//		PeptideDTO peptide2;
+//		List<StaticModDTO> staticMods;
+//		List<SrchRepPeptPeptDynamicModDTO> dynamicMods1;
+//		List<SrchRepPeptPeptDynamicModDTO> dynamicMods2;
+//		Integer charge;
+//		Double linkerMass;
+//		
+//		
+//		@Override
+//		public String toString() {
+//			return "PPM_Error_ComputeEntry [\n scanPreM=" + scanPreM 
+////					+ ", computedMZ=" + computedMZ 
+//					+ ", ppmError=" + ppmError
+//					+ "\n, linkType=" + linkType + ", searchId=" + searchId 
+//					+ "\n, reportedPeptideId=" + reportedPeptideId
+//					+ ", reportedPeptideString=" + reportedPeptideString 
+//					+ "\n, peptide1=" + peptide1 
+//					+ "\n, peptide2="
+//					+ peptide2
+//					+ "\n, staticMods=" + staticMods 
+//					+ "\n, dynamicMods1=" + dynamicMods1 
+//					+ "\n, dynamicMods2="
+//					+ dynamicMods2 
+//					+ "\n, charge=" + charge + ", linkerMass=" + linkerMass + "]";
+//		}
+//		
+//	}
 	
-//	/**
-//	 * @param peptideSequence
-//	 * @param staticModDTOList
-//	 * @return positions ("1" based), null if staticModDTOList is null or empty
-//	 * @throws Exception
-//	 */
-//	private Set<Integer> getStaticModsPeptidePositionsForPeptideSequenceStaticModList( String peptideSequence, List<StaticModDTO> staticModDTOList ) throws Exception {
-//		if ( staticModDTOList == null || staticModDTOList.isEmpty() ) {
-//			return null;  //  EARLY EXIT 
-//		}
-//		Set<Integer> results = new HashSet<>();
-//		int staticModIndex = -2; // arbitrary initial value
-//		for ( StaticModDTO staticModDTO : staticModDTOList ) {
-//			int startSearchIndex = 0;
-//			while ( ( staticModIndex = peptideSequence.indexOf( staticModDTO.getResidue(), startSearchIndex ) ) != -1 ) {
-//				int staticModPosition = staticModIndex + 1; // add "1" to index to get position which is "1" based
-//				results.add( staticModPosition );
-//				startSearchIndex = staticModIndex + 1; // move startSearchIndex to after found staticModIndex
-//			}
-//		}
-//		return results;
-//	}
-//	
-//	/**
-//	 * @param srchRepPeptPeptideId
-//	 * @return positions ("1" based)
-//	 * @throws Exception
-//	 */
-//	private Set<Integer> getDynamicModsPeptidePositionsForSrchRepPeptPeptide( int srchRepPeptPeptideId ) throws Exception {
-//		Set<Integer> results = new HashSet<>();
-//		List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList = 
-//				SrchRepPeptPeptDynamicModSearcher.getInstance()
-//				.getSrchRepPeptPeptDynamicModForSrchRepPeptPeptideId( srchRepPeptPeptideId );
-//		
-//		for ( SrchRepPeptPeptDynamicModDTO dynamicModRecord : srchRepPeptPeptDynamicModDTOList ) {
-//				results.add( dynamicModRecord.getPosition() );
-//		}
-//		
-//		return results;
-//	}
 
 }
