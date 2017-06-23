@@ -60,18 +60,32 @@ public class ConvertAndDownloadSVGAction extends Action {
 	}
 	
 	public ActionForward execute( ActionMapping mapping,
-			  ActionForm form,
+			  ActionForm actionForm,
 			  HttpServletRequest request,
 			  HttpServletResponse response ) throws Exception {
+
+		String referrerURLString = null;
+		String thisURLString = null;
+		URL referrerURL = null;
+		URL thisURL = null;
+		
+		ConvertAndDownloadSVGForm form = null;
+
+		try {
+			form = (ConvertAndDownloadSVGForm) actionForm;
+		} catch ( Exception e ) {
+			String msg = "Failed to cast actionForm to ConvertAndDownloadSVGForm";
+			log.error( msg, e );
+			throw e;
+		}
+		
 		try {
 			// ensure referrer was on the same server as this Action to prevent abuse
-			String referrerURLString = request.getHeader("referer");
+			referrerURLString = request.getHeader("referer");
 			if( StringUtils.isEmpty( referrerURLString ) ) {
 				log.error( "referrer host is empty string or null.  Exiting and not returning anything to browser" );
 				return null;
 			}
-			URL referrerURL = null;
-			URL thisURL = null;
 			try {
 				referrerURL = new URL( referrerURLString );
 			} catch (Exception e ) {
@@ -79,7 +93,8 @@ public class ConvertAndDownloadSVGAction extends Action {
 						+ "  referrerURLString: " + referrerURLString, e );
 				return null;
 			}
-			String thisURLString = request.getRequestURL().toString();
+			
+			thisURLString = request.getRequestURL().toString();
 			try {
 				thisURL = new URL( thisURLString );
 			} catch (Exception e ) {
@@ -94,29 +109,28 @@ public class ConvertAndDownloadSVGAction extends Action {
 				return null;
 			}
 			
-			ConvertAndDownloadSVGForm downloadForm = (ConvertAndDownloadSVGForm)form;
-			if ( StringUtils.isEmpty( downloadForm.getSvgString() ) ) {
-				String msg = "downloadForm.getSvgString() is empty.";
+			if ( StringUtils.isEmpty( form.getSvgString() ) ) {
+				String msg = "form.getSvgString() is empty.";
 				log.error( msg );
 				throw new ProxlWebappDataException(msg);
 			}
-			if ( StringUtils.isEmpty( downloadForm.getFileType() ) ) {
-				String msg = "downloadForm.getFileType() is empty.";
+			if ( StringUtils.isEmpty( form.getFileType() ) ) {
+				String msg = "form.getFileType() is empty.";
 				log.error( msg );
 				throw new ProxlWebappDataException(msg);
 			}
 			
-//			String svgString = downloadForm.getSvgString();
+//			String svgString = form.getSvgString();
 //			int svgStringLength = svgString.length();
 //			String svgStringLast100Chars = svgString.substring( svgString.length() - 100 );
 
-			byte[] fileBytes = this.getBytes( downloadForm.getSvgString(), downloadForm.getFileType() );
-			String fileName = this.getFilename( downloadForm.getFileType() );
+			byte[] fileBytes = this.getBytes( form.getSvgString(), form.getFileType() );
+			String fileName = this.getFilename( form.getFileType() );
 
-			String contentTypeString = mimeTypes.get( downloadForm.getFileType() ); 
+			String contentTypeString = mimeTypes.get( form.getFileType() ); 
 			
 			if ( contentTypeString == null ) {
-				log.error( "downloadForm.getFileType() not == any supported mime types, is: '" + downloadForm.getFileType() 
+				log.error( "form.getFileType() not == any supported mime types, is: '" + form.getFileType() 
 						+ "'.  Exiting and not returning anything to browser" );
 				return null;
 			}
@@ -149,10 +163,12 @@ public class ConvertAndDownloadSVGAction extends Action {
 			return null;
 			
 		} catch ( Exception e ) {
+
 			String msg = "Exception:  RemoteAddr: " + request.getRemoteAddr()  
-					+ ", Exception caught: " + e.toString();
-			
-			msg += "\nInput SVG:" + ((ConvertAndDownloadSVGForm)form).getSvgString();
+					+ ", Exception caught: " + e.toString()
+					+ "\nreferrerURL: " + referrerURLString
+					+ "\nthisURLString: " + thisURLString
+					+ "\nInput SVG:" + form.getSvgString();
 			
 			log.error( msg, e );
 			throw e;
