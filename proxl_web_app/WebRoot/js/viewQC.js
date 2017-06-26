@@ -693,6 +693,7 @@ var ViewQCPageCode = function() {
 			if ( cutoffs_SearchesEntryForDefProcessing === undefined || cutoffs_SearchesEntryForDefProcessing === null ) {
 				// Not in cutoff values so copy from default
 				var cutoffDefaultValues_ForSearch = cutoffDefaultsFromPage_Searches[ cutoffDefaultsFromPageSrchId ];
+				// 											(  true for deep, target object, source object, <source object 2>, ... )
 				var cloneOfDefaultValuesForSearch = jQuery.extend( true /* [deep ] */, {}, cutoffDefaultValues_ForSearch );
 				cutoffs_Searches[ cutoffDefaultsFromPageSrchId ] = cloneOfDefaultValuesForSearch;
 			}
@@ -1886,8 +1887,8 @@ var ViewQCPageCode = function() {
 			$cellForSelectedLinkType.show();
 		}
 		
-		//  Make a copy of _hash_json_Contents
-		var hash_json_Contents_COPY = $.extend( true /*deep*/, _hash_json_Contents, {} );
+		//  Make a copy of _hash_json_Contents    (  true for deep, target object, source object, <source object 2>, ... )
+		var hash_json_Contents_COPY = $.extend( true /*deep*/,  {}, _hash_json_Contents );
 		
 		for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
 			
