@@ -480,6 +480,34 @@
 	</td>
 </script>
 
+<script id="PSMChargeStatesCountsNoDataTemplate_crosslink" type="text/text">
+	<td style="padding: 4px;">
+	  <div class=" chart-standard-container-div qc-data-block " >
+		<div style="text-align: center; font-size: 16px; font-weight: bold;"> <!-- padding-top: 20%;  -->
+		 	No data for Crosslink for filter values
+		</div>
+	  </div>
+	</td>
+</script>
+<script id="PSMChargeStatesCountsNoDataTemplate_looplink" type="text/text">
+	<td style="padding: 4px;">
+	  <div class=" chart-standard-container-div qc-data-block " >
+		<div style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
+		 	No data for Looplink for filter values
+		</div>
+	  </div>
+	</td>
+</script>
+<script id="PSMChargeStatesCountsNoDataTemplate_unlinked" type="text/text">
+	<td style="padding: 4px;">
+	  <div class=" chart-standard-container-div qc-data-block " >
+		<div style="text-align: center; font-size: 16px; font-weight: bold;"> <!-- padding-top: 20%;  -->
+		 	No data for Unlnked for filter values
+		</div>
+	  </div>
+	</td>
+</script>
+
 <script id="PSM_M_Over_Z_CountsEntryTemplate" type="text/text">
 	<td style="padding: 4px;">
 	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 

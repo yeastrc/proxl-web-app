@@ -1214,8 +1214,18 @@ var ViewQCPageCode = function() {
 			var linkType = entryForLinkType.linkType;
 			var resultsPerChargeValueList = entryForLinkType.resultsPerChargeValueList;
 			
-			if ( resultsPerChargeValueList.length === 0 ) {
+			if ( resultsPerChargeValueList === null || resultsPerChargeValueList === undefined ||
+					resultsPerChargeValueList.length === 0 ) {
 
+				var noDataTemplate_ForLinkTypeSelector = "PSMChargeStatesCountsNoDataTemplate_" + linkType;
+				var $PSMChargeStatesCountsNoDataTemplate_linkType = $("#" + noDataTemplate_ForLinkTypeSelector );
+				if ( $PSMChargeStatesCountsNoDataTemplate_linkType.length === 0 ) {
+					throw Error( "unable to find HTML element with id '" + noDataTemplate_ForLinkTypeSelector + "'" );
+				}
+				var noDataFoundEntry = $PSMChargeStatesCountsNoDataTemplate_linkType.html();
+				var $noDataFoundContainer =
+					$( noDataFoundEntry ).appendTo( $PSMChargeStatesCountsBlock );
+				
 			} else {
 				var $chartOuterContainer =
 					$( PSMChargeStatesCountsEntryTemplate ).appendTo( $PSMChargeStatesCountsBlock );
@@ -1278,7 +1288,7 @@ var ViewQCPageCode = function() {
 			var entryForLinkType = resultsPerLinkTypeList[ indexForLinkType ];
 			var linkType = entryForLinkType.linkType;
 			var resultsPerChargeValueList = entryForLinkType.resultsPerChargeValueList;
-			if ( resultsPerChargeValueList.length !== 0 ) {
+			if ( resultsPerChargeValueList !== undefined && resultsPerChargeValueList !== null && resultsPerChargeValueList.length !== 0 ) {
 				var linkType = entryForLinkType.linkType;
 				var countPerLinkType = 0;
 				var resultsPerChargeValueList = entryForLinkType.resultsPerChargeValueList;
@@ -1913,6 +1923,7 @@ var ViewQCPageCode = function() {
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
 		$.ajax({
+//			cache : false,
 			url : contextPathJSVar + "/services/qc/dataPage/ppmError",
 			traditional: true,  //  Force traditional serialization of the data sent
 								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
@@ -1961,34 +1972,6 @@ var ViewQCPageCode = function() {
 			throw Error( "dataForChartPerLinkTypeList.length !== 1, is = " + dataForChartPerLinkTypeList.length );
 		}
 		
-//		var $PSM_PPM_Error_CountsEntryTemplate = $("#PSM_PPM_Error_CountsEntryTemplate");
-//		if ( $PSM_PPM_Error_CountsEntryTemplate.length === 0 ) {
-//			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_CountsEntryTemplate'" );
-//		}
-//		var PSM_PPM_Error_CountsEntryTemplate = $PSM_PPM_Error_CountsEntryTemplate.html();
-//
-//		var $PSM_PPM_Error_CountsLoadingBlock = $("#PSM_PPM_Error_CountsLoadingBlock");
-//		if ( $PSM_PPM_Error_CountsLoadingBlock.length === 0 ) {
-//			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_CountsLoadingBlock'" );
-//		}
-//		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
-//		if ( $PSM_PPM_Error_CountsBlock.length === 0 ) {
-//			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_CountsBlock'" );
-//		}
-//
-//		$PSM_PPM_Error_CountsLoadingBlock.hide();
-//		$PSM_PPM_Error_CountsBlock.show();
-
-		//  Get all cells for per link type charts and reset them
-//		var $PSM_PPM_Error_CountsBlock__per_link_type_row_jq_All = $PSM_PPM_Error_CountsBlock.find(".per_link_type_row_jq");
-//		$PSM_PPM_Error_CountsBlock__per_link_type_row_jq_All.hide();
-//		var $PSM_PPM_Error_CountsBlock__chart_loading_block_jq = $PSM_PPM_Error_CountsBlock.find(".loading_block_jq");
-//		$PSM_PPM_Error_CountsBlock__chart_loading_block_jq.show();
-//		var $PSM_PPM_Error_CountsBlock__chart_outer_container_for_download_jq = $PSM_PPM_Error_CountsBlock.find(".chart_outer_container_for_download_jq")
-//		$PSM_PPM_Error_CountsBlock__chart_outer_container_for_download_jq.hide();
-//		var $PSM_PPM_Error_CountsBlock__chart_container_for_download_jq = $PSM_PPM_Error_CountsBlock.find(".chart_container_for_download_jq");
-//		$PSM_PPM_Error_CountsBlock__chart_container_for_download_jq.empty();
-
 		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
 		if ( $PSM_PPM_Error_CountsBlock.length === 0 ) {
 			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_CountsBlock'" );
@@ -2008,7 +1991,6 @@ var ViewQCPageCode = function() {
 
 		} else {
 
-
 			//  Get cell for selectedLinkType
 			var cellClassSelector = selectedLinkType + "_row_jq";
 			var $cellForSelectedLinkType = $PSM_PPM_Error_CountsBlock.find("." + cellClassSelector );
@@ -2021,25 +2003,14 @@ var ViewQCPageCode = function() {
 			$chartOuterContainer.show();
 			
 			var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
-			
-			var width = $chartContainer.width();
-			var height = $chartContainer.height();
 
 			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
 			
-			setTimeout(function() {
+			this._add_PPM_Error_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chartContainer } );
 
-				var width = $chartContainer.width();
-				var height = $chartContainer.height();
-				
-				objectThis._add_PPM_Error_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chartContainer } );
-
-				chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
-				// Add tooltips for download links
-				addToolTips( $chartOuterContainer );
-			
-			}, 200);
-
+			chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
+			// Add tooltips for download links
+			addToolTips( $chartOuterContainer );
 
 		}
 	
@@ -2127,6 +2098,8 @@ var ViewQCPageCode = function() {
 		
 //		alert( "link type: " + linkType + ", totalCount: " + totalCount );
 		
+//		var hAxisTicks = ;
+		
 		var vAxisTicks = this._get_PPM_Error_For_PSMs_Histogram_ChartTickMarks( { maxValue : maxCount } );
 		
 		var barColors = [ colorAndbarColor.color ]; // must be an array
@@ -2152,6 +2125,10 @@ var ViewQCPageCode = function() {
 					,gridlines: {  
 		                color: 'none'  //  No vertical grid lines on the horzontal axis
 		            }
+//					,baselineColor: 'none' // Hide 'Zero' line
+//					,baselineColor: '#CDCDCD' // Make 'Zero' line really light
+//					,ticks: hAxisTicks
+//					,ticks: [-100,0,100]
 					,maxValue : maxPPMError
 					,minValue : minPPMError
 				},  

@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.StaticModDAO;
 import org.yeastrc.xlink.dto.StaticModDTO;
@@ -51,6 +52,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 
 	private static final Logger log = Logger.getLogger(PPM_Error_Histogram_For_PSMPeptideCutoffs.class);
+	
+	
+	private static final int REMOVE_OUTLIERS_FIRST_QUARTER_PERCENTILE = 25;
+	private static final int REMOVE_OUTLIERS_THIRD_QUARTER_PERCENTILE = 75;
+	
+	//  number of IQRs to add
+	private static final double OUTLIER_FACTOR = 1.5;
 	
 	/**
 	 * private constructor
@@ -96,10 +104,59 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 			ppmErrorListForUnlinked.addAll( ppmErrorListForDimer );
 		}
 		
+		//  Build a new map, removing outliers from each list
+		ppmErrorListForLinkType_ByLinkType = removeOutliers( ppmErrorListForLinkType_ByLinkType );
+		
+		
 		PPM_Error_Histogram_For_PSMPeptideCutoffs_Result result = 
 				getPPM_Error_Histogram_For_PSMPeptideCutoffs_Result( ppmErrorListForLinkType_ByLinkType );
 		
 		return result;
+	}
+	
+	/**
+	 * @param ppmErrorListForLinkType_ByLinkType
+	 * @return
+	 */
+	private Map<String, List<Double>> removeOutliers( Map<String, List<Double>> ppmErrorListForLinkType_ByLinkType ) {
+		
+		//  output map
+		Map<String, List<Double>> ppmErrorListForLinkType_ByLinkType_Result = new HashMap<>();
+		
+		// Process for each link type
+		
+		for ( Map.Entry<String, List<Double>> entry : ppmErrorListForLinkType_ByLinkType.entrySet() ) {
+			String linkType = entry.getKey();
+			List<Double> ppmErrorListBeforeRemoveOutliers = entry.getValue();
+
+			// Get a DescriptiveStatistics instance - Apache Commons
+			DescriptiveStatistics stats = new DescriptiveStatistics();
+			
+			// Add the PPM Error data
+			for( Double ppmError : ppmErrorListBeforeRemoveOutliers ) {
+				stats.addValue( ppmError );
+			}
+
+			// Compute some statistics
+			double firstquarter = stats.getPercentile( REMOVE_OUTLIERS_FIRST_QUARTER_PERCENTILE );
+			double thirdquarter = stats.getPercentile( REMOVE_OUTLIERS_THIRD_QUARTER_PERCENTILE );
+
+			double interQuartileRegion = thirdquarter - firstquarter;
+			double lowcutoff = firstquarter - ( OUTLIER_FACTOR * interQuartileRegion );
+			double highcutoff = thirdquarter + ( OUTLIER_FACTOR * interQuartileRegion );
+			
+			//  Build a new list removing values < lowcutoff and > highcutoff 
+			List<Double> ppmErrorList_After_RemoveOutliers = new ArrayList<>( ppmErrorListBeforeRemoveOutliers.size() );
+			for( Double ppmError : ppmErrorListBeforeRemoveOutliers ) {
+				if ( ppmError >= lowcutoff && ppmError <= highcutoff ) {
+					ppmErrorList_After_RemoveOutliers.add( ppmError );
+				}
+			}
+			//  Insert new list into new hash
+			ppmErrorListForLinkType_ByLinkType_Result.put( linkType, ppmErrorList_After_RemoveOutliers );
+		}
+		
+		return ppmErrorListForLinkType_ByLinkType_Result;
 	}
 	
 	
@@ -172,18 +229,81 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 				}
 			}
 		}
-		double ppmErrorMaxMinusMin = ppmErrorMax - ppmErrorMin;
-		
-		double ppmErrorMinAsDouble = ppmErrorMin;
-		double ppmErrorMaxMinusMinAsDouble = ppmErrorMaxMinusMin;
-		
+
 		//  Process data into bins
 		int binCount = (int) ( Math.sqrt( ppmErrorList.size() ) );
+		
+		if ( ppmErrorMax > 0 && ppmErrorMin < 0 ) {
+			//  Change Max and Min so the center of a bin is at zero
+			{
+				//  Initial 'extend' Min and Max by a bin  
+				double ppmErrorMaxMinusMin = ppmErrorMax - ppmErrorMin;
+				double binSize = ( ppmErrorMaxMinusMin ) / binCount;
+				ppmErrorMax += binSize;
+				ppmErrorMin -= binSize;
+				
+				//  Since the new bin size will be larger than the old bin size, 
+				//  adding half a bin is possibly not enough to keep from  
+				//  cutting into the existing data points when shifting the bins to center a bin on zero.
+				
+				//  WAS:
+				//  Initial 'extend' Min and Max by half a bin  
+//				double ppmErrorMaxMinusMin = ppmErrorMax - ppmErrorMin;
+//				double binSize = ( ppmErrorMaxMinusMin ) / binCount;
+//				double halfBinSize = binSize * 0.5;
+//				ppmErrorMax += halfBinSize;
+//				ppmErrorMin -= halfBinSize;
+			}
+//			
+			
+			
+			double ppmErrorMaxMinusMin = ppmErrorMax - ppmErrorMin;
+			double binSize = ( ppmErrorMaxMinusMin ) / binCount;
+			double halfBinSize = binSize * 0.5;
+			// The bin that contains position zero
+			int binIndexContainZero = (int) ( - ( ppmErrorMin / binSize ) );
+			// The start of the bin that contains position zero			
+			double binStartContainZero =  ppmErrorMin + ( binIndexContainZero * binSize );
+			// Center of bin that contains zero
+			double binStartContainZeroPlusHalfBin = binStartContainZero + ( binSize * 0.5 );
+			//  
+			double shift = binStartContainZeroPlusHalfBin;
+			
+			if ( binStartContainZeroPlusHalfBin > 0 ) {
+				//  Center of bin is 'right' of zero, so shift left
+				ppmErrorMin -= ( shift ); //  binStartContainZeroPlusHalfBin is positive here
+				ppmErrorMax -= ( shift ); //  binStartContainZeroPlusHalfBin is positive here
+			} else {
+				//  Center of bin is 'left' of zero, so shift right
+				ppmErrorMin += ( - shift ); //  binStartContainZeroPlusHalfBin is negative here
+				ppmErrorMax += ( - shift ); //  binStartContainZeroPlusHalfBin is negative here
+			}
+		}
+		
+		{
+			//  Get center of bin that contains zero
+			double ppmErrorMaxMinusMin = ppmErrorMax - ppmErrorMin;
+			double binSize = ( ppmErrorMaxMinusMin ) / binCount;
+			// The bin that contains position zero
+			int binIndexContainZero = (int) ( - ( ppmErrorMin / binSize ) );
+			// The start of the bin that contains position zero			
+			double binStartContainZero =  ppmErrorMin + ( binIndexContainZero * binSize );
+			// Center of bin that contains zero
+			double binStartContainZeroPlusHalfBin = binStartContainZero + ( binSize * 0.5 );
+
+			int z = 0;
+		}
+		
+		double ppmErrorMaxMinusMin = ppmErrorMax - ppmErrorMin;
+		
+		
+		//  Allocate bins
 		int[] ppmErrorCounts = new int[ binCount ];
-		double binSizeAsDouble = ( ppmErrorMaxMinusMinAsDouble ) / binCount;
+		//  Bin Size
+		double binSize = ( ppmErrorMaxMinusMin ) / binCount;
 		
 		for ( double ppmErrorEntry : ppmErrorList ) {
-			double preMZFraction = ( ppmErrorEntry - ppmErrorMinAsDouble ) / ppmErrorMaxMinusMinAsDouble;
+			double preMZFraction = ( ppmErrorEntry - ppmErrorMin ) / ppmErrorMaxMinusMin;
 			int bin = (int) ( (  preMZFraction ) * binCount );
 			if ( bin < 0 ) {
 				bin = 0;
@@ -194,15 +314,15 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 		}
 		
 		List<PPM_Error_Histogram_For_PSMPeptideCutoffsResultsChartBucket> chartBuckets = new ArrayList<>();
-		double binHalf = binSizeAsDouble / 2 ;
+		double binHalf = binSize / 2 ;
 		//  Take the data in the bins and  create "buckets" in the format required for the charting API
 		for ( int binIndex = 0; binIndex < ppmErrorCounts.length; binIndex++ ) {
 			PPM_Error_Histogram_For_PSMPeptideCutoffsResultsChartBucket chartBucket = new PPM_Error_Histogram_For_PSMPeptideCutoffsResultsChartBucket();
 			chartBuckets.add( chartBucket );
 			int preMZCount = ppmErrorCounts[ binIndex ];
-			double binStart = ( ( binIndex * binSizeAsDouble ) ) + ppmErrorMinAsDouble;
+			double binStart = ( ( binIndex * binSize ) ) + ppmErrorMin;
 			chartBucket.setBinStart( binStart );
-			double binEnd = ( ( binIndex + 1 ) * binSizeAsDouble ) + ppmErrorMinAsDouble;
+			double binEnd = ( ( binIndex + 1 ) * binSize ) + ppmErrorMin;
 			chartBucket.setBinEnd( binEnd );
 			double binMiddleDouble = binStart + binHalf;
 			chartBucket.setBinCenter( binMiddleDouble );
