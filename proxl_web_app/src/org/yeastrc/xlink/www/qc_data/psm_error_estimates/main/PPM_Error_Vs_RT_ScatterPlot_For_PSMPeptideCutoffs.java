@@ -1,13 +1,16 @@
-package org.yeastrc.xlink.www.qc_data.psm_level_data.main;
+package org.yeastrc.xlink.www.qc_data.psm_error_estimates.main;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
@@ -31,9 +34,10 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
-import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.PPM_Error_Histogram_For_PSMPeptideCutoffs_Result;
-import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.PPM_Error_Histogram_For_PSMPeptideCutoffs_Result.PPM_Error_Histogram_For_PSMPeptideCutoffsResultsChartBucket;
-import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.PPM_Error_Histogram_For_PSMPeptideCutoffs_Result.PPM_Error_Histogram_For_PSMPeptideCutoffsResultsForLinkType;
+import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result;
+import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket;
+import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType;
+import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultRetentionTimeBucket;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher;
@@ -46,26 +50,31 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
+ * Compute PPM Error Vs Retention Time Scatter Plot
  * 
- * Compute PPM Error Histogram
+ * Bin Retention Time to the minute
+ * Bin PPM Error to 0.1
  */
-public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
+public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 
-	private static final Logger log = Logger.getLogger(PPM_Error_Histogram_For_PSMPeptideCutoffs.class);
-	
+	private static final Logger log = Logger.getLogger(PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs.class);
 	
 	private static final int REMOVE_OUTLIERS_FIRST_QUARTER_PERCENTILE = 25;
 	private static final int REMOVE_OUTLIERS_THIRD_QUARTER_PERCENTILE = 75;
-	
+
+
+	private static final int BINNED_PPM_ERROR_DECIMAL_PLACES = 1;
+	private static final double BINNED_PPM_ERROR_BIN_SIZE = BINNED_PPM_ERROR_DECIMAL_PLACES / 10.0;
+
 	//  number of IQRs to add
 	private static final double OUTLIER_FACTOR = 1.5;
 	
 	/**
 	 * private constructor
 	 */
-	private PPM_Error_Histogram_For_PSMPeptideCutoffs(){}
-	public static PPM_Error_Histogram_For_PSMPeptideCutoffs getInstance( ) throws Exception {
-		PPM_Error_Histogram_For_PSMPeptideCutoffs instance = new PPM_Error_Histogram_For_PSMPeptideCutoffs();
+	private PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs(){}
+	public static PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs getInstance( ) throws Exception {
+		PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs instance = new PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs();
 		return instance;
 	}
 	
@@ -77,7 +86,7 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 	 * @return
 	 * @throws Exception
 	 */
-	public PPM_Error_Histogram_For_PSMPeptideCutoffs_Result getPPM_Error_Histogram_For_PSMPeptideCutoffs( 
+	public PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result getPPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs( 
 			String filterCriteriaJSON, 
 			List<Integer> projectSearchIdsListDeduppedSorted,
 			List<SearchDTO> searches, 
@@ -93,23 +102,27 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 //			mapProjectSearchIdToSearchId.put( search.getProjectSearchId(), search.getSearchId() );
 		}
 
-		Map<String, List<Double>> ppmErrorListForLinkType_ByLinkType = 
-				createppmErrorListForLinkType_ByLinkTypeMap( filterCriteriaJSON, searches, searchIds );
+		Map<String, List<PPMErrorRetentionTimePair>> ppmErrorListForLinkType_ByLinkType = 
+				create_ppmErrorListForLinkType_ByLinkTypeMap( filterCriteriaJSON, searches, searchIds );
 		
 		//  Combine the Dimer into the Unlinked
 		
-		List<Double> ppmErrorListForDimer = ppmErrorListForLinkType_ByLinkType.get( XLinkUtils.DIMER_TYPE_STRING );
-		if ( ppmErrorListForDimer != null && ( ! ppmErrorListForDimer.isEmpty() ) ) {
-			List<Double> ppmErrorListForUnlinked = ppmErrorListForLinkType_ByLinkType.get( XLinkUtils.UNLINKED_TYPE_STRING );
-			ppmErrorListForUnlinked.addAll( ppmErrorListForDimer );
+		List<PPMErrorRetentionTimePair> ppmErrorListForDimer = ppmErrorListForLinkType_ByLinkType.get( XLinkUtils.DIMER_TYPE_STRING );
+		if ( ppmErrorListForDimer != null ) {
+			if ( ! ppmErrorListForDimer.isEmpty() ) {
+				List<PPMErrorRetentionTimePair> ppmErrorListForUnlinked = ppmErrorListForLinkType_ByLinkType.get( XLinkUtils.UNLINKED_TYPE_STRING );
+				ppmErrorListForUnlinked.addAll( ppmErrorListForDimer );
+			}
+			ppmErrorListForLinkType_ByLinkType.remove( XLinkUtils.DIMER_TYPE_STRING );
 		}
+		
 		
 		//  Build a new map, removing outliers from each list
 		ppmErrorListForLinkType_ByLinkType = removeOutliers( ppmErrorListForLinkType_ByLinkType );
 		
 		
-		PPM_Error_Histogram_For_PSMPeptideCutoffs_Result result = 
-				getPPM_Error_Histogram_For_PSMPeptideCutoffs_Result( ppmErrorListForLinkType_ByLinkType );
+		PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result result = 
+				getPPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result( ppmErrorListForLinkType_ByLinkType );
 		
 		return result;
 	}
@@ -118,23 +131,23 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 	 * @param ppmErrorListForLinkType_ByLinkType
 	 * @return
 	 */
-	private Map<String, List<Double>> removeOutliers( Map<String, List<Double>> ppmErrorListForLinkType_ByLinkType ) {
+	private Map<String, List<PPMErrorRetentionTimePair>> removeOutliers( Map<String, List<PPMErrorRetentionTimePair>> ppmErrorListForLinkType_ByLinkType ) {
 		
 		//  output map
-		Map<String, List<Double>> ppmErrorListForLinkType_ByLinkType_Result = new HashMap<>();
+		Map<String, List<PPMErrorRetentionTimePair>> ppmErrorListForLinkType_ByLinkType_Result = new HashMap<>();
 		
 		// Process for each link type
 		
-		for ( Map.Entry<String, List<Double>> entry : ppmErrorListForLinkType_ByLinkType.entrySet() ) {
+		for ( Map.Entry<String, List<PPMErrorRetentionTimePair>> entry : ppmErrorListForLinkType_ByLinkType.entrySet() ) {
 			String linkType = entry.getKey();
-			List<Double> ppmErrorListBeforeRemoveOutliers = entry.getValue();
+			List<PPMErrorRetentionTimePair> ppmErrorListBeforeRemoveOutliers = entry.getValue();
 
 			// Get a DescriptiveStatistics instance - Apache Commons
 			DescriptiveStatistics stats = new DescriptiveStatistics();
 			
 			// Add the PPM Error data
-			for( Double ppmError : ppmErrorListBeforeRemoveOutliers ) {
-				stats.addValue( ppmError );
+			for( PPMErrorRetentionTimePair ppmErrorPair : ppmErrorListBeforeRemoveOutliers ) {
+				stats.addValue( ppmErrorPair.ppmError );
 			}
 
 			// Compute some statistics
@@ -146,10 +159,10 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 			double highcutoff = thirdquarter + ( OUTLIER_FACTOR * interQuartileRegion );
 			
 			//  Build a new list removing values < lowcutoff and > highcutoff 
-			List<Double> ppmErrorList_After_RemoveOutliers = new ArrayList<>( ppmErrorListBeforeRemoveOutliers.size() );
-			for( Double ppmError : ppmErrorListBeforeRemoveOutliers ) {
-				if ( ppmError >= lowcutoff && ppmError <= highcutoff ) {
-					ppmErrorList_After_RemoveOutliers.add( ppmError );
+			List<PPMErrorRetentionTimePair> ppmErrorList_After_RemoveOutliers = new ArrayList<>( ppmErrorListBeforeRemoveOutliers.size() );
+			for( PPMErrorRetentionTimePair ppmErrorPair : ppmErrorListBeforeRemoveOutliers ) {
+				if ( ppmErrorPair.ppmError >= lowcutoff && ppmErrorPair.ppmError <= highcutoff ) {
+					ppmErrorList_After_RemoveOutliers.add( ppmErrorPair );
 				}
 			}
 			//  Insert new list into new hash
@@ -164,20 +177,21 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 	 * @param ppmErrorListForLinkType_ByLinkType
 	 * @return
 	 */
-	private PPM_Error_Histogram_For_PSMPeptideCutoffs_Result getPPM_Error_Histogram_For_PSMPeptideCutoffs_Result(
-			Map<String,List<Double>> ppmErrorListForLinkType_ByLinkType ) {
+	private PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result getPPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result(
+			Map<String,List<PPMErrorRetentionTimePair>> ppmErrorListForLinkType_ByLinkType ) {
 		
-		Map<String,PPM_Error_Histogram_For_PSMPeptideCutoffsResultsForLinkType> resultsByLinkTypeMap = new HashMap<>();
+		Map<String,PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType> resultsByLinkTypeMap = new HashMap<>();
 
-		for ( Map.Entry<String,List<Double>> ppmErrorListForLinkTypeEntry : ppmErrorListForLinkType_ByLinkType.entrySet() ) {
+		for ( Map.Entry<String,List<PPMErrorRetentionTimePair>> ppmErrorListForLinkTypeEntry : ppmErrorListForLinkType_ByLinkType.entrySet() ) {
 			String linkType = ppmErrorListForLinkTypeEntry.getKey();
-			PPM_Error_Histogram_For_PSMPeptideCutoffsResultsForLinkType resultsForLinkType =
-					getPPM_Error_HistogramData_ForLinkType( ppmErrorListForLinkTypeEntry.getValue() );
+			List<PPMErrorRetentionTimePair> ppmErrorPairList = ppmErrorListForLinkTypeEntry.getValue();
+			PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType resultsForLinkType =
+					getPPM_Error_HistogramData_ForLinkType( ppmErrorPairList );
 			resultsForLinkType.setLinkType( linkType );
 			resultsByLinkTypeMap.put( linkType, resultsForLinkType );
 		}
 		
-		List<PPM_Error_Histogram_For_PSMPeptideCutoffsResultsForLinkType> dataForChartPerLinkTypeList = new ArrayList<>( 5 );
+		List<PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType> dataForChartPerLinkTypeList = new ArrayList<>( 5 );
 		
 		//  copy map to array for output, in a specific order
 		
@@ -186,17 +200,22 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 		addToOutputListForLinkType( XLinkUtils.UNLINKED_TYPE_STRING, dataForChartPerLinkTypeList, resultsByLinkTypeMap );
 		
 
-		PPM_Error_Histogram_For_PSMPeptideCutoffs_Result result = new PPM_Error_Histogram_For_PSMPeptideCutoffs_Result();
+		PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result result = new PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result();
 		result.setDataForChartPerLinkTypeList( dataForChartPerLinkTypeList );
 		
 		return result;
 	}
 	
+	/**
+	 * @param linkType
+	 * @param dataForChartPerLinkTypeList
+	 * @param resultsByLinkTypeMap
+	 */
 	private void addToOutputListForLinkType( 
 			String linkType, 
-			List<PPM_Error_Histogram_For_PSMPeptideCutoffsResultsForLinkType> dataForChartPerLinkTypeList, 
-			Map<String,PPM_Error_Histogram_For_PSMPeptideCutoffsResultsForLinkType> resultsByLinkTypeMap ) {
-		PPM_Error_Histogram_For_PSMPeptideCutoffsResultsForLinkType item = resultsByLinkTypeMap.get( linkType );
+			List<PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType> dataForChartPerLinkTypeList, 
+			Map<String,PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType> resultsByLinkTypeMap ) {
+		PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType item = resultsByLinkTypeMap.get( linkType );
 		if ( item != null ) {
 			dataForChartPerLinkTypeList.add( item );
 		}
@@ -204,137 +223,128 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 	
 
 	/**
-	 * @param ppmErrorList
+	 * @param ppmErrorPairList
 	 * @return
 	 */
-	private PPM_Error_Histogram_For_PSMPeptideCutoffsResultsForLinkType getPPM_Error_HistogramData_ForLinkType( 
-			List<Double> ppmErrorList ) {
-		
-		int numScans = ppmErrorList.size();
-		boolean firstOverallpreMZEntry = true;
-		//  Find max and min values
-		double ppmErrorMin = Double.MAX_VALUE;
-		double ppmErrorMax =  Double.MIN_VALUE;
-		for ( double ppmErrorEntry : ppmErrorList ) {
-			if ( firstOverallpreMZEntry  ) {
-				firstOverallpreMZEntry = false;
-				ppmErrorMin = ppmErrorEntry;
-				ppmErrorMax = ppmErrorEntry;
-			} else {
-				if ( ppmErrorEntry < ppmErrorMin ) {
-					ppmErrorMin = ppmErrorEntry;
-				}
-				if ( ppmErrorEntry > ppmErrorMax ) {
-					ppmErrorMax = ppmErrorEntry;
-				}
-			}
-		}
-
-		//  Process data into bins
-		int binCount = (int) ( Math.sqrt( ppmErrorList.size() ) );
-		
-		if ( ppmErrorMax > 0 && ppmErrorMin < 0 ) {
-			//  Change Max and Min so the center of a bin is at zero
-			{
-				//  Initial 'extend' Min and Max by a bin  
-				double ppmErrorMaxMinusMin = ppmErrorMax - ppmErrorMin;
-				double binSize = ( ppmErrorMaxMinusMin ) / binCount;
-				ppmErrorMax += binSize;
-				ppmErrorMin -= binSize;
-				
-				//  Since the new bin size will be larger than the old bin size, 
-				//  adding half a bin is possibly not enough to keep from  
-				//  cutting into the existing data points when shifting the bins to center a bin on zero.
-				
-				//  WAS:
-				//  Initial 'extend' Min and Max by half a bin  
-//				double ppmErrorMaxMinusMin = ppmErrorMax - ppmErrorMin;
-//				double binSize = ( ppmErrorMaxMinusMin ) / binCount;
-//				double halfBinSize = binSize * 0.5;
-//				ppmErrorMax += halfBinSize;
-//				ppmErrorMin -= halfBinSize;
-			}
-//			
-			
-			
-			double ppmErrorMaxMinusMin = ppmErrorMax - ppmErrorMin;
-			double binSize = ( ppmErrorMaxMinusMin ) / binCount;
-			double halfBinSize = binSize * 0.5;
-			// The bin that contains position zero
-			int binIndexContainZero = (int) ( - ( ppmErrorMin / binSize ) );
-			// The start of the bin that contains position zero			
-			double binStartContainZero =  ppmErrorMin + ( binIndexContainZero * binSize );
-			// Center of bin that contains zero
-			double binStartContainZeroPlusHalfBin = binStartContainZero + ( binSize * 0.5 );
-			//  
-			double shift = binStartContainZeroPlusHalfBin;
-			
-			if ( binStartContainZeroPlusHalfBin > 0 ) {
-				//  Center of bin is 'right' of zero, so shift left
-				ppmErrorMin -= ( shift ); //  binStartContainZeroPlusHalfBin is positive here
-				ppmErrorMax -= ( shift ); //  binStartContainZeroPlusHalfBin is positive here
-			} else {
-				//  Center of bin is 'left' of zero, so shift right
-				ppmErrorMin += ( - shift ); //  binStartContainZeroPlusHalfBin is negative here
-				ppmErrorMax += ( - shift ); //  binStartContainZeroPlusHalfBin is negative here
-			}
-		}
+	private PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType getPPM_Error_HistogramData_ForLinkType( 
+			List<PPMErrorRetentionTimePair> ppmErrorPairList ) {
 		
 		{
-			//  Get center of bin that contains zero
-			double ppmErrorMaxMinusMin = ppmErrorMax - ppmErrorMin;
-			double binSize = ( ppmErrorMaxMinusMin ) / binCount;
-			// The bin that contains position zero
-			int binIndexContainZero = (int) ( - ( ppmErrorMin / binSize ) );
-			// The start of the bin that contains position zero			
-			double binStartContainZero =  ppmErrorMin + ( binIndexContainZero * binSize );
-			// Center of bin that contains zero
-			double binStartContainZeroPlusHalfBin = binStartContainZero + ( binSize * 0.5 );
+			if ( ppmErrorPairList == null || ppmErrorPairList.isEmpty() ) {
+				PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType result = new PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType();
+				return result;
+			}
+		}
+		
+		int numScans = ppmErrorPairList.size();
+		boolean firstEntry = true;
+		//  Save max and min values
+		double ppmErrorBinMin = Double.MAX_VALUE;
+		double ppmErrorBinMax =  Double.MIN_VALUE;
+		int retentionTimeInMinutesFloorMin = Integer.MAX_VALUE;
+		int retentionTimeInMinutesFloorMax = Integer.MIN_VALUE;
+		
+		//  Bin the PPM Error and Retention Time
+		//     Bin the PPM Error to 0.1
+		//	   Bin the Retention Time to the minute (value in variable is in seconds
 
-			int z = 0;
+		final int ppmErrorMultDivFactor = 10 * BINNED_PPM_ERROR_DECIMAL_PLACES;
+
+		Map<Integer,Map<Double,PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket>> binnedValues = new HashMap<>();
+		
+		Set<Double> ppmErrorBinStartDistinctSet = new HashSet<>();
+		
+		for ( PPMErrorRetentionTimePair ppmErrorPair : ppmErrorPairList ) {
+			double ppmErrorBinEntry =  ( Math.floor( ppmErrorPair.ppmError * ppmErrorMultDivFactor ) ) / ppmErrorMultDivFactor;
+			int retentionTimeInMinutesFloorEntry = ppmErrorPair.retentionTime.intValue() / 60;
+			
+			if ( firstEntry  ) {
+				firstEntry = false;
+				ppmErrorBinMin = ppmErrorBinEntry;
+				ppmErrorBinMax = ppmErrorBinEntry;
+				retentionTimeInMinutesFloorMin = retentionTimeInMinutesFloorEntry;
+				retentionTimeInMinutesFloorMax = retentionTimeInMinutesFloorEntry;
+			} else {
+				if ( ppmErrorBinEntry < ppmErrorBinMin ) {
+					ppmErrorBinMin = ppmErrorBinEntry;
+				}
+				if ( ppmErrorBinEntry > ppmErrorBinMax ) {
+					ppmErrorBinMax = ppmErrorBinEntry;
+				}
+				if ( retentionTimeInMinutesFloorEntry < retentionTimeInMinutesFloorMin ) {
+					retentionTimeInMinutesFloorMin = retentionTimeInMinutesFloorEntry;
+				}
+				if ( retentionTimeInMinutesFloorEntry > retentionTimeInMinutesFloorMax ) {
+					retentionTimeInMinutesFloorMax = retentionTimeInMinutesFloorEntry;
+				}
+			}
+			Map<Double,PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket> mapOnPPMError = binnedValues.get( retentionTimeInMinutesFloorEntry );
+			if ( mapOnPPMError == null ) {
+				mapOnPPMError = new HashMap<>();
+				binnedValues.put( retentionTimeInMinutesFloorEntry, mapOnPPMError );
+			}
+			PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket chartBucket = mapOnPPMError.get( ppmErrorBinEntry );
+			if ( chartBucket == null ) {
+				chartBucket = new PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket();
+				chartBucket.setPpmErrorStart( ppmErrorBinEntry );
+				chartBucket.setPpmErrorEnd( ppmErrorBinEntry + BINNED_PPM_ERROR_BIN_SIZE );
+				chartBucket.setRetentionTimeStart( retentionTimeInMinutesFloorEntry );
+				chartBucket.setRetentionTimeEnd( retentionTimeInMinutesFloorEntry + 1 );
+				mapOnPPMError.put( ppmErrorBinEntry, chartBucket );
+			}
+			chartBucket.incrementCount();
 		}
 		
-		double ppmErrorMaxMinusMin = ppmErrorMax - ppmErrorMin;
-		
-		
-		//  Allocate bins
-		int[] ppmErrorCounts = new int[ binCount ];
-		//  Bin Size
-		double binSize = ( ppmErrorMaxMinusMin ) / binCount;
-		
-		for ( double ppmErrorEntry : ppmErrorList ) {
-			double preMZFraction = ( ppmErrorEntry - ppmErrorMin ) / ppmErrorMaxMinusMin;
-			int bin = (int) ( (  preMZFraction ) * binCount );
-			if ( bin < 0 ) {
-				bin = 0;
-			} else if ( bin >= binCount ) {
-				bin = binCount - 1;
-			} 
-			ppmErrorCounts[ bin ]++;
+		//  Copy Map of maps to output results objects and lists
+		List<PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultRetentionTimeBucket> retentionTimeBuckets = new ArrayList<>( binnedValues.size() );
+		for ( Map.Entry<Integer,Map<Double,PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket>> perRTentry : binnedValues.entrySet() ) {
+			boolean firstChartBucket = true;
+			List<PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket> chartBuckets = new ArrayList<>( perRTentry.getValue().size() );
+			for ( Map.Entry<Double,PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket> chartBucketEntry : perRTentry.getValue().entrySet() ) {
+				PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket chartBucket = chartBucketEntry.getValue();
+				if ( firstChartBucket ) {
+					firstChartBucket = false;
+					PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultRetentionTimeBucket rtBucket = new PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultRetentionTimeBucket();
+					rtBucket.setChartBuckets( chartBuckets );
+					rtBucket.setRetentionTimeStart( chartBucket.getRetentionTimeStart() );
+					rtBucket.setRetentionTimeEnd( chartBucket.getRetentionTimeEnd() );
+					retentionTimeBuckets.add( rtBucket );
+				}
+				chartBuckets.add( chartBucket );
+				ppmErrorBinStartDistinctSet.add( chartBucket.getPpmErrorStart() );
+			}
+			Collections.sort( chartBuckets, new Comparator<PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket>() {
+				@Override
+				public int compare(PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket o1, PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket o2) {
+					if ( o1.getPpmErrorStart() < o2.getPpmErrorStart() ) {
+						return -1;
+					};
+					if ( o1.getPpmErrorStart() > o2.getPpmErrorStart() ) {
+						return 1;
+					};
+					return 0;
+				}
+			} );
 		}
+		Collections.sort( retentionTimeBuckets, new Comparator<PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultRetentionTimeBucket>() {
+			@Override
+			public int compare(PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultRetentionTimeBucket o1, PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultRetentionTimeBucket o2) {
+				return o1.getRetentionTimeStart() - o2.getRetentionTimeStart();
+			}
+		} );
 		
-		List<PPM_Error_Histogram_For_PSMPeptideCutoffsResultsChartBucket> chartBuckets = new ArrayList<>();
-		double binHalf = binSize / 2 ;
-		//  Take the data in the bins and  create "buckets" in the format required for the charting API
-		for ( int binIndex = 0; binIndex < ppmErrorCounts.length; binIndex++ ) {
-			PPM_Error_Histogram_For_PSMPeptideCutoffsResultsChartBucket chartBucket = new PPM_Error_Histogram_For_PSMPeptideCutoffsResultsChartBucket();
-			chartBuckets.add( chartBucket );
-			int preMZCount = ppmErrorCounts[ binIndex ];
-			double binStart = ( ( binIndex * binSize ) ) + ppmErrorMin;
-			chartBucket.setBinStart( binStart );
-			double binEnd = ( ( binIndex + 1 ) * binSize ) + ppmErrorMin;
-			chartBucket.setBinEnd( binEnd );
-			double binMiddleDouble = binStart + binHalf;
-			chartBucket.setBinCenter( binMiddleDouble );
-			chartBucket.setCount( preMZCount );
-		}
+		List<Double> ppmErrorBinStartDistinctSorted = new ArrayList<>( ppmErrorBinStartDistinctSet );
+		Collections.sort( ppmErrorBinStartDistinctSorted );
 		
-		PPM_Error_Histogram_For_PSMPeptideCutoffsResultsForLinkType result = new PPM_Error_Histogram_For_PSMPeptideCutoffsResultsForLinkType();
+		PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType result = new PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType();
 		
-		result.setChartBuckets( chartBuckets );
+		result.setRetentionTimeBuckets( retentionTimeBuckets );
 		result.setNumScans( numScans );
-		result.setPpmErrorMax( ppmErrorMax );
-		result.setPpmErrorMin( ppmErrorMin );
+		result.setPpmErrorBinMax( ppmErrorBinMax );
+		result.setPpmErrorBinMin( ppmErrorBinMin );
+		result.setRetentionTimeBinMax( retentionTimeInMinutesFloorMax );
+		result.setRetentionTimeBinMin( retentionTimeInMinutesFloorMin );
+		result.setPpmErrorBinStartDistinctSorted( ppmErrorBinStartDistinctSorted );
 		
 		return result;
 	}
@@ -352,7 +362,7 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 	 * @throws Exception
 	 * @throws ProxlWebappDataException
 	 */
-	private Map<String, List<Double>> createppmErrorListForLinkType_ByLinkTypeMap(
+	private Map<String, List<PPMErrorRetentionTimePair>> create_ppmErrorListForLinkType_ByLinkTypeMap(
 			String filterCriteriaJSON, 
 			List<SearchDTO> searches,
 			Collection<Integer> searchIds)
@@ -401,7 +411,7 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 		
 		//   Map of List of PPM Error by Link Type
 		
-		Map<String,List<Double>> ppmErrorListForLinkType_ByLinkType = new HashMap<>();
+		Map<String,List<PPMErrorRetentionTimePair>> ppmErrorListForLinkType_ByLinkType = new HashMap<>();
 		
 		//  Populate countForLinkType_ByLinkType for selected link types
 		if ( mergedPeptideQueryJSONRoot.getLinkTypes() == null || mergedPeptideQueryJSONRoot.getLinkTypes().length == 0 ) {
@@ -611,7 +621,7 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 				}
 				
 				// get from map for link type
-				List<Double> ppmErrorListForLinkType = ppmErrorListForLinkType_ByLinkType.get( linkType );
+				List<PPMErrorRetentionTimePair> ppmErrorListForLinkType = ppmErrorListForLinkType_ByLinkType.get( linkType );
 				
 				if ( ppmErrorListForLinkType == null ) {
 					String msg = "In processing Reported Peptides, link type not found: " + linkType;
@@ -779,7 +789,7 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 
 				for ( PsmWebDisplayWebServiceResult psmWebDisplayWebServiceResult : psmWebDisplayList ) {
 
-//					psmWebDisplayWebServiceResult.getRetentionTime();
+					BigDecimal retentionTime = psmWebDisplayWebServiceResult.getRetentionTime();
 
 					BigDecimal scanPreMZ = psmWebDisplayWebServiceResult.getPreMZ(); // from scan table
 					double scanPreMZasDouble = scanPreMZ.doubleValue();
@@ -833,7 +843,10 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 							}
 							*/
 							
-							ppmErrorListForLinkType.add( ppmError );
+							PPMErrorRetentionTimePair ppmErrorRetentionTimePair = new PPMErrorRetentionTimePair();
+							ppmErrorRetentionTimePair.ppmError = ppmError;
+							ppmErrorRetentionTimePair.retentionTime = retentionTime;
+							ppmErrorListForLinkType.add( ppmErrorRetentionTimePair );
 						} catch ( Exception e ) {
 							String msg = "PSMMassCalculator.calculatePPMEstimateForPSM(...) threw exception:"
 									+ "\n linkType: " + linkType
@@ -956,75 +969,20 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 			}
 		}
 		
-		
-	//  ONLY FOR DEBUGGING
-		
-		//  Output List  ppm_Error_ComputeEntryList
-		
-//		System.out.println( "!!!!!!!!!!!!!!!!!!!!" );
-//		System.out.println( "ppm_Error_ComputeEntryList Values:" );
-//		
-//		for ( PPM_Error_ComputeEntry entry : ppm_Error_ComputeEntryList ) {
-//		
-//			System.out.println( "!!!!!!!" );
-//			System.out.println( entry.toString() );
-//		}
-		
 		if ( ! reportedPeptideIdsSkippedForErrorCalculatingMZ.isEmpty() ) {
-			
 			log.warn( "Number of Reported Peptides Skipped For Error Calculating MZ: " + reportedPeptideIdsSkippedForErrorCalculatingMZ.size()
 					+ ", List of Reported Peptide Ids: " + reportedPeptideIdsSkippedForErrorCalculatingMZ );
 		}
 		
-		
 		return ppmErrorListForLinkType_ByLinkType;
 	}
 	
-//  ONLY FOR DEBUGGING
-	
-//	private static class PPM_Error_ComputeEntry {
-//		
-//		double scanPreM;
-//		
-////		double computedMZ;  // not set
-//		
-//		double ppmError;
-//		
-//		String linkType;
-//		
-//		int searchId;
-//		int reportedPeptideId;
-//		
-//		String reportedPeptideString;
-//		
-//		PeptideDTO peptide1;
-//		PeptideDTO peptide2;
-//		List<StaticModDTO> staticMods;
-//		List<SrchRepPeptPeptDynamicModDTO> dynamicMods1;
-//		List<SrchRepPeptPeptDynamicModDTO> dynamicMods2;
-//		Integer charge;
-//		Double linkerMass;
-//		
-//		
-//		@Override
-//		public String toString() {
-//			return "PPM_Error_ComputeEntry [\n scanPreM=" + scanPreM 
-////					+ ", computedMZ=" + computedMZ 
-//					+ ", ppmError=" + ppmError
-//					+ "\n, linkType=" + linkType + ", searchId=" + searchId 
-//					+ "\n, reportedPeptideId=" + reportedPeptideId
-//					+ ", reportedPeptideString=" + reportedPeptideString 
-//					+ "\n, peptide1=" + peptide1 
-//					+ "\n, peptide2="
-//					+ peptide2
-//					+ "\n, staticMods=" + staticMods 
-//					+ "\n, dynamicMods1=" + dynamicMods1 
-//					+ "\n, dynamicMods2="
-//					+ dynamicMods2 
-//					+ "\n, charge=" + charge + ", linkerMass=" + linkerMass + "]";
-//		}
-//		
-//	}
-	
-
+	/**
+	 * 
+	 *
+	 */
+	private static class PPMErrorRetentionTimePair {
+		BigDecimal retentionTime;
+		double ppmError;
+	}
 }

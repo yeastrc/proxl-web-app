@@ -20,8 +20,8 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Histogram_For_PSMPeptideCutoffs;
-import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Histogram_For_PSMPeptideCutoffs_Result;
+import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs;
+import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
@@ -32,13 +32,13 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
 
 @Path("/qc/dataPage")
-public class QC_PPM_Error_Service {
+public class QC_PPM_Error_Vs_M_over_Z_Service {
 
-	private static final Logger log = Logger.getLogger(QC_PPM_Error_Service.class);
+	private static final Logger log = Logger.getLogger(QC_PPM_Error_Vs_M_over_Z_Service.class);
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/ppmError") 
+	@Path("/ppmErrorVsM_over_Z") 
 	public WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs
 		getPPM_Error_Histogram_For_PSMPeptideCutoffs( @QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
 										  @QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
@@ -150,15 +150,16 @@ public class QC_PPM_Error_Service {
 					searchIdsArrayIndex++;
 				}
 			}
+			
+			PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result ppm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result =
+					PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs.getInstance()
+					.getPPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs( 
+							filterCriteria_JSONString, projectSearchIdsListDeduppedSorted, searches, searchesMapOnSearchId );
 				
-			PPM_Error_Histogram_For_PSMPeptideCutoffs_Result ppm_Error_Histogram_For_PSMPeptideCutoffs_Result =
-					PPM_Error_Histogram_For_PSMPeptideCutoffs.getInstance()
-					.getPPM_Error_Histogram_For_PSMPeptideCutoffs( filterCriteria_JSONString, projectSearchIdsListDeduppedSorted, searches, searchesMapOnSearchId );
-
 			//  Get  for cutoffs and other data
 			WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs serviceResult = new WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs();
 			
-			serviceResult.ppmErrorHistogramResult = ppm_Error_Histogram_For_PSMPeptideCutoffs_Result;
+			serviceResult.ppmErrorVsM_over_ZScatterPlotResult = ppm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result;
 			
 			return serviceResult;
 			
@@ -189,14 +190,15 @@ public class QC_PPM_Error_Service {
 	 */
 	public static class WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs {
 		
-		PPM_Error_Histogram_For_PSMPeptideCutoffs_Result ppmErrorHistogramResult;
+		PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result ppmErrorVsM_over_ZScatterPlotResult;
 
-		public PPM_Error_Histogram_For_PSMPeptideCutoffs_Result getPpmErrorHistogramResult() {
-			return ppmErrorHistogramResult;
+		public PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result getPpmErrorVsM_over_ZScatterPlotResult() {
+			return ppmErrorVsM_over_ZScatterPlotResult;
 		}
 
-		public void setPpmErrorHistogramResult(PPM_Error_Histogram_For_PSMPeptideCutoffs_Result ppmErrorHistogramResult) {
-			this.ppmErrorHistogramResult = ppmErrorHistogramResult;
+		public void setPpmErrorVsM_over_ZScatterPlotResult(
+				PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result ppmErrorVsM_over_ZScatterPlotResult) {
+			this.ppmErrorVsM_over_ZScatterPlotResult = ppmErrorVsM_over_ZScatterPlotResult;
 		}
 
 	}

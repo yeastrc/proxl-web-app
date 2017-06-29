@@ -1,4 +1,4 @@
-package org.yeastrc.xlink.www.qc_data.psm_level_data.objects;
+package org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects;
 
 import java.util.List;
 

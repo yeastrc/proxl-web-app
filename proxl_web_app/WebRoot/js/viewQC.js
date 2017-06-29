@@ -81,14 +81,20 @@ var ViewQCPageCode = function() {
 	//  Block of "isLoaded" variables.  
 	//        These all need to be set to NO in ... when the user clicks "Update from Database" button
 	var _digestion_Statistics_isLoaded = _IS_LOADED_NO;
+	
 	var _chargeCount_Statistics_isLoaded = _IS_LOADED_NO;
 	var _M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_NO;
+	
 	var _PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_NO;
+	var _PPM_Error_Vs_RetentionTime_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_NO;
+	var _PPM_Error_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_NO;
+	
 	var _peptideLengthsHistogram_isLoaded = _IS_LOADED_NO;
 	
 	//  Block of "sectionDisplayed" variables.  Lists which sections are currently displayed
 	var _digestion_Statistics_sectionDisplayed = false;
 	var _psm_Statistics_sectionDisplayed = false;
+	var _psm_Error_Estimates_sectionDisplayed = false;
 	var _peptide_Statistics_sectionDisplayed = false;
 	
 	/**
@@ -167,6 +173,18 @@ var ViewQCPageCode = function() {
 		var $psm_level_collapse_link = $("#psm_level_collapse_link");
 		$psm_level_collapse_link.click( function( event ) { 
 			objectThis._psm_level_collapse_link_Clicked( { clickedThis : this } ); 
+			event.preventDefault();
+		});
+
+		var $psm_error_estimates_expand_link = $("#psm_error_estimates_expand_link");
+		$psm_error_estimates_expand_link.click( function( event ) { 
+			objectThis._psm_error_estimates_expand_link_Clicked( { clickedThis : this } ); 
+			event.preventDefault();
+		});
+
+		var $psm_error_estimates_collapse_link = $("#psm_error_estimates_collapse_link");
+		$psm_error_estimates_collapse_link.click( function( event ) { 
+			objectThis._psm_error_estimates_collapse_link_Clicked( { clickedThis : this } ); 
 			event.preventDefault();
 		});
 
@@ -290,6 +308,52 @@ var ViewQCPageCode = function() {
 	/**
 	 * 
 	 */
+	this._psm_error_estimates_expand_link_Clicked = function( params ) {
+		this.showPSMErrorEstimates();
+	};
+	
+	/**
+	 *  
+	 */
+	this._psm_error_estimates_collapse_link_Clicked = function( params ) {
+		this.hidePSMErrorEstimates();
+	};
+
+	/**
+	 *  
+	 */
+	this.showPSMErrorEstimates = function( params ) {
+
+		_psm_Error_Estimates_sectionDisplayed = true;
+
+		var $psm_error_estimates_display_block = $("#psm_error_estimates_display_block");
+		$psm_error_estimates_display_block.show();
+		var $psm_error_estimates_expand_link = $("#psm_error_estimates_expand_link");
+		$psm_error_estimates_expand_link.hide();
+		var $psm_error_estimates_collapse_link = $("#psm_error_estimates_collapse_link");
+		$psm_error_estimates_collapse_link.show();
+		
+		this.load_PSM_ErrorEstimatesIfNeeded();
+	};
+	
+	/**
+	 *  
+	 */
+	this.hidePSMErrorEstimates = function( params ) {
+		
+		var $psm_error_estimates_display_block = $("#psm_error_estimates_display_block");
+		$psm_error_estimates_display_block.hide();
+		var $psm_error_estimates_expand_link = $("#psm_error_estimates_expand_link");
+		$psm_error_estimates_expand_link.show();
+		var $psm_error_estimates_collapse_link = $("#psm_error_estimates_collapse_link");
+		$psm_error_estimates_collapse_link.hide();
+		
+		_psm_Error_Estimates_sectionDisplayed = false;
+	};
+
+	/**
+	 * 
+	 */
 	this._peptide_level_expand_link_Clicked = function( params ) {
 		this.showPeptideLevelstatistics();
 	};
@@ -356,6 +420,7 @@ var ViewQCPageCode = function() {
 		
 		this.clearDigestionStatistics();
 		this.clearPSM_Level_Statistics();
+		this.clearPSM_ErrorEstimates();
 		this.clear_Peptide_Level_Statistics();
 	};
 	
@@ -369,6 +434,9 @@ var ViewQCPageCode = function() {
 		}
 		if ( _psm_Statistics_sectionDisplayed ) {
 			this.load_PSM_Level_StatisticsIfNeeded();
+		}
+		if ( _psm_Error_Estimates_sectionDisplayed ) {
+			this.load_PSM_ErrorEstimatesIfNeeded();
 		}
 		if ( _peptide_Statistics_sectionDisplayed ) {
 			this.load_Peptide_Level_StatisticsIfNeeded();
@@ -1080,8 +1148,6 @@ var ViewQCPageCode = function() {
 		
 		this.clearChargeCount();
 		this.clear_M_Over_Z_For_PSMs_Histogram();
-		this.clear_PPM_Error_For_PSMs_Histogram();
-
 	};
 	
 	
@@ -1091,7 +1157,6 @@ var ViewQCPageCode = function() {
 	this.load_PSM_Level_StatisticsIfNeeded = function() {
 		this.loadChargeCountIfNeeded();
 		this.load_M_Over_Z_For_PSMs_HistogramIfNeeded();
-		this.load_PPM_Error_For_PSMs_HistogramIfNeeded();
 	};
 	
 	//////////////////////////////
@@ -1807,6 +1872,31 @@ var ViewQCPageCode = function() {
 		return undefined; //  Use defaults
 	};
 	
+
+	///////////////////////////////////////////////////////
+	
+	///////    PSM Error Estimates  ////////////////////
+	
+
+	/**
+	 * Clear the data for the PSM section
+	 */
+	this.clearPSM_ErrorEstimates = function() {
+		
+		this.clear_PPM_Error_For_PSMs_Histogram();
+		this.clear_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlot();
+		this.clear_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlot();
+	};
+	
+	
+	/**
+	 * Load the data for PSM section
+	 */
+	this.load_PSM_ErrorEstimatesIfNeeded = function() {
+		this.load_PPM_Error_For_PSMs_HistogramIfNeeded();
+		this.load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotIfNeeded();
+		this.load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotIfNeeded();
+	};
 	
 
 	//////////////////////////////////////////////////////////////////
@@ -1832,8 +1922,6 @@ var ViewQCPageCode = function() {
 		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
 		$PSM_PPM_Error_CountsLoadingBlock.show();
 		$PSM_PPM_Error_CountsBlock.hide();
-//		$PSM_PPM_Error_CountsBlock.empty();
-		
 	};
 
 	/**
@@ -1937,8 +2025,6 @@ var ViewQCPageCode = function() {
 							ajaxResponseData : ajaxResponseData, 
 							ajaxRequestData : ajaxRequestData,
 							selectedLinkType : selectedLinkType
-//							,
-//							topTRelement : topTRelement
 					};
 					objectThis.load_PPM_Error_For_PSMs_HistogramResponse( responseParams );
 //					$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
@@ -1957,7 +2043,7 @@ var ViewQCPageCode = function() {
 	};
 
 	/**
-	 * Load the data for Charge Counts
+	 * Process AJAX Response
 	 */
 	this.load_PPM_Error_For_PSMs_HistogramResponse = function( params ) {
 		var objectThis = this;
@@ -2094,18 +2180,11 @@ var ViewQCPageCode = function() {
 					minPPMError = bucket.binStart;
 				}
 			}
-
 		}
-		
-//		alert( "link type: " + linkType + ", totalCount: " + totalCount );
-		
-//		var hAxisTicks = ;
 		
 		var vAxisTicks = this._get_PPM_Error_For_PSMs_Histogram_ChartTickMarks( { maxValue : maxCount } );
 		
 		var barColors = [ colorAndbarColor.color ]; // must be an array
-
-		//  Chart title and layout also in viewQC_MZ_Data_NoDataAvailable.jsp for empty chart when no M/Z data
 		
 		var chartTitle = 'PSM Count vs/ PPM Error (' + linkType + ")";
 		var optionsFullsize = {
@@ -2187,6 +2266,1111 @@ var ViewQCPageCode = function() {
 		return undefined; //  Use defaults
 	};
 	
+	
+
+
+	//////////////////////////////////////////////////////////////////
+
+	//    PPM Error Vs Retention Time for PSMs Scatter Plot
+	
+
+	/**
+	 * Clear data for  PPM Error for PSMs Scatter Plot
+	 */
+	this.clear_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlot = function() {
+		
+		_PPM_Error_Vs_RetentionTime_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_NO;
+
+		var $NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock = $("#NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock");
+		if ( $NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock.length > 0 ) {
+			//  The element with id 'NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock' exists so there are no scans in the searches
+			_PPM_Error_Vs_RetentionTime_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_YES;
+			return;  //  EARLY EXIT
+		}
+		
+		var $PSM_PPM_Error_Vs_RetentionTime_CountsLoadingBlock = $("#PSM_PPM_Error_Vs_RetentionTime_CountsLoadingBlock");
+		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock = $("#PSM_PPM_Error_Vs_RetentionTime_CountsBlock");
+		$PSM_PPM_Error_Vs_RetentionTime_CountsLoadingBlock.show();
+		$PSM_PPM_Error_Vs_RetentionTime_CountsBlock.hide();
+		
+	};
+
+	/**
+	 * If not loaded, call load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlot()
+	 */
+	this.load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotIfNeeded = function() {
+		if ( _PPM_Error_Vs_RetentionTime_For_PSMs_ErrorEstimates_isLoaded === _IS_LOADED_NO ) {
+			this.load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlot();
+		}
+	};
+	
+	/**
+	 * Load the data for  PPM Error for PSMs Scatter Plot
+	 */
+	this.load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlot = function() {
+		var objectThis = this;
+
+		_PPM_Error_Vs_RetentionTime_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_LOADING;
+		
+		var $NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock = $("#NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock");
+		if ( $NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock.length > 0 ) {
+			//  The element with id 'NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock' exists so there are no scans in the searches
+			_PPM_Error_Vs_RetentionTime_Vs_RetentionTime_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_YES;
+			return;  //  EARLY EXIT
+		}
+
+		var selectedLinkTypes = _hash_json_Contents.linkTypes;
+		
+		//  For selected types, display those cells and display "Loading"
+
+		var $PSM_PPM_Error_Vs_RetentionTime_CountsLoadingBlock = $("#PSM_PPM_Error_Vs_RetentionTime_CountsLoadingBlock");
+		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock = $("#PSM_PPM_Error_Vs_RetentionTime_CountsBlock");
+		$PSM_PPM_Error_Vs_RetentionTime_CountsLoadingBlock.hide();  //  Hide generic loading section
+		$PSM_PPM_Error_Vs_RetentionTime_CountsBlock.show();
+		
+		//  Get all cells for per link type charts and reset them
+		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock__per_link_type_row_jq_All = $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.find(".per_link_type_row_jq");
+		$PSM_PPM_Error_Vs_RetentionTime_CountsBlock__per_link_type_row_jq_All.hide();
+		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock__chart_loading_block_jq = $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.find(".loading_block_jq");
+		$PSM_PPM_Error_Vs_RetentionTime_CountsBlock__chart_loading_block_jq.show();
+		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock__chart_outer_container_for_download_jq = $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.find(".chart_outer_container_for_download_jq")
+		$PSM_PPM_Error_Vs_RetentionTime_CountsBlock__chart_outer_container_for_download_jq.hide();
+		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock__chart_container_for_download_jq = $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.find(".chart_container_for_download_jq");
+		$PSM_PPM_Error_Vs_RetentionTime_CountsBlock__chart_container_for_download_jq.empty();
+		
+		// Show cells for selected link types
+		for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
+			var selectedLinkType = selectedLinkTypes[ index ];
+			var cellClassSelector = selectedLinkType + "_row_jq";
+			var $cellForSelectedLinkType = $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.find("." + cellClassSelector );
+			$cellForSelectedLinkType.show();
+		}
+		
+		//  Make a copy of _hash_json_Contents    (  true for deep, target object, source object, <source object 2>, ... )
+		var hash_json_Contents_COPY = $.extend( true /*deep*/,  {}, _hash_json_Contents );
+		
+		for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
+			
+			//  For each selected link type, 
+			//    set it as selected link type in hash_json_Contents_COPY,
+			//      and create a chart for that
+			
+			var selectedLinkType = selectedLinkTypes[ index ];
+			
+			hash_json_Contents_COPY.linkTypes = [ selectedLinkType ];
+			
+			this.load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkType( {  
+					selectedLinkType : selectedLinkType,
+					hash_json_Contents_COPY : hash_json_Contents_COPY
+			});
+		}
+		
+	};
+
+	/**
+	 * Load the data for  PPM Error Vs Retention Time for PSMs Scatter Plot Specific Link Type
+	 */
+	this.load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkType = function( params ) {
+		var objectThis = this;
+
+		var selectedLinkType = params.selectedLinkType;
+		var hash_json_Contents_COPY = params.hash_json_Contents_COPY;
+		var project_search_ids = params.project_search_ids; 
+			
+		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents_COPY );
+		var ajaxRequestData = {
+				project_search_id : _project_search_ids,
+				filterCriteria : hash_json_field_Contents_JSONString
+		};
+		$.ajax({
+//			cache : false,
+			url : contextPathJSVar + "/services/qc/dataPage/ppmErrorVsRetentionTime", // ppmErrorVsRetentionTime
+			traditional: true,  //  Force traditional serialization of the data sent
+								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+								//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+			data : ajaxRequestData,  // The data sent as params on the URL
+			dataType : "json",
+			success : function( ajaxResponseData ) {
+				try {
+					var responseParams = {
+							ajaxResponseData : ajaxResponseData, 
+							ajaxRequestData : ajaxRequestData,
+							selectedLinkType : selectedLinkType
+//							,
+//							topTRelement : topTRelement
+					};
+					objectThis.load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotResponse( responseParams );
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			},
+	        failure: function(errMsg) {
+	        	handleAJAXFailure( errMsg );
+	        },
+			error : function(jqXHR, textStatus, errorThrown) {
+				handleAJAXError(jqXHR, textStatus, errorThrown);
+			}
+		});
+	};
+
+	/**
+	 * Process AJAX Response
+	 */
+	this.load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotResponse = function( params ) {
+		var objectThis = this;
+
+		var ajaxResponseData = params.ajaxResponseData;
+		var ajaxRequestData = params.ajaxRequestData;
+		var selectedLinkType = params.selectedLinkType;
+		
+		var ppmErrorVsRTScatterPlotResult = ajaxResponseData.ppmErrorVsRTScatterPlotResult;
+		var dataForChartPerLinkTypeList = ppmErrorVsRTScatterPlotResult.dataForChartPerLinkTypeList;
+		
+		if ( dataForChartPerLinkTypeList.length !== 1 ) {
+			throw Error( "dataForChartPerLinkTypeList.length !== 1, is = " + dataForChartPerLinkTypeList.length );
+		}
+		
+		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock = $("#PSM_PPM_Error_Vs_RetentionTime_CountsBlock");
+		if ( $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_Vs_RetentionTime_CountsBlock'" );
+		}
+
+		var entryForLinkType = dataForChartPerLinkTypeList[ 0 ];
+		
+		var linkType = entryForLinkType.linkType;
+		var retentionTimeBuckets = entryForLinkType.retentionTimeBuckets;
+
+		if ( retentionTimeBuckets === null || retentionTimeBuckets.length === 0  ) {
+			//  No data for this link type
+			return;  //  EARLY RETURN
+		}
+
+		//  Get cell for selectedLinkType
+		var cellClassSelector = selectedLinkType + "_row_jq";
+		var $cellForSelectedLinkType = $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.find("." + cellClassSelector );
+
+		var $loading_block_jq = $cellForSelectedLinkType.find(".loading_block_jq");
+		$loading_block_jq.hide();
+
+		var $chartOuterContainer =
+			$cellForSelectedLinkType.find(".chart_outer_container_for_download_jq");
+		$chartOuterContainer.show();
+
+		var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
+
+		var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
+
+		this._add_PPM_Error_Vs_RetentionTime_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chartContainer } );
+
+		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
+		// Add tooltips for download links
+		addToolTips( $chartOuterContainer );
+	
+		//  TODO  FIX THIS
+		
+//		_PPM_Error_Vs_RetentionTime_Vs_RetentionTime_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_YES;
+	};
+	
+	//  Overridden for Specific elements like Chart Title and X and Y Axis labels
+	var _PPM_Error_Vs_RetentionTime_For_PSMs_CHART_GLOBALS = {
+			_CHART_DEFAULT_FONT_SIZE : 12,  //  Default font size - using to set font size for tick marks.
+			_TITLE_FONT_SIZE : 15, // In PX
+			_AXIS_LABEL_FONT_SIZE : 14, // In PX
+			_TICK_MARK_TEXT_FONT_SIZE : 14, // In PX
+	}
+
+	/**
+	 * 
+	 */
+	this._add_PPM_Error_Vs_RetentionTime_For_PSMs_Histogram_Chart = function( params ) {
+		var entryForLinkType = params.entryForLinkType;
+		var colorAndbarColor = params.colorAndbarColor;
+		var $chartContainer = params.$chartContainer;
+		
+		var linkType = entryForLinkType.linkType;
+
+		var retentionTimeBuckets = entryForLinkType.retentionTimeBuckets;
+
+		//  All PPM Error Bin Start values, sorted smallest to largest
+		var ppmErrorBinStartDistinctSorted = entryForLinkType.ppmErrorBinStartDistinctSorted;
+		
+		var numScans = entryForLinkType.numScans;
+		
+		var ppmErrorBinMin = entryForLinkType.ppmErrorBinMin;
+		var ppmErrorBinMax = entryForLinkType.ppmErrorBinMax;
+		var ppmErrorPossibleMax = entryForLinkType.ppmErrorPossibleMax;
+		var retentionTimeBinMin = entryForLinkType.retentionTimeBinMin;
+		var retentionTimeBinMax = entryForLinkType.retentionTimeBinMax;
+		var retentionTimePossibleMax = entryForLinkType.retentionTimePossibleMax;
+
+		//  chart data for Google charts
+		var chartData = [];
+
+		var OPACITY_DEFAULT = "0.5";
+		
+		//  opacity: null  Use Default
+
+		// Ranges:  1-3, 4-10, 11-17, 18+
+		
+		//  Only last element can have and must have "min" property 
+		var SERIES_SETTINGS = [
+			{ max: 3, color: _PROXL_COLOR_SITE_BLUE, pointSize : 4, opacity: null }
+			,{ max: 10, color: _PROXL_COLOR_SITE_GREEN, pointSize : 5, opacity: null }
+			,{ max: 17, color: '#ddbf17', pointSize : 6, opacity: null }
+			,{ min: 18, color: _PROXL_COLOR_SITE_RED, pointSize : 7, opacity: null }
+		];
+		
+		
+		
+		var addHeaderEntry = function( label ) {
+			chartDataHeaderEntry.push( {label: label, type: 'number'} );
+			chartDataHeaderEntry.push( {type:'string', role: 'style' } );
+//			, {type:'string', role: "tooltip", 'p': {'html': true} }
+		}
+
+		var chartDataHeaderEntry = [ 'Retention Time' ];
+
+		var prevMax = 0;
+		for ( var seriesSettingsIndex = 0; seriesSettingsIndex < SERIES_SETTINGS.length; seriesSettingsIndex++ ) {
+			var entry = SERIES_SETTINGS[ seriesSettingsIndex ];
+			if ( entry.max !== undefined && entry.max !== null ) {
+				addHeaderEntry( ( prevMax + 1 ) + "-" + entry.max );
+			} else {
+				// No max so must contain min
+				if ( entry.min === undefined || entry.min === null ) {
+					throw Error( "SERIES_SETTINGS element not contain min or max property" );
+				}
+				addHeaderEntry( entry.min + "+" );
+			}
+			prevMax = entry.max;
+		}
+		
+		chartData.push( chartDataHeaderEntry );
+
+		var maxCount = 0;
+		
+		var totalCount = 0;
+		
+		var maxRetenionTimeError = null;
+		var minRetenionTimeError = null;
+
+		var maxPPMError = null;
+		var minPPMError = null;
+
+		for ( var retentionTimeBucketsIndex = 0; retentionTimeBucketsIndex < retentionTimeBuckets.length; retentionTimeBucketsIndex++ ) {
+			var retentionTimeBucket = retentionTimeBuckets[ retentionTimeBucketsIndex ];
+			var chartBuckets = retentionTimeBucket.chartBuckets;
+
+			for ( var bucketIndex = 0; bucketIndex < chartBuckets.length; bucketIndex++ ) {
+				var bucket = chartBuckets[ bucketIndex ];
+
+				var retentionTimeStart = bucket.retentionTimeStart;
+				var retentionTimeEnd = bucket.retentionTimeEnd;
+				var ppmErrorStart = bucket.ppmErrorStart;
+				var ppmErrorEnd = bucket.ppmErrorEnd;
+				var count = bucket.count;
+				
+				var retentionTimeCenter = retentionTimeStart + ( ( retentionTimeEnd - retentionTimeStart ) / 2 );
+				var ppmErrorCenter = ppmErrorStart + ( ( ppmErrorEnd - ppmErrorStart ) / 2 );
+				
+//				var tooltipText = "<div style='padding: 4px;'>Count: " + bucket.count +
+//				"<br>PPM Error approximately " + 
+//				bucket.binStart.toPrecision( _PPM_ERROR_DISPLAY_MAX_SIGNIFICANT_DIGITS ) + 
+//				" to " + bucket.binEnd.toPrecision( _PPM_ERROR_DISPLAY_MAX_SIGNIFICANT_DIGITS ) +
+//				"</div>";
+
+				var entryAnnotationText = bucket.count;
+				
+				var chartEntrySpecificSeries = [
+					ppmErrorCenter 		// Y axis
+					, 'fill-opacity : ??'  // style
+				];
+				
+				var fillOpacityStyleOption = 'fill-opacity : ';
+
+				//  Style of point
+//				colorAndbarColor.barColor,
+				//  Style appears to be ignored
+//				' color : orange; ' +
+//				'opacity : 0; '+
+//				'stroke-width : 0; ' 
+//				+
+//				'stroke-color : red; ' +
+//				'stroke-opacity : 1; ' +
+//				'fill-color : red; ' +
+//				'fill-opacity : .2'
+//				,
+//				//  Tool Tip
+//				tooltipText
+////				,
+////				entryAnnotationText
+
+				var chartEntry = [ retentionTimeCenter ];  	// X axis
+
+				//  Copy chartEntrySpecificSeries to chartEntry
+				var copy_chartEntrySpecificSeriesTo_chartEntry = function( ) {
+					for ( var copy_chartEntrySpecificSeriesTo_chartEntry_index = 0; copy_chartEntrySpecificSeriesTo_chartEntry_index < chartEntrySpecificSeries.length; copy_chartEntrySpecificSeriesTo_chartEntry_index++ ) {
+						var chartEntrySpecificSeriesEntry = chartEntrySpecificSeries[ copy_chartEntrySpecificSeriesTo_chartEntry_index ];
+						chartEntry.push( chartEntrySpecificSeriesEntry );
+					}
+				}
+
+				//  Fill in for other series
+				var addNullEntriesToChartEntryForSeriesCount = function( seriesCount ) {
+					var counterMax = seriesCount * chartEntrySpecificSeries.length;
+					for ( var counter = 0; counter < counterMax ; counter++ ) {
+						chartEntry.push( null );
+					}
+				}
+
+				for ( var seriesSettingsIndex = 0; seriesSettingsIndex < SERIES_SETTINGS.length; seriesSettingsIndex++ ) {
+					var entry = SERIES_SETTINGS[ seriesSettingsIndex ];
+					if ( entry.max !== undefined && entry.max !== null ) {
+						if ( count <= entry.max ) {
+							addNullEntriesToChartEntryForSeriesCount( seriesSettingsIndex );
+							var opacityString = null;
+							if ( entry.opacity !== undefined && entry.opacity !== null ) {
+								opacityString = opacityString;
+							} else {
+								opacityString = OPACITY_DEFAULT;
+							}
+							chartEntrySpecificSeries[ 1 ] = fillOpacityStyleOption + opacityString;
+							copy_chartEntrySpecificSeriesTo_chartEntry( chartEntry, chartEntrySpecificSeries );
+							addNullEntriesToChartEntryForSeriesCount( SERIES_SETTINGS.length - ( seriesSettingsIndex + 1 ) );
+							break;
+						}
+					} else {
+						// No max so must contain min
+						if ( entry.min === undefined || entry.min === null ) {
+							throw Error( "SERIES_SETTINGS element not contain min or max property" );
+						}
+						if ( count >= entry.min ) {
+							addNullEntriesToChartEntryForSeriesCount( seriesSettingsIndex );
+							var opacityString = null;
+							if ( entry.opacity !== undefined && entry.opacity !== null ) {
+								opacityString = opacityString;
+							} else {
+								opacityString = OPACITY_DEFAULT;
+							}
+							chartEntrySpecificSeries[ 1 ] = fillOpacityStyleOption + opacityString;
+							copy_chartEntrySpecificSeriesTo_chartEntry( chartEntry, chartEntrySpecificSeries );
+							break;
+						}		
+					}
+				}
+				
+				chartData.push( chartEntry );
+
+				//  Update Max Min and Total
+				totalCount += bucket.count;
+				if ( bucket.count > maxCount ) {
+					maxCount = bucket.count;
+				}
+				if ( maxPPMError === null || ppmErrorEnd > maxPPMError ) {
+					maxPPMError = ppmErrorEnd;
+				}
+				if ( minPPMError === null || ppmErrorStart < minPPMError ) {
+					minPPMError = ppmErrorStart;
+				}
+				if ( maxRetenionTimeError === null || retentionTimeEnd > maxRetenionTimeError ) {
+					maxRetenionTimeError = retentionTimeEnd;
+				}
+				if ( minRetenionTimeError === null || retentionTimeStart < minRetenionTimeError ) {
+					minRetenionTimeError = retentionTimeStart;
+				}
+			}
+		}
+
+		var vAxisTicks = 
+			this._get_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlot_Chart_Vertical_TickMarks( { maxValue : maxPPMError, minValue : minPPMError } );
+
+		var hAxisTicks = 
+			this._get_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlot_Chart_Horizontal_TickMarks( { maxValue : maxRetenionTimeError, minValue : minRetenionTimeError } );
+		
+		//  Build Series Config and Color Arrays
+		var seriesConfig = [];
+		var barColors = []; // must be an array
+		
+		for ( var seriesSettingsIndex = 0; seriesSettingsIndex < SERIES_SETTINGS.length; seriesSettingsIndex++ ) {
+			var entry = SERIES_SETTINGS[ seriesSettingsIndex ];
+			var seriesConfigEntry = { color: entry.color, pointSize: entry.pointSize };
+			seriesConfig.push( 	seriesConfigEntry );
+			barColors.push( entry.color );
+		}
+		
+		var chartTitle = 'PPM Error vs/ Retention Time (' + linkType + ")";
+		var optionsFullsize = {
+			//  Overridden for Specific elements like Chart Title and X and Y Axis labels
+				fontSize: _PPM_Error_Vs_RetentionTime_For_PSMs_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
+				series: seriesConfig,	
+//				pointSize: 20,
+				title: chartTitle, // Title above chart
+			    titleTextStyle: {
+			    	color : _PROXL_DEFAULT_FONT_COLOR, //  Set default font color
+//			        color: <string>,    // any HTML string color ('red', '#cc00cc')
+//			        fontName: <string>, // i.e. 'Times New Roman'
+			        fontSize: _PPM_Error_Vs_RetentionTime_For_PSMs_CHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
+//			        bold: <boolean>,    // true or false
+//			        italic: <boolean>   // true of false
+			    },
+				//  X axis label below chart
+				hAxis: { title: 'Retention Time', titleTextStyle: { color: 'black', fontSize: _PPM_Error_Vs_RetentionTime_For_PSMs_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+					,gridlines: {  
+		                color: 'none'  //  No vertical grid lines on the horzontal axis
+		            }
+//					,baselineColor: 'none' // Hide 'Zero' line
+//					,baselineColor: '#CDCDCD' // Make 'Zero' line really light
+					,ticks: hAxisTicks
+//					,ticks: [-100,0,100]
+					,maxValue : maxRetenionTimeError
+					,minValue : minRetenionTimeError
+				},  
+				//  Y axis label left of chart
+				vAxis: { title: 'PPM Error', titleTextStyle: { color: 'black', fontSize: _PPM_Error_Vs_RetentionTime_For_PSMs_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+//					,baseline: 0     // always start at zero
+					,ticks: vAxisTicks
+					,maxValue : maxPPMError
+					,minValue : minPPMError
+				},
+//				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
+				//  Size picked up from containing HTML element
+//				width : 500, 
+//				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+//				bar: { groupWidth: '100%' },  // set bar width large to eliminate space between bars
+				colors: barColors,
+				tooltip: {isHtml: true}
+		};        
+		// create the chart
+		var data = google.visualization.arrayToDataTable( chartData );
+		
+		var chartFullsize = new google.visualization.ScatterChart( $chartContainer[0] );
+		chartFullsize.draw( data, optionsFullsize );
+		
+		//  Using Material chart.  added to viewQC.jsp:  <c:set var="googleChartPackagesLoadAdditions">,"scatter"</c:set>
+//		var chartFullsize = new google.charts.Scatter( $chartContainer[0] );
+//		chartFullsize.draw( data, google.charts.Scatter.convertOptions( optionsFullsize ) );
+		
+	};
+
+	/**
+	 * for vertical PPM Error axis
+	 */
+	this._get_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlot_Chart_Vertical_TickMarks = function( params ) {
+		var maxValue = params.maxValue;
+		var minValue = params.minValue;
+		//  Compute max and min tick marks, to next higher and lower multiple of 1
+		var maxValueCeil = Math.ceil( maxValue );
+		var minValueFloor = Math.floor( minValue );
+		
+		var maxCeilMinusMinFloor = maxValueCeil - minValueFloor;
+		
+		var tickMarkIncrementFromZero = maxCeilMinusMinFloor / 5;
+		
+		var tickMarks = [];
+		
+		if ( minValueFloor < 0 && maxValueCeil > 0 ) {
+			tickMarks.push( 0 );
+		}
+		
+		if ( minValueFloor < 0 ) {
+			//  Add tick marks for < 0 
+			for ( var tickCounter = 1; ( - ( tickCounter * tickMarkIncrementFromZero ) ) > minValueFloor; tickCounter++ ) {
+				var tickMark = ( - ( tickCounter * tickMarkIncrementFromZero ) );
+				tickMarks.push( tickMark );
+			}
+		}
+
+		if ( maxValueCeil > 0 ) {
+			//  Add tick marks for > 0 
+			for ( var tickCounter = 1; ( ( tickCounter * tickMarkIncrementFromZero ) ) < maxValueCeil; tickCounter++ ) {
+				var tickMark = ( ( tickCounter * tickMarkIncrementFromZero ) );
+				tickMarks.push( tickMark );
+			}
+		}
+		return tickMarks;
+	};
+	
+	/**
+	 * for horizontal Retention Time axis
+	 */
+	this._get_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlot_Chart_Horizontal_TickMarks = function( params ) {
+		var maxValue = params.maxValue;
+		var minValue = params.minValue;
+		
+		var SCALE_FACTOR = 10;
+		
+		//  Compute max and min tick marks, to next higher and lower multiple of SCALE_FACTOR
+		var maxTickMark = Math.ceil( maxValue / SCALE_FACTOR ) * SCALE_FACTOR;
+		var minTickMark = Math.floor( minValue / SCALE_FACTOR ) * SCALE_FACTOR;
+		
+		var maxMinusMin_TickMark =  maxTickMark - minTickMark;
+		
+		//  Create tick marks at min, 25%, 50%, 75%, max
+		var tickMarks = [ 
+			minTickMark, 
+			minTickMark + ( maxMinusMin_TickMark * .25 ),
+			minTickMark + ( maxMinusMin_TickMark * .5 ),
+			minTickMark + ( maxMinusMin_TickMark * .75 ),
+			maxTickMark
+			];
+		return tickMarks;
+	};
+		
+	//////////////////////////////////////////////////////////////////
+
+	//    PPM Error Vs M/Z for PSMs Scatter Plot
+	
+
+	/**
+	 * Clear data for  PPM Error for PSMs Scatter Plot
+	 */
+	this.clear_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlot = function() {
+		
+		_PPM_Error_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_NO;
+
+		var $NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock = $("#NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock");
+		if ( $NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock.length > 0 ) {
+			//  The element with id 'NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock' exists so there are no scans in the searches
+			_PPM_Error_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_YES;
+			return;  //  EARLY EXIT
+		}
+		
+		var $PSM_PPM_Error_Vs_M_over_Z_CountsLoadingBlock = $("#PSM_PPM_Error_Vs_M_over_Z_CountsLoadingBlock");
+		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock = $("#PSM_PPM_Error_Vs_M_over_Z_CountsBlock");
+		$PSM_PPM_Error_Vs_M_over_Z_CountsLoadingBlock.show();
+		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock.hide();
+	};
+
+	/**
+	 * If not loaded, call load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlot()
+	 */
+	this.load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotIfNeeded = function() {
+		
+		if ( _PPM_Error_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded === _IS_LOADED_NO ) {
+			this.load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlot();
+		}
+	};
+	
+	/**
+	 * Load the data for  PPM Error for PSMs Scatter Plot
+	 */
+	this.load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlot = function() {
+		var objectThis = this;
+
+		_PPM_Error_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_LOADING;
+		
+		var $NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock = $("#NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock");
+		if ( $NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock.length > 0 ) {
+			//  The element with id 'NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock' exists so there are no scans in the searches
+			_PPM_Error_Vs_M_over_Z_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_YES;
+			return;  //  EARLY EXIT
+		}
+
+		var selectedLinkTypes = _hash_json_Contents.linkTypes;
+		
+		//  For selected types, display those cells and display "Loading"
+
+		var $PSM_PPM_Error_Vs_M_over_Z_CountsLoadingBlock = $("#PSM_PPM_Error_Vs_M_over_Z_CountsLoadingBlock");
+		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock = $("#PSM_PPM_Error_Vs_M_over_Z_CountsBlock");
+		$PSM_PPM_Error_Vs_M_over_Z_CountsLoadingBlock.hide();  //  Hide generic loading section
+		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock.show();
+		
+		//  Get all cells for per link type charts and reset them
+		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock__per_link_type_row_jq_All = $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.find(".per_link_type_row_jq");
+		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock__per_link_type_row_jq_All.hide();
+		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock__chart_loading_block_jq = $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.find(".loading_block_jq");
+		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock__chart_loading_block_jq.show();
+		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock__chart_outer_container_for_download_jq = $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.find(".chart_outer_container_for_download_jq")
+		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock__chart_outer_container_for_download_jq.hide();
+		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock__chart_container_for_download_jq = $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.find(".chart_container_for_download_jq");
+		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock__chart_container_for_download_jq.empty();
+		
+		// Show cells for selected link types
+		for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
+			var selectedLinkType = selectedLinkTypes[ index ];
+			var cellClassSelector = selectedLinkType + "_row_jq";
+			var $cellForSelectedLinkType = $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.find("." + cellClassSelector );
+			$cellForSelectedLinkType.show();
+		}
+		
+		//  Make a copy of _hash_json_Contents    (  true for deep, target object, source object, <source object 2>, ... )
+		var hash_json_Contents_COPY = $.extend( true /*deep*/,  {}, _hash_json_Contents );
+		
+		for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
+			
+			//  For each selected link type, 
+			//    set it as selected link type in hash_json_Contents_COPY,
+			//      and create a chart for that
+			
+			var selectedLinkType = selectedLinkTypes[ index ];
+			
+			hash_json_Contents_COPY.linkTypes = [ selectedLinkType ];
+			
+			this.load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkType( {  
+					selectedLinkType : selectedLinkType,
+					hash_json_Contents_COPY : hash_json_Contents_COPY
+			});
+		}
+		
+	};
+
+	/**
+	 * Load the data for  PPM Error Vs M/Z for PSMs Scatter Plot Specific Link Type
+	 */
+	this.load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkType = function( params ) {
+		var objectThis = this;
+
+		var selectedLinkType = params.selectedLinkType;
+		var hash_json_Contents_COPY = params.hash_json_Contents_COPY;
+		var project_search_ids = params.project_search_ids; 
+			
+		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents_COPY );
+		var ajaxRequestData = {
+				project_search_id : _project_search_ids,
+				filterCriteria : hash_json_field_Contents_JSONString
+		};
+		$.ajax({
+//			cache : false,
+			url : contextPathJSVar + "/services/qc/dataPage/ppmErrorVsM_over_Z", // ppmErrorVsM_over_Z
+			traditional: true,  //  Force traditional serialization of the data sent
+								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+								//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+			data : ajaxRequestData,  // The data sent as params on the URL
+			dataType : "json",
+			success : function( ajaxResponseData ) {
+				try {
+					var responseParams = {
+							ajaxResponseData : ajaxResponseData, 
+							ajaxRequestData : ajaxRequestData,
+							selectedLinkType : selectedLinkType
+					};
+					objectThis.load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotResponse( responseParams );
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			},
+	        failure: function(errMsg) {
+	        	handleAJAXFailure( errMsg );
+	        },
+			error : function(jqXHR, textStatus, errorThrown) {
+				handleAJAXError(jqXHR, textStatus, errorThrown);
+			}
+		});
+	};
+
+	/**
+	 * Process AJAX Response
+	 */
+	this.load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotResponse = function( params ) {
+		var objectThis = this;
+
+		var ajaxResponseData = params.ajaxResponseData;
+		var ajaxRequestData = params.ajaxRequestData;
+		var selectedLinkType = params.selectedLinkType;
+		
+		var ppmErrorVsM_over_ZScatterPlotResult = ajaxResponseData.ppmErrorVsM_over_ZScatterPlotResult;
+		var dataForChartPerLinkTypeList = ppmErrorVsM_over_ZScatterPlotResult.dataForChartPerLinkTypeList;
+		
+		if ( dataForChartPerLinkTypeList.length !== 1 ) {
+			throw Error( "dataForChartPerLinkTypeList.length !== 1, is = " + dataForChartPerLinkTypeList.length );
+		}
+		
+		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock = $("#PSM_PPM_Error_Vs_M_over_Z_CountsBlock");
+		if ( $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_Vs_M_over_Z_CountsBlock'" );
+		}
+
+		var entryForLinkType = dataForChartPerLinkTypeList[ 0 ];
+		
+		var linkType = entryForLinkType.linkType;
+		var m_over_ZBuckets = entryForLinkType.m_over_ZBuckets;
+
+		if ( m_over_ZBuckets === null || m_over_ZBuckets.length === 0  ) {
+			//  No data for this link type
+			return;  //  EARLY RETURN
+		}
+
+		//  Get cell for selectedLinkType
+		var cellClassSelector = selectedLinkType + "_row_jq";
+		var $cellForSelectedLinkType = $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.find("." + cellClassSelector );
+
+		var $loading_block_jq = $cellForSelectedLinkType.find(".loading_block_jq");
+		$loading_block_jq.hide();
+
+		var $chartOuterContainer =
+			$cellForSelectedLinkType.find(".chart_outer_container_for_download_jq");
+		$chartOuterContainer.show();
+
+		var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
+
+		var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
+
+		this._add_PPM_Error_Vs_M_over_Z_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chartContainer } );
+
+		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
+		// Add tooltips for download links
+		addToolTips( $chartOuterContainer );
+	
+		//  TODO  FIX THIS
+		
+//		_PPM_Error_Vs_M_over_Z_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_YES;
+	};
+	
+	//  Overridden for Specific elements like Chart Title and X and Y Axis labels
+	var _PPM_Error_Vs_M_over_Z_For_PSMs_CHART_GLOBALS = {
+			_CHART_DEFAULT_FONT_SIZE : 12,  //  Default font size - using to set font size for tick marks.
+			_TITLE_FONT_SIZE : 15, // In PX
+			_AXIS_LABEL_FONT_SIZE : 14, // In PX
+			_TICK_MARK_TEXT_FONT_SIZE : 14, // In PX
+	}
+
+	/**
+	 * 
+	 */
+	this._add_PPM_Error_Vs_M_over_Z_For_PSMs_Histogram_Chart = function( params ) {
+		var entryForLinkType = params.entryForLinkType;
+		var colorAndbarColor = params.colorAndbarColor;
+		var $chartContainer = params.$chartContainer;
+		
+		var linkType = entryForLinkType.linkType;
+
+		var m_over_ZBuckets = entryForLinkType.m_over_ZBuckets;
+
+		//  All PPM Error Bin Start values, sorted smallest to largest
+		var ppmErrorBinStartDistinctSorted = entryForLinkType.ppmErrorBinStartDistinctSorted;
+		
+		var numScans = entryForLinkType.numScans;
+		
+		var ppmErrorBinMin = entryForLinkType.ppmErrorBinMin;
+		var ppmErrorBinMax = entryForLinkType.ppmErrorBinMax;
+		var ppmErrorPossibleMax = entryForLinkType.ppmErrorPossibleMax;
+		var m_over_ZBinMin = entryForLinkType.m_over_ZBinMin;
+		var m_over_ZBinMax = entryForLinkType.m_over_ZBinMax;
+		var m_over_ZPossibleMax = entryForLinkType.m_over_ZPossibleMax;
+
+		//  chart data for Google charts
+		var chartData = [];
+		
+		var OPACITY_DEFAULT = "0.5";
+		
+		//  opacity: null  Use Default
+
+		// Ranges:  1-3, 4-10, 11-17, 18+
+		
+		//  Only last element can have and must have "min" property 
+		var SERIES_SETTINGS = [
+			{ max: 3, color: _PROXL_COLOR_SITE_BLUE, pointSize : 4, opacity: null }
+			,{ max: 10, color: _PROXL_COLOR_SITE_GREEN, pointSize : 5, opacity: null }
+			,{ max: 17, color: '#ddbf17', pointSize : 6, opacity: null }
+			,{ min: 18, color: _PROXL_COLOR_SITE_RED, pointSize : 7, opacity: null }
+		];
+		
+		
+		
+		var addHeaderEntry = function( label ) {
+			chartDataHeaderEntry.push( {label: label, type: 'number'} );
+			chartDataHeaderEntry.push( {type:'string', role: 'style' } );
+//			, {type:'string', role: "tooltip", 'p': {'html': true} }
+		}
+
+		var chartDataHeaderEntry = [ 'M/Z' ];
+
+		var prevMax = 0;
+		for ( var seriesSettingsIndex = 0; seriesSettingsIndex < SERIES_SETTINGS.length; seriesSettingsIndex++ ) {
+			var entry = SERIES_SETTINGS[ seriesSettingsIndex ];
+			if ( entry.max !== undefined && entry.max !== null ) {
+				addHeaderEntry( ( prevMax + 1 ) + "-" + entry.max );
+			} else {
+				// No max so must contain min
+				if ( entry.min === undefined || entry.min === null ) {
+					throw Error( "SERIES_SETTINGS element not contain min or max property" );
+				}
+				addHeaderEntry( entry.min + "+" );
+			}
+			prevMax = entry.max;
+		}
+		
+		chartData.push( chartDataHeaderEntry );
+
+		var maxCount = 0;
+		
+		var totalCount = 0;
+
+		var max_M_over_Z_Error = null;
+		var min_M_over_Z_Error = null;
+
+		var maxPPMError = null;
+		var minPPMError = null;
+
+		for ( var m_over_ZBucketsIndex = 0; m_over_ZBucketsIndex < m_over_ZBuckets.length; m_over_ZBucketsIndex++ ) {
+			var m_over_ZBucket = m_over_ZBuckets[ m_over_ZBucketsIndex ];
+			var chartBuckets = m_over_ZBucket.chartBuckets;
+
+			for ( var bucketIndex = 0; bucketIndex < chartBuckets.length; bucketIndex++ ) {
+				var bucket = chartBuckets[ bucketIndex ];
+
+				var m_over_ZStart = bucket.m_over_ZStart;
+				var m_over_ZEnd = bucket.m_over_ZEnd;
+				var ppmErrorStart = bucket.ppmErrorStart;
+				var ppmErrorEnd = bucket.ppmErrorEnd;
+				var count = bucket.count;
+				
+				var m_over_ZCenter = m_over_ZStart + ( ( m_over_ZEnd - m_over_ZStart ) / 2 );
+				var ppmErrorCenter = ppmErrorStart + ( ( ppmErrorEnd - ppmErrorStart ) / 2 );
+				
+//				var tooltipText = "<div style='padding: 4px;'>Count: " + bucket.count +
+//				"<br>PPM Error approximately " + 
+//				bucket.binStart.toPrecision( _PPM_ERROR_DISPLAY_MAX_SIGNIFICANT_DIGITS ) + 
+//				" to " + bucket.binEnd.toPrecision( _PPM_ERROR_DISPLAY_MAX_SIGNIFICANT_DIGITS ) +
+//				"</div>";
+
+				var entryAnnotationText = bucket.count;
+				
+				var chartEntrySpecificSeries = [
+					ppmErrorCenter 		// Y axis
+					, 'fill-opacity : ??'  // style
+				];
+				
+				var fillOpacityStyleOption = 'fill-opacity : ';
+
+				//  Style of point
+//				colorAndbarColor.barColor,
+				//  Style appears to be ignored
+//				' color : orange; ' +
+//				'opacity : 0; '+
+//				'stroke-width : 0; ' 
+//				+
+//				'stroke-color : red; ' +
+//				'stroke-opacity : 1; ' +
+//				'fill-color : red; ' +
+//				'fill-opacity : .2'
+//				,
+//				//  Tool Tip
+//				tooltipText
+////				,
+////				entryAnnotationText
+
+				var chartEntry = [ m_over_ZCenter ];  	// X axis
+
+				//  Copy chartEntrySpecificSeries to chartEntry
+				var copy_chartEntrySpecificSeriesTo_chartEntry = function( ) {
+					for ( var copy_chartEntrySpecificSeriesTo_chartEntry_index = 0; copy_chartEntrySpecificSeriesTo_chartEntry_index < chartEntrySpecificSeries.length; copy_chartEntrySpecificSeriesTo_chartEntry_index++ ) {
+						var chartEntrySpecificSeriesEntry = chartEntrySpecificSeries[ copy_chartEntrySpecificSeriesTo_chartEntry_index ];
+						chartEntry.push( chartEntrySpecificSeriesEntry );
+					}
+				}
+
+				//  Fill in for other series
+				var addNullEntriesToChartEntryForSeriesCount = function( seriesCount ) {
+					var counterMax = seriesCount * chartEntrySpecificSeries.length;
+					for ( var counter = 0; counter < counterMax ; counter++ ) {
+						chartEntry.push( null );
+					}
+				}
+
+				for ( var seriesSettingsIndex = 0; seriesSettingsIndex < SERIES_SETTINGS.length; seriesSettingsIndex++ ) {
+					var entry = SERIES_SETTINGS[ seriesSettingsIndex ];
+					if ( entry.max !== undefined && entry.max !== null ) {
+						if ( count <= entry.max ) {
+							addNullEntriesToChartEntryForSeriesCount( seriesSettingsIndex );
+							var opacityString = null;
+							if ( entry.opacity !== undefined && entry.opacity !== null ) {
+								opacityString = opacityString;
+							} else {
+								opacityString = OPACITY_DEFAULT;
+							}
+							chartEntrySpecificSeries[ 1 ] = fillOpacityStyleOption + opacityString;
+							copy_chartEntrySpecificSeriesTo_chartEntry( chartEntry, chartEntrySpecificSeries );
+							addNullEntriesToChartEntryForSeriesCount( SERIES_SETTINGS.length - ( seriesSettingsIndex + 1 ) );
+							break;
+						}
+					} else {
+						// No max so must contain min
+						if ( entry.min === undefined || entry.min === null ) {
+							throw Error( "SERIES_SETTINGS element not contain min or max property" );
+						}
+						if ( count >= entry.min ) {
+							addNullEntriesToChartEntryForSeriesCount( seriesSettingsIndex );
+							var opacityString = null;
+							if ( entry.opacity !== undefined && entry.opacity !== null ) {
+								opacityString = opacityString;
+							} else {
+								opacityString = OPACITY_DEFAULT;
+							}
+							chartEntrySpecificSeries[ 1 ] = fillOpacityStyleOption + opacityString;
+							copy_chartEntrySpecificSeriesTo_chartEntry( chartEntry, chartEntrySpecificSeries );
+							break;
+						}		
+					}
+				}
+				
+				chartData.push( chartEntry );
+
+				//  Update Max Min and Total
+				totalCount += bucket.count;
+				if ( bucket.count > maxCount ) {
+					maxCount = bucket.count;
+				}
+				if ( maxPPMError === null || ppmErrorEnd > maxPPMError ) {
+					maxPPMError = ppmErrorEnd;
+				}
+				if ( minPPMError === null || ppmErrorStart < minPPMError ) {
+					minPPMError = ppmErrorStart;
+				}
+				if ( max_M_over_Z_Error === null || m_over_ZEnd > max_M_over_Z_Error ) {
+					max_M_over_Z_Error = m_over_ZEnd;
+				}
+				if ( min_M_over_Z_Error === null || m_over_ZStart < min_M_over_Z_Error ) {
+					min_M_over_Z_Error = m_over_ZStart;
+				}
+			}
+		}
+		
+		var vAxisTicks = 
+			this._get_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlot_Chart_Vertical_TickMarks( { maxValue : maxPPMError, minValue : minPPMError } );
+		var hAxisTicks = 
+			this._get_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlot_Chart_Horizontal_TickMarks( { maxValue : max_M_over_Z_Error, minValue : min_M_over_Z_Error } );
+		
+		//  Build Series Config and Color Arrays
+		var seriesConfig = [];
+		var barColors = []; // must be an array
+		
+		for ( var seriesSettingsIndex = 0; seriesSettingsIndex < SERIES_SETTINGS.length; seriesSettingsIndex++ ) {
+			var entry = SERIES_SETTINGS[ seriesSettingsIndex ];
+			var seriesConfigEntry = { color: entry.color, pointSize: entry.pointSize };
+			seriesConfig.push( 	seriesConfigEntry );
+			barColors.push( entry.color );
+		}
+
+		var chartTitle = 'PPM Error vs/ M/Z (' + linkType + ")";
+		var optionsFullsize = {
+			//  Overridden for Specific elements like Chart Title and X and Y Axis labels
+				fontSize: _PPM_Error_Vs_M_over_Z_For_PSMs_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
+				series: seriesConfig,
+//				pointSize: 20,
+				title: chartTitle, // Title above chart
+			    titleTextStyle: {
+			    	color : _PROXL_DEFAULT_FONT_COLOR, //  Set default font color
+//			        color: <string>,    // any HTML string color ('red', '#cc00cc')
+//			        fontName: <string>, // i.e. 'Times New Roman'
+			        fontSize: _PPM_Error_Vs_M_over_Z_For_PSMs_CHART_GLOBALS._TITLE_FONT_SIZE // 12, 18 whatever you want (don't specify px)
+//			        bold: <boolean>,    // true or false
+//			        italic: <boolean>   // true of false
+			    },
+				//  X axis label below chart
+				hAxis: 
+				{ 	title: 'M/Z'
+					, titleTextStyle: { color: 'black', fontSize: _PPM_Error_Vs_M_over_Z_For_PSMs_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+					,gridlines: {  
+		                color: 'none'  //  No vertical grid lines on the horzontal axis
+		            }
+//					,baseline: 0     // always start at zero
+//					,baselineColor: 'none' // Hide 'Zero' line
+//					,baselineColor: '#CDCDCD' // Make 'Zero' line really light
+					,ticks: hAxisTicks
+//					,ticks: [-100,0,100]
+					,maxValue : max_M_over_Z_Error
+					,minValue : min_M_over_Z_Error
+				},  
+				//  Y axis label left of chart
+				vAxis: 
+				{ 	title: 'PPM Error'
+					, titleTextStyle: { color: 'black', fontSize: _PPM_Error_Vs_M_over_Z_For_PSMs_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+//					,baseline: 0     // always start at zero
+					,ticks: vAxisTicks
+//					,maxValue : maxCount
+				,maxValue : maxPPMError
+				,minValue : minPPMError
+
+				},
+//				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
+				//  Size picked up from containing HTML element
+//				width : 500, 
+//				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+//				bar: { groupWidth: '100%' },  // set bar width large to eliminate space between bars
+				colors: barColors,
+				tooltip: {isHtml: true}
+		};        
+		// create the chart
+		var data = google.visualization.arrayToDataTable( chartData );
+		
+		var chartFullsize = new google.visualization.ScatterChart( $chartContainer[0] );
+		chartFullsize.draw( data, optionsFullsize );
+		
+		//  Using Material chart.  added to viewQC.jsp:  <c:set var="googleChartPackagesLoadAdditions">,"scatter"</c:set>
+//		var chartFullsize = new google.charts.Scatter( $chartContainer[0] );
+//		chartFullsize.draw( data, google.charts.Scatter.convertOptions( optionsFullsize ) );
+		
+	};
+
+
+	/**
+	 * for vertical PPM Error axis
+	 */
+	this._get_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlot_Chart_Vertical_TickMarks = function( params ) {
+		var maxValue = params.maxValue;
+		var minValue = params.minValue;
+		//  Compute max and min tick marks, to next higher and lower multiple of 1
+		var maxValueCeil = Math.ceil( maxValue );
+		var minValueFloor = Math.floor( minValue );
+		
+		var maxCeilMinusMinFloor = maxValueCeil - minValueFloor;
+		
+		var tickMarkIncrementFromZero = maxCeilMinusMinFloor / 5;
+		
+		var tickMarks = [];
+		
+		if ( minValueFloor < 0 && maxValueCeil > 0 ) {
+			tickMarks.push( 0 );
+		}
+		
+		if ( minValueFloor < 0 ) {
+			//  Add tick marks for < 0 
+			for ( var tickCounter = 1; ( - ( tickCounter * tickMarkIncrementFromZero ) ) > minValueFloor; tickCounter++ ) {
+				var tickMark = ( - ( tickCounter * tickMarkIncrementFromZero ) );
+				tickMarks.push( tickMark );
+			}
+		}
+
+		if ( maxValueCeil > 0 ) {
+			//  Add tick marks for > 0 
+			for ( var tickCounter = 1; ( ( tickCounter * tickMarkIncrementFromZero ) ) < maxValueCeil; tickCounter++ ) {
+				var tickMark = ( ( tickCounter * tickMarkIncrementFromZero ) );
+				tickMarks.push( tickMark );
+			}
+		}
+		
+		return tickMarks;
+	};
+	
+	/**
+	 * for horizontal M/Z axis
+	 */
+	this._get_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlot_Chart_Horizontal_TickMarks = function( params ) {
+		var maxValue = params.maxValue;
+		var minValue = params.minValue;
+		
+		var SCALE_FACTOR = 100;
+		
+		//  Compute max and min tick marks, to next higher and lower multiple of 100
+		var maxTickMark = Math.ceil( maxValue / SCALE_FACTOR ) * SCALE_FACTOR;
+		var minTickMark = Math.floor( minValue / SCALE_FACTOR ) * SCALE_FACTOR;
+		
+		var maxMinusMin_TickMark =  maxTickMark - minTickMark;
+		
+		//  Create tick marks at min, 25%, 50%, 75%, max
+		var tickMarks = [ 
+			minTickMark, 
+			minTickMark + ( maxMinusMin_TickMark * .25 ),
+			minTickMark + ( maxMinusMin_TickMark * .5 ),
+			minTickMark + ( maxMinusMin_TickMark * .75 ),
+			maxTickMark
+			];
+		return tickMarks;
+	};
+		
 	
 	//////////////////////////////////////////////////////////////////////
 
@@ -2449,7 +3633,9 @@ var ViewQCPageCode = function() {
 		};        
 		// create the chart
 		var data = google.visualization.arrayToDataTable( chartData );
+		
 		var chartFullsize = new google.visualization.ColumnChart( $chartContainer[0] );
+		
 		chartFullsize.draw(data, optionsFullsize);
 		
 		//  Temp code to find <rect> that are the actual data columns

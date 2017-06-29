@@ -86,15 +86,23 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	<link rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" type="text/css" media="print, projection, screen" />
 	<link rel="stylesheet" href="${ contextPath }/css/global.css?x=${cacheBustValue}" type="text/css" media="print, projection, screen" />
 
+	<%--  For Google Chart API import:
+	
+		 to import additional chart packages, 
+		 set page variable googleChartPackagesLoadAdditions to the chart, including a starting comma ','.
+		 
+		 example:
+		 	<c:set var="googleChartPackagesLoadAdditions">,"scatter"</c:set>
+		 
+		  --%>
 	
 	<%-- Google Chart API import --%>
-	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	<script type="text/javascript">
 	
 	  var googleChartAPIloaded_GLOBAL_VARIABLE = false;
 	  
-	  
-	  google.load("visualization", "1", {packages:["corechart"]});
+	   google.charts.load("current", {packages: ["corechart" ${ googleChartPackagesLoadAdditions } ]});
 	  
 	  var googleOnLoadCallbackFunction = function() {
 		try {	  
@@ -138,10 +146,9 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	  };
 	  
 	  //  Do NOT call a method on an object here.  The "this" gets set to the window.
-	  google.setOnLoadCallback(googleOnLoadCallbackFunction);
+	  google.charts.setOnLoadCallback(googleOnLoadCallbackFunction);
 	</script>		
-
-
+	
 </head>
  
 
