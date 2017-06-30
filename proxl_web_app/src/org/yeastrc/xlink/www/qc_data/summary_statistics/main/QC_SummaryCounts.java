@@ -212,6 +212,14 @@ public class QC_SummaryCounts {
 			}
 		}
 		
+		//  compute uniqueProteinSequenceIdCountAllLinkTypes.  combine all perLinkTypeTempData.proteinSequenceIds together
+		Set<Integer> all_proteinSequenceIds = new HashSet<>();
+		for ( Map.Entry<String,PerLinkTypeTempData> entry : perLinkTypeTempData_ByLinkType.entrySet() ) {
+			all_proteinSequenceIds.addAll( entry.getValue().proteinSequenceIds );
+		}
+		
+
+		
 //		//  copy map to array for output, in a specific order
 		List<QC_SummaryCountsResultsPerLinkType> resultsPerLinkTypeList = new ArrayList<>( perLinkTypeTempData_ByLinkType.size() );
 		createReultObjectPerLinkTypeAndAddToOutputListForLinkType( XLinkUtils.CROSS_TYPE_STRING, resultsPerLinkTypeList, perLinkTypeTempData_ByLinkType );
@@ -220,6 +228,7 @@ public class QC_SummaryCounts {
 		
 		QC_SummaryCountsResults result = new QC_SummaryCountsResults();
 		result.setResultsPerLinkTypeList( resultsPerLinkTypeList );
+		result.setUniqueProteinSequenceIdCountAllLinkTypes( all_proteinSequenceIds.size() );
 		
 		return result;
 	}

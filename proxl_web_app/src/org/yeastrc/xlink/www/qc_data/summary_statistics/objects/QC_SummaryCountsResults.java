@@ -11,6 +11,8 @@ public class QC_SummaryCountsResults {
 
 	private List<QC_SummaryCountsResultsPerLinkType> resultsPerLinkTypeList;
 	
+	private int uniqueProteinSequenceIdCountAllLinkTypes;
+	
 	/**
 	 * 
 	 *
@@ -57,6 +59,14 @@ public class QC_SummaryCountsResults {
 
 	public void setResultsPerLinkTypeList(List<QC_SummaryCountsResultsPerLinkType> resultsPerLinkTypeList) {
 		this.resultsPerLinkTypeList = resultsPerLinkTypeList;
+	}
+
+	public int getUniqueProteinSequenceIdCountAllLinkTypes() {
+		return uniqueProteinSequenceIdCountAllLinkTypes;
+	}
+
+	public void setUniqueProteinSequenceIdCountAllLinkTypes(int uniqueProteinSequenceIdCountAllLinkTypes) {
+		this.uniqueProteinSequenceIdCountAllLinkTypes = uniqueProteinSequenceIdCountAllLinkTypes;
 	}
 
 }

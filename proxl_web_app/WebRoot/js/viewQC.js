@@ -255,6 +255,28 @@ var ViewQCPageCode = function() {
 			}
 		});
 
+		var $summary_expand_link = $("#summary_expand_link");
+		$summary_expand_link.click( function( event ) { 
+			try {
+				objectThis._summary_expand_link_Clicked( { clickedThis : this } ); 
+				event.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+		var $summary_collapse_link = $("#summary_collapse_link");
+		$summary_collapse_link.click( function( event ) { 
+			try {
+				objectThis._summary_collapse_link_Clicked( { clickedThis : this } ); 
+				event.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+		
 		var $digestion_expand_link = $("#digestion_expand_link");
 		$digestion_expand_link.click( function( event ) { 
 			try {
@@ -1129,6 +1151,7 @@ var ViewQCPageCode = function() {
 		
 		var qc_SummaryCountsResults = ajaxResponseData.qc_SummaryCountsResults;
 		var resultsPerLinkTypeList = qc_SummaryCountsResults.resultsPerLinkTypeList;
+		var uniqueProteinSequenceIdCountAllLinkTypes = qc_SummaryCountsResults.uniqueProteinSequenceIdCountAllLinkTypes;
 		
 		// Block for "Summary Statistics"
 		var $Summary_Statistics_CountsBlock = $("#Summary_Statistics_CountsBlock");
@@ -1229,6 +1252,7 @@ var ViewQCPageCode = function() {
 		this._addSummaryChart( { 
 			chartTitle : 'Protein Count',
 			dataWithOneElementPerType: proteinSequenceIdCountPerType, 
+			combinedCount : uniqueProteinSequenceIdCountAllLinkTypes,
 			$chartContainer : $chart_container_jq } );
 		
 		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $Summary_Statistics_CountsBlock } );
@@ -1242,15 +1266,22 @@ var ViewQCPageCode = function() {
 	this._addSummaryChart = function( params ) {
 		var chartTitleParam = params.chartTitle;
 		var dataWithOneElementPerType = params.dataWithOneElementPerType;
+		var combinedCountParam = params.combinedCount;
 		var $chartContainer = params.$chartContainer;
 		
 		var combinedCount = 0;
 		
-		dataWithOneElementPerType.forEach( function ( currentArrayValue, index, array ) {
-			var entry = currentArrayValue;
-			combinedCount += entry.count;
-		}, this /* passed to function as this */ );
+		if ( combinedCountParam !== undefined ) {
+			combinedCount = combinedCountParam;
+		
+		} else {
 
+			dataWithOneElementPerType.forEach( function ( currentArrayValue, index, array ) {
+				var entry = currentArrayValue;
+				combinedCount += entry.count;
+			}, this /* passed to function as this */ );
+		}
+		
 		var $chart_container_jqHTMLElement = $chartContainer[ 0 ];
 
 		var totalForCombined = { 
