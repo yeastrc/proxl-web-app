@@ -31,7 +31,9 @@ public class CopyProjectSearchIdToNewProjectUsingDBTransactionService {
 	public void copyProjectSearchIdToNewProjectId( int[] projectSearchIdList, int newProjectId, boolean copyAllSearches ) throws Exception {
 		Connection dbConnection = null;
 		try {
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+			
 			for ( int projectSearchId : projectSearchIdList ) {
 				boolean copySearch = true;
 				if ( ! copyAllSearches ) {
@@ -92,13 +94,4 @@ public class CopyProjectSearchIdToNewProjectUsingDBTransactionService {
 		return insertedProjectsearchId;
 	}
 	
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-		dbConnection.setAutoCommit(false);
-		return dbConnection;
-	}
 }

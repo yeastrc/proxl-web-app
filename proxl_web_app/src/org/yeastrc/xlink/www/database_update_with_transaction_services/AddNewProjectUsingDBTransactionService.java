@@ -30,7 +30,9 @@ public class AddNewProjectUsingDBTransactionService {
 	public void addNewProjectAddAuthSharedObjectDTO( ProjectDTO projectDTO, int projectOwnerUserId ) throws Exception {
 		Connection dbConnection = null;
 		try {
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+
 			AuthSharedObjectDTO authSharedObjectDTO = new AuthSharedObjectDTO();
 			AuthSharedObjectDAO.getInstance().save( authSharedObjectDTO, dbConnection );
 			//  set SharedObject id here since was just set when saved authSharedObjectDTO
@@ -65,13 +67,4 @@ public class AddNewProjectUsingDBTransactionService {
 		}
 	}
 	
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-		dbConnection.setAutoCommit(false);
-		return dbConnection;
-	}
 }

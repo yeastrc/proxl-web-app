@@ -31,7 +31,9 @@ public class MoveProjectSearchIdToNewProjectUsingDBTransactionService {
 	public void moveProjectSearchIdToNewProjectId( int[] projectSearchIdList, int newProjectId, boolean moveAllSearches ) throws Exception {
 		Connection dbConnection = null;
 		try {
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+			
 			for ( int projectSearchId : projectSearchIdList ) {
 				boolean moveSearch = true;
 				if ( ! moveAllSearches ) {
@@ -81,13 +83,4 @@ public class MoveProjectSearchIdToNewProjectUsingDBTransactionService {
 		}
 	}
 	
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-		dbConnection.setAutoCommit(false);
-		return dbConnection;
-	}
 }

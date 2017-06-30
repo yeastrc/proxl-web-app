@@ -25,7 +25,9 @@ public class DeleteFolderResetSearchDisplayOrderUsingDBTransactionService {
 	public void deleteFolderResetSearchDisplayOrder( int folderId ) throws Exception {
 		Connection dbConnection = null;
 		try {
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+			
 			ProjectSearchDAO.getInstance().resetDisplayOrderForFolderId( folderId, dbConnection );
 			FolderForProjectDAO.getInstance().delete( folderId, dbConnection );
 			dbConnection.commit();
@@ -51,13 +53,4 @@ public class DeleteFolderResetSearchDisplayOrderUsingDBTransactionService {
 		}
 	}
 	
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-		dbConnection.setAutoCommit(false);
-		return dbConnection;
-	}
 }

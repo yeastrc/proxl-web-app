@@ -28,7 +28,9 @@ public class AddOrUpdateProjectAccessExistingUserUsingDBTransactionService {
 			AuthUserInviteTrackingDTO authUserInviteTrackingDTO ) throws Exception {
 		Connection dbConnection = null;
 		try {
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+			
 			AuthSharedObjectUsersDAO.getInstance().save( authSharedObjectUsersDTO, dbConnection );
 			int authUserInviteTrackingId = authUserInviteTrackingDTO.getId();
 			int authUserIdUsingInvite = authSharedObjectUsersDTO.getUserId();
@@ -59,7 +61,9 @@ public class AddOrUpdateProjectAccessExistingUserUsingDBTransactionService {
 			AuthUserInviteTrackingDTO authUserInviteTrackingDTO ) throws Exception {
 		Connection dbConnection = null;
 		try {
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+
 			AuthSharedObjectUsersDAO.getInstance().updateUserAccessLevel( authSharedObjectUsersDTO, dbConnection );
 			int authUserInviteTrackingId = authUserInviteTrackingDTO.getId();
 			int authUserIdUsingInvite = authSharedObjectUsersDTO.getUserId();
@@ -88,13 +92,4 @@ public class AddOrUpdateProjectAccessExistingUserUsingDBTransactionService {
 		}
 	}
 	
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-		dbConnection.setAutoCommit(false);
-		return dbConnection;
-	}
 }

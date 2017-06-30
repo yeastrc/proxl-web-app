@@ -47,8 +47,8 @@ public class AddNewScanFileAndHeadersIfNeededDBTransactionService {
 		ScanFileDTO scanFileDTOFromDB = null;
 		
 		try {
-
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
 			
 			lockRequiredTables( dbConnection );
 			
@@ -182,22 +182,6 @@ public class AddNewScanFileAndHeadersIfNeededDBTransactionService {
 		
 		return insertedNewScanFileDTO;
 	}
-	
-	
-	
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
-		
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-		
-		dbConnection.setAutoCommit(false);
-		
-		return dbConnection;
-	}
-	
 	
 
 	private static String lockTablesForWriteSQL = "LOCK TABLES scan_file WRITE, scan_file_header WRITE";

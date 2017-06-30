@@ -46,7 +46,9 @@ public class InsertIfNotInDBUnifiedReportedPeptideAndChildren {
 		UnifiedReportedPeptideLookupDTO unifiedReportedPeptideDTO = z_Internal_UnifiedReportedPeptide_Holder.getUnifiedReportedPeptideDTO();
 		String unifiedReportedPeptideSequence = unifiedReportedPeptideDTO.getUnifiedSequence();
 		try {
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+			
 			lockRequiredTables(dbConnection);
 			Integer unifiedReportedPeptideId = null;
 			try {
@@ -126,17 +128,7 @@ public class InsertIfNotInDBUnifiedReportedPeptideAndChildren {
 		}
 		return unifiedReportedPeptideDTO;
 	}
-	
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-		dbConnection.setAutoCommit(false);
-		return dbConnection;
-	}
-	
+		
 	private static String lockTablesForWriteSQL 
 		= "LOCK TABLES unified_reported_peptide_lookup WRITE, unified_rep_pep_matched_peptide_lookup WRITE, unified_rep_pep_dynamic_mod_lookup WRITE";
 	/**

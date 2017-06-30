@@ -45,9 +45,9 @@ public class SaveImportTrackingAndChildrenSingleDBTransaction {
 		Connection dbConnection = null;
 
 		try {
-
-			dbConnection = getConnectionWithAutocommitTurnedOff();
-						
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+			
 			ProxlXMLFileImportTracking_ForWebAppDAO.getInstance().save(trackingItem, dbConnection);
 		 	
 			for ( ProxlXMLFileImportTrackingSingleFileDTO singleFileItem : singleFileDTOList ) {
@@ -109,21 +109,5 @@ public class SaveImportTrackingAndChildrenSingleDBTransaction {
 		
 		
 	}
-	
-	
-
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
-		
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-		
-		dbConnection.setAutoCommit(false);
-		
-		return dbConnection;
-	}
-	
 	
 }

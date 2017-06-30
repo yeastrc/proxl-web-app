@@ -37,7 +37,9 @@ public class AddNewUserUsingDBTransactionService {
 			AuthUserInviteTrackingDTO authUserInviteTrackingDTO ) throws Exception {
 		Connection dbConnection = null;
 		try {
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+			
 			AuthUserDAO.getInstance().save( authUserDTO, dbConnection );
 			//  set user id here since was just set when called addNewUserInternal(...)
 			authSharedObjectUsersDTO.setUserId( authUserDTO.getId() );
@@ -75,7 +77,9 @@ public class AddNewUserUsingDBTransactionService {
 			AuthUserInviteTrackingDTO authUserInviteTrackingDTO ) throws Exception {
 		Connection dbConnection = null;
 		try {
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+			
 			AuthUserDAO.getInstance().save( authUserDTO, dbConnection );
 			if ( authUserInviteTrackingDTO != null ) {
 				int authUserInviteTrackingId = authUserInviteTrackingDTO.getId();
@@ -108,7 +112,9 @@ public class AddNewUserUsingDBTransactionService {
 	public void addNewUser( AuthUserDTO authUserDTO, ZzUserDataMirrorDTO zzUserDataMirrorDTO ) throws Exception {
 		Connection dbConnection = null;
 		try {
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+			
 			AuthUserDAO.getInstance().save( authUserDTO, dbConnection );
 			zzUserDataMirrorDTO.setAuthUserId( authUserDTO.getId() );
 			ZzUserDataMirrorDAO.getInstance().save( zzUserDataMirrorDTO, dbConnection );
@@ -135,13 +141,4 @@ public class AddNewUserUsingDBTransactionService {
 		}
 	}
 
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-		dbConnection.setAutoCommit(false);
-		return dbConnection;
-	}
 }

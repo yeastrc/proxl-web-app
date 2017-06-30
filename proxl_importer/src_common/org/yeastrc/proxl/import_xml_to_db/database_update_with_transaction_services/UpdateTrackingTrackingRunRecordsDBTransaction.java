@@ -40,9 +40,9 @@ public class UpdateTrackingTrackingRunRecordsDBTransaction {
 		Connection dbConnection = null;
 
 		try {
-
-			dbConnection = getConnectionWithAutocommitTurnedOff();
-
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+			
 			ProxlXMLFileImportTracking_For_ImporterRunner_DAO.getInstance()
 			.updateStatusAtImportEnd( status, id, dbConnection );
 			
@@ -100,21 +100,4 @@ public class UpdateTrackingTrackingRunRecordsDBTransaction {
 		
 	}
 	
-
-	
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
-		
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-		
-		dbConnection.setAutoCommit(false);
-		
-		return dbConnection;
-	}
-	
-	
-
 }

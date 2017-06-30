@@ -59,8 +59,8 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 		
 		
 		try {
-
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
 			
 			lockRequiredTables( dbConnection );
 			
@@ -274,24 +274,7 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 		return true;
 	}
 	
-	
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
-		
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-		
-		dbConnection.setAutoCommit(false);
-		
-		return dbConnection;
-	}
-	
-	
-
 	private static String lockTablesForWriteSQL = "LOCK TABLES scan WRITE, scan_spectrum_data WRITE";
-
 
 	/**
 	 * @param dbConnection

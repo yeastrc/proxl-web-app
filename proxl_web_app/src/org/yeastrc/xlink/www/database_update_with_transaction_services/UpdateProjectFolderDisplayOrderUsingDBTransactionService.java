@@ -25,7 +25,9 @@ public class UpdateProjectFolderDisplayOrderUsingDBTransactionService {
 	public void updateProjectFolderDisplayOrder( int[] folderIdList ) throws Exception {
 		Connection dbConnection = null;
 		try {
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+			
 			FolderForProjectDAO folderForProjectDAO = FolderForProjectDAO.getInstance();
 			int newDisplayOrder = 0;
 			for ( int folderId : folderIdList ) {
@@ -55,13 +57,4 @@ public class UpdateProjectFolderDisplayOrderUsingDBTransactionService {
 		}
 	}
 	
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-		dbConnection.setAutoCommit(false);
-		return dbConnection;
-	}
 }

@@ -25,7 +25,9 @@ public class UpdateSearchDisplayOrderUsingDBTransactionService {
 	public void updateSearchDisplayOrder( int[] searchIdList ) throws Exception {
 		Connection dbConnection = null;
 		try {
-			dbConnection = getConnectionWithAutocommitTurnedOff();
+			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			dbConnection.setAutoCommit(false);
+			
 			ProjectSearchDAO projectSearchDAO = ProjectSearchDAO.getInstance();
 			int newDisplayOrder = 0;
 			for ( int searchId : searchIdList ) {
@@ -55,13 +57,4 @@ public class UpdateSearchDisplayOrderUsingDBTransactionService {
 		}
 	}
 	
-	/**
-	 * @return
-	 * @throws Exception
-	 */
-	private Connection getConnectionWithAutocommitTurnedOff(  ) throws Exception {
-		Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-		dbConnection.setAutoCommit(false);
-		return dbConnection;
-	}
 }
