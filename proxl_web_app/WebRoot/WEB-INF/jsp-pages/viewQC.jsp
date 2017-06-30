@@ -105,6 +105,16 @@
 		<input type="hidden" id="viewMergedStructureDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="/structure" projectSearchId="${ onlySingleProjectSearchId }"></proxl:defaultPageUrl>">
 	</c:if>
+	
+	<c:choose>
+	 <c:when test="${ anySearchesHaveScanData }">
+	 	<script id="anySearchesHaveScanDataYes"></script>
+	 </c:when>
+	 <c:otherwise>
+	 	<script id="anySearchesHaveScanDataNo"></script>
+	 </c:otherwise>
+	</c:choose>
+			  
 					
 	
 		<div>
@@ -204,6 +214,34 @@
 	
 		<hr>
 		
+		<%--  Summary level Statistics --%>
+	
+		<div >
+
+		  <div class="top-level-container qc_top_level_container_jq" >
+			
+			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
+				<a id="summary_collapse_link" href="javascript:" class="top-level-collapsable-link" 
+						style="display: none;"
+					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+				<a id="summary_expand_link" href="javascript:" class="top-level-collapsable-link" 
+					><img  src="${ contextPath }/images/icon-expand.png"></a>
+			</div>
+			<div class="top-level-label">
+			  Summary Statistics
+			</div>
+
+			<div class="top-level-label-bottom-border" ></div>
+								
+			<div id="summary_display_block" class="project-info-block" style="display: none;"  >
+			
+	 		  <table  id="Summary_Statistics_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" >
+			  </table>			
+			</div>
+		  </div>
+
+		</div>  <%--  END:  Summary Statistics --%>
+			  
 		<%--  Digestion Statistics --%>
 		
 		<div >
@@ -225,12 +263,8 @@
 								
 			<div id="digestion_display_block" class="project-info-block" style="display: none;" >
 			
-			  <div >
-			  </div>
-			  <div id="missingCleavageReportedPeptidesCountLoadingBlock">
-			  	Loading
-			  </div>
- 		      <table  id="missingCleavageReportedPeptidesCountBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+ 		      <table  id="missingCleavageReportedPeptidesCountBlock" 
+ 		      	class="table-no-border-no-cell-spacing-no-cell-padding chart_group_container_table_jq " style="">
 			  </table>
 			</div>
 		  </div>
@@ -258,73 +292,16 @@
 								
 			<div id="psm_level_display_block" class="project-info-block" style="display: none;"  >
 			
-			  <h2>Summary Statistics</h2>
-			  
-			  <div id="PSM_Summary_CountsLoadingBlock">
-			  	Loading
-			  </div>
-			  
-	 		  <table  id="PSM_Summary_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="display: none;">
-	 		   <tr>
-				<td style="padding: 4px;">
-				 <div class=" chart-standard-container-div chart_outer_container_jq chart_outer_container_for_download_jq " > 
-				  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-				  </div>
-				  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
-				 </div>
-				</td>
-			   </tr>
-			  </table>			
-			  
 			   <h2>Charge State Statistics</h2>
 			   
-			  <div id="PSMChargeStatesCountsLoadingBlock">
-			  	Loading
-			  </div>
-			  
 	 		  <table  id="PSMChargeStatesCountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
 			  </table>
 			  
 			  <%-- M/Z Statistics  --%>
-			<c:choose>
-			 <c:when test="${ anySearchesHaveScanData }">
-			  
 			  <h2>M/Z Statistics</h2>
-			  
-			  <div id="PSM_M_Over_Z_CountsLoadingBlock">
-			  	Loading
-			  </div>
 			  
 	 		  <table  id="PSM_M_Over_Z_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
 			  </table>			  
-			 
-			 </c:when>
-			 <c:otherwise>
-			 	<%-- 
-			   		No Scans so not showing "M/Z for PSMs Per Link Type"
-			   	--%>
-			   	
-			   	<h2>M/Z Statistics</h2>
-			   	
-			   <script id="NO_PSM_M_Over_Z_CountsBlock" type="text/text">__ContentsNotRead__</script>
-				
-				<%-- No Data Found Charts --%>
-				<%-- --%>  
-				 <table class="table-no-border-no-cell-spacing-no-cell-padding" style="">
-				  <tr>
-				  	<c:set var="noDataLinkType" value="crosslink" />
-				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
-				  	<c:set var="noDataLinkType" value="looplink" />
-				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
-				  	<c:set var="noDataLinkType" value="unlinked" />
-				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
-				   </tr>
-				  </table>			   
-
-			 </c:otherwise>
-			</c:choose>
-			
-	
 			
 			</div> <%-- close <div class="project-info-block  collapsable_jq" > --%>
 		  </div> <%-- close <div class="top-level-container collapsable_container_jq" > --%>
@@ -355,294 +332,33 @@
 			<div id="psm_error_estimates_display_block" class="project-info-block" style="display: none;"  >
 			
 			  <%--  PPM Error --%>
-			<c:choose>
-			 <c:when test="${ anySearchesHaveScanData }">
 			  
-			  <h2>PPM Error</h2>
+			<h2>PPM Error</h2>
 			  
-			  <div id="PSM_PPM_Error_CountsLoadingBlock">
-			  	Loading
-			  </div>
-			  
-	 		  <table  id="PSM_PPM_Error_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
-	 		   <tr>
-	 		   
-				<td class=" per_link_type_row_jq <%= PeptideViewLinkTypesConstants.CROSSLINK_PSM %>_row_jq " 
-					style="padding: 4px;">
-				  <div class=" qc-data-block chart-standard-container-div" style="position: relative;">
-					 <div class=" loading_block_jq "
-					 	style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
-					 	Loading Crosslink
-					 </div>
-					 <div class="  chart_outer_container_for_download_jq " 
-					 	style="display: none;"> <!-- init to not displayed  -->
-					  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-					  </div>
-					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
-					 </div>
-				  </div>
-				</td>	 	
-					   
-				<td class=" per_link_type_row_jq <%= PeptideViewLinkTypesConstants.LOOPLINK_PSM %>_row_jq " 
-					style="padding: 4px;">
-				  <div class=" qc-data-block chart-standard-container-div" style="position: relative;">
-					 <div class=" loading_block_jq "
-					 	style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
-					 	Loading Looplink
-					 </div>
-					 <div class="  chart_outer_container_for_download_jq " 
-					 	style="display: none;"> <!-- init to not displayed -->
-					  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-					  </div>
-					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
-					 </div>
-				  </div>
-				</td>	 
-						   
-				<td class=" per_link_type_row_jq <%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>_row_jq " 
-					style="padding: 4px;">
-				  <div class=" qc-data-block chart-standard-container-div" style="position: relative;">
-					 <div class=" loading_block_jq "
-					 	style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
-					 	Loading Unlinked
-					 </div>
-					 <div class="  chart_outer_container_for_download_jq " 
-					 	style="display: none;"> <!-- init to not displayed -->
-					  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-					  </div>
-					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
-					 </div>
-				  </div>
-				</td>	 	
-					   
-	 		   </tr>
-			  </table>			  
+	 		<table  id="PSM_PPM_Error_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+			</table>			  
 			 
-			 </c:when>
-			 <c:otherwise>
-			 	<%-- 
-			   		No Scans so not showing "M/Z for PSMs Per Link Type"
-			   	--%>
-			   	
-			   	<h2>PPM Error</h2>
-			   	
-			   <script id="NO_PSM_PPM_Error_CountsBlock" type="text/text">__ContentsNotRead__</script>
-				
-				No Scans so not showing "PPM Error for PSMs Per Link Type"
-				
-				<%-- No Data Found Charts --%>
-				<%-- --%>  
-				<%-- 
-				 <table class="table-no-border-no-cell-spacing-no-cell-padding" style="">
-				  <tr>
-				  	<c:set var="noDataLinkType" value="crosslink" />
-				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
-				  	<c:set var="noDataLinkType" value="looplink" />
-				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
-				  	<c:set var="noDataLinkType" value="unlinked" />
-				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
-				   </tr>
-				  </table>
-				--%>			   
-		
-			 </c:otherwise>
-			</c:choose>
-			
 			<%--  End PPM Error --%>
 			
 			
 			  <%--  PPM Error Vs Retention Time --%>
-			<c:choose>
-			 <c:when test="${ anySearchesHaveScanData }">
+			<h2>Error Vs Retention Time</h2>
 			  
-			  <h2>Error Vs Retention Time</h2>
-			  
-			  <div id="PSM_PPM_Error_Vs_RetentionTime_CountsLoadingBlock">
-			  	Loading
-			  </div>
-			  
-	 		  <table  id="PSM_PPM_Error_Vs_RetentionTime_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
-	 		   <tr>
-	 		   
-				<td class=" per_link_type_row_jq <%= PeptideViewLinkTypesConstants.CROSSLINK_PSM %>_row_jq " 
-					style="padding: 4px;">
-				  <div class=" qc-data-block chart-standard-container-div" style="position: relative;">
-					 <div class=" loading_block_jq "
-					 	style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
-					 	Loading Crosslink
-					 </div>
-					 <div class="  chart_outer_container_for_download_jq " 
-					 	style="display: none;"> <!-- init to not displayed  -->
-					  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-					  </div>
-					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
-					 </div>
-				  </div>
-				</td>	 	
-					   
-				<td class=" per_link_type_row_jq <%= PeptideViewLinkTypesConstants.LOOPLINK_PSM %>_row_jq " 
-					style="padding: 4px;">
-				  <div class=" qc-data-block chart-standard-container-div" style="position: relative;">
-					 <div class=" loading_block_jq "
-					 	style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
-					 	Loading Looplink
-					 </div>
-					 <div class="  chart_outer_container_for_download_jq " 
-					 	style="display: none;"> <!-- init to not displayed -->
-					  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-					  </div>
-					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
-					 </div>
-				  </div>
-				</td>	 
-						   
-				<td class=" per_link_type_row_jq <%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>_row_jq " 
-					style="padding: 4px;">
-				  <div class=" qc-data-block chart-standard-container-div" style="position: relative;">
-					 <div class=" loading_block_jq "
-					 	style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
-					 	Loading Unlinked
-					 </div>
-					 <div class="  chart_outer_container_for_download_jq " 
-					 	style="display: none;"> <!-- init to not displayed -->
-					  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-					  </div>
-					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
-					 </div>
-				  </div>
-				</td>	 	
-					   
-	 		   </tr>
-			  </table>			  
+	 		<table  id="PSM_PPM_Error_Vs_RetentionTime_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+	 		</table>			  
 			 
-			 </c:when>
-			 <c:otherwise>
-			 	<%-- 
-			   		No Scans so not showing "M/Z for PSMs Per Link Type"
-			   	--%>
-			   	
-			   	<h2>Error Vs Retention Time</h2>
-			   	
-			   <script id="NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock" type="text/text">__ContentsNotRead__</script>
-				
-				No Scans so not showing "PPM Error Vs Retention Time for PSMs Per Link Type"
-				
-				<%-- No Data Found Charts --%>
-				<%-- --%>  
-				<%-- 
-				 <table class="table-no-border-no-cell-spacing-no-cell-padding" style="">
-				  <tr>
-				  	<c:set var="noDataLinkType" value="crosslink" />
-				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
-				  	<c:set var="noDataLinkType" value="looplink" />
-				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
-				  	<c:set var="noDataLinkType" value="unlinked" />
-				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
-				   </tr>
-				  </table>
-				--%>			   
-		
-			 </c:otherwise>
-			</c:choose>
 			
 			<%-- END PPM Error Vs Retention Time  --%>
 						
 
 
 			  <%--  PPM Error Vs M/Z --%>
-			<c:choose>
-			 <c:when test="${ anySearchesHaveScanData }">
-			  
-			  <h2>Error Vs M/Z</h2>
-			  
-			  <div id="PSM_PPM_Error_Vs_M_over_Z_CountsLoadingBlock">
-			  	Loading
-			  </div>
-			  
-	 		  <table  id="PSM_PPM_Error_Vs_M_over_Z_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
-	 		   <tr>
-	 		   
-				<td class=" per_link_type_row_jq <%= PeptideViewLinkTypesConstants.CROSSLINK_PSM %>_row_jq " 
-					style="padding: 4px;">
-				  <div class=" qc-data-block chart-standard-container-div" style="position: relative;">
-					 <div class=" loading_block_jq "
-					 	style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
-					 	Loading Crosslink
-					 </div>
-					 <div class="  chart_outer_container_for_download_jq " 
-					 	style="display: none;"> <!-- init to not displayed  -->
-					  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-					  </div>
-					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
-					 </div>
-				  </div>
-				</td>	 	
-					   
-				<td class=" per_link_type_row_jq <%= PeptideViewLinkTypesConstants.LOOPLINK_PSM %>_row_jq " 
-					style="padding: 4px;">
-				  <div class=" qc-data-block chart-standard-container-div" style="position: relative;">
-					 <div class=" loading_block_jq "
-					 	style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
-					 	Loading Looplink
-					 </div>
-					 <div class="  chart_outer_container_for_download_jq " 
-					 	style="display: none;"> <!-- init to not displayed -->
-					  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-					  </div>
-					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
-					 </div>
-				  </div>
-				</td>	 
-						   
-				<td class=" per_link_type_row_jq <%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>_row_jq " 
-					style="padding: 4px;">
-				  <div class=" qc-data-block chart-standard-container-div" style="position: relative;">
-					 <div class=" loading_block_jq "
-					 	style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
-					 	Loading Unlinked
-					 </div>
-					 <div class="  chart_outer_container_for_download_jq " 
-					 	style="display: none;"> <!-- init to not displayed -->
-					  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-					  </div>
-					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
-					 </div>
-				  </div>
-				</td>	 	
-					   
-	 		   </tr>
-			  </table>			  
-			 
-			 </c:when>
-			 <c:otherwise>
-			 	<%-- 
-			   		No Scans so not showing "M/Z for PSMs Per Link Type"
-			   	--%>
-			   	
-			   	<h2>Error Vs M/Z</h2>
-			   	
-			   <script id="NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock" type="text/text">__ContentsNotRead__</script>
-				
-				No Scans so not showing "PPM Error Vs M/Z for PSMs Per Link Type"
-				
-				<%-- No Data Found Charts --%>
-				<%-- --%>  
-				<%-- 
-				 <table class="table-no-border-no-cell-spacing-no-cell-padding" style="">
-				  <tr>
-				  	<c:set var="noDataLinkType" value="crosslink" />
-				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
-				  	<c:set var="noDataLinkType" value="looplink" />
-				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
-				  	<c:set var="noDataLinkType" value="unlinked" />
-				  	<%@ include file="/WEB-INF/jsp-includes/viewQC_MZ_Data_NoDataAvailable.jsp" %>
-				   </tr>
-				  </table>
-				--%>			   
-		
-			 </c:otherwise>
-			</c:choose>
 			
+			<h2>Error Vs M/Z</h2>
+			  
+	 		<table  id="PSM_PPM_Error_Vs_M_over_Z_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+			</table>			  
+			 
 			<%-- END PPM Error Vs M/Z  --%>
 						
 			
@@ -679,9 +395,6 @@
 			  	Peptide lengths Per Link Type
 			  </div>
 			  --%>
-			  <div id="PeptideLengthsCountsLoadingBlock">
-			  	Loading
-			  </div>
 			  
 	 		  <table  id="PeptideLengthsCountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
 			  </table>			  
@@ -693,83 +406,35 @@
 
 	</div>  <%--  Close   <div class="overall-enclosing-block">  --%>
 	
-<script id="PeptideCleavageEntryTemplate" type="text/text">
+
+	<%-- qc-data-block is here since it has the width and height of the chart --%>
+<script id="common_chart_outer_entry_template" type="text/text"> 
 	<td style="padding: 4px;">
-	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
-	  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-	  </div>
-	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+	 <div class=" chart-standard-container-div qc-data-block chart_outer_container_for_download_jq {{link_type}}_chart_outer_container_jq chart_outer_container_jq" > 
 	 </div>
 	</td>
 </script>	
 	
-<script id="PSMChargeStatesCountsEntryTemplate" type="text/text">
-	<td style="padding: 4px;">
-	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
+	<%-- qc-data-block is here since it has the width and height of the chart --%>
+<script id="common_chart_inner_entry_template" type="text/text">
+	 <div> 
 	  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
 	  </div>
 	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
 	 </div>
-	</td>
-</script>
-
-<script id="PSMChargeStatesCountsNoDataTemplate_crosslink" type="text/text">
-	<td style="padding: 4px;">
-	  <div class=" chart-standard-container-div qc-data-block " >
-		<div style="text-align: center; font-size: 16px; font-weight: bold;"> <!-- padding-top: 20%;  -->
-		 	No data for Crosslink for filter values
-		</div>
+</script>	
+	
+	<%--  Put inside contents of common_chart_outer_entry_template --%>
+<script id="dummy_chart_entry_for_message_template" type="text/text">
+	<div style="position: relative;"  class=" qc-data-block ">
+	  <div class=" message_text_containing_div_jq "
+	  	 style="position: absolute; text-align: center; z-index: 1; font-size: 20px; font-weight: bold;">
+	  	<span class=" message_text_jq "></span>
 	  </div>
-	</td>
-</script>
-<script id="PSMChargeStatesCountsNoDataTemplate_looplink" type="text/text">
-	<td style="padding: 4px;">
-	  <div class=" chart-standard-container-div qc-data-block " >
-		<div style="text-align: center; padding-top: 20%;  font-size: 16px; font-weight: bold;">
-		 	No data for Looplink for filter values
-		</div>
+	  <div  style="opacity: .5" class=" qc-data-block dummy_chart_container_jq ">
 	  </div>
-	</td>
+	</div>
 </script>
-<script id="PSMChargeStatesCountsNoDataTemplate_unlinked" type="text/text">
-	<td style="padding: 4px;">
-	  <div class=" chart-standard-container-div qc-data-block " >
-		<div style="text-align: center; font-size: 16px; font-weight: bold;"> <!-- padding-top: 20%;  -->
-		 	No data for Unlnked for filter values
-		</div>
-	  </div>
-	</td>
-</script>
-
-<script id="PSM_M_Over_Z_CountsEntryTemplate" type="text/text">
-	<td style="padding: 4px;">
-	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
-	  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-	  </div>
-	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
-	 </div>
-	</td>
-</script>
-
-
-<script id="PSM_PPM_Error_CountsEntryTemplate" type="text/text">
-	<td style="padding: 4px;">
-	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
-	  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-	  </div>
-	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
-	 </div>
-	</td>
-</script>
-
-<script id="PeptideLengthsCountsEntryTemplate" type="text/text">
-	<td style="padding: 4px;">
-	 <div class=" chart-standard-container-div chart_outer_container_for_download_jq " > 
-	  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
-	  </div>
-	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
-	 </div>
-	</td>
-</script>
+				
 							
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>

@@ -143,6 +143,15 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			// throw e;  //  No rethrow e, only for reporting to server
 		}
+		//  QC Page Init
+		try {	  
+			if ( window.viewQCPageCode ) {
+			  viewQCPageCode.init();
+			}
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			// throw e;  //  No rethrow e, only for reporting to server
+		}		
 	  };
 	  
 	  //  Do NOT call a method on an object here.  The "this" gets set to the window.

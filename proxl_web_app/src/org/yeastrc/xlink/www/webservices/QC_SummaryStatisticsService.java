@@ -20,9 +20,8 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.qc_data.digestion_statistics.main.QC_MissingCleavageReportedPeptidesCount;
-import org.yeastrc.xlink.www.qc_data.digestion_statistics.main.QC_MissingCleavageReportedPeptidesCount.QC_MissingCleavageReportedPeptidesCount_Result;
-import org.yeastrc.xlink.www.qc_data.digestion_statistics.objects.CountForLinkType;
+import org.yeastrc.xlink.www.qc_data.summary_statistics.main.QC_SummaryCounts;
+import org.yeastrc.xlink.www.qc_data.summary_statistics.objects.QC_SummaryCountsResults;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
@@ -32,16 +31,20 @@ import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
 
+/**
+ * Summary Statistics
+ *
+ */
 @Path("/qc/dataPage")
-public class QC_MissingCleavageService {
+public class QC_SummaryStatisticsService {
 
-	private static final Logger log = Logger.getLogger(QC_MissingCleavageService.class);
+	private static final Logger log = Logger.getLogger(QC_SummaryStatisticsService.class);
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/missingCleavages") 
-	public WebserviceResult_getQC_MissingCleavageReportedPeptidesCount
-		getQC_MissingCleavageReportedPeptidesCount( @QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
+	@Path("/summaryStatistics") 
+	public WebserviceResult_getQC_SummaryStatistics
+		getQC_SummaryStatistics( @QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
 										  @QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
 										  @Context HttpServletRequest request )
 	throws Exception {
@@ -152,18 +155,18 @@ public class QC_MissingCleavageService {
 				}
 			}
 				
-
-			QC_MissingCleavageReportedPeptidesCount_Result qc_MissingCleavageReportedPeptidesCount_Result = 
-					QC_MissingCleavageReportedPeptidesCount.getInstance()
-					.getQC_MissingCleavageReportedPeptidesCount( 
+			
+			QC_SummaryCountsResults qc_SummaryCountsResults =
+					QC_SummaryCounts.getInstance()
+					.getQC_SummaryCounts( 
 							filterCriteria_JSONString, projectSearchIdsListDeduppedSorted, searches, searchesMapOnSearchId );
 
 			//  Get PSMs for cutoffs and other data
-			WebserviceResult_getQC_MissingCleavageReportedPeptidesCount serviceResult = new WebserviceResult_getQC_MissingCleavageReportedPeptidesCount();
+			WebserviceResult_getQC_SummaryStatistics webserviceResult = new WebserviceResult_getQC_SummaryStatistics();
 			
-			serviceResult.missingCleavageReportedPeptidesCountForLinkTypeList = qc_MissingCleavageReportedPeptidesCount_Result.getCountForLinkTypeList();
+			webserviceResult.qc_SummaryCountsResults = qc_SummaryCountsResults;
 			
-			return serviceResult;
+			return webserviceResult;
 			
 		} catch ( WebApplicationException e ) {
 			throw e;
@@ -190,16 +193,16 @@ public class QC_MissingCleavageService {
 	 * 
 	 *
 	 */
-	public static class WebserviceResult_getQC_MissingCleavageReportedPeptidesCount {
-		private List<CountForLinkType> missingCleavageReportedPeptidesCountForLinkTypeList;
+	public static class WebserviceResult_getQC_SummaryStatistics {
+		
+		private QC_SummaryCountsResults qc_SummaryCountsResults;
 
-		public List<CountForLinkType> getMissingCleavageReportedPeptidesCountForLinkTypeList() {
-			return missingCleavageReportedPeptidesCountForLinkTypeList;
+		public QC_SummaryCountsResults getQc_SummaryCountsResults() {
+			return qc_SummaryCountsResults;
 		}
 
-		public void setMissingCleavageReportedPeptidesCountForLinkTypeList(
-				List<CountForLinkType> missingCleavageReportedPeptidesCountForLinkTypeList) {
-			this.missingCleavageReportedPeptidesCountForLinkTypeList = missingCleavageReportedPeptidesCountForLinkTypeList;
+		public void setQc_SummaryCountsResults(QC_SummaryCountsResults qc_SummaryCountsResults) {
+			this.qc_SummaryCountsResults = qc_SummaryCountsResults;
 		}
 
 	}

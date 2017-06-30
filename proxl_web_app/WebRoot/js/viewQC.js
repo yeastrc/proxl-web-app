@@ -11,6 +11,8 @@
  * 		but the code and SQL need to be reviewed to determine that the results returned are what the user expects,
  * 		especially for reported peptide level results. 
  * 
+ * This code has been updated to cancel existing active AJAX calls when "Update from Database" button is clicked.
+ *   This is done so that previous AJAX responses don't overlay new AJAX responses.
  */
 
 //  JavaScript directive:   all variables have to be declared with "var", maybe other things
@@ -19,8 +21,19 @@
 /**
  * 
  */
-$(document).ready(function() { 
-	viewQCPageCode.init();
+$(document).ready(function() {
+	
+	//  Delay init until Google Charts have loaded which is done in header_main.jsp
+	
+	//     viewQCPageCode.init(); called in header_main.jsp after Google charts are initialized
+	
+//	try {
+//	viewQCPageCode.init();
+//	} catch( e ) {
+//		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+//		throw e;
+//	}
+
 
 } ); // end $(document).ready(function() 
 
@@ -62,6 +75,16 @@ var ViewQCPageCode = function() {
 	
 
 	var _hash_json_Contents = null;
+	
+	var _anySearchesHaveScanDataYes = false;
+	
+	//  Contains {{link_type}} to replace with link type.  Contains {{link_type}}_chart_outer_container_jq chart_outer_container_jq
+	var _common_chart_outer_entry_templateHTML = null;
+	
+	var _common_chart_inner_entry_templateHTML = null;
+	
+	var _dummy_chart_entry_for_message_templateHTML = null;
+
 
 	var _link_type_crosslink_constant = null;
 	var _link_type_looplink_constant = null;
@@ -73,6 +96,18 @@ var ViewQCPageCode = function() {
 	var _link_type_unlinked_LOWER_CASE_constant = null;
 
 	var _link_type_combined_LOWER_CASE_constant = "combined";
+	
+	//   These will have the link type added in between prefix and suffix, adding a space after link type.
+	//       There is no space at start of suffix to support no link type
+	var _DUMMY_CHART_STATUS_TEXT_PREFIX_LOADING = "Loading ";
+	var _DUMMY_CHART_STATUS_TEXT_SUFFIX_LOADING = "Data";
+	var _DUMMY_CHART_STATUS_TEXT_PREFIX_NO_DATA = "No ";
+	var _DUMMY_CHART_STATUS_TEXT_SUFFIX_NO_DATA = "Data Found";
+	var _DUMMY_CHART_STATUS_TEXT_PREFIX_ERROR_LOADING = "Error Loading ";
+	var _DUMMY_CHART_STATUS_TEXT_SUFFIX_ERROR_LOADING = "Data";
+	
+	var _DUMMY_CHART_STATUS_WHOLE_TEXT_SCANS_NOT_UPLOADED = "Scans Not Uploaded";
+
 
 	var _IS_LOADED_YES = "YES";
 	var _IS_LOADED_NO = "NO";
@@ -80,6 +115,8 @@ var ViewQCPageCode = function() {
 
 	//  Block of "isLoaded" variables.  
 	//        These all need to be set to NO in ... when the user clicks "Update from Database" button
+	var _summary_Statistics_isLoaded = _IS_LOADED_NO;
+	
 	var _digestion_Statistics_isLoaded = _IS_LOADED_NO;
 	
 	var _chargeCount_Statistics_isLoaded = _IS_LOADED_NO;
@@ -92,51 +129,112 @@ var ViewQCPageCode = function() {
 	var _peptideLengthsHistogram_isLoaded = _IS_LOADED_NO;
 	
 	//  Block of "sectionDisplayed" variables.  Lists which sections are currently displayed
+	var _summary_Statistics_sectionDisplayed = false;
 	var _digestion_Statistics_sectionDisplayed = false;
 	var _psm_Statistics_sectionDisplayed = false;
 	var _psm_Error_Estimates_sectionDisplayed = false;
 	var _peptide_Statistics_sectionDisplayed = false;
 	
+
 	/**
-	 * Init page on load 
+	 * Should this AJAX Error be passed to handleAJAXError()?
+	 * Check textStatus in AJAX error for 'abort'.  If abort, return false
+	 */
+	this._passAJAXErrorTo_handleAJAXError = function( jqXHR, textStatus, errorThrown ) {
+		if ( textStatus === 'abort' ) {
+			return false;
+		}
+		return true;
+	};
+	
+	
+	/**
+	 * Init page.  Called after Google Charts have loaded.  Called in header_main.jsp 
 	 */
 	this.init = function() {
 		var objectThis = this;
+		setTimeout(function() {
+			objectThis.initActual();
+		}, 100 );
 		
-		this.populateConstantsFromPage();
-		
-		this.updatePageFiltersFromURLHash();
+	};
+	
+	/**
+	 * Init page Actual 
+	 */
+	this.initActual = function() {
+		try {
+			var objectThis = this;
 
-		//  Get Project Search Ids from Page
+			this.populateConstantsFromPage();
 
-		_project_search_ids = [];
-		var $project_search_id_jq_List = $(".project_search_id_jq");
-		if ( $project_search_id_jq_List.length === 0 ) {
-			throw "input fields with class 'project_search_id_jq' containing project search ids is missing from the page";
-		}
-		$project_search_id_jq_List.each( function( index, element ) {
-			var project_search_id = $( this ).val();
-			//  Convert all attributes to empty string if null or undefined
-			if ( ! project_search_id ) {
-				project_search_id = "";
+			this.updatePageFiltersFromURLHash();
+
+			//  Get Project Search Ids from Page
+
+			_project_search_ids = [];
+			var $project_search_id_jq_List = $(".project_search_id_jq");
+			if ( $project_search_id_jq_List.length === 0 ) {
+				throw "input fields with class 'project_search_id_jq' containing project search ids is missing from the page";
 			}
-			_project_search_ids.push( project_search_id );
-		} );
-		
-		
-		this.addClickAndOnChangeHandlers();
-		
+			$project_search_id_jq_List.each( function( index, element ) {
+				var project_search_id = $( this ).val();
+				//  Convert all attributes to empty string if null or undefined
+				if ( ! project_search_id ) {
+					project_search_id = "";
+				}
+				_project_search_ids.push( project_search_id );
+			} );
+			
+			var $anySearchesHaveScanDataYes = $("#anySearchesHaveScanDataYes");
+			if ( $anySearchesHaveScanDataYes.length > 0 ) {
+				_anySearchesHaveScanDataYes = true;
+			}
+			
+			//  Contains {{link_type}} to replace with link type
+			var $common_chart_outer_entry_template = $("#common_chart_outer_entry_template");
+			if ( $common_chart_outer_entry_template.length === 0 ) {
+				throw Error("No element with id 'common_chart_outer_entry_template'");
+			}
+			_common_chart_outer_entry_templateHTML = $common_chart_outer_entry_template.html();
 
-		//  Default display on page load
-		
-		//  TODO  TEMP comment out
-		this.showDigestionStatistics();
-		
-		//  TODO  TEMP Add
-		
-//		this.showScanLevelstatistics();
+			var $common_chart_inner_entry_template = $("#common_chart_inner_entry_template");
+			if ( $common_chart_inner_entry_template.length === 0 ) {
+				throw Error("No element with id 'common_chart_inner_entry_template'");
+			}
+			_common_chart_inner_entry_templateHTML = $common_chart_inner_entry_template.html();
 
-		
+			var $dummy_chart_entry_for_message_template = $("#dummy_chart_entry_for_message_template");
+			if ( $dummy_chart_entry_for_message_template.length === 0 ) {
+				throw Error("No element with id 'dummy_chart_entry_for_message_template'");
+			}
+			_dummy_chart_entry_for_message_templateHTML = $dummy_chart_entry_for_message_template.html();
+
+
+			this.addClickAndOnChangeHandlers();
+
+
+			//  Default display on page load
+
+			//  TODO  TEMP comment out
+			
+			this.showSummaryStatistics();
+
+			//  TODO  TEMP Add
+			
+//			this.showDigestionStatistics();
+
+//			this.showPSMLevelstatistics();
+
+//			this.showPSMErrorEstimates();
+			
+//			this.showPeptideLevelstatistics();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+
 	};
 	
 
@@ -145,64 +243,106 @@ var ViewQCPageCode = function() {
 	 */
 	this.addClickAndOnChangeHandlers = function() {
 		var objectThis = this;
-		
+
 		var $update_from_database_button = $("#update_from_database_button");
 		$update_from_database_button.click( function( event ) { 
-			objectThis._update_from_database_button_Clicked( { clickedThis : this } ); 
-			event.preventDefault();
+			try {
+				objectThis._update_from_database_button_Clicked( { clickedThis : this } ); 
+				event.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		});
-		
+
 		var $digestion_expand_link = $("#digestion_expand_link");
 		$digestion_expand_link.click( function( event ) { 
-			objectThis._digestion_expand_link_Clicked( { clickedThis : this } ); 
-			event.preventDefault();
+			try {
+				objectThis._digestion_expand_link_Clicked( { clickedThis : this } ); 
+				event.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		});
 
 		var $digestion_collapse_link = $("#digestion_collapse_link");
 		$digestion_collapse_link.click( function( event ) { 
-			objectThis._digestion_collapse_link_Clicked( { clickedThis : this } ); 
-			event.preventDefault();
+			try {
+				objectThis._digestion_collapse_link_Clicked( { clickedThis : this } ); 
+				event.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		});
 
 		var $psm_level_expand_link = $("#psm_level_expand_link");
 		$psm_level_expand_link.click( function( event ) { 
-			objectThis._psm_level_expand_link_Clicked( { clickedThis : this } ); 
-			event.preventDefault();
+			try {
+				objectThis._psm_level_expand_link_Clicked( { clickedThis : this } ); 
+				event.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		});
 
 		var $psm_level_collapse_link = $("#psm_level_collapse_link");
 		$psm_level_collapse_link.click( function( event ) { 
-			objectThis._psm_level_collapse_link_Clicked( { clickedThis : this } ); 
-			event.preventDefault();
+			try {
+				objectThis._psm_level_collapse_link_Clicked( { clickedThis : this } ); 
+				event.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		});
 
 		var $psm_error_estimates_expand_link = $("#psm_error_estimates_expand_link");
 		$psm_error_estimates_expand_link.click( function( event ) { 
-			objectThis._psm_error_estimates_expand_link_Clicked( { clickedThis : this } ); 
-			event.preventDefault();
+			try {
+				objectThis._psm_error_estimates_expand_link_Clicked( { clickedThis : this } ); 
+				event.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		});
 
 		var $psm_error_estimates_collapse_link = $("#psm_error_estimates_collapse_link");
 		$psm_error_estimates_collapse_link.click( function( event ) { 
-			objectThis._psm_error_estimates_collapse_link_Clicked( { clickedThis : this } ); 
-			event.preventDefault();
+			try {
+				objectThis._psm_error_estimates_collapse_link_Clicked( { clickedThis : this } ); 
+				event.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		});
 
 		var $peptide_level_expand_link = $("#peptide_level_expand_link");
 		$peptide_level_expand_link.click( function( event ) { 
-			objectThis._peptide_level_expand_link_Clicked( { clickedThis : this } ); 
-			event.preventDefault();
+			try {
+				objectThis._peptide_level_expand_link_Clicked( { clickedThis : this } ); 
+				event.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		});
 
 		var $peptide_level_collapse_link = $("#peptide_level_collapse_link");
 		$peptide_level_collapse_link.click( function( event ) { 
-			objectThis._peptide_level_collapse_link_Clicked( { clickedThis : this } ); 
-			event.preventDefault();
+			try {
+				objectThis._peptide_level_collapse_link_Clicked( { clickedThis : this } ); 
+				event.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		});
 		
-		//  Default display on page load
-		this.showDigestionStatistics();
-
 	};
 	
 	/**
@@ -210,6 +350,52 @@ var ViewQCPageCode = function() {
 	 */
 	this._update_from_database_button_Clicked = function( params ) {
 		this.updatePageForFilterCriteria();
+	};
+
+	/**
+	 * 
+	 */
+	this._summary_expand_link_Clicked = function( params ) {
+		this.showSummaryStatistics();
+	};
+	
+	/**
+	 *  
+	 */
+	this._summary_collapse_link_Clicked = function( params ) {
+		this.hideSummaryStatistics();
+	};
+	
+	/**
+	 *  
+	 */
+	this.showSummaryStatistics = function( params ) {
+		
+		_summary_Statistics_sectionDisplayed = true;
+		
+		var $summary_display_block = $("#summary_display_block");
+		$summary_display_block.show();
+		var $summary_expand_link = $("#summary_expand_link");
+		$summary_expand_link.hide();
+		var $summary_collapse_link = $("#summary_collapse_link");
+		$summary_collapse_link.show();
+		
+		this.loadSummaryStatisticsIfNeeded();
+	};
+	
+	/**
+	 *  
+	 */
+	this.hideSummaryStatistics = function( params ) {
+		
+		var $summary_display_block = $("#summary_display_block");
+		$summary_display_block.hide();
+		var $summary_expand_link = $("#summary_expand_link");
+		$summary_expand_link.show();
+		var $summary_collapse_link = $("#summary_collapse_link");
+		$summary_collapse_link.hide();
+		
+		_summary_Statistics_sectionDisplayed = false;
 	};
 	
 	/**
@@ -418,6 +604,7 @@ var ViewQCPageCode = function() {
 	 */
 	this.clearAllDisplayedDataAndCharts = function() {
 		
+		this.clearSummaryStatistics();
 		this.clearDigestionStatistics();
 		this.clearPSM_Level_Statistics();
 		this.clearPSM_ErrorEstimates();
@@ -429,6 +616,9 @@ var ViewQCPageCode = function() {
 	 *  
 	 */
 	this.loadDataForDisplayedDataAndCharts = function() {
+		if ( _summary_Statistics_sectionDisplayed ) {
+			this.loadSummaryStatisticsIfNeeded();
+		}
 		if ( _digestion_Statistics_sectionDisplayed ) {
 			this.loadDigestionStatisticsIfNeeded();
 		}
@@ -797,6 +987,372 @@ var ViewQCPageCode = function() {
 		}
 		return cutoffValuesRootLevelCutoffDefaults;
 	};
+	
+	///////////////////////////////////////////
+	
+	///////////////////////////////////////////
+	
+	/////////   Summary Statistics
+
+	/**
+	 * Load the data for the Summary Statistics section
+	 */
+	this.loadSummaryStatisticsIfNeeded = function() {
+		
+		this.loadSummaryStatisticsCountIfNeeded();
+	};
+	
+	/**
+	 * Clear the data for the Summary Statistics section
+	 */
+	this.clearSummaryStatistics = function() {
+		
+		this.clearSummaryStatisticsCount();
+	};
+	
+	/**
+	 * Clear data for Summary_Statistics_Counts
+	 */
+	this.clearSummaryStatisticsCount = function() {
+		
+		_summary_Statistics_isLoaded = _IS_LOADED_NO;
+
+		//  PSM Summary Summary 
+		var $Summary_Statistics_CountsBlock = $("#Summary_Statistics_CountsBlock");
+		var $Summary_Statistics_CountsBlock_chart_container_jq = $("#Summary_Statistics_CountsBlock .chart_container_jq"); 
+		$Summary_Statistics_CountsBlock_chart_container_jq.empty();
+		
+		if ( _loadSummaryStatisticsCountActiveAjax ) {
+			_loadSummaryStatisticsCountActiveAjax.abort();
+			_loadSummaryStatisticsCountActiveAjax = null;
+		}
+	};
+	
+
+	/**
+	 * If not currently loaded, call loadSummaryStatisticsCount()
+	 */
+	this.loadSummaryStatisticsCountIfNeeded = function() {
+		
+		if ( _summary_Statistics_isLoaded === _IS_LOADED_NO ) {
+			this.loadSummaryStatisticsCount();
+		}
+	};
+	
+	/**
+	 * Keep this in sync with the number of charts actually created in this.loadSummaryStatisticsCount(...)
+	 */
+	var _SUMMARY_STATISTICS_CHART_COUNT = 3;
+
+	var _loadSummaryStatisticsCountActiveAjax = null;
+	
+	/**
+	 * Load the data for SummaryStatisticsCount
+	 */
+	this.loadSummaryStatisticsCount = function() {
+		var objectThis = this;
+		
+		_summary_Statistics_isLoaded = _IS_LOADED_LOADING;
+		
+		// Block for "Summary Statistics"
+		var $Summary_Statistics_CountsBlock = $("#Summary_Statistics_CountsBlock");
+		if ( $Summary_Statistics_CountsBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'Summary_Statistics_CountsBlock'" );
+		}
+		$Summary_Statistics_CountsBlock.empty();
+
+		for ( var counter = 0; counter < _SUMMARY_STATISTICS_CHART_COUNT; counter++ ) {
+			//  Add empty chart with Loading message
+			var $chart_outer_container_jq = this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
+			this._placeEmptyDummyChartForMessage( { 
+				$chart_outer_container_jq : $chart_outer_container_jq, 
+				//				linkType : selectedLinkType, 
+				messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_LOADING,
+				messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_LOADING
+			} );
+		}
+				
+		var hash_json_field_Contents_JSONString = JSON.stringify( _hash_json_Contents );
+		var ajaxRequestData = {
+				project_search_id : _project_search_ids,
+				filterCriteria : hash_json_field_Contents_JSONString
+		};
+		
+		if ( _loadSummaryStatisticsCountActiveAjax ) {
+			_loadSummaryStatisticsCountActiveAjax.abort();
+			_loadSummaryStatisticsCountActiveAjax = null;
+		}
+		
+		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
+		_loadSummaryStatisticsCountActiveAjax =
+			$.ajax({
+				url : contextPathJSVar + "/services/qc/dataPage/summaryStatistics",
+				traditional: true,  //  Force traditional serialization of the data sent
+				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+				data : ajaxRequestData,  // The data sent as params on the URL
+				dataType : "json",
+				success : function( ajaxResponseData ) {
+					try {
+						_loadSummaryStatisticsCountActiveAjax = null;
+						var responseParams = {
+								ajaxResponseData : ajaxResponseData, 
+								ajaxRequestData : ajaxRequestData
+						};
+						objectThis.loadSummaryStatisticsCountProcessResponse( responseParams );
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				},
+				failure: function(errMsg) {
+					_loadSummaryStatisticsCountActiveAjax = null;
+					handleAJAXFailure( errMsg );
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					_loadSummaryStatisticsCountActiveAjax = null;
+					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
+						handleAJAXError(jqXHR, textStatus, errorThrown);
+					}
+				}
+			});
+	
+	};
+	
+
+	/**
+	 * Load the data for Summary_Statistics_Counts
+	 */
+	this.loadSummaryStatisticsCountProcessResponse = function( params ) {
+		var ajaxResponseData = params.ajaxResponseData;
+		var ajaxRequestData = params.ajaxRequestData;
+		
+		var qc_SummaryCountsResults = ajaxResponseData.qc_SummaryCountsResults;
+		var resultsPerLinkTypeList = qc_SummaryCountsResults.resultsPerLinkTypeList;
+		
+		// Block for "Summary Statistics"
+		var $Summary_Statistics_CountsBlock = $("#Summary_Statistics_CountsBlock");
+		if ( $Summary_Statistics_CountsBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'Summary_Statistics_CountsBlock'" );
+		}
+		$Summary_Statistics_CountsBlock.empty();
+
+		//  Build data for charts
+		var psmCountPerType = [];
+		var reportedPeptideCountPerType = [];
+		var proteinSequenceIdCountPerType = [];
+		
+		var foundDataForAtLeastOneLinkType = false;
+		
+		resultsPerLinkTypeList.forEach( function ( currentArrayValue, index, array ) {
+			var entry = currentArrayValue;
+			
+			if ( entry.psmCount === 0 ) {
+				//  No data for this entry so skip it
+				return;
+			}
+			
+			foundDataForAtLeastOneLinkType = true;
+			
+			var psmCountSingleType = { 
+					linkType : entry.linkType,
+					count : entry.psmCount
+			};
+
+			var reportedPeptideCountSingleType = { 
+					linkType : entry.linkType,
+					count : entry.uniqueReportedPeptideCount
+			};
+
+			var proteinSequenceIdCountSingleType = { 
+					linkType : entry.linkType,
+					count : entry.uniqueProteinSequenceIdCount
+			};
+			
+			psmCountPerType.push( psmCountSingleType );
+			reportedPeptideCountPerType.push( reportedPeptideCountSingleType );
+			proteinSequenceIdCountPerType.push( proteinSequenceIdCountSingleType );
+			
+		}, this /* passed to function as this */ );
+		
+		if ( ! foundDataForAtLeastOneLinkType ) {
+			
+			for ( var counter = 0; counter < _SUMMARY_STATISTICS_CHART_COUNT; counter++ ) {
+
+				var $chart_outer_container_jq =
+					this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
+
+				//  Add empty chart with No Data message
+				this._placeEmptyDummyChartForMessage( { 
+					$chart_outer_container_jq : $chart_outer_container_jq, 
+//					linkType : selectedLinkType, 
+					messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_NO_DATA,
+					messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_NO_DATA
+				} );
+			}
+			
+			//  Exit since no data found
+			
+			return;  //  EARLY EXIT 
+		}
+		
+		
+		//  Keep _SUMMARY_STATISTICS_CHART_COUNT in sync with the actual number of charts created here
+
+		var $chart_outer_container_jq =
+			this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
+		
+		var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
+		
+		this._addSummaryChart( { 
+			chartTitle : 'PSM Count',
+			dataWithOneElementPerType: psmCountPerType, 
+			$chartContainer : $chart_container_jq } );
+
+		
+		var $chart_outer_container_jq =
+			this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
+		
+		var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
+		
+		this._addSummaryChart( { 
+			chartTitle : 'Peptide Count',
+			dataWithOneElementPerType: reportedPeptideCountPerType, 
+			$chartContainer : $chart_container_jq } );
+
+		
+		var $chart_outer_container_jq =
+			this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
+		
+		var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
+		
+		this._addSummaryChart( { 
+			chartTitle : 'Protein Count',
+			dataWithOneElementPerType: proteinSequenceIdCountPerType, 
+			$chartContainer : $chart_container_jq } );
+		
+		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $Summary_Statistics_CountsBlock } );
+		// Add tooltips for download links
+		addToolTips( $Summary_Statistics_CountsBlock );
+	};
+	
+	/**
+	 * Add Summary Chart
+	 */
+	this._addSummaryChart = function( params ) {
+		var chartTitleParam = params.chartTitle;
+		var dataWithOneElementPerType = params.dataWithOneElementPerType;
+		var $chartContainer = params.$chartContainer;
+		
+		var combinedCount = 0;
+		
+		dataWithOneElementPerType.forEach( function ( currentArrayValue, index, array ) {
+			var entry = currentArrayValue;
+			combinedCount += entry.count;
+		}, this /* passed to function as this */ );
+
+		var $chart_container_jqHTMLElement = $chartContainer[ 0 ];
+
+		var totalForCombined = { 
+				linkType : _link_type_combined_LOWER_CASE_constant, 
+				count : combinedCount };
+		
+		dataWithOneElementPerType.push( totalForCombined );
+
+		var chartTitle = chartTitleParam;
+
+//		chart data for Google charts
+		var chartData = [];
+
+		var barColors = [  ]; // must be an array
+
+		var chartDataHeaderEntry = [ 'Link Type', "Count", 
+			{ role: 'style' },  // Style of the bar 
+			{role: "tooltip", 'p': {'html': true} }
+			, {type: 'string', role: 'annotation'}
+			]; 
+		chartData.push( chartDataHeaderEntry );
+
+		var maxYvalue = 0;
+
+		dataWithOneElementPerType.forEach( function ( currentArrayValue, index, array ) {
+			var totalForLinkType = currentArrayValue;
+
+			var linkType = totalForLinkType.linkType;
+			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
+
+			var chartY = totalForLinkType.count;
+
+			if ( chartY === undefined ) {
+				chartY = 0;
+			}
+
+			var tooltipText = "<div  style='padding: 4px;'>Count: " + totalForLinkType.count + "</div>";
+			var entryAnnotationText = chartY;
+
+			var chartEntry = [ 
+				linkType,
+				chartY, 
+				//  Style of bar
+				colorAndbarColor.barColor,
+				//  Tool Tip
+				tooltipText
+				,entryAnnotationText
+				];
+			chartData.push( chartEntry );
+			if ( chartY > maxYvalue ) {
+				maxYvalue = chartY;
+			}
+
+			barColors.push( colorAndbarColor.color );
+
+		}, this /* passed to function as this */ );
+
+//		var vAxisTicks = this._get___________TickMarks( { maxValue : maxYvalue } );
+
+		var optionsFullsize = {
+				//  Overridden for Specific elements like Chart Title and X and Y Axis labels
+				fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
+
+				title: chartTitle, // Title above chart
+				titleTextStyle: {
+			    	color : _PROXL_DEFAULT_FONT_COLOR, //  Set default font color
+//					color: <string>,    // any HTML string color ('red', '#cc00cc')
+//					fontName: <string>, // i.e. 'Times New Roman'
+					fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
+//					bold: <boolean>,    // true or false
+//					italic: <boolean>   // true of false
+				},
+				//  X axis label below chart
+				hAxis: { title: 'Link Type', titleTextStyle: { color: 'black', fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+				},  
+				//  Y axis label left of chart
+				vAxis: { title: 'Count', titleTextStyle: { color: 'black', fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+				,baseline: 0     // always start at zero
+//				,ticks: vAxisTicks
+//				,maxValue : maxChargeCount
+				},
+				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
+//				width : 500, 
+//				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+//				colors: barColors,  //  Assigned to each bar
+				tooltip: {isHtml: true}
+//				,chartArea : { left : 140, top: 60, 
+//				width: objectThis.RETENTION_TIME_COUNT_CHART_WIDTH - 200 ,  //  was 720 as measured in Chrome
+//				height : objectThis.RETENTION_TIME_COUNT_CHART_HEIGHT - 120 }  //  was 530 as measured in Chrome
+		};        
+//		create the chart
+		var data = google.visualization.arrayToDataTable( chartData );
+		var chartFullsize = new google.visualization.ColumnChart( $chart_container_jqHTMLElement );
+		chartFullsize.draw(data, optionsFullsize);
+
+	};
+	
+	
+	
+	///////////////////////////////////////////
+	
+	/////////    Digestion Statistics
 
 	/**
 	 * Load the data for the Digestion Statistics section
@@ -821,11 +1377,13 @@ var ViewQCPageCode = function() {
 		
 		_digestion_Statistics_isLoaded = _IS_LOADED_NO;
 
-		var $missingCleavageReportedPeptidesCountLoadingBlock = $("#missingCleavageReportedPeptidesCountLoadingBlock");
 		var $missingCleavageReportedPeptidesCountBlock = $("#missingCleavageReportedPeptidesCountBlock");
-		$missingCleavageReportedPeptidesCountLoadingBlock.show();
-		$missingCleavageReportedPeptidesCountBlock.hide();
 		$missingCleavageReportedPeptidesCountBlock.empty();
+		
+		if ( _loadMissingCleavageReportedPeptidesCountActiveAjax ) {
+			_loadMissingCleavageReportedPeptidesCountActiveAjax.abort();
+			_loadMissingCleavageReportedPeptidesCountActiveAjax = null;
+		}
 	};
 	
 
@@ -839,6 +1397,8 @@ var ViewQCPageCode = function() {
 		}
 	};
 
+	var _loadMissingCleavageReportedPeptidesCountActiveAjax = null;
+	
 	/**
 	 * Load the data for MissingCleavageReportedPeptidesCount
 	 */
@@ -847,48 +1407,74 @@ var ViewQCPageCode = function() {
 		
 		_digestion_Statistics_isLoaded = _IS_LOADED_LOADING;
 		
-		var $missingCleavageReportedPeptidesCountLoadingBlock = $("#missingCleavageReportedPeptidesCountLoadingBlock");
+		// Add 1 dummy chart for place holder
 		var $missingCleavageReportedPeptidesCountBlock = $("#missingCleavageReportedPeptidesCountBlock");
-		$missingCleavageReportedPeptidesCountLoadingBlock.show();
-		$missingCleavageReportedPeptidesCountBlock.hide();
+		if ( $missingCleavageReportedPeptidesCountBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'missingCleavageReportedPeptidesCountBlock'" );
+		}
+		$missingCleavageReportedPeptidesCountBlock.empty();
 		
+		var $chart_outer_container_jq =
+			this._addChartOuterTemplate( { $chart_group_container_table_jq : $missingCleavageReportedPeptidesCountBlock } );
+		
+		//  Add empty chart with Loading message
+		this._placeEmptyDummyChartForMessage( { 
+			$chart_outer_container_jq : $chart_outer_container_jq, 
+//			linkType : selectedLinkType, 
+			messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_LOADING,
+			messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_LOADING
+		} );
+				
 		var hash_json_field_Contents_JSONString = JSON.stringify( _hash_json_Contents );
 		var ajaxRequestData = {
 				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
-		$.ajax({
-			url : contextPathJSVar + "/services/qc/dataPage/missing",
-			traditional: true,  //  Force traditional serialization of the data sent
-								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-								//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-			data : ajaxRequestData,  // The data sent as params on the URL
-			dataType : "json",
-			success : function( ajaxResponseData ) {
-				try {
-					var responseParams = {
-							ajaxResponseData : ajaxResponseData, 
-							ajaxRequestData : ajaxRequestData
-//							,
-//							topTRelement : topTRelement
-					};
-					objectThis.loadMissingCleavageReportedPeptidesCountProcessResponse( responseParams );
-//					$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
-				} catch( e ) {
-					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-					throw e;
+		
+		if ( _loadMissingCleavageReportedPeptidesCountActiveAjax ) {
+			_loadMissingCleavageReportedPeptidesCountActiveAjax.abort();
+			_loadMissingCleavageReportedPeptidesCountActiveAjax = null;
+		}
+		
+		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
+		_loadMissingCleavageReportedPeptidesCountActiveAjax =
+			$.ajax({
+				url : contextPathJSVar + "/services/qc/dataPage/missingCleavages",
+				traditional: true,  //  Force traditional serialization of the data sent
+				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+				data : ajaxRequestData,  // The data sent as params on the URL
+				dataType : "json",
+				success : function( ajaxResponseData ) {
+					try {
+						_loadMissingCleavageReportedPeptidesCountActiveAjax = null;
+						var responseParams = {
+								ajaxResponseData : ajaxResponseData, 
+								ajaxRequestData : ajaxRequestData
+//								,
+//								topTRelement : topTRelement
+						};
+						objectThis.loadMissingCleavageReportedPeptidesCountProcessResponse( responseParams );
+//						$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				},
+				failure: function(errMsg) {
+					_loadMissingCleavageReportedPeptidesCountActiveAjax = null;
+					handleAJAXFailure( errMsg );
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					_loadMissingCleavageReportedPeptidesCountActiveAjax = null;
+					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
+						handleAJAXError(jqXHR, textStatus, errorThrown);
+					}
 				}
-			},
-	        failure: function(errMsg) {
-	        	handleAJAXFailure( errMsg );
-	        },
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
-			}
-		});
-		
-		
+			});
+	
 	};
+	
 	
 	/**
 	 * Load the data for MissingCleavageReportedPeptidesCount
@@ -899,25 +1485,19 @@ var ViewQCPageCode = function() {
 		
 		var missingCleavageReportedPeptidesCountForLinkTypeList = ajaxResponseData.missingCleavageReportedPeptidesCountForLinkTypeList;
 		
-		var $missingCleavageReportedPeptidesCountLoadingBlock = $("#missingCleavageReportedPeptidesCountLoadingBlock");
 		var $missingCleavageReportedPeptidesCountBlock = $("#missingCleavageReportedPeptidesCountBlock");
-
-		var $PeptideCleavageEntryTemplate = $("#PeptideCleavageEntryTemplate");
-		if ( $PeptideCleavageEntryTemplate.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PeptideCleavageEntryTemplate'" );
+		if ( $missingCleavageReportedPeptidesCountBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'missingCleavageReportedPeptidesCountBlock'" );
 		}
-		var PeptideCleavageEntryTemplate = $PeptideCleavageEntryTemplate.html();
 
 		$missingCleavageReportedPeptidesCountBlock.empty();
-		
-		$missingCleavageReportedPeptidesCountLoadingBlock.hide();
-		$missingCleavageReportedPeptidesCountBlock.show();
-		
 
 		//  Build data for charts
 		var peptidesWithMissedCleavagePerType = [];
 		var missedCleavagesPerType = [];
 		var missedCleavagePSMCountPerType = [];
+		
+		var foundDataForAtLeastOneLinkType = false;
 		
 		for ( var index = 0; index < missingCleavageReportedPeptidesCountForLinkTypeList.length; index++ ) {
 			var entry = missingCleavageReportedPeptidesCountForLinkTypeList[ index ];
@@ -926,6 +1506,8 @@ var ViewQCPageCode = function() {
 				//  No data for this entry so skip it
 				continue;
 			}
+			
+			foundDataForAtLeastOneLinkType = true;
 			
 			var peptidesWithMissedCleavageTooltip = 
 				entry.missedCleavageReportedPeptideCount + 
@@ -968,35 +1550,59 @@ var ViewQCPageCode = function() {
 			missedCleavagePSMCountPerType.push( missedCleavagePSMCountSingleType );
 		}
 		
-		var $chartOuterContainer =
-			$( PeptideCleavageEntryTemplate ).appendTo( $missingCleavageReportedPeptidesCountBlock );
+		if ( ! foundDataForAtLeastOneLinkType ) {
+
+			var $chart_outer_container_jq =
+				this._addChartOuterTemplate( { $chart_group_container_table_jq : $missingCleavageReportedPeptidesCountBlock } );
+			
+			//  Add empty chart with No Data message
+			this._placeEmptyDummyChartForMessage( { 
+				$chart_outer_container_jq : $chart_outer_container_jq, 
+//				linkType : selectedLinkType, 
+				messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_NO_DATA,
+				messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_NO_DATA
+			} );
+			
+			//  Exit since no data found
+			
+			return;  //  EARLY EXIT 
+		}
 		
-		var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
+
+		var $chart_outer_container_jq =
+			this._addChartOuterTemplate( { $chart_group_container_table_jq : $missingCleavageReportedPeptidesCountBlock } );
+		
+		var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 		
 		this._addMissedCleavageChart( { 
 			chartTitle : 'Fraction Peptides w/ Missed Cleavages',
 			dataWithOneElementPerType: peptidesWithMissedCleavagePerType, 
-			$chartContainer : $chartContainer } );
+			$chartContainer : $chart_container_jq } );
+
 		
-		$chartOuterContainer =
-			$( PeptideCleavageEntryTemplate ).appendTo( $missingCleavageReportedPeptidesCountBlock );
+		var $chart_outer_container_jq =
+			this._addChartOuterTemplate( { $chart_group_container_table_jq : $missingCleavageReportedPeptidesCountBlock } );
 		
-		$chartContainer = $chartOuterContainer.find(".chart_container_jq");
+		var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 		
 		this._addMissedCleavageChart( { 
 			chartTitle : 'Missed Cleavages Per Peptide',
 			dataWithOneElementPerType: missedCleavagesPerType, 
-			$chartContainer : $chartContainer } );
+			$chartContainer : $chart_container_jq } );
+
 		
-		$chartOuterContainer =
-			$( PeptideCleavageEntryTemplate ).appendTo( $missingCleavageReportedPeptidesCountBlock );
+		var $chart_outer_container_jq =
+			this._addChartOuterTemplate( { $chart_group_container_table_jq : $missingCleavageReportedPeptidesCountBlock } );
 		
-		$chartContainer = $chartOuterContainer.find(".chart_container_jq");
+		var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 		
 		this._addMissedCleavageChart( { 
 			chartTitle : 'Fraction PSMs w/ Missed Cleavages',
 			dataWithOneElementPerType: missedCleavagePSMCountPerType, 
-			$chartContainer : $chartContainer } );
+			$chartContainer : $chart_container_jq } );
+		
+		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $missingCleavageReportedPeptidesCountBlock } );
+
 	};
 	
 	/**
@@ -1170,19 +1776,13 @@ var ViewQCPageCode = function() {
 		
 		_chargeCount_Statistics_isLoaded = _IS_LOADED_NO;
 
-		var $PSMChargeStatesCountsLoadingBlock = $("#PSMChargeStatesCountsLoadingBlock");
 		var $PSMChargeStatesCountsBlock = $("#PSMChargeStatesCountsBlock");
-		$PSMChargeStatesCountsLoadingBlock.show();
-		$PSMChargeStatesCountsBlock.hide();
 		$PSMChargeStatesCountsBlock.empty();
 		
-		//  PSM Summary Summary 
-		var $PSM_Summary_CountsLoadingBlock = $("#PSM_Summary_CountsLoadingBlock");
-		var $PSM_Summary_CountsBlock = $("#PSM_Summary_CountsBlock");
-		var $PSM_Summary_CountsBlock_chart_container_jq = $("#PSM_Summary_CountsBlock .chart_container_jq"); 
-		$PSM_Summary_CountsLoadingBlock.show();
-		$PSM_Summary_CountsBlock.hide();
-		$PSM_Summary_CountsBlock_chart_container_jq.empty();
+		if ( _loadloadChargeCountActiveAjax ) {
+			_loadloadChargeCountActiveAjax.abort();
+			_loadloadChargeCountActiveAjax = null;
+		}
 	};
 	
 	/**
@@ -1194,6 +1794,8 @@ var ViewQCPageCode = function() {
 		}
 	};
 	
+	var _loadloadChargeCountActiveAjax = null;
+	
 	/**
 	 * Load the data for ChargeCount  and Summary (Summary created from ChargeCount Data)
 	 */
@@ -1202,45 +1804,75 @@ var ViewQCPageCode = function() {
 		
 		_chargeCount_Statistics_isLoaded = _IS_LOADED_LOADING;
 		
-		var $PSMChargeStatesCountsLoadingBlock = $("#PSMChargeStatesCountsLoadingBlock");
 		var $PSMChargeStatesCountsBlock = $("#PSMChargeStatesCountsBlock");
-		$PSMChargeStatesCountsLoadingBlock.show();
-		$PSMChargeStatesCountsBlock.hide();
+		$PSMChargeStatesCountsBlock.empty();
+
+		var selectedLinkTypes = _hash_json_Contents.linkTypes;
+		
+		// Show cells for selected link types
+		selectedLinkTypes.forEach( function ( currentArrayValue, index, array ) {
+			var selectedLinkType = currentArrayValue;
+
+			//  Add empty chart with Loading message
+			var $chart_outer_container_jq =
+				this._addChartOuterTemplate( { linkType : selectedLinkType, $chart_group_container_table_jq : $PSMChargeStatesCountsBlock } );
+
+			//  Add empty chart with Loading message
+			this._placeEmptyDummyChartForMessage( { 
+				$chart_outer_container_jq : $chart_outer_container_jq, 
+			//				linkType : selectedLinkType, 
+				messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_LOADING,
+				messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_LOADING
+			} );
+			
+		}, this /* passed to function as this */ );
 		
 		var hash_json_field_Contents_JSONString = JSON.stringify( _hash_json_Contents );
 		var ajaxRequestData = {
 				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
-		$.ajax({
-			url : contextPathJSVar + "/services/qc/dataPage/chargeCounts",
-			traditional: true,  //  Force traditional serialization of the data sent
-								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-								//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-			data : ajaxRequestData,  // The data sent as params on the URL
-			dataType : "json",
-			success : function( ajaxResponseData ) {
-				try {
-					var responseParams = {
-							ajaxResponseData : ajaxResponseData, 
-							ajaxRequestData : ajaxRequestData
-//							,
-//							topTRelement : topTRelement
-					};
-					objectThis.loadChargeCountResponse( responseParams );
-//					$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
-				} catch( e ) {
-					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-					throw e;
+		
+		if ( _loadloadChargeCountActiveAjax ) {
+			_loadloadChargeCountActiveAjax.abort();
+			_loadloadChargeCountActiveAjax = null;
+		}
+		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
+		_loadloadChargeCountActiveAjax =
+			$.ajax({
+				url : contextPathJSVar + "/services/qc/dataPage/chargeCounts",
+				traditional: true,  //  Force traditional serialization of the data sent
+				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+				data : ajaxRequestData,  // The data sent as params on the URL
+				dataType : "json",
+				success : function( ajaxResponseData ) {
+					try {
+						_loadloadChargeCountActiveAjax = null;
+						var responseParams = {
+								ajaxResponseData : ajaxResponseData, 
+								ajaxRequestData : ajaxRequestData
+//								,
+//								topTRelement : topTRelement
+						};
+						objectThis.loadChargeCountResponse( responseParams );
+//						$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				},
+				failure: function(errMsg) {
+					_loadloadChargeCountActiveAjax = null;
+					handleAJAXFailure( errMsg );
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					_loadloadChargeCountActiveAjax = null;
+					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
+						handleAJAXError(jqXHR, textStatus, errorThrown);
+					}
 				}
-			},
-	        failure: function(errMsg) {
-	        	handleAJAXFailure( errMsg );
-	        },
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
-			}
-		});
+			});
 	};
 	
 
@@ -1254,66 +1886,47 @@ var ViewQCPageCode = function() {
 		
 		var chargeStateCountsResults = ajaxResponseData.chargeStateCountsResults;
 		var resultsPerLinkTypeList = chargeStateCountsResults.resultsPerLinkTypeList;
-		
-		var $PSMChargeStatesCountsEntryTemplate = $("#PSMChargeStatesCountsEntryTemplate");
-		if ( $PSMChargeStatesCountsEntryTemplate.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PSMChargeStatesCountsEntryTemplate'" );
-		}
-		var PSMChargeStatesCountsEntryTemplate = $PSMChargeStatesCountsEntryTemplate.html();
 
-		var $PSMChargeStatesCountsLoadingBlock = $("#PSMChargeStatesCountsLoadingBlock");
-		if ( $PSMChargeStatesCountsLoadingBlock.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PSMChargeStatesCountsLoadingBlock'" );
-		}
 		var $PSMChargeStatesCountsBlock = $("#PSMChargeStatesCountsBlock");
 		if ( $PSMChargeStatesCountsBlock.length === 0 ) {
 			throw Error( "unable to find HTML element with id 'PSMChargeStatesCountsBlock'" );
 		}
 
 		$PSMChargeStatesCountsBlock.empty();
-
-		$PSMChargeStatesCountsLoadingBlock.hide();
-		$PSMChargeStatesCountsBlock.show();
 		
-		for ( var indexForLinkType = 0; indexForLinkType < resultsPerLinkTypeList.length; indexForLinkType++ ) {
-			var entryForLinkType = resultsPerLinkTypeList[ indexForLinkType ];
+		resultsPerLinkTypeList.forEach( function ( currentArrayValue, index, array ) {
+			var entryForLinkType = currentArrayValue;
 			var linkType = entryForLinkType.linkType;
 			var resultsPerChargeValueList = entryForLinkType.resultsPerChargeValueList;
 			
 			if ( resultsPerChargeValueList === null || resultsPerChargeValueList === undefined ||
 					resultsPerChargeValueList.length === 0 ) {
 
-				var noDataTemplate_ForLinkTypeSelector = "PSMChargeStatesCountsNoDataTemplate_" + linkType;
-				var $PSMChargeStatesCountsNoDataTemplate_linkType = $("#" + noDataTemplate_ForLinkTypeSelector );
-				if ( $PSMChargeStatesCountsNoDataTemplate_linkType.length === 0 ) {
-					throw Error( "unable to find HTML element with id '" + noDataTemplate_ForLinkTypeSelector + "'" );
-				}
-				var noDataFoundEntry = $PSMChargeStatesCountsNoDataTemplate_linkType.html();
-				var $noDataFoundContainer =
-					$( noDataFoundEntry ).appendTo( $PSMChargeStatesCountsBlock );
+				//  Add empty chart with No Data message
+				var $chart_outer_container_jq = this._addChartOuterTemplate( { $chart_group_container_table_jq : $PSMChargeStatesCountsBlock } );
+				this._placeEmptyDummyChartForMessage( { 
+					$chart_outer_container_jq : $chart_outer_container_jq, 
+					linkType : linkType, 
+					messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_NO_DATA,
+					messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_NO_DATA
+				} );
 				
 			} else {
-				var $chartOuterContainer =
-					$( PSMChargeStatesCountsEntryTemplate ).appendTo( $PSMChargeStatesCountsBlock );
-				
-				var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
+				var $chart_outer_container_jq = this._addChartOuterTemplate( { $chart_group_container_table_jq : $PSMChargeStatesCountsBlock } );
+				var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 				
 				var linkType = entryForLinkType.linkType;
 				var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
 				
-				this._addSinglePSMChargeChart( { entryForLinkType: entryForLinkType, colorAndbarColor : colorAndbarColor, $chartContainer : $chartContainer } );
+				this._addSinglePSMChargeChart( { entryForLinkType: entryForLinkType, colorAndbarColor : colorAndbarColor, $chartContainer : $chart_container_jq } );
 				
-				chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
+				chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq } );
 				// Add tooltips for download links
-				addToolTips( $chartOuterContainer );
+				addToolTips( $chart_outer_container_jq );
 			}
-		}
+		}, this /* passed to function as this */ );
 		
-		this._addPSMSummaryChart( { resultsPerLinkTypeList : resultsPerLinkTypeList } );
-		
-
 		_chargeCount_Statistics_isLoaded = _IS_LOADED_YES;
-		
 		
 	};
 	
@@ -1327,150 +1940,6 @@ var ViewQCPageCode = function() {
 			_TICK_MARK_TEXT_FONT_SIZE : 14 // In PX
 	};
 	
-
-	/**
-	 * Add PSM Summary Chart
-	 */
-	this._addPSMSummaryChart = function( params ) {
-		var resultsPerLinkTypeList = params.resultsPerLinkTypeList;
-		
-		//  PSM Summary Summary 
-		var $PSM_Summary_CountsLoadingBlock = $("#PSM_Summary_CountsLoadingBlock");
-		var $PSM_Summary_CountsBlock = $("#PSM_Summary_CountsBlock");
-		var $chartOuterContainer
-		var $PSM_Summary_CountsBlock_chart_container_jq = $("#PSM_Summary_CountsBlock .chart_container_jq");
-		var $PSM_Summary_CountsBlock_chart_outer_container_jq = $("#PSM_Summary_CountsBlock .chart_outer_container_jq");
-		$PSM_Summary_CountsLoadingBlock.hide();
-		$PSM_Summary_CountsBlock.show();
-		
-		var $chartContainer = $PSM_Summary_CountsBlock_chart_container_jq;
-		var $chartOuterContainer = $PSM_Summary_CountsBlock_chart_outer_container_jq;
-
-		var psmTotalsPerLinkType = [];
-		
-		var combinedCount = 0;
-
-		for ( var indexForLinkType = 0; indexForLinkType < resultsPerLinkTypeList.length; indexForLinkType++ ) {
-			var entryForLinkType = resultsPerLinkTypeList[ indexForLinkType ];
-			var linkType = entryForLinkType.linkType;
-			var resultsPerChargeValueList = entryForLinkType.resultsPerChargeValueList;
-			if ( resultsPerChargeValueList !== undefined && resultsPerChargeValueList !== null && resultsPerChargeValueList.length !== 0 ) {
-				var linkType = entryForLinkType.linkType;
-				var countPerLinkType = 0;
-				var resultsPerChargeValueList = entryForLinkType.resultsPerChargeValueList;
-				for ( var indexForChargeValue = 0; indexForChargeValue < resultsPerChargeValueList.length; indexForChargeValue++ ) {
-					var entryForChargeValue = resultsPerChargeValueList[ indexForChargeValue ];
-					countPerLinkType += entryForChargeValue.chargeCount;
-				}
-				psmTotalForLinkType = { linkType : linkType, countPerLinkType : countPerLinkType };
-				psmTotalsPerLinkType.push( psmTotalForLinkType )
-				combinedCount += countPerLinkType;
-			}
-		}
-		
-
-		var psmTotalForCombined = { 
-				linkType : _link_type_combined_LOWER_CASE_constant, 
-				countPerLinkType : combinedCount };
-		
-		psmTotalsPerLinkType.push( psmTotalForCombined );
-
-		var chartTitle = "PSM Count";
-
-//		chart data for Google charts
-		var chartData = [];
-
-		var barColors = [  ]; // must be an array
-
-		var chartDataHeaderEntry = [ 'Link Type', "Count", 
-			{ role: 'style' },  // Style of the bar 
-			{role: "tooltip", 'p': {'html': true} }
-			, {type: 'string', role: 'annotation'}
-			]; 
-		chartData.push( chartDataHeaderEntry );
-
-		var maxYvalue = 0;
-
-		for ( var index = 0; index < psmTotalsPerLinkType.length; index++ ) {
-			var psmTotalForLinkType = psmTotalsPerLinkType[ index ];
-
-			var linkType = psmTotalForLinkType.linkType;
-			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
-
-			var chartY = psmTotalForLinkType.countPerLinkType;
-
-			if ( chartY === undefined ) {
-				chartY = 0;
-			}
-
-			var tooltipText = "<div  style='padding: 4px;'>Count: " + psmTotalForLinkType.countPerLinkType + "</div>";
-			var entryAnnotationText = chartY;
-
-			var chartEntry = [ 
-				linkType,
-				chartY, 
-				//  Style of bar
-				colorAndbarColor.barColor,
-				//  Tool Tip
-				tooltipText
-				,entryAnnotationText
-				];
-			chartData.push( chartEntry );
-			if ( chartY > maxYvalue ) {
-				maxYvalue = chartY;
-			}
-
-			barColors.push( colorAndbarColor.color );
-
-		}
-
-//		var vAxisTicks = this._get___________TickMarks( { maxValue : maxYvalue } );
-
-		var optionsFullsize = {
-				//  Overridden for Specific elements like Chart Title and X and Y Axis labels
-				fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
-
-				title: chartTitle, // Title above chart
-				titleTextStyle: {
-			    	color : _PROXL_DEFAULT_FONT_COLOR, //  Set default font color
-//					color: <string>,    // any HTML string color ('red', '#cc00cc')
-//					fontName: <string>, // i.e. 'Times New Roman'
-					fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._TITLE_FONT_SIZE, // 12, 18 whatever you want (don't specify px)
-//					bold: <boolean>,    // true or false
-//					italic: <boolean>   // true of false
-				},
-				//  X axis label below chart
-				hAxis: { title: 'Link Type', titleTextStyle: { color: 'black', fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
-				},  
-				//  Y axis label left of chart
-				vAxis: { title: 'Count', titleTextStyle: { color: 'black', fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
-				,baseline: 0     // always start at zero
-//				,ticks: vAxisTicks
-//				,maxValue : maxChargeCount
-				},
-				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
-//				width : 500, 
-//				height : 300,   // width and height of chart, otherwise controlled by enclosing div
-//				colors: barColors,  //  Assigned to each bar
-				tooltip: {isHtml: true}
-//				,chartArea : { left : 140, top: 60, 
-//				width: objectThis.RETENTION_TIME_COUNT_CHART_WIDTH - 200 ,  //  was 720 as measured in Chrome
-//				height : objectThis.RETENTION_TIME_COUNT_CHART_HEIGHT - 120 }  //  was 530 as measured in Chrome
-		};        
-//		create the chart
-		var data = google.visualization.arrayToDataTable( chartData );
-		var chartFullsize = new google.visualization.ColumnChart( $chartContainer[0] );
-		chartFullsize.draw(data, optionsFullsize);
-
-
-		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
-		// Add tooltips for download links
-		addToolTips( $chartOuterContainer );
-		
-		
-	};
-	
-
 	/**
 	 * Add single Charge Chart
 	 */
@@ -1598,18 +2067,16 @@ var ViewQCPageCode = function() {
 		
 		_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_NO;
 
-		var $NO_PSM_M_Over_Z_CountsBlock = $("#NO_PSM_M_Over_Z_CountsBlock");
-		if ( $NO_PSM_M_Over_Z_CountsBlock.length > 0 ) {
-			//  The element with id 'NO_PSM_M_Over_Z_CountsBlock' exists so there are no scans in the searches
-			_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
-			return;  //  EARLY EXIT
-		}
-		
-		var $PSM_M_Over_Z_CountsLoadingBlock = $("#PSM_M_Over_Z_CountsLoadingBlock");
 		var $PSM_M_Over_Z_CountsBlock = $("#PSM_M_Over_Z_CountsBlock");
-		$PSM_M_Over_Z_CountsLoadingBlock.show();
-		$PSM_M_Over_Z_CountsBlock.hide();
+		if ( $PSM_M_Over_Z_CountsBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PSM_M_Over_Z_CountsBlock'" );
+		}
 		$PSM_M_Over_Z_CountsBlock.empty();
+		
+		if ( _load_M_Over_Z_For_PSMs_HistogramActiveAjax ) {
+			_load_M_Over_Z_For_PSMs_HistogramActiveAjax.abort();
+			_load_M_Over_Z_For_PSMs_HistogramActiveAjax = null;
+		}
 	};
 
 	/**
@@ -1621,6 +2088,8 @@ var ViewQCPageCode = function() {
 		}
 	};
 	
+	var _load_M_Over_Z_For_PSMs_HistogramActiveAjax = null;
+	
 	/**
 	 * Load the data for  M/Z for PSMs Histogram
 	 */
@@ -1628,53 +2097,102 @@ var ViewQCPageCode = function() {
 		var objectThis = this;
 
 		_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_LOADING;
+
+		var $PSM_M_Over_Z_CountsBlock = $("#PSM_M_Over_Z_CountsBlock");
+		if ( $PSM_M_Over_Z_CountsBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PSM_M_Over_Z_CountsBlock'" );
+		}
+		$PSM_M_Over_Z_CountsBlock.empty();
+
+		var selectedLinkTypes = _hash_json_Contents.linkTypes;
 		
-		var $NO_PSM_M_Over_Z_CountsBlock = $("#NO_PSM_M_Over_Z_CountsBlock");
-		if ( $NO_PSM_M_Over_Z_CountsBlock.length > 0 ) {
-			//  The element with id 'NO_PSM_M_Over_Z_CountsBlock' exists so there are no scans in the searches
+		if ( ! _anySearchesHaveScanDataYes ) {
+
+			// Show cells for selected link types
+			selectedLinkTypes.forEach( function ( currentArrayValue, index, array ) {
+				var selectedLinkType = currentArrayValue;
+
+				//  Add empty chart with Loading message
+				var $chart_outer_container_jq =
+					this._addChartOuterTemplate( { $chart_group_container_table_jq : $PSM_M_Over_Z_CountsBlock } );
+				this._placeEmptyDummyChartForMessage( { 
+					$chart_outer_container_jq : $chart_outer_container_jq, 
+//					linkType : selectedLinkType, 
+					messageWhole:  _DUMMY_CHART_STATUS_WHOLE_TEXT_SCANS_NOT_UPLOADED
+				} );
+			}, this /* passed to function as this */ );
+
 			_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
+			
+			//  Exit since no data to display
+			
 			return;  //  EARLY EXIT
 		}
 
-		var $PSM_M_Over_Z_CountsLoadingBlock = $("#PSM_M_Over_Z_CountsLoadingBlock");
-		var $PSM_M_Over_Z_CountsBlock = $("#PSM_M_Over_Z_CountsBlock");
-		$PSM_M_Over_Z_CountsLoadingBlock.show();
-		$PSM_M_Over_Z_CountsBlock.hide();
+		// Add cells for selected link types
+		selectedLinkTypes.forEach( function ( currentArrayValue, index, array ) {
+			var selectedLinkType = currentArrayValue;
+
+			//  Add empty chart with Loading message
+			var $chart_outer_container_jq =
+				this._addChartOuterTemplate( { linkType : selectedLinkType, $chart_group_container_table_jq : $PSM_M_Over_Z_CountsBlock } );
+
+			//  Add empty chart with Loading message
+			this._placeEmptyDummyChartForMessage( { 
+				$chart_outer_container_jq : $chart_outer_container_jq, 
+			//				linkType : selectedLinkType, 
+				messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_LOADING,
+				messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_LOADING
+			} );
+			
+		}, this /* passed to function as this */ );
 		
+
 		var hash_json_field_Contents_JSONString = JSON.stringify( _hash_json_Contents );
 		var ajaxRequestData = {
 				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
-		$.ajax({
-			url : contextPathJSVar + "/services/qc/dataPage/mzForPSMsHistogramCounts",
-			traditional: true,  //  Force traditional serialization of the data sent
-								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-								//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-			data : ajaxRequestData,  // The data sent as params on the URL
-			dataType : "json",
-			success : function( ajaxResponseData ) {
-				try {
-					var responseParams = {
-							ajaxResponseData : ajaxResponseData, 
-							ajaxRequestData : ajaxRequestData
-//							,
-//							topTRelement : topTRelement
-					};
-					objectThis.load_M_Over_Z_For_PSMs_HistogramResponse( responseParams );
-//					$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
-				} catch( e ) {
-					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-					throw e;
+		if ( _load_M_Over_Z_For_PSMs_HistogramActiveAjax ) {
+			_load_M_Over_Z_For_PSMs_HistogramActiveAjax.abort();
+			_load_M_Over_Z_For_PSMs_HistogramActiveAjax = null;
+		}
+		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
+		_load_M_Over_Z_For_PSMs_HistogramActiveAjax =
+			$.ajax({
+				url : contextPathJSVar + "/services/qc/dataPage/mzForPSMsHistogramCounts",
+				traditional: true,  //  Force traditional serialization of the data sent
+				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+				data : ajaxRequestData,  // The data sent as params on the URL
+				dataType : "json",
+				success : function( ajaxResponseData ) {
+					try {
+						_load_M_Over_Z_For_PSMs_HistogramActiveAjax = null;
+						var responseParams = {
+								ajaxResponseData : ajaxResponseData, 
+								ajaxRequestData : ajaxRequestData
+//								,
+//								topTRelement : topTRelement
+						};
+						objectThis.load_M_Over_Z_For_PSMs_HistogramResponse( responseParams );
+//						$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				},
+				failure: function(errMsg) {
+					_load_M_Over_Z_For_PSMs_HistogramActiveAjax = null;
+					handleAJAXFailure( errMsg );
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					_load_M_Over_Z_For_PSMs_HistogramActiveAjax = null;
+					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
+						handleAJAXError(jqXHR, textStatus, errorThrown);
+					}
 				}
-			},
-	        failure: function(errMsg) {
-	        	handleAJAXFailure( errMsg );
-	        },
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
-			}
-		});
+			});
 	};
 
 	/**
@@ -1686,17 +2204,7 @@ var ViewQCPageCode = function() {
 		
 		var preMZ_Histogram_For_PSMPeptideCutoffsResults = ajaxResponseData.preMZ_Histogram_For_PSMPeptideCutoffsResults;
 		var dataForChartPerLinkTypeList = preMZ_Histogram_For_PSMPeptideCutoffsResults.dataForChartPerLinkTypeList;
-		
-		var $PSM_M_Over_Z_CountsEntryTemplate = $("#PSM_M_Over_Z_CountsEntryTemplate");
-		if ( $PSM_M_Over_Z_CountsEntryTemplate.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PSM_M_Over_Z_CountsEntryTemplate'" );
-		}
-		var PSM_M_Over_Z_CountsEntryTemplate = $PSM_M_Over_Z_CountsEntryTemplate.html();
 
-		var $PSM_M_Over_Z_CountsLoadingBlock = $("#PSM_M_Over_Z_CountsLoadingBlock");
-		if ( $PSM_M_Over_Z_CountsLoadingBlock.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PSM_M_Over_Z_CountsLoadingBlock'" );
-		}
 		var $PSM_M_Over_Z_CountsBlock = $("#PSM_M_Over_Z_CountsBlock");
 		if ( $PSM_M_Over_Z_CountsBlock.length === 0 ) {
 			throw Error( "unable to find HTML element with id 'PSM_M_Over_Z_CountsBlock'" );
@@ -1704,36 +2212,38 @@ var ViewQCPageCode = function() {
 
 		$PSM_M_Over_Z_CountsBlock.empty();
 
-		$PSM_M_Over_Z_CountsLoadingBlock.hide();
-		$PSM_M_Over_Z_CountsBlock.show();
-		
-		for ( var indexForLinkType = 0; indexForLinkType < dataForChartPerLinkTypeList.length; indexForLinkType++ ) {
-			var entryForLinkType = dataForChartPerLinkTypeList[ indexForLinkType ];
+		dataForChartPerLinkTypeList.forEach( function ( currentArrayValue, indexForLinkType, array ) {
+			var entryForLinkType = currentArrayValue;
 			var linkType = entryForLinkType.linkType;
 			var chartBuckets = entryForLinkType.chartBuckets;
 			
-			if ( chartBuckets === null ) {
+			if ( chartBuckets === undefined ||chartBuckets === null || chartBuckets.length === 0 ) {
 				//  No data for this link type
-				continue;  //  EARLY CONTINUE
-			}
-			
-			if ( chartBuckets.length === 0 ) {
 
-			} else {
-				var $chartOuterContainer =
-					$( PSM_M_Over_Z_CountsEntryTemplate ).appendTo( $PSM_M_Over_Z_CountsBlock );
+				//  Add empty chart with No Data message
+				var $chart_outer_container_jq =
+					this._addChartOuterTemplate( { $chart_group_container_table_jq : $PSM_M_Over_Z_CountsBlock } );
+				this._placeEmptyDummyChartForMessage( { 
+					$chart_outer_container_jq : $chart_outer_container_jq, 
+					linkType : linkType, 
+					messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_NO_DATA,
+					messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_NO_DATA
+				} );
 				
-				var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
-
-				var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
-				
-				this._add_M_Over_Z_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chartContainer } );
-				
-				chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
-				// Add tooltips for download links
-				addToolTips( $chartOuterContainer );
+				return;  //  EARLY exit for this array element
 			}
-		}
+			var $chart_outer_container_jq =
+				this._addChartOuterTemplate( { $chart_group_container_table_jq : $PSM_M_Over_Z_CountsBlock } );
+			var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
+
+			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
+
+			this._add_M_Over_Z_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chart_container_jq } );
+
+			chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq } );
+			// Add tooltips for download links
+			addToolTips( $chart_outer_container_jq );
+		}, this /* passed to function as this */ );
 		
 		_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
 	};
@@ -1911,17 +2421,21 @@ var ViewQCPageCode = function() {
 		
 		_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_NO;
 
-		var $NO_PSM_PPM_Error_CountsBlock = $("#NO_PSM_PPM_Error_CountsBlock");
-		if ( $NO_PSM_PPM_Error_CountsBlock.length > 0 ) {
-			//  The element with id 'NO_PSM_PPM_Error_CountsBlock' exists so there are no scans in the searches
-			_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
-			return;  //  EARLY EXIT
-		}
-		
-		var $PSM_PPM_Error_CountsLoadingBlock = $("#PSM_PPM_Error_CountsLoadingBlock");
 		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
-		$PSM_PPM_Error_CountsLoadingBlock.show();
-		$PSM_PPM_Error_CountsBlock.hide();
+		$PSM_PPM_Error_CountsBlock.empty();
+		
+		//  Abort any active AJAX calls
+		if ( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax ) {
+			var objKeys = Object.keys( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax ); 
+			objKeys.forEach( function( element, index, array ) {
+				var selectedLinkType = element;
+				if ( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] ) {
+					_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ].abort();
+					_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] = null;
+				}
+			}, this /* passed to function as this */ );
+		}
+		_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax = null;
 	};
 
 	/**
@@ -1940,61 +2454,71 @@ var ViewQCPageCode = function() {
 		var objectThis = this;
 
 		_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_LOADING;
-		
-		var $NO_PSM_PPM_Error_CountsBlock = $("#NO_PSM_PPM_Error_CountsBlock");
-		if ( $NO_PSM_PPM_Error_CountsBlock.length > 0 ) {
-			//  The element with id 'NO_PSM_PPM_Error_CountsBlock' exists so there are no scans in the searches
-			_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
-			return;  //  EARLY EXIT
-		}
+
+		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
+		$PSM_PPM_Error_CountsBlock.empty();
 
 		var selectedLinkTypes = _hash_json_Contents.linkTypes;
 		
-		//  For selected types, display those cells and display "Loading"
+		if ( ! _anySearchesHaveScanDataYes ) {
 
-		var $PSM_PPM_Error_CountsLoadingBlock = $("#PSM_PPM_Error_CountsLoadingBlock");
-		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
-		$PSM_PPM_Error_CountsLoadingBlock.hide();  //  Hide generic loading section
-		$PSM_PPM_Error_CountsBlock.show();
-		
-		//  Get all cells for per link type charts and reset them
-		var $PSM_PPM_Error_CountsBlock__per_link_type_row_jq_All = $PSM_PPM_Error_CountsBlock.find(".per_link_type_row_jq");
-		$PSM_PPM_Error_CountsBlock__per_link_type_row_jq_All.hide();
-		var $PSM_PPM_Error_CountsBlock__chart_loading_block_jq = $PSM_PPM_Error_CountsBlock.find(".loading_block_jq");
-		$PSM_PPM_Error_CountsBlock__chart_loading_block_jq.show();
-		var $PSM_PPM_Error_CountsBlock__chart_outer_container_for_download_jq = $PSM_PPM_Error_CountsBlock.find(".chart_outer_container_for_download_jq")
-		$PSM_PPM_Error_CountsBlock__chart_outer_container_for_download_jq.hide();
-		var $PSM_PPM_Error_CountsBlock__chart_container_for_download_jq = $PSM_PPM_Error_CountsBlock.find(".chart_container_for_download_jq");
-		$PSM_PPM_Error_CountsBlock__chart_container_for_download_jq.empty();
-		
-		// Show cells for selected link types
-		for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
-			var selectedLinkType = selectedLinkTypes[ index ];
-			var cellClassSelector = selectedLinkType + "_row_jq";
-			var $cellForSelectedLinkType = $PSM_PPM_Error_CountsBlock.find("." + cellClassSelector );
-			$cellForSelectedLinkType.show();
-		}
-		
+			// Show cells for selected link types
+			for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
+				var selectedLinkType = selectedLinkTypes[ index ];
+				//  Add empty chart with Loading message
+
+				var $chart_outer_container_jq =
+					this._addChartOuterTemplate( { $chart_group_container_table_jq : $PSM_PPM_Error_CountsBlock } );
+				this._placeEmptyDummyChartForMessage( { 
+					$chart_outer_container_jq : $chart_outer_container_jq, 
+//					linkType : selectedLinkType, 
+					messageWhole:  _DUMMY_CHART_STATUS_WHOLE_TEXT_SCANS_NOT_UPLOADED
+				} );
+			}
+
+			_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
+			
+			//  Exit since no data to display
+			
+			return;  //  EARLY EXIT
+		}		
+
 		//  Make a copy of _hash_json_Contents    (  true for deep, target object, source object, <source object 2>, ... )
 		var hash_json_Contents_COPY = $.extend( true /*deep*/,  {}, _hash_json_Contents );
 		
-		for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
+		// Add cells for selected link types
+		selectedLinkTypes.forEach( function ( currentArrayValue, index, array ) {
+			var selectedLinkType = currentArrayValue;
+
+			//  Add empty chart with Loading message
+			var $chart_outer_container_jq =
+				this._addChartOuterTemplate( { linkType : selectedLinkType, $chart_group_container_table_jq : $PSM_PPM_Error_CountsBlock } );
+
+			//  Add empty chart with Loading message
+			this._placeEmptyDummyChartForMessage( { 
+				$chart_outer_container_jq : $chart_outer_container_jq, 
+			//				linkType : selectedLinkType, 
+				messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_LOADING,
+				messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_LOADING
+			} );
 			
 			//  For each selected link type, 
 			//    set it as selected link type in hash_json_Contents_COPY,
 			//      and create a chart for that
 			
-			var selectedLinkType = selectedLinkTypes[ index ];
-			
 			hash_json_Contents_COPY.linkTypes = [ selectedLinkType ];
 			
 			this.load_PPM_Error_For_PSMs_HistogramForLinkType( {  
 					selectedLinkType : selectedLinkType,
-					hash_json_Contents_COPY : hash_json_Contents_COPY
+					hash_json_Contents_COPY : hash_json_Contents_COPY,
+					$chart_outer_container_jq : $chart_outer_container_jq
 			});
-		}
+
+		}, this /* passed to function as this */ );
 		
 	};
+	
+	var _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax = null;
 
 	/**
 	 * Load the data for  PPM Error for PSMs Histogram Specific Link Type
@@ -2004,42 +2528,65 @@ var ViewQCPageCode = function() {
 
 		var selectedLinkType = params.selectedLinkType;
 		var hash_json_Contents_COPY = params.hash_json_Contents_COPY;
-		var project_search_ids = params.project_search_ids; 
+		var $chart_outer_container_jq = params.$chart_outer_container_jq; 
 			
 		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents_COPY );
 		var ajaxRequestData = {
 				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
-		$.ajax({
-//			cache : false,
-			url : contextPathJSVar + "/services/qc/dataPage/ppmError",
-			traditional: true,  //  Force traditional serialization of the data sent
-								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-								//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-			data : ajaxRequestData,  // The data sent as params on the URL
-			dataType : "json",
-			success : function( ajaxResponseData ) {
-				try {
-					var responseParams = {
-							ajaxResponseData : ajaxResponseData, 
-							ajaxRequestData : ajaxRequestData,
-							selectedLinkType : selectedLinkType
-					};
-					objectThis.load_PPM_Error_For_PSMs_HistogramResponse( responseParams );
-//					$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
-				} catch( e ) {
-					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-					throw e;
+		if ( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax && 
+				_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] ) {
+			_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ].abort();
+			_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] = null;
+		}
+		if ( ! _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax ) {
+			_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax = {};
+		}
+		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
+		_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] = 
+			$.ajax({
+//				cache : false,
+				url : contextPathJSVar + "/services/qc/dataPage/ppmError",
+				traditional: true,  //  Force traditional serialization of the data sent
+				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+				data : ajaxRequestData,  // The data sent as params on the URL
+				dataType : "json",
+				success : function( ajaxResponseData ) {
+					try {
+						if ( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax ) {
+							_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] = null;
+						}
+						var responseParams = {
+								ajaxResponseData : ajaxResponseData, 
+								ajaxRequestData : ajaxRequestData,
+								selectedLinkType : selectedLinkType,
+								$chart_outer_container_jq : $chart_outer_container_jq
+						};
+						objectThis.load_PPM_Error_For_PSMs_HistogramResponse( responseParams );
+//						$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				},
+				failure: function(errMsg) {
+					if ( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax ) {
+						_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] = null;
+					}
+					handleAJAXFailure( errMsg );
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					if ( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax ) {
+						_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] = null;
+					}
+					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
+						handleAJAXError(jqXHR, textStatus, errorThrown);
+					}
 				}
-			},
-	        failure: function(errMsg) {
-	        	handleAJAXFailure( errMsg );
-	        },
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
-			}
-		});
+			});
+		// indent due to assignment
 	};
 
 	/**
@@ -2051,6 +2598,7 @@ var ViewQCPageCode = function() {
 		var ajaxResponseData = params.ajaxResponseData;
 		var ajaxRequestData = params.ajaxRequestData;
 		var selectedLinkType = params.selectedLinkType;
+		var $chart_outer_container_jq = params.$chart_outer_container_jq;
 		
 		var ppmErrorHistogramResult = ajaxResponseData.ppmErrorHistogramResult;
 		var dataForChartPerLinkTypeList = ppmErrorHistogramResult.dataForChartPerLinkTypeList;
@@ -2059,45 +2607,35 @@ var ViewQCPageCode = function() {
 			throw Error( "dataForChartPerLinkTypeList.length !== 1, is = " + dataForChartPerLinkTypeList.length );
 		}
 		
-		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
-		if ( $PSM_PPM_Error_CountsBlock.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_CountsBlock'" );
-		}
-
 		var entryForLinkType = dataForChartPerLinkTypeList[ 0 ];
 		
 		var linkType = entryForLinkType.linkType;
 		var chartBuckets = entryForLinkType.chartBuckets;
+		
+		$chart_outer_container_jq.empty();
 
-		if ( chartBuckets === null ) {
+		if ( chartBuckets === null || chartBuckets.length === 0 ) {
 			//  No data for this link type
-			return;  //  EARLY RETURN
-		}
 
-		if ( chartBuckets.length === 0 ) {
-
+			//  Add empty chart with No Data message
+			this._placeEmptyDummyChartForMessage( { 
+				$chart_outer_container_jq : $chart_outer_container_jq, 
+			//				linkType : selectedLinkType, 
+				messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_NO_DATA,
+				messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_NO_DATA
+			} );
+			
 		} else {
 
-			//  Get cell for selectedLinkType
-			var cellClassSelector = selectedLinkType + "_row_jq";
-			var $cellForSelectedLinkType = $PSM_PPM_Error_CountsBlock.find("." + cellClassSelector );
-			
-			var $loading_block_jq = $cellForSelectedLinkType.find(".loading_block_jq");
-			$loading_block_jq.hide();
-			
-			var $chartOuterContainer =
-				$cellForSelectedLinkType.find(".chart_outer_container_for_download_jq");
-			$chartOuterContainer.show();
-			
-			var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
+			var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 
 			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
 			
-			this._add_PPM_Error_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chartContainer } );
+			this._add_PPM_Error_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chart_container_jq } );
 
-			chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
+			chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq } );
 			// Add tooltips for download links
-			addToolTips( $chartOuterContainer );
+			addToolTips( $chart_outer_container_jq );
 
 		}
 	
@@ -2281,17 +2819,19 @@ var ViewQCPageCode = function() {
 		
 		_PPM_Error_Vs_RetentionTime_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_NO;
 
-		var $NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock = $("#NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock");
-		if ( $NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock.length > 0 ) {
-			//  The element with id 'NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock' exists so there are no scans in the searches
-			_PPM_Error_Vs_RetentionTime_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_YES;
-			return;  //  EARLY EXIT
+		//  Abort any active AJAX calls
+		if ( _load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
+			var objKeys = Object.keys( _load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax ); 
+			objKeys.forEach(function( element, index, array ) {
+				var selectedLinkType = element;
+				if ( _load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] ) {
+					_load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ].abort();
+					_load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+				}
+			}, this /* passed to function as this */ );
 		}
-		
-		var $PSM_PPM_Error_Vs_RetentionTime_CountsLoadingBlock = $("#PSM_PPM_Error_Vs_RetentionTime_CountsLoadingBlock");
-		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock = $("#PSM_PPM_Error_Vs_RetentionTime_CountsBlock");
-		$PSM_PPM_Error_Vs_RetentionTime_CountsLoadingBlock.show();
-		$PSM_PPM_Error_Vs_RetentionTime_CountsBlock.hide();
+		_load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax = null;
+
 		
 	};
 
@@ -2312,60 +2852,71 @@ var ViewQCPageCode = function() {
 
 		_PPM_Error_Vs_RetentionTime_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_LOADING;
 		
-		var $NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock = $("#NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock");
-		if ( $NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock.length > 0 ) {
-			//  The element with id 'NO_PSM_PPM_Error_Vs_RetentionTime_CountsBlock' exists so there are no scans in the searches
-			_PPM_Error_Vs_RetentionTime_Vs_RetentionTime_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_YES;
-			return;  //  EARLY EXIT
-		}
+		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock = $("#PSM_PPM_Error_Vs_RetentionTime_CountsBlock");
+		$PSM_PPM_Error_Vs_RetentionTime_CountsBlock.empty();
+		
 
 		var selectedLinkTypes = _hash_json_Contents.linkTypes;
 		
-		//  For selected types, display those cells and display "Loading"
+		if ( ! _anySearchesHaveScanDataYes ) {
 
-		var $PSM_PPM_Error_Vs_RetentionTime_CountsLoadingBlock = $("#PSM_PPM_Error_Vs_RetentionTime_CountsLoadingBlock");
-		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock = $("#PSM_PPM_Error_Vs_RetentionTime_CountsBlock");
-		$PSM_PPM_Error_Vs_RetentionTime_CountsLoadingBlock.hide();  //  Hide generic loading section
-		$PSM_PPM_Error_Vs_RetentionTime_CountsBlock.show();
-		
-		//  Get all cells for per link type charts and reset them
-		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock__per_link_type_row_jq_All = $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.find(".per_link_type_row_jq");
-		$PSM_PPM_Error_Vs_RetentionTime_CountsBlock__per_link_type_row_jq_All.hide();
-		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock__chart_loading_block_jq = $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.find(".loading_block_jq");
-		$PSM_PPM_Error_Vs_RetentionTime_CountsBlock__chart_loading_block_jq.show();
-		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock__chart_outer_container_for_download_jq = $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.find(".chart_outer_container_for_download_jq")
-		$PSM_PPM_Error_Vs_RetentionTime_CountsBlock__chart_outer_container_for_download_jq.hide();
-		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock__chart_container_for_download_jq = $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.find(".chart_container_for_download_jq");
-		$PSM_PPM_Error_Vs_RetentionTime_CountsBlock__chart_container_for_download_jq.empty();
-		
-		// Show cells for selected link types
-		for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
-			var selectedLinkType = selectedLinkTypes[ index ];
-			var cellClassSelector = selectedLinkType + "_row_jq";
-			var $cellForSelectedLinkType = $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.find("." + cellClassSelector );
-			$cellForSelectedLinkType.show();
-		}
-		
+			// Show cells for selected link types
+			for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
+				var selectedLinkType = selectedLinkTypes[ index ];
+				//  Add empty chart with Loading message
+
+				var $chart_outer_container_jq =
+					this._addChartOuterTemplate( { $chart_group_container_table_jq : $PSM_PPM_Error_Vs_RetentionTime_CountsBlock } );
+				this._placeEmptyDummyChartForMessage( { 
+					$chart_outer_container_jq : $chart_outer_container_jq, 
+//					linkType : selectedLinkType, 
+					messageWhole:  _DUMMY_CHART_STATUS_WHOLE_TEXT_SCANS_NOT_UPLOADED
+				} );
+			}
+
+			_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
+			
+			//  Exit since no data to display
+			
+			return;  //  EARLY EXIT
+		}		
+
 		//  Make a copy of _hash_json_Contents    (  true for deep, target object, source object, <source object 2>, ... )
 		var hash_json_Contents_COPY = $.extend( true /*deep*/,  {}, _hash_json_Contents );
 		
-		for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
+		// Add cells for selected link types
+		selectedLinkTypes.forEach( function ( currentArrayValue, index, array ) {
+			var selectedLinkType = currentArrayValue;
+
+			//  Add empty chart with Loading message
+			var $chart_outer_container_jq =
+				this._addChartOuterTemplate( { linkType : selectedLinkType, $chart_group_container_table_jq : $PSM_PPM_Error_Vs_RetentionTime_CountsBlock } );
+
+			//  Add empty chart with Loading message
+			this._placeEmptyDummyChartForMessage( { 
+				$chart_outer_container_jq : $chart_outer_container_jq, 
+			//				linkType : selectedLinkType, 
+				messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_LOADING,
+				messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_LOADING
+			} );
 			
 			//  For each selected link type, 
 			//    set it as selected link type in hash_json_Contents_COPY,
 			//      and create a chart for that
 			
-			var selectedLinkType = selectedLinkTypes[ index ];
-			
 			hash_json_Contents_COPY.linkTypes = [ selectedLinkType ];
 			
 			this.load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkType( {  
 					selectedLinkType : selectedLinkType,
-					hash_json_Contents_COPY : hash_json_Contents_COPY
+					hash_json_Contents_COPY : hash_json_Contents_COPY,
+					$chart_outer_container_jq : $chart_outer_container_jq
 			});
-		}
+
+		}, this /* passed to function as this */ );
 		
 	};
+	
+	var _load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax = null;
 
 	/**
 	 * Load the data for  PPM Error Vs Retention Time for PSMs Scatter Plot Specific Link Type
@@ -2375,43 +2926,64 @@ var ViewQCPageCode = function() {
 
 		var selectedLinkType = params.selectedLinkType;
 		var hash_json_Contents_COPY = params.hash_json_Contents_COPY;
-		var project_search_ids = params.project_search_ids; 
+		var $chart_outer_container_jq = params.$chart_outer_container_jq; 
 			
 		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents_COPY );
 		var ajaxRequestData = {
 				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
-		$.ajax({
-//			cache : false,
-			url : contextPathJSVar + "/services/qc/dataPage/ppmErrorVsRetentionTime", // ppmErrorVsRetentionTime
-			traditional: true,  //  Force traditional serialization of the data sent
-								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-								//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-			data : ajaxRequestData,  // The data sent as params on the URL
-			dataType : "json",
-			success : function( ajaxResponseData ) {
-				try {
-					var responseParams = {
-							ajaxResponseData : ajaxResponseData, 
-							ajaxRequestData : ajaxRequestData,
-							selectedLinkType : selectedLinkType
-//							,
-//							topTRelement : topTRelement
-					};
-					objectThis.load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotResponse( responseParams );
-				} catch( e ) {
-					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-					throw e;
+
+		if ( _load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax && 
+				_load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] ) {
+			_load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ].abort();
+			_load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+		}
+		if ( ! _load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
+			_load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax = {};
+		}
+		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
+		_load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = 
+			$.ajax({
+//				cache : false,
+				url : contextPathJSVar + "/services/qc/dataPage/ppmErrorVsRetentionTime", // ppmErrorVsRetentionTime
+				traditional: true,  //  Force traditional serialization of the data sent
+				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+				data : ajaxRequestData,  // The data sent as params on the URL
+				dataType : "json",
+				success : function( ajaxResponseData ) {
+					try {
+						if ( _load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
+							_load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+						}
+						var responseParams = {
+								ajaxResponseData : ajaxResponseData, 
+								ajaxRequestData : ajaxRequestData,
+								selectedLinkType : selectedLinkType,
+								$chart_outer_container_jq : $chart_outer_container_jq
+						};
+						objectThis.load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotResponse( responseParams );
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				},
+				failure: function(errMsg) {
+					if ( _load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
+						_load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+					}
+					handleAJAXFailure( errMsg );
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					if ( _load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
+						_load_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+					}
+					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
+						handleAJAXError(jqXHR, textStatus, errorThrown);
+					}
 				}
-			},
-	        failure: function(errMsg) {
-	        	handleAJAXFailure( errMsg );
-	        },
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
-			}
-		});
+			});
 	};
 
 	/**
@@ -2423,6 +2995,7 @@ var ViewQCPageCode = function() {
 		var ajaxResponseData = params.ajaxResponseData;
 		var ajaxRequestData = params.ajaxRequestData;
 		var selectedLinkType = params.selectedLinkType;
+		var $chart_outer_container_jq = params.$chart_outer_container_jq;
 		
 		var ppmErrorVsRTScatterPlotResult = ajaxResponseData.ppmErrorVsRTScatterPlotResult;
 		var dataForChartPerLinkTypeList = ppmErrorVsRTScatterPlotResult.dataForChartPerLinkTypeList;
@@ -2431,41 +3004,36 @@ var ViewQCPageCode = function() {
 			throw Error( "dataForChartPerLinkTypeList.length !== 1, is = " + dataForChartPerLinkTypeList.length );
 		}
 		
-		var $PSM_PPM_Error_Vs_RetentionTime_CountsBlock = $("#PSM_PPM_Error_Vs_RetentionTime_CountsBlock");
-		if ( $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_Vs_RetentionTime_CountsBlock'" );
-		}
-
 		var entryForLinkType = dataForChartPerLinkTypeList[ 0 ];
 		
 		var linkType = entryForLinkType.linkType;
 		var retentionTimeBuckets = entryForLinkType.retentionTimeBuckets;
 
-		if ( retentionTimeBuckets === null || retentionTimeBuckets.length === 0  ) {
+		$chart_outer_container_jq.empty();
+
+		if ( retentionTimeBuckets === null || retentionTimeBuckets.length === 0 ) {
 			//  No data for this link type
+
+			//  Add empty chart with No Data message
+			this._placeEmptyDummyChartForMessage( { 
+				$chart_outer_container_jq : $chart_outer_container_jq, 
+			//				linkType : selectedLinkType, 
+				messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_NO_DATA,
+				messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_NO_DATA
+			} );
+			
 			return;  //  EARLY RETURN
 		}
 
-		//  Get cell for selectedLinkType
-		var cellClassSelector = selectedLinkType + "_row_jq";
-		var $cellForSelectedLinkType = $PSM_PPM_Error_Vs_RetentionTime_CountsBlock.find("." + cellClassSelector );
-
-		var $loading_block_jq = $cellForSelectedLinkType.find(".loading_block_jq");
-		$loading_block_jq.hide();
-
-		var $chartOuterContainer =
-			$cellForSelectedLinkType.find(".chart_outer_container_for_download_jq");
-		$chartOuterContainer.show();
-
-		var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
+		var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 
 		var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
 
-		this._add_PPM_Error_Vs_RetentionTime_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chartContainer } );
+		this._add_PPM_Error_Vs_RetentionTime_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chart_container_jq } );
 
-		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
+		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq } );
 		// Add tooltips for download links
-		addToolTips( $chartOuterContainer );
+		addToolTips( $chart_outer_container_jq );
 	
 		//  TODO  FIX THIS
 		
@@ -2547,6 +3115,8 @@ var ViewQCPageCode = function() {
 		}
 		
 		chartData.push( chartDataHeaderEntry );
+		
+		var dataPointCount = 0;
 
 		var maxCount = 0;
 		
@@ -2570,6 +3140,8 @@ var ViewQCPageCode = function() {
 				var ppmErrorStart = bucket.ppmErrorStart;
 				var ppmErrorEnd = bucket.ppmErrorEnd;
 				var count = bucket.count;
+				
+				dataPointCount++;
 				
 				var retentionTimeCenter = retentionTimeStart + ( ( retentionTimeEnd - retentionTimeStart ) / 2 );
 				var ppmErrorCenter = ppmErrorStart + ( ( ppmErrorEnd - ppmErrorStart ) / 2 );
@@ -2683,7 +3255,8 @@ var ViewQCPageCode = function() {
 		}
 
 		var vAxisTicks = 
-			this._get_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlot_Chart_Vertical_TickMarks( { maxValue : maxPPMError, minValue : minPPMError } );
+			this._get_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlot_Chart_Vertical_TickMarks( { 
+				maxValue : maxPPMError, minValue : minPPMError, dataPointCount : dataPointCount } );
 
 		var hAxisTicks = 
 			this._get_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlot_Chart_Horizontal_TickMarks( { maxValue : maxRetenionTimeError, minValue : minRetenionTimeError } );
@@ -2759,35 +3332,111 @@ var ViewQCPageCode = function() {
 	this._get_PPM_Error_Vs_RetentionTime_For_PSMs_ScatterPlot_Chart_Vertical_TickMarks = function( params ) {
 		var maxValue = params.maxValue;
 		var minValue = params.minValue;
+		var dataPointCount = params.dataPointCount; // number of data points in plot
+		
 		//  Compute max and min tick marks, to next higher and lower multiple of 1
 		var maxValueCeil = Math.ceil( maxValue );
 		var minValueFloor = Math.floor( minValue );
-		
 		var maxCeilMinusMinFloor = maxValueCeil - minValueFloor;
 		
 		var tickMarkIncrementFromZero = maxCeilMinusMinFloor / 5;
 		
 		var tickMarks = [];
 		
-		if ( minValueFloor < 0 && maxValueCeil > 0 ) {
-			tickMarks.push( 0 );
+		if ( minValue < 0 && maxValue > 0 ) {
+			
+			if ( ( maxValue - minValue ) >= 10 ) {
+				var tickMarkValueForTickMarkCounter = function( tickCounter ) {
+					var tickMark = tickCounter * tickMarkIncrementFromZero;
+					return tickMark; 
+				};
+
+				//  Add tick marks for < 0 
+				for ( var tickCounter = 1; ( - ( tickMarkValueForTickMarkCounter( tickCounter ) ) ) > minValueFloor; tickCounter++ ) {
+					var tickMark = ( - ( tickMarkValueForTickMarkCounter( tickCounter ) ) );
+					tickMarks.push( tickMark );
+				}
+				tickMarks.push( 0 );
+				//  Add tick marks for > 0 
+				for ( var tickCounter = 1; ( ( tickMarkValueForTickMarkCounter( tickCounter ) ) ) < maxValueCeil; tickCounter++ ) {
+					var tickMark = ( ( tickMarkValueForTickMarkCounter( tickCounter ) ) );
+					tickMarks.push( tickMark );
+				}
+			} else {
+				var minValueFloorPt5 = ( Math.floor( ( minValue * 2 ) ) / 2 );
+				var maxValueCeilPt5 = ( Math.ceil( ( maxValue * 2 ) ) / 2 );
+				var maxValueCeilPt5MinusminValueFloorPt5 = maxValueCeilPt5 - minValueFloorPt5;
+				var tickMarkIncrementForPt5 = maxValueCeilPt5MinusminValueFloorPt5 / 5;
+
+				var tickMarkValueForTickMarkCounterLessThanTenGE1 = function( tickCounter ) {
+					var tickMark = ( tickCounter * tickMarkIncrementForPt5 );
+					return tickMark;
+				};
+
+				//  Add tick marks for < 0 
+				for ( var tickCounter = 1; ( - ( tickMarkValueForTickMarkCounterLessThanTenGE1( tickCounter ) ) ) > minValue; tickCounter++ ) {
+					var tickMark = ( - ( tickMarkValueForTickMarkCounterLessThanTenGE1( tickCounter ) ) );
+					tickMarks.push( tickMark );
+				}
+				tickMarks.push( 0 );
+				//  Add tick marks for > 0 
+				for ( var tickCounter = 1; ( ( tickMarkValueForTickMarkCounterLessThanTenGE1( tickCounter ) ) ) < maxValue; tickCounter++ ) {
+					var tickMark = ( ( tickMarkValueForTickMarkCounterLessThanTenGE1( tickCounter ) ) );
+					tickMarks.push( tickMark );
+				}
+			}
+		} else {
+
+			if ( dataPointCount === 1 ) {
+				tickMarks.push( minValue );
+				tickMarks.push( ( minValue + ( maxValue - minValue ) / 2 ) );
+				tickMarks.push( maxValue );
+
+			} else if ( ( maxValue - minValue ) >= 10 ) {
+				var tickMarkValueForTickMarkCounterNoZero = function( tickCounter ) {
+					return minValueFloor + ( tickCounter * tickMarkIncrementFromZero );
+				};
+				for ( var tickCounter = 1; ( ( tickMarkValueForTickMarkCounterNoZero( tickCounter ) ) ) < maxValue; tickCounter++ ) {
+					var tickMark = ( ( tickMarkValueForTickMarkCounterNoZero( tickCounter ) ) );
+					tickMarks.push( tickMark );
+				}
+			} else if ( ( maxValue - minValue ) >= 1 ) {
+				var minValueFloorPt5 = ( Math.floor( ( minValue * 2 ) ) / 2 );
+				var maxValueCeilPt5 = ( Math.ceil( ( maxValue * 2 ) ) / 2 );
+				var maxValueCeilPt5MinusminValueFloorPt5 = maxValueCeilPt5 - minValueFloorPt5;
+				var tickMarkIncrementForPt5 = maxValueCeilPt5MinusminValueFloorPt5 / 5;
+
+				var tickMarkValueForTickMarkCounterLessThanTenGE1 = function( tickCounter ) {
+					return minValueFloorPt5 + ( tickCounter * tickMarkIncrementForPt5 );
+				};
+				for ( var tickCounter = 1; ( ( tickMarkValueForTickMarkCounterLessThanTenGE1( tickCounter ) ) ) < maxValue; tickCounter++ ) {
+					var tickMark = ( ( tickMarkValueForTickMarkCounterLessThanTenGE1( tickCounter ) ) );
+					tickMarks.push( tickMark );
+				}
+			} else {
+				if ( ( maxValue - minValue ) > .2 ) {
+					var minValueFloorPt1 = ( Math.floor( ( minValue * 10 ) ) / 10 );
+					var maxValueCeilPt1 = ( Math.ceil( ( maxValue * 10 ) ) / 10 );
+					var maxValueCeilPt1MinusminValueFloorPt1 = maxValueCeilPt1 - minValueFloorPt1;
+					var tickMarkIncrementForPt1 = maxValueCeilPt1MinusminValueFloorPt1 / 5;
+
+					var tickMarkValueForTickMarkCounterLessThanOneGtPt2 = function( tickCounter ) {
+						var tickMarkVal = minValueFloorPt1 + ( tickCounter * tickMarkIncrementForPt1 );
+						return tickMarkVal;
+					};
+					for ( var tickCounter = 1; ( ( tickMarkValueForTickMarkCounterLessThanOneGtPt2( tickCounter ) ) ) < maxValue; tickCounter++ ) {
+						var tickMark = ( ( tickMarkValueForTickMarkCounterLessThanOneGtPt2( tickCounter ) ) );
+						tickMarks.push( tickMark );
+					}
+				} else {
+					tickMarks.push( minValue );
+					tickMarks.push( ( minValue + ( maxValue - minValue ) / 2 ) );
+					tickMarks.push( maxValue );
+				}
+			}
 		}
 		
-		if ( minValueFloor < 0 ) {
-			//  Add tick marks for < 0 
-			for ( var tickCounter = 1; ( - ( tickCounter * tickMarkIncrementFromZero ) ) > minValueFloor; tickCounter++ ) {
-				var tickMark = ( - ( tickCounter * tickMarkIncrementFromZero ) );
-				tickMarks.push( tickMark );
-			}
-		}
-
-		if ( maxValueCeil > 0 ) {
-			//  Add tick marks for > 0 
-			for ( var tickCounter = 1; ( ( tickCounter * tickMarkIncrementFromZero ) ) < maxValueCeil; tickCounter++ ) {
-				var tickMark = ( ( tickCounter * tickMarkIncrementFromZero ) );
-				tickMarks.push( tickMark );
-			}
-		}
+		
 		return tickMarks;
 	};
 	
@@ -2829,17 +3478,24 @@ var ViewQCPageCode = function() {
 		
 		_PPM_Error_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_NO;
 
-		var $NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock = $("#NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock");
-		if ( $NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock.length > 0 ) {
-			//  The element with id 'NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock' exists so there are no scans in the searches
-			_PPM_Error_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_YES;
-			return;  //  EARLY EXIT
-		}
-		
-		var $PSM_PPM_Error_Vs_M_over_Z_CountsLoadingBlock = $("#PSM_PPM_Error_Vs_M_over_Z_CountsLoadingBlock");
 		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock = $("#PSM_PPM_Error_Vs_M_over_Z_CountsBlock");
-		$PSM_PPM_Error_Vs_M_over_Z_CountsLoadingBlock.show();
-		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock.hide();
+		if ( $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_Vs_M_over_Z_CountsBlock'" );
+		}
+		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock.empty();
+		
+		//  Abort any active AJAX calls
+		if ( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
+			var objKeys = Object.keys( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax ); 
+			objKeys.forEach(function( element, index, array ) {
+				var selectedLinkType = element;
+				if ( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] ) {
+					_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ].abort();
+					_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+				}
+			}, this )
+		}
+		_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax = null;
 	};
 
 	/**
@@ -2859,61 +3515,74 @@ var ViewQCPageCode = function() {
 		var objectThis = this;
 
 		_PPM_Error_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_LOADING;
-		
-		var $NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock = $("#NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock");
-		if ( $NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock.length > 0 ) {
-			//  The element with id 'NO_PSM_PPM_Error_Vs_M_over_Z_CountsBlock' exists so there are no scans in the searches
-			_PPM_Error_Vs_M_over_Z_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_YES;
-			return;  //  EARLY EXIT
+
+		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock = $("#PSM_PPM_Error_Vs_M_over_Z_CountsBlock");
+		if ( $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PSM_PPM_Error_Vs_M_over_Z_CountsBlock'" );
 		}
+		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock.empty();
 
 		var selectedLinkTypes = _hash_json_Contents.linkTypes;
 		
-		//  For selected types, display those cells and display "Loading"
+		if ( ! _anySearchesHaveScanDataYes ) {
 
-		var $PSM_PPM_Error_Vs_M_over_Z_CountsLoadingBlock = $("#PSM_PPM_Error_Vs_M_over_Z_CountsLoadingBlock");
-		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock = $("#PSM_PPM_Error_Vs_M_over_Z_CountsBlock");
-		$PSM_PPM_Error_Vs_M_over_Z_CountsLoadingBlock.hide();  //  Hide generic loading section
-		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock.show();
-		
-		//  Get all cells for per link type charts and reset them
-		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock__per_link_type_row_jq_All = $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.find(".per_link_type_row_jq");
-		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock__per_link_type_row_jq_All.hide();
-		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock__chart_loading_block_jq = $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.find(".loading_block_jq");
-		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock__chart_loading_block_jq.show();
-		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock__chart_outer_container_for_download_jq = $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.find(".chart_outer_container_for_download_jq")
-		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock__chart_outer_container_for_download_jq.hide();
-		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock__chart_container_for_download_jq = $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.find(".chart_container_for_download_jq");
-		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock__chart_container_for_download_jq.empty();
-		
-		// Show cells for selected link types
-		for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
-			var selectedLinkType = selectedLinkTypes[ index ];
-			var cellClassSelector = selectedLinkType + "_row_jq";
-			var $cellForSelectedLinkType = $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.find("." + cellClassSelector );
-			$cellForSelectedLinkType.show();
-		}
-		
+			// Show cells for selected link types
+			for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
+				var selectedLinkType = selectedLinkTypes[ index ];
+				//  Add empty chart with Loading message
+
+				var $chart_outer_container_jq =
+					this._addChartOuterTemplate( { $chart_group_container_table_jq : $PSM_PPM_Error_Vs_M_over_Z_CountsBlock } );
+				this._placeEmptyDummyChartForMessage( { 
+					$chart_outer_container_jq : $chart_outer_container_jq, 
+//					linkType : selectedLinkType, 
+					messageWhole:  _DUMMY_CHART_STATUS_WHOLE_TEXT_SCANS_NOT_UPLOADED
+				} );
+			}
+
+			_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
+			
+			//  Exit since no data to display
+			
+			return;  //  EARLY EXIT
+		}		
+
 		//  Make a copy of _hash_json_Contents    (  true for deep, target object, source object, <source object 2>, ... )
 		var hash_json_Contents_COPY = $.extend( true /*deep*/,  {}, _hash_json_Contents );
 		
-		for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
+		// Add cells for selected link types
+		selectedLinkTypes.forEach( function ( currentArrayValue, index, array ) {
+			var selectedLinkType = currentArrayValue;
+
+			//  Add empty chart with Loading message
+			var $chart_outer_container_jq =
+				this._addChartOuterTemplate( { linkType : selectedLinkType, $chart_group_container_table_jq : $PSM_PPM_Error_Vs_M_over_Z_CountsBlock } );
+
+			//  Add empty chart with Loading message
+			this._placeEmptyDummyChartForMessage( { 
+				$chart_outer_container_jq : $chart_outer_container_jq, 
+			//				linkType : selectedLinkType, 
+				messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_LOADING,
+				messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_LOADING
+			} );
 			
 			//  For each selected link type, 
 			//    set it as selected link type in hash_json_Contents_COPY,
 			//      and create a chart for that
 			
-			var selectedLinkType = selectedLinkTypes[ index ];
-			
 			hash_json_Contents_COPY.linkTypes = [ selectedLinkType ];
 			
 			this.load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkType( {  
 					selectedLinkType : selectedLinkType,
-					hash_json_Contents_COPY : hash_json_Contents_COPY
+					hash_json_Contents_COPY : hash_json_Contents_COPY,
+					$chart_outer_container_jq : $chart_outer_container_jq
 			});
-		}
+
+		}, this /* passed to function as this */ );
 		
 	};
+	
+	var _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax = null;
 
 	/**
 	 * Load the data for  PPM Error Vs M/Z for PSMs Scatter Plot Specific Link Type
@@ -2923,41 +3592,63 @@ var ViewQCPageCode = function() {
 
 		var selectedLinkType = params.selectedLinkType;
 		var hash_json_Contents_COPY = params.hash_json_Contents_COPY;
-		var project_search_ids = params.project_search_ids; 
+		var $chart_outer_container_jq = params.$chart_outer_container_jq; 
 			
 		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents_COPY );
 		var ajaxRequestData = {
 				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
-		$.ajax({
-//			cache : false,
-			url : contextPathJSVar + "/services/qc/dataPage/ppmErrorVsM_over_Z", // ppmErrorVsM_over_Z
-			traditional: true,  //  Force traditional serialization of the data sent
-								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-								//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-			data : ajaxRequestData,  // The data sent as params on the URL
-			dataType : "json",
-			success : function( ajaxResponseData ) {
-				try {
-					var responseParams = {
-							ajaxResponseData : ajaxResponseData, 
-							ajaxRequestData : ajaxRequestData,
-							selectedLinkType : selectedLinkType
-					};
-					objectThis.load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotResponse( responseParams );
-				} catch( e ) {
-					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-					throw e;
+		if ( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax && 
+				_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] ) {
+			_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ].abort();
+			_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+		}
+		if ( ! _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
+			_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax = {};
+		}
+		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
+		_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = 
+			$.ajax({
+//				cache : false,
+				url : contextPathJSVar + "/services/qc/dataPage/ppmErrorVsM_over_Z", // ppmErrorVsM_over_Z
+				traditional: true,  //  Force traditional serialization of the data sent
+				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+				data : ajaxRequestData,  // The data sent as params on the URL
+				dataType : "json",
+				success : function( ajaxResponseData ) {
+					try {
+						if ( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
+							_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+						}
+						var responseParams = {
+								ajaxResponseData : ajaxResponseData, 
+								ajaxRequestData : ajaxRequestData,
+								selectedLinkType : selectedLinkType,
+								$chart_outer_container_jq : $chart_outer_container_jq
+						};
+						objectThis.load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotResponse( responseParams );
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				},
+				failure: function(errMsg) {
+					if ( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
+						_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+					}
+					handleAJAXFailure( errMsg );
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					if ( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
+						_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+					}
+					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
+						handleAJAXError(jqXHR, textStatus, errorThrown);
+					}
 				}
-			},
-	        failure: function(errMsg) {
-	        	handleAJAXFailure( errMsg );
-	        },
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
-			}
-		});
+			});
 	};
 
 	/**
@@ -2969,6 +3660,7 @@ var ViewQCPageCode = function() {
 		var ajaxResponseData = params.ajaxResponseData;
 		var ajaxRequestData = params.ajaxRequestData;
 		var selectedLinkType = params.selectedLinkType;
+		var $chart_outer_container_jq = params.$chart_outer_container_jq;
 		
 		var ppmErrorVsM_over_ZScatterPlotResult = ajaxResponseData.ppmErrorVsM_over_ZScatterPlotResult;
 		var dataForChartPerLinkTypeList = ppmErrorVsM_over_ZScatterPlotResult.dataForChartPerLinkTypeList;
@@ -2987,31 +3679,32 @@ var ViewQCPageCode = function() {
 		var linkType = entryForLinkType.linkType;
 		var m_over_ZBuckets = entryForLinkType.m_over_ZBuckets;
 
-		if ( m_over_ZBuckets === null || m_over_ZBuckets.length === 0  ) {
+
+		$chart_outer_container_jq.empty();
+
+		if ( m_over_ZBuckets === null || m_over_ZBuckets.length === 0 ) {
 			//  No data for this link type
+
+			//  Add empty chart with No Data message
+			this._placeEmptyDummyChartForMessage( { 
+				$chart_outer_container_jq : $chart_outer_container_jq, 
+			//				linkType : selectedLinkType, 
+				messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_NO_DATA,
+				messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_NO_DATA
+			} );
+			
 			return;  //  EARLY RETURN
 		}
 
-		//  Get cell for selectedLinkType
-		var cellClassSelector = selectedLinkType + "_row_jq";
-		var $cellForSelectedLinkType = $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.find("." + cellClassSelector );
-
-		var $loading_block_jq = $cellForSelectedLinkType.find(".loading_block_jq");
-		$loading_block_jq.hide();
-
-		var $chartOuterContainer =
-			$cellForSelectedLinkType.find(".chart_outer_container_for_download_jq");
-		$chartOuterContainer.show();
-
-		var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
+		var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 
 		var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
 
-		this._add_PPM_Error_Vs_M_over_Z_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chartContainer } );
+		this._add_PPM_Error_Vs_M_over_Z_For_PSMs_Histogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chart_container_jq } );
 
-		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
+		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq } );
 		// Add tooltips for download links
-		addToolTips( $chartOuterContainer );
+		addToolTips( $chart_outer_container_jq );
 	
 		//  TODO  FIX THIS
 		
@@ -3312,35 +4005,110 @@ var ViewQCPageCode = function() {
 	this._get_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlot_Chart_Vertical_TickMarks = function( params ) {
 		var maxValue = params.maxValue;
 		var minValue = params.minValue;
+		var dataPointCount = params.dataPointCount; // number of data points in plot
+		
 		//  Compute max and min tick marks, to next higher and lower multiple of 1
 		var maxValueCeil = Math.ceil( maxValue );
 		var minValueFloor = Math.floor( minValue );
-		
 		var maxCeilMinusMinFloor = maxValueCeil - minValueFloor;
 		
 		var tickMarkIncrementFromZero = maxCeilMinusMinFloor / 5;
 		
 		var tickMarks = [];
 		
-		if ( minValueFloor < 0 && maxValueCeil > 0 ) {
-			tickMarks.push( 0 );
+		if ( minValue < 0 && maxValue > 0 ) {
+			
+			if ( ( maxValue - minValue ) >= 10 ) {
+				var tickMarkValueForTickMarkCounter = function( tickCounter ) {
+					var tickMark = tickCounter * tickMarkIncrementFromZero;
+					return tickMark; 
+				};
+
+				//  Add tick marks for < 0 
+				for ( var tickCounter = 1; ( - ( tickMarkValueForTickMarkCounter( tickCounter ) ) ) > minValueFloor; tickCounter++ ) {
+					var tickMark = ( - ( tickMarkValueForTickMarkCounter( tickCounter ) ) );
+					tickMarks.push( tickMark );
+				}
+				tickMarks.push( 0 );
+				//  Add tick marks for > 0 
+				for ( var tickCounter = 1; ( ( tickMarkValueForTickMarkCounter( tickCounter ) ) ) < maxValueCeil; tickCounter++ ) {
+					var tickMark = ( ( tickMarkValueForTickMarkCounter( tickCounter ) ) );
+					tickMarks.push( tickMark );
+				}
+			} else {
+				var minValueFloorPt5 = ( Math.floor( ( minValue * 2 ) ) / 2 );
+				var maxValueCeilPt5 = ( Math.ceil( ( maxValue * 2 ) ) / 2 );
+				var maxValueCeilPt5MinusminValueFloorPt5 = maxValueCeilPt5 - minValueFloorPt5;
+				var tickMarkIncrementForPt5 = maxValueCeilPt5MinusminValueFloorPt5 / 5;
+
+				var tickMarkValueForTickMarkCounterLessThanTenGE1 = function( tickCounter ) {
+					var tickMark = ( tickCounter * tickMarkIncrementForPt5 );
+					return tickMark;
+				};
+
+				//  Add tick marks for < 0 
+				for ( var tickCounter = 1; ( - ( tickMarkValueForTickMarkCounterLessThanTenGE1( tickCounter ) ) ) > minValue; tickCounter++ ) {
+					var tickMark = ( - ( tickMarkValueForTickMarkCounterLessThanTenGE1( tickCounter ) ) );
+					tickMarks.push( tickMark );
+				}
+				tickMarks.push( 0 );
+				//  Add tick marks for > 0 
+				for ( var tickCounter = 1; ( ( tickMarkValueForTickMarkCounterLessThanTenGE1( tickCounter ) ) ) < maxValue; tickCounter++ ) {
+					var tickMark = ( ( tickMarkValueForTickMarkCounterLessThanTenGE1( tickCounter ) ) );
+					tickMarks.push( tickMark );
+				}
+			}
+		} else {
+
+			if ( dataPointCount === 1 ) {
+				tickMarks.push( minValue );
+				tickMarks.push( ( minValue + ( maxValue - minValue ) / 2 ) );
+				tickMarks.push( maxValue );
+
+			} else if ( ( maxValue - minValue ) >= 10 ) {
+				var tickMarkValueForTickMarkCounterNoZero = function( tickCounter ) {
+					return minValueFloor + ( tickCounter * tickMarkIncrementFromZero );
+				};
+				for ( var tickCounter = 1; ( ( tickMarkValueForTickMarkCounterNoZero( tickCounter ) ) ) < maxValue; tickCounter++ ) {
+					var tickMark = ( ( tickMarkValueForTickMarkCounterNoZero( tickCounter ) ) );
+					tickMarks.push( tickMark );
+				}
+			} else if ( ( maxValue - minValue ) >= 1 ) {
+				var minValueFloorPt5 = ( Math.floor( ( minValue * 2 ) ) / 2 );
+				var maxValueCeilPt5 = ( Math.ceil( ( maxValue * 2 ) ) / 2 );
+				var maxValueCeilPt5MinusminValueFloorPt5 = maxValueCeilPt5 - minValueFloorPt5;
+				var tickMarkIncrementForPt5 = maxValueCeilPt5MinusminValueFloorPt5 / 5;
+
+				var tickMarkValueForTickMarkCounterLessThanTenGE1 = function( tickCounter ) {
+					return minValueFloorPt5 + ( tickCounter * tickMarkIncrementForPt5 );
+				};
+				for ( var tickCounter = 1; ( ( tickMarkValueForTickMarkCounterLessThanTenGE1( tickCounter ) ) ) < maxValue; tickCounter++ ) {
+					var tickMark = ( ( tickMarkValueForTickMarkCounterLessThanTenGE1( tickCounter ) ) );
+					tickMarks.push( tickMark );
+				}
+			} else {
+				if ( ( maxValue - minValue ) > .2 ) {
+					var minValueFloorPt1 = ( Math.floor( ( minValue * 10 ) ) / 10 );
+					var maxValueCeilPt1 = ( Math.ceil( ( maxValue * 10 ) ) / 10 );
+					var maxValueCeilPt1MinusminValueFloorPt1 = maxValueCeilPt1 - minValueFloorPt1;
+					var tickMarkIncrementForPt1 = maxValueCeilPt1MinusminValueFloorPt1 / 5;
+
+					var tickMarkValueForTickMarkCounterLessThanOneGtPt2 = function( tickCounter ) {
+						var tickMarkVal = minValueFloorPt1 + ( tickCounter * tickMarkIncrementForPt1 );
+						return tickMarkVal;
+					};
+					for ( var tickCounter = 1; ( ( tickMarkValueForTickMarkCounterLessThanOneGtPt2( tickCounter ) ) ) < maxValue; tickCounter++ ) {
+						var tickMark = ( ( tickMarkValueForTickMarkCounterLessThanOneGtPt2( tickCounter ) ) );
+						tickMarks.push( tickMark );
+					}
+				} else {
+					tickMarks.push( minValue );
+					tickMarks.push( ( minValue + ( maxValue - minValue ) / 2 ) );
+					tickMarks.push( maxValue );
+				}
+			}
 		}
 		
-		if ( minValueFloor < 0 ) {
-			//  Add tick marks for < 0 
-			for ( var tickCounter = 1; ( - ( tickCounter * tickMarkIncrementFromZero ) ) > minValueFloor; tickCounter++ ) {
-				var tickMark = ( - ( tickCounter * tickMarkIncrementFromZero ) );
-				tickMarks.push( tickMark );
-			}
-		}
-
-		if ( maxValueCeil > 0 ) {
-			//  Add tick marks for > 0 
-			for ( var tickCounter = 1; ( ( tickCounter * tickMarkIncrementFromZero ) ) < maxValueCeil; tickCounter++ ) {
-				var tickMark = ( ( tickCounter * tickMarkIncrementFromZero ) );
-				tickMarks.push( tickMark );
-			}
-		}
 		
 		return tickMarks;
 	};
@@ -3405,10 +4173,10 @@ var ViewQCPageCode = function() {
 		
 		_peptideLengthsHistogram_isLoaded = _IS_LOADED_NO;
 
-		var $PeptideLengthsCountsLoadingBlock = $("#PeptideLengthsCountsLoadingBlock");
 		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
-		$PeptideLengthsCountsLoadingBlock.show();
-		$PeptideLengthsCountsBlock.hide();
+		if ( $PeptideLengthsCountsBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsBlock'" );
+		}
 		$PeptideLengthsCountsBlock.empty();
 	};
 
@@ -3421,6 +4189,8 @@ var ViewQCPageCode = function() {
 		}
 	};
 	
+	var _loadPeptideLengthsHistogramActiveAjax = null;
+	
 	/**
 	 * Load the data for  Peptide Lengths Histogram
 	 */
@@ -3429,45 +4199,79 @@ var ViewQCPageCode = function() {
 		
 		_peptideLengthsHistogram_isLoaded = _IS_LOADED_LOADING;
 		
-		var $PeptideLengthsCountsLoadingBlock = $("#PeptideLengthsCountsLoadingBlock");
 		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
-		$PeptideLengthsCountsLoadingBlock.show();
-		$PeptideLengthsCountsBlock.hide();
+		if ( $PeptideLengthsCountsBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsBlock'" );
+		}
+		$PeptideLengthsCountsBlock.empty();
+		
+		var selectedLinkTypes = _hash_json_Contents.linkTypes;
+		
+		//  Make a copy of _hash_json_Contents    (  true for deep, target object, source object, <source object 2>, ... )
+		var hash_json_Contents_COPY = $.extend( true /*deep*/,  {}, _hash_json_Contents );
+		
+		// Add cells for selected link types
+		selectedLinkTypes.forEach( function ( currentArrayValue, index, array ) {
+			var selectedLinkType = currentArrayValue;
+
+			//  Add empty chart with Loading message
+			var $chart_outer_container_jq =
+				this._addChartOuterTemplate( { linkType : selectedLinkType, $chart_group_container_table_jq : $PeptideLengthsCountsBlock } );
+			this._placeEmptyDummyChartForMessage( { 
+				$chart_outer_container_jq : $chart_outer_container_jq, 
+			//				linkType : selectedLinkType, 
+				messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_LOADING,
+				messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_LOADING
+			} );
+			
+		}, this /* passed to function as this */ );
+		
 		
 		var hash_json_field_Contents_JSONString = JSON.stringify( _hash_json_Contents );
 		var ajaxRequestData = {
 				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
-		$.ajax({
-			url : contextPathJSVar + "/services/qc/dataPage/peptideLengthsHistogram",
-			traditional: true,  //  Force traditional serialization of the data sent
-								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-								//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-			data : ajaxRequestData,  // The data sent as params on the URL
-			dataType : "json",
-			success : function( ajaxResponseData ) {
-				try {
-					var responseParams = {
-							ajaxResponseData : ajaxResponseData, 
-							ajaxRequestData : ajaxRequestData
-//							,
-//							topTRelement : topTRelement
-					};
-					objectThis.loadPeptideLengthsHistogramResponse( responseParams );
-//					$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
-				} catch( e ) {
-					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-					throw e;
+		if ( _loadPeptideLengthsHistogramActiveAjax ) {
+			_loadPeptideLengthsHistogramActiveAjax.abort();
+			_loadPeptideLengthsHistogramActiveAjax = null;
+		}
+		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
+		_loadPeptideLengthsHistogramActiveAjax =
+			$.ajax({
+				url : contextPathJSVar + "/services/qc/dataPage/peptideLengthsHistogram",
+				traditional: true,  //  Force traditional serialization of the data sent
+				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+				data : ajaxRequestData,  // The data sent as params on the URL
+				dataType : "json",
+				success : function( ajaxResponseData ) {
+					_loadPeptideLengthsHistogramActiveAjax = null;
+					try {
+						var responseParams = {
+								ajaxResponseData : ajaxResponseData, 
+								ajaxRequestData : ajaxRequestData
+//								,
+//								topTRelement : topTRelement
+						};
+						objectThis.loadPeptideLengthsHistogramResponse( responseParams );
+//						$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				},
+				failure: function(errMsg) {
+					_loadPeptideLengthsHistogramActiveAjax = null;
+					handleAJAXFailure( errMsg );
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					_loadPeptideLengthsHistogramActiveAjax = null;
+					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
+						handleAJAXError(jqXHR, textStatus, errorThrown);
+					}
 				}
-			},
-	        failure: function(errMsg) {
-	        	handleAJAXFailure( errMsg );
-	        },
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
-			}
-		});
+			});
 	};
 	
 	/**
@@ -3480,52 +4284,44 @@ var ViewQCPageCode = function() {
 		var peptideLength_Histogram_For_PSMPeptideCutoffsResults = ajaxResponseData.peptideLength_Histogram_For_PSMPeptideCutoffsResults;
 		var dataForChartPerLinkTypeList = peptideLength_Histogram_For_PSMPeptideCutoffsResults.dataForChartPerLinkTypeList;
 		
-		var $PeptideLengthsCountsEntryTemplate = $("#PeptideLengthsCountsEntryTemplate");
-		if ( $PeptideLengthsCountsEntryTemplate.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsEntryTemplate'" );
-		}
-		var PeptideLengthsCountsEntryTemplate = $PeptideLengthsCountsEntryTemplate.html();
-
-		var $PeptideLengthsCountsLoadingBlock = $("#PeptideLengthsCountsLoadingBlock");
-		if ( $PeptideLengthsCountsLoadingBlock.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsLoadingBlock'" );
-		}
 		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
 		if ( $PeptideLengthsCountsBlock.length === 0 ) {
 			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsBlock'" );
 		}
-
 		$PeptideLengthsCountsBlock.empty();
 
-		$PeptideLengthsCountsLoadingBlock.hide();
-		$PeptideLengthsCountsBlock.show();
-		
 		for ( var indexForLinkType = 0; indexForLinkType < dataForChartPerLinkTypeList.length; indexForLinkType++ ) {
 			var entryForLinkType = dataForChartPerLinkTypeList[ indexForLinkType ];
 			var linkType = entryForLinkType.linkType;
 			var chartBuckets = entryForLinkType.chartBuckets;
-			
-			if ( chartBuckets === null ) {
+
+			if ( chartBuckets === null || chartBuckets.length === 0 ) {
 				//  No data for this link type
+
+				var $chart_outer_container_jq =
+					this._addChartOuterTemplate( { $chart_group_container_table_jq : $PeptideLengthsCountsBlock } );
+				//  Add empty chart with No Data message
+				this._placeEmptyDummyChartForMessage( { 
+					$chart_outer_container_jq : $chart_outer_container_jq, 
+				//				linkType : selectedLinkType, 
+					messagePrefix:  _DUMMY_CHART_STATUS_TEXT_PREFIX_NO_DATA,
+					messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_NO_DATA
+				} );
+				
 				continue;  //  EARLY CONTINUE
 			}
-			
-			if ( chartBuckets.length === 0 ) {
 
-			} else {
-				var $chartOuterContainer =
-					$( PeptideLengthsCountsEntryTemplate ).appendTo( $PeptideLengthsCountsBlock );
-				
-				var $chartContainer = $chartOuterContainer.find(".chart_container_jq");
-				
-				var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
-				
-				this._addPeptideLengthsHistogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor : colorAndbarColor, $chartContainer : $chartContainer } );
-				
-				chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chartOuterContainer } );
-				// Add tooltips for download links
-				addToolTips( $chartOuterContainer );
-			}
+			var $chart_outer_container_jq =
+				this._addChartOuterTemplate( { $chart_group_container_table_jq : $PeptideLengthsCountsBlock } );
+			var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
+
+			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
+
+			this._addPeptideLengthsHistogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor : colorAndbarColor, $chartContainer : $chart_container_jq } );
+
+			chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq } );
+			// Add tooltips for download links
+			addToolTips( $chart_outer_container_jq );
 		}
 		
 		_peptideLengthsHistogram_isLoaded = _IS_LOADED_YES;
@@ -3670,7 +4466,189 @@ var ViewQCPageCode = function() {
 		}
 		return undefined; //  Use defaults
 	};
+	
+	
 
+	/**
+	 * 
+	 */
+	this._placeEmptyDummyChartForMessage = function( params ) {
+		var $chart_outer_container_jq = params.$chart_outer_container_jq;
+		var linkType = params.linkType;  //  May be all caps or lower case
+		var messageWhole = params.messageWhole;  //  if set, it is the whole message
+		var messagePrefix = params.messagePrefix;
+		var messageSuffix = params.messageSuffix;
+
+		var $addedDummyChartEntryForMessageTemplate = $( _dummy_chart_entry_for_message_templateHTML ).appendTo( $chart_outer_container_jq );
+		
+		var $message_text_containing_div_jq = $addedDummyChartEntryForMessageTemplate.find(".message_text_containing_div_jq");
+		if ( $message_text_containing_div_jq.length === 0 ) {
+			throw Error( "element with class 'message_text_containing_div_jq' not found" );
+		}
+		var $message_text_jq = $addedDummyChartEntryForMessageTemplate.find(".message_text_jq");
+		if ( $message_text_jq.length === 0 ) {
+			throw Error( "element with class 'message_text_jq' not found" );
+		}
+		var $dummy_chart_container_jq = $addedDummyChartEntryForMessageTemplate.find(".dummy_chart_container_jq");
+		if ( $dummy_chart_container_jq.length === 0 ) {
+			throw Error( "element with class 'dummy_chart_container_jq' not found" );
+		}
+		
+		var dummy_chart_container_jqHTMLElement = $dummy_chart_container_jq[0];
+		if ( dummy_chart_container_jqHTMLElement === null || dummy_chart_container_jqHTMLElement === undefined ) {
+			throw Error( "element with class 'dummy_chart_container_jq' not found" );
+		}
+		
+		var displayMessage = undefined;
+		
+		if ( messageWhole ) {
+			displayMessage = messageWhole;
+			
+		} else {
+
+			//  A space is required after each link type since the messageSuffix does NOT start with a space
+			var linkTypeDisplay = null;
+			if ( linkType === null || linkType === undefined ) {
+				linkTypeDisplay = "";
+			} else if ( linkType === _link_type_crosslink_constant || linkType === _link_type_crosslink_LOWER_CASE_constant ) {
+				linkTypeDisplay = "Crosslink ";
+			} else if ( linkType === _link_type_looplink_constant || linkType === _link_type_looplink_LOWER_CASE_constant ) {
+				linkTypeDisplay = "Looplink ";
+			} else if ( linkType === _link_type_unlinked_constant || linkType === _link_type_unlinked_LOWER_CASE_constant ) {
+				linkTypeDisplay = "Unlinked ";
+			} else {
+				linkTypeDisplay = "Unknown Link Type ";
+			}
+
+			displayMessage = messagePrefix + linkTypeDisplay + messageSuffix;
+		}
+		
+		$message_text_jq.text( displayMessage );
+		
+		//  Position display message in center of $chartContainer
+		
+		var addedDummyChartEntryForMessageTemplateWidth = $addedDummyChartEntryForMessageTemplate.width();
+		var addedDummyChartEntryForMessageTemplateHeight = $addedDummyChartEntryForMessageTemplate.height();
+		
+		var message_text_containing_div_jqWidth = $message_text_containing_div_jq.width();
+		var message_text_containing_div_jqHeight = $message_text_containing_div_jq.height();
+		
+		var message_text_containing_div_jqLeft = ( addedDummyChartEntryForMessageTemplateWidth / 2 ) - ( message_text_containing_div_jqWidth / 2 );
+		var message_text_containing_div_jqTop = ( addedDummyChartEntryForMessageTemplateHeight / 2 ) - ( message_text_containing_div_jqHeight / 2 );
+		
+		$message_text_containing_div_jq.css( { top: message_text_containing_div_jqTop, left: message_text_containing_div_jqLeft } );
+		
+		//  add dummy chart
+		
+		var optionsFullsize = {
+			//  Overridden for Specific elements like Chart Title and X and Y Axis labels
+				fontSize: _PPM_Error_Vs_M_over_Z_For_PSMs_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
+				pointSize: 0,
+				legend: 'none',
+//				title: chartTitle, // Title above chart
+			    titleTextStyle: {
+			    	color : _PROXL_DEFAULT_FONT_COLOR, //  Set default font color
+//			        color: <string>,    // any HTML string color ('red', '#cc00cc')
+//			        fontName: <string>, // i.e. 'Times New Roman'
+			        fontSize: _PPM_Error_Vs_M_over_Z_For_PSMs_CHART_GLOBALS._TITLE_FONT_SIZE // 12, 18 whatever you want (don't specify px)
+//			        bold: <boolean>,    // true or false
+//			        italic: <boolean>   // true of false
+			    },
+				//  X axis label below chart
+				hAxis: 
+				{ 	title: 'X Axis'
+					, titleTextStyle: { color: 'black', fontSize: _PPM_Error_Vs_M_over_Z_For_PSMs_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+					,gridlines: {  
+		                color: 'none'  //  No vertical grid lines on the horzontal axis
+		            }
+//					,baseline: 0     // always start at zero
+					,baselineColor: 'none' // Hide 'Zero' line
+//					,baselineColor: '#CDCDCD' // Make 'Zero' line really light
+					,ticks: [ 0, 1 ]
+//					,maxValue : max_M_over_Z_Error
+//					,minValue : min_M_over_Z_Error
+				},  
+				//  Y axis label left of chart
+				vAxis: 
+				{ 	title: 'Y Axis'
+					, titleTextStyle: { color: 'black', fontSize: _PPM_Error_Vs_M_over_Z_For_PSMs_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+//					,baseline: 0     // always start at zero
+					,baselineColor: 'none' // Hide 'Zero' line
+					,ticks: [ 0, 1 ]
+//					,ticks: vAxisTicks
+//					,maxValue : maxCount
+//				,maxValue : maxPPMError
+//				,minValue : minPPMError
+
+				},
+//				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
+				//  Size picked up from containing HTML element
+//				width : 500, 
+//				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+//				bar: { groupWidth: '100%' },  // set bar width large to eliminate space between bars
+//				colors: barColors,
+				tooltip: {isHtml: true}
+		};        
+		
+		var chartData = [ ["X axis", "Y axis"], [ 1,1 ] ];
+		
+		// create the chart
+		var data = google.visualization.arrayToDataTable( chartData );
+		
+		var chartFullsize = new google.visualization.ScatterChart( dummy_chart_container_jqHTMLElement );
+		chartFullsize.draw( data, optionsFullsize );
+		
+		
+	};
+	
+
+	/**
+	 * 
+	 */
+	this._addChartOuterTemplateForLinkTypes = function( params ) {
+		var objectThis = this;
+		var $chart_group_container_table_jq = params.$chart_group_container_table_jq;
+		var linkTypes = params.linkTypes;
+		
+		linkTypes.forEach( function ( currentArrayValue, index, array ) {
+			var linkType = currentArrayValue;
+			this._addChartOuterTemplate( { $chart_group_container_table_jq : $chart_group_container_table_jq, linkType : linkType } );
+		}, this /* passed to function as this */ );
+	};
+	
+
+	/**
+	 * linkType optional
+	 */
+	this._addChartOuterTemplate = function( params ) {
+		var $chart_group_container_table_jq = params.$chart_group_container_table_jq;
+		var linkType = params.linkType;  
+		
+		if ( linkType === undefined || linkType === null ) {
+			linkType = "";
+		}
+		
+		var html = _common_chart_outer_entry_templateHTML.replace( "{{link_type}}", linkType );
+		
+		var $tdElement = $( html ).appendTo( $chart_group_container_table_jq );
+		var $chart_outer_container_jq = $tdElement.find(".chart_outer_container_jq");
+		
+		return $chart_outer_container_jq;
+	};
+	
+
+	/**
+	 * 
+	 */
+	this._addChartInnerTemplate = function( params ) {
+		var $chart_outer_container_jq = params.$chart_outer_container_jq;
+		
+		var $divElement = $( _common_chart_inner_entry_templateHTML ).appendTo( $chart_outer_container_jq );
+		var $chart_container_jq = $divElement.find(".chart_container_jq");
+		
+		return $chart_container_jq;
+	};
+	
 };
 
 
