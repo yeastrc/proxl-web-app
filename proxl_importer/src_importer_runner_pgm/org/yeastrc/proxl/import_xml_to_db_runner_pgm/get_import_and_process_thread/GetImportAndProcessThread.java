@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.database_update_with_transaction_services.GetNextTrackingToProcessDBTransaction;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.process_import.ProcessProxlXMLImport;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.objects.TrackingDTOTrackingRunDTOPair;
+import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
  * Get the next import and process it thread
@@ -116,6 +117,21 @@ public class GetImportAndProcessThread extends Thread {
 						processProxlXMLImport = null;
 					}
 				}
+				
+				try {
+					DBConnectionFactory.closeAllConnections();
+
+				} catch ( Throwable t ) {
+					log.error( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+					log.error( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+					log.error( "!!!! \n\n "
+							+ "DBConnectionFactory.closeAllConnections(); failed in .getNextTrackingToProcess(...)"
+							+ "  Exception: \n\n", t );
+					log.error( "!!!! \n\n " );
+					log.error( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+					log.error( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				}
+				
 			}
 		}
 		log.info( "Exiting run()" );
