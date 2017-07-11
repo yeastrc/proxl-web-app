@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.proxl.import_xml_to_db.dto.CutoffsAppliedOnImportDTO;
+import org.yeastrc.xlink.dto.CutoffsAppliedOnImportDTO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 

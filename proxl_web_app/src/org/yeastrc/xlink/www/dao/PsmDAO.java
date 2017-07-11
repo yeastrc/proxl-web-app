@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.www.dto.PsmDTO;
+import org.yeastrc.xlink.dto.PsmDTO;
 
 /**
  * Table psm

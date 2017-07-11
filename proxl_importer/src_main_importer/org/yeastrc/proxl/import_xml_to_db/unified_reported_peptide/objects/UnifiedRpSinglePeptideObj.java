@@ -2,7 +2,7 @@ package org.yeastrc.proxl.import_xml_to_db.unified_reported_peptide.objects;
 
 import java.util.List;
 
-import org.yeastrc.proxl.import_xml_to_db.dto.PeptideDTO;
+import org.yeastrc.xlink.dto.PeptideDTO;
 
 /**
  * One peptide out of the reported peptide, along with it's dynamic mods

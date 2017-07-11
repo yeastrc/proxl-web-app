@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.yeastrc.xlink.dao.LinkerDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.LinkerDTO;
-import org.yeastrc.xlink.www.dto.PsmDTO;
+import org.yeastrc.xlink.dto.PsmDTO;
 
 public class LinkerForPSMMatcher {
 

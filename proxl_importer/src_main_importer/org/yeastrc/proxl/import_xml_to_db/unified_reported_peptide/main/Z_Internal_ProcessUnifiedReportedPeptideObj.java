@@ -9,11 +9,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.constants.UnifiedReportedPeptideConstants;
-import org.yeastrc.proxl.import_xml_to_db.dto.PeptideDTO;
+import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepDynamicModLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepMatchedPeptideLookupDTO;
-import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptDynamicModDTO;
+import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.unified_reported_peptide.objects.UnifiedRpSinglePeptideDynamicMod;

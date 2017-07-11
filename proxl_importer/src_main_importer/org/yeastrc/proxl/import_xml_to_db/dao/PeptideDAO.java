@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.yeastrc.proxl.import_xml_to_db.dto.PeptideDTO;
+import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 

@@ -43,7 +43,7 @@ import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptides;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
-import org.yeastrc.proxl.import_xml_to_db.dto.PsmDTO;
+import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.PsmFilterableAnnotationGenericLookupDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;

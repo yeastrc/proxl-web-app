@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_CutoffsAppliedOnImportDAO;
-import org.yeastrc.proxl.import_xml_to_db.dto.CutoffsAppliedOnImportDTO;
+import org.yeastrc.xlink.dto.CutoffsAppliedOnImportDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;

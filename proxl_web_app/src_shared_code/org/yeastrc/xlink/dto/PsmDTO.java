@@ -1,4 +1,4 @@
-package org.yeastrc.xlink.www.dto;
+package org.yeastrc.xlink.dto;
 
 import java.math.BigDecimal;
 

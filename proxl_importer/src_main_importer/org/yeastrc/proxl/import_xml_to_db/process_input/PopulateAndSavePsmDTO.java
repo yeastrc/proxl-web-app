@@ -9,7 +9,7 @@ import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchScanFile
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.utils.RoundDecimalFieldsIfNecessary;
 import org.yeastrc.proxl_import.api.xml_dto.Psm;
-import org.yeastrc.proxl.import_xml_to_db.dto.PsmDTO;
+import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchScanFilenameDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.utils.XLinkUtils;

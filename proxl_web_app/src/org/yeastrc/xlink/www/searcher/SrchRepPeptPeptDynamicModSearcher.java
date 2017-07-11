@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.www.dto.SrchRepPeptPeptDynamicModDTO;
+import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 /**
  * table srch_rep_pept__pept__dynamic_mod
  *

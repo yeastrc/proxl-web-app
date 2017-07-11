@@ -8,13 +8,13 @@ import java.util.List;
 
 
 
-import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptDynamicModDTO;
+import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl_import.api.xml_dto.Modification;
 import org.yeastrc.proxl_import.api.xml_dto.Modifications;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl.import_xml_to_db.dao.PeptideDAO;
-import org.yeastrc.proxl.import_xml_to_db.dto.PeptideDTO;
+import org.yeastrc.xlink.dto.PeptideDTO;
 
 /**
  * 

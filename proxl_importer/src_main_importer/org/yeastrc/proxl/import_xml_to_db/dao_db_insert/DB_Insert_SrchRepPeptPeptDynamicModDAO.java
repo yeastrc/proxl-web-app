@@ -7,7 +7,7 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
-import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptDynamicModDTO;
+import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 
 

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.www.dto.CutoffsAppliedOnImportDTO;
+import org.yeastrc.xlink.dto.CutoffsAppliedOnImportDTO;
 
 /**
  * Return a list of cutoffs_applied_on_import for a search id

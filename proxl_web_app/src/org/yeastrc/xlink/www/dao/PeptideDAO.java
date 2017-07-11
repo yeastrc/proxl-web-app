@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.www.dto.PeptideDTO;
+import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_PeptideDTO;
 
 /**

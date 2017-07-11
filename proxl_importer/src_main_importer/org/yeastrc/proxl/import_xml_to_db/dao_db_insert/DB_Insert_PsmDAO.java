@@ -7,7 +7,7 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.proxl.import_xml_to_db.dto.PsmDTO;
+import org.yeastrc.xlink.dto.PsmDTO;
 
 /**
  * table psm
