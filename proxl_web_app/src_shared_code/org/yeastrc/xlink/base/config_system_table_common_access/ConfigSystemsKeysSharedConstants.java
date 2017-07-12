@@ -8,6 +8,10 @@ public class ConfigSystemsKeysSharedConstants {
 
 	//////   Any plain text inputs need to be added to textConfigKeys in the "static {}" at the bottom
 	
+	////  Proxl Cache Files Root Directory - The Root directory that all files used for caching are writen to.
+	
+	public static final String CACHE_FILES_ROOT_DIRECTORY = "cache_files_root_directory";
+	
 	////  Proxl XML File Import Set Up keys
 
 	public static final String file_import_proxl_xml_scans_TEMP_DIR_KEY = "file_import_proxl_xml_scans_temp_dir";
@@ -30,6 +34,7 @@ public class ConfigSystemsKeysSharedConstants {
 	public static final Set<String> textConfigKeys = new HashSet<>();
 	
 	static {
+		textConfigKeys.add( CACHE_FILES_ROOT_DIRECTORY );
 		textConfigKeys.add( file_import_proxl_xml_scans_TEMP_DIR_KEY );
 		textConfigKeys.add( SCAN_FILE_IMPORT_ALLOWED_VIA_WEB_SUBMIT_KEY );
 		

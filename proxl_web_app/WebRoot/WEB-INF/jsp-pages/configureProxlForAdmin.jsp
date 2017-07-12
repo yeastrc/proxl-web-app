@@ -129,9 +129,16 @@
 			data-config-key="<%= ConfigSystemsKeysConstants.PROTEIN_LISTING_FROM_SEQUENCE_TAXONOMY_WEBSERVICE_URL_KEY %>"> 
 	  </div> 
 	</div>
-	
-	
 
+	<div style="margin-bottom: 10px;" >
+		<div style="margin-bottom: 3px;">
+			Cache Files Root Directory (Must be writable by account running web app): 
+			<input type="text" class=" config_text_inputs_jq " style="width: 650px;"
+				data-config-key="<%= ConfigSystemsKeysSharedConstants.CACHE_FILES_ROOT_DIRECTORY %>"
+				>
+		</div>
+	</div>
+	
 	<div style="margin-bottom: 10px;">
 	  <div style="margin-bottom: 3px;">
 	  	<div>
