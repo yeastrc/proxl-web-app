@@ -3187,10 +3187,13 @@ var ViewQCPageCode = function() {
 				
 				var chartEntrySpecificSeries = [
 					ppmErrorCenter 		// Y axis
-					, 'fill-opacity : ??'  // style
+					, ''  // style will be set below
 				];
-				
-				var fillOpacityStyleOption = 'fill-opacity : ';
+
+				var fillStyleOptionEnd = ";";
+				var fillColorStyleOption = 'fill-color: ';
+
+				var fillOpacityStyleOption = 'fill-opacity: ';
 
 				//  Style of point
 //				colorAndbarColor.barColor,
@@ -3232,13 +3235,19 @@ var ViewQCPageCode = function() {
 					if ( entry.max !== undefined && entry.max !== null ) {
 						if ( count <= entry.max ) {
 							addNullEntriesToChartEntryForSeriesCount( seriesSettingsIndex );
+							var pointColor = entry.color;
 							var opacityString = null;
 							if ( entry.opacity !== undefined && entry.opacity !== null ) {
 								opacityString = opacityString;
 							} else {
 								opacityString = OPACITY_DEFAULT;
 							}
-							chartEntrySpecificSeries[ 1 ] = fillOpacityStyleOption + opacityString;
+
+							//  Add Style string
+							chartEntrySpecificSeries[ 1 ] = 
+								fillColorStyleOption + pointColor + fillStyleOptionEnd + 
+								fillOpacityStyleOption + opacityString + fillStyleOptionEnd;
+
 							copy_chartEntrySpecificSeriesTo_chartEntry( chartEntry, chartEntrySpecificSeries );
 							addNullEntriesToChartEntryForSeriesCount( SERIES_SETTINGS.length - ( seriesSettingsIndex + 1 ) );
 							break;
@@ -3250,13 +3259,19 @@ var ViewQCPageCode = function() {
 						}
 						if ( count >= entry.min ) {
 							addNullEntriesToChartEntryForSeriesCount( seriesSettingsIndex );
+							var pointColor = entry.color;
 							var opacityString = null;
 							if ( entry.opacity !== undefined && entry.opacity !== null ) {
 								opacityString = opacityString;
 							} else {
 								opacityString = OPACITY_DEFAULT;
 							}
-							chartEntrySpecificSeries[ 1 ] = fillOpacityStyleOption + opacityString;
+							
+							//  Add Style string
+							chartEntrySpecificSeries[ 1 ] = 
+								fillColorStyleOption + pointColor + fillStyleOptionEnd + 
+								fillOpacityStyleOption + opacityString + fillStyleOptionEnd;
+
 							copy_chartEntrySpecificSeriesTo_chartEntry( chartEntry, chartEntrySpecificSeries );
 							break;
 						}		
@@ -3854,9 +3869,12 @@ var ViewQCPageCode = function() {
 				
 				var chartEntrySpecificSeries = [
 					ppmErrorCenter 		// Y axis
-					, 'fill-opacity : ??'  // style
+					, ''  // style will be set below
 				];
-				
+
+				var fillStyleOptionEnd = ";";
+				var fillColorStyleOption = 'fill-color: ';
+
 				var fillOpacityStyleOption = 'fill-opacity : ';
 
 				//  Style of point
@@ -3899,13 +3917,18 @@ var ViewQCPageCode = function() {
 					if ( entry.max !== undefined && entry.max !== null ) {
 						if ( count <= entry.max ) {
 							addNullEntriesToChartEntryForSeriesCount( seriesSettingsIndex );
+							var pointColor = entry.color;
 							var opacityString = null;
 							if ( entry.opacity !== undefined && entry.opacity !== null ) {
 								opacityString = opacityString;
 							} else {
 								opacityString = OPACITY_DEFAULT;
 							}
-							chartEntrySpecificSeries[ 1 ] = fillOpacityStyleOption + opacityString;
+							//  Add Style string
+							chartEntrySpecificSeries[ 1 ] = 
+								fillColorStyleOption + pointColor + fillStyleOptionEnd + 
+								fillOpacityStyleOption + opacityString + fillStyleOptionEnd;
+							
 							copy_chartEntrySpecificSeriesTo_chartEntry( chartEntry, chartEntrySpecificSeries );
 							addNullEntriesToChartEntryForSeriesCount( SERIES_SETTINGS.length - ( seriesSettingsIndex + 1 ) );
 							break;
@@ -3917,13 +3940,18 @@ var ViewQCPageCode = function() {
 						}
 						if ( count >= entry.min ) {
 							addNullEntriesToChartEntryForSeriesCount( seriesSettingsIndex );
+							var pointColor = entry.color;
 							var opacityString = null;
 							if ( entry.opacity !== undefined && entry.opacity !== null ) {
 								opacityString = opacityString;
 							} else {
 								opacityString = OPACITY_DEFAULT;
 							}
-							chartEntrySpecificSeries[ 1 ] = fillOpacityStyleOption + opacityString;
+							//  Add Style string
+							chartEntrySpecificSeries[ 1 ] = 
+								fillColorStyleOption + pointColor + fillStyleOptionEnd + 
+								fillOpacityStyleOption + opacityString + fillStyleOptionEnd;
+							
 							copy_chartEntrySpecificSeriesTo_chartEntry( chartEntry, chartEntrySpecificSeries );
 							break;
 						}		
