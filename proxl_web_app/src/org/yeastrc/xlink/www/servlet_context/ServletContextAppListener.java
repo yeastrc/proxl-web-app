@@ -10,6 +10,7 @@ import org.yeastrc.user_mgmt_central.main_code.db.UserMgmtCentralMainDBConnectio
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTableGetValueCommon;
 import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTableGetValue;
+import org.yeastrc.xlink.www.async_action_via_executor_service.AsyncActionViaExecutorService;
 import org.yeastrc.xlink.www.auth_db.AuthLibraryDBConnectionFactoryForWeb;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
 import org.yeastrc.xlink.www.config_properties_file.ProxlConfigFileReader;
@@ -109,6 +110,8 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		AppContextConfigSystemValuesRetrieval appContextConfigSystemValuesRetrieval = 
 				new AppContextConfigSystemValuesRetrieval();
 		context.setAttribute( WebConstants.CONFIG_SYSTEM_VALUES_HTML_KEY, appContextConfigSystemValuesRetrieval );
+		
+		AsyncActionViaExecutorService.initInstance();
 		
 		log.warn( "INFO:  !!!!!!!!!!!!!!!   Start up of web app  'Proxl' complete  !!!!!!!!!!!!!!!!!!!! " );
 		log.warn( "INFO: Application context values set.  Key = " + WebConstants.APP_CONTEXT_CONTEXT_PATH + ": value = " + contextPath

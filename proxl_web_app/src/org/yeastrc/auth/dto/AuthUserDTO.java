@@ -13,6 +13,12 @@ public class AuthUserDTO {
 	 * Null if not set
 	 */
 	private Integer userAccessLevel;
+	
+	/**
+	 * Not always set
+	 */
+	private String lastLoginIP;
+	
 	/**
 	 * Default to true unless set to false
 	 */
@@ -21,10 +27,13 @@ public class AuthUserDTO {
 	//  These used to be in the auth_user table but now come from the User Mgmt Webapp
 	private String username;
 	private String email;
+	
 	/**
 	 * Default to true unless set to false
 	 */
 	private boolean enabledUserMgmtGlobalLevel = true;
+	
+	
 	
 	public boolean isEnabledUserMgmtGlobalLevel() {
 		return enabledUserMgmtGlobalLevel;
@@ -67,6 +76,20 @@ public class AuthUserDTO {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	/**
+	 * Not always set
+	 * @return
+	 */
+	public String getLastLoginIP() {
+		return lastLoginIP;
+	}
+	/**
+	 * Not always set
+	 * @param lastLoginIP
+	 */
+	public void setLastLoginIP(String lastLoginIP) {
+		this.lastLoginIP = lastLoginIP;
 	}
 
 }

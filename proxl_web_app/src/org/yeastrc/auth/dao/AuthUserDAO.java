@@ -9,16 +9,51 @@ import org.yeastrc.auth.db.AuthLibraryDBConnectionFactory;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 
 /**
  * Table auth_user
  */
-public class AuthUserDAO {
+public class AuthUserDAO implements Runnable {
 
 	private static final Logger log = Logger.getLogger(AuthUserDAO.class);
 	private AuthUserDAO() { }
 	public static AuthUserDAO getInstance() { return new AuthUserDAO(); }
+	/**
+	 * Separate since always return a new instance
+	 * @return
+	 */
+	public static AuthUserDAO getNewInstance() { return new AuthUserDAO(); }
 	
+	/**
+	 * Which method on this class to execute on this class with property authUserDTO_ToUseInRun
+	 * when run() is called when this is used as Runnable 
+	 *
+	 */
+	public enum MethodToExecuteAsRunnable { UPDATE_LAST_LOGIN }
+
+	private AuthUserDTO authUserDTO_ToUseInRun;
+	private MethodToExecuteAsRunnable methodToExecuteAsRunnable;
+	
+	/* 
+	 * Called when AuthUserDAO object passed as Runnable
+	 */
+	@Override
+	public void run() {
+		try {
+			if ( methodToExecuteAsRunnable == MethodToExecuteAsRunnable.UPDATE_LAST_LOGIN ) {
+				updateLastLogin( authUserDTO_ToUseInRun );
+			} else {
+				throw new ProxlWebappInternalErrorException( "methodToExecuteAsRunnable is not a valid value: " + methodToExecuteAsRunnable );
+			}
+		} catch ( Throwable t ) {
+			String msg = "Exception caught in run(): methodToExecuteAsRunnable: " + methodToExecuteAsRunnable
+					+ ", authUserDTO_ToUseInRun: " + authUserDTO_ToUseInRun;
+			log.error( msg, t );
+			throw new RuntimeException( msg, t );
+		}
+	}
+
 	/**
 	 * @param id
 	 * @return
@@ -368,7 +403,7 @@ public class AuthUserDAO {
 	 * @param authUserId
 	 * @throws Exception
 	 */
-	public void updateLastLogin( int authUserId, String lastLoginIP ) throws Exception {
+	public void updateLastLogin( AuthUserDTO item ) throws Exception {
 		Connection dbConnection = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -378,12 +413,12 @@ public class AuthUserDAO {
 			pstmt = dbConnection.prepareStatement( sql );
 			int paramCounter = 0;
 			paramCounter++;
-			pstmt.setString( paramCounter, lastLoginIP );
+			pstmt.setString( paramCounter, item.getLastLoginIP() );
 			paramCounter++;
-			pstmt.setInt( paramCounter, authUserId );
+			pstmt.setInt( paramCounter, item.getId() );
 			pstmt.executeUpdate();
 		} catch ( Exception e ) {
-			log.error( "ERROR: userId: " + authUserId + ", sql: " + sql, e );
+			log.error( "ERROR: userId: " + item.getId() + ", sql: " + sql, e );
 			throw e;
 		} finally {
 			// be sure database handles are closed
@@ -400,5 +435,17 @@ public class AuthUserDAO {
 				dbConnection = null;
 			}
 		}
+	}
+	public AuthUserDTO getAuthUserDTO_ToUseInRun() {
+		return authUserDTO_ToUseInRun;
+	}
+	public void setAuthUserDTO_ToUseInRun(AuthUserDTO authUserDTO_ToUseInRun) {
+		this.authUserDTO_ToUseInRun = authUserDTO_ToUseInRun;
+	}
+	public MethodToExecuteAsRunnable getMethodToExecuteAsRunnable() {
+		return methodToExecuteAsRunnable;
+	}
+	public void setMethodToExecuteAsRunnable(MethodToExecuteAsRunnable methodToExecuteAsRunnable) {
+		this.methodToExecuteAsRunnable = methodToExecuteAsRunnable;
 	}
 }

@@ -27,7 +27,10 @@ import org.yeastrc.xlink.www.dto.ZzUserDataMirrorDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappConfigException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.terms_of_service.GetTermsOfServiceTextForDisplay;
+import org.yeastrc.xlink.www.async_action_via_executor_service.AsyncActionViaExecutorService;
+import org.yeastrc.xlink.www.async_action_via_executor_service.AsyncItemToRun;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
+import org.yeastrc.xlink.www.constants.AsyncItemToRunPriorityConstants;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.UserSignupConstants;
@@ -276,7 +279,6 @@ public class LoginService {
 					}
 				}
 			}
-			AuthUserDAO.getInstance().updateLastLogin( proxlAuthUserId, request.getRemoteAddr() );
 			XLinkUserDTO userDatabaseRecord = new XLinkUserDTO();
 			AuthUserDTO authUserDTO = new AuthUserDTO();
 			userDatabaseRecord.setAuthUser(authUserDTO);
@@ -287,6 +289,16 @@ public class LoginService {
 			authUserDTO.setUserAccessLevel( userAccessLevel );
 			authUserDTO.setEnabledAppSpecific(true);
 			authUserDTO.setEnabledUserMgmtGlobalLevel(true);
+			authUserDTO.setLastLoginIP( request.getRemoteAddr() );
+
+			//  Update last login, using Async executor
+			AuthUserDAO authUserDAO = AuthUserDAO.getNewInstance();
+			authUserDAO.setAuthUserDTO_ToUseInRun( authUserDTO );
+			authUserDAO.setMethodToExecuteAsRunnable( AuthUserDAO.MethodToExecuteAsRunnable.UPDATE_LAST_LOGIN );
+			AsyncItemToRun asyncItemToRun = 
+					AsyncItemToRun.getInstance( authUserDAO, AsyncItemToRunPriorityConstants.PRIORITY_AUTH_USER_UPDATE_LAST_LOGIN_IP );
+			AsyncActionViaExecutorService.getInstance().addAsyncItemToRunToQueue( asyncItemToRun );
+			
 			userDatabaseRecord.setFirstName( userMgmtGetUserDataResponse.getFirstName() );
 			userDatabaseRecord.setLastName( userMgmtGetUserDataResponse.getLastName() );
 			userDatabaseRecord.setOrganization( userMgmtGetUserDataResponse.getOrganization() );
@@ -298,6 +310,7 @@ public class LoginService {
 			session.setAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN, userSessionObject );
 			loginResult.setStatus(true);
 			return loginResult;
+			
 		} catch ( WebApplicationException e ) {
 			throw e; //  Data exception so just rethrow
 		} catch ( Exception e ) {
