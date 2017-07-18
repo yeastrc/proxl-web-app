@@ -29,6 +29,7 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.terms_of_service.GetTermsOfServiceTextForDisplay;
 import org.yeastrc.xlink.www.async_action_via_executor_service.AsyncActionViaExecutorService;
 import org.yeastrc.xlink.www.async_action_via_executor_service.AsyncItemToRun;
+import org.yeastrc.xlink.www.async_action_via_executor_service.AsyncItemToRunFactory;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.AsyncItemToRunPriorityConstants;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
@@ -296,7 +297,7 @@ public class LoginService {
 			authUserDAO.setAuthUserDTO_ToUseInRun( authUserDTO );
 			authUserDAO.setMethodToExecuteAsRunnable( AuthUserDAO.MethodToExecuteAsRunnable.UPDATE_LAST_LOGIN );
 			AsyncItemToRun asyncItemToRun = 
-					AsyncItemToRun.getInstance( authUserDAO, AsyncItemToRunPriorityConstants.PRIORITY_AUTH_USER_UPDATE_LAST_LOGIN_IP );
+					AsyncItemToRunFactory.createAsyncItemToRun( authUserDAO, AsyncItemToRunPriorityConstants.PRIORITY_AUTH_USER_UPDATE_LAST_LOGIN_IP );
 			AsyncActionViaExecutorService.getInstance().addAsyncItemToRunToQueue( asyncItemToRun );
 			
 			userDatabaseRecord.setFirstName( userMgmtGetUserDataResponse.getFirstName() );
