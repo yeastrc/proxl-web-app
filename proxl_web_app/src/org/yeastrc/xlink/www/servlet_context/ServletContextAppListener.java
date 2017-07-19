@@ -133,6 +133,12 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 			log.error( "CachedDataCentralRegistry.getInstance().writeToLogAllCacheSizes() threw exception while app undeploying.", e);
 		}
 		
+		try {
+			AsyncActionViaExecutorService.getInstance().shutdownNow();
+		} catch ( Exception e ) {
+			log.error( "In contextDestroyed(ServletContextEvent event), AsyncActionViaExecutorService.getInstance().shutdownNow();", e );
+		}
+		
 //		LastLoginUpdaterQueue.endProcessing();
 //		
 //		try {
