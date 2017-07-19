@@ -1699,8 +1699,16 @@ var ViewQCPageCode = function() {
 			}
 			
 			barColors.push( colorAndbarColor.color );
-
 		}
+		
+		var chartOptionsVAxisMaxValue = undefined;
+		
+		if ( maxYvalue === 0 ) {
+			//  If only value for v axis for bars is zero, the scale bars are from -1 to 1 which is wrong 
+			//  so set chartOptionsVAxisMaxValue = 1.
+			chartOptionsVAxisMaxValue = 1;
+		}
+		
 		
 //		var vAxisTicks = this._get___________TickMarks( { maxValue : maxYvalue } );
 
@@ -1724,7 +1732,7 @@ var ViewQCPageCode = function() {
 				vAxis: { title: 'Fraction', titleTextStyle: { color: 'black', fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
 					,baseline: 0     // always start at zero
 //					,ticks: vAxisTicks
-//					,maxValue : maxChargeCount
+					,maxValue : chartOptionsVAxisMaxValue
 				},
 				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
 //				width : 500, 
