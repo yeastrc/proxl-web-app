@@ -346,31 +346,59 @@
 			  
 	 		<table  id="PSM_PPM_Error_Vs_RetentionTime_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
 	 		</table>			  
-			 
-			
 			<%-- END PPM Error Vs Retention Time  --%>
 						
-
-
 			  <%--  PPM Error Vs M/Z --%>
-			
 			<h2>Error Vs M/Z</h2>
 			  
 	 		<table  id="PSM_PPM_Error_Vs_M_over_Z_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
 			</table>			  
-			 
 			<%-- END PPM Error Vs M/Z  --%>
-						
-			
-						
-			
+					
 			</div> <%-- close <div class="project-info-block  collapsable_jq" > --%>
 		  </div> <%-- close <div class="top-level-container collapsable_container_jq" > --%>
 
-		</div>   <%-- END: PSM level Statistics --%>
+		</div>   <%-- END: PSM Error Estimates --%>
+
+
+
+		<%--  Modification Stats --%>
+	
+		<div >
+
+		  <div class="top-level-container qc_top_level_container_jq" >
+			
+			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
+				<a id="modification_stats_collapse_link" href="javascript:" class="top-level-collapsable-link" 
+						style="display: none;"
+					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+				<a id="modification_stats_expand_link" href="javascript:" class="top-level-collapsable-link" 
+					><img  src="${ contextPath }/images/icon-expand.png"></a>
+			</div>
+			<div class="top-level-label">
+			  Modification Stats
+			</div>
+
+			<div class="top-level-label-bottom-border" ></div>
+								
+			<div id="modification_stats_display_block" class="project-info-block" style="display: none;"  >
+			
+			  <%--  PSM per Modification Counts  --%>
+			  
+			<h2>PSM per Modification</h2>
+			  
+	 		<table  id="PSM_Per_Modification_Counts_Block" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+			</table>			  
+			 
+			<%--  PSM per Modification Counts --%>
+								
+			</div> <%-- close <div class="project-info-block  collapsable_jq" > --%>
+		  </div> <%-- close <div class="top-level-container collapsable_container_jq" > --%>
+
+		</div>   <%-- END: Modification Stats --%>
+
 
 		<%--  Peptide level Statistics --%>
-	
 		<div >
 
 		  <div class="top-level-container qc_top_level_container_jq" >
