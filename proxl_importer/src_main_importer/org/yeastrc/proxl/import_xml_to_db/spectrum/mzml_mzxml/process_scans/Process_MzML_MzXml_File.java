@@ -373,12 +373,14 @@ public class Process_MzML_MzXml_File {
 			System.out.println( "Scan numbers loaded:" );
 		}
 		
-		int scanCounter = 0;
+		long scanCounter = 0;
 		
-//		int ms1ScanCounter = 0;
-		int ms2ScanCounter = 0;
+		long ms1_ScanCounter = 0;
+		long ms2_ScanCounter = 0;
 		
-		
+		//  Object for accumulating Scan info/statistics for saving in DB
+		AccumScanFileStatistics accumScanFileStatistics = AccumScanFileStatistics.getInstance();
+	
 		try {
 
 			MzML_MzXmlScan scanIn = null;
@@ -404,32 +406,30 @@ public class Process_MzML_MzXml_File {
     			BigDecimal retentionTime = 
     					RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( scanIn.getRetentionTime() );
     			
-    			
-    			
     			//  Save every scan to table scan_retention_time
-    			
     			ScanRetentionTimeDTO scanRetentionTimeDTO = new ScanRetentionTimeDTO();
-    			
     			scanRetentionTimeDTO.setScanFileId( scanFileId );
     			scanRetentionTimeDTO.setScanNumber( scanIn.getStartScanNum() );
     			scanRetentionTimeDTO.setScanLevel( scanIn.getMsLevel() );
     			scanRetentionTimeDTO.setPrecursorScanNumber( scanIn.getPrecursorScanNum() );
     			scanRetentionTimeDTO.setRetentionTime( retentionTime );
-    			
-    			
     			ScanRetentionTimeDAO.save( scanRetentionTimeDTO );
     			
-				
+    			//  Sum up intensities
+                if(scanIn.getMsLevel() == 1)  {
+                	ms1_ScanCounter++;
+                } else {
+                	ms2_ScanCounter++;
+                }
+                
+                accumScanFileStatistics.processScanForAccum( scanIn );
+    			
                 if(scanIn.getMsLevel() == 1)  {
                 	
-//                	ms1ScanCounter++;
-
                 }
                 else {
                 	
-                	ms2ScanCounter++;
-
-                	//  Only save MS2
+                	//  Only save MS2 (also save associated MS1 scan which is the previous MS1 scan)
                 	
                 	//  Determine if load this scan
                 	
@@ -575,24 +575,31 @@ public class Process_MzML_MzXml_File {
 			
 		}
 		
-		
-		
 		if ( log.isInfoEnabled() ) {
 			log.info( "Done processing the MzML or MzXml scan file: " + scanFileWithPath.getAbsolutePath() );
 
 			log.info( "Number of scans (ms1, ms2, ?) read: " 
 					+ numberFormatInsertedScansCounter.format( scanCounter ) );
 
+			log.info( "Number of ms1 scans read: "  
+					+ numberFormatInsertedScansCounter.format( ms1_ScanCounter ) );
 			log.info( "Number of ms2 scans read: "  
-					+ numberFormatInsertedScansCounter.format( ms2ScanCounter ) );
+					+ numberFormatInsertedScansCounter.format( ms2_ScanCounter ) );
 
-			log.info( "Number of ms2 scans (also ms1 scans being inserted) inserted: "  
+			log.info( "for all ms1 scans: Intensities Summed: "  
+					+ numberFormatInsertedScansCounter.format( accumScanFileStatistics.getMs1_ScanIntensitiesSummed() ) );
+			log.info( "for all ms2 scans: Intensities Summed: "  
+					+ numberFormatInsertedScansCounter.format( accumScanFileStatistics.getMs2_ScanIntensitiesSummed() ) );
+
+			log.info( "Number of ms2 scans inserted (also ms1 scans being inserted) : "  
 					+ numberFormatInsertedScansCounter.format( insertedScansCounter ) );
 		}
-
+		
+		SaveScanFileStatisticsToDB.getInstance().saveScanFileStatisticsToDB( accumScanFileStatistics, scanFileId, scanFileDTO.getFilename() );
+		
 		return mapOfScanNumbersToScanIds;
 	}
 	
-	
+
 
 }

@@ -2601,6 +2601,12 @@ body.project-page .delete-alignment-overlay-containing-outer-div, body.project-p
 body.project-page .delete-alignment-overlay-container { left: -200px;  }
 
 
+/* ************************************ */
+
+/*    QC Page  */
+
+  /* charts and other data blocks */
+body.view-qc-page .qc-data-block { width: 500px; height: 300px; }
 
 /* ************************************ */
 

@@ -1,14 +1,26 @@
+
+--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+--  WARNING:  When regenerate this content:
+
+    --  Copy this block to a text editor first so it can be put back since "replace all" will change this block as well
+
+	-- remove '`' with search all
+	-- remove 'IF NOT EXISTS' with search all
+
+	-- remove 'USE proxl;' before TRIGGER
+	-- remove 'USE proxl$$' around 'TRIGGER'
+	-- remove 'proxl.' in 'TRIGGER'
+
+
+--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 -- MySQL Workbench Forward Engineering
 
---  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
---  WARNING:  When regenerate this content, remove 'proxl' around 'TRIGGER'
-
---  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
--- SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
--- SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
--- SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 -- -----------------------------------------------------
 -- Schema proxl
@@ -1307,7 +1319,7 @@ CREATE TABLE  unified_rp__search__rep_pept__generic_lookup (
   psm_num_at_default_cutoff INT(10) UNSIGNED NOT NULL,
   peptide_meets_default_cutoffs ENUM('yes','no','not_applicable') NOT NULL,
   related_peptides_unique_for_search TINYINT(1) NOT NULL DEFAULT 0,
-  num_unique_psm_at_default_cutoff INT(10) UNSIGNED NULL,
+  num_unique_psm_at_default_cutoff INT(10) UNSIGNED NULL COMMENT 'Allow num_unique_psm_at_default_cutoff since don\'t have value at record insert.',
   PRIMARY KEY (search_id, reported_peptide_id),
   CONSTRAINT unified_rp__search__rep_pept__gnrc_lkp_reported_peptide_id_fk
     FOREIGN KEY (reported_peptide_id)
@@ -2146,17 +2158,120 @@ ENGINE = InnoDB;
 CREATE INDEX default_page_view_prev_search_id_fk_idx ON default_page_view_generic_prev (project_search_id ASC);
 
 
--- SET SQL_MODE=@OLD_SQL_MODE;
--- SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
--- SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+-- -----------------------------------------------------
+-- Table scan_file_statistics
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS scan_file_statistics ;
+
+CREATE TABLE  scan_file_statistics (
+  scan_file_id INT UNSIGNED NOT NULL,
+  ms1_scan_count BIGINT UNSIGNED NOT NULL,
+  ms1_scan_intensities_summed DOUBLE NOT NULL,
+  ms2_scan_count BIGINT UNSIGNED NOT NULL,
+  ms2_scan_intensities_summed DOUBLE NOT NULL,
+  only_for_on_duplicate_update TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (scan_file_id),
+  CONSTRAINT fk_scan_file_statistics_scan_file_id
+    FOREIGN KEY (scan_file_id)
+    REFERENCES scan_file (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
 
 
--- Remove all references to 'proxl' in TRIGGER 
+-- -----------------------------------------------------
+-- Table scan_file_ms1_intensity_binned_summed_data
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS scan_file_ms1_intensity_binned_summed_data ;
 
---  Remove all 'USE proxl$$' 
---  Remove 'proxl.' on line starting with 'CREATE DEFINER ='
+CREATE TABLE  scan_file_ms1_intensity_binned_summed_data (
+  scan_file_id INT UNSIGNED NOT NULL,
+  binned_summed_data_json_gzipped LONGBLOB NOT NULL,
+  PRIMARY KEY (scan_file_id),
+  CONSTRAINT fk_scan_file_ms1_intenbnsmdata_scan_file_id
+    FOREIGN KEY (scan_file_id)
+    REFERENCES scan_file (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
 
--- USE proxl;
+
+-- -----------------------------------------------------
+-- Table scan_file_ms1_intensity_binned_summed_summary
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS scan_file_ms1_intensity_binned_summed_summary ;
+
+CREATE TABLE  scan_file_ms1_intensity_binned_summed_summary (
+  scan_file_id INT UNSIGNED NOT NULL,
+  retention_time_max_bin_minus_min_bin_plus_1 BIGINT NOT NULL,
+  mz_max_bin_minus_min_bin_plus_1 BIGINT NOT NULL,
+  intensity_max_minus_min DOUBLE NOT NULL,
+  PRIMARY KEY (scan_file_id),
+  CONSTRAINT fk_scan_file_ms1_intenbnsmsm_scan_file_id
+    FOREIGN KEY (scan_file_id)
+    REFERENCES scan_file (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table scan_file_ms1_intensity_binned_summed_summary_data
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS scan_file_ms1_intensity_binned_summed_summary_data ;
+
+CREATE TABLE  scan_file_ms1_intensity_binned_summed_summary_data (
+  scan_file_id INT UNSIGNED NOT NULL,
+  binned_summed_summary_data_json MEDIUMBLOB NOT NULL,
+  PRIMARY KEY (scan_file_id),
+  CONSTRAINT fk_scan_file_ms1_intenbnsmsmdt_scan_file_id
+    FOREIGN KEY (scan_file_id)
+    REFERENCES scan_file (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table scan_file_ms_1_per_scan_data_num_tic_rt
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS scan_file_ms_1_per_scan_data_num_tic_rt ;
+
+CREATE TABLE  scan_file_ms_1_per_scan_data_num_tic_rt (
+  scan_file_id INT UNSIGNED NOT NULL,
+  data_json_gzipped MEDIUMBLOB NOT NULL,
+  PRIMARY KEY (scan_file_id),
+  CONSTRAINT fk_scan_file_ms_1_per_scan_data_num_tic_rt
+    FOREIGN KEY (scan_file_id)
+    REFERENCES scan_file (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+COMMENT = 'For MS1 scans, store the scan number (sn), total ion current (tic), and retention time (rt) \nas JSON blob compressed with gzip';
+
+
+-- -----------------------------------------------------
+-- Table scan_file_ms_2_per_scan_data_num_tic_rt
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS scan_file_ms_2_per_scan_data_num_tic_rt ;
+
+CREATE TABLE  scan_file_ms_2_per_scan_data_num_tic_rt (
+  scan_file_id INT UNSIGNED NOT NULL,
+  data_json_gzipped MEDIUMBLOB NOT NULL,
+  PRIMARY KEY (scan_file_id),
+  CONSTRAINT fk_scan_file_ms_2_per_scan_data_num_tic_rt
+    FOREIGN KEY (scan_file_id)
+    REFERENCES scan_file (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+COMMENT = 'For MS2 scans, store the scan number (sn), total ion current (tic), and retention time (rt), assoc ms1 scan number (sn1)\nas JSON blob compressed with gzip';
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 DELIMITER $$
 

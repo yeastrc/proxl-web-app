@@ -2,13 +2,11 @@ package org.yeastrc.xlink.www.webservices;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-//import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -17,39 +15,45 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.ScanFileDAO;
-import org.yeastrc.xlink.dto.ScanFileDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.ScanFileIdsForSearchSearcher;
+import org.yeastrc.xlink.www.searcher.SearchIdScanFileIdCombinedRecordExistsSearcher;
+import org.yeastrc.xlink.dao.ScanFileMS_1_IntensityBinnedSummedDataDAO;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
-@Path("/utils")
-public class ScanFilesForProjectSearchIdService {
+@Path("/qc/dataPage")
+public class QC_Scan_MS_1_IonCurrent_HeatmapHasData_Service {
 	
-	private static final Logger log = Logger.getLogger(ScanFilesForProjectSearchIdService.class);
+	private static final Logger log = Logger.getLogger(QC_Scan_MS_1_IonCurrent_HeatmapHasData_Service.class);
 	
-	/**
-	 * @param projectSearchId
-	 * @param request
-	 * @return
-	 * @throws Exception
-	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/getScanFilesForProjectSearchId") 
-	public List<ScanFileDTO> getScanFilesForProjectSearchId( 
-			@QueryParam( "projectSearchId" ) List<Integer> projectSearchIdList,
+	@Path("/getScan_MS_1_IonCurrent_HeatmapHasData") 
+	public QC_Scan_MS_1_IonCurrent_HeatmapHasData_WebserviceResult getMS_1_IonCurrent_HeatmapHasData( 
+			@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
+			@QueryParam( "scan_file_id" ) Integer scanFileId,
 			@Context HttpServletRequest request )
 	throws Exception {
 
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
-			String msg = "Provided projectSearchId List is null or empty";
-			log.error( msg );
+			String msg = "Provided project_search_id is null or project_search_id is missing";
+			log.warn( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	        .entity( msg )
+		    	        .build()
+		    	        );
+		}
+
+		if ( scanFileId == null ) {
+			String msg = "Provided scan_file_id is null";
+			log.warn( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
@@ -60,16 +64,20 @@ public class ScanFilesForProjectSearchIdService {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			//   Get the project id for this search
-			//   Get the project id for this search
+			//   Get the project id for these searches
 			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
-			projectSearchIdsSet.addAll( projectSearchIdList );
-			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
-			if ( projectIdsFromSearchIds.isEmpty() ) {
+			for ( int projectSearchId : projectSearchIdList ) {
+				projectSearchIdsSet.add( projectSearchId );
+			}
+			List<Integer> projectSearchIdsListDeduppedSorted = new ArrayList<>( projectSearchIdsSet );
+			Collections.sort( projectSearchIdsListDeduppedSorted );
+
+			List<Integer> projectIdsFromProjectSearchIds = 
+					ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
+			if ( projectIdsFromProjectSearchIds.isEmpty() ) {
 				// should never happen
-				String msg = "No project ids for projectSearchIdList: ";
-				for ( int projectSearchId : projectSearchIdList ) {
-					msg += projectSearchId + ", ";
-				}				
+				@SuppressWarnings("unchecked")
+				String msg = "No project ids for project search ids: " + StringUtils.join( projectSearchIdList );
 				log.error( msg );
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
@@ -77,7 +85,7 @@ public class ScanFilesForProjectSearchIdService {
 						.build()
 						);
 			}
-			if ( projectIdsFromSearchIds.size() > 1 ) {
+			if ( projectIdsFromProjectSearchIds.size() > 1 ) {
 				//  Invalid request, searches across projects
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_ACROSS_PROJECTS_STATUS_CODE )  //  Send HTTP code
@@ -85,7 +93,7 @@ public class ScanFilesForProjectSearchIdService {
 						.build()
 						);
 			}
-			int projectId = projectIdsFromSearchIds.get( 0 );
+			int projectId = projectIdsFromProjectSearchIds.get( 0 );
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 //			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
@@ -100,18 +108,20 @@ public class ScanFilesForProjectSearchIdService {
 			//  Test access to the project id
 			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
-				//  No Access Allowed for this project id
+				//  No Access Allowed for this search id
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
 						.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
 						.build()
 						);
 			}
-
+			
 			////////   Auth complete
 			//////////////////////////////////////////
 			
-			Set<Integer> scanFileIdsForSearchIds = new HashSet<>();
+			//  Confirm the scan file id is in one of the project search ids
+			
+			boolean scanPsmRecordFoundForScanFileIdProjectSearchId = false;
 			
 			for ( Integer projectSearchId : projectSearchIdList ) {
 				Integer searchId =
@@ -125,21 +135,37 @@ public class ScanFilesForProjectSearchIdService {
 							.build()
 							);
 				}
-				List<Integer> scanFileIdsForSearchId = ScanFileIdsForSearchSearcher.getInstance().getScanFileIdsForSearchId( searchId );
-				scanFileIdsForSearchIds.addAll( scanFileIdsForSearchId );
-			}
-			List<ScanFileDTO> scanFiles = new ArrayList<>();
-			ScanFileDAO scanFileDAO = ScanFileDAO.getInstance();
-			for ( int scanFileId : scanFileIdsForSearchIds ) {
-				ScanFileDTO scanFile = scanFileDAO.getScanFileDTOById( scanFileId );
-				scanFiles.add( scanFile );
-			}
-			Collections.sort( scanFiles, new Comparator<ScanFileDTO>() {
-				public int compare( ScanFileDTO r1, ScanFileDTO r2 ) {
-					return r1.getFilename().compareTo( r2.getFilename() );
+
+				if ( SearchIdScanFileIdCombinedRecordExistsSearcher.getInstance()
+						.recordExistsForSearchIdScanFileIdCombined( searchId, scanFileId ) ) {
+					scanPsmRecordFoundForScanFileIdProjectSearchId = true;
+					break;
 				}
-			});
-			return scanFiles;
+			}
+			
+			if ( ! scanPsmRecordFoundForScanFileIdProjectSearchId ) {
+				@SuppressWarnings("unchecked")
+				String msg = "Provided scan_file_id not for for any provided project search ids.  "
+						+ "scan_file_id: " + scanFileId + ", projectSearchIds: " + StringUtils.join( projectSearchIdList );
+				log.warn( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	        .entity( msg )
+			    	        .build()
+			    	        );
+			}
+			
+			Integer scanFileIdFromDB = 
+					ScanFileMS_1_IntensityBinnedSummedDataDAO.getScanFileIdFromScanFileId( scanFileId );
+
+			QC_Scan_MS_1_IonCurrent_HeatmapHasData_WebserviceResult webserviceResult = new QC_Scan_MS_1_IonCurrent_HeatmapHasData_WebserviceResult();
+			
+			if ( scanFileIdFromDB != null ) {
+				webserviceResult.hasData = true;
+			}
+			
+			return webserviceResult;
+			
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
@@ -151,5 +177,23 @@ public class ScanFilesForProjectSearchIdService {
 					.build()
 					);
 		}
+	}
+	
+	/**
+	 * Webservice returned object
+	 *
+	 */
+	public static class QC_Scan_MS_1_IonCurrent_HeatmapHasData_WebserviceResult {
+
+		private boolean hasData;
+
+		public boolean isHasData() {
+			return hasData;
+		}
+
+		public void setHasData(boolean hasData) {
+			this.hasData = hasData;
+		}
+		
 	}
 }
