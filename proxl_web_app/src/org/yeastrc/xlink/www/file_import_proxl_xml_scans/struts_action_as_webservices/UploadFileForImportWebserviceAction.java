@@ -47,6 +47,25 @@ public class UploadFileForImportWebserviceAction extends Action {
 
 	private static Logger log = Logger.getLogger( UploadFileForImportWebserviceAction.class );
 	
+	//  Keep all these Strings in sync with the class SendToServerConstants in subdir proxl_submit_import
+	
+	public static final String UPLOAD_FILE_QUERY_PARAMETER_UPLOAD_KEY = "upload_key";
+	public static final String UPLOAD_FILE_QUERY_PARAMETER_PROJECT_ID = "project_id";
+	public static final String UPLOAD_FILE_QUERY_PARAMETER_FILE_INDEX = "file_index";
+	public static final String UPLOAD_FILE_QUERY_PARAMETER_FILE_TYPE = "file_type";
+	public static final String UPLOAD_FILE_QUERY_PARAMETER_FILENAME = "filename";
+	
+	/**
+	 * Form name for uploaded file on submitting machine ( Java Canonical Path )
+	 */
+	public static final String UPLOAD_FILE_FORM_NAME_UPLOADED_FILENAME_W_PATH_CANONICAL = 
+			"canonicalFilename_W_Path_OnSubmitMachine";
+	/**
+	 * Form name for uploaded file on submitting machine ( Java Absolute Path )
+	 */
+	public static final String UPLOAD_FILE_FORM_NAME_UPLOADED_FILENAME_W_PATH_ABSOLUTE = 
+			"absoluteFilename_W_Path_OnSubmitMachine";
+	
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
@@ -59,6 +78,8 @@ public class UploadFileForImportWebserviceAction extends Action {
 		File uploadFileTempSubDirForThisRequestFileObj = null;
 		File uploadedFileOnDisk = null;
 		ProxlXMLFileImportFileType fileType = null;
+		String canonicalFilename_W_Path_OnSubmitMachine = null;
+		String absoluteFilename_W_Path_OnSubmitMachine = null;
 		int fileIndex = -1;
 		int projectId = -1;
 		long uploadKey = -1;
@@ -66,11 +87,13 @@ public class UploadFileForImportWebserviceAction extends Action {
 		String maxFileSizeFormatted = null;
 		try {
 //			String requestURL = request.getRequestURL().toString();
-			String uploadedFilename = request.getParameter( "filename" );
-			String fileIndexString = request.getParameter( "file_index" );
-			String fileTypeString = request.getParameter( "file_type" );
-			String projectIdString = request.getParameter( "project_id" );
-			String uploadKeyString = request.getParameter( "upload_key" );
+			
+			String uploadedFilename = request.getParameter( UPLOAD_FILE_QUERY_PARAMETER_FILENAME );
+			String fileIndexString = request.getParameter( UPLOAD_FILE_QUERY_PARAMETER_FILE_INDEX );
+			String fileTypeString = request.getParameter( UPLOAD_FILE_QUERY_PARAMETER_FILE_TYPE );
+			String projectIdString = request.getParameter( UPLOAD_FILE_QUERY_PARAMETER_PROJECT_ID );
+			String uploadKeyString = request.getParameter( UPLOAD_FILE_QUERY_PARAMETER_UPLOAD_KEY );
+			
 			if ( StringUtils.isEmpty( uploadedFilename ) ) {
 				log.error( "'filename' query parameter is not sent or is empty" );
 				response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
@@ -97,14 +120,14 @@ public class UploadFileForImportWebserviceAction extends Action {
 			try {
 				fileTypeInt = Integer.parseInt( fileTypeString );
 			} catch (Exception e ) {
-				log.error( "'file_type' query parameter is not a valid value: " + projectIdString );
+				log.error( "'file_type' query parameter is not a valid value: " + fileTypeString );
 				response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
 				throw new FailResponseSentException();
 			}
 			try {
 				fileType = ProxlXMLFileImportFileType.fromValue( fileTypeInt );
 			} catch (Exception e ) {
-				log.error( "'file_type' query parameter is not a valid value: " + projectIdString );
+				log.error( "'file_type' query parameter is not a valid value: " + fileTypeString );
 				response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
 				throw new FailResponseSentException();
 			}
@@ -333,15 +356,31 @@ public class UploadFileForImportWebserviceAction extends Action {
 			log.info( "fileItemListFromServletFileUpload size " + fileItemListFromServletFileUpload.size() );
 			for ( FileItem fileItem : fileItemListFromServletFileUpload ) {
 			    if ( fileItem.isFormField() ) {
-			    	//  No form fields since all non-file upload data is passed as query string parameters
 			    	//  form field that is not a file upload
-//			    	String fieldName = item.getFieldName();
-//			    	String fieldValue = item.getString();
-//			    	
-//			    	if ( "XXXXXX".equals( fieldName) ) {
-//			    		
-//			    		aFormFieldValue = fieldValue;
-//			    	}
+			    	String fieldName = fileItem.getFieldName();
+			    	String fieldValue = fileItem.getString();
+
+			    	if ( UPLOAD_FILE_FORM_NAME_UPLOADED_FILENAME_W_PATH_CANONICAL.equals( fieldName) ) {
+			    		
+			    		canonicalFilename_W_Path_OnSubmitMachine = fieldValue;
+
+			    	} else if ( UPLOAD_FILE_FORM_NAME_UPLOADED_FILENAME_W_PATH_ABSOLUTE.equals( fieldName) ) {
+				    		
+				    		absoluteFilename_W_Path_OnSubmitMachine = fieldValue;
+			    	} else {
+						log.error( "Form Field in request not accepted: " + fieldName );
+						response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
+						JSON_Servlet_Response_Object importFileServletResponse = new JSON_Servlet_Response_Object();
+						importFileServletResponse.setStatusSuccess(false);
+						importFileServletResponse.setMoreThanOneuploadedFile(true);;
+						OutputStream responseOutputStream = response.getOutputStream();
+						// send the JSON response 
+						ObjectMapper mapper = new ObjectMapper();  //  Jackson JSON library object
+						mapper.writeValue( responseOutputStream, importFileServletResponse ); // where first param can be File, OutputStream or Writer
+						responseOutputStream.flush();
+						responseOutputStream.close();
+						throw new FailResponseSentException();
+			    	}
 			    } else {
 					String fieldName = fileItem.getFieldName();
 					//  Only allow the expected field name
@@ -513,6 +552,8 @@ public class UploadFileForImportWebserviceAction extends Action {
 			proxlUploadTempDataFileContents.setFileIndex( fileIndex );
 			proxlUploadTempDataFileContents.setFileType( fileType );
 			proxlUploadTempDataFileContents.setSearchNameInProxlXMLFile( searchNameInProxlXMLFile );
+			proxlUploadTempDataFileContents.setCanonicalFilename_W_Path_OnSubmitMachine( canonicalFilename_W_Path_OnSubmitMachine );
+			proxlUploadTempDataFileContents.setAbsoluteFilename_W_Path_OnSubmitMachine( absoluteFilename_W_Path_OnSubmitMachine );
 			//  Marshal (write) the object to the file
 			JAXBContext jaxbContext = JAXBContext.newInstance( ProxlUploadTempDataFileContents.class );
 			Marshaller marshaller = jaxbContext.createMarshaller();

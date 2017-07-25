@@ -5,13 +5,22 @@ package org.yeastrc.xlink.dto;
  *
  */
 public class ScanFileDTO {
+	
+	public static final long FILE_SIZE_NOT_SET = -1;
 
 	private int id;
 
 	private String filename;
 	private String path;
 	private String sha1sum;
-
+	private long fileSize = FILE_SIZE_NOT_SET;
+	
+	@Override
+	public String toString() {
+		return "ScanFileDTO [id=" + id + ", filename=" + filename + ", path=" + path + ", sha1sum=" + sha1sum
+				+ ", fileSize=" + fileSize + "]";
+	}
+	
 	public String getSha1sum() {
 		return sha1sum;
 	}
@@ -36,16 +45,11 @@ public class ScanFileDTO {
 	public void setPath(String path) {
 		this.path = path;
 	}
-	@Override
-	public String toString() {
-		return "ScanFileDTO [filename=" + filename + ", id=" + id + ", path="
-				+ path + "]";
+	public long getFileSize() {
+		return fileSize;
 	}
-
-//	CREATE TABLE scan_file (
-//			  id int(10) unsigned NOT NULL AUTO_INCREMENT,
-//			  filename varchar(255) NOT NULL,
-//			  path varchar(2000) DEFAULT NULL,
-//			  sha1sum varchar(255) DEFAULT NULL,
+	public void setFileSize(long fileSize) {
+		this.fileSize = fileSize;
+	}
 
 }

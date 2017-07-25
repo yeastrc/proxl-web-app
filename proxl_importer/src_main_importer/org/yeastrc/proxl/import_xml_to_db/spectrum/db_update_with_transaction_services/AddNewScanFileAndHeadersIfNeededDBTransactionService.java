@@ -8,9 +8,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.dao.ScanFileHeaderDAO;
+import org.yeastrc.xlink.dao.ScanFileSourceDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.ScanFileDTO;
 import org.yeastrc.xlink.dto.ScanFileHeaderDTO;
+import org.yeastrc.xlink.dto.ScanFileSourceDTO;
 
 /**
  * Service for adding a new Scan file and Scan file header data as a single DB transaction
@@ -23,56 +25,49 @@ public class AddNewScanFileAndHeadersIfNeededDBTransactionService {
 	AddNewScanFileAndHeadersIfNeededDBTransactionService() { }
 	private static AddNewScanFileAndHeadersIfNeededDBTransactionService _INSTANCE = new AddNewScanFileAndHeadersIfNeededDBTransactionService();
 	public static AddNewScanFileAndHeadersIfNeededDBTransactionService getInstance() { return _INSTANCE; }
-	
-	
 
 	/**
 	 * Inserts the scan file and headers records if needed, otherwise updates scanFileDTO.id with the id from the database
 	 * 
 	 * @param scanFileDTO
+	 * @param scanFileSourceDTO
 	 * @param scanFileHeaderDTOList
 	 * @return true if added record, otherwise false
 	 * @throws Exception
 	 */
-	public boolean addNewScanFileAndHeadersDBTransactionService( ScanFileDTO scanFileDTO, List<ScanFileHeaderDTO> scanFileHeaderDTOList  ) throws Exception {
-		
+	public boolean addNewScanFileAndHeadersDBTransactionService( 
+			ScanFileDTO scanFileDTO, 
+			ScanFileSourceDTO scanFileSourceDTO, 
+			List<ScanFileHeaderDTO> scanFileHeaderDTOList  ) throws Exception {
 		
 		boolean insertedNewScanFileDTO = false;
 
 		Connection dbConnection = null;
 		
-		
 		ScanFileDAO scanFileDAO = ScanFileDAO.getInstance();
 
-		ScanFileDTO scanFileDTOFromDB = null;
+		Integer scanFileIdFromDB = null;
 		
 		try {
 			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			dbConnection.setAutoCommit(false);
 			
 			lockRequiredTables( dbConnection );
-			
 
-			List<ScanFileDTO> scanFileDTOList = scanFileDAO.getScanFileDTOListByFilenameSha1Sum( scanFileDTO.getFilename(), scanFileDTO.getSha1sum(), dbConnection );
+			List<Integer> scanFileIdList = scanFileDAO.getScanFileIdListByFilenameSha1Sum( scanFileDTO.getFilename(), scanFileDTO.getSha1sum(), dbConnection );
 			
-			if ( scanFileDTOList.isEmpty() ) {
-
+			if ( scanFileIdList.isEmpty() ) {
 			
 			} else {
 				
-				if ( scanFileDTOList.size() > 1 ) {
-					
+				if ( scanFileIdList.size() > 1 ) {
 					//  More than one record in database for Filename and SHA1Sum combination, throw an exception 
-					
 					String msg = "More than one ScanFile record found for scanFileName: '" + scanFileDTO.getFilename() + "', SHA1Sum: '" + scanFileDTO.getSha1sum();
-					
 					log.error( msg );
-					
 					throw new Exception( msg );  // EARLY EXIT  throw exception
 				}
 				
 				if ( log.isInfoEnabled() ) {
-
 					log.info( "Importing MzMl or MzXml file.  The file:  " + scanFileDTO.getFilename()
 						+ " for path: " + scanFileDTO.getPath()
 						+ "  has already been loaded so processing to ensure all scans for this proxl xml file are loaded."  );
@@ -80,18 +75,17 @@ public class AddNewScanFileAndHeadersIfNeededDBTransactionService {
 				
 				//  Filename and SHA1Sum combination is in database, so use existing record
 				
-				scanFileDTOFromDB = scanFileDTOList.get( 0 );
-				
+				scanFileIdFromDB = scanFileIdList.get( 0 );
 			}
 			
 
-			if ( scanFileDTOFromDB != null ) {
+			if ( scanFileIdFromDB != null ) {
 				
 				//  Record found for filename and sha1sum
 				
 				//  Copy the id to the passed in scanFileDTO
 				
-				scanFileDTO.setId( scanFileDTOFromDB.getId() );
+				scanFileDTO.setId( scanFileIdFromDB );
 				
 			} else {
 				
@@ -99,23 +93,21 @@ public class AddNewScanFileAndHeadersIfNeededDBTransactionService {
 			
 				insertedNewScanFileDTO = true;
 				
-				
 				if ( log.isInfoEnabled() ) {
-					
 					log.info( "Adding to scan_file table, name: " + scanFileDTO.getFilename()
 							+ ", path: " + scanFileDTO.getPath() );
 				}
 
 				ScanFileDAO.getInstance().save( scanFileDTO, dbConnection );
+				
+				scanFileSourceDTO.setScanFileId( scanFileDTO.getId() );
+				ScanFileSourceDAO.save( scanFileSourceDTO, dbConnection );
 
 				for ( ScanFileHeaderDTO scanFileHeaderDTO : scanFileHeaderDTOList ) {
-
 					scanFileHeaderDTO.setScanFileId( scanFileDTO.getId() );
 					ScanFileHeaderDAO.save( scanFileHeaderDTO, dbConnection );
 				}
-
 			}
-			
 			
 			dbConnection.commit();
 			
@@ -150,18 +142,12 @@ public class AddNewScanFileAndHeadersIfNeededDBTransactionService {
 			throw e;
 			
 		} finally {
-			
 			try {
-
 				if( dbConnection != null ) {
 					unlockAllTable(dbConnection);
 				}
-				
-				
 			} finally {
-			
 				if( dbConnection != null ) {
-
 					try {
 						dbConnection.setAutoCommit(true);  /// reset for next user of connection
 					} catch (Exception ex) {
@@ -183,102 +169,58 @@ public class AddNewScanFileAndHeadersIfNeededDBTransactionService {
 		return insertedNewScanFileDTO;
 	}
 	
-
-	private static String lockTablesForWriteSQL = "LOCK TABLES scan_file WRITE, scan_file_header WRITE";
-
+	private static String lockTablesForWriteSQL = "LOCK TABLES scan_file WRITE, scan_file_source WRITE, scan_file_header WRITE";
 
 	/**
 	 * @param dbConnection
 	 * @throws Exception
 	 */
 	private void lockRequiredTables( Connection dbConnection ) throws Exception {
-		
-
 		PreparedStatement pstmt = null;
-
 		try {
-
 			pstmt = dbConnection.prepareStatement( lockTablesForWriteSQL );
-
 			pstmt.executeUpdate();
 
 		} catch (Exception sqlEx) {
-
 			log.error("lockRequiredTables: Exception '" + sqlEx.toString() + ".\nSQL = " + lockTablesForWriteSQL , sqlEx);
-
 			throw sqlEx;
-
 		} finally {
-
 			if (pstmt != null) {
-
 				try {
-
 					pstmt.close();
-
 				} catch (SQLException ex) {
-
 					// ignore
-
 				}
-
 			}
-
 		}
-		
-		
 	}
 	
-
-
 	private static String unlockAllTableSQL = "UNLOCK TABLES";
 
 	/**
-
 	 * Unlock All Tables
-
 	 * @throws Exception
-
 	 */
-
 	public void unlockAllTable( Connection connection ) throws Exception {
 
 		PreparedStatement pstmt = null;
-
 		try {
-
 			pstmt = connection.prepareStatement( unlockAllTableSQL );
 
 			pstmt.executeUpdate();
 
 		} catch (Exception sqlEx) {
-
 			log.error("unlockAllTable: Exception '" + sqlEx.toString() + ".\nSQL = " + unlockAllTableSQL , sqlEx);
-
 			throw sqlEx;
-
 		} finally {
-
 			if (pstmt != null) {
-
 				try {
-
 					pstmt.close();
-
 				} catch (SQLException ex) {
-
 					// ignore
-
 				}
-
 			}
-
-
 		}
-
 	}
-
-	
-	
 	
 }

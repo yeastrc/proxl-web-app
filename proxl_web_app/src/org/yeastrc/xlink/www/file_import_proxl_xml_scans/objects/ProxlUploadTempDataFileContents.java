@@ -14,6 +14,9 @@ public class ProxlUploadTempDataFileContents {
 	private String uploadedFilename;
 	private String savedToDiskFilename;
 
+	private String canonicalFilename_W_Path_OnSubmitMachine;
+	private String absoluteFilename_W_Path_OnSubmitMachine;
+	
 	private ProxlXMLFileImportFileType fileType;
 	private int fileIndex;
 	
@@ -50,4 +53,17 @@ public class ProxlUploadTempDataFileContents {
 	public void setSearchNameInProxlXMLFile(String searchNameInProxlXMLFile) {
 		this.searchNameInProxlXMLFile = searchNameInProxlXMLFile;
 	}
+	public String getCanonicalFilename_W_Path_OnSubmitMachine() {
+		return canonicalFilename_W_Path_OnSubmitMachine;
+	}
+	public void setCanonicalFilename_W_Path_OnSubmitMachine(String canonicalFilename_W_Path_OnSubmitMachine) {
+		this.canonicalFilename_W_Path_OnSubmitMachine = canonicalFilename_W_Path_OnSubmitMachine;
+	}
+	public String getAbsoluteFilename_W_Path_OnSubmitMachine() {
+		return absoluteFilename_W_Path_OnSubmitMachine;
+	}
+	public void setAbsoluteFilename_W_Path_OnSubmitMachine(String absoluteFilename_W_Path_OnSubmitMachine) {
+		this.absoluteFilename_W_Path_OnSubmitMachine = absoluteFilename_W_Path_OnSubmitMachine;
+	}
+
 }

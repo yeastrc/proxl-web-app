@@ -21,24 +21,22 @@ public class ProxlXMLFileImportTrackingSingleFileDTO {
 	
 	private String filenameOnDiskWithPathSubSameMachine;
 
+	private String canonicalFilename_W_Path_OnSubmitMachine;
+	private String absoluteFilename_W_Path_OnSubmitMachine;
 	
 	private String sha1Sum;
 	private Long fileSize;
 	
-	
 	@Override
 	public String toString() {
-		return "ProxlXMLFileImportTrackingSingleFileDTO [id=" + id
-				+ ", proxlXmlFileImportTrackingId="
-				+ proxlXmlFileImportTrackingId + ", fileType=" + fileType
-				+ ", fileUploadStatus=" + fileUploadStatus
-				+ ", filenameInUpload=" + filenameInUpload
-				+ ", filenameOnDisk=" + filenameOnDisk
-				+ ", filenameOnDiskWithPathSubSameMachine="
-				+ filenameOnDiskWithPathSubSameMachine + ", sha1Sum=" + sha1Sum
-				+ ", fileSize=" + fileSize + "]";
+		return "ProxlXMLFileImportTrackingSingleFileDTO [id=" + id + ", proxlXmlFileImportTrackingId="
+				+ proxlXmlFileImportTrackingId + ", fileType=" + fileType + ", fileUploadStatus=" + fileUploadStatus
+				+ ", filenameInUpload=" + filenameInUpload + ", filenameOnDisk=" + filenameOnDisk
+				+ ", filenameOnDiskWithPathSubSameMachine=" + filenameOnDiskWithPathSubSameMachine
+				+ ", canonicalFilename_W_Path_OnSubmitMachine=" + canonicalFilename_W_Path_OnSubmitMachine
+				+ ", absoluteFilename_W_Path_OnSubmitMachine=" + absoluteFilename_W_Path_OnSubmitMachine + ", sha1Sum="
+				+ sha1Sum + ", fileSize=" + fileSize + "]";
 	}
-
 	
 	public int getId() {
 		return id;
@@ -97,18 +95,24 @@ public class ProxlXMLFileImportTrackingSingleFileDTO {
 	public void setFileSize(Long fileSize) {
 		this.fileSize = fileSize;
 	}
-
-
-
 	public String getFilenameOnDiskWithPathSubSameMachine() {
 		return filenameOnDiskWithPathSubSameMachine;
 	}
-
-
-
 	public void setFilenameOnDiskWithPathSubSameMachine(
 			String filenameOnDiskWithPathSubSameMachine) {
 		this.filenameOnDiskWithPathSubSameMachine = filenameOnDiskWithPathSubSameMachine;
+	}
+	public String getCanonicalFilename_W_Path_OnSubmitMachine() {
+		return canonicalFilename_W_Path_OnSubmitMachine;
+	}
+	public void setCanonicalFilename_W_Path_OnSubmitMachine(String canonicalFilename_W_Path_OnSubmitMachine) {
+		this.canonicalFilename_W_Path_OnSubmitMachine = canonicalFilename_W_Path_OnSubmitMachine;
+	}
+	public String getAbsoluteFilename_W_Path_OnSubmitMachine() {
+		return absoluteFilename_W_Path_OnSubmitMachine;
+	}
+	public void setAbsoluteFilename_W_Path_OnSubmitMachine(String absoluteFilename_W_Path_OnSubmitMachine) {
+		this.absoluteFilename_W_Path_OnSubmitMachine = absoluteFilename_W_Path_OnSubmitMachine;
 	}
 
 

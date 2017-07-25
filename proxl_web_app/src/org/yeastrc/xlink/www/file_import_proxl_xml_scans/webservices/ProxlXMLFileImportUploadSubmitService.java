@@ -377,6 +377,8 @@ public class ProxlXMLFileImportUploadSubmitService {
 				proxlXMLFileImportTrackingSingleFileDTO.setFilenameOnDisk( proxlUploadTempDataFileContents.getSavedToDiskFilename() );
 				proxlXMLFileImportTrackingSingleFileDTO.setFileType( proxlUploadTempDataFileContents.getFileType() );
 				proxlXMLFileImportTrackingSingleFileDTO.setFileSize( proxlUploadTempDataFileContentsAndAssocData.fileLength );
+				proxlXMLFileImportTrackingSingleFileDTO.setCanonicalFilename_W_Path_OnSubmitMachine( proxlUploadTempDataFileContents.getCanonicalFilename_W_Path_OnSubmitMachine() );
+				proxlXMLFileImportTrackingSingleFileDTO.setAbsoluteFilename_W_Path_OnSubmitMachine( proxlUploadTempDataFileContents.getAbsoluteFilename_W_Path_OnSubmitMachine() );
 				proxlXMLFileImportTrackingSingleFileDTO.setFileUploadStatus( ProxlXMLImportSingleFileUploadStatus.FILE_UPLOAD_COMPLETE );
 				if ( proxlUploadTempDataFileContents.getFileType() == ProxlXMLFileImportFileType.PROXL_XML_FILE ) {
 					String searchNameFromProxlXMLFile = proxlUploadTempDataFileContents.getSearchNameInProxlXMLFile();

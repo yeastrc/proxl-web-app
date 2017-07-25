@@ -114,7 +114,7 @@ public class ProxlXMLFileImportTrackingSingleFileDAO {
 	 * @return
 	 * @throws SQLException
 	 */
-	public ProxlXMLFileImportTrackingSingleFileDTO populateResultObject(ResultSet rs) throws SQLException {
+	public ProxlXMLFileImportTrackingSingleFileDTO populateResultObject( ResultSet rs ) throws SQLException {
 		ProxlXMLFileImportTrackingSingleFileDTO returnItem = new ProxlXMLFileImportTrackingSingleFileDTO();
 		returnItem.setId( rs.getInt( "id" ) );
 		returnItem.setProxlXmlFileImportTrackingId( rs.getInt( "proxl_xml_file_import_tracking_id" ) );
@@ -122,6 +122,9 @@ public class ProxlXMLFileImportTrackingSingleFileDAO {
 		returnItem.setFilenameInUpload( rs.getString( "filename_in_upload" ) );
 		returnItem.setFilenameOnDisk( rs.getString( "filename_on_disk" ) );
 		returnItem.setFilenameOnDiskWithPathSubSameMachine( rs.getString( "filename_on_disk_with_path_sub_same_machine" ) );
+		returnItem.setCanonicalFilename_W_Path_OnSubmitMachine( rs.getString( "canonical_filename_w_path_on_submit_machine" ) );
+		returnItem.setAbsoluteFilename_W_Path_OnSubmitMachine( rs.getString( "absolute_filename_w_path_on_submit_machine" ) );
+		
 		return returnItem;
 	}
 }

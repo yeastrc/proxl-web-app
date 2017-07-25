@@ -25,7 +25,6 @@ import org.yeastrc.xlink.dao.StaticModDAO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.ScanDTO;
-import org.yeastrc.xlink.dto.ScanFileDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.xlink.dto.StaticModDTO;
 import org.yeastrc.xlink.utils.XLinkUtils;
@@ -48,6 +47,7 @@ import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+
 /**
  * 
  *
@@ -210,15 +210,15 @@ public class LorikeetSpectrumService {
 //			    	        );
 //        	}
         	///////////////////////
-        	ScanFileDTO scanFileDTO = null;
+        	String scanFilename = null;
 			try {
-				scanFileDTO = ScanFileDAO.getInstance().getScanFileDTOById( scanDTO.getScanFileId() );
+				scanFilename = ScanFileDAO.getInstance().getScanFilenameById( scanDTO.getScanFileId() );
 			} catch ( Exception e ) {
 				String msg = "Error retrieving scan_file for scanFileId: " + scanDTO.getScanFileId();
 				log.error( msg, e );
 				throw e;
 			}
-        	if ( scanFileDTO == null )  {
+        	if ( scanFilename == null )  {
 				String msg = "scan_file not found for scanFileId: " + scanDTO.getScanFileId();
 				log.error( msg);
 				//  TODO  Return something else instead
@@ -228,7 +228,7 @@ public class LorikeetSpectrumService {
 			    	        .build()
 			    	        );
         	}
-        	lorikeetRootData.setFileName( scanFileDTO.getFilename() );
+        	lorikeetRootData.setFileName( scanFilename );
 			lorikeetRootData.setPrecursorMz( scanDTO.getPreMZ() );
 	        String mzIntListAsString = scanDTO.getMzIntListAsString();
 	        List<Peak> peakList = StringToPeaks.peakStringToList( mzIntListAsString );

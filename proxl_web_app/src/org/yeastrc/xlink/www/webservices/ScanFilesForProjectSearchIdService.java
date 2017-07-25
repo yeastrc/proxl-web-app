@@ -19,7 +19,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dao.ScanFileDAO;
-import org.yeastrc.xlink.dto.ScanFileDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
@@ -42,7 +41,7 @@ public class ScanFilesForProjectSearchIdService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getScanFilesForProjectSearchId") 
-	public List<ScanFileDTO> getScanFilesForProjectSearchId( 
+	public List<WebserviceResultItem> getScanFilesForProjectSearchId( 
 			@QueryParam( "projectSearchId" ) List<Integer> projectSearchIdList,
 			@Context HttpServletRequest request )
 	throws Exception {
@@ -128,14 +127,19 @@ public class ScanFilesForProjectSearchIdService {
 				List<Integer> scanFileIdsForSearchId = ScanFileIdsForSearchSearcher.getInstance().getScanFileIdsForSearchId( searchId );
 				scanFileIdsForSearchIds.addAll( scanFileIdsForSearchId );
 			}
-			List<ScanFileDTO> scanFiles = new ArrayList<>();
+			List<WebserviceResultItem> scanFiles = new ArrayList<>();
 			ScanFileDAO scanFileDAO = ScanFileDAO.getInstance();
 			for ( int scanFileId : scanFileIdsForSearchIds ) {
-				ScanFileDTO scanFile = scanFileDAO.getScanFileDTOById( scanFileId );
-				scanFiles.add( scanFile );
+				String scanFilename = scanFileDAO.getScanFilenameById( scanFileId );
+				if ( scanFilename != null ) {
+					WebserviceResultItem webserviceResultItem = new WebserviceResultItem();
+					webserviceResultItem.setId( scanFileId );
+					webserviceResultItem.setFilename( scanFilename );
+					scanFiles.add( webserviceResultItem );
+				}
 			}
-			Collections.sort( scanFiles, new Comparator<ScanFileDTO>() {
-				public int compare( ScanFileDTO r1, ScanFileDTO r2 ) {
+			Collections.sort( scanFiles, new Comparator<WebserviceResultItem>() {
+				public int compare( WebserviceResultItem r1, WebserviceResultItem r2 ) {
 					return r1.getFilename().compareTo( r2.getFilename() );
 				}
 			});
@@ -150,6 +154,27 @@ public class ScanFilesForProjectSearchIdService {
 					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
 					.build()
 					);
+		}
+	}
+	
+	/**
+	 * 
+	 *
+	 */
+	public static class WebserviceResultItem {
+		private int id;
+		private String filename;
+		public int getId() {
+			return id;
+		}
+		public void setId(int id) {
+			this.id = id;
+		}
+		public String getFilename() {
+			return filename;
+		}
+		public void setFilename(String filename) {
+			this.filename = filename;
 		}
 	}
 }

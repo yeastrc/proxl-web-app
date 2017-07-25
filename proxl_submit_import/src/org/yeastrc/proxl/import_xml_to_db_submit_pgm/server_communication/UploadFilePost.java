@@ -10,9 +10,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.FormBodyPart;
+import org.apache.http.entity.mime.FormBodyPartBuilder;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.JSONStringCharsetConstants;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.SendToServerConstants;
@@ -57,16 +60,17 @@ public class UploadFilePost {
 		
 		String filename = uploadFile.getName();
 		
+		String uploadFileWPathCanonical = uploadFile.getCanonicalPath();
+		String uploadFileWPathAbsolute = uploadFile.getAbsolutePath();
+		
 		String filenameURIEncoded = URLEncoder.encode( filename, SendToServerConstants.ENCODING_CHARACTER_SET );
 		
 		String url = baseURL + SUB_URL
-				+ "upload_key=" +  uploadKey
-				+ "&project_id=" + projectIdString
-				+ "&file_index=" + fileIndex
-				+ "&file_type=" + fileType
-				+ "&filename=" + filenameURIEncoded;
-		
-		
+				+ SendToServerConstants.UPLOAD_FILE_QUERY_PARAMETER_UPLOAD_KEY + "=" +  uploadKey
+				+ "&" + SendToServerConstants.UPLOAD_FILE_QUERY_PARAMETER_PROJECT_ID + "=" + projectIdString
+				+ "&" + SendToServerConstants.UPLOAD_FILE_QUERY_PARAMETER_FILE_INDEX + "=" + fileIndex
+				+ "&" + SendToServerConstants.UPLOAD_FILE_QUERY_PARAMETER_FILE_TYPE + "=" + fileType
+				+ "&" + SendToServerConstants.UPLOAD_FILE_QUERY_PARAMETER_FILENAME + "=" + filenameURIEncoded;
 
 		HttpPost post = null;
 		HttpResponse response = null;
@@ -80,11 +84,43 @@ public class UploadFilePost {
 
 			post = new HttpPost( url );
 			
+			//
+			
 			FileBody fileBody = new FileBody( uploadFile, ContentType.DEFAULT_BINARY );
+
+			FormBodyPartBuilder formBodyPartBuilderForFile = 
+					FormBodyPartBuilder.create( SendToServerConstants.UPLOAD_FILE_FORM_NAME, fileBody );
+			FormBodyPart formBodyPartForFile = formBodyPartBuilderForFile.build(); 
+
+			//
+			
+			StringBody stringBodyFileWPathCanonical = 
+					new StringBody( uploadFileWPathCanonical, ContentType.APPLICATION_FORM_URLENCODED );
+			
+			FormBodyPartBuilder formBodyPartBuilderForFileWPathCanonical = 
+					FormBodyPartBuilder.
+					create( SendToServerConstants.UPLOAD_FILE_FORM_NAME_UPLOADED_FILENAME_W_PATH_CANONICAL, stringBodyFileWPathCanonical );
+			FormBodyPart formBodyPartForFileWPathCanonical = formBodyPartBuilderForFileWPathCanonical.build(); 
+			
+			//
+
+			StringBody stringBodyFileWPathAbsolute = 
+					new StringBody( uploadFileWPathAbsolute, ContentType.APPLICATION_FORM_URLENCODED );
+			
+			FormBodyPartBuilder formBodyPartBuilderForFileWPathAbsolute = 
+					FormBodyPartBuilder.
+					create( SendToServerConstants.UPLOAD_FILE_FORM_NAME_UPLOADED_FILENAME_W_PATH_ABSOLUTE, stringBodyFileWPathAbsolute );
+			FormBodyPart formBodyPartForFileWPathAbsolute = formBodyPartBuilderForFileWPathAbsolute.build(); 
+			
+			///////////
 			
 			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-			builder.addPart( SendToServerConstants.UPLOAD_FILE_FORM_NAME, fileBody);
+			
+			builder.addPart( formBodyPartForFile );
+			builder.addPart( formBodyPartForFileWPathCanonical );
+			builder.addPart( formBodyPartForFileWPathAbsolute );
+			
 			HttpEntity httpEntity = builder.build();
 			
 			post.setEntity( httpEntity );
@@ -158,7 +194,7 @@ public class UploadFilePost {
 			UploadFileResult uploadFileResult = new UploadFileResult();
 			
 			uploadFileResult.statusSuccess = uploadFileResponse.statusSuccess;
-
+			
 			return uploadFileResult;
 
 		} catch ( ProxlSubImportServerReponseException e ) {
@@ -178,6 +214,7 @@ public class UploadFilePost {
 				responseInputStream.close();
 			}
 		}
+		
 		
 	}
 	
