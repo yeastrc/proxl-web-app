@@ -173,6 +173,7 @@ public class ScanFileMS_1_IntensityBinnedSummedDataDAO {
 			log.error( msg );
 			throw new IllegalArgumentException( msg );
 		}
+		
 		PreparedStatement pstmtSave = null;
 		
 //		ResultSet rsGenKeys = null;
@@ -204,8 +205,9 @@ public class ScanFileMS_1_IntensityBinnedSummedDataDAO {
 
 
 		} catch (Exception sqlEx) {
-			
-			String msg = "save:Exception '" + sqlEx.toString() + ".\nSQL = " + insertSQL;
+						
+			String msg = "save failed: item.getDataJSON_Gzipped().length: " + item.getDataJSON_Gzipped().length
+					+ ", Exception '" + sqlEx.toString() + ".\nSQL = " + insertSQL;
 			
 			log.error( msg , sqlEx);
 
