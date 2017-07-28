@@ -14,9 +14,11 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.searcher.SearchPsmSearcher;
-import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.SearchLooplinkProteinsFromPeptide;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ReportedPeptideDTO;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -30,9 +32,14 @@ public class SearchPeptideLooplink {
 		}
 		populatePeptidesCalled = true;
 		try {
-			List<SrchRepPeptPeptideDTO> results = 
-					SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
-					.getForSearchIdReportedPeptideId( this.getSearch().getSearchId(), this.getReportedPeptideId() );
+			SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams = new SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams();
+			srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setSearchId( this.getSearch().getSearchId() );
+			srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setReportedPeptideId( this.getReportedPeptideId() );
+			SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result =
+					Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.getInstance()
+					.getSrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result( srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams );
+			List<SrchRepPeptPeptideDTO> results = srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result.getSrchRepPeptPeptideDTOList();
+
 			if ( results.size() != 1 ) {
 				String msg = "List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " +this.getSearch().getSearchId()
 						+ ", ReportedPeptideId: " + this.getReportedPeptideId() ;

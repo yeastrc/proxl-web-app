@@ -44,7 +44,9 @@ import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectSearchIdsForSearchIdSearcher;
 import org.yeastrc.xlink.www.searcher.SearchReportedPeptideLinkTypeSearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
-import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -304,9 +306,15 @@ public class LorikeetSpectrumService {
 	private LorikeetCrossLinkData getCrossLinkData( PsmDTO psmDTO ) throws Exception {
 		LorikeetCrossLinkData lorikeetCrossLinkData = new LorikeetCrossLinkData();
 		lorikeetCrossLinkData.setLinkerMass(  psmDTO.getLinkerMass() );
-		List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = 
-				SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
-				.getForSearchIdReportedPeptideId( psmDTO.getSearchId(), psmDTO.getReportedPeptideId() );
+		
+		SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams = new SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams();
+		srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setSearchId( psmDTO.getSearchId() );
+		srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setReportedPeptideId( psmDTO.getReportedPeptideId() );
+		SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result =
+				Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.getInstance()
+				.getSrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result( srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams );
+		List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result.getSrchRepPeptPeptideDTOList();
+
 		if ( srchRepPeptPeptideDTOList.size() != 2 ) {
 			String msg = "List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + psmDTO.getSearchId()
 					+ ", ReportedPeptideId: " + psmDTO.getReportedPeptideId() ;
@@ -331,9 +339,15 @@ public class LorikeetSpectrumService {
 	 */
 	private LorikeetDimerData getDimerData( PsmDTO psmDTO ) throws Exception {
 		LorikeetDimerData lorikeetDimerData = new LorikeetDimerData();
-		List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = 
-				SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
-				.getForSearchIdReportedPeptideId( psmDTO.getSearchId(), psmDTO.getReportedPeptideId() );
+		
+		SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams = new SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams();
+		srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setSearchId( psmDTO.getSearchId() );
+		srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setReportedPeptideId( psmDTO.getReportedPeptideId() );
+		SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result =
+				Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.getInstance()
+				.getSrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result( srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams );
+		List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result.getSrchRepPeptPeptideDTOList();
+
 		if ( srchRepPeptPeptideDTOList.size() != 2 ) {
 			String msg = "List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + psmDTO.getSearchId()
 					+ ", ReportedPeptideId: " + psmDTO.getReportedPeptideId() ;
@@ -357,9 +371,15 @@ public class LorikeetSpectrumService {
 	private LorikeetLoopLinkData getLoopLinkData( PsmDTO psmDTO ) throws Exception {
 		LorikeetLoopLinkData lorikeetLoopLinkData = new LorikeetLoopLinkData();
 		lorikeetLoopLinkData.setLinkerMass(  psmDTO.getLinkerMass() );
-		List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = 
-				SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
-				.getForSearchIdReportedPeptideId( psmDTO.getSearchId(), psmDTO.getReportedPeptideId() );
+		
+		SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams = new SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams();
+		srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setSearchId( psmDTO.getSearchId() );
+		srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setReportedPeptideId( psmDTO.getReportedPeptideId() );
+		SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result =
+				Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.getInstance()
+				.getSrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result( srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams );
+		List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result.getSrchRepPeptPeptideDTOList();
+
 		if ( srchRepPeptPeptideDTOList.size() != 1 ) {
 			String msg = "List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " + psmDTO.getSearchId()
 					+ ", ReportedPeptideId: " + psmDTO.getReportedPeptideId() ;
@@ -380,9 +400,15 @@ public class LorikeetSpectrumService {
 	 * @throws Exception
 	 */
 	private LorikeetPerPeptideData getUnlinkData( PsmDTO psmDTO ) throws Exception {
-		List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = 
-				SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
-				.getForSearchIdReportedPeptideId( psmDTO.getSearchId(), psmDTO.getReportedPeptideId() );
+		
+		SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams = new SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams();
+		srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setSearchId( psmDTO.getSearchId() );
+		srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setReportedPeptideId( psmDTO.getReportedPeptideId() );
+		SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result =
+				Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.getInstance()
+				.getSrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result( srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams );
+		List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result.getSrchRepPeptPeptideDTOList();
+
 		if ( srchRepPeptPeptideDTOList.size() != 1 ) {
 			String msg = "List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " + psmDTO.getSearchId()
 					+ ", ReportedPeptideId: " + psmDTO.getReportedPeptideId() ;

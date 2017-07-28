@@ -16,7 +16,9 @@ import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.searcher.SearchReportedPeptideLinkTypeSearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
-import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
 
 public class PSMMassCalculator {
 
@@ -178,8 +180,14 @@ public class PSMMassCalculator {
 		List<StaticModDTO> staticMods = StaticModDAO.getInstance().getStaticModDTOForSearchId( psm.getSearchId() );
 
 		// our search reported peptide peptide(s)
-		List<SrchRepPeptPeptideDTO> searchReportedPeptidePeptides = SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance().getForSearchIdReportedPeptideId( psm.getSearchId(), psm.getReportedPeptideId() );
-		
+		SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams = new SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams();
+		srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setSearchId( psm.getSearchId() );
+		srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setReportedPeptideId( psm.getReportedPeptideId() );
+		SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result =
+				Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.getInstance()
+				.getSrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result( srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams );
+		List<SrchRepPeptPeptideDTO> searchReportedPeptidePeptides = srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result.getSrchRepPeptPeptideDTOList();
+
 		int linkType = SearchReportedPeptideLinkTypeSearcher.getInstance().getSearchReportedPeptideLinkTypeNumber( psm.getSearchId(), psm.getReportedPeptideId() );
 		
 		if( linkType == XLinkUtils.TYPE_UNLINKED ) {

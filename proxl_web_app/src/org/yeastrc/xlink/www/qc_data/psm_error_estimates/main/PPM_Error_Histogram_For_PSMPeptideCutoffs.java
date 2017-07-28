@@ -36,8 +36,10 @@ import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Histo
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Histogram_For_PSMPeptideCutoffs_Result.PPM_Error_Histogram_For_PSMPeptideCutoffsResultsForLinkType;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
-import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 import org.yeastrc.xlink.www.web_utils.PSMMassCalculator;
 
@@ -490,12 +492,14 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 				//  srchRepPeptPeptideDTOList: associated SrchRepPeptPeptideDTO for the link, one per associated peptide, populated per link type
 				
 				//  copied from SearchPeptideCrosslink, this way not load PeptideDTO in SearchPeptideCrosslink
-				List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList =
-						SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
-						.getForSearchIdReportedPeptideId( searchId, reportedPeptideId );
-				
-				
-				
+				SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams = new SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams();
+				srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setSearchId( searchId );
+				srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setReportedPeptideId( reportedPeptideId );
+				SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result =
+						Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.getInstance()
+						.getSrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result( srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams );
+				List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result.getSrchRepPeptPeptideDTOList();
+
 				if ( webReportedPeptide.getSearchPeptideCrosslink() != null ) {
 					//  Process a crosslink
 					linkType = XLinkUtils.CROSS_TYPE_STRING;
