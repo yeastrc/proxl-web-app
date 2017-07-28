@@ -151,7 +151,8 @@ public class MS1_All_IntensityHeatmapImage {
 			return new MS1_All_IntensityHeatmapImageResult();
 		}
 		
-		BufferedImage bufferedImage = getImage(requestedImageWidth, ms1_IntensitiesBinnedSummedMapToJSONRoot);
+		BufferedImage bufferedImage = 
+				getImage( requestedImageWidth, ms1_IntensitiesBinnedSummedMapToJSONRoot, scanFileId /* for logging */ );
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(); // ( imageWidth * imageHeight * 4 );
 
@@ -176,11 +177,13 @@ public class MS1_All_IntensityHeatmapImage {
 	 */
 	public BufferedImage getImage(
 			Integer requestedImageWidth,
-			MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot)
+			MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot,
+			Integer scanFileId /* for logging */ )
 			throws ProxlWebappInternalErrorException, Exception {
 
 		CreateFullSizeImageForMS1IntensityDataResult createFullSizeImageForMS1IntensityDataResult = 
-				createFullSizeImageForMS1IntensityData( ms1_IntensitiesBinnedSummedMapToJSONRoot, PLOTTED_PIXEL_COLORS );
+				createFullSizeImageForMS1IntensityData( 
+						ms1_IntensitiesBinnedSummedMapToJSONRoot, PLOTTED_PIXEL_COLORS, scanFileId /* for logging */ );
 		
 		//  Add tick marks, legends, labels, etc
 		BufferedImage bufferedImage = 
@@ -290,7 +293,8 @@ public class MS1_All_IntensityHeatmapImage {
 	 */
 	public CreateFullSizeImageForMS1IntensityDataResult createFullSizeImageForMS1IntensityData(
 			MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot,
-			Color[] pixelPlottedColors )
+			Color[] pixelPlottedColors,
+			Integer scanFileId /* for logging */ )
 			throws ProxlWebappInternalErrorException {
 		
 		MS1_IntensitiesBinnedSummed_Summary_Data_ToJSONRoot summaryData =
@@ -302,6 +306,15 @@ public class MS1_All_IntensityHeatmapImage {
 
 		double intensityBinnedMinActual = summaryData.getIntensityBinnedMin();
 		double intensityBinnedMaxActual = summaryData.getIntensityBinnedMax();
+		
+		if ( intensityBinnedMinActual < 1 ) {
+			//  intensityBinnedMinActual cannot be zero since taking the log of zero is problematic
+			log.warn( "intensityBinnedMinActual < 1"
+					+ " so setting intensityBinnedMinActual = 1. "
+					+ "intensityBinnedMinActual was: " + intensityBinnedMinActual
+					+ ", scanFileId: " + scanFileId );
+			intensityBinnedMinActual = 1;
+		}
 
 		if ( log.isDebugEnabled() ) {
 			log.debug( "summaryData.getRtBinMax(): " + summaryData.getRtBinMax() );
@@ -362,9 +375,19 @@ public class MS1_All_IntensityHeatmapImage {
 		double intensityMaxBasedOnPercentilesActual = thirdquarter + QUARTILE_MULTIPLIER * iqr;
 		
 		if ( intensityMinBasedOnPercentilesActual < intensityBinnedMinActual ) {
+			if ( log.isDebugEnabled() ) {
+				log.debug( "intensityMinBasedOnPercentilesActual < intensityBinnedMinActual so setting intensityMinBasedOnPercentilesActual = intensityBinnedMinActual.  "
+						+ "intensityMinBasedOnPercentilesActual: " + intensityMinBasedOnPercentilesActual 
+						+ ", intensityBinnedMinActual: " + intensityBinnedMinActual );
+			}
 			intensityMinBasedOnPercentilesActual = intensityBinnedMinActual;
 		}
 		if ( intensityMaxBasedOnPercentilesActual > intensityBinnedMaxActual ) {
+			if ( log.isDebugEnabled() ) {
+				log.debug( "intensityMaxBasedOnPercentilesActual > intensityBinnedMaxActual so setting intensityMaxBasedOnPercentilesActual = intensityBinnedMaxActual.  "
+						+ "intensityMinBasedOnPercentilesActual: " + intensityMinBasedOnPercentilesActual 
+						+ ", intensityBinnedMaxActual: " + intensityBinnedMaxActual );
+			}
 			intensityMaxBasedOnPercentilesActual = intensityBinnedMaxActual;
 		}
 		
