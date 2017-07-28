@@ -140,6 +140,8 @@ public class SaveScanFileStatisticsToDB {
 		MS1_IntensitiesBinnedSummed_Summary_Data_ToJSONRoot summaryObject =
 				ms1_BinnedSummedIntensitiesProcessingResult.getSummaryObject();
 		
+		//  For each database table (independently), query the table for scanFileId and save if no record found
+		
 		{
 			Integer scanFileIdFromDB = ScanFileMS_1_IntensityBinnedSummedSummaryDAO.getScanFileIdFromScanFileId( scanFileId );
 			if ( scanFileIdFromDB == null ) {
