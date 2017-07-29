@@ -400,6 +400,15 @@ public class MS1_All_IntensityHeatmapImage {
 					+ "  intensityMinBasedOnPercentilesActual: " + intensityMinBasedOnPercentilesActual );
 		}
 		
+		if ( intensityMinBasedOnPercentilesUse > intensityMaxBasedOnPercentilesUse ) {
+			String msg = "ERROR: Computing Min and Max, Min > Max, "
+					+ " intensityMinBasedOnPercentilesUse > intensityMaxBasedOnPercentilesUse"
+					+ ", intensityMinBasedOnPercentilesUse: " + intensityMinBasedOnPercentilesUse
+					+ ", intensityMaxBasedOnPercentilesUse: " + intensityMaxBasedOnPercentilesUse;
+			log.error( msg );
+			throw new ProxlWebappInternalErrorException( msg );
+		}
+		
 		if ( log.isDebugEnabled() ) {
 			log.debug( "intensityMinBasedOnPercentilesActual: " + intensityMinBasedOnPercentilesActual 
 					+ ", intensityMinBasedOnPercentilesUse: " + intensityMinBasedOnPercentilesUse 
