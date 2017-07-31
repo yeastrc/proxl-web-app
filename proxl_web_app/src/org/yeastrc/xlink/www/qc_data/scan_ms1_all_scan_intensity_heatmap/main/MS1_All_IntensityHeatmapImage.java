@@ -315,6 +315,9 @@ public class MS1_All_IntensityHeatmapImage {
 					+ ", scanFileId: " + scanFileId );
 			intensityBinnedMinActual = 1;
 		}
+		
+		double intensityBinnedMinUseFromActualMinMax = getIntensityUseFromIntensity( intensityBinnedMinActual );
+		double intensityBinnedMaxUseFromActualMinMax = getIntensityUseFromIntensity( intensityBinnedMaxActual );
 
 		if ( log.isDebugEnabled() ) {
 			log.debug( "summaryData.getRtBinMax(): " + summaryData.getRtBinMax() );
@@ -325,6 +328,9 @@ public class MS1_All_IntensityHeatmapImage {
 
 			log.debug( "intensityBinnedMinActual: " + intensityBinnedMinActual );
 			log.debug( "intensityBinnedMaxActual: " + intensityBinnedMaxActual );
+
+			log.debug( "intensityBinnedMinUseFromActualMinMax - Before Interquartile computation: " + intensityBinnedMinUseFromActualMinMax );
+			log.debug( "intensityBinnedMaxUseFromActualMinMax - Before Interquartile computation: " + intensityBinnedMaxUseFromActualMinMax );
 
 			log.debug( "intensityBinned Min Max being used for processing (Currently natural log of min and max):" );
 		}
@@ -340,25 +346,35 @@ public class MS1_All_IntensityHeatmapImage {
 
 		int binnedSummedIntensityCountInt = (int) binnedSummedIntensityCount;
 
-		double[] intensityArrayForSort = new double[ binnedSummedIntensityCountInt ];
+		//  Put the intensity value into the array same as will use for plotting, 
+		//       currently taking the log in getIntensityUseFromIntensity(...)
+		
+		double[] intensityUseArrayForSort = new double[ binnedSummedIntensityCountInt ];
 
-		int intensityArrayForSortIndex = 0;
-		for ( Map.Entry<Long, Map<Long, Double>> rtEntry : ms1_IntensitiesBinnedSummedMap.entrySet() ) {
-			for ( Map.Entry<Long, Double> mzEntry : rtEntry.getValue().entrySet() ) {
-				intensityArrayForSort[ intensityArrayForSortIndex ] = mzEntry.getValue();
-				intensityArrayForSortIndex++;
+		{
+			int intensityArrayForSortIndex = 0;
+			for ( Map.Entry<Long, Map<Long, Double>> rtEntry : ms1_IntensitiesBinnedSummedMap.entrySet() ) {
+				for ( Map.Entry<Long, Double> mzEntry : rtEntry.getValue().entrySet() ) {
+					double intensityActual = mzEntry.getValue();
+//					if ( intensityActual > 0 ) {
+						//  Only process records for intensityActual > 0
+						double intensityUse = getIntensityUseFromIntensity( intensityActual );
+						intensityUseArrayForSort[ intensityArrayForSortIndex ] = intensityUse;
+//					}
+					intensityArrayForSortIndex++;
+				}
 			}
 		}
 		//   Available in Java 8  
 		//	Arrays.parallelSort( intensityArrayForSort );
-		Arrays.sort( intensityArrayForSort );
+		Arrays.sort( intensityUseArrayForSort );
 
 		// Get a DescriptiveStatistics instance
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 		 
 		// Add the data from the array
-		for( int i = 0; i < intensityArrayForSort.length; i++) {
-		        stats.addValue(intensityArrayForSort[i]);
+		for( int i = 0; i < intensityUseArrayForSort.length; i++) {
+			stats.addValue( intensityUseArrayForSort[i] );
 		}
 
 		final int FIRST_QUARTER_PERCENTILE = 25;
@@ -369,37 +385,32 @@ public class MS1_All_IntensityHeatmapImage {
 		double firstquarter = stats.getPercentile( FIRST_QUARTER_PERCENTILE );
 		double thirdquarter = stats.getPercentile( THIRD_QUARTER_PERCENTILE );
 		 
+		//  Compute the min and max based on percentiles using the intensity values from getIntensityUseFromIntensity(...)
+		//        getIntensityUseFromIntensity(...) is currently taking the log
 		
 		double iqr =  thirdquarter - firstquarter; // Interquartile Range
-		double intensityMinBasedOnPercentilesActual = firstquarter - QUARTILE_MULTIPLIER * iqr;
-		double intensityMaxBasedOnPercentilesActual = thirdquarter + QUARTILE_MULTIPLIER * iqr;
+		double intensityMinBasedOnPercentilesUse = firstquarter - QUARTILE_MULTIPLIER * iqr;
+		double intensityMaxBasedOnPercentilesUse = thirdquarter + QUARTILE_MULTIPLIER * iqr;
 		
-		if ( intensityMinBasedOnPercentilesActual < intensityBinnedMinActual ) {
+		if ( intensityMinBasedOnPercentilesUse < intensityBinnedMinUseFromActualMinMax ) {
 			if ( log.isDebugEnabled() ) {
-				log.debug( "intensityMinBasedOnPercentilesActual < intensityBinnedMinActual so setting intensityMinBasedOnPercentilesActual = intensityBinnedMinActual.  "
-						+ "intensityMinBasedOnPercentilesActual: " + intensityMinBasedOnPercentilesActual 
-						+ ", intensityBinnedMinActual: " + intensityBinnedMinActual );
+				log.debug( "intensityMinBasedOnPercentilesUse < intensityBinnedMinUseFromActualMinMax "
+						+ "so setting intensityMinBasedOnPercentilesActual = intensityBinnedMinUseFromActualMinMax.  "
+						+ "intensityMinBasedOnPercentilesUse: " + intensityMinBasedOnPercentilesUse 
+						+ ", intensityBinnedMinActual: " + intensityBinnedMinUseFromActualMinMax );
 			}
-			intensityMinBasedOnPercentilesActual = intensityBinnedMinActual;
+			intensityMinBasedOnPercentilesUse = intensityBinnedMinUseFromActualMinMax;
 		}
-		if ( intensityMaxBasedOnPercentilesActual > intensityBinnedMaxActual ) {
+		if ( intensityMaxBasedOnPercentilesUse > intensityBinnedMaxUseFromActualMinMax ) {
 			if ( log.isDebugEnabled() ) {
-				log.debug( "intensityMaxBasedOnPercentilesActual > intensityBinnedMaxActual so setting intensityMaxBasedOnPercentilesActual = intensityBinnedMaxActual.  "
-						+ "intensityMinBasedOnPercentilesActual: " + intensityMinBasedOnPercentilesActual 
-						+ ", intensityBinnedMaxActual: " + intensityBinnedMaxActual );
+				log.debug( "intensityMaxBasedOnPercentilesUse > intensityBinnedMaxUseFromActualMinMax "
+						+ "so setting intensityMaxBasedOnPercentilesUse = intensityBinnedMaxUseFromActualMinMax.  "
+						+ "intensityMinBasedOnPercentilesUse: " + intensityMinBasedOnPercentilesUse 
+						+ ", intensityBinnedMaxUseFromActualMinMax: " + intensityBinnedMaxUseFromActualMinMax );
 			}
-			intensityMaxBasedOnPercentilesActual = intensityBinnedMaxActual;
+			intensityMaxBasedOnPercentilesUse = intensityBinnedMaxUseFromActualMinMax;
 		}
-		
-		double intensityMinBasedOnPercentilesUse = getIntensityUseFromIntensity( intensityMinBasedOnPercentilesActual );
-		double intensityMaxBasedOnPercentilesUse = getIntensityUseFromIntensity( intensityMaxBasedOnPercentilesActual );
-		
-		if ( intensityMinBasedOnPercentilesActual < 0 ) {
-			intensityMinBasedOnPercentilesUse = 0;
-			log.warn( "intensityMinBasedOnPercentilesActual < 0 so setting intensityMinBasedOnPercentilesUse = 0."
-					+ "  intensityMinBasedOnPercentilesActual: " + intensityMinBasedOnPercentilesActual );
-		}
-		
+
 		if ( intensityMinBasedOnPercentilesUse > intensityMaxBasedOnPercentilesUse ) {
 			String msg = "ERROR: Computing Min and Max, Min > Max, "
 					+ " intensityMinBasedOnPercentilesUse > intensityMaxBasedOnPercentilesUse"
@@ -410,9 +421,7 @@ public class MS1_All_IntensityHeatmapImage {
 		}
 		
 		if ( log.isDebugEnabled() ) {
-			log.debug( "intensityMinBasedOnPercentilesActual: " + intensityMinBasedOnPercentilesActual 
-					+ ", intensityMinBasedOnPercentilesUse: " + intensityMinBasedOnPercentilesUse 
-					+ ", intensityMaxBasedOnPercentilesActual: " + intensityMaxBasedOnPercentilesActual
+			log.debug( "intensityMinBasedOnPercentilesUse: " + intensityMinBasedOnPercentilesUse 
 					+ ", intensityMaxBasedOnPercentilesUse: " + intensityMaxBasedOnPercentilesUse
 					);
 		}
