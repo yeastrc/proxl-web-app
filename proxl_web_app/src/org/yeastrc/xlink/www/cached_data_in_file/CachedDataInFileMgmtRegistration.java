@@ -41,15 +41,46 @@ public class CachedDataInFileMgmtRegistration {
 	
 	private Map<String, RegistrationEntry> registrationEntries = new HashMap<>();
 
+	private Map<String, RegistrationEntry> oldUnusedPrefixesToRemoveEntries = new HashMap<>();
+
+    /**
+     * Used to stop removal of cached directories
+     */
+    private volatile boolean shutdownNowReceived = false;
+    
+	/**
+	 * Called on web app shutdown
+	 */
+	public void shutdownNow(){
+		log.warn( "INFO: shutdownNow() called." );
+		shutdownNowReceived = true;
+		CachedDataInFileMgmt.getSingletonInstance().shutdownNow();
+	}
+	
 	/**
 	 * Array of classes to call "register()" on so they will call "register(...)" on this class.
 	 */
 	private final CachedDataInFileMgmtRegistrationIF[] classesToRegister = {
 		MS1_All_IntensityHeatmapImageCachedResultImageManager.getSingletonInstance()
 	};
+
+	/**
+	 * !!!!!!!!  Update this to add prefixes and last version to list to clean up
+	 * 
+	 *  This is part of removal of unused cached data files
+	 * 
+	 * called from init()
+	 * 
+	 * @throws ProxlWebappInternalErrorException
+	 */
+	private void addToOldUnusedPrefixesToRemove() throws ProxlWebappInternalErrorException {
+
+//		oldUnusedPrefixesToRemove( <prefix>, <last version used> );
+		
+	}
 	
 	/**
-	 * Called on web app shutdown
+	 * Called on web app startup
 	 * @throws Exception 
 	 */
 	public void init() throws Exception {
@@ -59,17 +90,27 @@ public class CachedDataInFileMgmtRegistration {
 			return;  //  EARLY EXIT
 		}
 		
-		log.warn( "Starting:  Calling 'register()' on entries in classesToRegister.  classesToRegister.length: " + classesToRegister.length );
+		log.warn( "INFO: Starting:  Calling 'register()' on entries in classesToRegister.  classesToRegister.length: " + classesToRegister.length );
 		
 		for ( CachedDataInFileMgmtRegistrationIF classToRegister : classesToRegister ) {
+			if ( shutdownNowReceived ) {
+				return;  //  EARLY EXIT
+			}
 			classToRegister.register();
 		}
-		log.warn( "Finished:  Calling 'register()' on entries in classesToRegister.  classesToRegister.length: " + classesToRegister.length );
+		log.warn( "INFO: Finished:  Calling 'register()' on entries in classesToRegister.  classesToRegister.length: " + classesToRegister.length );
 		
-
-		//  TODO  Start thread to clean up all versions < version registered 
-		//           and all unused prefixes { calls to oldUnusedPrefixesToRemove( String prefix ) }
+		if ( shutdownNowReceived ) {
+			return;  //  EARLY EXIT
+		}
 		
+		addToOldUnusedPrefixesToRemove();
+		
+		log.warn( "INFO: Starting thread to run CachedDataInFileMgmtCleanupOnWebAppStartRunnable to clean up unused cached files." );
+		CachedDataInFileMgmtCleanupOnWebAppStartRunnable cachedDataInFileMgmtCleanupOnWebAppStartRunnable =
+				CachedDataInFileMgmtCleanupOnWebAppStartRunnable.getNewInstance();
+		Thread thread = new Thread(cachedDataInFileMgmtCleanupOnWebAppStartRunnable);
+		thread.start();
 	}
 	
 	/**
@@ -94,7 +135,7 @@ public class CachedDataInFileMgmtRegistration {
 	
 	/**
 	 * @param prefix
-	 * @param version
+	 * @param version - Must be > 0
 	 * @throws ProxlWebappInternalErrorException
 	 */
 	public void register( String prefix, int version ) throws ProxlWebappInternalErrorException {
@@ -104,25 +145,77 @@ public class CachedDataInFileMgmtRegistration {
 			log.error( msg );
 			throw new ProxlWebappInternalErrorException(msg);
 		}
+		if ( version < 1 ) {
+			String msg = "version cannot be < 1, is '" + version + "'.";
+			log.error( msg );
+			throw new ProxlWebappInternalErrorException(msg);
+		}
 		registrationEntry = new RegistrationEntry();
 		registrationEntry.prefix = prefix;
 		registrationEntry.version = version;
 		registrationEntries.put( prefix, registrationEntry );
 	}
-	
+		
 	/**
 	 * Any old unused prefixes to remove
 	 * @param prefix
+	 * @param lastVersion - last version that was used
+	 * @throws ProxlWebappInternalErrorException 
 	 */
-	public void oldUnusedPrefixesToRemove( String prefix ) {
+	public void oldUnusedPrefixesToRemove( String prefix, int lastVersion ) throws ProxlWebappInternalErrorException {
+		RegistrationEntry registrationEntry = oldUnusedPrefixesToRemoveEntries.get( prefix );
+		if ( registrationEntry != null ) {
+			String msg = "prefix '" + prefix + "' is already registered.";
+			log.error( msg );
+			throw new ProxlWebappInternalErrorException(msg);
+		}
+		if ( lastVersion < 1 ) {
+			String msg = "lastVersion cannot be < 1, is '" + lastVersion + "'.";
+			log.error( msg );
+			throw new ProxlWebappInternalErrorException(msg);
+		}
+		registrationEntry = new RegistrationEntry();
+		registrationEntry.prefix = prefix;
+		registrationEntry.version = lastVersion;
+		oldUnusedPrefixesToRemoveEntries.put( prefix, registrationEntry );
+	}
+
+	/**
+	 * Package private
+	 * Called from CachedDataInFileMgmtRegistration
+	 * @throws Exception
+	 */
+	void cleanupUnusedCachedFilesDirectories() throws Exception {
+		if ( shutdownNowReceived ) {
+			return;  //  EARLY EXIT
+		}
+		log.warn( "registrationEntries.size: " + registrationEntries.size() );
+		log.warn( "oldUnusedPrefixesToRemoveEntries.size: " + oldUnusedPrefixesToRemoveEntries.size() );
+		final int startingVersion = 1;
+		//  For current entries, delete all versions before current version
+		for ( Map.Entry<String, RegistrationEntry> entry : registrationEntries.entrySet() ) {
+			RegistrationEntry registrationEntry = entry.getValue();
+			String namePrefix = registrationEntry.prefix;
+			for ( int versionToDelete = startingVersion; versionToDelete < registrationEntry.version; versionToDelete++ ) {
+				if ( shutdownNowReceived ) {
+					return;  //  EARLY EXIT
+				}
+				CachedDataInFileMgmt.getSingletonInstance().removeCachedDataDirectory( namePrefix, versionToDelete );
+			}
+		}
+
+		//  For Old prefixes to remove entries, delete all versions including current version
+		for ( Map.Entry<String, RegistrationEntry> entry : oldUnusedPrefixesToRemoveEntries.entrySet() ) {
+			RegistrationEntry registrationEntry = entry.getValue();
+			String namePrefix = registrationEntry.prefix;
+			for ( int versionToDelete = startingVersion; versionToDelete <= registrationEntry.version; versionToDelete++ ) {
+				if ( shutdownNowReceived ) {
+					return;  //  EARLY EXIT
+				}
+				CachedDataInFileMgmt.getSingletonInstance().removeCachedDataDirectory( namePrefix, versionToDelete );
+			}
+		}
 		
 	}
 	
-	/**
-	 * Called on web app shutdown
-	 */
-	public void shutdownNow(){
-		
-		//  TODO  Kill cleanup thread if executing
-	}
  }

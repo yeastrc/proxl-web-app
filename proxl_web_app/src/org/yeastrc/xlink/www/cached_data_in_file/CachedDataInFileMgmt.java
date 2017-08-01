@@ -51,6 +51,19 @@ public class CachedDataInFileMgmt {
     private final DecimalFormat decimalFormatZeroFill = new DecimalFormat("00000");
     
     /**
+     * Used to stop removal of cached directories
+     */
+    private volatile boolean shutdownNowReceived = false;
+    
+	/**
+	 * Called on web app shutdown
+	 */
+	public void shutdownNow(){
+		log.warn( "INFO: shutdownNow() called." );
+		shutdownNowReceived = true;
+	}
+	
+    /**
      * @return
      * @throws Exception
      */
@@ -74,6 +87,95 @@ public class CachedDataInFileMgmt {
 		}
 		return true;
 	}
+	
+
+	public void removeCachedDataDirectory( String namePrefix, int version ) throws Exception {
+
+		if ( shutdownNowReceived ) {
+			return;
+		}
+		
+		String cacheFilesRootDirString = getCacheFilesRootDirString();
+		if ( StringUtils.isEmpty( cacheFilesRootDirString ) ) {
+			//  CACHE_FILES_ROOT_DIRECTORY is not configured so return null always
+			return; //  Early Exit
+		}
+
+		File cacheFilesRootDir = new File( cacheFilesRootDirString );
+		if ( ! cacheFilesRootDir.exists() ) {
+			//  CACHE_FILES_ROOT_DIRECTORY does not exist
+//			log.warn( "Cached Data Files Directory does not exist.  Config Key: '" + CACHE_FILES_ROOT_DIRECTORY
+//					+ "', Config Value: " + cacheFilesRootDirString );
+			return; //  Early Exit
+		}
+		
+		
+		String versionAsString = getVersionAsString( version );
+
+		String rootDirForPrefixAndVersionString =  getRootDirForPrefixAndVersionString( namePrefix, versionAsString );
+		
+		File rootDirForPrefixAndVersion = new File( cacheFilesRootDir, rootDirForPrefixAndVersionString );
+		
+		if ( ! rootDirForPrefixAndVersion.exists() ) {
+			log.info( "Cached file directory to delete does not exist: " + rootDirForPrefixAndVersion.getAbsolutePath() );
+			return; //  Early Exit
+		}
+		
+		log.warn( "INFO: Starting: Deleting cached file directory (and it's contents): " + rootDirForPrefixAndVersion.getAbsolutePath() );
+		//  Delete cacheFilesRootDir and everything under it.  Always delete 'done' file first
+		deleteCacheFilesDir( rootDirForPrefixAndVersion );
+
+		if ( shutdownNowReceived ) {
+			log.warn( "Interrupted by shutdown received: Deleting cached file directory (and it's contents): " + rootDirForPrefixAndVersion.getAbsolutePath() );
+			return;
+		}
+		log.warn( "INFO: Finished: Deleting cached file directory (and it's contents): " + rootDirForPrefixAndVersion.getAbsolutePath() );
+	}
+	
+	/**
+	 * Calls itself recursively to delete subdirectories.
+	 * returns immediately if shutdownNowReceived is true
+	 * @param dir
+	 */
+	private void deleteCacheFilesDir( File dir ) {
+
+		if ( shutdownNowReceived ) {
+			return;
+		}
+		//  Delete 'done' files first
+		for ( File dirEntry : dir.listFiles() ) {
+			if ( dirEntry.isFile() && dirEntry.getName().endsWith( DONE_FILE_SUFFIX ) ) {
+				if ( ! dirEntry.delete() ) {
+					String msg = "Failed to delete file: " + dirEntry.getAbsolutePath();
+					log.error( msg );
+				}
+			}
+		}
+		
+		//  Delete other files and subdirectories
+		for ( File dirEntry : dir.listFiles() ) {
+			if ( shutdownNowReceived ) {
+				break;  // Exit loop immediately
+			}
+			if ( dirEntry.isFile() ) {
+				if ( ! dirEntry.delete() ) {
+					String msg = "Failed to delete file: " + dirEntry.getAbsolutePath();
+					log.error( msg );
+				}
+			} else if ( dirEntry.isDirectory() ) {
+				deleteCacheFilesDir( dirEntry ); // recursively delete subdirectories
+			} else {
+				String msg = "dirEntry is not file or directory: " + dirEntry.getAbsolutePath();
+				log.error( msg );
+			}
+		}
+		if ( ! dir.delete() ) {
+			String msg = "Failed to delete dir: " + dir.getAbsolutePath();
+			log.error( msg );
+		}
+
+	}
+
 	
 
 	/**
@@ -388,9 +490,9 @@ public class CachedDataInFileMgmt {
 		//  The namePrefix and version are used for the root subdirectory for this particular file.
 		//  The last 2 characters of the id as string are used for a subdirectory path to limit the number of files in a subdirectory.
 		
-		String versionAsString = decimalFormatZeroFill.format( version );
+		String versionAsString = getVersionAsString( version );
 
-		String rootDirForPrefixAndVersionString = namePrefix + "_v_" + versionAsString;
+		String rootDirForPrefixAndVersionString =  getRootDirForPrefixAndVersionString( namePrefix, versionAsString );
 
 		String filename = null;
 		String stringForSubdirs = null;
@@ -450,4 +552,27 @@ public class CachedDataInFileMgmt {
 	}
 	
 	
+	/**
+	 * The namePrefix and version are used for the root subdirectory for this particular file.
+	 * 
+	 * @param namePrefix
+	 * @param versionAsString
+	 * @return
+	 */
+	private String getRootDirForPrefixAndVersionString( String namePrefix, String versionAsString ) {
+
+		String rootDirForPrefixAndVersionString = namePrefix + "_v_" + versionAsString;
+		return rootDirForPrefixAndVersionString;
+	}
+	
+	/**
+	 * @param version
+	 * @return
+	 */
+	private String getVersionAsString( int version ) {
+		String versionAsString = decimalFormatZeroFill.format( version );
+		return versionAsString;
+	}
+
+
 }
