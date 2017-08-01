@@ -73,6 +73,8 @@ public class MS1_All_IntensityHeatmapImage {
 	private static final int IMAGE_MARGIN_TOP = 20;
 	private static final int IMAGE_MARGIN_BOTTOM = 30;
 
+	private static final int TEXT_HEIGHT = 10; // based on current font size.  Provides offset from top left to baseline
+	
 	private static final int HORIZONTAL_AXIS_LABEL_Y_OFFSET_FROM_IMAGE_BOTTOM = IMAGE_MARGIN_BOTTOM - 10; //  Measured up from bottom edge of image
 
 	
@@ -80,7 +82,7 @@ public class MS1_All_IntensityHeatmapImage {
 	
 	private static final int LEGEND_LABEL_VERTICAL_OFFSET_FROM_TOP_MARGIN = 10; // Label above Legend
 	//  Top of Legend position
-	private static final int LEGEND_VERTICAL_OFFSET_FROM_TOP_MARGIN = LEGEND_LABEL_VERTICAL_OFFSET_FROM_TOP_MARGIN + 15;
+	private static final int LEGEND_VERTICAL_OFFSET_FROM_TOP_MARGIN = LEGEND_LABEL_VERTICAL_OFFSET_FROM_TOP_MARGIN + 8;
 
 	private static final int LEGEND_OFFSET_FROM_IMAGE = 10;
 	private static final int LEGEND_WIDTH = 10;
@@ -707,15 +709,19 @@ public class MS1_All_IntensityHeatmapImage {
 			drawHorizontalAxisTickMarkAndLabel( 
 					numberFormat.format( summaryData.getRtBinMin() ),
 					IMAGE_MARGIN_LEFT, 
+					false, //  right align text
 					IMAGE_MARGIN_TOP + bufferedImageHeight, 
-					graphicsObj, fontMetrics );
+					graphicsObj, 
+					fontMetrics );
 
 			//  Draw right tick mark and label
 			drawHorizontalAxisTickMarkAndLabel( 
 					numberFormat.format( summaryData.getRtBinMax() ),
 					IMAGE_MARGIN_LEFT + bufferedImageWidth, 
+					true, //  right align text
 					IMAGE_MARGIN_TOP + bufferedImageHeight, 
-					graphicsObj, fontMetrics );
+					graphicsObj, 
+					fontMetrics );
 			
 			
 			//  Draw Y Axis Label text on Y Axis, rotated
@@ -740,18 +746,18 @@ public class MS1_All_IntensityHeatmapImage {
 			
 			//  Draw Y Axis Tick Marks and Labels
 			graphicsObj.setColor( Color.BLACK );
-
+			
 			//  Draw top tick mark and label
 			drawVerticalAxisTickMarkAndLabel( 
 					numberFormat.format( summaryData.getMzBinMax() ), 
-					IMAGE_MARGIN_TOP,
+					IMAGE_MARGIN_TOP + TEXT_HEIGHT,  // tickMark_Y_TextBaseline
 					graphicsObj, 
 					fontMetrics );
 
 			//  Draw bottom tick mark and label
 			drawVerticalAxisTickMarkAndLabel( 
 					numberFormat.format( summaryData.getMzBinMin() ), 
-					IMAGE_MARGIN_TOP + bufferedImageHeight - 2,
+					IMAGE_MARGIN_TOP + bufferedImageHeight - 2, // tickMark_Y_TextBaseline
 					graphicsObj, 
 					fontMetrics );
 			
@@ -796,14 +802,15 @@ public class MS1_All_IntensityHeatmapImage {
 
 	/**
 	 * @param tickMarkLabel
-	 * @param tickMark_center_X
+	 * @param tickMark_X
 	 * @param tickMark_top_Y
 	 * @param graphicsObj
 	 * @param fontMetrics
 	 */
 	public void drawHorizontalAxisTickMarkAndLabel(
 			String tickMarkLabel,
-			int tickMark_center_X,
+			int tickMark_X,
+			boolean rightAlignTheText, //  right align text
 			int tickMark_top_Y,
 			Graphics2D graphicsObj,
 			FontMetrics fontMetrics) {
@@ -815,7 +822,10 @@ public class MS1_All_IntensityHeatmapImage {
 		
 		int tickMarkLabelApproxWidth = getApproxStringWidth( tickMarkLabel, fontMetrics );
 
-		int tickMarkLabel_X = tickMark_center_X - ( tickMarkLabelApproxWidth / 2 );
+		int tickMarkLabel_X = tickMark_X;
+		if ( rightAlignTheText ) {
+			tickMarkLabel_X -= tickMarkLabelApproxWidth;
+		}
 		int tickMarkLabel_Y = tickMark_top_Y + fontAscent + TICK_MARK_LENGTH + TICK_MARK_HORIZONTAL_AXIS_VERTICAL_OFFSET;
 				
 		graphicsObj.drawString( tickMarkLabel, tickMarkLabel_X, tickMarkLabel_Y );
@@ -829,7 +839,7 @@ public class MS1_All_IntensityHeatmapImage {
 	 */
 	public void drawVerticalAxisTickMarkAndLabel(
 			String tickMarkLabel,
-			int tickMark_Y,
+			int tickMark_Y_TextBaseline,
 			Graphics2D graphicsObj,
 			FontMetrics fontMetrics) {
 		
@@ -839,7 +849,7 @@ public class MS1_All_IntensityHeatmapImage {
 		int tickMarkLabelApproxWidth = getApproxStringWidth( tickMarkLabel, fontMetrics );
 
 		int tickMarkLabel_X = IMAGE_MARGIN_LEFT - 1 - TICK_MARK_LENGTH - tickMarkLabelApproxWidth;
-		int tickMarkLabel_Y = tickMark_Y + TICK_MARK_VERTICAL_AXIS_VERTICAL_OFFSET;
+		int tickMarkLabel_Y = tickMark_Y_TextBaseline;
 				
 		graphicsObj.drawString( tickMarkLabel, tickMarkLabel_X, tickMarkLabel_Y );
 	}
@@ -928,6 +938,7 @@ public class MS1_All_IntensityHeatmapImage {
 				tickMarkLabel, 
 				end_X + 1,
 				start_Y,
+				start_Y + TEXT_HEIGHT,
 				graphicsObj );
 
 		tickMarkValueToSignificantDigits = new BigDecimal( createFullSizeImageForMS1IntensityDataResult.intensityMin_Actual, mcForPrecision );
@@ -936,6 +947,7 @@ public class MS1_All_IntensityHeatmapImage {
 		drawLegendTickMarkAndLabel( 
 				tickMarkLabel, 
 				end_X + 1,
+				end_Y,
 				end_Y,
 				graphicsObj );
 
@@ -952,13 +964,14 @@ public class MS1_All_IntensityHeatmapImage {
 			String tickMarkLabelValue,
 			int tickMark_Start_X,
 			int tickMark_Y,
+			int tickMark_Y_TextBaseline,
 			Graphics2D graphicsObj ) {
 		
 		//  Draw top tick mark and label
 //		graphicsObj.drawLine( tickMark_Start_X, tickMark_Y, tickMark_Start_X + TICK_MARK_LENGTH, tickMark_Y );
 		
 		int tickMarkLabel_X = tickMark_Start_X + TICK_MARK_LENGTH + 2;
-		int tickMarkLabel_Y = tickMark_Y + TICK_MARK_VERTICAL_AXIS_VERTICAL_OFFSET;
+		int tickMarkLabel_Y = tickMark_Y_TextBaseline;
 				
 		graphicsObj.drawString( tickMarkLabelValue, tickMarkLabel_X, tickMarkLabel_Y );
 	}
