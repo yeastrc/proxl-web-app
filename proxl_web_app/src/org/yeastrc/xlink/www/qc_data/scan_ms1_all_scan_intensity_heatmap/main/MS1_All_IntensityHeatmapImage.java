@@ -34,15 +34,25 @@ import org.yeastrc.xlink.ms1_binned_summed_intensities.objects.MS1_IntensitiesBi
 /**
  * Create a PNG image for the MS1 Intensity
  *
+ * !!!!!!!!!!!   VERY IMPORTANT  !!!!!!!!!!!!!!!!!!!!
+ * Increment VERSION_FOR_CACHING whenever change the resulting image since Caching the resulting image
+ * 
  */
 public class MS1_All_IntensityHeatmapImage {
 
 	private static final Logger log = Logger.getLogger(MS1_All_IntensityHeatmapImage.class);
 	
 	/**
+	 *  !!!!!!!!!!!   VERY IMPORTANT  !!!!!!!!!!!!!!!!!!!!
+	 * 
+	 *  Increment this value whenever change the resulting image since Caching the resulting image
+	 */
+	static final int VERSION_FOR_CACHING = 1;
+	
+	/**
 	 *  Must be in ascending order since searching using Arrays.binarySearch
 	 */
-	private static final int[] ALLOWED_REQUESTED_IMAGE_WIDTHS = { 1500 };
+	static final int[] ALLOWED_REQUESTED_IMAGE_WIDTHS = { 1500 };
 
 	private static final Color[] PLOTTED_PIXEL_COLORS = 
 		{ Color.white, new Color(82,46,155), new Color(255,246,11), Color.red };
@@ -65,7 +75,6 @@ public class MS1_All_IntensityHeatmapImage {
 	private final static int PIXEL_INTENSITY_PER_CHANNEL_MINUS_ONE = PIXEL_INTENSITY_PER_CHANNEL - 1;
 
 	private static final int TICK_MARK_LENGTH = 4;
-	private static final int TICK_MARK_VERTICAL_AXIS_VERTICAL_OFFSET = 4;
 	private static final int TICK_MARK_HORIZONTAL_AXIS_VERTICAL_OFFSET = 1;
 	
 	private static final int IMAGE_MARGIN_LEFT = 60;
@@ -145,24 +154,34 @@ public class MS1_All_IntensityHeatmapImage {
 			}
 		}
 		
-		MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot =
+
+		byte[] imageAsBytes = 
+				MS1_All_IntensityHeatmapImageCachedResultImageManager.getSingletonInstance()
+				.retrieveImageDataFromCache( scanFileId, requestedImageWidth );
+		
+		if ( imageAsBytes == null ) {
+
+			MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot =
 				getMS1_IntensitiesBinnedSummedMapToJSONRoot( scanFileId );
 
-		if ( ms1_IntensitiesBinnedSummedMapToJSONRoot == null ) {
-			
-			return new MS1_All_IntensityHeatmapImageResult();
+			if ( ms1_IntensitiesBinnedSummedMapToJSONRoot == null ) {
+				return new MS1_All_IntensityHeatmapImageResult();
+			}
+
+			BufferedImage bufferedImage = 
+					getImage( requestedImageWidth, ms1_IntensitiesBinnedSummedMapToJSONRoot, scanFileId /* for logging */ );
+
+			ByteArrayOutputStream baos = new ByteArrayOutputStream(); // ( imageWidth * imageHeight * 4 );
+
+			ImageIO.write( bufferedImage, "PNG", baos );
+
+			baos.close();
+
+			imageAsBytes = baos.toByteArray();
 		}
 		
-		BufferedImage bufferedImage = 
-				getImage( requestedImageWidth, ms1_IntensitiesBinnedSummedMapToJSONRoot, scanFileId /* for logging */ );
-
-		ByteArrayOutputStream baos = new ByteArrayOutputStream(); // ( imageWidth * imageHeight * 4 );
-
-		ImageIO.write( bufferedImage, "PNG", baos );
-
-		baos.close();
-
-		byte[] imageAsBytes = baos.toByteArray();
+		MS1_All_IntensityHeatmapImageCachedResultImageManager.getSingletonInstance()
+		.saveImageDataToCache( scanFileId, requestedImageWidth, imageAsBytes );
 		
 		MS1_All_IntensityHeatmapImageResult resultObj = new MS1_All_IntensityHeatmapImageResult();
 		

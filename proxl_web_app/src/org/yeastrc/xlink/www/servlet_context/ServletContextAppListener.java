@@ -12,6 +12,7 @@ import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTabl
 import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTableGetValue;
 import org.yeastrc.xlink.www.async_action_via_executor_service.AsyncActionViaExecutorService;
 import org.yeastrc.xlink.www.auth_db.AuthLibraryDBConnectionFactoryForWeb;
+import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistration;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
 import org.yeastrc.xlink.www.config_properties_file.ProxlConfigFileReader;
 import org.yeastrc.xlink.www.config_system_table.AppContextConfigSystemValuesRetrieval;
@@ -113,6 +114,13 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		
 		AsyncActionViaExecutorService.initInstance();
 		
+		try {
+			CachedDataInFileMgmtRegistration.getSingletonInstance().init();
+		} catch (Exception e) {
+			//  already logged
+			throw new RuntimeException( e );
+		} 
+		
 		log.warn( "INFO:  !!!!!!!!!!!!!!!   Start up of web app  'Proxl' complete  !!!!!!!!!!!!!!!!!!!! " );
 		log.warn( "INFO: Application context values set.  Key = " + WebConstants.APP_CONTEXT_CONTEXT_PATH + ": value = " + contextPath
 				+ "" );
@@ -132,6 +140,12 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		} catch (Exception e) {
 			log.error( "CachedDataCentralRegistry.getInstance().writeToLogAllCacheSizes() threw exception while app undeploying.", e);
 		}
+
+		try {
+			CachedDataInFileMgmtRegistration.getSingletonInstance().shutdownNow();
+		} catch ( Exception e ) {
+			log.error( "In contextDestroyed(ServletContextEvent event), CachedDataInFileMgmtRegistration.getSingletonInstance().shutdownNow();", e );
+		}
 		
 		try {
 			AsyncActionViaExecutorService.getInstance().shutdownNow();
@@ -139,15 +153,7 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 			log.error( "In contextDestroyed(ServletContextEvent event), AsyncActionViaExecutorService.getInstance().shutdownNow();", e );
 		}
 		
-//		LastLoginUpdaterQueue.endProcessing();
-//		
-//		try {
-//			LastLoginUpdaterThread.getInstance().join();
-//		} catch (InterruptedException e) {
-//
-//			log.error( "In contextDestroyed(ServletContextEvent event), LastLoginUpdaterThread.getInstance().join();", e );
-//			
-//			
-//		}
+		
+
 	}
 }

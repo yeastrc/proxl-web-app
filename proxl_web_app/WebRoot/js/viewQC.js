@@ -6047,10 +6047,19 @@ var ViewQCPageCode = function() {
 		var $img = $( img );
 		$fullSizeLink.append( $img );
 		
-		// 'load' event
-		$img.on( 'load', function() {
+		//  Add the 'load' before setting 'src' to ensure the 'load' callback is always called, even for cached images
+		
+		var callBackOnImageLoadSuccess = function( event ) {
 			objectThis.load_MS_1_IonCurrent_HeatmapOnImageLoad();
-		});
+		};
+		var callBackOnImageLoadFail = function( event ) {
+			//  Add code to handle fail, maybe display message to user
+			var z = 0;
+		};
+		
+		img.addEventListener('load', callBackOnImageLoadSuccess, false /* useCapture */);
+		img.addEventListener('error', callBackOnImageLoadFail, false /* useCapture */);
+		
 		img.src = imageHref;
 	};
 
