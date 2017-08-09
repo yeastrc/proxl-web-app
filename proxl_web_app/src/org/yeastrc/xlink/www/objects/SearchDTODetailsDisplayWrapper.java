@@ -22,7 +22,6 @@ public class SearchDTODetailsDisplayWrapper {
 	private SearchDTO searchDTO;
 	private List<SearchProgramDisplay> searchProgramDisplayList; 
 	private List<CutoffsAppliedOnImportWebDisplay> cutoffsAppliedOnImportList;
-	private String cutoffsAppliedOnImportAllAsString;
 	
 	/**
 	 * Not used on viewProject.jsp
@@ -83,16 +82,6 @@ public class SearchDTODetailsDisplayWrapper {
 				GetCutoffsAppliedOnImport.getInstance().getCutoffsAppliedOnImportList( searchDTO.getSearchId() );
 
 		return cutoffsAppliedOnImportList;
-	}
-	
-	public String getCutoffsAppliedOnImportAllAsString() throws Exception {
-		if ( cutoffsAppliedOnImportAllAsString != null ) {
-			return cutoffsAppliedOnImportAllAsString;
-		}
-		List<CutoffsAppliedOnImportWebDisplay> cutoffsAppliedOnImportList = this.getCutoffsAppliedOnImportList();
-		cutoffsAppliedOnImportAllAsString = 
-				GetCutoffsAppliedOnImport.getInstance().getCutoffsAppliedOnImportAllAsString( cutoffsAppliedOnImportList );
-		return cutoffsAppliedOnImportAllAsString;
 	}
 	
 	//  Getters & Setters
