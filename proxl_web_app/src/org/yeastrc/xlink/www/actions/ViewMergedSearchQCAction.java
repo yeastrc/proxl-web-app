@@ -19,6 +19,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
@@ -33,6 +34,7 @@ import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
+import org.yeastrc.xlink.www.web_utils.GetCutoffsAppliedOnImport;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
@@ -183,6 +185,17 @@ public class ViewMergedSearchQCAction extends Action {
 				modMassStringsList.add( modMassAsString );
 			}
 			request.setAttribute( "modMassFilterList", modMassStringsList );
+			
+			if ( searchIdsArray.length == 1 ) {
+				String cutoffsAppliedOnImportAllAsString =
+						GetCutoffsAppliedOnImport.getInstance().getCutoffsAppliedOnImportAllAsString( searchIdsArray[ 0 ] );
+				request.setAttribute( "cutoffsAppliedOnImportAllAsString", cutoffsAppliedOnImportAllAsString );
+			} else {
+				String msg = "Code for cutoffsAppliedOnImportAllAsString currently only supports 1 search id.";
+				log.error( msg );
+				throw new ProxlWebappInternalErrorException(msg);
+			}
+			
 			/////////////////////////////////////////////////////////////////////////////
 			////////   Generic Param processing
 			CutoffValuesRootLevel cutoffValuesRootLevelCutoffDefaults =

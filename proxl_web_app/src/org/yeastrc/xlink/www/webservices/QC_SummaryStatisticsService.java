@@ -139,7 +139,7 @@ public class QC_SummaryStatisticsService {
 					//  Haven't processed this projectSearchId yet in this loop so process it now
 					SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 					if ( search == null ) {
-						String msg = "projectSearchId '" + projectSearchId + "' not found in the database. User taken to home page.";
+						String msg = "projectSearchId '" + projectSearchId + "' not found in the database.";
 						log.warn( msg );
 						//  Search not found, the data on the page they are requesting does not exist.
 					    throw new WebApplicationException(

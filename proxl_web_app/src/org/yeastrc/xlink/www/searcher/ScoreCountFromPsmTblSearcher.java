@@ -25,8 +25,9 @@ public class ScoreCountFromPsmTblSearcher {
 	/**
 	 * Get count of records, never applying psmScoreCutoff
 	 * 
-	 * @param linkType
 	 * @param searchId
+	 * @param scanFileId - Optional
+	 * @param linkType
 	 * @param annotationTypeId
 	 * @param proteinSequenceIdsToIncludeList
 	 * @param proteinSequenceIdsToExcludeList
@@ -34,8 +35,9 @@ public class ScoreCountFromPsmTblSearcher {
 	 * @throws Exception
 	 */
 	public int getScoreCount( 
-			LinkType linkType, 
 			int searchId,
+			Integer scanFileId, 
+			LinkType linkType,  
 			int annotationTypeId,
 			List<Integer> proteinSequenceIdsToIncludeList,
 			List<Integer> proteinSequenceIdsToExcludeList
@@ -49,8 +51,9 @@ public class ScoreCountFromPsmTblSearcher {
 		ResultSet rs = null;
 		String sql = createSelectSQL( 
 				"COUNT(*) AS count", 
-				linkType, 
-				searchId, 
+				searchId,
+				scanFileId, 
+				linkType,  
 				annotationTypeId, 
 				null /* psmScoreCutoff */, 
 				proteinSequenceIdsToIncludeList, 
@@ -85,8 +88,9 @@ public class ScoreCountFromPsmTblSearcher {
 	}
 	
 	/**
-	 * @param linkType
 	 * @param searchId
+	 * @param scanFileId - Optional
+	 * @param linkType
 	 * @param annotationTypeId
 	 * @param psmScoreCutoff - Not NULL if set
 	 * @param proteinSequenceIdsToIncludeList
@@ -95,8 +99,9 @@ public class ScoreCountFromPsmTblSearcher {
 	 * @throws Exception
 	 */
 	public List<Double> getScoreValues( 
-			LinkType linkType,  
 			int searchId,
+			Integer scanFileId, 
+			LinkType linkType,  
 			int annotationTypeId,
 			Double psmScoreCutoff,
 			List<Integer> proteinSequenceIdsToIncludeList,
@@ -108,8 +113,9 @@ public class ScoreCountFromPsmTblSearcher {
 		}
 		String sql = createSelectSQL( 
 				"value_double", 
-				linkType, 
-				searchId, 
+				searchId,
+				scanFileId, 
+				linkType,  
 				annotationTypeId, 
 				psmScoreCutoff, 
 				proteinSequenceIdsToIncludeList, 
@@ -155,8 +161,9 @@ public class ScoreCountFromPsmTblSearcher {
 	 * Create SQL
 	 * 
 	 * @param selectResult - What the select should return 
-	 * @param linkType
 	 * @param searchId
+	 * @param scanFileId - Optional
+	 * @param linkType
 	 * @param annotationTypeId
 	 * @param psmScoreCutoff - Not NULL if set
 	 * @param proteinSequenceIdsToIncludeList
@@ -166,8 +173,9 @@ public class ScoreCountFromPsmTblSearcher {
 	 */
 	private String createSelectSQL( 
 			String selectResult,
-			LinkType linkType,  
 			int searchId,
+			Integer scanFileId, 
+			LinkType linkType,  
 			int annotationTypeId,
 			Double psmScoreCutoff,
 			List<Integer> proteinSequenceIdsToIncludeList,
@@ -187,6 +195,23 @@ public class ScoreCountFromPsmTblSearcher {
 		sqlSB.append( "SELECT " );
 		sqlSB.append( selectResult );
 		sqlSB.append( " FROM psm_filterable_annotation__generic_lookup AS pfagl \n" );
+		
+		//  If Scan file Id, add to SQL
+		if ( scanFileId != null ) {
+			sqlSB.append( " INNER JOIN ( \n" );
+			
+			sqlSB.append( "   SELECT psm.id AS psm_id FROM \n" );
+			sqlSB.append( "    psm INNER JOIN scan ON psm.scan_id = scan.id  \n" );
+			sqlSB.append( "    WHERE psm.search_id = " );
+			sqlSB.append( Integer.toString( searchId ) );
+			sqlSB.append( " AND scan.scan_file_id = " );
+			sqlSB.append( Integer.toString( scanFileId ) );
+			sqlSB.append( " \n" );
+
+			sqlSB.append( "\n ) AS psm_ids_for_scan_files ON pfagl.psm_id = psm_ids_for_scan_files.psm_id " ); //  Close the subselect and specify join
+		}
+		
+		//  If proteins Include or Exclude List is not empty, add to SQL
 		if ( ( proteinSequenceIdsToIncludeList != null && ( ! proteinSequenceIdsToIncludeList.isEmpty() ) )
 				|| ( proteinSequenceIdsToExcludeList != null && ( ! proteinSequenceIdsToExcludeList.isEmpty() ) ) ) {
 			sqlSB.append( " INNER JOIN ( \n" );
@@ -215,6 +240,7 @@ public class ScoreCountFromPsmTblSearcher {
 			}
 			sqlSB.append( "\n ) AS rep_pept_ids ON pfagl.reported_peptide_id = rep_pept_ids.reported_peptide_id " ); //  Close the subselect and specify join
 		}
+		
 		sqlSB.append( "\n WHERE pfagl.search_id = " );
 		sqlSB.append( searchIdString );
 		sqlSB.append( " AND annotation_type_id = " );

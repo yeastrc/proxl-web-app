@@ -40,6 +40,7 @@
 	  var _PROXL_DEFAULT_FONT_COLOR = "#545454";
 	  
 	  var _PROXL_COLOR_SITE_RED = "#A55353";
+	  var _PROXL_COLOR_SITE_PINK = "#FFF0F0"; // Light pink background of page header and footer
 	  var _PROXL_COLOR_SITE_GREEN = "#53A553";
 	  var _PROXL_COLOR_SITE_BLUE = "#5353A5";
 	  

@@ -44,12 +44,6 @@ function initViewProjectPage() {
 	/////////////////////////
 	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 		try {
-			if ( window.initQCPlotsClickHandlers ) {
-				initQCPlotsClickHandlers();
-			}
-			if ( window.initQCPlotPSMCountVsScoreClickHandlers ) {
-				initQCPlotPSMCountVsScoreClickHandlers();
-			}
 			if ( window.initQCPlotPSMScoreVsScoreClickHandlers ) {
 				initQCPlotPSMScoreVsScoreClickHandlers();
 			}

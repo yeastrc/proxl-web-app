@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.dao.SearchProgramsPerSearchDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
+import org.yeastrc.xlink.dto.SearchProgramsPerSearchDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
-import org.yeastrc.xlink.www.constants.QCPlotConstants;
+import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDBDataOutOfSyncException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
@@ -37,8 +39,9 @@ public class CreatePsmCountsVsScoreQCPlotData {
 	}
 	
 	/**
-	 * @param selectedLinkTypes
 	 * @param projectSearchId
+	 * @param scanFileId
+	 * @param selectedLinkTypes
 	 * @param annotationTypeId
 	 * @param psmScoreCutoff
 	 * @param proteinSequenceIdsToIncludeList
@@ -47,12 +50,14 @@ public class CreatePsmCountsVsScoreQCPlotData {
 	 * @throws Exception
 	 */
 	public PsmCountsVsScoreQCPlotDataJSONRoot create( 
-			Set<String> selectedLinkTypes, 
 			int projectSearchId, 
-			int annotationTypeId, 
+			Integer scanFileId, 
+			Set<String> selectedLinkTypes, 
+			Integer annotationTypeId, 
 			Double psmScoreCutoff,
 			List<Integer> proteinSequenceIdsToIncludeList,
 			List<Integer> proteinSequenceIdsToExcludeList ) throws Exception {
+		
 		if ( selectedLinkTypes == null || selectedLinkTypes.isEmpty() ) {
 			String msg = "selectedLinkTypes cannot be empty.";
 			log.error( msg );
@@ -76,12 +81,69 @@ public class CreatePsmCountsVsScoreQCPlotData {
 			log.error(msg);
 			throw new ProxlWebappDataException(msg);
 		}
-		AnnotationTypeDTO annotationTypeDTO = annotationTypeDataForSearchId.get( annotationTypeId );
-		if ( annotationTypeDTO == null ) {
-			String msg = "No Filterable PSM Annotation type for search id: " + searchId + ", annotationTypeId: " + annotationTypeId;
-			log.error(msg);
-			throw new ProxlWebappDataException(msg);
+		
+		AnnotationTypeDTO annotationTypeDTO = null;
+		
+		if ( annotationTypeId == null ) {
+			//  Get Default annotationTypeId for search id
+			// Use annotation type with smallest sort order, if any have sort order.
+			// Otherwise, use annotation type with first sorted name, using compareToIgnoreCase.
+			
+			AnnotationTypeDTO annotationTypeDTOBasedOnSortOrder = null;
+			AnnotationTypeDTO annotationTypeDTOBasedOnNameAlphabetical = null;
+			
+			for ( Map.Entry<Integer, AnnotationTypeDTO> entry : annotationTypeDataForSearchId.entrySet() ) {
+				AnnotationTypeDTO annotationTypeDTOInEntry = entry.getValue();
+				AnnotationTypeFilterableDTO annotationTypeFilterableDTO = annotationTypeDTOInEntry.getAnnotationTypeFilterableDTO();
+				if ( annotationTypeFilterableDTO == null ) {
+					String msg = "No annotationTypeFilterableDTO for Filterable PSM Annotation type for search id: " + searchId + ", annotationTypeId: " + annotationTypeId;
+					log.error(msg);
+					throw new ProxlWebappDataException(msg);
+				}
+				if ( annotationTypeDTOBasedOnNameAlphabetical == null ) {
+					annotationTypeDTOBasedOnNameAlphabetical = annotationTypeDTOInEntry;
+				} else {
+					if ( annotationTypeDTOInEntry.getName()
+							.compareToIgnoreCase( annotationTypeDTOBasedOnNameAlphabetical.getName() ) < 0 ) {
+						annotationTypeDTOBasedOnNameAlphabetical = annotationTypeDTOInEntry;
+					}
+				}
+				if ( annotationTypeDTOInEntry.getAnnotationTypeFilterableDTO().getSortOrder() == null ) {
+					continue;  // EARLY CONTINUE
+				}
+				if ( annotationTypeDTOBasedOnSortOrder == null ) {
+					annotationTypeDTOBasedOnSortOrder = annotationTypeDTOInEntry;
+					continue;  // EARLY CONTINUE
+				}
+				if ( annotationTypeDTOInEntry.getAnnotationTypeFilterableDTO().getSortOrder() <
+						annotationTypeDTOBasedOnSortOrder.getAnnotationTypeFilterableDTO().getSortOrder() ) {
+					annotationTypeDTOBasedOnSortOrder = annotationTypeDTOInEntry;
+					continue;  // EARLY CONTINUE
+				}
+			}
+			if ( annotationTypeDTOBasedOnSortOrder != null ) {
+				annotationTypeDTO = annotationTypeDTOBasedOnSortOrder;
+			} else {
+				annotationTypeDTO = annotationTypeDTOBasedOnNameAlphabetical;
+			}
+			annotationTypeId = annotationTypeDTO.getId();
+		} else {
+			annotationTypeDTO = annotationTypeDataForSearchId.get( annotationTypeId );
+			if ( annotationTypeDTO == null ) {
+				String msg = "No Filterable PSM Annotation type for search id: " + searchId + ", annotationTypeId: " + annotationTypeId;
+				log.error(msg);
+				throw new ProxlWebappDataException(msg);
+			}
 		}
+		
+		Integer searchProgramsPerSearchId = annotationTypeDTO.getSearchProgramsPerSearchId();
+		SearchProgramsPerSearchDTO searchProgramsPerSearchDTO = SearchProgramsPerSearchDAO.getInstance().getSearchProgramDTOForId( searchProgramsPerSearchId ) ;
+		if ( searchProgramsPerSearchDTO == null ) {
+			String msg = "No searchProgramsPerSearchDTO record found for searchProgramsPerSearchId: " + searchProgramsPerSearchId;
+			log.error( msg );
+			throw new ProxlWebappDBDataOutOfSyncException( msg );
+		}
+		
 		AnnotationTypeFilterableDTO annotationTypeFilterableDTO = annotationTypeDTO.getAnnotationTypeFilterableDTO();
 		if ( annotationTypeFilterableDTO == null ) {
 			String msg = "No annotationTypeFilterableDTO for Filterable PSM Annotation type for search id: " + searchId + ", annotationTypeId: " + annotationTypeId;
@@ -98,20 +160,21 @@ public class CreatePsmCountsVsScoreQCPlotData {
 		Map<String, List<Double>> scoreValuesForSelectedTypesMap = new HashMap<>();
 		for ( String selectedLinkType : selectedLinkTypes ) {
 			LinkType linkType = null;
-			if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__ALL_PSM.equals( selectedLinkType ) ) {
+			if ( PeptideViewLinkTypesConstants.ALL_PSM.equals( selectedLinkType ) ) {
 				linkType = LinkType.ALL;
-			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__CROSSLINK_PSM.equals( selectedLinkType ) ) {
+			} else if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( selectedLinkType ) ) {
 				linkType = LinkType.CROSSLINK;
-			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__LOOPLINK_PSM.equals( selectedLinkType ) ) {
+			} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( selectedLinkType ) ) {
 				linkType = LinkType.LOOPLINK;
-			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__UNLINKED_PSM.equals( selectedLinkType ) ) {
+			} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( selectedLinkType ) ) {
 				linkType = LinkType.UNLINKED;
 			}
 			//  Get data from DB for Link Type
 			List<Double> scoreValuesForPSMsthatMeetCriteriaList = 
 				ScoreCountFromPsmTblSearcher.getInstance().getScoreValues( 
-						linkType, 
 						searchId, 
+						scanFileId,  
+						linkType, 
 						annotationTypeId, 
 						psmScoreCutoff, 
 						proteinSequenceIdsToIncludeList,
@@ -160,34 +223,35 @@ public class CreatePsmCountsVsScoreQCPlotData {
 				//    without applying the cutoff but applying all other selections
 				//  Get data from DB, total score count for selectedLinkType, search id, annotation type id
 				LinkType linkType = null;
-				if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__ALL_PSM.equals( selectedLinkType ) ) {
+				if ( PeptideViewLinkTypesConstants.ALL_PSM.equals( selectedLinkType ) ) {
 					linkType = LinkType.ALL;
-				} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__CROSSLINK_PSM.equals( selectedLinkType ) ) {
+				} else if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( selectedLinkType ) ) {
 					linkType = LinkType.CROSSLINK;
-				} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__LOOPLINK_PSM.equals( selectedLinkType ) ) {
+				} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( selectedLinkType ) ) {
 					linkType = LinkType.LOOPLINK;
-				} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__UNLINKED_PSM.equals( selectedLinkType ) ) {
+				} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( selectedLinkType ) ) {
 					linkType = LinkType.UNLINKED;
 				}
 				totalCountForType = ScoreCountFromPsmTblSearcher.getInstance()
 						.getScoreCount( 
-								linkType, 
 								searchId, 
+								scanFileId, 
+								linkType, 
 								annotationTypeId, 
 								proteinSequenceIdsToIncludeList,
 								proteinSequenceIdsToExcludeList );
 			}
 			PsmCountsVsScoreQCPlotDataJSONPerType linkData = null;
-			if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__ALL_PSM.equals( selectedLinkType ) ) {
+			if ( PeptideViewLinkTypesConstants.ALL_PSM.equals( selectedLinkType ) ) {
 				alllinkData = new PsmCountsVsScoreQCPlotDataJSONPerType();
 				linkData = alllinkData;
-			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__CROSSLINK_PSM.equals( selectedLinkType ) ) {
+			} else if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( selectedLinkType ) ) {
 				crosslinkData = new PsmCountsVsScoreQCPlotDataJSONPerType();
 				linkData = crosslinkData;
-			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__LOOPLINK_PSM.equals( selectedLinkType ) ) {
+			} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( selectedLinkType ) ) {
 				looplinkData = new PsmCountsVsScoreQCPlotDataJSONPerType();
 				linkData = looplinkData;
-			} else if ( QCPlotConstants.PSM_COUNT_VS_SCORE_PLOT__UNLINKED_PSM.equals( selectedLinkType ) ) {
+			} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( selectedLinkType ) ) {
 				unlinkedData = new PsmCountsVsScoreQCPlotDataJSONPerType();
 				linkData = unlinkedData;
 			}
@@ -250,6 +314,9 @@ public class CreatePsmCountsVsScoreQCPlotData {
 		}
 		//  Populate objects to generate JSON
 		PsmCountsVsScoreQCPlotDataJSONRoot psmCountsVsScoreQCPlotDataJSONRoot = new PsmCountsVsScoreQCPlotDataJSONRoot();
+		psmCountsVsScoreQCPlotDataJSONRoot.setAnnotationTypeId( annotationTypeId );
+		psmCountsVsScoreQCPlotDataJSONRoot.setAnnotationTypeName( annotationTypeDTO.getName() );
+		psmCountsVsScoreQCPlotDataJSONRoot.setSearchProgramName( searchProgramsPerSearchDTO.getDisplayName() );
 		psmCountsVsScoreQCPlotDataJSONRoot.setDataArraySize( dataArraySize );
 		psmCountsVsScoreQCPlotDataJSONRoot.setAlllinkData( alllinkData );
 		psmCountsVsScoreQCPlotDataJSONRoot.setCrosslinkData( crosslinkData );

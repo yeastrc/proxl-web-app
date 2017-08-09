@@ -12,6 +12,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_plots.psm_count_for_score.CreatePsmCountsVsScoreQCPlotData;
@@ -28,8 +29,9 @@ public class QCPlotPsmCountsVsScoreService {
 	private static final Logger log = Logger.getLogger(QCPlotPsmCountsVsScoreService.class);
 	
 	/**
-	 * @param selectedLinkTypes
 	 * @param searchId
+	 * @param scanFileId - optional
+	 * @param selectedLinkTypes
 	 * @param annotationTypeId
 	 * @param psmScoreCutoff
 	 * @param proteinSequenceIdsToIncludeList
@@ -41,9 +43,10 @@ public class QCPlotPsmCountsVsScoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getPsmCountsVsScore") 
 	public PsmCountsVsScoreQCPlotDataJSONRoot getPsmCountsVsScore( 
-			@QueryParam( "selectedLinkTypes" ) Set<String> selectedLinkTypes,			
 			@QueryParam( "projectSearchId" ) int projectSearchId,
-			@QueryParam( "annotationTypeId" ) int annotationTypeId,
+			@QueryParam( "scanFileId" ) Integer scanFileId,
+			@QueryParam( "selectedLinkTypes" ) Set<String> selectedLinkTypes,			
+			@QueryParam( "annotationTypeId" ) Integer annotationTypeId,
 			@QueryParam( "psmScoreCutoff" ) Double psmScoreCutoff,
 			@QueryParam( "iP" ) List<Integer> proteinSequenceIdsToIncludeList,
 			@QueryParam( "eP" ) List<Integer> proteinSequenceIdsToExcludeList,
@@ -68,6 +71,7 @@ public class QCPlotPsmCountsVsScoreService {
 		    	        .build()
 		    	        );
 		}
+
 		try {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
@@ -119,8 +123,9 @@ public class QCPlotPsmCountsVsScoreService {
 			PsmCountsVsScoreQCPlotDataJSONRoot psmCountsVsScoreQCPlotDataJSONRoot = 
 					CreatePsmCountsVsScoreQCPlotData.getInstance()
 					.create( 
-							selectedLinkTypes, 
 							projectSearchId, 
+							scanFileId, 
+							selectedLinkTypes, 
 							annotationTypeId, 
 							psmScoreCutoff, 
 							proteinSequenceIdsToIncludeList,

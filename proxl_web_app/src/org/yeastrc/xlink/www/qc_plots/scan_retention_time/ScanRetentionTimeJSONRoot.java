@@ -8,19 +8,12 @@ import java.util.List;
  */
 public class ScanRetentionTimeJSONRoot {
 
-	private int scanFileId;
+	private List<Integer> scanFileIdList;
 	private int numScans;
 	private double retentionTimeMin;
 	private double retentionTimeMax;
 	private List<ScanRetentionTimeJSONChartBucket> chartBuckets;
 	
-	
-	public int getScanFileId() {
-		return scanFileId;
-	}
-	public void setScanFileId(int scanFileId) {
-		this.scanFileId = scanFileId;
-	}
 	public int getNumScans() {
 		return numScans;
 	}
@@ -44,6 +37,12 @@ public class ScanRetentionTimeJSONRoot {
 	}
 	public void setChartBuckets(List<ScanRetentionTimeJSONChartBucket> chartBuckets) {
 		this.chartBuckets = chartBuckets;
+	}
+	public List<Integer> getScanFileIdList() {
+		return scanFileIdList;
+	}
+	public void setScanFileIdList(List<Integer> scanFileIdList) {
+		this.scanFileIdList = scanFileIdList;
 	}
 
 }

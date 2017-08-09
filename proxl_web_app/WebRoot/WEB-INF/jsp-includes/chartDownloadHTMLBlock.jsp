@@ -9,7 +9,7 @@
 	     "chart_outer_container_for_download_jq" is required for the Javascript in chartDownload.js
  --%>
  
-	<div class="" style="position: absolute; top: 4px; right: 4px;">
+	<div class=" svg_download_outer_block_jq " style="position: absolute; top: 4px; right: 4px;">
 	  <div class="svg-download-block">
 		<a href="javascript:" class=" tool_tip_attached_jq  " data-tooltip="Download graphic as file." 
 			><img src="images/icon-download-small.png" /></a>

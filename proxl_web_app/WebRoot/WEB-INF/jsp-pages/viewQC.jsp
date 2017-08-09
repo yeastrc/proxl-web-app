@@ -66,7 +66,35 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/viewQC.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
+
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChartSummaryStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChartDigestionStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChartIonCurrentStatistics.js?x=${cacheBustValue}"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PPM_Error_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_Error_Vs_RetentionTime_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_Error_Vs_M_Over_Z_PSM.js?x=${cacheBustValue}"></script>
+				
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PSM_Count_Vs_RetentionTime_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PSM_Count_Vs_Score_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PSM_Score_Vs_Score_PSM.js?x=${cacheBustValue}"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChartChargeStateStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_M_Over_Z_Statistics_PSM.js?x=${cacheBustValue}"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PSM_Per_Modification.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_Peptide_Lengths.js?x=${cacheBustValue}"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/qcPageSectionSummaryStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageSectionDigestionStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageSectionIonCurrentStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageSection_PSM_Level_Statistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageSection_PSM_Error_Estimates.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageSectionModificationStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageSection_Peptide_Level_Statistics.js?x=${cacheBustValue}"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/qcPageMain.js?x=${cacheBustValue}"></script>
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:
@@ -202,7 +230,6 @@
 						
 						<input id="update_from_database_button"
 							type="button" value="${ UpdateButtonText }" > 
-						<%--  onclick="viewQCPageCode.refreshData()" > --%>
 
 						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 					</td>
@@ -287,7 +314,7 @@
 			
 			</div>
 			<div class="top-level-label">
-			  Scan File Statistics
+			  Ion Current Statistics
 			</div>
 
 			<div class="top-level-label-bottom-border" ></div>
@@ -496,7 +523,56 @@
 			<div class="top-level-label-bottom-border" ></div>
 								
 			<div id="psm_level_display_block" class="project-info-block" style="display: none;"  >
-			
+
+			   <h2>Interactive QC Plots</h2>
+	 		  <table  id="" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+	 		   <tr>
+	 		   		<%-- Retention Time Chart --%>
+				<td style="padding: 4px;">
+				 <div id="retention_time_outer_container_div"
+				 	class=" chart-standard-container-div qc-data-block chart_outer_container_for_download_jq chart_outer_container_jq" 
+				 	> 
+				 </div>
+				 <div style="text-align: center; margin-top: 5px;">
+				   <a id="qc_plot_scan_retention_time_link"
+				   		href="javascript:" data-tooltip="View PSM counts as function of retention time" class="tool_tip_attached_jq " 
+					   	>Click to launch interactive viewer</a>
+				  </div>
+				</td>
+					<%-- PSM Count Vs Score Chart --%>
+				<td style="padding: 4px;">
+				 <div id="psm_count_vs_score_outer_container_div"
+				 	class=" chart-standard-container-div qc-data-block chart_outer_container_for_download_jq chart_outer_container_jq" 
+				 	> 
+				 </div>
+				 <div style="text-align: center; margin-top: 5px;">
+				   <a id="qc_plot_psm_count_vs_score_link"
+				   		href="javascript:" data-tooltip="View PSM counts as function of score" class="tool_tip_attached_jq " 
+					   	>Click to launch interactive viewer</a>
+				  </div>
+				</td>				
+					<%-- PSM Score Vs Score Chart --%>
+				<td style="padding: 4px;">
+				 <div id="psm_score_vs_score_outer_container_div" 
+				 	class=" chart-standard-container-div qc-data-block chart_outer_container_for_download_jq chart_outer_container_jq" 
+				 	> 
+				 </div>
+				 <%--  Template for when insert <img> into DOM --%>
+				 <script type="text/text" id="psm_score_vs_score_image_uri_template"
+				 	><img src="{{image_uri}}" data-tooltip="Click to launch interactive viewer" style="cursor: pointer;" class="tool_tip_attached_jq "
+						id="psm_score_vs_score_thumbnail_chart_image"></script>
+				 <div style="text-align: center; margin-top: 5px;">
+				   <a id="qc_plot_psm_score_vs_score_link"
+				   		href="javascript:" data-tooltip="View 2 PSM scores plotted together" class="tool_tip_attached_jq " 
+					   	>Click to launch interactive viewer</a>
+				  </div>
+				</td>				
+			   </tr>			   
+			  </table>
+			   
+	 		  <table  id="PSMInteractiveQCPlotsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+			  </table>
+			  			
 			   <h2>Charge State Statistics</h2>
 			   
 	 		  <table  id="PSMChargeStatesCountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
@@ -632,6 +708,464 @@
 
 		</div>   <%-- END: Peptide level Statistics --%>
 
+
+
+		<!--  Modal dialog for displaying the Retention Time QC plot -->
+
+
+			<%--   Overlay Background --%>
+			
+		<div id="scan_retention_time_qc_plot_overlay_background" 
+			class=" qc-plot-overlay-background   scan_retention_time_qc_plot_overlay_show_hide_parts_jq scan_retention_time_qc_plot_overlay_close_parts_jq  overlay_show_hide_parts_jq"  
+			style="display: none;"  >
+		
+		</div>
+			
+			<%--  Retention Time QC plot Overlay Div --%>
+			
+				<!--  Inline div for positioning modal dialog on page -->
+		<div class="qc-plot-overlay-containing-outermost-div " id="scan_retention_time_qc_plot_overlay_containing_outermost_div_inline_div" >
+
+		  <div class="qc-plot-overlay-containing-outer-div " style="position: relative;" >
+			
+			<div id="scan_retention_time_qc_plot_overlay_container" 
+				class=" qc-plot-overlay-div overlay-outer-div   scan_retention_time_qc_plot_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
+				style="display: none; "  >
+			
+				<div id="scan_retention_time_qc_plot_overlay_header" class="qc-plot-overlay-header" style="width:100%; " >
+				
+					<h1 id="scan_retention_time_qc_plot_overlay_X_for_exit_overlay" 
+						class="qc-plot-overlay-X-for-exit-overlay  scan_retention_time_qc_plot_overlay_close_parts_jq" 
+						>X</h1>
+						
+					<h1 id="scan_retention_time_qc_plot_overlay_header_text" class="qc-plot-overlay-header-text" >QC Plot: Retention Time</h1>
+				</div>
+				<div id="scan_retention_time_qc_plot_overlay_body" class="qc-plot-overlay-body" >
+				  <div >
+					<table style="border-width:0px;">
+						<tr>
+							<td>Scan File:</td>
+							<td>
+								<select id="scan_retention_time_qc_plot_scan_file_id"  class="scan_retention_time_qc_plot_on_change_jq">
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td>Scans with:</td>
+							<td>
+							  <label >
+								<input type="checkbox" class="scan_retention_time_qc_plot_scans_include_jq scan_retention_time_qc_plot_on_change_jq"
+									id="scan_retention_time_qc_plot_link_type_checkbox_<%= PeptideViewLinkTypesConstants.CROSSLINK_PSM %>"
+									value="<%= PeptideViewLinkTypesConstants.CROSSLINK_PSM %>" >
+								crosslinks
+							  </label>
+							  <label >
+								<input type="checkbox" class="scan_retention_time_qc_plot_scans_include_jq scan_retention_time_qc_plot_on_change_jq"
+									id="scan_retention_time_qc_plot_link_type_checkbox_<%= PeptideViewLinkTypesConstants.LOOPLINK_PSM %>"
+									value="<%= PeptideViewLinkTypesConstants.LOOPLINK_PSM %>" >
+								looplinks
+							  </label> 
+							  <label >
+								<input type="checkbox" class="scan_retention_time_qc_plot_scans_include_jq scan_retention_time_qc_plot_on_change_jq"
+									id="scan_retention_time_qc_plot_link_type_checkbox_<%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>"
+									value="<%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>" >
+								unlinked
+							  </label>
+							</td>
+						</tr>
+						<tr>
+							<td>Max: </td>
+							<td>
+								X:
+								<input type="text" id="scan_retention_time_qc_plot_max_x" 
+									class="scan_retention_time_qc_plot_on_change_jq" 
+									size="8"> 
+								Y:
+								<input type="text" id="scan_retention_time_qc_plot_max_y" 
+									class="scan_retention_time_qc_plot_on_change_jq"
+									size="8">
+				
+								<input type="button" id="scan_retention_time_qc_plot_max_reset_button" value="Reset">
+							</td>
+						</tr>	
+					</table>
+
+					<%-- Error Messages, hidden by default --%>
+					<h1 class="scan_retention_time_qc_plot_filter_psms_by_param_not_a_number_jq" 
+						style="display: none;  ">
+						"Filter PSMs by" is not a number
+					</h1>
+					<h1 class="scan_retention_time_qc_plot_param_not_a_number_jq" 
+						style="display: none;  ">
+						Max X or Max Y is not empty and is not a number
+					</h1>
+
+					<div class="scan_retention_time_qc_plot_have_data_jq" >
+					</div>						
+					
+					<h1 class="scan_retention_time_qc_plot_no_data_jq" style="display: none;  ">
+						No Data
+					</h1>
+					
+					<div id="scan_retention_time_qc_plot_chartDiv_Container" 
+						class=" chart-standard-container-div scan_retention_time_qc_plot_have_data_jq chart_outer_container_for_download_jq chart_outer_container_jq "
+						style="width: 100%; height: 650px; margin-top: 20px; position: relative; " >
+
+					  <div id="scan_retention_time_qc_plot_chartDiv" style="width: 100%; height: 100%; " >
+					  </div>
+					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+					</div>
+												
+				</div>
+			</div>
+		   
+		   </div>
+	
+		  </div>
+		</div>
+		
+		<!-- END:   Modal dialog for displaying the Retention Time QC plot -->
+								
+
+		<!--  Modal dialog for displaying the PSM Q Value Counts QC plot -->
+
+
+			<%--   Overlay Background --%>
+			
+		<div id="psm_count_vs_score_qc_plot_overlay_background" 
+			class=" qc-plot-overlay-background   psm_count_vs_score_qc_plot_overlay_show_hide_parts_jq psm_count_vs_score_qc_plot_overlay_close_parts_jq  overlay_show_hide_parts_jq"  
+			style="display: none;"  >
+		
+		</div>
+			
+			<%--  PSM Q Value Counts QC plot Overlay Div --%>
+			
+				<!--  Inline div for positioning modal dialog on page -->
+		<div class="qc-plot-overlay-containing-outermost-div " id="psm_count_vs_score_qc_plot_overlay_containing_outermost_div_inline_div" >
+
+		  <div class="qc-plot-overlay-containing-outer-div " style="position: relative;" >
+			
+			
+			
+			<div id="psm_count_vs_score_qc_plot_overlay_container" 
+				class=" qc-plot-overlay-div overlay-outer-div   psm_count_vs_score_qc_plot_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
+				style="display: none; "  >
+			
+				<div id="psm_count_vs_score_qc_plot_overlay_header" class="qc-plot-overlay-header" style="width:100%; " >
+				
+					<h1 id="psm_count_vs_score_qc_plot_overlay_X_for_exit_overlay" 
+						class="qc-plot-overlay-X-for-exit-overlay  psm_count_vs_score_qc_plot_overlay_close_parts_jq" 
+						>X</h1>
+						
+					<h1 id="psm_count_vs_score_qc_plot_overlay_header_text" class="qc-plot-overlay-header-text" 
+						>QC Plot: PSM <span id="psm_count_vs_score_qc_plot_overlay_header_text_count_type" ></span> Counts</h1>
+				</div>
+				<div id="psm_count_vs_score_qc_plot_overlay_body" class="qc-plot-overlay-body" >
+			
+				<div >
+					<table style="border-width:0px;">
+						<tr>
+							<td>Scan File:</td>
+							<td colspan="3">
+								<select id="psm_count_vs_score_qc_plot_scan_file_id"  class="psm_count_vs_score_qc_plot_on_change_jq">
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td>Choose score:</td>
+							<td>
+								<select id="psm_count_vs_score_qc_plot_score_type_id" >
+								</select>							
+							</td>
+						</tr>
+						<tr>
+							<td valign="top" style="white-space: nowrap;">Include Protein filter:</td>
+							<td>
+								<select id="psm_count_vs_score_qc_plot_protein_seq_id_include_select" multiple="multiple" 
+									class=" psm_count_vs_score_qc_plot_on_change_jq " >
+								</select>					
+							</td>
+<%-- 							
+						</tr>
+						
+						<tr>
+--%>						
+							<td valign="top" style="white-space: nowrap; padding-left: 10px;">Exclude Protein filter:</td>
+							<td>
+								<select id="psm_count_vs_score_qc_plot_protein_seq_id_exclude_select" multiple="multiple" 
+									class=" psm_count_vs_score_qc_plot_on_change_jq " >
+								</select>					
+							</td>
+						</tr>
+						
+						<c:if test="${ not empty cutoffsAppliedOnImportAllAsString }">
+						  <tr id="psm_count_vs_score_qc_plot_score_cutoffs_on_import_row" 
+							style="">
+							<td id="psm_count_vs_score_qc_plot_score_cutoffs_on_import_message"
+								class=" qc-plot-filter-on-import-notice "
+								colspan="2" >
+								Note: Filtered on Import:
+								<%-- Block for annotations and values text --%>
+								<c:out value="${ cutoffsAppliedOnImportAllAsString }"></c:out>
+							</td>	
+						  </tr>
+						</c:if>
+						
+						<tr>
+							<td>View as:</td>
+							<td>
+							  <label >
+								<input type="radio"
+									id="psm_count_vs_score_qc_plot_y_axis_as_percentage"
+									name="psm_count_vs_score_qc_plot_y_axis_choice"
+									class=" psm_count_vs_score_qc_plot_on_change_jq"
+									value="" >
+									percentage
+							  </label>
+							  
+							  <label >
+								<input type="radio"
+									id="psm_count_vs_score_qc_plot_y_axis_as_raw_counts"
+									name="psm_count_vs_score_qc_plot_y_axis_choice"
+									class=" psm_count_vs_score_qc_plot_on_change_jq"
+									checked="checked"
+									value="" >
+									raw counts
+							  </label>
+							<td>
+						</tr>
+						
+						<tr>
+							<td>PSMs with:</td>
+							<td colspan="3">
+							  <label >
+								<input type="checkbox" class="psm_count_vs_score_qc_plot_link_type_include_jq psm_count_vs_score_qc_plot_on_change_jq"
+									id="psm_count_vs_score_qc_plot_link_type_checkbox_<%= PeptideViewLinkTypesConstants.CROSSLINK_PSM %>"
+									value="<%=PeptideViewLinkTypesConstants.CROSSLINK_PSM%>" >
+								crosslinks
+							  </label>
+							  <label >
+								<input type="checkbox" class="psm_count_vs_score_qc_plot_link_type_include_jq psm_count_vs_score_qc_plot_on_change_jq"
+									id="psm_count_vs_score_qc_plot_link_type_checkbox_<%= PeptideViewLinkTypesConstants.LOOPLINK_PSM %>"
+									value="<%=PeptideViewLinkTypesConstants.LOOPLINK_PSM%>" >
+								looplinks
+							  </label> 
+							  
+							  <label >
+								<input type="checkbox" class="psm_count_vs_score_qc_plot_link_type_include_jq psm_count_vs_score_qc_plot_on_change_jq"
+									id="psm_count_vs_score_qc_plot_link_type_checkbox_<%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>"
+									value="<%=PeptideViewLinkTypesConstants.UNLINKED_PSM%>" >
+								unlinked
+							  </label>
+							  <label >
+								<input type="checkbox" class="psm_count_vs_score_qc_plot_link_type_include_jq psm_count_vs_score_qc_plot_on_change_jq"
+									value="<%=PeptideViewLinkTypesConstants.ALL_PSM%>" >
+								all
+							  </label> 							  
+							</td>
+						</tr>
+	
+						<tr>
+							<td>Max: </td>
+							<td colspan="3">
+								X:
+								<input type="text" id="psm_count_vs_score_qc_plot_max_x" 
+									class="psm_count_vs_score_qc_plot_on_change_jq" 
+									size="8"> 
+								Y:
+								<input type="text" id="psm_count_vs_score_qc_plot_max_y" 
+									class="psm_count_vs_score_qc_plot_on_change_jq"
+									size="8">
+				
+								<input type="button" id="psm_count_vs_score_qc_plot_max_reset_button" value="Reset">
+							</td>
+						</tr>	
+					</table>
+					
+					<div style="margin-bottom: 15px;">
+						<a href="javascript:" id="psm_count-svg-download-data"
+							data-tooltip="Download current data as tab limited text." style="font-size:10pt;white-space:nowrap;" 
+							href="#" class="tool_tip_attached_jq download-svg">[Download Data]</a>
+					</div>
+
+					<h1 class="psm_count_vs_score_qc_plot_no_data_jq" 
+						style="display: none;  ">
+						No Data
+					</h1>
+					<h1 class="psm_count_vs_score_qc_plot_param_not_a_number_jq" 
+						style="display: none;  ">
+						Max X or Max Y is not empty and is not a number
+					</h1>
+					
+					<div id="psm_count_vs_score_qc_plot_chartDiv_Container" 
+						class=" chart-standard-container-div psm_count_vs_score_qc_plot_have_data_jq chart_outer_container_for_download_jq chart_outer_container_jq "
+						style="width: 100%; height: 650px; margin-top: 20px; position: relative; " >
+
+					  <div id="psm_count_vs_score_qc_plot_chartDiv" style="width: 100%; height: 100%; " >
+					  </div>
+					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+					</div>					
+					
+				</div>
+				
+			</div>
+		   
+		   </div>
+	
+		  </div>
+		</div>
+		
+		
+		<!-- END:   Modal dialog for displaying the PSM Q Value Counts QC plot -->
+								
+
+		
+		<!--  Modal dialog for displaying the PSM Score VS Score QC plot -->
+
+
+			<%--   Overlay Background --%>
+			
+		<div id="psm_score_vs_score_qc_plot_overlay_background" 
+			class=" qc-plot-overlay-background   psm_score_vs_score_qc_plot_overlay_show_hide_parts_jq psm_score_vs_score_qc_plot_overlay_close_parts_jq  overlay_show_hide_parts_jq"  
+			style="display: none;"  >
+		
+		</div>
+			
+			<%--  PSM Score VS Score QC plot Overlay Div --%>
+			
+				<!--  Inline div for positioning modal dialog on page -->
+		<div class="qc-plot-overlay-containing-outermost-div " id="psm_score_vs_score_qc_plot_overlay_containing_outermost_div_inline_div" >
+
+		  <div class="qc-plot-overlay-containing-outer-div " style="position: relative;" >
+			
+			<div id="psm_score_vs_score_qc_plot_overlay_container" 
+				class=" qc-plot-overlay-div overlay-outer-div   psm_score_vs_score_qc_plot_overlay_show_hide_parts_jq  overlay_show_hide_parts_jq" 
+				style="display: none; "  >
+			
+				<div id="psm_score_vs_score_qc_plot_overlay_header" class="qc-plot-overlay-header" style="width:100%; " >
+				
+					<h1 id="psm_score_vs_score_qc_plot_overlay_X_for_exit_overlay" 
+						class="qc-plot-overlay-X-for-exit-overlay  psm_score_vs_score_qc_plot_overlay_close_parts_jq" 
+						>X</h1>
+						
+					<h1 id="psm_score_vs_score_qc_plot_overlay_header_text" class="qc-plot-overlay-header-text" 
+						>QC Plot: PSM Score Vs Score</h1>
+				</div>
+				<div id="psm_score_vs_score_qc_plot_overlay_body" class="qc-plot-overlay-body" >
+			
+				<div >
+					<table style="border-width:0px;">
+						<tr>
+							<td>Scan File:</td>
+							<td>
+								<select id="psm_score_vs_score_qc_plot_scan_file_id"  class="psm_score_vs_score_qc_plot_on_change_jq">
+								</select>
+							</td>
+						</tr>				
+								
+						<tr>
+							<td>X-Axis Score:</td>
+							<td>
+								<select id="psm_score_vs_score_qc_plot_score_type_id_1" >
+								</select>							
+							</td>
+						</tr>
+						
+						<tr>
+							<td>Y-Axis Score:</td>
+							<td>
+								<select id="psm_score_vs_score_qc_plot_score_type_id_2" >
+									
+								</select>							
+							</td>
+						</tr>
+						<c:if test="${ not empty cutoffsAppliedOnImportAllAsString }">
+						  <tr id="psm_score_vs_score_qc_plot_score_cutoffs_on_import_row" 
+							style="">
+							<td id="psm_score_vs_score_qc_plot_score_cutoffs_on_import_message"
+								class=" qc-plot-filter-on-import-notice "
+								colspan="2" >
+								Note: Filtered on Import:
+								<%-- Block for annotations and values text --%>
+								<c:out value="${ cutoffsAppliedOnImportAllAsString }"></c:out>
+							</td>	
+						  </tr>
+						</c:if>
+						<tr>
+							<td>PSMs with:</td>
+							<td>
+							  <label >
+								<input type="checkbox" class="psm_score_vs_score_qc_plot_link_type_include_jq psm_score_vs_score_qc_plot_on_change_jq"
+									id="psm_score_vs_score_qc_plot_link_type_checkbox_<%= PeptideViewLinkTypesConstants.CROSSLINK_PSM %>"
+									value="<%=PeptideViewLinkTypesConstants.CROSSLINK_PSM%>" >
+								crosslinks
+							  </label>
+							  <label >
+								<input type="checkbox" class="psm_score_vs_score_qc_plot_link_type_include_jq psm_score_vs_score_qc_plot_on_change_jq"
+									id="psm_score_vs_score_qc_plot_link_type_checkbox_<%= PeptideViewLinkTypesConstants.LOOPLINK_PSM %>"
+									value="<%=PeptideViewLinkTypesConstants.LOOPLINK_PSM%>" >
+								looplinks
+							  </label> 
+							  
+							  <label >
+								<input type="checkbox" class="psm_score_vs_score_qc_plot_link_type_include_jq psm_score_vs_score_qc_plot_on_change_jq"
+									id="psm_score_vs_score_qc_plot_link_type_checkbox_<%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>"
+									value="<%=PeptideViewLinkTypesConstants.UNLINKED_PSM%>" >
+								unlinked
+							  </label>
+							</td>
+						</tr>
+						<tr>
+							<td>Max: </td>
+							<td>
+								X:
+								<input type="text" id="psm_score_vs_score_qc_plot_max_x" 
+									class="psm_score_vs_score_qc_plot_on_change_jq" 
+									size="8"> 
+								Y:
+								<input type="text" id="psm_score_vs_score_qc_plot_max_y" 
+									class="psm_score_vs_score_qc_plot_on_change_jq"
+									size="8">
+				
+								<input type="button" id="psm_score_vs_score_qc_plot_max_reset_button" value="Reset">
+							</td>
+						</tr>	
+														
+					</table>
+					
+					<div style="margin-bottom: 15px;">
+						<a href="javascript:" id="psm_score-svg-download-data"
+							data-tooltip="Download current data as tab limited text." style="font-size:10pt;white-space:nowrap;" 
+							href="javascript:" class="tool_tip_attached_jq download-svg">[Download Data]</a>
+					</div>
+					<h1 class="psm_score_vs_score_qc_plot_no_data_jq" style="display: none;  ">
+						No Data
+					</h1>
+					<h1 class="psm_score_vs_score_qc_plot_param_not_a_number_jq" style="display: none;  ">
+						Max X or Max Y is not empty and is not a number
+					</h1>
+
+					<div id="psm_score_vs_score_qc_plot_chartDiv_Container" 
+						class=" chart-standard-container-div psm_score_vs_score_qc_plot_have_data_jq chart_outer_container_for_download_jq chart_outer_container_jq "
+						style="width: 100%; height: 650px; margin-top: 20px; position: relative; " >
+
+					  <div id="psm_score_vs_score_qc_plot_chartDiv" style="width: 100%; height: 100%; " >
+					  </div>
+					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+					</div>					
+																		
+				</div>
+				
+			</div>
+		   
+		   </div>
+	
+		  </div>
+		</div>
+		
+		
+		<!-- END:   Modal dialog for displaying the PSM Score VS Score QC plot -->
+						
 
 	</div>  <!--  Close   <div class="overall-enclosing-block">  -->
 	

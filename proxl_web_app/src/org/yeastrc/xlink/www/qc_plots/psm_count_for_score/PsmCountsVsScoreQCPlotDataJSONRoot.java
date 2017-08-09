@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.qc_plots.psm_count_for_score;
 
 
 /**
- * Root of JSON returned for Psm Count per Q value Chart
+ * Root of JSON returned for Psm Count per Score Chart
  *
  */
 public class PsmCountsVsScoreQCPlotDataJSONRoot {
@@ -18,6 +18,10 @@ public class PsmCountsVsScoreQCPlotDataJSONRoot {
 	
 	private boolean sortDirectionAbove;
 	private boolean sortDirectionBelow;
+	
+	private Integer annotationTypeId;
+	private String annotationTypeName;
+	private String searchProgramName;
 	
 
 	public boolean isSortDirectionAbove() {
@@ -75,6 +79,30 @@ public class PsmCountsVsScoreQCPlotDataJSONRoot {
 
 	public void setAlllinkData(PsmCountsVsScoreQCPlotDataJSONPerType alllinkData) {
 		this.alllinkData = alllinkData;
+	}
+
+	public Integer getAnnotationTypeId() {
+		return annotationTypeId;
+	}
+
+	public void setAnnotationTypeId(Integer annotationTypeId) {
+		this.annotationTypeId = annotationTypeId;
+	}
+
+	public String getAnnotationTypeName() {
+		return annotationTypeName;
+	}
+
+	public void setAnnotationTypeName(String annotationTypeName) {
+		this.annotationTypeName = annotationTypeName;
+	}
+
+	public String getSearchProgramName() {
+		return searchProgramName;
+	}
+
+	public void setSearchProgramName(String searchProgramName) {
+		this.searchProgramName = searchProgramName;
 	}
 	
 }

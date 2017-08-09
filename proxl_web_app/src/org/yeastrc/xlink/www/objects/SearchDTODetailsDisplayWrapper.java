@@ -8,8 +8,7 @@ import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplaySearchLevel;
 import org.yeastrc.xlink.www.searcher.SearchProgramDisplaySearcher;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_CutoffsAppliedOnImportWebDisplay;
-import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.Cached_CutoffsAppliedOnImportWebDisplay_Result;
+import org.yeastrc.xlink.www.web_utils.GetCutoffsAppliedOnImport;
 
 
 /**
@@ -80,10 +79,8 @@ public class SearchDTODetailsDisplayWrapper {
 		if ( searchDTO == null ) {
 			throw new IllegalStateException( "searchDTO == null");
 		}
-		Cached_CutoffsAppliedOnImportWebDisplay_Result cached_CutoffsAppliedOnImportWebDisplay_Result =
-				Cached_CutoffsAppliedOnImportWebDisplay.getInstance()
-				.getCached_CutoffsAppliedOnImportWebDisplay_Result( searchDTO.getSearchId() );
-		cutoffsAppliedOnImportList = cached_CutoffsAppliedOnImportWebDisplay_Result.getCutoffsAppliedOnImportList();
+		cutoffsAppliedOnImportList = 
+				GetCutoffsAppliedOnImport.getInstance().getCutoffsAppliedOnImportList( searchDTO.getSearchId() );
 
 		return cutoffsAppliedOnImportList;
 	}
@@ -93,42 +90,8 @@ public class SearchDTODetailsDisplayWrapper {
 			return cutoffsAppliedOnImportAllAsString;
 		}
 		List<CutoffsAppliedOnImportWebDisplay> cutoffsAppliedOnImportList = this.getCutoffsAppliedOnImportList();
-		if ( cutoffsAppliedOnImportList == null || ( cutoffsAppliedOnImportList.isEmpty() ) ) {
-			cutoffsAppliedOnImportAllAsString = "";
-			return cutoffsAppliedOnImportAllAsString;
-		}
-		StringBuilder peptideCutoffsOnImport = new StringBuilder();
-		StringBuilder psmCutoffsOnImport = new StringBuilder();
-		boolean firstPeptideCutoffsOnImport = true;
-		boolean firstPsmCutoffsOnImport = true;
-		for ( CutoffsAppliedOnImportWebDisplay cutoffsAppliedOnImport : cutoffsAppliedOnImportList ) {
-			if ( cutoffsAppliedOnImport.isPeptideCutoff() ) {
-				if ( peptideCutoffsOnImport.length() == 0 ) {
-					peptideCutoffsOnImport.append( "Peptide Cutoffs: " );
-				}
-				if ( firstPeptideCutoffsOnImport ) {
-					firstPeptideCutoffsOnImport = false;
-				} else {
-					peptideCutoffsOnImport.append( ", " );
-				}
-				peptideCutoffsOnImport.append( cutoffsAppliedOnImport.getAnnotationName() );
-				peptideCutoffsOnImport.append( ": " );
-				peptideCutoffsOnImport.append( cutoffsAppliedOnImport.getCutoffValue() );
-			} else {
-				if ( psmCutoffsOnImport.length() == 0 ) {
-					psmCutoffsOnImport.append( "PSM Cutoffs: " );
-				}
-				if ( firstPsmCutoffsOnImport ) {
-					firstPsmCutoffsOnImport = false;
-				} else {
-					psmCutoffsOnImport.append( ", " );
-				}
-				psmCutoffsOnImport.append( cutoffsAppliedOnImport.getAnnotationName() );
-				psmCutoffsOnImport.append( ": " );
-				psmCutoffsOnImport.append( cutoffsAppliedOnImport.getCutoffValue() );
-			}
-		}
-		cutoffsAppliedOnImportAllAsString = peptideCutoffsOnImport + "; " + psmCutoffsOnImport;
+		cutoffsAppliedOnImportAllAsString = 
+				GetCutoffsAppliedOnImport.getInstance().getCutoffsAppliedOnImportAllAsString( cutoffsAppliedOnImportList );
 		return cutoffsAppliedOnImportAllAsString;
 	}
 	

@@ -49,7 +49,14 @@ var ChartDownload = function() {
 		$chart_download_link_jq_All.click( function( event ) { 
 			objectThis._downloadChart( { clickedThis : this } ); 
 			event.preventDefault();
+			event.stopPropagation();
 		});
+		var $svg_download_outer_block_jq = $chart_outer_container_for_download_jq.find(".svg_download_outer_block_jq");
+		$svg_download_outer_block_jq.click( function( event ) {  
+			event.preventDefault();
+			event.stopPropagation();
+		});
+		
 	};
 
 	/**
@@ -87,9 +94,6 @@ var ChartDownload = function() {
 			document.body.appendChild(form);    // Not entirely sure if this is necessary			
 			form.submit();
 			document.body.removeChild( form );
-
-			var getSVGContentsAsStringResult = getSVGContentsAsString( $chart_outer_container_for_download_jq );
-			var svgString = getSVGContentsAsStringResult.fullSVG_String;
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;

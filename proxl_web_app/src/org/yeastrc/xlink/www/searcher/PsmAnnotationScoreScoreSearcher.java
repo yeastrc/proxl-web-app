@@ -9,7 +9,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.utils.XLinkUtils;
-import org.yeastrc.xlink.www.constants.QCPlotConstants;
+import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.objects.PsmScoreVsScoreEntry;
 import org.yeastrc.xlink.www.objects.PsmScoreVsScoreSearcherResults;
 /**
@@ -25,6 +25,7 @@ public class PsmAnnotationScoreScoreSearcher {
 	public static PsmAnnotationScoreScoreSearcher getInstance() { return _INSTANCE; }
 	/**
 	 * @param searchId
+	 * @param scanFileId - Optional
 	 * @param selectedLinkTypes
 	 * @param annotationTypeId_Score_1
 	 * @param psmScoreCutoff_1 - null if not applicable
@@ -35,6 +36,7 @@ public class PsmAnnotationScoreScoreSearcher {
 	 */
 	public PsmScoreVsScoreSearcherResults getPsmScoreVsScoreList( 
 			int searchId, 
+			Integer scanFileId,
 			Set<String> selectedLinkTypes,
 			int annotationTypeId_Score_1, 
 			Double psmScoreCutoff_1,
@@ -52,6 +54,22 @@ public class PsmAnnotationScoreScoreSearcher {
 		if ( psmScoreCutoff_2 != null ) {
 			sqlScore_2_Max = " AND pfagl_2.value_double <= " + psmScoreCutoff_2;
 		}
+		String sqlScanFileId = "";
+		//  If Scan file Id, add to SQL
+		if ( scanFileId != null ) {
+			sqlScanFileId = " INNER JOIN ( \n" 
+			
+			+ "   SELECT psm.id AS psm_id FROM \n" 
+			+ "    psm INNER JOIN scan ON psm.scan_id = scan.id  \n" 
+			+ "    WHERE psm.search_id = " 
+			+ Integer.toString( searchId ) 
+			+ " AND scan.scan_file_id = " 
+			+ Integer.toString( scanFileId ) 
+			+ " \n" 
+
+			+ "\n ) AS psm_ids_for_scan_files ON pfagl_1.psm_id = psm_ids_for_scan_files.psm_id "; //  Close the subselect and specify join
+		}
+		
 		String sqlLinkType = "";
 		if ( selectedLinkTypes != null && ( ! selectedLinkTypes.isEmpty() ) ) {
 			StringBuilder sqlSB = new StringBuilder( 1000 );
@@ -64,11 +82,11 @@ public class PsmAnnotationScoreScoreSearcher {
 					sqlSB.append(",");
 				}
 				sqlSB.append("'");
-				if ( QCPlotConstants.PSM_SCORE_VS_SCORE_PLOT__CROSSLINK_PSM.equals(selectedLinkType) ) {
+				if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals(selectedLinkType) ) {
 					sqlSB.append( XLinkUtils.CROSS_TYPE_STRING);
-				} else if ( QCPlotConstants.PSM_SCORE_VS_SCORE_PLOT__LOOPLINK_PSM.equals(selectedLinkType) ) {
+				} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals(selectedLinkType) ) {
 					sqlSB.append( XLinkUtils.LOOP_TYPE_STRING);
-				} else if ( QCPlotConstants.PSM_SCORE_VS_SCORE_PLOT__UNLINKED_PSM.equals(selectedLinkType) ) {
+				} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals(selectedLinkType) ) {
 					sqlSB.append( XLinkUtils.DIMER_TYPE_STRING);
 					sqlSB.append("','");
 					sqlSB.append( XLinkUtils.UNLINKED_TYPE_STRING);
@@ -79,10 +97,12 @@ public class PsmAnnotationScoreScoreSearcher {
 			sqlSB.append(")");
 			sqlLinkType = sqlSB.toString();
 		}
+		
 		String sql = "SELECT  pfagl_1.psm_id, pfagl_1.psm_type, pfagl_1.value_double AS score_1,  pfagl_2.value_double AS score_2 "
 				+ " FROM psm_filterable_annotation__generic_lookup AS pfagl_1 "
 				+ " INNER JOIN psm_filterable_annotation__generic_lookup AS pfagl_2 "
 				+ "  ON pfagl_1.psm_id = pfagl_2.psm_id "
+				+ sqlScanFileId // Optional restriction on scan file id
 				+ " WHERE pfagl_1.search_id = " + searchId 
 				+ " AND ( pfagl_1.annotation_type_id = " + annotationTypeId_Score_1
 				+         sqlScore_1_Max

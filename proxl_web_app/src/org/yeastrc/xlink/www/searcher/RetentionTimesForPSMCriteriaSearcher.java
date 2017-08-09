@@ -1,15 +1,15 @@
 package org.yeastrc.xlink.www.searcher;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.dbcp.DelegatingPreparedStatement;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -22,47 +22,59 @@ import org.yeastrc.xlink.www.constants.DynamicModificationsSelectionConstants;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 
 /**
- * Get Distinct Charge States from PSMs based on criteria, including Reported Peptide and PSM cutoffs 
- *
+ * Return Retention Time List based on parameters.
+ * Return one entry for each psm record that meets filter.
  */
-public class PSM_DistinctChargeStatesSearcher {
-
-	private static final Logger log = Logger.getLogger(PSM_DistinctChargeStatesSearcher.class);
-	private PSM_DistinctChargeStatesSearcher() { }
-	private static final PSM_DistinctChargeStatesSearcher _INSTANCE = new PSM_DistinctChargeStatesSearcher();
-	public static PSM_DistinctChargeStatesSearcher getInstance() { return _INSTANCE; }
+public class RetentionTimesForPSMCriteriaSearcher {
 	
+	private static final Log log = LogFactory.getLog(RetentionTimesForPSMCriteriaSearcher.class);
+	private RetentionTimesForPSMCriteriaSearcher() { }
+	private static final RetentionTimesForPSMCriteriaSearcher _INSTANCE = new RetentionTimesForPSMCriteriaSearcher();
+	public static RetentionTimesForPSMCriteriaSearcher getInstance() { return _INSTANCE; }
+
 	private final String PSM_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS = "psm_fltrbl_tbl_";
 	private final String PEPTIDE_VALUE_FILTER_TABLE_ALIAS = "srch__rep_pept_fltrbl_tbl_";
 	
-	private final String SQL_FIRST_PART = 
-			"SELECT unified_rp__search__rep_pept__generic_lookup.link_type,"
-			+ " psm.charge, sum( 1 ) AS count \n";
+	private final String SQL_MAIN_FIRST_PART = 
+			"SELECT retention_time \n"
+			+ "FROM scan INNER JOIN ( ";
 	
-	private final String SQL_MAIN_FROM_START = " FROM unified_rp__search__rep_pept__generic_lookup \n"
+	//   Inner subquery between these parts is from the 'INNER_QUERY' variables listed next
+	
+	private final String SQL_MAIN_AFTER_INNER_QUERY_JOIN = " ) AS scan_ids ON scan.id = scan_ids.scan_id ";
+
+	private final String SQL_MAIN_MAIN_WHERE_SCAN_FILE_ID = 
+			" WHERE scan.scan_file_id = ? \n";
+	
+	private final String SQL_MAIN_MAIN_WHERE_RETENTION_TIME = " AND retention_time < ?  ";
+	
+	//  SQL for inner query between SQL_MAIN_FIRST_PART and SQL_MAIN_AFTER_INNER_QUERY_JOIN
+	
+	private final String SQL_INNER_QUERY_FIRST_PART = 
+			"SELECT psm.scan_id \n";
+	
+	private final String SQL_INNER_QUERY_MAIN_FROM_START = " FROM unified_rp__search__rep_pept__generic_lookup \n"
 			+ " INNER JOIN psm on unified_rp__search__rep_pept__generic_lookup.search_id = psm.search_id"
 			+ 					" AND unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = psm.reported_peptide_id \n";
-	
-	private final String SQL_LAST_PART = " GROUP BY link_type, charge ";
 	
 	/**
 	 *   If Dynamic Mods are selected, this gets added after the Join to the Dynamic Mods subselect
 	 */
-	private final String SQL_MAIN_WHERE_START = 
+	private final String SQL_INNER_QUERY_MAIN_WHERE_START = 
 			" WHERE unified_rp__search__rep_pept__generic_lookup.search_id = ? \n";
 
 	//  If Dynamic Mods are selected, one of these three gets added after the main where clause 
 	//  No Mods Only
-	private static final String SQL_NO_MODS_ONLY__MAIN_WHERE_CLAUSE = 
+	private static final String SQL_INNER_QUERY_NO_MODS_ONLY__MAIN_WHERE_CLAUSE = 
 			" AND  unified_rp__search__rep_pept__generic_lookup.has_dynamic_modifictions  = " 
 					+ Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE + " \n";
 	
 	//  Yes Mods Only
-	private static final String SQL_YES_MODS_ONLY_MAIN_WHERE_CLAUSE = 
+	private static final String SQL_INNER_QUERY_YES_MODS_ONLY_MAIN_WHERE_CLAUSE = 
 			" AND  unified_rp__search__rep_pept__generic_lookup.has_dynamic_modifictions  = " 
 					+	 Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE + " \n";
 	
-	private static final String SQL_NO_AND_YES_MODS__MAIN_WHERE_CLAUSE = 
+	private static final String SQL_INNER_QUERY_NO_AND_YES_MODS__MAIN_WHERE_CLAUSE = 
 			" AND ( "
 			// 		 No Mods
 			+ 		"unified_rp__search__rep_pept__generic_lookup.has_dynamic_modifictions  = " 
@@ -80,66 +92,56 @@ public class PSM_DistinctChargeStatesSearcher {
 	
 	///////////////////
 	//  Additional SQL parts
-	private static final String SQL_LINK_TYPE_START = "  unified_rp__search__rep_pept__generic_lookup.link_type IN ( ";
-	private static final String SQL_LINK_TYPE_END = " ) \n";
+	private static final String SQL_INNER_QUERY_LINK_TYPE_START = "  unified_rp__search__rep_pept__generic_lookup.link_type IN ( ";
+	private static final String SQL_INNER_QUERY_LINK_TYPE_END = " ) \n";
 	
 	//  Dynamic Mod processing
-	private static final String SQL_DYNAMIC_MOD_JOIN_START = 
+	private static final String SQL_INNER_QUERY_DYNAMIC_MOD_JOIN_START = 
 			" INNER JOIN (";
-	private static final String SQL_DYNAMIC_MOD_AND_NO_MODS_JOIN_START = 
+	private static final String SQL_INNER_QUERY_DYNAMIC_MOD_AND_NO_MODS_JOIN_START = 
 			" LEFT OUTER JOIN (";
-	private static final String SQL_DYNAMIC_MOD_INNER_SELECT_START = 
+	private static final String SQL_INNER_QUERY_DYNAMIC_MOD_INNER_SELECT_START = 
 			" SELECT DISTINCT search_id, reported_peptide_id "
 			+		" FROM search__reported_peptide__dynamic_mod_lookup "
 			+		" WHERE search_id = ? AND dynamic_mod_mass IN ( ";
-	private static final String SQL_DYNAMIC_MOD_JOIN_AFTER_MOD_MASSES = // After Dynamic Mod Masses 
+	private static final String SQL_INNER_QUERY_DYNAMIC_MOD_JOIN_AFTER_MOD_MASSES = // After Dynamic Mod Masses 
 			" )  \n";
-	private static final String SQL_DYNAMIC_MOD_JOIN_START_LINK_TYPES = // After Dynamic Mod Masses 
+	private static final String SQL_INNER_QUERY_DYNAMIC_MOD_JOIN_START_LINK_TYPES = // After Dynamic Mod Masses 
 						" AND  ( ";
-	private static final String SQL_DYNAMIC_MOD_LINK_TYPE_START = "  search__reported_peptide__dynamic_mod_lookup.link_type IN ( ";
-	private static final String SQL_DYNAMIC_MOD_LINK_TYPE_END = " ) ";
-	private static final String SQL_DYNAMIC_MOD_JOIN_AFTER_LINK_TYPES = // After Link Types
+	private static final String SQL_INNER_QUERY_DYNAMIC_MOD_LINK_TYPE_START = "  search__reported_peptide__dynamic_mod_lookup.link_type IN ( ";
+	private static final String SQL_INNER_QUERY_DYNAMIC_MOD_LINK_TYPE_END = " ) ";
+	private static final String SQL_INNER_QUERY_DYNAMIC_MOD_JOIN_AFTER_LINK_TYPES = // After Link Types
 						" )  \n";
-	private static final String SQL_DYNAMIC_MOD_JOIN_END = 
+	private static final String SQL_INNER_QUERY_DYNAMIC_MOD_JOIN_END = 
 			" ) AS srch_id_rep_pep_id_for_mod_masses "
 			+ " ON unified_rp__search__rep_pept__generic_lookup.search_id = srch_id_rep_pep_id_for_mod_masses.search_id "
 			+ "    AND unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = srch_id_rep_pep_id_for_mod_masses.reported_peptide_id \n";
 	
 	
 	
-	/**
-	 * 
-	 *
-	 */
-	public static class PSM_DistinctChargeStatesResult {
-		/**
-		 * Map <{Link Type},Map<{Charge Value},{count}>>
-		 */
-		private Map<String,Map<Integer,Long>> resultsChargeCountMap_KeyedOnLinkType_KeyedOnChargeValue;
-
-		/**
-		 * @return  Map <{Link Type},Map<{Charge Value},{count}>>
-		 */
-		public Map<String, Map<Integer, Long>> getResultsChargeCountMap_KeyedOnLinkType_KeyedOnChargeValue() {
-			return resultsChargeCountMap_KeyedOnLinkType_KeyedOnChargeValue;
-		}
-	}
 	
 	/**
+	 * Return Retention Time List based on parameters.
+	 * Return one entry for each psm record that meets filter.
+	 * 
 	 * @param searchId
+	 * @param scanFileId - null if not use
 	 * @param searcherCutoffValuesSearchLevel
 	 * @param linkTypes
 	 * @param modMassSelections
+	 * @param retentionTimeInSecondsCutoff - null if not use
 	 * @return
 	 * @throws Exception 
 	 */
-	public PSM_DistinctChargeStatesResult getPSM_DistinctChargeStates(
+	public List<BigDecimal> getRetentionTimes(
 			int searchId, 
+			Integer scanFileId,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
 			String[] linkTypes,
-			String[] modMassSelections  ) throws Exception {
+			String[] modMassSelections,
+			Double retentionTimeInSecondsCutoff ) throws Exception {
 
-		PSM_DistinctChargeStatesResult result = new PSM_DistinctChargeStatesResult();
+		List<BigDecimal> resultList = new ArrayList<>();
 
 		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
 				searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
@@ -194,9 +196,12 @@ public class PSM_DistinctChargeStatesSearcher {
 		//////////////////////
 		/////   Start building the SQL
 		StringBuilder sqlSB = new StringBuilder( 1000 );
-		sqlSB.append( SQL_FIRST_PART );
+		
+		sqlSB.append( SQL_MAIN_FIRST_PART );
+		
+		sqlSB.append( SQL_INNER_QUERY_FIRST_PART );
 
-		sqlSB.append( SQL_MAIN_FROM_START );
+		sqlSB.append( SQL_INNER_QUERY_MAIN_FROM_START );
 		{
 //			if ( ! defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) {
 				//  Non-Default PSM or Peptide cutoffs so have to query on the cutoffs
@@ -239,23 +244,23 @@ public class PSM_DistinctChargeStatesSearcher {
 		//  If Yes modifications, join to get records for those modifications
 		if ( modMassSelectionsIncludesYesModifications && modMassSelectionsWithoutNoMods != null ) {
 			if ( modMassSelectionsIncludesNoModifications) {
-				sqlSB.append( SQL_DYNAMIC_MOD_AND_NO_MODS_JOIN_START );
+				sqlSB.append( SQL_INNER_QUERY_DYNAMIC_MOD_AND_NO_MODS_JOIN_START );
 			} else {
-				sqlSB.append( SQL_DYNAMIC_MOD_JOIN_START );
+				sqlSB.append( SQL_INNER_QUERY_DYNAMIC_MOD_JOIN_START );
 			}
 			//   Start Dynamic Mods subselect
-			sqlSB.append( SQL_DYNAMIC_MOD_INNER_SELECT_START );
+			sqlSB.append( SQL_INNER_QUERY_DYNAMIC_MOD_INNER_SELECT_START );
 			sqlSB.append( modMassSelectionsWithoutNoMods.get( 0 ) );
 			// start at the second entry
 			for ( int index = 1; index < modMassSelectionsWithoutNoMods.size(); index++ ) {
 				sqlSB.append( ", " );
 				sqlSB.append( modMassSelectionsWithoutNoMods.get( index ) );
 			}
-			sqlSB.append( SQL_DYNAMIC_MOD_JOIN_AFTER_MOD_MASSES );
+			sqlSB.append( SQL_INNER_QUERY_DYNAMIC_MOD_JOIN_AFTER_MOD_MASSES );
 			//  Process link types for Dynamic Mod subselect
 			if ( linkTypes != null && ( linkTypes.length > 0 ) ) {
-				sqlSB.append( SQL_DYNAMIC_MOD_JOIN_START_LINK_TYPES );
-				sqlSB.append( SQL_DYNAMIC_MOD_LINK_TYPE_START );   //   ...  IN  (
+				sqlSB.append( SQL_INNER_QUERY_DYNAMIC_MOD_JOIN_START_LINK_TYPES );
+				sqlSB.append( SQL_INNER_QUERY_DYNAMIC_MOD_LINK_TYPE_START );   //   ...  IN  (
 				boolean firstLinkType = true;
 				for ( String linkType : linkTypes ) {
 					if ( firstLinkType ) {
@@ -285,19 +290,19 @@ public class PSM_DistinctChargeStatesSearcher {
 						throw new Exception( msg );
 					}
 				}
-				sqlSB.append( SQL_DYNAMIC_MOD_LINK_TYPE_END );
-				sqlSB.append( SQL_DYNAMIC_MOD_JOIN_AFTER_LINK_TYPES );
+				sqlSB.append( SQL_INNER_QUERY_DYNAMIC_MOD_LINK_TYPE_END );
+				sqlSB.append( SQL_INNER_QUERY_DYNAMIC_MOD_JOIN_AFTER_LINK_TYPES );
 			}
-			sqlSB.append( SQL_DYNAMIC_MOD_JOIN_END );
+			sqlSB.append( SQL_INNER_QUERY_DYNAMIC_MOD_JOIN_END );
 			sqlSB.append( "\n" );
 		}
 		//////////
-		sqlSB.append( SQL_MAIN_WHERE_START );
+		sqlSB.append( SQL_INNER_QUERY_MAIN_WHERE_START );
 		//////////
 		//  Process link types
 		if ( linkTypes != null && ( linkTypes.length > 0 ) ) {
 			sqlSB.append( " AND ( " );
-			sqlSB.append( SQL_LINK_TYPE_START );  //  ...  IN (
+			sqlSB.append( SQL_INNER_QUERY_LINK_TYPE_START );  //  ...  IN (
 			boolean firstLinkType = true;
 			for ( String linkType : linkTypes ) {
 				if ( firstLinkType ) {
@@ -327,16 +332,16 @@ public class PSM_DistinctChargeStatesSearcher {
 					throw new Exception( msg );
 				}
 			}
-			sqlSB.append( SQL_LINK_TYPE_END );  //   )
+			sqlSB.append( SQL_INNER_QUERY_LINK_TYPE_END );  //   )
 			sqlSB.append( " ) \n" );
 		}		
 		//  add modifications condition on unified_rep_pep__reported_peptide__search_lookup to main where clause
 		if ( modMassSelectionsIncludesYesModifications && modMassSelectionsIncludesNoModifications ) {
-			sqlSB.append( SQL_NO_AND_YES_MODS__MAIN_WHERE_CLAUSE );
+			sqlSB.append( SQL_INNER_QUERY_NO_AND_YES_MODS__MAIN_WHERE_CLAUSE );
 		} else if ( modMassSelectionsIncludesNoModifications) {
-			sqlSB.append( SQL_NO_MODS_ONLY__MAIN_WHERE_CLAUSE );
+			sqlSB.append( SQL_INNER_QUERY_NO_MODS_ONLY__MAIN_WHERE_CLAUSE );
 		} else if ( modMassSelectionsIncludesYesModifications ) {
-			sqlSB.append( SQL_YES_MODS_ONLY_MAIN_WHERE_CLAUSE );
+			sqlSB.append( SQL_INNER_QUERY_YES_MODS_ONLY_MAIN_WHERE_CLAUSE );
 		}
 		// Process PSM Cutoffs for WHERE
 		{
@@ -415,7 +420,17 @@ public class PSM_DistinctChargeStatesSearcher {
 //				sqlSB.append( "' \n" );
 //			}
 		}		
-		sqlSB.append( SQL_LAST_PART );
+		
+		sqlSB.append( SQL_MAIN_AFTER_INNER_QUERY_JOIN );
+		
+		if ( scanFileId != null ) {
+			// scanFileId passed in so use it in query
+			sqlSB.append( SQL_MAIN_MAIN_WHERE_SCAN_FILE_ID );
+		}
+		if ( retentionTimeInSecondsCutoff != null ) {
+			sqlSB.append( SQL_MAIN_MAIN_WHERE_RETENTION_TIME );
+		}
+
 		final String sql = sqlSB.toString();
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
@@ -459,6 +474,18 @@ public class PSM_DistinctChargeStatesSearcher {
 					}
 //				}
 			}
+			if ( scanFileId != null ) {
+				//  scanFileId passed in so use it in query
+				paramCounter++;
+				pstmt.setInt( paramCounter, scanFileId );
+			}
+			if ( retentionTimeInSecondsCutoff != null ) {
+				//  Retention Time passed in so use it in query
+				paramCounter++;
+				pstmt.setDouble( paramCounter, retentionTimeInSecondsCutoff );
+			}
+
+
 //			if ( log.isDebugEnabled() ) {
 //				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
 //			}
@@ -469,35 +496,10 @@ public class PSM_DistinctChargeStatesSearcher {
 
 			rs = pstmt.executeQuery();
 			
-			/**
-			 * Map <{Link Type},Map<{Charge Value},{count}>>
-			 */
-			Map<String,Map<Integer,Long>> resultsChargeCountMap_KeyedOnLinkType_KeyedOnChargeValue = new HashMap<>();
-			
-			result.resultsChargeCountMap_KeyedOnLinkType_KeyedOnChargeValue = resultsChargeCountMap_KeyedOnLinkType_KeyedOnChargeValue;
-
 			while( rs.next() ) {
-				String linkType = rs.getString( "link_type" );
-				Integer chargeValue = rs.getInt( "charge" );
-				Long chargeCount = rs.getLong( "count" );
-				
-				Map<Integer,Long> resultsChargeCountMap_KeyedOnChargeValue = resultsChargeCountMap_KeyedOnLinkType_KeyedOnChargeValue.get( linkType );
-				if ( resultsChargeCountMap_KeyedOnChargeValue == null ) {
-					resultsChargeCountMap_KeyedOnChargeValue = new HashMap<>();
-					resultsChargeCountMap_KeyedOnLinkType_KeyedOnChargeValue.put( linkType, resultsChargeCountMap_KeyedOnChargeValue );
-				}
-				
-				Long chargeCountInMap = resultsChargeCountMap_KeyedOnChargeValue.get( chargeValue );
-				if ( chargeCountInMap != null ) {
-					chargeCount = chargeCount.longValue() + chargeCountInMap.longValue();
-				}
-				resultsChargeCountMap_KeyedOnChargeValue.put( chargeValue, chargeCount );
-				
-//				log.error( "Searcher Results:  linkType: " + linkType 
-//						+ ", chargeValue: " + chargeValue 
-//						+ ", chargeCount: " + chargeCount );
-				
+				resultList.add( rs.getBigDecimal( "retention_time" ) );
 			}
+			
 		} catch ( Exception e ) {
 			String msg = "Exception in search( ... ), \n sql: " + sql
 					+ "\n Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString();
@@ -519,7 +521,7 @@ public class PSM_DistinctChargeStatesSearcher {
 			}
 		}
 		
-		return result;
+		return resultList;
 	
 	}
 }

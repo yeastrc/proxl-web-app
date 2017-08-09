@@ -120,8 +120,6 @@ function initPageSearchMaint() {
 	/////////////////////////
 	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 		try {
-			initQCPlotsClickHandlers();
-			initQCPlotPSMCountVsScoreClickHandlers();
 			initQCPlotPSMScoreVsScoreClickHandlers();
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );

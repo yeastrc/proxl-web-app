@@ -1,4 +1,5 @@
 package org.yeastrc.xlink.www.webservices;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -14,11 +15,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.PsmScoreVsScoreEntry;
-import org.yeastrc.xlink.www.objects.PsmScoreVsScoreSearcherResults;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
+import org.yeastrc.xlink.www.qc_plots.psm_score_vs_score.CreatePsmScoreVsScoreQCPlotData;
+import org.yeastrc.xlink.www.qc_plots.psm_score_vs_score.CreatePsmScoreVsScoreQCPlotDataResults;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.PsmAnnotationScoreScoreSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -30,11 +30,13 @@ public class QCPlotPsmScoreVsScoreService {
 	private static final Logger log = Logger.getLogger(QCPlotPsmScoreVsScoreService.class);
 	
 	/**
-	 * @param selectedLinkTypes
 	 * @param projectSearchId
-	 * @param annotationTypeId
-	 * @param psmScoreCutoff
-	 * @param proteinSequenceIdsToIncludeList
+	 * @param scanFileId - Optional
+	 * @param selectedLinkTypes
+	 * @param annotationTypeId_1
+	 * @param annotationTypeId_2
+	 * @param psmScoreCutoff_1
+	 * @param psmScoreCutoff_2
 	 * @param request
 	 * @return
 	 * @throws Exception
@@ -43,10 +45,11 @@ public class QCPlotPsmScoreVsScoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getPsmScoreVsScore") 
 	public QCPlotPsmScoreVsScoreServiceResult getPsmScoreVsScore( 
-			@QueryParam( "selectedLinkTypes" ) Set<String> selectedLinkTypes,			
 			@QueryParam( "projectSearchId" ) int projectSearchId,
-			@QueryParam( "annotationTypeId_1" ) int annotationTypeId_1,
-			@QueryParam( "annotationTypeId_2" ) int annotationTypeId_2,
+			@QueryParam( "scanFileId" ) Integer scanFileId,
+			@QueryParam( "selectedLinkTypes" ) Set<String> selectedLinkTypes,			
+			@QueryParam( "annotationTypeId_1" ) Integer annotationTypeId_1,
+			@QueryParam( "annotationTypeId_2" ) Integer annotationTypeId_2,
 			@QueryParam( "psmScoreCutoff_1" ) Double psmScoreCutoff_1,
 			@QueryParam( "psmScoreCutoff_2" ) Double psmScoreCutoff_2,
 			@Context HttpServletRequest request )
@@ -135,22 +138,12 @@ public class QCPlotPsmScoreVsScoreService {
 			    	        );
 			}
 			
-			PsmScoreVsScoreSearcherResults searcherResults  = 
-					PsmAnnotationScoreScoreSearcher.getInstance()
-					.getPsmScoreVsScoreList( 
-							searchId, 
-							selectedLinkTypes,
-							annotationTypeId_1, 
-							psmScoreCutoff_1,
-							annotationTypeId_2,
-							psmScoreCutoff_2 );
-
+			CreatePsmScoreVsScoreQCPlotDataResults results = 
+					CreatePsmScoreVsScoreQCPlotData.getInstance()
+					.createPsmScoreVsScoreQCPlotData( searchId, scanFileId, selectedLinkTypes, annotationTypeId_1, annotationTypeId_2, psmScoreCutoff_1, psmScoreCutoff_2 );
+			
 			QCPlotPsmScoreVsScoreServiceResult webserviceResult = new QCPlotPsmScoreVsScoreServiceResult();
-			
-			webserviceResult.crosslinkChartData = searcherResults.getCrosslinkEntries();
-			webserviceResult.looplinkChartData = searcherResults.getLooplinkEntries();
-			webserviceResult.unlinkedChartData = searcherResults.getUnlinkedEntries();
-			
+			webserviceResult.results = results;
 			return webserviceResult;
 			
 		} catch ( WebApplicationException e ) {
@@ -171,28 +164,15 @@ public class QCPlotPsmScoreVsScoreService {
 	 *
 	 */
 	public static class QCPlotPsmScoreVsScoreServiceResult {
-		private List<PsmScoreVsScoreEntry> crosslinkChartData;
-		private List<PsmScoreVsScoreEntry> looplinkChartData;
-		private List<PsmScoreVsScoreEntry> unlinkedChartData;
-		public List<PsmScoreVsScoreEntry> getCrosslinkChartData() {
-			return crosslinkChartData;
-		}
-		public void setCrosslinkChartData(List<PsmScoreVsScoreEntry> crosslinkChartData) {
-			this.crosslinkChartData = crosslinkChartData;
-		}
-		public List<PsmScoreVsScoreEntry> getLooplinkChartData() {
-			return looplinkChartData;
-		}
-		public void setLooplinkChartData(List<PsmScoreVsScoreEntry> looplinkChartData) {
-			this.looplinkChartData = looplinkChartData;
-		}
-		public List<PsmScoreVsScoreEntry> getUnlinkedChartData() {
-			return unlinkedChartData;
-		}
-		public void setUnlinkedChartData(List<PsmScoreVsScoreEntry> unlinkedChartData) {
-			this.unlinkedChartData = unlinkedChartData;
+		private CreatePsmScoreVsScoreQCPlotDataResults results;
+
+		public CreatePsmScoreVsScoreQCPlotDataResults getResults() {
+			return results;
 		}
 
+		public void setResults(CreatePsmScoreVsScoreQCPlotDataResults results) {
+			this.results = results;
+		}
 	}
 	
 }

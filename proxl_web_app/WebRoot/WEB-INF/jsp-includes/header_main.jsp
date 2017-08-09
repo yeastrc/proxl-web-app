@@ -145,8 +145,14 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 		}
 		//  QC Page Init
 		try {	  
-			if ( window.viewQCPageCode ) {
-			  viewQCPageCode.init();
+			if ( window.qcPageMain ) {
+				qcPageMain.init();
+			} else {
+				setTimeout(function() {
+					if ( window.qcPageMain ) {
+						qcPageMain.init();
+					}
+				}, 1000 );
 			}
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );

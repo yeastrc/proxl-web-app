@@ -10,6 +10,11 @@ public class PeptideViewLinkTypesConstants {
 
 	public static final String UNLINKED_PSM = "UNLINKED";
 
+	/**
+	 * Not used on Peptide page, used on some other places
+	 */
+	public static final String ALL_PSM = "ALL";
+
 	//  Previous values:
 	
 	public static final String PREVIOUS_VALUE_MONOLINK_PSM = "MONOLINK";
