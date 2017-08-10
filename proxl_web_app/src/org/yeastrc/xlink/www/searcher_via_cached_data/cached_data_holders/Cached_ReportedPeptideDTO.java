@@ -231,7 +231,9 @@ public class Cached_ReportedPeptideDTO implements CachedDataCommonIF {
 		}
 
 		private synchronized void invalidateKey( Integer key ) {
-			dbRecordsDataCache.invalidate( key );
+			if ( dbRecordsDataCache != null ) {
+				dbRecordsDataCache.invalidate( key );
+			}
 		}
 
 		/**
