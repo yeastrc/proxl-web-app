@@ -95,7 +95,7 @@ var QCPageChart_PPM_Error_PSM = function() {
 	
 	//   Variables for this chart
 	
-	var _PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_NO;
+	var _chart_isLoaded = _IS_LOADED_NO;
 
 
 	/**
@@ -181,23 +181,23 @@ var QCPageChart_PPM_Error_PSM = function() {
 	 */
 	this.clearChart = function() {
 
-		_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_NO;
+		_chart_isLoaded = _IS_LOADED_NO;
 
 		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
 		$PSM_PPM_Error_CountsBlock.empty();
 
 		//  Abort any active AJAX calls
-		if ( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax ) {
-			var objKeys = Object.keys( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax ); 
+		if ( _activeAjax ) {
+			var objKeys = Object.keys( _activeAjax ); 
 			objKeys.forEach( function( element, index, array ) {
 				var selectedLinkType = element;
-				if ( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] ) {
-					_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ].abort();
-					_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] = null;
+				if ( _activeAjax[ selectedLinkType ] ) {
+					_activeAjax[ selectedLinkType ].abort();
+					_activeAjax[ selectedLinkType ] = null;
 				}
 			}, this /* passed to function as this */ );
 		}
-		_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax = null;
+		_activeAjax = null;
 	};
 
 
@@ -206,7 +206,7 @@ var QCPageChart_PPM_Error_PSM = function() {
 	 */
 	this.loadChartIfNeeded = function() {
 
-		if ( _PPM_Error_For_PSMs_Statistics_isLoaded === _IS_LOADED_NO ) {
+		if ( _chart_isLoaded === _IS_LOADED_NO ) {
 			this.load_PPM_Error_For_PSMs_Histogram();
 		}
 	};
@@ -219,7 +219,7 @@ var QCPageChart_PPM_Error_PSM = function() {
 	this.load_PPM_Error_For_PSMs_Histogram = function() {
 		var objectThis = this;
 
-		_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_LOADING;
+		_chart_isLoaded = _IS_LOADED_LOADING;
 
 		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
 		$PSM_PPM_Error_CountsBlock.empty();
@@ -244,7 +244,7 @@ var QCPageChart_PPM_Error_PSM = function() {
 				} );
 			}
 
-			_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
+			_chart_isLoaded = _IS_LOADED_YES;
 
 			//  Exit since no data to display
 
@@ -286,7 +286,7 @@ var QCPageChart_PPM_Error_PSM = function() {
 
 	};
 
-	var _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax = null;
+	var _activeAjax = null;
 
 	/**
 	 * Load the data for  PPM Error for PSMs Histogram Specific Link Type
@@ -303,16 +303,16 @@ var QCPageChart_PPM_Error_PSM = function() {
 				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
-		if ( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax && 
-				_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] ) {
-			_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ].abort();
-			_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] = null;
+		if ( _activeAjax && 
+				_activeAjax[ selectedLinkType ] ) {
+			_activeAjax[ selectedLinkType ].abort();
+			_activeAjax[ selectedLinkType ] = null;
 		}
-		if ( ! _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax ) {
-			_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax = {};
+		if ( ! _activeAjax ) {
+			_activeAjax = {};
 		}
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] = 
+		_activeAjax[ selectedLinkType ] = 
 			$.ajax({
 //				cache : false,
 				url : contextPathJSVar + "/services/qc/dataPage/ppmError",
@@ -323,8 +323,8 @@ var QCPageChart_PPM_Error_PSM = function() {
 				dataType : "json",
 				success : function( ajaxResponseData ) {
 					try {
-						if ( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax ) {
-							_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] = null;
+						if ( _activeAjax ) {
+							_activeAjax[ selectedLinkType ] = null;
 						}
 						var responseParams = {
 								ajaxResponseData : ajaxResponseData, 
@@ -340,14 +340,14 @@ var QCPageChart_PPM_Error_PSM = function() {
 					}
 				},
 				failure: function(errMsg) {
-					if ( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax ) {
-						_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] = null;
+					if ( _activeAjax ) {
+						_activeAjax[ selectedLinkType ] = null;
 					}
 					handleAJAXFailure( errMsg );
 				},
 				error : function(jqXHR, textStatus, errorThrown) {
-					if ( _load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax ) {
-						_load_PPM_Error_For_PSMs_HistogramForLinkTypeActiveAjax[ selectedLinkType ] = null;
+					if ( _activeAjax ) {
+						_activeAjax[ selectedLinkType ] = null;
 					}
 					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
 						handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -409,7 +409,7 @@ var QCPageChart_PPM_Error_PSM = function() {
 
 		//  TODO  FIX THIS
 
-//		_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
+//		_chart_isLoaded = _IS_LOADED_YES;
 	};
 
 	//  Overridden for Specific elements like Chart Title and X and Y Axis labels

@@ -95,7 +95,7 @@ var QCPageChart_M_Over_Z_Statistics_PSM = function() {
 	
 	//   Variables for this chart
 	
-	var _M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_NO;
+	var _chart_isLoaded = _IS_LOADED_NO;
 
 
 	/**
@@ -181,7 +181,7 @@ var QCPageChart_M_Over_Z_Statistics_PSM = function() {
 	 */
 	this.clearChart = function() {
 
-		_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_NO;
+		_chart_isLoaded = _IS_LOADED_NO;
 
 		var $PSM_M_Over_Z_CountsBlock = $("#PSM_M_Over_Z_CountsBlock");
 		if ( $PSM_M_Over_Z_CountsBlock.length === 0 ) {
@@ -189,9 +189,9 @@ var QCPageChart_M_Over_Z_Statistics_PSM = function() {
 		}
 		$PSM_M_Over_Z_CountsBlock.empty();
 
-		if ( _load_M_Over_Z_For_PSMs_HistogramActiveAjax ) {
-			_load_M_Over_Z_For_PSMs_HistogramActiveAjax.abort();
-			_load_M_Over_Z_For_PSMs_HistogramActiveAjax = null;
+		if ( _activeAjax ) {
+			_activeAjax.abort();
+			_activeAjax = null;
 		}
 	};
 
@@ -201,12 +201,12 @@ var QCPageChart_M_Over_Z_Statistics_PSM = function() {
 	 */
 	this.loadChartIfNeeded = function() {
 
-		if ( _M_Over_Z_For_PSMs_Statistics_isLoaded === _IS_LOADED_NO ) {
+		if ( _chart_isLoaded === _IS_LOADED_NO ) {
 			this.load_M_Over_Z_For_PSMs_Histogram();
 		}
 	};
 
-	var _load_M_Over_Z_For_PSMs_HistogramActiveAjax = null;
+	var _activeAjax = null;
 
 	/**
 	 * Load the data for  M/Z for PSMs Histogram
@@ -214,7 +214,7 @@ var QCPageChart_M_Over_Z_Statistics_PSM = function() {
 	this.load_M_Over_Z_For_PSMs_Histogram = function() {
 		var objectThis = this;
 
-		_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_LOADING;
+		_chart_isLoaded = _IS_LOADED_LOADING;
 
 		var $PSM_M_Over_Z_CountsBlock = $("#PSM_M_Over_Z_CountsBlock");
 		if ( $PSM_M_Over_Z_CountsBlock.length === 0 ) {
@@ -242,7 +242,7 @@ var QCPageChart_M_Over_Z_Statistics_PSM = function() {
 				} );
 			}, this /* passed to function as this */ );
 
-			_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
+			_chart_isLoaded = _IS_LOADED_YES;
 
 			//  Exit since no data to display
 
@@ -273,12 +273,12 @@ var QCPageChart_M_Over_Z_Statistics_PSM = function() {
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
 
-		if ( _load_M_Over_Z_For_PSMs_HistogramActiveAjax ) {
-			_load_M_Over_Z_For_PSMs_HistogramActiveAjax.abort();
-			_load_M_Over_Z_For_PSMs_HistogramActiveAjax = null;
+		if ( _activeAjax ) {
+			_activeAjax.abort();
+			_activeAjax = null;
 		}
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_load_M_Over_Z_For_PSMs_HistogramActiveAjax =
+		_activeAjax =
 			$.ajax({
 				url : contextPathJSVar + "/services/qc/dataPage/mzForPSMsHistogramCounts",
 				traditional: true,  //  Force traditional serialization of the data sent
@@ -288,7 +288,7 @@ var QCPageChart_M_Over_Z_Statistics_PSM = function() {
 				dataType : "json",
 				success : function( ajaxResponseData ) {
 					try {
-						_load_M_Over_Z_For_PSMs_HistogramActiveAjax = null;
+						_activeAjax = null;
 						var responseParams = {
 								ajaxResponseData : ajaxResponseData, 
 								ajaxRequestData : ajaxRequestData
@@ -303,11 +303,11 @@ var QCPageChart_M_Over_Z_Statistics_PSM = function() {
 					}
 				},
 				failure: function(errMsg) {
-					_load_M_Over_Z_For_PSMs_HistogramActiveAjax = null;
+					_activeAjax = null;
 					handleAJAXFailure( errMsg );
 				},
 				error : function(jqXHR, textStatus, errorThrown) {
-					_load_M_Over_Z_For_PSMs_HistogramActiveAjax = null;
+					_activeAjax = null;
 					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
 						handleAJAXError(jqXHR, textStatus, errorThrown);
 					}
@@ -365,7 +365,7 @@ var QCPageChart_M_Over_Z_Statistics_PSM = function() {
 			addToolTips( $chart_outer_container_jq );
 		}, this /* passed to function as this */ );
 
-		_M_Over_Z_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
+		_chart_isLoaded = _IS_LOADED_YES;
 	};
 
 	//  Overridden for Specific elements like Chart Title and X and Y Axis labels

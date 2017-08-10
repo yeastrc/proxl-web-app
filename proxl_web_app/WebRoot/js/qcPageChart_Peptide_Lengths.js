@@ -95,7 +95,7 @@ var QCPageChart_Peptide_Lengths = function() {
 	
 	//   Variables for this chart
 	
-	var _peptideLengthsHistogram_isLoaded = _IS_LOADED_NO;
+	var _chart_isLoaded = _IS_LOADED_NO;
 
 
 	/**
@@ -186,7 +186,7 @@ var QCPageChart_Peptide_Lengths = function() {
 	 */
 	this.clearChart = function() {
 
-		_peptideLengthsHistogram_isLoaded = _IS_LOADED_NO;
+		_chart_isLoaded = _IS_LOADED_NO;
 
 		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
 		if ( $PeptideLengthsCountsBlock.length === 0 ) {
@@ -201,13 +201,12 @@ var QCPageChart_Peptide_Lengths = function() {
 	 */
 	this.loadChartIfNeeded = function() {
 
-		if ( _peptideLengthsHistogram_isLoaded === _IS_LOADED_NO ) {
+		if ( _chart_isLoaded === _IS_LOADED_NO ) {
 			this.loadPeptideLengthsHistogram();
 		}
 	};
 
-	var _load_Peptide_Le
-	var _loadPeptideLengthsHistogramActiveAjax = null;
+	var _activeAjax = null;
 
 	/**
 	 * Load the data for  Peptide Lengths Histogram
@@ -215,7 +214,7 @@ var QCPageChart_Peptide_Lengths = function() {
 	this.loadPeptideLengthsHistogram = function() {
 		var objectThis = this;
 
-		_peptideLengthsHistogram_isLoaded = _IS_LOADED_LOADING;
+		_chart_isLoaded = _IS_LOADED_LOADING;
 
 		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
 		if ( $PeptideLengthsCountsBlock.length === 0 ) {
@@ -252,12 +251,12 @@ var QCPageChart_Peptide_Lengths = function() {
 				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
-		if ( _loadPeptideLengthsHistogramActiveAjax ) {
-			_loadPeptideLengthsHistogramActiveAjax.abort();
-			_loadPeptideLengthsHistogramActiveAjax = null;
+		if ( _activeAjax ) {
+			_activeAjax.abort();
+			_activeAjax = null;
 		}
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_loadPeptideLengthsHistogramActiveAjax =
+		_activeAjax =
 			$.ajax({
 				url : contextPathJSVar + "/services/qc/dataPage/peptideLengthsHistogram",
 				traditional: true,  //  Force traditional serialization of the data sent
@@ -266,7 +265,7 @@ var QCPageChart_Peptide_Lengths = function() {
 				data : ajaxRequestData,  // The data sent as params on the URL
 				dataType : "json",
 				success : function( ajaxResponseData ) {
-					_loadPeptideLengthsHistogramActiveAjax = null;
+					_activeAjax = null;
 					try {
 						var responseParams = {
 								ajaxResponseData : ajaxResponseData, 
@@ -282,11 +281,11 @@ var QCPageChart_Peptide_Lengths = function() {
 					}
 				},
 				failure: function(errMsg) {
-					_loadPeptideLengthsHistogramActiveAjax = null;
+					_activeAjax = null;
 					handleAJAXFailure( errMsg );
 				},
 				error : function(jqXHR, textStatus, errorThrown) {
-					_loadPeptideLengthsHistogramActiveAjax = null;
+					_activeAjax = null;
 					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
 						handleAJAXError(jqXHR, textStatus, errorThrown);
 					}
@@ -344,7 +343,7 @@ var QCPageChart_Peptide_Lengths = function() {
 			addToolTips( $chart_outer_container_jq );
 		}
 
-		_peptideLengthsHistogram_isLoaded = _IS_LOADED_YES;
+		_chart_isLoaded = _IS_LOADED_YES;
 	};
 
 	/**

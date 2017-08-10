@@ -95,7 +95,7 @@ var QCPageChartDigestionStatistics = function() {
 	
 	//   Variables for this chart
 	
-	var _digestion_Statistics_isLoaded = _IS_LOADED_NO;
+	var _chart_isLoaded = _IS_LOADED_NO;
 
 
 	/**
@@ -181,14 +181,14 @@ var QCPageChartDigestionStatistics = function() {
 	 */
 	this.clearChart = function() {
 
-		_digestion_Statistics_isLoaded = _IS_LOADED_NO;
+		_chart_isLoaded = _IS_LOADED_NO;
 
 		var $missingCleavageReportedPeptidesCountBlock = $("#missingCleavageReportedPeptidesCountBlock");
 		$missingCleavageReportedPeptidesCountBlock.empty();
 
-		if ( _loadMissingCleavageReportedPeptidesCountActiveAjax ) {
-			_loadMissingCleavageReportedPeptidesCountActiveAjax.abort();
-			_loadMissingCleavageReportedPeptidesCountActiveAjax = null;
+		if ( _activeAjax ) {
+			_activeAjax.abort();
+			_activeAjax = null;
 		}
 	};
 
@@ -198,14 +198,14 @@ var QCPageChartDigestionStatistics = function() {
 	 */
 	this.loadChartIfNeeded = function() {
 
-		if ( _digestion_Statistics_isLoaded === _IS_LOADED_NO ) {
+		if ( _chart_isLoaded === _IS_LOADED_NO ) {
 			this.loadMissingCleavageReportedPeptidesCount();
 		}
 	};
 
 
 
-	var _loadMissingCleavageReportedPeptidesCountActiveAjax = null;
+	var _activeAjax = null;
 
 	/**
 	 * Load the data for MissingCleavageReportedPeptidesCount
@@ -213,7 +213,7 @@ var QCPageChartDigestionStatistics = function() {
 	this.loadMissingCleavageReportedPeptidesCount = function() {
 		var objectThis = this;
 
-		_digestion_Statistics_isLoaded = _IS_LOADED_LOADING;
+		_chart_isLoaded = _IS_LOADED_LOADING;
 
 		// Add 1 dummy chart for place holder
 		var $missingCleavageReportedPeptidesCountBlock = $("#missingCleavageReportedPeptidesCountBlock");
@@ -238,13 +238,13 @@ var QCPageChartDigestionStatistics = function() {
 				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
-		if ( _loadMissingCleavageReportedPeptidesCountActiveAjax ) {
-			_loadMissingCleavageReportedPeptidesCountActiveAjax.abort();
-			_loadMissingCleavageReportedPeptidesCountActiveAjax = null;
+		if ( _activeAjax ) {
+			_activeAjax.abort();
+			_activeAjax = null;
 		}
 
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_loadMissingCleavageReportedPeptidesCountActiveAjax =
+		_activeAjax =
 			$.ajax({
 				url : contextPathJSVar + "/services/qc/dataPage/missingCleavages",
 				traditional: true,  //  Force traditional serialization of the data sent
@@ -254,7 +254,7 @@ var QCPageChartDigestionStatistics = function() {
 				dataType : "json",
 				success : function( ajaxResponseData ) {
 					try {
-						_loadMissingCleavageReportedPeptidesCountActiveAjax = null;
+						_activeAjax = null;
 						var responseParams = {
 								ajaxResponseData : ajaxResponseData, 
 								ajaxRequestData : ajaxRequestData
@@ -269,11 +269,11 @@ var QCPageChartDigestionStatistics = function() {
 					}
 				},
 				failure: function(errMsg) {
-					_loadMissingCleavageReportedPeptidesCountActiveAjax = null;
+					_activeAjax = null;
 					handleAJAXFailure( errMsg );
 				},
 				error : function(jqXHR, textStatus, errorThrown) {
-					_loadMissingCleavageReportedPeptidesCountActiveAjax = null;
+					_activeAjax = null;
 					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
 						handleAJAXError(jqXHR, textStatus, errorThrown);
 					}

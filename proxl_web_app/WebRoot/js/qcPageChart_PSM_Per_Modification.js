@@ -95,7 +95,7 @@ var QCPageChart_PSM_Per_Modification = function() {
 	
 	//   Variables for this chart
 	
-	var _PSM_Count_Per_Modification_isLoaded = _IS_LOADED_NO;
+	var _chart_isLoaded = _IS_LOADED_NO;
 
 
 	/**
@@ -181,16 +181,16 @@ var QCPageChart_PSM_Per_Modification = function() {
 	 */
 	this.clearChart = function() {
 
-		_PSM_Count_Per_Modification_isLoaded = _IS_LOADED_NO;
+		_chart_isLoaded = _IS_LOADED_NO;
 
-		_PSM_Count_Per_Modification_isLoaded = _IS_LOADED_NO;
+		_chart_isLoaded = _IS_LOADED_NO;
 
 		var $PSM_Per_Modification_Counts_Block = $("#PSM_Per_Modification_Counts_Block");
 		$PSM_Per_Modification_Counts_Block.empty();
 
-		if ( _loadPSM_Count_Per_ModificationActiveAjax ) {
-			_loadPSM_Count_Per_ModificationActiveAjax.abort();
-			_loadPSM_Count_Per_ModificationActiveAjax = null;
+		if ( _activeAjax ) {
+			_activeAjax.abort();
+			_activeAjax = null;
 		}
 	};
 
@@ -200,13 +200,13 @@ var QCPageChart_PSM_Per_Modification = function() {
 	 */
 	this.loadChartIfNeeded = function() {
 
-		if ( _PSM_Count_Per_Modification_isLoaded === _IS_LOADED_NO ) {
+		if ( _chart_isLoaded === _IS_LOADED_NO ) {
 			this.loadPSM_Count_Per_Modification();
 		}
 	};
 
 
-	var _loadPSM_Count_Per_ModificationActiveAjax = null;
+	var _activeAjax = null;
 
 	/**
 	 * Load the data for PSM  Count Per Modification type for search
@@ -214,7 +214,7 @@ var QCPageChart_PSM_Per_Modification = function() {
 	this.loadPSM_Count_Per_Modification = function() {
 		var objectThis = this;
 
-		_PSM_Count_Per_Modification_isLoaded = _IS_LOADED_LOADING;
+		_chart_isLoaded = _IS_LOADED_LOADING;
 
 		var $PSM_Per_Modification_Counts_Block = $("#PSM_Per_Modification_Counts_Block");
 		$PSM_Per_Modification_Counts_Block.empty();
@@ -247,12 +247,12 @@ var QCPageChart_PSM_Per_Modification = function() {
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
 
-		if ( _loadPSM_Count_Per_ModificationActiveAjax ) {
-			_loadPSM_Count_Per_ModificationActiveAjax.abort();
-			_loadPSM_Count_Per_ModificationActiveAjax = null;
+		if ( _activeAjax ) {
+			_activeAjax.abort();
+			_activeAjax = null;
 		}
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_loadPSM_Count_Per_ModificationActiveAjax =
+		_activeAjax =
 			$.ajax({
 				url : contextPathJSVar + "/services/qc/dataPage/psmCountsPerModification",
 				traditional: true,  //  Force traditional serialization of the data sent
@@ -262,7 +262,7 @@ var QCPageChart_PSM_Per_Modification = function() {
 				dataType : "json",
 				success : function( ajaxResponseData ) {
 					try {
-						_loadPSM_Count_Per_ModificationActiveAjax = null;
+						_activeAjax = null;
 						var responseParams = {
 								ajaxResponseData : ajaxResponseData, 
 								ajaxRequestData : ajaxRequestData
@@ -274,11 +274,11 @@ var QCPageChart_PSM_Per_Modification = function() {
 					}
 				},
 				failure: function(errMsg) {
-					_loadPSM_Count_Per_ModificationActiveAjax = null;
+					_activeAjax = null;
 					handleAJAXFailure( errMsg );
 				},
 				error : function(jqXHR, textStatus, errorThrown) {
-					_loadPSM_Count_Per_ModificationActiveAjax = null;
+					_activeAjax = null;
 					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
 						handleAJAXError(jqXHR, textStatus, errorThrown);
 					}
@@ -336,7 +336,7 @@ var QCPageChart_PSM_Per_Modification = function() {
 			}
 		}, this /* passed to function as this */ );
 
-		_PSM_Count_Per_Modification_isLoaded = _IS_LOADED_YES;
+		_chart_isLoaded = _IS_LOADED_YES;
 
 	};
 

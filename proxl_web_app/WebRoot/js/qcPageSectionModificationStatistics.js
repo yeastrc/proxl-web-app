@@ -191,7 +191,7 @@ var QCPageSectionModificationStatistics = function() {
 		var $modification_stats_expand_link = $("#modification_stats_expand_link");
 		$modification_stats_expand_link.click( function( event ) { 
 			try {
-				objectThis._modification_stats_expand_link_Clicked( { clickedThis : this } ); 
+				objectThis._section_expand_link_Clicked( { clickedThis : this } ); 
 				event.preventDefault();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -202,7 +202,7 @@ var QCPageSectionModificationStatistics = function() {
 		var $modification_stats_collapse_link = $("#modification_stats_collapse_link");
 		$modification_stats_collapse_link.click( function( event ) { 
 			try {
-				objectThis._modification_stats_collapse_link_Clicked( { clickedThis : this } ); 
+				objectThis._section_collapse_link_Clicked( { clickedThis : this } ); 
 				event.preventDefault();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -214,21 +214,21 @@ var QCPageSectionModificationStatistics = function() {
 	/**
 	 * 
 	 */
-	this._modification_stats_expand_link_Clicked = function( params ) {
-		this.showModificationStatistics();
+	this._section_expand_link_Clicked = function( params ) {
+		this.show_Section();
 	};
 
 	/**
 	 *  
 	 */
-	this._modification_stats_collapse_link_Clicked = function( params ) {
-		this.hideModificationStatistics();
+	this._section_collapse_link_Clicked = function( params ) {
+		this.hide_Section();
 	};
 
 	/**
 	 *  
 	 */
-	this.showModificationStatistics = function( params ) {
+	this.show_Section = function( params ) {
 
 		_sectionDisplayed = true;
 
@@ -245,7 +245,7 @@ var QCPageSectionModificationStatistics = function() {
 	/**
 	 *  
 	 */
-	this.hideModificationStatistics = function( params ) {
+	this.hide_Section = function( params ) {
 
 		var $modification_stats_display_block = $("#modification_stats_display_block");
 		$modification_stats_display_block.hide();

@@ -317,11 +317,11 @@ var QCPageMain = function() {
 			//  TODO  TEMP comment out
 
 			if ( window.qcPageSectionSummaryStatistics ) {
-				qcPageSectionSummaryStatistics.showSummaryStatistics_From_qcPageMain();
+				qcPageSectionSummaryStatistics.show_Section_From_qcPageMain();
 			} else {
 				setTimeout( function () {
 					if ( window.qcPageSectionSummaryStatistics ) {
-						qcPageSectionSummaryStatistics.showSummaryStatistics_From_qcPageMain();
+						qcPageSectionSummaryStatistics.show_Section_From_qcPageMain();
 					}
 				}, 1000 );
 			}

@@ -194,7 +194,7 @@ var QCPageSection_PSM_Error_Estimates = function() {
 		var $psm_error_estimates_expand_link = $("#psm_error_estimates_expand_link");
 		$psm_error_estimates_expand_link.click( function( event ) { 
 			try {
-				objectThis._psm_error_estimates_expand_link_Clicked( { clickedThis : this } ); 
+				objectThis._section_expand_link_Clicked( { clickedThis : this } ); 
 				event.preventDefault();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -205,7 +205,7 @@ var QCPageSection_PSM_Error_Estimates = function() {
 		var $psm_error_estimates_collapse_link = $("#psm_error_estimates_collapse_link");
 		$psm_error_estimates_collapse_link.click( function( event ) { 
 			try {
-				objectThis._psm_error_estimates_collapse_link_Clicked( { clickedThis : this } ); 
+				objectThis._section_collapse_link_Clicked( { clickedThis : this } ); 
 				event.preventDefault();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -217,21 +217,21 @@ var QCPageSection_PSM_Error_Estimates = function() {
 	/**
 	 * 
 	 */
-	this._psm_error_estimates_expand_link_Clicked = function( params ) {
-		this.show_PSM_Error_Estimates();
+	this._section_expand_link_Clicked = function( params ) {
+		this.show_Section();
 	};
 
 	/**
 	 *  
 	 */
-	this._psm_error_estimates_collapse_link_Clicked = function( params ) {
-		this.hide_PSM_Error_Estimates();
+	this._section_collapse_link_Clicked = function( params ) {
+		this.hide_Section();
 	};
 
 	/**
 	 *  
 	 */
-	this.show_PSM_Error_Estimates = function( params ) {
+	this.show_Section = function( params ) {
 
 		_sectionDisplayed = true;
 
@@ -248,7 +248,7 @@ var QCPageSection_PSM_Error_Estimates = function() {
 	/**
 	 *  
 	 */
-	this.hide_PSM_Error_Estimates = function( params ) {
+	this.hide_Section = function( params ) {
 
 		var $psm_error_estimates_display_block = $("#psm_error_estimates_display_block");
 		$psm_error_estimates_display_block.hide();

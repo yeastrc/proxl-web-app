@@ -192,7 +192,7 @@ var QCPageSection_Peptide_Level_Statistics = function() {
 		var $peptide_level_expand_link = $("#peptide_level_expand_link");
 		$peptide_level_expand_link.click( function( event ) { 
 			try {
-				objectThis._peptide_level_expand_link_Clicked( { clickedThis : this } ); 
+				objectThis._section_expand_link_Clicked( { clickedThis : this } ); 
 				event.preventDefault();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -203,7 +203,7 @@ var QCPageSection_Peptide_Level_Statistics = function() {
 		var $peptide_level_collapse_link = $("#peptide_level_collapse_link");
 		$peptide_level_collapse_link.click( function( event ) { 
 			try {
-				objectThis._peptide_level_collapse_link_Clicked( { clickedThis : this } ); 
+				objectThis._section_collapse_link_Clicked( { clickedThis : this } ); 
 				event.preventDefault();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -215,21 +215,21 @@ var QCPageSection_Peptide_Level_Statistics = function() {
 	/**
 	 * 
 	 */
-	this._peptide_level_expand_link_Clicked = function( params ) {
-		this.show_Peptide_Level_Statistics();
+	this._section_expand_link_Clicked = function( params ) {
+		this.show_Section();
 	};
 
 	/**
 	 *  
 	 */
-	this._peptide_level_collapse_link_Clicked = function( params ) {
-		this.hide_Peptide_Level_Statistics();
+	this._section_collapse_link_Clicked = function( params ) {
+		this.hide_Section();
 	};
 
 	/**
 	 *  
 	 */
-	this.show_Peptide_Level_Statistics = function( params ) {
+	this.show_Section = function( params ) {
 
 		_sectionDisplayed = true;
 
@@ -246,7 +246,7 @@ var QCPageSection_Peptide_Level_Statistics = function() {
 	/**
 	 *  
 	 */
-	this.hide_Peptide_Level_Statistics = function( params ) {
+	this.hide_Section = function( params ) {
 
 		var $peptide_level_display_block = $("#peptide_level_display_block");
 		$peptide_level_display_block.hide();

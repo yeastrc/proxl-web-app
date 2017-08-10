@@ -95,7 +95,7 @@ var QCPageChartChargeStateStatistics = function() {
 	
 	//   Variables for this chart
 	
-	var _chargeCount_Statistics_isLoaded = _IS_LOADED_NO;
+	var _chart_isLoaded = _IS_LOADED_NO;
 
 
 	/**
@@ -181,16 +181,16 @@ var QCPageChartChargeStateStatistics = function() {
 	 */
 	this.clearChart = function() {
 
-		_chargeCount_Statistics_isLoaded = _IS_LOADED_NO;
+		_chart_isLoaded = _IS_LOADED_NO;
 
 		//  PSM ChargeState ChargeState 
 
 		var $PSMChargeStatesCountsBlock = $("#PSMChargeStatesCountsBlock");
 		$PSMChargeStatesCountsBlock.empty();
 
-		if ( _loadloadChargeCountActiveAjax ) {
-			_loadloadChargeCountActiveAjax.abort();
-			_loadloadChargeCountActiveAjax = null;
+		if ( _activeAjax ) {
+			_activeAjax.abort();
+			_activeAjax = null;
 		}
 	};
 
@@ -200,12 +200,12 @@ var QCPageChartChargeStateStatistics = function() {
 	 */
 	this.loadChartIfNeeded = function() {
 
-		if ( _chargeCount_Statistics_isLoaded === _IS_LOADED_NO ) {
+		if ( _chart_isLoaded === _IS_LOADED_NO ) {
 			this.loadChargeCount();
 		}
 	};
 
-	var _loadloadChargeCountActiveAjax = null;
+	var _activeAjax = null;
 
 	/**
 	 * Load the data for ChargeCount
@@ -213,7 +213,7 @@ var QCPageChartChargeStateStatistics = function() {
 	this.loadChargeCount = function() {
 		var objectThis = this;
 
-		_chargeCount_Statistics_isLoaded = _IS_LOADED_LOADING;
+		_chart_isLoaded = _IS_LOADED_LOADING;
 
 		var $PSMChargeStatesCountsBlock = $("#PSMChargeStatesCountsBlock");
 		$PSMChargeStatesCountsBlock.empty();
@@ -245,12 +245,12 @@ var QCPageChartChargeStateStatistics = function() {
 				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
-		if ( _loadloadChargeCountActiveAjax ) {
-			_loadloadChargeCountActiveAjax.abort();
-			_loadloadChargeCountActiveAjax = null;
+		if ( _activeAjax ) {
+			_activeAjax.abort();
+			_activeAjax = null;
 		}
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_loadloadChargeCountActiveAjax =
+		_activeAjax =
 			$.ajax({
 				url : contextPathJSVar + "/services/qc/dataPage/chargeCounts",
 				traditional: true,  //  Force traditional serialization of the data sent
@@ -260,7 +260,7 @@ var QCPageChartChargeStateStatistics = function() {
 				dataType : "json",
 				success : function( ajaxResponseData ) {
 					try {
-						_loadloadChargeCountActiveAjax = null;
+						_activeAjax = null;
 						var responseParams = {
 								ajaxResponseData : ajaxResponseData, 
 								ajaxRequestData : ajaxRequestData
@@ -275,11 +275,11 @@ var QCPageChartChargeStateStatistics = function() {
 					}
 				},
 				failure: function(errMsg) {
-					_loadloadChargeCountActiveAjax = null;
+					_activeAjax = null;
 					handleAJAXFailure( errMsg );
 				},
 				error : function(jqXHR, textStatus, errorThrown) {
-					_loadloadChargeCountActiveAjax = null;
+					_activeAjax = null;
 					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
 						handleAJAXError(jqXHR, textStatus, errorThrown);
 					}
@@ -338,7 +338,7 @@ var QCPageChartChargeStateStatistics = function() {
 			}
 		}, this /* passed to function as this */ );
 
-		_chargeCount_Statistics_isLoaded = _IS_LOADED_YES;
+		_chart_isLoaded = _IS_LOADED_YES;
 
 	};
 

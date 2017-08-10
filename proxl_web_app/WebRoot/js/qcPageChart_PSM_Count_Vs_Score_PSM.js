@@ -310,7 +310,7 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 	 */
 	this.clearChart = function() {
 
-//		_retentionTimeCountChartThumbnail_isLoaded = _IS_LOADED_NO;
+//		_chart_isLoaded = _IS_LOADED_NO;
 
 		//  Need updating before can uncomment !!!
 		
@@ -318,17 +318,17 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 //		$PSM_PPM_Error_CountsBlock.empty();
 
 		//  Abort any active AJAX calls
-//		if ( _load_PPM_Error_Vs_Score_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
-//			var objKeys = Object.keys( _load_PPM_Error_Vs_Score_For_PSMs_ScatterPlotForLinkTypeActiveAjax ); 
+//		if ( _activeAjax ) {
+//			var objKeys = Object.keys( _activeAjax ); 
 //			objKeys.forEach(function( element, index, array ) {
 //				var selectedLinkType = element;
-//				if ( _load_PPM_Error_Vs_Score_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] ) {
-//					_load_PPM_Error_Vs_Score_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ].abort();
-//					_load_PPM_Error_Vs_Score_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+//				if ( _activeAjax[ selectedLinkType ] ) {
+//					_activeAjax[ selectedLinkType ].abort();
+//					_activeAjax[ selectedLinkType ] = null;
 //				}
 //			}, this /* passed to function as this */ );
 //		}
-//		_load_PPM_Error_Vs_Score_For_PSMs_ScatterPlotForLinkTypeActiveAjax = null;
+//		_activeAjax = null;
 	};
 
 
@@ -337,12 +337,12 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 	 */
 	this.loadChartIfNeeded = function() {
 
-//		if ( _scoreCountChartThumbnail_isLoaded === _IS_LOADED_NO ) {
+//		if ( _chart_isLoaded === _IS_LOADED_NO ) {
 			this.createPSMCountVsScoreChartThumbnail();
 //		}
 	};
 
-//	var _load_PPM_Error_Vs_Score_For_PSMs_ScatterPlotForLinkTypeActiveAjax = null;
+//	var _activeAjax = null;
 
 	///
 	this.createPSMCountVsScoreChartThumbnail = function() {

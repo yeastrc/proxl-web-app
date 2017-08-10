@@ -97,7 +97,7 @@ var QCPageChartIonCurrentStatistics = function() {
 	
 	//   Variables for this chart
 	
-	var _scanFileFileSelector_isLoaded = _IS_LOADED_NO;
+	var _chart_isLoaded = _IS_LOADED_NO;
 
 	//  Saved webservice response data
 	var _scanOverallStatistics = null;
@@ -183,7 +183,7 @@ var QCPageChartIonCurrentStatistics = function() {
 	 */
 	this.clearScanFileSelector = function() {
 
-		_scanFileFileSelector_isLoaded = _IS_LOADED_NO;
+		_chart_isLoaded = _IS_LOADED_NO;
 
 		var $scan_file_files_loading_block = $("#scan_file_files_loading_block");
 		var $scan_file_no_files_block = $("#scan_file_no_files_block");
@@ -202,7 +202,7 @@ var QCPageChartIonCurrentStatistics = function() {
 	 * If not loaded, call ...
 	 */
 	this.loadScanFileSelectorIfNeeded = function() {
-		if ( _scanFileFileSelector_isLoaded === _IS_LOADED_NO ) {
+		if ( _chart_isLoaded === _IS_LOADED_NO ) {
 			this.loadScanFileSelector();
 		}
 	};
@@ -344,13 +344,13 @@ var QCPageChartIonCurrentStatistics = function() {
 		var $scan_file_overall_statistics_block = $("#scan_file_overall_statistics_block");
 		$scan_file_overall_statistics_block.hide();
 
-		if ( _loadScanOverallStatisticsActiveAjax ) {
-			_loadScanOverallStatisticsActiveAjax.abort();
-			_loadScanOverallStatisticsActiveAjax = null;
+		if ( _activeAjax ) {
+			_activeAjax.abort();
+			_activeAjax = null;
 		}
 	};
 
-	var _loadScanOverallStatisticsActiveAjax = null;
+	var _activeAjax = null;
 
 	/**
 	 * Load the data for  Scan Overall Statistics
@@ -366,12 +366,12 @@ var QCPageChartIonCurrentStatistics = function() {
 				project_search_id : _project_search_ids,
 				scan_file_id : scanFileId
 		};
-		if ( _loadScanOverallStatisticsActiveAjax ) {
-			_loadScanOverallStatisticsActiveAjax.abort();
-			_loadScanOverallStatisticsActiveAjax = null;
+		if ( _activeAjax ) {
+			_activeAjax.abort();
+			_activeAjax = null;
 		}
 
-		_loadScanOverallStatisticsActiveAjax =
+		_activeAjax =
 			$.ajax({
 				type : "GET",
 				url : _URL,
@@ -382,7 +382,7 @@ var QCPageChartIonCurrentStatistics = function() {
 				//   So _project_search_ids array is passed as "project_search_id=<value>" which is what Jersey expects
 				success : function(data) {
 					try {
-						_loadScanOverallStatisticsActiveAjax = null;
+						_activeAjax = null;
 						objectThis.loadScanOverallStatisticsProcessResponse(requestData, data, params );
 					} catch( e ) {
 						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -390,11 +390,11 @@ var QCPageChartIonCurrentStatistics = function() {
 					}
 				},
 				failure: function(errMsg) {
-					_loadScanOverallStatisticsActiveAjax = null;
+					_activeAjax = null;
 					handleAJAXFailure( errMsg );
 				},
 				error : function(jqXHR, textStatus, errorThrown) {
-					_loadScanOverallStatisticsActiveAjax = null;
+					_activeAjax = null;
 					handleAJAXError(jqXHR, textStatus, errorThrown);
 				}
 			});
@@ -462,8 +462,12 @@ var QCPageChartIonCurrentStatistics = function() {
 
 		this.loadScanOverallStatisticsMS2Counts( { scanFileId : scanFileId } );
 	};
+	
+	//////////////////////////////////////////
+	
+	/////   Second AJAX call to load MS2 Counts
 
-	var _loadScanOverallStatisticsMS2CountsActiveAjax = null;
+	var _MS2CountsActiveAjax = null;
 
 	/**
 	 * Load the data for  Scan Overall Statistics - MS2 Counts
@@ -481,11 +485,11 @@ var QCPageChartIonCurrentStatistics = function() {
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
 
-		if ( _loadScanOverallStatisticsMS2CountsActiveAjax ) {
-			_loadScanOverallStatisticsMS2CountsActiveAjax.abort();
-			_loadScanOverallStatisticsMS2CountsActiveAjax = null;
+		if ( _MS2CountsActiveAjax ) {
+			_MS2CountsActiveAjax.abort();
+			_MS2CountsActiveAjax = null;
 		}
-		_loadScanOverallStatisticsMS2CountsActiveAjax =
+		_MS2CountsActiveAjax =
 			$.ajax({
 				type : "GET",
 				url : _URL,
@@ -496,7 +500,7 @@ var QCPageChartIonCurrentStatistics = function() {
 				//   So _project_search_ids array is passed as "project_search_id=<value>" which is what Jersey expects
 				success : function(data) {
 					try {
-						_loadScanOverallStatisticsMS2CountsActiveAjax = null;
+						_MS2CountsActiveAjax = null;
 						objectThis.loadScanOverallStatisticsMS2CountsProcessResponse(requestData, data);
 					} catch( e ) {
 						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -504,11 +508,11 @@ var QCPageChartIonCurrentStatistics = function() {
 					}
 				},
 				failure: function(errMsg) {
-					_loadScanOverallStatisticsMS2CountsActiveAjax = null;
+					_MS2CountsActiveAjax = null;
 					handleAJAXFailure( errMsg );
 				},
 				error : function(jqXHR, textStatus, errorThrown) {
-					_loadScanOverallStatisticsMS2CountsActiveAjax = null;
+					_MS2CountsActiveAjax = null;
 					handleAJAXError(jqXHR, textStatus, errorThrown);
 				}
 			});
@@ -818,6 +822,8 @@ var QCPageChartIonCurrentStatistics = function() {
 		// Add tooltips for download links
 		addToolTips( $chart_outer_container_jq );
 	};
+	
+	
 
 	//  Overridden for Specific elements like Chart Title and X and Y Axis labels
 	var _MS_1_IonCurrent_Histograms_CHART_GLOBALS = {

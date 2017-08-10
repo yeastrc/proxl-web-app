@@ -95,7 +95,7 @@ var QCPageChart_Error_Vs_M_Over_Z_PSM = function() {
 	
 	//   Variables for this chart
 	
-	var _PPM_Error_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_NO;
+	var _chart_isLoaded = _IS_LOADED_NO;
 
 
 	/**
@@ -181,7 +181,7 @@ var QCPageChart_Error_Vs_M_Over_Z_PSM = function() {
 	 */
 	this.clearChart = function() {
 
-		_PPM_Error_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_NO;
+		_chart_isLoaded = _IS_LOADED_NO;
 
 		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock = $("#PSM_PPM_Error_Vs_M_over_Z_CountsBlock");
 		if ( $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.length === 0 ) {
@@ -190,17 +190,17 @@ var QCPageChart_Error_Vs_M_Over_Z_PSM = function() {
 		$PSM_PPM_Error_Vs_M_over_Z_CountsBlock.empty();
 
 		//  Abort any active AJAX calls
-		if ( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
-			var objKeys = Object.keys( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax ); 
+		if ( _activeAjax ) {
+			var objKeys = Object.keys( _activeAjax ); 
 			objKeys.forEach(function( element, index, array ) {
 				var selectedLinkType = element;
-				if ( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] ) {
-					_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ].abort();
-					_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+				if ( _activeAjax[ selectedLinkType ] ) {
+					_activeAjax[ selectedLinkType ].abort();
+					_activeAjax[ selectedLinkType ] = null;
 				}
 			}, this )
 		}
-		_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax = null;
+		_activeAjax = null;
 	};
 
 
@@ -209,7 +209,7 @@ var QCPageChart_Error_Vs_M_Over_Z_PSM = function() {
 	 */
 	this.loadChartIfNeeded = function() {
 
-		if ( _PPM_Error_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded === _IS_LOADED_NO ) {
+		if ( _chart_isLoaded === _IS_LOADED_NO ) {
 			this.load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlot();
 		}
 	};
@@ -222,7 +222,7 @@ var QCPageChart_Error_Vs_M_Over_Z_PSM = function() {
 	this.load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlot = function() {
 		var objectThis = this;
 
-		_PPM_Error_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_LOADING;
+		_chart_isLoaded = _IS_LOADED_LOADING;
 
 		var $PSM_PPM_Error_Vs_M_over_Z_CountsBlock = $("#PSM_PPM_Error_Vs_M_over_Z_CountsBlock");
 		if ( $PSM_PPM_Error_Vs_M_over_Z_CountsBlock.length === 0 ) {
@@ -250,7 +250,7 @@ var QCPageChart_Error_Vs_M_Over_Z_PSM = function() {
 				} );
 			}
 
-			_PPM_Error_For_PSMs_Statistics_isLoaded = _IS_LOADED_YES;
+			_chart_isLoaded = _IS_LOADED_YES;
 
 			//  Exit since no data to display
 
@@ -292,7 +292,7 @@ var QCPageChart_Error_Vs_M_Over_Z_PSM = function() {
 
 	};
 
-	var _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax = null;
+	var _activeAjax = null;
 
 	/**
 	 * Load the data for  PPM Error Vs M/Z for PSMs Scatter Plot Specific Link Type
@@ -309,16 +309,16 @@ var QCPageChart_Error_Vs_M_Over_Z_PSM = function() {
 				project_search_id : _project_search_ids,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
-		if ( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax && 
-				_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] ) {
-			_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ].abort();
-			_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+		if ( _activeAjax && 
+				_activeAjax[ selectedLinkType ] ) {
+			_activeAjax[ selectedLinkType ].abort();
+			_activeAjax[ selectedLinkType ] = null;
 		}
-		if ( ! _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
-			_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax = {};
+		if ( ! _activeAjax ) {
+			_activeAjax = {};
 		}
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = 
+		_activeAjax[ selectedLinkType ] = 
 			$.ajax({
 //				cache : false,
 				url : contextPathJSVar + "/services/qc/dataPage/ppmErrorVsM_over_Z", // ppmErrorVsM_over_Z
@@ -329,8 +329,8 @@ var QCPageChart_Error_Vs_M_Over_Z_PSM = function() {
 				dataType : "json",
 				success : function( ajaxResponseData ) {
 					try {
-						if ( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
-							_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+						if ( _activeAjax ) {
+							_activeAjax[ selectedLinkType ] = null;
 						}
 						var responseParams = {
 								ajaxResponseData : ajaxResponseData, 
@@ -345,14 +345,14 @@ var QCPageChart_Error_Vs_M_Over_Z_PSM = function() {
 					}
 				},
 				failure: function(errMsg) {
-					if ( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
-						_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+					if ( _activeAjax ) {
+						_activeAjax[ selectedLinkType ] = null;
 					}
 					handleAJAXFailure( errMsg );
 				},
 				error : function(jqXHR, textStatus, errorThrown) {
-					if ( _load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax ) {
-						_load_PPM_Error_Vs_M_over_Z_For_PSMs_ScatterPlotForLinkTypeActiveAjax[ selectedLinkType ] = null;
+					if ( _activeAjax ) {
+						_activeAjax[ selectedLinkType ] = null;
 					}
 					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
 						handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -418,7 +418,7 @@ var QCPageChart_Error_Vs_M_Over_Z_PSM = function() {
 
 		//  TODO  FIX THIS
 
-//		_PPM_Error_Vs_M_over_Z_Vs_M_over_Z_For_PSMs_ErrorEstimates_isLoaded = _IS_LOADED_YES;
+//		_chart_isLoaded = _IS_LOADED_YES;
 	};
 
 	//  Overridden for Specific elements like Chart Title and X and Y Axis labels

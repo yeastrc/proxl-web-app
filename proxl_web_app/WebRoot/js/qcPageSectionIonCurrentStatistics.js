@@ -191,7 +191,7 @@ var QCPageSectionIonCurrentStatistics = function() {
 		var $scan_level_expand_link = $("#scan_level_expand_link");
 		$scan_level_expand_link.click( function( event ) { 
 			try {
-				objectThis._scan_level_expand_link_Clicked( { clickedThis : this } ); 
+				objectThis._section_expand_link_Clicked( { clickedThis : this } ); 
 				event.preventDefault();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -202,7 +202,7 @@ var QCPageSectionIonCurrentStatistics = function() {
 		var $scan_level_collapse_link = $("#scan_level_collapse_link");
 		$scan_level_collapse_link.click( function( event ) { 
 			try {
-				objectThis._scan_level_collapse_link_Clicked( { clickedThis : this } ); 
+				objectThis._section_collapse_link_Clicked( { clickedThis : this } ); 
 				event.preventDefault();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -226,21 +226,21 @@ var QCPageSectionIonCurrentStatistics = function() {
 	/**
 	 * 
 	 */
-	this._scan_level_expand_link_Clicked = function( params ) {
-		this.showIonCurrentStatistics();
+	this._section_expand_link_Clicked = function( params ) {
+		this.show_Section();
 	};
 
 	/**
 	 *  
 	 */
-	this._scan_level_collapse_link_Clicked = function( params ) {
-		this.hideIonCurrentStatistics();
+	this._section_collapse_link_Clicked = function( params ) {
+		this.hide_Section();
 	};
 
 	/**
 	 *  
 	 */
-	this.showIonCurrentStatistics = function( params ) {
+	this.show_Section = function( params ) {
 
 		_sectionDisplayed = true;
 
@@ -257,7 +257,7 @@ var QCPageSectionIonCurrentStatistics = function() {
 	/**
 	 *  
 	 */
-	this.hideIonCurrentStatistics = function( params ) {
+	this.hide_Section = function( params ) {
 
 		var $scan_level_display_block = $("#scan_level_display_block");
 		$scan_level_display_block.hide();

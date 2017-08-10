@@ -191,7 +191,7 @@ var QCPageSectionSummaryStatistics = function() {
 		var $summary_expand_link = $("#summary_expand_link");
 		$summary_expand_link.click( function( event ) { 
 			try {
-				objectThis._summary_expand_link_Clicked( { clickedThis : this } ); 
+				objectThis._section_expand_link_Clicked( { clickedThis : this } ); 
 				event.preventDefault();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -202,7 +202,7 @@ var QCPageSectionSummaryStatistics = function() {
 		var $summary_collapse_link = $("#summary_collapse_link");
 		$summary_collapse_link.click( function( event ) { 
 			try {
-				objectThis._summary_collapse_link_Clicked( { clickedThis : this } ); 
+				objectThis._section_collapse_link_Clicked( { clickedThis : this } ); 
 				event.preventDefault();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -214,32 +214,32 @@ var QCPageSectionSummaryStatistics = function() {
 	/**
 	 * 
 	 */
-	this._summary_expand_link_Clicked = function() {
-		this.showSummaryStatistics();
+	this._section_expand_link_Clicked = function() {
+		this.show_Section();
 	};
 
 	/**
 	 *  
 	 */
-	this._summary_collapse_link_Clicked = function() {
-		this.hideSummaryStatistics();
+	this._section_collapse_link_Clicked = function() {
+		this.hide_Section();
 	};
 
 	/**
-	 *  
+	 *  Special function for calling from qcPageMain.js on page init to display this section automatically on page display
 	 */
-	this.showSummaryStatistics_From_qcPageMain = function() {
+	this.show_Section_From_qcPageMain = function() {
 		if ( ! _pageChartObjectsForSection ) {
 			//  _pageChartObjectsForSection not yet populated so exit
 			return;
 		}
-		this.showSummaryStatistics();
+		this.show_Section();
 	};
 	
 	/**
 	 *  
 	 */
-	this.showSummaryStatistics = function() {
+	this.show_Section = function() {
 
 		_sectionDisplayed = true;
 
@@ -256,7 +256,7 @@ var QCPageSectionSummaryStatistics = function() {
 	/**
 	 *  
 	 */
-	this.hideSummaryStatistics = function() {
+	this.hide_Section = function() {
 
 		var $summary_display_block = $("#summary_display_block");
 		$summary_display_block.hide();

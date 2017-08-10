@@ -190,7 +190,7 @@ var QCPageSectionDigestionStatistics = function() {
 		var $digestion_expand_link = $("#digestion_expand_link");
 		$digestion_expand_link.click( function( event ) { 
 			try {
-				objectThis._digestion_expand_link_Clicked( { clickedThis : this } ); 
+				objectThis._section_expand_link_Clicked( { clickedThis : this } ); 
 				event.preventDefault();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -201,7 +201,7 @@ var QCPageSectionDigestionStatistics = function() {
 		var $digestion_collapse_link = $("#digestion_collapse_link");
 		$digestion_collapse_link.click( function( event ) { 
 			try {
-				objectThis._digestion_collapse_link_Clicked( { clickedThis : this } ); 
+				objectThis._section_collapse_link_Clicked( { clickedThis : this } ); 
 				event.preventDefault();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -213,21 +213,21 @@ var QCPageSectionDigestionStatistics = function() {
 	/**
 	 * 
 	 */
-	this._digestion_expand_link_Clicked = function( params ) {
-		this.showDigestionStatistics();
+	this._section_expand_link_Clicked = function( params ) {
+		this.show_Section();
 	};
 
 	/**
 	 *  
 	 */
-	this._digestion_collapse_link_Clicked = function( params ) {
-		this.hideDigestionStatistics();
+	this._section_collapse_link_Clicked = function( params ) {
+		this.hide_Section();
 	};
 
 	/**
 	 *  
 	 */
-	this.showDigestionStatistics = function( params ) {
+	this.show_Section = function( params ) {
 
 		_sectionDisplayed = true;
 
@@ -244,7 +244,7 @@ var QCPageSectionDigestionStatistics = function() {
 	/**
 	 *  
 	 */
-	this.hideDigestionStatistics = function( params ) {
+	this.hide_Section = function( params ) {
 
 		var $digestion_display_block = $("#digestion_display_block");
 		$digestion_display_block.hide();

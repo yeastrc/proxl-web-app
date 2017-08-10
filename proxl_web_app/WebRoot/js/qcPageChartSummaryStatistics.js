@@ -95,7 +95,7 @@ var QCPageChartSummaryStatistics = function() {
 	
 	//   Variables for this chart
 	
-	var _summary_Statistics_isLoaded = _IS_LOADED_NO;
+	var _chart_isLoaded = _IS_LOADED_NO;
 
 
 	/**
@@ -181,16 +181,16 @@ var QCPageChartSummaryStatistics = function() {
 	 */
 	this.clearChart = function() {
 
-		_summary_Statistics_isLoaded = _IS_LOADED_NO;
+		_chart_isLoaded = _IS_LOADED_NO;
 
 		//  PSM Summary Summary 
 		var $Summary_Statistics_CountsBlock = $("#Summary_Statistics_CountsBlock");
 		var $Summary_Statistics_CountsBlock_chart_container_jq = $("#Summary_Statistics_CountsBlock .chart_container_jq"); 
 		$Summary_Statistics_CountsBlock_chart_container_jq.empty();
 
-		if ( _loadSummaryStatisticsCountActiveAjax ) {
-			_loadSummaryStatisticsCountActiveAjax.abort();
-			_loadSummaryStatisticsCountActiveAjax = null;
+		if ( _activeAjax ) {
+			_activeAjax.abort();
+			_activeAjax = null;
 		}
 	};
 
@@ -200,7 +200,7 @@ var QCPageChartSummaryStatistics = function() {
 	 */
 	this.loadChartIfNeeded = function() {
 
-		if ( _summary_Statistics_isLoaded === _IS_LOADED_NO ) {
+		if ( _chart_isLoaded === _IS_LOADED_NO ) {
 			this.loadSummaryStatisticsCount();
 		}
 	};
@@ -210,7 +210,7 @@ var QCPageChartSummaryStatistics = function() {
 	 */
 	var _SUMMARY_STATISTICS_CHART_COUNT = 3;
 
-	var _loadSummaryStatisticsCountActiveAjax = null;
+	var _activeAjax = null;
 
 	/**
 	 * Load the data for SummaryStatisticsCount
@@ -218,7 +218,7 @@ var QCPageChartSummaryStatistics = function() {
 	this.loadSummaryStatisticsCount = function() {
 		var objectThis = this;
 
-		_summary_Statistics_isLoaded = _IS_LOADED_LOADING;
+		_chart_isLoaded = _IS_LOADED_LOADING;
 
 		// Block for "Summary Statistics"
 		var $Summary_Statistics_CountsBlock = $("#Summary_Statistics_CountsBlock");
@@ -244,13 +244,13 @@ var QCPageChartSummaryStatistics = function() {
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
 
-		if ( _loadSummaryStatisticsCountActiveAjax ) {
-			_loadSummaryStatisticsCountActiveAjax.abort();
-			_loadSummaryStatisticsCountActiveAjax = null;
+		if ( _activeAjax ) {
+			_activeAjax.abort();
+			_activeAjax = null;
 		}
 
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_loadSummaryStatisticsCountActiveAjax =
+		_activeAjax =
 			$.ajax({
 				url : contextPathJSVar + "/services/qc/dataPage/summaryStatistics",
 				traditional: true,  //  Force traditional serialization of the data sent
@@ -260,7 +260,7 @@ var QCPageChartSummaryStatistics = function() {
 				dataType : "json",
 				success : function( ajaxResponseData ) {
 					try {
-						_loadSummaryStatisticsCountActiveAjax = null;
+						_activeAjax = null;
 						var responseParams = {
 								ajaxResponseData : ajaxResponseData, 
 								ajaxRequestData : ajaxRequestData
@@ -272,11 +272,11 @@ var QCPageChartSummaryStatistics = function() {
 					}
 				},
 				failure: function(errMsg) {
-					_loadSummaryStatisticsCountActiveAjax = null;
+					_activeAjax = null;
 					handleAJAXFailure( errMsg );
 				},
 				error : function(jqXHR, textStatus, errorThrown) {
-					_loadSummaryStatisticsCountActiveAjax = null;
+					_activeAjax = null;
 					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
 						handleAJAXError(jqXHR, textStatus, errorThrown);
 					}
