@@ -184,9 +184,11 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 	//  Read the user input parameters on the page and update the JSON in the hidden field to send to the server
 	this.put_query_json_field_ContentsToHiddenField = function() {
 		
+
 		var $query_json_field = $("#query_json_field");
-		if ( $query_json_field.length === 0 ) {
-			throw Error( "No HTML field with id 'query_json_field'" );
+		var $query_json_field_jq = $(".query_json_field_jq"); // Used on Protein Coverage page
+		if ( $query_json_field.length === 0 && $query_json_field_jq.length === 0 ) {
+			throw Error( "No HTML field with id 'query_json_field' or class 'query_json_field_jq'" );
 		}
 //		var inputCutoffs = _query_json_field_Contents.cutoffs;
 		var getCutoffsFromThePageResult = cutoffProcessingCommonCode.getCutoffsFromThePage(  {  } );
@@ -262,8 +264,9 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 		try {
 			var output_query_json_field_String = JSON.stringify( output_query_json_field_Contents );
 			$query_json_field.val( output_query_json_field_String );
+			$query_json_field_jq.val( output_query_json_field_String );
 		} catch( e ) {
-			throw Error( "Failed to stringify JSON to HTML field with id 'query_json_field'." );
+			throw Error( "Failed to stringify JSON to HTML field with id 'query_json_field' or HTML field with class 'query_json_field_jq'." );
 		}
 	};
 	

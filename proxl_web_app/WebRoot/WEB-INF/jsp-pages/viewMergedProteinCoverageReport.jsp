@@ -139,7 +139,7 @@
 						value="<bean:write name="search" property="projectSearchId" />">
 				</logic:iterate>
 
-				<input type="hidden" name="queryJSON" id="query_json_field"  value="<c:out value="${ queryJSONToForm }" ></c:out>" />
+				<input type="hidden" name="queryJSON" class="query_json_field_jq"   value="<c:out value="${ queryJSONToForm }" ></c:out>" />
 							
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
@@ -155,7 +155,7 @@
 						value="<bean:write name="search" property="projectSearchId" />">
 				</logic:iterate>
 			
-				<input type="hidden" name="queryJSON" id="query_json_field"  value="<c:out value="${ queryJSONToForm }" ></c:out>" />
+				<input type="hidden" name="queryJSON" class="query_json_field_jq"  value="<c:out value="${ queryJSONToForm }" ></c:out>" />
 			
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %> <%--  Currently empty --%>
