@@ -18,7 +18,8 @@ public class DefaultPageViewConstants {
 		"/proteinCoverageReport",
 		
 		"/image",
-		"/structure"
+		"/structure",
+		"/qc"
 		
 	};
 	

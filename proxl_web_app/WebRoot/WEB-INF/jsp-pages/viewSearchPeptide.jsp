@@ -119,6 +119,12 @@
 			<h2 style="margin-bottom:5px;">List search peptides:</h2>
 	
 			<div  class=" navigation-links-block ">
+
+				<%-- Navigation link to QC Page --%>
+				
+				<%@ include file="/WEB-INF/jsp-includes/qc_NavLinks.jsp" %>
+				
+				
 				[<a class="tool_tip_attached_jq" data-tooltip="View proteins" 
 					href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
 							>crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"

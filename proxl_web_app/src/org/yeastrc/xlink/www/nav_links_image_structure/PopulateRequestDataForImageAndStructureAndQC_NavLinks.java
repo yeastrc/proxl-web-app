@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.form_query_json_objects.ImageStructureQueryJSONRoot;
+import org.yeastrc.xlink.www.form_query_json_objects.ImageStructure_QC_QueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.PeptideQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
 import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
@@ -17,23 +17,23 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * 
+ * Put objects in the request scope to pass to imageAndStructureNavLinks.jsp and qc_NavLinks.jsp
  *
  */
-public class PopulateRequestDataForImageAndStructureNavLinks {
+public class PopulateRequestDataForImageAndStructureAndQC_NavLinks {
 
-	private static final Logger log = Logger.getLogger(PopulateRequestDataForImageAndStructureNavLinks.class);
+	private static final Logger log = Logger.getLogger(PopulateRequestDataForImageAndStructureAndQC_NavLinks.class);
 
 	/**
 	 * Static get instance
 	 * @return
 	 */
-	public static PopulateRequestDataForImageAndStructureNavLinks getInstance() {
-		return new PopulateRequestDataForImageAndStructureNavLinks(); 
+	public static PopulateRequestDataForImageAndStructureAndQC_NavLinks getInstance() {
+		return new PopulateRequestDataForImageAndStructureAndQC_NavLinks(); 
 	}
 	
 	//  constructor
-	private PopulateRequestDataForImageAndStructureNavLinks() { }
+	private PopulateRequestDataForImageAndStructureAndQC_NavLinks() { }
 	
 	/**
 	 * @param peptideQueryJSONRoot
@@ -43,7 +43,7 @@ public class PopulateRequestDataForImageAndStructureNavLinks {
 	 * @param request
 	 * @throws ProxlWebappDataException
 	 */
-	public void populateRequestDataForImageAndStructureNavLinksForPeptide(
+	public void populateRequestDataForImageAndStructureAndQC_NavLinksForPeptide(
 
 			PeptideQueryJSONRoot peptideQueryJSONRoot,
 			int projectId,
@@ -51,7 +51,7 @@ public class PopulateRequestDataForImageAndStructureNavLinks {
 			PeptideProteinCommonForm form, 
 			HttpServletRequest request ) throws ProxlWebappDataException {
 
-		ImageStructureQueryJSONRoot imageStructureQueryJSONRoot = new ImageStructureQueryJSONRoot( peptideQueryJSONRoot );
+		ImageStructure_QC_QueryJSONRoot imageStructureQueryJSONRoot = new ImageStructure_QC_QueryJSONRoot( peptideQueryJSONRoot );
 
 		populateRequestDataForImageAndStructureNavLinksCommon( imageStructureQueryJSONRoot, form, projectId, authAccessLevel, request );
 	}
@@ -72,14 +72,14 @@ public class PopulateRequestDataForImageAndStructureNavLinks {
 			PeptideProteinCommonForm form, 
 			HttpServletRequest request ) throws ProxlWebappDataException {
 		
-		ImageStructureQueryJSONRoot imageStructureQueryJSONRoot = new ImageStructureQueryJSONRoot( proteinQueryJSONRoot );
+		ImageStructure_QC_QueryJSONRoot imageStructureQueryJSONRoot = new ImageStructure_QC_QueryJSONRoot( proteinQueryJSONRoot );
 		
 		populateRequestDataForImageAndStructureNavLinksCommon( imageStructureQueryJSONRoot, form, projectId, authAccessLevel, request );
 	}
 	
 
 	/**
-	 * @param imageStructureQueryJSONRoot
+	 * @param imageStructure_QC_QueryJSONRoot
 	 * @param form
 	 * @param projectId
 	 * @param authAccessLevel
@@ -88,16 +88,16 @@ public class PopulateRequestDataForImageAndStructureNavLinks {
 	 */
 	private void populateRequestDataForImageAndStructureNavLinksCommon(
 			
-			ImageStructureQueryJSONRoot imageStructureQueryJSONRoot,
+			ImageStructure_QC_QueryJSONRoot imageStructure_QC_QueryJSONRoot,
 			PeptideProteinCommonForm form, 
 			int projectId,
 			AuthAccessLevel authAccessLevel,
 			HttpServletRequest request ) throws ProxlWebappDataException {
 		
-		request.setAttribute( "formDataForImageStructure", form );
+		request.setAttribute( "formDataForImageStructure_QC", form );
 		
 		if ( form.getProjectSearchId() != null && form.getProjectSearchId().length == 1 ) {
-			request.setAttribute( "ImageAndStructureSingleProjectSearchId", form.getProjectSearchId()[0] );
+			request.setAttribute( "ImageAndStructure_QC_SingleProjectSearchId", form.getProjectSearchId()[0] );
 		}
 		
 		try {
@@ -105,11 +105,11 @@ public class PopulateRequestDataForImageAndStructureNavLinks {
 
 			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
 
-			String imageStructureQueryJSONRootToPage = jacksonJSON_Mapper.writeValueAsString( imageStructureQueryJSONRoot );
+			String imageStructure_QC_QueryJSONRootToPage = jacksonJSON_Mapper.writeValueAsString( imageStructure_QC_QueryJSONRoot );
 
 			//  Create URI Encoded JSON for passing to Image and Structure pages in hash 
-			String imageAndStructureQueryJSONRootToPageURIEncoded = URLEncodeDecodeAURL.urlEncodeAURL( imageStructureQueryJSONRootToPage );
-			request.setAttribute( "imageAndStructureQueryJSON", imageAndStructureQueryJSONRootToPageURIEncoded );
+			String imageAndStructureAndQC_QueryJSONRootToPageURIEncoded = URLEncodeDecodeAURL.urlEncodeAURL( imageStructure_QC_QueryJSONRootToPage );
+			request.setAttribute( "imageAndStructureAndQC_QueryJSON", imageAndStructureAndQC_QueryJSONRootToPageURIEncoded );
 
 			boolean showStructureLink = true;
 			

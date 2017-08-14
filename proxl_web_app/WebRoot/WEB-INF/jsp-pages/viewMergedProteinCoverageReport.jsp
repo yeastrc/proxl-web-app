@@ -93,6 +93,17 @@
 				</c:choose> 
 
 			<div  class=" navigation-links-block ">
+			
+				<%--  Only display QC Nav link for non-merged page --%>
+				<c:choose>
+				 <c:when test="${ mergedPage }"> 
+				 
+				 </c:when>
+				 <c:otherwise>			
+					<%@ include file="/WEB-INF/jsp-includes/qc_NavLinks.jsp" %>
+				 </c:otherwise>
+				</c:choose> 
+						
 				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" href="${ contextPath }/${ peptideNav }.do?<bean:write name="queryString" />">Peptide View</a>]
 		
 				[<a class="tool_tip_attached_jq" data-tooltip="View proteins" href="${ contextPath }/${ proteinNav }.do?<bean:write name="queryString" />">Protein View</a>]

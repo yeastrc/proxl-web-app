@@ -5,6 +5,7 @@
 --%>
 <%--   Incoming page variable 'search_wrapper' --%>
 
+<%@page import="org.yeastrc.xlink.www.constants.PageLinkTextAndTooltipConstants"%>
 <%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
@@ -23,6 +24,9 @@
 			</td>
 			<td>
 			  <div style="float: right;" >
+				[<a data-tooltip="<%= PageLinkTextAndTooltipConstants.QC_LINK_TOOLTIP %>" class="tool_tip_attached_jq" 
+					href="${ contextPath }/qc.do?projectSearchId=<bean:write name="search" property="projectSearchId" />"
+						><%= PageLinkTextAndTooltipConstants.QC_LINK_TEXT %></a>]
 				[<a data-tooltip="View peptides found in search" class="tool_tip_attached_jq" 
 					href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ search.projectSearchId }">peptide.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 						>Peptides</a>]
@@ -155,17 +159,7 @@
 							</td>						
 					  </tr>
 					</c:if>
-					<tr >
-						<td>QC Plots:</td>
-						<td>
-<%--								
---%>								
-							[<a data-tooltip="View QC data" class="tool_tip_attached_jq" 
-								href="${ contextPath }/qc.do?projectSearchId=<bean:write name="search" property="projectSearchId" />"
-									>QC data</a>]
 
-						</td>
-					</tr>
 					<c:if test="${ not ( not authAccessLevel.writeAllowed and empty search.webLinks ) }" >
 							<%--  Hide this block if no Web Links and user unable to add Web Links --%>
 					<tr>

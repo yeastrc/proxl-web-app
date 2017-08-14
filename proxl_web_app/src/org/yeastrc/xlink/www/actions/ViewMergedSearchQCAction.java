@@ -204,6 +204,10 @@ public class ViewMergedSearchQCAction extends Action {
 			String cutoffValuesRootLevelCutoffDefaultsJSONString = jacksonJSON_Mapper.writeValueAsString( cutoffValuesRootLevelCutoffDefaults );
 			request.setAttribute( "cutoffValuesRootLevelCutoffDefaults", cutoffValuesRootLevelCutoffDefaultsJSONString );
 			//  This builds an object for the cutoff selection block on the page
+			
+			//  So certain sections treat this like coverage page.  ie: no selection of annotation data to display
+			request.setAttribute( "coveragePageForAnnDispMgmt", true );
+			
 			return mapping.findForward( "Success" );
 		} catch ( Exception e ) {
 			String msg = "Exception caught: " + e.toString();

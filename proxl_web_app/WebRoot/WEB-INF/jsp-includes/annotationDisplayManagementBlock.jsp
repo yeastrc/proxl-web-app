@@ -7,6 +7,7 @@
 <%--  
 	Block for user choosing which annotation types to display
 
+   Page variable 'coveragePageForAnnDispMgmt' also set on QC page  
 --%>
 
 <c:if test="${ coveragePageForAnnDispMgmt }">

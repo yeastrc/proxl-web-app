@@ -120,7 +120,11 @@
 			<h2 style="margin-bottom:5px;">List search proteins:</h2>
 	
 			<div  class=" navigation-links-block "> 
+
+				<%-- Navigation link to QC Page --%>
 				
+				<%@ include file="/WEB-INF/jsp-includes/qc_NavLinks.jsp" %>
+								
 				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" 
 					href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ search.projectSearchId }"
 						>peptide.do?projectSearchId=<bean:write name="search" property="projectSearchId" 

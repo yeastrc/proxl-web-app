@@ -1,3 +1,4 @@
+<%@page import="org.yeastrc.xlink.www.constants.PageLinkTextAndTooltipConstants"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 
 <%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
@@ -174,6 +175,9 @@
 		<input type="hidden" id="viewMergedStructureDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="/structure" projectSearchId="${ onlySingleProjectSearchId }"></proxl:defaultPageUrl>">
 	</c:if>
+	
+	<script id="qc_page_link_text" type="text/text"><%= PageLinkTextAndTooltipConstants.QC_LINK_TEXT %></script>
+	<script id="qc_page_link_tooltip" type="text/text"><%= PageLinkTextAndTooltipConstants.QC_LINK_TOOLTIP %></script>
 					
 	
 		<div>

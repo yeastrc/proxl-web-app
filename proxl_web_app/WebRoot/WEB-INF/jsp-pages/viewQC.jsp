@@ -45,6 +45,8 @@
 		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/lz-string.js"></script>
 		--%>
 		
+		<script src="${contextPath}/js/libs/jquery-ui-1.10.4.min.js"></script>
+		
 		<!-- Handlebars templating library   -->
 		
 		<%--  
@@ -130,6 +132,8 @@
 			value="<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ onlySingleProjectSearchId }"></proxl:defaultPageUrl>">
 		<input type="hidden" id="viewProteinCoverageReportDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="/proteinCoverageReport" projectSearchId="${ onlySingleProjectSearchId }"></proxl:defaultPageUrl>">
+		<input type="hidden" id="viewMergedImageDefaultPageUrl" 
+			value="<proxl:defaultPageUrl pageName="/image" projectSearchId="${ onlySingleProjectSearchId }"></proxl:defaultPageUrl>">
 		<input type="hidden" id="viewMergedStructureDefaultPageUrl" 
 			value="<proxl:defaultPageUrl pageName="/structure" projectSearchId="${ onlySingleProjectSearchId }"></proxl:defaultPageUrl>">
 	</c:if>
@@ -149,6 +153,23 @@
 	
 			<h2 style="margin-bottom:5px;">View <c:if test="${ empty onlySingleProjectSearchId }">merged </c:if>QC data:</h2>
 	
+			<div id="navigation-links"  class=" navigation-links-block ">
+			
+				<span id="navigation_links_except_structure"></span>
+
+				<c:choose>
+				 <c:when test="${ showStructureLink }">
+					
+					<span id="structure_viewer_link_span"></span>
+	
+				 </c:when>
+				 <c:otherwise>
+					<%@ include file="/WEB-INF/jsp-includes/structure_link_non_link.jsp" %>
+				 </c:otherwise>
+				</c:choose>
+								
+			</div>
+				
 			<%--  Hidden fields to pass data to JS --%>
 			
 			<input type="hidden" id="cutoffValuesRootLevelCutoffDefaults" value="<c:out value="${ cutoffValuesRootLevelCutoffDefaults }"></c:out>"> 
@@ -238,6 +259,9 @@
 			</table>
 			
 		</div>
+							
+			<%--  Block for user choosing which annotation types to display  --%>
+			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
 	
 		<hr>
 		

@@ -9,18 +9,18 @@
 													
 	<c:url value="" var="imageAndStructureQueryParams">
 			
-		<c:forEach var="projectSearchId" items="${ formDataForImageStructure.projectSearchId }" >
+		<c:forEach var="projectSearchId" items="${ formDataForImageStructure_QC.projectSearchId }" >
 			<c:param name="projectSearchId"   value="${projectSearchId}" />
 		</c:forEach>
 	</c:url>
 	
 	<c:set var="imagePageURL">image.do<c:out
 					value="${ imageAndStructureQueryParams }" ></c:out>#<c:out
-					value="${ imageAndStructureQueryJSON }" ></c:out></c:set>
+					value="${ imageAndStructureAndQC_QueryJSON }" ></c:out></c:set>
 	
 	<c:set var="structurePageURL">structure.do<c:out
 					value="${ imageAndStructureQueryParams }" ></c:out>#<c:out
-					value="${ imageAndStructureQueryJSON }" ></c:out></c:set>
+					value="${ imageAndStructureAndQC_QueryJSON }" ></c:out></c:set>
 
 
 	<%--  Use for Merged searches --%>
@@ -28,13 +28,13 @@
 	<c:set var="structurePageURLFinal" value="${ structurePageURL }" />
 	
 	<c:choose>
-		<c:when test="${ not empty ImageAndStructureSingleProjectSearchId }">
+		<c:when test="${ not empty ImageAndStructure_QC_SingleProjectSearchId }">
 	
 			<%--  Single searches so look up default Page URL --%>
  		
-			<c:set var="imagePageURLFinal"><proxl:defaultPageUrl pageName="/image" projectSearchId="${ ImageAndStructureSingleProjectSearchId }">${ imagePageURL }</proxl:defaultPageUrl></c:set>
+			<c:set var="imagePageURLFinal"><proxl:defaultPageUrl pageName="/image" projectSearchId="${ ImageAndStructure_QC_SingleProjectSearchId }">${ imagePageURL }</proxl:defaultPageUrl></c:set>
 
-			<c:set var="structurePageURLFinal"><proxl:defaultPageUrl pageName="/structure" projectSearchId="${ ImageAndStructureSingleProjectSearchId }">${ structurePageURL }</proxl:defaultPageUrl></c:set>
+			<c:set var="structurePageURLFinal"><proxl:defaultPageUrl pageName="/structure" projectSearchId="${ ImageAndStructure_QC_SingleProjectSearchId }">${ structurePageURL }</proxl:defaultPageUrl></c:set>
 		
 		</c:when>
 	</c:choose>

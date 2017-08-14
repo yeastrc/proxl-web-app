@@ -24,7 +24,7 @@ import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
 import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
 import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping;
 import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping.UnlinkedDimerPeptideProteinMappingResult;
-import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureNavLinks;
+import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureAndQC_NavLinks;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.MergedSearchProtein;
 import org.yeastrc.xlink.www.objects.SearchProtein;
@@ -434,7 +434,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			}
 			//////////////////////////////////////
 			//  Create data for Links for Image and Structure pages and put in request
-			PopulateRequestDataForImageAndStructureNavLinks.getInstance()
+			PopulateRequestDataForImageAndStructureAndQC_NavLinks.getInstance()
 			.populateRequestDataForImageAndStructureNavLinksForProtein( proteinQueryJSONRoot, projectId, authAccessLevel, form, request );
 			//////////////////////////////////////
 			return mapping.findForward( "Success" );

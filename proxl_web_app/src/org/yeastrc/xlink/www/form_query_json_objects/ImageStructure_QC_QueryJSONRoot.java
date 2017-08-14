@@ -1,10 +1,10 @@
 package org.yeastrc.xlink.www.form_query_json_objects;
 
 /**
- * The Root object for the hash value to pass to Image and Structure pages
+ * The Root object for the hash value to pass to Image and Structure and QC pages
  *
  */
-public class ImageStructureQueryJSONRoot extends A_QueryBase_JSONRoot {
+public class ImageStructure_QC_QueryJSONRoot extends A_QueryBase_JSONRoot {
 	//  A_QueryBase_JSONRoot contains the PSM and Peptide cutoffs
 	
 	private int[] excludeTaxonomy;
@@ -14,17 +14,17 @@ public class ImageStructureQueryJSONRoot extends A_QueryBase_JSONRoot {
 	
 	////////
 	//   Constuctors
-	public ImageStructureQueryJSONRoot() {}
+	public ImageStructure_QC_QueryJSONRoot() {}
 	/**
 	 * @param peptideQueryJSONRoot
 	 */
-	public ImageStructureQueryJSONRoot( PeptideQueryJSONRoot peptideQueryJSONRoot ) {
+	public ImageStructure_QC_QueryJSONRoot( PeptideQueryJSONRoot peptideQueryJSONRoot ) {
 		super( peptideQueryJSONRoot );
 	}
 	/**
 	 * @param proteinQueryJSONRoot
 	 */
-	public ImageStructureQueryJSONRoot( ProteinQueryJSONRoot proteinQueryJSONRoot ) {
+	public ImageStructure_QC_QueryJSONRoot( ProteinQueryJSONRoot proteinQueryJSONRoot ) {
 		super( proteinQueryJSONRoot );
 		this.excludeTaxonomy = proteinQueryJSONRoot.getExcludeTaxonomy();
 		this.filterNonUniquePeptides = proteinQueryJSONRoot.isFilterNonUniquePeptides();

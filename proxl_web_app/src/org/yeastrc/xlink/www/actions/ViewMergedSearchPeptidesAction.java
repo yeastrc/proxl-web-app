@@ -19,7 +19,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureNavLinks;
+import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureAndQC_NavLinks;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.IMergedSearchLink;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
@@ -266,8 +266,8 @@ public class ViewMergedSearchPeptidesAction extends Action {
 				}
 			}
 			//  Create data for Links for Image and Structure pages and put in request
-			PopulateRequestDataForImageAndStructureNavLinks.getInstance()
-			.populateRequestDataForImageAndStructureNavLinksForPeptide( peptidesMergedCommonPageDownloadResult.getMergedPeptideQueryJSONRoot(), projectId, authAccessLevel, form, request );
+			PopulateRequestDataForImageAndStructureAndQC_NavLinks.getInstance()
+			.populateRequestDataForImageAndStructureAndQC_NavLinksForPeptide( peptidesMergedCommonPageDownloadResult.getMergedPeptideQueryJSONRoot(), projectId, authAccessLevel, form, request );
 			if ( webappTiming != null ) {
 				webappTiming.markPoint( "Before send to JSP" );
 			}

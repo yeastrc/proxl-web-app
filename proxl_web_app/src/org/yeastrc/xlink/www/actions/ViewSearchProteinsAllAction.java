@@ -28,7 +28,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
-import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureNavLinks;
+import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureAndQC_NavLinks;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.SearchProtein;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
@@ -335,7 +335,7 @@ public class ViewSearchProteinsAllAction extends Action {
 				}
 			}
 			//  Create data for Links for Image and Structure pages and put in request
-			PopulateRequestDataForImageAndStructureNavLinks.getInstance()
+			PopulateRequestDataForImageAndStructureAndQC_NavLinks.getInstance()
 			.populateRequestDataForImageAndStructureNavLinksForProtein( proteinQueryJSONRoot, projectId, authAccessLevel, form, request );
 
 			return mapping.findForward( "Success" );
