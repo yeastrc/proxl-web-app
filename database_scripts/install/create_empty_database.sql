@@ -14,8 +14,6 @@
 
 
 --  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -360,6 +358,7 @@ CREATE TABLE  scan_file (
   filename VARCHAR(255) NOT NULL,
   path VARCHAR(2000) NULL,
   sha1sum VARCHAR(255) NULL,
+  file_size BIGINT UNSIGNED NULL,
   PRIMARY KEY (id))
 ENGINE = InnoDB;
 
@@ -1774,6 +1773,7 @@ CREATE TABLE  proxl_xml_file_import_tracking_single_file (
   file_size BIGINT(20) UNSIGNED NULL,
   sha1_sum VARCHAR(255) NULL,
   filename_on_disk_with_path_sub_same_machine VARCHAR(4000) NULL,
+  path_on_submitting_machine VARCHAR(4000) NULL,
   PRIMARY KEY (id),
   CONSTRAINT prxl_xml_fl_imprt_trkng_sngl_fl_id
     FOREIGN KEY (proxl_xml_file_import_tracking_id)
@@ -2266,6 +2266,25 @@ CREATE TABLE  scan_file_ms_2_per_scan_data_num_tic_rt (
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 COMMENT = 'For MS2 scans, store the scan number (sn), total ion current (tic), and retention time (rt), assoc ms1 scan number (sn1)\nas JSON blob compressed with gzip';
+
+
+-- -----------------------------------------------------
+-- Table scan_file_source
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS scan_file_source ;
+
+CREATE TABLE  scan_file_source (
+  scan_file_id INT UNSIGNED NOT NULL,
+  path VARCHAR(4000) NULL,
+  canonical_filename_w_path_on_submit_machine VARCHAR(4000) NULL,
+  absolute_filename_w_path_on_submit_machine VARCHAR(4000) NULL,
+  PRIMARY KEY (scan_file_id),
+  CONSTRAINT fk_scan_file_source
+    FOREIGN KEY (scan_file_id)
+    REFERENCES scan_file (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
