@@ -29,7 +29,6 @@ public class SearchSearcher {
 			"SELECT project_search.id FROM project_search"
 			+ " INNER JOIN project ON project_search.project_id = project.id   "
 			+ " WHERE project.id = ? AND project_search.status_id = " + SearchRecordStatus.IMPORT_COMPLETE_VIEW.value()
-			+   " AND active_project_id_search_id_unique_record IS NOT NULL "
 			+ " ORDER BY project_search.search_display_order , project_search.search_id DESC";
 	/**
 	 * Return a list of all searches for the project, ordered by upload date

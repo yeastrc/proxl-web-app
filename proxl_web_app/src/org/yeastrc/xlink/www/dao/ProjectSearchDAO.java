@@ -176,25 +176,21 @@ public class ProjectSearchDAO {
 	
 	
 	/**
-	 * Mark search as deleted
-	 * @param searchId
-	 * @param deletionAuthUserId
+	 * Delete the project_search record for the projectSearchId
+	 * @param projectSearchId
+	 * @param deletionAuthUserId - Not used
 	 * @throws Exception
 	 */
-	public void markAsDeleted( int searchId, int deletionAuthUserId ) throws Exception {
+	public void deleteProjectSearchId( int projectSearchId, int deletionAuthUserId ) throws Exception {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		Connection dbConnection = null;
-		//  active_project_id_search_id_unique_record = NULL  to remove this record from UNIQUE index on project_id, search_id, active_project_id_search_id_unique_record
-		String sql = "UPDATE project_search SET status_id = " + SearchRecordStatus.MARKED_FOR_DELETION.value()
-				+ ", active_project_id_search_id_unique_record = NULL "
-				+ ", marked_for_deletion_auth_user_id = ?, marked_for_deletion_timestamp = NOW() "
-				+ " WHERE id = ?";
+		String sql = "DELETE FROM project_search WHERE id = ?";
+				
 		try {
 			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = dbConnection.prepareStatement( sql );
-			pstmt.setInt( 1, deletionAuthUserId );
-			pstmt.setInt( 2, searchId );
+			pstmt.setInt( 1, projectSearchId );
 			pstmt.executeUpdate();
 		} catch ( Exception e ) {
 			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );

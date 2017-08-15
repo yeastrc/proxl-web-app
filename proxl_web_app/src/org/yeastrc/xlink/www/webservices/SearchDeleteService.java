@@ -106,7 +106,7 @@ public class SearchDeleteService {
 
 			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
 			AuthUserDTO authUserDTO = userSessionObject.getUserDBObject().getAuthUser();
-			ProjectSearchDAO.getInstance().markAsDeleted( projectSearchId, authUserDTO.getId() );
+			ProjectSearchDAO.getInstance().deleteProjectSearchId( projectSearchId, authUserDTO.getId() );
 			Cached_Search_Core_DTO.getInstance().invalidateProjectSearchId( projectSearchId );
 			
 			SearchDeleteServiceResult result = new SearchDeleteServiceResult();

@@ -14,6 +14,7 @@
 
 
 --  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -253,7 +254,6 @@ CREATE TABLE  project_search (
   status_id TINYINT UNSIGNED NOT NULL DEFAULT 1,
   search_name VARCHAR(2000) NULL,
   search_display_order INT NOT NULL DEFAULT 0,
-  active_project_id_search_id_unique_record TINYINT NULL DEFAULT 1 COMMENT 'Set to NULL to remove record from UNIQUE index project_id_search_id_active_p_id_s_id_u_r_unique_idx',
   marked_for_deletion_auth_user_id INT UNSIGNED NULL,
   marked_for_deletion_timestamp DATETIME NULL,
   created_by_user_id INT UNSIGNED NULL,
@@ -293,7 +293,7 @@ CREATE INDEX fk_project_search__del_auth_user_id_idx ON project_search (marked_f
 
 CREATE INDEX id_search_id_idx ON project_search (id ASC, search_id ASC);
 
-CREATE UNIQUE INDEX project_id_search_id_active_p_id_s_id_u_r_unique_idx ON project_search (project_id ASC, search_id ASC, active_project_id_search_id_unique_record ASC);
+CREATE UNIQUE INDEX project_id_search_id_unique_idx ON project_search (project_id ASC, search_id ASC);
 
 
 -- -----------------------------------------------------
@@ -2287,10 +2287,6 @@ CREATE TABLE  scan_file_source (
 ENGINE = InnoDB;
 
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 DELIMITER $$
 
@@ -2310,3 +2306,7 @@ END$$
 
 
 DELIMITER ;
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
