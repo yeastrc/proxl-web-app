@@ -117,15 +117,6 @@ function initPageSearchMaint() {
 		}
 		return false;
 	});
-	/////////////////////////
-	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-		try {
-			initQCPlotPSMScoreVsScoreClickHandlers();
-		} catch( e ) {
-			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-			throw e;
-		}
-	},10);
 	//  Initialize the buttons from the current values of the check boxes.
 	//     The check boxes may be checked from using the back button.
 	updateButtonsBasedOnCheckedSearches ( );
