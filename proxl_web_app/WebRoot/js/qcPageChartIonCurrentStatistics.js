@@ -91,6 +91,7 @@ var QCPageChartIonCurrentStatistics = function() {
 	this.getColorAndBarColorFromLinkType = undefined;
 	
 	var _get_hash_json_Contents = undefined; // function on qcPageMain
+	var _getScanFilesForProjectSearchId = undefined;
 	
 	
 	///////////
@@ -152,16 +153,15 @@ var QCPageChartIonCurrentStatistics = function() {
 			//  Do not store what is returned from function _get_hash_json_Contents since it can change
 			_get_hash_json_Contents = params.get_hash_json_Contents; // function
 
-			this.addClickAndOnChangeHandlers();
+			_getScanFilesForProjectSearchId = params.getScanFilesForProjectSearchId; // function
 
+			this.addClickAndOnChangeHandlers();
 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
 		}
-
 	};
-
 
 
 	/**
@@ -170,6 +170,17 @@ var QCPageChartIonCurrentStatistics = function() {
 	this.addClickAndOnChangeHandlers = function() {
 		var objectThis = this;
 
+
+		$("#scan_level_display_scan_file_selector").change(function(eventObject) {
+			try {
+				objectThis.scanFileSelectorChange( { changedThis : this } );
+				eventObject.preventDefault();
+				eventObject.stopPropagation();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 	};
 
 
@@ -186,13 +197,15 @@ var QCPageChartIonCurrentStatistics = function() {
 		_chart_isLoaded = _IS_LOADED_NO;
 
 		var $scan_file_files_loading_block = $("#scan_file_files_loading_block");
-		var $scan_file_no_files_block = $("#scan_file_no_files_block");
-		var $scan_file_selector_block = $("#scan_file_selector_block");
 		$scan_file_files_loading_block.show();
-		$scan_file_no_files_block.hide();
-		$scan_file_selector_block.hide();
-		var $scan_file_selector = $("#scan_file_selector");
-		$scan_file_selector.empty();
+		
+		var $scan_level_display_scan_file_selector_block = $("#scan_level_display_scan_file_selector_block");
+		$scan_level_display_scan_file_selector_block.hide();
+		var $scan_level_display_scan_file_selector = $("#scan_level_display_scan_file_selector");
+		$scan_level_display_scan_file_selector.hide();
+		$scan_level_display_scan_file_selector.empty();
+		var $scan_level_display_single_file_filename = $("#scan_level_display_single_file_filename")
+		$scan_level_display_single_file_filename.hide();
 
 		var $scan_file_selected_file_statistics_display_block = $("#scan_file_selected_file_statistics_display_block");
 		$scan_file_selected_file_statistics_display_block.hide();
@@ -202,56 +215,33 @@ var QCPageChartIonCurrentStatistics = function() {
 	 * If not loaded, call ...
 	 */
 	this.loadScanFileSelectorIfNeeded = function() {
+		var objectThis = this;
+		
 		if ( _chart_isLoaded === _IS_LOADED_NO ) {
-			this.loadScanFileSelector();
+
+			var callback_GetScanFilesForProjectSearchId = function( params ) {
+				objectThis.getScanFilesForProjectSearchId_ProcessResponse( params );
+			};
+			
+			_getScanFilesForProjectSearchId( { 
+				htmlElementScanFileTR : "#scan_level_display_scan_file_selector_block",
+				addAllOption : false,
+				callback: callback_GetScanFilesForProjectSearchId } );
 		}
 	};
 
 	/**
-	 * Load the data for  Scan Overall Statistics
+	 * Process callback response from _getScanFilesForProjectSearchId
 	 */
-	this.loadScanFileSelector = function() {
-		var objectThis = this;
-		var _URL = contextPathJSVar + "/services/utils/getScanFilesForProjectSearchId";
-		var requestData = {
-				projectSearchId : _project_search_ids
-		};
-		//  Skip Save request since never abort
-//		var request =
-		$.ajax({
-			type : "GET",
-			url : _URL,
-			data : requestData,
-			dataType : "json",
-			traditional: true,  //  Force traditional serialization of the data sent
-			//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-			//   So _project_search_ids array is passed as "project_search_id=<value>" which is what Jersey expects
-			success : function(data) {
-				try {
-					objectThis.loadScanFileSelectorResponse(requestData, data);
-				} catch( e ) {
-					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-					throw e;
-				}
-			},
-			failure: function(errMsg) {
-				handleAJAXFailure( errMsg );
-			},
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
-				// alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
-				// textStatus: " + textStatus );
-			}
-		});
-	};
-
-	/**
-	 * Process AJAX response for loadScanFileSelector
-	 */
-	this.loadScanFileSelectorResponse = function(requestData, responseData) {
+	this.getScanFilesForProjectSearchId_ProcessResponse = function( params ) {
 //		var objectThis = this;
-		var scanFiles = responseData;
-		if ( scanFiles.length === 0 ) {
+		var scanFiles = params.scanFiles;
+		var selectorUpdated = params.selectorUpdated;
+		if ( ! selectorUpdated ) {
+			
+		}
+		
+		if ( ! scanFiles || scanFiles.length === 0 ) {
 			//  No Scan files so show message and exit
 			var $scan_file_no_files_block = $("#scan_file_no_files_block");
 			$scan_file_no_files_block.show();
@@ -260,46 +250,51 @@ var QCPageChartIonCurrentStatistics = function() {
 
 			return;  //  EARLY EXIT
 		}
-
-		//  For viewing single Scan File
-
-		var scanfileIdToLoadDataFor = null;
-
-		if ( scanFiles.length === 1 ) {
-			var $scan_file_single_file_block = $("#scan_file_single_file_block");
-			$scan_file_single_file_block.show();
-			var $scan_file_single_file_filename = $("#scan_file_single_file_filename");
-			var scanFile = scanFiles[ 0 ];
-			$scan_file_single_file_filename.text( scanFile.filename );
-			$scan_file_single_file_filename.data("id", scanFile.id );
-			scanfileIdToLoadDataFor = scanFile.id;
-		} else {
-			var $scan_file_selector = $("#scan_file_selector");
-			$scan_file_selector.empty();
-			var optionsHTMLarray = [];
-			for ( var scanFilesIndex = 0; scanFilesIndex < scanFiles.length; scanFilesIndex++ ) {
-				var scanFile = scanFiles[ scanFilesIndex ];
-				var html = "<option value='" + scanFile.id + "'>" + scanFile.filename + "</option>";
-				optionsHTMLarray.push( html );
-				if ( scanFilesIndex === 0 ) {
-					scanfileIdToLoadDataFor = scanFile.id;
-				}
-			}
-			var optionsHTML = optionsHTMLarray.join("");
-			$scan_file_selector.append( optionsHTML );
-
-			var $scan_file_files_loading_block = $("#scan_file_files_loading_block");
-			var $scan_file_selector_block = $("#scan_file_selector_block");
-			$scan_file_files_loading_block.hide();
-			$scan_file_selector_block.show();
-		}
+//		
+//		//  For viewing single Scan File
+//
+//		var scanfileIdToLoadDataFor = null;
+//
+//		if ( scanFiles.length === 1 ) {
+//			var $scan_file_single_file_block = $("#scan_file_single_file_block");
+//			$scan_file_single_file_block.show();
+//			var $scan_file_single_file_filename = $("#scan_file_single_file_filename");
+//			var scanFile = scanFiles[ 0 ];
+//			$scan_file_single_file_filename.text( scanFile.filename );
+//			$scan_file_single_file_filename.data("id", scanFile.id );
+//			scanfileIdToLoadDataFor = scanFile.id;
+//		} else {
+//			var $scan_file_selector = $("#scan_file_selector");
+//			$scan_file_selector.empty();
+//			var optionsHTMLarray = [];
+//			for ( var scanFilesIndex = 0; scanFilesIndex < scanFiles.length; scanFilesIndex++ ) {
+//				var scanFile = scanFiles[ scanFilesIndex ];
+//				var html = "<option value='" + scanFile.id + "'>" + scanFile.filename + "</option>";
+//				optionsHTMLarray.push( html );
+//				if ( scanFilesIndex === 0 ) {
+//					scanfileIdToLoadDataFor = scanFile.id;
+//				}
+//			}
+//			var optionsHTML = optionsHTMLarray.join("");
+//			$scan_file_selector.append( optionsHTML );
+//
+//			var $scan_file_files_loading_block = $("#scan_file_files_loading_block");
+//			var $scan_file_selector_block = $("#scan_file_selector_block");
+//			$scan_file_files_loading_block.hide();
+//			$scan_file_selector_block.show();
+//		}
 
 		var $scan_file_files_loading_block = $("#scan_file_files_loading_block");
 		$scan_file_files_loading_block.hide();
 
+		var $scan_level_display_scan_file_selector_block = $("#scan_level_display_scan_file_selector_block");
+		$scan_level_display_scan_file_selector_block.show();
+
 		var $scan_file_selected_file_statistics_display_block = $("#scan_file_selected_file_statistics_display_block");
 		$scan_file_selected_file_statistics_display_block.show();
 
+		var scanfileIdToLoadDataFor = scanFiles[ 0 ].id;
+		
 		this.loadDataForScanFileId( { scanFileId: scanfileIdToLoadDataFor } );
 	};
 
@@ -310,6 +305,11 @@ var QCPageChartIonCurrentStatistics = function() {
 		var objectThis = this;
 		var changedThis = params.changedThis;
 		var $changedThis = $( changedThis );
+		
+		this.clearScanOverallStastics()
+		this.clear_MS_1_IonCurrent_Histograms()
+		this.clear_MS_1_IonCurrent_Heatmap()
+
 		var scanFileId = $changedThis.val();
 		this.loadDataForScanFileId( { scanFileId: scanFileId } );
 	};

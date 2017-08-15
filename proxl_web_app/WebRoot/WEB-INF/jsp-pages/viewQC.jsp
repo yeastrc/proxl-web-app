@@ -358,13 +358,13 @@
 			  	No Scan Files
 			  </div>
 			  
-			  <!-- <select> For Multiple Scan Files -->
-			  <h2 id="scan_file_selector_block" style="display: none;">
-			    File: <select id="scan_file_selector" style="font-size: inherit; color: inherit;" ></select>
-			  </h2>
-			  <!-- Display Single scan file -->
-			  <h2 id="scan_file_single_file_block" style="display: none;">
-				File: <span id="scan_file_single_file_filename"></span>
+			  
+			  <h2 id="scan_level_display_scan_file_selector_block" style="display: none;">
+			    File:
+			    	<!-- <select> For Multiple Scan Files --> 
+			    	<select id="scan_level_display_scan_file_selector" class=" scan_file_selector_jq " style="font-size: inherit; color: inherit; display: none;" ></select>
+			    	<!-- Display Single scan file -->
+			    	<span id="scan_level_display_single_file_filename" class=" single_scan_file_display_jq " style="display: none;"></span>
 			  </h2>
 			  
 			  <!--  Everything displayed once a scan file is selected -->
@@ -767,11 +767,12 @@
 				<div id="scan_retention_time_qc_plot_overlay_body" class="qc-plot-overlay-body" >
 				  <div >
 					<table style="border-width:0px;">
-						<tr>
+						<tr id="scan_retention_time_qc_plot_overlay_scan_file_selector_row" >
 							<td>Scan File:</td>
 							<td>
-								<select id="scan_retention_time_qc_plot_scan_file_id"  class="scan_retention_time_qc_plot_on_change_jq">
+								<select id="scan_retention_time_qc_plot_scan_file_id"  class=" scan_file_selector_jq  scan_retention_time_qc_plot_on_change_jq">
 								</select>
+								<span class=" single_scan_file_display_jq "></span> <%-- When only 1 scan file, display here --%>
 							</td>
 						</tr>
 						<tr>
@@ -891,8 +892,9 @@
 						<tr id="psm_count_vs_score_qc_plot_overlay_scan_file_selector_row" >
 							<td>Scan File:</td>
 							<td colspan="3">
-								<select id="psm_count_vs_score_qc_plot_scan_file_id"  class="psm_count_vs_score_qc_plot_on_change_jq">
+								<select id="psm_count_vs_score_qc_plot_scan_file_id"  class=" scan_file_selector_jq psm_count_vs_score_qc_plot_on_change_jq">
 								</select>
+								<span class=" single_scan_file_display_jq "></span> <%-- When only 1 scan file, display here --%>
 							</td>
 						</tr>
 						<tr>
@@ -1082,8 +1084,9 @@
 						<tr id="psm_score_vs_score_qc_plot_overlay_scan_file_selector_row">
 							<td>Scan File:</td>
 							<td>
-								<select id="psm_score_vs_score_qc_plot_scan_file_id"  class="psm_score_vs_score_qc_plot_on_change_jq">
+								<select id="psm_score_vs_score_qc_plot_scan_file_id"  class=" scan_file_selector_jq psm_score_vs_score_qc_plot_on_change_jq">
 								</select>
+								<span class=" single_scan_file_display_jq "></span> <%-- When only 1 scan file, display here --%>
 							</td>
 						</tr>				
 								

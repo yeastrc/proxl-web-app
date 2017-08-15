@@ -438,19 +438,24 @@ var QCPageMain = function() {
 	this.getScanFilesForProjectSearchId_ProcessResponse = function( params ) {
 //		var objectThis = this;
 		var originalParams = params.originalParams;
-		var htmlElementSelector = originalParams.htmlElementSelector;
+		var htmlElementScanFileTR = originalParams.htmlElementScanFileTR;
 		var addAllOption = originalParams.addAllOption;
 		var callback = originalParams.callback;
 		
 		var scanFiles = _scanFiles_ForProjectSearchId_Cached;
 		
-		var $htmlElementSelector = $( htmlElementSelector );
 		if ( scanFiles.length === 0 ) {
 			callback( {  scanFiles : null, selectorUpdated : false } );
 		}
-		$htmlElementSelector.empty();
+				
+		var $htmlElementScanFileTR = $( htmlElementScanFileTR );
+		var $scan_file_selector_jq = $htmlElementScanFileTR.find(".scan_file_selector_jq");
+		var $single_scan_file_display_jq = $htmlElementScanFileTR.find(".single_scan_file_display_jq");
+		
+		$scan_file_selector_jq.empty();
 		var optionsHTMLarray = [];
-		if ( addAllOption ) {
+		if ( addAllOption && scanFiles.length > 1 ) {
+			//  Only add if more than one scan file
 			optionsHTMLarray.push( "<option value=''>All</option>" );
 		}
 		for ( var scanFilesIndex = 0; scanFilesIndex < scanFiles.length; scanFilesIndex++ ) {
@@ -459,7 +464,18 @@ var QCPageMain = function() {
 			optionsHTMLarray.push( html );
 		}
 		var optionsHTML = optionsHTMLarray.join("");
-		$htmlElementSelector.append( optionsHTML );
+		$scan_file_selector_jq.append( optionsHTML );
+		
+		if ( scanFiles.length === 1 ) {
+			//  Only one scan file
+			scanFile = scanFiles[ 0 ];
+			$scan_file_selector_jq.hide();
+			$single_scan_file_display_jq.show();
+			$single_scan_file_display_jq.text( scanFile.filename );
+		} else {
+			$scan_file_selector_jq.show();
+			$single_scan_file_display_jq.hide();
+		}
 
 		callback( { scanFiles : _scanFiles_ForProjectSearchId_Cached, selectorUpdated : true } );
 	};

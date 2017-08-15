@@ -423,7 +423,7 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 		};
 		
 		_getScanFilesForProjectSearchId( { 
-			htmlElementSelector : "#scan_retention_time_qc_plot_scan_file_id",
+			htmlElementScanFileTR : "#scan_retention_time_qc_plot_overlay_scan_file_selector_row",
 			addAllOption : true,
 			callback: callback_GetScanFilesForProjectSearchId } );
 	};

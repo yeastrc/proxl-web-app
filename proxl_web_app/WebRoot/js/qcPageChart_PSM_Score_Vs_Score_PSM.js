@@ -461,7 +461,7 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 		};
 		
 		_getScanFilesForProjectSearchId( { 
-			htmlElementSelector : "#psm_score_vs_score_qc_plot_scan_file_id",
+			htmlElementScanFileTR : "#psm_score_vs_score_qc_plot_overlay_scan_file_selector_row",
 			addAllOption : true,
 			callback: callback_GetScanFilesForProjectSearchId } );
 		

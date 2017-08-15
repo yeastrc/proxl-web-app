@@ -210,17 +210,6 @@ var QCPageSectionIonCurrentStatistics = function() {
 			}
 		});
 
-		$("#scan_file_selector").change(function(eventObject) {
-			try {
-				qcPageChartIonCurrentStatistics.scanFileSelectorChange( { changedThis : this } );
-				eventObject.preventDefault();
-				eventObject.stopPropagation();
-			} catch( e ) {
-				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-				throw e;
-			}
-		});
-
 	};
 
 	/**
