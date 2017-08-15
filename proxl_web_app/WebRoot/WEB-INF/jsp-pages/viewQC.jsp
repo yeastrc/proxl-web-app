@@ -552,7 +552,7 @@
 	 		  <table  id="" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
 	 		   <tr>
 	 		   		<%-- Retention Time Chart --%>
-				<td style="padding: 4px;">
+				<td style="padding: 4px; vertical-align: top;" >
 				 <div id="retention_time_outer_container_div"
 				 	class=" chart-standard-container-div qc-data-block chart_outer_container_for_download_jq chart_outer_container_jq" 
 				 	> 
@@ -564,7 +564,7 @@
 				  </div>
 				</td>
 					<%-- PSM Count Vs Score Chart --%>
-				<td style="padding: 4px;">
+				<td style="padding: 4px; vertical-align: top;">
 				 <div id="psm_count_vs_score_outer_container_div"
 				 	class=" chart-standard-container-div qc-data-block chart_outer_container_for_download_jq chart_outer_container_jq" 
 				 	> 
@@ -576,7 +576,7 @@
 				  </div>
 				</td>				
 					<%-- PSM Score Vs Score Chart --%>
-				<td style="padding: 4px;">
+				<td style="padding: 4px; vertical-align: top;">
 				 <div id="psm_score_vs_score_outer_container_div" 
 				 	class=" chart-standard-container-div qc-data-block chart_outer_container_for_download_jq chart_outer_container_jq" 
 				 	> 
@@ -888,7 +888,7 @@
 			
 				<div >
 					<table style="border-width:0px;">
-						<tr>
+						<tr id="psm_count_vs_score_qc_plot_overlay_scan_file_selector_row" >
 							<td>Scan File:</td>
 							<td colspan="3">
 								<select id="psm_count_vs_score_qc_plot_scan_file_id"  class="psm_count_vs_score_qc_plot_on_change_jq">
@@ -1079,7 +1079,7 @@
 			
 				<div >
 					<table style="border-width:0px;">
-						<tr>
+						<tr id="psm_score_vs_score_qc_plot_overlay_scan_file_selector_row">
 							<td>Scan File:</td>
 							<td>
 								<select id="psm_score_vs_score_qc_plot_scan_file_id"  class="psm_score_vs_score_qc_plot_on_change_jq">

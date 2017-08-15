@@ -125,8 +125,6 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 	
 	//   Variables for this chart
 
-	var _scanFileIds = null;
-	
 	/**
 	 * Used by PSM Score Vs Scores Chart Code
 	 */
@@ -491,12 +489,15 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 		if ( ! selectorUpdated ) {
 			
 		}
-		_scanFileIds = [];
-		scanFiles.forEach(function( element, index, array ) {
-			var scanFile = element;
-			_scanFileIds.push( scanFile.id );
-		}, this )
 
+		var $psm_score_vs_score_qc_plot_overlay_scan_file_selector_row = $("#psm_score_vs_score_qc_plot_overlay_scan_file_selector_row");
+		if ( ! scanFiles ) {
+			//  No scan files
+			$psm_score_vs_score_qc_plot_overlay_scan_file_selector_row.hide();
+		} else {
+			$psm_score_vs_score_qc_plot_overlay_scan_file_selector_row.show();
+		}
+		
 		this.psmScoreVsScoreQCPlot_getPSMFilterableAnnTypesForProjectSearchId( );
 	};
 
@@ -573,10 +574,12 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 		$psm_score_vs_score_qc_plot_score_type_id_1.append( optionsHTML );
 		$psm_score_vs_score_qc_plot_score_type_id_2.append( optionsHTML );
 		
+
 		//  For ann_type_id_1, set specific annotation type record as "selected"
 		//  If any annotation type record has sort id, use annotation type record with smallest sort id
-		//  Otherwise, leave at first annotation type record as they are sorted alphabetically ignore case
+		//  Otherwise, leave at first annotation type record as they are sorted alphabetically
 		var annTypeIdToUse = undefined;
+		var annTypeIdToUse_SortOrder = undefined;
 		for ( var annTypesIndex = 0; annTypesIndex < annTypes.length; annTypesIndex++ ) {
 			var annType = annTypes [ annTypesIndex ];
 			if ( annType.annotationTypeFilterableDTO && 
@@ -584,9 +587,11 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 					annType.annotationTypeFilterableDTO.sortOrder !== null ) {
 				if ( annTypeIdToUse === undefined ) {
 					annTypeIdToUse = annType.id
+					annTypeIdToUse_SortOrder = annType.annotationTypeFilterableDTO.sortOrder;
 				} else {
-					if ( annType.id < annTypeIdToUse ) {
+					if ( annType.annotationTypeFilterableDTO.sortOrder < annTypeIdToUse_SortOrder ) {
 						annTypeIdToUse = annType.id;
+						annTypeIdToUse_SortOrder = annType.annotationTypeFilterableDTO.sortOrder
 					}
 				}
 			}
@@ -594,6 +599,7 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 		if ( annTypeIdToUse !== undefined ) {
 			$psm_score_vs_score_qc_plot_score_type_id_1.val( annTypeIdToUse );
 		}
+
 		//  For ann_type_id_2, leave at first annotation type record as they are sorted alphabetically ignore case
 		
 		this.psmScoreVsScoreQCPlot_createChartFromPageParams();
