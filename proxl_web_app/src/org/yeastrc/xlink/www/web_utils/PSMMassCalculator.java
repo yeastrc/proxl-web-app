@@ -26,7 +26,7 @@ public class PSMMassCalculator {
 	private static double getMZ( double mass, int charge ) throws Exception {
 		
 		// add in the mass of the protons (charge == number of proteins)
-		mass += charge * AtomUtils.getAtom( 'p' ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
+		mass += charge * AtomUtils.getAtom( "p" ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
 
 		// divide by the charge
 		mass /= charge;
@@ -63,7 +63,7 @@ public class PSMMassCalculator {
 		double mass = calculateNeutralMassForPSM( peptide1, peptide2, staticMods, dynamicMods1, dynamicMods2, linkerMass );
 		double calcMZ = getMZ( mass, charge );
 		
-		double neutronMass = AtomUtils.getAtom( 'n' ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
+		double neutronMass = AtomUtils.getAtom( "n" ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
 		
 		if( calcMZ > preMZ ) {
 			for( int i = 1; i < 21; i++ ) {
@@ -123,7 +123,7 @@ public class PSMMassCalculator {
 		double mass = calculateNeutralMassForPSM( peptide1, peptide2, staticMods, dynamicMods1, dynamicMods2, linkerMass );
 		
 		// add in the mass of the protons (charge == number of proteins)
-		mass += charge * AtomUtils.getAtom( 'p' ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
+		mass += charge * AtomUtils.getAtom( "p" ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
 
 		// divide by the charge
 		mass /= charge;
@@ -165,7 +165,7 @@ public class PSMMassCalculator {
 		double mass = calculateNeutralMassForPSM( psm );
 		
 		// add in the mass of the protons (charge == number of proteins)
-		mass += (double)psm.getCharge() * AtomUtils.getAtom( 'p' ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
+		mass += (double)psm.getCharge() * AtomUtils.getAtom( "p" ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
 
 		// divide by the charge
 		mass /= (double)psm.getCharge();
