@@ -19,12 +19,12 @@ public class ProjectIdsForProjectSearchIdsSearcher {
 	private ProjectIdsForProjectSearchIdsSearcher() { }
 	public static ProjectIdsForProjectSearchIdsSearcher getInstance() { return new ProjectIdsForProjectSearchIdsSearcher(); }
 	
-	private static final String sqlMain = " SELECT project_id FROM ( SELECT DISTINCT project_id AS project_id "
-			 + " FROM project_search "
-			 + " WHERE id IN (";
-	
-	private static final String sqlEnd = ") ) AS project_ids INNER JOIN project ON project_ids.project_id = project.id "
-			+ " WHERE project.enabled = 1 AND project.marked_for_deletion = 0  ";
+	private static final String sqlMain = 
+	  "SELECT DISTINCT project_id FROM project_search " 
+	  + " INNER JOIN project ON project_search.project_id = project.id " 
+	  + " WHERE project.enabled = 1 AND project.marked_for_deletion = 0 AND project_search.id IN ( ";
+	  
+	  private static final String sqlEnd = " )";
 
 	/**
 	 * Get a list of project ids for the collection of project_search ids
