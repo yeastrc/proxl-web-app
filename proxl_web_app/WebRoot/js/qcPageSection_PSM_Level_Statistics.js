@@ -264,6 +264,15 @@ var QCPageSection_PSM_Level_Statistics = function() {
 	};
 
 	/**
+	 * Load the data for the section, if this section is show
+	 */
+	this.loadSectionIfNeededIfShown = function() {
+		if ( _sectionDisplayed ) {
+			this.loadSectionIfNeeded();
+		}
+	};
+
+	/**
 	 * Load the data for the section
 	 */
 	this.loadSectionIfNeeded = function() {

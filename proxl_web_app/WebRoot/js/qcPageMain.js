@@ -519,7 +519,7 @@ var QCPageMain = function() {
 	this.loadDataForDisplayedDataAndCharts = function() {
 
 		_pageSectionObjects.forEach( function( pageSectionObject, index, array ) {
-			pageSectionObject.loadSectionIfNeeded();
+			pageSectionObject.loadSectionIfNeededIfShown();
 		}, this );
 		
 	};
