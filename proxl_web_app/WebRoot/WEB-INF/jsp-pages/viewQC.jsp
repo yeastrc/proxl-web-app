@@ -7,17 +7,13 @@
 <%-- viewQC.jsp --%>
 
 <%--   
-
-		!!!!  Currently only works for single search.  
-
-		The page is designed to work with multiple merged searches 
-		but the code and SQL need to be reviewed to determine that the results returned are what the user expects,
-		especially for reported peptide level results. 
-
+		Single Search QC Page
  --%>
 
 <%--  In searchDetailsBlock.jsp, suppress display of link "Change searches"  --%>
+<%-- 
 <c:set var="doNotDisplayChangeSearchesLink" value="${ true }"/>
+--%>
 
  <c:set var="pageTitle">View QC - <c:out value="${ headerProject.projectTblData.title }"></c:out></c:set>
 

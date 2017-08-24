@@ -183,6 +183,11 @@
 			<h2 style="margin-bottom:5px;">List merged search peptides:</h2>
 	
 			<div  class=" navigation-links-block ">
+
+				<%-- Navigation link to QC Page --%>
+				
+				<%@ include file="/WEB-INF/jsp-includes/qc_NavLinks.jsp" %>
+							
 				[<a class="tool_tip_attached_jq" data-tooltip="View proteins" 
 					href="${ contextPath }/mergedCrosslinkProtein.do?<bean:write name="queryString" />">Protein View</a>]
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 

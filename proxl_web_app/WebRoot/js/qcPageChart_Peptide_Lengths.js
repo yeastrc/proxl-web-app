@@ -389,9 +389,12 @@ var QCPageChart_Peptide_Lengths = function() {
 			} catch( e ) {
 			}
 
-			var tooltipText = "<div style='padding: 4px;'>Count: " + countString +
-			"<br>peptide length: " + bucket.binStart + " to " + bucket.binEnd + "</div>";
-
+			var tooltipText = null;
+			if ( bucket.binStart === bucket.binEnd ) {
+				tooltipText = "<div style='padding: 4px;'>Count: " + countString + "<br>peptide length: " + bucket.binStart + "</div>";
+			} else {
+				tooltipText = "<div style='padding: 4px;'>Count: " + countString + "<br>peptide length: " + bucket.binStart + " to " + bucket.binEnd + "</div>";
+			}
 			var entryAnnotationText = bucket.count;
 
 			var chartEntry = [ 
@@ -457,8 +460,21 @@ var QCPageChart_Peptide_Lengths = function() {
 
 		var chartFullsize = new google.visualization.ColumnChart( $chartContainer[0] );
 
-		chartFullsize.draw(data, optionsFullsize);
+		//  Register for chart errors
+		var errorDrawingChart = function( err ) {
+			//  Properties of err object
+//			id [Required] - The ID of the DOM element containing the chart, or an error message displayed instead of the chart if it cannot be rendered.
+//			message [Required] - A short message string describing the error.
+//			detailedMessage [Optional] - A detailed explanation of the error.
+//			options [Optional]- An object containing custom parameters appropriate to this error and chart type.
+			
+			//  This thrown string is displayed on the chart on the page as well as logged to browser console and logged to the server 
+			throw Error("Chart Error: " + err.message + " :: detailed error msg: " + err.detailedMessage ); 
+		}
+		google.visualization.events.addListener(chartFullsize, 'error', errorDrawingChart);
 
+		chartFullsize.draw(data, optionsFullsize);
+		
 		//  Temp code to find <rect> that are the actual data columns
 		//     Changing them to green to allow show that they are only the data columns and not other <rect> in the <svg>
 

@@ -15,8 +15,8 @@ import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.qc_data.scan_level_data.objects.MS2_Counts_Where_PSMs_MeetsCutoffsResults;
-import org.yeastrc.xlink.www.searcher.PSM_CountsPerLinkTypeForSearchScanFileSearcher;
-import org.yeastrc.xlink.www.searcher.PSM_CountsPerLinkTypeForSearchScanFileSearcher.PSM_CountsPerLinkTypeForSearchScanFileResult;
+import org.yeastrc.xlink.www.searcher.Scan_CountsPerLinkTypeForSearchScanFileSearcher;
+import org.yeastrc.xlink.www.searcher.Scan_CountsPerLinkTypeForSearchScanFileSearcher.PSM_CountsPerLinkTypeForSearchScanFileResult;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -98,7 +98,7 @@ public class MS2_Counts_Where_PSMs_MeetsCutoffs {
 		}
 		
 		PSM_CountsPerLinkTypeForSearchScanFileResult psm_CountsPerLinkTypeForSearchScanFileResult =
-				PSM_CountsPerLinkTypeForSearchScanFileSearcher.getInstance()
+				Scan_CountsPerLinkTypeForSearchScanFileSearcher.getInstance()
 				.getPSM_CountsPerLinkTypeForSearchScanFile( 
 						searchId, scanFileId, searcherCutoffValuesSearchLevel, modsForDBQuery );
 

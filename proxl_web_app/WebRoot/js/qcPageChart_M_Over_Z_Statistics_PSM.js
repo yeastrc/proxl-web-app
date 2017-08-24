@@ -102,6 +102,8 @@ var QCPageChart_M_Over_Z_Statistics_PSM = function() {
 	 * Init page Actual - Called from qcPageMain.initActual
 	 */
 	this.initActual = function( params ) {
+		var skipAddClickHandlers = params.skipAddClickHandlers;  // set to true when used by Merged chart
+		
 		try {
 			var objectThis = this;
 
@@ -383,6 +385,17 @@ var QCPageChart_M_Over_Z_Statistics_PSM = function() {
 		var entryForLinkType = params.entryForLinkType;
 		var colorAndbarColor = params.colorAndbarColor;
 		var $chartContainer = params.$chartContainer;
+		var enableInteractivityOption = params.enableInteractivityOption;
+		var chartReadyCallback = params.chartReadyCallback;
+		var chartWidthParam = params.chartWidth;
+		var chartHeightParam = params.chartHeight;
+		
+		if ( ! chartWidthParam ) {
+			chartWidthParam = undefined;
+		}
+		if ( ! chartHeightParam ) {
+			chartHeightParam = undefined;
+		}
 
 		var linkType = entryForLinkType.linkType;
 		var chartBuckets = entryForLinkType.chartBuckets;
@@ -470,14 +483,71 @@ var QCPageChart_M_Over_Z_Statistics_PSM = function() {
 				bar: { groupWidth: '100%' },  // set bar width large to eliminate space between bars
 				colors: barColors,
 				tooltip: {isHtml: true}
+				,enableInteractivity : enableInteractivityOption,
+				width : chartWidthParam,  // chartWidthParam may have a value or be undefined 
+				height : chartHeightParam // chartHeightParam may have a value or be undefined
+					
 //				,chartArea : { left : 140, top: 60, 
 //				width: objectThis.RETENTION_TIME_COUNT_CHART_WIDTH - 200 ,  //  was 720 as measured in Chrome
 //				height : objectThis.RETENTION_TIME_COUNT_CHART_HEIGHT - 120 }  //  was 530 as measured in Chrome
-		};        
+		};      
+		
 		// create the chart
 		var data = google.visualization.arrayToDataTable( chartData );
 		var chartFullsize = new google.visualization.ColumnChart( $chartContainer[0] );
+
+		if ( chartReadyCallback ) {
+
+			var chartWidth = undefined;
+			var chartHeight = undefined;
+			
+			if ( chartWidthParam ) {
+				chartWidth = chartWidthParam;
+			} else {
+				chartWidth = $chartContainer.width();
+			}
+			if ( chartHeightParam ) {
+				chartHeight = chartHeightParam;
+			} else {
+				chartHeight = $chartContainer.height();
+			}
+
+			var readyDrawingChart = function(  ) {
+				setTimeout(function() {  // put in settime to clear the stack.
+					try {
+						chartReadyCallback( { chart : chartFullsize, chartWidth : chartWidth, chartHeight : chartHeight  } );
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				}, 10 );
+			};
+			google.visualization.events.addListener( chartFullsize, 'ready', readyDrawingChart );
+
+		}
+
+
+		//  Register for chart errors
+		var errorDrawingChart = function( err ) {
+			//  Properties of err object
+//			id [Required] - The ID of the DOM element containing the chart, or an error message displayed instead of the chart if it cannot be rendered.
+//			message [Required] - A short message string describing the error.
+//			detailedMessage [Optional] - A detailed explanation of the error.
+//			options [Optional]- An object containing custom parameters appropriate to this error and chart type.
+			
+			try {
+				//  This thrown string is displayed on the chart on the page as well as logged to browser console and logged to the server 
+				throw Error("Chart Error: " + err.message + " :: detailed error msg: " + err.detailedMessage );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+
+		}
+		google.visualization.events.addListener(chartFullsize, 'error', errorDrawingChart);
+
 		chartFullsize.draw(data, optionsFullsize);
+		
 	};
 
 	/**

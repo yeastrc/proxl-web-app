@@ -242,18 +242,26 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs {
 			int peptideLengthMin, 
 			int peptideLengthMax ) {
 		
-		int peptideLengthMaxMinusMin = peptideLengthMax - peptideLengthMin;
+		//  Number of bins between 50 and 100.  Whole number of peptide lengths in each bin.
 		
-		int peptideLengthMinAsDouble = peptideLengthMin;
-		double peptideLengthMaxMinusMinAsDouble = peptideLengthMaxMinusMin;
+		int peptideLengthRange = peptideLengthMax - peptideLengthMin + 1;
+		double peptideLengthRangeAsDouble = peptideLengthRange;
 		
 		//  Process data into bins
-		int binCount = (int) ( Math.sqrt( peptideLengthList.size() ) );
+		int binCount = peptideLengthRange;
+		if ( peptideLengthRange > 100 ) {
+			//  bin count between 50 and 100
+			double rangeDiv50 = ( peptideLengthRange / 50.0 );
+			int rangeDiv50Floor = (int) Math.floor( rangeDiv50 );
+			binCount = peptideLengthRange / rangeDiv50Floor;
+		}
+		
+//		int binCount = (int) ( Math.sqrt( peptideLengthList.size() ) );
 		int[] peptideLengthCounts = new int[ binCount ];
-		double binSizeAsDouble = ( peptideLengthMaxMinusMinAsDouble ) / binCount;
+		double binSizeAsDouble = (  peptideLengthRangeAsDouble ) / binCount;
 		
 		for ( Integer peptideLength : peptideLengthList ) {
-			double peptideLengthFraction = ( peptideLength.doubleValue() - peptideLengthMinAsDouble ) / peptideLengthMaxMinusMinAsDouble;
+			double peptideLengthFraction = ( peptideLength - peptideLengthMin ) / peptideLengthRangeAsDouble;
 			int bin = (int) ( (  peptideLengthFraction ) * binCount );
 			if ( bin < 0 ) {
 				bin = 0;
@@ -278,7 +286,7 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs {
 			chartBucket.setBinStart( binStart );
 			int binEnd = (int)Math.round( ( binIndex + 1 ) * binSizeAsDouble ) - 1 + peptideLengthMin;
 			if ( binIndex == peptideLengthCounts.length - 1 ) {
-				binEnd++;  // increment since last entry at binEnd + 1
+				binEnd = peptideLengthMax;  //  since last entry, set binEnd to peptideLengthMax
 			}
 			chartBucket.setBinEnd( binEnd );
 			double binMiddleDouble = binStartDouble + binHalf;
@@ -340,209 +348,138 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs {
 				throw new ProxlWebappDataException( msg );
 			}
 
-			///////////////////////////////////////////////
-			//  Get peptides for this search from the DATABASE
-			List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
-					PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
-							searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
-							PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
-
-			for ( WebReportedPeptideWrapper webReportedPeptideWrapper : wrappedLinksPerForSearch ) {
-				WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
-				int reportedPeptideId = webReportedPeptide.getReportedPeptideId();
-				
-				String linkType = null;
-				
-				//  srchRepPeptPeptideDTOList: associated SrchRepPeptPeptideDTO for the link, one per associated peptide, populated per link type
-				
-				//  copied from SearchPeptideCrosslink, this way not load PeptideDTO in SearchPeptideCrosslink
-				SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams = new SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams();
-				srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setSearchId( searchId );
-				srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setReportedPeptideId( reportedPeptideId );
-				SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result =
-						Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.getInstance()
-						.getSrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result( srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams );
-				List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result.getSrchRepPeptPeptideDTOList();
-
-				if ( webReportedPeptide.getSearchPeptideCrosslink() != null ) {
-					//  Process a crosslink
-					linkType = XLinkUtils.CROSS_TYPE_STRING;
-					
-					//  validation for crosslink
-					if ( srchRepPeptPeptideDTOList.size() != 2 ) {
-						String msg = "For Crosslink: List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + searchId
-						+ ", ReportedPeptideId: " + reportedPeptideId ;
-						log.error( msg );
-						throw new ProxlWebappDataException( msg );
-					}
-					for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_1()  == null 
-								|| srchRepPeptPeptideDTO.getPeptidePosition_1() == SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Crosslink: srchRepPeptPeptideDTO.getPeptidePosition_1() not populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_2() != null
-								&& srchRepPeptPeptideDTO.getPeptidePosition_2() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Crosslink: srchRepPeptPeptideDTO.getPeptidePosition_2() is populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-					}
-
-				} else if ( webReportedPeptide.getSearchPeptideLooplink() != null ) {
-					//  Process a looplink
-					linkType = XLinkUtils.LOOP_TYPE_STRING;
-					
-					//  validation for looplink
-					if ( srchRepPeptPeptideDTOList.size() != 1 ) {
-						String msg = "For Looplink: List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " + searchId
-						+ ", ReportedPeptideId: " + reportedPeptideId ;
-						log.error( msg );
-						throw new ProxlWebappDataException( msg );
-					}
-					for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_1()  == null 
-								|| srchRepPeptPeptideDTO.getPeptidePosition_1() == SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Looplink: srchRepPeptPeptideDTO.getPeptidePosition_1() not populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_2() == null
-								|| srchRepPeptPeptideDTO.getPeptidePosition_2() == SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Looplink: srchRepPeptPeptideDTO.getPeptidePosition_2() not populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-					}
-
-				} else if ( webReportedPeptide.getSearchPeptideUnlinked() != null ) {
-					//  Process a unlinked
-					linkType = XLinkUtils.UNLINKED_TYPE_STRING;
-					
-					//  validation for unlinked
-					if ( srchRepPeptPeptideDTOList.size() != 1 ) {
-						String msg = "For Unlinked: List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " + searchId
-						+ ", ReportedPeptideId: " + reportedPeptideId ;
-						log.error( msg );
-						throw new ProxlWebappDataException( msg );
-					}
-					for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_1()  != null 
-								&& srchRepPeptPeptideDTO.getPeptidePosition_1() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Unlinked: srchRepPeptPeptideDTO.getPeptidePosition_1() is populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_2() != null
-								&& srchRepPeptPeptideDTO.getPeptidePosition_2() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Unlinked: srchRepPeptPeptideDTO.getPeptidePosition_2() is populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-					}
-				} else if ( webReportedPeptide.getSearchPeptideDimer() != null ) {
-					//  Process a dimer
-					linkType = XLinkUtils.UNLINKED_TYPE_STRING;  //  Lump in with unlinked reported peptides
-
-					//  validation for dimer
-					if ( srchRepPeptPeptideDTOList.size() != 2 ) {
-						String msg = "For Dimer: List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + searchId
-						+ ", ReportedPeptideId: " + reportedPeptideId ;
-						log.error( msg );
-						throw new ProxlWebappDataException( msg );
-					}
-					for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_1()  != null 
-								&& srchRepPeptPeptideDTO.getPeptidePosition_1() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Dimer: srchRepPeptPeptideDTO.getPeptidePosition_1() is populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_2() != null
-								&& srchRepPeptPeptideDTO.getPeptidePosition_2() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Dimer: srchRepPeptPeptideDTO.getPeptidePosition_2() is populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-					}
+			Map<String, List<Integer>> peptideLengthList_Map_KeyedOnLinkType = 
+					getPeptideLengths_SingleSearch(
+							linkTypesForDBQuery, 
+							modsForDBQuery, 
+							peptideDTO_MappedById, 
+							searchDTO, 
+							searchId, 
+							searcherCutoffValuesSearchLevel );
+			
+			//  Combine with entries for previous searches
+			for ( Map.Entry<String, List<Integer>> entry : peptideLengthList_Map_KeyedOnLinkType.entrySet() ) {
+				List<Integer> peptideLengthListAllSearchesForLinkType = allSearchesCombinedPeptideLengthList_Map_KeyedOnLinkType.get( entry.getKey() );
+				if ( peptideLengthListAllSearchesForLinkType == null )  {
+					allSearchesCombinedPeptideLengthList_Map_KeyedOnLinkType.put( entry.getKey(), entry.getValue() );
 				} else {
-					String msg = 
-							"Link type unkown"
-							+ " for reportedPeptideId: " + reportedPeptideId
-							+ ", searchId: " + searchId;
-					log.error( msg );
-					throw new ProxlWebappDataException( msg );
+					peptideLengthListAllSearchesForLinkType.addAll( entry.getValue() );
 				}
-				
-				// get object from map for link type
-				List<Integer> peptideLengthsListForLinkType = allSearchesCombinedPeptideLengthList_Map_KeyedOnLinkType.get( linkType );
-				if ( peptideLengthsListForLinkType == null ) {
-					String msg = "In adding peptide length for link type, link type not found: " + linkType;
-					log.error( msg );
-					throw new Exception(msg);
-				}
-				
-				int peptideLength = 0; //  peptide length is sum of peptides for reproted peptide
-
-				//  process srchRepPeptPeptideDTOList (Each peptide mapped to the reported peptide)
-				for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
-					// get PeptideDTO, caching locally in peptideDTO_MappedById
-					PeptideDTO peptide = peptideDTO_MappedById.get( srchRepPeptPeptideDTO.getPeptideId() );
-					if ( peptide == null ) {
-						peptide = PeptideDAO.getInstance().getPeptideDTOFromDatabase( srchRepPeptPeptideDTO.getPeptideId() );
-						//  To directly retrieve from DB:  PeptideDAO.getInstance().getPeptideDTOFromDatabaseActual( id )
-						if ( peptide == null ) {
-							String msg = 
-									"PeptideDTO not found in DB for id: " + srchRepPeptPeptideDTO.getPeptideId()
-									+ ", for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", for reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-						peptideDTO_MappedById.put( srchRepPeptPeptideDTO.getPeptideId(), peptide );
-					}
-					//  peptide length is sum of peptides for reproted peptide
-					peptideLength += peptide.getSequence().length();
-				}
-				peptideLengthsListForLinkType.add( peptideLength );
 			}
 		}
 
 		return allSearchesCombinedPeptideLengthList_Map_KeyedOnLinkType;
+	}
+	
+	
+	/**
+	 * @param linkTypesForDBQuery
+	 * @param modsForDBQuery
+	 * @param peptideDTO_MappedById
+	 * @param searchDTO
+	 * @param searchId
+	 * @param searcherCutoffValuesSearchLevel
+	 * @return
+	 * @throws Exception
+	 * @throws ProxlWebappDataException
+	 */
+	public Map<String, List<Integer>> getPeptideLengths_SingleSearch(
+			String[] linkTypesForDBQuery, 
+			String[] modsForDBQuery,
+			Map<Integer, PeptideDTO> peptideDTO_MappedById, 
+			SearchDTO searchDTO, 
+			Integer searchId,
+			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception, ProxlWebappDataException {
+		
+		Map<String, List<Integer>> peptideLengthList_Map_KeyedOnLinkType = new HashMap<>();
+		
+		///////////////////////////////////////////////
+		//  Get peptides for this search from the DATABASE
+		List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
+				PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
+						searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
+						PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
+
+		for ( WebReportedPeptideWrapper webReportedPeptideWrapper : wrappedLinksPerForSearch ) {
+			WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
+			int reportedPeptideId = webReportedPeptide.getReportedPeptideId();
+			
+			String linkType = null;
+			
+			//  srchRepPeptPeptideDTOList: associated SrchRepPeptPeptideDTO for the link, one per associated peptide, populated per link type
+			
+			//  copied from SearchPeptideCrosslink, this way not load PeptideDTO in SearchPeptideCrosslink
+			SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams = new SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams();
+			srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setSearchId( searchId );
+			srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setReportedPeptideId( reportedPeptideId );
+			SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result =
+					Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.getInstance()
+					.getSrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result( srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams );
+			List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result.getSrchRepPeptPeptideDTOList();
+
+			if ( webReportedPeptide.getSearchPeptideCrosslink() != null ) {
+				//  Process a crosslink
+				linkType = XLinkUtils.CROSS_TYPE_STRING;
+				
+			} else if ( webReportedPeptide.getSearchPeptideLooplink() != null ) {
+				//  Process a looplink
+				linkType = XLinkUtils.LOOP_TYPE_STRING;
+				
+			} else if ( webReportedPeptide.getSearchPeptideUnlinked() != null ) {
+				//  Process a unlinked
+				linkType = XLinkUtils.UNLINKED_TYPE_STRING;
+				
+			} else if ( webReportedPeptide.getSearchPeptideDimer() != null ) {
+				//  Process a dimer
+				linkType = XLinkUtils.UNLINKED_TYPE_STRING;  //  Lump in with unlinked reported peptides
+
+			} else {
+				String msg = 
+						"Link type unkown"
+						+ " for reportedPeptideId: " + reportedPeptideId
+						+ ", searchId: " + searchId;
+				log.error( msg );
+				throw new ProxlWebappDataException( msg );
+			}
+			
+			// get object from map for link type
+			List<Integer> peptideLengthsListForLinkType = peptideLengthList_Map_KeyedOnLinkType.get( linkType );
+			if ( peptideLengthsListForLinkType == null ) {
+				peptideLengthsListForLinkType = new ArrayList<>();
+				peptideLengthList_Map_KeyedOnLinkType.put( linkType, peptideLengthsListForLinkType );
+			}
+			
+			int peptideLength = 0; //  peptide length is sum of peptides for reproted peptide
+
+			//  process srchRepPeptPeptideDTOList (Each peptide mapped to the reported peptide)
+			for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
+				// get PeptideDTO, caching locally in peptideDTO_MappedById
+				PeptideDTO peptide = null;
+				// get PeptideDTO, caching locally in peptideDTO_MappedById
+				if ( peptideDTO_MappedById != null ) {
+					peptide = peptideDTO_MappedById.get( srchRepPeptPeptideDTO.getPeptideId() );
+				}
+				if ( peptide == null ) {
+					peptide = PeptideDAO.getInstance().getPeptideDTOFromDatabase( srchRepPeptPeptideDTO.getPeptideId() );
+					//  To directly retrieve from DB:  PeptideDAO.getInstance().getPeptideDTOFromDatabaseActual( id )
+					if ( peptide == null ) {
+						String msg = 
+								"PeptideDTO not found in DB for id: " + srchRepPeptPeptideDTO.getPeptideId()
+								+ ", for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
+								+ ", for reportedPeptideId: " + reportedPeptideId
+								+ ", searchId: " + searchId;
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
+					}
+					peptideDTO_MappedById.put( srchRepPeptPeptideDTO.getPeptideId(), peptide );
+				}
+				//  peptide length is sum of peptides for reproted peptide
+				peptideLength += peptide.getSequence().length();
+			}
+			peptideLengthsListForLinkType.add( peptideLength );
+		}
+		
+		return peptideLengthList_Map_KeyedOnLinkType;
 	}
 
 }

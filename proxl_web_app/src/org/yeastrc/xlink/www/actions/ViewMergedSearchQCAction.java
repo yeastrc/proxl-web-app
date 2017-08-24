@@ -19,7 +19,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
@@ -41,7 +40,7 @@ import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * QC data page - Single or multiple searches
+ * QC data page - Single and Multiple searches
  *
  */
 public class ViewMergedSearchQCAction extends Action {
@@ -190,10 +189,10 @@ public class ViewMergedSearchQCAction extends Action {
 				String cutoffsAppliedOnImportAllAsString =
 						GetCutoffsAppliedOnImport.getInstance().getCutoffsAppliedOnImportAllAsString( searchIdsArray[ 0 ] );
 				request.setAttribute( "cutoffsAppliedOnImportAllAsString", cutoffsAppliedOnImportAllAsString );
-			} else {
-				String msg = "Code for cutoffsAppliedOnImportAllAsString currently only supports 1 search id.";
-				log.error( msg );
-				throw new ProxlWebappInternalErrorException(msg);
+//			} else {
+//				String msg = "Code for cutoffsAppliedOnImportAllAsString currently only supports 1 search id.";
+//				log.error( msg );
+//				throw new ProxlWebappInternalErrorException(msg);
 			}
 			
 			/////////////////////////////////////////////////////////////////////////////
@@ -208,7 +207,11 @@ public class ViewMergedSearchQCAction extends Action {
 			//  So certain sections treat this like coverage page.  ie: no selection of annotation data to display
 			request.setAttribute( "coveragePageForAnnDispMgmt", true );
 			
-			return mapping.findForward( "Success" );
+			if ( searchIdsArray.length == 1 ) {
+				return mapping.findForward( "SuccessSingle" );
+			}
+			return mapping.findForward( "SuccessMerged" );
+			
 		} catch ( Exception e ) {
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );

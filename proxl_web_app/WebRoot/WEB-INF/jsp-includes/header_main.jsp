@@ -157,7 +157,22 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			// throw e;  //  No rethrow e, only for reporting to server
-		}		
+		}	
+		//  QC Merged Page Init
+		try {	  
+			if ( window.qcMergedPageMain ) {
+				qcMergedPageMain.init();
+			} else {
+				setTimeout(function() {
+					if ( window.qcMergedPageMain ) {
+						qcMergedPageMain.init();
+					}
+				}, 1000 );
+			}
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			// throw e;  //  No rethrow e, only for reporting to server
+		}	
 	  };
 	  
 	  //  Do NOT call a method on an object here.  The "this" gets set to the window.

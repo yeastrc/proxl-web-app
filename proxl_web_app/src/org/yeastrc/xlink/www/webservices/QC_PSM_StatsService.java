@@ -322,7 +322,7 @@ public class QC_PSM_StatsService {
 			PreMZ_Histogram_For_PSMPeptideCutoffsResults preMZ_Histogram_For_PSMPeptideCutoffsResults =
 					PreMZ_Histogram_For_PSMPeptideCutoffs.getInstance()
 					.getPreMZ_Histogram_For_PSMPeptideCutoffs( 
-							filterCriteria_JSONString, projectSearchIdsListDeduppedSorted, searches, searchesMapOnSearchId );
+							filterCriteria_JSONString, searches );
 			
 			WebserviceResult_getQC_PreMZCount serviceResult = new WebserviceResult_getQC_PreMZCount();
 			

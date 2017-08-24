@@ -151,6 +151,17 @@ function viewMergedStructure() {
 	}
 }
 
+//Called by "onclick" on HTML element
+function viewMergedQCPage() {
+try {
+	$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/qc.do");
+	$( "form#viewMergedDataForm" ).submit();
+} catch( e ) {
+	reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+	throw e;
+}
+}
+
 //   Called by "onclick" on HTML element
 function showSearchDetails( id ) {
 	try {

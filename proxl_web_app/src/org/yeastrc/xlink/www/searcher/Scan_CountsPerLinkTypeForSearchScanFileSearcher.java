@@ -29,19 +29,22 @@ import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDat
  * In order to use this with more than one project_search_id, 
  * the SQL query would require a DISTINCT to not count more than one PSM for a given scan.
  */
-public class PSM_CountsPerLinkTypeForSearchScanFileSearcher {
+public class Scan_CountsPerLinkTypeForSearchScanFileSearcher {
 
-	private static final Logger log = Logger.getLogger(PSM_CountsPerLinkTypeForSearchScanFileSearcher.class);
-	private PSM_CountsPerLinkTypeForSearchScanFileSearcher() { }
-	private static final PSM_CountsPerLinkTypeForSearchScanFileSearcher _INSTANCE = new PSM_CountsPerLinkTypeForSearchScanFileSearcher();
-	public static PSM_CountsPerLinkTypeForSearchScanFileSearcher getInstance() { return _INSTANCE; }
+	private static final Logger log = Logger.getLogger(Scan_CountsPerLinkTypeForSearchScanFileSearcher.class);
+	private Scan_CountsPerLinkTypeForSearchScanFileSearcher() { }
+	private static final Scan_CountsPerLinkTypeForSearchScanFileSearcher _INSTANCE = new Scan_CountsPerLinkTypeForSearchScanFileSearcher();
+	public static Scan_CountsPerLinkTypeForSearchScanFileSearcher getInstance() { return _INSTANCE; }
 	
 	private final String PSM_VALUE_FOR_PEPTIDE_FILTER_TABLE_ALIAS = "psm_fltrbl_tbl_";
 	private final String PEPTIDE_VALUE_FILTER_TABLE_ALIAS = "srch__rep_pept_fltrbl_tbl_";
-	
+		
 	private final String SQL_FIRST_PART = 
-			"SELECT unified_rp__search__rep_pept__generic_lookup.link_type,"
-			+ " sum( 1 ) AS count \n";
+			"SELECT link_type,"
+					+ " sum( 1 ) AS count FROM ( \n"
+			
+					+ "SELECT DISTINCT scan.id AS scan_id, "
+					+ " unified_rp__search__rep_pept__generic_lookup.link_type \n";
 	
 	private final String SQL_MAIN_FROM_START = " FROM unified_rp__search__rep_pept__generic_lookup \n"
 			+ " INNER JOIN psm on unified_rp__search__rep_pept__generic_lookup.search_id = psm.search_id"
@@ -49,7 +52,7 @@ public class PSM_CountsPerLinkTypeForSearchScanFileSearcher {
 			+ " INNER JOIN scan ON psm.scan_id = scan.id";
 	
 	
-	private final String SQL_LAST_PART = " GROUP BY link_type ";
+	private final String SQL_LAST_PART = " ) AS distinct_scan_ids__link_type GROUP BY link_type ";
 	
 	// Removed since not needed.  
 	// A WARN log message will be written if duplicate reported_peptide_id are found in the result set

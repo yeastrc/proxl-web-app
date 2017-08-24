@@ -51,7 +51,6 @@ public class PreMZ_Histogram_For_PSMPeptideCutoffs {
 		
 	/**
 	 * @param filterCriteriaJSON
-	 * @param projectSearchIdsListDeduppedSorted
 	 * @param searches
 	 * @param searchesMapOnSearchId
 	 * @return
@@ -59,15 +58,12 @@ public class PreMZ_Histogram_For_PSMPeptideCutoffs {
 	 */
 	public PreMZ_Histogram_For_PSMPeptideCutoffsResults getPreMZ_Histogram_For_PSMPeptideCutoffs( 			
 			String filterCriteriaJSON, 
-			List<Integer> projectSearchIdsListDeduppedSorted,
-			List<SearchDTO> searches, 
-			Map<Integer, SearchDTO> searchesMapOnSearchId ) throws Exception {
+			List<SearchDTO> searches
+			) throws Exception {
 
 		Collection<Integer> searchIds = new HashSet<>();
 		Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();
 		List<Integer> searchIdsListDeduppedSorted = new ArrayList<>( searches.size() );
-		
-		Set<String> selectedLinkTypes = new HashSet<>();
 		
 		for ( SearchDTO search : searches ) {
 			searchIds.add( search.getSearchId() );
@@ -95,11 +91,6 @@ public class PreMZ_Histogram_For_PSMPeptideCutoffs {
 			throw e;
 		}
 
-		///////////////////////////////////////////////////
-		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
-		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
-		//   Mods for DB Query
-		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
 		////////////
 		/////   Searcher cutoffs for all searches
 		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
@@ -108,6 +99,24 @@ public class PreMZ_Histogram_For_PSMPeptideCutoffs {
 				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
 		SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel =
 				cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
+		
+		return getResultsForParams(
+				searches, mergedPeptideQueryJSONRoot, searcherCutoffValuesRootLevel);
+	}
+	
+	public PreMZ_Histogram_For_PSMPeptideCutoffsResults getResultsForParams(
+			List<SearchDTO> searches, 
+			MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot, 
+			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel)
+			throws Exception, ProxlWebappDataException {
+
+		///////////////////////////////////////////////////
+		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
+		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
+		//   Mods for DB Query
+		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
+		
+		Set<String> selectedLinkTypes = new HashSet<>();
 		
 		//  Populate countForLinkType_ByLinkType for selected link types
 		if ( mergedPeptideQueryJSONRoot.getLinkTypes() == null || mergedPeptideQueryJSONRoot.getLinkTypes().length == 0 ) {

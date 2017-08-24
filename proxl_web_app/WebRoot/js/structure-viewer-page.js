@@ -1811,40 +1811,36 @@ function populateNavigation() {
 
 	var html = "";
 
+	//  Add QC Link
+	var qc_page_link_text = $("#qc_page_link_text").html();
+	var qc_page_link_tooltip = $("#qc_page_link_tooltip").html();
+	
+	var qcNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"" + qc_page_link_tooltip + "\" " +
+	"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/";
+	var qcQueryString = "?";
+	for ( var j = 0; j < _projectSearchIds.length; j++ ) {
+		if ( j > 0 ) {
+			qcQueryString += "&";
+		}
+		qcQueryString += "projectSearchId=" + _projectSearchIds[ j ];
+	}
+	var qcJSON = { };
+	//  Add Filter cutoffs
+	qcJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
+	//  Add Ann Type Display
+	var annTypeIdDisplay = baseJSONObject.annTypeIdDisplay;
+	qcJSON[ 'annTypeIdDisplay' ] = annTypeIdDisplay;
+	var qcJSONString = encodeURIComponent( JSON.stringify( qcJSON ) );
+	qcNavHTML += "qc.do" + qcQueryString + "#" + qcJSONString;
+	qcNavHTML += "\">" + qc_page_link_text + "</a>]</span>";
+	html += qcNavHTML;
+
 	if ( _searches.length > 1 ) {
 		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
 		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
 		
 		html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
 	} else {
-		//  Add QC Link
-		var qc_page_link_text = $("#qc_page_link_text").html();
-		var qc_page_link_tooltip = $("#qc_page_link_tooltip").html();
-		
-		var qcNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"" + qc_page_link_tooltip + "\" " +
-		"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/";
-		var viewMergedStructureDefaultPageUrl = $("#viewMergedStructureDefaultPageUrl").val();
-		if ( viewMergedStructureDefaultPageUrl === undefined || viewMergedStructureDefaultPageUrl === "" ) {
-			var qcQueryString = "?";
-			for ( var j = 0; j < _projectSearchIds.length; j++ ) {
-				if ( j > 0 ) {
-					qcQueryString += "&";
-				}
-				qcQueryString += "projectSearchId=" + _projectSearchIds[ j ];
-			}
-			var qcJSON = { };
-			//  Add Filter cutoffs
-			qcJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
-			//  Add Ann Type Display
-			var annTypeIdDisplay = baseJSONObject.annTypeIdDisplay;
-			qcJSON[ 'annTypeIdDisplay' ] = annTypeIdDisplay;
-			var qcJSONString = encodeURIComponent( JSON.stringify( qcJSON ) );
-			qcNavHTML += "qc.do" + qcQueryString + "#" + qcJSONString;
-		} else {
-			qcNavHTML += viewMergedStructureDefaultPageUrl;
-		}
-		qcNavHTML += "\">" + qc_page_link_text + "</a>]</span>";
-		html += qcNavHTML;
 		
 		//  Add Peptide Link
 		html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" href='" + contextPathJSVar + "/";

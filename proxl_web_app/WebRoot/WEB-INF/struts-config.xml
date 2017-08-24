@@ -308,9 +308,10 @@
 				name="mergedSearchViewProteinForm"
 				scope="request"
 				validate="false">
-			<forward name="Success" path="/WEB-INF/jsp-pages/viewQC.jsp" redirect="false" />
+			<forward name="SuccessSingle" path="/WEB-INF/jsp-pages/viewQC.jsp" redirect="false" />
+			<forward name="SuccessMerged" path="/WEB-INF/jsp-pages/viewQCMerged.jsp" redirect="false" />
 		</action>		
-  
+		  
     	<action path="/downloadMergedPSMsForPeptides"
 				type="org.yeastrc.xlink.www.actions.DownloadPSMsForMergedPeptidesAction"
 				scope="request"

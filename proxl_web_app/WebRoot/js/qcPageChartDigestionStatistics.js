@@ -524,6 +524,20 @@ var QCPageChartDigestionStatistics = function() {
 		// create the chart
 		var data = google.visualization.arrayToDataTable( chartData );
 		var chartFullsize = new google.visualization.ColumnChart( $chartContainer[0] );
+
+		//  Register for chart errors
+		var errorDrawingChart = function( err ) {
+			//  Properties of err object
+//			id [Required] - The ID of the DOM element containing the chart, or an error message displayed instead of the chart if it cannot be rendered.
+//			message [Required] - A short message string describing the error.
+//			detailedMessage [Optional] - A detailed explanation of the error.
+//			options [Optional]- An object containing custom parameters appropriate to this error and chart type.
+			
+			//  This thrown string is displayed on the chart on the page as well as logged to browser console and logged to the server 
+			throw Error("Chart Error: " + err.message + " :: detailed error msg: " + err.detailedMessage ); 
+		}
+		google.visualization.events.addListener(chartFullsize, 'error', errorDrawingChart);
+
 		chartFullsize.draw(data, optionsFullsize);
 
 		//  Temp code to find <rect> that are the actual data columns

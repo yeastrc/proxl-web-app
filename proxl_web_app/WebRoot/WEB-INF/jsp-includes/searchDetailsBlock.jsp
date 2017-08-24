@@ -64,7 +64,7 @@
 	  <tr>
 		<td style="vertical-align: top; padding-right: 3px;" >
 		
-			<c:if test="${ showSearchColorBlock }">
+			<c:if test="${ showSearchColorBlock and not do_NOT_SetSearchColorBlockColor }">
 			
 				<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
 				<%@ include file="/WEB-INF/jsp-includes/mergedSearch_SearchIndexToSearchColorCSSClassName.jsp" %>
@@ -75,7 +75,7 @@
 			  	><span 
 					<%--  This color block is now the drag handle for changing the order of the searches --%>
 			  		style="margin-right:10px;padding-left:10px;padding-right:10px; " <%--  cursor: pointer; --%>
-			  		class="${ backgroundColorClassName } search_sort_handle_jq  " <%-- tool_tip_attached_jq --%>
+			  		class="${ backgroundColorClassName } search_sort_handle_jq search_color_block_jq  " <%-- tool_tip_attached_jq --%>
 			  		 <%-- data-tooltip="Drag to re-order searches" --%>
 			  		></span
 			  	></c:if
