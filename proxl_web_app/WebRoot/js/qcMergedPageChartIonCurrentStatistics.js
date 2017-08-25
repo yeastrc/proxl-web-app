@@ -194,10 +194,15 @@ var QCMergedPageChartIonCurrentStatistics = function() {
 	 */
 	this.clearScanStatistics = function() {
 
-		var $scan_file_overall_statistics_loading_block = $("#scan_file_overall_statistics_loading_block");
-		$scan_file_overall_statistics_loading_block.show();
-		var $scan_file_overall_statistics_no_data_block = $("#scan_file_overall_statistics_no_data_block");
-		$scan_file_overall_statistics_no_data_block.hide();
+		var $scan_file_files_loading_block = $("#scan_file_files_loading_block");
+		$scan_file_files_loading_block.show();
+		
+		var $scan_file_no_files_block = $("#scan_file_no_files_block");
+		$scan_file_no_files_block.hide();
+
+		var $scan_file_selected_file_statistics_display_block = $("#scan_file_selected_file_statistics_display_block");
+		$scan_file_selected_file_statistics_display_block.hide();
+		
 		var $scan_file_overall_statistics_block = $("#scan_file_overall_statistics_block");
 		$scan_file_overall_statistics_block.empty();
 
