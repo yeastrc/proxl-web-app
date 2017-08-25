@@ -13,12 +13,16 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.qc_plots.psm_score_vs_score.CreatePsmScoreVsScoreQCPlotData;
+import org.yeastrc.xlink.www.qc_plots.psm_score_vs_score.CreatePsmScoreVsScoreQCPlotData.CreatePsmScoreVsScoreQCPlotDataRequest_SingleScoreType;
 import org.yeastrc.xlink.www.qc_plots.psm_score_vs_score.CreatePsmScoreVsScoreQCPlotDataResults;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
+import org.yeastrc.xlink.www.constants.QC_Plot_ScoreVsScore_Constants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -48,8 +52,8 @@ public class QCPlotPsmScoreVsScoreService {
 			@QueryParam( "projectSearchId" ) int projectSearchId,
 			@QueryParam( "scanFileId" ) Integer scanFileId,
 			@QueryParam( "selectedLinkTypes" ) Set<String> selectedLinkTypes,			
-			@QueryParam( "annotationTypeId_1" ) Integer annotationTypeId_1,
-			@QueryParam( "annotationTypeId_2" ) Integer annotationTypeId_2,
+			@QueryParam( "scoreType_1" ) String scoreType_1,
+			@QueryParam( "scoreType_2" ) String scoreType_2,
 			@QueryParam( "psmScoreCutoff_1" ) Double psmScoreCutoff_1,
 			@QueryParam( "psmScoreCutoff_2" ) Double psmScoreCutoff_2,
 			@Context HttpServletRequest request )
@@ -138,9 +142,13 @@ public class QCPlotPsmScoreVsScoreService {
 			    	        );
 			}
 			
+			CreatePsmScoreVsScoreQCPlotDataRequest_SingleScoreType singleScoreType_1 = processScoreTypeParam( scoreType_1, "scoreType_1" );
+			CreatePsmScoreVsScoreQCPlotDataRequest_SingleScoreType singleScoreType_2 = processScoreTypeParam( scoreType_2, "scoreType_2" );
+			
 			CreatePsmScoreVsScoreQCPlotDataResults results = 
 					CreatePsmScoreVsScoreQCPlotData.getInstance()
-					.createPsmScoreVsScoreQCPlotData( searchId, scanFileId, selectedLinkTypes, annotationTypeId_1, annotationTypeId_2, psmScoreCutoff_1, psmScoreCutoff_2 );
+					.createPsmScoreVsScoreQCPlotData( 
+							searchId, scanFileId, selectedLinkTypes, singleScoreType_1, singleScoreType_2, psmScoreCutoff_1, psmScoreCutoff_2 );
 			
 			QCPlotPsmScoreVsScoreServiceResult webserviceResult = new QCPlotPsmScoreVsScoreServiceResult();
 			webserviceResult.results = results;
@@ -157,6 +165,44 @@ public class QCPlotPsmScoreVsScoreService {
 					.build()
 					);
 		}
+	}
+	
+	/**
+	 * scoreType must be an allowed string or an int
+	 * @param scoreType
+	 * @return
+	 */
+	private CreatePsmScoreVsScoreQCPlotDataRequest_SingleScoreType processScoreTypeParam( String scoreType, String scoreTypeParamName ) {
+		
+		CreatePsmScoreVsScoreQCPlotDataRequest_SingleScoreType result = new CreatePsmScoreVsScoreQCPlotDataRequest_SingleScoreType();
+		
+		if ( StringUtils.isEmpty( scoreType ) ) {
+			result.setNoValue( true );
+			return result;  // EARLY EXIT
+		}
+		
+		if ( QC_Plot_ScoreVsScore_Constants.SCORE_SELECTION_RETENTION_TIME.equals( scoreType ) 
+				|| QC_Plot_ScoreVsScore_Constants.SCORE_SELECTION_CHARGE.equals( scoreType )
+				|| QC_Plot_ScoreVsScore_Constants.SCORE_SELECTION_PRE_MZ.equals( scoreType ) ) {
+			
+			result.setAltScoreType( scoreType );
+			return result;  // EARLY EXIT
+		}
+		
+		try {
+			int annotationTypeId = Integer.parseInt( scoreType );
+			result.setAnnotationTypeId( annotationTypeId );
+		} catch ( Exception e ) {
+			String msg = ": '" + scoreTypeParamName + "' is not an allowed string and not an integer";
+			log.error( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+		    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+		    	        .build()
+		    	        );
+		}
+		
+		return result;
 	}
 	
 	/**

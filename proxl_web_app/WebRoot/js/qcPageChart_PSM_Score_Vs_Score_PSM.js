@@ -140,7 +140,17 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 			chartDataFromServer : undefined
 	};
 	
+	// <%-- Values sent to server --%>
+	var _psm_score_vs_score_qc_plot_choice_value__retention_time;
+	var _psm_score_vs_score_qc_plot_choice_value__charge;
+	var _psm_score_vs_score_qc_plot_choice_value__pre_mz;
 
+	// <%-- Labels put on select for user --%>
+	var _psm_score_vs_score_qc_plot_choice_label__retention_time;
+	var _psm_score_vs_score_qc_plot_choice_label__charge;
+	var _psm_score_vs_score_qc_plot_choice_label__pre_mz;
+
+	
 	
 	/**
 	 * Init page Actual - Called from qcPageMain.initActual
@@ -195,7 +205,8 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 			_getScanFilesForProjectSearchId = params.getScanFilesForProjectSearchId; // function
 			
 			this.addClickAndOnChangeHandlers();
-
+			
+			this.getSelectValuesFromPage();
 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -324,6 +335,57 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 		
 	};
 
+
+	/**
+	 * Get values to use in <select> of value to plot from page
+	 */
+	this.getSelectValuesFromPage = function() {
+		
+		// <%-- Values sent to server --%>
+		var $psm_score_vs_score_qc_plot_choice_value__retention_time = $("#psm_score_vs_score_qc_plot_choice_value__retention_time");
+		var $psm_score_vs_score_qc_plot_choice_value__charge = $("#psm_score_vs_score_qc_plot_choice_value__charge");
+		var $psm_score_vs_score_qc_plot_choice_value__pre_mz = $("#psm_score_vs_score_qc_plot_choice_value__pre_mz");
+
+		// <%-- Labels put on select for user --%>
+		var $psm_score_vs_score_qc_plot_choice_label__retention_time = $("#psm_score_vs_score_qc_plot_choice_label__retention_time");
+		var $psm_score_vs_score_qc_plot_choice_label__charge = $("#psm_score_vs_score_qc_plot_choice_label__charge");
+		var $psm_score_vs_score_qc_plot_choice_label__pre_mz = $("#psm_score_vs_score_qc_plot_choice_label__pre_mz");
+
+		
+		
+		// <%-- Values sent to server --%>
+		if ( $psm_score_vs_score_qc_plot_choice_value__retention_time.length === 0 ) {
+			throw Error( "Failed to find HTML element with id 'psm_score_vs_score_qc_plot_choice_value__retention_time' " );
+		}
+		if ( $psm_score_vs_score_qc_plot_choice_value__charge.length === 0 ) {
+			throw Error( "Failed to find HTML element with id 'psm_score_vs_score_qc_plot_choice_value__charge' " );
+		}
+		if ( $psm_score_vs_score_qc_plot_choice_value__pre_mz.length === 0 ) {
+			throw Error( "Failed to find HTML element with id 'psm_score_vs_score_qc_plot_choice_value__pre_mz' " );
+		}
+
+		// <%-- Labels put on select for user --%>
+		if ( $psm_score_vs_score_qc_plot_choice_label__retention_time.length === 0 ) {
+			throw Error( "Failed to find HTML element with id 'psm_score_vs_score_qc_plot_choice_label__retention_time' " );
+		}
+		if ( $psm_score_vs_score_qc_plot_choice_label__charge.length === 0 ) {
+			throw Error( "Failed to find HTML element with id 'psm_score_vs_score_qc_plot_choice_label__charge' " );
+		}
+		if ( $psm_score_vs_score_qc_plot_choice_label__pre_mz.length === 0 ) {
+			throw Error( "Failed to find HTML element with id 'psm_score_vs_score_qc_plot_choice_label__pre_mz' " );
+		}
+
+		// <%-- Values sent to server --%>
+		_psm_score_vs_score_qc_plot_choice_value__retention_time = $psm_score_vs_score_qc_plot_choice_value__retention_time.text();
+		_psm_score_vs_score_qc_plot_choice_value__charge = $psm_score_vs_score_qc_plot_choice_value__charge.text();
+		_psm_score_vs_score_qc_plot_choice_value__pre_mz = $psm_score_vs_score_qc_plot_choice_value__pre_mz.text();
+
+		// <%-- Labels put on select for user --%>
+		_psm_score_vs_score_qc_plot_choice_label__retention_time = $psm_score_vs_score_qc_plot_choice_label__retention_time.text();
+		_psm_score_vs_score_qc_plot_choice_label__charge = $psm_score_vs_score_qc_plot_choice_label__charge.text();
+		_psm_score_vs_score_qc_plot_choice_label__pre_mz = $psm_score_vs_score_qc_plot_choice_label__pre_mz.text();
+		
+	};
 
 	///////////////////////////////////////////
 
@@ -570,6 +632,24 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 			"</option>";
 			optionsHTMLarray.push( html );
 		}
+		//  Add options for RT, Charge, preMZ
+		if ( _anySearchesHaveScanDataYes ) { // Only when have scans
+			var html = "<option value='" + _psm_score_vs_score_qc_plot_choice_value__retention_time + "'>" + 
+			_psm_score_vs_score_qc_plot_choice_label__retention_time +
+			"</option>";
+			optionsHTMLarray.push( html );
+		}
+		var html = "<option value='" + _psm_score_vs_score_qc_plot_choice_value__charge + "'>" + 
+		_psm_score_vs_score_qc_plot_choice_label__charge +
+		"</option>";
+		optionsHTMLarray.push( html );
+		if ( _anySearchesHaveScanDataYes ) { // Only when have scans
+			var html = "<option value='" + _psm_score_vs_score_qc_plot_choice_value__pre_mz + "'>" + 
+			_psm_score_vs_score_qc_plot_choice_label__pre_mz +
+			"</option>";
+			optionsHTMLarray.push( html );
+		}
+		
 		var optionsHTML = optionsHTMLarray.join("");
 		$psm_score_vs_score_qc_plot_score_type_id_1.append( optionsHTML );
 		$psm_score_vs_score_qc_plot_score_type_id_2.append( optionsHTML );
@@ -613,12 +693,12 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 	this.psmScoreVsScoreQCPlot_scoreTypeChanged = function( ) {
 //		var objectThis = this;
 		var annTypes = this.globals_PSMScoreVsScoresChart.currentSearchData.annotationTypeDataById;
-		var $psm_score_vs_score_qc_plot_score_type_id_1 = $("#psm_score_vs_score_qc_plot_score_type_id_1");
-		var selectedAnnTypeId = $psm_score_vs_score_qc_plot_score_type_id_1.val( );
-		var annTypeForSelectId = annTypes[ selectedAnnTypeId ];
-		if ( annTypeForSelectId === undefined || annTypeForSelectId === null ) {
-			throw "annType not found for id: " + selectedAnnTypeId;
-		}
+//		var $psm_score_vs_score_qc_plot_score_type_id_1 = $("#psm_score_vs_score_qc_plot_score_type_id_1");
+//		var selectedAnnTypeId = $psm_score_vs_score_qc_plot_score_type_id_1.val( );
+//		var annTypeForSelectId = annTypes[ selectedAnnTypeId ];
+//		if ( annTypeForSelectId === undefined || annTypeForSelectId === null ) {
+//			throw "annType not found for id: " + selectedAnnTypeId;
+//		}
 		var $psm_score_vs_score_qc_plot_max_x = $("#psm_score_vs_score_qc_plot_max_x");
 		var $psm_score_vs_score_qc_plot_max_y = $("#psm_score_vs_score_qc_plot_max_y");
 		$psm_score_vs_score_qc_plot_max_x.val("");
@@ -796,8 +876,8 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 		var requestData = {
 				selectedLinkTypes : selectedLinkTypes,
 				projectSearchId : projectSearchId,
-				annotationTypeId_1 : annotationTypeId_1,
-				annotationTypeId_2 : annotationTypeId_2
+				scoreType_1 : annotationTypeId_1,
+				scoreType_2 : annotationTypeId_2
 		};
 		if ( userInputMaxXString !== "" ) {
 			var psmScoreCutoff_1 = userInputMaxXString;
@@ -1209,10 +1289,11 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 //		});
 	};
 	
+	
+	
 	//  Combine Data Items to reduce number of entries in chart
 	//      Output elements also have new properties 'combinedCount' and optional 'opacity'
-//	chartDataPerLinkTypeAsArray_ForChart = this.combineDataItems( { 
-//		chartDataPerLinkTypeAsArray : chartDataPerLinkTypeAsArray, 
+	
 	/**
 	 *   Processing to reduce number of elements inserted into chart
 	 *   
@@ -1262,6 +1343,15 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 			}, this );
 		}, this );
 		
+		var score_1_Max_Eq_score_1_Min = false;
+		if ( score_1_Max === score_1_Min ) {
+			score_1_Max_Eq_score_1_Min = true;
+		};
+		var score_2_Max_Eq_score_2_Min = false;
+		if ( score_2_Max === score_2_Min ) {
+			score_2_Max_Eq_score_2_Min = true;
+		};
+		
 		var score_1_binSize = ( score_1_Max - score_1_Min ) / chartAreaAxis_X;
 		var score_2_binSize = ( score_2_Max - score_2_Min ) / chartAreaAxis_Y;
 		
@@ -1293,20 +1383,30 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 			dataItems.forEach(function( element, index, array ) {
 				var score_1 = element.score_1;
 				var score_2 = element.score_2;
-
-				var score_1_Bin = ( score_1 - score_1_Min ) / score_1_binSize;
-				var score_1_BinFloor = Math.floor( score_1_Bin );
-				if ( score_1_BinFloor >= chartAreaAxis_X ) {
-					score_1_BinFloor = chartAreaAxis_X - 1;
+				
+				var score_1_Bin = 1;
+				var score_1_BinFloor = 1;
+				var score_1_BinCenter = 1;
+				if ( ! score_1_Max_Eq_score_1_Min ) { // Only compute if not eq
+					score_1_Bin = ( score_1 - score_1_Min ) / score_1_binSize;
+					score_1_BinFloor = Math.floor( score_1_Bin );
+					if ( score_1_BinFloor >= chartAreaAxis_X ) {
+						score_1_BinFloor = chartAreaAxis_X - 1;
+					}
+					score_1_BinCenter = ( score_1_BinFloor * score_1_binSize ) + score_1_Min + score_1_binSizeHalf;
 				}
-				var score_1_BinCenter = ( score_1_BinFloor * score_1_binSize ) + score_1_binSizeHalf;
-
-				var score_2_Bin = ( score_2 - score_2_Min ) / score_2_binSize;
-				var score_2_BinFloor = Math.floor( score_2_Bin );
-				if ( score_2_BinFloor >= chartAreaAxis_Y ) {
-					score_2_BinFloor = chartAreaAxis_Y - 1;
+				
+				var score_2_Bin = 1;
+				var score_2_BinFloor = 1;
+				var score_2_BinCenter = 1;
+				if ( ! score_2_Max_Eq_score_2_Min ) { // Only compute if not eq
+					score_2_Bin = ( score_2 - score_2_Min ) / score_2_binSize;
+					score_2_BinFloor = Math.floor( score_2_Bin );
+					if ( score_2_BinFloor >= chartAreaAxis_X ) {
+						score_2_BinFloor = chartAreaAxis_X - 1;
+					}
+					score_2_BinCenter = ( score_2_BinFloor * score_2_binSize ) + score_2_Min + score_2_binSizeHalf;
 				}
-				var score_2_BinCenter = ( score_2_BinFloor * score_2_binSize ) + score_2_binSizeHalf;
 
 				var binnedData_FromScore_1_BinFloor = binnedData[ score_1_BinFloor ];
 				if ( ! binnedData_FromScore_1_BinFloor ) {
@@ -1315,10 +1415,18 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 				}
 				var binnedData_FromScore_2_BinFloor = binnedData_FromScore_1_BinFloor[ score_2_BinFloor ];
 				if ( ! binnedData_FromScore_2_BinFloor ) {
-					binnedData_FromScore_2_BinFloor = { score_1: score_1_BinCenter , score_2: score_2_BinCenter, combinedCount: 1 };
+					binnedData_FromScore_2_BinFloor = { 
+							score_1: score_1_BinCenter , 
+							score_2: score_2_BinCenter, 
+							combinedCount: 1,
+							score_1_list : [ score_1 ],
+							score_2_list : [ score_2 ]
+					};
 					binnedData_FromScore_1_BinFloor[ score_2_BinFloor ] = binnedData_FromScore_2_BinFloor;
 				} else {
 					binnedData_FromScore_2_BinFloor.combinedCount++;
+					binnedData_FromScore_2_BinFloor.score_1_list.push( score_1 );
+					binnedData_FromScore_2_BinFloor.score_2_list.push( score_2 );
 				}
 
 			}, this );
@@ -1327,6 +1435,7 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 			
 			binnedData.forEach( function( binnedDataElement, index, array ) {
 				binnedDataElement.forEach( function( binnedDataElementElement, index, array ) {
+					//  Set opactiy based on count
 					var combinedCount = binnedDataElementElement.combinedCount;
 					var opacity = undefined;
 					if ( combinedCount > 3 ) {
@@ -1337,6 +1446,24 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 					if ( opacity ) {
 						binnedDataElementElement.opacity = opacity;
 					}
+					
+					//  If the score min eq score max, use first element from score list
+					
+					if ( score_1_Max_Eq_score_1_Min ) { 
+						binnedDataElementElement.score_1 = binnedDataElementElement.score_1_list[ 0 ];
+					} else {
+						// if not eq, get from function eval binned score and score list
+						// If all scores are same value, use saved score instead of binned score
+						binnedDataElementElement.score_1 = this._getBinnedElement_Score_1_or_2( binnedDataElementElement.score_1, binnedDataElementElement.score_1_list );
+					}
+					if ( ! score_2_Max_Eq_score_2_Min ) { // if not eq, get from function eval binned score and score list
+						binnedDataElementElement.score_2 = binnedDataElementElement.score_2_list[ 0 ];
+					} else {
+						// If all scores are same value, use saved score instead of binned score
+						binnedDataElementElement.score_2 = this._getBinnedElement_Score_1_or_2( binnedDataElementElement.score_2, binnedDataElementElement.score_2_list );
+					}
+					
+					//  Add to results
 					resultForLinkType.push( binnedDataElementElement )
 				}, this );		
 			}, this );
@@ -1350,6 +1477,20 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 		
 		return result;
 
+	};
+	
+	/**
+	 * If all scores are same value, use saved score instead of binned score
+	 */
+	this._getBinnedElement_Score_1_or_2 = function( binned_Score, scoreList ) {
+		var firstScore = scoreList[ 0 ];
+		for ( var index = 1; index < scoreList.length; index++ ) {
+			if ( scoreList[ index ] != firstScore ) {
+				//  Entries in score list not all same so return binned_Score
+				return binned_Score;  // EARLY EXIT
+			}
+		}
+		return firstScore;  // Got here so all scoreList entries must be same
 	};
 
 	//////////////////

@@ -36,11 +36,41 @@ public class CreatePsmScoreVsScoreQCPlotData {
 	}
 	
 	/**
+	 * Request object for a single score type
+	 *
+	 */
+	public static class CreatePsmScoreVsScoreQCPlotDataRequest_SingleScoreType {
+
+		boolean noValue;
+		Integer annotationTypeId;
+		String altScoreType;  // for when not annotation type id
+		
+		public boolean isNoValue() {
+			return noValue;
+		}
+		public void setNoValue(boolean noValue) {
+			this.noValue = noValue;
+		}
+		public Integer getAnnotationTypeId() {
+			return annotationTypeId;
+		}
+		public void setAnnotationTypeId(Integer annotationTypeId) {
+			this.annotationTypeId = annotationTypeId;
+		}
+		public String getAltScoreType() {
+			return altScoreType;
+		}
+		public void setAltScoreType(String altScoreType) {
+			this.altScoreType = altScoreType;
+		}
+	}
+	
+	/**
 	 * @param searchId
 	 * @param scanFileId - Optional
 	 * @param selectedLinkTypes
-	 * @param annotationTypeId_1
-	 * @param annotationTypeId_2
+	 * @param scoreType_1
+	 * @param scoreType_2
 	 * @param psmScoreCutoff_1
 	 * @param psmScoreCutoff_2
 	 * @return
@@ -50,8 +80,8 @@ public class CreatePsmScoreVsScoreQCPlotData {
 			int searchId,
 			Integer scanFileId,
 			Set<String> selectedLinkTypes,			
-			Integer annotationTypeId_1,
-			Integer annotationTypeId_2,
+			CreatePsmScoreVsScoreQCPlotDataRequest_SingleScoreType singleScoreType_1,
+			CreatePsmScoreVsScoreQCPlotDataRequest_SingleScoreType singleScoreType_2,
 			Double psmScoreCutoff_1,
 			Double psmScoreCutoff_2 ) throws Exception {
 
@@ -62,7 +92,7 @@ public class CreatePsmScoreVsScoreQCPlotData {
 			log.error( msg );
 			throw new IllegalArgumentException( msg );
 		}
-		
+				
 		List<Integer> searchIdsList = new ArrayList<>( 1 );
 		searchIdsList.add( searchId );
 		Map<Integer, Map<Integer, AnnotationTypeDTO>> annotationTypeDataAllSearchIds = 
@@ -75,7 +105,7 @@ public class CreatePsmScoreVsScoreQCPlotData {
 			throw new ProxlWebappDataException(msg);
 		}
 
-		if ( annotationTypeId_1 == null ) {
+		if ( singleScoreType_1.isNoValue() ) {
 			AnnotationTypeDTO annotationTypeDTO = 
 					getAnnotationTypeDTO( searchId, annotationTypeDataForSearchId, GetAnnotationTypeDTO_Type.SORT_ID_THEN_ALPHA );
 			
@@ -91,10 +121,10 @@ public class CreatePsmScoreVsScoreQCPlotData {
 			results.setAnnotationTypeName_1( annotationTypeDTO.getName() );
 			results.setSearchProgramName_1( searchProgramsPerSearchDTO.getDisplayName() );
 			
-			annotationTypeId_1 = annotationTypeDTO.getId();
+			singleScoreType_1.setAnnotationTypeId( annotationTypeDTO.getId() );
 		}
 
-		if ( annotationTypeId_2 == null ) {
+		if ( singleScoreType_2.isNoValue() ) {
 			AnnotationTypeDTO annotationTypeDTO = 
 					getAnnotationTypeDTO( searchId, annotationTypeDataForSearchId, GetAnnotationTypeDTO_Type.ALPHA_ONLY );
 
@@ -110,7 +140,7 @@ public class CreatePsmScoreVsScoreQCPlotData {
 			results.setAnnotationTypeName_2( annotationTypeDTO.getName() );
 			results.setSearchProgramName_2( searchProgramsPerSearchDTO.getDisplayName() );
 			
-			annotationTypeId_2 = annotationTypeDTO.getId();
+			singleScoreType_2.setAnnotationTypeId( annotationTypeDTO.getId() );
 		}
 
 		PsmScoreVsScoreSearcherResults searcherResults  = 
@@ -119,9 +149,11 @@ public class CreatePsmScoreVsScoreQCPlotData {
 						searchId, 
 						scanFileId,
 						selectedLinkTypes,
-						annotationTypeId_1, 
+						singleScoreType_1.getAnnotationTypeId(),
+						singleScoreType_1.getAltScoreType(),
 						psmScoreCutoff_1,
-						annotationTypeId_2,
+						singleScoreType_2.getAnnotationTypeId(),
+						singleScoreType_2.getAltScoreType(),
 						psmScoreCutoff_2 );
 
 		results.setCrosslinkChartData( searcherResults.getCrosslinkEntries() );

@@ -1,3 +1,4 @@
+<%@page import="org.yeastrc.xlink.www.constants.QC_Plot_ScoreVsScore_Constants"%>
 <%@page import="org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 
@@ -1186,6 +1187,15 @@
 		  </div>
 		</div>
 		
+		<%-- Values sent to server --%>
+		<script id="psm_score_vs_score_qc_plot_choice_value__retention_time" type="text/text"><%= QC_Plot_ScoreVsScore_Constants.SCORE_SELECTION_RETENTION_TIME %></script>
+		<script id="psm_score_vs_score_qc_plot_choice_value__charge" type="text/text"><%= QC_Plot_ScoreVsScore_Constants.SCORE_SELECTION_CHARGE %></script>
+		<script id="psm_score_vs_score_qc_plot_choice_value__pre_mz" type="text/text"><%= QC_Plot_ScoreVsScore_Constants.SCORE_SELECTION_PRE_MZ %></script>
+
+		<%-- Labels put on select for user --%>
+		<script id="psm_score_vs_score_qc_plot_choice_label__retention_time" type="text/text">Retention Time</script>
+		<script id="psm_score_vs_score_qc_plot_choice_label__charge" type="text/text">Charge</script>
+		<script id="psm_score_vs_score_qc_plot_choice_label__pre_mz" type="text/text">Precursor M/Z</script>
 		
 		<!-- END:   Modal dialog for displaying the PSM Score VS Score QC plot -->
 						
