@@ -364,10 +364,10 @@ var QCMergedPageChartIonCurrentStatistics = function() {
 
 			if ( ms_2_ScanCount !== 0 ) {
 				try {
-					var crosslinkCountFraction = crosslinkCount / ms_2_ScanCount;
-					var looplinkCountFraction = looplinkCount / ms_2_ScanCount;
-					var unlinkedCountFraction = unlinkedCount / ms_2_ScanCount;
-					var totalMS2CountForFilterFraction = totalMS2CountForFilter / ms_2_ScanCount;
+					var crosslinkCountFraction = dataPerSearch.crosslinkCount / ms_2_ScanCount;
+					var looplinkCountFraction = dataPerSearch.looplinkCount / ms_2_ScanCount;
+					var unlinkedCountFraction = dataPerSearch.unlinkedCount / ms_2_ScanCount;
+					var totalMS2CountForFilterFraction = combinedLinkTypes_MS_2_scansMeetsCutoffs / ms_2_ScanCount;
 
 					crosslinkCountFractionDisplay = formatFraction( crosslinkCountFraction );
 					looplinkCountFractionDisplay = formatFraction( looplinkCountFraction );
