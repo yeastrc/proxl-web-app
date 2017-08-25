@@ -127,7 +127,7 @@ public class Scan_Statistics_Merged {
 			haveData = true;  //  Any data for all searches
 
 			//  Overall statistics
-			boolean haveSscanOverallData = false;
+			boolean haveSscanOverallData = true;
 			
 			long ms_1_ScanCount = 0;
 			double ms_1_ScanIntensitiesSummed = 0;
@@ -151,9 +151,10 @@ public class Scan_Statistics_Merged {
 				ScanFileStatisticsDTO scanFileStatisticsDTO = 
 						ScanFileStatisticsDAO.getInstance().getScanFileStatisticsDTOForScanFileId( scanFileId ); 
 				
-				if ( scanFileStatisticsDTO != null ) {
+				if ( scanFileStatisticsDTO == null ) {
 
-					haveSscanOverallData = true;
+					haveSscanOverallData = false; //  If no data for any scan file, then no scan overall data
+				} else {
 					
 					ms_1_ScanCount += scanFileStatisticsDTO.getMs_1_ScanCount();
 					ms_1_ScanIntensitiesSummed += scanFileStatisticsDTO.getMs_1_ScanIntensitiesSummed();

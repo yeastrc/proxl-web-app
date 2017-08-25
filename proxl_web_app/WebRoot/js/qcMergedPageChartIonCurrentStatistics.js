@@ -284,39 +284,55 @@ var QCMergedPageChartIonCurrentStatistics = function() {
 		
 		//  Build array of objects for rendering with Handlebars template
 		
+		var NO_DATA_STRING = "No Data";
+		
 		var displayPerSearchList = [];
 		
 		dataPerSearchList.forEach(function( dataPerSearch, index, array) {
 			
 			//  Process data for each searchId
 			
-			var ms_2_ScanCount = dataPerSearch.ms_2_ScanCount;
-			
-			var totalIonCurrent = dataPerSearch.ms_1_ScanIntensitiesSummed + dataPerSearch.ms_2_ScanIntensitiesSummed;
+			var ms_2_ScanCount = 0;
+			var totalIonCurrentString = NO_DATA_STRING;
+			var ms_1_ScanIntensitiesSummedString = NO_DATA_STRING;
+			var ms_2_ScanIntensitiesSummedString = NO_DATA_STRING;
 
-			var totalIonCurrentString = totalIonCurrent;
-			var ms_1_ScanIntensitiesSummedString = dataPerSearch.ms_1_ScanIntensitiesSummed;
-			var ms_2_ScanIntensitiesSummedString = dataPerSearch.ms_2_ScanIntensitiesSummed;
-			try {
-				totalIonCurrentString = totalIonCurrent.toExponential( 3 );
-				ms_1_ScanIntensitiesSummedString = dataPerSearch.ms_1_ScanIntensitiesSummed.toExponential( 3 );
-				ms_2_ScanIntensitiesSummedString = dataPerSearch.ms_2_ScanIntensitiesSummed.toExponential( 3 );
-			} catch( e ) {
+			var ms_1_ScanCountString = NO_DATA_STRING;
+			var ms_2_ScanCountString = NO_DATA_STRING;
+				
+			if ( dataPerSearch.haveSscanOverallData ) {
+
+				ms_2_ScanCount = dataPerSearch.ms_2_ScanCount;
+
+				var totalIonCurrent = dataPerSearch.ms_1_ScanIntensitiesSummed + dataPerSearch.ms_2_ScanIntensitiesSummed;
+
+				totalIonCurrentString = totalIonCurrent;
+				ms_1_ScanIntensitiesSummedString = dataPerSearch.ms_1_ScanIntensitiesSummed;
+				ms_2_ScanIntensitiesSummedString = dataPerSearch.ms_2_ScanIntensitiesSummed;
 				try {
-					totalIonCurrentString = totalIonCurrent.toExponential();
-					ms_1_ScanIntensitiesSummedString = dataPerSearch.ms_1_ScanIntensitiesSummed.toExponential();
-					ms_2_ScanIntensitiesSummedString = dataPerSearch.ms_2_ScanIntensitiesSummed.toExponential();
-				} catch( e2 ) {
+					totalIonCurrentString = totalIonCurrent.toExponential( 3 );
+					ms_1_ScanIntensitiesSummedString = dataPerSearch.ms_1_ScanIntensitiesSummed.toExponential( 3 );
+					ms_2_ScanIntensitiesSummedString = dataPerSearch.ms_2_ScanIntensitiesSummed.toExponential( 3 );
+				} catch( e ) {
+					try {
+						totalIonCurrentString = totalIonCurrent.toExponential();
+						ms_1_ScanIntensitiesSummedString = dataPerSearch.ms_1_ScanIntensitiesSummed.toExponential();
+						ms_2_ScanIntensitiesSummedString = dataPerSearch.ms_2_ScanIntensitiesSummed.toExponential();
+					} catch( e2 ) {
+					}
 				}
-			}
 
-			var ms_1_ScanCountString = dataPerSearch.ms_1_ScanCount;
-			var ms_2_ScanCountString = dataPerSearch.ms_2_ScanCount;
-			try {
-				ms_1_ScanCountString = dataPerSearch.ms_1_ScanCount.toLocaleString();
-				ms_2_ScanCountString = dataPerSearch.ms_2_ScanCount.toLocaleString();
-			} catch( e ) {
+				ms_1_ScanCountString = dataPerSearch.ms_1_ScanCount;
+				ms_2_ScanCountString = dataPerSearch.ms_2_ScanCount;
+				try {
+					ms_1_ScanCountString = dataPerSearch.ms_1_ScanCount.toLocaleString();
+					ms_2_ScanCountString = dataPerSearch.ms_2_ScanCount.toLocaleString();
+				} catch( e ) {
+				}
+				
 			}
+			
+			// "MS2 scans with a PSM meeting cutoffs" section
 			
 			var combinedLinkTypes_MS_2_scansMeetsCutoffs = dataPerSearch.crosslinkCount + dataPerSearch.looplinkCount + dataPerSearch.unlinkedCount;
 
