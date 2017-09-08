@@ -29,6 +29,7 @@
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery-ui-1.10.4.min.js"></script>
 		<script type="text/javascript" src="${ contextPath }/js/libs/base64.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
+		<script type="text/javascript" src="${ contextPath }/js/libs/spin.min.js"></script> 
 		
 
 
@@ -43,6 +44,8 @@
 		
 			
 		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
+		
+		<script type="text/javascript" src="${ contextPath }/js/spinner.js"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/viewProjectPage.js?x=${cacheBustValue}"></script> 
 		

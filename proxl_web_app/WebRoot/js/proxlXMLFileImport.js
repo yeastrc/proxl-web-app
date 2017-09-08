@@ -685,12 +685,13 @@ ProxlXMLFileImport.prototype.pageUnload  = function( eventObject ) {
 };
 
 
-//User clicked the "Close" button or the close "X"
+//  User clicked the "Cancel" button or the close "X"
 
 ProxlXMLFileImport.prototype.closeClicked  = function( clickThis, eventObject ) {
 
-
-	if ( ! this.isFileDataEmpty() ) {
+	if ( this.uploadKey && ! this.isFileDataEmpty() ) {
+		
+		//  Submit has not been called yet and files have been uploaded.
 		
 		//  Prompt to confirm
 
@@ -721,27 +722,22 @@ ProxlXMLFileImport.prototype.closeOverlay  = function( params ) {
 		var fileDataKey = fileDataKeys[ index ];
 		
 		var proxlXMLFileImportFileData = allFileData[ fileDataKey ];
-		
 
 		this.abortXMLHttpRequestSend( { proxlXMLFileImportFileData : proxlXMLFileImportFileData } );
-
 	}
-	
-	
-	//  TODO  Add code to clear current request and temp subdir on server
-	
-	//  TODO  Add code to clear variables related to current request
-	
-	
-	
+		
 	$(".proxl_xml_file_upload_overlay_show_hide_parts_jq").hide();
 	
 	this.resetOverlay();
 	
 	if ( this.uploadKey ) {
+		//  Submit has not been called yet
 		
 		this.updateServerAbandonedUploadKey();
 	}
+
+	this.clearFileData();
+
 };
 
 
@@ -784,12 +780,9 @@ ProxlXMLFileImport.prototype.resetOverlay  = function(  ) {
 	$("#import_proxl_xml_file_cancel_message_block").hide();
 
 	
+	this.hideSubmitInProgress();
+	
 };
-
-
-
-
-
 
 
 //  User chose a file in the Proxl XML file dialog, or it is empty
@@ -1324,6 +1317,7 @@ ProxlXMLFileImport.prototype.openOverlayProcessServerResponse  = function( param
 	this.uploadKey = uploadKey;
 	
 	this.resetOverlay();
+	
 	
 	var $overlay_background = $("#proxl_xml_file_upload_modal_dialog_overlay_background"); 
 	var $overlay_container = $("#proxl_xml_file_upload_overlay_container_div");
@@ -1898,23 +1892,17 @@ ProxlXMLFileImport.prototype.submitClicked  = function( clickThis, eventObject )
 	var uploadKey = this.uploadKey;
 	
 	if ( ! uploadKey ) {
-		
 		throw Error( "uploadKey must be set" );
 	}
-	
 	
 	var foundProxlXMLFile = false;
 	
 	var allFileData = this.getAllFileData();
-	
 	var fileItems = [];
-	
 	var fileDataKeys = Object.keys( allFileData );
-	
 	for( var index = 0; index < fileDataKeys.length; index++ ) {
 		
 		var fileDataKey = fileDataKeys[ index ];
-		
 		var fileData = allFileData[ fileDataKey ];
 		
 		if ( fileData.isUploadedToServer() ) {
@@ -1953,6 +1941,8 @@ ProxlXMLFileImport.prototype.submitClicked  = function( clickThis, eventObject )
 		throw Error( "No Proxl XML file in submit" );
 	}
 	
+	this.showSubmitInProgress();
+	
 
 	var _URL = contextPathJSVar + "/services/file_import_proxl_xml_scans/uploadSubmit";
 
@@ -1966,6 +1956,7 @@ ProxlXMLFileImport.prototype.submitClicked  = function( clickThis, eventObject )
 	
 	var requestData = JSON.stringify( requestObj );
 
+	this.uploadKey = undefined; // Clear since about to make AJAX call
 
 	// var request =
 	$.ajax({
@@ -2038,12 +2029,14 @@ ProxlXMLFileImport.prototype.submitClickedProcessServerResponse  = function( par
 		
 		return;
 		
-		throw Error( "statusSuccess is false" );  ///  TODO  Need to display error
+//		throw Error( "statusSuccess is false" );  ///  TODO  Need to display error
 	}
-	
-	this.uploadKey = undefined;
-	
-	this.clearFileData();
+
+	//  Moved to this.submitClicked();
+//	this.uploadKey = undefined;
+
+	//  Moved to this.closeOverlay();
+//	this.clearFileData();
 	
 	proxlXMLFileImportStatusDisplay.populateDataBlockAndPendingCount();
 	
@@ -2071,21 +2064,15 @@ ProxlXMLFileImport.prototype.enableDisableSubmitUploadButtonAndAddScanFileLinkCo
 		var proxlXMLFileImportFileData = allFileData[ fileDataKey ];
 		
 		if ( proxlXMLFileImportFileData.isIsProxlXMLFile() ) {
-			
+
 			if ( proxlXMLFileImportFileData.isUploadedToServer() ) {
-				
 				proxlXMLfileUploaded = true;
 			}
-			
 		} else {
-			
 			if ( proxlXMLFileImportFileData.isUploadedToServer() ) {
-				
 			} else {
-				
 				allScanFilesUploadedOrNoScanFiles = false;
 			}
-			
 		}
 	}
 	
@@ -2115,6 +2102,25 @@ ProxlXMLFileImport.prototype.disableSubmitUploadButton  = function () {
 
 	$("#import_proxl_xml_file_submit_button_disabled_overlay").show();
 	$("#import_proxl_xml_file_submit_button").prop( "disabled", true );
+};
+
+
+ProxlXMLFileImport.prototype.showSubmitInProgress = function() {
+
+	//  Show "Submit In Progress" 
+	var $proxl_xml_file_upload_submit_in_progress = $("#proxl_xml_file_upload_submit_in_progress");
+	$proxl_xml_file_upload_submit_in_progress.show();
+	
+	createSpinner();				// create spinner
+};
+
+ProxlXMLFileImport.prototype.hideSubmitInProgress = function() {
+
+	//  Hide "Submit In Progress" 
+	var $proxl_xml_file_upload_submit_in_progress = $("#proxl_xml_file_upload_submit_in_progress");
+	$proxl_xml_file_upload_submit_in_progress.hide();
+	
+	destroySpinner();				// destroy spinner
 };
 
 

@@ -42,9 +42,19 @@
 			class="proxl-xml-file-upload-overlay-X-for-exit-overlay proxl_xml_file_upload_overlay_close_parts_jq " >X</h1>
 		<h1 id="proxl_xml_file_upload_overlay_header_text" class="proxl-xml-file-upload-overlay-header-text" >Import Proxl XML File</h1>
 	</div>
-	<div id="proxl_xml_file_upload_overlay_body" class="proxl-xml-file-upload-overlay-body" style="text-align:left;" >
+	<div id="proxl_xml_file_upload_overlay_body" class="proxl-xml-file-upload-overlay-body" style="text-align:left; position: relative;" >
 
-		
+						<%-- overlay div to provide Submit in progress --%>
+		<div id="proxl_xml_file_upload_submit_in_progress" >
+			<%--  grey out under spinner --%>
+			<div style="position:absolute;left:0;right:0;top:0;bottom:0;background-color:grey;opacity:0.5;" 
+					class="tool_tip_attached_jq "
+					data-tooltip="Submit in progress" >
+					
+			</div>
+				<%-- id of next div as used by code in spinner.js --%>
+			<div style="opacity:1.0;position:absolute;left:20%;top:100px; z-index: 20001" id="coverage-map-loading-spinner" style="" ></div>
+		</div>
 		
 		<h3>
 			Upload a Proxl XML file 
@@ -190,7 +200,7 @@
 				  
 
 			<%--  Submit and Cancel buttons --%>
-		<table id="import_proxl_xml_choose_scan_file_block" class="proxl-xml-file-upload-overlay-main-table"
+		<table id="" class="proxl-xml-file-upload-overlay-main-table"
 			style="margin-top: 12px;">
 		 <tr  >
 		  <td class="column-1">
@@ -205,7 +215,8 @@
 		       <c:set var="submitDisabledTooltip">Submit. Enabled when Proxl XML file is uploaded and scan files are uploaded if any are selected</c:set>
 		    </c:if>
 		    
-			<div style="display:inline-block;position:relative;"> <%-- outer div to support overlay div when button disabled --%>
+			<div id="import_proxl_xml_file_submit_button_container_block"
+				style="display:inline-block;position:relative;"> <%-- outer div to support overlay div when button disabled --%>
 			  
 					<input type="button" value="Submit Upload" disabled="disabled"  id="import_proxl_xml_file_submit_button">
 					

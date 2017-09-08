@@ -36,7 +36,11 @@ function createSpinner () {
 
 function destroySpinner() {
 	
-	this.loadingSpinner.stop();
+	if ( this.loadingSpinner ) {
+		this.loadingSpinner.stop();
+	}
+	
+	this.loadingSpinner = undefined;
 
 	var $spinnerContainer = $("div#coverage-map-loading-spinner-block");
 
@@ -54,6 +58,7 @@ var incrementSpinner = function() {
 };
 
 var decrementSpinner = function() {
+	if ( ! loadingSpinner ) { return; }
 	var numSpinners = loadingSpinner.numSpinners;
 	if( !numSpinners ) { return; }
 	
