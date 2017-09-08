@@ -43,15 +43,6 @@ public class SearchPeptideNoLinkInfoAnnDataWrapper extends SortDisplayRecordsWra
 	/////////////////
 	//   Getters and Setters
 
-	public SearchPeptideNoLinkInfo getSearchPeptideNoLinkInfo() {
-		return searchPeptideNoLinkInfo;
-	}
-
-	public void setSearchPeptideNoLinkInfo(
-			SearchPeptideNoLinkInfo searchPeptideNoLinkInfo) {
-		this.searchPeptideNoLinkInfo = searchPeptideNoLinkInfo;
-	}
-
 	@Override
 	public List<String> getPsmAnnotationValueList() {
 
@@ -74,6 +65,14 @@ public class SearchPeptideNoLinkInfoAnnDataWrapper extends SortDisplayRecordsWra
 	public void setPeptideAnnotationValueList(
 			List<String> peptideAnnotationValueList) {
 		// TODO Auto-generated method stub
+	}
+
+	public SearchPeptideNoLinkInfo getSearchPeptideNoLinkInfo() {
+		return searchPeptideNoLinkInfo;
+	}
+
+	public void setSearchPeptideNoLinkInfo(SearchPeptideNoLinkInfo searchPeptideNoLinkInfo) {
+		this.searchPeptideNoLinkInfo = searchPeptideNoLinkInfo;
 	}
 
 }

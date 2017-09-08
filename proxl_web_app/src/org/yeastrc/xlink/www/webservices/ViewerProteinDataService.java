@@ -28,6 +28,7 @@ import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.linkable_positions.GetLinkablePositionsForLinkers;
 import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinksWith_Param;
 import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
 import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping;
 import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping.UnlinkedDimerPeptideProteinMappingResult;
@@ -79,6 +80,7 @@ public class ViewerProteinDataService {
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
 			@QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
 			@QueryParam( "filterOnlyOnePeptide" ) String filterOnlyOnePeptideString,
+			@QueryParam( "removeNonUniquePSMs" ) String removeNonUniquePSMsString,
 			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
 			@QueryParam( "excludeType" ) List<Integer> excludeType,
 			@Context HttpServletRequest request )
@@ -170,6 +172,9 @@ public class ViewerProteinDataService {
 			boolean filterOnlyOnePeptide = false;
 			if( "on".equals( filterOnlyOnePeptideString ) )
 				filterOnlyOnePeptide = true;
+			boolean removeNonUniquePSMs = false;
+			if( "on".equals( removeNonUniquePSMsString ) )
+				removeNonUniquePSMs = true;
 			//  Copy Exclude Taxonomy and Exclude Protein Sets for lookup
 			Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
 			if ( excludeTaxonomy != null ) {
@@ -231,6 +236,9 @@ public class ViewerProteinDataService {
 							searchIdsSet, cutoffValuesRootLevel ); 
 			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
 			
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param();
+			linkedPositions_FilterExcludeLinksWith_Param.setRemoveNonUniquePSMs( removeNonUniquePSMs );
+			
 			// Create collection with all possible proteins included in this set of  searches for this type
 			//  Keyed on proteinSequenceId
 			Map<Integer, List<SearchDTO>> searchDTOsKeyedOnProteinSequenceIdsMap = new HashMap<>();
@@ -247,7 +255,7 @@ public class ViewerProteinDataService {
 				///   Get Crosslink Proteins from DB
 				List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
 						CrosslinkLinkedPositions.getInstance()
-						.getSearchProteinCrosslinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+						.getSearchProteinCrosslinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 				for ( SearchProteinCrosslinkWrapper wrappedItem : wrappedCrosslinks ) {
 					SearchProteinCrosslink item = wrappedItem.getSearchProteinCrosslink();
 					Integer proteinId_1 = item.getProtein1().getProteinSequenceObject().getProteinSequenceId();
@@ -273,7 +281,7 @@ public class ViewerProteinDataService {
 				///   Get Looplink Proteins from DB
 				List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
 						LooplinkLinkedPositions.getInstance()
-						.getSearchProteinLooplinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+						.getSearchProteinLooplinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 				for ( SearchProteinLooplinkWrapper wrappedItem : wrappedLooplinks ) {
 					SearchProteinLooplink item = wrappedItem.getSearchProteinLooplink();
 					Integer proteinId = item.getProtein().getProteinSequenceObject().getProteinSequenceId();
@@ -298,7 +306,7 @@ public class ViewerProteinDataService {
 					///   Get Dimer and Unlinked Proteins from DB
 					UnlinkedDimerPeptideProteinMappingResult unlinkedDimerPeptideProteinMappingResult =
 							UnlinkedDimerPeptideProteinMapping.getInstance()
-							.getSearchProteinUnlinkedAndDimerWrapperLists( searchDTO, searcherCutoffValuesSearchLevel );
+							.getSearchProteinUnlinkedAndDimerWrapperLists( searchDTO, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 					List<SearchProteinDimerWrapper> wrappedDimers = 
 							unlinkedDimerPeptideProteinMappingResult.getSearchProteinDimerWrapperList();
 					for ( SearchProteinDimerWrapper wrappedItem : wrappedDimers ) {
@@ -484,6 +492,7 @@ public class ViewerProteinDataService {
 			ivd.setFilterNonUniquePeptides( filterNonUniquePeptides );
 			ivd.setFilterOnlyOnePSM( filterOnlyOnePSM );
 			ivd.setFilterOnlyOnePeptide( filterOnlyOnePeptide );
+			ivd.setRemoveNonUniquePSMs( removeNonUniquePSMs );
 			return ivd;
 			
 		} catch ( WebApplicationException e ) {

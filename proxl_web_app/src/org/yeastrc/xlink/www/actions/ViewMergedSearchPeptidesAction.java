@@ -36,6 +36,7 @@ import org.yeastrc.xlink.www.objects.VennDiagramDataToJSON;
 import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
 import org.yeastrc.xlink.www.web_utils.GenerateVennDiagramDataToJSON;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
@@ -170,7 +171,9 @@ public class ViewMergedSearchPeptidesAction extends Action {
 			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
 			//  Populate request objects for User Selection of Annotation Data Display
 			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( searches, request );
-			
+			//  Populate request objects for excludeLinksWith_Remove_NonUniquePSMs_Checkbox_Fragment.jsp
+			ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems.getInstance().excludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems( searches, request );
+
 			List<Double> modMassDistinctForSearchesList = SearchModMassDistinctSearcher.getInstance().getDistinctDynamicModMassesForSearchId( searchIdsArray );
 			if ( webappTiming != null ) {
 				webappTiming.markPoint( "After get Distinct Dynamic Mod Masses For SearchId" );
@@ -189,10 +192,12 @@ public class ViewMergedSearchPeptidesAction extends Action {
 							form,
 							projectSearchIdsListDeduppedSorted,
 							searches,
-							searchesMapOnSearchId );
+							searchesMapOnSearchId,
+							PeptidesMergedCommonPageDownload.FlagCombinedReportedPeptideEntries.YES );
 			
-			request.setAttribute( "peptidePsmAnnotationNameDescListsForEachSearch",
-					peptidesMergedCommonPageDownloadResult.getPeptidePsmAnnotationNameDescListsForEachSearch() );
+			request.setAttribute( "peptidePsmAnnotationNameDescListsForEachSearch", peptidesMergedCommonPageDownloadResult.getPeptidePsmAnnotationNameDescListsForEachSearch() );
+			request.setAttribute( "anyReportedPeptideEntriesWereCombined", peptidesMergedCommonPageDownloadResult.isAnyReportedPeptideEntriesWereCombined() );
+			
 			List<WebMergedReportedPeptide> webMergedReportedPeptideList = peptidesMergedCommonPageDownloadResult.getWebMergedReportedPeptideList();
 			for ( WebMergedReportedPeptide link : webMergedReportedPeptideList ) {
 				List<SearchBooleanWrapper> searchContainsPeptide = new ArrayList<SearchBooleanWrapper>( searches.size() );

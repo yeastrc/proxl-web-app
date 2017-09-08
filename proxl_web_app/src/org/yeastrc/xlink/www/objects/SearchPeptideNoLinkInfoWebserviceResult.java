@@ -24,7 +24,7 @@ public class SearchPeptideNoLinkInfoWebserviceResult implements SearchPeptideCom
 			this.reportedPeptide = searchPeptideNoLinkInfo.getReportedPeptide();
 						
 			this.numPsms = searchPeptideNoLinkInfo.getNumPsms();
-			this.numUniquePsms = searchPeptideNoLinkInfo.getNumUniquePsms();
+			this.numNonUniquePsms = searchPeptideNoLinkInfo.getNumNonUniquePsms();
 			
 		} catch ( Exception e ) {
 			
@@ -44,7 +44,7 @@ public class SearchPeptideNoLinkInfoWebserviceResult implements SearchPeptideCom
 	private int numPsms;
 
 
-	private Integer numUniquePsms;
+	private Integer numNonUniquePsms;
 
 	/**
 	 * Used for display on web page
@@ -70,19 +70,7 @@ public class SearchPeptideNoLinkInfoWebserviceResult implements SearchPeptideCom
 	public int getNumPsms() {
 		return numPsms;
 	}
-
-	public void setNumPsms(int numPsms) {
-		this.numPsms = numPsms;
-	}
-
-	public Integer getNumUniquePsms() {
-		return numUniquePsms;
-	}
-
-	public void setNumUniquePsms(Integer numUniquePsms) {
-		this.numUniquePsms = numUniquePsms;
-	}
-
+	
 	public List<String> getPsmAnnotationValueList() {
 		return psmAnnotationValueList;
 	}
@@ -130,6 +118,10 @@ public class SearchPeptideNoLinkInfoWebserviceResult implements SearchPeptideCom
 
 	public void setLinkTypeDimer(boolean linkTypeDimer) {
 		this.linkTypeDimer = linkTypeDimer;
+	}
+
+	public Integer getNumNonUniquePsms() {
+		return numNonUniquePsms;
 	}
 	
 	

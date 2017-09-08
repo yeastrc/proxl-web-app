@@ -10,20 +10,25 @@ import org.yeastrc.xlink.dto.ReportedPeptideDTO;
  */
 public class ReportedPeptidesForMergedPeptidePage implements SearchPeptideCommonLinkWebserviceResultIF {
 
-	private ReportedPeptideDTO reportedPeptide;
-	
 	private String searchName;
 	
 	private int searchId;
-
 	
-	private int numPSMs;
+	//  Use WebReportedPeptide
+	private WebReportedPeptide webReportedPeptide;
 	
 	private List<String> peptideAnnotationValues;
 	
 	private List<String> psmAnnotationValues;
 	
-
+	//  Defer to webReportedPeptide
+	public ReportedPeptideDTO getReportedPeptide() throws Exception {
+		return webReportedPeptide.getReportedPeptide();
+	}
+	public int getNumPSMs() throws Exception {
+		return webReportedPeptide.getNumPsms();
+	}
+	
 	@Override
 	public List<String> getPsmAnnotationValueList() {
 		return psmAnnotationValues;
@@ -59,12 +64,7 @@ public class ReportedPeptidesForMergedPeptidePage implements SearchPeptideCommon
 	public void setSearchName(String searchName) {
 		this.searchName = searchName;
 	}
-	public ReportedPeptideDTO getReportedPeptide() {
-		return reportedPeptide;
-	}
-	public void setReportedPeptide(ReportedPeptideDTO reportedPeptide) {
-		this.reportedPeptide = reportedPeptide;
-	}
+
 	public int getSearchId() {
 		return searchId;
 	}
@@ -72,11 +72,11 @@ public class ReportedPeptidesForMergedPeptidePage implements SearchPeptideCommon
 		this.searchId = searchId;
 	}
 
-	public int getNumPSMs() {
-		return numPSMs;
+	public WebReportedPeptide getWebReportedPeptide() {
+		return webReportedPeptide;
 	}
-	public void setNumPSMs(int numPSMs) {
-		this.numPSMs = numPSMs;
+	public void setWebReportedPeptide(WebReportedPeptide webReportedPeptide) {
+		this.webReportedPeptide = webReportedPeptide;
 	}
 
 	

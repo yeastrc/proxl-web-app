@@ -115,6 +115,19 @@ var ViewSearchPeptidePageCode = function() {
 				$item.prop('checked', true);
 			});
 		}
+		
+		//  Mark check boxes for chosen links to exclude: "only one PSM", "remove non-unique PSMs"
+		if ( _query_json_field_Contents.filterOnlyOnePSM ) {
+			$("#filterOnlyOnePSM").prop('checked', true);
+		} else {
+			$("#filterOnlyOnePSM").prop('checked', false);
+		}
+		if ( _query_json_field_Contents.removeNonUniquePSMs ) {
+			$("#removeNonUniquePSMs").prop('checked', true);
+		} else {
+			$("#removeNonUniquePSMs").prop('checked', false);
+		}
+
 	};
 	
 	/////////////
@@ -161,11 +174,23 @@ var ViewSearchPeptidePageCode = function() {
 		if ( allDynamicModMassesChosen ) {
 			outputDynamicModMasses = null;  //  set to null when all chosen
 		}
+		//  Mark check boxes for chosen links to exclude:  "only one PSM", "remove non-unique PSMs"
+		var filterOnlyOnePSM = false;
+		var removeNonUniquePSMs = false;
+		if ( $("#filterOnlyOnePSM").prop('checked') === true ) {
+			filterOnlyOnePSM = true;
+		}
+		if ( $("#removeNonUniquePSMs").prop('checked') === true ) {
+			removeNonUniquePSMs = true;
+		}
+
 		var output_query_json_field_Contents = { 
 				cutoffs : outputCutoffs, 
 				annTypeIdDisplay : annotationTypeDisplayByProjectSearchId,
 				linkTypes : outputLinkTypes, 
-				mods : outputDynamicModMasses 
+				mods : outputDynamicModMasses,
+				filterOnlyOnePSM : filterOnlyOnePSM,
+				removeNonUniquePSMs : removeNonUniquePSMs
 		};
 		try {
 			var output_query_json_field_String = JSON.stringify( output_query_json_field_Contents );

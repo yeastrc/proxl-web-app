@@ -44,6 +44,7 @@ import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
 import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -154,7 +155,11 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 								form,
 								projectSearchIdsListDeduppedSorted,
 								searches,
-								searchesMapOnSearchId );
+								searchesMapOnSearchId,
+								PeptidesMergedCommonPageDownload.FlagCombinedReportedPeptideEntries.NO );
+				
+				MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = peptidesMergedCommonPageDownloadResult.getMergedPeptideQueryJSONRoot();
+				
 				////////////
 				/////   Searcher cutoffs for all searches
 				SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel =
@@ -220,13 +225,23 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 								.getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( eachSearchIdToProcess, unifiedReportedPeptideId );
 						//  Process each search id, reported peptide id pair
 						for ( int reportedPeptideId : reportedPeptideIdList ) {
+							
 							//  Process Each search id/reported peptide id for the link
+							
 							//  Get the PSMs for a Peptide/Search combination and output the records
 							List<PsmWebDisplayWebServiceResult> psms = 
 									PsmWebDisplaySearcher.getInstance().getPsmsWebDisplay( 
 											eachSearchIdToProcess, 
 											reportedPeptideId, 
 											searcherCutoffValuesSearchLevel);
+
+							psms = DownloadPSMs_Common.getInstance().filterPSMs( mergedPeptideQueryJSONRoot, search, psms );
+
+							if ( psms.isEmpty() ) {
+								//  No PSMs after filter so skip this reported peptide
+								continue;  //  EARLY CONINUE
+							}
+
 							for ( PsmWebDisplayWebServiceResult psmWebDisplay : psms ) {
 								writer.write( Integer.toString( eachSearchIdToProcess ) );
 								writer.write( "\t" );

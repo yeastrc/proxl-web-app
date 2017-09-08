@@ -38,11 +38,12 @@ import org.yeastrc.xlink.www.web_utils.SearchPeptideWebserviceCommonCode;
 import org.yeastrc.xlink.www.web_utils.SearchPeptideWebserviceCommonCode.SearchPeptideWebserviceCommonCodeGetDataResult;
 
 /**
+ * Webservice to display the Reported Peptides related to a PSM that is not unique (Other PSMs are related to the same scan) 
  * 
- *
- */
-/**
+ * Not updated with @QueryParam( "excludeLinksWith_Root" ) String excludeLinksWith_Root_JSONString,
+ * since not reachable when PSMs excluded for non-unique.
  * 
+ *  Also not apply other exclusions since they are not used when determining if PSMs are non-unique
  *
  */
 @Path("/reportedPeptidesRelatedToPSMService")

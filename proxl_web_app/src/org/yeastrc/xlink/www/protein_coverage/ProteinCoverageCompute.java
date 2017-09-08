@@ -19,6 +19,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinksWith_Param;
 import org.yeastrc.xlink.www.linked_positions.MonolinkLinkedPositions;
 import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping;
 import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
@@ -57,6 +58,7 @@ public class ProteinCoverageCompute {
 	private boolean filterOnlyOnePeptide = false;
 	private int[] excludedProteinSequenceIds;
 	private int[] excludedTaxonomyIds;
+	private LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param;
 	
 	/**
 	 * Get a list describing the coverage of each protein in the requested collection of searches, given the
@@ -99,7 +101,7 @@ public class ProteinCoverageCompute {
 				{
 					List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
 							CrosslinkLinkedPositions.getInstance()
-							.getSearchProteinCrosslinkWrapperList( search, searcherCutoffValuesSearchLevel );
+							.getSearchProteinCrosslinkWrapperList( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 					wrappedCrosslinks_MappedOnSearchId.put( search.getSearchId(), wrappedCrosslinks );
 					for ( SearchProteinCrosslinkWrapper wrappedCrosslink : wrappedCrosslinks ) {
 						SearchProteinCrosslink crosslink = wrappedCrosslink.getSearchProteinCrosslink();
@@ -110,7 +112,7 @@ public class ProteinCoverageCompute {
 				{
 					List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
 							LooplinkLinkedPositions.getInstance()
-							.getSearchProteinLooplinkWrapperList( search, searcherCutoffValuesSearchLevel );
+							.getSearchProteinLooplinkWrapperList( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 					wrappedLooplinks_MappedOnSearchId.put( search.getSearchId(), wrappedLooplinks );
 					for ( SearchProteinLooplinkWrapper wrappedLooplink : wrappedLooplinks ) {
 						SearchProteinLooplink looplink = wrappedLooplink.getSearchProteinLooplink();
@@ -120,7 +122,7 @@ public class ProteinCoverageCompute {
 				{
 					List<SearchProteinMonolinkWrapper> wrappedMonolinks = 
 							MonolinkLinkedPositions.getInstance()
-							.getSearchProteinMonolinkWrapperList( search, searcherCutoffValuesSearchLevel );
+							.getSearchProteinMonolinkWrapperList( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 					wrappedMonolinks_MappedOnSearchId.put( search.getSearchId(), wrappedMonolinks );
 					for ( SearchProteinMonolinkWrapper wrappedMonolink : wrappedMonolinks ) {
 						SearchProteinMonolink link = wrappedMonolink.getSearchProteinMonolink();
@@ -130,7 +132,7 @@ public class ProteinCoverageCompute {
 				{
 					UnlinkedDimerPeptideProteinMappingResult unlinkedDimerPeptideProteinMappingResult =
 							UnlinkedDimerPeptideProteinMapping.getInstance()
-							.getSearchProteinUnlinkedAndDimerWrapperLists( search, searcherCutoffValuesSearchLevel );
+							.getSearchProteinUnlinkedAndDimerWrapperLists( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 					List<SearchProteinDimerWrapper> wrappedDimerLinks = 
 							unlinkedDimerPeptideProteinMappingResult.getSearchProteinDimerWrapperList();
 					for ( SearchProteinDimerWrapper wrappedDimer : wrappedDimerLinks ) {
@@ -651,5 +653,14 @@ public class ProteinCoverageCompute {
 	}
 	public void setExcludedTaxonomyIds(int[] excludedTaxonomyIds) {
 		this.excludedTaxonomyIds = excludedTaxonomyIds;
+	}
+
+	public LinkedPositions_FilterExcludeLinksWith_Param getLinkedPositions_FilterExcludeLinksWith_Param() {
+		return linkedPositions_FilterExcludeLinksWith_Param;
+	}
+
+	public void setLinkedPositions_FilterExcludeLinksWith_Param(
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param) {
+		this.linkedPositions_FilterExcludeLinksWith_Param = linkedPositions_FilterExcludeLinksWith_Param;
 	}
 }

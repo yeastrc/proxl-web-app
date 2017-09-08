@@ -25,6 +25,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinksWith_Param;
 import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
 import org.yeastrc.xlink.www.linked_positions.MonolinkLinkedPositions;
 import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
@@ -48,8 +49,10 @@ import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
+import org.yeastrc.xlink.www.form_query_json_objects.ExcludeLinksWith_JSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
+import org.yeastrc.xlink.www.form_query_json_objects.Z_Deserialize_ExcludeLinksWith_JSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -79,6 +82,7 @@ public class ProteinsService {
 	public ProteinCommonForPerSearchIdsProteinIdsPositionsWebserviceResult getCrosslinkProteins( 
 			@QueryParam( "project_search_ids" ) List<Integer> projectSearchIdList,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
+			@QueryParam( "excludeLinksWith_Root" ) String excludeLinksWith_Root_JSONString,
 			@QueryParam( "protein_1_id" ) Integer protein1Id,
 			@QueryParam( "protein_2_id" ) Integer protein2Id,
 			@QueryParam( "protein_1_position" ) Integer protein1Position,
@@ -225,6 +229,18 @@ public class ProteinsService {
 			
 			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = getSearcherCutoffValuesRootLevel( psmPeptideCutoffsForProjectSearchIds_JSONString, searchIdsSet );
 
+			//  Exclude Links With User Selections:
+			ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot = null;
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = null;
+			if ( StringUtils.isNotEmpty( excludeLinksWith_Root_JSONString ) ) {
+				excludeLinksWith_JSONRoot = 
+						Z_Deserialize_ExcludeLinksWith_JSONRoot.getInstance()
+						.deserialize_JSON_ToExcludeLinksWith_JSONRoot( excludeLinksWith_Root_JSONString );
+				linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param( excludeLinksWith_JSONRoot );
+			} else {
+				linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param();
+			}
+			
 			for ( SearchDTO search : searchList ) {
 				int projectSearchId = search.getProjectSearchId();
 				int searchId = search.getSearchId();
@@ -249,14 +265,52 @@ public class ProteinsService {
 						.getSearchProteinCrosslinkWrapperForSearchCutoffsProtIdsPositions(
 								search, 
 								searcherCutoffValuesSearchLevel, 
+								linkedPositions_FilterExcludeLinksWith_Param,
 								ProteinSequenceObject_1,
 								ProteinSequenceObject_2,
 								protein1Position,
 								protein2Position
 								);
+				
 				if( searchProteinCrosslinkWrapper != null ) {
 					SearchProteinCrosslink searchProteinCrosslink = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
 					if( searchProteinCrosslink != null ) {
+						
+
+						//////////////////////////////////////////////////////////////////
+						//////////    Filter Links based on user request
+						// Filter out links if requested
+						if( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
+								|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+								|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() )
+								
+								//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
+						{
+							// did they request to removal of non unique peptides?
+							if( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides()  ) {
+								if( searchProteinCrosslink.getNumUniqueLinkedPeptides() < 1 ) {
+									//  Skip to next entry in list, dropping this entry from output list
+									continue;  // EARLY CONTINUE
+								}
+							}
+							// did they request to removal of links with only one PSM?
+							if( excludeLinksWith_JSONRoot.isFilterOnlyOnePSM()  ) {
+								int psmCountForSearchId = searchProteinCrosslink.getNumPsms();
+								if ( psmCountForSearchId <= 1 ) {
+									//  Skip to next entry in list, dropping this entry from output list
+									continue;  // EARLY CONTINUE
+								}
+							}
+							// did they request to removal of links with only one Reported Peptide?
+							if( excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() ) {
+								int peptideCountForSearchId = searchProteinCrosslink.getNumLinkedPeptides();
+								if ( peptideCountForSearchId <= 1 ) {
+									//  Skip to next entry in list, dropping this entry from output list
+									continue;  // EARLY CONTINUE
+								}
+							}		
+						}
+						
 						//  Create list of Best Peptide annotation names to display as column headers
 						List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
 								searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
@@ -335,6 +389,7 @@ public class ProteinsService {
 	public ProteinCommonForPerSearchIdsProteinIdsPositionsWebserviceResult getLooplinkProteins( 
 			@QueryParam( "project_search_ids" ) List<Integer> projectSearchIdList,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
+			@QueryParam( "excludeLinksWith_Root" ) String excludeLinksWith_Root_JSONString,
 			@QueryParam( "protein_id" ) Integer proteinId,
 			@QueryParam( "protein_position_1" ) Integer proteinPosition1,
 			@QueryParam( "protein_position_2" ) Integer proteinPosition2,
@@ -470,6 +525,18 @@ public class ProteinsService {
 			
 			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = getSearcherCutoffValuesRootLevel( psmPeptideCutoffsForProjectSearchIds_JSONString, searchIdsSet );
 
+			//  Exclude Links With User Selections:
+			ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot = null;
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = null;
+			if ( StringUtils.isNotEmpty( excludeLinksWith_Root_JSONString ) ) {
+				excludeLinksWith_JSONRoot = 
+						Z_Deserialize_ExcludeLinksWith_JSONRoot.getInstance()
+						.deserialize_JSON_ToExcludeLinksWith_JSONRoot( excludeLinksWith_Root_JSONString );
+				linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param( excludeLinksWith_JSONRoot );
+			} else {
+				linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param();
+			}
+						
 			for ( SearchDTO search : searchList ) {
 				int projectSearchId = search.getProjectSearchId();
 				int searchId = search.getSearchId();
@@ -492,6 +559,7 @@ public class ProteinsService {
 						.getSearchProteinLooplinkWrapperForSearchCutoffsProtIdsPositions(
 								search, 
 								searcherCutoffValuesSearchLevel, 
+								linkedPositions_FilterExcludeLinksWith_Param,
 								ProteinSequenceObject,
 								proteinPosition1,
 								proteinPosition2
@@ -499,6 +567,41 @@ public class ProteinsService {
 				if( searchProteinLooplinkWrapper != null ) {
 					SearchProteinLooplink searchProteinLooplink = searchProteinLooplinkWrapper.getSearchProteinLooplink();
 					if( searchProteinLooplink != null ) {
+
+						//////////////////////////////////////////////////////////////////
+						//////////    Filter Links based on user request
+						// Filter out links if requested
+						if( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
+								|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+								|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() )
+								
+								//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
+						{
+							// did they request to removal of non unique peptides?
+							if( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides()  ) {
+								if( searchProteinLooplink.getNumUniquePeptides() < 1 ) {
+									//  Skip to next entry in list, dropping this entry from output list
+									continue;  // EARLY CONTINUE
+								}
+							}
+							// did they request to removal of links with only one PSM?
+							if( excludeLinksWith_JSONRoot.isFilterOnlyOnePSM()  ) {
+								int psmCountForSearchId = searchProteinLooplink.getNumPsms();
+								if ( psmCountForSearchId <= 1 ) {
+									//  Skip to next entry in list, dropping this entry from output list
+									continue;  // EARLY CONTINUE
+								}
+							}
+							// did they request to removal of links with only one Reported Peptide?
+							if( excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() ) {
+								int peptideCountForSearchId = searchProteinLooplink.getNumPeptides();
+								if ( peptideCountForSearchId <= 1 ) {
+									//  Skip to next entry in list, dropping this entry from output list
+									continue;  // EARLY CONTINUE
+								}
+							}		
+						}
+						
 						//  Create list of Best Peptide annotation names to display as column headers
 						List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
 								searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
@@ -584,6 +687,7 @@ public class ProteinsService {
 	public ProteinCommonForPerSearchIdsProteinIdsPositionsWebserviceResult getMonolinkProteins( 
 			@QueryParam( "project_search_ids" ) List<Integer> projectSearchIdList,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
+			@QueryParam( "excludeLinksWith_Root" ) String excludeLinksWith_Root_JSONString,
 			@QueryParam( "protein_id" ) Integer proteinId,
 			@QueryParam( "protein_position" ) Integer proteinPosition,
 			@Context HttpServletRequest request )
@@ -717,6 +821,18 @@ public class ProteinsService {
 			});
 			
 			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = getSearcherCutoffValuesRootLevel( psmPeptideCutoffsForProjectSearchIds_JSONString, searchIdsSet );
+
+			//  Exclude Links With User Selections:
+			ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot = null;
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = null;
+			if ( StringUtils.isNotEmpty( excludeLinksWith_Root_JSONString ) ) {
+				excludeLinksWith_JSONRoot = 
+						Z_Deserialize_ExcludeLinksWith_JSONRoot.getInstance()
+						.deserialize_JSON_ToExcludeLinksWith_JSONRoot( excludeLinksWith_Root_JSONString );
+				linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param( excludeLinksWith_JSONRoot );
+			} else {
+				linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param();
+			}
 			
 			for ( SearchDTO search : searchList ) {
 				int projectSearchId = search.getProjectSearchId();
@@ -740,12 +856,48 @@ public class ProteinsService {
 						.getSearchProteinMonolinkWrapperForSearchCutoffsProtIdsPositions(
 								search, 
 								searcherCutoffValuesSearchLevel, 
+								linkedPositions_FilterExcludeLinksWith_Param,
 								ProteinSequenceObject,
 								proteinPosition
 								);
 				if( searchProteinMonolinkWrapper != null ) {
 					SearchProteinMonolink searchProteinMonolink = searchProteinMonolinkWrapper.getSearchProteinMonolink();
 					if( searchProteinMonolink != null ) {
+
+						//////////////////////////////////////////////////////////////////
+						//////////    Filter Links based on user request
+						// Filter out links if requested
+						if( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
+								|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+								|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() )
+								
+								//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
+						{
+							// did they request to removal of non unique peptides?
+							if( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides()  ) {
+								if( searchProteinMonolink.getNumUniquePeptides() < 1 ) {
+									//  Skip to next entry in list, dropping this entry from output list
+									continue;  // EARLY CONTINUE
+								}
+							}
+							// did they request to removal of links with only one PSM?
+							if( excludeLinksWith_JSONRoot.isFilterOnlyOnePSM()  ) {
+								int psmCountForSearchId = searchProteinMonolink.getNumPsms();
+								if ( psmCountForSearchId <= 1 ) {
+									//  Skip to next entry in list, dropping this entry from output list
+									continue;  // EARLY CONTINUE
+								}
+							}
+							// did they request to removal of links with only one Reported Peptide?
+							if( excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() ) {
+								int peptideCountForSearchId = searchProteinMonolink.getNumPeptides();
+								if ( peptideCountForSearchId <= 1 ) {
+									//  Skip to next entry in list, dropping this entry from output list
+									continue;  // EARLY CONTINUE
+								}
+							}		
+						}
+						
 						//  Create list of Best Peptide annotation names to display as column headers
 						List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
 								searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
@@ -826,6 +978,7 @@ public class ProteinsService {
 	public ProteinCommonForPerSearchIdsProteinIdsPositionsWebserviceResult getProteinsAllTypes( 
 			@QueryParam( "project_search_ids" ) List<Integer> projectSearchIdList,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
+			@QueryParam( "excludeLinksWith_Root" ) String excludeLinksWith_Root_JSONString,
 			@QueryParam( "protein_id" ) Integer proteinId,
 			@QueryParam( "link_type" ) List<String> linkTypesList,
 			@Context HttpServletRequest request )
@@ -977,6 +1130,16 @@ public class ProteinsService {
 			proteinQueryJSONRoot.setLinkTypes( linkTypes );
 			proteinQueryJSONRoot.setCutoffs( cutoffValuesRootLevel );
 
+			//  Exclude Links With User Selections:
+			ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot = null;
+			if ( StringUtils.isNotEmpty( excludeLinksWith_Root_JSONString ) ) {
+				excludeLinksWith_JSONRoot = 
+						Z_Deserialize_ExcludeLinksWith_JSONRoot.getInstance()
+						.deserialize_JSON_ToExcludeLinksWith_JSONRoot( excludeLinksWith_Root_JSONString );
+				
+				proteinQueryJSONRoot.setRemoveNonUniquePSMs( excludeLinksWith_JSONRoot.isRemoveNonUniquePSMs() );
+			}
+			
 			for ( SearchDTO search : searchList ) {
 				int projectSearchId = search.getProjectSearchId();
 				int searchId = search.getSearchId();
@@ -1015,6 +1178,41 @@ public class ProteinsService {
 				
 				if( ! proteinSingleEntryList.isEmpty() ) {
 					ProteinSingleEntry proteinSingleEntry = proteinSingleEntryList.get( 0 );
+
+					//////////////////////////////////////////////////////////////////
+					//////////    Filter Links based on user request
+					// Filter out links if requested
+					if( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
+							|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+							|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() )
+							
+							//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
+					{
+						// did they request to removal of non unique peptides?
+						if( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides()  ) {
+							if( proteinSingleEntry.getNumUniquePeptides() < 1 ) {
+								//  Skip to next entry in list, dropping this entry from output list
+								continue;  // EARLY CONTINUE
+							}
+						}
+						// did they request to removal of links with only one PSM?
+						if( excludeLinksWith_JSONRoot.isFilterOnlyOnePSM()  ) {
+							int psmCountForSearchId = proteinSingleEntry.getNumPsms();
+							if ( psmCountForSearchId <= 1 ) {
+								//  Skip to next entry in list, dropping this entry from output list
+								continue;  // EARLY CONTINUE
+							}
+						}
+						// did they request to removal of links with only one Reported Peptide?
+						if( excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() ) {
+							int peptideCountForSearchId = proteinSingleEntry.getNumPeptides();
+							if ( peptideCountForSearchId <= 1 ) {
+								//  Skip to next entry in list, dropping this entry from output list
+								continue;  // EARLY CONTINUE
+							}
+						}		
+					}
+					
 					//  Create list of Best Peptide annotation names to display as column headers
 					List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
 							searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
@@ -1060,6 +1258,7 @@ public class ProteinsService {
 				}
 			}
 			return webserviceResult;
+			
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( ProxlWebappDataException e ) {

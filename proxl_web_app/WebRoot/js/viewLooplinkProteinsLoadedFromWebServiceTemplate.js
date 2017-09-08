@@ -15,26 +15,16 @@ var ViewLooplinkProteinsLoadedFromWebServiceTemplate = function() {
 	var _handlebarsTemplate_looplink_protein_child_row_entry_template = null;
 	var _data_per_search_between_searches_html = null;
 	var _psmPeptideCutoffsRootObject = null;
-	//   Currently expect _psmPeptideCriteria = 
-//					searches: Object
-//						128: Object			
-//							peptideCutoffValues: Object
-//								238: Object
-//									id: 238
-//									value: "0.01"
-//							psmCutoffValues: Object
-//								384: Object
-//									id: 384
-//									value: "0.01"
-//							searchId: 128
-//           The key to:
-//				searches - searchId
-//				peptideCutoffValues and psmCutoffValues - annotation type id
-//			peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+	var _excludeLinksWith_Root = null;
 	
 	//////////////
 	this.setPsmPeptideCriteria = function( psmPeptideCutoffsRootObject ) {
 		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
+	};
+
+	//////////////
+	this.setExcludeLinksWith_Root = function( excludeLinksWith_Root ) {
+		_excludeLinksWith_Root = excludeLinksWith_Root;
 	};
 	
 	//////////////
@@ -99,22 +89,6 @@ var ViewLooplinkProteinsLoadedFromWebServiceTemplate = function() {
 		if ( project_search_ids.length === 0 ) {
 			throw Error( "No values found in attribute 'data-project_search_ids'." );
 		}
-		//   Currently expect _psmPeptideCutoffsRootObject = 
-//						searches: Object
-//							128: Object			
-//								peptideCutoffValues: Object
-//									238: Object
-//										id: 238
-//										value: "0.01"
-//								psmCutoffValues: Object
-//									384: Object
-//										id: 384
-//										value: "0.01"
-//								searchId: 128
-//	           The key to:
-//					searches - searchId
-//					peptideCutoffValues and psmCutoffValues - annotation type id
-//				peptideCutoffValues.id and psmCutoffValues.id - annotation type id
 		//   Copy the cutoffs for the search ids found on the element
 		var psmPeptideCriteriaSearches = _psmPeptideCutoffsRootObject.searches;
 		var cutoffsPerProjectSearchIds = {};
@@ -128,9 +102,16 @@ var ViewLooplinkProteinsLoadedFromWebServiceTemplate = function() {
 		}
 		var cutoffsForWebservice = { searches: cutoffsPerProjectSearchIds };
 		var psmPeptideCutoffsForProjectSearchIds_JSONString = JSON.stringify( cutoffsForWebservice );
+
+		var excludeLinksWith_Root_JSONString = undefined;
+		if ( _excludeLinksWith_Root ) {
+			excludeLinksWith_Root_JSONString = JSON.stringify( _excludeLinksWith_Root );
+		}
+		
 		var ajaxRequestData = {
 				project_search_ids : project_search_ids,
 				psmPeptideCutoffsForProjectSearchIds : psmPeptideCutoffsForProjectSearchIds_JSONString,
+				excludeLinksWith_Root : excludeLinksWith_Root_JSONString,
 				protein_id : protein_id,
 				protein_position_1 : protein_position_1,
 				protein_position_2 : protein_position_2,

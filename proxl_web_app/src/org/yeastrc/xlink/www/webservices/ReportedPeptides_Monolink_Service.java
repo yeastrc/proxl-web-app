@@ -1,4 +1,5 @@
 package org.yeastrc.xlink.www.webservices;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,7 +30,9 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.form_query_json_objects.ExcludeLinksWith_JSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
+import org.yeastrc.xlink.www.form_query_json_objects.Z_Deserialize_ExcludeLinksWith_JSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_PerSearchResult;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -63,6 +66,7 @@ public class ReportedPeptides_Monolink_Service {
 			@QueryParam( "project_search_id" ) Integer projectSearchId,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchId" ) String psmPeptideCutoffsForProjectSearchId_JSONString,
 			@QueryParam( "peptideAnnTypeDisplayPerSearch" ) String annTypeIdDisplayJSON_PerSearch_JSONString,
+			@QueryParam( "excludeLinksWith_Root" ) String excludeLinksWith_Root_JSONString,
 			@QueryParam( "protein_id" ) Integer proteinId,
 			@QueryParam( "protein_position" ) Integer proteinPosition,
 			@Context HttpServletRequest request )
@@ -190,6 +194,14 @@ public class ReportedPeptides_Monolink_Service {
 						DeserializeAnnTypeIdDisplayJSON_PerSearch.getInstance()
 						.deserializeAnnTypeIdDisplayJSON_PerSearch( annTypeIdDisplayJSON_PerSearch_JSONString );
 			}
+
+			//  Exclude Links With User Selections:
+			ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot = null;
+			if ( StringUtils.isNotEmpty( excludeLinksWith_Root_JSONString ) ) {
+				excludeLinksWith_JSONRoot = 
+						Z_Deserialize_ExcludeLinksWith_JSONRoot.getInstance()
+						.deserialize_JSON_ToExcludeLinksWith_JSONRoot( excludeLinksWith_Root_JSONString );
+			}
 			
 			//  Get Peptide data
 			List<SearchPeptideMonolinkAnnDataWrapper> searchPeptideMonolinkList = 
@@ -206,7 +218,8 @@ public class ReportedPeptides_Monolink_Service {
 							searchId, 
 							cutoffValuesSearchLevel,
 							searcherCutoffValuesSearchLevel,
-							annTypeIdDisplayJSON_PerSearch
+							annTypeIdDisplayJSON_PerSearch,
+							excludeLinksWith_JSONRoot
 							 );
 			
 			return getMonolinkReportedPeptidesServiceResult;
@@ -246,12 +259,34 @@ public class ReportedPeptides_Monolink_Service {
 			int searchId,
 			CutoffValuesSearchLevel cutoffValuesSearchLevel,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
-			AnnTypeIdDisplayJSON_PerSearch annTypeIdDisplayJSON_PerSearch
+			AnnTypeIdDisplayJSON_PerSearch annTypeIdDisplayJSON_PerSearch,
+			ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot
 			) throws Exception {
 		
 		List<Integer> peptideDisplayAnnTypeIdList = null;
 		if ( annTypeIdDisplayJSON_PerSearch != null ) {
 			peptideDisplayAnnTypeIdList = annTypeIdDisplayJSON_PerSearch.getPeptide();
+		}
+
+		if ( excludeLinksWith_JSONRoot != null && excludeLinksWith_JSONRoot.isRemoveNonUniquePSMs() ) {
+			
+			// Update to Remove non-unique PSMs from PSM counts and any Reported Peptides with zero PSMs after updating PSM count 
+			
+			List<SearchPeptideMonolinkAnnDataWrapper> searchPeptideMonolinkWrappedList_Filtered = new ArrayList<>( searchPeptideMonolinkWrappedList.size() ); 
+			
+			for ( SearchPeptideMonolinkAnnDataWrapper searchPeptideMonolinkWrapped : searchPeptideMonolinkWrappedList ) {
+				SearchPeptideMonolink searchPeptideMonolink = searchPeptideMonolinkWrapped.getSearchPeptideMonolink();
+				//  Update webReportedPeptide object to remove non-unique PSMs
+				searchPeptideMonolink.updateNumPsmsToNotInclude_NonUniquePSMs();
+				if ( searchPeptideMonolink.getNumPsms() <= 0 ) {
+					// The number of PSMs after update is now zero
+					//  Skip to next entry in list, dropping this entry from output list
+					continue;  // EARLY CONTINUE
+				}
+				searchPeptideMonolinkWrappedList_Filtered.add( searchPeptideMonolinkWrapped );
+			}
+			searchPeptideMonolinkWrappedList = searchPeptideMonolinkWrappedList_Filtered;
+			
 		}
 		
 		//  Get Annotation Data for links and Sort Links

@@ -22,22 +22,52 @@ public class WebReportedPeptide implements SearchPeptideCommonLinkWebserviceResu
 
 	private static final Logger log = Logger.getLogger(WebReportedPeptide.class);
 
+	/**
+	 * Called to update numPsms to remove the number of non-unique PSMs.
+	 * @throws Exception 
+	 */
+	public void updateNumPsmsToNotInclude_NonUniquePSMs() throws Exception {
+		if ( updateNumPsmsToNotInclude_NonUniquePSMs_Called ) {
+			//  already called
+			return;  //  EARLY EXIT
+//			throw new IllegalStateException( "updateNumPsmsToNotInclude_NonUniquePSMs(...) cannot be called more than once" );
+		}
+		updateNumPsmsToNotInclude_NonUniquePSMs_Called = true;
+		SearchDTO search = getSearch();
+		if ( search.isHasScanData() ) {
+			//  Only update if search has scan data
+			int numPsms = getNumPsms();
+			int numNonUniquePsms= getNumNonUniquePsms();
+			this.numPsms = numPsms - numNonUniquePsms;
+		}
+	}
+
+	/**
+	 * Do not allow calling updateNumPsmsToNotInclude_NonUniquePSMs() more than once
+	 */
+	private boolean updateNumPsmsToNotInclude_NonUniquePSMs_Called;
+	
 
 
-
+	/**
+	 * @param numPsms
+	 */
 	public void setNumPsms(int numPsms) {
+		if ( numPsmsSet ) {
+			throw new IllegalStateException( "setNumPsms(...) cannot be called more than once" );
+		}
 		this.numPsms = numPsms;
 		numPsmsSet = true;
 	}
 
 
+	/**
+	 * @return
+	 * @throws Exception
+	 */
 	public int getNumPsms() throws Exception {
-
-
 		try {
-
 			if ( numPsmsSet ) {
-
 				return numPsms;
 			}
 
@@ -60,6 +90,10 @@ public class WebReportedPeptide implements SearchPeptideCommonLinkWebserviceResu
 	}
 
 
+	/**
+	 * @return
+	 * @throws Exception
+	 */
 	public int getNumNonUniquePsms() throws Exception {
 		try {
 			int numPsms = this.getNumPsms();
@@ -405,20 +439,16 @@ public class WebReportedPeptide implements SearchPeptideCommonLinkWebserviceResu
 		}
 	}
 
-
-
 	public void setSearch(SearchDTO search) {
+		if ( search != null )  {
+			this.searchId = search.getSearchId();
+		}
 		this.search = search;
 	}
 
 	public SearchDTO getSearch() {
-
 		return this.search;
-
 	}
-
-
-
 
 	public SearchPeptideDimer getSearchPeptideDimer() {
 		return searchPeptideDimer;

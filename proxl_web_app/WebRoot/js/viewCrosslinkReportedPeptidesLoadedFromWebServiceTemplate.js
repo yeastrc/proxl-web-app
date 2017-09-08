@@ -16,26 +16,10 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 	var _handlebarsTemplate_crosslink_peptide_data_row_entry_template = null;
 	var _handlebarsTemplate_crosslink_peptide_child_row_entry_template = null;
 
+	var _excludeLinksWith_Root = null;
 	var _psmPeptideAnnTypeIdDisplay = null;
 	var _psmPeptideCutoffsRootObject = null;
-	
-	//   Currently expect _psmPeptideCriteria = 
-//					searches: Object
-//						128: Object			
-//							peptideCutoffValues: Object
-//								238: Object
-//									id: 238
-//									value: "0.01"
-//							psmCutoffValues: Object
-//								384: Object
-//									id: 384
-//									value: "0.01"
-//							searchId: 128
-//           The key to:
-//				searches - searchId
-//				peptideCutoffValues and psmCutoffValues - annotation type id
-//			peptideCutoffValues.id and psmCutoffValues.id - annotation type id
-	
+
 	//////////////
 	this.setPsmPeptideCriteria = function( psmPeptideCutoffsRootObject ) {
 		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
@@ -44,6 +28,11 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 	//////////////
 	this.setPsmPeptideAnnTypeIdDisplay = function( psmPeptideAnnTypeIdDisplay ) {
 		_psmPeptideAnnTypeIdDisplay = psmPeptideAnnTypeIdDisplay;
+	};
+
+	//////////////
+	this.setExcludeLinksWith_Root = function( excludeLinksWith_Root ) {
+		_excludeLinksWith_Root = excludeLinksWith_Root;
 	};
 
 	// ////////////
@@ -125,22 +114,7 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		if ( ! protein_2_position ) {
 			protein_2_position = "";
 		}
-		//   Currently expect _psmPeptideCriteria = 
-//						searches: Object
-//							128: Object			
-//								peptideCutoffValues: Object
-//									238: Object
-//										id: 238
-//										value: "0.01"
-//								psmCutoffValues: Object
-//									384: Object
-//										id: 384
-//										value: "0.01"
-//								searchId: 128
-//	           The key to:
-//					searches - searchId
-//					peptideCutoffValues and psmCutoffValues - annotation type id
-//				peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+		
 		if ( _psmPeptideCutoffsRootObject === null || _psmPeptideCutoffsRootObject === undefined ) {
 			throw Error( "_psmPeptideCutoffsRootObject not initialized" );
 		} 
@@ -161,6 +135,11 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			psmPeptideAnnTypeDisplayPerProjectSearchId_JSONString = JSON.stringify( psmPeptideAnnTypeIdDisplayForProjectSearchId );
 		}
 
+		var excludeLinksWith_Root_JSONString = undefined;
+		if ( _excludeLinksWith_Root ) {
+			excludeLinksWith_Root_JSONString = JSON.stringify( _excludeLinksWith_Root );
+		}
+		
 		var ajaxRequestData = {
 				project_search_id : project_search_id,
 				protein_1_id : protein_1_id,
@@ -168,7 +147,8 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 				protein_1_position : protein_1_position,
 				protein_2_position : protein_2_position,
 				psmPeptideCutoffsForProjectSearchId : psmPeptideCutoffsForProjectSearchId_JSONString,
-				peptideAnnTypeDisplayPerSearch : psmPeptideAnnTypeDisplayPerProjectSearchId_JSONString
+				peptideAnnTypeDisplayPerSearch : psmPeptideAnnTypeDisplayPerProjectSearchId_JSONString,
+				excludeLinksWith_Root : excludeLinksWith_Root_JSONString
 		};
 		$.ajax({
 			url : contextPathJSVar + "/services/data/getCrosslinkReportedPeptides",
@@ -246,7 +226,7 @@ var ViewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			}
 			_handlebarsTemplate_crosslink_peptide_child_row_entry_template = Handlebars.compile( handlebarsSource_crosslink_peptide_child_row_entry_template );
 		}
-		//  Search for NumberUniquePSMs being set in any row
+		//  Search for NumberNonUniquePSMs being set in any row
 		var showNumberNonUniquePSMs = false;
 		for ( var crosslink_peptideIndex = 0; crosslink_peptideIndex < crosslink_peptides.length ; crosslink_peptideIndex++ ) {
 			var crosslink_peptide = crosslink_peptides[ crosslink_peptideIndex ];

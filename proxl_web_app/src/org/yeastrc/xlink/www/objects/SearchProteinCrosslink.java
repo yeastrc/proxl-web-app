@@ -52,81 +52,60 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 	 * @throws Exception
 	 */
 	public int getNumPsms() throws Exception {
-
 		try {
 			if( this.numPsms == null ) {
-								
 				throw new ProxlWebappInternalErrorException( "numPsms is not populated" );
 			}
-
 			return this.numPsms;
-
 		} catch ( Exception e ) {
-
 			String msg = "Exception in getNumPsms()";
-
 			log.error( msg, e );
-
 			throw e;
 		}
 	}
 	
 	public int getNumLinkedPeptides() throws Exception {
-
 		try {
 			if( this.numLinkedPeptides == -1 ) {
-				
 				if ( this.associatedReportedPeptideIds != null ) {
-					
 					this.numLinkedPeptides = this.associatedReportedPeptideIds.size();
-				
 				} else {
 					throw new ProxlWebappInternalErrorException( "numLinkedPeptides is not populated" );
 				}
-				
 			}
-
 			return this.numLinkedPeptides;
-
 		} catch ( Exception e ) {
-
 			String msg = "Exception in getNumLinkedPeptides()";
-
 			log.error( msg, e );
-
 			throw e;
 		}
 	}
 	
-	
 	public int getNumUniqueLinkedPeptides() throws Exception {
-
 		try {
 			if( this.numUniqueLinkedPeptides == -1 ) {
-
 				if ( this.associatedReportedPeptideIdsRelatedPeptidesUnique != null ) {
-					
 					this.numUniqueLinkedPeptides = this.associatedReportedPeptideIdsRelatedPeptidesUnique.size();
-				
 				} else {
-
 					throw new ProxlWebappInternalErrorException( "numUniqueLinkedPeptides is not populated" );
 				}
 			}
-
 			return this.numUniqueLinkedPeptides;
-
 		} catch ( Exception e ) {
-
 			String msg = "Exception in getNumUniqueLinkedPeptides()";
-
 			log.error( msg, e );
-
 			throw e;
 		}
 	}
 	
-	
+
+	public boolean isRemoveNonUniquePSMsAppliedTo_numPsms() {
+		return removeNonUniquePSMsAppliedTo_numPsms;
+	}
+	public void setRemoveNonUniquePSMsAppliedTo_numPsms(boolean removeNonUniquePSMsAppliedTo_numPsms) {
+		this.removeNonUniquePSMsAppliedTo_numPsms = removeNonUniquePSMsAppliedTo_numPsms;
+	}
+
 	
 	/**
 	 * Only set if the PSM and Peptide Cutoffs match the defaults
@@ -136,7 +115,7 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 	
 		this.numPsms = numPsms;
 	}
-	
+		
 	/**
 	 * Only set if the PSM and Peptide Cutoffs match the defaults
 	 * @param numLinkedPeptides
@@ -291,6 +270,7 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 
 
 	private Integer numPsms;
+	private boolean removeNonUniquePSMsAppliedTo_numPsms;
 
 	private int numLinkedPeptides = -1;
 	
@@ -315,5 +295,6 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 	 * Used for display on web page
 	 */
 	private List<String> peptideAnnotationValueList;
+
 
 }

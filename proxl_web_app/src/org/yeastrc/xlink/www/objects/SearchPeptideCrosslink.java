@@ -1,26 +1,22 @@
 package org.yeastrc.xlink.www.objects;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
-import org.yeastrc.xlink.base_searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
-import org.yeastrc.xlink.base_searcher.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
 import org.yeastrc.xlink.dto.PeptideDTO;
-import org.yeastrc.xlink.dto.ReportedPeptideDTO;
-import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
-import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.searcher.SearchPsmSearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.SearchCrosslinkProteinsFromPeptide;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ReportedPeptideDTO;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
 
-public class SearchPeptideCrosslink {
+/**
+ * Crosslink Reported Peptides retrieved when expanding a Protein entry
+ *
+ */
+public class SearchPeptideCrosslink extends SearchPeptide_BaseCommon {
 
 	private static final Logger log = Logger.getLogger(SearchPeptideCrosslink.class);
 	
@@ -84,43 +80,7 @@ public class SearchPeptideCrosslink {
 			throw e;
 		}
 	}
-//	@JsonIgnore // Don't serialize to JSON
-//	public SearchDTO getSearch() {
-//		return search;
-//	}
-	public void setSearch(SearchDTO search) {
-		if ( search == null ) {
-			throw new InvalidParameterException( "search cannot be assigned to null");
-		}
-		this.search = search;
-	}
-	public int getSearchId() {
-		return search.getSearchId();
-	}
-	public int getReportedPeptideId() {
-		return reportedPeptideId;
-	}
-	public void setReportedPeptideId(int reportedPeptideId) {
-		this.reportedPeptideId = reportedPeptideId;
-	}
-	public ReportedPeptideDTO getReportedPeptide() throws Exception {
-		try {
-			if ( reportedPeptide == null ) {
-				reportedPeptide = 
-						Cached_ReportedPeptideDTO.getInstance().getReportedPeptideDTO( reportedPeptideId );
-			}
-			return reportedPeptide;
-		} catch ( Exception e ) {
-			log.error( "getReportedPeptide() Exception: " + e.toString(), e );
-			throw e;
-		}
-	}
-	public void setReportedPeptide(ReportedPeptideDTO reportedPeptide) {
-		this.reportedPeptide = reportedPeptide;
-		if ( reportedPeptide != null ) {
-			this.reportedPeptideId = reportedPeptide.getId();
-		}
-	}
+
 	public PeptideDTO getPeptide1() throws Exception {
 		try {
 			if( this.peptide1 == null )
@@ -186,7 +146,7 @@ public class SearchPeptideCrosslink {
 				populatePeptides();
 				this.peptide1ProteinPositions = 
 						SearchCrosslinkProteinsFromPeptide.getInstance()
-						.getProteinPositions( search, this.getReportedPeptideId(), this.getPeptide1().getId(), this.getPeptide1Position() );
+						.getProteinPositions( this.getSearch(), this.getReportedPeptideId(), this.getPeptide1().getId(), this.getPeptide1Position() );
 			}
 			return peptide1ProteinPositions;
 		} catch ( Exception e ) {
@@ -214,7 +174,7 @@ public class SearchPeptideCrosslink {
 				populatePeptides();
 				this.peptide2ProteinPositions = 
 						SearchCrosslinkProteinsFromPeptide.getInstance()
-						.getProteinPositions( search, this.getReportedPeptideId(), this.getPeptide2().getId(), this.getPeptide2Position() );
+						.getProteinPositions( this.getSearch(), this.getReportedPeptideId(), this.getPeptide2().getId(), this.getPeptide2Position() );
 			}
 			return peptide2ProteinPositions;
 		} catch ( Exception e ) {
@@ -227,102 +187,13 @@ public class SearchPeptideCrosslink {
 			List<SearchProteinPosition> peptide2ProteinPositions) {
 		this.peptide2ProteinPositions = peptide2ProteinPositions;
 	}
-	public void setNumUniquePsms(int numUniquePsms) {
-		this.numUniquePsms = numUniquePsms;
-		numUniquePsmsSet = true;
-	}
-	/**
-	 * @return null when no scan data for search
-	 * @throws Exception
-	 */
-	public Integer getNumUniquePsms() throws Exception {
-		try {
-			if ( numUniquePsmsSet ) {
-				return numUniquePsms;
-			}
-			if ( ! this.search.isHasScanData() ) {
-				numUniquePsms = null;
-				numUniquePsmsSet = true;
-				return numUniquePsms;
-			}
-			numUniquePsms = 
-					PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher.getInstance()
-					.getPsmCountForUniquePSM_SearchIdReportedPeptideId( this.getReportedPeptideId(), this.search.getSearchId(), searcherCutoffValuesSearchLevel );
-			numUniquePsmsSet = true;
-			return numUniquePsms;
-		} catch ( Exception e ) {
-			log.error( "getNumUniquePsms() Exception: " + e.toString(), e );
-			throw e;
-		}
-	}
-	public int getNumPsms() throws Exception {
-		if ( numPsmsSet ) {
-			return numPsms;
-		}
-		//		num psms is always based on searching psm table for: search id, reported peptide id, and psm cutoff values.
-		numPsms = 
-				PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
-				.getPsmCountForSearchIdReportedPeptideId( this.reportedPeptideId, search.getSearchId(), searcherCutoffValuesSearchLevel );
-		numPsmsSet = true;
-		return numPsms;
-	}
-	public void setNumPsms(int numPsms) {
-		this.numPsms = numPsms;
-		numPsmsSet = true;
-	}
-	public SearcherCutoffValuesSearchLevel getSearcherCutoffValuesSearchLevel() {
-		return searcherCutoffValuesSearchLevel;
-	}
-	public void setSearcherCutoffValuesSearchLevel(
-			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel) {
-		this.searcherCutoffValuesSearchLevel = searcherCutoffValuesSearchLevel;
-	}
-	public List<String> getPsmAnnotationValueList() {
-		return psmAnnotationValueList;
-	}
-	public void setPsmAnnotationValueList(List<String> psmAnnotationValueList) {
-		this.psmAnnotationValueList = psmAnnotationValueList;
-	}
-	public List<String> getPeptideAnnotationValueList() {
-		return peptideAnnotationValueList;
-	}
-	public void setPeptideAnnotationValueList(
-			List<String> peptideAnnotationValueList) {
-		this.peptideAnnotationValueList = peptideAnnotationValueList;
-	}
-	/**
-	 * @return the psmId for a random psm record associated with this Peptide, null if none found
-	 * @throws Exception
-	 */
-	public Integer getSinglePsmId() throws Exception {
-		Integer psmId = SearchPsmSearcher.getInstance().getSinglePsmId( this.getSearchId(), this.getReportedPeptideId() );
-		return psmId;
-	}
 	
-	private int reportedPeptideId = -999;
-	private ReportedPeptideDTO reportedPeptide;
 	private boolean populatePeptidesCalled = false;
 	private PeptideDTO peptide1;
 	private PeptideDTO peptide2;
 	private int peptide1Position = -1;
 	private int peptide2Position = -1;
-	private SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel;
-	private SearchDTO search;
+
 	private List<SearchProteinPosition> peptide1ProteinPositions;
 	private List<SearchProteinPosition> peptide2ProteinPositions;
-	private int numPsms;
-	/**
-	 * true when SetNumPsms has been called
-	 */
-	private boolean numPsmsSet;
-	private Integer numUniquePsms;
-	private boolean numUniquePsmsSet;
-	/**
-	 * Used for display on web page
-	 */
-	private List<String> psmAnnotationValueList;
-	/**
-	 * Used for display on web page
-	 */
-	private List<String> peptideAnnotationValueList;
 }

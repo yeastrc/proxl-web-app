@@ -168,18 +168,8 @@
 				<tr>
 					<td>Exclude links with:</td>
 					<td>
-						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterNonUniquePeptides" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" > 					
-						 	 no unique peptides
-						 </span></label>
-						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterOnlyOnePSM"  onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" > 					
-						 	 only one PSM
-						 </span></label>
-						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterOnlyOnePeptide"  onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" > 					
-						 	 only one peptide
-						 </span></label>
+						 <%--  Checkboxes --%>
+						<%@ include file="/WEB-INF/jsp-includes/excludeLinksWith_Checkboxes_ProteinPages_Fragment.jsp" %>
 					</td>
 				</tr>
 

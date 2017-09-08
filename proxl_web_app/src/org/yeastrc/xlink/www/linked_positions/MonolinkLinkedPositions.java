@@ -60,7 +60,10 @@ public class MonolinkLinkedPositions {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<SearchProteinMonolinkWrapper> getSearchProteinMonolinkWrapperList( SearchDTO search, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
+	public List<SearchProteinMonolinkWrapper> getSearchProteinMonolinkWrapperList( 
+			SearchDTO search, 
+			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param ) throws Exception {
 		
 		int searchId = search.getSearchId();
 		String[] linkTypesAll = null; //  Get All Link Types
@@ -128,6 +131,7 @@ public class MonolinkLinkedPositions {
 						populateSearchProteinMonolinkWrapper(
 								search, 
 								searcherCutoffValuesSearchLevel,
+								linkedPositions_FilterExcludeLinksWith_Param,
 								proteinId, 
 								proteinPosition,  
 								searchProtein_KeyOn_PROT_SEQ_ID_Map,
@@ -153,6 +157,7 @@ public class MonolinkLinkedPositions {
 	public SearchProteinMonolinkWrapper getSearchProteinMonolinkWrapperForSearchCutoffsProtIdsPositions( 
 			SearchDTO search, 
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel, 
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param,
 			ProteinSequenceObject protein, 
 			int position ) throws Exception {
 		
@@ -171,6 +176,7 @@ public class MonolinkLinkedPositions {
 			webReportedPeptide.setSearch( search );
 			webReportedPeptide.setSearchId( search.getSearchId() );
 			webReportedPeptide.setReportedPeptideId( searchPeptideMonolink.getReportedPeptideId() );
+			webReportedPeptide.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 			webReportedPeptide.setNumPsms( searchPeptideMonolink.getNumPsms() );
 			webReportedPeptide.setSearchPeptideMonolink( searchPeptideMonolink );
 			WebReportedPeptideWrapper wrappedPeptidelink = new WebReportedPeptideWrapper();
@@ -183,6 +189,7 @@ public class MonolinkLinkedPositions {
 				populateSearchProteinMonolinkWrapper(
 						search, 
 						searcherCutoffValuesSearchLevel, 
+						linkedPositions_FilterExcludeLinksWith_Param,
 						protein.getProteinSequenceId(), 
 						position, 
 						searchProtein_KeyOn_PROT_SEQ_ID_Map, 
@@ -204,6 +211,7 @@ public class MonolinkLinkedPositions {
 	private SearchProteinMonolinkWrapper populateSearchProteinMonolinkWrapper(
 			SearchDTO search,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param,
 			Integer proteinId, 
 			Integer proteinPosition,
 			Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map,
@@ -220,6 +228,18 @@ public class MonolinkLinkedPositions {
 		for ( WebReportedPeptideWrapper webReportedPeptideWrapper : webReportedPeptideWrapperList ) {
 			WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
 			Integer reportedPeptideId = webReportedPeptide.getReportedPeptideId();
+
+			// did the user request to removal of links with only Non-Unique PSMs?
+			if( linkedPositions_FilterExcludeLinksWith_Param.isRemoveNonUniquePSMs()  ) {
+				//  Update webReportedPeptide object to remove non-unique PSMs
+				webReportedPeptide.updateNumPsmsToNotInclude_NonUniquePSMs();
+				if ( webReportedPeptide.getNumPsms() <= 0 ) {
+					// The number of PSMs after update is now zero
+					//  Skip to next entry in list, dropping this entry from output list
+					continue;  // EARLY CONTINUE
+				}
+			}
+			
 			numLinkedPeptides++;
 			reportedPeptideIds.add( reportedPeptideId );
 			Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request =

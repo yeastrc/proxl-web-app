@@ -79,7 +79,10 @@ public class UnlinkedDimerPeptideProteinMapping {
 	 * @return
 	 * @throws Exception
 	 */
-	public UnlinkedDimerPeptideProteinMappingResult getSearchProteinUnlinkedAndDimerWrapperLists( SearchDTO search, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
+	public UnlinkedDimerPeptideProteinMappingResult getSearchProteinUnlinkedAndDimerWrapperLists( 
+			SearchDTO search, 
+			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param ) throws Exception {
 		
 		int searchId = search.getSearchId();
 		String[] linkTypesUnlinkedDimer = { PeptideViewLinkTypesConstants.UNLINKED_PSM }; // Get Unlinked and Dimer records
@@ -130,12 +133,14 @@ public class UnlinkedDimerPeptideProteinMapping {
 		List<SearchProteinDimerWrapper> searchProteinDimerWrapperList = getSearchProteinDimerWrapperList(
 				search,
 				searcherCutoffValuesSearchLevel,
+				linkedPositions_FilterExcludeLinksWith_Param,
 				dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2,
 				searchProtein_KeyOn_PROT_SEQ_ID_Map );
 		List<SearchProteinUnlinkedWrapper> searchProteinUnlinkedWrapperList = 
 				getSearchProteinUnlinkedWrapperList( 
 						search, 
 						searcherCutoffValuesSearchLevel, 
+						linkedPositions_FilterExcludeLinksWith_Param,
 						unlinked__repPept_Stage_1_Wrapper_MappedProt, 
 						searchProtein_KeyOn_PROT_SEQ_ID_Map );
 		UnlinkedDimerPeptideProteinMappingResult unlinkedDimerPeptideProteinMappingResult = new UnlinkedDimerPeptideProteinMappingResult();
@@ -155,6 +160,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 	private List<SearchProteinDimerWrapper> getSearchProteinDimerWrapperList(
 			SearchDTO search,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param,
 			Map<Integer, Map<Integer, RepPept_Stage_1_Wrapper>> dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2,
 			Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map)
 			throws Exception {
@@ -179,6 +185,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 						populateSearchProteinDimerWrapper(
 								search, 
 								searcherCutoffValuesSearchLevel,
+								linkedPositions_FilterExcludeLinksWith_Param,
 								proteinId_1, 
 								proteinId_2,
 								searchProtein_KeyOn_PROT_SEQ_ID_Map,
@@ -204,6 +211,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 	private List<SearchProteinUnlinkedWrapper> getSearchProteinUnlinkedWrapperList(
 			SearchDTO search,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param,
 			Map<Integer, RepPept_Stage_1_Wrapper> unlinked__repPept_Stage_1_Wrapper_MappedProt,
 			Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map)
 			throws Exception {
@@ -223,6 +231,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 					populateSearchProteinUnlinkedWrapper(
 							search, 
 							searcherCutoffValuesSearchLevel,
+							linkedPositions_FilterExcludeLinksWith_Param,
 							proteinId, 
 							searchProtein_KeyOn_PROT_SEQ_ID_Map,
 							repPept_Stage_1_Wrapper );
@@ -374,6 +383,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 	private SearchProteinDimerWrapper populateSearchProteinDimerWrapper(
 			SearchDTO search,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param,
 			Integer proteinId_1, 
 			Integer proteinId_2, 
 			Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map,
@@ -387,6 +397,18 @@ public class UnlinkedDimerPeptideProteinMapping {
 		for ( WebReportedPeptideWrapper webReportedPeptideWrapper : webReportedPeptideWrapperList ) {
 			WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
 			Integer reportedPeptideId = webReportedPeptide.getReportedPeptideId();
+
+			// did the user request to removal of links with only Non-Unique PSMs?
+			if( linkedPositions_FilterExcludeLinksWith_Param.isRemoveNonUniquePSMs()  ) {
+				//  Update webReportedPeptide object to remove non-unique PSMs
+				webReportedPeptide.updateNumPsmsToNotInclude_NonUniquePSMs();
+				if ( webReportedPeptide.getNumPsms() <= 0 ) {
+					// The number of PSMs after update is now zero
+					//  Skip to next entry in list, dropping this entry from output list
+					continue;  // EARLY CONTINUE
+				}
+			}
+			
 			reportedPeptideIds.add( reportedPeptideId );
 			numPsms += webReportedPeptide.getNumPsms();
 			updateBestAnnotationValues( 
@@ -444,6 +466,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 	private SearchProteinUnlinkedWrapper populateSearchProteinUnlinkedWrapper(
 			SearchDTO search,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param,
 			Integer proteinId,  
 			Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map,
 			RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper) throws Exception {
@@ -456,6 +479,18 @@ public class UnlinkedDimerPeptideProteinMapping {
 		for ( WebReportedPeptideWrapper webReportedPeptideWrapper : webReportedPeptideWrapperList ) {
 			WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
 			Integer reportedPeptideId = webReportedPeptide.getReportedPeptideId();
+
+			// did the user request to removal of links with only Non-Unique PSMs?
+			if( linkedPositions_FilterExcludeLinksWith_Param.isRemoveNonUniquePSMs()  ) {
+				//  Update webReportedPeptide object to remove non-unique PSMs
+				webReportedPeptide.updateNumPsmsToNotInclude_NonUniquePSMs();
+				if ( webReportedPeptide.getNumPsms() <= 0 ) {
+					// The number of PSMs after update is now zero
+					//  Skip to next entry in list, dropping this entry from output list
+					continue;  // EARLY CONTINUE
+				}
+			}
+			
 			reportedPeptideIds.add( reportedPeptideId );
 			numPsms += webReportedPeptide.getNumPsms();
 			updateBestAnnotationValues( 

@@ -1,4 +1,5 @@
 package org.yeastrc.xlink.www.webservices;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,7 +30,6 @@ import org.yeastrc.xlink.www.objects.AnnotationTypeDTOListForSearchId;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.PsmsServiceResult;
-import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmAnnotationDataSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
@@ -44,12 +44,16 @@ import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataDefaultDisplayInDisplayOrder;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeDataInSortOrder;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
+import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.form_query_json_objects.ExcludeLinksWith_JSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_PerSearchResult;
+import org.yeastrc.xlink.www.form_query_json_objects.Z_Deserialize_ExcludeLinksWith_JSONRoot;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.DeserializeCutoffForWebservices;
@@ -67,6 +71,7 @@ public class PsmsService {
 										  @QueryParam( "reported_peptide_id" ) Integer reportedPeptideId,
 										  @QueryParam( "psmPeptideCutoffsForProjectSearchId" ) String psmPeptideCutoffsForProjectSearchId_JSONString,
 										  @QueryParam( "psmAnnTypeDisplayIncludeExclude" ) String psmAnnTypeDisplayIncludeExclude_JSONString,
+										  @QueryParam( "excludeLinksWith_Root" ) String excludeLinksWith_Root_JSONString,
 										  @Context HttpServletRequest request )
 	throws Exception {
 	
@@ -149,12 +154,11 @@ public class PsmsService {
 			
 			////////   Auth complete
 			//////////////////////////////////////////
-
-			Integer searchId =
-					MapProjectSearchIdToSearchId.getInstance().getSearchIdFromProjectSearchId( projectSearchId );
 			
-			if ( searchId == null ) {
-				String msg = ": No searchId found for projectSearchId: " + projectSearchId;
+			SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
+
+			if ( search == null ) {
+				String msg = ": No search found for projectSearchId: " + projectSearchId;
 				log.warn( msg );
 			    throw new WebApplicationException(
 			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
@@ -162,6 +166,9 @@ public class PsmsService {
 			    	        .build()
 			    	        );
 			}
+
+			Integer searchId = search.getSearchId();
+			
 			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
 
 			searchIdsCollection.add( searchId );
@@ -178,9 +185,17 @@ public class PsmsService {
 					.deserialize_JSON_ToAnnTypeIdDisplayJSON_PsmPeptide( psmAnnTypeDisplayIncludeExclude_JSONString );
 			}
 			
+			//  Exclude Links With User Selections:
+			ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot = null;
+			if ( StringUtils.isNotEmpty( excludeLinksWith_Root_JSONString ) ) {
+				excludeLinksWith_JSONRoot = 
+						Z_Deserialize_ExcludeLinksWith_JSONRoot.getInstance()
+						.deserialize_JSON_ToExcludeLinksWith_JSONRoot( excludeLinksWith_Root_JSONString );
+			}
+			
 			//  Get PSMs for cutoffs and other data
 			PsmsServiceResult psmsServiceResult = 
-					getPsmData( cutoffValuesSearchLevel, annTypeIdDisplayPsm, searchId, reportedPeptideId, searchIdsCollection );
+					getPsmData( cutoffValuesSearchLevel, annTypeIdDisplayPsm, excludeLinksWith_JSONRoot, search, searchId, reportedPeptideId, searchIdsCollection );
 			
 			return psmsServiceResult;
 			
@@ -217,6 +232,8 @@ public class PsmsService {
 	private PsmsServiceResult getPsmData( 
 			CutoffValuesSearchLevel cutoffValuesSearchLevel,
 			AnnTypeIdDisplayJSON_PsmPeptide annTypeIdDisplayPsm,
+			ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot,
+			SearchDTO search,
 			Integer searchId,
 			Integer reportedPeptideId,
 			Collection<Integer> searchIdsCollection ) throws Exception {
@@ -263,6 +280,26 @@ public class PsmsService {
 		//  Get PSM data
 		List<PsmWebDisplayWebServiceResult> psmWebDisplayList = 
 				PsmWebDisplaySearcher.getInstance().getPsmsWebDisplay( searchId, reportedPeptideId, searcherCutoffValuesSearchLevel );
+		
+		//  Filter PSMs
+		if ( search.isHasScanData() ) {
+			//  Has scan data so can use this filter
+			if ( excludeLinksWith_JSONRoot != null && excludeLinksWith_JSONRoot.isRemoveNonUniquePSMs() ) {
+				List<PsmWebDisplayWebServiceResult> psmWebDisplayList_Filtered = new ArrayList<>( psmWebDisplayList.size() );
+				for ( PsmWebDisplayWebServiceResult psmWebDisplayItem : psmWebDisplayList ) {
+					if ( excludeLinksWith_JSONRoot.isRemoveNonUniquePSMs() ) {
+						if ( psmWebDisplayItem.getPsmCountForOtherAssocScanId() != null
+								&& psmWebDisplayItem.getPsmCountForOtherAssocScanId() > 0 ) {
+							//  Drop this item from output list since not unique PSM
+							continue; // EARLY CONTINUE
+						}
+					}
+					psmWebDisplayList_Filtered.add( psmWebDisplayItem );
+				}
+				psmWebDisplayList = psmWebDisplayList_Filtered;
+			}
+		}
+		
 		PsmsServiceResult psmsServiceResult =
 				getAnnotationDataAndSort( 
 						searchId, 

@@ -27,7 +27,6 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappDBDataOutOfSyncException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.SearchProgramsPerSearchDTO;
-import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.search_programs_per_search_utils.GetSearchProgramsPerSearchData;
@@ -44,6 +43,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Get the PSMs for Multiple UDR
+ * 
+ * Only used by Structure page
+ * 
+ * Data is Unfiltered, no filters are used.  Not Used: "PSM, Peptide Cutoffs", "Exclude links with:", "Exclude proteins with:", "Exclude organisms:"
  */
 @Path("/imageViewer")
 public class Viewer_PSMsForMultUDR_Data_Service {
@@ -60,6 +63,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		private List<Integer> projectSearchIds;
 		private List<Viewer_UDR_Data_Service_Single_UDR_Request> crosslinkUdrRequestList;
 		private List<Viewer_UDR_Data_Service_Single_UDR_Request> looplinkUdrRequestList;
+		
 		public List<Viewer_UDR_Data_Service_Single_UDR_Request> getCrosslinkUdrRequestList() {
 			return crosslinkUdrRequestList;
 		}
@@ -79,8 +83,9 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 			this.projectSearchIds = projectSearchIds;
 		}
 	}
+	
 	/**
-	 * 
+	 * Request Sub part for single UDR
 	 *
 	 */
 	public static class Viewer_UDR_Data_Service_Single_UDR_Request {
@@ -88,6 +93,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 		private Integer pos1;
 		private Integer protId2;
 		private Integer pos2;
+		
 		public Integer getProtId1() {
 			return protId1;
 		}
@@ -120,6 +126,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 	 */
 	public static class Viewer_UDR_Data_Service_Result {
 		private Map<Integer,Viewer_UDR_Data_Service_Single_Search_Result> dataForSearches;
+		
 		public Map<Integer, Viewer_UDR_Data_Service_Single_Search_Result> getDataForSearches() {
 			return dataForSearches;
 		}
@@ -127,10 +134,15 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 			this.dataForSearches = dataForSearches;
 		}
 	}
+	/**
+	 * Result for single search
+	 *
+	 */
 	public static class Viewer_UDR_Data_Service_Single_Search_Result {
 		private List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> crosslinkUdrItemList;
 		private List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> looplinkUdrItemList;
 		private List<String> psmValuesNames;
+		
 		public List<String> getPsmValuesNames() {
 			return psmValuesNames;
 		}
@@ -209,6 +221,8 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 	}
 	
 	/**
+	 * See comments for class
+	 * 
 	 * @param queryJSONString
 	 * @param request
 	 * @return
@@ -225,6 +239,8 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 	}
 	
 	/**
+	 * See comments for class
+	 * 
 	 * @param webserviceRequest
 	 * @param request
 	 * @return
@@ -392,8 +408,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 			Map<Integer, Map<Integer, AnnotationTypeDTO>> 
 			srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap =
 					GetAnnotationTypeData.getInstance().getAll_Psm_Filterable_ForSearchIds( searchIds );
-			//  Create empty searcherCutoffValuesSearchLevel so returns everything
-			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
+			
 			for ( Integer projectSearchId : projectSearchIdListDeduppedSorted ) {
 				Integer searchId = projectSearchIdToSearchIdMap.get( projectSearchId );
 				Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_Psm_AnnotationType_DTOMap = 
@@ -403,11 +418,10 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 					srchPgm_Filterable_Psm_AnnotationType_DTOMap = new HashMap<>();
 				}
 				List<AnnotationTypeDTO> annotationTypesOrderByNameList = new ArrayList<>( srchPgm_Filterable_Psm_AnnotationType_DTOMap.size() );
-				Set<Integer> annotationTypeIdsForGettingAnnotationData = new HashSet<>();
 				for ( Map.Entry<Integer, AnnotationTypeDTO> entry : srchPgm_Filterable_Psm_AnnotationType_DTOMap.entrySet() ) {
 					annotationTypesOrderByNameList.add( entry.getValue() );
-					annotationTypeIdsForGettingAnnotationData.add( entry.getKey() );
 				}
+
 				Collections.sort( annotationTypesOrderByNameList, new Comparator<AnnotationTypeDTO>() {
 					@Override
 					public int compare(AnnotationTypeDTO o1, AnnotationTypeDTO o2) {
@@ -442,9 +456,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 									searchId, 
 									LinkType.Crosslink, 
 									webserviceRequest.crosslinkUdrRequestList,
-									searcherCutoffValuesSearchLevel, 
-									annotationTypesOrderByNameList,
-									annotationTypeIdsForGettingAnnotationData );
+									annotationTypesOrderByNameList );
 				}
 				if ( webserviceRequest.looplinkUdrRequestList != null 
 						&& ( ! webserviceRequest.looplinkUdrRequestList.isEmpty() ) ) {
@@ -453,12 +465,11 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 									searchId, 
 									LinkType.Looplink, 
 									webserviceRequest.looplinkUdrRequestList,
-									searcherCutoffValuesSearchLevel, 
-									annotationTypesOrderByNameList,
-									annotationTypeIdsForGettingAnnotationData );
+									annotationTypesOrderByNameList );
 				}
 			}
 			return viewer_UDR_Data_Service_Result;
+			
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
@@ -476,9 +487,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 	 * @param searchId
 	 * @param linkType
 	 * @param udrRequestList
-	 * @param searcherCutoffValuesSearchLevel
 	 * @param annotationTypesOrderByNameList
-	 * @param annotationTypeIdsForGettingAnnotationData
 	 * @return
 	 * @throws Exception
 	 * @throws ProxlWebappDataException
@@ -487,13 +496,13 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 			int searchId,
 			LinkType linkType,
 			List<Viewer_UDR_Data_Service_Single_UDR_Request> udrRequestList,
-			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel, 
-			List<AnnotationTypeDTO> annotationTypesOrderByNameList,
-			Set<Integer> annotationTypeIdsForGettingAnnotationData 
-			)
-					throws Exception, ProxlWebappDataException {
+			List<AnnotationTypeDTO> annotationTypesOrderByNameList
+			) throws Exception, ProxlWebappDataException {
+		
 		List<Viewer_PSM_UDR_Data_Service_Result_UDR_Item> udrItemList = new ArrayList<>();
+		
 		for ( Viewer_UDR_Data_Service_Single_UDR_Request singleUDRRequest : udrRequestList ) {
+			
 			Viewer_PSM_UDR_Data_Service_Result_UDR_Item udrItem = new Viewer_PSM_UDR_Data_Service_Result_UDR_Item(); 
 			udrItemList.add( udrItem );
 			udrItem.protId1 = singleUDRRequest.protId1;
@@ -502,6 +511,7 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 			udrItem.pos2 = singleUDRRequest.pos2;
 			List<Viewer_PSM_UDR_Data_Service_Result_PSM_Item> udrPsmItemList = new ArrayList<>();
 			udrItem.psmItemList = udrPsmItemList;
+			
 			//  Map<PSM_ID,Map<AnnTypeId,Value>
 			Map<Integer,Map<Integer,Double>> psmAnnValues = null; 
 			if ( linkType == LinkType.Crosslink ) {
@@ -566,7 +576,8 @@ public class Viewer_PSMsForMultUDR_Data_Service {
 							.entity( msg ).build() );
 				}
 				psmAnnValues =
-						PsmAnnFromLooplinkProteinSearcher.getInstance().searchOnSearchProteinLooplink( 
+						PsmAnnFromLooplinkProteinSearcher.getInstance()
+						.searchOnSearchProteinLooplink( 
 								searchId, singleUDRRequest.protId1, singleUDRRequest.pos1, singleUDRRequest.pos2 );
 			}
 			for ( Map.Entry<Integer,Map<Integer,Double>> psmAnnValuesEntry : psmAnnValues.entrySet() ) {

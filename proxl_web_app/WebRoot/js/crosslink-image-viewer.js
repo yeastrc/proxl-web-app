@@ -183,6 +183,7 @@ var HASH_OBJECT_PROPERTIES = {
 		"color_by" : "y",
 		"annTypeIdDisplay" : "z",
 		"link_exclusion_data_current" : "A",
+		"removeNonUniquePSMs" : "B",
 		
 		//  For future additions, please continue the single character approach instead of using mnemonic or acronym
 		//    1)  It will keep the overall JSON string shorter
@@ -335,6 +336,7 @@ var _excludeType;
 var _filterNonUniquePeptides;
 var _filterOnlyOnePSM;
 var _filterOnlyOnePeptide;
+var _removeNonUniquePSMs;
 var _colorLinesBy = undefined;
 
 //  working data (does round trip to the JSON in the Hash in the URL)
@@ -614,6 +616,11 @@ function getValuesFromForm() {
 	} else {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePeptide, false );
 	}
+	if ( $( "input#removeNonUniquePSMs" ).is( ':checked' ) ) {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.removeNonUniquePSMs, true );
+	} else {
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.removeNonUniquePSMs, false );
+	}
 	var xTax = new Array();
 	var taxKeys = Object.keys( _taxonomies );
 	for ( var taxKeysIndex = 0; taxKeysIndex < taxKeys.length; taxKeysIndex++ ) {
@@ -649,10 +656,13 @@ function updateURLHash( useSearchForm ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.cutoffs, _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject() );
 //		add filter out non unique peptides
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterNonUniquePeptides, _filterNonUniquePeptides );
-//		add filter out non unique peptides
+//		add filter out only one PSM
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePSM, _filterOnlyOnePSM );
-//		add filter out non unique peptides
+//		add filter out only one Peptide
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePeptide, _filterOnlyOnePeptide );
+//		add filter out non unique PSMs
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.removeNonUniquePSMs, _removeNonUniquePSMs );
+		
 	} else {
 //		build hash string from values in form, they've requested a data refresh
 		getValuesFromForm();
@@ -786,6 +796,9 @@ function buildQueryStringFromHash() {
 	}
 	if ( json.filterOnlyOnePeptide != undefined && json.filterOnlyOnePeptide ) {
 		items.push( "filterOnlyOnePeptide=on" );
+	}
+	if ( json.removeNonUniquePSMs != undefined && json.removeNonUniquePSMs ) {
+		items.push( "removeNonUniquePSMs=on" );
 	}
 	queryString += items.join( "&" );
 	return queryString;
@@ -1503,6 +1516,16 @@ function loadDataFromService() {
 	        		_filterNonUniquePeptides = data.filterNonUniquePeptides;
 	        		_filterOnlyOnePSM = data.filterOnlyOnePSM;
 	        		_filterOnlyOnePeptide = data.filterOnlyOnePeptide;
+	        		_removeNonUniquePSMs = data.removeNonUniquePSMs;
+	        		
+	    			//  Distribute the updated value to the JS code that loads and displays Peptide and PSM data
+	    			webserviceDataParamsDistributionCommonCode.paramsForDistribution( { 
+	    				filterNonUniquePeptides : _filterNonUniquePeptides,
+	    				filterOnlyOnePSM : _filterOnlyOnePSM,
+	    				filterOnlyOnePeptide : _filterOnlyOnePeptide,
+	    				removeNonUniquePSMs : _removeNonUniquePSMs
+	    			} );
+	        		
 	        		_taxonomies = data.taxonomies;
 	        		// remove any now-invalid proteins from the index manager
 	        		if( _indexManager ) {
@@ -1587,6 +1610,7 @@ function populateSearchForm() {
 	$( "input#filterNonUniquePeptides" ).prop('checked', _filterNonUniquePeptides);
 	$( "input#filterOnlyOnePSM" ).prop('checked', _filterOnlyOnePSM);
 	$( "input#filterOnlyOnePeptide" ).prop('checked', _filterOnlyOnePeptide);
+	$( "input#removeNonUniquePSMs" ).prop('checked', _removeNonUniquePSMs);
 	var html = "";
 	var taxKeys = Object.keys( _taxonomies );
 	for ( var i = 0; i < taxKeys.length; i++ ) {
@@ -1831,6 +1855,9 @@ function getNavigationJSON_Not_for_Image_Or_Structure() {
 	if ( json.filterOnlyOnePeptide !== undefined ) {
 		baseJSONObject.filterOnlyOnePeptide = json.filterOnlyOnePeptide;
 	}
+	if ( json.removeNonUniquePSMs !== undefined ) {
+		baseJSONObject.removeNonUniquePSMs = json.removeNonUniquePSMs;
+	}
 	if ( json.excludeTaxonomy !== undefined ) {
 		baseJSONObject.excludeTaxonomy = json.excludeTaxonomy;
 	}
@@ -1945,6 +1972,7 @@ function populateNavigation() {
 			structureJSON[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
 			structureJSON[ 'filterOnlyOnePSM' ] = _filterOnlyOnePSM;
 			structureJSON[ 'filterOnlyOnePeptide' ] = _filterOnlyOnePeptide;
+			structureJSON[ 'removeNonUniquePSMs' ] = _removeNonUniquePSMs;
 			var structureJSONString = encodeURIComponent( JSON.stringify( structureJSON ) );
 			structureNavHTML += "structure.do" + structureQueryString + "#" + structureJSONString;
 		} else {
@@ -5498,7 +5526,8 @@ function processClickOnLink( clickThis ) {
 function processClickOnLoopLink( clickThis  ) {
 	var params = {
 			clickThis : clickThis,
-			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
+			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject(),
+			removeNonUniquePSMs : _removeNonUniquePSMs
 	};
 	getLooplinkDataForSpecificLinkInGraph( params );
 }
@@ -5509,7 +5538,8 @@ function processClickOnLoopLink( clickThis  ) {
 function processClickOnCrossLink( clickThis  ) {
 	var params = {
 			clickThis : clickThis,
-			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
+			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject(),
+			removeNonUniquePSMs : _removeNonUniquePSMs
 	};
 	getCrosslinkDataForSpecificLinkInGraph( params );
 }
@@ -5520,7 +5550,8 @@ function processClickOnCrossLink( clickThis  ) {
 function processClickOnMonoLink( clickThis  ) {
 	var params = {
 			clickThis : clickThis,
-			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
+			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject(),
+			removeNonUniquePSMs : _removeNonUniquePSMs
 	};
 	getMonolinkDataForSpecificLinkInGraph( params );
 }
@@ -5634,7 +5665,15 @@ function initPage() {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
 		}
-	});		
+	});	
+	$( "input#removeNonUniquePSMs" ).change(function() {
+		try {
+			defaultPageView.searchFormChanged_ForDefaultPageView();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	});	
 	$("#exclude_protein_types_block").find("input").change(function() {
 		try {
 			defaultPageView.searchFormChanged_ForDefaultPageView();

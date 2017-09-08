@@ -2,25 +2,21 @@ package org.yeastrc.xlink.www.objects;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.base_searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
-import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
-import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.XLinkUtils;
-import org.yeastrc.xlink.www.searcher.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher;
 
 
-
-
+/**
+ * 
+ *
+ */
 public class WebMergedReportedPeptide implements IMergedSearchLink {
 	
 	private static final Logger log = Logger.getLogger(WebMergedReportedPeptide.class);
@@ -65,54 +61,12 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 	public int getNumPsms() throws Exception {
 		
 		if ( numPsmsSet ) {
-			
 			return numPsms;
 		}
-		
 
-//		num psms is always based on searching psm table for: search id, reported peptide id, and peptide and psm cutoffs.
-//		reported peptide id can be gotten from unified reported peptide id and search id
-
-		
-		//   Use WebReportedPeptide.getNumPsms() code for each search id / reported peptide id
-		
 		try {
+			throw new ProxlWebappInternalErrorException( "setNumPsms(int numPsms) not called" );
 
-			int totalNumPsms = 0;
-
-			for ( SearchDTO searchDTO : searches ) {
-				int projectSearchId = searchDTO.getProjectSearchId();
-				int searchId = searchDTO.getSearchId();
-
-				SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = 
-						searcherCutoffValuesRootLevel.getPerSearchCutoffs( projectSearchId );
-				if ( searcherCutoffValuesSearchLevel == null ) {
-					String msg = "searcherCutoffValuesRootLevel.getPerSearchCutoffs(projectSearchId) returned null for:  " + projectSearchId;
-					log.error( msg );
-					throw new ProxlWebappDataException( msg );
-				}
-
-				Collection<Integer>  reportedPeptideIdCollection = 
-						ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher.getInstance()
-						.getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( searchId, unifiedReportedPeptideId );
-				
-				Set<Integer> reportedPeptideIdSet = new HashSet<>( reportedPeptideIdCollection ); // remove any dups
-			
-				for ( Integer reportedPeptideId : reportedPeptideIdSet ) {
-					int numPsms = PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
-							.getPsmCountForSearchIdReportedPeptideId( reportedPeptideId, searchId, searcherCutoffValuesSearchLevel );
-
-					totalNumPsms += numPsms;
-				}
-			}
-
-
-			numPsms = totalNumPsms;
-
-			numPsmsSet = true;
-
-			return numPsms;
-			
 		} catch ( Exception e ) {
 			
 			String msg = "Error getting num psms";
@@ -466,14 +420,6 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 		this.searchIds = searchIds;
 	}
 	
-	public SearcherCutoffValuesRootLevel getSearcherCutoffValuesRootLevel() {
-		return searcherCutoffValuesRootLevel;
-	}
-	public void setSearcherCutoffValuesRootLevel(
-			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel) {
-		this.searcherCutoffValuesRootLevel = searcherCutoffValuesRootLevel;
-	}
-
 
 	public List<AnnValuePeptPsmListsPair> getPeptidePsmAnnotationValueListsForEachSearch() {
 		return peptidePsmAnnotationValueListsForEachSearch;
@@ -520,13 +466,6 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 	 * true when SetNumPsms has been called
 	 */
 	private boolean numPsmsSet;
-
-
-	
-	/**
-	 *  Used to get numPsms when they are not already set
-	 */
-	private SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel;
 
 
 	/**

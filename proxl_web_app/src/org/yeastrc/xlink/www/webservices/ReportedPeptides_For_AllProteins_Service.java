@@ -21,6 +21,7 @@ import org.yeastrc.xlink.www.objects.GetNoLinkInfoReportedPeptidesServiceResult;
 import org.yeastrc.xlink.www.objects.SearchPeptideNoLinkInfo;
 import org.yeastrc.xlink.www.objects.SearchPeptideNoLinkInfoAnnDataWrapper;
 import org.yeastrc.xlink.www.objects.SearchPeptideNoLinkInfoWebserviceResult;
+import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher;
@@ -30,7 +31,9 @@ import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.form_query_json_objects.ExcludeLinksWith_JSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
+import org.yeastrc.xlink.www.form_query_json_objects.Z_Deserialize_ExcludeLinksWith_JSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_PerSearchResult;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -55,6 +58,7 @@ public class ReportedPeptides_For_AllProteins_Service {
 			@QueryParam( "project_search_id" ) Integer projectSearchId,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchId" ) String psmPeptideCutoffsForProjectSearchId_JSONString,
 			@QueryParam( "peptideAnnTypeDisplayPerSearch" ) String annTypeIdDisplayJSON_PerSearch_JSONString,
+			@QueryParam( "excludeLinksWith_Root" ) String excludeLinksWith_Root_JSONString,
 			@QueryParam( "protein_id" ) Integer proteinId,
 			@QueryParam( "link_type" ) List<String> linkTypesList,
 			@Context HttpServletRequest request )
@@ -193,6 +197,14 @@ public class ReportedPeptides_For_AllProteins_Service {
 						DeserializeAnnTypeIdDisplayJSON_PerSearch.getInstance()
 						.deserializeAnnTypeIdDisplayJSON_PerSearch( annTypeIdDisplayJSON_PerSearch_JSONString );
 			}
+
+			//  Exclude Links With User Selections:
+			ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot = null;
+			if ( StringUtils.isNotEmpty( excludeLinksWith_Root_JSONString ) ) {
+				excludeLinksWith_JSONRoot = 
+						Z_Deserialize_ExcludeLinksWith_JSONRoot.getInstance()
+						.deserialize_JSON_ToExcludeLinksWith_JSONRoot( excludeLinksWith_Root_JSONString );
+			}
 			
 			//  Get Peptide data from DATABASE    from database
 			List<SearchPeptideNoLinkInfoAnnDataWrapper> searchPeptideNoLinkInfoList = 
@@ -203,6 +215,37 @@ public class ReportedPeptides_For_AllProteins_Service {
 							proteinId,
 							linkTypes
 							);
+			
+
+			//////////////////////////////////////////////////////////////////
+			
+			// Filter out links if requested, and Update PSM counts if "remove non-unique PSMs" selected 
+			
+			if( excludeLinksWith_JSONRoot != null && excludeLinksWith_JSONRoot.isRemoveNonUniquePSMs() ) {
+				///////  Output Lists, Results After Filtering
+				List<SearchPeptideNoLinkInfoAnnDataWrapper> searchPeptideNoLinkInfoList_AfterFilter = new ArrayList<>( searchPeptideNoLinkInfoList.size() );
+
+				///  Filter links
+				for ( SearchPeptideNoLinkInfoAnnDataWrapper searchPeptideNoLinkInfoItem : searchPeptideNoLinkInfoList ) {
+					SearchPeptideNoLinkInfo searchPeptideNoLinkInfo = searchPeptideNoLinkInfoItem.getSearchPeptideNoLinkInfo();
+					WebReportedPeptide webReportedPeptide = searchPeptideNoLinkInfo.getWebReportedPeptide();
+					// did the user request to removal of links with only Non-Unique PSMs?
+//					if( excludeLinksWith_JSONRoot != null && excludeLinksWith_JSONRoot.isRemoveNonUniquePSMs()  ) {  not needed since single condition in enclosing 'if'
+					
+					//  Update webReportedPeptide object to remove non-unique PSMs
+					webReportedPeptide.updateNumPsmsToNotInclude_NonUniquePSMs();
+					if ( webReportedPeptide.getNumPsms() <= 0 ) {
+						// The number of PSMs after update is now zero
+						//  Skip to next entry in list, dropping this entry from output list
+						continue;  // EARLY CONTINUE
+					}
+					
+//					}
+					searchPeptideNoLinkInfoList_AfterFilter.add( searchPeptideNoLinkInfoItem );
+				}
+
+				searchPeptideNoLinkInfoList = searchPeptideNoLinkInfoList_AfterFilter;
+			}
 			
 			//  Get Annotation data for links
 			GetNoLinkInfoReportedPeptidesServiceResult getNoLinkInfoReportedPeptidesServiceResult =

@@ -232,7 +232,20 @@
 						</logic:iterate>				
 					</td>
 				</tr>				
-				
+
+				<tr>
+					<td>Exclude links with:</td>
+					<td>
+						 <label><span style="white-space:nowrap;" >
+							<input type="checkbox" id="filterOnlyOnePSM"  onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" > 					
+						 	 only one PSM
+						 </span></label>
+						 
+						 <%--  Checkbox for removeNonUniquePSMs --%>
+						<%@ include file="/WEB-INF/jsp-includes/excludeLinksWith_Remove_NonUniquePSMs_Checkbox_Fragment.jsp" %>
+							 
+					</td>
+				</tr>
 				
 				<tr>
 					<td>&nbsp;</td>

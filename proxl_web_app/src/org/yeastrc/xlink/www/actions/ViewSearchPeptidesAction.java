@@ -46,6 +46,7 @@ import org.yeastrc.xlink.www.form_utils.Update__A_QueryBase_JSONRoot__ForCurrent
 import org.yeastrc.xlink.www.forms.SearchViewPeptidesForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
@@ -154,6 +155,8 @@ public class ViewSearchPeptidesAction extends Action {
 			GetSearchDetailsData.getInstance().getSearchDetailsData( search, request );
 			//  Populate request objects for User Selection of Annotation Data Display
 			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( search, request );
+			//  Populate request objects for excludeLinksWith_Remove_NonUniquePSMs_Checkbox_Fragment.jsp
+			ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems.getInstance().excludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems( search, request );
 			
 			///  Get list of all possible Dynamic Mod Masses.  Do here so if convert existing Query Param Data, have it here.
 			int[] searchIdsArray = { searchId };
@@ -257,6 +260,41 @@ public class ViewSearchPeptidesAction extends Action {
 							search, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
 							PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
 			
+			//////////////////////////////////////////////////////////////////
+			
+			// Filter out links if requested, and Update PSM counts if "remove non-unique PSMs" selected 
+			
+			if( peptideQueryJSONRoot.isFilterOnlyOnePSM() 
+					|| peptideQueryJSONRoot.isRemoveNonUniquePSMs() ) {
+				///////  Output Lists, Results After Filtering
+				List<WebReportedPeptideWrapper> wrappedlinksAfterFilter = new ArrayList<>( wrappedlinks.size() );
+
+				///  Filter links
+				for ( WebReportedPeptideWrapper webReportedPeptideWrapper : wrappedlinks ) {
+					WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
+					// did the user request to removal of links with only Non-Unique PSMs?
+					if( peptideQueryJSONRoot != null && peptideQueryJSONRoot.isRemoveNonUniquePSMs()  ) {
+						//  Update webReportedPeptide object to remove non-unique PSMs
+						webReportedPeptide.updateNumPsmsToNotInclude_NonUniquePSMs();
+						if ( webReportedPeptide.getNumPsms() <= 0 ) {
+							// The number of PSMs after update is now zero
+							//  Skip to next entry in list, dropping this entry from output list
+							continue;  // EARLY CONTINUE
+						}
+					}
+					// did the user request to removal of links with only one PSM?
+					if( peptideQueryJSONRoot.isFilterOnlyOnePSM()  ) {
+						if ( webReportedPeptide.getNumPsms() <= 1 ) {
+							//  Skip to next entry in list, dropping this entry from output list
+							continue;  // EARLY CONTINUE
+						}
+					}
+					wrappedlinksAfterFilter.add( webReportedPeptideWrapper );
+				}
+
+				wrappedlinks = wrappedlinksAfterFilter;
+			}
+			
 			//  If configured, throw exception if no peptides found
 			if ( ThrowExceptionOnNoDataConfig.getInstance().isThrowExceptionNoData() ) {
 				if ( wrappedlinks.isEmpty() ) {
@@ -292,7 +330,7 @@ public class ViewSearchPeptidesAction extends Action {
 					searchPeptideWebserviceCommonCodeGetDataResult.getPeptideAnnotationDisplayNameDescriptionList() );
 			viewSearchPeptidesPageDataRoot.setPsmAnnotationDisplayNameDescriptionList( 
 					searchPeptideWebserviceCommonCodeGetDataResult.getPsmAnnotationDisplayNameDescriptionList() );
-			/////////////////////////////////
+
 			if ( search.isHasScanData() ) {
 				viewSearchPeptidesPageDataRoot.setShowNumberUniquePSMs( true );
 			}

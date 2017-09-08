@@ -134,7 +134,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 			});
 		}		
 		
-		//  Mark check boxes for chosen links to exclude:  "no unique peptides", "only one PSM", "only one peptide"
+		//  Mark check boxes for chosen links to exclude:  "no unique peptides", "only one PSM", "only one peptide", "remove non-unique PSMs"
 		if ( _query_json_field_Contents.filterNonUniquePeptides ) {
 			$("#filterNonUniquePeptides").prop('checked', true);
 		} else {
@@ -149,6 +149,11 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 			$("#filterOnlyOnePeptide").prop('checked', true);
 		} else {
 			$("#filterOnlyOnePeptide").prop('checked', false);
+		}
+		if ( _query_json_field_Contents.removeNonUniquePSMs ) {
+			$("#removeNonUniquePSMs").prop('checked', true);
+		} else {
+			$("#removeNonUniquePSMs").prop('checked', false);
 		}
 		
 		//  Mark check boxes for chosen taxonomy to exclude
@@ -217,10 +222,11 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 			}
 		});
 
-		//  Mark check boxes for chosen links to exclude:  "no unique peptides", "only one PSM", "only one peptide"
+		//  Mark check boxes for chosen links to exclude:  "no unique peptides", "only one PSM", "only one peptide", "remove non-unique PSMs"
 		var filterNonUniquePeptides = false;
 		var filterOnlyOnePSM = false;
 		var filterOnlyOnePeptide = false;
+		var removeNonUniquePSMs = false;
 		if ( $("#filterNonUniquePeptides").prop('checked') === true ) {
 			filterNonUniquePeptides = true;
 		}
@@ -229,6 +235,9 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 		}
 		if ( $("#filterOnlyOnePeptide").prop('checked') === true ) {
 			filterOnlyOnePeptide = true;
+		}
+		if ( $("#removeNonUniquePSMs").prop('checked') === true ) {
+			removeNonUniquePSMs = true;
 		}
 		//  Create array from check boxes for chosen Taxonomy to exclude
 		var outputExcludeTaxonomy= [];
@@ -254,6 +263,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 				filterNonUniquePeptides : filterNonUniquePeptides,
 				filterOnlyOnePSM : filterOnlyOnePSM,
 				filterOnlyOnePeptide : filterOnlyOnePeptide,
+				removeNonUniquePSMs : removeNonUniquePSMs,
 				excludeTaxonomy : outputExcludeTaxonomy,  
 //				excludeProteinSequenceIds : outputExcludeProteinsAsInts
 				exclProteinSequenceIdsEncoded : getEncodedExcludeProteinsResult.encodedExcludeProteins,

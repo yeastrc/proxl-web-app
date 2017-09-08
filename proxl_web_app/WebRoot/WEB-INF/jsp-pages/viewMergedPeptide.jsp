@@ -1,3 +1,4 @@
+<%@page import="org.yeastrc.xlink.www.constants.ReportedPeptideCombined_IdentifierFlag_Constants"%>
 <%@page import="org.yeastrc.xlink.www.webapp_timing.WebappTiming"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 <%@page import="org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants"%>
@@ -279,7 +280,20 @@
 						</logic:iterate>				
 					</td>
 				</tr>				
-				
+
+				<tr>
+					<td>Exclude links with:</td>
+					<td>
+						 <label><span style="white-space:nowrap;" >
+							<input type="checkbox" id="filterOnlyOnePSM"  > 					
+						 	 only one PSM
+						 </span></label>
+						 
+						 <%--  Checkbox for removeNonUniquePSMs --%>
+						<%@ include file="/WEB-INF/jsp-includes/excludeLinksWith_Remove_NonUniquePSMs_Checkbox_Fragment.jsp" %>
+							 
+					</td>
+				</tr>				
 					
 				<tr>
 					<td>&nbsp;</td>
@@ -328,6 +342,18 @@
 			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
 
 
+			<%--  Show this when any of the reported Peptide entries were combined.
+				  Reported Peptide entries are combined for a specific search id when there are
+				  more than 1 reported peptides for a search id, unified reported peptide id pair.
+				  See the code for more info.
+			 --%>
+			<c:if test="${ anyReportedPeptideEntriesWereCombined }">
+			  <div style="">
+			  	Note: scores noted with a 
+			  	<%= ReportedPeptideCombined_IdentifierFlag_Constants.REPORTED_PEPTIDE_COMBINED__IDENTIFIER_FLAG %> 
+			  	represent the best of multiple scores for this peptide in the search.
+			  </div>
+			</c:if>
 
 
 			<%--  Create via javascript the parts that will be above the main table --%>

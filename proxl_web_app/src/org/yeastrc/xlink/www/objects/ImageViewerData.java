@@ -133,7 +133,13 @@ public class ImageViewerData {
 		this.filterOnlyOnePeptide = filterOnlyOnePeptide;
 	}
 
-	
+	public boolean isRemoveNonUniquePSMs() {
+		return removeNonUniquePSMs;
+	}
+
+	public void setRemoveNonUniquePSMs(boolean removeNonUniquePSMs) {
+		this.removeNonUniquePSMs = removeNonUniquePSMs;
+	}
 	
 	
 	public Map<Integer, Map<Integer, Map<Integer, Map<Integer, Integer>>>> getCrosslinkPSMCounts() {
@@ -189,6 +195,7 @@ public class ImageViewerData {
 	private boolean filterNonUniquePeptides;
 	private boolean filterOnlyOnePSM;
 	private boolean filterOnlyOnePeptide;
+	private boolean removeNonUniquePSMs;
 	
 	private Map<Integer, Map<Integer, Map<Integer, Map<Integer, Integer>>>> crosslinkPSMCounts;
 	private Map<Integer, Map<Integer, Map<Integer, Map<Integer, Integer>>>> looplinkPSMCounts;
@@ -196,5 +203,6 @@ public class ImageViewerData {
 
 
 	private Map<Integer, Collection<Integer>> linkablePositions;
+
 
 }

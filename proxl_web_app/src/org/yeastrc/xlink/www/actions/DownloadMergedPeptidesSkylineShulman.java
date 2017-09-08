@@ -38,6 +38,7 @@ import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
 import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
@@ -152,7 +153,10 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 								form,
 								projectSearchIdsListDeduppedSorted,
 								searches,
-								searchesMapOnSearchId );
+								searchesMapOnSearchId,
+								PeptidesMergedCommonPageDownload.FlagCombinedReportedPeptideEntries.NO );
+
+				MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = peptidesMergedCommonPageDownloadResult.getMergedPeptideQueryJSONRoot();
 				
 				////////////
 				/////   Searcher cutoffs for all searches
@@ -233,16 +237,26 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 											reportedPeptideId, 
 											searcherCutoffValuesSearchLevel);
 														
+							psms = DownloadPSMs_Common.getInstance().filterPSMs( mergedPeptideQueryJSONRoot, search, psms );
+
+							if ( psms.isEmpty() ) {
+								//  No PSMs after filter so skip this reported peptide
+								continue;  //  EARLY CONINUE
+							}
+
 							for ( PsmWebDisplayWebServiceResult psm : psms ) {
 																
 								LinkerDTO linkerdto = null;
-								
 								try {
 									linkerdto = LinkerForPSMMatcher.getInstance().getLinkerForPSM( psm.getPsmDTO() );
 								} catch (Exception e ) {
-									e.printStackTrace();
+									try {
+										int psmId = psm.getPsmDTO().getId();
+										log.error( "Error getting linkerDTO for psmId: " + psmId, e );
+									} catch (Exception e2 ) {
+										log.error( "Error getting searchId: " + psm.getSearchId(), e2 );
+									}
 								}
-								
 								
 								ILinker linker = GetLinkerFactory.getLinkerForAbbr( linkerdto.getAbbr() );
 								
@@ -253,7 +267,7 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 							}
 						}
 					}
-				}//end iterating over reported peptides
+				}  //  end iterating over reported peptides
 				
 				
 				// generate file name

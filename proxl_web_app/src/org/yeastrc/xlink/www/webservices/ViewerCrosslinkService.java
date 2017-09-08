@@ -26,6 +26,7 @@ import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinksWith_Param;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslinkWrapper;
@@ -57,6 +58,7 @@ public class ViewerCrosslinkService {
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
 			@QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
 			@QueryParam( "filterOnlyOnePeptide" ) String filterOnlyOnePeptideString,
+			@QueryParam( "removeNonUniquePSMs" ) String removeNonUniquePSMsString,
 			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
 			@Context HttpServletRequest request )
 	throws Exception {
@@ -201,9 +203,15 @@ public class ViewerCrosslinkService {
 			boolean filterOnlyOnePeptide = false;
 			if( "on".equals( filterOnlyOnePeptideString ) )
 				filterOnlyOnePeptide = true;
-
+			boolean removeNonUniquePSMs = false;
+			if( "on".equals( removeNonUniquePSMsString ) )
+				removeNonUniquePSMs = true;
+			
 			List<Integer> searchIdsListSorted = new ArrayList<Integer>( searchIdsSet );
 			Collections.sort( searchIdsListSorted );
+
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param();
+			linkedPositions_FilterExcludeLinksWith_Param.setRemoveNonUniquePSMs( removeNonUniquePSMs );
 
 			Map<Integer, List<SearchProteinCrosslinkWrapper>> wrappedCrosslinks_MappedOnSearchId = new HashMap<>();
 			for ( SearchDTO searchDTO : searchList ) {
@@ -223,7 +231,7 @@ public class ViewerCrosslinkService {
 				
 				List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
 						CrosslinkLinkedPositions.getInstance()
-						.getSearchProteinCrosslinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+						.getSearchProteinCrosslinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 
 				// Filter out links if requested
 				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
@@ -370,6 +378,7 @@ public class ViewerCrosslinkService {
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
 			@QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
 			@QueryParam( "filterOnlyOnePeptide" ) String filterOnlyOnePeptideString,
+			@QueryParam( "removeNonUniquePSMs" ) String removeNonUniquePSMsString,
 			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
 			@Context HttpServletRequest request )
 	throws Exception {
@@ -506,6 +515,12 @@ public class ViewerCrosslinkService {
 			boolean filterOnlyOnePeptide = false;
 			if( "on".equals( filterOnlyOnePeptideString ) )
 				filterOnlyOnePeptide = true;
+			boolean removeNonUniquePSMs = false;
+			if( "on".equals( removeNonUniquePSMsString ) )
+				removeNonUniquePSMs = true;
+
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param();
+			linkedPositions_FilterExcludeLinksWith_Param.setRemoveNonUniquePSMs( removeNonUniquePSMs );
 			
 			Map<Integer, List<SearchProteinCrosslinkWrapper>> wrappedCrosslinks_MappedOnSearchId = new HashMap<>();
 			for ( SearchDTO searchDTO : searchList ) {
@@ -525,7 +540,7 @@ public class ViewerCrosslinkService {
 				
 				List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
 						CrosslinkLinkedPositions.getInstance()
-						.getSearchProteinCrosslinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+						.getSearchProteinCrosslinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 
 				// Filter out links if requested
 				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 

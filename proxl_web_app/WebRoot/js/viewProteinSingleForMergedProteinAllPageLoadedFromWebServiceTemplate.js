@@ -15,6 +15,7 @@ var ViewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate = funct
 	var _handlebarsTemplate_all_protein_child_row_entry_template = null;
 	var _data_per_search_between_searches_html = null;
 	var _psmPeptideCutoffsRootObject = null;
+	var _excludeLinksWith_Root =  null;
 	var _chosenLinkTypes = undefined;
 
 	//////////////
@@ -22,6 +23,11 @@ var ViewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate = funct
 		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
 	};
 
+	//////////////
+	this.setExcludeLinksWith_Root = function( excludeLinksWith_Root ) {
+		_excludeLinksWith_Root = excludeLinksWith_Root;
+	};
+	
 	//////////////
 	this.setChosenLinkTypes = function( chosenLinkTypes ) {
 		_chosenLinkTypes = chosenLinkTypes;
@@ -94,10 +100,17 @@ var ViewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate = funct
 		}
 		var cutoffsForWebservice = { searches: cutoffsPerProjectSearchIds };
 		var psmPeptideCutoffsForProjectSearchIds_JSONString = JSON.stringify( cutoffsForWebservice );
+
+		var excludeLinksWith_Root_JSONString = undefined;
+		if ( _excludeLinksWith_Root ) {
+			excludeLinksWith_Root_JSONString = JSON.stringify( _excludeLinksWith_Root );
+		}
+		
 		var ajaxRequestData = {
 				project_search_ids : project_search_ids,
 				psmPeptideCutoffsForProjectSearchIds : psmPeptideCutoffsForProjectSearchIds_JSONString,
-				protein_id : protein_id,
+				excludeLinksWith_Root : excludeLinksWith_Root_JSONString,
+				protein_id : protein_id
 		};
 		if ( _chosenLinkTypes !== null && _chosenLinkTypes !== undefined ) {
 			ajaxRequestData.link_type = _chosenLinkTypes;

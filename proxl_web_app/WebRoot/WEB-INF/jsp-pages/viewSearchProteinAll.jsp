@@ -225,18 +225,8 @@
 				<tr>
 					<td>Exclude links with:</td>
 					<td>
-						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterNonUniquePeptides" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" > 					
-						 	 no unique peptides
-						 </span></label>
-						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterOnlyOnePSM"  onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" > 					
-						 	 only one PSM
-						 </span></label>
-						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterOnlyOnePeptide"  onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" > 					
-						 	 only one peptide
-						 </span></label>
+						 <%--  Checkboxes --%>
+						<%@ include file="/WEB-INF/jsp-includes/excludeLinksWith_Checkboxes_ProteinPages_Fragment.jsp" %>
 					</td>
 				</tr>
 
@@ -244,15 +234,6 @@
 					<td>Exclude organisms:</td>
 					<td>
 						<logic:iterate id="taxonomy" name="taxonomies">
-						
-<%-- 						
-						 <label style="white-space: nowrap" >
-						  <html:multibox property="excludeTaxonomy" styleClass="excludeTaxonomy_jq" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >
-						   <bean:write name="taxonomy" property="key"/> 
-						  </html:multibox> 
-						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
-						 </label> 
---%>						 
 						 <label style="white-space: nowrap" >
 						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq " onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >  
 						  
@@ -265,16 +246,7 @@
 				<tr>
 					<td>Exclude protein(s):</td>
 					<td>
-						<%--  shortened property from "excludeProtein" to "excP" to shorten the URL  --%>
-						<%-- TODO   TEMP
-						<html:select property="excP" multiple="true" styleId="excludeProtein" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >
-							<html:options collection="proteins" property="proteinSequenceObject.proteinSequenceId" labelProperty="name" />
-						</html:select>
-						--%>
-						
-						
-						<%--  New version: 
-						
+						<%--   
 						All <option> values must be parsable as integers:
 						--%>
 						<select name="excludedProteins" multiple="multiple" id="excludeProtein" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >  

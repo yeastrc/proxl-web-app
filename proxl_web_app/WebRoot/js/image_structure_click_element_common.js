@@ -16,7 +16,9 @@ var _data_per_search_between_searches_html = null;
 function getLooplinkDataCommon( params ) {
 	try {
 		var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
+		var removeNonUniquePSMs = params.removeNonUniquePSMs;
 		var requestContext = params.context;
+		
 		var project_search_ids = requestContext.searchesArray;
 		//  Extract psm peptide cutoffs for project search ids provided
 		var psmPeptideCutoffsRootObjectForQuery = { searches : {} };
@@ -30,8 +32,16 @@ function getLooplinkDataCommon( params ) {
 		} 
 		///   Serialize cutoffs to JSON
 		var psmPeptideCutoffsRootObjectForQueryObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObjectForQuery );
+
+		var excludeLinksWith_Root_JSONString = undefined;
+		if ( removeNonUniquePSMs ) {
+			var excludeLinksWith_Root = { removeNonUniquePSMs : removeNonUniquePSMs };
+			excludeLinksWith_Root_JSONString = JSON.stringify( excludeLinksWith_Root );
+		}
+		
 		var ajaxRequestData = {
 				psmPeptideCutoffsForProjectSearchIds : psmPeptideCutoffsRootObjectForQueryObject_JSONString,
+				excludeLinksWith_Root : excludeLinksWith_Root_JSONString,
 				project_search_ids: project_search_ids,
 				protein_id : requestContext.from_protein_id,
 				protein_position_1 : requestContext.protein_position_1,
@@ -192,7 +202,9 @@ function getLooplinkDataCommonProcessResponse( params ) {
 /////////////////////
 function getCrosslinkDataCommon( params ) {
 	var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
+	var removeNonUniquePSMs = params.removeNonUniquePSMs;
 	var requestContext = params.context;
+	
 	var project_search_ids = requestContext.searchesArray;
 	//  Extract psm peptide cutoffs for project search ids provided
 	var psmPeptideCutoffsRootObjectForQuery = { searches : {} };
@@ -206,8 +218,16 @@ function getCrosslinkDataCommon( params ) {
 	} 
 	///   Serialize cutoffs to JSON
 	var psmPeptideCutoffsRootObjectForQueryObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObjectForQuery );
+	
+	var excludeLinksWith_Root_JSONString = undefined;
+	if ( removeNonUniquePSMs ) {
+		var excludeLinksWith_Root = { removeNonUniquePSMs : removeNonUniquePSMs };
+		excludeLinksWith_Root_JSONString = JSON.stringify( excludeLinksWith_Root );
+	}
+	
 	var ajaxRequestData = {
 			psmPeptideCutoffsForProjectSearchIds : psmPeptideCutoffsRootObjectForQueryObject_JSONString,
+			excludeLinksWith_Root : excludeLinksWith_Root_JSONString,
 			project_search_ids: project_search_ids,
 			protein_1_id: requestContext.protein1.protein_id_int,
 			protein_2_id: requestContext.protein2.protein_id_int,
@@ -377,7 +397,9 @@ function getCrosslinkDataCommonProcessResponse( params ) {
 /////////////////////
 function getMonolinkDataCommon( params ) {
 	var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
+	var removeNonUniquePSMs = params.removeNonUniquePSMs;
 	var requestContext = params.context;
+	
 	var project_search_ids = requestContext.searchesArray;
 	//  Extract psm peptide cutoffs for project search ids provided
 	var psmPeptideCutoffsRootObjectForQuery = { searches : {} };
@@ -391,8 +413,16 @@ function getMonolinkDataCommon( params ) {
 	} 
 	///   Serialize cutoffs to JSON
 	var psmPeptideCutoffsRootObjectForQueryObject_JSONString = JSON.stringify( psmPeptideCutoffsRootObjectForQuery );
+	
+	var excludeLinksWith_Root_JSONString = undefined;
+	if ( removeNonUniquePSMs ) {
+		var excludeLinksWith_Root = { removeNonUniquePSMs : removeNonUniquePSMs };
+		excludeLinksWith_Root_JSONString = JSON.stringify( excludeLinksWith_Root );
+	}
+	
 	var ajaxRequestData = {
 			psmPeptideCutoffsForProjectSearchIds : psmPeptideCutoffsRootObjectForQueryObject_JSONString,
+			excludeLinksWith_Root : excludeLinksWith_Root_JSONString,
 			project_search_ids: project_search_ids,
 			protein_id : requestContext.from_protein_id,
 			protein_position : requestContext.protein_position

@@ -28,6 +28,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinksWith_Param;
 import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
 import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -52,7 +53,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * 
+ * Only used by Structure page
  *
  */
 @Path("/imageViewer")
@@ -180,6 +181,7 @@ public class Viewer_UDR_Data_Service {
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
 			@QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
 			@QueryParam( "filterOnlyOnePeptide" ) String filterOnlyOnePeptideString,
+			@QueryParam( "removeNonUniquePSMs" ) String removeNonUniquePSMsString,
 			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
 			@Context HttpServletRequest request )
 	throws Exception {
@@ -219,6 +221,13 @@ public class Viewer_UDR_Data_Service {
 		boolean filterOnlyOnePeptide = false;
 		if( "on".equals( filterOnlyOnePeptideString ) )
 			filterOnlyOnePeptide = true;
+		boolean removeNonUniquePSMs = false;
+		if( "on".equals( removeNonUniquePSMsString ) )
+			removeNonUniquePSMs = true;
+
+		LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param();
+		linkedPositions_FilterExcludeLinksWith_Param.setRemoveNonUniquePSMs( removeNonUniquePSMs );
+
 		try {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
@@ -382,13 +391,13 @@ public class Viewer_UDR_Data_Service {
 			//////////////////   Get Crosslinks data from DATABASE  from database
 			List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
 					CrosslinkLinkedPositions.getInstance()
-					.getSearchProteinCrosslinkWrapperList( search, searcherCutoffValuesSearchLevel );
+					.getSearchProteinCrosslinkWrapperList( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 			
 			////////////////////////////////////
 			//////////////////   Get Looplinks data from DATABASE   from database
 			List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
 					LooplinkLinkedPositions.getInstance()
-					.getSearchProteinLooplinkWrapperList( search, searcherCutoffValuesSearchLevel );
+					.getSearchProteinLooplinkWrapperList( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 			
 			// all possible proteins included in this search for this type
 			Collection<SearchProtein> prProteins = new HashSet<SearchProtein>();

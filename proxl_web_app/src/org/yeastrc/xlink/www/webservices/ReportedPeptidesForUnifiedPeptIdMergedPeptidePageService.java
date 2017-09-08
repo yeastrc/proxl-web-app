@@ -28,6 +28,7 @@ import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePage;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePageWrapper;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesPerSearchForMergedPeptidePageResult;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesPerSearchForMergedPeptidePageResultEntry;
+import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher;
@@ -39,7 +40,9 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
+import org.yeastrc.xlink.www.form_query_json_objects.ExcludeLinksWith_JSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
+import org.yeastrc.xlink.www.form_query_json_objects.Z_Deserialize_ExcludeLinksWith_JSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -64,6 +67,7 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 			@QueryParam( "unified_reported_peptide_id" ) Integer unifiedReportedPeptideId,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
 			@QueryParam( "annTypeDisplay" ) String annTypeDisplay_JSONString,
+			@QueryParam( "excludeLinksWith_Root" ) String excludeLinksWith_Root_JSONString,
 			@Context HttpServletRequest request )
 					throws Exception {
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
@@ -174,10 +178,20 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 				annTypeIdDisplayRoot =
 						DeserializeAnnTypeIdDisplayJSONRoot.getInstance().deserializeAnnTypeIdDisplayJSONRoot( annTypeDisplay_JSONString );
 			}
+
+			//  Exclude Links With User Selections:
+			ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot = null;
+			if ( StringUtils.isNotEmpty( excludeLinksWith_Root_JSONString ) ) {
+				excludeLinksWith_JSONRoot = 
+						Z_Deserialize_ExcludeLinksWith_JSONRoot.getInstance()
+						.deserialize_JSON_ToExcludeLinksWith_JSONRoot( excludeLinksWith_Root_JSONString );
+			}
 			
 			ReportedPeptidesPerSearchForMergedPeptidePageResult results =
-					getPeptideData( cutoffValuesRootLevel, annTypeIdDisplayRoot, projectSearchIdsCollection, unifiedReportedPeptideId );
+					getPeptideData( cutoffValuesRootLevel, annTypeIdDisplayRoot, excludeLinksWith_JSONRoot, projectSearchIdsCollection, unifiedReportedPeptideId );
+			
 			return results;
+			
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( ProxlWebappDataException e ) {
@@ -209,6 +223,7 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 	private ReportedPeptidesPerSearchForMergedPeptidePageResult getPeptideData( 
 			CutoffValuesRootLevel cutoffValuesRootLevel,
 			AnnTypeIdDisplayJSONRoot annTypeIdDisplayRoot,
+			ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot,
 			Set<Integer> projectSearchIdsSet,
 			int unifiedReportedPeptideId ) throws Exception {
 
@@ -256,7 +271,7 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 			
 			String searchIdAsString = Integer.toString( eachSearchIdToProcess );
 			
-			List<ReportedPeptidesForMergedPeptidePage> reportedPepidesListOutput = new ArrayList<>();
+			List<ReportedPeptidesForMergedPeptidePage> reportedPepidesListOutput = new ArrayList<>( searchList.size() + 5 );
 
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
 					searcherCutoffValuesRootLevel.getPerSearchCutoffs( eachProjectSearchIdToProcess );
@@ -292,10 +307,58 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 			
 			//  Process each search id, reported peptide id pair
 			for ( int reportedPeptideId : reportedPeptideIdList ) {
+				
 				//  Get Peptide data
 				List<ReportedPeptidesForMergedPeptidePageWrapper> peptideWebDisplayList = 
 						ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher.getInstance().getReportedPeptidesWebDisplay( search, eachSearchIdToProcess, reportedPeptideId, searcherCutoffValuesSearchLevel );
 
+				//////////////////////////////////////////////////////////////////
+				
+				// Filter out links if requested, and Update PSM counts if "remove non-unique PSMs" selected 
+				
+				if( excludeLinksWith_JSONRoot != null &&
+						( excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+								|| excludeLinksWith_JSONRoot.isRemoveNonUniquePSMs() ) ) {
+					
+					///////  Output Lists, Results After Filtering
+					List<ReportedPeptidesForMergedPeptidePageWrapper> peptideWebDisplayList_AfterFilter = new ArrayList<>( peptideWebDisplayList.size() );
+
+					///  Filter links
+					for ( ReportedPeptidesForMergedPeptidePageWrapper webDisplayItemWrapper : peptideWebDisplayList ) {
+
+						ReportedPeptidesForMergedPeptidePage webDisplayItem = webDisplayItemWrapper.getReportedPeptidesForMergedPeptidePage();
+						
+						WebReportedPeptide webReportedPeptide = webDisplayItem.getWebReportedPeptide();
+						
+						// did the user request to removal of links with only Non-Unique PSMs?
+						if( excludeLinksWith_JSONRoot != null && excludeLinksWith_JSONRoot.isRemoveNonUniquePSMs()  ) {
+							//  Update webReportedPeptide object to remove non-unique PSMs
+							webReportedPeptide.updateNumPsmsToNotInclude_NonUniquePSMs();
+							if ( webReportedPeptide.getNumPsms() <= 0 ) {
+								// The number of PSMs after update is now zero
+								//  Skip to next entry in list, dropping this entry from output list
+								continue;  // EARLY CONTINUE
+							}
+						}
+						// did the user request to removal of links with only one PSM?
+						if( excludeLinksWith_JSONRoot.isFilterOnlyOnePSM()  ) {
+							if ( webReportedPeptide.getNumPsms() <= 1 ) {
+								//  Skip to next entry in list, dropping this entry from output list
+								continue;  // EARLY CONTINUE
+							}
+						}
+						
+						peptideWebDisplayList_AfterFilter.add( webDisplayItemWrapper );
+					}
+
+					peptideWebDisplayList = peptideWebDisplayList_AfterFilter;
+				}
+				
+				if ( peptideWebDisplayList.isEmpty() ) {
+					//  Skip to next entry in list, dropping this entry from output list
+					continue;  // EARLY CONTINUE
+				}
+				
 				//  Get Annotation Data for links and Sort Links
 				searchPeptideWebserviceCommonCodeGetDataResult =
 						SearchPeptideWebserviceCommonCode.getInstance()

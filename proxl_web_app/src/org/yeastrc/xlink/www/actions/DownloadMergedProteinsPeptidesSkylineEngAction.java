@@ -42,6 +42,7 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dao.SrchRepPeptPeptideDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
+import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinCrosslink;
@@ -53,6 +54,7 @@ import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+
 /**
  * 
  *
@@ -158,6 +160,9 @@ public class DownloadMergedProteinsPeptidesSkylineEngAction extends Action {
 								projectSearchIdsListDeduppedSorted,
 								searches,
 								searchesMapOnSearchId  );
+
+				ProteinQueryJSONRoot proteinQueryJSONRoot = proteinsMergedCommonPageDownloadResult.getProteinQueryJSONRoot();
+				
 				List<MergedSearchProteinCrosslink> crosslinks = proteinsMergedCommonPageDownloadResult.getCrosslinks();
 
 				// generate file name
@@ -217,6 +222,13 @@ public class DownloadMergedProteinsPeptidesSkylineEngAction extends Action {
 
 							
 							List<PsmWebDisplayWebServiceResult> PSMs = PsmWebDisplaySearcher.getInstance().getPsmsWebDisplay( search.getSearchId(), crosslinkReportedPeptidePeptide.getReportedPeptideId(), searchProteinCrosslinks.get( search ).getSearcherCutoffValuesSearchLevel() );
+							
+							PSMs = DownloadPSMs_Common.getInstance().filterPSMs( proteinQueryJSONRoot, search, PSMs );
+
+							if ( PSMs.isEmpty() ) {
+								//  No PSMs after filter so skip this reported peptide
+								continue;  //  EARLY CONINUE
+							}
 
 							SrchRepPeptPeptideDTO searchReportedPeptidePeptide1 = SrchRepPeptPeptideDAO.getInstance().getForId( crosslinkReportedPeptidePeptide.getSearchReportedPeptidepeptideId_1() );
 							SrchRepPeptPeptideDTO searchReportedPeptidePeptide2 = SrchRepPeptPeptideDAO.getInstance().getForId( crosslinkReportedPeptidePeptide.getSearchReportedPeptidepeptideId_2() );

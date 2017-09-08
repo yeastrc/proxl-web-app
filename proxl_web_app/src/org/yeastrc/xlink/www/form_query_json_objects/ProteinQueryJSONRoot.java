@@ -14,8 +14,11 @@ public class ProteinQueryJSONRoot extends A_QueryBase_JSONRoot {
 	
 	private int[] excludeTaxonomy;
 	private boolean filterNonUniquePeptides;
-	private boolean filterOnlyOnePSM;
 	private boolean filterOnlyOnePeptide;
+	
+	//  Moved to base class A_QueryBase_JSONRoot since also used in Peptide Page
+//	private boolean filterOnlyOnePSM;
+
 	
 	/**
 	 * 
@@ -80,12 +83,6 @@ public class ProteinQueryJSONRoot extends A_QueryBase_JSONRoot {
 	}
 	public void setFilterNonUniquePeptides(boolean filterNonUniquePeptides) {
 		this.filterNonUniquePeptides = filterNonUniquePeptides;
-	}
-	public boolean isFilterOnlyOnePSM() {
-		return filterOnlyOnePSM;
-	}
-	public void setFilterOnlyOnePSM(boolean filterOnlyOnePSM) {
-		this.filterOnlyOnePSM = filterOnlyOnePSM;
 	}
 	public boolean isFilterOnlyOnePeptide() {
 		return filterOnlyOnePeptide;

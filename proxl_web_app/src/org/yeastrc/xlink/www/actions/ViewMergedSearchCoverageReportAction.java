@@ -21,6 +21,7 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
+import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinksWith_Param;
 import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
 import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping;
 import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping.UnlinkedDimerPeptideProteinMappingResult;
@@ -54,6 +55,7 @@ import org.yeastrc.xlink.www.protein_coverage.ProteinCoverageCompute;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
+import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
 import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
@@ -186,7 +188,9 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, request );
 			//  Populate request objects for User Selection of Annotation Data Display
 			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( searches, request );
-			
+			//  Populate request objects for excludeLinksWith_Remove_NonUniquePSMs_Checkbox_Fragment.jsp
+			ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems.getInstance().excludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems( searches, request );
+
 			boolean showStructureLink = true;
 			if ( authAccessLevel.isAssistantProjectOwnerAllowed()
 					|| authAccessLevel.isAssistantProjectOwnerIfProjectNotLockedAllowed() ) {
@@ -232,6 +236,9 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 					Z_CutoffValuesObjectsToOtherObjectsFactory.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
 			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
+			
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param( proteinQueryJSONRoot );
+			
 			//   Get the Protein Coverage Data
 			ProteinCoverageCompute pcs = new ProteinCoverageCompute();
 			pcs.setExcludedProteinSequenceIds( proteinQueryJSONRoot.getExcludeProteinSequenceIds() );
@@ -240,6 +247,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			pcs.setFilterOnlyOnePSM( proteinQueryJSONRoot.isFilterOnlyOnePSM() );
 			pcs.setFilterOnlyOnePeptide( proteinQueryJSONRoot.isFilterOnlyOnePeptide() );
 			pcs.setSearcherCutoffValuesRootLevel( searcherCutoffValuesRootLevel );
+			pcs.setLinkedPositions_FilterExcludeLinksWith_Param( linkedPositions_FilterExcludeLinksWith_Param );
 			pcs.setSearches( searches );
 			List<ProteinCoverageData> pcd = pcs.getProteinCoverageData();
 			request.setAttribute( "proteinCoverageData", pcd );
@@ -260,7 +268,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 					{
 						List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
 								CrosslinkLinkedPositions.getInstance()
-								.getSearchProteinCrosslinkWrapperList( search, searcherCutoffValuesSearchLevel );
+								.getSearchProteinCrosslinkWrapperList( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 						for ( SearchProteinCrosslinkWrapper wrappedCrosslink : wrappedCrosslinks ) {
 							SearchProteinCrosslink crosslink = wrappedCrosslink.getSearchProteinCrosslink();
 							SearchProtein searchProtein_1 = crosslink.getProtein1();
@@ -290,7 +298,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 					{
 						List<SearchProteinLooplinkWrapper> wrappedLooplinkLinks = 
 								LooplinkLinkedPositions.getInstance()
-								.getSearchProteinLooplinkWrapperList( search, searcherCutoffValuesSearchLevel );
+								.getSearchProteinLooplinkWrapperList( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 						for ( SearchProteinLooplinkWrapper wrappedLooplink : wrappedLooplinkLinks ) {
 							SearchProteinLooplink looplink = wrappedLooplink.getSearchProteinLooplink();
 							SearchProtein searchProtein = looplink.getProtein();
@@ -309,7 +317,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 					{
 						UnlinkedDimerPeptideProteinMappingResult unlinkedDimerPeptideProteinMappingResult =
 								UnlinkedDimerPeptideProteinMapping.getInstance()
-								.getSearchProteinUnlinkedAndDimerWrapperLists( search, searcherCutoffValuesSearchLevel );
+								.getSearchProteinUnlinkedAndDimerWrapperLists( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 						List<SearchProteinDimerWrapper> wrappedDimerLinks = 
 								unlinkedDimerPeptideProteinMappingResult.getSearchProteinDimerWrapperList();
 						for ( SearchProteinDimerWrapper wrappedDimer : wrappedDimerLinks ) {

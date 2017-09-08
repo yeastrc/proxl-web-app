@@ -38,6 +38,7 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dao.SrchRepPeptPeptideDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
+import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinCrosslink;
@@ -155,6 +156,9 @@ public class DownloadMergedProteinsPeptidesSkylineShulmanAction extends Action {
 								projectSearchIdsListDeduppedSorted,
 								searches,
 								searchesMapOnSearchId  );
+
+				ProteinQueryJSONRoot proteinQueryJSONRoot = proteinsMergedCommonPageDownloadResult.getProteinQueryJSONRoot();
+				
 				List<MergedSearchProteinCrosslink> crosslinks = proteinsMergedCommonPageDownloadResult.getCrosslinks();
 
 				// generate file name
@@ -191,6 +195,13 @@ public class DownloadMergedProteinsPeptidesSkylineShulmanAction extends Action {
 						for( ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink crosslinkReportedPeptidePeptide : crosslinkReportedPeptidePeptides ) {
 
 							List<PsmWebDisplayWebServiceResult> PSMs = PsmWebDisplaySearcher.getInstance().getPsmsWebDisplay( search.getSearchId(), crosslinkReportedPeptidePeptide.getReportedPeptideId(), searchProteinCrosslinks.get( search ).getSearcherCutoffValuesSearchLevel() );
+
+							PSMs = DownloadPSMs_Common.getInstance().filterPSMs( proteinQueryJSONRoot, search, PSMs );
+
+							if ( PSMs.isEmpty() ) {
+								//  No PSMs after filter so skip this reported peptide
+								continue;  //  EARLY CONINUE
+							}
 
 							SrchRepPeptPeptideDTO searchReportedPeptidePeptide1 = SrchRepPeptPeptideDAO.getInstance().getForId( crosslinkReportedPeptidePeptide.getSearchReportedPeptidepeptideId_1() );
 							SrchRepPeptPeptideDTO searchReportedPeptidePeptide2 = SrchRepPeptPeptideDAO.getInstance().getForId( crosslinkReportedPeptidePeptide.getSearchReportedPeptidepeptideId_2() );
@@ -234,9 +245,13 @@ public class DownloadMergedProteinsPeptidesSkylineShulmanAction extends Action {
 								try {
 									linkerdto = LinkerForPSMMatcher.getInstance().getLinkerForPSM( psm.getPsmDTO() );
 								} catch (Exception e ) {
-									e.printStackTrace();
+									try {
+										int psmId = psm.getPsmDTO().getId();
+										log.error( "Error getting linkerDTO for psmId: " + psmId, e );
+									} catch (Exception e2 ) {
+										log.error( "Error getting searchId: " + psm.getSearchId(), e2 );
+									}
 								}
-
 
 								ILinker linker = GetLinkerFactory.getLinkerForAbbr( linkerdto.getAbbr() );
 

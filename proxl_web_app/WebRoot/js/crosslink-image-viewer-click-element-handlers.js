@@ -16,6 +16,8 @@ function getLooplinkDataForSpecificLinkInGraph( params ) {
 
 	var clickThis = params.clickThis;
 	var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
+	var removeNonUniquePSMs = params.removeNonUniquePSMs;
+	
 	var $clickThis = $(clickThis);
 	incrementSpinner();				// create spinner
 	var from_protein_name = $clickThis.attr( "fromp" );
@@ -33,7 +35,8 @@ function getLooplinkDataForSpecificLinkInGraph( params ) {
 	};
 	var getLooplinkDataCommonParams = {
 			context : context,
-			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject
+			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject,
+			removeNonUniquePSMs : removeNonUniquePSMs
 	};
 	getLooplinkDataCommon( getLooplinkDataCommonParams );
 }
@@ -44,6 +47,8 @@ function getCrosslinkDataForSpecificLinkInGraph( params ) {
 
 	var clickThis = params.clickThis;
 	var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
+	var removeNonUniquePSMs = params.removeNonUniquePSMs;
+	
 	var $clickThis = $(clickThis);
 	incrementSpinner();				// create spinner
 	var from_protein_name = $clickThis.attr( "fromp" );
@@ -98,8 +103,9 @@ function getCrosslinkDataForSpecificLinkInGraph( params ) {
 		context.protein2 = tempprotein;
 	}
 	var getCrosslinkDataCommonParams = {
+			context : context,
 			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject,
-			context : context
+			removeNonUniquePSMs : removeNonUniquePSMs
 	};
 	getCrosslinkDataCommon( getCrosslinkDataCommonParams );
 }
@@ -109,6 +115,8 @@ function getCrosslinkDataForSpecificLinkInGraph( params ) {
 function getMonolinkDataForSpecificLinkInGraph( params ) {
 	var clickThis = params.clickThis;
 	var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
+	var removeNonUniquePSMs = params.removeNonUniquePSMs;
+	
 	var $clickThis = $(clickThis);
 	incrementSpinner();				// create spinner
 	var from_protein_name = $clickThis.attr( "fromp" );
@@ -124,7 +132,8 @@ function getMonolinkDataForSpecificLinkInGraph( params ) {
 	};
 	var getMonolinkDataCommonParams = {
 			context : context,
-			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject
+			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject,
+			removeNonUniquePSMs : removeNonUniquePSMs
 	};
 	getMonolinkDataCommon( getMonolinkDataCommonParams );
 }

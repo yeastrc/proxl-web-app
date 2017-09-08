@@ -20,6 +20,7 @@ var ViewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate = function() {
 
 	var _psmPeptideAnnTypeIdDisplay = null;
 	var _psmPeptideCutoffsRootObject = null;
+	var _excludeLinksWith_Root =  null;
 	var _chosenLinkTypes = undefined;
 	
 	//////////////
@@ -32,6 +33,11 @@ var ViewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate = function() {
 		_psmPeptideAnnTypeIdDisplay = psmPeptideAnnTypeIdDisplay;
 	};
 
+	//////////////
+	this.setExcludeLinksWith_Root = function( excludeLinksWith_Root ) {
+		_excludeLinksWith_Root = excludeLinksWith_Root;
+	};
+	
 	//////////////
 	this.setChosenLinkTypes = function( chosenLinkTypes ) {
 		_chosenLinkTypes = chosenLinkTypes;
@@ -124,11 +130,17 @@ var ViewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate = function() {
 			psmPeptideAnnTypeDisplayPerProjectSearchId_JSONString = JSON.stringify( psmPeptideAnnTypeIdDisplayForProjectSearchId );
 		}
 
+		var excludeLinksWith_Root_JSONString = undefined;
+		if ( _excludeLinksWith_Root ) {
+			excludeLinksWith_Root_JSONString = JSON.stringify( _excludeLinksWith_Root );
+		}
+		
 		var ajaxRequestData = {
 				project_search_id : project_search_id,
 				protein_id : protein_id,
 				psmPeptideCutoffsForProjectSearchId : psmPeptideCutoffsForProjectSearchId_JSONString,
-				peptideAnnTypeDisplayPerSearch : psmPeptideAnnTypeDisplayPerProjectSearchId_JSONString
+				peptideAnnTypeDisplayPerSearch : psmPeptideAnnTypeDisplayPerProjectSearchId_JSONString,
+				excludeLinksWith_Root : excludeLinksWith_Root_JSONString
 		};
 		if ( _chosenLinkTypes !== null && _chosenLinkTypes !== undefined ) {
 			ajaxRequestData.link_type = _chosenLinkTypes;
@@ -209,18 +221,18 @@ var ViewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate = function() {
 			}
 			_handlebarsTemplate_peptide_protein_all_child_row_entry_template = Handlebars.compile( handlebarsSource_peptide_protein_all_child_row_entry_template );
 		}
-		//  Search for NumberUniquePSMs being set in any row
-		var showNumberUniquePSMs = false;
+		//  Search for NumberNonUniquePSMs being set in any row
+		var showNumberNonUniquePSMs = false;
 		for ( var peptide_protein_allIndex = 0; peptide_protein_allIndex < peptide_protein_alls.length ; peptide_protein_allIndex++ ) {
 			var peptide_protein_all = peptide_protein_alls[ peptide_protein_allIndex ];
-			if ( peptide_protein_all.numUniquePsms !== undefined && peptide_protein_all.numUniquePsms !== null ) {
-				showNumberUniquePSMs = true;
+			if ( peptide_protein_all.numNonUniquePsms !== undefined && peptide_protein_all.numNonUniquePsms !== null ) {
+				showNumberNonUniquePSMs = true;
 				break;
 			}
 		}
 		//  create context for header row
 		var context = { 
-				showNumberUniquePSMs : showNumberUniquePSMs,
+				showNumberNonUniquePSMs : showNumberNonUniquePSMs,
 				peptideAnnotationDisplayNameDescriptionList : peptideAnnotationDisplayNameDescriptionList,
 				psmAnnotationDisplayNameDescriptionList : psmAnnotationDisplayNameDescriptionList
 		};
@@ -236,7 +248,7 @@ var ViewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate = function() {
 			var peptide_protein_all = peptide_protein_alls[ peptide_protein_allIndex ];
 			//  wrap data in an object to allow adding more fields
 			var context = { 
-					showNumberUniquePSMs : showNumberUniquePSMs,
+					showNumberNonUniquePSMs : showNumberNonUniquePSMs,
 					data : peptide_protein_all, 
 					projectSearchId : ajaxRequestData.project_search_id
 					};

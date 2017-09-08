@@ -56,8 +56,6 @@ public class ViewerSequenceCoverageService {
 	public SequenceCoverageData getSequenceCoverageDataForProtein( 
 			@QueryParam( "projectSearchId" ) List<Integer> projectSearchIdList,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
-			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
-			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
 			@QueryParam( "proteinSequenceId" ) List<Integer> proteinSequenceIdList,
 			@Context HttpServletRequest request )
 	throws Exception {

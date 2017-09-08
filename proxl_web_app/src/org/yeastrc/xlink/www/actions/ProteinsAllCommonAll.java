@@ -117,6 +117,35 @@ public class ProteinsAllCommonAll {
 						linkTypesForDBQuery, 
 						null /* modMassSelections */, 
 						PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
+
+		//////////////////////////////////////////////////////////////////
+		
+		// Filter out links if requested, and Update PSM counts if "remove non-unique PSMs" selected 
+		
+		if( proteinQueryJSONRoot != null && proteinQueryJSONRoot.isRemoveNonUniquePSMs() ) { // Uncomment inner 'if' if add more conditions here.
+			///////  Output Lists, Results After Filtering
+			List<WebReportedPeptideWrapper> wrappedlinksAfterFilter = new ArrayList<>( wrappedPeptidelinks.size() );
+
+			///  Filter links
+			for ( WebReportedPeptideWrapper webReportedPeptideWrapper : wrappedPeptidelinks ) {
+				WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
+				
+				//  Comment out this 'if' since only single condition in outer 'if'
+				// did the user request to removal of links with only Non-Unique PSMs?
+//				if( proteinQueryJSONRoot != null && proteinQueryJSONRoot.isRemoveNonUniquePSMs()  ) {
+					//  Update webReportedPeptide object to remove non-unique PSMs
+					webReportedPeptide.updateNumPsmsToNotInclude_NonUniquePSMs();
+					if ( webReportedPeptide.getNumPsms() <= 0 ) {
+						// The number of PSMs after update is now zero
+						//  Skip to next entry in list, dropping this entry from output list
+						continue;  // EARLY CONTINUE
+					}
+//				}
+				wrappedlinksAfterFilter.add( webReportedPeptideWrapper );
+			}
+
+			wrappedPeptidelinks = wrappedlinksAfterFilter;
+		}
 		
 		//  Process Reported Peptide records to get Proteins
 		
@@ -131,8 +160,6 @@ public class ProteinsAllCommonAll {
 			
 			WebReportedPeptide webReportedPeptide = wrappedPeptidelink.getWebReportedPeptide();
 			Integer reportedPeptideId = webReportedPeptide.getReportedPeptideId();
-			wrappedPeptidelink.getPeptideAnnotationDTOMap();
-			wrappedPeptidelink.getPsmAnnotationDTOMap();
 			
 			if ( webReportedPeptide.getSearchPeptideCrosslink() != null ) {
 				SrchRepPeptProtSeqIdPosCrosslinkDTO_ForSrchIdRepPeptId_ReqParams reqParams = new SrchRepPeptProtSeqIdPosCrosslinkDTO_ForSrchIdRepPeptId_ReqParams();

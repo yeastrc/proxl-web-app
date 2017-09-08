@@ -63,7 +63,10 @@ public class LooplinkLinkedPositions {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<SearchProteinLooplinkWrapper> getSearchProteinLooplinkWrapperList( SearchDTO search, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
+	public List<SearchProteinLooplinkWrapper> getSearchProteinLooplinkWrapperList( 
+			SearchDTO search, 
+			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param ) throws Exception {
 		
 		int searchId = search.getSearchId();
 		String[] linkTypesLooplink = { PeptideViewLinkTypesConstants.LOOPLINK_PSM };
@@ -152,6 +155,7 @@ public class LooplinkLinkedPositions {
 							populateSearchProteinLooplinkWrapper(
 									search, 
 									searcherCutoffValuesSearchLevel,
+									linkedPositions_FilterExcludeLinksWith_Param,
 									proteinId, 
 									proteinPosition_1, 
 									proteinPosition_2, 
@@ -181,6 +185,7 @@ public class LooplinkLinkedPositions {
 	public SearchProteinLooplinkWrapper getSearchProteinLooplinkWrapperForSearchCutoffsProtIdsPositions( 
 			SearchDTO search, 
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel, 
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param,
 			ProteinSequenceObject protein, 
 			int position1, 
 			int position2 ) throws Exception {
@@ -201,6 +206,7 @@ public class LooplinkLinkedPositions {
 			webReportedPeptide.setSearch( search );
 			webReportedPeptide.setSearchId( search.getSearchId() );
 			webReportedPeptide.setReportedPeptideId( searchPeptideLooplink.getReportedPeptideId() );
+			webReportedPeptide.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 			webReportedPeptide.setNumPsms( searchPeptideLooplink.getNumPsms() );
 			webReportedPeptide.setSearchPeptideLooplink( searchPeptideLooplink );
 			WebReportedPeptideWrapper wrappedPeptidelink = new WebReportedPeptideWrapper();
@@ -213,6 +219,7 @@ public class LooplinkLinkedPositions {
 				populateSearchProteinLooplinkWrapper(
 						search, 
 						searcherCutoffValuesSearchLevel, 
+						linkedPositions_FilterExcludeLinksWith_Param,
 						protein.getProteinSequenceId(), 
 						position1, 
 						position2, 
@@ -236,6 +243,7 @@ public class LooplinkLinkedPositions {
 	private SearchProteinLooplinkWrapper populateSearchProteinLooplinkWrapper(
 			SearchDTO search,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param,
 			Integer proteinId, 
 			Integer proteinPosition_1,
 			Integer proteinPosition_2,
@@ -250,8 +258,21 @@ public class LooplinkLinkedPositions {
 		int numUniqueLinkedPeptides = 0;
 		Set<Integer> reportedPeptideIds = new HashSet<>();
 		Set<Integer> reportedPeptideIdsRelatedPeptidesUnique = new HashSet<>();
+		
 		for ( WebReportedPeptideWrapper webReportedPeptideWrapper : webReportedPeptideWrapperList ) {
 			WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
+			
+			// did the user request to removal of links with only Non-Unique PSMs?
+			if( linkedPositions_FilterExcludeLinksWith_Param.isRemoveNonUniquePSMs()  ) {
+				//  Update webReportedPeptide object to remove non-unique PSMs
+				webReportedPeptide.updateNumPsmsToNotInclude_NonUniquePSMs();
+				if ( webReportedPeptide.getNumPsms() <= 0 ) {
+					// The number of PSMs after update is now zero
+					//  Skip to next entry in list, dropping this entry from output list
+					continue;  // EARLY CONTINUE
+				}
+			}
+
 			Integer reportedPeptideId = webReportedPeptide.getReportedPeptideId();
 			numLinkedPeptides++;
 			reportedPeptideIds.add( reportedPeptideId );

@@ -17,12 +17,20 @@ public class A_QueryBase_JSONRoot {
 	private CutoffValuesRootLevel cutoffs;
 	private AnnTypeIdDisplayJSONRoot annTypeIdDisplay;
 	
+	//  Moved to base class A_QueryBase_JSONRoot since also used in Peptide Page
+	private boolean filterOnlyOnePSM;
+	
+	private boolean removeNonUniquePSMs;
+
+	
 	////////
 	//   Constuctors
 	public A_QueryBase_JSONRoot() {}
 	public A_QueryBase_JSONRoot( A_QueryBase_JSONRoot a_QueryBase_JSONRoot ) {
 		this.cutoffs = a_QueryBase_JSONRoot.cutoffs;
 		this.annTypeIdDisplay = a_QueryBase_JSONRoot.annTypeIdDisplay;
+		this.filterOnlyOnePSM = a_QueryBase_JSONRoot.filterOnlyOnePSM;
+		this.removeNonUniquePSMs = a_QueryBase_JSONRoot.removeNonUniquePSMs;
 	}
 	
 	//////////////////////////////////////////
@@ -41,5 +49,17 @@ public class A_QueryBase_JSONRoot {
 	}
 	public void setAnnTypeIdDisplay(AnnTypeIdDisplayJSONRoot annTypeIdDisplay) {
 		this.annTypeIdDisplay = annTypeIdDisplay;
+	}
+	public boolean isFilterOnlyOnePSM() {
+		return filterOnlyOnePSM;
+	}
+	public void setFilterOnlyOnePSM(boolean filterOnlyOnePSM) {
+		this.filterOnlyOnePSM = filterOnlyOnePSM;
+	}
+	public boolean isRemoveNonUniquePSMs() {
+		return removeNonUniquePSMs;
+	}
+	public void setRemoveNonUniquePSMs(boolean removeNonUniquePSMs) {
+		this.removeNonUniquePSMs = removeNonUniquePSMs;
 	}
 }

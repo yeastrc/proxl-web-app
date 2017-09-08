@@ -1,5 +1,5 @@
 
-//  crosslink-image-viewer-click-element-handlers.js
+//  structure-viewer-click-element-handlers.js
 
 
 
@@ -17,6 +17,7 @@
 function getLooplinkDataForSpecificLinkInGraph( params, link ) {
 
 	var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
+	var removeNonUniquePSMs = params.removeNonUniquePSMs;
 
 	incrementSpinner();				// create spinner
 
@@ -40,7 +41,8 @@ function getLooplinkDataForSpecificLinkInGraph( params, link ) {
 	var getLooplinkDataCommonParams = {
 			
 			context : context,
-			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject
+			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject,
+			removeNonUniquePSMs : removeNonUniquePSMs
 	};
 	
 	getLooplinkDataCommon( getLooplinkDataCommonParams );
@@ -59,6 +61,7 @@ function getLooplinkDataForSpecificLinkInGraph( params, link ) {
 function getCrosslinkDataForSpecificLinkInGraph( params, link ) {
 
 	var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
+	var removeNonUniquePSMs = params.removeNonUniquePSMs;
 	
 	incrementSpinner();				// create spinner
 
@@ -147,6 +150,7 @@ function getCrosslinkDataForSpecificLinkInGraph( params, link ) {
 	var getCrosslinkDataCommonParams = {
 			
 			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject,
+			removeNonUniquePSMs : removeNonUniquePSMs,
 			context : context
 	};
 
@@ -165,6 +169,7 @@ function getMonolinkDataForSpecificLinkInGraph( params, link ) {
 	console.log( params );
 	
 	var psmPeptideCutoffsRootObject = params.psmPeptideCutoffsRootObject;
+	var removeNonUniquePSMs = params.removeNonUniquePSMs;
 	
 	incrementSpinner();				// create spinner
 
@@ -180,7 +185,8 @@ function getMonolinkDataForSpecificLinkInGraph( params, link ) {
 	var getMonolinkDataCommonParams = {
 			
 			context : context,
-			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject
+			psmPeptideCutoffsRootObject : psmPeptideCutoffsRootObject,
+			removeNonUniquePSMs : removeNonUniquePSMs
 	};
 	
 	getMonolinkDataCommon( getMonolinkDataCommonParams );

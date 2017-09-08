@@ -14,27 +14,18 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 	var _handlebarsTemplate_crosslink_protein_data_row_entry_template = null;
 	var _handlebarsTemplate_crosslink_protein_child_row_entry_template = null;
 	var _data_per_search_between_searches_html = null;
+
 	var _psmPeptideCutoffsRootObject = null;
-	//   Currently expect _psmPeptideCriteria = 
-//					searches: Object
-//						128: Object			
-//							peptideCutoffValues: Object
-//								238: Object
-//									id: 238
-//									value: "0.01"
-//							psmCutoffValues: Object
-//								384: Object
-//									id: 384
-//									value: "0.01"
-//							searchId: 128
-//           The key to:
-//				searches - searchId
-//				peptideCutoffValues and psmCutoffValues - annotation type id
-//			peptideCutoffValues.id and psmCutoffValues.id - annotation type id
+	var _excludeLinksWith_Root =  null;
 	
 	//////////////
 	this.setPsmPeptideCriteria = function( psmPeptideCutoffsRootObject ) {
 		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
+	};
+
+	//////////////
+	this.setExcludeLinksWith_Root = function( excludeLinksWith_Root ) {
+		_excludeLinksWith_Root = excludeLinksWith_Root;
 	};
 	
 	//////////////
@@ -132,13 +123,20 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 		}
 		var cutoffsForWebservice = { searches: cutoffsPerProjectSearchIds };
 		var psmPeptideCutoffsForProjectSearchIds_JSONString = JSON.stringify( cutoffsForWebservice );
+
+		var excludeLinksWith_Root_JSONString = undefined;
+		if ( _excludeLinksWith_Root ) {
+			excludeLinksWith_Root_JSONString = JSON.stringify( _excludeLinksWith_Root );
+		}
+		
 		var ajaxRequestData = {
 				project_search_ids : project_search_ids,
 				psmPeptideCutoffsForProjectSearchIds : psmPeptideCutoffsForProjectSearchIds_JSONString,
+				excludeLinksWith_Root : excludeLinksWith_Root_JSONString,
 				protein_1_id : protein_1_id,
 				protein_2_id : protein_2_id,
 				protein_1_position : protein_1_position,
-				protein_2_position : protein_2_position,
+				protein_2_position : protein_2_position
 		};
 		$.ajax({
 			url : contextPathJSVar + "/services/data/getCrosslinkProteinsPerSearchIdsProteinIdsPositions",

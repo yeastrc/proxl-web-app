@@ -8,10 +8,6 @@ public class SearchProteinCrosslinkWrapper extends SortDisplayRecordsWrapperBase
 
 	private SearchProteinCrosslink searchProteinCrosslink;
 
-	
-
-
-
 	/**
 	 * Used for sorting when all the values match so that every time the data is displayed, it is in the same order
 	 * @return

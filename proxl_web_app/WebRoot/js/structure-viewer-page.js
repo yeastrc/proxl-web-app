@@ -121,6 +121,7 @@ var _excludeType;
 var _filterNonUniquePeptides;
 var _filterOnlyOnePSM;
 var _filterOnlyOnePeptide;
+var _removeNonUniquePSMs;
 
 var _distanceReportData = { };
 
@@ -478,7 +479,7 @@ function populateSearchForm() {
 	$( "input#filterNonUniquePeptides" ).prop('checked', _filterNonUniquePeptides);
 	$( "input#filterOnlyOnePSM" ).prop('checked', _filterOnlyOnePSM);
 	$( "input#filterOnlyOnePeptide" ).prop('checked', _filterOnlyOnePeptide);
-
+	$( "input#removeNonUniquePSMs" ).prop('checked', _removeNonUniquePSMs);
 	var html = "";
 	var taxKeys = Object.keys( _taxonomies );
 	
@@ -553,8 +554,12 @@ function getValuesFromForm() {
 		items[ 'filterOnlyOnePeptide' ] = true;
 	else
 		items[ 'filterOnlyOnePeptide' ] = false;
-
-
+	
+	if ( $( "input#removeNonUniquePSMs" ).is( ':checked' ) )
+		items[ 'removeNonUniquePSMs' ] = true;
+	else
+		items[ 'removeNonUniquePSMs' ] = false;
+	
 	var xTax = new Array();
 	var taxKeys = Object.keys( _taxonomies );
 
@@ -611,7 +616,9 @@ function updateURLHash( useSearchForm) {
 //		add filter out non unique peptides
 		items[ 'filterOnlyOnePeptide' ] = _filterOnlyOnePeptide;
 
-		
+//		add filter out non unique peptides
+		items[ 'removeNonUniquePSMs' ] = _removeNonUniquePSMs;
+
 	} else {
 
 //		build hash string from values in form, they've requested a data refresh
@@ -772,13 +779,16 @@ function buildQueryStringFromHash() {
 	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
 		items.push( "filterNonUniquePeptides=on" );
 	}
-	
 	if ( json.filterOnlyOnePSM != undefined && json.filterOnlyOnePSM ) {
 		items.push( "filterOnlyOnePSM=on" );
 	}
 	if ( json.filterOnlyOnePeptide != undefined && json.filterOnlyOnePeptide ) {
 		items.push( "filterOnlyOnePeptide=on" );
 	}
+	if ( json.removeNonUniquePSMs != undefined && json.removeNonUniquePSMs ) {
+		items.push( "removeNonUniquePSMs=on" );
+	}
+
 
 	///   Serialize cutoffs to JSON
 	var cutoffs = json.cutoffs;
@@ -794,6 +804,9 @@ function buildQueryStringFromHash() {
 	}
 	if ( json.filterOnlyOnePeptide != undefined && json.filterOnlyOnePeptide ) {
 		items.push( "filterOnlyOnePeptide=on" );
+	}
+	if ( json.removeNonUniquePSMs != undefined && json.removeNonUniquePSMs ) {
+		items.push( "removeNonUniquePSMs=on" );
 	}
 	
 	queryString += items.join( "&" );
@@ -1689,6 +1702,16 @@ function loadDataFromService() {
 	        		_filterNonUniquePeptides = data.filterNonUniquePeptides;
 	        		_filterOnlyOnePSM = data.filterOnlyOnePSM;
 	        		_filterOnlyOnePeptide = data.filterOnlyOnePeptide;
+	        		_removeNonUniquePSMs = data.removeNonUniquePSMs;
+
+	    			//  Distribute the updated value to the JS code that loads and displays Peptide and PSM data
+	    			webserviceDataParamsDistributionCommonCode.paramsForDistribution( { 
+	    				filterNonUniquePeptides : _filterNonUniquePeptides,
+	    				filterOnlyOnePSM : _filterOnlyOnePSM,
+	    				filterOnlyOnePeptide : _filterOnlyOnePeptide,
+	    				removeNonUniquePSMs : _removeNonUniquePSMs
+	    			} );
+	        		
 	        		_taxonomies = data.taxonomies;
 
 	        		_linkablePositions = data.linkablePositions;
@@ -1782,7 +1805,9 @@ function getNavigationJSON_Not_for_Image_Or_Structure() {
 	if ( json.filterOnlyOnePeptide !== undefined ) {
 		baseJSONObject.filterOnlyOnePeptide = json.filterOnlyOnePeptide;
 	}
-	
+	if ( json.removeNonUniquePSMs !== undefined ) {
+		baseJSONObject.removeNonUniquePSMs = json.removeNonUniquePSMs;
+	}
 	
 	if ( json.excludeTaxonomy !== undefined ) {
 		baseJSONObject.excludeTaxonomy = json.excludeTaxonomy;
@@ -1905,6 +1930,7 @@ function populateNavigation() {
 		imageJSON[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
 		imageJSON[ 'filterOnlyOnePSM' ] = _filterOnlyOnePSM;
 		imageJSON[ 'filterOnlyOnePeptide' ] = _filterOnlyOnePeptide;
+		imageJSON[ 'removeNonUniquePSMs' ] = _removeNonUniquePSMs;
 		var imageJSONString = encodeURI( JSON.stringify( imageJSON ) );
 		imageNavHTML += "image.do" 
 		+ imageQueryString + "#" + imageJSONString;
@@ -3192,7 +3218,8 @@ var updateShownLinks = function () {
 		try {
 
 			var params = { 
-					psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
+					psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject(),
+					removeNonUniquePSMs : _removeNonUniquePSMs
 			};
 
 			var index = $(e.currentTarget ).attr( 'data-crosslink-index' );
@@ -3249,7 +3276,8 @@ var updateShownLinks = function () {
 		try {
 
 			var params = { 
-					psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
+					psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject(),
+					removeNonUniquePSMs : _removeNonUniquePSMs
 			};
 
 
@@ -3838,7 +3866,8 @@ var viewerClicked = function( picked, e ) {
 	var type = picked.target().type;
 	
 	var params = { 
-			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject()
+			psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject(),
+			removeNonUniquePSMs : _removeNonUniquePSMs
 	};
 	
 	if( type == 'monolink' ) {
@@ -5971,6 +6000,14 @@ function initPage() {
 
 			defaultPageView.searchFormChanged_ForDefaultPageView();
 
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	});		
+	$( "input#removeNonUniquePSMs" ).change(function() {
+		try {
+			defaultPageView.searchFormChanged_ForDefaultPageView();
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;

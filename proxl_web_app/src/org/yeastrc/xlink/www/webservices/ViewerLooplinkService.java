@@ -25,6 +25,7 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinksWith_Param;
 import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
@@ -57,6 +58,7 @@ public class ViewerLooplinkService {
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
 			@QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
 			@QueryParam( "filterOnlyOnePeptide" ) String filterOnlyOnePeptideString,
+			@QueryParam( "removeNonUniquePSMs" ) String removeNonUniquePSMsString,
 			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
 			@Context HttpServletRequest request )
 	throws Exception {
@@ -205,7 +207,13 @@ public class ViewerLooplinkService {
 			boolean filterOnlyOnePeptide = false;
 			if( "on".equals( filterOnlyOnePeptideString ) )
 				filterOnlyOnePeptide = true;
-			
+			boolean removeNonUniquePSMs = false;
+			if( "on".equals( removeNonUniquePSMsString ) )
+				removeNonUniquePSMs = true;
+
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param();
+			linkedPositions_FilterExcludeLinksWith_Param.setRemoveNonUniquePSMs( removeNonUniquePSMs );
+
 			Map<Integer, List<SearchProteinLooplinkWrapper>> wrappedLooplinks_MappedOnSearchId = new HashMap<>();
 			for ( SearchDTO searchDTO : searchList ) {
 				int projectSearchId = searchDTO.getProjectSearchId();
@@ -224,7 +232,7 @@ public class ViewerLooplinkService {
 				
 				List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
 						LooplinkLinkedPositions.getInstance()
-						.getSearchProteinLooplinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+						.getSearchProteinLooplinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 
 				// Filter out links if requested
 				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
@@ -354,6 +362,7 @@ public class ViewerLooplinkService {
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
 			@QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
 			@QueryParam( "filterOnlyOnePeptide" ) String filterOnlyOnePeptideString,
+			@QueryParam( "removeNonUniquePSMs" ) String removeNonUniquePSMsString,
 			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
 			@Context HttpServletRequest request )
 	throws Exception {
@@ -510,6 +519,12 @@ public class ViewerLooplinkService {
 			boolean filterOnlyOnePeptide = false;
 			if( "on".equals( filterOnlyOnePeptideString ) )
 				filterOnlyOnePeptide = true;
+			boolean removeNonUniquePSMs = false;
+			if( "on".equals( removeNonUniquePSMsString ) )
+				removeNonUniquePSMs = true;
+
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param();
+			linkedPositions_FilterExcludeLinksWith_Param.setRemoveNonUniquePSMs( removeNonUniquePSMs );
 			
 			Map<Integer, List<SearchProteinLooplinkWrapper>> wrappedLooplinks_MappedOnSearchId = new HashMap<>();
 			for ( SearchDTO searchDTO : searchList ) {
@@ -530,7 +545,7 @@ public class ViewerLooplinkService {
 
 				List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
 						LooplinkLinkedPositions.getInstance()
-						.getSearchProteinLooplinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel );
+						.getSearchProteinLooplinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 
 				// Filter out links if requested
 				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 

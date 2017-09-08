@@ -16,25 +16,11 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 	var _handlebarsTemplate_peptide_data_per_search_block_template = null;
 	var _handlebarsTemplate_peptide_data_per_search_data_row_template = null;
 	var _handlebarsTemplate_peptide_data_per_search_child_row_template = null;
+
+	var _excludeLinksWith_Root = null;
 	var _psmPeptideAnnTypeIdDisplay = null;
 	var _psmPeptideCutoffsRootObject = null;
-	//   Currently expect _psmPeptideCriteria = 
-//					searches: Object
-//						128: Object			
-//							peptideCutoffValues: Object
-//								238: Object
-//									id: 238
-//									value: "0.01"
-//							psmCutoffValues: Object
-//								384: Object
-//									id: 384
-//									value: "0.01"
-//							searchId: 128
-//           The key to:
-//				searches - searchId
-//				peptideCutoffValues and psmCutoffValues - annotation type id
-//			peptideCutoffValues.id and psmCutoffValues.id - annotation type id
-	
+
 	//////////////
 	this.setPsmPeptideCriteria = function( psmPeptideCutoffsRootObject ) {
 		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
@@ -43,6 +29,11 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 	//////////////
 	this.setPsmPeptideAnnTypeIdDisplay = function( psmPeptideAnnTypeIdDisplay ) {
 		_psmPeptideAnnTypeIdDisplay = psmPeptideAnnTypeIdDisplay;
+	};
+
+	//////////////
+	this.setExcludeLinksWith_Root = function( excludeLinksWith_Root ) {
+		_excludeLinksWith_Root = excludeLinksWith_Root;
 	};
 	
 	//////////////
@@ -117,11 +108,18 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 		if ( _psmPeptideAnnTypeIdDisplay ) {
 			annTypeDisplay_JSONString = JSON.stringify( _psmPeptideAnnTypeIdDisplay );
 		}
+
+		var excludeLinksWith_Root_JSONString = undefined;
+		if ( _excludeLinksWith_Root ) {
+			excludeLinksWith_Root_JSONString = JSON.stringify( _excludeLinksWith_Root );
+		}
+		
 		var ajaxRequestData = {
 				project_search_ids : project_search_ids,
 				unified_reported_peptide_id : unified_reported_peptide_id,
 				psmPeptideCutoffsForProjectSearchIds : psmPeptideCutoffsForProjectSearchIds_JSONString,
-				annTypeDisplay : annTypeDisplay_JSONString
+				annTypeDisplay : annTypeDisplay_JSONString,
+				excludeLinksWith_Root : excludeLinksWith_Root_JSONString
 		};
 		$.ajax({
 			url : contextPathJSVar + "/services/data/getReportedPeptidesForUnifiedPeptId",

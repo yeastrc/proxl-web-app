@@ -18,24 +18,9 @@ var ViewMonolinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 	var _handlebarsTemplate_monolink_peptide_data_row_entry_template = null;
 	var _handlebarsTemplate_monolink_peptide_child_row_entry_template = null;
 	
+	var _excludeLinksWith_Root =  null;
 	var _psmPeptideAnnTypeIdDisplay = null;
 	var _psmPeptideCutoffsRootObject = null;
-	//   Currently expect _psmPeptideCriteria = 
-//					searches: Object
-//						128: Object			
-//							peptideCutoffValues: Object
-//								238: Object
-//									id: 238
-//									value: "0.01"
-//							psmCutoffValues: Object
-//								384: Object
-//									id: 384
-//									value: "0.01"
-//							searchId: 128
-//           The key to:
-//				searches - searchId
-//				peptideCutoffValues and psmCutoffValues - annotation type id
-//			peptideCutoffValues.id and psmCutoffValues.id - annotation type id
 
 	//////////////
 	this.setPsmPeptideCriteria = function( psmPeptideCutoffsRootObject ) {
@@ -47,6 +32,11 @@ var ViewMonolinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		_psmPeptideAnnTypeIdDisplay = psmPeptideAnnTypeIdDisplay;
 	};
 
+	//////////////
+	this.setExcludeLinksWith_Root = function( excludeLinksWith_Root ) {
+		_excludeLinksWith_Root = excludeLinksWith_Root;
+	};
+	
 	// ////////////
 	//   Called by "onclick" on HTML element
 	this.showHideMonolinkReportedPeptides = function( params ) {
@@ -140,12 +130,18 @@ var ViewMonolinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 			psmPeptideAnnTypeDisplayPerSearchId_JSONString = JSON.stringify( psmPeptideAnnTypeIdDisplayForSearchId );
 		}
 
+		var excludeLinksWith_Root_JSONString = undefined;
+		if ( _excludeLinksWith_Root ) {
+			excludeLinksWith_Root_JSONString = JSON.stringify( _excludeLinksWith_Root );
+		}
+
 		var ajaxRequestData = {
 				project_search_id : project_search_id,
 				protein_id : protein_id,
 				protein_position : protein_position,
 				psmPeptideCutoffsForProjectSearchId : psmPeptideCutoffsForProjectSearchId_JSONString,
-				peptideAnnTypeDisplayPerSearch : psmPeptideAnnTypeDisplayPerSearchId_JSONString
+				peptideAnnTypeDisplayPerSearch : psmPeptideAnnTypeDisplayPerSearchId_JSONString,
+				excludeLinksWith_Root : excludeLinksWith_Root_JSONString
 		};
 		$.ajax({
 			url : contextPathJSVar + "/services/data/getMonolinkReportedPeptides",

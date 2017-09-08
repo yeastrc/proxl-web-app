@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.dao.ReportedPeptideDAO_Web;
-import org.yeastrc.xlink.base_searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
@@ -26,6 +24,7 @@ import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDat
 import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePage;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesForMergedPeptidePageWrapper;
+import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 
 /**
  * Get the Reported Peptides / Search combinations for a given Reported Peptide id and searchId and cutoffs
@@ -58,7 +57,8 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 			"SELECT"
 //					+ " unified_rp__search__rep_pept__generic_lookup.reported_peptide_id, "
 //			+ " unified_rp__search__rep_pept__generic_lookup.link_type, "
-			+ " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff ";
+			+ " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff,"
+			+ " unified_rp__search__rep_pept__generic_lookup.num_unique_psm_at_default_cutoff ";
 	
 	private final String SQL_FROM_PART = 
 			" FROM "
@@ -334,25 +334,30 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 				ReportedPeptidesForMergedPeptidePage reportedPeptideData = new ReportedPeptidesForMergedPeptidePage();
 				wrappedReportedPeptideData.setReportedPeptidesForMergedPeptidePage( reportedPeptideData );
 				
+				WebReportedPeptide webReportedPeptide = new WebReportedPeptide();
+				reportedPeptideData.setWebReportedPeptide( webReportedPeptide );
+				
 				reportedPeptideData.setSearchId( search.getProjectSearchId() );
 				reportedPeptideData.setSearchName( search.getName() );
 //				int reportedPeptideId = rs.getInt( "reported_peptide_id" );
-				if ( reportedPeptideDTO == null ) {
-					reportedPeptideDTO = ReportedPeptideDAO_Web.getInstance().getReportedPeptideDTO( reportedPeptideId );
-				}
-				reportedPeptideData.setReportedPeptide ( reportedPeptideDTO );
+				
+				webReportedPeptide.setSearch( search );
+				webReportedPeptide.setSearchId( search.getSearchId() );
+				webReportedPeptide.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
+				webReportedPeptide.setReportedPeptideId( reportedPeptideId );
+//				item.setUnifiedReportedPeptideId( reportedPeptideData.getUnifiedReportedPeptideId() );
+				
 				//  These counts are only valid for PSM and Peptide at default cutoffs
 				if ( defaultCutoffsExactlyMatchAnnTypeDataToSearchData ) {
 					//  associated PSM data
 					int numPsmsForDefaultCutoffs = rs.getInt( "psm_num_at_default_cutoff" );
 					if ( ! rs.wasNull() ) {
-						reportedPeptideData.setNumPSMs( numPsmsForDefaultCutoffs );
+						webReportedPeptide.setNumPsms( numPsmsForDefaultCutoffs );
 					}
-				} else {
-					int numPsms = 
-						PsmCountForSearchIdReportedPeptideIdSearcher.getInstance()
-						.getPsmCountForSearchIdReportedPeptideId( reportedPeptideId, searchId, searcherCutoffValuesSearchLevel );
-					reportedPeptideData.setNumPSMs( numPsms );
+					int numUniquePsmsForDefaultCutoffs = rs.getInt( "num_unique_psm_at_default_cutoff" );
+					if ( ! rs.wasNull() ) {
+						webReportedPeptide.setNumUniquePsms( numUniquePsmsForDefaultCutoffs );
+					}
 				}
 				if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
 						|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {

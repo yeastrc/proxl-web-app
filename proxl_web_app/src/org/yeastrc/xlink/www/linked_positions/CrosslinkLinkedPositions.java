@@ -72,7 +72,9 @@ public class CrosslinkLinkedPositions {
 	 * @throws Exception
 	 */
 	public List<SearchProteinCrosslinkWrapper> getSearchProteinCrosslinkWrapperList( 
-			SearchDTO search, SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
+			SearchDTO search, 
+			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param ) throws Exception {
 		
 		int searchId = search.getSearchId();
 		List<WebReportedPeptideWrapper> wrappedPeptidelinks =
@@ -233,6 +235,7 @@ public class CrosslinkLinkedPositions {
 								populateSearchProteinCrosslinkWrapper(
 										search, 
 										searcherCutoffValuesSearchLevel,
+										linkedPositions_FilterExcludeLinksWith_Param,
 										proteinSeqId_1, 
 										proteinPosition_1, 
 										proteinSeqId_2,
@@ -267,6 +270,7 @@ public class CrosslinkLinkedPositions {
 	public SearchProteinCrosslinkWrapper getSearchProteinCrosslinkWrapperForSearchCutoffsProtIdsPositions( 
 			SearchDTO search, 
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel, 
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param,
 			ProteinSequenceObject protein1, 
 			ProteinSequenceObject protein2, 
 			int position1, 
@@ -292,6 +296,7 @@ public class CrosslinkLinkedPositions {
 			webReportedPeptide.setSearch( search );
 			webReportedPeptide.setSearchId( search.getSearchId() );
 			webReportedPeptide.setReportedPeptideId( searchPeptideCrosslink.getReportedPeptideId() );
+			webReportedPeptide.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 			webReportedPeptide.setNumPsms( searchPeptideCrosslink.getNumPsms() );
 			webReportedPeptide.setSearchPeptideCrosslink( searchPeptideCrosslink );
 			WebReportedPeptideWrapper wrappedPeptidelink = new WebReportedPeptideWrapper();
@@ -308,6 +313,7 @@ public class CrosslinkLinkedPositions {
 				populateSearchProteinCrosslinkWrapper(
 						search, 
 						searcherCutoffValuesSearchLevel, 
+						linkedPositions_FilterExcludeLinksWith_Param,
 						protein1.getProteinSequenceId(), 
 						position1, 
 						protein2.getProteinSequenceId(), 
@@ -333,6 +339,7 @@ public class CrosslinkLinkedPositions {
 	private SearchProteinCrosslinkWrapper populateSearchProteinCrosslinkWrapper(
 			SearchDTO search,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
+			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param,
 			Integer proteinSeqId_1, 
 			Integer proteinPosition_1,
 			Integer proteinSeqId_2, 
@@ -344,9 +351,9 @@ public class CrosslinkLinkedPositions {
 				repPept_Stage_1_Wrapper.webReportedPeptideWrapper_And_Assoc_ContainerList;
 		Map<Integer, AnnotationDataBaseDTO> bestPsmAnnotationDTOMap = new HashMap<>();
 		Map<Integer, AnnotationDataBaseDTO> bestPeptideAnnotationDTOMap = new HashMap<>();
-		int numPsms = 0;
-		int numLinkedPeptides = 0;
-		int numUniqueLinkedPeptides = 0;
+		int numPsmsAtProteinLevel = 0;
+		int numLinkedPeptidesAtProteinLevel = 0;
+		int numUniqueLinkedPeptidesAtProteinLevel = 0;
 		Set<Integer> reportedPeptideIds = new HashSet<>();
 		Set<Integer> reportedPeptideIdsRelatedPeptidesUnique = new HashSet<>();
 		List<ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink> reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList = null;
@@ -355,6 +362,20 @@ public class CrosslinkLinkedPositions {
 			WebReportedPeptideWrapper webReportedPeptideWrapper = webReportedPeptideWrapper_And_Assoc_Container.webReportedPeptideWrapper;
 			WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
 			Integer reportedPeptideId = webReportedPeptide.getReportedPeptideId();
+			
+			// did the user request to removal of links with only Non-Unique PSMs?
+			if( linkedPositions_FilterExcludeLinksWith_Param.isRemoveNonUniquePSMs()  ) {
+				//  Update webReportedPeptide object to remove non-unique PSMs
+				webReportedPeptide.updateNumPsmsToNotInclude_NonUniquePSMs();
+				if ( webReportedPeptide.getNumPsms() <= 0 ) {
+					// The number of PSMs after update is now zero
+					//  Skip to next entry in list, dropping this entry from output list
+					continue;  // EARLY CONTINUE
+				}
+			}
+
+			//  Add # PSMs for this reported peptide to the total for this protein
+			numPsmsAtProteinLevel += webReportedPeptide.getNumPsms();;
 
 			  // Not populated for all requests
 			Integer searchReportedPeptidepeptideId_Item_1 = webReportedPeptideWrapper_And_Assoc_Container.searchReportedPeptidepeptideId_Item_1;
@@ -376,7 +397,7 @@ public class CrosslinkLinkedPositions {
 				reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList.add( reportedPeptide_SearchReportedPeptidepeptideId_Crosslink );
 			}
 			
-			numLinkedPeptides++;
+			numLinkedPeptidesAtProteinLevel++;
 			reportedPeptideIds.add( reportedPeptideId );
 			Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request =
 					new Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request();
@@ -387,10 +408,10 @@ public class CrosslinkLinkedPositions {
 					.getRelated_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Result( related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request );
 			boolean areRelatedPeptidesUnique = relatedResult.isRelated_peptides_unique();
 			if ( areRelatedPeptidesUnique ) {
-				numUniqueLinkedPeptides++;
+				numUniqueLinkedPeptidesAtProteinLevel++;
 				reportedPeptideIdsRelatedPeptidesUnique.add( reportedPeptideId );
 			}
-			numPsms += webReportedPeptide.getNumPsms();
+
 			updateBestAnnotationValues( 
 					bestPsmAnnotationDTOMap, 
 					webReportedPeptideWrapper.getPsmAnnotationDTOMap(), 
@@ -432,9 +453,13 @@ public class CrosslinkLinkedPositions {
 		if ( reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList != null ) {
 			searchProteinCrosslink.setReportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList( reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList );
 		}
-		searchProteinCrosslink.setNumPsms( numPsms );
-		searchProteinCrosslink.setNumLinkedPeptides( numLinkedPeptides );
-		searchProteinCrosslink.setNumUniqueLinkedPeptides( numUniqueLinkedPeptides );
+		
+		if ( linkedPositions_FilterExcludeLinksWith_Param.isRemoveNonUniquePSMs() ) {
+			searchProteinCrosslink.setRemoveNonUniquePSMsAppliedTo_numPsms( true );  // Set flag for tracking
+		}
+		searchProteinCrosslink.setNumPsms( numPsmsAtProteinLevel );
+		searchProteinCrosslink.setNumLinkedPeptides( numLinkedPeptidesAtProteinLevel );
+		searchProteinCrosslink.setNumUniqueLinkedPeptides( numUniqueLinkedPeptidesAtProteinLevel );
 		searchProteinCrosslink.setAssociatedReportedPeptideIds( reportedPeptideIds );
 		searchProteinCrosslink.setAssociatedReportedPeptideIdsRelatedPeptidesUnique( reportedPeptideIdsRelatedPeptidesUnique );
 		if ( searchProteinCrosslink.getNumPsms() <= 0 ) {

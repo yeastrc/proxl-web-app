@@ -1,7 +1,7 @@
 
-//viewPsmsLoadedFromWebServiceTemplate.js
+//  viewPsmsLoadedFromWebServiceTemplate.js
 
-//Process and load data into the file viewPsmsLoadedFromWebServiceTemplateFragment.jsp
+//  Process and load data into the file viewPsmsLoadedFromWebServiceTemplateFragment.jsp
 
 
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
@@ -21,24 +21,9 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 	
 	var _googleChartAPIloaded = false;
 
+	var _excludeLinksWith_Root =  null;
 	var _psmPeptideAnnTypeIdDisplay = null;
 	var _psmPeptideCutoffsRootObject = null;
-	//   Currently expect _psmPeptideCriteria = 
-//	searches: Object
-//	128: Object			
-//	peptideCutoffValues: Object
-//	238: Object
-//	id: 238
-//	value: "0.01"
-//	psmCutoffValues: Object
-//	384: Object
-//	id: 384
-//	value: "0.01"
-//	searchId: 128
-//	The key to:
-//	searches - searchId
-//	peptideCutoffValues and psmCutoffValues - annotation type id
-//	peptideCutoffValues.id and psmCutoffValues.id - annotation type id
 
 	this.googleChartAPIloaded = function() {
 		_googleChartAPIloaded = true;
@@ -53,6 +38,11 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 	//////////////
 	this.setPsmPeptideAnnTypeIdDisplay = function( psmPeptideAnnTypeIdDisplay ) {
 		_psmPeptideAnnTypeIdDisplay = psmPeptideAnnTypeIdDisplay;
+	};
+	
+	//////////////
+	this.setExcludeLinksWith_Root = function( excludeLinksWith_Root ) {
+		_excludeLinksWith_Root = excludeLinksWith_Root;
 	};
 
 	//////////
@@ -114,7 +104,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 //			throw Error( "Getting data.  Unable to get cutoff data for project_search_id: " + project_search_id );
 		}
 		var psmPeptideCutoffsForProjectSearchId_JSONString = JSON.stringify( psmPeptideCutoffsForProjectSearchId );
-		var psmAnnTypeDisplayIncludeExclude_JSONString = null;
+		var psmAnnTypeDisplayIncludeExclude_JSONString = undefined;
 		if ( _psmPeptideAnnTypeIdDisplay ) {
 			var psmPeptideAnnTypeIdDisplayForSearchId = _psmPeptideAnnTypeIdDisplay.searches[ project_search_id ];
 			if ( psmPeptideAnnTypeIdDisplayForSearchId === undefined || psmPeptideAnnTypeIdDisplayForSearchId === null ) {
@@ -128,11 +118,18 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			var psmAnnTypeDisplayIncludeExclude = { inclAnnTypeId : psmAnnTypeIdDisplayForSearchId };
 			psmAnnTypeDisplayIncludeExclude_JSONString = JSON.stringify( psmAnnTypeDisplayIncludeExclude );
 		}
+		
+		var excludeLinksWith_Root_JSONString = undefined;
+		if ( _excludeLinksWith_Root ) {
+			excludeLinksWith_Root_JSONString = JSON.stringify( _excludeLinksWith_Root );
+		}
+		
 		var ajaxRequestData = {
 				reported_peptide_id : reported_peptide_id,
 				project_search_id : project_search_id,
 				psmPeptideCutoffsForProjectSearchId : psmPeptideCutoffsForProjectSearchId_JSONString,
-				psmAnnTypeDisplayIncludeExclude : psmAnnTypeDisplayIncludeExclude_JSONString
+				psmAnnTypeDisplayIncludeExclude : psmAnnTypeDisplayIncludeExclude_JSONString,
+				excludeLinksWith_Root : excludeLinksWith_Root_JSONString
 		};
 		$.ajax({
 			url : contextPathJSVar + "/services/data/getPsms",

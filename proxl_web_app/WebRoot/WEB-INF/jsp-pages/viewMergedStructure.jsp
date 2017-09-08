@@ -63,8 +63,6 @@
 <%--  End of Lorikeet Core Parts --%>		
 
 		
-		<%--  On this page also used by crosslink-image-viewer.js and crosslink-image-viewer-click-element-handlers.js --%>				
-				
 		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
 		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
@@ -220,18 +218,8 @@
 				<tr>
 					<td>Exclude links with:</td>
 					<td>
-						 <label><span style="white-space:nowrap;" >
-						 	<input type="checkbox" id="filterNonUniquePeptides">
-						 	 no unique peptides
-						 </span></label>
-						 <label><span style="white-space:nowrap;" >
-						 	<input type="checkbox" id="filterOnlyOnePSM">
-						 	 only one PSM
-						 </span></label>
-						 <label><span style="white-space:nowrap;" >
-						 	<input type="checkbox" id="filterOnlyOnePeptide">
-						 	 only one peptide
-						 </span></label>
+						 <%--  Checkboxes --%>
+						<%@ include file="/WEB-INF/jsp-includes/excludeLinksWith_Checkboxes_ProteinPages_Fragment.jsp" %>
 					</td>
 				</tr>
 				

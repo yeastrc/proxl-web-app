@@ -140,7 +140,8 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 								form,
 								projectSearchIdsListDeduppedSorted,
 								searches,
-								searchesMapOnSearchId );
+								searchesMapOnSearchId,
+								PeptidesMergedCommonPageDownload.FlagCombinedReportedPeptideEntries.NO );
 
 				// generate file name
 				String filename = "xlinks-peptides-search-";

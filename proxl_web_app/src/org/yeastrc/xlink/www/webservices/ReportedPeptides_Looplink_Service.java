@@ -30,7 +30,9 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
+import org.yeastrc.xlink.www.form_query_json_objects.ExcludeLinksWith_JSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
+import org.yeastrc.xlink.www.form_query_json_objects.Z_Deserialize_ExcludeLinksWith_JSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_PerSearchResult;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -66,6 +68,7 @@ public class ReportedPeptides_Looplink_Service {
 			@QueryParam( "project_search_id" ) Integer projectSearchId,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchId" ) String psmPeptideCutoffsForProjectSearchId_JSONString,
 			@QueryParam( "peptideAnnTypeDisplayPerSearch" ) String annTypeIdDisplayJSON_PerSearch_JSONString,
+			@QueryParam( "excludeLinksWith_Root" ) String excludeLinksWith_Root_JSONString,
 			@QueryParam( "protein_id" ) Integer proteinId,
 			@QueryParam( "protein_position_1" ) Integer proteinPosition1,
 			@QueryParam( "protein_position_2" ) Integer proteinPosition2,
@@ -204,6 +207,15 @@ public class ReportedPeptides_Looplink_Service {
 						.deserializeAnnTypeIdDisplayJSON_PerSearch( annTypeIdDisplayJSON_PerSearch_JSONString );
 			}
 			
+			//  Exclude Links With User Selections:
+			ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot = null;
+			if ( StringUtils.isNotEmpty( excludeLinksWith_Root_JSONString ) ) {
+				excludeLinksWith_JSONRoot = 
+						Z_Deserialize_ExcludeLinksWith_JSONRoot.getInstance()
+						.deserialize_JSON_ToExcludeLinksWith_JSONRoot( excludeLinksWith_Root_JSONString );
+			}
+			
+
 			List<SearchPeptideLooplinkAnnDataWrapper> searchPeptideLooplinkList = 
 					SearchPeptideLooplink_LinkedPosition_Searcher.getInstance()
 					.searchOnSearchProteinLooplink( 
@@ -219,7 +231,8 @@ public class ReportedPeptides_Looplink_Service {
 							searchId, 
 							cutoffValuesSearchLevel,
 							searcherCutoffValuesSearchLevel,
-							annTypeIdDisplayJSON_PerSearch
+							annTypeIdDisplayJSON_PerSearch,
+							excludeLinksWith_JSONRoot
 							 );
 			
 			return getLooplinkReportedPeptidesServiceResult;
@@ -259,12 +272,34 @@ public class ReportedPeptides_Looplink_Service {
 			int searchId,
 			CutoffValuesSearchLevel cutoffValuesSearchLevel,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
-			AnnTypeIdDisplayJSON_PerSearch annTypeIdDisplayJSON_PerSearch
+			AnnTypeIdDisplayJSON_PerSearch annTypeIdDisplayJSON_PerSearch,
+			ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot
 			) throws Exception {
 
 		List<Integer> peptideDisplayAnnTypeIdList = null;
 		if ( annTypeIdDisplayJSON_PerSearch != null ) {
 			peptideDisplayAnnTypeIdList = annTypeIdDisplayJSON_PerSearch.getPeptide();
+		}
+		
+		if ( excludeLinksWith_JSONRoot != null && excludeLinksWith_JSONRoot.isRemoveNonUniquePSMs() ) {
+			
+			// Update to Remove non-unique PSMs from PSM counts and any Reported Peptides with zero PSMs after updating PSM count 
+			
+			List<SearchPeptideLooplinkAnnDataWrapper> searchPeptideLooplinkWrappedList_Filtered = new ArrayList<>( searchPeptideLooplinkWrappedList.size() ); 
+			
+			for ( SearchPeptideLooplinkAnnDataWrapper searchPeptideLooplinkWrapped : searchPeptideLooplinkWrappedList ) {
+				SearchPeptideLooplink searchPeptideLooplink = searchPeptideLooplinkWrapped.getSearchPeptideLooplink();
+				//  Update webReportedPeptide object to remove non-unique PSMs
+				searchPeptideLooplink.updateNumPsmsToNotInclude_NonUniquePSMs();
+				if ( searchPeptideLooplink.getNumPsms() <= 0 ) {
+					// The number of PSMs after update is now zero
+					//  Skip to next entry in list, dropping this entry from output list
+					continue;  // EARLY CONTINUE
+				}
+				searchPeptideLooplinkWrappedList_Filtered.add( searchPeptideLooplinkWrapped );
+			}
+			searchPeptideLooplinkWrappedList = searchPeptideLooplinkWrappedList_Filtered;
+			
 		}
 		
 		//  Get Annotation Data for links

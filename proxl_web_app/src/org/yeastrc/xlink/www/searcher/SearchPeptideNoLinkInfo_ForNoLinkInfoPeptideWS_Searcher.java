@@ -27,6 +27,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.objects.SearchPeptideNoLinkInfo;
 import org.yeastrc.xlink.www.objects.SearchPeptideNoLinkInfoAnnDataWrapper;
+import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData;
 import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult;
 
@@ -133,6 +134,7 @@ public class SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher {
 			int proteinId,
 			String[] linkTypes
 			) throws Exception {
+		
 		List<SearchPeptideNoLinkInfoAnnDataWrapper> wrappedLinks = new ArrayList<>();
 		if ( linkTypes != null && linkTypes.length == 0 ) {
 			throw new IllegalArgumentException( "linkTypes cannot be not null and have length of zero" );
@@ -580,16 +582,23 @@ public class SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher {
 					}
 				}
 				SearchPeptideNoLinkInfoAnnDataWrapper wrappedLink = new SearchPeptideNoLinkInfoAnnDataWrapper();
-				SearchPeptideNoLinkInfo link = new SearchPeptideNoLinkInfo();
-				wrappedLink.setSearchPeptideNoLinkInfo( link );
-				link.setSearch( searchDTO );
-				link.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
-				link.setLinkType( queryResultItem.linkType );
-				link.setReportedPeptideId( queryResultItem.reported_peptide_id );
+				
+				SearchPeptideNoLinkInfo searchPeptideNoLinkInfo_Link = new SearchPeptideNoLinkInfo();
+				wrappedLink.setSearchPeptideNoLinkInfo( searchPeptideNoLinkInfo_Link );
+				searchPeptideNoLinkInfo_Link.setLinkType( queryResultItem.linkType );
+				searchPeptideNoLinkInfo_Link.setSearchHasScanData( searchDTO.isHasScanData() );
+				
+				WebReportedPeptide webReportedPeptide_Link = new WebReportedPeptide();
+				searchPeptideNoLinkInfo_Link.setWebReportedPeptide( webReportedPeptide_Link );
+				
+				webReportedPeptide_Link.setSearch( searchDTO );
+				webReportedPeptide_Link.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
+				webReportedPeptide_Link.setLinkType( queryResultItem.linkType );
+				webReportedPeptide_Link.setReportedPeptideId( queryResultItem.reported_peptide_id );
 				if ( queryResultItem.numPsms != null ) {
 					//  Number of PSMs retrieve from reported peptide level record 
 					//  since query is on default Peptide and PSM cutoff values
-					link.setNumPsms( queryResultItem.numPsms );
+					webReportedPeptide_Link.setNumPsms( queryResultItem.numPsms );
 				} else {
 					//  Query is NOT on default Peptide and PSM cutoff values.
 					//  If more than one peptide or PSM cutoff, 
@@ -597,7 +606,7 @@ public class SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher {
 					//  If number of PSMs is zero, then this record is not an actual result record.
 					if ( peptideCutoffsAnnotationTypeDTOList.size() > 1 
 							|| psmCutoffsAnnotationTypeDTOList.size() > 1 ) {
-						if ( link.getNumPsms() <= 0 ) {
+						if ( webReportedPeptide_Link.getNumPsms() <= 0 ) {
 							//  !!!!!!!   Number of PSMs is zero this this isn't really a peptide that meets the cutoffs
 							continue;  //  EARY LOOP ENTRY EXIT
 						}
