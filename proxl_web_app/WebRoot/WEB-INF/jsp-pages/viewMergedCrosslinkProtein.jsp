@@ -99,7 +99,7 @@
 	function createMergedSearchesLinkCountsVennDiagram_PageFunction() {
 	
 		<c:if test="${ not empty vennDiagramDataToJSON }">
-	 		createMergedSearchesLinkCountsVennDiagram( );
+			createMergedSearchesLinkCountsVennDiagram.createMergedSearchesLinkCountsVennDiagram( );
 	 	</c:if>
 	}
 	</script>
