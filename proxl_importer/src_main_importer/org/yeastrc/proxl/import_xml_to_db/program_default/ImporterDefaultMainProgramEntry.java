@@ -913,6 +913,7 @@ public class ImporterDefaultMainProgramEntry {
 			}
 			return importResults;  //  EARLY EXIT
 		} catch ( ProxlImporterDataException e) {
+			log.error( "Caught ProxlImporterDataException: " + e.getMessage(), e );
 			processImporterDataException(
 					importResults,
 					proxlXMLFileImportTrackingDTO,
@@ -921,6 +922,7 @@ public class ImporterDefaultMainProgramEntry {
 					e );
 			return importResults;
 		} catch ( ProxlBaseDataException e) {
+			log.error( "Caught ProxlBaseDataException: " + e.getMessage(), e );
 			processBaseDataException(
 					importResults,
 					proxlXMLFileImportTrackingDTO,
@@ -1037,8 +1039,8 @@ public class ImporterDefaultMainProgramEntry {
 			throws IOException, Exception {
 		
 		if ( ( ! ( exception instanceof ProxlImporterDataException ) )
-				&& ( ! ( exception instanceof ProxlImporterDataException ) ) ) {
-			String msg = "exception not ProxlImporterDataException or ProxlImporterDataException";
+				&& ( ! ( exception instanceof ProxlBaseDataException ) ) ) {
+			String msg = "exception not ProxlImporterDataException or ProxlBaseDataException";
 			log.error( msg );
 			throw new IllegalArgumentException( msg );
 		}

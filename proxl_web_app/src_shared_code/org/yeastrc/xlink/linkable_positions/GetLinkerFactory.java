@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 import org.yeastrc.xlink.linkable_positions.linkers.BMOE;
 import org.yeastrc.xlink.linkable_positions.linkers.BS2;
@@ -23,6 +24,8 @@ public class GetLinkerFactory {
 	
 	private static final Logger log = Logger.getLogger(GetLinkerFactory.class);
 	
+	//   WARNING:  ALL linker abbreviations MUST be Lower Case.  This is because in the importer the incoming linker is converted to lower case
+	
 	public static final String BUILT_IN_LINKER_BMOE = "bmoe";
 	public static final String BUILT_IN_LINKER_BS2 = "bs2";
 	public static final String BUILT_IN_LINKER_BS3 = "bs3";
@@ -36,6 +39,8 @@ public class GetLinkerFactory {
 	public static final String BUILT_IN_LINKER_BS3_STY = "bs3.sty";
 	public static final String BUILT_IN_LINKER_DSS_STY = "dss.sty";
 
+	//   WARNING:  ALL linker abbreviations MUST be Lower Case.  This is because in the importer the incoming linker is converted to lower case
+	
 	
 
 	private static ILinker LINKER_BMOE = new BMOE();
@@ -71,14 +76,14 @@ public class GetLinkerFactory {
 	/**
 	 * @param linkerAbbr
 	 * @return
-	 * @throws Exception 
+	 * @throws ProxlBaseDataException 
 	 */
-	public static ILinker getLinkerForAbbr( String linkerAbbr ) throws Exception {
+	public static ILinker getLinkerForAbbr( String linkerAbbr ) throws ProxlBaseDataException {
 		ILinker linker = linkers.get( linkerAbbr );
 		if ( linker == null ) {
 			String msg = "linker abbreviation '" + linkerAbbr + "' does not match to any supported linker.";
 			log.error( msg );
-			throw new Exception( msg );
+			throw new ProxlBaseDataException( msg );
 		}
 		return linker;
 	}

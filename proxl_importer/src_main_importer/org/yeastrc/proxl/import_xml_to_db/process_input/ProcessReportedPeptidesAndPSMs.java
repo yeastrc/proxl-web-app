@@ -50,6 +50,7 @@ import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
+import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 import org.yeastrc.xlink.utils.XLinkUtils;
@@ -95,7 +96,17 @@ public class ProcessReportedPeptidesAndPSMs {
 		String linkerListStringForErrorMsgs = null;
 		for ( Linker proxlInputLinker : proxlInputLinkerList ) {
 			String proxlInputLinkerName = proxlInputLinker.getName();
-			ILinker linker = GetLinkerFactory.getLinkerForAbbr( proxlInputLinkerName );
+			
+			ILinker linker = null;
+			try {
+				linker = GetLinkerFactory.getLinkerForAbbr( proxlInputLinkerName );
+			} catch ( ProxlBaseDataException e ) {
+				log.error( "GetLinkerFactory.getLinkerForAbbr( linkerAbbr ); threw ProxlBaseDataException. Abbr: " + proxlInputLinkerName, e );
+				throw e;
+			} catch ( Exception e ) {
+				log.error( "GetLinkerFactory.getLinkerForAbbr( linkerAbbr ); threw Exception.  Abbr: " + proxlInputLinkerName, e );
+				throw e;
+			}
 			if( linker == null ) {
 				String msg = "Could not get an ILinker for linker abbreviation: " 
 						+ proxlInputLinkerName;

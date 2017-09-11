@@ -40,6 +40,7 @@ import org.yeastrc.xlink.dto.LinkerPerSearchMonolinkMassDTO;
 import org.yeastrc.xlink.dto.SearchCommentDTO;
 import org.yeastrc.xlink.dto.SearchLinkerDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
+import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 
 /**
@@ -320,25 +321,60 @@ public class ProcessProxlInput {
 			throw new ProxlImporterDataException(msg);
 		}
 		List<Linker> proxlInputLinkerList = proxlInputLinkers.getLinker();
+		if ( proxlInputLinkerList.isEmpty() ) {
+			String msg = "at least one linker is required";
+			log.error( msg );
+			throw new ProxlImporterDataException(msg);
+		}
 		for ( Linker proxlInputLinkerItem : proxlInputLinkerList ) {
 			String linkerAbbr = proxlInputLinkerItem.getName();
+			
+			if ( linkerAbbr == null ) {
+				String msg = "linker element does not have value for name attribute";
+				throw new ProxlImporterDataException( msg );
+			}
+			if ( linkerAbbr.length() == 0 ) {
+				String msg = "linker element name attribute is emty string";
+				throw new ProxlImporterDataException( msg );
+			}
+			
+			//  Lower case since all linker abbr are lower case
+			linkerAbbr = linkerAbbr.toLowerCase();
+			
+			//  Save the lower case version back to the object for use in the rest of the program
+			proxlInputLinkerItem.setName( linkerAbbr );
+			
 			try {
 				//  throws exception if linker abbr not supported in the code
 				GetLinkerFactory.getLinkerForAbbr( linkerAbbr );
-				LinkerDTO linkerDTO = LinkerDAO.getInstance().getLinkerDTOForAbbr( linkerAbbr );
-				if ( linkerDTO == null ) {
-					String msg = "No 'linker' record found for 'abbr': " + linkerAbbr;
-					throw new ProxlImporterDataException( msg );
-				}
-				SearchLinkerDTO searchLinkerDTO = new SearchLinkerDTO();
-				searchLinkerDTO.setSearchId( searchDTO.getId() );
-				searchLinkerDTO.setLinkerId( linkerDTO.getId() );
-				SearchLinkerDAO.getInstance().saveToDatabase( searchLinkerDTO );
-				saveMonolinkMasses( proxlInputLinkerItem, linkerDTO, searchDTO );
-				saveCrosslinkMasses( proxlInputLinkerItem, linkerDTO, searchDTO );
+
+			} catch ( ProxlBaseDataException e ) {
+				log.error( "GetLinkerFactory.getLinkerForAbbr( linkerAbbr ); threw ProxlBaseDataException. Abbr: " + linkerAbbr, e );
+				throw e;
 			} catch ( Exception e ) {
+				log.error( "GetLinkerFactory.getLinkerForAbbr( linkerAbbr ); threw Exception.  Abbr: " + linkerAbbr, e );
 				throw e;
 			}
+			
+			LinkerDTO linkerDTO = null;
+			try {
+				linkerDTO = LinkerDAO.getInstance().getLinkerDTOForAbbr( linkerAbbr );
+			} catch ( Exception e ) {
+				log.error( "LinkerDAO.getInstance().getLinkerDTOForAbbr( linkerAbbr ); threw Exception.  Abbr: " + linkerAbbr, e );
+				throw e;
+			}
+			if ( linkerDTO == null ) {
+				String msg = "No 'linker' record found for 'abbr': " + linkerAbbr;
+				throw new ProxlImporterDataException( msg );
+			}
+			
+			SearchLinkerDTO searchLinkerDTO = new SearchLinkerDTO();
+			searchLinkerDTO.setSearchId( searchDTO.getId() );
+			searchLinkerDTO.setLinkerId( linkerDTO.getId() );
+			SearchLinkerDAO.getInstance().saveToDatabase( searchLinkerDTO );
+			saveMonolinkMasses( proxlInputLinkerItem, linkerDTO, searchDTO );
+			saveCrosslinkMasses( proxlInputLinkerItem, linkerDTO, searchDTO );
+			
 		}
 	}
 	
