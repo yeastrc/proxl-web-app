@@ -10,8 +10,11 @@
 			
 	<c:url value="" var="qc_QueryParams">
 		<c:forEach var="projectSearchId" items="${ formDataForImageStructure_QC.projectSearchId }" >
-			<c:param name="projectSearchId"   value="${projectSearchId}" />
+			<c:param name="projectSearchId"   value="${ projectSearchId }" />
 		</c:forEach>
+		<c:if test="${ not empty formDataForImageStructure_QC.ds }" >
+			<c:param name="ds"   value="${ formDataForImageStructure_QC.ds }" />
+		</c:if>
 	</c:url>
 	
 	<c:set var="qc_PageURL">qc.do<c:out
