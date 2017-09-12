@@ -37,6 +37,7 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 	var _OVERALL_GLOBALS;
 
 	var _project_search_ids = undefined;
+	var _searchIdsObject_Key_projectSearchId = undefined;
 
 	var _colorsPerSearch = undefined;
 	
@@ -106,6 +107,7 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 			_OVERALL_GLOBALS = params.OVERALL_GLOBALS;
 
 			_project_search_ids = params.project_search_ids;
+			_searchIdsObject_Key_projectSearchId = params.searchIdsObject_Key_projectSearchId;
 
 			_colorsPerSearch = params.colorsPerSearch;
 			
@@ -385,21 +387,24 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 		var $chartContainer = params.$chartContainer;
 
 		var linkType = entryForLinkType.linkType;
-		var dataForChartPerSearchIdList = entryForLinkType.dataForChartPerSearchIdList;
+		var dataForChartPerSearchIdMap_KeyProjectSearchId = entryForLinkType.dataForChartPerSearchIdMap_KeyProjectSearchId;
 		
 		//  Get max preMZ_outliers length
 		
 		var preMZ_outliers_Max_Length = 0;
 
 		var preMZ_outliers_Min_Length = undefined;
-		
-		dataForChartPerSearchIdList.forEach( function ( currentArrayValue, indexForSearchId, array ) {
-			if ( currentArrayValue.preMZ_outliers.length > preMZ_outliers_Max_Length ) {
-				preMZ_outliers_Max_Length = currentArrayValue.preMZ_outliers.length; 
+
+		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, index, array ) {
+			
+			var dataForChartPerSearchIdEntry = dataForChartPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
+			
+			if ( dataForChartPerSearchIdEntry.preMZ_outliers.length > preMZ_outliers_Max_Length ) {
+				preMZ_outliers_Max_Length = dataForChartPerSearchIdEntry.preMZ_outliers.length; 
 			}
 			
-			if ( preMZ_outliers_Min_Length === undefined || currentArrayValue.preMZ_outliers.length < preMZ_outliers_Min_Length ) {
-				preMZ_outliers_Min_Length = currentArrayValue.preMZ_outliers.length; 
+			if ( preMZ_outliers_Min_Length === undefined || dataForChartPerSearchIdEntry.preMZ_outliers.length < preMZ_outliers_Min_Length ) {
+				preMZ_outliers_Min_Length = dataForChartPerSearchIdEntry.preMZ_outliers.length; 
 			}
 		}, this /* passed to function as this */ );
 
@@ -440,12 +445,13 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 				
 		chartData.push( chartDataHeaderEntry );
 
-
-		dataForChartPerSearchIdList.forEach( function ( currentArrayValue, indexForSearchId, array ) {
-			var dataForChartPerSearchIdEntry = currentArrayValue;
+		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, indexForProjectSearchId, array ) {
+			
+			var dataForChartPerSearchIdEntry = dataForChartPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
+			
 			var searchId = dataForChartPerSearchIdEntry.searchId;
 			
-			var colorForSearchEntry = _colorsPerSearch[ indexForSearchId ];
+			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
 
 			var chartEntry = [ 
 				searchId.toString(),

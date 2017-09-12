@@ -37,7 +37,8 @@ var QCMergedPageChartIonCurrentStatistics = function() {
 	var _OVERALL_GLOBALS;
 
 	var _project_search_ids = undefined;
-
+	var _searchIdsObject_Key_projectSearchId = undefined;
+	
 	var _anySearchesHaveScanDataYes = undefined;
 
 	//  Contains {{link_type}} to replace with link type.  Contains {{link_type}}_chart_outer_container_jq chart_outer_container_jq
@@ -104,7 +105,8 @@ var QCMergedPageChartIonCurrentStatistics = function() {
 			_OVERALL_GLOBALS = params.OVERALL_GLOBALS;
 
 			_project_search_ids = params.project_search_ids;
-
+			_searchIdsObject_Key_projectSearchId = params.searchIdsObject_Key_projectSearchId;
+			
 			_anySearchesHaveScanDataYes = params.anySearchesHaveScanDataYes;
 
 			//  Contains {{link_type}} to replace with link type.  Contains {{link_type}}_chart_outer_container_jq chart_outer_container_jq
@@ -285,17 +287,19 @@ var QCMergedPageChartIonCurrentStatistics = function() {
 		var $scan_file_selected_file_statistics_display_block = $("#scan_file_selected_file_statistics_display_block");
 		$scan_file_selected_file_statistics_display_block.show();
 		
-		var dataPerSearchList = results.dataPerSearchList;
+		var dataPerSearchMap_KeyProjectSearchId = results.dataPerSearchMap_KeyProjectSearchId;
 		
-		var searchCountPlusOne = dataPerSearchList.length + 1;
-		
+		var searchCountPlusOne = _project_search_ids.length + 1;
+				
 		//  Build array of objects for rendering with Handlebars template
 		
 		var NO_DATA_STRING = "No Data";
 		
 		var displayPerSearchList = [];
-		
-		dataPerSearchList.forEach(function( dataPerSearch, index, array) {
+
+		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, index, array ) {
+			
+			var dataPerSearch = dataPerSearchMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
 			
 			//  Process data for each searchId
 			

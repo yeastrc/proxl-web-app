@@ -184,7 +184,7 @@ public class QC_MissingCleavageReportedPeptidesCount_Merged {
 			
 			for ( String linkType : linkTypesList ) {
 				PerLinkTypeTempData perLinkTypeTempData = new PerLinkTypeTempData();
-				perLinkTypeTempData.linkType = linkType;
+//				perLinkTypeTempData.linkType = linkType;
 				perLinkTypeTempData_ByLinkType.put( linkType, perLinkTypeTempData );
 			}
 			
@@ -378,7 +378,7 @@ public class QC_MissingCleavageReportedPeptidesCount_Merged {
 				// Reported Peptide Count entry add
 				addPerSearchIdEntryForLinkType( 
 						peptideCountPerLinkTypeList, 
-						searchId, 
+						searchDTO, 
 						linkTypeIndex, 
 						perLinkTypeTempData.missedCleavageReportedPeptideCount, 
 						perLinkTypeTempData.totalReportedPeptideCount );
@@ -386,7 +386,7 @@ public class QC_MissingCleavageReportedPeptidesCount_Merged {
 				// Per Reported Peptide Count entry add
 				addPerSearchIdEntryForLinkType( 
 						perPeptideCountPerLinkTypeList, 
-						searchId, 
+						searchDTO, 
 						linkTypeIndex, 
 						perLinkTypeTempData.missedCleavageCount,
 						perLinkTypeTempData.totalReportedPeptideCount );
@@ -394,7 +394,7 @@ public class QC_MissingCleavageReportedPeptidesCount_Merged {
 				 // PSM Count entry add
 				addPerSearchIdEntryForLinkType( 
 						psmCountPerLinkTypeList, 
-						searchId, 
+						searchDTO, 
 						linkTypeIndex, 
 						perLinkTypeTempData.missedCleavagePSMCount,
 						perLinkTypeTempData.totalPSMCount );
@@ -419,17 +419,17 @@ public class QC_MissingCleavageReportedPeptidesCount_Merged {
 	 */
 	public void addPerSearchIdEntryForLinkType(
 			List<QC_MissingCleavageReportedPeptidesCountResultsPerLinkType_Merged> countPerLinkTypeList, 
-			Integer searchId,
+			SearchDTO searchDTO,
 			int linkTypeIndex, 
 			int count,
 			int totalCount ) {
 		
 		QC_MissingCleavageReportedPeptidesCountResultsPerLinkType_Merged countPerLinkTypeEntry = countPerLinkTypeList.get( linkTypeIndex );
 		QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged countsPerSearchId = new QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged();
-		countsPerSearchId.setSearchId(searchId);
+		countsPerSearchId.setSearchId( searchDTO.getSearchId() );
 		countsPerSearchId.setCount( count );
 		countsPerSearchId.setTotalCount( totalCount );
-		countPerLinkTypeEntry.getCountPerSearchIdList().add( countsPerSearchId );
+		countPerLinkTypeEntry.getCountPerSearchIdMap_KeyProjectSearchId().put( searchDTO.getProjectSearchId(), countsPerSearchId );
 	}
 
 
@@ -448,7 +448,7 @@ public class QC_MissingCleavageReportedPeptidesCount_Merged {
 		for ( String linkType : linkTypesDisplayOrderList ) {
 			QC_MissingCleavageReportedPeptidesCountResultsPerLinkType_Merged qc_SummaryCountsResultsPerLinkType_Merged = new QC_MissingCleavageReportedPeptidesCountResultsPerLinkType_Merged();
 			qc_SummaryCountsResultsPerLinkType_Merged.setLinkType( linkType );
-			qc_SummaryCountsResultsPerLinkType_Merged.setCountPerSearchIdList( new ArrayList<QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged>( searches.size() ) );
+			qc_SummaryCountsResultsPerLinkType_Merged.setCountPerSearchIdMap_KeyProjectSearchId( new HashMap<>() );
 			countPerLinkTypeList.add( qc_SummaryCountsResultsPerLinkType_Merged );
 		}
 
@@ -524,7 +524,7 @@ public class QC_MissingCleavageReportedPeptidesCount_Merged {
 		private int missedCleavageCount;
 
 		
-		private String linkType;
+//		private String linkType;
 		
 		//  Per Reported peptide counts
 		public void incrementTotalReportedPeptideCount() {

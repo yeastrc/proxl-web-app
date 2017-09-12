@@ -281,7 +281,10 @@ public class QC_PSM_CountsPerModification_Merged {
 		}
 		
 		QC_PSM_CountsPerModification_Merged_Results result = 
-				createFinalOutputResult( step_2_ResultsPer_LinkType__perLinkType, searchIdsListDeduppedSorted, linkTypesDisplayOrderList, dynamicModsFilterSelectionFromUserPreprocessingResult );
+				createFinalOutputResult( step_2_ResultsPer_LinkType__perLinkType, 
+						searches, 
+						linkTypesDisplayOrderList, 
+						dynamicModsFilterSelectionFromUserPreprocessingResult );
 		
 		result.setSearchIds( searchIdsListDeduppedSorted );
 		result.setFoundData( foundData );
@@ -404,7 +407,7 @@ public class QC_PSM_CountsPerModification_Merged {
 
 	/**
 	 * @param step_2_ResultsPer_LinkType__perLinkType
-	 * @param searchIdsListDeduppedSorted
+	 * @param searches
 	 * @param linkTypesDisplayOrderList
 	 * @param dynamicModsFilterSelectionFromUserPreprocessingResult
 	 * @return
@@ -412,7 +415,7 @@ public class QC_PSM_CountsPerModification_Merged {
 	 */
 	private QC_PSM_CountsPerModification_Merged_Results   createFinalOutputResult ( 
 			Map<String,Step_2_ResultsPer_LinkType_TempData> step_2_ResultsPer_LinkType__perLinkType,
-			List<Integer> searchIdsListDeduppedSorted,
+			List<SearchDTO> searches,
 			List<String> linkTypesDisplayOrderList,
 			DynamicModsFilterSelectionFromUserPreprocessingResult dynamicModsFilterSelectionFromUserPreprocessingResult ) throws ProxlWebappInternalErrorException {
 		
@@ -436,7 +439,7 @@ public class QC_PSM_CountsPerModification_Merged {
 				//  Create entry for no modification
 				QC_PSM_CountsPerModificationResultsPerModMass_Merged result_perModMass = 
 						finalResult_Create_PerModMass_PerSearchId(
-								searchIdsListDeduppedSorted, 
+								searches, 
 								perModMassTempData_ByModMass, 
 								totalCountPerLinkType_BySearchId, 
 								true, // itemForNoMods 
@@ -450,7 +453,7 @@ public class QC_PSM_CountsPerModification_Merged {
 				
 				QC_PSM_CountsPerModificationResultsPerModMass_Merged result_perModMass = 
 						finalResult_Create_PerModMass_PerSearchId(
-								searchIdsListDeduppedSorted, 
+								searches, 
 								perModMassTempData_ByModMass, 
 								totalCountPerLinkType_BySearchId, 
 								false, // itemForNoMods 
@@ -473,14 +476,15 @@ public class QC_PSM_CountsPerModification_Merged {
 	}
 	
 	/**
-	 * @param searchIdsListDeduppedSorted
+	 * @param searches
 	 * @param perModMassTempData_ByModMass
 	 * @param totalCountPerLinkType_BySearchId
 	 * @param itemForNoMods
 	 * @param modMass
+	 * @return
 	 */
 	public QC_PSM_CountsPerModificationResultsPerModMass_Merged finalResult_Create_PerModMass_PerSearchId(
-			List<Integer> searchIdsListDeduppedSorted,
+			List<SearchDTO> searches,
 			Map<Step_2_ResultsPer_ModMass_TempData,
 			Step_2_ResultsPer_ModMass_TempData> perModMassTempData_ByModMass,
 			Map<Integer, Integer> totalCountPerLinkType_BySearchId, 
@@ -495,8 +499,9 @@ public class QC_PSM_CountsPerModification_Merged {
 		QC_PSM_CountsPerModificationResultsPerModMass_Merged perModMass = new QC_PSM_CountsPerModificationResultsPerModMass_Merged();
 		perModMass.setNoModMass( itemForNoMods );
 		perModMass.setModMassLabel( modMassLabel );
-		List<QC_PSM_CountsPerModificationResults_Per_ModMass_SearchId_Merged> countPerSearchIdList = new ArrayList<>( searchIdsListDeduppedSorted.size() );
-		perModMass.setCountPerSearchIdList( countPerSearchIdList );
+		
+		Map<Integer, QC_PSM_CountsPerModificationResults_Per_ModMass_SearchId_Merged> countPerSearchIdMap_KeyProjectSearchId = new HashMap<>();
+		perModMass.setCountPerSearchIdMap_KeyProjectSearchId( countPerSearchIdMap_KeyProjectSearchId );
 		
 		// object to use as key for .get(...)
 		Step_2_ResultsPer_ModMass_TempData step_2_ResultsPer_ModMass_TempData_FOR_GET = new Step_2_ResultsPer_ModMass_TempData();
@@ -509,7 +514,10 @@ public class QC_PSM_CountsPerModification_Merged {
 		if ( step_2_ResultsPer_ModMass_TempData_FROM_MAP != null ) {
 			Map<Integer,Step_2_ResultsPer_SearchId_TempData> perSearchIdTempData_BySearchId =
 					step_2_ResultsPer_ModMass_TempData_FROM_MAP.perSearchIdTempData_BySearchId;
-			for ( Integer searchId : searchIdsListDeduppedSorted ) {
+			for ( SearchDTO search : searches ) {
+				Integer searchId = search.getSearchId();
+				Integer projectSearchId = search.getProjectSearchId();
+
 				Integer totalCountPerLinkType = totalCountPerLinkType_BySearchId.get( searchId );
 				
 				QC_PSM_CountsPerModificationResults_Per_ModMass_SearchId_Merged per_ModMass_SearchId = new QC_PSM_CountsPerModificationResults_Per_ModMass_SearchId_Merged();
@@ -521,11 +529,14 @@ public class QC_PSM_CountsPerModification_Merged {
 				if ( step_2_ResultsPer_SearchId_TempData != null ) {
 					per_ModMass_SearchId.setCount( step_2_ResultsPer_SearchId_TempData.count );
 				}
-				countPerSearchIdList.add( per_ModMass_SearchId );
+				countPerSearchIdMap_KeyProjectSearchId.put( projectSearchId, per_ModMass_SearchId );
 			}
 		} else {
 			//  Create entries for all search ids with count zero
-			for ( Integer searchId : searchIdsListDeduppedSorted ) {
+			for ( SearchDTO search : searches ) {
+				Integer searchId = search.getSearchId();
+				Integer projectSearchId = search.getProjectSearchId();
+
 				Integer totalCountPerLinkType = totalCountPerLinkType_BySearchId.get( searchId );
 				
 				QC_PSM_CountsPerModificationResults_Per_ModMass_SearchId_Merged per_ModMass_SearchId = new QC_PSM_CountsPerModificationResults_Per_ModMass_SearchId_Merged();
@@ -534,7 +545,7 @@ public class QC_PSM_CountsPerModification_Merged {
 					per_ModMass_SearchId.setTotalCount( totalCountPerLinkType );
 				}
 				per_ModMass_SearchId.setCount( 0 );
-				countPerSearchIdList.add( per_ModMass_SearchId );
+				countPerSearchIdMap_KeyProjectSearchId.put( projectSearchId, per_ModMass_SearchId );
 			}
 		}
 		

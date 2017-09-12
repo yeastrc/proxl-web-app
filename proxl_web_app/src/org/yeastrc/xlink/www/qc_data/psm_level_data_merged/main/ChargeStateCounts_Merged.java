@@ -145,6 +145,7 @@ public class ChargeStateCounts_Merged {
 				getPerChartData_KeyedOnLinkType( 
 						allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId_KeyedOnLinkType, 
 						linkTypesList, 
+						searches,
 						searchIdsListDeduppedSorted );
 		
 		return results;
@@ -160,6 +161,7 @@ public class ChargeStateCounts_Merged {
 			// Map<[link type], Map<[search id],Map<[charge value],[count of charge value]>>>
 			Map<String,Map<Integer,Map<Integer,Long>>> allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId_KeyedOnLinkType,
 			List<String> linkTypesList,
+			List<SearchDTO> searches,
 			List<Integer> searchIdsListDeduppedSorted ) {
 		
 		List<ChargeStateCountsResultsForLinkType> dataForChartPerLinkTypeList = new ArrayList<>( linkTypesList.size() );
@@ -176,7 +178,7 @@ public class ChargeStateCounts_Merged {
 				dataForChartPerLinkTypeList.add( resultForLinkType );
 			} else {
 				ChargeStateCountsResultsForLinkType resultForLinkType =
-						getSingleChartData_ForLinkType( allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId, searchIdsListDeduppedSorted );
+						getSingleChartData_ForLinkType( allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId, searches );
 				resultForLinkType.setLinkType( linkType );
 				dataForChartPerLinkTypeList.add( resultForLinkType );
 				foundData = true;
@@ -199,7 +201,7 @@ public class ChargeStateCounts_Merged {
 	private ChargeStateCountsResultsForLinkType getSingleChartData_ForLinkType( 
 			// Map<[search id],Map<[charge value],[count of charge value]>>
 			Map<Integer,Map<Integer,Long>> allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId,
-			List<Integer> searchIdsListDeduppedSorted ) {
+			List<SearchDTO> searches ) {
 		
 		//  First, reprocess maps into  Map<[charge value],Map<[search id],[count of charge value]>>
 		Map<Integer,Map<Integer,Long>> allSearchesCombinedSearchIdCountMap_Map_KeyedOnChargeValue = new HashMap<>();
@@ -232,21 +234,22 @@ public class ChargeStateCounts_Merged {
 			dataForChartPerChargeValueList.add( chargeStateCountsResultsForChargeValue );
 			chargeStateCountsResultsForChargeValue.setCharge( allSearchesCombinedSearchIdCountMapEntry.getKey() );
 			
-			List<ChargeStateCountsResultsForSearchId> countPerSearchIdList = new ArrayList<>( searchIdsListDeduppedSorted.size() );
-			chargeStateCountsResultsForChargeValue.setCountPerSearchIdList( countPerSearchIdList );
+			Map<Integer, ChargeStateCountsResultsForSearchId> countPerSearchIdMap_KeyProjectSearchId = new HashMap<>();
+			chargeStateCountsResultsForChargeValue.setCountPerSearchIdMap_KeyProjectSearchId( countPerSearchIdMap_KeyProjectSearchId );
 			
 			Map<Integer,Long> allSearchesCombinedSearchIdCount = allSearchesCombinedSearchIdCountMapEntry.getValue();
-			for ( Integer searchId : searchIdsListDeduppedSorted ) {
-				Long chargeCount = allSearchesCombinedSearchIdCount.get( searchId );
+			
+			for ( SearchDTO search : searches ) {
+				Long chargeCount = allSearchesCombinedSearchIdCount.get( search.getSearchId() );
 				ChargeStateCountsResultsForSearchId resultForSearchId = new ChargeStateCountsResultsForSearchId();
-				resultForSearchId.setSearchId( searchId );
+				resultForSearchId.setSearchId( search.getSearchId() );
 				if ( chargeCount == null ) {
 					resultForSearchId.setCount( 0 );
 				} else {
 					resultForSearchId.setCount( chargeCount );
 					dataFound = true;
 				}
-				countPerSearchIdList.add( resultForSearchId );
+				countPerSearchIdMap_KeyProjectSearchId.put( search.getProjectSearchId(), resultForSearchId );
 			}
 		};
 		

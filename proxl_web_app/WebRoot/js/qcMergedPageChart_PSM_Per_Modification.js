@@ -37,7 +37,8 @@ var QCMergedPageChart_PSM_Per_Modification = function() {
 	var _OVERALL_GLOBALS;
 
 	var _project_search_ids = undefined;
-
+	var _searchIdsObject_Key_projectSearchId = undefined;
+	
 	var _colorsPerSearch = undefined;
 	
 	var _anySearchesHaveScanDataYes = undefined;
@@ -106,6 +107,7 @@ var QCMergedPageChart_PSM_Per_Modification = function() {
 			_OVERALL_GLOBALS = params.OVERALL_GLOBALS;
 
 			_project_search_ids = params.project_search_ids;
+			_searchIdsObject_Key_projectSearchId = params.searchIdsObject_Key_projectSearchId;
 			
 			_colorsPerSearch = params.colorsPerSearch;
 			
@@ -388,7 +390,7 @@ var QCMergedPageChart_PSM_Per_Modification = function() {
 			
 			var dataForOneModMass = resultsPerModMassArrayValue;
 
-			var countPerSearchIdList = dataForOneModMass.countPerSearchIdList;
+			var countPerSearchIdMap_KeyProjectSearchId = dataForOneModMass.countPerSearchIdMap_KeyProjectSearchId;
 			
 			var modMassLabel = dataForOneModMass.modMassLabel;
 
@@ -398,10 +400,11 @@ var QCMergedPageChart_PSM_Per_Modification = function() {
 			
 			var chartEntry = [ modMassLabel ];
 
-			countPerSearchIdList.forEach( function ( countPerSearchIdArrayValue, index, array ) {
 
-				var chartCountPerSearchIdEntry = countPerSearchIdArrayValue;
-
+			_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, index, array ) {
+				
+				var chartCountPerSearchIdEntry = countPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
+				
 //				var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
 
 				var count = chartCountPerSearchIdEntry.count;

@@ -1,6 +1,7 @@
 package org.yeastrc.xlink.www.qc_data.reported_peptide_level_merged.objects;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Results from PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged
@@ -18,7 +19,7 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results {
 
 		private String linkType;
 		private boolean dataFound;
-		private List<PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForSearchId> dataForChartPerSearchIdList;
+		private Map<Integer, PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForSearchId> dataForChartPerSearchIdMap_KeyProjectSearchId;
 		
 		public String getLinkType() {
 			return linkType;
@@ -32,12 +33,12 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results {
 		public void setDataFound(boolean dataFound) {
 			this.dataFound = dataFound;
 		}
-		public List<PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForSearchId> getDataForChartPerSearchIdList() {
-			return dataForChartPerSearchIdList;
+		public Map<Integer, PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForSearchId> getDataForChartPerSearchIdMap_KeyProjectSearchId() {
+			return dataForChartPerSearchIdMap_KeyProjectSearchId;
 		}
-		public void setDataForChartPerSearchIdList(
-				List<PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForSearchId> dataForChartPerSearchIdList) {
-			this.dataForChartPerSearchIdList = dataForChartPerSearchIdList;
+		public void setDataForChartPerSearchIdMap_KeyProjectSearchId(
+				Map<Integer, PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForSearchId> dataForChartPerSearchIdMap_KeyProjectSearchId) {
+			this.dataForChartPerSearchIdMap_KeyProjectSearchId = dataForChartPerSearchIdMap_KeyProjectSearchId;
 		}
 		
 	}

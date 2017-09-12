@@ -1,6 +1,7 @@
 package org.yeastrc.xlink.www.qc_data.digestion_statistics_merged.objects;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Results for QC_MissingCleavageReportedPeptidesCount_Merged
@@ -22,18 +23,19 @@ public class QC_MissingCleavageReportedPeptidesCount_Merged_Results {
 	public static class QC_MissingCleavageReportedPeptidesCountResultsPerLinkType_Merged {
 		
 		private String linkType;
-		private List<QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged> countPerSearchIdList;
+		private Map<Integer, QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged> countPerSearchIdMap_KeyProjectSearchId;
 		public String getLinkType() {
 			return linkType;
 		}
 		public void setLinkType(String linkType) {
 			this.linkType = linkType;
 		}
-		public List<QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged> getCountPerSearchIdList() {
-			return countPerSearchIdList;
+		public Map<Integer, QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged> getCountPerSearchIdMap_KeyProjectSearchId() {
+			return countPerSearchIdMap_KeyProjectSearchId;
 		}
-		public void setCountPerSearchIdList(List<QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged> countPerSearchIdList) {
-			this.countPerSearchIdList = countPerSearchIdList;
+		public void setCountPerSearchIdMap_KeyProjectSearchId(
+				Map<Integer, QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged> countPerSearchIdMap_KeyProjectSearchId) {
+			this.countPerSearchIdMap_KeyProjectSearchId = countPerSearchIdMap_KeyProjectSearchId;
 		}
 	}
 

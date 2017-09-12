@@ -37,6 +37,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 	var _OVERALL_GLOBALS;
 
 	var _project_search_ids = undefined;
+	var _searchIdsObject_Key_projectSearchId = undefined;
 
 	var _colorsPerSearch = undefined;
 	
@@ -106,6 +107,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 			_OVERALL_GLOBALS = params.OVERALL_GLOBALS;
 
 			_project_search_ids = params.project_search_ids;
+			_searchIdsObject_Key_projectSearchId = params.searchIdsObject_Key_projectSearchId;
 
 			_colorsPerSearch = params.colorsPerSearch;
 
@@ -349,7 +351,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 		var $chartContainer = params.$chartContainer;
 
 		var linkType = entryForLinkType.linkType;
-		var dataForChartPerSearchIdList = entryForLinkType.dataForChartPerSearchIdList;
+		var dataForChartPerSearchIdMap_KeyProjectSearchId = entryForLinkType.dataForChartPerSearchIdMap_KeyProjectSearchId;
 
 		//  Get max peptideLengths_outliers length
 		
@@ -357,15 +359,30 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 
 		var peptideLengths_outliers_Min_Length = undefined;
 		
-		dataForChartPerSearchIdList.forEach( function ( currentArrayValue, indexForSearchId, array ) {
-			if ( currentArrayValue.peptideLengths_outliers.length > peptideLengths_outliers_Max_Length ) {
-				peptideLengths_outliers_Max_Length = currentArrayValue.peptideLengths_outliers.length; 
+
+		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, index, array ) {
+			
+			var dataForChartPerSearchIdEntry = dataForChartPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
+			
+			if ( dataForChartPerSearchIdEntry.peptideLengths_outliers.length > peptideLengths_outliers_Max_Length ) {
+				peptideLengths_outliers_Max_Length = dataForChartPerSearchIdEntry.peptideLengths_outliers.length; 
 			}
 			
-			if ( peptideLengths_outliers_Min_Length === undefined || currentArrayValue.peptideLengths_outliers.length < peptideLengths_outliers_Min_Length ) {
-				peptideLengths_outliers_Min_Length = currentArrayValue.peptideLengths_outliers.length; 
+			if ( peptideLengths_outliers_Min_Length === undefined || dataForChartPerSearchIdEntry.peptideLengths_outliers.length < peptideLengths_outliers_Min_Length ) {
+				peptideLengths_outliers_Min_Length = dataForChartPerSearchIdEntry.peptideLengths_outliers.length; 
 			}
 		}, this /* passed to function as this */ );
+
+//		ss ss
+//		dataForChartPerSearchIdMap_KeyProjectSearchId.forEach( function ( currentArrayValue, indexForSearchId, array ) {
+//			if ( currentArrayValue.peptideLengths_outliers.length > peptideLengths_outliers_Max_Length ) {
+//				peptideLengths_outliers_Max_Length = currentArrayValue.peptideLengths_outliers.length; 
+//			}
+//			
+//			if ( peptideLengths_outliers_Min_Length === undefined || currentArrayValue.peptideLengths_outliers.length < peptideLengths_outliers_Min_Length ) {
+//				peptideLengths_outliers_Min_Length = currentArrayValue.peptideLengths_outliers.length; 
+//			}
+//		}, this /* passed to function as this */ );
 
 		//  chart data for Google charts
 		var chartData = [];
@@ -405,11 +422,13 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 		chartData.push( chartDataHeaderEntry );
 
 
-		dataForChartPerSearchIdList.forEach( function ( currentArrayValue, indexForSearchId, array ) {
-			var dataForChartPerSearchIdEntry = currentArrayValue;
+		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, indexForProjectSearchId, array ) {
+			
+			var dataForChartPerSearchIdEntry = dataForChartPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
+			
 			var searchId = dataForChartPerSearchIdEntry.searchId;
 			
-			var colorForSearchEntry = _colorsPerSearch[ indexForSearchId ];
+			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
 
 			var chartEntry = [ 
 				searchId.toString(),

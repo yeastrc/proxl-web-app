@@ -87,6 +87,19 @@ var MergedPeptideProteinSearchesListVennDiagramSection = function() {
 			var project_search_id = $searches_sort_list_item.attr("data-project_search_id");
 			projectSearchIdsInNewOrder.push( project_search_id );
 		});
+		
+		//   Special case for Merged QC Page
+		
+		if ( window.qcMergedPageMain ) {
+			
+			//   qcMergedPageMain object on window object so call this instead of the code below
+			
+			qcMergedPageMain.changeProjectSearchIdOrderInURL( { projectSearchIdsInNewOrder : projectSearchIdsInNewOrder } );
+			
+			return;  //  EARLY EXIT
+		}
+		
+		
 
 		//  Update order of search ids and submit form
 
@@ -130,20 +143,6 @@ var MergedPeptideProteinSearchesListVennDiagramSection = function() {
 		$form_get_for_updated_parameters_multiple_searches.submit();
 		var z = 0;
 
-//		// Move the moved protein to the correct index position in the index manager
-//		var $selected_proteins_container = $("#selected_proteins_container");
-//		var $protein_select_outer_block_jq_Items = $selected_proteins_container.find(".protein_select_outer_block_jq");
-//		$protein_select_outer_block_jq_Items.each( function( index, element ) {
-//		var $this = $( this );
-//		var tuid = $this.attr("data-uid");
-//		if( tuid === uid ) {
-//		// index is now the position to which we moved the protein
-//		_indexManager.moveEntryToIndexPosition( uid, index );
-//		}
-//		} );
-//		updateURLHash( false /* useSearchForm */ );
-//		//showSelectedProteins();
-//		drawSvg();
 	};
 };
 

@@ -1,6 +1,7 @@
 package org.yeastrc.xlink.www.qc_data.psm_level_data_merged.objects;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * results from ChargeStateCounts_Merged
@@ -49,19 +50,20 @@ public class ChargeStateCounts_Merged_Results {
 	public static class ChargeStateCountsResultsForChargeValue {
 		
 		private int charge;
-		private List<ChargeStateCountsResultsForSearchId> countPerSearchIdList;
+		private Map<Integer, ChargeStateCountsResultsForSearchId> countPerSearchIdMap_KeyProjectSearchId;
 		
-		public List<ChargeStateCountsResultsForSearchId> getCountPerSearchIdList() {
-			return countPerSearchIdList;
-		}
-		public void setCountPerSearchIdList(List<ChargeStateCountsResultsForSearchId> countPerSearchIdList) {
-			this.countPerSearchIdList = countPerSearchIdList;
-		}
 		public int getCharge() {
 			return charge;
 		}
 		public void setCharge(int charge) {
 			this.charge = charge;
+		}
+		public Map<Integer, ChargeStateCountsResultsForSearchId> getCountPerSearchIdMap_KeyProjectSearchId() {
+			return countPerSearchIdMap_KeyProjectSearchId;
+		}
+		public void setCountPerSearchIdMap_KeyProjectSearchId(
+				Map<Integer, ChargeStateCountsResultsForSearchId> countPerSearchIdMap_KeyProjectSearchId) {
+			this.countPerSearchIdMap_KeyProjectSearchId = countPerSearchIdMap_KeyProjectSearchId;
 		}
 		
 	}

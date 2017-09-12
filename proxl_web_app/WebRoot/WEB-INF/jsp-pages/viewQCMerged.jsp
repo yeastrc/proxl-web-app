@@ -72,6 +72,10 @@
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
+		
+		
+		<script type="text/javascript" src="${ contextPath }/js/mergedPeptideProteinSearchesListVennDiagramSection.js?x=${cacheBustValue}"></script>
+		
 
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChartSummaryStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChartDigestionStatistics.js?x=${cacheBustValue}"></script>
@@ -112,6 +116,15 @@
 	<input type="hidden" id="annotation_data_webservice_base_url" value="<c:out value="${ annotation_data_webservice_base_url }"></c:out>"> 
 
 	<input type="hidden" id="project_id" value="<c:out value="${ project_id }"></c:out>"> 
+	
+	
+	<c:forEach var="search" items="${ searches }">
+	
+		<%--  Put Project_Search_Ids on the page for the JS code --%>
+		<input type="hidden" class=" project_search_id__search_id_pair_jq " value="<c:out value="${ search.projectSearchId }"></c:out>:<c:out value="${ search.searchId }"></c:out>">
+	</c:forEach>
+	
+	<input type="hidden" id="userOrderedProjectSearchIds" value="<c:out value="${ userOrderedProjectSearchIds }"></c:out>"> 
 	
 	<c:forEach var="projectSearchId" items="${ projectSearchIds }">
 	

@@ -293,6 +293,8 @@ public class QC_SummaryCounts_Merged {
 
 		for ( SearchDTO searchDTO : searches ) {
 			Integer searchId = searchDTO.getSearchId();
+			Integer projectSearchId = searchDTO.getProjectSearchId();
+			
 			PerSearchIdTempData perSearchIdTempData = perSearchIdTempData_BySearchId.get( searchId );
 			if ( perSearchIdTempData == null ) {
 				String msg = "Internal error, search id not found in perSearchIdTempData_BySearchId. searchId: " + searchId;
@@ -312,21 +314,21 @@ public class QC_SummaryCounts_Merged {
 					throw new ProxlWebappInternalErrorException(msg);
 				}
 				 // PSM Count entry add
-				addPerSearchIdEntryForLinkType( psmCountPerLinkTypeList, searchId, linkTypeIndex, perLinkTypeTempData.psmCount );
+				addPerSearchIdEntryForLinkType( psmCountPerLinkTypeList, searchId, projectSearchId, linkTypeIndex, perLinkTypeTempData.psmCount );
 				// Reported Peptide Count entry add
-				addPerSearchIdEntryForLinkType( reportedPeptideCountPerLinkTypeList, searchId, linkTypeIndex, perLinkTypeTempData.reportedPeptideIds.size() );
+				addPerSearchIdEntryForLinkType( reportedPeptideCountPerLinkTypeList, searchId, projectSearchId, linkTypeIndex, perLinkTypeTempData.reportedPeptideIds.size() );
 				// Protein Count entry add
-				addPerSearchIdEntryForLinkType( proteinCountPerLinkTypeList, searchId, linkTypeIndex, perLinkTypeTempData.proteinSequenceIds.size() );
+				addPerSearchIdEntryForLinkType( proteinCountPerLinkTypeList, searchId, projectSearchId, linkTypeIndex, perLinkTypeTempData.proteinSequenceIds.size() );
 			}
 			
 			//  Process Combined entry across link types
 			PerLinkTypeTempData combinedCountsPerSearchEntry = perSearchIdTempData.combinedCountsPerSearchEntry;
 			 // PSM Count entry add
-			addPerSearchIdEntryForCombined( psmCountPerLinkTypeList, searchId, combinedEntryIndex, combinedCountsPerSearchEntry.psmCount );
+			addPerSearchIdEntryForCombined( psmCountPerLinkTypeList, searchId, projectSearchId, combinedEntryIndex, combinedCountsPerSearchEntry.psmCount );
 			// Reported Peptide Count entry add
-			addPerSearchIdEntryForCombined( reportedPeptideCountPerLinkTypeList, searchId, combinedEntryIndex, combinedCountsPerSearchEntry.reportedPeptideIds.size() );
+			addPerSearchIdEntryForCombined( reportedPeptideCountPerLinkTypeList, searchId, projectSearchId, combinedEntryIndex, combinedCountsPerSearchEntry.reportedPeptideIds.size() );
 			// Protein Count entry add
-			addPerSearchIdEntryForCombined( proteinCountPerLinkTypeList, searchId, combinedEntryIndex, combinedCountsPerSearchEntry.proteinSequenceIds.size() );
+			addPerSearchIdEntryForCombined( proteinCountPerLinkTypeList, searchId, projectSearchId, combinedEntryIndex, combinedCountsPerSearchEntry.proteinSequenceIds.size() );
 		}
 
 		QC_SummaryCounts_Merged_Results result = new QC_SummaryCounts_Merged_Results();
@@ -347,6 +349,7 @@ public class QC_SummaryCounts_Merged {
 	public void addPerSearchIdEntryForLinkType(
 			List<QC_SummaryCountsResultsPerLinkType_Merged> countPerLinkTypeList, 
 			Integer searchId,
+			Integer projectSearchId,
 			int linkTypeIndex, 
 			int count) {
 		
@@ -354,7 +357,7 @@ public class QC_SummaryCounts_Merged {
 		QC_SummaryCountsResults_PerSearchId_Merged countsPerSearchId = new QC_SummaryCountsResults_PerSearchId_Merged();
 		countsPerSearchId.setSearchId(searchId);
 		countsPerSearchId.setCount( count );
-		countPerLinkTypeEntry.getCountPerSearchIdList().add( countsPerSearchId );
+		countPerLinkTypeEntry.getCountPerSearchIdMap_KeyProjectSearchId().put( projectSearchId, countsPerSearchId );
 	}
 
 	/**
@@ -366,6 +369,7 @@ public class QC_SummaryCounts_Merged {
 	public void addPerSearchIdEntryForCombined(
 			List<QC_SummaryCountsResultsPerLinkType_Merged> countPerLinkTypeList, 
 			Integer searchId,
+			Integer projectSearchId,
 			int combinedEntryIndex,
 			int count) {
 
@@ -373,7 +377,7 @@ public class QC_SummaryCounts_Merged {
 		QC_SummaryCountsResults_PerSearchId_Merged countsPerSearchId = new QC_SummaryCountsResults_PerSearchId_Merged();
 		countsPerSearchId.setSearchId(searchId);
 		countsPerSearchId.setCount( count );
-		countPerLinkTypeEntry.getCountPerSearchIdList().add( countsPerSearchId );
+		countPerLinkTypeEntry.getCountPerSearchIdMap_KeyProjectSearchId().put( projectSearchId, countsPerSearchId );
 	}
 
 
@@ -392,14 +396,14 @@ public class QC_SummaryCounts_Merged {
 		for ( String linkType : linkTypesDisplayOrderList ) {
 			QC_SummaryCountsResultsPerLinkType_Merged qc_SummaryCountsResultsPerLinkType_Merged = new QC_SummaryCountsResultsPerLinkType_Merged();
 			qc_SummaryCountsResultsPerLinkType_Merged.setLinkType( linkType );
-			qc_SummaryCountsResultsPerLinkType_Merged.setCountPerSearchIdList( new ArrayList<QC_SummaryCountsResults_PerSearchId_Merged>( searches.size() ) );
+			qc_SummaryCountsResultsPerLinkType_Merged.setCountPerSearchIdMap_KeyProjectSearchId( new HashMap<>() );
 			countPerLinkTypeList.add( qc_SummaryCountsResultsPerLinkType_Merged );
 		}
 
 		//  Add Combined Entry
 		QC_SummaryCountsResultsPerLinkType_Merged qc_SummaryCountsResultsPerLinkType_Merged = new QC_SummaryCountsResultsPerLinkType_Merged();
 		qc_SummaryCountsResultsPerLinkType_Merged.setCombinedEntry( true );
-		qc_SummaryCountsResultsPerLinkType_Merged.setCountPerSearchIdList( new ArrayList<QC_SummaryCountsResults_PerSearchId_Merged>( searches.size() ) );
+		qc_SummaryCountsResultsPerLinkType_Merged.setCountPerSearchIdMap_KeyProjectSearchId( new HashMap<>() );
 		countPerLinkTypeList.add( qc_SummaryCountsResultsPerLinkType_Merged );
 
 	}

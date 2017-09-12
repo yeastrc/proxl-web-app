@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.qc_data.scan_level_data_merged.objects;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Results from Scan_Statistics_Merged
@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class Scan_Statistics_Merged_Results {
 	
-	private List<Scan_Statistics_PerSearch> dataPerSearchList;
+	private Map<Integer, Scan_Statistics_PerSearch> dataPerSearchMap_KeyProjectSearchId;
 	
 	private boolean haveData;
 
@@ -100,20 +100,21 @@ public class Scan_Statistics_Merged_Results {
 		
 	}
 
-	public List<Scan_Statistics_PerSearch> getDataPerSearchList() {
-		return dataPerSearchList;
-	}
-
-	public void setDataPerSearchList(List<Scan_Statistics_PerSearch> dataPerSearchList) {
-		this.dataPerSearchList = dataPerSearchList;
-	}
-
 	public boolean isHaveData() {
 		return haveData;
 	}
 
 	public void setHaveData(boolean haveData) {
 		this.haveData = haveData;
+	}
+
+	public Map<Integer, Scan_Statistics_PerSearch> getDataPerSearchMap_KeyProjectSearchId() {
+		return dataPerSearchMap_KeyProjectSearchId;
+	}
+
+	public void setDataPerSearchMap_KeyProjectSearchId(
+			Map<Integer, Scan_Statistics_PerSearch> dataPerSearchMap_KeyProjectSearchId) {
+		this.dataPerSearchMap_KeyProjectSearchId = dataPerSearchMap_KeyProjectSearchId;
 	}
 	
 }

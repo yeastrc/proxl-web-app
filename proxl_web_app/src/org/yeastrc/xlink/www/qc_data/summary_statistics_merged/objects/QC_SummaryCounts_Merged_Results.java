@@ -1,6 +1,7 @@
 package org.yeastrc.xlink.www.qc_data.summary_statistics_merged.objects;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -23,7 +24,7 @@ public class QC_SummaryCounts_Merged_Results {
 		
 		private String linkType;
 		private boolean combinedEntry;
-		private List<QC_SummaryCountsResults_PerSearchId_Merged> countPerSearchIdList;
+		private Map<Integer,QC_SummaryCountsResults_PerSearchId_Merged> countPerSearchIdMap_KeyProjectSearchId;
 		public String getLinkType() {
 			return linkType;
 		}
@@ -36,12 +37,14 @@ public class QC_SummaryCounts_Merged_Results {
 		public void setCombinedEntry(boolean combinedEntry) {
 			this.combinedEntry = combinedEntry;
 		}
-		public List<QC_SummaryCountsResults_PerSearchId_Merged> getCountPerSearchIdList() {
-			return countPerSearchIdList;
+		public Map<Integer, QC_SummaryCountsResults_PerSearchId_Merged> getCountPerSearchIdMap_KeyProjectSearchId() {
+			return countPerSearchIdMap_KeyProjectSearchId;
 		}
-		public void setCountPerSearchIdList(List<QC_SummaryCountsResults_PerSearchId_Merged> countPerSearchIdList) {
-			this.countPerSearchIdList = countPerSearchIdList;
+		public void setCountPerSearchIdMap_KeyProjectSearchId(
+				Map<Integer, QC_SummaryCountsResults_PerSearchId_Merged> countPerSearchIdMap_KeyProjectSearchId) {
+			this.countPerSearchIdMap_KeyProjectSearchId = countPerSearchIdMap_KeyProjectSearchId;
 		}
+
 	}
 
 	/**
