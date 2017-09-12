@@ -280,9 +280,10 @@ public class ProteinsService {
 						//////////////////////////////////////////////////////////////////
 						//////////    Filter Links based on user request
 						// Filter out links if requested
-						if( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
-								|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
-								|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() )
+						if( excludeLinksWith_JSONRoot != null 
+								&& ( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
+										|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+										|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() ) )
 								
 								//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
 						{
@@ -571,9 +572,10 @@ public class ProteinsService {
 						//////////////////////////////////////////////////////////////////
 						//////////    Filter Links based on user request
 						// Filter out links if requested
-						if( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
-								|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
-								|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() )
+						if( excludeLinksWith_JSONRoot != null 
+								&& ( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
+										|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+										|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() ) )
 								
 								//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
 						{
@@ -867,9 +869,10 @@ public class ProteinsService {
 						//////////////////////////////////////////////////////////////////
 						//////////    Filter Links based on user request
 						// Filter out links if requested
-						if( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
-								|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
-								|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() )
+						if( excludeLinksWith_JSONRoot != null 
+								&& ( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
+										|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+										|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() ) )
 								
 								//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
 						{
@@ -1182,9 +1185,10 @@ public class ProteinsService {
 					//////////////////////////////////////////////////////////////////
 					//////////    Filter Links based on user request
 					// Filter out links if requested
-					if( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
-							|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
-							|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() )
+					if( excludeLinksWith_JSONRoot != null 
+							&& ( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
+									|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+									|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() ) )
 							
 							//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
 					{
