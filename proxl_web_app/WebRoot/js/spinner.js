@@ -67,7 +67,8 @@ var decrementSpinner = function() {
 	if( !numSpinners ) {
 		destroySpinner();
 	}
-	
-	loadingSpinner.numSpinners = numSpinners;
+	if( numSpinners ) {
+		loadingSpinner.numSpinners = numSpinners;
+	}
 	
 };
