@@ -37,6 +37,7 @@ var QCMergedPageChartSummaryStatistics = function() {
 	var _OVERALL_GLOBALS;
 
 	var _project_search_ids = undefined;
+	var _searchIdsObject_Key_projectSearchId = undefined;
 	
 	var _colorsPerSearch = undefined;
 
@@ -106,6 +107,8 @@ var QCMergedPageChartSummaryStatistics = function() {
 			_OVERALL_GLOBALS = params.OVERALL_GLOBALS;
 
 			_project_search_ids = params.project_search_ids;
+			
+			_searchIdsObject_Key_projectSearchId = params.searchIdsObject_Key_projectSearchId;
 			
 			_colorsPerSearch = params.colorsPerSearch;
 
@@ -383,8 +386,12 @@ var QCMergedPageChartSummaryStatistics = function() {
 		
 		var chartDataHeaderEntry = [ 'Link Type' ];
 		
-		searchIds.forEach( function ( currentArrayValue, index, array ) {
-			chartDataHeaderEntry.push( currentArrayValue.toString() );
+
+		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, index, array ) {
+
+			var searchId = _searchIdsObject_Key_projectSearchId[ _project_search_ids_ArrayValue ];
+		
+			chartDataHeaderEntry.push( searchId.toString() );
 			chartDataHeaderEntry.push( { role: 'style' } );  // Style of the bar 
 			chartDataHeaderEntry.push( {role: "tooltip", 'p': {'html': true} } );
 //			chartDataHeaderEntry.push(  {type: 'string', role: 'annotation'} );
@@ -399,7 +406,7 @@ var QCMergedPageChartSummaryStatistics = function() {
 			var totalForLinkType = dataWithOneElementPerTypeArrayValue;
 
 			var linkType = totalForLinkType.linkType;
-			var countPerSearchIdList = totalForLinkType.countPerSearchIdList;
+			var countPerSearchIdMap_KeyProjectSearchId = totalForLinkType.countPerSearchIdMap_KeyProjectSearchId;
 
 			if ( totalForLinkType.combinedEntry ) {
 				//  Combined entry so set link type text for combined entry
@@ -408,9 +415,9 @@ var QCMergedPageChartSummaryStatistics = function() {
 			
 			var chartEntry = [ linkType ];
 			
-			countPerSearchIdList.forEach( function ( countPerSearchIdArrayValue, index, array ) {
-
-				var countPerSearchIdEntry = countPerSearchIdArrayValue;
+			_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, index, array ) {
+				
+				var countPerSearchIdEntry = countPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
 				
 //				var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
 				

@@ -100,11 +100,12 @@ var CreateMergedSearchesLinkCountsVennDiagram = function() {
 			event.preventDefault();
 			event.stopPropagation();
 		});
-		var $svg_download_outer_block_jq = $chart_outer_container_for_download_jq.find(".svg_download_outer_block_jq");
-		$svg_download_outer_block_jq.click( function( event ) {  
-			event.preventDefault();
-			event.stopPropagation();
-		});
+		//  Comment out since no elements with class 'svg_download_outer_block_jq'
+//		var $svg_download_outer_block_jq = $venn_diagram_download_link_jq_All.find(".svg_download_outer_block_jq");
+//		$svg_download_outer_block_jq.click( function( event ) {  
+//			event.preventDefault();
+//			event.stopPropagation();
+//		});
 		
 	};
 

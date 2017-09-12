@@ -38,6 +38,8 @@ var QCMergedPageChartDigestionStatistics = function() {
 
 	var _project_search_ids = undefined;
 
+	var _searchIdsObject_Key_projectSearchId = undefined;
+	
 	var _colorsPerSearch = undefined;
 	
 	var _anySearchesHaveScanDataYes = undefined;
@@ -106,6 +108,7 @@ var QCMergedPageChartDigestionStatistics = function() {
 			_OVERALL_GLOBALS = params.OVERALL_GLOBALS;
 
 			_project_search_ids = params.project_search_ids;
+			_searchIdsObject_Key_projectSearchId = params.searchIdsObject_Key_projectSearchId;
 			
 			_colorsPerSearch = params.colorsPerSearch;
 
@@ -334,8 +337,11 @@ var QCMergedPageChartDigestionStatistics = function() {
 			listPerLinkType.forEach( function ( peptideCountPerLinkTypeEntry, index, array ) {
 				var linkType = peptideCountPerLinkTypeEntry.linkType;
 				var chartCountPerSearchIdArray = [];
-				peptideCountPerLinkTypeEntry.countPerSearchIdList.forEach( function ( countPerSearchIdEntry, index, array ) {
-
+				
+				_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, index, array ) {
+					
+					var countPerSearchIdEntry = peptideCountPerLinkTypeEntry.countPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
+					
 					var count = countPerSearchIdEntry.count;
 					var totalCount = countPerSearchIdEntry.totalCount;
 					
@@ -474,8 +480,12 @@ var QCMergedPageChartDigestionStatistics = function() {
 
 		var chartDataHeaderEntry = [ 'Link Type' ]
 
-		searchIds.forEach( function ( currentArrayValue, index, array ) {
-			chartDataHeaderEntry.push( currentArrayValue.toString() );
+
+		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, index, array ) {
+
+			var searchId = _searchIdsObject_Key_projectSearchId[ _project_search_ids_ArrayValue ];
+		
+			chartDataHeaderEntry.push( searchId.toString() );
 			chartDataHeaderEntry.push( { role: 'style' } );  // Style of the bar 
 			chartDataHeaderEntry.push( {role: "tooltip", 'p': {'html': true} } );
 //			chartDataHeaderEntry.push(  {type: 'string', role: 'annotation'} );

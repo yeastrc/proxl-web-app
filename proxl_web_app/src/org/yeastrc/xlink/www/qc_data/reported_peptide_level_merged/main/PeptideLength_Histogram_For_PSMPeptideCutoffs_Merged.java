@@ -142,7 +142,7 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 				getPerChartData_KeyedOnLinkType( 
 						allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType, 
 						linkTypesList, 
-						searchIdsListDeduppedSorted );
+						searches );
 
 		return results;
 	}
@@ -157,7 +157,7 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 	private PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results getPerChartData_KeyedOnLinkType( 
 			Map<String,Map<Integer,List<Integer>>> allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType, 
 			List<String> linkTypesList,
-			List<Integer> searchIdsListDeduppedSorted ) throws ProxlWebappInternalErrorException {
+			List<SearchDTO> searches ) throws ProxlWebappInternalErrorException {
 		
 		List<PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForLinkType> dataForChartPerLinkTypeList = new ArrayList<>( linkTypesList.size() );
 
@@ -172,7 +172,7 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 				dataForChartPerLinkTypeList.add( resultForLinkType );
 			} else {
 				PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForLinkType resultForLinkType =
-						getSingleChartData_ForLinkType( allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId, searchIdsListDeduppedSorted );
+						getSingleChartData_ForLinkType( allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId, searches );
 				resultForLinkType.setLinkType( linkType );
 				dataForChartPerLinkTypeList.add( resultForLinkType );
 			}
@@ -190,33 +190,36 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 	 */
 	private PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForLinkType getSingleChartData_ForLinkType( 
 			Map<Integer,List<Integer>> allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId,
-			List<Integer> searchIdsListDeduppedSorted ) throws ProxlWebappInternalErrorException {
+			List<SearchDTO> searches ) throws ProxlWebappInternalErrorException {
 		
 		//   Create output object for creating a chart
 		
 		boolean dataFound = false;
 		
-		List<PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForSearchId> dataForChartPerSearchIdList = new ArrayList<>( searchIdsListDeduppedSorted.size() );
+		Map<Integer, PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForSearchId> dataForChartPerSearchIdMap_KeyProjectSearchId = new HashMap<>();
 		
-		for ( Integer searchId : searchIdsListDeduppedSorted ) {
+		for ( SearchDTO search : searches ) {
+			Integer searchId = search.getSearchId();
+			Integer projectSearchId = search.getProjectSearchId();
+					
 			List<Integer> peptideLengthList = allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId.get( searchId );
 			if ( peptideLengthList == null ) {
 				PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForSearchId resultForSearchId = new PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForSearchId();
 				resultForSearchId.setSearchId( searchId );
 				resultForSearchId.setDataFound( false );
-				dataForChartPerSearchIdList.add( resultForSearchId );
+				dataForChartPerSearchIdMap_KeyProjectSearchId.put( projectSearchId, resultForSearchId );
 			} else {
 				dataFound = true;
 				PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForSearchId resultForSearchId = 
 						getSingleChartData_ForSearchId( peptideLengthList );
 				resultForSearchId.setSearchId( searchId );
 				resultForSearchId.setDataFound( true );
-				dataForChartPerSearchIdList.add( resultForSearchId );
+				dataForChartPerSearchIdMap_KeyProjectSearchId.put( projectSearchId, resultForSearchId );
 			}
 		}
 		
 		PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForLinkType result = new PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForLinkType();
-		result.setDataForChartPerSearchIdList( dataForChartPerSearchIdList );
+		result.setDataForChartPerSearchIdMap_KeyProjectSearchId( dataForChartPerSearchIdMap_KeyProjectSearchId );
 		result.setDataFound( dataFound );
 		
 		return result;

@@ -143,7 +143,7 @@ public class PreMZ_Chart_For_PSMPeptideCutoffs_Merged {
 				getPerChartData_KeyedOnLinkType( 
 						allSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType, 
 						linkTypesList, 
-						searchIdsListDeduppedSorted );
+						searches );
 
 		return results;
 	}
@@ -158,7 +158,7 @@ public class PreMZ_Chart_For_PSMPeptideCutoffs_Merged {
 	private PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Results getPerChartData_KeyedOnLinkType( 
 			Map<String,Map<Integer,List<BigDecimal>>> allSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType, 
 			List<String> linkTypesList,
-			List<Integer> searchIdsListDeduppedSorted ) throws ProxlWebappInternalErrorException {
+			List<SearchDTO> searches ) throws ProxlWebappInternalErrorException {
 		
 		List<PreMZ_Chart_For_PSMPeptideCutoffsResultsForLinkType> dataForChartPerLinkTypeList = new ArrayList<>( linkTypesList.size() );
 
@@ -173,7 +173,7 @@ public class PreMZ_Chart_For_PSMPeptideCutoffs_Merged {
 				dataForChartPerLinkTypeList.add( resultForLinkType );
 			} else {
 				PreMZ_Chart_For_PSMPeptideCutoffsResultsForLinkType resultForLinkType =
-						getSingleChartData_ForLinkType( allSearchesCombinedPreMZList_Map_KeyedOnSearchId, searchIdsListDeduppedSorted );
+						getSingleChartData_ForLinkType( allSearchesCombinedPreMZList_Map_KeyedOnSearchId, searches );
 				resultForLinkType.setLinkType( linkType );
 				dataForChartPerLinkTypeList.add( resultForLinkType );
 			}
@@ -191,33 +191,33 @@ public class PreMZ_Chart_For_PSMPeptideCutoffs_Merged {
 	 */
 	private PreMZ_Chart_For_PSMPeptideCutoffsResultsForLinkType getSingleChartData_ForLinkType( 
 			Map<Integer,List<BigDecimal>> allSearchesCombinedPreMZList_Map_KeyedOnSearchId,
-			List<Integer> searchIdsListDeduppedSorted ) throws ProxlWebappInternalErrorException {
+			List<SearchDTO> searches ) throws ProxlWebappInternalErrorException {
 		
 		//   Create output object for creating a chart
 		
 		boolean dataFound = false;
 		
-		List<PreMZ_Chart_For_PSMPeptideCutoffsResultsForSearchId> dataForChartPerSearchIdList = new ArrayList<>( searchIdsListDeduppedSorted.size() );
+		Map<Integer, PreMZ_Chart_For_PSMPeptideCutoffsResultsForSearchId> dataForChartPerSearchIdMap_KeyProjectSearchId = new HashMap<>();
 		
-		for ( Integer searchId : searchIdsListDeduppedSorted ) {
-			List<BigDecimal> preMZList = allSearchesCombinedPreMZList_Map_KeyedOnSearchId.get( searchId );
+		for ( SearchDTO search : searches ) {
+			List<BigDecimal> preMZList = allSearchesCombinedPreMZList_Map_KeyedOnSearchId.get( search.getSearchId() );
 			if ( preMZList == null ) {
 				PreMZ_Chart_For_PSMPeptideCutoffsResultsForSearchId resultForSearchId = new PreMZ_Chart_For_PSMPeptideCutoffsResultsForSearchId();
-				resultForSearchId.setSearchId( searchId );
+				resultForSearchId.setSearchId( search.getSearchId() );
 				resultForSearchId.setDataFound( false );
-				dataForChartPerSearchIdList.add( resultForSearchId );
+				dataForChartPerSearchIdMap_KeyProjectSearchId.put( search.getProjectSearchId(), resultForSearchId );
 			} else {
 				dataFound = true;
 				PreMZ_Chart_For_PSMPeptideCutoffsResultsForSearchId resultForSearchId = 
 						getSingleChartData_ForSearchId( preMZList );
-				resultForSearchId.setSearchId( searchId );
+				resultForSearchId.setSearchId( search.getSearchId() );
 				resultForSearchId.setDataFound( true );
-				dataForChartPerSearchIdList.add( resultForSearchId );
+				dataForChartPerSearchIdMap_KeyProjectSearchId.put( search.getProjectSearchId(), resultForSearchId );
 			}
 		}
 		
 		PreMZ_Chart_For_PSMPeptideCutoffsResultsForLinkType result = new PreMZ_Chart_For_PSMPeptideCutoffsResultsForLinkType();
-		result.setDataForChartPerSearchIdList( dataForChartPerSearchIdList );
+		result.setDataForChartPerSearchIdMap_KeyProjectSearchId( dataForChartPerSearchIdMap_KeyProjectSearchId );
 		result.setDataFound( dataFound );
 		
 		return result;

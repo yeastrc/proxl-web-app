@@ -55,6 +55,12 @@ var ViewMergedProteinAllPageCode = function() {
 				}
 			}
 		},10);
+
+		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+			if ( window.mergedPeptideProteinSearchesListVennDiagramSection ) {
+				window.mergedPeptideProteinSearchesListVennDiagramSection.init();
+			}
+		},10);		
 	};
 	
 		

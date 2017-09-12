@@ -37,6 +37,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 	var _OVERALL_GLOBALS;
 
 	var _project_search_ids = undefined;
+	var _searchIdsObject_Key_projectSearchId = undefined;
 
 	var _colorsPerSearch = undefined;
 	
@@ -106,6 +107,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 			_OVERALL_GLOBALS = params.OVERALL_GLOBALS;
 
 			_project_search_ids = params.project_search_ids;
+			_searchIdsObject_Key_projectSearchId = params.searchIdsObject_Key_projectSearchId;
 
 			_colorsPerSearch = params.colorsPerSearch;
 			
@@ -431,7 +433,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		var $chartContainer = params.$chartContainer;
 
 		var linkType = entryForLinkType.linkType;
-		var dataForChartPerSearchIdList = entryForLinkType.dataForChartPerSearchIdList;
+		var dataForChartPerSearchIdMap_KeyProjectSearchId = entryForLinkType.dataForChartPerSearchIdMap_KeyProjectSearchId;
 		
 		//  chart data for Google charts
 		var chartData = [];
@@ -467,11 +469,14 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 
 		var totalCount = 0;
 
-		dataForChartPerSearchIdList.forEach( function ( currentArrayValue, indexForSearchId, array ) {
-			var dataForChartPerSearchIdEntry = currentArrayValue;
+
+		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, indexForProjectSearchId, array ) {
+			
+			var dataForChartPerSearchIdEntry = dataForChartPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
+			
 			var searchId = dataForChartPerSearchIdEntry.searchId;
 			
-			var colorForSearchEntry = _colorsPerSearch[ indexForSearchId ];
+			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
 
 			var chartEntry = [ 
 				searchId.toString(),

@@ -196,7 +196,7 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 				getPPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results( 
 						allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType,
 						linkTypesList, 
-						searchIds );
+						searches );
 		
 
 		if ( ! reportedPeptideIdsSkippedForErrorCalculatingMZ.isEmpty() ) {
@@ -221,7 +221,7 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 			Map<String,Map<Integer,List<Double>>> allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType,
 			
 			List<String> linkTypesList,
-			List<Integer> searchIdsListDeduppedSorted ) throws ProxlWebappInternalErrorException {
+			List<SearchDTO> searches ) throws ProxlWebappInternalErrorException {
 		
 		List<PPM_Error_Chart_For_PSMPeptideCutoffsResultsForLinkType> dataForChartPerLinkTypeList = new ArrayList<>( linkTypesList.size() );
 
@@ -236,7 +236,7 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 				dataForChartPerLinkTypeList.add( resultForLinkType );
 			} else {
 				PPM_Error_Chart_For_PSMPeptideCutoffsResultsForLinkType resultForLinkType =
-						getSingleChartData_ForLinkType( allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId, searchIdsListDeduppedSorted );
+						getSingleChartData_ForLinkType( allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId, searches );
 				resultForLinkType.setLinkType( linkType );
 				dataForChartPerLinkTypeList.add( resultForLinkType );
 			}
@@ -254,33 +254,33 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 	 */
 	private PPM_Error_Chart_For_PSMPeptideCutoffsResultsForLinkType getSingleChartData_ForLinkType( 
 			Map<Integer,List<Double>> allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId,
-			List<Integer> searchIdsListDeduppedSorted ) throws ProxlWebappInternalErrorException {
+			List<SearchDTO> searches ) throws ProxlWebappInternalErrorException {
 		
 		//   Create output object for creating a chart
 		
 		boolean dataFound = false;
 		
-		List<PPM_Error_Chart_For_PSMPeptideCutoffsResultsForSearchId> dataForChartPerSearchIdList = new ArrayList<>( searchIdsListDeduppedSorted.size() );
+		Map<Integer, PPM_Error_Chart_For_PSMPeptideCutoffsResultsForSearchId> dataForChartPerSearchIdMap_KeyProjectSearchId = new HashMap<>();
 		
-		for ( Integer searchId : searchIdsListDeduppedSorted ) {
-			List<Double> ppmErrorList = allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId.get( searchId );
+		for ( SearchDTO search : searches ) {
+			List<Double> ppmErrorList = allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId.get( search.getSearchId() );
 			if ( ppmErrorList == null ) {
 				PPM_Error_Chart_For_PSMPeptideCutoffsResultsForSearchId resultForSearchId = new PPM_Error_Chart_For_PSMPeptideCutoffsResultsForSearchId();
-				resultForSearchId.setSearchId( searchId );
+				resultForSearchId.setSearchId( search.getSearchId() );
 				resultForSearchId.setDataFound( false );
-				dataForChartPerSearchIdList.add( resultForSearchId );
+				dataForChartPerSearchIdMap_KeyProjectSearchId.put( search.getProjectSearchId(), resultForSearchId );
 			} else {
 				dataFound = true;
 				PPM_Error_Chart_For_PSMPeptideCutoffsResultsForSearchId resultForSearchId = 
 						getSingleChartData_ForSearchId( ppmErrorList );
-				resultForSearchId.setSearchId( searchId );
+				resultForSearchId.setSearchId( search.getSearchId() );
 				resultForSearchId.setDataFound( true );
-				dataForChartPerSearchIdList.add( resultForSearchId );
+				dataForChartPerSearchIdMap_KeyProjectSearchId.put( search.getProjectSearchId(), resultForSearchId );
 			}
 		}
 		
 		PPM_Error_Chart_For_PSMPeptideCutoffsResultsForLinkType result = new PPM_Error_Chart_For_PSMPeptideCutoffsResultsForLinkType();
-		result.setDataForChartPerSearchIdList( dataForChartPerSearchIdList );
+		result.setDataForChartPerSearchIdMap_KeyProjectSearchId( dataForChartPerSearchIdMap_KeyProjectSearchId );
 		result.setDataFound( dataFound );
 		
 		return result;

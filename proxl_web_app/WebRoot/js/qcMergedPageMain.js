@@ -85,6 +85,10 @@ var QCMergedPageMain = function() {
 
 	var _project_search_ids = null;
 	
+	var _searchIdsObject_Key_projectSearchId = null;
+	
+	var _userOrderedProjectSearchIds = null;
+	
 	var _colorsPerSearch = null;
 
 
@@ -159,6 +163,12 @@ var QCMergedPageMain = function() {
 			objectThis.initActual();
 		}, 100 );
 
+
+		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+			if ( window.mergedPeptideProteinSearchesListVennDiagramSection ) {
+				window.mergedPeptideProteinSearchesListVennDiagramSection.init();
+			}
+		},10);
 	};
 	
 	/**
@@ -222,7 +232,35 @@ var QCMergedPageMain = function() {
 				}
 				_project_search_ids.push( project_search_id );
 			} );
-						
+			
+			//  Get Project Search Id / Search Id Pairs from Page
+
+			_searchIdsObject_Key_projectSearchId = {};
+			var $project_search_id__search_id_pair_jq_List = $(".project_search_id__search_id_pair_jq");
+			if ( $project_search_id__search_id_pair_jq_List.length === 0 ) {
+				throw "input fields with class 'project_search_id__search_id_pair_jq' containing project search ids is missing from the page";
+			}
+			$project_search_id__search_id_pair_jq_List.each( function( index, element ) {
+				var fieldContents = $( this ).val();
+				if ( ! fieldContents || fieldContents === "" ) {
+					throw Error( "element with class 'project_search_id__search_id_pair_jq' is empty or .val() returns null or undefined" );
+				}
+				var fieldContentsSplit = fieldContents.split( ":" );
+				if ( fieldContentsSplit.length !== 2 ) {
+					throw Error( "element with class 'project_search_id__search_id_pair_jq' does not contain ':'" );
+				}
+				var projectSearchId = fieldContentsSplit[ 0 ];
+				var searchId = fieldContentsSplit[ 1 ];
+				_searchIdsObject_Key_projectSearchId[ projectSearchId ] = searchId;
+			} );
+			
+			//  Did user order project search ids
+			
+			var $userOrderedProjectSearchIds = $("#userOrderedProjectSearchIds");
+			if ( $userOrderedProjectSearchIds.length > 0 ) {
+				_userOrderedProjectSearchIds = $userOrderedProjectSearchIds.val();
+			}
+			
 			this.populateNavigation();
 
 			this.populateColorsPerSearchArray();
@@ -265,6 +303,8 @@ var QCMergedPageMain = function() {
 				OVERALL_GLOBALS : _OVERALL_GLOBALS,
 
 				project_search_ids : _project_search_ids,
+				
+				searchIdsObject_Key_projectSearchId : _searchIdsObject_Key_projectSearchId,
 				
 				colorsPerSearch : _colorsPerSearch,
 
@@ -1124,6 +1164,10 @@ var QCMergedPageMain = function() {
 		for ( var i = 0; i < _project_search_ids.length; i++ ) {
 			items.push( "projectSearchId=" + _project_search_ids[ i ] );
 		}
+		if ( _userOrderedProjectSearchIds ) {
+			items.push( "ds=" + _userOrderedProjectSearchIds );
+		}
+		
 		var baseJSONObject = this.getNavigationJSON_Not_for_Image_Or_Structure();
 		
 		var psmPeptideCutoffsForProjectSearchIds_JSONString = JSON.stringify( baseJSONObject );
@@ -1247,6 +1291,37 @@ var QCMergedPageMain = function() {
 	}
 
 
+	/**
+	 * Called from mergedPeptideProteinSearchesListVennDiagramSection.js to change order of project search ids in the URL
+	 * 
+	 * 
+	 */
+	this.changeProjectSearchIdOrderInURL = function( params ) {
+		var projectSearchIdsInNewOrder = params.projectSearchIdsInNewOrder;
+		
+		var newProjectSearchIdParamsArray = [];
+		
+		projectSearchIdsInNewOrder.forEach(function( element, idex, array ) {
+			var newProjectSearchIdParam = "projectSearchId=" + element;
+			newProjectSearchIdParamsArray.push( newProjectSearchIdParam )
+		}, this );
+		
+		var newProjectSearchIdParamsString = newProjectSearchIdParamsArray.join( "&" );
+		
+		//  qc.do?projectSearchId=
+		
+		var windowHref = window.location.href;
+		
+		var windowHash = window.location.hash;
+		
+		var strutsActionIndex = windowHref.indexOf( "qc.do?projectSearchId" );
+		
+		var windowHrefBeforeStrutsAction = windowHref.substring( 0, strutsActionIndex );
+		
+		var newWindowHref = windowHrefBeforeStrutsAction + "qc.do?" + newProjectSearchIdParamsString + "&ds=y" + windowHash;
+		
+		window.location.href = newWindowHref;
+	};
 
 };
 

@@ -37,7 +37,8 @@ var QCMergedPageChartChargeStateStatistics = function() {
 	var _OVERALL_GLOBALS;
 
 	var _project_search_ids = undefined;
-
+	var _searchIdsObject_Key_projectSearchId = undefined;
+	
 	var _colorsPerSearch = undefined;
 	
 	var _anySearchesHaveScanDataYes = undefined;
@@ -106,7 +107,8 @@ var QCMergedPageChartChargeStateStatistics = function() {
 			_OVERALL_GLOBALS = params.OVERALL_GLOBALS;
 
 			_project_search_ids = params.project_search_ids;
-
+			_searchIdsObject_Key_projectSearchId = params.searchIdsObject_Key_projectSearchId;
+			
 			_colorsPerSearch = params.colorsPerSearch;
 
 			_anySearchesHaveScanDataYes = params.anySearchesHaveScanDataYes;
@@ -368,8 +370,12 @@ var QCMergedPageChartChargeStateStatistics = function() {
 
 		var chartDataHeaderEntry = [ 'Charge' ];
 		
-		searchIds.forEach( function ( currentArrayValue, index, array ) {
-			chartDataHeaderEntry.push( currentArrayValue.toString() );
+
+		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, index, array ) {
+
+			var searchId = _searchIdsObject_Key_projectSearchId[ _project_search_ids_ArrayValue ];
+		
+			chartDataHeaderEntry.push( searchId.toString() );
 			chartDataHeaderEntry.push( { role: 'style' } );  // Style of the bar 
 			chartDataHeaderEntry.push( {role: "tooltip", 'p': {'html': true} } );
 //			chartDataHeaderEntry.push(  {type: 'string', role: 'annotation'} );
@@ -383,13 +389,14 @@ var QCMergedPageChartChargeStateStatistics = function() {
 			var entryForChargeValue = resultsPerChargeValueArrayValue;
 
 			var charge = entryForChargeValue.charge;
-			var countPerSearchIdList = entryForChargeValue.countPerSearchIdList;
+			var countPerSearchIdMap_KeyProjectSearchId = entryForChargeValue.countPerSearchIdMap_KeyProjectSearchId;
 
 			var chartEntry = [ "+" + charge ]; 
 
-			countPerSearchIdList.forEach( function ( countPerSearchIdArrayValue, index, array ) {
-
-				var chartCountPerSearchIdEntry = countPerSearchIdArrayValue;
+			_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, index, array ) {
+				
+				var chartCountPerSearchIdEntry = countPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
+				
 				var count = chartCountPerSearchIdEntry.count;
 
 				var chargeCountString = chartCountPerSearchIdEntry.count;

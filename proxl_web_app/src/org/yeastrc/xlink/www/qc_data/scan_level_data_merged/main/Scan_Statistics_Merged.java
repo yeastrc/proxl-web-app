@@ -1,8 +1,8 @@
 package org.yeastrc.xlink.www.qc_data.scan_level_data_merged.main;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +24,6 @@ import org.yeastrc.xlink.www.qc_data.scan_level_data_merged.objects.Scan_Statist
 import org.yeastrc.xlink.www.searcher.Scan_CountsPerLinkTypeForSearchScanFileSearcher;
 import org.yeastrc.xlink.www.searcher.ScanFileIdsForSearchSearcher;
 import org.yeastrc.xlink.www.searcher.Scan_CountsPerLinkTypeForSearchScanFileSearcher.PSM_CountsPerLinkTypeForSearchScanFileResult;
-import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -98,7 +97,7 @@ public class Scan_Statistics_Merged {
 				cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
 		
 		
-		List<Scan_Statistics_PerSearch> dataPerSearchList = new ArrayList<>( searches.size() );
+		Map<Integer, Scan_Statistics_PerSearch> dataPerSearchMap_KeyProjectSearchId = new HashMap<>();
 		boolean haveData = false;
 		
 		for ( SearchDTO search : searches ) {
@@ -115,7 +114,7 @@ public class Scan_Statistics_Merged {
 			}
 			
 			Scan_Statistics_PerSearch scan_Statistics_PerSearch = new Scan_Statistics_PerSearch();
-			dataPerSearchList.add( scan_Statistics_PerSearch );
+			dataPerSearchMap_KeyProjectSearchId.put( projectSearchId, scan_Statistics_PerSearch );
 			
 			scan_Statistics_PerSearch.setSearchId( searchId );
 			
@@ -213,7 +212,7 @@ public class Scan_Statistics_Merged {
 		}
 		
 		Scan_Statistics_Merged_Results results = new Scan_Statistics_Merged_Results();
-		results.setDataPerSearchList( dataPerSearchList );
+		results.setDataPerSearchMap_KeyProjectSearchId( dataPerSearchMap_KeyProjectSearchId );
 		results.setHaveData( haveData );
 		
 		return results;
