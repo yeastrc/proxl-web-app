@@ -1840,6 +1840,14 @@
 					</div>
 					
 					<div style="display:inline-block;position:relative;"> <%-- outer div to support overlay div when button disabled --%>
+						<input onClick="viewMergedQCPage()" class="merge-button submit-button" type="button" value="View Merged Stats/QC" disabled>
+							<%-- overlay div to provide tooltip for button --%>
+						<div class=" tool_tip_attached_jq   merge_button_disabled_cover_div_jq "
+							style="position:absolute;left:0;right:0;top:0;bottom:0;" 
+							data-tooltip="Click on two or more searches above and click here to view combined results." ></div>
+					</div>
+										
+					<div style="display:inline-block;position:relative;"> <%-- outer div to support overlay div when button disabled --%>
 						<input onClick="viewMergedPeptides()" class="merge-button submit-button" type="button" value="View Merged Peptides" disabled>
 							<%-- overlay div to provide tooltip for button --%>
 						<div class=" tool_tip_attached_jq  merge_button_disabled_cover_div_jq " 
@@ -1885,13 +1893,7 @@
 					 </c:otherwise>
 					</c:choose>
 					
-					<div style="display:inline-block;position:relative;"> <%-- outer div to support overlay div when button disabled --%>
-						<input onClick="viewMergedQCPage()" class="merge-button submit-button" type="button" value="View Merged Stats/QC" disabled>
-							<%-- overlay div to provide tooltip for button --%>
-						<div class=" tool_tip_attached_jq   merge_button_disabled_cover_div_jq "
-							style="position:absolute;left:0;right:0;top:0;bottom:0;" 
-							data-tooltip="Click on two or more searches above and click here to view combined results." ></div>
-					</div>
+
 					
 				   </div> <%--   Main Data Block Under "Explore Data" section  <div id="explore_data_main_data_block">  --%>
 						
