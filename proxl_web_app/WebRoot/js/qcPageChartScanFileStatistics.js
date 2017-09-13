@@ -1,9 +1,9 @@
 /**
- * qcPageChartIonCurrentStatistics.js
+ * qcPageChartScanFileStatistics.js
  * 
  * Javascript for the viewQC.jsp page - Chart Ion Current Statistics
  * 
- * page variable qcPageChartIonCurrentStatistics
+ * page variable qcPageChartScanFileStatistics
  * 
  * All Chart data for Ion Current section
  * 
@@ -24,7 +24,7 @@
 /**
  * Constructor 
  */
-var QCPageChartIonCurrentStatistics = function() {
+var QCPageChartScanFileStatistics = function() {
 
 
 	/**
@@ -103,6 +103,10 @@ var QCPageChartIonCurrentStatistics = function() {
 	//  Saved webservice response data
 	var _scanOverallStatistics = null;
 	
+
+	var _ionCurrentVsRetentionTime_helpTooltipHTML = undefined;
+	var _ionCurrentVs_M_Over_Z_helpTooltipHTML = undefined;
+	
 	/**
 	 * Init page Actual - Called from qcPageMain.initActual
 	 */
@@ -156,6 +160,46 @@ var QCPageChartIonCurrentStatistics = function() {
 			_getScanFilesForProjectSearchId = params.getScanFilesForProjectSearchId; // function
 
 			this.addClickAndOnChangeHandlers();
+			
+			//  Get Help tooltip HTML
+			
+			var $scan_level_block_help_tooltip_overall_statistics_section = $("#scan_level_block_help_tooltip_overall_statistics_section");
+			if ( $scan_level_block_help_tooltip_overall_statistics_section.length === 0 ) {
+				throw Error( "No element found with id 'scan_level_block_help_tooltip_overall_statistics_section' " );
+			}
+
+			var $scan_level_block_help_tooltip_ms1_binned_ion_current_chart = $("#scan_level_block_help_tooltip_ms1_binned_ion_current_chart");
+			if ( $scan_level_block_help_tooltip_ms1_binned_ion_current_chart.length === 0 ) {
+				throw Error( "No element found with id 'scan_level_block_help_tooltip_ms1_binned_ion_current_chart' " );
+			}
+			
+			var overallStatistics_helpTooltipHTML = $scan_level_block_help_tooltip_overall_statistics_section.html();
+			var ms1BinnedIonCurrent_helpTooltipHTML = $scan_level_block_help_tooltip_ms1_binned_ion_current_chart.html();
+			
+			var $scan_file_overall_statistics_help_block = $("#scan_file_overall_statistics_help_block");
+
+			//  Use for adding Help
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $scan_file_overall_statistics_help_block, helpTooltipHTML : overallStatistics_helpTooltipHTML, helpTooltip_Wide : true } );
+
+			var $MS_1_IonCurrent_Heatmap_image_outer_container = $("#MS_1_IonCurrent_Heatmap_image_outer_container");
+
+			//  Use for adding Help
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $MS_1_IonCurrent_Heatmap_image_outer_container, helpTooltipHTML : ms1BinnedIonCurrent_helpTooltipHTML, helpTooltip_Wide : false } );
+			
+			//   Save help tooltip HTML
+			
+			var $scan_level_block_help_tooltip_ion_current_vs_retention_time_chart = $("#scan_level_block_help_tooltip_ion_current_vs_retention_time_chart");
+			if ( $scan_level_block_help_tooltip_ion_current_vs_retention_time_chart.length === 0 ) {
+				throw Error( "No element found with id 'scan_level_block_help_tooltip_ion_current_vs_retention_time_chart' " );
+			}
+			
+			var $scan_level_block_help_tooltip_ion_current_vs_m_over_z_chart = $("#scan_level_block_help_tooltip_ion_current_vs_m_over_z_chart");
+			if ( $scan_level_block_help_tooltip_ion_current_vs_m_over_z_chart.length === 0 ) {
+				throw Error( "No element found with id 'scan_level_block_help_tooltip_ion_current_vs_m_over_z_chart' " );
+			}
+			
+			_ionCurrentVsRetentionTime_helpTooltipHTML = $scan_level_block_help_tooltip_ion_current_vs_retention_time_chart.html();
+			_ionCurrentVs_M_Over_Z_helpTooltipHTML = $scan_level_block_help_tooltip_ion_current_vs_m_over_z_chart.html();
 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -773,7 +817,8 @@ var QCPageChartIonCurrentStatistics = function() {
 				chartTitle : "MS1 Ion Current vs/ Retention Time",
 				chart_X_Axis_Label : "Retention Time (s)",
 				tooltip: retentionTimeTooltip,
-				$chart_outer_container_jq : $MS_1_IonCurrent_RetentionTime_Histogram_Container
+				$chart_outer_container_jq : $MS_1_IonCurrent_RetentionTime_Histogram_Container,
+				helpTooltipHTML : _ionCurrentVsRetentionTime_helpTooltipHTML
 		};
 
 		this._process_MS_1_IonCurrent_Histograms_Data_OneChartType( retentionTimeParams );
@@ -786,7 +831,8 @@ var QCPageChartIonCurrentStatistics = function() {
 				chartTitle : "MS1 Ion Current vs/ M/Z",
 				chart_X_Axis_Label : "M/Z",
 				tooltip: mOverZ_Tooltip,
-				$chart_outer_container_jq : $MS_1_IonCurrent_M_Over_Z_Histogram_Container
+				$chart_outer_container_jq : $MS_1_IonCurrent_M_Over_Z_Histogram_Container,
+				helpTooltipHTML : _ionCurrentVs_M_Over_Z_helpTooltipHTML
 		};
 
 		this._process_MS_1_IonCurrent_Histograms_Data_OneChartType( mOverZ_Params );
@@ -798,6 +844,7 @@ var QCPageChartIonCurrentStatistics = function() {
 	this._process_MS_1_IonCurrent_Histograms_Data_OneChartType = function( params ) {
 		var chartData = params.chartData;
 		var $chart_outer_container_jq = params.$chart_outer_container_jq;
+		var helpTooltipHTML = params.helpTooltipHTML;
 
 		var chartBuckets = chartData.chartBuckets;
 
@@ -818,7 +865,9 @@ var QCPageChartIonCurrentStatistics = function() {
 
 		this._add_MS_1_IonCurrent_Histograms_Chart( { chartDataParams : params, $chartContainer : $chart_container_jq } );
 
-		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq } );
+		//  Use for adding Help
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : helpTooltipHTML, helpTooltip_Wide : false } );
+
 		// Add tooltips for download links
 		addToolTips( $chart_outer_container_jq );
 	};
@@ -1208,4 +1257,4 @@ var QCPageChartIonCurrentStatistics = function() {
  * page variable 
  */
 
-var qcPageChartIonCurrentStatistics = new QCPageChartIonCurrentStatistics();
+var qcPageChartScanFileStatistics = new QCPageChartScanFileStatistics();

@@ -66,10 +66,12 @@
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
-
+		
+		<script type="text/javascript" src="${ contextPath }/js/qcChart_Download_Help_HTMLBlock.js?x=${cacheBustValue}"></script>
+	
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChartSummaryStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChartDigestionStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChartIonCurrentStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChartScanFileStatistics.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PPM_Error_PSM.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_Error_Vs_RetentionTime_PSM.js?x=${cacheBustValue}"></script>
@@ -87,7 +89,7 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/qcPageSectionSummaryStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcPageSectionDigestionStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageSectionIonCurrentStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageSectionScanFileStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcPageSection_PSM_Level_Statistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcPageSection_PSM_Error_Estimates.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcPageSectionModificationStatistics.js?x=${cacheBustValue}"></script>
@@ -265,6 +267,13 @@
 		<%--  Summary level Statistics --%>
 	
 		<div >
+			<%--  Help Icon tooltip HTML for these charts --%>
+			<script id="summary_block_help_tooltip_psm_count_chart" type="text/text"
+				><div class="">For each class of peptide, the number of PSMs that meet the current filtering criteria.</div></script>
+			<script id="summary_block_help_tooltip_peptide_count_chart" type="text/text"
+				><div class="">For each class of peptide, the number of distinct peptide identifications that meet the current filtering criteria.</div></script>
+			<script id="summary_block_help_tooltip_protein_count_chart" type="text/text"
+				><div class="">For each class of peptide, the number of distinct proteins for which peptides were found that meet the current filtering criteria.</div></script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
@@ -293,6 +302,13 @@
 		<%--  Digestion Statistics --%>
 		
 		<div >
+			<%--  Help Icon tooltip HTML for these charts --%>
+			<script id="digestion_block_help_tooltip_peptides_with_missed_cleavage_chart" type="text/text"
+				><div class="">For each class of peptide, the fraction of distinct peptide identifications that meet the current filtering criteria that contain at least one missed cleavage.</div></script>
+			<script id="digestion_block_help_tooltip_missed_cleavage_chart" type="text/text"
+				><div class="">For each class of peptide, the total number of missed cleavages divided by the total number of distinct peptides. (For peptides that meet the current filtering criteria.)</div></script>
+			<script id="digestion_block_help_tooltip_missed_cleavage_psm_count_chart" type="text/text"
+				><div class="">For each class of peptide, the fraction of PSMs that meet the current filtering criteria that match a peptide that contains at least one missed cleavage.</div></script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
@@ -323,6 +339,34 @@
 		<%--  Scan level Statistics --%>
 	
 		<div >
+		
+		
+			<%--  Help Icon tooltip HTML for these charts --%>
+<script id="scan_level_block_help_tooltip_overall_statistics_section" type="text/text">
+<div >
+<div style="margin-bottom: 10px;">Ion current summary statistics for the scan file(s) uploaded with the search results. </div>
+<div style="margin-bottom: 10px;">"Total ion current" is calculated as the sum of all peak intensities of the respective scan type. </div>
+<div style="margin-bottom: 10px;">"Number of scans" is the total number of scans in the file of the respective type. </div>
+<div style="margin-bottom: 10px;">"MS2 scans with a PSM meeting cutoffs" is the number of MS2 scans in the file that resulted in a PSM meeting the current filtering criteria.</div> 
+<div >The percentage indicates the percentage of all MS2 scans in the file that resulted in a PSM meeting the current filtering criteria.</div>
+</div>
+</script>
+
+<script id="scan_level_block_help_tooltip_ion_current_vs_retention_time_chart" type="text/text">
+A histogram of binned total ion current of MS1 scans as a function of retentiom time.
+</script>
+
+<script id="scan_level_block_help_tooltip_ion_current_vs_m_over_z_chart" type="text/text">
+A histogram of binned total ion current of MS1 scans as a function of the m/z of the peak.
+</script>
+
+<script id="scan_level_block_help_tooltip_ms1_binned_ion_current_chart" type="text/text">
+<div class="">
+A two-dimensional density plot showing showing total MS1 intensity in a m/z + retention time bin. 
+Intensities are binned for each 1 m/z and each second of retention time. 
+The total ion current in the bin is indicated by color, as indicated by the legend.
+</div>
+</script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
@@ -335,7 +379,7 @@
 			
 			</div>
 			<div class="top-level-label">
-			  Ion Current Statistics
+			  Scan File Statistics
 			</div>
 
 			<div class="top-level-label-bottom-border" ></div>
@@ -371,8 +415,16 @@
 	 		     <tr>
 	 		      <td style="padding: 4px;">
 
-				    <div style=""
+				    <div style=" position: relative;"
 				    	 class="chart-standard-container-div  qc-data-block"> <!-- Scan File Statistics outer block -->
+				    	 
+						<!-- Help Image for 'Scan File Statistics' section -->
+					 <div id="scan_file_overall_statistics_help_block" class="  " style="position: absolute; top: 4px; right: 4px;">
+						  <div class=" help-image-for-qc-chart-block ">
+						  	<img src="images/icon-help.png" class=" help-image-for-qc-chart help_image_for_qc_chart_jq ">
+						  </div>
+					 </div>
+
 				     <div class="" >
 	
 					  <h3  style="text-align: center; font-size: 22px; margin-top: 10px; margin-bottom: 10px;">
@@ -496,10 +548,13 @@
 					  <script id="MS_1_IonCurrent_Heatmap_href_prefix" type="text/text"
 					  	>qc_Scan_MS1_All_IntensityHeatmapImage.do?&image_width=1500&cbv=${cacheBustValue}</script>
 	
-					  <div class="chart-standard-container-div" style="width: 1520px;">
+						<!-- MS1 Binned data - Image as Chart -->
+					  <div  id="MS_1_IonCurrent_Heatmap_image_outer_container" class="chart-standard-container-div" style="width: 1520px;">
 					  	<div style="text-align: center; padding-top: 15px; padding-bottom: 0px; font-size: 15px; font-weight: bold;">
 					  		MS1 Binned Ion Current: m/z vs/ Retention Time (click to view full size)
+					  		<img src="images/icon-help.png" class=" help-image-for-qc-chart help_image_for_qc_chart_jq ">
 					  	</div>
+					  	<!-- img tag will be inserted here -->
 						<div id="MS_1_IonCurrent_Heatmap_image_container" >
 						</div>
 					    <div id="MS_1_IonCurrent_Heatmap_Loading" 
@@ -527,6 +582,42 @@
 		<%--  PSM level Statistics --%>
 	
 		<div >
+
+			<%--  Help Icon tooltip HTML for these charts --%>
+<script id="psm_level_block_help_tooltip_psm_counts_vs_retention_time" type="text/text">
+<div >
+A histogram of the distribution of MS2 scans as a function of retention time (light pink). 
+Another histogram of the number of MS2 scans that meet the current filtering criteria is overlaid in dark red. 
+Click on the plot to launch it in interactive mode.
+</div>
+</script>
+<script id="psm_level_block_help_tooltip_psm_counts_vs_score" type="text/text">
+<div >
+For each type of peptide, the cumulative number of PSMs identified as a function of a user-choosable score from the search. 
+All numeric, filterable scores are available for plotting. 
+Click on the plot to launch it in interactive mode.
+</div>
+</script>
+<script id="psm_level_block_help_tooltip_psm_score_vs_score" type="text/text">
+<div >
+For each type of peptide, a scatter plot of a user-choosable score vs/ another user-choosable score for PSMs from the search. 
+All numeric, filterable scores are available for plotting. 
+Click on the plot to launch it in interactive mode.
+</div>
+</script>
+
+<script id="psm_level_block_help_tooltip_charge_state" type="text/text">
+<div >
+<div >Number PSMs with Charge (crosslink/looplink/unlinked): </div>
+<div >A bar chart comparing the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria for each identified charge for precursor ions.</div>
+</div>
+</script>
+<script id="psm_level_block_help_tooltip_m_over_z_statistics" type="text/text">
+<div >
+<div >PSM Count vs/ m/z (crosslink/looplink/unlinked): </div>
+<div >A histogram of the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria versus m/z of the precursor ion.</div>
+</div>
+</script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
@@ -615,6 +706,32 @@
 		<%--  PSM Error Estimates --%>
 	
 		<div >
+		
+<script id="psm_error_block_help_tooltip_ppm_error" type="text/text">
+<div >
+<div >PSM Count vs/ PPM Error (crosslink/looplink/unlinked):</div> 
+<div >A histogram of the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria vs/ PPM error of the PSM. 
+PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
+Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
+</div>
+</script>
+<script id="psm_error_block_help_tooltip_error_vs_retention_time" type="text/text">
+<div >
+<div >PPM Error vs/ Retention Time (crosslink/looplink/unlinked): </div> 
+<div >A two-dimensional density plot indicating the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria that have the indicated estimated PPM error as a function of retention time. 
+PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
+Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
+</div>
+</script>
+<script id="psm_error_block_help_tooltip_error_vs_m_over_z" type="text/text">
+<div >
+<div >PPM Error vs/ m/z (crosslink/looplink/unlinked):</div> 
+<div >A two-dimensional density plot indicating the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria that have the indicated estimated PPM error 
+as a function of the measured m/z of the precursor ion. 
+PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
+Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
+</div>
+</script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
@@ -667,6 +784,14 @@
 		<%--  Modification Stats --%>
 	
 		<div >
+		
+<script id="modification_stats_block_help_tooltip" type="text/text">
+<div >
+<div >PSM per Modification (crosslink/looplink/unlinked):</div> 
+<div >A bar chart indicating the fraction of PSMs for crosslink/looplink/unlinked peptides that were found to contain the indicated mass modification. 
+The mass modifications shown are those found in the search from all identified peptides.</div>
+</div>
+</script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
@@ -702,6 +827,14 @@
 
 		<%--  Peptide level Statistics --%>
 		<div >
+
+<script id="peptide_level_block_help_tooltip" type="text/text">
+<div >
+<div >Peptide Count vs/ Length (crosslink/looplink/unlinked):</div> 
+<div >A histogram of the count of distinct crosslink/looplink/unlinked peptides that meet the current filtering criteria that were found for respective peptide lengths. 
+(for crosslink one only: This is the length of both linked peptides added together.)</div>
+</div>
+</script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
@@ -835,7 +968,7 @@
 
 					  <div id="scan_retention_time_qc_plot_chartDiv" style="width: 100%; height: 100%; " >
 					  </div>
-					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+					  <%@ include file="/WEB-INF/jsp-includes/qcChart_Download_Help_HTMLBlock.jsp" %>
 					</div>
 												
 				</div>
@@ -1026,7 +1159,7 @@
 
 					  <div id="psm_count_vs_score_qc_plot_chartDiv" style="width: 100%; height: 100%; " >
 					  </div>
-					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+					  <%@ include file="/WEB-INF/jsp-includes/qcChart_Download_Help_HTMLBlock.jsp" %>
 					</div>					
 					
 				</div>
@@ -1175,7 +1308,7 @@
 
 					  <div id="psm_score_vs_score_qc_plot_chartDiv" style="width: 100%; height: 100%; " >
 					  </div>
-					  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+					  <%@ include file="/WEB-INF/jsp-includes/qcChart_Download_Help_HTMLBlock.jsp" %>
 					</div>					
 																		
 				</div>
@@ -1216,7 +1349,7 @@
 	 <div> 
 	  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
 	  </div>
-	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+	  <%@ include file="/WEB-INF/jsp-includes/qcChart_Download_Help_HTMLBlock.jsp" %>
 	 </div>
 </script>	
 	

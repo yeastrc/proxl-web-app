@@ -177,7 +177,7 @@ var QCPageMain = function() {
 				_pageSectionObjects = [
 					qcPageSectionSummaryStatistics,
 					qcPageSectionDigestionStatistics,
-					qcPageSectionIonCurrentStatistics,
+					qcPageSectionScanFileStatistics,
 					qcPageSection_PSM_Level_Statistics,
 					qcPageSection_PSM_Error_Estimates,
 					qcPageSectionModificationStatistics,
@@ -334,7 +334,7 @@ var QCPageMain = function() {
 
 //			qcPageSectionDigestionStatistics.showDigestionStatistics();
 			
-//			qcPageSectionIonCurrentStatistics.showIonCurrentStatistics();
+//			qcPageSectionScanFileStatistics.showScanFileStatistics();
 
 //			qcPageSection_PSM_Level_Statistics.show_PSM_Level_Statistics();
 

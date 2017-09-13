@@ -95,6 +95,8 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 	//   Variables for this chart
 	
 	var _chart_isLoaded = _IS_LOADED_NO;
+	
+	var _helpTooltipHTML = undefined;
 
 
 	/**
@@ -151,7 +153,13 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 			_get_hash_json_Contents = params.get_hash_json_Contents; // function
 
 			this.addClickAndOnChangeHandlers();
-
+			
+			//  Get Help tooltip HTML
+			var $psm_error_block_help_tooltip_ppm_error = $("#psm_error_block_help_tooltip_ppm_error");
+			if ( $psm_error_block_help_tooltip_ppm_error.length === 0 ) {
+				throw Error( "No element found with id 'psm_error_block_help_tooltip_ppm_error' " );
+			}
+			_helpTooltipHTML = $psm_error_block_help_tooltip_ppm_error.html();
 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -405,7 +413,8 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 
 			this._add_PPM_Error_For_PSMs_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chart_container_jq } );
 
-			chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq } );
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _helpTooltipHTML, helpTooltip_Wide : true } );
+			
 			// Add tooltips for download links
 			addToolTips( $chart_outer_container_jq );
 

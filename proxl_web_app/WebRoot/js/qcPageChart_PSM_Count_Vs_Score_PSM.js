@@ -110,7 +110,9 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 	///////////
 	
 	//   Variables for this chart
-
+	
+	var _helpTooltipHTML = undefined;
+	
 	
 	/**
 	 * Used by PSM Count Vs Scores Chart Code
@@ -182,6 +184,12 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 			
 			this.addClickAndOnChangeHandlers();
 
+			//  Get Help tooltip HTML
+			var $psm_level_block_help_tooltip_psm_counts_vs_score = $("#psm_level_block_help_tooltip_psm_counts_vs_score");
+			if ( $psm_level_block_help_tooltip_psm_counts_vs_score.length === 0 ) {
+				throw Error( "No element found with id 'psm_level_block_help_tooltip_psm_counts_vs_score' " );
+			}
+			_helpTooltipHTML = $psm_level_block_help_tooltip_psm_counts_vs_score.html();
 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -196,22 +204,6 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 	this.addClickAndOnChangeHandlers = function() {
 		var objectThis = this;
 
-		//////////////////////////
-		
-		///////   PSM Count Vs Score
-
-		// Make so clicking on the thumbnail chart opens the overlay
-		$("#psm_count_vs_score_outer_container_div").click(function(eventObject) {
-			try {
-				var clickThis = this;
-				objectThis.psmCountVsScoreQCPlotClickHandler( clickThis, eventObject );
-				eventObject.preventDefault();
-				eventObject.stopPropagation();
-			} catch( e ) {
-				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-				throw e;
-			}
-		});	 
 		$("#qc_plot_psm_count_vs_score_link").click(function(eventObject) {
 			try {
 				var clickThis = this;
@@ -291,7 +283,7 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 
 		// For PSM Count Vs Score, add Download Click handlers for overlay
 		var $psm_count_vs_score_qc_plot_chartDiv_Container = $("#psm_count_vs_score_qc_plot_chartDiv_Container");
-		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $psm_count_vs_score_qc_plot_chartDiv_Container } );
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $psm_count_vs_score_qc_plot_chartDiv_Container, helpTooltipHTML : _helpTooltipHTML } );
 		
 	};
 
@@ -899,7 +891,21 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 			var $psm_count_vs_score_outer_container_div = $("#psm_count_vs_score_outer_container_div");
 			$psm_count_vs_score_outer_container_div.empty();
 			var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $psm_count_vs_score_outer_container_div } );
-			chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $psm_count_vs_score_outer_container_div } );
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $psm_count_vs_score_outer_container_div, helpTooltipHTML : _helpTooltipHTML } );
+			
+			// Make so clicking on the thumbnail chart opens the overlay
+			$chart_container_jq.click(function(eventObject) {
+				try {
+					var clickThis = this;
+					objectThis.psmCountVsScoreQCPlotClickHandler( clickThis, eventObject );
+					eventObject.preventDefault();
+					eventObject.stopPropagation();
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			});	 
+			
 			$chartContainer = $chart_container_jq;
 		} else {
 			$chartContainer = $("#psm_count_vs_score_qc_plot_chartDiv");

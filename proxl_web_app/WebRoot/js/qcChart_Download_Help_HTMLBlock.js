@@ -1,13 +1,13 @@
 /**
- * chartDownload.js
+ * qcChart_Download_Help_HTMLBlock.js
  * 
- * Javascript for the chartDownloadHTMLBlock.jsp page fragment
+ * Javascript for the qcChart_Download_Help_HTMLBlock.jsp page fragment
  * 
  * page variable chartDownload
  * 
  * !!!!   Page Requirements:
  * 
- * The element containing the include of chartDownloadHTMLBlock.jsp 
+ * The element containing the include of qcChart_Download_Help_HTMLBlock.jsp 
  *   has to have class "chart_outer_container_for_download_jq".
  * 
  * The 
@@ -19,7 +19,7 @@
 
 ///////
 $(document).ready(function() { 
-	chartDownload.init();
+	qcChartDownloadHelp.init();
 
 } ); // end $(document).ready(function() 
 
@@ -27,7 +27,7 @@ $(document).ready(function() {
 /**
  * Constructor 
  */
-var ChartDownload = function() {
+var QC_ChartDownloadHelp = function() {
 
 	/**
 	 * Init page on load 
@@ -38,24 +38,64 @@ var ChartDownload = function() {
 
 	/**
 	 * params: { $chart_outer_container_for_download_jq : element with ".chart_outer_container_for_download_jq"
+	 * 			 helpTooltipHTML : String with text/HTML for tooltip for help icon on chart
 	 * 
 	 * If the element $chart_outer_container_for_download_jq was dynamically added, need to run to add tool tips on download links: 
 	 *			addToolTips( $chartOuterContainer );
+	 *
+	 * addDownloadClickHandlers
 	 */
-	this.addDownloadClickHandlers = function( params ) {
+	this.add_DownloadClickHandlers_HelpTooltip = function( params ) {
 		var objectThis = this;
 		var $chart_outer_container_for_download_jq = params.$chart_outer_container_for_download_jq;
+		var helpTooltipHTML = params.helpTooltipHTML;
+		var helpTooltip_Wide = params.helpTooltip_Wide;
+		
 		var $chart_download_link_jq_All = $chart_outer_container_for_download_jq.find(".chart_download_link_jq");
 		$chart_download_link_jq_All.click( function( event ) { 
 			objectThis._downloadChart( { clickedThis : this } ); 
 			event.preventDefault();
 			event.stopPropagation();
 		});
-		var $svg_download_outer_block_jq = $chart_outer_container_for_download_jq.find(".svg_download_outer_block_jq");
-		$svg_download_outer_block_jq.click( function( event ) {  
+		
+		//  Eat any clicks that occur on these elements or their children
+		
+		var $svg_download_block_jq = $chart_outer_container_for_download_jq.find(".svg_download_block_jq");
+		$svg_download_block_jq.click( function( event ) {  
 			event.preventDefault();
 			event.stopPropagation();
 		});
+
+		var $svg_download_backing_block_jq = $chart_outer_container_for_download_jq.find(".svg_download_backing_block_jq");
+		$svg_download_backing_block_jq.click( function( event ) {  
+			event.preventDefault();
+			event.stopPropagation();
+		});
+				
+		//  Add tooltip to ? with circle located upper right corner of chart
+		
+		var helpTooltipClasses = " help-for-qc-chart-tooltip ";
+		
+		if ( helpTooltip_Wide ) {
+			helpTooltipClasses += " help-for-qc-chart-tooltip-wide ";
+		}
+		
+		var $help_image_for_qc_chart_jq = $chart_outer_container_for_download_jq.find(".help_image_for_qc_chart_jq");
+
+		$help_image_for_qc_chart_jq.qtip( {
+	        content: {
+	            text: helpTooltipHTML
+	        },
+	        style : {
+	        	def : false,  // Do not add class 'qtip-default'.  Class 'qtip' is still added, which contains font-size
+	        	classes : helpTooltipClasses //  Add this/these class to the tooltip
+	        },
+			position: {
+				target: 'mouse',
+				adjust: { x: 5, y: 5 }, // Offset it slightly from under the mouse
+	            viewport: $(window)
+	         }
+	    });		
 		
 	};
 
@@ -131,4 +171,4 @@ var ChartDownload = function() {
 
 };
 
-var chartDownload = new ChartDownload();
+var qcChartDownloadHelp = new QC_ChartDownloadHelp();

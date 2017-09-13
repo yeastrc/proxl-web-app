@@ -102,6 +102,8 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 	var _chart_isLoaded = _IS_LOADED_NO;
 
 	var _scanFileIds = null;
+	
+	var _helpTooltipHTML = undefined;
 
 	/**
 	 * Used by Retention Time Chart Code
@@ -174,6 +176,12 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 			
 			this.addClickAndOnChangeHandlers();
 
+			//  Get Help tooltip HTML
+			var $psm_level_block_help_tooltip_psm_counts_vs_retention_time = $("#psm_level_block_help_tooltip_psm_counts_vs_retention_time");
+			if ( $psm_level_block_help_tooltip_psm_counts_vs_retention_time.length === 0 ) {
+				throw Error( "No element found with id 'psm_level_block_help_tooltip_psm_counts_vs_retention_time' " );
+			}
+			_helpTooltipHTML = $psm_level_block_help_tooltip_psm_counts_vs_retention_time.html();
 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -187,23 +195,6 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 	 */
 	this.addClickAndOnChangeHandlers = function() {
 		var objectThis = this;
-
-
-		////////////////////
-		//  Retention Time:
-
-		// Make so clicking on the thumbnail chart opens the overlay
-		$("#retention_time_outer_container_div").click(function(eventObject) {
-			try {
-				var clickThis = this;
-				objectThis.scanRetentionTimeQCPlotClickHandler( clickThis, eventObject );
-				eventObject.preventDefault();
-				eventObject.stopPropagation();
-			} catch( e ) {
-				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-				throw e;
-			}
-		});	 
 		
 		//  Link below thumbnail chart for opening overlay
 		$("#qc_plot_scan_retention_time_link").click(function(eventObject) {
@@ -278,7 +269,7 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 
 		// For Retention Time, add Download Click handlers for overlay
 		var $scan_retention_time_qc_plot_chartDiv_Container = $("#scan_retention_time_qc_plot_chartDiv_Container");
-		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $scan_retention_time_qc_plot_chartDiv_Container } );
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $scan_retention_time_qc_plot_chartDiv_Container, helpTooltipHTML : _helpTooltipHTML } );
 		
 	};
 
@@ -616,7 +607,7 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 		} else {
 			$retention_time_outer_container_div.empty();
 			var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $retention_time_outer_container_div } );
-			chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $retention_time_outer_container_div } );
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $retention_time_outer_container_div, helpTooltipHTML : _helpTooltipHTML } );
 			$scan_retention_time_qc_plot_chartDiv = $chart_container_jq;
 		}
 
@@ -629,6 +620,21 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 		if ( thumbnailChart ) {
 			var $svg_download_outer_block_jq = $retention_time_outer_container_div.find(".svg_download_outer_block_jq");
 			$svg_download_outer_block_jq.show();
+			
+			var $chart_container_jq = $retention_time_outer_container_div.find(".chart_container_jq");
+			
+			// Make so clicking on the thumbnail chart opens the overlay
+			$chart_container_jq.click(function(eventObject) {
+				try {
+					var clickThis = this;
+					objectThis.scanRetentionTimeQCPlotClickHandler( clickThis, eventObject );
+					eventObject.preventDefault();
+					eventObject.stopPropagation();
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			});	 
 		}
 		
 		if ( scanFileIdList.length === 0 ) {

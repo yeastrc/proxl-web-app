@@ -1,9 +1,9 @@
 /**
- * qcMergedPageChartIonCurrentStatistics.js
+ * qcMergedPageChartScanFileStatistics.js
  * 
  * Javascript for the viewQCMerged.jsp page - Chart Ion Current Statistics
  * 
- * page variable qcMergedPageChartIonCurrentStatistics
+ * page variable qcMergedPageChartScanFileStatistics
  * 
  * Merged QC Page
  * 
@@ -18,7 +18,7 @@
 /**
  * Constructor 
  */
-var QCMergedPageChartIonCurrentStatistics = function() {
+var QCMergedPageChartScanFileStatistics = function() {
 
 
 	/**
@@ -149,6 +149,21 @@ var QCMergedPageChartIonCurrentStatistics = function() {
 			_getScanFilesForProjectSearchId = params.getScanFilesForProjectSearchId; // function
 
 			this.addClickAndOnChangeHandlers();
+			
+
+			//  Get Help tooltip HTML
+			
+			var $scan_level_block_help_tooltip_overall_statistics_section = $("#scan_level_block_help_tooltip_overall_statistics_section");
+			if ( $scan_level_block_help_tooltip_overall_statistics_section.length === 0 ) {
+				throw Error( "No element found with id 'scan_level_block_help_tooltip_overall_statistics_section' " );
+			}
+			var overallStatistics_helpTooltipHTML = $scan_level_block_help_tooltip_overall_statistics_section.html();
+		
+			var $scan_file_overall_statistics_help_block = $("#scan_file_overall_statistics_help_block");
+
+			//  Use for adding Help
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $scan_file_overall_statistics_help_block, helpTooltipHTML : overallStatistics_helpTooltipHTML, helpTooltip_Wide : true } );
+
 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -444,4 +459,4 @@ var QCMergedPageChartIonCurrentStatistics = function() {
  * page variable 
  */
 
-var qcMergedPageChartIonCurrentStatistics = new QCMergedPageChartIonCurrentStatistics();
+var qcMergedPageChartScanFileStatistics = new QCMergedPageChartScanFileStatistics();

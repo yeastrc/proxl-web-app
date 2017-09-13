@@ -96,7 +96,8 @@ var QCPageChart_Peptide_Lengths = function() {
 	//   Variables for this chart
 	
 	var _chart_isLoaded = _IS_LOADED_NO;
-
+	
+	var _helpTooltipHTML = undefined;
 
 	/**
 	 * Init page Actual - Called from qcPageMain.initActual
@@ -149,7 +150,13 @@ var QCPageChart_Peptide_Lengths = function() {
 			_get_hash_json_Contents = params.get_hash_json_Contents; // function
 
 			this.addClickAndOnChangeHandlers();
-
+			
+			//  Get Help tooltip HTML
+			var $peptide_level_block_help_tooltip = $("#peptide_level_block_help_tooltip");
+			if ( $peptide_level_block_help_tooltip.length === 0 ) {
+				throw Error( "No element found with id 'peptide_level_block_help_tooltip' " );
+			}
+			_helpTooltipHTML = $peptide_level_block_help_tooltip.html();
 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -337,8 +344,9 @@ var QCPageChart_Peptide_Lengths = function() {
 			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
 
 			this._addPeptideLengthsHistogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor : colorAndbarColor, $chartContainer : $chart_container_jq } );
-
-			chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq } );
+			
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _helpTooltipHTML, helpTooltip_Wide : true } );
+			
 			// Add tooltips for download links
 			addToolTips( $chart_outer_container_jq );
 		}

@@ -183,7 +183,7 @@ var QCMergedPageMain = function() {
 				_pageSectionObjects = [
 					qcMergedPageSectionSummaryStatistics,
 					qcMergedPageSectionDigestionStatistics,
-					qcMergedPageSectionIonCurrentStatistics,
+					qcMergedPageSectionScanFileStatistics,
 					qcMergedPageSection_PSM_Level_Statistics,
 					qcMergedPageSection_PSM_Error_Estimates,
 					qcMergedPageSectionModificationStatistics,
@@ -375,7 +375,7 @@ var QCMergedPageMain = function() {
 
 //			qcMergedPageSectionDigestionStatistics.show_Section();
 			
-//			qcMergedPageSectionIonCurrentStatistics.show_Section();
+//			qcMergedPageSectionScanFileStatistics.show_Section();
 
 //			qcMergedPageSection_PSM_Level_Statistics.show_Section();
 

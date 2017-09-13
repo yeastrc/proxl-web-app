@@ -69,8 +69,6 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	
 	<script type="text/javascript" src="${ contextPath }/js/header_main.js?x=${cacheBustValue}"></script>
 	
-	<script type="text/javascript" src="${ contextPath }/js/chartDownload.js?x=${cacheBustValue}"></script>
-	
 	<style >
 	
 		/* This depends on the JQueryUI ui-lightness theme being included in the web app  */

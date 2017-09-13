@@ -95,6 +95,11 @@ var QCMergedPageChartSummaryStatistics = function() {
 	//   Variables for this chart
 	
 	var _chart_isLoaded = _IS_LOADED_NO;
+	
+	
+	var _psmCountChart_helpTooltipHTML = undefined;
+	var _peptideCountChart_helpTooltipHTML = undefined;
+	var _proteinCountChart_helpTooltipHTML = undefined;
 
 
 	/**
@@ -153,6 +158,24 @@ var QCMergedPageChartSummaryStatistics = function() {
 
 			this.addClickAndOnChangeHandlers();
 
+			//  Get Help tooltip HTML
+			
+			var $summary_block_help_tooltip_psm_count_chart = $("#summary_block_help_tooltip_psm_count_chart");
+			if ( $summary_block_help_tooltip_psm_count_chart.length === 0 ) {
+				throw Error( "No element found with id 'summary_block_help_tooltip_psm_count_chart' " );
+			}
+			var $summary_block_help_tooltip_peptide_count_chart = $("#summary_block_help_tooltip_peptide_count_chart");
+			if ( $summary_block_help_tooltip_peptide_count_chart.length === 0 ) {
+				throw Error( "No element found with id 'summary_block_help_tooltip_peptide_count_chart' " );
+			}
+			var $summary_block_help_tooltip_protein_count_chart = $("#summary_block_help_tooltip_protein_count_chart");
+			if ( $summary_block_help_tooltip_protein_count_chart.length === 0 ) {
+				throw Error( "No element found with id 'summary_block_help_tooltip_protein_count_chart' " );
+			}
+
+			_psmCountChart_helpTooltipHTML = $summary_block_help_tooltip_psm_count_chart.html();
+			_peptideCountChart_helpTooltipHTML = $summary_block_help_tooltip_peptide_count_chart.html();
+			_proteinCountChart_helpTooltipHTML = $summary_block_help_tooltip_protein_count_chart.html();
 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -326,6 +349,10 @@ var QCMergedPageChartSummaryStatistics = function() {
 		}
 
 		
+		//  Keep _SUMMARY_STATISTICS_CHART_COUNT in sync with the actual number of charts created here
+		
+		//   PSM Count Chart
+
 		var $chart_outer_container_jq =
 			this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
 
@@ -337,6 +364,9 @@ var QCMergedPageChartSummaryStatistics = function() {
 			searchIds : qc_SummaryCountsResults_Merged.searchIds,
 			$chartContainer : $chart_container_jq } );
 
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _psmCountChart_helpTooltipHTML } );
+		
+		//  Peptide Count Chart
 
 		var $chart_outer_container_jq =
 			this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
@@ -349,6 +379,9 @@ var QCMergedPageChartSummaryStatistics = function() {
 			searchIds : qc_SummaryCountsResults_Merged.searchIds,
 			$chartContainer : $chart_container_jq } );
 
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _peptideCountChart_helpTooltipHTML } );
+
+		//   Protein Count Chart
 
 		var $chart_outer_container_jq =
 			this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
@@ -361,7 +394,8 @@ var QCMergedPageChartSummaryStatistics = function() {
 			searchIds : qc_SummaryCountsResults_Merged.searchIds,
 			$chartContainer : $chart_container_jq } );
 
-		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $Summary_Statistics_CountsBlock } );
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _proteinCountChart_helpTooltipHTML } );
+
 		// Add tooltips for download links
 		addToolTips( $Summary_Statistics_CountsBlock );
 	};

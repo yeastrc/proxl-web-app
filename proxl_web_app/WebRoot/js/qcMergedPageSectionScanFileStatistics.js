@@ -1,9 +1,9 @@
 /**
- * qcMergedPageSectionIonCurrentStatistics.js
+ * qcMergedPageSectionScanFileStatistics.js
  * 
  * Javascript for the viewQCMerged.jsp page - Section Ion Current Statistics
  * 
- * page variable qcMergedPageSectionIonCurrentStatistics
+ * page variable qcMergedPageSectionScanFileStatistics
  * 
  * Merged QC Page
  */
@@ -15,7 +15,7 @@
 /**
  * Constructor 
  */
-var QCMergedPageSectionIonCurrentStatistics = function() {
+var QCMergedPageSectionScanFileStatistics = function() {
 
 	var _pageChartObjectsForSection = undefined; // Populated in initActual()
 
@@ -85,7 +85,7 @@ var QCMergedPageSectionIonCurrentStatistics = function() {
 			try {
 				//  _pageChartObjectsForSection not used everywhere, hard coded in some places
 				_pageChartObjectsForSection = [
-					qcMergedPageChartIonCurrentStatistics
+					qcMergedPageChartScanFileStatistics
 				];
 
 			} catch( e ) {
@@ -283,4 +283,4 @@ var QCMergedPageSectionIonCurrentStatistics = function() {
  * page variable 
  */
 
-var qcMergedPageSectionIonCurrentStatistics = new QCMergedPageSectionIonCurrentStatistics();
+var qcMergedPageSectionScanFileStatistics = new QCMergedPageSectionScanFileStatistics();

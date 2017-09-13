@@ -1,9 +1,9 @@
 /**
- * qcPageSectionIonCurrentStatistics.js
+ * qcPageSectionScanFileStatistics.js
  * 
  * Javascript for the viewQC.jsp page - Section Ion Current Statistics
  * 
- * page variable qcPageSectionIonCurrentStatistics
+ * page variable qcPageSectionScanFileStatistics
  * 
  * 		!!!!  Currently only works for single search.  
  * 
@@ -22,7 +22,7 @@
 /**
  * Constructor 
  */
-var QCPageSectionIonCurrentStatistics = function() {
+var QCPageSectionScanFileStatistics = function() {
 
 	var _pageChartObjectsForSection = undefined; // Populated in initActual()
 
@@ -92,7 +92,7 @@ var QCPageSectionIonCurrentStatistics = function() {
 			try {
 				//  _pageChartObjectsForSection not used everywhere, hard coded in some places
 				_pageChartObjectsForSection = [
-					qcPageChartIonCurrentStatistics
+					qcPageChartScanFileStatistics
 				];
 
 			} catch( e ) {
@@ -274,7 +274,7 @@ var QCPageSectionIonCurrentStatistics = function() {
 //		_pageChartObjectsForSection.forEach( function( pageChartObjectForSection, index, array ) {
 //			pageChartObjectForSection.loadChartIfNeeded();
 //		}, this );
-		qcPageChartIonCurrentStatistics.loadScanFileSelectorIfNeeded();
+		qcPageChartScanFileStatistics.loadScanFileSelectorIfNeeded();
 	};
 
 	/**
@@ -284,10 +284,10 @@ var QCPageSectionIonCurrentStatistics = function() {
 //		_pageChartObjectsForSection.forEach( function( pageChartObjectForSection, index, array ) {
 //			pageChartObjectForSection.clearChart();
 //		}, this );
-		qcPageChartIonCurrentStatistics.clearScanFileSelector();
-		qcPageChartIonCurrentStatistics.clearScanOverallStastics();
-		qcPageChartIonCurrentStatistics.clear_MS_1_IonCurrent_Histograms();
-		qcPageChartIonCurrentStatistics.clear_MS_1_IonCurrent_Heatmap();
+		qcPageChartScanFileStatistics.clearScanFileSelector();
+		qcPageChartScanFileStatistics.clearScanOverallStastics();
+		qcPageChartScanFileStatistics.clear_MS_1_IonCurrent_Histograms();
+		qcPageChartScanFileStatistics.clear_MS_1_IonCurrent_Heatmap();
 	};
 };
 
@@ -295,4 +295,4 @@ var QCPageSectionIonCurrentStatistics = function() {
  * page variable 
  */
 
-var qcPageSectionIonCurrentStatistics = new QCPageSectionIonCurrentStatistics();
+var qcPageSectionScanFileStatistics = new QCPageSectionScanFileStatistics();

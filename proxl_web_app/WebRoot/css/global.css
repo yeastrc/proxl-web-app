@@ -1001,7 +1001,7 @@ body.project-page .proxl-xml-file-upload-complete-successfully-overlay-container
 
 
 	/* QC Plots modal dialog background */
-body.project-page .qc-plot-overlay-background {
+body.view-qc-page .qc-plot-overlay-background {
 	
 
 	cursor: pointer; /* set mouse to pointer */
@@ -1026,7 +1026,7 @@ body.project-page .qc-plot-overlay-background {
 /*  QC Plots Overlay   */
 
 
-body.project-page div.qc-plot-overlay-div {
+body.view-qc-page div.qc-plot-overlay-div {
 
 	opacity: 1;
 	filter: Alpha(Opacity=100);
@@ -1055,7 +1055,7 @@ body.project-page div.qc-plot-overlay-div {
 
 }
 
-body.project-page .qc-plot-overlay-header { 
+body.view-qc-page .qc-plot-overlay-header { 
 	
 	height: 35px;
 	background-color: #FFF0F0; padding-bottom: 5px;
@@ -1066,15 +1066,15 @@ body.project-page .qc-plot-overlay-header {
 	border-color: #D3D3D3 ;
  }
 
-body.project-page .qc-plot-overlay-X-for-exit-overlay { float: right; border-color: #000000; height:33px; background-color: #A55353; color: white; padding: 3px; margin: 0px;  cursor: pointer;  }
+body.view-qc-page .qc-plot-overlay-X-for-exit-overlay { float: right; border-color: #000000; height:33px; background-color: #A55353; color: white; padding: 3px; margin: 0px;  cursor: pointer;  }
 
-body.project-page .qc-plot-overlay-header-text { color: black; padding: 3px; margin: 0px; text-align: center;  }
+body.view-qc-page .qc-plot-overlay-header-text { color: black; padding: 3px; margin: 0px; text-align: center;  }
 
-body.project-page .qc-plot-overlay-body {  padding: 20px; }
+body.view-qc-page .qc-plot-overlay-body {  padding: 20px; }
 
-body.project-page .qc-plot-overlay-link { margin-right: 20px;  }
+body.view-qc-page .qc-plot-overlay-link { margin-right: 20px;  }
 
-body.project-page .qc-plot-filter-on-import-notice { color: #A55353; padding-bottom: 5px; }
+body.view-qc-page .qc-plot-filter-on-import-notice { color: #A55353; padding-bottom: 5px; }
 
 
 	/* ----------------------  */
@@ -2608,9 +2608,19 @@ body.project-page .delete-alignment-overlay-container { left: -200px;  }
   /* charts and other data blocks */
 body.view-qc-page .qc-data-block { width: 500px; height: 300px; }
 
-/* ************************************ */
+body.view-qc-page .help-image-for-qc-chart-block { position: relative; display: inline-block; }
+body.view-qc-page .help-image-for-qc-chart { max-height: 12px; }
 
-/*    QC Page  */
+/* Class for tooltips on ? with circle on QC pages */
+/* Class 'qtip' is also on element (from jquery.qtip.min.css) which contains font-size  */
+body.view-qc-page .help-for-qc-chart-tooltip { min-width: 300px; font-size: 14px; line-height: 20px; background-color: white; border-style: solid; border-color: #A55353 }
 
-  /* charts and other data blocks */
-body.view-qc-page .qc-data-block { width: 500px; height: 300px; }
+body.view-qc-page .help-for-qc-chart-tooltip-wide { min-width: 450px; }
+
+/*
+This would change qtip style for all tooltips on the qc page
+body.view-qc-page .qtip-default { background-color: white; border-style: solid; border-color: #A55353 }
+
+From above
+.qtip-default{border-width:1px;border-style:solid;border-color:#AAAAAA;background-color:#FFF0F0;color:#000000;font-size:10pt;}
+*/

@@ -73,13 +73,14 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
 		
+		<script type="text/javascript" src="${ contextPath }/js/qcChart_Download_Help_HTMLBlock.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/mergedPeptideProteinSearchesListVennDiagramSection.js?x=${cacheBustValue}"></script>
 		
 
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChartSummaryStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChartDigestionStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChartIonCurrentStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChartScanFileStatistics.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChartChargeStateStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChart_M_Over_Z_Statistics_PSM.js?x=${cacheBustValue}"></script>
@@ -89,7 +90,7 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSectionSummaryStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSectionDigestionStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSectionIonCurrentStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSectionScanFileStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSection_PSM_Level_Statistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSection_PSM_Error_Estimates.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSectionModificationStatistics.js?x=${cacheBustValue}"></script>
@@ -280,6 +281,14 @@
 	
 		<div >
 
+			<%--  Help Icon tooltip HTML for these charts --%>
+			<script id="summary_block_help_tooltip_psm_count_chart" type="text/text"
+				><div  For each class of peptide, the number of PSMs for each search that meet the current filtering criteria.</div></script>
+			<script id="summary_block_help_tooltip_peptide_count_chart" type="text/text"
+				><div class="">For each class of peptide, the number of distinct peptide identifications for each search that meet the current filtering criteria.</div></script>
+			<script id="summary_block_help_tooltip_protein_count_chart" type="text/text"
+				><div class="">For each class of peptide, the number of distinct proteins for each search for which peptides were found that meet the current filtering criteria.</div></script>
+
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
 			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
@@ -307,6 +316,13 @@
 		<%--  Digestion Statistics --%>
 		
 		<div >
+			<%--  Help Icon tooltip HTML for these charts --%>
+			<script id="digestion_block_help_tooltip_peptides_with_missed_cleavage_chart" type="text/text"
+				><div class="">For each class of peptide, the fraction of distinct peptide identifications in each search that meet the current filtering criteria that contain at least one missed cleavage.</div></script>
+			<script id="digestion_block_help_tooltip_missed_cleavage_chart" type="text/text"
+				><div class="">For each class of peptide, the total number of missed cleavages in each search divided by the total number of distinct peptides in each search. (For peptides that meet the current filtering criteria.)</div></script>
+			<script id="digestion_block_help_tooltip_missed_cleavage_psm_count_chart" type="text/text"
+				><div class="">For each class of peptide, the fraction of PSMs in each search that meet the current filtering criteria that match a peptide that contains at least one missed cleavage.</div></script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
@@ -338,6 +354,17 @@
 	
 		<div >
 
+<%--  Help Icon tooltip HTML for these charts --%>
+<script id="scan_level_block_help_tooltip_overall_statistics_section" type="text/text">
+<div>
+<div style="margin-bottom: 10px;">A table comparing ion current summary statistics for the scan files uploaded for each search. </div>
+<div style="margin-bottom: 10px;">"Total ion current" is calculated as the sum of all peak intensities of the respective scan type in each search. </div>
+<div style="margin-bottom: 10px;">"Number of scans" is the total number of scans in each search for the respective type. </div>
+<div style="margin-bottom: 10px;">"MS2 scans with a PSM meeting cutoffs" is the number of MS2 scans in each search that resulted in a PSM meeting the current filtering criteria.</div> 
+<div >The percentage indicates the percentage of all MS2 scans in the respective search that resulted in a PSM meeting the current filtering criteria.</div>
+</div>
+</script>
+
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
 			<div  class="collapsable-link-container top-level-collapsable-link-container " > 
@@ -349,7 +376,7 @@
 			
 			</div>
 			<div class="top-level-label">
-			  Ion Current Statistics
+			  Scan File Statistics
 			</div>
 
 			<div class="top-level-label-bottom-border" ></div>
@@ -372,7 +399,15 @@
 	 		     <tr>
 	 		      <td style="padding: 4px;">
 
-				    <div style="" class="chart-standard-container-div  "> <!-- qc-data-block Scan File Statistics outer block -->
+				    <div style=" position: relative;" class="chart-standard-container-div  "> <!-- qc-data-block Scan File Statistics outer block -->
+
+						<!-- Help Image for 'Scan File Statistics' section -->
+					 <div id="scan_file_overall_statistics_help_block" class="  " style="position: absolute; top: 4px; right: 4px;">
+						  <div class=" help-image-for-qc-chart-block ">
+						  	<img src="images/icon-help.png" class=" help-image-for-qc-chart help_image_for_qc_chart_jq ">
+						  </div>
+					 </div>
+				    
 				     <div class="" >
 	
 					  <h3  style="text-align: center; font-size: 22px; margin-top: 10px; margin-bottom: 10px;">
@@ -503,6 +538,19 @@
 	
 		<div >
 
+<script id="psm_level_block_help_tooltip_charge_state" type="text/text">
+<div >
+<div >Number PSMs with Charge (crosslink/looplink/unlinked):</div>
+<div >A bar chart comparing the number of PSMs in each search for crosslink/looplink/unlinked peptides that meet the current filtering criteria for each identified charge for precursor ions.</div>
+</div>
+</script>
+<script id="psm_level_block_help_tooltip_m_over_z_statistics" type="text/text">
+<div >
+<div >Distribution of Precursor m/z (crosslink/looplink/unlinked):</div>
+<div >A box plot comparing distribution of the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria in each search as a function of the m/z of the precursor ion.</div>
+</div>
+</script>
+
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
 			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
@@ -540,6 +588,15 @@
 		<%--  PSM Error Estimates --%>
 	
 		<div >
+		
+<script id="psm_error_block_help_tooltip_ppm_error" type="text/text">
+<div >
+<div >Distribution of Precursor error (crosslink/looplink/unlinked): 
+<div >A box plot comparing the distributions in each search of the number of PSMs for crosslink/looplink/unlinked peptides as a function of estimated PPM error. 
+PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
+Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
+</div>
+</script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
@@ -576,6 +633,14 @@
 	
 		<div >
 
+<script id="modification_stats_block_help_tooltip" type="text/text">
+<div >
+<div >PSM per Modification (crosslink/looplink/unlinked):</div> 
+<div >A bar chart comparing the fraction of PSMs for crosslink/looplink/unlinked peptides in each search that were found to contain the indicated mass modification. 
+The mass modifications shown are those found in the search from all identified peptides.</div>
+</div>
+</script>
+
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
 			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
@@ -610,6 +675,14 @@
 
 		<%--  Peptide level Statistics --%>
 		<div >
+
+<script id="peptide_level_block_help_tooltip" type="text/text">
+<div >
+<div >Distribution of peptide lengths (crosslink/looplink/unlinked):</div> 
+<div >Box plots comparing the distributions of the lengths of distinct peptides in each search. 
+(for crosslink one only: This is the length of both linked peptides added together.)</div>
+</div>
+</script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
@@ -654,7 +727,7 @@
 	 <div> 
 	  <div class=" qc-data-block chart_container_jq chart_container_for_download_jq">
 	  </div>
-	  <%@ include file="/WEB-INF/jsp-includes/chartDownloadHTMLBlock.jsp" %>
+	  <%@ include file="/WEB-INF/jsp-includes/qcChart_Download_Help_HTMLBlock.jsp" %>
 	 </div>
 </script>	
 	

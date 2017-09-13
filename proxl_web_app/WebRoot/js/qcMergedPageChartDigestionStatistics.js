@@ -96,7 +96,10 @@ var QCMergedPageChartDigestionStatistics = function() {
 	//   Variables for this chart
 	
 	var _chart_isLoaded = _IS_LOADED_NO;
-
+	
+	var _peptidesWithMissedCleavage_helpTooltipHTML = undefined;
+	var _missedCleavage_helpTooltipHTML = undefined;
+	var _missedCleavagePSMCount_helpTooltipHTML = undefined;
 
 	/**
 	 * Init page Actual - Called from qcPageMain.initActual
@@ -152,6 +155,25 @@ var QCMergedPageChartDigestionStatistics = function() {
 			_get_hash_json_Contents = params.get_hash_json_Contents; // function
 
 			this.addClickAndOnChangeHandlers();
+
+			//  Get Help tooltip HTML
+			
+			var $digestion_block_help_tooltip_peptides_with_missed_cleavage_chart = $("#digestion_block_help_tooltip_peptides_with_missed_cleavage_chart");
+			if ( $digestion_block_help_tooltip_peptides_with_missed_cleavage_chart.length === 0 ) {
+				throw Error( "No element found with id 'digestion_block_help_tooltip_peptides_with_missed_cleavage_chart' " );
+			}
+			var $digestion_block_help_tooltip_missed_cleavage_chart = $("#digestion_block_help_tooltip_missed_cleavage_chart");
+			if ( $digestion_block_help_tooltip_missed_cleavage_chart.length === 0 ) {
+				throw Error( "No element found with id '$digestion_block_help_tooltip_missed_cleavage_chart' " );
+			}
+			var $digestion_block_help_tooltip_missed_cleavage_psm_count_chart = $("#digestion_block_help_tooltip_missed_cleavage_psm_count_chart");
+			if ( $digestion_block_help_tooltip_missed_cleavage_psm_count_chart.length === 0 ) {
+				throw Error( "No element found with id 'digestion_block_help_tooltip_missed_cleavage_psm_count_chart' " );
+			}
+
+			_peptidesWithMissedCleavage_helpTooltipHTML = $digestion_block_help_tooltip_peptides_with_missed_cleavage_chart.html();
+			_missedCleavage_helpTooltipHTML = $digestion_block_help_tooltip_missed_cleavage_chart.html();
+			_missedCleavagePSMCount_helpTooltipHTML = $digestion_block_help_tooltip_missed_cleavage_psm_count_chart.html();
 
 
 		} catch( e ) {
@@ -412,6 +434,8 @@ var QCMergedPageChartDigestionStatistics = function() {
 			tooltipPart_2 : " Total PSMs"
 		} );
 		
+		//   Chart:  
+		
 		var $chart_outer_container_jq =
 			this._addChartOuterTemplate( { $chart_group_container_table_jq : $missingCleavageReportedPeptidesCountBlock } );
 
@@ -423,6 +447,9 @@ var QCMergedPageChartDigestionStatistics = function() {
 			searchIds : result.searchIds,
 			$chartContainer : $chart_container_jq } );
 
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _peptidesWithMissedCleavage_helpTooltipHTML } );
+
+		//   Chart:  
 
 		var $chart_outer_container_jq =
 			this._addChartOuterTemplate( { $chart_group_container_table_jq : $missingCleavageReportedPeptidesCountBlock } );
@@ -435,6 +462,10 @@ var QCMergedPageChartDigestionStatistics = function() {
 			searchIds : result.searchIds,
 			$chartContainer : $chart_container_jq } );
 
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _missedCleavage_helpTooltipHTML } );
+
+		//   Chart:  
+		
 
 		var $chart_outer_container_jq =
 			this._addChartOuterTemplate( { $chart_group_container_table_jq : $missingCleavageReportedPeptidesCountBlock } );
@@ -447,7 +478,7 @@ var QCMergedPageChartDigestionStatistics = function() {
 			searchIds : result.searchIds,
 			$chartContainer : $chart_container_jq } );
 
-		chartDownload.addDownloadClickHandlers( { $chart_outer_container_for_download_jq :  $missingCleavageReportedPeptidesCountBlock } );
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _missedCleavagePSMCount_helpTooltipHTML } );
 
 	};
 
