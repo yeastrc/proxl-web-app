@@ -51,6 +51,8 @@ public class QC_SummaryCounts_Merged {
 		return instance;
 	}
 	
+	enum AddCombinedEntry { YES, NO }
+	
 	/**
 	 * @param filterCriteriaJSON
 	 * @param projectSearchIdsListDeduppedSorted
@@ -287,9 +289,9 @@ public class QC_SummaryCounts_Merged {
 		int combinedEntryIndex = linkTypesDisplayOrderList.size();
 		
 		// method also adds combined entry at end
-		populateCountPerLinkTypeList( linkTypesDisplayOrderList, psmCountPerLinkTypeList, searches);
-		populateCountPerLinkTypeList( linkTypesDisplayOrderList, reportedPeptideCountPerLinkTypeList, searches);
-		populateCountPerLinkTypeList( linkTypesDisplayOrderList, proteinCountPerLinkTypeList, searches);
+		populateCountPerLinkTypeList( linkTypesDisplayOrderList, psmCountPerLinkTypeList, searches, AddCombinedEntry.NO );
+		populateCountPerLinkTypeList( linkTypesDisplayOrderList, reportedPeptideCountPerLinkTypeList, searches, AddCombinedEntry.NO );
+		populateCountPerLinkTypeList( linkTypesDisplayOrderList, proteinCountPerLinkTypeList, searches, AddCombinedEntry.YES );
 
 		for ( SearchDTO searchDTO : searches ) {
 			Integer searchId = searchDTO.getSearchId();
@@ -324,9 +326,9 @@ public class QC_SummaryCounts_Merged {
 			//  Process Combined entry across link types
 			PerLinkTypeTempData combinedCountsPerSearchEntry = perSearchIdTempData.combinedCountsPerSearchEntry;
 			 // PSM Count entry add
-			addPerSearchIdEntryForCombined( psmCountPerLinkTypeList, searchId, projectSearchId, combinedEntryIndex, combinedCountsPerSearchEntry.psmCount );
+//			addPerSearchIdEntryForCombined( psmCountPerLinkTypeList, searchId, projectSearchId, combinedEntryIndex, combinedCountsPerSearchEntry.psmCount );
 			// Reported Peptide Count entry add
-			addPerSearchIdEntryForCombined( reportedPeptideCountPerLinkTypeList, searchId, projectSearchId, combinedEntryIndex, combinedCountsPerSearchEntry.reportedPeptideIds.size() );
+//			addPerSearchIdEntryForCombined( reportedPeptideCountPerLinkTypeList, searchId, projectSearchId, combinedEntryIndex, combinedCountsPerSearchEntry.reportedPeptideIds.size() );
 			// Protein Count entry add
 			addPerSearchIdEntryForCombined( proteinCountPerLinkTypeList, searchId, projectSearchId, combinedEntryIndex, combinedCountsPerSearchEntry.proteinSequenceIds.size() );
 		}
@@ -391,7 +393,8 @@ public class QC_SummaryCounts_Merged {
 	private void populateCountPerLinkTypeList( 
 			List<String> linkTypesDisplayOrderList, 
 			List<QC_SummaryCountsResultsPerLinkType_Merged> countPerLinkTypeList, 
-			List<SearchDTO> searches ) {
+			List<SearchDTO> searches,
+			AddCombinedEntry addCombinedEntry ) {
 		
 		for ( String linkType : linkTypesDisplayOrderList ) {
 			QC_SummaryCountsResultsPerLinkType_Merged qc_SummaryCountsResultsPerLinkType_Merged = new QC_SummaryCountsResultsPerLinkType_Merged();
@@ -400,12 +403,13 @@ public class QC_SummaryCounts_Merged {
 			countPerLinkTypeList.add( qc_SummaryCountsResultsPerLinkType_Merged );
 		}
 
-		//  Add Combined Entry
-		QC_SummaryCountsResultsPerLinkType_Merged qc_SummaryCountsResultsPerLinkType_Merged = new QC_SummaryCountsResultsPerLinkType_Merged();
-		qc_SummaryCountsResultsPerLinkType_Merged.setCombinedEntry( true );
-		qc_SummaryCountsResultsPerLinkType_Merged.setCountPerSearchIdMap_KeyProjectSearchId( new HashMap<>() );
-		countPerLinkTypeList.add( qc_SummaryCountsResultsPerLinkType_Merged );
-
+		if ( addCombinedEntry == AddCombinedEntry.YES ) {
+			//  Add Combined Entry
+			QC_SummaryCountsResultsPerLinkType_Merged qc_SummaryCountsResultsPerLinkType_Merged = new QC_SummaryCountsResultsPerLinkType_Merged();
+			qc_SummaryCountsResultsPerLinkType_Merged.setCombinedEntry( true );
+			qc_SummaryCountsResultsPerLinkType_Merged.setCountPerSearchIdMap_KeyProjectSearchId( new HashMap<>() );
+			countPerLinkTypeList.add( qc_SummaryCountsResultsPerLinkType_Merged );
+		}
 	}
 	
 

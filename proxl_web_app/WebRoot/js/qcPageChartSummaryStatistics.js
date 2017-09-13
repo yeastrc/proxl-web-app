@@ -412,26 +412,31 @@ var QCPageChartSummaryStatistics = function() {
 		var combinedCountParam = params.combinedCount;
 		var $chartContainer = params.$chartContainer;
 
-		var combinedCount = 0;
-
-		if ( combinedCountParam !== undefined ) {
-			combinedCount = combinedCountParam;
-
-		} else {
-
-			dataWithOneElementPerType.forEach( function ( currentArrayValue, index, array ) {
-				var entry = currentArrayValue;
-				combinedCount += entry.count;
-			}, this /* passed to function as this */ );
-		}
+//		var combinedCount = 0;
+//
+//		if ( combinedCountParam !== undefined ) {
+//			combinedCount = combinedCountParam;
+//
+//		} else {
+//
+//			dataWithOneElementPerType.forEach( function ( currentArrayValue, index, array ) {
+//				var entry = currentArrayValue;
+//				combinedCount += entry.count;
+//			}, this /* passed to function as this */ );
+//		}
 
 		var $chart_container_jqHTMLElement = $chartContainer[ 0 ];
 
-		var totalForCombined = { 
-				linkType : _link_type_combined_LOWER_CASE_constant, 
-				count : combinedCount };
+		if ( combinedCountParam !== undefined ) {
 
-		dataWithOneElementPerType.push( totalForCombined );
+			//  Only for Protein
+			
+			var totalForCombined = { 
+					linkType : _link_type_combined_LOWER_CASE_constant, 
+					count : combinedCountParam };
+
+			dataWithOneElementPerType.push( totalForCombined );
+		}
 
 		var chartTitle = chartTitleParam;
 
