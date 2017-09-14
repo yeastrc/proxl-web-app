@@ -606,15 +606,24 @@ Click on the plot to launch it in interactive mode.
 </div>
 </script>
 
-<script id="psm_level_block_help_tooltip_charge_state" type="text/text">
-<div >
-<div >A bar chart comparing the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria for each identified charge for precursor ions.</div>
-</div>
+<script id="psm_level_block_help_tooltip_charge_state_crosslink" type="text/text">
+<div >A bar chart comparing the number of PSMs for crosslink peptides that meet the current filtering criteria for each identified charge for precursor ions.</div>
 </script>
-<script id="psm_level_block_help_tooltip_m_over_z_statistics" type="text/text">
-<div >
-<div >A histogram of the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria versus m/z of the precursor ion.</div>
-</div>
+<script id="psm_level_block_help_tooltip_charge_state_looplink" type="text/text">
+<div >A bar chart comparing the number of PSMs for looplink peptides that meet the current filtering criteria for each identified charge for precursor ions.</div>
+</script>
+<script id="psm_level_block_help_tooltip_charge_state_unlinked" type="text/text">
+<div >A bar chart comparing the number of PSMs for unlinked peptides that meet the current filtering criteria for each identified charge for precursor ions.</div>
+</script>
+
+<script id="psm_level_block_help_tooltip_m_over_z_statistics_crosslink" type="text/text">
+<div >A histogram of the number of PSMs for crosslink peptides that meet the current filtering criteria versus m/z of the precursor ion.</div>
+</script>
+<script id="psm_level_block_help_tooltip_m_over_z_statistics_looplink" type="text/text">
+<div >A histogram of the number of PSMs for looplink peptides that meet the current filtering criteria versus m/z of the precursor ion.</div>
+</script>
+<script id="psm_level_block_help_tooltip_m_over_z_statistics_unlinked" type="text/text">
+<div >A histogram of the number of PSMs for unlinked peptides that meet the current filtering criteria versus m/z of the precursor ion.</div>
 </script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >
@@ -705,27 +714,55 @@ Click on the plot to launch it in interactive mode.
 	
 		<div >
 		
-<script id="psm_error_block_help_tooltip_ppm_error" type="text/text">
-<div >
-<div >A histogram of the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria vs/ PPM error of the PSM. 
+<script id="psm_error_block_help_tooltip_ppm_error_crosslink" type="text/text">
+<div >A histogram of the number of PSMs for crosslink peptides that meet the current filtering criteria vs/ PPM error of the PSM. 
 PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
 Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
-</div>
 </script>
-<script id="psm_error_block_help_tooltip_error_vs_retention_time" type="text/text">
-<div >
-<div >A two-dimensional density plot indicating the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria that have the indicated estimated PPM error as a function of retention time. 
+<script id="psm_error_block_help_tooltip_ppm_error_looplink" type="text/text">
+<div >A histogram of the number of PSMs for looplink peptides that meet the current filtering criteria vs/ PPM error of the PSM. 
 PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
 Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
-</div>
 </script>
-<script id="psm_error_block_help_tooltip_error_vs_m_over_z" type="text/text">
-<div >
-<div >A two-dimensional density plot indicating the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria that have the indicated estimated PPM error 
+<script id="psm_error_block_help_tooltip_ppm_error_unlinked" type="text/text">
+<div >A histogram of the number of PSMs for unlinked peptides that meet the current filtering criteria vs/ PPM error of the PSM. 
+PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
+Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
+</script>
+
+<script id="psm_error_block_help_tooltip_error_vs_retention_time_crosslink" type="text/text">
+<div >A two-dimensional density plot indicating the number of PSMs for crosslink peptides that meet the current filtering criteria that have the indicated estimated PPM error as a function of retention time. 
+PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
+Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
+</script>
+<script id="psm_error_block_help_tooltip_error_vs_retention_time_looplink" type="text/text">
+<div >A two-dimensional density plot indicating the number of PSMs for looplink peptides that meet the current filtering criteria that have the indicated estimated PPM error as a function of retention time. 
+PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
+Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
+</script>
+<script id="psm_error_block_help_tooltip_error_vs_retention_time_unlinked" type="text/text">
+<div >A two-dimensional density plot indicating the number of PSMs for unlinked peptides that meet the current filtering criteria that have the indicated estimated PPM error as a function of retention time. 
+PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
+Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
+</script>
+
+<script id="psm_error_block_help_tooltip_error_vs_m_over_z_crosslink" type="text/text">
+<div >A two-dimensional density plot indicating the number of PSMs for crosslink peptides that meet the current filtering criteria that have the indicated estimated PPM error 
 as a function of the measured m/z of the precursor ion. 
 PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
 Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
-</div>
+</script>
+<script id="psm_error_block_help_tooltip_error_vs_m_over_z_looplink" type="text/text">
+<div >A two-dimensional density plot indicating the number of PSMs for looplink peptides that meet the current filtering criteria that have the indicated estimated PPM error 
+as a function of the measured m/z of the precursor ion. 
+PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
+Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
+</script>
+<script id="psm_error_block_help_tooltip_error_vs_m_over_z_unlinked" type="text/text">
+<div >A two-dimensional density plot indicating the number of PSMs for unlinked peptides that meet the current filtering criteria that have the indicated estimated PPM error 
+as a function of the measured m/z of the precursor ion. 
+PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
+Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
 </script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >
@@ -780,11 +817,17 @@ Several isotopic compositions are compared for calculating m/z, and the minimum 
 	
 		<div >
 		
-<script id="modification_stats_block_help_tooltip" type="text/text">
-<div >
-<div >A bar chart indicating the fraction of PSMs for crosslink/looplink/unlinked peptides that were found to contain the indicated mass modification. 
+<script id="modification_stats_block_help_tooltip_crosslink" type="text/text">
+<div >A bar chart indicating the fraction of PSMs for crosslink peptides that were found to contain the indicated mass modification. 
 The mass modifications shown are those found in the search from all identified peptides.</div>
-</div>
+</script>
+<script id="modification_stats_block_help_tooltip_looplink" type="text/text">
+<div >A bar chart indicating the fraction of PSMs for looplink peptides that were found to contain the indicated mass modification. 
+The mass modifications shown are those found in the search from all identified peptides.</div>
+</script>
+<script id="modification_stats_block_help_tooltip_unlinked" type="text/text">
+<div >A bar chart indicating the fraction of PSMs for unlinked peptides that were found to contain the indicated mass modification. 
+The mass modifications shown are those found in the search from all identified peptides.</div>
 </script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >
@@ -822,11 +865,15 @@ The mass modifications shown are those found in the search from all identified p
 		<%--  Peptide level Statistics --%>
 		<div >
 
-<script id="peptide_level_block_help_tooltip" type="text/text">
-<div >
-<div >A histogram of the count of distinct crosslink/looplink/unlinked peptides that meet the current filtering criteria that were found for respective peptide lengths. 
-(for crosslink one only: This is the length of both linked peptides added together.)</div>
-</div>
+<script id="peptide_level_block_help_tooltip_crosslink" type="text/text">
+<div >A histogram of the count of distinct crosslink peptides that meet the current filtering criteria that were found for respective peptide lengths. 
+This is the length of both linked peptides added together.</div>
+</script>
+<script id="peptide_level_block_help_tooltip_looplink" type="text/text">
+<div >A histogram of the count of distinct looplink peptides that meet the current filtering criteria that were found for respective peptide lengths. </div>
+</script>
+<script id="peptide_level_block_help_tooltip_unlinked" type="text/text">
+<div >A histogram of the count of distinct unlinked peptides that meet the current filtering criteria that were found for respective peptide lengths.</div>
 </script>
 
 		  <div class="top-level-container qc_top_level_container_jq" >

@@ -96,9 +96,6 @@ var QCMergedPageChart_PSM_Per_Modification = function() {
 	
 	var _chart_isLoaded = _IS_LOADED_NO;
 	
-	var _helpTooltipHTML = undefined;
-
-
 	/**
 	 * Init page Actual - Called from qcPageMain.initActual
 	 */
@@ -154,14 +151,6 @@ var QCMergedPageChart_PSM_Per_Modification = function() {
 
 			this.addClickAndOnChangeHandlers();
 			
-			//  Get Help tooltip HTML
-			var $modification_stats_block_help_tooltip = $("#modification_stats_block_help_tooltip");
-			if ( $modification_stats_block_help_tooltip.length === 0 ) {
-				throw Error( "No element found with id 'modification_stats_block_help_tooltip' " );
-			}
-			_helpTooltipHTML = $modification_stats_block_help_tooltip.html();
-
-
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -339,8 +328,16 @@ var QCMergedPageChart_PSM_Per_Modification = function() {
 				var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
 
 				this._addSingle_PSM_Count_Per_Modification_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor : colorAndbarColor, $chartContainer : $chart_container_jq } );
-				
-				qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _helpTooltipHTML, helpTooltip_Wide : true } );
+
+				//  Get Help tooltip HTML
+				var elementId = "modification_stats_block_help_tooltip_" + linkType
+				var $modification_stats_block_help_tooltip_LinkType = $("#" + elementId );
+				if ( $modification_stats_block_help_tooltip_LinkType.length === 0 ) {
+					throw Error( "No element found with id '" + elementId + "' " );
+				}
+				var helpTooltipHTML = $modification_stats_block_help_tooltip_LinkType.html();
+
+				qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : helpTooltipHTML, helpTooltip_Wide : true } );
 				
 				// Add tooltips for download links
 				addToolTips( $chart_outer_container_jq );

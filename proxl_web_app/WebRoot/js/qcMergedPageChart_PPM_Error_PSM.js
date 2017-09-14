@@ -96,9 +96,6 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 	
 	var _chart_isLoaded = _IS_LOADED_NO;
 	
-	var _helpTooltipHTML = undefined;
-
-
 	/**
 	 * Init page Actual - Called from qcPageMain.initActual
 	 */
@@ -154,13 +151,6 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 
 			this.addClickAndOnChangeHandlers();
 			
-			//  Get Help tooltip HTML
-			var $psm_error_block_help_tooltip_ppm_error = $("#psm_error_block_help_tooltip_ppm_error");
-			if ( $psm_error_block_help_tooltip_ppm_error.length === 0 ) {
-				throw Error( "No element found with id 'psm_error_block_help_tooltip_ppm_error' " );
-			}
-			_helpTooltipHTML = $psm_error_block_help_tooltip_ppm_error.html();
-
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -413,7 +403,16 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 
 			this._add_PPM_Error_For_PSMs_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chart_container_jq } );
 
-			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _helpTooltipHTML, helpTooltip_Wide : true } );
+
+			//  Get Help tooltip HTML
+			var elementId = "psm_error_block_help_tooltip_ppm_error_" + linkType
+			var $psm_error_block_help_tooltip_ppm_error_LinkType = $("#" + elementId );
+			if ( $psm_error_block_help_tooltip_ppm_error_LinkType.length === 0 ) {
+				throw Error( "No element found with id '" + elementId + "' " );
+			}
+			var helpTooltipHTML = $psm_error_block_help_tooltip_ppm_error_LinkType.html();
+			
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : helpTooltipHTML, helpTooltip_Wide : true } );
 			
 			// Add tooltips for download links
 			addToolTips( $chart_outer_container_jq );
