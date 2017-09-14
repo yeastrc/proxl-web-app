@@ -540,13 +540,11 @@
 
 <script id="psm_level_block_help_tooltip_charge_state" type="text/text">
 <div >
-<div >Number PSMs with Charge (crosslink/looplink/unlinked):</div>
 <div >A bar chart comparing the number of PSMs in each search for crosslink/looplink/unlinked peptides that meet the current filtering criteria for each identified charge for precursor ions.</div>
 </div>
 </script>
 <script id="psm_level_block_help_tooltip_m_over_z_statistics" type="text/text">
 <div >
-<div >Distribution of Precursor m/z (crosslink/looplink/unlinked):</div>
 <div >A box plot comparing distribution of the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria in each search as a function of the m/z of the precursor ion.</div>
 </div>
 </script>
@@ -591,7 +589,6 @@
 		
 <script id="psm_error_block_help_tooltip_ppm_error" type="text/text">
 <div >
-<div >Distribution of Precursor error (crosslink/looplink/unlinked): 
 <div >A box plot comparing the distributions in each search of the number of PSMs for crosslink/looplink/unlinked peptides as a function of estimated PPM error. 
 PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
 Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
@@ -635,7 +632,6 @@ Several isotopic compositions are compared for calculating m/z, and the minimum 
 
 <script id="modification_stats_block_help_tooltip" type="text/text">
 <div >
-<div >PSM per Modification (crosslink/looplink/unlinked):</div> 
 <div >A bar chart comparing the fraction of PSMs for crosslink/looplink/unlinked peptides in each search that were found to contain the indicated mass modification. 
 The mass modifications shown are those found in the search from all identified peptides.</div>
 </div>
@@ -678,7 +674,6 @@ The mass modifications shown are those found in the search from all identified p
 
 <script id="peptide_level_block_help_tooltip" type="text/text">
 <div >
-<div >Distribution of peptide lengths (crosslink/looplink/unlinked):</div> 
 <div >Box plots comparing the distributions of the lengths of distinct peptides in each search. 
 (for crosslink one only: This is the length of both linked peptides added together.)</div>
 </div>

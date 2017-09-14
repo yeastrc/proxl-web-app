@@ -608,13 +608,11 @@ Click on the plot to launch it in interactive mode.
 
 <script id="psm_level_block_help_tooltip_charge_state" type="text/text">
 <div >
-<div >Number PSMs with Charge (crosslink/looplink/unlinked): </div>
 <div >A bar chart comparing the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria for each identified charge for precursor ions.</div>
 </div>
 </script>
 <script id="psm_level_block_help_tooltip_m_over_z_statistics" type="text/text">
 <div >
-<div >PSM Count vs/ m/z (crosslink/looplink/unlinked): </div>
 <div >A histogram of the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria versus m/z of the precursor ion.</div>
 </div>
 </script>
@@ -709,7 +707,6 @@ Click on the plot to launch it in interactive mode.
 		
 <script id="psm_error_block_help_tooltip_ppm_error" type="text/text">
 <div >
-<div >PSM Count vs/ PPM Error (crosslink/looplink/unlinked):</div> 
 <div >A histogram of the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria vs/ PPM error of the PSM. 
 PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
 Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
@@ -717,7 +714,6 @@ Several isotopic compositions are compared for calculating m/z, and the minimum 
 </script>
 <script id="psm_error_block_help_tooltip_error_vs_retention_time" type="text/text">
 <div >
-<div >PPM Error vs/ Retention Time (crosslink/looplink/unlinked): </div> 
 <div >A two-dimensional density plot indicating the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria that have the indicated estimated PPM error as a function of retention time. 
 PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
 Several isotopic compositions are compared for calculating m/z, and the minimum PPM error is used.</div>
@@ -725,7 +721,6 @@ Several isotopic compositions are compared for calculating m/z, and the minimum 
 </script>
 <script id="psm_error_block_help_tooltip_error_vs_m_over_z" type="text/text">
 <div >
-<div >PPM Error vs/ m/z (crosslink/looplink/unlinked):</div> 
 <div >A two-dimensional density plot indicating the number of PSMs for crosslink/looplink/unlinked peptides that meet the current filtering criteria that have the indicated estimated PPM error 
 as a function of the measured m/z of the precursor ion. 
 PPM error is calculated as: 1,000,000 * (precursor m/z - calculated m/z) / calculated m/z. 
@@ -787,7 +782,6 @@ Several isotopic compositions are compared for calculating m/z, and the minimum 
 		
 <script id="modification_stats_block_help_tooltip" type="text/text">
 <div >
-<div >PSM per Modification (crosslink/looplink/unlinked):</div> 
 <div >A bar chart indicating the fraction of PSMs for crosslink/looplink/unlinked peptides that were found to contain the indicated mass modification. 
 The mass modifications shown are those found in the search from all identified peptides.</div>
 </div>
@@ -830,7 +824,6 @@ The mass modifications shown are those found in the search from all identified p
 
 <script id="peptide_level_block_help_tooltip" type="text/text">
 <div >
-<div >Peptide Count vs/ Length (crosslink/looplink/unlinked):</div> 
 <div >A histogram of the count of distinct crosslink/looplink/unlinked peptides that meet the current filtering criteria that were found for respective peptide lengths. 
 (for crosslink one only: This is the length of both linked peptides added together.)</div>
 </div>
