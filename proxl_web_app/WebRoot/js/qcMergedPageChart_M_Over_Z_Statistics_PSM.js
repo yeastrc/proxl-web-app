@@ -398,7 +398,7 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 		
 		//  Get max preMZ_outliers length
 		
-		var preMZ_outliers_Max_Length = 0;
+		var preMZ_outliers_Max_Length = undefined;
 
 		var preMZ_outliers_Min_Length = undefined;
 
@@ -406,14 +406,30 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 			
 			var dataForChartPerSearchIdEntry = dataForChartPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
 			
-			if ( dataForChartPerSearchIdEntry.preMZ_outliers.length > preMZ_outliers_Max_Length ) {
-				preMZ_outliers_Max_Length = dataForChartPerSearchIdEntry.preMZ_outliers.length; 
-			}
+			if ( dataForChartPerSearchIdEntry.preMZ_outliers ) { // preMZ_outliers null if no outliers
 			
-			if ( preMZ_outliers_Min_Length === undefined || dataForChartPerSearchIdEntry.preMZ_outliers.length < preMZ_outliers_Min_Length ) {
-				preMZ_outliers_Min_Length = dataForChartPerSearchIdEntry.preMZ_outliers.length; 
+				if ( preMZ_outliers_Max_Length === undefined 
+						|| ( dataForChartPerSearchIdEntry.preMZ_outliers
+								&& dataForChartPerSearchIdEntry.preMZ_outliers.length > preMZ_outliers_Max_Length ) ) {
+					preMZ_outliers_Max_Length = dataForChartPerSearchIdEntry.preMZ_outliers.length; 
+				}
+
+				if ( preMZ_outliers_Min_Length === undefined 
+						|| ( dataForChartPerSearchIdEntry.preMZ_outliers
+								&& dataForChartPerSearchIdEntry.preMZ_outliers.length < preMZ_outliers_Min_Length ) ) {
+					preMZ_outliers_Min_Length = dataForChartPerSearchIdEntry.preMZ_outliers.length; 
+				}
 			}
 		}, this /* passed to function as this */ );
+		
+		if ( preMZ_outliers_Max_Length === undefined ) {
+			// not set so set to 0
+			preMZ_outliers_Max_Length = 0;
+		}
+		if ( preMZ_outliers_Min_Length === undefined ) {
+			// not set so set to 0
+			preMZ_outliers_Min_Length = 0;
+		}
 
 		//  chart data for Google charts
 		var chartData = [];
@@ -480,17 +496,28 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 			
 			chartEntry.push( 'color: ' + colorForSearchEntry + ';' ); // style required to make visible :  color: blue; opacity: 1;
 			
-			//  Add each outlier
-			dataForChartPerSearchIdEntry.preMZ_outliers.forEach( function ( currentArrayValue, indexForSearchId, array ) {
-				chartEntry.push( currentArrayValue );
-				chartEntry.push( 'point { visible: true; size: 2; color: ' + colorForSearchEntry + ' }' ); // style required to make visible :  color: blue; opacity: 1; 
-			}, this /* passed to function as this */ );
+			if ( dataForChartPerSearchIdEntry.preMZ_outliers ) {
+				//  preMZ_outliers is not null
+
+				//  Add each outlier
+				dataForChartPerSearchIdEntry.preMZ_outliers.forEach( function ( currentArrayValue, indexForSearchId, array ) {
+					chartEntry.push( currentArrayValue );
+					chartEntry.push( 'point { visible: true; size: 2; color: ' + colorForSearchEntry + ' }' ); // style required to make visible :  color: blue; opacity: 1; 
+				}, this /* passed to function as this */ );
+
+				//  Add the last outlier point for each search to the max length of outlier.  Done so this X-axis entry has the same number of Y-axis entries as for Max Outliers X-axis entry
+				var preMZ_outliers_lastEntry = dataForChartPerSearchIdEntry.preMZ_outliers[ dataForChartPerSearchIdEntry.preMZ_outliers.length - 1 ];
+				for ( var counter = dataForChartPerSearchIdEntry.preMZ_outliers.length; counter < preMZ_outliers_Max_Length; counter++ ) {
+					chartEntry.push( preMZ_outliers_lastEntry );
+					chartEntry.push( 'point { visible: false; size: 0; }' ); // style as hidden, size zero since not an actual valid point 
+				}
 			
-			//  Add the last outlier point for each search to the max length of outlier.  Done so this X-axis entry has the same number of Y-axis entries as for Max Outliers X-axis entry
-			var preMZ_outliers_lastEntry = dataForChartPerSearchIdEntry.preMZ_outliers[ dataForChartPerSearchIdEntry.preMZ_outliers.length - 1 ];
-			for ( var counter = dataForChartPerSearchIdEntry.preMZ_outliers.length; counter < preMZ_outliers_Max_Length; counter++ ) {
-				chartEntry.push( preMZ_outliers_lastEntry );
-				chartEntry.push( 'point { visible: false; size: 0; }' ); // style as hidden, size zero since not an actual valid point 
+			} else {
+				//  No outliers so add invisible point at the chartIntervalMax position
+				for ( var counter = 0; counter < preMZ_outliers_Max_Length; counter++ ) {
+					chartEntry.push( dataForChartPerSearchIdEntry.chartIntervalMax );
+					chartEntry.push( 'point { visible: false; size: 0; }' ); // style as hidden, size zero since not an actual valid point 
+				}
 			}
 			
 			chartData.push( chartEntry );

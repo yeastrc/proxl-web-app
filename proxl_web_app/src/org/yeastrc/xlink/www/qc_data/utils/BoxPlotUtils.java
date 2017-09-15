@@ -40,9 +40,26 @@ public class BoxPlotUtils {
 		// Get a DescriptiveStatistics instance - Apache Commons
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 
+		double maxValue = 0;
+		double minValue = 0;
+		
+		boolean firstValue = true;
+		
 		// Add the data
 		for( Double value : values ) {
 			stats.addValue( value );
+			if ( firstValue ) {
+				maxValue = value;
+				minValue = value;
+				firstValue = false;
+			} else {
+				if ( value > maxValue ) {
+					maxValue = value;
+				}
+				if ( value < minValue ) {
+					minValue = value;
+				}
+			}
 		}
 
 		// Compute some statistics
@@ -61,12 +78,12 @@ public class BoxPlotUtils {
 		
 		//  adjust chart interval max and min based on each value
 		for( Double value : values ) {
-			if ( value < highCutoff ) {
+			if ( value <= highCutoff ) {
 				if ( chartIntervalMax == null || value > chartIntervalMax ) {
 					chartIntervalMax = value;
 				}
 			}
-			if ( value > lowCutoff ) {
+			if ( value >= lowCutoff ) {
 				if ( chartIntervalMin == null || value < chartIntervalMin ) {
 					chartIntervalMin = value;
 				}

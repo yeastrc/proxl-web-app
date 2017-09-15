@@ -362,7 +362,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 
 		//  Get max peptideLengths_outliers length
 		
-		var peptideLengths_outliers_Max_Length = 0;
+		var peptideLengths_outliers_Max_Length = undefined;
 
 		var peptideLengths_outliers_Min_Length = undefined;
 		
@@ -370,26 +370,31 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, index, array ) {
 			
 			var dataForChartPerSearchIdEntry = dataForChartPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
-			
-			if ( dataForChartPerSearchIdEntry.peptideLengths_outliers.length > peptideLengths_outliers_Max_Length ) {
-				peptideLengths_outliers_Max_Length = dataForChartPerSearchIdEntry.peptideLengths_outliers.length; 
-			}
-			
-			if ( peptideLengths_outliers_Min_Length === undefined || dataForChartPerSearchIdEntry.peptideLengths_outliers.length < peptideLengths_outliers_Min_Length ) {
-				peptideLengths_outliers_Min_Length = dataForChartPerSearchIdEntry.peptideLengths_outliers.length; 
+
+			if ( dataForChartPerSearchIdEntry.peptideLengths_outliers ) { // peptideLengths_outliers null if no outliers
+				
+				if ( peptideLengths_outliers_Max_Length === undefined 
+						|| ( dataForChartPerSearchIdEntry.peptideLengths_outliers.length
+								&& dataForChartPerSearchIdEntry.peptideLengths_outliers.length > peptideLengths_outliers_Max_Length ) ) {
+					peptideLengths_outliers_Max_Length = dataForChartPerSearchIdEntry.peptideLengths_outliers.length; 
+				}
+
+				if ( peptideLengths_outliers_Min_Length === undefined 
+						|| ( dataForChartPerSearchIdEntry.peptideLengths_outliers.length
+								&& dataForChartPerSearchIdEntry.peptideLengths_outliers.length < peptideLengths_outliers_Min_Length ) ) {
+					peptideLengths_outliers_Min_Length = dataForChartPerSearchIdEntry.peptideLengths_outliers.length; 
+				}
 			}
 		}, this /* passed to function as this */ );
 
-//		ss ss
-//		dataForChartPerSearchIdMap_KeyProjectSearchId.forEach( function ( currentArrayValue, indexForSearchId, array ) {
-//			if ( currentArrayValue.peptideLengths_outliers.length > peptideLengths_outliers_Max_Length ) {
-//				peptideLengths_outliers_Max_Length = currentArrayValue.peptideLengths_outliers.length; 
-//			}
-//			
-//			if ( peptideLengths_outliers_Min_Length === undefined || currentArrayValue.peptideLengths_outliers.length < peptideLengths_outliers_Min_Length ) {
-//				peptideLengths_outliers_Min_Length = currentArrayValue.peptideLengths_outliers.length; 
-//			}
-//		}, this /* passed to function as this */ );
+		if ( peptideLengths_outliers_Max_Length === undefined ) {
+			// not set so set to 0
+			peptideLengths_outliers_Max_Length = 0;
+		}
+		if ( peptideLengths_outliers_Min_Length === undefined ) {
+			// not set so set to 0
+			peptideLengths_outliers_Min_Length = 0;
+		}
 
 		//  chart data for Google charts
 		var chartData = [];
@@ -457,17 +462,28 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 			
 			chartEntry.push( 'color: ' + colorForSearchEntry + ';' ); // style required to make visible :  color: blue; opacity: 1;
 			
-			//  Add each outlier
-			dataForChartPerSearchIdEntry.peptideLengths_outliers.forEach( function ( currentArrayValue, indexForSearchId, array ) {
-				chartEntry.push( currentArrayValue );
-				chartEntry.push( 'point { visible: true; size: 2; color: ' + colorForSearchEntry + ' }' ); // style required to make visible :  color: blue; opacity: 1; 
-			}, this /* passed to function as this */ );
-			
-			//  Add the last outlier point for each search to the max length of outlier.  Done so this X-axis entry has the same number of Y-axis entries as for Max Outliers X-axis entry
-			var peptideLengths_outliers_lastEntry = dataForChartPerSearchIdEntry.peptideLengths_outliers[ dataForChartPerSearchIdEntry.peptideLengths_outliers.length - 1 ];
-			for ( var counter = dataForChartPerSearchIdEntry.peptideLengths_outliers.length; counter < peptideLengths_outliers_Max_Length; counter++ ) {
-				chartEntry.push( peptideLengths_outliers_lastEntry );
-				chartEntry.push( 'point { visible: false; size: 0; }' ); // style as hidden, size zero since not an actual valid point 
+			if ( dataForChartPerSearchIdEntry.peptideLengths_outliers ) {
+				//  peptideLengths_outliers is not null
+
+				//  Add each outlier
+				dataForChartPerSearchIdEntry.peptideLengths_outliers.forEach( function ( currentArrayValue, indexForSearchId, array ) {
+					chartEntry.push( currentArrayValue );
+					chartEntry.push( 'point { visible: true; size: 2; color: ' + colorForSearchEntry + ' }' ); // style required to make visible :  color: blue; opacity: 1; 
+				}, this /* passed to function as this */ );
+
+				//  Add the last outlier point for each search to the max length of outlier.  Done so this X-axis entry has the same number of Y-axis entries as for Max Outliers X-axis entry
+				var peptideLengths_outliers_lastEntry = dataForChartPerSearchIdEntry.peptideLengths_outliers[ dataForChartPerSearchIdEntry.peptideLengths_outliers.length - 1 ];
+				for ( var counter = dataForChartPerSearchIdEntry.peptideLengths_outliers.length; counter < peptideLengths_outliers_Max_Length; counter++ ) {
+					chartEntry.push( peptideLengths_outliers_lastEntry );
+					chartEntry.push( 'point { visible: false; size: 0; }' ); // style as hidden, size zero since not an actual valid point 
+				}
+
+			} else {
+				//  No outliers so add invisible point at the chartIntervalMax position
+				for ( var counter = 0; counter < peptideLengths_outliers_Max_Length; counter++ ) {
+					chartEntry.push( dataForChartPerSearchIdEntry.chartIntervalMax );
+					chartEntry.push( 'point { visible: false; size: 0; }' ); // style as hidden, size zero since not an actual valid point 
+				}
 			}
 			
 			chartData.push( chartEntry );
