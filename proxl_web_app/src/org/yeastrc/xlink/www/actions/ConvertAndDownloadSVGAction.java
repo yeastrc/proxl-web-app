@@ -232,6 +232,9 @@ public class ConvertAndDownloadSVGAction extends Action {
 	        // Create a PNG transcoder
     		PNGTranscoder t = new PNGTranscoder();
     		t.addTranscodingHint( PNGTranscoder.KEY_BACKGROUND_COLOR, Color.white );
+    		
+    		t.addTranscodingHint( PNGTranscoder.KEY_WIDTH, new Float(2000.0));
+    		
 	        // Save the image.
 	        t.transcode(input, output);			
 
@@ -241,6 +244,9 @@ public class ConvertAndDownloadSVGAction extends Action {
 	        // Set the transcoding hints.
 	        t.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, new Float(.8));
     		t.addTranscodingHint( JPEGTranscoder.KEY_BACKGROUND_COLOR, Color.white );
+    		
+    		t.addTranscodingHint( JPEGTranscoder.KEY_WIDTH, new Float(2000.0));
+    		
 	        // Save the image.
 	        t.transcode(input, output);			
 		} else {
