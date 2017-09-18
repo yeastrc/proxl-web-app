@@ -212,6 +212,9 @@
 				<%--  Set to false to NOT show color block before search for key --%>
 				<c:set var="showSearchColorBlock" value="${ false }" />
 				
+				<%--  Set to true so not display 'Re-order searches' link since does not work on this page --%>
+				<c:set var="doNotDisplayChangeSearchesDisplayOrderLink" value="${ true }" />
+				
 				<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
 				<%@ include file="/WEB-INF/jsp-includes/searchDetailsBlock.jsp" %>
 

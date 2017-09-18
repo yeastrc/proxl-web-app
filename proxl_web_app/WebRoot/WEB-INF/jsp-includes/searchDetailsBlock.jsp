@@ -1,5 +1,3 @@
-
-
 <%--
 	searchDetailsBlock.jsp
 
@@ -20,7 +18,7 @@
 <script id="search_details_block_filter_direction_above_value" type="text/text" ><%= FilterDirectionType.ABOVE.value()  %></script>
 <script id="search_details_block_filter_direction_below_value" type="text/text" ><%= FilterDirectionType.BELOW.value()  %></script>
 
-
+<%--  Set page variable "singleSearch" --%>
 
 <c:set var="singleSearch" value="${ true }" />
 
@@ -41,6 +39,14 @@
 				data-tooltip="Change searches from which data are displayed"
 				>Change searches</a>
 		  </div>
+		  <c:if test="${ not singleSearch and not doNotDisplayChangeSearchesDisplayOrderLink }" >
+		  	<div id="searches_change_display_order_button_container" style="display: none;">
+				<a href="javascript:" id="searches_change_display_order_open_overlay" style="font-size: 12px;"
+					class="tool_tip_attached_jq"  
+					data-tooltip="Change order of searches"
+					>Re-order searches</a>
+		  	</div>
+		  </c:if>
 		</c:if>
 	 
 	 </td>
@@ -56,8 +62,8 @@
 			
 	<c:set var="search" value="${ search_details.searchDTO }"></c:set>
  
- 	 <%--  On Merged Peptide, Protein pages, this is draggable for re-ording --%>
-	 <table class="table-no-border-no-cell-spacing-no-cell-padding  searches_sort_list_item_jq  " 
+ 	 <%--  On Merged Peptide, Protein pages, this is draggable for re-ording.    'search_list_item_jq' for searchesChangeDisplayOrder.js --%>
+	 <table class="table-no-border-no-cell-spacing-no-cell-padding  searches_sort_list_item_jq search_list_item_jq  " 
 	 	data-project_search_id="${ search.projectSearchId }"
 	 	data-search_order_index="${ searchVarStatus.index }"
 	 	style="border-width:0px;" >
@@ -97,7 +103,7 @@
 		 <table class="table-no-border-no-cell-spacing-no-cell-padding" style="border-width:0px;" >
 		  <tr>
 		   <td style="<c:if test="${ not singleSearch }" > padding-bottom: 2px;</c:if>">
-			<div><bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="searchId" />)</div>
+			<div class=" search_details_name_search_id_string_jq "><bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="searchId" />)</div>
 
 			<div id="search_details_<bean:write name="search" property="projectSearchId" />"
 					 
@@ -312,6 +318,8 @@
 							</div>
 
 			<%@ include file="/WEB-INF/jsp-includes/searchesForPageChooser.jsp" %>
+			
+			<%@ include file="/WEB-INF/jsp-includes/searchesChangeDisplayOrder.jsp" %>
 						
 	 </td>
 	</tr>

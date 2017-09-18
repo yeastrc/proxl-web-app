@@ -88,6 +88,15 @@ var MergedPeptideProteinSearchesListVennDiagramSection = function() {
 			projectSearchIdsInNewOrder.push( project_search_id );
 		});
 		
+		this.updatePageToNewProjectSearchIdsOrder( projectSearchIdsInNewOrder );
+	};
+	
+	/**
+	 * 'update': This function is called when the user stopped sorting and the DOM position has changed.
+	 * (User released the item they were dragging and items are now in "after sort" order)
+	 */
+	this.updatePageToNewProjectSearchIdsOrder = function( projectSearchIdsInNewOrder ) {
+
 		//   Special case for Merged QC Page
 		
 		if ( window.qcMergedPageMain ) {
@@ -141,7 +150,6 @@ var MergedPeptideProteinSearchesListVennDiagramSection = function() {
 		}
 
 		$form_get_for_updated_parameters_multiple_searches.submit();
-		var z = 0;
 
 	};
 };
