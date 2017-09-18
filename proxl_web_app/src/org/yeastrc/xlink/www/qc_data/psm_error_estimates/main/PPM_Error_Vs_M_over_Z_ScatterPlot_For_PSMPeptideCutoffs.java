@@ -60,6 +60,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs {
 
 	private static final Logger log = Logger.getLogger(PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs.class);
+
+	public enum ForDownload { YES, NO }
 	
 	private static final int REMOVE_OUTLIERS_FIRST_QUAM_over_ZER_PERCENTILE = 25;
 	private static final int REMOVE_OUTLIERS_THIRD_QUAM_over_ZER_PERCENTILE = 75;
@@ -81,6 +83,37 @@ public class PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs {
 		PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs instance = new PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs();
 		return instance;
 	}
+
+	/**
+	 * Response from call to getPPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs(...)
+	 *
+	 */
+	public static class PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Method_Response {
+
+		private PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result ppm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result;
+		/**
+		 * Map<[link type], ...>
+		 */
+		private Map<String, List<PPMErrorM_over_ZPair>> ppmErrorListForLinkType_ByLinkType;
+		public PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result getPpm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result() {
+			return ppm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result;
+		}
+		public void setPpm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result(
+				PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result ppm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result) {
+			this.ppm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result = ppm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result;
+		}
+		/**
+		 * Map<[link type], ...>
+		 * @return
+		 */
+		public Map<String, List<PPMErrorM_over_ZPair>> getPpmErrorListForLinkType_ByLinkType() {
+			return ppmErrorListForLinkType_ByLinkType;
+		}
+		public void setPpmErrorListForLinkType_ByLinkType(
+				Map<String, List<PPMErrorM_over_ZPair>> ppmErrorListForLinkType_ByLinkType) {
+			this.ppmErrorListForLinkType_ByLinkType = ppmErrorListForLinkType_ByLinkType;
+		}
+	}
 	
 	/**
 	 * @param filterCriteriaJSON
@@ -90,11 +123,10 @@ public class PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs {
 	 * @return
 	 * @throws Exception
 	 */
-	public PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result getPPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs( 
+	public PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Method_Response getPPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs( 
+			ForDownload forDownload,
 			String filterCriteriaJSON, 
-			List<Integer> projectSearchIdsListDeduppedSorted,
-			List<SearchDTO> searches, 
-			Map<Integer, SearchDTO> searchesMapOnSearchId ) throws Exception {
+			List<SearchDTO> searches ) throws Exception {
 
 		Collection<Integer> searchIds = new HashSet<>();
 //		Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();
@@ -120,6 +152,13 @@ public class PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs {
 			ppmErrorListForLinkType_ByLinkType.remove( XLinkUtils.DIMER_TYPE_STRING );
 		}
 		
+		PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Method_Response methodResponse = new PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Method_Response();
+		
+		methodResponse.ppmErrorListForLinkType_ByLinkType = ppmErrorListForLinkType_ByLinkType;
+		
+		if ( forDownload == ForDownload.YES ) {
+			return methodResponse;  //  EARY RETURN
+		}
 		
 		//  Build a new map, removing outliers from each list
 		ppmErrorListForLinkType_ByLinkType = removeOutliers( ppmErrorListForLinkType_ByLinkType );
@@ -128,7 +167,9 @@ public class PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs {
 		PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result result = 
 				getPPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result( ppmErrorListForLinkType_ByLinkType );
 		
-		return result;
+		methodResponse.ppm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result = result;
+		
+		return methodResponse;
 	}
 	
 	/**
@@ -398,6 +439,41 @@ public class PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs {
 			throw e;
 		}
 
+		{
+			String[] linkTypesFromURL = mergedPeptideQueryJSONRoot.getLinkTypes();
+
+			if ( linkTypesFromURL == null || linkTypesFromURL.length == 0 ) {
+				String msg = "At least one linkType is required";
+				log.error( msg );
+				throw new ProxlWebappDataException(msg);
+			}
+
+			//  Create link types in upper case for being like the selection from web page if came from other place
+			{
+				String[] linkTypesFromURLUpdated = new String[ linkTypesFromURL.length ];
+				int linkTypesFromURLUpdatedIndex = 0;
+
+				for ( String linkTypeFromWeb : linkTypesFromURL ) {
+					String linkTypeRequestUpdated = null;
+					if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkTypeFromWeb ) || XLinkUtils.CROSS_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+						linkTypeRequestUpdated = PeptideViewLinkTypesConstants.CROSSLINK_PSM;
+					} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkTypeFromWeb ) || XLinkUtils.LOOP_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+						linkTypeRequestUpdated = PeptideViewLinkTypesConstants.LOOPLINK_PSM;
+					} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkTypeFromWeb ) || XLinkUtils.UNLINKED_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+						linkTypeRequestUpdated = PeptideViewLinkTypesConstants.UNLINKED_PSM;
+					} else {
+						String msg = "linkType is invalid, linkTypeFromWeb: " + linkTypeFromWeb;
+						log.error( msg );
+						throw new Exception( msg );
+					}
+					linkTypesFromURLUpdated[ linkTypesFromURLUpdatedIndex ] = linkTypeRequestUpdated;
+					linkTypesFromURLUpdatedIndex++;
+				}
+				linkTypesFromURL = linkTypesFromURLUpdated;
+				mergedPeptideQueryJSONRoot.setLinkTypes( linkTypesFromURLUpdated );
+			}
+		}
+		
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
 		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
@@ -987,8 +1063,20 @@ public class PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs {
 	 * 
 	 *
 	 */
-	private static class PPMErrorM_over_ZPair {
-		BigDecimal m_over_z;
-		double ppmError;
+	public static class PPMErrorM_over_ZPair {
+		private BigDecimal m_over_z;
+		private double ppmError;
+		public BigDecimal getM_over_z() {
+			return m_over_z;
+		}
+		public void setM_over_z(BigDecimal m_over_z) {
+			this.m_over_z = m_over_z;
+		}
+		public double getPpmError() {
+			return ppmError;
+		}
+		public void setPpmError(double ppmError) {
+			this.ppmError = ppmError;
+		}
 	}
 }

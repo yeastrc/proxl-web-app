@@ -137,7 +137,8 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 				}
 			},
 			prevYAxisChoice : undefined,
-			chartDataFromServer : undefined
+			chartDataFromServer_Thumbnail : undefined,
+			chartDataFromServer_FullSize_Overlay : undefined
 	};
 	
 	// <%-- Values sent to server --%>
@@ -206,15 +207,15 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 
 			_getScanFilesForProjectSearchId = params.getScanFilesForProjectSearchId; // function
 			
-			this.addClickAndOnChangeHandlers();
-
 			//  Get Help tooltip HTML
 			var $psm_level_block_help_tooltip_psm_score_vs_score = $("#psm_level_block_help_tooltip_psm_score_vs_score");
 			if ( $psm_level_block_help_tooltip_psm_score_vs_score.length === 0 ) {
 				throw Error( "No element found with id 'psm_level_block_help_tooltip_psm_score_vs_score' " );
 			}
 			_helpTooltipHTML = $psm_level_block_help_tooltip_psm_score_vs_score.html();
-			
+
+			this.addClickAndOnChangeHandlers();
+
 			this.getSelectValuesFromPage();
 
 		} catch( e ) {
@@ -318,13 +319,22 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 			}
 			});
 
-		$( "#psm_score-svg-download-data" ).click( function() { 
-			objectThis.psmScoreVsScoreQCPlot_downloadData( ); 
-		});
-
 		// For PSM Score Vs Score, add Download Click handlers for overlay
 		var $psm_score_vs_score_qc_plot_chartDiv_Container = $("#psm_score_vs_score_qc_plot_chartDiv_Container");
-		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $psm_score_vs_score_qc_plot_chartDiv_Container, helpTooltipHTML : _helpTooltipHTML } );
+
+		//  Download Data Setup
+		var downloadDataCallback = function( params ) {
+//			var clickedThis = params.clickedThis;
+
+			//  Download the data for params
+			objectThis.psmScoreVsScoreQCPlot_downloadData( { thumbnailChart : false } );
+		};
+		
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
+			$chart_outer_container_for_download_jq :  $psm_score_vs_score_qc_plot_chartDiv_Container, 
+			downloadDataCallback : downloadDataCallback,
+			helpTooltipHTML : _helpTooltipHTML 
+		} );
 		
 	};
 
@@ -928,6 +938,17 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 		var userInputMaxYString = originalParams.userInputMaxY;
 		var thumbnailChart = originalParams.thumbnailChart;
 		
+
+		if ( thumbnailChart ) {
+			this.globals_PSMScoreVsScoresChart.chartDataFromServer_Thumbnail = chartDataParam;
+
+			selectedAnnotationType_1_Text = chartDataParam.annotationTypeName_1 + " (" + chartDataParam.searchProgramName_1 + ")";
+			selectedAnnotationType_2_Text = chartDataParam.annotationTypeName_2 + " (" + chartDataParam.searchProgramName_2 + ")";
+				
+		} else {
+			this.globals_PSMScoreVsScoresChart.chartDataFromServer_FullSize_Overlay = chartDataParam;
+		}
+		
 		var userInputMaxX = undefined;
 		if ( userInputMaxXString !== "" ) {
 			userInputMaxX = parseFloat( userInputMaxXString );
@@ -947,7 +968,24 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 			var $psm_score_vs_score_outer_container_div = $("#psm_score_vs_score_outer_container_div");
 			$psm_score_vs_score_outer_container_div.empty();
 			var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $psm_score_vs_score_outer_container_div } );
-			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $psm_score_vs_score_outer_container_div, helpTooltipHTML : _helpTooltipHTML } );
+
+			//  Download Data Setup
+			var downloadDataCallback = function( params ) {
+//				var clickedThis = params.clickedThis;
+
+				//  Download the data for params
+				objectThis.psmScoreVsScoreQCPlot_downloadData( { 
+					thumbnailChart : thumbnailChart, 
+					selectedAnnotationType_1_Text : selectedAnnotationType_1_Text,
+					selectedAnnotationType_2_Text : selectedAnnotationType_2_Text 
+				} );
+			};
+			
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
+				$chart_outer_container_for_download_jq :  $psm_score_vs_score_outer_container_div, 
+				downloadDataCallback : downloadDataCallback,
+				helpTooltipHTML : _helpTooltipHTML 
+			} );
 			
 			// Make so clicking on the thumbnail chart opens the overlay
 			$chart_container_jq.click(function(eventObject) {
@@ -972,9 +1010,6 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 			$chartContainerDiv.empty();
 		}
 		
-
-		this.globals_PSMScoreVsScoresChart.chartDataFromServer = chartDataParam;
-
 		var crosslinkChartData = chartDataParam.crosslinkChartData;
 		var looplinkChartData = chartDataParam.looplinkChartData;
 		var unlinkedChartData = chartDataParam.unlinkedChartData;
@@ -1006,9 +1041,6 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 
 		if ( thumbnailChart ) {
 			
-			selectedAnnotationType_1_Text = chartDataParam.annotationTypeName_1 + " (" + chartDataParam.searchProgramName_1 + ")";
-			selectedAnnotationType_2_Text = chartDataParam.annotationTypeName_2 + " (" + chartDataParam.searchProgramName_2 + ")";
-			
 		} else {
 
 			var $psm_score_vs_score_qc_plot_overlay_container = $("#psm_score_vs_score_qc_plot_overlay_container");
@@ -1029,7 +1061,7 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 			}
 
 
-			//  Hack to remove tooltip from Thumbnail chart
+			//  Hack to remove tooltip from chart
 			var $google_visualization_tooltip = $(".google-visualization-tooltip");
 			$google_visualization_tooltip.remove();  //  remove element and children
 
@@ -1505,28 +1537,60 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 	/**
 	 * 
 	 */
-	this.psmScoreVsScoreQCPlot_downloadData = function( ) {
+	this.psmScoreVsScoreQCPlot_downloadData = function( params ) {
 
 		var objectThis = this;
+		
+		var thumbnailChart = false;
+		var selectedAnnotationType_1_Text = undefined
+		var selectedAnnotationType_2_Text = undefined
+
+		if ( params ) {
+			if ( params.thumbnailChart ) {
+				thumbnailChart = true;
+			}
+			if ( params.selectedAnnotationType_1_Text ) {
+				selectedAnnotationType_1_Text = params.selectedAnnotationType_1_Text;
+			}
+			if ( params.selectedAnnotationType_2_Text ) {
+				selectedAnnotationType_2_Text = params.selectedAnnotationType_2_Text;
+			}
+		}
 
 		try {
-			if ( this.globals_PSMScoreVsScoresChart === undefined || this.globals_PSMScoreVsScoresChart.chartDataFromServer === undefined ) {
-//				No stored chart data from server so exit
-				return;  //  EARLY EXIT
+			var chartDataFromServer = undefined;
+
+			if ( thumbnailChart ) {
+			
+				if ( this.globals_PSMScoreVsScoresChart === undefined || this.globals_PSMScoreVsScoresChart.chartDataFromServer_Thumbnail === undefined ) {
+//					No stored chart data from server so exit
+					return;  //  EARLY EXIT
+				}
+			
+				chartDataFromServer = this.globals_PSMScoreVsScoresChart.chartDataFromServer_Thumbnail;
+				
+			} else {
+				if ( this.globals_PSMScoreVsScoresChart === undefined || this.globals_PSMScoreVsScoresChart.chartDataFromServer_FullSize_Overlay === undefined ) {
+//					No stored chart data from server so exit
+					return;  //  EARLY EXIT
+				}
+				
+				chartDataFromServer = this.globals_PSMScoreVsScoresChart.chartDataFromServer_FullSize_Overlay;
+				
+//				Selected Annotation Text
+				selectedAnnotationType_1_Text = $("#psm_score_vs_score_qc_plot_score_type_id_1 option:selected").text();
+				selectedAnnotationType_2_Text = $("#psm_score_vs_score_qc_plot_score_type_id_2 option:selected").text();
+
 			}
 
 			// TODO  Hard code taking first project search id
 			var projectSearchId = _project_search_ids[ 0 ];	
 
-			var crosslinkChartData = this.globals_PSMScoreVsScoresChart.chartDataFromServer.crosslinkChartData;
-			var looplinkChartData = this.globals_PSMScoreVsScoresChart.chartDataFromServer.looplinkChartData;
-			var unlinkedChartData = this.globals_PSMScoreVsScoresChart.chartDataFromServer.unlinkedChartData;
+			var crosslinkChartData = chartDataFromServer.crosslinkChartData;
+			var looplinkChartData = chartDataFromServer.looplinkChartData;
+			var unlinkedChartData = chartDataFromServer.unlinkedChartData;
 
-//			Selected Annotation Text
-			var selectedAnnotationTypeText_1 = $("#psm_score_vs_score_qc_plot_score_type_id_1 option:selected").text();
-			var selectedAnnotationTypeText_2 = $("#psm_score_vs_score_qc_plot_score_type_id_2 option:selected").text();
-
-			var headerLine = "search id\tpsm id\ttype\t" + selectedAnnotationTypeText_1 + "\t" + selectedAnnotationTypeText_2;
+			var headerLine = "search id\tpsm id\ttype\t" + selectedAnnotationType_1_Text + "\t" + selectedAnnotationType_2_Text;
 
 			var outputStringArray = new Array();
 

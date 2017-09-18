@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -40,6 +41,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 
 	private static final Logger log = Logger.getLogger(PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged.class);
+
+	public enum ForDownload { YES, NO }
 	
 	/**
 	 * private constructor
@@ -49,20 +52,77 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 		PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged instance = new PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged();
 		return instance;
 	}
+	
+
+	/**
+	 * Response from call to getPeptideLength_Histogram_For_PSMPeptideCutoffs_Merged(...)
+	 *
+	 */
+	public static class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Method_Response {
+
+		PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results peptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results;
+		
+		/**
+		 * Lists of peptideLength mapped by search id then link type
+		 * Map<[link type], Map<[Search Id],List<[Peptide Length]>>>
+		 */
+		Map<String,Map<Integer,List<Integer>>> allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType;
+
+		/**
+		 * map of counts mapped by peptideLength mapped by search id then link type
+		 * Map<[link type], Map<[Search Id],Map<[Peptide Length],[Count]>>>
+		 */
+		Map<String,Map<Integer,Map<Integer,MutableInt>>> countsKeyPeptideLength_KeySearchId_KeyLinkType;
+		
+		/**
+		 * Lists of peptideLength mapped by search id then link type
+		 * Map<[link type], Map<[Search Id],List<[Peptide Length]>>>
+		 * @return
+		 */
+		public Map<String, Map<Integer, List<Integer>>> getAllSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType() {
+			return allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType;
+		}
+
+		public void setAllSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType(
+				Map<String, Map<Integer, List<Integer>>> allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType) {
+			this.allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType = allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType;
+		}
+
+		public PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results getPeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results() {
+			return peptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results;
+		}
+
+		public void setPeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results(
+				PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results peptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results) {
+			this.peptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results = peptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results;
+		}
+
+		/**
+		 * map of counts mapped by peptideLength mapped by search id then link type
+		 * Map<[link type], Map<[Search Id],Map<[Peptide Length],[Count]>>>
+		 * @return
+		 */
+		public Map<String, Map<Integer, Map<Integer, MutableInt>>> getCountsKeyPeptideLength_KeySearchId_KeyLinkType() {
+			return countsKeyPeptideLength_KeySearchId_KeyLinkType;
+		}
+
+		public void setCountsKeyPeptideLength_KeySearchId_KeyLinkType(
+				Map<String, Map<Integer, Map<Integer, MutableInt>>> countsKeyPeptideLength_KeySearchId_KeyLinkType) {
+			this.countsKeyPeptideLength_KeySearchId_KeyLinkType = countsKeyPeptideLength_KeySearchId_KeyLinkType;
+		}
+	}
 		
 	/**
+	 * @param forDownload
 	 * @param filterCriteriaJSON
-	 * @param projectSearchIdsListDeduppedSorted
 	 * @param searches
-	 * @param searchesMapOnSearchId
 	 * @return
 	 * @throws Exception
 	 */
-	public PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results getPeptideLength_Histogram_For_PSMPeptideCutoffs_Merged( 			
+	public PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Method_Response getPeptideLength_Histogram_For_PSMPeptideCutoffs_Merged( 			
+			ForDownload forDownload,
 			String filterCriteriaJSON, 
-			List<Integer> projectSearchIdsListDeduppedSorted,
-			List<SearchDTO> searches, 
-			Map<Integer, SearchDTO> searchesMapOnSearchId ) throws Exception {
+			List<SearchDTO> searches ) throws Exception {
 
 		Collection<Integer> searchIds = new HashSet<>();
 		Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();
@@ -94,6 +154,51 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 			throw e;
 		}
 
+		//  Populate countForLinkType_ByLinkType for selected link types
+		if ( mergedPeptideQueryJSONRoot.getLinkTypes() == null || mergedPeptideQueryJSONRoot.getLinkTypes().length == 0 ) {
+			String msg = "At least one linkType is required";
+			log.error( msg );
+			throw new Exception( msg );
+		} 
+		String[] linkTypesFromURL = mergedPeptideQueryJSONRoot.getLinkTypes();
+		
+		if ( linkTypesFromURL == null || linkTypesFromURL.length == 0 ) {
+			String msg = "At least one linkType is required";
+			log.error( msg );
+			throw new ProxlWebappDataException(msg);
+		}
+		
+		//  Create link types in lower case for display and upper case for being like the selection from web page if came from other place
+		List<String> linkTypesList = new ArrayList<String>( linkTypesFromURL.length );
+		{
+			String[] linkTypesFromURLUpdated = new String[ linkTypesFromURL.length ];
+			int linkTypesFromURLUpdatedIndex = 0;
+
+			for ( String linkTypeFromWeb : linkTypesFromURL ) {
+				String linkTypeRequestUpdated = null;
+				String linkTypeDisplay = null;
+				if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkTypeFromWeb ) || XLinkUtils.CROSS_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+					linkTypeRequestUpdated = PeptideViewLinkTypesConstants.CROSSLINK_PSM;
+					linkTypeDisplay = XLinkUtils.CROSS_TYPE_STRING;
+				} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkTypeFromWeb ) || XLinkUtils.LOOP_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+					linkTypeRequestUpdated = PeptideViewLinkTypesConstants.LOOPLINK_PSM;
+					linkTypeDisplay = XLinkUtils.LOOP_TYPE_STRING;
+				} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkTypeFromWeb ) || XLinkUtils.UNLINKED_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+					linkTypeRequestUpdated = PeptideViewLinkTypesConstants.UNLINKED_PSM;
+					linkTypeDisplay = XLinkUtils.UNLINKED_TYPE_STRING;
+				} else {
+					String msg = "linkType is invalid, linkTypeFromWeb: " + linkTypeFromWeb;
+					log.error( msg );
+					throw new Exception( msg );
+				}
+				linkTypesList.add( linkTypeDisplay );
+				linkTypesFromURLUpdated[ linkTypesFromURLUpdatedIndex ] = linkTypeRequestUpdated;
+				linkTypesFromURLUpdatedIndex++;
+			}
+			linkTypesFromURL = linkTypesFromURLUpdated;
+			mergedPeptideQueryJSONRoot.setLinkTypes( linkTypesFromURLUpdated );
+		}
+
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
 		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
@@ -107,45 +212,70 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
 		SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel =
 				cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
-		
-		//  Populate countForLinkType_ByLinkType for selected link types
-		if ( mergedPeptideQueryJSONRoot.getLinkTypes() == null || mergedPeptideQueryJSONRoot.getLinkTypes().length == 0 ) {
-			String msg = "At least one linkType is required";
-			log.error( msg );
-			throw new Exception( msg );
-		} 
-
-		List<String> linkTypesList = new ArrayList<String>( mergedPeptideQueryJSONRoot.getLinkTypes().length );
-
-		for ( String linkTypeFromWeb : mergedPeptideQueryJSONRoot.getLinkTypes() ) {
-			String linkType = null;
-			if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkTypeFromWeb ) ) {
-				linkType = XLinkUtils.CROSS_TYPE_STRING;
-			} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkTypeFromWeb ) ) {
-				linkType = XLinkUtils.LOOP_TYPE_STRING;
-			} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkTypeFromWeb ) ) {
-				linkType = XLinkUtils.UNLINKED_TYPE_STRING;
-			} else {
-				String msg = "linkType is invalid, linkTypeFromWeb: " + linkTypeFromWeb;
-				log.error( msg );
-				throw new Exception( msg );
-			}
-			linkTypesList.add( linkType );
-		}
-
-		
+				
 		//  Get Lists of peptideLength mapped by search id then link type
+		//  Map<[link type], Map<[Search Id],List<[Peptide Length]>>>
 		Map<String,Map<Integer,List<Integer>>> allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType = 
 				getAllSearchesCombinedPeptideLengthList_Map_KeyedOnLinkType(searches, linkTypesForDBQuery, modsForDBQuery, searcherCutoffValuesRootLevel);
 		
-		PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results results = 
+		PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Method_Response methodResponse = new PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Method_Response();
+		
+		methodResponse.allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType = allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType;
+		
+		if ( forDownload == ForDownload.YES ) {
+			
+			Map<String,Map<Integer,Map<Integer,MutableInt>>> countsKeyPeptideLength_KeySearchId_KeyLinkType = 
+					remapForCountsPerPeptideLength( allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType );
+			
+			methodResponse.countsKeyPeptideLength_KeySearchId_KeyLinkType = countsKeyPeptideLength_KeySearchId_KeyLinkType;
+			return methodResponse;  //  EARLY RETURN
+		}
+		
+		PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results peptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results = 
 				getPerChartData_KeyedOnLinkType( 
 						allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType, 
 						linkTypesList, 
 						searches );
 
-		return results;
+		methodResponse.peptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results = peptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results;
+		
+		return methodResponse;
 	}
+	
+
+	/**
+	 * @param allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType
+	 * @return
+	 */
+	private Map<String,Map<Integer,Map<Integer,MutableInt>>> remapForCountsPerPeptideLength(
+			/**
+			 * Lists of peptideLength mapped by search id then link type
+			 * Map<[link type], Map<[Search Id],List<[Peptide Length]>>>
+			 */
+			Map<String,Map<Integer,List<Integer>>> allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType
+			) {
+		
+		Map<String,Map<Integer,Map<Integer,MutableInt>>> countsKeyPeptideLength_KeySearchId_KeyLinkType = new HashMap<>();
+		
+		for ( Map.Entry<String,Map<Integer,List<Integer>>> entryByLinkType : allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType.entrySet() ) {
+			Map<Integer,Map<Integer,MutableInt>> countsKeyPeptideLength_KeySearchId = new HashMap<>();
+			countsKeyPeptideLength_KeySearchId_KeyLinkType.put( entryByLinkType.getKey() , countsKeyPeptideLength_KeySearchId );
+			for ( Map.Entry<Integer,List<Integer>> entryBySearchId : entryByLinkType.getValue().entrySet() ) {
+				Map<Integer,MutableInt> countsKeyPeptideLength = new HashMap<>();
+				countsKeyPeptideLength_KeySearchId.put( entryBySearchId.getKey(), countsKeyPeptideLength );
+				for ( Integer peptideLength : entryBySearchId.getValue() ) {
+					MutableInt countForPeptideLength = countsKeyPeptideLength.get( peptideLength );
+					if ( countForPeptideLength == null ) {
+						countsKeyPeptideLength.put( peptideLength, new MutableInt( 1 ) );
+					} else {
+						countForPeptideLength.increment();
+					}
+				}
+			}
+		}
+		return countsKeyPeptideLength_KeySearchId_KeyLinkType;
+	}
+	
 	
 	/**
 	 * @param allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType

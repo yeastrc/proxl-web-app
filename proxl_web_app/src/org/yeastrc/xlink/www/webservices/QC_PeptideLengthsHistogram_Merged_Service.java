@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_data.reported_peptide_level_merged.main.PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged;
+import org.yeastrc.xlink.www.qc_data.reported_peptide_level_merged.main.PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged.PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Method_Response;
 import org.yeastrc.xlink.www.qc_data.reported_peptide_level_merged.objects.PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -151,11 +152,13 @@ public class QC_PeptideLengthsHistogram_Merged_Service {
 				}
 			}
 				
-
-			PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results results = 
+			PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Method_Response methodResponse = 
 					PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged.getInstance()
 					.getPeptideLength_Histogram_For_PSMPeptideCutoffs_Merged(
-							filterCriteria_JSONString, projectSearchIdsListDeduppedSorted, searches, searchesMapOnSearchId );
+							PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged.ForDownload.NO,
+							filterCriteria_JSONString, searches );
+
+			PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results results = methodResponse.getPeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results();
 
 			//  Get PSMs for cutoffs and other data
 			WebserviceResult_getQC_PeptideLengthsHistogram serviceResult = new WebserviceResult_getQC_PeptideLengthsHistogram();

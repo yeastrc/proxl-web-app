@@ -42,6 +42,8 @@ public class PreMZ_Chart_For_PSMPeptideCutoffs_Merged {
 
 	private static final Logger log = Logger.getLogger(PreMZ_Chart_For_PSMPeptideCutoffs_Merged.class);
 	
+	public enum ForDownload { YES, NO }
+	
 	/**
 	 * private constructor
 	 */
@@ -49,6 +51,45 @@ public class PreMZ_Chart_For_PSMPeptideCutoffs_Merged {
 	public static PreMZ_Chart_For_PSMPeptideCutoffs_Merged getInstance( ) throws Exception {
 		PreMZ_Chart_For_PSMPeptideCutoffs_Merged instance = new PreMZ_Chart_For_PSMPeptideCutoffs_Merged();
 		return instance;
+	}
+	
+	/**
+	 * Response from call to getPreMZ_Chart_For_PSMPeptideCutoffs_Merged(...)
+	 *
+	 */
+	public static class PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Method_Response {
+
+		private PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Results preMZ_Chart_For_PSMPeptideCutoffs_Merged_Results;
+
+		/**
+		 * Lists of preMZ mapped by search id then link type
+		 * Map<[link type],Map<[Search id]>,List<[preMZ]>>>
+		 */
+		private Map<String,Map<Integer,List<BigDecimal>>> allSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType;
+
+		public PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Results getPreMZ_Chart_For_PSMPeptideCutoffs_Merged_Results() {
+			return preMZ_Chart_For_PSMPeptideCutoffs_Merged_Results;
+		}
+
+		public void setPreMZ_Chart_For_PSMPeptideCutoffs_Merged_Results(
+				PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Results preMZ_Chart_For_PSMPeptideCutoffs_Merged_Results) {
+			this.preMZ_Chart_For_PSMPeptideCutoffs_Merged_Results = preMZ_Chart_For_PSMPeptideCutoffs_Merged_Results;
+		}
+
+		/**
+		 * Lists of preMZ mapped by search id then link type
+		 * Map<[link type],Map<[Search id]>,List<[preMZ]>>>
+		 * @return
+		 */
+		public Map<String, Map<Integer, List<BigDecimal>>> getAllSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType() {
+			return allSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType;
+		}
+
+		public void setAllSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType(
+				Map<String, Map<Integer, List<BigDecimal>>> allSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType) {
+			this.allSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType = allSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType;
+		}
+		
 	}
 		
 	/**
@@ -59,7 +100,8 @@ public class PreMZ_Chart_For_PSMPeptideCutoffs_Merged {
 	 * @return
 	 * @throws Exception
 	 */
-	public PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Results getPreMZ_Chart_For_PSMPeptideCutoffs_Merged( 			
+	public PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Method_Response getPreMZ_Chart_For_PSMPeptideCutoffs_Merged( 
+			ForDownload forDownload,
 			String filterCriteriaJSON, 
 			List<Integer> projectSearchIdsListDeduppedSorted,
 			List<SearchDTO> searches, 
@@ -95,6 +137,46 @@ public class PreMZ_Chart_For_PSMPeptideCutoffs_Merged {
 			throw e;
 		}
 
+
+		String[] linkTypesFromURL = mergedPeptideQueryJSONRoot.getLinkTypes();
+		
+		if ( linkTypesFromURL == null || linkTypesFromURL.length == 0 ) {
+			String msg = "no link types specified";
+			log.error( msg );
+			throw new ProxlWebappDataException(msg);
+		}
+		
+		//  Create link types in lower case for display and upper case for being like the selection from web page if came from other place
+		List<String> linkTypesList = new ArrayList<String>( linkTypesFromURL.length );
+		{
+			String[] linkTypesFromURLUpdated = new String[ linkTypesFromURL.length ];
+			int linkTypesFromURLUpdatedIndex = 0;
+
+			for ( String linkTypeFromWeb : linkTypesFromURL ) {
+				String linkTypeRequestUpdated = null;
+				String linkTypeDisplay = null;
+				if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkTypeFromWeb ) || XLinkUtils.CROSS_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+					linkTypeRequestUpdated = PeptideViewLinkTypesConstants.CROSSLINK_PSM;
+					linkTypeDisplay = XLinkUtils.CROSS_TYPE_STRING;
+				} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkTypeFromWeb ) || XLinkUtils.LOOP_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+					linkTypeRequestUpdated = PeptideViewLinkTypesConstants.LOOPLINK_PSM;
+					linkTypeDisplay = XLinkUtils.LOOP_TYPE_STRING;
+				} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkTypeFromWeb ) || XLinkUtils.UNLINKED_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+					linkTypeRequestUpdated = PeptideViewLinkTypesConstants.UNLINKED_PSM;
+					linkTypeDisplay = XLinkUtils.UNLINKED_TYPE_STRING;
+				} else {
+					String msg = "linkType is invalid, linkTypeFromWeb: " + linkTypeFromWeb;
+					log.error( msg );
+					throw new Exception( msg );
+				}
+				linkTypesList.add( linkTypeDisplay );
+				linkTypesFromURLUpdated[ linkTypesFromURLUpdatedIndex ] = linkTypeRequestUpdated;
+				linkTypesFromURLUpdatedIndex++;
+			}
+			linkTypesFromURL = linkTypesFromURLUpdated;
+			mergedPeptideQueryJSONRoot.setLinkTypes( linkTypesFromURLUpdated );
+		}
+		
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
 		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
@@ -115,37 +197,29 @@ public class PreMZ_Chart_For_PSMPeptideCutoffs_Merged {
 			log.error( msg );
 			throw new Exception( msg );
 		} 
-
-		List<String> linkTypesList = new ArrayList<String>( mergedPeptideQueryJSONRoot.getLinkTypes().length );
-
-		for ( String linkTypeFromWeb : mergedPeptideQueryJSONRoot.getLinkTypes() ) {
-			String linkType = null;
-			if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkTypeFromWeb ) ) {
-				linkType = XLinkUtils.CROSS_TYPE_STRING;
-			} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkTypeFromWeb ) ) {
-				linkType = XLinkUtils.LOOP_TYPE_STRING;
-			} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkTypeFromWeb ) ) {
-				linkType = XLinkUtils.UNLINKED_TYPE_STRING;
-			} else {
-				String msg = "linkType is invalid, linkTypeFromWeb: " + linkTypeFromWeb;
-				log.error( msg );
-				throw new Exception( msg );
-			}
-			linkTypesList.add( linkType );
-		}
-
 		
+		PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Method_Response methodResponse = new PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Method_Response();
+
 		//  Get Lists of preMZ mapped by search id then link type
+		//   Map<[link type],Map<[Search id]>,List<[preMZ]>>>
 		Map<String,Map<Integer,List<BigDecimal>>> allSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType = 
 				getAllSearchesCombinedPreMZList_Map_KeyedOnLinkType(searches, linkTypesForDBQuery, modsForDBQuery, searcherCutoffValuesRootLevel);
 		
-		PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Results results = 
+		methodResponse.allSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType = allSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType;
+		
+		if ( forDownload == ForDownload.YES ) {
+			return methodResponse;  // EARLY RETURN
+		}
+		
+		PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Results preMZ_Chart_For_PSMPeptideCutoffs_Merged_Results = 
 				getPerChartData_KeyedOnLinkType( 
 						allSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType, 
 						linkTypesList, 
 						searches );
 
-		return results;
+		methodResponse.preMZ_Chart_For_PSMPeptideCutoffs_Merged_Results = preMZ_Chart_For_PSMPeptideCutoffs_Merged_Results;
+		
+		return methodResponse;
 	}
 	
 	/**

@@ -20,7 +20,9 @@
  */
 var QCMergedPageChartChargeStateStatistics = function() {
 
-
+	//  Download data URL
+	var _downloadStrutsAction = "downloadQC_PsmChargeChartData.do";
+	
 	/**
 	 * Overridden for Specific elements like Chart Title and X and Y Axis labels
 	 */
@@ -328,10 +330,21 @@ var QCMergedPageChartChargeStateStatistics = function() {
 				var $chart_outer_container_jq = this._addChartOuterTemplate( { $chart_group_container_table_jq : $PSMChargeStatesCountsBlock } );
 				var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 
-				var linkType = entryForLinkType.linkType;
-
 				this._addSinglePSMChargeChart( { entryForLinkType: entryForLinkType, searchIds : searchIds, $chartContainer : $chart_container_jq } );
+				
+				//  Download Data
+				
+				var hash_json_Contents = _get_hash_json_Contents();
+				//  Set link types to chart link type
+				hash_json_Contents.linkTypes = [ linkType ];
+								
+				var downloadDataCallback = function( params ) {
+//					var clickedThis = params.clickedThis;
 
+					//  Download the data for params
+					qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _downloadStrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+				};
+				
 				//  Get Help tooltip HTML
 				
 				var elementId = "psm_level_block_help_tooltip_charge_state_" + linkType
@@ -342,7 +355,12 @@ var QCMergedPageChartChargeStateStatistics = function() {
 				}
 				var helpTooltipHTML = $psm_level_block_help_tooltip_charge_state_LinkType.html();
 
-				qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : helpTooltipHTML, helpTooltip_Wide : false } );
+				qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
+					$chart_outer_container_for_download_jq :  $chart_outer_container_jq, 
+					downloadDataCallback : downloadDataCallback,
+					helpTooltipHTML : helpTooltipHTML, 
+					helpTooltip_Wide : false 
+				} );
 				
 				// Add tooltips for download links
 				addToolTips( $chart_outer_container_jq );

@@ -63,9 +63,7 @@ public class QC_SummaryCounts_Merged {
 	 */
 	public QC_SummaryCounts_Merged_Results getQC_SummaryCounts_Merged( 
 			String filterCriteriaJSON, 
-			List<Integer> projectSearchIdsListDeduppedSorted,
-			List<SearchDTO> searches, 
-			Map<Integer, SearchDTO> searchesMapOnSearchId ) throws Exception {
+			List<SearchDTO> searches ) throws Exception {
 
 		Collection<Integer> searchIds = new HashSet<>();
 		Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();

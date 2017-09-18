@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates_merged.main.PPM_Error_Chart_For_PSMPeptideCutoffs_Merged;
+import org.yeastrc.xlink.www.qc_data.psm_error_estimates_merged.main.PPM_Error_Chart_For_PSMPeptideCutoffs_Merged.PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates_merged.objects.PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -150,10 +151,16 @@ public class QC_PPM_Error_Merged_Service {
 					searchIdsArrayIndex++;
 				}
 			}
-				
-			PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results =
+			
+			PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response =
 					PPM_Error_Chart_For_PSMPeptideCutoffs_Merged.getInstance()
-					.getPPM_Error_Chart_For_PSMPeptideCutoffs_Merged( filterCriteria_JSONString, searches );
+					.getPPM_Error_Chart_For_PSMPeptideCutoffs_Merged(
+							PPM_Error_Chart_For_PSMPeptideCutoffs_Merged.ForDownload.NO,
+							filterCriteria_JSONString, 
+							searches );
+
+			PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results =
+					ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response.getPpm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results();
 
 			//  Get  for cutoffs and other data
 			WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs serviceResult = new WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs();

@@ -64,17 +64,13 @@ public class QC_MissingCleavageReportedPeptidesCount_Merged {
 	
 	/**
 	 * @param filterCriteriaJSON
-	 * @param projectSearchIdsListDeduppedSorted
 	 * @param searches
-	 * @param searchesMapOnSearchId
 	 * @return
 	 * @throws Exception
 	 */
 	public QC_MissingCleavageReportedPeptidesCount_Merged_Results getQC_MissingCleavageReportedPeptidesCount_Merged( 
 			String filterCriteriaJSON, 
-			List<Integer> projectSearchIdsListDeduppedSorted,
-			List<SearchDTO> searches, 
-			Map<Integer, SearchDTO> searchesMapOnSearchId ) throws Exception {
+			List<SearchDTO> searches ) throws Exception {
 
 		Collection<Integer> searchIds = new HashSet<>();
 		Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();

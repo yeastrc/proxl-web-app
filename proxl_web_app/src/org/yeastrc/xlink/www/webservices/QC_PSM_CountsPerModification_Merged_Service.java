@@ -154,7 +154,7 @@ public class QC_PSM_CountsPerModification_Merged_Service {
 			QC_PSM_CountsPerModification_Merged_Results qc_PSM_CountsPerModification_Merged_Results = 
 					QC_PSM_CountsPerModification_Merged.getInstance()
 					.getQC_PSM_CountsPerModification_Merged(
-							filterCriteria_JSONString, projectSearchIdsListDeduppedSorted, searches, searchesMapOnSearchId );
+							filterCriteria_JSONString, searches );
 
 			WebserviceResult_getQC_psmCountsPerModification_Merged serviceResult = new WebserviceResult_getQC_psmCountsPerModification_Merged();
 			

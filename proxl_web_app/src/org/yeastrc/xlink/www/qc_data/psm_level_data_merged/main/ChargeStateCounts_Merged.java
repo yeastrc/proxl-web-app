@@ -53,17 +53,13 @@ public class ChargeStateCounts_Merged {
 		
 	/**
 	 * @param filterCriteriaJSON
-	 * @param projectSearchIdsListDeduppedSorted
 	 * @param searches
-	 * @param searchesMapOnSearchId
 	 * @return
 	 * @throws Exception
 	 */
 	public ChargeStateCounts_Merged_Results getChargeStateCounts_Merged( 			
 			String filterCriteriaJSON, 
-			List<Integer> projectSearchIdsListDeduppedSorted,
-			List<SearchDTO> searches, 
-			Map<Integer, SearchDTO> searchesMapOnSearchId ) throws Exception {
+			List<SearchDTO> searches ) throws Exception {
 
 		Collection<Integer> searchIds = new HashSet<>();
 		Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();
@@ -95,6 +91,44 @@ public class ChargeStateCounts_Merged {
 			throw e;
 		}
 
+		String[] linkTypesFromURL = mergedPeptideQueryJSONRoot.getLinkTypes();
+		
+		if ( linkTypesFromURL == null || linkTypesFromURL.length == 0 ) {
+			String msg = "At least one linkType is required";
+			log.error( msg );
+			throw new ProxlWebappDataException(msg);
+		}
+		
+		//  Create link types in lower case for display and upper case for being like the selection from web page if came from other place
+		List<String> linkTypesList = new ArrayList<String>( linkTypesFromURL.length );
+		{
+			String[] linkTypesFromURLUpdated = new String[ linkTypesFromURL.length ];
+			int linkTypesFromURLUpdatedIndex = 0;
+
+			for ( String linkTypeFromWeb : linkTypesFromURL ) {
+				String linkTypeRequestUpdated = null;
+				String linkTypeDisplay = null;
+				if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkTypeFromWeb ) || XLinkUtils.CROSS_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+					linkTypeRequestUpdated = PeptideViewLinkTypesConstants.CROSSLINK_PSM;
+					linkTypeDisplay = XLinkUtils.CROSS_TYPE_STRING;
+				} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkTypeFromWeb ) || XLinkUtils.LOOP_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+					linkTypeRequestUpdated = PeptideViewLinkTypesConstants.LOOPLINK_PSM;
+					linkTypeDisplay = XLinkUtils.LOOP_TYPE_STRING;
+				} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkTypeFromWeb ) || XLinkUtils.UNLINKED_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+					linkTypeRequestUpdated = PeptideViewLinkTypesConstants.UNLINKED_PSM;
+					linkTypeDisplay = XLinkUtils.UNLINKED_TYPE_STRING;
+				} else {
+					String msg = "linkType is invalid, linkTypeFromWeb: " + linkTypeFromWeb;
+					log.error( msg );
+					throw new Exception( msg );
+				}
+				linkTypesList.add( linkTypeDisplay );
+				linkTypesFromURLUpdated[ linkTypesFromURLUpdatedIndex ] = linkTypeRequestUpdated;
+				linkTypesFromURLUpdatedIndex++;
+			}
+			linkTypesFromURL = linkTypesFromURLUpdated;
+			mergedPeptideQueryJSONRoot.setLinkTypes( linkTypesFromURLUpdated );
+		}
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
 		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
@@ -109,32 +143,6 @@ public class ChargeStateCounts_Merged {
 		SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel =
 				cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
 		
-		//  Populate countForLinkType_ByLinkType for selected link types
-		if ( mergedPeptideQueryJSONRoot.getLinkTypes() == null || mergedPeptideQueryJSONRoot.getLinkTypes().length == 0 ) {
-			String msg = "At least one linkType is required";
-			log.error( msg );
-			throw new Exception( msg );
-		}
-		
-
-		List<String> linkTypesList = new ArrayList<String>( mergedPeptideQueryJSONRoot.getLinkTypes().length );
-
-		for ( String linkTypeFromWeb : mergedPeptideQueryJSONRoot.getLinkTypes() ) {
-			String linkType = null;
-			if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkTypeFromWeb ) ) {
-				linkType = XLinkUtils.CROSS_TYPE_STRING;
-			} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkTypeFromWeb ) ) {
-				linkType = XLinkUtils.LOOP_TYPE_STRING;
-			} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkTypeFromWeb ) ) {
-				linkType = XLinkUtils.UNLINKED_TYPE_STRING;
-			} else {
-				String msg = "linkType is invalid, linkTypeFromWeb: " + linkTypeFromWeb;
-				log.error( msg );
-				throw new Exception( msg );
-			}
-			linkTypesList.add( linkType );
-		}
-
 		//  Get Maps of Charge values mapped to count, mapped by search id then link type
 		//  Map<[link type], Map<[search id],Map<[charge value],[count of charge value]>>>
 		Map<String,Map<Integer,Map<Integer,Long>>> allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId_KeyedOnLinkType = 

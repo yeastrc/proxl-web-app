@@ -67,6 +67,8 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
 		
+		<script type="text/javascript" src="${ contextPath }/js/qc_pages_Single_Merged_Common.js?x=${cacheBustValue}"></script>
+		
 		<script type="text/javascript" src="${ contextPath }/js/qcChart_Download_Help_HTMLBlock.js?x=${cacheBustValue}"></script>
 	
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChartSummaryStatistics.js?x=${cacheBustValue}"></script>
@@ -353,7 +355,7 @@
 </script>
 
 <script id="scan_level_block_help_tooltip_ion_current_vs_retention_time_chart" type="text/text">
-A histogram of binned total ion current of MS1 scans as a function of retentiom time.
+A histogram of binned total ion current of MS1 scans as a function of retention time.
 </script>
 
 <script id="scan_level_block_help_tooltip_ion_current_vs_m_over_z_chart" type="text/text">
@@ -553,6 +555,25 @@ The total ion current in the bin is indicated by color, as indicated by the lege
 					  	<div style="text-align: center; padding-top: 15px; padding-bottom: 0px; font-size: 15px; font-weight: bold;">
 					  		MS1 Binned Ion Current: m/z vs/ Retention Time (click to view full size)
 					  		<img src="images/icon-help.png" class=" help-image-for-qc-chart help_image_for_qc_chart_jq ">
+					  		
+						  <div class="svg-download-block">
+							<a href="javascript:" class=" tool_tip_attached_jq  " data-tooltip="Download graphic as file." 
+								><img src="images/icon-download-small.png" /></a>
+					
+							<!-- Overlay that goes under main overlay: display on hover of download icon -->
+							<div class="svg-download-options-backing-block svg_download_backing_block_jq ">
+							</div>
+							<!-- Overlay: display on hover of download icon -->
+							<span class=" svg-download-options-block svg_download_block_jq ">
+								Choose download file format:
+								<%-- Download the data for the chart, hidden until shown in each JS chart code since then a click handler is attached. --%>
+								<a id="MS_1_IonCurrent_Heatmap_image_download_data_link"
+									data-tooltip="Download as text, tab delimited." 
+									class="svg-download-option tool_tip_attached_jq " href="javascript:" style="margin-top:5px; margin-bottom: 5px;"
+									>Text/Tab Delimited</a>
+							</span>
+						  </div>					  		
+					  		
 					  	</div>
 					  	<!-- img tag will be inserted here -->
 						<div id="MS_1_IonCurrent_Heatmap_image_container" >
@@ -1178,12 +1199,6 @@ This is the length of both linked peptides added together.</div>
 						</tr>	
 					</table>
 					
-					<div style="margin-bottom: 15px;">
-						<a href="javascript:" id="psm_count-svg-download-data"
-							data-tooltip="Download current data as tab limited text." style="font-size:10pt;white-space:nowrap;" 
-							href="#" class="tool_tip_attached_jq download-svg">[Download Data]</a>
-					</div>
-
 					<h1 class="psm_count_vs_score_qc_plot_no_data_jq" 
 						style="display: none;  ">
 						No Data
@@ -1330,11 +1345,6 @@ This is the length of both linked peptides added together.</div>
 														
 					</table>
 					
-					<div style="margin-bottom: 15px;">
-						<a href="javascript:" id="psm_score-svg-download-data"
-							data-tooltip="Download current data as tab limited text." style="font-size:10pt;white-space:nowrap;" 
-							href="javascript:" class="tool_tip_attached_jq download-svg">[Download Data]</a>
-					</div>
 					<h1 class="psm_score_vs_score_qc_plot_no_data_jq" style="display: none;  ">
 						No Data
 					</h1>
@@ -1379,7 +1389,7 @@ This is the length of both linked peptides added together.</div>
 	<%-- qc-data-block is here since it has the width and height of the chart --%>
 <script id="common_chart_outer_entry_template" type="text/text"> 
 	<td style="padding: 4px;">
-	 <div class=" chart-standard-container-div qc-data-block chart_outer_container_for_download_jq {{link_type}}_chart_outer_container_jq chart_outer_container_jq" > 
+	 <div class=" chart-standard-container-div qc-data-block chart_outer_container_for_download_jq {{ link_type }}_chart_outer_container_jq chart_outer_container_jq" data-link_type="{{ link_type }}" > 
 	 </div>
 	</td>
 </script>	

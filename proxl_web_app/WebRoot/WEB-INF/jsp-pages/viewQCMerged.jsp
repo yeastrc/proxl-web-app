@@ -73,6 +73,8 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
 		
+		<script type="text/javascript" src="${ contextPath }/js/qc_pages_Single_Merged_Common.js?x=${cacheBustValue}"></script>
+		
 		<script type="text/javascript" src="${ contextPath }/js/qcChart_Download_Help_HTMLBlock.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/mergedPeptideProteinSearchesListVennDiagramSection.js?x=${cacheBustValue}"></script>

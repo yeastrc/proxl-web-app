@@ -311,7 +311,125 @@
 			<forward name="SuccessSingle" path="/WEB-INF/jsp-pages/viewQC.jsp" redirect="false" />
 			<forward name="SuccessMerged" path="/WEB-INF/jsp-pages/viewQCMerged.jsp" redirect="false" />
 		</action>		
-		  
+		
+		<!-- Downloads for QC pages (Single search and Merged) -->
+
+      	<action path="/downloadQC_SummaryPsmChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_Summary_PsmChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+      	<action path="/downloadQC_SummaryPeptideChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_Summary_PeptideChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+      	<action path="/downloadQC_SummaryProteinChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_Summary_ProteinChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+
+      	<action path="/downloadQC_Digestion_PeptideMissedCleavageChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_Digestion_PeptideMissedCleavageChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+      	<action path="/downloadQC_Digestion_MissedCleavagePerPeptideChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_Digestion_MissedCleavagePerPeptideChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+      	<action path="/downloadQC_Digestion_PsmMissedCleavageChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_Digestion_PsmMissedCleavageChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+				
+      	<action path="/downloadQC_PsmCountVsRetentionTimeChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_PSM_Count_Vs_RetentionTime_ChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+		
+      	<action path="/downloadQC_PsmChargeChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_PsmChargeChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+		
+      	<action path="/downloadQC_Psm_M_Over_Z_ChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_Psm_M_Over_Z_ChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+		
+      	<action path="/downloadQC_Psm_PPM_Error_ChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_Psm_PPM_Error_ChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+		
+      	<action path="/downloadQC_Psm_PPM_Error_VS_RT_ChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_Psm_PPM_Error_VS_RT_ChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+		
+      	<action path="/downloadQC_Psm_PPM_Error_VS_MZ_ChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_Psm_PPM_Error_VS_MZ_ChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+
+      	<action path="/downloadQC_PsmModificationChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_PsmModificationChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+
+      	<action path="/downloadQC_PeptideLengthChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_PeptideLengthChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>		
+		
+				<!-- QC: Scan File data downloads  -->
+		
+      	<action path="/download_MS1_VS_RetentionTime_ChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_MS1_VS_RetentionTime_ChartDataAction"
+				scope="request"
+				validate="false">
+		</action>		
+		
+      	<action path="/download_MS1_VS_M_Over_Z_ChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_MS1_VS_M_Over_Z_ChartDataAction"
+				scope="request"
+				validate="false">
+		</action>		
+	
+      	<action path="/download_MS1_VS_RetentionTime_VS_M_Over_Z_ChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_MS1_VS_RetentionTime_VS_M_Over_Z_ChartDataAction"
+				scope="request"
+				validate="false">
+		</action>				
+				
+		<!--  Other downloads  -->
+  		  
     	<action path="/downloadMergedPSMsForPeptides"
 				type="org.yeastrc.xlink.www.actions.DownloadPSMsForMergedPeptidesAction"
 				scope="request"

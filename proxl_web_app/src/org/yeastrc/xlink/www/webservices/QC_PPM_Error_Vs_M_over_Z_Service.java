@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs;
+import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs.PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Method_Response;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -151,11 +152,15 @@ public class QC_PPM_Error_Vs_M_over_Z_Service {
 				}
 			}
 			
-			PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result ppm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result =
+			PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Method_Response ppm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Method_Response =
 					PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs.getInstance()
 					.getPPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs( 
-							filterCriteria_JSONString, projectSearchIdsListDeduppedSorted, searches, searchesMapOnSearchId );
-				
+							PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs.ForDownload.NO,
+							filterCriteria_JSONString, searches );
+
+			PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result ppm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result =
+					ppm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Method_Response.getPpm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result();
+			
 			//  Get  for cutoffs and other data
 			WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs serviceResult = new WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs();
 			

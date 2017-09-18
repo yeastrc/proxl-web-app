@@ -54,7 +54,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 
 	private static final Logger log = Logger.getLogger(PPM_Error_Chart_For_PSMPeptideCutoffs_Merged.class);
-		
+
+	public enum ForDownload { YES, NO }
+	
 	/**
 	 * private constructor
 	 */
@@ -63,6 +65,41 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 		PPM_Error_Chart_For_PSMPeptideCutoffs_Merged instance = new PPM_Error_Chart_For_PSMPeptideCutoffs_Merged();
 		return instance;
 	}
+
+	/**
+	 * Response from call to getPreMZ_Chart_For_PSMPeptideCutoffs_Merged(...)
+	 *
+	 */
+	public static class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response {
+
+		private PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results;
+		/**
+		 * Lists of PPM Error mapped by search id then link type
+		 * Map <{Link Type},,Map<<Search id>,List<{PPM Error}>>>
+		 */
+		private Map<String,Map<Integer,List<Double>>> allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType;
+		
+		public PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results getPpm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results() {
+			return ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results;
+		}
+		public void setPpm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results(
+				PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results) {
+			this.ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results = ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results;
+		}
+		/**
+		 * Lists of PPM Error mapped by search id then link type
+		 * Map <{Link Type},,Map<<Search id>,List<{PPM Error}>>>
+		 * @return
+		 */
+		public Map<String, Map<Integer, List<Double>>> getAllSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType() {
+			return allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType;
+		}
+		public void setAllSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType(
+				Map<String, Map<Integer, List<Double>>> allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType) {
+			this.allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType = allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType;
+		}
+
+	}
 	
 	/**
 	 * @param filterCriteriaJSON
@@ -70,7 +107,8 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 	 * @return
 	 * @throws Exception
 	 */
-	public PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results getPPM_Error_Chart_For_PSMPeptideCutoffs_Merged( 
+	public PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response getPPM_Error_Chart_For_PSMPeptideCutoffs_Merged( 
+			ForDownload forDownload,
 			String filterCriteriaJSON, 
 			List<SearchDTO> searches ) throws Exception {
 
@@ -113,26 +151,44 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 			log.error( msg );
 			throw new Exception( msg );
 		} 
-
-		List<String> linkTypesList = new ArrayList<String>( mergedPeptideQueryJSONRoot.getLinkTypes().length );
-
-		for ( String linkTypeFromWeb : mergedPeptideQueryJSONRoot.getLinkTypes() ) {
-			String linkType = null;
-			if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkTypeFromWeb ) ) {
-				linkType = XLinkUtils.CROSS_TYPE_STRING;
-			} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkTypeFromWeb ) ) {
-				linkType = XLinkUtils.LOOP_TYPE_STRING;
-			} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkTypeFromWeb ) ) {
-				linkType = XLinkUtils.UNLINKED_TYPE_STRING;
-			} else {
-				String msg = "linkType is invalid, linkTypeFromWeb: " + linkTypeFromWeb;
-				log.error( msg );
-				throw new Exception( msg );
-			}
-			linkTypesList.add( linkType );
+		String[] linkTypesFromURL = mergedPeptideQueryJSONRoot.getLinkTypes();
+		
+		if ( linkTypesFromURL == null || linkTypesFromURL.length == 0 ) {
+			String msg = "At least one linkType is required";
+			log.error( msg );
+			throw new ProxlWebappDataException(msg);
 		}
 		
+		//  Create link types in lower case for display and upper case for being like the selection from web page if came from other place
+		List<String> linkTypesList = new ArrayList<String>( linkTypesFromURL.length );
+		{
+			String[] linkTypesFromURLUpdated = new String[ linkTypesFromURL.length ];
+			int linkTypesFromURLUpdatedIndex = 0;
 
+			for ( String linkTypeFromWeb : linkTypesFromURL ) {
+				String linkTypeRequestUpdated = null;
+				String linkTypeDisplay = null;
+				if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkTypeFromWeb ) || XLinkUtils.CROSS_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+					linkTypeRequestUpdated = PeptideViewLinkTypesConstants.CROSSLINK_PSM;
+					linkTypeDisplay = XLinkUtils.CROSS_TYPE_STRING;
+				} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkTypeFromWeb ) || XLinkUtils.LOOP_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+					linkTypeRequestUpdated = PeptideViewLinkTypesConstants.LOOPLINK_PSM;
+					linkTypeDisplay = XLinkUtils.LOOP_TYPE_STRING;
+				} else if ( PeptideViewLinkTypesConstants.UNLINKED_PSM.equals( linkTypeFromWeb ) || XLinkUtils.UNLINKED_TYPE_STRING.equals( linkTypeFromWeb ) ) {
+					linkTypeRequestUpdated = PeptideViewLinkTypesConstants.UNLINKED_PSM;
+					linkTypeDisplay = XLinkUtils.UNLINKED_TYPE_STRING;
+				} else {
+					String msg = "linkType is invalid, linkTypeFromWeb: " + linkTypeFromWeb;
+					log.error( msg );
+					throw new Exception( msg );
+				}
+				linkTypesList.add( linkTypeDisplay );
+				linkTypesFromURLUpdated[ linkTypesFromURLUpdatedIndex ] = linkTypeRequestUpdated;
+				linkTypesFromURLUpdatedIndex++;
+			}
+			linkTypesFromURL = linkTypesFromURLUpdated;
+			mergedPeptideQueryJSONRoot.setLinkTypes( linkTypesFromURLUpdated );
+		}
 		////////////
 		/////   Searcher cutoffs for all searches
 		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
@@ -189,22 +245,29 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 				allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId.put( searchId, ppmErrorList_Map_Entry.getValue() );
 			}
 		}
+
+		PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response methodResult = new PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response();
+		methodResult.allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType = allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType;
 		
+		if ( forDownload == ForDownload.YES ) {
+			return methodResult; //  EARLY RETURN
+		}
 		//  Create output Results
 		
-		PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results result = 
+		PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results = 
 				getPPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results( 
 						allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType,
 						linkTypesList, 
 						searches );
 		
+		methodResult.ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results = ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results;
 
 		if ( ! reportedPeptideIdsSkippedForErrorCalculatingMZ.isEmpty() ) {
 			log.warn( "Number of Reported Peptides Skipped For Error Calculating MZ: " + reportedPeptideIdsSkippedForErrorCalculatingMZ.size()
 					+ ", List of Reported Peptide Ids: " + reportedPeptideIdsSkippedForErrorCalculatingMZ );
 		}
 		
-		return result;
+		return methodResult;
 	}
 	
 

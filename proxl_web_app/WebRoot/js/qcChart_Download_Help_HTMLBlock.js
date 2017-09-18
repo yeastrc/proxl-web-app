@@ -47,7 +47,10 @@ var QC_ChartDownloadHelp = function() {
 	 */
 	this.add_DownloadClickHandlers_HelpTooltip = function( params ) {
 		var objectThis = this;
+		
 		var $chart_outer_container_for_download_jq = params.$chart_outer_container_for_download_jq;
+		var downloadDataCallback = params.downloadDataCallback;
+		
 		var helpTooltipHTML = params.helpTooltipHTML;
 		var helpTooltip_Wide = params.helpTooltip_Wide;
 		
@@ -57,6 +60,27 @@ var QC_ChartDownloadHelp = function() {
 			event.preventDefault();
 			event.stopPropagation();
 		});
+		
+		if ( downloadDataCallback ) {
+			//  Download data callback function provided so show link and attach click handler
+
+			//  Add Data Download Click Handler and show the download data link
+			var $chart_data_download_link_jq = $chart_outer_container_for_download_jq.find(".chart_data_download_link_jq");
+			$chart_data_download_link_jq.click( function( event ) { 
+				try {
+					var $this = $( this );
+					var $chart_outer_container_for_download_jq = $this.closest(".chart_outer_container_for_download_jq");
+//					var linkType = $chart_outer_container_for_download_jq.attr( "data-link_type" ); //  Not populated in HTML
+//					downloadDataCallback( { clickedThis : this, linkType : linkType } ); 
+					downloadDataCallback( { clickedThis : this } ); 
+					event.preventDefault();
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			});
+			$chart_data_download_link_jq.show();
+		}
 		
 		//  Eat any clicks that occur on these elements or their children
 		

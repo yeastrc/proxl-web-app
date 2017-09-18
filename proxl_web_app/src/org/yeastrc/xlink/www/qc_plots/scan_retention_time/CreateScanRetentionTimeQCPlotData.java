@@ -39,6 +39,8 @@ public class CreateScanRetentionTimeQCPlotData {
 
 	private static final Logger log = Logger.getLogger(CreateScanRetentionTimeQCPlotData.class);
 	
+	public enum ForDownload { YES, NO }
+	
 	private static final int BIN_COUNT = 100;  //  Number of bars on the chart
 	private static final int EXCLUDE_SCAN_LEVEL_1 = 1;
 	
@@ -52,6 +54,44 @@ public class CreateScanRetentionTimeQCPlotData {
 	}
 	
 	/**
+	 * Result from method create
+	 *
+	 */
+	public static class CreateScanRetentionTimeQCPlotData_Result {
+		
+		ScanRetentionTimeJSONRoot scanRetentionTimeJSONRoot;
+		
+		List<BigDecimal> retentionTimeForPSMsthatMeetCriteriaList;
+		List<ScanRetentionTimeDTO> scanRetentionTime_AllScansExcludeScanLevel_1_List;
+
+		public ScanRetentionTimeJSONRoot getScanRetentionTimeJSONRoot() {
+			return scanRetentionTimeJSONRoot;
+		}
+
+		public void setScanRetentionTimeJSONRoot(ScanRetentionTimeJSONRoot scanRetentionTimeJSONRoot) {
+			this.scanRetentionTimeJSONRoot = scanRetentionTimeJSONRoot;
+		}
+
+		public List<BigDecimal> getRetentionTimeForPSMsthatMeetCriteriaList() {
+			return retentionTimeForPSMsthatMeetCriteriaList;
+		}
+
+		public void setRetentionTimeForPSMsthatMeetCriteriaList(List<BigDecimal> retentionTimeForPSMsthatMeetCriteriaList) {
+			this.retentionTimeForPSMsthatMeetCriteriaList = retentionTimeForPSMsthatMeetCriteriaList;
+		}
+
+		public List<ScanRetentionTimeDTO> getScanRetentionTime_AllScansExcludeScanLevel_1_List() {
+			return scanRetentionTime_AllScansExcludeScanLevel_1_List;
+		}
+
+		public void setScanRetentionTime_AllScansExcludeScanLevel_1_List(
+				List<ScanRetentionTimeDTO> scanRetentionTime_AllScansExcludeScanLevel_1_List) {
+			this.scanRetentionTime_AllScansExcludeScanLevel_1_List = scanRetentionTime_AllScansExcludeScanLevel_1_List;
+		}
+		
+	}
+	
+	/**
 	 * @param projectSearchId
 	 * @param scanFileIdList
 	 * @param scanFileAll
@@ -60,13 +100,15 @@ public class CreateScanRetentionTimeQCPlotData {
 	 * @return
 	 * @throws Exception
 	 */
-	public ScanRetentionTimeJSONRoot create( 
+	public CreateScanRetentionTimeQCPlotData_Result create( 
+			ForDownload forDownload,
 			int projectSearchId, 
 			List<Integer> scanFileIdList, 
 			boolean scanFileAll, 
-			List<String> scansForSelectedLinkTypes,
 			String filterCriteria_JSONString,
 			Double retentionTimeInSecondsCutoff ) throws Exception {
+		
+		CreateScanRetentionTimeQCPlotData_Result result = new CreateScanRetentionTimeQCPlotData_Result();
 
 		SearchDTO searchDTO = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 		if ( searchDTO == null ) {
@@ -87,24 +129,49 @@ public class CreateScanRetentionTimeQCPlotData {
 
 		if ( scanFileIdList.isEmpty() ) {
 			//  Handle here if no scan files for search id
-			ScanRetentionTimeJSONRoot result = new ScanRetentionTimeJSONRoot();
-			result.setScanFileIdList( scanFileIdList );
+			ScanRetentionTimeJSONRoot scanRetentionTimeJSONRoot = new ScanRetentionTimeJSONRoot();
+			scanRetentionTimeJSONRoot.setScanFileIdList( scanFileIdList );
+			
+			result.scanRetentionTimeJSONRoot = scanRetentionTimeJSONRoot;
 			return result; //  EARLY EXIT
 		}
 		
-		List<BigDecimal> retentionTimeForPSMsthatMeetCriteriaList = null;
-		if ( ! scansForSelectedLinkTypes.isEmpty() ) {
-			retentionTimeForPSMsthatMeetCriteriaList = 
+		List<BigDecimal> retentionTimeForPSMsthatMeetCriteriaList =
 					getRetentionTimeForPSMsthatMeetCriteriaList( 
 							projectSearchId, 
 							searchDTO,
 							scanFileIdList, 
 							scanFileAll, 
-							scansForSelectedLinkTypes, 
 							filterCriteria_JSONString, 
 							retentionTimeInSecondsCutoff );
+		
+		List<ScanRetentionTimeDTO> scanRetentionTime_AllScansExcludeScanLevel_1_List = null;
+		for ( int scanFileId : scanFileIdList ) {
+			List<ScanRetentionTimeDTO> scanRetentionTime_ForThisScanFileId_List =
+					ScanRetentionTimeDAO.getForScanFileIdExcludeScanLevel( scanFileId, retentionTimeInSecondsCutoff, EXCLUDE_SCAN_LEVEL_1 );
+			if ( scanRetentionTime_AllScansExcludeScanLevel_1_List == null ) {
+				scanRetentionTime_AllScansExcludeScanLevel_1_List = scanRetentionTime_ForThisScanFileId_List;
+			} else {
+				scanRetentionTime_AllScansExcludeScanLevel_1_List.addAll( scanRetentionTime_ForThisScanFileId_List );
+			}
 		}
-		return createScanRetentionTimeQCPlotData( scanFileIdList, retentionTimeInSecondsCutoff, retentionTimeForPSMsthatMeetCriteriaList );
+		
+		result.retentionTimeForPSMsthatMeetCriteriaList = retentionTimeForPSMsthatMeetCriteriaList;
+		result.scanRetentionTime_AllScansExcludeScanLevel_1_List = scanRetentionTime_AllScansExcludeScanLevel_1_List;
+		
+		if ( forDownload == ForDownload.YES ) {
+			return result;  //  EARLY EXIT
+		}
+		
+		ScanRetentionTimeJSONRoot scanRetentionTimeJSONRoot = 
+				createScanRetentionTimeQCPlotData( 
+						scanFileIdList, 
+						scanRetentionTime_AllScansExcludeScanLevel_1_List,
+						retentionTimeForPSMsthatMeetCriteriaList );
+		
+		result.scanRetentionTimeJSONRoot = scanRetentionTimeJSONRoot;
+		
+		return result;
 	}
 	
 	/**
@@ -123,7 +190,6 @@ public class CreateScanRetentionTimeQCPlotData {
 			SearchDTO searchDTO, 
 			List<Integer> scanFileIdList, 
 			boolean scanFileAll, 
-			List<String> scansForSelectedLinkTypes,	
 			String filterCriteria_JSONString,
 			Double retentionTimeInSecondsCutoff ) throws Exception {
 		
@@ -168,23 +234,10 @@ public class CreateScanRetentionTimeQCPlotData {
 			log.error( msg );
 			throw new ProxlWebappDataException( msg );
 		}
-
-		//  Copy link types requested into an array to pass to GetLinkTypesForSearchers
-		String [] linkTypesUserRequestInOverlay = null;
-		if ( scansForSelectedLinkTypes != null && ( ! scansForSelectedLinkTypes.isEmpty() ) ) {
-			linkTypesUserRequestInOverlay = new String[ scansForSelectedLinkTypes.size() ];
-			{
-				int index = 0;
-				for ( String linkType : scansForSelectedLinkTypes ) {
-					linkTypesUserRequestInOverlay[ index ] = linkType;
-					index++;
-				}
-			}
-		}
-
+		
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
-		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( linkTypesUserRequestInOverlay );
+		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
 		//   Mods for DB Query
 		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
 		
@@ -208,26 +261,16 @@ public class CreateScanRetentionTimeQCPlotData {
 	
 	/**
 	 * @param scanFileIdList
-	 * @param retentionTimeInSecondsCutoff
+	 * @param scanRetentionTime_AllScansExcludeScanLevel_1_List
 	 * @param retentionTimeForPSMsthatMeetCriteriaList
 	 * @return
 	 * @throws Exception
 	 */
 	private ScanRetentionTimeJSONRoot createScanRetentionTimeQCPlotData( 
-			List<Integer> scanFileIdList, 
-			Double retentionTimeInSecondsCutoff, 
+			List<Integer> scanFileIdList,
+			List<ScanRetentionTimeDTO> scanRetentionTime_AllScansExcludeScanLevel_1_List,
 			List<BigDecimal> retentionTimeForPSMsthatMeetCriteriaList ) throws Exception {
 		int numScans = 0;
-		List<ScanRetentionTimeDTO> scanRetentionTime_AllScansExcludeScanLevel_1_List = null;
-		for ( int scanFileId : scanFileIdList ) {
-			List<ScanRetentionTimeDTO> scanRetentionTime_ForThisScanFileId_List =
-					ScanRetentionTimeDAO.getForScanFileIdExcludeScanLevel( scanFileId, retentionTimeInSecondsCutoff, EXCLUDE_SCAN_LEVEL_1 );
-			if ( scanRetentionTime_AllScansExcludeScanLevel_1_List == null ) {
-				scanRetentionTime_AllScansExcludeScanLevel_1_List = scanRetentionTime_ForThisScanFileId_List;
-			} else {
-				scanRetentionTime_AllScansExcludeScanLevel_1_List.addAll( scanRetentionTime_ForThisScanFileId_List );
-			}
-		}
 		//  Find max and min values
 		double retentionTimeMin = 0;
 		double retentionTimeMax =  0;

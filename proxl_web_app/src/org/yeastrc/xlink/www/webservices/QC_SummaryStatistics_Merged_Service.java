@@ -159,7 +159,7 @@ public class QC_SummaryStatistics_Merged_Service {
 			QC_SummaryCounts_Merged_Results qc_SummaryCountsResults_Merged =
 					QC_SummaryCounts_Merged.getInstance()
 					.getQC_SummaryCounts_Merged( 
-							filterCriteria_JSONString, projectSearchIdsListDeduppedSorted, searches, searchesMapOnSearchId );
+							filterCriteria_JSONString, searches );
 
 			//  Get PSMs for cutoffs and other data
 			WebserviceResult_getQC_SummaryStatistics webserviceResult = new WebserviceResult_getQC_SummaryStatistics();

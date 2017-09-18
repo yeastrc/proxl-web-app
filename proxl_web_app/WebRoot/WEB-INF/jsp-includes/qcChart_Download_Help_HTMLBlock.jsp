@@ -42,8 +42,13 @@
 				>PNG</a>
 			<a data-tooltip="Download as scalable vector graphics file suitable for use in Inkscape or other compatible software." 
 				data-download_type="svg"
-				class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px;"
+				class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px; margin-bottom: 5px;"
 				>SVG</a>
+				
+			<%-- Download the data for the chart, hidden until shown in each JS chart code since then a click handler is attached. --%>
+			<a data-tooltip="Download as text, tab delimited." 
+				class="svg-download-option tool_tip_attached_jq chart_data_download_link_jq " href="javascript:" style="margin-top:5px; margin-bottom: 5px; display: none;"
+				>Text/Tab Delimited</a>
 		</span>
 	  </div>
 	</div>	

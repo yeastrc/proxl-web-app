@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_plots.scan_retention_time.CreateScanRetentionTimeQCPlotData;
 import org.yeastrc.xlink.www.qc_plots.scan_retention_time.ScanRetentionTimeJSONRoot;
+import org.yeastrc.xlink.www.qc_plots.scan_retention_time.CreateScanRetentionTimeQCPlotData.CreateScanRetentionTimeQCPlotData_Result;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -46,7 +47,6 @@ public class QCPlotScanRetentionTimeService {
 			@QueryParam( "projectSearchId" ) Integer projectSearchId,
 			@QueryParam( "scanFileId" ) List<Integer> scanFileIdList,
 			@QueryParam( "scanFileAll" ) String scanFileAllString, 
-			@QueryParam( "scansForSelectedLinkTypes" ) List<String> scansForSelectedLinkTypes,			
 			@QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
 			@QueryParam( "retentionTimeInMinutesCutoff" ) Double retentionTimeInMinutesCutoff,
 			@Context HttpServletRequest request )
@@ -152,10 +152,16 @@ public class QCPlotScanRetentionTimeService {
 			if ( retentionTimeInMinutesCutoff != null ) {
 				retentionTimeInSecondsCutoff = ( retentionTimeInMinutesCutoff + 1 ) * 60;
 			}
-			ScanRetentionTimeJSONRoot scanRetentionTimeJSONRoot = 
+			
+			CreateScanRetentionTimeQCPlotData_Result createScanRetentionTimeQCPlotData_Result = 
 					CreateScanRetentionTimeQCPlotData.getInstance()
-					.create( projectSearchId, scanFileIdList, scanFileAll, scansForSelectedLinkTypes, filterCriteria_JSONString, retentionTimeInSecondsCutoff );
+					.create( CreateScanRetentionTimeQCPlotData.ForDownload.NO,  
+							projectSearchId, scanFileIdList, scanFileAll, filterCriteria_JSONString, retentionTimeInSecondsCutoff );
+			
+			ScanRetentionTimeJSONRoot scanRetentionTimeJSONRoot = createScanRetentionTimeQCPlotData_Result.getScanRetentionTimeJSONRoot();
+					
 			return scanRetentionTimeJSONRoot;
+			
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {

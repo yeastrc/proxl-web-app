@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.main.ChargeStateCounts_Merged;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.main.PreMZ_Chart_For_PSMPeptideCutoffs_Merged;
+import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.main.PreMZ_Chart_For_PSMPeptideCutoffs_Merged.PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Method_Response;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.objects.ChargeStateCounts_Merged_Results;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.objects.PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Results;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
@@ -129,9 +130,6 @@ public class QC_PSM_Stats_Merged_Service {
 			Set<Integer> projectSearchIdsProcessedFromForm = new HashSet<>(); // add each projectSearchId as process in loop next
 			
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
-			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
-			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
-			int searchIdsArrayIndex = 0;
 			for ( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
 				if ( projectSearchIdsProcessedFromForm.add( projectSearchId ) ) {
 					//  Haven't processed this projectSearchId yet in this loop so process it now
@@ -147,16 +145,13 @@ public class QC_PSM_Stats_Merged_Service {
 					    	        );			
 					}
 					searches.add( search );
-					searchesMapOnSearchId.put( search.getSearchId(), search );
-					searchIdsArray[ searchIdsArrayIndex ] = search.getSearchId();
-					searchIdsArrayIndex++;
 				}
 			}
 			
 			ChargeStateCounts_Merged_Results chargeStateCountsResults = 
 					ChargeStateCounts_Merged.getInstance()
 					.getChargeStateCounts_Merged( 
-							filterCriteria_JSONString, projectSearchIdsListDeduppedSorted, searches, searchesMapOnSearchId );
+							filterCriteria_JSONString, searches );
 
 			WebserviceResult_getQC_ChargeCount_Merged serviceResult = new WebserviceResult_getQC_ChargeCount_Merged();
 			
@@ -320,11 +315,17 @@ public class QC_PSM_Stats_Merged_Service {
 				}
 			}
 			
-			PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Results preMZ_Chart_For_PSMPeptideCutoffs_Merged_Results =
+			PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Method_Response methodResponse = 
 					PreMZ_Chart_For_PSMPeptideCutoffs_Merged.getInstance()
 					.getPreMZ_Chart_For_PSMPeptideCutoffs_Merged(
-							filterCriteria_JSONString, projectSearchIdsListDeduppedSorted, searches, searchesMapOnSearchId );
-			
+							PreMZ_Chart_For_PSMPeptideCutoffs_Merged.ForDownload.NO,
+							filterCriteria_JSONString, 
+							projectSearchIdsListDeduppedSorted, 
+							searches, 
+							searchesMapOnSearchId );
+
+			PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Results preMZ_Chart_For_PSMPeptideCutoffs_Merged_Results = methodResponse.getPreMZ_Chart_For_PSMPeptideCutoffs_Merged_Results();
+
 			WebserviceResult_getQC_PreMZCount_Merged serviceResult = new WebserviceResult_getQC_PreMZCount_Merged();
 			
 			serviceResult.preMZ_Chart_For_PSMPeptideCutoffs_Merged_Results = preMZ_Chart_For_PSMPeptideCutoffs_Merged_Results;

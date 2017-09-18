@@ -24,6 +24,8 @@
  */
 var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 
+	//  Download data URL
+	var _downloadStrutsAction = "downloadQC_PsmCountVsRetentionTimeChartData.do";
 
 	//  CONSTANTS - Retention Time Code
 	var RELOAD_RETENTION_COUNT_CHART_TIMER_DELAY = 400;  // in Milliseconds
@@ -174,14 +176,14 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 
 			_getScanFilesForProjectSearchId = params.getScanFilesForProjectSearchId; // function
 			
-			this.addClickAndOnChangeHandlers();
-
 			//  Get Help tooltip HTML
 			var $psm_level_block_help_tooltip_psm_counts_vs_retention_time = $("#psm_level_block_help_tooltip_psm_counts_vs_retention_time");
 			if ( $psm_level_block_help_tooltip_psm_counts_vs_retention_time.length === 0 ) {
 				throw Error( "No element found with id 'psm_level_block_help_tooltip_psm_counts_vs_retention_time' " );
 			}
 			_helpTooltipHTML = $psm_level_block_help_tooltip_psm_counts_vs_retention_time.html();
+
+			this.addClickAndOnChangeHandlers();
 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -269,7 +271,30 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 
 		// For Retention Time, add Download Click handlers for overlay
 		var $scan_retention_time_qc_plot_chartDiv_Container = $("#scan_retention_time_qc_plot_chartDiv_Container");
-		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $scan_retention_time_qc_plot_chartDiv_Container, helpTooltipHTML : _helpTooltipHTML } );
+
+		//  Download Data Setup
+		var downloadDataCallback = function( params ) {
+//			var clickedThis = params.clickedThis;
+			
+			var scansForSelectedLinkTypes = [];
+			var $scan_retention_time_qc_plot_scans_include_jq = $(".scan_retention_time_qc_plot_scans_include_jq");
+			$scan_retention_time_qc_plot_scans_include_jq.each( function(   ) {
+				var $thisCheckbox = $( this );
+				if ( $thisCheckbox.prop('checked') ) {
+					var checkboxValue = $thisCheckbox.attr("value");
+					scansForSelectedLinkTypes.push( checkboxValue );
+				}
+			} );
+			
+			//  Download the data for params
+			objectThis.psmCountVsRetentionTimeQCPlot_downloadData( { thumbnailChart : false, scansForSelectedLinkTypes : scansForSelectedLinkTypes } );
+		};
+		
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
+			$chart_outer_container_for_download_jq :  $scan_retention_time_qc_plot_chartDiv_Container, 
+			downloadDataCallback : downloadDataCallback,
+			helpTooltipHTML : _helpTooltipHTML 
+		} );
 		
 	};
 
@@ -533,6 +558,7 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 		var thumbnailChart = params.thumbnailChart;
 		
 		var hash_json_Contents = _get_hash_json_Contents();
+		hash_json_Contents.linkTypes = scansForSelectedLinkTypes;
 		
 //		if ( ! qcRetentionTimeChartInitialized ) {
 //			throw "qcRetentionTimeChartInitialized is false"; 
@@ -541,7 +567,6 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 
 		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents );
 		var requestData = {
-				scansForSelectedLinkTypes : scansForSelectedLinkTypes,
 				projectSearchId : projectSearchId,
 				filterCriteria : hash_json_field_Contents_JSONString
 		};
@@ -607,7 +632,21 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 		} else {
 			$retention_time_outer_container_div.empty();
 			var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $retention_time_outer_container_div } );
-			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $retention_time_outer_container_div, helpTooltipHTML : _helpTooltipHTML } );
+
+			//  Download Data Setup
+			var downloadDataCallback = function( params ) {
+//				var clickedThis = params.clickedThis;
+
+				//  Download the data for params
+				objectThis.psmCountVsRetentionTimeQCPlot_downloadData( { thumbnailChart : true } );
+			};
+			
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
+				$chart_outer_container_for_download_jq :  $retention_time_outer_container_div, 
+				downloadDataCallback : downloadDataCallback,
+				helpTooltipHTML : _helpTooltipHTML 
+			} );
+			
 			$scan_retention_time_qc_plot_chartDiv = $chart_container_jq;
 		}
 
@@ -951,6 +990,56 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 		var scan_retention_time_qc_plot_max_y_initial_value = $scan_retention_time_qc_plot_max_y_initial_value.val();
 		$scan_retention_time_qc_plot_max_x.val( scan_retention_time_qc_plot_max_x_initial_value );
 		$scan_retention_time_qc_plot_max_y.val( scan_retention_time_qc_plot_max_y_initial_value );
+	};
+
+///////////
+	this.psmCountVsRetentionTimeQCPlot_downloadData = function( params ) {
+		var objectThis = this;
+		var thumbnailChart = false;
+		var scansForSelectedLinkTypes = undefined
+		if ( params ) {
+			if ( params.thumbnailChart ) {
+				thumbnailChart = true;
+			}
+			if ( params.scansForSelectedLinkTypes ) {
+				scansForSelectedLinkTypes = params.scansForSelectedLinkTypes; //  From overlay user selection, undefined for thumbnail
+			}
+		}
+		
+		var hash_json_Contents = _get_hash_json_Contents();
+		
+		if ( scansForSelectedLinkTypes ) {
+			//  Set link types From overlay user selection
+			hash_json_Contents.linkTypes = scansForSelectedLinkTypes;
+		}
+		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents );
+		var hash_json_field_Contents_JSONString_encodeURIComponent = encodeURIComponent(hash_json_field_Contents_JSONString  );
+
+
+		var urlQueryParamsArray = [];
+		
+		_project_search_ids.forEach(function( projectSearchId, i, array) {
+			urlQueryParamsArray.push( "projectSearchId=" + projectSearchId  );
+		}, this );
+		
+		var $scan_retention_time_qc_plot_scan_file_id = $("#scan_retention_time_qc_plot_scan_file_id");
+		var scanFileId = $scan_retention_time_qc_plot_scan_file_id.val();
+
+		if ( scanFileId !== undefined && scanFileId !== null && scanFileId !== "" ) {
+			urlQueryParamsArray.push( "scanFileId=" + scanFileId );
+		} else {
+			urlQueryParamsArray.push( "scanFileAll=Y" );
+		}
+
+		urlQueryParamsArray.push( "queryJSON=" + hash_json_field_Contents_JSONString_encodeURIComponent );
+
+		var urlQueryParams = urlQueryParamsArray.join( "&" );
+
+		var downloadURL = _downloadStrutsAction + "?" + urlQueryParams;
+
+		qc_pages_Single_Merged_Common.submitDownloadURL( { downloadURL : downloadURL } );
+
+		
 	};
 	
 };

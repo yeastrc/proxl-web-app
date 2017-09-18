@@ -24,7 +24,15 @@
  */
 var QCPageChartDigestionStatistics = function() {
 
-
+	//  Download data URL
+	var _download_PeptideMissedCleavage_StrutsAction = "downloadQC_Digestion_PeptideMissedCleavageChartData.do";
+	
+//  Download data URL
+	var _download_MissedCleavagePerPeptide_StrutsAction = "downloadQC_Digestion_MissedCleavagePerPeptideChartData.do";
+	
+//  Download data URL
+	var _download_PsmMissedCleavage_StrutsAction = "downloadQC_Digestion_PsmMissedCleavageChartData.do";
+	
 	/**
 	 * Overridden for Specific elements like Chart Title and X and Y Axis labels
 	 */
@@ -98,7 +106,7 @@ var QCPageChartDigestionStatistics = function() {
 	var _chart_isLoaded = _IS_LOADED_NO;
 	
 	var _peptidesWithMissedCleavage_helpTooltipHTML = undefined;
-	var _missedCleavage_helpTooltipHTML = undefined;
+	var _missedCleavagePerPeptide_helpTooltipHTML = undefined;
 	var _missedCleavagePSMCount_helpTooltipHTML = undefined;
 
 	/**
@@ -169,7 +177,7 @@ var QCPageChartDigestionStatistics = function() {
 			}
 
 			_peptidesWithMissedCleavage_helpTooltipHTML = $digestion_block_help_tooltip_peptides_with_missed_cleavage_chart.html();
-			_missedCleavage_helpTooltipHTML = $digestion_block_help_tooltip_missed_cleavage_chart.html();
+			_missedCleavagePerPeptide_helpTooltipHTML = $digestion_block_help_tooltip_missed_cleavage_chart.html();
 			_missedCleavagePSMCount_helpTooltipHTML = $digestion_block_help_tooltip_missed_cleavage_psm_count_chart.html();
 
 		} catch( e ) {
@@ -396,6 +404,10 @@ var QCPageChartDigestionStatistics = function() {
 			return;  //  EARLY EXIT 
 		}
 
+		
+		//  Used for each chart type for download
+		var hash_json_Contents = _get_hash_json_Contents();
+
 		//   Chart:  
 
 		var $chart_outer_container_jq =
@@ -407,8 +419,18 @@ var QCPageChartDigestionStatistics = function() {
 			chartTitle : 'Fraction Peptides w/ Missed Cleavages',
 			dataWithOneElementPerType: peptidesWithMissedCleavagePerType, 
 			$chartContainer : $chart_container_jq } );
-
-		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _peptidesWithMissedCleavage_helpTooltipHTML } );
+		
+		//  Download Data Setup
+		var download_PeptideMissedCleavage_DataCallback = function( params ) {
+			//			var clickedThis = params.clickedThis;
+			//  Download the data for params
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_PeptideMissedCleavage_StrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+		};
+		
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
+			$chart_outer_container_for_download_jq :  $chart_outer_container_jq, 
+			downloadDataCallback : download_PeptideMissedCleavage_DataCallback, 
+			helpTooltipHTML : _peptidesWithMissedCleavage_helpTooltipHTML } );
 
 		//   Chart:  
 		
@@ -419,10 +441,21 @@ var QCPageChartDigestionStatistics = function() {
 
 		this._addMissedCleavageChart( { 
 			chartTitle : 'Missed Cleavages Per Peptide',
+			y_AxisLabel : 'Missed Cleavages / Peptide',
 			dataWithOneElementPerType: missedCleavagesPerType, 
 			$chartContainer : $chart_container_jq } );
 
-		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _missedCleavage_helpTooltipHTML } );
+		//  Download Data Setup
+		var download_MissedCleavagePerPeptide_DataCallback = function( params ) {
+			//			var clickedThis = params.clickedThis;
+			//  Download the data for params
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_MissedCleavagePerPeptide_StrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+		};
+		
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
+			$chart_outer_container_for_download_jq :  $chart_outer_container_jq, 
+			downloadDataCallback : download_MissedCleavagePerPeptide_DataCallback, 
+			helpTooltipHTML : _missedCleavagePerPeptide_helpTooltipHTML } );
 
 		//   Chart:  
 		
@@ -436,7 +469,18 @@ var QCPageChartDigestionStatistics = function() {
 			dataWithOneElementPerType: missedCleavagePSMCountPerType, 
 			$chartContainer : $chart_container_jq } );
 
-		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _missedCleavagePSMCount_helpTooltipHTML } );
+
+		//  Download Data Setup
+		var download_PsmMissedCleavage_DataCallback = function( params ) {
+			//			var clickedThis = params.clickedThis;
+			//  Download the data for params
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_PsmMissedCleavage_StrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+		};
+		
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
+			$chart_outer_container_for_download_jq :  $chart_outer_container_jq, 
+			downloadDataCallback : download_PsmMissedCleavage_DataCallback, 
+			helpTooltipHTML : _missedCleavagePSMCount_helpTooltipHTML } );
 
 	};
 
@@ -459,6 +503,7 @@ var QCPageChartDigestionStatistics = function() {
 
 		var dataWithOneElementPerType = params.dataWithOneElementPerType;
 		var chartTitle = params.chartTitle;
+		var y_AxisLabel = params.y_AxisLabel;
 		var $chartContainer = params.$chartContainer;
 
 		//  chart data for Google charts
@@ -514,6 +559,11 @@ var QCPageChartDigestionStatistics = function() {
 			//  so set chartOptionsVAxisMaxValue = 1.
 			chartOptionsVAxisMaxValue = 1;
 		}
+		
+		if ( ! y_AxisLabel ) {
+			// default
+			y_AxisLabel = 'Fraction';
+		}
 
 
 //		var vAxisTicks = this._get___________TickMarks( { maxValue : maxYvalue } );
@@ -535,7 +585,7 @@ var QCPageChartDigestionStatistics = function() {
 				hAxis: { title: 'Link Type', titleTextStyle: { color: 'black', fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
 				},  
 				//  Y axis label left of chart
-				vAxis: { title: 'Fraction', titleTextStyle: { color: 'black', fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+				vAxis: { title: y_AxisLabel, titleTextStyle: { color: 'black', fontSize: _MISSED_CLEAVAGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
 				,baseline: 0     // always start at zero
 //				,ticks: vAxisTicks
 				,maxValue : chartOptionsVAxisMaxValue

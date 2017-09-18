@@ -20,6 +20,15 @@
  */
 var QCMergedPageChartSummaryStatistics = function() {
 
+	//  Download data URL
+	var _download_PSM_StrutsAction = "downloadQC_SummaryPsmChartData.do";
+	
+	//  Download data URL
+	var _download_Peptide_StrutsAction = "downloadQC_SummaryPeptideChartData.do";
+	
+	//  Download data URL
+	var _download_Protein_StrutsAction = "downloadQC_SummaryProteinChartData.do";
+
 
 	/**
 	 * Overridden for Specific elements like Chart Title and X and Y Axis labels
@@ -350,6 +359,10 @@ var QCMergedPageChartSummaryStatistics = function() {
 
 		
 		//  Keep _SUMMARY_STATISTICS_CHART_COUNT in sync with the actual number of charts created here
+
+		//  Used for each chart type for download
+		var hash_json_Contents = _get_hash_json_Contents();
+
 		
 		//   PSM Count Chart
 
@@ -363,8 +376,15 @@ var QCMergedPageChartSummaryStatistics = function() {
 			dataWithOneElementPerType: qc_SummaryCountsResults_Merged.psmCountPerLinkTypeList, 
 			searchIds : qc_SummaryCountsResults_Merged.searchIds,
 			$chartContainer : $chart_container_jq } );
+		
+		//  Download Data Setup
+		var download_Psm_DataCallback = function( params ) {
+//			var clickedThis = params.clickedThis;
+			//  Download the data for params
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_PSM_StrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+		};
 
-		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _psmCountChart_helpTooltipHTML } );
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _psmCountChart_helpTooltipHTML, downloadDataCallback : download_Psm_DataCallback } );
 		
 		//  Peptide Count Chart
 
@@ -379,7 +399,15 @@ var QCMergedPageChartSummaryStatistics = function() {
 			searchIds : qc_SummaryCountsResults_Merged.searchIds,
 			$chartContainer : $chart_container_jq } );
 
-		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _peptideCountChart_helpTooltipHTML } );
+		//  Download Data Setup
+		var download_Peptide_DataCallback = function( params ) {
+//			var clickedThis = params.clickedThis;
+
+			//  Download the data for params
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_Peptide_StrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+		};
+		
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _peptideCountChart_helpTooltipHTML, downloadDataCallback : download_Peptide_DataCallback } );
 
 		//   Protein Count Chart
 
@@ -394,7 +422,15 @@ var QCMergedPageChartSummaryStatistics = function() {
 			searchIds : qc_SummaryCountsResults_Merged.searchIds,
 			$chartContainer : $chart_container_jq } );
 
-		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _proteinCountChart_helpTooltipHTML } );
+		//  Download Data Setup
+		var download_Protein_DataCallback = function( params ) {
+//			var clickedThis = params.clickedThis;
+
+			//  Download the data for params
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_Protein_StrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+		};
+		
+		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _proteinCountChart_helpTooltipHTML, downloadDataCallback : download_Protein_DataCallback } );
 
 		// Add tooltips for download links
 		addToolTips( $Summary_Statistics_CountsBlock );

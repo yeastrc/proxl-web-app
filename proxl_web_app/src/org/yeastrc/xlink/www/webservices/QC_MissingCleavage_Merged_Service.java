@@ -155,7 +155,7 @@ public class QC_MissingCleavage_Merged_Service {
 			QC_MissingCleavageReportedPeptidesCount_Merged_Results qc_MissingCleavageReportedPeptidesCount_Merged_Result = 
 					QC_MissingCleavageReportedPeptidesCount_Merged.getInstance()
 					.getQC_MissingCleavageReportedPeptidesCount_Merged(
-							filterCriteria_JSONString, projectSearchIdsListDeduppedSorted, searches, searchesMapOnSearchId );
+							filterCriteria_JSONString, searches );
 
 			//  Get PSMs for cutoffs and other data
 			WebserviceResult_getQC_MissingCleavageReportedPeptidesCount_Merged serviceResult = new WebserviceResult_getQC_MissingCleavageReportedPeptidesCount_Merged();

@@ -19,7 +19,9 @@
  * Constructor 
  */
 var QCMergedPageChart_PPM_Error_PSM = function() {
-
+	
+	//  Download data URL
+	var _downloadStrutsAction = "downloadQC_Psm_PPM_Error_ChartData.do";
 
 	/**
 	 * Overridden for Specific elements like Chart Title and X and Y Axis labels
@@ -403,6 +405,18 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 
 			this._add_PPM_Error_For_PSMs_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chart_container_jq } );
 
+			//  Download Data Setup
+			
+			var hash_json_Contents = _get_hash_json_Contents();
+			//  Set link types to chart link type
+			hash_json_Contents.linkTypes = [ linkType ];
+							
+			var downloadDataCallback = function( params ) {
+//				var clickedThis = params.clickedThis;
+
+				//  Download the data for params
+				qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _downloadStrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+			};
 
 			//  Get Help tooltip HTML
 			var elementId = "psm_error_block_help_tooltip_ppm_error_" + linkType
@@ -411,8 +425,13 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 				throw Error( "No element found with id '" + elementId + "' " );
 			}
 			var helpTooltipHTML = $psm_error_block_help_tooltip_ppm_error_LinkType.html();
-			
-			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : helpTooltipHTML, helpTooltip_Wide : true } );
+
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
+				$chart_outer_container_for_download_jq :  $chart_outer_container_jq, 
+				downloadDataCallback : downloadDataCallback,
+				helpTooltipHTML : helpTooltipHTML, 
+				helpTooltip_Wide : true 
+			} );
 			
 			// Add tooltips for download links
 			addToolTips( $chart_outer_container_jq );
