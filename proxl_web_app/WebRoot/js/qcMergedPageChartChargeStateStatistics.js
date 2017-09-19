@@ -26,14 +26,14 @@ var QCMergedPageChartChargeStateStatistics = function() {
 	/**
 	 * Overridden for Specific elements like Chart Title and X and Y Axis labels
 	 */
-//	var _CHART_GLOBALS = {
+	var _CHART_GLOBALS = {
 //			_CHART_DEFAULT_FONT_SIZE : 12,  //  Default font size - using to set font size for tick marks.
 //			_TITLE_FONT_SIZE : 15, // In PX
 //			_AXIS_LABEL_FONT_SIZE : 14, // In PX
 //			_TICK_MARK_TEXT_FONT_SIZE : 14 // In PX
-//
-//			, _ENTRY_ANNOTATION_TEXT_SIGNIFICANT_DIGITS : 2
-//	}
+//			,
+			_ENTRY_ANNOTATION_TEXT_SIGNIFICANT_DIGITS : 2
+	}
 	
 	//  From QCPageMain
 	var _OVERALL_GLOBALS;
@@ -425,6 +425,7 @@ var QCMergedPageChartChargeStateStatistics = function() {
 				var chartCountPerSearchIdEntry = countPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
 				
 				var count = chartCountPerSearchIdEntry.count;
+				var totalCount = chartCountPerSearchIdEntry.totalCount;
 
 				var chargeCountString = chartCountPerSearchIdEntry.count;
 				try {
@@ -432,15 +433,31 @@ var QCMergedPageChartChargeStateStatistics = function() {
 				} catch( e ) {
 				}
 
+				var totalCountString = totalCount;
+				try {
+					totalCountString = totalCount.toLocaleString();
+				} catch( e ) {
+				}
+				
+				var fraction = 0;
+				if ( totalCount !== 0 ) {
+					fraction = count / totalCount;
+				}
+				
+				var fractionDisplay = fraction.toPrecision( _CHART_GLOBALS._ENTRY_ANNOTATION_TEXT_SIGNIFICANT_DIGITS );
+				
+
 				var tooltipText = "<div  style='padding: 4px;'>" +
 				"<div style='margin-bottom: 3px;'>Search id: " + chartCountPerSearchIdEntry.searchId.toString() + "</div>" +
 				"<div style='margin-bottom: 3px;'>Charge: +" + charge  + "</div>" +
-				"Count: " + chargeCountString + 
+				"<div style='margin-bottom: 3px;'>Fraction: " + fractionDisplay  + "</div>" +
+				"<div style='margin-bottom: 3px;'>Count: " + chargeCountString  + "</div>" +
+				"<div style='margin-bottom: 3px;'>Total Count: " + totalCountString  + "</div>" +
 				"</div>";
 //				var entryAnnotationText = "+" + entryForChargeValue.chargeValue + ":" + entryForChargeValue.chargeCount;
 				var entryAnnotationText = chargeCountString;
 
-				chartEntry.push( count );
+				chartEntry.push( fraction );
 				chartEntry.push( _colorsPerSearch[ index ] );
 				//  Tool Tip
 				chartEntry.push( tooltipText );
@@ -456,11 +473,11 @@ var QCMergedPageChartChargeStateStatistics = function() {
 
 		}, this /* passed to function as this */ );
 
-		var vAxisTicks = this._getChargeCountTickMarks( { maxValue : maxChargeCount } );
+//		var vAxisTicks = this._getChargeCountTickMarks( { maxValue : maxChargeCount } );
 
 //		var barColors = [ colorAndbarColor.color ]; // must be an array
 
-		var chartTitle = 'Number PSMs with Charge (' + linkType + ")";
+		var chartTitle = 'Fraction PSMs with Charge (' + linkType + ")";
 		var optionsFullsize = {
 				//  Overridden for Specific elements like Chart Title and X and Y Axis labels
 				fontSize: _CHARGE_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
@@ -478,10 +495,10 @@ var QCMergedPageChartChargeStateStatistics = function() {
 				hAxis: { title: 'Charge', titleTextStyle: { color: 'black', fontSize: _CHARGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
 				},  
 				//  Y axis label left of chart
-				vAxis: { title: 'Count', titleTextStyle: { color: 'black', fontSize: _CHARGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+				vAxis: { title: 'Fraction', titleTextStyle: { color: 'black', fontSize: _CHARGE_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
 				,baseline: 0     // always start at zero
-				,ticks: vAxisTicks
-				,maxValue : maxChargeCount
+//				,ticks: vAxisTicks
+//				,maxValue : maxChargeCount
 				},
 //				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
 //				width : 500, 

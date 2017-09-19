@@ -76,6 +76,7 @@ public class ChargeStateCounts_Merged_Results {
 
 		private int searchId;
 		private long count;
+		private long totalCount;
 		
 		public long getCount() {
 			return count;
@@ -88,6 +89,12 @@ public class ChargeStateCounts_Merged_Results {
 		}
 		public void setSearchId(int searchId) {
 			this.searchId = searchId;
+		}
+		public long getTotalCount() {
+			return totalCount;
+		}
+		public void setTotalCount(long totalCount) {
+			this.totalCount = totalCount;
 		}
 	}
 

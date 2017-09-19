@@ -545,13 +545,13 @@
 		<div >
 
 <script id="psm_level_block_help_tooltip_charge_state_crosslink" type="text/text">
-<div >A bar chart comparing the number of PSMs in each search for crosslink peptides that meet the current filtering criteria for each identified charge for precursor ions.</div>
+<div >A bar chart comparing the fraction of PSMs with given precursor ion charges for crosslink peptides that meet the current filtering criteria.</div>
 </script>
 <script id="psm_level_block_help_tooltip_charge_state_looplink" type="text/text">
-<div >A bar chart comparing the number of PSMs in each search for looplink peptides that meet the current filtering criteria for each identified charge for precursor ions.</div>
+<div >A bar chart comparing the fraction of PSMs with given precursor ion charges for looplink peptides that meet the current filtering criteria.</div>
 </script>
 <script id="psm_level_block_help_tooltip_charge_state_unlinked" type="text/text">
-<div >A bar chart comparing the number of PSMs in each search for unlinked peptides that meet the current filtering criteria for each identified charge for precursor ions.</div>
+<div >A bar chart comparing the fraction of PSMs with given precursor ion charges for unlinked peptides that meet the current filtering criteria.</div>
 </script>
 
 <script id="psm_level_block_help_tooltip_m_over_z_statistics_crosslink" type="text/text">

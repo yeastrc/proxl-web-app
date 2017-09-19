@@ -18,16 +18,20 @@ import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
+import org.yeastrc.xlink.www.objects.WebReportedPeptide;
+import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.objects.ChargeStateCounts_Merged_Results;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.objects.ChargeStateCounts_Merged_Results.ChargeStateCountsResultsForChargeValue;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.objects.ChargeStateCounts_Merged_Results.ChargeStateCountsResultsForLinkType;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.objects.ChargeStateCounts_Merged_Results.ChargeStateCountsResultsForSearchId;
 import org.yeastrc.xlink.www.searcher.PSM_DistinctChargeStatesSearcher;
 import org.yeastrc.xlink.www.searcher.PSM_DistinctChargeStatesSearcher.PSM_DistinctChargeStatesResult;
+import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -149,9 +153,16 @@ public class ChargeStateCounts_Merged {
 				getAllSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId_KeyedOnLinkType(
 						searches, linkTypesForDBQuery, modsForDBQuery, searcherCutoffValuesRootLevel);
 
+		//  Get Maps of PSM count mapped by search id and then link type
+		//  Map<[link type], Map<[search id],[count of PSMs]>>
+		Map<String,Map<Integer,Long>> allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId_KeyedOnLinkType = 
+				getAllSearchesCombinedPSMCountMap_Map_KeyedOnSearchId_KeyedOnLinkType (
+						allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId_KeyedOnLinkType );
+
 		ChargeStateCounts_Merged_Results results =
 				getPerChartData_KeyedOnLinkType( 
 						allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId_KeyedOnLinkType, 
+						allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId_KeyedOnLinkType,
 						linkTypesList, 
 						searches,
 						searchIdsListDeduppedSorted );
@@ -159,15 +170,21 @@ public class ChargeStateCounts_Merged {
 		return results;
 	}
 
+
 	/**
-	 * @param allSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType
+	 * @param allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId_KeyedOnLinkType
+	 * @param allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId_KeyedOnLinkType
 	 * @param linkTypesList
+	 * @param searches
 	 * @param searchIdsListDeduppedSorted
 	 * @return
 	 */
 	private ChargeStateCounts_Merged_Results getPerChartData_KeyedOnLinkType( 
 			// Map<[link type], Map<[search id],Map<[charge value],[count of charge value]>>>
 			Map<String,Map<Integer,Map<Integer,Long>>> allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId_KeyedOnLinkType,
+		//  Map<[link type], Map<[search id],[count of PSMs]>>
+			Map<String,Map<Integer,Long>> allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId_KeyedOnLinkType,
+			
 			List<String> linkTypesList,
 			List<SearchDTO> searches,
 			List<Integer> searchIdsListDeduppedSorted ) {
@@ -185,8 +202,14 @@ public class ChargeStateCounts_Merged {
 				resultForLinkType.setDataFound( false );
 				dataForChartPerLinkTypeList.add( resultForLinkType );
 			} else {
+				Map<Integer,Long> allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId =
+						allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId_KeyedOnLinkType.get( linkType );
+
 				ChargeStateCountsResultsForLinkType resultForLinkType =
-						getSingleChartData_ForLinkType( allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId, searches );
+						getSingleChartData_ForLinkType( 
+								allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId, 
+								allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId, 
+								searches );
 				resultForLinkType.setLinkType( linkType );
 				dataForChartPerLinkTypeList.add( resultForLinkType );
 				foundData = true;
@@ -209,6 +232,8 @@ public class ChargeStateCounts_Merged {
 	private ChargeStateCountsResultsForLinkType getSingleChartData_ForLinkType( 
 			// Map<[search id],Map<[charge value],[count of charge value]>>
 			Map<Integer,Map<Integer,Long>> allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId,
+			// Map<[search id],[count of PSMs]>
+			Map<Integer,Long> allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId,
 			List<SearchDTO> searches ) {
 		
 		//  First, reprocess maps into  Map<[charge value],Map<[search id],[count of charge value]>>
@@ -257,6 +282,14 @@ public class ChargeStateCounts_Merged {
 					resultForSearchId.setCount( chargeCount );
 					dataFound = true;
 				}
+				
+				Long totalCount = allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId.get( search.getSearchId() );
+				if ( totalCount == null ) {
+					resultForSearchId.setTotalCount( 0 );
+				} else {
+					resultForSearchId.setTotalCount( totalCount );
+				}
+				
 				countPerSearchIdMap_KeyProjectSearchId.put( search.getProjectSearchId(), resultForSearchId );
 			}
 		};
@@ -274,6 +307,46 @@ public class ChargeStateCounts_Merged {
 		result.setDataFound( dataFound );
 		
 		return result;
+	}
+	
+
+	
+	/////////////////////////////////////
+	
+	
+	/**
+	 * Return Map<[link type], Map<[search id],[count of PSMs]>>>
+	 * 
+	 * @param allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId_KeyedOnLinkType
+	 * @return
+	 * @throws ProxlWebappDataException
+	 * @throws Exception
+	 */
+	private Map<String,Map<Integer,Long>> getAllSearchesCombinedPSMCountMap_Map_KeyedOnSearchId_KeyedOnLinkType (
+		//  Get Maps of Charge values mapped to count, mapped by search id then link type
+			//  Map<[link type], Map<[search id],Map<[charge value],[count of charge value]>>>
+			Map<String,Map<Integer,Map<Integer,Long>>> allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId_KeyedOnLinkType 
+			) throws ProxlWebappDataException, Exception {
+	
+		//  Map<[link type], Map<[search id],[count of PSMs]>>
+		Map<String,Map<Integer,Long>> output_allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId_KeyedOnLinkType = new HashMap<>();
+
+		for ( Map.Entry<String,Map<Integer,Map<Integer,Long>>> entryOnLinkType : allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId_KeyedOnLinkType.entrySet() ) {
+			Map<Integer,Long> output_allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId = new HashMap<>();
+			output_allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId_KeyedOnLinkType.put( entryOnLinkType.getKey(), output_allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId );
+			
+			for ( Map.Entry<Integer,Map<Integer,Long>> entryOnSearchId : entryOnLinkType.getValue().entrySet() ) {
+				
+				long psmTotalForChargeEntries = 0;
+				
+				for ( Map.Entry<Integer,Long> entryOnCharge : entryOnSearchId.getValue().entrySet() ) {
+					psmTotalForChargeEntries += entryOnCharge.getValue();
+				}
+				output_allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId.put( entryOnSearchId.getKey(), psmTotalForChargeEntries );
+			}
+		}
+		
+		return output_allSearchesCombinedPSMCountMap_Map_KeyedOnSearchId_KeyedOnLinkType;
 	}
 	
 	
