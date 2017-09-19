@@ -165,8 +165,11 @@ public class DownloadQC_Summary_PeptideChartDataAction extends Action {
 					String linkType = resultPerLinkType.getLinkType();
 //					boolean dataFound;
 					Map<Integer,QC_SummaryCountsResults_PerSearchId_Merged> countPerSearchIdMap_KeyProjectSearchId = resultPerLinkType.getCountPerSearchIdMap_KeyProjectSearchId();
-					for ( Integer searchId : searchIds ) {
-						QC_SummaryCountsResults_PerSearchId_Merged countPerSearchId = countPerSearchIdMap_KeyProjectSearchId.get( searchId );
+					for ( SearchDTO search : searches ) {
+						int searchId = search.getSearchId();
+						Integer projectSearchId = search.getProjectSearchId();
+						QC_SummaryCountsResults_PerSearchId_Merged countPerSearchId = 
+								countPerSearchIdMap_KeyProjectSearchId.get( projectSearchId );
 						if ( countPerSearchId != null ) {
 							writer.write( Long.toString( countPerSearchId.getCount() ) );
 							writer.write( "\t" );

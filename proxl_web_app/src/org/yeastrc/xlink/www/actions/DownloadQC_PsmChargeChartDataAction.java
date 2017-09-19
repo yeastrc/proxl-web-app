@@ -175,8 +175,10 @@ public class DownloadQC_PsmChargeChartDataAction extends Action {
 						int charge = dataForChartPerChargeValue.getCharge();
 						Map<Integer, ChargeStateCountsResultsForSearchId> countPerSearchIdMap_KeyProjectSearchId = dataForChartPerChargeValue.getCountPerSearchIdMap_KeyProjectSearchId();
 
-						for ( Integer searchId : searchIds ) {
-							ChargeStateCountsResultsForSearchId countPerSearchId = countPerSearchIdMap_KeyProjectSearchId.get( searchId );
+						for ( SearchDTO search : searches ) {
+							int searchId = search.getSearchId();
+							Integer projectSearchId = search.getProjectSearchId();
+							ChargeStateCountsResultsForSearchId countPerSearchId = countPerSearchIdMap_KeyProjectSearchId.get( projectSearchId );
 							if ( countPerSearchId != null ) {
 								
 								writer.write( Long.toString( countPerSearchId.getCount() ) );

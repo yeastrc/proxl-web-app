@@ -179,8 +179,11 @@ public class DownloadQC_PsmModificationChartDataAction extends Action {
 						}
 						Map<Integer, QC_PSM_CountsPerModificationResults_Per_ModMass_SearchId_Merged> countPerSearchIdMap_KeyProjectSearchId = dataForChartPerModMassValue.getCountPerSearchIdMap_KeyProjectSearchId();
 
-						for ( Integer searchId : searchIds ) {
-							QC_PSM_CountsPerModificationResults_Per_ModMass_SearchId_Merged countPerSearchId = countPerSearchIdMap_KeyProjectSearchId.get( searchId );
+						for ( SearchDTO search : searches ) {
+							int searchId = search.getSearchId();
+							Integer projectSearchId = search.getProjectSearchId();
+							QC_PSM_CountsPerModificationResults_Per_ModMass_SearchId_Merged countPerSearchId =
+									countPerSearchIdMap_KeyProjectSearchId.get( projectSearchId );
 							if ( countPerSearchId != null ) {
 								
 								double fraction = countPerSearchId.getCount() / (double) countPerSearchId.getTotalCount();

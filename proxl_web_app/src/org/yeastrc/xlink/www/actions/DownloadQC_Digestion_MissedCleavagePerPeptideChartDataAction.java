@@ -165,8 +165,11 @@ public class DownloadQC_Digestion_MissedCleavagePerPeptideChartDataAction extend
 					String linkType = resultPerLinkType.getLinkType();
 //					boolean dataFound;
 					Map<Integer,QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged> countPerSearchIdMap_KeyProjectSearchId = resultPerLinkType.getCountPerSearchIdMap_KeyProjectSearchId();
-					for ( Integer searchId : searchIds ) {
-						QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged countPerSearchId = countPerSearchIdMap_KeyProjectSearchId.get( searchId );
+					for ( SearchDTO search : searches ) {
+						int searchId = search.getSearchId();
+						Integer projectSearchId = search.getProjectSearchId();
+						QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged countPerSearchId = 
+								countPerSearchIdMap_KeyProjectSearchId.get( projectSearchId );
 						if ( countPerSearchId != null ) {
 							double fraction = countPerSearchId.getCount() / (double) countPerSearchId.getTotalCount();
 							writer.write( Double.toString( fraction ) );
