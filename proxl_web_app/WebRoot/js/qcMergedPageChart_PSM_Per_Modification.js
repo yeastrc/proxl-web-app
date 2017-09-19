@@ -297,6 +297,7 @@ var QCMergedPageChart_PSM_Per_Modification = function() {
 
 		var qc_PSM_CountsPerModification_Merged_Results = ajaxResponseData.qc_PSM_CountsPerModification_Merged_Results;
 		var resultsPerLinkTypeList = qc_PSM_CountsPerModification_Merged_Results.resultsPerLinkTypeList;
+		var searchIds = qc_PSM_CountsPerModification_Merged_Results.searchIds;
 
 		var $PSM_Per_Modification_Counts_Block = $("#PSM_Per_Modification_Counts_Block");
 		if ( $PSM_Per_Modification_Counts_Block.length === 0 ) {
@@ -329,7 +330,7 @@ var QCMergedPageChart_PSM_Per_Modification = function() {
 				var linkType = entryForLinkType.linkType;
 				var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
 
-				this._addSingle_PSM_Count_Per_Modification_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor : colorAndbarColor, $chartContainer : $chart_container_jq } );
+				this._addSingle_PSM_Count_Per_Modification_Chart( { entryForLinkType: entryForLinkType, searchIds : searchIds, colorAndbarColor : colorAndbarColor, $chartContainer : $chart_container_jq } );
 
 				//  Download Data
 				
@@ -385,10 +386,10 @@ var QCMergedPageChart_PSM_Per_Modification = function() {
 	 */
 	this._addSingle_PSM_Count_Per_Modification_Chart = function( params ) {
 		var entryForLinkType = params.entryForLinkType;
+		var searchIds = params.searchIds;
 //		var colorAndbarColor = params.colorAndbarColor;
 		var $chartContainer = params.$chartContainer;
 
-		var searchIds = _project_search_ids;
 
 		var linkType = entryForLinkType.linkType;
 		var resultsPerModMassList = entryForLinkType.resultsPerModMassList;
