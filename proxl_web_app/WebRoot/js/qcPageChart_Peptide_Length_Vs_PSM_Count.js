@@ -1,11 +1,15 @@
 /**
- * qcMergedPageChart_Peptide_Lengths.js
+ * qcPageChart_Peptide_Length_Vs_PSM_Count.js
  * 
- * Javascript for the viewQCMerged.jsp page - Chart Peptide Lengths Vs Peptide Count
+ * Javascript for the viewQC.jsp page - Chart Peptide Lengths Vs PSM Count
  * 
- * page variable qcMergedPageChart_Peptide_Lengths
+ * page variable qcPageChart_Peptide_Length_Vs_PSM_Count
  * 
- * Merged QC Page
+ * 		!!!!  Currently only works for single search.  
+ * 
+ * 		The page is designed to work with multiple merged searches 
+ * 		but the code and SQL need to be reviewed to determine that the results returned are what the user expects,
+ * 		especially for reported peptide level results. 
  * 
  * This code has been updated to cancel existing active AJAX calls when "Update from Database" button is clicked.
  *   This is done so that previous AJAX responses don't overlay new AJAX responses.
@@ -18,10 +22,10 @@
 /**
  * Constructor 
  */
-var QCMergedPageChart_Peptide_Lengths = function() {
-
+var QCPageChart_Peptide_Length_Vs_PSM_Count = function() {
+	
 	//  Download data URL
-	var _downloadStrutsAction = "downloadQC_PeptideLengthChartData.do";
+	var _downloadStrutsAction = "downloadQC_PeptideLengthVsPSMCountHistogramSingleSearchChartData.do";
 
 	/**
 	 * Overridden for Specific elements like Chart Title and X and Y Axis labels
@@ -39,10 +43,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 	var _OVERALL_GLOBALS;
 
 	var _project_search_ids = undefined;
-	var _searchIdsObject_Key_projectSearchId = undefined;
 
-	var _colorsPerSearch = undefined;
-	
 	var _anySearchesHaveScanDataYes = undefined;
 
 	//  Contains {{link_type}} to replace with link type.  Contains {{link_type}}_chart_outer_container_jq chart_outer_container_jq
@@ -97,7 +98,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 	//   Variables for this chart
 	
 	var _chart_isLoaded = _IS_LOADED_NO;
-	
+
 	/**
 	 * Init page Actual - Called from qcPageMain.initActual
 	 */
@@ -108,9 +109,6 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 			_OVERALL_GLOBALS = params.OVERALL_GLOBALS;
 
 			_project_search_ids = params.project_search_ids;
-			_searchIdsObject_Key_projectSearchId = params.searchIdsObject_Key_projectSearchId;
-
-			_colorsPerSearch = params.colorsPerSearch;
 
 			_anySearchesHaveScanDataYes = params.anySearchesHaveScanDataYes;
 
@@ -152,12 +150,15 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 			_get_hash_json_Contents = params.get_hash_json_Contents; // function
 
 			this.addClickAndOnChangeHandlers();
-			
+
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
 		}
+
 	};
+
+
 
 	/**
 	 * Add Click and onChange handlers 
@@ -167,6 +168,19 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 
 	};
 
+
+	///////////////////////////////////////////
+
+	///////////////////////////////////////////
+
+	/////////   _Peptide_Level_ Statistics
+
+
+	//////////////////////////////////////////////////////////////////////
+
+	//     Peptide Lengths Histogram
+
+
 	/**
 	 * Clear data for _Peptide_Level__Statistics_Counts
 	 */
@@ -174,12 +188,13 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 
 		_chart_isLoaded = _IS_LOADED_NO;
 
-		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
-		if ( $PeptideLengthsCountsBlock.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsBlock'" );
+		var $PeptideLengthVsPSMCountBlock = $("#PeptideLengthVsPSMCountBlock");
+		if ( $PeptideLengthVsPSMCountBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PeptideLengthVsPSMCountBlock'" );
 		}
-		$PeptideLengthsCountsBlock.empty();
+		$PeptideLengthVsPSMCountBlock.empty();
 	};
+
 
 	/**
 	 * If not currently loaded, load
@@ -201,11 +216,11 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 
 		_chart_isLoaded = _IS_LOADED_LOADING;
 
-		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
-		if ( $PeptideLengthsCountsBlock.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsBlock'" );
+		var $PeptideLengthVsPSMCountBlock = $("#PeptideLengthVsPSMCountBlock");
+		if ( $PeptideLengthVsPSMCountBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PeptideLengthVsPSMCountBlock'" );
 		}
-		$PeptideLengthsCountsBlock.empty();
+		$PeptideLengthVsPSMCountBlock.empty();
 		
 		var hash_json_Contents = _get_hash_json_Contents();
 
@@ -220,7 +235,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 
 			//  Add empty chart with Loading message
 			var $chart_outer_container_jq =
-				this._addChartOuterTemplate( { linkType : selectedLinkType, $chart_group_container_table_jq : $PeptideLengthsCountsBlock } );
+				this._addChartOuterTemplate( { linkType : selectedLinkType, $chart_group_container_table_jq : $PeptideLengthVsPSMCountBlock } );
 			this._placeEmptyDummyChartForMessage( { 
 				$chart_outer_container_jq : $chart_outer_container_jq, 
 				//				linkType : selectedLinkType, 
@@ -243,7 +258,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
 		_activeAjax =
 			$.ajax({
-				url : contextPathJSVar + "/services/qc/dataPage/peptideLengthsHistogram_Merged",
+				url : contextPathJSVar + "/services/qc/dataPage/peptideLengthVsPSMCount",
 				traditional: true,  //  Force traditional serialization of the data sent
 				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
 				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
@@ -285,25 +300,26 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 		var ajaxResponseData = params.ajaxResponseData;
 		var ajaxRequestData = params.ajaxRequestData;
 
-		var results = ajaxResponseData.results;
-		var dataForChartPerLinkTypeList = results.dataForChartPerLinkTypeList;
+		var peptideLengthVsPSMCount_For_PSMPeptideCutoffsResults = ajaxResponseData.peptideLengthVsPSMCount_For_PSMPeptideCutoffsResults;
+		var dataForChartPerLinkTypeList = peptideLengthVsPSMCount_For_PSMPeptideCutoffsResults.dataForChartPerLinkTypeList;
 
-		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
-		if ( $PeptideLengthsCountsBlock.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsBlock'" );
+		var $PeptideLengthVsPSMCountBlock = $("#PeptideLengthVsPSMCountBlock");
+		if ( $PeptideLengthVsPSMCountBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PeptideLengthVsPSMCountBlock'" );
 		}
-		$PeptideLengthsCountsBlock.empty();
+		$PeptideLengthVsPSMCountBlock.empty();
 
 		dataForChartPerLinkTypeList.forEach( function ( currentArrayValue, indexForLinkType, array ) {
+
 			var entryForLinkType = currentArrayValue;
 			var linkType = entryForLinkType.linkType;
-			var dataFound = entryForLinkType.dataFound;
+			var chartBuckets = entryForLinkType.chartBuckets;
 
-			if ( ! dataFound ) {
+			if ( chartBuckets === null || chartBuckets.length === 0 ) {
 				//  No data for this link type
 
 				var $chart_outer_container_jq =
-					this._addChartOuterTemplate( { $chart_group_container_table_jq : $PeptideLengthsCountsBlock } );
+					this._addChartOuterTemplate( { $chart_group_container_table_jq : $PeptideLengthVsPSMCountBlock } );
 				//  Add empty chart with No Data message
 				this._placeEmptyDummyChartForMessage( { 
 					$chart_outer_container_jq : $chart_outer_container_jq, 
@@ -316,7 +332,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 			}
 
 			var $chart_outer_container_jq =
-				this._addChartOuterTemplate( { $chart_group_container_table_jq : $PeptideLengthsCountsBlock } );
+				this._addChartOuterTemplate( { $chart_group_container_table_jq : $PeptideLengthVsPSMCountBlock } );
 			var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 
 			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
@@ -337,23 +353,23 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 			};
 			
 			//  Get Help tooltip HTML
-			var elementId = "peptide_level_block_help_tooltip_" + linkType
-			var $peptide_level_block_help_tooltip_LinkType = $("#" + elementId );
-			if ( $peptide_level_block_help_tooltip_LinkType.length === 0 ) {
+			var elementId = "psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_" + linkType
+			var $psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_LinkType = $("#" + elementId );
+			if ( $psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_LinkType.length === 0 ) {
 				throw Error( "No element found with id '" + elementId + "' " );
 			}
-			var helpTooltipHTML = $peptide_level_block_help_tooltip_LinkType.html();
-			
+			var helpTooltipHTML = $psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_LinkType.html();
+
 			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
 				$chart_outer_container_for_download_jq :  $chart_outer_container_jq, 
 				downloadDataCallback : downloadDataCallback,
-				helpTooltipHTML : helpTooltipHTML,
+				helpTooltipHTML : helpTooltipHTML, 
 				helpTooltip_Wide : true 
 			} );
 			
 			// Add tooltips for download links
 			addToolTips( $chart_outer_container_jq );
-			
+
 		}, this /* passed to function as this */ );
 
 		_chart_isLoaded = _IS_LOADED_YES;
@@ -378,139 +394,58 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 		var $chartContainer = params.$chartContainer;
 
 		var linkType = entryForLinkType.linkType;
-		var dataForChartPerSearchIdMap_KeyProjectSearchId = entryForLinkType.dataForChartPerSearchIdMap_KeyProjectSearchId;
-
-		//  Get max peptideLengths_outliers length
-		
-		var peptideLengths_outliers_Max_Length = undefined;
-
-		var peptideLengths_outliers_Min_Length = undefined;
-		
-
-		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, index, array ) {
-			
-			var dataForChartPerSearchIdEntry = dataForChartPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
-
-			if ( dataForChartPerSearchIdEntry.peptideLengths_outliers ) { // peptideLengths_outliers null if no outliers
-				
-				if ( peptideLengths_outliers_Max_Length === undefined 
-						|| ( dataForChartPerSearchIdEntry.peptideLengths_outliers.length
-								&& dataForChartPerSearchIdEntry.peptideLengths_outliers.length > peptideLengths_outliers_Max_Length ) ) {
-					peptideLengths_outliers_Max_Length = dataForChartPerSearchIdEntry.peptideLengths_outliers.length; 
-				}
-
-				if ( peptideLengths_outliers_Min_Length === undefined 
-						|| ( dataForChartPerSearchIdEntry.peptideLengths_outliers.length
-								&& dataForChartPerSearchIdEntry.peptideLengths_outliers.length < peptideLengths_outliers_Min_Length ) ) {
-					peptideLengths_outliers_Min_Length = dataForChartPerSearchIdEntry.peptideLengths_outliers.length; 
-				}
-			}
-		}, this /* passed to function as this */ );
-
-		if ( peptideLengths_outliers_Max_Length === undefined ) {
-			// not set so set to 0
-			peptideLengths_outliers_Max_Length = 0;
-		}
-		if ( peptideLengths_outliers_Min_Length === undefined ) {
-			// not set so set to 0
-			peptideLengths_outliers_Min_Length = 0;
-		}
+		var chartBuckets = entryForLinkType.chartBuckets;
 
 		//  chart data for Google charts
 		var chartData = [];
 
-		var chartDataHeaderEntry = [ 
-			'SearchId', 
-			
-			//  Putting style here doesn't work since that styles the lines which are hidden
-			
-			'Max',
-			'Min',
-			'First Quartile',
-			'Median',
-			'Third Quartile',
-
-			//  Putting style here doesn't work since that styles the intervals
-			
-			{id:'max', type:'number', role:'interval'},
-			{id:'min', type:'number', role:'interval'},
-			
-			{id:'firstQuartile', type:'number', role:'interval'},
-			{id:'median', type:'number', role:'interval'},
-			{id:'thirdQuartile', type:'number', role:'interval'},
-			
-			{type:'string', role: 'style' } // Color for all of interval parts/entries for current X axis entry
-			
-			];
-				
-//		!!!!!!!!!!   Adding a variable number of outliers does not work when putting null for missing outliers for a given search id
-		
-		//   Add header entries for max number of outliers found across all link types
-		for ( var counter = 0; counter < peptideLengths_outliers_Max_Length; counter++ ) {
-			chartDataHeaderEntry.push( 'Outlier Point' );
-			chartDataHeaderEntry.push( {type:'string', role: 'style' } );
-		}
-				
+		var chartDataHeaderEntry = [ 'peptideLength', "Count", { role: 'style' }, {role: "tooltip", 'p': {'html': true} }
+//		, {type: 'string', role: 'annotation'}
+		]; 
 		chartData.push( chartDataHeaderEntry );
 
+		var minpeptideLength = null;
+		var maxpeptideLength = null;
 
-		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, indexForProjectSearchId, array ) {
+		var maxCount = 0;
+
+		for ( var index = 0; index < chartBuckets.length; index++ ) {
+			var bucket = chartBuckets[ index ];
 			
-			var dataForChartPerSearchIdEntry = dataForChartPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
-			
-			var searchId = dataForChartPerSearchIdEntry.searchId;
-			
-			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
+			var peptideLength = bucket.peptideLength;
+			var psmCount = bucket.psmCount;
+
+			var countString = psmCount;
+			try {
+				countString = psmCount.toLocaleString();
+			} catch( e ) {
+			}
+
+			var tooltipText = null;
+			tooltipText = "<div style='padding: 4px;'>Count: " + countString + "<br>peptide length: " + peptideLength + "</div>";
+			var entryAnnotationText = psmCount;
 
 			var chartEntry = [ 
-				searchId.toString(),
-				//  First list for charting for tool tips
-				dataForChartPerSearchIdEntry.chartIntervalMax,
-				dataForChartPerSearchIdEntry.chartIntervalMin,
-				dataForChartPerSearchIdEntry.firstQuartile,
-				dataForChartPerSearchIdEntry.median,
-				dataForChartPerSearchIdEntry.thirdQuartile,
-				
-				//  Next list for Box Chart
-				dataForChartPerSearchIdEntry.chartIntervalMax,
-				dataForChartPerSearchIdEntry.chartIntervalMin,
-				dataForChartPerSearchIdEntry.firstQuartile,
-				dataForChartPerSearchIdEntry.median,
-				dataForChartPerSearchIdEntry.thirdQuartile,
-			
+				peptideLength,  
+				psmCount, 
+				//  Style of the bar
+				colorAndbarColor.barColor,
+				//  Tool Tip
+				tooltipText
+//				,
+//				entryAnnotationText
 				];
-			
-			chartEntry.push( 'color: ' + colorForSearchEntry + ';' ); // style required to make visible :  color: blue; opacity: 1;
-			
-			if ( dataForChartPerSearchIdEntry.peptideLengths_outliers ) {
-				//  peptideLengths_outliers is not null
-
-				//  Add each outlier
-				dataForChartPerSearchIdEntry.peptideLengths_outliers.forEach( function ( currentArrayValue, indexForSearchId, array ) {
-					chartEntry.push( currentArrayValue );
-					chartEntry.push( 'point { visible: true; size: 2; color: ' + colorForSearchEntry + ' }' ); // style required to make visible :  color: blue; opacity: 1; 
-				}, this /* passed to function as this */ );
-
-				//  Add the last outlier point for each search to the max length of outlier.  Done so this X-axis entry has the same number of Y-axis entries as for Max Outliers X-axis entry
-				var peptideLengths_outliers_lastEntry = dataForChartPerSearchIdEntry.peptideLengths_outliers[ dataForChartPerSearchIdEntry.peptideLengths_outliers.length - 1 ];
-				for ( var counter = dataForChartPerSearchIdEntry.peptideLengths_outliers.length; counter < peptideLengths_outliers_Max_Length; counter++ ) {
-					chartEntry.push( peptideLengths_outliers_lastEntry );
-					chartEntry.push( 'point { visible: false; size: 0; }' ); // style as hidden, size zero since not an actual valid point 
-				}
-
-			} else {
-				//  No outliers so add invisible point at the chartIntervalMax position
-				for ( var counter = 0; counter < peptideLengths_outliers_Max_Length; counter++ ) {
-					chartEntry.push( dataForChartPerSearchIdEntry.chartIntervalMax );
-					chartEntry.push( 'point { visible: false; size: 0; }' ); // style as hidden, size zero since not an actual valid point 
-				}
-			}
-			
 			chartData.push( chartEntry );
+			if ( psmCount > maxCount ) {
+				maxCount = psmCount;
+			}
+		}
 
-		}, this /* passed to function as this */ );
-		
-		var chartTitle = 'Distribution of peptide lengths (' + linkType + ")";
+		var vAxisTicks = this._getPeptideLengthsHistogram_ChartTickMarks( { maxValue : maxCount } );
+
+		var barColors = [ colorAndbarColor.color ]; // must be an array
+
+		var chartTitle = 'PSM Count vs/ Peptide Length (' + linkType + ")";
 		var optionsFullsize = {
 				//  Overridden for Specific elements like Chart Title and X and Y Axis labels
 				fontSize: PeptideLengthsCHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
@@ -524,53 +459,34 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 //					bold: <boolean>,    // true or false
 //					italic: <boolean>   // true of false
 				},
-				legend: {position: 'none'},
-				hAxis: {
-					title: 'Search Number'
-						, titleTextStyle: { color: 'black', fontSize: PeptideLengthsCHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
-//					gridlines: {color: '#fff'}
-				},
-				vAxis: 
-				{ 	title: 'Peptide Length'
-					, titleTextStyle: { color: 'black', fontSize: PeptideLengthsCHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
-				},
-				
-				lineWidth: 0,  //  Hide lines
-				
-				interpolateNulls: true,   //  Supposed to continue a line when there is no value for x-axis point.  Doesn't appear to work when using for outliers
-				
-//				series: [{'color': '#D3362D'}],
-				//  Series overrides colors when there are enough entries to cover the interval entries
-//				series: [{'color': '#00FF00'},{'color': '#00FF00'},{'color': '#00FF00'},{'color': '#00FF00'},{'color': '#00FF00'},{'color': '#00FF00'},{'color': '#00FF00'},{'color': '#00FF00'},{'color': '#00FF00'}],
-//				colors: [ '#0000FF' ],
-				
-				intervals: {
-					barWidth: 1,
-					boxWidth: 1,
-					lineWidth: 2,
-					style: 'boxes'
-				},
-				interval: {
-					max: {
-						style: 'bars',
-						barWidth: 0.75, // length of horizontal bars, as a fraction of total width ( '1' for same width as boxes )
-						fillOpacity: 1,
-//						,
-//						color: '#777'  //  Removed since overridden on a per search basis
-					},
-					min: {
-						style: 'bars',
-						barWidth: 0.75, // length of horizontal bars, as a fraction of total width ( '1' for same width as boxes )
-						fillOpacity: 1
-//						,
-//						color: '#777'  //  Removed since overridden on a per search basis
-					}
+				//  X axis label below chart
+				hAxis: { title: 'Peptide Length', titleTextStyle: { color: 'black', fontSize: PeptideLengthsCHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+				,minValue : entryForLinkType.peptideLengthMin
+				,maxValue : entryForLinkType.peptideLengthMax
+				,gridlines: {  
+					color: 'none'  //  No vertical grid lines on the horzontal axis
 				}
+				},  
+				//  Y axis label left of chart
+				vAxis: { title: 'PSM Count', titleTextStyle: { color: 'black', fontSize: PeptideLengthsCHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+//				,baseline: 0     // always start at zero
+				,ticks: vAxisTicks
+				,maxValue : maxCount
+				},
+				legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
+//				width : 500, 
+//				height : 300,   // width and height of chart, otherwise controlled by enclosing div
+				bar: { groupWidth: '100%' },  // set bar width large to eliminate space between bars
+				colors: barColors,
+				tooltip: {isHtml: true}
+//				,chartArea : { left : 140, top: 60, 
+//				width: objectThis.RETENTION_TIME_COUNT_CHART_WIDTH - 200 ,  //  was 720 as measured in Chrome
+//				height : objectThis.RETENTION_TIME_COUNT_CHART_HEIGHT - 120 }  //  was 530 as measured in Chrome
 		};        
 		// create the chart
 		var data = google.visualization.arrayToDataTable( chartData );
 
-		var chartFullsize = new google.visualization.LineChart( $chartContainer[0] );
+		var chartFullsize = new google.visualization.ColumnChart( $chartContainer[0] );
 
 		//  Register for chart errors
 		var errorDrawingChart = function( err ) {
@@ -587,7 +503,37 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 
 		chartFullsize.draw(data, optionsFullsize);
 		
+		//  Temp code to find <rect> that are the actual data columns
+		//     Changing them to green to allow show that they are only the data columns and not other <rect> in the <svg>
 
+//		var $rectanglesInChart_All = $chartContainer.find("rect");
+
+//		$rectanglesInChart_All.each( function() {
+//		var $rectangleInChart = $( this );
+//		var rectangleFillColor = $rectangleInChart.attr("fill");
+//		if ( rectangleFillColor !== undefined ) {
+//		if ( rectangleFillColor.toLowerCase() === _OVERALL_GLOBALS.BAR_COLOR_CROSSLINK.toLowerCase() ) {
+//		$rectangleInChart.attr("fill","green");
+//		var z = 0;
+//		}
+//		}
+//		});
+
+	};
+
+	/**
+	 * 
+	 */
+	this._getPeptideLengthsHistogram_ChartTickMarks = function( params ) {
+		var maxValue = params.maxValue;
+		if ( maxValue < 5 ) {
+			var tickMarks = [ 0 ];
+			for ( var counter = 1; counter <= maxValue; counter++ ) {
+				tickMarks.push( counter );
+			}
+			return tickMarks;
+		}
+		return undefined; //  Use defaults
 	};
 
 
@@ -598,4 +544,4 @@ var QCMergedPageChart_Peptide_Lengths = function() {
  * page variable 
  */
 
-var qcMergedPageChart_Peptide_Lengths = new QCMergedPageChart_Peptide_Lengths();
+var qcPageChart_Peptide_Length_Vs_PSM_Count = new QCPageChart_Peptide_Length_Vs_PSM_Count();

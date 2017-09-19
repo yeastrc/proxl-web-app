@@ -373,6 +373,20 @@
 				validate="false">
 		</action>
 		
+      	<action path="/downloadQC_PeptideLengthVsPSMCountHistogramSingleSearchChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_PeptideLengthVsPSMCountHistogramSingleSearchChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+		
+      	<action path="/downloadQC_PeptideLengthVsPSMCountBoxplotChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_PeptideLengthVsPSMCountBoxplotChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+		
       	<action path="/downloadQC_Psm_PPM_Error_ChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_Psm_PPM_Error_ChartDataAction"
 				scope="request"

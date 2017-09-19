@@ -97,7 +97,8 @@ var QCPageSection_PSM_Level_Statistics = function() {
 					qcPageChart_PSM_Score_Vs_Score_PSM,
 					
 					qcPageChartChargeStateStatistics,
-					qcPageChart_M_Over_Z_Statistics_PSM
+					qcPageChart_M_Over_Z_Statistics_PSM,
+					qcPageChart_Peptide_Length_Vs_PSM_Count
 				];
 
 			} catch( e ) {

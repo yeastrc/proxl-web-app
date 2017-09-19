@@ -87,6 +87,7 @@ var QCMergedPageSection_PSM_Level_Statistics = function() {
 				_pageChartObjectsForSection = [
 					qcMergedPageChartChargeStateStatistics,
 					qcMergedPageChart_M_Over_Z_Statistics_PSM,
+					qcMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot
 				];
 
 			} catch( e ) {

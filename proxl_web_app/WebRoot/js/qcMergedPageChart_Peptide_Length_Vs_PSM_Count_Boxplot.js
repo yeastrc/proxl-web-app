@@ -1,9 +1,9 @@
 /**
- * qcMergedPageChart_Peptide_Lengths.js
+ * qcMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot.js
  * 
- * Javascript for the viewQCMerged.jsp page - Chart Peptide Lengths Vs Peptide Count
+ * Javascript for the viewQCMerged.jsp page - Chart Peptide Lengths Vs PSM Count Boxplot
  * 
- * page variable qcMergedPageChart_Peptide_Lengths
+ * page variable qcMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot
  * 
  * Merged QC Page
  * 
@@ -18,10 +18,10 @@
 /**
  * Constructor 
  */
-var QCMergedPageChart_Peptide_Lengths = function() {
+var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 
 	//  Download data URL
-	var _downloadStrutsAction = "downloadQC_PeptideLengthChartData.do";
+	var _downloadStrutsAction = "downloadQC_PeptideLengthVsPSMCountBoxplotChartData.do";
 
 	/**
 	 * Overridden for Specific elements like Chart Title and X and Y Axis labels
@@ -174,11 +174,11 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 
 		_chart_isLoaded = _IS_LOADED_NO;
 
-		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
-		if ( $PeptideLengthsCountsBlock.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsBlock'" );
+		var $PeptideLengthVsPSMCountBlock = $("#PeptideLengthVsPSMCountBlock");
+		if ( $PeptideLengthVsPSMCountBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PeptideLengthVsPSMCountBlock'" );
 		}
-		$PeptideLengthsCountsBlock.empty();
+		$PeptideLengthVsPSMCountBlock.empty();
 	};
 
 	/**
@@ -187,25 +187,25 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 	this.loadChartIfNeeded = function() {
 
 		if ( _chart_isLoaded === _IS_LOADED_NO ) {
-			this.loadPeptideLengthsHistogram();
+			this.loadChart();
 		}
 	};
 
 	var _activeAjax = null;
 
 	/**
-	 * Load the data for  Peptide Lengths Histogram
+	 * Load the data  
 	 */
-	this.loadPeptideLengthsHistogram = function() {
+	this.loadChart = function() {
 		var objectThis = this;
 
 		_chart_isLoaded = _IS_LOADED_LOADING;
 
-		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
-		if ( $PeptideLengthsCountsBlock.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsBlock'" );
+		var $PeptideLengthVsPSMCountBlock = $("#PeptideLengthVsPSMCountBlock");
+		if ( $PeptideLengthVsPSMCountBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PeptideLengthVsPSMCountBlock'" );
 		}
-		$PeptideLengthsCountsBlock.empty();
+		$PeptideLengthVsPSMCountBlock.empty();
 		
 		var hash_json_Contents = _get_hash_json_Contents();
 
@@ -220,7 +220,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 
 			//  Add empty chart with Loading message
 			var $chart_outer_container_jq =
-				this._addChartOuterTemplate( { linkType : selectedLinkType, $chart_group_container_table_jq : $PeptideLengthsCountsBlock } );
+				this._addChartOuterTemplate( { linkType : selectedLinkType, $chart_group_container_table_jq : $PeptideLengthVsPSMCountBlock } );
 			this._placeEmptyDummyChartForMessage( { 
 				$chart_outer_container_jq : $chart_outer_container_jq, 
 				//				linkType : selectedLinkType, 
@@ -243,7 +243,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
 		_activeAjax =
 			$.ajax({
-				url : contextPathJSVar + "/services/qc/dataPage/peptideLengthsHistogram_Merged",
+				url : contextPathJSVar + "/services/qc/dataPage/peptideLengthVsPSMCountBoxplot_Merged",
 				traditional: true,  //  Force traditional serialization of the data sent
 				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
 				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
@@ -288,11 +288,11 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 		var results = ajaxResponseData.results;
 		var dataForChartPerLinkTypeList = results.dataForChartPerLinkTypeList;
 
-		var $PeptideLengthsCountsBlock = $("#PeptideLengthsCountsBlock");
-		if ( $PeptideLengthsCountsBlock.length === 0 ) {
-			throw Error( "unable to find HTML element with id 'PeptideLengthsCountsBlock'" );
+		var $PeptideLengthVsPSMCountBlock = $("#PeptideLengthVsPSMCountBlock");
+		if ( $PeptideLengthVsPSMCountBlock.length === 0 ) {
+			throw Error( "unable to find HTML element with id 'PeptideLengthVsPSMCountBlock'" );
 		}
-		$PeptideLengthsCountsBlock.empty();
+		$PeptideLengthVsPSMCountBlock.empty();
 
 		dataForChartPerLinkTypeList.forEach( function ( currentArrayValue, indexForLinkType, array ) {
 			var entryForLinkType = currentArrayValue;
@@ -303,7 +303,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 				//  No data for this link type
 
 				var $chart_outer_container_jq =
-					this._addChartOuterTemplate( { $chart_group_container_table_jq : $PeptideLengthsCountsBlock } );
+					this._addChartOuterTemplate( { $chart_group_container_table_jq : $PeptideLengthVsPSMCountBlock } );
 				//  Add empty chart with No Data message
 				this._placeEmptyDummyChartForMessage( { 
 					$chart_outer_container_jq : $chart_outer_container_jq, 
@@ -316,7 +316,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 			}
 
 			var $chart_outer_container_jq =
-				this._addChartOuterTemplate( { $chart_group_container_table_jq : $PeptideLengthsCountsBlock } );
+				this._addChartOuterTemplate( { $chart_group_container_table_jq : $PeptideLengthVsPSMCountBlock } );
 			var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 
 			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
@@ -337,12 +337,12 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 			};
 			
 			//  Get Help tooltip HTML
-			var elementId = "peptide_level_block_help_tooltip_" + linkType
-			var $peptide_level_block_help_tooltip_LinkType = $("#" + elementId );
-			if ( $peptide_level_block_help_tooltip_LinkType.length === 0 ) {
+			var elementId = "psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_" + linkType
+			var $psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_LinkType = $("#" + elementId );
+			if ( $psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_LinkType.length === 0 ) {
 				throw Error( "No element found with id '" + elementId + "' " );
 			}
-			var helpTooltipHTML = $peptide_level_block_help_tooltip_LinkType.html();
+			var helpTooltipHTML = $psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_LinkType.html();
 			
 			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
 				$chart_outer_container_for_download_jq :  $chart_outer_container_jq, 
@@ -510,7 +510,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 
 		}, this /* passed to function as this */ );
 		
-		var chartTitle = 'Distribution of peptide lengths (' + linkType + ")";
+		var chartTitle = 'Distribution of PSM peptide lengths (' + linkType + ")";
 		var optionsFullsize = {
 				//  Overridden for Specific elements like Chart Title and X and Y Axis labels
 				fontSize: PeptideLengthsCHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
@@ -531,7 +531,7 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 //					gridlines: {color: '#fff'}
 				},
 				vAxis: 
-				{ 	title: 'Peptide Length'
+				{ 	title: 'PSM Peptide Length'
 					, titleTextStyle: { color: 'black', fontSize: PeptideLengthsCHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
 				},
 				
@@ -598,4 +598,4 @@ var QCMergedPageChart_Peptide_Lengths = function() {
  * page variable 
  */
 
-var qcMergedPageChart_Peptide_Lengths = new QCMergedPageChart_Peptide_Lengths();
+var qcMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = new QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot();

@@ -85,6 +85,7 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChartChargeStateStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_M_Over_Z_Statistics_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_Peptide_Length_Vs_PSM_Count.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PSM_Per_Modification.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_Peptide_Lengths.js?x=${cacheBustValue}"></script>
@@ -649,6 +650,18 @@ Click on the plot to launch it in interactive mode.
 <div >A histogram of the number of PSMs for unlinked peptides that meet the current filtering criteria versus m/z of the precursor ion.</div>
 </script>
 
+<script id="psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_crosslink" type="text/text">
+<div >Histogram depicting the distribution of the lengths of peptides for all PSMs that meet current filtering criteria.  
+This is the length of both linked peptides added together.</div>
+</script>
+<script id="psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_looplink" type="text/text">
+<div >Histogram depicting the distribution of the lengths of peptides for all PSMs that meet current filtering criteria.  </div>
+</script>
+<script id="psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_unlinked" type="text/text">
+<div >Histogram depicting the distribution of the lengths of peptides for all PSMs that meet current filtering criteria. </div>
+</script>
+
+
 		  <div class="top-level-container qc_top_level_container_jq" >
 			
 			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
@@ -725,7 +738,13 @@ Click on the plot to launch it in interactive mode.
 			  
 	 		  <table  id="PSM_M_Over_Z_CountsBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
 			  </table>			  
-			
+
+			  <%--  Peptide Lengths Vs PSM Counts --%>
+			  <h2>Peptide Length Statistics</h2>
+
+	 		  <table  id="PeptideLengthVsPSMCountBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+			  </table>	
+			  			
 			</div> <%-- close <div class="project-info-block  collapsable_jq" > --%>
 		  </div> <%-- close <div class="top-level-container collapsable_container_jq" > --%>
 
