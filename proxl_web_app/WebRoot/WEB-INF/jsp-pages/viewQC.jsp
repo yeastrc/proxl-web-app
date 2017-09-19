@@ -266,6 +266,8 @@
 	
 		<hr>
 		
+		<input type="button" value="Expand All" id="qc_page_expand_all_button">
+		 
 		<%--  Summary level Statistics --%>
 	
 		<div >

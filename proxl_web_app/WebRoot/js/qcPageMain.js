@@ -369,7 +369,30 @@ var QCPageMain = function() {
 			}
 		});
 
+		var $qc_page_expand_all_button = $("#qc_page_expand_all_button");
+		$qc_page_expand_all_button.click( function( event ) { 
+			try {
+				objectThis._expand_all_button_Clicked( { clickedThis : this } ); 
+				event.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 	};
+	
+	/**
+	 * "Expand All" Button Clicked
+	 */
+	this._expand_all_button_Clicked = function( params ) {
+		var clickedThis = params.clickedThis;
+
+		_pageSectionObjects.forEach( function( pageSectionObject, index, array ) {
+			pageSectionObject.show_Section();
+		}, this );
+		
+	}; 
+	
 	
 	var _scanFiles_ForProjectSearchId_Cached = null;
 	
