@@ -86,6 +86,7 @@
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChartChargeStateStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_M_Over_Z_Statistics_PSM.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_Peptide_Length_Vs_PSM_Count.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PeptideLength_Vs_RetentionTime_PSM.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PSM_Per_Modification.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_Peptide_Lengths.js?x=${cacheBustValue}"></script>
@@ -744,6 +745,9 @@ This is the length of both linked peptides added together.</div>
 
 	 		  <table  id="PeptideLengthVsPSMCountBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
 			  </table>	
+
+	 		  <table  id="PeptideLengthVsRetentionTimeBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
+			  </table>				  
 			  			
 			</div> <%-- close <div class="project-info-block  collapsable_jq" > --%>
 		  </div> <%-- close <div class="top-level-container collapsable_container_jq" > --%>
