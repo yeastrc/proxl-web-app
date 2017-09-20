@@ -759,6 +759,9 @@ The color and point size indicate the number of PSMs in a given retention time b
 	 		  <table  id="PeptideLengthVsPSMCountBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
 			  </table>	
 
+			  <%--  Peptide Lengths Vs Retention Time --%>
+			  <h2>Chromatography Statistics</h2>
+			  
 	 		  <table  id="PeptideLengthVsRetentionTimeBlock" class="table-no-border-no-cell-spacing-no-cell-padding" style="">
 			  </table>				  
 			  			
