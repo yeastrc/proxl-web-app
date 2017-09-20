@@ -651,15 +651,28 @@ Click on the plot to launch it in interactive mode.
 <div >A histogram of the number of PSMs for unlinked peptides that meet the current filtering criteria versus m/z of the precursor ion.</div>
 </script>
 
-<script id="psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_crosslink" type="text/text">
+<script id="psm_level_block_help_tooltip_peptide_length_vs_psm_count_tooltip_crosslink" type="text/text">
 <div >Histogram depicting the distribution of the lengths of peptides for all PSMs that meet current filtering criteria.  
 This is the length of both linked peptides added together.</div>
 </script>
-<script id="psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_looplink" type="text/text">
+<script id="psm_level_block_help_tooltip_peptide_length_vs_psm_count_tooltip_looplink" type="text/text">
 <div >Histogram depicting the distribution of the lengths of peptides for all PSMs that meet current filtering criteria.  </div>
 </script>
-<script id="psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_unlinked" type="text/text">
+<script id="psm_level_block_help_tooltip_peptide_length_vs_psm_count_tooltip_unlinked" type="text/text">
 <div >Histogram depicting the distribution of the lengths of peptides for all PSMs that meet current filtering criteria. </div>
+</script>
+
+<script id="psm_level_block_help_tooltip_peptide_length_vs_retention_time_tooltip_crosslink" type="text/text">
+<div >Two-dimensional density plot of peptide length as a function of binned retention time. 
+The color and point size indicate the number of PSMs in a given retention time bin with a given peptide length.</div>
+</script>
+<script id="psm_level_block_help_tooltip_peptide_length_vs_retention_time_tooltip_looplink" type="text/text">
+<div >Two-dimensional density plot of peptide length as a function of binned retention time. 
+The color and point size indicate the number of PSMs in a given retention time bin with a given peptide length.</div>
+</script>
+<script id="psm_level_block_help_tooltip_peptide_length_vs_retention_time_tooltip_unlinked" type="text/text">
+<div >Two-dimensional density plot of peptide length as a function of binned retention time. 
+The color and point size indicate the number of PSMs in a given retention time bin with a given peptide length.</div>
 </script>
 
 

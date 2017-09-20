@@ -75,6 +75,7 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 		PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults;
 		
 		Map<Integer,List<BigDecimal>> retentionTime_KeyedByPeptideLength;
+		String linkTypeDisplay;
 
 		public PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults getPeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults() {
 			return peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults;
@@ -91,6 +92,14 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 
 		public void setRetentionTime_KeyedByPeptideLength(Map<Integer, List<BigDecimal>> retentionTime_KeyedByPeptideLength) {
 			this.retentionTime_KeyedByPeptideLength = retentionTime_KeyedByPeptideLength;
+		}
+
+		public String getLinkTypeDisplay() {
+			return linkTypeDisplay;
+		}
+
+		public void setLinkTypeDisplay(String linkTypeDisplay) {
+			this.linkTypeDisplay = linkTypeDisplay;
 		}
 	}
 	
@@ -201,6 +210,7 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 			
 		PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response methodResponse = new PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response();
 		
+		methodResponse.linkTypeDisplay = linkTypeDisplay;
 		methodResponse.retentionTime_KeyedByPeptideLength = retentionTime_KeyedByPeptideLength;
 
 		if ( forDownload == ForDownload.YES ) {

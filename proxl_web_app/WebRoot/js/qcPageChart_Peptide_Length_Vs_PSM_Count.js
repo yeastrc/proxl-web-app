@@ -353,12 +353,12 @@ var QCPageChart_Peptide_Length_Vs_PSM_Count = function() {
 			};
 			
 			//  Get Help tooltip HTML
-			var elementId = "psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_" + linkType
-			var $psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_LinkType = $("#" + elementId );
-			if ( $psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_LinkType.length === 0 ) {
+			var elementId = "psm_level_block_help_tooltip_peptide_length_vs_psm_count_tooltip_" + linkType
+			var $psm_level_block_help_tooltip_peptide_length_vs_psm_count_tooltip_LinkType = $("#" + elementId );
+			if ( $psm_level_block_help_tooltip_peptide_length_vs_psm_count_tooltip_LinkType.length === 0 ) {
 				throw Error( "No element found with id '" + elementId + "' " );
 			}
-			var helpTooltipHTML = $psm_level_block_help_tooltip_peptide_length_vs_psm_count_boxplot_tooltip_LinkType.html();
+			var helpTooltipHTML = $psm_level_block_help_tooltip_peptide_length_vs_psm_count_tooltip_LinkType.html();
 
 			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
 				$chart_outer_container_for_download_jq :  $chart_outer_container_jq, 

@@ -352,6 +352,8 @@
 				validate="false">
 		</action>
 				
+		<!-- section PSM Level Statistics -->
+				
       	<action path="/downloadQC_PsmCountVsRetentionTimeChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_PSM_Count_Vs_RetentionTime_ChartDataAction"
 				scope="request"
@@ -386,6 +388,15 @@
 				name="mergedSearchViewPeptideForm"
 				validate="false">
 		</action>
+		
+      	<action path="/downloadQC_Psm_PeptideLength_VS_RT_ChartData"
+				type="org.yeastrc.xlink.www.actions.DownloadQC_Psm_PeptideLength_VS_RT_ChartDataAction"
+				scope="request"
+				name="mergedSearchViewPeptideForm"
+				validate="false">
+		</action>
+		
+		<!-- section PSM Error Estimates -->
 		
       	<action path="/downloadQC_Psm_PPM_Error_ChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_Psm_PPM_Error_ChartDataAction"

@@ -25,7 +25,7 @@
 var QCPageChart_PeptideLength_Vs_RetentionTime_PSM = function() {
 	
 	//  Download data URL
-	var _downloadStrutsAction = "downloadQC_Psm_PeptideLength_Vs_RetentionTime_ChartData.do";
+	var _downloadStrutsAction = "downloadQC_Psm_PeptideLength_VS_RT_ChartData.do";
 
 
 //	/**
@@ -410,12 +410,12 @@ var QCPageChart_PeptideLength_Vs_RetentionTime_PSM = function() {
 		};
 		
 		//  Get Help tooltip HTML
-		var elementId = "psm_error_block_help_tooltip_error_vs_retention_time_" + linkType
-		var $psm_error_block_help_tooltip_error_vs_retention_time_LinkType = $("#" + elementId );
-		if ( $psm_error_block_help_tooltip_error_vs_retention_time_LinkType.length === 0 ) {
+		var elementId = "psm_level_block_help_tooltip_peptide_length_vs_retention_time_tooltip_" + linkType
+		var $psm_level_block_help_tooltip_peptide_length_vs_retention_time_tooltip_LinkType = $("#" + elementId );
+		if ( $psm_level_block_help_tooltip_peptide_length_vs_retention_time_tooltip_LinkType.length === 0 ) {
 			throw Error( "No element found with id '" + elementId + "' " );
 		}
-		var helpTooltipHTML = $psm_error_block_help_tooltip_error_vs_retention_time_LinkType.html();
+		var helpTooltipHTML = $psm_level_block_help_tooltip_peptide_length_vs_retention_time_tooltip_LinkType.html();
 
 		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
 			$chart_outer_container_for_download_jq :  $chart_outer_container_jq, 
