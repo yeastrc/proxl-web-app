@@ -684,7 +684,7 @@ var QCPageChart_Error_Vs_RetentionTime_PSM = function() {
 			barColors.push( entry.color );
 		}
 
-		var chartTitle = 'PPM Error vs/ Retention Time (minutes) (' + linkType + ")";
+		var chartTitle = 'PPM Error vs/ Retention Time (' + linkType + ")";
 		var optionsFullsize = {
 				//  Overridden for Specific elements like Chart Title and X and Y Axis labels
 				fontSize: _PPM_Error_Vs_RetentionTime_For_PSMs_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
@@ -700,7 +700,7 @@ var QCPageChart_Error_Vs_RetentionTime_PSM = function() {
 //					italic: <boolean>   // true of false
 				},
 				//  X axis label below chart
-				hAxis: { title: 'Retention Time', titleTextStyle: { color: 'black', fontSize: _PPM_Error_Vs_RetentionTime_For_PSMs_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
+				hAxis: { title: 'Retention Time (minutes)', titleTextStyle: { color: 'black', fontSize: _PPM_Error_Vs_RetentionTime_For_PSMs_CHART_GLOBALS._AXIS_LABEL_FONT_SIZE }
 				,gridlines: {  
 					color: 'none'  //  No vertical grid lines on the horzontal axis
 				}
