@@ -265,7 +265,7 @@ public class AnnotationTypeFilterableDAO {
 			
 			counter++;
 			if ( item.getDefaultFilterValueAtDatabaseLoad() != null ) {
-				pstmt.setDouble( counter, item.getDefaultFilterValue() );
+				pstmt.setDouble( counter, item.getDefaultFilterValueAtDatabaseLoad() );
 			} else {
 				pstmt.setNull( counter, java.sql.Types.DOUBLE );
 			}
