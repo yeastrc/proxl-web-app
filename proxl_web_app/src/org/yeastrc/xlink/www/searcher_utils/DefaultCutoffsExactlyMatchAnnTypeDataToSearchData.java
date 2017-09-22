@@ -10,6 +10,8 @@ import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
+import org.yeastrc.xlink.www.config_properties_file.ProxlConfigFileValues;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 /**
  * 
@@ -20,6 +22,9 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
  * The answer is yes if and only if exactly only and all the annotation types with a default cutoff 
  * are present in the list of cutoffs passed in 
  * and the cutoffs passed in match the default cutoffs for the annotation types
+ * 
+ * Any annotation type records where annotation_type_filterable.default_filter_value_at_database_load = null and annotation_type_filterable.default_filter_at_database_load = 1
+ *   will cause a return value of false.  Those records are only allowed when the config properties file contains a special entry.  see code below. 
  */
 public class DefaultCutoffsExactlyMatchAnnTypeDataToSearchData {
 	
@@ -71,10 +76,12 @@ public class DefaultCutoffsExactlyMatchAnnTypeDataToSearchData {
 	 * @param filterableAnnotationTypesForSearchId
 	 * @return
 	 * @throws ProxlWebappInternalErrorException
+	 * @throws ProxlWebappDataException 
 	 */
 	private boolean processPeptideOrPSM( 
 			List<SearcherCutoffValuesAnnotationLevel> cutoffValuesList, 
-			Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesForSearchId ) throws ProxlWebappInternalErrorException {
+			Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesForSearchId ) throws ProxlWebappInternalErrorException, ProxlWebappDataException {
+		
 		Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesWithDefaultValues = getFilterableAnnTypesWithDefaultValues( filterableAnnotationTypesForSearchId );
 		if ( cutoffValuesList == null || cutoffValuesList.isEmpty() ) {
 			//  No cutoffs so must not be any default cutoffs in annotation types
@@ -90,6 +97,23 @@ public class DefaultCutoffsExactlyMatchAnnTypeDataToSearchData {
 			//  Safe to do .remove(...) since this is a copy Map
 			AnnotationTypeDTO annotationTypeDTOWithDefaultValue = filterableAnnotationTypesWithDefaultValues.remove( searcherCutoffValuesAnnotationLevel.getAnnotationTypeId() );
 			if ( annotationTypeDTOWithDefaultValue != null ) { // Have ann type with default so make comparison
+				if ( annotationTypeDTOWithDefaultValue.getAnnotationTypeFilterableDTO().getDefaultFilterValueAtDatabaseLoad() == null ) {
+					// Found a default ann type and the default value on database load is null so cannot match user input cutoff
+					//       (This property being null at this point is not normal database value)
+					//    annotation_type_filterable.default_filter_value_at_database_load = null and annotation_type_filterable.default_filter_at_database_load = 1
+					if ( ProxlConfigFileValues.getInstance()
+							.isAllowAnnTypeFilterDefaultFilterValueAtDatabaseLoad_Null_When_isDefaultFilter_True() ) {
+						// Configuration allows null value
+						return false; //  EARLY EXIT
+					}
+					{
+						String msg = "Data in DB is invalid. getDefaultFilterValueAtDatabaseLoad() == null when isDefaultFilter() is true."
+								+ " annotation_type_filterable.default_filter_value_at_database_load = null and annotation_type_filterable.default_filter_at_database_load = 1. "
+								+ " annotation type id: " + annotationTypeDTOWithDefaultValue.getId();
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
+					}
+				}
 				if ( annotationTypeDTOWithDefaultValue.getAnnotationTypeFilterableDTO().getDefaultFilterValueAtDatabaseLoad().doubleValue() 
 						!= searcherCutoffValuesAnnotationLevel.getAnnotationCutoffValue() ) {
 					// Found a default ann type and the default values don't match
