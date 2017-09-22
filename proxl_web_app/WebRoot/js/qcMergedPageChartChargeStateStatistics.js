@@ -511,7 +511,12 @@ var QCMergedPageChartChargeStateStatistics = function() {
 		};        
 		// create the chart
 		var data = google.visualization.arrayToDataTable( chartData );
-		var chartFullsize = new google.visualization.ColumnChart( $chartContainer[0] );
+
+		//  WAS Column Chart
+//		var chartFullsize = new google.visualization.ColumnChart( $chartContainer[0] );
+		
+		var chartFullsize = new google.visualization.LineChart( $chartContainer[0] );
+
 
 		//  Register for chart errors
 		var errorDrawingChart = function( err ) {
