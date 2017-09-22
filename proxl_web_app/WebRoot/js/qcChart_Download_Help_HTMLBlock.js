@@ -50,6 +50,7 @@ var QC_ChartDownloadHelp = function() {
 		
 		var $chart_outer_container_for_download_jq = params.$chart_outer_container_for_download_jq;
 		var downloadDataCallback = params.downloadDataCallback;
+		var downloadSummaryDataCallback = params.downloadSummaryDataCallback;
 		
 		var helpTooltipHTML = params.helpTooltipHTML;
 		var helpTooltip_Wide = params.helpTooltip_Wide;
@@ -69,7 +70,7 @@ var QC_ChartDownloadHelp = function() {
 			$chart_data_download_link_jq.click( function( event ) { 
 				try {
 					var $this = $( this );
-					var $chart_outer_container_for_download_jq = $this.closest(".chart_outer_container_for_download_jq");
+//					var $chart_outer_container_for_download_jq = $this.closest(".chart_outer_container_for_download_jq");
 //					var linkType = $chart_outer_container_for_download_jq.attr( "data-link_type" ); //  Not populated in HTML
 //					downloadDataCallback( { clickedThis : this, linkType : linkType } ); 
 					downloadDataCallback( { clickedThis : this } ); 
@@ -80,6 +81,27 @@ var QC_ChartDownloadHelp = function() {
 				}
 			});
 			$chart_data_download_link_jq.show();
+		}
+		
+		if ( downloadSummaryDataCallback ) {
+			//  Download summary data callback function provided so show link and attach click handler
+
+			//  Add Data Download Click Handler and show the download data link
+			var $chart_summary_data_download_link_jq = $chart_outer_container_for_download_jq.find(".chart_summary_data_download_link_jq");
+			$chart_summary_data_download_link_jq.click( function( event ) { 
+				try {
+					var $this = $( this );
+//					var $chart_outer_container_for_download_jq = $this.closest(".chart_outer_container_for_download_jq");
+//					var linkType = $chart_outer_container_for_download_jq.attr( "data-link_type" ); //  Not populated in HTML
+//					downloadSummaryDataCallback( { clickedThis : this, linkType : linkType } ); 
+					downloadSummaryDataCallback( { clickedThis : this } ); 
+					event.preventDefault();
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			});
+			$chart_summary_data_download_link_jq.show();
 		}
 		
 		//  Eat any clicks that occur on these elements or their children
@@ -123,6 +145,7 @@ var QC_ChartDownloadHelp = function() {
 		
 	};
 
+
 	/**
 	 * 
 	 */
@@ -164,7 +187,61 @@ var QC_ChartDownloadHelp = function() {
 		}
 		
 	};
-	
+
+	/**
+	 * 
+	 */
+	this._downloadBoxplotChartSummaryData = function( params ) {
+		var filenamePartChartName = params.filenamePartChartName;
+		var entryForLinkType = params.entryForLinkType;
+		var _project_search_ids = params._project_search_ids;
+		try {
+
+			var linkType = entryForLinkType.linkType;
+			var dataForChartPerSearchIdMap_KeyProjectSearchId = entryForLinkType.dataForChartPerSearchIdMap_KeyProjectSearchId;
+			
+			var headerLine = "SEARCH ID\tLINK TYPE\tMAX\tMIN\tMEDIAN\tFIRST QUARTILE\tTHIRD QUARTILE" ;
+
+			var outputStringArray = [ headerLine ];
+
+			var searchIds = [];
+
+			_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, indexForProjectSearchId, array ) {
+				
+				var dataForChartPerSearchIdEntry = dataForChartPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
+				
+				var searchId = dataForChartPerSearchIdEntry.searchId;
+				
+				searchIds.push( searchId );
+				
+				var ouputLine = 
+					searchId + "\t" +
+					linkType + "\t" +
+					dataForChartPerSearchIdEntry.chartIntervalMax + "\t" +
+					dataForChartPerSearchIdEntry.chartIntervalMin + "\t" +
+					dataForChartPerSearchIdEntry.median + "\t" +
+					dataForChartPerSearchIdEntry.firstQuartile + "\t" +
+					dataForChartPerSearchIdEntry.thirdQuartile;
+				
+				outputStringArray.push( ouputLine );
+			} );
+			
+
+			var searchIdsString = searchIds.join("-");
+			
+			var content = outputStringArray.join("\n");
+
+			var filename = "proxl-" + filenamePartChartName + "-" + linkType + "-search-" + searchIdsString + ".txt";
+			var mimetype = "text/plain";
+
+			downloadStringAsFile( filename, mimetype, content );
+			
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+		
+	};
 
 	/**
 	 * 

@@ -367,7 +367,13 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 			var hash_json_Contents = _get_hash_json_Contents();
 			//  Set link types to chart link type
 			hash_json_Contents.linkTypes = [ linkType ];
-							
+
+			var downloadSummaryDataCallback = function( params ) {
+//				var clickedThis = params.clickedThis;
+				
+				qcChartDownloadHelp._downloadBoxplotChartSummaryData( { filenamePartChartName : "qc-m-over-z-summary-" , entryForLinkType : entryForLinkType, _project_search_ids : _project_search_ids } );
+			};
+			
 			var downloadDataCallback = function( params ) {
 //				var clickedThis = params.clickedThis;
 
@@ -386,6 +392,7 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
 				$chart_outer_container_for_download_jq :  $chart_outer_container_jq, 
 				downloadDataCallback : downloadDataCallback,
+				downloadSummaryDataCallback : downloadSummaryDataCallback,
 				helpTooltipHTML : helpTooltipHTML, 
 				helpTooltip_Wide : false 
 			} );
