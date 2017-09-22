@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 
 
@@ -12,41 +12,13 @@ public class SearcherCutoffValuesAnnotationLevel {
 
 	//  Warning:  Has equals(...) and hashCode() that need to be updated if properties change
 	
-	private static final Logger log = Logger.getLogger(SearcherCutoffValuesAnnotationLevel.class);
+//	private static final Logger log = Logger.getLogger(SearcherCutoffValuesAnnotationLevel.class);
 	
 	private int annotationTypeId;
 	private double annotationCutoffValue;
 
 	private AnnotationTypeDTO annotationTypeDTO;
 	
-
-	public boolean annotationValueMatchesDefault() {
-		
-		if ( annotationTypeDTO == null ) {
-			
-			String msg = "annotationValueMatchesDefault() annotationTypeDTO cannot == null. annotationTypeId: " + annotationTypeId;
-			log.error( msg );
-			throw new IllegalStateException( msg );
-		}
-		
-		if ( annotationTypeDTO.getAnnotationTypeFilterableDTO() == null ) {
-			
-			return false;
-		}
-		
-		if ( ! annotationTypeDTO.getAnnotationTypeFilterableDTO().isDefaultFilterAtDatabaseLoad() ) {
-			
-			return false;
-		}
-		
-		if ( annotationTypeDTO.getAnnotationTypeFilterableDTO().getDefaultFilterValueAtDatabaseLoad() == null ) {
-			
-			return false;
-		}
-		
-		return ( annotationCutoffValue == annotationTypeDTO.getAnnotationTypeFilterableDTO().getDefaultFilterValueAtDatabaseLoad().doubleValue() );
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
