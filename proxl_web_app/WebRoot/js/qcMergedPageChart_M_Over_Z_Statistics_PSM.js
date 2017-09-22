@@ -481,6 +481,8 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 			{id:'median', type:'number', role:'interval'},
 			{id:'thirdQuartile', type:'number', role:'interval'},
 			
+			{role: "tooltip", 'p': {'html': true} }, // tooltip for top of top box
+			
 			{type:'string', role: 'style' } // Color for all of interval parts/entries for current X axis entry
 			
 			];
@@ -494,12 +496,30 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 		}
 				
 		chartData.push( chartDataHeaderEntry );
+		
+		var _CHART_SIGNIFICANT_DIGITS = 6;
 
 		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, indexForProjectSearchId, array ) {
 			
 			var dataForChartPerSearchIdEntry = dataForChartPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
 			
 			var searchId = dataForChartPerSearchIdEntry.searchId;
+			
+			var chartIntervalMaxString = dataForChartPerSearchIdEntry.chartIntervalMax.toPrecision( _CHART_SIGNIFICANT_DIGITS );
+			var thirdQuartileString = dataForChartPerSearchIdEntry.thirdQuartile.toPrecision( _CHART_SIGNIFICANT_DIGITS );
+			var medianString = dataForChartPerSearchIdEntry.median.toPrecision( _CHART_SIGNIFICANT_DIGITS );
+			var firstQuartileString = dataForChartPerSearchIdEntry.firstQuartile.toPrecision( _CHART_SIGNIFICANT_DIGITS );
+			var chartIntervalMinString = dataForChartPerSearchIdEntry.chartIntervalMin.toPrecision( _CHART_SIGNIFICANT_DIGITS );
+			
+
+			var mainBoxPlotTooltip =
+					"Search Id: " + searchId + "\n\n" +
+					"Max: " + chartIntervalMaxString + "\n" +
+					"Third Quartile: " + thirdQuartileString + "\n" +
+					"Median: " + medianString + "\n" +
+					"First Quartile: " + firstQuartileString + "\n" +
+					"Min: " + chartIntervalMinString + "\n"
+					;
 			
 			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
 
@@ -518,11 +538,13 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 				dataForChartPerSearchIdEntry.firstQuartile,
 				dataForChartPerSearchIdEntry.median,
 				dataForChartPerSearchIdEntry.thirdQuartile,
+
+				mainBoxPlotTooltip, // tooltip for top of top box
+				
+				'color: ' + colorForSearchEntry + ';'  // style required to make visible :  color: blue; opacity: 1;
 			
 				];
-			
-			chartEntry.push( 'color: ' + colorForSearchEntry + ';' ); // style required to make visible :  color: blue; opacity: 1;
-			
+						
 			if ( dataForChartPerSearchIdEntry.preMZ_outliers ) {
 				//  preMZ_outliers is not null
 

@@ -446,6 +446,8 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 			{id:'median', type:'number', role:'interval'},
 			{id:'thirdQuartile', type:'number', role:'interval'},
 			
+			{role: "tooltip", 'p': {'html': true} }, // tooltip for top of top box
+			
 			{type:'string', role: 'style' } // Color for all of interval parts/entries for current X axis entry
 			
 			];
@@ -460,12 +462,27 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 				
 		chartData.push( chartDataHeaderEntry );
 
-
 		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, indexForProjectSearchId, array ) {
 			
 			var dataForChartPerSearchIdEntry = dataForChartPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
 			
 			var searchId = dataForChartPerSearchIdEntry.searchId;
+
+			var chartIntervalMaxString = dataForChartPerSearchIdEntry.chartIntervalMax;
+			var thirdQuartileString = dataForChartPerSearchIdEntry.thirdQuartile;
+			var medianString = dataForChartPerSearchIdEntry.median;
+			var firstQuartileString = dataForChartPerSearchIdEntry.firstQuartile;
+			var chartIntervalMinString = dataForChartPerSearchIdEntry.chartIntervalMin;
+			
+
+			var mainBoxPlotTooltip =
+					"Search Id: " + searchId + "\n\n" +
+					"Max: " + chartIntervalMaxString + "\n" +
+					"Third Quartile: " + thirdQuartileString + "\n" +
+					"Median: " + medianString + "\n" +
+					"First Quartile: " + firstQuartileString + "\n" +
+					"Min: " + chartIntervalMinString + "\n"
+					;
 			
 			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
 
@@ -484,10 +501,12 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 				dataForChartPerSearchIdEntry.firstQuartile,
 				dataForChartPerSearchIdEntry.median,
 				dataForChartPerSearchIdEntry.thirdQuartile,
+
+				mainBoxPlotTooltip, // tooltip for top of top box
+				
+				'color: ' + colorForSearchEntry + ';'  // style required to make visible :  color: blue; opacity: 1;
 			
 				];
-			
-			chartEntry.push( 'color: ' + colorForSearchEntry + ';' ); // style required to make visible :  color: blue; opacity: 1;
 			
 			if ( dataForChartPerSearchIdEntry.peptideLengths_outliers ) {
 				//  peptideLengths_outliers is not null
