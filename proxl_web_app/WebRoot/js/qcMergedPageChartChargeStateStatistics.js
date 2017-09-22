@@ -481,7 +481,7 @@ var QCMergedPageChartChargeStateStatistics = function() {
 		var optionsFullsize = {
 				//  Overridden for Specific elements like Chart Title and X and Y Axis labels
 				fontSize: _CHARGE_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
-
+				pointSize : 3,
 				title: chartTitle, // Title above chart
 				titleTextStyle: {
 					color : _PROXL_DEFAULT_FONT_COLOR, //  Set default font color

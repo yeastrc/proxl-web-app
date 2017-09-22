@@ -17,6 +17,10 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults {
 	private int retentionTimeBinMax;
 	private int retentionTimePossibleMax;
 	
+	private int countValuePercentile25;
+	private int countValuePercentile50;
+	private int countValuePercentile75;
+	
 	private List<PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultRetentionTimeBucket> retentionTimeBuckets;
 	
 	/**
@@ -163,5 +167,29 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults {
 	public void setRetentionTimeBuckets(
 			List<PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultRetentionTimeBucket> retentionTimeBuckets) {
 		this.retentionTimeBuckets = retentionTimeBuckets;
+	}
+
+	public int getCountValuePercentile25() {
+		return countValuePercentile25;
+	}
+
+	public void setCountValuePercentile25(int countValuePercentile25) {
+		this.countValuePercentile25 = countValuePercentile25;
+	}
+
+	public int getCountValuePercentile50() {
+		return countValuePercentile50;
+	}
+
+	public void setCountValuePercentile50(int countValuePercentile50) {
+		this.countValuePercentile50 = countValuePercentile50;
+	}
+
+	public int getCountValuePercentile75() {
+		return countValuePercentile75;
+	}
+
+	public void setCountValuePercentile75(int countValuePercentile75) {
+		this.countValuePercentile75 = countValuePercentile75;
 	}
 }

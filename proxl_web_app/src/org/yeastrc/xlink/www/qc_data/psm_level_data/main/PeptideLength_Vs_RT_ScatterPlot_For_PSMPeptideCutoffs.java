@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -316,6 +317,9 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
  
 		//  Create output objects
 		
+		// Used for getting Percentiles of all Count Values:  Get a DescriptiveStatistics instance - Apache Commons
+		DescriptiveStatistics statsForCountValues = new DescriptiveStatistics();
+		
 		List<PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultRetentionTimeBucket> retentionTimeBuckets = new ArrayList<>();
 		
 		for ( Map.Entry<Integer,Map<Integer,MutableInt>> entryOnRetentionTime : count_KeyedOn_PeptideLength_KeyedOn_RetentionTime.entrySet() ) {
@@ -342,8 +346,16 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 				chartBucket.setPeptideLength( peptideLength );
 				chartBucket.setCount( entryOnPeptideLength.getValue().intValue() );
 				
+				statsForCountValues.addValue( entryOnPeptideLength.getValue().intValue() );
 			}
 		}
+		
+		// Compute some statistics on counts
+		int countValuePercentile25 = (int) statsForCountValues.getPercentile( 25 );
+		int countValuePercentile50 = (int) statsForCountValues.getPercentile( 50 );
+		int countValuePercentile75 = (int) statsForCountValues.getPercentile( 75 );
+
+		//  Create output object
 		
 		PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults = new PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults();
 		peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults.setNumScans( numScans );
@@ -353,6 +365,10 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 		peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults.setRetentionTimeBinMin( retentionTimeBinMin );
 		peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults.setRetentionTimePossibleMax( retentionTimePossibleMax );
 		peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults.setRetentionTimeBuckets( retentionTimeBuckets );
+		
+		peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults.setCountValuePercentile25( countValuePercentile25 );
+		peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults.setCountValuePercentile50( countValuePercentile50 );
+		peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults.setCountValuePercentile75( countValuePercentile75 );
 		
 		return peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults;
 	}

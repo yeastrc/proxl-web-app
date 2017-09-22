@@ -371,12 +371,9 @@ var QCPageChart_PeptideLength_Vs_RetentionTime_PSM = function() {
 		var peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults = ajaxResponseData.peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults;
 		var dataForChart = peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults;
 
-		var linkType = dataForChart.linkType;
-		var retentionTimeBuckets = dataForChart.retentionTimeBuckets;
-
 		$chart_outer_container_jq.empty();
 
-		if ( retentionTimeBuckets === null || retentionTimeBuckets.length === 0 ) {
+		if ( ( ! dataForChart ) || dataForChart.retentionTimeBuckets === null || dataForChart.retentionTimeBuckets.length === 0 ) {
 			//  No data for this link type
 
 			//  Add empty chart with No Data message
@@ -390,6 +387,8 @@ var QCPageChart_PeptideLength_Vs_RetentionTime_PSM = function() {
 			return;  //  EARLY RETURN
 		}
 
+		var linkType = dataForChart.linkType;
+		
 		var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 
 		var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
@@ -454,6 +453,12 @@ var QCPageChart_PeptideLength_Vs_RetentionTime_PSM = function() {
 
 		var retentionTimeBuckets = dataForChart.retentionTimeBuckets;
 
+		var countValuePercentile25 = dataForChart.countValuePercentile25;
+		var countValuePercentile50 = dataForChart.countValuePercentile50;
+		var countValuePercentile75 = dataForChart.countValuePercentile75;
+		
+		var minCountValueForMaxSeries = countValuePercentile75 + 1;
+
 		//  Not used
 //		var numScans = dataForChart.numScans;
 
@@ -475,10 +480,10 @@ var QCPageChart_PeptideLength_Vs_RetentionTime_PSM = function() {
 
 		//  Only last element can have and must have "min" property 
 		var SERIES_SETTINGS = [
-			{ max: 3, color: _PROXL_COLOR_SITE_BLUE, pointSize : 4, opacity: null }
-			,{ max: 10, color: _PROXL_COLOR_SITE_GREEN, pointSize : 5, opacity: null }
-			,{ max: 17, color: '#ddbf17', pointSize : 6, opacity: null }
-			,{ min: 18, color: _PROXL_COLOR_SITE_RED, pointSize : 7, opacity: null }
+			{ max: countValuePercentile25, color: _PROXL_COLOR_SITE_BLUE, pointSize : 4, opacity: null }
+			,{ max: countValuePercentile50, color: _PROXL_COLOR_SITE_GREEN, pointSize : 5, opacity: null }
+			,{ max: countValuePercentile75, color: '#ddbf17', pointSize : 6, opacity: null }
+			,{ min: minCountValueForMaxSeries, color: _PROXL_COLOR_SITE_RED, pointSize : 7, opacity: null }
 			];
 
 		var addHeaderEntry = function( label ) {
