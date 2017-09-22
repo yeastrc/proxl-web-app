@@ -870,7 +870,7 @@ var QCPageChartScanFileStatistics = function() {
 		var retentionTimeParams = { 
 				chartData: dataForRetentionTimeChart,
 				chartTitle : "MS1 Ion Current vs/ Retention Time",
-				chart_X_Axis_Label : "Retention Time (s)",
+				chart_X_Axis_Label : "Retention Time (minutes)",
 				tooltip: retentionTimeTooltip,
 				$chart_outer_container_jq : $MS_1_IonCurrent_RetentionTime_Histogram_Container,
 				downloadDataCallback : download_MS1_VS_RetentionTime_DataCallback,

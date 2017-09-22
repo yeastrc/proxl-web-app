@@ -256,7 +256,7 @@ public class DownloadQC_MS1_VS_RetentionTime_ChartDataAction extends Action {
 				writer.write( "\n" );
 				
 				//  Write header line
-				writer.write( "ION CURRENT SUMMED FOR BIN\tRETENTION TIME BIN START (>=)\tRETENTION TIME BIN END (<)\tSEARCH ID" );
+				writer.write( "ION CURRENT SUMMED FOR BIN\tRETENTION TIME BIN START (Seconds) (>=)\tRETENTION TIME BIN END (Seconds) (<)\tSEARCH ID" );
 				writer.write( "\n" );
 				
 				for ( Map.Entry<Long, MutableDouble> entry : ms1_IntensitiesBinnedSummedMappedByRetentionTime_List ) {

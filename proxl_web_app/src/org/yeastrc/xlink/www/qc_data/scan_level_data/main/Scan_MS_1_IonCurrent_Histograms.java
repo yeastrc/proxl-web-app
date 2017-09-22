@@ -34,6 +34,8 @@ public class Scan_MS_1_IonCurrent_Histograms {
 		return instance;
 	}
 	
+	private enum ChartType { RETENTION_TIME, M_OVER_Z } // for shared charting code
+	
 	/**
 	 * @param scanFileId
 	 * @return
@@ -95,6 +97,7 @@ public class Scan_MS_1_IonCurrent_Histograms {
 
 		Scan_MS_1_IonCurrent_HistogramsResultForChartType dataForRetentionTimeChart =
 				getChartData( 
+						ChartType.RETENTION_TIME,
 						ms1_IntensitiesBinnedSummedMappedByRetentionTime,
 						summaryData.getRtBinMin(),
 						summaryData.getRtBinMax(),
@@ -102,6 +105,7 @@ public class Scan_MS_1_IonCurrent_Histograms {
 						);
 		Scan_MS_1_IonCurrent_HistogramsResultForChartType dataFor_M_Over_Z_Chart =
 				getChartData( 
+						ChartType.M_OVER_Z,
 						ms1_IntensitiesBinnedSummedMappedBy_M_Over_Z,
 						summaryData.getMzBinMin(),
 						summaryData.getMzBinMax(),
@@ -123,11 +127,19 @@ public class Scan_MS_1_IonCurrent_Histograms {
 	 * @return
 	 */
 	private Scan_MS_1_IonCurrent_HistogramsResultForChartType getChartData( 
+			ChartType chartType,
 			Map<Long, MutableDouble> ms1_IntensitiesBinnedSummedMapped,
 			long min, // Smallest bin value 
 			long max, // Largest bin value
 			long maxPossible //  Since data is binned
 			) {
+		
+		if ( chartType == ChartType.RETENTION_TIME ) {
+			// Convert to minutes from seconds
+			min = min / 60;
+			max = max / 60;
+			maxPossible = maxPossible / 60;
+		}
 		
 		long maxMinusMin = maxPossible - min;
 		double maxMinusMinAsDouble = maxMinusMin; 
@@ -140,8 +152,14 @@ public class Scan_MS_1_IonCurrent_Histograms {
 		for ( Map.Entry<Long, MutableDouble> entry : ms1_IntensitiesBinnedSummedMapped.entrySet() ) {
 			long mapKey = entry.getKey();
 			double intensitySummed = entry.getValue().doubleValue();
-			double preMZFraction = ( mapKey - min ) / maxMinusMinAsDouble;
-			int bin = (int) ( (  preMZFraction ) * binCount );
+			double preMZ_Or_RT_Fraction = ( mapKey - min ) / maxMinusMinAsDouble;
+
+			if ( chartType == ChartType.RETENTION_TIME ) {
+				// Convert to minutes from seconds
+				preMZ_Or_RT_Fraction = preMZ_Or_RT_Fraction / 60;
+			}
+			
+			int bin = (int) ( (  preMZ_Or_RT_Fraction ) * binCount );
 			if ( bin < 0 ) {
 				bin = 0;
 			} else if ( bin >= binCount ) {

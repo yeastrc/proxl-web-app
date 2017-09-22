@@ -223,7 +223,7 @@ public class DownloadQC_PSM_Count_Vs_RetentionTime_ChartDataAction extends Actio
 				final String FILTERED_PSMs = "FILTERED PSMs";
 
 				//  Write header line
-				writer.write( "RETENTION TIME (Not filtered for Max X or Max Y)\tGROUP ("
+				writer.write( "RETENTION TIME (Seconds) (Not filtered for Max X or Max Y)\tGROUP ("
 						+ "'" + GROUP_ALL_MS2_SCANS 
 						+ "' OR '" + FILTERED_PSMs + "')\tSEARCH ID" );
 				

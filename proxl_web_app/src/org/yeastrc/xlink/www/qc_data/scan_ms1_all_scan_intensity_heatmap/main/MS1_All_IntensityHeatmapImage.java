@@ -47,7 +47,7 @@ public class MS1_All_IntensityHeatmapImage {
 	 * 
 	 *  Increment this value whenever change the resulting image since Caching the resulting image
 	 */
-	static final int VERSION_FOR_CACHING = 1;
+	static final int VERSION_FOR_CACHING = 2;
 	
 	/**
 	 *  Must be in ascending order since searching using Arrays.binarySearch
@@ -61,7 +61,7 @@ public class MS1_All_IntensityHeatmapImage {
 	private static final String GREATER_THAN_OR_EQUAL_UNICODE_CHARACTER = "\u2265"; // (>= as single character)
 	private static final String LESS_THAN_OR_EQUAL_UNICODE_CHARACTER = "\u2264"; // (<= as single character)
 
-	private static final String X_AXIS_LABEL = "Retention Time (s)";
+	private static final String X_AXIS_LABEL = "Retention Time (minutes)";
 
 	private static final  String Y_AXIS_LABEL = "M/Z";
 	
@@ -723,10 +723,15 @@ public class MS1_All_IntensityHeatmapImage {
 					IMAGE_MARGIN_TOP + bufferedImageHeight + HORIZONTAL_AXIS_LABEL_Y_OFFSET_FROM_IMAGE_BOTTOM );
 
 			//  Draw X Axis Tick Marks and Labels
+			
+			//  Convert labels to minutes
+			
+			long retentionTimeBinMinMinutes = summaryData.getRtBinMin() / 60;
+			long retentionTimeBinMaxMinutes = summaryData.getRtBinMax() / 60;
 
 			//  Draw left tick mark and label
 			drawHorizontalAxisTickMarkAndLabel( 
-					numberFormat.format( summaryData.getRtBinMin() ),
+					numberFormat.format( retentionTimeBinMinMinutes ),
 					IMAGE_MARGIN_LEFT, 
 					false, //  right align text
 					IMAGE_MARGIN_TOP + bufferedImageHeight, 
@@ -735,7 +740,7 @@ public class MS1_All_IntensityHeatmapImage {
 
 			//  Draw right tick mark and label
 			drawHorizontalAxisTickMarkAndLabel( 
-					numberFormat.format( summaryData.getRtBinMax() ),
+					numberFormat.format( retentionTimeBinMaxMinutes ),
 					IMAGE_MARGIN_LEFT + bufferedImageWidth, 
 					true, //  right align text
 					IMAGE_MARGIN_TOP + bufferedImageHeight, 

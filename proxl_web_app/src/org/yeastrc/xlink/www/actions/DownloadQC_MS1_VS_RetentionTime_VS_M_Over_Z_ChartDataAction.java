@@ -219,7 +219,7 @@ public class DownloadQC_MS1_VS_RetentionTime_VS_M_Over_Z_ChartDataAction extends
 				writer.write( "\n" );
 				
 				//  Write header line
-				writer.write( "ION CURRENT SUMMED FOR BIN\tRETENTION TIME BIN START (>=)\tRETENTION TIME BIN END (<)\t\tm/z BIN START (>=)\tm/z BIN END (<)\tSEARCH ID" );
+				writer.write( "ION CURRENT SUMMED FOR BIN\tRETENTION TIME BIN START (Seconds) (>=)\tRETENTION TIME BIN END (Seconds) (<)\t\tm/z BIN START (>=)\tm/z BIN END (<)\tSEARCH ID" );
 				writer.write( "\n" );
 				
 				for ( Map.Entry<Long, Map<Long, Double>> retentionTimeEntry : ms1_IntensitiesBinnedSummedMap.entrySet() ) {

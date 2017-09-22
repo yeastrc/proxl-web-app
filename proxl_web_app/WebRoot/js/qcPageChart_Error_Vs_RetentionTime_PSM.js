@@ -684,7 +684,7 @@ var QCPageChart_Error_Vs_RetentionTime_PSM = function() {
 			barColors.push( entry.color );
 		}
 
-		var chartTitle = 'PPM Error vs/ Retention Time (' + linkType + ")";
+		var chartTitle = 'PPM Error vs/ Retention Time (minutes) (' + linkType + ")";
 		var optionsFullsize = {
 				//  Overridden for Specific elements like Chart Title and X and Y Axis labels
 				fontSize: _PPM_Error_Vs_RetentionTime_For_PSMs_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
