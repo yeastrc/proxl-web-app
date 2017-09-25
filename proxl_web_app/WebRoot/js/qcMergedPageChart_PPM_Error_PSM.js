@@ -525,19 +525,19 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 					"Third Quartile: " + thirdQuartileString + "\n" +
 					"Median: " + medianString + "\n" +
 					"First Quartile: " + firstQuartileString + "\n" +
-					"Min: " + chartIntervalMinString + "\n"
+					"Min: " + chartIntervalMinString
 					;
 			
 			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
 
 			var chartEntry = [ 
-				searchId.toString(),
+				{ v: searchId.toString(), f: 'Search Id: ' + searchId },
 				//  First list for charting for tool tips
-				dataForChartPerSearchIdEntry.chartIntervalMax,
-				dataForChartPerSearchIdEntry.chartIntervalMin,
-				dataForChartPerSearchIdEntry.firstQuartile,
-				dataForChartPerSearchIdEntry.median,
-				dataForChartPerSearchIdEntry.thirdQuartile,
+				{ v: dataForChartPerSearchIdEntry.chartIntervalMax , f: '\nMax Value: ' + chartIntervalMaxString },
+				{ v: dataForChartPerSearchIdEntry.chartIntervalMin , f: '\nMin Value: ' + chartIntervalMinString },
+				{ v: dataForChartPerSearchIdEntry.firstQuartile , f: '\nFirst Quartile Value: ' + firstQuartileString },
+				{ v: dataForChartPerSearchIdEntry.median , f: '\nMedian Value: ' + medianString },
+				{ v: dataForChartPerSearchIdEntry.thirdQuartile , f: '\nThird Quartile Value: ' + thirdQuartileString },
 				
 				//  Next list for Box Chart
 				dataForChartPerSearchIdEntry.chartIntervalMax,

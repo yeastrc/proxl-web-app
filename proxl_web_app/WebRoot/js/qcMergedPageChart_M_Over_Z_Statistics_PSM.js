@@ -518,19 +518,19 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 					"Third Quartile: " + thirdQuartileString + "\n" +
 					"Median: " + medianString + "\n" +
 					"First Quartile: " + firstQuartileString + "\n" +
-					"Min: " + chartIntervalMinString + "\n"
+					"Min: " + chartIntervalMinString
 					;
 			
 			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
 
 			var chartEntry = [ 
-				searchId.toString(),
+				{ v: searchId.toString(), f: 'Search Id: ' + searchId },
 				//  First list for charting for tool tips
-				dataForChartPerSearchIdEntry.chartIntervalMax,
-				dataForChartPerSearchIdEntry.chartIntervalMin,
-				dataForChartPerSearchIdEntry.firstQuartile,
-				dataForChartPerSearchIdEntry.median,
-				dataForChartPerSearchIdEntry.thirdQuartile,
+				{ v: dataForChartPerSearchIdEntry.chartIntervalMax , f: '\nMax Value: ' + chartIntervalMaxString },
+				{ v: dataForChartPerSearchIdEntry.chartIntervalMin , f: '\nMin Value: ' + chartIntervalMinString },
+				{ v: dataForChartPerSearchIdEntry.firstQuartile , f: '\nFirst Quartile Value: ' + firstQuartileString },
+				{ v: dataForChartPerSearchIdEntry.median , f: '\nMedian Value: ' + medianString },
+				{ v: dataForChartPerSearchIdEntry.thirdQuartile , f: '\nThird Quartile Value: ' + thirdQuartileString },
 				
 				//  Next list for Box Chart
 				dataForChartPerSearchIdEntry.chartIntervalMax,
@@ -545,21 +545,24 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 			
 				];
 						
-			if ( dataForChartPerSearchIdEntry.preMZ_outliers ) {
-				//  preMZ_outliers is not null
+			if ( dataForChartPerSearchIdEntry.preMZ_outliers  && dataForChartPerSearchIdEntry.preMZ_outliers.length > 0 ) {
+				//  preMZ_outliers is not null and not empty array
 
-				//  Add each outlier
-				dataForChartPerSearchIdEntry.preMZ_outliers.forEach( function ( currentArrayValue, indexForSearchId, array ) {
-					chartEntry.push( currentArrayValue );
-					chartEntry.push( 'point { visible: true; size: 2; color: ' + colorForSearchEntry + ' }' ); // style required to make visible :  color: blue; opacity: 1; 
-				}, this /* passed to function as this */ );
-
+				//  Place first so under the visible outlier point
 				//  Add the last outlier point for each search to the max length of outlier.  Done so this X-axis entry has the same number of Y-axis entries as for Max Outliers X-axis entry
 				var preMZ_outliers_lastEntry = dataForChartPerSearchIdEntry.preMZ_outliers[ dataForChartPerSearchIdEntry.preMZ_outliers.length - 1 ];
 				for ( var counter = dataForChartPerSearchIdEntry.preMZ_outliers.length; counter < preMZ_outliers_Max_Length; counter++ ) {
 					chartEntry.push( preMZ_outliers_lastEntry );
 					chartEntry.push( 'point { visible: false; size: 0; }' ); // style as hidden, size zero since not an actual valid point 
 				}
+				
+				//  Add each outlier
+				dataForChartPerSearchIdEntry.preMZ_outliers.forEach( function ( currentArrayValue, indexForSearchId, array ) {
+					var chartOutlierString = currentArrayValue.toPrecision( _CHART_SIGNIFICANT_DIGITS );
+					chartEntry.push( { v: currentArrayValue , f: '\nOutlier Value: ' + chartOutlierString } );
+					chartEntry.push( 'point { visible: true; size: 2; color: ' + colorForSearchEntry + ' }' ); // style required to make visible :  color: blue; opacity: 1; 
+				}, this /* passed to function as this */ );
+
 			
 			} else {
 				//  No outliers so add invisible point at the chartIntervalMax position
