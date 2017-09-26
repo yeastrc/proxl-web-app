@@ -786,6 +786,71 @@ This is the length of both linked peptides added together.</div>
 	  </div>
 	</div>
 </script>
-		
+
+
+	  <!-- style following table -->
+	  <style > 
+	    .boxplot-wholechart-tooltip-table td { font-size: 14px; font-weight: bold; padding-bottom: 5px; }
+	    .boxplot-wholechart-tooltip-table .label-cell { padding-right: 30px; }
+	    .boxplot-wholechart-tooltip-table .data-cell { text-align: right; padding-right: 15px; }
+	    .boxplot-wholechart-tooltip-table .search-id-row td { padding-bottom: 10px; }
+	  </style>
+					  
+	<%--  Handlebars template for displaying Info in Tooltip for Box Plots  --%>		
+
+<script id="boxplot_chart_whole_chart_tooltip_template"  type="text/x-handlebars-template">
+
+		<%--  Consider creating CSS classes for this table --%>
+		<%--  Use of {{#each ... }}  For each search --%>
+ <div >		
+  	{{#if chartTitle}}
+	    <div style="text-align: center; white-space: nowrap; font-size: 16px; font-weight: bold; padding-top: 10px; padding-bottom: 10px;" class=""
+	    	>{{ chartTitle }}</div>
+	{{/if}}
+   <div >
+	  <table class="table-no-border-no-cell-spacing-no-cell-padding boxplot-wholechart-tooltip-table  boxplot_wholechart_tooltip_table_jq " 
+	  		style="margin-left: auto; margin-right: auto; padding-bottom: 5px;">
+	   <tr class="search-id-row">
+	    <td class="label-cell">Search Number:</td>
+		{{#each perSearchDataList }}
+		 	<td style="white-space: nowrap; color: {{ this.searchColor }}; " class="data-cell"
+				>{{ this.searchId }}</td>
+		{{/each}}	    
+	   </tr>
+	   <tr>
+	    <td class="label-cell">Max:</td>
+		{{#each perSearchDataList }}
+		 	<td style="white-space: nowrap; color: {{ this.searchColor }}; " class="data-cell">{{ this.max }}</td>
+		{{/each}}	    
+	   </tr>
+	   <tr>
+	    <td class="label-cell">Third Quartile:</td>
+		{{#each perSearchDataList }}
+		 	<td style="white-space: nowrap; color: {{ this.searchColor }}; " class="data-cell">{{ this.thirdQuartile }}</td>
+		{{/each}}	    
+	   </tr>
+	   <tr>
+	    <td class="label-cell">Median:</td>
+		{{#each perSearchDataList }}
+		 	<td style="white-space: nowrap; color: {{ this.searchColor }}; " class="data-cell">{{ this.median }}</td>
+		{{/each}}	    
+	   </tr>
+	   <tr>
+	    <td class="label-cell">First Quartile:</td>
+		{{#each perSearchDataList }}
+		 	<td style="white-space: nowrap; color: {{ this.searchColor }}" class="data-cell">{{ this.firstQuartile }}</td>
+		{{/each}}	    
+	   </tr>
+	   <tr>
+	    <td class="label-cell">Min:</td>
+		{{#each perSearchDataList }}
+		 	<td style="white-space: nowrap; color: {{ this.searchColor }}" class="data-cell">{{ this.min  }}</td>
+		{{/each}}	    
+	   </tr>
+	  </table>
+   </div>
+ </div>
+</script>
+
 							
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>

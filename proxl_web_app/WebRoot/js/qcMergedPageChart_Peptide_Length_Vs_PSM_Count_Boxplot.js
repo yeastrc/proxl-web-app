@@ -321,7 +321,7 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 
 			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
 
-			this._addPeptideLengthsHistogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor : colorAndbarColor, $chartContainer : $chart_container_jq } );
+			this._addPeptideLengthsHistogram_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor : colorAndbarColor, chartIndex : indexForLinkType, $chartContainer : $chart_container_jq } );
 			
 			//  Download Data
 			
@@ -382,6 +382,7 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 	this._addPeptideLengthsHistogram_Chart = function( params ) {
 		var entryForLinkType = params.entryForLinkType;
 		var colorAndbarColor = params.colorAndbarColor;
+		var chartIndex = params.chartIndex;  //  zero based
 		var $chartContainer = params.$chartContainer;
 
 		var linkType = entryForLinkType.linkType;
@@ -464,11 +465,18 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 
 		var _CHART_SIGNIFICANT_DIGITS = 5;
 
+		var searchCountPlusOne = _project_search_ids.length + 1;
+		
+		var wholeChartTooltipData = [];
+
 		_project_search_ids.forEach( function ( _project_search_ids_ArrayValue, indexForProjectSearchId, array ) {
 			
 			var dataForChartPerSearchIdEntry = dataForChartPerSearchIdMap_KeyProjectSearchId[ _project_search_ids_ArrayValue ];
 			
 			var searchId = dataForChartPerSearchIdEntry.searchId;
+
+			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
+
 			
 			var chartIntervalMaxString = dataForChartPerSearchIdEntry.chartIntervalMax;
 			var thirdQuartileString = dataForChartPerSearchIdEntry.thirdQuartile;
@@ -478,16 +486,26 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 			
 
 			var mainBoxPlotTooltip =
-					"Search Id: " + searchId + "\n\n" +
+					"Search Number: " + searchId + "\n\n" +
 					"Max: " + chartIntervalMaxString + "\n" +
 					"Third Quartile: " + thirdQuartileString + "\n" +
 					"Median: " + medianString + "\n" +
 					"First Quartile: " + firstQuartileString + "\n" +
 					"Min: " + chartIntervalMinString
 					;
-			
-			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
 
+			var wholeChartTooltipEntry = {
+					searchId : searchId,
+					max : chartIntervalMaxString,
+					thirdQuartile : thirdQuartileString,
+					median : medianString,
+					firstQuartile : firstQuartileString,
+					min : chartIntervalMinString,
+					searchColor : colorForSearchEntry
+			};
+			
+			wholeChartTooltipData.push( wholeChartTooltipEntry );
+			
 			var chartEntry = [ 
 				{ v: searchId.toString(), f: searchId.toString() }, //  X axis label as well as for tooltip
 				//  First list for charting for tool tips
@@ -539,8 +557,56 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 			chartData.push( chartEntry );
 
 		}, this /* passed to function as this */ );
-		
+
 		var chartTitle = 'Distribution of PSM peptide lengths (' + linkType + ")";
+		
+		var $boxplot_chart_whole_chart_tooltip_template = $("#boxplot_chart_whole_chart_tooltip_template");
+		if ( $boxplot_chart_whole_chart_tooltip_template.length === 0 ) {
+			throw Error( "HTML element not found for id 'boxplot_chart_whole_chart_tooltip_template'" );
+		}
+		var handlebarsSource_boxplot_chart_whole_chart_tooltip_template = $boxplot_chart_whole_chart_tooltip_template.html();
+		
+		var _handlebarsTemplate_boxplot_chart_whole_chart_tooltip_template = Handlebars.compile( handlebarsSource_boxplot_chart_whole_chart_tooltip_template );
+
+		var dataForTable = { perSearchDataList : wholeChartTooltipData, chartTitle : chartTitle, searchCountPlusOne : searchCountPlusOne };
+		
+		var htmlForTooltip = _handlebarsTemplate_boxplot_chart_whole_chart_tooltip_template( dataForTable );
+		
+		var qtipWholeChartPosition = {
+				viewport: $(window)
+		}
+
+		if ( chartIndex == 0 ) { // zero based
+			//  Left chart, attach to left edge of chart, tooltip grows to right
+			qtipWholeChartPosition.my = 'bottom left';
+			qtipWholeChartPosition.at = 'top left';
+
+		} else if ( chartIndex == 1 ) {
+			//  Center chart, attach to center of chart
+			qtipWholeChartPosition.my = 'bottom center';
+			qtipWholeChartPosition.at = 'top center';
+
+		} else {
+			//  Right chart, attach to right edge of chart, tooltip grows to left
+			qtipWholeChartPosition.my = 'bottom right';
+			qtipWholeChartPosition.at = 'top right';
+		}
+
+		// Add tooltip to whole chart
+		$chartContainer.qtip( {
+			content: {
+				text: htmlForTooltip
+			},
+			style: {
+				classes: 'qc-chart-boxplot-whole-chart-tooltip' // add this class to the tool tip
+			},
+			position: qtipWholeChartPosition,
+			hide: {  //  Allow user to mouse into tooltip within 500 milliseconds
+		          fixed: true,
+		          delay: 500
+		     }
+		});	
+		
 		var optionsFullsize = {
 				//  Overridden for Specific elements like Chart Title and X and Y Axis labels
 				fontSize: PeptideLengthsCHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.

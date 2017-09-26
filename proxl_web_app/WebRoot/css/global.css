@@ -2728,9 +2728,11 @@ body.view-qc-page .help-image-for-qc-chart { max-height: 12px; }
 
 /* Class for tooltips on ? with circle on QC pages */
 /* Class 'qtip' is also on element (from jquery.qtip.min.css) which contains font-size  */
-body.view-qc-page .help-for-qc-chart-tooltip { min-width: 300px; font-size: 14px; line-height: 20px; background-color: white; border-style: solid; border-color: #A55353 }
+body.view-qc-page .help-for-qc-chart-tooltip { min-width: 300px; font-size: 14px; line-height: 20px; background-color: white; border-style: solid; border-width: 4px; border-color: #A55353 }
 
 body.view-qc-page .help-for-qc-chart-tooltip-wide { min-width: 450px; }
+
+body.view-qc-page .qc-chart-boxplot-whole-chart-tooltip { min-width: 250px; max-width: 1000px; font-size: 14px; line-height: 20px; background-color: white; border-style: solid; border-width: 4px; border-color: #A55353 } /* qtip2 has default max-width: 280px;  */
 
 /*
 This would change qtip style for all tooltips on the qc page
@@ -2739,3 +2741,4 @@ body.view-qc-page .qtip-default { background-color: white; border-style: solid; 
 From above
 .qtip-default{border-width:1px;border-style:solid;border-color:#AAAAAA;background-color:#FFF0F0;color:#000000;font-size:10pt;}
 */
+

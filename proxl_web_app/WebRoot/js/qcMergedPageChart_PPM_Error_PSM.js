@@ -257,7 +257,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		var hash_json_Contents_COPY = $.extend( true /*deep*/,  {}, hash_json_Contents );
 
 		// Add cells for selected link types
-		selectedLinkTypes.forEach( function ( currentArrayValue, index, array ) {
+		selectedLinkTypes.forEach( function ( currentArrayValue, indexForLinkType, array ) {
 			var selectedLinkType = currentArrayValue;
 
 			//  Add empty chart with Loading message
@@ -280,6 +280,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 
 			this.load_PPM_Error_For_PSMs_HistogramForLinkType( {  
 				selectedLinkType : selectedLinkType,
+				indexForLinkType : indexForLinkType,
 				hash_json_Contents_COPY : hash_json_Contents_COPY,
 				$chart_outer_container_jq : $chart_outer_container_jq
 			});
@@ -297,6 +298,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		var objectThis = this;
 
 		var selectedLinkType = params.selectedLinkType;
+		var indexForLinkType = params.indexForLinkType;
 		var hash_json_Contents_COPY = params.hash_json_Contents_COPY;
 		var $chart_outer_container_jq = params.$chart_outer_container_jq; 
 
@@ -332,6 +334,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 								ajaxResponseData : ajaxResponseData, 
 								ajaxRequestData : ajaxRequestData,
 								selectedLinkType : selectedLinkType,
+								indexForLinkType : indexForLinkType,
 								$chart_outer_container_jq : $chart_outer_container_jq
 						};
 						objectThis.load_PPM_Error_For_PSMs_HistogramResponse( responseParams );
@@ -368,6 +371,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		var ajaxResponseData = params.ajaxResponseData;
 		var ajaxRequestData = params.ajaxRequestData;
 		var selectedLinkType = params.selectedLinkType;
+		var indexForLinkType = params.indexForLinkType;
 		var $chart_outer_container_jq = params.$chart_outer_container_jq;
 
 		var results = ajaxResponseData.results;
@@ -403,7 +407,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 
 			var colorAndbarColor = this.getColorAndBarColorFromLinkType( linkType );
 
-			this._add_PPM_Error_For_PSMs_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, $chartContainer : $chart_container_jq } );
+			this._add_PPM_Error_For_PSMs_Chart( { entryForLinkType: entryForLinkType, colorAndbarColor: colorAndbarColor, chartIndex : indexForLinkType, $chartContainer : $chart_container_jq } );
 
 			//  Download Data Setup
 			
@@ -464,6 +468,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 	this._add_PPM_Error_For_PSMs_Chart = function( params ) {
 		var entryForLinkType = params.entryForLinkType;
 		var colorAndbarColor = params.colorAndbarColor;
+		var chartIndex = params.chartIndex;  //  zero based
 		var $chartContainer = params.$chartContainer;
 
 		var linkType = entryForLinkType.linkType;
@@ -500,6 +505,11 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		chartData.push( chartDataHeaderEntry );
 		
 		var _CHART_SIGNIFICANT_DIGITS = 5;
+
+		var searchCountPlusOne = _project_search_ids.length + 1;
+		
+		var wholeChartTooltipData = [];
+
 		
 		var maxCount = 0;
 
@@ -512,6 +522,9 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 			
 			var searchId = dataForChartPerSearchIdEntry.searchId;
 
+			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
+
+			
 			var chartIntervalMaxString = dataForChartPerSearchIdEntry.chartIntervalMax.toPrecision( _CHART_SIGNIFICANT_DIGITS );
 			var thirdQuartileString = dataForChartPerSearchIdEntry.thirdQuartile.toPrecision( _CHART_SIGNIFICANT_DIGITS );
 			var medianString = dataForChartPerSearchIdEntry.median.toPrecision( _CHART_SIGNIFICANT_DIGITS );
@@ -520,16 +533,26 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 			
 
 			var mainBoxPlotTooltip =
-					"Search Id: " + searchId + "\n\n" +
+					"Search Number: " + searchId + "\n\n" +
 					"Max: " + chartIntervalMaxString + "\n" +
 					"Third Quartile: " + thirdQuartileString + "\n" +
 					"Median: " + medianString + "\n" +
 					"First Quartile: " + firstQuartileString + "\n" +
 					"Min: " + chartIntervalMinString
 					;
-			
-			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
 
+			var wholeChartTooltipEntry = {
+					searchId : searchId,
+					max : chartIntervalMaxString,
+					thirdQuartile : thirdQuartileString,
+					median : medianString,
+					firstQuartile : firstQuartileString,
+					min : chartIntervalMinString,
+					searchColor : colorForSearchEntry
+			};
+			
+			wholeChartTooltipData.push( wholeChartTooltipEntry );
+			
 			var chartEntry = [ 
 				{ v: searchId.toString(), f: searchId.toString() }, //  X axis label as well as for tooltip
 				//  First list for charting for tool tips
@@ -557,9 +580,58 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		}, this /* passed to function as this */ );
 		
 
+		var chartTitle = 'Distribution of Precursor error (' + linkType + ")";
+		
+		
+		var $boxplot_chart_whole_chart_tooltip_template = $("#boxplot_chart_whole_chart_tooltip_template");
+		if ( $boxplot_chart_whole_chart_tooltip_template.length === 0 ) {
+			throw Error( "HTML element not found for id 'boxplot_chart_whole_chart_tooltip_template'" );
+		}
+		var handlebarsSource_boxplot_chart_whole_chart_tooltip_template = $boxplot_chart_whole_chart_tooltip_template.html();
+		
+		var _handlebarsTemplate_boxplot_chart_whole_chart_tooltip_template = Handlebars.compile( handlebarsSource_boxplot_chart_whole_chart_tooltip_template );
+
+		var dataForTable = { perSearchDataList : wholeChartTooltipData, chartTitle : chartTitle, searchCountPlusOne : searchCountPlusOne };
+		
+		var htmlForTooltip = _handlebarsTemplate_boxplot_chart_whole_chart_tooltip_template( dataForTable );
+		
+		var qtipWholeChartPosition = {
+				viewport: $(window)
+		}
+
+		if ( chartIndex == 0 ) { // zero based
+			//  Left chart, attach to left edge of chart, tooltip grows to right
+			qtipWholeChartPosition.my = 'bottom left';
+			qtipWholeChartPosition.at = 'top left';
+
+		} else if ( chartIndex == 1 ) {
+			//  Center chart, attach to center of chart
+			qtipWholeChartPosition.my = 'bottom center';
+			qtipWholeChartPosition.at = 'top center';
+
+		} else {
+			//  Right chart, attach to right edge of chart, tooltip grows to left
+			qtipWholeChartPosition.my = 'bottom right';
+			qtipWholeChartPosition.at = 'top right';
+		}
+
+		// Add tooltip to whole chart
+		$chartContainer.qtip( {
+			content: {
+				text: htmlForTooltip
+			},
+			style: {
+				classes: 'qc-chart-boxplot-whole-chart-tooltip' // add this class to the tool tip
+			},
+			position: qtipWholeChartPosition,
+			hide: {  //  Allow user to mouse into tooltip within 500 milliseconds
+		          fixed: true,
+		          delay: 500
+		     }
+		});	
+		
 		var barColors = [ colorAndbarColor.color ]; // must be an array
 
-		var chartTitle = 'Distribution of Precursor error (' + linkType + ")";
 		var optionsFullsize = {
 				//  Overridden for Specific elements like Chart Title and X and Y Axis labels
 				fontSize: _PPM_Error_For_PSMs_CHART_GLOBALS._CHART_DEFAULT_FONT_SIZE,  //  Default font size - using to set font size for tick marks.
