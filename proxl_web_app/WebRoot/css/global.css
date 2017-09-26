@@ -2732,7 +2732,8 @@ body.view-qc-page .help-for-qc-chart-tooltip { min-width: 300px; font-size: 14px
 
 body.view-qc-page .help-for-qc-chart-tooltip-wide { min-width: 450px; }
 
-body.view-qc-page .qc-chart-boxplot-whole-chart-tooltip { min-width: 250px; max-width: 1000px; font-size: 14px; line-height: 20px; background-color: white; border-style: solid; border-width: 4px; border-color: #A55353 } /* qtip2 has default max-width: 280px;  */
+/* qtip2 has default max-width: 280px;  */
+body.view-qc-page .qc-chart-boxplot-whole-chart-tooltip { min-width: 250px; max-width: 3000px; font-size: 14px; line-height: 20px; background-color: white; border-style: solid; border-width: 4px; border-color: #A55353 } 
 
 /*
 This would change qtip style for all tooltips on the qc page

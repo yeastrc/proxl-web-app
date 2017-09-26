@@ -602,9 +602,9 @@ var QCMergedPageChart_Peptide_Lengths = function() {
 				classes: 'qc-chart-boxplot-whole-chart-tooltip' // add this class to the tool tip
 			},
 			position: qtipWholeChartPosition,
-			hide: {  //  Allow user to mouse into tooltip within 500 milliseconds
+			hide: {  //  Allow user to mouse into tooltip within 100 milliseconds
 		          fixed: true,
-		          delay: 500
+		          delay: 100
 		     }
 		});	
 		
