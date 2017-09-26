@@ -524,7 +524,7 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
 
 			var chartEntry = [ 
-				{ v: searchId.toString(), f: 'Search Id: ' + searchId },
+				{ v: searchId.toString(), f: searchId.toString() }, //  X axis label as well as for tooltip
 				//  First list for charting for tool tips
 				{ v: dataForChartPerSearchIdEntry.chartIntervalMax , f: '\nMax Value: ' + chartIntervalMaxString },
 				{ v: dataForChartPerSearchIdEntry.chartIntervalMin , f: '\nMin Value: ' + chartIntervalMinString },

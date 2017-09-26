@@ -531,7 +531,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 			var colorForSearchEntry = _colorsPerSearch[ indexForProjectSearchId ];
 
 			var chartEntry = [ 
-				{ v: searchId.toString(), f: 'Search Id: ' + searchId },
+				{ v: searchId.toString(), f: searchId.toString() }, //  X axis label as well as for tooltip
 				//  First list for charting for tool tips
 				{ v: dataForChartPerSearchIdEntry.chartIntervalMax , f: '\nMax Value: ' + chartIntervalMaxString },
 				{ v: dataForChartPerSearchIdEntry.chartIntervalMin , f: '\nMin Value: ' + chartIntervalMinString },
