@@ -15,7 +15,8 @@ public enum SearchRecordStatus {
     IMPORT_COMPLETE_VIEW( 2 ),
     IMPORT_FAIL( 3 ),
     IMPORT_CANCELED_INCOMPLETE( 4 ),
-    MARKED_FOR_DELETION( 5 );
+    MARKED_FOR_DELETION( 5 ),
+	DELETION_IN_PROGRESS( 6 );
 	
     private final int value;
 
