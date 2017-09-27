@@ -166,7 +166,7 @@ public class ProjectSearch_Shared_DAO {
 	 * @param statusId
 	 * @throws Exception
 	 */
-	public void updateProjectIdForProjectSearch( int projectSearchId, int statusId ) throws Exception {
+	public void updateStatusId( int projectSearchId, int statusId ) throws Exception {
 		
 		Connection dbConnection = null;
 		try {
