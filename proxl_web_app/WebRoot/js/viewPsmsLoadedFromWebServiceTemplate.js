@@ -75,9 +75,9 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		var $topTRelement = params.$topTRelement;
 		var $clickedElement = params.$clickedElement;
 		var dataLoaded = $topTRelement.data( _DATA_LOADED_DATA_KEY );
-//		if ( dataLoaded ) {
-//			return;  //  EARLY EXIT  since data already loaded. 
-//		}
+		if ( dataLoaded ) {
+			return;  //  EARLY EXIT  since data already loaded. 
+		}
 		var initial_scan_id = $clickedElement.attr( "data-initial_scan_id" );
 		var reported_peptide_id = $clickedElement.attr( "data-reported_peptide_id" );
 		var project_search_id = $clickedElement.attr( "data-project_search_id" );
