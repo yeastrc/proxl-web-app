@@ -75,9 +75,9 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		var $topTRelement = params.$topTRelement;
 		var $clickedElement = params.$clickedElement;
 		var dataLoaded = $topTRelement.data( _DATA_LOADED_DATA_KEY );
-		if ( dataLoaded ) {
-			return;  //  EARLY EXIT  since data already loaded. 
-		}
+//		if ( dataLoaded ) {
+//			return;  //  EARLY EXIT  since data already loaded. 
+//		}
 		var initial_scan_id = $clickedElement.attr( "data-initial_scan_id" );
 		var reported_peptide_id = $clickedElement.attr( "data-reported_peptide_id" );
 		var project_search_id = $clickedElement.attr( "data-project_search_id" );
@@ -573,6 +573,9 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		}
 		
 		var maxBucketCount = 0;
+		
+		var bucketSizeMinutes = bucketSize / 60;
+		var bucketSizeMinutesHalf = bucketSizeMinutes / 2;
 
 		//  chart data for Google charts
 		var chartData = [];
@@ -588,17 +591,32 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 				maxBucketCount = bucketCount;
 			}
 			//  With Tooltip
-			var approxBucketStart = minRetentionTime + ( index * bucketSize );
-			var approxBucketEnd = minRetentionTime + ( ( index + 1 ) * bucketSize );
-			var approxBucketCenter = ( approxBucketStart + ( bucketSize / 2 ) ) / 60 ;
-			var approxBucketStartMinutesString = ( approxBucketStart / 60 ).toFixed( 2 );
-			var approxBucketEndMinutesString = ( approxBucketEnd / 60 ).toFixed( 2 );
+			var approxBucketStart = ( minRetentionTime + ( index * bucketSize ) ) / 60;
+			var approxBucketEnd = ( minRetentionTime + ( ( index + 1 ) * bucketSize ) ) / 60;
+			var approxBucketCenter = ( approxBucketStart + ( bucketSizeMinutesHalf ) );
+			var approxBucketStartMinutesString = ( approxBucketStart).toFixed( 2 );
+			var approxBucketEndMinutesString = ( approxBucketEnd ).toFixed( 2 );
 			
 			var tooltip = "<div style='margin: 10px;'>PSM count: " + bucketCount + 
 			"<br>retention time approximately " + approxBucketStartMinutesString + 
 			" to " + approxBucketEndMinutesString + 
 			"</div>";
-			chartData.push( [ approxBucketCenter, bucketCount, tooltip 
+			
+			var chartXaxisValue = approxBucketCenter;
+			
+			if ( maxMinusMinRetentionTime === 0 ) {
+				//  Only 1 value for retention time
+				
+				//  Convert to string so Google Chart will display
+				chartXaxisValue = approxBucketStart.toFixed( 2 );
+				
+				//  Change tooltip
+				tooltip = "<div style='margin: 10px;'>PSM count: " + bucketCount + 
+				"<br>retention time approximately " + approxBucketStartMinutesString + 
+				"</div>";
+			}
+			
+			chartData.push( [ chartXaxisValue, bucketCount, tooltip 
 //				,  'stroke-width: 2;stroke-color: blue; '
 				] );
 		}
