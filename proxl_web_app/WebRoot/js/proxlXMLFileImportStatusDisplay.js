@@ -38,10 +38,12 @@ ProxlXMLFileImportStatusDisplay.prototype.CONSTANTS = {
 //		UPDATE_PENDING_COUNT_DELAY : 60 * 1000  //  Check every 60 seconds
 //		,
 		
+		//  Remove Auto Refresh
+		
 		//  Auto Refresh for certain status values
 
-		AUTO_REFRESH_DELAY : 60 * 1000  //  In Milliseconds  Check every 60 seconds
-		,
+//		AUTO_REFRESH_DELAY : 60 * 1000  //  In Milliseconds  Check every 60 seconds
+//		,
 		
 //		AUTO_REFRESH_DELAY : 3 * 1000  //  In Milliseconds  Check every 3 seconds
 //		,
@@ -567,16 +569,17 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCountProces
 
 	var uploadDataShowing = $("#upload_data_top_level_container").data( this.CONSTANTS.DATA_ATTR_FOR_UPLOAD_DATA_SHOWING );
 	
-	if ( uploadDataShowing &&
-			pendingItemsList && pendingItemsList.length > 0 ) {
-		
-		//  Auto Refresh after delay
-
-		this.autoRefreshTimerId = setTimeout( function() {
-			objectThis.autoRefreshTimerId = undefined;
-			objectThis.populateDataBlockAndPendingCount( { fromAutoRefresh : true } );
-		}, this.CONSTANTS.AUTO_REFRESH_DELAY );
-	}
+	//  Remove auto-refresh since now that closes any detail items the user had showing
+//	if ( uploadDataShowing &&
+//			pendingItemsList && pendingItemsList.length > 0 ) {
+//		
+//		//  Auto Refresh after delay
+//
+//		this.autoRefreshTimerId = setTimeout( function() {
+//			objectThis.autoRefreshTimerId = undefined;
+//			objectThis.populateDataBlockAndPendingCount( { fromAutoRefresh : true } );
+//		}, this.CONSTANTS.AUTO_REFRESH_DELAY );
+//	}
 };
 
 

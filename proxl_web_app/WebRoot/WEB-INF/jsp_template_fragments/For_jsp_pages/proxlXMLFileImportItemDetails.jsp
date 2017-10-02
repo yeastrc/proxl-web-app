@@ -22,7 +22,7 @@ containing <script> id:  proxl_xml_import_item_row_details_template
 		style="padding-top: 10px; padding-left: 25px;">
 			
 	 <div >
-	    <table style="width: 100%">
+	    <table >
 		  <tr>
 	  	 	<td class="label-cell">File:</td>
 			<td>{{ uploadedFilename }}</td>
