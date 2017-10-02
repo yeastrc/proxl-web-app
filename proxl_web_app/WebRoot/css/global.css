@@ -659,8 +659,6 @@ body.project-page .upload-search-tooltip {
 	max-width: 800px;
 }	
 
-body.project-page .upload-search-tooltip-table { max-width: 780px; }
-
 body.project-page .upload-search-tooltip-table td { vertical-align: top; padding-top: 2px; padding-bottom: 2px; }
 
 body.project-page .upload-search-tooltip-table .label-cell { white-space: nowrap; padding-right: 10px; }

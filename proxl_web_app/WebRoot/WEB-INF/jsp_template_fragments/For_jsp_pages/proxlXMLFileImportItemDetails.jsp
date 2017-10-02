@@ -21,8 +21,8 @@ containing <script> id:  proxl_xml_import_item_row_details_template
   <td colspan="{{ numColsMinusTwo }}" <%-- colspan so occupies all but first column --%>
 		style="padding-top: 10px; padding-left: 25px;">
 			
-	 <div > <%-- width: applied here doesn't work.  set width on tooltip using css.   style="width: 400px;" --%>
-	    <table class="upload-search-tooltip-table">
+	 <div >
+	    <table style="width: 100%">
 		  <tr>
 	  	 	<td class="label-cell">File:</td>
 			<td>{{ uploadedFilename }}</td>
