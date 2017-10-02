@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
+import org.yeastrc.xlink.www.qc_data.scan_level_data.main.Scan_MS_1_IonCurrent_Histograms_CachedResultManager;
 import org.yeastrc.xlink.www.qc_data.scan_ms1_all_scan_intensity_heatmap.main.MS1_All_IntensityHeatmapImageCachedResultImageManager;
 
 /**
@@ -61,7 +62,8 @@ public class CachedDataInFileMgmtRegistration {
 	 * Array of classes to call "register()" on so they will call "register(...)" on this class.
 	 */
 	private final CachedDataInFileMgmtRegistrationIF[] classesToRegister = {
-		MS1_All_IntensityHeatmapImageCachedResultImageManager.getSingletonInstance()
+		MS1_All_IntensityHeatmapImageCachedResultImageManager.getSingletonInstance(),
+		Scan_MS_1_IonCurrent_Histograms_CachedResultManager.getSingletonInstance()
 	};
 
 	/**
@@ -107,9 +109,11 @@ public class CachedDataInFileMgmtRegistration {
 		addToOldUnusedPrefixesToRemove();
 		
 		log.warn( "INFO: Starting thread to run CachedDataInFileMgmtCleanupOnWebAppStartRunnable to clean up unused cached files." );
+		
 		CachedDataInFileMgmtCleanupOnWebAppStartRunnable cachedDataInFileMgmtCleanupOnWebAppStartRunnable =
 				CachedDataInFileMgmtCleanupOnWebAppStartRunnable.getNewInstance();
-		Thread thread = new Thread(cachedDataInFileMgmtCleanupOnWebAppStartRunnable);
+		
+		Thread thread = new Thread( cachedDataInFileMgmtCleanupOnWebAppStartRunnable );
 		thread.start();
 	}
 	

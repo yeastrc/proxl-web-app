@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.qc_data.scan_level_data.main.Scan_MS_1_IonCurrent_Histograms;
-import org.yeastrc.xlink.www.qc_data.scan_level_data.objects.Scan_MS_1_IonCurrent_HistogramsResult;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchIdScanFileIdCombinedRecordExistsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -36,7 +35,7 @@ public class QC_Scan_MS_1_IonCurrent_Histograms_Service {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getScan_MS_1_IonCurrent_Histograms") 
-	public QC_Scan_MS_1_IonCurrent_Histograms_WebserviceResult getMS_1_IonCurrent_Histograms( 
+	public byte[] getMS_1_IonCurrent_Histograms( 
 			@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
 			@QueryParam( "scan_file_id" ) Integer scanFileId,
 			@Context HttpServletRequest request )
@@ -156,13 +155,16 @@ public class QC_Scan_MS_1_IonCurrent_Histograms_Service {
 			    	        );
 			}
 
-			Scan_MS_1_IonCurrent_HistogramsResult scan_MS_1_IonCurrent_HistogramsResult =
+			byte[] resultsAsBytes = 
 					Scan_MS_1_IonCurrent_Histograms.getInstance()
 					.getScan_MS_1_IonCurrent_HistogramsResult( scanFileId );
 
-			QC_Scan_MS_1_IonCurrent_Histograms_WebserviceResult webserviceResult = new QC_Scan_MS_1_IonCurrent_Histograms_WebserviceResult();
-			webserviceResult.scan_MS_1_IonCurrent_HistogramsResult = scan_MS_1_IonCurrent_HistogramsResult;
-			return webserviceResult;
+//			QC_Scan_MS_1_IonCurrent_Histograms_WebserviceResult webserviceResult = new QC_Scan_MS_1_IonCurrent_Histograms_WebserviceResult();
+//			webserviceResult.scan_MS_1_IonCurrent_HistogramsResult = scan_MS_1_IonCurrent_HistogramsResult;
+//			return webserviceResult;
+			
+			
+			return resultsAsBytes;
 			
 		} catch ( WebApplicationException e ) {
 			throw e;
@@ -177,21 +179,23 @@ public class QC_Scan_MS_1_IonCurrent_Histograms_Service {
 		}
 	}
 	
-	/**
-	 * Webservice returned object
-	 *
-	 */
-	public static class QC_Scan_MS_1_IonCurrent_Histograms_WebserviceResult {
-
-		private Scan_MS_1_IonCurrent_HistogramsResult scan_MS_1_IonCurrent_HistogramsResult;
-		
-		public Scan_MS_1_IonCurrent_HistogramsResult getScan_MS_1_IonCurrent_HistogramsResult() {
-			return scan_MS_1_IonCurrent_HistogramsResult;
-		}
-		public void setScan_MS_1_IonCurrent_HistogramsResult(
-				Scan_MS_1_IonCurrent_HistogramsResult scan_MS_1_IonCurrent_HistogramsResult) {
-			this.scan_MS_1_IonCurrent_HistogramsResult = scan_MS_1_IonCurrent_HistogramsResult;
-		}
-		
-	}
+//	Not used since directly returning byte[] of JSON from internal code
+//	
+//	/**
+//	 * Webservice returned object
+//	 *
+//	 */
+//	public static class QC_Scan_MS_1_IonCurrent_Histograms_WebserviceResult {
+//
+//		private Scan_MS_1_IonCurrent_HistogramsResult scan_MS_1_IonCurrent_HistogramsResult;
+//		
+//		public Scan_MS_1_IonCurrent_HistogramsResult getScan_MS_1_IonCurrent_HistogramsResult() {
+//			return scan_MS_1_IonCurrent_HistogramsResult;
+//		}
+//		public void setScan_MS_1_IonCurrent_HistogramsResult(
+//				Scan_MS_1_IonCurrent_HistogramsResult scan_MS_1_IonCurrent_HistogramsResult) {
+//			this.scan_MS_1_IonCurrent_HistogramsResult = scan_MS_1_IonCurrent_HistogramsResult;
+//		}
+//		
+//	}
 }

@@ -17,14 +17,24 @@ import org.yeastrc.xlink.www.qc_data.scan_level_data.objects.Scan_MS_1_IonCurren
 import org.yeastrc.xlink.www.qc_data.scan_level_data.objects.Scan_MS_1_IonCurrent_HistogramsResult.Scan_MS_1_IonCurrent_HistogramsResultChartBucket;
 import org.yeastrc.xlink.www.qc_data.scan_level_data.objects.Scan_MS_1_IonCurrent_HistogramsResult.Scan_MS_1_IonCurrent_HistogramsResultForChartType;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
- * 
+ * Create JSON for MS 1 Histograms for MS 1 Ion Current VS Retention Time and M/Z
  *
  */
 public class Scan_MS_1_IonCurrent_Histograms {
 
 	private static final Logger log = Logger.getLogger( Scan_MS_1_IonCurrent_Histograms.class );
 
+	/**
+	 *  !!!!!!!!!!!   VERY IMPORTANT  !!!!!!!!!!!!!!!!!!!!
+	 * 
+	 *  Increment this value whenever change the resulting image since Caching the resulting image
+	 */
+	static final int VERSION_FOR_CACHING = 1;
+	
+	
 	/**
 	 * private constructor
 	 */
@@ -41,14 +51,28 @@ public class Scan_MS_1_IonCurrent_Histograms {
 	 * @return
 	 * @throws Exception 
 	 */
-	public Scan_MS_1_IonCurrent_HistogramsResult getScan_MS_1_IonCurrent_HistogramsResult( int scanFileId ) throws Exception {
+	public byte[] getScan_MS_1_IonCurrent_HistogramsResult( int scanFileId ) throws Exception {
+
+		{
+			byte[] resultsAsBytes = 
+					Scan_MS_1_IonCurrent_Histograms_CachedResultManager.getSingletonInstance()
+					.retrieveDataFromCache( scanFileId );
+
+			if ( resultsAsBytes != null ) {
+				//  Have Cached data so return it
+				return resultsAsBytes;  //  EARLY RETURN
+			}
+		}
+		
+		//  Jackson JSON Mapper object for JSON deserialization and serialization
+		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
 		
 		MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot =
 				getMS1_IntensitiesBinnedSummedMapToJSONRoot( scanFileId );
 
 		if ( ms1_IntensitiesBinnedSummedMapToJSONRoot == null ) {
 			//  No data found for scanFileId so return
-			return new Scan_MS_1_IonCurrent_HistogramsResult();
+			return jacksonJSON_Mapper.writeValueAsBytes( new Scan_MS_1_IonCurrent_HistogramsResult() );
 		}
 
 		MS1_IntensitiesBinnedSummed_Summary_Data_ToJSONRoot summaryData =
@@ -115,7 +139,14 @@ public class Scan_MS_1_IonCurrent_Histograms {
 		Scan_MS_1_IonCurrent_HistogramsResult result = new Scan_MS_1_IonCurrent_HistogramsResult();
 		result.setDataForRetentionTimeChart( dataForRetentionTimeChart );
 		result.setDataFor_M_Over_Z_Chart( dataFor_M_Over_Z_Chart );
-		return result;
+		
+
+		byte[] resultsAsBytes = jacksonJSON_Mapper.writeValueAsBytes( result );
+		
+		Scan_MS_1_IonCurrent_Histograms_CachedResultManager.getSingletonInstance()
+		.saveDataToCache( scanFileId, resultsAsBytes );
+		
+		return resultsAsBytes;
 	}
 
 	

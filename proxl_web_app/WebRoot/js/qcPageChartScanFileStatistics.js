@@ -796,7 +796,8 @@ var QCPageChartScanFileStatistics = function() {
 		var ajaxRequestData = params.ajaxRequestData;
 		var scanFileId = params.scanFileId;
 
-		var scan_MS_1_IonCurrent_HistogramsResult = ajaxResponseData.scan_MS_1_IonCurrent_HistogramsResult;
+//		var scan_MS_1_IonCurrent_HistogramsResult = ajaxResponseData.scan_MS_1_IonCurrent_HistogramsResult;
+		var scan_MS_1_IonCurrent_HistogramsResult = ajaxResponseData;
 
 		var dataForRetentionTimeChart = scan_MS_1_IonCurrent_HistogramsResult.dataForRetentionTimeChart;
 		var dataFor_M_Over_Z_Chart = scan_MS_1_IonCurrent_HistogramsResult.dataFor_M_Over_Z_Chart;
