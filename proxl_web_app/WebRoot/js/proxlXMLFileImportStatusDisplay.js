@@ -75,11 +75,8 @@ ProxlXMLFileImportStatusDisplay.prototype.initOnDocumentReady  = function(  ) {
 	try {
 
 		$("#upload_data_expand_show_data").click(function(eventObject) {
-
 			try {
-
 				var clickThis = this;
-
 				$( this ).hide();
 				$("#upload_data_collapse_hide_data").show();
 				$("#upload_data_main_collapsable_jq").show();
@@ -97,11 +94,8 @@ ProxlXMLFileImportStatusDisplay.prototype.initOnDocumentReady  = function(  ) {
 		});
 
 		$("#upload_data_collapse_hide_data").click(function(eventObject) {
-
 			try {
-
 //				var clickThis = this;
-
 				$( this ).hide();
 				$("#upload_data_expand_show_data").show();
 				$("#upload_data_main_collapsable_jq").hide();
@@ -136,9 +130,7 @@ ProxlXMLFileImportStatusDisplay.prototype.initOnDocumentReady  = function(  ) {
 
 
 		$(".proxl_xml_file_upload_complete_successfully_overlay_cancel_parts_jq").click(function(eventObject) {
-
 			try {
-
 				var clickThis = this;
 
 				objectThis.cancelClicked( clickThis, eventObject );
@@ -153,9 +145,7 @@ ProxlXMLFileImportStatusDisplay.prototype.initOnDocumentReady  = function(  ) {
 
 
 		$("#proxl_xml_file_upload_complete_successfully_refresh_page_button").click(function(eventObject) {
-
 			try {
-
 				var clickThis = this;
 
 				objectThis.refreshPageClicked( clickThis, eventObject );
@@ -176,9 +166,7 @@ ProxlXMLFileImportStatusDisplay.prototype.initOnDocumentReady  = function(  ) {
 
 
 		$("#upload_data_pending_items_show_link").click(function(eventObject) {
-
 			try {
-
 				$( this ).hide();
 				$("#upload_data_pending_items_container").show();
 				$("#upload_data_pending_items_hide_link").show();
@@ -192,9 +180,7 @@ ProxlXMLFileImportStatusDisplay.prototype.initOnDocumentReady  = function(  ) {
 		});
 
 		$("#upload_data_pending_items_hide_link").click(function(eventObject) {
-
 			try {
-
 				$( this ).hide();
 				$("#upload_data_pending_items_container").hide();
 				$("#upload_data_pending_items_show_link").show();
@@ -209,9 +195,7 @@ ProxlXMLFileImportStatusDisplay.prototype.initOnDocumentReady  = function(  ) {
 
 
 		$("#upload_data_history_items_show_link").click(function(eventObject) {
-
 			try {
-
 				$( this ).hide();
 				$("#upload_data_history_items_container").show();
 				$("#upload_data_history_items_hide_link").show();
@@ -227,9 +211,7 @@ ProxlXMLFileImportStatusDisplay.prototype.initOnDocumentReady  = function(  ) {
 		});
 
 		$("#upload_data_history_items_hide_link").click(function(eventObject) {
-
 			try {
-
 				$( this ).hide();
 				$("#upload_data_history_items_container").hide();
 				$("#upload_data_history_items_show_link").show();
@@ -244,7 +226,26 @@ ProxlXMLFileImportStatusDisplay.prototype.initOnDocumentReady  = function(  ) {
 			}
 		});
 
-
+		$("#upload_data_pending_items_show_all_details_link").click(function(eventObject) {
+			try {
+				objectThis.showAllItemDetails({ clickedThis : this } );
+				eventObject.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+		
+		$("#upload_data_history_items_show_all_details_link").click(function(eventObject) {
+			try {
+				objectThis.showAllItemDetails({ clickedThis : this } );
+				eventObject.preventDefault();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+		
 
 //		this.populatePendingCount();  do initial population in the Struts Action instead 
 
@@ -350,37 +351,42 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCount = fun
 	//  Compile needed Handlebars Templates
 	
 	if ( this.handlebarsTemplate_proxl_xml_import_item_template === undefined ) {
-
 		var handlebarsSource_proxl_xml_import_item_template = $( "#proxl_xml_import_item_template" ).html();
-
 		if ( handlebarsSource_proxl_xml_import_item_template === undefined ) {
 			throw Error( "handlebarsSource_proxl_xml_import_item_template === undefined" );
 		}
 		if ( handlebarsSource_proxl_xml_import_item_template === null ) {
 			throw Error( "handlebarsSource_proxl_xml_import_item_template === null" );
 		}
-
 		this.handlebarsTemplate_proxl_xml_import_item_template = Handlebars.compile( handlebarsSource_proxl_xml_import_item_template );
 	}
-	
 
-	if ( this.handlebarsTemplate_proxl_xml_import_item_tooltip_template === undefined ) {
-
-		var handlebarsSource_proxl_xml_import_item_tooltip_template = $( "#proxl_xml_import_item_tooltip_template" ).html();
-
-		if ( handlebarsSource_proxl_xml_import_item_tooltip_template === undefined ) {
-			throw Error( "handlebarsSource_proxl_xml_import_item_tooltip_template === undefined" );
+	if ( this.handlebarsTemplate_proxl_xml_import_item_separator_template === undefined ) {
+		var handlebarsSource_proxl_xml_import_item_separator_template = $( "#proxl_xml_import_item_separator_template" ).html();
+		if ( handlebarsSource_proxl_xml_import_item_separator_template === undefined ) {
+			throw Error( "handlebarsSource_proxl_xml_import_item_separator_template === undefined" );
 		}
-		if ( handlebarsSource_proxl_xml_import_item_tooltip_template === null ) {
-			throw Error( "handlebarsSource_proxl_xml_import_item_tooltip_template === null" );
+		if ( handlebarsSource_proxl_xml_import_item_separator_template === null ) {
+			throw Error( "handlebarsSource_proxl_xml_import_item_separator_template === null" );
 		}
+		this.handlebarsTemplate_proxl_xml_import_item_separator_template = Handlebars.compile( handlebarsSource_proxl_xml_import_item_separator_template );
+	}
 
-		this.handlebarsTemplate_proxl_xml_import_item_tooltip_template = Handlebars.compile( handlebarsSource_proxl_xml_import_item_tooltip_template );
+	if ( this.handlebarsTemplate_proxl_xml_import_item_row_details_template === undefined ) {
+		var handlebarsSource_proxl_xml_import_item_row_details_template = $( "#proxl_xml_import_item_row_details_template" ).html();
+		if ( handlebarsSource_proxl_xml_import_item_row_details_template === undefined ) {
+			throw Error( "handlebarsSource_proxl_xml_import_item_row_details_template === undefined" );
+		}
+		if ( handlebarsSource_proxl_xml_import_item_row_details_template === null ) {
+			throw Error( "handlebarsSource_proxl_xml_import_item_row_details_template === null" );
+		}
+		this.handlebarsTemplate_proxl_xml_import_item_row_details_template = Handlebars.compile( handlebarsSource_proxl_xml_import_item_row_details_template );
 	}
 	
-	
-	
+
 };
+
+
 
 ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCountProcessResponse  = function( params ) {
 
@@ -397,25 +403,16 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCountProces
 	var completeSuccessTrackingIdList = responseData.completeSuccessTrackingIdList;
 	
 	if ( pendingCount > 0 ) {
-		
-		
 	} else {
-		
-		
 	}
 	
 	$("#upload_data_pending_number").text( pendingCount );
 	$("#upload_data_pending_block").show();
 	
-	
-
-	
 	var submit_process_date_time_jqMaxWidth = 0;
 	
 	var $submit_process_date_time_jq_Pending = null;
 	var $submit_process_date_time_jq_History = null;
-	
-	
 	
 	///  Process pendingItemsList
 	
@@ -424,22 +421,19 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCountProces
 		//  No Pending to display
 		
 //		$("#upload_data_pending_items_block").hide();
-		
 
 		$("#upload_data_pending_items_block").show();
 		
-		$("#upload_data_pending_items_table").hide();
+		$("#upload_data_pending_items_outer_container").hide();
 		$("#upload_data_pending_items_no_pending_text").show();
-		
-		
 		
 	} else {
 	
 		//  Have Pending to display
-
+		
 		$("#upload_data_pending_items_block").show();
 
-		$("#upload_data_pending_items_table").show();
+		$("#upload_data_pending_items_outer_container").show();
 		$("#upload_data_pending_items_no_pending_text").hide();
 
 		var $upload_data_pending_items_table = $("#upload_data_pending_items_table");
@@ -449,52 +443,22 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCountProces
 
 		$filename_status_cell_jq_ALL.qtip('destroy', true); // Immediately destroy all tooltips belonging to the selected elements
 
-
 		$upload_data_pending_items_table.empty();
 		
-		var $upload_data_item = null;
-
 		//  Add data to the page
 
 		for ( var dataIndex = 0; dataIndex < pendingItemsList.length ; dataIndex++ ) {
 
 			var dataItem = pendingItemsList[ dataIndex ];
 
-			var context = dataItem;
-
-			var html = this.handlebarsTemplate_proxl_xml_import_item_template( context );
-
-			$upload_data_item = $(html).appendTo( $upload_data_pending_items_table );
-
-			addToolTips( $upload_data_item );
-
-
-			var tooltipHtml = this.handlebarsTemplate_proxl_xml_import_item_tooltip_template( context );
-
-			var $filename_status_cell_jq = $upload_data_item.find(".filename_status_cell_jq");
-
-			$filename_status_cell_jq.qtip( {
-				content: {
-					text: tooltipHtml
-				},
-				style: {
-					classes: 'upload-search-tooltip' // add this class to the tool tip
-				},
-				position: {
-					my: 'bottom right',
-					at: 'top left',
-					viewport: $(window)
-				}
-			});	
+			this.populateDataBlockPendingOrHistoryItem( { dataItem : dataItem, $containerTable : $upload_data_pending_items_table } );
 		}
 
 		$submit_process_date_time_jq_Pending = $upload_data_pending_items_table.find(".submit_process_date_time_jq");
 		
 		var submit_process_date_time_jqWidth = $submit_process_date_time_jq_Pending.width();
-		
 
 		if ( submit_process_date_time_jqMaxWidth < submit_process_date_time_jqWidth ) {
-			
 			submit_process_date_time_jqMaxWidth = submit_process_date_time_jqWidth;
 		}
 	}
@@ -508,9 +472,7 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCountProces
 	if ( historyItemsList.length === 0 ) {
 		
 		//  No History to display
-		
 		$("#upload_data_history_items_block").hide();
-		
 		
 	} else {
 	
@@ -530,40 +492,11 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCountProces
 
 		$upload_data_history_items_table.empty();
 		
-		var $upload_data_item = null;
-
 		//  Add data to the page
 
 		for ( var dataIndex = 0; dataIndex < historyItemsList.length ; dataIndex++ ) {
-
 			var dataItem = historyItemsList[ dataIndex ];
-
-			var context = dataItem;
-
-			var html = this.handlebarsTemplate_proxl_xml_import_item_template( context );
-
-			$upload_data_item = $(html).appendTo( $upload_data_history_items_table );
-
-			addToolTips( $upload_data_item );
-
-
-			var tooltipHtml = this.handlebarsTemplate_proxl_xml_import_item_tooltip_template( context );
-
-			var $filename_status_cell_jq = $upload_data_item.find(".filename_status_cell_jq");
-
-			$filename_status_cell_jq.qtip( {
-				content: {
-					text: tooltipHtml
-				},
-				style: {
-					classes: 'upload-search-tooltip' // add this class to the tool tip
-				},
-				position: {
-					my: 'bottom right',
-					at: 'top left',
-					viewport: $(window)
-				}
-			});	
+			this.populateDataBlockPendingOrHistoryItem( { dataItem : dataItem, $containerTable : $upload_data_history_items_table } );
 		}
 		
 		$submit_process_date_time_jq_History = $upload_data_history_items_table.find(".submit_process_date_time_jq");
@@ -611,30 +544,18 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCountProces
 		}
 	}
 
-	
-	
-
 	if ( window.proxlXMLFileImportUserUpdates ) {
-		
 		try {
-	
 			window.proxlXMLFileImportUserUpdates.addClickHandlers();
 		} catch (e) {
-			
-			
 		}
 	}
 	
 	this.eval_completeSuccessTrackingIdList_forAdditions( completeSuccessTrackingIdList );
 	
-	
 	//  auto refresh for certain statuses
-	
-	
 	if ( this.autoRefreshTimerId ) {
-		
 		//  clear existing timer since refreshed data now
-
 		try {
 			clearTimeout( this.autoRefreshTimerId );
 		} catch (e) {
@@ -642,13 +563,9 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCountProces
 	}
 	
 	var $upload_data_pending_and_history_items_block = $("#upload_data_pending_and_history_items_block");
-	
 	$upload_data_pending_and_history_items_block.attr( this.CONSTANTS.DATA_ATTR_FOR_UPLOAD_DATA_LOADED, true );
-	
 
 	var uploadDataShowing = $("#upload_data_top_level_container").data( this.CONSTANTS.DATA_ATTR_FOR_UPLOAD_DATA_SHOWING );
-
-
 	
 	if ( uploadDataShowing &&
 			pendingItemsList && pendingItemsList.length > 0 ) {
@@ -656,14 +573,120 @@ ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockAndPendingCountProces
 		//  Auto Refresh after delay
 
 		this.autoRefreshTimerId = setTimeout( function() {
-
 			objectThis.autoRefreshTimerId = undefined;
-
 			objectThis.populateDataBlockAndPendingCount( { fromAutoRefresh : true } );
-
 		}, this.CONSTANTS.AUTO_REFRESH_DELAY );
 	}
 };
+
+
+ProxlXMLFileImportStatusDisplay.prototype.populateDataBlockPendingOrHistoryItem  = function( params ) {
+	var objectThis = this;
+	var dataItem = params.dataItem;
+	var $containerTable = params.$containerTable;
+
+	var context = dataItem;
+
+	var html = this.handlebarsTemplate_proxl_xml_import_item_template( context );
+
+	var $upload_data_item = $(html).appendTo( $containerTable );
+
+	var numCols = $upload_data_item.children("td").length;
+
+	addToolTips( $upload_data_item );
+
+	//  Add details row
+
+	context.numCols = numCols;
+	context.numColsMinusTwo = numCols - 2;
+	
+	var detailsHtml = this.handlebarsTemplate_proxl_xml_import_item_row_details_template( context );
+
+	var $upload_data_details_item = $(detailsHtml).appendTo( $containerTable );
+	
+	var $proxl_xml_import_item_expand_collapse_row_clickable_jq_All = $upload_data_item.find(".proxl_xml_import_item_expand_collapse_row_clickable_jq");
+
+	$proxl_xml_import_item_expand_collapse_row_clickable_jq_All.click(function(eventObject) {
+		try {
+			objectThis.processClickStatusRow( { clickedThis : this } );
+			
+			eventObject.preventDefault();
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	});
+
+
+	addToolTips( $upload_data_details_item );
+
+	//  Add divider row
+	
+	var html = this.handlebarsTemplate_proxl_xml_import_item_separator_template( context );
+
+	var $upload_divider_item = $(html).appendTo( $containerTable );
+
+};
+
+
+//////////
+
+ProxlXMLFileImportStatusDisplay.prototype.showAllItemDetails  = function( params ) {
+	var objectThis = this;
+	var clickedThis = params.clickedThis;
+	var $clickedThis = $( clickedThis );
+
+	var container_id = $clickedThis.attr("data-container_id");
+	
+	var $container = $( "#" + container_id );
+	
+	var $proxl_xml_import_item_row_jq_All = $container.find(".proxl_xml_import_item_row_jq");
+	$proxl_xml_import_item_row_jq_All.each( function() {
+		var $row = $( this );
+		objectThis.showHideStatusDetailsRow({ alwaysShowRow : true, $proxl_xml_import_item_row_jq : $row } );
+	} );
+};
+
+//////////
+
+ProxlXMLFileImportStatusDisplay.prototype.processClickStatusRow  = function( params ) {
+	var clickedThis = params.clickedThis;
+
+	var $clickedThis = $( clickedThis );
+	var $proxl_xml_import_item_row_jq = $clickedThis.closest(".proxl_xml_import_item_row_jq");
+
+	this.showHideStatusDetailsRow({ $proxl_xml_import_item_row_jq : $proxl_xml_import_item_row_jq } );
+};
+
+
+//////////
+
+ProxlXMLFileImportStatusDisplay.prototype.showHideStatusDetailsRow  = function( params ) {
+	var $proxl_xml_import_item_row_jq = params.$proxl_xml_import_item_row_jq;
+	var alwaysShowRow = params.alwaysShowRow;
+	
+	var $proxl_xml_import_item_expand_row_icon_jq = $proxl_xml_import_item_row_jq.find(".proxl_xml_import_item_expand_row_icon_jq");
+	var $proxl_xml_import_item_collapse_row_icon_jq = $proxl_xml_import_item_row_jq.find(".proxl_xml_import_item_collapse_row_icon_jq");
+	
+	var $proxl_xml_import_item_row_jq_NextRow = $proxl_xml_import_item_row_jq.next();
+	
+	if ( alwaysShowRow || $proxl_xml_import_item_expand_row_icon_jq.is(":visible") ) {
+		
+		$proxl_xml_import_item_row_jq_NextRow.show();
+		$proxl_xml_import_item_expand_row_icon_jq.hide();
+		$proxl_xml_import_item_collapse_row_icon_jq.show();
+		
+	} else {
+		
+		$proxl_xml_import_item_row_jq_NextRow.hide();
+		$proxl_xml_import_item_collapse_row_icon_jq.hide();
+		$proxl_xml_import_item_expand_row_icon_jq.show();
+	}
+	
+	
+};
+
 
 //////////
 

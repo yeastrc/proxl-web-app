@@ -59,8 +59,8 @@ ProxlXMLFileImportUserUpdates.prototype.addClickHandlers  = function(  ) {
 			var clickThis = this;
 
 			objectThis.cancelQueuedItemClicked( { cancelQueued : true, clickThis : clickThis, eventObject : eventObject } );
-
-			return false;
+			eventObject.preventDefault();
+			
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -75,8 +75,8 @@ ProxlXMLFileImportUserUpdates.prototype.addClickHandlers  = function(  ) {
 			var clickThis = this;
 
 			objectThis.cancelQueuedItemConfirmedClicked(  { cancelQueued : true, clickThis : clickThis, eventObject : eventObject } );
-
-			return false;
+			eventObject.preventDefault();
+			
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;

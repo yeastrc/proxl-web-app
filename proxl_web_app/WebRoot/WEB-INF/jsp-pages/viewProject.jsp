@@ -1188,7 +1188,8 @@
 				  
 				   <div   id="upload_data_pending_items_block"> <%-- Keep div with this id, used in JS --%>
 
-					<div style="font-size: 18px;">
+					<div >
+					  <span  style="font-size: 18px;">
 						<a  id="upload_data_pending_items_show_link"
 							class="tool_tip_attached_jq " 
 							data-tooltip="Show pending" 
@@ -1206,6 +1207,9 @@
 							></a>
 														
 							Pending
+					  </span>
+
+							
 					</div>
 					
 					<div class="top-level-label-bottom-border"></div>
@@ -1217,7 +1221,15 @@
 					  </div>
 					  
 					  
-					  <div style="">
+					  <div  id="upload_data_pending_items_outer_container">
+					   
+					   <div style="margin-bottom: 5px;"  >
+					  	 <a id="upload_data_pending_items_show_all_details_link" href="javascript:" class=" tool_tip_attached_jq "  
+					  		data-tooltip="Show details for all items" 
+					  		data-container_id="upload_data_pending_items_container" 
+					  		>[Expand All]</a>
+					   </div>
+					   
 					   <table id="upload_data_pending_items_table" style="width: 100%;">
 					   
 					   	<tr><td>LOADING</td></tr>
@@ -1230,7 +1242,8 @@
 
 				   <div   id="upload_data_history_items_block"> <%-- Keep div with this id, used in JS --%>
 
-					<div style="font-size: 18px;">
+					<div >
+					  <span  style="font-size: 18px;">
 						<a  id="upload_data_history_items_show_link"
 							class="tool_tip_attached_jq " 
 							data-tooltip="Show history" 
@@ -1247,14 +1260,24 @@
 							></a>
 								
 								History						
+					  </span>
 							
 					</div>				
 					
 					<div class="top-level-label-bottom-border"></div>	  
 					   
 					<div  id="upload_data_history_items_container" >
+
 						<%--  Spacer for icon --%>
-					  <div  style="padding-left: 17px;">
+					  <div  id="upload_data_history_items_table_outer_container" style="padding-left: 17px;">
+					   
+					   <div style="margin-bottom: 5px;" id="upload_data_history_items_show_all_details_container" >
+					  	 <a id="upload_data_history_items_show_all_details_link" href="javascript:"  class=" tool_tip_attached_jq "  
+					  		data-tooltip="Show details for all items" 
+					  		data-container_id="upload_data_history_items_container" 
+					  		>[Expand All]</a>
+					   </div>
+
 					   <table id="upload_data_history_items_table" style="width: 100%;" >
 					   
 					   	<tr><td>LOADING</td></tr>
@@ -1275,16 +1298,34 @@
 			</div>  <%--  END   <div id="upload_data_top_level_container"  class="top-level-container " > --%>
 
 
-					
-			<%--  Tooltip HTML --%>
-					
-			<script id="proxl_xml_import_item_tooltip_template"  type="text/x-handlebars-template">
+
+			<%--  Proxl XML File Import Entry Template --%>
+			<script id="proxl_xml_import_item_template"  type="text/x-handlebars-template">
+				<%--  include the template text  --%>
+				<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/proxlXMLFileImportItem.jsp" %>
+			</script>	
+			
+			<%--  Proxl XML File Import Entry Separator Template --%>
+			<script id="proxl_xml_import_item_separator_template"  type="text/x-handlebars-template">
+			 <tr>
+			  <td colspan="{{ numCols }}" <%-- colspan so occupies all but first column --%>
+					style="">
+
+				<div class="search-entry-bottom-border"></div>
+
+			  </td>
+			 </tr>
+			</script>
+			
+						
+			<%--  File Import Row 'expanded' to show details --%>
+			
+			<script id="proxl_xml_import_item_row_details_template"  type="text/x-handlebars-template">
 
 				<%--  include the template text  --%>
-				<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/proxlXMLFileImportItemTooltip.jsp" %>
+				<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/proxlXMLFileImportItemDetails.jsp" %>
 
 			</script>
-	
 
 
 			<!--  END  Upload Data -->
@@ -1994,11 +2035,6 @@
 			
 			<script type="text/javascript" src="${ contextPath }/js/proxlXMLFileImportStatusDisplay.js?x=${cacheBustValue}"></script>
 		
-			<%--  Proxl XML File Import Entry Template --%>
-			<script id="proxl_xml_import_item_template"  type="text/x-handlebars-template">
-				<%--  include the template text  --%>
-				<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/proxlXMLFileImportItem.jsp" %>
-			</script>	
 									
 		  </c:if> <%--  END test="${ authAccessLevel.assistantProjectOwnerAllowed }"  --%>
 		  

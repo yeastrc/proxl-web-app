@@ -47,8 +47,16 @@
   	  
  	</td>
   </c:if>
+  
+  <td class=" clickable proxl_xml_import_item_expand_collapse_row_clickable_jq " style="vertical-align: top; padding-top: 2px;">
+	  <img src="${ contextPath }/images/icon-expand-small.png" class=" proxl_xml_import_item_expand_row_icon_jq tool_tip_attached_jq "
+	  		data-tooltip="Show Details" >
+	  <img src="${ contextPath }/images/icon-collapse-small.png" class=" proxl_xml_import_item_collapse_row_icon_jq tool_tip_attached_jq " 
+	  		data-tooltip="Hide Details"  style="display: none;">
+  </td>
 
-   <td style="width: 100%;" class=" filename_status_cell_jq ">
+   <td style="width: 100%; vertical-align: top;" class=" clickable filename_status_cell_jq proxl_xml_import_item_expand_collapse_row_clickable_jq tool_tip_attached_jq "
+   			data-tooltip="Click to Show/Hide Details" >
    	<div >
 	  	{{#if searchName }}
 	  		{{ searchName }} 
@@ -61,7 +69,8 @@
   		{{#if statusFailed }}(Error){{/if}}
   	</div> 
    </td>
-   <td style="white-space: nowrap;vertical-align: top;" class=" submit_process_date_time_jq ">
+   <td style="white-space: nowrap; vertical-align: top;" class=" clickable submit_process_date_time_jq proxl_xml_import_item_expand_collapse_row_clickable_jq tool_tip_attached_jq "
+   			data-tooltip="Click to Show/Hide Details" >
 	 	{{#if importEndDateTime }}
 	  	  	Processed: {{ importEndDateTime }}
 		{{else}}	
