@@ -7,7 +7,9 @@ import org.yeastrc.proxl_import.api.xml_dto.ConfigurationFiles;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
 import org.yeastrc.xlink.base.constants.ConfigFileMimeType;
 import org.yeastrc.xlink.dao.SearchFileDAO;
+import org.yeastrc.xlink.dao.SearchFileProjectSearchDAO;
 import org.yeastrc.xlink.dto.SearchFileDTO;
+import org.yeastrc.xlink.dto.SearchFileProjectSearchDTO;
 
 /**
  * 
@@ -24,12 +26,14 @@ public class ProcessConfigurationFiles {
 		return new ProcessConfigurationFiles();
 	}
 	
+	
 	/**
 	 * @param proxlInput
 	 * @param searchId
-	 * @throws Exception 
+	 * @param projectSearchId
+	 * @throws Exception
 	 */
-	public void processConfigurationFiles( ProxlInput proxlInput, int searchId ) throws Exception {
+	public void processConfigurationFiles( ProxlInput proxlInput, int searchId, int projectSearchId ) throws Exception {
 		
 		ConfigurationFiles configurationFiles =
 				proxlInput.getConfigurationFiles();
@@ -53,6 +57,12 @@ public class ProcessConfigurationFiles {
 					//				searchFileDTO.set
 					searchFileDAO.save( searchFileDTO );
 					searchFileDAO.saveData( searchFileDTO.getId(), configurationFile.getFileContent() );
+					
+					SearchFileProjectSearchDTO searchFileProjectSearchDTO = new SearchFileProjectSearchDTO();
+					searchFileProjectSearchDTO.setProjectSearchId( projectSearchId );
+					searchFileProjectSearchDTO.setSearchFileId( searchFileDTO.getId() );
+					searchFileProjectSearchDTO.setDisplayFilename( searchFileDTO.getFilename() );
+					SearchFileProjectSearchDAO.getInstance().save( searchFileProjectSearchDTO );
 				}
 			}
 		}

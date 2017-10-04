@@ -118,7 +118,7 @@ public class ProcessProxlInput {
 			///   process Linkers
 			processLinkersValidateAndSave(proxlInput, searchDTO);
 			ProcessStaticModifications.getInstance().processStaticModifications( proxlInput, searchDTO.getId() );
-			ProcessConfigurationFiles.getInstance().processConfigurationFiles( proxlInput, searchDTO.getId() );
+			ProcessConfigurationFiles.getInstance().processConfigurationFiles( proxlInput, searchDTO.getId(), projectSearchDTOInserted.getId() );
 			//  TODO  Must load linkers in a Per Search way
 //			proxlInput.getLinkers();
 			//  Scan Numbers to Scan Ids Map per Scan Filename
