@@ -285,6 +285,7 @@ var _dataLoadManager = { };
 
 //  From Page
 var _projectSearchIds;
+var _projectSearchIdsUserOrdered = "";
 
 //  Loaded data:
 var _proteins;
@@ -772,6 +773,9 @@ function buildQueryStringFromHash() {
 	//  _projectSearchIds from the page
 	for ( var i = 0; i < _projectSearchIds.length; i++ ) {
 		items.push( "projectSearchId=" + _projectSearchIds[ i ] );
+	}
+	if ( _projectSearchIdsUserOrdered && _projectSearchIdsUserOrdered !== "" ) {
+		items.push( "ds=" + _projectSearchIdsUserOrdered );
 	}
 	if ( json.excludeTaxonomy != undefined && json.excludeTaxonomy.length > 0 ) {
 		for ( var i = 0; i < json.excludeTaxonomy.length; i++ ) {
@@ -1873,6 +1877,9 @@ function populateNavigation() {
 	for ( var i = 0; i < _projectSearchIds.length; i++ ) {
 		items.push( "projectSearchId=" + _projectSearchIds[ i ] );
 	}
+	if ( _projectSearchIdsUserOrdered && _projectSearchIdsUserOrdered !== "" ) {
+		items.push( "ds=" + _projectSearchIdsUserOrdered );
+	}
 	var baseJSONObject = getNavigationJSON_Not_for_Image_Or_Structure();
 	var psmPeptideCutoffsForProjectSearchIds_JSONString = JSON.stringify( baseJSONObject );
 	var psmPeptideCutoffsForProjectSearchIds_JSONStringEncodedURIComponent = encodeURIComponent( psmPeptideCutoffsForProjectSearchIds_JSONString ); 
@@ -1895,6 +1902,10 @@ function populateNavigation() {
 		}
 		qcQueryString += "projectSearchId=" + _projectSearchIds[ j ];
 	}
+	if ( _projectSearchIdsUserOrdered && _projectSearchIdsUserOrdered !== "" ) {
+		qcQueryString += "&ds=" + _projectSearchIdsUserOrdered;
+	}
+	
 	var qcJSON = { };
 	//  Add Filter cutoffs
 	qcJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
@@ -1957,6 +1968,9 @@ function populateNavigation() {
 					structureQueryString += "&";
 				}
 				structureQueryString += "projectSearchId=" + _projectSearchIds[ j ];
+			}
+			if ( _projectSearchIdsUserOrdered && _projectSearchIdsUserOrdered !== "" ) {
+				structureQueryString += "&ds=" + _projectSearchIdsUserOrdered;
 			}
 			var structureJSON = { };
 //			add taxonomy exclusions
@@ -5625,6 +5639,17 @@ function initPage() {
 		_projectSearchIds.push( projectSearchId );
 	});
 	
+	
+	_projectSearchIdsUserOrdered = "";
+	var $project_search_ids_user_ordered = $("#project_search_ids_user_ordered");
+	if ( $project_search_id_jq.length === 0 ) {
+		throw Error( "Must be hidden field with id 'project_search_ids_user_ordered'" );
+	}
+	var project_search_ids_user_orderedString = $project_search_ids_user_ordered.val();
+	if ( project_search_ids_user_orderedString.length > 0 ) {
+		_projectSearchIdsUserOrdered = project_search_ids_user_orderedString;
+	}
+	
 	var json = getJsonFromHash();
 	if ( json === null ) {
 		$("#invalid_url_no_data_after_hash_div").show();
@@ -5725,7 +5750,41 @@ var imageViewerPageObject = {
 			var queryJSON = getJsonFromHash();
 			var queryJSONString = JSON.stringify( queryJSON );
 			return queryJSONString;
+		},
+		
+
+		/**
+		 * Called from searchesChangeDisplayOrder.js to change order of project search ids in the URL
+		 * 
+		 * 
+		 */
+		changeProjectSearchIdOrderInURL : function( params ) {
+			var projectSearchIdsInNewOrder = params.projectSearchIdsInNewOrder;
+			
+			var newProjectSearchIdParamsArray = [];
+			
+			projectSearchIdsInNewOrder.forEach(function( element, idex, array ) {
+				var newProjectSearchIdParam = "projectSearchId=" + element;
+				newProjectSearchIdParamsArray.push( newProjectSearchIdParam )
+			}, this );
+			
+			var newProjectSearchIdParamsString = newProjectSearchIdParamsArray.join( "&" );
+			
+			//  image.do?projectSearchId=
+			
+			var windowHref = window.location.href;
+			
+			var windowHash = window.location.hash;
+			
+			var strutsActionIndex = windowHref.indexOf( "image.do?projectSearchId" );
+			
+			var windowHrefBeforeStrutsAction = windowHref.substring( 0, strutsActionIndex );
+			
+			var newWindowHref = windowHrefBeforeStrutsAction + "image.do?" + newProjectSearchIdParamsString + "&ds=y" + windowHash;
+			
+			window.location.href = newWindowHref;
 		}
+
 };
 
 /**

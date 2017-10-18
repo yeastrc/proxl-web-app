@@ -12,6 +12,11 @@
 		<c:forEach var="projectSearchId" items="${ formDataForImageStructure_QC.projectSearchId }" >
 			<c:param name="projectSearchId"   value="${projectSearchId}" />
 		</c:forEach>
+		
+		<%--  Do Not Sort Value if equal PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES in URL --%>
+		<c:if test="${ not empty ImageAndStructure_QC_DoNotSortValue }">
+			<c:param name="ds"   value="${ImageAndStructure_QC_DoNotSortValue}" />
+		</c:if>
 	</c:url>
 	
 	<c:set var="imagePageURL">image.do<c:out

@@ -243,6 +243,21 @@ var SearchesChangeDisplayOrder = function( params ) {
 			projectSearchIdsInNewOrder.push( projectSearchId );
 		} ) ;
 		
+
+		//   Special case for Image Page
+		if ( window.imageViewerPageObject ) {
+			//   imageViewerPageObject object on window object so call this instead of the code below
+			imageViewerPageObject.changeProjectSearchIdOrderInURL( { projectSearchIdsInNewOrder : projectSearchIdsInNewOrder } );
+			return;  //  EARLY EXIT
+		}
+
+		//   Special case for Structure Page
+		if ( window.structureViewerPageObject ) {
+			//   imageViewerPageObject object on window object so call this instead of the code below
+			structureViewerPageObject.changeProjectSearchIdOrderInURL( { projectSearchIdsInNewOrder : projectSearchIdsInNewOrder } );
+			return;  //  EARLY EXIT
+		}
+		
 		mergedPeptideProteinSearchesListVennDiagramSection.updatePageToNewProjectSearchIdsOrder( projectSearchIdsInNewOrder );
 	};
 

@@ -58,6 +58,7 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
+import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
 import org.yeastrc.xlink.www.objects.ImageViewerData;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -76,6 +77,7 @@ public class ViewerProteinDataService {
 	public ImageViewerData getViewerData( 
 			
 			@QueryParam( "projectSearchId" ) List<Integer> projectSearchIdList,
+			@QueryParam( "ds" ) String userSorted_ProjectSearchIds,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
 			@QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
@@ -182,32 +184,42 @@ public class ViewerProteinDataService {
 					excludeTaxonomy_Ids_Set_UserInput.add( taxonomyId );
 				}
 			}
+
+			Set<Integer> projectSearchIdsProcessedFromURL = new HashSet<>(); // add each projectSearchId as process in loop next
 			
 			Set<Integer> searchIdsSet = new HashSet<>( projectSearchIdsSet.size() );
 			List<SearchDTO> searchList = new ArrayList<>( projectSearchIdsSet.size() );
 			
-			for ( Integer projectSearchId : projectSearchIdsSet ) {
-				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
-				if ( search == null ) {
-					String msg = ": No search found for projectSearchId: " + projectSearchId;
-					log.warn( msg );
-				    throw new WebApplicationException(
-				    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
-				    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
-				    	        .build()
-				    	        );
+			for ( Integer projectSearchId : projectSearchIdList ) {
+				
+				if ( projectSearchIdsProcessedFromURL.add( projectSearchId ) ) {
+					//  Haven't processed this projectSearchId yet in this loop so process it now
+					
+					SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
+					if ( search == null ) {
+						String msg = ": No search found for projectSearchId: " + projectSearchId;
+						log.warn( msg );
+						throw new WebApplicationException(
+								Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+								.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+								.build()
+								);
+					}
+					Integer searchId = search.getSearchId();
+					searchIdsSet.add( searchId );
+					searchList.add( search );
 				}
-				Integer searchId = search.getSearchId();
-				searchIdsSet.add( searchId );
-				searchList.add( search );
 			}
-			
-			Collections.sort( searchList, new Comparator<SearchDTO>() {
-				@Override
-				public int compare(SearchDTO o1, SearchDTO o2) {
-					return o1.getProjectSearchId() - o2.getProjectSearchId();
-				}
-			});
+
+			if ( ! PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( userSorted_ProjectSearchIds ) ) {
+
+				Collections.sort( searchList, new Comparator<SearchDTO>() {
+					@Override
+					public int compare(SearchDTO o1, SearchDTO o2) {
+						return o1.getProjectSearchId() - o2.getProjectSearchId();
+					}
+				});
+			}
 			
 			List<Integer> searchIdsListDedupedSorted = new ArrayList<>( searchIdsSet );
 			Collections.sort( searchIdsListDedupedSorted );

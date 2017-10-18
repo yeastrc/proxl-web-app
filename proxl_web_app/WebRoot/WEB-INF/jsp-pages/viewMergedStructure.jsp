@@ -162,6 +162,10 @@
 		<input type="hidden" class=" project_search_id_jq " value="<c:out value="${ projectSearchId }"></c:out>">
 	</c:forEach>
 	
+		<%--  projectSearchIdsUserOrdered set to PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES if true, empty string if false (from 'ds' query string param value).  
+			Javascript on this page will copy this to some URLs for Webservices and links to other pages --%>
+	<input type="hidden" id="project_search_ids_user_ordered" value="<c:out value="${ projectSearchIdsUserOrdered }"></c:out>" />
+	
 	<c:if test="${ not empty onlySingleProjectSearchId }">
 	
 		<%--  Only one search id so get Default Page URL values for that search id for links to other pages for navigation.
@@ -211,9 +215,6 @@
 
 				<%--  Set to false to NOT show color block before search for key --%>
 				<c:set var="showSearchColorBlock" value="${ false }" />
-				
-				<%--  Set to true so not display 'Re-order searches' link since does not work on this page --%>
-				<c:set var="doNotDisplayChangeSearchesDisplayOrderLink" value="${ true }" />
 				
 				<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
 				<%@ include file="/WEB-INF/jsp-includes/searchDetailsBlock.jsp" %>

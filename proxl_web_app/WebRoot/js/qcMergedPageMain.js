@@ -1246,6 +1246,10 @@ var QCMergedPageMain = function() {
 				}
 				imageQueryString += "projectSearchId=" + _project_search_ids[ j ];
 			}
+			if ( _userOrderedProjectSearchIds ) {
+				imageQueryString +=  "&ds=" + _userOrderedProjectSearchIds;
+			}
+			
 			var imageJSON = { };
 			//  Add Filter cutoffs
 			imageJSON[ 'cutoffs' ] = baseJSONObject.cutoffs;
@@ -1281,6 +1285,10 @@ var QCMergedPageMain = function() {
 					}
 					structureQueryString += "projectSearchId=" + _project_search_ids[ j ];
 				}
+				if ( _userOrderedProjectSearchIds ) {
+					structureQueryString +=  "&ds=" + _userOrderedProjectSearchIds;
+				}
+
 				var structureJSON = { };
 				//  Add Filter cutoffs
 				structureJSON[ 'cutoffs' ] = baseJSONObject.cutoffs;

@@ -99,6 +99,10 @@ public class PopulateRequestDataForImageAndStructureAndQC_NavLinks {
 		if ( form.getProjectSearchId() != null && form.getProjectSearchId().length == 1 ) {
 			request.setAttribute( "ImageAndStructure_QC_SingleProjectSearchId", form.getProjectSearchId()[0] );
 		}
+
+		if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
+			request.setAttribute( "ImageAndStructure_QC_DoNotSortValue", PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES );
+		}
 		
 		try {
 			//  Jackson JSON Mapper object for JSON deserialization and serialization

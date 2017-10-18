@@ -61,6 +61,7 @@ var COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS = "SEARCH_IDS";
 
 
 var _projectSearchIds;
+var _projectSearchIdsUserOrdered = "";
 
 // object to handle all link color determination duties
 var _linkColorHandler = new LinkColorHandler();
@@ -762,6 +763,9 @@ function buildQueryStringFromHash() {
 	//  _projectSearchIds from the page
 	for ( var i = 0; i < _projectSearchIds.length; i++ ) {
 		items.push( "projectSearchId=" + _projectSearchIds[ i ] );
+	}
+	if ( _projectSearchIdsUserOrdered && _projectSearchIdsUserOrdered !== "" ) {
+		items.push( "ds=" + _projectSearchIdsUserOrdered );
 	}
 	
 	if ( json.excludeTaxonomy != undefined && json.excludeTaxonomy.length > 0 ) {
@@ -1825,6 +1829,9 @@ function populateNavigation() {
 	for ( var i = 0; i < _projectSearchIds.length; i++ ) {
 		items.push( "projectSearchId=" + _projectSearchIds[ i ] );
 	}
+	if ( _projectSearchIdsUserOrdered && _projectSearchIdsUserOrdered !== "" ) {
+		items.push( "ds=" + _projectSearchIdsUserOrdered );
+	}
 	
 	var baseJSONObject = getNavigationJSON_Not_for_Image_Or_Structure();
 	var psmPeptideCutoffsForProjectSearchIds_JSONString = JSON.stringify( baseJSONObject );
@@ -1849,6 +1856,10 @@ function populateNavigation() {
 		}
 		qcQueryString += "projectSearchId=" + _projectSearchIds[ j ];
 	}
+	if ( _projectSearchIdsUserOrdered && _projectSearchIdsUserOrdered !== "" ) {
+		qcQueryString += "&ds=" + _projectSearchIdsUserOrdered;
+	}
+	
 	var qcJSON = { };
 	//  Add Filter cutoffs
 	qcJSON[ 'cutoffs' ] = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
@@ -1916,6 +1927,10 @@ function populateNavigation() {
 			}
 			imageQueryString += "projectSearchId=" + _projectSearchIds[ j ];
 		}
+		if ( _projectSearchIdsUserOrdered && _projectSearchIdsUserOrdered !== "" ) {
+			imageQueryString += "&ds=" + _projectSearchIdsUserOrdered;
+		}
+		
 		var imageJSON = { };
 //		add taxonomy exclusions
 		imageJSON[ 'excludeTaxonomy' ] = _excludeTaxonomy;
@@ -4606,7 +4621,7 @@ var drawLegend = function() {
 	var mode = getLinkColorMode();
 	
 	
-	if( mode === 'type' ) {
+	if ( mode === 'type' ) {
 		
 		$legend_by_link_type.show();
 		
@@ -4666,97 +4681,61 @@ var drawLegend = function() {
 			$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, searchIds );
 		}
 		
-		// color blocks for pairs of search ids
-		
-		for( var i = 0; i < _searches.length; i++ ) {
-			
-			for( var k = 0; k < _searches.length; k++ ) {
-				
-				if( _searches[ i ].id >= _searches[ k ].id ) { 
-					continue; 
-				}
+		if ( _searches.length <= 3 ) {
 
-				var projectSearchId_A = _searches[ i ].id;
-				var projectSearchId_B = _searches[ k ].id;
-				
-				var projectSearchIds = [ projectSearchId_A, projectSearchId_B ];
+			// color blocks for pairs of search ids
+
+			//  Pairs so outer loop stops before _searches.length - 1
+			for( var i = 0; i < _searches.length - 1; i++ ) {
+
+				//  Start inner loop at outer loop index + 1
+				for( var k = i + 1; k < _searches.length; k++ ) {
+
+					var projectSearchId_A = _searches[ i ].id;
+					var projectSearchId_B = _searches[ k ].id;
+
+					var projectSearchIds = [ projectSearchId_A, projectSearchId_B ];
+
+					var searchIds = convertProjectSearchIdArrayToSearchIdArray( projectSearchIds );
+
+					var colorForBlock = _linkColorHandler.getColorForSearches( projectSearchIds ); 
+
+					var searchPositionNumber_A = ( i + 1 );
+					var searchPositionNumber_B = ( k + 1 );
+
+					var $legend_by_search_container_for_search_X = 
+						$( "#legend_by_search_container_for_search_" + searchPositionNumber_A + "_" + searchPositionNumber_B );
+					var $legend_by_search_color_block_for_search_X = 
+						$( "#legend_by_search_color_block_for_search_" + searchPositionNumber_A + "_" + searchPositionNumber_B );
+
+					$legend_by_search_container_for_search_X.show();
+					$legend_by_search_color_block_for_search_X.css({ "background-color" : colorForBlock } );
+					$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorForBlock );
+					$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, searchIds );
+
+				}
+			}
+
+			if( _searches.length === 3 ) {
+
+				var projectSearchIds = [ _searches[ 0 ].id, _searches[ 1 ].id, _searches[ 2 ].id ];
 
 				var searchIds = convertProjectSearchIdArrayToSearchIdArray( projectSearchIds );
 
 				var colorForBlock = _linkColorHandler.getColorForSearches( projectSearchIds ); 
 
-				var searchPositionNumber_A = ( i + 1 );
-				var searchPositionNumber_B = ( k + 1 );
-				
-				var $legend_by_search_container_for_search_X = 
-					$( "#legend_by_search_container_for_search_" + searchPositionNumber_A + "_" + searchPositionNumber_B );
-				var $legend_by_search_color_block_for_search_X = 
-					$( "#legend_by_search_color_block_for_search_" + searchPositionNumber_A + "_" + searchPositionNumber_B );
+				var $legend_by_search_container_for_search_1_2_3 = $("#legend_by_search_container_for_search_1_2_3");
+				var $legend_by_search_color_block_for_search_1_2_3 = $("#legend_by_search_color_block_for_search_1_2_3");
 
-				$legend_by_search_container_for_search_X.show();
-				$legend_by_search_color_block_for_search_X.css({ "background-color" : colorForBlock } );
-				$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorForBlock );
-				$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, searchIds );
-
+				$legend_by_search_container_for_search_1_2_3.show();
+				$legend_by_search_color_block_for_search_1_2_3.css({ "background-color" : colorForBlock } );
+				$legend_by_search_color_block_for_search_1_2_3.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorForBlock );
+				$legend_by_search_color_block_for_search_1_2_3.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, searchIds );
 			}
-		}
-
-		if( _searches.length === 3 ) {
-			
-			var projectSearchIds = [ _searches[ 0 ].id, _searches[ 1 ].id, _searches[ 2 ].id ];
-
-			var searchIds = convertProjectSearchIdArrayToSearchIdArray( projectSearchIds );
-
-			var colorForBlock = _linkColorHandler.getColorForSearches( projectSearchIds ); 
-			
-			var $legend_by_search_container_for_search_1_2_3 = $("#legend_by_search_container_for_search_1_2_3");
-			var $legend_by_search_color_block_for_search_1_2_3 = $("#legend_by_search_color_block_for_search_1_2_3");
-			
-			$legend_by_search_container_for_search_1_2_3.show();
-			$legend_by_search_color_block_for_search_1_2_3.css({ "background-color" : colorForBlock } );
-			$legend_by_search_color_block_for_search_1_2_3.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorForBlock );
-			$legend_by_search_color_block_for_search_1_2_3.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, searchIds );
 		}
 
 		$legend_by_search.show();
 		
-		
-//		var html = "";
-//		
-//		for ( var i = 0; i < _searches.length; i++ ) {
-//			html += "<span style=\"white-space:nowrap;margin-left:15px;\">"
-//				+ "<span style=\"display:inline-block;width:11px;height:11px;background-color:" 
-//				+ _linkColorHandler.getColorForSearches( [ _searches[ i ].id ] ) 
-//				+ "\"></span> Search: " + _searches[ i ].id
-//				+ "</span>";
-//		}
-//		
-//		for( var i = 0; i < _searches.length; i++ ) {
-//			
-//			for( var k = 0; k < _searches.length; k++ ) {
-//				
-//				if( _searches[ i ].id >= _searches[ k ].id ) { 
-//					continue; 
-//				}
-//								
-//				html += "<span style=\"white-space:nowrap;margin-left:15px;\">"
-//				+ "<span style=\"display:inline-block;width:11px;height:11px;background-color:" 
-//				+ _linkColorHandler.getColorForSearches( [ _searches[ i ].id, _searches[ k ].id ] ) 
-//				+ "\"></span> Search: " + _searches[ i ].id + ", " + _searches[ k ].id
-//				+ "</span>\n";
-//				
-//			}
-//		}
-//		
-//		html += "<span style=\"white-space:nowrap;margin-left:15px;\">";
-//		
-//		if( _searches.length === 3 ) {
-//			html += "<span style=\"display:inline-block;width:11px;height:11px;background-color:" + _linkColorHandler.getColorForSearches( [ _searches[ 0 ].id, _searches[ 1 ].id, _searches[ 2 ].id ] ) + "\"></span> Search: " + _searches[ 0 ].id + ", " + _searches[ 1 ].id + ", " + _searches[ 2 ].id + "</span>\n";
-//		}
-//		
-//		$legend_by_search.html( html );
-//
-//		$legend_by_search.show();
 	}
 	
 	else {
@@ -5892,6 +5871,17 @@ function initPage() {
 		_projectSearchIds.push( projectSearchId );
 	});
 	
+	_projectSearchIdsUserOrdered = "";
+	var $project_search_ids_user_ordered = $("#project_search_ids_user_ordered");
+	if ( $project_search_id_jq.length === 0 ) {
+		throw Error( "Must be hidden field with id 'project_search_ids_user_ordered'" );
+	}
+	var project_search_ids_user_orderedString = $project_search_ids_user_ordered.val();
+	if ( project_search_ids_user_orderedString.length > 0 ) {
+		_projectSearchIdsUserOrdered = project_search_ids_user_orderedString;
+	}
+	
+	
 	if ( json.searches && json.searches.length > 1 ) {
 		
 		$("#merged_label_text_header").show();  //  Update text at top to show this is for "merged" since more than one search
@@ -6340,6 +6330,39 @@ var structureViewerPageObject = {
 			var queryJSONString = JSON.stringify( queryJSON );
 
 			return queryJSONString;
+		},
+		
+
+		/**
+		 * Called from searchesChangeDisplayOrder.js to change order of project search ids in the URL
+		 * 
+		 * 
+		 */
+		changeProjectSearchIdOrderInURL : function( params ) {
+			var projectSearchIdsInNewOrder = params.projectSearchIdsInNewOrder;
+			
+			var newProjectSearchIdParamsArray = [];
+			
+			projectSearchIdsInNewOrder.forEach(function( element, idex, array ) {
+				var newProjectSearchIdParam = "projectSearchId=" + element;
+				newProjectSearchIdParamsArray.push( newProjectSearchIdParam )
+			}, this );
+			
+			var newProjectSearchIdParamsString = newProjectSearchIdParamsArray.join( "&" );
+			
+			//  structure.do?projectSearchId=
+			
+			var windowHref = window.location.href;
+			
+			var windowHash = window.location.hash;
+			
+			var strutsActionIndex = windowHref.indexOf( "structure.do?projectSearchId" );
+			
+			var windowHrefBeforeStrutsAction = windowHref.substring( 0, strutsActionIndex );
+			
+			var newWindowHref = windowHrefBeforeStrutsAction + "structure.do?" + newProjectSearchIdParamsString + "&ds=y" + windowHash;
+			
+			window.location.href = newWindowHref;
 		}
 
 };
