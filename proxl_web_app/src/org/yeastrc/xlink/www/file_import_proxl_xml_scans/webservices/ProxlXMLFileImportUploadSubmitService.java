@@ -449,6 +449,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				proxlXMLFileImportTrackingSingleFileDTO.setFilenameOnDiskWithPathSubSameMachine( fileItem.filenameOnDiskWithPathSubSameMachine );
 				proxlXMLFileImportTrackingSingleFileDTO.setFileType( proxlXMLFileImportFileType );
 				proxlXMLFileImportTrackingSingleFileDTO.setFileSize( fileSize );
+				proxlXMLFileImportTrackingSingleFileDTO.setCanonicalFilename_W_Path_OnSubmitMachine( fileItemFile.getCanonicalPath() );
 				proxlXMLFileImportTrackingSingleFileDTO.setFileUploadStatus( ProxlXMLImportSingleFileUploadStatus.FILE_UPLOAD_COMPLETE );
 			}
 		}
