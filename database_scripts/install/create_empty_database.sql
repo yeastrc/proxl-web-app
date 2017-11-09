@@ -1,4 +1,7 @@
 
+--   This is current out of sync with the Workbench model for table CREATE TABLE  proxl_xml_file_import_tracking_single_file
+
+
 --  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 --  WARNING:  When regenerate this content:
@@ -14,6 +17,7 @@
 
 
 --  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 -- MySQL Workbench Forward Engineering
 
@@ -1773,7 +1777,8 @@ CREATE TABLE  proxl_xml_file_import_tracking_single_file (
   file_size BIGINT(20) UNSIGNED NULL,
   sha1_sum VARCHAR(255) NULL,
   filename_on_disk_with_path_sub_same_machine VARCHAR(4000) NULL,
-  path_on_submitting_machine VARCHAR(4000) NULL,
+  canonical_filename_w_path_on_submit_machine VARCHAR(4000) NULL,
+  absolute_filename_w_path_on_submit_machine VARCHAR(4000) NULL,
   PRIMARY KEY (id),
   CONSTRAINT prxl_xml_fl_imprt_trkng_sngl_fl_id
     FOREIGN KEY (proxl_xml_file_import_tracking_id)
