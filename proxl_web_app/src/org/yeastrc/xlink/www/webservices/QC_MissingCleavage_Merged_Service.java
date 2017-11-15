@@ -9,7 +9,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -40,10 +43,32 @@ public class QC_MissingCleavage_Merged_Service {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/missingCleavages_Merged") 
 	public WebserviceResult_getQC_MissingCleavageReportedPeptidesCount_Merged
-		getQC_MissingCleavageReportedPeptidesCount_Merged( @QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
-										  @QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
-										  @Context HttpServletRequest request )
-	throws Exception {
+		getQC_MissingCleavageReportedPeptidesCount_Merged_GET( 
+				@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
+				@QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
+				@Context HttpServletRequest request ) {
+	
+		return getQC_MissingCleavageReportedPeptidesCount_Merged_Internal( projectSearchIdList, filterCriteria_JSONString, request );
+	}
+
+	@POST
+	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/missingCleavages_Merged") 
+	public WebserviceResult_getQC_MissingCleavageReportedPeptidesCount_Merged
+		getQC_MissingCleavageReportedPeptidesCount_Merged_POST( 
+				@FormParam( "project_search_id" ) List<Integer> projectSearchIdList,
+				@FormParam( "filterCriteria" ) String filterCriteria_JSONString,
+				@Context HttpServletRequest request ) {
+	
+		return getQC_MissingCleavageReportedPeptidesCount_Merged_Internal( projectSearchIdList, filterCriteria_JSONString, request );
+	}
+
+	private WebserviceResult_getQC_MissingCleavageReportedPeptidesCount_Merged
+		getQC_MissingCleavageReportedPeptidesCount_Merged_Internal( 
+				List<Integer> projectSearchIdList,
+				String filterCriteria_JSONString,
+				HttpServletRequest request ) {
 	
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
 			String msg = "Provided project_search_id is null or project_search_id is missing";

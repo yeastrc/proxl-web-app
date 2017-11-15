@@ -252,7 +252,7 @@ var QCMergedPageChartScanFileStatistics = function() {
 
 		_activeAjax =
 			$.ajax({
-				type : "GET",
+				type : "POST",
 				url : _URL,
 				data : ajaxRequestData,
 				dataType : "json",

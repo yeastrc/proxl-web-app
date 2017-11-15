@@ -318,7 +318,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
 		_activeAjax[ selectedLinkType ] = 
 			$.ajax({
-//				cache : false,
+				type : "POST",
 				url : contextPathJSVar + "/services/qc/dataPage/ppmError_Merged",
 				traditional: true,  //  Force traditional serialization of the data sent
 				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".

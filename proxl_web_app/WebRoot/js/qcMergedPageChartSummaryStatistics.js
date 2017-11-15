@@ -287,6 +287,7 @@ var QCMergedPageChartSummaryStatistics = function() {
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
 		_activeAjax =
 			$.ajax({
+				type : "POST",
 				url : contextPathJSVar + "/services/qc/dataPage/summaryStatistics_Merged",
 				traditional: true,  //  Force traditional serialization of the data sent
 				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".

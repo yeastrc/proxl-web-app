@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -40,12 +43,31 @@ public class QC_Scan_Statistics_Merged_Service {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getScanStatistics_Merged") 
-	public WebserviceResult getScanOverallStatistics( 
+	public WebserviceResult getScanOverallStatistics_GET( 
 			@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
 			@QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
-			@Context HttpServletRequest request )
-	throws Exception {
+			@Context HttpServletRequest request ) {
 
+		return getScanOverallStatistics_Internal( projectSearchIdList, filterCriteria_JSONString, request );
+	}
+	
+	
+	@POST
+	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/getScanStatistics_Merged") 
+	public WebserviceResult getScanOverallStatistics_POST( 
+			@FormParam( "project_search_id" ) List<Integer> projectSearchIdList,
+			@FormParam( "filterCriteria" ) String filterCriteria_JSONString,
+			@Context HttpServletRequest request ) {
+		
+		return getScanOverallStatistics_Internal( projectSearchIdList, filterCriteria_JSONString, request );
+	}
+	
+	private WebserviceResult getScanOverallStatistics_Internal( 
+			List<Integer> projectSearchIdList,
+			String filterCriteria_JSONString,
+			HttpServletRequest request ) {
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
 			String msg = "Provided project_search_id is null or project_search_id is missing";
 			log.warn( msg );

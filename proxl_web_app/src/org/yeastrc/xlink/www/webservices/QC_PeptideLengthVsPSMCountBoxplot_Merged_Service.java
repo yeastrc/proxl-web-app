@@ -9,7 +9,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -41,10 +44,38 @@ public class QC_PeptideLengthVsPSMCountBoxplot_Merged_Service {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/peptideLengthVsPSMCountBoxplot_Merged") 
 	public WebserviceResult_getQC_PeptideLengthsHistogram
-		getQC_PeptideLengthsHistogram( @QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
-										  @QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
-										  @Context HttpServletRequest request )
-	throws Exception {
+	getQC_PeptideLengthsHistogram_GET(
+			@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
+			@QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
+			@Context HttpServletRequest request ) {
+		
+		return getQC_PeptideLengthsHistogram_Internal( projectSearchIdList, filterCriteria_JSONString, request );
+	}
+
+	@POST
+	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/peptideLengthVsPSMCountBoxplot_Merged") 
+	public WebserviceResult_getQC_PeptideLengthsHistogram
+	getQC_PeptideLengthsHistogram_POST( 
+			@FormParam( "project_search_id" ) List<Integer> projectSearchIdList,
+			@FormParam( "filterCriteria" ) String filterCriteria_JSONString,
+			@Context HttpServletRequest request ) {
+
+		return getQC_PeptideLengthsHistogram_Internal( projectSearchIdList, filterCriteria_JSONString, request );
+	}
+
+	/**
+	 * @param projectSearchIdList
+	 * @param filterCriteria_JSONString
+	 * @param request
+	 * @return
+	 */
+	private WebserviceResult_getQC_PeptideLengthsHistogram
+		getQC_PeptideLengthsHistogram_Internal( 
+				List<Integer> projectSearchIdList,
+				String filterCriteria_JSONString,
+				HttpServletRequest request ) {
 	
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
 			String msg = "Provided project_search_id is null or project_search_id is missing";

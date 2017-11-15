@@ -9,7 +9,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -43,10 +46,38 @@ public class QC_PSM_Stats_Merged_Service {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/chargeCounts_Merged") 
 	public WebserviceResult_getQC_ChargeCount_Merged
-		getQC_ChargeCount( @QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
-										  @QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
-										  @Context HttpServletRequest request )
-	throws Exception {
+		getQC_ChargeCount_GET( 
+				@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
+				@QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
+				@Context HttpServletRequest request ) {
+
+		return getQC_ChargeCount_Internal( projectSearchIdList, filterCriteria_JSONString, request );
+	}
+
+	@POST
+	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/chargeCounts_Merged") 
+	public WebserviceResult_getQC_ChargeCount_Merged
+		getQC_ChargeCount_POST( 
+				@FormParam( "project_search_id" ) List<Integer> projectSearchIdList,
+				@FormParam( "filterCriteria" ) String filterCriteria_JSONString,
+				@Context HttpServletRequest request ) {
+	
+		return getQC_ChargeCount_Internal( projectSearchIdList, filterCriteria_JSONString, request );
+	}
+
+	/**
+	 * @param projectSearchIdList
+	 * @param filterCriteria_JSONString
+	 * @param request
+	 * @return
+	 */
+	private WebserviceResult_getQC_ChargeCount_Merged
+		getQC_ChargeCount_Internal( 
+				List<Integer> projectSearchIdList,
+				String filterCriteria_JSONString,
+				HttpServletRequest request ) {
 	
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
 			String msg = "Provided project_search_id is null or project_search_id is missing";
@@ -204,10 +235,31 @@ public class QC_PSM_Stats_Merged_Service {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/mzForPSMsHistogramCounts_Merged") 
 	public WebserviceResult_getQC_PreMZCount_Merged
-		getQC_PreMZCount( @QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
-										  @QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
-										  @Context HttpServletRequest request )
-	throws Exception {
+		getQC_PreMZCount_GET( 
+				@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
+				@QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
+				@Context HttpServletRequest request ) {
+	
+		return getQC_PreMZCount_Internal( projectSearchIdList, filterCriteria_JSONString, request );
+	}
+	@POST
+	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/mzForPSMsHistogramCounts_Merged") 
+	public WebserviceResult_getQC_PreMZCount_Merged
+		getQC_PreMZCount_POST( 
+				@FormParam( "project_search_id" ) List<Integer> projectSearchIdList,
+				@FormParam( "filterCriteria" ) String filterCriteria_JSONString,
+				@Context HttpServletRequest request ) {
+	
+		return getQC_PreMZCount_Internal( projectSearchIdList, filterCriteria_JSONString, request );
+	}
+	
+	private WebserviceResult_getQC_PreMZCount_Merged
+		getQC_PreMZCount_Internal(
+				List<Integer> projectSearchIdList,
+				String filterCriteria_JSONString,
+				HttpServletRequest request ) {
 	
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
 			String msg = "Provided project_search_id is null or project_search_id is missing";

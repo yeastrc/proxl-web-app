@@ -9,7 +9,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -41,10 +44,33 @@ public class QC_PPM_Error_Merged_Service {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/ppmError_Merged") 
 	public WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs
-		getPPM_Error_Histogram_For_PSMPeptideCutoffs( @QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
-										  @QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
-										  @Context HttpServletRequest request )
-	throws Exception {
+		getPPM_Error_Histogram_For_PSMPeptideCutoffs_GET( 
+				@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
+				@QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
+				@Context HttpServletRequest request ) {
+	
+		return getPPM_Error_Histogram_For_PSMPeptideCutoffs_Internal( projectSearchIdList, filterCriteria_JSONString, request );
+	}
+
+
+	@POST
+	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/ppmError_Merged") 
+	public WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs
+		getPPM_Error_Histogram_For_PSMPeptideCutoffs_POST( 
+				@FormParam( "project_search_id" ) List<Integer> projectSearchIdList,
+				@FormParam( "filterCriteria" ) String filterCriteria_JSONString,
+				@Context HttpServletRequest request ) {
+	
+		return getPPM_Error_Histogram_For_PSMPeptideCutoffs_Internal( projectSearchIdList, filterCriteria_JSONString, request );
+	}
+
+	private WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs
+		getPPM_Error_Histogram_For_PSMPeptideCutoffs_Internal( 
+				List<Integer> projectSearchIdList,
+				String filterCriteria_JSONString,
+				HttpServletRequest request ) {
 	
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
 			String msg = "Provided project_search_id is null or project_search_id is missing";
