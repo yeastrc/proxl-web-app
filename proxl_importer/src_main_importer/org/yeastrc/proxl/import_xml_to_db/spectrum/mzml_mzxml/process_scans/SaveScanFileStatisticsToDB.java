@@ -3,13 +3,11 @@ package org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.process_scans;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ScanFileStatistics_Importer_DAO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
-import org.yeastrc.xlink.dao.ScanFileMS_1_IntensityBinnedSummedDataDAO;
 import org.yeastrc.xlink.dao.ScanFileMS_1_IntensityBinnedSummedSummaryDAO;
 import org.yeastrc.xlink.dao.ScanFileMS_1_IntensityBinnedSummedSummaryDataDAO;
 import org.yeastrc.xlink.dao.ScanFileMS_1_PerScanData_Num_TIC_RT_DAO;
 import org.yeastrc.xlink.dao.ScanFileMS_2_PerScanData_Num_TIC_RT_DAO;
 import org.yeastrc.xlink.dao.ScanFileStatisticsDAO;
-import org.yeastrc.xlink.dto.ScanFileMS_1_IntensityBinnedSummedDataDTO;
 import org.yeastrc.xlink.dto.ScanFileMS_1_IntensityBinnedSummedSummaryDTO;
 import org.yeastrc.xlink.dto.ScanFileMS_1_IntensityBinnedSummedSummaryDataDTO;
 import org.yeastrc.xlink.dto.ScanFileMS_1_PerScanData_Num_TIC_RT_DTO;
@@ -180,24 +178,24 @@ public class SaveScanFileStatisticsToDB {
 				}
 			}
 		}
-		{
-			Integer scanFileIdFromDB = ScanFileMS_1_IntensityBinnedSummedDataDAO.getScanFileIdFromScanFileId( scanFileId );
-			if ( scanFileIdFromDB == null ) {
-				// Record not in DB so add it
-				try {
-					ScanFileMS_1_IntensityBinnedSummedDataDTO item = new ScanFileMS_1_IntensityBinnedSummedDataDTO();
-					item.setScanFileId( scanFileId );
-					item.setDataJSON_Gzipped( ms1_IntensitiesBinnedSummedDataJSONAsBytes_Gzipped );
-					ScanFileMS_1_IntensityBinnedSummedDataDAO.save( item );
-				} catch ( Exception e ) {
-					Integer scanFileIdFromDBAfterInsert = ScanFileMS_1_IntensityBinnedSummedDataDAO.getScanFileIdFromScanFileId( scanFileId );
-					if ( scanFileIdFromDBAfterInsert == null ) {
-						//  Failed to insert and wasn't already inserted (if was already inserted, Duplicate key would be thrown to here)
-						throw e;
-					}
-				}
-			}
-		}
+//		{
+//			Integer scanFileIdFromDB = ScanFileMS_1_IntensityBinnedSummedDataDAO.getScanFileIdFromScanFileId( scanFileId );
+//			if ( scanFileIdFromDB == null ) {
+//				// Record not in DB so add it
+//				try {
+//					ScanFileMS_1_IntensityBinnedSummedDataDTO item = new ScanFileMS_1_IntensityBinnedSummedDataDTO();
+//					item.setScanFileId( scanFileId );
+//					item.setDataJSON_Gzipped( ms1_IntensitiesBinnedSummedDataJSONAsBytes_Gzipped );
+//					ScanFileMS_1_IntensityBinnedSummedDataDAO.save( item );
+//				} catch ( Exception e ) {
+//					Integer scanFileIdFromDBAfterInsert = ScanFileMS_1_IntensityBinnedSummedDataDAO.getScanFileIdFromScanFileId( scanFileId );
+//					if ( scanFileIdFromDBAfterInsert == null ) {
+//						//  Failed to insert and wasn't already inserted (if was already inserted, Duplicate key would be thrown to here)
+//						throw e;
+//					}
+//				}
+//			}
+//		}
 		
 		{
 			Integer scanFileIdFromDB = ScanFileMS_1_PerScanData_Num_TIC_RT_DAO.getScanFileIdFromScanFileId( scanFileId );

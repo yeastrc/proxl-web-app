@@ -360,6 +360,9 @@ CREATE TABLE  scan_file (
   path VARCHAR(2000) NULL,
   sha1sum VARCHAR(255) NULL,
   file_size BIGINT UNSIGNED NULL,
+  spectral_storage_api_key VARCHAR(300) NULL,
+  spectral_storage_process_key_temp VARCHAR(300) NULL,
+  create_date DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id))
 ENGINE = InnoDB;
 
@@ -633,23 +636,6 @@ CREATE INDEX fk_scan_file_header_scan_file_id_idx ON scan_file_header (scan_file
 
 
 -- -----------------------------------------------------
--- Table scan_spectrum_data
--- -----------------------------------------------------
-DROP TABLE IF EXISTS scan_spectrum_data ;
-
-CREATE TABLE  scan_spectrum_data (
-  scan_id INT UNSIGNED NOT NULL,
-  spectrum_data LONGBLOB NULL,
-  PRIMARY KEY (scan_id),
-  CONSTRAINT fk_scan_spectrum_data_scan_id
-    FOREIGN KEY (scan_id)
-    REFERENCES scan (id)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table search_linker
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS search_linker ;
@@ -697,31 +683,6 @@ CREATE TABLE  search_file (
 ENGINE = InnoDB;
 
 CREATE INDEX search_file_search_id_fk_idx ON search_file (search_id ASC);
-
-
--- -----------------------------------------------------
--- Table scan_retention_time
--- -----------------------------------------------------
-DROP TABLE IF EXISTS scan_retention_time ;
-
-CREATE TABLE  scan_retention_time (
-  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  scan_file_id INT UNSIGNED NOT NULL,
-  scan_number INT NOT NULL,
-  precursor_scan_number INT NULL,
-  scan_level INT NOT NULL,
-  retention_time DECIMAL(18,9) NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT scan_retention_time_scan_file_id_fk
-    FOREIGN KEY (scan_file_id)
-    REFERENCES scan_file (id)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-CREATE INDEX scan_retention_time_scan_file_id_fk_idx ON scan_retention_time (scan_file_id ASC);
-
-CREATE UNIQUE INDEX scan_retention_time_unique ON scan_retention_time (scan_file_id ASC, scan_number ASC);
 
 
 -- -----------------------------------------------------
@@ -2182,23 +2143,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table scan_file_ms1_intensity_binned_summed_data
--- -----------------------------------------------------
-DROP TABLE IF EXISTS scan_file_ms1_intensity_binned_summed_data ;
-
-CREATE TABLE  scan_file_ms1_intensity_binned_summed_data (
-  scan_file_id INT UNSIGNED NOT NULL,
-  binned_summed_data_json_gzipped LONGBLOB NOT NULL,
-  PRIMARY KEY (scan_file_id),
-  CONSTRAINT fk_scan_file_ms1_intenbnsmdata_scan_file_id
-    FOREIGN KEY (scan_file_id)
-    REFERENCES scan_file (id)
-    ON DELETE CASCADE
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table scan_file_ms1_intensity_binned_summed_summary
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS scan_file_ms1_intensity_binned_summed_summary ;
@@ -2312,3 +2256,4 @@ END$$
 
 
 DELIMITER ;
+

@@ -6,9 +6,13 @@ import java.math.RoundingMode;
 public class RetentionTimeScalingAndRounding {
 
 	// Divide by 60 to change all retention times to minutes.
-	private static final BigDecimal RETENTION_TIME_SECONDS_TO_MINUTES_DIVIDE_BY = new BigDecimal( 60 ); 
+	private static final int  RETENTION_TIME_SECONDS_TO_MINUTES_DIVIDE_BY = 60;
+	
+	private static final BigDecimal RETENTION_TIME_SECONDS_TO_MINUTES_DIVIDE_BY_BD = new BigDecimal( RETENTION_TIME_SECONDS_TO_MINUTES_DIVIDE_BY );
+	
 	//  Number of places to right of decimal point
 	private static final int NUMBER_OF_DECIMAL_PLACES = 2;
+	
 	/**
 	 * @param initialRetentionTime
 	 * @return
@@ -24,6 +28,14 @@ public class RetentionTimeScalingAndRounding {
 	 * @return
 	 */
 	public static BigDecimal retentionTimeToMinutes( BigDecimal initialRetentionTime )  {
-		return initialRetentionTime.divide( RETENTION_TIME_SECONDS_TO_MINUTES_DIVIDE_BY, RoundingMode.HALF_UP );
+		return initialRetentionTime.divide( RETENTION_TIME_SECONDS_TO_MINUTES_DIVIDE_BY_BD, RoundingMode.HALF_UP );
+	}
+	
+	/**
+	 * @param initialRetentionTime
+	 * @return
+	 */
+	public static float retentionTimeToMinutes( float initialRetentionTime )  {
+		return initialRetentionTime / RETENTION_TIME_SECONDS_TO_MINUTES_DIVIDE_BY;
 	}
 }

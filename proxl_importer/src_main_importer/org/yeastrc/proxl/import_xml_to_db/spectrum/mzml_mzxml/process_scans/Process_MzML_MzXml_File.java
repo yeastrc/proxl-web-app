@@ -1,7 +1,6 @@
 package org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.process_scans;
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,13 +9,14 @@ import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
-import org.yeastrc.xlink.dao.ScanRetentionTimeDAO;
 import org.yeastrc.xlink.dto.ScanFileDTO;
 import org.yeastrc.xlink.dto.ScanFileHeaderDTO;
 import org.yeastrc.xlink.dto.ScanFileSourceDTO;
-import org.yeastrc.xlink.dto.ScanRetentionTimeDTO;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterConfigException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterSpectralStorageServiceErrorException;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterSpectralStorageServiceRetryExceededException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ScanFileFileContainer;
 import org.yeastrc.proxl.import_xml_to_db.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTrackingSingleFile_Importer_DAO;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.db_update_with_transaction_services.AddNewScanFileAndHeadersIfNeededDBTransactionService;
@@ -24,7 +24,7 @@ import org.yeastrc.proxl.import_xml_to_db.spectrum.db_update_with_transaction_se
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.dto.MzML_MzXmlHeader;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.dto.MzML_MzXmlScan;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.reader.MzMl_MzXml_FileReader;
-import org.yeastrc.proxl.import_xml_to_db.utils.RoundDecimalFieldsIfNecessary;
+import org.yeastrc.proxl.import_xml_to_db.spectrum.spectral_storage_service_interface.ScanFileToSpectralStorageService_Processing;
 import org.yeastrc.proxl.import_xml_to_db.utils.SHA1SumCalculator;
 
 /**
@@ -133,17 +133,37 @@ public class Process_MzML_MzXml_File {
 				System.out.println( msg );
 			} else {
 			}
+
 			mapOfScanNumbersToScanIds =
 					processAllScan( scanFileReader, scanNumbersToLoad, scanFileWithPath, scanFileDTO, newScanFileRecord );
+
+			//  Send scan file to Spectral Storage Service for storage, will update proxl.scan_file record with returned API key
+			//         Send after import to Proxl DB to ensure it is valid first and scans match Proxl Input XML file.
+			//           (Could do the Scan File to Proxl Input XML file matching validation before inserting into the database, then could send to Spectral Storage Service first)
+			ScanFileToSpectralStorageService_Processing.getInstance().sendScanFileToSpectralStorageServiceUpdateScanFileSpectralStorageAPIKey( scanFileWithPath, scanFileDTO );
+			
+		} catch ( RuntimeException e ) {
+			throw e;
+		} catch ( ProxlImporterConfigException e ) {
+			throw e;
 		} catch ( ProxlImporterInteralException e ) {
 			throw e;
+		} catch ( ProxlImporterSpectralStorageServiceRetryExceededException e ) {
+			String msg = "Error: ProxlImporterSpectralStorageServiceRetryExceededException processing mzML or mzXml Scan file: " + scanFileWithPath.getAbsolutePath()
+				+ ",  Throwing ProxlImporterInteralException.";
+			log.error( msg, e );
+			throw new ProxlImporterInteralException( msg, e );
+		} catch ( ProxlImporterSpectralStorageServiceErrorException e ) {
+			String msg = "Error: ProxlImporterSpectralStorageServiceErrorException processing mzML or mzXml Scan file: " + scanFileWithPath.getAbsolutePath()
+				+ ",  Throwing ProxlImporterInteralException.";
+			log.error( msg, e );
+			throw new ProxlImporterInteralException( msg, e );
 		} catch ( Exception e ) {
 			String msg = "Error Exception processing mzML or mzXml Scan file: " + scanFileWithPath.getAbsolutePath()
 					+ ",  Throwing Data error since probably error in file format.";
 			log.error( msg, e );
 			String msgForException = "Error processing Scan file: " + scanFileWithPath.getAbsolutePath()
-					+ ".  Please check the file to ensure it contains the correct contents for "
-					+ "a scan file based on the suffix of the file ('mzML' or 'mzXML')";
+					+ ".  Please check the file to ensure it contains the correct contents for a scan file based on the suffix of the file ('mzML' or 'mzXML')";
 			throw new ProxlImporterDataException( msgForException );
 		} finally {
 			if ( scanFileReader != null ) {
@@ -259,7 +279,6 @@ public class Process_MzML_MzXml_File {
 			insertedScanNumberAtIndex = new boolean[ scanNumbersToLoad.length ];
 		}
 		int scanFileId = scanFileDTO.getId();
-		boolean saveSpectrumData = true;
 		int insertedScansCounter = 0;
 		 NumberFormat numberFormatInsertedScansCounter = NumberFormat.getInstance();
 		int insertedScansBlockCounter = 0; // track number since last reported on number inserted.
@@ -277,7 +296,7 @@ public class Process_MzML_MzXml_File {
 		
 		try {
 			MzML_MzXmlScan scanIn = null;
-			MzML_MzXmlScan prevMS1ScanIn = null;
+//			MzML_MzXmlScan prevMS1ScanIn = null;
 			while ( ( scanIn = scanFileReader.getNextScan() ) != null ) {
 				scanCounter++;
 				scansReadBlockCounter++;
@@ -288,16 +307,7 @@ public class Process_MzML_MzXml_File {
     				}
     				scansReadBlockCounter = 0;
     			}
-    			BigDecimal retentionTime = 
-    					RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( scanIn.getRetentionTime() );
-    			//  Save every scan to table scan_retention_time
-    			ScanRetentionTimeDTO scanRetentionTimeDTO = new ScanRetentionTimeDTO();
-    			scanRetentionTimeDTO.setScanFileId( scanFileId );
-    			scanRetentionTimeDTO.setScanNumber( scanIn.getStartScanNum() );
-    			scanRetentionTimeDTO.setScanLevel( scanIn.getMsLevel() );
-    			scanRetentionTimeDTO.setPrecursorScanNumber( scanIn.getPrecursorScanNum() );
-    			scanRetentionTimeDTO.setRetentionTime( retentionTime );
-    			ScanRetentionTimeDAO.save( scanRetentionTimeDTO );
+
     			//  Sum up intensities
                 if(scanIn.getMsLevel() == 1)  {
                 	ms1_ScanCounter++;
@@ -324,7 +334,7 @@ public class Process_MzML_MzXml_File {
                 	if ( scanNumberFoundInListToLoad ) {
                 		boolean insertedRecord = 
                 				InsertNewScanAndPrescanIfNeededDBTransactionService.getInstance()
-                				.insertNewScanAndPrescanIfNeededDBTransactionService( scanIn, prevMS1ScanIn, scanFileDTO, saveSpectrumData, mapOfScanNumbersToScanIds );
+                				.insertNewScanAndPrescanIfNeededDBTransactionService( scanIn, scanFileDTO, mapOfScanNumbersToScanIds );
                 		if ( insertedRecord ) { 
                 			////////  Do some reporting
                 			insertedScansCounter++;
@@ -337,7 +347,7 @@ public class Process_MzML_MzXml_File {
                     			}
                     			if ( insertedScansBlockCounter > 5000 ) {
                     				if ( log.isInfoEnabled() ) {
-                    					log.info( "Number of ms2 scans (also ms1 scans being inserted) inserted so far: " 
+                    					log.info( "Number of ms2 scans inserted so far: " 
                     							+ numberFormatInsertedScansCounter.format( insertedScansCounter ) );
                     				}
                     				insertedScansBlockCounter = 0;
@@ -349,15 +359,8 @@ public class Process_MzML_MzXml_File {
                 				}
                 				System.out.print( Integer.toString( scanIn.getStartScanNum() ) );
                 			}                			
-//                		} else {
-//                			int z = 0;
                 		}
-//            		} else {
-//            			int z = 0;
             		}
-                }
-                if(scanIn.getMsLevel() == 1)  {
-                	prevMS1ScanIn = scanIn;
                 }
 			}
 //		} catch (IOException e) {

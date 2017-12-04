@@ -22,7 +22,7 @@ import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchIdScanFileIdCombinedRecordExistsSearcher;
-import org.yeastrc.xlink.dao.ScanFileMS_1_IntensityBinnedSummedDataDAO;
+import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -155,12 +155,13 @@ public class QC_Scan_MS_1_IonCurrent_HeatmapHasData_Service {
 			    	        );
 			}
 			
-			Integer scanFileIdFromDB = 
-					ScanFileMS_1_IntensityBinnedSummedDataDAO.getScanFileIdFromScanFileId( scanFileId );
+			//  Get spectralStorageAPIKey for  Spectral Storage Service
+
+			String spectralStorageAPIKey = ScanFileDAO.getInstance().getSpectralStorageAPIKeyById( scanFileId );
 
 			QC_Scan_MS_1_IonCurrent_HeatmapHasData_WebserviceResult webserviceResult = new QC_Scan_MS_1_IonCurrent_HeatmapHasData_WebserviceResult();
 			
-			if ( scanFileIdFromDB != null ) {
+			if ( StringUtils.isNotEmpty( spectralStorageAPIKey ) ) {
 				webserviceResult.hasData = true;
 			}
 			

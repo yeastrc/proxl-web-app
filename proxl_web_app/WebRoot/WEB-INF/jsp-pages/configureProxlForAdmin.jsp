@@ -172,6 +172,15 @@
 	  </div> 
 	</div>	
 	
+	<div style="margin-bottom: 10px;" >
+		<div style="margin-bottom: 3px;">
+			Spectral Storage Service Base URL (required if allow scan file uploads): 
+			<input type="text" class=" config_text_inputs_jq " style="width: 650px;"
+				data-config-key="<%= ConfigSystemsKeysSharedConstants.SPECTRAL_STORAGE_SERVICE_BASE_URL %>"
+				>
+		</div>
+	</div>
+	
 	<div >
 		<input type="button" value="Save" id="save_button">
 		<input type="button" value="Reset" id="reset_button">

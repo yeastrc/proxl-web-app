@@ -1,4 +1,4 @@
-package org.yeastrc.proxl.import_xml_to_db_runner_pgm.dao;
+package org.yeastrc.proxl.import_xml_to_db.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

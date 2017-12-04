@@ -10,9 +10,10 @@ import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.ScanRetentionTimeDAO;
-import org.yeastrc.xlink.dto.ScanRetentionTimeDTO;
+import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.Single_ScanRetentionTime_ScanNumber_SubResponse;
+import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.dao.SearchDAO;
@@ -24,6 +25,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.searcher.RetentionTimesForPSMCriteriaSearcher;
 import org.yeastrc.xlink.www.searcher.ScanFileIdsForSearchSearcher;
+import org.yeastrc.xlink.www.spectral_storage_service_interface.Call_Get_ScanRetentionTimes_FromSpectralStorageService;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 import org.yeastrc.xlink.www.web_utils.RetentionTimeScalingAndRounding;
 
@@ -62,7 +64,7 @@ public class CreateScanRetentionTimeQCPlotData {
 		ScanRetentionTimeJSONRoot scanRetentionTimeJSONRoot;
 		
 		List<BigDecimal> retentionTimeForPSMsthatMeetCriteriaList;
-		List<ScanRetentionTimeDTO> scanRetentionTime_AllScansExcludeScanLevel_1_List;
+		List<Single_ScanRetentionTime_ScanNumber_SubResponse> scanRetentionTime_AllScansExcludeScanLevel_1_List;
 
 		public ScanRetentionTimeJSONRoot getScanRetentionTimeJSONRoot() {
 			return scanRetentionTimeJSONRoot;
@@ -80,12 +82,12 @@ public class CreateScanRetentionTimeQCPlotData {
 			this.retentionTimeForPSMsthatMeetCriteriaList = retentionTimeForPSMsthatMeetCriteriaList;
 		}
 
-		public List<ScanRetentionTimeDTO> getScanRetentionTime_AllScansExcludeScanLevel_1_List() {
+		public List<Single_ScanRetentionTime_ScanNumber_SubResponse> getScanRetentionTime_AllScansExcludeScanLevel_1_List() {
 			return scanRetentionTime_AllScansExcludeScanLevel_1_List;
 		}
 
 		public void setScanRetentionTime_AllScansExcludeScanLevel_1_List(
-				List<ScanRetentionTimeDTO> scanRetentionTime_AllScansExcludeScanLevel_1_List) {
+				List<Single_ScanRetentionTime_ScanNumber_SubResponse> scanRetentionTime_AllScansExcludeScanLevel_1_List) {
 			this.scanRetentionTime_AllScansExcludeScanLevel_1_List = scanRetentionTime_AllScansExcludeScanLevel_1_List;
 		}
 		
@@ -145,14 +147,14 @@ public class CreateScanRetentionTimeQCPlotData {
 							filterCriteria_JSONString, 
 							retentionTimeInSecondsCutoff );
 		
-		List<ScanRetentionTimeDTO> scanRetentionTime_AllScansExcludeScanLevel_1_List = null;
+		List<Single_ScanRetentionTime_ScanNumber_SubResponse> scanRetentionTime_AllScansExcludeScanLevel_1_List = null;
 		for ( int scanFileId : scanFileIdList ) {
-			List<ScanRetentionTimeDTO> scanRetentionTime_ForThisScanFileId_List =
-					ScanRetentionTimeDAO.getForScanFileIdExcludeScanLevel( scanFileId, retentionTimeInSecondsCutoff, EXCLUDE_SCAN_LEVEL_1 );
+			List<Single_ScanRetentionTime_ScanNumber_SubResponse> scanPartsNoLevel_1_ForThisScanFileId_List = 
+					getScanParts_NoLevel_1_WithRetentionTimesForScanFileId_retentionTimeInSecondsCutoff( scanFileId, retentionTimeInSecondsCutoff );
 			if ( scanRetentionTime_AllScansExcludeScanLevel_1_List == null ) {
-				scanRetentionTime_AllScansExcludeScanLevel_1_List = scanRetentionTime_ForThisScanFileId_List;
+				scanRetentionTime_AllScansExcludeScanLevel_1_List = scanPartsNoLevel_1_ForThisScanFileId_List;
 			} else {
-				scanRetentionTime_AllScansExcludeScanLevel_1_List.addAll( scanRetentionTime_ForThisScanFileId_List );
+				scanRetentionTime_AllScansExcludeScanLevel_1_List.addAll( scanPartsNoLevel_1_ForThisScanFileId_List );
 			}
 		}
 		
@@ -173,6 +175,41 @@ public class CreateScanRetentionTimeQCPlotData {
 		
 		return result;
 	}
+	
+	private List<Single_ScanRetentionTime_ScanNumber_SubResponse> getScanParts_NoLevel_1_WithRetentionTimesForScanFileId_retentionTimeInSecondsCutoff( 
+			int scanFileId,
+			Double retentionTimeInSecondsCutoff ) throws Exception {
+
+		String scanFileAPIKey = ScanFileDAO.getInstance().getSpectralStorageAPIKeyById( scanFileId );
+		if ( StringUtils.isEmpty( scanFileAPIKey ) ) {
+			String msg = "No value for scanFileAPIKey for scan file id: " + scanFileId;
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
+		}
+
+		//  Filter out scan level 1 from Spectral Storage data
+		
+		final int EXCLUDED_SCAN_LEVEL_1 = 1;
+		
+		List<Single_ScanRetentionTime_ScanNumber_SubResponse> scanPartsNoLevel_1 = 
+				Call_Get_ScanRetentionTimes_FromSpectralStorageService.getSingletonInstance().get_ScanRetentionTimes_Exclude_ScanLevel( scanFileAPIKey, EXCLUDED_SCAN_LEVEL_1 );
+
+		//  If retentionTimeInSecondsCutoff, filter for retentionTimeInSecondsCutoff
+		
+		if ( retentionTimeInSecondsCutoff != null ) {
+			//  Filter for retentionTimeInSecondsCutoff
+			List<Single_ScanRetentionTime_ScanNumber_SubResponse> scanPartsFiltered = new ArrayList<>( scanPartsNoLevel_1.size() );
+			for ( Single_ScanRetentionTime_ScanNumber_SubResponse scanPart : scanPartsNoLevel_1 ) {
+				if ( scanPart.getRetentionTime() < retentionTimeInSecondsCutoff ) {
+					scanPartsFiltered.add( scanPart );
+				}
+			}
+			scanPartsNoLevel_1 = scanPartsFiltered;
+		}
+		
+		return scanPartsNoLevel_1;
+	}
+	
 	
 	/**
 	 * @param projectSearchId
@@ -268,17 +305,17 @@ public class CreateScanRetentionTimeQCPlotData {
 	 */
 	private ScanRetentionTimeJSONRoot createScanRetentionTimeQCPlotData( 
 			List<Integer> scanFileIdList,
-			List<ScanRetentionTimeDTO> scanRetentionTime_AllScansExcludeScanLevel_1_List,
+			List<Single_ScanRetentionTime_ScanNumber_SubResponse> scanRetentionTime_AllScansExcludeScanLevel_1_List,
 			List<BigDecimal> retentionTimeForPSMsthatMeetCriteriaList ) throws Exception {
 		int numScans = 0;
 		//  Find max and min values
-		double retentionTimeMin = 0;
-		double retentionTimeMax =  0;
+		float retentionTimeMin = 0;
+		float retentionTimeMax =  0;
 		boolean firstOverallRetentionTimeEntry = true;
-		for ( ScanRetentionTimeDTO scanRetentionTimeDTO : scanRetentionTime_AllScansExcludeScanLevel_1_List ) {
-			BigDecimal retentionTime = scanRetentionTimeDTO.getRetentionTime();
-			double retentionTimeScaled = 
-					RetentionTimeScalingAndRounding.retentionTimeToMinutes( retentionTime ).doubleValue();
+		for ( Single_ScanRetentionTime_ScanNumber_SubResponse single_ScanRetentionTime_ScanNumber_SubResponse : scanRetentionTime_AllScansExcludeScanLevel_1_List ) {
+			float retentionTime = single_ScanRetentionTime_ScanNumber_SubResponse.getRetentionTime();
+			float retentionTimeScaled = 
+					RetentionTimeScalingAndRounding.retentionTimeToMinutes( retentionTime );
 			if ( firstOverallRetentionTimeEntry  ) {
 				firstOverallRetentionTimeEntry = false;
 				retentionTimeMin = retentionTimeScaled;
@@ -292,14 +329,14 @@ public class CreateScanRetentionTimeQCPlotData {
 				}
 			}
 		}
-		double retentionTimeMaxMinusMin = retentionTimeMax - retentionTimeMin;
+		float retentionTimeMaxMinusMin = retentionTimeMax - retentionTimeMin;
 		//  Process data into bins
-		double binSizeAsDouble = ( retentionTimeMax ) / BIN_COUNT;
+		float binSizeAsDouble = ( retentionTimeMax ) / BIN_COUNT;
 		//   First process the retention times for all PSMs for the scan file into bins, excluding scan level 1 (EXCLUDE_SCAN_LEVEL_1)
 		int[] retentionTimeCountsAllPSMs = new int[ BIN_COUNT ];
-		for ( ScanRetentionTimeDTO scanRetentionTimeDTO : scanRetentionTime_AllScansExcludeScanLevel_1_List ) {
-			BigDecimal retentionTime = scanRetentionTimeDTO.getRetentionTime();
-			double retentionTimeFraction = RetentionTimeScalingAndRounding.retentionTimeToMinutes( retentionTime ).doubleValue() / retentionTimeMax;
+		for ( Single_ScanRetentionTime_ScanNumber_SubResponse single_ScanRetentionTime_ScanNumber_SubResponse : scanRetentionTime_AllScansExcludeScanLevel_1_List ) {
+			float retentionTime = single_ScanRetentionTime_ScanNumber_SubResponse.getRetentionTime();
+			float retentionTimeFraction = RetentionTimeScalingAndRounding.retentionTimeToMinutes( retentionTime ) / retentionTimeMax;
 			int bin = (int) ( (  retentionTimeFraction ) * BIN_COUNT );
 			if ( bin < 0 ) {
 				bin = 0;
@@ -312,8 +349,8 @@ public class CreateScanRetentionTimeQCPlotData {
 		int[] retentionTimeForPsmthatMeetCriteriaCounts = new int[ BIN_COUNT ];
 		if ( retentionTimeForPSMsthatMeetCriteriaList != null ) {
 			for ( BigDecimal retentionTimeForPSMsthatMeetCriteria : retentionTimeForPSMsthatMeetCriteriaList ) {
-				double retentionTimeFraction = 
-						RetentionTimeScalingAndRounding.retentionTimeToMinutes(  retentionTimeForPSMsthatMeetCriteria ).doubleValue() / retentionTimeMax;
+				float retentionTimeFraction = 
+						RetentionTimeScalingAndRounding.retentionTimeToMinutes(  retentionTimeForPSMsthatMeetCriteria ).floatValue() / retentionTimeMax;
 				int bin = (int) ( (  retentionTimeFraction ) * BIN_COUNT );
 				if ( bin < 0 ) {
 					bin = 0;

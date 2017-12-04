@@ -23,13 +23,11 @@ import java.awt.image.renderable.ParameterBlock;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.yeastrc.heatmap.impl.MultiColorMapper;
-import org.yeastrc.xlink.dao.ScanFileMS_1_IntensityBinnedSummedDataDAO;
-import org.yeastrc.xlink.dto.ScanFileMS_1_IntensityBinnedSummedDataDTO;
-import org.yeastrc.xlink.utils.ZipUnzipByteArray;
+import org.yeastrc.spectral_storage.shared_server_client_importer.accum_scan_rt_mz_binned.dto.MS1_IntensitiesBinnedSummedMapRoot;
+import org.yeastrc.spectral_storage.shared_server_client_importer.accum_scan_rt_mz_binned.dto.MS1_IntensitiesBinnedSummed_Summary_DataRoot;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
-import org.yeastrc.xlink.ms1_binned_summed_intensities.main.MS1_BinnedSummedIntensitiesProcessing;
-import org.yeastrc.xlink.ms1_binned_summed_intensities.objects.MS1_IntensitiesBinnedSummedMapToJSONRoot;
-import org.yeastrc.xlink.ms1_binned_summed_intensities.objects.MS1_IntensitiesBinnedSummed_Summary_Data_ToJSONRoot;
+import org.yeastrc.xlink.www.spectral_storage_service_interface.Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice;
+import org.yeastrc.xlink.dao.ScanFileDAO;
 
 /**
  * Create a PNG image for the MS1 Intensity
@@ -47,7 +45,7 @@ public class MS1_All_IntensityHeatmapImage {
 	 * 
 	 *  Increment this value whenever change the resulting image since Caching the resulting image
 	 */
-	static final int VERSION_FOR_CACHING = 2;
+	static final int VERSION_FOR_CACHING = 3;
 	
 	/**
 	 *  Must be in ascending order since searching using Arrays.binarySearch
@@ -161,15 +159,15 @@ public class MS1_All_IntensityHeatmapImage {
 		
 		if ( imageAsBytes == null ) {
 
-			MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot =
-				getMS1_IntensitiesBinnedSummedMapToJSONRoot( scanFileId );
+			MS1_IntensitiesBinnedSummedMapRoot ms1_IntensitiesBinnedSummedMapRoot =
+				getMS1_IntensitiesBinnedSummedMapRoot( scanFileId );
 
-			if ( ms1_IntensitiesBinnedSummedMapToJSONRoot == null ) {
+			if ( ms1_IntensitiesBinnedSummedMapRoot == null ) {
 				return new MS1_All_IntensityHeatmapImageResult();
 			}
 
 			BufferedImage bufferedImage = 
-					getImage( requestedImageWidth, ms1_IntensitiesBinnedSummedMapToJSONRoot, scanFileId /* for logging */ );
+					getImage( requestedImageWidth, ms1_IntensitiesBinnedSummedMapRoot, scanFileId /* for logging */ );
 
 			ByteArrayOutputStream baos = new ByteArrayOutputStream(); // ( imageWidth * imageHeight * 4 );
 
@@ -191,24 +189,24 @@ public class MS1_All_IntensityHeatmapImage {
 	
 	/**
 	 * @param requestedImageWidth
-	 * @param ms1_IntensitiesBinnedSummedMapToJSONRoot
+	 * @param ms1_IntensitiesBinnedSummedMapRoot
 	 * @return
 	 * @throws ProxlWebappInternalErrorException
 	 * @throws Exception
 	 */
 	public BufferedImage getImage(
 			Integer requestedImageWidth,
-			MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot,
+			MS1_IntensitiesBinnedSummedMapRoot ms1_IntensitiesBinnedSummedMapRoot,
 			Integer scanFileId /* for logging */ )
 			throws ProxlWebappInternalErrorException, Exception {
 
 		CreateFullSizeImageForMS1IntensityDataResult createFullSizeImageForMS1IntensityDataResult = 
 				createFullSizeImageForMS1IntensityData( 
-						ms1_IntensitiesBinnedSummedMapToJSONRoot, PLOTTED_PIXEL_COLORS, scanFileId /* for logging */ );
+						ms1_IntensitiesBinnedSummedMapRoot, PLOTTED_PIXEL_COLORS, scanFileId /* for logging */ );
 		
 		//  Add tick marks, legends, labels, etc
 		BufferedImage bufferedImage = 
-				createImageWithAdditions( requestedImageWidth, ms1_IntensitiesBinnedSummedMapToJSONRoot, createFullSizeImageForMS1IntensityDataResult, PLOTTED_PIXEL_COLORS );
+				createImageWithAdditions( requestedImageWidth, ms1_IntensitiesBinnedSummedMapRoot, createFullSizeImageForMS1IntensityDataResult, PLOTTED_PIXEL_COLORS );
 		
 		return bufferedImage;
 	}
@@ -307,21 +305,21 @@ public class MS1_All_IntensityHeatmapImage {
 	}
 	
 	/**
-	 * @param ms1_IntensitiesBinnedSummedMapToJSONRoot
+	 * @param ms1_IntensitiesBinnedSummedMapRoot
 	 * @param pixelPlottedColors
 	 * @return
 	 * @throws ProxlWebappInternalErrorException
 	 */
 	public CreateFullSizeImageForMS1IntensityDataResult createFullSizeImageForMS1IntensityData(
-			MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot,
+			MS1_IntensitiesBinnedSummedMapRoot ms1_IntensitiesBinnedSummedMapRoot,
 			Color[] pixelPlottedColors,
 			Integer scanFileId /* for logging */ )
 			throws ProxlWebappInternalErrorException {
 		
-		MS1_IntensitiesBinnedSummed_Summary_Data_ToJSONRoot summaryData =
-				ms1_IntensitiesBinnedSummedMapToJSONRoot.getSummaryData();
+		MS1_IntensitiesBinnedSummed_Summary_DataRoot summaryData =
+				ms1_IntensitiesBinnedSummedMapRoot.getSummaryData();
 		Map<Long, Map<Long, Double>> ms1_IntensitiesBinnedSummedMap =
-				ms1_IntensitiesBinnedSummedMapToJSONRoot.getMs1_IntensitiesBinnedSummedMap();
+				ms1_IntensitiesBinnedSummedMapRoot.getMs1_IntensitiesBinnedSummedMap();
 
 		long binnedSummedIntensityCount = summaryData.getBinnedSummedIntensityCount();
 
@@ -341,11 +339,11 @@ public class MS1_All_IntensityHeatmapImage {
 		double intensityBinnedMaxUseFromActualMinMax = getIntensityUseFromIntensity( intensityBinnedMaxActual );
 
 		if ( log.isDebugEnabled() ) {
-			log.debug( "summaryData.getRtBinMax(): " + summaryData.getRtBinMax() );
-			log.debug( "summaryData.getRtMaxPossibleValue(): " + summaryData.getRtMaxPossibleValue() );
+			log.debug( "summaryData.getRtBinMaxInSeconds(): " + summaryData.getRtBinMaxInSeconds() );
+			log.debug( "summaryData.getRtMaxPossibleValueInSeconds(): " + summaryData.getRtMaxPossibleValueInSeconds() );
 
-			log.debug( "summaryData.getMzBinMax(): " + summaryData.getMzBinMax() );
-			log.debug( "summaryData.getMzMaxPossibleValue(): " + summaryData.getMzMaxPossibleValue() );
+			log.debug( "summaryData.getMzBinMaxInMZ(): " + summaryData.getMzBinMaxInMZ() );
+			log.debug( "summaryData.getMzMaxPossibleValueInMZ(): " + summaryData.getMzMaxPossibleValueInMZ() );
 
 			log.debug( "intensityBinnedMinActual: " + intensityBinnedMinActual );
 			log.debug( "intensityBinnedMaxActual: " + intensityBinnedMaxActual );
@@ -450,7 +448,7 @@ public class MS1_All_IntensityHeatmapImage {
 		MultiColorMapper colorMapper = new MultiColorMapper( intensityMinBasedOnPercentilesUse, intensityMaxBasedOnPercentilesUse, pixelPlottedColors );
 
 		BufferedImage bufferedImage = createFullSizeImageOnlyDataActualImage(
-				ms1_IntensitiesBinnedSummedMapToJSONRoot, 
+				ms1_IntensitiesBinnedSummedMapRoot, 
 				intensityMinBasedOnPercentilesUse, 
 				colorMapper );
 		
@@ -512,22 +510,22 @@ public class MS1_All_IntensityHeatmapImage {
 	}
 
 	/**
-	 * @param ms1_IntensitiesBinnedSummedMapToJSONRoot
+	 * @param ms1_IntensitiesBinnedSummedMapRoot
 	 * @param intensityMinUse
 	 * @param colorMapper
 	 * @return
 	 * @throws ProxlWebappInternalErrorException
 	 */
 	public BufferedImage createFullSizeImageOnlyDataActualImage(
-			MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot,
+			MS1_IntensitiesBinnedSummedMapRoot ms1_IntensitiesBinnedSummedMapRoot,
 			double intensityMinUse,
 			MultiColorMapper colorMapper) throws ProxlWebappInternalErrorException {
 		
-		Map<Long, Map<Long, Double>> ms1_IntensitiesBinnedSummedMap = ms1_IntensitiesBinnedSummedMapToJSONRoot.getMs1_IntensitiesBinnedSummedMap(); 
-		MS1_IntensitiesBinnedSummed_Summary_Data_ToJSONRoot summaryData = ms1_IntensitiesBinnedSummedMapToJSONRoot.getSummaryData();
+		Map<Long, Map<Long, Double>> ms1_IntensitiesBinnedSummedMap = ms1_IntensitiesBinnedSummedMapRoot.getMs1_IntensitiesBinnedSummedMap(); 
+		MS1_IntensitiesBinnedSummed_Summary_DataRoot summaryData = ms1_IntensitiesBinnedSummedMapRoot.getSummaryData();
 
-		int imageWidth = (int) ( summaryData.getRtMaxPossibleValue() - summaryData.getRtBinMin() );
-		int imageHeight = (int) ( summaryData.getMzMaxPossibleValue() - summaryData.getMzBinMin() );
+		int imageWidth = (int) ( summaryData.getRtMaxPossibleValueInSeconds() - summaryData.getRtBinMinInSeconds() );
+		int imageHeight = (int) ( summaryData.getMzMaxPossibleValueInMZ() - summaryData.getMzBinMinInMZ() );
 
 		BufferedImage bufferedImage = createBufferedImageForWidthHeight( imageWidth, imageHeight );
 
@@ -554,13 +552,13 @@ public class MS1_All_IntensityHeatmapImage {
 		for ( Map.Entry<Long, Map<Long, Double>> rtEntry : ms1_IntensitiesBinnedSummedMap.entrySet() ) {
 			long retentionTimeBin = rtEntry.getKey();
 
-			int xAxis = (int) ( retentionTimeBin - summaryData.getRtBinMin() );
+			int xAxis = (int) ( retentionTimeBin - summaryData.getRtBinMinInSeconds() );
 
 			for ( Map.Entry<Long, Double> mzEntry : rtEntry.getValue().entrySet() ) {
 				long mzBin = mzEntry.getKey();
 
 				//  flipping y axis so min mzBin is at the bottom of the image
-				int yAxis = imageHeight - ( (int) ( mzBin - summaryData.getMzBinMin() ) ) - 1;
+				int yAxis = imageHeight - ( (int) ( mzBin - summaryData.getMzBinMinInMZ() ) ) - 1;
 
 				double intensityActual = mzEntry.getValue();
 				
@@ -618,14 +616,14 @@ public class MS1_All_IntensityHeatmapImage {
 	 */
 	public BufferedImage createImageWithAdditions( 
 			Integer requestedImageWidth,
-			MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot,
+			MS1_IntensitiesBinnedSummedMapRoot ms1_IntensitiesBinnedSummedMapRoot,
 			CreateFullSizeImageForMS1IntensityDataResult createFullSizeImageForMS1IntensityDataResult,
 			Color[] colors ) throws Exception {
 		
 		BufferedImage bufferedImage = createFullSizeImageForMS1IntensityDataResult.bufferedImage;
 		
-		MS1_IntensitiesBinnedSummed_Summary_Data_ToJSONRoot summaryData =
-				ms1_IntensitiesBinnedSummedMapToJSONRoot.getSummaryData();
+		MS1_IntensitiesBinnedSummed_Summary_DataRoot summaryData =
+				ms1_IntensitiesBinnedSummedMapRoot.getSummaryData();
 
 		int bufferedImageWidth = bufferedImage.getWidth();
 		int bufferedImageHeight = bufferedImage.getHeight();
@@ -726,8 +724,8 @@ public class MS1_All_IntensityHeatmapImage {
 			
 			//  Convert labels to minutes
 			
-			long retentionTimeBinMinMinutes = summaryData.getRtBinMin() / 60;
-			long retentionTimeBinMaxMinutes = summaryData.getRtBinMax() / 60;
+			long retentionTimeBinMinMinutes = summaryData.getRtBinMinInSeconds() / 60;
+			long retentionTimeBinMaxMinutes = summaryData.getRtBinMaxInSeconds() / 60;
 
 			//  Draw left tick mark and label
 			drawHorizontalAxisTickMarkAndLabel( 
@@ -773,14 +771,14 @@ public class MS1_All_IntensityHeatmapImage {
 			
 			//  Draw top tick mark and label
 			drawVerticalAxisTickMarkAndLabel( 
-					numberFormat.format( summaryData.getMzBinMax() ), 
+					numberFormat.format( summaryData.getMzBinMaxInMZ() ), 
 					IMAGE_MARGIN_TOP + TEXT_HEIGHT,  // tickMark_Y_TextBaseline
 					graphicsObj, 
 					fontMetrics );
 
 			//  Draw bottom tick mark and label
 			drawVerticalAxisTickMarkAndLabel( 
-					numberFormat.format( summaryData.getMzBinMin() ), 
+					numberFormat.format( summaryData.getMzBinMinInMZ() ), 
 					IMAGE_MARGIN_TOP + bufferedImageHeight - 2, // tickMark_Y_TextBaseline
 					graphicsObj, 
 					fontMetrics );
@@ -1045,19 +1043,30 @@ public class MS1_All_IntensityHeatmapImage {
 	 * @return null if not in db
 	 * @throws Exception
 	 */
-	private MS1_IntensitiesBinnedSummedMapToJSONRoot getMS1_IntensitiesBinnedSummedMapToJSONRoot( int scanFileId ) throws Exception {
+	private MS1_IntensitiesBinnedSummedMapRoot getMS1_IntensitiesBinnedSummedMapRoot( int scanFileId ) throws Exception {
 
-		ScanFileMS_1_IntensityBinnedSummedDataDTO scanFileMS_1_IntensityBinnedSummedDataDTO =
-				ScanFileMS_1_IntensityBinnedSummedDataDAO.getFromScanFileId( scanFileId );
-		if ( scanFileMS_1_IntensityBinnedSummedDataDTO == null ) {
-			return null;
+		//  Get from Spectral Storage Service
+
+		String spectralStorageAPIKey = ScanFileDAO.getInstance().getSpectralStorageAPIKeyById( scanFileId );
+
+		if ( spectralStorageAPIKey == null ) {
+			log.error( "No spectralStorageAPIKey value in scan file table for scanFileId: " + scanFileId );
+			return null;  // EARLY RETURN
 		}
-		byte[] dataJSON_Gzipped = scanFileMS_1_IntensityBinnedSummedDataDTO.getDataJSON_Gzipped();
-		byte[] dataJSON = ZipUnzipByteArray.getInstance().unzipByteArray( dataJSON_Gzipped );
 
-		MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot =
-				MS1_BinnedSummedIntensitiesProcessing.getInstance().getMainObjectFromBytes( dataJSON );
+		MS1_IntensitiesBinnedSummedMapRoot ms1_IntensitiesBinnedSummedMapRoot_FromSpectralStorage =
+				Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice.getSingletonInstance()
+				.getScanPeakIntensityBinnedOn_RT_MZFromSpectralStorageService( spectralStorageAPIKey );
 
-		return ms1_IntensitiesBinnedSummedMapToJSONRoot;
+		if ( ms1_IntensitiesBinnedSummedMapRoot_FromSpectralStorage == null ) {
+
+			log.error( "No data in Spectral Storage for ms1_IntensitiesBinnedSummedMapRoot_FromSpectralStorage. scanFileId: " + scanFileId 
+					+ ", spectralStorageAPIKey: "
+					+ spectralStorageAPIKey );
+
+			return null;  // EARLY RETURN
+		}
+
+		return ms1_IntensitiesBinnedSummedMapRoot_FromSpectralStorage;
 	}
 }

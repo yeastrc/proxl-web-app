@@ -74,7 +74,7 @@ public class SaveImportTrackingAndChildrenSingleDBTransaction {
 					
 				} catch (Exception ex) {
 					
-					String msgRollback = "Rollback Exception:  saveImportTrackingAndChildrenInSingleDBTransaction(...) Exception:  See Syserr or Sysout for original exception: Rollback Exception, tables 'scan' and 'scan_spectrum_data' are in an inconsistent state. '" + ex.toString();
+					String msgRollback = "Rollback Exception:  saveImportTrackingAndChildrenInSingleDBTransaction(...) Exception:  See Syserr or Sysout for original exception: Rollback Exception, tables 'scan' is in an inconsistent state. '" + ex.toString();
 					
 					log.error( msgRollback, ex );
 

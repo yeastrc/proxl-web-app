@@ -22,6 +22,7 @@ import org.yeastrc.proxl.import_xml_to_db.objects.ScanFileFileContainer;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl.import_xml_to_db.post_insert_search_processing.PerformPostInsertSearchProcessing;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.process_scans.Process_MzML_MzXml_File;
+import org.yeastrc.proxl.import_xml_to_db.spectrum.validate_input_scan_file.ValidateInputScanFile;
 import org.yeastrc.proxl_import.api.xml_dto.CrosslinkMass;
 import org.yeastrc.proxl_import.api.xml_dto.CrosslinkMasses;
 import org.yeastrc.proxl_import.api.xml_dto.Linker;
@@ -145,11 +146,32 @@ public class ProcessProxlInput {
 						scanNumbersToLoadIntArray[ index ] = scanNumberToLoad;
 						index++;
 					}
+					
+					//  Throws ProxlImporterDataException if validate fails
+					ValidateInputScanFile.getInstance().validateScanFile( scanFile, scanFilenameString );
+					
 					Map<Integer,Integer> mapOfScanNumbersToScanIds =
 							Process_MzML_MzXml_File.getInstance()
 							.processMzMLFileWithScanNumbersToLoad( scanFileFileContainer, scanNumbersToLoadIntArray );
+					
 					mapOfScanFilenamesMapsOfScanNumbersToScanIds.put( scanFilenameString, mapOfScanNumbersToScanIds );
+					
 				} else {
+					
+					// First validate all scan files
+
+					for ( ScanFileFileContainer scanFileFileContainer : scanFileFileContainerList ) {
+						File scanFile = scanFileFileContainer.getScanFile();
+						String scanFilenameString = scanFile.getName();
+						if ( scanFileFileContainer.getScanFileDBRecord() != null ) {
+							ProxlXMLFileImportTrackingSingleFileDTO scanFileDBRecord = scanFileFileContainer.getScanFileDBRecord();
+							scanFilenameString = scanFileDBRecord.getFilenameInUpload();
+						}
+
+						//  Throws ProxlImporterDataException if validate fails
+						ValidateInputScanFile.getInstance().validateScanFile( scanFile, scanFilenameString );
+					}
+					
 					boolean scanNumbersFoundForAnyScanFile = false;
 					for ( ScanFileFileContainer scanFileFileContainer : scanFileFileContainerList ) {
 						File scanFile = scanFileFileContainer.getScanFile();
@@ -182,6 +204,8 @@ public class ProcessProxlInput {
 						throw new ProxlImporterInteralException( msg );
 					}
 				}
+				
+				log.warn( "INFO:  !!  Finished processing Scan Files.");
 			}
 			Map<String, SearchProgramEntry> searchProgramEntryMap =
 					ProcessSearchProgramEntries.getInstance()
@@ -205,6 +229,8 @@ public class ProcessProxlInput {
 				log.error( msg );
 				throw new ProxlImporterInteralException(msg);
 			}
+			
+			log.warn( "INFO:  !!  Starting to process Reported Peptides and PSMs");
 
 			ProcessReportedPeptidesAndPSMs.getInstance().processReportedPeptides( 
 					proxlInput, 

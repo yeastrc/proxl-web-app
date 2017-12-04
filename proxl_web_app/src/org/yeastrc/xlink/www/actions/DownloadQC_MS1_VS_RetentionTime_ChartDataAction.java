@@ -31,12 +31,9 @@ import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchIdScanFileIdCombinedRecordExistsSearcher;
+import org.yeastrc.xlink.www.spectral_storage_service_interface.Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice;
+import org.yeastrc.spectral_storage.shared_server_client_importer.accum_scan_rt_mz_binned.dto.MS1_IntensitiesBinnedSummedMapRoot;
 import org.yeastrc.xlink.dao.ScanFileDAO;
-import org.yeastrc.xlink.dao.ScanFileMS_1_IntensityBinnedSummedDataDAO;
-import org.yeastrc.xlink.dto.ScanFileMS_1_IntensityBinnedSummedDataDTO;
-import org.yeastrc.xlink.ms1_binned_summed_intensities.main.MS1_BinnedSummedIntensitiesProcessing;
-import org.yeastrc.xlink.ms1_binned_summed_intensities.objects.MS1_IntensitiesBinnedSummedMapToJSONRoot;
-import org.yeastrc.xlink.utils.ZipUnzipByteArray;
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
@@ -179,22 +176,16 @@ public class DownloadQC_MS1_VS_RetentionTime_ChartDataAction extends Action {
 
 			//  Copied from class Scan_MS_1_IonCurrent_Histograms
 
-			ScanFileMS_1_IntensityBinnedSummedDataDTO scanFileMS_1_IntensityBinnedSummedDataDTO =
-					ScanFileMS_1_IntensityBinnedSummedDataDAO.getFromScanFileId( scanFileId );
-			if ( scanFileMS_1_IntensityBinnedSummedDataDTO == null ) {
-				String msg = "No ScanFileMS_1_IntensityBinnedSummedDataDTO data found for provided scan_file_id.  "
+			MS1_IntensitiesBinnedSummedMapRoot  ms1_IntensitiesBinnedSummedMapRoot = getMS1_IntensitiesBinnedSummedMapRoot( scanFileId );
+			
+			if ( ms1_IntensitiesBinnedSummedMapRoot == null ) {
+				String msg = "No ms1_IntensitiesBinnedSummedMapRoot data found for provided scan_file_id.  "
 						+ "scan_file_id: " + scanFileId;
 				log.warn( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
 			
-			byte[] dataJSON_Gzipped = scanFileMS_1_IntensityBinnedSummedDataDTO.getDataJSON_Gzipped();
-			byte[] dataJSON = ZipUnzipByteArray.getInstance().unzipByteArray( dataJSON_Gzipped );
-
-			MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot =
-					MS1_BinnedSummedIntensitiesProcessing.getInstance().getMainObjectFromBytes( dataJSON );
-
-			Map<Long, Map<Long, Double>> ms1_IntensitiesBinnedSummedMap = ms1_IntensitiesBinnedSummedMapToJSONRoot.getMs1_IntensitiesBinnedSummedMap();
+			Map<Long, Map<Long, Double>> ms1_IntensitiesBinnedSummedMap = ms1_IntensitiesBinnedSummedMapRoot.getMs1_IntensitiesBinnedSummedMap();
 
 			//  Sum Intensities by Retention Time 
 
@@ -291,5 +282,37 @@ public class DownloadQC_MS1_VS_RetentionTime_ChartDataAction extends Action {
 			log.error( msg, e );
 			throw e;
 		}
+	}
+
+	/**
+	 * @param scanFileId
+	 * @return null if not in db
+	 * @throws Exception
+	 */
+	private MS1_IntensitiesBinnedSummedMapRoot getMS1_IntensitiesBinnedSummedMapRoot( int scanFileId ) throws Exception {
+
+		//  Get from Spectral Storage Service
+
+		String spectralStorageAPIKey = ScanFileDAO.getInstance().getSpectralStorageAPIKeyById( scanFileId );
+
+		if ( spectralStorageAPIKey == null ) {
+			log.error( "No spectralStorageAPIKey value in scan file table for scanFileId: " + scanFileId );
+			return null;  // EARLY RETURN
+		}
+
+		MS1_IntensitiesBinnedSummedMapRoot ms1_IntensitiesBinnedSummedMapRoot_FromSpectralStorage =
+				Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice.getSingletonInstance()
+				.getScanPeakIntensityBinnedOn_RT_MZFromSpectralStorageService( spectralStorageAPIKey );
+
+		if ( ms1_IntensitiesBinnedSummedMapRoot_FromSpectralStorage == null ) {
+
+			log.error( "No data in Spectral Storage for ms1_IntensitiesBinnedSummedMapRoot_FromSpectralStorage. scanFileId: " + scanFileId 
+					+ ", spectralStorageAPIKey: "
+					+ spectralStorageAPIKey );
+
+			return null;  // EARLY RETURN
+		}
+
+		return ms1_IntensitiesBinnedSummedMapRoot_FromSpectralStorage;
 	}
 }

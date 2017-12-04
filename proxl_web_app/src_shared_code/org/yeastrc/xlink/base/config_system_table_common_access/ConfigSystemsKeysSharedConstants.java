@@ -11,6 +11,10 @@ public class ConfigSystemsKeysSharedConstants {
 	////  Proxl Cache Files Root Directory - The Root directory that all files used for caching are writen to.
 	
 	public static final String CACHE_FILES_ROOT_DIRECTORY = "cache_files_root_directory";
+
+	////  Proxl Spectal Storage Service Base URL - URL used to communicate to Spectral Storage Service using Class CallSpectralStorageWebservice
+	
+	public static final String SPECTRAL_STORAGE_SERVICE_BASE_URL = "spectral_storage_service_base_url";
 	
 	////  Proxl XML File Import Set Up keys
 
@@ -35,6 +39,7 @@ public class ConfigSystemsKeysSharedConstants {
 	
 	static {
 		textConfigKeys.add( CACHE_FILES_ROOT_DIRECTORY );
+		textConfigKeys.add( SPECTRAL_STORAGE_SERVICE_BASE_URL );
 		textConfigKeys.add( file_import_proxl_xml_scans_TEMP_DIR_KEY );
 		textConfigKeys.add( SCAN_FILE_IMPORT_ALLOWED_VIA_WEB_SUBMIT_KEY );
 		

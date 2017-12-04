@@ -26,8 +26,8 @@ import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_plots.scan_retention_time.CreateScanRetentionTimeQCPlotData;
 import org.yeastrc.xlink.www.qc_plots.scan_retention_time.CreateScanRetentionTimeQCPlotData.CreateScanRetentionTimeQCPlotData_Result;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
+import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.Single_ScanRetentionTime_ScanNumber_SubResponse;
 import org.yeastrc.xlink.dao.ScanFileDAO;
-import org.yeastrc.xlink.dto.ScanRetentionTimeDTO;
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
@@ -234,7 +234,7 @@ public class DownloadQC_PSM_Count_Vs_RetentionTime_ChartDataAction extends Actio
 				writer.write( "\n" );
 				
 				List<BigDecimal> retentionTimeForPSMsthatMeetCriteriaList = createScanRetentionTimeQCPlotData_Result.getRetentionTimeForPSMsthatMeetCriteriaList();
-				List<ScanRetentionTimeDTO> scanRetentionTime_AllScansExcludeScanLevel_1_List = createScanRetentionTimeQCPlotData_Result.getScanRetentionTime_AllScansExcludeScanLevel_1_List();
+				List<Single_ScanRetentionTime_ScanNumber_SubResponse> scanRetentionTime_AllScansExcludeScanLevel_1_List = createScanRetentionTimeQCPlotData_Result.getScanRetentionTime_AllScansExcludeScanLevel_1_List();
 
 				//  output filtered PSMs
 				for ( BigDecimal retentionTime : retentionTimeForPSMsthatMeetCriteriaList ) {
@@ -248,8 +248,8 @@ public class DownloadQC_PSM_Count_Vs_RetentionTime_ChartDataAction extends Actio
 				}
 				
 				//  output All MS2 Scans
-				for ( ScanRetentionTimeDTO scanRetentionTimeDTO : scanRetentionTime_AllScansExcludeScanLevel_1_List ) {
-					writer.write( scanRetentionTimeDTO.getRetentionTime().toString() );
+				for ( Single_ScanRetentionTime_ScanNumber_SubResponse single_ScanRetentionTime_ScanNumber_SubResponse : scanRetentionTime_AllScansExcludeScanLevel_1_List ) {
+					writer.write( Float.toString( single_ScanRetentionTime_ScanNumber_SubResponse.getRetentionTime() ) );
 					writer.write( "\t" );
 					writer.write( GROUP_ALL_MS2_SCANS );
 					writer.write( "\t" );

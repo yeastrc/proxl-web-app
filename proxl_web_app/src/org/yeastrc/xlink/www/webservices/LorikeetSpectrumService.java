@@ -3,6 +3,7 @@ package org.yeastrc.xlink.www.webservices;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 //import javax.servlet.http.HttpSession;
@@ -14,7 +15,12 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.enums.Get_ScanDataFromScanNumbers_IncludeParentScans;
+import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.SingleScanPeak_SubResponse;
+import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.SingleScan_SubResponse;
 import org.yeastrc.xlink.base.spectrum.common.dto.Peak;
 import org.yeastrc.xlink.base.spectrum.common.utils.StringToPeaks;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
@@ -40,6 +46,7 @@ import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectSearchIdsForSearchIdSearcher;
 import org.yeastrc.xlink.www.searcher.SearchReportedPeptideLinkTypeSearcher;
@@ -47,6 +54,7 @@ import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
+import org.yeastrc.xlink.www.spectral_storage_service_interface.Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -171,16 +179,17 @@ public class LorikeetSpectrumService {
         	}
 			////////   Auth complete
 			//////////////////////////////////////////
-			ScanDTO scanDTO = null;
+        	
+			ScanDTO scanDTO_ms_2 = null;
 			int scanId = psmDTO.getScanId();
 			try {
-				 scanDTO = ScanDAO.getScanFromId( scanId );
+				 scanDTO_ms_2 = ScanDAO.getScanFromId( scanId );
 			} catch ( Exception e ) {
 				String msg = "Error retrieving scan for scanId: " + scanId;
 				log.error( msg, e );
 				throw e;
 			}
-        	if ( scanDTO == null )  {
+        	if ( scanDTO_ms_2 == null )  {
 				String msg = "scan not found for scanId: " + scanId;
 				log.error( msg);
 				//  TODO  Return something else instead
@@ -190,38 +199,50 @@ public class LorikeetSpectrumService {
 			    	        .build()
 			    	        );
         	}
-        	///////////////////////
-			ScanDTO scanDTO_Ms1 = null;
-			int scanId_Ms1 = scanDTO.getPrecursorScanId();
+        	
+			int ms2ScanNumber = psmDTO.getScanNumber();
+			
+			int ms2ScanNumber_FromScanRecord = scanDTO_ms_2.getStartScanNumber();
+			int scanFileId = scanDTO_ms_2.getScanFileId();
+			
+			//  Sanity check that scan number on psm must be same as scan number on scan 
+			if ( ms2ScanNumber != ms2ScanNumber_FromScanRecord ) {
+				//  Scan number on PSM record not match scan number on scan record
+				String msg = "Scan number on PSM record not match scan number on scan record. " 
+						+ " Scan number on PSM record: "
+						+ ms2ScanNumber
+						+ " scan number on scan record: "
+						+ ms2ScanNumber_FromScanRecord
+						+ ", psm id: " + psmDTO.getId()
+						+ ", scan id: " + scanId
+						+ ", scan file id: " + scanFileId;
+				log.error( msg );
+			}
+
+			//  Get Scan Data from Spectral Storage Service
+
+			
+			ScanDataFromSpectralStorageService_MS_2_1 scanDataFromSpectralStorageService_MS_2_1 = null;
 			try {
-				scanDTO_Ms1 = ScanDAO.getScanFromId( scanId_Ms1 );
+				scanDataFromSpectralStorageService_MS_2_1 = getScanDataFromSpectralStorageService( ms2ScanNumber, scanFileId );
 			} catch ( Exception e ) {
-				String msg = "Error retrieving scan for scanId_Ms1: " + scanId_Ms1;
+				String msg = "Failed to get scan data from Spectral Storage Service. ms2ScanNumber: " + ms2ScanNumber
+						+ ", scanFileId: " + scanFileId;
 				log.error( msg, e );
 				throw e;
 			}
-			//  Ignore if not found
-//        	if ( scanDTO_Ms1 == null )  {
-//				String msg = "scan not found for scanId_Ms1: " + scanId_Ms1;
-//				log.error( msg);
-//				//  TODO  Return something else instead
-//			    throw new WebApplicationException(
-//			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
-//			    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
-//			    	        .build()
-//			    	        );
-//        	}
+			
         	///////////////////////
         	String scanFilename = null;
 			try {
-				scanFilename = ScanFileDAO.getInstance().getScanFilenameById( scanDTO.getScanFileId() );
+				scanFilename = ScanFileDAO.getInstance().getScanFilenameById( scanDTO_ms_2.getScanFileId() );
 			} catch ( Exception e ) {
-				String msg = "Error retrieving scan_file for scanFileId: " + scanDTO.getScanFileId();
+				String msg = "Error retrieving scan_file for scanFileId: " + scanDTO_ms_2.getScanFileId();
 				log.error( msg, e );
 				throw e;
 			}
         	if ( scanFilename == null )  {
-				String msg = "scan_file not found for scanFileId: " + scanDTO.getScanFileId();
+				String msg = "scan_file not found for scanFileId: " + scanDTO_ms_2.getScanFileId();
 				log.error( msg);
 				//  TODO  Return something else instead
 			    throw new WebApplicationException(
@@ -231,23 +252,27 @@ public class LorikeetSpectrumService {
 			    	        );
         	}
         	lorikeetRootData.setFileName( scanFilename );
-			lorikeetRootData.setPrecursorMz( scanDTO.getPreMZ() );
-	        String mzIntListAsString = scanDTO.getMzIntListAsString();
-	        List<Peak> peakList = StringToPeaks.peakStringToList( mzIntListAsString );
-	        for ( Peak peak : peakList ) {
-	        	lorikeetRootData.addPeak( peak.getMz(), peak.getIntensity() );
-	        }
-		    //  Add ms1 peak if exists
-        	if ( scanDTO_Ms1 != null )  {
-    	        String mzIntListAsString_Ms1 = scanDTO_Ms1.getMzIntListAsString();
-    	        List<Peak> peakList_Ms1 = StringToPeaks.peakStringToList( mzIntListAsString_Ms1 );
-    	        for ( Peak peak_Ms1 : peakList_Ms1 ) {
-    	        	lorikeetRootData.addMs1Peak( peak_Ms1.getMz(), peak_Ms1.getIntensity() );
-    	        }
-        	}     
+			lorikeetRootData.setPrecursorMz( scanDTO_ms_2.getPreMZ() );
+			{
+				// Add MS 2 peaks to output 
+				SingleScan_SubResponse ms_2_scanDataFromSpectralStorageService = scanDataFromSpectralStorageService_MS_2_1.ms_2_scanDataFromSpectralStorageService;
+				for ( SingleScanPeak_SubResponse scanPeak : ms_2_scanDataFromSpectralStorageService.getPeaks() ) {
+					lorikeetRootData.addPeak( scanPeak.getMz(), scanPeak.getIntensity() );
+				}
+			}
+			{
+				//  Add MS 1 peaks if exists
+				SingleScan_SubResponse ms_1_scanDataFromSpectralStorageService = scanDataFromSpectralStorageService_MS_2_1.ms_1_scanDataFromSpectralStorageService;
+				if ( ms_1_scanDataFromSpectralStorageService != null )  {
+					for ( SingleScanPeak_SubResponse scanPeak : ms_1_scanDataFromSpectralStorageService.getPeaks() ) {
+						lorikeetRootData.addMs1Peak( scanPeak.getMz(), scanPeak.getIntensity() );
+					}
+				}     
+			}
+			
 	        //
 	        lorikeetRootData.setCharge( psmDTO.getCharge() );
-	        lorikeetRootData.setScanNum( scanDTO.getStartScanNumber() );
+	        lorikeetRootData.setScanNum( scanDTO_ms_2.getStartScanNumber() );
 	        List<StaticModDTO> staticModsForSearch = StaticModDAO.getInstance().getStaticModDTOForSearchId( searchId );
 	        List<LorikeetStaticMod> staticModsLorikeet = new ArrayList<>( staticModsForSearch.size() );
 	        for ( StaticModDTO staticModDTO : staticModsForSearch ) {
@@ -297,6 +322,101 @@ public class LorikeetSpectrumService {
 					);
 		}
 	}
+	
+	/**
+	 * 
+	 *
+	 */
+	private static class ScanDataFromSpectralStorageService_MS_2_1 {
+		private SingleScan_SubResponse ms_1_scanDataFromSpectralStorageService;
+		private SingleScan_SubResponse ms_2_scanDataFromSpectralStorageService;
+	}
+
+	/**
+	 * Get Scan Data from Spectral Storage Service
+	 * 
+	 * @param scanDTO_ms_2
+	 * @param scanDTO_ms_1
+	 * @throws Exception 
+	 */
+	private ScanDataFromSpectralStorageService_MS_2_1 getScanDataFromSpectralStorageService( int ms2ScanNumber, int scanFileId ) throws Exception {
+		
+		String scanFileAPIKey = ScanFileDAO.getInstance().getSpectralStorageAPIKeyById( scanFileId );
+		if ( StringUtils.isEmpty( scanFileAPIKey ) ) {
+			String msg = "No value for scanFileAPIKey for scan file id: " + scanFileId;
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
+		}
+
+
+		//  Get scans from Spectral Storage Service.
+		//  Send ms2 scan number and request parent scan as well
+		
+		List<Integer> scanNumbers = new ArrayList<>( 3 );
+		scanNumbers.add(  ms2ScanNumber  );
+
+		List<SingleScan_SubResponse> scans = 
+				Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice.getSingletonInstance()
+				.getScanDataFromSpectralStorageService(
+						scanNumbers, 
+						Get_ScanDataFromScanNumbers_IncludeParentScans.IMMEDIATE_PARENT,
+						scanFileAPIKey );
+		
+		ScanDataFromSpectralStorageService_MS_2_1 scanDataFromSpectralStorageService_MS_2_1 = new ScanDataFromSpectralStorageService_MS_2_1();
+		
+		//  Get ms2 scan from returned list
+		for ( SingleScan_SubResponse scan : scans ) {
+			if ( scan.getScanNumber() == ms2ScanNumber ) {
+				scanDataFromSpectralStorageService_MS_2_1.ms_2_scanDataFromSpectralStorageService = scan;
+				break;
+			}
+		}
+
+		if ( scanDataFromSpectralStorageService_MS_2_1.ms_2_scanDataFromSpectralStorageService == null ) {
+			//  ms2 scan number not found in returned list
+			String msg = "No ms2 scan found in spectral storage service for scan number: " 
+					+ ms2ScanNumber
+					+ ", API Key: " + scanFileAPIKey
+					+ ", scan file id: " + scanFileId;
+			log.error( msg );
+			throw new ProxlWebappDataException(msg);
+		}
+
+		//  Get ms1 scan from returned list
+
+		if ( scanDataFromSpectralStorageService_MS_2_1.ms_2_scanDataFromSpectralStorageService.getParentScanNumber() == null ) {
+			//  ms2 scan parent scan number not populated
+			String msg = "The ms2 scan retrieved from spectral storage service"
+					+ " did not have a parent scan number"
+					+ " for ms2 scan number: " + scanDataFromSpectralStorageService_MS_2_1.ms_2_scanDataFromSpectralStorageService.getScanNumber()
+					+ ", API Key: " + scanFileAPIKey
+					+ ", scan file id: " + scanFileId;
+			log.error( msg );
+			throw new ProxlWebappDataException(msg);
+		}
+		
+		int ms1_ScanNumber = scanDataFromSpectralStorageService_MS_2_1.ms_2_scanDataFromSpectralStorageService.getParentScanNumber();
+		
+		for ( SingleScan_SubResponse scan : scans ) {
+			if ( scan.getScanNumber() == ms1_ScanNumber ) {
+				scanDataFromSpectralStorageService_MS_2_1.ms_1_scanDataFromSpectralStorageService = scan;
+				break;
+			}
+		}
+
+		if ( scanDataFromSpectralStorageService_MS_2_1.ms_1_scanDataFromSpectralStorageService == null ) {
+			//  ms1 scan number not found in returned list
+			String msg = "No ms1 scan found in spectral storage service for scan number: " 
+					+ ms1_ScanNumber
+					+ ", API Key: " + scanFileAPIKey
+					+ ", scan file id: " + scanFileId;
+			log.error( msg );
+//			throw new ProxlWebappDataException(msg);
+		}
+		
+		return scanDataFromSpectralStorageService_MS_2_1;
+	}
+	
 	
 	/**
 	 * @param psmDTO

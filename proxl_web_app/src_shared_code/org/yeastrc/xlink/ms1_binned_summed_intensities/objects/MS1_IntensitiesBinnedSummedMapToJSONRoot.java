@@ -10,6 +10,12 @@ public class MS1_IntensitiesBinnedSummedMapToJSONRoot {
 
 	String jsonContents;
 	MS1_IntensitiesBinnedSummed_Summary_Data_ToJSONRoot summaryData;
+	
+	/**
+	 * for ms 1 scans: Map<RetentionTime_Floor,Map<MZ_Floor,SummedIntensity>
+	 * 
+	 * "_Floor" means truncate any decimal fraction part
+	 */
 	Map<Long, Map<Long, Double>> ms1_IntensitiesBinnedSummedMap;
 	
 	public String getJsonContents() {

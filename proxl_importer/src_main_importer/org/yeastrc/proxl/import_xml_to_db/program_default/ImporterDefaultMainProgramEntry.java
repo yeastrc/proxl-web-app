@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.DataErrorsFileConstants;
 import org.yeastrc.proxl.import_xml_to_db.constants.ImporterProgramExitCodes;
 import org.yeastrc.proxl.import_xml_to_db.constants.ScanFilenameConstants;
+import org.yeastrc.proxl.import_xml_to_db.dao.ConfigSystemDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO;
 import org.yeastrc.proxl.import_xml_to_db.database_update_with_transaction_services.UpdateTrackingTrackingRunRecordsDBTransaction;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFile;
@@ -48,6 +49,7 @@ import org.yeastrc.proxl.import_xml_to_db.file_import_proxl_xml_scans.run_import
 import org.yeastrc.proxl.import_xml_to_db.file_import_proxl_xml_scans.run_importer_to_importer_file_data.RunImporterToImporterParameterNamesConstants;
 import org.yeastrc.proxl.import_xml_to_db.utils.SHA1SumCalculator;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
+import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTableGetValueCommon;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTrackingRun_Base_DAO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTrackingSingleFileDAO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTracking_Base_DAO;
@@ -338,6 +340,8 @@ public class ImporterDefaultMainProgramEntry {
 				importDBConnectionFactory.setDbConnectionParametersProvider( dbConnectionParametersProvider );
 				DBConnectionFactory.setDbConnectionFactoryImpl( importDBConnectionFactory );
 				//				databaseConnectionFactoryCreated = true;
+				ConfigSystemDAO configSystemDAO = ConfigSystemDAO.getInstance();
+				ConfigSystemTableGetValueCommon.getInstance().setIConfigSystemTableGetValue( configSystemDAO );
 			}
 			
 			///  runImporterParamsFilename is the file that the Run Importer Program creates

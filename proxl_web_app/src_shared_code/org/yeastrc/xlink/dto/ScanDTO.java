@@ -27,24 +27,6 @@ public class ScanDTO {
     private String fragmentationType;
     private String isCentroid;
 
-
-	/**
-	 * The data that gets put in the field spectrum_data
-	 */
-    private List<Peak> peakList;
-    
-	private String mzIntListAsString;
-
-	
-
-	public List<Peak> getPeakList() {
-		return peakList;
-	}
-	public void setPeakList(List<Peak> peakList) {
-		this.peakList = peakList;
-	}
-
-
 	public String getIsCentroid() {
 		return isCentroid;
 	}
@@ -82,19 +64,6 @@ public class ScanDTO {
 	public void setPreMZ(BigDecimal preMZ) {
 		this.preMZ = preMZ;
 	}
-//	public List<MzInt> getMzIntList() {
-//		return mzIntList;
-//	}
-//	public void setMzIntList(List<MzInt> mzIntList) {
-//		this.mzIntList = mzIntList;
-//	}
-	public String getMzIntListAsString() {
-		return mzIntListAsString;
-	}
-	public void setMzIntListAsString(String mzIntListAsString) {
-		this.mzIntListAsString = mzIntListAsString;
-	}
-	
 
 	public int getLevel() {
 		return level;

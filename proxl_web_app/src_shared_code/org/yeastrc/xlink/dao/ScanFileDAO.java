@@ -71,117 +71,54 @@ public class ScanFileDAO {
 		return result;
 	}
 	
-	
-//	/**
-//	 * @param id
-//	 * @return
-//	 * @throws Exception
-//	 */
-//	public ScanFileDTO getScanFileDTOById( int id ) throws Exception {
-//		
-//		ScanFileDTO result = null;
-//		
-//		Connection conn = null;
-//		PreparedStatement pstmt = null;
-//		ResultSet rs = null;
-//
-//		String sql = "SELECT * FROM scan_file WHERE id = ?";
-//		
-//		try {
-//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-//			pstmt = conn.prepareStatement( sql );
-//			pstmt.setInt( 1, id );
-//			
-//			rs = pstmt.executeQuery();
-//			
-//			if( rs.next() ) {
-//				result = populateFromResultSet(rs);
-//			}
-//			
-//		} catch ( Exception e ) {
-//			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
-//			throw e;
-//		} finally {
-//			// be sure database handles are closed
-//			if( rs != null ) {
-//				try { rs.close(); } catch( Throwable t ) { ; }
-//				rs = null;
-//			}
-//			if( pstmt != null ) {
-//				try { pstmt.close(); } catch( Throwable t ) { ; }
-//				pstmt = null;
-//			}
-//			if( conn != null ) {
-//				try { conn.close(); } catch( Throwable t ) { ; }
-//				conn = null;
-//			}
-//		}
-//		return result;
-//	}
 
-	
-//	/**
-//	 * 
-//	 * @return
-//	 * @throws Exception
-//	 */
-//	public List<ScanFileDTO> getAll( ) throws Exception {
-//		
-//		List<ScanFileDTO> results = new ArrayList<>();
-//		
-//		Connection conn = null;
-//		PreparedStatement pstmt = null;
-//		ResultSet rs = null;
-//
-//		String sql = "SELECT * FROM scan_file ORDER BY filename, path";
-//		
-//		try {
-//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-//			pstmt = conn.prepareStatement( sql );
-//			rs = pstmt.executeQuery();
-//			
-//			while ( rs.next() ) {
-//				ScanFileDTO result = populateFromResultSet( rs );
-//				results.add( result );
-//			}
-//		} catch ( Exception e ) {
-//			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
-//			throw e;
-//		} finally {
-//			// be sure database handles are closed
-//			if( rs != null ) {
-//				try { rs.close(); } catch( Throwable t ) { ; }
-//				rs = null;
-//			}
-//			if( pstmt != null ) {
-//				try { pstmt.close(); } catch( Throwable t ) { ; }
-//				pstmt = null;
-//			}
-//			if( conn != null ) {
-//				try { conn.close(); } catch( Throwable t ) { ; }
-//				conn = null;
-//			}
-//		}
-//		
-//		return results;
-//	}
+	/**
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	public String getSpectralStorageAPIKeyById( int id ) throws Exception {
+		
+		String result = null;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
 
-//	/**
-//	 * !!!  Incomplete Field List !!!
-//	 * @param rs
-//	 * @return
-//	 * @throws SQLException
-//	 */
-//	private ScanFileDTO populateFromResultSet(ResultSet rs) throws SQLException {
-//		
-//		ScanFileDTO result = new ScanFileDTO();
-//		
-//		result.setId( rs.getInt( "id" ) );
-//		result.setFilename( rs.getString( "filename" ) );
-//		result.setPath( rs.getString( "path" ) );
-//		result.setSha1sum( rs.getString( "sha1sum" ) );
-//		return result;
-//	}
+		String sql = "SELECT spectral_storage_api_key FROM scan_file WHERE id = ?";
+		
+		try {
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			pstmt = conn.prepareStatement( sql );
+			pstmt.setInt( 1, id );
+			
+			rs = pstmt.executeQuery();
+			
+			if( rs.next() ) {
+				result = rs.getString( "spectral_storage_api_key" );
+			}
+			
+		} catch ( Exception e ) {
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
+			throw e;
+		} finally {
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			if( conn != null ) {
+				try { conn.close(); } catch( Throwable t ) { ; }
+				conn = null;
+			}
+		}
+		return result;
+	}
+	
 	
 	/**
 	 * @param filename
@@ -345,4 +282,83 @@ public class ScanFileDAO {
 
 		return item.getId();
 	}
+	
+	/**
+	 * update the spectral_storage_process_key_temp in the database
+	 * 
+	 * @param item
+	 * @throws Exception
+	 */
+	public void updateSpectralStorageProcessKeyTemp( String spectralStorageProcessKeyTemp, int id ) throws Exception {
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+
+		final String sql = "UPDATE scan_file SET spectral_storage_process_key_temp = ? WHERE id = ?";
+
+		try {
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			
+			pstmt = conn.prepareStatement( sql );
+			pstmt.setString( 1, spectralStorageProcessKeyTemp);
+			pstmt.setInt( 2, id );
+			
+//			int updatedRowCount = 
+			pstmt.executeUpdate();
+			
+		} catch ( Exception e ) {
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
+			throw e;
+		} finally {
+			// be sure database handles are closed
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			if( conn != null ) {
+				try { conn.close(); } catch( Throwable t ) { ; }
+				conn = null;
+			}
+		}
+	}
+	
+	/**
+	 * update the spectral_storage_api_key in the database
+	 * 
+	 * @param item
+	 * @throws Exception
+	 */
+	public void updateSpectralStorageAPIKey( String spectralStorageAPIKey, int id ) throws Exception {
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+
+		final String sql = "UPDATE scan_file SET spectral_storage_api_key = ? WHERE id = ?";
+
+		try {
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			
+			pstmt = conn.prepareStatement( sql );
+			pstmt.setString( 1, spectralStorageAPIKey);
+			pstmt.setInt( 2, id );
+			
+//			int updatedRowCount = 
+			pstmt.executeUpdate();
+			
+		} catch ( Exception e ) {
+			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
+			throw e;
+		} finally {
+			// be sure database handles are closed
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			if( conn != null ) {
+				try { conn.close(); } catch( Throwable t ) { ; }
+				conn = null;
+			}
+		}
+	}
+
 }

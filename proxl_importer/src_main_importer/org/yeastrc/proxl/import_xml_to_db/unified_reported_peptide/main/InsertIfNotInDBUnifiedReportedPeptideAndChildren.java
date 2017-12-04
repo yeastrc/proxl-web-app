@@ -97,7 +97,7 @@ public class InsertIfNotInDBUnifiedReportedPeptideAndChildren {
 				try {
 					dbConnection.rollback();
 				} catch (Exception ex) {
-					String msgRollback = "Rollback Exception:  insertIfNotInDBUnifiedReportedPeptideAndChildren(...) Exception:  See Syserr or Sysout for original exception: Rollback Exception, tables 'scan' and 'scan_spectrum_data' are in an inconsistent state. '" + ex.toString();
+					String msgRollback = "Rollback Exception:  insertIfNotInDBUnifiedReportedPeptideAndChildren(...) Exception:  See Syserr or Sysout for original exception: Rollback Exception, tables are in an inconsistent state. '" + ex.toString();
 					System.out.println( msgRollback );
 					System.err.println( msgRollback );
 					log.error( msgRollback, ex );

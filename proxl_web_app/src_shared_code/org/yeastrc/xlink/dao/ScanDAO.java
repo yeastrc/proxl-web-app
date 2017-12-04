@@ -30,12 +30,10 @@ public class ScanDAO {
 		ResultSet rs = null;
 
 		// Our SQL statement
-		final String sqlStr =  "SELECT UNCOMPRESS( spectrum_data ) AS spectrum_data, scan.* "
-			+ " FROM scan INNER JOIN scan_spectrum_data AS ssd ON  scan.id = ssd.scan_id "
+		final String sqlStr =  "SELECT scan.* "
+			+ " FROM scan "
 			+ " WHERE id = ?  " ;
 
-
-	
 		try {
 			
 
@@ -66,28 +64,8 @@ public class ScanDAO {
 				scanDTO.setFragmentationType( rs.getString( "fragmentation_type" ) );;
 				scanDTO.setIsCentroid( rs.getString( "is_centroid" ) );
 				
-				scanDTO.setMzIntListAsString( rs.getString( "spectrum_data" ) );
+//				scanDTO.setMzIntListAsString( rs.getString( "spectrum_data" ) );
 			}
-			
-//			CREATE TABLE scan (
-//			  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//			  scan_file_id INT UNSIGNED NOT NULL,
-//			  start_scan_number INT UNSIGNED NOT NULL,
-//			  end_scan_number INT UNSIGNED NULL,
-//			  level SMALLINT UNSIGNED NOT NULL,
-//			  preMZ DECIMAL(18,9) NULL,
-//			  precursor_scan_number INT NOT NULL,
-//			  precursor_scan_id INT UNSIGNED NULL,
-//			  retention_time DECIMAL(18,9) NULL,
-//			  peak_count INT NOT NULL,
-//			  fragmentation_type VARCHAR(45) NULL,
-//			  is_centroid CHAR(1) NULL DEFAULT NULL
-
-//			CREATE TABLE scan_spectrum_data (
-//					  scan_id INT(10) UNSIGNED NOT NULL,
-//					  spectrum_data LONGBLOB NULL DEFAULT NULL,
-		
-
 			
 		} catch ( Exception e ) {
 			
@@ -194,33 +172,13 @@ public class ScanDAO {
 			+ "  precursor_scan_number,  precursor_scan_id, retention_time, peak_count, fragmentation_type, is_centroid )"
 			+ " VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
-   
-
-	private static String insert_scan_spectrum_data_SQL = "INSERT INTO scan_spectrum_data (scan_id, spectrum_data )"
-		+ " VALUES ( ?, COMPRESS(?) )";
-
-
-
-//	CREATE TABLE scan (
-//	  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-//	  scan_file_id INT UNSIGNED NOT NULL,
-//	  start_scan_number INT UNSIGNED NOT NULL,
-//	  end_scan_number INT UNSIGNED NULL,
-//	  level SMALLINT UNSIGNED NOT NULL,
-//	  preMZ DECIMAL(18,9) NULL,
-//	  precursor_scan_number INT NOT NULL,
-//	  precursor_scan_id INT UNSIGNED NULL,
-//	  retention_time DECIMAL(18,9) NULL,
-//	  peak_count INT NOT NULL,
-//	  fragmentation_type VARCHAR(45) NULL,
-//	  is_centroid TINYINT(4) NULL DEFAULT NULL
-
-//	CREATE TABLE scan_spectrum_data (
-//			  scan_id INT(10) UNSIGNED NOT NULL,
-//			  spectrum_data LONGBLOB NULL DEFAULT NULL,
-
-
-	public static int save( ScanDTO item, boolean saveSpectrumData ) throws Exception {
+	
+	/**
+	 * @param item
+	 * @return
+	 * @throws Exception
+	 */
+	public static int save( ScanDTO item ) throws Exception {
 
 		Connection dbConnection = null;
 
@@ -228,7 +186,7 @@ public class ScanDAO {
 
 			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 
-			save( item, saveSpectrumData, dbConnection );
+			save( item, dbConnection );
 			
 		} finally {
 
@@ -248,11 +206,10 @@ public class ScanDAO {
 		
 	/**
 	 * @param item
-	 * @param saveSpectrumData - true if should save the spectrum in table scan_spectrum_data
 	 * @return
 	 * @throws Exception
 	 */
-	public static int save( ScanDTO item, boolean saveSpectrumData, Connection dbConnection ) throws Exception {
+	public static int save( ScanDTO item, Connection dbConnection ) throws Exception {
 
 		
 		if ( ! ValidateIsCentroidValidValue.validateIsCentroidValidValue( item.getIsCentroid() ) ) {
@@ -319,29 +276,6 @@ public class ScanDAO {
 			}
 
 			
-			//  Save the spectrum
-			
-			if ( saveSpectrumData ) {
-			
-				pstmtSaveSpectrumData = dbConnection.prepareStatement( insert_scan_spectrum_data_SQL );
-
-				counter = 0;
-
-				counter++;
-				pstmtSaveSpectrumData.setInt( counter, item.getId() );
-				counter++;
-				pstmtSaveSpectrumData.setString( counter, item.getMzIntListAsString() );
-
-				rowsUpdated = pstmtSaveSpectrumData.executeUpdate();
-
-				if ( rowsUpdated == 0 ) {
-
-				}
-
-			}
-
-
-
 		} catch (Exception sqlEx) {
 			
 			String msg = "save:Exception '" + sqlEx.toString() + ".\nSQL = " + insertSQL;

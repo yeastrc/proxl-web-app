@@ -128,7 +128,7 @@ public class AddNewScanFileAndHeadersIfNeededDBTransactionService {
 					
 				} catch (Exception ex) {
 					
-					String msgRollback = "Rollback Exception:  addNewScanFileDBTransactionService(...) Exception:  See Syserr or Sysout for original exception: Rollback Exception, tables 'scan' and 'scan_spectrum_data' are in an inconsistent state. '" + ex.toString();
+					String msgRollback = "Rollback Exception:  addNewScanFileDBTransactionService(...) Exception:  See Syserr or Sysout for original exception: Rollback Exception, tables 'scan' is in an inconsistent state. '" + ex.toString();
 
 					System.out.println( msgRollback );
 					System.err.println( msgRollback );

@@ -7,15 +7,13 @@ import java.util.Map;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.ScanFileMS_1_IntensityBinnedSummedDataDAO;
-import org.yeastrc.xlink.dto.ScanFileMS_1_IntensityBinnedSummedDataDTO;
-import org.yeastrc.xlink.ms1_binned_summed_intensities.main.MS1_BinnedSummedIntensitiesProcessing;
-import org.yeastrc.xlink.ms1_binned_summed_intensities.objects.MS1_IntensitiesBinnedSummedMapToJSONRoot;
-import org.yeastrc.xlink.ms1_binned_summed_intensities.objects.MS1_IntensitiesBinnedSummed_Summary_Data_ToJSONRoot;
-import org.yeastrc.xlink.utils.ZipUnzipByteArray;
+import org.yeastrc.spectral_storage.shared_server_client_importer.accum_scan_rt_mz_binned.dto.MS1_IntensitiesBinnedSummedMapRoot;
+import org.yeastrc.spectral_storage.shared_server_client_importer.accum_scan_rt_mz_binned.dto.MS1_IntensitiesBinnedSummed_Summary_DataRoot;
+import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.www.qc_data.scan_level_data.objects.Scan_MS_1_IonCurrent_HistogramsResult;
 import org.yeastrc.xlink.www.qc_data.scan_level_data.objects.Scan_MS_1_IonCurrent_HistogramsResult.Scan_MS_1_IonCurrent_HistogramsResultChartBucket;
 import org.yeastrc.xlink.www.qc_data.scan_level_data.objects.Scan_MS_1_IonCurrent_HistogramsResult.Scan_MS_1_IonCurrent_HistogramsResultForChartType;
+import org.yeastrc.xlink.www.spectral_storage_service_interface.Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,7 +28,7 @@ public class Scan_MS_1_IonCurrent_Histograms {
 	/**
 	 *  !!!!!!!!!!!   VERY IMPORTANT  !!!!!!!!!!!!!!!!!!!!
 	 * 
-	 *  Increment this value whenever change the resulting image since Caching the resulting image
+	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
 	 */
 	static final int VERSION_FOR_CACHING = 1;
 	
@@ -53,32 +51,31 @@ public class Scan_MS_1_IonCurrent_Histograms {
 	 */
 	public byte[] getScan_MS_1_IonCurrent_HistogramsResult( int scanFileId ) throws Exception {
 
-		{
-			byte[] resultsAsBytes = 
-					Scan_MS_1_IonCurrent_Histograms_CachedResultManager.getSingletonInstance()
-					.retrieveDataFromCache( scanFileId );
+		byte[] resultsAsBytes = 
+				Scan_MS_1_IonCurrent_Histograms_CachedResultManager.getSingletonInstance()
+				.retrieveDataFromCache( scanFileId );
 
-			if ( resultsAsBytes != null ) {
-				//  Have Cached data so return it
-				return resultsAsBytes;  //  EARLY RETURN
-			}
+		if ( resultsAsBytes != null ) {
+			//  Have Cached data so return it
+			return resultsAsBytes;  //  EARLY RETURN
 		}
+
 		
 		//  Jackson JSON Mapper object for JSON deserialization and serialization
 		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		
-		MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot =
-				getMS1_IntensitiesBinnedSummedMapToJSONRoot( scanFileId );
 
-		if ( ms1_IntensitiesBinnedSummedMapToJSONRoot == null ) {
+		MS1_IntensitiesBinnedSummedMapRoot ms1_IntensitiesBinnedSummedMapRoot =
+			getMS1_IntensitiesBinnedSummedMapRoot( scanFileId );
+
+		if ( ms1_IntensitiesBinnedSummedMapRoot == null ) {
 			//  No data found for scanFileId so return
 			return jacksonJSON_Mapper.writeValueAsBytes( new Scan_MS_1_IonCurrent_HistogramsResult() );
 		}
 
-		MS1_IntensitiesBinnedSummed_Summary_Data_ToJSONRoot summaryData =
-				ms1_IntensitiesBinnedSummedMapToJSONRoot.getSummaryData();
+		MS1_IntensitiesBinnedSummed_Summary_DataRoot summaryData =
+				ms1_IntensitiesBinnedSummedMapRoot.getSummaryData();
 		Map<Long, Map<Long, Double>> ms1_IntensitiesBinnedSummedMap =
-				ms1_IntensitiesBinnedSummedMapToJSONRoot.getMs1_IntensitiesBinnedSummedMap();
+				ms1_IntensitiesBinnedSummedMapRoot.getMs1_IntensitiesBinnedSummedMap();
 		
 //		long binnedSummedIntensityCount = summaryData.getBinnedSummedIntensityCount();
 
@@ -86,11 +83,11 @@ public class Scan_MS_1_IonCurrent_Histograms {
 		double intensityBinnedMaxActual = summaryData.getIntensityBinnedMax();
 
 		if ( log.isDebugEnabled() ) {
-			log.debug( "summaryData.getRtBinMax(): " + summaryData.getRtBinMax() );
-			log.debug( "summaryData.getRtMaxPossibleValue(): " + summaryData.getRtMaxPossibleValue() );
+			log.debug( "summaryData.getRtBinMaxInSeconds(): " + summaryData.getRtBinMaxInSeconds() );
+			log.debug( "summaryData.getRtMaxPossibleValueInSeconds(): " + summaryData.getRtMaxPossibleValueInSeconds() );
 
-			log.debug( "summaryData.getMzBinMax(): " + summaryData.getMzBinMax() );
-			log.debug( "summaryData.getMzMaxPossibleValue(): " + summaryData.getMzMaxPossibleValue() );
+			log.debug( "summaryData.getMzBinMaxInMZ(): " + summaryData.getMzBinMaxInMZ() );
+			log.debug( "summaryData.getMzMaxPossibleValueInMZ(): " + summaryData.getMzMaxPossibleValueInMZ() );
 
 			log.debug( "intensityBinnedMinActual: " + intensityBinnedMinActual );
 			log.debug( "intensityBinnedMaxActual: " + intensityBinnedMaxActual );
@@ -123,17 +120,17 @@ public class Scan_MS_1_IonCurrent_Histograms {
 				getChartData( 
 						ChartType.RETENTION_TIME,
 						ms1_IntensitiesBinnedSummedMappedByRetentionTime,
-						summaryData.getRtBinMin(),
-						summaryData.getRtBinMax(),
-						summaryData.getRtMaxPossibleValue()
+						summaryData.getRtBinMinInSeconds(),
+						summaryData.getRtBinMaxInSeconds(),
+						summaryData.getRtMaxPossibleValueInSeconds()
 						);
 		Scan_MS_1_IonCurrent_HistogramsResultForChartType dataFor_M_Over_Z_Chart =
 				getChartData( 
 						ChartType.M_OVER_Z,
 						ms1_IntensitiesBinnedSummedMappedBy_M_Over_Z,
-						summaryData.getMzBinMin(),
-						summaryData.getMzBinMax(),
-						summaryData.getMzMaxPossibleValue()
+						summaryData.getMzBinMinInMZ(),
+						summaryData.getMzBinMaxInMZ(),
+						summaryData.getMzMaxPossibleValueInMZ()
 						);
 		
 		Scan_MS_1_IonCurrent_HistogramsResult result = new Scan_MS_1_IonCurrent_HistogramsResult();
@@ -141,7 +138,7 @@ public class Scan_MS_1_IonCurrent_Histograms {
 		result.setDataFor_M_Over_Z_Chart( dataFor_M_Over_Z_Chart );
 		
 
-		byte[] resultsAsBytes = jacksonJSON_Mapper.writeValueAsBytes( result );
+		resultsAsBytes = jacksonJSON_Mapper.writeValueAsBytes( result );
 		
 		Scan_MS_1_IonCurrent_Histograms_CachedResultManager.getSingletonInstance()
 		.saveDataToCache( scanFileId, resultsAsBytes );
@@ -229,25 +226,36 @@ public class Scan_MS_1_IonCurrent_Histograms {
 		
 		return result;
 	}
-	
+
 	/**
 	 * @param scanFileId
 	 * @return null if not in db
 	 * @throws Exception
 	 */
-	private MS1_IntensitiesBinnedSummedMapToJSONRoot getMS1_IntensitiesBinnedSummedMapToJSONRoot( int scanFileId ) throws Exception {
+	private MS1_IntensitiesBinnedSummedMapRoot getMS1_IntensitiesBinnedSummedMapRoot( int scanFileId ) throws Exception {
 
-		ScanFileMS_1_IntensityBinnedSummedDataDTO scanFileMS_1_IntensityBinnedSummedDataDTO =
-				ScanFileMS_1_IntensityBinnedSummedDataDAO.getFromScanFileId( scanFileId );
-		if ( scanFileMS_1_IntensityBinnedSummedDataDTO == null ) {
-			return null;
+		//  Get from Spectral Storage Service
+
+		String spectralStorageAPIKey = ScanFileDAO.getInstance().getSpectralStorageAPIKeyById( scanFileId );
+
+		if ( spectralStorageAPIKey == null ) {
+			log.error( "No spectralStorageAPIKey value in scan file table for scanFileId: " + scanFileId );
+			return null;  // EARLY RETURN
 		}
-		byte[] dataJSON_Gzipped = scanFileMS_1_IntensityBinnedSummedDataDTO.getDataJSON_Gzipped();
-		byte[] dataJSON = ZipUnzipByteArray.getInstance().unzipByteArray( dataJSON_Gzipped );
 
-		MS1_IntensitiesBinnedSummedMapToJSONRoot ms1_IntensitiesBinnedSummedMapToJSONRoot =
-				MS1_BinnedSummedIntensitiesProcessing.getInstance().getMainObjectFromBytes( dataJSON );
+		MS1_IntensitiesBinnedSummedMapRoot ms1_IntensitiesBinnedSummedMapRoot_FromSpectralStorage =
+				Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice.getSingletonInstance()
+				.getScanPeakIntensityBinnedOn_RT_MZFromSpectralStorageService( spectralStorageAPIKey );
 
-		return ms1_IntensitiesBinnedSummedMapToJSONRoot;
+		if ( ms1_IntensitiesBinnedSummedMapRoot_FromSpectralStorage == null ) {
+
+			log.error( "No data in Spectral Storage for ms1_IntensitiesBinnedSummedMapRoot_FromSpectralStorage. scanFileId: " + scanFileId 
+					+ ", spectralStorageAPIKey: "
+					+ spectralStorageAPIKey );
+
+			return null;  // EARLY RETURN
+		}
+
+		return ms1_IntensitiesBinnedSummedMapRoot_FromSpectralStorage;
 	}
 }

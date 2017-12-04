@@ -4,12 +4,9 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.base.spectrum.common.dto.Peak;
-import org.yeastrc.xlink.base.spectrum.common.utils.PeaksToString;
 import org.yeastrc.xlink.dao.ScanDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.ScanDTO;
@@ -37,7 +34,6 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 	 * Inserts the scan file and headers records if needed
 	 * 
 	 * @param scanIn
-	 * @param prevMS1ScanIn
 	 * @param scanFileDTO
 	 * @param saveSpectrumData
 	 * @param mapOfScanNumbersToScanIds
@@ -47,9 +43,7 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 	public boolean insertNewScanAndPrescanIfNeededDBTransactionService( 
 			
 			MzML_MzXmlScan scanIn, 
-			MzML_MzXmlScan prevMS1ScanIn, 
 			ScanFileDTO scanFileDTO, 
-			boolean saveSpectrumData, 
 			Map<Integer,Integer> mapOfScanNumbersToScanIds  ) throws Exception {
 		
 		
@@ -72,7 +66,7 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
     			//  Not in DB so insert
     		
     			//  insert this ms2 scan and the previous ms1 scan if necessary
-    			processScan( scanIn, prevMS1ScanIn, scanFileDTO, saveSpectrumData, mapOfScanNumbersToScanIds, dbConnection );
+    			processScan( scanIn, scanFileDTO, mapOfScanNumbersToScanIds, dbConnection );
     		}
 			
 			
@@ -95,7 +89,7 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 					
 				} catch (Exception ex) {
 					
-					String msgRollback = "Rollback Exception:  insertNewScanAndPrescanIfNeededDBTransactionService(...) Exception:  See Syserr or Sysout for original exception: Rollback Exception, tables 'scan' and 'scan_spectrum_data' are in an inconsistent state. '" + ex.toString();
+					String msgRollback = "Rollback Exception:  insertNewScanAndPrescanIfNeededDBTransactionService(...) Exception:  See Syserr or Sysout for original exception: Rollback Exception, tables 'scan' is in an inconsistent state. '" + ex.toString();
 
 					System.out.println( msgRollback );
 					System.err.println( msgRollback );
@@ -147,9 +141,7 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 
 	/**
 	 * @param scanIn
-	 * @param prevMS1ScanIn
 	 * @param scanFileDTO
-	 * @param saveSpectrumData
 	 * @param mapOfScanNumbersToScanIds
 	 * @param dbConnection
 	 * @throws Exception
@@ -157,45 +149,15 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 	public void processScan( 
 			
 			MzML_MzXmlScan scanIn, 
-			MzML_MzXmlScan prevMS1ScanIn, 
 			ScanFileDTO scanFileDTO, 
-			boolean saveSpectrumData, 
 			Map<Integer,Integer> mapOfScanNumbersToScanIds,
 			
 			Connection dbConnection ) throws Exception {
 
-		if ( scanIn.getPrecursorScanNum() != prevMS1ScanIn.getStartScanNum() ) {
-			
-			String msg = "";
-			
-			log.error( msg );
-			System.out.println( msg );
-			System.err.println( msg );
-			
-			throw new Exception(msg);
-		}
-		
-		int recordIdForScanFileIdScanNumberInScanTable = 
-				ScanTableScanFileIdScanNumberGetIdSearcher.recordIdForScanFileIdScanNumberInScanTable( scanFileDTO.getId(), prevMS1ScanIn.getStartScanNum(), dbConnection );
-
-		
-		if ( recordIdForScanFileIdScanNumberInScanTable == ScanTableScanFileIdScanNumberGetIdSearcher.RECORD_NOT_FOUND_VALUE ) {
-			
-			//  MS1 is not in DB so create and insert it. 
-			
-			ScanDTO prevScanDTO = createScanDTO( prevMS1ScanIn, scanFileDTO );
-
-			ScanDAO.save( prevScanDTO, saveSpectrumData, dbConnection );
-			
-			recordIdForScanFileIdScanNumberInScanTable = prevScanDTO.getId();
-		}
-		
 
 		ScanDTO scanDTO = createScanDTO(scanIn, scanFileDTO);
 
-		scanDTO.setPrecursorScanId( recordIdForScanFileIdScanNumberInScanTable );
-		
-		ScanDAO.save( scanDTO, saveSpectrumData, dbConnection );
+		ScanDAO.save( scanDTO, dbConnection );
 
 		//  Put scan number and scan id in Map for inserting psm table records later
 		
@@ -238,15 +200,6 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 		
 		scanDTO.setIsCentroid( isCentroidString );
 		
-
-		scanIn.getPrecursorScanNum();
-
-		List<Peak> peaks = scanIn.getPeaks();
-
-		String peaksAsString = PeaksToString.peaksToString( peaks );
-
-		scanDTO.setMzIntListAsString( peaksAsString );
-		
 		return scanDTO;
 	}
 	
@@ -274,7 +227,7 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 		return true;
 	}
 	
-	private static String lockTablesForWriteSQL = "LOCK TABLES scan WRITE, scan_spectrum_data WRITE";
+	private static String lockTablesForWriteSQL = "LOCK TABLES scan WRITE";
 
 	/**
 	 * @param dbConnection
