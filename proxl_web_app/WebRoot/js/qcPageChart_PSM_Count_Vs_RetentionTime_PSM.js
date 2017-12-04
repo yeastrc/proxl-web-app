@@ -348,13 +348,33 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 	///
 	this.createRetentionTimeCountChartThumbnail = function() {
 
-		// TODO  Hard code taking first project search id
-		var projectSearchId = _project_search_ids[ 0 ];	
-
 		//  TODO  Need this for thumbnail
 		
 		var $retention_time_outer_container_div = $("#retention_time_outer_container_div");
 		$retention_time_outer_container_div.empty();
+		
+		
+		if ( ! _anySearchesHaveScanDataYes ) {
+	
+			//  No Scan Data
+
+			var $qc_plot_scan_retention_time_link = $("#qc_plot_scan_retention_time_link");
+			$qc_plot_scan_retention_time_link.hide();
+
+			//  Add empty chart with No Scans message
+			this._placeEmptyDummyChartForMessage( { 
+				$chart_outer_container_jq : $retention_time_outer_container_div, 
+//				linkType : selectedLinkType, 
+				messageWhole:  _DUMMY_CHART_STATUS_WHOLE_TEXT_SCANS_NOT_UPLOADED
+			} );	
+			
+			return;  //  EARLY EXIT
+		}
+		
+
+		// TODO  Hard code taking first project search id
+		var projectSearchId = _project_search_ids[ 0 ];	
+
 		
 		this._placeEmptyDummyChartForMessage( { 
 			$chart_outer_container_jq : $retention_time_outer_container_div, 
