@@ -1,7 +1,4 @@
 
---   This is current out of sync with the Workbench model for table CREATE TABLE  proxl_xml_file_import_tracking_single_file
-
-
 --  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 --  WARNING:  When regenerate this content:
