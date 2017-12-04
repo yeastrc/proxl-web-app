@@ -26,7 +26,8 @@ public class ProcessImporterRunnerConfigFile {
 	private static final String NO_PROPERTIES_FILE_ERROR_MESSAGE = "No DB Connection Properties file found.";
 	
 	private static final String CONFIG_FILENAME = "run_importer_config_file.properties";
-	
+
+	private static final String PROPERTY_NAME__WAIT_TIME_FOR_NEXT_CHECK_FOR_IMPORT_TO_PROCESS = "wait.time.for.next.check.for.import.to.process";
 
 	private static final String PROPERTY_NAME__JAVA_EXECUTABLE_WITH_PATH = "java.executable.with.path";
 
@@ -63,9 +64,7 @@ public class ProcessImporterRunnerConfigFile {
 	 */
 	public DBConnectionParametersProviderFromPropertiesFile processConfigFile( File configFileFromCommandLine ) throws Exception {
 		
-
 		try {
-			
 			Properties configProps = null;
 			
 			InputStream propertiesFileAsStream = null;
@@ -151,6 +150,7 @@ public class ProcessImporterRunnerConfigFile {
 				}
 			}
 			
+			String waitTimeForNextCheckForImportToProcess_InSecondsString = configProps.getProperty( PROPERTY_NAME__WAIT_TIME_FOR_NEXT_CHECK_FOR_IMPORT_TO_PROCESS );
 			String javaExecutableWithPath = configProps.getProperty( PROPERTY_NAME__JAVA_EXECUTABLE_WITH_PATH );
 			String importerJarWithPath = configProps.getProperty( PROPERTY_NAME__IMPORTER_JAR_WITH_PATH );
 			String importerDbConfigWithPath = configProps.getProperty( PROPERTY_NAME__IMPORTER_DB_CONFIG_WITH_PATH );
@@ -160,12 +160,28 @@ public class ProcessImporterRunnerConfigFile {
 			String commandToRunOnSuccessfulImport = configProps.getProperty( PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT );
 			String commandToRunOnSuccessfulImportSyoutSyserrDir = configProps.getProperty( PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT_SYSOUT_SYSERR_DIR );
 
-//			if ( StringUtils.isEmpty( importerJarWithPath ) ) {
-//
-//				String msg = "For config file: parameter '" + PROPERTY_NAME__IMPORTER_JAR_WITH_PATH + "' is not provided or is empty string.";
-//				log.error( msg );
-//				throw new ConfigPropertiesFileErrorException(msg);
-//			}
+			if ( StringUtils.isNotEmpty( waitTimeForNextCheckForImportToProcess_InSecondsString ) ) {
+
+				int waitTimeForNextCheckForImportToProcess_InSeconds = -1;
+				try {
+					waitTimeForNextCheckForImportToProcess_InSeconds = Integer.parseInt( waitTimeForNextCheckForImportToProcess_InSecondsString );
+				} catch (Exception e ) {
+					String msg = "For config file: parameter '" 
+							+ PROPERTY_NAME__WAIT_TIME_FOR_NEXT_CHECK_FOR_IMPORT_TO_PROCESS 
+							+ "' is provided but is not an integer.  Value in config file: "
+							+ waitTimeForNextCheckForImportToProcess_InSecondsString;
+					log.error( msg, e );
+					throw new ConfigPropertiesFileErrorException(msg);
+				}
+
+				ImporterRunnerConfigData.setWaitTimeForNextCheckForImportToProcess_InSeconds( waitTimeForNextCheckForImportToProcess_InSeconds );
+				
+				log.warn( "INFO: Config file property '" 
+						+ PROPERTY_NAME__WAIT_TIME_FOR_NEXT_CHECK_FOR_IMPORT_TO_PROCESS
+						+ "' has value: " 
+						+ waitTimeForNextCheckForImportToProcess_InSeconds
+						+ " seconds" );
+			}
 
 			if ( StringUtils.isEmpty( proxlWebAppBaseURL ) ) {
 

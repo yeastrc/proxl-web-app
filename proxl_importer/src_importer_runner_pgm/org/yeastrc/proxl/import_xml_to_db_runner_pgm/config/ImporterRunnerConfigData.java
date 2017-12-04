@@ -10,6 +10,8 @@ public class ImporterRunnerConfigData {
 
 	private static Logger log = Logger.getLogger( ImporterRunnerConfigData.class );
 	
+	private static Integer waitTimeForNextCheckForImportToProcess_InSeconds;
+	
 	private static String javaExecutableWithPath;
 	private static String importerJarWithPath;
 	private static String importerDbConfigWithPath;
@@ -20,7 +22,16 @@ public class ImporterRunnerConfigData {
 	private static String commandToRunOnSuccessfulImportSyoutSyserrDir;
 	
 	private static boolean configured = false;
+
 	
+	public static Integer getWaitTimeForNextCheckForImportToProcess_InSeconds() {
+		if ( ! configured ) {
+			String msg = "ImporterRunnerConfigData not configured";
+			log.error( msg );
+			throw new IllegalStateException(msg);
+		}
+		return waitTimeForNextCheckForImportToProcess_InSeconds;
+	}
 	public static String getImporterJarWithPath() {
 		if ( ! configured ) {
 			String msg = "ImporterRunnerConfigData not configured";
@@ -93,6 +104,10 @@ public class ImporterRunnerConfigData {
 	public static void setCommandToRunOnSuccessfulImportSyoutSyserrDir(
 			String commandToRunOnSuccessfulImportSyoutSyserrDir) {
 		ImporterRunnerConfigData.commandToRunOnSuccessfulImportSyoutSyserrDir = commandToRunOnSuccessfulImportSyoutSyserrDir;
+	}
+	public static void setWaitTimeForNextCheckForImportToProcess_InSeconds(
+			Integer waitTimeForNextCheckForImportToProcess_InSeconds) {
+		ImporterRunnerConfigData.waitTimeForNextCheckForImportToProcess_InSeconds = waitTimeForNextCheckForImportToProcess_InSeconds;
 	}
 
 	

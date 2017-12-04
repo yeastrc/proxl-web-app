@@ -2,6 +2,7 @@ package org.yeastrc.proxl.import_xml_to_db_runner_pgm.get_import_and_process_thr
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.database_update_with_transaction_services.GetNextTrackingToProcessDBTransaction;
+import org.yeastrc.proxl.import_xml_to_db_runner_pgm.config.ImporterRunnerConfigData;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.process_import.ProcessProxlXMLImport;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.objects.TrackingDTOTrackingRunDTOPair;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -13,7 +14,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
 public class GetImportAndProcessThread extends Thread {
 
 	private static final String className = GetImportAndProcessThread.class.getSimpleName();
-	private static final int WAIT_TIME_TO_GET_SOMETHING_TO_PROCESS = 5; // in seconds
+	private static final int WAIT_TIME_TO_GET_SOMETHING_TO_PROCESS_DEFAULT = 5; // in seconds
 	private static final int WAIT_TIME_WHEN_GET_EXCEPTION = 5 * 60; // in seconds
 	
 	private static Logger log = Logger.getLogger(GetImportAndProcessThread.class);
@@ -21,7 +22,16 @@ public class GetImportAndProcessThread extends Thread {
 	private volatile boolean keepRunning = true;
 	private volatile ProcessProxlXMLImport processProxlXMLImport;
 	
+	private int waitTimeForNextCheckForImportToProcess_InSeconds = WAIT_TIME_TO_GET_SOMETHING_TO_PROCESS_DEFAULT;
+	
 	private int maxTrackingRecordPriorityToRetrieve;
+	
+	public static GetImportAndProcessThread getInstance( String s ) {
+		
+		GetImportAndProcessThread instance = new GetImportAndProcessThread();
+		instance.init();
+		return instance;
+	}
 	
 	/**
 	 * default Constructor
@@ -30,7 +40,6 @@ public class GetImportAndProcessThread extends Thread {
 		//  Set a name for the thread
 		String threadName = className;
 		setName( threadName );
-		init();
 	}
 	/**
 	 * Constructor
@@ -38,13 +47,18 @@ public class GetImportAndProcessThread extends Thread {
 	 */
 	public GetImportAndProcessThread( String s ) {
 		super(s);
-		init();
 	}
+	
 	/**
 	 *
 	 */
 	private void init() {
+		Integer waitTimeForNextCheckForImportToProcess_InSeconds_InConfig = ImporterRunnerConfigData.getWaitTimeForNextCheckForImportToProcess_InSeconds();
+		if ( waitTimeForNextCheckForImportToProcess_InSeconds_InConfig != null ) {
+			waitTimeForNextCheckForImportToProcess_InSeconds = waitTimeForNextCheckForImportToProcess_InSeconds_InConfig;
+		}
 	}
+	
 	/**
 	 * awaken thread to get next import or to complete
 	 */
@@ -70,7 +84,7 @@ public class GetImportAndProcessThread extends Thread {
 					}
 					processProxlXMLImport.processProxlXMLImport( trackingDTOTrackingRunDTOPair );
 				} else {
-					int waitTimeInSeconds = WAIT_TIME_TO_GET_SOMETHING_TO_PROCESS;
+					int waitTimeInSeconds = waitTimeForNextCheckForImportToProcess_InSeconds;
 					synchronized (this) {
 						try {
 							wait( ( (long) waitTimeInSeconds ) * 1000 ); //  wait for notify() call or timeout, in milliseconds
