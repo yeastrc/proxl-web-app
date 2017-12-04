@@ -97,7 +97,7 @@
 	<table  class=" tablesorter psm_table_jq" style="width:60%"  >
 		<thead>
 		<tr>
-			{{#if scanDataAnyRows}}
+			{{#if showViewSpectrumLinkColumn}}
 				<th style="text-align:left;font-weight:bold;"><!-- spectrum link for Lorikeet --></th>
 			{{/if}}
 <%-- 					

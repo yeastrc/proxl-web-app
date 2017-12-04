@@ -8,6 +8,8 @@ import java.util.List;
  */
 public class PsmsServiceResult {
 
+	private boolean searchHasScanData; //  From search record 
+	
 	private List<AnnotationDisplayNameDescription> annotationDisplayNameDescriptionList;
 	
 	private List<PsmWebDisplayWebServiceResult> psmWebDisplayList;
@@ -25,5 +27,11 @@ public class PsmsServiceResult {
 	}
 	public void setPsmWebDisplayList(List<PsmWebDisplayWebServiceResult> psmWebDisplayList) {
 		this.psmWebDisplayList = psmWebDisplayList;
+	}
+	public boolean isSearchHasScanData() {
+		return searchHasScanData;
+	}
+	public void setSearchHasScanData(boolean searchHasScanData) {
+		this.searchHasScanData = searchHasScanData;
 	}
 }

@@ -165,12 +165,16 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 
 	////////////
 	this.loadAndInsertPsmsResponse = function( params ) {
+		
 		var ajaxRequestData = params.ajaxRequestData;
 		var ajaxResponseData = params.ajaxResponseData;
 		var show_associated_peptides_link_true = params.otherData.show_associated_peptides_link_true;
 		var initial_scan_id_String = params.otherData.initial_scan_id;
+		
 		var annotationDisplayNameDescriptionList = ajaxResponseData.annotationDisplayNameDescriptionList;
 		var psmWebDisplayList = ajaxResponseData.psmWebDisplayList;
+		var searchHasScanData = ajaxResponseData.searchHasScanData;
+		
 		var initial_scan_id = parseInt( initial_scan_id_String, 10 );
 		if ( isNaN( initial_scan_id ) ) {
 			initial_scan_id = null;
@@ -224,19 +228,24 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 				chargeDataAnyRows = true;
 			}
 		}
+
+		var showViewSpectrumLinkColumn = false;
+		
+		if ( searchHasScanData && scanDataAnyRows ) {
+			showViewSpectrumLinkColumn = true;
+		}
+		
 		//  Context for creating column headings HTML
 		var context = {
 				annotationDisplayNameDescriptionList : annotationDisplayNameDescriptionList,
+				showViewSpectrumLinkColumn : showViewSpectrumLinkColumn,
 				scanDataAnyRows : scanDataAnyRows,
 				scanNumberAnyRows : scanNumberAnyRows,
 				scanFilenameAnyRows : scanFilenameAnyRows,
 				chargeDataAnyRows : chargeDataAnyRows
 		};
-		context.scanDataAnyRows = scanDataAnyRows;
-		context.scanNumberAnyRows = scanNumberAnyRows;
-		context.scanFilenameAnyRows = scanFilenameAnyRows;
-		context.chargeDataAnyRows = chargeDataAnyRows;
-		var html = _handlebarsTemplate_psm_block_template(context);
+
+		var html = _handlebarsTemplate_psm_block_template( context );
 		var $psm_block_template = $( html ).appendTo( $psm_data_container ); 
 		var $psm_table_jq = $psm_block_template.find(".psm_table_jq");
 		//			var $psm_table_jq = $psm_data_container.find(".psm_table_jq");
@@ -257,7 +266,9 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 					psm.chargeDisplay = psm.charge;
 				}
 				//  Context for creating data row HTML
-				var context = { psm : psm,
+				var context = { 
+						psm : psm,
+						showViewSpectrumLinkColumn : showViewSpectrumLinkColumn,
 						scanDataAnyRows : scanDataAnyRows,
 						scanNumberAnyRows : scanNumberAnyRows,
 						scanFilenameAnyRows : scanFilenameAnyRows,

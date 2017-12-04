@@ -197,6 +197,9 @@ public class PsmsService {
 			PsmsServiceResult psmsServiceResult = 
 					getPsmData( cutoffValuesSearchLevel, annTypeIdDisplayPsm, excludeLinksWith_JSONRoot, search, searchId, reportedPeptideId, searchIdsCollection );
 			
+			
+			psmsServiceResult.setSearchHasScanData( search.isHasScanData() );
+			
 			return psmsServiceResult;
 			
 		} catch ( WebApplicationException e ) {

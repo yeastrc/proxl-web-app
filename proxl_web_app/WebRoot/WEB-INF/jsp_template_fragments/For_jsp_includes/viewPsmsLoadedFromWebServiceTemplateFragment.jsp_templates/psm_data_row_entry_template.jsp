@@ -10,7 +10,7 @@
 	<td><a href="javascript:" psmId="{{id}}" class="view_spectrum_open_spectrum_link_jq">{{psmId}}</a></td>
   --%>
 
-	{{#if scanDataAnyRows}}
+	{{#if showViewSpectrumLinkColumn}}
 		<td style="white-space: nowrap; "  class=" {{#if psm.scanIdMatchesInitialScanId }}   highlight-row  {{/if}} "  
 			><a href="javascript:" psmId="{{ psm.psmDTO.id }}" class="view_spectrum_open_spectrum_link_jq" 
 					psm_type="{{ psmDTO.type }}"
