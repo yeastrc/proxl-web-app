@@ -19,3 +19,13 @@ DROP TABLE scan_file_ms1_intensity_binned_summed_data;
 
 DROP TABLE scan_retention_time;
 
+
+DROP TABLE scan_file_statistics;
+
+DROP TABLE scan_file_ms_1_per_scan_data_num_tic_rt;
+DROP TABLE scan_file_ms_2_per_scan_data_num_tic_rt;
+
+DROP TABLE scan_file_ms1_intensity_binned_summed_summary;
+DROP TABLE scan_file_ms1_intensity_binned_summed_summary_data;
+
+

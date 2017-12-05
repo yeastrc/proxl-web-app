@@ -22,8 +22,9 @@ import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchIdScanFileIdCombinedRecordExistsSearcher;
-import org.yeastrc.xlink.dao.ScanFileStatisticsDAO;
-import org.yeastrc.xlink.dto.ScanFileStatisticsDTO;
+import org.yeastrc.xlink.www.spectral_storage_service_interface.Call_Get_GetSummaryDataPerScanLevel_FromSpectralStorageService;
+import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.SingleScanLevelSummaryData_SubResponse;
+import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -158,16 +159,22 @@ public class QC_Scan_OverallStatistics_Service {
 			    	        );
 			}
 
-			ScanFileStatisticsDTO scanFileStatisticsDTO = 
-					ScanFileStatisticsDAO.getInstance().getScanFileStatisticsDTOForScanFileId( scanFileId ); 
-			
-			if ( scanFileStatisticsDTO == null ) {
+			String scanFileAPIKey = ScanFileDAO.getInstance().getSpectralStorageAPIKeyById( scanFileId );
+			if ( StringUtils.isEmpty( scanFileAPIKey ) ) {
+				String msg = "No value for scanFileAPIKey for scan file id: " + scanFileId;
+				log.warn( msg );
 				webserviceResult = new QC_Scan_OverallStatistics_WebserviceResult();
 				webserviceResult.setHaveData(false);
-			} else {
-				webserviceResult = new QC_Scan_OverallStatistics_WebserviceResult( scanFileStatisticsDTO );
-			}
+//				throw new ProxlWebappDataException( msg );
 			
+			} else {
+
+				List<SingleScanLevelSummaryData_SubResponse> scanSummaryPerScanLevelList = 
+						Call_Get_GetSummaryDataPerScanLevel_FromSpectralStorageService.getSingletonInstance()
+						.get_GetSummaryDataPerScanLevel_All( scanFileAPIKey );
+
+				webserviceResult = createQC_Scan_OverallStatistics_WebserviceResult( scanSummaryPerScanLevelList );
+			}
 			
 		} catch ( WebApplicationException e ) {
 			throw e;
@@ -186,6 +193,29 @@ public class QC_Scan_OverallStatistics_Service {
 	}
 	
 	/**
+	 * @param scanSummaryPerScanLevelList
+	 * @return
+	 */
+	private QC_Scan_OverallStatistics_WebserviceResult createQC_Scan_OverallStatistics_WebserviceResult( List<SingleScanLevelSummaryData_SubResponse> scanSummaryPerScanLevelList ) {
+		
+		QC_Scan_OverallStatistics_WebserviceResult result = new QC_Scan_OverallStatistics_WebserviceResult();
+		
+		result.setHaveData( true );
+		
+		for ( SingleScanLevelSummaryData_SubResponse singleScanLevelSummaryData_SubResponse : scanSummaryPerScanLevelList ) {
+			if ( singleScanLevelSummaryData_SubResponse.getScanLevel() == 1 ) {
+				result.setMs_1_ScanCount( singleScanLevelSummaryData_SubResponse.getNumberOfScans() );
+				result.setMs_1_ScanIntensitiesSummed( singleScanLevelSummaryData_SubResponse.getTotalIonCurrent() );
+			} else if ( singleScanLevelSummaryData_SubResponse.getScanLevel() == 2 ) {
+				result.setMs_2_ScanCount( singleScanLevelSummaryData_SubResponse.getNumberOfScans() );
+				result.setMs_2_ScanIntensitiesSummed( singleScanLevelSummaryData_SubResponse.getTotalIonCurrent() );
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * Webservice returned object
 	 *
 	 */
@@ -198,18 +228,6 @@ public class QC_Scan_OverallStatistics_Service {
 		private long ms_2_ScanCount;
 		private double ms_2_ScanIntensitiesSummed;
 
-		// Constructors
-		public QC_Scan_OverallStatistics_WebserviceResult() { }
-		public QC_Scan_OverallStatistics_WebserviceResult( ScanFileStatisticsDTO scanFileStatisticsDTO ) {
-			super();
-			this.haveData = true;
-			this.scanFileId = scanFileStatisticsDTO.getScanFileId();
-			this.ms_1_ScanCount = scanFileStatisticsDTO.getMs_1_ScanCount();
-			this.ms_1_ScanIntensitiesSummed = scanFileStatisticsDTO.getMs_1_ScanIntensitiesSummed();
-			this.ms_2_ScanCount = scanFileStatisticsDTO.getMs_2_ScanCount();
-			this.ms_2_ScanIntensitiesSummed = scanFileStatisticsDTO.getMs_2_ScanIntensitiesSummed();
-		}
-		
 		public int getScanFileId() {
 			return scanFileId;
 		}

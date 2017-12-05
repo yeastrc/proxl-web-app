@@ -278,7 +278,6 @@ public class Process_MzML_MzXml_File {
 			Arrays.sort( scanNumbersToLoad ); // sort so can do binary search
 			insertedScanNumberAtIndex = new boolean[ scanNumbersToLoad.length ];
 		}
-		int scanFileId = scanFileDTO.getId();
 		int insertedScansCounter = 0;
 		 NumberFormat numberFormatInsertedScansCounter = NumberFormat.getInstance();
 		int insertedScansBlockCounter = 0; // track number since last reported on number inserted.
@@ -290,9 +289,6 @@ public class Process_MzML_MzXml_File {
 		long scanCounter = 0;
 		long ms1_ScanCounter = 0;
 		long ms2_ScanCounter = 0;
-		
-		//  Object for accumulating Scan info/statistics for saving in DB
-		AccumScanFileStatistics accumScanFileStatistics = AccumScanFileStatistics.getInstance();
 		
 		try {
 			MzML_MzXmlScan scanIn = null;
@@ -314,11 +310,10 @@ public class Process_MzML_MzXml_File {
                 } else {
                 	ms2_ScanCounter++;
                 }
-                accumScanFileStatistics.processScanForAccum( scanIn );
                 if(scanIn.getMsLevel() == 1)  {
                 }
                 else {
-                	//  Only save MS2 (also save associated MS1 scan which is the previous MS1 scan)
+                	//  Only save MS2
                 	//  Determine if load this scan
                 	boolean scanNumberFoundInListToLoad = false;
                 	if ( scanNumbersToLoad != null ) {
@@ -407,15 +402,9 @@ public class Process_MzML_MzXml_File {
 					+ numberFormatInsertedScansCounter.format( ms1_ScanCounter ) );
 			log.info( "Number of ms2 scans read: "  
 					+ numberFormatInsertedScansCounter.format( ms2_ScanCounter ) );
-			log.info( "for all ms1 scans: Intensities Summed: "  
-					+ numberFormatInsertedScansCounter.format( accumScanFileStatistics.getMs1_ScanIntensitiesSummed() ) );
-			log.info( "for all ms2 scans: Intensities Summed: "  
-					+ numberFormatInsertedScansCounter.format( accumScanFileStatistics.getMs2_ScanIntensitiesSummed() ) );
-			log.info( "Number of ms2 scans inserted (also ms1 scans being inserted) : "  
+			log.info( "Number of ms2 scans inserted: "  
 					+ numberFormatInsertedScansCounter.format( insertedScansCounter ) );
 		}
-		
-		SaveScanFileStatisticsToDB.getInstance().saveScanFileStatisticsToDB( accumScanFileStatistics, scanFileId, scanFileDTO.getFilename() );
 		
 		return mapOfScanNumbersToScanIds;
 	}

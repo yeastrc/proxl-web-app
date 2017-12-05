@@ -7,9 +7,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.ScanFileStatisticsDAO;
-import org.yeastrc.xlink.dto.ScanFileStatisticsDTO;
+import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.SingleScanLevelSummaryData_SubResponse;
+import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.XLinkUtils;
@@ -24,6 +25,7 @@ import org.yeastrc.xlink.www.qc_data.scan_level_data_merged.objects.Scan_Statist
 import org.yeastrc.xlink.www.searcher.Scan_CountsPerLinkTypeForSearchScanFileSearcher;
 import org.yeastrc.xlink.www.searcher.ScanFileIdsForSearchSearcher;
 import org.yeastrc.xlink.www.searcher.Scan_CountsPerLinkTypeForSearchScanFileSearcher.PSM_CountsPerLinkTypeForSearchScanFileResult;
+import org.yeastrc.xlink.www.spectral_storage_service_interface.Call_Get_GetSummaryDataPerScanLevel_FromSpectralStorageService;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -147,18 +149,28 @@ public class Scan_Statistics_Merged {
 
 				//  Overall statistics for scan file
 
-				ScanFileStatisticsDTO scanFileStatisticsDTO = 
-						ScanFileStatisticsDAO.getInstance().getScanFileStatisticsDTOForScanFileId( scanFileId ); 
-				
-				if ( scanFileStatisticsDTO == null ) {
+				String scanFileAPIKey = ScanFileDAO.getInstance().getSpectralStorageAPIKeyById( scanFileId );
+				if ( StringUtils.isEmpty( scanFileAPIKey ) ) {
+					String msg = "No value for scanFileAPIKey for scan file id: " + scanFileId;
+					log.warn( msg );
 
 					haveSscanOverallData = false; //  If no data for any scan file, then no scan overall data
 				} else {
+
+					List<SingleScanLevelSummaryData_SubResponse> scanSummaryPerScanLevelList = 
+							Call_Get_GetSummaryDataPerScanLevel_FromSpectralStorageService.getSingletonInstance()
+							.get_GetSummaryDataPerScanLevel_All( scanFileAPIKey );
+
+					for ( SingleScanLevelSummaryData_SubResponse singleScanLevelSummaryData_SubResponse : scanSummaryPerScanLevelList ) {
+						if ( singleScanLevelSummaryData_SubResponse.getScanLevel() == 1 ) {
+							ms_1_ScanCount += singleScanLevelSummaryData_SubResponse.getNumberOfScans();
+							ms_1_ScanIntensitiesSummed += singleScanLevelSummaryData_SubResponse.getTotalIonCurrent();
+						} else if ( singleScanLevelSummaryData_SubResponse.getScanLevel() == 2 ) {
+							ms_2_ScanCount += singleScanLevelSummaryData_SubResponse.getNumberOfScans();
+							ms_2_ScanIntensitiesSummed += singleScanLevelSummaryData_SubResponse.getTotalIonCurrent();
+						}
+					}
 					
-					ms_1_ScanCount += scanFileStatisticsDTO.getMs_1_ScanCount();
-					ms_1_ScanIntensitiesSummed += scanFileStatisticsDTO.getMs_1_ScanIntensitiesSummed();
-					ms_2_ScanCount += scanFileStatisticsDTO.getMs_2_ScanCount();
-					ms_2_ScanIntensitiesSummed += scanFileStatisticsDTO.getMs_2_ScanIntensitiesSummed();
 				}
 
 //				///   MS2 counts For Cutoffs 
