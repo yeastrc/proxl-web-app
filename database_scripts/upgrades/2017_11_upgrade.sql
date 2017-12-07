@@ -13,7 +13,7 @@ UPDATE scan_file SET create_date = NULL ; -- Clear field for existing records si
 DROP TABLE scan_spectrum_data;
 
 --  remove all records in scan table with level 1
-DELETE FROM scan WHERE level = 1
+DELETE FROM scan WHERE level = 1;
 
 DROP TABLE scan_file_ms1_intensity_binned_summed_data;
 
