@@ -43,6 +43,11 @@ public class ConfigSystemsKeysConstants {
 	public static final String EMAIL_SMTP_SERVER_URL_KEY = "email_smtp_server_url";
 	public static final String EMAIL_FROM_ADDRESS_URL_KEY = "email_from_address";
 	
+
+	/////////   Run Importer Status Emails Config
+	
+	public static final String RUN_IMPORT_EXTRA_EMAILS_TO_SEND_TO_KEY = "run_import_extra_emails_to_send_to";
+	
 	
 	///   Page Content Config
 	

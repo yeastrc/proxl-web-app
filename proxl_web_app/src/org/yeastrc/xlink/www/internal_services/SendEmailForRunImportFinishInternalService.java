@@ -5,6 +5,8 @@ import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingDTO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingRunDTO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportStatus;
+import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
+import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.send_email.GetEmailConfig;
 import org.yeastrc.xlink.www.send_email.SendEmail;
@@ -18,7 +20,14 @@ import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataResponse
  */
 public class SendEmailForRunImportFinishInternalService {
 	private static final Logger log = Logger.getLogger(SendEmailForRunImportFinishInternalService.class);
+	
 	private static final int MAX_FAILURE_MESSAGE_LENGTH = 500;
+	
+	private enum Email_Contents_Control { 
+		FOR_USER, 
+		FOR_OTHER // used when send email to addresses configured in config_system table 
+	}
+	
 	//  private constructor
 	private SendEmailForRunImportFinishInternalService() { }
 	/**
@@ -69,11 +78,36 @@ public class SendEmailForRunImportFinishInternalService {
 		// Generate and send the email to the user.
 		try {
         	SendEmailDTO sendEmailDTO = createMailMessageToSend( 
+        			Email_Contents_Control.FOR_USER,
         			proxlXMLFileImportTrackingDTO, 
         			proxlXMLFileImportTrackingRunDTO,
-        			userMgmtGetUserDataResponse.getEmail() );
+        			userMgmtGetUserDataResponse.getEmail(), // toEmailAddressParam
+        			null // userEmailAddressParam
+        			);
+			
         	if ( sendEmailDTO != null ) {
         		SendEmail.getInstance().sendEmail( sendEmailDTO );
+        		
+        		String extraEmailAddressesToSendTo_CommaDelim =
+        				ConfigSystemCaching.getInstance()
+        				.getConfigValueForConfigKey( ConfigSystemsKeysConstants.RUN_IMPORT_EXTRA_EMAILS_TO_SEND_TO_KEY );
+        		
+        		if ( StringUtils.isNotEmpty( extraEmailAddressesToSendTo_CommaDelim ) ) {
+        			String[] extraEmailAddressesToSendTo_Array = extraEmailAddressesToSendTo_CommaDelim.split( "," );
+        			for ( String extraEmailAddressesToSendTo : extraEmailAddressesToSendTo_Array ) {
+        				
+        				sendEmailDTO = createMailMessageToSend(
+        						Email_Contents_Control.FOR_OTHER, // used when send email to addresses configured in config_system table
+        	        			proxlXMLFileImportTrackingDTO, 
+        	        			proxlXMLFileImportTrackingRunDTO,
+        	        			extraEmailAddressesToSendTo, // toEmailAddressParam
+        	        			userMgmtGetUserDataResponse.getEmail() // userEmailAddressParam
+        	        			);
+        				
+        				sendEmailDTO.setToEmailAddress( extraEmailAddressesToSendTo );
+        				SendEmail.getInstance().sendEmail( sendEmailDTO );
+        			}
+        		}
         	}
 		}
 		catch (Exception e) {
@@ -89,9 +123,12 @@ public class SendEmailForRunImportFinishInternalService {
 	 * @throws Exception
 	 */
 	private SendEmailDTO createMailMessageToSend( 
+			Email_Contents_Control email_Contents_Control,
 			ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO,
 			ProxlXMLFileImportTrackingRunDTO proxlXMLFileImportTrackingRunDTO,
-			String toEmailAddressParam ) throws Exception {
+			String toEmailAddressParam,
+			String userEmailAddressParam ) throws Exception {
+		
 		ProxlXMLFileImportStatus status = proxlXMLFileImportTrackingDTO.getStatus();
 		String statusText = null;
 		if ( status == ProxlXMLFileImportStatus.COMPLETE ) {
@@ -122,15 +159,29 @@ public class SendEmailForRunImportFinishInternalService {
 					+ "\n\n"
 					+ "** END Import Failure Message";
 		}
+		String importedShortDescription = null;
+		if ( StringUtils.isNotEmpty( proxlXMLFileImportTrackingDTO.getSearchName() ) ) {
+			importedShortDescription = "Imported short description: " + proxlXMLFileImportTrackingDTO.getSearchName();
+		} else {
+			importedShortDescription = "No Imported short description";
+		}
+			
+		
 		// set the message body
 		String text = 
 				"The ProXL Import has " + statusText
 				+ ".\n\n"
-				+ "Imported short description: " + proxlXMLFileImportTrackingDTO.getSearchName()
+				+ importedShortDescription
 				+ searchPathWithLabel
 				+ failedMessage
 				+ "\n\n"
 				+ "Thank you\n\nThe ProXL DB";
+		
+		if ( email_Contents_Control == Email_Contents_Control.FOR_OTHER ) {
+			
+			text += "\n\nThe above text was sent to email address: " + userEmailAddressParam + "\n"
+					+ "Project Id: " + proxlXMLFileImportTrackingDTO.getProjectId();
+		}
 		
 		String fromEmailAddress = GetEmailConfig.getFromAddress();
 		String toEmailAddress = toEmailAddressParam;
