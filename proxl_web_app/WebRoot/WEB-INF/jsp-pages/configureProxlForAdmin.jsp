@@ -154,12 +154,42 @@
 			</div>
 			<div>
 				Allow Scan file Upload: 
-				<input type="checkbox" class=" config_checkbox_inputs_jq "  
+				<input type="checkbox" class=" config_checkbox_inputs_jq "  id="allow_scan_file_upload_checkbox"
 					data-config-key="<%= ConfigSystemsKeysSharedConstants.SCAN_FILE_IMPORT_ALLOWED_VIA_WEB_SUBMIT_KEY %>"
 					data-value-checked="<%= ConfigSystemsValuesSharedConstants.TRUE %>" 
 					data-value-not-checked="<%= ConfigSystemsValuesSharedConstants.FALSE %>" > 
 			
 			</div>
+			
+			<%--  Error Message for 'Allow Scan file Upload' checked 
+			      but 'Spectral Storage Service Base URL' not populated,
+				  or vice versa
+			 --%>
+			<div style="position: relative;"> <%--  container div for error-message-container which is position absolute --%>
+			  <div style="position: absolute; top: -60px;">
+		  		<div class="error-message-container error_message_container_jq" 
+		  				id="error_message_allow_scan_file_selected_spectral_storage_empty"
+		  				style="text-align: left; margin-left: 50px;width: 400px;" >
+		  			<div class="error-message-inner-container" >
+		  				<div class="error-message-close-x error_message_close_x_jq">X</div>
+			  			<div class="error-message-text" 
+			  			  >'Allow Scan file Upload' is selected so 'Spectral Storage Service Base URL' must have a value.</div>
+		  			</div>
+			  	</div>
+			  </div>
+			  <div style="position: absolute; top: -60px;">
+		  		<div class="error-message-container error_message_container_jq" 
+		  				id="error_message_allow_scan_file_not_selected_spectral_storage_not_empty"
+		  				style="text-align: left; margin-left: 50px;width: 400px;" >
+		  			<div class="error-message-inner-container" >
+		  				<div class="error-message-close-x error_message_close_x_jq">X</div>
+			  			<div class="error-message-text" 
+			  			  >'Spectral Storage Service Base URL' has a value so 'Allow Scan file Upload' must be selected.</div>
+		  			</div>
+			  	</div>
+			  </div>
+		    </div>
+		   
 			<div>
 				Delete uploaded files after Successful Import: 
 				<input type="checkbox" class=" config_checkbox_inputs_jq "  
@@ -175,7 +205,8 @@
 	<div style="margin-bottom: 10px;" >
 		<div style="margin-bottom: 3px;">
 			Spectral Storage Service Base URL (required if allow scan file uploads): 
-			<input type="text" class=" config_text_inputs_jq " style="width: 650px;"
+			<input type="text" class=" config_text_inputs_jq " id="spectral_storage_service_base_url_input_field" 
+				style="width: 650px;"
 				data-config-key="<%= ConfigSystemsKeysSharedConstants.SPECTRAL_STORAGE_SERVICE_BASE_URL %>"
 				>
 		</div>

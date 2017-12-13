@@ -82,6 +82,30 @@ function saveListConfiguration() {
 	
 	var configList = [];
 	var input_footer_center_of_page_html_Val = null;
+	
+	var $allow_scan_file_upload_checkbox = $("#allow_scan_file_upload_checkbox");
+	var allow_scan_file_upload_checkboxChecked = $allow_scan_file_upload_checkbox.prop( "checked" );
+	
+	var $spectral_storage_service_base_url_input_field = $("#spectral_storage_service_base_url_input_field");
+	var spectral_storage_service_base_url_input_fieldValue = $spectral_storage_service_base_url_input_field.val();
+	
+	if ( allow_scan_file_upload_checkboxChecked && spectral_storage_service_base_url_input_fieldValue === "" ) {
+		//  Display error message since checkbox checked but input field empty
+		var $error_message_allow_scan_file_selected_spectral_storage_empty = $("#error_message_allow_scan_file_selected_spectral_storage_empty");
+		showErrorMsg( $error_message_allow_scan_file_selected_spectral_storage_empty );
+		
+		 return;  //  EARLY EXIT
+	}	
+
+	if ( ( ! allow_scan_file_upload_checkboxChecked ) && spectral_storage_service_base_url_input_fieldValue !== "" ) {
+		//  Display error message since checkbox not checked but input field not empty
+		var $error_message_allow_scan_file_not_selected_spectral_storage_not_empty = $("#error_message_allow_scan_file_not_selected_spectral_storage_not_empty");
+		showErrorMsg( $error_message_allow_scan_file_not_selected_spectral_storage_not_empty );
+		
+		 return;  //  EARLY EXIT
+	}	
+	
+	
 	//  Process text inputs
 	var $config_text_inputs_jq = $(".config_text_inputs_jq");
 	$config_text_inputs_jq.each( function( index, element ) {
