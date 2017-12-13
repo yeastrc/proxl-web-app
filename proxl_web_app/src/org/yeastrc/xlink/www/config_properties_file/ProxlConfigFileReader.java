@@ -24,6 +24,8 @@ public class ProxlConfigFileReader {
 	private static String PROPERTY_NAME__PROXL_WEBAPP_IDENTIFIER_FOR_USER_ACCOUNT_WEB_APP = "proxl.webapp.identifier.for.user.account.webapp";
 	private static String PROPERTY_NAME__PROXL_WEBAPP_KEY_FOR_USER_ACCOUNT_WEB_APP = "proxl.webapp.key.for.user.account.webapp";
 	
+	private static String PROPERTY_NAME__SPECTRAL_STORAGE_WEB_APP_URL = "spectral.storage.webapp.url.app.context";
+	
 	/**
 	 * special for when re-computing values for table unified_rp__search__rep_pept__generic_lookup
 	 * First set annotation_type_filterable.default_filter_value_at_database_load = null where annotation_type_filterable.default_filter_at_database_load = 1
@@ -93,6 +95,10 @@ public class ProxlConfigFileReader {
 			log.warn( "INFO: '" + PROPERTY_NAME__PROXL_WEBAPP_ENCRYPTION_KEY_FOR_USER_ACCOUNT_WEB_APP 
 					+ "' is not populated in config or is empty string." ); 
 		}
+		
+		log.warn( "INFO: '" + PROPERTY_NAME__SPECTRAL_STORAGE_WEB_APP_URL + "' has value: " 
+				+ proxlConfigFileValues.getSpectralStorageServerURLandAppContext() );
+		
 	}
 	
 	/**
@@ -148,6 +154,11 @@ public class ProxlConfigFileReader {
 			propertyValue = configProps.getProperty( PROPERTY_NAME__PROXL_WEBAPP_ENCRYPTION_KEY_FOR_USER_ACCOUNT_WEB_APP );
 			if ( StringUtils.isNotEmpty( propertyValue ) ) {
 				proxlConfigFileValues.setRequestingEncryptionKey( propertyValue );
+			}
+			
+			propertyValue = configProps.getProperty( PROPERTY_NAME__SPECTRAL_STORAGE_WEB_APP_URL );
+			if ( StringUtils.isNotEmpty( propertyValue ) ) {
+				proxlConfigFileValues.setSpectralStorageServerURLandAppContext( propertyValue );
 			}
 			
 			propertyValue = configProps.getProperty( PROPERTY_NAME__allowAnnTypeFilterDefaultFilterValueAtDatabaseLoad_Null_When_isDefaultFilter_True );

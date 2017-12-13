@@ -21,10 +21,14 @@ public class ProxlConfigFileValues {
 	 */
 	private ProxlConfigFileValues() {}
 	
+	//  User Account Server Connection Info
 	private String userAccountServerURLandAppContext;
 	private String requestingWebappIdentifier;
 	private String requestingWebappKey;
 	private String requestingEncryptionKey;
+	
+	//  Spectral Storage Server Connection Info
+	private String spectralStorageServerURLandAppContext;
 	
  	/**
 	 * special for when re-computing values for table unified_rp__search__rep_pept__generic_lookup
@@ -78,6 +82,14 @@ public class ProxlConfigFileValues {
 	}
 	public void setUserAccountServerURLandAppContext(String userAccountServerURLandAppContext) {
 		this.userAccountServerURLandAppContext = userAccountServerURLandAppContext;
+	}
+
+	public String getSpectralStorageServerURLandAppContext() {
+		return spectralStorageServerURLandAppContext;
+	}
+
+	public void setSpectralStorageServerURLandAppContext(String spectralStorageServerURLandAppContext) {
+		this.spectralStorageServerURLandAppContext = spectralStorageServerURLandAppContext;
 	}
 
 }

@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.spectral_storage.webservice_connect.main.CallSpectralStorageWebservice;
 import org.yeastrc.spectral_storage.webservice_connect.main.CallSpectralStorageWebserviceInitParameters;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
+import org.yeastrc.xlink.www.config_properties_file.ProxlConfigFileValues;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappConfigException;
 
@@ -29,9 +30,17 @@ class CallSpectralStorageWebservice_ForProxl_Factory {
 	 */
 	public CallSpectralStorageWebservice getCallSpectralStorageWebservice() throws Exception {
 		
+		// First get override URL from config file
 		String spectralStorageWebserviceBaseURL = 
-				ConfigSystemDAO.getInstance().getConfigValueForConfigKey( ConfigSystemsKeysSharedConstants.SPECTRAL_STORAGE_SERVICE_BASE_URL );
-
+				ProxlConfigFileValues.getInstance().getSpectralStorageServerURLandAppContext();
+				
+		if ( StringUtils.isEmpty( spectralStorageWebserviceBaseURL ) ) {
+			//  Not in config file so get from config_system table
+			spectralStorageWebserviceBaseURL = 
+					ConfigSystemDAO.getInstance()
+					.getConfigValueForConfigKey( ConfigSystemsKeysSharedConstants.SPECTRAL_STORAGE_SERVICE_BASE_URL );
+		}
+		
 		if ( StringUtils.isEmpty( spectralStorageWebserviceBaseURL ) ) {
 			String msg = "No value in config for key '"
 					+ ConfigSystemsKeysSharedConstants.SPECTRAL_STORAGE_SERVICE_BASE_URL
