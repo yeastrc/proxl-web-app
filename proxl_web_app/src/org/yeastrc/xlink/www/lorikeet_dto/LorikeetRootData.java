@@ -90,7 +90,7 @@ public class LorikeetRootData {
      * @param mz
      * @param intensity
      */
-    public void addPeak( float mz, float intensity ) {
+    public void addPeak( double mz, float intensity ) {
     	
     	if ( peaks == null ) {
     		
@@ -111,7 +111,7 @@ public class LorikeetRootData {
      * @param mz
      * @param intensity
      */
-    public void addMs1Peak( float mz, float intensity ) {
+    public void addMs1Peak( double mz, float intensity ) {
     	
     	if ( ms1peaks == null ) {
     		
