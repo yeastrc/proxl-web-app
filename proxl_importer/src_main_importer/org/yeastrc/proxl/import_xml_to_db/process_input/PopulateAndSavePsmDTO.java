@@ -67,9 +67,15 @@ public class PopulateAndSavePsmDTO {
 				throw new ProxlImporterDataException( msg );
 			}
 		}
-		if ( psm.getPrecursorCharge() != null ) {
-			psmDTO.setCharge( psm.getPrecursorCharge().intValue() );
+		if ( psm.getPrecursorCharge() == null ) {
+			String msg = "Psm PrecursorCharge cannot be null.  " 
+					+ "  Psm Scanfilename: " + psm.getScanFileName()
+					+ ", Psm ScanNumber: " + psm.getScanNumber();
+			log.error( msg );
+			throw new ProxlImporterDataException( msg );
 		}
+		psmDTO.setCharge( psm.getPrecursorCharge().intValue() );
+		
 		if ( psm.getScanNumber() != null ) {
 			psmDTO.setScanNumber( psm.getScanNumber().intValue() );
 		}

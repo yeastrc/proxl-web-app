@@ -90,14 +90,8 @@ public class DB_Insert_PsmDAO {
 				pstmt.setNull( counter, java.sql.Types.INTEGER );
 			}
 			
-
 			counter++;
-			
-			if ( psm.getCharge() != null ) {
-				pstmt.setInt( counter, psm.getCharge() );
-			} else {
-				pstmt.setNull( counter, java.sql.Types.INTEGER );
-			}
+			pstmt.setInt( counter, psm.getCharge() );
 
 			counter++;
 			pstmt.setBigDecimal( counter, psm.getLinkerMass() );

@@ -42,10 +42,10 @@ public class PsmDTO {
 	public void setScanId(Integer scanId) {
 		this.scanId = scanId;
 	}
-	public Integer getCharge() {
+	public int getCharge() {
 		return charge;
 	}
-	public void setCharge(Integer charge) {
+	public void setCharge(int charge) {
 		this.charge = charge;
 	}
 	public BigDecimal getLinkerMass() {
@@ -74,7 +74,7 @@ public class PsmDTO {
 	private int searchId;
 	private Integer scanId;
 	private int reportedPeptideId;
-	private Integer charge;
+	private int charge;
 	private BigDecimal linkerMass;
 	private Integer scanNumber;
 	private Integer searchScanFilenameId;

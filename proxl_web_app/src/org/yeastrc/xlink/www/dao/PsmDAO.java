@@ -160,9 +160,8 @@ public class PsmDAO {
 			psm.setScanId( scanId );
 		}
 		int charge = rs.getInt( "charge" );
-		if ( ! rs.wasNull() ) {
-			psm.setCharge( charge );
-		}
+		psm.setCharge( charge );
+		
 		psm.setLinkerMass( rs.getBigDecimal( "linker_mass" ) );  //  Can be NULL
 		psm.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
 		int scanNumber = rs.getInt( "scan_number" );
