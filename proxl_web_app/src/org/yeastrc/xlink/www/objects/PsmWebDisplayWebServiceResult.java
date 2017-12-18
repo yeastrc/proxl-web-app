@@ -20,21 +20,30 @@ public class PsmWebDisplayWebServiceResult extends SortDisplayRecordsWrapperBase
 	private PsmDTO psmDTO;
 	private Integer scanNumber;
 	private String scanFilename;
-	private BigDecimal retentionTime;
-	private BigDecimal retentionTimeMinutesRounded;
-	private String retentionTimeMinutesRoundedString;
-	
-
 
 	private int searchId;
 	
-	private Integer charge;
+	private Integer charge; // from psm
+	
+
+	//  From scan
+	private BigDecimal retentionTime;
+	private BigDecimal retentionTimeMinutesRounded;
+	private String retentionTimeMinutesRoundedString;
+
 	private BigDecimal preMZ;
 	private String preMZRounded; 
+
+	private Integer scanFileId;
+
+	
+	//  Searched for in DB:
 	
 	private int psmCountForAssocScanId;
 
 	private boolean psmCountForAssocScanIdSet;
+	
+	//  Retrieved for psm
 	
 	private List<String> psmAnnotationValueList;
 	
@@ -208,6 +217,16 @@ public class PsmWebDisplayWebServiceResult extends SortDisplayRecordsWrapperBase
 			List<String> peptideAnnotationValueList) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	public Integer getScanFileId() {
+		return scanFileId;
+	}
+
+
+	public void setScanFileId(Integer scanFileId) {
+		this.scanFileId = scanFileId;
 	}
 
 

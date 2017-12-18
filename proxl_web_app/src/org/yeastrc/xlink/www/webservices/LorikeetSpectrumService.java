@@ -3,7 +3,6 @@ package org.yeastrc.xlink.www.webservices;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 //import javax.servlet.http.HttpSession;
@@ -19,10 +18,9 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.enums.Get_ScanDataFromScanNumbers_IncludeParentScans;
+import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.enums.Get_ScanData_ExcludeReturnScanPeakData;
 import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.SingleScanPeak_SubResponse;
 import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.SingleScan_SubResponse;
-import org.yeastrc.xlink.base.spectrum.common.dto.Peak;
-import org.yeastrc.xlink.base.spectrum.common.utils.StringToPeaks;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.www.dao.PsmDAO;
 import org.yeastrc.xlink.dao.ScanDAO;
@@ -46,7 +44,6 @@ import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectSearchIdsForSearchIdSearcher;
 import org.yeastrc.xlink.www.searcher.SearchReportedPeptideLinkTypeSearcher;
@@ -360,6 +357,7 @@ public class LorikeetSpectrumService {
 				.getScanDataFromSpectralStorageService(
 						scanNumbers, 
 						Get_ScanDataFromScanNumbers_IncludeParentScans.IMMEDIATE_PARENT,
+						Get_ScanData_ExcludeReturnScanPeakData.NO,
 						scanFileAPIKey );
 		
 		ScanDataFromSpectralStorageService_MS_2_1 scanDataFromSpectralStorageService_MS_2_1 = new ScanDataFromSpectralStorageService_MS_2_1();

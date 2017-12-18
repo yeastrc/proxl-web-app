@@ -31,8 +31,9 @@ public class PsmWebDisplaySearcher {
 	public static PsmWebDisplaySearcher getInstance() { return _INSTANCE; }
 	
 	private static final String SQL_MAIN = 
-			"SELECT psm.id AS psm_id, psm.charge, psm.scan_number AS scan_number, scan.retention_time, "
-			+        "  scan.preMZ, search_scan_filename.filename AS scan_filename "
+			"SELECT psm.id AS psm_id, psm.charge, psm.scan_number AS scan_number, "
+			+ 		 " scan.retention_time,  scan.preMZ,  scan.scan_file_id, "
+			+        " search_scan_filename.filename AS scan_filename "
 			+ " FROM psm  "
 			+ " LEFT OUTER JOIN search_scan_filename ON psm.search_scan_filename_id = search_scan_filename.id "
 			+ " LEFT OUTER JOIN scan ON psm.scan_id = scan.id ";
@@ -139,6 +140,10 @@ public class PsmWebDisplaySearcher {
 				int scanNumber = rs.getInt( "scan_number" );
 				if ( ! rs.wasNull() ) {
 					psmWebDisplay.setScanNumber( scanNumber );
+				}
+				int scanFileId = rs.getInt( "scan_file_id" );
+				if ( ! rs.wasNull() ) {
+					psmWebDisplay.setScanFileId( scanFileId );
 				}
 				psmWebDisplay.setScanFilename( rs.getString( "scan_filename" ) );
 				BigDecimal retentionTime = rs.getBigDecimal( "retention_time" );
