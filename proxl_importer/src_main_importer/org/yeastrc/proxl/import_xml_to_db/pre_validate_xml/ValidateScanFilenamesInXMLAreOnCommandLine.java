@@ -55,7 +55,6 @@ public class ValidateScanFilenamesInXMLAreOnCommandLine {
 					reportedPeptides.getReportedPeptide();
 			if ( reportedPeptideList != null && ( ! reportedPeptideList.isEmpty() ) ) {
 				for ( ReportedPeptide reportedPeptide : reportedPeptideList ) {
-					reportedPeptide.getPsms();
 					Psms psms =	reportedPeptide.getPsms();
 					if ( psms != null ) {
 						List<Psm> psmList = psms.getPsm();

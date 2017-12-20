@@ -27,6 +27,7 @@ import org.yeastrc.proxl.import_xml_to_db.objects.ProxlInputObjectContainer;
 import org.yeastrc.proxl.import_xml_to_db.objects.ScanFileFileContainer;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateAnnotationTypeRecords;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateMatchedProteinSection;
+import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidatePsmPeptideRecordsUniqueIdOnPeptideRecord;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateScanFilenamesInXMLAreOnCommandLine;
 import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput;
 import org.yeastrc.proxl.import_xml_to_db.project_importable_validation.IsImportingAllowForProject;
@@ -255,15 +256,19 @@ public class ImporterCoreEntryPoint {
 			//   Throws ProxlImporterDataException if data error found
 			ValidateAnnotationTypeRecords.getInstance().validateAnnotationTypeRecords( proxlInputForImport );
 			//   Throws ProxlImporterDataException if data error found
+			ValidatePsmPeptideRecordsUniqueIdOnPeptideRecord.getInstance().validatePsmPeptideRecordsUniqueIdOnPeptideRecord (proxlInputForImport );
+			//   Throws ProxlImporterDataException if data error found
 			ValidateMatchedProteinSection.getInstance().validateMatchedProteinSection( proxlInputForImport );
 			//   Throws ProxlImporterDataException if data error found
 			ValidateScanFilenamesInXMLAreOnCommandLine.getInstance().validateScanFilenamesInXMLAreOnCommandLine( proxlInputForImport, scanFileFileContainerList );
+			
 			if ( doNotUseCutoffInInputFile ) {
 				dropPeptidePSMCutoffValues = new DropPeptidePSMCutoffValues();
 			} else {
 				//   Throws ProxlImporterDataException if data error found
 				DropPeptidePSMPopulateFromProxlXMLInput.getInstance().populateFromProxlXMLInput( dropPeptidePSMCutoffValues, proxlInputForImport );
 			}
+			
 			//  Process proxl Input
 			processProxlInput = ProcessProxlInput.getInstance();
 			processProxlInput.processProxlInput( 

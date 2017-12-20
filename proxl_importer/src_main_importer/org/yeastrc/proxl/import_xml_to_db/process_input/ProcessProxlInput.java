@@ -218,6 +218,8 @@ public class ProcessProxlInput {
 					createReportedPeptideFilterableAnnotationTypesOnId( searchProgramEntryMap );
 			reportedPeptideAndPsmFilterableAnnotationTypesOnId.filterablePsmAnnotationTypesOnId = 
 					createPsmFilterableAnnotationTypesOnId( searchProgramEntryMap );
+			reportedPeptideAndPsmFilterableAnnotationTypesOnId.filterablePsmPerPeptideAnnotationTypesOnId =
+					createPsmPerPeptideFilterableAnnotationTypesOnId( searchProgramEntryMap );
 			
 			if ( reportedPeptideAndPsmFilterableAnnotationTypesOnId.filterablePsmAnnotationTypesOnId == null ) {
 				String msg = "filterablePsmAnnotationTypesOnId == null";
@@ -266,6 +268,7 @@ public class ProcessProxlInput {
 		
 		private Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnId;
 		private Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId;
+		private Map<Integer, AnnotationTypeDTO> filterablePsmPerPeptideAnnotationTypesOnId;
 		
 		public Map<Integer, AnnotationTypeDTO> getFilterableReportedPeptideAnnotationTypesOnId() {
 			return filterableReportedPeptideAnnotationTypesOnId;
@@ -279,6 +282,13 @@ public class ProcessProxlInput {
 		}
 		public void setFilterablePsmAnnotationTypesOnId(Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId) {
 			this.filterablePsmAnnotationTypesOnId = filterablePsmAnnotationTypesOnId;
+		}
+		public Map<Integer, AnnotationTypeDTO> getFilterablePsmPerPeptideAnnotationTypesOnId() {
+			return filterablePsmPerPeptideAnnotationTypesOnId;
+		}
+		public void setFilterablePsmPerPeptideAnnotationTypesOnId(
+				Map<Integer, AnnotationTypeDTO> filterablePsmPerPeptideAnnotationTypesOnId) {
+			this.filterablePsmPerPeptideAnnotationTypesOnId = filterablePsmPerPeptideAnnotationTypesOnId;
 		}
 	}
 	
@@ -323,6 +333,29 @@ public class ProcessProxlInput {
 				if ( psmAnnotationTypeDTO.getFilterableDescriptiveAnnotationType()
 						== FilterableDescriptiveAnnotationType.FILTERABLE ) {
 					filterableAnnotationTypesOnId.put( psmAnnotationTypeDTO.getId(), psmAnnotationTypeDTO );
+				}
+			}
+		}
+		return filterableAnnotationTypesOnId;
+	}
+
+	/**
+	 * @param searchProgramEntryMap
+	 * @return
+	 */
+	private Map<Integer, AnnotationTypeDTO> createPsmPerPeptideFilterableAnnotationTypesOnId( Map<String, SearchProgramEntry> searchProgramEntryMap ) {
+		
+		///  Build list of Filterable annotation type ids
+		Map<Integer, AnnotationTypeDTO> filterableAnnotationTypesOnId = new HashMap<>();
+		for ( Map.Entry<String, SearchProgramEntry> searchProgramEntryMapEntry : searchProgramEntryMap.entrySet() ) {
+			SearchProgramEntry searchProgramEntry = searchProgramEntryMapEntry.getValue();
+			Map<String, AnnotationTypeDTO> psmPerPeptideAnnotationTypeDTOMap =
+					searchProgramEntry.getPsmPerPeptideAnnotationTypeDTOMap();
+			for ( Map.Entry<String, AnnotationTypeDTO> psmPerPeptideAnnotationTypeDTOMapEntry : psmPerPeptideAnnotationTypeDTOMap.entrySet() ) {
+				AnnotationTypeDTO psmPerPeptideAnnotationTypeDTO = psmPerPeptideAnnotationTypeDTOMapEntry.getValue();
+				if ( psmPerPeptideAnnotationTypeDTO.getFilterableDescriptiveAnnotationType()
+						== FilterableDescriptiveAnnotationType.FILTERABLE ) {
+					filterableAnnotationTypesOnId.put( psmPerPeptideAnnotationTypeDTO.getId(), psmPerPeptideAnnotationTypeDTO );
 				}
 			}
 		}

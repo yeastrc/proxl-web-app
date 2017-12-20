@@ -43,6 +43,8 @@ public class GetPerPeptideData {
 
 		perPeptideData.setPeptideDTO( peptideDTO );
 		
+		perPeptideData.setUniqueId( peptide.getUniqueId() );
+		
 		List<SrchRepPeptPeptDynamicModDTO> dynamicModDTOList_Peptide = new ArrayList<>();
 		List<Integer> monolinkPositionList = new ArrayList<>();
 

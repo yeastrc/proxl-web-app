@@ -903,7 +903,7 @@ CREATE TABLE  annotation_type (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   search_programs_per_search_id INT(10) UNSIGNED NOT NULL,
-  psm_peptide_type ENUM('psm','peptide') NOT NULL,
+  psm_peptide_type ENUM('psm', 'peptide', 'psm_per_peptide') NOT NULL COMMENT '\'peptide\' is actually reported peptide',
   filterable_descriptive_type ENUM('filterable','descriptive') NOT NULL,
   name VARCHAR(255) NOT NULL,
   default_visible INT(1) NOT NULL,
@@ -958,7 +958,7 @@ CREATE TABLE  psm_annotation (
   annotation_type_id INT UNSIGNED NOT NULL,
   value_location ENUM('local','large_value_table') NOT NULL,
   value_double DOUBLE NOT NULL,
-  value_string VARCHAR(50) NOT NULL,
+  value_string VARCHAR(50) NOT NULL COMMENT 'Length is also coded in Java class AnnotationValueStringLocalFieldLength',
   PRIMARY KEY (id),
   CONSTRAINT psm_filterable_annotation__psm_id_fk
     FOREIGN KEY (psm_id)
@@ -987,7 +987,7 @@ CREATE TABLE  srch__rep_pept__annotation (
   annotation_type_id INT(10) UNSIGNED NOT NULL,
   value_location ENUM('local','large_value_table') NOT NULL,
   value_double DOUBLE NOT NULL,
-  value_string VARCHAR(50) NOT NULL,
+  value_string VARCHAR(50) NOT NULL COMMENT 'Length is also coded in Java class AnnotationValueStringLocalFieldLength',
   PRIMARY KEY (id),
   CONSTRAINT srch__rep_pept__ann__rep_pept_id_fk
     FOREIGN KEY (reported_peptide_id)
@@ -2138,6 +2138,58 @@ CREATE TABLE  scan_file_source (
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table psm_per_peptide_annotation
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS psm_per_peptide_annotation ;
+
+CREATE TABLE  psm_per_peptide_annotation (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  psm_id INT UNSIGNED NOT NULL,
+  srch_rep_pept__peptide_id INT UNSIGNED NOT NULL,
+  filterable_descriptive_type ENUM('filterable','descriptive') NOT NULL,
+  annotation_type_id INT UNSIGNED NOT NULL,
+  value_location ENUM('local','large_value_table') NOT NULL,
+  value_double DOUBLE NOT NULL,
+  value_string VARCHAR(50) NOT NULL COMMENT 'Length is also coded in Java class AnnotationValueStringLocalFieldLength',
+  PRIMARY KEY (id),
+  CONSTRAINT psm_per_peptide_annotation__psm_id_fk
+    FOREIGN KEY (psm_id)
+    REFERENCES psm (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT psm_per_peptide_annotation__fk_2
+    FOREIGN KEY (srch_rep_pept__peptide_id)
+    REFERENCES srch_rep_pept__peptide (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX psm_per_peptide_annotation__psm_id_fk_idx ON psm_per_peptide_annotation (psm_id ASC);
+
+CREATE UNIQUE INDEX psm_per_p_a_psm_id_srch_rep__ann_typ_id_idx ON psm_per_peptide_annotation (psm_id ASC, srch_rep_pept__peptide_id ASC, annotation_type_id ASC);
+
+CREATE INDEX fk_psm_peptide_annotation_1_idx ON psm_per_peptide_annotation (srch_rep_pept__peptide_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table psm_per_peptide_annotation_large_value
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS psm_per_peptide_annotation_large_value ;
+
+CREATE TABLE  psm_per_peptide_annotation_large_value (
+  psm_per_peptide_annotation_id INT UNSIGNED NOT NULL,
+  value_string LONGTEXT NOT NULL,
+  CONSTRAINT psm_per_peptide_annotation_large_value_fk1
+    FOREIGN KEY (psm_per_peptide_annotation_id)
+    REFERENCES psm_per_peptide_annotation (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX psm_per_peptide_annotation_large_value_fk1_idx ON psm_per_peptide_annotation_large_value (psm_per_peptide_annotation_id ASC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

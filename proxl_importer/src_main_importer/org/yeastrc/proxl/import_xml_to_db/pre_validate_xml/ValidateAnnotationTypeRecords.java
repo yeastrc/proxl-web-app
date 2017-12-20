@@ -9,10 +9,14 @@ import org.yeastrc.proxl_import.api.xml_dto.DescriptivePeptideAnnotationType;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptivePeptideAnnotationTypes;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmAnnotationType;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmAnnotationTypes;
+import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmPerPeptideAnnotationType;
+import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmPerPeptideAnnotationTypes;
 import org.yeastrc.proxl_import.api.xml_dto.FilterablePeptideAnnotationType;
 import org.yeastrc.proxl_import.api.xml_dto.FilterablePeptideAnnotationTypes;
 import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmAnnotationType;
 import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmAnnotationTypes;
+import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmPerPeptideAnnotationType;
+import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmPerPeptideAnnotationTypes;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
 import org.yeastrc.proxl_import.api.xml_dto.SearchProgram;
 import org.yeastrc.proxl_import.api.xml_dto.SearchProgramInfo;
@@ -51,6 +55,7 @@ public class ValidateAnnotationTypeRecords {
 		for ( SearchProgram searchProgram : searchProgramList ) {
 			validateReportedPeptideAnnotationNamesUniqueWithinSearchProgramAndType( searchProgram );
 			validatePsmAnnotationNamesUniqueWithinSearchProgramAndType( searchProgram );
+			validatePsmPerPeptideAnnotationNamesUniqueWithinSearchProgramAndType( searchProgram );
 		}
 	}
 	
@@ -199,6 +204,83 @@ public class ValidateAnnotationTypeRecords {
 					if ( ! annotationNames.add( annotationName ) ) {
 						String msg = "Annotation name '" + annotationName + "'"
 								+ " occurs more than once for Psm annotation types for search program  "
+								+ "'" + searchProgram.getName() + "'.";
+						log.error( msg );
+						throw new ProxlImporterDataException( msg );
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 *  validate Psm Per Peptide Annotation Types
+	 *  
+	 * @param searchProgram
+	 * @throws ProxlImporterDataException 
+	 */
+	private void validatePsmPerPeptideAnnotationNamesUniqueWithinSearchProgramAndType( SearchProgram searchProgram ) throws ProxlImporterDataException {
+		Set<String> annotationNames = new HashSet<>();
+		SearchProgram.PsmPerPeptideAnnotationTypes psmPerPeptideAnnotationTypes =
+				searchProgram.getPsmPerPeptideAnnotationTypes();
+		if ( psmPerPeptideAnnotationTypes == null ) {
+			if ( log.isInfoEnabled() ) {
+				String msg = "No PsmPerPeptide Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
+			return;
+		}
+		//////	Filterable Psm PerPeptide Annotations
+		FilterablePsmPerPeptideAnnotationTypes filterablePsmPerPeptideAnnotationTypes =
+				psmPerPeptideAnnotationTypes.getFilterablePsmPerPeptideAnnotationTypes();
+		if ( filterablePsmPerPeptideAnnotationTypes == null ) {
+			if ( log.isInfoEnabled() ) {
+				String msg = "No Filterable PsmPerPeptide Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
+		} else {
+			List<FilterablePsmPerPeptideAnnotationType> filterablePsmPerPeptideAnnotationTypeList =
+					filterablePsmPerPeptideAnnotationTypes.getFilterablePsmPerPeptideAnnotationType();
+			if ( filterablePsmPerPeptideAnnotationTypeList == null || filterablePsmPerPeptideAnnotationTypeList.isEmpty() ) {
+				if ( log.isInfoEnabled() ) {
+					String msg = "No Filterable PsmPerPeptide Annotation Types for search program name: " + searchProgram.getName();
+					log.info(msg);
+				}
+			} else {
+				for ( FilterablePsmPerPeptideAnnotationType filterablePsmPerPeptideAnnotationType : filterablePsmPerPeptideAnnotationTypeList ) {
+					String annotationName = filterablePsmPerPeptideAnnotationType.getName();
+					if ( ! annotationNames.add( annotationName ) ) {
+						String msg = "Annotation name '" + annotationName + "'"
+								+ " occurs more than once for PsmPerPeptide annotation types for search program  "
+								+ "'" + searchProgram.getName() + "'.";
+						log.error( msg );
+						throw new ProxlImporterDataException( msg );
+					}
+				}
+			}
+		}
+		////////   Descriptive Psm PerPeptide Annotations
+		DescriptivePsmPerPeptideAnnotationTypes descriptivePsmPerPeptideAnnotationTypes =
+				psmPerPeptideAnnotationTypes.getDescriptivePsmPerPeptideAnnotationTypes();
+		if ( descriptivePsmPerPeptideAnnotationTypes == null ) {
+			if ( log.isInfoEnabled() ) {
+				String msg = "No Descriptive PsmPerPeptide Annotation Types for search program name: " + searchProgram.getName();
+				log.info(msg);
+			}
+		} else {
+			List<DescriptivePsmPerPeptideAnnotationType> descriptivePsmPerPeptideAnnotationTypeList =
+					descriptivePsmPerPeptideAnnotationTypes.getDescriptivePsmPerPeptideAnnotationType();
+			if ( descriptivePsmPerPeptideAnnotationTypeList == null || descriptivePsmPerPeptideAnnotationTypeList.isEmpty() ) {
+				if ( log.isInfoEnabled() ) {
+					String msg = "No Descriptive PsmPerPeptide Annotation Types for search program name: " + searchProgram.getName();
+					log.info(msg);
+				}
+			} else {
+				for ( DescriptivePsmPerPeptideAnnotationType descriptivePsmPerPeptideAnnotationType : descriptivePsmPerPeptideAnnotationTypeList ) {
+					String annotationName = descriptivePsmPerPeptideAnnotationType.getName();
+					if ( ! annotationNames.add( annotationName ) ) {
+						String msg = "Annotation name '" + annotationName + "'"
+								+ " occurs more than once for PsmPerPeptide annotation types for search program  "
 								+ "'" + searchProgram.getName() + "'.";
 						log.error( msg );
 						throw new ProxlImporterDataException( msg );

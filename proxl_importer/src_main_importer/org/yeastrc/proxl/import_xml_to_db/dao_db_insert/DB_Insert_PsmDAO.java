@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.PsmDTO;
 
@@ -28,24 +29,25 @@ public class DB_Insert_PsmDAO {
 	 */
 	public void saveToDatabase(PsmDTO item ) throws Exception {
 
-		Connection connection = null;
+		Connection dbConnection = null;
 
 		try {
 
-
-			connection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+//			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
-			saveToDatabase( item, connection );
+			dbConnection = ImportDBConnectionFactory.getInstance().getInsertControlCommitConnection();
+			
+			saveToDatabase( item, dbConnection );
 			
 		} finally {
 
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (Exception ex) {
-					// ignore
-				}
-			}
+//			if (dbConnection != null) {
+//				try {
+//					dbConnection.close();
+//				} catch (Exception ex) {
+//					// ignore
+//				}
+//			}
 		}
 	}
 	

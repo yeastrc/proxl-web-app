@@ -10,6 +10,8 @@ public class PsmsServiceResult {
 
 	private boolean searchHasScanData; //  From search record 
 	
+	private boolean searchHasPsmPerPeptideAnnTypes;
+	
 	private List<AnnotationDisplayNameDescription> annotationDisplayNameDescriptionList;
 	
 	private List<PsmWebDisplayWebServiceResult> psmWebDisplayList;
@@ -33,5 +35,11 @@ public class PsmsServiceResult {
 	}
 	public void setSearchHasScanData(boolean searchHasScanData) {
 		this.searchHasScanData = searchHasScanData;
+	}
+	public boolean isSearchHasPsmPerPeptideAnnTypes() {
+		return searchHasPsmPerPeptideAnnTypes;
+	}
+	public void setSearchHasPsmPerPeptideAnnTypes(boolean searchHasPsmPerPeptideAnnTypes) {
+		this.searchHasPsmPerPeptideAnnTypes = searchHasPsmPerPeptideAnnTypes;
 	}
 }

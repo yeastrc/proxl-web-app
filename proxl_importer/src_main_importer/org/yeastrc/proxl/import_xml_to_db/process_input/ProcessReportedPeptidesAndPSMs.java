@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ReportedPeptideDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_PsmFilterableAnnotationGenericLookupDAO;
@@ -40,6 +42,8 @@ import org.yeastrc.proxl_import.api.xml_dto.Psm;
 import org.yeastrc.proxl_import.api.xml_dto.Psms;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptides;
+import org.yeastrc.proxl_import.api.xml_dto.Psm.PerPeptideAnnotations;
+import org.yeastrc.proxl_import.api.xml_dto.Psm.PerPeptideAnnotations.PsmPeptide;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
@@ -125,7 +129,9 @@ public class ProcessReportedPeptidesAndPSMs {
 				reportedPeptideAndPsmFilterableAnnotationTypesOnId.getFilterableReportedPeptideAnnotationTypesOnId();
 		Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId = 
 				reportedPeptideAndPsmFilterableAnnotationTypesOnId.getFilterablePsmAnnotationTypesOnId();
-
+		Map<Integer, AnnotationTypeDTO> filterablePsmPerPeptideAnnotationTypesOnId = 
+				reportedPeptideAndPsmFilterableAnnotationTypesOnId.getFilterablePsmPerPeptideAnnotationTypesOnId();
+		
 		Map<String, SearchScanFilenameDTO> scanFilenamesOnPSMsKeyedOnScanFilename = new HashMap<>();
 		//////////////
 		ReportedPeptides reportedPeptides = proxlInput.getReportedPeptides();
@@ -145,6 +151,7 @@ public class ProcessReportedPeptidesAndPSMs {
 							searchProgramEntryMap, 
 							filterableReportedPeptideAnnotationTypesOnId,
 							filterablePsmAnnotationTypesOnId,
+							filterablePsmPerPeptideAnnotationTypesOnId,
 							mapOfScanFilenamesMapsOfScanNumbersToScanIds,
 							uniqueDynamicModMassesForTheSearch,
 							scanFilenamesOnPSMsKeyedOnScanFilename );
@@ -187,6 +194,7 @@ public class ProcessReportedPeptidesAndPSMs {
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
 			Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnId,
 			Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId,
+			Map<Integer, AnnotationTypeDTO> filterablePsmPerPeptideAnnotationTypesOnId,
 			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds,
 			Set<Double> uniqueDynamicModMassesForTheSearch,
 			Map<String, SearchScanFilenameDTO> scanFilenamesOnPSMsKeyedOnScanFilename
@@ -315,6 +323,7 @@ public class ProcessReportedPeptidesAndPSMs {
 			log.error( msg );
 			throw new ProxlImporterDataException(msg);
 		}
+		
 		PsmStatisticsAndBestValues psmStatisticsAndBestValues =
 				savePSMs( 
 						reportedPeptide, 
@@ -322,10 +331,13 @@ public class ProcessReportedPeptidesAndPSMs {
 						mapOfScanFilenamesMapsOfScanNumbersToScanIds, 
 						linkTypeNumber, 
 						reportedPeptideDTO, 
+						perPeptideDataList,
 						dropPeptidePSMCutoffValues, 
 						searchProgramEntryMap,
 						filterablePsmAnnotationTypesOnId,
+						filterablePsmPerPeptideAnnotationTypesOnId,
 						scanFilenamesOnPSMsKeyedOnScanFilename );
+		
 		saveUnifiedReportedPeptideAndPsmAndReportedPeptideLookupRecords( 
 				searchId,
 				reportedPeptideId,
@@ -538,9 +550,11 @@ public class ProcessReportedPeptidesAndPSMs {
 			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds, 
 			int linkTypeNumber, 
 			ReportedPeptideDTO reportedPeptideDTO, 
+			List<PerPeptideData> perPeptideDataList,
 			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
 			Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId,
+			Map<Integer, AnnotationTypeDTO> filterablePsmPerPeptideAnnotationTypesOnId,
 			Map<String, SearchScanFilenameDTO> scanFilenamesOnPSMsKeyedOnScanFilename
 			) throws ProxlImporterDataException, Exception {
 		
@@ -554,11 +568,25 @@ public class ProcessReportedPeptidesAndPSMs {
 			log.error( msg );
 			throw new ProxlImporterInteralException(msg);
 		}
+		
+		//  copy PerPeptideData perPeptideDataList to map
+		Map<String, PerPeptideData> perPeptideDataMap_Key_UniqueId = new HashMap<>();
+		for ( PerPeptideData perPeptideData : perPeptideDataList ) {
+			if ( StringUtils.isNotEmpty( perPeptideData.getUniqueId() ) ) {
+				perPeptideDataMap_Key_UniqueId.put( perPeptideData.getUniqueId(), perPeptideData );
+			}
+		}
+		
+		
 		Psms psms =	reportedPeptide.getPsms();
 		List<Psm> psmList = psms.getPsm();
+		
 		SavePsmAnnotations savePsmAnnotations = SavePsmAnnotations.getInstance( searchProgramEntryMap, filterablePsmAnnotationTypesOnId );
-		BestPsmAnnotationProcessing bestPsmAnnotationProcessing =
-				BestPsmAnnotationProcessing.getInstance( filterablePsmAnnotationTypesOnId );
+		
+		BestPsmAnnotationProcessing bestPsmAnnotationProcessing = BestPsmAnnotationProcessing.getInstance( filterablePsmAnnotationTypesOnId );
+		
+		SavePsmPerPeptideAnnotations savePsmPerPeptideAnnotations = SavePsmPerPeptideAnnotations.getInstance( searchProgramEntryMap, filterablePsmPerPeptideAnnotationTypesOnId );
+		
 		int psmCountPassDefaultCutoffs = 0;
 		boolean saveAnyPSMs = false;
 		for ( Psm psm : psmList ) {
@@ -598,6 +626,10 @@ public class ProcessReportedPeptidesAndPSMs {
 				psmCountPassDefaultCutoffs++;
 			}
 			bestPsmAnnotationProcessing.updateForCurrentPsmAnnotationData( currentPsm_psmAnnotationDTO_Filterable_List );
+			
+			// process per_peptide_annotations under psm if exist
+			processPsmPerPeptideAnnotationsForPSM( psm, perPeptideDataMap_Key_UniqueId, savePsmPerPeptideAnnotations, psmDTO, reportedPeptide );
+			
 			saveAnyPSMs = true;
 		}
 		if ( ! saveAnyPSMs ) {
@@ -610,6 +642,46 @@ public class ProcessReportedPeptidesAndPSMs {
 		psmStatisticsAndBestValues.psmCountPassDefaultCutoffs = psmCountPassDefaultCutoffs;
 		psmStatisticsAndBestValues.bestPsmAnnotationProcessing = bestPsmAnnotationProcessing;
 		return psmStatisticsAndBestValues;
+	}
+	
+	/**
+	 * process per_peptide_annotations under psm if exist
+	 * 
+	 * @param psm
+	 * @param perPeptideDataMap_Key_UniqueId
+	 * @param reportedPeptide
+	 * @throws ProxlImporterInteralException 
+	 */
+	private void processPsmPerPeptideAnnotationsForPSM( 
+			Psm psm, 
+			Map<String, PerPeptideData> perPeptideDataMap_Key_UniqueId, 
+			SavePsmPerPeptideAnnotations savePsmPerPeptideAnnotations,
+			PsmDTO psmDTO,
+			ReportedPeptide reportedPeptide ) throws Exception {
+
+		//  process per_peptide_annotations under psm if exist
+		
+		List<PerPeptideAnnotations> perPeptideAnnotationsList = psm.getPerPeptideAnnotations();
+		if ( perPeptideAnnotationsList != null && ( ! perPeptideAnnotationsList.isEmpty() ) ) {
+			for ( PerPeptideAnnotations perPeptideAnnotations : perPeptideAnnotationsList  ) {
+				PsmPeptide psmPeptide = perPeptideAnnotations.getPsmPeptide();
+				String psmPeptideUniqueId =	psmPeptide.getUniqueId();
+				PerPeptideData perPeptideData =  perPeptideDataMap_Key_UniqueId.get( psmPeptideUniqueId );
+				if ( perPeptideData == null ) {
+					String psmScanNumber = "";
+					if ( psm.getScanNumber() != null ) {
+						psmScanNumber = ", psm scan number: " + psm.getScanNumber();
+					}
+					String msg = "peptide unique_id found for psm_peptide. unique_id: " + psmPeptideUniqueId
+							+ psmScanNumber
+							+ ", reported peptide: " + reportedPeptide.getReportedPeptideString();
+					log.error( msg );
+					throw new ProxlImporterInteralException(msg);
+				}
+				
+				savePsmPerPeptideAnnotations.savePsmPerPeptideAnnotations( psmPeptide, perPeptideData, psmDTO );
+			}
+		}
 	}
 	
 	/**

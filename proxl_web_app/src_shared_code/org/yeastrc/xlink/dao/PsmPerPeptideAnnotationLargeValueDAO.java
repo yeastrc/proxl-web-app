@@ -8,24 +8,24 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
- * Table psm_annotation_large_value
+ * Table psm_per_peptide_annotation_large_value
  *
  */
-public class PsmAnnotationLargeValueDAO {
+public class PsmPerPeptideAnnotationLargeValueDAO {
 	
-	private static final Logger log = Logger.getLogger(PsmAnnotationLargeValueDAO.class);
+	private static final Logger log = Logger.getLogger(PsmPerPeptideAnnotationLargeValueDAO.class);
 
-	private PsmAnnotationLargeValueDAO() { }
-	public static PsmAnnotationLargeValueDAO getInstance() { return new PsmAnnotationLargeValueDAO(); }
+	private PsmPerPeptideAnnotationLargeValueDAO() { }
+	public static PsmPerPeptideAnnotationLargeValueDAO getInstance() { return new PsmPerPeptideAnnotationLargeValueDAO(); }
 	
 	/**
-	 * Get the given psm_annotation_large_value String from the database
+	 * Get the given psm_per_peptide_annotation_large_value String from the database
 	 * 
 	 * @param psmAnnotationId
 	 * @return
 	 * @throws Exception
 	 */
-	public String getValueString( int psmAnnotationId ) throws Exception {
+	public String getValueString( int psmPerPeptideAnnotationId ) throws Exception {
 		
 		String valueString = null;
 		
@@ -33,7 +33,7 @@ public class PsmAnnotationLargeValueDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
-		String sql = "SELECT value_string FROM psm_annotation_large_value WHERE psm_annotation_id = ?";
+		String sql = "SELECT value_string FROM psm_per_peptide_annotation_large_value WHERE psm_per_peptide_annotation_id = ?";
 		
 
 		try {
@@ -41,7 +41,7 @@ public class PsmAnnotationLargeValueDAO {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, psmAnnotationId );
+			pstmt.setInt( 1, psmPerPeptideAnnotationId );
 			
 			rs = pstmt.executeQuery();
 			
@@ -73,10 +73,14 @@ public class PsmAnnotationLargeValueDAO {
 				try { conn.close(); } catch( Throwable t ) { ; }
 				conn = null;
 			}
+			
 		}
+		
 		
 		return valueString;
 	}
+	
+	
 
 	
 }

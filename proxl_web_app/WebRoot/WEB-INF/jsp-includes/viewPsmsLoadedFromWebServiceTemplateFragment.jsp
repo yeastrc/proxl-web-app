@@ -24,6 +24,14 @@
 	</script>
 	
 	
+	<%--  PSM Child Row Entry Template --%>
+			
+	<script id="psm_child_row_entry_template"  type="text/x-handlebars-template">
+			<%--  include the template text  --%>
+			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_includes/viewPsmsLoadedFromWebServiceTemplateFragment.jsp_templates/psm_child_row_entry_template.jsp" %>
+	</script>
+
+	
 	<script id="psm_data_row_entry_no_annotation_data_no_scan_data_row"  type="text/x-handlebars-template">
 		<tr><td>PSM</td></tr>
 	

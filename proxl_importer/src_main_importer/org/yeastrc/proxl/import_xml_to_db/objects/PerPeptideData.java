@@ -19,6 +19,11 @@ import org.yeastrc.xlink.dto.PeptideDTO;
 public class PerPeptideData {
 	
 	private PeptideDTO peptideDTO;
+	
+	/**
+	 * from 'peptide' record in proxl XML
+	 */
+	private String uniqueId;
 
 	private SrchRepPeptPeptideDTO srchRepPeptPeptideDTO;
 		
@@ -34,6 +39,22 @@ public class PerPeptideData {
 	private boolean peptideIdMapsToOnlyOneProtein;
 	
 
+	/**
+	 * 'unique_id' from 'peptide' record in proxl XML
+	 * @return
+	 */
+	public String getUniqueId() {
+		return uniqueId;
+	}
+
+	/**
+	 * 'unique_id' from 'peptide' record in proxl XML
+	 * @param uniqueId
+	 */
+	public void setUniqueId(String uniqueId) {
+		this.uniqueId = uniqueId;
+	}
+	
 	/**
 	 * Only maps to 1 protein
 	 * @return
@@ -93,6 +114,6 @@ public class PerPeptideData {
 			List<MonolinkContainer> monolinkContainerList) {
 		this.monolinkContainerList = monolinkContainerList;
 	}
-	
+
 	
 }

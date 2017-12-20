@@ -34,7 +34,7 @@ public class DB_Insert_PsmFilterableAnnotationGenericLookupDAO {
 
 		try {
 
-//			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//			dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			dbConnection = ImportDBConnectionFactory.getInstance().getInsertControlCommitConnection();
 			
@@ -76,7 +76,7 @@ public class DB_Insert_PsmFilterableAnnotationGenericLookupDAO {
 
 		try {
 			
-//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.CROSSLINKS );
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			
 			pstmt = conn.prepareStatement( sql ); // , Statement.RETURN_GENERATED_KEYS
 			

@@ -24,6 +24,12 @@ public class SearchProgramEntry {
 	 */
 	private Map<String, AnnotationTypeDTO> psmAnnotationTypeDTOMap;
 
+	/**
+	 * Key is name
+	 */
+	private Map<String, AnnotationTypeDTO> psmPerPeptideAnnotationTypeDTOMap;
+
+	
 	
 	
 	
@@ -52,6 +58,14 @@ public class SearchProgramEntry {
 	public void setPsmAnnotationTypeDTOMap(
 			Map<String, AnnotationTypeDTO> psmAnnotationTypeDTOMap) {
 		this.psmAnnotationTypeDTOMap = psmAnnotationTypeDTOMap;
+	}
+
+	public Map<String, AnnotationTypeDTO> getPsmPerPeptideAnnotationTypeDTOMap() {
+		return psmPerPeptideAnnotationTypeDTOMap;
+	}
+
+	public void setPsmPerPeptideAnnotationTypeDTOMap(Map<String, AnnotationTypeDTO> psmPerPeptideAnnotationTypeDTOMap) {
+		this.psmPerPeptideAnnotationTypeDTOMap = psmPerPeptideAnnotationTypeDTOMap;
 	}
 		
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReportedPeptideAnnotationDAO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
@@ -15,7 +16,6 @@ import org.yeastrc.proxl_import.api.xml_dto.DescriptiveReportedPeptideAnnotation
 import org.yeastrc.proxl_import.api.xml_dto.FilterableReportedPeptideAnnotation;
 import org.yeastrc.proxl_import.api.xml_dto.FilterableReportedPeptideAnnotations;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
-import org.yeastrc.xlink.dao.SearchReportedPeptideAnnotationDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
@@ -157,7 +157,7 @@ public class SaveSearchReportedPeptideAnnotations {
 						searchReportedPeptideAnnotationDTO.setAnnotationTypeId( annotationTypeId );
 						searchReportedPeptideAnnotationDTO.setValueDouble( value.doubleValue() );
 						searchReportedPeptideAnnotationDTO.setValueString( value.toString() );
-						SearchReportedPeptideAnnotationDAO.getInstance().saveToDatabase(searchReportedPeptideAnnotationDTO);
+						DB_Insert_SearchReportedPeptideAnnotationDAO.getInstance().saveToDatabase(searchReportedPeptideAnnotationDTO);
 						searchReportedPeptideFilterableAnnotationDTOList.add(searchReportedPeptideAnnotationDTO);
 					}
 				}
@@ -218,7 +218,7 @@ public class SaveSearchReportedPeptideAnnotations {
 						searchReportedPeptideAnnotationDTO.setFilterableDescriptiveAnnotationType( FilterableDescriptiveAnnotationType.DESCRIPTIVE );
 						searchReportedPeptideAnnotationDTO.setAnnotationTypeId( descriptiveAnnotationTypeId );
 						searchReportedPeptideAnnotationDTO.setValueString( value );
-						SearchReportedPeptideAnnotationDAO.getInstance().saveToDatabase(searchReportedPeptideAnnotationDTO);
+						DB_Insert_SearchReportedPeptideAnnotationDAO.getInstance().saveToDatabase(searchReportedPeptideAnnotationDTO);
 					}
 				}
 			}

@@ -1,11 +1,17 @@
 
 		<%-- !!!   Handlebars template   !!!!!!!!!   --%>
 		
-	<%--  PSM Entry Template --%>
+	<%--  PSM Entry Template  - Enclosed with  <script id="psm_data_row_entry_template" --%>
 
 	
 
-<tr  class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} "  >
+<tr  class=" {{#if scanIdMatchesInitialScanId }}   highlight-row  {{/if}} " 
+	style=" {{#if searchHasPsmPerPeptideAnnTypes }} cursor: pointer; {{/if}} "
+	{{#if searchHasPsmPerPeptideAnnTypes }} 
+		onclick="viewPsmPerPeptideLoadedFromWebServiceTemplate.showHidePsmPerPeptide( { clickedElement : this } )"
+	{{/if}}
+	data-project_search_id="{{  project_search_id }}"
+	data-psm_id="{{ psm.psmDTO.id }}" >
   <%-- 
 	<td><a href="javascript:" psmId="{{id}}" class="view_spectrum_open_spectrum_link_jq">{{psmId}}</a></td>
   --%>

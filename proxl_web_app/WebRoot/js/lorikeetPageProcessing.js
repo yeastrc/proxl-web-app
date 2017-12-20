@@ -132,6 +132,9 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 					dataType : "json"
 				});
 
+		event.preventDefault(); // prevent default for element
+		
+		event.stopPropagation(); // prevent click bubbling
 	};
 
 

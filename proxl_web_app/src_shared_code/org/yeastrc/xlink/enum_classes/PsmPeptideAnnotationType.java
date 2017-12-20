@@ -14,6 +14,11 @@ public enum PsmPeptideAnnotationType {
      * Annotation type records for PSMs
      */
     PSM("psm"),
+
+    /**
+     * Annotation type records for PSM Per Peptide
+     */
+    PSM_PER_PEPTIDE("psm_per_peptide"),
     
     /**
      * Annotation type records for peptides

@@ -10,10 +10,14 @@ import org.yeastrc.proxl_import.api.xml_dto.DescriptivePeptideAnnotationType;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptivePeptideAnnotationTypes;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmAnnotationType;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmAnnotationTypes;
+import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmPerPeptideAnnotationType;
+import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmPerPeptideAnnotationTypes;
 import org.yeastrc.proxl_import.api.xml_dto.FilterablePeptideAnnotationType;
 import org.yeastrc.proxl_import.api.xml_dto.FilterablePeptideAnnotationTypes;
 import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmAnnotationType;
 import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmAnnotationTypes;
+import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmPerPeptideAnnotationType;
+import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmPerPeptideAnnotationTypes;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
 import org.yeastrc.proxl_import.api.xml_dto.SearchAnnotation;
 import org.yeastrc.proxl_import.api.xml_dto.SearchProgram;
@@ -71,6 +75,7 @@ public class ProcessSearchProgramEntries {
 			searchProgramEntryMap.put( searchProgramsPerSearchDTO.getName(), searchProgramEntry );
 			processReportedPeptideAnnotationTypes( searchProgram, searchProgramEntry, searchProgramsPerSearchDTO.getId(), searchId, searchProgramInfo );
 			processPsmAnnotationTypes( searchProgram, searchProgramEntry, searchProgramsPerSearchDTO.getId(), searchId, searchProgramInfo );
+			processPsmPerPeptideAnnotationTypes( searchProgram, searchProgramEntry, searchProgramsPerSearchDTO.getId(), searchId, searchProgramInfo );
 		}
 		return searchProgramEntryMap;
 	}
@@ -385,6 +390,153 @@ public class ProcessSearchProgramEntries {
 			psmAnnotationTypeDTOMap.put( item.getName(), item );
 		}
 	}
+	
+
+	/**
+	 * @param searchProgram
+	 * @param searchProgramEntry
+	 * @param searchProgramId
+	 * @throws Exception 
+	 */
+	private void processPsmPerPeptideAnnotationTypes( SearchProgram searchProgram, SearchProgramEntry searchProgramEntry, int searchProgramId, int searchId, SearchProgramInfo searchProgramInfo ) throws Exception {
+		processFilterablePsmPerPeptideAnnotationTypes( searchProgram, searchProgramEntry, searchProgramId, searchId, searchProgramInfo );
+		processDescriptivePsmPerPeptideAnnotationTypes( searchProgram, searchProgramEntry, searchProgramId, searchId, searchProgramInfo );
+	}
+	
+	/**
+	 * @param searchProgram
+	 * @param searchProgramEntry
+	 * @param searchProgramId
+	 * @param searchProgramInfo
+	 * @throws Exception 
+	 */
+	private void processFilterablePsmPerPeptideAnnotationTypes( SearchProgram searchProgram, SearchProgramEntry searchProgramEntry, int searchProgramId, int searchId, SearchProgramInfo searchProgramInfo ) throws Exception {
+	
+		Map<String, AnnotationTypeDTO> psmPerPeptideAnnotationTypeDTOMap = 
+				searchProgramEntry.getPsmPerPeptideAnnotationTypeDTOMap();
+		if ( psmPerPeptideAnnotationTypeDTOMap == null ) {
+			psmPerPeptideAnnotationTypeDTOMap = new HashMap<>();
+			searchProgramEntry.setPsmPerPeptideAnnotationTypeDTOMap( psmPerPeptideAnnotationTypeDTOMap );
+		}
+		String searchProgramName = searchProgram.getName();
+		List<SearchAnnotation> psmPerPeptideAnnotationSortOrderSearchAnnotationList = null;
+		List<SearchAnnotation> visiblePsmDefaultVisibleAnnotationsSearchAnnotationList = null;
+		if ( searchProgramInfo != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations() != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmPerPeptideAnnotations() != null 
+				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmPerPeptideAnnotations().getSearchAnnotation() != null ) {
+			visiblePsmDefaultVisibleAnnotationsSearchAnnotationList = 
+					searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmPerPeptideAnnotations().getSearchAnnotation();
+		}
+		
+		SearchProgram.PsmPerPeptideAnnotationTypes psmPerPeptideAnnotationTypes = searchProgram.getPsmPerPeptideAnnotationTypes();
+		if ( psmPerPeptideAnnotationTypes == null ) {
+			return;  //  EARLY EXIT
+		}
+		
+		FilterablePsmPerPeptideAnnotationTypes filterablePsmPerPeptideAnnotationTypes = psmPerPeptideAnnotationTypes.getFilterablePsmPerPeptideAnnotationTypes();
+		if ( filterablePsmPerPeptideAnnotationTypes == null ) {
+			return;  //  EARLY EXIT
+		}
+		
+		List<FilterablePsmPerPeptideAnnotationType> filterablePsmPerPeptideAnnotationTypeList =
+				filterablePsmPerPeptideAnnotationTypes.getFilterablePsmPerPeptideAnnotationType();
+		if ( filterablePsmPerPeptideAnnotationTypeList == null || filterablePsmPerPeptideAnnotationTypeList.isEmpty() ) {
+			return;  //  EARLY EXIT
+		}
+		
+		AnnotationTypeDAO srchPgmFilterablePsmPerPeptideAnnotationTypeDAO = AnnotationTypeDAO.getInstance();
+		
+		for ( FilterablePsmPerPeptideAnnotationType filterablePsmPerPeptideAnnotationType : filterablePsmPerPeptideAnnotationTypeList ) {
+			
+			String annotationTypeName = filterablePsmPerPeptideAnnotationType.getName();
+			Integer annotationTypeSortOrder = getAnnotationTypeSortOrder( annotationTypeName, searchProgramName, psmPerPeptideAnnotationSortOrderSearchAnnotationList );
+			boolean annotationTypeDefaultVisible = getAnnotationTypeDefaultVisible( annotationTypeName, searchProgramName, visiblePsmDefaultVisibleAnnotationsSearchAnnotationList );
+			Integer annotationTypeDisplayOrder = getAnnotationTypeDisplayOrder( annotationTypeName, searchProgramName, visiblePsmDefaultVisibleAnnotationsSearchAnnotationList );
+			AnnotationTypeDTO item = new AnnotationTypeDTO();
+			AnnotationTypeFilterableDTO annotationTypeFilterableDTO = new AnnotationTypeFilterableDTO();
+			item.setAnnotationTypeFilterableDTO( annotationTypeFilterableDTO );
+			item.setPsmPeptideAnnotationType( PsmPeptideAnnotationType.PSM_PER_PEPTIDE );
+			item.setFilterableDescriptiveAnnotationType( FilterableDescriptiveAnnotationType.FILTERABLE );
+			item.setSearchId( searchId );
+			item.setSearchProgramsPerSearchId( searchProgramId );
+			item.setName( filterablePsmPerPeptideAnnotationType.getName() );
+			String filterDirectionString = filterablePsmPerPeptideAnnotationType.getFilterDirection().value();
+			FilterDirectionType filterDirectionType = FilterDirectionType.fromValue( filterDirectionString );
+			annotationTypeFilterableDTO.setFilterDirectionType( filterDirectionType );
+//			annotationTypeFilterableDTO.setDefaultFilter( filterablePsmPerPeptideAnnotationType.isDefaultFilter() );
+//			annotationTypeFilterableDTO.setDefaultFilterAtDatabaseLoad( filterablePsmPerPeptideAnnotationType.isDefaultFilter() );
+//			BigDecimal defaultFilterValue = filterablePsmPerPeptideAnnotationType.getDefaultFilterValue();
+//			if ( defaultFilterValue != null ) {
+//				annotationTypeFilterableDTO.setDefaultFilterValue( defaultFilterValue.doubleValue() );
+//				annotationTypeFilterableDTO.setDefaultFilterValueString( defaultFilterValue.toString() );
+//				annotationTypeFilterableDTO.setDefaultFilterValueAtDatabaseLoad( defaultFilterValue.doubleValue() );
+//				annotationTypeFilterableDTO.setDefaultFilterValueStringAtDatabaseLoad( defaultFilterValue.toString() );
+//			}
+			annotationTypeFilterableDTO.setSortOrder( annotationTypeSortOrder );
+			item.setDefaultVisible( annotationTypeDefaultVisible );
+			item.setDisplayOrder( annotationTypeDisplayOrder );
+			item.setDescription( filterablePsmPerPeptideAnnotationType.getDescription() );
+			srchPgmFilterablePsmPerPeptideAnnotationTypeDAO.saveToDatabase( item );
+			psmPerPeptideAnnotationTypeDTOMap.put( item.getName(), item );
+		}
+	}
+	
+	/**
+	 * @param searchProgram
+	 * @param searchProgramEntry
+	 * @param searchProgramId
+	 * @param filterDirectionStringIdMap
+	 * @throws Exception 
+	 */
+	private void processDescriptivePsmPerPeptideAnnotationTypes( SearchProgram searchProgram, SearchProgramEntry searchProgramEntry, int searchProgramId, int searchId, SearchProgramInfo searchProgramInfo ) throws Exception {
+		
+		Map<String, AnnotationTypeDTO> psmPerPeptideAnnotationTypeDTOMap = 
+				searchProgramEntry.getPsmPerPeptideAnnotationTypeDTOMap();
+		if ( psmPerPeptideAnnotationTypeDTOMap == null ) {
+			psmPerPeptideAnnotationTypeDTOMap = new HashMap<>();
+			searchProgramEntry.setPsmPerPeptideAnnotationTypeDTOMap( psmPerPeptideAnnotationTypeDTOMap );
+		}
+//		String searchProgramName = searchProgram.getName();
+//		List<SearchAnnotation> visiblePsmDefaultVisibleAnnotationsSearchAnnotationList = null;
+//		if ( searchProgramInfo != null 
+//				&& searchProgramInfo.getDefaultVisibleAnnotations() != null 
+//				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmPerPeptideAnnotations() != null 
+//				&& searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmPerPeptideAnnotations().getSearchAnnotation() != null ) {
+//			visiblePsmDefaultVisibleAnnotationsSearchAnnotationList = 
+//					searchProgramInfo.getDefaultVisibleAnnotations().getVisiblePsmPerPeptideAnnotations().getSearchAnnotation();
+//		}
+		
+		SearchProgram.PsmPerPeptideAnnotationTypes psmPerPeptideAnnotationTypes = searchProgram.getPsmPerPeptideAnnotationTypes();
+		if ( psmPerPeptideAnnotationTypes == null ) {
+			return;  //  EARLY EXIT
+		}
+
+		DescriptivePsmPerPeptideAnnotationTypes descriptivePsmPerPeptideAnnotationTypes = psmPerPeptideAnnotationTypes.getDescriptivePsmPerPeptideAnnotationTypes();
+		if ( descriptivePsmPerPeptideAnnotationTypes == null ) {
+			//  No descriptive annotation types so exit 
+			return;  //  EARLY EXIT
+		}
+		List<DescriptivePsmPerPeptideAnnotationType> descriptivePsmPerPeptideAnnotationTypeList = descriptivePsmPerPeptideAnnotationTypes.getDescriptivePsmPerPeptideAnnotationType();
+		AnnotationTypeDAO srchPgmDescriptivePsmPerPeptideAnnotationTypeDAO = AnnotationTypeDAO.getInstance();
+		for ( DescriptivePsmPerPeptideAnnotationType descriptivePsmPerPeptideAnnotationType : descriptivePsmPerPeptideAnnotationTypeList ) {
+//			String annotationTypeName = descriptivePsmPerPeptideAnnotationType.getName();
+//			boolean annotationTypeDefaultVisible = getAnnotationTypeDefaultVisible( annotationTypeName, searchProgramName, visiblePsmDefaultVisibleAnnotationsSearchAnnotationList );
+//			Integer annotationTypeDisplayOrder = getAnnotationTypeDisplayOrder( annotationTypeName, searchProgramName, visiblePsmDefaultVisibleAnnotationsSearchAnnotationList );
+			AnnotationTypeDTO item = new AnnotationTypeDTO();
+			item.setPsmPeptideAnnotationType( PsmPeptideAnnotationType.PSM_PER_PEPTIDE );
+			item.setFilterableDescriptiveAnnotationType( FilterableDescriptiveAnnotationType.DESCRIPTIVE );
+			item.setSearchId( searchId );
+			item.setSearchProgramsPerSearchId( searchProgramId );
+			item.setName( descriptivePsmPerPeptideAnnotationType.getName() );
+//			item.setDefaultVisible( annotationTypeDefaultVisible );
+//			item.setDisplayOrder( annotationTypeDisplayOrder );
+			item.setDescription( descriptivePsmPerPeptideAnnotationType.getDescription() );
+			srchPgmDescriptivePsmPerPeptideAnnotationTypeDAO.saveToDatabase( item );
+			psmPerPeptideAnnotationTypeDTOMap.put( item.getName(), item );
+		}
+	}
+	
 	
 	/**
 	 * Utility Lookup.  Get position in AnnotationTypeSortOrder or return null if not found

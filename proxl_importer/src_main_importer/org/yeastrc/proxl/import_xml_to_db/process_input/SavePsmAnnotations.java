@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_PsmAnnotationDAO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
@@ -15,7 +16,6 @@ import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmAnnotations;
 import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmAnnotation;
 import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmAnnotations;
 import org.yeastrc.proxl_import.api.xml_dto.Psm;
-import org.yeastrc.xlink.dao.PsmAnnotationDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.dto.PsmDTO;
@@ -141,7 +141,7 @@ public class SavePsmAnnotations {
 					psmAnnotationDTO.setAnnotationTypeId( annotationTypeId );
 					psmAnnotationDTO.setValueDouble( value.doubleValue() );
 					psmAnnotationDTO.setValueString( value.toString() );
-					PsmAnnotationDAO.getInstance().saveToDatabase(psmAnnotationDTO);
+					DB_Insert_PsmAnnotationDAO.getInstance().saveToDatabase(psmAnnotationDTO);
 					psmAnnotationDTO_Filterable_List.add(psmAnnotationDTO);
 				}
 			}
@@ -188,7 +188,7 @@ public class SavePsmAnnotations {
 					psmAnnotationDTO.setFilterableDescriptiveAnnotationType( FilterableDescriptiveAnnotationType.DESCRIPTIVE );
 					psmAnnotationDTO.setAnnotationTypeId( annotationTypeId );
 					psmAnnotationDTO.setValueString( value.toString() );
-					PsmAnnotationDAO.getInstance().saveToDatabase(psmAnnotationDTO);
+					DB_Insert_PsmAnnotationDAO.getInstance().saveToDatabase(psmAnnotationDTO);
 				}
 			}
 		}

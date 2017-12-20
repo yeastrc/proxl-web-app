@@ -22,6 +22,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
+import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
+import org.yeastrc.xlink.enum_classes.PsmPeptideAnnotationType;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
@@ -559,10 +561,50 @@ public class PsmsService {
 			annotationDisplayNameDescription.setDescription( annotationTypeDTO.getDescription() );
 			annotationDisplayNameDescriptionList.add( annotationDisplayNameDescription );
 		}
+		
+		//  Determine if PSM Per Peptide default display annotation types
+		
+		boolean searchHasPsmPerPeptideAnnTypes = false;
+
+		//  Get Annotation Type records for PSM and Peptide
+		//  Get  Annotation Type records for PSM
+		//    Filterable annotations
+		Map<Integer, Map<Integer, AnnotationTypeDTO>> psmPerPeptideFilterableAnnotationTypeDTOListPerSearchIdMap =
+				GetAnnotationTypeData.getInstance()
+				.getAnnTypeForSearchIdsFiltDescPsmPeptide( searchIdsCollection, FilterableDescriptiveAnnotationType.FILTERABLE, PsmPeptideAnnotationType.PSM_PER_PEPTIDE );
+		//    Descriptive annotations
+		Map<Integer, Map<Integer, AnnotationTypeDTO>> psmPerPeptideDescriptiveAnnotationTypeDTOListPerSearchIdMap =
+				GetAnnotationTypeData.getInstance()
+				.getAnnTypeForSearchIdsFiltDescPsmPeptide( searchIdsCollection, FilterableDescriptiveAnnotationType.DESCRIPTIVE, PsmPeptideAnnotationType.PSM_PER_PEPTIDE );
+		
+		if ( psmPerPeptideFilterableAnnotationTypeDTOListPerSearchIdMap != null ) {
+			Map<Integer, AnnotationTypeDTO> psmPerPeptideFilterableAnnotationTypeDTOPerAnnType = psmPerPeptideFilterableAnnotationTypeDTOListPerSearchIdMap.get( searchId );
+			if ( psmPerPeptideFilterableAnnotationTypeDTOPerAnnType != null ) {
+				for ( Map.Entry<Integer, AnnotationTypeDTO> entry : psmPerPeptideFilterableAnnotationTypeDTOPerAnnType.entrySet() ) {
+					AnnotationTypeDTO annotationTypeDTO = entry.getValue();
+					if ( annotationTypeDTO.isDefaultVisible() ) {
+						searchHasPsmPerPeptideAnnTypes = true;
+					}
+				}
+			}
+		}
+		if ( psmPerPeptideDescriptiveAnnotationTypeDTOListPerSearchIdMap != null ) {
+			Map<Integer, AnnotationTypeDTO> psmPerPeptideDescriptiveAnnotationTypeDTOPerAnnType = psmPerPeptideDescriptiveAnnotationTypeDTOListPerSearchIdMap.get( searchId );
+			if ( psmPerPeptideDescriptiveAnnotationTypeDTOPerAnnType != null ) {
+				for ( Map.Entry<Integer, AnnotationTypeDTO> entry : psmPerPeptideDescriptiveAnnotationTypeDTOPerAnnType.entrySet() ) {
+					AnnotationTypeDTO annotationTypeDTO = entry.getValue();
+					if ( annotationTypeDTO.isDefaultVisible() ) {
+						searchHasPsmPerPeptideAnnTypes = true;
+					}
+				}
+			}
+		}
+		
 		///////////
 		PsmsServiceResult psmsServiceResult = new PsmsServiceResult();
 		psmsServiceResult.setAnnotationDisplayNameDescriptionList( annotationDisplayNameDescriptionList );
 		psmsServiceResult.setPsmWebDisplayList( psmWebDisplayListOutput );
+		psmsServiceResult.setSearchHasPsmPerPeptideAnnTypes( searchHasPsmPerPeptideAnnTypes );
 		return psmsServiceResult;
 	}
 	/**
