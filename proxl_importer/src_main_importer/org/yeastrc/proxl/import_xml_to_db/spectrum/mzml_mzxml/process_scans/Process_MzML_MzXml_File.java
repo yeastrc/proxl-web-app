@@ -18,6 +18,7 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralExcepti
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterSpectralStorageServiceErrorException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterSpectralStorageServiceRetryExceededException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ScanFileFileContainer;
+import org.yeastrc.proxl.import_xml_to_db.objects.ScanFilenameScanNumberScanIdScanFileId_Mapping;
 import org.yeastrc.proxl.import_xml_to_db.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTrackingSingleFile_Importer_DAO;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.db_update_with_transaction_services.AddNewScanFileAndHeadersIfNeededDBTransactionService;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.db_update_with_transaction_services.InsertNewScanAndPrescanIfNeededDBTransactionService;
@@ -56,7 +57,9 @@ public class Process_MzML_MzXml_File {
 	 * @param scanNumbersToLoad
 	 * @throws Exception
 	 */
-	public Map<Integer,Integer> processMzMLFileWithScanNumbersToLoad( ScanFileFileContainer scanFileFileContainer , int[] scanNumbersToLoad ) throws Exception {
+	public ScanFilenameScanNumberScanIdScanFileId_Mapping processMzMLFileWithScanNumbersToLoad( ScanFileFileContainer scanFileFileContainer , int[] scanNumbersToLoad ) throws Exception {
+		
+		ScanFilenameScanNumberScanIdScanFileId_Mapping scanFilenameScanNumberScanIdScanFileId_Mapping = new ScanFilenameScanNumberScanIdScanFileId_Mapping();
 		
 		File scanFileWithPath = scanFileFileContainer.getScanFile();
 		Map<Integer,Integer> mapOfScanNumbersToScanIds = null;
@@ -77,7 +80,9 @@ public class Process_MzML_MzXml_File {
 		String canonicalFilename_W_Path_OnSubmitMachine = null;
 		String absoluteFilename_W_Path_OnSubmitMachine = null;
 		
+		scanFilenameScanNumberScanIdScanFileId_Mapping.setScanFilename( scanFileName );
 
+		
 		/**
 		 * When running the Import from the Run Importer Process
 		 */
@@ -170,7 +175,10 @@ public class Process_MzML_MzXml_File {
 				scanFileReader.close();
 			}
 		}
-		return mapOfScanNumbersToScanIds;
+		
+		scanFilenameScanNumberScanIdScanFileId_Mapping.setScanFileId( scanFileDTO.getId() );
+		scanFilenameScanNumberScanIdScanFileId_Mapping.setMapOfScanNumbersToScanIds( mapOfScanNumbersToScanIds );
+		return scanFilenameScanNumberScanIdScanFileId_Mapping;
 	}
 	
 	/**

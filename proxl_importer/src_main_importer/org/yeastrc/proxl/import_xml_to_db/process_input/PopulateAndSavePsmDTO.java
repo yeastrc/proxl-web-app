@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_PsmDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchScanFilenameDAO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
+import org.yeastrc.proxl.import_xml_to_db.objects.ScanFilenameScanNumberScanIdScanFileId_Mapping;
 import org.yeastrc.proxl.import_xml_to_db.utils.RoundDecimalFieldsIfNecessary;
 import org.yeastrc.proxl_import.api.xml_dto.Psm;
 import org.yeastrc.xlink.dto.PsmDTO;
@@ -43,7 +44,7 @@ public class PopulateAndSavePsmDTO {
 	 */
 	public PsmDTO populateAndSavePSMDTO(
 			int searchId,
-			Map<String, Map<Integer, Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds,
+			Map<String, ScanFilenameScanNumberScanIdScanFileId_Mapping> mapOfScanFilenamesMapsOfScanNumbersToScanIds,
 			int linkTypeNumber, 
 			ReportedPeptideDTO reportedPeptideDTO, 
 			Psm psm,
@@ -79,38 +80,39 @@ public class PopulateAndSavePsmDTO {
 		if ( psm.getScanNumber() != null ) {
 			psmDTO.setScanNumber( psm.getScanNumber().intValue() );
 		}
-		if ( StringUtils.isNotEmpty( psm.getScanFileName() ) ) {
-			SearchScanFilenameDTO searchScanFilenameDTO = scanFilenamesOnPSMsKeyedOnScanFilename.get( psm.getScanFileName() );
-			if ( searchScanFilenameDTO == null ) {
-				searchScanFilenameDTO = new SearchScanFilenameDTO();
-				searchScanFilenameDTO.setSearchId( searchId );
-				searchScanFilenameDTO.setFilename( psm.getScanFileName() );
-				DB_Insert_SearchScanFilenameDAO.getInstance().saveToDatabase( searchScanFilenameDTO );
-				scanFilenamesOnPSMsKeyedOnScanFilename.put( psm.getScanFileName(), searchScanFilenameDTO );
-			}
-			psmDTO.setSearchScanFilenameId( searchScanFilenameDTO.getId() );
-		}
+
+		//  These may be set or changed as process info from processing of uploaded scan file(s)
+		String scanFilename = psm.getScanFileName();
+		Integer scanFileId = null;
+		
 		if ( psm.getScanNumber() != null
 				&& mapOfScanFilenamesMapsOfScanNumbersToScanIds != null 
 				&& ( ! mapOfScanFilenamesMapsOfScanNumbersToScanIds.isEmpty() ) ) {
 			//  Have scan files so map the scan number to the scan id and put the scan id on the psmDTO
-			Map<Integer,Integer> mapOfScanNumbersToScanIds = null;
+			ScanFilenameScanNumberScanIdScanFileId_Mapping scanFilenameScanNumberScanIdScanFileId_Mapping = null;
 			String scanFilenameFromMapEntry = null;
 			if ( mapOfScanFilenamesMapsOfScanNumbersToScanIds.size() == 1 ) {
 				//  If only one scan file, just use the map entry
-				Map.Entry<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIdsEntry =
+				Map.Entry<String, ScanFilenameScanNumberScanIdScanFileId_Mapping> mapOfScanFilenamesMapsOfScanNumbersToScanIdsEntry =
 						mapOfScanFilenamesMapsOfScanNumbersToScanIds.entrySet().iterator().next();
 				scanFilenameFromMapEntry = mapOfScanFilenamesMapsOfScanNumbersToScanIdsEntry.getKey();
-				mapOfScanNumbersToScanIds = mapOfScanFilenamesMapsOfScanNumbersToScanIdsEntry.getValue();
+				scanFilenameScanNumberScanIdScanFileId_Mapping = mapOfScanFilenamesMapsOfScanNumbersToScanIdsEntry.getValue();
+				//  Save scan filename for display on PSMs
+				scanFilename = scanFilenameFromMapEntry;
 			} else {
 				//  More than one scan file so get the scan file entry for this PSM
-				mapOfScanNumbersToScanIds = mapOfScanFilenamesMapsOfScanNumbersToScanIds.get( psm.getScanFileName() );
-				if ( mapOfScanNumbersToScanIds == null ) {
+				scanFilenameScanNumberScanIdScanFileId_Mapping = mapOfScanFilenamesMapsOfScanNumbersToScanIds.get( psm.getScanFileName() );
+				if ( scanFilenameScanNumberScanIdScanFileId_Mapping == null ) {
 					String msg = "No Scan Numbers to Scan Ids Mapping for Scan File: " + psm.getScanFileName();
 					log.error( msg );
 					throw new ProxlImporterDataException(msg);
 				}
 			}
+			
+			scanFileId = scanFilenameScanNumberScanIdScanFileId_Mapping.getScanFileId();
+			
+			Map<Integer,Integer> mapOfScanNumbersToScanIds = scanFilenameScanNumberScanIdScanFileId_Mapping.getMapOfScanNumbersToScanIds();
+
 			int scanNumberInPSM = psm.getScanNumber().intValue();
 			Integer scanId = mapOfScanNumbersToScanIds.get( scanNumberInPSM );
 			if ( scanId == null ) {
@@ -122,6 +124,22 @@ public class PopulateAndSavePsmDTO {
 			}
 			psmDTO.setScanId( scanId );
 		}
+		
+		if ( StringUtils.isNotEmpty( scanFilename ) ) {
+			SearchScanFilenameDTO searchScanFilenameDTO = scanFilenamesOnPSMsKeyedOnScanFilename.get( psm.getScanFileName() );
+			if ( searchScanFilenameDTO == null ) {
+				searchScanFilenameDTO = new SearchScanFilenameDTO();
+				searchScanFilenameDTO.setSearchId( searchId );
+				searchScanFilenameDTO.setFilename( scanFilename );
+				if ( scanFileId != null ) {
+					searchScanFilenameDTO.setScanFileId( scanFileId ); //  May be set, may be null
+				}
+				DB_Insert_SearchScanFilenameDAO.getInstance().saveToDatabase( searchScanFilenameDTO );
+				scanFilenamesOnPSMsKeyedOnScanFilename.put( psm.getScanFileName(), searchScanFilenameDTO );
+			}
+			psmDTO.setSearchScanFilenameId( searchScanFilenameDTO.getId() );
+		}
+		
 		DB_Insert_PsmDAO.getInstance().saveToDatabase( psmDTO );
 		return psmDTO;
 	}

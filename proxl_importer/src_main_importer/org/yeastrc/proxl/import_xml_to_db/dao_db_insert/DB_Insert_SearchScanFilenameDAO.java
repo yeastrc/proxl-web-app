@@ -52,15 +52,15 @@ public class DB_Insert_SearchScanFilenameDAO {
 	private static final String INSERT_SQL =
 			
 			"INSERT INTO search_scan_filename "
-			+ "( search_id, filename ) "
-			+ "VALUES ( ?, ? )";
+			+ "( search_id, filename, scan_file_id ) "
+			+ "VALUES ( ?, ?, ? )";
 	
 	/**
-	 * @param psm
+	 * @param item
 	 * @param conn
 	 * @throws Exception
 	 */
-	public void saveToDatabase( SearchScanFilenameDTO psm, Connection conn ) throws Exception {
+	public void saveToDatabase( SearchScanFilenameDTO item, Connection conn ) throws Exception {
 		
 //		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -79,19 +79,25 @@ public class DB_Insert_SearchScanFilenameDAO {
 			int counter = 0;
 			
 			counter++;
-			pstmt.setInt( counter, psm.getSearchId() );
+			pstmt.setInt( counter, item.getSearchId() );
 
 
 			counter++;
-			pstmt.setString( counter, psm.getFilename() );
+			pstmt.setString( counter, item.getFilename() );
 
+			counter++;
+			if ( item.getScanFileId() != null ) {
+				pstmt.setInt( counter, item.getScanFileId() );
+			} else {
+				pstmt.setNull( counter, java.sql.Types.INTEGER );
+			}
 			pstmt.executeUpdate();
 			
 			rs = pstmt.getGeneratedKeys();
 			if( rs.next() ) {
-				psm.setId( rs.getInt( 1 ) );
+				item.setId( rs.getInt( 1 ) );
 			} else
-				throw new Exception( "Failed to insert psm..." );
+				throw new Exception( "Failed to insert record..." );
 			
 		} catch ( Exception e ) {
 			

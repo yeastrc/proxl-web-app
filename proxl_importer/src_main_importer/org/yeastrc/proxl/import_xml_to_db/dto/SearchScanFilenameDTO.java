@@ -9,13 +9,13 @@ public class SearchScanFilenameDTO {
 	private int id;
 	private int searchId;
 	private String filename;
+	private Integer scanFileId;
 	
 	@Override
 	public String toString() {
-		return "SearchScanFilenameDTO [id=" + id + ", searchId=" + searchId
-				+ ", filename=" + filename + "]";
+		return "SearchScanFilenameDTO [id=" + id + ", searchId=" + searchId + ", filename=" + filename + ", scanFileId="
+				+ scanFileId + "]";
 	}
-	
  	
 	public int getId() {
 		return id;
@@ -34,6 +34,12 @@ public class SearchScanFilenameDTO {
 	}
 	public void setFilename(String filename) {
 		this.filename = filename;
+	}
+	public Integer getScanFileId() {
+		return scanFileId;
+	}
+	public void setScanFileId(Integer scanFileId) {
+		this.scanFileId = scanFileId;
 	}
 
 	

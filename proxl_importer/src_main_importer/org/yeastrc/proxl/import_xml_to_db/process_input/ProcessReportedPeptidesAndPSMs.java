@@ -28,6 +28,7 @@ import org.yeastrc.proxl.import_xml_to_db.dto.UnifiedRepPep_Search_ReportedPepti
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
+import org.yeastrc.proxl.import_xml_to_db.objects.ScanFilenameScanNumberScanIdScanFileId_Mapping;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput.ReportedPeptideAndPsmFilterableAnnotationTypesOnId;
 import org.yeastrc.proxl.import_xml_to_db.unified_reported_peptide.main.InsertIfNotInDBUnifiedReportedPeptideAndChildren;
@@ -88,7 +89,7 @@ public class ProcessReportedPeptidesAndPSMs {
 			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
 			ReportedPeptideAndPsmFilterableAnnotationTypesOnId reportedPeptideAndPsmFilterableAnnotationTypesOnId,
-			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds ) throws Exception {
+			Map<String, ScanFilenameScanNumberScanIdScanFileId_Mapping> mapOfScanFilenamesMapsOfScanNumbersToScanIds ) throws Exception {
 		
 		int searchId = search.getId();
 		// Put MatchedProteins in Singleton class GetProteinsForPeptides
@@ -195,7 +196,7 @@ public class ProcessReportedPeptidesAndPSMs {
 			Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnId,
 			Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId,
 			Map<Integer, AnnotationTypeDTO> filterablePsmPerPeptideAnnotationTypesOnId,
-			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds,
+			Map<String, ScanFilenameScanNumberScanIdScanFileId_Mapping> mapOfScanFilenamesMapsOfScanNumbersToScanIds,
 			Set<Double> uniqueDynamicModMassesForTheSearch,
 			Map<String, SearchScanFilenameDTO> scanFilenamesOnPSMsKeyedOnScanFilename
 			) throws Exception {
@@ -547,7 +548,7 @@ public class ProcessReportedPeptidesAndPSMs {
 	private PsmStatisticsAndBestValues savePSMs( 
 			ReportedPeptide reportedPeptide, 
 			int searchId, 
-			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds, 
+			Map<String, ScanFilenameScanNumberScanIdScanFileId_Mapping> mapOfScanFilenamesMapsOfScanNumbersToScanIds, 
 			int linkTypeNumber, 
 			ReportedPeptideDTO reportedPeptideDTO, 
 			List<PerPeptideData> perPeptideDataList,

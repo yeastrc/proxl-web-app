@@ -19,6 +19,7 @@ import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ScanFileFileContainer;
+import org.yeastrc.proxl.import_xml_to_db.objects.ScanFilenameScanNumberScanIdScanFileId_Mapping;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl.import_xml_to_db.post_insert_search_processing.PerformPostInsertSearchProcessing;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.process_scans.Process_MzML_MzXml_File;
@@ -123,7 +124,7 @@ public class ProcessProxlInput {
 			//  TODO  Must load linkers in a Per Search way
 //			proxlInput.getLinkers();
 			//  Scan Numbers to Scan Ids Map per Scan Filename
-			Map<String, Map<Integer,Integer>> mapOfScanFilenamesMapsOfScanNumbersToScanIds = new HashMap<>();
+			Map<String, ScanFilenameScanNumberScanIdScanFileId_Mapping> mapOfScanFilenamesMapsOfScanNumbersToScanIds = new HashMap<>();
 			if ( scanFileFileContainerList != null && ( ! scanFileFileContainerList.isEmpty() ) ) {
 				//  Scan Numbers in the input XML that need to be read from the scan files and inserted into the DB
 				Map<String, Set<Integer>> mapOfScanFilenamesSetsOfScanNumbers = 
@@ -150,11 +151,11 @@ public class ProcessProxlInput {
 					//  Throws ProxlImporterDataException if validate fails
 					ValidateInputScanFile.getInstance().validateScanFile( scanFile, scanFilenameString );
 					
-					Map<Integer,Integer> mapOfScanNumbersToScanIds =
+					ScanFilenameScanNumberScanIdScanFileId_Mapping scanFilenameScanNumberScanIdScanFileId_Mapping =
 							Process_MzML_MzXml_File.getInstance()
 							.processMzMLFileWithScanNumbersToLoad( scanFileFileContainer, scanNumbersToLoadIntArray );
 					
-					mapOfScanFilenamesMapsOfScanNumbersToScanIds.put( scanFilenameString, mapOfScanNumbersToScanIds );
+					mapOfScanFilenamesMapsOfScanNumbersToScanIds.put( scanFilenameString, scanFilenameScanNumberScanIdScanFileId_Mapping );
 					
 				} else {
 					
@@ -192,10 +193,10 @@ public class ProcessProxlInput {
 								scanNumbersToLoadIntArray[ index ] = scanNumberToLoad;
 								index++;
 							}
-							Map<Integer,Integer> mapOfScanNumbersToScanIds =
+							ScanFilenameScanNumberScanIdScanFileId_Mapping scanFilenameScanNumberScanIdScanFileId_Mapping =
 									Process_MzML_MzXml_File.getInstance()
 									.processMzMLFileWithScanNumbersToLoad( scanFileFileContainer, scanNumbersToLoadIntArray );
-							mapOfScanFilenamesMapsOfScanNumbersToScanIds.put( scanFilenameString, mapOfScanNumbersToScanIds );
+							mapOfScanFilenamesMapsOfScanNumbersToScanIds.put( scanFilenameString, scanFilenameScanNumberScanIdScanFileId_Mapping );
 						}
 					}
 					if ( ! scanNumbersFoundForAnyScanFile ) {
