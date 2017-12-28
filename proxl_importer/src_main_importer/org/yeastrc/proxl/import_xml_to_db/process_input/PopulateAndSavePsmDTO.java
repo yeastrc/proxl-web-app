@@ -11,8 +11,8 @@ import org.yeastrc.proxl.import_xml_to_db.objects.ScanFilenameScanNumberScanIdSc
 import org.yeastrc.proxl.import_xml_to_db.utils.RoundDecimalFieldsIfNecessary;
 import org.yeastrc.proxl_import.api.xml_dto.Psm;
 import org.yeastrc.xlink.dto.PsmDTO;
-import org.yeastrc.proxl.import_xml_to_db.dto.SearchScanFilenameDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
+import org.yeastrc.xlink.dto.SearchScanFilenameDTO;
 import org.yeastrc.xlink.utils.XLinkUtils;
 
 /**

@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.lorikeet_dto;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +10,7 @@ import java.util.List;
 public class LorikeetRootData {
 
 	private int charge;
-	private BigDecimal precursorMz;
+	private double precursorMz;
 	
 	/**
 	 * Filename for display
@@ -223,11 +222,11 @@ public class LorikeetRootData {
 		this.charge = charge;
 	}
 
-	public BigDecimal getPrecursorMz() {
+	public double getPrecursorMz() {
 		return precursorMz;
 	}
 
-	public void setPrecursorMz(BigDecimal precursorMz) {
+	public void setPrecursorMz(double precursorMz) {
 		this.precursorMz = precursorMz;
 	}
 

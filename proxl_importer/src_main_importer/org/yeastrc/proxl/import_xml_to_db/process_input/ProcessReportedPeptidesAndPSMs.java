@@ -21,7 +21,6 @@ import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPep
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DroppedPeptideCount;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDTO;
-import org.yeastrc.proxl.import_xml_to_db.dto.SearchScanFilenameDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic_Lookup__DTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.UnifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO;
@@ -52,6 +51,7 @@ import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.PsmFilterableAnnotationGenericLookupDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
+import org.yeastrc.xlink.dto.SearchScanFilenameDTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;

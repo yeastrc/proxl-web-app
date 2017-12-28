@@ -23,12 +23,12 @@ import org.yeastrc.spectral_storage.shared_server_client.webservice_request_resp
 import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.SingleScan_SubResponse;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.www.dao.PsmDAO;
-import org.yeastrc.xlink.dao.ScanDAO;
+import org.yeastrc.xlink.www.dao.SearchScanFilenameDAO;
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.dao.StaticModDAO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.PsmDTO;
-import org.yeastrc.xlink.dto.ScanDTO;
+import org.yeastrc.xlink.dto.SearchScanFilenameDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.xlink.dto.StaticModDTO;
 import org.yeastrc.xlink.utils.XLinkUtils;
@@ -44,6 +44,7 @@ import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectSearchIdsForSearchIdSearcher;
 import org.yeastrc.xlink.www.searcher.SearchReportedPeptideLinkTypeSearcher;
@@ -177,44 +178,30 @@ public class LorikeetSpectrumService {
 			////////   Auth complete
 			//////////////////////////////////////////
         	
-			ScanDTO scanDTO_ms_2 = null;
-			int scanId = psmDTO.getScanId();
-			try {
-				 scanDTO_ms_2 = ScanDAO.getScanFromId( scanId );
-			} catch ( Exception e ) {
-				String msg = "Error retrieving scan for scanId: " + scanId;
-				log.error( msg, e );
-				throw e;
-			}
-        	if ( scanDTO_ms_2 == null )  {
-				String msg = "scan not found for scanId: " + scanId;
-				log.error( msg);
-				//  TODO  Return something else instead
-			    throw new WebApplicationException(
-			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
-			    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
-			    	        .build()
-			    	        );
-        	}
-        	
 			int ms2ScanNumber = psmDTO.getScanNumber();
 			
-			int ms2ScanNumber_FromScanRecord = scanDTO_ms_2.getStartScanNumber();
-			int scanFileId = scanDTO_ms_2.getScanFileId();
-			
-			//  Sanity check that scan number on psm must be same as scan number on scan 
-			if ( ms2ScanNumber != ms2ScanNumber_FromScanRecord ) {
-				//  Scan number on PSM record not match scan number on scan record
-				String msg = "Scan number on PSM record not match scan number on scan record. " 
-						+ " Scan number on PSM record: "
-						+ ms2ScanNumber
-						+ " scan number on scan record: "
-						+ ms2ScanNumber_FromScanRecord
-						+ ", psm id: " + psmDTO.getId()
-						+ ", scan id: " + scanId
-						+ ", scan file id: " + scanFileId;
+			if ( psmDTO.getSearchScanFilenameId() == null ) {
+				String msg = "psmDTO.getSearchScanFilenameId() == null.  psmId: " + psmId;
 				log.error( msg );
+				throw new ProxlWebappInternalErrorException( msg );
 			}
+			
+			SearchScanFilenameDTO searchScanFilenameDTO = 
+					SearchScanFilenameDAO.getInstance().getSearchScanFilenameDTO( psmDTO.getSearchScanFilenameId() );
+
+			if ( searchScanFilenameDTO == null ) {
+				String msg = "searchScanFilenameDTO == null.  psmId: " + psmId;
+				log.error( msg );
+				throw new ProxlWebappInternalErrorException( msg );
+			}
+
+			if ( searchScanFilenameDTO.getScanFileId() == null ) {
+				String msg = "searchScanFilenameDTO.getScanFileId() == null.  psmId: " + psmId;
+				log.error( msg );
+				throw new ProxlWebappInternalErrorException( msg );
+			}
+			
+			int scanFileId = searchScanFilenameDTO.getScanFileId();
 
 			//  Get Scan Data from Spectral Storage Service
 
@@ -229,27 +216,20 @@ public class LorikeetSpectrumService {
 				throw e;
 			}
 			
-        	///////////////////////
-        	String scanFilename = null;
-			try {
-				scanFilename = ScanFileDAO.getInstance().getScanFilenameById( scanDTO_ms_2.getScanFileId() );
-			} catch ( Exception e ) {
-				String msg = "Error retrieving scan_file for scanFileId: " + scanDTO_ms_2.getScanFileId();
-				log.error( msg, e );
-				throw e;
+			Double ms_2_precursor_M_Over_Z =
+					scanDataFromSpectralStorageService_MS_2_1.ms_2_scanDataFromSpectralStorageService.getPrecursor_M_Over_Z();
+			
+			if ( ms_2_precursor_M_Over_Z == null ) {
+				String msg = "ms_2_precursor_M_Over_Z == null: psm id: " + psmId;
+				log.error( msg );
+				throw new ProxlWebappInternalErrorException(msg);
 			}
-        	if ( scanFilename == null )  {
-				String msg = "scan_file not found for scanFileId: " + scanDTO_ms_2.getScanFileId();
-				log.error( msg);
-				//  TODO  Return something else instead
-			    throw new WebApplicationException(
-			    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
-			    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
-			    	        .build()
-			    	        );
-        	}
+			
+        	///////////////////////
+        	String scanFilename = searchScanFilenameDTO.getFilename();
+
         	lorikeetRootData.setFileName( scanFilename );
-			lorikeetRootData.setPrecursorMz( scanDTO_ms_2.getPreMZ() );
+			lorikeetRootData.setPrecursorMz( ms_2_precursor_M_Over_Z );
 			{
 				// Add MS 2 peaks to output 
 				SingleScan_SubResponse ms_2_scanDataFromSpectralStorageService = scanDataFromSpectralStorageService_MS_2_1.ms_2_scanDataFromSpectralStorageService;
@@ -269,7 +249,7 @@ public class LorikeetSpectrumService {
 			
 	        //
 	        lorikeetRootData.setCharge( psmDTO.getCharge() );
-	        lorikeetRootData.setScanNum( scanDTO_ms_2.getStartScanNumber() );
+	        lorikeetRootData.setScanNum( psmDTO.getScanNumber() );
 	        List<StaticModDTO> staticModsForSearch = StaticModDAO.getInstance().getStaticModDTOForSearchId( searchId );
 	        List<LorikeetStaticMod> staticModsLorikeet = new ArrayList<>( staticModsForSearch.size() );
 	        for ( StaticModDTO staticModDTO : staticModsForSearch ) {

@@ -1,4 +1,4 @@
-package org.yeastrc.proxl.import_xml_to_db.dto;
+package org.yeastrc.xlink.dto;
 
 /**
  * table search_scan_filename
