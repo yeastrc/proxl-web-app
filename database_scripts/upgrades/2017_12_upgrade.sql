@@ -13,7 +13,7 @@ CREATE TABLE psm_per_peptide_annotation (
   value_double double NOT NULL,
   value_string varchar(50) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY psm_annotation_psm_id_ann_typ_id_idx (psm_id,annotation_type_id),
+  UNIQUE KEY psm_per_p_a_psm_id_srch_rep__ann_typ_id_idx (psm_id,srch_rep_pept__peptide_id,annotation_type_id),
   KEY psm_per_peptide_annotation__psm_id_fk_idx (psm_id),
   KEY fk_psm_peptide_annotation_1_idx (srch_rep_pept__peptide_id),
   CONSTRAINT psm_per_peptide_annotation__fk_2 FOREIGN KEY (srch_rep_pept__peptide_id) REFERENCES srch_rep_pept__peptide (id) ON DELETE NO ACTION ON UPDATE NO ACTION,
