@@ -359,7 +359,7 @@ public class UserMgmtCentralWebappWebserviceAccess {
 			throw new IllegalStateException( "Not initialized" );
 		}
 		SearchUserDataAccountWebserviceRequest webserviceRequest = new SearchUserDataAccountWebserviceRequest();
-		webserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtSearchUserDataRequest.getSessionKey() );
+		webserviceRequest.setNoSessionKeyWURIPOWmvcxuozm(true);
 		webserviceRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
 		webserviceRequest.setSearchStringExactMatch( userMgmtSearchUserDataRequest.isSearchStringExactMatch() );
 
@@ -389,7 +389,7 @@ public class UserMgmtCentralWebappWebserviceAccess {
 			throw new IllegalStateException( "Not initialized" );
 		}
 		SearchUserDataAccountWebserviceRequest webserviceRequest = new SearchUserDataAccountWebserviceRequest();
-		webserviceRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtSearchUserDataRequest.getSessionKey() );
+		webserviceRequest.setNoSessionKeyWURIPOWmvcxuozm(true);
 		webserviceRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
 		webserviceRequest.setSearchStringExactMatch( userMgmtSearchUserDataRequest.isSearchStringExactMatch() );
 
