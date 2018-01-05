@@ -6,6 +6,7 @@ import java.util.List;
 import org.yeastrc.proxl.import_xml_to_db.dto.AnnotationDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchProteinSequenceAnnotationDTO;
+import org.yeastrc.proxl.import_xml_to_db.utils.PeptideProteinSequenceForProteinInference;
 import org.yeastrc.proxl.import_xml_to_db.utils.ProteinAnnotationNameTruncationUtil;
 import org.yeastrc.proxl_import.api.xml_dto.Protein;
 import org.yeastrc.proxl_import.api.xml_dto.ProteinAnnotation;
@@ -26,6 +27,8 @@ import org.yeastrc.proxl_import.api.xml_dto.ProteinAnnotation;
 public class ProteinImporterContainer {
 
 	private ProteinSequenceDTO proteinSequenceDTO;
+	
+	private String proteinSequenceForProteinInference;
 
 	private List<AnnotationDTO> annotationDTOList;
 
@@ -50,6 +53,9 @@ public class ProteinImporterContainer {
 		
 		proteinImporterContainer.proteinFromProxlXMLFile = proteinFromProxlXMLFile;
 		
+		proteinImporterContainer.proteinSequenceForProteinInference =
+				PeptideProteinSequenceForProteinInference.getSingletonInstance()
+				.convert_PeptideOrProtein_SequenceFor_I_L_Equivalence_ChangeTo_J( proteinFromProxlXMLFile.getSequence() );
 		
 		return proteinImporterContainer;
 	}
@@ -151,5 +157,8 @@ public class ProteinImporterContainer {
 		this.dataInObjectSavedToDB = dataInObjectSavedToDB;
 	}
 
+	public String getProteinSequenceForProteinInference() {
+		return proteinSequenceForProteinInference;
+	}
 
 }

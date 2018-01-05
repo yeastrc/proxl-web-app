@@ -7,10 +7,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
-import org.yeastrc.proxl.import_xml_to_db.utils.ProteinPositionUtils;
+import org.yeastrc.proxl.import_xml_to_db.utils.PeptideProteinSequenceForProteinInference;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
@@ -22,10 +24,12 @@ import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 public class GetLinkableProteinsAndPositions {
 
 	private static final Logger log = Logger.getLogger(GetLinkableProteinsAndPositions.class);
+	
+	private static final GetLinkableProteinsAndPositions instance = new GetLinkableProteinsAndPositions();
+	
 	//  private constructor
-	private GetLinkableProteinsAndPositions() {  }
-	private static final GetLinkableProteinsAndPositions _INSTANCE = new GetLinkableProteinsAndPositions(); 
-	public static GetLinkableProteinsAndPositions getInstance() { return _INSTANCE; }
+	private GetLinkableProteinsAndPositions() { }
+	public static GetLinkableProteinsAndPositions getInstance() { return instance; }
 	
 	/**
 	 * For Crosslinks:
@@ -44,17 +48,31 @@ public class GetLinkableProteinsAndPositions {
 	 * @throws Exception
 	 */
 	public  Map<ProteinImporterContainer, Collection<Integer>> getCrosslinkLinkableProteinsAndPositions( 
-			ReportedPeptide reportedPeptide,
-			Peptide peptide, 
 			String peptideSequence, 
 			int peptideCrossLinkPosition, 
 			Set<Integer> peptideMonolinkPositions,
 			List<ILinker> linkerList, 
-			Collection<ProteinImporterContainer> proteinImporterContainerCollection ) throws Exception {
+			Collection<ProteinImporterContainer> proteinImporterContainerCollection,
+			ReportedPeptide reportedPeptide // For error reporting only
+			) throws Exception {
+
+		// Create copy of peptide sequence for protein inference where I and L are replaced with J
+		String peptideSequenceForProteinInference = 
+				PeptideProteinSequenceForProteinInference.getSingletonInstance().
+				convert_PeptideOrProtein_SequenceFor_I_L_Equivalence_ChangeTo_J( peptideSequence );
+		
 		Map<ProteinImporterContainer, Collection<Integer>> results = new HashMap<>();
+		
 		for( ProteinImporterContainer proteinImporterContainer : proteinImporterContainerCollection ) {
+			
 			String proteinSequence = proteinImporterContainer.getProteinSequenceDTO().getSequence();
-			List<Integer> proteinCrosslinkedPositions = ProteinPositionUtils.getProteinPosition( proteinSequence, peptideSequence, peptideCrossLinkPosition );
+			String proteinSequenceForProteinInference = proteinImporterContainer.getProteinSequenceForProteinInference();
+			
+			List<Integer> proteinCrosslinkedPositions = new ArrayList<>(); 
+	        for (int i = -1; (i = proteinSequenceForProteinInference.indexOf( peptideSequenceForProteinInference, i + 1)) != -1; ) {
+	        	proteinCrosslinkedPositions.add( i + peptideCrossLinkPosition );
+	        }
+			
 			//  Get linkable positions for all the linkers
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
 			for ( ILinker linker : linkerList ) {
@@ -142,20 +160,36 @@ public class GetLinkableProteinsAndPositions {
 	 * @throws Exception
 	 */
 	public  Map<ProteinImporterContainer, Collection<List<Integer>>> getLooplinkLinkableProteinsAndPositionsForLooplink( 
-			ReportedPeptide reportedPeptide,
-			Peptide peptide, 
 			String peptideSequence, 
 			int peptideLooplinkPosition_1, 
 			int peptideLooplinkPosition_2, 
 			Set<Integer> peptideMonolinkPositions,
 			List<ILinker> linkerList, 
-			Collection<ProteinImporterContainer> proteinImporterContainerCollection ) throws Exception {
+			Collection<ProteinImporterContainer> proteinImporterContainerCollection,
+			ReportedPeptide reportedPeptide // For error reporting only
+			) throws Exception {
+
+		// Create copy of peptide sequence for protein inference where I and L are replaced with J
+		String peptideSequenceForProteinInference = 
+				PeptideProteinSequenceForProteinInference.getSingletonInstance().
+				convert_PeptideOrProtein_SequenceFor_I_L_Equivalence_ChangeTo_J( peptideSequence );
 		
 		Map<ProteinImporterContainer, Collection<List<Integer>>> results = new HashMap<>();
+		
 		for( ProteinImporterContainer proteinImporterContainer : proteinImporterContainerCollection ) {
+			
 			String proteinSequence = proteinImporterContainer.getProteinSequenceDTO().getSequence();
-			List<List<Integer>> proteinPositions = 
-					ProteinPositionUtils.getLooplinkProteinPosition( proteinSequence, peptideSequence, peptideLooplinkPosition_1, peptideLooplinkPosition_2 );
+			String proteinSequenceForProteinInference = proteinImporterContainer.getProteinSequenceForProteinInference();
+			
+			List<List<Integer>> proteinPositions = new ArrayList<>();
+			for ( int i = -1; ( i = proteinSequenceForProteinInference.indexOf( peptideSequenceForProteinInference, i + 1 ) ) != -1; ) {
+				List<Integer> l = new ArrayList<Integer>(2);
+				l.add( i + peptideLooplinkPosition_1 );
+				l.add( i + peptideLooplinkPosition_2 );
+
+				proteinPositions.add( l );
+			}
+
 			//  Get linkable positions for all the linkers
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
 			for ( ILinker linker : linkerList ) {
@@ -239,16 +273,24 @@ public class GetLinkableProteinsAndPositions {
 	 * @throws Exception
 	 */
 	public Map<ProteinImporterContainer, Collection<Integer>> get_Unlinked_Dimer_PeptidePositionsInProteins(
-			ReportedPeptide reportedPeptide,
-			Peptide peptide, 
 			String peptideSequence, 
 			Set<Integer> peptideMonolinkPositions,
 			List<ILinker> linkerList, 
-			Collection<ProteinImporterContainer> proteinImporterContainerCollection ) throws Exception {
+			Collection<ProteinImporterContainer> proteinImporterContainerCollection,
+			ReportedPeptide reportedPeptide // For error reporting only
+			) throws Exception {
+
+		// Create copy of peptide sequence for protein inference where I and L are replaced with J
+		String peptideSequenceForProteinInference = 
+				PeptideProteinSequenceForProteinInference.getSingletonInstance().
+				convert_PeptideOrProtein_SequenceFor_I_L_Equivalence_ChangeTo_J( peptideSequence );
 		
 		Map<ProteinImporterContainer, Collection<Integer>> results = new HashMap<>();
 		for( ProteinImporterContainer proteinImporterContainer : proteinImporterContainerCollection ) {
+			
 			String proteinSequence = proteinImporterContainer.getProteinSequenceDTO().getSequence();
+			String proteinSequenceForProteinInference = proteinImporterContainer.getProteinSequenceForProteinInference();
+			
 			//  Get linkable positions for all the linkers
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
 			for ( ILinker linker : linkerList ) {
@@ -258,7 +300,7 @@ public class GetLinkableProteinsAndPositions {
 			List<Integer> peptidePositionInProteinList = null;
 			int fromIndex = 0;
 			int peptideIndex = 0;
-			while ( ( peptideIndex = proteinSequence.indexOf( peptideSequence, fromIndex ) ) >= 0 ) {
+			while ( ( peptideIndex = proteinSequenceForProteinInference.indexOf( peptideSequenceForProteinInference, fromIndex ) ) >= 0 ) {
 				int proteinStartPosition = peptideIndex + 1;  //  Positions are 1 based
 //				int proteinEndPosition = proteinStartPosition + peptideSequence.length() - 1;
 				boolean monolinksFoundInLinkablePositions = true;
@@ -306,4 +348,5 @@ public class GetLinkableProteinsAndPositions {
 		}
 		return results;
 	}
+	
 }

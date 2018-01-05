@@ -162,13 +162,13 @@ public class ProcessLinkTypeCrosslink {
 		Map<ProteinImporterContainer, Collection<Integer>> proteinMap = 
 				GetLinkableProteinsAndPositions.getInstance()
 				.getCrosslinkLinkableProteinsAndPositions( 
-						reportedPeptide,
-						peptide,
 						peptideDTO.getSequence(), 
 						peptideCrossLinkPosition,
 						peptideMonolinkPositions,
 						linkerList, 
-						proteinMatches_Peptide );
+						proteinMatches_Peptide,
+						reportedPeptide // for error reporting only 
+						);
 		if( proteinMap.size() < 1 ) {
 			String msg = null;
 			if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {

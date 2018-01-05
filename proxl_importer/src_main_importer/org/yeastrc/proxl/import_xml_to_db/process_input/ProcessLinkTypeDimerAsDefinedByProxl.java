@@ -157,12 +157,12 @@ public class ProcessLinkTypeDimerAsDefinedByProxl {
 		Map<ProteinImporterContainer, Collection<Integer>> proteinMap = 
 				GetLinkableProteinsAndPositions.getInstance()
 				.get_Unlinked_Dimer_PeptidePositionsInProteins( 
-						reportedPeptide, 
-						peptide, 
 						peptideDTO.getSequence(), 
 						peptideMonolinkPositions, 
 						linkerList, 
-						proteinMatches_Peptide );
+						proteinMatches_Peptide,
+						reportedPeptide // For error reporting only
+						);
 		if( proteinMap.size() < 1 ) {
 			String msg = null;
 			if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {

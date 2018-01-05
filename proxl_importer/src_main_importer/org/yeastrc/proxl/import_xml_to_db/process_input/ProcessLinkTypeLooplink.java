@@ -126,14 +126,14 @@ public class ProcessLinkTypeLooplink {
 		Map<ProteinImporterContainer, Collection<List<Integer>>> proteinMap = 
 				GetLinkableProteinsAndPositions.getInstance()
 				.getLooplinkLinkableProteinsAndPositionsForLooplink( 
-						reportedPeptide,
-						peptide,
 						peptideDTO.getSequence(), 
 						peptideLinkedPosition_1, 
 						peptideLinkedPosition_2,
 						peptideMonolinkPositions,
 						linkerList, 
-						proteinMatches_Peptide );
+						proteinMatches_Peptide,
+						reportedPeptide // For error reporting only
+						);
 		if( proteinMap.size() < 1 ) {
 			String msg = null;
 			if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
