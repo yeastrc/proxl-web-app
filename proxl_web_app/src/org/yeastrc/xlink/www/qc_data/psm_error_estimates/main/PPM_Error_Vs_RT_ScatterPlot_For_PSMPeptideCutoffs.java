@@ -1058,7 +1058,9 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 		}
 		
 		if ( ! reportedPeptideIdsSkippedForErrorCalculatingMZ.isEmpty() ) {
-			log.warn( "Number of Reported Peptides Skipped For Error Calculating MZ: " + reportedPeptideIdsSkippedForErrorCalculatingMZ.size()
+			log.warn( "Number of Reported Peptides Skipped For Error Calculating MZ: " 
+					+ reportedPeptideIdsSkippedForErrorCalculatingMZ.size()
+					+ ", search ids: " + searchIds.toString()
 					+ ", List of Reported Peptide Ids: " + reportedPeptideIdsSkippedForErrorCalculatingMZ );
 		}
 		

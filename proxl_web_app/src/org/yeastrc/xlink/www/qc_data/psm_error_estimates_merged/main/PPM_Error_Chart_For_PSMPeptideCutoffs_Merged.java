@@ -263,7 +263,9 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 		methodResult.ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results = ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results;
 
 		if ( ! reportedPeptideIdsSkippedForErrorCalculatingMZ.isEmpty() ) {
-			log.warn( "Number of Reported Peptides Skipped For Error Calculating MZ: " + reportedPeptideIdsSkippedForErrorCalculatingMZ.size()
+			log.warn( "Number of Reported Peptides Skipped For Error Calculating MZ: " 
+					+ reportedPeptideIdsSkippedForErrorCalculatingMZ.size()
+					+ ", search ids: " + searchIds.toString()
 					+ ", List of Reported Peptide Ids: " + reportedPeptideIdsSkippedForErrorCalculatingMZ );
 		}
 		
