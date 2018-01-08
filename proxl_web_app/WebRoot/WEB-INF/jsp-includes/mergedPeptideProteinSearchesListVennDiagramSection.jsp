@@ -27,11 +27,10 @@
 			<%@ include file="/WEB-INF/jsp-includes/mergedSearch_SearchIndexToSearchColorCSSClassName.jsp" %>
 						
 				
-		  <div class=" searches_sort_list_item_jq " style="margin-top: 5px;"
+		  <div class="  " style="margin-top: 5px;"
 		  	data-project_search_id="${ searchCount.projectSearchId }">	
-				<span style="margin-right: 10px; padding-left: 10px; padding-right: 10px; cursor: pointer;" 
-					class="${ backgroundColorClassName } search_sort_handle_jq tool_tip_attached_jq "
-					data-tooltip="Drag to re-order searches"
+				<span style="margin-right: 10px; padding-left: 10px; padding-right: 10px;" 
+					class="${ backgroundColorClassName }  "
 					></span>
 			  (Search <bean:write name="searchCount" property="searchId" />: <bean:write name="searchCount" property="count" />)
 		  </div>
@@ -88,7 +87,7 @@
 
 	<%-- No Venn Diagram, list legend in horizontal list list --%>
  
-  <div  class=" searches_sort_list_container_jq "  style="margin-top: 5px;">	
+  <div style="margin-top: 5px;">	
 
 	 <c:forEach items="${ searchCounts }" var="searchCount"  varStatus="searchVarStatus">
 	 
@@ -99,9 +98,8 @@
 		<%@ include file="/WEB-INF/jsp-includes/mergedSearch_SearchIndexToSearchColorCSSClassName.jsp" %>
 					
 			
-			<span style="margin-right: 10px; padding-left: 10px; padding-right: 10px; cursor: pointer;" 
-				class="${ backgroundColorClassName } search_sort_handle_jq tool_tip_attached_jq "
-				data-tooltip="Drag to re-order searches"
+			<span style="margin-right: 10px; padding-left: 10px; padding-right: 10px; " 
+				class="${ backgroundColorClassName }  "
 				></span>
 		  (Search <bean:write name="searchCount" property="searchId" />: <bean:write name="searchCount" property="count" />)
 		  
