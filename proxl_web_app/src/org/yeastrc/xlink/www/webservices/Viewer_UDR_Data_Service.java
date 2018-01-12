@@ -47,7 +47,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.objects.SearchProtein;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
+import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -336,7 +336,7 @@ public class Viewer_UDR_Data_Service {
 			////////////
 			//  Copy Exclude Taxonomy and Exclude Protein Sets for lookup
 			Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
-			Set<Integer> excludeProteinSequenceIds_Set_UserInput = new HashSet<>();
+			Set<Integer> excludeproteinSequenceVersionIds_Set_UserInput = new HashSet<>();
 			
 			/////////////////////////////////////////////////////////////////////////////
 			////////   Generic Param processing
@@ -416,7 +416,7 @@ public class Viewer_UDR_Data_Service {
 					|| filterOnlyOnePSM 
 					|| filterOnlyOnePeptide
 					|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 ) ||
-					( ! excludeProteinSequenceIds_Set_UserInput.isEmpty() ) ) {
+					( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) ) {
 				///////  Output Lists, Results After Filtering
 				List<SearchProteinCrosslinkWrapper> wrappedCrosslinksAfterFilter = new ArrayList<>( wrappedLooplinks.size() );
 				List<SearchProteinLooplinkWrapper> wrappedLooplinksAfterFilter = new ArrayList<>( wrappedLooplinks.size() );
@@ -449,20 +449,20 @@ public class Viewer_UDR_Data_Service {
 					// did user request removal of certain taxonomy IDs?
 					if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 						boolean excludeOnProtein_1 =
-								ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-								.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+								ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+								.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 										excludeTaxonomy_Ids_Set_UserInput, 
-										link.getProtein1().getProteinSequenceObject(), 
+										link.getProtein1().getProteinSequenceVersionObject(), 
 										searchId );
 						boolean excludeOnProtein_2 =
-								ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-								.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+								ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+								.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 										excludeTaxonomy_Ids_Set_UserInput, 
-										link.getProtein2().getProteinSequenceObject(), 
+										link.getProtein2().getProteinSequenceVersionObject(), 
 										searchId );
 						if ( excludeOnProtein_1 || excludeOnProtein_2 ) {
-//						int taxonomyId_1 = link.getProtein1().getProteinSequenceObject().getTaxonomyId();
-//						int taxonomyId_2 = link.getProtein2().getProteinSequenceObject().getTaxonomyId();
+//						int taxonomyId_1 = link.getProtein1().getProteinSequenceVersionObject().getTaxonomyId();
+//						int taxonomyId_2 = link.getProtein2().getProteinSequenceVersionObject().getTaxonomyId();
 //						
 //						if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_1 ) 
 //								|| excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_2 ) ) {
@@ -471,11 +471,11 @@ public class Viewer_UDR_Data_Service {
 						}
 					}
 					// did user request removal of certain protein IDs?
-					if( ! excludeProteinSequenceIds_Set_UserInput.isEmpty() ) {
-						int proteinId_1 = link.getProtein1().getProteinSequenceObject().getProteinSequenceId();
-						int proteinId_2 = link.getProtein2().getProteinSequenceObject().getProteinSequenceId();
-						if ( excludeProteinSequenceIds_Set_UserInput.contains( proteinId_1 ) 
-								|| excludeProteinSequenceIds_Set_UserInput.contains( proteinId_2 ) ) {
+					if( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) {
+						int proteinId_1 = link.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId();
+						int proteinId_2 = link.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId();
+						if ( excludeproteinSequenceVersionIds_Set_UserInput.contains( proteinId_1 ) 
+								|| excludeproteinSequenceVersionIds_Set_UserInput.contains( proteinId_2 ) ) {
 							//  Skip to next entry in list, dropping this entry from output list
 							continue;  // EARLY CONTINUE
 						}
@@ -511,13 +511,13 @@ public class Viewer_UDR_Data_Service {
 					// did user request removal of certain taxonomy IDs?
 					if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 						boolean excludeOnProtein =
-								ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-								.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+								ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+								.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 										excludeTaxonomy_Ids_Set_UserInput, 
-										link.getProtein().getProteinSequenceObject(), 
+										link.getProtein().getProteinSequenceVersionObject(), 
 										searchId );
 						if ( excludeOnProtein ) {
-//						int taxonomyId = link.getProtein().getProteinSequenceObject().getTaxonomyId();
+//						int taxonomyId = link.getProtein().getProteinSequenceVersionObject().getTaxonomyId();
 //						
 //						if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
 							//  Skip to next entry in list, dropping this entry from output list
@@ -525,9 +525,9 @@ public class Viewer_UDR_Data_Service {
 						}
 					}
 					// did user request removal of certain protein IDs?
-					if( ! excludeProteinSequenceIds_Set_UserInput.isEmpty() ) {
-						int proteinId = link.getProtein().getProteinSequenceObject().getProteinSequenceId();
-						if ( excludeProteinSequenceIds_Set_UserInput.contains( proteinId ) ) {
+					if( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) {
+						int proteinId = link.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
+						if ( excludeproteinSequenceVersionIds_Set_UserInput.contains( proteinId ) ) {
 							//  Skip to next entry in list, dropping this entry from output list
 							continue;  // EARLY CONTINUE
 						}
@@ -585,18 +585,18 @@ public class Viewer_UDR_Data_Service {
 //					public int compare(SearchProteinCrosslinkWrapper o1,
 //							SearchProteinCrosslinkWrapper o2) {
 //
-//						if ( o1.getSearchProteinCrosslink().getProtein1().getProteinSequenceObject().getProteinSequenceId()
-//								!= o2.getSearchProteinCrosslink().getProtein1().getProteinSequenceObject().getProteinSequenceId() ) {
+//						if ( o1.getSearchProteinCrosslink().getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId()
+//								!= o2.getSearchProteinCrosslink().getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
 //							
-//							return o1.getSearchProteinCrosslink().getProtein1().getProteinSequenceObject().getProteinSequenceId() 
-//									- o2.getSearchProteinCrosslink().getProtein1().getProteinSequenceObject().getProteinSequenceId();
+//							return o1.getSearchProteinCrosslink().getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() 
+//									- o2.getSearchProteinCrosslink().getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 //						}
 //						
-//						if ( o1.getSearchProteinCrosslink().getProtein2().getProteinSequenceObject().getProteinSequenceId()
-//								!= o2.getSearchProteinCrosslink().getProtein2().getProteinSequenceObject().getProteinSequenceId() ) {
+//						if ( o1.getSearchProteinCrosslink().getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId()
+//								!= o2.getSearchProteinCrosslink().getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
 //							
-//							return o1.getSearchProteinCrosslink().getProtein2().getProteinSequenceObject().getProteinSequenceId() 
-//									- o2.getSearchProteinCrosslink().getProtein2().getProteinSequenceObject().getProteinSequenceId();
+//							return o1.getSearchProteinCrosslink().getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() 
+//									- o2.getSearchProteinCrosslink().getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 //						}
 //
 //						if ( o1.getSearchProteinCrosslink().getProtein1Position()
@@ -638,9 +638,9 @@ public class Viewer_UDR_Data_Service {
 					SearchProteinCrosslink searchProteinCrosslink = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
 					Viewer_UDR_Data_Service_Result_Item item = new Viewer_UDR_Data_Service_Result_Item();
 					item.setLinkType( CROSSLINK_LINK_TYPE );
-					item.setProteinSeqId_1( searchProteinCrosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId() );
+					item.setProteinSeqId_1( searchProteinCrosslink.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					item.setProteinPos_1( searchProteinCrosslink.getProtein1Position() );
-					item.setProteinSeqId_2( searchProteinCrosslink.getProtein2().getProteinSequenceObject().getProteinSequenceId() );
+					item.setProteinSeqId_2( searchProteinCrosslink.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					item.setProteinPos_2( searchProteinCrosslink.getProtein2Position() );
 					item.setNumPeptides( searchProteinCrosslink.getNumLinkedPeptides() );
 					item.setNumUniquePeptides( searchProteinCrosslink.getNumUniqueLinkedPeptides() );
@@ -688,11 +688,11 @@ public class Viewer_UDR_Data_Service {
 //					public int compare(SearchProteinLooplinkWrapper o1,
 //							SearchProteinLooplinkWrapper o2) {
 //
-//						if ( o1.getSearchProteinLooplink().getProtein().getProteinSequenceObject().getProteinSequenceId()
-//								!= o2.getSearchProteinLooplink().getProtein().getProteinSequenceObject().getProteinSequenceId() ) {
+//						if ( o1.getSearchProteinLooplink().getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId()
+//								!= o2.getSearchProteinLooplink().getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
 //							
-//							return o1.getSearchProteinLooplink().getProtein().getProteinSequenceObject().getProteinSequenceId() 
-//									- o2.getSearchProteinLooplink().getProtein().getProteinSequenceObject().getProteinSequenceId();
+//							return o1.getSearchProteinLooplink().getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() 
+//									- o2.getSearchProteinLooplink().getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 //						}
 //						
 //						if ( o1.getSearchProteinLooplink().getProteinPosition1()
@@ -733,9 +733,9 @@ public class Viewer_UDR_Data_Service {
 					SearchProteinLooplink searchProteinLooplink = searchProteinLooplinkWrapper.getSearchProteinLooplink();
 					Viewer_UDR_Data_Service_Result_Item item = new Viewer_UDR_Data_Service_Result_Item();
 					item.setLinkType( LOOPLINK_LINK_TYPE );
-					item.setProteinSeqId_1( searchProteinLooplink.getProtein().getProteinSequenceObject().getProteinSequenceId() );
+					item.setProteinSeqId_1( searchProteinLooplink.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					item.setProteinPos_1( searchProteinLooplink.getProteinPosition1() );
-					item.setProteinSeqId_2( searchProteinLooplink.getProtein().getProteinSequenceObject().getProteinSequenceId() );
+					item.setProteinSeqId_2( searchProteinLooplink.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					item.setProteinPos_2( searchProteinLooplink.getProteinPosition2() );
 					item.setNumPeptides( searchProteinLooplink.getNumPeptides() );
 					item.setNumUniquePeptides( searchProteinLooplink.getNumUniquePeptides() );

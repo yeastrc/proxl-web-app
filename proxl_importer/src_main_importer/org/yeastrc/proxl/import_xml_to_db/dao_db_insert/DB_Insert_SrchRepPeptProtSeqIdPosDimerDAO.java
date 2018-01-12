@@ -28,7 +28,7 @@ public class DB_Insert_SrchRepPeptProtSeqIdPosDimerDAO {
 	private static final String INSERT_SQL = "INSERT INTO srch_rep_pept__prot_seq_id_dimer "
 
 			+ " ( search_id, reported_peptide_id, search_reported_peptide_peptide_id, "
-			+   " protein_sequence_id )"
+			+   " protein_sequence_version_id )"
 
 			+ " VALUES ( ?, ?, ?, ? )";
 
@@ -63,7 +63,7 @@ public class DB_Insert_SrchRepPeptProtSeqIdPosDimerDAO {
 			counter++;
 			pstmt.setInt( counter,  item.getSearchReportedPeptidepeptideId() );
 			counter++;
-			pstmt.setInt( counter,  item.getProteinSequenceId() );
+			pstmt.setInt( counter,  item.getProteinSequenceVersionId() );
 			
 			pstmt.executeUpdate();
 

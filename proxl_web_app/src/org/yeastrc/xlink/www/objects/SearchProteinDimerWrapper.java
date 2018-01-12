@@ -19,7 +19,7 @@ public class SearchProteinDimerWrapper extends SortDisplayRecordsWrapperBase {
 	@Override
 	public int getFinalSortOrderKey() {
 
-		return searchProteinDimer.getProtein1().getProteinSequenceObject().getProteinSequenceId();
+		return searchProteinDimer.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 	}
 	
 	

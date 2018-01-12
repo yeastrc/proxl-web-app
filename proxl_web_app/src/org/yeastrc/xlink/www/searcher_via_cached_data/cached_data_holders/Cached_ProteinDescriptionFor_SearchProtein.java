@@ -223,9 +223,9 @@ public class Cached_ProteinDescriptionFor_SearchProtein implements CachedDataCom
 			}
 			String proteinDescription = 
 					SearchUtils
-					.getProteinDescriptionForSearchIdProteinSequenceId( 
+					.getProteinDescriptionForSearchIdproteinSequenceVersionId( 
 							proteinDescriptionFor_SearchProtein_Request.getSearchId(),
-							proteinDescriptionFor_SearchProtein_Request.getProteinSequenceId() );
+							proteinDescriptionFor_SearchProtein_Request.getProteinSequenceVersionId() );
 			ProteinDescriptionFor_SearchProtein_Result proteinDescriptionFor_SearchProtein_Result =
 					new ProteinDescriptionFor_SearchProtein_Result();
 			proteinDescriptionFor_SearchProtein_Result.setProteinDescription( proteinDescription );

@@ -6,7 +6,7 @@ public class SearchProteinDoublePosition {
 		try {
 			return protein.getName() + "(" + position1 + "," + position2 + ")";
 		} catch( Exception e ) {
-			return "Error with protein: " + protein.getProteinSequenceObject().getProteinSequenceId();
+			return "Error with protein: " + protein.getProteinSequenceVersionObject().getProteinSequenceVersionId();
 		}
 	}
 	

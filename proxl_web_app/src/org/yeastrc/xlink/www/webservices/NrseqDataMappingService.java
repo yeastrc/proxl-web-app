@@ -14,7 +14,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.searcher.ProteinSequenceIdForNrseqProteinIdSearcher;
+import org.yeastrc.xlink.www.searcher.ProteinSequenceVersionIdForNrseqProteinIdSearcher;
 
 @Path("/nrseqDataMapping")
 public class NrseqDataMappingService {
@@ -24,7 +24,7 @@ public class NrseqDataMappingService {
 	@POST
 	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/getProteinSequenceIdsForNrseqProteinIds")
+	@Path("/getProteinSequenceVersionIdsForNrseqProteinIds")
 	public Map<String,String> saveOrUpdateDefaultPageView( 
 			@FormParam("nrseqProteinId") List<Integer> nrseqProteinIdList, 
 			@Context HttpServletRequest request ) throws Exception {
@@ -38,12 +38,12 @@ public class NrseqDataMappingService {
 			    	        .build()
 			    	        );
 			}
-			Map<String,String> nrseqProteinIdToProteinSequenceIdMap = new HashMap<>();
+			Map<String,String> nrseqProteinIdToproteinSequenceVersionIdMap = new HashMap<>();
 			for ( Integer nrseqProteinId : nrseqProteinIdList ) {
-				Integer proteinSequenceId =
-						ProteinSequenceIdForNrseqProteinIdSearcher.getInstance()
-						.getProteinSequenceIdForNrseqProteinIdSearcher( nrseqProteinId );
-				if ( proteinSequenceId == null ) {
+				Integer proteinSequenceVersionId =
+						ProteinSequenceVersionIdForNrseqProteinIdSearcher.getInstance()
+						.getProteinSequenceVersionIdForNrseqProteinIdSearcher( nrseqProteinId );
+				if ( proteinSequenceVersionId == null ) {
 					String msg = "No protein sequence id found for nrseqProteinId: " + nrseqProteinId;
 					log.error( msg );
 				    throw new WebApplicationException(
@@ -52,9 +52,9 @@ public class NrseqDataMappingService {
 				    	        .build()
 				    	        ); 
 				}
-				nrseqProteinIdToProteinSequenceIdMap.put( nrseqProteinId.toString(), proteinSequenceId.toString() );
+				nrseqProteinIdToproteinSequenceVersionIdMap.put( nrseqProteinId.toString(), proteinSequenceVersionId.toString() );
 			}
-			return nrseqProteinIdToProteinSequenceIdMap;
+			return nrseqProteinIdToproteinSequenceVersionIdMap;
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {

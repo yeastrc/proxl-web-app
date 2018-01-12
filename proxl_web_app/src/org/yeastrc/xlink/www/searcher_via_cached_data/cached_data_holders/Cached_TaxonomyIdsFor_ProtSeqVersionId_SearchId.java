@@ -23,9 +23,9 @@ import com.google.common.cache.LoadingCache;
  * TaxonomyIdsForProtSeqIdSearchId_Request
  * TaxonomyIdsForProtSeqIdSearchId_Result
  */
-public class Cached_TaxonomyIdsForProtSeqIdSearchId implements CachedDataCommonIF {
+public class Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId implements CachedDataCommonIF {
 
-	private static final Logger log = Logger.getLogger( Cached_TaxonomyIdsForProtSeqIdSearchId.class );
+	private static final Logger log = Logger.getLogger( Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId.class );
 
 	private static final int CACHE_MAX_SIZE_FULL_SIZE = 10000;
 	private static final int CACHE_MAX_SIZE_SMALL = 10;
@@ -44,17 +44,17 @@ public class Cached_TaxonomyIdsForProtSeqIdSearchId implements CachedDataCommonI
 	/**
 	 * Static singleton instance
 	 */
-	private static Cached_TaxonomyIdsForProtSeqIdSearchId _instance = null; //  Delay creating until first getInstance() call
+	private static Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId _instance = null; //  Delay creating until first getInstance() call
 
 	/**
 	 * Static get singleton instance
 	 * @return
 	 * @throws Exception 
 	 */
-	public static synchronized Cached_TaxonomyIdsForProtSeqIdSearchId getInstance() throws Exception {
+	public static synchronized Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId getInstance() throws Exception {
 
 		if ( _instance == null ) {
-			_instance = new Cached_TaxonomyIdsForProtSeqIdSearchId();
+			_instance = new Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId();
 		}
 		return _instance; 
 	}
@@ -62,7 +62,7 @@ public class Cached_TaxonomyIdsForProtSeqIdSearchId implements CachedDataCommonI
 	/**
 	 * constructor
 	 */
-	private Cached_TaxonomyIdsForProtSeqIdSearchId() {
+	private Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId() {
 		if ( log.isDebugEnabled() ) {
 			debugLogLevelEnabled = true;
 			log.debug( "debug log level enabled" );
@@ -129,9 +129,9 @@ public class Cached_TaxonomyIdsForProtSeqIdSearchId implements CachedDataCommonI
 	 */
 	private static class CacheHolderInternal {
 
-		private Cached_TaxonomyIdsForProtSeqIdSearchId parentObject;
+		private Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId parentObject;
 		
-		private CacheHolderInternal( Cached_TaxonomyIdsForProtSeqIdSearchId parentObject ) {
+		private CacheHolderInternal( Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId parentObject ) {
 			this.parentObject = parentObject;
 		}
 		
@@ -224,7 +224,7 @@ public class Cached_TaxonomyIdsForProtSeqIdSearchId implements CachedDataCommonI
 			Set<Integer> taxonomyIds =
 					TaxonomyIdsForProtSeqIdSearchIdSearcher.getInstance()
 					.getTaxonomyIdsSingleSearch(
-							taxonomyIdsForProtSeqIdSearchId_Request.getProteinSequenceId(),
+							taxonomyIdsForProtSeqIdSearchId_Request.getProteinSequenceVersionId(),
 							taxonomyIdsForProtSeqIdSearchId_Request.getSearchId() );
 			TaxonomyIdsForProtSeqIdSearchId_Result taxonomyIdsForProtSeqIdSearchId_Result =
 					new TaxonomyIdsForProtSeqIdSearchId_Result();

@@ -2,13 +2,13 @@ package org.yeastrc.proxl.import_xml_to_db.dto;
 
 /**
  * 
- * table search_protein_sequence_annotation
+ * table search__protein_sequence_version__annotation
  */
-public class SearchProteinSequenceAnnotationDTO {
+public class SearchProteinSequenceVersionAnnotationDTO {
 
 	private int id;
 	private int searchId;
-	private int proteinSequenceId;
+	private int proteinSequenceVersionId;
 	private int annotationId;
 	
 	
@@ -24,17 +24,17 @@ public class SearchProteinSequenceAnnotationDTO {
 	public void setSearchId(int searchId) {
 		this.searchId = searchId;
 	}
-	public int getProteinSequenceId() {
-		return proteinSequenceId;
-	}
-	public void setProteinSequenceId(int proteinSequenceId) {
-		this.proteinSequenceId = proteinSequenceId;
-	}
 	public int getAnnotationId() {
 		return annotationId;
 	}
 	public void setAnnotationId(int annotationId) {
 		this.annotationId = annotationId;
+	}
+	public int getProteinSequenceVersionId() {
+		return proteinSequenceVersionId;
+	}
+	public void setProteinSequenceVersionId(int proteinSequenceVersionId) {
+		this.proteinSequenceVersionId = proteinSequenceVersionId;
 	}
 
 }

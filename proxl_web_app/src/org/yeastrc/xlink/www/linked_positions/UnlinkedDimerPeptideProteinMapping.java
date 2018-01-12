@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
+import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
@@ -295,7 +295,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 				SrchRepPeptProtSeqIdPosDimerDTO srchRepPeptProtSeqIdPosDimerDTO_Item_1 = srchRepPeptProtSeqIdPosDimerDTO_Entry_A_Item;
 				SrchRepPeptProtSeqIdPosDimerDTO srchRepPeptProtSeqIdPosDimerDTO_Item_2 = srchRepPeptProtSeqIdPosDimerDTO_Entry_B_Item;
 				//  Order so:  ( id1 <= id2 )
-				if ( ( srchRepPeptProtSeqIdPosDimerDTO_Item_1.getProteinSequenceId() > srchRepPeptProtSeqIdPosDimerDTO_Item_2.getProteinSequenceId() ) ) {
+				if ( ( srchRepPeptProtSeqIdPosDimerDTO_Item_1.getProteinSequenceVersionId() > srchRepPeptProtSeqIdPosDimerDTO_Item_2.getProteinSequenceVersionId() ) ) {
 					//  Swap order for consistency of displayed data and to match order the dimer records were inserted in
 					srchRepPeptProtSeqIdPosDimerDTO_Item_1 = srchRepPeptProtSeqIdPosDimerDTO_Entry_B_Item;
 					srchRepPeptProtSeqIdPosDimerDTO_Item_2 = srchRepPeptProtSeqIdPosDimerDTO_Entry_A_Item;
@@ -303,16 +303,16 @@ public class UnlinkedDimerPeptideProteinMapping {
 				//  Process into Map of protein 1, protein 2 objects
 				// Map<Integer,Map<Integer,Map<Integer,Map<Integer,RepPept_Stage_1_Wrapper>>>> repPept_Stage_1_Wrapper_MappedProt1Prot2 = new HashMap<>();
 				Map<Integer,RepPept_Stage_1_Wrapper> repPept_Stage_1_Wrapper_MappedProt2 =
-						dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2.get( srchRepPeptProtSeqIdPosDimerDTO_Item_1.getProteinSequenceId() );
+						dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2.get( srchRepPeptProtSeqIdPosDimerDTO_Item_1.getProteinSequenceVersionId() );
 				if ( repPept_Stage_1_Wrapper_MappedProt2 == null ) {
 					repPept_Stage_1_Wrapper_MappedProt2 = new HashMap<>();
-					dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2.put( srchRepPeptProtSeqIdPosDimerDTO_Item_1.getProteinSequenceId(), repPept_Stage_1_Wrapper_MappedProt2 );
+					dimer__repPept_Stage_1_Wrapper_MappedProt1Prot2.put( srchRepPeptProtSeqIdPosDimerDTO_Item_1.getProteinSequenceVersionId(), repPept_Stage_1_Wrapper_MappedProt2 );
 				}
 				RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper =
-						repPept_Stage_1_Wrapper_MappedProt2.get( srchRepPeptProtSeqIdPosDimerDTO_Item_2.getProteinSequenceId() );
+						repPept_Stage_1_Wrapper_MappedProt2.get( srchRepPeptProtSeqIdPosDimerDTO_Item_2.getProteinSequenceVersionId() );
 				if ( repPept_Stage_1_Wrapper == null ) {
 					repPept_Stage_1_Wrapper = new RepPept_Stage_1_Wrapper();
-					repPept_Stage_1_Wrapper_MappedProt2.put( srchRepPeptProtSeqIdPosDimerDTO_Item_2.getProteinSequenceId(), repPept_Stage_1_Wrapper );
+					repPept_Stage_1_Wrapper_MappedProt2.put( srchRepPeptProtSeqIdPosDimerDTO_Item_2.getProteinSequenceVersionId(), repPept_Stage_1_Wrapper );
 				}
 				boolean reportedPeptideIdAlreadyInList = false;
 				for ( WebReportedPeptideWrapper itemInList : repPept_Stage_1_Wrapper.webReportedPeptideWrapperList ) {
@@ -351,10 +351,10 @@ public class UnlinkedDimerPeptideProteinMapping {
 			//  Process into Map of protein objects
 			// Map<Integer, RepPept_Stage_1_Wrapper> unlinked__repPept_Stage_1_Wrapper_MappedProt,
 			RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper =
-					unlinked__repPept_Stage_1_Wrapper_MappedProt.get( srchRepPeptProtSeqIdPosUnlinkedDTO_Item.getProteinSequenceId() );
+					unlinked__repPept_Stage_1_Wrapper_MappedProt.get( srchRepPeptProtSeqIdPosUnlinkedDTO_Item.getProteinSequenceVersionId() );
 			if ( repPept_Stage_1_Wrapper == null ) {
 				repPept_Stage_1_Wrapper = new RepPept_Stage_1_Wrapper();
-				unlinked__repPept_Stage_1_Wrapper_MappedProt.put( srchRepPeptProtSeqIdPosUnlinkedDTO_Item.getProteinSequenceId(), repPept_Stage_1_Wrapper );
+				unlinked__repPept_Stage_1_Wrapper_MappedProt.put( srchRepPeptProtSeqIdPosUnlinkedDTO_Item.getProteinSequenceVersionId(), repPept_Stage_1_Wrapper );
 			}
 			boolean reportedPeptideIdAlreadyInList = false;
 			for ( WebReportedPeptideWrapper itemInList : repPept_Stage_1_Wrapper.webReportedPeptideWrapperList ) {
@@ -431,7 +431,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 		searchProteinDimer.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 		SearchProtein searchProtein_1 = searchProtein_KeyOn_PROT_SEQ_ID_Map.get( proteinId_1 );
 		if ( searchProtein_1 == null ) {
-			searchProtein_1 = new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId_1 ) );
+			searchProtein_1 = new SearchProtein( search, ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( proteinId_1 ) );
 			searchProtein_KeyOn_PROT_SEQ_ID_Map.put( proteinId_1, searchProtein_1 );
 		}
 		SearchProtein searchProtein_2 = null;
@@ -440,7 +440,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 		} else {
 			searchProtein_2 = searchProtein_KeyOn_PROT_SEQ_ID_Map.get( proteinId_2 );
 			if ( searchProtein_2 == null ) {
-				searchProtein_2 = new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId_2 ) );
+				searchProtein_2 = new SearchProtein( search, ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( proteinId_2 ) );
 				searchProtein_KeyOn_PROT_SEQ_ID_Map.put( proteinId_2, searchProtein_2 );
 			}
 		}
@@ -513,7 +513,7 @@ public class UnlinkedDimerPeptideProteinMapping {
 		searchProteinUnlinked.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 		SearchProtein searchProtein = searchProtein_KeyOn_PROT_SEQ_ID_Map.get( proteinId );
 		if ( searchProtein == null ) {
-			searchProtein = new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId ) );
+			searchProtein = new SearchProtein( search, ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( proteinId ) );
 			searchProtein_KeyOn_PROT_SEQ_ID_Map.put( proteinId, searchProtein );
 		}
 		searchProteinUnlinked.setProtein( searchProtein );

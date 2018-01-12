@@ -22,7 +22,7 @@ public class PsmAnnFromCrosslinkProteinSearcher {
 	//  The data returned from THIS SEARCHER IS CORRECT since the data is placed in MAPs.
 	//  The following WARNING only applies if using this SQL elsewhere.
 	//  WARNING:  This SQL returns duplicate records 
-	//				when Prot_Seq_Id_1 = Prot_Seq_Id_2  AND Prot_Pos_1 = Prot_Pos_2
+	//				when Prot_Seq_V_Id_1 = Prot_Seq_V_Id_2  AND Prot_Pos_1 = Prot_Pos_2
 	private final String SQL = 
 			"SELECT psm_fltrbl_tbl.psm_id, psm_fltrbl_tbl.annotation_type_id, psm_fltrbl_tbl.value_double "
 			+ " FROM "
@@ -35,8 +35,8 @@ public class PsmAnnFromCrosslinkProteinSearcher {
 			+ " INNER JOIN psm_filterable_annotation__generic_lookup AS psm_fltrbl_tbl "
 			+ 	" ON srpnipc_1.search_id = psm_fltrbl_tbl.search_id AND srpnipc_1.reported_peptide_id  = psm_fltrbl_tbl.reported_peptide_id "
 			+ " WHERE  "
-			+ 	  " srpnipc_1.search_id = ? AND srpnipc_1.protein_sequence_id = ? AND srpnipc_1.protein_sequence_position = ? "
-			+ " AND srpnipc_2.search_id = ? AND srpnipc_2.protein_sequence_id = ? AND srpnipc_2.protein_sequence_position = ?  ";
+			+ 	  " srpnipc_1.search_id = ? AND srpnipc_1.protein_sequence_version_id = ? AND srpnipc_1.protein_sequence_position = ? "
+			+ " AND srpnipc_2.search_id = ? AND srpnipc_2.protein_sequence_version_id = ? AND srpnipc_2.protein_sequence_position = ?  ";
 	/**
 	 * @param searchId
 	 * @param protein1Id

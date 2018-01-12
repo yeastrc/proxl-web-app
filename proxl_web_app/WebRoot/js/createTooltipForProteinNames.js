@@ -131,7 +131,7 @@ var addSingleTooltipForProteinName = function( params ) {
                 				  && _protein_listing_webservice_base_url_set !== "" ) {
                 				var requestData = {
                 						searchId : _searchIds_protein_listing,
-                						proteinSequenceId : proteinIdString
+                						proteinSequenceVersionId : proteinIdString
                 				};
                 			  var _URL = contextPathJSVar + "/services/proteinNameForTooltip/getData";
                 			  $.ajax({

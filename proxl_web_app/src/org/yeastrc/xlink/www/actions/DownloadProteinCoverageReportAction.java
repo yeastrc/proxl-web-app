@@ -195,10 +195,10 @@ public class DownloadProteinCoverageReportAction extends Action {
 					}
 				}
 				//  First convert the protein sequence ids that come from the JS code to standard integers and put
-				//   in the property excludeProteinSequenceIds
-				ProteinsMergedProteinsCommon.getInstance().processExcludeProteinSequenceIdsFromJS( proteinQueryJSONRoot );
-				if ( proteinQueryJSONRoot.getExcludeProteinSequenceIds() != null ) {
-					for ( Integer proteinId : proteinQueryJSONRoot.getExcludeProteinSequenceIds() ) {
+				//   in the property excludeproteinSequenceVersionIds
+				ProteinsMergedProteinsCommon.getInstance().processExcludeproteinSequenceVersionIdsFromJS( proteinQueryJSONRoot );
+				if ( proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() != null ) {
+					for ( Integer proteinId : proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() ) {
 						excludeProtein_Ids_Set_UserInput.add( proteinId );
 					}
 				}
@@ -212,7 +212,7 @@ public class DownloadProteinCoverageReportAction extends Action {
 				LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param( proteinQueryJSONRoot );
 				
 				ProteinCoverageCompute pcs = new ProteinCoverageCompute();
-				pcs.setExcludedProteinSequenceIds( proteinQueryJSONRoot.getExcludeProteinSequenceIds() );
+				pcs.setExcludedproteinSequenceVersionIds( proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() );
 				pcs.setExcludedTaxonomyIds( proteinQueryJSONRoot.getExcludeTaxonomy() );
 				pcs.setFilterNonUniquePeptides( proteinQueryJSONRoot.isFilterNonUniquePeptides() );
 				pcs.setFilterOnlyOnePSM( proteinQueryJSONRoot.isFilterOnlyOnePSM() );

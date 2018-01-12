@@ -39,7 +39,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.objects.ImageViewerData;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
+import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -243,10 +243,10 @@ public class ViewerLooplinkService {
 						SearchProteinLooplink link = searchProteinLooplinkWrapper.getSearchProteinLooplink();
 						// did user request removal of certain taxonomy IDs?
 						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
-							if ( ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+							if ( ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 											excludeTaxonomy_Ids_Set_UserInput, 
-											link.getProtein().getProteinSequenceObject(), 
+											link.getProtein().getProteinSequenceVersionObject(), 
 											searchId ) ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
@@ -291,7 +291,7 @@ public class ViewerLooplinkService {
 				List<SearchProteinLooplinkWrapper> wrappedLooplinks = wrappedLooplinks_MappedOnSearchId_Entry.getValue();
 				for ( SearchProteinLooplinkWrapper wrappedLooplink : wrappedLooplinks ) {
 					SearchProteinLooplink searchProteinLooplink = wrappedLooplink.getSearchProteinLooplink();
-					int fromProtId = searchProteinLooplink.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					int fromProtId = searchProteinLooplink.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 					int toProtId = fromProtId;
 					int fromProtPosition = searchProteinLooplink.getProteinPosition1();
 					int toProtPosition = searchProteinLooplink.getProteinPosition2();
@@ -556,10 +556,10 @@ public class ViewerLooplinkService {
 						SearchProteinLooplink link = searchProteinLooplinkWrapper.getSearchProteinLooplink();
 						// did user request removal of certain taxonomy IDs?
 						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
-							if ( ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+							if ( ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 											excludeTaxonomy_Ids_Set_UserInput, 
-											link.getProtein().getProteinSequenceObject(), 
+											link.getProtein().getProteinSequenceVersionObject(), 
 											searchId ) ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
@@ -605,7 +605,7 @@ public class ViewerLooplinkService {
 				for ( SearchProteinLooplinkWrapper wrappedLooplink : wrappedLooplinks ) {
 					SearchProteinLooplink searchProteinLooplink = wrappedLooplink.getSearchProteinLooplink();
 					Integer numPsms = searchProteinLooplink.getNumPsms();
-					int fromProtId = searchProteinLooplink.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					int fromProtId = searchProteinLooplink.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 					int toProtId = fromProtId;
 					int fromProtPosition = searchProteinLooplink.getProteinPosition1();
 					int toProtPosition = searchProteinLooplink.getProteinPosition2();

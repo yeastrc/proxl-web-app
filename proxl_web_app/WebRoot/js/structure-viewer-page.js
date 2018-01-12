@@ -141,7 +141,7 @@ function convertOldJSONIfNecessaryReturnTrueIfExit() {
 
 	var json = getJsonFromHash();
 
-	if ( convertVisibleChainsToProteinSequenceIds( json ) ) {
+	if ( convertVisibleChainsToproteinSequenceVersionIds( json ) ) {
 		
 		return true;  // force main code to wait for async
 	}
@@ -151,7 +151,7 @@ function convertOldJSONIfNecessaryReturnTrueIfExit() {
 
 /////
 
-function convertVisibleChainsToProteinSequenceIds( json ) {
+function convertVisibleChainsToproteinSequenceVersionIds( json ) {
 	
 	if ( ! ( HASH_PROPERTY_PREV__VISIBLE_CHAINS  in json ) ) {
 		
@@ -184,7 +184,7 @@ function convertVisibleChainsToProteinSequenceIds( json ) {
 	
 	var callback = function( params ) {
 		
-		convertVisibleChainsToProteinSequenceIdsProcessReponse( params );
+		convertVisibleChainsToproteinSequenceVersionIdsProcessReponse( params );
 	};
 	
 	
@@ -195,7 +195,7 @@ function convertVisibleChainsToProteinSequenceIds( json ) {
 			callback : callback
 	};
 	
-	var response = getProteinSequenceIdsForNrseqProteinIds( params );
+	var response = getProteinSequenceVersionIdsForNrseqProteinIds( params );
 	
 	if ( response.calledAJAX ) {
 	
@@ -207,7 +207,7 @@ function convertVisibleChainsToProteinSequenceIds( json ) {
 
 /////
 
-function convertVisibleChainsToProteinSequenceIdsProcessReponse( responseParams ) {
+function convertVisibleChainsToproteinSequenceVersionIdsProcessReponse( responseParams ) {
 
 	var proteinIdsMapping = responseParams.proteinIdsMapping;
 	var calledAJAX = responseParams.calledAJAX;
@@ -235,14 +235,14 @@ function convertVisibleChainsToProteinSequenceIdsProcessReponse( responseParams 
 			
 			var visibleChainNRSEQProteinIdEntry = visibleChainNRSEQProteinIdsArray[ visibleChainNRSEQProteinIdsArrayIndex ];
 			
-			var matchingProteinSequenceId = proteinIdsMapping[ visibleChainNRSEQProteinIdEntry ];
+			var matchingproteinSequenceVersionId = proteinIdsMapping[ visibleChainNRSEQProteinIdEntry ];
 			
-			if ( matchingProteinSequenceId === undefined || matchingProteinSequenceId === null ) {
+			if ( matchingproteinSequenceVersionId === undefined || matchingproteinSequenceVersionId === null ) {
 				
 				throw Error( "Matching protein sequence id not found for nrseq protein id: " + visibleChainNRSEQProteinIdEntry );
 			}
 			
-			visibleChainNRSEQProteinIdsArray[ visibleChainNRSEQProteinIdsArrayIndex ] = matchingProteinSequenceId;
+			visibleChainNRSEQProteinIdsArray[ visibleChainNRSEQProteinIdsArrayIndex ] = matchingproteinSequenceVersionId;
 		}
 	}	
 
@@ -847,7 +847,7 @@ function loadSequenceCoverageDataForProtein( protein, loadRequest, callout ) {
 			
 			var url = contextPathJSVar + "/services/sequenceCoverage/getDataForProtein";
 			url += buildQueryStringFromHash();
-			url += "&proteinSequenceId=" + protein;
+			url += "&proteinSequenceVersionId=" + protein;
 			
 			 $.ajax({
 			        type: "GET",
@@ -2458,7 +2458,7 @@ var getAlignmentByChainAndProtein = function ( chainId, proteinId ) {
 		
 		var alignment = _ALIGNMENTS[ chainId ][ j ];
 		
-		if( proteinId == alignment.proteinSequenceId ) {
+		if( proteinId == alignment.proteinSequenceVersionId ) {
 			return _ALIGNMENTS[ chainId ][ j ];
 		}
 		
@@ -2710,32 +2710,32 @@ var downloadPymolScript = function() {
 			
 			//  Get Experiment Protein Sequence Id and Position data for the atoms and process them
 			
-			var atom1_ExpProteinSequenceIdPositionPairs = getExpProteinSequenceIdPositionPairs( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
-			var atom2_ExpProteinSequenceIdPositionPairs = getExpProteinSequenceIdPositionPairs( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
+			var atom1_ExpproteinSequenceVersionIdPositionPairs = getExpproteinSequenceVersionIdPositionPairs( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
+			var atom2_ExpproteinSequenceVersionIdPositionPairs = getExpproteinSequenceVersionIdPositionPairs( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
 			
-			if( !atom1_ExpProteinSequenceIdPositionPairs || atom1_ExpProteinSequenceIdPositionPairs.length != 1 ) {
+			if( !atom1_ExpproteinSequenceVersionIdPositionPairs || atom1_ExpproteinSequenceVersionIdPositionPairs.length != 1 ) {
 				console.log( "WARNING: Got anomolous readings for first protein in link." );
 			}
 			
-			if( !atom2_ExpProteinSequenceIdPositionPairs || atom2_ExpProteinSequenceIdPositionPairs.length != 1 ) {
+			if( !atom2_ExpproteinSequenceVersionIdPositionPairs || atom2_ExpproteinSequenceVersionIdPositionPairs.length != 1 ) {
 				console.log( "WARNING: Got anomolous readings for second protein in link." );
 			}
 			
-			var atom1_ExpProteinSequenceIdPositionPair = atom1_ExpProteinSequenceIdPositionPairs[ 0 ];
-			var atom2_ExpProteinSequenceIdPositionPair = atom2_ExpProteinSequenceIdPositionPairs[ 0 ];
+			var atom1_ExpproteinSequenceVersionIdPositionPair = atom1_ExpproteinSequenceVersionIdPositionPairs[ 0 ];
+			var atom2_ExpproteinSequenceVersionIdPositionPair = atom2_ExpproteinSequenceVersionIdPositionPairs[ 0 ];
 			
 			// if protein names contain commas, only keep what's before the first comma
-			var proteinName1 = _proteinNames[ atom1_ExpProteinSequenceIdPositionPair.proteinSequenceId ];
+			var proteinName1 = _proteinNames[ atom1_ExpproteinSequenceVersionIdPositionPair.proteinSequenceVersionId ];
 			proteinName1 = proteinName1.split(",")[ 0 ];
 			
-			var proteinName2 = _proteinNames[ atom2_ExpProteinSequenceIdPositionPair.proteinSequenceId ];
+			var proteinName2 = _proteinNames[ atom2_ExpproteinSequenceVersionIdPositionPair.proteinSequenceVersionId ];
 			proteinName2 = proteinName2.split(",")[ 0 ];
 			
 			var uniqueId = 
 				proteinName1 + "_" 
-				+ atom1_ExpProteinSequenceIdPositionPair.position 
+				+ atom1_ExpproteinSequenceVersionIdPositionPair.position 
 				+ "L" + proteinName2 + "_" 
-				+ atom2_ExpProteinSequenceIdPositionPair.position;
+				+ atom2_ExpproteinSequenceVersionIdPositionPair.position;
 
 			// ensure a distance is only added once (ie, don't want same distance added for a looplink and crosslink on same atoms)
 			var distanceId = atom1.residue().chain().name() + "-" + atom1.residue().num() + "-" + atom2.residue().chain().name() + "-" + atom2.residue().num();	
@@ -2782,35 +2782,35 @@ var downloadPymolScript = function() {
 
 			//  Get Experiment Protein Sequence Id and Position data for the atoms and process them
 			
-			var atom1_ExpProteinSequenceIdPositionPairs = getExpProteinSequenceIdPositionPairs( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
-			var atom2_ExpProteinSequenceIdPositionPairs = getExpProteinSequenceIdPositionPairs( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
+			var atom1_ExpproteinSequenceVersionIdPositionPairs = getExpproteinSequenceVersionIdPositionPairs( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
+			var atom2_ExpproteinSequenceVersionIdPositionPairs = getExpproteinSequenceVersionIdPositionPairs( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
 			
 			
-			if( !atom1_ExpProteinSequenceIdPositionPairs || atom1_ExpProteinSequenceIdPositionPairs.length != 1 ) {
+			if( !atom1_ExpproteinSequenceVersionIdPositionPairs || atom1_ExpproteinSequenceVersionIdPositionPairs.length != 1 ) {
 				console.log( "WARNING: Got anomolous readings for first protein in link." );
 			}
 			
-			if( !atom2_ExpProteinSequenceIdPositionPairs || atom2_ExpProteinSequenceIdPositionPairs.length != 1 ) {
+			if( !atom2_ExpproteinSequenceVersionIdPositionPairs || atom2_ExpproteinSequenceVersionIdPositionPairs.length != 1 ) {
 				console.log( "WARNING: Got anomolous readings for second protein in link." );
 			}
 			
 
-			var atom1_ExpProteinSequenceIdPositionPair = atom1_ExpProteinSequenceIdPositionPairs[ 0 ];
-			var atom2_ExpProteinSequenceIdPositionPair = atom2_ExpProteinSequenceIdPositionPairs[ 0 ];
+			var atom1_ExpproteinSequenceVersionIdPositionPair = atom1_ExpproteinSequenceVersionIdPositionPairs[ 0 ];
+			var atom2_ExpproteinSequenceVersionIdPositionPair = atom2_ExpproteinSequenceVersionIdPositionPairs[ 0 ];
 			
 			
 			// if protein names contain commas, only keep what's before the first comma
-			var proteinName1 = _proteinNames[ atom1_ExpProteinSequenceIdPositionPair.proteinSequenceId ];
+			var proteinName1 = _proteinNames[ atom1_ExpproteinSequenceVersionIdPositionPair.proteinSequenceVersionId ];
 			proteinName1 = proteinName1.split(",")[ 0 ];
 			
-			var proteinName2 = _proteinNames[ atom2_ExpProteinSequenceIdPositionPair.proteinSequenceId ];
+			var proteinName2 = _proteinNames[ atom2_ExpproteinSequenceVersionIdPositionPair.proteinSequenceVersionId ];
 			proteinName2 = proteinName2.split(",")[ 0 ];
 			
 			var uniqueId = 
 				proteinName1 + "_" 
-				+ atom1_ExpProteinSequenceIdPositionPair.position 
+				+ atom1_ExpproteinSequenceVersionIdPositionPair.position 
 				+ "C" + proteinName2 
-				+ "_" + atom2_ExpProteinSequenceIdPositionPair.position;
+				+ "_" + atom2_ExpproteinSequenceVersionIdPositionPair.position;
 			
 			// ensure a distance is only added once (ie, don't want same distance added for a looplink and crosslink on same atoms)
 			var distanceId = atom1.residue().chain().name() + "-" + atom1.residue().num() + "-" + atom2.residue().chain().name() + "-" + atom2.residue().num();	
@@ -3745,7 +3745,7 @@ var listChains = function( doDraw ) {
 				
 				var alignment = _ALIGNMENTS[ chains[ i ].name() ][ k ];
 				
-				var proteinId = alignment.proteinSequenceId;
+				var proteinId = alignment.proteinSequenceVersionId;
 				
 				// limit the list to proteins in this experiment
 				if( _proteinNames[ proteinId ] ) {
@@ -5195,10 +5195,10 @@ function getSequenceCoverageColorOp() {
 
 		  //console.log( "Got " + alignments.length + " visible alignments for chain: " + chain.name() );
 
-		  // get a map of proteinSequenceId:position pairs that correspond to the supplied pdbPosition in the supplied alignments
-		  var expProteinSequenceIdPositionPairs = getExpProteinSequenceIdPositionPairs( alignments, pdbPosition );
+		  // get a map of proteinSequenceVersionId:position pairs that correspond to the supplied pdbPosition in the supplied alignments
+		  var expproteinSequenceVersionIdPositionPairs = getExpproteinSequenceVersionIdPositionPairs( alignments, pdbPosition );
 
-		  if( !expProteinSequenceIdPositionPairs || expProteinSequenceIdPositionPairs.length < 1 ) {
+		  if( !expproteinSequenceVersionIdPositionPairs || expproteinSequenceVersionIdPositionPairs.length < 1 ) {
 
 			  console.log( atom );
 			  //console.log( "Got no nrseq proteins positions for chain " + chain.name() );
@@ -5211,16 +5211,16 @@ function getSequenceCoverageColorOp() {
 		  }
 
 
-		  if( expProteinSequenceIdPositionPairs.length > 1 ) {
+		  if( expproteinSequenceVersionIdPositionPairs.length > 1 ) {
 			  //console.log( "WARNING: Got more than 1 nrseq:position for chain " + chain.name() + " at " + pdbPosition + ". Only using first one." );
 		  }
 
-		  var proteinSequenceId = expProteinSequenceIdPositionPairs[ 0 ].proteinSequenceId;
-		  var position = expProteinSequenceIdPositionPairs[ 0 ].position;
+		  var proteinSequenceVersionId = expproteinSequenceVersionIdPositionPairs[ 0 ].proteinSequenceVersionId;
+		  var position = expproteinSequenceVersionIdPositionPairs[ 0 ].position;
 
-		  if( isProteinPositionCovered( proteinSequenceId, position ) ) {
+		  if( isProteinPositionCovered( proteinSequenceVersionId, position ) ) {
 
-			  //console.log( proteinSequenceId + " at position " + position + " is a covered position." );
+			  //console.log( proteinSequenceVersionId + " at position " + position + " is a covered position." );
 
 			  // color as a covered position
 			  out[index+0] = _COVERED_RESIDUE_COLOR[ 0 ]; out[index+1] = _COVERED_RESIDUE_COLOR[ 1 ];
@@ -5229,7 +5229,7 @@ function getSequenceCoverageColorOp() {
 
 		  } else {
 
-			  //console.log( proteinSequenceId + " at position " + position + " is not a covered position." );
+			  //console.log( proteinSequenceVersionId + " at position " + position + " is not a covered position." );
 
 			  out[index+0] = _UNCOVERED_RESIDUE_COLOR[ 0 ]; out[index+1] = _UNCOVERED_RESIDUE_COLOR[ 1 ];
 			  out[index+2] = _UNCOVERED_RESIDUE_COLOR[ 2 ]; out[index+3] = _UNCOVERED_RESIDUE_COLOR[ 3 ];
@@ -5288,28 +5288,28 @@ function getAllAlignmentsForChain( chainId ) {
 }
 
 /**
- * Get all proteinSequenceId:position pairs that correspond to the supplied pdbPosition in the supplied alignments
+ * Get all proteinSequenceVersionId:position pairs that correspond to the supplied pdbPosition in the supplied alignments
  * 
  * This is for the "experimental" protein sequence from the experiment
  */
-var getExpProteinSequenceIdPositionPairs = function( alignments, pdbPosition ) {
+var getExpproteinSequenceVersionIdPositionPairs = function( alignments, pdbPosition ) {
 	
-	var expProteinSequenceIdPositionPairs = new Array();
+	var expproteinSequenceVersionIdPositionPairs = new Array();
 	
 	for( var i = 0; i < alignments.length; i++ ) {
 		var expProteinPosition = findExpPositionForPDBPosition( alignments[ i ], pdbPosition );
 		
 		if( expProteinPosition ) {
-			var expProteinSequenceIdPositionPair = { 
-					proteinSequenceId : alignments[ i ].proteinSequenceId,
+			var expproteinSequenceVersionIdPositionPair = { 
+					proteinSequenceVersionId : alignments[ i ].proteinSequenceVersionId,
 					position : expProteinPosition
 			};
 			
-			expProteinSequenceIdPositionPairs.push( expProteinSequenceIdPositionPair );
+			expproteinSequenceVersionIdPositionPairs.push( expproteinSequenceVersionIdPositionPair );
 		}
 	}
 	
-	return expProteinSequenceIdPositionPairs;	
+	return expproteinSequenceVersionIdPositionPairs;	
 };
 
 /**
@@ -5448,7 +5448,7 @@ var findExpPositionForPDBPosition = function( alignment, position ) {
 		}
 	}
 	
-	console.log( "MAJOR WARNING: DID NOT FIND POSITION " + position + " FOR PROTEIN " + alignment.proteinSequenceId + " IN CHAIN " + alignment.chainId );
+	console.log( "MAJOR WARNING: DID NOT FIND POSITION " + position + " FOR PROTEIN " + alignment.proteinSequenceVersionId + " IN CHAIN " + alignment.chainId );
 	console.log( alignment );
 	return null;
 };

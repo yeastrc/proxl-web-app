@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
+import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.objects.SearchProtein;
 import org.yeastrc.xlink.www.objects.SearchProteinPosition;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_CrosslinkProteinPositionsFor_CrosslinkPeptide;
@@ -47,7 +47,7 @@ public class SearchCrosslinkProteinsFromPeptide {
 		for ( CrosslinkProteinPositionsFor_CrosslinkPeptide_Result_Entry entry : entryList ) {
 			SearchProteinPosition prpp = new SearchProteinPosition();
 			prpp.setPosition( entry.getProteinSequencePosition() );
-			prpp.setProtein( new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( entry.getProteinSequenceId() ) ) );
+			prpp.setProtein( new SearchProtein( search, ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( entry.getProteinSequenceVersionId() ) ) );
 
 			proteinPositions.add( prpp );
 		}
@@ -59,9 +59,9 @@ public class SearchCrosslinkProteinsFromPeptide {
 			@Override
 			public int compare(SearchProteinPosition o1, SearchProteinPosition o2) {
 
-				if ( o1.getProtein().getProteinSequenceObject().getProteinSequenceId() != o2.getProtein().getProteinSequenceObject().getProteinSequenceId() ) {
+				if ( o1.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() != o2.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
 
-					return o1.getProtein().getProteinSequenceObject().getProteinSequenceId() - o2.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					return o1.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() - o2.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 				}
 				return o1.getPosition() - o2.getPosition();
 			}

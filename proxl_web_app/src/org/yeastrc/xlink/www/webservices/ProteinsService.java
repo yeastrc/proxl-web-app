@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -255,10 +255,10 @@ public class ProteinsService {
 				    	        .build()
 				    	        );
 				}
-				ProteinSequenceObject ProteinSequenceObject_1 = new ProteinSequenceObject();
-				ProteinSequenceObject_1.setProteinSequenceId( protein1Id );
-				ProteinSequenceObject ProteinSequenceObject_2 = new ProteinSequenceObject();
-				ProteinSequenceObject_2.setProteinSequenceId( protein2Id );
+				ProteinSequenceVersionObject ProteinSequenceObject_1 = new ProteinSequenceVersionObject();
+				ProteinSequenceObject_1.setProteinSequenceVersionId( protein1Id );
+				ProteinSequenceVersionObject ProteinSequenceObject_2 = new ProteinSequenceVersionObject();
+				ProteinSequenceObject_2.setProteinSequenceVersionId( protein2Id );
 
 				SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper =
 						CrosslinkLinkedPositions.getInstance()
@@ -552,8 +552,8 @@ public class ProteinsService {
 				    	        .build()
 				    	        );
 				}
-				ProteinSequenceObject ProteinSequenceObject = new ProteinSequenceObject();
-				ProteinSequenceObject.setProteinSequenceId( proteinId );
+				ProteinSequenceVersionObject ProteinSequenceObject = new ProteinSequenceVersionObject();
+				ProteinSequenceObject.setProteinSequenceVersionId( proteinId );
 
 				SearchProteinLooplinkWrapper searchProteinLooplinkWrapper =
 						LooplinkLinkedPositions.getInstance()
@@ -850,8 +850,8 @@ public class ProteinsService {
 				    	        .build()
 				    	        );
 				}
-				ProteinSequenceObject ProteinSequenceObject = new ProteinSequenceObject();
-				ProteinSequenceObject.setProteinSequenceId( proteinId );
+				ProteinSequenceVersionObject ProteinSequenceObject = new ProteinSequenceVersionObject();
+				ProteinSequenceObject.setProteinSequenceVersionId( proteinId );
 
 				SearchProteinMonolinkWrapper searchProteinMonolinkWrapper =
 						MonolinkLinkedPositions.getInstance()
@@ -1127,7 +1127,7 @@ public class ProteinsService {
 
 			//  Empty sets since nothing to exclude
 			Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
-			Set<Integer> excludeProteinSequenceIds_Set_UserInput = new HashSet<>();
+			Set<Integer> excludeproteinSequenceVersionIds_Set_UserInput = new HashSet<>();
 			
 			ProteinQueryJSONRoot proteinQueryJSONRoot = new ProteinQueryJSONRoot();
 			proteinQueryJSONRoot.setLinkTypes( linkTypes );
@@ -1157,17 +1157,17 @@ public class ProteinsService {
 				    	        .build()
 				    	        );
 				}
-				ProteinSequenceObject ProteinSequenceObject = new ProteinSequenceObject();
-				ProteinSequenceObject.setProteinSequenceId( proteinId );
+				ProteinSequenceVersionObject ProteinSequenceObject = new ProteinSequenceVersionObject();
+				ProteinSequenceObject.setProteinSequenceVersionId( proteinId );
 
 				ProteinsAllCommonAllResult proteinsAllCommonAllResult =
 						ProteinsAllCommonAll.getInstance().getProteinSingleEntryList(
-								proteinId, //  onlyReturnThisProteinSequenceId
+								proteinId, //  onlyReturnThisproteinSequenceVersionId
 								search, 
 								searchId, 
 								proteinQueryJSONRoot, 
 								excludeTaxonomy_Ids_Set_UserInput, 
-								excludeProteinSequenceIds_Set_UserInput, 
+								excludeproteinSequenceVersionIds_Set_UserInput, 
 								searcherCutoffValuesSearchLevel );
 
 				List<ProteinSingleEntry> proteinSingleEntryList = proteinsAllCommonAllResult.getProteinSingleEntryList();

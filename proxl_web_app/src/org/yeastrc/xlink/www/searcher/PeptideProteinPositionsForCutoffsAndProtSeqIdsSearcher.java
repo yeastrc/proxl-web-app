@@ -15,7 +15,7 @@ import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.www.protein_coverage.PeptideProteinPositionsForCutoffsAndProtSeqIdsResultItem;
+import org.yeastrc.xlink.www.protein_coverage.ProteinCoverageForCutoffsAndProtSeqIdsResultItem;
 import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData;
 import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult;
 import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
@@ -37,38 +37,37 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 	private final String PEPTIDE_VALUE_FILTER_TABLE_ALIAS = "srch__rep_pept_fltrbl_tbl_";
 	
 	private final String SQL_FIRST_PART = 
-			"SELECT peptide_protein_position.reported_peptide_id, "
-			+ " peptide_protein_position.peptide_id, "
-			+ " peptide_protein_position.protein_sequence_id, "
-			+ " peptide_protein_position.protein_start_position, "
-			+ " peptide_protein_position.protein_end_position ";
+			"SELECT protein_coverage.reported_peptide_id, "
+			+ " protein_coverage.protein_sequence_version_id, "
+			+ " protein_coverage.protein_start_position, "
+			+ " protein_coverage.protein_end_position ";
 	
 	private final String SQL_MAIN_FROM_START = 			
 			" FROM "
 			+ " unified_rp__search__rep_pept__generic_lookup "
-			+ " INNER JOIN peptide_protein_position "
+			+ " INNER JOIN protein_coverage "
 			+ 		" ON unified_rp__search__rep_pept__generic_lookup.search_id"
-			+ 				" =  peptide_protein_position.search_id  "
+			+ 				" =  protein_coverage.search_id  "
 			+ 			" AND unified_rp__search__rep_pept__generic_lookup.reported_peptide_id"
-			+ 				" =  peptide_protein_position.reported_peptide_id  ";
+			+ 				" =  protein_coverage.reported_peptide_id  ";
 	
 	private final String SQL_MAIN_WHERE_START = 
-			" WHERE peptide_protein_position.search_id = ? ";
+			" WHERE protein_coverage.search_id = ? ";
 	
 	/**
-	 * Get data from peptide_protein_position
-	 * @param proteinSequenceIds The Protein Sequence Ids
+	 * Get data from protein_coverage
+	 * @param proteinSequenceVersionIds The Protein Sequence Ids
 	 * @param search The search we're searching
 	 * @param searcherCutoffValuesSearchLevel - PSM and Peptide cutoffs for a search id
 	 * @return
 	 * @throws Exception
 	 */
-	public List<PeptideProteinPositionsForCutoffsAndProtSeqIdsResultItem> searchOnSearchIdPsmCutoffPeptideCutoff( 
-			Set<Integer> proteinSequenceIds,
+	public List<ProteinCoverageForCutoffsAndProtSeqIdsResultItem> searchOnSearchIdPsmCutoffPeptideCutoff( 
+			Set<Integer> proteinSequenceVersionIds,
 			SearchDTO search, 
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception {
 		
-		List<PeptideProteinPositionsForCutoffsAndProtSeqIdsResultItem> resultList = new ArrayList<>();
+		List<ProteinCoverageForCutoffsAndProtSeqIdsResultItem> resultList = new ArrayList<>();
 		int searchId = search.getSearchId();
 		List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
 				searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
@@ -152,15 +151,15 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 		sqlSB.append( SQL_MAIN_WHERE_START );
 		//////////
 		///   Add protein sequence ids to WHERE
-		sqlSB.append( " AND peptide_protein_position.protein_sequence_id IN ( " );
+		sqlSB.append( " AND protein_coverage.protein_sequence_version_id IN ( " );
 		boolean firstProtSeqId = true;
-		for ( Integer proteinSequenceId : proteinSequenceIds ) {
+		for ( Integer proteinSequenceVersionId : proteinSequenceVersionIds ) {
 			if ( firstProtSeqId ) {
 				firstProtSeqId = false;
 			} else {
 				sqlSB.append( "," );
 			}
-			sqlSB.append( proteinSequenceId );
+			sqlSB.append( proteinSequenceVersionId );
 		}
 		sqlSB.append( " ) " );
 		// Process PSM Cutoffs for WHERE
@@ -302,11 +301,10 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 						}
 					}
 				}
-				PeptideProteinPositionsForCutoffsAndProtSeqIdsResultItem item = new PeptideProteinPositionsForCutoffsAndProtSeqIdsResultItem();
+				ProteinCoverageForCutoffsAndProtSeqIdsResultItem item = new ProteinCoverageForCutoffsAndProtSeqIdsResultItem();
 				item.setSearchId( searchId );
 				item.setReportedPeptideId( reportedPeptideId );
-				item.setPeptideId( rs.getInt( "peptide_id" ) );
-				item.setProteinSequenceId( rs.getInt( "protein_sequence_id" ) );
+				item.setProteinSequenceVersionId( rs.getInt( "protein_sequence_version_id" ) );
 				item.setProteinStartPosition( rs.getInt( "protein_start_position" ) );
 				item.setProteinEndPosition( rs.getInt( "protein_end_position" ) );
 				resultList.add( item );

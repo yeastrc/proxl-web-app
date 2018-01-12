@@ -23,7 +23,7 @@ var CONSOLE_LOGGING = true;  //  Set to true to get logging, console.log(....)
  */
 var ProteinAnnotationStore = function() {
 	this.annotationData = {};
-	this.annotationSequenceIds = {}; // keyed on ProteinSequenceId
+	this.annotationSequenceIds = {}; // keyed on proteinSequenceVersionId
 	this.currentLoadIdentifierForSubmit = undefined;  // uses Date.now();
 	this.currentLoadIdentifierForAllLoaded = undefined;  // uses Date.now();
 };
@@ -436,7 +436,7 @@ ProteinAnnotationStore.prototype._get_AnnotationData_Common_ForProteinId = funct
 	var annotationTypeData_For_proteinId = annotationTypeData[ proteinId ];
 	if ( annotationTypeData_For_proteinId === undefined 
 			|| annotationTypeData_For_proteinId.status === objectThis.CONSTANTS.SERVER_STATUS_VALUES.STATUS_NO_RECORD ) {
-		throw Error( "_get_AnnotationData_Common_ForProteinId: Unable to get PAWS proteinSequenceId for protein id: " + proteinId );
+		throw Error( "_get_AnnotationData_Common_ForProteinId: Unable to get PAWS proteinSequenceVersionId for protein id: " + proteinId );
 	}
 	var sequenceId = annotationTypeData_For_proteinId.sequenceId;
 	if ( sequenceId === undefined ) {

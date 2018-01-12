@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +38,7 @@ import org.yeastrc.xlink.www.objects.MergedSearchProteinLooplink;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+
 /**
  * 
  *
@@ -168,35 +168,35 @@ public class DownloadMergedProteinsXvisLengthsAction extends Action {
 				
 				for( MergedSearchProteinCrosslink link : crosslinks ) {
 
-					if( !outputProteinIds.contains( link.getProtein1().getProteinSequenceObject().getProteinSequenceId() ) ) {
+					if( !outputProteinIds.contains( link.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) ) {
 						
 						String name = fixFormattingForName( link.getProtein1().getName() );					
 
-						writer.write( name + "," + link.getProtein1().getProteinSequenceObject().getSequence().length() + "\n" );
+						writer.write( name + "," + link.getProtein1().getProteinSequenceVersionObject().getProteinSequenceObject().getSequence().length() + "\n" );
 						
-						outputProteinIds.add( link.getProtein1().getProteinSequenceObject().getProteinSequenceId() );
+						outputProteinIds.add( link.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					}
 					
-					if( !outputProteinIds.contains( link.getProtein2().getProteinSequenceObject().getProteinSequenceId() ) ) {
+					if( !outputProteinIds.contains( link.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) ) {
 						
 						String name = fixFormattingForName( link.getProtein2().getName() );					
 
-						writer.write( name + "," + link.getProtein2().getProteinSequenceObject().getSequence().length() + "\n" );
+						writer.write( name + "," + link.getProtein2().getProteinSequenceVersionObject().getProteinSequenceObject().getSequence().length() + "\n" );
 						
-						outputProteinIds.add( link.getProtein2().getProteinSequenceObject().getProteinSequenceId() );
+						outputProteinIds.add( link.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					}
 					
 				}
 				
 				for( MergedSearchProteinLooplink link : looplinks ) {
 
-					if( !outputProteinIds.contains( link.getProtein().getProteinSequenceObject().getProteinSequenceId() ) ) {
+					if( !outputProteinIds.contains( link.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) ) {
 						
 						String name = fixFormattingForName( link.getProtein().getName() );					
 
-						writer.write( name + "," + link.getProtein().getProteinSequenceObject().getSequence().length() + "\n" );
+						writer.write( name + "," + link.getProtein().getProteinSequenceVersionObject().getProteinSequenceObject().getSequence().length() + "\n" );
 						
-						outputProteinIds.add( link.getProtein().getProteinSequenceObject().getProteinSequenceId() );
+						outputProteinIds.add( link.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					}
 				}
 				

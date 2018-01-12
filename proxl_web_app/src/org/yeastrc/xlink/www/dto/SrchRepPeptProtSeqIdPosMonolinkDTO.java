@@ -14,14 +14,14 @@ public class SrchRepPeptProtSeqIdPosMonolinkDTO {
 	private int reportedPeptideId;
 	private int searchReportedPeptidepeptideId;
 	private int peptidePosition;
-	private int proteinSequenceId;
+	private int proteinSequenceVersionId;
 	private int proteinSequencePosition;
 	
 	@Override
 	public String toString() {
 		return "SrchRepPeptProtSeqIdPosMonolinkDTO [id=" + id + ", searchId=" + searchId + ", reportedPeptideId="
 				+ reportedPeptideId + ", searchReportedPeptidepeptideId=" + searchReportedPeptidepeptideId
-				+ ", peptidePosition=" + peptidePosition + ", proteinSequenceId=" + proteinSequenceId
+				+ ", peptidePosition=" + peptidePosition + ", proteinSequenceVersionId=" + proteinSequenceVersionId
 				+ ", proteinSequencePosition=" + proteinSequencePosition + "]";
 	}
 	
@@ -49,12 +49,6 @@ public class SrchRepPeptProtSeqIdPosMonolinkDTO {
 	public void setSearchReportedPeptidepeptideId(int searchReportedPeptidepeptideId) {
 		this.searchReportedPeptidepeptideId = searchReportedPeptidepeptideId;
 	}
-	public int getProteinSequenceId() {
-		return proteinSequenceId;
-	}
-	public void setProteinSequenceId(int proteinSequenceId) {
-		this.proteinSequenceId = proteinSequenceId;
-	}
 	public int getProteinSequencePosition() {
 		return proteinSequencePosition;
 	}
@@ -66,6 +60,14 @@ public class SrchRepPeptProtSeqIdPosMonolinkDTO {
 	}
 	public void setPeptidePosition(int peptidePosition) {
 		this.peptidePosition = peptidePosition;
+	}
+
+	public int getProteinSequenceVersionId() {
+		return proteinSequenceVersionId;
+	}
+
+	public void setProteinSequenceVersionId(int proteinSequenceVersionId) {
+		this.proteinSequenceVersionId = proteinSequenceVersionId;
 	}
 		
 }

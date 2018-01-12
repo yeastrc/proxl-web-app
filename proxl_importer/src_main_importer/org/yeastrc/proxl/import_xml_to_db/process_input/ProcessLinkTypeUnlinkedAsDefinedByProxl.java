@@ -10,8 +10,8 @@ import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProteinImporterContainerDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReportedPeptideDynamicModLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptProtSeqIdPosUnlinkedDAO;
-import org.yeastrc.proxl.import_xml_to_db.dto.PeptideProteinPositionDTO;
-import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.ProteinCoverageDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceVersionDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDynamicModLookupDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosMonolinkDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosUnlinkedDTO;
@@ -22,7 +22,7 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralExcepti
 import org.yeastrc.proxl.import_xml_to_db.objects.MonolinkContainer;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
-import org.yeastrc.proxl.import_xml_to_db.peptide_protein_position.PeptideProteinPositionDTO_SaveToDB_NoDups;
+import org.yeastrc.proxl.import_xml_to_db.peptide_protein_position.ProteinCoverageDTO_SaveToDB_NoDups;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.Peptides;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
@@ -113,7 +113,7 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 		perPeptideData.setSrchRepPeptPeptideDTO( srchRepPeptPeptideDTO );
 		Collection<ProteinImporterContainer> proteinMatches_Peptide = 
 				GetProteinsForPeptide.getInstance()
-				.getProteinsForPeptides( peptideDTO.getSequence() );
+				.getProteinsForPeptide( peptide, reportedPeptide /* for error reporting */ );
 		// get proteins and linkable positions in those proteins that are mapped to by the given peptides and positions
 		Map<ProteinImporterContainer, Collection<Integer>> proteinMap = 
 				GetLinkableProteinsAndPositions.getInstance()
@@ -156,16 +156,18 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 			srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_PairList.add( srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair );
 			for ( Integer peptidePositionsInProtein : peptidePositionsInProteinCollection ) {
 				//  Process the monolink positions
-				for ( Integer peptideMonolinkPosition : peptideMonolinkPositionList ) {
-					//  Convert peptide monolink position to protein position
-					int proteinMonolinkPosition = peptidePositionsInProtein + peptideMonolinkPosition - 1; 
-					SrchRepPeptProtSeqIdPosMonolinkDTO srchRepPeptProtSeqIdPosMonolinkDTO = new SrchRepPeptProtSeqIdPosMonolinkDTO();
-					srchRepPeptProtSeqIdPosMonolinkDTO.setPeptidePosition( peptideMonolinkPosition );
-					srchRepPeptProtSeqIdPosMonolinkDTO.setProteinSequencePosition( proteinMonolinkPosition );
-					MonolinkContainer monolinkContainer = new MonolinkContainer();
-					monolinkContainer.setProteinImporterContainer( proteinImporterContainer );
-					monolinkContainer.setSrchRepPeptProtSeqIdPosMonolinkDTO( srchRepPeptProtSeqIdPosMonolinkDTO );
-					monolinkContainerList.add( monolinkContainer );
+				if ( peptideMonolinkPositionList != null && ( ! peptideMonolinkPositionList.isEmpty() ) ) {
+					for ( Integer peptideMonolinkPosition : peptideMonolinkPositionList ) {
+						//  Convert peptide monolink position to protein position
+						int proteinMonolinkPosition = peptidePositionsInProtein + peptideMonolinkPosition - 1; 
+						SrchRepPeptProtSeqIdPosMonolinkDTO srchRepPeptProtSeqIdPosMonolinkDTO = new SrchRepPeptProtSeqIdPosMonolinkDTO();
+						srchRepPeptProtSeqIdPosMonolinkDTO.setPeptidePosition( peptideMonolinkPosition );
+						srchRepPeptProtSeqIdPosMonolinkDTO.setProteinSequencePosition( proteinMonolinkPosition );
+						MonolinkContainer monolinkContainer = new MonolinkContainer();
+						monolinkContainer.setProteinImporterContainer( proteinImporterContainer );
+						monolinkContainer.setSrchRepPeptProtSeqIdPosMonolinkDTO( srchRepPeptProtSeqIdPosMonolinkDTO );
+						monolinkContainerList.add( monolinkContainer );
+					}
 				}
 			}
 		}  //end looping over proteins
@@ -186,8 +188,7 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 	public List<PerPeptideData> saveUnlinkedData( 
 			ReportedPeptideDTO reportedPeptideDTO, 
 			int searchId, 
-			GetUnlinkedProteinMappingsResult getUnlinkedProteinMappingsResult,
-			Set<Double> uniqueDynamicModMassesForTheSearch
+			GetUnlinkedProteinMappingsResult getUnlinkedProteinMappingsResult
 			) throws Exception {
 		
 		//  Save ProteinImporterContainer if needed first since used in SavePerPeptideData.getInstance().savePerPeptideData(...)
@@ -209,9 +210,9 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 		for ( SrchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair
 				: getUnlinkedProteinMappingsResult.srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_PairList ) {
 			ProteinImporterContainer proteinImporterContainer = srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair.proteinImporterContainer;
-			ProteinSequenceDTO proteinSequenceDTO = proteinImporterContainer.getProteinSequenceDTO();
+			ProteinSequenceVersionDTO proteinSequenceVersionDTO = proteinImporterContainer.getProteinSequenceVersionDTO();
 			SrchRepPeptProtSeqIdPosUnlinkedDTO srchRepPeptProtSeqIdPosUnlinkedDimerDTO = srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair.srchRepPeptProtSeqIdPosUnlinkedDimer;
-			srchRepPeptProtSeqIdPosUnlinkedDimerDTO.setProteinSequenceId( proteinSequenceDTO.getId() );
+			srchRepPeptProtSeqIdPosUnlinkedDimerDTO.setProteinSequenceVersionId( proteinSequenceVersionDTO.getId() );
 			srchRepPeptProtSeqIdPosUnlinkedDimerDTO.setSearchId( searchId );
 			srchRepPeptProtSeqIdPosUnlinkedDimerDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
 			srchRepPeptProtSeqIdPosUnlinkedDimerDTO.setSearchReportedPeptidepeptideId( searchReportedPeptidepeptideId );
@@ -219,27 +220,28 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 			//  Insert PeptideProteinPositionDTO record for protein coverage
 			Collection<Integer> peptidePositionsInProteinCollection = srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair.peptidePositionsInProteinCollection;
 			for ( Integer peptidePositionInProtein : peptidePositionsInProteinCollection ) {
-				PeptideProteinPositionDTO peptideProteinPositionDTO = new PeptideProteinPositionDTO();
-				peptideProteinPositionDTO.setSearchId( searchId );
-				peptideProteinPositionDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
-				peptideProteinPositionDTO.setPeptideId( peptideDTO.getId() );
-				peptideProteinPositionDTO.setProteinSequenceId( proteinSequenceDTO.getId() );
-				peptideProteinPositionDTO.setProteinStartPosition( peptidePositionInProtein );
-				peptideProteinPositionDTO.setProteinEndPosition( peptidePositionInProtein + peptideLength - 1 );
-				PeptideProteinPositionDTO_SaveToDB_NoDups.getInstance().peptideProteinPositionDTO_SaveToDB_NoDups( peptideProteinPositionDTO );
+				ProteinCoverageDTO proteinCoverageDTO = new ProteinCoverageDTO();
+				proteinCoverageDTO.setSearchId( searchId );
+				proteinCoverageDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
+				proteinCoverageDTO.setPeptideIdInfoOnly( peptideDTO.getId() );
+				proteinCoverageDTO.setProteinSequenceVersionId( proteinSequenceVersionDTO.getId() );
+				proteinCoverageDTO.setProteinStartPosition( peptidePositionInProtein );
+				proteinCoverageDTO.setProteinEndPosition( peptidePositionInProtein + peptideLength - 1 );
+				ProteinCoverageDTO_SaveToDB_NoDups.getInstance().proteinCoverageDTO_SaveToDB_NoDups( proteinCoverageDTO );
 			}
 		}
-		//  Save Dynamic Mod Masses into Lookup table and into Set for Search level lookup
-		for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide() ) {
-			SearchReportedPeptideDynamicModLookupDTO item = new SearchReportedPeptideDynamicModLookupDTO();
-			item.setDynamicModMass( srchRepPeptPeptDynamicModDTO.getMass() );
-			item.setLinkType( XLinkUtils.TYPE_UNLINKED );
-			item.setReportedPeptideId( reportedPeptideDTO.getId() );
-			item.setSearchId( searchId );
-			DB_Insert_SearchReportedPeptideDynamicModLookupDAO.getInstance().saveToDatabaseIgnoreDuplicates( item );
-			//  Accumulate mod mass values across the search 
-			uniqueDynamicModMassesForTheSearch.add( srchRepPeptPeptDynamicModDTO.getMass() );
+		//  Save Dynamic Mod Masses into Lookup table
+		if ( perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide() != null && ( ! perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide().isEmpty() ) ) {
+			for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide() ) {
+				SearchReportedPeptideDynamicModLookupDTO item = new SearchReportedPeptideDynamicModLookupDTO();
+				item.setDynamicModMass( srchRepPeptPeptDynamicModDTO.getMass() );
+				item.setLinkType( XLinkUtils.TYPE_UNLINKED );
+				item.setReportedPeptideId( reportedPeptideDTO.getId() );
+				item.setSearchId( searchId );
+				DB_Insert_SearchReportedPeptideDynamicModLookupDAO.getInstance().saveToDatabaseIgnoreDuplicates( item );
+			}
 		}
+		
 		//   Determine if peptide is only mapped to one protein and save that to perPeptideData
 		List<SrchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair> srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_PairList_Peptide =
 				getUnlinkedProteinMappingsResult.srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_PairList;	
@@ -259,9 +261,9 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 			SrchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair firstSrchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair =
 					srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_PairList_Peptide.get( 0 );
 			SrchRepPeptProtSeqIdPosUnlinkedDTO firstSrchRepPeptProtSeqIdPosUnlinkedDimerDTO = firstSrchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair.srchRepPeptProtSeqIdPosUnlinkedDimer;
-			int firstProteinSequenceId = firstSrchRepPeptProtSeqIdPosUnlinkedDimerDTO.getProteinSequenceId();
+			int firstProteinSequenceVersionId = firstSrchRepPeptProtSeqIdPosUnlinkedDimerDTO.getProteinSequenceVersionId();
 			for ( SrchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_Pair item : srchRepPeptProtSeqIdPosUnlinkedDimerDTO_ProteinImporterContainer_PairList_Peptide ) {
-				if ( firstProteinSequenceId != item.srchRepPeptProtSeqIdPosUnlinkedDimer.getProteinSequenceId() ) {
+				if ( firstProteinSequenceVersionId != item.srchRepPeptProtSeqIdPosUnlinkedDimer.getProteinSequenceVersionId() ) {
 					//  Found record with different protein sequence id so peptide is not unique
 					peptideIdMapsToOnlyOneProtein = false;
 					break;

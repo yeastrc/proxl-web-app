@@ -265,7 +265,7 @@
 						<%--  shortened property from "excludeProtein" to "excP" to shorten the URL  --%>
 						<%-- TODO   TEMP
 						<html:select property="excP" multiple="true" styleId="excludeProtein" >
-							<html:options collection="proteins" property="proteinSequenceObject.proteinSequenceId" labelProperty="name" />
+							<html:options collection="proteins" property="proteinSequenceVersionObject.proteinSequenceVersionId" labelProperty="name" />
 						</html:select>
 						--%>
 						
@@ -277,7 +277,7 @@
 						<select name="excludedProteins" multiple="multiple" id="excludeProtein" >  
 						  
 	  						<logic:iterate id="protein" name="allProteinsForCrosslinksAndLooplinksUnfilteredList">
-	  						  <option value="<c:out value="${ protein.proteinSequenceObject.proteinSequenceId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
+	  						  <option value="<c:out value="${ protein.proteinSequenceVersionObject.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
 	  						</logic:iterate>
 	  					</select>
 									
@@ -476,8 +476,8 @@
 								
 								onclick="viewCrosslinkProteinsLoadedFromWebServiceTemplate.showHideCrosslinkProteins( { clickedElement : this })"
 								data-project_search_ids="<c:forEach var="searchEntryForThisRow" items="${ proteinEntry.searches }">,${ searchEntryForThisRow.projectSearchId }</c:forEach>"
-								data-protein_1_id="<bean:write name="proteinEntry" property="protein1.proteinSequenceObject.proteinSequenceId" />"
-								data-protein_2_id="<bean:write name="proteinEntry" property="protein2.proteinSequenceObject.proteinSequenceId" />"
+								data-protein_1_id="<bean:write name="proteinEntry" property="protein1.proteinSequenceVersionObject.proteinSequenceVersionId" />"
+								data-protein_2_id="<bean:write name="proteinEntry" property="protein2.proteinSequenceVersionObject.proteinSequenceVersionId" />"
 								data-protein_1_position="<bean:write name="proteinEntry" property="protein1Position" />"
 								data-protein_2_position="<bean:write name="proteinEntry" property="protein2Position" />"
 							>
@@ -513,9 +513,9 @@
 									</a>
 								</td>								
 								
-								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein1.proteinSequenceObject.proteinSequenceId" />"><bean:write name="proteinEntry" property="protein1.name" /></span></td>
+								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein1.proteinSequenceVersionObject.proteinSequenceVersionId" />"><bean:write name="proteinEntry" property="protein1.name" /></span></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="protein1Position" /></td>
-								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein2.proteinSequenceObject.proteinSequenceId" />"><bean:write name="proteinEntry" property="protein2.name" /></span></td>
+								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein2.proteinSequenceVersionObject.proteinSequenceVersionId" />"><bean:write name="proteinEntry" property="protein2.name" /></span></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="protein2Position" /></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="numPsms" /></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="numLinkedPeptides" /></td>

@@ -14,6 +14,7 @@ public class SearchDTO_Importer {
 	private String fastaFilename;
 	private String directoryName;
 	private boolean hasScanData;
+	private boolean hasIsotopeLabel;
 	private Integer createdByUserId;
 
 	//  Setters and Getters
@@ -59,6 +60,12 @@ public class SearchDTO_Importer {
 	}
 	public void setCreatedByUserId(Integer createdByUserId) {
 		this.createdByUserId = createdByUserId;
+	}
+	public boolean isHasIsotopeLabel() {
+		return hasIsotopeLabel;
+	}
+	public void setHasIsotopeLabel(boolean hasIsotopeLabel) {
+		this.hasIsotopeLabel = hasIsotopeLabel;
 	}
 
 }

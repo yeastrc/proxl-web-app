@@ -16,13 +16,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
+import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsForProtSeqIdSearchId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Request;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Result;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -38,7 +38,7 @@ public class ViewerProteinNCBITaxonomyIdService {
 	@Path("/getDataForProtein") 
 	public Map<Integer, Integer> getTaxonomyIdsDataForProteinIds( 
 			@QueryParam( "projectSearchIds" ) List<Integer> projectSearchIdList,
-			@QueryParam( "proteinIds" ) List<Integer>  proteinSequenceIds,  // "proteinIds" to remain compatible with JS code
+			@QueryParam( "proteinIds" ) List<Integer>  proteinSequenceVersionIds,  // "proteinIds" to remain compatible with JS code
 			@Context HttpServletRequest request )
 	throws Exception {
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
@@ -50,7 +50,7 @@ public class ViewerProteinNCBITaxonomyIdService {
 		    	        .build()
 		    	        );
 		}
-		if ( proteinSequenceIds == null || proteinSequenceIds.isEmpty() ) {
+		if ( proteinSequenceVersionIds == null || proteinSequenceVersionIds.isEmpty() ) {
 			String msg = "Provided proteinIds is null or empty";
 			log.error( msg );
 		    throw new WebApplicationException(
@@ -130,11 +130,11 @@ public class ViewerProteinNCBITaxonomyIdService {
 			}
 			
 			Map<Integer, Integer> proteinIdsTaxonomyIdsMap = new HashMap<Integer, Integer>();
-			for ( Integer proteinSequenceId : proteinSequenceIds ) {
+			for ( Integer proteinSequenceVersionId : proteinSequenceVersionIds ) {
 				//  don't load duplicates;
-				if ( ! proteinIdsTaxonomyIdsMap.containsKey( proteinSequenceId ) ) {
-					ProteinSequenceObject proteinSequenceObject = 
-							ProteinSequenceObjectFactory.getProteinSequenceObject( proteinSequenceId );
+				if ( ! proteinIdsTaxonomyIdsMap.containsKey( proteinSequenceVersionId ) ) {
+					ProteinSequenceVersionObject proteinSequenceVersionObject = 
+							ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( proteinSequenceVersionId );
 					//  Get a taxonomy id for protein sequence id and search id
 					boolean foundTaxonomyIdZero = false;
 					final int taxonomyIdSmallestNonZeroInitialValue = Integer.MAX_VALUE;
@@ -144,9 +144,9 @@ public class ViewerProteinNCBITaxonomyIdService {
 						TaxonomyIdsForProtSeqIdSearchId_Request taxonomyIdsForProtSeqIdSearchId_Request =
 								new TaxonomyIdsForProtSeqIdSearchId_Request();
 						taxonomyIdsForProtSeqIdSearchId_Request.setSearchId( searchId );
-						taxonomyIdsForProtSeqIdSearchId_Request.setProteinSequenceId( proteinSequenceObject.getProteinSequenceId() );
+						taxonomyIdsForProtSeqIdSearchId_Request.setProteinSequenceVersionId( proteinSequenceVersionObject.getProteinSequenceVersionId() );
 						TaxonomyIdsForProtSeqIdSearchId_Result taxonomyIdsForProtSeqIdSearchId_Result =
-								Cached_TaxonomyIdsForProtSeqIdSearchId.getInstance()
+								Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId.getInstance()
 								.getTaxonomyIdsForProtSeqIdSearchId_Result( taxonomyIdsForProtSeqIdSearchId_Request );
 						Set<Integer> taxonomyIds = taxonomyIdsForProtSeqIdSearchId_Result.getTaxonomyIds();
 
@@ -163,7 +163,7 @@ public class ViewerProteinNCBITaxonomyIdService {
 						}
 					}
 					if ( ( ! foundTaxonomyIdZero ) && taxonomyIdSmallestNonZero == taxonomyIdSmallestNonZeroInitialValue ) {
-						String msg = "Failed to find a taxonomy id for proteinSequenceId: " + proteinSequenceId
+						String msg = "Failed to find a taxonomy id for proteinSequenceVersionId: " + proteinSequenceVersionId
 								+ ", all search ids: " + searchIdsSet;
 						log.error( msg );
 						throw new WebApplicationException(
@@ -176,7 +176,7 @@ public class ViewerProteinNCBITaxonomyIdService {
 					if ( ( foundTaxonomyIdZero ) && taxonomyIdSmallestNonZero == taxonomyIdSmallestNonZeroInitialValue ) {
 						taxonomyId = 0;
 					}
-					proteinIdsTaxonomyIdsMap.put( proteinSequenceId, taxonomyId );
+					proteinIdsTaxonomyIdsMap.put( proteinSequenceVersionId, taxonomyId );
 				}
 			}
 			return proteinIdsTaxonomyIdsMap;

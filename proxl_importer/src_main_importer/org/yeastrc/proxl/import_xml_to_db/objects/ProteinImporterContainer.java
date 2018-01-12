@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.proxl.import_xml_to_db.dto.AnnotationDTO;
-import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceDTO;
-import org.yeastrc.proxl.import_xml_to_db.dto.SearchProteinSequenceAnnotationDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceV2DTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceVersionDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchProteinSequenceVersionAnnotationDTO;
+import org.yeastrc.proxl.import_xml_to_db.utils.GetIsotopeLabelIdFor_Protein_or_Peptide_FromProxlXMLFile;
 import org.yeastrc.proxl.import_xml_to_db.utils.PeptideProteinSequenceForProteinInference;
 import org.yeastrc.proxl.import_xml_to_db.utils.ProteinAnnotationNameTruncationUtil;
 import org.yeastrc.proxl_import.api.xml_dto.Protein;
@@ -13,8 +15,16 @@ import org.yeastrc.proxl_import.api.xml_dto.ProteinAnnotation;
 
 /**
  * Encapsulates a Protein for the Importer
+ * 
+ * equals(...) comparisons and hashcode() Based On:
+ * 
+ *    proteinSequenceVersionDTO.isotopeLabelId
+ *    proteinSequenceV2DTO
+ *    
  *
  * Holds:
+ * 
+ * a ProteinSequenceVersionDTO
  * 
  * a ProteinSequenceDTO - Used for equals(...) comparisons and hashcode()
  * 
@@ -26,13 +36,15 @@ import org.yeastrc.proxl_import.api.xml_dto.ProteinAnnotation;
 
 public class ProteinImporterContainer {
 
-	private ProteinSequenceDTO proteinSequenceDTO;
+	private ProteinSequenceV2DTO proteinSequenceV2DTO;
 	
 	private String proteinSequenceForProteinInference;
 
+	private ProteinSequenceVersionDTO proteinSequenceVersionDTO;
+	
 	private List<AnnotationDTO> annotationDTOList;
 
-	private List<SearchProteinSequenceAnnotationDTO> searchProteinSequenceAnnotationDTOList;
+	private List<SearchProteinSequenceVersionAnnotationDTO> searchProteinSequenceVersionAnnotationDTOList;
 	
 	private Protein proteinFromProxlXMLFile;
 	
@@ -42,32 +54,37 @@ public class ProteinImporterContainer {
 	
 	/**
 	 * get ProteinImporterContainer from protein in Proxl XML File
+	 * @throws Exception 
 	 *
 	 */
-	public static ProteinImporterContainer getInstance( Protein proteinFromProxlXMLFile ) {
+	public static ProteinImporterContainer getInstance( Protein proteinFromProxlXMLFile ) throws Exception {
 		
 		ProteinImporterContainer proteinImporterContainer = new ProteinImporterContainer();
 	
-		
-		proteinImporterContainer.proteinSequenceDTO = new ProteinSequenceDTO( proteinFromProxlXMLFile.getSequence() );
+		proteinImporterContainer.proteinSequenceV2DTO = new ProteinSequenceV2DTO( proteinFromProxlXMLFile.getSequence() );
 		
 		proteinImporterContainer.proteinFromProxlXMLFile = proteinFromProxlXMLFile;
 		
 		proteinImporterContainer.proteinSequenceForProteinInference =
 				PeptideProteinSequenceForProteinInference.getSingletonInstance()
 				.convert_PeptideOrProtein_SequenceFor_I_L_Equivalence_ChangeTo_J( proteinFromProxlXMLFile.getSequence() );
+
+		proteinImporterContainer.proteinSequenceVersionDTO = new ProteinSequenceVersionDTO();
+		
+		GetIsotopeLabelIdFor_Protein_or_Peptide_FromProxlXMLFile.GetIsotopeLabelIdFor_Protein_or_Peptide_FromProxlXMLFile_Result result =
+				GetIsotopeLabelIdFor_Protein_or_Peptide_FromProxlXMLFile.getInstance().getIsotopeLabelIdFor_Protein_FromProxlXMLFile( proteinFromProxlXMLFile );
+		proteinImporterContainer.proteinSequenceVersionDTO.setIsotopeLabelId( result.getIsotopeLabelId() );
 		
 		return proteinImporterContainer;
 	}
+	
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((proteinSequenceDTO == null) ? 0 : proteinSequenceDTO
-						.hashCode());
+		result = prime * result + proteinSequenceVersionDTO.getIsotopeLabelId();
+		result = prime * result + ((proteinSequenceV2DTO == null) ? 0 : proteinSequenceV2DTO.hashCode());
 		return result;
 	}
 
@@ -80,20 +97,25 @@ public class ProteinImporterContainer {
 		if (getClass() != obj.getClass())
 			return false;
 		ProteinImporterContainer other = (ProteinImporterContainer) obj;
-		if (proteinSequenceDTO == null) {
-			if (other.proteinSequenceDTO != null)
+		if (proteinSequenceVersionDTO.getIsotopeLabelId() != other.proteinSequenceVersionDTO.getIsotopeLabelId())
+			return false;
+		if (proteinSequenceV2DTO == null) {
+			if (other.proteinSequenceV2DTO != null)
 				return false;
-		} else if (!proteinSequenceDTO.equals(other.proteinSequenceDTO))
+		} else if (!proteinSequenceV2DTO.equals(other.proteinSequenceV2DTO))
 			return false;
 		return true;
 	}
 
-	public ProteinSequenceDTO getProteinSequenceDTO() {
-		return proteinSequenceDTO;
+	
+	///////////////////////////////
+
+	public ProteinSequenceV2DTO getProteinSequenceDTO() {
+		return proteinSequenceV2DTO;
 	}
 
-	public void setProteinSequenceDTO(ProteinSequenceDTO proteinSequenceDTO) {
-		this.proteinSequenceDTO = proteinSequenceDTO;
+	public void setProteinSequenceDTO(ProteinSequenceV2DTO proteinSequenceV2DTO) {
+		this.proteinSequenceV2DTO = proteinSequenceV2DTO;
 	}
 
 	public List<AnnotationDTO> getAnnotationDTOList() {
@@ -132,13 +154,13 @@ public class ProteinImporterContainer {
 		this.annotationDTOList = annotationDTOList;
 	}
 
-	public List<SearchProteinSequenceAnnotationDTO> getSearchProteinSequenceAnnotationDTOList() {
-		return searchProteinSequenceAnnotationDTOList;
+	public List<SearchProteinSequenceVersionAnnotationDTO> getSearchProteinSequenceAnnotationDTOList() {
+		return searchProteinSequenceVersionAnnotationDTOList;
 	}
 
 	public void setSearchProteinSequenceAnnotationDTOList(
-			List<SearchProteinSequenceAnnotationDTO> searchProteinSequenceAnnotationDTOList) {
-		this.searchProteinSequenceAnnotationDTOList = searchProteinSequenceAnnotationDTOList;
+			List<SearchProteinSequenceVersionAnnotationDTO> searchProteinSequenceVersionAnnotationDTOList) {
+		this.searchProteinSequenceVersionAnnotationDTOList = searchProteinSequenceVersionAnnotationDTOList;
 	}
 
 	public int getSearchId() {
@@ -159,6 +181,16 @@ public class ProteinImporterContainer {
 
 	public String getProteinSequenceForProteinInference() {
 		return proteinSequenceForProteinInference;
+	}
+
+
+	public ProteinSequenceVersionDTO getProteinSequenceVersionDTO() {
+		return proteinSequenceVersionDTO;
+	}
+
+
+	public void setProteinSequenceVersionDTO(ProteinSequenceVersionDTO proteinSequenceVersionDTO) {
+		this.proteinSequenceVersionDTO = proteinSequenceVersionDTO;
 	}
 
 }

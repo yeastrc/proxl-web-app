@@ -44,8 +44,8 @@ public class CreatePsmCountsVsScoreQCPlotData {
 	 * @param selectedLinkTypes
 	 * @param annotationTypeId
 	 * @param psmScoreCutoff
-	 * @param proteinSequenceIdsToIncludeList
-	 * @param proteinSequenceIdsToExcludeList
+	 * @param proteinSequenceVersionIdsToIncludeList
+	 * @param proteinSequenceVersionIdsToExcludeList
 	 * @return
 	 * @throws Exception
 	 */
@@ -55,8 +55,8 @@ public class CreatePsmCountsVsScoreQCPlotData {
 			Set<String> selectedLinkTypes, 
 			Integer annotationTypeId, 
 			Double psmScoreCutoff,
-			List<Integer> proteinSequenceIdsToIncludeList,
-			List<Integer> proteinSequenceIdsToExcludeList ) throws Exception {
+			List<Integer> proteinSequenceVersionIdsToIncludeList,
+			List<Integer> proteinSequenceVersionIdsToExcludeList ) throws Exception {
 		
 		if ( selectedLinkTypes == null || selectedLinkTypes.isEmpty() ) {
 			String msg = "selectedLinkTypes cannot be empty.";
@@ -177,8 +177,8 @@ public class CreatePsmCountsVsScoreQCPlotData {
 						linkType, 
 						annotationTypeId, 
 						psmScoreCutoff, 
-						proteinSequenceIdsToIncludeList,
-						proteinSequenceIdsToExcludeList );
+						proteinSequenceVersionIdsToIncludeList,
+						proteinSequenceVersionIdsToExcludeList );
 			scoreValuesForSelectedTypesMap.put( selectedLinkType, scoreValuesForPSMsthatMeetCriteriaList );
 		}
 		double maxScore = 0;
@@ -238,8 +238,8 @@ public class CreatePsmCountsVsScoreQCPlotData {
 								scanFileId, 
 								linkType, 
 								annotationTypeId, 
-								proteinSequenceIdsToIncludeList,
-								proteinSequenceIdsToExcludeList );
+								proteinSequenceVersionIdsToIncludeList,
+								proteinSequenceVersionIdsToExcludeList );
 			}
 			PsmCountsVsScoreQCPlotDataJSONPerType linkData = null;
 			if ( PeptideViewLinkTypesConstants.ALL_PSM.equals( selectedLinkType ) ) {

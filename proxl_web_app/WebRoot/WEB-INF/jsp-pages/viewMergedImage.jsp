@@ -79,7 +79,7 @@
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 		
 
-		<script type="text/javascript" src="${ contextPath }/js/nrseqProteinIdToProteinSequenceIdLookup.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/nrseqProteinIdToProteinSequenceVersionIdLookup.js?x=${cacheBustValue}"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
 

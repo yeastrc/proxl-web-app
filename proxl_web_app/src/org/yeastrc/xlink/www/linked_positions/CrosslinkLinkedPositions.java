@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.objects.ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosCrosslinkDTO;
@@ -20,7 +20,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
+import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.objects.SearchPeptideCrosslink;
 import org.yeastrc.xlink.www.objects.SearchPeptideCrosslinkAnnDataWrapper;
 import org.yeastrc.xlink.www.objects.SearchProtein;
@@ -136,8 +136,8 @@ public class CrosslinkLinkedPositions {
 					SrchRepPeptProtSeqIdPosCrosslinkDTO srchRepPeptProtSeqIdPosCrosslinkDTO_Item_1 = srchRepPeptProtSeqIdPosCrosslinkDTO_Entry_A_Item;
 					SrchRepPeptProtSeqIdPosCrosslinkDTO srchRepPeptProtSeqIdPosCrosslinkDTO_Item_2 = srchRepPeptProtSeqIdPosCrosslinkDTO_Entry_B_Item;
 					//  Order so:  ( id1 < id2 ) or ( id1 == id2 and pos1 <= pos2 )
-					if ( ( srchRepPeptProtSeqIdPosCrosslinkDTO_Item_1.getProteinSequenceId() > srchRepPeptProtSeqIdPosCrosslinkDTO_Item_2.getProteinSequenceId() )
-							|| ( srchRepPeptProtSeqIdPosCrosslinkDTO_Item_1.getProteinSequenceId() == srchRepPeptProtSeqIdPosCrosslinkDTO_Item_2.getProteinSequenceId()
+					if ( ( srchRepPeptProtSeqIdPosCrosslinkDTO_Item_1.getProteinSequenceVersionId() > srchRepPeptProtSeqIdPosCrosslinkDTO_Item_2.getProteinSequenceVersionId() )
+							|| ( srchRepPeptProtSeqIdPosCrosslinkDTO_Item_1.getProteinSequenceVersionId() == srchRepPeptProtSeqIdPosCrosslinkDTO_Item_2.getProteinSequenceVersionId()
 									&& srchRepPeptProtSeqIdPosCrosslinkDTO_Item_1.getProteinSequencePosition() > srchRepPeptProtSeqIdPosCrosslinkDTO_Item_2.getProteinSequencePosition() ) ) {
 						//  Swap order for consistency of displayed data and to match order the crosslink records were inserted in
 						srchRepPeptProtSeqIdPosCrosslinkDTO_Item_1 = srchRepPeptProtSeqIdPosCrosslinkDTO_Entry_B_Item;
@@ -149,10 +149,10 @@ public class CrosslinkLinkedPositions {
 					//  Process into Map of protein 1, position 1, protein 2, position 2 objects
 					// Map<Integer,Map<Integer,Map<Integer,Map<Integer,RepPept_Stage_1_Wrapper>>>> repPept_Stage_1_Wrapper_MappedProt1Pos1Prot2Pos2 = new HashMap<>();
 					Map<Integer,Map<Integer,Map<Integer,RepPept_Stage_1_Wrapper>>> repPept_Stage_1_Wrapper_MappedPos1Prot2Pos2 =
-							repPept_Stage_1_Wrapper_MappedProt1Pos1Prot2Pos2.get( srchRepPeptProtSeqIdPosCrosslinkDTO_Item_1.getProteinSequenceId() );
+							repPept_Stage_1_Wrapper_MappedProt1Pos1Prot2Pos2.get( srchRepPeptProtSeqIdPosCrosslinkDTO_Item_1.getProteinSequenceVersionId() );
 					if ( repPept_Stage_1_Wrapper_MappedPos1Prot2Pos2 == null ) {
 						repPept_Stage_1_Wrapper_MappedPos1Prot2Pos2 = new HashMap<>();
-						repPept_Stage_1_Wrapper_MappedProt1Pos1Prot2Pos2.put( srchRepPeptProtSeqIdPosCrosslinkDTO_Item_1.getProteinSequenceId(), repPept_Stage_1_Wrapper_MappedPos1Prot2Pos2 );
+						repPept_Stage_1_Wrapper_MappedProt1Pos1Prot2Pos2.put( srchRepPeptProtSeqIdPosCrosslinkDTO_Item_1.getProteinSequenceVersionId(), repPept_Stage_1_Wrapper_MappedPos1Prot2Pos2 );
 					}
 					
 					Map<Integer,Map<Integer,RepPept_Stage_1_Wrapper>> repPept_Stage_1_Wrapper_MappedProt2Pos2 =
@@ -163,10 +163,10 @@ public class CrosslinkLinkedPositions {
 					}
 					
 					Map<Integer,RepPept_Stage_1_Wrapper> repPept_Stage_1_Wrapper_MappedPos2 =
-							repPept_Stage_1_Wrapper_MappedProt2Pos2.get( srchRepPeptProtSeqIdPosCrosslinkDTO_Item_2.getProteinSequenceId() );
+							repPept_Stage_1_Wrapper_MappedProt2Pos2.get( srchRepPeptProtSeqIdPosCrosslinkDTO_Item_2.getProteinSequenceVersionId() );
 					if ( repPept_Stage_1_Wrapper_MappedPos2 == null ) {
 						repPept_Stage_1_Wrapper_MappedPos2 = new HashMap<>();
-						repPept_Stage_1_Wrapper_MappedProt2Pos2.put( srchRepPeptProtSeqIdPosCrosslinkDTO_Item_2.getProteinSequenceId(), repPept_Stage_1_Wrapper_MappedPos2 );
+						repPept_Stage_1_Wrapper_MappedProt2Pos2.put( srchRepPeptProtSeqIdPosCrosslinkDTO_Item_2.getProteinSequenceVersionId(), repPept_Stage_1_Wrapper_MappedPos2 );
 					}
 					
 					RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper = repPept_Stage_1_Wrapper_MappedPos2.get( srchRepPeptProtSeqIdPosCrosslinkDTO_Item_2.getProteinSequencePosition() );
@@ -271,8 +271,8 @@ public class CrosslinkLinkedPositions {
 			SearchDTO search, 
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel, 
 			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param,
-			ProteinSequenceObject protein1, 
-			ProteinSequenceObject protein2, 
+			ProteinSequenceVersionObject protein1, 
+			ProteinSequenceVersionObject protein2, 
 			int position1, 
 			int position2 ) throws Exception {
 		
@@ -285,8 +285,8 @@ public class CrosslinkLinkedPositions {
 				.searchOnSearchProteinCrosslink( 
 						search, 
 						searcherCutoffValuesSearchLevel, 
-						protein1.getProteinSequenceId(), 
-						protein2.getProteinSequenceId(), 
+						protein1.getProteinSequenceVersionId(), 
+						protein2.getProteinSequenceVersionId(), 
 						position1, 
 						position2 );
 		
@@ -314,9 +314,9 @@ public class CrosslinkLinkedPositions {
 						search, 
 						searcherCutoffValuesSearchLevel, 
 						linkedPositions_FilterExcludeLinksWith_Param,
-						protein1.getProteinSequenceId(), 
+						protein1.getProteinSequenceVersionId(), 
 						position1, 
-						protein2.getProteinSequenceId(), 
+						protein2.getProteinSequenceVersionId(), 
 						position2, 
 						searchProtein_KeyOn_PROT_SEQ_ID_Map, 
 						repPept_Stage_1_Wrapper );
@@ -387,8 +387,8 @@ public class CrosslinkLinkedPositions {
 				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setReportedPeptideId( reportedPeptideId );
 				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setSearchReportedPeptidepeptideId_1( searchReportedPeptidepeptideId_Item_1 );
 				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setSearchReportedPeptidepeptideId_2( searchReportedPeptidepeptideId_Item_2 );
-				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setProteinSequenceId_1( proteinSeqId_1 );
-				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setProteinSequenceId_2( proteinSeqId_2 );
+				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setProteinSequenceVersionId_1( proteinSeqId_1 );
+				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setProteinSequenceVersionId_2( proteinSeqId_2 );
 				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setProteinPosition_1( proteinPosition_1 );
 				reportedPeptide_SearchReportedPeptidepeptideId_Crosslink.setProteinPosition_2( proteinPosition_2 );
 				if ( reportedPeptide_SearchReportedPeptidepeptideId_CrosslinkList == null ) {
@@ -433,7 +433,7 @@ public class CrosslinkLinkedPositions {
 		searchProteinCrosslink.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 		SearchProtein searchProtein_1 = searchProtein_KeyOn_PROT_SEQ_ID_Map.get( proteinSeqId_1 );
 		if ( searchProtein_1 == null ) {
-			searchProtein_1 = new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( proteinSeqId_1 ) );
+			searchProtein_1 = new SearchProtein( search, ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( proteinSeqId_1 ) );
 			searchProtein_KeyOn_PROT_SEQ_ID_Map.put( proteinSeqId_1, searchProtein_1 );
 		}
 		SearchProtein searchProtein_2 = null;
@@ -442,7 +442,7 @@ public class CrosslinkLinkedPositions {
 		} else {
 			searchProtein_2 = searchProtein_KeyOn_PROT_SEQ_ID_Map.get( proteinSeqId_2 );
 			if ( searchProtein_2 == null ) {
-				searchProtein_2 = new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( proteinSeqId_2 ) );
+				searchProtein_2 = new SearchProtein( search, ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( proteinSeqId_2 ) );
 				searchProtein_KeyOn_PROT_SEQ_ID_Map.put( proteinSeqId_2, searchProtein_2 );
 			}
 		}

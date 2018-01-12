@@ -25,17 +25,17 @@ public class ProteinSequenceAnnotationSearcher {
 	public static ProteinSequenceAnnotationSearcher getInstance() { return _INSTANCE; }
 	
 	private static final String SQL = 
-			"SELECT DISTINCT annotation_id FROM search_protein_sequence_annotation "
-			+ " WHERE search_id IN (#SEARCHES#) AND protein_sequence_id = ? "
+			"SELECT DISTINCT annotation_id FROM search__protein_sequence_version__annotation "
+			+ " WHERE search_id IN (#SEARCHES#) AND protein_sequence_version_id = ? "
 			+ " ORDER BY annotation_id";
 
 	/**
 	 * @param searchIds
-	 * @param proteinSequenceId
+	 * @param proteinSequenceVersionId
 	 * @return
 	 * @throws Exception
 	 */
-	public Collection<ProteinSequenceAnnotationDTO> getProteinSequenceAnnotationsForSearchAndProtein( Collection<Integer> searchIds, int proteinSequenceId ) throws Exception {
+	public Collection<ProteinSequenceAnnotationDTO> getProteinSequenceAnnotationsForSearchAndProtein( Collection<Integer> searchIds, int proteinSequenceVersionId ) throws Exception {
 		Collection<ProteinSequenceAnnotationDTO> annotations = new ArrayList<>();
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -44,7 +44,7 @@ public class ProteinSequenceAnnotationSearcher {
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, proteinSequenceId );
+			pstmt.setInt( 1, proteinSequenceVersionId );
 			rs = pstmt.executeQuery();
 			while( rs.next() )
 				annotations.add( ProteinSequenceAnnotationDAO.getInstance().getProteinSequenceAnnotationDTOForAnnotationId( rs.getInt( "annotation_id" ) ) );

@@ -19,7 +19,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.dao.SearchDAO;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureAndQC_NavLinks;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -40,7 +40,7 @@ import org.yeastrc.xlink.www.objects.VennDiagramDataToJSON;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
-import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
+import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
 import org.yeastrc.xlink.www.web_utils.GenerateVennDiagramDataToJSON;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
@@ -245,17 +245,17 @@ public class ViewMergedSearchProteinsAction extends Action {
 					}
 					searchesForProtein.add(searchForProtein);
 				}
-				ProteinSequenceObject ProteinSequenceObject = new ProteinSequenceObject();
-				ProteinSequenceObject.setProteinSequenceId( proteinId );
+				ProteinSequenceVersionObject ProteinSequenceObject = new ProteinSequenceVersionObject();
+				ProteinSequenceObject.setProteinSequenceVersionId( proteinId );
 				MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searchesForProtein, ProteinSequenceObject );
 				//  Exclude protein if excluded for all searches
 				boolean excludeTaxonomyIdAllSearches = true;
 				for ( SearchDTO searchDTO : searchesForProtein ) {
 					boolean excludeOnProtein =
-							ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-							.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+							ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+							.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 									proteinsMergedCommonPageDownloadResult.getExcludeTaxonomy_Ids_Set_UserInput(), 
-									mergedSearchProtein.getProteinSequenceObject(), 
+									mergedSearchProtein.getProteinSequenceVersionObject(), 
 									searchDTO.getSearchId() );
 					if ( ! excludeOnProtein ) {
 						excludeTaxonomyIdAllSearches = false;
@@ -266,7 +266,7 @@ public class ViewMergedSearchProteinsAction extends Action {
 					//////////  Taxonomy Id in list of excluded taxonomy ids so drop the record
 					continue;  //   EARLY Continue
 				}
-//				int mergedSearchProteinTaxonomyId = mergedSearchProtein.getProteinSequenceObject().getTaxonomyId(); 
+//				int mergedSearchProteinTaxonomyId = mergedSearchProtein.getProteinSequenceVersionObject().getTaxonomyId(); 
 //
 //				if ( proteinsMergedCommonPageDownloadResult.getExcludeTaxonomy_Ids_Set_UserInput().contains( mergedSearchProteinTaxonomyId ) ) {
 //					

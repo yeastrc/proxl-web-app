@@ -254,7 +254,7 @@
 						<select name="excludedProteins" multiple="multiple" id="excludeProtein" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >  
 						  
 	  						<logic:iterate id="protein" name="proteins">
-	  						  <option value="<c:out value="${ protein.proteinSequenceObject.proteinSequenceId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
+	  						  <option value="<c:out value="${ protein.proteinSequenceVersionObject.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
 	  						</logic:iterate>
 	  					</select>
 					</td>
@@ -357,14 +357,14 @@
 					</thead>
 						
 					<logic:iterate id="proteinMain" name="proteinsMainList">
-							<tr id="${ proteinMain.proteinSequenceId }"
+							<tr id="${ proteinMain.proteinSequenceVersionId }"
 								style="cursor: pointer; "
 								
 								onclick="viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate.showHideReportedPeptides( { clickedElement : this })"
 								data-project_search_id="${ search.projectSearchId }"
-								data-protein_id="${ proteinMain.proteinSequenceId }"
+								data-protein_id="${ proteinMain.proteinSequenceVersionId }"
 							>
-								<td><span class="proteinName" id="protein-id-<bean:write name="proteinMain" property="searchProtein.proteinSequenceObject.proteinSequenceId" />"
+								<td><span class="proteinName" id="protein-id-<bean:write name="proteinMain" property="searchProtein.proteinSequenceVersionObject.proteinSequenceVersionId" />"
 									><bean:write name="proteinMain" property="searchProtein.name" /></span></td>
 
 								<td class="integer-number-column"><bean:write name="proteinMain" property="numPsms" /></td>

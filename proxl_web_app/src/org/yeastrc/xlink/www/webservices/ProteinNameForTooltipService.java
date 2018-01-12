@@ -35,13 +35,13 @@ import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.constants.WebServiceURLConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
+import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProteinSequenceAnnotationSearcher;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsForProtSeqIdSearchId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Request;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Result;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
@@ -61,7 +61,7 @@ public class ProteinNameForTooltipService {
 	@Path("/getData") 
 	public ProteinNameForTooltipServiceWebserviceResponse proteinNameForTooltip( 
 			@QueryParam( "searchId" ) List<Integer> projectSearchIdList,
-			@QueryParam( "proteinSequenceId" ) Integer  proteinSequenceId,
+			@QueryParam( "proteinSequenceVersionId" ) Integer  proteinSequenceVersionId,
 			@Context HttpServletRequest request )
 	throws Exception {
 		
@@ -84,8 +84,8 @@ public class ProteinNameForTooltipService {
 		    	        .build()
 		    	        );
 		}
-		if ( proteinSequenceId == null ) {
-			String msg = "Provided proteinSequenceId is null";
+		if ( proteinSequenceVersionId == null ) {
+			String msg = "Provided proteinSequenceVersionId is null";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -147,11 +147,11 @@ public class ProteinNameForTooltipService {
 			////////   Auth complete
 			//////////////////////////////////////////
 			
-			ProteinSequenceObject proteinSequenceObject = 
-					ProteinSequenceObjectFactory.getProteinSequenceObject( proteinSequenceId );
-			String proteinSequence = proteinSequenceObject.getSequence();
+			ProteinSequenceVersionObject proteinSequenceVersionObject = 
+					ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( proteinSequenceVersionId );
+			String proteinSequence = proteinSequenceVersionObject.getProteinSequenceObject().getSequence();
 			if ( proteinSequence == null || proteinSequence.isEmpty() ) {
-				String msg = "Provided proteinSequenceId is not in database:  " + proteinSequenceId;
+				String msg = "Provided proteinSequenceVersionId is not in database:  " + proteinSequenceVersionId;
 				log.error( msg );
 				throw new WebApplicationException(
 						Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -183,9 +183,9 @@ public class ProteinNameForTooltipService {
 				TaxonomyIdsForProtSeqIdSearchId_Request taxonomyIdsForProtSeqIdSearchId_Request =
 						new TaxonomyIdsForProtSeqIdSearchId_Request();
 				taxonomyIdsForProtSeqIdSearchId_Request.setSearchId( searchId );
-				taxonomyIdsForProtSeqIdSearchId_Request.setProteinSequenceId( proteinSequenceObject.getProteinSequenceId() );
+				taxonomyIdsForProtSeqIdSearchId_Request.setProteinSequenceVersionId( proteinSequenceVersionObject.getProteinSequenceVersionId() );
 				TaxonomyIdsForProtSeqIdSearchId_Result taxonomyIdsForProtSeqIdSearchId_Result =
-						Cached_TaxonomyIdsForProtSeqIdSearchId.getInstance()
+						Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId.getInstance()
 						.getTaxonomyIdsForProtSeqIdSearchId_Result( taxonomyIdsForProtSeqIdSearchId_Request );
 				Set<Integer> taxonomyIds = taxonomyIdsForProtSeqIdSearchId_Result.getTaxonomyIds();
 				
@@ -202,7 +202,7 @@ public class ProteinNameForTooltipService {
 				}
 			}
 			if ( ( ! foundTaxonomyIdZero ) && taxonomyIdSmallestNonZero == taxonomyIdSmallestNonZeroInitialValue ) {
-				String msg = "Failed to find a taxonomy id for proteinSequenceId: " + proteinSequenceId
+				String msg = "Failed to find a taxonomy id for proteinSequenceVersionId: " + proteinSequenceVersionId
 						+ ", all search ids: " + searchIdsSet;
 				log.error( msg );
 				throw new WebApplicationException(
@@ -277,7 +277,7 @@ public class ProteinNameForTooltipService {
 				proteinNameForTooltipServiceWebserviceResponse.setSource( proteinListingOutputResponse.getSource() );
 			}
 			// add in local annotations for this protein sequence
-			Collection<ProteinSequenceAnnotationDTO> annotations = ProteinSequenceAnnotationSearcher.getInstance().getProteinSequenceAnnotationsForSearchAndProtein( searchIdsSet, proteinSequenceId );
+			Collection<ProteinSequenceAnnotationDTO> annotations = ProteinSequenceAnnotationSearcher.getInstance().getProteinSequenceAnnotationsForSearchAndProtein( searchIdsSet, proteinSequenceVersionId );
 			proteinNameForTooltipServiceWebserviceResponse.setAnnotations( annotations );
 			return proteinNameForTooltipServiceWebserviceResponse;
 		} catch ( WebApplicationException e ) {

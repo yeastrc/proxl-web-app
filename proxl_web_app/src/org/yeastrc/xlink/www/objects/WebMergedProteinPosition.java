@@ -30,7 +30,7 @@ public class WebMergedProteinPosition {
 		try {
 			proteinName = protein.getName();
 		} catch( Exception e ) {
-			return "Error with protein: " + protein.getProteinSequenceObject().getProteinSequenceId();
+			return "Error with protein: " + protein.getProteinSequenceVersionObject().getProteinSequenceVersionId();
 		}
 		
 		if ( StringUtils.isNotEmpty( position2 ) )

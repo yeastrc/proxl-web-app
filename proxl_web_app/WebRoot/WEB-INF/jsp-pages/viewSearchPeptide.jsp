@@ -397,7 +397,7 @@
 								<td>
 								  <c:if test="${ not empty peptideEntry.peptide1ProteinPositions }">
 									<logic:iterate id="pp" name="peptideEntry" property="peptide1ProteinPositions">
-										<span class="proteinName" id="protein-id-<bean:write name="pp" property="protein.proteinSequenceObject.proteinSequenceId" />">
+										<span class="proteinName" id="protein-id-<bean:write name="pp" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />">
 											<bean:write name="pp" property="protein.name" 
 												/><c:if test="${ not empty pp.position1 }"
 														>(<bean:write name="pp" property="position1" 
@@ -411,7 +411,7 @@
 								<td>
 								  <c:if test="${ not empty peptideEntry.peptide2ProteinPositions }">
 									<logic:iterate id="pp" name="peptideEntry" property="peptide2ProteinPositions">
-										<span class="proteinName" id="protein-id-<bean:write name="pp" property="protein.proteinSequenceObject.proteinSequenceId" />">
+										<span class="proteinName" id="protein-id-<bean:write name="pp" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />">
 											<bean:write name="pp" property="protein.name" 
 												/><c:if test="${ not empty pp.position1 }"
 														>(<bean:write name="pp" property="position1" 

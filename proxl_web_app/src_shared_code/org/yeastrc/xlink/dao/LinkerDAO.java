@@ -221,12 +221,3 @@ public class LinkerDAO {
 	
 	
 }
-
-//CREATE TABLE `linker` (
-//`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-//`abbr` varchar(255) NOT NULL,
-//`name` varchar(255) DEFAULT NULL,
-//PRIMARY KEY (`id`),
-//UNIQUE KEY `abbr` (`abbr`)
-//) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
-//

@@ -21,9 +21,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
+import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.dao.SearchDAO;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -56,7 +56,7 @@ public class ViewerSequenceCoverageService {
 	public SequenceCoverageData getSequenceCoverageDataForProtein( 
 			@QueryParam( "projectSearchId" ) List<Integer> projectSearchIdList,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
-			@QueryParam( "proteinSequenceId" ) List<Integer> proteinSequenceIdList,
+			@QueryParam( "proteinSequenceVersionId" ) List<Integer> proteinSequenceVersionIdList,
 			@Context HttpServletRequest request )
 	throws Exception {
 		
@@ -69,7 +69,7 @@ public class ViewerSequenceCoverageService {
 		    	        .build()
 		    	        );
 		}
-		if ( proteinSequenceIdList == null || proteinSequenceIdList.isEmpty() ) {
+		if ( proteinSequenceVersionIdList == null || proteinSequenceVersionIdList.isEmpty() ) {
 			String msg = "Provided proteinId is null or empty";
 			log.error( msg );
 		    throw new WebApplicationException(
@@ -196,20 +196,20 @@ public class ViewerSequenceCoverageService {
 			Map<Integer, List<SequenceCoverageRange>> ranges = new HashMap<Integer, List<SequenceCoverageRange>>();
 			SequenceCoverageData scd = new SequenceCoverageData();
 			
-			List<ProteinSequenceObject> proteinSequenceObjectList = new ArrayList<>( proteinSequenceIdList.size() );
-			for ( Integer proteinId : proteinSequenceIdList ) {
-				ProteinSequenceObject protein = ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId );
-				proteinSequenceObjectList.add(protein);
+			List<ProteinSequenceVersionObject> proteinSequenceVersionObjectList = new ArrayList<>( proteinSequenceVersionIdList.size() );
+			for ( Integer proteinId : proteinSequenceVersionIdList ) {
+				ProteinSequenceVersionObject protein = ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( proteinId );
+				proteinSequenceVersionObjectList.add(protein);
 			}
 			
 			Map<Integer, ProteinSequenceCoverage> proteinSequenceCoveragesKeyedOnProtSeqIdMap = 
 					ProteinSequenceCoverageFactory.getInstance()
-					.getProteinSequenceCoveragesForProteins( proteinSequenceObjectList, searchList, searcherCutoffValuesRootLevel );
+					.getProteinSequenceCoveragesForProteins( proteinSequenceVersionObjectList, searchList, searcherCutoffValuesRootLevel );
 			
 			for ( Map.Entry<Integer, ProteinSequenceCoverage> entry : proteinSequenceCoveragesKeyedOnProtSeqIdMap.entrySet() ) { 
-				Integer proteinSequenceId = entry.getKey();
+				Integer proteinSequenceVersionId = entry.getKey();
 				ProteinSequenceCoverage cov = entry.getValue();
-				coverages.put( proteinSequenceId, cov.getSequenceCoverage() );
+				coverages.put( proteinSequenceVersionId, cov.getSequenceCoverage() );
 				Set<Range<Integer>> coverageRanges = cov.getRanges();
 				List<SequenceCoverageRange> sequenceCoverageRangesTempList = new ArrayList<SequenceCoverageRange>( coverageRanges.size() );
 				for( Range<Integer> r : cov.getRanges() ) {
@@ -244,7 +244,7 @@ public class ViewerSequenceCoverageService {
 					//  Add last entry
 					sequenceCoverageRangesOutputList.add( prevSequenceCoverageRange );
 				}
-				ranges.put( proteinSequenceId, sequenceCoverageRangesOutputList );
+				ranges.put( proteinSequenceVersionId, sequenceCoverageRangesOutputList );
 			}
 			
 			scd.setCoverages( coverages );

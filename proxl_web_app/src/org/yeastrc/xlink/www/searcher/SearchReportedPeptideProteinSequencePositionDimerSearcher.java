@@ -48,7 +48,7 @@ public class SearchReportedPeptideProteinSequencePositionDimerSearcher {
 				item.setSearchId( rs.getInt( "search_id" ) );
 				item.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
 				item.setSearchReportedPeptidepeptideId( rs.getInt( "search_reported_peptide_peptide_id" ) );
-				item.setProteinSequenceId( rs.getInt( "protein_sequence_id" ) );
+				item.setProteinSequenceVersionId( rs.getInt( "protein_sequence_version_id" ) );
 				results.add( item );
 			}
 		} catch ( Exception e ) {

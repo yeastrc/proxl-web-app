@@ -222,9 +222,9 @@ public class Cached_ProteinNameFor_SearchProtein implements CachedDataCommonIF {
 			}
 			String proteinName = 
 					SearchUtils
-					.getProteinNameForSearchIdProteinSequenceId( 
+					.getProteinNameForSearchIdProteinSequenceVersionId( 
 							proteinNameFor_SearchProtein_Request.getSearchId(),
-							proteinNameFor_SearchProtein_Request.getProteinSequenceId() );
+							proteinNameFor_SearchProtein_Request.getProteinSequenceVersionId() );
 			ProteinNameFor_SearchProtein_Result proteinNameFor_SearchProtein_Result =
 					new ProteinNameFor_SearchProtein_Result();
 			proteinNameFor_SearchProtein_Result.setProteinName( proteinName );

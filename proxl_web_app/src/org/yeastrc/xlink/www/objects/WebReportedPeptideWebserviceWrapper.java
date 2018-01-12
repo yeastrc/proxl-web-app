@@ -113,7 +113,7 @@ public class WebReportedPeptideWebserviceWrapper implements SearchPeptideCommonL
 		}
 		public int getProteinId() throws Exception {
 			try {
-				return webProteinPosition.getProtein().getProteinSequenceObject().getProteinSequenceId();
+				return webProteinPosition.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 			} catch ( Exception e ) {
 				String msg = "Exception in webProteinPosition.getName()";
 				log.error( msg, e );

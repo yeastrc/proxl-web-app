@@ -5,8 +5,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.DatabaseAutoIncIdFieldForRecordNotInsertedYetConstants;
 import org.yeastrc.proxl.import_xml_to_db.dto.AnnotationDTO;
-import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceDTO;
-import org.yeastrc.proxl.import_xml_to_db.dto.SearchProteinSequenceAnnotationDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceV2DTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceVersionDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SearchProteinSequenceVersionAnnotationDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
 
@@ -34,27 +35,37 @@ public class ProteinImporterContainerDAO {
 			//  Exit since data already saved
 			return;  //  EARLY RETURN
 		}
-		ProteinSequenceDTO proteinSequenceDTO = proteinImporterContainer.getProteinSequenceDTO();
-		if ( proteinSequenceDTO.getId() == DatabaseAutoIncIdFieldForRecordNotInsertedYetConstants.DB_AUTO_INC_FIELD_INITIAL_VALUE_FOR_NOT_INSERTED_YET ) {
+		ProteinSequenceV2DTO proteinSequenceV2DTO = proteinImporterContainer.getProteinSequenceDTO();
+		if ( proteinSequenceV2DTO.getId() == DatabaseAutoIncIdFieldForRecordNotInsertedYetConstants.DB_AUTO_INC_FIELD_INITIAL_VALUE_FOR_NOT_INSERTED_YET ) {
 			//  Protein sequence id zero indicates it has not been saved so save it to get the id.  New object returned. 
-			proteinSequenceDTO = ProteinSequenceDAO.getInstance().getProteinSequenceDTO_InsertIfNotInDB( proteinSequenceDTO.getSequence() );
-			proteinImporterContainer.setProteinSequenceDTO( proteinSequenceDTO );
+			proteinSequenceV2DTO = 
+					ProteinSequenceV2DAO.getInstance().getProteinSequenceDTO_InsertIfNotInDB( proteinSequenceV2DTO.getSequence() );
+			proteinImporterContainer.setProteinSequenceDTO( proteinSequenceV2DTO );
 		}
+		ProteinSequenceVersionDTO proteinSequenceVersionDTO = proteinImporterContainer.getProteinSequenceVersionDTO();
+		if ( proteinSequenceVersionDTO.getId() == DatabaseAutoIncIdFieldForRecordNotInsertedYetConstants.DB_AUTO_INC_FIELD_INITIAL_VALUE_FOR_NOT_INSERTED_YET ) {
+			//  Protein sequence version id zero indicates it has not been saved so save it to get the id.  New object returned. 
+			proteinSequenceVersionDTO.setProteinSequenceId( proteinSequenceV2DTO.getId() );
+			proteinSequenceVersionDTO = 
+					ProteinSequenceVersionDAO.getInstance().getProteinSequenceVersionDTO_InsertIfNotInDB( proteinSequenceVersionDTO );
+			proteinImporterContainer.setProteinSequenceVersionDTO( proteinSequenceVersionDTO );
+		}
+		
 		List<AnnotationDTO> annotationDTOList = proteinImporterContainer.getAnnotationDTOList();
 		for ( AnnotationDTO annotationDTO : annotationDTOList ) {
 			if ( annotationDTO.getId() == 0 ) {
 				AnnotationDAO.getInstance().getAnnotationId_InsertIfNotInDB( annotationDTO );
 			}
 		}
-		List<SearchProteinSequenceAnnotationDTO> searchProteinSequenceAnnotationDTOList = new ArrayList<>();
-		proteinImporterContainer.setSearchProteinSequenceAnnotationDTOList( searchProteinSequenceAnnotationDTOList );
+		List<SearchProteinSequenceVersionAnnotationDTO> searchProteinSequenceVersionAnnotationDTOList = new ArrayList<>();
+		proteinImporterContainer.setSearchProteinSequenceAnnotationDTOList( searchProteinSequenceVersionAnnotationDTOList );
 		for ( AnnotationDTO annotationDTO : annotationDTOList ) {
-			SearchProteinSequenceAnnotationDTO searchProteinSequenceAnnotationDTO = new SearchProteinSequenceAnnotationDTO();
-			searchProteinSequenceAnnotationDTO.setSearchId( proteinImporterContainer.getSearchId() );
-			searchProteinSequenceAnnotationDTO.setProteinSequenceId( proteinSequenceDTO.getId() );
-			searchProteinSequenceAnnotationDTO.setAnnotationId( annotationDTO.getId() );
-			SearchProteinSequenceAnnotationDAO.getInstance().saveToDatabase( searchProteinSequenceAnnotationDTO );
-			searchProteinSequenceAnnotationDTOList.add( searchProteinSequenceAnnotationDTO );
+			SearchProteinSequenceVersionAnnotationDTO searchProteinSequenceVersionAnnotationDTO = new SearchProteinSequenceVersionAnnotationDTO();
+			searchProteinSequenceVersionAnnotationDTO.setSearchId( proteinImporterContainer.getSearchId() );
+			searchProteinSequenceVersionAnnotationDTO.setProteinSequenceVersionId( proteinSequenceVersionDTO.getId() );
+			searchProteinSequenceVersionAnnotationDTO.setAnnotationId( annotationDTO.getId() );
+			SearchProteinSequenceVersionAnnotationDAO.getInstance().saveToDatabase( searchProteinSequenceVersionAnnotationDTO );
+			searchProteinSequenceVersionAnnotationDTOList.add( searchProteinSequenceVersionAnnotationDTO );
 		}
 		proteinImporterContainer.setDataInObjectSavedToDB( true );
 	}

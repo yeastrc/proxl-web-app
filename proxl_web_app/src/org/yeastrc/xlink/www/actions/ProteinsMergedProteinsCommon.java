@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
-import org.yeastrc.xlink.www.searcher.ProteinSequenceIdForNrseqProteinIdSearcher;
+import org.yeastrc.xlink.www.searcher.ProteinSequenceVersionIdForNrseqProteinIdSearcher;
 /**
  * Shared code for Protein page (single search) and Merged Proteins ( Multiple searches ) 
  *
@@ -25,7 +25,7 @@ public class ProteinsMergedProteinsCommon {
 	}
 	
 	/**
-	 * Populates the property excludeProteinSequenceIds in the input proteinQueryJSONRoot
+	 * Populates the property excludeproteinSequenceVersionIds in the input proteinQueryJSONRoot
 	 * 
 	 * Process the exclude protein from the JS code
 	 * 
@@ -34,64 +34,64 @@ public class ProteinsMergedProteinsCommon {
 	 * @param proteinQueryJSONRoot
 	 * @throws Exception 
 	 */
-	public void processExcludeProteinSequenceIdsFromJS( ProteinQueryJSONRoot proteinQueryJSONRoot ) throws Exception {
+	public void processExcludeproteinSequenceVersionIdsFromJS( ProteinQueryJSONRoot proteinQueryJSONRoot ) throws Exception {
 		if ( proteinQueryJSONRoot.getExcludeProtein() != null ) {
-			//  Old Nrseq Protein Ids provided, convert to Protein Sequence Ids and populate excludeProteinSequenceIds
+			//  Old Nrseq Protein Ids provided, convert to Protein Sequence Ids and populate excludeproteinSequenceVersionIds
 			processNrseqProteinIds( proteinQueryJSONRoot );
 			return;  //  EARLY RETURN
 		}
 		/**
 		 * Exclude Protein Encoded
 		 */
-		String exclProteinSequenceIdsEncoded = proteinQueryJSONRoot.getExclProteinSequenceIdsEncoded();
-		if ( exclProteinSequenceIdsEncoded == null || "".equals( exclProteinSequenceIdsEncoded ) ) {
+		String exclproteinSequenceVersionIdsEncoded = proteinQueryJSONRoot.getExclproteinSequenceVersionIdsEncoded();
+		if ( exclproteinSequenceVersionIdsEncoded == null || "".equals( exclproteinSequenceVersionIdsEncoded ) ) {
 			//  No protein sequence ids to exclude
 			return;  //  EARLY RETURN
 		}
 		/**
 		 * Exclude Protein Separator
 		 */
-		String exclProteinSequenceIdsEncodedSeparator = proteinQueryJSONRoot.getExclProteinSequenceIdsEncodedSeparator();
+		String exclproteinSequenceVersionIdsEncodedSeparator = proteinQueryJSONRoot.getExclproteinSequenceVersionIdsEncodedSeparator();
 		/**
 		 * Base X RADIX encoding for exclProtEnc
 		 */
-		int exclProteinSequenceIdsEncodedRadix = proteinQueryJSONRoot.getExclProteinSequenceIdsEncodedRadix();
+		int exclproteinSequenceVersionIdsEncodedRadix = proteinQueryJSONRoot.getExclproteinSequenceVersionIdsEncodedRadix();
 		
-		String[] exclProteinSequenceIdsEncodedSplit = exclProteinSequenceIdsEncoded.split( exclProteinSequenceIdsEncodedSeparator );
+		String[] exclproteinSequenceVersionIdsEncodedSplit = exclproteinSequenceVersionIdsEncoded.split( exclproteinSequenceVersionIdsEncodedSeparator );
 		
-		Set<Integer> excludeProteinSequenceIdsSet = new HashSet<>();
-		int exclProteinSequenceIdsEncodedEntryActualPrev = 0;
-		for ( String exclProteinSequenceIdsEncodedEntry : exclProteinSequenceIdsEncodedSplit ) {
+		Set<Integer> excludeproteinSequenceVersionIdsSet = new HashSet<>();
+		int exclproteinSequenceVersionIdsEncodedEntryActualPrev = 0;
+		for ( String exclproteinSequenceVersionIdsEncodedEntry : exclproteinSequenceVersionIdsEncodedSplit ) {
 			try {
-				int exclProteinSequenceIdsEncodedEntryInt = 
-						Integer.parseInt(exclProteinSequenceIdsEncodedEntry, exclProteinSequenceIdsEncodedRadix);
+				int exclproteinSequenceVersionIdsEncodedEntryInt = 
+						Integer.parseInt(exclproteinSequenceVersionIdsEncodedEntry, exclproteinSequenceVersionIdsEncodedRadix);
 				//  The actual protein sequence id is the encoded id + the prev encoded id.
-				int exclProteinSequenceIdsEncodedEntryActual = exclProteinSequenceIdsEncodedEntryInt + exclProteinSequenceIdsEncodedEntryActualPrev;
-				excludeProteinSequenceIdsSet.add( exclProteinSequenceIdsEncodedEntryActual );
-				exclProteinSequenceIdsEncodedEntryActualPrev = exclProteinSequenceIdsEncodedEntryActual;
+				int exclproteinSequenceVersionIdsEncodedEntryActual = exclproteinSequenceVersionIdsEncodedEntryInt + exclproteinSequenceVersionIdsEncodedEntryActualPrev;
+				excludeproteinSequenceVersionIdsSet.add( exclproteinSequenceVersionIdsEncodedEntryActual );
+				exclproteinSequenceVersionIdsEncodedEntryActualPrev = exclproteinSequenceVersionIdsEncodedEntryActual;
 			} catch ( Exception e ) {
-				String msg = "Failed to parse exclude protein sequence id using radix '" + exclProteinSequenceIdsEncodedRadix
-						+ "'.  exclude protein sequence id string: " + exclProteinSequenceIdsEncodedEntry;
+				String msg = "Failed to parse exclude protein sequence id using radix '" + exclproteinSequenceVersionIdsEncodedRadix
+						+ "'.  exclude protein sequence id string: " + exclproteinSequenceVersionIdsEncodedEntry;
 				log.error( msg );
 				throw new ProxlBaseDataException(msg);
 			}
 		}
-		int[] excludeProteinSequenceIds = getExcludeProteinSequenceIdsArray( excludeProteinSequenceIdsSet );
-		proteinQueryJSONRoot.setExcludeProteinSequenceIds( excludeProteinSequenceIds );
+		int[] excludeproteinSequenceVersionIds = getExcludeproteinSequenceVersionIdsArray( excludeproteinSequenceVersionIdsSet );
+		proteinQueryJSONRoot.setExcludeproteinSequenceVersionIds( excludeproteinSequenceVersionIds );
 	}
 	
 	/**
-	 * @param excludeProteinSequenceIdsCollection
+	 * @param excludeproteinSequenceVersionIdsCollection
 	 * @return
 	 */
-	private int[] getExcludeProteinSequenceIdsArray( Collection<Integer> excludeProteinSequenceIdsCollection ) {
-		List<Integer> excludeProteinSequenceIdsList = new ArrayList<>( excludeProteinSequenceIdsCollection );
-		Collections.sort( excludeProteinSequenceIdsList );
-		int[] excludeProteinSequenceIds = new int[ excludeProteinSequenceIdsList.size() ];
-		for ( int index = 0; index < excludeProteinSequenceIdsList.size(); index++ ) {
-			excludeProteinSequenceIds[ index ] = excludeProteinSequenceIdsList.get(index);
+	private int[] getExcludeproteinSequenceVersionIdsArray( Collection<Integer> excludeproteinSequenceVersionIdsCollection ) {
+		List<Integer> excludeproteinSequenceVersionIdsList = new ArrayList<>( excludeproteinSequenceVersionIdsCollection );
+		Collections.sort( excludeproteinSequenceVersionIdsList );
+		int[] excludeproteinSequenceVersionIds = new int[ excludeproteinSequenceVersionIdsList.size() ];
+		for ( int index = 0; index < excludeproteinSequenceVersionIdsList.size(); index++ ) {
+			excludeproteinSequenceVersionIds[ index ] = excludeproteinSequenceVersionIdsList.get(index);
 		}
-		return excludeProteinSequenceIds;
+		return excludeproteinSequenceVersionIds;
 	}
 	
 	/**
@@ -100,19 +100,19 @@ public class ProteinsMergedProteinsCommon {
 	 */
 	private void processNrseqProteinIds( ProteinQueryJSONRoot proteinQueryJSONRoot  ) throws Exception {
 		int[] excludeNrseqProteinIds = proteinQueryJSONRoot.getExcludeProtein();
-		Set<Integer> excludeProteinSequenceIdsSet = new HashSet<>();
+		Set<Integer> excludeproteinSequenceVersionIdsSet = new HashSet<>();
 		for ( int nrseqProteinId : excludeNrseqProteinIds ) {
-			Integer proteinSequenceId =
-					ProteinSequenceIdForNrseqProteinIdSearcher.getInstance()
-					.getProteinSequenceIdForNrseqProteinIdSearcher( nrseqProteinId );
-			if ( proteinSequenceId == null ) {
+			Integer proteinSequenceVersionId =
+					ProteinSequenceVersionIdForNrseqProteinIdSearcher.getInstance()
+					.getProteinSequenceVersionIdForNrseqProteinIdSearcher( nrseqProteinId );
+			if ( proteinSequenceVersionId == null ) {
 				String msg = "No protein sequence id found for nrseqProteinId: " + nrseqProteinId;
 				log.error( msg );
 			    throw new ProxlWebappDataException( msg );
 			}
-			excludeProteinSequenceIdsSet.add( proteinSequenceId );
+			excludeproteinSequenceVersionIdsSet.add( proteinSequenceVersionId );
 		}
-		int[] excludeProteinSequenceIds = getExcludeProteinSequenceIdsArray( excludeProteinSequenceIdsSet );
-		proteinQueryJSONRoot.setExcludeProteinSequenceIds( excludeProteinSequenceIds );
+		int[] excludeproteinSequenceVersionIds = getExcludeproteinSequenceVersionIdsArray( excludeproteinSequenceVersionIdsSet );
+		proteinQueryJSONRoot.setExcludeproteinSequenceVersionIds( excludeproteinSequenceVersionIds );
 	}
 }

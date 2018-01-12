@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -42,8 +41,8 @@ public class SearchDAO_Importer {
 	
 	private static final String INSERT_SQL =
 			"INSERT INTO search "
-			+ " (path, directory_name, fasta_filename, has_scan_data, status_id, created_by_user_id ) "
-			+ " VALUES (?, ?, ?, ?, " +  SearchRecordStatus.IMPORTING.value() + ", ? "
+			+ " (path, directory_name, fasta_filename, has_scan_data, has_isotope_label, status_id, created_by_user_id ) "
+			+ " VALUES (?, ?, ?, ?, ?, " +  SearchRecordStatus.IMPORTING.value() + ", ? "
 			+ " )";
 	/**
 	 * This will INSERT the given SearchDTO into the database... even if an id is already set.
@@ -68,6 +67,12 @@ public class SearchDAO_Importer {
 			pstmt.setString( counter, item.getFastaFilename() );
 			counter++;
 			if ( item.isHasScanData() ) {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+			} else {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+			}
+			counter++;
+			if ( item.isHasIsotopeLabel() ) {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
 			} else {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
@@ -155,55 +160,4 @@ public class SearchDAO_Importer {
 		}
 	}
 	
-
-	/**
-	 * @param id
-	 * @return
-	 * @throws Exception
-	 */
-	public SearchDTO_Importer getSearchDTO_ImporterById( int id ) throws Exception {
-		SearchDTO_Importer result = null;
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		String sql = "SELECT * FROM search WHERE id = ?";
-		try {
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, id );
-			rs = pstmt.executeQuery();
-			if( rs.next() ) {
-				result = new SearchDTO_Importer();
-				result.setId( rs.getInt( "id" ) );
-				result.setFastaFilename( rs.getString( "fasta_filename" ) );
-				result.setPath( rs.getString( "path" ) );
-				result.setDirectoryName( rs.getString( "directory_name" ) );
-				result.setLoad_time( new DateTime( rs.getTimestamp( "load_time" ) ) );
-				int hasScanDataInt = rs.getInt( "has_scan_data" );
-				if ( Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE == hasScanDataInt ) {
-					result.setHasScanData( false );
-				} else {
-					result.setHasScanData( true );
-				}
-			}
-		} catch ( Exception e ) {
-			log.error( "ERROR: database connection: '" + DBConnectionFactory.PROXL + "' sql: " + sql, e );
-			throw e;
-		} finally {
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-		}
-		return result;
-	}
 }

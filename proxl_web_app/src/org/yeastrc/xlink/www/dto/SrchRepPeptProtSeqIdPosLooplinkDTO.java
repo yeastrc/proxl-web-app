@@ -13,7 +13,7 @@ public class SrchRepPeptProtSeqIdPosLooplinkDTO implements SrchRepPeptProtSeqIdP
 	private int searchId;
 	private int reportedPeptideId;
 	private int searchReportedPeptidepeptideId;
-	private int proteinSequenceId;
+	private int proteinSequenceVersionId;
 	private int proteinSequencePosition_1; 
 	private int proteinSequencePosition_2; 
 	
@@ -22,7 +22,7 @@ public class SrchRepPeptProtSeqIdPosLooplinkDTO implements SrchRepPeptProtSeqIdP
 		return "SrchRepPeptProtSeqIdPosDTO [id=" + id + ", searchId=" + searchId
 				+ ", reportedPeptideId=" + reportedPeptideId
 				+ ", searchReportedPeptidepeptideId="
-				+ searchReportedPeptidepeptideId + ", proteinSequenceId=" + proteinSequenceId
+				+ searchReportedPeptidepeptideId + ", proteinSequenceVersionId=" + proteinSequenceVersionId
 				+ ", proteinSequencePosition_1=" + proteinSequencePosition_1 + ", proteinSequencePosition_2="
 				+ proteinSequencePosition_2 + "]";
 	}
@@ -59,12 +59,12 @@ public class SrchRepPeptProtSeqIdPosLooplinkDTO implements SrchRepPeptProtSeqIdP
 		this.searchReportedPeptidepeptideId = searchReportedPeptidepeptideId;
 	}
 
-	public int getProteinSequenceId() {
-		return proteinSequenceId;
+	public int getProteinSequenceVersionId() {
+		return proteinSequenceVersionId;
 	}
 
-	public void setProteinSequenceId(int proteinSequenceId) {
-		this.proteinSequenceId = proteinSequenceId;
+	public void setProteinSequenceVersionId(int proteinSequenceVersionId) {
+		this.proteinSequenceVersionId = proteinSequenceVersionId;
 	}
 
 	public int getProteinSequencePosition_1() {

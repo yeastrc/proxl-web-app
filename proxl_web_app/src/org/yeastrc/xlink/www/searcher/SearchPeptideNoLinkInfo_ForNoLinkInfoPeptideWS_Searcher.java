@@ -79,22 +79,22 @@ public class SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher {
 	private final String SQL_CROSSLINK_SUBSELECT = 
 			  " SELECT reported_peptide_id FROM "
 			+ 	" srch_rep_pept__prot_seq_id_pos_crosslink AS srpnipc "
-			+ 	" WHERE srpnipc.search_id = ? AND srpnipc.protein_sequence_id = ? ";
+			+ 	" WHERE srpnipc.search_id = ? AND srpnipc.protein_sequence_version_id = ? ";
 
 	private final String SQL_LOOPLINK_SUBSELECT = 
 			" SELECT reported_peptide_id FROM "
 					+ 	" srch_rep_pept__prot_seq_id_pos_looplink AS srpnipl "
-					+ 	" WHERE srpnipl.search_id = ? AND srpnipl.protein_sequence_id = ? ";
+					+ 	" WHERE srpnipl.search_id = ? AND srpnipl.protein_sequence_version_id = ? ";
 
 	private final String SQL_UNLINKED_SUBSELECT = 
 			" SELECT reported_peptide_id FROM "
 			+ 	" srch_rep_pept__prot_seq_id_unlinked AS srpnipu "
-			+ 	" WHERE srpnipu.search_id = ? AND srpnipu.protein_sequence_id = ? ";
+			+ 	" WHERE srpnipu.search_id = ? AND srpnipu.protein_sequence_version_id = ? ";
 		
 	private final String SQL_DIMER_SUBSELECT = 
 			" SELECT reported_peptide_id FROM "
 			+ 	" srch_rep_pept__prot_seq_id_dimer AS srpnipd "
-			+ 	" WHERE srpnipd.search_id = ? AND srpnipd.protein_sequence_id = ? ";
+			+ 	" WHERE srpnipd.search_id = ? AND srpnipd.protein_sequence_version_id = ? ";
 	
 	private final String SQL_MAIN_FROM_AFTER_SUBSELECT = 
 			" ) AS reported_peptide_ids_from_protein_search "

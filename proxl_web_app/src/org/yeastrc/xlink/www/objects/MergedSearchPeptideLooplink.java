@@ -148,7 +148,7 @@ public class MergedSearchPeptideLooplink implements IMergedSearchLink {
 						SearchLooplinkProteinsFromPeptide.getInstance()
 						.getLooplinkProteinPositions( search, reportedPeptideIdForSearchId, peptide.getId(), position1, position2 );
 				for ( SearchProteinDoublePosition searchProteinDoublePosition : resultPerSearch ) {
-					Integer proteinId = searchProteinDoublePosition.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					Integer proteinId = searchProteinDoublePosition.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 					Integer proteinPosition_1 = searchProteinDoublePosition.getPosition1();
 					Integer proteinPosition_2 = searchProteinDoublePosition.getPosition2();
 					//  get MergedSearchProteinDoublePosition for protein id, position 1, position 2
@@ -169,7 +169,7 @@ public class MergedSearchPeptideLooplink implements IMergedSearchLink {
 						mergedSearchProteinDoublePosition = new MergedSearchProteinDoublePosition();
 						mergedSearchProteinDoublePosition_MappedOn_Pos2.put( proteinPosition_2, mergedSearchProteinDoublePosition );
 						List<SearchDTO> searches = new ArrayList<>();
-						MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searches, searchProteinDoublePosition.getProtein().getProteinSequenceObject() );
+						MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searches, searchProteinDoublePosition.getProtein().getProteinSequenceVersionObject() );
 						mergedSearchProteinDoublePosition.setProtein( mergedSearchProtein );
 						mergedSearchProteinDoublePosition.setPosition1( proteinPosition_1 );
 						mergedSearchProteinDoublePosition.setPosition2( proteinPosition_2 );
@@ -205,8 +205,8 @@ public class MergedSearchPeptideLooplink implements IMergedSearchLink {
 			Collections.sort( mergedSearchProteinDoublePositionList, new Comparator<MergedSearchProteinDoublePosition>() {
 				@Override
 				public int compare(MergedSearchProteinDoublePosition o1, MergedSearchProteinDoublePosition o2) {
-					if ( o1.getProtein().getProteinSequenceObject().getProteinSequenceId() != o2.getProtein().getProteinSequenceObject().getProteinSequenceId() ) {
-						return o1.getProtein().getProteinSequenceObject().getProteinSequenceId() - o2.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					if ( o1.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() != o2.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
+						return o1.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() - o2.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 					}
 					if ( o1.getPosition1() != o2.getPosition1() ) {
 						return o1.getPosition1() - o2.getPosition1();

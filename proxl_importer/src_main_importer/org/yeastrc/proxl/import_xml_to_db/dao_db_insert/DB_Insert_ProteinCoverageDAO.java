@@ -7,26 +7,26 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
-import org.yeastrc.proxl.import_xml_to_db.dto.PeptideProteinPositionDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.ProteinCoverageDTO;
 
 
 /**
- * table peptide_protein_position
+ * table protein_coverage
  *
  */
-public class DB_Insert_PeptideProteinPositionDAO {
+public class DB_Insert_ProteinCoverageDAO {
 
 
-	private static final Logger log = Logger.getLogger(DB_Insert_PeptideProteinPositionDAO.class);
+	private static final Logger log = Logger.getLogger(DB_Insert_ProteinCoverageDAO.class);
 
-	private DB_Insert_PeptideProteinPositionDAO() { }
-	public static DB_Insert_PeptideProteinPositionDAO getInstance() { return new DB_Insert_PeptideProteinPositionDAO(); }
+	private DB_Insert_ProteinCoverageDAO() { }
+	public static DB_Insert_ProteinCoverageDAO getInstance() { return new DB_Insert_ProteinCoverageDAO(); }
 
 
-	private static final String INSERT_SQL = "INSERT INTO peptide_protein_position "
+	private static final String INSERT_SQL = "INSERT INTO protein_coverage "
 
-			+ " ( search_id, reported_peptide_id, peptide_id, "
-			+   " protein_sequence_id, protein_start_position, protein_end_position )"
+			+ " ( search_id, reported_peptide_id, peptide_id_info_only, "
+			+   " protein_sequence_version_id, protein_start_position, protein_end_position )"
 
 			+ " VALUES ( ?, ?, ?, ?, ?, ? )";
 	
@@ -35,7 +35,7 @@ public class DB_Insert_PeptideProteinPositionDAO {
 	 * @param item
 	 * @throws Exception
 	 */
-	public void save( PeptideProteinPositionDTO item ) throws Exception {
+	public void save( ProteinCoverageDTO item ) throws Exception {
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -59,10 +59,10 @@ public class DB_Insert_PeptideProteinPositionDAO {
 			counter++;
 			pstmt.setInt( counter,  item.getReportedPeptideId());
 			counter++;
-			pstmt.setInt( counter,  item.getPeptideId() );
+			pstmt.setInt( counter,  item.getPeptideIdInfoOnly() );
 			
 			counter++;
-			pstmt.setInt( counter,  item.getProteinSequenceId() );
+			pstmt.setInt( counter,  item.getProteinSequenceVersionId() );
 
 			counter++;
 			pstmt.setInt( counter,  item.getProteinStartPosition() );

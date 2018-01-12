@@ -6,7 +6,7 @@ public class SearchProteinPosition {
 		try {
 			return protein.getName() + "(" + position + ")";
 		} catch( Exception e ) {
-			return "Error with protein: " + protein.getProteinSequenceObject().getProteinSequenceId();
+			return "Error with protein: " + protein.getProteinSequenceVersionObject().getProteinSequenceVersionId();
 		}
 	}
 	
@@ -28,7 +28,7 @@ public class SearchProteinPosition {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + position;
-		result = prime * result + protein.getProteinSequenceObject().getProteinSequenceId();
+		result = prime * result + protein.getProteinSequenceVersionObject().getProteinSequenceVersionId();
 		return result;
 	}
 
@@ -43,7 +43,7 @@ public class SearchProteinPosition {
 		SearchProteinPosition other = (SearchProteinPosition) obj;
 		if (position != other.position)
 			return false;
-		if (protein.getProteinSequenceObject().getProteinSequenceId() != other.protein.getProteinSequenceObject().getProteinSequenceId()) {
+		if (protein.getProteinSequenceVersionObject().getProteinSequenceVersionId() != other.protein.getProteinSequenceVersionObject().getProteinSequenceVersionId()) {
 			return false;
 		}
 		return true;

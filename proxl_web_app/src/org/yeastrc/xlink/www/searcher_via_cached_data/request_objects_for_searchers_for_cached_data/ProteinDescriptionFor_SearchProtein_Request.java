@@ -7,13 +7,13 @@ package org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searc
 public class ProteinDescriptionFor_SearchProtein_Request {
 
 	int searchId;
-	int proteinSequenceId;
+	int proteinSequenceVersionId;
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + proteinSequenceId;
+		result = prime * result + proteinSequenceVersionId;
 		result = prime * result + searchId;
 		return result;
 	}
@@ -26,7 +26,7 @@ public class ProteinDescriptionFor_SearchProtein_Request {
 		if (getClass() != obj.getClass())
 			return false;
 		ProteinNameFor_SearchProtein_Request other = (ProteinNameFor_SearchProtein_Request) obj;
-		if (proteinSequenceId != other.proteinSequenceId)
+		if (proteinSequenceVersionId != other.proteinSequenceVersionId)
 			return false;
 		if (searchId != other.searchId)
 			return false;
@@ -39,10 +39,10 @@ public class ProteinDescriptionFor_SearchProtein_Request {
 	public void setSearchId(int searchId) {
 		this.searchId = searchId;
 	}
-	public int getProteinSequenceId() {
-		return proteinSequenceId;
+	public int getProteinSequenceVersionId() {
+		return proteinSequenceVersionId;
 	}
-	public void setProteinSequenceId(int proteinSequenceId) {
-		this.proteinSequenceId = proteinSequenceId;
+	public void setProteinSequenceVersionId(int proteinSequenceVersionId) {
+		this.proteinSequenceVersionId = proteinSequenceVersionId;
 	}
 }

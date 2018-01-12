@@ -39,7 +39,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.objects.ImageViewerData;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
+import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -240,10 +240,10 @@ public class ViewerMonolinkService {
 						// did user request removal of certain taxonomy IDs?
 						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 							boolean excludeOnProtein =
-									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+									ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 											excludeTaxonomy_Ids_Set_UserInput, 
-											link.getProtein().getProteinSequenceObject(), 
+											link.getProtein().getProteinSequenceVersionObject(), 
 											searchId );
 							if ( excludeOnProtein ) {
 								//  Skip to next entry in list, dropping this entry from output list
@@ -289,7 +289,7 @@ public class ViewerMonolinkService {
 				List<SearchProteinMonolinkWrapper> wrappedMonolinks = wrappedMonolinks_MappedOnSearchId_Entry.getValue();
 				for ( SearchProteinMonolinkWrapper wrappedMonolink : wrappedMonolinks ) {
 					SearchProteinMonolink searchProteinMonolink = wrappedMonolink.getSearchProteinMonolink();
-					int protId = searchProteinMonolink.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					int protId = searchProteinMonolink.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 					int protPosition = searchProteinMonolink.getProteinPosition();
 					Map<Integer, Set<Integer>> map_keyed_by_protPosition = monolinkPositions.get( protId );
 					if ( map_keyed_by_protPosition == null ) {
@@ -516,10 +516,10 @@ public class ViewerMonolinkService {
 						// did user request removal of certain taxonomy IDs?
 						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 							boolean excludeOnProtein =
-									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+									ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 											excludeTaxonomy_Ids_Set_UserInput, 
-											link.getProtein().getProteinSequenceObject(), 
+											link.getProtein().getProteinSequenceVersionObject(), 
 											searchId );
 							if ( excludeOnProtein ) {
 								//  Skip to next entry in list, dropping this entry from output list
@@ -566,7 +566,7 @@ public class ViewerMonolinkService {
 				for ( SearchProteinMonolinkWrapper wrappedMonolink : wrappedMonolinks ) {
 					SearchProteinMonolink searchProteinMonolink = wrappedMonolink.getSearchProteinMonolink();
 					Integer numPsms = searchProteinMonolink.getNumPsms();
-					int protId = searchProteinMonolink.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					int protId = searchProteinMonolink.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 					int protPosition = searchProteinMonolink.getProteinPosition();
 					Map<Integer, Integer> map_keyed_by_protPosition = proteinLinkPositionPsmCount.get( protId );
 					if ( map_keyed_by_protPosition == null ) {

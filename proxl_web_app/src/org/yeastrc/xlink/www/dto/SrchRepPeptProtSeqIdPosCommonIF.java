@@ -12,5 +12,5 @@ public interface SrchRepPeptProtSeqIdPosCommonIF {
 
 	public int getSearchReportedPeptidepeptideId();
 
-	public int getProteinSequenceId();
+	public int getProteinSequenceVersionId();
 }

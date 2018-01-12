@@ -295,15 +295,15 @@ var _proteinTaxonomyIds = {};
 
 var _proteinLengths = {
 		_proteinLengthsInternal : {},
-		getProteinLength : function( proteinSequenceIdString ) {
-			var proteinLength = this._proteinLengthsInternal[ proteinSequenceIdString ];
+		getProteinLength : function( proteinSequenceVersionIdString ) {
+			var proteinLength = this._proteinLengthsInternal[ proteinSequenceVersionIdString ];
 			if ( proteinLength === undefined ) {
-				throw Error( "proteinLength not found in _proteinLengths._proteinLengthsInternal for proteinSequenceIdString: " + proteinSequenceIdString );
+				throw Error( "proteinLength not found in _proteinLengths._proteinLengthsInternal for proteinSequenceVersionIdString: " + proteinSequenceVersionIdString );
 			}
 			return proteinLength;
 		},
-		setProteinLength : function( proteinSequenceIdString, proteinLength ) {
-			this._proteinLengthsInternal[ proteinSequenceIdString ] = proteinLength;
+		setProteinLength : function( proteinSequenceVersionIdString, proteinLength ) {
+			this._proteinLengthsInternal[ proteinSequenceVersionIdString ] = proteinLength;
 		}
 };
 
@@ -832,13 +832,13 @@ function loadSequenceCoverageDataForProtein( selProteinsForSeqCov, doDraw ) {
 	incrementSpinner();				// create spinner
 	var url = contextPathJSVar + "/services/sequenceCoverage/getDataForProtein";
 	url += buildQueryStringFromHash();
-	var urlAdditionProteinSequenceIds = "";
+	var urlAdditionproteinSequenceVersionIds = "";
 	for ( var index = 0; index < selProteinsForSeqCov.length; index++ ) {
 		var protein = selProteinsForSeqCov[ index ];
-		urlAdditionProteinSequenceIds += "&proteinSequenceId=" + protein;
+		urlAdditionproteinSequenceVersionIds += "&proteinSequenceVersionId=" + protein;
 	}
-	url += urlAdditionProteinSequenceIds;
-	console.log( "Loading sequence coverage data for selProteinsForSeqCov: " + urlAdditionProteinSequenceIds );
+	url += urlAdditionproteinSequenceVersionIds;
+	console.log( "Loading sequence coverage data for selProteinsForSeqCov: " + urlAdditionproteinSequenceVersionIds );
 	$.ajax({
 		type: "GET",
 		url: url,
@@ -3035,8 +3035,8 @@ function precomputeMultiplierAndOtherValuesForSVG( svgRootSnapSVGObject, selecte
 	var maxProteinLength = 0;
 	var selectedProteins = _indexManager.getProteinList();
 	for ( var i = 0; i < selectedProteins.length; i++ ) {
-		var proteinSequenceId = selectedProteins[ i ];
-		var proteinLength = _proteinLengths.getProteinLength( proteinSequenceId );
+		var proteinSequenceVersionId = selectedProteins[ i ];
+		var proteinLength = _proteinLengths.getProteinLength( proteinSequenceVersionId );
 		if ( proteinLength > maxProteinLength ) { 
 			maxProteinLength = proteinLength; 
 		}

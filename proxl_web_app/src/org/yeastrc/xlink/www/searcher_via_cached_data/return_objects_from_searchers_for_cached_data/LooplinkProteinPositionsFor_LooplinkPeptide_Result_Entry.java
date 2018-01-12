@@ -2,15 +2,15 @@ package org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searc
 
 public class LooplinkProteinPositionsFor_LooplinkPeptide_Result_Entry {
 	
-	private int proteinSequenceId;
+	private int proteinSequenceVersionId;
 	private int proteinSequencePosition_1;
 	private int proteinSequencePosition_2;
 	
-	public int getProteinSequenceId() {
-		return proteinSequenceId;
+	public int getProteinSequenceVersionId() {
+		return proteinSequenceVersionId;
 	}
-	public void setProteinSequenceId(int proteinSequenceId) {
-		this.proteinSequenceId = proteinSequenceId;
+	public void setProteinSequenceVersionId(int proteinSequenceVersionId) {
+		this.proteinSequenceVersionId = proteinSequenceVersionId;
 	}
 	public int getProteinSequencePosition_1() {
 		return proteinSequencePosition_1;

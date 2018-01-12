@@ -116,8 +116,8 @@ var showProteinSelectInOverlay = function( chainId ) {
 	if( alignments && alignments.length > 0 ) {
 		for( var i = 0; i < alignments.length; i++ ) {
 			var alignment = alignments[ i ];
-			var alignmentProteinSequenceId = alignment.proteinSequenceId;
-			alignedProteins.push( alignmentProteinSequenceId );			
+			var alignmentproteinSequenceVersionId = alignment.proteinSequenceVersionId;
+			alignedProteins.push( alignmentproteinSequenceVersionId );			
 		}
 	}	
 	
@@ -220,11 +220,11 @@ var showAlignment = function( alignment, showSave ) {
 	}
 	
 	
-	var proteinNameForProteinId = _proteinNames[ alignment.proteinSequenceId ];
+	var proteinNameForProteinId = _proteinNames[ alignment.proteinSequenceVersionId ];
 	
 	var html = 
 		"<div style=\"margin-top:20px;margin-bottom:20px;font-size:14pt;\">Showing alignment for "
-		+ _proteinNames[ alignment.proteinSequenceId ] 
+		+ _proteinNames[ alignment.proteinSequenceVersionId ] 
 		+ " and " 
 		+ pdbFile.name + " (Chain " + alignment.chainId + "):</div>\n"
 	
@@ -281,7 +281,7 @@ var showEditAlignmentOverlay = function( alignment ) {
 	var $overlayDiv = $("#pdb-show-alignment-overlay-body");
 	$overlayDiv.empty();
 	
-	var proteinNameForAlignment  = _proteinNames[ alignment.proteinSequenceId ];
+	var proteinNameForAlignment  = _proteinNames[ alignment.proteinSequenceVersionId ];
 	
 	var html = 
 		"<div style=\"margin-top:20px;margin-bottom:20px;font-size:14pt;\">Editing alignment for " 
@@ -358,7 +358,7 @@ var saveEditedAlignment = function( alignment ) {
 	
 	var rawExperimentalSequence = alignment.alignedExperimentalSequence.replace( /-/g, "" );
 	if( tmpExperimentalSequence !== rawExperimentalSequence ) {
-		var proteinName = _proteinNames[ alignment.proteinSequenceId ];
+		var proteinName = _proteinNames[ alignment.proteinSequenceVersionId ];
 		
 		alert( "Sequence given for " + proteinName + " does not match sequence on file for that protein." );
 		return;
@@ -392,7 +392,7 @@ var saveAlignment = function( alignment ) {
 	        type: "POST",
 	        url: _URL,
 	        data: { 'id' : alignment.id, 'pdbFileId' : alignment.pdbFileId, 'chainId' : alignment.chainId,
-	        	'alignedPDBSequence' : alignment.alignedPDBSequence, 'proteinSequenceId' : alignment.proteinSequenceId,
+	        	'alignedPDBSequence' : alignment.alignedPDBSequence, 'proteinSequenceVersionId' : alignment.proteinSequenceVersionId,
 	        	'alignedExperimentalSequence' : alignment.alignedExperimentalSequence },
 	        dataType: "json",
 	        success: function(data)	{

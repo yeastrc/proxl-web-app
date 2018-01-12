@@ -30,7 +30,13 @@ import org.yeastrc.proxl_import.api.xml_dto.Linker;
 import org.yeastrc.proxl_import.api.xml_dto.Linkers;
 import org.yeastrc.proxl_import.api.xml_dto.MonolinkMass;
 import org.yeastrc.proxl_import.api.xml_dto.MonolinkMasses;
+import org.yeastrc.proxl_import.api.xml_dto.Peptide;
+import org.yeastrc.proxl_import.api.xml_dto.Peptides;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
+import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
+import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptides;
+import org.yeastrc.proxl_import.api.xml_dto.Peptide.PeptideIsotopeLabels;
+import org.yeastrc.proxl_import.api.xml_dto.Peptide.PeptideIsotopeLabels.PeptideIsotopeLabel;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
 import org.yeastrc.xlink.dao.LinkerDAO;
 import org.yeastrc.xlink.dao.SearchCommentDAO;
@@ -99,8 +105,10 @@ public class ProcessProxlInput {
 			} else {
 				searchDTO.setHasScanData( true );
 			}
+			searchDTO.setHasIsotopeLabel( peptideContainsIsotopeLabel( proxlInput ) );
 			SearchDAO_Importer.getInstance().saveToDatabase( searchDTO );
 			searchDTOInserted = searchDTO;
+			
 			ProjectSearchDTO_Importer projectSearchDTO = new ProjectSearchDTO_Importer();
 			projectSearchDTO.setProjectId( projectId );
 			projectSearchDTO.setSearchId( searchDTO.getId() );
@@ -489,4 +497,63 @@ public class ProcessProxlInput {
 			DB_Insert_LinkerPerSearchCrosslinkMassDAO.getInstance().save( linkerPerSearchCrosslinkMassDTO );
 		}
 	}
+	
+
+	/**
+	 * At least one "peptide" under a "reported_peptide" contains "peptide_isotope_label"
+	 * @param proxlInput
+	 * @throws ProxlImporterDataException for data errors
+	 */
+	private boolean peptideContainsIsotopeLabel( ProxlInput proxlInput ) throws ProxlImporterDataException {
+		
+		ReportedPeptides reportedPeptides = proxlInput.getReportedPeptides();
+		if ( reportedPeptides != null ) {
+			List<ReportedPeptide> reportedPeptideList =
+					reportedPeptides.getReportedPeptide();
+			if ( reportedPeptideList != null && ( ! reportedPeptideList.isEmpty() ) ) {
+				for ( ReportedPeptide reportedPeptide : reportedPeptideList ) {
+					if ( peptideContainsIsotopeLabel_ProcessSingleReportedPeptide( reportedPeptide ) ) {
+						//  This reported peptide contains at least one peptide that contains "peptide_isotope_label"
+						return true;  //  EARLY RETURN
+					}
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * @param reportedPeptide
+	 * @throws ProxlImporterDataException
+	 */
+	private boolean peptideContainsIsotopeLabel_ProcessSingleReportedPeptide( ReportedPeptide reportedPeptide ) throws ProxlImporterDataException {
+		
+		Peptides peptides = reportedPeptide.getPeptides();
+		if ( peptides == null ) {
+			String msg = "No Peptides under reported peptide id: " + reportedPeptide.getReportedPeptideString();
+			log.error( msg );
+			throw new ProxlImporterDataException( msg );
+		}
+		List<Peptide> peptideList = peptides.getPeptide();
+		if ( peptideList == null || peptideList.isEmpty() ) {
+			String msg = "No Peptides under reported peptide id: " + reportedPeptide.getReportedPeptideString();
+			log.error( msg );
+			throw new ProxlImporterDataException( msg );
+		}
+		
+		for ( Peptide peptide : peptideList ) {
+			PeptideIsotopeLabels peptideIsotopeLabels = peptide.getPeptideIsotopeLabels();
+			if ( peptideIsotopeLabels != null ) {
+				PeptideIsotopeLabel peptideIsotopeLabel = peptideIsotopeLabels.getPeptideIsotopeLabel();
+				if ( StringUtils.isNotEmpty( peptideIsotopeLabel.getLabel() ) ) {
+					// Peptide contains a isotope label
+					return true; // EARLY RETURN
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 }

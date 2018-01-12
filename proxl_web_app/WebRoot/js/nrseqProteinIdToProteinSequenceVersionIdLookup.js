@@ -1,10 +1,10 @@
 "use strict";
 
-//   nrseqProteinIdToProteinSequenceIdLookup.js
+//   nrseqProteinIdToProteinSequenceVersionIdLookup.js
 
 //  Perform the AJAX call to get protein sequence id values for the provided nrseq protein ids
 
-function getProteinSequenceIdsForNrseqProteinIds( params ) {
+function getProteinSequenceVersionIdsForNrseqProteinIds( params ) {
 	
 	try {
 
@@ -16,7 +16,7 @@ function getProteinSequenceIdsForNrseqProteinIds( params ) {
 
 		incrementSpinner();				// create spinner
 
-		var url = contextPathJSVar + "/services/nrseqDataMapping/getProteinSequenceIdsForNrseqProteinIds";
+		var url = contextPathJSVar + "/services/nrseqDataMapping/getProteinSequenceVersionIdsForNrseqProteinIds";
 
 
 		var ajaxRequestData = {

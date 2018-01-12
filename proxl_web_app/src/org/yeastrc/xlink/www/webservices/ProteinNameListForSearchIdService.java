@@ -15,10 +15,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.ProteinSequenceIdProteinAnnotationName;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionIdProteinAnnotationName;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher.ProteinSequenceIdAnnotationNameSearcher;
+import org.yeastrc.xlink.www.searcher.ProteinSequenceVersionIdAnnotationNameSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -116,20 +116,20 @@ public class ProteinNameListForSearchIdService {
 			    	        );
 			}
 			
-			//  Get  ProteinSequenceId and AnnotationName for search
+			//  Get  proteinSequenceVersionId and AnnotationName for search
 			
-			List<ProteinSequenceIdProteinAnnotationName> proteinSequenceIdProteinAnnotationNameList = 
-					ProteinSequenceIdAnnotationNameSearcher.getInstance()
-					.getProteinSequenceIdAnnotationNameForSearch( searchId );
+			List<ProteinSequenceVersionIdProteinAnnotationName> proteinSequenceVersionIdProteinAnnotationNameList = 
+					ProteinSequenceVersionIdAnnotationNameSearcher.getInstance()
+					.getProteinSequenceVersionIdAnnotationNameForSearch( searchId );
 
-			Collections.sort( proteinSequenceIdProteinAnnotationNameList, new Comparator<ProteinSequenceIdProteinAnnotationName>() {
+			Collections.sort( proteinSequenceVersionIdProteinAnnotationNameList, new Comparator<ProteinSequenceVersionIdProteinAnnotationName>() {
 				@Override
-				public int compare(ProteinSequenceIdProteinAnnotationName o1, ProteinSequenceIdProteinAnnotationName o2) {
+				public int compare(ProteinSequenceVersionIdProteinAnnotationName o1, ProteinSequenceVersionIdProteinAnnotationName o2) {
 					return o1.getAnnotationName().compareToIgnoreCase( o2.getAnnotationName() );
 				}
 			});
 			ProteinNameListForSearchIdServiceResult result = new ProteinNameListForSearchIdServiceResult();
-			result.proteinSequenceIdProteinAnnotationNameList = proteinSequenceIdProteinAnnotationNameList;
+			result.proteinSequenceVersionIdProteinAnnotationNameList = proteinSequenceVersionIdProteinAnnotationNameList;
 			return result;
 			
 		} catch ( WebApplicationException e ) {
@@ -148,15 +148,15 @@ public class ProteinNameListForSearchIdService {
 	
 	public static final class ProteinNameListForSearchIdServiceResult {
 		
-		List<ProteinSequenceIdProteinAnnotationName> proteinSequenceIdProteinAnnotationNameList;
+		List<ProteinSequenceVersionIdProteinAnnotationName> proteinSequenceVersionIdProteinAnnotationNameList;
 
-		public List<ProteinSequenceIdProteinAnnotationName> getProteinSequenceIdProteinAnnotationNameList() {
-			return proteinSequenceIdProteinAnnotationNameList;
+		public List<ProteinSequenceVersionIdProteinAnnotationName> getProteinSequenceVersionIdProteinAnnotationNameList() {
+			return proteinSequenceVersionIdProteinAnnotationNameList;
 		}
 
-		public void setProteinSequenceIdProteinAnnotationNameList(
-				List<ProteinSequenceIdProteinAnnotationName> proteinSequenceIdProteinAnnotationNameList) {
-			this.proteinSequenceIdProteinAnnotationNameList = proteinSequenceIdProteinAnnotationNameList;
+		public void setProteinSequenceVersionIdProteinAnnotationNameList(
+				List<ProteinSequenceVersionIdProteinAnnotationName> proteinSequenceVersionIdProteinAnnotationNameList) {
+			this.proteinSequenceVersionIdProteinAnnotationNameList = proteinSequenceVersionIdProteinAnnotationNameList;
 		}
 		
 	}

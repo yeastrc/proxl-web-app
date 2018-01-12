@@ -9,7 +9,7 @@ import org.yeastrc.xlink.www.dto.ProteinSequenceDTO;
 
 /**
  * 
- * table protein_sequence
+ * table protein_sequence_v2
  */
 public class ProteinSequenceDAO {
 
@@ -27,7 +27,7 @@ public class ProteinSequenceDAO {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT sequence FROM protein_sequence WHERE id = ?";
+		String sql = "SELECT sequence FROM protein_sequence_v2 WHERE id = ?";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );

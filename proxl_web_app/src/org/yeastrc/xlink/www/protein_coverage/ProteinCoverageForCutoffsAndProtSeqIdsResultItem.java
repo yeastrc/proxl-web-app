@@ -4,12 +4,12 @@ package org.yeastrc.xlink.www.protein_coverage;
  * One entry in result from PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher
  *
  */
-public class PeptideProteinPositionsForCutoffsAndProtSeqIdsResultItem {
+public class ProteinCoverageForCutoffsAndProtSeqIdsResultItem {
 
 	private int searchId;
 	private int reportedPeptideId;
-	private int peptideId;
-	private int proteinSequenceId;
+//	private int peptideIdInfoOnly; //  Not to be used for peptide to protein mapping
+	private int proteinSequenceVersionId;
 	private int proteinStartPosition;
 	private int proteinEndPosition;
 	
@@ -26,17 +26,11 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsResultItem {
 	public void setReportedPeptideId(int reportedPeptideId) {
 		this.reportedPeptideId = reportedPeptideId;
 	}
-	public int getPeptideId() {
-		return peptideId;
+	public int getProteinSequenceVersionId() {
+		return proteinSequenceVersionId;
 	}
-	public void setPeptideId(int peptideId) {
-		this.peptideId = peptideId;
-	}
-	public int getProteinSequenceId() {
-		return proteinSequenceId;
-	}
-	public void setProteinSequenceId(int proteinSequenceId) {
-		this.proteinSequenceId = proteinSequenceId;
+	public void setProteinSequenceVersionId(int proteinSequenceVersionId) {
+		this.proteinSequenceVersionId = proteinSequenceVersionId;
 	}
 	public int getProteinStartPosition() {
 		return proteinStartPosition;

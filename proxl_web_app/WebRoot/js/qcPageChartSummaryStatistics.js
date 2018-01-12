@@ -326,7 +326,7 @@ var QCPageChartSummaryStatistics = function() {
 
 		var qc_SummaryCountsResults = ajaxResponseData.qc_SummaryCountsResults;
 		var resultsPerLinkTypeList = qc_SummaryCountsResults.resultsPerLinkTypeList;
-		var uniqueProteinSequenceIdCountAllLinkTypes = qc_SummaryCountsResults.uniqueProteinSequenceIdCountAllLinkTypes;
+		var uniqueproteinSequenceVersionIdCountAllLinkTypes = qc_SummaryCountsResults.uniqueproteinSequenceVersionIdCountAllLinkTypes;
 
 		// Block for "Summary Statistics"
 		var $Summary_Statistics_CountsBlock = $("#Summary_Statistics_CountsBlock");
@@ -338,7 +338,7 @@ var QCPageChartSummaryStatistics = function() {
 		//  Build data for charts
 		var psmCountPerType = [];
 		var reportedPeptideCountPerType = [];
-		var proteinSequenceIdCountPerType = [];
+		var proteinSequenceVersionIdCountPerType = [];
 
 		var foundDataForAtLeastOneLinkType = false;
 
@@ -362,14 +362,14 @@ var QCPageChartSummaryStatistics = function() {
 					count : entry.uniqueReportedPeptideCount
 			};
 
-			var proteinSequenceIdCountSingleType = { 
+			var proteinSequenceVersionIdCountSingleType = { 
 					linkType : entry.linkType,
-					count : entry.uniqueProteinSequenceIdCount
+					count : entry.uniqueproteinSequenceVersionIdCount
 			};
 
 			psmCountPerType.push( psmCountSingleType );
 			reportedPeptideCountPerType.push( reportedPeptideCountSingleType );
-			proteinSequenceIdCountPerType.push( proteinSequenceIdCountSingleType );
+			proteinSequenceVersionIdCountPerType.push( proteinSequenceVersionIdCountSingleType );
 
 		}, this /* passed to function as this */ );
 
@@ -453,8 +453,8 @@ var QCPageChartSummaryStatistics = function() {
 
 		this._addSummaryChart( { 
 			chartTitle : 'Protein Count',
-			dataWithOneElementPerType: proteinSequenceIdCountPerType, 
-			combinedCount : uniqueProteinSequenceIdCountAllLinkTypes,
+			dataWithOneElementPerType: proteinSequenceVersionIdCountPerType, 
+			combinedCount : uniqueproteinSequenceVersionIdCountAllLinkTypes,
 			$chartContainer : $chart_container_jq } );
 
 		//  Download Data Setup

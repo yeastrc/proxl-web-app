@@ -15,7 +15,7 @@ import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -46,7 +46,7 @@ import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
 import org.yeastrc.xlink.www.objects.SearchProteinLooplinkWrapper;
-import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
+import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
 
 /**
  *  Common code for Merged Protein and Download Merged Protein 
@@ -108,20 +108,20 @@ public class ProteinsMergedCommonPageDownload {
 		////////////
 		//  Copy Exclude Taxonomy and Exclude Protein Sets for lookup
 		Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
-		Set<Integer> excludeProteinSequenceIds_Set_UserInput = new HashSet<>();
+		Set<Integer> excludeproteinSequenceVersionIds_Set_UserInput = new HashSet<>();
 		proteinsMergedCommonPageDownloadResult.excludeTaxonomy_Ids_Set_UserInput = excludeTaxonomy_Ids_Set_UserInput;
-		proteinsMergedCommonPageDownloadResult.excludeProteinSequenceIds_Set_UserInput = excludeProteinSequenceIds_Set_UserInput;
+		proteinsMergedCommonPageDownloadResult.excludeproteinSequenceVersionIds_Set_UserInput = excludeproteinSequenceVersionIds_Set_UserInput;
 		if ( proteinQueryJSONRoot.getExcludeTaxonomy() != null ) {
 			for ( Integer taxonomyId : proteinQueryJSONRoot.getExcludeTaxonomy() ) {
 				excludeTaxonomy_Ids_Set_UserInput.add( taxonomyId );
 			}
 		}
 		//  First convert the protein sequence ids that come from the JS code to standard integers and put
-		//   in the property excludeProteinSequenceIds
-		ProteinsMergedProteinsCommon.getInstance().processExcludeProteinSequenceIdsFromJS( proteinQueryJSONRoot );
-		if ( proteinQueryJSONRoot.getExcludeProteinSequenceIds() != null ) {
-			for ( Integer proteinId : proteinQueryJSONRoot.getExcludeProteinSequenceIds() ) {
-				excludeProteinSequenceIds_Set_UserInput.add( proteinId );
+		//   in the property excludeproteinSequenceVersionIds
+		ProteinsMergedProteinsCommon.getInstance().processExcludeproteinSequenceVersionIdsFromJS( proteinQueryJSONRoot );
+		if ( proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() != null ) {
+			for ( Integer proteinId : proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() ) {
+				excludeproteinSequenceVersionIds_Set_UserInput.add( proteinId );
 			}
 		}
 		/////////////////////////////////////////////////////////////////////////////
@@ -214,8 +214,8 @@ public class ProteinsMergedCommonPageDownload {
 				SearchProteinCrosslink searchProteinCrosslink = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
 				SearchProtein searchProtein_1 = searchProteinCrosslink.getProtein1();
 				SearchProtein searchProtein_2 = searchProteinCrosslink.getProtein2();
-				Integer searchProtein_id_1 = searchProtein_1.getProteinSequenceObject().getProteinSequenceId();
-				Integer searchProtein_id_2 = searchProtein_2.getProteinSequenceObject().getProteinSequenceId();
+				Integer searchProtein_id_1 = searchProtein_1.getProteinSequenceVersionObject().getProteinSequenceVersionId();
+				Integer searchProtein_id_2 = searchProtein_2.getProteinSequenceVersionObject().getProteinSequenceVersionId();
 				{
 					Set<Integer> searchIdsForProtein_1 =
 							allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.get( searchProtein_id_1 );
@@ -238,7 +238,7 @@ public class ProteinsMergedCommonPageDownload {
 			for ( SearchProteinLooplinkWrapper searchProteinLooplinkWrapper : wrappedLooplinks ) {
 				SearchProteinLooplink searchProteinLooplink = searchProteinLooplinkWrapper.getSearchProteinLooplink();
 				SearchProtein searchProtein = searchProteinLooplink.getProtein();
-				Integer searchProtein_id = searchProtein.getProteinSequenceObject().getProteinSequenceId();
+				Integer searchProtein_id = searchProtein.getProteinSequenceVersionObject().getProteinSequenceVersionId();
 				Set<Integer> searchIdsForProtein =
 						allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.get( searchProtein_id );
 				if ( searchIdsForProtein == null ) {
@@ -256,7 +256,7 @@ public class ProteinsMergedCommonPageDownload {
 					
 					//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
 					
-					|| ( ! excludeProteinSequenceIds_Set_UserInput.isEmpty() ) 
+					|| ( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) 
 					|| ( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) ) {
 				///////  Output Lists, Results After Filtering
 				List<SearchProteinCrosslinkWrapper> wrappedCrosslinksAfterFilter = new ArrayList<>( wrappedCrosslinks.size() );
@@ -267,16 +267,16 @@ public class ProteinsMergedCommonPageDownload {
 					// did user request removal of certain taxonomy IDs?
 					if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 						boolean excludeOnProtein_1 =
-								ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-								.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+								ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+								.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 										excludeTaxonomy_Ids_Set_UserInput, 
-										link.getProtein1().getProteinSequenceObject(), 
+										link.getProtein1().getProteinSequenceVersionObject(), 
 										searchId );
 						boolean excludeOnProtein_2 =
-								ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-								.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+								ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+								.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 										excludeTaxonomy_Ids_Set_UserInput, 
-										link.getProtein2().getProteinSequenceObject(), 
+										link.getProtein2().getProteinSequenceVersionObject(), 
 										searchId );
 						if ( excludeOnProtein_1 || excludeOnProtein_2 ) {
 							//  Skip to next entry in list, dropping this entry from output list
@@ -284,11 +284,11 @@ public class ProteinsMergedCommonPageDownload {
 						}
 					}
 					// did user request removal of certain protein IDs?
-					if( ! excludeProteinSequenceIds_Set_UserInput.isEmpty() ) {
-						int proteinId_1 = link.getProtein1().getProteinSequenceObject().getProteinSequenceId();
-						int proteinId_2 = link.getProtein2().getProteinSequenceObject().getProteinSequenceId();
-						if ( excludeProteinSequenceIds_Set_UserInput.contains( proteinId_1 ) 
-								|| excludeProteinSequenceIds_Set_UserInput.contains( proteinId_2 ) ) {
+					if( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) {
+						int proteinId_1 = link.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId();
+						int proteinId_2 = link.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId();
+						if ( excludeproteinSequenceVersionIds_Set_UserInput.contains( proteinId_1 ) 
+								|| excludeproteinSequenceVersionIds_Set_UserInput.contains( proteinId_2 ) ) {
 							//  Skip to next entry in list, dropping this entry from output list
 							continue;  // EARLY CONTINUE
 						}
@@ -324,10 +324,10 @@ public class ProteinsMergedCommonPageDownload {
 					// did user request removal of certain taxonomy IDs?
 					if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 						boolean excludeOnProtein =
-								ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-								.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+								ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+								.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 										excludeTaxonomy_Ids_Set_UserInput, 
-										link.getProtein().getProteinSequenceObject(), 
+										link.getProtein().getProteinSequenceVersionObject(), 
 										searchId );
 						if ( excludeOnProtein ) {
 							//  Skip to next entry in list, dropping this entry from output list
@@ -335,9 +335,9 @@ public class ProteinsMergedCommonPageDownload {
 						}
 					}
 					// did user request removal of certain protein IDs?
-					if( ! excludeProteinSequenceIds_Set_UserInput.isEmpty() ) {
-						int proteinId = link.getProtein().getProteinSequenceObject().getProteinSequenceId();
-						if ( excludeProteinSequenceIds_Set_UserInput.contains( proteinId ) ) {
+					if( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) {
+						int proteinId = link.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
+						if ( excludeproteinSequenceVersionIds_Set_UserInput.contains( proteinId ) ) {
 							//  Skip to next entry in list, dropping this entry from output list
 							continue;  // EARLY CONTINUE
 						}
@@ -491,10 +491,10 @@ public class ProteinsMergedCommonPageDownload {
 					searchProteinCrosslinksMapOnSearchDTOForThisItem.put(searchDTO, searchProteinCrosslink );
 				}
 				SearchProteinCrosslink anySearchProteinCrosslink = anySearchProteinCrosslinkWrapper.getSearchProteinCrosslink();
-				ProteinSequenceObject ProteinSequenceObject_1 = new ProteinSequenceObject();
-				ProteinSequenceObject_1.setProteinSequenceId( anySearchProteinCrosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId() );
-				ProteinSequenceObject ProteinSequenceObject_2 = new ProteinSequenceObject();
-				ProteinSequenceObject_2.setProteinSequenceId( anySearchProteinCrosslink.getProtein2().getProteinSequenceObject().getProteinSequenceId() );
+				ProteinSequenceVersionObject ProteinSequenceObject_1 = new ProteinSequenceVersionObject();
+				ProteinSequenceObject_1.setProteinSequenceVersionId( anySearchProteinCrosslink.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
+				ProteinSequenceVersionObject ProteinSequenceObject_2 = new ProteinSequenceVersionObject();
+				ProteinSequenceObject_2.setProteinSequenceVersionId( anySearchProteinCrosslink.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 				MergedSearchProtein protein_1 = new MergedSearchProtein( searchesForThisItem, ProteinSequenceObject_1 );
 				MergedSearchProtein protein_2 = new MergedSearchProtein( searchesForThisItem, ProteinSequenceObject_2 );
 				MergedSearchProteinCrosslink mergedSearchProteinCrosslink = new MergedSearchProteinCrosslink();
@@ -518,8 +518,8 @@ public class ProteinsMergedCommonPageDownload {
 				mergedSearchProteinCrosslinkWrapper.setSearchProteinCrosslinkWrapperMapOnSearchId( crosslinksWrapperMapOnSearchId );
 				SearchProteinCrosslinkWrapper anySearchProteinCrosslinkWrapper = crosslinksWrapperMapOnSearchId.entrySet().iterator().next().getValue();
 				SearchProteinCrosslink anySearchProteinCrosslink = anySearchProteinCrosslinkWrapper.getSearchProteinCrosslink();
-				mergedSearchProteinCrosslinkWrapper.setProteinId_1( anySearchProteinCrosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId() );
-				mergedSearchProteinCrosslinkWrapper.setProteinId_2( anySearchProteinCrosslink.getProtein2().getProteinSequenceObject().getProteinSequenceId() );
+				mergedSearchProteinCrosslinkWrapper.setProteinId_1( anySearchProteinCrosslink.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
+				mergedSearchProteinCrosslinkWrapper.setProteinId_2( anySearchProteinCrosslink.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 				mergedSearchProteinCrosslinkWrapper.setProtein_1_Position( anySearchProteinCrosslink.getProtein1Position() );
 				mergedSearchProteinCrosslinkWrapper.setProtein_2_Position( anySearchProteinCrosslink.getProtein2Position() );
 			}
@@ -563,10 +563,10 @@ public class ProteinsMergedCommonPageDownload {
 					associatedReportedPeptideIdsRelatedPeptidesUniqueMergedSet.addAll( searchProteinCrosslink.getAssociatedReportedPeptideIdsRelatedPeptidesUnique() );
 					searchProteinCrosslinksMapOnSearchDTOForThisItem.put(searchDTO, searchProteinCrosslink );
 				}
-				ProteinSequenceObject ProteinSequenceObject_1 = new ProteinSequenceObject();
-				ProteinSequenceObject_1.setProteinSequenceId( mergedSearchProteinCrosslinkWrapper.getProteinId_1() );
-				ProteinSequenceObject ProteinSequenceObject_2 = new ProteinSequenceObject();
-				ProteinSequenceObject_2.setProteinSequenceId( mergedSearchProteinCrosslinkWrapper.getProteinId_2() );
+				ProteinSequenceVersionObject ProteinSequenceObject_1 = new ProteinSequenceVersionObject();
+				ProteinSequenceObject_1.setProteinSequenceVersionId( mergedSearchProteinCrosslinkWrapper.getProteinId_1() );
+				ProteinSequenceVersionObject ProteinSequenceObject_2 = new ProteinSequenceVersionObject();
+				ProteinSequenceObject_2.setProteinSequenceVersionId( mergedSearchProteinCrosslinkWrapper.getProteinId_2() );
 				MergedSearchProtein protein_1 = new MergedSearchProtein( searchesForThisItem, ProteinSequenceObject_1 );
 				MergedSearchProtein protein_2 = new MergedSearchProtein( searchesForThisItem, ProteinSequenceObject_2 );
 				MergedSearchProteinCrosslink mergedSearchProteinCrosslink = new MergedSearchProteinCrosslink();
@@ -701,8 +701,8 @@ public class ProteinsMergedCommonPageDownload {
 					searchProteinLooplinksMapOnSearchDTOForThisItem.put(searchDTO, searchProteinLooplink );
 				}
 				SearchProteinLooplink anySearchProteinLooplink = anySearchProteinLooplinkWrapper.getSearchProteinLooplink();
-				ProteinSequenceObject ProteinSequenceObject = new ProteinSequenceObject();
-				ProteinSequenceObject.setProteinSequenceId( anySearchProteinLooplink.getProtein().getProteinSequenceObject().getProteinSequenceId() );
+				ProteinSequenceVersionObject ProteinSequenceObject = new ProteinSequenceVersionObject();
+				ProteinSequenceObject.setProteinSequenceVersionId( anySearchProteinLooplink.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 				MergedSearchProtein protein = new MergedSearchProtein( searchesForThisItem, ProteinSequenceObject );
 				MergedSearchProteinLooplink mergedSearchProteinLooplink = new MergedSearchProteinLooplink();
 				looplinks.add( mergedSearchProteinLooplink );
@@ -726,7 +726,7 @@ public class ProteinsMergedCommonPageDownload {
 				mergedSearchProteinLooplinkWrapper.setSearchProteinLooplinkWrapperMapOnSearchId( looplinksWrapperMapOnSearchId );
 				SearchProteinLooplinkWrapper anySearchProteinLooplinkWrapper = looplinksWrapperMapOnSearchId.entrySet().iterator().next().getValue();
 				SearchProteinLooplink anySearchProteinLooplink = anySearchProteinLooplinkWrapper.getSearchProteinLooplink();
-				mergedSearchProteinLooplinkWrapper.setProteinId( anySearchProteinLooplink.getProtein().getProteinSequenceObject().getProteinSequenceId() );
+				mergedSearchProteinLooplinkWrapper.setProteinId( anySearchProteinLooplink.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 				mergedSearchProteinLooplinkWrapper.setProteinPosition_1( anySearchProteinLooplink.getProteinPosition1() );
 				mergedSearchProteinLooplinkWrapper.setProteinPosition_2( anySearchProteinLooplink.getProteinPosition2() );
 			}
@@ -769,8 +769,8 @@ public class ProteinsMergedCommonPageDownload {
 					associatedReportedPeptideIdsRelatedPeptidesUniqueMergedSet.addAll( searchProteinLooplink.getAssociatedReportedPeptideIdsRelatedPeptidesUnique() );
 					searchProteinLooplinksMapOnSearchDTOForThisItem.put(searchDTO, searchProteinLooplink );
 				}
-				ProteinSequenceObject ProteinSequenceObject = new ProteinSequenceObject();
-				ProteinSequenceObject.setProteinSequenceId( mergedSearchProteinLooplinkWrapper.getProteinId() );
+				ProteinSequenceVersionObject ProteinSequenceObject = new ProteinSequenceVersionObject();
+				ProteinSequenceObject.setProteinSequenceVersionId( mergedSearchProteinLooplinkWrapper.getProteinId() );
 				MergedSearchProtein protein = new MergedSearchProtein( searchesForThisItem, ProteinSequenceObject );
 				MergedSearchProteinLooplink mergedSearchProteinLooplink = new MergedSearchProteinLooplink();
 				looplinks.add( mergedSearchProteinLooplink );
@@ -881,8 +881,8 @@ public class ProteinsMergedCommonPageDownload {
 		 * constructor
 		 */
 		public CrosslinkPrimaryKey( SearchProteinCrosslink link ) {
-			proteinId_1 = link.getProtein1().getProteinSequenceObject().getProteinSequenceId();
-			proteinId_2 = link.getProtein2().getProteinSequenceObject().getProteinSequenceId();
+			proteinId_1 = link.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId();
+			proteinId_2 = link.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 			protein_1_Position = link.getProtein1Position();
 			protein_2_Position = link.getProtein2Position();
 		}
@@ -935,7 +935,7 @@ public class ProteinsMergedCommonPageDownload {
 		 * constructor
 		 */
 		public LooplinkPrimaryKey( SearchProteinLooplink link ) {
-			proteinId = link.getProtein().getProteinSequenceObject().getProteinSequenceId();
+			proteinId = link.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 			proteinPosition_1 = link.getProteinPosition1();
 			proteinPosition_2 = link.getProteinPosition2();
 		}
@@ -1014,11 +1014,11 @@ public class ProteinsMergedCommonPageDownload {
 				//  If everything matches, sort on protein id, protein positions
 				SearchProteinCrosslink searchProteinCrosslink_o1 = searchProteinCrosslinkWrapper_o1.getSearchProteinCrosslink();
 				SearchProteinCrosslink searchProteinCrosslink_o2 = searchProteinCrosslinkWrapper_o2.getSearchProteinCrosslink();
-				if ( searchProteinCrosslink_o1.getProtein1().getProteinSequenceObject().getProteinSequenceId() != searchProteinCrosslink_o2.getProtein1().getProteinSequenceObject().getProteinSequenceId() ) {
-					return searchProteinCrosslink_o1.getProtein1().getProteinSequenceObject().getProteinSequenceId() - searchProteinCrosslink_o2.getProtein1().getProteinSequenceObject().getProteinSequenceId();
+				if ( searchProteinCrosslink_o1.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() != searchProteinCrosslink_o2.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
+					return searchProteinCrosslink_o1.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() - searchProteinCrosslink_o2.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 				}
-				if ( searchProteinCrosslink_o1.getProtein2().getProteinSequenceObject().getProteinSequenceId() != searchProteinCrosslink_o2.getProtein2().getProteinSequenceObject().getProteinSequenceId() ) {
-					return searchProteinCrosslink_o1.getProtein2().getProteinSequenceObject().getProteinSequenceId() - searchProteinCrosslink_o2.getProtein2().getProteinSequenceObject().getProteinSequenceId();
+				if ( searchProteinCrosslink_o1.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() != searchProteinCrosslink_o2.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
+					return searchProteinCrosslink_o1.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() - searchProteinCrosslink_o2.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 				}
 				if ( searchProteinCrosslink_o1.getProtein1Position() != searchProteinCrosslink_o2.getProtein1Position() ) {
 					return searchProteinCrosslink_o1.getProtein1Position() - searchProteinCrosslink_o2.getProtein1Position();
@@ -1081,8 +1081,8 @@ public class ProteinsMergedCommonPageDownload {
 				//  If everything matches, sort on protein id, protein positions
 				SearchProteinLooplink searchProteinLooplink_o1 = searchProteinLooplinkWrapper_o1.getSearchProteinLooplink();
 				SearchProteinLooplink searchProteinLooplink_o2 = searchProteinLooplinkWrapper_o2.getSearchProteinLooplink();
-				if ( searchProteinLooplink_o1.getProtein().getProteinSequenceObject().getProteinSequenceId() != searchProteinLooplink_o2.getProtein().getProteinSequenceObject().getProteinSequenceId() ) {
-					return searchProteinLooplink_o1.getProtein().getProteinSequenceObject().getProteinSequenceId() - searchProteinLooplink_o2.getProtein().getProteinSequenceObject().getProteinSequenceId();
+				if ( searchProteinLooplink_o1.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() != searchProteinLooplink_o2.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
+					return searchProteinLooplink_o1.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() - searchProteinLooplink_o2.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 				}
 				if ( searchProteinLooplink_o1.getProteinPosition1() != searchProteinLooplink_o2.getProteinPosition1() ) {
 					return searchProteinLooplink_o1.getProteinPosition1() - searchProteinLooplink_o2.getProteinPosition1();
@@ -1250,7 +1250,7 @@ public class ProteinsMergedCommonPageDownload {
 		
 		ProteinQueryJSONRoot proteinQueryJSONRoot;
 		Set<Integer> excludeTaxonomy_Ids_Set_UserInput;
-		Set<Integer> excludeProteinSequenceIds_Set_UserInput;
+		Set<Integer> excludeproteinSequenceVersionIds_Set_UserInput;
 		List<AnnDisplayNameDescPeptPsmListsPair> peptidePsmAnnotationNameDescListsForEachSearch;
 		List<MergedSearchProteinCrosslink> crosslinks;
 		List<MergedSearchProteinLooplink> looplinks;
@@ -1282,11 +1282,11 @@ public class ProteinsMergedCommonPageDownload {
 			this.excludeTaxonomy_Ids_Set_UserInput = excludeTaxonomy_Ids_Set_UserInput;
 		}
 		public Set<Integer> getExcludeProtein_Ids_Set_UserInput() {
-			return excludeProteinSequenceIds_Set_UserInput;
+			return excludeproteinSequenceVersionIds_Set_UserInput;
 		}
 		public void setExcludeProtein_Ids_Set_UserInput(
 				Set<Integer> excludeProtein_Ids_Set_UserInput) {
-			this.excludeProteinSequenceIds_Set_UserInput = excludeProtein_Ids_Set_UserInput;
+			this.excludeproteinSequenceVersionIds_Set_UserInput = excludeProtein_Ids_Set_UserInput;
 		}
 		public List<AnnDisplayNameDescPeptPsmListsPair> getPeptidePsmAnnotationNameDescListsForEachSearch() {
 			return peptidePsmAnnotationNameDescListsForEachSearch;

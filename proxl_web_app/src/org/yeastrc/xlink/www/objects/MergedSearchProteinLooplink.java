@@ -112,7 +112,7 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 		} catch ( Exception e ) {
 
 			String msg = "Exception in getNumPeptides( MergedSearchProteinLooplink looplink ): " 
-					+ " this.getProtein().getProteinSequenceObject().getProteinSequenceId(): " + this.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					+ " this.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId(): " + this.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 
 			log.error( msg, e );
 
@@ -132,7 +132,7 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 		} catch ( Exception e ) {
 
 			String msg = "Exception in getNumUniquePeptides( MergedSearchProteinLooplink looplink ): " 
-					+ " this.getProtein().getProteinSequenceObject().getProteinSequenceId(): " + this.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					+ " this.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId(): " + this.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 
 			log.error( msg, e );
 
@@ -153,7 +153,7 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 //					.getNumPeptidesPSMsForLooplink(
 //							searches,
 //							this.getSearcherCutoffValuesRootLevel(),
-//							this.getProtein().getProteinSequenceObject().getProteinSequenceId(),
+//							this.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId(),
 //							this.getProteinPosition1(),
 //							this.getProteinPosition2() );
 //			

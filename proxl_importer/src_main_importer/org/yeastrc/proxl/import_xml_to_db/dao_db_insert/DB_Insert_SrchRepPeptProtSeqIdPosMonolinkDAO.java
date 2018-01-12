@@ -28,7 +28,7 @@ public class DB_Insert_SrchRepPeptProtSeqIdPosMonolinkDAO {
 	private static final String INSERT_SQL = "INSERT INTO srch_rep_pept__prot_seq_id_pos_monolink "
 
 			+ " ( search_id, reported_peptide_id, search_reported_peptide_peptide_id, "
-			+   " peptide_position, protein_sequence_id, protein_sequence_position )"
+			+   " peptide_position, protein_sequence_version_id, protein_sequence_position )"
 
 			+ " VALUES ( ?, ?, ?, ?, ?, ? )";
 
@@ -67,7 +67,7 @@ public class DB_Insert_SrchRepPeptProtSeqIdPosMonolinkDAO {
 			pstmt.setInt( counter,  item.getPeptidePosition() );
 			
 			counter++;
-			pstmt.setInt( counter,  item.getProteinSequenceId() );
+			pstmt.setInt( counter,  item.getProteinSequenceVersionId() );
 			
 			counter++;
 			pstmt.setInt( counter,  item.getProteinSequencePosition() );

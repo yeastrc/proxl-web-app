@@ -21,12 +21,12 @@ public class ProteinSequenceObject {
 	/**
 	 * constructor
 	 */
-	public ProteinSequenceObject( int proteinSequenceId ) {
+	public ProteinSequenceObject( int proteinSequenceVersionId ) {
 		
-		this.proteinSequenceId = proteinSequenceId;
+		this.proteinSequenceVersionId = proteinSequenceVersionId;
 	}
 
-	private int proteinSequenceId;
+	private int proteinSequenceVersionId;
 	private ProteinSequenceDTO proteinSequenceDTO;
 	
 	/**
@@ -37,11 +37,11 @@ public class ProteinSequenceObject {
 		
 		if ( proteinSequenceDTO == null ) {
 			
-			proteinSequenceDTO = ProteinSequenceDAO.getInstance().getProteinSequenceDTOFromDatabase(proteinSequenceId);
+			proteinSequenceDTO = ProteinSequenceDAO.getInstance().getProteinSequenceDTOFromDatabase(proteinSequenceVersionId);
 			
 			if ( proteinSequenceDTO == null ) {
 				
-				String msg = "Failed to retrieve protein_sequence record for id: " + proteinSequenceId;
+				String msg = "Failed to retrieve protein_sequence record for id: " + proteinSequenceVersionId;
 				log.error( msg );
 				throw new ProxlWebappDataException(msg);
 			}
@@ -51,11 +51,11 @@ public class ProteinSequenceObject {
 	}
 	
 	
-	public int getProteinSequenceId() {
-		return proteinSequenceId;
+	public int getProteinSequenceVersionId() {
+		return proteinSequenceVersionId;
 	}
-	public void setProteinSequenceId(int proteinSequenceId) {
-		this.proteinSequenceId = proteinSequenceId;
+	public void setProteinSequenceVersionId(int proteinSequenceVersionId) {
+		this.proteinSequenceVersionId = proteinSequenceVersionId;
 	}
 	public ProteinSequenceDTO getProteinSequenceDTO() {
 		return proteinSequenceDTO;

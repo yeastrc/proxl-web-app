@@ -44,7 +44,7 @@ import org.yeastrc.xlink.www.forms.SearchViewProteinsForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
-import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
+import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
@@ -150,18 +150,18 @@ public class ViewSearchProteinsAllAction extends Action {
 			////////////
 			//  Copy Exclude Taxonomy and Exclude Protein Sets for lookup
 			Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
-			Set<Integer> excludeProteinSequenceIds_Set_UserInput = new HashSet<>();
+			Set<Integer> excludeproteinSequenceVersionIds_Set_UserInput = new HashSet<>();
 			if ( proteinQueryJSONRoot.getExcludeTaxonomy() != null ) {
 				for ( Integer taxonomyId : proteinQueryJSONRoot.getExcludeTaxonomy() ) {
 					excludeTaxonomy_Ids_Set_UserInput.add( taxonomyId );
 				}
 			}
 			//  First convert the protein sequence ids that come from the JS code to standard integers and put
-			//   in the property excludeProteinSequenceIds
-			ProteinsMergedProteinsCommon.getInstance().processExcludeProteinSequenceIdsFromJS( proteinQueryJSONRoot );
-			if ( proteinQueryJSONRoot.getExcludeProteinSequenceIds() != null ) {
-				for ( Integer proteinId : proteinQueryJSONRoot.getExcludeProteinSequenceIds() ) {
-					excludeProteinSequenceIds_Set_UserInput.add( proteinId );
+			//   in the property excludeproteinSequenceVersionIds
+			ProteinsMergedProteinsCommon.getInstance().processExcludeproteinSequenceVersionIdsFromJS( proteinQueryJSONRoot );
+			if ( proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() != null ) {
+				for ( Integer proteinId : proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() ) {
+					excludeproteinSequenceVersionIds_Set_UserInput.add( proteinId );
 				}
 			}
 			
@@ -231,12 +231,12 @@ public class ViewSearchProteinsAllAction extends Action {
 
 			ProteinsAllCommonAllResult proteinsAllCommonAllResult =
 					ProteinsAllCommonAll.getInstance().getProteinSingleEntryList(
-							null /* onlyReturnThisProteinSequenceId */, 
+							null /* onlyReturnThisproteinSequenceVersionId */, 
 							search, 
 							searchId,
 							proteinQueryJSONRoot, 
 							excludeTaxonomy_Ids_Set_UserInput, 
-							excludeProteinSequenceIds_Set_UserInput,
+							excludeproteinSequenceVersionIds_Set_UserInput,
 							searcherCutoffValuesSearchLevel );
 
 			List<ProteinSingleEntry> proteinSingleEntryList = proteinsAllCommonAllResult.getProteinSingleEntryList();
@@ -249,7 +249,7 @@ public class ViewSearchProteinsAllAction extends Action {
 				@Override
 				public int compare(ProteinSingleEntry o1,
 						ProteinSingleEntry o2) {
-					return o1.getProteinSequenceId() - o2.getProteinSequenceId();
+					return o1.getProteinSequenceVersionId() - o2.getProteinSequenceVersionId();
 				}
 			} );
 			//      Get Annotation data and Sort by Annotation data
@@ -271,10 +271,10 @@ public class ViewSearchProteinsAllAction extends Action {
 				// did they request removal of certain taxonomy IDs?
 				if( proteinQueryJSONRoot.getExcludeTaxonomy() != null && proteinQueryJSONRoot.getExcludeTaxonomy().length > 0 ) {
 					boolean excludeOnProtein =
-							ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-							.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+							ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+							.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 									excludeTaxonomy_Ids_Set_UserInput, 
-									prp.getProteinSequenceObject(), 
+									prp.getProteinSequenceVersionObject(), 
 									searchId );
 					if ( excludeOnProtein ) {
 						searchProteinUnfilteredForSearch.remove( prp );

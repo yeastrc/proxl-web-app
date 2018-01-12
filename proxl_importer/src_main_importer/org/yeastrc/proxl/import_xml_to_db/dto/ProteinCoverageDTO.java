@@ -2,15 +2,15 @@ package org.yeastrc.proxl.import_xml_to_db.dto;
 
 /**
  * 
- * table peptide_protein_position
+ * table protein_coverage
  */
-public class PeptideProteinPositionDTO {
+public class ProteinCoverageDTO {
 
 	private int id;
 	private int searchId;
 	private int reportedPeptideId;
-	private int peptideId;
-	private int proteinSequenceId;
+	private int peptideIdInfoOnly;
+	private int proteinSequenceVersionId;
 	private int proteinStartPosition;
 	private int proteinEndPosition;
 
@@ -20,9 +20,9 @@ public class PeptideProteinPositionDTO {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + peptideId;
+		result = prime * result + peptideIdInfoOnly;
 		result = prime * result + proteinEndPosition;
-		result = prime * result + proteinSequenceId;
+		result = prime * result + proteinSequenceVersionId;
 		result = prime * result + proteinStartPosition;
 		result = prime * result + reportedPeptideId;
 		result = prime * result + searchId;
@@ -36,12 +36,12 @@ public class PeptideProteinPositionDTO {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PeptideProteinPositionDTO other = (PeptideProteinPositionDTO) obj;
-		if (peptideId != other.peptideId)
+		ProteinCoverageDTO other = (ProteinCoverageDTO) obj;
+		if (peptideIdInfoOnly != other.peptideIdInfoOnly)
 			return false;
 		if (proteinEndPosition != other.proteinEndPosition)
 			return false;
-		if (proteinSequenceId != other.proteinSequenceId)
+		if (proteinSequenceVersionId != other.proteinSequenceVersionId)
 			return false;
 		if (proteinStartPosition != other.proteinStartPosition)
 			return false;
@@ -55,8 +55,8 @@ public class PeptideProteinPositionDTO {
 	@Override
 	public String toString() {
 		return "PeptideProteinPositionDTO [id=" + id + ", searchId=" + searchId
-				+ ", reportedPeptideId=" + reportedPeptideId + ", peptideId="
-				+ peptideId + ", proteinSequenceId=" + proteinSequenceId
+				+ ", reportedPeptideId=" + reportedPeptideId + ", peptideIdInfoOnly="
+				+ peptideIdInfoOnly + ", proteinSequenceVersionId=" + proteinSequenceVersionId
 				+ ", proteinStartPosition=" + proteinStartPosition
 				+ ", proteinEndPosition=" + proteinEndPosition + "]";
 	}
@@ -79,18 +79,6 @@ public class PeptideProteinPositionDTO {
 	public void setReportedPeptideId(int reportedPeptideId) {
 		this.reportedPeptideId = reportedPeptideId;
 	}
-	public int getPeptideId() {
-		return peptideId;
-	}
-	public void setPeptideId(int peptideId) {
-		this.peptideId = peptideId;
-	}
-	public int getProteinSequenceId() {
-		return proteinSequenceId;
-	}
-	public void setProteinSequenceId(int proteinSequenceId) {
-		this.proteinSequenceId = proteinSequenceId;
-	}
 	public int getProteinStartPosition() {
 		return proteinStartPosition;
 	}
@@ -102,6 +90,18 @@ public class PeptideProteinPositionDTO {
 	}
 	public void setProteinEndPosition(int proteinEndPosition) {
 		this.proteinEndPosition = proteinEndPosition;
+	}
+	public int getPeptideIdInfoOnly() {
+		return peptideIdInfoOnly;
+	}
+	public void setPeptideIdInfoOnly(int peptideIdInfoOnly) {
+		this.peptideIdInfoOnly = peptideIdInfoOnly;
+	}
+	public int getProteinSequenceVersionId() {
+		return proteinSequenceVersionId;
+	}
+	public void setProteinSequenceVersionId(int proteinSequenceVersionId) {
+		this.proteinSequenceVersionId = proteinSequenceVersionId;
 	}
 
 	

@@ -24,7 +24,7 @@ public class DB_Insert_SearchDynamicModMassDAO {
 	/**
 	 * insert search__dynamic_mod_mass_lookup
 	 * @param searchId
-	 * @param reportedPeptideId
+	 * @param dynamicModMass
 	 * @throws Exception
 	 */
 	public void saveSearchDynamicModMass( int searchId, double dynamicModMass ) throws Exception {

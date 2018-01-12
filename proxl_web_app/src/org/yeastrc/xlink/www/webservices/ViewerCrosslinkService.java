@@ -39,7 +39,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.objects.ImageViewerData;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
+import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -243,16 +243,16 @@ public class ViewerCrosslinkService {
 						// did user request removal of certain taxonomy IDs?
 						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 							boolean excludeOnProtein_1 =
-									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+									ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 											excludeTaxonomy_Ids_Set_UserInput, 
-											link.getProtein1().getProteinSequenceObject(), 
+											link.getProtein1().getProteinSequenceVersionObject(), 
 											searchId );
 							boolean excludeOnProtein_2 =
-									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+									ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 											excludeTaxonomy_Ids_Set_UserInput, 
-											link.getProtein2().getProteinSequenceObject(), 
+											link.getProtein2().getProteinSequenceVersionObject(), 
 											searchId );
 							if ( excludeOnProtein_1 || excludeOnProtein_2 ) {
 								//  Skip to next entry in list, dropping this entry from output list
@@ -300,8 +300,8 @@ public class ViewerCrosslinkService {
 					SearchProteinCrosslink searchProteinCrosslink = wrappedCrosslink.getSearchProteinCrosslink();
 					addToProteinLinkPositions(  
 							searchIdForEntry,
-							searchProteinCrosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId(), // fromProtId
-							searchProteinCrosslink.getProtein2().getProteinSequenceObject().getProteinSequenceId(), // toProtId
+							searchProteinCrosslink.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId(), // fromProtId
+							searchProteinCrosslink.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId(), // toProtId
 							searchProteinCrosslink.getProtein1Position(), // fromProtPosition
 							searchProteinCrosslink.getProtein2Position(),  // toProtPosition
 							proteinLinkPositions  //  Map to Add to
@@ -309,8 +309,8 @@ public class ViewerCrosslinkService {
 					//  Add a second time with prot and pos 1 and 2 switched
 					addToProteinLinkPositions(  
 							searchIdForEntry,
-							searchProteinCrosslink.getProtein2().getProteinSequenceObject().getProteinSequenceId(), // fromProtId
-							searchProteinCrosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId(), // toProtId
+							searchProteinCrosslink.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId(), // fromProtId
+							searchProteinCrosslink.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId(), // toProtId
 							searchProteinCrosslink.getProtein2Position(), // fromProtPosition
 							searchProteinCrosslink.getProtein1Position(),  // toProtPosition
 							proteinLinkPositions  //  Map to Add to
@@ -552,16 +552,16 @@ public class ViewerCrosslinkService {
 						// did user request removal of certain taxonomy IDs?
 						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 							boolean excludeOnProtein_1 =
-									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+									ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 											excludeTaxonomy_Ids_Set_UserInput, 
-											link.getProtein1().getProteinSequenceObject(), 
+											link.getProtein1().getProteinSequenceVersionObject(), 
 											searchId );
 							boolean excludeOnProtein_2 =
-									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+									ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 											excludeTaxonomy_Ids_Set_UserInput, 
-											link.getProtein2().getProteinSequenceObject(), 
+											link.getProtein2().getProteinSequenceVersionObject(), 
 											searchId );
 							if ( excludeOnProtein_1 || excludeOnProtein_2 ) {
 								//  Skip to next entry in list, dropping this entry from output list
@@ -609,8 +609,8 @@ public class ViewerCrosslinkService {
 					Integer numPsms = searchProteinCrosslink.getNumPsms();
 					addToProteinLinkPositionPsmCount(  
 							numPsms,
-							searchProteinCrosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId(), // fromProtId
-							searchProteinCrosslink.getProtein2().getProteinSequenceObject().getProteinSequenceId(), // toProtId
+							searchProteinCrosslink.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId(), // fromProtId
+							searchProteinCrosslink.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId(), // toProtId
 							searchProteinCrosslink.getProtein1Position(), // fromProtPosition
 							searchProteinCrosslink.getProtein2Position(),  // toProtPosition
 							proteinLinkPositionPsmCount  //  Map to Add to
@@ -618,8 +618,8 @@ public class ViewerCrosslinkService {
 					//  Add a second time with prot and pos 1 and 2 switched
 					addToProteinLinkPositionPsmCount(
 							numPsms,
-							searchProteinCrosslink.getProtein2().getProteinSequenceObject().getProteinSequenceId(), // fromProtId
-							searchProteinCrosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId(), // toProtId
+							searchProteinCrosslink.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId(), // fromProtId
+							searchProteinCrosslink.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId(), // toProtId
 							searchProteinCrosslink.getProtein2Position(), // fromProtPosition
 							searchProteinCrosslink.getProtein1Position(),  // toProtPosition
 							proteinLinkPositionPsmCount  //  Map to Add to

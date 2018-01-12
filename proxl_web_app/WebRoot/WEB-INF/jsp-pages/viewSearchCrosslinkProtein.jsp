@@ -229,7 +229,7 @@
 						--%>
 						<select name="excludedProteins" multiple="multiple" id="excludeProtein" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >  
 	  						<logic:iterate id="protein" name="proteins">
-	  						  <option value="<c:out value="${ protein.proteinSequenceObject.proteinSequenceId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
+	  						  <option value="<c:out value="${ protein.proteinSequenceVersionObject.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
 	  						</logic:iterate>
 	  					</select>
 					</td>
@@ -358,19 +358,19 @@
 					</thead>
 						
 					<logic:iterate id="crosslink" name="crosslinks">
-							<tr id="<bean:write name="crosslink" property="protein1.proteinSequenceObject.proteinSequenceId" />-<bean:write name="crosslink" property="protein1Position" />-<bean:write name="crosslink" property="protein2.proteinSequenceObject.proteinSequenceId" />-<bean:write name="crosslink" property="protein2Position" />"
+							<tr id="<bean:write name="crosslink" property="protein1.proteinSequenceVersionObject.proteinSequenceVersionId" />-<bean:write name="crosslink" property="protein1Position" />-<bean:write name="crosslink" property="protein2.proteinSequenceVersionObject.proteinSequenceVersionId" />-<bean:write name="crosslink" property="protein2Position" />"
 								style="cursor: pointer; "
 								
 								onclick="viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.showHideCrosslinkReportedPeptides( { clickedElement : this })"
 								data-project_search_id="${ search.projectSearchId }"
-								data-protein_1_id="<bean:write name="crosslink" property="protein1.proteinSequenceObject.proteinSequenceId" />"
-								data-protein_2_id="<bean:write name="crosslink" property="protein2.proteinSequenceObject.proteinSequenceId" />"
+								data-protein_1_id="<bean:write name="crosslink" property="protein1.proteinSequenceVersionObject.proteinSequenceVersionId" />"
+								data-protein_2_id="<bean:write name="crosslink" property="protein2.proteinSequenceVersionObject.proteinSequenceVersionId" />"
 								data-protein_1_position="<bean:write name="crosslink" property="protein1Position" />"
 								data-protein_2_position="<bean:write name="crosslink" property="protein2Position" />"
 							>
-								<td><span class="proteinName" id="protein-id-<bean:write name="crosslink" property="protein1.proteinSequenceObject.proteinSequenceId" />"><bean:write name="crosslink" property="protein1.name" /></span></td>
+								<td><span class="proteinName" id="protein-id-<bean:write name="crosslink" property="protein1.proteinSequenceVersionObject.proteinSequenceVersionId" />"><bean:write name="crosslink" property="protein1.name" /></span></td>
 								<td class="integer-number-column"><bean:write name="crosslink" property="protein1Position" /></td>
-								<td><span class="proteinName" id="protein-id-<bean:write name="crosslink" property="protein2.proteinSequenceObject.proteinSequenceId" />"><bean:write name="crosslink" property="protein2.name" /></span></td>
+								<td><span class="proteinName" id="protein-id-<bean:write name="crosslink" property="protein2.proteinSequenceVersionObject.proteinSequenceVersionId" />"><bean:write name="crosslink" property="protein2.name" /></span></td>
 								<td class="integer-number-column"><bean:write name="crosslink" property="protein2Position" /></td>
 								<td class="integer-number-column"><bean:write name="crosslink" property="numPsms" /></td>
 								

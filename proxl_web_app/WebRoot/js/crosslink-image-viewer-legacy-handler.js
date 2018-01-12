@@ -59,7 +59,7 @@ LegacyJSONUpdater.prototype.convertLegacyJSON = function() {
 					callback : cbFunction
 			};
 			
-			getProteinSequenceIdsForNrseqProteinIds( params );
+			getProteinSequenceVersionIdsForNrseqProteinIds( params );
 			
 			return true;
 			
@@ -84,7 +84,7 @@ LegacyJSONUpdater.prototype.convertLegacyJSON = function() {
 						callback : cbFunction
 				};
 				
-				getProteinSequenceIdsForNrseqProteinIds( params );
+				getProteinSequenceVersionIdsForNrseqProteinIds( params );
 				
 				return true;
 

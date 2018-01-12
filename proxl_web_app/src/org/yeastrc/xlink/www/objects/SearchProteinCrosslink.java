@@ -232,8 +232,8 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 //					.searchOnSearchProteinCrosslink( 
 //							this.getSearch().getId(),
 //							this.searcherCutoffValuesSearchLevel,
-//							this.getProtein1().getProteinSequenceObject().getProteinSequenceId(),
-//							this.getProtein2().getProteinSequenceObject().getProteinSequenceId(),
+//							this.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId(),
+//							this.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId(),
 //							this.getProtein1Position(),
 //							this.getProtein2Position() );
 //			}

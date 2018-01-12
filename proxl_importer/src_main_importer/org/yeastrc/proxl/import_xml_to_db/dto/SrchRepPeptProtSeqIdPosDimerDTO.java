@@ -13,14 +13,14 @@ public class SrchRepPeptProtSeqIdPosDimerDTO {
 	private int searchId;
 	private int reportedPeptideId;
 	private int searchReportedPeptidepeptideId;
-	private int proteinSequenceId;
+	private int proteinSequenceVersionId;
 	
 	@Override
 	public String toString() {
 		return "SrchRepPeptProteinSequenceIdPosDimerDTO [id=" + id
 				+ ", searchId=" + searchId + ", reportedPeptideId="
 				+ reportedPeptideId + ", searchReportedPeptidepeptideId="
-				+ searchReportedPeptidepeptideId + ", proteinSequenceId=" + proteinSequenceId
+				+ searchReportedPeptidepeptideId + ", proteinSequenceVersionId=" + proteinSequenceVersionId
 				+ "]";
 	}
 	
@@ -49,13 +49,11 @@ public class SrchRepPeptProtSeqIdPosDimerDTO {
 	public void setSearchReportedPeptidepeptideId(int searchReportedPeptidepeptideId) {
 		this.searchReportedPeptidepeptideId = searchReportedPeptidepeptideId;
 	}
-	public int getProteinSequenceId() {
-		return proteinSequenceId;
+	public int getProteinSequenceVersionId() {
+		return proteinSequenceVersionId;
 	}
-	public void setProteinSequenceId(int proteinSequenceId) {
-		this.proteinSequenceId = proteinSequenceId;
+	public void setProteinSequenceVersionId(int proteinSequenceVersionId) {
+		this.proteinSequenceVersionId = proteinSequenceVersionId;
 	}
-
-
 		
 }

@@ -10,6 +10,8 @@ import org.yeastrc.proxl_import.api.xml_dto.MatchedProteins;
 import org.yeastrc.proxl_import.api.xml_dto.Protein;
 import org.yeastrc.proxl_import.api.xml_dto.ProteinAnnotation;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
+import org.yeastrc.proxl_import.api.xml_dto.Protein.ProteinIsotopeLabels;
+import org.yeastrc.proxl_import.api.xml_dto.Protein.ProteinIsotopeLabels.ProteinIsotopeLabel;
 
 /**
  * 
@@ -23,14 +25,18 @@ public class ValidateMatchedProteinSection {
 		return new ValidateMatchedProteinSection();
 	}
 	
+	
 	/**
 	 * @param proxlInput
 	 * @throws ProxlImporterDataException for data errors
 	 */
 	public void validateMatchedProteinSection( ProxlInput proxlInput ) throws ProxlImporterDataException {
-		//  Validate that protein sequence only exists once.
+		
+		//  Validate that protein sequence only exists once with a given isotope label or without any isotope label.
+		
 		//  Validate that all protein annotation names are unique
-		Set<String> proteinSequences = new HashSet<>();
+		
+		Set<ProteinData_ProtienSequenceWithIsotopeLabel> proteinSequenceisotopeLabelName_Set = new HashSet<>();
 		Set<String> proteinAnnotationNames = new HashSet<>();
 		MatchedProteins matchedProteins = proxlInput.getMatchedProteins();
 		if ( matchedProteins == null ) {
@@ -44,9 +50,29 @@ public class ValidateMatchedProteinSection {
 			return;  //  TODO  maybe throw exception
 		}
 		for ( Protein protein : proteinList ) {
-			if ( ! proteinSequences.add( protein.getSequence() ) ) {
-				String msg = "duplicate protein sequences under <matched_proteins> section, sequence: "
-						+ protein.getSequence();
+			
+			String proteinIsotopeLabelString = null;
+
+			ProteinIsotopeLabels proteinIsotopeLabels = protein.getProteinIsotopeLabels();
+			if ( proteinIsotopeLabels != null ) {
+				ProteinIsotopeLabel proteinIsotopeLabel = proteinIsotopeLabels.getProteinIsotopeLabel();
+				if ( proteinIsotopeLabel != null ) {
+					proteinIsotopeLabelString = proteinIsotopeLabel.getLabel();
+				}
+			}
+			
+			ProteinData_ProtienSequenceWithIsotopeLabel proteinData_ProtienSequenceWithIsotopeLabel = new ProteinData_ProtienSequenceWithIsotopeLabel();
+			proteinData_ProtienSequenceWithIsotopeLabel.proteinSequence = protein.getSequence();
+			proteinData_ProtienSequenceWithIsotopeLabel.isotopeLabelName = proteinIsotopeLabelString;
+			
+			if ( ! proteinSequenceisotopeLabelName_Set.add( proteinData_ProtienSequenceWithIsotopeLabel ) ) {
+				String isotopeLabelNameForErrorMsg = ", no isotope label name.";
+				if ( proteinIsotopeLabelString != null ) {
+					isotopeLabelNameForErrorMsg = ", isotope label name: " + proteinIsotopeLabelString;
+				}
+				String msg = "duplicate protein sequence / isotope label name under <matched_proteins> section, sequence: "
+						+ protein.getSequence()
+						+ isotopeLabelNameForErrorMsg;
 				log.error( msg );
 				throw new ProxlImporterDataException(msg);
 			}
@@ -74,6 +100,48 @@ public class ValidateMatchedProteinSection {
 					throw new ProxlImporterDataException(msg);
 				}
 			}
+		}
+	}
+	
+
+	/**
+	 * Used for validating a protein is in the <matched_proteins> section only once 
+	 * for a given protein sequence and isotope label name (or isotope label name is null if no isotope label name)
+	 *
+	 */
+	private static class ProteinData_ProtienSequenceWithIsotopeLabel {
+		
+		private String proteinSequence;
+		private String isotopeLabelName;
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((isotopeLabelName == null) ? 0 : isotopeLabelName.hashCode());
+			result = prime * result + ((proteinSequence == null) ? 0 : proteinSequence.hashCode());
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ProteinData_ProtienSequenceWithIsotopeLabel other = (ProteinData_ProtienSequenceWithIsotopeLabel) obj;
+			if (isotopeLabelName == null) {
+				if (other.isotopeLabelName != null)
+					return false;
+			} else if (!isotopeLabelName.equals(other.isotopeLabelName))
+				return false;
+			if (proteinSequence == null) {
+				if (other.proteinSequence != null)
+					return false;
+			} else if (!proteinSequence.equals(other.proteinSequence))
+				return false;
+			return true;
 		}
 	}
 }

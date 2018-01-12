@@ -165,32 +165,32 @@ public class DownloadMergedProteinsFASTAAction extends Action {
 				
 				for( MergedSearchProteinCrosslink link : crosslinks ) {
 
-					if( !outputProteinIds.contains( link.getProtein1().getProteinSequenceObject().getProteinSequenceId() ) ) {
+					if( !outputProteinIds.contains( link.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) ) {
 						
 						writer.write( ">" + link.getProtein1().getName() + "\n" );
-						writer.write( link.getProtein1().getProteinSequenceObject().getSequence() + "\n" );
+						writer.write( link.getProtein1().getProteinSequenceVersionObject().getProteinSequenceObject().getSequence() + "\n" );
 						
-						outputProteinIds.add( link.getProtein1().getProteinSequenceObject().getProteinSequenceId() );
+						outputProteinIds.add( link.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					}
 					
-					if( !outputProteinIds.contains( link.getProtein2().getProteinSequenceObject().getProteinSequenceId() ) ) {
+					if( !outputProteinIds.contains( link.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) ) {
 						
 						writer.write( ">" + link.getProtein2().getName() + "\n" );
-						writer.write( link.getProtein2().getProteinSequenceObject().getSequence() + "\n" );
+						writer.write( link.getProtein2().getProteinSequenceVersionObject().getProteinSequenceObject().getSequence() + "\n" );
 						
-						outputProteinIds.add( link.getProtein2().getProteinSequenceObject().getProteinSequenceId() );
+						outputProteinIds.add( link.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					}
 					
 				}
 				
 				for( MergedSearchProteinLooplink link : looplinks ) {
 
-					if( !outputProteinIds.contains( link.getProtein().getProteinSequenceObject().getProteinSequenceId() ) ) {
+					if( !outputProteinIds.contains( link.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) ) {
 						
 						writer.write( ">" + link.getProtein().getName() + "\n" );
-						writer.write( link.getProtein().getProteinSequenceObject().getSequence() + "\n" );
+						writer.write( link.getProtein().getProteinSequenceVersionObject().getProteinSequenceObject().getSequence() + "\n" );
 						
-						outputProteinIds.add( link.getProtein().getProteinSequenceObject().getProteinSequenceId() );
+						outputProteinIds.add( link.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					}
 				}
 				

@@ -262,7 +262,7 @@
 						<select name="excludedProteins" multiple="multiple" id="excludeProtein"  >  
 						  
 	  						<logic:iterate id="protein" name="allProteinsForCrosslinksAndLooplinksUnfilteredList">
-	  						  <option value="<c:out value="${ protein.proteinSequenceObject.proteinSequenceId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
+	  						  <option value="<c:out value="${ protein.proteinSequenceVersionObject.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
 	  						</logic:iterate>
 	  					</select>
 									
@@ -428,7 +428,7 @@
 								
 								onclick="viewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate.showHideProteinAlls( { clickedElement : this })"
 								data-project_search_ids="<c:forEach var="searchEntryForThisRow" items="${ proteinEntry.searches }">,${ searchEntryForThisRow.projectSearchId }</c:forEach>"
-								data-protein_id="<bean:write name="proteinEntry" property="protein.proteinSequenceObject.proteinSequenceId" />"
+								data-protein_id="<bean:write name="proteinEntry" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />"
 							>
 									
 								<c:forEach items="${ protein.searchContainsProtein }" var="isMarked"  varStatus="searchVarStatus">
@@ -461,7 +461,7 @@
 									</a>
 								</td>
 																				
-								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein.proteinSequenceObject.proteinSequenceId" />"><bean:write name="proteinEntry" property="protein.name" /></span></td>
+								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />"><bean:write name="proteinEntry" property="protein.name" /></span></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="numPsms" /></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="numPeptides" /></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="numUniquePeptides" /></td>

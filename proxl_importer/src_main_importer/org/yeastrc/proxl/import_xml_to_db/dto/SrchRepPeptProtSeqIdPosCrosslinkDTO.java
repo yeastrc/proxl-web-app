@@ -13,7 +13,7 @@ public class SrchRepPeptProtSeqIdPosCrosslinkDTO {
 	private int searchId;
 	private int reportedPeptideId;
 	private int searchReportedPeptidepeptideId;
-	private int proteinSequenceId;
+	private int proteinSequenceVersionId;
 	private int proteinSequencePosition;
 	
 	@Override
@@ -21,7 +21,7 @@ public class SrchRepPeptProtSeqIdPosCrosslinkDTO {
 		return "SrchRepPeptProteinSequenceIdPosCrosslinkDTO [id=" + id + ", searchId="
 				+ searchId + ", reportedPeptideId=" + reportedPeptideId
 				+ ", searchReportedPeptidepeptideId="
-				+ searchReportedPeptidepeptideId + ", proteinSequenceId=" + proteinSequenceId
+				+ searchReportedPeptidepeptideId + ", proteinSequenceVersionId=" + proteinSequenceVersionId
 				+ ", proteinSequencePosition=" + proteinSequencePosition + "]";
 	}
 	
@@ -50,17 +50,19 @@ public class SrchRepPeptProtSeqIdPosCrosslinkDTO {
 		this.searchReportedPeptidepeptideId = searchReportedPeptidepeptideId;
 	}
 
-	public int getProteinSequenceId() {
-		return proteinSequenceId;
-	}
-	public void setProteinSequenceId(int proteinSequenceId) {
-		this.proteinSequenceId = proteinSequenceId;
-	}
 	public int getProteinSequencePosition() {
 		return proteinSequencePosition;
 	}
 	public void setProteinSequencePosition(int proteinSequencePosition) {
 		this.proteinSequencePosition = proteinSequencePosition;
+	}
+
+	public int getProteinSequenceVersionId() {
+		return proteinSequenceVersionId;
+	}
+
+	public void setProteinSequenceVersionId(int proteinSequenceVersionId) {
+		this.proteinSequenceVersionId = proteinSequenceVersionId;
 	}
 
 		

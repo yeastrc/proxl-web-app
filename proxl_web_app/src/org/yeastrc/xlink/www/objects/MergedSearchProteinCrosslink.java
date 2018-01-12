@@ -152,8 +152,8 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 		} catch ( Exception e ) {
 
 			String msg = "Exception in getNumLinkedPeptides( MergedSearchProteinCrosslink crosslink ): " 
-					+ " this.getProtein1().getProteinSequenceObject().getProteinSequenceId(): " + this.getProtein1().getProteinSequenceObject().getProteinSequenceId()
-					+ " this.getProtein2().getProteinSequenceObject().getProteinSequenceId(): " + this.getProtein2().getProteinSequenceObject().getProteinSequenceId();
+					+ " this.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId(): " + this.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId()
+					+ " this.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId(): " + this.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 
 			log.error( msg, e );
 
@@ -180,8 +180,8 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 		} catch ( Exception e ) {
 			
 			String msg = "Exception in getNumUniqueLinkedPeptides( MergedSearchProteinCrosslink crosslink ): " 
-					+ " this.getProtein1().getProteinSequenceObject().getProteinSequenceId(): " + this.getProtein1().getProteinSequenceObject().getProteinSequenceId()
-					+ " this.getProtein2().getProteinSequenceObject().getProteinSequenceId(): " + this.getProtein2().getProteinSequenceObject().getProteinSequenceId();
+					+ " this.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId(): " + this.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId()
+					+ " this.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId(): " + this.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 			
 			log.error( msg, e );
 			
@@ -203,8 +203,8 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 //					.getNumPeptidesPSMsForCrosslink(
 //							searches,
 //							this.getSearcherCutoffValuesRootLevel(),
-//							this.getProtein1().getProteinSequenceObject().getProteinSequenceId(),
-//							this.getProtein2().getProteinSequenceObject().getProteinSequenceId(),
+//							this.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId(),
+//							this.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId(),
 //							this.getProtein1Position(),
 //							this.getProtein2Position() );
 //			

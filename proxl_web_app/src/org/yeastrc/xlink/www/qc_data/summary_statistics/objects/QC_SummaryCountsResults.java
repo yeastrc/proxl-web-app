@@ -11,7 +11,7 @@ public class QC_SummaryCountsResults {
 
 	private List<QC_SummaryCountsResultsPerLinkType> resultsPerLinkTypeList;
 	
-	private int uniqueProteinSequenceIdCountAllLinkTypes;
+	private int uniqueproteinSequenceVersionIdCountAllLinkTypes;
 	
 	/**
 	 * 
@@ -25,13 +25,13 @@ public class QC_SummaryCountsResults {
 		 * Unique in case of more than one search id
 		 */
 		private int uniqueReportedPeptideCount;
-		private int uniqueProteinSequenceIdCount;
+		private int uniqueproteinSequenceVersionIdCount;
 		
-		public int getUniqueProteinSequenceIdCount() {
-			return uniqueProteinSequenceIdCount;
+		public int getUniqueproteinSequenceVersionIdCount() {
+			return uniqueproteinSequenceVersionIdCount;
 		}
-		public void setUniqueProteinSequenceIdCount(int uniqueProteinSequenceIdCount) {
-			this.uniqueProteinSequenceIdCount = uniqueProteinSequenceIdCount;
+		public void setUniqueproteinSequenceVersionIdCount(int uniqueproteinSequenceVersionIdCount) {
+			this.uniqueproteinSequenceVersionIdCount = uniqueproteinSequenceVersionIdCount;
 		}
 		public String getLinkType() {
 			return linkType;
@@ -61,12 +61,12 @@ public class QC_SummaryCountsResults {
 		this.resultsPerLinkTypeList = resultsPerLinkTypeList;
 	}
 
-	public int getUniqueProteinSequenceIdCountAllLinkTypes() {
-		return uniqueProteinSequenceIdCountAllLinkTypes;
+	public int getUniqueproteinSequenceVersionIdCountAllLinkTypes() {
+		return uniqueproteinSequenceVersionIdCountAllLinkTypes;
 	}
 
-	public void setUniqueProteinSequenceIdCountAllLinkTypes(int uniqueProteinSequenceIdCountAllLinkTypes) {
-		this.uniqueProteinSequenceIdCountAllLinkTypes = uniqueProteinSequenceIdCountAllLinkTypes;
+	public void setUniqueproteinSequenceVersionIdCountAllLinkTypes(int uniqueproteinSequenceVersionIdCountAllLinkTypes) {
+		this.uniqueproteinSequenceVersionIdCountAllLinkTypes = uniqueproteinSequenceVersionIdCountAllLinkTypes;
 	}
 
 }

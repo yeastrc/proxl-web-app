@@ -134,7 +134,7 @@ public class PairwiseSequenceAlignmentService {
 		                PairwiseSequenceAlignerType.GLOBAL, new SimpleGapPenalty(), matrix);
 				pa.setPdbFileId( pdbFileId );
 				pa.setChainId( chain );
-				pa.setProteinSequenceId( proteinId );
+				pa.setProteinSequenceVersionId( proteinId );
 				pa.setAlignedPDBSequence( pair.getQuery().toString() );
 				pa.setAlignedExperimentalSequence( pair.getTarget().toString() );
 			} else if( ratio > 2.0 ) {
@@ -146,7 +146,7 @@ public class PairwiseSequenceAlignmentService {
 		                PairwiseSequenceAlignerType.GLOBAL, new SimpleGapPenalty(), matrix);
 				pa.setPdbFileId( pdbFileId );
 				pa.setChainId( chain );
-				pa.setProteinSequenceId( proteinId );
+				pa.setProteinSequenceVersionId( proteinId );
 				pa.setAlignedExperimentalSequence( pair.getQuery().toString() );
 				pa.setAlignedPDBSequence( pair.getTarget().toString() );
 			} else {
@@ -160,7 +160,7 @@ public class PairwiseSequenceAlignmentService {
 			                PairwiseSequenceAlignerType.GLOBAL, new SimpleGapPenalty(), matrix);
 					pa.setPdbFileId( pdbFileId );
 					pa.setChainId( chain );
-					pa.setProteinSequenceId( proteinId );
+					pa.setProteinSequenceVersionId( proteinId );
 					pa.setAlignedExperimentalSequence( pair.getQuery().toString() );
 					pa.setAlignedPDBSequence( pair.getTarget().toString() );
 				} else {
@@ -170,7 +170,7 @@ public class PairwiseSequenceAlignmentService {
 			                PairwiseSequenceAlignerType.GLOBAL, new SimpleGapPenalty(), matrix);
 					pa.setPdbFileId( pdbFileId );
 					pa.setChainId( chain );
-					pa.setProteinSequenceId( proteinId );
+					pa.setProteinSequenceVersionId( proteinId );
 					pa.setAlignedPDBSequence( pair.getQuery().toString() );
 					pa.setAlignedExperimentalSequence( pair.getTarget().toString() );
 				}
@@ -194,7 +194,7 @@ public class PairwiseSequenceAlignmentService {
 	 * @param pdbFileId
 	 * @param chainId
 	 * @param alignedPDBSequence
-	 * @param proteinSequenceId
+	 * @param proteinSequenceVersionId
 	 * @param alignedExperimentalSequence
 	 * @param request
 	 * @return
@@ -209,7 +209,7 @@ public class PairwiseSequenceAlignmentService {
 			@FormParam("pdbFileId") int pdbFileId,
 			@FormParam("chainId") String chainId,
 			@FormParam("alignedPDBSequence") String alignedPDBSequence,
-			@FormParam("proteinSequenceId") int proteinSequenceId,
+			@FormParam("proteinSequenceVersionId") int proteinSequenceVersionId,
 			@FormParam("alignedExperimentalSequence") String alignedExperimentalSequence,
 			@Context HttpServletRequest request ) throws Exception {
 		try {
@@ -260,7 +260,7 @@ public class PairwiseSequenceAlignmentService {
 			pa.setAlignedExperimentalSequence( alignedExperimentalSequence );
 			pa.setAlignedPDBSequence( alignedPDBSequence );
 			pa.setChainId( chainId );
-			pa.setProteinSequenceId( proteinSequenceId );
+			pa.setProteinSequenceVersionId( proteinSequenceVersionId );
 			pa.setPdbFileId( pdbFileId );
 			PDBAlignmentDAO.getInstance().savePDBAlignment( pa );
 			return pa;

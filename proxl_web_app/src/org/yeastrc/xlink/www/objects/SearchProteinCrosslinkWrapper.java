@@ -15,7 +15,7 @@ public class SearchProteinCrosslinkWrapper extends SortDisplayRecordsWrapperBase
 	@Override
 	public int getFinalSortOrderKey() {
 
-		return searchProteinCrosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId();
+		return searchProteinCrosslink.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 	}
 	
 	

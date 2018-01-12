@@ -171,21 +171,22 @@ CREATE TABLE  pdb_alignment (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   pdb_file_id INT(10) UNSIGNED NOT NULL,
   chain_id CHAR(1) NULL DEFAULT NULL,
-  protein_sequence_id INT(10) UNSIGNED NOT NULL,
+  protein_sequence_version_id INT(10) UNSIGNED NOT NULL,
   aligned_pdb_sequence VARCHAR(10000) NULL,
   aligned_experimental_sequence VARCHAR(10000) NULL,
   PRIMARY KEY (id),
   CONSTRAINT pdb_alignment_ibfk_1
     FOREIGN KEY (pdb_file_id)
     REFERENCES pdb_file (id)
-    ON DELETE CASCADE)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_bin;
 
 CREATE INDEX pdb_file_id ON pdb_alignment (pdb_file_id ASC, chain_id ASC);
 
-CREATE UNIQUE INDEX unique_prot_seq_id_chain_id_pdb_file_id ON pdb_alignment (protein_sequence_id ASC, chain_id ASC, pdb_file_id ASC);
+CREATE UNIQUE INDEX unique_prot_seq_id_chain_id_pdb_file_id ON pdb_alignment (protein_sequence_version_id ASC, chain_id ASC, pdb_file_id ASC);
 
 
 -- -----------------------------------------------------
@@ -229,7 +230,8 @@ CREATE TABLE  search (
   load_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   import_end_timestamp TIMESTAMP NULL,
   directory_name VARCHAR(255) NULL,
-  has_scan_data TINYINT UNSIGNED NOT NULL DEFAULT 1,
+  has_scan_data TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  has_isotope_label TINYINT(1) NOT NULL DEFAULT 0,
   created_by_user_id INT UNSIGNED NULL,
   created_date_time DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -1402,7 +1404,7 @@ CREATE TABLE  srch_rep_pept__prot_seq_id_pos_monolink (
   reported_peptide_id INT UNSIGNED NOT NULL,
   search_reported_peptide_peptide_id INT UNSIGNED NOT NULL,
   peptide_position INT UNSIGNED NOT NULL,
-  protein_sequence_id INT UNSIGNED NOT NULL,
+  protein_sequence_version_id INT UNSIGNED NOT NULL,
   protein_sequence_position INT UNSIGNED NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT srch_rppp_prt_sq_d_ps_mnlnk_srch_rppptpptd
@@ -1428,7 +1430,7 @@ CREATE TABLE  srch_rep_pept__prot_seq_id_pos_crosslink (
   search_id INT UNSIGNED NOT NULL,
   reported_peptide_id INT UNSIGNED NOT NULL,
   search_reported_peptide_peptide_id INT UNSIGNED NOT NULL,
-  protein_sequence_id INT UNSIGNED NOT NULL,
+  protein_sequence_version_id INT UNSIGNED NOT NULL,
   protein_sequence_position INT UNSIGNED NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT srch_rppp_prt_sq_d_ps_crslnk_srch_rppptpptd
@@ -1454,7 +1456,7 @@ CREATE TABLE  srch_rep_pept__prot_seq_id_pos_looplink (
   search_id INT UNSIGNED NOT NULL,
   reported_peptide_id INT UNSIGNED NOT NULL,
   search_reported_peptide_peptide_id INT UNSIGNED NOT NULL,
-  protein_sequence_id INT UNSIGNED NOT NULL,
+  protein_sequence_version_id INT UNSIGNED NOT NULL,
   protein_sequence_position_1 INT UNSIGNED NOT NULL,
   protein_sequence_position_2 INT UNSIGNED NOT NULL,
   PRIMARY KEY (id),
@@ -1472,11 +1474,11 @@ CREATE INDEX srch_rppp_prt_sq_d_ps_lplnk_srch_rppptpptd ON srch_rep_pept__prot_s
 
 
 -- -----------------------------------------------------
--- Table protein_sequence
+-- Table protein_sequence_v2
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS protein_sequence ;
+DROP TABLE IF EXISTS protein_sequence_v2 ;
 
-CREATE TABLE  protein_sequence (
+CREATE TABLE  protein_sequence_v2 (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   sequence MEDIUMTEXT NOT NULL,
   PRIMARY KEY (id))
@@ -1484,7 +1486,7 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
 COLLATE = latin1_bin;
 
-CREATE INDEX sequence ON protein_sequence (sequence(500) ASC);
+CREATE INDEX sequence ON protein_sequence_v2 (sequence(500) ASC);
 
 
 -- -----------------------------------------------------
@@ -1508,14 +1510,60 @@ CREATE INDEX tax_name_desc ON annotation (taxonomy ASC, name(100) ASC, descripti
 
 
 -- -----------------------------------------------------
--- Table search_protein_sequence_annotation
+-- Table isotope_label
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS search_protein_sequence_annotation ;
+DROP TABLE IF EXISTS isotope_label ;
 
-CREATE TABLE  search_protein_sequence_annotation (
+CREATE TABLE  isotope_label (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(50) NOT NULL,
+  PRIMARY KEY (id))
+ENGINE = InnoDB;
+
+CREATE INDEX name ON isotope_label (name ASC);
+
+
+-- -----------------------------------------------------
+-- Table protein_sequence_version
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS protein_sequence_version ;
+
+CREATE TABLE  protein_sequence_version (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  protein_sequence_id INT UNSIGNED NOT NULL,
+  isotope_label_id INT UNSIGNED NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_protein_sequence_version__prot_seq_id
+    FOREIGN KEY (protein_sequence_id)
+    REFERENCES protein_sequence_v2 (id)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT fk_protein_sequence_version__isotope_label_id
+    FOREIGN KEY (isotope_label_id)
+    REFERENCES isotope_label (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin
+COMMENT = 'This table is the FK on many other tables';
+
+CREATE UNIQUE INDEX search_id_prot_seq_id_ann_id ON protein_sequence_version (protein_sequence_id ASC, isotope_label_id ASC);
+
+CREATE INDEX srch_prt_sqnc_annttn_prot_seq_id_idx ON protein_sequence_version (protein_sequence_id ASC);
+
+CREATE INDEX fk_protein__isotope_label_id_idx ON protein_sequence_version (isotope_label_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table search__protein_sequence_version__annotation
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS search__protein_sequence_version__annotation ;
+
+CREATE TABLE  search__protein_sequence_version__annotation (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
-  protein_sequence_id INT UNSIGNED NOT NULL,
+  protein_sequence_version_id INT UNSIGNED NOT NULL,
   annotation_id INT UNSIGNED NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT srch_prt_sqnc_annttn__search_id_fk
@@ -1523,35 +1571,35 @@ CREATE TABLE  search_protein_sequence_annotation (
     REFERENCES search (id)
     ON DELETE CASCADE
     ON UPDATE RESTRICT,
-  CONSTRAINT srch_prt_sqnc_annttn_prot_seq_id
-    FOREIGN KEY (protein_sequence_id)
-    REFERENCES protein_sequence (id)
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT,
   CONSTRAINT srch_prt_sqnc_annttn_annotation_id
     FOREIGN KEY (annotation_id)
     REFERENCES annotation (id)
     ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
+    ON UPDATE RESTRICT,
+  CONSTRAINT srch_prt_sqnc_annttn_prot_seq_v_id_fk
+    FOREIGN KEY (protein_sequence_version_id)
+    REFERENCES protein_sequence_version (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
 COLLATE = latin1_bin;
 
-CREATE UNIQUE INDEX search_id_prot_seq_id_ann_id ON search_protein_sequence_annotation (search_id ASC, protein_sequence_id ASC, annotation_id ASC);
+CREATE UNIQUE INDEX search_id_prot_seq_v_id_ann_id ON search__protein_sequence_version__annotation (search_id ASC, protein_sequence_version_id ASC, annotation_id ASC);
 
-CREATE INDEX srch_prt_sqnc_annttn_prot_seq_id_idx ON search_protein_sequence_annotation (protein_sequence_id ASC);
+CREATE INDEX srch_prt_sqnc_annttn_annotation_id_idx ON search__protein_sequence_version__annotation (annotation_id ASC);
 
-CREATE INDEX srch_prt_sqnc_annttn_annotation_id_idx ON search_protein_sequence_annotation (annotation_id ASC);
+CREATE INDEX srch_prt_sqnc_annttn_prot_seq_v_id_fk_idx ON search__protein_sequence_version__annotation (protein_sequence_version_id ASC);
 
 
 -- -----------------------------------------------------
--- Table z_mapping__nrseq_prot_id__prot_seq_id
+-- Table z_mapping__nrseq_prot_id__prot_seq_version_id
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS z_mapping__nrseq_prot_id__prot_seq_id ;
+DROP TABLE IF EXISTS z_mapping__nrseq_prot_id__prot_seq_version_id ;
 
-CREATE TABLE  z_mapping__nrseq_prot_id__prot_seq_id (
+CREATE TABLE  z_mapping__nrseq_prot_id__prot_seq_version_id (
   nrseq_protein_id INT UNSIGNED NOT NULL,
-  protein_sequence_id INT UNSIGNED NOT NULL,
+  protein_sequence_version_id INT UNSIGNED NOT NULL,
   PRIMARY KEY (nrseq_protein_id))
 ENGINE = InnoDB;
 
@@ -1802,16 +1850,16 @@ CREATE INDEX prxl_xml_fl_imprt_trkng_sngl_fl_up_st_id_idx ON proxl_xml_file_impo
 
 
 -- -----------------------------------------------------
--- Table peptide_protein_position
+-- Table protein_coverage
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS peptide_protein_position ;
+DROP TABLE IF EXISTS protein_coverage ;
 
-CREATE TABLE  peptide_protein_position (
+CREATE TABLE  protein_coverage (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   reported_peptide_id INT UNSIGNED NOT NULL,
-  peptide_id INT UNSIGNED NOT NULL,
-  protein_sequence_id INT UNSIGNED NOT NULL,
+  peptide_id_info_only INT UNSIGNED NOT NULL COMMENT 'Do Not use peptide_id_info_only to map peptides to  proteins',
+  protein_sequence_version_id INT UNSIGNED NOT NULL,
   protein_start_position INT UNSIGNED NOT NULL,
   protein_end_position INT UNSIGNED NOT NULL,
   PRIMARY KEY (id),
@@ -1822,9 +1870,9 @@ CREATE TABLE  peptide_protein_position (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-CREATE INDEX peptide_protein_position_search_id_idx ON peptide_protein_position (search_id ASC);
+CREATE INDEX peptide_protein_position_search_id_idx ON protein_coverage (search_id ASC);
 
-CREATE INDEX search_id_protein_seq_id ON peptide_protein_position (search_id ASC, protein_sequence_id ASC);
+CREATE INDEX search_id_protein_seq_version_id ON protein_coverage (search_id ASC, protein_sequence_version_id ASC);
 
 
 -- -----------------------------------------------------
@@ -2063,7 +2111,7 @@ CREATE TABLE  srch_rep_pept__prot_seq_id_unlinked (
   search_id INT UNSIGNED NOT NULL,
   reported_peptide_id INT UNSIGNED NOT NULL,
   search_reported_peptide_peptide_id INT UNSIGNED NOT NULL,
-  protein_sequence_id INT UNSIGNED NOT NULL,
+  protein_sequence_version_id INT UNSIGNED NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT srch_rppp_prt_sq_d_ps_unlnkd_srch_rppptpptd0
     FOREIGN KEY (search_reported_peptide_peptide_id)
@@ -2088,7 +2136,7 @@ CREATE TABLE  srch_rep_pept__prot_seq_id_dimer (
   search_id INT UNSIGNED NOT NULL,
   reported_peptide_id INT UNSIGNED NOT NULL,
   search_reported_peptide_peptide_id INT UNSIGNED NOT NULL,
-  protein_sequence_id INT UNSIGNED NOT NULL,
+  protein_sequence_version_id INT UNSIGNED NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT srch_rppp_prt_sq_d_ps_unlnkd_srch_rppptpptd1
     FOREIGN KEY (search_reported_peptide_peptide_id)
@@ -2192,6 +2240,54 @@ CREATE TABLE  psm_per_peptide_annotation_large_value (
 ENGINE = InnoDB;
 
 CREATE INDEX psm_per_peptide_annotation_large_value_fk1_idx ON psm_per_peptide_annotation_large_value (psm_per_peptide_annotation_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table srch_rep_pept__peptide_isotope_label
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS srch_rep_pept__peptide_isotope_label ;
+
+CREATE TABLE  srch_rep_pept__peptide_isotope_label (
+  srch_rep_pept__peptide_id INT UNSIGNED NOT NULL,
+  isotope_label_id INT UNSIGNED NOT NULL,
+  PRIMARY KEY (srch_rep_pept__peptide_id, isotope_label_id),
+  CONSTRAINT fk_srch_rpppt_pptd_istplbl_srch_rpppt_pptd_id
+    FOREIGN KEY (srch_rep_pept__peptide_id)
+    REFERENCES srch_rep_pept__peptide (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_srch_rpppt_pptd_istplbl_istplbl_id
+    FOREIGN KEY (isotope_label_id)
+    REFERENCES isotope_label (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX fk_srch_rpppt_pptd_istplbl_istplbl_id_idx ON srch_rep_pept__peptide_isotope_label (isotope_label_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table search__isotope_label_lookup
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS search__isotope_label_lookup ;
+
+CREATE TABLE  search__isotope_label_lookup (
+  search_id INT UNSIGNED NOT NULL,
+  isotope_label_id INT UNSIGNED NOT NULL,
+  PRIMARY KEY (search_id, isotope_label_id),
+  CONSTRAINT search__isotope_label_lookup__search_id_fk
+    FOREIGN KEY (search_id)
+    REFERENCES search (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT search__isotope_label_lookup__isotope_label_id_fk
+    FOREIGN KEY (isotope_label_id)
+    REFERENCES isotope_label (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX search__isotope_label_lookup__isotope_label_id_fk_idx ON search__isotope_label_lookup (isotope_label_id ASC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

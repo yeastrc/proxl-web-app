@@ -26,7 +26,7 @@ public class PsmAnnFromLooplinkProteinSearcher {
 			+ 	" ON srpnipl.search_id = psm_fltrbl_tbl.search_id AND srpnipl.reported_peptide_id  = psm_fltrbl_tbl.reported_peptide_id "
 			+ " WHERE  "
 			+ "  srpnipl.search_id = ? "
-			+ " AND srpnipl.protein_sequence_id = ? "
+			+ " AND srpnipl.protein_sequence_version_id = ? "
 			+ " AND srpnipl.protein_sequence_position_1 = ? "
 			+ " AND srpnipl.protein_sequence_position_2 = ?  ";
 	/**

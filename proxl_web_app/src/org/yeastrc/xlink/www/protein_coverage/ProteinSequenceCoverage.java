@@ -3,8 +3,8 @@ package org.yeastrc.xlink.www.protein_coverage;
 import java.util.Set;
 
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
-import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
@@ -16,7 +16,7 @@ import com.google.common.collect.TreeRangeSet;
  */
 public class ProteinSequenceCoverage {
 
-	public ProteinSequenceCoverage( ProteinSequenceObject protein ) {
+	public ProteinSequenceCoverage( ProteinSequenceVersionObject protein ) {
 		this.protein = protein;
 	}
 	
@@ -24,7 +24,7 @@ public class ProteinSequenceCoverage {
 	 * @return a copy of this object
 	 */
 	public ProteinSequenceCoverage copy() {
-		ProteinSequenceObject ps = ProteinSequenceObjectFactory.getProteinSequenceObject( this.protein.getProteinSequenceId() );
+		ProteinSequenceVersionObject ps = ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( this.protein.getProteinSequenceVersionId() );
 		ProteinSequenceCoverage returnedProteinCoverage = new ProteinSequenceCoverage( ps );
 		for( Range<Integer> range : this.getRanges() ) {
 			returnedProteinCoverage.addStartEndBoundary( range.lowerEndpoint(), range.upperEndpoint() );
@@ -57,7 +57,7 @@ public class ProteinSequenceCoverage {
 		if( this.ranges == null )
 			this.ranges = TreeRangeSet.create();
 		
-		if( this.getProtein().getProteinSequenceId() != coverageToAdd.getProtein().getProteinSequenceId() )
+		if( this.getProtein().getProteinSequenceVersionId() != coverageToAdd.getProtein().getProteinSequenceVersionId() )
 			throw new ProxlWebappInternalErrorException( "Attempted to add two coverage objects that do not describe the same protein." );
 		
 		if( coverageToAdd.getRanges() == null )
@@ -96,18 +96,18 @@ public class ProteinSequenceCoverage {
 			totalResidues += r.upperEndpoint() - r.lowerEndpoint() + 1;
 		}
 		
-		return (double)totalResidues / (double)this.getProtein().getSequence().length();
+		return (double)totalResidues / (double)this.getProtein().getProteinSequenceObject().getSequence().length();
 	}
 	
 	/**
 	 * Get the protein covered by this sequence coverage
 	 * @return
 	 */
-	public ProteinSequenceObject getProtein() {
+	public ProteinSequenceVersionObject getProtein() {
 		return protein;
 	}
 
 
-	private final ProteinSequenceObject protein;
+	private final ProteinSequenceVersionObject protein;
 	private RangeSet<Integer> ranges;
 }

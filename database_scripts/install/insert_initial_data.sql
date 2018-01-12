@@ -91,6 +91,19 @@ INSERT INTO linker(abbr,name)VALUES(
 	'bs3.sty','bis[sulfosuccinimidyl] suberate that includes sty links on one half of the link' );
 INSERT INTO linker(abbr,name)VALUES( 'sulfo-smcc','sulfosuccinimidyl 4-[N-maleimidomethyl]cyclohexane-1-carboxylate');
 
+--  Insert entries into isotope_label
+
+--     Do NOT add new entries without adding support in the Proxl code (and probably libraries that Proxl code uses)
+
+--  id for 'none' is hard coded in Java in class IsotopeLabelsConstants
+INSERT INTO isotope_label (id, name) VALUES ( 1, "none" );
+
+--  The rest of records use auto increment for id
+INSERT INTO isotope_label (name) VALUES ( "13C" );
+INSERT INTO isotope_label (name) VALUES ( "15N" );
+INSERT INTO isotope_label (name) VALUES ( "18O" ); -- (this is the letter O not zero)
+INSERT INTO isotope_label (name) VALUES ( "2H" );
+
 --  INSERT to config_system to connect to YRC services for protein listing and protein annotation (paws)
 
 INSERT INTO config_system (config_key, config_value) VALUES ('protein_annotation_webservice_url', 'http://yeastrc.org/paws/services/');

@@ -224,7 +224,7 @@
 						<select name="excludedProteins" multiple="multiple" id="excludeProtein" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >  
 						  
 	  						<logic:iterate id="protein" name="proteins">
-	  						  <option value="<c:out value="${ protein.proteinSequenceObject.proteinSequenceId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
+	  						  <option value="<c:out value="${ protein.proteinSequenceVersionObject.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
 	  						</logic:iterate>
 	  					</select>
 					</td>
@@ -351,17 +351,17 @@
 					</thead>
 						
 					<logic:iterate id="looplink" name="looplinks">
-							<tr id="<bean:write name="looplink" property="protein.proteinSequenceObject.proteinSequenceId" />-<bean:write name="looplink" property="proteinPosition1" />-<bean:write name="looplink" property="protein.proteinSequenceObject.proteinSequenceId" />-<bean:write name="looplink" property="proteinPosition2" />"
+							<tr id="<bean:write name="looplink" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />-<bean:write name="looplink" property="proteinPosition1" />-<bean:write name="looplink" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />-<bean:write name="looplink" property="proteinPosition2" />"
 								style="cursor: pointer; "
 								
 								
 								onclick="viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.showHideLooplinkReportedPeptides( { clickedElement : this })"
 								data-project_search_id="${ search.projectSearchId }"
-								data-protein_id="<bean:write name="looplink" property="protein.proteinSequenceObject.proteinSequenceId" />"
+								data-protein_id="<bean:write name="looplink" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />"
 								data-protein_position_1="<bean:write name="looplink" property="proteinPosition1" />"
 								data-protein_position_2="<bean:write name="looplink" property="proteinPosition2" />"
 							>
-								<td><span class="proteinName" id="protein-id-<bean:write name="looplink" property="protein.proteinSequenceObject.proteinSequenceId" />"><bean:write name="looplink" property="protein.name" /></span></td>
+								<td><span class="proteinName" id="protein-id-<bean:write name="looplink" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />"><bean:write name="looplink" property="protein.name" /></span></td>
 								<td class="integer-number-column"><bean:write name="looplink" property="proteinPosition1" /></td>
 								<td class="integer-number-column"><bean:write name="looplink" property="proteinPosition2" /></td>
 								<td class="integer-number-column"><bean:write name="looplink" property="numPsms" /></td>

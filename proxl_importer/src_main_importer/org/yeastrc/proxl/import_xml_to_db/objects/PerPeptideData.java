@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptide_IsotopeLabel_DTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 
 
@@ -32,6 +33,8 @@ public class PerPeptideData {
 	private List<Integer> monolinkPositionList;
 	
 	private List<MonolinkContainer> monolinkContainerList;
+	
+	private List<SrchRepPeptPeptide_IsotopeLabel_DTO> srchRepPeptPeptide_IsotopeLabel_DTOList_Peptide;
 	
 	/**
 	 * Only maps to 1 protein
@@ -113,6 +116,15 @@ public class PerPeptideData {
 	public void setMonolinkContainerList(
 			List<MonolinkContainer> monolinkContainerList) {
 		this.monolinkContainerList = monolinkContainerList;
+	}
+
+	public List<SrchRepPeptPeptide_IsotopeLabel_DTO> getSrchRepPeptPeptide_IsotopeLabel_DTOList_Peptide() {
+		return srchRepPeptPeptide_IsotopeLabel_DTOList_Peptide;
+	}
+
+	public void setSrchRepPeptPeptide_IsotopeLabel_DTOList_Peptide(
+			List<SrchRepPeptPeptide_IsotopeLabel_DTO> srchRepPeptPeptide_IsotopeLabel_DTOList_Peptide) {
+		this.srchRepPeptPeptide_IsotopeLabel_DTOList_Peptide = srchRepPeptPeptide_IsotopeLabel_DTOList_Peptide;
 	}
 
 	

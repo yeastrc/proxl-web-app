@@ -14,8 +14,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -70,8 +70,8 @@ public class ViewerProteinSequenceService {
 				//  don't load duplicates;
 				if ( ! proteinIdsSequencesMap.containsKey( proteinId ) ) {
 					// get proteins to get sequences for protein id
-					ProteinSequenceObject protein = ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId );
-					String proteinSequence = protein.getSequence();
+					ProteinSequenceVersionObject protein = ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( proteinId );
+					String proteinSequence = protein.getProteinSequenceObject().getSequence();
 					proteinIdsSequencesMap.put( proteinId, proteinSequence );
 				}
 			}

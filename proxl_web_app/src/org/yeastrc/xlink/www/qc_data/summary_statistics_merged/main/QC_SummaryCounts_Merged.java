@@ -209,33 +209,33 @@ public class QC_SummaryCounts_Merged {
 				perLinkTypeTempData.psmCount += webReportedPeptide.getNumPsms();
 				perLinkTypeTempData.reportedPeptideIds.add( reportedPeptideId );
 				
-				Set<Integer> proteinSequenceIds = perLinkTypeTempData.proteinSequenceIds;
+				Set<Integer> proteinSequenceVersionIds = perLinkTypeTempData.proteinSequenceVersionIds;
 
 				List<WebProteinPosition> peptide_1_ProteinPositionsList = webReportedPeptide.getPeptide1ProteinPositions();
 				if ( peptide_1_ProteinPositionsList != null ) {
 					for ( WebProteinPosition webProteinPosition : peptide_1_ProteinPositionsList ) {
-						int proteinSequenceId = webProteinPosition.getProtein().getProteinSequenceObject().getProteinSequenceId();
-						proteinSequenceIds.add( proteinSequenceId );
+						int proteinSequenceVersionId = webProteinPosition.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
+						proteinSequenceVersionIds.add( proteinSequenceVersionId );
 					}
 				}
 				List<WebProteinPosition> peptide_2_ProteinPositionsList = webReportedPeptide.getPeptide2ProteinPositions();
 				if ( peptide_2_ProteinPositionsList != null ) {
 					for ( WebProteinPosition webProteinPosition : peptide_2_ProteinPositionsList ) {
-						int proteinSequenceId = webProteinPosition.getProtein().getProteinSequenceObject().getProteinSequenceId();
-						proteinSequenceIds.add( proteinSequenceId );
+						int proteinSequenceVersionId = webProteinPosition.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
+						proteinSequenceVersionIds.add( proteinSequenceVersionId );
 					}
 				}
 
 			}
 
-			//  combine all perLinkTypeTempData.proteinSequenceIds together for combinedCountsPerSearchEntry
+			//  combine all perLinkTypeTempData.proteinSequenceVersionIds together for combinedCountsPerSearchEntry
 			PerLinkTypeTempData combinedCountsPerSearchEntry = new PerLinkTypeTempData();
 			
 			for ( Map.Entry<String,PerLinkTypeTempData> entry : perLinkTypeTempData_ByLinkType.entrySet() ) {
 				PerLinkTypeTempData perLinkTypeTempData = entry.getValue();
 				combinedCountsPerSearchEntry.psmCount += perLinkTypeTempData.psmCount;
 				combinedCountsPerSearchEntry.reportedPeptideIds.addAll( perLinkTypeTempData.reportedPeptideIds );
-				combinedCountsPerSearchEntry.proteinSequenceIds.addAll( perLinkTypeTempData.proteinSequenceIds );
+				combinedCountsPerSearchEntry.proteinSequenceVersionIds.addAll( perLinkTypeTempData.proteinSequenceVersionIds );
 			}
 
 			PerSearchIdTempData perSearchIdTempData = new PerSearchIdTempData();
@@ -318,7 +318,7 @@ public class QC_SummaryCounts_Merged {
 				// Reported Peptide Count entry add
 				addPerSearchIdEntryForLinkType( reportedPeptideCountPerLinkTypeList, searchId, projectSearchId, linkTypeIndex, perLinkTypeTempData.reportedPeptideIds.size() );
 				// Protein Count entry add
-				addPerSearchIdEntryForLinkType( proteinCountPerLinkTypeList, searchId, projectSearchId, linkTypeIndex, perLinkTypeTempData.proteinSequenceIds.size() );
+				addPerSearchIdEntryForLinkType( proteinCountPerLinkTypeList, searchId, projectSearchId, linkTypeIndex, perLinkTypeTempData.proteinSequenceVersionIds.size() );
 			}
 			
 			//  Process Combined entry across link types
@@ -328,7 +328,7 @@ public class QC_SummaryCounts_Merged {
 			// Reported Peptide Count entry add
 //			addPerSearchIdEntryForCombined( reportedPeptideCountPerLinkTypeList, searchId, projectSearchId, combinedEntryIndex, combinedCountsPerSearchEntry.reportedPeptideIds.size() );
 			// Protein Count entry add
-			addPerSearchIdEntryForCombined( proteinCountPerLinkTypeList, searchId, projectSearchId, combinedEntryIndex, combinedCountsPerSearchEntry.proteinSequenceIds.size() );
+			addPerSearchIdEntryForCombined( proteinCountPerLinkTypeList, searchId, projectSearchId, combinedEntryIndex, combinedCountsPerSearchEntry.proteinSequenceVersionIds.size() );
 		}
 
 		QC_SummaryCounts_Merged_Results result = new QC_SummaryCounts_Merged_Results();
@@ -428,7 +428,7 @@ public class QC_SummaryCounts_Merged {
 
 		int psmCount = 0;
 		Set<Integer> reportedPeptideIds = new HashSet<>();
-		Set<Integer> proteinSequenceIds = new HashSet<>();
+		Set<Integer> proteinSequenceVersionIds = new HashSet<>();
 	}
 
 

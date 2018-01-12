@@ -1,17 +1,17 @@
 package org.yeastrc.xlink.www.objects;
 
 /**
- * proteinSequenceId
+ * proteinSequenceVersionId
  * annotationName
  */
-public class ProteinSequenceIdProteinAnnotationName {
+public class ProteinSequenceVersionIdProteinAnnotationName {
 
-	private int proteinSequenceId;
+	private int proteinSequenceVersionId;
 	private String annotationName;
 	
 	@Override
 	public String toString() {
-		return "ProteinSequenceIdProteinAnnotationName [proteinSequenceId=" + proteinSequenceId + ", annotationName="
+		return "proteinSequenceVersionIdProteinAnnotationName [proteinSequenceVersionId=" + proteinSequenceVersionId + ", annotationName="
 				+ annotationName + "]";
 	}
 	@Override
@@ -19,7 +19,7 @@ public class ProteinSequenceIdProteinAnnotationName {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((annotationName == null) ? 0 : annotationName.hashCode());
-		result = prime * result + proteinSequenceId;
+		result = prime * result + proteinSequenceVersionId;
 		return result;
 	}
 	@Override
@@ -30,21 +30,21 @@ public class ProteinSequenceIdProteinAnnotationName {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ProteinSequenceIdProteinAnnotationName other = (ProteinSequenceIdProteinAnnotationName) obj;
+		ProteinSequenceVersionIdProteinAnnotationName other = (ProteinSequenceVersionIdProteinAnnotationName) obj;
 		if (annotationName == null) {
 			if (other.annotationName != null)
 				return false;
 		} else if (!annotationName.equals(other.annotationName))
 			return false;
-		if (proteinSequenceId != other.proteinSequenceId)
+		if (proteinSequenceVersionId != other.proteinSequenceVersionId)
 			return false;
 		return true;
 	}
-	public int getProteinSequenceId() {
-		return proteinSequenceId;
+	public int getProteinSequenceVersionId() {
+		return proteinSequenceVersionId;
 	}
-	public void setProteinSequenceId(int proteinSequenceId) {
-		this.proteinSequenceId = proteinSequenceId;
+	public void setProteinSequenceVersionId(int proteinSequenceVersionId) {
+		this.proteinSequenceVersionId = proteinSequenceVersionId;
 	}
 	public String getAnnotationName() {
 		return annotationName;

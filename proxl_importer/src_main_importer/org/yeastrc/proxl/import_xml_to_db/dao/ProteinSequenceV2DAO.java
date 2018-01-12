@@ -8,38 +8,38 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceV2DTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
  * 
- * table protein_sequence
+ * table protein_sequence_v2
  */
-public class ProteinSequenceDAO {
+public class ProteinSequenceV2DAO {
 
-	private static final Logger log = Logger.getLogger(ProteinSequenceDAO.class);
-	private ProteinSequenceDAO() { }
-	public static ProteinSequenceDAO getInstance() { return new ProteinSequenceDAO(); }
+	private static final Logger log = Logger.getLogger(ProteinSequenceV2DAO.class);
+	private ProteinSequenceV2DAO() { }
+	public static ProteinSequenceV2DAO getInstance() { return new ProteinSequenceV2DAO(); }
 	
 	/**
 	 * @param id
 	 * @return
 	 * @throws Exception
 	 */
-	public ProteinSequenceDTO getProteinSequenceDTOFromDatabase( int id ) throws Exception {
-		ProteinSequenceDTO protein_sequence = new ProteinSequenceDTO();
+	public ProteinSequenceV2DTO getProteinSequenceDTOFromDatabase( int id ) throws Exception {
+		ProteinSequenceV2DTO protein_sequence = new ProteinSequenceV2DTO();
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT sequence FROM protein_sequence WHERE id = ?";
+		String sql = "SELECT sequence FROM protein_sequence_v2 WHERE id = ?";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, id );
 			rs = pstmt.executeQuery();
 			if( !rs.next() )
-				throw new Exception( "could not find protein_sequence with id " + id );
+				throw new Exception( "could not find protein_sequence_v2 with id " + id );
 			protein_sequence.setId( id );
 			protein_sequence.setSequence( rs.getString( 1 ) );
 		} catch ( Exception e ) {
@@ -65,7 +65,7 @@ public class ProteinSequenceDAO {
 	
 	/**
 	 * Get the protein_sequence DTO corresponding to supplied sequence. If no matching
-	 * protein_sequence is found in the database, it is inserted and a populated DTO
+	 * protein_sequence_v2 is found in the database, it is inserted and a populated DTO
 	 * returned. If already in the database, DTO is populated from database
 	 * and returned.
 	 * 
@@ -73,19 +73,19 @@ public class ProteinSequenceDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public ProteinSequenceDTO getProteinSequenceDTO_InsertIfNotInDB( String sequence ) throws Exception {
-		ProteinSequenceDTO proteinSequenceDTO = new ProteinSequenceDTO();
-		proteinSequenceDTO.setSequence( sequence );
+	public ProteinSequenceV2DTO getProteinSequenceDTO_InsertIfNotInDB( String sequence ) throws Exception {
+		ProteinSequenceV2DTO proteinSequenceV2DTO = new ProteinSequenceV2DTO();
+		proteinSequenceV2DTO.setSequence( sequence );
 		List<Integer> proteinIdList = getProteinIdForSequence( sequence );
 		if ( proteinIdList.size() > 1 ) {
 			deleteAllButRecordWithId( proteinIdList.get(0), sequence );
 		}
 		if ( ! proteinIdList.isEmpty() ) {
-			proteinSequenceDTO.setId( proteinIdList.get(0) );
-			return proteinSequenceDTO;
+			proteinSequenceV2DTO.setId( proteinIdList.get(0) );
+			return proteinSequenceV2DTO;
 		}
-		saveToDatabase( proteinSequenceDTO );
-		return proteinSequenceDTO;
+		saveToDatabase( proteinSequenceV2DTO );
+		return proteinSequenceV2DTO;
 	}
 	
 	/**
@@ -99,7 +99,7 @@ public class ProteinSequenceDAO {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT id FROM protein_sequence WHERE sequence = ?";
+		String sql = "SELECT id FROM protein_sequence_v2 WHERE sequence = ? ORDER BY id";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
@@ -134,12 +134,12 @@ public class ProteinSequenceDAO {
 	 * @param item
 	 * @throws Exception
 	 */
-	private void saveToDatabase( ProteinSequenceDTO item ) throws Exception {
+	private void saveToDatabase( ProteinSequenceV2DTO item ) throws Exception {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		int insertedProteinId = 0;
-		String sql = "INSERT INTO protein_sequence (sequence) VALUES (?)";
+		String sql = "INSERT INTO protein_sequence_v2 (sequence) VALUES (?)";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );
@@ -191,7 +191,7 @@ public class ProteinSequenceDAO {
 	private void deleteAllButRecordWithId( int id, String sequence ) throws Exception {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-		String sql = "DELETE FROM protein_sequence WHERE id <> ? AND sequence = ?";
+		String sql = "DELETE FROM protein_sequence_v2 WHERE id <> ? AND sequence = ?";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );

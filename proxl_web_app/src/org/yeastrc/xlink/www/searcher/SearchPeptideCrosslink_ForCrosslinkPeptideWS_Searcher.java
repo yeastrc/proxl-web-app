@@ -77,9 +77,9 @@ public class SearchPeptideCrosslink_ForCrosslinkPeptideWS_Searcher {
 			"SELECT unified_rp__search__rep_pept__generic_lookup.reported_peptide_id, "
 			+ " unified_rp__search__rep_pept__generic_lookup.link_type, "
 			+ " unified_rp__search__rep_pept__generic_lookup.psm_num_at_default_cutoff,"
-//			+ " srpnipc_1.protein_sequence_id AS protein_sequence_id_1, "
+//			+ " srpnipc_1.protein_sequence_version_id AS protein_sequence_version_id_1, "
 //			+ " srpnipc_1.protein_sequence_position AS protein_sequence_position_1, "
-//			+ " srpnipc_2.protein_sequence_id AS protein_sequence_id_2, "
+//			+ " srpnipc_2.protein_sequence_version_id AS protein_sequence_version_id_2, "
 //			+ " srpnipc_2.protein_sequence_position AS protein_sequence_position_2, "
 			+ " srpp_1.peptide_id AS peptide_id_1, srpp_1.peptide_position_1 AS peptide_position_1__1, "
 			+ " srpp_2.peptide_id AS peptide_id_2, srpp_2.peptide_position_1 AS peptide_position_1__2, "
@@ -110,11 +110,11 @@ public class SearchPeptideCrosslink_ForCrosslinkPeptideWS_Searcher {
 	private final String SQL_MAIN_WHERE_START = 
 			" WHERE unified_rp__search__rep_pept__generic_lookup.search_id = ? "
 			+ " AND unified_rp__search__rep_pept__generic_lookup.link_type = '" + XLinkUtils.CROSS_TYPE_STRING + "' "
-			+ " AND srpnipc_1.search_id = ? AND srpnipc_1.protein_sequence_id = ? AND srpnipc_1.protein_sequence_position = ? "
-			+ " AND srpnipc_2.search_id = ? AND srpnipc_2.protein_sequence_id = ? AND srpnipc_2.protein_sequence_position = ?  ";
+			+ " AND srpnipc_1.search_id = ? AND srpnipc_1.protein_sequence_version_id = ? AND srpnipc_1.protein_sequence_position = ? "
+			+ " AND srpnipc_2.search_id = ? AND srpnipc_2.protein_sequence_version_id = ? AND srpnipc_2.protein_sequence_position = ?  ";
 	
 	//  This query will return 2 rows for a given reported_peptide_id 
-	//    when srpnipc_1.protein_sequence_id       = srpnipc_2.protein_sequence_id 
+	//    when srpnipc_1.protein_sequence_version_id       = srpnipc_2.protein_sequence_version_id 
 	//     AND srpnipc_1.protein_sequence_position = srpnipc_2.protein_sequence_position
 	//     The extra row is handled in processing the result set
 	private final String SQL_LAST_PART = 
@@ -418,9 +418,9 @@ public class SearchPeptideCrosslink_ForCrosslinkPeptideWS_Searcher {
 					}
 				}
 				queryResultItem.reported_peptide_id = reportedPeptideId;
-//				queryResultItem.protein_sequence_id_1 = rs.getInt( "protein_sequence_id_1" );
+//				queryResultItem.protein_sequence_version_id_1 = rs.getInt( "protein_sequence_version_id_1" );
 //				queryResultItem.protein_sequence_position_1 = rs.getInt( "protein_sequence_position_1" );
-//				queryResultItem.protein_sequence_id_2 = rs.getInt( "protein_sequence_id_2" );
+//				queryResultItem.protein_sequence_version_id_2 = rs.getInt( "protein_sequence_version_id_2" );
 //				queryResultItem.protein_sequence_position_2 = rs.getInt( "protein_sequence_position_2" );
 				queryResultItem.peptide_id_1 = rs.getInt( "peptide_id_1" );
 				queryResultItem.peptide_position_1__1 = rs.getInt( "peptide_position_1__1" );
@@ -575,9 +575,9 @@ public class SearchPeptideCrosslink_ForCrosslinkPeptideWS_Searcher {
 	}
 	private static class QueryResultItem {
 		int reported_peptide_id;
-//		int protein_sequence_id_1;
+//		int protein_sequence_version_id_1;
 //		int protein_sequence_position_1;
-//		int protein_sequence_id_2;
+//		int protein_sequence_version_id_2;
 //		int protein_sequence_position_2;
 		int peptide_id_1; 
 		int peptide_position_1__1;

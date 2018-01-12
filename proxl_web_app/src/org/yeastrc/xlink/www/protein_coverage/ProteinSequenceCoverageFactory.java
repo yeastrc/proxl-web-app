@@ -12,7 +12,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.searcher.PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher;
 
 /**
@@ -35,7 +35,7 @@ public class ProteinSequenceCoverageFactory {
 	 * @throws Exception
 	 */
 	public Map<Integer, ProteinSequenceCoverage> getProteinSequenceCoveragesForProteins( 
-			List<ProteinSequenceObject> proteinList, 
+			List<ProteinSequenceVersionObject> proteinList, 
 			Collection<SearchDTO> searches,
 			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel ) throws Exception {
 		
@@ -56,9 +56,9 @@ public class ProteinSequenceCoverageFactory {
 				throw new ProxlWebappDataException( msg );
 			}
 			//  Collection of protein sequence ids we need to compute coverage for
-			Map<Integer, ProteinSequenceObject> proteinSequenceObjectsToComputeCoverageFor_KeyedOnProtSeqId = new HashMap<>();
-			for ( ProteinSequenceObject protein : proteinList ) {
-				Integer proteinSequenceId = protein.getProteinSequenceId();
+			Map<Integer, ProteinSequenceVersionObject> proteinSequenceVersionObjectsToComputeCoverageFor_KeyedOnProtSeqId = new HashMap<>();
+			for ( ProteinSequenceVersionObject protein : proteinList ) {
+				Integer proteinSequenceVersionId = protein.getProteinSequenceVersionId();
 
 				
 				//  !!!!!!!!!!!!!   Commented out Caching of coverage since combining coverage in this code
@@ -68,22 +68,22 @@ public class ProteinSequenceCoverageFactory {
 				//  First check if in cache and use that
 //				coverageInCache = 
 //						ProteinSequenceCoverageCachedData.getInstance()
-//						.getProteinSequenceCoverage( proteinSequenceId, searcherCutoffValuesSearchLevel );
+//						.getProteinSequenceCoverage( proteinSequenceVersionId, searcherCutoffValuesSearchLevel );
 				
 				
 //				if( coverageInCache != null ) {
-//					proteinSequenceCoverages_KeyedOnProtId_Map.put( proteinSequenceId, coverageInCache );
+//					proteinSequenceCoverages_KeyedOnProtId_Map.put( proteinSequenceVersionId, coverageInCache );
 //				} else {
 					//  Not in cache, add to collection of proteins to compute coverage
 				
-					proteinSequenceObjectsToComputeCoverageFor_KeyedOnProtSeqId.put( proteinSequenceId, protein );
+					proteinSequenceVersionObjectsToComputeCoverageFor_KeyedOnProtSeqId.put( proteinSequenceVersionId, protein );
 					
 //				}
 			}
-			if ( ! proteinSequenceObjectsToComputeCoverageFor_KeyedOnProtSeqId.isEmpty() ) {
+			if ( ! proteinSequenceVersionObjectsToComputeCoverageFor_KeyedOnProtSeqId.isEmpty() ) {
 				Map<Integer, ProteinSequenceCoverage> proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages = 
-						computeCoverageForProteinSequenceIdsForSearch( 
-								proteinSequenceObjectsToComputeCoverageFor_KeyedOnProtSeqId, 
+						computeCoverageForproteinSequenceVersionIdsForSearch( 
+								proteinSequenceVersionObjectsToComputeCoverageFor_KeyedOnProtSeqId, 
 								searchDTO, 
 								searcherCutoffValuesSearchLevel );
 				proteinSequenceCoverages_KeyedOnProtId_Map.putAll( proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages );
@@ -104,18 +104,18 @@ public class ProteinSequenceCoverageFactory {
 					proteinSequenceCoverages_KeyedOn_SeachId_ProtId_Map.entrySet() ) {
 				Map<Integer, ProteinSequenceCoverage> proteinSequenceCoverages_KeyedOnProtId_Map = entryPerSearch.getValue();
 				for ( Map.Entry<Integer, ProteinSequenceCoverage> entryPerProtSeqId : proteinSequenceCoverages_KeyedOnProtId_Map.entrySet() ) {
-					Integer proteinSequenceId = entryPerProtSeqId.getKey();
+					Integer proteinSequenceVersionId = entryPerProtSeqId.getKey();
 					ProteinSequenceCoverage coveragePerSearchProtSeqId = entryPerProtSeqId.getValue();
 					ProteinSequenceCoverage coverageResultProtSeqId = 
-							proteinSequenceCoverages_KeyedOnProtId_Map_Result.get( proteinSequenceId );
+							proteinSequenceCoverages_KeyedOnProtId_Map_Result.get( proteinSequenceVersionId );
 					if ( coverageResultProtSeqId == null ) {
-						proteinSequenceCoverages_KeyedOnProtId_Map_Result.put( proteinSequenceId, coveragePerSearchProtSeqId );
+						proteinSequenceCoverages_KeyedOnProtId_Map_Result.put( proteinSequenceVersionId, coveragePerSearchProtSeqId );
 					} else {
 						
 						//  !!!!!!!!!!!   ERROR  Cannot just combine coverage since the coverage is cached.  
 						//                Always need to create a new coverage object for each protein sequence id
 						
-						//  already have entry for proteinSequenceId so combine the coverage
+						//  already have entry for proteinSequenceVersionId so combine the coverage
 						coverageResultProtSeqId.addSequenceCoverageObject(coveragePerSearchProtSeqId);
 					}
 				}
@@ -125,33 +125,33 @@ public class ProteinSequenceCoverageFactory {
 	}
 	
 	/**
-	 * @param proteinSequenceObjectsToComputeCoverageFor_KeyedOnProtSeqId
+	 * @param proteinSequenceVersionObjectsToComputeCoverageFor_KeyedOnProtSeqId
 	 * @param searchDTO
 	 * @param searcherCutoffValuesSearchLevel
 	 * @return
 	 * @throws Exception
 	 */
-	private Map<Integer, ProteinSequenceCoverage> computeCoverageForProteinSequenceIdsForSearch(
-			Map<Integer, ProteinSequenceObject> proteinSequenceObjectsToComputeCoverageFor_KeyedOnProtSeqId,
+	private Map<Integer, ProteinSequenceCoverage> computeCoverageForproteinSequenceVersionIdsForSearch(
+			Map<Integer, ProteinSequenceVersionObject> proteinSequenceVersionObjectsToComputeCoverageFor_KeyedOnProtSeqId,
 			SearchDTO searchDTO,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel
 			) throws Exception {
 		
 		Map<Integer, ProteinSequenceCoverage> proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages = new HashMap<>();
-		Set<Integer> proteinSequenceIdsToComputeCoverageFor = new HashSet<>();
-		for ( Map.Entry<Integer, ProteinSequenceObject> entry : proteinSequenceObjectsToComputeCoverageFor_KeyedOnProtSeqId.entrySet() ) {
-			proteinSequenceIdsToComputeCoverageFor.add( entry.getValue().getProteinSequenceId() );
+		Set<Integer> proteinSequenceVersionIdsToComputeCoverageFor = new HashSet<>();
+		for ( Map.Entry<Integer, ProteinSequenceVersionObject> entry : proteinSequenceVersionObjectsToComputeCoverageFor_KeyedOnProtSeqId.entrySet() ) {
+			proteinSequenceVersionIdsToComputeCoverageFor.add( entry.getValue().getProteinSequenceVersionId() );
 			ProteinSequenceCoverage coverage = new ProteinSequenceCoverage( entry.getValue() );
-			proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages.put( entry.getValue().getProteinSequenceId(), coverage );
+			proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages.put( entry.getValue().getProteinSequenceVersionId(), coverage );
 		}
-		List<PeptideProteinPositionsForCutoffsAndProtSeqIdsResultItem> peptideProteinPositionsList = 
+		List<ProteinCoverageForCutoffsAndProtSeqIdsResultItem> peptideProteinPositionsList = 
 				PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher.getInstance()
-				.searchOnSearchIdPsmCutoffPeptideCutoff( proteinSequenceIdsToComputeCoverageFor, searchDTO, searcherCutoffValuesSearchLevel );
-		for ( PeptideProteinPositionsForCutoffsAndProtSeqIdsResultItem peptideProteinPositionsItem : peptideProteinPositionsList ) {
-			Integer proteinSequenceId = peptideProteinPositionsItem.getProteinSequenceId();
-			ProteinSequenceCoverage coverage = proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages.get(proteinSequenceId);
+				.searchOnSearchIdPsmCutoffPeptideCutoff( proteinSequenceVersionIdsToComputeCoverageFor, searchDTO, searcherCutoffValuesSearchLevel );
+		for ( ProteinCoverageForCutoffsAndProtSeqIdsResultItem peptideProteinPositionsItem : peptideProteinPositionsList ) {
+			Integer proteinSequenceVersionId = peptideProteinPositionsItem.getProteinSequenceVersionId();
+			ProteinSequenceCoverage coverage = proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages.get(proteinSequenceVersionId);
 			if ( coverage == null ) {
-				String msg = "Internal Error: proteinSequenceCovarege not found in map for proteinSequenceId: " + proteinSequenceId;
+				String msg = "Internal Error: proteinSequenceCovarege not found in map for proteinSequenceVersionId: " + proteinSequenceVersionId;
 				log.error( msg );
 				throw new ProxlWebappInternalErrorException(msg);
 			}
@@ -162,11 +162,11 @@ public class ProteinSequenceCoverageFactory {
 //		List<ProteinSequenceCoverageCacheAddEntry> proteinSequenceCoverageCacheAddEntryList = new ArrayList<>( proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages.size() );
 //		synchronized ( this ) {
 //			for ( Map.Entry<Integer, ProteinSequenceCoverage> entry : proteinSequenceCoverages_KeyedOnProtId_Map_ComputedCoverages.entrySet() ) {
-//				Integer proteinSequenceId = entry.getKey();
+//				Integer proteinSequenceVersionId = entry.getKey();
 //				ProteinSequenceCoverage coverage = entry.getValue(); 
 //				ProteinSequenceCoverage coverageCopy = coverage.copy();
 //				ProteinSequenceCoverageCacheAddEntry psccae = new ProteinSequenceCoverageCacheAddEntry();
-//				psccae.proteinSequenceId = proteinSequenceId;
+//				psccae.proteinSequenceVersionId = proteinSequenceVersionId;
 //				psccae.searcherCutoffValuesSearchLevel = searcherCutoffValuesSearchLevel;
 //				psccae.coverage = coverageCopy;
 //				proteinSequenceCoverageCacheAddEntryList.add( psccae );
@@ -182,7 +182,7 @@ public class ProteinSequenceCoverageFactory {
 //			 * add coverage object to the cache
 //			 */
 //			proteinSequenceCoverageCachedData
-//			.addProteinSequenceCoverage( entry.proteinSequenceId, entry.searcherCutoffValuesSearchLevel, entry.coverage );
+//			.addProteinSequenceCoverage( entry.proteinSequenceVersionId, entry.searcherCutoffValuesSearchLevel, entry.coverage );
 //		}
 
 
@@ -196,7 +196,7 @@ public class ProteinSequenceCoverageFactory {
 //	 */
 //	private class ProteinSequenceCoverageCacheAddEntry {
 //		
-//		int proteinSequenceId;
+//		int proteinSequenceVersionId;
 //		SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel;
 //		ProteinSequenceCoverage coverage;
 //	}

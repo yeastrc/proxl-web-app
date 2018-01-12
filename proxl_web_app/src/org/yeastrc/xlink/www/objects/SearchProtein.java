@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.objects;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ProteinDescriptionFor_SearchProtein;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ProteinNameFor_SearchProtein;
@@ -15,16 +15,16 @@ public class SearchProtein implements IProtein {
 	private static final Logger log = Logger.getLogger(SearchProtein.class);
 	
 	// Instantiate SearchProtein
-	public SearchProtein( SearchDTO search, ProteinSequenceObject protein ) {
+	public SearchProtein( SearchDTO search, ProteinSequenceVersionObject protein ) {
 		this.search = search;
-		this.proteinSequenceObject = protein;
+		this.proteinSequenceVersionObject = protein;
 	}
 	public int hashCode() {
-		return ("" + this.getProteinSequenceObject().getProteinSequenceId() + "-" + this.getSearch().getSearchId() ).hashCode();
+		return ("" + this.getProteinSequenceVersionObject().getProteinSequenceVersionId() + "-" + this.getSearch().getSearchId() ).hashCode();
 	}
 	public boolean equals( Object o ) {
 		if( !( o instanceof SearchProtein ) ) return false;
-		if( ((SearchProtein)o).getProteinSequenceObject().getProteinSequenceId() != this.getProteinSequenceObject().getProteinSequenceId() )
+		if( ((SearchProtein)o).getProteinSequenceVersionObject().getProteinSequenceVersionId() != this.getProteinSequenceVersionObject().getProteinSequenceVersionId() )
 			return false;
 		if( ((SearchProtein)o).getSearch().getSearchId() != this.getSearch().getSearchId() )
 			return false;
@@ -35,7 +35,7 @@ public class SearchProtein implements IProtein {
 			if( this.name == null ) {
 				ProteinNameFor_SearchProtein_Request proteinNameFor_SearchProtein_Request = new ProteinNameFor_SearchProtein_Request();
 				proteinNameFor_SearchProtein_Request.setSearchId( this.getSearch().getSearchId() );
-				proteinNameFor_SearchProtein_Request.setProteinSequenceId( this.getProteinSequenceObject().getProteinSequenceId() );
+				proteinNameFor_SearchProtein_Request.setProteinSequenceVersionId( this.getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 				ProteinNameFor_SearchProtein_Result proteinNameFor_SearchProtein_Result = 
 						Cached_ProteinNameFor_SearchProtein.getInstance()
 						.getProteinNameFor_SearchProtein_Result( proteinNameFor_SearchProtein_Request );
@@ -53,7 +53,7 @@ public class SearchProtein implements IProtein {
 			if( this.description == null ) {
 				ProteinDescriptionFor_SearchProtein_Request proteinDescriptionFor_SearchProtein_Request = new ProteinDescriptionFor_SearchProtein_Request();
 				proteinDescriptionFor_SearchProtein_Request.setSearchId( this.getSearch().getSearchId() );
-				proteinDescriptionFor_SearchProtein_Request.setProteinSequenceId( this.getProteinSequenceObject().getProteinSequenceId() );
+				proteinDescriptionFor_SearchProtein_Request.setProteinSequenceVersionId( this.getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 				ProteinDescriptionFor_SearchProtein_Result proteinDescriptionFor_SearchProtein_Result = 
 						Cached_ProteinDescriptionFor_SearchProtein.getInstance()
 						.getProteinDescriptionFor_SearchProtein_Result( proteinDescriptionFor_SearchProtein_Request );
@@ -66,11 +66,11 @@ public class SearchProtein implements IProtein {
 			throw e;
 		}
 	}
-	public ProteinSequenceObject getProteinSequenceObject() {
-		return proteinSequenceObject;
+	public ProteinSequenceVersionObject getProteinSequenceVersionObject() {
+		return proteinSequenceVersionObject;
 	}
-	public void setProteinSequenceObject(ProteinSequenceObject proteinSequenceObject) {
-		this.proteinSequenceObject = proteinSequenceObject;
+	public void setProteinSequenceVersionObject(ProteinSequenceVersionObject proteinSequenceVersionObject) {
+		this.proteinSequenceVersionObject = proteinSequenceVersionObject;
 	}
 	public SearchDTO getSearch() {
 		return search;
@@ -79,7 +79,7 @@ public class SearchProtein implements IProtein {
 		this.search = search;
 	}
 	
-	private ProteinSequenceObject proteinSequenceObject;
+	private ProteinSequenceVersionObject proteinSequenceVersionObject;
 	private SearchDTO search;
 	private String name;
 	private String description;

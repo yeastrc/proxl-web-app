@@ -74,7 +74,7 @@ public class SearchPeptideMonolink_LinkedPosition_Searcher {
 			" WHERE unified_rp__search__rep_pept__generic_lookup.search_id = ? "
 			+ " AND unified_rp__search__rep_pept__generic_lookup.has_monolinks = '" 
 					+ Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE + "' "
-			+ " AND srpnipm.search_id = ? AND srpnipm.protein_sequence_id = ? AND srpnipm.protein_sequence_position = ? ";
+			+ " AND srpnipm.search_id = ? AND srpnipm.protein_sequence_version_id = ? AND srpnipm.protein_sequence_position = ? ";
 	private final String SQL_LAST_PART = 
 			"";
 	// Removed since not needed.  

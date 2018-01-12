@@ -181,7 +181,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 		}
 		
 		//  Mark Multi <select> for chosen Proteins to exclude
-		var excludeProtein = _query_json_field_Contents.excludeProteinSequenceIds;
+		var excludeProtein = _query_json_field_Contents.excludeproteinSequenceVersionIds;
 		$("#excludeProtein").val( excludeProtein );
 	};
 	
@@ -265,10 +265,10 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 				filterOnlyOnePeptide : filterOnlyOnePeptide,
 				removeNonUniquePSMs : removeNonUniquePSMs,
 				excludeTaxonomy : outputExcludeTaxonomy,  
-//				excludeProteinSequenceIds : outputExcludeProteinsAsInts
-				exclProteinSequenceIdsEncoded : getEncodedExcludeProteinsResult.encodedExcludeProteins,
-				exclProteinSequenceIdsEncodedRadix : getEncodedExcludeProteinsResult.exclProtEncRadix,
-				exclProteinSequenceIdsEncodedSeparator : getEncodedExcludeProteinsResult.exclProtEncSeparator
+//				excludeproteinSequenceVersionIds : outputExcludeProteinsAsInts
+				exclproteinSequenceVersionIdsEncoded : getEncodedExcludeProteinsResult.encodedExcludeProteins,
+				exclproteinSequenceVersionIdsEncodedRadix : getEncodedExcludeProteinsResult.exclProtEncRadix,
+				exclproteinSequenceVersionIdsEncodedSeparator : getEncodedExcludeProteinsResult.exclProtEncSeparator
 		};
 		//  Create the JSON of the page parameters and store it on the page
 		try {

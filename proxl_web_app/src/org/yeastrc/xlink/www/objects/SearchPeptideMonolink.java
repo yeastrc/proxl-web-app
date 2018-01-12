@@ -21,50 +21,6 @@ public class SearchPeptideMonolink extends SearchPeptide_BaseCommon {
 	 */
 	public SearchPeptideMonolink() { super(); }
 
-//	private void populatePeptides() throws Exception {
-//
-//		if ( populatePeptidesCalled ) {
-//			
-//			return;
-//		}
-//		
-//		populatePeptidesCalled = true;
-//		
-//		
-//		try {
-//			List<SrchRepPeptPeptideDTO> results = 
-//					SrchRepPeptPeptideOnSearchIdRepPeptIdSearcher.getInstance()
-//					.getForSearchIdReportedPeptideId( this.getSearch().getId(), this.getReportedPeptideId() );
-//
-//			if ( results.size() != 1 ) {
-//
-//
-//				String msg = "List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " +this.getSearch().getId()
-//						+ ", ReportedPeptideId: " + this.getReportedPeptideId() ;
-//
-//				log.error( msg );
-//
-//				throw new ProxlWebappDataException( msg );
-//			}
-//			
-//			SrchRepPeptPeptideDTO result = results.get( 0 );
-//
-//			PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( result.getPeptideId() );
-//
-//			this.setPeptide( peptideDTO );
-//
-////			this.setPeptidePosition(  );  //  Peptide Position already set from the srch_rep_pept__prot_seq_id_pos_monolink record
-//
-//		} catch ( Exception e ) {
-//
-//			String msg = "Exception in populatePeptides()";
-//
-//			log.error( msg, e );
-//
-//			throw e;
-//		}
-//	}
-		
 	public PeptideDTO getPeptide() throws Exception {
 		try {
 			if( this.peptide == null ) {

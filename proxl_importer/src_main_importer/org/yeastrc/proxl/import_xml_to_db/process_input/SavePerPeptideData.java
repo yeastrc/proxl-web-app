@@ -2,11 +2,14 @@ package org.yeastrc.proxl.import_xml_to_db.process_input;
 
 // import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptProtSeqIdPosMonolinkDAO;
+
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptPeptDynamicModDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptPeptideDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptPeptide_IsotopeLabel_DAO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosMonolinkDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptide_IsotopeLabel_DTO;
 import org.yeastrc.proxl.import_xml_to_db.objects.MonolinkContainer;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
@@ -53,27 +56,40 @@ public class SavePerPeptideData {
 		
 		//  Save SrchRepPeptPeptDynamicModDTO
 		
-		for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide() ) {
-			
-			srchRepPeptPeptDynamicModDTO.setSearchReportedPeptidepeptideId( searchReportedPeptidepeptideId );
-			
-			DB_Insert_SrchRepPeptPeptDynamicModDAO.getInstance().save( srchRepPeptPeptDynamicModDTO );
+		if ( perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide() != null && ( ! perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide().isEmpty() ) ) {
+			for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide() ) {
+
+				srchRepPeptPeptDynamicModDTO.setSearchReportedPeptidepeptideId( searchReportedPeptidepeptideId );
+				
+				DB_Insert_SrchRepPeptPeptDynamicModDAO.getInstance().save( srchRepPeptPeptDynamicModDTO );
+			}
 		}
 		
 		//  Save SrchRepPeptProtSeqIdPosMonolinkDTO
-		for ( MonolinkContainer monolinkContainer : perPeptideData.getMonolinkContainerList() ) {
-			SrchRepPeptProtSeqIdPosMonolinkDTO srchRepPeptProtSeqIdPosMonolinkDTO = monolinkContainer.getSrchRepPeptProtSeqIdPosMonolinkDTO();
-			ProteinImporterContainer proteinImporterContainer = monolinkContainer.getProteinImporterContainer();
-			
-			srchRepPeptProtSeqIdPosMonolinkDTO.setSearchId( searchId );
-			srchRepPeptProtSeqIdPosMonolinkDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
-			srchRepPeptProtSeqIdPosMonolinkDTO.setSearchReportedPeptidepeptideId( searchReportedPeptidepeptideId );
-			
-			srchRepPeptProtSeqIdPosMonolinkDTO.setProteinSequenceId( proteinImporterContainer.getProteinSequenceDTO().getId() );
+		if ( perPeptideData.getMonolinkContainerList() != null ) {
+			for ( MonolinkContainer monolinkContainer : perPeptideData.getMonolinkContainerList() ) {
+				SrchRepPeptProtSeqIdPosMonolinkDTO srchRepPeptProtSeqIdPosMonolinkDTO = monolinkContainer.getSrchRepPeptProtSeqIdPosMonolinkDTO();
+				ProteinImporterContainer proteinImporterContainer = monolinkContainer.getProteinImporterContainer();
 
-			
-			DB_Insert_SrchRepPeptProtSeqIdPosMonolinkDAO.getInstance().save( srchRepPeptProtSeqIdPosMonolinkDTO );
+				srchRepPeptProtSeqIdPosMonolinkDTO.setSearchId( searchId );
+				srchRepPeptProtSeqIdPosMonolinkDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
+				srchRepPeptProtSeqIdPosMonolinkDTO.setSearchReportedPeptidepeptideId( searchReportedPeptidepeptideId );
+
+				srchRepPeptProtSeqIdPosMonolinkDTO.setProteinSequenceVersionId( proteinImporterContainer.getProteinSequenceVersionDTO().getId() );
+
+				DB_Insert_SrchRepPeptProtSeqIdPosMonolinkDAO.getInstance().save( srchRepPeptProtSeqIdPosMonolinkDTO );
+			}
 		}
+
+		//  Save SrchRepPeptPeptide_IsotopeLabel_DTO if have isotope labels
+		if ( perPeptideData.getSrchRepPeptPeptide_IsotopeLabel_DTOList_Peptide() != null ) {
+			for ( SrchRepPeptPeptide_IsotopeLabel_DTO srchRepPeptPeptide_IsotopeLabel_DTO : perPeptideData.getSrchRepPeptPeptide_IsotopeLabel_DTOList_Peptide() ) {
+				srchRepPeptPeptide_IsotopeLabel_DTO.setSrchRepPeptPeptideId( searchReportedPeptidepeptideId );
+				DB_Insert_SrchRepPeptPeptide_IsotopeLabel_DAO.getInstance().save( srchRepPeptPeptide_IsotopeLabel_DTO );
+			}
+		}
+
+		
 	}
 		
 }

@@ -49,7 +49,7 @@ public class SearchReportedPeptideProteinSequencePositionLooplinkSearcher {
 				item.setSearchId( rs.getInt( "search_id" ) );
 				item.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
 				item.setSearchReportedPeptidepeptideId( rs.getInt( "search_reported_peptide_peptide_id" ) );
-				item.setProteinSequenceId( rs.getInt( "protein_sequence_id" ) );
+				item.setProteinSequenceVersionId( rs.getInt( "protein_sequence_version_id" ) );
 				item.setProteinSequencePosition_1( rs.getInt( "protein_sequence_position_1" ) );
 				item.setProteinSequencePosition_2( rs.getInt( "protein_sequence_position_2" ) );
 				results.add( item );

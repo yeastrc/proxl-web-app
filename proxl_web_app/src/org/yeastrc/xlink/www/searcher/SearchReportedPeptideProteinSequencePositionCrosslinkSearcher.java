@@ -50,7 +50,7 @@ public class SearchReportedPeptideProteinSequencePositionCrosslinkSearcher {
 				item.setSearchId( rs.getInt( "search_id" ) );
 				item.setReportedPeptideId( rs.getInt( "reported_peptide_id" ) );
 				item.setSearchReportedPeptidepeptideId( rs.getInt( "search_reported_peptide_peptide_id" ) );
-				item.setProteinSequenceId( rs.getInt( "protein_sequence_id" ) );
+				item.setProteinSequenceVersionId( rs.getInt( "protein_sequence_version_id" ) );
 				item.setProteinSequencePosition( rs.getInt( "protein_sequence_position" ) );
 				results.add( item );
 			}

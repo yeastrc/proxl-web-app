@@ -23,19 +23,19 @@ public class ProteinQueryJSONRoot extends A_QueryBase_JSONRoot {
 	/**
 	 * 
 	 */
-	private int[] excludeProteinSequenceIds;
+	private int[] excludeproteinSequenceVersionIds;
 	/**
 	 * Exclude Protein Encoded
 	 */
-	private String exclProteinSequenceIdsEncoded;
+	private String exclproteinSequenceVersionIdsEncoded;
 	/**
 	 * Exclude Protein Separator
 	 */
-	private String exclProteinSequenceIdsEncodedSeparator;
+	private String exclproteinSequenceVersionIdsEncodedSeparator;
 	/**
 	 * Base X RADIX encoding for exclProtEnc
 	 */
-	private int exclProteinSequenceIdsEncodedRadix;
+	private int exclproteinSequenceVersionIdsEncodedRadix;
 	/**
 	 * OLD  Nrseq Protein Ids
 	 */
@@ -90,32 +90,32 @@ public class ProteinQueryJSONRoot extends A_QueryBase_JSONRoot {
 	public void setFilterOnlyOnePeptide(boolean filterOnlyOnePeptide) {
 		this.filterOnlyOnePeptide = filterOnlyOnePeptide;
 	}
-	public String getExclProteinSequenceIdsEncoded() {
-		return exclProteinSequenceIdsEncoded;
+	public String getExclproteinSequenceVersionIdsEncoded() {
+		return exclproteinSequenceVersionIdsEncoded;
 	}
-	public void setExclProteinSequenceIdsEncoded(
-			String exclProteinSequenceIdsEncoded) {
-		this.exclProteinSequenceIdsEncoded = exclProteinSequenceIdsEncoded;
+	public void setExclproteinSequenceVersionIdsEncoded(
+			String exclproteinSequenceVersionIdsEncoded) {
+		this.exclproteinSequenceVersionIdsEncoded = exclproteinSequenceVersionIdsEncoded;
 	}
-	public int getExclProteinSequenceIdsEncodedRadix() {
-		return exclProteinSequenceIdsEncodedRadix;
+	public int getExclproteinSequenceVersionIdsEncodedRadix() {
+		return exclproteinSequenceVersionIdsEncodedRadix;
 	}
-	public void setExclProteinSequenceIdsEncodedRadix(
-			int exclProteinSequenceIdsEncodedRadix) {
-		this.exclProteinSequenceIdsEncodedRadix = exclProteinSequenceIdsEncodedRadix;
+	public void setExclproteinSequenceVersionIdsEncodedRadix(
+			int exclproteinSequenceVersionIdsEncodedRadix) {
+		this.exclproteinSequenceVersionIdsEncodedRadix = exclproteinSequenceVersionIdsEncodedRadix;
 	}
-	public String getExclProteinSequenceIdsEncodedSeparator() {
-		return exclProteinSequenceIdsEncodedSeparator;
+	public String getExclproteinSequenceVersionIdsEncodedSeparator() {
+		return exclproteinSequenceVersionIdsEncodedSeparator;
 	}
-	public void setExclProteinSequenceIdsEncodedSeparator(
-			String exclProteinSequenceIdsEncodedSeparator) {
-		this.exclProteinSequenceIdsEncodedSeparator = exclProteinSequenceIdsEncodedSeparator;
+	public void setExclproteinSequenceVersionIdsEncodedSeparator(
+			String exclproteinSequenceVersionIdsEncodedSeparator) {
+		this.exclproteinSequenceVersionIdsEncodedSeparator = exclproteinSequenceVersionIdsEncodedSeparator;
 	}
-	public int[] getExcludeProteinSequenceIds() {
-		return excludeProteinSequenceIds;
+	public int[] getExcludeproteinSequenceVersionIds() {
+		return excludeproteinSequenceVersionIds;
 	}
-	public void setExcludeProteinSequenceIds(int[] excludeProteinSequenceIds) {
-		this.excludeProteinSequenceIds = excludeProteinSequenceIds;
+	public void setExcludeproteinSequenceVersionIds(int[] excludeproteinSequenceVersionIds) {
+		this.excludeproteinSequenceVersionIds = excludeproteinSequenceVersionIds;
 	}
 
 }

@@ -15,7 +15,7 @@ import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -96,20 +96,20 @@ public class ProteinsAllMergedCommonPageDownload {
 		////////////
 		//  Copy Exclude Taxonomy and Exclude Protein Sets for lookup
 		Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
-		Set<Integer> excludeProteinSequenceIds_Set_UserInput = new HashSet<>();
+		Set<Integer> excludeproteinSequenceVersionIds_Set_UserInput = new HashSet<>();
 		allProteinsMergedCommonPageDownloadResult.excludeTaxonomy_Ids_Set_UserInput = excludeTaxonomy_Ids_Set_UserInput;
-		allProteinsMergedCommonPageDownloadResult.excludeProteinSequenceIds_Set_UserInput = excludeProteinSequenceIds_Set_UserInput;
+		allProteinsMergedCommonPageDownloadResult.excludeproteinSequenceVersionIds_Set_UserInput = excludeproteinSequenceVersionIds_Set_UserInput;
 		if ( proteinQueryJSONRoot.getExcludeTaxonomy() != null ) {
 			for ( Integer taxonomyId : proteinQueryJSONRoot.getExcludeTaxonomy() ) {
 				excludeTaxonomy_Ids_Set_UserInput.add( taxonomyId );
 			}
 		}
 		//  First convert the protein sequence ids that come from the JS code to standard integers and put
-		//   in the property excludeProteinSequenceIds
-		ProteinsMergedProteinsCommon.getInstance().processExcludeProteinSequenceIdsFromJS( proteinQueryJSONRoot );
-		if ( proteinQueryJSONRoot.getExcludeProteinSequenceIds() != null ) {
-			for ( Integer proteinId : proteinQueryJSONRoot.getExcludeProteinSequenceIds() ) {
-				excludeProteinSequenceIds_Set_UserInput.add( proteinId );
+		//   in the property excludeproteinSequenceVersionIds
+		ProteinsMergedProteinsCommon.getInstance().processExcludeproteinSequenceVersionIdsFromJS( proteinQueryJSONRoot );
+		if ( proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() != null ) {
+			for ( Integer proteinId : proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() ) {
+				excludeproteinSequenceVersionIds_Set_UserInput.add( proteinId );
 			}
 		}
 
@@ -125,7 +125,7 @@ public class ProteinsAllMergedCommonPageDownload {
 		/////////////////////////////////////
 		//////    Get data from database per search and put in Map by Primary Key then SearchId
 		//   Primary Key is protein sequence id
-		Map<Integer, Map<Integer, ProteinSingleEntry>> proteinMapOnProteinSequenceIdSubKeySearchId = new HashMap<>();
+		Map<Integer, Map<Integer, ProteinSingleEntry>> proteinMapOnproteinSequenceVersionIdSubKeySearchId = new HashMap<>();
 		
 		Map<Integer, List<AnnotationTypeDTO>> peptideCutoffsAnnotationTypeDTOListAnnotationSortOrderSortedBySearchIdMap = new HashMap<>();
 		Map<Integer, List<AnnotationTypeDTO>> peptideCutoffsAnnotationTypeDTOListAnnotationDisplayOrderSortedBySearchIdMap = new HashMap<>();
@@ -184,12 +184,12 @@ public class ProteinsAllMergedCommonPageDownload {
 
 			ProteinsAllCommonAllResult proteinsAllCommonAllResult =
 					ProteinsAllCommonAll.getInstance().getProteinSingleEntryList(
-							null /* onlyReturnThisProteinSequenceId */, 
+							null /* onlyReturnThisproteinSequenceVersionId */, 
 							searchDTO, 
 							searchId,
 							proteinQueryJSONRoot, 
 							excludeTaxonomy_Ids_Set_UserInput, 
-							excludeProteinSequenceIds_Set_UserInput,
+							excludeproteinSequenceVersionIds_Set_UserInput,
 							searcherCutoffValuesSearchLevel );
 
 			List<ProteinSingleEntry> proteinSingleEntryList = proteinsAllCommonAllResult.getProteinSingleEntryList();
@@ -198,7 +198,7 @@ public class ProteinsAllMergedCommonPageDownload {
 			/////////////////////////////////////////////////////////
 			//////////    Add to list of all proteins (for "Exclude Protein" list on web page) 
 			for ( SearchProtein  searchProtein : searchProteinUnfilteredForSearch ) {
-				Integer searchProtein_id = searchProtein.getProteinSequenceObject().getProteinSequenceId();
+				Integer searchProtein_id = searchProtein.getProteinSequenceVersionObject().getProteinSequenceVersionId();
 				Set<Integer> searchIdsForProtein =
 						allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.get( searchProtein_id );
 				if ( searchIdsForProtein == null ) {
@@ -208,20 +208,20 @@ public class ProteinsAllMergedCommonPageDownload {
 				searchIdsForProtein.add( searchId );
 			}
 			
-			//  Add ProteinSingleEntry to map on ProteinSequenceId SubKey SearchId
+			//  Add ProteinSingleEntry to map on proteinSequenceVersionId SubKey SearchId
 			for ( ProteinSingleEntry proteinSingleEntry : proteinSingleEntryList ) {
 
 				Map<Integer, ProteinSingleEntry>  proteinMapOnSearchId = 
-						proteinMapOnProteinSequenceIdSubKeySearchId.get( proteinSingleEntry.getProteinSequenceId() );
+						proteinMapOnproteinSequenceVersionIdSubKeySearchId.get( proteinSingleEntry.getProteinSequenceVersionId() );
 				if ( proteinMapOnSearchId == null ) {
 					proteinMapOnSearchId = new HashMap<>();
-					proteinMapOnProteinSequenceIdSubKeySearchId.put( proteinSingleEntry.getProteinSequenceId(), proteinMapOnSearchId );
+					proteinMapOnproteinSequenceVersionIdSubKeySearchId.put( proteinSingleEntry.getProteinSequenceVersionId(), proteinMapOnSearchId );
 				}
 				ProteinSingleEntry prevProteinSingleEntry =
 						proteinMapOnSearchId.put( searchId, proteinSingleEntry );
 				if ( prevProteinSingleEntry != null ) {
 					String msg = "proteinSingleEntry already contains entry for search id: " + searchId
-							+ ", ProteinSequenceId: " + proteinSingleEntry.getProteinSequenceId();
+							+ ", proteinSequenceVersionId: " + proteinSingleEntry.getProteinSequenceVersionId();
 					log.error( msg );
 					throw new ProxlWebappDataException(msg);
 				}
@@ -275,15 +275,15 @@ public class ProteinsAllMergedCommonPageDownload {
 		////     Prepare Proteins for display
 		/////////////////////
 		//   Transfer Proteins into a list of MergedProteinSingleEntry
-		List<MergedProteinSingleEntry> mergedProteinSingleEntryList = new ArrayList<>( proteinMapOnProteinSequenceIdSubKeySearchId.size() );
+		List<MergedProteinSingleEntry> mergedProteinSingleEntryList = new ArrayList<>( proteinMapOnproteinSequenceVersionIdSubKeySearchId.size() );
 		
-		for ( Map.Entry<Integer, Map<Integer, ProteinSingleEntry>> entry : proteinMapOnProteinSequenceIdSubKeySearchId.entrySet() ) {
+		for ( Map.Entry<Integer, Map<Integer, ProteinSingleEntry>> entry : proteinMapOnproteinSequenceVersionIdSubKeySearchId.entrySet() ) {
 			Map<Integer, ProteinSingleEntry> proteinMapOnSearchId = entry.getValue();
 			MergedProteinSingleEntry mergedProteinSingleEntry = new MergedProteinSingleEntry();
 			mergedProteinSingleEntryList.add( mergedProteinSingleEntry );
 			mergedProteinSingleEntry.setProteinMapOnSearchId( proteinMapOnSearchId );
 			ProteinSingleEntry anyProteinSingleEntry = proteinMapOnSearchId.entrySet().iterator().next().getValue();
-			mergedProteinSingleEntry.setProteinSequenceId( anyProteinSingleEntry.getProteinSequenceId() );
+			mergedProteinSingleEntry.setProteinSequenceVersionId( anyProteinSingleEntry.getProteinSequenceVersionId() );
 		}
 		//////////  
 		//   Sort Proteins on values in first search, or so on if no data for first search
@@ -323,8 +323,8 @@ public class ProteinsAllMergedCommonPageDownload {
 				associatedReportedPeptideIdsRelatedPeptidesUniqueMergedSet.addAll( proteinSingleEntry.getReportedPeptideIdsRelatedPeptidesUnique() );
 				proteinSingleEntryMapOnSearchDTOForThisItem.put(searchDTO, proteinSingleEntry );
 			}
-			ProteinSequenceObject ProteinSequenceObject = new ProteinSequenceObject();
-			ProteinSequenceObject.setProteinSequenceId( mergedProteinSingleEntry.getProteinSequenceId() );
+			ProteinSequenceVersionObject ProteinSequenceObject = new ProteinSequenceVersionObject();
+			ProteinSequenceObject.setProteinSequenceVersionId( mergedProteinSingleEntry.getProteinSequenceVersionId() );
 			MergedSearchProtein protein = new MergedSearchProtein( searchesForThisItem, ProteinSequenceObject );
 			
 			mergedProteinSingleEntry.setProtein( protein );
@@ -452,10 +452,10 @@ public class ProteinsAllMergedCommonPageDownload {
 				}
 
 				//  If everything matches, sort on protein id
-				return o1_ProteinSingleEntry.getProteinSequenceId() - o2_ProteinSingleEntry.getProteinSequenceId();
+				return o1_ProteinSingleEntry.getProteinSequenceVersionId() - o2_ProteinSingleEntry.getProteinSequenceVersionId();
 			}
 			//  No data in the same search so sort on protein sequence id
-			return o1.getProteinSequenceId() - o2.getProteinSequenceId();
+			return o1.getProteinSequenceVersionId() - o2.getProteinSequenceVersionId();
 		}
 	}
 	
@@ -608,7 +608,7 @@ public class ProteinsAllMergedCommonPageDownload {
     public static class MergedProteinSingleEntry implements IMergedSearchLink {
 
     	private List<SearchBooleanWrapper> searchContainsProtein;
-    	private int proteinSequenceId;
+    	private int proteinSequenceVersionId;
     	private MergedSearchProtein protein;
     	private Map<Integer, ProteinSingleEntry> proteinMapOnSearchId;
 
@@ -636,11 +636,11 @@ public class ProteinsAllMergedCommonPageDownload {
 		public void setSearchContainsProtein(List<SearchBooleanWrapper> searchContainsProtein) {
 			this.searchContainsProtein = searchContainsProtein;
 		}
-		public int getProteinSequenceId() {
-			return proteinSequenceId;
+		public int getProteinSequenceVersionId() {
+			return proteinSequenceVersionId;
 		}
-		public void setProteinSequenceId(int proteinSequenceId) {
-			this.proteinSequenceId = proteinSequenceId;
+		public void setProteinSequenceVersionId(int proteinSequenceVersionId) {
+			this.proteinSequenceVersionId = proteinSequenceVersionId;
 		}
 		public MergedSearchProtein getProtein() {
 			return protein;
@@ -695,7 +695,7 @@ public class ProteinsAllMergedCommonPageDownload {
 		
 		ProteinQueryJSONRoot proteinQueryJSONRoot;
 		Set<Integer> excludeTaxonomy_Ids_Set_UserInput;
-		Set<Integer> excludeProteinSequenceIds_Set_UserInput;
+		Set<Integer> excludeproteinSequenceVersionIds_Set_UserInput;
 		List<AnnDisplayNameDescPeptPsmListsPair> peptidePsmAnnotationNameDescListsForEachSearch;
 		
 		List<MergedProteinSingleEntry> proteins;
@@ -724,11 +724,11 @@ public class ProteinsAllMergedCommonPageDownload {
 			this.excludeTaxonomy_Ids_Set_UserInput = excludeTaxonomy_Ids_Set_UserInput;
 		}
 		public Set<Integer> getExcludeProtein_Ids_Set_UserInput() {
-			return excludeProteinSequenceIds_Set_UserInput;
+			return excludeproteinSequenceVersionIds_Set_UserInput;
 		}
 		public void setExcludeProtein_Ids_Set_UserInput(
 				Set<Integer> excludeProtein_Ids_Set_UserInput) {
-			this.excludeProteinSequenceIds_Set_UserInput = excludeProtein_Ids_Set_UserInput;
+			this.excludeproteinSequenceVersionIds_Set_UserInput = excludeProtein_Ids_Set_UserInput;
 		}
 		public List<AnnDisplayNameDescPeptPsmListsPair> getPeptidePsmAnnotationNameDescListsForEachSearch() {
 			return peptidePsmAnnotationNameDescListsForEachSearch;

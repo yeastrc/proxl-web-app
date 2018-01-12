@@ -25,21 +25,21 @@ public class SearchTaxonomySearcher {
 	private static final String SINGLE_SEARCH_CROSSLINKS_LOOPLINKS_SQL =
 			"SELECT   annotation.taxonomy "
 			+ " FROM annotation "
-			+ " INNER JOIN search_protein_sequence_annotation AS spsa "
-			+ 	" ON annotation.id = spsa.annotation_id "
+			+ " INNER JOIN search__protein_sequence_version__annotation AS spsva "
+			+ 	" ON annotation.id = spsva.annotation_id "
 			+ " INNER JOIN srch_rep_pept__prot_seq_id_pos_crosslink AS srpppsipc "
-			+	" ON spsa.protein_sequence_id = srpppsipc.protein_sequence_id "
-			+ " WHERE spsa.search_id = ? AND srpppsipc.search_id = ? "
+			+	" ON spsva.protein_sequence_version_id = srpppsipc.protein_sequence_version_id "
+			+ " WHERE spsva.search_id = ? AND srpppsipc.search_id = ? "
 			
 			+ " UNION DISTINCT "
 			
 			+ "SELECT   annotation.taxonomy "
 			+ " FROM annotation "
-			+ " INNER JOIN search_protein_sequence_annotation AS spsa "
-			+ 	" ON annotation.id = spsa.annotation_id "
+			+ " INNER JOIN search__protein_sequence_version__annotation AS spsva "
+			+ 	" ON annotation.id = spsva.annotation_id "
 			+ " INNER JOIN srch_rep_pept__prot_seq_id_pos_looplink AS srpppsipl "
-			+	" ON spsa.protein_sequence_id = srpppsipl.protein_sequence_id "
-			+ " WHERE spsa.search_id = ? AND srpppsipl.search_id = ? "
+			+	" ON spsva.protein_sequence_version_id = srpppsipl.protein_sequence_version_id "
+			+ " WHERE spsva.search_id = ? AND srpppsipl.search_id = ? "
 			;
 
 	/**
@@ -98,9 +98,9 @@ public class SearchTaxonomySearcher {
 	private static final String SINGLE_SEARCH_ALL_LINK_TYPES_SQL =
 			"SELECT DISTINCT  annotation.taxonomy "
 					+ " FROM  annotation "
-					+ " INNER JOIN search_protein_sequence_annotation AS spsa "
-					+ " ON annotation.id = spsa.annotation_id "
-			+ " WHERE spsa.search_id = ? ";
+					+ " INNER JOIN search__protein_sequence_version__annotation AS spvsa "
+					+ " ON annotation.id = spsva.annotation_id "
+			+ " WHERE spsva.search_id = ? ";
 	
 	/**
 	 * Get the taxonomies present in the percolator search

@@ -3,11 +3,11 @@ package org.yeastrc.proxl.import_xml_to_db.dto;
 import org.yeastrc.proxl.import_xml_to_db.constants.DatabaseAutoIncIdFieldForRecordNotInsertedYetConstants;
 
 /**
- * table protein_sequence
+ * table protein_sequence_v2
  *
  * equals(...) based on sequence
  */
-public class ProteinSequenceDTO {
+public class ProteinSequenceV2DTO {
 	
 
 	private int id = DatabaseAutoIncIdFieldForRecordNotInsertedYetConstants.DB_AUTO_INC_FIELD_INITIAL_VALUE_FOR_NOT_INSERTED_YET;
@@ -16,14 +16,14 @@ public class ProteinSequenceDTO {
 	/**
 	 * Constructor
 	 */
-	public ProteinSequenceDTO() { }
+	public ProteinSequenceV2DTO() { }
 	
 	/**
 	 * Constructor
 	 * 
 	 * @param sequence
 	 */
-	public ProteinSequenceDTO( String sequence ) {
+	public ProteinSequenceV2DTO( String sequence ) {
 		
 		this.sequence = sequence;
 	}
@@ -44,7 +44,7 @@ public class ProteinSequenceDTO {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ProteinSequenceDTO other = (ProteinSequenceDTO) obj;
+		ProteinSequenceV2DTO other = (ProteinSequenceV2DTO) obj;
 		if (sequence == null) {
 			if (other.sequence != null)
 				return false;

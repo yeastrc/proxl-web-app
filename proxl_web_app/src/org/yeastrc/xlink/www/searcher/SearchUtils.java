@@ -17,17 +17,17 @@ public class SearchUtils {
 	private static final String NAME_SQL =
 			"SELECT DISTINCT  annotation.name "
 					+ " FROM annotation "
-					+ " INNER JOIN search_protein_sequence_annotation AS spsa "
-					+ " ON annotation.id = spsa.annotation_id "
-			+ " WHERE spsa.search_id = ? AND spsa.protein_sequence_id = ? ";
+					+ " INNER JOIN search__protein_sequence_version__annotation AS spsva "
+					+ " ON annotation.id = spsva.annotation_id "
+			+ " WHERE spsva.search_id = ? AND spsva.protein_sequence_version_id = ? ";
 	/**
 	 * Get the name for this protein in the context of its search 
 	 * @param searchId
-	 * @param proteinSequenceId
+	 * @param proteinSequenceVersionId
 	 * @return
 	 * @throws Exception
 	 */
-	public static String getProteinNameForSearchIdProteinSequenceId( int searchId, int proteinSequenceId ) throws Exception {
+	public static String getProteinNameForSearchIdProteinSequenceVersionId( int searchId, int proteinSequenceVersionId ) throws Exception {
 		String result = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -37,7 +37,7 @@ public class SearchUtils {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, searchId );
-			pstmt.setInt( 2, proteinSequenceId );
+			pstmt.setInt( 2, proteinSequenceVersionId );
 			rs = pstmt.executeQuery();
 			StringBuilder resultsSB = new StringBuilder( 1000 );
 			while( rs.next() ) {
@@ -73,18 +73,18 @@ public class SearchUtils {
 	private static final String DESCRIPTION_SQL =
 			"SELECT DISTINCT  annotation.description "
 					+ " FROM annotation "
-					+ " INNER JOIN search_protein_sequence_annotation AS spsa "
-					+ " ON annotation.id = spsa.annotation_id "
-			+ " WHERE spsa.search_id = ? AND spsa.protein_sequence_id = ? ";
+					+ " INNER JOIN search__protein_sequence_version__annotation AS spsva "
+					+ " ON annotation.id = spsva.annotation_id "
+			+ " WHERE spsva.search_id = ? AND spsva.protein_sequence_version_id = ? ";
 	/**
 	 * Get the description for this protein in the context of its search (based on
 	 * the FASTA file used to do the search.
 	 * @param searchId
-	 * @param proteinSequenceId
+	 * @param proteinSequenceVersionId
 	 * @return
 	 * @throws Exception
 	 */
-	public static String getProteinDescriptionForSearchIdProteinSequenceId( int searchId, int proteinSequenceId ) throws Exception {
+	public static String getProteinDescriptionForSearchIdproteinSequenceVersionId( int searchId, int proteinSequenceVersionId ) throws Exception {
 		String result = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -94,7 +94,7 @@ public class SearchUtils {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, searchId );
-			pstmt.setInt( 2, proteinSequenceId );
+			pstmt.setInt( 2, proteinSequenceVersionId );
 			rs = pstmt.executeQuery();
 			StringBuilder resultsSB = new StringBuilder( 1000 );
 			while( rs.next() ) {

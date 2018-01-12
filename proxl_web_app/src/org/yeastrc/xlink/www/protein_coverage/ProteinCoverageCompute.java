@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
+import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.dto.LinkerDTO;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.linkable_positions.GetLinkablePositionsForLinkers;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -26,6 +26,7 @@ import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
 import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping.UnlinkedDimerPeptideProteinMappingResult;
 import org.yeastrc.xlink.www.objects.MergedSearchProtein;
 import org.yeastrc.xlink.www.objects.ProteinCoverageData;
+import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinDimer;
@@ -37,10 +38,11 @@ import org.yeastrc.xlink.www.objects.SearchProteinMonolinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinked;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinkedWrapper;
 import org.yeastrc.xlink.www.searcher.LinkersForSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsForProtSeqIdSearchId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Request;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Result;
-import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
+import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
+
 import com.google.common.collect.Range;
 
 /**
@@ -56,7 +58,7 @@ public class ProteinCoverageCompute {
 	private boolean filterNonUniquePeptides = false;
 	private boolean filterOnlyOnePSM = false;
 	private boolean filterOnlyOnePeptide = false;
-	private int[] excludedProteinSequenceIds;
+	private int[] excludedproteinSequenceVersionIds;
 	private int[] excludedTaxonomyIds;
 	private LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param;
 	
@@ -77,8 +79,8 @@ public class ProteinCoverageCompute {
 				excludeTaxonomy_Ids_Set_UserInput.add( taxonomyId );
 			}
 		}
-		if ( excludedProteinSequenceIds != null ) {
-			for ( Integer proteinId : excludedProteinSequenceIds ) {
+		if ( excludedproteinSequenceVersionIds != null ) {
+			for ( Integer proteinId : excludedproteinSequenceVersionIds ) {
 				excludeProtein_Ids_Set_UserInput.add( proteinId );
 			}
 		}
@@ -105,8 +107,8 @@ public class ProteinCoverageCompute {
 					wrappedCrosslinks_MappedOnSearchId.put( search.getSearchId(), wrappedCrosslinks );
 					for ( SearchProteinCrosslinkWrapper wrappedCrosslink : wrappedCrosslinks ) {
 						SearchProteinCrosslink crosslink = wrappedCrosslink.getSearchProteinCrosslink();
-						proteinIds.add( crosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId() );
-						proteinIds.add( crosslink.getProtein2().getProteinSequenceObject().getProteinSequenceId() );
+						proteinIds.add( crosslink.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
+						proteinIds.add( crosslink.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					}
 				}
 				{
@@ -116,7 +118,7 @@ public class ProteinCoverageCompute {
 					wrappedLooplinks_MappedOnSearchId.put( search.getSearchId(), wrappedLooplinks );
 					for ( SearchProteinLooplinkWrapper wrappedLooplink : wrappedLooplinks ) {
 						SearchProteinLooplink looplink = wrappedLooplink.getSearchProteinLooplink();
-						proteinIds.add( looplink.getProtein().getProteinSequenceObject().getProteinSequenceId() );
+						proteinIds.add( looplink.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					}
 				}
 				{
@@ -126,7 +128,7 @@ public class ProteinCoverageCompute {
 					wrappedMonolinks_MappedOnSearchId.put( search.getSearchId(), wrappedMonolinks );
 					for ( SearchProteinMonolinkWrapper wrappedMonolink : wrappedMonolinks ) {
 						SearchProteinMonolink link = wrappedMonolink.getSearchProteinMonolink();
-						proteinIds.add( link.getProtein().getProteinSequenceObject().getProteinSequenceId() );
+						proteinIds.add( link.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					}
 				}
 				{
@@ -137,19 +139,19 @@ public class ProteinCoverageCompute {
 							unlinkedDimerPeptideProteinMappingResult.getSearchProteinDimerWrapperList();
 					for ( SearchProteinDimerWrapper wrappedDimer : wrappedDimerLinks ) {
 						SearchProteinDimer dimer = wrappedDimer.getSearchProteinDimer();
-						proteinIds.add( dimer.getProtein1().getProteinSequenceObject().getProteinSequenceId() );
-						proteinIds.add( dimer.getProtein2().getProteinSequenceObject().getProteinSequenceId() );
+						proteinIds.add( dimer.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
+						proteinIds.add( dimer.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					}
 					List<SearchProteinUnlinkedWrapper> wrappedUnlinkedLinks = 
 							unlinkedDimerPeptideProteinMappingResult.getSearchProteinUnlinkedWrapperList();
 					for ( SearchProteinUnlinkedWrapper wrappedUnlinked : wrappedUnlinkedLinks ) {
 						SearchProteinUnlinked unlinked = wrappedUnlinked.getSearchProteinUnlinked();
-						proteinIds.add( unlinked.getProtein().getProteinSequenceObject().getProteinSequenceId() );
+						proteinIds.add( unlinked.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					}
 				}
 			}
 			for ( int proteinId : proteinIds ) {
-				proteins.add( new MergedSearchProtein( searches, ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId ) ) );
+				proteins.add( new MergedSearchProtein( searches, ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( proteinId ) ) );
 			}
 		}
 		////////////////////////////////////////////////////////////////////////
@@ -179,13 +181,13 @@ public class ProteinCoverageCompute {
 						// did user request removal of certain taxonomy IDs?
 						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 							boolean excludeOnProtein =
-									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+									ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 											excludeTaxonomy_Ids_Set_UserInput, 
-											link.getProtein().getProteinSequenceObject(), 
+											link.getProtein().getProteinSequenceVersionObject(), 
 											searchId );
 							if ( excludeOnProtein ) {
-//							int taxonomyId = link.getProtein().getProteinSequenceObject().getTaxonomyId();
+//							int taxonomyId = link.getProtein().getProteinSequenceVersionObject().getTaxonomyId();
 //							
 //							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
 								//  Skip to next entry in list, dropping this entry from output list
@@ -194,7 +196,7 @@ public class ProteinCoverageCompute {
 						}
 						// did user request removal of certain protein IDs?
 						if( ! excludeProtein_Ids_Set_UserInput.isEmpty() ) {
-							int proteinId = link.getProtein().getProteinSequenceObject().getProteinSequenceId();
+							int proteinId = link.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 							if ( excludeProtein_Ids_Set_UserInput.contains( proteinId ) ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
@@ -242,13 +244,13 @@ public class ProteinCoverageCompute {
 						// did user request removal of certain taxonomy IDs?
 						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 							boolean excludeOnProtein =
-									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+									ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 											excludeTaxonomy_Ids_Set_UserInput, 
-											link.getProtein().getProteinSequenceObject(), 
+											link.getProtein().getProteinSequenceVersionObject(), 
 											searchId );
 							if ( excludeOnProtein ) {
-//							int taxonomyId = link.getProtein().getProteinSequenceObject().getTaxonomyId();
+//							int taxonomyId = link.getProtein().getProteinSequenceVersionObject().getTaxonomyId();
 //							
 //							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
 								//  Skip to next entry in list, dropping this entry from output list
@@ -257,7 +259,7 @@ public class ProteinCoverageCompute {
 						}
 						// did user request removal of certain protein IDs?
 						if( ! excludeProtein_Ids_Set_UserInput.isEmpty() ) {
-							int proteinId = link.getProtein().getProteinSequenceObject().getProteinSequenceId();
+							int proteinId = link.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 							if ( excludeProtein_Ids_Set_UserInput.contains( proteinId ) ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
@@ -305,20 +307,20 @@ public class ProteinCoverageCompute {
 						// did user request removal of certain taxonomy IDs?
 						if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 							boolean excludeOnProtein_1 =
-									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+									ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 											excludeTaxonomy_Ids_Set_UserInput, 
-											link.getProtein1().getProteinSequenceObject(), 
+											link.getProtein1().getProteinSequenceVersionObject(), 
 											searchId );
 							boolean excludeOnProtein_2 =
-									ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-									.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+									ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+									.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 											excludeTaxonomy_Ids_Set_UserInput, 
-											link.getProtein2().getProteinSequenceObject(), 
+											link.getProtein2().getProteinSequenceVersionObject(), 
 											searchId );
 							if ( excludeOnProtein_1 || excludeOnProtein_2 ) {
-//							int taxonomyId_1 = link.getProtein1().getProteinSequenceObject().getTaxonomyId();
-//							int taxonomyId_2 = link.getProtein2().getProteinSequenceObject().getTaxonomyId();
+//							int taxonomyId_1 = link.getProtein1().getProteinSequenceVersionObject().getTaxonomyId();
+//							int taxonomyId_2 = link.getProtein2().getProteinSequenceVersionObject().getTaxonomyId();
 //							
 //							if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_1 ) 
 //									|| excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId_2 ) ) {
@@ -328,8 +330,8 @@ public class ProteinCoverageCompute {
 						}
 						// did user request removal of certain protein IDs?
 						if( ! excludeProtein_Ids_Set_UserInput.isEmpty() ) {
-							int proteinId_1 = link.getProtein1().getProteinSequenceObject().getProteinSequenceId();
-							int proteinId_2 = link.getProtein2().getProteinSequenceObject().getProteinSequenceId();
+							int proteinId_1 = link.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId();
+							int proteinId_2 = link.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 							if ( excludeProtein_Ids_Set_UserInput.contains( proteinId_1 ) 
 									|| excludeProtein_Ids_Set_UserInput.contains( proteinId_2 ) ) {
 								//  Skip to next entry in list, dropping this entry from output list
@@ -417,15 +419,15 @@ public class ProteinCoverageCompute {
 		for ( Map.Entry<Set<Integer>, List<MergedSearchProtein>> mergedSearchProtein_KeyedOnSearchIds_Map_Entry :
 			mergedSearchProtein_KeyedOnSearchIds_Map.entrySet() ) {
 			List<MergedSearchProtein> mergedSearchProteinList = mergedSearchProtein_KeyedOnSearchIds_Map_Entry.getValue();
-			List<ProteinSequenceObject> proteinSequenceObjectList = new ArrayList<>( mergedSearchProteinList.size() );
+			List<ProteinSequenceVersionObject> proteinSequenceVersionObjectList = new ArrayList<>( mergedSearchProteinList.size() );
 			MergedSearchProtein lastMergedSearchProtein = null;
 			for ( MergedSearchProtein mergedSearchProtein : mergedSearchProteinList ) {
 				lastMergedSearchProtein = mergedSearchProtein;
-				proteinSequenceObjectList.add( mergedSearchProtein.getProteinSequenceObject() );
+				proteinSequenceVersionObjectList.add( mergedSearchProtein.getProteinSequenceVersionObject() );
 			}
 			Map<Integer, ProteinSequenceCoverage> proteinSequenceCoverages_Partial = 
 					ProteinSequenceCoverageFactory.getInstance()
-					.getProteinSequenceCoveragesForProteins(proteinSequenceObjectList, lastMergedSearchProtein.getSearchs(), searcherCutoffValuesRootLevel);
+					.getProteinSequenceCoveragesForProteins(proteinSequenceVersionObjectList, lastMergedSearchProtein.getSearchs(), searcherCutoffValuesRootLevel);
 			for ( Map.Entry<Integer, ProteinSequenceCoverage> proteinSequenceCoverages_Partial_Entry : proteinSequenceCoverages_Partial.entrySet() ) {
 				proteinSequenceCoverage_KeyedOnProteinId_Map.put( proteinSequenceCoverages_Partial_Entry.getKey(), proteinSequenceCoverages_Partial_Entry.getValue() );
 			}
@@ -440,9 +442,9 @@ public class ProteinCoverageCompute {
 					TaxonomyIdsForProtSeqIdSearchId_Request taxonomyIdsForProtSeqIdSearchId_Request =
 							new TaxonomyIdsForProtSeqIdSearchId_Request();
 					taxonomyIdsForProtSeqIdSearchId_Request.setSearchId( searchDTO.getSearchId() );
-					taxonomyIdsForProtSeqIdSearchId_Request.setProteinSequenceId( protein.getProteinSequenceObject().getProteinSequenceId() );
+					taxonomyIdsForProtSeqIdSearchId_Request.setProteinSequenceVersionId( protein.getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 					TaxonomyIdsForProtSeqIdSearchId_Result taxonomyIdsForProtSeqIdSearchId_Result =
-							Cached_TaxonomyIdsForProtSeqIdSearchId.getInstance()
+							Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId.getInstance()
 							.getTaxonomyIdsForProtSeqIdSearchId_Result( taxonomyIdsForProtSeqIdSearchId_Request );
 					Set<Integer> taxonomyIds = taxonomyIdsForProtSeqIdSearchId_Result.getTaxonomyIds();
 					for ( Integer taxonomyId : taxonomyIds ) {
@@ -456,7 +458,7 @@ public class ProteinCoverageCompute {
 					}
 				}
 				if ( excludeForAllSearches ) {
-//				int taxonomyId = protein.getProteinSequenceObject().getTaxonomyId();
+//				int taxonomyId = protein.getProteinSequenceVersionObject().getTaxonomyId();
 //
 //				if ( excludeTaxonomy_Ids_Set_UserInput.contains( taxonomyId ) ) {
 					//  Skip to next entry in list, dropping this entry from output list
@@ -465,26 +467,31 @@ public class ProteinCoverageCompute {
 			}
 			// did user request removal of certain protein IDs?
 			if( ! excludeProtein_Ids_Set_UserInput.isEmpty() ) {
-				int proteinId = protein.getProteinSequenceObject().getProteinSequenceId();
+				int proteinId = protein.getProteinSequenceVersionObject().getProteinSequenceVersionId();
 				if ( excludeProtein_Ids_Set_UserInput.contains( proteinId ) ) {
 					//  Skip to next entry in list, dropping this entry from output list
 					continue;  // EARLY CONTINUE
 				}
-			}									
+			}
+			ProteinSequenceVersionObject proteinSequenceVersionObject = protein.getProteinSequenceVersionObject();
+			ProteinSequenceObject proteinSequenceObject = proteinSequenceVersionObject.getProteinSequenceObject();
+			
+			String proteinSequence = proteinSequenceObject.getSequence();
+			int proteinSequenceLength = proteinSequence.length();
+			
 			ProteinCoverageData pcd = new ProteinCoverageData();
 			pcd.setName( protein.getName() );
-			pcd.setNumResidues( protein.getProteinSequenceObject().getSequence().length() );
+			pcd.setNumResidues( proteinSequenceLength );
 			totalResidues += pcd.getNumResidues();
 			//  report sequence coverage
-			ProteinSequenceCoverage psc = proteinSequenceCoverage_KeyedOnProteinId_Map.get( protein.getProteinSequenceObject().getProteinSequenceId() );
+			ProteinSequenceCoverage psc = proteinSequenceCoverage_KeyedOnProteinId_Map.get( protein.getProteinSequenceVersionObject().getProteinSequenceVersionId() );
 			if ( psc == null ) {
-				String msg = "proteinSequenceCoverage_KeyedOnProteinId_Map does not contain entry for protein id: " + protein.getProteinSequenceObject();
+				String msg = "proteinSequenceCoverage_KeyedOnProteinId_Map does not contain entry for protein id: " + protein.getProteinSequenceVersionObject();
 				log.error( msg );
 				throw new ProxlWebappDataException(msg);
 			}
 			pcd.setSequenceCoverage( psc.getSequenceCoverage() );
 			totalCoveredResidues += (int)Math.round( pcd.getNumResidues() * psc.getSequenceCoverage() );
-			String proteinSequence = protein.getProteinSequenceObject().getSequence();
 			Set<Integer> linkablePositionsForProtein = GetLinkablePositionsForLinkers.getLinkablePositionsForProteinSequenceAndLinkerAbbrSet( proteinSequence, linkerAbbrSet );
 			// calculate and report number of modifiable residues
 			int numLinkableResidues = linkablePositionsForProtein.size();
@@ -515,7 +522,7 @@ public class ProteinCoverageCompute {
 				List<SearchProteinMonolinkWrapper> wrappedMonolinksFiltered = wrappedMonolinksFiltered_MappedOnSearchId_Entry.getValue();
 				for ( SearchProteinMonolinkWrapper searchProteinMonolinkWrapper : wrappedMonolinksFiltered ) {
 					SearchProteinMonolink searchProteinMonolink = searchProteinMonolinkWrapper.getSearchProteinMonolink();
-					if( searchProteinMonolink.getProtein().getProteinSequenceObject().getProteinSequenceId() != protein.getProteinSequenceObject().getProteinSequenceId() ) { 
+					if( searchProteinMonolink.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() != protein.getProteinSequenceVersionObject().getProteinSequenceVersionId() ) { 
 						//  Protein id for this link is not the protein id being processed in this iteration through the proteins
 						//     so skip to next link
 						continue; 
@@ -530,7 +537,7 @@ public class ProteinCoverageCompute {
 				List<SearchProteinLooplinkWrapper> wrappedLooplinksFiltered = wrappedLooplinksFiltered_MappedOnSearchId_Entry.getValue();
 				for ( SearchProteinLooplinkWrapper searchProteinLooplinkWrapper : wrappedLooplinksFiltered ) {
 					SearchProteinLooplink searchProteinLooplink = searchProteinLooplinkWrapper.getSearchProteinLooplink();
-					if( searchProteinLooplink.getProtein().getProteinSequenceObject().getProteinSequenceId() != protein.getProteinSequenceObject().getProteinSequenceId() ) { 
+					if( searchProteinLooplink.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() != protein.getProteinSequenceVersionObject().getProteinSequenceVersionId() ) { 
 						//  Protein id for this link is not the protein id being processed in this iteration through the proteins
 						//     so skip to next link
 						continue;
@@ -549,14 +556,14 @@ public class ProteinCoverageCompute {
 				List<SearchProteinCrosslinkWrapper> wrappedCrosslinksFiltered = wrappedCrosslinksFiltered_MappedOnSearchId_Entry.getValue();
 				for ( SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper : wrappedCrosslinksFiltered ) {
 					SearchProteinCrosslink searchProteinCrosslink = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
-					if( searchProteinCrosslink.getProtein1().getProteinSequenceObject().getProteinSequenceId() == protein.getProteinSequenceObject().getProteinSequenceId() ) {
+					if( searchProteinCrosslink.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() == protein.getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
 						//  Protein id 1 for this link is the protein id being processed in this iteration through the proteins
 						//     so process this link
 						crosslinkedResidues.add( searchProteinCrosslink.getProtein1Position() );					
 						mlcResidues.add( searchProteinCrosslink.getProtein1Position() );
 						lcResidues.add( searchProteinCrosslink.getProtein1Position() );
 					}
-					if( searchProteinCrosslink.getProtein2().getProteinSequenceObject().getProteinSequenceId() == protein.getProteinSequenceObject().getProteinSequenceId() ) {
+					if( searchProteinCrosslink.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() == protein.getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
 						//  Protein id 2 for this link is the protein id being processed in this iteration through the proteins
 						//     so process this link
 						crosslinkedResidues.add( searchProteinCrosslink.getProtein2Position() );					
@@ -642,11 +649,11 @@ public class ProteinCoverageCompute {
 	public void setFilterNonUniquePeptides(boolean filterNonUniquePeptides) {
 		this.filterNonUniquePeptides = filterNonUniquePeptides;
 	}
-	public int[] getExcludedProteinSequenceIds() {
-		return excludedProteinSequenceIds;
+	public int[] getExcludedproteinSequenceVersionIds() {
+		return excludedproteinSequenceVersionIds;
 	}
-	public void setExcludedProteinSequenceIds(int[] excludedProteinSequenceIds) {
-		this.excludedProteinSequenceIds = excludedProteinSequenceIds;
+	public void setExcludedproteinSequenceVersionIds(int[] excludedproteinSequenceVersionIds) {
+		this.excludedproteinSequenceVersionIds = excludedproteinSequenceVersionIds;
 	}
 	public int[] getExcludedTaxonomyIds() {
 		return excludedTaxonomyIds;

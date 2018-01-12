@@ -11,8 +11,8 @@ public class ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink {
 	private int searchReportedPeptidepeptideId_2;
 	
 	// Associated protein sequence ids
-	private int proteinSequenceId_1;
-	private int proteinSequenceId_2;
+	private int proteinSequenceVersionId_1;
+	private int proteinSequenceVersionId_2;
 	private int proteinPosition_1;
 	private int proteinPosition_2;
 	
@@ -35,17 +35,17 @@ public class ReportedPeptide_SearchReportedPeptidepeptideId_Crosslink {
 	public void setSearchReportedPeptidepeptideId_2(int searchReportedPeptidepeptideId_2) {
 		this.searchReportedPeptidepeptideId_2 = searchReportedPeptidepeptideId_2;
 	}
-	public int getProteinSequenceId_1() {
-		return proteinSequenceId_1;
+	public int getProteinSequenceVersionId_1() {
+		return proteinSequenceVersionId_1;
 	}
-	public void setProteinSequenceId_1(int proteinSequenceId_1) {
-		this.proteinSequenceId_1 = proteinSequenceId_1;
+	public void setProteinSequenceVersionId_1(int proteinSequenceVersionId_1) {
+		this.proteinSequenceVersionId_1 = proteinSequenceVersionId_1;
 	}
-	public int getProteinSequenceId_2() {
-		return proteinSequenceId_2;
+	public int getProteinSequenceVersionId_2() {
+		return proteinSequenceVersionId_2;
 	}
-	public void setProteinSequenceId_2(int proteinSequenceId_2) {
-		this.proteinSequenceId_2 = proteinSequenceId_2;
+	public void setProteinSequenceVersionId_2(int proteinSequenceVersionId_2) {
+		this.proteinSequenceVersionId_2 = proteinSequenceVersionId_2;
 	}
 	public int getProteinPosition_1() {
 		return proteinPosition_1;

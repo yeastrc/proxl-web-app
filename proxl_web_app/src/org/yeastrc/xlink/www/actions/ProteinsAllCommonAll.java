@@ -22,7 +22,7 @@ import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosDimerDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosLooplinkDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosUnlinkedDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
+import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
 import org.yeastrc.xlink.www.objects.SearchProtein;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
@@ -39,7 +39,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_search
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Result;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptProtSeqIdPosCrosslinkDTO_ForSrchIdRepPeptId_Result;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_Result;
-import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceIdSearchId;
+import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 
 /**
@@ -79,24 +79,24 @@ public class ProteinsAllCommonAll {
 	}
 
 	/**
-	 * @param onlyReturnThisProteinSequenceId
+	 * @param onlyReturnThisproteinSequenceVersionId
 	 * @param search
 	 * @param searchId
 	 * @param proteinQueryJSONRoot
 	 * @param excludeTaxonomy_Ids_Set_UserInput
-	 * @param excludeProteinSequenceIds_Set_UserInput
+	 * @param excludeproteinSequenceVersionIds_Set_UserInput
 	 * @param searcherCutoffValuesSearchLevel
 	 * @return
 	 * @throws Exception
 	 * @throws ProxlWebappDataException
 	 */
 	public ProteinsAllCommonAllResult getProteinSingleEntryList(
-			Integer onlyReturnThisProteinSequenceId, 
+			Integer onlyReturnThisproteinSequenceVersionId, 
 			SearchDTO search, 
 			int searchId,
 			ProteinQueryJSONRoot proteinQueryJSONRoot, 
 			Set<Integer> excludeTaxonomy_Ids_Set_UserInput,
-			Set<Integer> excludeProteinSequenceIds_Set_UserInput, 
+			Set<Integer> excludeproteinSequenceVersionIds_Set_UserInput, 
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel
 			) throws Exception, ProxlWebappDataException {
 		
@@ -169,7 +169,7 @@ public class ProteinsAllCommonAll {
 						cached_SrchRepPeptProtSeqIdPosCrosslinkDTO_ForSrchIdRepPeptId.getSrchRepPeptProtSeqIdPosCrosslinkDTO_ForSrchIdRepPeptId_Result( reqParams );
 				List<SrchRepPeptProtSeqIdPosCrosslinkDTO> srchRepPeptProtSeqIdPosCrosslinkDTOList = result.getSrchRepPeptProtSeqIdPosCrosslinkDTOList();
 				proteinWithBestPeptideAndPSMAnnDataContainer.addProteinEntriesForReportedPeptide(
-						onlyReturnThisProteinSequenceId,
+						onlyReturnThisproteinSequenceVersionId,
 						wrappedPeptidelink, 
 						srchRepPeptProtSeqIdPosCrosslinkDTOList, 
 						searcherCutoffValuesSearchLevel, 
@@ -183,7 +183,7 @@ public class ProteinsAllCommonAll {
 				List<SrchRepPeptProtSeqIdPosLooplinkDTO> srchRepPeptProtSeqIdPosLooplinkDTOList =
 						result.getSrchRepPeptProtSeqIdPosLooplinkDTOList();
 				proteinWithBestPeptideAndPSMAnnDataContainer.addProteinEntriesForReportedPeptide(
-						onlyReturnThisProteinSequenceId,
+						onlyReturnThisproteinSequenceVersionId,
 						wrappedPeptidelink, 
 						srchRepPeptProtSeqIdPosLooplinkDTOList, 
 						searcherCutoffValuesSearchLevel, 
@@ -193,7 +193,7 @@ public class ProteinsAllCommonAll {
 						SearchReportedPeptideProteinSequencePositionUnlinkedSearcher.getInstance()
 						.getSrchRepPeptProtSeqIdPosUnlinkedDTOList( searchId, reportedPeptideId );
 				proteinWithBestPeptideAndPSMAnnDataContainer.addProteinEntriesForReportedPeptide(
-						onlyReturnThisProteinSequenceId,
+						onlyReturnThisproteinSequenceVersionId,
 						wrappedPeptidelink, 
 						srchRepPeptProtSeqIdPosUnlinkedDTOList, 
 						searcherCutoffValuesSearchLevel, 
@@ -203,7 +203,7 @@ public class ProteinsAllCommonAll {
 						SearchReportedPeptideProteinSequencePositionDimerSearcher.getInstance()
 						.getSrchRepPeptProtSeqIdPosDimerDTOList( searchId, reportedPeptideId );
 				proteinWithBestPeptideAndPSMAnnDataContainer.addProteinEntriesForReportedPeptide(
-						onlyReturnThisProteinSequenceId,
+						onlyReturnThisproteinSequenceVersionId,
 						wrappedPeptidelink, 
 						srchRepPeptProtSeqIdPosDimerDTOList, 
 						searcherCutoffValuesSearchLevel, 
@@ -228,7 +228,7 @@ public class ProteinsAllCommonAll {
 				|| proteinQueryJSONRoot.isFilterOnlyOnePSM() 
 				|| proteinQueryJSONRoot.isFilterOnlyOnePeptide()
 				|| ( proteinQueryJSONRoot.getExcludeTaxonomy() != null && proteinQueryJSONRoot.getExcludeTaxonomy().length > 0 ) ||
-				( ! excludeProteinSequenceIds_Set_UserInput.isEmpty() ) ) {
+				( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) ) {
 		
 			///  Filter Protein Entries
 			for ( ProteinSingleEntry proteinSingleEntry : proteinSingleEntryListBeforeFilter ) {
@@ -236,7 +236,7 @@ public class ProteinsAllCommonAll {
 				if( proteinQueryJSONRoot.isFilterNonUniquePeptides()  ) {
 					if( proteinSingleEntry.getNumUniquePeptides() < 1 ) {
 						//  Drop this entry from output list
-						proteinWithBestPeptideAndPSMAnnDataContainer.removeForProteinSequenceId( proteinSingleEntry.getProteinSequenceId() );
+						proteinWithBestPeptideAndPSMAnnDataContainer.removeForproteinSequenceVersionId( proteinSingleEntry.getProteinSequenceVersionId() );
 						continue;  // EARLY CONTINUE
 					}
 				}
@@ -245,7 +245,7 @@ public class ProteinsAllCommonAll {
 					int psmCountForSearchId = proteinSingleEntry.getNumPsms();
 					if ( psmCountForSearchId <= 1 ) {
 						//  Drop this entry from output list
-						proteinWithBestPeptideAndPSMAnnDataContainer.removeForProteinSequenceId( proteinSingleEntry.getProteinSequenceId() );
+						proteinWithBestPeptideAndPSMAnnDataContainer.removeForproteinSequenceVersionId( proteinSingleEntry.getProteinSequenceVersionId() );
 						continue;  // EARLY CONTINUE
 					}
 				}
@@ -254,30 +254,30 @@ public class ProteinsAllCommonAll {
 					int peptideCountForSearchId = proteinSingleEntry.getNumPeptides();
 					if ( peptideCountForSearchId <= 1 ) {
 						//  Drop this entry from output list
-						proteinWithBestPeptideAndPSMAnnDataContainer.removeForProteinSequenceId( proteinSingleEntry.getProteinSequenceId() );
+						proteinWithBestPeptideAndPSMAnnDataContainer.removeForproteinSequenceVersionId( proteinSingleEntry.getProteinSequenceVersionId() );
 						continue;  // EARLY CONTINUE
 					}
 				}
 				// did user request removal of certain taxonomy IDs?
 				if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
 					boolean excludeOnProtein =
-							ExcludeOnTaxonomyForProteinSequenceIdSearchId.getInstance()
-							.excludeOnTaxonomyForProteinSequenceIdSearchId( 
+							ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
+							.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
 									excludeTaxonomy_Ids_Set_UserInput, 
-									proteinSingleEntry.getSearchProtein().getProteinSequenceObject(), 
+									proteinSingleEntry.getSearchProtein().getProteinSequenceVersionObject(), 
 									searchId );
 					if ( excludeOnProtein ) {
 						//  Drop this entry from output list
-						proteinWithBestPeptideAndPSMAnnDataContainer.removeForProteinSequenceId( proteinSingleEntry.getProteinSequenceId() );
+						proteinWithBestPeptideAndPSMAnnDataContainer.removeForproteinSequenceVersionId( proteinSingleEntry.getProteinSequenceVersionId() );
 						continue;  // EARLY CONTINUE
 					}
 				}
 				// did user request removal of certain protein IDs?
-				if( ! excludeProteinSequenceIds_Set_UserInput.isEmpty() ) {
-					int proteinId = proteinSingleEntry.getSearchProtein().getProteinSequenceObject().getProteinSequenceId();
-					if ( excludeProteinSequenceIds_Set_UserInput.contains( proteinId ) ) {
+				if( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) {
+					int proteinId = proteinSingleEntry.getSearchProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
+					if ( excludeproteinSequenceVersionIds_Set_UserInput.contains( proteinId ) ) {
 						//  Drop this entry from output list
-						proteinWithBestPeptideAndPSMAnnDataContainer.removeForProteinSequenceId( proteinSingleEntry.getProteinSequenceId() );
+						proteinWithBestPeptideAndPSMAnnDataContainer.removeForproteinSequenceVersionId( proteinSingleEntry.getProteinSequenceVersionId() );
 						continue;  // EARLY CONTINUE
 					}
 				}								
@@ -313,16 +313,16 @@ public class ProteinsAllCommonAll {
     	}
     	
     	/**
-    	 * @param proteinSequenceId
+    	 * @param proteinSequenceVersionId
     	 */
-    	public void removeForProteinSequenceId( int proteinSequenceId ) {
+    	public void removeForproteinSequenceVersionId( int proteinSequenceVersionId ) {
     		
-    		entryMap.remove( proteinSequenceId );
+    		entryMap.remove( proteinSequenceVersionId );
     	}
     	
 
     	/**
-    	 * @param onlyReturnThisProteinSequenceId
+    	 * @param onlyReturnThisproteinSequenceVersionId
     	 * @param wrappedPeptidelink
     	 * @param protSeqCommonList
     	 * @param searcherCutoffValuesSearchLevel
@@ -330,42 +330,42 @@ public class ProteinsAllCommonAll {
     	 * @throws Exception
     	 */
     	public void addProteinEntriesForReportedPeptide(  
-    			Integer onlyReturnThisProteinSequenceId,
+    			Integer onlyReturnThisproteinSequenceVersionId,
     			WebReportedPeptideWrapper wrappedPeptidelink,
     			List<? extends SrchRepPeptProtSeqIdPosCommonIF> protSeqCommonList,
     			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
     			SearchDTO search
     			) throws Exception {
     		
-			Set<Integer> processedproteinSequenceId = new HashSet<Integer>();
+			Set<Integer> processedproteinSequenceVersionId = new HashSet<Integer>();
 			for ( SrchRepPeptProtSeqIdPosCommonIF srchRepPeptProtSeqIdPosCommon : protSeqCommonList ) {
-				int proteinSequenceId = srchRepPeptProtSeqIdPosCommon.getProteinSequenceId();
-				if ( onlyReturnThisProteinSequenceId == null 
-						|| onlyReturnThisProteinSequenceId == proteinSequenceId ) {
-					if ( processedproteinSequenceId.add( proteinSequenceId ) ) {
-						// Only process a proteinSequenceId once for a wrappedPeptidelink
-						addProteinEntry( proteinSequenceId, wrappedPeptidelink, searcherCutoffValuesSearchLevel, search );
+				int proteinSequenceVersionId = srchRepPeptProtSeqIdPosCommon.getProteinSequenceVersionId();
+				if ( onlyReturnThisproteinSequenceVersionId == null 
+						|| onlyReturnThisproteinSequenceVersionId == proteinSequenceVersionId ) {
+					if ( processedproteinSequenceVersionId.add( proteinSequenceVersionId ) ) {
+						// Only process a proteinSequenceVersionId once for a wrappedPeptidelink
+						addProteinEntry( proteinSequenceVersionId, wrappedPeptidelink, searcherCutoffValuesSearchLevel, search );
 					}
 				}
 			}
     	}
     	
     	/**
-    	 * @param proteinSequenceId
+    	 * @param proteinSequenceVersionId
     	 * @param wrappedPeptidelink
     	 * @throws Exception 
     	 */
     	private void addProteinEntry( 
-    			Integer proteinSequenceId, 
+    			Integer proteinSequenceVersionId, 
     			WebReportedPeptideWrapper wrappedPeptidelink,
     			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
     			SearchDTO search ) throws Exception {
     		
-    		ProteinSingleEntry entry = entryMap.get( proteinSequenceId );
+    		ProteinSingleEntry entry = entryMap.get( proteinSequenceVersionId );
     		if ( entry == null ) {
     			entry = new ProteinSingleEntry();
-    			entry.init( proteinSequenceId, wrappedPeptidelink, search );
-    			entryMap.put( proteinSequenceId, entry );
+    			entry.init( proteinSequenceVersionId, wrappedPeptidelink, search );
+    			entryMap.put( proteinSequenceVersionId, entry );
     		} else {
     			entry.updateForWebReportedPeptideWrapper( wrappedPeptidelink, searcherCutoffValuesSearchLevel, search );
     		}
@@ -380,7 +380,7 @@ public class ProteinsAllCommonAll {
      */
     public class ProteinSingleEntry extends SortDisplayRecordsWrapperBase {
 
-    	private int proteinSequenceId;
+    	private int proteinSequenceVersionId;
     	
     	private SearchProtein searchProtein;
 
@@ -419,12 +419,12 @@ public class ProteinsAllCommonAll {
     	 * @throws Exception 
     	 */
     	public void init( 
-    			int proteinSequenceId,
+    			int proteinSequenceVersionId,
     			WebReportedPeptideWrapper wrappedPeptidelink,
     			SearchDTO search ) throws Exception {
     		
-			this.proteinSequenceId = proteinSequenceId;
-			this.searchProtein = new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( proteinSequenceId ) );
+			this.proteinSequenceVersionId = proteinSequenceVersionId;
+			this.searchProtein = new SearchProtein( search, ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( proteinSequenceVersionId ) );
 
     		this.setPeptideAnnotationDTOMap( wrappedPeptidelink.getPeptideAnnotationDTOMap() );
 			this.setPsmAnnotationDTOMap( wrappedPeptidelink.getPsmAnnotationDTOMap() );
@@ -559,11 +559,11 @@ public class ProteinsAllCommonAll {
     		}
     	}
 
-		public int getProteinSequenceId() {
-			return proteinSequenceId;
+		public int getProteinSequenceVersionId() {
+			return proteinSequenceVersionId;
 		}
-		public void setProteinSequenceId(int proteinSequenceId) {
-			this.proteinSequenceId = proteinSequenceId;
+		public void setProteinSequenceVersionId(int proteinSequenceVersionId) {
+			this.proteinSequenceVersionId = proteinSequenceVersionId;
 		}
 		@Override
 		public List<String> getPsmAnnotationValueList() {
@@ -583,7 +583,7 @@ public class ProteinsAllCommonAll {
 		}
 		@Override
 		public int getFinalSortOrderKey() {
-			return proteinSequenceId;
+			return proteinSequenceVersionId;
 		}
 		public SearchProtein getSearchProtein() {
 			return searchProtein;

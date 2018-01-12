@@ -40,7 +40,7 @@ public class PDBAlignmentDAO {
 			pa.setAlignedExperimentalSequence( rs.getString( "aligned_experimental_sequence" ) );
 			pa.setAlignedPDBSequence( rs.getString( "aligned_pdb_sequence" ) );
 			pa.setChainId( rs.getString( "chain_id" ) );
-			pa.setProteinSequenceId( rs.getInt( "protein_sequence_id" ) );
+			pa.setProteinSequenceVersionId( rs.getInt( "protein_sequence_version_id" ) );
 			pa.setPdbFileId( rs.getInt( "pdb_file_id" ) );
 		} catch ( Exception e ) {
 			log.error( "ERROR: getPDBAlignment ", e );
@@ -88,7 +88,7 @@ public class PDBAlignmentDAO {
 			} else {
 				// inserting a new PDB alignment
 				final String sql = "INSERT INTO pdb_alignment"
-						+ " (pdb_file_id, chain_id, protein_sequence_id, aligned_pdb_sequence, aligned_experimental_sequence ) " 
+						+ " (pdb_file_id, chain_id, protein_sequence_version_id, aligned_pdb_sequence, aligned_experimental_sequence ) " 
 						+ " VALUES ( ?, ?, ?, ?, ? )";
 				pstmt = conn.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );
 				int counter = 0;
@@ -97,7 +97,7 @@ public class PDBAlignmentDAO {
 				counter++;
 				pstmt.setString( counter, pa.getChainId() );
 				counter++;
-				pstmt.setInt( counter, pa.getProteinSequenceId() );
+				pstmt.setInt( counter, pa.getProteinSequenceVersionId() );
 				counter++;
 				pstmt.setString( counter, pa.getAlignedPDBSequence() );
 				counter++;

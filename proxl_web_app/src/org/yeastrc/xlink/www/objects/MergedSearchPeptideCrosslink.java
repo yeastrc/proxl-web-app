@@ -192,7 +192,7 @@ public class MergedSearchPeptideCrosslink implements IMergedSearchLink {
 						SearchCrosslinkProteinsFromPeptide.getInstance()
 						.getProteinPositions( search, reportedPeptideIdForSearchId, peptide.getId(), position );
 				for ( SearchProteinPosition searchProteinPosition : resultPerSearch ) {
-					Integer proteinId = searchProteinPosition.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					Integer proteinId = searchProteinPosition.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 					Integer proteinPosition = searchProteinPosition.getPosition();
 					//  get MergedSearchProteinPosition for protein id, position
 					Map<Integer, MergedSearchProteinPosition> mergedSearchProteinPosition_MappedOn_Pos = 
@@ -206,7 +206,7 @@ public class MergedSearchPeptideCrosslink implements IMergedSearchLink {
 						mergedSearchProteinPosition = new MergedSearchProteinPosition();
 						mergedSearchProteinPosition_MappedOn_Pos.put( proteinPosition, mergedSearchProteinPosition );
 						List<SearchDTO> searches = new ArrayList<>();
-						MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searches, searchProteinPosition.getProtein().getProteinSequenceObject() );
+						MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searches, searchProteinPosition.getProtein().getProteinSequenceVersionObject() );
 						mergedSearchProteinPosition.setProtein( mergedSearchProtein );
 						mergedSearchProteinPosition.setPosition( searchProteinPosition.getPosition() );
 					}
@@ -238,8 +238,8 @@ public class MergedSearchPeptideCrosslink implements IMergedSearchLink {
 			Collections.sort( mergedSearchProteinPositionList, new Comparator<MergedSearchProteinPosition>() {
 				@Override
 				public int compare(MergedSearchProteinPosition o1, MergedSearchProteinPosition o2) {
-					if ( o1.getProtein().getProteinSequenceObject().getProteinSequenceId() != o2.getProtein().getProteinSequenceObject().getProteinSequenceId() ) {
-						return o1.getProtein().getProteinSequenceObject().getProteinSequenceId() - o2.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					if ( o1.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() != o2.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
+						return o1.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() - o2.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 					}
 					return o1.getPosition() - o2.getPosition();
 				}

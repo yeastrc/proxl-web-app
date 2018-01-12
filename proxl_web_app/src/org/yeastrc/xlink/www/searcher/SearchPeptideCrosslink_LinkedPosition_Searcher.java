@@ -81,8 +81,8 @@ public class SearchPeptideCrosslink_LinkedPosition_Searcher {
 	private final String SQL_MAIN_WHERE_START = 
 			" WHERE unified_rp__search__rep_pept__generic_lookup.search_id = ? "
 			+ " AND unified_rp__search__rep_pept__generic_lookup.link_type = '" + XLinkUtils.CROSS_TYPE_STRING + "' "
-			+ " AND srpnipc_1.search_id = ? AND srpnipc_1.protein_sequence_id = ? AND srpnipc_1.protein_sequence_position = ? "
-			+ " AND srpnipc_2.search_id = ? AND srpnipc_2.protein_sequence_id = ? AND srpnipc_2.protein_sequence_position = ?  ";
+			+ " AND srpnipc_1.search_id = ? AND srpnipc_1.protein_sequence_version_id = ? AND srpnipc_1.protein_sequence_position = ? "
+			+ " AND srpnipc_2.search_id = ? AND srpnipc_2.protein_sequence_version_id = ? AND srpnipc_2.protein_sequence_position = ?  ";
 	private final String SQL_LAST_PART = 
 			"";
 	// Removed since not needed.  

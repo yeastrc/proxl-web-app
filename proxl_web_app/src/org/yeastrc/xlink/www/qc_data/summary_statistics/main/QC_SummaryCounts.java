@@ -192,30 +192,30 @@ public class QC_SummaryCounts {
 				perLinkTypeTempData.psmCount += webReportedPeptide.getNumPsms();
 				perLinkTypeTempData.reportedPeptideIds.add( reportedPeptideId );
 				
-				Set<Integer> proteinSequenceIds = perLinkTypeTempData.proteinSequenceIds;
+				Set<Integer> proteinSequenceVersionIds = perLinkTypeTempData.proteinSequenceVersionIds;
 
 				List<WebProteinPosition> peptide_1_ProteinPositionsList = webReportedPeptide.getPeptide1ProteinPositions();
 				if ( peptide_1_ProteinPositionsList != null ) {
 					for ( WebProteinPosition webProteinPosition : peptide_1_ProteinPositionsList ) {
-						int proteinSequenceId = webProteinPosition.getProtein().getProteinSequenceObject().getProteinSequenceId();
-						proteinSequenceIds.add( proteinSequenceId );
+						int proteinSequenceVersionId = webProteinPosition.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
+						proteinSequenceVersionIds.add( proteinSequenceVersionId );
 					}
 				}
 				List<WebProteinPosition> peptide_2_ProteinPositionsList = webReportedPeptide.getPeptide2ProteinPositions();
 				if ( peptide_2_ProteinPositionsList != null ) {
 					for ( WebProteinPosition webProteinPosition : peptide_2_ProteinPositionsList ) {
-						int proteinSequenceId = webProteinPosition.getProtein().getProteinSequenceObject().getProteinSequenceId();
-						proteinSequenceIds.add( proteinSequenceId );
+						int proteinSequenceVersionId = webProteinPosition.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
+						proteinSequenceVersionIds.add( proteinSequenceVersionId );
 					}
 				}
 
 			}
 		}
 		
-		//  compute uniqueProteinSequenceIdCountAllLinkTypes.  combine all perLinkTypeTempData.proteinSequenceIds together
-		Set<Integer> all_proteinSequenceIds = new HashSet<>();
+		//  compute uniqueproteinSequenceVersionIdCountAllLinkTypes.  combine all perLinkTypeTempData.proteinSequenceVersionIds together
+		Set<Integer> all_proteinSequenceVersionIds = new HashSet<>();
 		for ( Map.Entry<String,PerLinkTypeTempData> entry : perLinkTypeTempData_ByLinkType.entrySet() ) {
-			all_proteinSequenceIds.addAll( entry.getValue().proteinSequenceIds );
+			all_proteinSequenceVersionIds.addAll( entry.getValue().proteinSequenceVersionIds );
 		}
 		
 
@@ -228,7 +228,7 @@ public class QC_SummaryCounts {
 		
 		QC_SummaryCountsResults result = new QC_SummaryCountsResults();
 		result.setResultsPerLinkTypeList( resultsPerLinkTypeList );
-		result.setUniqueProteinSequenceIdCountAllLinkTypes( all_proteinSequenceIds.size() );
+		result.setUniqueproteinSequenceVersionIdCountAllLinkTypes( all_proteinSequenceVersionIds.size() );
 		
 		return result;
 	}
@@ -250,7 +250,7 @@ public class QC_SummaryCounts {
 			qc_SummaryCountsResultsPerLinkType.setLinkType( linkType );
 			qc_SummaryCountsResultsPerLinkType.setPsmCount( perLinkTypeTempData.psmCount );
 			qc_SummaryCountsResultsPerLinkType.setUniqueReportedPeptideCount( perLinkTypeTempData.reportedPeptideIds.size() );
-			qc_SummaryCountsResultsPerLinkType.setUniqueProteinSequenceIdCount( perLinkTypeTempData.proteinSequenceIds.size() );
+			qc_SummaryCountsResultsPerLinkType.setUniqueproteinSequenceVersionIdCount( perLinkTypeTempData.proteinSequenceVersionIds.size() );
 			resultsPerLinkTypeList.add( qc_SummaryCountsResultsPerLinkType );
 		}
 	}
@@ -259,7 +259,7 @@ public class QC_SummaryCounts {
 		
 		int psmCount = 0;
 		Set<Integer> reportedPeptideIds = new HashSet<>();
-		Set<Integer> proteinSequenceIds = new HashSet<>();
+		Set<Integer> proteinSequenceVersionIds = new HashSet<>();
 	}
 	
 }

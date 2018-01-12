@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
+import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.objects.SearchProtein;
 import org.yeastrc.xlink.www.objects.SearchProteinDoublePosition;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_LooplinkProteinPositionsFor_LooplinkPeptide;
@@ -55,7 +55,7 @@ public class SearchLooplinkProteinsFromPeptide {
 			SearchProteinDoublePosition prpp = new SearchProteinDoublePosition();
 			prpp.setPosition1( entry.getProteinSequencePosition_1() );
 			prpp.setPosition2( entry.getProteinSequencePosition_2() );
-			prpp.setProtein( new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( entry.getProteinSequenceId() ) ) );
+			prpp.setProtein( new SearchProtein( search, ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( entry.getProteinSequenceVersionId() ) ) );
 
 			proteinPositions.add( prpp );
 		}
@@ -67,9 +67,9 @@ public class SearchLooplinkProteinsFromPeptide {
 			@Override
 			public int compare(SearchProteinDoublePosition o1, SearchProteinDoublePosition o2) {
 				
-				if ( o1.getProtein().getProteinSequenceObject().getProteinSequenceId() != o2.getProtein().getProteinSequenceObject().getProteinSequenceId() ) {
+				if ( o1.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() != o2.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
 					
-					return o1.getProtein().getProteinSequenceObject().getProteinSequenceId() - o2.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					return o1.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() - o2.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 				}
 				if ( o1.getPosition1() != o2.getPosition1() ) {
 					return o1.getPosition1() - o2.getPosition1();

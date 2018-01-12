@@ -596,7 +596,7 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 //	/
 	this.psmCountVsScoreQCPlot_getProteinSeqIdsProteinAnnNamesForProjectSearchIdResponse = function(requestData, responseData, originalParams) {
 
-		var proteinSequenceIdProteinAnnotationNameList = responseData.proteinSequenceIdProteinAnnotationNameList;
+		var proteinSequenceVersionIdProteinAnnotationNameList = responseData.proteinSequenceVersionIdProteinAnnotationNameList;
 
 		//	Empty Include Protein Name option Select before get list of protein names
 		var $psm_count_vs_score_qc_plot_protein_seq_id_include_select = $("#psm_count_vs_score_qc_plot_protein_seq_id_include_select");
@@ -607,10 +607,10 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 		$psm_count_vs_score_qc_plot_protein_seq_id_exclude_select.empty();
 
 		var optionsHTMLarray = [];
-		for ( var dataIndex = 0; dataIndex < proteinSequenceIdProteinAnnotationNameList.length; dataIndex++ ) {
-			var proteinSequenceIdProteinAnnotationName = proteinSequenceIdProteinAnnotationNameList[ dataIndex ];
-			var html = "<option value='" + proteinSequenceIdProteinAnnotationName.proteinSequenceId + 
-			"'>" + proteinSequenceIdProteinAnnotationName.annotationName +
+		for ( var dataIndex = 0; dataIndex < proteinSequenceVersionIdProteinAnnotationNameList.length; dataIndex++ ) {
+			var proteinSequenceVersionIdProteinAnnotationName = proteinSequenceVersionIdProteinAnnotationNameList[ dataIndex ];
+			var html = "<option value='" + proteinSequenceVersionIdProteinAnnotationName.proteinSequenceVersionId + 
+			"'>" + proteinSequenceVersionIdProteinAnnotationName.annotationName +
 			"</option>";
 			optionsHTMLarray.push( html );
 		}
@@ -781,7 +781,7 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 			var psm_count_vs_score_qc_plot_protein_seq_id_include_select = $psm_count_vs_score_qc_plot_protein_seq_id_include_select.val();
 
 			if ( psm_count_vs_score_qc_plot_protein_seq_id_include_select !== null ) {
-				createChartParams.includeProteinSequenceIds = psm_count_vs_score_qc_plot_protein_seq_id_include_select;
+				createChartParams.includeproteinSequenceVersionIds = psm_count_vs_score_qc_plot_protein_seq_id_include_select;
 			}
 
 			//  Process User select of proteins to exclude
@@ -790,7 +790,7 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 			var psm_count_vs_score_qc_plot_protein_seq_id_exclude_select = $psm_count_vs_score_qc_plot_protein_seq_id_exclude_select.val();
 
 			if ( psm_count_vs_score_qc_plot_protein_seq_id_exclude_select !== null ) {
-				createChartParams.excludeProteinSequenceIds = psm_count_vs_score_qc_plot_protein_seq_id_exclude_select;
+				createChartParams.excludeproteinSequenceVersionIds = psm_count_vs_score_qc_plot_protein_seq_id_exclude_select;
 			}
 		}
 
@@ -819,8 +819,8 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 		var scanFileId = params.scanFileId;
 		var scanFileName = params.scanFileName;
 		var selectedLinkTypes = params.selectedLinkTypes;
-		var includeProteinSequenceIds = params.includeProteinSequenceIds;
-		var excludeProteinSequenceIds = params.excludeProteinSequenceIds;
+		var includeproteinSequenceVersionIds = params.includeproteinSequenceVersionIds;
+		var excludeproteinSequenceVersionIds = params.excludeproteinSequenceVersionIds;
 		var annotationTypeId = params.annotationTypeId;
 		var userInputMaxXString = params.userInputMaxX;
 		var thumbnailChart = params.thumbnailChart;
@@ -830,8 +830,8 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 		var _URL = contextPathJSVar + "/services/qcplot/getPsmCountsVsScore";
 		var requestData = {
 				selectedLinkTypes : selectedLinkTypes,
-				iP : includeProteinSequenceIds,
-				eP : excludeProteinSequenceIds,
+				iP : includeproteinSequenceVersionIds,
+				eP : excludeproteinSequenceVersionIds,
 				projectSearchId : projectSearchId,
 				annotationTypeId : annotationTypeId
 		};

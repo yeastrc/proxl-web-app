@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ReportedPeptideDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_PsmFilterableAnnotationGenericLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchDynamicModMassDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchIsotopeLabelDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReportedPeptideDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic_Lookup__DAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DAO;
@@ -21,6 +22,7 @@ import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPep
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DroppedPeptideCount;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptide_IsotopeLabel_DTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic_Lookup__DTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.UnifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO;
@@ -52,6 +54,7 @@ import org.yeastrc.xlink.dto.PsmFilterableAnnotationGenericLookupDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.dto.SearchReportedPeptideAnnotationDTO;
 import org.yeastrc.xlink.dto.SearchScanFilenameDTO;
+import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
@@ -140,8 +143,12 @@ public class ProcessReportedPeptidesAndPSMs {
 			List<ReportedPeptide> reportedPeptideList =
 					reportedPeptides.getReportedPeptide();
 			if ( reportedPeptideList != null && ( ! reportedPeptideList.isEmpty() ) ) {
+				
 				//  Accumulate Unique Dynamic Mod Masses to insert into a lookup table
 				Set<Double> uniqueDynamicModMassesForTheSearch = new HashSet<>();
+				//  Accumulate Unique Isotope Label Ids to insert into a lookup table
+				Set<Integer> uniqueIsotopeLabelIdsForTheSearch = new HashSet<>();
+				
 				for ( ReportedPeptide reportedPeptide : reportedPeptideList ) {
 					processSingleReportedPeptide( 
 							reportedPeptide, 
@@ -155,9 +162,11 @@ public class ProcessReportedPeptidesAndPSMs {
 							filterablePsmPerPeptideAnnotationTypesOnId,
 							mapOfScanFilenamesMapsOfScanNumbersToScanIds,
 							uniqueDynamicModMassesForTheSearch,
+							uniqueIsotopeLabelIdsForTheSearch,
 							scanFilenamesOnPSMsKeyedOnScanFilename );
 				}
 				insertUniqueDynamicModMassesForTheSearch( uniqueDynamicModMassesForTheSearch, searchId );
+				insertIsotopeLabelIdsForTheSearch( uniqueIsotopeLabelIdsForTheSearch, searchId );
 			}
 		}
 	}
@@ -172,6 +181,18 @@ public class ProcessReportedPeptidesAndPSMs {
 			DB_Insert_SearchDynamicModMassDAO.getInstance().saveSearchDynamicModMass( searchId, dynamicModMass );
 		}	
 	}
+
+	/**
+	 * @param uniqueIsotopeLabelIdsForTheSearch
+	 * @throws Exception
+	 */
+	private void insertIsotopeLabelIdsForTheSearch( 
+			Set<Integer> uniqueIsotopeLabelIdsForTheSearch, int searchId ) throws Exception {
+		for ( Integer isotopeLabelId : uniqueIsotopeLabelIdsForTheSearch ) {
+			DB_Insert_SearchIsotopeLabelDAO.getInstance().saveSearchIsotopeLabelId( searchId, isotopeLabelId );
+		}	
+	}
+	
 	
 	/**
 	 * @param reportedPeptide
@@ -198,6 +219,7 @@ public class ProcessReportedPeptidesAndPSMs {
 			Map<Integer, AnnotationTypeDTO> filterablePsmPerPeptideAnnotationTypesOnId,
 			Map<String, ScanFilenameScanNumberScanIdScanFileId_Mapping> mapOfScanFilenamesMapsOfScanNumbersToScanIds,
 			Set<Double> uniqueDynamicModMassesForTheSearch,
+			Set<Integer> uniqueIsotopeLabelIdsForTheSearch,
 			Map<String, SearchScanFilenameDTO> scanFilenamesOnPSMsKeyedOnScanFilename
 			) throws Exception {
 		
@@ -295,34 +317,48 @@ public class ProcessReportedPeptidesAndPSMs {
 					ProcessLinkTypeCrosslink.getInstance().saveCrosslinkData( 
 							reportedPeptideDTO, 
 							searchId, 
-							getCrosslinkProteinMappingsResult,
-							uniqueDynamicModMassesForTheSearch );
+							getCrosslinkProteinMappingsResult );
 		} else if ( linkTypeNumber == XLinkUtils.TYPE_LOOPLINK ) {
 			perPeptideDataList = 
 					ProcessLinkTypeLooplink.getInstance().saveLooplinkData(
 							reportedPeptideDTO, 
 							searchId, 
-							getLooplinkProteinMappingsResult,
-							uniqueDynamicModMassesForTheSearch );
+							getLooplinkProteinMappingsResult );
 		} else if ( linkTypeNumber == XLinkUtils.TYPE_UNLINKED ) {
 			perPeptideDataList = 
 						ProcessLinkTypeUnlinkedAsDefinedByProxl.getInstance().saveUnlinkedData(
 								reportedPeptideDTO, 
 								searchId, 
-								getProteinMappings_For_XML_LinkType_Unlinked_Result.getUnlinkedProteinMappingsResult,
-								uniqueDynamicModMassesForTheSearch  );
+								getProteinMappings_For_XML_LinkType_Unlinked_Result.getUnlinkedProteinMappingsResult );
 		} else if ( linkTypeNumber == XLinkUtils.TYPE_DIMER ) {
 			//  Can now test for DIMER since linkTypeNumber = XLinkUtils.TYPE_DIMER for Dimer in above code.
 			perPeptideDataList = 
 					ProcessLinkTypeDimerAsDefinedByProxl.getInstance().saveDimerData(
 							reportedPeptideDTO, 
 							searchId, 
-							getProteinMappings_For_XML_LinkType_Unlinked_Result.getDimerProteinMappingsResult,
-							uniqueDynamicModMassesForTheSearch  );
+							getProteinMappings_For_XML_LinkType_Unlinked_Result.getDimerProteinMappingsResult  );
 		} else {
 			String msg = "Link Type name '" + linkTypeName + "' is not recognized for reported peptpide: " + reportedPeptide.getReportedPeptideString();
 			log.error( msg );
 			throw new ProxlImporterDataException(msg);
+		}
+		
+		//  Accumulate mod mass and Isotope label id values across the search
+		for ( PerPeptideData perPeptideData : perPeptideDataList ) {
+			
+			//  Accumulate mod mass values across the search 
+			if ( perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide() != null && ( ! perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide().isEmpty() ) ) {
+				for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide() ) {
+					uniqueDynamicModMassesForTheSearch.add( srchRepPeptPeptDynamicModDTO.getMass() );
+				}
+			}
+			//  Accumulate Isotope label id values across the search
+			if ( perPeptideData.getSrchRepPeptPeptide_IsotopeLabel_DTOList_Peptide() != null 
+					&& ( ! perPeptideData.getSrchRepPeptPeptide_IsotopeLabel_DTOList_Peptide().isEmpty() ) ) {
+				for ( SrchRepPeptPeptide_IsotopeLabel_DTO item : perPeptideData.getSrchRepPeptPeptide_IsotopeLabel_DTOList_Peptide() ) {
+					uniqueIsotopeLabelIdsForTheSearch.add( item.getIsotopeLabelId() );
+				}
+			}
 		}
 		
 		PsmStatisticsAndBestValues psmStatisticsAndBestValues =
@@ -379,10 +415,11 @@ public class ProcessReportedPeptidesAndPSMs {
 			if ( ! perPeptideData.isPeptideIdMapsToOnlyOneProtein() ) {
 				allRelatedPeptidesUniqueForSearch = false;
 			}
-			if ( ! perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide().isEmpty() ) {
+			if ( perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide() != null
+					&& ( ! perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide().isEmpty() ) ) {
 				hasDynamicModifications = true;
 			}
-			if ( ! perPeptideData.getMonolinkPositionList().isEmpty() ) {
+			if ( perPeptideData.getMonolinkPositionList() != null && ( ! perPeptideData.getMonolinkPositionList().isEmpty() ) ) {
 				hasMonolinks = true;
 			}
 		}

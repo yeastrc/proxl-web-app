@@ -183,7 +183,7 @@ public class MergedSearchPeptideDimer implements IMergedSearchLink {
 
 				for ( SearchProteinPosition searchProteinPosition : resultPerSearch ) {
 
-					Integer proteinId = searchProteinPosition.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					Integer proteinId = searchProteinPosition.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 
 					//  get MergedSearchProteinPosition for protein id, position
 					
@@ -196,7 +196,7 @@ public class MergedSearchPeptideDimer implements IMergedSearchLink {
 						mergedSearchProteinPosition_MappedOn_ProtId.put( proteinId, mergedSearchProteinPosition );
 						
 						List<SearchDTO> searches = new ArrayList<>();
-						MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searches, searchProteinPosition.getProtein().getProteinSequenceObject() );
+						MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searches, searchProteinPosition.getProtein().getProteinSequenceVersionObject() );
 						mergedSearchProteinPosition.setProtein( mergedSearchProtein );
 					}
 					
@@ -241,7 +241,7 @@ public class MergedSearchPeptideDimer implements IMergedSearchLink {
 				@Override
 				public int compare(MergedSearchProteinPosition o1, MergedSearchProteinPosition o2) {
 					
-					return o1.getProtein().getProteinSequenceObject().getProteinSequenceId() - o2.getProtein().getProteinSequenceObject().getProteinSequenceId();
+					return o1.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() - o2.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
 				}
 			});
 

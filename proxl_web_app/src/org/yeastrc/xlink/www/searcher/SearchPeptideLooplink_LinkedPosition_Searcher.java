@@ -69,7 +69,7 @@ public class SearchPeptideLooplink_LinkedPosition_Searcher {
 	private final String SQL_MAIN_WHERE_START = 
 			" WHERE unified_rp__search__rep_pept__generic_lookup.search_id = ? "
 			+ " AND unified_rp__search__rep_pept__generic_lookup.link_type = '" + XLinkUtils.LOOP_TYPE_STRING + "' "
-			+ " AND srpnipl.search_id = ? AND srpnipl.protein_sequence_id = ? AND srpnipl.protein_sequence_position_1 = ? "
+			+ " AND srpnipl.search_id = ? AND srpnipl.protein_sequence_version_id = ? AND srpnipl.protein_sequence_position_1 = ? "
 			+ " AND srpnipl.protein_sequence_position_2 = ?  ";
 	private final String SQL_LAST_PART = 
 			"";

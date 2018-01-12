@@ -10,14 +10,14 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
-import org.yeastrc.xlink.www.objects.ProteinSequenceObject;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosMonolinkDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.factories.ProteinSequenceObjectFactory;
+import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.objects.SearchPeptideMonolink;
 import org.yeastrc.xlink.www.objects.SearchPeptideMonolinkAnnDataWrapper;
 import org.yeastrc.xlink.www.objects.SearchProtein;
@@ -87,10 +87,10 @@ public class MonolinkLinkedPositions {
 			for ( SrchRepPeptProtSeqIdPosMonolinkDTO srchRepPeptProtSeqIdPosMonolinkDTO : srchRepPeptProtSeqIdPosMonolinkDTOList ) {
 				//  Process into Map of protein, position objects
 				Map<Integer,RepPept_Stage_1_Wrapper> repPept_Stage_1_Wrapper_MappedPos =
-						repPept_Stage_1_Wrapper_MappedProtPos.get( srchRepPeptProtSeqIdPosMonolinkDTO.getProteinSequenceId() );
+						repPept_Stage_1_Wrapper_MappedProtPos.get( srchRepPeptProtSeqIdPosMonolinkDTO.getProteinSequenceVersionId() );
 				if ( repPept_Stage_1_Wrapper_MappedPos == null ) {
 					repPept_Stage_1_Wrapper_MappedPos = new HashMap<>();
-					repPept_Stage_1_Wrapper_MappedProtPos.put( srchRepPeptProtSeqIdPosMonolinkDTO.getProteinSequenceId(), repPept_Stage_1_Wrapper_MappedPos );
+					repPept_Stage_1_Wrapper_MappedProtPos.put( srchRepPeptProtSeqIdPosMonolinkDTO.getProteinSequenceVersionId(), repPept_Stage_1_Wrapper_MappedPos );
 				}
 				RepPept_Stage_1_Wrapper repPept_Stage_1_Wrapper = repPept_Stage_1_Wrapper_MappedPos.get( srchRepPeptProtSeqIdPosMonolinkDTO.getProteinSequencePosition() );
 				if ( repPept_Stage_1_Wrapper == null ) {
@@ -158,7 +158,7 @@ public class MonolinkLinkedPositions {
 			SearchDTO search, 
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel, 
 			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param,
-			ProteinSequenceObject protein, 
+			ProteinSequenceVersionObject protein, 
 			int position ) throws Exception {
 		
 		Map<Integer, SearchProtein> searchProtein_KeyOn_PROT_SEQ_ID_Map = new HashMap<>();
@@ -168,7 +168,7 @@ public class MonolinkLinkedPositions {
 				.searchOnSearchProteinMonolink( 
 						search, 
 						searcherCutoffValuesSearchLevel, 
-						protein.getProteinSequenceId(), 
+						protein.getProteinSequenceVersionId(), 
 						position );
 		for ( SearchPeptideMonolinkAnnDataWrapper searchPeptideMonolinkAnnDataWrapper : searchPeptideMonolinkAnnDataWrapper_List ) {
 			SearchPeptideMonolink searchPeptideMonolink = searchPeptideMonolinkAnnDataWrapper.getSearchPeptideMonolink();
@@ -190,7 +190,7 @@ public class MonolinkLinkedPositions {
 						search, 
 						searcherCutoffValuesSearchLevel, 
 						linkedPositions_FilterExcludeLinksWith_Param,
-						protein.getProteinSequenceId(), 
+						protein.getProteinSequenceVersionId(), 
 						position, 
 						searchProtein_KeyOn_PROT_SEQ_ID_Map, 
 						repPept_Stage_1_Wrapper );
@@ -275,7 +275,7 @@ public class MonolinkLinkedPositions {
 		searchProteinMonolink.setSearcherCutoffValuesSearchLevel( searcherCutoffValuesSearchLevel );
 		SearchProtein searchProtein = searchProtein_KeyOn_PROT_SEQ_ID_Map.get( proteinId );
 		if ( searchProtein == null ) {
-			searchProtein = new SearchProtein( search, ProteinSequenceObjectFactory.getProteinSequenceObject( proteinId ) );
+			searchProtein = new SearchProtein( search, ProteinSequenceVersionObjectFactory.getProteinSequenceVersionObject( proteinId ) );
 			searchProtein_KeyOn_PROT_SEQ_ID_Map.put( proteinId, searchProtein );
 		}
 		searchProteinMonolink.setProtein( searchProtein );

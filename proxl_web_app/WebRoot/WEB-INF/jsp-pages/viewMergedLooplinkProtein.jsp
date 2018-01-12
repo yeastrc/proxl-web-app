@@ -273,7 +273,7 @@
 						<%--  shortened property from "excludeProtein" to "excP" to shorten the URL  --%>
 						<%-- TODO   TEMP
 						<html:select property="excP" multiple="true" styleId="excludeProtein"  >
-							<html:options collection="proteins" property="proteinSequenceObject.proteinSequenceId" labelProperty="name" />
+							<html:options collection="proteins" property="proteinSequenceVersionObject.proteinSequenceVersionId" labelProperty="name" />
 						</html:select>
 						--%>
 						
@@ -285,7 +285,7 @@
 						<select name="excludedProteins" multiple="multiple" id="excludeProtein"  >  
 						  
 	  						<logic:iterate id="protein" name="allProteinsForCrosslinksAndLooplinksUnfilteredList">
-	  						  <option value="<c:out value="${ protein.proteinSequenceObject.proteinSequenceId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
+	  						  <option value="<c:out value="${ protein.proteinSequenceVersionObject.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
 	  						</logic:iterate>
 	  					</select>
 									
@@ -477,7 +477,7 @@
 								
 								onclick="viewLooplinkProteinsLoadedFromWebServiceTemplate.showHideLooplinkProteins( { clickedElement : this })"
 								data-project_search_ids="<c:forEach var="searchEntryForThisRow" items="${ proteinEntry.searches }">,${ searchEntryForThisRow.projectSearchId }</c:forEach>"
-								data-protein_id="<bean:write name="proteinEntry" property="protein.proteinSequenceObject.proteinSequenceId" />"
+								data-protein_id="<bean:write name="proteinEntry" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />"
 								data-protein_position_1="<bean:write name="proteinEntry" property="proteinPosition1" />"
 								data-protein_position_2="<bean:write name="proteinEntry" property="proteinPosition2" />"
 							>
@@ -512,7 +512,7 @@
 									</a>
 								</td>
 																				
-								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein.proteinSequenceObject.proteinSequenceId" />"><bean:write name="proteinEntry" property="protein.name" /></span></td>
+								<td><span class="proteinName" id="protein-id-<bean:write name="proteinEntry" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />"><bean:write name="proteinEntry" property="protein.name" /></span></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="proteinPosition1" /></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="proteinPosition2" /></td>
 								<td class="integer-number-column"><bean:write name="proteinEntry" property="numPsms" /></td>
