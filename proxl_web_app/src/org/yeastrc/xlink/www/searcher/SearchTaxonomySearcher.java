@@ -98,7 +98,7 @@ public class SearchTaxonomySearcher {
 	private static final String SINGLE_SEARCH_ALL_LINK_TYPES_SQL =
 			"SELECT DISTINCT  annotation.taxonomy "
 					+ " FROM  annotation "
-					+ " INNER JOIN search__protein_sequence_version__annotation AS spvsa "
+					+ " INNER JOIN search__protein_sequence_version__annotation AS spsva "
 					+ " ON annotation.id = spsva.annotation_id "
 			+ " WHERE spsva.search_id = ? ";
 	
