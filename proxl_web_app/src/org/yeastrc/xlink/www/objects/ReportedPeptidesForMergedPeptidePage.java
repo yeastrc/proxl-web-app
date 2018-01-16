@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * 
  *
@@ -28,6 +30,15 @@ public class ReportedPeptidesForMergedPeptidePage implements SearchPeptideCommon
 	public int getNumPSMs() throws Exception {
 		return webReportedPeptide.getNumPsms();
 	}
+
+	@JsonIgnore
+	public WebReportedPeptide getWebReportedPeptide() {
+		return webReportedPeptide;
+	}
+	public void setWebReportedPeptide(WebReportedPeptide webReportedPeptide) {
+		this.webReportedPeptide = webReportedPeptide;
+	}
+
 	
 	@Override
 	public List<String> getPsmAnnotationValueList() {
@@ -72,13 +83,5 @@ public class ReportedPeptidesForMergedPeptidePage implements SearchPeptideCommon
 		this.searchId = searchId;
 	}
 
-	public WebReportedPeptide getWebReportedPeptide() {
-		return webReportedPeptide;
-	}
-	public void setWebReportedPeptide(WebReportedPeptide webReportedPeptide) {
-		this.webReportedPeptide = webReportedPeptide;
-	}
-
-	
 	
 }

@@ -12,6 +12,8 @@ import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ReportedPeptideDTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 
 /**
@@ -446,6 +448,7 @@ public class WebReportedPeptide implements SearchPeptideCommonLinkWebserviceResu
 		this.search = search;
 	}
 
+	@JsonIgnore
 	public SearchDTO getSearch() {
 		return this.search;
 	}

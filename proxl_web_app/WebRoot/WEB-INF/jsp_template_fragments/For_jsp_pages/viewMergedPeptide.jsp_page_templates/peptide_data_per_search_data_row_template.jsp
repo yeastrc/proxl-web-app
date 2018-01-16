@@ -1,7 +1,11 @@
+<%--
+		peptide_data_per_search_data_row_template.jsp
 
-		<%-- !!!   Handlebars template   !!!!!!!!!   --%>
+		!!!   Handlebars template   !!!!!!!!!   
 
-	<%--  Peptide Data Per Search Template --%>
+	Peptide Data Per Search Template 
+	
+--%>
 
 <tr class="" 
 	id=""
