@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +32,8 @@ public class ProcessImporterRunnerConfigFile {
 	private static final String PROPERTY_NAME__WAIT_TIME_FOR_NEXT_CHECK_FOR_IMPORT_TO_PROCESS = "wait.time.for.next.check.for.import.to.process";
 
 	private static final String PROPERTY_NAME__JAVA_EXECUTABLE_WITH_PATH = "java.executable.with.path";
-
+	private static String PROPERTY_NAME__JAVA_EXECUTABLE_PARAMETERS = "java.executable.parameters";
+	
 	private static final String PROPERTY_NAME__IMPORTER_JAR_WITH_PATH = "importer.jar.with.path";
 	
 	private static final String PROPERTY_NAME__IMPORTER_DB_CONFIG_WITH_PATH = "importer.db.config.file.with.path";
@@ -66,73 +69,49 @@ public class ProcessImporterRunnerConfigFile {
 		
 		try {
 			Properties configProps = null;
-			
 			InputStream propertiesFileAsStream = null;
 			
 			try {
-
 				if ( configFileFromCommandLine != null ) {
-
 					if ( ! configFileFromCommandLine.exists() ) {
-
 						System.err.println( NO_PROPERTIES_FILE_ERROR_MESSAGE );
-
 						String msg = "Properties file not found: " + configFileFromCommandLine.getAbsolutePath();
 						//					log.error( msg );
-
 						throw new ConfigPropertiesFileErrorException( msg );
 					}
 
 					try {
-
 						propertiesFileAsStream = new FileInputStream(configFileFromCommandLine);
 
 					} catch ( FileNotFoundException e ) {
-
 						System.err.println( NO_PROPERTIES_FILE_ERROR_MESSAGE );
-
 						String msg = "Properties file not found: " + configFileFromCommandLine.getAbsolutePath() + " exception: " + e.toString();
 						//					log.error( msg, e );
-
 						throw new ConfigPropertiesFileErrorException( msg );
 					}
-
 				} else {
-
 					//  Get config file from class path
 
 					ClassLoader thisClassLoader = this.getClass().getClassLoader();
-
 					URL configFileUrlObjUrlLocal = thisClassLoader.getResource( CONFIG_FILENAME );
 
 					if ( configFileUrlObjUrlLocal == null ) {
-
 						System.err.println( NO_PROPERTIES_FILE_ERROR_MESSAGE );
-
 						String msg = "Properties file '" + CONFIG_FILENAME + "' not found in class path.";
 						//					log.error( msg );
-
 						throw new ConfigPropertiesFileErrorException( msg );
-
 					} else {
-
 						if ( log.isInfoEnabled() ) {
-
 							log.info( "Properties file '" + CONFIG_FILENAME + "' found, load path = " + configFileUrlObjUrlLocal.getFile() );
 						}
 					}
 
 					propertiesFileAsStream = configFileUrlObjUrlLocal.openStream();
 
-
 					if ( propertiesFileAsStream == null ) {
-
 						System.err.println( NO_PROPERTIES_FILE_ERROR_MESSAGE );
-
 						String msg = "Properties file '" + CONFIG_FILENAME + "' not found in class path.";
-
 						//					log.error( msg );
-
 						throw new ConfigPropertiesFileErrorException( msg );
 					}
 				}
@@ -151,7 +130,10 @@ public class ProcessImporterRunnerConfigFile {
 			}
 			
 			String waitTimeForNextCheckForImportToProcess_InSecondsString = configProps.getProperty( PROPERTY_NAME__WAIT_TIME_FOR_NEXT_CHECK_FOR_IMPORT_TO_PROCESS );
+			
 			String javaExecutableWithPath = configProps.getProperty( PROPERTY_NAME__JAVA_EXECUTABLE_WITH_PATH );
+			String javaExecutableParametersString = configProps.getProperty( PROPERTY_NAME__JAVA_EXECUTABLE_PARAMETERS );
+			
 			String importerJarWithPath = configProps.getProperty( PROPERTY_NAME__IMPORTER_JAR_WITH_PATH );
 			String importerDbConfigWithPath = configProps.getProperty( PROPERTY_NAME__IMPORTER_DB_CONFIG_WITH_PATH );
 			
@@ -192,6 +174,19 @@ public class ProcessImporterRunnerConfigFile {
 
 			if ( StringUtils.isNotEmpty( javaExecutableWithPath ) ) {
 				ImporterRunnerConfigData.setJavaExecutableWithPath( javaExecutableWithPath );
+			}
+			
+			if ( StringUtils.isNotEmpty( javaExecutableParametersString ) ) {
+				String[] javaExecutableParametersArray = javaExecutableParametersString.split( " " );
+				List<String> javaExecutableParametersLocal = new ArrayList<>( javaExecutableParametersArray.length );
+				for ( String javaExecutableParameter : javaExecutableParametersArray ) {
+					if ( StringUtils.isNotEmpty(javaExecutableParameter) ) {
+						javaExecutableParametersLocal.add( javaExecutableParameter );
+					}
+				}
+				if ( ! javaExecutableParametersLocal.isEmpty() ) {
+					ImporterRunnerConfigData.setJavaExecutableParameters( javaExecutableParametersLocal );
+				}
 			}
 			
 			ImporterRunnerConfigData.setImporterJarWithPath( importerJarWithPath );

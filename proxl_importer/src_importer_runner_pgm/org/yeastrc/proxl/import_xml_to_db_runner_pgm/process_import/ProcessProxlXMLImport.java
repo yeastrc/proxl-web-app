@@ -166,8 +166,16 @@ public class ProcessProxlXMLImport {
 		if ( StringUtils.isNotEmpty( ImporterRunnerConfigData.getJavaExecutableWithPath() ) ) {
 			javaCommand = ImporterRunnerConfigData.getJavaExecutableWithPath();
 		}
+		
 		List<String> commandAndItsArgumentsAsList = new ArrayList<>( 20 );
 		commandAndItsArgumentsAsList.add( javaCommand );
+		
+		if ( ImporterRunnerConfigData.getJavaExecutableParameters() != null && ( ! ImporterRunnerConfigData.getJavaExecutableParameters().isEmpty() ) ) {
+			for ( String javaExecutableParameter : ImporterRunnerConfigData.getJavaExecutableParameters() ) {
+				commandAndItsArgumentsAsList.add( javaExecutableParameter );
+			}
+		}
+		
 		commandAndItsArgumentsAsList.add(  "-jar" );
 		commandAndItsArgumentsAsList.add( importJarWithPath );
 //		commandAndItsArgumentsAsList.add(  "--debug" );  //  TODO  TEMP

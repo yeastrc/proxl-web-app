@@ -1,5 +1,7 @@
 package org.yeastrc.proxl.import_xml_to_db_runner_pgm.config;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -13,6 +15,8 @@ public class ImporterRunnerConfigData {
 	private static Integer waitTimeForNextCheckForImportToProcess_InSeconds;
 	
 	private static String javaExecutableWithPath;
+	private static List<String> javaExecutableParameters;
+	
 	private static String importerJarWithPath;
 	private static String importerDbConfigWithPath;
 	
@@ -93,6 +97,13 @@ public class ImporterRunnerConfigData {
 	public static void setJavaExecutableWithPath(String javaExecutableWithPath) {
 		ImporterRunnerConfigData.javaExecutableWithPath = javaExecutableWithPath;
 	}
+	public static List<String> getJavaExecutableParameters() {
+		return javaExecutableParameters;
+	}
+	public static void setJavaExecutableParameters(List<String> javaExecutableParameters) {
+		ImporterRunnerConfigData.javaExecutableParameters = javaExecutableParameters;
+	}
+
 	
 	public static void setProxlWebAppBaseURL(String proxlWebAppBaseURL) {
 		ImporterRunnerConfigData.proxlWebAppBaseURL = proxlWebAppBaseURL;
