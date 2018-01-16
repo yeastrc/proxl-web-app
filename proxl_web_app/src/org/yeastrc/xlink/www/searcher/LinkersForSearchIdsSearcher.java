@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dao.LinkerDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.LinkerDTO;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Linker;
 
 /**
  * 
@@ -49,10 +49,10 @@ public class LinkersForSearchIdsSearcher {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
 			rs = pstmt.executeQuery();
-			LinkerDAO linkerDAO = LinkerDAO.getInstance();
+			Cached_Linker cached_Linker = Cached_Linker.getInstance();
 			while ( rs.next() ) {
 				int linkerId = rs.getInt( "linker_id" );
-				LinkerDTO linkerDTO = linkerDAO.getLinkerDTOForId( linkerId );
+				LinkerDTO linkerDTO = cached_Linker.getLinkerDTO( linkerId );
 				if ( linkerDTO == null ) {
 					String msg = "linker id '" + linkerId + "' retrieved from 'table search_linker' is not found in table 'linker'";
 					log.error(msg);

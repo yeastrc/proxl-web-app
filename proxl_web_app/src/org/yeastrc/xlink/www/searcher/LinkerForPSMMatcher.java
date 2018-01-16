@@ -8,10 +8,10 @@ import java.sql.ResultSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yeastrc.xlink.dao.LinkerDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.PsmDTO;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Linker;
 
 public class LinkerForPSMMatcher {
 
@@ -45,7 +45,7 @@ public class LinkerForPSMMatcher {
 				linkerMass = linkerMass.setScale( 3, RoundingMode.HALF_UP );
 								
 				if( psmLinkerMass.toString().equals( linkerMass.toString() ) ) {
-					return LinkerDAO.getInstance().getLinkerDTOForId( rs.getInt( 1 ) );
+					return Cached_Linker.getInstance().getLinkerDTO( rs.getInt( 1 ) );
 				}				
 			}
 

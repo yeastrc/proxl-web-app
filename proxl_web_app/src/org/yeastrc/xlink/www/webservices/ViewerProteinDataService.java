@@ -43,11 +43,12 @@ import org.yeastrc.xlink.www.objects.SearchProteinLooplinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinked;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinkedWrapper;
-import org.yeastrc.xlink.www.searcher.LinkersForSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Linkers_ForSearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyNameStringForTaxonomyId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Request;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.Linkers_ForSearchId_Response;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Result;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyNameStringForTaxonomyId_Result;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -433,25 +434,28 @@ public class ViewerProteinDataService {
 			}
 			//  Map of linkablePositions where the key is the protein id and the value is the collection of linkable positions
 			Map<Integer, Collection<Integer>> proteinIdslinkablePositionsMap = new HashMap<Integer, Collection<Integer>>();
-			List<LinkerDTO>  linkerList = LinkersForSearchIdsSearcher.getInstance().getLinkersForSearchIds( searchIdsListDedupedSorted );
-			if ( linkerList == null || linkerList.isEmpty() ) {
-				String errorMsgSearchIdList = null;
-				for ( Integer searchId : searchIdsListDedupedSorted ) {
-					if ( errorMsgSearchIdList == null ) {
-						errorMsgSearchIdList = searchId.toString();
-					} else {
-						errorMsgSearchIdList += "," + searchId.toString();
+			
+			//  Get the linker abbreviations for the searches
+			Set<String> linkerAbbrSet = new HashSet<>();
+			{
+				Cached_Linkers_ForSearchId cached_Linkers_ForSearchId = Cached_Linkers_ForSearchId.getInstance();
+				for ( SearchDTO search : searchList ) {
+					int searchId = search.getSearchId();
+					Linkers_ForSearchId_Response linkers_ForSearchId_Response =
+							cached_Linkers_ForSearchId.getLinkers_ForSearchId_Response( searchId );
+					List<LinkerDTO>  linkerList = linkers_ForSearchId_Response.getLinkersForSearchIdList();
+					if ( linkerList == null || linkerList.isEmpty() ) {
+						String msg = "No linkers found for Search Id: " + searchId;
+						log.error( msg );
+						//			throw new Exception(msg);
+					}
+					for ( LinkerDTO linker : linkerList ) {
+						String linkerAbbr = linker.getAbbr();
+						linkerAbbrSet.add( linkerAbbr );
 					}
 				}
-				String msg = "No linkers found for Search Ids: " + errorMsgSearchIdList;
-				log.error( msg );
-//				throw new Exception(msg);
 			}
-			Set<String> linkerAbbrSet = new HashSet<>();
-			for ( LinkerDTO linker : linkerList ) {
-				String linkerAbbr = linker.getAbbr();
-				linkerAbbrSet.add( linkerAbbr );
-			}
+			
 			// add locations of all linkablePositions in the found proteins
 			for( MergedSearchProtein mp : proteins ) {
 				String proteinSequence = mp.getProteinSequenceVersionObject().getProteinSequenceObject().getSequence();
