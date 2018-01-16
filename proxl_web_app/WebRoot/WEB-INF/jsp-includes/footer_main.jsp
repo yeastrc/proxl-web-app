@@ -15,7 +15,7 @@
 			<span><img src="${ contextPath }/images/proxl-logo-footer-21px.png" ></span>
 		</div>
 		<div class="footer-right-container">
-			© 2017 University of Washington
+			© 2018 University of Washington
 			<c:if test="${ configSystemValues.termsOfServiceEnabled }">
 				(<a href="termsOfService.do" target="terms_of_service" >Terms of Service</a>)
 			</c:if>			
