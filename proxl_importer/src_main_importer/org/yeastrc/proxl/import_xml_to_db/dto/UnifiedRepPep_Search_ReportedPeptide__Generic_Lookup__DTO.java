@@ -17,6 +17,7 @@ public class UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO {
 	
 	private boolean hasDynamicModifications;
 	private boolean hasMonolinks;
+	private boolean hasIsotopeLabels;
 	private boolean allRelatedPeptidesUniqueForSearch;
 
 	private int psmNumAtDefaultCutoff;
@@ -98,6 +99,14 @@ public class UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO {
 	public void setPeptideMeetsDefaultCutoffs(
 			Yes_No__NOT_APPLICABLE_Enum peptideMeetsDefaultCutoffs) {
 		this.peptideMeetsDefaultCutoffs = peptideMeetsDefaultCutoffs;
+	}
+
+	public boolean isHasIsotopeLabels() {
+		return hasIsotopeLabels;
+	}
+
+	public void setHasIsotopeLabels(boolean hasIsotopeLabels) {
+		this.hasIsotopeLabels = hasIsotopeLabels;
 	}
 
 }

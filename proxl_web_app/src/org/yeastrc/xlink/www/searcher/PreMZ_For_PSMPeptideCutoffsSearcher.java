@@ -15,15 +15,12 @@ import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
-import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.constants.DynamicModificationsSelectionConstants;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
-import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData;
-import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult;
 
 /**
  * Get PreMZ from Scans where associated PSMs meet on criteria, including Reported Peptide and PSM cutoffs 

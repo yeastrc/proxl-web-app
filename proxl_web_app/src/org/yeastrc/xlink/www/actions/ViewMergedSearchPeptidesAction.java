@@ -195,8 +195,11 @@ public class ViewMergedSearchPeptidesAction extends Action {
 							searchesMapOnSearchId,
 							PeptidesMergedCommonPageDownload.FlagCombinedReportedPeptideEntries.YES );
 			
+			boolean anyResultsHaveIsotopeLabels = peptidesMergedCommonPageDownloadResult.isAnyResultsHaveIsotopeLabels();
+			
 			request.setAttribute( "peptidePsmAnnotationNameDescListsForEachSearch", peptidesMergedCommonPageDownloadResult.getPeptidePsmAnnotationNameDescListsForEachSearch() );
 			request.setAttribute( "anyReportedPeptideEntriesWereCombined", peptidesMergedCommonPageDownloadResult.isAnyReportedPeptideEntriesWereCombined() );
+			request.setAttribute( "anyResultsHaveIsotopeLabels", anyResultsHaveIsotopeLabels );
 			
 			List<WebMergedReportedPeptide> webMergedReportedPeptideList = peptidesMergedCommonPageDownloadResult.getWebMergedReportedPeptideList();
 			for ( WebMergedReportedPeptide link : webMergedReportedPeptideList ) {

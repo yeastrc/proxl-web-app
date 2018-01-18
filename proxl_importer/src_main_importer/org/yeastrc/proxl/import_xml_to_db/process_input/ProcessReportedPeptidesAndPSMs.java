@@ -411,6 +411,7 @@ public class ProcessReportedPeptidesAndPSMs {
 		boolean allRelatedPeptidesUniqueForSearch = true;
 		boolean hasDynamicModifications = false;
 		boolean hasMonolinks = false;
+		boolean hasIsotopeLabels = false;
 		for ( PerPeptideData perPeptideData : perPeptideDataList ) {
 			if ( ! perPeptideData.isPeptideIdMapsToOnlyOneProtein() ) {
 				allRelatedPeptidesUniqueForSearch = false;
@@ -421,6 +422,9 @@ public class ProcessReportedPeptidesAndPSMs {
 			}
 			if ( perPeptideData.getMonolinkPositionList() != null && ( ! perPeptideData.getMonolinkPositionList().isEmpty() ) ) {
 				hasMonolinks = true;
+			}
+			if ( perPeptideData.getSrchRepPeptPeptide_IsotopeLabel_DTOList_Peptide() != null && ( ! perPeptideData.getSrchRepPeptPeptide_IsotopeLabel_DTOList_Peptide().isEmpty() ) ) {
+				hasIsotopeLabels = true;
 			}
 		}
 		//  Determine statistic for reported peptide
@@ -480,6 +484,7 @@ public class ProcessReportedPeptidesAndPSMs {
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setAllRelatedPeptidesUniqueForSearch( allRelatedPeptidesUniqueForSearch );
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setHasDynamicModifications( hasDynamicModifications );
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setHasMonolinks( hasMonolinks );
+		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setHasIsotopeLabels( hasIsotopeLabels );
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setLinkType( linkTypeNumber );
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setPsmNumAtDefaultCutoff( psmStatisticsAndBestValues.psmCountPassDefaultCutoffs );
 		unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.setPeptideMeetsDefaultCutoffs( peptideMeetsDefaultCutoffs );
@@ -494,6 +499,7 @@ public class ProcessReportedPeptidesAndPSMs {
 			unifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DTO.setAnnotationTypeId( searchReportedPeptideAnnotationDTO.getAnnotationTypeId() );
 			unifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DTO.setHasDynamicModifications( hasDynamicModifications );
 			unifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DTO.setHasMonolinks( hasMonolinks );
+			unifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DTO.setHasIsotopeLabels( hasIsotopeLabels );
 			unifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DTO.setLinkType(linkTypeNumber);
 			unifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DTO.setPeptideValueForAnnTypeId( searchReportedPeptideAnnotationDTO.getValueDouble() );
 			DB_Insert_UnifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DAO.getInstance().saveToDatabase( unifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DTO );

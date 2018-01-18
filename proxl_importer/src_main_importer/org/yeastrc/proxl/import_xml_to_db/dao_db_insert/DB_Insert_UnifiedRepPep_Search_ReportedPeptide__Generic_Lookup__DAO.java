@@ -42,9 +42,7 @@ public class DB_Insert_UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO
 			saveToDatabase( item, conn );
 			
 		} catch ( Exception e ) {
-			
 			throw e;
-			
 		} finally {
 			
 			// be sure database handles are closed
@@ -53,23 +51,18 @@ public class DB_Insert_UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO
 //				try { conn.close(); } catch( Throwable t ) { ; }
 //				conn = null;
 //			}
-			
 		}
-		
-		
 	}
-		  
 
 	private static final String MONOLINK_TYPE_STRING = XLinkUtils.getTypeString( XLinkUtils.TYPE_MONOLINK ) ;
-
 	
 	private static final String SAVE_SQL =
 			"INSERT INTO unified_rp__search__rep_pept__generic_lookup "
 			+ 	"( unified_reported_peptide_id, reported_peptide_id, search_id, link_type, "
-			+  		" has_dynamic_modifictions, has_monolinks, psm_num_at_default_cutoff, "
+			+  		" has_dynamic_modifictions, has_monolinks, has_isotope_labels,"
+			+ 		" psm_num_at_default_cutoff, "
 			+ 		" peptide_meets_default_cutoffs, related_peptides_unique_for_search ) "
-			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )";
-
+			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
 	/**
 	 * @param item
@@ -79,40 +72,22 @@ public class DB_Insert_UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO
 	public void saveToDatabase( UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO item, Connection conn ) throws Exception {
 		
 		PreparedStatement pstmt = null;
-		
 		final String sql = SAVE_SQL;
-
-
-		
 		try {
-
 			int linkType = item.getLinkType();
-
-			
 			String linkTypeString = XLinkUtils.getTypeString( linkType );
-
 			
 			if ( linkType == XLinkUtils.TYPE_MONOLINK ) {
-				
 				String msg = "Invalid to insert unified_rp__search__rep_pept__generic_lookup with type Monolink, UnifiedReportedPeptideId: " + item.getUnifiedReportedPeptideId();
-				
 				log.error( msg );
-				
 				throw new Exception(msg);
 			}
-			
 			
 			if (MONOLINK_TYPE_STRING.equals(linkTypeString) ) {
-				
 				String msg = "Invalid to insert unified_rp__search__rep_pept__generic_lookup with type Monolink, UnifiedReportedPeptideId: " + item.getUnifiedReportedPeptideId();
-				
 				log.error( msg );
-				
 				throw new Exception(msg);
 			}
-			
-					
-			
 			
 			pstmt = conn.prepareStatement( sql );
 			
@@ -128,7 +103,6 @@ public class DB_Insert_UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO
 			counter++;
 			pstmt.setString( counter, linkTypeString );
 
-
 			counter++;
 			if ( item.isHasDynamicModifications() ) {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
@@ -138,6 +112,13 @@ public class DB_Insert_UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO
 
 			counter++;
 			if ( item.isHasMonolinks() ) {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+			} else {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+			}
+
+			counter++;
+			if ( item.isHasIsotopeLabels() ) {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
 			} else {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );

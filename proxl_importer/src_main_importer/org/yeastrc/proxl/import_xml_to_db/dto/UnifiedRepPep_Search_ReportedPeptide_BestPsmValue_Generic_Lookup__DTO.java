@@ -16,6 +16,7 @@ public class UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic_Lookup__D
 	
 	private boolean hasDynamicModifications;
 	private boolean hasMonolinks;
+	private boolean hasIsotopeLabels;
 	
 	private double bestPsmValueForAnnTypeId;
 	
@@ -37,6 +38,7 @@ public class UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic_Lookup__D
 		
 		this.hasDynamicModifications = unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.isHasDynamicModifications();
 		this.hasMonolinks = unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.isHasMonolinks();
+		this.hasIsotopeLabels = unifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO.isHasIsotopeLabels();
 	}
 	
 
@@ -56,6 +58,8 @@ public class UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic_Lookup__D
 				+ hasDynamicModifications
 				+ ", hasMonolinks="
 				+ hasMonolinks
+				+ ", hasIsotopeLabels="
+				+ hasIsotopeLabels
 				+ ", bestPsmValueForAnnTypeId="
 				+ bestPsmValueForAnnTypeId
 				+ ", psmIdForBestValue=" + psmIdForBestValue + "]";
@@ -135,6 +139,14 @@ public class UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic_Lookup__D
 
 	public void setPsmIdForBestValue(int psmIdForBestValue) {
 		this.psmIdForBestValue = psmIdForBestValue;
+	}
+
+	public boolean isHasIsotopeLabels() {
+		return hasIsotopeLabels;
+	}
+
+	public void setHasIsotopeLabels(boolean hasIsotopeLabels) {
+		this.hasIsotopeLabels = hasIsotopeLabels;
 	}
 
 	

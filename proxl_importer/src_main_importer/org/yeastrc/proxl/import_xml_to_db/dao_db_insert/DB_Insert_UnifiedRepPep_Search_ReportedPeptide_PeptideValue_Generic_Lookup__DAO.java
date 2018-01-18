@@ -69,9 +69,9 @@ public class DB_Insert_UnifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic
 			"INSERT INTO unified_rp__search_reported_peptide_fltbl_value_generic_lookup "
 			+ 	"( unified_reported_peptide_id, reported_peptide_id, search_id, "
 			+ 		" annotation_type_id, link_type, "
-			+  		" has_dynamic_modifictions, has_monolinks,  "
+			+  		" has_dynamic_modifictions, has_monolinks, has_isotope_labels, "
 			+ 		" peptide_value_for_ann_type_id ) "
-			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )";
+			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
 	
 	/**
@@ -144,6 +144,13 @@ public class DB_Insert_UnifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic
 
 			counter++;
 			if ( item.isHasMonolinks() ) {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+			} else {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+			}
+			
+			counter++;
+			if ( item.isHasIsotopeLabels() ) {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
 			} else {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );

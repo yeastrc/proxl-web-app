@@ -12,15 +12,18 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.dao.UnifiedReportedPeptideLookupDAO;
 import org.yeastrc.xlink.dao.UnifiedRepPepDynamicModLookupDAO;
+import org.yeastrc.xlink.dao.UnifiedRepPepIsotopeLabelLookupDAO;
 import org.yeastrc.xlink.dao.UnifiedRepPepMatchedPeptideLookupDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepDynamicModLookupDTO;
+import org.yeastrc.xlink.dto.UnifiedRepPepIsotopeLabelLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepMatchedPeptideLookupDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.SearchLooplinkProteinsFromPeptide;
 import org.yeastrc.xlink.www.web_utils.FormatDynamicModsToString;
+import org.yeastrc.xlink.www.web_utils.FormatIsotopeLablesToString;
 
 public class MergedSearchPeptideLooplink implements IMergedSearchLink {
 	
@@ -74,8 +77,15 @@ public class MergedSearchPeptideLooplink implements IMergedSearchLink {
 			}
 			this.setPeptidePosition1( position1 );
 			this.setPeptidePosition2( position2 );
+			
 			List<UnifiedRepPepDynamicModLookupDTO> unifiedRpDynamicModListPeptide = UnifiedRepPepDynamicModLookupDAO.getInstance().getUnifiedRpDynamicModDTOForMatchedPeptideId( unifiedRpMatchedPeptide.getId() );
 			modsStringPeptide = FormatDynamicModsToString.formatDynamicModsToString( unifiedRpDynamicModListPeptide );
+
+			unifiedRepPepIsotopeLabelListPeptide =
+					UnifiedRepPepIsotopeLabelLookupDAO.getInstance()
+					.getUnifiedRepPepIsotopeLabelLookupDTOForMatchedPeptideId( unifiedRpMatchedPeptide.getId() );
+			isotopeLabelsStringPeptide = FormatIsotopeLablesToString.formatIsotopeLabelsToString( unifiedRepPepIsotopeLabelListPeptide );
+			
 		} catch ( Exception e ) {
 			String msg = "Exception in populatePeptides(): " + e.toString();
 			log.error( msg, e );
@@ -222,14 +232,25 @@ public class MergedSearchPeptideLooplink implements IMergedSearchLink {
 		}
 	}
 	
-	public UnifiedRepPepMatchedPeptideLookupDTO getUnifiedRpMatchedPeptide() {
+	public UnifiedRepPepMatchedPeptideLookupDTO getUnifiedRpMatchedPeptide() throws Exception {
+		if( this.unifiedRpMatchedPeptide == null )
+			this.populatePeptides();
 		return unifiedRpMatchedPeptide;
 	}
-	public List<UnifiedRepPepDynamicModLookupDTO> getUnifiedRpDynamicModListPeptide() {
+	public List<UnifiedRepPepDynamicModLookupDTO> getUnifiedRpDynamicModListPeptide() throws Exception {
+		if( this.unifiedRpDynamicModListPeptide == null )
+			this.populatePeptides();
 		return unifiedRpDynamicModListPeptide;
 	}
-	public String getModsStringPeptide() {
+	public String getModsStringPeptide() throws Exception {
+		if( this.modsStringPeptide == null )
+			this.populatePeptides();
 		return modsStringPeptide;
+	}
+	public String getIsotopeLabelsStringPeptide() throws Exception {
+		if( this.isotopeLabelsStringPeptide == null )
+			this.populatePeptides();
+		return isotopeLabelsStringPeptide;
 	}
 	public Map<Integer, Integer> getReportedPeptideIds_KeyedOnSearchId_Map() {
 		return reportedPeptideIds_KeyedOnSearchId_Map;
@@ -243,11 +264,16 @@ public class MergedSearchPeptideLooplink implements IMergedSearchLink {
 	private UnifiedReportedPeptideLookupDTO UnifiedReportedPeptideLookupDTO;
 	private UnifiedRepPepMatchedPeptideLookupDTO unifiedRpMatchedPeptide;
 	private List<UnifiedRepPepDynamicModLookupDTO> unifiedRpDynamicModListPeptide;
+	private List<UnifiedRepPepIsotopeLabelLookupDTO> unifiedRepPepIsotopeLabelListPeptide;
+
 	private String modsStringPeptide;
+	private String isotopeLabelsStringPeptide;
+	
 	private PeptideDTO peptide;
 	private int peptidePosition1 = -1;
 	private int peptidePosition2 = -1;
 	private List<MergedSearchProteinDoublePosition> proteinPositions;
 	private Collection<SearchDTO> searches;
 	private Map<Integer, Integer> reportedPeptideIds_KeyedOnSearchId_Map;
+
 }

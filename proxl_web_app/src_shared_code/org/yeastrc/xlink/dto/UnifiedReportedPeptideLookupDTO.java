@@ -16,6 +16,7 @@ public class UnifiedReportedPeptideLookupDTO {
 	private int linkTypeNumber;
 	
 	private boolean hasMods;
+	private boolean hasIsotopeLabels;
 	
 
 	public void setLinkTypeString(String linkTypeString) {
@@ -56,6 +57,14 @@ public class UnifiedReportedPeptideLookupDTO {
 	}
 	public void setUnifiedSequence(String unifiedSequence) {
 		this.unifiedSequence = unifiedSequence;
+	}
+
+	public boolean isHasIsotopeLabels() {
+		return hasIsotopeLabels;
+	}
+
+	public void setHasIsotopeLabels(boolean hasIsotopeLabels) {
+		this.hasIsotopeLabels = hasIsotopeLabels;
 	}
 
 	

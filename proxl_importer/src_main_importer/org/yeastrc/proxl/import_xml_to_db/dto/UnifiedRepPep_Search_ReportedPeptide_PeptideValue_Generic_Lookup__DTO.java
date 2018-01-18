@@ -17,6 +17,7 @@ public class UnifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__D
 	
 	private boolean hasDynamicModifications;
 	private boolean hasMonolinks;
+	private boolean hasIsotopeLabels;
 	
 	private double peptideValueForAnnTypeId;
 	
@@ -122,6 +123,14 @@ public class UnifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__D
 
 	public void setPeptideValueForAnnTypeId(double peptideValueForAnnTypeId) {
 		this.peptideValueForAnnTypeId = peptideValueForAnnTypeId;
+	}
+
+	public boolean isHasIsotopeLabels() {
+		return hasIsotopeLabels;
+	}
+
+	public void setHasIsotopeLabels(boolean hasIsotopeLabels) {
+		this.hasIsotopeLabels = hasIsotopeLabels;
 	}
 	
 }

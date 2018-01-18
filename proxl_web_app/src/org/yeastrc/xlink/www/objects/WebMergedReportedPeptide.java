@@ -21,62 +21,57 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 	
 	private static final Logger log = Logger.getLogger(WebMergedReportedPeptide.class);
 
-
-
+	/**
+	 * @return
+	 */
 	public String getLinkType() {
 		
 		if ( mergedSearchPeptideCrosslink != null ) {
-			
 			return XLinkUtils.CROSS_TYPE_STRING_UPPERCASE;
 		}
-		
 		if ( mergedSearchPeptideLooplink != null ) {
-			
 			return XLinkUtils.LOOP_TYPE_STRING_UPPERCASE;
 		}
-		
 		if ( mergedSearchPeptideUnlinked != null ) {
 			
 			return XLinkUtils.UNLINKED_TYPE_STRING_UPPERCASE;
 		}
-		
 		if ( mergedSearchPeptideDimer != null ) {
-			
 			return XLinkUtils.DIMER_TYPE_STRING_UPPERCASE;
 		}
-		
-		
-		
 		return "UNKNOWN";	
 	}
-
 	
-	
+	/**
+	 * @param numPsms
+	 */
 	public void setNumPsms(int numPsms) {
 		this.numPsms = numPsms;
 		numPsmsSet = true;
 	}
 
-
+	/**
+	 * @return
+	 * @throws Exception
+	 */
 	public int getNumPsms() throws Exception {
 		
 		if ( numPsmsSet ) {
 			return numPsms;
 		}
-
 		try {
 			throw new ProxlWebappInternalErrorException( "setNumPsms(int numPsms) not called" );
-
 		} catch ( Exception e ) {
-			
 			String msg = "Error getting num psms";
 			log.error( msg, e );
 			throw e;
 		}
 	}
-		
 
-
+	/**
+	 * @return
+	 * @throws Exception
+	 */
 	public UnifiedReportedPeptideLookupDTO getUnifiedReportedPeptide() throws Exception {
 		
 		if ( mergedSearchPeptideCrosslink != null ) {
@@ -181,7 +176,7 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 		return "";	
 	}
 
-	public String getModsStringPeptide1() {
+	public String getModsStringPeptide1() throws Exception {
 
 		if ( mergedSearchPeptideCrosslink != null ) {
 			
@@ -206,7 +201,7 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 		
 		return "";	
 	}
-	public String getModsStringPeptide2() {
+	public String getModsStringPeptide2() throws Exception {
 		
 		if ( mergedSearchPeptideCrosslink != null ) {
 			
@@ -216,6 +211,48 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 		if ( mergedSearchPeptideDimer != null ) {
 			
 			return mergedSearchPeptideDimer.getModsStringPeptide2();
+		}
+		
+		
+		return "";	
+	}
+
+
+	public String getIsotopeLabelsStringPeptide1() throws Exception {
+
+		if ( mergedSearchPeptideCrosslink != null ) {
+			
+			return mergedSearchPeptideCrosslink.getIsotopeLabelsStringPeptide1();
+		}
+		
+		if ( mergedSearchPeptideLooplink != null ) {
+			
+			return mergedSearchPeptideLooplink.getIsotopeLabelsStringPeptide();
+		}
+		
+		
+		if ( mergedSearchPeptideUnlinked != null ) {
+			
+			return mergedSearchPeptideUnlinked.getIsotopeLabelsStringPeptide();
+		}
+		
+		if ( mergedSearchPeptideDimer != null ) {
+			
+			return mergedSearchPeptideDimer.getIsotopeLabelsStringPeptide1();
+		}
+		
+		return "";	
+	}
+	public String getIsotopeLabelsStringPeptide2() throws Exception {
+		
+		if ( mergedSearchPeptideCrosslink != null ) {
+			
+			return mergedSearchPeptideCrosslink.getIsotopeLabelsStringPeptide2();
+		}
+
+		if ( mergedSearchPeptideDimer != null ) {
+			
+			return mergedSearchPeptideDimer.getIsotopeLabelsStringPeptide2();
 		}
 		
 		

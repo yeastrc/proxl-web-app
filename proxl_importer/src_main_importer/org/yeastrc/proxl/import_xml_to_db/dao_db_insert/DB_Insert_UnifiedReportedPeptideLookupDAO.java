@@ -33,7 +33,7 @@ public class DB_Insert_UnifiedReportedPeptideLookupDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		
-		String sql = "INSERT INTO unified_reported_peptide_lookup (unified_sequence, link_type, has_dynamic_modifictions ) VALUES (?,?,?)";
+		final String sql = "INSERT INTO unified_reported_peptide_lookup (unified_sequence, link_type, has_dynamic_modifictions, has_isotope_labels ) VALUES (?,?,?,?)";
 
 		try {
 			
@@ -42,6 +42,7 @@ public class DB_Insert_UnifiedReportedPeptideLookupDAO {
 			pstmt.setString( 1, unifiedReportedPeptide.getUnifiedSequence() );
 			pstmt.setString( 2, unifiedReportedPeptide.getLinkTypeString() );
 			pstmt.setBoolean( 3, unifiedReportedPeptide.isHasMods() );
+			pstmt.setBoolean( 4, unifiedReportedPeptide.isHasIsotopeLabels());
 			
 			pstmt.executeUpdate();
 			

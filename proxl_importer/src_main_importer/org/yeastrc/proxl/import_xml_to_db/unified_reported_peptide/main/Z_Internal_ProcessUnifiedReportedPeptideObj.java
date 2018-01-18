@@ -9,12 +9,17 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.base.constants.UnifiedReportedPeptideConstants;
+import org.yeastrc.xlink.dao.IsotopeLabelDAO;
+import org.yeastrc.xlink.dto.IsotopeLabelDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepDynamicModLookupDTO;
+import org.yeastrc.xlink.dto.UnifiedRepPepIsotopeLabelLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepMatchedPeptideLookupDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
+import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptide_IsotopeLabel_DTO;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.unified_reported_peptide.objects.UnifiedRpSinglePeptideDynamicMod;
 import org.yeastrc.xlink.utils.XLinkUtils;
@@ -31,10 +36,11 @@ class Z_Internal_ProcessUnifiedReportedPeptideObj {
 
 	//  add the formatted peptides with the separator
 	
-	private String CROSSLINK_SEPARATOR = "--";
-	private String DIMER_SEPARATOR = "+";
+	private static final String CROSSLINK_SEPARATOR = "--";
+	private static final String DIMER_SEPARATOR = "+";
 	
-	
+	//  Placed before the isotope label in the generated string
+	private static final String ISOTOPE_LABEL_PREFIX_SEPARATOR = "-";
 	
 	
 	// private constructor
@@ -126,22 +132,33 @@ class Z_Internal_ProcessUnifiedReportedPeptideObj {
 			throw new Exception(msg);
 		}
 		
-		
-		boolean hasMods = false;
-		
-		for ( Z_Internal_UnifiedRpMatchedPeptide_Holder unifiedRpMatchedPeptide_Holder : unifiedReportedPeptide_Holder.getZ_Internal_UnifiedRpMatchedPeptide_HolderList() ) {
-			
-			if ( unifiedRpMatchedPeptide_Holder.getZ_Internal_UnifiedRpDynamicMod_Holder_List() != null 
-					&& ( ! unifiedRpMatchedPeptide_Holder.getZ_Internal_UnifiedRpDynamicMod_Holder_List().isEmpty() ) ) {
-				
-				hasMods = true;
-				break;
+		UnifiedReportedPeptideLookupDTO unifiedReportedPeptideDTO = unifiedReportedPeptide_Holder.getUnifiedReportedPeptideDTO();
+
+		{
+			boolean hasMods = false;
+			for ( Z_Internal_UnifiedRpMatchedPeptide_Holder unifiedRpMatchedPeptide_Holder : unifiedReportedPeptide_Holder.getZ_Internal_UnifiedRpMatchedPeptide_HolderList() ) {
+				if ( unifiedRpMatchedPeptide_Holder.getZ_Internal_UnifiedRpDynamicMod_Holder_List() != null 
+						&& ( ! unifiedRpMatchedPeptide_Holder.getZ_Internal_UnifiedRpDynamicMod_Holder_List().isEmpty() ) ) {
+					hasMods = true;
+					break;
+				}
 			}
+			unifiedReportedPeptideDTO.setHasMods( hasMods );
+		}
+
+		{
+			boolean hasIsotopeLabels = false;
+			for ( Z_Internal_UnifiedRpMatchedPeptide_Holder unifiedRpMatchedPeptide_Holder : unifiedReportedPeptide_Holder.getZ_Internal_UnifiedRpMatchedPeptide_HolderList() ) {
+				if ( unifiedRpMatchedPeptide_Holder.getZ_Internal_UnifiedRpIsotopeLabel_Holder_List() != null 
+						&& ( ! unifiedRpMatchedPeptide_Holder.getZ_Internal_UnifiedRpIsotopeLabel_Holder_List().isEmpty() ) ) {
+					hasIsotopeLabels = true;
+					break;
+				}
+			}
+			unifiedReportedPeptideDTO.setHasIsotopeLabels( hasIsotopeLabels );
 		}
 		
-		unifiedReportedPeptide_Holder.getUnifiedReportedPeptideDTO().setHasMods( hasMods );
-
-		unifiedReportedPeptide_Holder.getUnifiedReportedPeptideDTO().setLinkTypeNumber(linkType);
+		unifiedReportedPeptideDTO.setLinkTypeNumber(linkType);
 		
 
 		return unifiedReportedPeptide_Holder;
@@ -167,10 +184,10 @@ class Z_Internal_ProcessUnifiedReportedPeptideObj {
 		PerPeptideData singlePeptide2 = perPeptideDataList.get(1);
 		
 		Z_Internal_UnifiedRpMatchedPeptide_Holder unifiedRpMatchedPeptide_Holder_1
-			= getPeptideWithModsForCrosslinks( singlePeptide1 );
+			= getPeptideWithModsAndIsotopeLabelsForCrosslinks( singlePeptide1 );
 
 		Z_Internal_UnifiedRpMatchedPeptide_Holder unifiedRpMatchedPeptide_Holder_2
-			= getPeptideWithModsForCrosslinks( singlePeptide2 );
+			= getPeptideWithModsAndIsotopeLabelsForCrosslinks( singlePeptide2 );
 		
 		{
 			if ( unifiedRpMatchedPeptide_Holder_1.getFormattedPeptideString()
@@ -226,7 +243,7 @@ class Z_Internal_ProcessUnifiedReportedPeptideObj {
 	 * @return
 	 * @throws Exception
 	 */
-	private Z_Internal_UnifiedRpMatchedPeptide_Holder getPeptideWithModsForCrosslinks( PerPeptideData perPeptideData ) throws Exception {
+	private Z_Internal_UnifiedRpMatchedPeptide_Holder getPeptideWithModsAndIsotopeLabelsForCrosslinks( PerPeptideData perPeptideData ) throws Exception {
 
 		SrchRepPeptPeptideDTO srchRepPeptPeptideDTO = perPeptideData.getSrchRepPeptPeptideDTO();
 		
@@ -246,11 +263,11 @@ class Z_Internal_ProcessUnifiedReportedPeptideObj {
 				
 
 		Z_Internal_UnifiedRpMatchedPeptide_Holder unifiedRpMatchedPeptide_Holder 
-			= addModsToPeptideString( perPeptideData );
+			= addModsAndIsotopeLabelsToPeptideString( perPeptideData );
 		
-		String peptideStringWithMods = unifiedRpMatchedPeptide_Holder.getPeptideStringWithMods();
+		String peptideStringWithModsAndIsotopeLabels = unifiedRpMatchedPeptide_Holder.getPeptideStringWithModsAndIsotopeLabels();
 		
-		String formattedPeptideString = peptideStringWithMods + "(" + srchRepPeptPeptideDTO.getPeptidePosition_1() + ")"; 
+		String formattedPeptideString = peptideStringWithModsAndIsotopeLabels + "(" + srchRepPeptPeptideDTO.getPeptidePosition_1() + ")"; 
 
 		unifiedRpMatchedPeptide_Holder.setFormattedPeptideString( formattedPeptideString );
 
@@ -309,14 +326,14 @@ class Z_Internal_ProcessUnifiedReportedPeptideObj {
 
 
 		Z_Internal_UnifiedRpMatchedPeptide_Holder unifiedRpMatchedPeptide_Holder 
-			= addModsToPeptideString( perPeptideData );
+			= addModsAndIsotopeLabelsToPeptideString( perPeptideData );
 		
 		// Set the order
 
 		unifiedRpMatchedPeptide_Holder.getUnifiedRpMatchedPeptideDTO().setPeptideOrder( 1 );
 
 		
-		String peptideStringWithMods = unifiedRpMatchedPeptide_Holder.getPeptideStringWithMods();
+		String peptideStringWithMods = unifiedRpMatchedPeptide_Holder.getPeptideStringWithModsAndIsotopeLabels();
 		
 		String formattedPeptideString = peptideStringWithMods + "(" + linkPositions[ 0 ] + "," + linkPositions[ 1 ] + ")"; 
 
@@ -454,9 +471,9 @@ class Z_Internal_ProcessUnifiedReportedPeptideObj {
 		}
 
 		Z_Internal_UnifiedRpMatchedPeptide_Holder unifiedRpMatchedPeptide_Holder 
-			= addModsToPeptideString( perPeptideData );
+			= addModsAndIsotopeLabelsToPeptideString( perPeptideData );
 		
-		String peptideStringWithMods = unifiedRpMatchedPeptide_Holder.getPeptideStringWithMods();
+		String peptideStringWithMods = unifiedRpMatchedPeptide_Holder.getPeptideStringWithModsAndIsotopeLabels();
 		
 		String formattedPeptideString = peptideStringWithMods; 
 
@@ -509,14 +526,14 @@ class Z_Internal_ProcessUnifiedReportedPeptideObj {
 		
 
 		Z_Internal_UnifiedRpMatchedPeptide_Holder unifiedRpMatchedPeptide_Holder 
-			= addModsToPeptideString( perPeptideData );
+			= addModsAndIsotopeLabelsToPeptideString( perPeptideData );
 		
 		// Set the order
 
 		unifiedRpMatchedPeptide_Holder.getUnifiedRpMatchedPeptideDTO().setPeptideOrder( 1 );
 
 		
-		String peptideStringWithMods = unifiedRpMatchedPeptide_Holder.getPeptideStringWithMods();
+		String peptideStringWithMods = unifiedRpMatchedPeptide_Holder.getPeptideStringWithModsAndIsotopeLabels();
 		
 		String formattedPeptideString = peptideStringWithMods; 
 
@@ -551,8 +568,9 @@ class Z_Internal_ProcessUnifiedReportedPeptideObj {
 	/**
 	 * @param perPeptideData
 	 * @return
+	 * @throws Exception 
 	 */
-	private Z_Internal_UnifiedRpMatchedPeptide_Holder addModsToPeptideString( PerPeptideData perPeptideData ) {
+	private Z_Internal_UnifiedRpMatchedPeptide_Holder addModsAndIsotopeLabelsToPeptideString( PerPeptideData perPeptideData ) throws Exception {
 
 		Z_Internal_UnifiedRpMatchedPeptide_Holder unifiedRpMatchedPeptide_Holder 
 			= new Z_Internal_UnifiedRpMatchedPeptide_Holder();
@@ -570,91 +588,155 @@ class Z_Internal_ProcessUnifiedReportedPeptideObj {
 		
 		List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList = perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide();
 
+		List<SrchRepPeptPeptide_IsotopeLabel_DTO> srchRepPeptPeptide_IsotopeLabel_DTO_List = perPeptideData.getSrchRepPeptPeptide_IsotopeLabel_DTOList_Peptide();
+		
+		//  
+		
+		if ( ( srchRepPeptPeptDynamicModDTOList == null || srchRepPeptPeptDynamicModDTOList.isEmpty() )
+				&& ( srchRepPeptPeptide_IsotopeLabel_DTO_List == null || srchRepPeptPeptide_IsotopeLabel_DTO_List.isEmpty() ) ) {
+			
+			//  Optimization/Early Exit
+
+			unifiedRpMatchedPeptide_Holder.setPeptideStringWithModsAndIsotopeLabels( peptideSequence );
+			
+			return unifiedRpMatchedPeptide_Holder; // EARLY RETURN
+		}
+
+		int srchRepPeptPeptDynamicModDTOList_Size = 0;
+		int srchRepPeptPeptide_IsotopeLabel_DTO_List_Size = 0;
+		
+		if ( srchRepPeptPeptDynamicModDTOList != null ) {
+			srchRepPeptPeptDynamicModDTOList_Size = srchRepPeptPeptDynamicModDTOList.size();
+		}
+		if ( srchRepPeptPeptide_IsotopeLabel_DTO_List != null ) {
+			srchRepPeptPeptide_IsotopeLabel_DTO_List_Size = srchRepPeptPeptide_IsotopeLabel_DTO_List.size();
+		}
+		
+		StringBuilder peptideSequenceOutSB = 
+				new StringBuilder( peptideSequence.length() 
+						+ ( srchRepPeptPeptDynamicModDTOList_Size * 13 )
+						+ ( srchRepPeptPeptide_IsotopeLabel_DTO_List_Size * 13 ) );
+
+
+		
 		if ( srchRepPeptPeptDynamicModDTOList == null || srchRepPeptPeptDynamicModDTOList.isEmpty() ) {
-
-			unifiedRpMatchedPeptide_Holder.setPeptideStringWithMods( peptideSequence );
 			
-			return unifiedRpMatchedPeptide_Holder;
-		}
-		
-		//  Build list of local holder dynamic mods 
-		
-		// WAS named: List<UnifiedRpSinglePeptideDynamicMod> dynamicModList = unifiedRpSinglePeptideObj.getDynamicModList();
-		
-		List<UnifiedRpSinglePeptideDynamicMod> unifiedRpSinglePeptideDynamicModList = new ArrayList<>( srchRepPeptPeptDynamicModDTOList.size() );
-		
-		for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : srchRepPeptPeptDynamicModDTOList ) {
-
-			UnifiedRpSinglePeptideDynamicMod unifiedRpSinglePeptideDynamicMod = new UnifiedRpSinglePeptideDynamicMod();
-			unifiedRpSinglePeptideDynamicModList.add(unifiedRpSinglePeptideDynamicMod);
-
-			unifiedRpSinglePeptideDynamicMod.setPosition( srchRepPeptPeptDynamicModDTO.getPosition() );
-			unifiedRpSinglePeptideDynamicMod.setMass( srchRepPeptPeptDynamicModDTO.getMass() );
-		}
-		
-		List<Z_Internal_UnifiedRpDynamicMod_Holder> unifiedRpDynamicMod_Holder_List = new ArrayList<>();
+			peptideSequenceOutSB.append( peptideSequence );
 			
-		unifiedRpMatchedPeptide_Holder.setZ_Internal_UnifiedRpDynamicMod_Holder_List( unifiedRpDynamicMod_Holder_List );
+		} else {
+			// Process Dynamic Mods
+			
+			//  List to store in parent object
+			List<Z_Internal_UnifiedRpDynamicMod_Holder> unifiedRpDynamicMod_Holder_List = new ArrayList<>( srchRepPeptPeptDynamicModDTOList.size() );
+			unifiedRpMatchedPeptide_Holder.setZ_Internal_UnifiedRpDynamicMod_Holder_List( unifiedRpDynamicMod_Holder_List );
 
-		
-		
-		StringBuilder peptideSequenceOutSB = new StringBuilder( peptideSequence.length() + ( srchRepPeptPeptDynamicModDTOList.size() * 13 ) );
+			//  Build list of local holder dynamic mods 
+
+			List<UnifiedRpSinglePeptideDynamicMod> unifiedRpSinglePeptideDynamicModList = new ArrayList<>( srchRepPeptPeptDynamicModDTOList.size() );
+
+			for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : srchRepPeptPeptDynamicModDTOList ) {
+
+				UnifiedRpSinglePeptideDynamicMod unifiedRpSinglePeptideDynamicMod = new UnifiedRpSinglePeptideDynamicMod();
+				unifiedRpSinglePeptideDynamicModList.add(unifiedRpSinglePeptideDynamicMod);
+
+				unifiedRpSinglePeptideDynamicMod.setPosition( srchRepPeptPeptDynamicModDTO.getPosition() );
+				unifiedRpSinglePeptideDynamicMod.setMass( srchRepPeptPeptDynamicModDTO.getMass() );
+			}
 
 
-		Collections.sort( unifiedRpSinglePeptideDynamicModList );
-		
-		Iterator<UnifiedRpSinglePeptideDynamicMod> dynamicModIterator = unifiedRpSinglePeptideDynamicModList.iterator();
-		
-		UnifiedRpSinglePeptideDynamicMod mod = dynamicModIterator.next();
+			Collections.sort( unifiedRpSinglePeptideDynamicModList );
 
-		char[] peptideSequenceArray = peptideSequence.toCharArray();
-		
-		int modOrder = 0;
+			Iterator<UnifiedRpSinglePeptideDynamicMod> dynamicModIterator = unifiedRpSinglePeptideDynamicModList.iterator();
 
-		for ( int seqIndex = 0; seqIndex < peptideSequenceArray.length; seqIndex++ ) {
+			UnifiedRpSinglePeptideDynamicMod mod = dynamicModIterator.next();
 
-			int modPosition = seqIndex + 1; // since mod position is 1 based
+			char[] peptideSequenceArray = peptideSequence.toCharArray();
 
-			char seqChar = peptideSequenceArray[ seqIndex ];
+			int modOrder = 0;
+			
+			for ( int seqIndex = 0; seqIndex < peptideSequenceArray.length; seqIndex++ ) {
 
-			peptideSequenceOutSB.append( seqChar );
+				int modPosition = seqIndex + 1; // since mod position is 1 based
 
-			while ( mod != null && mod.getPosition() == modPosition ) {
+				char seqChar = peptideSequenceArray[ seqIndex ];
 
-				modOrder++;
-				
-				BigDecimal modMassRounded = mod.getMassRounded();
+				peptideSequenceOutSB.append( seqChar );
 
-				peptideSequenceOutSB.append( "[" );
-				peptideSequenceOutSB.append( modMassRounded );
-				peptideSequenceOutSB.append( "]" );
-				
-				Z_Internal_UnifiedRpDynamicMod_Holder unifiedRpDynamicMod_Holder = new Z_Internal_UnifiedRpDynamicMod_Holder();
-				unifiedRpDynamicMod_Holder_List.add( unifiedRpDynamicMod_Holder );
-				
-				UnifiedRepPepDynamicModLookupDTO unifiedRpDynamicModDTO = new UnifiedRepPepDynamicModLookupDTO();
-				unifiedRpDynamicMod_Holder.setUnifiedRpDynamicModDTO( unifiedRpDynamicModDTO );
-				
-				unifiedRpDynamicModDTO.setPosition( mod.getPosition() );
-				
-				unifiedRpDynamicModDTO.setMass( mod.getMass() );
-				unifiedRpDynamicModDTO.setMassRounded( mod.getMassRounded().doubleValue() );
-				unifiedRpDynamicModDTO.setMassRoundedString( mod.getMassRounded().toString() );
-				unifiedRpDynamicModDTO.setMassRoundingPlaces( UnifiedReportedPeptideConstants.DECIMAL_POSITIONS_ROUNDED_TO );
-				unifiedRpDynamicModDTO.setModOrder( modOrder );
-				
-				if ( dynamicModIterator.hasNext() ) {
-					mod = dynamicModIterator.next();
-				} else {
-					mod = null;
+				while ( mod != null && mod.getPosition() == modPosition ) {
+
+					modOrder++;
+
+					BigDecimal modMassRounded = mod.getMassRounded();
+
+					peptideSequenceOutSB.append( "[" );
+					peptideSequenceOutSB.append( modMassRounded );
+					peptideSequenceOutSB.append( "]" );
+
+					Z_Internal_UnifiedRpDynamicMod_Holder unifiedRpDynamicMod_Holder = new Z_Internal_UnifiedRpDynamicMod_Holder();
+					unifiedRpDynamicMod_Holder_List.add( unifiedRpDynamicMod_Holder );
+
+					UnifiedRepPepDynamicModLookupDTO unifiedRpDynamicModDTO = new UnifiedRepPepDynamicModLookupDTO();
+					unifiedRpDynamicMod_Holder.setUnifiedRpDynamicModDTO( unifiedRpDynamicModDTO );
+
+					unifiedRpDynamicModDTO.setPosition( mod.getPosition() );
+
+					unifiedRpDynamicModDTO.setMass( mod.getMass() );
+					unifiedRpDynamicModDTO.setMassRounded( mod.getMassRounded().doubleValue() );
+					unifiedRpDynamicModDTO.setMassRoundedString( mod.getMassRounded().toString() );
+					unifiedRpDynamicModDTO.setMassRoundingPlaces( UnifiedReportedPeptideConstants.DECIMAL_POSITIONS_ROUNDED_TO );
+					unifiedRpDynamicModDTO.setModOrder( modOrder );
+
+					if ( dynamicModIterator.hasNext() ) {
+						mod = dynamicModIterator.next();
+					} else {
+						mod = null;
+					}
 				}
+
+			}
+		} 
+		
+		// Add Isotope Labels to end of string
+		
+		if ( srchRepPeptPeptide_IsotopeLabel_DTO_List != null && ( ! srchRepPeptPeptide_IsotopeLabel_DTO_List.isEmpty() ) ) {
+			
+			//  List to store in parent object
+			List<Z_Internal_UnifiedRpIsotopeLabel_Holder> unifiedRpIsotopeLabel_Holder_List = new ArrayList<>( srchRepPeptPeptide_IsotopeLabel_DTO_List.size() );
+			unifiedRpMatchedPeptide_Holder.setZ_Internal_UnifiedRpIsotopeLabel_Holder_List( unifiedRpIsotopeLabel_Holder_List );
+
+			// process isotope labels
+			List<String> isotopeLabels = new ArrayList<>( srchRepPeptPeptide_IsotopeLabel_DTO_List.size() );
+			for ( SrchRepPeptPeptide_IsotopeLabel_DTO srchRepPeptPeptide_IsotopeLabel_DTO : srchRepPeptPeptide_IsotopeLabel_DTO_List ) {
+				IsotopeLabelDTO isotopeLabelDTO = 
+						IsotopeLabelDAO.getInstance().getIsotopeLabelDTOForId( srchRepPeptPeptide_IsotopeLabel_DTO.getIsotopeLabelId() );
+				if ( isotopeLabelDTO == null ) {
+					String msg = "No Isotope label found for id: " + srchRepPeptPeptide_IsotopeLabel_DTO.getIsotopeLabelId();
+					log.error( msg );
+					throw new ProxlImporterInteralException( msg );
+				}
+				isotopeLabels.add( isotopeLabelDTO.getName() );
+				
+				Z_Internal_UnifiedRpIsotopeLabel_Holder z_Internal_UnifiedRpIsotopeLabel_Holder = new Z_Internal_UnifiedRpIsotopeLabel_Holder();
+				unifiedRpIsotopeLabel_Holder_List.add( z_Internal_UnifiedRpIsotopeLabel_Holder );
+				
+				UnifiedRepPepIsotopeLabelLookupDTO unifiedRepPepIsotopeLabelLookupDTO = new UnifiedRepPepIsotopeLabelLookupDTO();
+				z_Internal_UnifiedRpIsotopeLabel_Holder.setUnifiedRepPepIsotopeLabelLookupDTO( unifiedRepPepIsotopeLabelLookupDTO );
+
+				unifiedRepPepIsotopeLabelLookupDTO.setIsotopeLabelId( srchRepPeptPeptide_IsotopeLabel_DTO.getIsotopeLabelId() );
+			}
+			// Sort on isotope label string		
+			Collections.sort( isotopeLabels );
+			// Add isotope labels to peptideSequenceOutSB
+			for ( String isotopeLabel : isotopeLabels ) {
+				peptideSequenceOutSB.append( ISOTOPE_LABEL_PREFIX_SEPARATOR );
+				peptideSequenceOutSB.append( isotopeLabel );
 			}
 
 		}
 		
 		String peptideSequenceOut = peptideSequenceOutSB.toString();
 		
-		unifiedRpMatchedPeptide_Holder.setPeptideStringWithMods( peptideSequenceOut );
+		unifiedRpMatchedPeptide_Holder.setPeptideStringWithModsAndIsotopeLabels( peptideSequenceOut );
 		
 		return unifiedRpMatchedPeptide_Holder;
 	}

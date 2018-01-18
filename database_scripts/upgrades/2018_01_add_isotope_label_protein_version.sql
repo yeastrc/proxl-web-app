@@ -186,3 +186,43 @@ CHANGE COLUMN protein_sequence_id protein_sequence_version_id INT(10) UNSIGNED N
 RENAME TO  z_mapping__nrseq_prot_id__prot_seq_version_id ;
 
 
+-- ---------------------
+
+--  Second additional part for unified reported peptide
+
+
+ALTER TABLE unified_reported_peptide_lookup 
+ADD COLUMN has_isotope_labels TINYINT(4) NOT NULL DEFAULT 0 AFTER has_dynamic_modifictions;
+
+ALTER TABLE unified_rp__search__rep_pept__generic_lookup 
+ADD COLUMN has_isotope_labels TINYINT(3) NOT NULL DEFAULT 0 AFTER has_monolinks;
+
+ALTER TABLE unified_rp__search_reported_peptide_fltbl_value_generic_lookup 
+ADD COLUMN has_isotope_labels TINYINT(3) NOT NULL DEFAULT 0 AFTER has_monolinks;
+
+ALTER TABLE unified_rp__search__rep_pept__best_psm_value_generic_lookup 
+ADD COLUMN has_isotope_labels TINYINT(3) NOT NULL DEFAULT 0 AFTER has_monolinks;
+
+
+CREATE TABLE IF NOT EXISTS unified_rep_pep_isotope_label_lookup (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  rp_matched_peptide_id INT(10) UNSIGNED NOT NULL,
+  isotope_label_id INT(10) UNSIGNED NOT NULL,
+  PRIMARY KEY (id),
+  INDEX unified_rp_dynamic_mod__rp_matched_peptide_id_fk_idx (rp_matched_peptide_id ASC),
+  INDEX unified_rep_pep_isotope_label_lookup_isotope_label_id_fk_idx (isotope_label_id ASC),
+  CONSTRAINT unified_rep_pep_isotope_label_lookup_matched_peptide_id_fk
+    FOREIGN KEY (rp_matched_peptide_id)
+    REFERENCES unified_rep_pep_matched_peptide_lookup (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT unified_rep_pep_isotope_label_lookup_isotope_label_id_fk
+    FOREIGN KEY (isotope_label_id)
+    REFERENCES isotope_label (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_general_ci;
+
+

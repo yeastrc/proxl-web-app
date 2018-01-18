@@ -763,6 +763,7 @@ CREATE TABLE  unified_reported_peptide_lookup (
   unified_sequence VARCHAR(2000) NOT NULL,
   link_type ENUM('looplink','crosslink','unlinked','dimer') NOT NULL,
   has_dynamic_modifictions TINYINT UNSIGNED NOT NULL,
+  has_isotope_labels TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1
@@ -1279,6 +1280,7 @@ CREATE TABLE  unified_rp__search__rep_pept__generic_lookup (
   link_type ENUM('looplink','crosslink','unlinked','dimer') NOT NULL,
   has_dynamic_modifictions TINYINT(3) UNSIGNED NOT NULL,
   has_monolinks TINYINT(3) UNSIGNED NOT NULL,
+  has_isotope_labels TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
   psm_num_at_default_cutoff INT(10) UNSIGNED NOT NULL,
   peptide_meets_default_cutoffs ENUM('yes','no','not_applicable') NOT NULL,
   related_peptides_unique_for_search TINYINT(1) NOT NULL DEFAULT 0,
@@ -1325,6 +1327,7 @@ CREATE TABLE  unified_rp__search_reported_peptide_fltbl_value_generic_lookup (
   link_type ENUM('looplink','crosslink','unlinked','dimer') NOT NULL,
   has_dynamic_modifictions TINYINT(3) UNSIGNED NOT NULL,
   has_monolinks TINYINT(3) UNSIGNED NOT NULL,
+  has_isotope_labels TINYINT(3) NOT NULL DEFAULT 0,
   peptide_value_for_ann_type_id DOUBLE NOT NULL,
   PRIMARY KEY (search_id, reported_peptide_id, annotation_type_id),
   CONSTRAINT unified_rp_srch_rep_pept_fltbl_val_gnrc_lkp_srch_id_rep_pept_id
@@ -1365,6 +1368,7 @@ CREATE TABLE  unified_rp__search__rep_pept__best_psm_value_generic_lookup (
   link_type ENUM('looplink','crosslink','unlinked','dimer') NOT NULL,
   has_dynamic_modifictions TINYINT(3) UNSIGNED NOT NULL,
   has_monolinks TINYINT(3) UNSIGNED NOT NULL,
+  has_isotope_labels TINYINT(3) NOT NULL DEFAULT 0,
   best_psm_value_for_ann_type_id DOUBLE NOT NULL,
   psm_id_for_best_value__non_fk INT(10) UNSIGNED NOT NULL,
   PRIMARY KEY (search_id, reported_peptide_id, annotation_type_id),
@@ -2288,6 +2292,35 @@ CREATE TABLE  search__isotope_label_lookup (
 ENGINE = InnoDB;
 
 CREATE INDEX search__isotope_label_lookup__isotope_label_id_fk_idx ON search__isotope_label_lookup (isotope_label_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table unified_rep_pep_isotope_label_lookup
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS unified_rep_pep_isotope_label_lookup ;
+
+CREATE TABLE  unified_rep_pep_isotope_label_lookup (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  rp_matched_peptide_id INT(10) UNSIGNED NOT NULL,
+  isotope_label_id INT(10) UNSIGNED NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT unified_rep_pep_isotope_label_lookup_matched_peptide_id_fk
+    FOREIGN KEY (rp_matched_peptide_id)
+    REFERENCES unified_rep_pep_matched_peptide_lookup (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT unified_rep_pep_isotope_label_lookup_isotope_label_id_fk
+    FOREIGN KEY (isotope_label_id)
+    REFERENCES isotope_label (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_general_ci;
+
+CREATE INDEX unified_rp_dynamic_mod__rp_matched_peptide_id_fk_idx ON unified_rep_pep_isotope_label_lookup (rp_matched_peptide_id ASC);
+
+CREATE INDEX unified_rep_pep_isotope_label_lookup_isotope_label_id_fk_idx ON unified_rep_pep_isotope_label_lookup (isotope_label_id ASC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

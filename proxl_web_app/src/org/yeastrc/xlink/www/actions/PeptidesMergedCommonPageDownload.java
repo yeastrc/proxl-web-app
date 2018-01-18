@@ -71,6 +71,7 @@ public class PeptidesMergedCommonPageDownload {
 		private List<AnnDisplayNameDescPeptPsmListsPair> peptidePsmAnnotationNameDescListsForEachSearch;
 		SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel;
 		boolean anyReportedPeptideEntriesWereCombined;
+		boolean anyResultsHaveIsotopeLabels;
 		
 		public List<AnnDisplayNameDescPeptPsmListsPair> getPeptidePsmAnnotationNameDescListsForEachSearch() {
 			return peptidePsmAnnotationNameDescListsForEachSearch;
@@ -104,6 +105,12 @@ public class PeptidesMergedCommonPageDownload {
 		}
 		public void setAnyReportedPeptideEntriesWereCombined(boolean anyReportedPeptideEntriesWereCombined) {
 			this.anyReportedPeptideEntriesWereCombined = anyReportedPeptideEntriesWereCombined;
+		}
+		public boolean isAnyResultsHaveIsotopeLabels() {
+			return anyResultsHaveIsotopeLabels;
+		}
+		public void setAnyResultsHaveIsotopeLabels(boolean anyResultsHaveIsotopeLabels) {
+			this.anyResultsHaveIsotopeLabels = anyResultsHaveIsotopeLabels;
 		}
 	}
 	
@@ -544,12 +551,26 @@ public class PeptidesMergedCommonPageDownload {
 				}
 			}
 		}
+		
+		boolean anyResultsHaveIsotopeLabels = false;
+		
+		for ( WebMergedReportedPeptide item : webMergedReportedPeptideList ) {
+			String isotopeLabelsStringPeptide1 = item.getIsotopeLabelsStringPeptide1();
+			String isotopeLabelsStringPeptide2 = item.getIsotopeLabelsStringPeptide2();
+			if ( StringUtils.isNotEmpty( isotopeLabelsStringPeptide1 ) 
+					|| StringUtils.isNotEmpty( isotopeLabelsStringPeptide2 ) ) {
+				anyResultsHaveIsotopeLabels = true;
+				break;
+			}
+		}
+		
 		PeptidesMergedCommonPageDownloadResult peptidesMergedCommonPageDownloadResult = new PeptidesMergedCommonPageDownloadResult();
 		peptidesMergedCommonPageDownloadResult.peptidePsmAnnotationNameDescListsForEachSearch = peptidePsmAnnotationNameDescListsForEachSearch;
 		peptidesMergedCommonPageDownloadResult.mergedPeptideQueryJSONRoot = mergedPeptideQueryJSONRoot;
 		peptidesMergedCommonPageDownloadResult.webMergedReportedPeptideList = webMergedReportedPeptideList;
 		peptidesMergedCommonPageDownloadResult.searcherCutoffValuesRootLevel = searcherCutoffValuesRootLevel;
 		peptidesMergedCommonPageDownloadResult.anyReportedPeptideEntriesWereCombined = anyReportedPeptideEntriesWereCombined;
+		peptidesMergedCommonPageDownloadResult.anyResultsHaveIsotopeLabels = anyResultsHaveIsotopeLabels;
 		
 		return peptidesMergedCommonPageDownloadResult;
 	}

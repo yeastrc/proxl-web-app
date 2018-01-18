@@ -12,19 +12,20 @@ class Z_Internal_UnifiedRpMatchedPeptide_Holder {
 	
 	private UnifiedRepPepMatchedPeptideLookupDTO unifiedRpMatchedPeptideDTO;
 	private String formattedPeptideString;
-	private String peptideStringWithMods;
+	private String peptideStringWithModsAndIsotopeLabels;
 
 
 	private List<Z_Internal_UnifiedRpDynamicMod_Holder> z_Internal_UnifiedRpDynamicMod_Holder_List;
 
+	private List<Z_Internal_UnifiedRpIsotopeLabel_Holder> z_Internal_UnifiedRpIsotopeLabel_Holder_List;
 	
 
-	public String getPeptideStringWithMods() {
-		return peptideStringWithMods;
+	public String getPeptideStringWithModsAndIsotopeLabels() {
+		return peptideStringWithModsAndIsotopeLabels;
 	}
 
-	public void setPeptideStringWithMods(String peptideStringWithMods) {
-		this.peptideStringWithMods = peptideStringWithMods;
+	public void setPeptideStringWithModsAndIsotopeLabels(String peptideStringWithModsAndIsotopeLabels) {
+		this.peptideStringWithModsAndIsotopeLabels = peptideStringWithModsAndIsotopeLabels;
 	}
 	public String getFormattedPeptideString() {
 		return formattedPeptideString;
@@ -50,6 +51,15 @@ class Z_Internal_UnifiedRpMatchedPeptide_Holder {
 	public void setZ_Internal_UnifiedRpDynamicMod_Holder_List(
 			List<Z_Internal_UnifiedRpDynamicMod_Holder> z_Internal_UnifiedRpDynamicMod_Holder_List) {
 		this.z_Internal_UnifiedRpDynamicMod_Holder_List = z_Internal_UnifiedRpDynamicMod_Holder_List;
+	}
+
+	public List<Z_Internal_UnifiedRpIsotopeLabel_Holder> getZ_Internal_UnifiedRpIsotopeLabel_Holder_List() {
+		return z_Internal_UnifiedRpIsotopeLabel_Holder_List;
+	}
+
+	public void setZ_Internal_UnifiedRpIsotopeLabel_Holder_List(
+			List<Z_Internal_UnifiedRpIsotopeLabel_Holder> z_Internal_UnifiedRpIsotopeLabel_Holder_List) {
+		this.z_Internal_UnifiedRpIsotopeLabel_Holder_List = z_Internal_UnifiedRpIsotopeLabel_Holder_List;
 	}
 
 	

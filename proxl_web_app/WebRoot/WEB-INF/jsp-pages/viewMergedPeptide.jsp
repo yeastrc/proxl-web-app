@@ -417,6 +417,13 @@
 								style="width:5%;font-weight:bold;">
 							Mods
 						</th>
+						<c:if test="${ anyResultsHaveIsotopeLabels  }">
+							<th data-tooltip="Isotope Labels for first peptide" 
+									class="tool_tip_attached_jq" 
+									style="width:5%;font-weight:bold;">
+								Isotope Labels
+							</th>
+						</c:if>
 						<th data-tooltip="Sequenced of second matched peptide in crosslink" 
 								class="tool_tip_attached_jq" 
 								style="text-align:left;width:10%;font-weight:bold;">
@@ -432,6 +439,13 @@
 								style="width:5%;font-weight:bold;">
 							Mods
 						</th>
+						<c:if test="${ anyResultsHaveIsotopeLabels  }">
+							<th data-tooltip="Isotope Labels for second peptide" 
+									class="tool_tip_attached_jq" 
+									style="width:5%;font-weight:bold;">
+								Isotope Labels
+							</th>
+						</c:if>
 						<th data-tooltip="Proteins (and positions) matched by first peptide and position" 
 								class="tool_tip_attached_jq" 
 								style="text-align:left;width:5%;font-weight:bold;">
@@ -572,6 +586,13 @@
 									--%>
 									<bean:write name="peptideEntry" property="modsStringPeptide1" />
 								</td>
+
+								<c:if test="${ anyResultsHaveIsotopeLabels  }">
+									<td class="">
+										<bean:write name="peptideEntry" property="isotopeLabelsStringPeptide1" />
+									</td>
+								</c:if>
+								
 								<td>
 								  <c:if test="${ not empty peptideEntry.peptide2 }">
 									<bean:write name="peptideEntry" property="peptide2.sequence" />
@@ -585,6 +606,13 @@
 									--%>
 									<bean:write name="peptideEntry" property="modsStringPeptide2" />
 								</td>
+
+								<c:if test="${ anyResultsHaveIsotopeLabels  }">
+									<td class="">
+										<bean:write name="peptideEntry" property="isotopeLabelsStringPeptide2" />
+									</td>
+								</c:if>
+								
 								
 								<td>
 								  <c:if test="${ not empty peptideEntry.peptide1ProteinPositions }">

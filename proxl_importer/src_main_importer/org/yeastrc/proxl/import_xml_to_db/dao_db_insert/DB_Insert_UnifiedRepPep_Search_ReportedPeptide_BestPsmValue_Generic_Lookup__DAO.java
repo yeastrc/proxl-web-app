@@ -67,9 +67,9 @@ public class DB_Insert_UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic
 			"INSERT INTO unified_rp__search__rep_pept__best_psm_value_generic_lookup "
 			+ 	"( unified_reported_peptide_id, reported_peptide_id, search_id, "
 			+ 		" annotation_type_id, link_type, "
-			+  		" has_dynamic_modifictions, has_monolinks, "
+			+  		" has_dynamic_modifictions, has_monolinks, has_isotope_labels, "
 			+ 		" best_psm_value_for_ann_type_id, psm_id_for_best_value__non_fk ) "
-			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?  )";
+			+ 	" VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?  )";
 
 	
 	/**
@@ -142,6 +142,13 @@ public class DB_Insert_UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic
 
 			counter++;
 			if ( item.isHasMonolinks() ) {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+			} else {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+			}
+
+			counter++;
+			if ( item.isHasIsotopeLabels() ) {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
 			} else {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );

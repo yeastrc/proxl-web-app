@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.proteomics.peptide.peptide.Peptide;
+import org.yeastrc.proteomics.peptide.peptide.PeptideUtils;
 import org.yeastrc.xlink.dao.StaticModDAO;
+import org.yeastrc.xlink.dto.IsotopeLabelDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
@@ -20,6 +23,7 @@ import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
+import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideIsotopeLabelDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
@@ -34,14 +38,20 @@ import org.yeastrc.xlink.www.qc_data.psm_error_estimates_merged.objects.PPM_Erro
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates_merged.objects.PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results.PPM_Error_Chart_For_PSMPeptideCutoffsResultsForSearchId;
 import org.yeastrc.xlink.www.qc_data.utils.BoxPlotUtils;
 import org.yeastrc.xlink.www.qc_data.utils.BoxPlotUtils.GetBoxPlotValuesResult;
+import org.yeastrc.xlink.www.searcher.IsotopeLabelSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_IsotopeLabel;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
+import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId_ReqParams;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId_Result;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 import org.yeastrc.xlink.www.web_utils.PSMMassCalculator;
+import org.yeastrc.xlink.www.web_utils.PSMMassCalculatorParams;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -475,8 +485,16 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 			List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_1 = null;
 			List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_2 = null;
 
+			IsotopeLabelDTO isotopeLabel_1 = null;
+			IsotopeLabelDTO isotopeLabel_2 = null;
+			
+			
 			//  process srchRepPeptPeptideDTOList (Each peptide mapped to the reported peptide)
 			for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
+								
+				//  Get Isotope Label
+				IsotopeLabelDTO isotopeLabelDTO = IsotopeLabelSearcher.getInstance().getIsotopeLabelForSearchReportedPeptide_Peptide( srchRepPeptPeptideDTO );
+				
 				// get PeptideDTO, caching locally in peptideDTO_MappedById
 				PeptideDTO peptide = peptideDTO_MappedById.get( srchRepPeptPeptideDTO.getPeptideId() );
 				if ( peptide == null ) {
@@ -535,8 +553,14 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 
 				if ( peptide_1 == null ) {
 					peptide_1 = peptide;
+					isotopeLabel_1 = isotopeLabelDTO;
+					srchRepPeptPeptDynamicModDTOList_1 = srchRepPeptPeptDynamicModDTOList;
+
 				} else if ( peptide_2 == null ) {
 					peptide_2 = peptide;
+					isotopeLabel_2 = isotopeLabelDTO;
+					srchRepPeptPeptDynamicModDTOList_2 = srchRepPeptPeptDynamicModDTOList;
+
 				} else {
 					String msg = 
 							"peptide_1 and peptide_2 already have values"
@@ -546,45 +570,15 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 					log.error( msg );
 					throw new ProxlWebappDataException( msg );
 				}
-
-
-				if ( srchRepPeptPeptDynamicModDTOList_1 == null ) {
-					srchRepPeptPeptDynamicModDTOList_1 = srchRepPeptPeptDynamicModDTOList;
-				} else if ( srchRepPeptPeptDynamicModDTOList_2 == null ) {
-					srchRepPeptPeptDynamicModDTOList_1 = srchRepPeptPeptDynamicModDTOList;
-				} else {
-					String msg = 
-							"srchRepPeptPeptDynamicModDTOList_1 and srchRepPeptPeptDynamicModDTOList_2 already have values"
-									+ ", for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", for reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-					log.error( msg );
-					throw new ProxlWebappDataException( msg );
-				}
+				
 			}
 
 			//  To confirm that peptide sequences do not contain invalid amino acid characters
+			if( !PeptideUtils.isValidPeptideSequence( peptide_1.getSequence() ) || ( peptide_2 != null && !PeptideUtils.isValidPeptideSequence( peptide_2.getSequence() ) ) ) {
 
-			//  Calculate M/Z from sequence(s), ... 
-
-			try {
-				//					double mzCalculated = 
-				PSMMassCalculator.calculateMZForPSM( 
-						peptide_1, 
-						peptide_2, 
-						staticModDTOList, 
-						srchRepPeptPeptDynamicModDTOList_1, 
-						srchRepPeptPeptDynamicModDTOList_2, 
-						1, // artificial charge, 
-						null  // artificial linkerMassAsDouble
-						);
-			} catch ( Exception e ) {
-
+				// invalid peptide sequence(s), note it and skip this reported peptide
 				reportedPeptideIdsSkippedForErrorCalculatingMZ.add( reportedPeptideId );
-
-				//  SKIP to next Reported Peptide
-
-				continue;  // EARLY CONTINUE
+				continue;
 			}
 
 
@@ -614,18 +608,27 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 
 					double ppmError = 0;
 					try {
-						ppmError = 
-								PSMMassCalculator.calculatePPMEstimateForPSM(
-										scanPreMZasDouble, 
-										peptide_1, 
-										peptide_2, 
-										staticModDTOList, 
-										srchRepPeptPeptDynamicModDTOList_1, 
-										srchRepPeptPeptDynamicModDTOList_2, 
-										charge, 
-										linkerMassAsDouble);
-
+						
+						PSMMassCalculatorParams params = new PSMMassCalculatorParams();
+						params.setCharge( charge );
+						params.setLinkerMass( linkerMassAsDouble );
+						params.setPrecursorMZ( scanPreMZasDouble );
+						
+						params.setPeptide1( peptide_1 );
+						params.setPeptide2( peptide_2 );
+						
+						params.setLabel1( isotopeLabel_1 );
+						params.setLabel2( isotopeLabel_2 );
+						
+						params.setDynamicMods1( srchRepPeptPeptDynamicModDTOList_1 );
+						params.setDynamicMods2( srchRepPeptPeptDynamicModDTOList_2 );
+						
+						params.setStaticMods( staticModDTOList );
+						
+						ppmError = PSMMassCalculator.calculatePPMEstimateForPSM( params );
+						
 						ppmErrorListForLinkType.add( ppmError );
+						
 					} catch ( Exception e ) {
 						String msg = "PSMMassCalculator.calculatePPMEstimateForPSM(...) threw exception:"
 								+ "\n linkType: " + linkType
@@ -635,6 +638,8 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 								+ "\n reported peptide: " + webReportedPeptide.getReportedPeptide().getSequence()
 								+ "\n peptide_1: " + peptide_1 
 								+ "\n peptide_2: " + peptide_2
+								+ "\n label_1: " + isotopeLabel_1 
+								+ "\n label_2: " + isotopeLabel_2
 								+ "\n srchRepPeptPeptDynamicModDTOList_1: " + srchRepPeptPeptDynamicModDTOList_1
 								+ "\n srchRepPeptPeptDynamicModDTOList_2: " + srchRepPeptPeptDynamicModDTOList_2
 								+ "\n charge: " + charge
@@ -650,5 +655,6 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 
 		return ppmErrorListForLinkType_ByLinkType;
 	}
+	
 	
 }

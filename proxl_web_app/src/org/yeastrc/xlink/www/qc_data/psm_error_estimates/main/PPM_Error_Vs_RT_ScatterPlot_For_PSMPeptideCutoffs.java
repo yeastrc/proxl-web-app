@@ -14,7 +14,9 @@ import java.util.Set;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
+import org.yeastrc.proteomics.peptide.peptide.PeptideUtils;
 import org.yeastrc.xlink.dao.StaticModDAO;
+import org.yeastrc.xlink.dto.IsotopeLabelDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
@@ -38,6 +40,7 @@ import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_RT
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultRetentionTimeBucket;
+import org.yeastrc.xlink.www.searcher.IsotopeLabelSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
@@ -46,6 +49,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_search
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 import org.yeastrc.xlink.www.web_utils.PSMMassCalculator;
+import org.yeastrc.xlink.www.web_utils.PSMMassCalculatorParams;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -725,8 +729,15 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 				List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_1 = null;
 				List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_2 = null;
 				
+				IsotopeLabelDTO isotopeLabel_1 = null;
+				IsotopeLabelDTO isotopeLabel_2 = null;
+				
 				//  process srchRepPeptPeptideDTOList (Each peptide mapped to the reported peptide)
 				for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
+					
+					//  Get Isotope Label
+					IsotopeLabelDTO isotopeLabelDTO = IsotopeLabelSearcher.getInstance().getIsotopeLabelForSearchReportedPeptide_Peptide( srchRepPeptPeptideDTO );
+					
 					// get PeptideDTO, caching locally in peptideDTO_MappedById
 					PeptideDTO peptide = peptideDTO_MappedById.get( srchRepPeptPeptideDTO.getPeptideId() );
 					if ( peptide == null ) {
@@ -795,29 +806,20 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 
 					if ( peptide_1 == null ) {
 						peptide_1 = peptide;
+						isotopeLabel_1 = isotopeLabelDTO;
+						srchRepPeptPeptDynamicModDTOList_1 = srchRepPeptPeptDynamicModDTOList;
+
 					} else if ( peptide_2 == null ) {
 						peptide_2 = peptide;
+						isotopeLabel_2 = isotopeLabelDTO;
+						srchRepPeptPeptDynamicModDTOList_2 = srchRepPeptPeptDynamicModDTOList;
+
 					} else {
 						String msg = 
 								"peptide_1 and peptide_2 already have values"
-								+ ", for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-								+ ", for reportedPeptideId: " + reportedPeptideId
-								+ ", searchId: " + searchId;
-						log.error( msg );
-						throw new ProxlWebappDataException( msg );
-					}
-
-
-					if ( srchRepPeptPeptDynamicModDTOList_1 == null ) {
-						srchRepPeptPeptDynamicModDTOList_1 = srchRepPeptPeptDynamicModDTOList;
-					} else if ( srchRepPeptPeptDynamicModDTOList_2 == null ) {
-						srchRepPeptPeptDynamicModDTOList_1 = srchRepPeptPeptDynamicModDTOList;
-					} else {
-						String msg = 
-								"srchRepPeptPeptDynamicModDTOList_1 and srchRepPeptPeptDynamicModDTOList_2 already have values"
-								+ ", for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-								+ ", for reportedPeptideId: " + reportedPeptideId
-								+ ", searchId: " + searchId;
+										+ ", for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
+										+ ", for reportedPeptideId: " + reportedPeptideId
+										+ ", searchId: " + searchId;
 						log.error( msg );
 						throw new ProxlWebappDataException( msg );
 					}
@@ -826,45 +828,11 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 
 				
 				//  To confirm that peptide sequences do not contain invalid amino acid characters
-				
-				//  Calculate M/Z from sequence(s), ... 
-				
-				
-				try {
-//					double mzCalculated = 
-							PSMMassCalculator.calculateMZForPSM( 
-									peptide_1, 
-									peptide_2, 
-									staticModDTOList, 
-									srchRepPeptPeptDynamicModDTOList_1, 
-									srchRepPeptPeptDynamicModDTOList_2, 
-									1, // artificial charge, 
-									null  // artificial linkerMassAsDouble
-									);
-				} catch ( Exception e ) {
-					
+				if( !PeptideUtils.isValidPeptideSequence( peptide_1.getSequence() ) || ( peptide_2 != null && !PeptideUtils.isValidPeptideSequence( peptide_2.getSequence() ) ) ) {
+
+					// invalid peptide sequence(s), note it and skip this reported peptide
 					reportedPeptideIdsSkippedForErrorCalculatingMZ.add( reportedPeptideId );
-					
-//					String msg = "'Precalc' of mass at reported peptide level failed, SKIPPING processing scans for this Reported Peptide.  "
-//							+ "PSMMassCalculator.calculateMZForPSM(...) threw exception."
-//							+ "\n linkType: " + linkType
-//							+ "\n search id: " + searchId
-//							+ "\n reported peptide id: " + reportedPeptideId
-//							+ "\n reported peptide: " + webReportedPeptide.getReportedPeptide().getSequence()
-//							+ "\n peptide_1: " + peptide_1 
-//							+ "\n peptide_2: " + peptide_2
-//							+ "\n srchRepPeptPeptDynamicModDTOList_1: " + srchRepPeptPeptDynamicModDTOList_1
-//							+ "\n srchRepPeptPeptDynamicModDTOList_2: " + srchRepPeptPeptDynamicModDTOList_2
-//							+ "\n charge: Fake charge of '1' passed in"
-//							+ "\n linkerMassAsDouble: Fake charge of null passed in"
-//							+ "\n staticModDTOList: " + staticModDTOList
-//							+ "\n Exception message from PSMMassCalculator.calculateMZForPSM(...): " + e.toString()
-//							+ "\n Exception class from PSMMassCalculator.calculateMZForPSM(...): " + e.getClass().getCanonicalName();
-//					log.warn( msg );
-					
-					//  SKIP to next Reported Peptide
-					
-					continue;  // EARLY CONTINUE
+					continue;
 				}
 
 				
@@ -899,37 +867,23 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 						double ppmError = 0;
 						
 						try {
-							ppmError = 
-									PSMMassCalculator.calculatePPMEstimateForPSM(
-											scanPreMZasDouble, 
-											peptide_1, 
-											peptide_2, 
-											staticModDTOList, 
-											srchRepPeptPeptDynamicModDTOList_1, 
-											srchRepPeptPeptDynamicModDTOList_2, 
-											charge, 
-											linkerMassAsDouble);
-
-							/*
-							if( Math.abs( ppmError ) > 400 ) {
-								String msg = "Got ppm error over 400:"
-										+ "\n linkType: " + linkType
-										+ "\n scanPreMZasDouble: " + scanPreMZasDouble
-										+ "\n ppmError: " + ppmError
-										+ "\n search id: " + searchId
-										+ "\n reported peptide id: " + reportedPeptideId
-										+ "\n reported peptide: " + webReportedPeptide.getReportedPeptide().getSequence()
-										+ "\n peptide_1: " + peptide_1 
-										+ "\n peptide_2: " + peptide_2
-										+ "\n srchRepPeptPeptDynamicModDTOList_1: " + srchRepPeptPeptDynamicModDTOList_1
-										+ "\n srchRepPeptPeptDynamicModDTOList_2: " + srchRepPeptPeptDynamicModDTOList_2
-										+ "\n charge: " + charge
-										+ "\n linkerMassAsDouble: " + linkerMassAsDouble
-										+ "\n staticModDTOList: " + staticModDTOList;
-								
-								System.out.println( msg );
-							}
-							*/
+							PSMMassCalculatorParams params = new PSMMassCalculatorParams();
+							params.setCharge( charge );
+							params.setLinkerMass( linkerMassAsDouble );
+							params.setPrecursorMZ( scanPreMZasDouble );
+							
+							params.setPeptide1( peptide_1 );
+							params.setPeptide2( peptide_2 );
+							
+							params.setLabel1( isotopeLabel_1 );
+							params.setLabel2( isotopeLabel_2 );
+							
+							params.setDynamicMods1( srchRepPeptPeptDynamicModDTOList_1 );
+							params.setDynamicMods2( srchRepPeptPeptDynamicModDTOList_2 );
+							
+							params.setStaticMods( staticModDTOList );
+							
+							ppmError = PSMMassCalculator.calculatePPMEstimateForPSM( params );
 							
 							PPMErrorRetentionTimePair ppmErrorRetentionTimePair = new PPMErrorRetentionTimePair();
 							ppmErrorRetentionTimePair.ppmError = ppmError;

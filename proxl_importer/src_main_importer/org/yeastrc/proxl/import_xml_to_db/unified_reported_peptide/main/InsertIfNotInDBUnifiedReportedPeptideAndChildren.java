@@ -9,8 +9,10 @@ import org.yeastrc.xlink.dao.UnifiedReportedPeptideLookupDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepDynamicModLookupDTO;
+import org.yeastrc.xlink.dto.UnifiedRepPepIsotopeLabelLookupDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepMatchedPeptideLookupDTO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPepDynamicModLookupDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPepIsotopeLabelLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPepMatchedPeptideLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedReportedPeptideLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
@@ -41,6 +43,7 @@ public class InsertIfNotInDBUnifiedReportedPeptideAndChildren {
 		UnifiedReportedPeptideLookupDAO unifiedReportedPeptideDAO = UnifiedReportedPeptideLookupDAO.getInstance();
 		DB_Insert_UnifiedRepPepMatchedPeptideLookupDAO db_Insert_UnifiedRepPepMatchedPeptideLookupDAO = DB_Insert_UnifiedRepPepMatchedPeptideLookupDAO.getInstance();
 		DB_Insert_UnifiedRepPepDynamicModLookupDAO db_Insert_UnifiedRepPepDynamicModLookupDAO = DB_Insert_UnifiedRepPepDynamicModLookupDAO.getInstance();
+		DB_Insert_UnifiedRepPepIsotopeLabelLookupDAO db_Insert_UnifiedRepPepIsotopeLabelLookupDAO = DB_Insert_UnifiedRepPepIsotopeLabelLookupDAO.getInstance();
 		DB_Insert_UnifiedReportedPeptideLookupDAO db_Insert_UnifiedReportedPeptideLookupDAO = DB_Insert_UnifiedReportedPeptideLookupDAO.getInstance();
 		Connection dbConnection = null;
 		UnifiedReportedPeptideLookupDTO unifiedReportedPeptideDTO = z_Internal_UnifiedReportedPeptide_Holder.getUnifiedReportedPeptideDTO();
@@ -74,9 +77,11 @@ public class InsertIfNotInDBUnifiedReportedPeptideAndChildren {
 			List<Z_Internal_UnifiedRpMatchedPeptide_Holder> unifiedRpMatchedPeptide_HolderList
 				= z_Internal_UnifiedReportedPeptide_Holder.getZ_Internal_UnifiedRpMatchedPeptide_HolderList();
 			for ( Z_Internal_UnifiedRpMatchedPeptide_Holder unifiedRpMatchedPeptide_Holder : unifiedRpMatchedPeptide_HolderList ) {
+				
 				UnifiedRepPepMatchedPeptideLookupDTO unifiedRpMatchedPeptideDTO = unifiedRpMatchedPeptide_Holder.getUnifiedRpMatchedPeptideDTO();
 				unifiedRpMatchedPeptideDTO.setUnifiedReportedPeptideId( unifiedReportedPeptideDTO.getId() );
 				db_Insert_UnifiedRepPepMatchedPeptideLookupDAO.save( unifiedRpMatchedPeptideDTO, dbConnection );
+				
 				List<Z_Internal_UnifiedRpDynamicMod_Holder> unifiedRpDynamicMod_Holder_List
 					= unifiedRpMatchedPeptide_Holder.getZ_Internal_UnifiedRpDynamicMod_Holder_List();
 				if ( unifiedRpDynamicMod_Holder_List != null ) {
@@ -86,6 +91,17 @@ public class InsertIfNotInDBUnifiedReportedPeptideAndChildren {
 						db_Insert_UnifiedRepPepDynamicModLookupDAO.save( unifiedRpDynamicModDTO, dbConnection );
 					}
 				}
+				
+				List<Z_Internal_UnifiedRpIsotopeLabel_Holder> z_Internal_UnifiedRpIsotopeLabel_Holder_List =
+						unifiedRpMatchedPeptide_Holder.getZ_Internal_UnifiedRpIsotopeLabel_Holder_List();
+				if ( z_Internal_UnifiedRpIsotopeLabel_Holder_List != null ) {
+					for ( Z_Internal_UnifiedRpIsotopeLabel_Holder unifiedRpIsotopeLabel_Holder : z_Internal_UnifiedRpIsotopeLabel_Holder_List ) {
+						UnifiedRepPepIsotopeLabelLookupDTO unifiedRpIsotopeLabelDTO = unifiedRpIsotopeLabel_Holder.getUnifiedRepPepIsotopeLabelLookupDTO();
+						unifiedRpIsotopeLabelDTO.setRpMatchedPeptideId( unifiedRpMatchedPeptideDTO.getId() );
+						db_Insert_UnifiedRepPepIsotopeLabelLookupDAO.save( unifiedRpIsotopeLabelDTO, dbConnection );
+					}
+				}
+				
 			}
 			dbConnection.commit();
 		} catch ( Exception e ) {
@@ -130,7 +146,8 @@ public class InsertIfNotInDBUnifiedReportedPeptideAndChildren {
 	}
 		
 	private static String lockTablesForWriteSQL 
-		= "LOCK TABLES unified_reported_peptide_lookup WRITE, unified_rep_pep_matched_peptide_lookup WRITE, unified_rep_pep_dynamic_mod_lookup WRITE";
+		= "LOCK TABLES unified_reported_peptide_lookup WRITE, unified_rep_pep_matched_peptide_lookup WRITE, "
+				+ " unified_rep_pep_dynamic_mod_lookup WRITE, unified_rep_pep_isotope_label_lookup WRITE";
 	/**
 	 * @param dbConnection
 	 * @throws Exception

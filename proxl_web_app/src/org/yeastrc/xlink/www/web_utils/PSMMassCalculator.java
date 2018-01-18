@@ -5,24 +5,20 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.yeastrc.proteomics.mass.MassUtils;
 import org.yeastrc.proteomics.peptide.atom.AtomUtils;
+import org.yeastrc.proteomics.peptide.isotope_label.LabelFactory;
 import org.yeastrc.proteomics.peptide.peptide.Peptide;
-import org.yeastrc.xlink.dao.StaticModDAO;
-import org.yeastrc.xlink.dto.PeptideDTO;
-import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.xlink.dto.StaticModDTO;
-import org.yeastrc.xlink.utils.XLinkUtils;
-import org.yeastrc.xlink.www.dao.PeptideDAO;
-import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
-import org.yeastrc.xlink.www.searcher.SearchReportedPeptideLinkTypeSearcher;
-import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
-import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
-import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
 
 public class PSMMassCalculator {
 
-	
+	/**
+	 * Get what the m/z would be for applying the supplied charge to the given neutral mass
+	 * @param mass
+	 * @param charge
+	 * @return
+	 * @throws Exception
+	 */
 	private static double getMZ( double mass, int charge ) throws Exception {
 		
 		// add in the mass of the protons (charge == number of proteins)
@@ -35,42 +31,43 @@ public class PSMMassCalculator {
 		
 	}
 	
-	private static double getPPMError( double preMZ, double calcMZ ) {
-		return ( preMZ - calcMZ ) / calcMZ * 1000000;
+	/**
+	 * Calculate the error in PPM for the supplied observed m/z given the supplied calculated m/z
+	 * @param obsMZ Observed m/z
+	 * @param calcMZ Calculated m/z
+	 * @return
+	 */
+	private static double getPPMError( double obsMZ, double calcMZ ) {
+		return ( obsMZ - calcMZ ) / calcMZ * 1000000;
 	}
 	
 	
-	public static double calculatePPMEstimateForPSM(
-			Double preMZ,
-			PeptideDTO peptide1,
-			PeptideDTO peptide2,
-			List<StaticModDTO> staticMods,
-			List<SrchRepPeptPeptDynamicModDTO> dynamicMods1,
-			List<SrchRepPeptPeptDynamicModDTO> dynamicMods2,
-			Integer charge,
-			Double linkerMass ) throws Exception {
+	public static double calculatePPMEstimateForPSM( PSMMassCalculatorParams params ) throws Exception {
 		
-		if( charge == null )
+		if( params.getCharge() == null )
 			throw new Exception( "charge cannot be null." );
 		
-		if( preMZ == null )
-			throw new Exception( "preMZ cannot be null." );
+		if( params.getPrecursorMZ() == null )
+			throw new Exception( "precursorMZ cannot be null." );
 			
-		if( peptide1 == null )
+		if( params.getPeptide1() == null )
 			throw new Exception( "peptide1 cannot be null." );
 		
 		
-		double mass = calculateNeutralMassForPSM( peptide1, peptide2, staticMods, dynamicMods1, dynamicMods2, linkerMass );
-		double calcMZ = getMZ( mass, charge );
+		double mass = calculateTheoreticalNeutralMassForPSM( params );
+
+		double precusorMZ = params.getPrecursorMZ();
+		double calcMZ = getMZ( mass, params.getCharge() );
+		int charge = params.getCharge();
 		
 		double neutronMass = AtomUtils.getAtom( "n" ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
 		
-		if( calcMZ > preMZ ) {
+		if( calcMZ > precusorMZ ) {
 			for( int i = 1; i < 21; i++ ) {
 				double tmass = mass - i * neutronMass;
 				double tmz = getMZ( tmass, charge );
 					
-				if( Math.abs( preMZ - tmz ) < Math.abs( preMZ - calcMZ ) ) {
+				if( Math.abs( precusorMZ - tmz ) < Math.abs( precusorMZ - calcMZ ) ) {
 					
 					/*
 					System.out.println( "Found better calcMZ:" );
@@ -88,7 +85,7 @@ public class PSMMassCalculator {
 				double tmass = mass + i * neutronMass;
 				double tmz = getMZ( tmass, charge );
 					
-				if( Math.abs( preMZ - tmz ) < Math.abs( preMZ - calcMZ ) ) {
+				if( Math.abs( precusorMZ - tmz ) < Math.abs( precusorMZ - calcMZ ) ) {
 					
 					/*
 					System.out.println( "Found better calcMZ:" );
@@ -103,191 +100,65 @@ public class PSMMassCalculator {
 			}
 		}
 
-		return getPPMError( preMZ, calcMZ );	
+		return getPPMError( precusorMZ, calcMZ );	
 	}
-	
-	
-	
-	public static double calculateMZForPSM( PeptideDTO peptide1,
-			PeptideDTO peptide2,
-			List<StaticModDTO> staticMods,
-			List<SrchRepPeptPeptDynamicModDTO> dynamicMods1,
-			List<SrchRepPeptPeptDynamicModDTO> dynamicMods2,
-			Integer charge,
-			Double linkerMass ) throws Exception {
-		
-
-		if( charge == null )
-			throw new Exception( "charge cannot be null." );
-		
-		double mass = calculateNeutralMassForPSM( peptide1, peptide2, staticMods, dynamicMods1, dynamicMods2, linkerMass );
-		
-		// add in the mass of the protons (charge == number of proteins)
-		mass += charge * AtomUtils.getAtom( "p" ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
-
-		// divide by the charge
-		mass /= charge;
-
-		return mass;	
-	}
-	
-	
-	public static double calculateNeutralMassForPSM( PeptideDTO peptide1,
-											PeptideDTO peptide2,
-											List<StaticModDTO> staticMods,
-											List<SrchRepPeptPeptDynamicModDTO> dynamicMods1,
-											List<SrchRepPeptPeptDynamicModDTO> dynamicMods2,
-											Double linkerMass ) throws Exception {
-		
-		double mass = 0.0;
-		
-		if( peptide1 == null )
-			throw new Exception( "peptide1 cannot be null" );
-		
-		Peptide peptide = new Peptide( peptide1.getSequence() );
-		mass += getTotalMass( peptide, staticMods, dynamicMods1 );
-		
-		if( peptide2 != null ) {
-			
-			peptide = new Peptide( peptide2.getSequence() );
-			mass += getTotalMass( peptide, staticMods, dynamicMods2 );
-		}
-		
-		if( linkerMass != null ) {
-			mass += linkerMass;
-		}
-		
-		return mass;
-	}
-	
-	public static double calculateMZForPSM( PsmDTO psm ) throws Exception {
-		
-		double mass = calculateNeutralMassForPSM( psm );
-		
-		// add in the mass of the protons (charge == number of proteins)
-		mass += (double)psm.getCharge() * AtomUtils.getAtom( "p" ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
-
-		// divide by the charge
-		mass /= (double)psm.getCharge();
-
-		return mass;
-	}
-	
-	
-	public static double calculateNeutralMassForPSM( PsmDTO psm ) throws Exception {
-		
-		// our static mods
-		List<StaticModDTO> staticMods = StaticModDAO.getInstance().getStaticModDTOForSearchId( psm.getSearchId() );
-
-		// our search reported peptide peptide(s)
-		SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams = new SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams();
-		srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setSearchId( psm.getSearchId() );
-		srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setReportedPeptideId( psm.getReportedPeptideId() );
-		SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result =
-				Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.getInstance()
-				.getSrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result( srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams );
-		List<SrchRepPeptPeptideDTO> searchReportedPeptidePeptides = srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result.getSrchRepPeptPeptideDTOList();
-
-		int linkType = SearchReportedPeptideLinkTypeSearcher.getInstance().getSearchReportedPeptideLinkTypeNumber( psm.getSearchId(), psm.getReportedPeptideId() );
-		
-		if( linkType == XLinkUtils.TYPE_UNLINKED ) {
-			
-			SrchRepPeptPeptideDTO searchReportedPeptidePeptide = searchReportedPeptidePeptides.get( 0 );
-			
-			// our dynamic mods for this peptide
-			List<SrchRepPeptPeptDynamicModDTO> dynamicMods = SrchRepPeptPeptDynamicModSearcher.getInstance().getSrchRepPeptPeptDynamicModForSrchRepPeptPeptideId( searchReportedPeptidePeptide.getId() );			
-			
-			PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( searchReportedPeptidePeptide.getPeptideId() );
-			
-			// get the mass of the base peptide
-			Peptide peptide = new Peptide( peptideDTO.getSequence() );
-			double mass = getTotalMass( peptide, staticMods, dynamicMods );
-			
-			return mass;	
-		}
-		
-		
-		if( linkType == XLinkUtils.TYPE_DIMER ) {
-			
-			double mass = 0.0;
-			
-			for( SrchRepPeptPeptideDTO searchReportedPeptidePeptide : searchReportedPeptidePeptides ) {
-				
-				// our dynamic mods for this peptide
-				List<SrchRepPeptPeptDynamicModDTO> dynamicMods = SrchRepPeptPeptDynamicModSearcher.getInstance().getSrchRepPeptPeptDynamicModForSrchRepPeptPeptideId( searchReportedPeptidePeptide.getId() );			
-				
-				PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( searchReportedPeptidePeptide.getPeptideId() );
-				
-				// get the mass of the base peptide
-				Peptide peptide = new Peptide( peptideDTO.getSequence() );
-				mass += getTotalMass( peptide, staticMods, dynamicMods );				
-			}
-			
-			return mass;
-		}
-		
-		
-		if( linkType == XLinkUtils.TYPE_LOOPLINK ) {
-			
-			SrchRepPeptPeptideDTO searchReportedPeptidePeptide = searchReportedPeptidePeptides.get( 0 );
-			
-			// our dynamic mods for this peptide
-			List<SrchRepPeptPeptDynamicModDTO> dynamicMods = SrchRepPeptPeptDynamicModSearcher.getInstance().getSrchRepPeptPeptDynamicModForSrchRepPeptPeptideId( searchReportedPeptidePeptide.getId() );			
-			
-			PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( searchReportedPeptidePeptide.getPeptideId() );
-			
-			// get the mass of the base peptide
-			Peptide peptide = new Peptide( peptideDTO.getSequence() );
-			double mass = getTotalMass( peptide, staticMods, dynamicMods );
-			
-			// add in mass of cross-linker
-			mass += psm.getLinkerMass().doubleValue();			
-			
-			return mass;
-		}
-		
-		
-		if( linkType == XLinkUtils.TYPE_CROSSLINK ) {
-			
-			double mass = 0.0;
-			
-			for( SrchRepPeptPeptideDTO searchReportedPeptidePeptide : searchReportedPeptidePeptides ) {
-				
-				// our dynamic mods for this peptide
-				List<SrchRepPeptPeptDynamicModDTO> dynamicMods = SrchRepPeptPeptDynamicModSearcher.getInstance().getSrchRepPeptPeptDynamicModForSrchRepPeptPeptideId( searchReportedPeptidePeptide.getId() );			
-				
-				PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( searchReportedPeptidePeptide.getPeptideId() );
-				
-				// get the mass of the base peptide
-				Peptide peptide = new Peptide( peptideDTO.getSequence() );
-				mass += getTotalMass( peptide, staticMods, dynamicMods );				
-			}
-			
-			// add in mass of cross-linker
-			mass += psm.getLinkerMass().doubleValue();
-			
-			return mass;
-			
-		}
-		
-		
-		// should not get here.
-		throw new Exception( "Unknown PSM type." );
-		
-		
-	}
-	
 	
 	/**
-	 * Get the mass of the peptide, given the static mods and dynamic mods.
+	 * Calculate the theoretical neutral mass for the peptide ion associated with a particular PSM. For cross-links
+	 * this will be both peptides linked together with a cross-linker.
 	 * 
-	 * @param peptide
-	 * @param staticMods
-	 * @param dynamicMods
+	 * @param params
 	 * @return
 	 * @throws Exception
 	 */
-	private static double getTotalMass( Peptide peptide, List<StaticModDTO> staticMods, List<SrchRepPeptPeptDynamicModDTO> dynamicMods ) throws Exception {
+	public static double calculateTheoreticalNeutralMassForPSM( PSMMassCalculatorParams params ) throws Exception {
+		
+		double mass = 0.0;
+		
+		if( params.getPeptide1() == null )
+			throw new Exception( "peptide1 cannot be null" );
+		
+		Peptide peptide = new Peptide( params.getPeptide1().getSequence() );
+		
+		if( params.getLabel1() != null ) {
+		
+			//System.out.println( peptide.getSequence() );
+			//System.out.println( "\t" + peptide.getMass( MassUtils.MASS_TYPE_MONOISOTOPIC ) + " (pre label)");		
+		
+			peptide.setLabel( LabelFactory.getInstance().getLabel( params.getLabel1().getName() ) );
+			//System.out.println( "\t" + peptide.getMass( MassUtils.MASS_TYPE_MONOISOTOPIC ) + " (post label)" );
+
+		}
+		
+		mass += getTotalMassWithMods( peptide, params.getStaticMods(), params.getDynamicMods1() );
+		
+		if( params.getPeptide2() != null ) {
+			
+			peptide = new Peptide( params.getPeptide2().getSequence() );
+			
+			if( params.getLabel2() != null )
+				peptide.setLabel( LabelFactory.getInstance().getLabel( params.getLabel2().getName() ) );
+			
+			mass += getTotalMassWithMods( peptide, params.getStaticMods(), params.getDynamicMods2() );
+		}
+		
+		if( params.getLinkerMass() != null ) {
+			mass += params.getLinkerMass();
+		}
+		
+		return mass;
+	}
+	
+	/**
+	 * Get the mass of the peptide, including the static mods and dynamic mods.
+	 * 
+	 * @param peptide The YRC proteomics utils peptide, which should have the label set (if any)
+	 * @param staticMods The static mods in the experiment
+	 * @param dynamicMods The dynamic mods found for this peptide for this PSM
+	 * @return
+	 * @throws Exception
+	 */
+	private static double getTotalMassWithMods( Peptide peptide, List<StaticModDTO> staticMods, List<SrchRepPeptPeptDynamicModDTO> dynamicMods ) throws Exception {
 		double mass = peptide.getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
 		
 		// add in the dynamic mods
