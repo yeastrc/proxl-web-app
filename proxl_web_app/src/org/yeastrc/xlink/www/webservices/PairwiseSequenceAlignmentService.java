@@ -30,9 +30,12 @@ import org.biojava.nbio.structure.io.PDBFileReader;
 import org.yeastrc.xlink.www.dao.PDBAlignmentDAO;
 import org.yeastrc.xlink.www.dao.PDBFileDAO;
 import org.yeastrc.xlink.www.dao.ProteinSequenceDAO;
+import org.yeastrc.xlink.www.dao.ProteinSequenceVersionDAO;
 import org.yeastrc.xlink.www.dto.PDBAlignmentDTO;
 import org.yeastrc.xlink.www.dto.PDBFileDTO;
 import org.yeastrc.xlink.www.dto.ProteinSequenceDTO;
+import org.yeastrc.xlink.www.dto.ProteinSequenceVersionDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.constants.PDBFileConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -114,9 +117,15 @@ public class PairwiseSequenceAlignmentService {
 			Structure structure = pdbReader.getStructure( new ByteArrayInputStream( pdbFile.getContent().getBytes() ) );
 			String pdbSequence = structure.getChainByPDB( chain ).getAtomSequence();
 			// get sequence for protein protein
+			ProteinSequenceVersionDTO proteinSequenceVersionDTO = ProteinSequenceVersionDAO.getInstance().getFromId( proteinId );
+			if ( proteinSequenceVersionDTO == null ) {
+				String msg = "No proteinSequenceVersionDTO found for proteinId: " + proteinId;
+				log.error( msg );
+				throw new ProxlWebappDataException(msg);
+			}
 			String proteinSequence = null;
 			ProteinSequenceDTO proteinSequenceDTO = 
-					ProteinSequenceDAO.getInstance().getProteinSequenceDTOFromDatabase( proteinId );
+					ProteinSequenceDAO.getInstance().getProteinSequenceDTOFromDatabase( proteinSequenceVersionDTO.getproteinSequenceId() );
 			if ( proteinSequenceDTO != null ) {
 				proteinSequence = proteinSequenceDTO.getSequence();
 			}

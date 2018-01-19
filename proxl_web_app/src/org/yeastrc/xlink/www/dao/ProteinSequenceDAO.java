@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.ProteinSequenceDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 
 /**
  * 
@@ -34,7 +35,7 @@ public class ProteinSequenceDAO {
 			pstmt.setInt( 1, id );
 			rs = pstmt.executeQuery();
 			if( !rs.next() )
-				throw new Exception( "could not find protein_sequence with id " + id );
+				throw new ProxlWebappDataException( "could not find protein_sequence with id " + id );
 			protein_sequence.setId( id );
 			protein_sequence.setSequence( rs.getString( 1 ) );
 		} catch ( Exception e ) {
