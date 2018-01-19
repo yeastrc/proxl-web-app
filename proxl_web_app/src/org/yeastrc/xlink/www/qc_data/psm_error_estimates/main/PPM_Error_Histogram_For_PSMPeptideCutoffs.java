@@ -4,21 +4,14 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.yeastrc.proteomics.peptide.peptide.PeptideUtils;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.enums.Get_ScanDataFromScanNumbers_IncludeParentScans;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.enums.Get_ScanData_ExcludeReturnScanPeakData;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.SingleScan_SubResponse;
-import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.dao.StaticModDAO;
 import org.yeastrc.xlink.dto.IsotopeLabelDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
@@ -50,7 +43,6 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searche
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
-import org.yeastrc.xlink.www.spectral_storage_service_interface.Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 import org.yeastrc.xlink.www.web_utils.PSMMassCalculator;
 import org.yeastrc.xlink.www.web_utils.PSMMassCalculatorParams;
@@ -800,8 +792,8 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 						PsmWebDisplaySearcher.getInstance().getPsmsWebDisplay( searchId, reportedPeptideId, searcherCutoffValuesSearchLevel );
 
 				//  Returns null if insufficient info to get the precursor mass (scan file id or scan number is null, ...)
-				Map<Integer,Map<Integer,SingleScan_SubResponse>> scanFromSpectalStorage_Key_ScanNumber_Key_ScanFileId = 
-						getPrecursorMassFromSpectralStorageService( psmWebDisplayList );
+//				Map<Integer,Map<Integer,SingleScan_SubResponse>> scanFromSpectalStorage_Key_ScanNumber_Key_ScanFileId = 
+//						getPrecursorMassFromSpectralStorageService( psmWebDisplayList );
 				
 				
 				for ( PsmWebDisplayWebServiceResult psmWebDisplayWebServiceResult : psmWebDisplayList ) {
@@ -811,32 +803,36 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 					double scanPreMZasDouble = 0;
 					boolean scanPreMZasDoubleSet = false;
 					
-					if ( scanFromSpectalStorage_Key_ScanNumber_Key_ScanFileId == null ) {
-						
-						log.error( "scanFromSpectalStorage_Key_ScanNumber_Key_ScanFileId is null. " );
-
-					} else {
-						
-						Map<Integer,SingleScan_SubResponse> scanFromSpectalStorage_Key_ScanNumber =
-								scanFromSpectalStorage_Key_ScanNumber_Key_ScanFileId.get( psmWebDisplayWebServiceResult.getScanFileId() );
-						
-						if ( scanFromSpectalStorage_Key_ScanNumber == null ) {
-							log.error( "No entry in scanFromSpectalStorage_Key_ScanNumber_Key_ScanFileId for scan file id: " 
-									+ psmWebDisplayWebServiceResult.getScanFileId() );
-						} else {
-							SingleScan_SubResponse singleScan_SubResponse = 
-									scanFromSpectalStorage_Key_ScanNumber.get( psmWebDisplayWebServiceResult.getScanNumber() );
-							if ( singleScan_SubResponse == null ) {
-								log.error( "No entry in scanFromSpectalStorage_Key_ScanNumber for scan number: "
-										+ psmWebDisplayWebServiceResult.getScanNumber()
-										+ ", scan file id: " 
-										+ psmWebDisplayWebServiceResult.getScanFileId() );
-							} else {
-								scanPreMZasDoubleSet = true;
-								scanPreMZasDouble = singleScan_SubResponse.getPrecursor_M_Over_Z();
-							}
-						}
-					}
+					//  Use Scan Precursor M/Z from proxl.scan table instead of from Spectral Storage since is too slow as currently implemented in Proxl (need to batch more) 
+					
+					//  Comment out call to Spectral Storage
+					
+//					if ( scanFromSpectalStorage_Key_ScanNumber_Key_ScanFileId == null ) {
+//						
+//						log.error( "scanFromSpectalStorage_Key_ScanNumber_Key_ScanFileId is null. " );
+//
+//					} else {
+//						
+//						Map<Integer,SingleScan_SubResponse> scanFromSpectalStorage_Key_ScanNumber =
+//								scanFromSpectalStorage_Key_ScanNumber_Key_ScanFileId.get( psmWebDisplayWebServiceResult.getScanFileId() );
+//						
+//						if ( scanFromSpectalStorage_Key_ScanNumber == null ) {
+//							log.error( "No entry in scanFromSpectalStorage_Key_ScanNumber_Key_ScanFileId for scan file id: " 
+//									+ psmWebDisplayWebServiceResult.getScanFileId() );
+//						} else {
+//							SingleScan_SubResponse singleScan_SubResponse = 
+//									scanFromSpectalStorage_Key_ScanNumber.get( psmWebDisplayWebServiceResult.getScanNumber() );
+//							if ( singleScan_SubResponse == null ) {
+//								log.error( "No entry in scanFromSpectalStorage_Key_ScanNumber for scan number: "
+//										+ psmWebDisplayWebServiceResult.getScanNumber()
+//										+ ", scan file id: " 
+//										+ psmWebDisplayWebServiceResult.getScanFileId() );
+//							} else {
+//								scanPreMZasDoubleSet = true;
+//								scanPreMZasDouble = singleScan_SubResponse.getPrecursor_M_Over_Z();
+//							}
+//						}
+//					}
 					
 					BigDecimal scanPreMZ = psmWebDisplayWebServiceResult.getPreMZ(); // from scan table
 					
@@ -916,119 +912,119 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 		return ppmErrorListForLinkType_ByLinkType;
 	}
 	
-	/**
-	 * @param psmWebDisplayList
-	 * @return null if cannot get scan data from Spectral Storage Service for all entries (scan file id or scan number is null)
-	 * @throws Exception 
-	 */
-	private Map<Integer,Map<Integer,SingleScan_SubResponse>> getPrecursorMassFromSpectralStorageService( List<PsmWebDisplayWebServiceResult> psmWebDisplayList ) throws Exception {
-
-		//  Get scan precursor mass (Scan Pre MZ) from Spectral Storage Service
-		
-		Map<Integer,Map<Integer,SingleScan_SubResponse>> scanFromSpectralStorage_Key_ScanNumber_Key_ScanFileId = new HashMap<>();
-		
-		//  Get scan numbers per scan file id
-		
-		Map<Integer,Set<Integer>> scanNumbersKeyedOnScanFileId = new HashMap<>();
-		int prevScanFileId = -1;
-		Set<Integer> scanNumbersSet_Current = null; // optimization
-
-		for ( PsmWebDisplayWebServiceResult psmWebDisplayWebServiceResult : psmWebDisplayList ) {
-
-			if ( psmWebDisplayWebServiceResult.getScanFileId() == null 
-					|| psmWebDisplayWebServiceResult.getScanNumber() == null ) {
-				
-				return null;  // Early exit since cannot get scan data from Spectral Storage Service for all entries
-			}
-			
-			if ( scanNumbersSet_Current == null ) {  // First entry
-				scanNumbersSet_Current = new HashSet<>();
-				scanNumbersKeyedOnScanFileId.put( psmWebDisplayWebServiceResult.getScanFileId(), scanNumbersSet_Current );
-				prevScanFileId = psmWebDisplayWebServiceResult.getScanFileId();
-			} else if ( prevScanFileId != psmWebDisplayWebServiceResult.getScanFileId() ) {
-				//  Scan file id diff from prev record in list
-				scanNumbersSet_Current = scanNumbersKeyedOnScanFileId.get( psmWebDisplayWebServiceResult.getScanFileId() );
-				if ( scanNumbersSet_Current == null ) {
-					scanNumbersSet_Current = new HashSet<>();
-					scanNumbersKeyedOnScanFileId.put( psmWebDisplayWebServiceResult.getScanFileId(), scanNumbersSet_Current );
-				}
-				prevScanFileId = psmWebDisplayWebServiceResult.getScanFileId();
-			}
-			scanNumbersSet_Current.add( psmWebDisplayWebServiceResult.getScanNumber() );
-		}
-		
-		Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice =
-				Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice.getSingletonInstance();
-		
-		//  Process scan numbers per scan file id
-		
-		for ( Map.Entry<Integer,Set<Integer>> entry : scanNumbersKeyedOnScanFileId.entrySet() ) {
-			Integer scanFileId = entry.getKey();
-			Set<Integer> scanNumbersSet = entry.getValue();
-			
-			Map<Integer,SingleScan_SubResponse> scanFromSpectralStorage_Key_ScanNumber_Key =
-					get_precursorMass_Key_ScanNumber_Key_ForScanFileIdScanNumbers( 
-							scanFileId, scanNumbersSet, call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice );
-			if ( scanFromSpectralStorage_Key_ScanNumber_Key == null ) {
-				return null; // EARLY EXIT since cannot get data
-			}
-			scanFromSpectralStorage_Key_ScanNumber_Key_ScanFileId.put( scanFileId, scanFromSpectralStorage_Key_ScanNumber_Key );
-		}
-		
-		return scanFromSpectralStorage_Key_ScanNumber_Key_ScanFileId;
-	}
-	
-	/**
-	 * @param scanFileId
-	 * @param scanNumbersSet
-	 * @param call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice
-	 * @return null if not all data found or matched up
-	 * @throws Exception 
-	 */
-	private Map<Integer,SingleScan_SubResponse> get_precursorMass_Key_ScanNumber_Key_ForScanFileIdScanNumbers( 
-			Integer scanFileId, Set<Integer> scanNumbersSet,Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice ) throws Exception {
-		
-		String spectralStorageAPIKey = ScanFileDAO.getInstance().getSpectralStorageAPIKeyById( scanFileId );
-		if ( StringUtils.isEmpty( spectralStorageAPIKey ) ) {
-			String msg = "spectralStorageAPIKey not found for scan file id: " + scanFileId;
-			log.error( msg );
-			return null; // EARLY EXIT since cannot get data
-		}
-		
-		Map<Integer,SingleScan_SubResponse> scanFromSpectralStorage_Key_ScanNumber_Key = new HashMap<>();
-		
-		List<Integer> scanNumbersList = new ArrayList<>( scanNumbersSet );
-		Collections.sort( scanNumbersList );
-		
-		List<SingleScan_SubResponse> scansFromSpectralStorage =
-				call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice.getScanDataFromSpectralStorageService( 
-						scanNumbersList, 
-						Get_ScanDataFromScanNumbers_IncludeParentScans.NO, 
-						Get_ScanData_ExcludeReturnScanPeakData.YES, 
-						spectralStorageAPIKey );
-		
-		Set<Integer> scanNumbersSetValidateReturnedValues = new HashSet<>( scanNumbersSet );
-		
-		for ( SingleScan_SubResponse singleScan_SubResponse : scansFromSpectralStorage ) {
-			if ( ! scanNumbersSetValidateReturnedValues.remove( singleScan_SubResponse.getScanNumber() ) ) {
-				// scan number returned not in request set
-				String msg = "scan number not in request set: " + singleScan_SubResponse.getScanNumber()
-				+ ", for scan file id: " + scanFileId;
-				log.error( msg );
-				return null; // EARLY EXIT since cannot get data
-			}
-			scanFromSpectralStorage_Key_ScanNumber_Key.put( singleScan_SubResponse.getScanNumber(), singleScan_SubResponse );
-		}
-		
-		if ( ! scanNumbersSetValidateReturnedValues.isEmpty() ) {
-			String msg = "the following scan numbers in request not in result from spectral storage: "  
-					+ StringUtils.join( scanNumbersSetValidateReturnedValues )
-					+ ", for scan file id: " + scanFileId;
-			log.error( msg );
-			return null; // EARLY EXIT since cannot get data
-		}
-		
-		return scanFromSpectralStorage_Key_ScanNumber_Key;
-	}
+//	/**
+//	 * @param psmWebDisplayList
+//	 * @return null if cannot get scan data from Spectral Storage Service for all entries (scan file id or scan number is null)
+//	 * @throws Exception 
+//	 */
+//	private Map<Integer,Map<Integer,SingleScan_SubResponse>> getPrecursorMassFromSpectralStorageService( List<PsmWebDisplayWebServiceResult> psmWebDisplayList ) throws Exception {
+//
+//		//  Get scan precursor mass (Scan Pre MZ) from Spectral Storage Service
+//		
+//		Map<Integer,Map<Integer,SingleScan_SubResponse>> scanFromSpectralStorage_Key_ScanNumber_Key_ScanFileId = new HashMap<>();
+//		
+//		//  Get scan numbers per scan file id
+//		
+//		Map<Integer,Set<Integer>> scanNumbersKeyedOnScanFileId = new HashMap<>();
+//		int prevScanFileId = -1;
+//		Set<Integer> scanNumbersSet_Current = null; // optimization
+//
+//		for ( PsmWebDisplayWebServiceResult psmWebDisplayWebServiceResult : psmWebDisplayList ) {
+//
+//			if ( psmWebDisplayWebServiceResult.getScanFileId() == null 
+//					|| psmWebDisplayWebServiceResult.getScanNumber() == null ) {
+//				
+//				return null;  // Early exit since cannot get scan data from Spectral Storage Service for all entries
+//			}
+//			
+//			if ( scanNumbersSet_Current == null ) {  // First entry
+//				scanNumbersSet_Current = new HashSet<>();
+//				scanNumbersKeyedOnScanFileId.put( psmWebDisplayWebServiceResult.getScanFileId(), scanNumbersSet_Current );
+//				prevScanFileId = psmWebDisplayWebServiceResult.getScanFileId();
+//			} else if ( prevScanFileId != psmWebDisplayWebServiceResult.getScanFileId() ) {
+//				//  Scan file id diff from prev record in list
+//				scanNumbersSet_Current = scanNumbersKeyedOnScanFileId.get( psmWebDisplayWebServiceResult.getScanFileId() );
+//				if ( scanNumbersSet_Current == null ) {
+//					scanNumbersSet_Current = new HashSet<>();
+//					scanNumbersKeyedOnScanFileId.put( psmWebDisplayWebServiceResult.getScanFileId(), scanNumbersSet_Current );
+//				}
+//				prevScanFileId = psmWebDisplayWebServiceResult.getScanFileId();
+//			}
+//			scanNumbersSet_Current.add( psmWebDisplayWebServiceResult.getScanNumber() );
+//		}
+//		
+//		Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice =
+//				Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice.getSingletonInstance();
+//		
+//		//  Process scan numbers per scan file id
+//		
+//		for ( Map.Entry<Integer,Set<Integer>> entry : scanNumbersKeyedOnScanFileId.entrySet() ) {
+//			Integer scanFileId = entry.getKey();
+//			Set<Integer> scanNumbersSet = entry.getValue();
+//			
+//			Map<Integer,SingleScan_SubResponse> scanFromSpectralStorage_Key_ScanNumber_Key =
+//					get_precursorMass_Key_ScanNumber_Key_ForScanFileIdScanNumbers( 
+//							scanFileId, scanNumbersSet, call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice );
+//			if ( scanFromSpectralStorage_Key_ScanNumber_Key == null ) {
+//				return null; // EARLY EXIT since cannot get data
+//			}
+//			scanFromSpectralStorage_Key_ScanNumber_Key_ScanFileId.put( scanFileId, scanFromSpectralStorage_Key_ScanNumber_Key );
+//		}
+//		
+//		return scanFromSpectralStorage_Key_ScanNumber_Key_ScanFileId;
+//	}
+//	
+//	/**
+//	 * @param scanFileId
+//	 * @param scanNumbersSet
+//	 * @param call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice
+//	 * @return null if not all data found or matched up
+//	 * @throws Exception 
+//	 */
+//	private Map<Integer,SingleScan_SubResponse> get_precursorMass_Key_ScanNumber_Key_ForScanFileIdScanNumbers( 
+//			Integer scanFileId, Set<Integer> scanNumbersSet,Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice ) throws Exception {
+//		
+//		String spectralStorageAPIKey = ScanFileDAO.getInstance().getSpectralStorageAPIKeyById( scanFileId );
+//		if ( StringUtils.isEmpty( spectralStorageAPIKey ) ) {
+//			String msg = "spectralStorageAPIKey not found for scan file id: " + scanFileId;
+//			log.error( msg );
+//			return null; // EARLY EXIT since cannot get data
+//		}
+//		
+//		Map<Integer,SingleScan_SubResponse> scanFromSpectralStorage_Key_ScanNumber_Key = new HashMap<>();
+//		
+//		List<Integer> scanNumbersList = new ArrayList<>( scanNumbersSet );
+//		Collections.sort( scanNumbersList );
+//		
+//		List<SingleScan_SubResponse> scansFromSpectralStorage =
+//				call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice.getScanDataFromSpectralStorageService( 
+//						scanNumbersList, 
+//						Get_ScanDataFromScanNumbers_IncludeParentScans.NO, 
+//						Get_ScanData_ExcludeReturnScanPeakData.YES, 
+//						spectralStorageAPIKey );
+//		
+//		Set<Integer> scanNumbersSetValidateReturnedValues = new HashSet<>( scanNumbersSet );
+//		
+//		for ( SingleScan_SubResponse singleScan_SubResponse : scansFromSpectralStorage ) {
+//			if ( ! scanNumbersSetValidateReturnedValues.remove( singleScan_SubResponse.getScanNumber() ) ) {
+//				// scan number returned not in request set
+//				String msg = "scan number not in request set: " + singleScan_SubResponse.getScanNumber()
+//				+ ", for scan file id: " + scanFileId;
+//				log.error( msg );
+//				return null; // EARLY EXIT since cannot get data
+//			}
+//			scanFromSpectralStorage_Key_ScanNumber_Key.put( singleScan_SubResponse.getScanNumber(), singleScan_SubResponse );
+//		}
+//		
+//		if ( ! scanNumbersSetValidateReturnedValues.isEmpty() ) {
+//			String msg = "the following scan numbers in request not in result from spectral storage: "  
+//					+ StringUtils.join( scanNumbersSetValidateReturnedValues )
+//					+ ", for scan file id: " + scanFileId;
+//			log.error( msg );
+//			return null; // EARLY EXIT since cannot get data
+//		}
+//		
+//		return scanFromSpectralStorage_Key_ScanNumber_Key;
+//	}
 
 }
