@@ -22,7 +22,10 @@ import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.ProteinSequenceDAO;
+import org.yeastrc.xlink.www.dao.ProteinSequenceVersionDAO;
 import org.yeastrc.xlink.www.dto.ProteinSequenceDTO;
+import org.yeastrc.xlink.www.dto.ProteinSequenceVersionDTO;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.objects.ProteinPositionPair;
 
 @Path("/linkablePositions")
@@ -43,24 +46,36 @@ public class LinkablePositionsService {
 
 			Set<ProteinPositionPair> positionPairs = new HashSet<ProteinPositionPair>();
 
-			for( int protein1 : proteins ) {
-				for( int protein2 : proteins ) {
-
-					String sequence1 = null;
-					String sequence2 = null;
-
-
-					ProteinSequenceDTO proteinSequenceDTO_1 = 
-							ProteinSequenceDAO.getInstance().getProteinSequenceDTOFromDatabase( protein1 );
-					ProteinSequenceDTO proteinSequenceDTO_2 = 
-							ProteinSequenceDAO.getInstance().getProteinSequenceDTOFromDatabase( protein2 );
-
-					if ( proteinSequenceDTO_1 != null ) {
-						sequence1 = proteinSequenceDTO_1.getSequence();
+			for( int proteinId1 : proteins ) {
+				for( int proteinId2 : proteins ) {
+					// get sequence for protein sequence version ids
+					
+					//  protein sequence version id 1
+					ProteinSequenceVersionDTO proteinSequenceVersionDTO_1 = ProteinSequenceVersionDAO.getInstance().getFromId( proteinId1 );
+					if ( proteinSequenceVersionDTO_1 == null ) {
+						String msg = "No proteinSequenceVersionDTO found for proteinId 1: " + proteinId1;
+						log.error( msg );
+						throw new ProxlWebappDataException(msg);
 					}
-
+					String proteinSequence_1 = null;
+					ProteinSequenceDTO proteinSequenceDTO_1 = 
+							ProteinSequenceDAO.getInstance().getProteinSequenceDTOFromDatabase( proteinSequenceVersionDTO_1.getproteinSequenceId() );
+					if ( proteinSequenceDTO_1 != null ) {
+						proteinSequence_1 = proteinSequenceDTO_1.getSequence();
+					}
+					
+					//  protein sequence version id 2
+					ProteinSequenceVersionDTO proteinSequenceVersionDTO_2 = ProteinSequenceVersionDAO.getInstance().getFromId( proteinId2 );
+					if ( proteinSequenceVersionDTO_2 == null ) {
+						String msg = "No proteinSequenceVersionDTO found for proteinId 2: " + proteinId2;
+						log.error( msg );
+						throw new ProxlWebappDataException(msg);
+					}
+					String proteinSequence_2 = null;
+					ProteinSequenceDTO proteinSequenceDTO_2 = 
+							ProteinSequenceDAO.getInstance().getProteinSequenceDTOFromDatabase( proteinSequenceVersionDTO_2.getproteinSequenceId() );
 					if ( proteinSequenceDTO_2 != null ) {
-						sequence2 = proteinSequenceDTO_2.getSequence();
+						proteinSequence_2 = proteinSequenceDTO_2.getSequence();
 					}
 
 					for( String l : linkers ) {
@@ -69,9 +84,9 @@ public class LinkablePositionsService {
 							throw new Exception( "Invalid linker: " + l );
 						}
 
-						for( int position1 : linker.getLinkablePositions( sequence1 ) ) {
-							for( int position2 : linker.getLinkablePositions( sequence2, sequence1, position1 ) ) {					
-								positionPairs.add( new ProteinPositionPair( protein1, position1, protein2, position2 ) );					
+						for( int position1 : linker.getLinkablePositions( proteinSequence_1 ) ) {
+							for( int position2 : linker.getLinkablePositions( proteinSequence_2, proteinSequence_1, position1 ) ) {					
+								positionPairs.add( new ProteinPositionPair( proteinId1, position1, proteinId2, position2 ) );					
 							}
 
 						}
