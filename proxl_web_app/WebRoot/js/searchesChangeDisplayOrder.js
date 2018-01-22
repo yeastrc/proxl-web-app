@@ -257,8 +257,71 @@ var SearchesChangeDisplayOrder = function( params ) {
 			structureViewerPageObject.changeProjectSearchIdOrderInURL( { projectSearchIdsInNewOrder : projectSearchIdsInNewOrder } );
 			return;  //  EARLY EXIT
 		}
+
+		//   Special case for Merged QC Page
 		
-		mergedPeptideProteinSearchesListVennDiagramSection.updatePageToNewProjectSearchIdsOrder( projectSearchIdsInNewOrder );
+		if ( window.qcMergedPageMain ) {
+			
+			//   qcMergedPageMain object on window object so call this instead of the code below
+			
+			qcMergedPageMain.changeProjectSearchIdOrderInURL( { projectSearchIdsInNewOrder : projectSearchIdsInNewOrder } );
+			
+			return;  //  EARLY EXIT
+		}
+		
+		
+		this.updatePageToNewProjectSearchIdsOrder( projectSearchIdsInNewOrder );
+	};
+	
+
+	/**
+	 * 'update': This function is called when the user stopped sorting and the DOM position has changed.
+	 * (User released the item they were dragging and items are now in "after sort" order)
+	 */
+	this.updatePageToNewProjectSearchIdsOrder = function( projectSearchIdsInNewOrder ) {
+
+
+		//  Update order of search ids and submit form
+
+		//  Plain text template using "#" for project search id 
+		var $searches_for_page_chooser_overlay_project_search_id_input_template = $("#searches_for_page_chooser_overlay_project_search_id_input_template");
+		if ( $searches_for_page_chooser_overlay_project_search_id_input_template.length === 0 ) {
+			throw Error( "value with id 'searches_for_page_chooser_overlay_project_search_id_input_template' not on page" );
+		}
+//		this._project_search_id_input_template = $searches_for_page_chooser_overlay_project_search_id_input_template.text();
+		var project_search_id_input_template = $searches_for_page_chooser_overlay_project_search_id_input_template.text();
+
+
+		var $query_param_do_not_sort_yes_input_template = $("#query_param_do_not_sort_yes_input_template");
+		if ( $query_param_do_not_sort_yes_input_template.length === 0 ) {
+			throw Error( "value with id 'query_param_do_not_sort_yes_input_template' not on page" );
+		}
+		var query_param_do_not_sort_yes_input_template = $query_param_do_not_sort_yes_input_template.text();
+
+
+		var $form_get_for_updated_parameters_multiple_searches = $("#form_get_for_updated_parameters_multiple_searches");
+
+		var $query_param_do_not_sort_in_update_form_jq = $form_get_for_updated_parameters_multiple_searches.find(".query_param_do_not_sort_in_update_form_jq");
+		$query_param_do_not_sort_in_update_form_jq.remove(); // Removes existing do not search input field
+
+		//  Add new do not search input field
+		var $addedItem = 
+			$( query_param_do_not_sort_yes_input_template ).prependTo( $form_get_for_updated_parameters_multiple_searches );
+
+
+		var $project_search_id_in_update_form_jq_All = $form_get_for_updated_parameters_multiple_searches.find(".project_search_id_in_update_form_jq");
+		$project_search_id_in_update_form_jq_All.remove(); // Removes all existing projectSearchId input fields
+
+		//  Add in reverse since 'prependTo' since want to have query JSON at end of URL
+		for ( var index = projectSearchIdsInNewOrder.length - 1; index >= 0; index-- ) {
+			var projectSearchId = projectSearchIdsInNewOrder[ index ];
+			var inputFieldForProjectSearchIdHTML = project_search_id_input_template.replace( "#", projectSearchId );
+			var $addedItem = 
+				$( inputFieldForProjectSearchIdHTML ).prependTo( $form_get_for_updated_parameters_multiple_searches );
+		}
+
+		$form_get_for_updated_parameters_multiple_searches.submit();
+
 	};
 
 	/**
