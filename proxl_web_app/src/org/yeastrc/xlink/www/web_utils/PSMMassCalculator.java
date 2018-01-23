@@ -68,7 +68,7 @@ public class PSMMassCalculator {
 			peptides.add( peptide );
 		}
 
-		return IsotopeAbundanceCalculator.getInstance().getIsotopMassShiftProbabilities( peptides, params.getCharge() );		
+		return IsotopeAbundanceCalculator.getInstance().getIsotopMassShiftProbabilities( peptides, params.getCharge(), 1E-5 );		
 	}
 	
 	
