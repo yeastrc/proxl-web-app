@@ -1,6 +1,10 @@
 package org.yeastrc.xlink.www.web_utils;
 
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.yeastrc.proteomics.mass.MassUtils;
@@ -9,6 +13,8 @@ import org.yeastrc.proteomics.peptide.isotope_label.LabelFactory;
 import org.yeastrc.proteomics.peptide.peptide.Peptide;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.xlink.dto.StaticModDTO;
+
+import org.yeastrc.proteomics.peptide.peptide.*;
 
 public class PSMMassCalculator {
 
@@ -42,6 +48,30 @@ public class PSMMassCalculator {
 	}
 	
 	
+	private static Map< BigDecimal, Double > getMassShiftProbabilities( PSMMassCalculatorParams params ) throws Exception {
+		
+		Collection< Peptide > peptides = new HashSet<>();
+		
+		{
+			Peptide peptide = new Peptide( params.getPeptide1().getSequence() );
+			if( params.getLabel1() != null )
+				peptide.setLabel( LabelFactory.getInstance().getLabel( params.getLabel1().getName() ) );
+			
+			peptides.add( peptide );
+		}
+		
+		if( params.getPeptide2() != null ) {
+			Peptide peptide = new Peptide( params.getPeptide2().getSequence() );
+			if( params.getLabel2() != null )
+				peptide.setLabel( LabelFactory.getInstance().getLabel( params.getLabel2().getName() ) );
+			
+			peptides.add( peptide );
+		}
+
+		return IsotopeAbundanceCalculator.getInstance().getIsotopMassShiftProbabilities( peptides, params.getCharge() );		
+	}
+	
+	
 	public static double calculatePPMEstimateForPSM( PSMMassCalculatorParams params ) throws Exception {
 		
 		if( params.getCharge() == null )
@@ -59,43 +89,27 @@ public class PSMMassCalculator {
 		double precusorMZ = params.getPrecursorMZ();
 		double calcMZ = getMZ( mass, params.getCharge() );
 		int charge = params.getCharge();
-		
-		double neutronMass = AtomUtils.getAtom( "n" ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
+				
+		Map< BigDecimal, Double > massShiftProbabilities = getMassShiftProbabilities( params );
 		
 		if( calcMZ > precusorMZ ) {
-			for( int i = 1; i < 21; i++ ) {
-				double tmass = mass - i * neutronMass;
-				double tmz = getMZ( tmass, charge );
+			for( BigDecimal massShift : massShiftProbabilities.keySet() ) {
+
+				double totalNeutralMass = mass - massShift.doubleValue();
+				double totalMoverZ = getMZ( totalNeutralMass, charge );
 					
-				if( Math.abs( precusorMZ - tmz ) < Math.abs( precusorMZ - calcMZ ) ) {
-					
-					/*
-					System.out.println( "Found better calcMZ:" );
-					System.out.println( "\tOld: pre: " + preMZ + ", calcMZ: " + calcMZ );
-					System.out.println( "\tNew: pre: " + preMZ + ", calcMZ: " + tmz );
-					*/
-					
-					calcMZ = tmz;
-				} else {					
-					break;
+				if( Math.abs( precusorMZ - totalMoverZ ) < Math.abs( precusorMZ - calcMZ ) ) {
+					calcMZ = totalMoverZ;
 				}
 			}
 		} else {
-			for( int i = 1; i < 21; i++ ) {
-				double tmass = mass + i * neutronMass;
-				double tmz = getMZ( tmass, charge );
+			for( BigDecimal massShift : massShiftProbabilities.keySet() ) {
+				
+				double totalNeutralMass = mass + massShift.doubleValue();
+				double totalMoverZ = getMZ( totalNeutralMass, charge );
 					
-				if( Math.abs( precusorMZ - tmz ) < Math.abs( precusorMZ - calcMZ ) ) {
-					
-					/*
-					System.out.println( "Found better calcMZ:" );
-					System.out.println( "\tOld: pre: " + preMZ + ", calcMZ: " + calcMZ );
-					System.out.println( "\tNew: pre: " + preMZ + ", calcMZ: " + tmz );
-					*/
-					
-					calcMZ = tmz;
-				} else {					
-					break;
+				if( Math.abs( precusorMZ - totalMoverZ ) < Math.abs( precusorMZ - calcMZ ) ) {		
+					calcMZ = totalMoverZ;
 				}
 			}
 		}
