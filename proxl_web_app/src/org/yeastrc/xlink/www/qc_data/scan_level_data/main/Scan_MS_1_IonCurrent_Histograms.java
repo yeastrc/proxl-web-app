@@ -30,7 +30,7 @@ public class Scan_MS_1_IonCurrent_Histograms {
 	 * 
 	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
 	 */
-	static final int VERSION_FOR_CACHING = 1;
+	static final int VERSION_FOR_CACHING = 2;
 	
 	
 	/**
