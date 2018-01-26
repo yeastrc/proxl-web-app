@@ -16,7 +16,6 @@ public class LorikeetCrossLinkData {
 	
 	private BigDecimal linkerMass;
 
-
 	public int getCrossLinkPos1() {
 		return crossLinkPos1;
 	}
@@ -56,5 +55,6 @@ public class LorikeetCrossLinkData {
 	public void setPeptideData2(LorikeetPerPeptideData peptideData2) {
 		this.peptideData2 = peptideData2;
 	}
+	
 
 }

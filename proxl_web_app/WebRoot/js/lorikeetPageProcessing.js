@@ -268,6 +268,7 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 		if ( lorikeetOptions.loopLinkDataInputFormat ) {
 			
 			lorikeetOptions.sequence = lorikeetOptions.loopLinkDataInputFormat.peptideData.sequence;
+			lorikeetOptions.label = lorikeetOptions.loopLinkDataInputFormat.peptideData.label;
 			lorikeetOptions.variableMods = lorikeetOptions.loopLinkDataInputFormat.peptideData.variableMods;
 			
 //			loopLinkDataInputFormat: Object
@@ -754,6 +755,7 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 			
 			lorikeetOptions.sequence = lorikeetOptions.crossLinkDataInputFormat.peptideData1.sequence;
 			lorikeetOptions.variableMods = lorikeetOptions.crossLinkDataInputFormat.peptideData1.variableMods;
+			lorikeetOptions.label = lorikeetOptions.crossLinkDataInputFormat.peptideData1.label;
 			
 			
 			createSingleCrossLinkLorikeet( lorikeetOptions, 1 /* indexStartAtOne */ );
@@ -762,6 +764,7 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 			
 			lorikeetOptions.sequence = lorikeetOptions.crossLinkDataInputFormat.peptideData2.sequence;
 			lorikeetOptions.variableMods = lorikeetOptions.crossLinkDataInputFormat.peptideData2.variableMods;
+			lorikeetOptions.label = lorikeetOptions.crossLinkDataInputFormat.peptideData2.label;
 			
 			createSingleCrossLinkLorikeet( lorikeetOptions, 2 /* indexStartAtOne */ );
 

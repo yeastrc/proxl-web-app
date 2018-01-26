@@ -26,6 +26,7 @@ import org.yeastrc.xlink.www.dao.PsmDAO;
 import org.yeastrc.xlink.www.dao.SearchScanFilenameDAO;
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.dao.StaticModDAO;
+import org.yeastrc.xlink.dto.IsotopeLabelDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.SearchScanFilenameDTO;
@@ -45,6 +46,7 @@ import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
+import org.yeastrc.xlink.www.searcher.IsotopeLabelSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectSearchIdsForSearchIdSearcher;
 import org.yeastrc.xlink.www.searcher.SearchReportedPeptideLinkTypeSearcher;
@@ -278,6 +280,7 @@ public class LorikeetSpectrumService {
         		LorikeetPerPeptideData lorikeetPerPeptideData = getUnlinkData( psmDTO );
         		lorikeetRootData.setSequence( lorikeetPerPeptideData.getSequence() );
         		lorikeetRootData.setVariableMods( lorikeetPerPeptideData.getVariableMods() );
+        		lorikeetRootData.setLabel( lorikeetPerPeptideData.getLabel() );
         	} else if ( linkTypeNumber == XLinkUtils.TYPE_DIMER ) {  
         		LorikeetDimerData dimerDataInputFormat = getDimerData( psmDTO );
         		lorikeetRootData.setDimerDataInputFormat( dimerDataInputFormat );
@@ -553,6 +556,12 @@ public class LorikeetSpectrumService {
         }
 		lorikeetPerPeptideData.setSequence( sequence );
 		lorikeetPerPeptideData.setVariableMods( variableMods );
+		
+		// get any stable isotope label
+		IsotopeLabelDTO labelDTO = IsotopeLabelSearcher.getInstance().getIsotopeLabelForSearchReportedPeptide_Peptide( srchRepPeptPeptideDTO );
+		if( labelDTO != null )
+			lorikeetPerPeptideData.setLabel( labelDTO.getName() );
+		
 		return lorikeetPerPeptideData;
 	}
 }

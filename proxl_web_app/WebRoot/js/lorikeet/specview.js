@@ -9,6 +9,7 @@
 
         var defaults = {
                 sequence: null,
+                label: null,
                 scanNum: null,
                 fileName: null,
                 charge: null,
@@ -155,7 +156,7 @@
         }
         
         
-        //  Convert loopLinkDataInputFormat to internal format
+        //  Convert crossLinkDataInputFormat to internal format
         
         if ( options.crossLinkDataInputFormat ) {
 
@@ -167,7 +168,7 @@
         
 
         var peptide = new Peptide(options.sequence, options.staticMods, options.variableMods,
-                                options.ntermMod, options.ctermMod, options.maxNeutralLossCount, options.loopLinkData, options.crossLinkData);
+                                options.ntermMod, options.ctermMod, options.maxNeutralLossCount, options.loopLinkData, options.crossLinkData, options.label);
         options.peptide = peptide;
 
 
@@ -196,6 +197,7 @@
             showSequenceInfo(container, options);
             showFileInfo(container, options);
             showModInfo(container, options);
+            showLabelInfo(container, options);
         }
         
         
@@ -2246,6 +2248,27 @@
 		
 		$(getElementSelector(container, elementIds.modInfo)).append(modInfo);
 	}
+	
+	//---------------------------------------------------------
+	// LABEL INFO
+	//---------------------------------------------------------
+	function showLabelInfo (container) {
+
+        var options = container.data("options");
+        if( options.label ) {
+        	
+    		var modInfo = '';
+
+
+			modInfo += '<div style="margin-top:5px;"><b>';
+			modInfo += 'Isotope Label: ' + options.label;
+			modInfo += '</b></div>'
+				
+		    $(getElementSelector(container, elementIds.modInfo)).append(modInfo);
+        }
+
+	}
+	
 	
 	//---------------------------------------------------------
 	// VIEWING OPTIONS TABLE

@@ -13,9 +13,7 @@ public class LorikeetLoopLinkData {
 	private int loopLinkPos1;
 	private int loopLinkPos2;
 
-	private BigDecimal linkerMass;
-
-	
+	private BigDecimal linkerMass;	
 	
 	public int getLoopLinkPos1() {
 		return loopLinkPos1;
@@ -49,4 +47,5 @@ public class LorikeetLoopLinkData {
 	public void setLinkerMass(BigDecimal linkerMass) {
 		this.linkerMass = linkerMass;
 	}
+	
 }

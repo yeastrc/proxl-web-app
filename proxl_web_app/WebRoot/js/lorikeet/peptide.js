@@ -5,7 +5,7 @@
 // -----------------------------------------------------------------------------
 // Peptide sequence and modifications
 // -----------------------------------------------------------------------------
-function Peptide(seq, staticModifications, varModifications, ntermModification, ctermModification, maxNeutralLossCount, loopLinkData, crossLinkData) {
+function Peptide(seq, staticModifications, varModifications, ntermModification, ctermModification, maxNeutralLossCount, loopLinkData, crossLinkData, label) {
 	
 	var sequence = seq;
     if(!sequence) {
@@ -22,6 +22,7 @@ function Peptide(seq, staticModifications, varModifications, ntermModification, 
     var nterm_totalLossOptions = [];
     var cterm_totalLossOptions = [];
     var maxNeutralLossCount = maxNeutralLossCount;
+    var label = label;
 
     var debug = false;
 
@@ -58,15 +59,38 @@ function Peptide(seq, staticModifications, varModifications, ntermModification, 
         return _getSeqMass(index, term, "avg");
     }
 
-    // Returns the monoisotopic neutral mass of the peptide; modifications added. N-term H and C-term OH are added
+    // Returns the monoisotopic neutral mass of the peptide; modifications added. N-term H and C-term OH are added. Stable isotope label mass change is added
     this.getNeutralMassMono = function _massNeutralMono() {
 
+    	
         var mass = 0;
         var aa_obj = new AminoAcid();
+        
+        var labeledAtom = null;
+        var massDiff = null;
+                
+        if( label ) {
+        	if( IsotopeLabelMassShifts[ label ] ) {
+        		labeledAtom = IsotopeLabelMassShifts[ label ].atom;
+        		massDiff = IsotopeLabelMassShifts[ label ].massDiff.mono;
+        	} else {
+        		console.log( "Could not find info for label: " + label );
+        	}
+        }
+        
+        
         if(sequence) {
             for(var i = 0; i < sequence.length; i++) {
                 var aa = aa_obj.get(sequence.charAt(i));
                 mass += aa.mono;
+
+                // if this peptide is labeled, increase the mass by the mass difference the label causes
+                if( labeledAtom != null && aa.atomicCountMap[ labeledAtom ] ) {
+                	var diff = aa.atomicCountMap[ labeledAtom ] * massDiff;
+                	
+                	mass += diff;
+                }
+                
             }
         }
 
@@ -78,7 +102,7 @@ function Peptide(seq, staticModifications, varModifications, ntermModification, 
         mass = mass + Ion.MASS_H_1;
         // add C-terminal OH
         mass = mass + Ion.MASS_O_16 + Ion.MASS_H_1;
-
+        
         return mass;
     }
 
@@ -87,10 +111,30 @@ function Peptide(seq, staticModifications, varModifications, ntermModification, 
 
             var mass = 0;
             var aa_obj = new AminoAcid();
+            
+            var labeledAtom = null;
+            var massDiff = null;
+                    
+            if( label ) {
+            	if( IsotopeLabelMassShifts[ label ] ) {
+            		labeledAtom = IsotopeLabelMassShifts[ label ].atom;
+            		massDiff = IsotopeLabelMassShifts[ label ].massDiff.avg;
+            	} else {
+            		console.log( "Could not find info for label: " + label );
+            	}
+            }
+            
             if(sequence) {
                 for(var i = 0; i < sequence.length; i++) {
                     var aa = aa_obj.get(sequence.charAt(i));
                     mass += aa.avg;
+                    
+                    // if this peptide is labeled, increase the mass by the mass difference the label causes
+                    if( labeledAtom != null && aa.atomicCountMap[ labeledAtom ] ) {
+                    	var diff = aa.atomicCountMap[ labeledAtom ] * massDiff;
+                    	
+                    	mass += diff;
+                    }
                 }
             }
 
@@ -105,50 +149,6 @@ function Peptide(seq, staticModifications, varModifications, ntermModification, 
 
             return mass;
         }
-    
-
-    
-    // this.getFullSequenceMass not needed since have this.getNeutralMassMono and this.getNeutralMassAvg
-    
-//    this.getFullSequenceMass = function( massType ) {
-//    	
-//    	//   First duplicate function _getSeqMass
-//    	
-//    	//   Change to do for full sequence
-//    	//   Change to add mass of H2O ( water )
-//    	
-//        var mass = 0;
-//        var aa_obj = new AminoAcid();
-//        if(sequence) {
-//
-//        	for( var i = 0; i < sequence.length; i += 1) {
-//                var aa = aa_obj.get(sequence[i]);
-//                mass += aa[massType];
-//            }
-//        }
-//        
-//        //  Add in 
-//        
-//    	if(massType == "mono") {
-//    		
-//    		//  Add Water H2O MONOISOTOPIC
-//    		
-//    		mass += Ion.WaterLossMass_mono;  //  it says water loss but it is the mass of H2O Mono
-//
-//    	} else if(massType == "avg") {
-//    		
-//    		//  Add Water H2O AVERAGE
-//    		
-//    		mass += Ion.WaterLossMass_avg;  //  it says water loss but it is the mass of H2O AVERAGE
-//    	
-//    	} else {
-//    		
-//    		throw "this.getFullSequenceMass, massType invalid: '" + massType;
-//    	}
-//        
-//    	return mass;
-//    };
-    
 
     this.getPotentialLosses = function _getPotentialLosses(sion)
     {
@@ -433,7 +433,6 @@ function Peptide(seq, staticModifications, varModifications, ntermModification, 
         return mass;
     }
     
-    
 
     function _addCrossLinkLoopLinkModMasses(seqMass, index, term, massType) {
 
@@ -481,14 +480,39 @@ function Peptide(seq, staticModifications, varModifications, ntermModification, 
     
     
     function _getSeqMass(index, term, massType) {
-
+    	
         var mass = 0;
         var aa_obj = new AminoAcid();
+
+        var labeledAtom = null;
+        var massDiff = null;
+                
+        if( label ) {
+        	if( IsotopeLabelMassShifts[ label ] ) {
+
+        		labeledAtom = IsotopeLabelMassShifts[ label ].atom;
+        		massDiff = IsotopeLabelMassShifts[ label ].massDiff[ massType ];
+        		
+        	} else {
+        		console.log( "Could not find info for label: " + label );
+        	}
+        }
+        
+        
         if(sequence) {
-            var slice = new _Slice(index, term);
+        	
+        	var slice = new _Slice(index, term);
             for( var i = slice.from; i < slice.to; i += 1) {
                 var aa = aa_obj.get(sequence[i]);
+                
                 mass += aa[massType];
+
+                    // if this peptide is labeled, increase the mass by the mass difference the label causes
+                    if( labeledAtom != null && aa.atomicCountMap[ labeledAtom ] ) {
+                    	var diff = aa.atomicCountMap[ labeledAtom ] * massDiff;
+                    	
+                    	mass += diff;
+                    }
             }
         }
 
@@ -839,7 +863,8 @@ function CrossLinkData( crossLinkDataInputFormat, options ) { //  loopLinkData
 			undefined /* ctermModification */,  
 			undefined /* maxNeutralLossCount */, 
 			undefined /* loopLinkData */, 
-			undefined /* crossLinkData  */ );
+			undefined /* crossLinkData  */,
+			peptideData.label);
 	
 	//  From "options" defaults:
 //    ntermMod: 0, // additional mass to be added to the n-term
@@ -877,6 +902,17 @@ CrossLinkData.prototype.getCrossLinkedPeptideAndLinkerMass = function( massType 
 	return otherPeptideMass;
 	
 };
+
+
+/*
+ * mass diff of stable isotope label isotopes
+ */
+IsotopeLabelMassShifts = { };
+IsotopeLabelMassShifts[ '15N' ] = { 'atom':'N', massDiff: { mono:0.99703497,  avg:0.993409 } };
+IsotopeLabelMassShifts[ '13C' ] = { 'atom':'C', massDiff: { mono:1.00335483,  avg:0.992655 } };
+IsotopeLabelMassShifts[ '18O' ] = { 'atom':'O', massDiff: { mono:2.00424567,  avg:1.99976 } };
+IsotopeLabelMassShifts[ '2H' ] =  { 'atom':'H', massDiff: { mono:1.006276744, avg:1.006162 } };
+
 
 
 

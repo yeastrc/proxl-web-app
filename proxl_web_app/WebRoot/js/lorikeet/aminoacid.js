@@ -1,6 +1,3 @@
-// $LastChangedDate: 2012-12-21 16:04:41 -0800 (Fri, 21 Dec 2012) $
-// $LastChangedBy: vagisha@gmail.com $
-// $LastChangedRevision: 49 $
 
 function AminoAcid(aaCode, aaShortName, aaName, monoMass, avgMass) {
    this.code = aaCode;
@@ -32,6 +29,130 @@ AminoAcid.T = new AminoAcid ("T", "Thr", "Threonine",     101.047678505, 101.103
 AminoAcid.W = new AminoAcid ("W", "Trp", "Tryptophan",    186.079312980, 186.2099);
 AminoAcid.Y = new AminoAcid ("Y", "Tyr", "Tyrosine",      163.063328575, 163.17326);
 AminoAcid.V = new AminoAcid ("V", "Val", "Valine",         99.068413945,  99.13106);
+
+// add atomic makeups to each amino acid to support isotope label mass adjustments
+// Michael Riffle
+AminoAcid.A.atomicCountMap = { }
+AminoAcid.A.atomicCountMap.C = 3;
+AminoAcid.A.atomicCountMap.H = 7;
+AminoAcid.A.atomicCountMap.N = 1;
+AminoAcid.A.atomicCountMap.O = 2;
+
+AminoAcid.R.atomicCountMap = { }
+AminoAcid.R.atomicCountMap.C = 6;
+AminoAcid.R.atomicCountMap.H = 14;
+AminoAcid.R.atomicCountMap.N = 4;
+AminoAcid.R.atomicCountMap.O = 2;
+
+AminoAcid.N.atomicCountMap = { }
+AminoAcid.N.atomicCountMap.C = 4;
+AminoAcid.N.atomicCountMap.H = 8;
+AminoAcid.N.atomicCountMap.N = 2;
+AminoAcid.N.atomicCountMap.O = 3;
+
+AminoAcid.D.atomicCountMap = { }
+AminoAcid.D.atomicCountMap.C = 4;
+AminoAcid.D.atomicCountMap.H = 7;
+AminoAcid.D.atomicCountMap.N = 1;
+AminoAcid.D.atomicCountMap.O = 4;
+
+AminoAcid.C.atomicCountMap = { }
+AminoAcid.C.atomicCountMap.C = 3;
+AminoAcid.C.atomicCountMap.H = 7;
+AminoAcid.C.atomicCountMap.N = 1;
+AminoAcid.C.atomicCountMap.O = 2;
+AminoAcid.C.atomicCountMap.S = 1;
+
+AminoAcid.E.atomicCountMap = { }
+AminoAcid.E.atomicCountMap.C = 5;
+AminoAcid.E.atomicCountMap.H = 9;
+AminoAcid.E.atomicCountMap.N = 1;
+AminoAcid.E.atomicCountMap.O = 4;
+
+AminoAcid.Q.atomicCountMap = { }
+AminoAcid.Q.atomicCountMap.C = 5;
+AminoAcid.Q.atomicCountMap.H = 10;
+AminoAcid.Q.atomicCountMap.N = 2;
+AminoAcid.Q.atomicCountMap.O = 3;
+
+AminoAcid.G.atomicCountMap = { }
+AminoAcid.G.atomicCountMap.C = 2;
+AminoAcid.G.atomicCountMap.H = 5;
+AminoAcid.G.atomicCountMap.N = 1;
+AminoAcid.G.atomicCountMap.O = 2;
+
+AminoAcid.H.atomicCountMap = { }
+AminoAcid.H.atomicCountMap.C = 6;
+AminoAcid.H.atomicCountMap.H = 9;
+AminoAcid.H.atomicCountMap.N = 3;
+AminoAcid.H.atomicCountMap.O = 2;
+
+AminoAcid.I.atomicCountMap = { }
+AminoAcid.I.atomicCountMap.C = 6;
+AminoAcid.I.atomicCountMap.H = 13;
+AminoAcid.I.atomicCountMap.N = 1;
+AminoAcid.I.atomicCountMap.O = 2;
+
+AminoAcid.L.atomicCountMap = { }
+AminoAcid.L.atomicCountMap.C = 6;
+AminoAcid.L.atomicCountMap.H = 13;
+AminoAcid.L.atomicCountMap.N = 1;
+AminoAcid.L.atomicCountMap.O = 2;
+
+AminoAcid.K.atomicCountMap = { }
+AminoAcid.K.atomicCountMap.C = 6;
+AminoAcid.K.atomicCountMap.H = 14;
+AminoAcid.K.atomicCountMap.N = 2;
+AminoAcid.K.atomicCountMap.O = 2;
+
+AminoAcid.M.atomicCountMap = { }
+AminoAcid.M.atomicCountMap.C = 5;
+AminoAcid.M.atomicCountMap.H = 11;
+AminoAcid.M.atomicCountMap.N = 1;
+AminoAcid.M.atomicCountMap.O = 2;
+AminoAcid.M.atomicCountMap.S = 1;
+
+AminoAcid.F.atomicCountMap = { }
+AminoAcid.F.atomicCountMap.C = 9;
+AminoAcid.F.atomicCountMap.H = 11;
+AminoAcid.F.atomicCountMap.N = 1;
+AminoAcid.F.atomicCountMap.O = 2;
+
+AminoAcid.P.atomicCountMap = { }
+AminoAcid.P.atomicCountMap.C = 5;
+AminoAcid.P.atomicCountMap.H = 9;
+AminoAcid.P.atomicCountMap.N = 1;
+AminoAcid.P.atomicCountMap.O = 2;
+
+AminoAcid.S.atomicCountMap = { }
+AminoAcid.S.atomicCountMap.C = 3;
+AminoAcid.S.atomicCountMap.H = 7;
+AminoAcid.S.atomicCountMap.N = 1;
+AminoAcid.S.atomicCountMap.O = 3;
+
+AminoAcid.T.atomicCountMap = { }
+AminoAcid.T.atomicCountMap.C = 4;
+AminoAcid.T.atomicCountMap.H = 9;
+AminoAcid.T.atomicCountMap.N = 1;
+AminoAcid.T.atomicCountMap.O = 3;
+
+AminoAcid.W.atomicCountMap = { }
+AminoAcid.W.atomicCountMap.C = 11;
+AminoAcid.W.atomicCountMap.H = 12;
+AminoAcid.W.atomicCountMap.N = 2;
+AminoAcid.W.atomicCountMap.O = 2;
+
+AminoAcid.Y.atomicCountMap = { }
+AminoAcid.Y.atomicCountMap.C = 9;
+AminoAcid.Y.atomicCountMap.H = 11;
+AminoAcid.Y.atomicCountMap.N = 1;
+AminoAcid.Y.atomicCountMap.O = 3;
+
+AminoAcid.V.atomicCountMap = { }
+AminoAcid.V.atomicCountMap.C = 5;
+AminoAcid.V.atomicCountMap.H = 11;
+AminoAcid.V.atomicCountMap.N = 1;
+AminoAcid.V.atomicCountMap.O = 2;
 
 
 AminoAcid.aa = [];

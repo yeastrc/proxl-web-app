@@ -71,6 +71,8 @@ public class LorikeetRootData {
 	private LorikeetDimerData dimerDataInputFormat;  //  Lorikeet will ignore this property, the setup JS code will handle this
 
 
+	private String label;		// stable isotope label name
+	
 	/**
 	 * 
 	 */
@@ -291,6 +293,16 @@ public class LorikeetRootData {
 
 	public void setDimerDataInputFormat(LorikeetDimerData dimerDataInputFormat) {
 		this.dimerDataInputFormat = dimerDataInputFormat;
+	}
+
+
+	public String getLabel() {
+		return label;
+	}
+
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 
