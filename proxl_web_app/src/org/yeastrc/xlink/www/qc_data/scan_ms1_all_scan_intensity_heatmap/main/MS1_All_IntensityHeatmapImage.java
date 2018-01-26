@@ -45,7 +45,7 @@ public class MS1_All_IntensityHeatmapImage {
 	 * 
 	 *  Increment this value whenever change the resulting image since Caching the resulting image
 	 */
-	static final int VERSION_FOR_CACHING = 3;
+	static final int VERSION_FOR_CACHING = 4;
 	
 	/**
 	 *  Must be in ascending order since searching using Arrays.binarySearch
@@ -139,7 +139,7 @@ public class MS1_All_IntensityHeatmapImage {
 	 * @return
 	 * @throws Exception
 	 */
-	public MS1_All_IntensityHeatmapImageResult getHeatmap( int scanFileId, Integer requestedImageWidth ) throws Exception {
+	public MS1_All_IntensityHeatmapImageResult getHeatmap( int scanFileId, Integer requestedImageWidth, String requestQueryString ) throws Exception {
 
 		if ( requestedImageWidth != null ) {
 			if ( ! isRequestedImageWidthAllowed( requestedImageWidth ) ) {
@@ -155,7 +155,7 @@ public class MS1_All_IntensityHeatmapImage {
 
 		byte[] imageAsBytes = 
 				MS1_All_IntensityHeatmapImageCachedResultImageManager.getSingletonInstance()
-				.retrieveImageDataFromCache( scanFileId, requestedImageWidth );
+				.retrieveImageDataFromCache( scanFileId, requestedImageWidth, requestQueryString );
 		
 		if ( imageAsBytes == null ) {
 
@@ -179,7 +179,7 @@ public class MS1_All_IntensityHeatmapImage {
 		}
 		
 		MS1_All_IntensityHeatmapImageCachedResultImageManager.getSingletonInstance()
-		.saveImageDataToCache( scanFileId, requestedImageWidth, imageAsBytes );
+		.saveImageDataToCache( scanFileId, requestedImageWidth, imageAsBytes, requestQueryString );
 		
 		MS1_All_IntensityHeatmapImageResult resultObj = new MS1_All_IntensityHeatmapImageResult();
 		

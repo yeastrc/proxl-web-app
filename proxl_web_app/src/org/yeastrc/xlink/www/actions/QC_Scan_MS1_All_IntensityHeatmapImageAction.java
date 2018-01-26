@@ -43,6 +43,8 @@ public class QC_Scan_MS1_All_IntensityHeatmapImageAction extends Action {
 			HttpServletRequest request,
 			HttpServletResponse response ) throws Exception {
 
+		String requestQueryString = request.getQueryString();
+		
 		String scanFileIdString = null;
 		String projectSearchIdString = null;
 		String requestedImageWidthString = null;
@@ -221,7 +223,7 @@ public class QC_Scan_MS1_All_IntensityHeatmapImageAction extends Action {
 
 			MS1_All_IntensityHeatmapImageResult ms1_All_IntensityHeatmapImageResult =
 					MS1_All_IntensityHeatmapImage.getInstance()
-					.getHeatmap( scanFileId, requestedImageWidth );
+					.getHeatmap( scanFileId, requestedImageWidth, requestQueryString );
 
 			byte[] imageAsBytes = ms1_All_IntensityHeatmapImageResult.getImageAsBytes();
 

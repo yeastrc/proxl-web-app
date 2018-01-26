@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.qc_data.psm_error_estimates.main;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
+import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager_Result;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultForLinkType;
@@ -43,6 +45,8 @@ import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_RT
 import org.yeastrc.xlink.www.searcher.IsotopeLabelSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
+import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData;
+import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
@@ -65,6 +69,14 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 
 	private static final Logger log = Logger.getLogger(PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs.class);
 
+	/**
+	 *  !!!!!!!!!!!   VERY IMPORTANT  !!!!!!!!!!!!!!!!!!!!
+	 * 
+	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
+	 */
+	static final int VERSION_FOR_CACHING = 1;
+	
+	
 	public enum ForDownload { YES, NO }
 	
 	private static final int REMOVE_OUTLIERS_FIRST_QUARTER_PERCENTILE = 25;
@@ -92,6 +104,8 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 	 */
 	public static class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response {
 
+		private byte[] resultsAsBytes; //  PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result as JSON
+		
 		private PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result ppm_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result;
 		/**
 		 * Map<[link type]...>
@@ -116,39 +130,55 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 				Map<String, List<PPMErrorRetentionTimePair>> ppmErrorListForLinkType_ByLinkType) {
 			this.ppmErrorListForLinkType_ByLinkType = ppmErrorListForLinkType_ByLinkType;
 		}
+		public byte[] getResultsAsBytes() {
+			return resultsAsBytes;
+		}
+		public void setResultsAsBytes(byte[] resultsAsBytes) {
+			this.resultsAsBytes = resultsAsBytes;
+		}
 	}
 	
 	/**
-	 * Only 1 search is allowed
-	 * 
+	 * @param requestQueryString
+	 * @param forDownload
 	 * @param filterCriteriaJSON
-	 * @param searches
+	 * @param search
 	 * @return
 	 * @throws Exception
 	 */
 	public PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response getPPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs( 
+			String requestQueryString, // query string from request URL
 			ForDownload forDownload,
 			String filterCriteriaJSON, 
-			List<SearchDTO> searches ) throws Exception {
-		
-		if ( searches.size() > 1 ) {
-			String msg = "Only 1 search is allowed";
-			log.error( msg );
-			throw new ProxlWebappDataException(msg);
-		}
+			SearchDTO search ) throws Exception {
 
-		Collection<Integer> searchIds = new HashSet<>();
-//		Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();
-		List<Integer> searchIdsListDeduppedSorted = new ArrayList<>( searches.size() );
-		
-		for ( SearchDTO search : searches ) {
-			searchIds.add( search.getSearchId() );
-			searchIdsListDeduppedSorted.add( search.getSearchId() );
-//			mapProjectSearchIdToSearchId.put( search.getProjectSearchId(), search.getSearchId() );
-		}
+		List<Integer> searchIdsList = new ArrayList<>( 1 );
+		searchIdsList.add( search.getSearchId() );
 
+		MergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder mergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder =
+				getMergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder( filterCriteriaJSON, searchIdsList );
+
+		//  Only applicable if search cutoffs are defaults
+		boolean searchOnlyHasDefaultCutoffs = get_searchOnlyHasDefaultCutoffs( search, mergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder);
+
+		if ( forDownload != ForDownload.YES ) {
+			//  Only if not for download
+			if ( searchOnlyHasDefaultCutoffs ) {
+				byte[] resultsAsBytes = 
+						retrieveDataFromCacheAndMatchCutoffs( search, mergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder, requestQueryString );
+
+				if ( resultsAsBytes != null ) {
+					//  Have Cached data so return it
+					PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response methodResponse = new PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response();
+					methodResponse.resultsAsBytes = resultsAsBytes;
+					
+					return methodResponse;  //  EARLY RETURN
+				}
+			}
+		}
+		
 		Map<String, List<PPMErrorRetentionTimePair>> ppmErrorListForLinkType_ByLinkType = 
-				create_ppmErrorListForLinkType_ByLinkTypeMap( filterCriteriaJSON, searches, searchIds );
+				create_ppmErrorListForLinkType_ByLinkTypeMap( mergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder, search );
 		
 		//  Combine the Dimer into the Unlinked
 		
@@ -178,8 +208,166 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 				getPPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result( ppmErrorListForLinkType_ByLinkType );
 		
 		methodResponse.ppm_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result = ppm_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result;
+
+		byte[] resultAsJSONBytes = getResultsByteArray( ppm_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result, search.getSearchId() );
+		
+		if ( searchOnlyHasDefaultCutoffs ) {
+			cacheResult( resultAsJSONBytes, search, requestQueryString );
+		}
+		
+		methodResponse.resultsAsBytes = resultAsJSONBytes;
 		
 		return methodResponse;
+	}
+
+	/**
+	 * @param chartJSONAsBytes
+	 * @param search
+	 * @param requestQueryString
+	 * @throws Exception
+	 */
+	private void cacheResult( 
+			byte[] chartJSONAsBytes, 
+			SearchDTO search, 
+			String requestQueryString ) throws Exception {
+
+		PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager.getSingletonInstance()
+		.saveDataToCache( search.getSearchId(), chartJSONAsBytes, requestQueryString );
+	}
+	
+	/**
+	 * @param resultsObject
+	 * @param searchId
+	 * @return
+	 * @throws IOException
+	 */
+	private byte[] getResultsByteArray( PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result resultsObject, int searchId ) throws IOException {
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream( );
+
+		//  Jackson JSON Mapper object for JSON deserialization and serialization
+		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();
+		//   serialize 
+		try {
+			jacksonJSON_Mapper.writeValue( baos, resultsObject );
+		} catch ( JsonParseException e ) {
+			String msg = "Failed to serialize 'resultsObject', JsonParseException.  "
+					+ ". searchId: " + searchId;
+			log.error( msg, e );
+			throw e;
+		} catch ( JsonMappingException e ) {
+			String msg = "Failed to serialize 'resultsObject', JsonMappingException.  "
+					+ ". searchId: " + searchId;
+			log.error( msg, e );
+			throw e;
+		} catch ( IOException e ) {
+			String msg = "Failed to serialize 'resultsObject', IOException.  "
+					+ ". searchId: " + searchId;
+			log.error( msg, e );
+			throw e;
+		}
+		
+		return baos.toByteArray();
+	}
+
+	/**
+	 * @param searches
+	 * @param mergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder
+	 * @return
+	 * @throws Exception
+	 */
+	private byte[] retrieveDataFromCacheAndMatchCutoffs( SearchDTO search,
+			MergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder mergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder,
+			String requestQueryString )
+			throws Exception {
+
+		PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager_Result cachedDataResult =
+				PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager.getSingletonInstance()
+				.retrieveDataFromCache( search.getSearchId(), requestQueryString );
+
+		if ( cachedDataResult == null ) {
+			//  No Cached results so return null
+			return null;  //  EARLY RETURN
+		}
+		
+		byte[] chartJSONAsBytes = cachedDataResult.getChartJSONAsBytes();
+		return chartJSONAsBytes;
+	}
+	
+	/**
+	 * @param search
+	 * @param mergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder
+	 * @return
+	 * @throws Exception
+	 */
+	private boolean get_searchOnlyHasDefaultCutoffs( SearchDTO search,
+			MergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder mergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder)
+			throws Exception {
+		
+
+		boolean searchOnlyHasDefaultCutoffs = false;
+
+		SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = mergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder.searcherCutoffValuesRootLevel;
+
+		SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = searcherCutoffValuesRootLevel.getPerSearchCutoffs( search.getProjectSearchId() );
+		DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult result =
+				DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.getInstance()
+				.defaultCutoffsExactlyMatchAnnTypeDataToSearchData( search.getSearchId(), searcherCutoffValuesSearchLevel );
+		if ( result.isDefaultCutoffsExactlyMatchAnnTypeDataToSearchData() ) {
+			searchOnlyHasDefaultCutoffs = true;
+		}
+		
+		return searchOnlyHasDefaultCutoffs;
+	}
+	
+	private static class MergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder {
+		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot;
+		SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel;
+	}
+	
+	/**
+	 * @param filterCriteriaJSON
+	 * @param searchIds
+	 * @return
+	 * @throws Exception
+	 */
+	private MergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder 
+		getMergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder( String filterCriteriaJSON, Collection<Integer> searchIds ) throws Exception {
+
+		//  Jackson JSON Mapper object for JSON deserialization and serialization
+		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
+		//   deserialize 
+		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
+		try {
+			mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( filterCriteriaJSON, MergedPeptideQueryJSONRoot.class );
+		} catch ( JsonParseException e ) {
+			String msg = "Failed to parse 'filterCriteriaJSON', JsonParseException.  filterCriteriaJSON: " + filterCriteriaJSON;
+			log.error( msg, e );
+			throw e;
+		} catch ( JsonMappingException e ) {
+			String msg = "Failed to parse 'filterCriteriaJSON', JsonMappingException.  filterCriteriaJSON: " + filterCriteriaJSON;
+			log.error( msg, e );
+			throw e;
+		} catch ( IOException e ) {
+			String msg = "Failed to parse 'filterCriteriaJSON', IOException.  filterCriteriaJSON: " + filterCriteriaJSON;
+			log.error( msg, e );
+			throw e;
+		}
+
+		////////////
+		/////   Searcher cutoffs for all searches
+		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
+		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
+				Z_CutoffValuesObjectsToOtherObjectsFactory
+				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
+		SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel =
+				cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
+		
+		MergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder holder = new MergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder();
+		holder.mergedPeptideQueryJSONRoot = mergedPeptideQueryJSONRoot;
+		holder.searcherCutoffValuesRootLevel = searcherCutoffValuesRootLevel;
+		
+		return holder;
 	}
 	
 	/**
@@ -418,10 +606,12 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 	 * @throws ProxlWebappDataException
 	 */
 	private Map<String, List<PPMErrorRetentionTimePair>> create_ppmErrorListForLinkType_ByLinkTypeMap(
-			String filterCriteriaJSON, 
-			List<SearchDTO> searches,
-			Collection<Integer> searchIds)
+			MergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder mergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder, 
+			SearchDTO searchDTO )
 			throws JsonParseException, JsonMappingException, IOException, Exception, ProxlWebappDataException {
+		
+		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = mergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder.mergedPeptideQueryJSONRoot;
+		SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = mergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder.searcherCutoffValuesRootLevel;
 		
 		//  Reported Peptide Ids Skipped For Error Calculating MZ
 		List<Integer> reportedPeptideIdsSkippedForErrorCalculatingMZ = new ArrayList<>( 100 );
@@ -429,26 +619,6 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 		//  Internal use for tracking data used to compute PPM Error for entries with highest PPM Error
 //		List<PPM_Error_ComputeEntry> ppm_Error_ComputeEntryList = new ArrayList<>( 10 );
 		
-		//  Jackson JSON Mapper object for JSON deserialization and serialization
-		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		//   deserialize 
-		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
-		try {
-			mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( filterCriteriaJSON, MergedPeptideQueryJSONRoot.class );
-		} catch ( JsonParseException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonParseException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( JsonMappingException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonMappingException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( IOException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', IOException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		}
-
 		{
 			String[] linkTypesFromURL = mergedPeptideQueryJSONRoot.getLinkTypes();
 
@@ -489,14 +659,6 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
 		//   Mods for DB Query
 		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
-		////////////
-		/////   Searcher cutoffs for all searches
-		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
-		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
-				Z_CutoffValuesObjectsToOtherObjectsFactory
-				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
-		SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel =
-				cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
 		
 		
 		//   Map of List of PPM Error by Link Type
@@ -528,493 +690,491 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 		
 		//  Cache peptideDTO ById locally
 		Map<Integer,PeptideDTO> peptideDTO_MappedById = new HashMap<>();
-		
-		for ( SearchDTO searchDTO : searches ) {
-			Integer projectSearchId = searchDTO.getProjectSearchId();
-			Integer searchId = searchDTO.getSearchId();
-			
-			//  Get cutoffs for this project search id
-			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
-					searcherCutoffValuesRootLevel.getPerSearchCutoffs( projectSearchId );
-			if ( searcherCutoffValuesSearchLevel == null ) {
-				String msg = "searcherCutoffValuesRootLevel.getPerSearchCutoffs(projectSearchId) returned null for:  " + projectSearchId;
-				log.error( msg );
-				throw new ProxlWebappDataException( msg );
-			}
-			
-			//  Get static mods for search id
-			List<StaticModDTO> staticModDTOList = StaticModDAO.getInstance().getStaticModDTOForSearchId( searchId );
-			
-			///////////////////////////////////////////////
-			//  Get peptides for this search from the DATABASE
-			List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
-					PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
-							searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
-							PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
 
-			for ( WebReportedPeptideWrapper webReportedPeptideWrapper : wrappedLinksPerForSearch ) {
-				WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
-				int reportedPeptideId = webReportedPeptide.getReportedPeptideId();
-				
-				String linkType = null;
-				
-				//  srchRepPeptPeptideDTOList: associated SrchRepPeptPeptideDTO for the link, one per associated peptide, populated per link type
-				
-				//  copied from SearchPeptideCrosslink, this way not load PeptideDTO in SearchPeptideCrosslink
-				SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams = new SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams();
-				srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setSearchId( searchId );
-				srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setReportedPeptideId( reportedPeptideId );
-				SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result =
-						Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.getInstance()
-						.getSrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result( srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams );
-				List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result.getSrchRepPeptPeptideDTOList();
+		Integer projectSearchId = searchDTO.getProjectSearchId();
+		Integer searchId = searchDTO.getSearchId();
 
-				if ( webReportedPeptide.getSearchPeptideCrosslink() != null ) {
-					//  Process a crosslink
-					linkType = XLinkUtils.CROSS_TYPE_STRING;
-					
-					//  validation for crosslink
-					if ( srchRepPeptPeptideDTOList.size() != 2 ) {
-						String msg = "For Crosslink: List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + searchId
-						+ ", ReportedPeptideId: " + reportedPeptideId ;
-						log.error( msg );
-						throw new ProxlWebappDataException( msg );
-					}
-					for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_1()  == null 
-								|| srchRepPeptPeptideDTO.getPeptidePosition_1() == SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Crosslink: srchRepPeptPeptideDTO.getPeptidePosition_1() not populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_2() != null
-								&& srchRepPeptPeptideDTO.getPeptidePosition_2() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Crosslink: srchRepPeptPeptideDTO.getPeptidePosition_2() is populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-					}
+		//  Get cutoffs for this project search id
+		SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel =
+				searcherCutoffValuesRootLevel.getPerSearchCutoffs( projectSearchId );
+		if ( searcherCutoffValuesSearchLevel == null ) {
+			String msg = "searcherCutoffValuesRootLevel.getPerSearchCutoffs(projectSearchId) returned null for:  " + projectSearchId;
+			log.error( msg );
+			throw new ProxlWebappDataException( msg );
+		}
 
-				} else if ( webReportedPeptide.getSearchPeptideLooplink() != null ) {
-					//  Process a looplink
-					linkType = XLinkUtils.LOOP_TYPE_STRING;
-					
-					//  validation for looplink
-					if ( srchRepPeptPeptideDTOList.size() != 1 ) {
-						String msg = "For Looplink: List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " + searchId
-						+ ", ReportedPeptideId: " + reportedPeptideId ;
-						log.error( msg );
-						throw new ProxlWebappDataException( msg );
-					}
-					for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_1()  == null 
-								|| srchRepPeptPeptideDTO.getPeptidePosition_1() == SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Looplink: srchRepPeptPeptideDTO.getPeptidePosition_1() not populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_2() == null
-								|| srchRepPeptPeptideDTO.getPeptidePosition_2() == SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Looplink: srchRepPeptPeptideDTO.getPeptidePosition_2() not populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-					}
+		//  Get static mods for search id
+		List<StaticModDTO> staticModDTOList = StaticModDAO.getInstance().getStaticModDTOForSearchId( searchId );
 
-				} else if ( webReportedPeptide.getSearchPeptideUnlinked() != null ) {
-					//  Process a unlinked
-					linkType = XLinkUtils.UNLINKED_TYPE_STRING;
-					
-					//  validation for unlinked
-					if ( srchRepPeptPeptideDTOList.size() != 1 ) {
-						String msg = "For Unlinked: List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " + searchId
-						+ ", ReportedPeptideId: " + reportedPeptideId ;
-						log.error( msg );
-						throw new ProxlWebappDataException( msg );
-					}
-					for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_1()  != null 
-								&& srchRepPeptPeptideDTO.getPeptidePosition_1() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Unlinked: srchRepPeptPeptideDTO.getPeptidePosition_1() is populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_2() != null
-								&& srchRepPeptPeptideDTO.getPeptidePosition_2() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Unlinked: srchRepPeptPeptideDTO.getPeptidePosition_2() is populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-					}
-				} else if ( webReportedPeptide.getSearchPeptideDimer() != null ) {
-					//  Process a dimer
-					linkType = XLinkUtils.UNLINKED_TYPE_STRING;  //  Lump in with unlinked reported peptides
+		///////////////////////////////////////////////
+		//  Get peptides for this search from the DATABASE
+		List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
+				PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
+						searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
+						PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
 
-					//  validation for dimer
-					if ( srchRepPeptPeptideDTOList.size() != 2 ) {
-						String msg = "For Dimer: List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + searchId
-						+ ", ReportedPeptideId: " + reportedPeptideId ;
-						log.error( msg );
-						throw new ProxlWebappDataException( msg );
-					}
-					for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_1()  != null 
-								&& srchRepPeptPeptideDTO.getPeptidePosition_1() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Dimer: srchRepPeptPeptideDTO.getPeptidePosition_1() is populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-						if ( srchRepPeptPeptideDTO.getPeptidePosition_2() != null
-								&& srchRepPeptPeptideDTO.getPeptidePosition_2() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
-							String msg = 
-									"For Dimer: srchRepPeptPeptideDTO.getPeptidePosition_2() is populated "
-									+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-					}
-				} else {
-					String msg = 
-							"Link type unkown"
-							+ " for reportedPeptideId: " + reportedPeptideId
-							+ ", searchId: " + searchId;
+		for ( WebReportedPeptideWrapper webReportedPeptideWrapper : wrappedLinksPerForSearch ) {
+			WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();
+			int reportedPeptideId = webReportedPeptide.getReportedPeptideId();
+
+			String linkType = null;
+
+			//  srchRepPeptPeptideDTOList: associated SrchRepPeptPeptideDTO for the link, one per associated peptide, populated per link type
+
+			//  copied from SearchPeptideCrosslink, this way not load PeptideDTO in SearchPeptideCrosslink
+			SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams = new SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams();
+			srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setSearchId( searchId );
+			srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams.setReportedPeptideId( reportedPeptideId );
+			SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result =
+					Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.getInstance()
+					.getSrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result( srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams );
+			List<SrchRepPeptPeptideDTO> srchRepPeptPeptideDTOList = srchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result.getSrchRepPeptPeptideDTOList();
+
+			if ( webReportedPeptide.getSearchPeptideCrosslink() != null ) {
+				//  Process a crosslink
+				linkType = XLinkUtils.CROSS_TYPE_STRING;
+
+				//  validation for crosslink
+				if ( srchRepPeptPeptideDTOList.size() != 2 ) {
+					String msg = "For Crosslink: List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + searchId
+							+ ", ReportedPeptideId: " + reportedPeptideId ;
 					log.error( msg );
 					throw new ProxlWebappDataException( msg );
 				}
-				
-				// get from map for link type
-				List<PPMErrorRetentionTimePair> ppmErrorListForLinkType = ppmErrorListForLinkType_ByLinkType.get( linkType );
-				
-				if ( ppmErrorListForLinkType == null ) {
-					String msg = "In processing Reported Peptides, link type not found: " + linkType;
-					log.error( msg );
-					throw new Exception(msg);
-				}
-
-				//  Collect the peptides and dynamic mods
-				
-				PeptideDTO peptide_1 =  null;
-				PeptideDTO peptide_2 =  null;
-				
-				List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_1 = null;
-				List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_2 = null;
-				
-				IsotopeLabelDTO isotopeLabel_1 = null;
-				IsotopeLabelDTO isotopeLabel_2 = null;
-				
-				//  process srchRepPeptPeptideDTOList (Each peptide mapped to the reported peptide)
 				for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
-					
-					//  Get Isotope Label
-					IsotopeLabelDTO isotopeLabelDTO = IsotopeLabelSearcher.getInstance().getIsotopeLabelForSearchReportedPeptide_Peptide( srchRepPeptPeptideDTO );
-					
-					// get PeptideDTO, caching locally in peptideDTO_MappedById
-					PeptideDTO peptide = peptideDTO_MappedById.get( srchRepPeptPeptideDTO.getPeptideId() );
-					if ( peptide == null ) {
-						peptide = PeptideDAO.getInstance().getPeptideDTOFromDatabase( srchRepPeptPeptideDTO.getPeptideId() );
-						//  To directly retrieve from DB:  PeptideDAO.getInstance().getPeptideDTOFromDatabaseActual( id )
-						if ( peptide == null ) {
-							String msg = 
-									"PeptideDTO not found in DB for id: " + srchRepPeptPeptideDTO.getPeptideId()
-									+ ", for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-									+ ", for reportedPeptideId: " + reportedPeptideId
-									+ ", searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-						peptideDTO_MappedById.put( srchRepPeptPeptideDTO.getPeptideId(), peptide );
-					}
-					
-//					staticModDTOList
-					
-					List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_Original = 
-							SrchRepPeptPeptDynamicModSearcher.getInstance()
-							.getSrchRepPeptPeptDynamicModForSrchRepPeptPeptideId( srchRepPeptPeptideDTO.getId() );
-					
-					//  Remove duplicate dynamic mods for same position and both compared are monolink flag true
-					//     logging error if mass is different
-					
-					List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList = new ArrayList<>( srchRepPeptPeptDynamicModDTOList_Original.size() );
-
-					for ( SrchRepPeptPeptDynamicModDTO item_OriginalList : srchRepPeptPeptDynamicModDTOList_Original ) {
-						
-						//  Check if already in list 
-						boolean alreadyInList = false;
-						for ( SrchRepPeptPeptDynamicModDTO item_OutputList : srchRepPeptPeptDynamicModDTOList ) {
-							
-							if ( item_OriginalList.getPosition() == item_OutputList.getPosition()
-									&& item_OriginalList.isMonolink() 
-									&& item_OutputList.isMonolink() ) {
-								
-								alreadyInList = true;
-								
-								if ( item_OriginalList.getMass() != item_OutputList.getMass() ) {
-									log.error( "Two SrchRepPeptPeptDynamicModDTO for same searchReportedPeptidepeptideId"
-											+ " found with same position and both are monolink and have different massses."
-											+ "  Entry 1: " + item_OriginalList
-											+ ", Entry 2: " + item_OutputList
-											+ ". searchId: " + searchId + ", reportedPeptideId: " + reportedPeptideId
-											);
-								}
-								break;
-							}
-						}
-						if ( ! alreadyInList ) {
-							srchRepPeptPeptDynamicModDTOList.add( item_OriginalList );
-						}
-					}
-						
-					
-					//  Specific debugging
-					
-//					if ( searchId == 188 && reportedPeptideId == 1408748 ) {
-//						log.warn( "searchId == 188 && reportedPeptideId == 1408748:  srchRepPeptPeptDynamicModDTOList: " 
-//								+ srchRepPeptPeptDynamicModDTOList );
-//					}
-						
-						
-
-					if ( peptide_1 == null ) {
-						peptide_1 = peptide;
-						isotopeLabel_1 = isotopeLabelDTO;
-						srchRepPeptPeptDynamicModDTOList_1 = srchRepPeptPeptDynamicModDTOList;
-
-					} else if ( peptide_2 == null ) {
-						peptide_2 = peptide;
-						isotopeLabel_2 = isotopeLabelDTO;
-						srchRepPeptPeptDynamicModDTOList_2 = srchRepPeptPeptDynamicModDTOList;
-
-					} else {
+					if ( srchRepPeptPeptideDTO.getPeptidePosition_1()  == null 
+							|| srchRepPeptPeptideDTO.getPeptidePosition_1() == SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
 						String msg = 
-								"peptide_1 and peptide_2 already have values"
-										+ ", for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
-										+ ", for reportedPeptideId: " + reportedPeptideId
+								"For Crosslink: srchRepPeptPeptideDTO.getPeptidePosition_1() not populated "
+										+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
+										+ ", reportedPeptideId: " + reportedPeptideId
+										+ ", searchId: " + searchId;
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
+					}
+					if ( srchRepPeptPeptideDTO.getPeptidePosition_2() != null
+							&& srchRepPeptPeptideDTO.getPeptidePosition_2() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
+						String msg = 
+								"For Crosslink: srchRepPeptPeptideDTO.getPeptidePosition_2() is populated "
+										+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
+										+ ", reportedPeptideId: " + reportedPeptideId
 										+ ", searchId: " + searchId;
 						log.error( msg );
 						throw new ProxlWebappDataException( msg );
 					}
 				}
-				
 
-				
-				//  To confirm that peptide sequences do not contain invalid amino acid characters
-				if( !PeptideUtils.isValidPeptideSequence( peptide_1.getSequence() ) || ( peptide_2 != null && !PeptideUtils.isValidPeptideSequence( peptide_2.getSequence() ) ) ) {
+			} else if ( webReportedPeptide.getSearchPeptideLooplink() != null ) {
+				//  Process a looplink
+				linkType = XLinkUtils.LOOP_TYPE_STRING;
 
-					// invalid peptide sequence(s), note it and skip this reported peptide
-					reportedPeptideIdsSkippedForErrorCalculatingMZ.add( reportedPeptideId );
-					continue;
+				//  validation for looplink
+				if ( srchRepPeptPeptideDTOList.size() != 1 ) {
+					String msg = "For Looplink: List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " + searchId
+							+ ", ReportedPeptideId: " + reportedPeptideId ;
+					log.error( msg );
+					throw new ProxlWebappDataException( msg );
+				}
+				for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
+					if ( srchRepPeptPeptideDTO.getPeptidePosition_1()  == null 
+							|| srchRepPeptPeptideDTO.getPeptidePosition_1() == SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
+						String msg = 
+								"For Looplink: srchRepPeptPeptideDTO.getPeptidePosition_1() not populated "
+										+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
+										+ ", reportedPeptideId: " + reportedPeptideId
+										+ ", searchId: " + searchId;
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
+					}
+					if ( srchRepPeptPeptideDTO.getPeptidePosition_2() == null
+							|| srchRepPeptPeptideDTO.getPeptidePosition_2() == SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
+						String msg = 
+								"For Looplink: srchRepPeptPeptideDTO.getPeptidePosition_2() not populated "
+										+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
+										+ ", reportedPeptideId: " + reportedPeptideId
+										+ ", searchId: " + searchId;
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
+					}
 				}
 
-				
-				
+			} else if ( webReportedPeptide.getSearchPeptideUnlinked() != null ) {
+				//  Process a unlinked
+				linkType = XLinkUtils.UNLINKED_TYPE_STRING;
 
-				// process PSMs for this Reported Peptide
-
-				List<PsmWebDisplayWebServiceResult> psmWebDisplayList = 
-						PsmWebDisplaySearcher.getInstance().getPsmsWebDisplay( searchId, reportedPeptideId, searcherCutoffValuesSearchLevel );
-
-				for ( PsmWebDisplayWebServiceResult psmWebDisplayWebServiceResult : psmWebDisplayList ) {
-
-					BigDecimal retentionTime = psmWebDisplayWebServiceResult.getRetentionTime();
-
-					BigDecimal scanPreMZ = psmWebDisplayWebServiceResult.getPreMZ(); // from scan table
-					double scanPreMZasDouble = scanPreMZ.doubleValue();
-
-					PsmDTO psmDTO = psmWebDisplayWebServiceResult.getPsmDTO();
-					Integer charge = psmDTO.getCharge();
-					BigDecimal linkerMass = psmDTO.getLinkerMass();
-					
-					Double linkerMassAsDouble = null;
-					
-					if ( linkerMass != null ) {
-						linkerMassAsDouble = linkerMass.doubleValue();
-					}
-					
-					if ( charge != null && scanPreMZ != null ) {
-
-						//  Compute PPM Error
-
-						double ppmError = 0;
-						
-						try {
-							PSMMassCalculatorParams params = new PSMMassCalculatorParams();
-							params.setCharge( charge );
-							params.setLinkerMass( linkerMassAsDouble );
-							params.setPrecursorMZ( scanPreMZasDouble );
-							
-							params.setPeptide1( peptide_1 );
-							params.setPeptide2( peptide_2 );
-							
-							params.setLabel1( isotopeLabel_1 );
-							params.setLabel2( isotopeLabel_2 );
-							
-							params.setDynamicMods1( srchRepPeptPeptDynamicModDTOList_1 );
-							params.setDynamicMods2( srchRepPeptPeptDynamicModDTOList_2 );
-							
-							params.setStaticMods( staticModDTOList );
-							
-							ppmError = PSMMassCalculator.calculatePPMEstimateForPSM( params );
-							
-							PPMErrorRetentionTimePair ppmErrorRetentionTimePair = new PPMErrorRetentionTimePair();
-							ppmErrorRetentionTimePair.ppmError = ppmError;
-							ppmErrorRetentionTimePair.retentionTime = retentionTime;
-							ppmErrorListForLinkType.add( ppmErrorRetentionTimePair );
-						} catch ( Exception e ) {
-							String msg = "PSMMassCalculator.calculatePPMEstimateForPSM(...) threw exception:"
-									+ "\n linkType: " + linkType
-									+ "\n scanPreMZasDouble: " + scanPreMZasDouble
-									+ "\n search id: " + searchId
-									+ "\n reported peptide id: " + reportedPeptideId
-									+ "\n reported peptide: " + webReportedPeptide.getReportedPeptide().getSequence()
-									+ "\n peptide_1: " + peptide_1 
-									+ "\n peptide_2: " + peptide_2
-									+ "\n srchRepPeptPeptDynamicModDTOList_1: " + srchRepPeptPeptDynamicModDTOList_1
-									+ "\n srchRepPeptPeptDynamicModDTOList_2: " + srchRepPeptPeptDynamicModDTOList_2
-									+ "\n charge: " + charge
-									+ "\n linkerMassAsDouble: " + linkerMassAsDouble
-									+ "\n staticModDTOList: " + staticModDTOList;
-							log.error( msg, e );
-							throw e;
-						}
-						
-						
-//						//  Calculate M/Z from sequence(s), ...
-//						
-//						double mzCalculated = 0;
-//						
-//						try {
-//							mzCalculated = 
-//									PSMMassCalculator.calculateMZForPSM( 
-//											peptide_1, 
-//											peptide_2, 
-//											staticModDTOList, 
-//											srchRepPeptPeptDynamicModDTOList_1, 
-//											srchRepPeptPeptDynamicModDTOList_2, 
-//											charge, 
-//											linkerMassAsDouble );
-//						} catch ( Exception e ) {
-//							String msg = "PSMMassCalculator.calculateMZForPSM(...) threw exception:"
-//									+ "\n linkType: " + linkType
-//									+ "\n scanPreMZasDouble: " + scanPreMZasDouble 
-//									+ "\n peptide_1: " + peptide_1 
-//									+ "\n peptide_2: " + peptide_2
-//									+ "\n srchRepPeptPeptDynamicModDTOList_1: " + srchRepPeptPeptDynamicModDTOList_1
-//									+ "\n srchRepPeptPeptDynamicModDTOList_2: " + srchRepPeptPeptDynamicModDTOList_2
-//									+ "\n charge: " + charge
-//									+ "\n linkerMassAsDouble: " + linkerMassAsDouble
-//									+ "\n staticModDTOList: " + staticModDTOList;
-//							log.error( msg, e );
-//							throw e;
-//						}
-//
-//						
-//						//  Compare preMZ to computed mass, applying charge, linkerMass(if not null)
-//						
-//						double ppmError = ( scanPreMZasDouble - mzCalculated ) / mzCalculated * 1000000;
-//						
-//						ppmErrorListForLinkType.add( ppmError );
-						
-						
-//						//  ONLY FOR DEBUGGING
-//						
-//						//  Tracking entries with largest PPM Error for Unlinked
-//						
-//						if ( linkType.equals( XLinkUtils.UNLINKED_TYPE_STRING ) ) {
-////						if ( linkType.equals( XLinkUtils.CROSS_TYPE_STRING ) ) {
-//
-//							PPM_Error_ComputeEntry ppm_Error_ComputeEntry = new PPM_Error_ComputeEntry();
-//
-//							ppm_Error_ComputeEntry.ppmError = ppmError;
-//							ppm_Error_ComputeEntry.linkType = linkType;
-//							
-//							ppm_Error_ComputeEntry.scanPreM = scanPreMZasDouble;
-////							ppm_Error_ComputeEntry.computedMZ = mzCalculated;
-//							
-//							ppm_Error_ComputeEntry.searchId = searchId;
-//							ppm_Error_ComputeEntry.reportedPeptideId = reportedPeptideId;
-//							
-//							ppm_Error_ComputeEntry.reportedPeptideString = webReportedPeptide.getReportedPeptide().getSequence();
-//							
-//							ppm_Error_ComputeEntry.peptide1 = peptide_1;
-//							ppm_Error_ComputeEntry.peptide2 = peptide_2;
-//							ppm_Error_ComputeEntry.staticMods = staticModDTOList;
-//							ppm_Error_ComputeEntry.dynamicMods1 = srchRepPeptPeptDynamicModDTOList_1;
-//							ppm_Error_ComputeEntry.dynamicMods2 = srchRepPeptPeptDynamicModDTOList_2;
-//							ppm_Error_ComputeEntry.charge = charge;
-//							ppm_Error_ComputeEntry.linkerMass = linkerMassAsDouble;
-//
-//							ppm_Error_ComputeEntryList.add( ppm_Error_ComputeEntry );
-//
-//							//  Sort in descending ABS( ppmError ) order
-//							Collections.sort( ppm_Error_ComputeEntryList, new Comparator<PPM_Error_ComputeEntry>() {
-//
-//								@Override
-//								public int compare(PPM_Error_ComputeEntry o1, PPM_Error_ComputeEntry o2) {
-//									double o1_ppmError = o1.ppmError;
-//									double o2_ppmError = o2.ppmError;
-//									double difference = Math.abs( o1_ppmError ) - Math.abs( o2_ppmError );
-//									//  Sort in descending ppmError order
-//									if ( difference > 0 ) {
-//										return -1;
-//									}
-//									if ( difference < 0 ) {
-//										return 1;
-//									}
-//									return 0;
-//								}
-//							});
-//
-//							int MAX_ENTRIES = 10;
-//
-//							if ( ppm_Error_ComputeEntryList.size() > MAX_ENTRIES ) {
-//								for ( int index = MAX_ENTRIES; index < ppm_Error_ComputeEntryList.size(); index++ ) {
-//									ppm_Error_ComputeEntryList.remove( index );
-//								}
-//							}
-//						} // END  //  Tracking entries with largest PPM Error for Unlinked
-						
-					}
-
-
+				//  validation for unlinked
+				if ( srchRepPeptPeptideDTOList.size() != 1 ) {
+					String msg = "For Unlinked: List<SrchRepPeptPeptideDTO> results.size() != 1. SearchId: " + searchId
+							+ ", ReportedPeptideId: " + reportedPeptideId ;
+					log.error( msg );
+					throw new ProxlWebappDataException( msg );
 				}
-				
+				for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
+					if ( srchRepPeptPeptideDTO.getPeptidePosition_1()  != null 
+							&& srchRepPeptPeptideDTO.getPeptidePosition_1() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
+						String msg = 
+								"For Unlinked: srchRepPeptPeptideDTO.getPeptidePosition_1() is populated "
+										+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
+										+ ", reportedPeptideId: " + reportedPeptideId
+										+ ", searchId: " + searchId;
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
+					}
+					if ( srchRepPeptPeptideDTO.getPeptidePosition_2() != null
+							&& srchRepPeptPeptideDTO.getPeptidePosition_2() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
+						String msg = 
+								"For Unlinked: srchRepPeptPeptideDTO.getPeptidePosition_2() is populated "
+										+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
+										+ ", reportedPeptideId: " + reportedPeptideId
+										+ ", searchId: " + searchId;
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
+					}
+				}
+			} else if ( webReportedPeptide.getSearchPeptideDimer() != null ) {
+				//  Process a dimer
+				linkType = XLinkUtils.UNLINKED_TYPE_STRING;  //  Lump in with unlinked reported peptides
+
+				//  validation for dimer
+				if ( srchRepPeptPeptideDTOList.size() != 2 ) {
+					String msg = "For Dimer: List<SrchRepPeptPeptideDTO> results.size() != 2. SearchId: " + searchId
+							+ ", ReportedPeptideId: " + reportedPeptideId ;
+					log.error( msg );
+					throw new ProxlWebappDataException( msg );
+				}
+				for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
+					if ( srchRepPeptPeptideDTO.getPeptidePosition_1()  != null 
+							&& srchRepPeptPeptideDTO.getPeptidePosition_1() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
+						String msg = 
+								"For Dimer: srchRepPeptPeptideDTO.getPeptidePosition_1() is populated "
+										+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
+										+ ", reportedPeptideId: " + reportedPeptideId
+										+ ", searchId: " + searchId;
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
+					}
+					if ( srchRepPeptPeptideDTO.getPeptidePosition_2() != null
+							&& srchRepPeptPeptideDTO.getPeptidePosition_2() != SrchRepPeptPeptideDTO.PEPTIDE_POSITION_NOT_SET ) {
+						String msg = 
+								"For Dimer: srchRepPeptPeptideDTO.getPeptidePosition_2() is populated "
+										+ " for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
+										+ ", reportedPeptideId: " + reportedPeptideId
+										+ ", searchId: " + searchId;
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
+					}
+				}
+			} else {
+				String msg = 
+						"Link type unkown"
+								+ " for reportedPeptideId: " + reportedPeptideId
+								+ ", searchId: " + searchId;
+				log.error( msg );
+				throw new ProxlWebappDataException( msg );
 			}
+
+			// get from map for link type
+			List<PPMErrorRetentionTimePair> ppmErrorListForLinkType = ppmErrorListForLinkType_ByLinkType.get( linkType );
+
+			if ( ppmErrorListForLinkType == null ) {
+				String msg = "In processing Reported Peptides, link type not found: " + linkType;
+				log.error( msg );
+				throw new Exception(msg);
+			}
+
+			//  Collect the peptides and dynamic mods
+
+			PeptideDTO peptide_1 =  null;
+			PeptideDTO peptide_2 =  null;
+
+			List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_1 = null;
+			List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_2 = null;
+
+			IsotopeLabelDTO isotopeLabel_1 = null;
+			IsotopeLabelDTO isotopeLabel_2 = null;
+
+			//  process srchRepPeptPeptideDTOList (Each peptide mapped to the reported peptide)
+			for ( SrchRepPeptPeptideDTO srchRepPeptPeptideDTO : srchRepPeptPeptideDTOList ) {
+
+				//  Get Isotope Label
+				IsotopeLabelDTO isotopeLabelDTO = IsotopeLabelSearcher.getInstance().getIsotopeLabelForSearchReportedPeptide_Peptide( srchRepPeptPeptideDTO );
+
+				// get PeptideDTO, caching locally in peptideDTO_MappedById
+				PeptideDTO peptide = peptideDTO_MappedById.get( srchRepPeptPeptideDTO.getPeptideId() );
+				if ( peptide == null ) {
+					peptide = PeptideDAO.getInstance().getPeptideDTOFromDatabase( srchRepPeptPeptideDTO.getPeptideId() );
+					//  To directly retrieve from DB:  PeptideDAO.getInstance().getPeptideDTOFromDatabaseActual( id )
+					if ( peptide == null ) {
+						String msg = 
+								"PeptideDTO not found in DB for id: " + srchRepPeptPeptideDTO.getPeptideId()
+								+ ", for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
+								+ ", for reportedPeptideId: " + reportedPeptideId
+								+ ", searchId: " + searchId;
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
+					}
+					peptideDTO_MappedById.put( srchRepPeptPeptideDTO.getPeptideId(), peptide );
+				}
+
+				//					staticModDTOList
+
+				List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_Original = 
+						SrchRepPeptPeptDynamicModSearcher.getInstance()
+						.getSrchRepPeptPeptDynamicModForSrchRepPeptPeptideId( srchRepPeptPeptideDTO.getId() );
+
+				//  Remove duplicate dynamic mods for same position and both compared are monolink flag true
+				//     logging error if mass is different
+
+				List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList = new ArrayList<>( srchRepPeptPeptDynamicModDTOList_Original.size() );
+
+				for ( SrchRepPeptPeptDynamicModDTO item_OriginalList : srchRepPeptPeptDynamicModDTOList_Original ) {
+
+					//  Check if already in list 
+					boolean alreadyInList = false;
+					for ( SrchRepPeptPeptDynamicModDTO item_OutputList : srchRepPeptPeptDynamicModDTOList ) {
+
+						if ( item_OriginalList.getPosition() == item_OutputList.getPosition()
+								&& item_OriginalList.isMonolink() 
+								&& item_OutputList.isMonolink() ) {
+
+							alreadyInList = true;
+
+							if ( item_OriginalList.getMass() != item_OutputList.getMass() ) {
+								log.error( "Two SrchRepPeptPeptDynamicModDTO for same searchReportedPeptidepeptideId"
+										+ " found with same position and both are monolink and have different massses."
+										+ "  Entry 1: " + item_OriginalList
+										+ ", Entry 2: " + item_OutputList
+										+ ". searchId: " + searchId + ", reportedPeptideId: " + reportedPeptideId
+										);
+							}
+							break;
+						}
+					}
+					if ( ! alreadyInList ) {
+						srchRepPeptPeptDynamicModDTOList.add( item_OriginalList );
+					}
+				}
+
+
+				//  Specific debugging
+
+				//					if ( searchId == 188 && reportedPeptideId == 1408748 ) {
+				//						log.warn( "searchId == 188 && reportedPeptideId == 1408748:  srchRepPeptPeptDynamicModDTOList: " 
+				//								+ srchRepPeptPeptDynamicModDTOList );
+				//					}
+
+
+
+				if ( peptide_1 == null ) {
+					peptide_1 = peptide;
+					isotopeLabel_1 = isotopeLabelDTO;
+					srchRepPeptPeptDynamicModDTOList_1 = srchRepPeptPeptDynamicModDTOList;
+
+				} else if ( peptide_2 == null ) {
+					peptide_2 = peptide;
+					isotopeLabel_2 = isotopeLabelDTO;
+					srchRepPeptPeptDynamicModDTOList_2 = srchRepPeptPeptDynamicModDTOList;
+
+				} else {
+					String msg = 
+							"peptide_1 and peptide_2 already have values"
+									+ ", for srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
+									+ ", for reportedPeptideId: " + reportedPeptideId
+									+ ", searchId: " + searchId;
+					log.error( msg );
+					throw new ProxlWebappDataException( msg );
+				}
+			}
+
+
+
+			//  To confirm that peptide sequences do not contain invalid amino acid characters
+			if( !PeptideUtils.isValidPeptideSequence( peptide_1.getSequence() ) || ( peptide_2 != null && !PeptideUtils.isValidPeptideSequence( peptide_2.getSequence() ) ) ) {
+
+				// invalid peptide sequence(s), note it and skip this reported peptide
+				reportedPeptideIdsSkippedForErrorCalculatingMZ.add( reportedPeptideId );
+				continue;
+			}
+
+
+
+
+			// process PSMs for this Reported Peptide
+
+			List<PsmWebDisplayWebServiceResult> psmWebDisplayList = 
+					PsmWebDisplaySearcher.getInstance().getPsmsWebDisplay( searchId, reportedPeptideId, searcherCutoffValuesSearchLevel );
+
+			for ( PsmWebDisplayWebServiceResult psmWebDisplayWebServiceResult : psmWebDisplayList ) {
+
+				BigDecimal retentionTime = psmWebDisplayWebServiceResult.getRetentionTime();
+
+				BigDecimal scanPreMZ = psmWebDisplayWebServiceResult.getPreMZ(); // from scan table
+				double scanPreMZasDouble = scanPreMZ.doubleValue();
+
+				PsmDTO psmDTO = psmWebDisplayWebServiceResult.getPsmDTO();
+				Integer charge = psmDTO.getCharge();
+				BigDecimal linkerMass = psmDTO.getLinkerMass();
+
+				Double linkerMassAsDouble = null;
+
+				if ( linkerMass != null ) {
+					linkerMassAsDouble = linkerMass.doubleValue();
+				}
+
+				if ( charge != null && scanPreMZ != null ) {
+
+					//  Compute PPM Error
+
+					double ppmError = 0;
+
+					try {
+						PSMMassCalculatorParams params = new PSMMassCalculatorParams();
+						params.setCharge( charge );
+						params.setLinkerMass( linkerMassAsDouble );
+						params.setPrecursorMZ( scanPreMZasDouble );
+
+						params.setPeptide1( peptide_1 );
+						params.setPeptide2( peptide_2 );
+
+						params.setLabel1( isotopeLabel_1 );
+						params.setLabel2( isotopeLabel_2 );
+
+						params.setDynamicMods1( srchRepPeptPeptDynamicModDTOList_1 );
+						params.setDynamicMods2( srchRepPeptPeptDynamicModDTOList_2 );
+
+						params.setStaticMods( staticModDTOList );
+
+						ppmError = PSMMassCalculator.calculatePPMEstimateForPSM( params );
+
+						PPMErrorRetentionTimePair ppmErrorRetentionTimePair = new PPMErrorRetentionTimePair();
+						ppmErrorRetentionTimePair.ppmError = ppmError;
+						ppmErrorRetentionTimePair.retentionTime = retentionTime;
+						ppmErrorListForLinkType.add( ppmErrorRetentionTimePair );
+					} catch ( Exception e ) {
+						String msg = "PSMMassCalculator.calculatePPMEstimateForPSM(...) threw exception:"
+								+ "\n linkType: " + linkType
+								+ "\n scanPreMZasDouble: " + scanPreMZasDouble
+								+ "\n search id: " + searchId
+								+ "\n reported peptide id: " + reportedPeptideId
+								+ "\n reported peptide: " + webReportedPeptide.getReportedPeptide().getSequence()
+								+ "\n peptide_1: " + peptide_1 
+								+ "\n peptide_2: " + peptide_2
+								+ "\n srchRepPeptPeptDynamicModDTOList_1: " + srchRepPeptPeptDynamicModDTOList_1
+								+ "\n srchRepPeptPeptDynamicModDTOList_2: " + srchRepPeptPeptDynamicModDTOList_2
+								+ "\n charge: " + charge
+								+ "\n linkerMassAsDouble: " + linkerMassAsDouble
+								+ "\n staticModDTOList: " + staticModDTOList;
+						log.error( msg, e );
+						throw e;
+					}
+
+
+					//						//  Calculate M/Z from sequence(s), ...
+					//						
+					//						double mzCalculated = 0;
+					//						
+					//						try {
+					//							mzCalculated = 
+					//									PSMMassCalculator.calculateMZForPSM( 
+					//											peptide_1, 
+					//											peptide_2, 
+					//											staticModDTOList, 
+					//											srchRepPeptPeptDynamicModDTOList_1, 
+					//											srchRepPeptPeptDynamicModDTOList_2, 
+					//											charge, 
+					//											linkerMassAsDouble );
+					//						} catch ( Exception e ) {
+					//							String msg = "PSMMassCalculator.calculateMZForPSM(...) threw exception:"
+					//									+ "\n linkType: " + linkType
+					//									+ "\n scanPreMZasDouble: " + scanPreMZasDouble 
+					//									+ "\n peptide_1: " + peptide_1 
+					//									+ "\n peptide_2: " + peptide_2
+					//									+ "\n srchRepPeptPeptDynamicModDTOList_1: " + srchRepPeptPeptDynamicModDTOList_1
+					//									+ "\n srchRepPeptPeptDynamicModDTOList_2: " + srchRepPeptPeptDynamicModDTOList_2
+					//									+ "\n charge: " + charge
+					//									+ "\n linkerMassAsDouble: " + linkerMassAsDouble
+					//									+ "\n staticModDTOList: " + staticModDTOList;
+					//							log.error( msg, e );
+					//							throw e;
+					//						}
+					//
+					//						
+					//						//  Compare preMZ to computed mass, applying charge, linkerMass(if not null)
+					//						
+					//						double ppmError = ( scanPreMZasDouble - mzCalculated ) / mzCalculated * 1000000;
+					//						
+					//						ppmErrorListForLinkType.add( ppmError );
+
+
+					//						//  ONLY FOR DEBUGGING
+					//						
+					//						//  Tracking entries with largest PPM Error for Unlinked
+					//						
+					//						if ( linkType.equals( XLinkUtils.UNLINKED_TYPE_STRING ) ) {
+					////						if ( linkType.equals( XLinkUtils.CROSS_TYPE_STRING ) ) {
+					//
+					//							PPM_Error_ComputeEntry ppm_Error_ComputeEntry = new PPM_Error_ComputeEntry();
+					//
+					//							ppm_Error_ComputeEntry.ppmError = ppmError;
+					//							ppm_Error_ComputeEntry.linkType = linkType;
+					//							
+					//							ppm_Error_ComputeEntry.scanPreM = scanPreMZasDouble;
+					////							ppm_Error_ComputeEntry.computedMZ = mzCalculated;
+					//							
+					//							ppm_Error_ComputeEntry.searchId = searchId;
+					//							ppm_Error_ComputeEntry.reportedPeptideId = reportedPeptideId;
+					//							
+					//							ppm_Error_ComputeEntry.reportedPeptideString = webReportedPeptide.getReportedPeptide().getSequence();
+					//							
+					//							ppm_Error_ComputeEntry.peptide1 = peptide_1;
+					//							ppm_Error_ComputeEntry.peptide2 = peptide_2;
+					//							ppm_Error_ComputeEntry.staticMods = staticModDTOList;
+					//							ppm_Error_ComputeEntry.dynamicMods1 = srchRepPeptPeptDynamicModDTOList_1;
+					//							ppm_Error_ComputeEntry.dynamicMods2 = srchRepPeptPeptDynamicModDTOList_2;
+					//							ppm_Error_ComputeEntry.charge = charge;
+					//							ppm_Error_ComputeEntry.linkerMass = linkerMassAsDouble;
+					//
+					//							ppm_Error_ComputeEntryList.add( ppm_Error_ComputeEntry );
+					//
+					//							//  Sort in descending ABS( ppmError ) order
+					//							Collections.sort( ppm_Error_ComputeEntryList, new Comparator<PPM_Error_ComputeEntry>() {
+					//
+					//								@Override
+					//								public int compare(PPM_Error_ComputeEntry o1, PPM_Error_ComputeEntry o2) {
+					//									double o1_ppmError = o1.ppmError;
+					//									double o2_ppmError = o2.ppmError;
+					//									double difference = Math.abs( o1_ppmError ) - Math.abs( o2_ppmError );
+					//									//  Sort in descending ppmError order
+					//									if ( difference > 0 ) {
+					//										return -1;
+					//									}
+					//									if ( difference < 0 ) {
+					//										return 1;
+					//									}
+					//									return 0;
+					//								}
+					//							});
+					//
+					//							int MAX_ENTRIES = 10;
+					//
+					//							if ( ppm_Error_ComputeEntryList.size() > MAX_ENTRIES ) {
+					//								for ( int index = MAX_ENTRIES; index < ppm_Error_ComputeEntryList.size(); index++ ) {
+					//									ppm_Error_ComputeEntryList.remove( index );
+					//								}
+					//							}
+					//						} // END  //  Tracking entries with largest PPM Error for Unlinked
+
+				}
+
+
+			}
+
 		}
 		
 		if ( ! reportedPeptideIdsSkippedForErrorCalculatingMZ.isEmpty() ) {
 			log.warn( "Number of Reported Peptides Skipped For Error Calculating MZ: " 
 					+ reportedPeptideIdsSkippedForErrorCalculatingMZ.size()
-					+ ", search ids: " + searchIds.toString()
+					+ ", search id: " + searchId
 					+ ", List of Reported Peptide Ids: " + reportedPeptideIdsSkippedForErrorCalculatingMZ );
 		}
 		

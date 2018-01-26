@@ -1,8 +1,13 @@
 package org.yeastrc.xlink.www.qc_data.scan_level_data.main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 //import org.apache.log4j.Logger;
 
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt;
+import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt.IdParamType;
+import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt.ReplaceExistingValue;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistration;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistrationIF;
 
@@ -39,18 +44,23 @@ public class Scan_MS_1_IonCurrent_Histograms_CachedResultManager implements Cach
 	 * @param imageAsBytes
 	 * @throws Exception
 	 */
-	public byte[] retrieveDataFromCache( int scanFileId ) throws Exception {
+	public byte[] retrieveDataFromCache( int scanFileId, String requestQueryString ) throws Exception {
 		
 		if ( ! CachedDataInFileMgmt.getSingletonInstance().isCachedDataFilesDirConfigured() ) {
 			return null;  //  EARLY EXIT
 		}
+
+		List<Integer> ids = new ArrayList<>( 1 );
+		ids.add( scanFileId );
+		
 		byte[] resultJSONAsBytes = 
 				CachedDataInFileMgmt.getSingletonInstance()
 				.retrieveCachedDataFileContents(
 						PREFIX_FOR_CACHING /* namePrefix */, 
 						Scan_MS_1_IonCurrent_Histograms.VERSION_FOR_CACHING /* version */, 
-						null /* fullIdentifier */, 
-						Integer.toString( scanFileId ) /* id */ );
+						requestQueryString, 
+						ids,
+						IdParamType.SCAN_FILE_ID );
 		return resultJSONAsBytes;
 	}
 	
@@ -59,19 +69,24 @@ public class Scan_MS_1_IonCurrent_Histograms_CachedResultManager implements Cach
 	 * @param imageAsBytes
 	 * @throws Exception
 	 */
-	public void saveDataToCache( int scanFileId, byte[] resultJSONAsBytes ) throws Exception {
+	public void saveDataToCache( int scanFileId, byte[] resultJSONAsBytes, String requestQueryString ) throws Exception {
 		
 		if ( ! CachedDataInFileMgmt.getSingletonInstance().isCachedDataFilesDirConfigured() ) {
 			return;  //  EARLY EXIT
 		}
+
+		List<Integer> ids = new ArrayList<>( 1 );
+		ids.add( scanFileId );
 		
 		CachedDataInFileMgmt.getSingletonInstance()
 		.saveCachedDataFileContents(
 				resultJSONAsBytes, 
+				ReplaceExistingValue.NO,
 				PREFIX_FOR_CACHING /* namePrefix */, 
 				Scan_MS_1_IonCurrent_Histograms.VERSION_FOR_CACHING /* version */, 
-				null /* fullIdentifier */, 
-				Integer.toString( scanFileId ) /* id */ );
+				requestQueryString, 
+				ids,
+				IdParamType.SCAN_FILE_ID );
 		
 	}
 

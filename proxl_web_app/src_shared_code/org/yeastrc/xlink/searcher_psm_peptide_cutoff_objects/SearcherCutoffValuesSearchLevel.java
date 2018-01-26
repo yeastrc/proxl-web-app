@@ -1,11 +1,13 @@
 package org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
@@ -32,6 +34,76 @@ public class SearcherCutoffValuesSearchLevel {
 	private List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesPerAnnotationIdList;
 	private List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesPerAnnotationIdList;
 	
+	/**
+	 * Make compact string for comparing to another SearcherCutoffValuesSearchLevel value 
+	 * when need to serialize it to a string
+	 */
+	private String asCompactString;
+	
+
+	byte[] compactStringByteArray;
+
+	
+	/**
+	 * @return
+	 */
+	public byte[] getAsCompactStringByteArray() {
+		if ( compactStringByteArray != null ) {
+			return compactStringByteArray;
+		}
+		compactStringByteArray = getAsCompactString().getBytes( StandardCharsets.UTF_8 );
+		return compactStringByteArray;
+	}
+	
+	/**
+	 * @return
+	 */
+	public String getAsCompactString() {
+		if ( asCompactString != null ) {
+			return asCompactString;
+		}
+		
+		StringBuilder asStringSB = new StringBuilder( 100000 );
+		asStringSB.append( String.valueOf( projectSearchId ) );
+		asStringSB.append( "pep" );
+		addCutoffsPerAnnotationDataAsCompactString(peptideCutoffValuesPerAnnotationId, asStringSB);
+		asStringSB.append( "psm" );
+		addCutoffsPerAnnotationDataAsCompactString(psmCutoffValuesPerAnnotationId, asStringSB);
+		
+		asCompactString = asStringSB.toString();
+		return asCompactString;
+	}
+
+	/**
+	 * @param cutoffsPerAnnotationData
+	 * @param asStringSB
+	 */
+	private void addCutoffsPerAnnotationDataAsCompactString( 
+			Map<Integer, SearcherCutoffValuesAnnotationLevel> cutoffsPerAnnotationData, 
+			StringBuilder asStringSB ) {
+		//  Put in List so can sort
+		List<Map.Entry<Integer, SearcherCutoffValuesAnnotationLevel> > mapEntriesList = new ArrayList<>( cutoffsPerAnnotationData.entrySet() );
+		Collections.sort( mapEntriesList, new Comparator<Map.Entry<Integer, SearcherCutoffValuesAnnotationLevel>>() {
+			@Override
+			public int compare(Entry<Integer, SearcherCutoffValuesAnnotationLevel> o1,
+					Entry<Integer, SearcherCutoffValuesAnnotationLevel> o2) {
+				if ( o1.getKey() < o2.getKey() ) {
+					return -1;
+				}
+				if ( o1.getKey() > o2.getKey() ) {
+					return 1;
+				}
+				return 0;
+			}
+		});
+		for ( Map.Entry<Integer, SearcherCutoffValuesAnnotationLevel> entry : mapEntriesList ) {
+			asStringSB.append( String.valueOf( entry.getValue().getAnnotationTypeId() ) );
+			asStringSB.append( ":" );
+			asStringSB.append( String.valueOf( entry.getValue().getAnnotationCutoffValue() ) );
+			asStringSB.append( "," );
+		}
+		
+	}
 	
 	/**
 	 * 

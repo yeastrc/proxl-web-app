@@ -372,8 +372,7 @@ var QCPageChart_Error_Vs_M_Over_Z_PSM = function() {
 		var selectedLinkType = params.selectedLinkType;
 		var $chart_outer_container_jq = params.$chart_outer_container_jq;
 
-		var ppmErrorVsM_over_ZScatterPlotResult = ajaxResponseData.ppmErrorVsM_over_ZScatterPlotResult;
-		var dataForChartPerLinkTypeList = ppmErrorVsM_over_ZScatterPlotResult.dataForChartPerLinkTypeList;
+		var dataForChartPerLinkTypeList = ajaxResponseData.dataForChartPerLinkTypeList;
 
 		if ( dataForChartPerLinkTypeList.length !== 1 ) {
 			throw Error( "dataForChartPerLinkTypeList.length !== 1, is = " + dataForChartPerLinkTypeList.length );

@@ -3,7 +3,6 @@ package org.yeastrc.xlink.www.actions;
 import java.io.BufferedOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +50,8 @@ public class DownloadQC_Psm_PPM_Error_VS_MZ_ChartDataAction extends Action {
 			  HttpServletResponse response )
 					  throws Exception {
 		try {
+			String requestQueryString = request.getQueryString();
+			
 			// our form
 			MergedSearchViewPeptidesForm form = (MergedSearchViewPeptidesForm)actionForm;
 			// Get the session first.  
@@ -64,11 +65,12 @@ public class DownloadQC_Psm_PPM_Error_VS_MZ_ChartDataAction extends Action {
 				log.error( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
+
+			int projectSearchId = projectSearchIds[ 0 ];
+			
 			//   Get the project id for these searches
 			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
-			for ( int searchId : projectSearchIds ) {
-				projectSearchIdsSet.add( searchId );
-			}
+			projectSearchIdsSet.add( projectSearchId );
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
@@ -102,35 +104,16 @@ public class DownloadQC_Psm_PPM_Error_VS_MZ_ChartDataAction extends Action {
 			
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
-			
-			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIds.length );
-			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
-			List<Integer> searchIds = new ArrayList<>( projectSearchIds.length );
-			
-			Set<Integer> projectSearchIdsAlreadyProcessed = new HashSet<>();
-			
-			for( int projectSearchId : projectSearchIds ) {
-				if ( projectSearchIdsAlreadyProcessed.contains( projectSearchId ) ) {
-					// ALready processed this projectSearchId, this must be a duplicate
-					continue; //  EARLY CONTINUE
-				}
-				projectSearchIdsAlreadyProcessed.add( projectSearchId );
-				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
-				if ( search == null ) {
-					String msg = "projectSearchId '" + projectSearchId + "' not found in the database. User taken to home page.";
-					log.warn( msg );
-					//  Search not found, the data on the page they are requesting does not exist.
-					//  The data on the user's previous page no longer reflects what is in the database.
-					//  Take the user to the home page
-					return mapping.findForward( StrutsGlobalForwardNames.HOME );  //  EARLY EXIT from Method
-				}
-				searches.add( search );
-				searchesMapOnSearchId.put( search.getSearchId(), search );
-				searchIds.add( search.getSearchId() );
+
+			SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
+			if ( search == null ) {
+				String msg = "projectSearchId '" + projectSearchId + "' not found in the database. User taken to home page.";
+				log.warn( msg );
+				//  Search not found, the data on the page they are requesting does not exist.
+				//  The data on the user's previous page no longer reflects what is in the database.
+				//  Take the user to the home page
+				return mapping.findForward( StrutsGlobalForwardNames.HOME );  //  EARLY EXIT from Method
 			}
-//			Collections.sort( searchIds );
-			
-			SearchDTO search = searches.get( 0 );// Works since only 1 is allowed
 			int searchId = search.getSearchId();
 			
 			OutputStreamWriter writer = null;
@@ -143,8 +126,9 @@ public class DownloadQC_Psm_PPM_Error_VS_MZ_ChartDataAction extends Action {
 				PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Method_Response ppm_Error_Vs_MZ_ScatterPlot_For_PSMPeptideCutoffs_Method_Response =
 						PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs.getInstance()
 						.getPPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs( 
+								requestQueryString,
 								PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs.ForDownload.YES,
-								filterCriteria_JSONString, searches );
+								filterCriteria_JSONString, search );
 				
 				/**
 				 * Map<[link type]...>
@@ -165,7 +149,7 @@ public class DownloadQC_Psm_PPM_Error_VS_MZ_ChartDataAction extends Action {
 				String filename = "proxl-qc-psm-ppm-error-vs-m-over-z-" 
 						+ StringUtils.join( linkTypesList, '-' ) 
 						+ "-search-"
-						+ StringUtils.join( searchIds, '-' )
+						+ searchId
 						+ "-" + fmt.print( dt )
 						+ ".txt";
 				

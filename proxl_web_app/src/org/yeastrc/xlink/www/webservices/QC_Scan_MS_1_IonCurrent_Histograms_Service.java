@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -38,7 +39,8 @@ public class QC_Scan_MS_1_IonCurrent_Histograms_Service {
 	public byte[] getMS_1_IonCurrent_Histograms( 
 			@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
 			@QueryParam( "scan_file_id" ) Integer scanFileId,
-			@Context HttpServletRequest request )
+			@Context HttpServletRequest request,
+			@Context HttpServletResponse response )
 	throws Exception {
 
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
@@ -60,6 +62,9 @@ public class QC_Scan_MS_1_IonCurrent_Histograms_Service {
 		    	        .build()
 		    	        );
 		}
+
+		String requestQueryString = request.getQueryString();
+		
 		try {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
@@ -157,14 +162,23 @@ public class QC_Scan_MS_1_IonCurrent_Histograms_Service {
 
 			byte[] resultsAsBytes = 
 					Scan_MS_1_IonCurrent_Histograms.getInstance()
-					.getScan_MS_1_IonCurrent_HistogramsResult( scanFileId );
-
-//			QC_Scan_MS_1_IonCurrent_Histograms_WebserviceResult webserviceResult = new QC_Scan_MS_1_IonCurrent_Histograms_WebserviceResult();
-//			webserviceResult.scan_MS_1_IonCurrent_HistogramsResult = scan_MS_1_IonCurrent_HistogramsResult;
-//			return webserviceResult;
-			
+					.getScan_MS_1_IonCurrent_HistogramsResult( scanFileId, requestQueryString );
+		
 			
 			return resultsAsBytes;
+			
+			//  Can return a response by writing it to response.getOutputStream() and returning null 
+			
+//			try ( OutputStream responseOutputStream = response.getOutputStream() ) {
+//				
+//				responseOutputStream.write( resultsAsBytes );
+//			} catch ( Exception e ) {
+//				String msg = "Exception Writing result to response.getOutputStream(): " + e.toString();
+//				log.error( msg, e );
+//				throw e;
+//			}
+//			
+//			return null;
 			
 		} catch ( WebApplicationException e ) {
 			throw e;

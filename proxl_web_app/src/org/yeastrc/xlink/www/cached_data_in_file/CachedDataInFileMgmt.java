@@ -3,7 +3,10 @@ package org.yeastrc.xlink.www.cached_data_in_file;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.text.DecimalFormat;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -13,7 +16,6 @@ import org.yeastrc.xlink.www.async_action_via_executor_service.AsyncItemToRun;
 import org.yeastrc.xlink.www.async_action_via_executor_service.AsyncItemToRunFactory;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappConfigException;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 
 /**
@@ -27,10 +29,34 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 public class CachedDataInFileMgmt {
 
 	private static final Logger log = Logger.getLogger(CachedDataInFileMgmt.class);
+	
+	/**
+	 * If YES, always save even if already exists
+	 *
+	 */
+	public enum ReplaceExistingValue { YES, NO }
+	
+	/**
+	 * Accepted types for the ids
+	 *
+	 */
+	public enum IdParamType { SEARCH_ID, PROJECT_SEARCH_ID, SCAN_FILE_ID }
+	
+	//  Filename prefix for the assoc id type
+	private static final String CACHE_FILENAME_PREFIX_FOR_SEARCH_ID = "se_";
+	private static final String CACHE_FILENAME_PREFIX_FOR_PROJECT_SEARCH_ID = "ps_";
+	private static final String CACHE_FILENAME_PREFIX_FOR_SCAN_FILE_ID = "sc_";
+	
+
+	private static final String SHA_384_ALGORITHM = "SHA-384";
+//	private static final String SHA_512_ALGORITHM = "SHA-512";
+//	private static final String SHA_1_ALGORITHM = "SHA1";
 
 	private static final String CACHE_FILES_ROOT_DIRECTORY = ConfigSystemsKeysSharedConstants.CACHE_FILES_ROOT_DIRECTORY;
 
-	private static final String idPrefixWhenOneChar = "_";
+	private static final String subdirPrefixWhenOneChar = "_";
+
+	private static final String REQUEST_URL_PARTIAL_FILE_SUFFIX = "_rurlp";
 	
 	private static final String DONE_FILE_SUFFIX = "_done";
 	
@@ -48,6 +74,7 @@ public class CachedDataInFileMgmt {
 		return instance;
 	}
 	
+	//  For Version as String
     private final DecimalFormat decimalFormatZeroFill = new DecimalFormat("00000");
     
     /**
@@ -92,7 +119,7 @@ public class CachedDataInFileMgmt {
 	public void removeCachedDataDirectory( String namePrefix, int version ) throws Exception {
 
 		if ( shutdownNowReceived ) {
-			return;
+			return; // EARLY EXIT
 		}
 		
 		String cacheFilesRootDirString = getCacheFilesRootDirString();
@@ -127,7 +154,7 @@ public class CachedDataInFileMgmt {
 
 		if ( shutdownNowReceived ) {
 			log.warn( "Interrupted by shutdown received: Deleting cached file directory (and it's contents): " + rootDirForPrefixAndVersion.getAbsolutePath() );
-			return;
+			return; // EARLY EXIT
 		}
 		log.warn( "INFO: Finished: Deleting cached file directory (and it's contents): " + rootDirForPrefixAndVersion.getAbsolutePath() );
 	}
@@ -140,7 +167,7 @@ public class CachedDataInFileMgmt {
 	private void deleteCacheFilesDir( File dir ) {
 
 		if ( shutdownNowReceived ) {
-			return;
+			return; // EARLY EXIT
 		}
 		//  Delete 'done' files first
 		for ( File dirEntry : dir.listFiles() ) {
@@ -177,35 +204,34 @@ public class CachedDataInFileMgmt {
 	}
 
 	
-
 	/**
 	 * Get the byte[] of the cached data, if it exists.
 	 * 
 	 * namePrefix and version are used for grouping cached data and deleting cached data that is no longer used.
 	 *   (Currently that amounts to putting them under the same subdirectory)
+	 *   
+	 * requestURLPartial: normally the query string.  May be the path if write true REST services 
 	 * 
-	 * For specifying a specific cached data item, either namePrefix and id or fullIdentifier is used.
-	 * 
-	 * namePrefix and version are required.  fullIdentifier or id is required.
-	 * If fullIdentifier and id are provided, id is used for splitting files into subdirectories.
-	 * If id is not provided, the last 2 characters of fullIdentifier are used for splitting files into subdirectories.
-	 * 
+	 * ids are the ids associated for this cached data - Search Ids, Project Search Ids, or Scan File Ids
+	 *   
 	 * @param namePrefix
 	 * @param version
-	 * @param fullIdentifier
-	 * @param id
+	 * @param requestURLPartial
+	 * @param ids - Search Ids, Project Search Ids, or Scan File Ids
+	 * @param idParamType - type for param ids
 	 * @return
 	 * @throws Exception
 	 */
 	public byte[] retrieveCachedDataFileContents( 
 			String namePrefix,
 			int version,
-			String fullIdentifier,
-			String id 
+			String requestURLPartial, 
+			List<Integer> ids,
+			IdParamType idParamType
 			 ) throws Exception {
 
 		GetCachedDataFileAndDoneFileResult getCachedDataFileAndDoneFileResult =
-				getCachedDataFileAndDoneFile( namePrefix, version, fullIdentifier, id, CalledFrom.FROM_retrieveCachedDataFileContents );
+				getCachedDataFileAndDoneFile( namePrefix, version, requestURLPartial, ids, idParamType, CalledFrom.FROM_retrieveCachedDataFileContents );
 
 		if ( getCachedDataFileAndDoneFileResult == null ) {
 			//  Not configured or the subdirectory does not exist
@@ -213,10 +239,15 @@ public class CachedDataInFileMgmt {
 		}
 		
 		File cachedDataFile = getCachedDataFileAndDoneFileResult.cachedDataFile;
+		File cachedDataFileRequestURLPartialFile = getCachedDataFileAndDoneFileResult.cachedDataFileRequestURLPartialFile;
 		File cachedDataFileDoneFile = getCachedDataFileAndDoneFileResult.cachedDataFileDoneFile;
 
 		if ( ! cachedDataFileDoneFile.exists() ) {
 			//  The 'done' file does not exist
+			return null; //  Early Exit
+		}
+		if ( ! cachedDataFileRequestURLPartialFile.exists() ) {
+			//  The file does not exist
 			return null; //  Early Exit
 		}
 		if ( ! cachedDataFile.exists() ) {
@@ -224,30 +255,78 @@ public class CachedDataInFileMgmt {
 			return null; //  Early Exit
 		}
 		
+		{
+			//		Read cachedDataFileRequestURLPartialFile and compare to requestURLPartial
+			//		return null if not match and log warn
+
+			long cachedDataFileRequestURLPartialFileLength = cachedDataFileRequestURLPartialFile.length();
+			if ( cachedDataFileRequestURLPartialFileLength == 0 ) {
+				String msg = "cachedDataFileRequestURLPartialFile file is empty. length: " + cachedDataFileRequestURLPartialFileLength 
+						+ ", file: " + cachedDataFileRequestURLPartialFile.getCanonicalPath();
+				log.error( msg );
+				throw new ProxlWebappInternalErrorException(msg);
+			}
+			if ( cachedDataFileRequestURLPartialFileLength > Integer.MAX_VALUE ) {
+				String msg = "Cached file Request URL Partial length >  so unable to read into byte[]. length: " + cachedDataFileRequestURLPartialFileLength 
+						+ ", file: " + cachedDataFileRequestURLPartialFile.getCanonicalPath();
+				log.error( msg );
+				throw new ProxlWebappInternalErrorException(msg);
+			}
+
+			byte[] cachedDataFileRequestURLPartialContents = new byte[ (int)cachedDataFileRequestURLPartialFileLength ];
+			FileInputStream cachedDataFileRequestURLPartialInputStream = null;
+			try {
+				cachedDataFileRequestURLPartialInputStream = new FileInputStream( cachedDataFileRequestURLPartialFile );
+				int bytesRead = cachedDataFileRequestURLPartialInputStream.read( cachedDataFileRequestURLPartialContents );
+				if ( bytesRead != cachedDataFileRequestURLPartialFileLength ) {
+					String msg = "bytesRead != cachedDataFileRequestURLPartialFileLength. length: " + cachedDataFileRequestURLPartialFileLength 
+							+ ", file: " + cachedDataFile.getCanonicalPath();
+					log.error( msg );
+					throw new ProxlWebappInternalErrorException(msg);
+				}
+			} finally {
+				if ( cachedDataFileRequestURLPartialInputStream != null ) {
+					cachedDataFileRequestURLPartialInputStream.close();
+				}
+			}
+			
+			String cachedDataFileRequestURLPartial_String = new String( cachedDataFileRequestURLPartialContents, StandardCharsets.UTF_8 );
+			
+			if ( ! cachedDataFileRequestURLPartial_String.equals( requestURLPartial ) ) {
+				String msg = "The cached Request URL Partial does not match the Request URL Partial in the request.  "
+						+ "Cached Request URL Partial: " + cachedDataFileRequestURLPartial_String
+						+ ".  Request URL Partial in the request: " + requestURLPartial
+						+ ", file: " + cachedDataFile.getCanonicalPath();
+				log.warn( msg );
+				return null;  // EARLY EXIT
+			}
+		}
+		
 		long cachedDataFileLength = cachedDataFile.length();
 		if ( cachedDataFileLength > Integer.MAX_VALUE ) {
 			String msg = "Cached file length >  so unable to read into byte[]. length: " + cachedDataFileLength 
 					+ ", file: " + cachedDataFile.getCanonicalPath();
 			log.error( msg );
-			throw new ProxlWebappDataException(msg);
+			throw new ProxlWebappInternalErrorException(msg);
 		}
 		
 		byte[] cachedDataFileContents = new byte[ (int)cachedDataFileLength ];
 		FileInputStream cachedDataFileInputStream = null;
 		try {
-			cachedDataFileInputStream = new FileInputStream(cachedDataFile);
+			cachedDataFileInputStream = new FileInputStream( cachedDataFile );
 			int bytesRead = cachedDataFileInputStream.read( cachedDataFileContents );
 			if ( bytesRead != cachedDataFileLength ) {
 				String msg = "bytesRead != cachedDataFileLength. length: " + cachedDataFileLength 
 						+ ", file: " + cachedDataFile.getCanonicalPath();
 				log.error( msg );
-				throw new ProxlWebappDataException(msg);
+				throw new ProxlWebappInternalErrorException(msg);
 			}
 		} finally {
 			if ( cachedDataFileInputStream != null ) {
 				cachedDataFileInputStream.close();
 			}
 		}
+		
 		return cachedDataFileContents;
 	}
 	
@@ -257,31 +336,32 @@ public class CachedDataInFileMgmt {
 	 * 
 	 * namePrefix and version are used for grouping cached data and deleting cached data that is no longer used.
 	 *   (Currently that amounts to putting them under the same subdirectory)
+	 *   
+	 * requestURLPartial: normally the query string.  May be the path if write true REST services 
 	 * 
-	 * For specifying a specific cached data item, either namePrefix and id or fullIdentifier is used.
-	 * 
-	 * namePrefix and version are required.  fullIdentifier or id is required.
-	 * If fullIdentifier and id are provided, id is used for splitting files into subdirectories.
-	 * If id is not provided, the last 2 characters of fullIdentifier are used for splitting files into subdirectories.
+	 * ids are the ids associated for this cached data - Search Ids, Project Search Ids, or Scan File Ids
 	 * 
 	 * @param dataToSave
 	 * @param namePrefix
 	 * @param version
-	 * @param fullIdentifier
-	 * @param id
+	 * @param requestURLPartial
+	 * @param ids - Search Ids, Project Search Ids, or Scan File Ids
+	 * @param idParamType - type for param ids
 	 * @return
 	 * @throws Exception
 	 */
 	public boolean saveCachedDataFileContents( 
 			byte[] dataToSave,
+			ReplaceExistingValue replaceExistingValue,
 			String namePrefix, 
 			int version,
-			String fullIdentifier,
-			String id
+			String requestURLPartial, 
+			List<Integer> ids,
+			IdParamType idParamType
 			) throws Exception {
 
 		GetCachedDataFileAndDoneFileResult getCachedDataFileAndDoneFileResult =
-				getCachedDataFileAndDoneFile( namePrefix, version, fullIdentifier, id, CalledFrom.FROM_saveCachedDataFileContentsFor_NamePrefix_Id_Version );
+				getCachedDataFileAndDoneFile( namePrefix, version, requestURLPartial, ids, idParamType, CalledFrom.FROM_saveCachedDataFileContentsFor_NamePrefix_Id_Version );
 
 		if ( getCachedDataFileAndDoneFileResult == null ) {
 			//  Not configured or the configured subdirectory does not exist
@@ -291,8 +371,14 @@ public class CachedDataInFileMgmt {
 		File cachedDataFileDoneFile = getCachedDataFileAndDoneFileResult.cachedDataFileDoneFile;
 
 		//  If already exists, assume it is the same value and exit
-		if ( cachedDataFileDoneFile.exists() ) {
+		if ( ( replaceExistingValue == null || replaceExistingValue ==  ReplaceExistingValue.NO ) 
+				&& cachedDataFileDoneFile.exists() ) {
 			return true; //  Early Exit
+		}
+
+		if ( ( replaceExistingValue != null && replaceExistingValue ==  ReplaceExistingValue.YES ) 
+				&& cachedDataFileDoneFile.exists() ) {
+			cachedDataFileDoneFile.delete();
 		}
 		
 		SaveCachedDataFileContentsActualParameters saveCachedDataFileContentsActualParameters = null;
@@ -300,6 +386,8 @@ public class CachedDataInFileMgmt {
 			saveCachedDataFileContentsActualParameters = new SaveCachedDataFileContentsActualParameters();
 			saveCachedDataFileContentsActualParameters.dataToSave = dataToSave;
 			saveCachedDataFileContentsActualParameters.cachedDataFile = getCachedDataFileAndDoneFileResult.cachedDataFile;
+			saveCachedDataFileContentsActualParameters.cachedDataFileRequestURLPartialFile = getCachedDataFileAndDoneFileResult.cachedDataFileRequestURLPartialFile;
+			saveCachedDataFileContentsActualParameters.requestUrlPartialData = getCachedDataFileAndDoneFileResult.requestUrlPartialData;
 			saveCachedDataFileContentsActualParameters.cachedDataFileDoneFile = getCachedDataFileAndDoneFileResult.cachedDataFileDoneFile;
 			saveCachedDataFileContentsActualParameters.subdir_1 = getCachedDataFileAndDoneFileResult.subdir_1;
 			saveCachedDataFileContentsActualParameters.subdir_2 = getCachedDataFileAndDoneFileResult.subdir_2;
@@ -326,6 +414,8 @@ public class CachedDataInFileMgmt {
 	static class SaveCachedDataFileContentsActualParameters {
 		private byte[] dataToSave;
 		private File cachedDataFile;
+		private File cachedDataFileRequestURLPartialFile;
+		private byte[] requestUrlPartialData;
 		private File cachedDataFileDoneFile;
 		private File subdir_1;
 		private File subdir_2;
@@ -360,6 +450,18 @@ public class CachedDataInFileMgmt {
 		public void setSubdir_2(File subdir_2) {
 			this.subdir_2 = subdir_2;
 		}
+		public File getCachedDataFileRequestURLPartialFile() {
+			return cachedDataFileRequestURLPartialFile;
+		}
+		public void setCachedDataFileRequestURLPartialFile(File cachedDataFileRequestURLPartialFile) {
+			this.cachedDataFileRequestURLPartialFile = cachedDataFileRequestURLPartialFile;
+		}
+		public byte[] getRequestUrlPartialData() {
+			return requestUrlPartialData;
+		}
+		public void setRequestUrlPartialData(byte[] requestUrlPartialData) {
+			this.requestUrlPartialData = requestUrlPartialData;
+		}
 	}
 
 	/**
@@ -373,6 +475,7 @@ public class CachedDataInFileMgmt {
 			SaveCachedDataFileContentsActualParameters saveCachedDataFileContentsActualParameters ) throws Exception {
 
 		File cachedDataFile = saveCachedDataFileContentsActualParameters.cachedDataFile;
+		File cachedDataFileRequestURLPartialFile = saveCachedDataFileContentsActualParameters.cachedDataFileRequestURLPartialFile;
 		File cachedDataFileDoneFile = saveCachedDataFileContentsActualParameters.cachedDataFileDoneFile;
 
 		File subdir_1 = saveCachedDataFileContentsActualParameters.subdir_1;
@@ -410,6 +513,22 @@ public class CachedDataInFileMgmt {
 				}
 			}
 		}
+		//  Create file containing the Partial Request URL
+		{
+			FileOutputStream cachedDataFileOutputStream = null;
+			try {
+				cachedDataFileOutputStream = new FileOutputStream( cachedDataFileRequestURLPartialFile );
+				cachedDataFileOutputStream.write( saveCachedDataFileContentsActualParameters.requestUrlPartialData );
+			} catch ( Exception e ) {
+				String msg = "Failed to write to Cached Data 'Partial Request URL' file: " + cachedDataFileRequestURLPartialFile.getCanonicalPath();
+				log.error( msg, e );
+				throw new ProxlWebappInternalErrorException( msg );
+			} finally {
+				if ( cachedDataFileOutputStream != null ) {
+					cachedDataFileOutputStream.close();
+				}
+			}
+		}
 		//  Create 'done' file
 		{
 			FileOutputStream cachedDataFileOutputStream = null;
@@ -434,6 +553,8 @@ public class CachedDataInFileMgmt {
 	 */
 	private static class GetCachedDataFileAndDoneFileResult {
 		File cachedDataFile;
+		File cachedDataFileRequestURLPartialFile;
+		byte[] requestUrlPartialData;
 		File cachedDataFileDoneFile;
 		File subdir_1;
 		File subdir_2;
@@ -445,20 +566,29 @@ public class CachedDataInFileMgmt {
 	 *    createSubdirsIfNotExist == YES and base directory does not exist
 	 *    createSubdirsIfNotExist == NO and ( base directory or subdirectories do not exist )
 	 * 
+	 * namePrefix and version are used for grouping cached data and deleting cached data that is no longer used.
+	 *   (Currently that amounts to putting them under the same subdirectory)
+	 *   
+	 * requestURLPartial: normally the query string.  May be the path if write true REST services 
+	 * 
+	 * ids are the ids associated for this cached data - Search Ids, Project Search Ids, or Scan File Ids
+	 *   
 	 * @param namePrefix
 	 * @param version
-	 * @param fullIdentifier
-	 * @param id
+	 * @param requestURLPartial
+	 * @param ids - Search Ids, Project Search Ids, or Scan File Ids
+	 * @param idParamType - type for param ids
 	 * @param createSubdirsIfNotExist
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 */
 	private GetCachedDataFileAndDoneFileResult getCachedDataFileAndDoneFile( 
 			String namePrefix,
 			int version,
-			String fullIdentifier,
-			String id,
-			CalledFrom createSubdirsIfNotExist ) throws Exception {
+			String requestURLPartial, 
+			List<Integer> ids,
+			IdParamType idParamType,
+			CalledFrom calledFrom ) throws Exception {
 		
 		if ( StringUtils.isEmpty( namePrefix ) ) {
 			String msg = "namePrefix cannot be null or empty";
@@ -466,13 +596,24 @@ public class CachedDataInFileMgmt {
 			throw new IllegalArgumentException( msg );
 		}
 
-		if ( StringUtils.isEmpty( fullIdentifier )
-				&& ( StringUtils.isEmpty( id ) ) ) {
-			String msg = "fullIdentifier and id cannot both be null or empty";
+		if ( StringUtils.isEmpty( requestURLPartial ) ) {
+			String msg = "namePrefix cannot be null or empty";
 			log.error( msg );
 			throw new IllegalArgumentException( msg );
 		}
 
+		if ( ids == null || ids.isEmpty() ) {
+			String msg = "ids cannot be null or empty";
+			log.error( msg );
+			throw new IllegalArgumentException( msg );
+		}
+
+		if ( idParamType == null ) {
+			String msg = "idParamType cannot be null";
+			log.error( msg );
+			throw new IllegalArgumentException( msg );
+		}
+		
 		String cacheFilesRootDirString = getCacheFilesRootDirString();
 		if ( StringUtils.isEmpty( cacheFilesRootDirString ) ) {
 			//  CACHE_FILES_ROOT_DIRECTORY is not configured so return null always
@@ -486,30 +627,23 @@ public class CachedDataInFileMgmt {
 					+ "', Config Value: " + cacheFilesRootDirString );
 			return null; //  Early Exit
 		}
+
+		Integer firstId = ids.get( 0 );
 		
 		//  The namePrefix and version are used for the root subdirectory for this particular file.
-		//  The last 2 characters of the id as string are used for a subdirectory path to limit the number of files in a subdirectory.
+		//  The last 2 characters of the first id as string are used for a subdirectory path to limit the number of files in a subdirectory.
 		
 		String versionAsString = getVersionAsString( version );
 
 		String rootDirForPrefixAndVersionString =  getRootDirForPrefixAndVersionString( namePrefix, versionAsString );
 
-		String filename = null;
-		String stringForSubdirs = null;
-		
-		if ( StringUtils.isNotEmpty( fullIdentifier ) ) {
-
-			filename = fullIdentifier;
-			stringForSubdirs = fullIdentifier;
-		} else {
-			filename =  namePrefix + "_id_" + id + "_v_" + versionAsString;
-			stringForSubdirs = id;
-
-			//  prefix id if only 1 character long
-			if ( stringForSubdirs.length() == 1 ) {
-				stringForSubdirs = idPrefixWhenOneChar + stringForSubdirs;
-			}
+		String filename = getCacheFilename( requestURLPartial, ids, idParamType );
+		String stringForSubdirs = String.valueOf( firstId );
+		if ( stringForSubdirs.length() == 1 ) {
+			stringForSubdirs += subdirPrefixWhenOneChar;
 		}
+		
+		String filenameRequestURLPartialFileString = filename + REQUEST_URL_PARTIAL_FILE_SUFFIX;
 		
 		String filenameDoneFileString = filename + DONE_FILE_SUFFIX;
 		
@@ -524,7 +658,7 @@ public class CachedDataInFileMgmt {
 
 		File rootDirForPrefixAndVersion = new File( cacheFilesRootDir, rootDirForPrefixAndVersionString );
 		if ( ! rootDirForPrefixAndVersion.exists() ) {
-			if ( createSubdirsIfNotExist == CalledFrom.FROM_retrieveCachedDataFileContents ) {
+			if ( calledFrom == CalledFrom.FROM_retrieveCachedDataFileContents ) {
 				return null;  //  EARLY EXIT
 			}
 			//  For Save Contents, create this directory here to ensure this user account can create this directory
@@ -539,17 +673,98 @@ public class CachedDataInFileMgmt {
 		File subdir_2 = new File( subdir_1, subdir_2_String );
 
 		File cachedDataFile = new File( subdir_2, filename );
+		File cachedDataFileRequestURLPartialFile = new File( subdir_2, filenameRequestURLPartialFileString );
 		File cachedDataFileDoneFile = new File( subdir_2, filenameDoneFileString );
 
 		GetCachedDataFileAndDoneFileResult result = new GetCachedDataFileAndDoneFileResult();
 		
 		result.cachedDataFile = cachedDataFile;
+		result.cachedDataFileRequestURLPartialFile = cachedDataFileRequestURLPartialFile;
+		result.requestUrlPartialData = requestURLPartial.getBytes( StandardCharsets.UTF_8 );
 		result.cachedDataFileDoneFile = cachedDataFileDoneFile;
 		result.subdir_1 = subdir_1;
 		result.subdir_2 = subdir_2;
 		
 		return result;
 	}
+	
+	/**
+	 * @param requestURLPartial
+	 * @param ids
+	 * @param idParamType
+	 * @return
+	 * @throws Exception 
+	 */
+	private String getCacheFilename( String requestURLPartial, List<Integer> ids, IdParamType idParamType ) throws Exception {
+		
+		StringBuilder filenameSB = new StringBuilder( 1000 );
+		
+		if ( idParamType == IdParamType.SEARCH_ID ) {
+			filenameSB.append( CACHE_FILENAME_PREFIX_FOR_SEARCH_ID );
+		} else if ( idParamType == IdParamType.PROJECT_SEARCH_ID ) {
+			filenameSB.append( CACHE_FILENAME_PREFIX_FOR_PROJECT_SEARCH_ID );
+		} else if ( idParamType == IdParamType.SCAN_FILE_ID ) {
+			filenameSB.append( CACHE_FILENAME_PREFIX_FOR_SCAN_FILE_ID );
+		} else {
+			String msg = "Unknown value for idParamType: " + idParamType.toString();
+			log.error( msg );
+			throw new ProxlWebappInternalErrorException(msg);
+		}
+		
+		for ( Integer id : ids ) {
+			filenameSB.append( String.valueOf( id ) );
+			filenameSB.append( "_" );
+		}
+		
+		// get 
+		
+		MessageDigest md_SHA_384 = MessageDigest.getInstance( SHA_384_ALGORITHM );
+		byte[] requestURLPartialBytes = requestURLPartial.getBytes( StandardCharsets.UTF_8 );
+		md_SHA_384.update( requestURLPartialBytes );
+		byte[] requestURLPartialDigest = md_SHA_384.digest();
+
+		String requestURLPartialDigestHexString = hashBytesToHexString( requestURLPartialDigest );
+		
+		filenameSB.append( requestURLPartialDigestHexString );
+		
+		String filename = filenameSB.toString();
+		
+		return filename;
+	}
+
+	/**
+	 * @param hashBytes
+	 * @return
+	 */
+	private String hashBytesToHexString( byte[] hashBytes ) {
+
+		StringBuilder hashBytesAsHexSB = new StringBuilder( hashBytes.length * 2 + 2 );
+
+		for ( int i = 0; i < hashBytes.length; i++ ) {
+			String byteAsHex = Integer.toHexString( Byte.toUnsignedInt( hashBytes[ i ] ) );
+			if ( byteAsHex.length() == 1 ) {
+				hashBytesAsHexSB.append( "0" ); //  Leading zero dropped by 'toHexString' so add here
+			}
+			hashBytesAsHexSB.append( byteAsHex );
+		}
+
+		String result = hashBytesAsHexSB.toString();
+
+		return result;
+		
+		//  WAS - which is equivalent, except for the added "0" when a hex pair starts with "0"
+		
+		//convert the byte to hex format
+//		StringBuffer sb = new StringBuffer("");
+//		for (int i = 0; i < hashBytes.length; i++) {
+//			sb.append(Integer.toString((hashBytes[i] & 0xff) + 0x100, 16).substring(1));
+//		}
+//		
+//		String result = sb.toString();
+//		
+//		return result;
+	}
+	
 	
 	
 	/**

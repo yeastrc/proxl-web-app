@@ -368,8 +368,7 @@ var QCPageChart_PPM_Error_PSM = function() {
 		var selectedLinkType = params.selectedLinkType;
 		var $chart_outer_container_jq = params.$chart_outer_container_jq;
 
-		var ppmErrorHistogramResult = ajaxResponseData.ppmErrorHistogramResult;
-		var dataForChartPerLinkTypeList = ppmErrorHistogramResult.dataForChartPerLinkTypeList;
+		var dataForChartPerLinkTypeList = ajaxResponseData.dataForChartPerLinkTypeList;
 
 		if ( dataForChartPerLinkTypeList.length !== 1 ) {
 			throw Error( "dataForChartPerLinkTypeList.length !== 1, is = " + dataForChartPerLinkTypeList.length );

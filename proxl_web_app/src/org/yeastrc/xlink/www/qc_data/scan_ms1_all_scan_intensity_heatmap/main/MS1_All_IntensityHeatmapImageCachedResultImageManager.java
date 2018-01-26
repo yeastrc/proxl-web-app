@@ -1,6 +1,11 @@
 package org.yeastrc.xlink.www.qc_data.scan_ms1_all_scan_intensity_heatmap.main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt;
+import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt.IdParamType;
+import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt.ReplaceExistingValue;
 //import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistration;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistrationIF;
@@ -42,11 +47,15 @@ public class MS1_All_IntensityHeatmapImageCachedResultImageManager implements Ca
 	 * @param imageAsBytes
 	 * @throws Exception
 	 */
-	public byte[] retrieveImageDataFromCache( int scanFileId, Integer requestedImageWidth ) throws Exception {
+	public byte[] retrieveImageDataFromCache( int scanFileId, Integer requestedImageWidth, String requestQueryString ) throws Exception {
 		
 		if ( ! CachedDataInFileMgmt.getSingletonInstance().isCachedDataFilesDirConfigured() ) {
 			return null;  //  EARLY EXIT
 		}
+
+		List<Integer> ids = new ArrayList<>( 1 );
+		ids.add( scanFileId );
+		
 		byte[] imageAsBytes = null;
 		
 		if ( requestedImageWidth == null ) {
@@ -55,16 +64,18 @@ public class MS1_All_IntensityHeatmapImageCachedResultImageManager implements Ca
 				.retrieveCachedDataFileContents(
 						PREFIX_FOR_CACHING_FULL_WIDTH /* namePrefix */, 
 						MS1_All_IntensityHeatmapImage.VERSION_FOR_CACHING /* version */, 
-						null /* fullIdentifier */, 
-						Integer.toString( scanFileId ) /* id */ );
+						requestQueryString, 
+						ids,
+						IdParamType.SCAN_FILE_ID );
 		} else {
 			String prefixImageWidth = getPrefixForImageWidth( requestedImageWidth );
 			imageAsBytes = CachedDataInFileMgmt.getSingletonInstance()
 					.retrieveCachedDataFileContents(
 							prefixImageWidth /* namePrefix */, 
 							MS1_All_IntensityHeatmapImage.VERSION_FOR_CACHING /* version */, 
-							null /* fullIdentifier */, 
-							Integer.toString( scanFileId ) /* id */ );
+							requestQueryString, 
+							ids,
+							IdParamType.SCAN_FILE_ID );
 		}
 		return imageAsBytes;
 	}
@@ -75,29 +86,36 @@ public class MS1_All_IntensityHeatmapImageCachedResultImageManager implements Ca
 	 * @param imageAsBytes
 	 * @throws Exception
 	 */
-	public void saveImageDataToCache( int scanFileId, Integer requestedImageWidth, byte[] imageAsBytes ) throws Exception {
+	public void saveImageDataToCache( int scanFileId, Integer requestedImageWidth, byte[] imageAsBytes, String requestQueryString ) throws Exception {
 		
 		if ( ! CachedDataInFileMgmt.getSingletonInstance().isCachedDataFilesDirConfigured() ) {
 			return;  //  EARLY EXIT
 		}
+
+		List<Integer> ids = new ArrayList<>( 1 );
+		ids.add( scanFileId );
 		
 		if ( requestedImageWidth == null ) {
 			CachedDataInFileMgmt.getSingletonInstance()
 			.saveCachedDataFileContents(
 					imageAsBytes, 
+					ReplaceExistingValue.NO,
 					PREFIX_FOR_CACHING_FULL_WIDTH /* namePrefix */, 
 					MS1_All_IntensityHeatmapImage.VERSION_FOR_CACHING /* version */, 
-					null /* fullIdentifier */, 
-					Integer.toString( scanFileId ) /* id */ );
+					requestQueryString, 
+					ids,
+					IdParamType.SCAN_FILE_ID );
 		} else {
 			String prefixImageWidth = getPrefixForImageWidth( requestedImageWidth );
 			CachedDataInFileMgmt.getSingletonInstance()
 			.saveCachedDataFileContents(
 					imageAsBytes, 
+					ReplaceExistingValue.NO,
 					prefixImageWidth /* namePrefix */, 
 					MS1_All_IntensityHeatmapImage.VERSION_FOR_CACHING /* version */, 
-					null /* fullIdentifier */, 
-					Integer.toString( scanFileId ) /* id */ );
+					requestQueryString, 
+					ids,
+					IdParamType.SCAN_FILE_ID );
 		}
 		
 	}

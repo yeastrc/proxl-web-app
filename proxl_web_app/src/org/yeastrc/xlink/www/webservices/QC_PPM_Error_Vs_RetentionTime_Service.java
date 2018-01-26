@@ -1,7 +1,5 @@
 package org.yeastrc.xlink.www.webservices;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +18,6 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response;
-import org.yeastrc.xlink.www.qc_data.psm_error_estimates.objects.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
@@ -48,7 +45,7 @@ public class QC_PPM_Error_Vs_RetentionTime_Service {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/ppmErrorVsRetentionTime") 
-	public WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs
+	public byte[]
 		getPPM_Error_Histogram_For_PSMPeptideCutoffs( @QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
 										  @QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
 										  @Context HttpServletRequest request )
@@ -63,9 +60,8 @@ public class QC_PPM_Error_Vs_RetentionTime_Service {
 		    	        .build()
 		    	        );
 		}
-
-		if ( projectSearchIdList.size() > 1 ) {
-			String msg = "Only 1 project_search_id is allowed";
+		if ( projectSearchIdList.size() != 1 ) {
+			String msg = "Only 1 project_search_id is accepted";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -73,7 +69,6 @@ public class QC_PPM_Error_Vs_RetentionTime_Service {
 		    	        .build()
 		    	        );
 		}
-		
 		if ( StringUtils.isEmpty( filterCriteria_JSONString ) ) {
 			String msg = "Provided filterCriteria is null or filterCriteria is missing";
 			log.error( msg );
@@ -83,17 +78,18 @@ public class QC_PPM_Error_Vs_RetentionTime_Service {
 					.build()
 					);
 		}
+
+		String requestQueryString = request.getQueryString();
+		
+		int projectSearchId = projectSearchIdList.get( 0 );
+		
 		try {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			//   Get the project id for this search
 			//   Get the project id for these searches
 			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
-			for ( int projectSearchId : projectSearchIdList ) {
-				projectSearchIdsSet.add( projectSearchId );
-			}
-			List<Integer> projectSearchIdsListDeduppedSorted = new ArrayList<>( projectSearchIdsSet );
-			Collections.sort( projectSearchIdsListDeduppedSorted );
+			projectSearchIdsSet.add( projectSearchId );
 
 			List<Integer> projectIdsFromProjectSearchIds = 
 					ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
@@ -142,48 +138,27 @@ public class QC_PPM_Error_Vs_RetentionTime_Service {
 			
 			////////   Auth complete
 			//////////////////////////////////////////
-			
 
-			Set<Integer> projectSearchIdsProcessedFromForm = new HashSet<>(); // add each projectSearchId as process in loop next
-			
-			List<SearchDTO> searches = new ArrayList<SearchDTO>();
-			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
-			int searchIdsArrayIndex = 0;
-			for ( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
-				if ( projectSearchIdsProcessedFromForm.add( projectSearchId ) ) {
-					//  Haven't processed this projectSearchId yet in this loop so process it now
-					SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
-					if ( search == null ) {
-						String msg = "projectSearchId '" + projectSearchId + "' not found in the database. User taken to home page.";
-						log.warn( msg );
-						//  Search not found, the data on the page they are requesting does not exist.
-					    throw new WebApplicationException(
-					    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-					    	        .entity( msg )
-					    	        .build()
-					    	        );			
-					}
-					searches.add( search );
-					searchIdsArray[ searchIdsArrayIndex ] = search.getSearchId();
-					searchIdsArrayIndex++;
-				}
+			SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
+			if ( search == null ) {
+				String msg = "projectSearchId '" + projectSearchId + "' not found in the database. User taken to home page.";
+				log.warn( msg );
+				//  Search not found, the data on the page they are requesting does not exist.
+				throw new WebApplicationException(
+						Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+						.entity( msg )
+						.build()
+						);			
 			}
 			
 			PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response ppm_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response =
 					PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs.getInstance()
 					.getPPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs( 
+							requestQueryString, 
 							PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs.ForDownload.NO,
-							filterCriteria_JSONString, searches );
+							filterCriteria_JSONString, search );
 
-			PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result ppm_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result =
-					ppm_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response.getPpm_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result();
-
-			//  Get  for cutoffs and other data
-			WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs serviceResult = new WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs();
-			
-			serviceResult.ppmErrorVsRTScatterPlotResult = ppm_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result;
-			
-			return serviceResult;
+			return ppm_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response.getResultsAsBytes();
 			
 		} catch ( WebApplicationException e ) {
 			throw e;
@@ -206,22 +181,22 @@ public class QC_PPM_Error_Vs_RetentionTime_Service {
 		}
 	}
 	
-	/**
-	 * 
-	 *
-	 */
-	public static class WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs {
-		
-		PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result ppmErrorVsRTScatterPlotResult;
-
-		public PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result getPpmErrorVsRTScatterPlotResult() {
-			return ppmErrorVsRTScatterPlotResult;
-		}
-
-		public void setPpmErrorVsRTScatterPlotResult(
-				PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result ppmErrorVsRTScatterPlotResult) {
-			this.ppmErrorVsRTScatterPlotResult = ppmErrorVsRTScatterPlotResult;
-		}
-
-	}
+//	/**
+//	 * 
+//	 *
+//	 */
+//	public static class WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs {
+//		
+//		PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result ppmErrorVsRTScatterPlotResult;
+//
+//		public PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result getPpmErrorVsRTScatterPlotResult() {
+//			return ppmErrorVsRTScatterPlotResult;
+//		}
+//
+//		public void setPpmErrorVsRTScatterPlotResult(
+//				PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Result ppmErrorVsRTScatterPlotResult) {
+//			this.ppmErrorVsRTScatterPlotResult = ppmErrorVsRTScatterPlotResult;
+//		}
+//
+//	}
 }
