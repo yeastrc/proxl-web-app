@@ -324,9 +324,8 @@ var QCPageChartSummaryStatistics = function() {
 		var ajaxResponseData = params.ajaxResponseData;
 		var ajaxRequestData = params.ajaxRequestData;
 
-		var qc_SummaryCountsResults = ajaxResponseData.qc_SummaryCountsResults;
-		var resultsPerLinkTypeList = qc_SummaryCountsResults.resultsPerLinkTypeList;
-		var uniqueproteinSequenceVersionIdCountAllLinkTypes = qc_SummaryCountsResults.uniqueproteinSequenceVersionIdCountAllLinkTypes;
+		var resultsPerLinkTypeList = ajaxResponseData.resultsPerLinkTypeList;
+		var uniqueproteinSequenceVersionIdCountAllLinkTypes = ajaxResponseData.uniqueproteinSequenceVersionIdCountAllLinkTypes;
 
 		// Block for "Summary Statistics"
 		var $Summary_Statistics_CountsBlock = $("#Summary_Statistics_CountsBlock");

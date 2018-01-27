@@ -1,11 +1,7 @@
 package org.yeastrc.xlink.www.webservices;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_data.summary_statistics.main.QC_SummaryCounts;
+import org.yeastrc.xlink.www.qc_data.summary_statistics.main.QC_SummaryCounts.QC_SummaryCounts_Method_Response;
 import org.yeastrc.xlink.www.qc_data.summary_statistics.objects.QC_SummaryCountsResults;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -43,7 +40,7 @@ public class QC_SummaryStatisticsService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/summaryStatistics") 
-	public WebserviceResult_getQC_SummaryStatistics
+	public byte[]
 		getQC_SummaryStatistics( @QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
 										  @QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
 										  @Context HttpServletRequest request )
@@ -51,6 +48,15 @@ public class QC_SummaryStatisticsService {
 	
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
 			String msg = "Provided project_search_id is null or project_search_id is missing";
+			log.error( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	        .entity( msg )
+		    	        .build()
+		    	        );
+		}
+		if ( projectSearchIdList.size() != 1 ) {
+			String msg = "Only 1 project_search_id is accepted";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -67,17 +73,18 @@ public class QC_SummaryStatisticsService {
 					.build()
 					);
 		}
+
+		String requestQueryString = request.getQueryString();
+		
+		int projectSearchId = projectSearchIdList.get( 0 );
+		
 		try {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			//   Get the project id for this search
 			//   Get the project id for these searches
 			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
-			for ( int projectSearchId : projectSearchIdList ) {
-				projectSearchIdsSet.add( projectSearchId );
-			}
-			List<Integer> projectSearchIdsListDeduppedSorted = new ArrayList<>( projectSearchIdsSet );
-			Collections.sort( projectSearchIdsListDeduppedSorted );
+			projectSearchIdsSet.add( projectSearchId );
 
 			List<Integer> projectIdsFromProjectSearchIds = 
 					ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
@@ -127,46 +134,28 @@ public class QC_SummaryStatisticsService {
 			////////   Auth complete
 			//////////////////////////////////////////
 			
-
-			Set<Integer> projectSearchIdsProcessedFromForm = new HashSet<>(); // add each projectSearchId as process in loop next
-			
-			List<SearchDTO> searches = new ArrayList<SearchDTO>();
-			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
-			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
-			int searchIdsArrayIndex = 0;
-			for ( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
-				if ( projectSearchIdsProcessedFromForm.add( projectSearchId ) ) {
-					//  Haven't processed this projectSearchId yet in this loop so process it now
-					SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
-					if ( search == null ) {
-						String msg = "projectSearchId '" + projectSearchId + "' not found in the database.";
-						log.warn( msg );
-						//  Search not found, the data on the page they are requesting does not exist.
-					    throw new WebApplicationException(
-					    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-					    	        .entity( msg )
-					    	        .build()
-					    	        );			
-					}
-					searches.add( search );
-					searchesMapOnSearchId.put( search.getSearchId(), search );
-					searchIdsArray[ searchIdsArrayIndex ] = search.getSearchId();
-					searchIdsArrayIndex++;
-				}
+			SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
+			if ( search == null ) {
+				String msg = "projectSearchId '" + projectSearchId + "' not found in the database. User taken to home page.";
+				log.warn( msg );
+				//  Search not found, the data on the page they are requesting does not exist.
+				throw new WebApplicationException(
+						Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+						.entity( msg )
+						.build()
+						);			
 			}
 				
 			
-			QC_SummaryCountsResults qc_SummaryCountsResults =
+			QC_SummaryCounts_Method_Response qc_SummaryCounts_Method_Response =
 					QC_SummaryCounts.getInstance()
 					.getQC_SummaryCounts( 
-							filterCriteria_JSONString, projectSearchIdsListDeduppedSorted, searches, searchesMapOnSearchId );
+							requestQueryString, 
+							QC_SummaryCounts.ForDownload.NO,
+							filterCriteria_JSONString, 
+							search );
 
-			//  Get PSMs for cutoffs and other data
-			WebserviceResult_getQC_SummaryStatistics webserviceResult = new WebserviceResult_getQC_SummaryStatistics();
-			
-			webserviceResult.qc_SummaryCountsResults = qc_SummaryCountsResults;
-			
-			return webserviceResult;
+			return qc_SummaryCounts_Method_Response.getResultsAsBytes();
 			
 		} catch ( WebApplicationException e ) {
 			throw e;
