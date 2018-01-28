@@ -597,7 +597,7 @@ public class CachedDataInFileMgmt {
 		}
 
 		if ( StringUtils.isEmpty( requestURLPartial ) ) {
-			String msg = "namePrefix cannot be null or empty";
+			String msg = "requestURLPartial cannot be null or empty";
 			log.error( msg );
 			throw new IllegalArgumentException( msg );
 		}
