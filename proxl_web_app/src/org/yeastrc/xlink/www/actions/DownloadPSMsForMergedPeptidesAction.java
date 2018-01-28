@@ -181,7 +181,7 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 				writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
 //				writer.write( "SEARCH ID(S)\tTYPE\tPEPTIDE 1\tPOSITION\tMODS\tPEPTIDE 2\tPOSITION\tMODS\tPROTEIN 1\tPROTEIN 2\tBEST PSM Q-VALUE\tNUM PSMS\n" );
 				//  Write header line
-				writer.write( "SEARCH ID\tSCAN NUMBER\tPEPTIDE 1\tPOSITION 1\tMODS\tPROTEINS\tPEPTIDE 2\tPOSITION 2\tMODS\tPROTEINS\tLink Type" );
+				writer.write( "SEARCH ID\tSCAN NUMBER\tPEPTIDE 1\tPOSITION 1\tMODS\tISOTOPE LABELS\tPROTEINS\tPEPTIDE 2\tPOSITION 2\tMODS\tISOTOPE LABELS\tPROTEINS\tLink Type" );
 				writer.write( "\tOBSERVED M/Z\tCHARGE\tRETENTION TIME (MINUTES)\tSCAN FILENAME" );
 				//  Process for each search id:
 				for ( SearchDTO search : searches ) {
@@ -256,6 +256,8 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 								writer.write( "\t" );
 								writer.write( link.getModsStringPeptide1() );  // MODS
 								writer.write( "\t" );
+								writer.write( link.getIsotopeLabelsStringPeptide1() ); // Isotope Labels
+								writer.write( "\t" );
 								{
 									List<WebMergedProteinPosition> peptideProteinPositions = link.getPeptide1ProteinPositions();
 									List<String> reportedProteinStrings = new ArrayList<>();
@@ -279,6 +281,8 @@ public class DownloadPSMsForMergedPeptidesAction extends Action {
 								writer.write( link.getPeptide2Position() );
 								writer.write( "\t" );
 								writer.write( link.getModsStringPeptide2() );  // MODS
+								writer.write( "\t" );
+								writer.write( link.getIsotopeLabelsStringPeptide2() ); // Isotope Labels
 								writer.write( "\t" );
 								{
 									List<WebMergedProteinPosition> peptideProteinPositions = link.getPeptide2ProteinPositions();

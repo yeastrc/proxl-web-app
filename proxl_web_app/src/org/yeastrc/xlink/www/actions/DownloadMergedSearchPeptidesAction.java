@@ -156,7 +156,7 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 				BufferedOutputStream bos = new BufferedOutputStream(out);
 				writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
 				//  Write header line
-				writer.write( "SEARCH ID(S)\tTYPE\tPEPTIDE 1\tPOSITION\tMODS\tPEPTIDE 2\tPOSITION\tMODS\tPROTEIN 1\tPROTEIN 2\tNUM PSMS" );
+				writer.write( "SEARCH ID(S)\tTYPE\tPEPTIDE 1\tPOSITION\tMODS\tISOTOPE LABELS\tPEPTIDE 2\tPOSITION\tMODS\tISOTOPE LABELS\tPROTEIN 1\tPROTEIN 2\tNUM PSMS" );
 				for ( AnnDisplayNameDescPeptPsmListsPair annDisplayNameDescPeptPsmListsPair : peptidesMergedCommonPageDownloadResult.getPeptidePsmAnnotationNameDescListsForEachSearch() ) {
 					for ( AnnotationDisplayNameDescription peptideAnnotationDisplayNameDescription : annDisplayNameDescPeptPsmListsPair.getPeptideAnnotationNameDescriptionList() ) {
 						writer.write( "\tPeptide Value:" );
@@ -195,6 +195,8 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 					writer.write( "\t" );
 					writer.write( link.getModsStringPeptide1() );
 					writer.write( "\t" );
+					writer.write( link.getIsotopeLabelsStringPeptide1() );
+					writer.write( "\t" );
 					if ( link.getPeptide2() != null ) {
 						writer.write( link.getPeptide2().getSequence() );
 					}
@@ -202,6 +204,8 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 					writer.write( link.getPeptide2Position() );
 					writer.write( "\t" );
 					writer.write( link.getModsStringPeptide2() );
+					writer.write( "\t" );
+					writer.write( link.getIsotopeLabelsStringPeptide2() );
 					writer.write( "\t" );
 					writer.write( peptide1ProteinPositionsString );
 					writer.write( "\t" );
