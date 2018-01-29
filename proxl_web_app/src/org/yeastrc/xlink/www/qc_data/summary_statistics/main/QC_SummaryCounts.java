@@ -49,7 +49,7 @@ public class QC_SummaryCounts {
 	 * 
 	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
 	 */
-	static final int VERSION_FOR_CACHING = 1;
+	static final int VERSION_FOR_CACHING = 2;
 	
 	
 	public enum ForDownload { YES, NO }
@@ -283,7 +283,7 @@ public class QC_SummaryCounts {
 			String requestQueryString ) throws Exception {
 
 		QC_SummaryCounts_CachedResultManager.getSingletonInstance()
-		.saveDataToCache( search.getSearchId(), chartJSONAsBytes, requestQueryString );
+		.saveDataToCache( search.getProjectSearchId(), chartJSONAsBytes, requestQueryString );
 	}
 
 	/**
@@ -334,7 +334,7 @@ public class QC_SummaryCounts {
 
 		QC_SummaryCounts_CachedResultManager_Result cachedDataResult =
 				QC_SummaryCounts_CachedResultManager.getSingletonInstance()
-				.retrieveDataFromCache( search.getSearchId(), requestQueryString );
+				.retrieveDataFromCache( search.getProjectSearchId(), requestQueryString );
 
 		if ( cachedDataResult == null ) {
 			//  No Cached results so return null

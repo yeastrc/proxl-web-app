@@ -15,6 +15,8 @@ import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistratio
  * 
  * Interfaces with the CachedDataInFileMgmt for saving and retrieving the result image for caching
  * 
+ * Added to CachedDataInFileMgmtRegistration to register it
+ * 
  * Singleton
  */
 public class MS1_All_IntensityHeatmapImageCachedResultImageManager implements CachedDataInFileMgmtRegistrationIF {

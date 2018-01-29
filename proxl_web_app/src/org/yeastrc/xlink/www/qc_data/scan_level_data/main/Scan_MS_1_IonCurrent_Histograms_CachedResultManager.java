@@ -17,6 +17,8 @@ import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistratio
  * 
  * Interfaces with the CachedDataInFileMgmt for saving and retrieving the result JSON for caching
  * 
+ * Added to CachedDataInFileMgmtRegistration to register it
+ * 
  * Singleton
  */
 public class Scan_MS_1_IonCurrent_Histograms_CachedResultManager implements CachedDataInFileMgmtRegistrationIF {

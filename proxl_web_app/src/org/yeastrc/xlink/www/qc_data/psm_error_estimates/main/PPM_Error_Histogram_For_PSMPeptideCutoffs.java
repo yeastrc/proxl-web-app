@@ -67,7 +67,7 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 	 * 
 	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
 	 */
-	static final int VERSION_FOR_CACHING = 1;
+	static final int VERSION_FOR_CACHING = 2;
 	
 	
 	private static final int REMOVE_OUTLIERS_FIRST_QUARTER_PERCENTILE = 25;
@@ -157,7 +157,7 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 			String requestQueryString ) throws Exception {
 
 		PPM_Error_Histogram_For_PSMPeptideCutoffs_CachedResultManager.getSingletonInstance()
-		.saveDataToCache( search.getSearchId(), chartJSONAsBytes, requestQueryString );
+		.saveDataToCache( search.getProjectSearchId(), chartJSONAsBytes, requestQueryString );
 	}
 	
 	/**
@@ -208,7 +208,7 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 
 		PPM_Error_Histogram_For_PSMPeptideCutoffs_CachedResultManager_Result cachedDataResult =
 				PPM_Error_Histogram_For_PSMPeptideCutoffs_CachedResultManager.getSingletonInstance()
-				.retrieveDataFromCache( search.getSearchId(), requestQueryString );
+				.retrieveDataFromCache( search.getProjectSearchId(), requestQueryString );
 
 		if ( cachedDataResult == null ) {
 			//  No Cached results so return null

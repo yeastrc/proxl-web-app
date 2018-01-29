@@ -5,8 +5,12 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
+import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Histogram_For_PSMPeptideCutoffs_CachedResultManager;
+import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager;
+import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager;
 import org.yeastrc.xlink.www.qc_data.scan_level_data.main.Scan_MS_1_IonCurrent_Histograms_CachedResultManager;
 import org.yeastrc.xlink.www.qc_data.scan_ms1_all_scan_intensity_heatmap.main.MS1_All_IntensityHeatmapImageCachedResultImageManager;
+import org.yeastrc.xlink.www.qc_data.summary_statistics.main.QC_SummaryCounts_CachedResultManager;
 
 /**
  * Registration to use CachedDataInFileMgmt.  Registration is required.
@@ -63,7 +67,13 @@ public class CachedDataInFileMgmtRegistration {
 	 */
 	private final CachedDataInFileMgmtRegistrationIF[] classesToRegister = {
 		MS1_All_IntensityHeatmapImageCachedResultImageManager.getSingletonInstance(),
-		Scan_MS_1_IonCurrent_Histograms_CachedResultManager.getSingletonInstance()
+		Scan_MS_1_IonCurrent_Histograms_CachedResultManager.getSingletonInstance(),
+		
+		QC_SummaryCounts_CachedResultManager.getSingletonInstance(),
+		
+		PPM_Error_Histogram_For_PSMPeptideCutoffs_CachedResultManager.getSingletonInstance(),
+		PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager.getSingletonInstance(),
+		PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager.getSingletonInstance()
 	};
 
 	/**
