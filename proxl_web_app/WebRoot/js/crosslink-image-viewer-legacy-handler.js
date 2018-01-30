@@ -179,6 +179,7 @@ LegacyJSONUpdater.prototype.convertProteinBarDataToIndexManager = function( json
 	var imdata = [ ];		// the Index Manager data
 	var pbdata = { };       //  Protein Bar Manager Data
 	
+	
 	for( var i = 0; i < proteinBarData.length; i++ ) {
 		
 		var item = proteinBarData[ i ];
@@ -201,14 +202,14 @@ LegacyJSONUpdater.prototype.convertProteinBarDataToIndexManager = function( json
 	}
 
 	
-	var jsonKey_indexManagerData = hashObjectPropertyValueFromPropertyNameLookup( "index-manager-data-current" );
-	json[ jsonKey_indexManagerData ] = imdata;
+	var jsonKey_indexManagerData = hashObjectPropertyValueFromPropertyNameLookup( "index-manager-data" );
+	json[ jsonKey_indexManagerData ] = {a:0, b:imdata};
 
-	var jsonKey_protein_bar_data_current = hashObjectPropertyValueFromPropertyNameLookup( "protein_bar_data_current" );
-	json[ jsonKey_protein_bar_data_current ] = pbdata;
+	var jsonKey_protein_bar_data_current = hashObjectPropertyValueFromPropertyNameLookup( "protein_bar_data" );
+	json[ jsonKey_protein_bar_data_current ] = {a:0, b:pbdata};
 
 	updateURLHashWithJSONObject( json );
-
+		
 	// if ajaxResults is true, then we need to re-call initPage()
 	if( ajaxResults ) {
 		initPage();
