@@ -273,11 +273,19 @@ var QCMergedPageChartSummaryStatistics = function() {
 			} );
 		}
 
+		//  POST body
 		var hash_json_field_Contents_JSONString = JSON.stringify( _get_hash_json_Contents() );
-		var ajaxRequestData = {
-				project_search_id : _project_search_ids,
-				filterCriteria : hash_json_field_Contents_JSONString
-		};
+
+		//  Put Project Search Ids on the Query String of the URL
+		var projectSearchIdsForQueryStringArray = [];
+		_project_search_ids.forEach(function( projectSearchId, index, array) {
+			projectSearchIdsForQueryStringArray.push( "project_search_id=" + projectSearchId );
+		}, this )
+		
+		var projectSearchIdsForQueryString = projectSearchIdsForQueryStringArray.join( "&" );
+		
+		var url = contextPathJSVar + "/services/qc/dataPage/summaryStatistics_Merged?" + projectSearchIdsForQueryString;
+
 
 		if ( _activeAjax ) {
 			_activeAjax.abort();
@@ -288,18 +296,18 @@ var QCMergedPageChartSummaryStatistics = function() {
 		_activeAjax =
 			$.ajax({
 				type : "POST",
-				url : contextPathJSVar + "/services/qc/dataPage/summaryStatistics_Merged",
+				url : url,
 				traditional: true,  //  Force traditional serialization of the data sent
 				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
 				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-				data : ajaxRequestData,  // The data sent as params on the URL
+				data : hash_json_field_Contents_JSONString,  // The data sent as the POST body
+				contentType: "application/json; charset=utf-8",
 				dataType : "json",
 				success : function( ajaxResponseData ) {
 					try {
 						_activeAjax = null;
 						var responseParams = {
-								ajaxResponseData : ajaxResponseData, 
-								ajaxRequestData : ajaxRequestData
+								ajaxResponseData : ajaxResponseData 
 						};
 						objectThis.loadSummaryStatisticsCountProcessResponse( responseParams );
 					} catch( e ) {
@@ -326,9 +334,8 @@ var QCMergedPageChartSummaryStatistics = function() {
 	 */
 	this.loadSummaryStatisticsCountProcessResponse = function( params ) {
 		var ajaxResponseData = params.ajaxResponseData;
-		var ajaxRequestData = params.ajaxRequestData;
 
-		var qc_SummaryCountsResults_Merged = ajaxResponseData.qc_SummaryCountsResults_Merged;
+		var qc_SummaryCountsResults_Merged = ajaxResponseData;
 
 		// Block for "Summary Statistics"
 		var $Summary_Statistics_CountsBlock = $("#Summary_Statistics_CountsBlock");

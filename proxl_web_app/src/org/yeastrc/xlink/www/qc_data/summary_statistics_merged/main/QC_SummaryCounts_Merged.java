@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +25,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.objects.WebProteinPosition;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
+import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main.QC_SummaryCounts_Merged_CachedResultManager.QC_SummaryCounts_Merged_CachedResultManager_Result;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.objects.QC_SummaryCounts_Merged_Results;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.objects.QC_SummaryCounts_Merged_Results.QC_SummaryCountsResultsPerLinkType_Merged;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.objects.QC_SummaryCounts_Merged_Results.QC_SummaryCountsResults_PerSearchId_Merged;
@@ -41,6 +43,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class QC_SummaryCounts_Merged {
 
 	private static final Logger log = Logger.getLogger(QC_SummaryCounts_Merged.class);
+
+	/**
+	 *  !!!!!!!!!!!   VERY IMPORTANT  !!!!!!!!!!!!!!!!!!!!
+	 * 
+	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
+	 */
+	static final int VERSION_FOR_CACHING = 1;
+	
+	
+	public enum ForDownload { YES, NO }
+	
 	
 	/**
 	 * private constructor
@@ -52,19 +65,48 @@ public class QC_SummaryCounts_Merged {
 	}
 	
 	enum AddCombinedEntry { YES, NO }
+
+	/**
+	 * Response from call to getQC_SummaryCounts(...)
+	 *
+	 */
+	public static class QC_SummaryCounts_Merged_Method_Response {
+
+		private byte[] resultsAsBytes; //  summaryCounts_Merged_Results as JSON
+		private QC_SummaryCounts_Merged_Results summaryCounts_Merged_Results;
+
+		public byte[] getResultsAsBytes() {
+			return resultsAsBytes;
+		}
+		public void setResultsAsBytes(byte[] resultsAsBytes) {
+			this.resultsAsBytes = resultsAsBytes;
+		}
+		public QC_SummaryCounts_Merged_Results getSummaryCounts_Merged_Results() {
+			return summaryCounts_Merged_Results;
+		}
+		public void setSummaryCounts_Merged_Results(QC_SummaryCounts_Merged_Results summaryCounts_Merged_Results) {
+			this.summaryCounts_Merged_Results = summaryCounts_Merged_Results;
+		}
+
+	}
 	
 	/**
-	 * @param filterCriteriaJSON
-	 * @param projectSearchIdsListDeduppedSorted
+	 * @param forDownload
+	 * @param postBody
+	 * @param requestQueryString
 	 * @param searches
-	 * @param searchesMapOnSearchId
 	 * @return
 	 * @throws Exception
 	 */
-	public QC_SummaryCounts_Merged_Results getQC_SummaryCounts_Merged( 
-			String filterCriteriaJSON, 
+	public QC_SummaryCounts_Merged_Method_Response getQC_SummaryCounts_Merged( 
+			ForDownload forDownload,
+			String filterCriteriaJSON,
+			String requestQueryString,
 			List<SearchDTO> searches ) throws Exception {
 
+
+		String cacheKey = null;
+		
 		Collection<Integer> searchIds = new HashSet<>();
 		Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();
 		List<Integer> searchIdsListDeduppedSorted = new ArrayList<>( searches.size() );
@@ -74,6 +116,29 @@ public class QC_SummaryCounts_Merged {
 			searchIdsListDeduppedSorted.add( search.getSearchId() );
 			mapProjectSearchIdToSearchId.put( search.getProjectSearchId(), search.getSearchId() );
 		}
+		
+		if ( forDownload != ForDownload.YES ) {
+			
+			//  Only if not download, get from Cache on disk
+			
+			cacheKey = requestQueryString + filterCriteriaJSON;
+			
+			QC_SummaryCounts_Merged_CachedResultManager_Result qc_SummaryCounts_Merged_CachedResultManager_Result =
+					QC_SummaryCounts_Merged_CachedResultManager.getSingletonInstance()
+					.retrieveDataFromCache(searchIdsListDeduppedSorted, cacheKey );
+			if ( qc_SummaryCounts_Merged_CachedResultManager_Result != null ) {
+				byte[] chartJSONAsBytes = qc_SummaryCounts_Merged_CachedResultManager_Result.getChartJSONAsBytes();
+				if ( chartJSONAsBytes != null ) {
+					
+					//  Data in Cache on disk so return it
+					
+					QC_SummaryCounts_Merged_Method_Response response = new QC_SummaryCounts_Merged_Method_Response();
+					response.resultsAsBytes = chartJSONAsBytes;
+					
+					return response;  // EARLY EXIT
+				}
+			}
+		}
 
 		//  Jackson JSON Mapper object for JSON deserialization and serialization
 		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
@@ -82,15 +147,15 @@ public class QC_SummaryCounts_Merged {
 		try {
 			mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( filterCriteriaJSON, MergedPeptideQueryJSONRoot.class );
 		} catch ( JsonParseException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonParseException.  filterCriteriaJSON: " + filterCriteriaJSON;
+			String msg = "Failed to parse 'postBody', JsonParseException. filterCriteriaJSON: " + filterCriteriaJSON; 
 			log.error( msg, e );
 			throw e;
 		} catch ( JsonMappingException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonMappingException.  filterCriteriaJSON: " + filterCriteriaJSON;
+			String msg = "Failed to parse 'postBody', JsonMappingException. filterCriteriaJSON: " + filterCriteriaJSON;
 			log.error( msg, e );
 			throw e;
 		} catch ( IOException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', IOException.  filterCriteriaJSON: " + filterCriteriaJSON;
+			String msg = "Failed to parse 'postBody', IOException. filterCriteriaJSON: " + filterCriteriaJSON;
 			log.error( msg, e );
 			throw e;
 		}
@@ -259,13 +324,56 @@ public class QC_SummaryCounts_Merged {
 		}
 		
 
-		QC_SummaryCounts_Merged_Results result = createResult( searches, perSearchIdTempData_BySearchId, linkTypesDisplayOrderList );
-		result.setSearchIds( searchIdsListDeduppedSorted );
-		result.setFoundData( foundData );
+		QC_SummaryCounts_Merged_Results qc_SummaryCounts_Merged_Results = createResult( searches, perSearchIdTempData_BySearchId, linkTypesDisplayOrderList );
+		qc_SummaryCounts_Merged_Results.setSearchIds( searchIdsListDeduppedSorted );
+		qc_SummaryCounts_Merged_Results.setFoundData( foundData );
 		
-		return result;
+		QC_SummaryCounts_Merged_Method_Response response = new QC_SummaryCounts_Merged_Method_Response();
+		response.summaryCounts_Merged_Results = qc_SummaryCounts_Merged_Results;
+		
+		if ( forDownload != ForDownload.YES && cacheKey != null ) {
+			//  Not for download so create the JSON and cache it to disk
+			response.resultsAsBytes = getResultsByteArray( qc_SummaryCounts_Merged_Results );
+			
+			QC_SummaryCounts_Merged_CachedResultManager.getSingletonInstance()
+			.saveDataToCache( searchIdsListDeduppedSorted, response.resultsAsBytes, cacheKey );
+		}
+		
+		return response;
 	}
-	
+
+	/**
+	 * @param resultsObject
+	 * @param searchId
+	 * @return
+	 * @throws IOException
+	 */
+	private byte[] getResultsByteArray( QC_SummaryCounts_Merged_Results resultsObject ) throws IOException {
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream( );
+
+		//  Jackson JSON Mapper object for JSON deserialization and serialization
+		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();
+		//   serialize 
+		try {
+			jacksonJSON_Mapper.writeValue( baos, resultsObject );
+		} catch ( JsonParseException e ) {
+			String msg = "Failed to serialize 'resultsObject', JsonParseException.  " ;
+			log.error( msg, e );
+			throw e;
+		} catch ( JsonMappingException e ) {
+			String msg = "Failed to serialize 'resultsObject', JsonMappingException.  " ;
+			log.error( msg, e );
+			throw e;
+		} catch ( IOException e ) {
+			String msg = "Failed to serialize 'resultsObject', IOException. " ;
+			log.error( msg, e );
+			throw e;
+		}
+		
+		return baos.toByteArray();
+	}
+
 	
 	/**
 	 * @param searches

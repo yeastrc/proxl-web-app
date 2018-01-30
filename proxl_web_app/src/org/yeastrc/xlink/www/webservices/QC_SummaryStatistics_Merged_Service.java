@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,8 +11,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -24,7 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main.QC_SummaryCounts_Merged;
-import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.objects.QC_SummaryCounts_Merged_Results;
+import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main.QC_SummaryCounts_Merged.ForDownload;
+import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main.QC_SummaryCounts_Merged.QC_SummaryCounts_Merged_Method_Response;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
@@ -43,40 +43,15 @@ public class QC_SummaryStatistics_Merged_Service {
 
 	private static final Logger log = Logger.getLogger(QC_SummaryStatistics_Merged_Service.class);
 	
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/summaryStatistics_Merged") 
-	public WebserviceResult_getQC_SummaryStatistics getQC_SummaryStatistics_Merged_GET( 
-			@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
-			@QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
-			@Context HttpServletRequest request ) {
-		
-		return getQC_SummaryStatistics_Merged_Internal( projectSearchIdList, filterCriteria_JSONString, request );
-	}
 	
 	@POST
-	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
+	@Consumes( MediaType.APPLICATION_JSON )
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/summaryStatistics_Merged") 
-	public WebserviceResult_getQC_SummaryStatistics getQC_SummaryStatistics_Merged_POST( 
-			@FormParam( "project_search_id" ) List<Integer> projectSearchIdList,
-			@FormParam( "filterCriteria" ) String filterCriteria_JSONString,
+	public byte[] getQC_SummaryStatistics_Merged_POST( 
+			@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
+			byte[] postBody,
 			@Context HttpServletRequest request ) {
-
-		return getQC_SummaryStatistics_Merged_Internal( projectSearchIdList, filterCriteria_JSONString, request );
-	}
-
-	/**
-	 * @param projectSearchIdList
-	 * @param filterCriteria_JSONString
-	 * @param request
-	 * @return
-	 */
-	private WebserviceResult_getQC_SummaryStatistics getQC_SummaryStatistics_Merged_Internal( 
-			List<Integer> projectSearchIdList,
-			String filterCriteria_JSONString,
-			HttpServletRequest request ) {
-
 
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
 			String msg = "Provided project_search_id is null or project_search_id is missing";
@@ -87,8 +62,8 @@ public class QC_SummaryStatistics_Merged_Service {
 		    	        .build()
 		    	        );
 		}
-		if ( StringUtils.isEmpty( filterCriteria_JSONString ) ) {
-			String msg = "Provided filterCriteria is null or filterCriteria is missing";
+		if ( postBody == null || postBody.length == 0 ) {
+			String msg = "POST body is null or POST body is missing";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -157,6 +132,8 @@ public class QC_SummaryStatistics_Merged_Service {
 			//////////////////////////////////////////
 			
 
+			String requestQueryString = request.getQueryString();
+			
 			Set<Integer> projectSearchIdsProcessedFromForm = new HashSet<>(); // add each projectSearchId as process in loop next
 			
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
@@ -183,19 +160,18 @@ public class QC_SummaryStatistics_Merged_Service {
 					searchIdsArrayIndex++;
 				}
 			}
-				
 			
-			QC_SummaryCounts_Merged_Results qc_SummaryCountsResults_Merged =
+			String filterCriteriaJSON = new String( postBody, StandardCharsets.UTF_8 );
+
+			QC_SummaryCounts_Merged_Method_Response qc_SummaryCounts_Merged_Method_Response =
 					QC_SummaryCounts_Merged.getInstance()
 					.getQC_SummaryCounts_Merged( 
-							filterCriteria_JSONString, searches );
+							ForDownload.NO,
+							filterCriteriaJSON,
+							requestQueryString,
+							searches );
 
-			//  Get PSMs for cutoffs and other data
-			WebserviceResult_getQC_SummaryStatistics webserviceResult = new WebserviceResult_getQC_SummaryStatistics();
-			
-			webserviceResult.qc_SummaryCountsResults_Merged = qc_SummaryCountsResults_Merged;
-			
-			return webserviceResult;
+			return qc_SummaryCounts_Merged_Method_Response.getResultsAsBytes();
 			
 		} catch ( WebApplicationException e ) {
 			throw e;
@@ -222,18 +198,13 @@ public class QC_SummaryStatistics_Merged_Service {
 	 * 
 	 *
 	 */
-	public static class WebserviceResult_getQC_SummaryStatistics {
-		
-		private QC_SummaryCounts_Merged_Results qc_SummaryCountsResults_Merged;
-
-		public QC_SummaryCounts_Merged_Results getQc_SummaryCountsResults_Merged() {
-			return qc_SummaryCountsResults_Merged;
-		}
-
-		public void setQc_SummaryCountsResults_Merged(QC_SummaryCounts_Merged_Results qc_SummaryCountsResults_Merged) {
-			this.qc_SummaryCountsResults_Merged = qc_SummaryCountsResults_Merged;
-		}
-
-
-	}
+//	public static class WebserviceResult_getQC_SummaryStatistics {
+//		private QC_SummaryCounts_Merged_Results qc_SummaryCountsResults_Merged;
+//		public QC_SummaryCounts_Merged_Results getQc_SummaryCountsResults_Merged() {
+//			return qc_SummaryCountsResults_Merged;
+//		}
+//		public void setQc_SummaryCountsResults_Merged(QC_SummaryCounts_Merged_Results qc_SummaryCountsResults_Merged) {
+//			this.qc_SummaryCountsResults_Merged = qc_SummaryCountsResults_Merged;
+//		}
+//	}
 }

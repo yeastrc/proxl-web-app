@@ -24,6 +24,8 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main.QC_SummaryCounts_Merged;
+import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main.QC_SummaryCounts_Merged.ForDownload;
+import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main.QC_SummaryCounts_Merged.QC_SummaryCounts_Merged_Method_Response;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.objects.QC_SummaryCounts_Merged_Results;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.objects.QC_SummaryCounts_Merged_Results.QC_SummaryCountsResultsPerLinkType_Merged;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.objects.QC_SummaryCounts_Merged_Results.QC_SummaryCountsResults_PerSearchId_Merged;
@@ -54,6 +56,9 @@ public class DownloadQC_Summary_PeptideChartDataAction extends Action {
 		try {
 			// our form
 			MergedSearchViewPeptidesForm form = (MergedSearchViewPeptidesForm)actionForm;
+
+			String requestQueryString = request.getQueryString();
+			
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			int[] projectSearchIds = form.getProjectSearchId();
@@ -130,10 +135,17 @@ public class DownloadQC_Summary_PeptideChartDataAction extends Action {
 			try {
 
 				////////     Get Download Data
-				QC_SummaryCounts_Merged_Results qc_SummaryCountsResults_Merged =
+
+				QC_SummaryCounts_Merged_Method_Response qc_SummaryCounts_Merged_Method_Response =
 						QC_SummaryCounts_Merged.getInstance()
 						.getQC_SummaryCounts_Merged( 
-								form.getQueryJSON(), searches );
+								ForDownload.YES,
+								form.getQueryJSON(),
+								requestQueryString,
+								searches );
+				
+				QC_SummaryCounts_Merged_Results qc_SummaryCountsResults_Merged =
+						qc_SummaryCounts_Merged_Method_Response.getSummaryCounts_Merged_Results();
 				
 				List<QC_SummaryCountsResultsPerLinkType_Merged> peptideCountPerLinkTypeList = qc_SummaryCountsResults_Merged.getReportedPeptideCountPerLinkTypeList();
 				
