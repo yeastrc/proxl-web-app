@@ -302,11 +302,20 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		var hash_json_Contents_COPY = params.hash_json_Contents_COPY;
 		var $chart_outer_container_jq = params.$chart_outer_container_jq; 
 
+
+		//  POST body
 		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents_COPY );
-		var ajaxRequestData = {
-				project_search_id : _project_search_ids,
-				filterCriteria : hash_json_field_Contents_JSONString
-		};
+
+		//  Put Project Search Ids on the Query String of the URL
+		var projectSearchIdsForQueryStringArray = [];
+		_project_search_ids.forEach(function( projectSearchId, index, array) {
+			projectSearchIdsForQueryStringArray.push( "project_search_id=" + projectSearchId );
+		}, this )
+		
+		var projectSearchIdsForQueryString = projectSearchIdsForQueryStringArray.join( "&" );
+		
+		var url = contextPathJSVar + "/services/qc/dataPage/ppmError_Merged?" + projectSearchIdsForQueryString;
+
 		if ( _activeAjax && 
 				_activeAjax[ selectedLinkType ] ) {
 			_activeAjax[ selectedLinkType ].abort();
@@ -319,11 +328,12 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		_activeAjax[ selectedLinkType ] = 
 			$.ajax({
 				type : "POST",
-				url : contextPathJSVar + "/services/qc/dataPage/ppmError_Merged",
+				url : url,
 				traditional: true,  //  Force traditional serialization of the data sent
 				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
 				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-				data : ajaxRequestData,  // The data sent as params on the URL
+				data : hash_json_field_Contents_JSONString,  // The data sent as the POST body
+				contentType: "application/json; charset=utf-8",
 				dataType : "json",
 				success : function( ajaxResponseData ) {
 					try {
@@ -332,7 +342,6 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 						}
 						var responseParams = {
 								ajaxResponseData : ajaxResponseData, 
-								ajaxRequestData : ajaxRequestData,
 								selectedLinkType : selectedLinkType,
 								indexForLinkType : indexForLinkType,
 								$chart_outer_container_jq : $chart_outer_container_jq
@@ -369,13 +378,11 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		var objectThis = this;
 
 		var ajaxResponseData = params.ajaxResponseData;
-		var ajaxRequestData = params.ajaxRequestData;
 		var selectedLinkType = params.selectedLinkType;
 		var indexForLinkType = params.indexForLinkType;
 		var $chart_outer_container_jq = params.$chart_outer_container_jq;
 
-		var results = ajaxResponseData.results;
-		var dataForChartPerLinkTypeList = results.dataForChartPerLinkTypeList;
+		var dataForChartPerLinkTypeList = ajaxResponseData.dataForChartPerLinkTypeList;
 
 		if ( dataForChartPerLinkTypeList.length !== 1 ) {
 			throw Error( "dataForChartPerLinkTypeList.length !== 1, is = " + dataForChartPerLinkTypeList.length );

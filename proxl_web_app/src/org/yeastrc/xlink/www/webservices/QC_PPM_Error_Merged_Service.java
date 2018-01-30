@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,8 +11,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -40,37 +39,14 @@ public class QC_PPM_Error_Merged_Service {
 
 	private static final Logger log = Logger.getLogger(QC_PPM_Error_Merged_Service.class);
 	
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/ppmError_Merged") 
-	public WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs
-		getPPM_Error_Histogram_For_PSMPeptideCutoffs_GET( 
-				@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
-				@QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
-				@Context HttpServletRequest request ) {
-	
-		return getPPM_Error_Histogram_For_PSMPeptideCutoffs_Internal( projectSearchIdList, filterCriteria_JSONString, request );
-	}
-
-
 	@POST
-	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
+	@Consumes( MediaType.APPLICATION_JSON )
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/ppmError_Merged") 
-	public WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs
-		getPPM_Error_Histogram_For_PSMPeptideCutoffs_POST( 
-				@FormParam( "project_search_id" ) List<Integer> projectSearchIdList,
-				@FormParam( "filterCriteria" ) String filterCriteria_JSONString,
+	public byte[] getPPM_Error_Histogram_For_PSMPeptideCutoffs_POST( 
+				@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
+				byte[] postBody,
 				@Context HttpServletRequest request ) {
-	
-		return getPPM_Error_Histogram_For_PSMPeptideCutoffs_Internal( projectSearchIdList, filterCriteria_JSONString, request );
-	}
-
-	private WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs
-		getPPM_Error_Histogram_For_PSMPeptideCutoffs_Internal( 
-				List<Integer> projectSearchIdList,
-				String filterCriteria_JSONString,
-				HttpServletRequest request ) {
 	
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
 			String msg = "Provided project_search_id is null or project_search_id is missing";
@@ -81,8 +57,8 @@ public class QC_PPM_Error_Merged_Service {
 		    	        .build()
 		    	        );
 		}
-		if ( StringUtils.isEmpty( filterCriteria_JSONString ) ) {
-			String msg = "Provided filterCriteria is null or filterCriteria is missing";
+		if ( postBody == null || postBody.length == 0 ) {
+			String msg = "POST body is null or POST body is missing";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -149,8 +125,9 @@ public class QC_PPM_Error_Merged_Service {
 			
 			////////   Auth complete
 			//////////////////////////////////////////
-			
 
+			String requestQueryString = request.getQueryString();
+			
 			Set<Integer> projectSearchIdsProcessedFromForm = new HashSet<>(); // add each projectSearchId as process in loop next
 			
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
@@ -177,23 +154,18 @@ public class QC_PPM_Error_Merged_Service {
 					searchIdsArrayIndex++;
 				}
 			}
-			
+
+			String filterCriteria_JSONString = new String( postBody, StandardCharsets.UTF_8 );
+
 			PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response =
 					PPM_Error_Chart_For_PSMPeptideCutoffs_Merged.getInstance()
 					.getPPM_Error_Chart_For_PSMPeptideCutoffs_Merged(
 							PPM_Error_Chart_For_PSMPeptideCutoffs_Merged.ForDownload.NO,
 							filterCriteria_JSONString, 
+							requestQueryString,
 							searches );
 
-			PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results =
-					ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response.getPpm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results();
-
-			//  Get  for cutoffs and other data
-			WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs serviceResult = new WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs();
-			
-			serviceResult.results = ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results;
-			
-			return serviceResult;
+			return ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response.getResultsAsBytes();
 			
 		} catch ( WebApplicationException e ) {
 			throw e;
@@ -216,22 +188,4 @@ public class QC_PPM_Error_Merged_Service {
 		}
 	}
 	
-	/**
-	 * 
-	 *
-	 */
-	public static class WebserviceResult_getPPM_Error_Histogram_For_PSMPeptideCutoffs {
-		
-		PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results results;
-
-		public PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results getResults() {
-			return results;
-		}
-
-		public void setResults(PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results results) {
-			this.results = results;
-		}
-
-
-	}
 }

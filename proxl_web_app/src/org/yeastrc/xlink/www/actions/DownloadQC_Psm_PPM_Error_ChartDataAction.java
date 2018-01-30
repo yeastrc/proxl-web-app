@@ -52,6 +52,9 @@ public class DownloadQC_Psm_PPM_Error_ChartDataAction extends Action {
 		try {
 			// our form
 			MergedSearchViewPeptidesForm form = (MergedSearchViewPeptidesForm)actionForm;
+			
+			String requestQueryString = request.getQueryString();
+			
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			int[] projectSearchIds = form.getProjectSearchId();
@@ -136,6 +139,7 @@ public class DownloadQC_Psm_PPM_Error_ChartDataAction extends Action {
 						.getPPM_Error_Chart_For_PSMPeptideCutoffs_Merged(
 								PPM_Error_Chart_For_PSMPeptideCutoffs_Merged.ForDownload.YES,
 								filterCriteria_JSONString, 
+								requestQueryString,
 								searches );
 				
 				/**

@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.qc_data.psm_error_estimates_merged.main;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.proteomics.peptide.peptide.Peptide;
 import org.yeastrc.proteomics.peptide.peptide.PeptideUtils;
 import org.yeastrc.xlink.dao.StaticModDAO;
 import org.yeastrc.xlink.dto.IsotopeLabelDTO;
@@ -23,7 +23,6 @@ import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
-import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideIsotopeLabelDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
@@ -33,6 +32,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
+import org.yeastrc.xlink.www.qc_data.psm_error_estimates_merged.main.PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager.PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager_Result;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates_merged.objects.PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates_merged.objects.PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results.PPM_Error_Chart_For_PSMPeptideCutoffsResultsForLinkType;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates_merged.objects.PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results.PPM_Error_Chart_For_PSMPeptideCutoffsResultsForSearchId;
@@ -42,13 +42,9 @@ import org.yeastrc.xlink.www.searcher.IsotopeLabelSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_IsotopeLabel;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
-import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId_ReqParams;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
-import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId_Result;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 import org.yeastrc.xlink.www.web_utils.PSMMassCalculator;
 import org.yeastrc.xlink.www.web_utils.PSMMassCalculatorParams;
@@ -65,6 +61,13 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 
 	private static final Logger log = Logger.getLogger(PPM_Error_Chart_For_PSMPeptideCutoffs_Merged.class);
 
+	/**
+	 *  !!!!!!!!!!!   VERY IMPORTANT  !!!!!!!!!!!!!!!!!!!!
+	 * 
+	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
+	 */
+	static final int VERSION_FOR_CACHING = 1;
+	
 	public enum ForDownload { YES, NO }
 	
 	/**
@@ -82,6 +85,7 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 	 */
 	public static class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response {
 
+		private byte[] resultsAsBytes; //  ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results as JSON
 		private PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results;
 		/**
 		 * Lists of PPM Error mapped by search id then link type
@@ -108,6 +112,12 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 				Map<String, Map<Integer, List<Double>>> allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType) {
 			this.allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType = allSearchesCombined_PPM_Error_List_Map_KeyedOnSearchId_KeyedOnLinkType;
 		}
+		public byte[] getResultsAsBytes() {
+			return resultsAsBytes;
+		}
+		public void setResultsAsBytes(byte[] resultsAsBytes) {
+			this.resultsAsBytes = resultsAsBytes;
+		}
 
 	}
 	
@@ -120,13 +130,40 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 	public PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response getPPM_Error_Chart_For_PSMPeptideCutoffs_Merged( 
 			ForDownload forDownload,
 			String filterCriteriaJSON, 
+			String requestQueryString,
 			List<SearchDTO> searches ) throws Exception {
 
 
+		String cacheKey = null;
+		
 		List<Integer> searchIds = new ArrayList<Integer>( searches.size() );
 		
 		for ( SearchDTO search : searches ) {
 			searchIds.add( search.getSearchId() );
+		}
+
+		if ( forDownload != ForDownload.YES ) {
+			
+			//  Only if not download, get from Cache on disk
+			
+			cacheKey = requestQueryString + filterCriteriaJSON;
+			
+			PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager_Result ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager_Result =
+					PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager.getSingletonInstance()
+					.retrieveDataFromCache( searchIds, cacheKey );
+			
+			if ( ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager_Result != null ) {
+				byte[] chartJSONAsBytes = ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager_Result.getChartJSONAsBytes();
+				if ( chartJSONAsBytes != null ) {
+					
+					//  Data in Cache on disk so return it
+					
+					PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response response = new PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Method_Response();
+					response.resultsAsBytes = chartJSONAsBytes;
+					
+					return response;  // EARLY EXIT
+				}
+			}
 		}
 		
 		//  Reported Peptide Ids Skipped For Error Calculating MZ
@@ -278,10 +315,50 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 					+ ", search ids: " + searchIds.toString()
 					+ ", List of Reported Peptide Ids: " + reportedPeptideIdsSkippedForErrorCalculatingMZ );
 		}
+
+		if ( forDownload != ForDownload.YES && cacheKey != null ) {
+			//  Not for download so create the JSON and cache it to disk
+			methodResult.resultsAsBytes = getResultsByteArray( methodResult.ppm_Error_Chart_For_PSMPeptideCutoffs_Merged_Results );
+			
+			PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager.getSingletonInstance()
+			.saveDataToCache( searchIds, methodResult.resultsAsBytes, cacheKey );
+		}
 		
 		return methodResult;
 	}
-	
+
+	/**
+	 * @param resultsObject
+	 * @param searchId
+	 * @return
+	 * @throws IOException
+	 */
+	private byte[] getResultsByteArray( PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_Results resultsObject ) throws IOException {
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream( );
+
+		//  Jackson JSON Mapper object for JSON deserialization and serialization
+		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();
+		//   serialize 
+		try {
+			jacksonJSON_Mapper.writeValue( baos, resultsObject );
+		} catch ( JsonParseException e ) {
+			String msg = "Failed to serialize 'resultsObject', JsonParseException.  " ;
+			log.error( msg, e );
+			throw e;
+		} catch ( JsonMappingException e ) {
+			String msg = "Failed to serialize 'resultsObject', JsonMappingException.  " ;
+			log.error( msg, e );
+			throw e;
+		} catch ( IOException e ) {
+			String msg = "Failed to serialize 'resultsObject', IOException. " ;
+			log.error( msg, e );
+			throw e;
+		}
+		
+		return baos.toByteArray();
+	}
+
 
 	/**
 	 * @param allSearchesCombinedPreMZList_Map_KeyedOnSearchId_KeyedOnLinkType
