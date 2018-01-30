@@ -333,6 +333,12 @@ var QCPageChartSummaryStatistics = function() {
 			throw Error( "unable to find HTML element with id 'Summary_Statistics_CountsBlock'" );
 		}
 		$Summary_Statistics_CountsBlock.empty();
+		
+		if ( ! resultsPerLinkTypeList ) {
+			
+			var ajaxRequestDataAsJSON = JSON.stringify( ajaxRequestData );
+			throw Error( "resultsPerLinkTypeList is null or undefined. ajaxRequestData: " + ajaxRequestDataAsJSON );
+		}
 
 		//  Build data for charts
 		var psmCountPerType = [];
