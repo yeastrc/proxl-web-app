@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +41,11 @@ import org.yeastrc.xlink.www.objects.ImageViewerData;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerCrosslinkService_Results_Main_CachedResultManager;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerCrosslinkService_Results_Main_CachedResultManager.ViewerCrosslinkService_Results_Main_CachedResultManager_Result;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerCrosslinkService_Results_PsmCount_CachedResultManager;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerCrosslinkService_Results_PsmCount_CachedResultManager.ViewerCrosslinkService_Results_PsmCount_CachedResultManager_Result;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,11 +54,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ViewerCrosslinkService {
 	
 	private static final Logger log = Logger.getLogger(ViewerCrosslinkService.class);
+
+	/**
+	 *  !!!!!!!!!!!   VERY IMPORTANT  !!!!!!!!!!!!!!!!!!!!
+	 * 
+	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
+	 */
+	public static final int VERSION_FOR_CACHING = 1;
+	
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getCrosslinkData") 
-	public ImageViewerData getViewerData(
+	public byte[]  getViewerData(
 			@QueryParam( "projectSearchId" ) List<Integer> projectSearchIdList,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
@@ -135,6 +149,25 @@ public class ViewerCrosslinkService {
 			////////   Auth complete
 			//////////////////////////////////////////
 
+			String requestQueryString = request.getQueryString();
+			
+			List<Integer> projectSearchIdListDedupedSorted = new ArrayList<>( projectSearchIdsSet );
+			Collections.sort( projectSearchIdListDedupedSorted );
+			
+			ViewerCrosslinkService_Results_Main_CachedResultManager_Result cachedResultManager_Result =
+					ViewerCrosslinkService_Results_Main_CachedResultManager.getSingletonInstance()
+					.retrieveDataFromCache( projectSearchIdListDedupedSorted, requestQueryString );
+			
+			if ( cachedResultManager_Result != null ) {
+
+				byte[] resultsAsBytes = cachedResultManager_Result.getChartJSONAsBytes();
+				if ( resultsAsBytes != null ) {
+					
+					//  Use JSON cached to disk
+					return resultsAsBytes;  //  EARLY EXIT
+				}
+			}
+			
 			ImageViewerData ivd = new ImageViewerData();
 			
 			//   Get PSM and Peptide Cutoff data from JSON
@@ -318,7 +351,15 @@ public class ViewerCrosslinkService {
 				}
 			}
 			ivd.setProteinLinkPositions( proteinLinkPositions );
-			return ivd;
+			
+
+			byte[] resultJSONasBytes = getResultsByteArray( ivd );
+			
+			ViewerCrosslinkService_Results_Main_CachedResultManager.getSingletonInstance()
+			.saveDataToCache( projectSearchIdListDedupedSorted, resultJSONasBytes, requestQueryString );
+			
+			return resultJSONasBytes;
+			
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
@@ -327,7 +368,7 @@ public class ViewerCrosslinkService {
 			throw e;
 		}
 	}
-	
+
 	/**
 	 * @param searchId
 	 * @param fromProtId
@@ -372,7 +413,7 @@ public class ViewerCrosslinkService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getCrosslinkPSMCounts") 
-	public ImageViewerData getPSMCounts( 
+	public byte[] getPSMCounts( 
 			@QueryParam( "projectSearchId" ) List<Integer> projectSearchIdList,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
@@ -445,7 +486,25 @@ public class ViewerCrosslinkService {
 			
 			////////   Auth complete
 			//////////////////////////////////////////
+
+			String requestQueryString = request.getQueryString();
 			
+			List<Integer> projectSearchIdListDedupedSorted = new ArrayList<>( projectSearchIdsSet );
+			Collections.sort( projectSearchIdListDedupedSorted );
+			
+			ViewerCrosslinkService_Results_PsmCount_CachedResultManager_Result cachedResultManager_Result =
+					ViewerCrosslinkService_Results_PsmCount_CachedResultManager.getSingletonInstance()
+					.retrieveDataFromCache( projectSearchIdListDedupedSorted, requestQueryString );
+			
+			if ( cachedResultManager_Result != null ) {
+
+				byte[] resultsAsBytes = cachedResultManager_Result.getChartJSONAsBytes();
+				if ( resultsAsBytes != null ) {
+					
+					//  Use JSON cached to disk
+					return resultsAsBytes;  //  EARLY EXIT
+				}
+			}
 
 			ImageViewerData ivd = new ImageViewerData();
 			
@@ -627,7 +686,14 @@ public class ViewerCrosslinkService {
 				}
 			}
 			ivd.setCrosslinkPSMCounts( proteinLinkPositionPsmCount );
-			return ivd;
+
+			byte[] resultJSONasBytes = getResultsByteArray( ivd );
+			
+			ViewerCrosslinkService_Results_PsmCount_CachedResultManager.getSingletonInstance()
+			.saveDataToCache( projectSearchIdListDedupedSorted, resultJSONasBytes, requestQueryString );
+			
+			return resultJSONasBytes;
+			
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( ProxlWebappDataException e ) {
@@ -684,4 +750,38 @@ public class ViewerCrosslinkService {
 		}
 		map_keyed_by_toProtPosition.put( toProtPosition, psmCount );
 	}
+	
+
+	/**
+	 * @param resultsObject
+	 * @param searchId
+	 * @return
+	 * @throws IOException
+	 */
+	private byte[] getResultsByteArray( ImageViewerData resultsObject ) throws IOException {
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream( );
+
+		//  Jackson JSON Mapper object for JSON deserialization and serialization
+		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();
+		//   serialize 
+		try {
+			jacksonJSON_Mapper.writeValue( baos, resultsObject );
+		} catch ( JsonParseException e ) {
+			String msg = "Failed to serialize 'resultsObject', JsonParseException.  " ;
+			log.error( msg, e );
+			throw e;
+		} catch ( JsonMappingException e ) {
+			String msg = "Failed to serialize 'resultsObject', JsonMappingException.  " ;
+			log.error( msg, e );
+			throw e;
+		} catch ( IOException e ) {
+			String msg = "Failed to serialize 'resultsObject', IOException. " ;
+			log.error( msg, e );
+			throw e;
+		}
+		
+		return baos.toByteArray();
+	}
+	
 }

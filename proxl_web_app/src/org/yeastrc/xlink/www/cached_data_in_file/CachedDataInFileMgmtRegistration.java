@@ -13,6 +13,14 @@ import org.yeastrc.xlink.www.qc_data.scan_level_data.main.Scan_MS_1_IonCurrent_H
 import org.yeastrc.xlink.www.qc_data.scan_ms1_all_scan_intensity_heatmap.main.MS1_All_IntensityHeatmapImageCachedResultImageManager;
 import org.yeastrc.xlink.www.qc_data.summary_statistics.main.QC_SummaryCounts_CachedResultManager;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main.QC_SummaryCounts_Merged_CachedResultManager;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerCrosslinkService_Results_Main_CachedResultManager;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerCrosslinkService_Results_PsmCount_CachedResultManager;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerLooplinkService_Results_Main_CachedResultManager;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerLooplinkService_Results_PsmCount_CachedResultManager;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerMonolinkService_Results_Main_CachedResultManager;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerMonolinkService_Results_PsmCount_CachedResultManager;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerProteinDataService_Results_CachedResultManager;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerSequenceCoverageService_Results_CachedResultManager;
 
 /**
  * Registration to use CachedDataInFileMgmt.  Registration is required.
@@ -68,6 +76,16 @@ public class CachedDataInFileMgmtRegistration {
 	 * Array of classes to call "register()" on so they will call "register(...)" on this class.
 	 */
 	private final CachedDataInFileMgmtRegistrationIF[] classesToRegister = {
+			
+			// Image and Structure Page webservices
+			ViewerProteinDataService_Results_CachedResultManager.getSingletonInstance(),
+			ViewerCrosslinkService_Results_Main_CachedResultManager.getSingletonInstance(),
+			ViewerCrosslinkService_Results_PsmCount_CachedResultManager.getSingletonInstance(),
+			ViewerLooplinkService_Results_Main_CachedResultManager.getSingletonInstance(),
+			ViewerLooplinkService_Results_PsmCount_CachedResultManager.getSingletonInstance(),
+			ViewerMonolinkService_Results_Main_CachedResultManager.getSingletonInstance(),
+			ViewerMonolinkService_Results_PsmCount_CachedResultManager.getSingletonInstance(),
+			ViewerSequenceCoverageService_Results_CachedResultManager.getSingletonInstance(),
 			
 			//  QC Single Search
 			MS1_All_IntensityHeatmapImageCachedResultImageManager.getSingletonInstance(),

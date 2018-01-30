@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,6 +64,9 @@ import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
 import org.yeastrc.xlink.www.objects.ImageViewerData;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerProteinDataService_Results_CachedResultManager;
+import org.yeastrc.xlink.www.webservices_cache_response.ViewerProteinDataService_Results_CachedResultManager.ViewerProteinDataService_Results_CachedResultManager_Result;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,11 +75,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ViewerProteinDataService {
 	
 	private static final Logger log = Logger.getLogger(ViewerProteinDataService.class);
+
+	/**
+	 *  !!!!!!!!!!!   VERY IMPORTANT  !!!!!!!!!!!!!!!!!!!!
+	 * 
+	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
+	 */
+	public static final int VERSION_FOR_CACHING = 1;
+	
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getProteinData") 
-	public ImageViewerData getViewerData( 
+	public byte[] getViewerData( 
 			
 			@QueryParam( "projectSearchId" ) List<Integer> projectSearchIdList,
 			@QueryParam( "ds" ) String userSorted_ProjectSearchIds,
@@ -163,6 +175,25 @@ public class ViewerProteinDataService {
 			
 			////////   Auth complete
 			//////////////////////////////////////////
+
+			String requestQueryString = request.getQueryString();
+			
+			List<Integer> projectSearchIdListDedupedSorted = new ArrayList<>( projectSearchIdsSet );
+			Collections.sort( projectSearchIdListDedupedSorted );
+			
+			ViewerProteinDataService_Results_CachedResultManager_Result viewerProteinDataService_Results_CachedResultManager_Result =
+					ViewerProteinDataService_Results_CachedResultManager.getSingletonInstance()
+					.retrieveDataFromCache( projectSearchIdListDedupedSorted, requestQueryString );
+			
+			if ( viewerProteinDataService_Results_CachedResultManager_Result != null ) {
+
+				byte[] resultsAsBytes = viewerProteinDataService_Results_CachedResultManager_Result.getChartJSONAsBytes();
+				if ( resultsAsBytes != null ) {
+					
+					//  Use JSON cached to disk
+					return resultsAsBytes;  //  EARLY EXIT
+				}
+			}
 			
 			if( excludeTaxonomy == null ) 
 				excludeTaxonomy = new ArrayList<Integer>();
@@ -509,7 +540,13 @@ public class ViewerProteinDataService {
 			ivd.setFilterOnlyOnePSM( filterOnlyOnePSM );
 			ivd.setFilterOnlyOnePeptide( filterOnlyOnePeptide );
 			ivd.setRemoveNonUniquePSMs( removeNonUniquePSMs );
-			return ivd;
+			
+			byte[] resultJSONasBytes = getResultsByteArray( ivd );
+			
+			ViewerProteinDataService_Results_CachedResultManager.getSingletonInstance()
+			.saveDataToCache( projectSearchIdListDedupedSorted, resultJSONasBytes, requestQueryString );
+			
+			return resultJSONasBytes;
 			
 		} catch ( WebApplicationException e ) {
 			throw e;
@@ -531,6 +568,39 @@ public class ViewerProteinDataService {
 					);
 		}
 	}
+
+	/**
+	 * @param resultsObject
+	 * @param searchId
+	 * @return
+	 * @throws IOException
+	 */
+	private byte[] getResultsByteArray( ImageViewerData resultsObject ) throws IOException {
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream( );
+
+		//  Jackson JSON Mapper object for JSON deserialization and serialization
+		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();
+		//   serialize 
+		try {
+			jacksonJSON_Mapper.writeValue( baos, resultsObject );
+		} catch ( JsonParseException e ) {
+			String msg = "Failed to serialize 'resultsObject', JsonParseException.  " ;
+			log.error( msg, e );
+			throw e;
+		} catch ( JsonMappingException e ) {
+			String msg = "Failed to serialize 'resultsObject', JsonMappingException.  " ;
+			log.error( msg, e );
+			throw e;
+		} catch ( IOException e ) {
+			String msg = "Failed to serialize 'resultsObject', IOException. " ;
+			log.error( msg, e );
+			throw e;
+		}
+		
+		return baos.toByteArray();
+	}
+
 	
 	/**
 	 * 
