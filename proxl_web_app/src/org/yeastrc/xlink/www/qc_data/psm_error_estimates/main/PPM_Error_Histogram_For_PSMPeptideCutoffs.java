@@ -67,7 +67,7 @@ public class PPM_Error_Histogram_For_PSMPeptideCutoffs {
 	 * 
 	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
 	 */
-	static final int VERSION_FOR_CACHING = 2;
+	static final int VERSION_FOR_CACHING = 3;
 	
 	
 	private static final int REMOVE_OUTLIERS_FIRST_QUARTER_PERCENTILE = 25;
