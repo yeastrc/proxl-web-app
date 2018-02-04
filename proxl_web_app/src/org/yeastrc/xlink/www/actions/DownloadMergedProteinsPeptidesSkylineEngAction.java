@@ -27,8 +27,9 @@ import org.apache.struts.action.ActionMapping;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.yeastrc.proteomics.mass.MassUtils;
+import org.yeastrc.proteomics.mass.MassUtils.MassType;
 import org.yeastrc.proteomics.peptide.peptide.Peptide;
+import org.yeastrc.proteomics.peptide.peptide.PeptideMassCalculator;
 import org.yeastrc.xlink.dao.StaticModDAO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
@@ -294,7 +295,7 @@ public class DownloadMergedProteinsPeptidesSkylineEngAction extends Action {
 
 									BigDecimal modMass = psm.getPsmDTO().getLinkerMass();
 
-									modMass = modMass.add( new BigDecimal( otherPeptide.getMass( MassUtils.MASS_TYPE_MONOISOTOPIC ) ) );
+									modMass = modMass.add( new BigDecimal( PeptideMassCalculator.getInstance().getMassForPeptide( otherPeptide, MassType.MONOISOTOPIC ) ) );
 									modMass = modMass.add( new BigDecimal( modsSum ) );
 
 									modMass = modMass.setScale( 5, RoundingMode.CEILING );		// set to 5 decimal places
@@ -334,7 +335,7 @@ public class DownloadMergedProteinsPeptidesSkylineEngAction extends Action {
 
 									BigDecimal modMass = psm.getPsmDTO().getLinkerMass();
 
-									modMass = modMass.add( new BigDecimal( otherPeptide.getMass( MassUtils.MASS_TYPE_MONOISOTOPIC ) ) );
+									modMass = modMass.add( new BigDecimal( PeptideMassCalculator.getInstance().getMassForPeptide( otherPeptide, MassType.MONOISOTOPIC ) ) );
 									modMass = modMass.add( new BigDecimal( modsSum ) );
 
 									modMass = modMass.setScale( 5, RoundingMode.CEILING );		// set to 5 decimal places

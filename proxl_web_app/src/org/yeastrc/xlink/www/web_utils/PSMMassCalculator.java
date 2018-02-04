@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.yeastrc.proteomics.mass.MassUtils;
+import org.yeastrc.proteomics.mass.MassUtils.MassType;
 import org.yeastrc.proteomics.peptide.atom.AtomUtils;
+import org.yeastrc.proteomics.peptide.isotope_label.IsotopeAbundanceCalculator;
 import org.yeastrc.proteomics.peptide.isotope_label.LabelFactory;
 import org.yeastrc.proteomics.peptide.peptide.Peptide;
+import org.yeastrc.proteomics.peptide.peptide.PeptideMassCalculator;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.xlink.dto.StaticModDTO;
-
-import org.yeastrc.proteomics.peptide.peptide.*;
 
 public class PSMMassCalculator {
 
@@ -28,7 +28,7 @@ public class PSMMassCalculator {
 	private static double getMZ( double mass, int charge ) throws Exception {
 		
 		// add in the mass of the protons (charge == number of proteins)
-		mass += charge * AtomUtils.getAtom( "p" ).getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
+		mass += charge * AtomUtils.getAtom( "p" ).getMass( MassType.MONOISOTOPIC );
 
 		// divide by the charge
 		mass /= charge;
@@ -53,17 +53,23 @@ public class PSMMassCalculator {
 		Collection< Peptide > peptides = new HashSet<>();
 		
 		{
-			Peptide peptide = new Peptide( params.getPeptide1().getSequence() );
-			if( params.getLabel1() != null )
-				peptide.setLabel( LabelFactory.getInstance().getLabel( params.getLabel1().getName() ) );
-			
+			Peptide peptide = null;
+			if( params.getLabel1() != null ) {
+				peptide = new Peptide( params.getPeptide1().getSequence(), LabelFactory.getInstance().getLabel( params.getLabel1().getName() ) );
+			} else {
+				peptide = new Peptide( params.getPeptide1().getSequence() );
+			}
+				
 			peptides.add( peptide );
 		}
 		
 		if( params.getPeptide2() != null ) {
-			Peptide peptide = new Peptide( params.getPeptide2().getSequence() );
-			if( params.getLabel2() != null )
-				peptide.setLabel( LabelFactory.getInstance().getLabel( params.getLabel2().getName() ) );
+			Peptide peptide = null;
+			if( params.getLabel2() != null ) {
+				peptide = new Peptide( params.getPeptide2().getSequence(), LabelFactory.getInstance().getLabel( params.getLabel2().getName() ) );
+			} else {
+				peptide = new Peptide( params.getPeptide2().getSequence() );
+			}
 			
 			peptides.add( peptide );
 		}
@@ -132,26 +138,23 @@ public class PSMMassCalculator {
 		if( params.getPeptide1() == null )
 			throw new Exception( "peptide1 cannot be null" );
 		
-		Peptide peptide = new Peptide( params.getPeptide1().getSequence() );
+		Peptide peptide = null;
 		
 		if( params.getLabel1() != null ) {
-		
-			//System.out.println( peptide.getSequence() );
-			//System.out.println( "\t" + peptide.getMass( MassUtils.MASS_TYPE_MONOISOTOPIC ) + " (pre label)");		
-		
-			peptide.setLabel( LabelFactory.getInstance().getLabel( params.getLabel1().getName() ) );
-			//System.out.println( "\t" + peptide.getMass( MassUtils.MASS_TYPE_MONOISOTOPIC ) + " (post label)" );
-
+			peptide = new Peptide( params.getPeptide1().getSequence(), LabelFactory.getInstance().getLabel( params.getLabel1().getName() ) );
+		} else {
+			peptide = new Peptide( params.getPeptide1().getSequence() );
 		}
 		
 		mass += getTotalMassWithMods( peptide, params.getStaticMods(), params.getDynamicMods1() );
 		
 		if( params.getPeptide2() != null ) {
 			
-			peptide = new Peptide( params.getPeptide2().getSequence() );
-			
-			if( params.getLabel2() != null )
-				peptide.setLabel( LabelFactory.getInstance().getLabel( params.getLabel2().getName() ) );
+			if( params.getLabel2() != null ) {
+				peptide = new Peptide( params.getPeptide2().getSequence(), LabelFactory.getInstance().getLabel( params.getLabel2().getName() ) );
+			} else {
+				peptide = new Peptide( params.getPeptide2().getSequence() );
+			}
 			
 			mass += getTotalMassWithMods( peptide, params.getStaticMods(), params.getDynamicMods2() );
 		}
@@ -173,7 +176,7 @@ public class PSMMassCalculator {
 	 * @throws Exception
 	 */
 	private static double getTotalMassWithMods( Peptide peptide, List<StaticModDTO> staticMods, List<SrchRepPeptPeptDynamicModDTO> dynamicMods ) throws Exception {
-		double mass = peptide.getMass( MassUtils.MASS_TYPE_MONOISOTOPIC );
+		double mass = PeptideMassCalculator.getInstance().getMassForPeptide( peptide, MassType.MONOISOTOPIC );
 		
 		// add in the dynamic mods
 		if( dynamicMods != null && dynamicMods.size() > 0 ) {
