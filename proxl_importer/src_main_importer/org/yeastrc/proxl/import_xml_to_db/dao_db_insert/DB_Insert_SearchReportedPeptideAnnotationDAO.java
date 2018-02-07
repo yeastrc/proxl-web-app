@@ -86,7 +86,7 @@ public class DB_Insert_SearchReportedPeptideAnnotationDAO {
 			saveToDatabaseInternal( item, conn );
 
 			if ( item.getAnnotationValueLocation() == AnnotationValueLocation.LARGE_VALUE_TABLE ) {
-				DB_Insert_PsmAnnotationLargeValueDAO.getInstance().saveToDatabase( item.getId(), item.getValueString(), conn );
+				DB_Insert_SearchReportedPeptideAnnotationLargeValueDAO.getInstance().saveToDatabase( item.getId(), item.getValueString(), conn );
 			}
 		
 		} catch ( Exception e ) {
