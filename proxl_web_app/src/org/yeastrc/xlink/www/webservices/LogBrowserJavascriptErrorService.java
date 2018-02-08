@@ -43,7 +43,8 @@ public class LogBrowserJavascriptErrorService {
 		log.error( "Error encountered on browser: message: " + logBrowserJavascriptErrorsRequest.errorMsg
 				+ "\n stack: " + logBrowserJavascriptErrorsRequest.stackString
 				+ "\n userAgent: " + logBrowserJavascriptErrorsRequest.userAgent
-				+ "\n browserURL: " + logBrowserJavascriptErrorsRequest.browserURL );
+				+ "\n browserURL: " + logBrowserJavascriptErrorsRequest.browserURL
+				+ "\n Remote IP: " + request.getRemoteAddr() );
 		
 		LogBrowserJavascriptErrorResult logBrowserJavascriptErrorResult = new LogBrowserJavascriptErrorResult();
 		logBrowserJavascriptErrorResult.status = true;
