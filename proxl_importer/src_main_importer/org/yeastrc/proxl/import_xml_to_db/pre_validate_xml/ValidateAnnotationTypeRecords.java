@@ -371,17 +371,17 @@ public class ValidateAnnotationTypeRecords {
 			throw new ProxlImporterDataException( msg );
 		}
 		//  Not covered by XSD validation
-		if ( ! foundPsmDefaultFilterableAnnotationType ) {
-			String msg = "At least one PSM Filterable Annotation Type is required to be a default filter.";
-			log.error( msg );
-			throw new ProxlImporterDataException( msg );
-		}
+//		if ( ! foundPsmDefaultFilterableAnnotationType ) {
+//			String msg = "At least one PSM Filterable Annotation Type is required to be a default filter.";
+//			log.error( msg );
+//			throw new ProxlImporterDataException( msg );
+//		}
 		//  Not covered by XSD validation
-		if ( foundPeptideFilterableAnnotationType && ( ! foundPeptideDefaultFilterableAnnotationType ) ) {
-			String msg = "There is at least one Peptide Filterable Annotation Type "
-					+ " but none of theem is a default filter.";
-			log.error( msg );
-			throw new ProxlImporterDataException( msg );
-		}
+//		if ( foundPeptideFilterableAnnotationType && ( ! foundPeptideDefaultFilterableAnnotationType ) ) {
+//			String msg = "There is at least one Peptide Filterable Annotation Type "
+//					+ " but none of them is a default filter.";
+//			log.error( msg );
+//			throw new ProxlImporterDataException( msg );
+//		}
 	}
 }
