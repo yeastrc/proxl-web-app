@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'proxl'
-copyright = u'2017, Michael Riffle'
+copyright = u'2016-2018, Michael Riffle'
 author = u'Michael Riffle'
 
 # The version info for the project you're documenting, acts as replacement for
