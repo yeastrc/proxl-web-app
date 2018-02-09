@@ -25,7 +25,7 @@ the [import documentation](http://proxl-web-app.readthedocs.io/en/latest/using/u
 
 * [Kojak](https://github.com/yeastrc/proxl-import-kojak)
 * [Crux](https://github.com/yeastrc/proxl-import-crux)
-* [pLink](https://github.com/yeastrc/proxl-import-plink)
+* [pLink 1.x](https://github.com/yeastrc/proxl-import-plink) [pLink 2.x](https://github.com/yeastrc/proxl-import-plink2)
 * [StavroX](https://github.com/yeastrc/proxl-import-stavrox)
 * [xQuest](https://github.com/yeastrc/proxl-import-xquest)
 
