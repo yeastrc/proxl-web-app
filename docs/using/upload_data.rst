@@ -13,7 +13,7 @@ software, below, to download and learn more about the respective converter.
     * `iProphet (TPP) <https://github.com/yeastrc/proxl-import-iprophet>`_
     * `Kojak <https://github.com/yeastrc/proxl-import-kojak>`_
     * `Crux <https://github.com/yeastrc/proxl-import-crux>`_
-    * `pLink 1.x <https://github.com/yeastrc/proxl-import-plink>`_ `pLink 2.x <https://github.com/yeastrc/proxl-import-plink>`_
+    * `pLink 1.x <https://github.com/yeastrc/proxl-import-plink>`_ `pLink 2.x <https://github.com/yeastrc/proxl-import-plink2>`_
     * `StavroX <https://github.com/yeastrc/proxl-import-stavrox>`_
     * `xQuest <https://github.com/yeastrc/proxl-import-xquest>`_
 
