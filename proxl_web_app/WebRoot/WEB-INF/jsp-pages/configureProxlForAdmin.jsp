@@ -168,12 +168,23 @@
 			<div style="position: relative;"> <%--  container div for error-message-container which is position absolute --%>
 			  <div style="position: absolute; top: -60px;">
 		  		<div class="error-message-container error_message_container_jq" 
+		  				id="error_message_spectral_storage_only_one_has_value"
+		  				style="text-align: left; margin-left: 50px;width: 400px;" >
+		  			<div class="error-message-inner-container" >
+		  				<div class="error-message-close-x error_message_close_x_jq">X</div>
+			  			<div class="error-message-text" 
+			  			  >If one 'Spectral Storage Service Base URL' has a value BOTH must have a value.</div>
+		  			</div>
+			  	</div>
+			  </div>
+			  <div style="position: absolute; top: -60px;">
+		  		<div class="error-message-container error_message_container_jq" 
 		  				id="error_message_allow_scan_file_selected_spectral_storage_empty"
 		  				style="text-align: left; margin-left: 50px;width: 400px;" >
 		  			<div class="error-message-inner-container" >
 		  				<div class="error-message-close-x error_message_close_x_jq">X</div>
 			  			<div class="error-message-text" 
-			  			  >'Allow Scan file Upload' is selected so 'Spectral Storage Service Base URL' must have a value.</div>
+			  			  >'Allow Scan file Upload' is selected so BOTH 'Spectral Storage Service Base URL' must have a value.</div>
 		  			</div>
 			  	</div>
 			  </div>
@@ -184,7 +195,7 @@
 		  			<div class="error-message-inner-container" >
 		  				<div class="error-message-close-x error_message_close_x_jq">X</div>
 			  			<div class="error-message-text" 
-			  			  >'Spectral Storage Service Base URL' has a value so 'Allow Scan file Upload' must be selected.</div>
+			  			  >BOTH 'Spectral Storage Service Base URL' has a value so 'Allow Scan file Upload' must be selected.</div>
 		  			</div>
 			  	</div>
 			  </div>
@@ -204,14 +215,23 @@
 	
 	<div style="margin-bottom: 10px;" >
 		<div style="margin-bottom: 3px;">
-			Spectral Storage Service Base URL (required if allow scan file uploads): 
-			<input type="text" class=" config_text_inputs_jq " id="spectral_storage_service_base_url_input_field" 
+			Spectral Storage Service Accept Import Base URL (required if allow scan file uploads): 
+			<input type="text" class=" config_text_inputs_jq " id="spectral_storage_service_accept_import_base_url_input_field" 
 				style="width: 650px;"
-				data-config-key="<%= ConfigSystemsKeysSharedConstants.SPECTRAL_STORAGE_SERVICE_BASE_URL %>"
+				data-config-key="<%= ConfigSystemsKeysSharedConstants.SPECTRAL_STORAGE_SERVICE_ACCEPT_IMPORT_BASE_URL %>"
 				>
 		</div>
 	</div>
 	
+	<div style="margin-bottom: 10px;" >
+		<div style="margin-bottom: 3px;">
+			Spectral Storage Service Get Data Base URL (required if allow scan file uploads): 
+			<input type="text" class=" config_text_inputs_jq " id="spectral_storage_service_get_data_base_url_input_field" 
+				style="width: 650px;"
+				data-config-key="<%= ConfigSystemsKeysSharedConstants.SPECTRAL_STORAGE_SERVICE_GET_DATA_BASE_URL %>"
+				>
+		</div>
+	</div>
 	<div >
 		<input type="button" value="Save" id="save_button">
 		<input type="button" value="Reset" id="reset_button">

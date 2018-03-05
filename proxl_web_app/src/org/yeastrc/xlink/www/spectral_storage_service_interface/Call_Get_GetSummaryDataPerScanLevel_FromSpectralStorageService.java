@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.Get_SummaryDataPerScanLevel_Request;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.Get_SummaryDataPerScanLevel_Response;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.SingleScanLevelSummaryData_SubResponse;
-import org.yeastrc.spectral_storage.webservice_connect.main.CallSpectralStorageWebservice;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.main.Get_SummaryDataPerScanLevel_Request;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.main.Get_SummaryDataPerScanLevel_Response;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.sub_parts.SingleScanLevelSummaryData_SubResponse;
+import org.yeastrc.spectral_storage.get_data_webapp.webservice_connect.main.CallSpectralStorageGetDataWebservice;
 
 /**
  * 
@@ -37,7 +37,7 @@ public class Call_Get_GetSummaryDataPerScanLevel_FromSpectralStorageService {
 		Get_SummaryDataPerScanLevel_Request webserviceRequest = new Get_SummaryDataPerScanLevel_Request();
 		webserviceRequest.setScanFileAPIKey( scanFileAPIKey );
 	
-		CallSpectralStorageWebservice callSpectralStorageWebservice = 
+		CallSpectralStorageGetDataWebservice callSpectralStorageWebservice = 
 				CallSpectralStorageWebservice_ForProxl_Factory.getSingletonInstance().getCallSpectralStorageWebservice();
 		
 		Get_SummaryDataPerScanLevel_Response get_SummaryDataPerScanLevel_Response =

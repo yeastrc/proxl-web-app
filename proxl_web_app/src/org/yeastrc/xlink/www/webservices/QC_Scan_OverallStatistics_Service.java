@@ -23,7 +23,7 @@ import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdT
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchIdScanFileIdCombinedRecordExistsSearcher;
 import org.yeastrc.xlink.www.spectral_storage_service_interface.Call_Get_GetSummaryDataPerScanLevel_FromSpectralStorageService;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.SingleScanLevelSummaryData_SubResponse;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.sub_parts.SingleScanLevelSummaryData_SubResponse;
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;

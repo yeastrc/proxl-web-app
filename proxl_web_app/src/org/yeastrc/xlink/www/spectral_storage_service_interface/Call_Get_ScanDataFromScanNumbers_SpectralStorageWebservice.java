@@ -4,12 +4,13 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.enums.Get_ScanDataFromScanNumbers_IncludeParentScans;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.enums.Get_ScanData_ExcludeReturnScanPeakData;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.Get_ScanDataFromScanNumbers_Request;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.Get_ScanDataFromScanNumbers_Response;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.SingleScan_SubResponse;
-import org.yeastrc.spectral_storage.webservice_connect.main.CallSpectralStorageWebservice;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.enums.Get_ScanDataFromScanNumbers_IncludeParentScans;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.enums.Get_ScanData_ExcludeReturnScanPeakData;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.enums.Get_ScanData_ScanFileAPI_Key_NotFound;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.main.Get_ScanDataFromScanNumbers_Request;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.main.Get_ScanDataFromScanNumbers_Response;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.sub_parts.SingleScan_SubResponse;
+import org.yeastrc.spectral_storage.get_data_webapp.webservice_connect.main.CallSpectralStorageGetDataWebservice;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 
 /**
@@ -50,7 +51,7 @@ public class Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice {
 			throw new IllegalArgumentException( msg );
 		}
 		
-		CallSpectralStorageWebservice callSpectralStorageWebservice = 
+		CallSpectralStorageGetDataWebservice callSpectralStorageWebservice = 
 				CallSpectralStorageWebservice_ForProxl_Factory.getSingletonInstance().getCallSpectralStorageWebservice();
 		
 		Get_ScanDataFromScanNumbers_Request webserviceRequest = new Get_ScanDataFromScanNumbers_Request();
@@ -63,6 +64,13 @@ public class Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice {
 		Get_ScanDataFromScanNumbers_Response get_ScanDataFromScanNumber_Response =
 				callSpectralStorageWebservice.call_Get_ScanDataFromScanNumbers_Webservice( webserviceRequest );
 
+		if ( get_ScanDataFromScanNumber_Response.getStatus_scanFileAPIKeyNotFound() 
+				== Get_ScanData_ScanFileAPI_Key_NotFound.YES ) {
+			String msg = "No data in Spectral Storage for API Key: " + scanFileAPIKey;
+			log.error( msg );
+			throw new ProxlWebappInternalErrorException(msg);
+		}
+		
 		if ( get_ScanDataFromScanNumber_Response.getTooManyScansToReturn() != null
 				&& get_ScanDataFromScanNumber_Response.getTooManyScansToReturn() ) {
 			
@@ -73,6 +81,12 @@ public class Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice {
 		}
 		
 		List<SingleScan_SubResponse> scans = get_ScanDataFromScanNumber_Response.getScans();
+		
+		if ( scans == null ) {
+			String msg = "Returned Scans property is null: Spectral Storage API Key: " + scanFileAPIKey;
+			log.error( msg );
+			throw new ProxlWebappInternalErrorException(msg);
+		}
 		
 		return scans;
 	}

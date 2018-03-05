@@ -12,9 +12,17 @@ public class ConfigSystemsKeysSharedConstants {
 	
 	public static final String CACHE_FILES_ROOT_DIRECTORY = "cache_files_root_directory";
 
-	////  Proxl Spectal Storage Service Base URL - URL used to communicate to Spectral Storage Service using Class CallSpectralStorageWebservice
+	////  Proxl Spectal Storage Service Accept Import Base URL - For Importer to submit scan file for import
+	////             URL used to communicate to Spectral Storage Service using Class CallSpectralStorageAcceptImportWebservice
 	
-	public static final String SPECTRAL_STORAGE_SERVICE_BASE_URL = "spectral_storage_service_base_url";
+	public static final String SPECTRAL_STORAGE_SERVICE_ACCEPT_IMPORT_BASE_URL =
+			"spectral_storage_service_accept_import_base_url";
+
+	////  Proxl Spectal Storage Service Base URL - 
+	////             URL used to communicate to Spectral Storage Service using Class CallSpectralStorageWebservice
+	
+	public static final String SPECTRAL_STORAGE_SERVICE_GET_DATA_BASE_URL = 
+			"spectral_storage_service_get_data_base_url";
 	
 	////  Proxl XML File Import Set Up keys
 
@@ -39,7 +47,8 @@ public class ConfigSystemsKeysSharedConstants {
 	
 	static {
 		textConfigKeys.add( CACHE_FILES_ROOT_DIRECTORY );
-		textConfigKeys.add( SPECTRAL_STORAGE_SERVICE_BASE_URL );
+		textConfigKeys.add( SPECTRAL_STORAGE_SERVICE_ACCEPT_IMPORT_BASE_URL );
+		textConfigKeys.add( SPECTRAL_STORAGE_SERVICE_GET_DATA_BASE_URL );
 		textConfigKeys.add( file_import_proxl_xml_scans_TEMP_DIR_KEY );
 		textConfigKeys.add( SCAN_FILE_IMPORT_ALLOWED_VIA_WEB_SUBMIT_KEY );
 		

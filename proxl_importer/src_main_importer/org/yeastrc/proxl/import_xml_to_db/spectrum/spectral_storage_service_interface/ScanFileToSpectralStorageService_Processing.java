@@ -8,18 +8,19 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterConfigExceptio
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterSpectralStorageServiceErrorException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterSpectralStorageServiceRetryExceededException;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.Get_UploadedScanFileInfo_Request;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.Get_UploadedScanFileInfo_Response;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.UploadScanFile_Delete_For_ScanProcessStatusKey_Request;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.UploadScanFile_Delete_For_ScanProcessStatusKey_Response;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.UploadScanFile_Init_Request;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.UploadScanFile_Init_Response;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.UploadScanFile_Submit_Request;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.UploadScanFile_Submit_Response;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.UploadScanFile_UploadScanFile_Request;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.UploadScanFile_UploadScanFile_Response;
-import org.yeastrc.spectral_storage.webservice_connect.main.CallSpectralStorageWebservice;
-import org.yeastrc.spectral_storage.webservice_connect.main.CallSpectralStorageWebserviceInitParameters;
+import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.constants_enums.WebserviceSpectralStorageAcceptImport_ProcessStatusEnum;
+import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.Get_UploadedScanFileInfo_Request;
+import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.Get_UploadedScanFileInfo_Response;
+import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.UploadScanFile_Delete_For_ScanProcessStatusKey_Request;
+import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.UploadScanFile_Delete_For_ScanProcessStatusKey_Response;
+import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.UploadScanFile_Init_Request;
+import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.UploadScanFile_Init_Response;
+import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.UploadScanFile_Submit_Request;
+import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.UploadScanFile_Submit_Response;
+import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.UploadScanFile_UploadScanFile_Request;
+import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.UploadScanFile_UploadScanFile_Response;
+import org.yeastrc.spectral_storage.accept_import_web_app.webservice_connect.main.CallSpectralStorageAcceptImportWebservice;
+import org.yeastrc.spectral_storage.accept_import_web_app.webservice_connect.main.CallSpectralStorageAcceptImportWebserviceInitParameters;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTableGetValueCommon;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
 import org.yeastrc.xlink.dao.ScanFileDAO;
@@ -75,20 +76,20 @@ public class ScanFileToSpectralStorageService_Processing {
 		
 		String spectralStorageServiceBaseURL = 
 				ConfigSystemTableGetValueCommon.getInstance()
-				.getConfigValueForConfigKey( ConfigSystemsKeysSharedConstants.SPECTRAL_STORAGE_SERVICE_BASE_URL );
+				.getConfigValueForConfigKey( ConfigSystemsKeysSharedConstants.SPECTRAL_STORAGE_SERVICE_ACCEPT_IMPORT_BASE_URL );
 		
 		if ( StringUtils.isEmpty( spectralStorageServiceBaseURL ) ) {
-			String msg = "No Config value for Spectral Storage Base URL, key: " + ConfigSystemsKeysSharedConstants.SPECTRAL_STORAGE_SERVICE_BASE_URL;
+			String msg = "No Config value for Spectral Storage Base URL, key: " + ConfigSystemsKeysSharedConstants.SPECTRAL_STORAGE_SERVICE_ACCEPT_IMPORT_BASE_URL;
 			log.error( msg );
 			throw new ProxlImporterConfigException( msg );
 		}
 		
 		try {
-			CallSpectralStorageWebserviceInitParameters initParams = new CallSpectralStorageWebserviceInitParameters();
+			CallSpectralStorageAcceptImportWebserviceInitParameters initParams = new CallSpectralStorageAcceptImportWebserviceInitParameters();
 
 			initParams.setSpectralStorageServerBaseURL( spectralStorageServiceBaseURL );
 
-			CallSpectralStorageWebservice callSpectralStorageWebservice = CallSpectralStorageWebservice.getInstance();
+			CallSpectralStorageAcceptImportWebservice callSpectralStorageWebservice = CallSpectralStorageAcceptImportWebservice.getInstance();
 
 			callSpectralStorageWebservice.init( initParams );
 			
@@ -136,7 +137,7 @@ public class ScanFileToSpectralStorageService_Processing {
 	private UploadScanFile_Init_Response spectralStorageService_InitUploadScanFileProcess( 
 			File scanFileWithPath, 
 			ScanFileDTO scanFileDTO,
-			CallSpectralStorageWebservice callSpectralStorageWebservice ) throws Exception {
+			CallSpectralStorageAcceptImportWebservice callSpectralStorageWebservice ) throws Exception {
 
 		UploadScanFile_Init_Response response = null;
 
@@ -207,7 +208,7 @@ public class ScanFileToSpectralStorageService_Processing {
 			UploadScanFile_Init_Response uploadScanFile_Init_Response,
 			File scanFileWithPath, 
 			ScanFileDTO scanFileDTO,
-			CallSpectralStorageWebservice callSpectralStorageWebservice ) throws Exception {
+			CallSpectralStorageAcceptImportWebservice callSpectralStorageWebservice ) throws Exception {
 
 		UploadScanFile_UploadScanFile_Response response = null;
 
@@ -284,7 +285,7 @@ public class ScanFileToSpectralStorageService_Processing {
 			UploadScanFile_Init_Response uploadScanFile_Init_Response,
 			File scanFileWithPath, 
 			ScanFileDTO scanFileDTO,
-			CallSpectralStorageWebservice callSpectralStorageWebservice ) throws Exception {
+			CallSpectralStorageAcceptImportWebservice callSpectralStorageWebservice ) throws Exception {
 
 		UploadScanFile_Submit_Response response = null;
 
@@ -354,7 +355,7 @@ public class ScanFileToSpectralStorageService_Processing {
 	 */
 	private void getSpectralServiceAPI_AndUpdateScanFileTable( 
 			File scanFileWithPath, ScanFileDTO scanFileDTO,
-			CallSpectralStorageWebservice callSpectralStorageWebservice, 
+			CallSpectralStorageAcceptImportWebservice callSpectralStorageWebservice, 
 			UploadScanFile_Submit_Response response ) throws  Exception {
 
 		//  Try with progressively longer delays and different retry count max
@@ -427,7 +428,7 @@ public class ScanFileToSpectralStorageService_Processing {
 				throw new ProxlImporterSpectralStorageServiceErrorException(msg);
 			}
 
-			if ( get_UploadedScanFileInfo_Response.isStatusFail() ) {
+			if ( get_UploadedScanFileInfo_Response.getStatus() == WebserviceSpectralStorageAcceptImport_ProcessStatusEnum.FAIL ) {
 				String msg = "Spectral Storage System Failed to process Scan file.  ScanProcessStatusKey: " + response.getScanProcessStatusKey()
 				+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
 				log.error( msg );
@@ -454,12 +455,12 @@ public class ScanFileToSpectralStorageService_Processing {
 
 			{
 				String msg = "INFO: getSpectralServiceAPI_AndUpdateScanFileTable: Get API Key from Spectral Storage Service "
-						+ " isStatusSuccess: " + get_UploadedScanFileInfo_Response.isStatusSuccess() + ", retryCount: " + retryCount + ", ScanProcessStatusKey: " + response.getScanProcessStatusKey()
+						+ " Status: " + get_UploadedScanFileInfo_Response.getStatus() + ", retryCount: " + retryCount + ", ScanProcessStatusKey: " + response.getScanProcessStatusKey()
 						+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
 				log.warn( msg );
 			}
 
-			if ( get_UploadedScanFileInfo_Response.isStatusSuccess() ) {
+			if ( get_UploadedScanFileInfo_Response.getStatus() == WebserviceSpectralStorageAcceptImport_ProcessStatusEnum.SUCCESS ) {
 				
 				spectralStorageAPIKey = get_UploadedScanFileInfo_Response.getScanFileAPIKey();
 				

@@ -3,11 +3,11 @@ package org.yeastrc.xlink.www.spectral_storage_service_interface;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.spectral_storage.shared_server_client.exceptions.YRCSpectralStorageWebserviceCallErrorException;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.Get_ScanPeakIntensityBinnedOn_RT_MZ_Request;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.exceptions.YRCSpectralStorageGetDataWebserviceCallErrorException;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.main.Get_ScanPeakIntensityBinnedOn_RT_MZ_Request;
+import org.yeastrc.spectral_storage.get_data_webapp.webservice_connect.main.CallSpectralStorageGetDataWebservice;
+import org.yeastrc.spectral_storage.get_data_webapp.webservice_connect.json_helper.CallSpectralStorageGetDataWebservice_JSON_Parse_Helper;
 import org.yeastrc.spectral_storage.shared_server_client_importer.accum_scan_rt_mz_binned.dto.MS1_IntensitiesBinnedSummedMapRoot;
-import org.yeastrc.spectral_storage.webservice_connect.json_helper.CallSpectralStorageWebservice_JSON_Parse_Helper;
-import org.yeastrc.spectral_storage.webservice_connect.main.CallSpectralStorageWebservice;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 
 /**
@@ -42,7 +42,7 @@ public class Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice {
 			throw new IllegalArgumentException( msg );
 		}
 		
-		CallSpectralStorageWebservice callSpectralStorageWebservice = 
+		CallSpectralStorageGetDataWebservice callSpectralStorageWebservice = 
 				CallSpectralStorageWebservice_ForProxl_Factory.getSingletonInstance().getCallSpectralStorageWebservice();
 		
 		Get_ScanPeakIntensityBinnedOn_RT_MZ_Request webserviceRequest = new Get_ScanPeakIntensityBinnedOn_RT_MZ_Request();
@@ -55,7 +55,7 @@ public class Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice {
 			serverResponseBytes =
 				callSpectralStorageWebservice.call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice( webserviceRequest );
 		
-		} catch ( YRCSpectralStorageWebserviceCallErrorException e ) {
+		} catch ( YRCSpectralStorageGetDataWebserviceCallErrorException e ) {
 			
 			throw e;
 		}
@@ -68,7 +68,7 @@ public class Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice {
 		}
 		
 		MS1_IntensitiesBinnedSummedMapRoot ms1_IntensitiesBinnedSummedMapRoot =
-				CallSpectralStorageWebservice_JSON_Parse_Helper.getInstance()
+				CallSpectralStorageGetDataWebservice_JSON_Parse_Helper.getInstance()
 				.deserialize_unGzip_Get_ScanPeakIntensityBinnedOn_RT_MZ_Response( serverResponseBytes );
 		
 		return ms1_IntensitiesBinnedSummedMapRoot;

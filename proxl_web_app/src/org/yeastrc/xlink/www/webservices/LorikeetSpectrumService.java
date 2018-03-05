@@ -17,13 +17,13 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.enums.Get_ScanDataFromScanNumbers_IncludeParentScans;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.enums.Get_ScanData_ExcludeReturnScanPeakData;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.SingleScanPeak_SubResponse;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.SingleScan_SubResponse;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.www.dao.PsmDAO;
 import org.yeastrc.xlink.www.dao.SearchScanFilenameDAO;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.enums.Get_ScanDataFromScanNumbers_IncludeParentScans;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.enums.Get_ScanData_ExcludeReturnScanPeakData;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.sub_parts.SingleScanPeak_SubResponse;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.sub_parts.SingleScan_SubResponse;
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.dao.StaticModDAO;
 import org.yeastrc.xlink.dto.IsotopeLabelDTO;

@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.Get_ScanRetentionTimes_Request;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.main.Get_ScanRetentionTimes_Response;
-import org.yeastrc.spectral_storage.shared_server_client.webservice_request_response.sub_parts.Single_ScanRetentionTime_ScanNumber_SubResponse;
-import org.yeastrc.spectral_storage.webservice_connect.main.CallSpectralStorageWebservice;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.main.Get_ScanRetentionTimes_Request;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.main.Get_ScanRetentionTimes_Response;
+import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.sub_parts.Single_ScanRetentionTime_ScanNumber_SubResponse;
+import org.yeastrc.spectral_storage.get_data_webapp.webservice_connect.main.CallSpectralStorageGetDataWebservice;
 
 /**
  * 
@@ -72,7 +72,7 @@ public class Call_Get_ScanRetentionTimes_FromSpectralStorageService {
 	 */
 	private List<Single_ScanRetentionTime_ScanNumber_SubResponse> internal_ScanRetentionTimesFromSpectralStorageService( Get_ScanRetentionTimes_Request webserviceRequest ) throws Exception {
 		
-		CallSpectralStorageWebservice callSpectralStorageWebservice = 
+		CallSpectralStorageGetDataWebservice callSpectralStorageWebservice = 
 				CallSpectralStorageWebservice_ForProxl_Factory.getSingletonInstance().getCallSpectralStorageWebservice();
 		
 		Get_ScanRetentionTimes_Response get_ScanRetentionTimes_Response =
