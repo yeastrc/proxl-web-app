@@ -15,6 +15,7 @@ import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortDisplayRecordsWrapperBase;
+import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosCommonIF;
 import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosCrosslinkDTO;
@@ -225,7 +226,7 @@ public class ProteinsAllCommonAll {
 		//////////////////////////////////////////////////////////////////
 		// Filter out links if requested
 		if( proteinQueryJSONRoot.isFilterNonUniquePeptides() 
-				|| proteinQueryJSONRoot.isFilterOnlyOnePSM() 
+				|| proteinQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT 
 				|| proteinQueryJSONRoot.isFilterOnlyOnePeptide()
 				|| ( proteinQueryJSONRoot.getExcludeTaxonomy() != null && proteinQueryJSONRoot.getExcludeTaxonomy().length > 0 ) ||
 				( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) ) {
@@ -240,10 +241,10 @@ public class ProteinsAllCommonAll {
 						continue;  // EARLY CONTINUE
 					}
 				}
-				// did they request to removal of links with only one PSM?
-				if( proteinQueryJSONRoot.isFilterOnlyOnePSM()  ) {
+				// did they request to removal of links with less than a specified number of PSMs?
+				if( proteinQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT  ) {
 					int psmCountForSearchId = proteinSingleEntry.getNumPsms();
-					if ( psmCountForSearchId <= 1 ) {
+					if ( psmCountForSearchId < proteinQueryJSONRoot.getMinPSMs() ) {
 						//  Drop this entry from output list
 						proteinWithBestPeptideAndPSMAnnDataContainer.removeForproteinSequenceVersionId( proteinSingleEntry.getProteinSequenceVersionId() );
 						continue;  // EARLY CONTINUE

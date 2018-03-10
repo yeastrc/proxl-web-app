@@ -161,7 +161,7 @@ var HASH_OBJECT_PROPERTIES = {
 		excludeType : "b",
 		cutoffs : "c",
 		filterNonUniquePeptides : "d",
-		filterOnlyOnePSM : "e",
+		filterOnlyOnePSM : "e",   //  only for backwards compatibility, used by LegacyJSONUpdater
 		filterOnlyOnePeptide : "f",
 		"show-self-crosslinks" : "g",
 		"show-crosslinks" : "h",
@@ -184,6 +184,7 @@ var HASH_OBJECT_PROPERTIES = {
 		"annTypeIdDisplay" : "z",
 		"link_exclusion_data_current" : "A",
 		"removeNonUniquePSMs" : "B",
+		"minPSMs" : "C",
 		
 		//  For future additions, please continue the single character approach instead of using mnemonic or acronym
 		//    1)  It will keep the overall JSON string shorter
@@ -335,7 +336,7 @@ var _psmPeptideCutoffsRootObjectStorage = {
 var _excludeTaxonomy;
 var _excludeType;
 var _filterNonUniquePeptides;
-var _filterOnlyOnePSM;
+var _minPSMs;
 var _filterOnlyOnePeptide;
 var _removeNonUniquePSMs;
 var _colorLinesBy = undefined;
@@ -602,15 +603,12 @@ function getValuesFromForm() {
 	}
 	var outputCutoffs = getCutoffsFromThePageResult.cutoffsByProjectSearchId;
 	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.cutoffs, outputCutoffs );
+	hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.minPSMs, minimumPSM_Count_Filter.getMinPSMsFilter() );
+	
 	if ( $( "input#filterNonUniquePeptides" ).is( ':checked' ) ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterNonUniquePeptides, true );
 	} else {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterNonUniquePeptides, false );
-	}
-	if ( $( "input#filterOnlyOnePSM" ).is( ':checked' ) ) {
-		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePSM, true );
-	} else {
-		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePSM, false );
 	}
 	if ( $( "input#filterOnlyOnePeptide" ).is( ':checked' ) ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePeptide, true );
@@ -655,10 +653,10 @@ function updateURLHash( useSearchForm ) {
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.excludeType, _excludeType );
 //		add psm/peptide cutoffs
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.cutoffs, _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject() );
+//		add filter on minimum number of PSMs
+		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.minPSMs, _minPSMs );
 //		add filter out non unique peptides
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterNonUniquePeptides, _filterNonUniquePeptides );
-//		add filter out only one PSM
-		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePSM, _filterOnlyOnePSM );
 //		add filter out only one Peptide
 		hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES.filterOnlyOnePeptide, _filterOnlyOnePeptide );
 //		add filter out non unique PSMs
@@ -792,11 +790,15 @@ function buildQueryStringFromHash() {
 	var psmPeptideCutoffsForProjectSearchIds_JSONString = JSON.stringify( cutoffs );
 	var psmPeptideCutoffsForProjectSearchIds_JSONStringEncoded = encodeURIComponent( psmPeptideCutoffsForProjectSearchIds_JSONString );
 	items.push( "psmPeptideCutoffsForProjectSearchIds=" + psmPeptideCutoffsForProjectSearchIds_JSONStringEncoded );
+	
+	var minPSMs = json.minPSMs;
+	if ( minPSMs === undefined || minPSMs === null ) {
+		minPSMs = minimumPSM_Count_Filter.getDefault();
+	}
+	items.push( "minPSMs=" + minPSMs );
+	
 	if ( json.filterNonUniquePeptides != undefined && json.filterNonUniquePeptides ) {
 		items.push( "filterNonUniquePeptides=on" );
-	}
-	if ( json.filterOnlyOnePSM != undefined && json.filterOnlyOnePSM ) {
-		items.push( "filterOnlyOnePSM=on" );
 	}
 	if ( json.filterOnlyOnePeptide != undefined && json.filterOnlyOnePeptide ) {
 		items.push( "filterOnlyOnePeptide=on" );
@@ -1518,14 +1520,14 @@ function loadDataFromService() {
 	        		_excludeTaxonomy = data.excludeTaxonomy;
 	        		_excludeType = data.excludeType;
 	        		_filterNonUniquePeptides = data.filterNonUniquePeptides;
-	        		_filterOnlyOnePSM = data.filterOnlyOnePSM;
+	        		_minPSMs = data.minPSMs;
 	        		_filterOnlyOnePeptide = data.filterOnlyOnePeptide;
 	        		_removeNonUniquePSMs = data.removeNonUniquePSMs;
 	        		
 	    			//  Distribute the updated value to the JS code that loads and displays Peptide and PSM data
 	    			webserviceDataParamsDistributionCommonCode.paramsForDistribution( { 
 	    				filterNonUniquePeptides : _filterNonUniquePeptides,
-	    				filterOnlyOnePSM : _filterOnlyOnePSM,
+	    				minPSMs : _minPSMs,
 	    				filterOnlyOnePeptide : _filterOnlyOnePeptide,
 	    				removeNonUniquePSMs : _removeNonUniquePSMs
 	    			} );
@@ -1611,8 +1613,8 @@ function populateSearchForm() {
 	var psmPeptideCutoffsRootObject = _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject();
 	webserviceDataParamsDistributionCommonCode.paramsForDistribution( { cutoffs : psmPeptideCutoffsRootObject } );
 	cutoffProcessingCommonCode.putCutoffsOnThePage(  { cutoffs : psmPeptideCutoffsRootObject } );
+	minimumPSM_Count_Filter.saveMinPSMsFilter( { minPSMs : _minPSMs } );
 	$( "input#filterNonUniquePeptides" ).prop('checked', _filterNonUniquePeptides);
-	$( "input#filterOnlyOnePSM" ).prop('checked', _filterOnlyOnePSM);
 	$( "input#filterOnlyOnePeptide" ).prop('checked', _filterOnlyOnePeptide);
 	$( "input#removeNonUniquePSMs" ).prop('checked', _removeNonUniquePSMs);
 	var html = "";
@@ -1853,8 +1855,8 @@ function getNavigationJSON_Not_for_Image_Or_Structure() {
 	if ( json.filterNonUniquePeptides !== undefined ) {
 		baseJSONObject.filterNonUniquePeptides = json.filterNonUniquePeptides;
 	}
-	if ( json.filterOnlyOnePSM !== undefined ) {
-		baseJSONObject.filterOnlyOnePSM = json.filterOnlyOnePSM;
+	if ( json.minPSMs !== undefined ) {
+		baseJSONObject.minPSMs = json.minPSMs;
 	}
 	if ( json.filterOnlyOnePeptide !== undefined ) {
 		baseJSONObject.filterOnlyOnePeptide = json.filterOnlyOnePeptide;
@@ -1984,7 +1986,7 @@ function populateNavigation() {
 			structureJSON[ 'annTypeIdDisplay' ] = annTypeIdDisplay;
 //			add filter out non unique peptides
 			structureJSON[ 'filterNonUniquePeptides' ] = _filterNonUniquePeptides;
-			structureJSON[ 'filterOnlyOnePSM' ] = _filterOnlyOnePSM;
+			structureJSON[ 'minPSMs' ] = _minPSMs;
 			structureJSON[ 'filterOnlyOnePeptide' ] = _filterOnlyOnePeptide;
 			structureJSON[ 'removeNonUniquePSMs' ] = _removeNonUniquePSMs;
 			var structureJSONString = encodeURIComponent( JSON.stringify( structureJSON ) );
@@ -5668,14 +5670,6 @@ function initPage() {
 	}
 	_proteinBarToolTip_template_HandlebarsTemplate = Handlebars.compile( proteinBarToolTip_template_handlebarsSource );
 	$( "input#filterNonUniquePeptides" ).change(function() {
-		try {
-			defaultPageView.searchFormChanged_ForDefaultPageView();
-		} catch( e ) {
-			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-			throw e;
-		}
-	});
-	$( "input#filterOnlyOnePSM" ).change(function() {
 		try {
 			defaultPageView.searchFormChanged_ForDefaultPageView();
 		} catch( e ) {

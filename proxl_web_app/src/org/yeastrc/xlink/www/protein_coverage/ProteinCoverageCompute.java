@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
+import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.linkable_positions.GetLinkablePositionsForLinkers;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -56,8 +57,8 @@ public class ProteinCoverageCompute {
 	
 	private Collection<SearchDTO> searches;
 	private SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel;
+	private int minPSMs;
 	private boolean filterNonUniquePeptides = false;
-	private boolean filterOnlyOnePSM = false;
 	private boolean filterOnlyOnePeptide = false;
 	private int[] excludedproteinSequenceVersionIds;
 	private int[] excludedTaxonomyIds;
@@ -169,7 +170,7 @@ public class ProteinCoverageCompute {
 		int totalResidues = 0;
 		int totalCoveredResidues = 0;
 		// filter out links that only contain non unique peptides, if requested
-		if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide ) {
+		if( filterNonUniquePeptides || minPSMs != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT || filterOnlyOnePeptide ) {
 			// filter looplinks
 			{
 				for ( Map.Entry<Integer, List<SearchProteinLooplinkWrapper>> wrappedLooplinks_MappedOnSearchId_Entry :
@@ -210,10 +211,10 @@ public class ProteinCoverageCompute {
 								continue;  // EARLY CONTINUE
 							}
 						}
-						// did they request to removal of links with only one PSM?
-						if( filterOnlyOnePSM  ) {
+						// did they request to removal of links with less than a specified number of PSMs?
+						if( minPSMs != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT  ) {
 							int psmCountForSearchId = link.getNumPsms();
-							if ( psmCountForSearchId <= 1 ) {
+							if ( psmCountForSearchId < minPSMs ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
 							}
@@ -273,10 +274,10 @@ public class ProteinCoverageCompute {
 								continue;  // EARLY CONTINUE
 							}
 						}
-						// did they request to removal of links with only one PSM?
-						if( filterOnlyOnePSM  ) {
+						// did they request to removal of links with less than a specified number of PSMs?
+						if( minPSMs != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT  ) {
 							int psmCountForSearchId = link.getNumPsms();
-							if ( psmCountForSearchId <= 1 ) {
+							if ( psmCountForSearchId < minPSMs ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
 							}
@@ -346,10 +347,10 @@ public class ProteinCoverageCompute {
 								continue;  // EARLY CONTINUE
 							}
 						}
-						// did they request to removal of links with only one PSM?
-						if( filterOnlyOnePSM  ) {
+						// did they request to removal of links with less than a specified number of PSMs?
+						if( minPSMs != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT  ) {
 							int psmCountForSearchId = link.getNumPsms();
-							if ( psmCountForSearchId <= 1 ) {
+							if ( psmCountForSearchId < minPSMs ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
 							}
@@ -614,12 +615,6 @@ public class ProteinCoverageCompute {
 		return proteinCoverageDataList;
 	}
 	
-	public boolean isFilterOnlyOnePSM() {
-		return filterOnlyOnePSM;
-	}
-	public void setFilterOnlyOnePSM(boolean filterOnlyOnePSM) {
-		this.filterOnlyOnePSM = filterOnlyOnePSM;
-	}
 	public boolean isFilterOnlyOnePeptide() {
 		return filterOnlyOnePeptide;
 	}
@@ -665,5 +660,13 @@ public class ProteinCoverageCompute {
 	public void setLinkedPositions_FilterExcludeLinksWith_Param(
 			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param) {
 		this.linkedPositions_FilterExcludeLinksWith_Param = linkedPositions_FilterExcludeLinksWith_Param;
+	}
+
+	public int getMinPSMs() {
+		return minPSMs;
+	}
+
+	public void setMinPSMs(int minPSMs) {
+		this.minPSMs = minPSMs;
 	}
 }

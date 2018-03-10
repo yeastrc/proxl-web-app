@@ -1,5 +1,7 @@
 package org.yeastrc.xlink.www.form_query_json_objects;
 
+import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
@@ -17,8 +19,27 @@ public class ExcludeLinksWith_JSONRoot {
 
 	private boolean filterNonUniquePeptides;
 	private boolean filterOnlyOnePeptide;
-	private boolean filterOnlyOnePSM;
 	private boolean removeNonUniquePSMs;
+	
+	/**
+	 * Exclude if # PSMs is less than minPSMs
+	 */
+	private int minPSMs = MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT;
+	
+	/**
+	 * Exclude if # PSMs is less than minPSMs
+	 * @return
+	 */
+	public int getMinPSMs() {
+		return minPSMs;
+	}
+	/**
+	 * Exclude if # PSMs is less than minPSMs
+	 * @param minPSMs
+	 */
+	public void setMinPSMs(int minPSMs) {
+		this.minPSMs = minPSMs;
+	}
 	
 	public boolean isFilterNonUniquePeptides() {
 		return filterNonUniquePeptides;
@@ -32,16 +53,11 @@ public class ExcludeLinksWith_JSONRoot {
 	public void setFilterOnlyOnePeptide(boolean filterOnlyOnePeptide) {
 		this.filterOnlyOnePeptide = filterOnlyOnePeptide;
 	}
-	public boolean isFilterOnlyOnePSM() {
-		return filterOnlyOnePSM;
-	}
-	public void setFilterOnlyOnePSM(boolean filterOnlyOnePSM) {
-		this.filterOnlyOnePSM = filterOnlyOnePSM;
-	}
 	public boolean isRemoveNonUniquePSMs() {
 		return removeNonUniquePSMs;
 	}
 	public void setRemoveNonUniquePSMs(boolean removeNonUniquePSMs) {
 		this.removeNonUniquePSMs = removeNonUniquePSMs;
 	}
+
 }

@@ -134,17 +134,16 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 			});
 		}		
 		
+		//  Set Minimum PSM count on page
+		minimumPSM_Count_Filter.saveMinPSMsFilter( { minPSMs : _query_json_field_Contents.minPSMs } );
+		
 		//  Mark check boxes for chosen links to exclude:  "no unique peptides", "only one PSM", "only one peptide", "remove non-unique PSMs"
 		if ( _query_json_field_Contents.filterNonUniquePeptides ) {
 			$("#filterNonUniquePeptides").prop('checked', true);
 		} else {
 			$("#filterNonUniquePeptides").prop('checked', false);
 		}
-		if ( _query_json_field_Contents.filterOnlyOnePSM ) {
-			$("#filterOnlyOnePSM").prop('checked', true);
-		} else {
-			$("#filterOnlyOnePSM").prop('checked', false);
-		}
+		
 		if ( _query_json_field_Contents.filterOnlyOnePeptide ) {
 			$("#filterOnlyOnePeptide").prop('checked', true);
 		} else {
@@ -222,16 +221,15 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 			}
 		});
 
-		//  Mark check boxes for chosen links to exclude:  "no unique peptides", "only one PSM", "only one peptide", "remove non-unique PSMs"
+		//  Get Minimum PSM count 
+		var minPSMs = minimumPSM_Count_Filter.getMinPSMsFilter();
+		
+		//  Read check boxes for chosen links to exclude:  "no unique peptides", "only one peptide", "remove non-unique PSMs"
 		var filterNonUniquePeptides = false;
-		var filterOnlyOnePSM = false;
 		var filterOnlyOnePeptide = false;
 		var removeNonUniquePSMs = false;
 		if ( $("#filterNonUniquePeptides").prop('checked') === true ) {
 			filterNonUniquePeptides = true;
-		}
-		if ( $("#filterOnlyOnePSM").prop('checked') === true ) {
-			filterOnlyOnePSM = true;
 		}
 		if ( $("#filterOnlyOnePeptide").prop('checked') === true ) {
 			filterOnlyOnePeptide = true;
@@ -260,8 +258,8 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 				cutoffs : outputCutoffs, 
 				annTypeIdDisplay : annotationTypeDisplayByProjectSearchId,
 				linkTypes : outputLinkTypes, 
+				minPSMs : minPSMs,
 				filterNonUniquePeptides : filterNonUniquePeptides,
-				filterOnlyOnePSM : filterOnlyOnePSM,
 				filterOnlyOnePeptide : filterOnlyOnePeptide,
 				removeNonUniquePSMs : removeNonUniquePSMs,
 				excludeTaxonomy : outputExcludeTaxonomy,  

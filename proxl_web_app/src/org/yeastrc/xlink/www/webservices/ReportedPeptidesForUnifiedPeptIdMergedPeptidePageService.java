@@ -35,6 +35,7 @@ import org.yeastrc.xlink.www.searcher.ReportedPeptidesForUnifiedPeptIdSearchIdsS
 import org.yeastrc.xlink.www.annotation_display.AnnTypeIdDisplayJSONRoot;
 import org.yeastrc.xlink.www.annotation_display.AnnTypeIdDisplayJSON_PerSearch;
 import org.yeastrc.xlink.www.annotation_display.DeserializeAnnTypeIdDisplayJSONRoot;
+import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
@@ -317,7 +318,7 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 				// Filter out links if requested, and Update PSM counts if "remove non-unique PSMs" selected 
 				
 				if( excludeLinksWith_JSONRoot != null &&
-						( excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+						( excludeLinksWith_JSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT 
 								|| excludeLinksWith_JSONRoot.isRemoveNonUniquePSMs() ) ) {
 					
 					///////  Output Lists, Results After Filtering
@@ -340,9 +341,10 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 								continue;  // EARLY CONTINUE
 							}
 						}
-						// did the user request to removal of links with only one PSM?
-						if( excludeLinksWith_JSONRoot.isFilterOnlyOnePSM()  ) {
-							if ( webReportedPeptide.getNumPsms() <= 1 ) {
+						// did the user request to removal of links with less than a specified number of PSMs?
+						if( excludeLinksWith_JSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
+							int psmCountForSearchId = webReportedPeptide.getNumPsms();
+							if ( psmCountForSearchId < excludeLinksWith_JSONRoot.getMinPSMs() ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
 							}

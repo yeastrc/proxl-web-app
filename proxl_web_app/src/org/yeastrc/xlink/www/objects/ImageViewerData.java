@@ -117,12 +117,12 @@ public class ImageViewerData {
 		this.linkablePositions = linkablePositions;
 	}
 
-	public boolean isFilterOnlyOnePSM() {
-		return filterOnlyOnePSM;
+	public int getMinPSMs() {
+		return minPSMs;
 	}
 
-	public void setFilterOnlyOnePSM(boolean filterOnlyOnePSM) {
-		this.filterOnlyOnePSM = filterOnlyOnePSM;
+	public void setMinPSMs(int minPSMs) {
+		this.minPSMs = minPSMs;
 	}
 
 	public boolean isFilterOnlyOnePeptide() {
@@ -192,8 +192,8 @@ public class ImageViewerData {
 	private Map<Integer, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>> proteinLoopLinkPositions;
 	private Map<Integer, Map<Integer, Set<Integer>>> proteinMonoLinkPositions;
 	private Map<Integer, String> taxonomies;
+	private int minPSMs;
 	private boolean filterNonUniquePeptides;
-	private boolean filterOnlyOnePSM;
 	private boolean filterOnlyOnePeptide;
 	private boolean removeNonUniquePSMs;
 	
@@ -203,6 +203,7 @@ public class ImageViewerData {
 
 
 	private Map<Integer, Collection<Integer>> linkablePositions;
+
 
 
 }

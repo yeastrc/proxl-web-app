@@ -6,6 +6,8 @@
 <%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
+ <c:set var="peptidePage" value="${ true }" />
+
  <c:set var="pageTitle">Peptides - <c:out value="${ headerProject.projectTblData.title }"></c:out></c:set>
 
  <c:set var="pageBodyClass" >project-page</c:set>
@@ -68,8 +70,8 @@
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
-		
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
@@ -184,7 +186,8 @@
 				<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
 				<%@ include file="/WEB-INF/jsp-includes/searchDetailsBlock.jsp" %>
 
-
+				<%--  Minimum PSM filter --%>
+				<%@ include file="/WEB-INF/jsp-includes/minimumPSM_Count_Filter.jsp" %>
 				
 				<tr>
 					<td>Type Filter:</td>
@@ -238,14 +241,8 @@
 				<tr>
 					<td>Exclude links with:</td>
 					<td>
-						 <label><span style="white-space:nowrap;" >
-							<input type="checkbox" id="filterOnlyOnePSM"  onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" > 					
-						 	 only one PSM
-						 </span></label>
-						 
 						 <%--  Checkbox for removeNonUniquePSMs --%>
 						<%@ include file="/WEB-INF/jsp-includes/excludeLinksWith_Remove_NonUniquePSMs_Checkbox_Fragment.jsp" %>
-							 
 					</td>
 				</tr>
 				

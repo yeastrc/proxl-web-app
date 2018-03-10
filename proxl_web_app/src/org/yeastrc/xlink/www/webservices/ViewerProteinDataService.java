@@ -81,7 +81,7 @@ public class ViewerProteinDataService {
 	 * 
 	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
 	 */
-	public static final int VERSION_FOR_CACHING = 1;
+	public static final int VERSION_FOR_CACHING = 2;
 	
 	
 	@GET
@@ -92,8 +92,8 @@ public class ViewerProteinDataService {
 			@QueryParam( "projectSearchId" ) List<Integer> projectSearchIdList,
 			@QueryParam( "ds" ) String userSorted_ProjectSearchIds,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
+			@QueryParam( "minPSMs" ) Integer minPSMs,
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
-			@QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
 			@QueryParam( "filterOnlyOnePeptide" ) String filterOnlyOnePeptideString,
 			@QueryParam( "removeNonUniquePSMs" ) String removeNonUniquePSMsString,
 			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
@@ -119,6 +119,16 @@ public class ViewerProteinDataService {
 					.build()
 					);
 		}
+		if ( minPSMs == null ) {
+			String msg = "Provided minPSMs is null or minPSMs is missing";
+			log.error( msg );
+			throw new WebApplicationException(
+					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					.entity( msg )
+					.build()
+					);
+		}
+
 		try {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
@@ -200,9 +210,6 @@ public class ViewerProteinDataService {
 			boolean filterNonUniquePeptides = false;
 			if( filterNonUniquePeptidesString != null && filterNonUniquePeptidesString.equals( "on" ) )
 				filterNonUniquePeptides = true;
-			boolean filterOnlyOnePSM = false;
-			if( "on".equals( filterOnlyOnePSMString ) )
-				filterOnlyOnePSM = true;
 			boolean filterOnlyOnePeptide = false;
 			if( "on".equals( filterOnlyOnePeptideString ) )
 				filterOnlyOnePeptide = true;
@@ -536,8 +543,8 @@ public class ViewerProteinDataService {
 			ivd.setExcludeTaxonomy( excludeTaxonomy );
 			ivd.setExcludeType( excludeType );
 			ivd.setSearches( searchPartsList );
+			ivd.setMinPSMs( minPSMs );
 			ivd.setFilterNonUniquePeptides( filterNonUniquePeptides );
-			ivd.setFilterOnlyOnePSM( filterOnlyOnePSM );
 			ivd.setFilterOnlyOnePeptide( filterOnlyOnePeptide );
 			ivd.setRemoveNonUniquePSMs( removeNonUniquePSMs );
 			

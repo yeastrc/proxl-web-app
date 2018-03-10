@@ -214,8 +214,8 @@ public class DownloadProteinCoverageReportAction extends Action {
 				ProteinCoverageCompute pcs = new ProteinCoverageCompute();
 				pcs.setExcludedproteinSequenceVersionIds( proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() );
 				pcs.setExcludedTaxonomyIds( proteinQueryJSONRoot.getExcludeTaxonomy() );
+				pcs.setMinPSMs( proteinQueryJSONRoot.getMinPSMs() );
 				pcs.setFilterNonUniquePeptides( proteinQueryJSONRoot.isFilterNonUniquePeptides() );
-				pcs.setFilterOnlyOnePSM( proteinQueryJSONRoot.isFilterOnlyOnePSM() );
 				pcs.setFilterOnlyOnePeptide( proteinQueryJSONRoot.isFilterOnlyOnePeptide() );
 				pcs.setSearcherCutoffValuesRootLevel( searcherCutoffValuesRootLevel );
 				pcs.setLinkedPositions_FilterExcludeLinksWith_Param( linkedPositions_FilterExcludeLinksWith_Param );

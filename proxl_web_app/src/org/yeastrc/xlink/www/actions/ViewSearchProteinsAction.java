@@ -38,6 +38,7 @@ import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
 import org.yeastrc.xlink.www.objects.SearchProteinLooplinkWrapper;
+import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.Struts_Config_Parameter_Values_Constants;
 import org.yeastrc.xlink.www.constants.WebConstants;
@@ -291,7 +292,7 @@ public class ViewSearchProteinsAction extends Action {
 			//////////////////////////////////////////////////////////////////
 			// Filter out links if requested  ---  Filtering for proteinQueryJSONRoot.isRemoveNonUniquePSMs() is performed in CrosslinkLinkedPositions and TODO
 			if( proteinQueryJSONRoot.isFilterNonUniquePeptides() 
-					|| proteinQueryJSONRoot.isFilterOnlyOnePSM() 
+					|| proteinQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT
 					|| proteinQueryJSONRoot.isFilterOnlyOnePeptide()
 					|| ( proteinQueryJSONRoot.getExcludeTaxonomy() != null && proteinQueryJSONRoot.getExcludeTaxonomy().length > 0 ) ||
 					( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) ) {
@@ -310,10 +311,11 @@ public class ViewSearchProteinsAction extends Action {
 							continue;  // EARLY CONTINUE
 						}
 					}
-					// did they request to removal of links with only one PSM?
-					if( proteinQueryJSONRoot.isFilterOnlyOnePSM()  ) {
+				
+					// did they request to removal of links with less than a specified number of PSMs?
+					if( proteinQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
 						int psmCountForSearchId = link.getNumPsms();
-						if ( psmCountForSearchId <= 1 ) {
+						if ( psmCountForSearchId < proteinQueryJSONRoot.getMinPSMs() ) {
 							//  Skip to next entry in list, dropping this entry from output list
 							continue;  // EARLY CONTINUE
 						}
@@ -369,9 +371,9 @@ public class ViewSearchProteinsAction extends Action {
 						}
 					}
 					// did they request to removal of links with only one PSM?
-					if( proteinQueryJSONRoot.isFilterOnlyOnePSM()  ) {
+					if( proteinQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT  ) {
 						int psmCountForSearchId = link.getNumPsms();
-						if ( psmCountForSearchId <= 1 ) {
+						if ( psmCountForSearchId < proteinQueryJSONRoot.getMinPSMs() ) {
 							//  Skip to next entry in list, dropping this entry from output list
 							continue;  // EARLY CONTINUE
 						}

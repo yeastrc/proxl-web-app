@@ -23,16 +23,16 @@ var WebserviceDataParamsDistributionCommonCode = function() {
 		
 		//  Java class ExcludeLinksWith_JSONRoot
 		var excludeLinksWith_Root = undefined
-		if ( params.filterNonUniquePeptides !== undefined || 
+		if ( params.minPSMs !== undefined ||
+				params.filterNonUniquePeptides !== undefined || 
 				params.filterOnlyOnePeptide !== undefined ||
-				params.filterOnlyOnePSM !== undefined ||
 				params.removeNonUniquePSMs !== undefined ) {
 
 			// Populate this since at least one input is not undefined
 			excludeLinksWith_Root = {
+					minPSMs : params.minPSMs,
 					filterNonUniquePeptides : params.filterNonUniquePeptides,
 					filterOnlyOnePeptide : params.filterOnlyOnePeptide,
-					filterOnlyOnePSM : params.filterOnlyOnePSM,
 					removeNonUniquePSMs : params.removeNonUniquePSMs
 			};
 		}

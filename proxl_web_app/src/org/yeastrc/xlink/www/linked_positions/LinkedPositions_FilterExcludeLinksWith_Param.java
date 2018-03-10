@@ -11,17 +11,14 @@ import org.yeastrc.xlink.www.form_query_json_objects.ExcludeLinksWith_JSONRoot;
  */
 public class LinkedPositions_FilterExcludeLinksWith_Param {
 
-//	private boolean filterOnlyOnePSM;  // Not do this here.  Not sure what it would alter/break
 	private boolean removeNonUniquePSMs;
 	
 	//  Constructors
 	public LinkedPositions_FilterExcludeLinksWith_Param() {}
 	public LinkedPositions_FilterExcludeLinksWith_Param( A_QueryBase_JSONRoot a_QueryBase_JSONRoot ) {
-//		this.filterOnlyOnePSM = a_QueryBase_JSONRoot.isFilterOnlyOnePSM();
 		this.removeNonUniquePSMs = a_QueryBase_JSONRoot.isRemoveNonUniquePSMs();
 	}
 	public LinkedPositions_FilterExcludeLinksWith_Param( ExcludeLinksWith_JSONRoot excludeLinksWith_JSONRoot ) {
-//		this.filterOnlyOnePSM = a_QueryBase_JSONRoot.isFilterOnlyOnePSM();
 		this.removeNonUniquePSMs = excludeLinksWith_JSONRoot.isRemoveNonUniquePSMs();
 	}
 	

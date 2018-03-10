@@ -1,6 +1,8 @@
 package org.yeastrc.xlink.www.form_query_json_objects;
 
 import org.yeastrc.xlink.www.annotation_display.AnnTypeIdDisplayJSONRoot;
+import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
@@ -17,8 +19,7 @@ public class A_QueryBase_JSONRoot {
 	private CutoffValuesRootLevel cutoffs;
 	private AnnTypeIdDisplayJSONRoot annTypeIdDisplay;
 	
-	//  Moved to base class A_QueryBase_JSONRoot since also used in Peptide Page
-	private boolean filterOnlyOnePSM;
+	private int minPSMs = MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT;
 	
 	private boolean removeNonUniquePSMs;
 
@@ -29,9 +30,21 @@ public class A_QueryBase_JSONRoot {
 	public A_QueryBase_JSONRoot( A_QueryBase_JSONRoot a_QueryBase_JSONRoot ) {
 		this.cutoffs = a_QueryBase_JSONRoot.cutoffs;
 		this.annTypeIdDisplay = a_QueryBase_JSONRoot.annTypeIdDisplay;
-		this.filterOnlyOnePSM = a_QueryBase_JSONRoot.filterOnlyOnePSM;
+		this.minPSMs = a_QueryBase_JSONRoot.minPSMs;
 		this.removeNonUniquePSMs = a_QueryBase_JSONRoot.removeNonUniquePSMs;
 	}
+	
+	//  For backwards compatibility
+	
+	/**
+	 * @param filterOnlyOnePSM
+	 */
+	public void setFilterOnlyOnePSM(boolean filterOnlyOnePSM) {
+		if ( filterOnlyOnePSM ) {
+			this.minPSMs = MinimumPSMsConstants.MINIMUM_PSMS_FOR_FILTER_ONLY_ONE_PSM;
+		}
+	}
+	
 	
 	//////////////////////////////////////////
 	///    getters setters
@@ -50,16 +63,16 @@ public class A_QueryBase_JSONRoot {
 	public void setAnnTypeIdDisplay(AnnTypeIdDisplayJSONRoot annTypeIdDisplay) {
 		this.annTypeIdDisplay = annTypeIdDisplay;
 	}
-	public boolean isFilterOnlyOnePSM() {
-		return filterOnlyOnePSM;
-	}
-	public void setFilterOnlyOnePSM(boolean filterOnlyOnePSM) {
-		this.filterOnlyOnePSM = filterOnlyOnePSM;
-	}
 	public boolean isRemoveNonUniquePSMs() {
 		return removeNonUniquePSMs;
 	}
 	public void setRemoveNonUniquePSMs(boolean removeNonUniquePSMs) {
 		this.removeNonUniquePSMs = removeNonUniquePSMs;
+	}
+	public int getMinPSMs() {
+		return minPSMs;
+	}
+	public void setMinPSMs(int minPSMs) {
+		this.minPSMs = minPSMs;
 	}
 }

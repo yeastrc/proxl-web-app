@@ -36,12 +36,8 @@ public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedS
 	public Map<SearchDTO, SearchProteinCrosslink> getSearchProteinCrosslinks() throws Exception {
 		
 		try {
-
-			//  Used in Web service for isFilterOnlyOnePSM and isFilterOnlyOnePeptide
-
-
+			//  Used in Web service for isFilterOnlyOnePeptide
 			if ( searchProteinCrosslinks == null ) {
-				
 				throw new Exception( "searchProteinCrosslinks == null, no longer looking up the data" );
 			}
 

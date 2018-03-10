@@ -40,6 +40,7 @@ import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
+import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
@@ -160,13 +161,14 @@ public class Viewer_UDR_Data_Service {
 			this.numUniquePeptides = numUniquePeptides;
 		}
 	}
+
 	/**
-	 * 
 	 * @param projectSearchIdList
 	 * @param psmPeptideCutoffsForProjectSearchIds_JSONString
+	 * @param minPSMs
 	 * @param filterNonUniquePeptidesString
-	 * @param filterOnlyOnePSMString
 	 * @param filterOnlyOnePeptideString
+	 * @param removeNonUniquePSMsString
 	 * @param excludeTaxonomy
 	 * @param request
 	 * @return
@@ -178,8 +180,8 @@ public class Viewer_UDR_Data_Service {
 	public Viewer_UDR_Data_Service_Result getViewerData(
 			@QueryParam( "projectSearchId" ) List<Integer> projectSearchIdList,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
+			@QueryParam( "minPSMs" ) Integer minPSMs,
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
-			@QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
 			@QueryParam( "filterOnlyOnePeptide" ) String filterOnlyOnePeptideString,
 			@QueryParam( "removeNonUniquePSMs" ) String removeNonUniquePSMsString,
 			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
@@ -212,12 +214,19 @@ public class Viewer_UDR_Data_Service {
 					.build()
 					);
 		}
+		if ( minPSMs == null ) {
+			String msg = "Provided minPSMs is null or minPSMs is missing";
+			log.error( msg );
+			throw new WebApplicationException(
+					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					.entity( msg )
+					.build()
+					);
+		}
+
 		boolean filterNonUniquePeptides = false;
 		if( filterNonUniquePeptidesString != null && filterNonUniquePeptidesString.equals( "on" ) )
 			filterNonUniquePeptides = true;
-		boolean filterOnlyOnePSM = false;
-		if( "on".equals( filterOnlyOnePSMString ) )
-			filterOnlyOnePSM = true;
 		boolean filterOnlyOnePeptide = false;
 		if( "on".equals( filterOnlyOnePeptideString ) )
 			filterOnlyOnePeptide = true;
@@ -413,8 +422,8 @@ public class Viewer_UDR_Data_Service {
 			//////////////////////////////////////////////////////////////////
 			// Filter out links if requested
 			if( filterNonUniquePeptides 
-					|| filterOnlyOnePSM 
-					|| filterOnlyOnePeptide
+					|| minPSMs != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT
+					|| filterOnlyOnePeptide 
 					|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 ) ||
 					( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) ) {
 				///////  Output Lists, Results After Filtering
@@ -430,10 +439,10 @@ public class Viewer_UDR_Data_Service {
 							continue;  // EARLY CONTINUE
 						}
 					}
-					// did they request to removal of links with only one PSM?
-					if( filterOnlyOnePSM  ) {
+					// did they request to removal of links with less than a specified number of PSMs?
+					if( minPSMs != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
 						int psmCountForSearchId = link.getNumPsms();
-						if ( psmCountForSearchId <= 1 ) {
+						if ( psmCountForSearchId < minPSMs ) {
 							//  Skip to next entry in list, dropping this entry from output list
 							continue;  // EARLY CONTINUE
 						}
@@ -492,10 +501,10 @@ public class Viewer_UDR_Data_Service {
 							continue;  // EARLY CONTINUE
 						}
 					}
-					// did they request to removal of links with only one PSM?
-					if( filterOnlyOnePSM  ) {
+					// did they request to removal of links with less than a specified number of PSMs?
+					if( minPSMs != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
 						int psmCountForSearchId = link.getNumPsms();
-						if ( psmCountForSearchId <= 1 ) {
+						if ( psmCountForSearchId < minPSMs ) {
 							//  Skip to next entry in list, dropping this entry from output list
 							continue;  // EARLY CONTINUE
 						}

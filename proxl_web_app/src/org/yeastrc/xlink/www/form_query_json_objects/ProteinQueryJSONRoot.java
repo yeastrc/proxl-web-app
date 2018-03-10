@@ -16,10 +16,6 @@ public class ProteinQueryJSONRoot extends A_QueryBase_JSONRoot {
 	private boolean filterNonUniquePeptides;
 	private boolean filterOnlyOnePeptide;
 	
-	//  Moved to base class A_QueryBase_JSONRoot since also used in Peptide Page
-//	private boolean filterOnlyOnePSM;
-
-	
 	/**
 	 * 
 	 */

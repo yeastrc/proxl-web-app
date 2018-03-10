@@ -45,6 +45,7 @@ import org.yeastrc.xlink.www.actions.ProteinsAllCommonAll.ProteinSingleEntry;
 import org.yeastrc.xlink.www.actions.ProteinsAllCommonAll.ProteinsAllCommonAllResult;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt;
+import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -282,7 +283,7 @@ public class ProteinsService {
 						// Filter out links if requested
 						if( excludeLinksWith_JSONRoot != null 
 								&& ( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
-										|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+										|| excludeLinksWith_JSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT 
 										|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() ) )
 								
 								//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
@@ -294,10 +295,10 @@ public class ProteinsService {
 									continue;  // EARLY CONTINUE
 								}
 							}
-							// did they request to removal of links with only one PSM?
-							if( excludeLinksWith_JSONRoot.isFilterOnlyOnePSM()  ) {
+							// did they request to removal of links with less than a specified number of PSMs?
+							if( excludeLinksWith_JSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
 								int psmCountForSearchId = searchProteinCrosslink.getNumPsms();
-								if ( psmCountForSearchId <= 1 ) {
+								if ( psmCountForSearchId < excludeLinksWith_JSONRoot.getMinPSMs() ) {
 									//  Skip to next entry in list, dropping this entry from output list
 									continue;  // EARLY CONTINUE
 								}
@@ -574,7 +575,7 @@ public class ProteinsService {
 						// Filter out links if requested
 						if( excludeLinksWith_JSONRoot != null 
 								&& ( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
-										|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+										|| excludeLinksWith_JSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT 
 										|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() ) )
 								
 								//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
@@ -586,10 +587,10 @@ public class ProteinsService {
 									continue;  // EARLY CONTINUE
 								}
 							}
-							// did they request to removal of links with only one PSM?
-							if( excludeLinksWith_JSONRoot.isFilterOnlyOnePSM()  ) {
+							// did they request to removal of links with less than a specified number of PSMs?
+							if( excludeLinksWith_JSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
 								int psmCountForSearchId = searchProteinLooplink.getNumPsms();
-								if ( psmCountForSearchId <= 1 ) {
+								if ( psmCountForSearchId < excludeLinksWith_JSONRoot.getMinPSMs() ) {
 									//  Skip to next entry in list, dropping this entry from output list
 									continue;  // EARLY CONTINUE
 								}
@@ -871,7 +872,7 @@ public class ProteinsService {
 						// Filter out links if requested
 						if( excludeLinksWith_JSONRoot != null 
 								&& ( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
-										|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+										|| excludeLinksWith_JSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT 
 										|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() ) )
 								
 								//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
@@ -883,10 +884,10 @@ public class ProteinsService {
 									continue;  // EARLY CONTINUE
 								}
 							}
-							// did they request to removal of links with only one PSM?
-							if( excludeLinksWith_JSONRoot.isFilterOnlyOnePSM()  ) {
+							// did they request to removal of links with less than a specified number of PSMs?
+							if( excludeLinksWith_JSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
 								int psmCountForSearchId = searchProteinMonolink.getNumPsms();
-								if ( psmCountForSearchId <= 1 ) {
+								if ( psmCountForSearchId < excludeLinksWith_JSONRoot.getMinPSMs() ) {
 									//  Skip to next entry in list, dropping this entry from output list
 									continue;  // EARLY CONTINUE
 								}
@@ -1187,7 +1188,7 @@ public class ProteinsService {
 					// Filter out links if requested
 					if( excludeLinksWith_JSONRoot != null 
 							&& ( excludeLinksWith_JSONRoot.isFilterNonUniquePeptides() 
-									|| excludeLinksWith_JSONRoot.isFilterOnlyOnePSM() 
+									|| excludeLinksWith_JSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT 
 									|| excludeLinksWith_JSONRoot.isFilterOnlyOnePeptide() ) )
 							
 							//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
@@ -1199,10 +1200,10 @@ public class ProteinsService {
 								continue;  // EARLY CONTINUE
 							}
 						}
-						// did they request to removal of links with only one PSM?
-						if( excludeLinksWith_JSONRoot.isFilterOnlyOnePSM()  ) {
+						// did they request to removal of links with less than a specified number of PSMs?
+						if( excludeLinksWith_JSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
 							int psmCountForSearchId = proteinSingleEntry.getNumPsms();
-							if ( psmCountForSearchId <= 1 ) {
+							if ( psmCountForSearchId < excludeLinksWith_JSONRoot.getMinPSMs() ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
 							}

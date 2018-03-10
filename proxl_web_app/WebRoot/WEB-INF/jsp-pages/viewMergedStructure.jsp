@@ -74,7 +74,9 @@
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
-		
+	
+		<script type="text/javascript" src="${ contextPath }/js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
+	
 		<script type="text/javascript" src="${ contextPath }/js/nrseqProteinIdToProteinSequenceVersionIdLookup.js?x=${cacheBustValue}"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
@@ -220,6 +222,9 @@
 				
 				<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
 				<%@ include file="/WEB-INF/jsp-includes/searchDetailsBlock.jsp" %>
+
+				<%--  Minimum PSM filter --%>
+				<%@ include file="/WEB-INF/jsp-includes/minimumPSM_Count_Filter.jsp" %>
 
 				<tr>
 					<td>Exclude links with:</td>

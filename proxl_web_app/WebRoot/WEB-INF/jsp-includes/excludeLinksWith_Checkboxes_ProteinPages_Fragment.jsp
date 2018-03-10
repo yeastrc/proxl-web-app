@@ -14,10 +14,6 @@
  	 no unique peptides
  </span></label>
  <label><span style="white-space:nowrap;" >
-	<input type="checkbox" id="filterOnlyOnePSM"  onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); }" > 					
- 	 only one PSM
- </span></label>
- <label><span style="white-space:nowrap;" >
 	<input type="checkbox" id="filterOnlyOnePeptide"  onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); }" > 					
  	 only one peptide
  </span></label>

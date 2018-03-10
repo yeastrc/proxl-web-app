@@ -22,6 +22,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortAnnotationDTORecords;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortDisplayRecordsWrapperBase;
+import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
@@ -251,7 +252,7 @@ public class ProteinsMergedCommonPageDownload {
 			//////////    Filter Links based on user request
 			// Filter out links if requested
 			if( proteinQueryJSONRoot.isFilterNonUniquePeptides() 
-					|| proteinQueryJSONRoot.isFilterOnlyOnePSM() 
+					|| proteinQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT 
 					|| proteinQueryJSONRoot.isFilterOnlyOnePeptide()
 					
 					//  || proteinQueryJSONRoot.isRemoveNonUniquePSMs() -- Handled in CrosslinkLinkedPositions and LooplinkLinkedPositions
@@ -300,10 +301,10 @@ public class ProteinsMergedCommonPageDownload {
 							continue;  // EARLY CONTINUE
 						}
 					}
-					// did they request to removal of links with only one PSM?
-					if( proteinQueryJSONRoot.isFilterOnlyOnePSM()  ) {
+					// did they request to removal of links with less than a specified number of PSMs?
+					if( proteinQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
 						int psmCountForSearchId = link.getNumPsms();
-						if ( psmCountForSearchId <= 1 ) {
+						if ( psmCountForSearchId < proteinQueryJSONRoot.getMinPSMs() ) {
 							//  Skip to next entry in list, dropping this entry from output list
 							continue;  // EARLY CONTINUE
 						}
@@ -349,10 +350,10 @@ public class ProteinsMergedCommonPageDownload {
 							continue;  // EARLY CONTINUE
 						}
 					}
-					// did they request to removal of links with only one PSM?
-					if( proteinQueryJSONRoot.isFilterOnlyOnePSM()  ) {
+					// did they request to removal of links with less than a specified number of PSMs?
+					if( proteinQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
 						int psmCountForSearchId = link.getNumPsms();
-						if ( psmCountForSearchId <= 1 ) {
+						if ( psmCountForSearchId < proteinQueryJSONRoot.getMinPSMs() ) {
 							//  Skip to next entry in list, dropping this entry from output list
 							continue;  // EARLY CONTINUE
 						}

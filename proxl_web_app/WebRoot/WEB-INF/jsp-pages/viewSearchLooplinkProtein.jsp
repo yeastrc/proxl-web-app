@@ -66,13 +66,14 @@
 		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 	
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
-				
+
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
+						
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js?x=${cacheBustValue}"></script>
 
@@ -193,6 +194,9 @@
 				
 				<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
 				<%@ include file="/WEB-INF/jsp-includes/searchDetailsBlock.jsp" %>
+
+				<%--  Minimum PSM filter --%>
+				<%@ include file="/WEB-INF/jsp-includes/minimumPSM_Count_Filter.jsp" %>
 
 				<tr>
 					<td>Exclude links with:</td>

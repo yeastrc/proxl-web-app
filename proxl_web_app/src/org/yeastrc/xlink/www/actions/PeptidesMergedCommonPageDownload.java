@@ -21,6 +21,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SortAnnotationDTORecords;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
+import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.constants.ReportedPeptideCombined_IdentifierFlag_Constants;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
@@ -264,7 +265,7 @@ public class PeptidesMergedCommonPageDownload {
 			
 			// Filter out links if requested, and Update PSM counts if "remove non-unique PSMs" selected 
 			
-			if( mergedPeptideQueryJSONRoot.isFilterOnlyOnePSM() 
+			if( mergedPeptideQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT
 					|| mergedPeptideQueryJSONRoot.isRemoveNonUniquePSMs() ) {
 				///////  Output Lists, Results After Filtering
 				List<WebReportedPeptideWrapper> wrappedlinksAfterFilter = new ArrayList<>( wrappedLinksPerForSearch.size() );
@@ -282,9 +283,10 @@ public class PeptidesMergedCommonPageDownload {
 							continue;  // EARLY CONTINUE
 						}
 					}
-					// did the user request to removal of links with only one PSM?
-					if( mergedPeptideQueryJSONRoot.isFilterOnlyOnePSM()  ) {
-						if ( webReportedPeptide.getNumPsms() <= 1 ) {
+					// did the user request to removal of links with less than a specified number of PSMs?
+					if( mergedPeptideQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
+						int psmCountForSearchId = webReportedPeptide.getNumPsms();
+						if ( psmCountForSearchId < mergedPeptideQueryJSONRoot.getMinPSMs() ) {
 							//  Skip to next entry in list, dropping this entry from output list
 							continue;  // EARLY CONTINUE
 						}

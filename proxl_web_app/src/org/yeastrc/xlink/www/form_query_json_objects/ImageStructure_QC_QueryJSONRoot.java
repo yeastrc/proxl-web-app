@@ -10,9 +10,6 @@ public class ImageStructure_QC_QueryJSONRoot extends A_QueryBase_JSONRoot {
 	private int[] excludeTaxonomy;
 	private boolean filterNonUniquePeptides;
 	private boolean filterOnlyOnePeptide;
-
-	//  Moved to base class A_QueryBase_JSONRoot since also used in Peptide Page
-//	private boolean filterOnlyOnePSM;
 	
 	////////
 	//   Constuctors

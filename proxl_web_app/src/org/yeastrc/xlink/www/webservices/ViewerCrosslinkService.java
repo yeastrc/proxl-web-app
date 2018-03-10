@@ -32,6 +32,7 @@ import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslinkWrapper;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
+import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
@@ -69,8 +70,8 @@ public class ViewerCrosslinkService {
 	public byte[]  getViewerData(
 			@QueryParam( "projectSearchId" ) List<Integer> projectSearchIdList,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
+			@QueryParam( "minPSMs" ) Integer minPSMs,
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
-			@QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
 			@QueryParam( "filterOnlyOnePeptide" ) String filterOnlyOnePeptideString,
 			@QueryParam( "removeNonUniquePSMs" ) String removeNonUniquePSMsString,
 			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
@@ -94,6 +95,16 @@ public class ViewerCrosslinkService {
 					.build()
 					);
 		}
+		if ( minPSMs == null ) {
+			String msg = "Provided minPSMs is null or minPSMs is missing";
+			log.error( msg );
+			throw new WebApplicationException(
+					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					.entity( msg )
+					.build()
+					);
+		}
+		
 		try {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
@@ -230,9 +241,6 @@ public class ViewerCrosslinkService {
 			boolean filterNonUniquePeptides = false;
 			if( filterNonUniquePeptidesString != null && filterNonUniquePeptidesString.equals( "on" ) )
 				filterNonUniquePeptides = true;
-			boolean filterOnlyOnePSM = false;
-			if( "on".equals( filterOnlyOnePSMString ) )
-				filterOnlyOnePSM = true;
 			boolean filterOnlyOnePeptide = false;
 			if( "on".equals( filterOnlyOnePeptideString ) )
 				filterOnlyOnePeptide = true;
@@ -267,7 +275,9 @@ public class ViewerCrosslinkService {
 						.getSearchProteinCrosslinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 
 				// Filter out links if requested
-				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
+				if( filterNonUniquePeptides 
+						|| minPSMs != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT
+						|| filterOnlyOnePeptide 
 						|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
 					///////  Output Lists, Results After Filtering
 					List<SearchProteinCrosslinkWrapper> wrappedCrosslinksAfterFilter = new ArrayList<>( wrappedCrosslinks.size() );
@@ -299,10 +309,10 @@ public class ViewerCrosslinkService {
 								continue;  // EARLY CONTINUE
 							}
 						}
-						//	did they request to removal of links with only one PSM?
-						if( filterOnlyOnePSM  ) {
+						// did they request to removal of links with less than a specified number of PSMs?
+						if( minPSMs != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
 							int psmCountForSearchId = link.getNumPsms();
-							if ( psmCountForSearchId <= 1 ) {
+							if ( psmCountForSearchId < minPSMs ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
 							}
@@ -416,8 +426,8 @@ public class ViewerCrosslinkService {
 	public byte[] getPSMCounts( 
 			@QueryParam( "projectSearchId" ) List<Integer> projectSearchIdList,
 			@QueryParam( "psmPeptideCutoffsForProjectSearchIds" ) String psmPeptideCutoffsForProjectSearchIds_JSONString,
+			@QueryParam( "minPSMs" ) Integer minPSMs,
 			@QueryParam( "filterNonUniquePeptides" ) String filterNonUniquePeptidesString,
-			@QueryParam( "filterOnlyOnePSM" ) String filterOnlyOnePSMString,
 			@QueryParam( "filterOnlyOnePeptide" ) String filterOnlyOnePeptideString,
 			@QueryParam( "removeNonUniquePSMs" ) String removeNonUniquePSMsString,
 			@QueryParam( "excludeTaxonomy" ) List<Integer> excludeTaxonomy,
@@ -432,6 +442,25 @@ public class ViewerCrosslinkService {
 		    	        .build()
 		    	        );
 		}
+		if ( StringUtils.isEmpty( psmPeptideCutoffsForProjectSearchIds_JSONString ) ) {
+			String msg = "Provided psmPeptideCutoffsForProjectSearchIds is null or psmPeptideCutoffsForProjectSearchIds is missing";
+			log.error( msg );
+			throw new WebApplicationException(
+					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					.entity( msg )
+					.build()
+					);
+		}
+		if ( minPSMs == null ) {
+			String msg = "Provided minPSMs is null or minPSMs is missing";
+			log.error( msg );
+			throw new WebApplicationException(
+					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					.entity( msg )
+					.build()
+					);
+		}
+		
 		try {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
@@ -568,9 +597,6 @@ public class ViewerCrosslinkService {
 			boolean filterNonUniquePeptides = false;
 			if( filterNonUniquePeptidesString != null && filterNonUniquePeptidesString.equals( "on" ) )
 				filterNonUniquePeptides = true;
-			boolean filterOnlyOnePSM = false;
-			if( "on".equals( filterOnlyOnePSMString ) )
-				filterOnlyOnePSM = true;
 			boolean filterOnlyOnePeptide = false;
 			if( "on".equals( filterOnlyOnePeptideString ) )
 				filterOnlyOnePeptide = true;
@@ -602,7 +628,9 @@ public class ViewerCrosslinkService {
 						.getSearchProteinCrosslinkWrapperList( searchDTO, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
 
 				// Filter out links if requested
-				if( filterNonUniquePeptides || filterOnlyOnePSM || filterOnlyOnePeptide 
+				if( filterNonUniquePeptides 
+						|| minPSMs != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT
+						|| filterOnlyOnePeptide 
 						|| ( excludeTaxonomy != null && excludeTaxonomy.size() > 0 )  ) {
 					///////  Output Lists, Results After Filtering
 					List<SearchProteinCrosslinkWrapper> wrappedCrosslinksAfterFilter = new ArrayList<>( wrappedCrosslinks.size() );
@@ -634,10 +662,10 @@ public class ViewerCrosslinkService {
 								continue;  // EARLY CONTINUE
 							}
 						}
-						//	did they request to removal of links with only one PSM?
-						if( filterOnlyOnePSM  ) {
+						// did they request to removal of links with less than a specified number of PSMs?
+						if( minPSMs != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
 							int psmCountForSearchId = link.getNumPsms();
-							if ( psmCountForSearchId <= 1 ) {
+							if ( psmCountForSearchId < minPSMs ) {
 								//  Skip to next entry in list, dropping this entry from output list
 								continue;  // EARLY CONTINUE
 							}

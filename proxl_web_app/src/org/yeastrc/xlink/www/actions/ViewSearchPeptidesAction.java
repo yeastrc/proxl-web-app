@@ -31,6 +31,7 @@ import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
 import org.yeastrc.xlink.www.annotation_display.AnnTypeIdDisplayJSONRoot;
 import org.yeastrc.xlink.www.annotation_display.AnnTypeIdDisplayJSON_PerSearch;
+import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
@@ -264,7 +265,7 @@ public class ViewSearchPeptidesAction extends Action {
 			
 			// Filter out links if requested, and Update PSM counts if "remove non-unique PSMs" selected 
 			
-			if( peptideQueryJSONRoot.isFilterOnlyOnePSM() 
+			if( peptideQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT 
 					|| peptideQueryJSONRoot.isRemoveNonUniquePSMs() ) {
 				///////  Output Lists, Results After Filtering
 				List<WebReportedPeptideWrapper> wrappedlinksAfterFilter = new ArrayList<>( wrappedlinks.size() );
@@ -282,9 +283,10 @@ public class ViewSearchPeptidesAction extends Action {
 							continue;  // EARLY CONTINUE
 						}
 					}
-					// did the user request to removal of links with only one PSM?
-					if( peptideQueryJSONRoot.isFilterOnlyOnePSM()  ) {
-						if ( webReportedPeptide.getNumPsms() <= 1 ) {
+					// did the user request to removal of links with less than a specified number of PSMs?
+					if( peptideQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
+						int psmCountForSearchId = webReportedPeptide.getNumPsms();
+						if ( psmCountForSearchId < peptideQueryJSONRoot.getMinPSMs() ) {
 							//  Skip to next entry in list, dropping this entry from output list
 							continue;  // EARLY CONTINUE
 						}
