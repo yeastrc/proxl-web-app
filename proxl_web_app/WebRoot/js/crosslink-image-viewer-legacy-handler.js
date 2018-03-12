@@ -39,7 +39,7 @@ LegacyJSONUpdater.prototype.convertLegacyJSON = function() {
 		proteinBarData = json['protein_bar_data'];
 	}
 	
-	if( !version || version <= 1 ) {
+	if( !version || version < 1 ) {
 	
 		json[ HASH_OBJECT_PROPERTIES["version-number"] ] /* json.vn */ = 1;
 		updateURLHashWithJSONObject( json );
@@ -96,7 +96,40 @@ LegacyJSONUpdater.prototype.convertLegacyJSON = function() {
 			}
 		}
 	} //end conversion to version 1
+
+	/*
+	 * Convert JSON to version 2
+	 */
+
+	if( !version || version < 2 ) {
 	
+//		filterOnlyOnePSM : "e", 
+		
+		json[ HASH_OBJECT_PROPERTIES["version-number"] ] /* json.vn */ = 2;
+		updateURLHashWithJSONObject( json );
+		
+		if ( json[ HASH_OBJECT_PROPERTIES[ "filterOnlyOnePSM" ] ] !== undefined ) {
+			if ( json[ HASH_OBJECT_PROPERTIES[ "filterOnlyOnePSM" ] ] ) {
+				json[ HASH_OBJECT_PROPERTIES[ "minPSMs" ] ] = 2;
+			} else {
+				json[ HASH_OBJECT_PROPERTIES["minPSMs" ] ] = 1;
+			}
+			delete json[ HASH_OBJECT_PROPERTIES[ "filterOnlyOnePSM" ] ];
+			updateURLHashWithJSONObject( json );
+		}
+		if ( json[ "filterOnlyOnePSM" ] !== undefined ) {
+			if ( json[ "filterOnlyOnePSM" ] ) {
+				json[ HASH_OBJECT_PROPERTIES[ "minPSMs" ] ] = 2;
+			} else {
+				json[ HASH_OBJECT_PROPERTIES[ "minPSMs" ] ] = 1;
+			}
+			delete json[ HASH_OBJECT_PROPERTIES[ "filterOnlyOnePSM" ] ];
+			updateURLHashWithJSONObject( json );
+		}
+		
+		
+	} //end conversion to version 2
+
 	/*
 	// convert pre-protein data bar manager and pre-protein sequence id usage
 	if(	convertOldJSONIfNecessaryReturnTrueIfExit() ){ 

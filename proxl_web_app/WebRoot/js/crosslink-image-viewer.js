@@ -35,7 +35,7 @@
 /*
  * The version number to pass along in the JSON for check for compatibility
  */
-var _JSON_VERSION_NUMBER = 1;
+var _JSON_VERSION_NUMBER = 2;
 /**
  * Default exclude link type "No Links"
  */

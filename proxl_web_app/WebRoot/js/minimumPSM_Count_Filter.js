@@ -30,7 +30,10 @@ var MinimumPSM_Count_Filter = function() {
 			var objectThis = this;
 			var $minimum_psm_count_default_value = $("#minimum_psm_count_default_value");
 			var minimum_psm_count_default_valueString = $minimum_psm_count_default_value.text();
-			minimum_psm_count_default_value = parseInt( minimum_psm_count_default_valueString, 10 );
+			minimum_psm_count_default_value = window.parseInt( minimum_psm_count_default_valueString, 10 );
+			if ( window.isNaN( minimum_psm_count_default_value ) ) {
+				throw Error( "Value in element with id 'minimum_psm_count_default_value' cannot be parsed to a integer.  Value: " + minimum_psm_count_default_valueString );
+			}
 			initializeCalled = true;
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -128,6 +131,12 @@ var MinimumPSM_Count_Filter = function() {
 		}
 		
 		minPSMs = parseInt( minimum_psm_count_user_input, 10 );
+		if ( window.isNaN( minPSMs ) ) {
+			minPSMs = 1;  // Not valid integer so default to 1
+		} 
+		if ( minPSMs < 1 ) {
+			minPSMs = 1; // Minimum value is 1
+		}
 		this.updatePageWithCurrentValue();
 		this.hideOverlay();
 	};

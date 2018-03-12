@@ -38,7 +38,7 @@
 								<span class="tool_tip_attached_jq  "
 			 	 					data-tooltip="Cross-links or loop-links must have at least this number of PSMs to be shown"
 			 	 						> Minimum PSMs:</span> 
-			 	 				<input id="minimum_psm_count_user_input" style="width: 20px;">
+			 	 				<input id="minimum_psm_count_user_input" style="width: 40px;">
 							</div>
 
 							<input type="button" value="Save" 

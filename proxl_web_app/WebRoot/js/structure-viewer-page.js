@@ -398,6 +398,9 @@ function getJsonFromHash() {
 		json.cutoffs = getCutoffDefaultsFromPage();
 	}
 	
+	if ( json.filterOnlyOnePSM ) {
+		json.minPSMs = 2;
+	}
 
 	//  START: Special update to allow projectSearchId values to be added or removed from URL
 
