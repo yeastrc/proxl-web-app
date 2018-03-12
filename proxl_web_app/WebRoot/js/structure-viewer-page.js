@@ -2981,6 +2981,46 @@ var downloadAllLinkablePositions = function( onlyShortest) {
 };
 
 
+var downloadShownUDRsForRosetta = function() {
+	var response = "";
+	
+	if( _renderedLinks[ 'crosslinks' ] && _renderedLinks[ 'crosslinks' ].length > 0 ) {
+		
+		for( var i = 0; i < _renderedLinks[ 'crosslinks' ].length; i++ ) {
+
+			var atom1 =  _renderedLinks[ 'crosslinks' ][ i ][ 'atom1' ];	// cA atom
+			var atom2 =  _renderedLinks[ 'crosslinks' ][ i ][ 'atom2' ];	// cA atom
+		
+			response += "AtomPair ";
+			response += "CA " + atom1.residue().num() + atom1.residue().chain().name() + " ";
+			response += "CA " + atom2.residue().num() + atom2.residue().chain().name() + " ";
+
+			response += "HARMONIC NUM1 NUM2 NUM3\n";
+		}
+	}
+	
+	if( _renderedLinks[ 'looplinks' ] && _renderedLinks[ 'looplinks' ].length > 0 ) {
+				
+		for( var i = 0; i < _renderedLinks[ 'looplinks' ].length; i++ ) {
+
+			var atom1 =  _renderedLinks[ 'looplinks' ][ i ][ 'atom1' ];	// cA atom
+			var atom2 =  _renderedLinks[ 'looplinks' ][ i ][ 'atom2' ];	// cA atom
+		
+			response += "AtomPair ";
+			response += "CA " + atom1.residue().num() + atom1.residue().chain().name() + " ";
+			response += "CA " + atom2.residue().num() + atom2.residue().chain().name() + " ";
+
+			response += "HARMONIC NUM1 NUM2 NUM3\n";
+		}
+		
+	}
+	
+	if( response == "" ) { return; }
+	
+	downloadStringAsFile( "all-shown-udrs.txt", "text/plain", response );
+};
+
+
 var downloadShownUDRLinks = function() {
 	var response = "";
 	
@@ -3167,6 +3207,7 @@ var redrawDistanceReport = function( ) {
 	
 	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadAllLinkablePositions(0)\">All possible UDRs (all possible points on structure)</a></div>";
 	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadAllLinkablePositions(1)\">All possible UDRs (shortest-only)</a></div>";
+	html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:downloadShownUDRsForRosetta()\">Download Rosetta Constraints File</a></div>";
 	
 	$distanceReportDiv.html( html );
 	
