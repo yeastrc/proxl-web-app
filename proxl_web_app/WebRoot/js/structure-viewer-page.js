@@ -3017,7 +3017,7 @@ var downloadShownUDRsForRosetta = function() {
 	
 	if( response == "" ) { return; }
 	
-	downloadStringAsFile( "all-shown-udrs.txt", "text/plain", response );
+	downloadStringAsFile( "rosetta-constraints.txt", "text/plain", response );
 };
 
 
