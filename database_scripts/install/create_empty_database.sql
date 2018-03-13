@@ -1966,7 +1966,7 @@ CREATE TABLE  url_shortener (
   shortened_url_key VARCHAR(12) NOT NULL,
   auth_user_id INT UNSIGNED NULL,
   date_record_created DATETIME NOT NULL,
-  url VARCHAR(6000) NOT NULL,
+  url MEDIUMTEXT NOT NULL,
   PRIMARY KEY (id, shortened_url_key))
 ENGINE = InnoDB;
 
