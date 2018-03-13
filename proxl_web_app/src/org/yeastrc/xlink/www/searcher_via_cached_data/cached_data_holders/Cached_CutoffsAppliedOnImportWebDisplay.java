@@ -29,7 +29,7 @@ public class Cached_CutoffsAppliedOnImportWebDisplay implements CachedDataCommon
 
 	private static final Logger log = Logger.getLogger( Cached_CutoffsAppliedOnImportWebDisplay.class );
 
-	private static final int CACHE_MAX_SIZE_FULL_SIZE = 400;
+	private static final int CACHE_MAX_SIZE_FULL_SIZE = 1000;
 	private static final int CACHE_MAX_SIZE_SMALL = 10;
 
 	private static final int CACHE_TIMEOUT_FULL_SIZE = 20; // in days
