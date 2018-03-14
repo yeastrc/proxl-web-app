@@ -602,6 +602,7 @@ public class ViewSearchProteinsAction extends Action {
 				try {
 					PeptideQueryJSONRoot peptideQueryJSONRoot = new PeptideQueryJSONRoot();
 					peptideQueryJSONRoot.setCutoffs( proteinQueryJSONRoot.getCutoffs() );
+					peptideQueryJSONRoot.setMinPSMs( proteinQueryJSONRoot.getMinPSMs() );
 					String[] peptidePageLinkTypes = new String[ 1 ];
 					if ( Struts_Config_Parameter_Values_Constants.STRUTS__PARAMETER__CROSSLINK.equals( strutsActionMappingParameter ) ) {
 						peptidePageLinkTypes[ 0 ] = XLinkUtils.CROSS_TYPE_STRING_UPPERCASE; 

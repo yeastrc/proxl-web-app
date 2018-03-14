@@ -135,7 +135,9 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 		}		
 		
 		//  Set Minimum PSM count on page
-		minimumPSM_Count_Filter.saveMinPSMsFilter( { minPSMs : _query_json_field_Contents.minPSMs } );
+		if ( window.minimumPSM_Count_Filter ) {
+			minimumPSM_Count_Filter.saveMinPSMsFilter( { minPSMs : _query_json_field_Contents.minPSMs } );
+		}
 		
 		//  Mark check boxes for chosen links to exclude:  "no unique peptides", "only one PSM", "only one peptide", "remove non-unique PSMs"
 		if ( _query_json_field_Contents.filterNonUniquePeptides ) {
