@@ -14,6 +14,7 @@ import org.yeastrc.xlink.linkable_positions.linkers.BS3;
 import org.yeastrc.xlink.linkable_positions.linkers.BS3_STY;
 import org.yeastrc.xlink.linkable_positions.linkers.DSG;
 import org.yeastrc.xlink.linkable_positions.linkers.DSS;
+import org.yeastrc.xlink.linkable_positions.linkers.DSSO;
 import org.yeastrc.xlink.linkable_positions.linkers.DSS_STY;
 import org.yeastrc.xlink.linkable_positions.linkers.EDC;
 import org.yeastrc.xlink.linkable_positions.linkers.DFDNB;
@@ -34,7 +35,7 @@ public class GetLinkerFactory {
 	public static final String BUILT_IN_LINKER_EDC = "edc";
 	public static final String BUILT_IN_LINKER_DFDNB = "dfdnb";
 	public static final String BUILT_IN_LINKER_SULFO_SMCC = "sulfo-smcc";
-
+	public static final String BUILD_INT_LINKER_DSSO = "dsso";
 	
 	public static final String BUILT_IN_LINKER_BS3_STY = "bs3.sty";
 	public static final String BUILT_IN_LINKER_DSS_STY = "dss.sty";
@@ -51,6 +52,7 @@ public class GetLinkerFactory {
 	private static ILinker LINKER_EDC = new EDC();
 	private static ILinker LINKER_DFDNB = new DFDNB();
 	private static ILinker LINKER_SULFO_SMCC = new SulfoSMCC();
+	private static ILinker LINKER_DSSO = new DSSO();
 
 	private static ILinker LINKER_DSS_STY = new DSS_STY();
 	private static ILinker LINKER_BS3_STY = new BS3_STY();
@@ -68,6 +70,7 @@ public class GetLinkerFactory {
 		linkers.put( BUILT_IN_LINKER_EDC, LINKER_EDC );
 		linkers.put( BUILT_IN_LINKER_DFDNB, LINKER_DFDNB );
 		linkers.put( BUILT_IN_LINKER_SULFO_SMCC, LINKER_SULFO_SMCC);
+		linkers.put( BUILD_INT_LINKER_DSSO, LINKER_DSSO);
 		
 		linkers.put( BUILT_IN_LINKER_BS3_STY, LINKER_BS3_STY );
 		linkers.put( BUILT_IN_LINKER_DSS_STY, LINKER_DSS_STY );
@@ -113,24 +116,4 @@ public class GetLinkerFactory {
 		return linkerAbbrList;
 	}
 	
-//	/**
-//	 * @param linkerAbbrSet
-//	 * @return
-//	 */
-//	public static Collection<IGetLinkablePositions> getLinkablePositionsCodeObjectForLinkerAbbr( Set<String> linkerAbbrSet ) {
-//		
-//		Collection<IGetLinkablePositions> getLinkablePositionsCodeObjects = new ArrayList<>();
-//		
-//		for ( String linkerAbbr : linkerAbbrSet ) {
-//
-//			if ( "dss".equals( linkerAbbr ) ) {
-//
-//				IGetLinkablePositions getLinkablePositions = new GetLinkablePositionsLinkerDSS(); 
-//
-//				getLinkablePositionsCodeObjects.add( getLinkablePositions );
-//			}
-//		}
-//		
-//		return getLinkablePositionsCodeObjects;
-//	}
 }
