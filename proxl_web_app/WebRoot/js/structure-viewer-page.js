@@ -3757,7 +3757,10 @@ var listChains = function( doDraw ) {
 		
 	for( var i = 0; i < chains.length; i++ ) {
 		
-		html = "<div style=\"margin-top:10px;\" id=\"chain-" + chains[ i ].name() + "-div\"><span style=\"font-size:14pt;\">Chain: " + chains[ i ].name() + "</span>\n";
+		var chainDisplayName = chains[ i ].name();
+		if( chainDisplayName === " " ) { chainDisplayName = "Default"; }
+
+		html = "<div style=\"margin-top:10px;\" id=\"chain-" + chains[ i ].name() + "-div\"><span style=\"font-size:14pt;\">Chain: " + chainDisplayName + "</span>\n";
 
 		if( _PDB_FILES[ pdbFile.id ][ 'canEdit' ] ) {
 			if( PDBChainIsProtein( chains[ i ].name() ) ) {
