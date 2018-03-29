@@ -115,6 +115,12 @@ public class PairwiseSequenceAlignmentService {
 			// get sequence for PDB chain
 			PDBFileReader pdbReader = new PDBFileReader();
 			Structure structure = pdbReader.getStructure( new ByteArrayInputStream( pdbFile.getContent().getBytes() ) );
+			
+			if( structure.getChains() != null && structure.getChains().size() == 1 ) {
+				if( structure.getChains().get( 0 ).getChainID().equals( " " ) )
+					structure.getChains().get( 0 ).setChainID( "_" );
+			}
+			
 			String pdbSequence = structure.getChainByPDB( chain ).getAtomSequence();
 			// get sequence for protein protein
 			ProteinSequenceVersionDTO proteinSequenceVersionDTO = ProteinSequenceVersionDAO.getInstance().getFromId( proteinId );

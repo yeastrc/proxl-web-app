@@ -222,11 +222,14 @@ var showAlignment = function( alignment, showSave ) {
 	
 	var proteinNameForProteinId = _proteinNames[ alignment.proteinSequenceVersionId ];
 	
+	var chainDisplayName = alignment.chainId;
+	if( chainDisplayName === "_" ) { chainDisplayName = "Default"; }
+
 	var html = 
 		"<div style=\"margin-top:20px;margin-bottom:20px;font-size:14pt;\">Showing alignment for "
 		+ _proteinNames[ alignment.proteinSequenceVersionId ] 
 		+ " and " 
-		+ pdbFile.name + " (Chain " + alignment.chainId + "):</div>\n"
+		+ pdbFile.name + " (Chain " + chainDisplayName + "):</div>\n"
 	
 	
 	+ "<div style=\"overflow:scroll;\">\n"
@@ -237,7 +240,7 @@ var showAlignment = function( alignment, showSave ) {
 	+ "</tr>"
 	
 	+ "<tr>"
-	+ "<td style=\"white-space:nowrap;font-weight:bold;\">" + pdbFile.name + "(" + alignment.chainId + ")</td>"
+	+ "<td style=\"white-space:nowrap;font-weight:bold;\">" + pdbFile.name + "(" + chainDisplayName + ")</td>"
 	+ "<td style=\"white-space:nowrap;font-size:11pt;font-family:monospace;\">" + alignment.alignedPDBSequence + "</td>"
 	+ "</tr>"
 	+ "</table>"
@@ -283,10 +286,13 @@ var showEditAlignmentOverlay = function( alignment ) {
 	
 	var proteinNameForAlignment  = _proteinNames[ alignment.proteinSequenceVersionId ];
 	
+	var chainDisplayName = alignment.chainId;
+	if( chainDisplayName === "_" ) { chainDisplayName = "Default"; }
+
 	var html = 
 		"<div style=\"margin-top:20px;margin-bottom:20px;font-size:14pt;\">Editing alignment for " 
 		+  proteinNameForAlignment + " and " 
-		+ pdbFile.name + " (Chain " + alignment.chainId + "):</div>\n"
+		+ pdbFile.name + " (Chain " + chainDisplayName + "):</div>\n"
 
 
 		+ "<div>\n"
@@ -304,7 +310,7 @@ var showEditAlignmentOverlay = function( alignment ) {
 		+ "</div>\n"
 
 		+ "<div style=\"margin-top:20px;\">Instructions: Sequence for " + proteinNameForAlignment
-		+ " is on the top and " + pdbFile.name + " (Chain " + alignment.chainId + ") " 
+		+ " is on the top and " + pdbFile.name + " (Chain " + chainDisplayName + ") " 
 		+ " is on the bottom. Replace the text above with a new alignment and click &quot;Save.&quot;</div>";
 
 	

@@ -2266,6 +2266,16 @@ function initViewer() {
 	_VIEWER = createViewer();
 	_STRUCTURE = pv.io.pdb( _PDB_FILE_CONTENT );
 
+	/*
+	 * If the structure has a chain with no name, change its name to _ (underscore)
+	 */
+	if( _STRUCTURE._chains && _STRUCTURE._chains.length == 1 ) {
+		if( _STRUCTURE._chains[ 0 ]._name === " " ) {
+			_STRUCTURE._chains[ 0 ]._name = "_";
+		}
+	}
+
+
 	var proxlOb = { };
 	proxlOb.viewerInitialLoad = 1;
 	
@@ -3758,7 +3768,7 @@ var listChains = function( doDraw ) {
 	for( var i = 0; i < chains.length; i++ ) {
 		
 		var chainDisplayName = chains[ i ].name();
-		if( chainDisplayName === " " ) { chainDisplayName = "Default"; }
+		if( chainDisplayName === "_" ) { chainDisplayName = "Default"; }
 
 		html = "<div style=\"margin-top:10px;\" id=\"chain-" + chains[ i ].name() + "-div\"><span style=\"font-size:14pt;\">Chain: " + chainDisplayName + "</span>\n";
 
