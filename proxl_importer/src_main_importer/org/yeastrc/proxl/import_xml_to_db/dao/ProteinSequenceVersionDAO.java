@@ -87,6 +87,7 @@ public class ProteinSequenceVersionDAO {
 		}
 		if ( smallestId != item.getId() ) {
 			deleteAllButRecordWithId( smallestId, item );
+			item.setId( smallestId );
 		}
 	}
 
