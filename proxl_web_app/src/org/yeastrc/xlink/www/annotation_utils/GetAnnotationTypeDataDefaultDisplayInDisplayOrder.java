@@ -123,7 +123,7 @@ public class GetAnnotationTypeDataDefaultDisplayInDisplayOrder {
 						return 1;  // sort o1 after o2 
 					}
 					if ( o2.getDisplayOrder() == null ) {
-						return 1;  // sort o1 before o2 
+						return -1;  // sort o1 before o2 
 					}
 					return o1.getDisplayOrder() - o2.getDisplayOrder();
 				}
