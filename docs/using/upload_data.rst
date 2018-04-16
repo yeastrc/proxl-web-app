@@ -15,6 +15,7 @@ software, below, to download and learn more about the respective converter.
     * `Crux <https://github.com/yeastrc/proxl-import-crux>`_
     * `pLink 1.x <https://github.com/yeastrc/proxl-import-plink>`_ `pLink 2.x <https://github.com/yeastrc/proxl-import-plink2>`_
     * `StavroX <https://github.com/yeastrc/proxl-import-stavrox>`_
+    * `MetaMorpheus <https://github.com/yeastrc/proxl-import-metamorpheus>`_
     * `xQuest <https://github.com/yeastrc/proxl-import-xquest>`_
 
 If you are using one of the software packages listed above, download the runnable file and
