@@ -27,6 +27,7 @@ the [import documentation](http://proxl-web-app.readthedocs.io/en/latest/using/u
 * [Crux](https://github.com/yeastrc/proxl-import-crux)
 * [pLink 1.x](https://github.com/yeastrc/proxl-import-plink) [pLink 2.x](https://github.com/yeastrc/proxl-import-plink2)
 * [StavroX](https://github.com/yeastrc/proxl-import-stavrox)
+* [MetaMorpheus](https://github.com/yeastrc/proxl-import-metamorpheus)
 * [xQuest](https://github.com/yeastrc/proxl-import-xquest)
 
 Please send any questions, suggestions, or any other feedback to proxl-help@yeastrc.org.
