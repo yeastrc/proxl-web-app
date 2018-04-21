@@ -52,7 +52,7 @@
   </global-forwards>
   
     <action-mappings>
-    
+    	
 		<action path="/qc_Scan_MS1_All_IntensityHeatmapImage"
 				type="org.yeastrc.xlink.www.actions.QC_Scan_MS1_All_IntensityHeatmapImageAction"
 				scope="request"
@@ -169,6 +169,13 @@
 			<forward name="Success" path="/WEB-INF/jsp-pages/listProjects.jsp" redirect="false" />
 			<forward name="Failure" path="/WEB-INF/jsp-pages/listProjects.jsp" redirect="false" />
 		</action>		
+
+		<action path="/projectSearchList"
+				type="org.yeastrc.xlink.www.actions.ProjectsSearchListAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/projectsSearchList.jsp" redirect="false"/>
+		</action>	      
 	      
 		<action path="/viewProject"
 				type="org.yeastrc.xlink.www.actions.ViewProjectAction"
