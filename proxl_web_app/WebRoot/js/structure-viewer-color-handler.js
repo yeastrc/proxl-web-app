@@ -157,7 +157,7 @@ LinkColorHandler.prototype.clearUserColorByLength = function() {
 };
 
 LinkColorHandler.prototype.setUserColorByLengthSingleColor = function( params ) {
-	
+
 	var linkLengthLabel = params.linkLengthLabel;
 	var linkColor = params.linkColor;
 	

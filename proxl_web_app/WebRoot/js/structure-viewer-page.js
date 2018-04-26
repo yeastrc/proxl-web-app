@@ -4722,7 +4722,7 @@ var drawLegend = function() {
 			$legend_by_search_search_id_for_search_X_jq.text( searchId );
 			
 			$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorForBlock );
-			$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, searchIds );
+			$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, projectSearchIds );
 		}
 		
 		if ( _searches.length <= 3 ) {
@@ -4755,7 +4755,7 @@ var drawLegend = function() {
 					$legend_by_search_container_for_search_X.show();
 					$legend_by_search_color_block_for_search_X.css({ "background-color" : colorForBlock } );
 					$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorForBlock );
-					$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, searchIds );
+					$legend_by_search_color_block_for_search_X.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, projectSearchIds );
 
 				}
 			}
@@ -4774,7 +4774,7 @@ var drawLegend = function() {
 				$legend_by_search_container_for_search_1_2_3.show();
 				$legend_by_search_color_block_for_search_1_2_3.css({ "background-color" : colorForBlock } );
 				$legend_by_search_color_block_for_search_1_2_3.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SAVED_BACKGROUND_COLOR, colorForBlock );
-				$legend_by_search_color_block_for_search_1_2_3.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, searchIds );
+				$legend_by_search_color_block_for_search_1_2_3.data( COLOR_BY_SEARCH_COLOR_BLOCK__DATA__SEARCH_IDS, projectSearchIds );
 			}
 		}
 
