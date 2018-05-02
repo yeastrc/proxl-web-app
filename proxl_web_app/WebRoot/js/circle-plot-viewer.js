@@ -154,6 +154,11 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
 		} else if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE ) {
 			
 			segments = _ranges[ pid ];
+
+		} else if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_CUSTOM ) {
+
+			segments = _customRegionManager._customRegionAnnotationData[ pid ];
+			if( segments === undefined ) { segments = [ ]; }
 			
 		} else {
 			console.log( "Error, unknown feature annotation type selected." );
@@ -203,6 +208,12 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
 				
 				toolTipText = 'Sequence coverage segment: start: ' + segment.start + ', end: ' + segment.end;
 				
+			} else if( annoType === SELECT_ELEMENT_ANNOTATION_TYPE_CUSTOM ) {
+
+				color = segment.annotationColor;
+				
+				toolTipText = segment.annotationText;
+
 			}
 			
 			// draw this segment
@@ -1851,7 +1862,7 @@ circlePlotViewer.prototype.getCurvedBarPath = function( startAngle, endAngle){
 /**
  * Get the radii to use for protein bars
  * 
- * @returns { outer: outer radius, inner: inner radius
+ * @returns { outer: outer radius, inner: inner radius }
  */
 circlePlotViewer.prototype.getProteinBarRadii = function() {
 	

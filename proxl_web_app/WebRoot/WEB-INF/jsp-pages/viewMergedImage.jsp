@@ -85,6 +85,7 @@
 
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-legacy-handler.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-index-manager.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-custom-region-manager.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-color-manager.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
 
@@ -120,6 +121,9 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
 		
+				<%--  Color Picker - jQuery Plugin --%>
+		<script type="text/javascript" src="${ contextPath }/js/libs/colorpicker/colorpicker.js"></script>
+		
 		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
 		
@@ -128,6 +132,7 @@
 		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/jquery-ui-1.10.2-Themes/ui-lightness/jquery-ui.min.css">
 		--%>
 		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/lorikeet.css">
+		<link rel="stylesheet" media="screen" type="text/css" href="${ contextPath }/css/libs/colorpicker_custom_colors.css" />
 		
 
 
@@ -352,7 +357,7 @@
 						<select id="annotation_type">
 							<option></option>
 							<option value="sequence_coverage">Sequence Coverage</option>
-							
+							<option value="custom">Custom Regions</option>
 							<c:if test="${ not empty annotation_data_webservice_base_url }">
 							
 								<%-- These require annotation_data_webservice_base_url to be populated --%>
@@ -370,10 +375,7 @@
 							data-tooltip="Reset Proteins highlighting, flipping, positioning, and horizontal scaling"  
 							href="javascript:resetProteins()"  style="font-size:10pt;white-space:nowrap;"
 							>[Reset Proteins]</a>
-						<a class="bar-only tool_tip_attached_jq" data-tooltip="Orients all proteins with N-terminus on left-hand side" style="font-size:10pt;white-space:nowrap;" 
-							href="javascript:resetProteinsReversed()"
-							>[Reset Protein Flipping]</a>
-					
+
 					</span>
 
 					<%--  Keep these next two items together on the same line --%>
@@ -402,6 +404,17 @@
 					  </span>
 					</span>
 
+					<c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" >
+						<span style="white-space:nowrap;" >
+	
+							<a class="tool_tip_attached_jq" 
+								data-tooltip="Manage user-defined protein region annotations--such as marking domains of interest."  
+								href="javascript:" onclick="_customRegionManager.showManagerOverlay()"  style="font-size:10pt;white-space:nowrap;"
+								>[Custom Annotation Manager]</a>
+	
+						</span>
+					</c:if>
+					
 					<%--  Keep these next two items together on the same line --%>
 					
 					<span style="white-space:nowrap;" >
@@ -553,6 +566,110 @@
 	<%--  !!!!!!!!!!    Overlays               !!!!!!!!!! --%>
 
 	<%--  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! --%>
+	
+	
+		<!--  Overlay for custom region manager -->
+	
+			<div id="custom_region_manager_modal_dialog_overlay_background" class="custom_region_manager_modal_dialog_overlay_background" style="display: none;"  >
+			
+			</div>
+	
+		<div id="custom-region-manager-overlay-container" class="custom-region-manager-overlay-container" style="display:none;">
+
+				<div id="custom_region_manager_overlay_header" class="custom-region-manager-overlay-header" style="width:100%; " >
+					<h1 id="custom_region_manager_overlay_X_for_exit_overlay" class="custom-region-manager-overlay-X-for-exit-overlay" >X</h1>
+					<h1 id="custom_region_manager_header_text" class="custom-region-manager-overlay-header-text">
+						Custom Protein Region Manager
+					</h1>
+				</div>
+				
+				
+				<div id="custom_region_manager_left_pane" class="custom-region-manager-left-pane">
+
+					<div style="width:100%;text-align:center;font-weight:bold;font-size:14pt;margin-top:5px;">Select Protein</div>
+
+
+					<div id="custom_region_manager_protein_list" class="custom-region-manager-protein-list">
+					
+					</div>
+
+
+				</div>
+				
+				<div style="font-size:14pt;" id="custom_region_manager_right_pane_empty" class="custom-region-manager-right-pane">
+					<div style="margin:10px;">
+						This tools allows you to define custom protein domain annotations that may optionally appear on the
+						protein bars in the image viewer. These include binding domains, structural motifs, or any other
+						annotation you like.
+						
+						<br><br>
+						
+						These may be viewed by choosing &quot;Custom Regions&quot; in the &quot;Show Feature Annotations&quot; select list.
+						
+						<br><br>
+						
+						Choose a protein to the left to define domains for that protein.
+					</div>
+				</div>
+				
+				
+				<div style="display:none;" id="custom_region_manager_right_pane_protein_selected" class="custom-region-manager-right-pane">
+
+					<div style="width:100%;text-align:center;font-weight:bold;font-size:14pt;margin-top:5px;">Add/Change Annotations</div>
+					
+					<div id="custom_region_manager_error_div" style="margin:5px;display:none;width:350px;color:red;font-size:12pt;border-width:1px;border-color:red;border-style:solid;padding:5px;"></div>
+					<div id="custom_region_manager_info_div" style="margin:5px;display:none;width:350px;color:#7c783c;font-size:12pt;border-width:1px;border-color:#7c783c;border-style:solid;padding:5px;"></div>
+					<div id="custom_region_manager_success_div" style="margin:5px;display:none;width:350px;color:#3f7c3c;font-size:12pt;border-width:1px;border-color:#3f7c3c;border-style:solid;padding:5px;"></div>
+					
+					
+					<!--  Where we'll put the custom annotations for the selected protein -->
+					<div id="custom_region_manager_right_pane_add_domain">
+					
+			
+			 			<div style="margin-top:10px;" id="custom_region_manager_add_domains_list">
+						</div>
+					
+					</div>
+					
+
+				</div>
+				
+
+		</div>
+	
+	
+		<script id="custom_region_manager_region_form_template" type="text/x-handlebars-template">
+			
+						<div style="margin-top:10px;">							
+							<form class="region-input-form" style="font-size:12pt;">
+							
+								Start: <input class="region_form_input" type="text" id="startPosition" size="4" value="{{startPosition}}"/>
+								End: <input class="region_form_input" type="text" id="endPosition" size="4" value="{{endPosition}}"/>
+
+  								{{#if annotationColor}}
+									Color: <span id="custom_region_manager_right_pane_add_domain_color" class="color_picker_box" style="background-color:{{annotationColor}};">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> <span style="font-size:10pt;">(click color)</span>
+  								{{else}}
+									Color: <span id="custom_region_manager_right_pane_add_domain_color" class="color_picker_box" style="background-color:#ff0000;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> <span style="font-size:10pt;">(click color)</span>
+								{{/if}}
+
+								<div style="margin-top:5px;">Annotation: <input id="annotation_text" class="region_form_input" type="text" size="30" maxlength="2000" value="{{annotationText}}"/></div>
+								
+							</form>
+						</div>
+		</script>
+	
+	
+		<script id="custom_region_manager_region_form_buttons" type="text/x-handlebars-template">
+			
+						<div style="margin-top:10px;" id="custom_region_manager_right_pane_form_buttons">
+						 <form>
+							<input id="custom_region_manager_create_new_region_button" type="button" value="+Create New Region" class="tool_tip_attached_jq" data-tooltip="Add custom domain annotation for protein." />
+							<input id="custom_region_manager_save_button" type="button" value="Save to Database" class="tool_tip_attached_jq" data-tooltip="Save changes to database." />
+							<input id="custom_region_manager_cancel_button" type="button" value="Reset" class="tool_tip_attached_jq" data-tooltip="Discard changes." />
+						 </form>
+						 <span style="font-size:10pt;">Regions with no start, end, and annotation will be ignored.</span>
+						</div>
+		</script>
 	
 	
 	

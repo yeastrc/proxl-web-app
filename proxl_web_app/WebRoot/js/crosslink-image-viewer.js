@@ -48,6 +48,7 @@ var SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE = "sequence_coverage";
 //var SELECT_ELEMENT_ANNOTATION_TYPE_DISOPRED2 = "disopred2";
 var SELECT_ELEMENT_ANNOTATION_TYPE_DISOPRED3 = "disopred3";
 var SELECT_ELEMENT_ANNOTATION_TYPE_PSIPRED3 = "psired3";
+var SELECT_ELEMENT_ANNOTATION_TYPE_CUSTOM = "custom";
 
 /**
  * Matches the "value" for the <select id="color_by">
@@ -245,6 +246,7 @@ var hashObjectManager = {
 
 var _imageProteinBarDataManager = ImageProteinBarDataManagerContructor();
 var _indexManager = new indexManager();
+var _customRegionManager = new customRegionManager();
 
 var _linkExclusionDataManager = LinkExclusionDataManagerContructor( { 
 	imageProteinBarDataManager : _imageProteinBarDataManager,
@@ -1386,6 +1388,18 @@ function loadDataAndDraw( doDraw, loadComplete ) {
 		if ( selProtsFrSeqCov.length > 0 ) {
 			return loadSequenceCoverageDataForProtein( selProtsFrSeqCov, doDraw );
 		}
+	} else if ( annotationType === SELECT_ELEMENT_ANNOTATION_TYPE_CUSTOM ) {
+
+		var proteinsToLoad = [];
+		for ( var i = 0; i < selectedProteins.length; i++ ) {
+			var selectedProtein = selectedProteins[ i ];
+			if ( _customRegionManager._customRegionAnnotationData[ selectedProtein ] == undefined ) {
+				proteinsToLoad.push( selectedProtein );
+			}
+		}
+		if ( proteinsToLoad.length > 0 ) {
+			return _customRegionManager.getCustomRegionDataForProteinsViaAjaxForViewerDisplay( proteinsToLoad, doDraw );
+		}
 	} else if ( annotationType !== undefined && annotationType !== "" ) {
 		// load Selected Protein Annotation for visible proteins
 		////////////////////
@@ -2037,15 +2051,6 @@ function getProteinOffset( params ) {
 	var entry = _imageProteinBarDataManager.getItemByIndex( proteinBarIndex );
 	var proteinOffset = entry.getProteinOffset();
 	return proteinOffset;
-}
-
-/**
- * reset all proteinsReversed and redraw
- */
-function resetProteinsReversed() {
-	_imageProteinBarDataManager.clearAllProteinBarsReversed();
-	updateURLHash( false /* useSearchForm */ );
-	drawSvg();
 }
 
 /**
@@ -3190,6 +3195,9 @@ function drawSvg() {
 	if ( annotationType === SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE ) {
 		drawSequenceCoverage( selectedProteins, svgRootSnapSVGObject );
 	}
+	else if ( annotationType === SELECT_ELEMENT_ANNOTATION_TYPE_CUSTOM ) {
+		drawCustomRegions( selectedProteins, svgRootSnapSVGObject );
+	}
 	drawAnnotationData( selectedProteins, svgRootSnapSVGObject );
 	// draw protein bar rectangles
 	var addAllProteinBarGroupsResponse = addAllProteinBarGroups( selectedProteins, svgRootSnapSVGObject, $merged_image_svg_jq );
@@ -3241,6 +3249,71 @@ function drawSvg() {
 	svgRootSnapSVGObject.attr( { width: newWidth } );
 	var newHeightContainingDiv = newHeight + 4;
 	$svg_image_inner_container_div.css( { height : newHeightContainingDiv } );
+}
+
+/**
+ * 
+ */
+function drawCustomRegions( selectedProteins, svgRootSnapSVGObject ) {
+
+	console.log( "drawCustomRegions() called" );
+
+	var isAnyProteinBarsHighlighted = _imageProteinBarDataManager.isAnyProteinBarsHighlighted();
+	for ( var proteinBarRowIndex = 0; proteinBarRowIndex < selectedProteins.length; proteinBarRowIndex++ ) {
+		var protein = selectedProteins[ proteinBarRowIndex ];
+		var segments = _customRegionManager._customRegionAnnotationData[ protein ];
+
+		if ( segments != undefined && segments.length > 0 ) {
+			for ( var k = 0; k < segments.length; k++ ) {
+				var segment = segments[ k ];
+
+				var start = segment.startPosition;
+				var end = segment.endPosition;
+				var blockColor = undefined;
+
+				if ( isAnyProteinBarsHighlighted ) {
+					var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByIndex( proteinBarRowIndex );
+					var isProteinBarHighlightedAnywhereBetweenPositionsParams = {
+							position_1 : start,
+							position_2 : end
+					};
+					if ( ! imageProteinBarDataEntry.isProteinBarHighlightedAnywhereBetweenPositions( isProteinBarHighlightedAnywhereBetweenPositionsParams ) ) {
+						//  The sequence coverage block is outside of any selected regions so set the block color for Unhighlighted
+						blockColor = _NOT_HIGHLIGHTED_LINE_COLOR;
+					}
+				}
+
+				if ( blockColor === undefined ) {
+					blockColor = segment.annotationColor;
+				}
+				var drawAnnotationRectangle_Params = {
+						 protein : protein,
+						 start : start,
+						 end : end,
+						 proteinBarRowIndex : proteinBarRowIndex,
+						 blockColor : blockColor,
+						 svgRootSnapSVGObject : svgRootSnapSVGObject,
+						 fillOpacity : 0.5
+				};
+
+				var rectangleSnapSVGObject = drawAnnotationRectangle( drawAnnotationRectangle_Params );
+				var toolTipText = segment.annotationText;
+				var toolTipParams = {
+						content: {
+							text: toolTipText
+						},
+						position: {
+							target: 'mouse'
+								,
+								adjust: { x: 5, y: 5 } // Offset it slightly from under the mouse
+						}
+				};
+				var rectangleSVGNativeObject = rectangleSnapSVGObject.node;
+				var $rectangleSVGNativeObject = $(rectangleSVGNativeObject);
+				$rectangleSVGNativeObject.qtip( toolTipParams );
+			}
+		}
+	}
 }
 
 /**
@@ -3313,7 +3386,7 @@ function drawSequenceCoverage( selectedProteins, svgRootSnapSVGObject ) {
  */
 function drawAnnotationData( selectedProteins, svgRootSnapSVGObject ) {
 	var annotationType = $("#annotation_type").val();
-	if ( annotationType !== undefined && annotationType !== "" && annotationType !== SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE ) {
+	if ( annotationType !== undefined && annotationType !== "" && annotationType !== SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE && annotationType !== SELECT_ELEMENT_ANNOTATION_TYPE_CUSTOM ) {
 		if ( annotationType === SELECT_ELEMENT_ANNOTATION_TYPE_DISOPRED3 ) {
 			drawDisopred_3_AnnotationData( selectedProteins, svgRootSnapSVGObject );
 		} else if ( annotationType === SELECT_ELEMENT_ANNOTATION_TYPE_PSIPRED3 ) {
@@ -3519,7 +3592,13 @@ function drawAnnotationRectangle( params ) {
 		rectX = rectX - rectWidth;
 	}
 	var rectangleSnapSVGObject = svgRootSnapSVGObject.rect( rectX, rectY, rectWidth, rectHeight );
-	rectangleSnapSVGObject.attr( { fill: blockColor, "fill-opacity": 0.15 } );
+
+	if( params.fillOpacity ) {
+		rectangleSnapSVGObject.attr( { fill: blockColor, "fill-opacity": params.fillOpacity } );
+	} else {
+		rectangleSnapSVGObject.attr( { fill: blockColor, "fill-opacity": 0.15 } );
+	}
+
 	return rectangleSnapSVGObject;
 }
 
@@ -5718,6 +5797,25 @@ function initPage() {
 			throw e;
 		}
 	} );
+
+	$("#custom_region_manager_modal_dialog_overlay_background").click( function( eventObject ) {
+		try {
+			_customRegionManager.closeManagerOverlay();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	} );
+	$("#custom_region_manager_overlay_X_for_exit_overlay").click( function( eventObject ) {
+		try {
+			_customRegionManager.closeManagerOverlay();
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	} );
+
+
 	_proteinBarRegionSelectionsOverlayCode.init();
 	_linkExclusionSelectionsOverlayCode.init();
 	loadDataFromService();

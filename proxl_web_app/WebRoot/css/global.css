@@ -86,7 +86,9 @@ input { font-size:20px;  }
         
 BODY.inset-page, BODY.login-page, BODY.reset-password-page, BODY.reset-password-code-fail-page  { background-color: #FFF8F8 }        
         
-
+body.view-merged-image-page .colorpicker {
+	z-index:21;
+}
         
 
 /* */
@@ -1514,6 +1516,158 @@ div.searches-change-display-order-overlay-user-selected-search:hover { backgroun
 
 
 /* --------------------------------------- */
+
+
+/* --- custom region annotation manager styles --- */
+
+.custom_region_manager_modal_dialog_overlay_background {
+	
+
+	cursor: pointer; /* set mouse to pointer */
+
+	z-index: 18;
+	  
+	background-color: black;
+	opacity: .80;
+	filter: Alpha(Opacity=80);
+
+	  /*  Moved to inline style in header so context is not hard coded
+	background: #666 url(/???context???/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
+	*/
+	/*  
+	opacity: .50;
+	filter: Alpha(Opacity=50);
+	*/
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+
+div.custom-region-manager-overlay-container {
+
+	opacity: 1;
+	filter: Alpha(Opacity=100);
+
+	background-color:white;
+	outline: 0px;
+
+	position: absolute;
+	top: 20px;
+	left: 20px;
+
+	border: 1px;
+	border-style: solid;
+	border-color: #D3D3D3 ;
+
+	display: block;
+	z-index: 20;
+
+	width: 600px;
+	height:400px;
+
+}
+
+.custom-region-manager-overlay-header  { 
+	
+	height: 35px;
+	background-color: #FFF0F0; padding-bottom: 5px;
+
+	border-width: 0px;
+	border-bottom-width: 1px;
+	border-style: solid;
+	border-color: #D3D3D3 ;
+ }
+
+
+.custom-region-manager-left-pane {
+
+	position:absolute;
+	top:45px;
+	left:0px;
+	height: 350px;
+	width:200px;
+	background-color:white;
+	padding-bottom: 5px;
+	float:left;
+	border-width: 0px;
+	border-right-width: 1px;
+	border-style: solid;
+	border-color: #D3D3D3 ;
+	
+	margin:0px;
+}
+
+.custom-region-manager-right-pane {
+	position:absolute;
+	top:45px;
+	left:205px;
+	height: 350px;
+	width:390px;
+	background-color:white;
+	padding-bottom: 5px;
+	float:right;
+	border-width: 0px;
+	margin:0px;
+}
+
+div.custom-region-manager-protein-list {
+	width:100%;
+	height:317px;
+	max-height:317px;
+	margin:0px;
+	margin-top:10px;
+	padding:0px;
+	border-width:0px;
+	overflow: scroll;
+}
+
+div.custom-region-manager-protein-item {
+
+	width:100%;
+	height:30px;
+	line-height:30px;
+	border-width: 0px;
+	border-top-width:1px;
+	border-style: solid;
+	border-color: #D3D3D3;
+	font-size:12pt;
+	text-indent:5px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+div.last-item {
+	border-bottom-width:1px;
+	border-style: solid;
+	border-color: #D3D3D3;
+}
+
+div.custom-region-manager-protein-item:hover {
+	background-color:#A55353;
+	color:white;
+}
+
+div.custom-region-manager-selected-item {
+	background-color:#A55353;
+	color:white;
+}
+
+div#custom_region_manager_right_pane_protein_selected {
+	overflow:scroll;
+}
+
+
+.custom-region-manager-overlay-X-for-exit-overlay { float: right; border-color: #000000; height:33px; background-color: #A55353; color: white;  padding: 3px; margin: 0px;  cursor: pointer;  }
+
+.custom-region-manager-overlay-header-text { color: black; padding: 3px; margin: 0px; text-align: center;  }
+
+.custom-region-manager-overlay-body {  padding: 20px; }
+
+
 
 
 /* -----   Protein Selector  Overlay Div on View Image Page  modal dialog background ----- */
