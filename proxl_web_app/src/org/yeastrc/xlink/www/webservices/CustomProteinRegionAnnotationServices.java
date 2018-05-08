@@ -180,7 +180,6 @@ public class CustomProteinRegionAnnotationServices {
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, httpServletRequest );
 			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-			userId = userSessionObject.getUserDBObject().getAuthUser().getId();
 
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
@@ -201,6 +200,9 @@ public class CustomProteinRegionAnnotationServices {
 						.build()
 						);
 			}
+			
+			userId = userSessionObject.getUserDBObject().getAuthUser().getId();
+
 
 		} catch ( WebApplicationException e ) {
 			throw e;
