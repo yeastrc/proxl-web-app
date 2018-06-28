@@ -100,69 +100,70 @@ public class ProxlXMLFileImportTrackingStatusValuesLookupDAO {
 	
 
 	
-
-	/**
-	 * @param id
-	 * @return 
-	 * @throws Exception
-	 */
-	public ProxlXMLFileImportTrackingStatusValLkupDTO getForId( int id ) throws Exception {
-
-
-		ProxlXMLFileImportTrackingStatusValLkupDTO result = null;
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		final String sql = "SELECT * FROM proxl_xml_file_import_tracking WHERE id = ?";
-		
-		try {
-			
-			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			
-			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, id );
-			
-			rs = pstmt.executeQuery();
-			
-			if ( rs.next() ) {
-				
-				result = populateResultObject( rs );
-			}
-			
-		} catch ( Exception e ) {
-			
-			String msg = "Failed to select ProxlXMLFileImportTrackingStatusValLkupDTO, id: " + id + ", sql: " + sql;
-			
-			log.error( msg, e );
-			
-			throw e;
-			
-
-		} finally {
-			
-			// be sure database handles are closed
-			if( rs != null ) {
-				try { rs.close(); } catch( Throwable t ) { ; }
-				rs = null;
-			}
-			
-			if( pstmt != null ) {
-				try { pstmt.close(); } catch( Throwable t ) { ; }
-				pstmt = null;
-			}
-			
-			if( conn != null ) {
-				try { conn.close(); } catch( Throwable t ) { ; }
-				conn = null;
-			}
-			
-		}
-		
-		return result;
-	}
-	
+//  Unused Code.  May be Incorrect. Validate it if you use it.
+//	
+//	/**
+//	 * @param id
+//	 * @return 
+//	 * @throws Exception
+//	 */
+//	public ProxlXMLFileImportTrackingStatusValLkupDTO getForId( int id ) throws Exception {
+//
+//
+//		ProxlXMLFileImportTrackingStatusValLkupDTO result = null;
+//		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		ResultSet rs = null;
+//		
+//		final String sql = "SELECT * FROM proxl_xml_file_import_tracking_status_values_lookup WHERE id = ?";
+//		
+//		try {
+//			
+//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+//			
+//			pstmt = conn.prepareStatement( sql );
+//			pstmt.setInt( 1, id );
+//			
+//			rs = pstmt.executeQuery();
+//			
+//			if ( rs.next() ) {
+//				
+//				result = populateResultObject( rs );
+//			}
+//			
+//		} catch ( Exception e ) {
+//			
+//			String msg = "Failed to select ProxlXMLFileImportTrackingStatusValLkupDTO, id: " + id + ", sql: " + sql;
+//			
+//			log.error( msg, e );
+//			
+//			throw e;
+//			
+//
+//		} finally {
+//			
+//			// be sure database handles are closed
+//			if( rs != null ) {
+//				try { rs.close(); } catch( Throwable t ) { ; }
+//				rs = null;
+//			}
+//			
+//			if( pstmt != null ) {
+//				try { pstmt.close(); } catch( Throwable t ) { ; }
+//				pstmt = null;
+//			}
+//			
+//			if( conn != null ) {
+//				try { conn.close(); } catch( Throwable t ) { ; }
+//				conn = null;
+//			}
+//			
+//		}
+//		
+//		return result;
+//	}
+//	
 	
 	/**
 	 * @param rs
