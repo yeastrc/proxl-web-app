@@ -91,6 +91,7 @@ INSERT INTO linker(abbr,name)VALUES(
 	'bs3.sty','bis[sulfosuccinimidyl] suberate that includes sty links on one half of the link' );
 INSERT INTO linker(abbr,name)VALUES( 'sulfo-smcc','sulfosuccinimidyl 4-[N-maleimidomethyl]cyclohexane-1-carboxylate');
 INSERT INTO linker(abbr,name)VALUES( 'dsso','disuccinimidyl sulfoxide' );
+INSERT INTO linker (abbr, name) VALUES ('tg','transglutaminase');
 
 --  Insert entries into isotope_label
 
