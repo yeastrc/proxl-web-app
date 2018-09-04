@@ -20,6 +20,7 @@ import org.yeastrc.xlink.linkable_positions.linkers.EDC;
 import org.yeastrc.xlink.linkable_positions.linkers.DFDNB;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 import org.yeastrc.xlink.linkable_positions.linkers.SulfoSMCC;
+import org.yeastrc.xlink.linkable_positions.linkers.Transglutaminase;
 
 public class GetLinkerFactory {
 	
@@ -35,7 +36,10 @@ public class GetLinkerFactory {
 	public static final String BUILT_IN_LINKER_EDC = "edc";
 	public static final String BUILT_IN_LINKER_DFDNB = "dfdnb";
 	public static final String BUILT_IN_LINKER_SULFO_SMCC = "sulfo-smcc";
-	public static final String BUILD_INT_LINKER_DSSO = "dsso";
+	public static final String BUILD_IN_LINKER_DSSO = "dsso";
+	
+	public static final String BUILD_IN_LINKER_TG = "tg";
+	public static final String BUILD_IN_LINKER_transglutaminase = "transglutaminase";
 	
 	public static final String BUILT_IN_LINKER_BS3_STY = "bs3.sty";
 	public static final String BUILT_IN_LINKER_DSS_STY = "dss.sty";
@@ -53,6 +57,7 @@ public class GetLinkerFactory {
 	private static ILinker LINKER_DFDNB = new DFDNB();
 	private static ILinker LINKER_SULFO_SMCC = new SulfoSMCC();
 	private static ILinker LINKER_DSSO = new DSSO();
+	private static ILinker LINKER_TG = new Transglutaminase();
 
 	private static ILinker LINKER_DSS_STY = new DSS_STY();
 	private static ILinker LINKER_BS3_STY = new BS3_STY();
@@ -70,7 +75,10 @@ public class GetLinkerFactory {
 		linkers.put( BUILT_IN_LINKER_EDC, LINKER_EDC );
 		linkers.put( BUILT_IN_LINKER_DFDNB, LINKER_DFDNB );
 		linkers.put( BUILT_IN_LINKER_SULFO_SMCC, LINKER_SULFO_SMCC);
-		linkers.put( BUILD_INT_LINKER_DSSO, LINKER_DSSO);
+		linkers.put( BUILD_IN_LINKER_DSSO, LINKER_DSSO);
+
+		linkers.put( BUILD_IN_LINKER_TG, LINKER_TG );
+		linkers.put( BUILD_IN_LINKER_transglutaminase, LINKER_TG );
 		
 		linkers.put( BUILT_IN_LINKER_BS3_STY, LINKER_BS3_STY );
 		linkers.put( BUILT_IN_LINKER_DSS_STY, LINKER_DSS_STY );
