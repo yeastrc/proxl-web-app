@@ -127,17 +127,30 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 		if( proteinMap.size() < 1 ) {
 			String msg = null;
 			if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
-				msg = "Could not map this peptide and monolink positions to any protein in the Proxl XML file for peptide " 
-					+ peptide.getSequence()
-					+ ", monolink position(s): " + StringUtils.join( peptideMonolinkPositions, ", " )
-					+ " for "
-					 + " linker(s).  reportedPeptide sequence: " + reportedPeptide.getReportedPeptideString();
+
+				List<String> linkersToStringArray = new ArrayList<>( linkerList.size() );
+				for ( ILinker linkerItem : linkerList ) {
+					linkersToStringArray.add(  linkerItem.toString() );
+				}
+				String linkersToString = StringUtils.join( linkersToStringArray, "," );
+				
+				msg = "Could not import this Proxl XML file. Either no protein in the Proxl XML contained this peptide sequence (" 
+						+ peptide.getSequence()
+						+ ") or the linked position(s) reported for the peptide (positions " 
+						+ StringUtils.join( peptideMonolinkPositions, ", " )
+						+ ") was not a linkable position in the matched protein for the given cross-linker(s) (["
+						+ linkersToString
+						+ "]). The whole reported peptide string was: "
+						+ reportedPeptide.getReportedPeptideString()
+						+ "  \n\nThis is most-probably caused by specifying the incorrect cross-linker or the incorrect FASTA file when generating the Proxl XML file.";
 			} else {
-				msg = "Could not map this peptide to any protein in the Proxl XML file for " 
-					+ peptide.getSequence()
-					 + ".  reportedPeptide sequence: " + reportedPeptide.getReportedPeptideString();
+				msg = "Could not import this Proxl XML file. No protein in the Proxl XML contained this peptide sequence (" 
+						+ peptide.getSequence()
+						+ "). The whole reported peptide string was: "
+						+ reportedPeptide.getReportedPeptideString()
+						+ "  \n\nThis is most-probably caused by specifying the incorrect FASTA file when generating the Proxl XML file.";
 			}
-			log.error( "getUnlinkedroteinMappings(...): " + msg );
+			log.error( "getUnlinkedroteinMappings(...): Msg thrown in ProxlImporterDataException: " + msg );
 			throw new ProxlImporterDataException( msg );
 		}
 		///  Data in perPeptideData for Monolinks
