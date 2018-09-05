@@ -8,6 +8,11 @@ import org.yeastrc.xlink.linkable_positions.linkers.AmineLinker;
 public class DSS extends AmineLinker {
 
 	@Override
+	public String toString() {
+		return "DSS";
+	}
+	
+	@Override
 	public double getLinkerLength() {
 		return 11.4;
 	}

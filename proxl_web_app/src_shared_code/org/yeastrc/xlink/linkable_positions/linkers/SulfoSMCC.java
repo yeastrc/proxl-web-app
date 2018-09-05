@@ -13,6 +13,11 @@ import org.yeastrc.xlink.utils.ProteinSequenceUtils;
 public class SulfoSMCC implements ILinker {
 
 	@Override
+	public String toString() {
+		return "Sulfo-SMCC";
+	}
+	
+	@Override
 	public Collection<Integer> getLinkablePositions(String proteinSequence) throws Exception {
 
 		// add in lysines

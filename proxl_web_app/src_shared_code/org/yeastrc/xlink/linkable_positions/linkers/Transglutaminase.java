@@ -8,6 +8,11 @@ import org.yeastrc.xlink.utils.ProteinSequenceUtils;
 public class Transglutaminase implements ILinker {
 
 	@Override
+	public String toString() {
+		return "tg (transglutaminase)";
+	}
+	
+	@Override
 	public Collection<Integer> getLinkablePositions(String proteinSequence) throws Exception {
 		
 		Collection<Integer> linkablePositions = ProteinSequenceUtils.getPositionsOfResidueForProteinSequence( proteinSequence, "K" );

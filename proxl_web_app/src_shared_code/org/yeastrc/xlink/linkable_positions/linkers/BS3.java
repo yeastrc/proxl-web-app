@@ -8,6 +8,11 @@ import org.yeastrc.xlink.linkable_positions.linkers.AmineLinker;
 public class BS3 extends AmineLinker {
 
 	@Override
+	public String toString() {
+		return "BS3";
+	}
+	
+	@Override
 	public double getLinkerLength() {
 		return 11.4;
 	}

@@ -6,6 +6,11 @@ import java.util.HashSet;
 public class DSSO extends AmineLinker {
 
 	@Override
+	public String toString() {
+		return "DSSO";
+	}
+	
+	@Override
 	public double getLinkerLength() {
 		return 10.3;
 	}

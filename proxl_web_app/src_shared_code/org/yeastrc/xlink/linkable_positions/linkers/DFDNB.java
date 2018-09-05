@@ -8,6 +8,11 @@ import org.yeastrc.xlink.linkable_positions.linkers.AmineLinker;
 public class DFDNB extends AmineLinker {
 
 	@Override
+	public String toString() {
+		return "DFDNB";
+	}
+	
+	@Override
 	public double getLinkerLength() {
 		return 3;
 	}

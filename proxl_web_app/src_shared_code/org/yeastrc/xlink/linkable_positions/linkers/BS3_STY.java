@@ -6,6 +6,11 @@ import java.util.HashSet;
 public class BS3_STY extends AmineLinkerSTY {
 
 	@Override
+	public String toString() {
+		return "BS3 (include STY)";
+	}
+	
+	@Override
 	public double getLinkerLength() {
 		return 11.4;
 	}

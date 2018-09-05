@@ -8,6 +8,11 @@ import org.yeastrc.xlink.utils.ProteinSequenceUtils;
 public class EDC implements ILinker {
 
 	@Override
+	public String toString() {
+		return "EDC";
+	}
+	
+	@Override
 	public Collection<Integer> getLinkablePositions(String proteinSequence) throws Exception {
 		
 		Collection<Integer> linkablePositions = ProteinSequenceUtils.getPositionsOfResidueForProteinSequence( proteinSequence, "K" );

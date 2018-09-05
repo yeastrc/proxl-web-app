@@ -13,6 +13,11 @@ import org.yeastrc.xlink.utils.ProteinSequenceUtils;
  */
 public class BMOE implements ILinker {
 
+	@Override
+	public String toString() {
+		return "BMOE";
+	}
+	
 	/**
 	 * Get all theoretically linkable positions (N-terminal residue is position 1)
 	 * in the supplied protein sequence for this crosslinker
