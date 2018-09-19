@@ -900,7 +900,7 @@
 
 			<%--  Public access Management --%>			
 		
-			<div class="top-level-container collapsable_container_jq" >
+			<div id="public_access_data_top_level_container" class="top-level-container collapsable_container_jq" >
 			
 				<div  class="collapsable-link-container top-level-collapsable-link-container collapsable_link_container_jq" style="">
 					<a href="javascript:" id="public_access_collapse_link_jq" class="top-level-collapsable-link " style="display: none;" <%-- collapsable_collapse_link_jq --%>

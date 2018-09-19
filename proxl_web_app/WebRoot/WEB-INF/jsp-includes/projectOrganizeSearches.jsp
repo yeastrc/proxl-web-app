@@ -39,6 +39,7 @@
 		     	style="cursor: move; margin-bottom: 15px; font-weight: bold; font-size: 16px;"
 		     	class="tool_tip_attached_jq" data-tooltip="Drag to move Folder List" 
 		     	>
+		     	<img src="${ contextPath }/images/icon-draggable-small.png" >
 		     	Folder List
 		     </div>
 		     <div class=" outer-item-container clickable folder_display_order_item_jq tool_tip_attached_jq " 
@@ -104,6 +105,12 @@
 	<script id="organize_searches_single_search_template"  type="text/x-handlebars-template">
 	 <%--  include the template text  --%>
 	 <%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_includes/srchDsplyOrderAdmin/srchDsplyOrdrSrchAdminTmpl.jsp" %>
+	</script>
+	
+	<%--  Tooltip for Single Search Entry HTML Template --%>
+	<script id="organize_searches_single_search_tooltip_template"  type="text/x-handlebars-template">
+	 <%--  include the template text  --%>
+	 <%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_includes/srchDsplyOrderAdmin/srchTooltipDsplyOrdrSrchAdminTmpl.jsp" %>
 	</script>
 	
   </div> <%-- Organize searches block   <div id="explore_data_organize_searches_data_block">  --%>

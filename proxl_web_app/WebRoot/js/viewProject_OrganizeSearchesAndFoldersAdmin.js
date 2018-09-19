@@ -153,7 +153,13 @@ var OrganizeSearches = function() {
 	
 	this.startSearchesOrganize = function() {
 		var objectThis = this;
-		$("#explore_data_main_data_block").hide();
+		
+		//  Remove other blocks from project page
+		$("#view_searches_project_admin_div").remove();
+		$("#public_access_data_top_level_container").remove();
+		$("#upload_data_top_level_container").remove();
+		$("#explore_data_main_data_block").remove();
+		
 		$("#organize_searches_data_block").show();
 		
 		var callback = function( params ) {
@@ -357,6 +363,16 @@ var OrganizeSearches = function() {
 			throw Error( '$("#organize_searches_single_search_template").html() === null' );
 		}
 		var organize_searches_single_search_template = Handlebars.compile(organize_searches_single_search_template_html);
+
+		//  Get Search Tooltip Handlebars template and parse it
+		var organize_searches_single_search_tooltip_template_html = $("#organize_searches_single_search_tooltip_template").html();
+		if ( organize_searches_single_search_tooltip_template_html === undefined ) {
+			throw Error( '$("#organize_searches_single_search_tooltip_template").html() === undefined' );
+		}
+		if ( organize_searches_single_search_tooltip_template_html === null ) {
+			throw Error( '$("#organize_searches_single_search_tooltip_template").html() === null' );
+		}
+		var organize_searches_single_search_tooltip_template = Handlebars.compile(organize_searches_single_search_tooltip_template_html);
 		
 		// Reposition the Folder list at the top of the draggable space
 		var $organize_searches_folder_total_block = $("#organize_searches_folder_total_block");
@@ -369,8 +385,21 @@ var OrganizeSearches = function() {
 		for ( var searchDataListIndex = 0; searchDataListIndex < searchesToDisplay.length; searchDataListIndex++ ) {
 			var searchDataEntry = searchesToDisplay[ searchDataListIndex ];
 			var html = organize_searches_single_search_template(searchDataEntry);
-//			var $addedItem = 
-			$( html ).appendTo( $organize_searches_search_entries_block );
+			var $addedItem = 
+				$( html ).appendTo( $organize_searches_search_entries_block );
+			 
+			var tooltipHTML = organize_searches_single_search_tooltip_template( searchDataEntry )
+			
+			$addedItem.qtip( {
+		        content: {
+		            text: tooltipHTML
+		        },
+				position: {
+					target: 'mouse',
+					adjust: { x: 5, y: 5 }, // Offset it slightly from under the mouse
+		            viewport: $(window)
+		         }
+		    });	
 		}
 
 		//   Add Search events and handling	    
@@ -511,8 +540,8 @@ var OrganizeSearches = function() {
 	    $( "#organize_searches_search_entries_block" ).disableSelection();		
 	    
 
-		//  Add tooltips
-		addToolTips( $organize_searches_search_entries_block );
+		//  Add tooltips - Already added above
+		// addToolTips( $organize_searches_search_entries_block );
 
 	};
 	
