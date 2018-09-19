@@ -31,8 +31,7 @@ Containing element: <script id="organize_searches_single_folder_template"  type=
 		  ><img src="${ contextPath }/images/icon-draggable-small.png" class="folder-row-icon"
 		  ></span>
 	 </div >
-     <div class="item-display-name folder_display_name_jq folder_name_jq tool_tip_attached_jq " 
-     	data-tooltip="Click to view searches in this folder"
+     <div class="item-display-name folder_display_name_jq folder_name_jq " 
 	  	>{{name}}</div>
      <div class="edit-delete-icons">
 		<a href="javascript:" class="folder_rename_button_jq tool_tip_attached_jq" 

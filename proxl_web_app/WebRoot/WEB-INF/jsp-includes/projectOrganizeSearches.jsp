@@ -31,7 +31,7 @@
 	 <div style="margin-top: 12px;">
 	  <table  id="organize_searches_folder_searches_table" >
 	   <tr>
-	    <td  id="organize_searches_folder_total_block_container" >
+	    <td  id="organize_searches_folder_total_block_container" style=" width: 400px; min-width: 400px; max-width: 400px;" >
 	     
 	     <div id="organize_searches_folder_total_block">
 		     
@@ -95,12 +95,19 @@
 	 </div>
 	 
 	</div>
+	
 	<%--  Single Folder Entry HTML Template --%>
 	<script id="organize_searches_single_folder_template"  type="text/x-handlebars-template">
 	 <%--  include the template text  --%>
 	 <%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_includes/srchDsplyOrderAdmin/srchDsplyOrdrFoldrAdminTmpl.jsp" %>
 	</script>
-		
+
+	<%--  Single Folder Tooltip Entry HTML Template --%>
+	<script id="organize_searches_single_folder_tooltip_template"  type="text/x-handlebars-template">
+	 <%--  include the template text  --%>
+	 <%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_includes/srchDsplyOrderAdmin/srchDsplyOrdrFoldrTooltipAdminTmpl.jsp" %>
+	</script>
+				
 	<%--  Single Search Entry HTML Template --%>
 	<script id="organize_searches_single_search_template"  type="text/x-handlebars-template">
 	 <%--  include the template text  --%>

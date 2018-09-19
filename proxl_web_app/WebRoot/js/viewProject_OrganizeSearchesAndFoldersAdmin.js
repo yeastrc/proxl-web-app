@@ -35,6 +35,11 @@ var OrganizeSearches = function() {
 		var objectThis = this;
 		$("#organize_searches_button").click(function(eventObject) {
 			try {
+				var $clickThis = $( this );
+				var qtipApi = $clickThis.qtip('api');
+				if ( qtipApi ) {
+					qtipApi.hide(true);
+				}
 				objectThis.startSearchesOrganize();
 				eventObject.stopPropagation();
 			} catch( e ) {
@@ -233,6 +238,16 @@ var OrganizeSearches = function() {
 		var organize_searches_single_folder_template = Handlebars.compile(organize_searches_single_folder_template_html);
 		
 
+		//  Get Folder Tooltip Handlebars template and parse it
+		var organize_searches_single_folder_tooltip_template_html = $("#organize_searches_single_folder_tooltip_template").html();
+		if ( organize_searches_single_folder_tooltip_template_html === undefined ) {
+			throw Error( '$("#organize_searches_single_folder_tooltip_template").html() === undefined' );
+		}
+		if ( organize_searches_single_folder_tooltip_template_html === null ) {
+			throw Error( '$("#organize_searches_single_folder_tooltip_template").html() === null' );
+		}
+		var organize_searches_single_folder_tooltip_template = Handlebars.compile(organize_searches_single_folder_tooltip_template_html);
+		
 		var firstSearchesToDisplay = searchesNotInFoldersList;
 		var folderIndex = null;
 
@@ -272,6 +287,20 @@ var OrganizeSearches = function() {
 				var $folder_display_order_inner_item_jq = $addedItem.find(".folder_display_order_inner_item_jq");
 				$folder_display_order_inner_item_jq.addClass("selected-item");
 			}
+			
+			var $folder_display_name_jq = $addedItem.find(".folder_display_name_jq");
+			
+			var tooltipHTML = organize_searches_single_folder_tooltip_template( folderDataEntry );
+			$folder_display_name_jq.qtip( {
+		        content: {
+		            text: tooltipHTML
+		        },
+				position: {
+					target: 'mouse',
+					adjust: { x: 5, y: 5 }, // Offset it slightly from under the mouse
+		            viewport: $(window)
+		         }
+		    });				
 		}
 		
 		//   Add Folder events and handling 
@@ -390,7 +419,9 @@ var OrganizeSearches = function() {
 			 
 			var tooltipHTML = organize_searches_single_search_tooltip_template( searchDataEntry )
 			
-			$addedItem.qtip( {
+			var $search_display_name_jq = $addedItem.find(".search_display_name_jq");
+			
+			$search_display_name_jq.qtip( {
 		        content: {
 		            text: tooltipHTML
 		        },
@@ -540,8 +571,8 @@ var OrganizeSearches = function() {
 	    $( "#organize_searches_search_entries_block" ).disableSelection();		
 	    
 
-		//  Add tooltips - Already added above
-		// addToolTips( $organize_searches_search_entries_block );
+		//  Add tooltips
+		addToolTips( $organize_searches_search_entries_block );
 
 	};
 	
@@ -601,13 +632,20 @@ var OrganizeSearches = function() {
 		var $searchItem = params.$searchItem; 
 		var $folder_display_order_item_jq_MouseIsOver = params.$folder_display_order_item_jq_MouseIsOver;
 
+		var qtipApi_OnSearchItem = $searchItem.qtip('api');
+		if ( qtipApi_OnSearchItem ) {
+			qtipApi_OnSearchItem.destroy(true);
+		}
+		
 		var $tool_tip_attached_jq_All = $searchItem.find(".tool_tip_attached_jq");
 
 		$tool_tip_attached_jq_All.each( function( index ) {
 			var $tool_tip_attached_jq_One = $( this );
 			// Grab the first element in the $folder_root_jq_One array and access its qTip API
 			var qtipApi = $tool_tip_attached_jq_One.qtip('api');
-			qtipApi.destroy(true);
+			if ( qtipApi ) {
+				qtipApi.destroy(true);
+			}
 		});
 		
 		this.showMovedSearchToFolderMessage( { $searchItem : $searchItem, $folder_display_order_item_jq_MouseIsOver : $folder_display_order_item_jq_MouseIsOver } );
