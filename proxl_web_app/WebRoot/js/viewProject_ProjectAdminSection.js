@@ -1981,6 +1981,21 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 			} else {
 				$invited_person_entry_access_level_remove_button_jq.css({visibility:"hidden"});
 			}
+			
+			if ( adminGlobals.logged_in_user_access_level_owner_or_better ) {
+				var invited_person_entry_resend_invite_email_button_jq = $invited_person_entry.find(".invited_person_entry_resend_invite_email_button_jq");
+				invited_person_entry_resend_invite_email_button_jq.click(function(eventObject) {
+					try {
+						var clickThis = this;
+						resendPersonInviteEmail( { clickThis: clickThis } );
+						return false;
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				});
+			}
+
 		}
 	} else {
 //		var noDataMsg = $("#invited_person_entry_no_data_template_div").html();
@@ -2046,6 +2061,67 @@ var updateInvitedPersonAccessLevelResponse = function(params) {
 		alert("Error Updating invited person access to project");
 	}
 	updateInvitedPeopleCurrentUsersLists();
+};
+
+/////////////////
+var resendPersonInviteEmail = function(params) {
+	var clickThis = params.clickThis;
+	var $clickThis = $(clickThis);
+//	get root div for this invited person entry
+	var $invited_person_entry_root_div_jq = $clickThis.closest(".invited_person_entry_root_div_jq");
+//	var $invited_person_entry_access_level_entry_field_jq = $invited_person_entry_root_div_jq
+//	.find(".current_user_entry_access_level_entry_field_jq");
+//	var invited_person_entry_access_level_entry = $invited_person_entry_access_level_entry_field_jq
+//	.val();
+	var invited_person_entry_user_id = $invited_person_entry_root_div_jq.attr("inviteId");
+	if (adminGlobals.project_id === null) {
+		throw Error( "Unable to find input field for id 'project_id' " );
+	}
+	var _URL = contextPathJSVar + "/services/user/resendInviteEmail";
+	var ajaxParams = {
+			inviteId : invited_person_entry_user_id,
+			projectId : adminGlobals.project_id
+	};
+//	var request =
+	$.ajax({
+		type : "POST",
+		url : _URL,
+		data : ajaxParams,
+		dataType : "json",
+		success : function(data) {
+			try {
+				resendPersonInviteEmailResponse({
+					data : data,
+					clickThis : clickThis
+				});
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		},
+		failure: function(errMsg) {
+			handleAJAXFailure( errMsg );
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+			handleAJAXError(jqXHR, textStatus, errorThrown);
+//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
+//			textStatus: " + textStatus );
+		}
+	});
+};
+
+var resendPersonInviteEmailResponse = function(params) {
+	var data = params.data;
+	if (data.status) {
+//		alert("User access to project updated");
+	} else {
+//		alert("Unable to send email, system error.");
+		var $element = $("#error_message_invite_email_re_send_sytem_error");
+		showErrorMsg( $element );
+	}
+	// No element and no email value $("#invite_user_email_that_was_sent").text( email );
+	var $element = $("#success_message_invite_email_re_sent");
+	showErrorMsg( $element );  //  Used for success messages as well
 };
 
 /////////////////

@@ -24,6 +24,7 @@ import org.yeastrc.auth.services.GenerateInviteCodeSaveInviteRecordService;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.AddNewUserUsingDBTransactionService;
+import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
 import org.yeastrc.xlink.www.dto.ZzUserDataMirrorDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
@@ -45,7 +46,16 @@ import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserAccessLevel;
 
-@Path("/user")
+/**
+ * Search @Path for webservices
+ * 
+ * Current webservices:
+ * 
+ * userInviteService @Path("/invite") 
+ * userResendInviteEmailService  @Path("/resendInviteEmail") 
+ *
+ */
+@Path("/user") // Root Path
 public class UserInviteService {
 	
 	private static final Logger log = Logger.getLogger(UserInviteService.class);
@@ -310,6 +320,7 @@ public class UserInviteService {
 					);
 		}
 	}
+	
 	/**
 	 * @param invitedPersonLastName
 	 * @param invitedPersonAccessLevel
@@ -352,6 +363,7 @@ public class UserInviteService {
 			addExistingUserToProjectUsingProjectId( invitedPersonUserId, invitedPersonAccessLevel, projectAuthShareableObjectId, userInviteResult );
 		}
 	}
+	
 	/**
 	 * @param invitedPersonUserId
 	 * @param invitedPersonAccessLevel
@@ -479,6 +491,7 @@ public class UserInviteService {
 			}
 		}
 	}
+	
 	/**
 	 * @param invitedPersonEmail
 	 * @param request
@@ -518,6 +531,7 @@ public class UserInviteService {
 			userInviteResult.setUnableToSendEmailError(true);
 		}
 	}
+	
 	/**
 	 * @param authUserInviteTrackingDTO
 	 */
@@ -530,6 +544,7 @@ public class UserInviteService {
 			}
 		}
 	}
+	
 	/**
 	 * @param authUserInviteTrackingDTO
 	 * @param userDatabaseRecord
@@ -565,5 +580,178 @@ public class UserInviteService {
 		sendEmailDTO.setEmailSubject( emailSubject );
 		sendEmailDTO.setEmailBody( emailBody );
 		return sendEmailDTO;
+	}
+	
+	/**
+	 * 
+	 *
+	 */
+	public static class ResendInviteEmailResult {
+		
+		private boolean status;
+
+		public boolean isStatus() {
+			return status;
+		}
+
+		public void setStatus(boolean status) {
+			this.status = status;
+		}
+		
+	}
+
+	/**
+	 * Resend Invite Email
+	 * 
+	 * @param inviteIdString
+	 * @param projectIdString
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@POST
+	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/resendInviteEmail") 
+	public ResendInviteEmailResult userResendInviteEmailService(   
+			@FormParam( "inviteId" ) String inviteIdString,
+			@FormParam( "projectId" ) String projectIdString,
+			@Context HttpServletRequest request )
+	throws Exception {
+		
+		ResendInviteEmailResult resendInviteEmailResult = new ResendInviteEmailResult();
+		
+		//  Restricted to users with ACCESS_LEVEL_ASSISTANT_PROJECT_OWNER or better
+
+		Integer projectId = null;
+		if ( StringUtils.isEmpty( projectIdString ) ) {
+			log.warn( "UserInviteService: userResendInviteEmailService():  projectId empty or not populated: " + projectIdString );
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+					.build()
+					);
+		}
+		try {
+			projectId = Integer.parseInt( projectIdString );
+		} catch (Exception e) {
+			log.warn( "UserInviteService: userResendInviteEmailService():  projectId is not valid integer: " + projectIdString, e );
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+					.build()
+					);
+		}
+		Integer inviteTrackingId = null;
+		if ( StringUtils.isEmpty( inviteIdString ) ) {
+			log.warn( "UserInviteService: userResendInviteEmailService():  inviteId empty or not populated: " + inviteIdString );
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+					.build()
+					);
+		}
+		try {
+			inviteTrackingId = Integer.parseInt( inviteIdString );
+		} catch (Exception e) {
+			log.warn( "UserInviteService: userResendInviteEmailService():  inviteId is not valid integer: " + inviteIdString, e );
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+					.build()
+					);
+		}
+		
+		try {
+
+			///////////
+			//  Auth Check for Project:
+
+			// Get the session first.  
+//			HttpSession session = request.getSession();
+			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
+					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			if ( accessAndSetupWebSessionResult.isNoSession() ) {
+				//  No User session 
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+			//  Test access to the project id
+			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			if ( ! authAccessLevel.isAssistantProjectOwnerAllowed() ) {
+				//  No Access Allowed for this project id
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+			AuthUserInviteTrackingDTO authUserInviteTrackingDTO = AuthUserInviteTrackingDAO.getInstance().getForInviteTrackingId( inviteTrackingId );
+			if ( authUserInviteTrackingDTO == null ) {
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+		
+			Integer invitedSharedObjectId = authUserInviteTrackingDTO.getInvitedSharedObjectId();
+			if ( invitedSharedObjectId == null ) {
+				//  For now, reject request to send email for
+				log.warn( "Currently not support re-sending invite email for invite not tied to project" );
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+			ProjectDAO projectDAO = ProjectDAO.getInstance();
+			ProjectDTO projectDTO = projectDAO.getProjectDTOForProjectId( projectId );
+			if ( projectDTO == null ) {
+				log.warn( "projectId is not in database: " + projectId );
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+			if ( projectDTO.getAuthShareableObjectId() != invitedSharedObjectId.intValue() ) {
+				log.warn( "projectDTO.getAuthShareableObjectId() != authUserInviteTrackingDTO.getInvitedSharedObjectId()" );
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+		
+			XLinkUserDTO userDatabaseRecord = userSessionObject.getUserDBObject();
+
+			//  Generate email with invite code
+			// Generate and send the email to the user.
+			try {
+	        	SendEmailDTO sendEmailDTO = createMailMessageToSend( authUserInviteTrackingDTO, userDatabaseRecord, request );
+	        	SendEmail.getInstance().sendEmail( sendEmailDTO );
+	        	resendInviteEmailResult.setStatus(true);
+			}
+			catch (Exception e) {
+				log.error( "UserInviteService: userResendInviteEmailService(...): Exception: inviteIdString: " + inviteIdString, e );
+			}
+			
+			return resendInviteEmailResult;
+		} catch ( WebApplicationException e ) {
+			throw e;
+		} catch ( Exception e ) {
+			String msg = "Exception caught: " + e.toString();
+			log.error( msg, e );
+			throw new WebApplicationException(
+					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
+					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
+					.build()
+					);
+		}
 	}
 }

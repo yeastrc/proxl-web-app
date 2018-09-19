@@ -765,6 +765,24 @@
 							See comment "Current User Template" down just a bit. 
 					
 					  --%>
+										  	<%-- Re-Invite email successfully sent message --%>
+				<div style="position: relative;">
+			  		<div class="success-message-container error_message_container_jq" id="success_message_invite_email_re_sent">
+			  			<div class="success-message-inner-container"  style="width: 800px;">
+			  				<div class="success-message-close-x error_message_close_x_jq">X</div>
+				  			<div class="success-message-text" >Email re-sent inviting them to this project</div>
+					  	</div>
+				  	</div>	  
+	
+				<%-- Re-Invite email NOT successfully sent message --%>
+			  		<div class="error-message-container error_message_container_jq" id="error_message_invite_email_re_send_sytem_error">
+			  		
+			  			<div class="error-message-inner-container" style="width: 400px;">
+			  				<div class="error-message-close-x error_message_close_x_jq">X</div>
+				  			<div class="error-message-text" >Unable to send email, system error.</div>
+			  			</div>
+				  	</div>
+				</div>		
 						
 				 <table border="0" id="invited_people_current_users" width="100%">
 					
@@ -811,9 +829,13 @@
 					<span class="access_level_researcher_jq" style="display: none;">Researcher</span>
 				 </td>
 				 
-			   <td nowrap class="invited-person-invite-date-block" >
-			   	Invited on {{inviteDate}}
+			   <td nowrap class="invited-person-invite-date-block" >Invited on {{inviteDate}} </td> 
+
+			   <td style="padding-left: 20px;" >
+			   	<input type="button" value="Resend Email" class=" submit-button tool_tip_attached_jq invited_person_entry_resend_invite_email_button_jq " 
+			   		data-tooltip="Resend Invite Email"  inviteId="{{inviteId}}">
 			   </td> 
+			   
 			   <td width="100%"></td>
 			  </tr>
 				
@@ -878,6 +900,7 @@
 					<span class="access_level_owner_jq" style="display: none;">Owner</span>		
 					<span class="access_level_researcher_jq" style="display: none;">Researcher</span>
 				 </td>
+				 <td></td> <%-- Invite has button in this <td> --%>
 				 <td width="100%"></td>
 				
 				</tr>
