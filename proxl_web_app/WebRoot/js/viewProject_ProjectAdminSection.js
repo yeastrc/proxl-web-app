@@ -2114,14 +2114,14 @@ var resendPersonInviteEmailResponse = function(params) {
 	var data = params.data;
 	if (data.status) {
 //		alert("User access to project updated");
+		// No element and no email value $("#invite_user_email_that_was_sent").text( email );
+		var $element = $("#success_message_invite_email_re_sent");
+		showErrorMsg( $element );  //  Used for success messages as well
 	} else {
 //		alert("Unable to send email, system error.");
 		var $element = $("#error_message_invite_email_re_send_sytem_error");
 		showErrorMsg( $element );
 	}
-	// No element and no email value $("#invite_user_email_that_was_sent").text( email );
-	var $element = $("#success_message_invite_email_re_sent");
-	showErrorMsg( $element );  //  Used for success messages as well
 };
 
 /////////////////
