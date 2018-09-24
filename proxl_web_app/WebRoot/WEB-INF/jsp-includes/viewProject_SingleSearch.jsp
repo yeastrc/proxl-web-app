@@ -189,7 +189,7 @@
 											href="javascript:"
 												><img src="${ contextPath }/images/icon-delete-small.png"></a>
 									</c:if>
-									<a  target="_blank" download href="<bean:write name="webLink" property="linkUrl" />" 
+									<a  target="_blank" href="<bean:write name="webLink" property="linkUrl" />" 
 										><bean:write name="webLink" property="linkLabel" /></a>
 								</div>
 							</logic:iterate>
