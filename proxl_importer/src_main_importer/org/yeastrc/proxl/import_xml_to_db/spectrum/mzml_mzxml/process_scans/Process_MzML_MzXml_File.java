@@ -29,7 +29,8 @@ import org.yeastrc.proxl.import_xml_to_db.spectrum.spectral_storage_service_inte
 import org.yeastrc.proxl.import_xml_to_db.utils.SHA1SumCalculator;
 
 /**
- * 
+ * Ensure all contents of throw new ProxlImporterDataException(...) 
+ * does not contain the scan filename and path on the file system.
  *
  */
 public class Process_MzML_MzXml_File {
@@ -140,7 +141,7 @@ public class Process_MzML_MzXml_File {
 			}
 
 			mapOfScanNumbersToScanIds =
-					processAllScan( scanFileReader, scanNumbersToLoad, scanFileWithPath, scanFileDTO, newScanFileRecord );
+					processAllScan( scanFileReader, scanNumbersToLoad, scanFileWithPath, scanFileName, scanFileDTO, newScanFileRecord );
 
 			//  Send scan file to Spectral Storage Service for storage, will update proxl.scan_file record with returned API key
 			//         Send after import to Proxl DB to ensure it is valid first and scans match Proxl Input XML file.
@@ -164,10 +165,12 @@ public class Process_MzML_MzXml_File {
 			log.error( msg, e );
 			throw new ProxlImporterInteralException( msg, e );
 		} catch ( Exception e ) {
-			String msg = "Error Exception processing mzML or mzXml Scan file: " + scanFileWithPath.getAbsolutePath()
+			String msg = "Error Exception processing mzML or mzXml Scan file: " 
+					+ scanFileWithPath.getAbsolutePath()
+					+ ", scanFileName (possibly different if uploaded) (reported to user submitting upload): " + scanFileName
 					+ ",  Throwing Data error since probably error in file format.";
 			log.error( msg, e );
-			String msgForException = "Error processing Scan file: " + scanFileWithPath.getAbsolutePath()
+			String msgForException = "Error processing Scan file: " + scanFileName
 					+ ".  Please check the file to ensure it contains the correct contents for a scan file based on the suffix of the file ('mzML' or 'mzXML')";
 			throw new ProxlImporterDataException( msgForException );
 		} finally {
@@ -278,7 +281,9 @@ public class Process_MzML_MzXml_File {
 	 * @return mapOfScanNumbersToScanIds
 	 * @throws Exception
 	 */
-	private Map<Integer,Integer> processAllScan( MzMl_MzXml_FileReader scanFileReader, int[] scanNumbersToLoad, File scanFileWithPath, ScanFileDTO scanFileDTO, boolean newScanFileRecord ) throws Exception {
+	private Map<Integer,Integer> processAllScan(
+			MzMl_MzXml_FileReader scanFileReader, int[] scanNumbersToLoad, File scanFileWithPath, String scanFileName_ForErrorMessages, 
+			ScanFileDTO scanFileDTO, boolean newScanFileRecord ) throws Exception {
 		
 		Map<Integer,Integer> mapOfScanNumbersToScanIds = new HashMap<>();
 		boolean[] insertedScanNumberAtIndex = null;
@@ -371,10 +376,13 @@ public class Process_MzML_MzXml_File {
 //			log.error( msg, e );
 //			throw new ProxlImporterInteralException( msg, e );
 		} catch ( Exception e ) {
-			String msg = "Error Exception processing mzML or mzXml Scan file: " + scanFileWithPath.getAbsolutePath()
+			String msg = "Error Exception processing mzML or mzXml Scan file: " 
+					+ scanFileWithPath.getAbsolutePath()
+					+ ", scanFileName (possibly different if uploaded) (reported to user submitting upload): " + scanFileName_ForErrorMessages
+					+ scanFileName_ForErrorMessages
 					+ ",  Throwing Data error since probably error in file format.";
 			log.error( msg, e );
-			String msgForException = "Error processing Scan file: " + scanFileWithPath.getAbsolutePath()
+			String msgForException = "Error processing Scan file: " + scanFileName_ForErrorMessages
 					+ ".  Please check the file to ensure it contains the correct contents for "
 					+ "a scan file based on the suffix of the file ('mzML' or 'mzXML')";
 			throw new ProxlImporterDataException( msgForException );
@@ -395,11 +403,17 @@ public class Process_MzML_MzXml_File {
 			}
 			if ( scanNumbersNotInsertedSB != null ) {
 				String scanNumbersNotInserted = scanNumbersNotInsertedSB.toString();
-				String msg = "ERROR: For Scan File: " + scanFileReader.getFileName()
+				String msg = "Error Exception processing mzML or mzXml Scan file: " 
+						+ scanFileWithPath.getAbsolutePath()
+						+ ", scanFileName (possibly different if uploaded) (reported to user submitting upload): " + scanFileName_ForErrorMessages
+						+ scanFileName_ForErrorMessages
 						+ ", the following scan numbers were in the main import XML file but not in the scan file: "
 						+ scanNumbersNotInserted;
 				log.error( msg );
-				throw new ProxlImporterDataException(msg);
+				String msgForException = "Error processing Scan file: " + scanFileName_ForErrorMessages
+						+ ", the following scan numbers were in the main import XML file but not in the scan file: "
+						+ scanNumbersNotInserted;
+				throw new ProxlImporterDataException(msgForException);
 			}
 		}
 		if ( log.isInfoEnabled() ) {
