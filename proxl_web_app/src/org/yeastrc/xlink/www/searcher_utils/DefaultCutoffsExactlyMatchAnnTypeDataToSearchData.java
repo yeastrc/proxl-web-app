@@ -94,9 +94,14 @@ public class DefaultCutoffsExactlyMatchAnnTypeDataToSearchData {
 		}
 		//  Process the cutoffs, ensure that ALL are default and all default in Annotation types is in the cutoffs
 		for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesAnnotationLevel : cutoffValuesList ) {
+			Integer annotationTypeId_In_searcherCutoffValuesAnnotationLevel = searcherCutoffValuesAnnotationLevel.getAnnotationTypeId();
 			//  Safe to do .remove(...) since this is a copy Map
-			AnnotationTypeDTO annotationTypeDTOWithDefaultValue = filterableAnnotationTypesWithDefaultValues.remove( searcherCutoffValuesAnnotationLevel.getAnnotationTypeId() );
-			if ( annotationTypeDTOWithDefaultValue != null ) { // Have ann type with default so make comparison
+			AnnotationTypeDTO annotationTypeDTOWithDefaultValue = filterableAnnotationTypesWithDefaultValues.remove( annotationTypeId_In_searcherCutoffValuesAnnotationLevel );
+			if ( annotationTypeDTOWithDefaultValue == null ) { 
+				// Cutoff is not in default list so return false;
+//				return false; //  EARLY EXIT
+			} else {
+				// Have ann type with default so make comparison
 				if ( annotationTypeDTOWithDefaultValue.getAnnotationTypeFilterableDTO().getDefaultFilterValueAtDatabaseLoad() == null ) {
 					// Found a default ann type and the default value on database load is null so cannot match user input cutoff
 					//       (This property being null at this point is not normal database value)
