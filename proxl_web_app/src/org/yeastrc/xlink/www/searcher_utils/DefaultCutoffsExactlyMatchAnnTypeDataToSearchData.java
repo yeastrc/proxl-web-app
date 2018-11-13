@@ -99,7 +99,7 @@ public class DefaultCutoffsExactlyMatchAnnTypeDataToSearchData {
 			AnnotationTypeDTO annotationTypeDTOWithDefaultValue = filterableAnnotationTypesWithDefaultValues.remove( annotationTypeId_In_searcherCutoffValuesAnnotationLevel );
 			if ( annotationTypeDTOWithDefaultValue == null ) { 
 				// Cutoff is not in default list so return false;
-//				return false; //  EARLY EXIT
+				return false; //  EARLY EXIT
 			} else {
 				// Have ann type with default so make comparison
 				if ( annotationTypeDTOWithDefaultValue.getAnnotationTypeFilterableDTO().getDefaultFilterValueAtDatabaseLoad() == null ) {
