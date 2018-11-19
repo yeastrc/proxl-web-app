@@ -4,3 +4,6 @@
 /.settings/
 .classpath
 .project
+
+aa_ant_buildWar_CopyToTomcat.settings.properties
+

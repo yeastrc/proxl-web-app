@@ -1,0 +1,13 @@
+
+# Make a copy named:  aa_ant_buildWar_CopyToTomcat.settings.properties
+
+#   and update the properties below
+
+#  Input to Ant script: ant_buildWar_CopyToTomcat.xml
+
+gradle.wrapper.executable=/opt/gradle/gradle-4.5/bin/gradle
+
+
+tomcat.webapps.root=/data/web_tools/Tomcat_8.0_Port_8080/webapps
+
+proxl.context=proxl
