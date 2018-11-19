@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Proxl Submit Import pgm: Create Runnable Jar for Jar-in-Jar Loader">
+
+	<property name="input_submit_import_zip_filename" value="proxl_submit_import.zip" />
+
+<!--
+	<property name="input_importer_zip_file_dir" value="/data/code_checkouts/Bitbucket_New/Yeastrc/Emozi_Project/Emozi_Main_Incubating/GIT_CLONE/emozi-main-incubating/importer/build/distributions" />
+
+-->
+	<property name="jar.main.class" value="org.yeastrc.proxl.import_xml_to_db_submit_pgm.program.SubmitProxlImportProgram" />
+
+	<property name="output_runnable_jar" value="submitProxlXMLImport.jar"/>
+
+    <property name="expand_zip" value="expand_zip" />
+    <property name="expand_zip_jars_dir" value="${expand_zip}/proxl_submit_import/lib" />
+
+<!--
+    <property name="jar_db_config_file_dir" value="jar_db_config_file" />
+    <property name="db_config_file_jar_filename" value="db_config_file_jar.jar" />
+-->
+
+    <property name="deploy" value="deploy" />
+
+  <target name="unzip_import_file" >
+
+<!--
+	<copy overwrite="true" file="${input_importer_zip_file_dir}/${input_submit_import_zip_filename}"  todir="Importer_Zip_File_From_Build_Goes_Here" />
+-->	
+    <unzip 
+	src="../build/distributions/${input_submit_import_zip_filename}"
+	dest="${expand_zip}"
+	/>
+  </target>
+
+<!--
+  <target name="jar_db_config_file" >
+	<jar destfile="${jar_db_config_file_dir}/${db_config_file_jar_filename}" basedir="db_connection_file" />
+
+  </target>
+-->	
+
+    <target name="create_run_jar"  depends="clean,unzip_import_file"> <!-- ,jar_db_config_file -->
+    	
+    	<!-- Add the jars in the 'expand_zip/proxl_submit_import/lib' folder to the class path   -->
+    	
+		<path id="build.classpath">
+		  <fileset dir="${expand_zip_jars_dir}">
+		    <include name="**/*.jar" />
+		  </fileset>
+		</path>
+
+		<!-- convert classpath to a flat list/string for use in manifest task -->
+		<pathconvert property="jars.classpath" pathsep=" ">
+		    <path refid="build.classpath" />
+		    <flattenmapper />
+		</pathconvert>
+
+    	<property name="final.classpath" value="./ ${jars.classpath} "/> <!-- ${db_config_file_jar_filename}  -->
+    	
+    	
+		<echo >Classpath for runnable jar ${final.classpath}</echo>
+    	
+    	
+        <jar destfile="deploy/${output_runnable_jar}">
+
+    	
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" 
+                		value="${jar.main.class}"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="${final.classpath}"/>
+
+<!--
+            	<attribute name="GIT-last-tag-commit-hash" value="${git.last.tag.and.commit.hash}"/>
+            	<attribute name="GIT-commit-hash" value="${git.last.commit.hash}"/>
+    			
+				<attribute name="Date" value="${build-info.current-date}" />
+				<attribute name="Time" value="${build-info.current-time}" />
+-->
+            </manifest>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <zipfileset dir="${expand_zip_jars_dir}" />
+<!--
+            <zipfileset dir="${jar_db_config_file_dir}" />
+-->
+        </jar>
+
+<!--
+	<copy overwrite="true" file="deploy/${output_runnable_jar}"  todir=".." />
+-->	
+    </target>
+	
+
+
+	
+	<!-- ================================================================================== -->
+	<!-- Clean the build directory -->
+	<!-- ================================================================================== -->
+    <target name="clean" description="Prepare for clean build">
+
+      <delete dir="${deploy}" />
+      <mkdir  dir="${deploy}"/>
+
+    	<delete dir="${expand_zip}"/>
+    	<mkdir  dir="${expand_zip}"/>
+
+<!--
+    	<delete dir="${jar_db_config_file_dir}"/>
+    	<mkdir  dir="${jar_db_config_file_dir}"/>
+-->
+    </target>
+	
+			
+</project>
+

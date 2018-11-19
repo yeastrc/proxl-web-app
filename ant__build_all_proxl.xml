@@ -14,46 +14,37 @@
 	  -->
 
 
-	<!-- init depends on nothing -->
-	<target name="init">
-		<tstamp />
+	<property name="config_file" value="aa_ant__build_all_proxl_config.properties" />
+	
+	<property name="config_file_with_path" 
+		value="${config_file}"/>
 
-		<!-- name of jar or whatever that is copied to deploy -->
+	<echo>Using Config file ${config_file_with_path}</echo>
+	
+	<fail message="ERROR: '${config_file}' file not found, check the path. filename with path: ${config_file_with_path}">
+		<condition>
+		    <not>
+		    	<available file="${config_file_with_path}" />
+		    </not>
+		</condition>
+	</fail>
+	
+	<echo>config_file_with_path: ${config_file_with_path}</echo>
+	
+	<!-- This does not fail if the file is not found -->
+	<property file="${config_file_with_path}" />
+	
+	<echo>gradle.wrapper.executable: ${gradle.wrapper.executable}</echo>
+	
 
-		<!-- Properties -->
-
-		
-	</target>
-
-	<!--   Not in any 'target'  -->
-		
-		<tstamp prefix="build-info">
-			<format property="current-date" pattern="d-MMMM-yyyy" locale="en" />
-			<format property="current-time" pattern="hh:mm:ss a z" locale="en" />
-			<format property="year-month-day" pattern="yyyy-MM-dd" locale="en" />
-		</tstamp>
-		
-
-	<!-- Clean depends on init -->
-	<target name="clean" depends="init">
+	<!--  -->
+	<target name="clean" >
 		<delete dir="deploy" />
-		<delete dir="generated_jars" />
-		<delete dir="create_installables_work_dir" />
-
-		<ant dir="proxl_importer" antfile="ant__create_runnable_jar_main_importer.xml" target="clean" />
-		<ant dir="proxl_importer" antfile="ant__create_runnable_jar_run_importer.xml" target="clean" />
-		
-		<ant dir="proxl_submit_import" antfile="ant__create_runnable_jar_submit_import.xml" target="clean" />
-		<ant dir="proxl_web_app" antfile="ant_build_webapp_war.xml" target="clean" />
-
 	</target>
-
-
 
 	<!-- Prepare depends on clean -->
 	<target name="prepare" depends="clean">
 		<mkdir dir="deploy" />
-		<mkdir dir="create_installables_work_dir" />
 	</target>
 
 	<!--
@@ -62,11 +53,39 @@
 	 -->
 	<target name="compileAllSubmodules" depends="prepare">
 
-		<ant dir="proxl_importer" antfile="ant__create_runnable_jar_main_importer.xml" />
-		<ant dir="proxl_importer" antfile="ant__create_runnable_jar_run_importer.xml" />
+		<!--  Build submodules and create runnable jars -->
+
+		<!--  web app  -->		
+		<exec executable="${gradle.wrapper.executable}" dir="proxl_web_app" failonerror="true" >
+			<arg value="build" />
+			<!--   <arg value="XXXX" /> -->
+		</exec>
+
+		<!--  importer  -->		
+		<exec executable="${gradle.wrapper.executable}" dir="proxl_importer" failonerror="true" >
+			<arg value="build" />
+			<!--   <arg value="XXXX" /> -->
+		</exec>
+		<!--  importer executable jar -->		
+		<ant dir="proxl_importer/build_runnable_jar" antfile="ant__create_runnable_jar_importer.xml" />
+
+		<!-- run importer  -->		
+		<exec executable="${gradle.wrapper.executable}" dir="proxl_run_importer" failonerror="true" >
+			<arg value="build" />
+			<!--   <arg value="XXXX" /> -->
+		</exec>
+		<!-- run importer executable jar -->		
+		<ant dir="proxl_run_importer/build_runnable_jar" antfile="ant__create_runnable_jar_run_importer.xml" />
 		
-		<ant dir="proxl_submit_import" antfile="ant__create_runnable_jar_submit_import.xml" />
-		<ant dir="proxl_web_app" antfile="ant_build_webapp_war.xml" />
+		<!-- submit import  -->		
+		<exec executable="${gradle.wrapper.executable}" dir="proxl_submit_import" failonerror="true" >
+			<arg value="build" />
+			<!--   <arg value="XXXX" /> -->
+		</exec>
+		<!-- submit import executable jar -->		
+		<ant dir="proxl_submit_import/build_runnable_jar" antfile="ant__create_runnable_jar_submit_import.xml" />
+		
+		
 	</target>
 	
 
@@ -76,10 +95,10 @@
 	<target name="createInstallables" depends="compileAllSubmodules">
 
 		<!-- copy files from subdir 'deploy' to deploy -->
-		<copy file="proxl_web_app/deploy/proxl.war" todir="deploy" />
-		<copy file="proxl_importer/deploy/importProxlXML.jar" todir="deploy" />
-		<copy file="proxl_importer/deploy_run_importer/runImportProxlXML.jar" todir="deploy" />
-		<copy file="proxl_submit_import/deploy/submitProxlXMLImport.jar" todir="deploy" />
+		<copy file="proxl_web_app/build/libs/proxl.war" todir="deploy" />
+		<copy file="proxl_importer/build_runnable_jar/deploy/importProxlXML.jar" todir="deploy" />
+		<copy file="proxl_run_importer/build_runnable_jar/deploy/runImportProxlXML.jar" todir="deploy" />
+		<copy file="proxl_submit_import/build_runnable_jar/deploy/submitProxlXMLImport.jar" todir="deploy" />
 		
 	</target>
 	

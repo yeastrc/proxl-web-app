@@ -1,0 +1,161 @@
+/*
+ * Web App
+ *
+ * This build file was Copied from https://spring.io/guides/gs/serving-web-content/.
+ *
+ */
+
+plugins {
+	id 'java'
+	id 'war'
+	id 'eclipse'
+//	id "org.springframework.boot" version "2.0.1.RELEASE"
+//	id "io.spring.dependency-management" version "1.0.5.RELEASE"
+}
+
+repositories {
+	jcenter()
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8     //  defaults to currently installed JVM
+// targetCompatibility = 1.8  //  defaults to sourceCompatibility
+
+configurations.all {
+//  Need all these excludes if using Spring Boot
+	//  Exclude default logger for Spring Boot 'logback'
+//   exclude group:"ch.qos.logback", module:"logback-core"
+//   exclude group:"ch.qos.logback", module:"logback-classic"
+   	//  Exclude Routing of log4j to slf4j since using opposite (slf4j to log4j) and including this would create a circular reference
+//   exclude group:'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+//   exclude group:'org.apache.logging.log4j', module: 'log4j-api'
+}
+
+dependencies {
+
+//  Specify dependency on Proxl Shared Code
+	
+	compile project(":proxl-shared-code")
+	
+//  Specify dependency on proxl_submit_import_client_connector to get Webservice Request and Response Java Classes
+	
+	// compile project(":proxl_submit_import_client_connector")
+	
+	
+	//  Mail
+	
+	// https://mvnrepository.com/artifact/javax.mail/mail
+	// compile group: 'javax.mail', name: 'mail', version: '1.4.1'
+	
+	//  Later versions like this have license CDDL and GPL
+	// https://mvnrepository.com/artifact/javax.mail/javax.mail-api
+//	compile group: 'javax.mail', name: 'javax.mail-api', version: '1.6.1'
+	
+	// https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
+	// compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.2.0'
+	
+	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
+//	compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.45'
+	
+	//  Logging Log4j Version 2 ( Proxl Currently uses Log4J Version 1 )
+	
+//	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.0'
+//	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.0'	
+//	compile group: 'org.apache.logging.log4j', name: 'log4j-web', version: '2.11.0' //  Needed for Web app
+	
+	// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
+//	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.11.0'
+	
+	//  Jakarta Commons Logging to SLF4J
+//	compile group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
+	
+	//  Log4j 1 to 2 bridge
+//	compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.2'
+		
+	
+	
+	//  redirects log4j to slf4j, the opposite of how logging is set up
+	// https://mvnrepository.com/artifact/org.slf4j/log4j-over-slf4j
+//	compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.25'
+	
+		
+	// Used by included yeastrc jars
+	// https://mvnrepository.com/artifact/com.google.guava/guava
+//	compile group: 'com.google.guava', name: 'guava', version: '24.0-jre'
+	
+	
+	//  compile('javax.servlet:jstl')
+	
+	//  moved
+	// https://mvnrepository.com/artifact/javax.servlet.jsp.jstl/javax.servlet.jsp.jstl-api
+	compile group: 'javax.servlet.jsp.jstl', name: 'javax.servlet.jsp.jstl-api', version: '1.2.2'
+	
+	
+	
+	//   Apache Commons
+	
+	//  Old StringUtils
+	// https://mvnrepository.com/artifact/commons-lang/commons-lang
+	// compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+	
+	//  New StringUtils
+	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+	// compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+	
+	// https://mvnrepository.com/artifact/commons-io/commons-io
+	// compile group: 'commons-io', name: 'commons-io', version: '2.6'
+	
+	//  Other Proxl Jars
+		
+	//  Jars built from other Proxl Github repositories
+	compile fileTree(dir: '../libs_proxl_github_jars', include: ['*.jar'])
+	
+	//  Other Yeastrc Jars
+	
+	//  Jars built from other Yeastrc Github repositories
+	compile fileTree(dir: '../libs_yeastrc_github_jars', include: ['*.jar'])
+
+	//  Jars built from other Yeastrc Github repositories - Webapp only	
+	compile fileTree(dir: 'libs_webapp__yeastrc_github_jars', include: ['*.jar'])
+	
+	
+	//  Other Jars - Webapp only	
+	
+	compile fileTree(dir: 'libs_webapp__other', include: ['*.jar'])
+	
+	
+	
+    // https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-core
+    providedCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '8.5.29'
+
+	//  
+	// https://mvnrepository.com/artifact/javax.servlet/servlet-api
+	providedCompile group: 'javax.servlet', name: 'servlet-api', version: '2.5'
+	
+	//  Most current servlet spec:
+	// providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
+	
+	// https://mvnrepository.com/artifact/javax.servlet.jsp/javax.servlet.jsp-api
+	providedCompile group: 'javax.servlet.jsp', name: 'javax.servlet.jsp-api', version: '2.3.3'
+	
+    // compile('org.springframework.boot:spring-boot-starter-web')
+	
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
+	// compile group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '2.0.0.RELEASE'
+    
+	// https://mvnrepository.com/artifact/org.springframework/spring-jdbc
+	// compile group: 'org.springframework', name: 'spring-jdbc', version: '5.0.4.RELEASE'
+    
+    //  Mark provided since creating a war
+	// providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
+	
+	// testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+/*
+	Before the Gradle WAR processing creates the war, it runs task ':front_end:frontEndBuild'
+	to build the front end.
+*/
+// processResources.dependsOn 'front_end:frontEndBuild'
+
+

@@ -1,0 +1,13 @@
+
+#  Copy to filename  aa_ant__build_all_proxl_config.properties
+
+#   and update the properties below
+
+#  Configuration for ant__build_all_proxl.xml
+
+#  Path to gradle executable
+
+gradle.wrapper.executable=
+
+# possible Linux path (depending on version)
+# gradle.wrapper.executable=/opt/gradle/gradle-4.5/bin/gradle
