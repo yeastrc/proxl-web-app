@@ -36,7 +36,7 @@
 	<echo>gradle.wrapper.executable: ${gradle.wrapper.executable}</echo>
 	
 	<echo>tomcat.webapps.root: ${tomcat.webapps.root}</echo>
-	<echo>limelight.context: ${limelight.context}</echo>
+	<echo>proxl.context: ${proxl.context}</echo>
 
 	<target name="built-copy-war" description="">
 		
