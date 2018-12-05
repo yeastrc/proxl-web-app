@@ -237,6 +237,8 @@ var QCMergedPageChartScanFileStatistics = function() {
 	this.loadScanStatistics = function( params ) {
 		var objectThis = this;
 
+		_chart_isLoaded = _IS_LOADED_LOADING;
+		
 		var hash_json_field_Contents_JSONString = JSON.stringify( _get_hash_json_Contents() );
 		var ajaxRequestData = {
 				project_search_id : _project_search_ids,
@@ -439,6 +441,8 @@ var QCMergedPageChartScanFileStatistics = function() {
 		var $scan_file_overall_statistics_block = $("#scan_file_overall_statistics_block");
 		
 		var dataForTable = { perSearchDataList : displayPerSearchList, searchCountPlusOne : searchCountPlusOne };
+		
+		$scan_file_overall_statistics_block.empty();
 		
 		var html = _handlebarsTemplate_scan_file_overall_statistics_template( dataForTable );
 //		var $psm_block_template = 
