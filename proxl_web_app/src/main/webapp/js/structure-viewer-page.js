@@ -4061,16 +4061,16 @@ var drawCrosslinks = function( proteins ) {
 						// only consider links to the same position in the same protein if the protein appears multiple times in the structure
 						if( toPosition == fromPosition ) {
 						
-							/*
+
 							if( countCrosslinkToSelfAsUDR( protein1 ) ) {
 								console.log( "Drawing " + protein1 + " (" + toPosition + ") to " + protein1 + " (" + toPosition + ") -- protein appears more than once in structure." );								
 							} else {
 								console.log( "NOT drawing " + protein1 + " (" + toPosition + ") to " + protein1 + " (" + toPosition + ") -- protein appears once in structure." );								
 								continue;
 							}
-							*/
+
 							
-							continue;		// never draw links from same position in protein to itself
+							//continue;		// never draw links from same position in protein to itself
 							
 						}
 					}
