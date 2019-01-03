@@ -156,6 +156,40 @@ dependencies {
 	Before the Gradle WAR processing creates the war, it runs task ':front_end:frontEndBuild'
 	to build the front end.
 */
-// processResources.dependsOn 'front_end:frontEndBuild'
+processResources.dependsOn 'front_end:frontEndBuild'
 
 
+
+
+
+/*
+ * Before the Gradle WAR processing creates the war, it deletes the output .war file to ensure it is always re-created 
+ */
+processResources.dependsOn 'deleteExistingBuiltWar'
+
+
+/*
+ * Before the Gradle WAR processing creates the war, it deletes the output .war file to ensure it is always re-created 
+ */
+
+task deleteExistingBuiltWar(type: GradleBuild) {
+  	
+  	println("Webapp Gradle build deleteExistingBuiltWar called - Before WAR created. Deletes the output .war file to ensure it is always re-created")
+  	
+	  	
+	//  from file settings.gradle
+	
+	//  Generated war name
+	//  rootProject.name = 'proxl' // value may be different, see file settings.gradle
+	  	
+  	println("project.name: ${project.name}")
+  	println("rootProject.name: ${rootProject.name}")
+  	
+  	String warFilename = "${rootProject.name}.war"
+  	
+  	String warFileInBuildLibs = "build/libs/" + warFilename
+  	
+  	println("Deleting the output .war file " + warFileInBuildLibs )
+  	  
+	delete warFileInBuildLibs
+}
