@@ -17,7 +17,7 @@ var globalVars = {
 };
 
 ///////////////////
-var createAccountFormSubmit = function() {
+window.createAccountFormSubmit = function() {
 	try {
 		var requestData = createAccountGetFormDataAndValidate();
 		if ( requestData === null ) {  //  Error in form data so exit
@@ -40,7 +40,7 @@ var createAccountFormSubmit = function() {
 
 
 ///////////////////
-var createAccountGetFormDataAndValidate = function() {
+window.createAccountGetFormDataAndValidate = function() {
 
 	try {
 		hideAllErrorMessages();
@@ -137,7 +137,7 @@ var createAccountGetFormDataAndValidate = function() {
 
 
 //////////////////////
-var createAccount = function() {
+window.createAccount = function() {
 	try {
 
 		var requestData = createAccountGetFormDataAndValidate();
@@ -176,7 +176,7 @@ var createAccount = function() {
 	}
 };
 
-var createAccountComplete = function( params ) {
+window.createAccountComplete = function( params ) {
 	var requestData = params.requestData;
 	var responseData = params.responseData;
 	
@@ -224,7 +224,7 @@ var createAccountComplete = function( params ) {
 //	////////////
 //	
 //	
-//	function showErrorMsg( $element ) {
+//	window.showErrorMsg = function( $element ) {
 //	
 //		$element.css( { top: PAGE_CONSTANTS.ERROR_MESSAGE_VERTICAL_MOVEMENT } );
 //	
@@ -238,7 +238,7 @@ var createAccountComplete = function( params ) {
 //	
 //	/////////////
 //	
-//	function hideAllErrorMessages() {
+//	window.hideAllErrorMessages = function() {
 //	
 //		var $error_message_container_jq = $(".error_message_container_jq");
 //	
@@ -247,7 +247,7 @@ var createAccountComplete = function( params ) {
 //	
 
 /////////////////
-function initPage() {
+window.initPage = function() {
 
 	$(document).click( function(eventObject) {
 		try {

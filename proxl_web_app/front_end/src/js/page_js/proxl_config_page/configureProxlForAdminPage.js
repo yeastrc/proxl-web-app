@@ -8,7 +8,7 @@
 "use strict";
 
 /////////////////
-var getListConfiguration = function() {
+window.getListConfiguration = function() {
 	
 	var requestData = {
 	};
@@ -39,7 +39,7 @@ var getListConfiguration = function() {
 };
 
 ///////
-var getListConfigurationResponse = function(requestData, responseData) {
+window.getListConfigurationResponse = function(requestData, responseData) {
 	
 	var configList = responseData.configList;
 	//  Process text inputs
@@ -78,7 +78,7 @@ var getListConfigurationResponse = function(requestData, responseData) {
 	} );
 };
 
-function saveListConfiguration() {
+window.saveListConfiguration = function() {
 	
 	var configList = [];
 	var input_footer_center_of_page_html_Val = null;
@@ -209,7 +209,7 @@ function saveListConfiguration() {
 	});
 }
 
-function saveListConfigurationResponse( params ) {
+window.saveListConfigurationResponse = function( params ) {
 	
 //	var requestData = params.requestData;
 //	var responseData = params.responseData;
@@ -225,17 +225,17 @@ function saveListConfigurationResponse( params ) {
 
 ////////////////////////////////
 //////   Term of Service
-function openTermsOfServiceOverlay() {
+window.openTermsOfServiceOverlay = function() {
 	$("#terms_of_service_modal_dialog_overlay_background").show();
 	$("#terms_of_service_overlay_div").show();
 }
-function closeTermsOfServiceOverlay() {
+window.closeTermsOfServiceOverlay = function() {
 	$("#terms_of_service_modal_dialog_overlay_background").hide();
 	$("#terms_of_service_overlay_div").hide();
 }
 
 /////////////////
-var getTermsOfServiceData = function() {
+window.getTermsOfServiceData = function() {
 	
 	var requestData = {
 	};
@@ -266,7 +266,7 @@ var getTermsOfServiceData = function() {
 };
 
 ///////
-var getTermsOfServiceDataResponse = function(requestData, responseData) {
+window.getTermsOfServiceDataResponse = function(requestData, responseData) {
 	
 	var termsOfServiceEnabled = responseData.termsOfServiceEnabled;
 	var termsOfServiceText = responseData.termsOfServiceText;
@@ -290,7 +290,7 @@ var getTermsOfServiceDataResponse = function(requestData, responseData) {
 	$("#terms_of_service_user_text").val( termsOfServiceText );
 };
 
-function addChangeTermsOfServiceData( params ) {
+window.addChangeTermsOfServiceData = function( params ) {
 	
 	var add = params.add;
 	var change = params.change;
@@ -332,7 +332,7 @@ function addChangeTermsOfServiceData( params ) {
 	});
 }
 
-function addTermsOfServiceDataResponse( params ) {
+window.addTermsOfServiceDataResponse = function( params ) {
 	
 	var responseData = params.responseData;
 	var add = params.add;
@@ -358,7 +358,7 @@ function addTermsOfServiceDataResponse( params ) {
 	}
 }
 
-function disableTermsOfService( ) {
+window.disableTermsOfService = function( ) {
 	
 	var requestData = { };
 	var _URL = contextPathJSVar + "/services/config/disableTermsOfService";
@@ -390,7 +390,7 @@ function disableTermsOfService( ) {
 	});
 }
 
-function disableTermsOfServiceResponse( params ) {
+window.disableTermsOfServiceResponse = function( params ) {
 	var responseData = params.responseData;
 	if ( responseData.status ) {
 		$("#tos_enabled").hide();
@@ -401,7 +401,7 @@ function disableTermsOfServiceResponse( params ) {
 	}
 }
 
-function enableTermsOfService( ) {
+window.enableTermsOfService = function( ) {
 	
 	var requestData = { };
 	var _URL = contextPathJSVar + "/services/config/enableTermsOfService";
@@ -433,7 +433,7 @@ function enableTermsOfService( ) {
 	});
 }
 
-function enableTermsOfServiceResponse( params ) {
+window.enableTermsOfServiceResponse = function( params ) {
 	
 	var responseData = params.responseData;
 	if ( responseData.status ) {
@@ -446,7 +446,7 @@ function enableTermsOfServiceResponse( params ) {
 }
 
 /////////////////////////////////////
-function clearCachedConfigData() {
+window.clearCachedConfigData = function() {
 
 	var requestData = { };
 	var _URL = contextPathJSVar + "/cacheDataClearConfigDataDFUIEWORU.do";
@@ -484,7 +484,7 @@ function clearCachedConfigData() {
 }
 
 /////////////////////////////////////
-function clearAllCachedData() {
+window.clearAllCachedData = function() {
 
 	var requestData = { };
 	var _URL = contextPathJSVar + "/cacheDataClearAllDFUIEWORU.do";
@@ -522,7 +522,7 @@ function clearAllCachedData() {
 }
 
 /////////////////////////////////////
-function cacheDataAllLogCurrentCacheSizes() {
+window.cacheDataAllLogCurrentCacheSizes = function() {
 
 	var requestData = { };
 	var _URL = contextPathJSVar + "/cacheDataAllLogCurrentCacheSizesDFUIEWORU.do";
@@ -560,7 +560,7 @@ function cacheDataAllLogCurrentCacheSizes() {
 }
 
 /////////////////////////////////////
-function initPage() {
+window.initPage = function() {
 	
 	$("#save_button").click(function(eventObject) {
 		try {

@@ -13,7 +13,7 @@
 
 /////////////////
 
-var unlockProject = function(clickThis) {
+window.unlockProject = function(clickThis) {
 
 	try {
 
@@ -66,7 +66,7 @@ var unlockProject = function(clickThis) {
 
 /////////////////
 
-var lockProject = function(clickThis) {
+window.lockProject = function(clickThis) {
 
 	try {
 
@@ -155,3 +155,8 @@ var reloadPageForProjectLockUnlockChange = function(clickThis) {
 	}
 };
 
+///////////////////
+
+var viewProject_ProjectLockAdmin = null;
+
+export { viewProject_ProjectLockAdmin }

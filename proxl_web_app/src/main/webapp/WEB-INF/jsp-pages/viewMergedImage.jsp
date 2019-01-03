@@ -64,25 +64,27 @@
 			<%--  On this page Snap also used by crosslink-image-viewer.js and crosslink-image-viewer-click-element-handlers.js --%>				
 		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
+
+		
+
+<%--  Replaced with the JS bundle listed next
+			 
 		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 		 
 		<script type="text/javascript" src="${ contextPath }/js/spinner.js?x=${cacheBustValue}"></script> 
 		
-		<script type="text/javascript" src="${ contextPath }/js/trypsinCutPointsForSequence.js?x=${cacheBustValue}"></script>
-		 
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-protein-annotation.js?x=${cacheBustValue}"></script>
-
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
+
+		<script type="text/javascript" src="${ contextPath }/js/trypsinCutPointsForSequence.js?x=${cacheBustValue}"></script>
+
 		
-		<script type="text/javascript" src="${ contextPath }/js/nrseqProteinIdToProteinSequenceVersionIdLookup.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
-
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-protein-annotation.js?x=${cacheBustValue}"></script>
+	
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-legacy-handler.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-index-manager.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-custom-region-manager.js?x=${cacheBustValue}"></script>
@@ -98,28 +100,46 @@
 
 		<script type="text/javascript" src="${ contextPath }/js/circle-plot-viewer.js?x=${cacheBustValue}"></script> 
 		
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer.js?x=${cacheBustValue}"></script>
+		
+		
+		Image page and Structure Page Shared
+		
+		<script type="text/javascript" src="${ contextPath }/js/nrseqProteinIdToProteinSequenceVersionIdLookup.js?x=${cacheBustValue}"></script>
+
+		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
+
+		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
+		
+		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
+
+		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
+		
+--%>
+		
+		<%--  Bundle version of core page JS --%>
+		<script type="text/javascript" src="${ contextPath }/static/js_generated_bundles/data_pages/imageView-bundle.js?x=${cacheBustValue}"></script>
 		
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
-		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
+<%--  Replaced with the JS bundle listed next
+			<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
+  --%>
+  		
 		
-		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 		
 		
-		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
 		
 				<%--  Color Picker - jQuery Plugin --%>
 		<script type="text/javascript" src="${ contextPath }/js/libs/colorpicker/colorpicker.js"></script>
@@ -265,7 +285,7 @@
 					
 						<c:set var="UpdateButtonText" value="Update From Database"/>
 						
-						<input type="button" value="${ UpdateButtonText }"  onclick="refreshData()" >
+						<input type="button" value="${ UpdateButtonText }"  onclick="window.imagePagePrimaryRootCodeObject.call__refreshData()" >
 
 						<c:if test="${ not empty onlySingleProjectSearchId }">
 							<c:set var="projectSearchId" value="${ onlySingleProjectSearchId }"/>	
@@ -373,7 +393,8 @@
 
 						<a class="bar-only tool_tip_attached_jq" 
 							data-tooltip="Reset Proteins highlighting, flipping, positioning, and horizontal scaling"  
-							href="javascript:resetProteins()"  style="font-size:10pt;white-space:nowrap;"
+							href="javascript:window.imagePagePrimaryRootCodeObject.call__resetProteins()"  
+							style="font-size:10pt;white-space:nowrap;"
 							>[Reset Proteins]</a>
 
 					</span>
@@ -386,12 +407,12 @@
 					  
 						<a class="tool_tip_attached_jq" data-tooltip="Protein Selection Regions Management" 
 							style="font-size:10pt;white-space:nowrap;" 
-							href="javascript:" onclick="_proteinBarRegionSelectionsOverlayCode.openOverlay()"
+							href="javascript:" onclick="window.imagePagePrimaryRootCodeObject.call__proteinBarRegionSelectionsOverlayCode_openOverlay()"
 							>[Manage Protein Selections]</a>							
 							
 						<a class="tool_tip_attached_jq" data-tooltip="Choose which links are always un-highlighted (greyed out)." 
 							style="font-size:10pt;white-space:nowrap;" 
-							href="javascript:" onclick="_linkExclusionSelectionsOverlayCode.openOverlay()"
+							href="javascript:" onclick="window.imagePagePrimaryRootCodeObject.call__linkExclusionSelectionsOverlayCode_openOverlay()"
 							>[Manage Link Exclusions]</a>							
 					  </span>
 
@@ -409,7 +430,8 @@
 	
 							<a class="tool_tip_attached_jq" 
 								data-tooltip="Manage user-defined protein region annotations--such as marking domains of interest."  
-								href="javascript:" onclick="_customRegionManager.showManagerOverlay()"  style="font-size:10pt;white-space:nowrap;"
+								href="javascript:" onclick="window.imagePagePrimaryRootCodeObject.call__customRegionManager_showManagerOverlay()" 
+								style="font-size:10pt;white-space:nowrap;"
 								>[Custom Annotation Manager]</a>
 	
 						</span>
@@ -474,7 +496,8 @@
 					  <div >
 						<input type="button" class="tool_tip_attached_jq" data-tooltip="Add another protein bar to the image" 
 							id="svg-protein-selector_location"
-							onclick="openSelectProteinSelect( { clickedThis : this, addProteinsClicked : true } )" value="Add Protein">
+							onclick="window.imagePagePrimaryRootCodeObject.call__openSelectProteinSelect( { clickedThis : this, addProteinsClicked : true } )" 
+							value="Add Protein">
 					  </div>
 					</div>
 				</div>		
@@ -488,7 +511,7 @@
 			<div id="no_proteins_add_protein_outer_container" style="display: none;">
 			
 				<div class=" no-proteins-add-protein-block clickable "
-					onclick="openSelectProteinSelect( { clickedThis : this, addProteinsClicked : true } )" >
+					onclick="window.imagePagePrimaryRootCodeObject.call__openSelectProteinSelect( { clickedThis : this, addProteinsClicked : true } )" >
 
 						Click to Add Protein
 				</div>

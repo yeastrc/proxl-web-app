@@ -9,6 +9,20 @@
 
 "use strict";
 
+
+import { onDocumentReady, viewSearchProteinPageCommonCrosslinkLooplinkCoverage } from 'page_js/data_pages/project_search_ids_driven_pages/protein__protein_coverage__shared/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js';
+
+import { createMergedSearchesLinkCountsVennDiagram } from 'page_js/data_pages/project_search_ids_driven_pages/merged_pages_common/mergedSearchesVennDiagramCreator.js';
+
+//  For showing Data for links (Drilldown) (Called by HTML onclick):
+import { viewCrosslinkProteinsLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/protein_pages/viewCrosslinkProteinsLoadedFromWebServiceTemplate.js';
+import { viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/protein_pages/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js';
+
+$(document).ready(function() { 
+	onDocumentReady();
+}); // end $(document).ready(function()
+
+
 //  Constructor
 
 var ViewMergedCrosslinkProteinPageCode = function() {
@@ -32,12 +46,6 @@ var ViewMergedCrosslinkProteinPageCode = function() {
 
 				viewSearchProteinPageCommonCrosslinkLooplinkCoverage.createPartsAboveMainTableSearchProteinPageCommon( params );
 
-				setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-					if ( window.mergedPeptideProteinSearchesListVennDiagramSection ) {
-						window.mergedPeptideProteinSearchesListVennDiagramSection.init();
-					}
-				},10);
-				
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
@@ -47,18 +55,13 @@ var ViewMergedCrosslinkProteinPageCode = function() {
 
 		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 
-			//  If this function exists, call it to create the Venn diagram on the page
+			//  call to create the Venn diagram on the page, if there is venn data on the page
+			try {
+				createMergedSearchesLinkCountsVennDiagram.createMergedSearchesLinkCountsVennDiagram( );
 
-			if ( window.createMergedSearchesLinkCountsVennDiagram_PageFunction ) {
-
-				try {
-
-					window.createMergedSearchesLinkCountsVennDiagram_PageFunction();
-
-				} catch( e ) {
-					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-					throw e;
-				}
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
 			}
 		},10);
 	};
@@ -84,7 +87,7 @@ var ViewMergedCrosslinkProteinPageCode = function() {
 
 //  Instance of class
 
-var viewMergedCrosslinkProteinPageCode = new ViewMergedCrosslinkProteinPageCode();
+window.viewMergedCrosslinkProteinPageCode = new ViewMergedCrosslinkProteinPageCode();
 
 
 

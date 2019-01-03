@@ -21,7 +21,7 @@ var PAGE_CONSTANTS = {
 
 ///////////////////
 
-var resetPasswordFormSubmit = function() {
+window.resetPasswordFormSubmit = function() {
 
 	try {
 		resetPassword();
@@ -34,7 +34,7 @@ var resetPasswordFormSubmit = function() {
 
 ////////////////////////////
 
-var resetPassword = function(clickThis, eventObject) {
+window.resetPassword = function(clickThis, eventObject) {
 
 	hideAllErrorMessages();
 	
@@ -126,7 +126,7 @@ var resetPassword = function(clickThis, eventObject) {
 
 //////////
 
-var resetPasswordComplete = function(requestData, responseData) {
+window.resetPasswordComplete = function(requestData, responseData) {
 
 	if ( ! responseData.status ) {
 
@@ -217,7 +217,7 @@ var resetPasswordComplete = function(requestData, responseData) {
 };
 
 
-function showMsg( $element ) {
+window.showMsg = function( $element ) {
 	
 	$element.css( { top: PAGE_CONSTANTS.ERROR_MESSAGE_VERTICAL_MOVEMENT } );
 	
@@ -230,7 +230,7 @@ function showMsg( $element ) {
 
 /////////////
 
-function hideAllErrorMessages() {
+window.hideAllErrorMessages = function() {
 
 	var $error_message_container_jq = $(".error_message_container_jq");
 

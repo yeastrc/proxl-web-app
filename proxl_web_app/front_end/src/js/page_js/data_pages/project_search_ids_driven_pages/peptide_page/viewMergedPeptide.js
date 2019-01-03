@@ -6,6 +6,25 @@
 //  JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+
+//  Import to make available on the page
+import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesChangeDisplayOrder.js';
+import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesForPageChooser.js';
+import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';
+import { addSingleTooltipForProteinName } from 'page_js/data_pages/project_search_ids_driven_pages/common/createTooltipForProteinNames.js';
+
+
+import { minimumPSM_Count_Filter } from 'page_js/data_pages/project_search_ids_driven_pages/common/minimumPSM_Count_Filter.js';
+import { annotationDataDisplayProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideAnnDisplayDataCommon.js';
+import { cutoffProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideCutoffsCommon.js';
+
+import { webserviceDataParamsDistributionCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/webserviceDataParamsDistribution.js';
+
+import { ViewMergedPeptidePerSearchDataFromWebServiceTemplate } from './viewMergedPeptidePerSearchData.js';
+
+import { createMergedSearchesLinkCountsVennDiagram } from 'page_js/data_pages/project_search_ids_driven_pages/merged_pages_common/mergedSearchesVennDiagramCreator.js';
+
+
 $(document).ready(function() { 
 	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 		$("#crosslink-table").tablesorter(); // gets exception if there are no data rows
@@ -25,19 +44,21 @@ var ViewMergedPeptidePageCode = function() {
 		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 			try {
 				objectThis.get_query_json_field_ContentsFromHiddenField();
-				window.createVennDiagramIfNeeded();
+				
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
 			}
 		},10);
-		
 		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-			if ( window.mergedPeptideProteinSearchesListVennDiagramSection ) {
-				window.mergedPeptideProteinSearchesListVennDiagramSection.init();
+			try {
+				createMergedSearchesLinkCountsVennDiagram.createMergedSearchesLinkCountsVennDiagram( );
+
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
 			}
-		},10);
-		
+		},10);		
 	};
 	
 	///////
@@ -243,7 +264,12 @@ var ViewMergedPeptidePageCode = function() {
 };
 
 //  Instance of class
-var viewMergedPeptidePageCode = new ViewMergedPeptidePageCode();
+window.viewMergedPeptidePageCode = new ViewMergedPeptidePageCode();
 
 //  Copy to standard page level JS Code Object
-var standardFullPageCode = viewMergedPeptidePageCode;
+window.standardFullPageCode = window.viewMergedPeptidePageCode;
+
+
+//  Static Singleton Instance of Class
+window.viewMergedPeptidePerSearchDataFromWebServiceTemplate = new ViewMergedPeptidePerSearchDataFromWebServiceTemplate();
+

@@ -142,3 +142,7 @@ var SharePageURLShortener = function() {
 }
 
 var sharePageURLShortener = new SharePageURLShortener();
+
+window.sharePageURLShortener = sharePageURLShortener;
+
+export { sharePageURLShortener }

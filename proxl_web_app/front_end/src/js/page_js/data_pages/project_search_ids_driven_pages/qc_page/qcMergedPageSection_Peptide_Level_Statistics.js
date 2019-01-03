@@ -12,12 +12,18 @@
 "use strict";
 
 
+import { qcMergedPageChart_Peptide_Lengths } from './qcMergedPageChart_Peptide_Lengths.js';
+
+
 /**
  * Constructor 
  */
 var QCMergedPageSection_Peptide_Level_Statistics = function() {
-
-	var _pageChartObjectsForSection = undefined; // Populated in initActual()
+	
+	//  objects for the charts on the page for this section
+	var _pageChartObjectsForSection = [
+		qcMergedPageChart_Peptide_Lengths
+	];
 
 	//  From QCPageMain
 	var _OVERALL_GLOBALS;
@@ -82,37 +88,6 @@ var QCMergedPageSection_Peptide_Level_Statistics = function() {
 		try {
 			var objectThis = this;
 			
-			try {
-				//  objects for the charts on the page for this section
-				_pageChartObjectsForSection = [
-					qcMergedPageChart_Peptide_Lengths
-				];
-
-			} catch( e ) {
-				//  Either the variable _pageChartObjectsForSection does not exist or one of the page chart objects does not exist
-				
-				//  Test if _pageChartObjectsForSection exists;
-				var pageChartObjectsForSectionLocal = _pageChartObjectsForSection;
-
-				//  One of the page chart objects does not exist.  Wait for it to be added, for 6 attempts
-				
-				if ( ! this.initAttemptCounter ) {
-					this.initAttemptCounter = 0;
-				}
-				if ( this.initAttemptCounter < 6 ) {
-					this.initAttemptCounter++;
-					setTimeout(function() {
-						objectThis.initActual();
-					}, 1000 );
-					
-					//  Exit since will be called again from inside setTimeout
-					return;  //  EARLY EXIT
-				}
-				
-				throw e;
-			}
-			
-
 			_OVERALL_GLOBALS = params.OVERALL_GLOBALS;
 
 			_project_search_ids = params.project_search_ids;
@@ -284,3 +259,5 @@ var QCMergedPageSection_Peptide_Level_Statistics = function() {
  */
 
 var qcMergedPageSection_Peptide_Level_Statistics = new QCMergedPageSection_Peptide_Level_Statistics();
+
+export { qcMergedPageSection_Peptide_Level_Statistics }

@@ -2,6 +2,8 @@
 //  structure-viewer-click-element-handlers.js
 
 
+import { getLooplinkDataCommon, getCrosslinkDataCommon, getMonolinkDataCommon, attachViewLinkInfoOverlayClickHandlers } from 'page_js/data_pages/project_search_ids_driven_pages/image_page__structure_page__shared/image_structure_click_element_common.js';
+
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -26,13 +28,13 @@ function getLooplinkDataForSpecificLinkInGraph( params, link ) {
 			searchesArray : link.searchIds,
 			
 			from_protein_id : link.protein1,
-			from_protein_name : _proteinNames[ link.protein1 ],
+			from_protein_name : window.structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ],
 			protein_position_1 : link.position1,
 			protein_position_2 : link.position2,
 			
 			fcnToCallOnDisplay : function() {
 
-				$length = $("#looplink_length");
+				var $length = $("#looplink_length");
 				$length.text( Math.round( link.length * 10 ) / 10 );
 			}
 	};
@@ -65,9 +67,9 @@ function getCrosslinkDataForSpecificLinkInGraph( params, link ) {
 	
 	incrementSpinner();				// create spinner
 
-	var from_protein_name = _proteinNames[ link.protein1 ];
+	var from_protein_name = window.structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ];
 	var from_protein_position = link.position1;
-	var to_protein_name = _proteinNames[ link.protein2 ];
+	var to_protein_name = window.structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein2 ];
 	var to_protein_position = link.position2;
 
 	var from_protein_id = link.protein1;
@@ -127,7 +129,7 @@ function getCrosslinkDataForSpecificLinkInGraph( params, link ) {
 
 			fcnToCallOnDisplay : function() {
 
-				$length = $("#crosslink_length");
+				var $length = $("#crosslink_length");
 				$length.text( Math.round( link.length * 10 ) / 10 );
 			}
 	};
@@ -177,7 +179,7 @@ function getMonolinkDataForSpecificLinkInGraph( params, link ) {
 			
 			searchesArray : link.searchIds,
 			
-			from_protein_name : _proteinNames[ link.protein1 ],
+			from_protein_name : window.structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ],
 			from_protein_id : link.protein1,
 			protein_position : link.position1
 	};
@@ -193,3 +195,4 @@ function getMonolinkDataForSpecificLinkInGraph( params, link ) {
 }
 
 
+export { getLooplinkDataForSpecificLinkInGraph, getCrosslinkDataForSpecificLinkInGraph, getMonolinkDataForSpecificLinkInGraph }

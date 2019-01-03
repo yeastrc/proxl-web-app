@@ -9,6 +9,21 @@
 
 "use strict";
 
+//  Import to make available on the page
+import { defaultPageView } from 'page_js/data_pages/project_search_ids_driven_pages/common/defaultPageView.js';
+
+
+import { onDocumentReady, viewSearchProteinPageCommonCrosslinkLooplinkCoverage } from 'page_js/data_pages/project_search_ids_driven_pages/protein__protein_coverage__shared/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js';
+
+//  For showing Data for links (Drilldown) (Called by HTML onclick):
+import { viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/protein_pages/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js';
+
+
+$(document).ready(function() { 
+	onDocumentReady();
+}); // end $(document).ready(function()
+
+
 //  Constructor
 
 var ViewSearchCrosslinkProteinPageCode = function() {
@@ -37,6 +52,6 @@ var ViewSearchCrosslinkProteinPageCode = function() {
 
 //  Instance of class
 
-var viewSearchCrosslinkProteinPageCode = new ViewSearchCrosslinkProteinPageCode();
+window.viewSearchCrosslinkProteinPageCode = new ViewSearchCrosslinkProteinPageCode();
 
 

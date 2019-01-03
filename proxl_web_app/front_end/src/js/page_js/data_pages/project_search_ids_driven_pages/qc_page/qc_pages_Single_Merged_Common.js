@@ -113,3 +113,4 @@ var QC_Pages_Single_Merged_Common = function() {
 //  instance of object
 var qc_pages_Single_Merged_Common = new QC_Pages_Single_Merged_Common();
 
+export { qc_pages_Single_Merged_Common }

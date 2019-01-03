@@ -29,27 +29,40 @@ var CreateMergedSearchesLinkCountsVennDiagram = function() {
 	this.createMergedSearchesLinkCountsVennDiagram = function() {
 		try {
 			if ( typeof Modernizr === 'undefined' || ! Modernizr.svg ) {
-				console.log( "SVG not supported." );
+				console.log( "CreateMergedSearchesLinkCountsVennDiagram: SVG not supported." );
 				return;
 			}
 			var $venn_diagram_data_JSON = $("#venn_diagram_data_JSON");
 			if ( $venn_diagram_data_JSON.length === 0 ) {
-				throw Error( 'element with id "venn_diagram_data_JSON" not found ' );
+				//  No DOM element so exit
+				// console.log( "CreateMergedSearchesLinkCountsVennDiagram: No data for venn diagram." );
+				return; // EARLY EXIT
+				// throw Error( 'element with id "venn_diagram_data_JSON" not found ' );
 			}
 			var venn_diagram_data_JSONString = $venn_diagram_data_JSON.text();
 			if ( venn_diagram_data_JSONString === undefined ) {
-				throw Error( 'element with id "venn_diagram_data_JSON" returned .text() undefined  ' );
+				//  No DOM element so exit
+				// console.log( "CreateMergedSearchesLinkCountsVennDiagram: No data for venn diagram." );
+				return; // EARLY EXIT
+				// throw Error( 'element with id "venn_diagram_data_JSON" returned .text() undefined  ' );
 			}
 			if ( venn_diagram_data_JSONString === null ) {
-				throw Error( 'element with id "venn_diagram_data_JSON" returned .text() null ' );
+				//  No DOM element so exit
+				// console.log( "CreateMergedSearchesLinkCountsVennDiagram: No data for venn diagram." );
+				return; // EARLY EXIT
+				// throw Error( 'element with id "venn_diagram_data_JSON" returned .text() null ' );
 			}
 			if ( venn_diagram_data_JSONString === "" ) {
-				throw Error( 'element with id "venn_diagram_data_JSON" returned .text() empty string "" ' );
+				//  DOM element has empty string
+				// console.log( "CreateMergedSearchesLinkCountsVennDiagram: No data for venn diagram." );
+				return; // EARLY EXIT
+				// throw Error( 'element with id "venn_diagram_data_JSON" returned .text() empty string "" ' );
 			}
 			var venn_diagram_data = null;
 			try {
 				venn_diagram_data = JSON.parse( venn_diagram_data_JSONString );
 			} catch( e ) {
+				console.log( 'element with id "venn_diagram_data_JSON" does not contain valid JSON, failed to parse as JSON ' );
 				throw Error( 'element with id "venn_diagram_data_JSON" does not contain valid JSON, failed to parse as JSON ' );
 			}
 
@@ -77,7 +90,11 @@ var CreateMergedSearchesLinkCountsVennDiagram = function() {
 			//  Apply a stroke width
 			$circle_All.attr("stroke-width","1");
 
-			this.addDownloadClickHandlers()
+			this.addDownloadClickHandlers();
+
+			var $searches_intersection_venn_diagram_outer_container = $("#searches_intersection_venn_diagram_outer_container");
+			$searches_intersection_venn_diagram_outer_container.show();
+
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -183,3 +200,8 @@ var CreateMergedSearchesLinkCountsVennDiagram = function() {
 };
 
 var createMergedSearchesLinkCountsVennDiagram = new CreateMergedSearchesLinkCountsVennDiagram();
+
+// window.createMergedSearchesLinkCountsVennDiagram = createMergedSearchesLinkCountsVennDiagram;
+
+export { createMergedSearchesLinkCountsVennDiagram }
+

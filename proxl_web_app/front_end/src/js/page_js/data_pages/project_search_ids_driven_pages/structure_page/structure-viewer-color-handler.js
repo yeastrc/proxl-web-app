@@ -248,7 +248,7 @@ LinkColorHandler.prototype.getColorByColorPropertyObjectKey = function( colorPro
 
 	//  No User defined color so return default color
 	
-	if( _searches.length === 2 ) {
+	if( window.structurePagePrimaryRootCodeObject.getVariable__v_searches().length === 2 ) {
 		
 		//  different set of colors for 2 searches being merged 
 		
@@ -280,7 +280,7 @@ LinkColorHandler.prototype.getLinkColor = function( link, colorFormat ) {
 		return;
 	}
 	
-	var mode = getLinkColorMode();
+	var mode = window.structurePagePrimaryRootCodeObject.call__getLinkColorMode();
 	var color = '';
 	
 	if( mode === 'length' ) {
@@ -354,16 +354,18 @@ LinkColorHandler.prototype.getLinkColorByLength = function( link ) {
  * @param link
  */
 LinkColorHandler.prototype.getLinkColorByType = function( link ) {
+
+	var linkColorHandler = window.structurePagePrimaryRootCodeObject.getVariable__v_linkColorHandler();
 	
 	// color by the type (e.g. cross-link, loop-link, and mono-link)
 	if( link.type === 'crosslink' ) { 
-		return this.getColorByLinkTypeLabel( _linkColorHandler._CONSTANTS.typeColorsProperties.CROSSLINK ); 
+		return this.getColorByLinkTypeLabel( linkColorHandler._CONSTANTS.typeColorsProperties.CROSSLINK ); 
 	}
 	if( link.type === 'looplink' ) { 
-		return this.getColorByLinkTypeLabel( _linkColorHandler._CONSTANTS.typeColorsProperties.LOOPLINK ); 
+		return this.getColorByLinkTypeLabel( linkColorHandler._CONSTANTS.typeColorsProperties.LOOPLINK ); 
 	}
 	if( link.type === 'monolink' ) { 
-		return this.getColorByLinkTypeLabel( _linkColorHandler._CONSTANTS.typeColorsProperties.MONOLINK ); 
+		return this.getColorByLinkTypeLabel( linkColorHandler._CONSTANTS.typeColorsProperties.MONOLINK ); 
 	}		
 	
 	console.log( "ERROR: link.type is not recognized." );
@@ -379,9 +381,9 @@ LinkColorHandler.prototype.getLinkColorBySearches = function( link ) {
 
 	var searches;		// searches in which this link is found
 	
-	if( link.type === 'crosslink' ) { searches = findSearchesForCrosslink( link.protein1, link.protein2, link.position1, link.position2 ); }
-	else if( link.type === 'looplink' ) { searches = findSearchesForLooplink( link.protein1, link.position1, link.position2 ); }
-	else if( link.type === 'monolink' ) { searches = findSearchesForMonolink( link.protein1, link.position1 ); }	
+	if( link.type === 'crosslink' ) { searches = window.structurePagePrimaryRootCodeObject.call__findSearchesForCrosslink( link.protein1, link.protein2, link.position1, link.position2 ); }
+	else if( link.type === 'looplink' ) { searches = window.structurePagePrimaryRootCodeObject.call__findSearchesForLooplink( link.protein1, link.position1, link.position2 ); }
+	else if( link.type === 'monolink' ) { searches = window.structurePagePrimaryRootCodeObject.call__findSearchesForMonolink( link.protein1, link.position1 ); }	
 	else {
 		console.log( "ERROR: link.type is not recognized." );
 		return;
@@ -406,13 +408,13 @@ LinkColorHandler.prototype.getColorForSearches = function( searches ) {
 	//  It is a concatenation of the positions of the search id positions ( One based )
 	//  Which is used to retrieve colors based on properties that match that set of positions 
 	
-	//  The variable _searches  is defined and populated in the Javascript file "structure-viewer-page.js"
+	//  The variable window.structurePagePrimaryRootCodeObject.getVariable__v_searches()  is defined and populated in the Javascript file "structure-viewer-page.js"
 	
 	var colorPropertyObjectKey = this.getColorPropertyNameLabelForSearches( searches );
 	
 	return this.getColorByColorPropertyObjectKey( colorPropertyObjectKey );
 	
-//	if( _searches.length === 2 ) {
+//	if( window.structurePagePrimaryRootCodeObject.getVariable__v_searches().length === 2 ) {
 //		
 //		//  different set of colors for 2 searches being merged 
 //		
@@ -434,11 +436,11 @@ LinkColorHandler.prototype.getColorPropertyNameLabelForSearches = function( sear
 	//  It is a concatenation of the positions of the search id positions ( One based )
 	//  Which is used to retrieve colors based on properties that match that set of positions 
 	
-	//  The variable _searches  is defined and populated in the Javascript file "structure-viewer-page.js"
+	//  The variable window.structurePagePrimaryRootCodeObject.getVariable__v_searches()  is defined and populated in the Javascript file "structure-viewer-page.js"
 	
 	var colorPropertyLookup = "";
 	
-	for ( var i = 0; i < _searches.length; i++ ) {
+	for ( var i = 0; i < window.structurePagePrimaryRootCodeObject.getVariable__v_searches().length; i++ ) {
 		
 		//  Loop through all searches being merged
 		
@@ -446,7 +448,7 @@ LinkColorHandler.prototype.getColorPropertyNameLabelForSearches = function( sear
 			
 			//  Loop through the search ids getting a color for
 			
-			if ( _searches[i]['id'] === searches[ k ] ) {
+			if ( window.structurePagePrimaryRootCodeObject.getVariable__v_searches()[i]['id'] === searches[ k ] ) {
 				
 				//  If the search id from "all searches being merged" 
 				//    matches the search id getting the color for,
@@ -558,7 +560,7 @@ LinkColorHandler.prototype.getDistanceConstraints = function() {
 		return this.getUserDistanceConstraints();
 	}
 	
-	var linkers = getLinkerStringsAsArray();
+	var linkers = window.structurePagePrimaryRootCodeObject.call__getLinkerStringsAsArray();
 	
 	if( !linkers || linkers.length < 1 ) {
 		return this._CONSTANTS.linkers.generic;
@@ -589,3 +591,6 @@ LinkColorHandler.prototype.getDistanceConstraints = function() {
 	
 	return longLinker;
 };
+
+
+export { LinkColorHandler }

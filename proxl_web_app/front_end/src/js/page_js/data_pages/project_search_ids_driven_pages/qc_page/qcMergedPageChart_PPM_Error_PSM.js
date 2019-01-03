@@ -14,6 +14,9 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
+
+import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
 
 /**
  * Constructor 
@@ -726,3 +729,5 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
  */
 
 var qcMergedPageChart_PPM_Error_PSM = new QCMergedPageChart_PPM_Error_PSM();
+
+export { qcMergedPageChart_PPM_Error_PSM }

@@ -794,8 +794,9 @@ function getDisorderedRegionsDisopred_3( proteinId ) {
 }
 
 /////////////////////////////////////////
-var BETA_SHEET = "E";
-var ALPHA_HELIX = "H";
+//  Using variables from crosslink-image-viewer.js
+// var BETA_SHEET = "E";
+// var ALPHA_HELIX = "H";
 /**
  * 
  */
@@ -815,7 +816,8 @@ function getSecondaryStructureRegions( proteinId ) {
 	for ( var dataIndex = 0; dataIndex < secondaryStructureDataEntries.length; dataIndex++ ) {
 		var entry = secondaryStructureDataEntries[ dataIndex ];
 		var type = entry.type;
-		if ( type === BETA_SHEET || type === ALPHA_HELIX ) {
+		if ( type === window.imagePagePrimaryRootCodeObject.getVariable__v_BETA_SHEET() || 
+				type === window.imagePagePrimaryRootCodeObject.getVariable__v_ALPHA_HELIX() ) {
 			var position = entry.position;
 			if ( type !== prevType || position > ( endPosition + 1 )  ) {
 				if ( startPosition !== startPositionInitializationValue ) {
@@ -834,3 +836,5 @@ function getSecondaryStructureRegions( proteinId ) {
 	}
 	return ssBlocks;
 }
+
+export { proteinAnnotationStore, getDisorderedRegionsDisopred_2, getDisorderedRegionsDisopred_3, getSecondaryStructureRegions }

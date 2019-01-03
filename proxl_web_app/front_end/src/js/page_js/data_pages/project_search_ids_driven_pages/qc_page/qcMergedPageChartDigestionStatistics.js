@@ -15,6 +15,11 @@
 "use strict";
 
 
+import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
+
+import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
+
+
 /**
  * Constructor 
  */
@@ -687,3 +692,5 @@ var QCMergedPageChartDigestionStatistics = function() {
  */
 
 var qcMergedPageChartDigestionStatistics = new QCMergedPageChartDigestionStatistics();
+
+export { qcMergedPageChartDigestionStatistics }

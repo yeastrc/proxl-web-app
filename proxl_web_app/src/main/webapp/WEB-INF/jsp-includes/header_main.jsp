@@ -65,9 +65,16 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	 
 	
 	
-	<script type="text/javascript" src="${ contextPath }/js/crosslinksCollapsible.js?x=${cacheBustValue}"></script>
 	
+	
+	
+	<script type="text/javascript" src="static/js_generated_bundles/header_section_main_pages/header_section_main_pages-bundle.js?x=${ cacheBustValue }"></script>
+
+<%--  Moved to Front End Build Bundles		
+	<script type="text/javascript" src="${ contextPath }/js/crosslinksCollapsible.js?x=${cacheBustValue}"></script>
+		
 	<script type="text/javascript" src="${ contextPath }/js/header_main.js?x=${cacheBustValue}"></script>
+--%>
 	
 	<style >
 	

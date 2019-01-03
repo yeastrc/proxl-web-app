@@ -6,6 +6,21 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+
+import { closeLorikeetOverlay } from 'page_js/data_pages/project_search_ids_driven_pages/common/lorikeetPageProcessing.js';
+
+
+// /////////////////////////////////////////////
+$(document).ready(function()  { 
+	try {
+		viewPeptidesRelatedToPSMsByScanId.init();
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
+});
+
+
 // Class contructor
 
 var ViewPeptidesRelatedToPSMsByScanId = function() {
@@ -314,12 +329,6 @@ var ViewPeptidesRelatedToPSMsByScanId = function() {
 // Static Singleton Instance of Class
 var viewPeptidesRelatedToPSMsByScanId = new ViewPeptidesRelatedToPSMsByScanId();
 
-// /////////////////////////////////////////////
-$(document).ready(function()  { 
-	try {
-		viewPeptidesRelatedToPSMsByScanId.init();
-	} catch( e ) {
-		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-		throw e;
-	}
-});
+window.viewPeptidesRelatedToPSMsByScanId = viewPeptidesRelatedToPSMsByScanId;
+
+export { viewPeptidesRelatedToPSMsByScanId }

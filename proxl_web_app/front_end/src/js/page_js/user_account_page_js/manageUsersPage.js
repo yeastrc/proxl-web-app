@@ -16,7 +16,7 @@ var adminGlobals = {
 };
 
 /////////////////
-var updateInvitedPeopleCurrentUsersLists = function() {
+window.updateInvitedPeopleCurrentUsersLists = function() {
 	try {
 		getInvitedPeople();
 //		getCurrentUserAccess();
@@ -26,7 +26,7 @@ var updateInvitedPeopleCurrentUsersLists = function() {
 	}
 };
 /////////////////
-var getInvitedPeople = function() {
+window.getInvitedPeople = function() {
 	var requestData = {
 	};
 	var _URL = contextPathJSVar + "/services/user/listInvitedPeople";
@@ -55,7 +55,7 @@ var getInvitedPeople = function() {
 	});
 };
 ///////
-var getInvitedPeopleResponse = function(requestData, responseData) {
+window.getInvitedPeopleResponse = function(requestData, responseData) {
 	var $invited_people = $("#invited_people_current_users");
 	$invited_people.empty();
 	if (responseData && responseData.length > 0) {
@@ -228,7 +228,7 @@ var getInvitedPeopleResponse = function(requestData, responseData) {
 	getCurrentUserAccess();
 };
 /////////////////
-var updateInvitedPersonAccessLevel = function(params) {
+window.updateInvitedPersonAccessLevel = function(params) {
 	var clickThis = params.clickThis;
 	var newAccessLevel = params.newAccessLevel;
 	var $clickThis = $(clickThis);
@@ -268,7 +268,7 @@ var updateInvitedPersonAccessLevel = function(params) {
 		}
 	});
 };
-var updateInvitedPersonAccessLevelResponse = function(params) {
+window.updateInvitedPersonAccessLevelResponse = function(params) {
 	var data = params.data;
 	if (data.status) {
 //		alert("User access to project updated");
@@ -278,11 +278,11 @@ var updateInvitedPersonAccessLevelResponse = function(params) {
 	updateInvitedPeopleCurrentUsersLists();
 };
 /////////////////
-var revokePersonInvite = function(clickThis, eventObject) {
+window.revokePersonInvite = function(clickThis, eventObject) {
 	openRevokePersonInviteOverlay(clickThis, eventObject);
 	return;
 };
-var openRevokePersonInviteOverlay = function(clickThis, eventObject) {
+window.openRevokePersonInviteOverlay = function(clickThis, eventObject) {
 	var $clickThis = $(clickThis);
 //	get root div for this current user entry
 	var $invited_person_entry_root_div_jq = $clickThis.closest(".invited_person_entry_root_div_jq");
@@ -298,17 +298,17 @@ var openRevokePersonInviteOverlay = function(clickThis, eventObject) {
 	$("#revoke_invite_to_project_overlay_container").show();
 };
 ///////////
-var closeRevokePersonInviteOverlay = function(clickThis, eventObject) {
+window.closeRevokePersonInviteOverlay = function(clickThis, eventObject) {
 	var $revoke_invite_to_project_confirm_button = $("#revoke_invite_to_project_confirm_button");
 	$revoke_invite_to_project_confirm_button.data("userId", null);
 	$(".revoke_invite_to_project_overlay_show_hide_parts_jq").hide();
 };
 /////////////////
 //put click handler for this on #revoke_invite_to_project_confirm_button
-var revokePersonInviteConfirmed = function(clickThis, eventObject) {
+window.revokePersonInviteConfirmed = function(clickThis, eventObject) {
 ///////////////////
 //
-//var revokePersonInvite = function(clickThis) {
+//window.revokePersonInvite = function(clickThis) {
 //
 //	if (!confirm('Are you sure you want to revoke this invite?')) {
 //
@@ -346,7 +346,7 @@ var revokePersonInviteConfirmed = function(clickThis, eventObject) {
 		}
 	});
 };
-var revokePersonInviteResponse = function(params) {
+window.revokePersonInviteResponse = function(params) {
 	var data = params.data;
 	if (data.status) {
 		closeRevokePersonInviteOverlay();
@@ -357,7 +357,7 @@ var revokePersonInviteResponse = function(params) {
 	}
 };
 ////////////////////
-var getCurrentUserAccess = function() {
+window.getCurrentUserAccess = function() {
 	var requestData = {
 	};
 	var _URL = contextPathJSVar + "/services/user/listAll";
@@ -381,7 +381,7 @@ var getCurrentUserAccess = function() {
 	});
 };
 ////////
-var getCurrentUserAccessResponse = function(requestData, responseData) {
+window.getCurrentUserAccessResponse = function(requestData, responseData) {
 	if ( responseData === undefined || responseData === null || responseData.status === false ) {
 		alert("Get user data failed.");
 		return;
@@ -557,7 +557,7 @@ var getCurrentUserAccessResponse = function(requestData, responseData) {
 	}
 };
 /////////////////
-var updateUserAccessLevel = function(params) {
+window.updateUserAccessLevel = function(params) {
 	var clickThis = params.clickThis;
 	var newAccessLevel = params.newAccessLevel;
 	var $clickThis = $(clickThis);
@@ -594,7 +594,7 @@ var updateUserAccessLevel = function(params) {
 	});
 };
 //////
-var updateUserAccessLevelResponse = function(params) {
+window.updateUserAccessLevelResponse = function(params) {
 	var data = params.data;
 	if (data.status) {
 //		alert("User access updated");
@@ -604,17 +604,17 @@ var updateUserAccessLevelResponse = function(params) {
 	}
 };
 /////////////////
-var disableUser = function(clickThis) {
+window.disableUser = function(clickThis) {
 //	var $clickThis = $(clickThis);
 	enableDisableUser( { enabled: false, clickThis: clickThis });
 };
 /////////////////
-var enableUser = function(clickThis) {
+window.enableUser = function(clickThis) {
 //var $clickThis = $(clickThis);
 	enableDisableUser( { enabled: true, clickThis: clickThis });
 };
 /////////////////
-var enableDisableUser = function(params) {
+window.enableDisableUser = function(params) {
 	var enabled = params.enabled;
 	var clickThis = params.clickThis;
 	var $clickThis = $(clickThis);
@@ -648,7 +648,7 @@ var enableDisableUser = function(params) {
 		}
 	});
 };
-var enableDisableUserResponse = function(params) {
+window.enableDisableUserResponse = function(params) {
 	var data = params.data;
 	if (data.status) {
 //		alert("User updated");
@@ -659,7 +659,7 @@ var enableDisableUserResponse = function(params) {
 };
 
 ////////////////////////////
-var invitePerson = function(clickThis, eventObject) {
+window.invitePerson = function(clickThis, eventObject) {
 	var $invite_user_email = $("#invite_user_email");
 	if ($invite_user_email.length === 0) {
 		throw Error( "Unable to find input field for id 'invite_user_email' " );
@@ -703,7 +703,7 @@ var invitePerson = function(clickThis, eventObject) {
 	});
 };
 //////////
-var inviteComplete = function(requestData, responseData) {
+window.inviteComplete = function(requestData, responseData) {
 	if ( ! responseData.status ) {
 		if ( responseData.emailAddressDuplicateError ) {
 			var $element = $("#error_message_email_already_exists");
@@ -720,7 +720,7 @@ var inviteComplete = function(requestData, responseData) {
 	$("#invite_user_expanded").hide();
 	updateInvitedPeopleCurrentUsersLists();
 };
-var clearInviteUserField = function( ) {
+window.clearInviteUserField = function( ) {
 	var $invite_user_email = $("#invite_user_email");
 	$invite_user_email.val("");
 };
@@ -731,7 +731,7 @@ var clearInviteUserField = function( ) {
 
 
 ///////////////////
-var createAccountGetFormDataAndValidate = function() {
+window.createAccountGetFormDataAndValidate = function() {
 
 	try {
 		hideAllErrorMessages();
@@ -814,7 +814,7 @@ var createAccountGetFormDataAndValidate = function() {
 
 
 
-var createAccountFormSubmit = function() {
+window.createAccountFormSubmit = function() {
 
 	var requestData = createAccountGetFormDataAndValidate();
 	if ( requestData === null ) {  //  Error in form data so exit
@@ -843,7 +843,7 @@ var createAccountFormSubmit = function() {
 	});
 };
 
-var createAccountComplete = function( params ) {
+window.createAccountComplete = function( params ) {
 	var requestData = params.requestData;
 	var responseData = params.responseData;
 	
@@ -880,7 +880,7 @@ var createAccountComplete = function( params ) {
 
 
 //////////////////
-function initAdmin() {
+window.initAdmin = function() {
 	var $logged_in_user_id = $("#logged_in_user_id");
 	if ( $logged_in_user_id.length === 0 ) {
 		throw Error( "Unable to find hidden field '#logged_in_user_id'" );

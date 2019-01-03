@@ -12,7 +12,7 @@
 
 ////////////////////////////
 
-var updateFirstName = function(clickThis, eventObject) {
+window.updateFirstName = function(clickThis, eventObject) {
 	var $firstName = $("#first-name-change-field");
 	if ($firstName.length === 0) {
 		throw Error( "Unable to find input field for id 'first-name-change-field' " );
@@ -56,7 +56,7 @@ var updateFirstName = function(clickThis, eventObject) {
 	});
 };
 //////////
-var updateFirstNameComplete = function( params ) {
+window.updateFirstNameComplete = function( params ) {
 	 var requestData = params.requestData;
 	 var responseData = params.responseData;
 	 var clickThis = params.clickThis; 
@@ -76,7 +76,7 @@ var updateFirstNameComplete = function( params ) {
 	$current_value_container_jq.show();
 };
 ////////////////////////////
-var updateLastName = function(clickThis, eventObject) {
+window.updateLastName = function(clickThis, eventObject) {
 	var $lastName = $("#last-name-change-field");
 	if ($lastName.length === 0) {
 		throw Error( "Unable to find input field for id 'last-name-change-field' " );
@@ -119,7 +119,7 @@ var updateLastName = function(clickThis, eventObject) {
 		}
 	});
 };
-var updateLastNameComplete = function( params ) {
+window.updateLastNameComplete = function( params ) {
 	var requestData = params.requestData;
 	var responseData = params.responseData;
 	var clickThis = params.clickThis; 
@@ -139,7 +139,7 @@ var updateLastNameComplete = function( params ) {
 	$current_value_container_jq.show();
 };
 ////////////////////
-var updateOrganization = function(clickThis, eventObject) {
+window.updateOrganization = function(clickThis, eventObject) {
 	var $organization = $("#organization-change-field");
 	if ($organization.length === 0) {
 		throw Error( "Unable to find input field for id 'organization-change-field' " );
@@ -182,7 +182,7 @@ var updateOrganization = function(clickThis, eventObject) {
 		}
 	});
 };
-var updateOrganizationComplete = function( params ) {
+window.updateOrganizationComplete = function( params ) {
 	var requestData = params.requestData;
 	var responseData = params.responseData;
 	var clickThis = params.clickThis; 
@@ -201,7 +201,7 @@ var updateOrganizationComplete = function( params ) {
 	$current_value_container_jq.show();
 };
 ////////////////////
-var updateEmail = function(clickThis, eventObject) {
+window.updateEmail = function(clickThis, eventObject) {
 	var $email = $("#email-change-field");
 	if ($email.length === 0) {
 		throw Error( "Unable to find input field for id 'email-change-field' " );
@@ -244,7 +244,7 @@ var updateEmail = function(clickThis, eventObject) {
 		}
 	});
 };
-var updateEmailComplete = function( params ) {
+window.updateEmailComplete = function( params ) {
 	var requestData = params.requestData;
 	var responseData = params.responseData;
 	var clickThis = params.clickThis; 
@@ -269,7 +269,7 @@ var updateEmailComplete = function( params ) {
 	$current_value_container_jq.show();
 };
 ////////////////
-var updateUsername = function(clickThis, eventObject) {
+window.updateUsername = function(clickThis, eventObject) {
 	var $username = $("#username-change-field");
 	if ($username.length === 0) {
 		throw Error( "Unable to find input field for id 'username-change-field' " );
@@ -313,7 +313,7 @@ var updateUsername = function(clickThis, eventObject) {
 	});
 };
 /////////////
-var updateUsernameComplete = function( params ) {
+window.updateUsernameComplete = function( params ) {
 	var requestData = params.requestData;
 	var responseData = params.responseData;
 	var clickThis = params.clickThis; 
@@ -339,7 +339,7 @@ var updateUsernameComplete = function( params ) {
 	$current_value_container_jq.show();
 };
 ////////////////
-var updatePassword = function(clickThis, eventObject) {
+window.updatePassword = function(clickThis, eventObject) {
 	var $password = $("#password-change-field");
 	if ($password.length === 0) {
 		throw Error( "Unable to find input field for id 'password-change-field' " );
@@ -408,7 +408,7 @@ var updatePassword = function(clickThis, eventObject) {
 		}
 	});
 };
-var updatePasswordComplete = function( params ) {
+window.updatePasswordComplete = function( params ) {
 	var requestData = params.requestData;
 	var responseData = params.responseData;
 	var clickThis = params.clickThis; 
@@ -449,7 +449,7 @@ var updatePasswordComplete = function( params ) {
 	$passwordConfirm.val("");
 };
 ///////////////
-var editValue = function( clickThis ) {
+window.editValue = function( clickThis ) {
 	var $clickThis = $(clickThis);
 	var $value_container_jq = $clickThis.closest(".value_container_jq");
 	var $current_value_container_jq = $value_container_jq.find(".current_value_container_jq");
@@ -464,7 +464,7 @@ var editValue = function( clickThis ) {
 	$edit_value_container_jq.show();
 };
 //////////////////
-var closeEditValue = function( clickThis ) {
+window.closeEditValue = function( clickThis ) {
 	var $clickThis = $(clickThis);
 	var $value_container_jq = $clickThis.closest(".value_container_jq");
 	var $current_value_container_jq = $value_container_jq.find(".current_value_container_jq");
@@ -473,7 +473,7 @@ var closeEditValue = function( clickThis ) {
 	$current_value_container_jq.show();
 };
 //////////////////
-function initPage() {
+window.initPage = function() {
 //	$(document).click( function(eventObject) {
 //	
 //		var $error_message_container_jq = $(".error_message_container_jq");

@@ -18,6 +18,10 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
+
+import { downloadStringAsFile } from 'page_js/data_pages/project_search_ids_driven_pages/common/download-string-as-file.js';
+
 
 /**
  * Constructor 
@@ -1672,3 +1676,5 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
  */
 
 var qcPageChart_PSM_Score_Vs_Score_PSM = new QCPageChart_PSM_Score_Vs_Score_PSM();
+
+export { qcPageChart_PSM_Score_Vs_Score_PSM }

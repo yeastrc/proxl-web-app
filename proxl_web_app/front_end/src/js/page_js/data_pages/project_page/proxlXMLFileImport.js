@@ -2186,3 +2186,8 @@ ProxlXMLFileImport.prototype.updateServerAbandonedUploadKey  = function() {
 //  Instance of object on page
 
 var proxlXMLFileImport = new ProxlXMLFileImport();
+
+window.proxlXMLFileImport = proxlXMLFileImport;
+
+export { proxlXMLFileImport }
+

@@ -5,9 +5,16 @@
 
 //   Process and load data into the file viewMonolinkReportedPeptidesLoadedFromWebServiceTemplateFragment.jsp
 
+//   Only used on Image and Structure pages.  Placed here for consistency with Cross and Loop link processing
+
 //////////////////////////////////
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
+
+
+//  For showing Data for links (Drilldown) (Called by HTML onclick):
+import { viewPsmsLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/common/viewPsmsLoadedFromWebServiceTemplate.js';
+
 
 //   Class contructor
 
@@ -281,5 +288,10 @@ var ViewMonolinkReportedPeptidesLoadedFromWebServiceTemplate = function() {
 		}
 	};
 };
+
 //Static Singleton Instance of Class
 var viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate = new ViewMonolinkReportedPeptidesLoadedFromWebServiceTemplate();
+
+window.viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate = viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate;
+
+export { viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate }

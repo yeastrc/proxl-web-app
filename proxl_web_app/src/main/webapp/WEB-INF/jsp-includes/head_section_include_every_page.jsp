@@ -13,9 +13,6 @@
  
 	<script type="text/javascript" src="${contextPath}/js/libs/modernizr.v2.7.1__custom.39924_min.js"></script>
 	
-	<script type="text/javascript" src="${ contextPath }/js/reportWebErrorToServer.js?x=${cacheBustValue}"></script>
-	
-	
 	<%--
 	<script type="text/javascript" src="${contextPath}/js/libs/modernizr.v2.7.1__custom.39924.js"></script>
 	--%>
@@ -27,9 +24,15 @@
 
 	<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
 
+
+	<script type="text/javascript" src="static/js_generated_bundles/header_section_every_page/header_section_every_page-bundle.js?x=${ cacheBustValue }"></script>
+
+<%--  Moved to Front End Build Bundles		
+	
+	<script type="text/javascript" src="${ contextPath }/js/reportWebErrorToServer.js?x=${cacheBustValue}"></script>
+	
 	<script type="text/javascript" src="${ contextPath }/js/genericToolTip.js?x=${cacheBustValue}"></script>
-
-
+--%>	
 	
 	
 	<%--  Store the context path of the web app in a javascript variable named contextPathJSVar --%>
@@ -162,9 +165,12 @@ if (!Array.prototype.forEach) {
 	  
 	</script>	
 	
+	
+<%--  Moved to Front End Build Bundles		
+	
 	<script type="text/javascript" src="${contextPath}/js/crosslinks_constants_every_page.js?x=${cacheBustValue}"></script>
 	
 	<script type="text/javascript" src="${contextPath}/js/showHideErrorMessage.js?x=${cacheBustValue}"></script>
-	
+--%>	
 	
 	

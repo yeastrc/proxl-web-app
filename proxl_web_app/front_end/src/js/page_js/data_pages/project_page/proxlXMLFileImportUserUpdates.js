@@ -10,10 +10,10 @@
 
 
 
-$(document).ready(function() {
+// $(document).ready(function() {
 
 //	proxlXMLFileImportUserUpdates.initOnDocumentReady();
-});
+// });
 
 
 
@@ -585,4 +585,7 @@ ProxlXMLFileImportUserUpdates.prototype.removeFailedItemClickedProcessAjaxRespon
 
 var proxlXMLFileImportUserUpdates = new ProxlXMLFileImportUserUpdates();
 
+window.proxlXMLFileImportUserUpdates = proxlXMLFileImportUserUpdates;
+
+export { proxlXMLFileImportUserUpdates }
 

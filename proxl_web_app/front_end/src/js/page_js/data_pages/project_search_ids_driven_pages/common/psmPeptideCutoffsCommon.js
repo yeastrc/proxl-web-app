@@ -656,3 +656,7 @@ var CutoffProcessingCommonCode = function() {
 
 //   Instance of class
 var cutoffProcessingCommonCode = new CutoffProcessingCommonCode();
+
+window.cutoffProcessingCommonCode = cutoffProcessingCommonCode;
+
+export { cutoffProcessingCommonCode }

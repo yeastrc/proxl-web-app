@@ -17,10 +17,12 @@
 	 
 	
 	
-<%-- 
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script>
---%>		
+	<script type="text/javascript" src="static/js_generated_bundles/user_pages/userLoginPage-bundle.js?x=${ cacheBustValue }"></script>
+
+<%--  Moved to Front End Build Bundles		
+	
 		<script type="text/javascript" src="${ contextPath }/js/user_account/userLoginPage.js?x=${cacheBustValue}"></script>
+--%>	
 		
 </head>
 

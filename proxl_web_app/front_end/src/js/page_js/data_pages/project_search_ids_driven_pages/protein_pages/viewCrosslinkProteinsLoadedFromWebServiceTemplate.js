@@ -7,6 +7,11 @@
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+
+//  For showing Data for links (Drilldown) (Called by HTML onclick):
+import { viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/protein_pages/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js';
+
+
 //   Class contructor
 var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 	var _DATA_LOADED_DATA_KEY = "dataLoaded";
@@ -278,3 +283,7 @@ var ViewCrosslinkProteinsLoadedFromWebServiceTemplate = function() {
 
 //Static Singleton Instance of Class
 var viewCrosslinkProteinsLoadedFromWebServiceTemplate = new ViewCrosslinkProteinsLoadedFromWebServiceTemplate();
+
+window.viewCrosslinkProteinsLoadedFromWebServiceTemplate = viewCrosslinkProteinsLoadedFromWebServiceTemplate;
+
+export { viewCrosslinkProteinsLoadedFromWebServiceTemplate }

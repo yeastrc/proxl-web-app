@@ -18,6 +18,9 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
+
+import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
 
 /**
  * Constructor 
@@ -911,3 +914,5 @@ var QCPageChart_Error_Vs_M_Over_Z_PSM = function() {
  */
 
 var qcPageChart_Error_Vs_M_Over_Z_PSM = new QCPageChart_Error_Vs_M_Over_Z_PSM();
+
+export { qcPageChart_Error_Vs_M_Over_Z_PSM }

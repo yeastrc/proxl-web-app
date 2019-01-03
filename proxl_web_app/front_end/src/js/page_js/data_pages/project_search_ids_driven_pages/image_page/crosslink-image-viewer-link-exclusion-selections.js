@@ -11,8 +11,8 @@
  *  
  * !!! The following global variables from "crosslink-image-viewer.js" are used in this file:
  * 
- * 	updateURLHash( ... );
- * loadDataAndDraw( ... );
+ * 	window.imagePagePrimaryRootCodeObject.call__updateURLHash( ... );
+ *  window.imagePagePrimaryRootCodeObject.call__loadDataAndDraw( ... );
  * 	  
  */
 
@@ -25,6 +25,9 @@
 ////////////////////////////
 
 /////     Link Exclusion Data Overlay code
+
+import { ProteinBarHighlightedRegion } from './crosslink-image-viewer-per-protein-bar-data.js';
+
 
 
 /**
@@ -127,8 +130,8 @@ LinkExclusionSelectionsOverlayCode.prototype.closeOverlay = function( ) {
 	
 	if ( this.dataChanged ) {
 
-		updateURLHash( false /* useSearchForm */ );
-		loadDataAndDraw( true /* doDraw */ );
+		window.imagePagePrimaryRootCodeObject.call__updateURLHash( false /* useSearchForm */ );
+		window.imagePagePrimaryRootCodeObject.call__loadDataAndDraw( true /* doDraw */ );
 	}
 };
 
@@ -265,7 +268,7 @@ LinkExclusionSelectionsOverlayCode.prototype._getProteinAndRegionInfo = function
 	}
 	var proteinId = imageProteinBarDataItem.getProteinId();
 	var proteinLength = imageProteinBarDataItem.getProteinLength();
-	var proteinName = _proteinNames[ proteinId ];
+	var proteinName = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ];
 	var regionRange = undefined;
 	if ( regionUID ) {
 		var regionEntry = imageProteinBarDataItem.getRegionFromRegionUID( { regionUID : regionUID } );
@@ -321,7 +324,7 @@ LinkExclusionSelectionsOverlayCode.prototype._populateExcludeChoiceItems = funct
 		}
 		var proteinId = imageProteinBarDataItem.getProteinId();
 		var proteinLength = imageProteinBarDataItem.getProteinLength();
-		var proteinName = _proteinNames[ proteinId ];
+		var proteinName = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ];
 		
 		//  First add Protein without Regions
 		//  singleExclusionChoiceContext is for Handlebars template to put info on the overlay on the page
@@ -581,7 +584,7 @@ LinkExclusionSelectionsOverlayCode.prototype.addExclusion = function( params ) {
 	
 	this._clearExcludeChoicesBothLists( );
 	
-	updateURLHash( false /* useSearchForm */ );
+	window.imagePagePrimaryRootCodeObject.call__updateURLHash( false /* useSearchForm */ );
 
 };
 
@@ -616,5 +619,7 @@ LinkExclusionSelectionsOverlayCode.prototype._getExcludeChoice = function( param
 	return selectedChoiceData;
 };
 
+
+export { LinkExclusionSelectionsOverlayCodeContructor }
 
 

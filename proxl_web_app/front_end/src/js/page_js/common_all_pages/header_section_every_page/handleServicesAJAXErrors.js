@@ -27,7 +27,7 @@ var AJAX_RESPONSE_INVALID_PARAMETER_STATUS_CODE = 400;
 
 //Handle when AJAX call gets failure
 
-function handleAJAXFailure( errMsg ) {
+window.handleAJAXFailure = function( errMsg ) {
 
 	showAjaxErrorMsgFromMsg( { errorMsg : "Connecting to server failed: " + errorMsg } );
 }
@@ -37,7 +37,7 @@ function handleAJAXFailure( errMsg ) {
 
 //  Handle when AJAX call gets error, non-jQuery Direct use of var xhr = new XMLHttpRequest();
 
-function handleRawAJAXError( xhr ) {
+window.handleRawAJAXError = function( xhr ) {
 
 	var status = xhr.status;
 	var response = xhr.response;
@@ -74,7 +74,7 @@ function handleRawAJAXError( xhr ) {
 
 //  Handle when AJAX call gets error
 
-function handleAJAXError( jqXHR, textStatus, errorThrown ) {
+window.handleAJAXError = function( jqXHR, textStatus, errorThrown ) {
 
 	
 	var jqXHR_statusCode = jqXHR.status;
@@ -154,7 +154,7 @@ function handleAJAXError( jqXHR, textStatus, errorThrown ) {
 };
 
 
-function showAjaxErrorMsg( params ) {
+window.showAjaxErrorMsg = function( params ) {
 	
 	var errorPageElementId = params.errorPageElementId;
 	var errorMsg = params.errorMsg;
@@ -187,7 +187,7 @@ function showAjaxErrorMsg( params ) {
 }
 	
 
-function showAjaxErrorMsgFromMsg( params ) {
+window.showAjaxErrorMsgFromMsg = function( params ) {
 	
 	try {
 
@@ -228,5 +228,5 @@ function showAjaxErrorMsgFromMsg( params ) {
 	}
 }
 	
-			
+export { handleAJAXFailure } // export something for import
 			

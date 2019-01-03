@@ -7,6 +7,14 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+
+//  For showing Data for links (Drilldown) (Called by HTML onclick):
+import { viewPsmPerPeptideLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/common/viewPsmPerPeptideLoadedFromWebServiceTemplate.js';
+import { viewPeptidesRelatedToPSMsByScanId } from 'page_js/data_pages/project_search_ids_driven_pages/common/viewPeptidesRelatedToPSMsByScanId.js';
+
+
+import { addOpenLorikeetViewerClickHandlers } from 'page_js/data_pages/project_search_ids_driven_pages/common/lorikeetPageProcessing.js';
+
 //Class contructor
 
 var ViewPsmsLoadedFromWebServiceTemplate = function() {
@@ -841,4 +849,8 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 };
 
 //	Static Singleton Instance of Class
-	var viewPsmsLoadedFromWebServiceTemplate = new ViewPsmsLoadedFromWebServiceTemplate();
+var viewPsmsLoadedFromWebServiceTemplate = new ViewPsmsLoadedFromWebServiceTemplate();
+
+window.viewPsmsLoadedFromWebServiceTemplate = viewPsmsLoadedFromWebServiceTemplate;
+
+export { viewPsmsLoadedFromWebServiceTemplate }

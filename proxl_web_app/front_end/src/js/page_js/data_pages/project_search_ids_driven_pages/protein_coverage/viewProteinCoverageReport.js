@@ -9,6 +9,19 @@
 
 "use strict";
 
+//  Import to make available on the page
+import { defaultPageView } from 'page_js/data_pages/project_search_ids_driven_pages/common/defaultPageView.js';
+
+
+import { onDocumentReady, viewSearchProteinPageCommonCrosslinkLooplinkCoverage } from 'page_js/data_pages/project_search_ids_driven_pages/protein__protein_coverage__shared/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js';
+
+
+
+$(document).ready(function() { 
+	onDocumentReady();
+}); // end $(document).ready(function()
+
+
 
 //  Constructor
 
@@ -53,6 +66,6 @@ var ViewProteinCoverageReportPageCode = function() {
 
 //  Instance of class
 
-var viewProteinCoverageReportPageCode = new ViewProteinCoverageReportPageCode();
+window.viewProteinCoverageReportPageCode = new ViewProteinCoverageReportPageCode();
 
 

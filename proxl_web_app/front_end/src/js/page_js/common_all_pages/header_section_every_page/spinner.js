@@ -19,7 +19,8 @@ var SPINNER_OPTIONS = {
 
 
 var loadingSpinner;
-function createSpinner () {
+
+window.createSpinner = function () {
 
 	var $spinnerContainer = $( "div#coverage-map-loading-spinner-block" );
 
@@ -34,13 +35,13 @@ function createSpinner () {
 };
 
 
-function destroySpinner() {
+window.destroySpinner = function() {
 	
-	if ( this.loadingSpinner ) {
-		this.loadingSpinner.stop();
+	if ( loadingSpinner ) {
+		loadingSpinner.stop();
 	}
 	
-	this.loadingSpinner = undefined;
+	loadingSpinner = undefined;
 
 	var $spinnerContainer = $("div#coverage-map-loading-spinner-block");
 
@@ -48,7 +49,7 @@ function destroySpinner() {
 
 };
 
-var incrementSpinner = function() {
+window.incrementSpinner = function() {
 	if( !loadingSpinner || !loadingSpinner.numSpinners ) {
 		createSpinner();
 		loadingSpinner.numSpinners = 1;
@@ -57,7 +58,7 @@ var incrementSpinner = function() {
 	}	
 };
 
-var decrementSpinner = function() {
+window.decrementSpinner = function() {
 	if ( ! loadingSpinner ) { return; }
 	var numSpinners = loadingSpinner.numSpinners;
 	if( !numSpinners ) { return; }
@@ -72,3 +73,5 @@ var decrementSpinner = function() {
 	}
 	
 };
+
+export { createSpinner } // export something for import to get onto page

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." name="Proxl buildFrontEnd_CopyToTomcat" default="build-copy-front-end">
+
+	<!--  Build the 'front end' and copy to a Tomcat Deploy  -->
+	
+	<!--
+	<property environment="env" />
+	<property name="gradle.wrapper.executable" location="${env.GRADLE_HOME}/bin/gradle" />
+	
+	<echo>env:${env}</echo>
+	<echo>env.GRADLE_HOME:${env.GRADLE_HOME}</echo>
+	-->
+	
+	<!-- Need A unique property name since will run ant script 'ant_Copy_FrontEnd_ToTomcat.xml' -->
+	
+	<property name="config_file__Build_Front_End" value="..${file.separator}aa_ant_buildWar_CopyToTomcat.settings.properties" />
+	
+	<property name="config_file__Build_Front_End_with_path" 
+		value="${config_file__Build_Front_End}"/>
+		
+	<fail message="ERROR: '${config_file__Build_Front_End}' file not found, check the path. filename with path: ${config_file__Build_Front_End_with_path}">
+		<condition>
+		    <not>
+		    	<available file="${config_file__Build_Front_End_with_path}" />
+		    </not>
+		</condition>
+	</fail>
+	
+	<echo>config_file__Build_Front_End_with_path: ${config_file__Build_Front_End_with_path}</echo>
+	
+	<!-- This does not fail if the file is not found -->
+	<property file="${config_file__Build_Front_End_with_path}" />
+	
+	<echo>gradle.wrapper.executable: ${gradle.wrapper.executable}</echo>
+	
+	<echo>tomcat.webapps.root: ${tomcat.webapps.root}</echo>
+	<echo>proxl.context: ${proxl.context}</echo>
+
+	<property name="tomcat.proxl.webapp.root" value="${tomcat.webapps.root}${file.separator}${proxl.context}" />
+	
+	<property name="tomcat.static" value="${tomcat.proxl.webapp.root}${file.separator}static" />
+
+	
+	<property name="tomcat.css" value="${tomcat.proxl.webapp.root}${file.separator}css" />
+	<property name="tomcat.images" value="${tomcat.proxl.webapp.root}${file.separator}images" />
+	<property name="tomcat.js" value="${tomcat.proxl.webapp.root}${file.separator}js" />
+	
+	<property name="tomcat.jsp-includes" value="${tomcat.proxl.webapp.root}${file.separator}WEB-INF${file.separator}jsp-includes" />
+	<property name="tomcat.jsp-pages" value="${tomcat.proxl.webapp.root}${file.separator}WEB-INF${file.separator}jsp-pages" />
+	<property name="tomcat.jsp_template_fragments" value="${tomcat.proxl.webapp.root}${file.separator}WEB-INF${file.separator}jsp_template_fragments" />
+	
+	<!-- ================== 
+	
+		Root target  build and copy front end
+	-->
+	<target name="build-copy-front-end" description="" depends="build-front-end,copy-front-end" />
+	
+	<!-- ================== 
+	
+		build front end
+	-->
+	<target name="build-front-end" description="">
+		
+		<echo>Executing gradle using executable: ${gradle.wrapper.executable}</echo>
+		
+		<exec executable="${gradle.wrapper.executable}" dir="." failonerror="true" >
+			<!--   <arg value="XXXX" /> -->
+		</exec>
+
+	</target>
+	
+
+	<!-- ================== 
+	
+		copy front end
+	-->
+	<target name="copy-front-end" description="">
+		
+		<!-- Copy 'front end' files -->
+
+	      <delete dir="${tomcat.static}"/>
+	      <mkdir  dir="${tomcat.static}"/>
+				
+		<copy todir="${tomcat.static}" >
+		    <fileset dir="..${file.separator}src${file.separator}main${file.separator}webapp${file.separator}static" />
+		</copy>			 
+		
+		<!-- Copy legacy files -->
+		
+		<ant dir=".." antfile="ant_Copy_FrontEnd_ToTomcat.xml" />
+		
+	</target>
+
+
+</project>

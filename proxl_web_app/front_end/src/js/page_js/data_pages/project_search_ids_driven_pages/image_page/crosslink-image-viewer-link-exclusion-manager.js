@@ -494,3 +494,4 @@ LinkExclusionDataEntry.constructEmptyLinkExclusionDataEntry = function(  ) {
 	return linkExclusionDataEntry;
 };
 
+export { LinkExclusionDataManagerContructor }

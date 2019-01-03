@@ -6,6 +6,11 @@
  * This code uses a number of variables and functions from crosslink-image-viewer.js and possibly other JS files
  */
 
+import { ImageProteinBarDataManagerContructor, ImageProteinBarData } from './crosslink-image-viewer-per-protein-bar-data.js';
+
+import { getProteinSequenceVersionIdsForNrseqProteinIds } from 'page_js/data_pages/project_search_ids_driven_pages/image_page__structure_page__shared/nrseqProteinIdToProteinSequenceVersionIdLookup.js';
+
+
 var LegacyJSONUpdater = function() {
 
 };
@@ -18,13 +23,13 @@ var LegacyJSONUpdater = function() {
  */
 LegacyJSONUpdater.prototype.convertLegacyJSON = function() {
 
-	var json = getRawJsonFromHash();
-	var version = getJSONVersionNumber();
+	var json = window.imagePagePrimaryRootCodeObject.call__getRawJsonFromHash();
+	var version = window.imagePagePrimaryRootCodeObject.call__getJSONVersionNumber();
 
 	var objectThis = this;
 	
 	// nothing to do, we're current
-	if( version && version >= _JSON_VERSION_NUMBER ) {
+	if( version && version >= window.imagePagePrimaryRootCodeObject.getVariable__v_JSON_VERSION_NUMBER() ) {
 		return false;
 	}
 	
@@ -32,7 +37,7 @@ LegacyJSONUpdater.prototype.convertLegacyJSON = function() {
 	 * Convert JSON to version 1
 	 */
 		
-	var proteinBarData = json[ HASH_OBJECT_PROPERTIES["protein_bar_data"] ];
+	var proteinBarData = json[ window.imagePagePrimaryRootCodeObject.getVariable__v_HASH_OBJECT_PROPERTIES()["protein_bar_data"] ];
 	
 	// check for the pre-URL-shortened version
 	if( !proteinBarData ) {
@@ -41,8 +46,8 @@ LegacyJSONUpdater.prototype.convertLegacyJSON = function() {
 	
 	if( !version || version < 1 ) {
 	
-		json[ HASH_OBJECT_PROPERTIES["version-number"] ] /* json.vn */ = 1;
-		updateURLHashWithJSONObject( json );
+		json[ window.imagePagePrimaryRootCodeObject.getVariable__v_HASH_OBJECT_PROPERTIES()["version-number"] ] /* json.vn */ = 1;
+		window.imagePagePrimaryRootCodeObject.call__updateURLHashWithJSONObject( json );
 		
 		if( json[ "selected-proteins" ] ) {
 			/*
@@ -105,26 +110,26 @@ LegacyJSONUpdater.prototype.convertLegacyJSON = function() {
 	
 //		filterOnlyOnePSM : "e", 
 		
-		json[ HASH_OBJECT_PROPERTIES["version-number"] ] /* json.vn */ = 2;
-		updateURLHashWithJSONObject( json );
+		json[ window.imagePagePrimaryRootCodeObject.getVariable__v_HASH_OBJECT_PROPERTIES()["version-number"] ] /* json.vn */ = 2;
+		window.imagePagePrimaryRootCodeObject.call__updateURLHashWithJSONObject( json );
 		
-		if ( json[ HASH_OBJECT_PROPERTIES[ "filterOnlyOnePSM" ] ] !== undefined ) {
-			if ( json[ HASH_OBJECT_PROPERTIES[ "filterOnlyOnePSM" ] ] ) {
-				json[ HASH_OBJECT_PROPERTIES[ "minPSMs" ] ] = 2;
+		if ( json[ window.imagePagePrimaryRootCodeObject.getVariable__v_HASH_OBJECT_PROPERTIES()[ "filterOnlyOnePSM" ] ] !== undefined ) {
+			if ( json[ window.imagePagePrimaryRootCodeObject.getVariable__v_HASH_OBJECT_PROPERTIES()[ "filterOnlyOnePSM" ] ] ) {
+				json[ window.imagePagePrimaryRootCodeObject.getVariable__v_HASH_OBJECT_PROPERTIES()[ "minPSMs" ] ] = 2;
 			} else {
-				json[ HASH_OBJECT_PROPERTIES["minPSMs" ] ] = 1;
+				json[ window.imagePagePrimaryRootCodeObject.getVariable__v_HASH_OBJECT_PROPERTIES()["minPSMs" ] ] = 1;
 			}
-			delete json[ HASH_OBJECT_PROPERTIES[ "filterOnlyOnePSM" ] ];
-			updateURLHashWithJSONObject( json );
+			delete json[ window.imagePagePrimaryRootCodeObject.getVariable__v_HASH_OBJECT_PROPERTIES()[ "filterOnlyOnePSM" ] ];
+			window.imagePagePrimaryRootCodeObject.call__updateURLHashWithJSONObject( json );
 		}
 		if ( json[ "filterOnlyOnePSM" ] !== undefined ) {
 			if ( json[ "filterOnlyOnePSM" ] ) {
-				json[ HASH_OBJECT_PROPERTIES[ "minPSMs" ] ] = 2;
+				json[ window.imagePagePrimaryRootCodeObject.getVariable__v_HASH_OBJECT_PROPERTIES()[ "minPSMs" ] ] = 2;
 			} else {
-				json[ HASH_OBJECT_PROPERTIES[ "minPSMs" ] ] = 1;
+				json[ window.imagePagePrimaryRootCodeObject.getVariable__v_HASH_OBJECT_PROPERTIES()[ "minPSMs" ] ] = 1;
 			}
-			delete json[ HASH_OBJECT_PROPERTIES[ "filterOnlyOnePSM" ] ];
-			updateURLHashWithJSONObject( json );
+			delete json[ window.imagePagePrimaryRootCodeObject.getVariable__v_HASH_OBJECT_PROPERTIES()[ "filterOnlyOnePSM" ] ];
+			window.imagePagePrimaryRootCodeObject.call__updateURLHashWithJSONObject( json );
 		}
 		
 		
@@ -149,10 +154,10 @@ LegacyJSONUpdater.prototype.convertLegacyJSON = function() {
  */
 LegacyJSONUpdater.prototype.convertProteinBarDataCallback = function( params ) {
 	
-	var json = getRawJsonFromHash();
+	var json = window.imagePagePrimaryRootCodeObject.call__getRawJsonFromHash();
 	var proteinIdsMapping = params[ "proteinIdsMapping" ];
 	
-	var proteinBarData = json[ HASH_OBJECT_PROPERTIES["protein_bar_data"] ];
+	var proteinBarData = json[ window.imagePagePrimaryRootCodeObject.getVariable__v_HASH_OBJECT_PROPERTIES()["protein_bar_data"] ];
 	
 	// check for the pre-URL-shortened version
 	if( !proteinBarData ) {
@@ -235,17 +240,17 @@ LegacyJSONUpdater.prototype.convertProteinBarDataToIndexManager = function( json
 	}
 
 	
-	var jsonKey_indexManagerData = hashObjectPropertyValueFromPropertyNameLookup( "index-manager-data" );
+	var jsonKey_indexManagerData = window.imagePagePrimaryRootCodeObject.call__hashObjectPropertyValueFromPropertyNameLookup( "index-manager-data" );
 	json[ jsonKey_indexManagerData ] = {a:0, b:imdata};
 
-	var jsonKey_protein_bar_data_current = hashObjectPropertyValueFromPropertyNameLookup( "protein_bar_data" );
+	var jsonKey_protein_bar_data_current = window.imagePagePrimaryRootCodeObject.call__hashObjectPropertyValueFromPropertyNameLookup( "protein_bar_data" );
 	json[ jsonKey_protein_bar_data_current ] = {a:0, b:pbdata};
 
-	updateURLHashWithJSONObject( json );
+	window.imagePagePrimaryRootCodeObject.call__updateURLHashWithJSONObject( json );
 		
-	// if ajaxResults is true, then we need to re-call initPage()
+	// if ajaxResults is true, then we need to re-call window.imagePagePrimaryRootCodeObject.call__initPage()
 	if( ajaxResults ) {
-		initPage();
+		window.imagePagePrimaryRootCodeObject.call__initPage();
 	}
 };
 
@@ -284,7 +289,7 @@ LegacyJSONUpdater.prototype.proteinBarDataContainsNrSeqIds = function( ob ) {
  */
 LegacyJSONUpdater.prototype.convertSelectedProteinsJSON = function( params ) {
 	
-	var json = getRawJsonFromHash();
+	var json = window.imagePagePrimaryRootCodeObject.call__getRawJsonFromHash();
 	var proteinIdsMapping = params[ "proteinIdsMapping" ];
 	
 	if( !proteinIdsMapping || Object.keys( proteinIdsMapping ).length < 1 ) {
@@ -297,16 +302,16 @@ LegacyJSONUpdater.prototype.convertSelectedProteinsJSON = function( params ) {
 	for( var i = 0; i < nrseqIds.length; i++ ) {
 		var nrseqId = nrseqIds[ i ];
 		var pid = proteinIdsMapping[ nrseqId ];
-		var uid = _indexManager.addProteinId( pid );
+		var uid = window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().addProteinId( pid );
 		// populate the protein bar data manager
 		this.convertProteinHashDataPre_protein_bar_data( json, uid, nrseqId );
 	}
 	
-	var jsonKey_indexManagerData = hashObjectPropertyValueFromPropertyNameLookup( "index-manager-data" );
-	var jsonKey_protein_bar_data_current = hashObjectPropertyValueFromPropertyNameLookup( "protein_bar_data" );
+	var jsonKey_indexManagerData = window.imagePagePrimaryRootCodeObject.call__hashObjectPropertyValueFromPropertyNameLookup( "index-manager-data" );
+	var jsonKey_protein_bar_data_current = window.imagePagePrimaryRootCodeObject.call__hashObjectPropertyValueFromPropertyNameLookup( "protein_bar_data" );
 
-	json[ jsonKey_indexManagerData ] = _indexManager.getDataForHash();
-	json[ jsonKey_protein_bar_data_current ] = _imageProteinBarDataManager.getDataForHash();
+	json[ jsonKey_indexManagerData ] = window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getDataForHash();
+	json[ jsonKey_protein_bar_data_current ] = window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getDataForHash();
 	
 	delete json[ 'selected-proteins' ];
 	delete json[ 'protein-offsets' ];
@@ -314,9 +319,9 @@ LegacyJSONUpdater.prototype.convertSelectedProteinsJSON = function( params ) {
 	delete json[ 'proteins-reversed' ];
 	delete json[ 'highlighted-proteins' ];
 	
-	updateURLHashWithJSONObject( json );
+	window.imagePagePrimaryRootCodeObject.call__updateURLHashWithJSONObject( json );
 	
-	initPage();
+	window.imagePagePrimaryRootCodeObject.call__initPage();
 };
 
 
@@ -332,7 +337,7 @@ LegacyJSONUpdater.prototype.convertProteinHashDataPre_protein_bar_data = functio
 	//  Backwards compatibility Support	
 		
 	var newEntry = ImageProteinBarData.constructEmptyImageProteinBarData();
-	_imageProteinBarDataManager.addEntry( uid, newEntry );
+	window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().addEntry( uid, newEntry );
 
 	var highlightedProteins = json['highlighted-proteins'];  //   Array of the indexes of the highlighted proteins
 
@@ -341,7 +346,7 @@ LegacyJSONUpdater.prototype.convertProteinHashDataPre_protein_bar_data = functio
 			var highlightedProteinProteinBarPositionIndex = highlightedProteins[ highlightedProteinsIndex ];
 			try {
 				//  Try/Catch since the index may not be valid
-				var entry = _imageProteinBarDataManager.getItemByIndex( highlightedProteinProteinBarPositionIndex );
+				var entry = window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByIndex( highlightedProteinProteinBarPositionIndex );
 				entry.setProteinBarHighlightedAll();
 			} catch ( e ) {
 			}
@@ -382,10 +387,13 @@ LegacyJSONUpdater.prototype.convertProteinHashDataPre_protein_bar_data = functio
 				//  value is a number so use it
 				var offsetProtein_ProteinId = offsetProtein_Key;
 				if( offsetProtein_ProteinId == nrseqId ) {
-					var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByUID( uid );
+					var imageProteinBarDataEntry = window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );
 					imageProteinBarDataEntry.setProteinOffset( { proteinOffset : offsetProtein_Value } );
 				}
 			}
 		}
 	}
 };
+
+
+export { LegacyJSONUpdater } 

@@ -43,12 +43,43 @@
 		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
 		
 			
+<%--  Moved to Front End Build Bundles
+		
+		<script type="text/javascript" src="${ contextPath }/js/viewProjectPage.js?x=${cacheBustValue}"></script> 
+
 		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 		
 		<script type="text/javascript" src="${ contextPath }/js/spinner.js"></script>
-		
-		<script type="text/javascript" src="${ contextPath }/js/viewProjectPage.js?x=${cacheBustValue}"></script> 
-		
+				
+ --%>
+ 
+ 
+	<%-- Choose which Javascript bundle to load, based on user type --%>
+<c:choose>
+  <c:when test="${ authAccessLevel.projectOwnerAllowed }">
+  	<%--  Project Owner and Project is NOT locked --%>
+	<script type="text/javascript" src="static/js_generated_bundles/data_pages/projectViewPage_ProjectOwner_W_User-bundle.js?x=${ cacheBustValue }"></script>
+  </c:when>
+  <c:when test="${ authAccessLevel.projectOwnerIfProjectNotLockedAllowed }">
+  	<%--  Project Owner and Project IS locked --%>
+	<script type="text/javascript" src="static/js_generated_bundles/data_pages/projectViewPage_ProjectLocked_ProjectOwner_W_User-bundle.js?x=${ cacheBustValue }"></script>
+  </c:when>
+  <c:when test="${ authAccessLevel.assistantProjectOwnerAllowed }">
+  	<%--  Researcher (NOT Project Owner) and Project is NOT locked --%>
+	<script type="text/javascript" src="static/js_generated_bundles/data_pages/projectViewPage_Researcher_W_User-bundle.js?x=${ cacheBustValue }"></script>
+  </c:when>
+  <c:when test="${ authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }">
+  	<%--  Researcher (NOT Project Owner) and Project IS locked --%>
+	<script type="text/javascript" src="static/js_generated_bundles/data_pages/projectViewPage_ProjectLocked_Researcher_W_User-bundle.js?x=${ cacheBustValue }"></script>
+  </c:when>
+  <c:otherwise>
+  	<%--  Project is public and not signed in user --%>
+	<script type="text/javascript" src="static/js_generated_bundles/data_pages/projectViewPage_PublicUser-bundle.js?x=${ cacheBustValue }"></script>
+  </c:otherwise>
+
+</c:choose>
+ 
+ 		
 		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
 		
 		
@@ -1852,12 +1883,15 @@
 							<div >
 								<span class=" folder-name-display folder_name_jq "
 									><c:out value="${ folder.folderName }"></c:out></span>
-								<a href="javascript:" class="folder_rename_button_jq tool_tip_attached_jq" 
-									data-tooltip="Edit name of folder"
-									><img  src="${ contextPath }/images/icon-edit-small.png"></a>
-								<a href="javascript:" class="folder_delete_button_jq tool_tip_attached_jq" 
-									data-tooltip="Delete folder.  Searches in it become 'Unfiled'."
-									><img  src="${ contextPath }/images/icon-delete-small.png"></a>
+									
+								<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
+									<a href="javascript:" class="folder_rename_button_jq tool_tip_attached_jq" 
+										data-tooltip="Edit name of folder"
+										><img  src="${ contextPath }/images/icon-edit-small.png"></a>
+									<a href="javascript:" class="folder_delete_button_jq tool_tip_attached_jq" 
+										data-tooltip="Delete folder.  Searches in it become 'Unfiled'."
+										><img  src="${ contextPath }/images/icon-delete-small.png"></a>
+								</c:if>
 							</div>
 
 									
@@ -1991,11 +2025,15 @@
 
 			<%@ include file="/WEB-INF/jsp-includes/proxl_XML_Upload_Overlay.jsp" %>
 
+			<%--  Moved to Front End Build Bundles	
 			<script type="text/javascript" src="${ contextPath }/js/proxlXMLFileImport.js?x=${cacheBustValue}"></script>
+			--%>
 		
 			<%--  Separate JS for Project owner to cancel queued or remove failed import tracking item --%>
 		
+			<%--  Moved to Front End Build Bundles	
 			<script type="text/javascript" src="${ contextPath }/js/proxlXMLFileImportUserUpdates.js?x=${cacheBustValue}"></script>
+			--%>
 		  </c:if>
 		  
 		  <%--  Overlay and JS for notifying user that one the Proxl XML Import items imported successfully --%>
@@ -2056,7 +2094,9 @@
 			
 			 <!-- END:   Modal dialog for notifying user that the status has changed on one of the Proxl XML Import items -->
 			
+			<%--  Moved to Front End Build Bundles	
 			<script type="text/javascript" src="${ contextPath }/js/proxlXMLFileImportStatusDisplay.js?x=${cacheBustValue}"></script>
+			--%>
 		
 									
 		  </c:if> <%--  END test="${ authAccessLevel.assistantProjectOwnerAllowed }"  --%>
@@ -2066,24 +2106,30 @@
 		
 	
 		<%--  If Not locked and user allowed to change search data, include the Javascript for it --%>
+		<%--  Moved to Front End Build Bundles	
 		<c:if test="${authAccessLevel.assistantProjectOwnerAllowed }" >
 			<script type="text/javascript" src="${ contextPath }/js/viewProject_SearchMaint.js?x=${cacheBustValue}"></script>
 		</c:if> 
+		--%>
 		<%--  If admin section rendered, include the Javascript for it --%>
+		<%--  Moved to Front End Build Bundles	
 		<c:if test="${authAccessLevel.assistantProjectOwnerAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed}" >
 			<script type="text/javascript" src="${ contextPath }/js/viewProject_ProjectAdminSection.js?x=${cacheBustValue}"></script>
 		</c:if> 
+		--%>
 		<%--  If project owner, include the Javascript for Project Search Order admin --%>
+		<%--  Moved to Front End Build Bundles	
 		<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
 			<script type="text/javascript" src="${ contextPath }/js/viewProject_OrganizeSearchesAndFoldersAdmin.js?x=${cacheBustValue}"></script>
 		</c:if>		
+		--%>
 		<%--  If project owner, include the Javascript for Project Lock admin --%>
+		<%--  Moved to Front End Build Bundles	
 		<c:if test="${authAccessLevel.projectOwnerAllowed or authAccessLevel.projectOwnerIfProjectNotLockedAllowed}" >
 			<script type="text/javascript" src="${ contextPath }/js/viewProject_ProjectLockAdmin.js?x=${cacheBustValue}"></script>
 		</c:if>
+		--%>
 	
 	</div>
-
-			<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
 
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>

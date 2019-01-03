@@ -805,3 +805,7 @@ ProxlXMLFileImportStatusDisplay.prototype.refreshPageClicked  = function( clickT
 //  Instance of object on page
 
 var proxlXMLFileImportStatusDisplay = new ProxlXMLFileImportStatusDisplay();
+
+window.proxlXMLFileImportStatusDisplay = proxlXMLFileImportStatusDisplay;
+
+export { proxlXMLFileImportStatusDisplay }

@@ -750,3 +750,7 @@ var AnnotationDataDisplayProcessingCommonCode = function() {
 
 //   Instance of class
 var annotationDataDisplayProcessingCommonCode = new AnnotationDataDisplayProcessingCommonCode();
+
+window.annotationDataDisplayProcessingCommonCode = annotationDataDisplayProcessingCommonCode;
+
+export { annotationDataDisplayProcessingCommonCode }

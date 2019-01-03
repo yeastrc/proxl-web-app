@@ -347,4 +347,6 @@ indexManager.prototype.replaceInternalDataWithDataInHash = function( indexManage
 	}
 };
 
+export { indexManager }
+
 

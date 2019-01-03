@@ -8,6 +8,10 @@
 
 //  All references to proteinId are actually referencing the protein sequence id
 
+
+import { getLooplinkDataCommon, getCrosslinkDataCommon, getMonolinkDataCommon, attachViewLinkInfoOverlayClickHandlers } from 'page_js/data_pages/project_search_ids_driven_pages/image_page__structure_page__shared/image_structure_click_element_common.js';
+
+
 ////////////    Click handlers for the links ( Lines that show the links )
 
 //////////////   Process LOOP link
@@ -137,3 +141,7 @@ function getMonolinkDataForSpecificLinkInGraph( params ) {
 	};
 	getMonolinkDataCommon( getMonolinkDataCommonParams );
 }
+
+
+export { getLooplinkDataForSpecificLinkInGraph, getCrosslinkDataForSpecificLinkInGraph, getMonolinkDataForSpecificLinkInGraph }
+

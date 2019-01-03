@@ -13,7 +13,7 @@
 
 //  Constructor
 
-var ReportWebErrorToServer = function() {
+window.ReportWebErrorToServer = function() {
 	
 	
 	
@@ -85,4 +85,7 @@ var ReportWebErrorToServer = function() {
 
 //  Instance of class
 
-var reportWebErrorToServer = new ReportWebErrorToServer();
+window.reportWebErrorToServer = new ReportWebErrorToServer();
+
+export { reportWebErrorToServer }
+

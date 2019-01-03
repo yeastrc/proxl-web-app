@@ -13,7 +13,7 @@
 // /////////////////////////////////////////
 
 
-function toggleVisibility( elementParam ) {
+window.toggleVisibility = function( elementParam ) {
 
 
 	if (typeof elementParam == 'string' || elementParam instanceof String) {
@@ -32,7 +32,7 @@ function toggleVisibility( elementParam ) {
 ///////////////////////////////////////////
 
 
-function toggleVisibilityElementIdPassed( elementId ) {
+window.toggleVisibilityElementIdPassed = function( elementId ) {
 
 	var $jitem = $( '#' + elementId ).next();
 	
@@ -58,7 +58,7 @@ function toggleVisibilityElementIdPassed( elementId ) {
 //  using  onclick="toggleVisibility(this)"
 //    toggleVisibility(...) will call  toggleVisibilityHTMLElement(...)
 
-function toggleVisibilityHTMLElement( htmlElement ) {
+window.toggleVisibilityHTMLElement = function( htmlElement ) {
 
 	var $htmlElement = $(htmlElement);
 
@@ -94,7 +94,7 @@ function toggleVisibilityHTMLElement( htmlElement ) {
 
 
 
-function addToggleVisibilityClickHandler( $parentElement ) {
+window.addToggleVisibilityClickHandler = function( $parentElement ) {
 
 	var $toggle_visibility_link_jq = $parentElement.find(".toggle_visibility_link_jq");
 	
@@ -134,7 +134,7 @@ function addToggleVisibilityClickHandler( $parentElement ) {
 
 
 
-function initToggleVisibility( ) {
+window.initToggleVisibility = function( ) {
 
 	var $parentElement = $(document);
 	
@@ -148,3 +148,5 @@ $(document).ready(function() {
 	initToggleVisibility();
 
 });
+
+export { initToggleVisibility } // Export something to get this on the page

@@ -118,4 +118,4 @@ function computeCutPoints( proteinSequence ) {
 	}
 }
 
-
+export { computeCutPoints }

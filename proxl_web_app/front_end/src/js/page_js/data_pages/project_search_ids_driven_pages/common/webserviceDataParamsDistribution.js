@@ -188,3 +188,7 @@ var WebserviceDataParamsDistributionCommonCode = function() {
 //  Instance of class
 
 var webserviceDataParamsDistributionCommonCode = new WebserviceDataParamsDistributionCommonCode();
+
+window.webserviceDataParamsDistributionCommonCode = webserviceDataParamsDistributionCommonCode;
+
+export { webserviceDataParamsDistributionCommonCode }

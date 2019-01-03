@@ -19,7 +19,7 @@ $(document).ready(function() {
 	addCollapsableEventHandlers();  // Run with no parameter
 });
 
-var addCollapsableEventHandlers = function( $searchRoot ) {
+window.addCollapsableEventHandlers = function( $searchRoot ) {
 	
 	try {
 
@@ -115,3 +115,5 @@ var addCollapsableEventHandlers = function( $searchRoot ) {
 	}
 
 };
+
+export { addCollapsableEventHandlers }

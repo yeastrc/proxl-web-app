@@ -3,7 +3,7 @@
  * 
  * Javascript for the qcChart_Download_Help_HTMLBlock.jsp page fragment
  * 
- * page variable chartDownload
+ * page variable qcChartDownloadHelp
  * 
  * !!!!   Page Requirements:
  * 
@@ -17,11 +17,15 @@
 //  JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
-///////
-$(document).ready(function() { 
-	qcChartDownloadHelp.init();
 
-} ); // end $(document).ready(function() 
+import { downloadStringAsFile } from 'page_js/data_pages/project_search_ids_driven_pages/common/download-string-as-file.js';
+
+
+///////  removed since init() body is empty
+// $(document).ready(function() { 
+// 	qcChartDownloadHelp.init();
+
+// } ); // end $(document).ready(function() 
 
 
 /**
@@ -32,9 +36,9 @@ var QC_ChartDownloadHelp = function() {
 	/**
 	 * Init page on load 
 	 */
-	this.init = function() {
-		var objectThis = this;
-	};
+	// this.init = function() {
+	// 	var objectThis = this;
+	// };
 
 	/**
 	 * params: { $chart_outer_container_for_download_jq : element with ".chart_outer_container_for_download_jq"
@@ -273,3 +277,6 @@ var QC_ChartDownloadHelp = function() {
 };
 
 var qcChartDownloadHelp = new QC_ChartDownloadHelp();
+
+export { qcChartDownloadHelp }
+

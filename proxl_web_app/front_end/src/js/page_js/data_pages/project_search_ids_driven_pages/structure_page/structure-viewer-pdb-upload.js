@@ -6,22 +6,22 @@ var _MAX_PDB_FILESIZE = _MAX_PDB_FILESIZE_IN_MB * 1000 * 1000;
 
 
 
-// initialize the pdb upload overlay
-$(document).ready(function()  { 
+// initialize the pdb upload overlay - Moved to main JS file
+// $(document).ready(function()  { 
 	
-	try {
+// 	try {
 	
-		attachPDBUploadOverlayClickHandlers();
-		attachPDBFileUploadHandlers();
+// 		attachPDBUploadOverlayClickHandlers();
+// 		attachPDBFileUploadHandlers();
 		
-	} catch( e ) {
-		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-		throw e;
-	}
-});
+// 	} catch( e ) {
+// 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+// 		throw e;
+// 	}
+// });
 
 // opens the overlay
-var openPDBUploadOverlay = function (  ) {
+window.openPDBUploadOverlay = function (  ) {
 
 	try {
 
@@ -40,7 +40,7 @@ var openPDBUploadOverlay = function (  ) {
 };
 
 // close the overlay
-var closePDBUploadOverlay = function (  ) {
+window.closePDBUploadOverlay = function (  ) {
 
 	try {
 
@@ -106,7 +106,7 @@ function attachPDBFileUploadHandlers() {
 };
 
 
-function uploadPDBFile() {
+window.uploadPDBFile = function() {
 	
 	// get our file
 	var file = document.getElementById("pdb-file-field").files[ 0 ];
@@ -186,8 +186,8 @@ function uploadPDBFile() {
 
     			closePDBUploadOverlay();
 
-    			var pdbFileId = getSelectedPDBFile().id;
-    			loadPDBFiles( pdbFileId );
+    			var pdbFileId = window.structurePagePrimaryRootCodeObject.call__getSelectedPDBFile().id;
+    			window.structurePagePrimaryRootCodeObject.call__loadPDBFiles( pdbFileId );
 
     		} else {
 
@@ -206,3 +206,5 @@ function uploadPDBFile() {
     xhr.send(formData);
 
 }
+
+export { attachPDBUploadOverlayClickHandlers, attachPDBFileUploadHandlers }

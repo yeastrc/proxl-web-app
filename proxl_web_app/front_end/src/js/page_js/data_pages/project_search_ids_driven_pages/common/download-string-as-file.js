@@ -51,3 +51,5 @@ var downloadStringAsFile = function( filename, mimetype, content ) {
 		throw e;
 	}
 };
+
+export { downloadStringAsFile }

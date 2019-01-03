@@ -17,12 +17,12 @@ var pageGlobals = {
 };
 
 ///////////////////
-var loginPersonFormSubmit = function() {
+window.loginPersonFormSubmit = function() {
 	loginPerson();
 };
 
 ////////////////////////////
-var loginPerson = function( params ) {
+window.loginPerson = function( params ) {
 	var tosKeyToServer = "";
 	if ( params ) {
 		if ( params.tosKey ) {
@@ -95,7 +95,7 @@ var loginPerson = function( params ) {
 };
 
 //////////
-var loginComplete = function(requestData, responseData) {
+window.loginComplete = function(requestData, responseData) {
 	if ( ! responseData.status ) {
 		//  User not logged in if status not true
 		if ( responseData.termsOfServiceAcceptanceRequired ) {
@@ -194,7 +194,7 @@ var loginComplete = function(requestData, responseData) {
 
 
 //////////////////
-function initLoginPage() {
+window.initLoginPage = function() {
 	$(document).click( function(eventObject) {
 		try {
 			hideAllErrorMessages();

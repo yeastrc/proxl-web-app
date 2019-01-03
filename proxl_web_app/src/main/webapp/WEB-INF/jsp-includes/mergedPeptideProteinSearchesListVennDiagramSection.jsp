@@ -8,8 +8,6 @@
 
 <%--  If no Venn diagram data, lists the searches and their counts and color blocks --%>
 
-<script type="text/javascript" src="${ contextPath }/js/mergedPeptideProteinSearchesListVennDiagramSection.js?x=${cacheBustValue}"></script>
-
 <c:choose>
 	 <c:when test="${ not empty vennDiagramDataToJSON }">
 
@@ -39,7 +37,7 @@
 	  </td>
 	  <td style="vertical-align: top">
 	  
-		<div  id="searches_intersection_venn_diagram_outer_container" style="position: relative;" >
+		<div  id="searches_intersection_venn_diagram_outer_container" style="position: relative; display: none;" >
 			<div class=" svg_download_outer_block_jq " style="position: absolute; top: 4px; right: 4px;">
 			  <div class="svg-download-block">
 				<a href="javascript:" class=" tool_tip_attached_jq  " data-tooltip="Download graphic as file." 

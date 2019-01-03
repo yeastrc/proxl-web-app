@@ -15,7 +15,13 @@
 // /////////////////////////////////////////
 
 
-var HEADER_MAIN_CONSTANTS = {
+//  Import to get onto page
+
+import { addCollapsableEventHandlers } from "./crosslinksCollapsible.js";
+
+
+
+window.HEADER_MAIN_CONSTANTS = {
 		
 	DIV_CLOSE_TIMEOUT : 250  // milliseconds	
 		
@@ -23,7 +29,7 @@ var HEADER_MAIN_CONSTANTS = {
 
 
 
-var headerMainGlobals = {
+window.headerMainGlobals = {
 
 	divCloseTimerId : null
 };
@@ -33,7 +39,7 @@ var headerMainGlobals = {
 
 ////////////////////////////
 
-var initHeaderMain = function() {
+window.initHeaderMain = function() {
 
 	
 	$("#header_projects_link,#header_projects_list_container").mouseenter( function( eventObject  ) {

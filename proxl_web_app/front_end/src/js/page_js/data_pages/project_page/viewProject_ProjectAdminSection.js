@@ -7,7 +7,9 @@
 "use strict";
 
 ///////////////////////////////////////////
-var adminGlobals = {
+
+//  Attach to 'window.' since used in other JS files
+window.adminGlobals = {
 		projectToCopySearchesToSelected : false,
 		searchCheckboxesCheckedCount : 0,
 		project_id : null,
@@ -616,12 +618,12 @@ function updateCopySearchesButton() {
 };
 
 ////////////////////////////
-function updateCopySearchesButtonFromSearchCheckboxes(searchCheckboxesCheckedCount) {
+window.updateCopySearchesButtonFromSearchCheckboxes = function(searchCheckboxesCheckedCount) {
 	adminGlobals.searchCheckboxesCheckedCount = searchCheckboxesCheckedCount;
 	updateCopySearchesButton();
 };
 
-var openCopySearchesOverlay = function(clickThis, eventObject) {
+window.openCopySearchesOverlay = function(clickThis, eventObject) {
 	$(".copy_searches_display_copy_part_jq").show();
 	$(".copy_searches_display_move_part_jq").hide();
 	
@@ -631,7 +633,7 @@ var openCopySearchesOverlay = function(clickThis, eventObject) {
 	populateOtherProjectsForCopySearchesOverlay( { doCopy : true } );
 };
 
-var openMoveSearchesOverlay = function(clickThis, eventObject) {
+window.openMoveSearchesOverlay = function(clickThis, eventObject) {
 	$(".copy_searches_display_move_part_jq").show();
 	$(".copy_searches_display_copy_part_jq").hide();
 
@@ -2800,3 +2802,8 @@ $(document).ready(function() {
 		throw e;
 	}
 });
+
+// Something to export
+var viewProject_ProjectAdminSection = null;
+
+export { viewProject_ProjectAdminSection }

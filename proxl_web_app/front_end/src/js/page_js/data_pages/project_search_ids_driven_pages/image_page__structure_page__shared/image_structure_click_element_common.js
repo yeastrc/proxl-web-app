@@ -7,6 +7,18 @@
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+
+
+//  For showing Data for links (Drilldown) (Called by HTML onclick):
+import { viewLooplinkProteinsLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/protein_pages/viewLooplinkProteinsLoadedFromWebServiceTemplate.js';
+
+import { viewCrosslinkProteinsLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/protein_pages/viewCrosslinkProteinsLoadedFromWebServiceTemplate.js';
+import { viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/protein_pages/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js';
+import { viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/protein_pages/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js';
+
+import { closeLorikeetOverlay } from 'page_js/data_pages/project_search_ids_driven_pages/common/lorikeetPageProcessing.js';
+
+
 //////////
 //   Globals
 var _data_per_search_between_searches_html = null;
@@ -644,3 +656,9 @@ var linkInfoOverlayWidthResizer = function() {
 	var view_link_info_overlay_div = max_link_info_table_width + 40;
 	$("#view_link_info_overlay_div").css( {"width": view_link_info_overlay_div } );
 };
+
+
+//  Attach to window since code not in front end build still calls this function
+window.linkInfoOverlayWidthResizer = linkInfoOverlayWidthResizer;
+
+export { getLooplinkDataCommon, getCrosslinkDataCommon, getMonolinkDataCommon, attachViewLinkInfoOverlayClickHandlers }

@@ -1,0 +1,572 @@
+/*
+ * This build file was Copied from https://spring.io/guides/gs/serving-web-content/.
+ *
+ */
+ 
+ //  New way to import gradle plugin for node:  per https://plugins.gradle.org/plugin/com.moowork.node
+
+/* 
+ plugins {
+  id "com.moowork.node" version "1.2.0"
+} 
+ */
+ 
+// import com.moowork.gradle.node.task.NodeTask
+
+buildscript {
+    repositories {
+        mavenCentral()
+         jcenter()
+         
+      maven {
+     	 url "https://plugins.gradle.org/m2/"
+    	}
+    }
+    dependencies {
+        classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
+    }
+}
+
+apply plugin: "com.moowork.node"
+
+
+apply plugin: 'eclipse'
+// apply plugin: 'idea'
+
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+}
+
+
+defaultTasks 'frontEndBuild'
+
+
+/*
+ * working directory: emozi-webapp/front_end
+ */
+task delete_outputDirs(type: Delete) {
+  doFirst {	
+  	  println("delete_outputDirs::doFirst called")
+  	  
+	   println("delete_outputDirs called")
+	   delete 'handlebars_templates_precompiled'
+	   delete 'webpack_build_output'
+	   delete '../src/main/webapp/static/js_generated_bundles'
+	   delete '../src/main/webapp/static/css_generated'
+   }
+}
+
+//  Create all createHandlebarsOutputDirs
+
+task createHandlebarsOutputDirs { 
+  println("createHandlebarsOutputDirs called")
+  doFirst {	
+  	  println("createHandlebarsOutputDirs::doFirst called")
+  	  
+  	  String rootDir = "handlebars_templates_precompiled/"
+  	  
+  	  String dirToCreate = ""
+  	  boolean mkdirSuccess = false;
+  	  
+  	  dirToCreate = rootDir
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "peptide_page"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "protein_page"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "mod_view_page"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+
+      dirToCreate = rootDir + "common"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "save_view"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "protein_sequence_formatted_display"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "search_detail_section_main_page"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "search_detail_section_user_input_section"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "psm_list"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "lorikeet_overlay"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "project_page__project_info_section_all_users_interaction"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "project_page__project_info_section_logged_in_users_interaction"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "project_page_searches_section_all_users_interaction"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "project_page_searches_section_researcher_user_interaction"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "project_page_upload_data_section_project_owner_user_interaction"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "project_page__saved_views_section"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "project_page__saved_views_section_loggedin_users"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "project_page__share_data_section_loggedin_users"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "project_list"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "user_account_create_account"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "user_account_login_forgot_password"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "user_invite_processing"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+  	  dirToCreate = rootDir + "dummy_template"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+  	  
+	}
+}
+
+//  Handlebars Precompile for input handlebars_templates/peptide_page_single_search
+
+task handlebarsPrecompile_peptide_page(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/peptide_page/peptide_page_single_search_template-bundle.js',
+   'handlebars_templates/peptide_page_single_search'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/protein_page_single_search
+
+task handlebarsPrecompile_protein_page(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/protein_page/protein_page_single_search_template-bundle.js',
+   'handlebars_templates/protein_page_single_search'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/mod_view_page
+
+task handlebarsPrecompile_mod_view_page(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/mod_view_page/mod_view_page_template-bundle.js',
+   'handlebars_templates/mod_view_page'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/common
+task handlebarsPrecompile_common(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/common/common_template-bundle.js',
+   'handlebars_templates/common'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/save_view
+task handlebarsPrecompile_save_view(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/save_view/save_view_template-bundle.js',
+   'handlebars_templates/save_view'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/protein_sequence_formatted_display
+
+task handlebarsPrecompile_protein_sequence_formatted_display(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/protein_sequence_formatted_display/protein_sequence_formatted_display_template-bundle.js',
+   'handlebars_templates/protein_sequence_formatted_display'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/search_detail_section_main_page
+
+task handlebarsPrecompile_search_detail_section_main_page(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/search_detail_section_main_page/search_detail_section_main_page_template-bundle.js',
+   'handlebars_templates/search_detail_section_main_page'
+   ]
+}
+
+
+//  Handlebars Precompile for input handlebars_templates/search_detail_section_user_input_section
+
+task handlebarsPrecompile_search_detail_section_user_input_section(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/search_detail_section_user_input_section/search_detail_section_user_input_section_template-bundle.js',
+   'handlebars_templates/search_detail_section_user_input_section'
+   ]
+}
+
+
+  
+//  Handlebars Precompile for input handlebars_templates/psm_list
+
+task handlebarsPrecompile_psm_list(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/psm_list/psm_list_template-bundle.js',
+   'handlebars_templates/psm_list'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/lorikeet_overlay
+
+task handlebarsPrecompile_lorikeet_overlay(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/lorikeet_overlay/lorikeet_overlay_template-bundle.js',
+   'handlebars_templates/lorikeet_overlay'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/project_page__project_info_section_all_users_interaction
+
+task handlebarsPrecompile_project_page__project_info_section_all_users_interaction(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/project_page__project_info_section_all_users_interaction/project_page__project_info_section_all_users_interaction_template-bundle.js',
+   'handlebars_templates/project_page__project_info_section_all_users_interaction'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/project_page__project_info_section_logged_in_users_interaction
+
+task handlebarsPrecompile_project_page__project_info_section_logged_in_users_interaction(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/project_page__project_info_section_logged_in_users_interaction/project_page__project_info_section_logged_in_users_interaction_template-bundle.js',
+   'handlebars_templates/project_page__project_info_section_logged_in_users_interaction'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/project_page_searches_section_all_users_interaction
+
+task handlebarsPrecompile_project_page_searches_section_all_users_interaction(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/project_page_searches_section_all_users_interaction/project_page_searches_section_all_users_interaction_template-bundle.js',
+   'handlebars_templates/project_page_searches_section_all_users_interaction'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/project_page_searches_section_researcher_user_interaction
+
+task handlebarsPrecompile_project_page_searches_section_researcher_user_interaction(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/project_page_searches_section_researcher_user_interaction/project_page_searches_section_researcher_user_interaction_template-bundle.js',
+   'handlebars_templates/project_page_searches_section_researcher_user_interaction'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/project_page_upload_data_section_project_owner_user_interaction
+
+task handlebarsPrecompile_project_page_upload_data_section_project_owner_user_interaction(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/project_page_upload_data_section_project_owner_user_interaction/project_page_upload_data_section_project_owner_user_interaction_template-bundle.js',
+   'handlebars_templates/project_page_upload_data_section_project_owner_user_interaction'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/project_page__saved_views_section
+
+task handlebarsPrecompile_project_page__saved_views_section(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/project_page__saved_views_section/project_page__saved_views_section_template-bundle.js',
+   'handlebars_templates/project_page__saved_views_section'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/project_page__saved_views_section_loggedin_users
+
+task handlebarsPrecompile_project_page__saved_views_section_loggedin_users(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/project_page__saved_views_section_loggedin_users/project_page__saved_views_section_loggedin_users_template-bundle.js',
+   'handlebars_templates/project_page__saved_views_section_loggedin_users'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/project_page__share_data_section_loggedin_users
+
+task handlebarsPrecompile_project_page__share_data_section_loggedin_users(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/project_page__share_data_section_loggedin_users/project_page__share_data_section_loggedin_users_template-bundle.js',
+   'handlebars_templates/project_page__share_data_section_loggedin_users'
+   ]
+}
+
+
+//  Handlebars Precompile for input handlebars_templates/project_list
+
+task handlebarsPrecompile_project_list(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/project_list/project_list_template-bundle.js',
+   'handlebars_templates/project_list'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/user_account_create_account
+
+task handlebarsPrecompile_user_account_create_account(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/user_account_create_account/user_account_create_account_template-bundle.js',
+   'handlebars_templates/user_account_create_account'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/user_account_login_forgot_password
+
+task handlebarsPrecompile_user_account_login_forgot_password(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/user_account_login_forgot_password/user_account_login_forgot_password_template-bundle.js',
+   'handlebars_templates/user_account_login_forgot_password'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/user_invite_processing
+
+task handlebarsPrecompile_user_invite_processing(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/user_invite_processing/user_invite_processing_template-bundle.js',
+   'handlebars_templates/user_invite_processing'
+   ]
+}
+
+//  Handlebars Precompile for input handlebars_templates/dummy_template
+
+task handlebarsPrecompile_dummy_template(type: NodeTask) {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', 'handlebars_templates_precompiled/dummy_template/dummy_template_template-bundle.js',
+   'handlebars_templates/dummy_template'
+   ]
+}
+
+//  Change so dev runs  'npm install' separately since it takes so long
+
+task webpack(type: NodeTask ) { //  , dependsOn: 'npmInstall') {
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/webpack/bin/webpack.js')
+  } else {
+    script = project.file('node_modules/.bin/webpack')
+  }
+  //  specify mode development, defaults to production
+  args = [ '--mode=development' ] // --mode=development does no minification
+}
+
+/*
+	does a copy into where the Gradle WAR processing expects it
+*/
+task copyFrontEndJS(type: Sync) {
+    from "webpack_build_output/js_generated_bundles"
+    into "../src/main/webapp/static/js_generated_bundles"
+}
+
+task copyFrontEndCSS(type: Sync) {
+    from "webpack_build_output/css_generated"
+    into "../src/main/webapp/static/css_generated"
+}
+
+
+task frontEndBuild(type: GradleBuild) {
+   tasks = [ 
+     'delete_outputDirs', 
+     'createHandlebarsOutputDirs', 
+     'webpack',
+     'copyFrontEndJS',
+//     'copyFrontEndCSS'
+   ]
+}
+
+
+
+// task copyFrontEnd(type: Sync) { // , dependsOn: 'webpack') {
+//    from "FrontEnd/webapp_prebuild"
+//    into "src/main/webapp"
+// }
+
+// processResources.dependsOn 'copyFrontEnd' //  'webpack'
+
+// clean.delete << file('node_modules')
+// clean.delete << file('src/main/webapp/dist')
+
+
+

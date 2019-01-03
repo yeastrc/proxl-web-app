@@ -697,4 +697,8 @@ var ViewPsmPerPeptideLoadedFromWebServiceTemplate = function() {
 };
 
 //	Static Singleton Instance of Class
-	var viewPsmPerPeptideLoadedFromWebServiceTemplate = new ViewPsmPerPeptideLoadedFromWebServiceTemplate();
+var viewPsmPerPeptideLoadedFromWebServiceTemplate = new ViewPsmPerPeptideLoadedFromWebServiceTemplate();
+
+window.viewPsmPerPeptideLoadedFromWebServiceTemplate = viewPsmPerPeptideLoadedFromWebServiceTemplate;
+
+export { viewPsmPerPeptideLoadedFromWebServiceTemplate }

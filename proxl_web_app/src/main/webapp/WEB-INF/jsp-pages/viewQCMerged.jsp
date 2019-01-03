@@ -59,26 +59,29 @@
 		<!-- use minimized version  -->
 		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
 
+		
+		
+<%--  Replaced with the JS bundle listed next
+
 		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 		 
 		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/spinner.js?x=${cacheBustValue}"></script> 
 		
+		<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
+
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
-		
+		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
+			 
 		<script type="text/javascript" src="${ contextPath }/js/qc_pages_Single_Merged_Common.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/qcChart_Download_Help_HTMLBlock.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/mergedPeptideProteinSearchesListVennDiagramSection.js?x=${cacheBustValue}"></script>
-		
+		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChartSummaryStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChartDigestionStatistics.js?x=${cacheBustValue}"></script>
@@ -92,6 +95,7 @@
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChart_PSM_Per_Modification.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChart_Peptide_Lengths.js?x=${cacheBustValue}"></script>
 		
+		
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSectionSummaryStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSectionDigestionStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSectionScanFileStatistics.js?x=${cacheBustValue}"></script>
@@ -99,8 +103,13 @@
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSection_PSM_Error_Estimates.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSectionModificationStatistics.js?x=${cacheBustValue}"></script>
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSection_Peptide_Level_Statistics.js?x=${cacheBustValue}"></script>
-		
+
 		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageMain.js?x=${cacheBustValue}"></script>
+--%>
+	
+		<%--  Bundle version of core page JS --%>
+		<script type="text/javascript" src="${ contextPath }/static/js_generated_bundles/data_pages/qcMergedView-bundle.js?x=${cacheBustValue}"></script>
+			
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:

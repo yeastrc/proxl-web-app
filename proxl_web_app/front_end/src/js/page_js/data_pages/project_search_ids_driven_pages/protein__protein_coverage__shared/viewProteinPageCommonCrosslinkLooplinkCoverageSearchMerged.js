@@ -15,11 +15,34 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+//  Import to make available on the page
+import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesChangeDisplayOrder.js';
+import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesForPageChooser.js';
+import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';
+import { addSingleTooltipForProteinName } from 'page_js/data_pages/project_search_ids_driven_pages/common/createTooltipForProteinNames.js';
+
+
+
+import { minimumPSM_Count_Filter } from 'page_js/data_pages/project_search_ids_driven_pages/common/minimumPSM_Count_Filter.js';
+import { annotationDataDisplayProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideAnnDisplayDataCommon.js';
+import { cutoffProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideCutoffsCommon.js';
+
+import { webserviceDataParamsDistributionCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/webserviceDataParamsDistribution.js';
+
+
 $(document).ready(function() { 
+}); // end $(document).ready(function()
+
+//  Called when $(document).ready fires
+
+var onDocumentReady = function() {
+
 	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 		$("#main_page_data_table").tablesorter(); // gets exception if there are no data rows
 	},10);
-}); // end $(document).ready(function()
+
+
+}
 
 /////////////////////////
 //  Constructor
@@ -349,7 +372,9 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 };
 
 //  Instance of class
-var viewSearchProteinPageCommonCrosslinkLooplinkCoverage = new ViewSearchProteinPageCommonCrosslinkLooplinkCoverage();
+window.viewSearchProteinPageCommonCrosslinkLooplinkCoverage = new ViewSearchProteinPageCommonCrosslinkLooplinkCoverage();
 
 //  Copy to standard page level JS Code Object
-var standardFullPageCode = viewSearchProteinPageCommonCrosslinkLooplinkCoverage;
+window.standardFullPageCode = window.viewSearchProteinPageCommonCrosslinkLooplinkCoverage;
+
+export { onDocumentReady, viewSearchProteinPageCommonCrosslinkLooplinkCoverage }

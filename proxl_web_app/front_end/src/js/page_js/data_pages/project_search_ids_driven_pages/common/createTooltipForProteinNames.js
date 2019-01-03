@@ -28,7 +28,7 @@ $(document).ready(function() {
 	},10);
 });
 
-var createTooltipForProteinNames = function() {
+window.createTooltipForProteinNames = function() {
 
 	_protein_listing_webservice_base_url_set = $("#protein_listing_webservice_base_url_set").val();
 	if ( _protein_listing_webservice_base_url_set === undefined 
@@ -60,7 +60,7 @@ var createTooltipForProteinNames = function() {
 var __proteinDataForToolTipFormattedHTMLCache = {};
 
 //   Add the tool tip to display on the top right of the element
-var addSingleTooltipForProteinNameOnTopRight = function( params ) {
+window.addSingleTooltipForProteinNameOnTopRight = function( params ) {
 	params.tipPosition = {
             my: 'bottom left',
             at: 'top right',
@@ -83,7 +83,7 @@ var addSingleTooltipForProteinNameOnTopRight = function( params ) {
 //	addSingleTooltipForProteinName( params );
 //};
 
-var addSingleTooltipForProteinName = function( params ) {
+window.addSingleTooltipForProteinName = function( params ) {
 	
 	_protein_listing_webservice_base_url_set = $("#protein_listing_webservice_base_url_set").val();
 	if ( _protein_listing_webservice_base_url_set === undefined 
@@ -226,3 +226,7 @@ var _addSingleTooltipForProteinName_HTML_Addition_DisplayedProteinName = functio
 	  + "</div>";
 	return html;
 };
+
+
+export { addSingleTooltipForProteinName }
+

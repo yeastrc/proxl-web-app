@@ -3,9 +3,6 @@
  * 
  * Javascript for the choosing what order searches are shown
  * 
- * Uses function mergedPeptideProteinSearchesListVennDiagramSection.updatePageToNewProjectSearchIdsOrder(...)
- *    in mergedPeptideProteinSearchesListVennDiagramSection.js
- * 
  * Instance object on page:  searchesChangeDisplayOrder
  */
 
@@ -354,12 +351,6 @@ var SearchesChangeDisplayOrder = function( params ) {
  */
 var searchesChangeDisplayOrder = new SearchesChangeDisplayOrder();
 
+window.searchesChangeDisplayOrder = searchesChangeDisplayOrder;
 
-//$(document).ready(function()  { 
-try {
-	searchesChangeDisplayOrder.init();
-} catch( e ) {
-	reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-	throw e;
-}
-//});
+export { searchesChangeDisplayOrder }

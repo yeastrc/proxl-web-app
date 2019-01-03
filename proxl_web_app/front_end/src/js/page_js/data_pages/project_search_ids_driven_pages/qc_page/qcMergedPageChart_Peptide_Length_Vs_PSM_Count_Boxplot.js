@@ -14,6 +14,9 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
+
+import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
 
 /**
  * Constructor 
@@ -696,3 +699,5 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
  */
 
 var qcMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = new QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot();
+
+export { qcMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot }

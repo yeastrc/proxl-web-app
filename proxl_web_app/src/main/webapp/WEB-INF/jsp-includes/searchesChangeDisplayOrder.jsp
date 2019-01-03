@@ -80,6 +80,12 @@
 	<input type="hidden" name="projectSearchId" value="#" class=" project_search_id_in_update_form_jq " />
 </script>
 
-		<%--  Keep at end since requires everything on the DOM first --%>
-		<script type="text/javascript" src="${ contextPath }/js/searchesChangeDisplayOrder.js?x=${cacheBustValue}"></script>
-
+<%--  Keep at end since requires everything on the DOM first --%>
+<script type="text/javascript" >
+	try {
+		searchesChangeDisplayOrder.init();
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
+</script>

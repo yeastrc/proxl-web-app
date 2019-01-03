@@ -18,6 +18,10 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
+
+import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
+
 
 /**
  * Constructor 
@@ -545,3 +549,5 @@ var QCPageChart_Peptide_Length_Vs_PSM_Count = function() {
  */
 
 var qcPageChart_Peptide_Length_Vs_PSM_Count = new QCPageChart_Peptide_Length_Vs_PSM_Count();
+
+export { qcPageChart_Peptide_Length_Vs_PSM_Count }

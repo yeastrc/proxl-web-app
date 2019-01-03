@@ -1309,3 +1309,7 @@ var OrganizeSearches = function() {
 
 //  Instance of class
 var organizeSearches = new OrganizeSearches();
+
+window.organizeSearches = organizeSearches;
+
+export { organizeSearches }

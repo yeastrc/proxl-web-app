@@ -18,6 +18,28 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+
+//  Import to make available on the page
+import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesChangeDisplayOrder.js';
+import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesForPageChooser.js';
+import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';
+
+
+
+import { webserviceDataParamsDistributionCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/webserviceDataParamsDistribution.js';
+import { annotationDataDisplayProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideAnnDisplayDataCommon.js';
+import { cutoffProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideCutoffsCommon.js';
+
+
+import { qcPageSection_Peptide_Level_Statistics } from './qcPageSection_Peptide_Level_Statistics.js';
+import { qcPageSection_PSM_Error_Estimates } from './qcPageSection_PSM_Error_Estimates.js';
+import { qcPageSection_PSM_Level_Statistics } from './qcPageSection_PSM_Level_Statistics.js';
+import { qcPageSectionDigestionStatistics } from './qcPageSectionDigestionStatistics.js';
+import { qcPageSectionModificationStatistics } from './qcPageSectionModificationStatistics.js';
+import { qcPageSectionScanFileStatistics } from './qcPageSectionScanFileStatistics.js';
+import { qcPageSectionSummaryStatistics } from './qcPageSectionSummaryStatistics.js';
+
+
 /**
  * 
  */
@@ -44,7 +66,15 @@ $(document).ready(function() {
 var QCPageMain = function() {
 
 	//  objects for the sections on the page
-	var _pageSectionObjects = undefined;
+	var _pageSectionObjects = [
+		qcPageSectionSummaryStatistics,
+		qcPageSectionDigestionStatistics,
+		qcPageSectionScanFileStatistics,
+		qcPageSection_PSM_Level_Statistics,
+		qcPageSection_PSM_Error_Estimates,
+		qcPageSectionModificationStatistics,
+		qcPageSection_Peptide_Level_Statistics
+		];
 	
 	
 	var _OVERALL_GLOBALS = { 
@@ -172,41 +202,6 @@ var QCPageMain = function() {
 		try {
 			var objectThis = this;
 
-			try {
-				//  objects for the sections on the page
-				_pageSectionObjects = [
-					qcPageSectionSummaryStatistics,
-					qcPageSectionDigestionStatistics,
-					qcPageSectionScanFileStatistics,
-					qcPageSection_PSM_Level_Statistics,
-					qcPageSection_PSM_Error_Estimates,
-					qcPageSectionModificationStatistics,
-					qcPageSection_Peptide_Level_Statistics
-					];
-			} catch( e ) {
-				//  Either the variable _pageSectionObjects does not exist or one of the page section objects does not exist
-				
-				//  Test if _pageSectionObjects exists;
-				var pageSectionObjectsLocal = _pageSectionObjects;
-
-				//  One of the page section objects does not exist.  Wait for it to be added, for 6 attempts
-				if ( ! this.initAttemptCounter ) {
-					this.initAttemptCounter = 0;
-				}
-				if ( this.initAttemptCounter < 6 ) {
-					this.initAttemptCounter++;
-					setTimeout(function() {
-						objectThis.initActual();
-					}, 1000 );
-					
-					//  Exit since will be called again from inside setTimeout
-					return;  //  EARLY EXIT
-				}
-				
-				throw e;
-			}
-			
-			
 			this.populateConstantsFromPage();
 
 			this.updatePageFiltersFromURLHash();
@@ -315,20 +310,7 @@ var QCPageMain = function() {
 
 			this.addClickAndOnChangeHandlers();
 
-
-			//  Default display on page load
-
-			//  TODO  TEMP comment out
-
-			if ( window.qcPageSectionSummaryStatistics ) {
-				qcPageSectionSummaryStatistics.show_Section_From_qcPageMain();
-			} else {
-				setTimeout( function () {
-					if ( window.qcPageSectionSummaryStatistics ) {
-						qcPageSectionSummaryStatistics.show_Section_From_qcPageMain();
-					}
-				}, 1000 );
-			}
+			qcPageSectionSummaryStatistics.show_Section_From_qcPageMain();
 
 			//  TODO  TEMP Add
 
@@ -1236,7 +1218,7 @@ var QCPageMain = function() {
 
 };
 
-var qcPageMain = new QCPageMain();
+window.qcPageMain = new QCPageMain();
 
 //  Copy to standard page level JS Code Object
 //  Not currently supported  var standardFullPageCode = qcPageMain;

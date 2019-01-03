@@ -1,0 +1,15 @@
+//  Comments of this style allowed.  See for allowed format: https://www.npmjs.com/package/json5
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "browsers": [
+        	"last 1 versions",
+        	"not ie > 0"
+        ]
+      }
+    }
+    ],
+    "stage-2"
+  ]
+}

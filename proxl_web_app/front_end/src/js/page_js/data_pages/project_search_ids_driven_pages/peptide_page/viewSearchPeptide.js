@@ -6,6 +6,29 @@
 //  JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+
+
+//  For showing Data for links (Drilldown) (Called by HTML onclick):
+import { viewPsmsLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/common/viewPsmsLoadedFromWebServiceTemplate.js';
+
+
+//  Import to make available on the page
+import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesChangeDisplayOrder.js';
+import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesForPageChooser.js';
+import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';
+import { addSingleTooltipForProteinName } from 'page_js/data_pages/project_search_ids_driven_pages/common/createTooltipForProteinNames.js';
+import { defaultPageView } from 'page_js/data_pages/project_search_ids_driven_pages/common/defaultPageView.js';
+
+
+
+import { minimumPSM_Count_Filter } from 'page_js/data_pages/project_search_ids_driven_pages/common/minimumPSM_Count_Filter.js';
+import { annotationDataDisplayProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideAnnDisplayDataCommon.js';
+import { cutoffProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideCutoffsCommon.js';
+
+import { webserviceDataParamsDistributionCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/webserviceDataParamsDistribution.js';
+
+
+
 ///////
 $(document).ready(function() { 
 	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
@@ -220,7 +243,7 @@ var ViewSearchPeptidePageCode = function() {
 };
 
 // Instance of class
-var viewSearchPeptidePageCode = new ViewSearchPeptidePageCode();
+window.viewSearchPeptidePageCode = new ViewSearchPeptidePageCode();
 
 // Copy to standard page level JS Code Object
-var standardFullPageCode = viewSearchPeptidePageCode;
+window.standardFullPageCode = window.viewSearchPeptidePageCode;

@@ -10,6 +10,22 @@
 "use strict";
 
 
+import { createMergedSearchesLinkCountsVennDiagram } from 'page_js/data_pages/project_search_ids_driven_pages/merged_pages_common/mergedSearchesVennDiagramCreator.js';
+
+
+import { onDocumentReady, viewSearchProteinPageCommonCrosslinkLooplinkCoverage } from 'page_js/data_pages/project_search_ids_driven_pages/protein__protein_coverage__shared/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js';
+
+
+//  For showing Data for links (Drilldown) (Called by HTML onclick):
+import { viewLooplinkProteinsLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/protein_pages/viewLooplinkProteinsLoadedFromWebServiceTemplate.js';
+import { viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/protein_pages/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js';
+
+
+$(document).ready(function() { 
+	onDocumentReady();
+}); // end $(document).ready(function()
+
+
 //  Constructor
 
 var ViewMergedLooplinkProteinPageCode = function() {
@@ -39,29 +55,18 @@ var ViewMergedLooplinkProteinPageCode = function() {
 				throw e;
 			}
 			
-			setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-				if ( window.mergedPeptideProteinSearchesListVennDiagramSection ) {
-					window.mergedPeptideProteinSearchesListVennDiagramSection.init();
-				}
-			},10);
-
 		},10);
 		
 
 		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+			
+			//  call to create the Venn diagram on the page, if there is venn data on the page
+			try {
+				createMergedSearchesLinkCountsVennDiagram.createMergedSearchesLinkCountsVennDiagram( );
 
-			//  If this function exists, call it to create the Venn diagram on the page
-
-			if ( window.createMergedSearchesLinkCountsVennDiagram_PageFunction ) {
-
-				try {
-
-					window.createMergedSearchesLinkCountsVennDiagram_PageFunction();
-
-				} catch( e ) {
-					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-					throw e;
-				}
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
 			}
 		},10);
 	};
@@ -89,5 +94,5 @@ var ViewMergedLooplinkProteinPageCode = function() {
 
 //  Instance of class
 
-var viewMergedLooplinkProteinPageCode = new ViewMergedLooplinkProteinPageCode();
+window.viewMergedLooplinkProteinPageCode = new ViewMergedLooplinkProteinPageCode();
 

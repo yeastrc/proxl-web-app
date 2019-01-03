@@ -12,6 +12,28 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+
+//  Import to make available on the page
+import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesChangeDisplayOrder.js';
+import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesForPageChooser.js';
+import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';
+
+
+
+import { webserviceDataParamsDistributionCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/webserviceDataParamsDistribution.js';
+import { annotationDataDisplayProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideAnnDisplayDataCommon.js';
+import { cutoffProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideCutoffsCommon.js';
+
+
+import { qcMergedPageSection_Peptide_Level_Statistics } from './qcMergedPageSection_Peptide_Level_Statistics.js';
+import { qcMergedPageSection_PSM_Error_Estimates } from './qcMergedPageSection_PSM_Error_Estimates.js';
+import { qcMergedPageSection_PSM_Level_Statistics } from './qcMergedPageSection_PSM_Level_Statistics.js';
+import { qcMergedPageSectionDigestionStatistics } from './qcMergedPageSectionDigestionStatistics.js';
+import { qcMergedPageSectionModificationStatistics } from './qcMergedPageSectionModificationStatistics.js';
+import { qcMergedPageSectionScanFileStatistics } from './qcMergedPageSectionScanFileStatistics.js';
+import { qcMergedPageSectionSummaryStatistics } from './qcMergedPageSectionSummaryStatistics.js';
+
+
 /**
  * 
  */
@@ -38,8 +60,15 @@ $(document).ready(function() {
 var QCMergedPageMain = function() {
 
 	//  objects for the sections on the page
-	var _pageSectionObjects = undefined;
-	
+	var _pageSectionObjects = [
+		qcMergedPageSectionSummaryStatistics,
+		qcMergedPageSectionDigestionStatistics,
+		qcMergedPageSectionScanFileStatistics,
+		qcMergedPageSection_PSM_Level_Statistics,
+		qcMergedPageSection_PSM_Error_Estimates,
+		qcMergedPageSectionModificationStatistics,
+		qcMergedPageSection_Peptide_Level_Statistics
+		];
 	
 	var _OVERALL_GLOBALS = { 
 			//  Color of bars:  from head_section_include_every_page.jsp
@@ -178,41 +207,6 @@ var QCMergedPageMain = function() {
 		try {
 			var objectThis = this;
 
-			try {
-				//  objects for the sections on the page
-				_pageSectionObjects = [
-					qcMergedPageSectionSummaryStatistics,
-					qcMergedPageSectionDigestionStatistics,
-					qcMergedPageSectionScanFileStatistics,
-					qcMergedPageSection_PSM_Level_Statistics,
-					qcMergedPageSection_PSM_Error_Estimates,
-					qcMergedPageSectionModificationStatistics,
-					qcMergedPageSection_Peptide_Level_Statistics
-					];
-			} catch( e ) {
-				//  Either the variable _pageSectionObjects does not exist or one of the page section objects does not exist
-				
-				//  Test if _pageSectionObjects exists;
-				var pageSectionObjectsLocal = _pageSectionObjects;
-
-				//  One of the page section objects does not exist.  Wait for it to be added, for 6 attempts
-				if ( ! this.initAttemptCounter ) {
-					this.initAttemptCounter = 0;
-				}
-				if ( this.initAttemptCounter < 6 ) {
-					this.initAttemptCounter++;
-					setTimeout(function() {
-						objectThis.initActual();
-					}, 1000 );
-					
-					//  Exit since will be called again from inside setTimeout
-					return;  //  EARLY EXIT
-				}
-				
-				throw e;
-			}
-			
-			
 			this.populateConstantsFromPage();
 
 			this.updatePageFiltersFromURLHash();
@@ -361,15 +355,7 @@ var QCMergedPageMain = function() {
 
 			//  TODO  TEMP comment out
 
-			if ( window.qcMergedPageSectionSummaryStatistics ) {
-				qcMergedPageSectionSummaryStatistics.show_Section_From_qcMergedPageMain();
-			} else {
-				setTimeout( function () {
-					if ( window.qcMergedPageSectionSummaryStatistics ) {
-						qcMergedPageSectionSummaryStatistics.show_Section_From_qcMergedPageMain();
-					}
-				}, 1000 );
-			}
+			qcMergedPageSectionSummaryStatistics.show_Section_From_qcMergedPageMain();
 
 			//  TODO  TEMP Add
 
@@ -1357,7 +1343,7 @@ var QCMergedPageMain = function() {
 
 };
 
-var qcMergedPageMain = new QCMergedPageMain();
+window.qcMergedPageMain = new QCMergedPageMain();
 
 //  Copy to standard page level JS Code Object
 //  Not currently supported  var standardFullPageCode = qcMergedPageMain;

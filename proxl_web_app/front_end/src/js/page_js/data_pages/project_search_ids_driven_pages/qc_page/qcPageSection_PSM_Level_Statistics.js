@@ -18,13 +18,31 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { qcPageChart_PSM_Count_Vs_RetentionTime_PSM } from './qcPageChart_PSM_Count_Vs_RetentionTime_PSM.js';
+import { qcPageChart_PSM_Count_Vs_Score_PSM } from './qcPageChart_PSM_Count_Vs_Score_PSM.js';
+import { qcPageChart_PSM_Score_Vs_Score_PSM } from './qcPageChart_PSM_Score_Vs_Score_PSM.js';
+
+import { qcPageChartChargeStateStatistics } from './qcPageChartChargeStateStatistics.js';
+import { qcPageChart_M_Over_Z_Statistics_PSM } from './qcPageChart_M_Over_Z_Statistics_PSM.js';
+import { qcPageChart_Peptide_Length_Vs_PSM_Count } from './qcPageChart_Peptide_Length_Vs_PSM_Count.js';
+import { qcPageChart_PeptideLength_Vs_RetentionTime_PSM } from './qcPageChart_PeptideLength_Vs_RetentionTime_PSM.js';
+
 
 /**
  * Constructor 
  */
 var QCPageSection_PSM_Level_Statistics = function() {
 
-	var _pageChartObjectsForSection = undefined; // Populated in initActual()
+	var _pageChartObjectsForSection = [
+		qcPageChart_PSM_Count_Vs_RetentionTime_PSM,
+		qcPageChart_PSM_Count_Vs_Score_PSM,
+		qcPageChart_PSM_Score_Vs_Score_PSM,
+		
+		qcPageChartChargeStateStatistics,
+		qcPageChart_M_Over_Z_Statistics_PSM,
+		qcPageChart_Peptide_Length_Vs_PSM_Count,
+		qcPageChart_PeptideLength_Vs_RetentionTime_PSM
+	];
 
 	//  From QCPageMain
 	var _OVERALL_GLOBALS;
@@ -89,43 +107,7 @@ var QCPageSection_PSM_Level_Statistics = function() {
 		try {
 			var objectThis = this;
 			
-			try {
-				//  objects for the charts on the page for this section
-				_pageChartObjectsForSection = [
-					qcPageChart_PSM_Count_Vs_RetentionTime_PSM,
-					qcPageChart_PSM_Count_Vs_Score_PSM,
-					qcPageChart_PSM_Score_Vs_Score_PSM,
-					
-					qcPageChartChargeStateStatistics,
-					qcPageChart_M_Over_Z_Statistics_PSM,
-					qcPageChart_Peptide_Length_Vs_PSM_Count,
-					qcPageChart_PeptideLength_Vs_RetentionTime_PSM
-				];
 
-			} catch( e ) {
-				//  Either the variable _pageChartObjectsForSection does not exist or one of the page chart objects does not exist
-				
-				//  Test if _pageChartObjectsForSection exists;
-				var pageChartObjectsForSectionLocal = _pageChartObjectsForSection;
-
-				//  One of the page chart objects does not exist.  Wait for it to be added, for 6 attempts
-				
-				if ( ! this.initAttemptCounter ) {
-					this.initAttemptCounter = 0;
-				}
-				if ( this.initAttemptCounter < 6 ) {
-					this.initAttemptCounter++;
-					setTimeout(function() {
-						objectThis.initActual();
-					}, 1000 );
-					
-					//  Exit since will be called again from inside setTimeout
-					return;  //  EARLY EXIT
-				}
-				
-				throw e;
-			}
-			
 
 			_OVERALL_GLOBALS = params.OVERALL_GLOBALS;
 
@@ -302,3 +284,5 @@ var QCPageSection_PSM_Level_Statistics = function() {
  */
 
 var qcPageSection_PSM_Level_Statistics = new QCPageSection_PSM_Level_Statistics();
+
+export { qcPageSection_PSM_Level_Statistics }

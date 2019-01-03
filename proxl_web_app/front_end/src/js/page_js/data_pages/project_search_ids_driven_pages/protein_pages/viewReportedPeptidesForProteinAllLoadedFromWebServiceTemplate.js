@@ -9,6 +9,11 @@
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+
+//  For showing Data for links (Drilldown) (Called by HTML onclick):
+import { viewPsmsLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/common/viewPsmsLoadedFromWebServiceTemplate.js';
+
+
 //   Class contructor
 
 var ViewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate = function() {
@@ -278,3 +283,7 @@ var ViewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate = function() {
 
 //  Static Singleton Instance of Class
 var viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate = new ViewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate();
+
+window.viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate = viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate;
+
+export { viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate }

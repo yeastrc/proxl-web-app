@@ -57,13 +57,13 @@ function initViewProjectPage() {
 	updateButtonsBasedOnCheckedSearches ( );
 }
 
-/////////////
-var searchesToMerge = new Array();
+///////////// attach to window. since used in other JS files
+window.searchesToMerge = new Array();
 
 
 //////////
 //   Called by "onclick" on HTML element
-function checkSearchCheckboxes( projectSearchId) {
+window.checkSearchCheckboxes = function( projectSearchId) {
 	try {
 		if( $( "input#search-checkbox-" + projectSearchId ).is( ":checked" ) ) {
 			if( searchesToMerge.indexOf( projectSearchId ) == -1 ) { searchesToMerge.push( projectSearchId ); }
@@ -81,7 +81,7 @@ function checkSearchCheckboxes( projectSearchId) {
 }
 
 //////////
-function updateButtonsBasedOnCheckedSearches ( ) {
+window.updateButtonsBasedOnCheckedSearches = function ( ) {
 	var count = 0;
 	$( ".search-checkbox" ).each( function() {
 		if( $( this ).is( ":checked" ) ) {
@@ -102,18 +102,18 @@ function updateButtonsBasedOnCheckedSearches ( ) {
 }
 
 //////////
-function disableButtons() {
+window.disableButtons = function() {
 	$( ".merge-button" ).attr("disabled", "disabled"); 
 	//  show covering div
 	$(".merge_button_disabled_cover_div_jq").show();
 }
-function enableButtons() {
+window.enableButtons = function() {
 	$( ".merge-button" ).removeAttr("disabled"); 
 	//  hide covering div
 	$(".merge_button_disabled_cover_div_jq").hide();
 }
 //   Called by "onclick" on HTML element
-function viewMergedPeptides() {
+window.viewMergedPeptides = function() {
 	try {
 		$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/mergedPeptide.do");
 		$( "form#viewMergedDataForm" ).submit();
@@ -124,7 +124,7 @@ function viewMergedPeptides() {
 }
 
 //   Called by "onclick" on HTML element
-function viewMergedProteins() {
+window.viewMergedProteins = function() {
 	try {
 		$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/mergedCrosslinkProtein.do");
 		$( "form#viewMergedDataForm" ).submit();
@@ -135,13 +135,13 @@ function viewMergedProteins() {
 }
 
 //   Called by "onclick" on HTML element
-function viewMergedImage() {
+window.viewMergedImage = function() {
 	$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/image.do");
 	$( "form#viewMergedDataForm" ).submit();
 }
 
 //   Called by "onclick" on HTML element
-function viewMergedStructure() {
+window.viewMergedStructure = function() {
 	try {
 		$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/structure.do");
 		$( "form#viewMergedDataForm" ).submit();
@@ -152,7 +152,7 @@ function viewMergedStructure() {
 }
 
 //Called by "onclick" on HTML element
-function viewMergedQCPage() {
+window.viewMergedQCPage = function() {
 try {
 	$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/qc.do");
 	$( "form#viewMergedDataForm" ).submit();
@@ -163,7 +163,7 @@ try {
 }
 
 //   Called by "onclick" on HTML element
-function showSearchDetails( id ) {
+window.showSearchDetails = function( id ) {
 	try {
 		if( $( "table#search-details-" + id ).is( ":visible" ) ) {
 			$( "table#search-details-" + id ).hide();
@@ -180,38 +180,5 @@ function showSearchDetails( id ) {
 	}
 }
 
-//   Called by "onclick" on HTML element
-function expandAll() {
-	try {
-		var $folder_contents_block_jq = $(".folder_contents_block_jq");
-		$folder_contents_block_jq.show();
-		var $folder_hide_contents_link_jq = $(".folder_hide_contents_link_jq");
-		$folder_hide_contents_link_jq.show();
-		var $folder_show_contents_link_jq = $(".folder_show_contents_link_jq");
-		$folder_show_contents_link_jq.hide();
-		
-		$( "table.search-details" ).show();
-		$( "a.expand-link" ).html( '<img src="' + contextPathJSVar + '/images/icon-collapse-small.png">' );
-	} catch( e ) {
-		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-		throw e;
-	}
-}
 
-//   Called by "onclick" on HTML element
-function collapseAll() {
-	try {
-		var $folder_contents_block_jq = $(".folder_contents_block_jq");
-		$folder_contents_block_jq.hide();
-		var $folder_hide_contents_link_jq = $(".folder_hide_contents_link_jq");
-		$folder_hide_contents_link_jq.hide();
-		var $folder_show_contents_link_jq = $(".folder_show_contents_link_jq");
-		$folder_show_contents_link_jq.show();
-
-		$( "table.search-details" ).hide();
-		$( "a.expand-link" ).html( '<img src="' + contextPathJSVar + '/images/icon-expand-small.png">' );
-	} catch( e ) {
-		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-		throw e;
-	}
-}
+export { initViewProjectPage }

@@ -174,3 +174,8 @@ var MinimumPSM_Count_Filter = function() {
 
 //Instance of class
 var minimumPSM_Count_Filter = new MinimumPSM_Count_Filter();
+
+window.minimumPSM_Count_Filter = minimumPSM_Count_Filter;
+
+export { minimumPSM_Count_Filter }
+

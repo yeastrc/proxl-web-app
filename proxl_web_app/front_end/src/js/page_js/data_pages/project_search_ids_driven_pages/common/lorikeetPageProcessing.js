@@ -53,7 +53,9 @@ function initLorikeetViewer() {
 
 		var $openLorkeetLinks = $(".view_spectrum_open_spectrum_link_jq");
 
-		addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
+		if ( $openLorkeetLinks.length !== 0 ) {
+			addOpenLorikeetViewerClickHandlers( $openLorkeetLinks );
+		}
 
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -1061,4 +1063,5 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 	};
 	
 
+	export { addOpenLorikeetViewerClickHandlers, closeLorikeetOverlay }
 

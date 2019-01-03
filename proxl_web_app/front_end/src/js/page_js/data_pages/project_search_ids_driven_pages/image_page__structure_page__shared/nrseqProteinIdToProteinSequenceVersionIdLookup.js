@@ -73,3 +73,5 @@ function getProteinSequenceVersionIdsForNrseqProteinIds( params ) {
 	}
 
 }
+
+export { getProteinSequenceVersionIdsForNrseqProteinIds }

@@ -2,9 +2,12 @@
 <%--  viewPeptidesRelatedToPSMsByScanId.jsp  --%>
 
 
+<%--  
+	Moved to Front End build so JS file included in bundles
+	
 		<script type="text/javascript" src="${ contextPath }/js/viewPeptidesRelatedToPSMsByScanId.js?x=${cacheBustValue}"></script>
 	
-
+ --%>
 		
 
 

@@ -14,6 +14,8 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
+
 
 /**
  * Constructor 
@@ -464,3 +466,5 @@ var QCMergedPageChartScanFileStatistics = function() {
  */
 
 var qcMergedPageChartScanFileStatistics = new QCMergedPageChartScanFileStatistics();
+
+export { qcMergedPageChartScanFileStatistics }

@@ -1,3 +1,9 @@
+/node_modules/
+/handlebars_templates_precompiled/
+/webpack_build_output/
+/.gradle/
 /.settings/
 .project
-
+package-lock.json
+VS_Code_Workspace.code-workspace
+ant_buildFrontEnd_CopyToTomcat.settings.properties

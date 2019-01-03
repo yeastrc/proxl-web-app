@@ -7,11 +7,14 @@
  *  
  * !!! The following global variables from "crosslink-image-viewer.js" are used in this file:
  * 
- *    _proteinNames - used since the variable is replaced every time "Update from Database" is clicked.
+ *    window.imagePagePrimaryRootCodeObject.getVariable__v_proteinNames() - used since the variable is replaced every time "Update from Database" is clicked.
  */
 
 //  JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
+
+import { ProteinBarHighlightedRegion } from './crosslink-image-viewer-per-protein-bar-data.js';
+
 
 /**
  * Constructor
@@ -145,7 +148,7 @@ ProteinBarRegionSelectionsOverlayCode.prototype._populate = function( params ) {
 		}
 		var proteinId = imageProteinBarDataItem.getProteinId();
 		var proteinLength = imageProteinBarDataItem.getProteinLength();
-		var proteinName = _proteinNames[ proteinId ];
+		var proteinName = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ];
 		//  singleBarContext is for Handlebars template to put info for this bar on the overlay on the page
 		var singleBarContext = {
 				uid : uid,
@@ -384,8 +387,8 @@ ProteinBarRegionSelectionsOverlayCode.prototype.save = function( params ) {
 		}
 	}
 	//  Update the Hash and redraw
-	updateURLHash( false /* useSearchForm */ );	  					// save the new selection to the URL hash
-	drawSvg();
+	window.imagePagePrimaryRootCodeObject.call__updateURLHash( false /* useSearchForm */ );	 // save the new selection to the URL hash
+	window.imagePagePrimaryRootCodeObject.call__drawSvg();
 	this.closeOverlay();
 };
 
@@ -410,3 +413,7 @@ ProteinBarRegionSelectionsOverlayCode.prototype._getRegionStartEnd = function( p
 	var regionStartEndInt = parseInt( regionStartEndString, 10 );
 	return { valueInt : regionStartEndInt, $inputField : $inputField };
 };
+
+
+
+export { ProteinBarRegionSelectionsOverlayCodeContructor }

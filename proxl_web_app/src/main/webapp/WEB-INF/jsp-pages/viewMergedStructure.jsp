@@ -11,6 +11,7 @@
 
  <c:set var="headerAdditions">
  
+		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter_Modified.js"></script>
 		<script type="text/javascript" src="${ contextPath }/js/libs/spin.min.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/base64.js"></script> 
 		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
@@ -65,6 +66,8 @@
 		
 		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
+<%--  Pre Front End Build
+		 
 		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
 		
 		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
@@ -76,38 +79,54 @@
 		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 	
 		<script type="text/javascript" src="${ contextPath }/js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
+
+
+		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-pdb-upload.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-map-protein.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-color-handler.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-page.js?x=${cacheBustValue}"></script> 
+
 	
+
+		Image page and Structure Page Shared
+		
 		<script type="text/javascript" src="${ contextPath }/js/nrseqProteinIdToProteinSequenceVersionIdLookup.js?x=${cacheBustValue}"></script>
 
 		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
-		 
-		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-color-handler.js?x=${cacheBustValue}"></script> 
-		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-page.js?x=${cacheBustValue}"></script> 
+
+		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+
+		<script type="text/javascript" src="${ contextPath }/js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
+
+		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
+				
+		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
+		<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
+--%>
+  
+  <%--  Front End Build  --%>
+  
+  		<script type="text/javascript" src="${ contextPath }/static/js_generated_bundles/data_pages/structureView-bundle.js?x=${cacheBustValue}"></script> 
+  		
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
-		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
+<%--  Replaced with the JS bundle listed next
+			<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
+  --%>
+  		
 		
-		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
-				
-		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-pdb-upload.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-map-protein.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
 		
 		
 		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />

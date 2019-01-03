@@ -38,7 +38,7 @@ var ERROR_MESSAGE_CONSTANTS = {
 
 ////////////
 
-function showErrorMsg( $element, clearMsg ) {
+window.showErrorMsg = function( $element, clearMsg ) {
 	
 	if ( clearMsg === undefined ) { //  If no value passed, default to true;
 		
@@ -75,7 +75,7 @@ function showErrorMsg( $element, clearMsg ) {
 
 /////////////
 
-function hideAllErrorMessages() {
+window.hideAllErrorMessages = function() {
 	
 	//  Hides all error messages
 
@@ -93,7 +93,7 @@ function hideAllErrorMessages() {
 
 ////////////
 
-function clearErrorMsg( $element, fadeErrorMsg ) {
+window.clearErrorMsg = function( $element, fadeErrorMsg ) {
 
 	$element.stop( true /* [clearQueue ] */ /*  [, jumpToEnd ] */ );
 	
@@ -124,7 +124,7 @@ function clearErrorMsg( $element, fadeErrorMsg ) {
 
 ////////////
 
-function initShowHideErrorMessage( ) {
+window.initShowHideErrorMessage = function( ) {
 
 
 	var $error_message_close_x_jq  = $(".error_message_close_x_jq");
@@ -135,7 +135,7 @@ function initShowHideErrorMessage( ) {
 
 ////////////
 
-function initShowHideErrorMessageSpecificElements( $elements ) {
+window.initShowHideErrorMessageSpecificElements = function( $elements ) {
 
 	$elements.click( function(eventObject) {
 		
@@ -163,3 +163,4 @@ $(document).ready(function() {
 });
 
 
+export { showErrorMsg, hideAllErrorMessages, clearErrorMsg, initShowHideErrorMessage, initShowHideErrorMessageSpecificElements }

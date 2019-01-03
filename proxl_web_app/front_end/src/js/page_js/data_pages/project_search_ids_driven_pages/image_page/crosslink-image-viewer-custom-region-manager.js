@@ -97,7 +97,7 @@ customRegionManager.prototype.handleSuccessfulSave = function( params, regionDat
     this.hideAllDialogs();
     this.showSuccess( "Data saved to database." );
 
-    drawSvg();
+    window.imagePagePrimaryRootCodeObject.call__drawSvg();
 
 }
 
@@ -157,8 +157,8 @@ customRegionManager.prototype.validateRegionData = function ( regionArray, prote
             this.showError( "End position must be greater than start position. (Region #" + ( i + 1 ) + ")" );
             return false;
         }
-        if( endPosition > _proteinLengths.getProteinLength( proteinId ) ) {
-            this.showError( "End position is passed the end of the protein. Protein length is: " +  _proteinLengths.getProteinLength( proteinId ) + " (Region #" + ( i + 1 ) + ")" );
+        if( endPosition > window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( proteinId ) ) {
+            this.showError( "End position is passed the end of the protein. Protein length is: " +  window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( proteinId ) + " (Region #" + ( i + 1 ) + ")" );
             return false;
         }
 
@@ -257,15 +257,15 @@ customRegionManager.prototype.populateProteinList  = function(  ) {
 
     var proteinListContainer = $("#custom_region_manager_protein_list");
     
-    for( var i = 0; i < _proteins.length; i++ ) {
+    for( var i = 0; i < window.imagePagePrimaryRootCodeObject.getVariable__v_proteins().length; i++ ) {
 
-        var proteinId = _proteins[ i ];
-        var proteinName = _proteinNames[ proteinId ];
+        var proteinId = window.imagePagePrimaryRootCodeObject.getVariable__v_proteins()[ i ];
+        var proteinName = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ];
 
         var html = "<div data-protein-id=\"" + proteinId + "\" ";
         html += "class=\"custom-region-manager-protein-item";
         
-        if( i === _proteins.length - 1 ) {
+        if( i === window.imagePagePrimaryRootCodeObject.getVariable__v_proteins().length - 1 ) {
             html += " last-item";
         }
         
@@ -633,7 +633,7 @@ customRegionManager.prototype.getCustomRegionDataForProteinsViaAjaxForViewerDisp
             console.log( objectThis._customRegionAnnotationData );
 
             decrementSpinner();
-            loadDataAndDraw( doDraw );
+            window.imagePagePrimaryRootCodeObject.call__loadDataAndDraw( doDraw );
             
 		},
         failure: function(errMsg) {
@@ -660,7 +660,7 @@ customRegionManager.prototype.validateAndSaveRegionsToDatabase = function( param
     var proteinId = params.proteinId;
 
     // need to validate against protein length--need to make sure we know how long it is
-    if( !_proteinLengths._proteinLengthsInternal[ proteinId ] ) {
+    if( !window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths()._proteinLengthsInternal[ proteinId ] ) {
 
         var callback = function( _params ) {
             objectThis.validateAndSaveRegionsToDatabase( _params );
@@ -748,7 +748,7 @@ customRegionManager.prototype.loadProteinSequenceDataForProtein = function( para
 	        		for ( var keysIndex = 0; keysIndex < returnedProteinIdsAndSequences_Keys.length; keysIndex++ ) {
 	        			var proteinId = returnedProteinIdsAndSequences_Keys[ keysIndex ];
 	        			_proteinSequences[ proteinId ] = returnedProteinIdsAndSequences[ proteinId ];
-	        			_proteinLengths.setProteinLength( proteinId, returnedProteinIdsAndSequences[ proteinId ].length )
+	        			window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().setProteinLength( proteinId, returnedProteinIdsAndSequences[ proteinId ].length )
 	        		}
 
 	        		callback( params );
@@ -786,3 +786,6 @@ customRegionManager.prototype.isAnInteger = function( x ) {
 
     return false;
 }
+
+
+export { customRegionManager } 

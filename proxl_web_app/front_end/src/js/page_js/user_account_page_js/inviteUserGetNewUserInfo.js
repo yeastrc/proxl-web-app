@@ -13,7 +13,7 @@ var PAGE_CONSTANTS = {
 };
 
 ///////////////////
-var createAccountFormSubmit = function() {
+window.createAccountFormSubmit = function() {
 	try {
 		var requestData = createAccountGetFormDataAndValidate();
 		if ( requestData === null ) {  //  Error in form data so exit
@@ -34,7 +34,7 @@ var createAccountFormSubmit = function() {
 };
 
 ///////////////////
-var createAccountGetFormDataAndValidate = function() {
+window.createAccountGetFormDataAndValidate = function() {
 
 	hideAllErrorMessages();
 	var $inviteCode = $("#code");
@@ -127,7 +127,7 @@ var createAccountGetFormDataAndValidate = function() {
 };
 
 //////////////////////
-var createAccount = function() {	
+window.createAccount = function() {	
 
 	var requestData = createAccountGetFormDataAndValidate();
 	
@@ -161,7 +161,7 @@ var createAccount = function() {
 	});
 };
 
-var createAccountComplete = function( params ) {
+window.createAccountComplete = function( params ) {
 	var requestData = params.requestData;
 	var responseData = params.responseData;
 	
@@ -198,7 +198,7 @@ var createAccountComplete = function( params ) {
 };
 
 /////////////////
-function initPage() {
+window.initPage = function() {
 	$(document).click( function(eventObject) {
 		try {
 			hideAllErrorMessages();

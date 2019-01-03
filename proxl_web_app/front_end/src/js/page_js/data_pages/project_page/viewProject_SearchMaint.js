@@ -131,7 +131,7 @@ function validateURL(textval) {
 }
 
 
-function addWebLink( searchId ) {
+window.addWebLink = function( searchId ) {
 	var _URL = contextPathJSVar + "/services/searchWebLinks/add";
 	var $linkUrlInputField = $( "input#web-links-url-input-" + searchId );
 	var linkUrl = $linkUrlInputField.val();
@@ -205,7 +205,7 @@ function addWebLink( searchId ) {
 
 
 //Called by "onclick" on HTML element
-function cancelWebLink( id ) {
+window.cancelWebLink = function( id ) {
 	try {
 		$( "#add-web-links-form-span-" + id ).hide();
 		$( "#add-web-links-link-span-" + id ).show();
@@ -216,7 +216,7 @@ function cancelWebLink( id ) {
 }
 
 //Called by "onclick" on HTML element
-function showAddWebLink( id ) {
+window.showAddWebLink = function( id ) {
 	try {
 		$( "input#web-links-url-input-" + id ).val("");
 		$( "input#web-links-label-input-" + id ).val( "" );
@@ -233,7 +233,7 @@ function showAddWebLink( id ) {
 //Files for Search Maint
 
 //Called by "onclick" on HTML element
-function saveSearchFilename( clickThis ) {
+window.saveSearchFilename = function( clickThis ) {
 	try {
 		var _URL = contextPathJSVar + "/services/search_file/updateDisplayFilename";
 		var $clickThis = $( clickThis );
@@ -283,7 +283,7 @@ function saveSearchFilename( clickThis ) {
 
 
 //Called by "onclick" on HTML element
-function cancelSearchFilenameEdit( clickThis ) {
+window.cancelSearchFilenameEdit = function( clickThis ) {
 	try {
 		var $clickThis = $( clickThis );
 		var $display_search_filename_outer_container_jq = $clickThis.closest(".display_search_filename_outer_container_jq");
@@ -299,7 +299,7 @@ function cancelSearchFilenameEdit( clickThis ) {
 
 
 //Called by "onclick" on HTML element
-function showSearchFilenameForm( clickThis ) {
+window.showSearchFilenameForm = function( clickThis ) {
 	try {
 		var $clickThis = $( clickThis );
 		var $display_search_filename_outer_container_jq = $clickThis.closest(".display_search_filename_outer_container_jq");
@@ -317,7 +317,7 @@ function showSearchFilenameForm( clickThis ) {
 ////////////Search Comment
 ///////////////
 //Called by "onclick" on HTML element
-function showSearchCommentEditForm( clickThis ) {
+window.showSearchCommentEditForm = function( clickThis ) {
 	try {
 		var $clickThis = $( clickThis );
 		var $search_comment_root_jq = $clickThis.closest(".search_comment_root_jq");
@@ -337,7 +337,7 @@ function showSearchCommentEditForm( clickThis ) {
 
 ///////////////
 //Called by "onclick" on HTML element
-function cancelSearchCommentEditForm( clickThis ) {
+window.cancelSearchCommentEditForm = function( clickThis ) {
 	try {
 		var $clickThis = $( clickThis );
 		var $search_comment_root_jq = $clickThis.closest(".search_comment_root_jq");
@@ -354,7 +354,7 @@ function cancelSearchCommentEditForm( clickThis ) {
 ///////////////
 
 //Called by "onclick" on HTML element
-function updateSearchComment( clickThis ) {
+window.updateSearchComment = function( clickThis ) {
 	try {
 		var _URL = contextPathJSVar + "/services/searchComment/updateText";
 		var $clickThis = $( clickThis );
@@ -399,7 +399,7 @@ function updateSearchComment( clickThis ) {
 
 
 //Called by "onclick" on HTML element
-function addComment( searchId ) {
+window.addComment = function( searchId ) {
 	try {
 		var _URL = contextPathJSVar + "/services/searchComment/add";
 		var comment = $( "input#comment-input-" + searchId ).val();
@@ -451,7 +451,7 @@ function addComment( searchId ) {
 
 
 //Called by "onclick" on HTML element
-function cancelComment( id ) {
+window.cancelComment = function( id ) {
 	try {
 		$( "span#add-comment-form-span-" + id ).hide();
 		$( "span#add-comment-link-span-" + id ).show();
@@ -462,7 +462,7 @@ function cancelComment( id ) {
 }
 
 //Called by "onclick" on HTML element
-function showAddComment( id ) {
+window.showAddComment = function( id ) {
 	try {
 		$( "span#add-comment-form-span-" + id ).show();
 		$( "span#add-comment-link-span-" + id ).hide();
@@ -475,7 +475,7 @@ function showAddComment( id ) {
 
 //Delete Search processing
 /////////////////
-var deleteSearchClickHandler = function(clickThis, eventObject) {
+window.deleteSearchClickHandler = function(clickThis, eventObject) {
 	openConfirmDeleteSearchOverlay(clickThis, eventObject);
 	return;
 };
@@ -515,7 +515,7 @@ var openConfirmDeleteSearchOverlay = function(clickThis, eventObject) {
 };
 
 ///////////
-var closeConfirmDeleteSearchOverlay = function(clickThis, eventObject) {
+window.closeConfirmDeleteSearchOverlay = function(clickThis, eventObject) {
 	var $delete_search_confirm_button = $("#delete_search_confirm_button");
 	$delete_search_confirm_button.data("projectSearchId", null);
 	$(".delete_search_overlay_show_hide_parts_jq").hide();
@@ -523,7 +523,7 @@ var closeConfirmDeleteSearchOverlay = function(clickThis, eventObject) {
 
 /////////////////
 //  user confirms search delete
-var deleteSearchConfirmed = function(clickThis, eventObject) {
+window.deleteSearchConfirmed = function(clickThis, eventObject) {
 	var $clickThis = $(clickThis);
 	var projectSearchId = $clickThis.data("projectSearchId");
 	if ( projectSearchId === undefined || projectSearchId === null ) {
@@ -582,7 +582,7 @@ var deleteSearchConfirmedResponse = function( params ) {
 //  Delete Search Comment processing
 
 /////////////////
-var deleteSearchCommentClickHandler = function(clickThis) {
+window.deleteSearchCommentClickHandler = function(clickThis) {
 	openConfirmDeleteSearchCommentOverlay(clickThis);
 	return;
 };
@@ -614,7 +614,7 @@ var openConfirmDeleteSearchCommentOverlay = function(clickThis) {
 };
 
 ///////////
-var closeConfirmDeleteSearchCommentOverlay = function(clickThis, eventObject) {
+window.closeConfirmDeleteSearchCommentOverlay = function(clickThis, eventObject) {
 	var $delete_search_comment_confirm_button = $("#delete_search_comment_confirm_button");
 	$delete_search_comment_confirm_button.data("searchCommentId", null);
 	$(".delete_search_comment_overlay_show_hide_parts_jq").hide();
@@ -622,7 +622,7 @@ var closeConfirmDeleteSearchCommentOverlay = function(clickThis, eventObject) {
 
 /////////////////
 //put click handler for this on #delete_search_comment_confirm_button
-var deleteSearchCommentConfirmed = function(clickThis, eventObject) {
+window.deleteSearchCommentConfirmed = function(clickThis, eventObject) {
 	var $clickThis = $(clickThis);
 	var searchCommentId = $clickThis.data("searchCommentId");
 	if ( searchCommentId === undefined || searchCommentId === null ) {
@@ -663,7 +663,7 @@ var deleteSearchCommentConfirmed = function(clickThis, eventObject) {
 //Delete Search Web Link processing
 
 /////////////////
-var deleteSearchWebLinkClickHandler = function(clickThis, eventObject) {
+window.deleteSearchWebLinkClickHandler = function(clickThis, eventObject) {
 	openConfirmDeleteSearchWebLinkOverlay(clickThis, eventObject);
 	return;
 };
@@ -695,7 +695,7 @@ var openConfirmDeleteSearchWebLinkOverlay = function(clickThis, eventObject) {
 };
 
 ///////////
-var closeConfirmDeleteSearchWebLinkOverlay = function(clickThis, eventObject) {
+window.closeConfirmDeleteSearchWebLinkOverlay = function(clickThis, eventObject) {
 	var $delete_search_web_link_confirm_button = $("#delete_search_web_link_confirm_button");
 	$delete_search_web_link_confirm_button.data("searchwebLinkId", null);
 	$(".delete_search_web_link_overlay_show_hide_parts_jq").hide();
@@ -703,7 +703,7 @@ var closeConfirmDeleteSearchWebLinkOverlay = function(clickThis, eventObject) {
 
 /////////////////
 //put click handler for this on #delete_search_web_link_confirm_button
-var deleteSearchWebLinkConfirmed = function(clickThis, eventObject) {
+window.deleteSearchWebLinkConfirmed = function(clickThis, eventObject) {
 	var $clickThis = $(clickThis);
 	var searchwebLinkId = $clickThis.data("searchwebLinkId");
 	if ( searchwebLinkId === undefined || searchwebLinkId === null ) {
@@ -743,7 +743,7 @@ var deleteSearchWebLinkConfirmed = function(clickThis, eventObject) {
 
 
 //Called by "onclick" on HTML element
-function showSearchNameForm( id ) {
+window.showSearchNameForm = function( id ) {
 	try {
 		$( "span#search-name-normal-" + id ).hide();
 		$( "span#search-name-edit-" + id ).show();	
@@ -753,7 +753,7 @@ function showSearchNameForm( id ) {
 	}
 }
 
-function cancelNameEdit( id ) {
+window.cancelNameEdit = function( id ) {
 	try {
 		$( "span#search-name-edit-" + id ).hide();
 		$( "span#search-name-normal-" + id ).show();
@@ -766,7 +766,7 @@ function cancelNameEdit( id ) {
 
 
 //Called by "onclick" on HTML element
-function saveName( projectSearchId ) {
+window.saveName = function( projectSearchId ) {
 	try {
 		var _URL = contextPathJSVar + "/services/searchName/save";
 		var name = $( "input#search-name-value-" + projectSearchId ).val();
@@ -800,3 +800,9 @@ function saveName( projectSearchId ) {
 		throw e;
 	}
 }
+
+////////////////
+
+var viewProject_SearchMaint = null;
+
+export { viewProject_SearchMaint }

@@ -4,6 +4,7 @@
 
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
+<%--  projectsSearchList.jsp --%>
 
 <%--  List all the Projects and their searches for a user  --%>
 
@@ -14,7 +15,7 @@
  <c:set var="headerAdditions">
  
 
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js"></script> 
+	<script type="text/javascript" src="static/js_generated_bundles/header_section_every_page/header_section_every_page-bundle.js?x=${ cacheBustValue }"></script>
 
  </c:set>
 

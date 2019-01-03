@@ -12,8 +12,6 @@
  <c:set var="headerAdditions">
  
 
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js"></script> 
-
 	<!-- Handlebars templating library   -->
 	
 	<%--  
@@ -23,9 +21,14 @@
 	<!-- use minimized version  -->
 	<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
 
+	<script type="text/javascript" src="static/js_generated_bundles/data_pages/projectsListPage-bundle.js?x=${ cacheBustValue }"></script>
 
+<%--  Moved to Front End Build Bundles		
+	
+		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js"></script> 
 	
 	<script type="text/javascript" src="${ contextPath }/js/listProjectsPage.js?x=${cacheBustValue}"></script>
+--%>
 
  </c:set>
 

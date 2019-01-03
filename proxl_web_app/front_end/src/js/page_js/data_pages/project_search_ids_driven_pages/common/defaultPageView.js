@@ -189,3 +189,8 @@ var DefaultPageView = function() {
 
 //  Object from class
 var defaultPageView = new DefaultPageView(); 
+
+window.defaultPageView = defaultPageView;
+
+export { defaultPageView }
+

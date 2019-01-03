@@ -14,7 +14,7 @@
 
 	});
 	
-	var addToolTips = function ( $element ) {
+	window.addToolTips = function ( $element ) {
 
 		var $elements;
 		
@@ -39,7 +39,7 @@
 	};
 	
 
-	var addSingleGenericProxlToolTip = function ( $element ) {
+	window.addSingleGenericProxlToolTip = function ( $element ) {
 		
 		var tooltipText = $element.attr("data-tooltip");			
 		
@@ -55,3 +55,5 @@
 	    });		
 		
 	};
+
+export { addToolTips, addSingleGenericProxlToolTip }
