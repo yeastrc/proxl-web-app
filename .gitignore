@@ -1,6 +1,8 @@
 *.class
 
 /.gradle/
+aa_ant__build_all_proxl_config.properties
+
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
