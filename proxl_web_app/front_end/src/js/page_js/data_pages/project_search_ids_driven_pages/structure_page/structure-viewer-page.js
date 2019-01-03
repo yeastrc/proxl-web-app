@@ -66,9 +66,18 @@ window.refreshData = function() {
 	window.structurePagePrimaryRootCodeObject.call__refreshData();
 }
 
+
 window.popoutViewer = function() {
 	window.structurePagePrimaryRootCodeObject.call__popoutViewer();
 }
+
+window.closePopout = function() {
+	window.structurePagePrimaryRootCodeObject.call__closePopout();
+}
+
+
+
+
 
 window.showDistanceReportPanel = function() {
 	window.structurePagePrimaryRootCodeObject.call__showDistanceReportPanel();
@@ -152,10 +161,17 @@ var StructurePagePrimaryRootCodeClass = function() {
 		refreshData();
 	}
 
-	//  These are all called from the JSP
+	//  These are all called from the JSP (and some also from HTML in this JS)
+	
 	this_OfOutermostObjectOfClass.call__popoutViewer = function() {
 		popoutViewer();
 	}
+	this_OfOutermostObjectOfClass.call__closePopout = function() {
+		closePopout();
+	}
+	
+	
+	
 	this_OfOutermostObjectOfClass.call__showDistanceReportPanel = function() {
 		showDistanceReportPanel();
 	}
@@ -2682,7 +2698,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 		console.log( "called popinViewer()" );
 		
-		$("#popout-link-span").html( "<a href=\"javascript:\" onclick=\"window.structurePagePrimaryRootCodeObject.popoutViewer()\">[Popout Viewer]</a>" );
+		$("#popout-link-span").html( "<a href=\"javascript:\" onclick=\"popoutViewer()\">[Popout Viewer]</a>" );
 		_NEW_WINDOW = undefined;
 		
 		_VIEWER = createViewer();
