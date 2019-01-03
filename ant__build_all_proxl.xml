@@ -34,7 +34,9 @@
 	<!-- This does not fail if the file is not found -->
 	<property file="${config_file_with_path}" />
 	
+	<echo>Properties after read config file:</echo>
 	<echo>gradle.wrapper.executable: ${gradle.wrapper.executable}</echo>
+	<echo>npm.executable: ${npm.executable}</echo>
 	
 
 	<!--  -->
@@ -48,10 +50,23 @@
 	</target>
 
 	<!--
+		npm install depends on prepare
+		executes 'npm install' in the web app to populate 'node_modules' folder
+	 -->
+	<target name="npm_install" depends="prepare">
+
+		<!--  web app - npm install  -->		
+		<exec executable="${npm.executable}" dir="proxl_web_app/front_end" failonerror="true" >
+			<arg value="install" />
+			<!--   <arg value="XXXX" /> -->
+		</exec>
+	</target>
+	
+	<!--
 		compileAllSubmodules depends on prepare
 		executes external builds for each sub project
 	 -->
-	<target name="compileAllSubmodules" depends="prepare">
+	<target name="compileAllSubmodules" depends="npm_install">
 
 		<!--  Build submodules and create runnable jars -->
 
