@@ -318,7 +318,10 @@ public class ScanFileToSpectralStorageService_Processing {
 				response = callSpectralStorageWebservice.call_UploadScanFile_Submit_Webservice( uploadScanFile_Submit_Request );
 
 				if ( ! response.isStatusSuccess() ) {
-					String msg = "UploadScanFile_Submit: Failed to send scan file to Spectral Storage: response.isStatusSuccess() is false";
+					String msg = "UploadScanFile_Submit: Failed to send scan file to Spectral Storage: response.isStatusSuccess() is false. response.isUploadScanFileTempKey_NotFound(): " 
+							+ response.isUploadScanFileTempKey_NotFound()
+							+ ", response.isNoUploadedScanFile(): "
+							+ response.isNoUploadedScanFile();
 					log.error( msg );
 					throw new ProxlImporterSpectralStorageServiceErrorException(msg);
 				}
