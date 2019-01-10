@@ -144,6 +144,8 @@ public class ScanFileToSpectralStorageService_Processing {
 		int retryCount = 0;
 
 		while( true ) {  // use 'break;' inside loop to exit
+			
+			response = null; // reset to null for each iteration of loop
 
 			retryCount++;
 
@@ -166,7 +168,7 @@ public class ScanFileToSpectralStorageService_Processing {
 				response = callSpectralStorageWebservice.call_UploadScanFile_Init_Webservice( webserviceRequest );
 
 				if ( ! response.isStatusSuccess() ) {
-					String msg = "Failed to send scan file to Spectral Storage  UploadScanFileTempKey: " 
+					String msg = "UploadScanFile_Init: Failed to send scan file to Spectral Storage. response.isStatusSuccess() is false.  UploadScanFileTempKey: " 
 							 + response.getUploadScanFileTempKey()
 							 + ", Scan File: " + scanFileWithPath.getAbsolutePath();
 					log.error( msg );
@@ -183,7 +185,7 @@ public class ScanFileToSpectralStorageService_Processing {
 						scanProcessStatusKeyResponsePart = " UploadScanFileTempKey: " + response.getUploadScanFileTempKey();
 					}
 					
-					String msg = "Send Scan File to Spectral Storage Service send threw exception and failed for retryCount == SEND_FILE_RETRY_COUNT. " + scanProcessStatusKeyResponsePart
+					String msg = "UploadScanFile_Init: Send Scan File to Spectral Storage Service send threw exception and failed for retryCount == SEND_FILE_RETRY_COUNT. " + scanProcessStatusKeyResponsePart
 						+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
 					log.error( msg, e );
 					throw new ProxlImporterSpectralStorageServiceErrorException( msg, e );
@@ -215,11 +217,13 @@ public class ScanFileToSpectralStorageService_Processing {
 		int retryCount = 0;
 
 		while( true ) {  // use 'break;' inside loop to exit
+			
+			response = null;
 
 			retryCount++;
 
 			if ( retryCount > SEND_FILE_RETRY_COUNT_MAX ) {
-				String msg = "Send Scan File to Spectral Storage Service failed for retryCount > SEND_FILE_RETRY_COUNT.  StatusSuccess: " + response.isStatusSuccess()
+				String msg = "UploadSendScanFile: Send Scan File to Spectral Storage Service failed for retryCount > SEND_FILE_RETRY_COUNT.  StatusSuccess: " + response.isStatusSuccess()
 					+ ", UploadScanFileTempKey: " + uploadScanFile_Init_Response.getUploadScanFileTempKey()
 					+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
 				log.error( msg );
@@ -227,11 +231,9 @@ public class ScanFileToSpectralStorageService_Processing {
 			}
 			
 			if ( retryCount > 1 ) {
-				log.warn( "In sendScanFileToSpectralStorageService(...) retryCount: " + retryCount + ", scanFileWithPath: " + scanFileWithPath.getAbsolutePath() );
-				
+				log.warn( "UploadSendScanFile: In sendScanFileToSpectralStorageService(...) retryCount: " + retryCount + ", scanFileWithPath: " + scanFileWithPath.getAbsolutePath() );
 			}
 			
-
 			UploadScanFile_UploadScanFile_Request uploadScanFile_UploadScanFile_Request = new UploadScanFile_UploadScanFile_Request();
 			uploadScanFile_UploadScanFile_Request.setUploadScanFileTempKey( uploadScanFile_Init_Response.getUploadScanFileTempKey() );
 			uploadScanFile_UploadScanFile_Request.setScanFile( scanFileWithPath );
@@ -241,7 +243,7 @@ public class ScanFileToSpectralStorageService_Processing {
 				response = callSpectralStorageWebservice.call_UploadScanFile_UploadScanFile_Service( uploadScanFile_UploadScanFile_Request );
 
 				if ( ! response.isStatusSuccess() ) {
-					String msg = "Failed to Submit scan file to Spectral Storage  UploadScanFileTempKey: " 
+					String msg = "UploadSendScanFile: Failed to Submit scan file to Spectral Storage. response.isStatusSuccess() is false.  UploadScanFileTempKey: " 
 							 + uploadScanFile_Init_Response.getUploadScanFileTempKey()
 							 + ", Scan File: " + scanFileWithPath.getAbsolutePath();
 					log.error( msg );
@@ -259,7 +261,7 @@ public class ScanFileToSpectralStorageService_Processing {
 							+ ", UploadScanFileTempKey: " + uploadScanFile_Init_Response.getUploadScanFileTempKey();
 					}
 					
-					String msg = "Send Scan File to Spectral Storage Service send threw exception and failed for retryCount == SEND_FILE_RETRY_COUNT. " + scanProcessStatusKeyResponsePart
+					String msg = "UploadSendScanFile: Send Scan File to Spectral Storage Service send threw exception and failed for retryCount == SEND_FILE_RETRY_COUNT. " + scanProcessStatusKeyResponsePart
 						+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
 					log.error( msg, e );
 					throw new ProxlImporterSpectralStorageServiceErrorException( msg, e );
@@ -296,7 +298,7 @@ public class ScanFileToSpectralStorageService_Processing {
 			retryCount++;
 
 			if ( retryCount > SEND_FILE_RETRY_COUNT_MAX ) {
-				String msg = "Send Scan File to Spectral Storage Service failed for retryCount > SEND_FILE_RETRY_COUNT.  StatusSuccess: " + response.isStatusSuccess()
+				String msg = "UploadScanFile_Submit: Send Scan File to Spectral Storage Service failed for retryCount > SEND_FILE_RETRY_COUNT.  StatusSuccess: " + response.isStatusSuccess()
 					+ ", UploadScanFileTempKey: " + uploadScanFile_Init_Response.getUploadScanFileTempKey()
 					+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
 				log.error( msg );
@@ -304,7 +306,7 @@ public class ScanFileToSpectralStorageService_Processing {
 			}
 
 			if ( retryCount > 1 ) {
-				log.warn( "In submitScanFileToSpectralStorageService(...) retryCount: " + retryCount + ", scanFileWithPath: " + scanFileWithPath.getAbsolutePath() );
+				log.warn( "UploadScanFile_Submit: In submitScanFileToSpectralStorageService(...) retryCount: " + retryCount + ", scanFileWithPath: " + scanFileWithPath.getAbsolutePath() );
 				
 			}
 			
@@ -316,7 +318,7 @@ public class ScanFileToSpectralStorageService_Processing {
 				response = callSpectralStorageWebservice.call_UploadScanFile_Submit_Webservice( uploadScanFile_Submit_Request );
 
 				if ( ! response.isStatusSuccess() ) {
-					String msg = "Failed to send scan file to Spectral Storage";
+					String msg = "UploadScanFile_Submit: Failed to send scan file to Spectral Storage: response.isStatusSuccess() is false";
 					log.error( msg );
 					throw new ProxlImporterSpectralStorageServiceErrorException(msg);
 				}
@@ -333,8 +335,9 @@ public class ScanFileToSpectralStorageService_Processing {
 						scanProcessStatusKeyResponsePart = " ScanProcessStatusKey: " + response.getScanProcessStatusKey();
 					}
 					
-					String msg = "Send Scan File to Spectral Storage Service send threw exception and failed for retryCount == SEND_FILE_RETRY_COUNT. " + scanProcessStatusKeyResponsePart
-						+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
+					String msg = "UploadScanFile_Submit: Send Scan File to Spectral Storage Service send threw exception and failed for retryCount == SEND_FILE_RETRY_COUNT. " + scanProcessStatusKeyResponsePart
+						+ ", Scan File: " + scanFileWithPath.getAbsolutePath()
+						+ "\n Exception Caught toString: " + e.toString();
 					log.error( msg, e );
 					throw new ProxlImporterSpectralStorageServiceErrorException( msg, e );
 				}
