@@ -8,7 +8,12 @@
 
 
  --%>
- 
+  	
+  	<%--  Make all relative URLs start after the context path request.getContextPath() --%>
+	<base href="<%= request.getContextPath() %>/">  <%-- The trailing '/' in the href is required --%>
+	
+	
+	
     <link rel="icon" href="${ contextPath }/images/favicon.ico" />
  
 	<script type="text/javascript" src="${contextPath}/js/libs/modernizr.v2.7.1__custom.39924_min.js"></script>
