@@ -154,10 +154,10 @@
 										  	value has to be 
 										  	<c:choose>
 										  	 <c:when test="${ annotationCutoffDataEntry. annotationFilterDirectionAbove }">
-										  	   >= 
+										  	   &gt;= 
 										  	 </c:when>
 										  	 <c:otherwise>
-										  	   <=
+										  	   &lt;=
 										  	 </c:otherwise>
 										  	</c:choose>
 										  	 
